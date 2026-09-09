@@ -262,6 +262,180 @@ ok("6a. this view declares no fixed or absolute positioning",
    "if that is intended, the selector goes in the corners list in " +
    "verify-hatchoverlap.mjs and gets a gutter");
 
+// ── 7. EDITING KEEPS WHAT YOU SAVED ─────────────────────────────────────
+console.log("\nTEST 7 - a saved session survives a round trip through the editor");
+
+// THE ASSERTION THIS WHOLE FEATURE TURNS ON.
+//
+// The first implementation loaded saved sessions through
+// buildSessionFromSelection(), which intersects the ids with the
+// candidate pool for the session type -- filtered by categories,
+// equipment and conditions AS THEY ARE NOW. Measured on this fixture:
+// FOUR movements in, TWO back, and the save that followed reported
+// "Saved. Your changes are in."
+//
+// Opening a session to change one thing, losing half of it, and being
+// told it worked is worse than not being able to edit at all.
+//
+// Starting a saved session already keeps every movement -- no category,
+// equipment or condition filter is applied on that path. Editing must
+// not enforce a rule starting does not.
+
+const savedData = await import(B + "data/saved-sessions.js");
+const builder   = await import(B + "session-builder.js");
+
+fixture();
+const roundTrip = savedData.savedSessions()[0] || null;
+ok("7pc. positive control: there is a saved session to edit",
+   !!roundTrip && (roundTrip.exerciseIds || []).length > 0,
+   "no fixture session - everything below measures nothing");
+
+if (roundTrip) {
+  const { exercises } = savedData.resolveSavedSession(roundTrip);
+  const rebuilt = builder.buildSessionFromSaved({
+    sessionType:  roundTrip.sessionType,
+    durationMins: roundTrip.durationMins,
+    exercises,
+    title:        roundTrip.name
+  });
+
+  ok("7a. the editor builds something from it", !!rebuilt,
+     "buildSessionFromSaved returned null for a session that resolves");
+
+  const backIds = (rebuilt?.exercises || []).map(e => e.id);
+  ok("7b. EVERY resolvable movement comes back",
+     backIds.length === exercises.length,
+     `went in with ${exercises.length}, came back with ${backIds.length}: ` +
+     `lost ${exercises.map(e => e.id).filter(id => !backIds.includes(id)).join(", ")}`);
+
+  ok("7c. and they are the same ones, not replacements",
+     exercises.every(e => backIds.includes(e.id)),
+     `in:  ${exercises.map(e => e.id).join(", ")}\n        out: ${backIds.join(", ")}`);
+
+  ok("7d. the person's own name is kept, not replaced by a type label",
+     rebuilt?.title === roundTrip.name,
+     `title is "${rebuilt?.title}", the session is called "${roundTrip.name}"`);
+
+  ok("7e. every movement carries a section so the preview can group it",
+     (rebuilt?.exercises || []).every(e => ["warmup", "main", "cooldown"].includes(e.section)),
+     "library exercises carry no section - it is assigned at assembly, and " +
+     "one without it disappears from a preview that groups by section");
+
+  ok("7f. and a role, so the card does not print UNDEFINED (ROLE-1)",
+     (rebuilt?.exercises || []).every(e => ["warmup", "main", "cooldown"].includes(e.role)),
+     "a new assembler that forgets the stamp reopens ROLE-1 on this path");
+
+  // The write-back, end to end.
+  // Counted BEFORE, not asserted as a literal: the fixture holds more
+  // than one session, and hard-coding 1 here asserted the fixture rather
+  // than the behaviour. What matters is that editing adds no record.
+  const countBefore = savedData.savedSessions().length;
+  const res = savedData.updateSavedSession(roundTrip.id, {
+    name:        roundTrip.name,
+    exerciseIds: backIds
+  });
+  const after = savedData.savedSessions().find(x => x.id === roundTrip.id);
+  ok("7g. saving writes back to the SAME record, not a new one",
+     res.ok && savedData.savedSessions().length === countBefore,
+     `${countBefore} records before the edit, ${savedData.savedSessions().length} after - ` +
+     `editing spawned a copy instead of overwriting`);
+  ok("7h. with nothing lost on the way out",
+     (after?.exerciseIds || []).length === exercises.length,
+     `saved ${after?.exerciseIds?.length} of ${exercises.length}`);
+  ok("7i. createdAt untouched, so the list does not reshuffle",
+     after?.createdAt === roundTrip.createdAt,
+     "editing moved the session in a list ordered by createdAt");
+  ok("7j. updatedAt stamped", !!after?.updatedAt);
+}
+
+// ── 8. AN EDIT CANNOT EMPTY A SESSION ───────────────────────────────────
+console.log("\nTEST 8 - an edit cannot leave a session with nothing in it");
+
+fixture();
+const target = savedData.savedSessions()[0];
+const emptied = savedData.updateSavedSession(target.id, { exerciseIds: [] });
+ok("8a. it is refused", emptied.ok === false && emptied.reason === "empty",
+   `returned ${JSON.stringify(emptied)}`);
+ok("8b. and nothing changed",
+   (savedData.savedSessions().find(x => x.id === target.id)?.exerciseIds || []).length ===
+   (target.exerciseIds || []).length,
+   "an emptying edit went through - that is a deletion wearing an edit's " +
+   "clothes, and it leaves a row whose start button 2b already suppresses");
+
+const blankName = savedData.updateSavedSession(target.id, { name: "   " });
+ok("8c. and a name cannot be emptied either",
+   blankName.ok === false && blankName.reason === "name",
+   "creation requires a name; an edit that can remove it is a second set " +
+   "of rules that will drift from the first");
+
+// ── 9. THE EDIT ROUTE ITSELF, NOT JUST THE ASSEMBLER ────────────────────
+console.log("\nTEST 9 - the Edit button actually reaches the preserving builder");
+
+// Test 7 calls buildSessionFromSaved() directly. That proves the
+// assembler is right and proves NOTHING about the wiring: reversing the
+// edit route back to buildSessionFromSelection() -- the exact defect
+// this feature was rebuilt to fix -- left test 7 entirely green.
+//
+// A gate that verifies a function while the screen calls a different one
+// is the source-text problem wearing a fixture's clothes.
+
+const builderView = await import(B + "views/session-builder-ui.js?saved2");
+
+fixture();
+const editTarget = savedData.savedSessions()[0];
+const savedCount = (editTarget.exerciseIds || []).length;
+
+store.set("sessionBuilderPreselect", {
+  mode: "edit", savedSessionId: editTarget.id, returnTo: "saved-sessions"
+});
+
+main.innerHTML = builderView.render();
+builderView.onMount();
+
+ok("9pc. positive control: the builder reached the PREVIEW",
+   !!main.querySelector("#sb-save-open"),
+   `landed on: ${(main.textContent || "").replace(/\s+/g, " ").trim().slice(0, 90)}`);
+
+ok("9a. and the preselect was consumed",
+   !store.get("sessionBuilderPreselect"),
+   "an edit preselect left in the store re-opens this session on the next build");
+
+// Against the RESOLVABLE count, not the saved id count. This fixture
+// deliberately carries an id that is gone from the library, and an id
+// with no exercise behind it cannot be shown by anything. Comparing to
+// exerciseIds.length asserted the fixture's own gap as a defect.
+const resolvable = savedData.resolveSavedSession(editTarget).exercises.length;
+const rows  = main.querySelectorAll('[role="listitem"]').length;
+const swaps = main.querySelectorAll("[data-swap-index]").length;
+
+ok("9b. EVERY resolvable saved movement is on the preview",
+   rows === resolvable,
+   `${resolvable} of the session's ${savedCount} ids resolve, the editor ` +
+   `shows ${rows} rows. This is the defect the feature was rebuilt for: ` +
+   `the route going through a builder that filters against today's ` +
+   `categories, equipment and conditions instead of one that keeps what ` +
+   `was saved`);
+
+// Counted separately, because a row and a CHANGEABLE row are not the
+// same thing. The edit preview first shipped with every movement on
+// screen and none of them swappable -- candidatePools was never built,
+// so _canSwap() answered false for all of them and editing meant
+// renaming. Rows alone would have called that a pass.
+ok("9e. and they can actually be changed",
+   swaps === rows && swaps > 0,
+   `${rows} rows, ${swaps} of them changeable. Editing a saved session ` +
+   `that cannot be changed is a rename with extra steps`);
+
+ok("9c. under the person's own name",
+   /\b(Sunday|Ten minutes)\b/.test(main.textContent || "") ||
+   (main.textContent || "").includes(editTarget.name),
+   `the preview does not show "${editTarget.name}"`);
+
+ok("9d. and the save action offers to change it, not to make a second one",
+   /save your changes/i.test(main.querySelector("#sb-save-open")?.textContent || ""),
+   `the button says "${main.querySelector("#sb-save-open")?.textContent.trim()}" - ` +
+   `an edit that reads as a fresh save invites a duplicate`);
+
 console.log(fails === 0
   ? "\nSAVED-1: all assertions pass\n"
   : `\nSAVED-1: ${fails} FAILED\n`);

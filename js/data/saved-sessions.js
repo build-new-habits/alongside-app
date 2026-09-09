@@ -1,5 +1,26 @@
 /**
  * saved-sessions.js
+ * 08 Sep 2026 v2
+ *
+ * v2 - SAVED-2. updateSavedSession(). Graeme's decision: saved sessions
+ *   should be editable and deletable.
+ *
+ *   "Iterations", so editing OVERWRITES: no version history, no
+ *   "Sunday legs v2". A saved session is one thing that changes over
+ *   time, which is exactly what makes deleteSavedSession() the only way
+ *   to lose one.
+ *
+ *   Validates by saveSession()'s rules rather than its own. An edit that
+ *   could set a name creation would have rejected is a second set of
+ *   rules, and the two would drift the first time either moved. An edit
+ *   that empties the movement list is refused too: that is a deletion
+ *   wearing an edit's clothes, and it leaves a row whose start button
+ *   SAVED-1b already has to suppress.
+ *
+ *   createdAt is NOT touched. The list orders by it, so stamping it on
+ *   every edit would shuffle the session somebody uses most to the top
+ *   of their own list for no reason they asked for.
+ *
  * 06 Sep 2026 v1
  *
  * YOUR-OWN. Sessions the person built and kept.
@@ -100,6 +121,67 @@ export function saveSession(name, built) {
 
   store.set("savedSessions", [...list(), record]);
   return { ok: true, saved: record };
+}
+
+/**
+ * SAVED-2, 08 Sep 2026. Write a change back to an existing saved session.
+ *
+ * Graeme's decision, asked and answered: saved sessions should be
+ * editable and deletable. "Iterations" -- so this OVERWRITES. There is no
+ * version history and no "Sunday legs v2": a saved session is one thing
+ * that changes over time, which is exactly what makes
+ * deleteSavedSession() the only way to lose one.
+ *
+ * Validates by the same rules as saveSession() rather than its own: an
+ * edit that could set a name saveSession() would have rejected is a
+ * second set of rules, and the two would drift the first time either
+ * changed. Empty or whitespace-only names are refused here too, so an
+ * edit cannot empty a name that creation required.
+ *
+ * createdAt is NOT touched. The list orders by it, so stamping it on
+ * every edit would shuffle the session somebody uses most to the top of
+ * their own list for no reason they asked for.
+ *
+ * Returns the same { ok, reason } shape as saveSession() so callers do
+ * not need to learn a second one.
+ */
+export function updateSavedSession(id, changes = {}) {
+  if (!isPremium()) return { ok: false, reason: "tier" };
+
+  const before = list();
+  const idx = before.findIndex(s => s && s.id === id);
+  if (idx === -1) return { ok: false, reason: "missing" };
+
+  const next = { ...before[idx] };
+
+  if ("name" in changes) {
+    const clean = String(changes.name || "").trim().slice(0, NAME_MAX);
+    if (!clean) return { ok: false, reason: "name" };
+    next.name = clean;
+  }
+
+  if ("exerciseIds" in changes) {
+    const ids = Array.isArray(changes.exerciseIds)
+      ? changes.exerciseIds.filter(Boolean)
+      : null;
+    // A session with nothing in it is not an edit, it is a deletion
+    // wearing an edit's clothes -- and it would leave a row whose start
+    // button SAVED-1b already has to suppress. If somebody wants it gone
+    // they can say so.
+    if (!ids || ids.length === 0) return { ok: false, reason: "empty" };
+    next.exerciseIds = ids;
+  }
+
+  if ("durationMins" in changes) {
+    next.durationMins = Number(changes.durationMins) || null;
+  }
+
+  next.updatedAt = new Date().toISOString();
+
+  const after = [...before];
+  after[idx] = next;
+  store.set("savedSessions", after);
+  return { ok: true, saved: next };
 }
 
 export function deleteSavedSession(id) {

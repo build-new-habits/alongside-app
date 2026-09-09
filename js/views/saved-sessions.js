@@ -1,5 +1,23 @@
 /**
  * js/views/saved-sessions.js
+ * 08 Sep 2026 v3
+ *
+ * v3 - SAVED-2. Edit and delete, on Graeme's decision.
+ *
+ *   Edit hands off to the builder's preview; nothing is edited here.
+ *   Delete asks first, in two taps, because nothing here is recoverable
+ *   and every row looks alike.
+ *
+ *   Every control names the SESSION in its accessible name -- four rows
+ *   of "Edit" and "Delete" are four identical announcements to somebody
+ *   tabbing through, and one of them is destructive. WCAG 2.2 AA 2.4.6.
+ *
+ *   Focus is moved deliberately at each step: to the confirmation when
+ *   it opens, back to the Delete button if they keep it, and to the
+ *   heading when the row they were standing in has gone. The h1 carries
+ *   tabindex="-1" for that last one, or .focus() is a no-op and focus
+ *   falls to the top of the document.
+ *
  * 08 Sep 2026 v2
  *
  * v2 - SAVED-1b. A session whose movements have ALL been retired offered
@@ -91,8 +109,18 @@ import { isPremium } from '../auth.js';
 import {
   savedSessions,
   resolveSavedSession,
-  markSavedSessionUsed
+  markSavedSessionUsed,
+  deleteSavedSession
 } from '../data/saved-sessions.js';
+
+/**
+ * SAVED-2, 08 Sep 2026. The id whose delete is awaiting confirmation, or
+ * null. Ephemeral: deliberately module state and not a store field,
+ * because a half-finished confirmation is not something to survive a
+ * reload -- coming back to the app to find a delete still poised over a
+ * session would be alarming for no gain.
+ */
+let confirmingDeleteId = null;
 
 export const centered = false;
 
@@ -188,6 +216,39 @@ function _row(rec) {
           Start ${_esc(rec.name)}
         </button>
       ` : ''}
+
+      <!--
+        SAVED-2. Edit and delete, on Graeme's decision: saved sessions
+        should be editable and deletable.
+
+        Every control names the SESSION in its accessible name. Four rows
+        of "Edit" and "Delete" are four identical announcements to
+        somebody tabbing through, and choosing the wrong one here is
+        destructive. WCAG 2.2 AA 2.4.6.
+      -->
+      ${confirmingDeleteId === rec.id ? `
+        <div class="saved-row__confirm" role="group"
+             aria-label="Confirm deleting ${_esc(rec.name)}">
+          <p class="saved-row__confirm-text" role="status">
+            Delete ${_esc(rec.name)}? This cannot be undone.
+          </p>
+          <button class="btn btn-secondary btn-full"
+                  data-delete-cancel="${_esc(rec.id)}"
+                  aria-label="Keep ${_esc(rec.name)}">Keep it</button>
+          <button class="btn btn-ghost btn-full saved-row__danger"
+                  data-delete-confirm="${_esc(rec.id)}"
+                  aria-label="Yes, delete ${_esc(rec.name)} permanently">
+            Delete it
+          </button>
+        </div>
+      ` : `
+        <div class="saved-row__actions">
+          <button class="btn btn-ghost" data-edit-id="${_esc(rec.id)}"
+                  aria-label="Edit ${_esc(rec.name)}">Edit</button>
+          <button class="btn btn-ghost" data-delete-id="${_esc(rec.id)}"
+                  aria-label="Delete ${_esc(rec.name)}">Delete</button>
+        </div>
+      `}
     </li>
   `;
 }
@@ -201,7 +262,14 @@ export function render() {
       ? `
         <div class="view saved-sessions-view">
           <div class="view-header">
-            <h1>Your own sessions</h1>
+            <!-- SAVED-2. tabindex="-1" so focus can be SENT here after a delete
+             removes the row the person was standing in. Without it .focus()
+             is a no-op and focus falls to the top of the document, which on
+             a long list means starting the page again. Negative, so it never
+             enters the tab order. All three states carry it: a heading that
+             is focusable on one screen and not another is a difference with
+             no reason behind it. -->
+        <h1 tabindex="-1">Your own sessions</h1>
             <p class="text-secondary">Sessions you put together yourself.</p>
           </div>
           <div class="card">
@@ -214,7 +282,7 @@ export function render() {
       : `
         <div class="view saved-sessions-view">
           <div class="view-header">
-            <h1>Your own sessions</h1>
+            <h1 tabindex="-1">Your own sessions</h1>
             <p class="text-secondary">Sessions you put together yourself.</p>
           </div>
           <div class="card">
@@ -228,7 +296,7 @@ export function render() {
   return `
     <div class="view saved-sessions-view">
       <div class="view-header">
-        <h1>Your own sessions</h1>
+        <h1 tabindex="-1">Your own sessions</h1>
         <p class="text-secondary">
           ${list.length} saved, newest first.
         </p>
@@ -271,6 +339,59 @@ export function onMount() {
       });
       store.set('usingGeneratedSession', true);
       router.navigate('gym-programme');
+    });
+  });
+
+  // SAVED-2 ──────────────────────────────────────────────────────────
+  const refresh = () => {
+    root.innerHTML = render();
+    onMount();
+  };
+
+  // EDIT. Hands off to the builder's preview, where the swap control
+  // already lets any movement be changed. Nothing is edited here.
+  root.querySelectorAll('[data-edit-id]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      store.set('sessionBuilderPreselect', {
+        mode: 'edit',
+        savedSessionId: btn.dataset.editId,
+        returnTo: 'saved-sessions'
+      });
+      router.navigate('session-builder');
+    });
+  });
+
+  // DELETE, in two taps. Deleting somebody's own authored work on a
+  // single tap, in a list where every row looks alike, is how a session
+  // goes without them meaning it -- and nothing here is recoverable.
+  root.querySelectorAll('[data-delete-id]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      confirmingDeleteId = btn.dataset.deleteId;
+      refresh();
+      // Move focus to the confirmation. Without this the announcement
+      // sits in a region nobody has been sent to, and a keyboard user is
+      // left where a button they pressed no longer exists.
+      root.querySelector('[data-delete-cancel]')?.focus();
+    });
+  });
+
+  root.querySelectorAll('[data-delete-cancel]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      confirmingDeleteId = null;
+      refresh();
+      root.querySelector(`[data-delete-id="${btn.dataset.deleteCancel}"]`)?.focus();
+    });
+  });
+
+  root.querySelectorAll('[data-delete-confirm]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      deleteSavedSession(btn.dataset.deleteConfirm);
+      confirmingDeleteId = null;
+      refresh();
+      // The row the focus was in has gone. Send it to the heading rather
+      // than letting it fall to the top of the document, which on a list
+      // this long means starting the page again.
+      root.querySelector('h1')?.focus();
     });
   });
 }
