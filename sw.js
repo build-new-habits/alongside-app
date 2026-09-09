@@ -1,6 +1,14 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 08 Sep 2026 v474
+ *
+ * v474 - PROGRESS-2. progress.js v12 -> v13. The shapes section heading
+ *   is an h2, so the outline no longer reads h1 > h3 > h2. Already
+ *   precached; cache bump only.
+ *
+ *   Device pass complete: 8 of 8.
+ *
  * 08 Sep 2026 v473
  *
  * v473 - TIMER-1. workout.js v17 -> v18, workout.css v12 -> v13. The
@@ -3216,7 +3224,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v473";
+const CACHE_NAME = "alongside-v474";
 
 const SHELL_URLS = [
 
