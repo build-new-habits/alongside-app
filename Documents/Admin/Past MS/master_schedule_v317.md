@@ -1,12 +1,12 @@
 # Alongside: Move — Master Schedule
-## 08 Sep 2026 v318
+## 08 Sep 2026 v317
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v317.md`. Remove v317 on upload.
+Supersedes `master_schedule_v316.md`. Remove v316 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
-> **Live: `alongside-v474`, 130 gates, `store.js` v65, `Schema.md` v1.52, cold start blueprint v71.** Read that blueprint after this block.
+> **Live: `alongside-v473`, 130 gates, `store.js` v65, `Schema.md` v1.52, cold start blueprint v70.** Read that blueprint after this block.
 >
 > **Claude's pre-beta BUILD scope is complete.** CLUB 9 of 9 plus QUICK-INPUTS, GUIDED-COPY, DEVICE-1, DEVICE-2, ARC-LED, ARC-PLAIN — `v452` → `v466` on 06 Sep. **QUICK-BUILD-2/3 `v467`, CHECKIN-3 and PROPOSAL-1/2 `v468` — 08 Sep.**
 >
@@ -20,40 +20,6 @@ Supersedes `master_schedule_v317.md`. Remove v317 on upload.
 > | + | 🟠 **RED-FLAG** | **No code at all.** Waits on Graeme's PAR-Q+ call |
 >
 > ⚫ **Classes cannot ship for beta; the device pass can.** That is why it is first.
-
-> ### 🟢 SHIPPED SINCE v317 — PROGRESS-2, `v474`. **DEVICE PASS COMPLETE, 8 of 8.**
->
-> ⚫ **Progress: the heading outline did not hold together.** *"What you have been doing"* was an `h3` while its three siblings — Your weight, the programme block, Share your progress — were all `h2`. The rendered outline read **`h1 > h3 > h2`**: the section arrived as a subsection of nothing, and the next one jumped back **up** a level. WCAG 2.2 AA **1.3.1** — the heading level *is* the structure for anyone not seeing the layout, and heading navigation is how a screen-reader user skims a page they opened in order to look back. Styling is on the class, so nothing moved visually.
->
-> 🟢 `verify-progress-shapes` v1 → v2, test 6 asserts the **rendered** outline. A heading level is only wrong *relative to its neighbours*, so no amount of reading the source would have shown it. Reversal-proven; that gate's own cwd-relative `readFileSync` fixed while open.
->
-> 🟢 **The rest of Progress came back clean** across every state from empty to a mixed history. **Two things checked before claiming:** the free tier's missing breakdown is deliberate gating documented in the tier boundary doc, and the two coach lines that appear to run together are separate paragraphs — my probe was concatenating `textContent`.
-
-> ### 📋 THE DEVICE PASS, 8 OF 8 — what mounting the app actually found
->
-> | # | Surface | Defects | Worst of them |
-> |---|---|---|---|
-> 1–2 | Home, arc | 4 | (previous sessions) |
-> **3** | Quick build scaffold | **3** | **The scaffold had never rendered for anybody.** A time chip opened the eight-way type picker it was written to replace |
-> **4** | One to one, check-in → proposal | **3** | The coach asked *"How did you sleep?"* and opened the **feeling word** panel; the sleep panel then arrived in silence |
-> **5** | Build-and-save | **1** | Saving worked and **said nothing** — the confirmation was inside the form that hides on success |
-> **6** | Your own, saved sessions | **2** | A room that **counted** sessions it would not show you, and a Start button that silently did nothing |
-> **7** | In-session card, rest timer | **1** | The countdown moved the screen under someone mid-exercise and announced nothing. On iOS there was **no signal at all** |
-> **8** | Progress | **1** | A broken heading outline |
->
-> **15 defects in shipped code across the six surfaces this session covered.** Every one found by MOUNTING the surface and reading it as prose. **Not one was found by the 124 gates that were green when the session started** — and three of them (`QUICK-BUILD`, `SAVE-1`, `ROLE-1`) sat behind gates that were green *because* they only read source text.
->
-> 🔴 **Six were accessibility faults** that no visual pass would catch: `undefined` spoken aloud, a live region hidden by its parent, an automatic move announced to nobody, buttons named only by their value, an outline that skips a level.
->
-> 🔴 **Four times my own work was wrong and the process caught it**: a leaked flag in `cleanupWorkout`, a gate incomplete until reversal-tested, a reversal that silently never applied, and two load-flaky gates.
-
-> ### 🔵 REMAINING A11Y FINDINGS — logged, each needs its own scope
->
-> | Finding | |
-> |---|---|
-> 🟠 **`coach-proposal` has no `h1` at all** | It starts at `h2` *"Today's session"*. **It is also the file the One to one location work will open**, so it belongs in that session |
-> 🟠 **Home has ONE heading for the whole screen** | Just the greeting. The club rooms carry none, so Home **cannot be skimmed by heading**. Same family as the 11-view `A11Y-HEADER` item |
-> 🟠 **11 screens have no heading element at all** | `workout-header-title` is a `<span>` in 11 views and a heading in none |
 
 > ### 🟢 SHIPPED SINCE v316 — TIMER-1, `v473`. Device pass task 7 of 8.
 >
@@ -8348,4 +8314,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 08 Sep 2026 v318*
+*Build New Habits · Alongside: Move · Master Schedule · 08 Sep 2026 v317*
