@@ -14,12 +14,21 @@ Supersedes `master_schedule_v321.md`. Remove v321 on upload.
 >
 > | # | What | State |
 > |---|---|---|
-> | 1 | 🟠 **Device pass, tasks 5–8** | **Recommended next.** Tasks 1–4 found **ten defects in shipped code**, so expect more. ~~Quick build scaffold~~ · ~~One to one through check-in to proposal~~ **both done 08 Sep** · build-and-save · Your own with saved sessions · in-session card and rest timer · Progress |
-> | 2 | 🟡 **Class data contract** | Three classes written; **fix the contract against them before writing a fourth** |
-> | 3 | 🟡 **Class content** | Graeme's arc first, then expand. Six to eight more plus lighter variants |
+> | ✅ | ~~**Device pass**~~ | **COMPLETE, 8 of 8, 08 Sep.** 15 defects in shipped code, plus 6 more from Graeme's handset. See the tally below |
+> | 1 | 🟡 **Class data contract** | **Recommended next, and the only Claude-side BUILD work left.** Three classes written (`alongside_class_001/002/003`); **fix the contract against them before a fourth is written.** Nothing is built for classes yet. Decisions already taken are further down this document: the mapping unit is the STRAND not the aim; extend `practice-library.js` rather than building beside it; PACING (spec §4b) |
+> | 2 | 🟡 **Class content** | **Graeme's.** His arc first, then expand — six to eight more plus lighter variants |
 > | + | 🟠 **RED-FLAG** | **No code at all.** Waits on Graeme's PAR-Q+ call |
 >
-> ⚫ **Classes cannot ship for beta; the device pass can.** That is why it is first.
+> ⚫ **Classes cannot ship for beta; the device pass could, and has.** That is why it went first.
+>
+> ### 🔵 Smaller things still open, none of them blocking
+>
+> | | |
+> |---|---|
+> 🟠 **Home has one heading for the whole screen** | Just the greeting. The club rooms are disclosure buttons carrying no heading, so **Home cannot be skimmed by heading** — the one screen everybody starts on. The standard pattern is `<h2><button aria-expanded>` wrapping each room head. Same family as `A11Y-HEADER`, but a different shape of change |
+> 🟠 **49 gates read cwd-relative** | Green from the repo root, reading nothing from anywhere else. **A trap, not a live fault:** a session running the suite by full path from elsewhere sees ~70 red and concludes the app is broken. Four fixed so far, one at a time as each gate is opened |
+> 🟠 **The five tools outside the `verify-*` suite** | `schedule-drift`, `precache-check`, `schema-check`, `contrast-check`, `audit-gate-proxies`. **They have caught two live faults nobody would otherwise have seen** — a stale schedule and an unprecached view — because nothing runs them by default. Folding them into the standard run is a small change with a proven return |
+> 🟡 **Changelog stale since March** | Resume or retire — Graeme's call |
 
 > ### 🟢 SHIPPED SINCE v321 — A11Y-HEADER, `v478`. Eleven screens had no heading at all.
 >
@@ -156,9 +165,9 @@ Supersedes `master_schedule_v321.md`. Remove v321 on upload.
 >
 > | Finding | |
 > |---|---|
-> 🟠 **`coach-proposal` has no `h1` at all** | It starts at `h2` *"Today's session"*. **It is also the file the One to one location work will open**, so it belongs in that session |
+> ✅ ~~**`coach-proposal` has no `h1`**~~ | **CLOSED 08 Sep** with LOCATION-1, in the same session, as predicted |
 > 🟠 **Home has ONE heading for the whole screen** | Just the greeting. The club rooms carry none, so Home **cannot be skimmed by heading**. Same family as the 11-view `A11Y-HEADER` item |
-> 🟠 **11 screens have no heading element at all** | `workout-header-title` is a `<span>` in 11 views and a heading in none |
+> ✅ ~~**11 screens have no heading element**~~ | **CLOSED 08 Sep, A11Y-HEADER.** All 42 sites |
 
 > ### 🟢 SHIPPED SINCE v316 — TIMER-1, `v473`. Device pass task 7 of 8.
 >
@@ -225,9 +234,9 @@ Supersedes `master_schedule_v321.md`. Remove v321 on upload.
 >
 > | Finding | Why not here |
 > |---|---|
-> 🔴 **`today.js` has the same dead button** | The identical silent `if (!exercises.length) return;` on the Home room's featured saved session, shipped 06 Sep with YOUR-OWN. Same fault, on the **Home screen**. Its row is built through `roomRow()` and changing that shape is a Home-screen change that wants agreeing on its own terms |
-> 🟠 **`deleteSavedSession()` has no caller anywhere** | A list is its obvious home, and it is deliberately not wired up. Adding a destructive control to somebody's own authored work is a product decision. **Graeme's call — see below** |
-> 🟠 **`today.js` drops `missing`** | It destructures `{ exercises }` from `resolveSavedSession()` and discards the count, so the Home card can come back short without saying so. The module's own comment says that is the thing to avoid |
+> ✅ ~~**`today.js` has the same dead button**~~ | **CLOSED 08 Sep, OWN-1** |
+> ✅ ~~**`deleteSavedSession()` has no caller**~~ | **CLOSED 08 Sep, SAVED-2.** Graeme's answer was that saved sessions should be editable AND deletable |
+> ✅ ~~**`today.js` drops `missing`**~~ | **CLOSED 08 Sep, OWN-1**, along with the dead Start button beside it |
 
 > ### 🔵 DECISION FOR GRAEME — deleting a saved session
 >
