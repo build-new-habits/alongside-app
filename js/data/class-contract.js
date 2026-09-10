@@ -1,6 +1,14 @@
 /**
  * data/class-contract.js
  *
+ * 08 Sep 2026 v3
+ *
+ * v3 - CLASS-2. The lighter variant, as a SUBTRACTION of sections rather
+ *   than a second script. Graeme decided on 06 Sep that a not-great day
+ *   gets the lighter class and only a genuinely-should-not day routes
+ *   out of the room; none of the three written classes encoded one and
+ *   there was no field for it.
+ *
  * 08 Sep 2026 v2
  *
  * v2 - CLASS-1b. durationLabel(). What a person reads is DERIVED from the
@@ -118,6 +126,66 @@ export const BEAT_KINDS = Object.freeze([
 export const POSITIONS = Object.freeze(['floor', 'seated', 'standing', 'mixed']);
 
 /**
+ * CLASS-2, 08 Sep 2026. The lighter variant.
+ *
+ * Graeme's decision, 06 Sep, and it was already made before any class was
+ * written: on a NOT-GREAT day the class serves its lighter variant --
+ * "you still get the class you came for" -- and only a genuinely-should-
+ * not day routes the person out of the room to One to one or Quick build.
+ * Two tiers, and he was explicit that the pairing beats either alone.
+ *
+ * None of the three written classes encoded one and the contract had no
+ * field for it, so a fourth class written now would have been written in
+ * one variant of a thing that is supposed to have two.
+ *
+ * ── WHY IT IS A SUBTRACTION, NOT A SECOND SCRIPT ─────────────────────
+ *
+ * A lighter variant expressed as its own set of sections would be a
+ * second class to keep in step with the first: change a line in Ground
+ * and you would have two places to change it, and the day somebody
+ * changed one and not the other is the day a person on a bad day gets
+ * the older, worse version.
+ *
+ * So it names what to LEAVE OUT and what to say instead. The class is
+ * the class; the lighter day is the class with less of it.
+ *
+ * `omitSections` — section ids not run.
+ * `note`         — what the coach says about the shorter shape, if
+ *                  anything needs saying. Optional: Steady Round already
+ *                  says it inside the class itself.
+ *
+ * ⚫ The lighter variant is NOT the seated route and NOT the easier
+ * route. Those answer "I cannot get to the floor" and "I cannot hold
+ * this for that long". This one answers "today is not a good day", which
+ * is a different question with a different answer, and conflating them
+ * would offer somebody a chair when what they needed was a shorter class.
+ */
+export const LIGHTER_FIELDS = Object.freeze({
+  required: ['omitSections'],
+  optional: ['note']
+});
+
+/**
+ * The sections a class runs today. The whole class, or the lighter one.
+ *
+ * One function, so a caller cannot accidentally run the full class on a
+ * bad day by reaching for `cls.sections` directly -- which is what every
+ * caller would otherwise do, because that is the obvious field.
+ */
+export function sectionsFor(cls, { lighter = false } = {}) {
+  if (!lighter || !cls.lighter) return cls.sections || [];
+  const omit = new Set(cls.lighter.omitSections || []);
+  return (cls.sections || []).filter(s => !omit.has(s.id));
+}
+
+/** Minutes the lighter variant runs. Derived, like everything else. */
+export function lighterMinutes(cls) {
+  const secs = sectionsFor(cls, { lighter: true })
+    .reduce((a, s) => a + (s.durationSeconds || 0), 0);
+  return secs / 60;
+}
+
+/**
  * Fields every class carries, and the ones only some do.
  *
  * Listed here rather than implied by a validator so that the contract is
@@ -127,7 +195,7 @@ export const POSITIONS = Object.freeze(['floor', 'seated', 'standing', 'mixed'])
 export const CLASS_FIELDS = Object.freeze({
   required: ['id', 'title', 'serves', 'formats', 'intensityBias',
              'durationMins', 'position', 'equipment', 'flags', 'sections'],
-  optional: ['touches', 'seatedRoute', 'rounds', 'roundRange', 'notes', 'durationNote']
+  optional: ['touches', 'seatedRoute', 'rounds', 'roundRange', 'notes', 'durationNote', 'lighter']
 });
 
 /**
@@ -262,6 +330,25 @@ export function validateClass(cls, { strandIds = null, exerciseIds = null } = {}
       'cannot get to the floor needs to know before they start');
   }
 
+  if (cls.lighter !== undefined) {
+    const L = cls.lighter;
+    if (!L || typeof L !== 'object') {
+      p('lighter must be an object');
+    } else {
+      for (const f of LIGHTER_FIELDS.required) {
+        if (L[f] === undefined) p(`lighter: missing ${f}`);
+      }
+      const knownL = new Set([...LIGHTER_FIELDS.required, ...LIGHTER_FIELDS.optional]);
+      for (const f of Object.keys(L)) {
+        if (!knownL.has(f)) p(`lighter: unknown field "${f}"`);
+      }
+      if (Array.isArray(L.omitSections) && L.omitSections.length === 0) {
+        p('lighter omits nothing — a lighter variant identical to the class ' +
+          'is not a lighter variant, and offering it on a bad day is a lie');
+      }
+    }
+  }
+
   if (!Array.isArray(cls.sections) || cls.sections.length === 0) {
     p('sections must be a non-empty array');
     return { ok: problems.length === 0, problems };
@@ -292,6 +379,21 @@ export function validateClass(cls, { strandIds = null, exerciseIds = null } = {}
     p(`sections total ${(stated / 60).toFixed(1)} min but the class says ` +
       `${cls.durationMins} — a stated length nothing checks is a claim with ` +
       `nothing behind it`);
+  }
+
+  if (cls.lighter && Array.isArray(cls.lighter.omitSections)) {
+    for (const id of cls.lighter.omitSections) {
+      if (!sectionIds.has(id)) p(`lighter omits a section that does not exist: ${id}`);
+    }
+    const left = cls.sections.filter(s => !cls.lighter.omitSections.includes(s.id));
+    // A lighter day still has to arrive somewhere and leave somewhere.
+    // Stripping a class back to its middle is not a gentler version of
+    // it, it is a fragment.
+    const kinds = new Set(left.flatMap(s => (s.beats || []).map(b => b.kind)));
+    if (!kinds.has('closing')) {
+      p('the lighter variant has no closing — a class that stops rather ' +
+        'than ends is not a gentler version of one that ends');
+    }
   }
 
   // Rounds repeat SECTIONS, by id. Class 002's "Round two" repeats

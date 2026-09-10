@@ -1,6 +1,12 @@
 /**
  * data/classes/class-steady-round-002.js
  *
+ * 08 Sep 2026 v3
+ *
+ * v3 - CLASS-2. Its lighter variant is one round, which the class already
+ *   argues for in its own voice halfway through. No note added: saying it
+ *   twice would make it sound like a concession.
+ *
  * 08 Sep 2026 v2
  *
  * v2 - CLASS-1b. durationNote: this class is meaningfully shorter for
@@ -69,6 +75,19 @@ export const CLASS_STEADY_ROUND_002 = {
   // five movements in the same order, cued by name only.
   rounds:     2,
   roundRange: ['glute-bridge', 'dead-bug', 'bird-dog', 'plank', 'hip-hinge'],
+
+  // CLASS-2. The lighter variant needed no inventing: this class already
+  // says it out loud, in the middle of itself, in the coach's own voice.
+  // "If one round is what today had in it, stop here and that's a whole
+  // session. I'd rather you did one round for six weeks than two rounds
+  // once."
+  //
+  // So a not-great day runs everything except round two, and no note is
+  // added -- the class already makes the case better than a note would,
+  // and saying it twice would make it sound like a concession.
+  lighter: {
+    omitSections: ['round-two']
+  },
 
   sections: [
     {
