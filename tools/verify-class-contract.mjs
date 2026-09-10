@@ -338,6 +338,16 @@ const LINES = [
    "the exit offered in the middle, out loud, before anybody has to invent it"],
   ["class-stopping-early-003", "later in the week — not now",
    "the honest form of the promise, and the delay is what makes the delay survivable"],
+  ["class-standing-up-005",    "on a staircase in a month",
+   "the same refusal again — legs get better slowly, and saying otherwise " +
+   "is a claim the class cannot show you today"],
+  ["class-out-006",            "You went outside on purpose",
+   "a statement of what happened, meaning left to the person. 'Well done " +
+   "for getting out' would make going outside an achievement, and this " +
+   "strand belongs to people for whom it must become ordinary"],
+  ["class-out-006",            "survives being interrupted",
+   "nothing outdoors can be timed against what the person is doing, and " +
+   "saying so is what stops them feeling behind a script they cannot keep up with"],
   ["class-bending-004",         "not a today question",
    "the alternative — 'this will strengthen your back' — is a claim the class " +
    "cannot verify and this person has been promised it before by somebody wrong"]
@@ -355,6 +365,28 @@ for (const [id, line, why] of LINES) {
   ok(`6. ${id}: "${line}"`,
      !!cls && textOf(cls).includes(line),
      `${why}. Gone from ${id}`);
+}
+
+// ── 6b. PROPERTIES THAT ARE LOAD-BEARING, NOT JUST WORDS ────────────────
+console.log("\nTEST 6b - the held positions stay held");
+
+// Test 4 proves a hold does not SCALE. It cannot notice a hold quietly
+// becoming a speech gap, which is a one-word edit with the same effect:
+// the position stops being timed and starts being a pause somebody can
+// wander out of. Reversal testing turned Standing Up's wall sit into a
+// speechSeconds and every assertion stayed green.
+const HELD = [
+  ["class-steady-round-002", "plank",   "the plank is held to a duration, not paused for one"],
+  ["class-standing-up-005",  "wall-sit", "the wall sit is the one held position in the class"]
+];
+
+for (const [id, sectionId, why] of HELD) {
+  const cls = all.find(c => c.id === id);
+  const sec = cls && cls.sections.find(s => s.id === sectionId);
+  ok(`6b. ${id} / ${sectionId} still carries a hold`,
+     !!sec && sec.beats.some(b => typeof b.holdSeconds === "number"),
+     `${why}. A holdSeconds turned into a speechSeconds scales with pacing, ` +
+     `which is the exact thing the two fields exist to prevent`);
 }
 
 // ── 7. SAFETY IS THE LIBRARY'S, NOT A SECOND COPY ───────────────────────

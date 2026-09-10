@@ -1,12 +1,12 @@
 # Alongside: Move — Master Schedule
-## 08 Sep 2026 v329
+## 08 Sep 2026 v328
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v328.md`. Remove v328 on upload.
+Supersedes `master_schedule_v327.md`. Remove v327 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
-> **Live: `alongside-v485`, 133 gates, `store.js` v65, `Schema.md` v1.56, cold start blueprint v86.** Read that blueprint after this block.
+> **Live: `alongside-v484`, 133 gates, `store.js` v65, `Schema.md` v1.56, cold start blueprint v85.** Read that blueprint after this block.
 >
 > **Claude's pre-beta BUILD scope is complete.** CLUB 9 of 9 plus QUICK-INPUTS, GUIDED-COPY, DEVICE-1, DEVICE-2, ARC-LED, ARC-PLAIN — `v452` → `v466` on 06 Sep. **QUICK-BUILD-2/3 `v467`, CHECKIN-3 and PROPOSAL-1/2 `v468` — 08 Sep.**
 >
@@ -17,8 +17,7 @@ Supersedes `master_schedule_v328.md`. Remove v328 on upload.
 > | ✅ | ~~**Device pass**~~ | **COMPLETE, 8 of 8, 08 Sep.** 15 defects in shipped code, plus 6 more from Graeme's handset. See the tally below |
 > | ✅ | ~~**Class data contract**~~ | **FIXED 08 Sep, CLASS-1, `v479`.** All three classes are in as data and validating. See below |
 > | ✅ | ~~**Class four — "Bending"**~~ | **LIVE, `v484`.** Graeme read it and approved the shape and voice. **His arc is now fully served.** Three questions still open on the document — the name, "about forty times", and whether the lighter line is needed — each a one-line edit |
-> | ✅ | ~~**Transcribe 005 and 006**~~ | **LIVE, `v485`. Six classes.** 26 of 33 aims now have at least one served strand |
-> | 1 | 🟡 **Class seven onwards** | Next unserved by need: `hip-range` (8 aims), `not-overdoing` (8 — already touched by Stopping Early), `self-kindness` (7), `winding-down` (7 — touched by Out) |
+> | 1 | 🟡 **Transcribe 005 and 006** | Voice approved in this vein, so both are unblocked. Structure, ids and arithmetic already checked on each |
 > | 2 | 🟡 **Class five — "Standing Up"** | **DRAFTED, awaiting Graeme on the voice.** `alongside_class_005_standing_up_08sep2026_v1_DRAFT.md`. Serves `leg-strength` — **both the next strand in Graeme's own aim and the most-wanted unserved strand across all 33 (12 aims)**. Three open questions |
 > | 3 | 🟡 **Class six — "Out"** | **DRAFTED, and it strained the contract in five places.** `alongside_class_006_out_08sep2026_v1_DRAFT.md`. Serves `being-outside`. **Two strains fixed (CLASS-3); three are decisions for Graeme** |
 > | 4 | 🟡 **Class seven onwards** | Next unserved by need: `hip-range` (8 aims), `not-overdoing` (8 — but already touched by Stopping Early), `self-kindness` (7), `winding-down` (7) | Three classes written (`alongside_class_001/002/003`); **fix the contract against them before a fourth is written.** Nothing is built for classes yet. Decisions already taken are further down this document: the mapping unit is the STRAND not the aim; extend `practice-library.js` rather than building beside it; PACING (spec §4b) |
@@ -35,35 +34,6 @@ Supersedes `master_schedule_v328.md`. Remove v328 on upload.
 > 🟠 **49 gates read cwd-relative** | Green from the repo root, reading nothing from anywhere else. **A trap, not a live fault:** a session running the suite by full path from elsewhere sees ~70 red and concludes the app is broken. Four fixed so far, one at a time as each gate is opened |
 > 🟠 **The five tools outside the `verify-*` suite** | `schedule-drift`, `precache-check`, `schema-check`, `contrast-check`, `audit-gate-proxies`. **They have caught two live faults nobody would otherwise have seen** — a stale schedule and an unprecached view — because nothing runs them by default. Folding them into the standard run is a small change with a proven return |
 > 🟡 **Changelog stale since March** | Resume or retire — Graeme's call |
-
-> ### 🟢 SHIPPED SINCE v328 — CLASS-5, `v485`. Six classes live.
->
-> Standing Up and Out transcribed. **26 of 33 aims now have at least one served strand.**
->
-> | Class | Serves | Full / lighter | Position |
-> |---|---|---|---|
-> Ground | `trusting-body` | 15 / 10 | floor |
-> Steady Round | `trunk-strength` | 19 / 14 | floor |
-> Stopping Early | `pacing` | 12 / 10 | seated |
-> Bending | `back-resilience` | 15 / 10 | floor |
-> **Standing Up** | `leg-strength` | 15 / 10 | standing |
-> **Out** | `being-outside` | 15 / 10 | **walking** |
->
-> ⚫ **Out looks unfinished and is not**, which is why its file says so at length. **No `screen` on any beat** — the phone is in a pocket and the person is watching traffic, so screen text would be written for nobody. **No `movement` beats** — the walk is the movement and it has no reps or stop cue. Its flags are longer than any other class's *because* of that: nothing in it is visible to `classSafety()`, so they are the only warning that reaches the person from any direction.
->
-> ### 🔴 THREE MORE GAPS IN MY OWN GATE, ALL FOUND BY REVERSAL
->
-> Every one of these looked covered and was not:
->
-> | Reversal | What happened |
-> |---|---|
-> **Softened Standing Up's honesty line** to *"you'll feel stronger straight away"* | **Green.** Not in the protected list. Now is |
-> **Turned the wall sit's `holdSeconds` into `speechSeconds`** | **Green.** Test 4 proves a hold does not SCALE — it cannot notice a hold quietly *becoming a pause*, which is a one-word edit with the same effect: the position stops being timed and starts being something you can wander out of. **New test 6b names the held positions as load-bearing properties** |
-> **Bending's honesty line** (earlier today) | **Green.** Same fault, third instance |
->
-> 🔴 **The pattern is worth stating: a gate that protects WORDS does not protect STRUCTURE, and I had been treating "reversal-proven" as if it covered both.** Test 6 guards eight sentences; test 6b now guards two properties. Both lists grow by hand, which means **each new class needs its load-bearing parts added deliberately** — that is the cost of protecting things this specific, and it is worth paying.
->
-> ⚫ **Four of the six classes now carry the same refusal in different words** — *later in the week, not now* · *on a staircase in a month* · *not a today question* · and Out's *"you went outside on purpose"* declining to congratulate. Across six classes that is unmistakably the voice rather than a line.
 
 > ### 🟢 SHIPPED SINCE v327 — CLASS-4, `v484`. Bending is live, and Graeme's arc is served.
 >
@@ -8658,4 +8628,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 08 Sep 2026 v329*
+*Build New Habits · Alongside: Move · Master Schedule · 08 Sep 2026 v328*
