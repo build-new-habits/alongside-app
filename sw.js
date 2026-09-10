@@ -1,6 +1,13 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 08 Sep 2026 v487
+ *
+ * v487 - PLAYER-1 / PACING-1. TWO NEW FILES PRECACHED: the class player
+ *   view and its stylesheet. Seven classes existed as data nothing could
+ *   play; this is the screen that plays them, and the timing model that
+ *   makes the number on their cards true.
+ *
  * 08 Sep 2026 v486
  *
  * v486 - CLASS-6. NEW FILE PRECACHED: class-unsticking-007.js. Seven
@@ -3310,7 +3317,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v486";
+const CACHE_NAME = "alongside-v487";
 
 const SHELL_URLS = [
 
@@ -3464,6 +3471,8 @@ const SHELL_URLS = [
   "/alongside-app/js/data/classes/class-standing-up-005.js",
   "/alongside-app/js/data/classes/class-out-006.js",
   "/alongside-app/js/data/classes/class-unsticking-007.js",
+  "/alongside-app/js/views/class-player.js",
+  "/alongside-app/css/components/class-player.css",
   "/alongside-app/js/views/saved-sessions.js",
   "/alongside-app/js/views/session-builder-ui.js",
   "/alongside-app/js/views/noticing.js",
