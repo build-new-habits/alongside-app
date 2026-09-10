@@ -1,6 +1,14 @@
 /**
  * data/classes/class-ground-001.js
  *
+ * 08 Sep 2026 v3
+ *
+ * v3 - CLASS-2/2b. Lighter variant: drops the two hands-and-knees
+ *   movements, keeps the one done lying on the back. Chosen from 38
+ *   structurally viable subtractions as the only one leaving a movement
+ *   somebody can do without getting onto all fours. The second noticing
+ *   gains a lighterVoice: "four minutes ago" is not true on a short day.
+ *
  * 08 Sep 2026 v2
  *
  * v2 - CLASS-1. Regrouped into the eight SECTIONS the document is
@@ -58,6 +66,31 @@ export const CLASS_GROUND_001 = {
   // bodily sensation is not neutral. Every noticing beat below offers an
   // external alternative.
   flags:         ['floor-transfer', 'eyes-closed-offered', 'body-focused-attention'],
+
+  /**
+   * CLASS-2, 08 Sep 2026. The lighter variant.
+   *
+   * Drops the two hands-and-knees movements. Cat-Cow and Thread the
+   * Needle both need a transfer onto all fours, which is the hardest
+   * thing in this class on a bad day; knees-side-to-side is done lying
+   * on the back and stays, so the class still has movement in it. A
+   * movement class with no movement is not a gentler version of itself.
+   *
+   * The first noticing goes too, and that is the considered part: with
+   * one movement instead of three there is no before-and-after to ask
+   * about, and asking twice would be asking about nothing.
+   *
+   * What stays: arriving, a movement, the second noticing with its
+   * "there might not be", the full three minutes of stillness, and the
+   * closing line that is the whole class. Ten minutes.
+   *
+   * Chosen from thirty-eight structurally viable subtractions, on the
+   * grounds that it is the only one that keeps a movement the person can
+   * do without getting onto all fours.
+   */
+  lighter: {
+    omitSections: ['first-noticing', 'cat-cow', 'thread']
+  },
 
   // The eight sections the class is written in, with the durations it
   // states. They sum to durationMins and the contract asserts it.
@@ -180,6 +213,14 @@ export const CLASS_GROUND_001 = {
         {
           kind:   'reflect',
           voice:  "Is anything different from four minutes ago? It might not be. That's a real answer, not a failed one.",
+          // CLASS-2b. On a lighter day two of the three movements are not
+          // run, so "four minutes ago" names a stretch of time the person
+          // did not have. In a class about whether you can trust what
+          // your body reports, telling somebody they did four minutes of
+          // something they did not do is the wrong kind of small error.
+          // The load-bearing half of the line -- "there might not be" --
+          // is untouched.
+          lighterVoice: "Is anything different from a couple of minutes ago? There might not be. That's a real answer, not a failed one.",
           speechSeconds: 20
         }
       ]
