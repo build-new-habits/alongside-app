@@ -1,6 +1,13 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 08 Sep 2026 v480
+ *
+ * v480 - CLASS-1b. class-contract.js v2, class-steady-round-002.js v2.
+ *   The length on a class card is derived from its content and rounded
+ *   up, so it can never read shorter than the class runs. Both already
+ *   precached; cache bump only.
+ *
  * 08 Sep 2026 v479
  *
  * v479 - CLASS-1. FIVE NEW FILES PRECACHED: js/data/class-contract.js
@@ -3262,7 +3269,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v479";
+const CACHE_NAME = "alongside-v480";
 
 const SHELL_URLS = [
 
