@@ -1,6 +1,12 @@
 /**
  * data/classes/class-steady-round-002.js
  *
+ * 08 Sep 2026 v2
+ *
+ * v2 - CLASS-1b. durationNote: this class is meaningfully shorter for
+ *   anybody who takes the exit it offers halfway. The card reads "about
+ *   20 minutes — less if you stop after one round".
+ *
  * 08 Sep 2026 v1
  *
  * CLASS-1. Class 002, "Steady Round", as data.
@@ -47,7 +53,13 @@ export const CLASS_STEADY_ROUND_002 = {
 
   formats:       ['circuit'],
   intensityBias: 'gentle',
+  // The true total, checked against the sections. What a person reads is
+  // durationLabel(): "about 20 minutes — less if you stop after one
+  // round". The card used to say 18 while these sections totalled 19, and
+  // both numbers were slightly false for a class that openly offers
+  // stopping halfway.
   durationMins:  19,
+  durationNote:  'less if you stop after one round',
   position:      'floor',
   seatedRoute:   false,
   equipment:     [],

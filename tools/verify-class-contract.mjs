@@ -92,6 +92,49 @@ for (const c of all) {
      `is a claim with nothing behind it`);
 }
 
+// ── 2b. WHAT A PERSON READS IS DERIVED, AND ROUNDS UP ───────────────────
+console.log("\nTEST 2b - the stated length is derived, hedged, and never short");
+
+// Graeme's call. Class 002's card said 18 while its own sections totalled
+// 19, and reconciling those two would have been tidying a number that was
+// misleading either way -- that class openly offers stopping after one
+// round, so any single exact figure describes a session plenty of people
+// will not have.
+//
+// The class keeps its true total and the sections still have to sum to
+// it. What changed is that the true total is no longer what anybody
+// reads.
+
+for (const c of all) {
+  const label = CONTRACT.durationLabel(c);
+  const shown = Number((label.match(/about (\d+) minutes/) || [])[1]);
+
+  ok(`2b. ${c.title}: reads "${label}"`, Number.isFinite(shown),
+     "no readable label produced");
+
+  // 🔴 THE DIRECTION IS THE POINT. To the NEAREST five, a 12-minute class
+  // reads "about 10 minutes" and somebody with exactly ten minutes starts
+  // it and runs over. Over-stating costs a pleasant surprise;
+  // under-stating costs the thing they were protecting when they checked.
+  ok(`2b. ${c.title}: never reads shorter than it is`,
+     shown >= c.durationMins,
+     `reads ${shown} for a class that runs ${c.durationMins}. Rounding to ` +
+     `the nearest instead of up puts somebody over their own limit`);
+
+  ok(`2b. ${c.title}: and is hedged, not precise`,
+     /^about /.test(label),
+     "a precise figure on a class whose length depends on what the person " +
+     "does is precise and slightly false");
+}
+
+// The one place a number cannot carry the meaning: Class 002 is
+// meaningfully shorter for anybody who takes the exit it offers.
+ok("2b-note. a class whose SHAPE affects its length says so",
+   /less if you stop after one round/.test(CONTRACT.durationLabel(
+     all.find(c => c.id === "class-steady-round-002"))),
+   "Steady Round offers stopping halfway, out loud, in the middle of " +
+   "itself. A card reading only 'about 20 minutes' contradicts that");
+
 // ── 3. SERVES IS ONE STRAND, AND IT IS NOT TOUCHES ──────────────────────
 console.log("\nTEST 3 - a class serves one strand and brushes others");
 
