@@ -1,0 +1,100 @@
+/* ============================================================
+   class-list.css
+   css/components/class-list.css
+   08 Sep 2026 v1
+
+   TIMETABLE-1. The board of classes.
+
+   Graeme: "When I go to Nuffield they have a timetable. I get to choose
+   which class I go to because I can see the timetable."
+
+   ⚫ SO IT LOOKS LIKE A LIST, NOT A FEED. No cards competing for
+   attention, no image per class, nothing emphasised over anything else.
+   Somebody arriving here has already decided to choose; the job is to
+   let them read seven things quickly and pick one.
+
+   🔴 WITHHELD CLASSES ARE VISIBLY QUIETER BUT NOT HIDDEN. A class that
+   vanishes leaves somebody wondering whether it exists. Dimmed and
+   grouped under "Not today", with the reason, is the honest form.
+   ============================================================ */
+
+.class-list {
+  padding: var(--space-4);
+}
+
+.class-list__title {
+  margin: 0 0 var(--space-2);
+}
+
+.class-list__intro {
+  margin: 0 0 var(--space-5);
+  color: var(--color-text-secondary);
+  line-height: var(--leading-relaxed);
+}
+
+.class-list__board {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.class-list__row {
+  padding: var(--space-4) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.class-list__name {
+  margin: 0 0 var(--space-1);
+  font-size: var(--text-lg);
+  font-weight: var(--font-semibold);
+  color: var(--color-text);
+}
+
+.class-list__facts,
+.class-list__serves,
+.class-list__flags,
+.class-list__why {
+  margin: 0 0 var(--space-1);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  line-height: var(--leading-normal);
+}
+
+/* The arc is NAMED and that is all it does -- it does not reorder or
+   badge anything. Reordering would be the coach picking, which is the
+   other room. */
+.class-list__serves {
+  color: var(--color-primary);
+}
+
+.class-list__flags {
+  font-size: var(--text-xs);
+}
+
+.class-list__actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+
+.class-list__held {
+  margin-top: var(--space-6);
+}
+
+.class-list__held-title {
+  margin: 0 0 var(--space-2);
+  font-size: var(--text-base);
+  color: var(--color-text-secondary);
+}
+
+/* Quieter, never gone. */
+.class-list__row--held .class-list__name {
+  font-size: var(--text-base);
+  color: var(--color-text-secondary);
+}
+
+.class-list__empty {
+  color: var(--color-text-secondary);
+  line-height: var(--leading-relaxed);
+}

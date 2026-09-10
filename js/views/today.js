@@ -1,5 +1,13 @@
 /**
  * today.js
+ * 08 Sep 2026 v38
+ *
+ * v38 - TIMETABLE-1. The Guided class room reaches the classes.
+ *   Seven playable classes existed and the room named for them led to
+ *   the programme instead. Classes first, in both states -- a class no
+ *   more depends on a twelve-week shape than a yoga class at a gym
+ *   depends on having signed up for a course.
+ *
  * 08 Sep 2026 v37
  *
  * v37 - A11Y-HOME. Each room's button is wrapped in an h2, so Home can
@@ -663,6 +671,8 @@ import { isPremium, lockedFeature } from '../auth.js';
 import { advanceWeekIfNeeded, isHingePending, chapterSuccessor, startChapter }
   from '../data/programmeEngine.js';
 import { getProgramme, getPhaseForWeek } from '../data/programmes.js';
+// TIMETABLE-1. The room named for classes now counts them.
+import { CLASSES } from '../data/classes/index.js';
 import { savedSessions, resolveSavedSession, markSavedSessionUsed }
   from '../data/saved-sessions.js';
 import { detectBurnout }       from '../data/checkin.js';
@@ -1807,9 +1817,12 @@ export function TodayView(router) {
     const guided = progMeta
       ? roomRow({
           id: 'guided', title: 'Guided class',
+          // TIMETABLE-1. The room is named for classes and now contains
+          // them, so it says so. It described only the twelve-week shape
+          // while the classes it is named for sat unreachable.
           // The summary is what the row shows CLOSED, so it carries the
           // one fact worth deciding on rather than the room's slogan.
-          what: 'A twelve-week shape. I fit your sessions to it.',
+          what: 'Drop into a class. It knows what you\u2019re working towards.',
           summary: `${progMeta.name} \u00b7 ${prog.currentWeek || 1} week${(prog.currentWeek || 1) === 1 ? '' : 's'} in`,
           facts: [
             phase ? `${phase.label} \u2014 ${phase.description}` : 'A twelve-week shape',
@@ -1819,25 +1832,47 @@ export function TodayView(router) {
             // clothes, and the gate caught it within the hour.
             `You are ${prog.currentWeek || 1} week${(prog.currentWeek || 1) === 1 ? '' : 's'} in`
           ].filter(Boolean),
+          // TIMETABLE-1, 08 Sep 2026. THE CLASSES WERE UNREACHABLE.
+          //
+          // Seven classes existed as data and this room -- the one named
+          // for them -- led to the programme instead. Graeme: "when you
+          // tell me there's classes in folders but it doesn't get
+          // anywhere, that makes me worried."
+          //
+          // Classes first, because that is what the room is called and
+          // what CLUB spec v2 6.1 says it holds. The twelve-week shape
+          // is still here, underneath, where somebody who wants it can
+          // find it.
           action: `<button class="btn btn-primary btn-full club-room__go"
+                           data-route="classes" data-door-id="guided"
+                           data-requires-checkin="false">See the classes</button>
+                   <button class="btn btn-secondary btn-full club-room__go"
                            data-route="my-programme" data-door-id="guided"
                            data-requires-checkin="false">See your shape</button>`
         })
       // EMPTY STATE. An invitation, and it states the cost before it is
       // paid -- CLUB spec v2 3.5.
+      // TIMETABLE-1. NOT AN EMPTY STATE ANY MORE.
+      //
+      // This branch used to say "Nothing chosen yet" and offer only the
+      // programme picker -- so somebody without a twelve-week shape
+      // could not reach a class at all. Classes do not depend on a
+      // programme any more than a yoga class at a gym depends on having
+      // signed up for a course. The classes come first here too; the
+      // shape is the second button, for anybody who wants one.
       : roomRow({
           id: 'guided', title: 'Guided class',
-          what: 'A twelve-week shape. I fit your sessions to it.',
-          summary: 'Nothing chosen yet',
-          facts: ['Twelve weeks', 'It shapes what I suggest, week by week',
-                  'You can change or stop at any point'],
-          // PLAN-PICKER-TIER, 06 Sep 2026. goal-setup is
-          // programme-select.js, the chooser that calls startChapter()
-          // properly. plan-select.js wrote six activeProgramme fields
-          // directly and is now retired.
+          what: 'Drop into a class. It knows what you\u2019re working towards.',
+          summary: `${CLASSES.length} classes`,
+          facts: ['Same class for everybody, fitted to your arc',
+                  'Ten to twenty minutes',
+                  'A shorter version of each one, for the days that need it'],
           action: `<button class="btn btn-primary btn-full club-room__go"
+                           data-route="classes" data-door-id="guided"
+                           data-requires-checkin="false">See the classes</button>
+                   <button class="btn btn-secondary btn-full club-room__go"
                            data-route="goal-setup" data-door-id="guided"
-                           data-requires-checkin="false">Choose a shape</button>`
+                           data-requires-checkin="false">Choose a twelve-week shape</button>`
         });
 
     const pt = roomRow({

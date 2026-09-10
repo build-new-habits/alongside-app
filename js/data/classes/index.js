@@ -1,6 +1,12 @@
 /**
  * data/classes/index.js
  *
+ * 08 Sep 2026 v2
+ *
+ * v2 - TIMETABLE-1. blockedBy is de-duplicated. Steady Round uses a
+ *   glute bridge in both rounds, and naming it twice in one sentence
+ *   reads as a bug in the app rather than a fact about the class.
+ *
  * 08 Sep 2026 v1
  *
  * CLASS-1. The three written classes, and the safety filter over them.
@@ -102,7 +108,11 @@ export function classSafety(cls, { conditionIds = [], painScores = {} } = {}) {
     if (!safeRoute) blockedBy.push(byId.get(b.exerciseId)?.name || b.exerciseId);
   }
 
-  return { offer: blockedBy.length === 0, blockedBy };
+  // TIMETABLE-1. Unique. A class can use the same movement in two
+  // sections -- Steady Round has a glute bridge in both rounds -- and
+  // naming it twice in one sentence reads as a mistake in the app rather
+  // than a fact about the class.
+  return { offer: blockedBy.length === 0, blockedBy: [...new Set(blockedBy)] };
 }
 
 /**
