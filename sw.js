@@ -1,6 +1,12 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 08 Sep 2026 v483
+ *
+ * v483 - CLASS-3. class-contract.js v5. `walking` is a position, and a
+ *   class with no movement beats must declare its own flags because the
+ *   safety filter cannot see it. Already precached; cache bump only.
+ *
  * 08 Sep 2026 v482
  *
  * v482 - CLASS-2b. class-contract.js v4, class-ground-001.js v3,
@@ -3283,7 +3289,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v482";
+const CACHE_NAME = "alongside-v483";
 
 const SHELL_URLS = [
 
