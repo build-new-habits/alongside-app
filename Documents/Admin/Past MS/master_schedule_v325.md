@@ -1,8 +1,8 @@
 # Alongside: Move — Master Schedule
-## 08 Sep 2026 v326
+## 08 Sep 2026 v325
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v325.md`. Remove v325 on upload.
+Supersedes `master_schedule_v324.md`. Remove v324 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
@@ -17,8 +17,7 @@ Supersedes `master_schedule_v325.md`. Remove v325 on upload.
 > | ✅ | ~~**Device pass**~~ | **COMPLETE, 8 of 8, 08 Sep.** 15 defects in shipped code, plus 6 more from Graeme's handset. See the tally below |
 > | ✅ | ~~**Class data contract**~~ | **FIXED 08 Sep, CLASS-1, `v479`.** All three classes are in as data and validating. See below |
 > | 1 | 🟡 **Class four — "Bending"** | **DRAFTED, awaiting Graeme on the voice.** `alongside_class_004_bending_08sep2026_v1_DRAFT.md`. Serves `back-resilience`, the one strand in Graeme's arc no class serves. Three open questions at the end, including whether "Bending" is the right name or the frightening one |
-> | 2 | 🟡 **Class five — "Standing Up"** | **DRAFTED, awaiting Graeme on the voice.** `alongside_class_005_standing_up_08sep2026_v1_DRAFT.md`. Serves `leg-strength` — **both the next strand in Graeme's own aim and the most-wanted unserved strand across all 33 (12 aims)**. Three open questions |
-> | 3 | 🟡 **Class six onwards** | Next unserved by need: `hip-range` (8 aims), `not-overdoing` (8), `being-outside` (8), `self-kindness` (7), `winding-down` (7) | Three classes written (`alongside_class_001/002/003`); **fix the contract against them before a fourth is written.** Nothing is built for classes yet. Decisions already taken are further down this document: the mapping unit is the STRAND not the aim; extend `practice-library.js` rather than building beside it; PACING (spec §4b) |
+> | 2 | 🟡 **Class five onwards** | Contract fixed and gated, lighter variants included. Next unserved strands by need: `leg-strength` (12 aims), `hip-range` (8), `not-overdoing` (8), `being-outside` (8) | Three classes written (`alongside_class_001/002/003`); **fix the contract against them before a fourth is written.** Nothing is built for classes yet. Decisions already taken are further down this document: the mapping unit is the STRAND not the aim; extend `practice-library.js` rather than building beside it; PACING (spec §4b) |
 > | 2 | 🟡 **Class content** | **Graeme's.** His arc first, then expand — six to eight more plus lighter variants |
 > | + | 🟠 **RED-FLAG** | **No code at all.** Waits on Graeme's PAR-Q+ call |
 >
@@ -32,30 +31,6 @@ Supersedes `master_schedule_v325.md`. Remove v325 on upload.
 > 🟠 **49 gates read cwd-relative** | Green from the repo root, reading nothing from anywhere else. **A trap, not a live fault:** a session running the suite by full path from elsewhere sees ~70 red and concludes the app is broken. Four fixed so far, one at a time as each gate is opened |
 > 🟠 **The five tools outside the `verify-*` suite** | `schedule-drift`, `precache-check`, `schema-check`, `contrast-check`, `audit-gate-proxies`. **They have caught two live faults nobody would otherwise have seen** — a stale schedule and an unprecached view — because nothing runs them by default. Folding them into the standard run is a small change with a proven return |
 > 🟡 **Changelog stale since March** | Resume or retire — Graeme's call |
-
-> ### 📝 DRAFTED SINCE v325 — Class 005, "Standing Up". Serves `leg-strength`.
->
-> ⚫ **Two things converge on the same strand.** `leg-strength` is the **next strand in Graeme's own aim** — `stronger-core` carries five and the card shows three — and it is the **most-wanted unserved strand across all 33 aims at 12**, more than double any other still uncovered. First class of the *expand outward* step.
->
-> 🔴 **This is the strand most likely to be a session rather than a class, and the draft has to earn the difference.** The builder already does leg strength perfectly well. What the class adds is what the twelve aims are actually about: *off the floor · up the stairs · carrying the shopping · picking up somebody I love · steadier on my feet · keep doing things for myself*. **Ten of the twelve are things people do, not numbers they want to hit** — only *lift heavier* and *get faster* are performance.
->
-> So it is **not leg day. It is four things you already do, done on purpose, named for what they are for.** ⚫ And it never says "functional" — that word belongs to the people who write about this, not the people doing it.
->
-> **Structure checked, voice open.** All five exercise ids exist; 15 minutes exactly; lighter variant lands on 10 with a label that reads differently.
->
-> ### 🟢 What it told us about the contract
->
-> **Second use of `holdSeconds`, and that matters more than the first.** One instance of a field is a special case; two is a pattern. The wall sit and Steady Round's plank are unrelated movements in unrelated classes, and both need a duration a pacing control must not touch.
->
-> 🔴 **Third class in a row to need a `lighterVoice`, and always for the same reason: a line that COUNTS something the lighter variant changes.** Ground's "four minutes ago", Stopping Early's "three times you stopped", now "four movements". **Three of three. If the count is in the voice, the lighter variant will contradict it.** A future class might be better written not to count out loud at all — a voice decision, not a contract one.
->
-> ### 🔵 Open questions on this draft
->
-> | | |
-> |---|---|
-> **The name** | *"Standing Up"* is the first movement, what the class is for, and quietly the other thing — staying able to do things for yourself. That last part may be exactly right or heavier than a card should carry |
-> **It needs a wall and a step** | The first class with a real environmental requirement. Both are in the lighter variant's omit list, **so a lighter day is also the version for somebody who has neither** — convenient, and possibly too convenient: it conflates *bad day* with *small flat* |
-> **"Carrying something heavy while you find your keys"** | The most specific image in any class so far. Specific is usually good and occasionally it is somebody else's life |
 
 > ### 🟢 SHIPPED SINCE v324 — CLASS-2 / 2b, `v481`. Every class has a lighter day.
 >
@@ -8580,4 +8555,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 08 Sep 2026 v326*
+*Build New Habits · Alongside: Move · Master Schedule · 08 Sep 2026 v325*
