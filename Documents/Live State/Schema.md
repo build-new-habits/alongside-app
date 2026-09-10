@@ -1,4 +1,10 @@
 # Alongside — Data Schema Reference
+## 08 Sep 2026 v1.58
+
+> **v1.58 — LOG-CLASS-1.** No field changes. Records that the class
+> player writes to `activityLog`, and corrects a note that had been read
+> as "do not log classes".
+
 ## 08 Sep 2026 v1.57
 
 > **v1.57, 08 Sep 2026 — PLAYER-1.** New nested field **`activeClass`**,
@@ -28,9 +34,19 @@
 > in a pocket. Module state does not survive that; the workout view keeps
 > its progress in the store for the same reason.
 >
-> ⚫ **No count of classes completed, and no streak.** Four of the seven
-> classes exist to argue that today's result is not the evidence, and a
-> counter would contradict them from the corner of the screen.
+> ⚫ **No count of classes completed, and no streak** — in `activeClass`.
+> Four of the seven classes exist to argue that today's result is not the
+> evidence, and a counter in the corner of the player would contradict
+> them.
+>
+> 🔴 **v1.58, 08 Sep 2026 — LOG-CLASS-1. That is about a TALLY ON THE
+> CLASS SCREEN, and it was allowed to stand in for logging at all.** The
+> player wrote nothing to `activityLog`, so Progress reported "Nothing
+> logged in this window. 0 sessions, 0 minutes" to somebody who had just
+> done a class. Not showing a count is not the same as not remembering
+> they were there, and Progress exists to answer "what have I been
+> doing". A completed class now logs `type: 'class'` with the minutes
+> actually spent; leaving part-way logs a partial.
 
 ## 08 Sep 2026 v1.56
 

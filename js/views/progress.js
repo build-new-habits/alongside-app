@@ -1,5 +1,13 @@
 /**
  * progress.js
+ * 08 Sep 2026 v14
+ *
+ * v14 - LOG-CLASS-1. Two echoing fallthroughs and a plural.
+ *   _formatType() and _shapeLabel() both ended `|| input`, so a class
+ *   logged with a strand id printed "trunk-strength" at somebody. Same
+ *   shape as formatRole() in ROLE-1, in two more places. And the
+ *   sessions count read "1 sessions" in its accessible name.
+ *
  * 08 Sep 2026 v13
  *
  * v13 - PROGRESS-2. "What you have been doing" is an h2, not an h3.
@@ -534,7 +542,13 @@ export function ProgressView(router) {
     return `
       <section class="progress-summary" aria-label="Activity summary for last ${activeWindow} days">
         <div class="progress-summary__stat">
-          <span class="progress-summary__number" aria-label="${sessionCount} sessions">${sessionCount}</span>
+          <!-- LOG-CLASS-1, 08 Sep 2026. "1 sessions" in the accessible
+               name. The VISIBLE word below is a column heading and is
+               right to stay plural; this one is read as a sentence.
+               Third instance of this exact fault -- PROPOSAL-1 on the
+               proposal card, OWN-1 on the Home card. -->
+          <span class="progress-summary__number"
+                aria-label="${sessionCount} session${sessionCount === 1 ? '' : 's'}">${sessionCount}</span>
           <span class="progress-summary__label">sessions</span>
         </div>
         <div class="progress-summary__stat">
@@ -629,9 +643,24 @@ export function ProgressView(router) {
    * the first time one changed -- which is exactly what the retired
    * getWorkoutName() did with its three.
    */
+  /**
+   * LOG-CLASS-1, 08 Sep 2026. Was `t ? t.label : id` -- echoing its own
+   * input on a miss, which is the THIRD instance of that shape found
+   * today. formatRole() in workout.js printed the word UNDEFINED on
+   * every card of every coach-built session (ROLE-1); _formatType() just
+   * above printed a raw strand id; and this printed "class".
+   *
+   * ⚫ The pattern is worth naming: a lookup that ends `|| input` reads
+   * as a safe default and is the opposite. It guarantees that the one
+   * case nobody thought about is shown to a person verbatim, in
+   * developer vocabulary, on a screen about their own life.
+   *
+   * Falls through to _formatType(), which knows the log's vocabulary and
+   * has a readable fallback of its own.
+   */
   function _shapeLabel(id) {
     const t = SESSION_TYPES.find(x => x.id === id);
-    return t ? t.label : id;
+    return t ? t.label : _formatType(id);
   }
 
   // ── Programme progress ─────────────────────────────────────────────────────
@@ -1143,8 +1172,19 @@ export function ProgressView(router) {
       'core-session':     'core work',
       'quiet-session':    'breathing',
       'gym-programme':    'gym',
+      'class':            'guided class',
     };
-    return MAP[type] || type;
+    // LOG-CLASS-1, 08 Sep 2026. Was `MAP[type] || type` -- the same
+    // echoing fallthrough ROLE-1 fixed in workout.js, in a second file.
+    // It printed raw internal tokens to a person: a class logged with a
+    // strand id showed "trunk-strength" in "What you have been doing".
+    //
+    // A miss now returns a readable fallback rather than the id. Not "",
+    // because unlike a badge this line is a list of what somebody did
+    // and an entry silently vanishing from their own record is worse
+    // than one labelled plainly.
+    if (MAP[type]) return MAP[type];
+    return String(type || '').replace(/[-_]/g, ' ').trim() || 'movement';
   }
 
   return { mount };
