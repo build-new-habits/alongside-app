@@ -50,11 +50,13 @@ import { STRANDS } from '../aims.js';
 import { CLASS_GROUND_001 }         from './class-ground-001.js';
 import { CLASS_STEADY_ROUND_002 }   from './class-steady-round-002.js';
 import { CLASS_STOPPING_EARLY_003 } from './class-stopping-early-003.js';
+import { CLASS_BENDING_004 }        from './class-bending-004.js';
 
 export const CLASSES = Object.freeze([
   CLASS_GROUND_001,
   CLASS_STEADY_ROUND_002,
-  CLASS_STOPPING_EARLY_003
+  CLASS_STOPPING_EARLY_003,
+  CLASS_BENDING_004
 ]);
 
 const byId = new Map(EXERCISES.map(e => [e.id, e]));
