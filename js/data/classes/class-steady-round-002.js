@@ -1,6 +1,21 @@
 /**
  * data/classes/class-steady-round-002.js
  *
+ * 08 Sep 2026 v5
+ *
+ * v5 - ROUND-TWO-2. The second round gives the SAME instruction as the
+ *   first. It opened "I'll say less this time -- you know what they are
+ *   now" and then cued each movement in four words.
+ *
+ *   Graeme: "If I go to a yoga class, they still say the same to
+ *   everybody. They give you the instructions of what you have to do."
+ *
+ *   An instructor in a room cues every round the same. And the reasoning
+ *   behind the original -- that repeating the coaching would say the
+ *   person had not learned it -- is the coach remarking on their
+ *   progress and reducing support on the strength of it, at the point in
+ *   the session where they are most tired and most likely to lose form.
+ *
  * 08 Sep 2026 v4
  *
  * v4 - PACING-1. Section durations rebalanced so each one holds its own
@@ -264,7 +279,7 @@ export const CLASS_STEADY_ROUND_002 = {
 
     {
       id: 'round-two', title: 'Round two', durationSeconds: 279,
-      note: 'Quieter on purpose. Repeating the full coaching would say the person had not learned it — but quieter is not empty, and every movement is still NAMED. See the block below.',
+      note: 'The SAME instruction as round one. An instructor in a room cues every round the same, and the second round is when form goes.',
       beats: [
         /**
          * 🔴 A11Y-CLASS-1, 08 Sep 2026. This section was ONE BEAT and
@@ -287,8 +302,36 @@ export const CLASS_STEADY_ROUND_002 = {
          *
          * ⚫ Each movement keeps its own screen line, so the name is
          * READABLE at the moment it is needed rather than recalled from
-         * a list four minutes earlier. That is the whole fix: quieter
-         * coaching, same signposts.
+         * a list four minutes earlier.
+         *
+         * 🔴 ROUND-TWO-2, 08 Sep 2026. IT NO LONGER SAYS LESS.
+         *
+         * It used to open "I'll say less this time -- you know what they
+         * are now", and then give each movement a single short cue. Two
+         * things were wrong with that, and Graeme named the second:
+         *
+         *   "If I go to a yoga class, they still say the same to
+         *    everybody. They give you the instructions of what you have
+         *    to do."
+         *
+         * He is right. An instructor in a room cues every round the
+         * same. Nobody goes quiet on the second pass.
+         *
+         * And the reason it was written that way -- "repeating the full
+         * coaching would say the person had not learned it" -- is the
+         * coach REMARKING ON WHAT THE PERSON HAS LEARNED, then reducing
+         * support on the strength of it. At the point in the session
+         * where somebody is most tired and most likely to lose form.
+         *
+         * The stop cues are the only safety-relevant lines in this class
+         * and round two is the round where form goes. Coaching does not
+         * get quieter here.
+         *
+         * The opening line is now just "Same five, same order." No
+         * commentary on progress, and nothing that notices the person
+         * carried on past the exit two minutes earlier -- because that
+         * exit is offered as a genuinely equal choice, and noticing it
+         * would make it a thing they declined.
          *
          * The plank keeps its 35 second hold. Round two is the same
          * work, and a hold that shortened on the second pass would be
@@ -297,14 +340,14 @@ export const CLASS_STEADY_ROUND_002 = {
         {
           kind: 'arriving',
           screen: 'Same five, same order. Glute Bridge · Dead Bug · Bird Dog · Plank · Hip Hinge',
-          voice: "Same five, same order. I'll say less this time — you know what they are now.",
+          voice: 'Same five, same order.',
           speechSeconds: 10
         },
         {
           kind: 'movement',
           screen: 'Glute Bridge',
-          voice: 'Glute bridge. Same as before — stop when it stops feeling smooth.',
-          speechSeconds: 45,
+          voice: 'Glute bridge. Push through your heels, hips up, down slowly. Stop when it stops feeling smooth.',
+          speechSeconds: 38,
           exerciseId: 'glute-bridge',
           sitOut: true,
           stopCue: 'when it stops feeling smooth'
@@ -312,8 +355,8 @@ export const CLASS_STEADY_ROUND_002 = {
         {
           kind: 'movement',
           screen: 'Dead Bug',
-          voice: 'Dead bug. Back stays on the floor.',
-          speechSeconds: 45,
+          voice: 'Dead bug. Opposite arm and leg, slowly. Stop if your lower back lifts off the floor.',
+          speechSeconds: 38,
           exerciseId: 'dead-bug',
           sitOut: true,
           stopCue: 'your lower back leaves the floor'
@@ -321,8 +364,8 @@ export const CLASS_STEADY_ROUND_002 = {
         {
           kind: 'movement',
           screen: 'Bird Dog',
-          voice: 'Bird dog. Slow beats far.',
-          speechSeconds: 45,
+          voice: 'Bird dog. Opposite arm and leg, and try not to tip. Slow beats far.',
+          speechSeconds: 38,
           exerciseId: 'bird-dog',
           sitOut: true,
           stopCue: 'slow beats far — stop when the slowness goes'
@@ -330,18 +373,27 @@ export const CLASS_STEADY_ROUND_002 = {
         {
           kind: 'movement',
           screen: 'Plank',
-          voice: 'Plank. Down before it gets ugly.',
+          voice: 'Plank. Forearms, or knees — knees is a real version of this, not a lesser one.',
+          speechSeconds: 8,
           exerciseId: 'plank',
           sitOut: true,
           easierRouteId: 'plank',
-          holdSeconds: 35,
           stopCue: 'before it gets ugly, not after'
+        },
+        {
+          // The hold, unchanged from round one. Not shortened for
+          // tiredness and not lengthened for progress: round two is the
+          // same work, and a hold that moved between rounds would be the
+          // class deciding something about this person's capacity.
+          kind: 'movement',
+          voice: 'Come down before it gets ugly.',
+          holdSeconds: 35
         },
         {
           kind: 'movement',
           screen: 'Hip Hinge',
-          voice: 'And the hip hinge. Back stays long.',
-          speechSeconds: 45,
+          voice: 'Hip hinge. Stand up when you\u2019re ready. Hips back, chest forward, back stays long.',
+          speechSeconds: 32,
           exerciseId: 'hip-hinge-drill',
           sitOut: true,
           stopCue: 'while your back stays long'
