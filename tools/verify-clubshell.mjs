@@ -381,6 +381,77 @@ ok("10g. and 'not yet' is said not to mean behind",
    "without that sentence, two of three strands reading 'not yet' is read as " +
    "being behind, whatever the design intends");
 
+console.log("\nTEST 11 - A11Y-HOME: Home can be read by heading");
+
+// Home had ONE heading for the whole screen -- the greeting -- so the
+// page everybody starts on could not be skimmed at all. Four rooms, and
+// a screen reader user had no way to jump between them. WCAG 2.2 AA
+// 1.3.1: these are the page's sections and they existed in presentation
+// only.
+//
+// Graeme, on being told nothing on Home reached the class player:
+// "That's obviously an accessibility problem... Home needs to be read."
+
+{
+  // home() returns { c, navs, text } -- the element is on .c. Destructured
+  // rather than assumed: the first version treated the return value as
+  // the element and threw, which is a fixture not reaching what it names.
+  const { c } = home("personal");
+  const heads = [...c.querySelectorAll("h1,h2,h3,h4,h5,h6")]
+    .map(h => ({ level: Number(h.tagName[1]), text: (h.textContent || "").replace(/\s+/g, " ").trim() }));
+
+  ok("11pc. positive control: Home rendered headings to check",
+     heads.length > 0, "no headings at all, so nothing below measures anything");
+
+  ok("11a. exactly one h1",
+     heads.filter(h => h.level === 1).length === 1,
+     `${heads.filter(h => h.level === 1).length} found`);
+
+  const roomHeads = c.querySelectorAll("h2.club-row__heading");
+  ok("11b. every room is reachable by heading",
+     roomHeads.length === c.querySelectorAll(".club-row").length &&
+     roomHeads.length > 0,
+     `${roomHeads.length} headings for ${c.querySelectorAll(".club-row").length} rooms`);
+
+  ok("11c. no level is skipped",
+     heads.every((h, i) => i === 0 || h.level <= heads[i - 1].level + 1),
+     heads.map(h => `h${h.level} ${h.text.slice(0, 18)}`).join(" > "));
+
+  // 🔴 The heading WRAPS the button. A heading nested inside an
+  // interactive element is not reliably exposed, and shrinking the
+  // button to fit a shorter heading would take the tap target away from
+  // the rest of the row -- where people already press. That removal
+  // would be the change, not an improvement.
+  const inner = [...roomHeads].every(h => h.querySelector("button.club-row__head"));
+  ok("11d. and it wraps the button rather than sitting inside it",
+     inner, "the button is not inside its heading");
+
+  ok("11e. the whole row is still the tap target",
+     [...c.querySelectorAll("button.club-row__head")]
+       .every(b => b.querySelector(".club-row__what")),
+     "the button no longer contains the room's description, so the tap " +
+     "target has shrunk to the title alone");
+
+  // Comments STRIPPED before matching. A11Y-HEADER's equivalent assertion
+  // matched the comment explaining why margin:0 was load-bearing, so
+  // deleting the declaration left the gate green -- a gate passing on its
+  // own documentation. Same trap, avoided here on purpose.
+  const roomsCss = fs.readFileSync(new URL("../css/components/club-rooms.css", import.meta.url), "utf8")
+    .replace(/\/\*[\s\S]*?\*\//g, "");
+  ok("11g. the heading's margin is reset",
+     /\.club-row__heading\s*\{[^}]*margin:\s*0/.test(roomsCss),
+     "an h2 carries a UA default of 0.83em top and bottom where a div " +
+     "carries none, so the element change alone pushes all four rooms apart");
+  ok("11h. and it inherits the button's type",
+     /\.club-row__heading\s*\{[^}]*font:\s*inherit/.test(roomsCss),
+     "without it the rooms take the browser's h2 size and the layout moves");
+
+  ok("11f. and it still announces its expanded state",
+     [...c.querySelectorAll("button.club-row__head")]
+       .every(b => b.hasAttribute("aria-expanded")),
+     "wrapping the button cost it its disclosure semantics");
+}
+
 console.log(fails === 0
   ? "\nCLUB-SHELL: all assertions pass\n"
   : `\nCLUB-SHELL: ${fails} FAILED\n`);

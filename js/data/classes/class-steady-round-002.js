@@ -264,12 +264,87 @@ export const CLASS_STEADY_ROUND_002 = {
 
     {
       id: 'round-two', title: 'Round two', durationSeconds: 279,
-      note: 'Quieter on purpose. Repeating the full coaching would say the person had not learned it.',
+      note: 'Quieter on purpose. Repeating the full coaching would say the person had not learned it — but quieter is not empty, and every movement is still NAMED. See the block below.',
       beats: [
+        /**
+         * 🔴 A11Y-CLASS-1, 08 Sep 2026. This section was ONE BEAT and
+         * nine seconds of content in a five-minute slot.
+         *
+         * The document always said what belongs here -- "then the five,
+         * cued by name only, with the same holds" -- and it was never
+         * written out. PACING-1 made the consequence visible: the
+         * silence tail dutifully filled four minutes fifty with quiet.
+         *
+         * Graeme called it an accessibility problem, and it is the
+         * sharper reading of it. This class is TEXT for anybody who has
+         * the voice off, cannot hear it, or is reading rather than
+         * listening -- and for five of its nineteen minutes that text
+         * said "same five, same order" and then nothing at all. A person
+         * relying on the screen had no idea which movement they were
+         * meant to be on. WCAG 2.2 AA 1.2.x: the audio and the text have
+         * to carry the same content, and here the text carried a third
+         * of it.
+         *
+         * ⚫ Each movement keeps its own screen line, so the name is
+         * READABLE at the moment it is needed rather than recalled from
+         * a list four minutes earlier. That is the whole fix: quieter
+         * coaching, same signposts.
+         *
+         * The plank keeps its 35 second hold. Round two is the same
+         * work, and a hold that shortened on the second pass would be
+         * the class quietly making it easier without saying so.
+         */
         {
           kind: 'arriving',
           screen: 'Same five, same order. Glute Bridge · Dead Bug · Bird Dog · Plank · Hip Hinge',
-          voice: "Same five, same order. I'll say less this time — you know what they are now."
+          voice: "Same five, same order. I'll say less this time — you know what they are now.",
+          speechSeconds: 10
+        },
+        {
+          kind: 'movement',
+          screen: 'Glute Bridge',
+          voice: 'Glute bridge. Same as before — stop when it stops feeling smooth.',
+          speechSeconds: 45,
+          exerciseId: 'glute-bridge',
+          sitOut: true,
+          stopCue: 'when it stops feeling smooth'
+        },
+        {
+          kind: 'movement',
+          screen: 'Dead Bug',
+          voice: 'Dead bug. Back stays on the floor.',
+          speechSeconds: 45,
+          exerciseId: 'dead-bug',
+          sitOut: true,
+          stopCue: 'your lower back leaves the floor'
+        },
+        {
+          kind: 'movement',
+          screen: 'Bird Dog',
+          voice: 'Bird dog. Slow beats far.',
+          speechSeconds: 45,
+          exerciseId: 'bird-dog',
+          sitOut: true,
+          stopCue: 'slow beats far — stop when the slowness goes'
+        },
+        {
+          kind: 'movement',
+          screen: 'Plank',
+          voice: 'Plank. Down before it gets ugly.',
+          exerciseId: 'plank',
+          sitOut: true,
+          easierRouteId: 'plank',
+          holdSeconds: 35,
+          stopCue: 'before it gets ugly, not after'
+        },
+        {
+          kind: 'movement',
+          screen: 'Hip Hinge',
+          voice: 'And the hip hinge. Back stays long.',
+          speechSeconds: 45,
+          exerciseId: 'hip-hinge-drill',
+          sitOut: true,
+          stopCue: 'while your back stays long'
         }
       ]
     },
