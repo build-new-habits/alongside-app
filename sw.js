@@ -1,6 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 08 Sep 2026 v490
+ *
+ * v490 - ROUND-TWO-2. class-steady-round-002.js v5. The second round is
+ *   cued the same as the first. Already precached; cache bump only.
+ *
  * 08 Sep 2026 v489
  *
  * v489 - TIMETABLE-1. TWO NEW FILES PRECACHED: the class timetable and
@@ -3330,7 +3335,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v489";
+const CACHE_NAME = "alongside-v490";
 
 const SHELL_URLS = [
 
