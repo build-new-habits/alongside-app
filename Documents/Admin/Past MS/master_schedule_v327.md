@@ -1,8 +1,8 @@
 # Alongside: Move — Master Schedule
-## 08 Sep 2026 v328
+## 08 Sep 2026 v327
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v327.md`. Remove v327 on upload.
+Supersedes `master_schedule_v326.md`. Remove v326 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
@@ -16,8 +16,7 @@ Supersedes `master_schedule_v327.md`. Remove v327 on upload.
 > |---|---|---|
 > | ✅ | ~~**Device pass**~~ | **COMPLETE, 8 of 8, 08 Sep.** 15 defects in shipped code, plus 6 more from Graeme's handset. See the tally below |
 > | ✅ | ~~**Class data contract**~~ | **FIXED 08 Sep, CLASS-1, `v479`.** All three classes are in as data and validating. See below |
-> | ✅ | ~~**Class four — "Bending"**~~ | **LIVE, `v484`.** Graeme read it and approved the shape and voice. **His arc is now fully served.** Three questions still open on the document — the name, "about forty times", and whether the lighter line is needed — each a one-line edit |
-> | 1 | 🟡 **Transcribe 005 and 006** | Voice approved in this vein, so both are unblocked. Structure, ids and arithmetic already checked on each |
+> | 1 | 🟡 **Class four — "Bending"** | **DRAFTED, awaiting Graeme on the voice.** `alongside_class_004_bending_08sep2026_v1_DRAFT.md`. Serves `back-resilience`, the one strand in Graeme's arc no class serves. Three open questions at the end, including whether "Bending" is the right name or the frightening one |
 > | 2 | 🟡 **Class five — "Standing Up"** | **DRAFTED, awaiting Graeme on the voice.** `alongside_class_005_standing_up_08sep2026_v1_DRAFT.md`. Serves `leg-strength` — **both the next strand in Graeme's own aim and the most-wanted unserved strand across all 33 (12 aims)**. Three open questions |
 > | 3 | 🟡 **Class six — "Out"** | **DRAFTED, and it strained the contract in five places.** `alongside_class_006_out_08sep2026_v1_DRAFT.md`. Serves `being-outside`. **Two strains fixed (CLASS-3); three are decisions for Graeme** |
 > | 4 | 🟡 **Class seven onwards** | Next unserved by need: `hip-range` (8 aims), `not-overdoing` (8 — but already touched by Stopping Early), `self-kindness` (7), `winding-down` (7) | Three classes written (`alongside_class_001/002/003`); **fix the contract against them before a fourth is written.** Nothing is built for classes yet. Decisions already taken are further down this document: the mapping unit is the STRAND not the aim; extend `practice-library.js` rather than building beside it; PACING (spec §4b) |
@@ -34,30 +33,6 @@ Supersedes `master_schedule_v327.md`. Remove v327 on upload.
 > 🟠 **49 gates read cwd-relative** | Green from the repo root, reading nothing from anywhere else. **A trap, not a live fault:** a session running the suite by full path from elsewhere sees ~70 red and concludes the app is broken. Four fixed so far, one at a time as each gate is opened |
 > 🟠 **The five tools outside the `verify-*` suite** | `schedule-drift`, `precache-check`, `schema-check`, `contrast-check`, `audit-gate-proxies`. **They have caught two live faults nobody would otherwise have seen** — a stale schedule and an unprecached view — because nothing runs them by default. Folding them into the standard run is a small change with a proven return |
 > 🟡 **Changelog stale since March** | Resume or retire — Graeme's call |
-
-> ### 🟢 SHIPPED SINCE v327 — CLASS-4, `v484`. Bending is live, and Graeme's arc is served.
->
-> ⚫ **Graeme read the draft: *"I like it. I've read several now and like the shape and voice. Ready to continue in this vein."*** That approval is what turned three markdown drafts from pending into work that can land — a drafted class does nothing; a transcribed one is in the app and gated.
->
-> **Bending serves `back-resilience`.** With it, all three of Graeme's displayed arc strands are covered:
->
-> | Strand | Class |
-> |---|---|
-> Trunk strength | Steady Round |
-> A back that copes | **Bending** |
-> Trusting your body again | Ground |
->
-> 🟢 **Safety spot-check, severe lower back: Bending is withheld and Ground is offered.** A bending class is exactly what a severe lower back should not be handed, and the filter reaches that conclusion on its own from the exercise ids — no rule was written for it.
->
-> ⚫ Three questions stay open on the document and were **transcribed as drafted rather than pre-empted**: whether "Bending" is the right name or the frightening one, whether *"about forty times"* should be vaguer, and whether the lighter variant needs its replacement line. Each is a one-line edit now.
->
-> ### 🔴 Two faults in my own gate, both the same shape
->
-> **`0a` asserted `all.length === 3`** and went red the moment a fourth class existed. **`7pc` asserted `clear === 3`** likewise. Both were asserting the FIXTURE rather than the behaviour — **the identical fault `verify-saved1` had this morning with a hard-coded record count.** Now: the set is non-empty, ids are distinct, and *every* class is offered when nothing is declared.
->
-> 🔴 **And Bending's honesty line was not protected.** Reversal testing replaced *"whether it helps is not a today question"* with *"this will strengthen your back"* — the exact claim the class exists not to make — **and the gate stayed green.** Added to the protected lines.
->
-> ⚫ **Three of the four classes now carry the same refusal in different words** — *later in the week, not now* · *on a staircase in a month* · *not a today question*. Across the set that is a property of the voice rather than a line in one class, and the protected-lines list is where a fifth class breaking it would be noticed.
 
 > ### 📝 DRAFTED SINCE v326 — Class 006, "Out". Serves `being-outside`. **CLASS-3 shipped with it.**
 >
@@ -8628,4 +8603,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 08 Sep 2026 v328*
+*Build New Habits · Alongside: Move · Master Schedule · 08 Sep 2026 v327*
