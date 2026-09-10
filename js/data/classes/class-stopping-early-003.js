@@ -1,6 +1,14 @@
 /**
  * data/classes/class-stopping-early-003.js
  *
+ * 08 Sep 2026 v2
+ *
+ * v2 - CLASS-2/2b. Lighter variant: drops the standing practice, the
+ *   only one that asks the person out of the chair and the one the class
+ *   itself calls hardest. Two lines gain a lighterVoice -- the count of
+ *   times stopped is the evidence this class gathers, so it has to be
+ *   right.
+ *
  * 08 Sep 2026 v1
  *
  * CLASS-1. Class 003, "Stopping Early", as data.
@@ -53,6 +61,27 @@ export const CLASS_STOPPING_EARLY_003 = {
   position:      'seated',
   equipment:     [],
   flags:         ['body-focused-attention', 'deliberately-stopping-short'],
+
+  /**
+   * CLASS-2, 08 Sep 2026. The lighter variant.
+   *
+   * Drops the third practice — the standing one. It is the only section
+   * that asks the person out of the chair, and the class itself says it
+   * is the hardest of the three: "this is the one where stopping early
+   * is hardest, because it feels like so little."
+   *
+   * Two practices still teach the thing. This class is not about the
+   * shoulders or the reaching; it is about the stopping, and stopping
+   * twice on purpose is the same lesson as stopping three times.
+   *
+   * The quiet stays at its full two and a half minutes. On a bad day it
+   * is the part most worth keeping, and shortening it would make the
+   * lighter variant a rush — which is the opposite of a class about not
+   * pushing on.
+   */
+  lighter: {
+    omitSections: ['standing']
+  },
 
   sections: [
     {
@@ -191,6 +220,11 @@ export const CLASS_STOPPING_EARLY_003 = {
           // 🔴 The honest form of the promise. See the header.
           kind: 'rest',
           voice: "You stopped three times today when you didn't have to. Whether that turns out to be useful, you'll find out later in the week — not now.",
+          // CLASS-2b. Two practices on a lighter day, not three. The
+          // count is the evidence the whole class is gathering, so
+          // getting it wrong here would undercut the one thing it asks
+          // the person to believe. The promise itself is untouched.
+          lighterVoice: "You stopped twice today when you didn't have to. Whether that turns out to be useful, you'll find out later in the week — not now.",
           speechSeconds: 50
         },
         { kind: 'rest', speechSeconds: 40 }
@@ -204,6 +238,7 @@ export const CLASS_STOPPING_EARLY_003 = {
           kind: 'closing',
           screen: 'Done.',
           voice: "That's it. Twelve minutes, and the useful part was the three times you stopped.",
+          lighterVoice: "That's it. Ten minutes, and the useful part was the two times you stopped.",
           speechSeconds: 10
         },
         { kind: 'closing', voice: 'See you next time.' }
