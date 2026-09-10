@@ -1,6 +1,13 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 08 Sep 2026 v482
+ *
+ * v482 - CLASS-2b. class-contract.js v4, class-ground-001.js v3,
+ *   class-stopping-early-003.js v2. All three classes now have a lighter
+ *   variant, and two carry alternative lines for the sentences that are
+ *   only true on the full day. Already precached; cache bump only.
+ *
  * 08 Sep 2026 v481
  *
  * v481 - CLASS-2. class-contract.js v3, class-steady-round-002.js v3.
@@ -3276,7 +3283,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v481";
+const CACHE_NAME = "alongside-v482";
 
 const SHELL_URLS = [
 
