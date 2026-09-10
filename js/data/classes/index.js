@@ -53,6 +53,7 @@ import { CLASS_STOPPING_EARLY_003 } from './class-stopping-early-003.js';
 import { CLASS_BENDING_004 }        from './class-bending-004.js';
 import { CLASS_STANDING_UP_005 }    from './class-standing-up-005.js';
 import { CLASS_OUT_006 }            from './class-out-006.js';
+import { CLASS_UNSTICKING_007 }     from './class-unsticking-007.js';
 
 export const CLASSES = Object.freeze([
   CLASS_GROUND_001,
@@ -60,7 +61,8 @@ export const CLASSES = Object.freeze([
   CLASS_STOPPING_EARLY_003,
   CLASS_BENDING_004,
   CLASS_STANDING_UP_005,
-  CLASS_OUT_006
+  CLASS_OUT_006,
+  CLASS_UNSTICKING_007
 ]);
 
 const byId = new Map(EXERCISES.map(e => [e.id, e]));

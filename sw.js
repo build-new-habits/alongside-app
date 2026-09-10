@@ -1,6 +1,12 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 08 Sep 2026 v486
+ *
+ * v486 - CLASS-6. NEW FILE PRECACHED: class-unsticking-007.js. Seven
+ *   classes live. "See you Thursday" removed on Graeme's call before it
+ *   ever shipped.
+ *
  * 08 Sep 2026 v485
  *
  * v485 - CLASS-5. TWO NEW FILES PRECACHED: class-standing-up-005.js and
@@ -3304,7 +3310,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v485";
+const CACHE_NAME = "alongside-v486";
 
 const SHELL_URLS = [
 
@@ -3457,6 +3463,7 @@ const SHELL_URLS = [
   "/alongside-app/js/data/classes/class-bending-004.js",
   "/alongside-app/js/data/classes/class-standing-up-005.js",
   "/alongside-app/js/data/classes/class-out-006.js",
+  "/alongside-app/js/data/classes/class-unsticking-007.js",
   "/alongside-app/js/views/saved-sessions.js",
   "/alongside-app/js/views/session-builder-ui.js",
   "/alongside-app/js/views/noticing.js",

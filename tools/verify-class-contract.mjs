@@ -348,6 +348,10 @@ const LINES = [
   ["class-out-006",            "survives being interrupted",
    "nothing outdoors can be timed against what the person is doing, and " +
    "saying so is what stops them feeling behind a script they cannot keep up with"],
+  ["class-unsticking-007",     "The next one is the one that counts",
+   "the class's whole case. It said 'Thursday' until Graeme called it an " +
+   "own goal — a schedule nobody agreed to, and a small failure handed to " +
+   "anybody who then did not do it on Thursday"],
   ["class-bending-004",         "not a today question",
    "the alternative — 'this will strengthen your back' — is a claim the class " +
    "cannot verify and this person has been promised it before by somebody wrong"]
@@ -387,6 +391,33 @@ for (const [id, sectionId, why] of HELD) {
      !!sec && sec.beats.some(b => typeof b.holdSeconds === "number"),
      `${why}. A holdSeconds turned into a speechSeconds scales with pacing, ` +
      `which is the exact thing the two fields exist to prevent`);
+}
+
+// ── 6c. NO CLASS NAMES A DAY OF THE WEEK ────────────────────────────────
+console.log("\nTEST 6c - no class assumes a schedule nobody agreed to");
+
+// Class 007 ended "See you Thursday", and its argument -- that the NEXT
+// class is what counts -- carried that phrase in three places. Graeme:
+// "this seems like an own goal." It assumed a schedule the person had
+// not agreed to, and for anybody who then did not do it on Thursday it
+// was a small failure the class had handed them, inside a class already
+// asking them to accept that today's good feeling does not count.
+//
+// Caught before it shipped. Gated because the same instinct -- make the
+// commitment concrete -- will recur in a future class, and it reads as
+// helpful every time.
+
+const DAYS = /\b(monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b/i;
+for (const c of all) {
+  const named = c.sections
+    .flatMap(s => s.beats)
+    .flatMap(b => [b.voice, b.screen, b.lighterVoice])
+    .filter(Boolean)
+    .filter(t => DAYS.test(t));
+  ok(`6c. ${c.title}`, named.length === 0,
+     `names a weekday: ${named.map(t => t.slice(0, 60)).join(" / ")} — ` +
+     `the person did not agree to a schedule, and missing it becomes a ` +
+     `failure the class handed them`);
 }
 
 // ── 7. SAFETY IS THE LIBRARY'S, NOT A SECOND COPY ───────────────────────
