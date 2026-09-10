@@ -221,6 +221,8 @@ const VIEW_NAMES = {
   'coach-proposal':    { path: './views/coach-proposal.js',   fn: 'CoachProposalView'   },
   // PLAYER-1, 08 Sep 2026. The classes existed as data nothing could
   // reach. This is the route.
+  // TIMETABLE-1, 08 Sep 2026. The board of classes, and the player.
+  'classes':           { path: './views/class-list.js',        fn: 'ClassListView'       },
   'class-player':      { path: './views/class-player.js',      fn: 'ClassPlayerView'     },
   'home-threshold':    { path: './views/home-threshold.js',   fn: 'HomeThresholdView'   },
   'reflect':           { path: './views/reflect.js',          fn: 'ReflectView'         },
@@ -299,7 +301,7 @@ const hideNavViews = new Set([
   'onboarding/equipment', 'onboarding/plan-select',
   // Core flow (no nav)
   'home-threshold', 'community-impact', 'annual-reflection',
-  'checkin', 'checkin-mini', 'coach-proposal', 'class-player',
+  'checkin', 'checkin-mini', 'coach-proposal', 'class-player', 'classes',
   'workout', 'gym-programme', 'morning-session', 'core-session',
   'yoga-session', 'walk-session', 'running-session', 'cycle-session',
   'swim-session', 'quiet-session', 'breathing-session',

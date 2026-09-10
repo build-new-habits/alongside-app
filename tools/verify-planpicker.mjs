@@ -129,9 +129,22 @@ console.log("\nTEST 3 - Guided class is the way in");
 
 const todaySrc = fs.readFileSync("js/views/today.js", "utf8");
 const guidedBlock = todaySrc.slice(todaySrc.indexOf("id: 'guided', title: 'Guided class'"));
-ok("3a. Guided class's empty state routes to the chooser",
-   /data-route="goal-setup"/.test(guidedBlock.slice(0, 3000)),
-   "the empty state points somewhere else, so the picker has no home");
+// 08 Sep 2026, TIMETABLE-1. The slice was 3000 characters, and comments
+// added to that block pushed the button past it -- a source-text
+// assertion measuring a window rather than a fact. PLAN-PICKER-TIER's
+// point is that the picker LIVES in Guided class, not that it is the
+// first thing in the block.
+//
+// The room now leads with the classes it is named for and offers the
+// twelve-week shape second. The picker still has its home.
+ok("3a. Guided class routes to the chooser",
+   /data-route="goal-setup"/.test(guidedBlock),
+   "the picker has no home in Guided class");
+
+ok("3a-2. and the classes are reachable from the same room",
+   /data-route="classes"/.test(guidedBlock),
+   "the room named for classes does not reach them — the fault " +
+   "TIMETABLE-1 exists to fix");
 
 ok("3b. and goal-setup is programme-select, not the retired picker",
    /'goal-setup':\s*\{\s*path:\s*'\.\/views\/programme-select\.js'/
