@@ -1,5 +1,11 @@
 /**
  * store.js - Data persistence layer
+ * 08 Sep 2026 v66
+ *
+ * v66 - PLAYER-1. activeClass: the only state a class in progress
+ *   keeps. Stored, not module state, because fifteen minutes on a phone
+ *   includes locking, calls and pockets.
+ *
  * 06 Sep 2026 v65
  *
  * v65 - YOUR-OWN. savedSessions added. Sessions the person built and
@@ -1127,6 +1133,11 @@ export const store = {
       // ── SESSION BUILDER ───────────────────────────────────────
       generatedSession: saved.generatedSession || { session: null, builtAt: null, inputs: {} },
 
+      // PLAYER-1. Defaulted on rehydrate like every other nested object.
+      activeClass: saved.activeClass || {
+        id: null, lighter: false, sectionIndex: 0, beatIndex: 0, startedAt: null
+      },
+
       // ── CONDITION PAIN SCORES ─────────────────────────────────
       conditionPainScores: (saved.conditionPainScores && typeof saved.conditionPainScores === 'object')
         ? saved.conditionPainScores
@@ -2077,6 +2088,24 @@ export const store = {
         session: null,
         builtAt: null,
         inputs:  {}
+      },
+
+      // ── GUIDED CLASS ──────────────────────────────────────────
+      // PLAYER-1, 08 Sep 2026. The only state a class in progress
+      // keeps. Stored rather than held in module state because a
+      // class runs fifteen minutes on a phone that will lock, take a
+      // call, or go in a pocket -- and module state does not survive
+      // any of those. `lighter` is fixed at start and never changes
+      // mid-class. No completion count and no streak: four of the
+      // seven classes exist to argue that today's result is not the
+      // evidence, and a counter would contradict them from the corner
+      // of the screen.
+      activeClass: {
+        id:           null,
+        lighter:      false,
+        sectionIndex: 0,
+        beatIndex:    0,
+        startedAt:    null
       },
 
       // ── WEEKLY PLAN ───────────────────────────────────────────

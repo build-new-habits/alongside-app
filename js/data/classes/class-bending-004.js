@@ -1,6 +1,12 @@
 /**
  * data/classes/class-bending-004.js
  *
+ * 08 Sep 2026 v2
+ *
+ * v2 - PACING-1. Section durations rebalanced so each one holds its own
+ *   content: tight sections grew, sections with slack gave the time back,
+ *   and the CLASS TOTAL is unchanged. Nothing a person reads moved.
+ *
  * 08 Sep 2026 v1
  *
  * CLASS-4. Class 004, "Bending", as data.
@@ -62,7 +68,7 @@ export const CLASS_BENDING_004 = {
 
   sections: [
     {
-      id: 'before', title: 'Before we start', durationSeconds: 90,
+      id: 'before', title: 'Before we start', durationSeconds: 85,
       note: 'The exit is offered before the first movement, not after somebody has hurt themselves finding out.',
       beats: [
         {
@@ -89,7 +95,7 @@ export const CLASS_BENDING_004 = {
     },
 
     {
-      id: 'pelvic-tilt', title: 'Pelvic tilt', durationSeconds: 120,
+      id: 'pelvic-tilt', title: 'Pelvic tilt', durationSeconds: 124,
       beats: [
         {
           kind: 'movement',
@@ -215,7 +221,7 @@ export const CLASS_BENDING_004 = {
     },
 
     {
-      id: 'settling', title: 'Settling', durationSeconds: 120,
+      id: 'settling', title: 'Settling', durationSeconds: 150,
       beats: [
         {
           kind: 'rest',
@@ -247,7 +253,7 @@ export const CLASS_BENDING_004 = {
     },
 
     {
-      id: 'leaving', title: 'Leaving', durationSeconds: 90,
+      id: 'leaving', title: 'Leaving', durationSeconds: 61,
       beats: [
         {
           kind: 'closing',

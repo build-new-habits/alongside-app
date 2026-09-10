@@ -1,6 +1,12 @@
 /**
  * data/classes/class-stopping-early-003.js
  *
+ * 08 Sep 2026 v3
+ *
+ * v3 - PACING-1. Section durations rebalanced so each one holds its own
+ *   content: tight sections grew, sections with slack gave the time back,
+ *   and the CLASS TOTAL is unchanged. Nothing a person reads moved.
+ *
  * 08 Sep 2026 v2
  *
  * v2 - CLASS-2/2b. Lighter variant: drops the standing practice, the
@@ -85,7 +91,7 @@ export const CLASS_STOPPING_EARLY_003 = {
 
   sections: [
     {
-      id: 'what-this-is', title: 'What this is', durationSeconds: 90,
+      id: 'what-this-is', title: 'What this is', durationSeconds: 92,
       beats: [
         {
           kind: 'arriving',
@@ -114,7 +120,7 @@ export const CLASS_STOPPING_EARLY_003 = {
     },
 
     {
-      id: 'shoulders', title: 'First one: shoulders', durationSeconds: 120,
+      id: 'shoulders', title: 'First one: shoulders', durationSeconds: 124,
       beats: [
         {
           kind: 'movement',
@@ -142,7 +148,7 @@ export const CLASS_STOPPING_EARLY_003 = {
     },
 
     {
-      id: 'what-that-was-like', title: 'What that was like', durationSeconds: 60,
+      id: 'what-that-was-like', title: 'What that was like', durationSeconds: 62,
       beats: [
         {
           kind: 'reflect',
@@ -207,7 +213,7 @@ export const CLASS_STOPPING_EARLY_003 = {
     },
 
     {
-      id: 'the-quiet', title: 'The quiet', durationSeconds: 150,
+      id: 'the-quiet', title: 'The quiet', durationSeconds: 153,
       note: 'The longest silence in any class so far, and written as a guess. In a class about stopping, sitting still afterwards is thematically right and may still be too long.',
       beats: [
         {
@@ -232,7 +238,7 @@ export const CLASS_STOPPING_EARLY_003 = {
     },
 
     {
-      id: 'leaving', title: 'Leaving', durationSeconds: 60,
+      id: 'leaving', title: 'Leaving', durationSeconds: 49,
       beats: [
         {
           kind: 'closing',

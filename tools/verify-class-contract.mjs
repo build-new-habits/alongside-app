@@ -275,6 +275,80 @@ ok("2e-pos. walking is an allowed position",
    "Class 006 is a walk; 'standing' is technically true and useless to " +
    "somebody deciding whether they can do it today");
 
+// ── 2f. THE CLASS RUNS AS LONG AS IT SAYS ───────────────────────────────
+console.log("\nTEST 2f - no section's content overruns its slot");
+
+// PACING-1. Found by BUILDING A PLAYER and playing a class: the first
+// one ran a fifteen minute class in eight and a half, because
+// speechSeconds is the pause AFTER a line and nothing accounted for the
+// time to SAY it. 50 of 55 sections missed their own duration by more
+// than fifteen seconds.
+//
+// The model: a beat costs speaking + pause, a section runs for its
+// stated duration, and the remainder is silence. That makes the number
+// on the card true and leaves exactly one error worth gating -- a
+// section whose content OVERFLOWS, which is a class running past what it
+// promised.
+
+for (const c of all) {
+  const over = c.sections.filter(s => CONTRACT.sectionOverflows(s));
+  ok(`2f. ${c.title}: every section fits its slot`,
+     over.length === 0,
+     over.map(s => `${s.id} needs ${Math.round(CONTRACT.sectionSeconds(s))}s ` +
+                   `of ${s.durationSeconds}s`).join("; "));
+}
+
+ok("2f-pc. positive control: content is actually being measured",
+   CONTRACT.sectionSeconds(all[0].sections[0]) > 0,
+   "sectionSeconds returned zero for a section with beats in it");
+
+// 🔴 THE ORIGINAL FAULT, GATED DIRECTLY. Zeroing the speaking time
+// leaves every section fitting comfortably -- less content simply means
+// more silence -- so 2f alone cannot see it. This can: a line with words
+// in it must cost more than the same beat with none.
+//
+// That is exactly how the fault shipped. speechSeconds is the pause
+// AFTER a line, nothing counted the saying of it, and the player ran a
+// fifteen minute class in eight and a half.
+const spoken = CONTRACT.beatSeconds({ voice: "one two three four five six seven eight", speechSeconds: 10 });
+const silent = CONTRACT.beatSeconds({ voice: "", speechSeconds: 10 });
+ok("2f-speak. saying the line costs time",
+   spoken > silent + 2,
+   `a beat with eight words costs ${spoken.toFixed(1)}s and one with none ` +
+   `costs ${silent.toFixed(1)}s. If they are equal, nothing is counting the ` +
+   `speaking — which is the fault that ran a 15 minute class in 8.5`);
+
+ok("2f-rate. and the rate is a guided-delivery rate, not a reading one",
+   CONTRACT.SPEAKING_WPM >= 90 && CONTRACT.SPEAKING_WPM <= 125,
+   `${CONTRACT.SPEAKING_WPM} wpm. The app's TTS default of 0.9 is roughly ` +
+   `135, which is a reading voice; these classes are a coach talking to ` +
+   `somebody lying on the floor`);
+
+// 🔴 A hold is added, never scaled. Third place this is asserted,
+// because it is the one rule that changes what a person's body does.
+ok("2f-hold. a hold is unchanged by the speech rate",
+   CONTRACT.beatSeconds({ voice: 'x', holdSeconds: 30 }, { rate: 2 }) ===
+   CONTRACT.beatSeconds({ voice: 'x', holdSeconds: 30 }, { rate: 1 }),
+   "beatSeconds scaled a held position with the pacing rate");
+
+console.log("\nTEST 2g - the card is honest to the minute");
+
+// Rounded UP to the nearest MINUTE, not to five. Graeme, working it out:
+// the case for five-minute boundaries was transition time, "but actually
+// these are paced classes, aren't they? So we might have pauses." The
+// slack belongs in a pause control the person operates, not padded onto
+// a number on their behalf. Under the old bucket a 15.5 minute class
+// read "about 20" -- a 30% overstatement that would make somebody skip a
+// class they had time for.
+for (const c of all) {
+  const label = CONTRACT.durationLabel(c);
+  const shown = Number((label.match(/about (\d+) minute/) || [])[1]);
+  ok(`2g. ${c.title}: "${label.replace(/ —.*/, "")}"`,
+     Number.isFinite(shown) && shown >= c.durationMins && shown < c.durationMins + 1,
+     `a class of ${c.durationMins} min reads ${shown} — it must round UP and ` +
+     `by less than a minute`);
+}
+
 // ── 3. SERVES IS ONE STRAND, AND IT IS NOT TOUCHES ──────────────────────
 console.log("\nTEST 3 - a class serves one strand and brushes others");
 

@@ -1,6 +1,14 @@
 /**
  * data/class-contract.js
  *
+ * 08 Sep 2026 v6
+ *
+ * v6 - PACING-1. Beats cost SAYING the line plus the pause after it;
+ *   a section runs for its stated duration and the remainder is silence.
+ *   The card rounds up to the nearest MINUTE, not to five: a 15.5 minute
+ *   class read "about 20", a 30% overstatement. The slack belongs in a
+ *   pause control the person operates.
+ *
  * 08 Sep 2026 v5
  *
  * v5 - CLASS-3. Two things Class 006 found by being the first class that
@@ -303,15 +311,30 @@ export const BEAT_FIELDS = Object.freeze({
  * length drifting apart. What changes is that the true total is no longer
  * what anybody reads.
  *
- * Rounded UP to five minutes, and hedged. "About 20 minutes" is both true
- * and useful where "19 minutes" is precise and slightly false.
+ * Rounded UP to the nearest MINUTE, and hedged.
  *
- * UP, not to the nearest. To the nearest, a 12-minute class reads "about
- * 10 minutes" -- and somebody who has exactly ten minutes starts it and
- * runs over. Over-stating costs them a pleasant surprise; under-stating
- * costs them the thing they were protecting when they checked. Those are
- * not symmetrical, and this app is for people whose time and energy are
- * often the scarce thing.
+ * UP, not to the nearest: over-stating costs a pleasant surprise,
+ * under-stating costs somebody the thing they were protecting when they
+ * checked. Not symmetrical, in an app for people whose time and energy
+ * are usually the scarce thing.
+ *
+ * ── WHY MINUTES AND NOT FIVES ────────────────────────────────────────
+ *
+ * It rounded up to five until PACING-1 measured what the classes
+ * actually run. A 15.5 minute class then read "about 20 minutes" -- a
+ * 30% overstatement that would make somebody skip a class they had time
+ * for. The five-minute bucket was sound at "is this 10 or 20" and coarse
+ * at "is this 15 or 16".
+ *
+ * Graeme, thinking it through out loud: the case for five-minute
+ * boundaries was transition time -- getting to the floor, finding a
+ * chair -- and then "but actually, these are paced classes, aren't they?
+ * So we might have pauses." Which is the better answer: the slack
+ * belongs in a PAUSE CONTROL the person operates, not in a number padded
+ * on their behalf.
+ *
+ * So the number is honest to the minute, and the class says you can stop
+ * it whenever you like.
  *
  * A second authored label would be a second thing to keep in step with
  * the content, and it would go stale the first time a section changed --
@@ -320,12 +343,81 @@ export const BEAT_FIELDS = Object.freeze({
  */
 export function durationLabel(cls) {
   if (!cls || typeof cls.durationMins !== 'number') return '';
-  const rounded = Math.ceil(cls.durationMins / 5) * 5;
-  const base = `about ${rounded} minutes`;
+  const rounded = Math.ceil(cls.durationMins);
+  const base = `about ${rounded} minute${rounded === 1 ? '' : 's'}`;
   // durationNote is for the classes where the SHAPE matters, not the
   // number: Class 002 is meaningfully shorter if somebody stops after one
   // round, and that is a fact about the class, not a rounding.
   return cls.durationNote ? `${base} — ${cls.durationNote}` : base;
+}
+
+/**
+ * PACING-1, 08 Sep 2026. How long a beat actually takes.
+ *
+ * ── THE FAULT THIS FIXES ─────────────────────────────────────────────
+ *
+ * `speechSeconds` is the pause AFTER a line. Nothing anywhere accounted
+ * for the time to SAY the line — so the first player ran a fifteen
+ * minute class in eight and a half, and 50 of the 55 sections across
+ * seven classes missed their own stated duration by more than fifteen
+ * seconds. Only playing a class revealed it; reading never would.
+ *
+ * ── WHY THE RATE IS 105 AND NOT THE APP'S TTS DEFAULT ────────────────
+ *
+ * tts.js speaks at Web Speech rate 0.9, roughly 135 wpm. That is a
+ * reading voice. These classes are a coach talking to somebody lying on
+ * the floor, and calm guided delivery sits nearer 100–120.
+ *
+ * ⚫ Checked against the classes themselves rather than assumed: at 105
+ * wpm the four classes drafted on 08 Sep land within a minute of their
+ * authored lengths. The three from 06 Sep do not, and looking at WHICH
+ * sections showed why — Steady Round's round two is a five minute slot
+ * holding one beat and nine seconds of content, because "the same five,
+ * cued by name only" was never written out. A content gap, not a rate.
+ */
+export const SPEAKING_WPM = 105;
+
+export function speakingSeconds(text, wpm = SPEAKING_WPM) {
+  const words = String(text || '').trim().split(/\s+/).filter(Boolean).length;
+  return words === 0 ? 0 : (words / wpm) * 60;
+}
+
+/**
+ * The whole cost of a beat: saying it, then the pause written after it.
+ *
+ * 🔴 holdSeconds is added, never scaled. A held position is a duration
+ * somebody is in, not a gap between sentences.
+ */
+export function beatSeconds(beat, { lighter = false, rate = 1, wpm = SPEAKING_WPM } = {}) {
+  const said = speakingSeconds(voiceFor(beat, { lighter }), wpm);
+  if (typeof beat.holdSeconds === 'number') return said + beat.holdSeconds;
+  const paced = pacedBeat(beat, rate);
+  return said + (typeof paced.speechSeconds === 'number' ? paced.speechSeconds : 3);
+}
+
+/** What a section's content actually needs. */
+export function sectionSeconds(section, opts = {}) {
+  return (section.beats || []).reduce((a, b) => a + beatSeconds(b, opts), 0);
+}
+
+/**
+ * PACING-1. A SECTION RUNS FOR ITS STATED DURATION.
+ *
+ * Graeme's call, after hearing it: beats consume time inside the
+ * section, and whatever is left is silence at the end. That keeps the
+ * authored durations as the truth — they are the SHAPE of the class —
+ * and makes the number on the card true rather than aspirational.
+ *
+ * It also produces the one error worth gating: a section whose content
+ * OVERFLOWS its slot. That is not silence, it is a class running past
+ * what it promised, and it is the direction that actually harms anybody.
+ */
+export function silenceTailSeconds(section, opts = {}) {
+  return Math.max(0, (section.durationSeconds || 0) - sectionSeconds(section, opts));
+}
+
+export function sectionOverflows(section, opts = {}) {
+  return sectionSeconds(section, opts) > (section.durationSeconds || 0);
 }
 
 export function pacedBeat(beat, rate = 1) {

@@ -219,6 +219,9 @@ const VIEW_NAMES = {
   'checkin':           { path: './views/checkin.js',          fn: 'CheckinView'         },
   'checkin-mini':      { path: './views/checkin-mini.js',     fn: 'CheckinMiniView'     },
   'coach-proposal':    { path: './views/coach-proposal.js',   fn: 'CoachProposalView'   },
+  // PLAYER-1, 08 Sep 2026. The classes existed as data nothing could
+  // reach. This is the route.
+  'class-player':      { path: './views/class-player.js',      fn: 'ClassPlayerView'     },
   'home-threshold':    { path: './views/home-threshold.js',   fn: 'HomeThresholdView'   },
   'reflect':           { path: './views/reflect.js',          fn: 'ReflectView'         },
 
@@ -296,7 +299,7 @@ const hideNavViews = new Set([
   'onboarding/equipment', 'onboarding/plan-select',
   // Core flow (no nav)
   'home-threshold', 'community-impact', 'annual-reflection',
-  'checkin', 'checkin-mini', 'coach-proposal',
+  'checkin', 'checkin-mini', 'coach-proposal', 'class-player',
   'workout', 'gym-programme', 'morning-session', 'core-session',
   'yoga-session', 'walk-session', 'running-session', 'cycle-session',
   'swim-session', 'quiet-session', 'breathing-session',

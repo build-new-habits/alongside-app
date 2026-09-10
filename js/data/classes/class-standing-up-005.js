@@ -1,6 +1,12 @@
 /**
  * data/classes/class-standing-up-005.js
  *
+ * 08 Sep 2026 v2
+ *
+ * v2 - PACING-1. Section durations rebalanced so each one holds its own
+ *   content: tight sections grew, sections with slack gave the time back,
+ *   and the CLASS TOTAL is unchanged. Nothing a person reads moved.
+ *
  * 08 Sep 2026 v1
  *
  * CLASS-5. Class 005, "Standing Up", as data.
@@ -68,7 +74,7 @@ export const CLASS_STANDING_UP_005 = {
 
   sections: [
     {
-      id: 'before', title: 'Before we start', durationSeconds: 90,
+      id: 'before', title: 'Before we start', durationSeconds: 73,
       beats: [
         {
           kind: 'arriving',
@@ -95,7 +101,7 @@ export const CLASS_STANDING_UP_005 = {
     },
 
     {
-      id: 'sit-to-stand', title: 'Getting out of a chair', durationSeconds: 150,
+      id: 'sit-to-stand', title: 'Getting out of a chair', durationSeconds: 172,
       beats: [
         {
           // 🔴 The stop cue for the whole class, doing the same job as
@@ -130,7 +136,7 @@ export const CLASS_STANDING_UP_005 = {
     },
 
     {
-      id: 'what-that-was-like', title: 'What that was like', durationSeconds: 60,
+      id: 'what-that-was-like', title: 'What that was like', durationSeconds: 66,
       note: 'A reflect beat that UNDOES the counting rather than gathering it. In a strength class the expected question is how many you managed, and asking it would turn the session into a score.',
       beats: [
         {
@@ -148,7 +154,7 @@ export const CLASS_STANDING_UP_005 = {
     },
 
     {
-      id: 'step-up', title: 'Going up a step', durationSeconds: 150,
+      id: 'step-up', title: 'Going up a step', durationSeconds: 167,
       beats: [
         {
           kind: 'movement',
@@ -178,7 +184,7 @@ export const CLASS_STANDING_UP_005 = {
     },
 
     {
-      id: 'calf-raise', title: 'Going up on your toes', durationSeconds: 120,
+      id: 'calf-raise', title: 'Going up on your toes', durationSeconds: 109,
       beats: [
         {
           kind: 'movement',
@@ -204,7 +210,7 @@ export const CLASS_STANDING_UP_005 = {
     },
 
     {
-      id: 'wall-sit', title: 'Holding still', durationSeconds: 150,
+      id: 'wall-sit', title: 'Holding still', durationSeconds: 137,
       beats: [
         {
           kind: 'movement',
@@ -238,7 +244,7 @@ export const CLASS_STANDING_UP_005 = {
     },
 
     {
-      id: 'settling', title: 'Settling', durationSeconds: 120,
+      id: 'settling', title: 'Settling', durationSeconds: 147,
       beats: [
         {
           kind: 'rest',
@@ -265,7 +271,7 @@ export const CLASS_STANDING_UP_005 = {
     },
 
     {
-      id: 'leaving', title: 'Leaving', durationSeconds: 60,
+      id: 'leaving', title: 'Leaving', durationSeconds: 29,
       beats: [
         {
           kind: 'closing',

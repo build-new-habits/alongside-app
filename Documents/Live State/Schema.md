@@ -1,4 +1,37 @@
 # Alongside — Data Schema Reference
+## 08 Sep 2026 v1.57
+
+> **v1.57, 08 Sep 2026 — PLAYER-1.** New nested field **`activeClass`**,
+> the only state a class in progress keeps.
+>
+> Seven classes existed as data that nothing could play: no view imported
+> them, no route reached them, and the only code calling `sectionsFor()`
+> was their own gate. This is the field the player needs.
+>
+> ```
+> activeClass: {
+>   id:           string|null,   // which class
+>   lighter:      boolean,       // running the lighter variant
+>   sectionIndex: number,        // where they are
+>   beatIndex:    number,
+>   startedAt:    string|null    // ISO
+> }
+> ```
+>
+> **`lighter` is fixed when the class starts and never changes mid-class.**
+> Switching variants halfway would drop the person into a section they
+> had not been shown or repeat one they had, and the omitted sections are
+> chosen for the shape of the whole class rather than beat by beat.
+>
+> **It is stored rather than held in module state** because a class runs
+> for fifteen minutes on a phone that will lock, take a call, or be put
+> in a pocket. Module state does not survive that; the workout view keeps
+> its progress in the store for the same reason.
+>
+> ⚫ **No count of classes completed, and no streak.** Four of the seven
+> classes exist to argue that today's result is not the evidence, and a
+> counter would contradict them from the corner of the screen.
+
 ## 08 Sep 2026 v1.56
 
 > **v1.56, 08 Sep 2026 — LOCATION-1.** No new field. `sessionLocation`
@@ -82,7 +115,7 @@
 
 ## 06 Sep 2026 v1.51
 
-**File:** `js/store.js` (confirmed live version: **v65, 06 Sep 2026**)
+**File:** `js/store.js` (confirmed live version: **v66, 08 Sep 2026**)
 
 > **v1.47, 06 Sep 2026 — CR-1.** `conditions[]` gains three ids and loses one. `chronic-fatigue` is **retired**; `persistent-fatigue`, `me-cfs` and `long-covid` replace it. No field shape changed — `conditions` is still `string[]` and `conditionMeta` is still keyed by condition id.
 >

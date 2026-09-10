@@ -1,6 +1,12 @@
 /**
  * data/classes/class-steady-round-002.js
  *
+ * 08 Sep 2026 v4
+ *
+ * v4 - PACING-1. Section durations rebalanced so each one holds its own
+ *   content: tight sections grew, sections with slack gave the time back,
+ *   and the CLASS TOTAL is unchanged. Nothing a person reads moved.
+ *
  * 08 Sep 2026 v3
  *
  * v3 - CLASS-2. Its lighter variant is one round, which the class already
@@ -116,7 +122,7 @@ export const CLASS_STEADY_ROUND_002 = {
     },
 
     {
-      id: 'glute-bridge', title: 'Glute Bridge', durationSeconds: 120,
+      id: 'glute-bridge', title: 'Glute Bridge', durationSeconds: 123,
       beats: [
         {
           kind: 'movement',
@@ -179,7 +185,7 @@ export const CLASS_STEADY_ROUND_002 = {
     },
 
     {
-      id: 'plank', title: 'Plank', durationSeconds: 90,
+      id: 'plank', title: 'Plank', durationSeconds: 97,
       beats: [
         {
           // easierRouteId, NOT seatedAlternativeId. Knees-down plank is
@@ -232,7 +238,7 @@ export const CLASS_STEADY_ROUND_002 = {
     },
 
     {
-      id: 'the-stop', title: 'The stop', durationSeconds: 120,
+      id: 'the-stop', title: 'The stop', durationSeconds: 131,
       note: 'The exit is offered here, out loud, before anybody has to invent it.',
       beats: [
         {
@@ -257,7 +263,7 @@ export const CLASS_STEADY_ROUND_002 = {
     },
 
     {
-      id: 'round-two', title: 'Round two', durationSeconds: 300,
+      id: 'round-two', title: 'Round two', durationSeconds: 279,
       note: 'Quieter on purpose. Repeating the full coaching would say the person had not learned it.',
       beats: [
         {
