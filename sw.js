@@ -1,6 +1,13 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 08 Sep 2026 v481
+ *
+ * v481 - CLASS-2. class-contract.js v3, class-steady-round-002.js v3.
+ *   The lighter variant: a not-great day runs the class with sections
+ *   left out rather than a second script. Both already precached; cache
+ *   bump only.
+ *
  * 08 Sep 2026 v480
  *
  * v480 - CLASS-1b. class-contract.js v2, class-steady-round-002.js v2.
@@ -3269,7 +3276,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v480";
+const CACHE_NAME = "alongside-v481";
 
 const SHELL_URLS = [
 
