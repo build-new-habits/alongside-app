@@ -1,6 +1,13 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 08 Sep 2026 v489
+ *
+ * v489 - TIMETABLE-1. TWO NEW FILES PRECACHED: the class timetable and
+ *   its stylesheet. The Guided class room now reaches the classes it is
+ *   named for -- seven playable classes that nothing in the app could
+ *   get to.
+ *
  * 08 Sep 2026 v488
  *
  * v488 - A11Y-HOME. today.js v37, club-rooms.css v4. Each room on Home
@@ -3323,7 +3330,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v488";
+const CACHE_NAME = "alongside-v489";
 
 const SHELL_URLS = [
 
@@ -3478,6 +3485,8 @@ const SHELL_URLS = [
   "/alongside-app/js/data/classes/class-out-006.js",
   "/alongside-app/js/data/classes/class-unsticking-007.js",
   "/alongside-app/js/views/class-player.js",
+  "/alongside-app/js/views/class-list.js",
+  "/alongside-app/css/components/class-list.css",
   "/alongside-app/css/components/class-player.css",
   "/alongside-app/js/views/saved-sessions.js",
   "/alongside-app/js/views/session-builder-ui.js",
