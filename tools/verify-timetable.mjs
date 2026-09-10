@@ -256,6 +256,108 @@ if (first) {
      "behind it");
 }
 
+// ── 5b. A CLASS THAT WAS DONE IS RECORDED ───────────────────────────────
+console.log("\nTEST 5b - finishing a class reaches Progress");
+
+// 🔴 LOG-CLASS-1. class-player.js contained NO reference to activityLog.
+// Somebody did a class and Progress said "Nothing logged in this window.
+// 0 sessions, 0 minutes."
+//
+// Graeme: "I did a class on trunk work. It didn't get registered. No
+// progress measures. Is that deliberate? It feels like it ignored me."
+//
+// It was not deliberate. Schema v1.57 says activeClass keeps "no count
+// of classes completed, and no streak" -- sound reasoning about a TALLY
+// ON THE CLASS SCREEN, which was allowed to stand in for logging at all.
+// Not showing somebody a count is not the same as not remembering they
+// were there.
+
+{
+  localStorage.clear();
+  store.init();
+  store.set("tier", "personal");
+
+  P.startClass("class-ground-001");
+  main.innerHTML = P.render();
+  P.onMount();
+
+  // Run it to the end by advancing rather than waiting on real clocks.
+  for (let i = 0; i < 200; i++) {
+    const st = store.get("activeClass") || {};
+    if (st.sectionIndex >= 8) break;
+    P.advance();
+  }
+
+  const log = store.get("activityLog") || [];
+  ok("5b-pc. positive control: the class reached its end",
+     (store.get("activeClass") || {}).sectionIndex >= 8,
+     "never finished, so nothing below measures anything");
+
+  ok("5b. finishing a class writes an activity entry",
+     log.length === 1,
+     `${log.length} entries. A class that leaves no trace is the app ` +
+     `ignoring somebody who turned up`);
+
+  const e = log[0] || {};
+  ok("5b-2. recorded as complete, with real minutes",
+     e.status === "complete" && e.durationMins > 0,
+     `status=${e.status} mins=${e.durationMins}`);
+
+  ok("5b-3. and Progress counts it",
+     store.completedSessions(log).length === 1,
+     "logged but not counted as a session");
+
+  // 🔴 No raw internal tokens on a screen about somebody's own life.
+  // Three echoing fallthroughs were found today -- formatRole printing
+  // UNDEFINED, _formatType printing a strand id, _shapeLabel printing
+  // "class".
+  ok("5b-4. sessionType is the log's vocabulary, not a strand id",
+     e.sessionType === "class",
+     `sessionType=${e.sessionType} — everywhere else in the log that ` +
+     `field means the kind of SESSION, and Progress groups by it`);
+}
+
+console.log("\nTEST 5c - leaving part-way is a partial, not nothing");
+
+// store.logActivity()'s own rule: "three minutes of a walk is a real
+// partial and is kept." Graeme: "If I've done an exercise or activity it
+// needs recording."
+{
+  localStorage.clear();
+  store.init();
+  store.set("tier", "personal");
+  P.startClass("class-ground-001");
+  main.innerHTML = P.render();
+  P.onMount();
+  for (let i = 0; i < 10; i++) P.advance();
+  P.leave();
+
+  const log = store.get("activityLog") || [];
+  ok("5c. leaving part-way records a partial",
+     log.length === 1 && log[0].status === "partial",
+     `${log.length} entries, status ${log[0] && log[0].status}`);
+
+  ok("5c-2. with the minutes actually spent, not the class's length",
+     (log[0] || {}).durationMins > 0 && (log[0] || {}).durationMins < 15,
+     `${(log[0] || {}).durationMins} minutes logged for a class left ` +
+     `part-way through a 15 minute session`);
+}
+
+console.log("\nTEST 5d - leaving immediately records nothing");
+{
+  localStorage.clear();
+  store.init();
+  store.set("tier", "personal");
+  P.startClass("class-ground-001");
+  main.innerHTML = P.render();
+  P.onMount();
+  P.leave();
+  ok("5d. an untouched class leaves no trace",
+     (store.get("activityLog") || []).length === 0,
+     "opening a class and closing it wrote an entry, which misrepresents " +
+     "somebody's own record back to them");
+}
+
 // ── 6. THE SHORTER VERSION IS OFFERED ───────────────────────────────────
 console.log("\nTEST 6 - the lighter variant is a choice on the board");
 
