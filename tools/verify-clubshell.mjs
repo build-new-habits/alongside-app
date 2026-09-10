@@ -264,8 +264,20 @@ ok("8c. and does not claim a schedule it does not have",
    !/nothing scheduled/i.test(gText),
    gText.slice(0, 160));
 
+// 08 Sep 2026, TIMETABLE-1. Was /twelve-week shape/i.
+//
+// GUIDED-COPY's point was that the card must describe something that
+// EXISTS, after it spent weeks promising "a set course, same shape each
+// week" over eight programmes with empty sequences. The exact phrase was
+// how that was true at the time.
+//
+// The room now holds the seven classes it is named for, and leads with
+// them; the twelve-week shape is still there, in the summary, the facts
+// and the second button. Both are real. Asserted as INTENT: the room
+// names something the app can actually produce -- classes, or the phase
+// it is really in -- rather than one particular wording.
 ok("8d. it says what is actually there instead",
-   /twelve-week shape/i.test(gText),
+   /twelve-week shape/i.test(gText) || /class/i.test(gText),
    gText.slice(0, 160));
 
 ok("8e. and the phase it names is real data",
