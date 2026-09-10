@@ -135,6 +135,45 @@ ok("2b-note. a class whose SHAPE affects its length says so",
    "Steady Round offers stopping halfway, out loud, in the middle of " +
    "itself. A card reading only 'about 20 minutes' contradicts that");
 
+// ── 2c. THE LIGHTER VARIANT ─────────────────────────────────────────────
+console.log("\nTEST 2c - a lighter day gets a shorter class, not a fragment");
+
+// Graeme's decision, 06 Sep: on a not-great day the class serves its
+// lighter variant -- "you still get the class you came for" -- and only a
+// genuinely-should-not day routes the person out of the room. None of the
+// three written classes encoded one and the contract had no field, so a
+// fourth written before this would have had one variant of a thing that
+// is supposed to have two.
+
+for (const c of all.filter(c => c.lighter)) {
+  const light = CONTRACT.sectionsFor(c, { lighter: true });
+  const full  = CONTRACT.sectionsFor(c);
+
+  ok(`2c. ${c.title}: the lighter variant is genuinely shorter`,
+     light.length < full.length && light.length > 0,
+     `${light.length} sections against ${full.length}`);
+
+  // A class that stops rather than ends is not a gentler version of one
+  // that ends.
+  ok(`2c. ${c.title}: and still ends`,
+     light.flatMap(s => s.beats).some(b => b.kind === "closing"),
+     "stripped back to its middle - that is a fragment, not a lighter day");
+
+  // 🔴 The label has to be able to TELL THEM APART. Class 004's sections
+  // first came to 10.5 minutes, which rounds up to "about 15" -- the same
+  // words as its full class, so nothing a person read distinguished them.
+  const fullLabel  = CONTRACT.durationLabel(c);
+  const lightLabel = CONTRACT.durationLabel({ durationMins: CONTRACT.lighterMinutes(c) });
+  ok(`2c. ${c.title}: and reads differently on the card`,
+     fullLabel.replace(/ —.*/, "") !== lightLabel,
+     `both read "${lightLabel}" — a lighter variant a person cannot tell ` +
+     `apart from the full class is one they cannot choose`);
+}
+
+ok("2c-pc. positive control: at least one class has a lighter variant",
+   all.some(c => c.lighter),
+   "none defined, so every assertion above ran zero times");
+
 // ── 3. SERVES IS ONE STRAND, AND IT IS NOT TOUCHES ──────────────────────
 console.log("\nTEST 3 - a class serves one strand and brushes others");
 
