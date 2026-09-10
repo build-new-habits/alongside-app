@@ -1,6 +1,12 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 08 Sep 2026 v485
+ *
+ * v485 - CLASS-5. TWO NEW FILES PRECACHED: class-standing-up-005.js and
+ *   class-out-006.js. Six classes live; 26 of 33 aims now have at least
+ *   one served strand.
+ *
  * 08 Sep 2026 v484
  *
  * v484 - CLASS-4. NEW FILE PRECACHED: js/data/classes/class-bending-004.js.
@@ -3298,7 +3304,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v484";
+const CACHE_NAME = "alongside-v485";
 
 const SHELL_URLS = [
 
@@ -3449,6 +3455,8 @@ const SHELL_URLS = [
   "/alongside-app/js/data/classes/class-steady-round-002.js",
   "/alongside-app/js/data/classes/class-stopping-early-003.js",
   "/alongside-app/js/data/classes/class-bending-004.js",
+  "/alongside-app/js/data/classes/class-standing-up-005.js",
+  "/alongside-app/js/data/classes/class-out-006.js",
   "/alongside-app/js/views/saved-sessions.js",
   "/alongside-app/js/views/session-builder-ui.js",
   "/alongside-app/js/views/noticing.js",
