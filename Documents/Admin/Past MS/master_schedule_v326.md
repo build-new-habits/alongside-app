@@ -1,8 +1,8 @@
 # Alongside: Move — Master Schedule
-## 08 Sep 2026 v327
+## 08 Sep 2026 v326
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v326.md`. Remove v326 on upload.
+Supersedes `master_schedule_v325.md`. Remove v325 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
@@ -18,8 +18,7 @@ Supersedes `master_schedule_v326.md`. Remove v326 on upload.
 > | ✅ | ~~**Class data contract**~~ | **FIXED 08 Sep, CLASS-1, `v479`.** All three classes are in as data and validating. See below |
 > | 1 | 🟡 **Class four — "Bending"** | **DRAFTED, awaiting Graeme on the voice.** `alongside_class_004_bending_08sep2026_v1_DRAFT.md`. Serves `back-resilience`, the one strand in Graeme's arc no class serves. Three open questions at the end, including whether "Bending" is the right name or the frightening one |
 > | 2 | 🟡 **Class five — "Standing Up"** | **DRAFTED, awaiting Graeme on the voice.** `alongside_class_005_standing_up_08sep2026_v1_DRAFT.md`. Serves `leg-strength` — **both the next strand in Graeme's own aim and the most-wanted unserved strand across all 33 (12 aims)**. Three open questions |
-> | 3 | 🟡 **Class six — "Out"** | **DRAFTED, and it strained the contract in five places.** `alongside_class_006_out_08sep2026_v1_DRAFT.md`. Serves `being-outside`. **Two strains fixed (CLASS-3); three are decisions for Graeme** |
-> | 4 | 🟡 **Class seven onwards** | Next unserved by need: `hip-range` (8 aims), `not-overdoing` (8 — but already touched by Stopping Early), `self-kindness` (7), `winding-down` (7) | Three classes written (`alongside_class_001/002/003`); **fix the contract against them before a fourth is written.** Nothing is built for classes yet. Decisions already taken are further down this document: the mapping unit is the STRAND not the aim; extend `practice-library.js` rather than building beside it; PACING (spec §4b) |
+> | 3 | 🟡 **Class six onwards** | Next unserved by need: `hip-range` (8 aims), `not-overdoing` (8), `being-outside` (8), `self-kindness` (7), `winding-down` (7) | Three classes written (`alongside_class_001/002/003`); **fix the contract against them before a fourth is written.** Nothing is built for classes yet. Decisions already taken are further down this document: the mapping unit is the STRAND not the aim; extend `practice-library.js` rather than building beside it; PACING (spec §4b) |
 > | 2 | 🟡 **Class content** | **Graeme's.** His arc first, then expand — six to eight more plus lighter variants |
 > | + | 🟠 **RED-FLAG** | **No code at all.** Waits on Graeme's PAR-Q+ call |
 >
@@ -33,28 +32,6 @@ Supersedes `master_schedule_v326.md`. Remove v326 on upload.
 > 🟠 **49 gates read cwd-relative** | Green from the repo root, reading nothing from anywhere else. **A trap, not a live fault:** a session running the suite by full path from elsewhere sees ~70 red and concludes the app is broken. Four fixed so far, one at a time as each gate is opened |
 > 🟠 **The five tools outside the `verify-*` suite** | `schedule-drift`, `precache-check`, `schema-check`, `contrast-check`, `audit-gate-proxies`. **They have caught two live faults nobody would otherwise have seen** — a stale schedule and an unprecached view — because nothing runs them by default. Folding them into the standard run is a small change with a proven return |
 > 🟡 **Changelog stale since March** | Resume or retire — Graeme's call |
-
-> ### 📝 DRAFTED SINCE v326 — Class 006, "Out". Serves `being-outside`. **CLASS-3 shipped with it.**
->
-> ⚫ **Chosen over the two strands tied with it on 8 aims, and not by count.** `hip-range` is the closest thing left to what the builder already does, and Ground covers gentle floor mobility — highest duplication risk. `not-overdoing` is already touched by Stopping Early, and two classes that feel like each other is worse than one strand waiting. **`being-outside` is untouched, and it is the one place a class beats a built session outright: the builder can tell you to go for a walk, it cannot go with you.**
->
-> Its aims say plainly it is not a fitness walk — *feel more at home in my own body · have something left by the evening · wind down properly · spend more of my life outdoors · be steadier when things shift*. **Two of eight are about distance.**
->
-> ### 🔴 FIVE STRAINS, and they are the reason it was drafted now
->
-> The structure holds whatever Graeme decides about the voice in 004 and 005, so this work is not at risk from that.
->
-> | # | Strain | |
-> |---|---|---|
-> **1** | `position` had no value for a walk | ✅ **FIXED, CLASS-3.** `walking` added. `standing` was technically true and useless to somebody deciding whether they can do it today. ⚫ Noted while fresh: the field is really *where the body is*, not *what posture it holds* — if a swimming class ever exists, rename it rather than keep adding postures that are not postures |
-> **2** | **No `[SCREEN]` anywhere.** Phone in a pocket, person watching traffic | 🔵 `screen` is already optional, but nothing says a class WITHOUT one is deliberate rather than unfinished. **Graeme's call** |
-> **3** | **The timings are not timings.** `speechSeconds` indoors is a gap in a controlled room; out here it is a guess about somebody crossing a road | 🔵 The numbers still shape pacing but **mean something weaker than in every other class**, and nothing records the difference. Third appearance of the split that separated `holdSeconds` from `speechSeconds` |
-> **4** | 🔴 **The safety filter does nothing here.** `classSafety()` judges movement beats; this class has **none**, so it passes trivially — for everybody, in every condition, including somebody who should not be walking alone today | ✅ **PARTLY FIXED, CLASS-3.** Not a bug in the filter: weather, light, traffic and going out alone do not belong in an exercise library. But a class nothing can vet **must now declare its own flags**, or the person is warned from no direction at all |
-> **5** | **The lighter variant may do two jobs again** | 🔵 Ten minutes outside instead of fifteen is a real lighter day — but **somebody who cannot leave the house at all is not served by a shorter walk**, and this class has no answer for them. That may be correct: a class about being outside cannot be done inside. **It should be a decision, not an omission** |
->
-> ### 🔵 Open questions on the draft
->
-> **The name "Out"** is the shortest possible and says exactly the thing; it may also read as a placeholder. **Going alone** is flagged and otherwise unacknowledged — a line risks making it strange for everybody else, silence assumes a safety not everyone has. **Weather** is currently treated as always fine, and no view has been taken on whether there is a limit.
 
 > ### 📝 DRAFTED SINCE v325 — Class 005, "Standing Up". Serves `leg-strength`.
 >
@@ -8603,4 +8580,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 08 Sep 2026 v327*
+*Build New Habits · Alongside: Move · Master Schedule · 08 Sep 2026 v326*

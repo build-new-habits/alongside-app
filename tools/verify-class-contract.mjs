@@ -224,6 +224,49 @@ for (const c of all.filter(c => c.lighter)) {
      `lighter variant does not run - it can never be said`);
 }
 
+// ── 2e. A CLASS NOTHING CAN VET MUST SAY WHAT IT INVOLVES ───────────────
+console.log("\nTEST 2e - a class the safety filter cannot see declares its own risks");
+
+// CLASS-3. Found by drafting Class 006, the first class that leaves the
+// room. classSafety() judges movement beats against the person's
+// conditions -- so a class with NO movement beats passes trivially, for
+// everybody, in every condition, including somebody who should not be
+// walking alone today.
+//
+// Not a bug in the filter. That class's risks are weather, light,
+// traffic and going out alone, none of which belong in an exercise
+// library. But a class nothing can vet must at least say what it
+// involves, or the person is warned from no direction at all.
+
+const noMovement = all.filter(c =>
+  !c.sections.flatMap(s => s.beats).some(b => b.kind === "movement"));
+
+for (const c of noMovement) {
+  ok(`2e. ${c.title}: declares flags despite having no movements`,
+     Array.isArray(c.flags) && c.flags.length > 0,
+     "nothing in this class is visible to classSafety(), and it names no " +
+     "risks of its own — so no warning reaches the person from anywhere");
+}
+
+// The rule has to be enforceable whether or not such a class exists yet,
+// so it is tested directly rather than only on the current set.
+const invisible = {
+  id: "probe", title: "probe", serves: "being-outside",
+  formats: ["mindfulness"], intensityBias: "gentle", durationMins: 1,
+  position: "walking", equipment: [], flags: [],
+  sections: [{ id: "a", title: "a", durationSeconds: 60,
+               beats: [{ kind: "closing", voice: "x" }] }]
+};
+ok("2e-rule. and the contract refuses one that does not",
+   !CONTRACT.validateClass(invisible).ok &&
+   CONTRACT.validateClass(invisible).problems.some(p => /invisible to the safety filter/.test(p)),
+   "a class with no movements and no flags validated clean");
+
+ok("2e-pos. walking is an allowed position",
+   CONTRACT.POSITIONS.includes("walking"),
+   "Class 006 is a walk; 'standing' is technically true and useless to " +
+   "somebody deciding whether they can do it today");
+
 // ── 3. SERVES IS ONE STRAND, AND IT IS NOT TOUCHES ──────────────────────
 console.log("\nTEST 3 - a class serves one strand and brushes others");
 
