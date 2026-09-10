@@ -1,5 +1,10 @@
 /**
  * club-rooms.css
+ * 08 Sep 2026 v4
+ *
+ * v4 - A11Y-HOME. .club-row__heading, the h2 wrapping each room's
+ *   button. margin:0 and font:inherit so nothing moves.
+ *
  * 08 Sep 2026 v3
  *
  * v3 - OWN-1. .club-room__note: what stands in place of a Start button
@@ -288,6 +293,18 @@
 }
 
 /* The whole head is the target, not a chevron somebody has to hit. */
+/* A11Y-HOME, 08 Sep 2026. The h2 that wraps each room's button.
+
+   margin: 0 is load-bearing, exactly as it was for A11Y-HEADER: an h2
+   carries a UA default of 0.83em top and bottom where a div carries
+   none, so the element change alone would push all four rooms apart.
+   font is inherited so the heading takes the button's type, not the
+   browser's h2 size. Nothing moves. */
+.club-row__heading {
+  margin: 0;
+  font: inherit;
+}
+
 .club-row__head {
   align-items: center;
   background: none;

@@ -1,5 +1,15 @@
 /**
  * today.js
+ * 08 Sep 2026 v37
+ *
+ * v37 - A11Y-HOME. Each room's button is wrapped in an h2, so Home can
+ *   be navigated by heading. It had ONE heading for the whole screen --
+ *   the greeting -- on the page everybody starts on. WCAG 2.2 AA 1.3.1.
+ *   The heading WRAPS the button rather than sitting inside it: a
+ *   heading nested in an interactive element is not reliably exposed,
+ *   and shrinking the button to fit a shorter heading would take the tap
+ *   target away from the rest of the row.
+ *
  * 08 Sep 2026 v36
  *
  * v36 - OWN-1. Three faults in the Your own room's card, all of
@@ -1702,6 +1712,30 @@ export function TodayView(router) {
   function roomRow({ id, title, what, summary, facts, action }) {
     return `
       <div class="club-row" data-room-id="${id}">
+        <!--
+          A11Y-HOME, 08 Sep 2026. The h2 wraps the button, which is the
+          WAI-ARIA accordion pattern.
+
+          Home had ONE heading for the entire screen -- the greeting --
+          so the one page everybody starts on could not be skimmed by
+          heading at all. Four rooms, and a screen reader user had no way
+          to jump between them. WCAG 2.2 AA 1.3.1: these are the page's
+          sections, and they existed in presentation only.
+
+          THE HEADING WRAPS THE BUTTON RATHER THAN SITTING INSIDE IT.
+          A heading nested inside an interactive element is not reliably
+          exposed, and the alternative -- shrinking the button to just
+          the title so the heading could be short -- would take the tap
+          target away from the rest of the row, where people already
+          press. That removal would be the change, not an improvement.
+
+          It makes the heading text long: "Guided class. A twelve-week
+          shape. I fit your sessions to it. Nothing chosen yet." That
+          reads as a virtue rather than a cost -- CLUB spec v2 3.1 exists
+          because you should not have to OPEN a room to learn what it is,
+          and navigating by heading now tells you.
+        -->
+        <h2 class="club-row__heading">
         <button class="club-row__head"
                 type="button"
                 aria-expanded="false"
@@ -1721,6 +1755,7 @@ export function TodayView(router) {
           </span>
           <span class="club-row__chev" aria-hidden="true">\u25be</span>
         </button>
+        </h2>
         <div class="club-row__detail" id="club-row-${id}-detail" hidden>
           ${facts && facts.length ? `
             <ul class="club-row__facts">
