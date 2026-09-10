@@ -1,12 +1,12 @@
 # Alongside: Move — Master Schedule
-## 08 Sep 2026 v324
+## 08 Sep 2026 v323
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v323.md`. Remove v323 on upload.
+Supersedes `master_schedule_v322.md`. Remove v322 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
-> **Live: `alongside-v480`, 133 gates, `store.js` v65, `Schema.md` v1.56, cold start blueprint v81.** Read that blueprint after this block.
+> **Live: `alongside-v479`, 133 gates, `store.js` v65, `Schema.md` v1.56, cold start blueprint v80.** Read that blueprint after this block.
 >
 > **Claude's pre-beta BUILD scope is complete.** CLUB 9 of 9 plus QUICK-INPUTS, GUIDED-COPY, DEVICE-1, DEVICE-2, ARC-LED, ARC-PLAIN — `v452` → `v466` on 06 Sep. **QUICK-BUILD-2/3 `v467`, CHECKIN-3 and PROPOSAL-1/2 `v468` — 08 Sep.**
 >
@@ -72,19 +72,11 @@ Supersedes `master_schedule_v323.md`. Remove v323 on upload.
 >
 > 🟢 **Every strand id and every exercise id checked against the live data — all of them exist.** One naming mismatch resolved: Class 003's prose says *"seated heel raise"*; the library id is `seated-heel-toe-raise`.
 
-> ### ✅ ~~Class 002's stated length~~ — ANSWERED, and better than reconciling it
+> ### 🔵 ONE THING FOR GRAEME — Class 002's stated length
 >
-> Graeme: *"The card could be less accurate and more rounded up. 'Approximately 20 minutes'?"*
+> The card says **18 minutes**. Its nine sections, at the durations the document itself gives them, total **19**: `1m30 + 2 + 2 + 2 + 1m30 + 2 + 2 + 5 + 1`.
 >
-> ⚫ **Right, and it fixes something the exact check was papering over.** Picking a winner between 18 and 19 would have been tidying a number that was misleading either way: **Class 002 openly offers stopping after one round**, so any single exact figure describes a session a good proportion of people will not have.
->
-> **CLASS-1b, `v480`.** The class keeps its true total and the sections still have to sum to it — that check is what stops content and stated length drifting apart. What changed is that **the true total is no longer what anybody reads.** `durationLabel()` derives the card text, rounded up to five minutes and hedged.
->
-> 🔴 **UP, not to the nearest, and the direction is the point.** To the nearest, a 12-minute class reads *"about 10 minutes"* — and somebody who has exactly ten minutes starts it and runs over. **Over-stating costs them a pleasant surprise; under-stating costs them the thing they were protecting when they checked.** Not symmetrical, in an app for people whose time and energy are often the scarce thing.
->
-> **Derived, not authored.** A second label field would be a second thing to keep in step with the content, going stale the first time a section changed — this contract's own fault, reintroduced one level up.
->
-> `durationNote` carries the one thing a number cannot: Steady Round reads **"about 20 minutes — less if you stop after one round"**, because a card saying only "about 20" would contradict the class saying out loud, halfway through, that one round is a whole session.
+> The data says 19 so that it validates. **Which number is wrong is a content decision, not mine** — either the card is a minute out, or a section is. Nothing else depends on it, and the contract will hold either answer.
 
 > ### 🟢 SHIPPED SINCE v321 — A11Y-HEADER, `v478`. Eleven screens had no heading at all.
 >
@@ -8518,4 +8510,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 08 Sep 2026 v324*
+*Build New Habits · Alongside: Move · Master Schedule · 08 Sep 2026 v323*
