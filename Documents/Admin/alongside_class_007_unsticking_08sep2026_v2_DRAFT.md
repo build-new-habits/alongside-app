@@ -1,6 +1,8 @@
 # Class 007 — "Unsticking"
 
-**08 Sep 2026 v1 — DRAFT for Graeme**
+**08 Sep 2026 v2 — DRAFT for Graeme**
+
+**v2** — "See you Thursday" removed on Graeme's call. It appeared three times and all three moved together.
 
 Serves `hip-range`. **The last unserved strand that no existing class even touches**, and the highest remaining by need at 8 aims.
 
@@ -50,7 +52,7 @@ I set this strand aside once, at class six, on the grounds that it duplicates wh
 
 So this class has to do the thing the other five do, but pointed at the one place a person will actively resist it:
 
-> **You will feel looser at the end of this. That feeling is real and it will not last. The part that lasts is doing it again on Thursday.**
+> **You will feel looser at the end of this. That feeling is real and it will not last. The part that lasts is doing it again in the next class.**
 
 ⚫ **It says this at the start, not the end.** Said at the end, after they already feel better, it reads as the class talking itself down. Said at the start it is a frame — and it turns the temporary feeling from evidence of success into something they were told to expect.
 
@@ -75,7 +77,7 @@ You'll feel looser afterwards. That part doesn't last — the doing it again doe
 
 `⏸ 25s`
 
-`[VOICE]` That's not me being gloomy. It's the reason people stretch their hips for years and stay exactly as stiff as they were — they were measuring the wrong thing. **The bit that changes anything is doing this again on Thursday.**
+`[VOICE]` That's not me being gloomy. It's the reason people stretch their hips for years and stay exactly as stiff as they were — they were measuring the wrong thing. **The bit that changes anything is doing it again in the next class.**
 
 `⏸ 25s`
 
@@ -187,7 +189,7 @@ The front of the hip, not the back.
 ### 7 · Settling (2 min)
 
 `[SCREEN]` **Done.**
-Thursday is the one that counts.
+The next one is the one that counts.
 
 `[VOICE]` Lie down, or sit back. Nothing to do.
 
@@ -197,7 +199,7 @@ Thursday is the one that counts.
 
 `⏸ 40s`
 
-`[VOICE]` And the thing from the start still stands. What you're feeling now is today's version. **Thursday is the one that counts.**
+`[VOICE]` And the thing from the start still stands. What you're feeling now is today's version. **The next one is the one that counts.**
 
 `⏸ 30s`
 
@@ -207,13 +209,15 @@ Thursday is the one that counts.
 
 ### 8 · Leaving (1 min)
 
-`[SCREEN]` **See you Thursday.**
+`[SCREEN]` **See you in the next class.**
 
-`[VOICE]` That's it. See you Thursday — I mean that fairly literally.
+`[VOICE]` That's it. See you in the next class.
 
 `⏸ 15s`
 
-⚫ **The only class that names the next session in its closing.** Every other one ends *see you next time*. This one is about repetition being the whole mechanism, so the ending says so. **It may be too directive** — see the open questions.
+⚫ **The only class whose closing points at the next one.** Every other ends *see you next time*; this ends *see you in the next class*, because repetition is the whole mechanism here and the ending should say so.
+
+🔴 **It said "See you Thursday" in v1.** Graeme: *"This seems like an own goal."* He was right — it assumed a schedule nobody had agreed to, and for anybody who then did not do it on Thursday it was **a small failure the class had handed them**, in a class already asking them to accept that today's good feeling does not count. Naming the next class instead keeps the argument and drops the presumption.
 
 ---
 
@@ -241,7 +245,7 @@ Section 7's line changes: *five bits of hip* is not true of three.
 
 ## Open questions for Graeme
 
-1. **"See you Thursday."** It is the sharpest line in the class and the most presumptuous. It assumes a schedule the person has not agreed to, and for somebody who then does not do it on Thursday it is a small failure the class handed them. **The alternative is losing the one ending that actually carries the argument.**
+1. ✅ **~~"See you Thursday"~~ — ANSWERED.** Graeme: *"This seems like an own goal. Perhaps the best thing to do is actually say see you in the next class."* Changed in all three places it appeared — the framing at the start, the settling line, and the closing. **All three had to move together or the argument breaks**: the class's whole case is that the next one is what counts, so the phrase carrying that case appears throughout rather than only at the end.
 
 2. **Is "Unsticking" a word you want?** It is plain and slightly wry and matches "Bending". It also implies something is stuck, which is precisely what the person believes and possibly not what you want reinforced on a card.
 

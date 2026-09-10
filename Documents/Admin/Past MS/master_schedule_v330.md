@@ -1,12 +1,12 @@
 # Alongside: Move — Master Schedule
-## 08 Sep 2026 v331
+## 08 Sep 2026 v330
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v330.md`. Remove v330 on upload.
+Supersedes `master_schedule_v329.md`. Remove v329 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
-> **Live: `alongside-v486`, 133 gates, `store.js` v65, `Schema.md` v1.56, cold start blueprint v87.** Read that blueprint after this block.
+> **Live: `alongside-v485`, 133 gates, `store.js` v65, `Schema.md` v1.56, cold start blueprint v86.** Read that blueprint after this block.
 >
 > **Claude's pre-beta BUILD scope is complete.** CLUB 9 of 9 plus QUICK-INPUTS, GUIDED-COPY, DEVICE-1, DEVICE-2, ARC-LED, ARC-PLAIN — `v452` → `v466` on 06 Sep. **QUICK-BUILD-2/3 `v467`, CHECKIN-3 and PROPOSAL-1/2 `v468` — 08 Sep.**
 >
@@ -18,7 +18,7 @@ Supersedes `master_schedule_v330.md`. Remove v330 on upload.
 > | ✅ | ~~**Class data contract**~~ | **FIXED 08 Sep, CLASS-1, `v479`.** All three classes are in as data and validating. See below |
 > | ✅ | ~~**Class four — "Bending"**~~ | **LIVE, `v484`.** Graeme read it and approved the shape and voice. **His arc is now fully served.** Three questions still open on the document — the name, "about forty times", and whether the lighter line is needed — each a one-line edit |
 > | ✅ | ~~**Transcribe 005 and 006**~~ | **LIVE, `v485`. Six classes.** 26 of 33 aims now have at least one served strand |
-> | ✅ | ~~**Class seven — "Unsticking"**~~ | **LIVE, `v486`. Seven classes; 29 of 33 aims served.** "See you Thursday" caught by Graeme and removed before it shipped |
+> | 1 | 🟡 **Class seven — "Unsticking"** | **DRAFTED, awaiting Graeme.** `alongside_class_007_unsticking_08sep2026_v1_DRAFT.md`. Serves `hip-range` — **the only remaining strand no class even touches**, and the highest by need at 8 aims. Three open questions, one of them sharp |
 > | 2 | 🟡 **Class eight onwards** | All remaining strands are at least TOUCHED by an existing class: `not-overdoing` (8, Stopping Early), `self-kindness` (7, Ground), `winding-down` (7, Out). **A different selection rule is needed from here** — need alone stops discriminating |
 > | 2 | 🟡 **Class five — "Standing Up"** | **DRAFTED, awaiting Graeme on the voice.** `alongside_class_005_standing_up_08sep2026_v1_DRAFT.md`. Serves `leg-strength` — **both the next strand in Graeme's own aim and the most-wanted unserved strand across all 33 (12 aims)**. Three open questions |
 > | 3 | 🟡 **Class six — "Out"** | **DRAFTED, and it strained the contract in five places.** `alongside_class_006_out_08sep2026_v1_DRAFT.md`. Serves `being-outside`. **Two strains fixed (CLASS-3); three are decisions for Graeme** |
@@ -36,30 +36,6 @@ Supersedes `master_schedule_v330.md`. Remove v330 on upload.
 > 🟠 **49 gates read cwd-relative** | Green from the repo root, reading nothing from anywhere else. **A trap, not a live fault:** a session running the suite by full path from elsewhere sees ~70 red and concludes the app is broken. Four fixed so far, one at a time as each gate is opened |
 > 🟠 **The five tools outside the `verify-*` suite** | `schedule-drift`, `precache-check`, `schema-check`, `contrast-check`, `audit-gate-proxies`. **They have caught two live faults nobody would otherwise have seen** — a stale schedule and an unprecached view — because nothing runs them by default. Folding them into the standard run is a small change with a proven return |
 > 🟡 **Changelog stale since March** | Resume or retire — Graeme's call |
-
-> ### 🟢 SHIPPED SINCE v330 — CLASS-6, `v486`. Unsticking is live. Seven classes, 29 of 33 aims served.
->
-> ### 🔴 "See you Thursday" — caught by Graeme, before it shipped
->
-> Graeme: *"This seems like an own goal. Perhaps the best thing to do is actually say see you in the next class."*
->
-> **He was right, and it was worse than one line.** The class's whole case is that the NEXT session is what counts, not the pleasant loose feeling today — so the phrase carrying that case appeared in **three places**: the framing at the start, the settling line, and the closing. **All three had to move together or the argument breaks.**
->
-> The fault: it assumed a schedule nobody had agreed to, and **for anybody who then did not do it on Thursday it was a small failure the class had handed them** — inside a class already asking them to accept that today's good feeling does not count. That is the opposite of what it is for.
->
-> 🟢 **Gated, not just fixed.** `verify-class-contract` test 6c now fails any class naming a weekday, across every voice, screen and lighter line. **The instinct that produced it — make the commitment concrete — will recur, and it reads as helpful every time.**
->
-> ### ⚫ Why this strand, having set it aside once
->
-> `hip-range` was the last strand **no existing class even touched**, and the highest remaining at 8 aims. I had passed over it at class six as too close to what the builder does. Its aims changed that: *get through a day at a desk without seizing up · feel less stiff than I do · get off the floor without using my hands.* **Not a mobility programme — the strand people feel every day and have quietly decided is just age.**
->
-> 🔴 **The problem it had to solve.** Stiffness is the one thing people expect an immediate result from, **and they get one.** Fifteen minutes of hip work does make you feel looser, and it is almost entirely temporary. So the class makes the same refusal as the other six — pointed at the one place a person will actively resist it, and **made at the start**, because after they already feel better it would read as the class talking itself down.
->
-> ⚫ Section 4 is a `reflect` beat doing the **opposite job to Ground's**: Ground asks *is anything different* and accepts "no"; this asks expecting "yes" and declines to let it be the evidence. Same beat kind, opposite purpose.
->
-> ### 🔵 Two questions still open on the document
->
-> Whether **"Unsticking"** reinforces the belief that something is stuck, and whether **the honesty at the start is wrong for somebody's FIRST class** — true, but possibly the wrong first thing to hear, and **the contract has no way to say "from session two onwards"**.
 
 > ### 📝 DRAFTED SINCE v329 — Class 007, "Unsticking". Serves `hip-range`.
 >
@@ -8713,4 +8689,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 08 Sep 2026 v331*
+*Build New Habits · Alongside: Move · Master Schedule · 08 Sep 2026 v330*
