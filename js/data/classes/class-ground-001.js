@@ -1,6 +1,12 @@
 /**
  * data/classes/class-ground-001.js
  *
+ * 08 Sep 2026 v4
+ *
+ * v4 - PACING-1. Section durations rebalanced so each one holds its own
+ *   content: tight sections grew, sections with slack gave the time back,
+ *   and the CLASS TOTAL is unchanged. Nothing a person reads moved.
+ *
  * 08 Sep 2026 v3
  *
  * v3 - CLASS-2/2b. Lighter variant: drops the two hands-and-knees
@@ -121,7 +127,7 @@ export const CLASS_GROUND_001 = {
       ]
     },
     {
-      id: 'first-noticing', title: 'The first noticing', durationSeconds: 60,
+      id: 'first-noticing', title: 'The first noticing', durationSeconds: 66,
       beats: [
         {
           // Location, not sensation. "Where" is answerable and has no wrong
@@ -250,7 +256,7 @@ export const CLASS_GROUND_001 = {
       ]
     },
     {
-      id: 'stillness', title: 'Stillness', durationSeconds: 180,
+      id: 'stillness', title: 'Stillness', durationSeconds: 188,
       beats: [
         {
           // Eyes closed is offered, never instructed. For a lot of people it
@@ -278,7 +284,7 @@ export const CLASS_GROUND_001 = {
       ]
     },
     {
-      id: 'leaving', title: 'Leaving', durationSeconds: 120,
+      id: 'leaving', title: 'Leaving', durationSeconds: 106,
       beats: [
         {
           kind:   'closing',

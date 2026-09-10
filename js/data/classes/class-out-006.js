@@ -1,6 +1,12 @@
 /**
  * data/classes/class-out-006.js
  *
+ * 08 Sep 2026 v2
+ *
+ * v2 - PACING-1. Section durations rebalanced so each one holds its own
+ *   content: tight sections grew, sections with slack gave the time back,
+ *   and the CLASS TOTAL is unchanged. Nothing a person reads moved.
+ *
  * 08 Sep 2026 v1
  *
  * CLASS-5. Class 006, "Out", as data. The first class that leaves the
@@ -113,7 +119,7 @@ export const CLASS_OUT_006 = {
     },
 
     {
-      id: 'first-bit', title: 'The first bit', durationSeconds: 180,
+      id: 'first-bit', title: 'The first bit', durationSeconds: 170,
       note: 'The longest near-silence in any class. Indoors, silence is something to justify; out here it is the default and the talking is the interruption.',
       beats: [
         {
@@ -130,7 +136,7 @@ export const CLASS_OUT_006 = {
     },
 
     {
-      id: 'far-away', title: 'Something far away', durationSeconds: 150,
+      id: 'far-away', title: 'Something far away', durationSeconds: 163,
       beats: [
         {
           kind: 'reflect',
@@ -152,7 +158,7 @@ export const CLASS_OUT_006 = {
     },
 
     {
-      id: 'underfoot', title: 'Something under your feet', durationSeconds: 150,
+      id: 'underfoot', title: 'Something under your feet', durationSeconds: 162,
       beats: [
         {
           kind: 'reflect',
@@ -176,7 +182,7 @@ export const CLASS_OUT_006 = {
     },
 
     {
-      id: 'the-air', title: 'The air', durationSeconds: 120,
+      id: 'the-air', title: 'The air', durationSeconds: 115,
       beats: [
         {
           kind: 'reflect',
@@ -197,7 +203,7 @@ export const CLASS_OUT_006 = {
     },
 
     {
-      id: 'heading-back', title: 'Heading back', durationSeconds: 120,
+      id: 'heading-back', title: 'Heading back', durationSeconds: 115,
       beats: [
         {
           kind: 'rest',
@@ -214,7 +220,7 @@ export const CLASS_OUT_006 = {
     },
 
     {
-      id: 'back', title: 'Back', durationSeconds: 60,
+      id: 'back', title: 'Back', durationSeconds: 55,
       beats: [
         {
           kind: 'closing',

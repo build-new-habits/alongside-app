@@ -1,0 +1,102 @@
+/* ============================================================
+   class-player.css
+   css/components/class-player.css
+   08 Sep 2026 v1
+
+   PLAYER-1 / PACING-1. The guided class player.
+
+   Seven classes existed as data nothing could play. This is the screen
+   that plays them.
+
+   ⚫ DELIBERATELY PLAIN. Somebody is on the floor with their eyes shut,
+   or walking. The screen is a place to glance, not to watch — so there
+   is no animation, no progress bar creeping to a finish line, and one
+   thing large enough to read from arm's length.
+
+   🔴 NO WHOLE-CLASS PROGRESS BAR. Four of the seven classes exist to
+   argue that today's result is not the evidence. A bar filling towards a
+   finish contradicts them from the corner of the screen. "3 of 8" says
+   where you are; a bar says how much is left of a thing you are getting
+   through.
+   ============================================================ */
+
+.class-player {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  padding: var(--space-4);
+}
+
+.class-player__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+}
+
+.class-player__where {
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+}
+
+/* The class title stays quiet. The BEAT is what the person needs. */
+.class-player__title {
+  margin: 0;
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--color-text-secondary);
+}
+
+.class-player__section {
+  margin: 0 0 var(--space-5);
+  font-size: var(--text-lg);
+  font-weight: var(--font-semibold);
+  color: var(--color-primary);
+}
+
+.class-player__beat {
+  flex: 1 1 auto;
+  margin-bottom: var(--space-5);
+}
+
+/* Large enough to read at arm's length, lying down. */
+.class-player__screen {
+  margin: 0 0 var(--space-4);
+  font-size: var(--text-xl);
+  font-weight: var(--font-semibold);
+  line-height: var(--leading-snug);
+  color: var(--color-text);
+}
+
+.class-player__voice {
+  margin: 0;
+  font-size: var(--text-base);
+  line-height: var(--leading-relaxed);
+  color: var(--color-text-secondary);
+}
+
+/* A held position is the one thing on this screen with a number in it. */
+.class-player__held {
+  margin: var(--space-4) 0 0;
+  padding: var(--space-3);
+  border-left: 4px solid var(--color-accent);
+  border-radius: var(--radius-md, 8px);
+  color: var(--color-text);
+}
+
+/* PACING-1. The silence at the end of a section. Named, so an empty
+   screen reads as part of the class rather than as something stalling. */
+.class-player__quiet {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
+/* PACING-1. Graeme: "round it up to the nearest minute, but also tell
+   them they can pause." This is the telling. */
+.class-player__pausenote {
+  margin: var(--space-3) 0 0;
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  text-align: center;
+}

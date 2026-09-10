@@ -1,6 +1,12 @@
 /**
  * data/classes/class-unsticking-007.js
  *
+ * 08 Sep 2026 v2
+ *
+ * v2 - PACING-1. A SIXTEEN minute class. Its content measures 15.2,
+ *   and squeezing that into 15 meant six sections overrunning their
+ *   slots. Sayable now that the card rounds to the minute.
+ *
  * 08 Sep 2026 v1
  *
  * CLASS-6. Class 007, "Unsticking", as data.
@@ -59,7 +65,14 @@ export const CLASS_UNSTICKING_007 = {
 
   formats:       ['stretch'],
   intensityBias: 'gentle',
-  durationMins:  15,
+  // PACING-1. SIXTEEN, not fifteen. Its content measures 15.2 minutes,
+  // and squeezing that into a 15-minute frame meant six sections
+  // overflowing their slots -- a class quietly running past what its own
+  // card promised. Rounding to the nearest MINUTE is what makes 16
+  // sayable: under the old five-minute bucket this read "about 20", a
+  // 30% overstatement that would make somebody skip a class they had
+  // time for.
+  durationMins:  16,
   position:      'floor',
   seatedRoute:   true,
   equipment:     [],
@@ -78,7 +91,7 @@ export const CLASS_UNSTICKING_007 = {
 
   sections: [
     {
-      id: 'before', title: 'Before we start', durationSeconds: 120,
+      id: 'before', title: 'Before we start', durationSeconds: 130,
       note: 'The whole class turns on the honesty arriving FIRST. Afterwards it would sound like an excuse.',
       beats: [
         {
@@ -101,7 +114,7 @@ export const CLASS_UNSTICKING_007 = {
     },
 
     {
-      id: 'hip-circles', title: 'Hip circles', durationSeconds: 120,
+      id: 'hip-circles', title: 'Hip circles', durationSeconds: 116,
       beats: [
         {
           kind: 'movement',
@@ -127,7 +140,7 @@ export const CLASS_UNSTICKING_007 = {
     },
 
     {
-      id: 'figure-four', title: 'Figure four', durationSeconds: 150,
+      id: 'figure-four', title: 'Figure four', durationSeconds: 154,
       beats: [
         {
           kind: 'movement',
@@ -148,7 +161,7 @@ export const CLASS_UNSTICKING_007 = {
     },
 
     {
-      id: 'whats-different', title: "What's different", durationSeconds: 60,
+      id: 'whats-different', title: "What's different", durationSeconds: 70,
       note: 'A reflect beat doing the OPPOSITE job to Ground\u2019s. Ground asks "is anything different" and accepts no; this asks expecting yes, and declines to let it be the evidence.',
       beats: [
         {
@@ -166,7 +179,7 @@ export const CLASS_UNSTICKING_007 = {
     },
 
     {
-      id: 'ninety-ninety', title: '90-90', durationSeconds: 150,
+      id: 'ninety-ninety', title: '90-90', durationSeconds: 172,
       beats: [
         {
           kind: 'movement',
@@ -192,7 +205,7 @@ export const CLASS_UNSTICKING_007 = {
     },
 
     {
-      id: 'hip-flexor', title: 'Hip flexor', durationSeconds: 120,
+      id: 'hip-flexor', title: 'Hip flexor', durationSeconds: 131,
       beats: [
         {
           kind: 'movement',
@@ -214,7 +227,7 @@ export const CLASS_UNSTICKING_007 = {
     },
 
     {
-      id: 'settling', title: 'Settling', durationSeconds: 120,
+      id: 'settling', title: 'Settling', durationSeconds: 135,
       beats: [
         {
           kind: 'rest',
@@ -239,7 +252,7 @@ export const CLASS_UNSTICKING_007 = {
     },
 
     {
-      id: 'leaving', title: 'Leaving', durationSeconds: 60,
+      id: 'leaving', title: 'Leaving', durationSeconds: 52,
       beats: [
         {
           kind: 'closing',

@@ -6,6 +6,8 @@
  *
  * 18 Aug 2026 v23
  *
+ * v24 - PLAYER-1. components/class-player.css imported.
+ *
  * v23 - PRAC-1. components/practices.css imported.
  *
  * 13 Aug 2026 v22
@@ -132,6 +134,9 @@
 @import 'components/upgrade-door.css';
 @import 'components/upgrade-page.css';
 @import 'components/practices.css';
+/* PLAYER-1, 08 Sep 2026. The guided class player. A component file not
+   imported here is dead on arrival, per this file's own note. */
+@import 'components/class-player.css';
 @import 'components/club-rooms.css';   /* CLUB-SHELL, 06 Sep 2026 */
 /* Content-gated — add when content sessions complete */
 /* D3:  @import 'components/home-threshold.css';       */
