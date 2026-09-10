@@ -1,6 +1,14 @@
 /**
  * data/class-contract.js
  *
+ * 08 Sep 2026 v5
+ *
+ * v5 - CLASS-3. Two things Class 006 found by being the first class that
+ *   leaves the room: `walking` is a position, and a class with no
+ *   movement beats -- invisible to classSafety(), which judges exercise
+ *   ids -- must declare its own flags, or nothing warns the person from
+ *   any direction.
+ *
  * 08 Sep 2026 v4
  *
  * v4 - CLASS-2b. lighterVoice: one alternative line per beat, used only
@@ -130,7 +138,20 @@ export const BEAT_KINDS = Object.freeze([
   'closing'     // the last beat. Class 001: the closing line IS the class.
 ]);
 
-export const POSITIONS = Object.freeze(['floor', 'seated', 'standing', 'mixed']);
+/**
+ * CLASS-3, 08 Sep 2026. `walking` added for Class 006, the first class
+ * that leaves the room.
+ *
+ * `standing` was technically true of a walk and completely useless to
+ * somebody deciding whether they can do it today, which is the only
+ * question this field exists to answer.
+ *
+ * ⚫ Worth saying while it is fresh: this field is really WHERE THE BODY
+ * IS, not what posture it holds. If a swimming or cycling class is ever
+ * written, the honest fix is to rename it rather than keep adding
+ * postures that are not postures.
+ */
+export const POSITIONS = Object.freeze(['floor', 'seated', 'standing', 'mixed', 'walking']);
 
 /**
  * CLASS-2, 08 Sep 2026. The lighter variant.
@@ -365,6 +386,25 @@ export function validateClass(cls, { strandIds = null, exerciseIds = null } = {}
   if (cls.position === 'floor' && cls.seatedRoute === undefined) {
     p('a floor class must state seatedRoute either way — somebody who ' +
       'cannot get to the floor needs to know before they start');
+  }
+
+  // CLASS-3. A class with no movement beats is INVISIBLE to the safety
+  // filter: classSafety() judges exercise ids against the person's
+  // conditions, and a class with none passes trivially, for everybody, in
+  // every condition.
+  //
+  // That is not a bug in the filter -- Class 006's risks are weather,
+  // light, traffic and going out alone, none of which are in the model
+  // and none of which belong in an exercise library. But a class that
+  // nothing can vet must at least SAY what it involves, or the person
+  // gets no warning from any direction at all.
+  const anyMovement = (cls.sections || [])
+    .flatMap(s => s.beats || [])
+    .some(b => b.kind === 'movement');
+  if (!anyMovement && Array.isArray(cls.flags) && cls.flags.length === 0) {
+    p('a class with no movement beats is invisible to the safety filter, ' +
+      'so it must declare its own flags — otherwise nothing warns the ' +
+      'person about it from any direction');
   }
 
   if (cls.lighter !== undefined) {
