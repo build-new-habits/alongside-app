@@ -1,6 +1,12 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 08 Sep 2026 v488
+ *
+ * v488 - A11Y-HOME. today.js v37, club-rooms.css v4. Each room on Home
+ *   is wrapped in a heading, so the page everybody starts on can be
+ *   navigated by heading. Both already precached; cache bump only.
+ *
  * 08 Sep 2026 v487
  *
  * v487 - PLAYER-1 / PACING-1. TWO NEW FILES PRECACHED: the class player
@@ -3317,7 +3323,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v487";
+const CACHE_NAME = "alongside-v488";
 
 const SHELL_URLS = [
 
