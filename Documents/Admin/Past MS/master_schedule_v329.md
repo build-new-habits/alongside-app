@@ -1,8 +1,8 @@
 # Alongside: Move — Master Schedule
-## 08 Sep 2026 v330
+## 08 Sep 2026 v329
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v329.md`. Remove v329 on upload.
+Supersedes `master_schedule_v328.md`. Remove v328 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
@@ -18,8 +18,7 @@ Supersedes `master_schedule_v329.md`. Remove v329 on upload.
 > | ✅ | ~~**Class data contract**~~ | **FIXED 08 Sep, CLASS-1, `v479`.** All three classes are in as data and validating. See below |
 > | ✅ | ~~**Class four — "Bending"**~~ | **LIVE, `v484`.** Graeme read it and approved the shape and voice. **His arc is now fully served.** Three questions still open on the document — the name, "about forty times", and whether the lighter line is needed — each a one-line edit |
 > | ✅ | ~~**Transcribe 005 and 006**~~ | **LIVE, `v485`. Six classes.** 26 of 33 aims now have at least one served strand |
-> | 1 | 🟡 **Class seven — "Unsticking"** | **DRAFTED, awaiting Graeme.** `alongside_class_007_unsticking_08sep2026_v1_DRAFT.md`. Serves `hip-range` — **the only remaining strand no class even touches**, and the highest by need at 8 aims. Three open questions, one of them sharp |
-> | 2 | 🟡 **Class eight onwards** | All remaining strands are at least TOUCHED by an existing class: `not-overdoing` (8, Stopping Early), `self-kindness` (7, Ground), `winding-down` (7, Out). **A different selection rule is needed from here** — need alone stops discriminating |
+> | 1 | 🟡 **Class seven onwards** | Next unserved by need: `hip-range` (8 aims), `not-overdoing` (8 — already touched by Stopping Early), `self-kindness` (7), `winding-down` (7 — touched by Out) |
 > | 2 | 🟡 **Class five — "Standing Up"** | **DRAFTED, awaiting Graeme on the voice.** `alongside_class_005_standing_up_08sep2026_v1_DRAFT.md`. Serves `leg-strength` — **both the next strand in Graeme's own aim and the most-wanted unserved strand across all 33 (12 aims)**. Three open questions |
 > | 3 | 🟡 **Class six — "Out"** | **DRAFTED, and it strained the contract in five places.** `alongside_class_006_out_08sep2026_v1_DRAFT.md`. Serves `being-outside`. **Two strains fixed (CLASS-3); three are decisions for Graeme** |
 > | 4 | 🟡 **Class seven onwards** | Next unserved by need: `hip-range` (8 aims), `not-overdoing` (8 — but already touched by Stopping Early), `self-kindness` (7), `winding-down` (7) | Three classes written (`alongside_class_001/002/003`); **fix the contract against them before a fourth is written.** Nothing is built for classes yet. Decisions already taken are further down this document: the mapping unit is the STRAND not the aim; extend `practice-library.js` rather than building beside it; PACING (spec §4b) |
@@ -36,36 +35,6 @@ Supersedes `master_schedule_v329.md`. Remove v329 on upload.
 > 🟠 **49 gates read cwd-relative** | Green from the repo root, reading nothing from anywhere else. **A trap, not a live fault:** a session running the suite by full path from elsewhere sees ~70 red and concludes the app is broken. Four fixed so far, one at a time as each gate is opened |
 > 🟠 **The five tools outside the `verify-*` suite** | `schedule-drift`, `precache-check`, `schema-check`, `contrast-check`, `audit-gate-proxies`. **They have caught two live faults nobody would otherwise have seen** — a stale schedule and an unprecached view — because nothing runs them by default. Folding them into the standard run is a small change with a proven return |
 > 🟡 **Changelog stale since March** | Resume or retire — Graeme's call |
-
-> ### 📝 DRAFTED SINCE v329 — Class 007, "Unsticking". Serves `hip-range`.
->
-> ⚫ **The last unserved strand that no existing class even touches**, and the highest remaining at 8 aims. Every other candidate — `not-overdoing`, `self-kindness`, `winding-down` — is already met somewhere by a class serving something else.
->
-> 🔴 **I set this strand aside at class six** on the grounds that it duplicates what the builder already does. **Reading its aims changed my mind:** *get through a day at a desk without seizing up · feel less stiff than I do · get off the floor without using my hands · get back to moving after a long gap.* **This is not a mobility programme. It is the strand people feel every single day and have quietly decided is just age.**
->
-> ### 🔴 The problem this class has, and the answer it tries
->
-> **Stiffness is the one thing people expect an immediate result from — and they get one.** Fifteen minutes of hip work does make you feel looser. **And it is almost entirely temporary**: range that comes back within the hour, which is why people have been stretching their hips for years and are exactly as stiff as they were.
->
-> So the class makes the same refusal the other five make, pointed at the one place a person will actively resist it:
->
-> > *"You'll probably feel looser when we finish. That feeling is real, and it mostly wears off within the hour. The bit that changes anything is doing this again on Thursday."*
->
-> ⚫ **Said at the START, not the end.** After they already feel better it reads as the class talking itself down; before, it is a frame — and it turns the temporary feeling from evidence of success into something they were told to expect.
->
-> ⚫ **Section 4 is a `reflect` beat doing the opposite job to Ground's.** Ground asks *is anything different* and accepts "no". This asks the same question **expecting "yes"** and declines to let it be the evidence. Same beat kind, opposite purpose — which is a good sign for the contract.
->
-> ### 🔵 Open questions, one of them sharp
->
-> **"See you Thursday"** is the only class ending that names the next session, and it is the sharpest line in the class and the most presumptuous. It assumes a schedule the person has not agreed to, and for somebody who then does not do it on Thursday **it is a small failure the class handed them.** The alternative is losing the one ending that carries the argument.
->
-> **"Unsticking"** is plain and matches "Bending" — and implies something is stuck, which is exactly what the person believes and possibly not what should be reinforced on a card.
->
-> 🔴 **The honesty at the start may be wrong for a FIRST class.** Somebody arriving stiff, on day one, is told within ninety seconds that the thing they came for wears off. **True, and possibly the wrong first thing to hear** — it might belong from session two onwards, and **the contract has no way to express that.**
->
-> ### ⚫ A note on selection from here
->
-> Every remaining strand is at least touched by an existing class, so **need alone stops discriminating.** Class eight will want a different rule — likely *what does an arc actually walk through*, rather than *what is most wanted overall*.
 
 > ### 🟢 SHIPPED SINCE v328 — CLASS-5, `v485`. Six classes live.
 >
@@ -8689,4 +8658,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 08 Sep 2026 v330*
+*Build New Habits · Alongside: Move · Master Schedule · 08 Sep 2026 v329*
