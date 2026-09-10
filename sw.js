@@ -1,6 +1,13 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 08 Sep 2026 v491
+ *
+ * v491 - LOG-CLASS-1. class-player.js v3, progress.js v14. A class that
+ *   was done now reaches Progress, and finishing one reaches the coach
+ *   moment like every other session. Both already precached; cache bump
+ *   only.
+ *
  * 08 Sep 2026 v490
  *
  * v490 - ROUND-TWO-2. class-steady-round-002.js v5. The second round is
@@ -3335,7 +3342,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v490";
+const CACHE_NAME = "alongside-v491";
 
 const SHELL_URLS = [
 
