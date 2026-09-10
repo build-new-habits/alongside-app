@@ -65,7 +65,15 @@ const textOf = (cls) => JSON.stringify(cls);
 // ── 0. THE FIXTURE IS THE THREE CLASSES ─────────────────────────────────
 console.log("\nTEST 0 - the three written classes are present");
 
-ok("0a. three classes", all.length === 3, `${all.length} loaded`);
+// Not a literal count. This first read `all.length === 3` and went red
+// the moment a fourth class was written -- asserting the fixture rather
+// than the behaviour, which is the same fault verify-saved1 had this
+// morning with a hard-coded record count. What matters is that the set
+// is non-empty and every class in it is real.
+ok("0a. classes are loaded", all.length > 0, `${all.length} loaded`);
+ok("0a2. and each is a distinct, identified class",
+   new Set(all.map(c => c.id)).size === all.length && all.every(c => c.id && c.title),
+   `ids: ${all.map(c => c.id).join(", ")}`);
 ok("0b. and each has content",
    all.every(c => (c.sections || []).flatMap(s => s.beats || []).length > 5),
    "a class with almost no beats means the transcription did not land, and " +
@@ -329,8 +337,18 @@ const LINES = [
   ["class-steady-round-002",   "one round for six weeks",
    "the exit offered in the middle, out loud, before anybody has to invent it"],
   ["class-stopping-early-003", "later in the week — not now",
-   "the honest form of the promise, and the delay is what makes the delay survivable"]
+   "the honest form of the promise, and the delay is what makes the delay survivable"],
+  ["class-bending-004",         "not a today question",
+   "the alternative — 'this will strengthen your back' — is a claim the class " +
+   "cannot verify and this person has been promised it before by somebody wrong"]
 ];
+
+// 🔴 THREE OF THE FOUR CLASSES NOW CARRY THE SAME REFUSAL, in different
+// words: "later in the week — not now", "on a staircase in a month", "not
+// a today question". Across the set that is a property of the voice
+// rather than a line in one class. A fifth class that promises a result
+// it can show you today would be the odd one out, and this list is where
+// that would be noticed.
 
 for (const [id, line, why] of LINES) {
   const cls = all.find(c => c.id === id);
@@ -355,8 +373,10 @@ ok("7a. it imports the shared safety functions",
 // one not offered, because the person cannot see what is missing.
 const clear   = CLASSES.getClasses().length;
 const injured = CLASSES.getClasses({ conditionIds: ["lower-back"], painScores: { "lower-back": 9 } }).length;
-ok("7pc. positive control: all three offered with nothing declared",
-   clear === 3, `${clear} of 3`);
+ok("7pc. positive control: EVERY class is offered with nothing declared",
+   clear === all.length, `${clear} of ${all.length} — a class withheld from ` +
+   `somebody with no conditions means the filter is rejecting on something ` +
+   `other than safety`);
 ok("7b. and a severe zone withholds the ones it should",
    injured < clear && injured > 0,
    `${injured} of ${clear} offered with a severe lower back. All three would ` +

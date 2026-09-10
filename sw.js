@@ -1,6 +1,15 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 08 Sep 2026 v484
+ *
+ * v484 - CLASS-4. NEW FILE PRECACHED: js/data/classes/class-bending-004.js.
+ *   Class 004 "Bending" is live, which completes Graeme's arc: trunk
+ *   strength, a back that copes, trusting your body again.
+ *
+ *   Caught by precache-check.mjs again — fourth new file the verify-*
+ *   suite could not see.
+ *
  * 08 Sep 2026 v483
  *
  * v483 - CLASS-3. class-contract.js v5. `walking` is a position, and a
@@ -3289,7 +3298,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v483";
+const CACHE_NAME = "alongside-v484";
 
 const SHELL_URLS = [
 
@@ -3439,6 +3448,7 @@ const SHELL_URLS = [
   "/alongside-app/js/data/classes/class-ground-001.js",
   "/alongside-app/js/data/classes/class-steady-round-002.js",
   "/alongside-app/js/data/classes/class-stopping-early-003.js",
+  "/alongside-app/js/data/classes/class-bending-004.js",
   "/alongside-app/js/views/saved-sessions.js",
   "/alongside-app/js/views/session-builder-ui.js",
   "/alongside-app/js/views/noticing.js",
