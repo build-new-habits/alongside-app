@@ -1,6 +1,13 @@
 /**
  * data/class-contract.js
  *
+ * 08 Sep 2026 v2
+ *
+ * v2 - CLASS-1b. durationLabel(). What a person reads is DERIVED from the
+ *   true total and rounded UP to five minutes, not authored. Graeme's
+ *   call, and it resolves a discrepancy the exact check was papering
+ *   over rather than tidying a number that was misleading either way.
+ *
  * 08 Sep 2026 v1
  *
  * CLASS-1. The guided class data contract, fixed against the three
@@ -120,7 +127,7 @@ export const POSITIONS = Object.freeze(['floor', 'seated', 'standing', 'mixed'])
 export const CLASS_FIELDS = Object.freeze({
   required: ['id', 'title', 'serves', 'formats', 'intensityBias',
              'durationMins', 'position', 'equipment', 'flags', 'sections'],
-  optional: ['touches', 'seatedRoute', 'rounds', 'roundRange', 'notes']
+  optional: ['touches', 'seatedRoute', 'rounds', 'roundRange', 'notes', 'durationNote']
 });
 
 /**
@@ -155,6 +162,46 @@ export const BEAT_FIELDS = Object.freeze({
  * has to go around this function, which is exactly the visibility the
  * spec asks for.
  */
+/**
+ * What a person reads on the card.
+ *
+ * DERIVED, NEVER AUTHORED. Graeme's call, and it fixes something the
+ * exact check was papering over: Class 002's card said 18 minutes and its
+ * own sections totalled 19, and reconciling those two numbers would have
+ * been tidying a figure that was misleading either way. That class openly
+ * offers stopping after one round -- so a single exact number describes a
+ * session a good proportion of people will not have.
+ *
+ * The class still carries its true total, and the contract still asserts
+ * the sections sum to it, because that is what stops content and stated
+ * length drifting apart. What changes is that the true total is no longer
+ * what anybody reads.
+ *
+ * Rounded UP to five minutes, and hedged. "About 20 minutes" is both true
+ * and useful where "19 minutes" is precise and slightly false.
+ *
+ * UP, not to the nearest. To the nearest, a 12-minute class reads "about
+ * 10 minutes" -- and somebody who has exactly ten minutes starts it and
+ * runs over. Over-stating costs them a pleasant surprise; under-stating
+ * costs them the thing they were protecting when they checked. Those are
+ * not symmetrical, and this app is for people whose time and energy are
+ * often the scarce thing.
+ *
+ * A second authored label would be a second thing to keep in step with
+ * the content, and it would go stale the first time a section changed --
+ * which is the whole fault this file exists to prevent, reintroduced one
+ * level up.
+ */
+export function durationLabel(cls) {
+  if (!cls || typeof cls.durationMins !== 'number') return '';
+  const rounded = Math.ceil(cls.durationMins / 5) * 5;
+  const base = `about ${rounded} minutes`;
+  // durationNote is for the classes where the SHAPE matters, not the
+  // number: Class 002 is meaningfully shorter if somebody stops after one
+  // round, and that is a fact about the class, not a rounding.
+  return cls.durationNote ? `${base} — ${cls.durationNote}` : base;
+}
+
 export function pacedBeat(beat, rate = 1) {
   const r = Number(rate) > 0 ? Number(rate) : 1;
   const out = { ...beat };
