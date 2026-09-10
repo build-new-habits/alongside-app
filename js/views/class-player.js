@@ -1,6 +1,20 @@
 /**
  * js/views/class-player.js
  *
+ * 08 Sep 2026 v3
+ *
+ * v3 - LOG-CLASS-1. A class that was done is RECORDED, and finishing
+ *   one reaches the coach moment like every other session.
+ *
+ *   This view contained no reference to activityLog. Graeme, after doing
+ *   the trunk class: "It didn't get registered. No progress measures.
+ *   Is that deliberate? It feels like it ignored me."
+ *
+ *   Not deliberate. Schema v1.57's "no count of classes completed, and
+ *   no streak" is sound reasoning about a TALLY ON THIS SCREEN, and it
+ *   was allowed to stand in for logging at all. Not showing somebody a
+ *   count is not the same as not remembering they were there.
+ *
  * 08 Sep 2026 v2
  *
  * v2 - PACING-1. Runs on the contract's timing model, and gains a
@@ -71,7 +85,7 @@ import { store } from '../store.js';
 import { router } from '../router.js';
 import { CLASSES } from '../data/classes/index.js';
 import { sectionsFor, voiceFor, durationLabel,
-         beatSeconds, silenceTailSeconds } from '../data/class-contract.js';
+         beatSeconds, silenceTailSeconds, sectionSeconds } from '../data/class-contract.js';
 
 export const centered = false;
 
@@ -242,7 +256,15 @@ function _renderDone() {
     <div class="view class-player">
       <h1 class="class-player__title" tabindex="-1">${_esc(_cls.title)}</h1>
       <p class="class-player__voice">That's the class.</p>
-      <button class="btn btn-primary btn-full" id="cp-home">Back to today</button>
+      <!--
+        LOG-CLASS-1. Goes to REFLECT, like every other session view.
+        verify-shared1 caught this: fourteen session views route there
+        and the class player was the only one that did not, so a class
+        was the one thing you could finish and be met with nothing.
+        That is the same complaint as the missing activity entry --
+        "it feels like it ignored me" -- in its other form.
+      -->
+      <button class="btn btn-primary btn-full" id="cp-reflect">Finish</button>
     </div>`;
 }
 
@@ -256,6 +278,18 @@ export function onMount() {
 
   root.querySelector('#cp-exit')?.addEventListener('click', leave);
   root.querySelector('#cp-home')?.addEventListener('click', leave);
+  root.querySelector('#cp-reflect')?.addEventListener('click', () => {
+    // The class is already logged -- advance() writes it the moment it
+    // runs off the last section, so somebody who closes the app on the
+    // final beat still has it recorded. This only clears the state and
+    // hands over to the coach moment.
+    _stop();
+    _paused = false; _remaining = 0;
+    store.set('activeClass', {
+      id: null, lighter: false, sectionIndex: 0, beatIndex: 0, startedAt: null
+    });
+    router.navigate('reflect');
+  });
   root.querySelector('#cp-skip')?.addEventListener('click', () => advance());
   root.querySelector('#cp-pause')?.addEventListener('click', togglePause);
 
@@ -296,6 +330,12 @@ export function advance() {
     st.beatIndex = 0;
   }
   store.set('activeClass', st);
+
+  // LOG-CLASS-1. Off the end of the last section is the class finishing.
+  // Logged HERE rather than on the done screen, because somebody who
+  // closes the app on the final beat still did the class.
+  if (st.sectionIndex >= _sections.length) _logClass('complete');
+
   _rerender();
 }
 
@@ -311,6 +351,11 @@ export function advance() {
  */
 export function leave() {
   _stop();
+  // LOG-CLASS-1. Leaving part-way is a partial, not nothing. Nothing is
+  // written if they got nowhere: logActivity() drops genuinely empty
+  // partials at its single write path.
+  const st = _state();
+  if (_cls && st.sectionIndex < _sections.length) _logClass('partial');
   _paused = false; _remaining = 0;
   store.set('activeClass', {
     id: null, lighter: false, sectionIndex: 0, beatIndex: 0, startedAt: null
@@ -339,6 +384,93 @@ export function togglePause() {
   _remaining = Math.max(200, full - elapsed);
   _stop();
   _rerender();
+}
+
+/**
+ * LOG-CLASS-1, 08 Sep 2026. A class that was done gets recorded.
+ *
+ * ── THE FAULT ────────────────────────────────────────────────────────
+ *
+ * 🔴 This view contained NO reference to activityLog. A person did a
+ * class and Progress said "Nothing logged in this window. 0 sessions,
+ * 0 minutes."
+ *
+ * Graeme, after doing the trunk class: "It didn't get registered. No
+ * progress measures. Is that deliberate? It feels like it ignored me."
+ *
+ * It was not deliberate, and the reason it happened is worth keeping.
+ * Schema v1.57 records that activeClass holds "no count of classes
+ * completed, and no streak" -- because four of the seven classes exist
+ * to argue that today's result is not the evidence, and a tally in the
+ * corner of the player would contradict them.
+ *
+ * ⚫ THAT REASONING IS ABOUT A COUNTER ON THE CLASS SCREEN, and it was
+ * allowed to stand in for logging altogether. They are different things.
+ * Not showing somebody a tally is not the same as not remembering they
+ * were there, and Progress exists precisely to answer "what have I been
+ * doing".
+ *
+ * ── MINUTES ARE WHAT WAS ACTUALLY SPENT ──────────────────────────────
+ *
+ * Not the class's stated length. Somebody who left after two sections of
+ * Ground did four minutes, not fifteen, and logging fifteen would put a
+ * number in their own record that they did not do. The sections they
+ * reached are the honest measure.
+ *
+ * ── LEAVING PART-WAY IS A PARTIAL, NOT NOTHING ───────────────────────
+ *
+ * store.logActivity() already drops genuinely empty partials at the
+ * single write path, and its comment sets the rule: "three minutes of a
+ * walk is a real partial and is kept." A class left halfway is the same.
+ * Graeme: "If I've done an exercise or activity it needs recording."
+ */
+function _elapsedMins() {
+  const st = _state();
+  const done = _sections.slice(0, st.sectionIndex);
+  const secs = done.reduce((a, sec) => a + (sec.durationSeconds || 0), 0);
+  return Math.round(secs / 60);
+}
+
+/** The movements actually reached, for exerciseHistory. */
+function _exerciseIdsSoFar() {
+  const st = _state();
+  return _sections.slice(0, st.sectionIndex + 1)
+    .flatMap(sec => sec.beats || [])
+    .filter(b => b.kind === 'movement' && b.exerciseId)
+    .map(b => b.exerciseId);
+}
+
+function _logClass(status) {
+  if (!_cls) return;
+  const nowIso = new Date().toISOString();
+  const mins = status === 'complete'
+    ? Math.round(_sections.reduce((a, sec) => a + (sec.durationSeconds || 0), 0) / 60)
+    : _elapsedMins();
+  const ids = [...new Set(_exerciseIdsSoFar())];
+
+  store.logActivity({
+    type:           'class',
+    date:           nowIso,
+    completedAt:    nowIso,
+    sessionEnd:     nowIso,
+    status,
+    durationMins:   mins,
+    // 'class', not the strand id. sessionType everywhere else in the
+    // log means the kind of SESSION -- glute, core, mobility -- and
+    // Progress groups "What you have been doing" by it. A strand id
+    // there printed "trunk-strength" at somebody. The strand is kept
+    // below, in its own field, where it is not mistaken for a type.
+    sessionType:    'class',
+    serves:         _cls.serves,
+    title:          _lighter ? `${_cls.title} (shorter)` : _cls.title,
+    classId:        _cls.id,
+    lighter:        _lighter,
+    exercisesCount: ids.length,
+    exerciseIds:    ids,
+    moodAfter:      null,
+    isEvent:        false,
+    eventName:      null
+  });
 }
 
 function _stop() {
