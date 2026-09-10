@@ -1,12 +1,12 @@
 # Alongside: Move — Master Schedule
-## 08 Sep 2026 v325
+## 08 Sep 2026 v324
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v324.md`. Remove v324 on upload.
+Supersedes `master_schedule_v323.md`. Remove v323 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
-> **Live: `alongside-v481`, 133 gates, `store.js` v65, `Schema.md` v1.56, cold start blueprint v82.** Read that blueprint after this block.
+> **Live: `alongside-v480`, 133 gates, `store.js` v65, `Schema.md` v1.56, cold start blueprint v81.** Read that blueprint after this block.
 >
 > **Claude's pre-beta BUILD scope is complete.** CLUB 9 of 9 plus QUICK-INPUTS, GUIDED-COPY, DEVICE-1, DEVICE-2, ARC-LED, ARC-PLAIN — `v452` → `v466` on 06 Sep. **QUICK-BUILD-2/3 `v467`, CHECKIN-3 and PROPOSAL-1/2 `v468` — 08 Sep.**
 >
@@ -16,8 +16,7 @@ Supersedes `master_schedule_v324.md`. Remove v324 on upload.
 > |---|---|---|
 > | ✅ | ~~**Device pass**~~ | **COMPLETE, 8 of 8, 08 Sep.** 15 defects in shipped code, plus 6 more from Graeme's handset. See the tally below |
 > | ✅ | ~~**Class data contract**~~ | **FIXED 08 Sep, CLASS-1, `v479`.** All three classes are in as data and validating. See below |
-> | 1 | 🟡 **Class four — "Bending"** | **DRAFTED, awaiting Graeme on the voice.** `alongside_class_004_bending_08sep2026_v1_DRAFT.md`. Serves `back-resilience`, the one strand in Graeme's arc no class serves. Three open questions at the end, including whether "Bending" is the right name or the frightening one |
-> | 2 | 🟡 **Class five onwards** | Contract fixed and gated, lighter variants included. Next unserved strands by need: `leg-strength` (12 aims), `hip-range` (8), `not-overdoing` (8), `being-outside` (8) | Three classes written (`alongside_class_001/002/003`); **fix the contract against them before a fourth is written.** Nothing is built for classes yet. Decisions already taken are further down this document: the mapping unit is the STRAND not the aim; extend `practice-library.js` rather than building beside it; PACING (spec §4b) |
+> | 1 | 🟡 **Class four onwards** | **Now unblocked.** The contract is fixed and gated; a fourth class can be written against it. ~~Recommended next, and the only Claude-side BUILD work left.~~ Three classes written (`alongside_class_001/002/003`); **fix the contract against them before a fourth is written.** Nothing is built for classes yet. Decisions already taken are further down this document: the mapping unit is the STRAND not the aim; extend `practice-library.js` rather than building beside it; PACING (spec §4b) |
 > | 2 | 🟡 **Class content** | **Graeme's.** His arc first, then expand — six to eight more plus lighter variants |
 > | + | 🟠 **RED-FLAG** | **No code at all.** Waits on Graeme's PAR-Q+ call |
 >
@@ -31,42 +30,6 @@ Supersedes `master_schedule_v324.md`. Remove v324 on upload.
 > 🟠 **49 gates read cwd-relative** | Green from the repo root, reading nothing from anywhere else. **A trap, not a live fault:** a session running the suite by full path from elsewhere sees ~70 red and concludes the app is broken. Four fixed so far, one at a time as each gate is opened |
 > 🟠 **The five tools outside the `verify-*` suite** | `schedule-drift`, `precache-check`, `schema-check`, `contrast-check`, `audit-gate-proxies`. **They have caught two live faults nobody would otherwise have seen** — a stale schedule and an unprecached view — because nothing runs them by default. Folding them into the standard run is a small change with a proven return |
 > 🟡 **Changelog stale since March** | Resume or retire — Graeme's call |
-
-> ### 🟢 SHIPPED SINCE v324 — CLASS-2 / 2b, `v481`. Every class has a lighter day.
->
-> ⚫ **GRAEME'S ARC DECIDED CLASS FOUR.** *"Build a core that actually holds me up"* — trunk strength, a back that copes, trusting your body again. Steady Round serves `trunk-strength`; Ground serves `trusting-body`. **`back-resilience` is the one strand in his own arc that no class serves** — Steady Round only touches it.
->
-> That deliberately beats the global count: across all 33 aims `leg-strength` is the most-wanted unserved strand at **12 aims** against back-resilience's 4. **His arc comes first.** ⚫ Worth knowing: **Stopping Early serves `pacing`, which is not in his arc at all.**
->
-> ### 🔴 The contract was missing the lighter variant — which is why no content was written first
->
-> Graeme decided on **06 Sep** that a not-great day serves the class's lighter variant — *"you still get the class you came for"* — and only a genuinely-should-not day routes out of the room. **None of the three written classes encoded one and there was no field for it.** A fourth written before this would have been one variant of a thing supposed to have two, and all three existing classes would have needed revisiting.
->
-> | | |
-> |---|---|
-> **A subtraction, not a second script** | `omitSections` names what is left out. A separate set of sections would be a second class to keep in step — **and the day somebody changed one and not the other is the day a person on a bad day gets the older, worse version** |
-> **`sectionsFor()` is the only way to ask** | So a caller cannot reach for `cls.sections` and serve the full class on a bad day, which is what every caller would otherwise do because that is the obvious field |
-> **NOT the seated route, NOT the easier route** | Those answer *"I cannot get to the floor"* and *"I cannot hold this that long"*. This answers *"today is not a good day"* — **conflating them offers somebody a chair when they needed a shorter class** |
-> **It must still END** | Stripped back to its middle is a fragment, not a gentler class |
-> **It must omit something** | One identical to the class is a lie on a bad day |
->
-> ### 🔴 CLASS-2b — subtraction alone turned out not to be enough
->
-> Ground's second noticing asks *"is anything different from **four minutes ago**?"* — and a lighter variant dropping two of three movements makes that **untrue**. In a class whose subject is whether you can trust what your body reports, naming a stretch of time the person did not have is the wrong kind of small error.
->
-> **Found by searching every possible subtraction of Ground's sections.** 38 satisfy the structural rules; the best still leaves that line saying something false. So the contract needed one more thing, deliberately **the smallest that works**: `lighterVoice`, one alternative line on one beat. **There is still exactly one class**, changed in exactly one place. It replaces the voice only — never the screen, the exercise, the hold or the stop cue.
->
-> Stopping Early needed it for the same reason: its closing says *"the useful part was the **three** times you stopped"*, and **the count is the evidence the whole class is gathering**.
->
-> ### 🟢 All three now have one, and they read differently on the card
->
-> | Class | Full | Lighter | What comes out |
-> |---|---|---|---|
-> **Ground** | about 15 min | **about 10** | The two hands-and-knees movements. Keeps the one done lying on the back — **a movement class with no movement is not a gentler version of itself** |
-> **Steady Round** | about 20 min | **about 15** | Round two. Needed no inventing: the class already argues for it in its own voice, halfway through |
-> **Stopping Early** | about 15 min | **about 10** | The standing practice — the only one asking the person out of the chair, and the one the class itself calls hardest |
->
-> ⚠️ **Class 004's arithmetic caught a label problem.** Its lighter variant first came to 10.5 minutes, which rounds up to *"about 15"* — **the same words as its full class**, so nothing a person read could tell them apart. Reshaped to land on 10 exactly, and the gate now asserts the two labels differ for every class.
 
 > ### 🟢 SHIPPED SINCE v322 — CLASS-1, `v479`. The class contract is fixed, and the three classes are in.
 >
@@ -8555,4 +8518,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 08 Sep 2026 v325*
+*Build New Habits · Alongside: Move · Master Schedule · 08 Sep 2026 v324*

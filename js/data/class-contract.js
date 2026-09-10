@@ -1,6 +1,13 @@
 /**
  * data/class-contract.js
  *
+ * 08 Sep 2026 v4
+ *
+ * v4 - CLASS-2b. lighterVoice: one alternative line per beat, used only
+ *   when the lighter variant runs. Subtraction alone turned out not to
+ *   be sufficient -- a line naming a duration the person did not have.
+ *   Smallest thing that works: there is still exactly ONE class.
+ *
  * 08 Sep 2026 v3
  *
  * v3 - CLASS-2. The lighter variant, as a SUBTRACTION of sections rather
@@ -178,6 +185,36 @@ export function sectionsFor(cls, { lighter = false } = {}) {
   return (cls.sections || []).filter(s => !omit.has(s.id));
 }
 
+/**
+ * CLASS-2b, 08 Sep 2026. A line that is only true on the full day.
+ *
+ * Ground's second noticing asks "is anything different from four minutes
+ * ago?" -- and in a lighter variant that drops two of the three
+ * movements, four minutes ago is wrong. Not a nuance: it names a
+ * duration the person did not experience, in a class whose entire
+ * subject is whether they can trust what their body reports.
+ *
+ * Found by searching every possible subtraction of Ground's sections.
+ * Thirty-eight satisfy the structural rules, and the best of them still
+ * leaves that line saying something untrue -- so subtraction alone is
+ * not sufficient after all, and the contract needed one more thing.
+ *
+ * `lighterVoice` is that thing, and it is deliberately the SMALLEST
+ * thing that works. Not a second script, not a second set of sections:
+ * one alternative line on one beat, used only when the lighter variant
+ * runs. There is still exactly one class, and a change to it is still
+ * made in exactly one place.
+ *
+ * ⚫ It replaces the voice only, never the screen, the exercise, the
+ * hold or the stop cue. A lighter day is a shorter class, not a
+ * different one — the moment this could swap an exercise it would be a
+ * second script wearing a small field's clothes.
+ */
+export function voiceFor(beat, { lighter = false } = {}) {
+  if (lighter && typeof beat.lighterVoice === 'string') return beat.lighterVoice;
+  return beat.voice;
+}
+
 /** Minutes the lighter variant runs. Derived, like everything else. */
 export function lighterMinutes(cls) {
   const secs = sectionsFor(cls, { lighter: true })
@@ -219,7 +256,7 @@ export const BEAT_FIELDS = Object.freeze({
   required: ['kind'],
   optional: ['screen', 'voice', 'speechSeconds', 'holdSeconds', 'exerciseId',
              'practiceId', 'sitOut', 'seatedAlternativeId', 'easierRouteId',
-             'stopCue']
+             'stopCue', 'lighterVoice']
 });
 
 /**
@@ -430,6 +467,11 @@ export function validateClass(cls, { strandIds = null, exerciseIds = null } = {}
                        'seatedAlternativeId', 'easierRouteId']) {
         if (b[f] !== undefined) p(`${at}: ${f} on a ${b.kind} beat`);
       }
+    }
+
+    if (b.lighterVoice !== undefined && !cls.lighter) {
+      p(`${at}: lighterVoice on a class with no lighter variant — it can ` +
+        `never be said`);
     }
 
     if (typeof b.holdSeconds === 'number' && typeof b.speechSeconds === 'number') {

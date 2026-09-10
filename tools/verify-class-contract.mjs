@@ -145,6 +145,13 @@ console.log("\nTEST 2c - a lighter day gets a shorter class, not a fragment");
 // fourth written before this would have had one variant of a thing that
 // is supposed to have two.
 
+// Every class, not just the ones that happen to have one. Graeme's
+// decision covers the format, so a class without a lighter variant has
+// nothing to offer on a not-great day except the full thing or the door.
+ok("2c-all. every class has a lighter variant",
+   all.every(c => c.lighter),
+   `missing on: ${all.filter(c => !c.lighter).map(c => c.title).join(", ")}`);
+
 for (const c of all.filter(c => c.lighter)) {
   const light = CONTRACT.sectionsFor(c, { lighter: true });
   const full  = CONTRACT.sectionsFor(c);
@@ -173,6 +180,49 @@ for (const c of all.filter(c => c.lighter)) {
 ok("2c-pc. positive control: at least one class has a lighter variant",
    all.some(c => c.lighter),
    "none defined, so every assertion above ran zero times");
+
+// ── 2d. LINES THAT ARE ONLY TRUE ON THE FULL DAY ────────────────────────
+console.log("\nTEST 2d - the lighter variant does not say untrue things");
+
+// Found by searching every subtraction of Ground's sections: 38 satisfy
+// the structural rules, and the best still left "is anything different
+// from four minutes ago?" naming a stretch of time the person did not
+// have. In a class about whether you can trust what your body reports,
+// that is the wrong kind of small error.
+//
+// lighterVoice is the smallest fix that works: one alternative line on
+// one beat. There is still exactly ONE class.
+
+const withAlt = all.flatMap(c =>
+  CONTRACT.sectionsFor(c, { lighter: true }).flatMap(sec =>
+    sec.beats.filter(b => b.lighterVoice).map(b => ({ c, b }))));
+
+ok("2d-pc. positive control: some beats carry an alternative line",
+   withAlt.length > 0,
+   "none found - either no class needed one, or sectionsFor is not " +
+   "returning the sections that do");
+
+for (const { c, b } of withAlt) {
+  ok(`2d. ${c.title}: the alternative is used when lighter`,
+     CONTRACT.voiceFor(b, { lighter: true }) === b.lighterVoice &&
+     CONTRACT.voiceFor(b) === b.voice,
+     "voiceFor did not swap the line, or swapped it on the full day too");
+  ok(`2d. ${c.title}: and it actually differs`,
+     b.lighterVoice !== b.voice,
+     "an alternative identical to the line it replaces is dead weight");
+}
+
+// A beat that is OMITTED on a lighter day can never say its alternative.
+for (const c of all.filter(c => c.lighter)) {
+  const omitted = (c.sections || [])
+    .filter(s => (c.lighter.omitSections || []).includes(s.id))
+    .flatMap(s => s.beats)
+    .filter(b => b.lighterVoice);
+  ok(`2d. ${c.title}: no alternative line on an omitted section`,
+     omitted.length === 0,
+     `${omitted.length} beat(s) carry a lighterVoice in a section the ` +
+     `lighter variant does not run - it can never be said`);
+}
 
 // ── 3. SERVES IS ONE STRAND, AND IT IS NOT TOUCHES ──────────────────────
 console.log("\nTEST 3 - a class serves one strand and brushes others");
