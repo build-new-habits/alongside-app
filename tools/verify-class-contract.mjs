@@ -494,6 +494,57 @@ for (const c of all) {
      `failure the class handed them`);
 }
 
+// ── 6d. NO ROUND COACHES LESS THAN THE ONE BEFORE ───────────────────────
+console.log("\nTEST 6d - a repeated round is cued the same, not more quietly");
+
+// ROUND-TWO-2. Steady Round's second round opened "I'll say less this
+// time -- you know what they are now", and gave each movement one short
+// cue instead of its instruction.
+//
+// Graeme: "If I go to a yoga class, they still say the same to
+// everybody. They give you the instructions of what you have to do."
+//
+// He is right, and the reasoning behind the original -- "repeating the
+// full coaching would say the person had not learned it" -- is the coach
+// remarking on the person's progress and then reducing support on the
+// strength of it, at the point in the session where they are most tired
+// and most likely to lose form.
+//
+// Gated because the instinct behind it is a good one that recurs: not
+// wanting to patronise somebody who already knows the movement.
+
+for (const c of all.filter(x => x.rounds)) {
+  const repeated = (c.sections || []).filter(s => s.id === "round-two" ||
+    /round (two|2)/i.test(s.title || ""));
+
+  ok(`6d-pc. ${c.title}: the repeated round exists to check`,
+     repeated.length > 0, "no repeated round found on a class declaring rounds");
+
+  for (const sec of repeated) {
+    const said = sec.beats.map(b => b.voice || "").join(" ");
+
+    ok(`6d. ${c.title}: it does not announce saying less`,
+       !/say less|said less|less this time|you know (what they are|them) (now|by now)/i.test(said),
+       `"${said.slice(0, 90)}" — announcing reduced support at the point ` +
+       `somebody is most tired is backwards`);
+
+    // Every movement carries a stop cue, exactly as in round one. These
+    // are the only safety-relevant lines in the class.
+    const moves = sec.beats.filter(b => b.kind === "movement" && b.exerciseId);
+    ok(`6d. ${c.title}: every movement still carries its limit`,
+       moves.length > 0 && moves.every(b => typeof b.stopCue === "string"),
+       `${moves.filter(b => !b.stopCue).length} movement(s) with no stop cue ` +
+       `in the round where form goes`);
+
+    // And it does not remark on the person having carried on past the
+    // exit offered two minutes earlier -- that exit is a genuinely equal
+    // choice, and noticing it makes it something they declined.
+    ok(`6d. ${c.title}: and does not remark on them carrying on`,
+       !/came back|carried on|kept going|well done|good on you/i.test(said),
+       `noticing the second round turns the exit into a thing they declined`);
+  }
+}
+
 // ── 7. SAFETY IS THE LIBRARY'S, NOT A SECOND COPY ───────────────────────
 console.log("\nTEST 7 - a class is filtered by the same rules as everything else");
 
