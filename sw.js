@@ -1,6 +1,12 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 11 Sep 2026 v495
+ *
+ * v495 - ADAPT-1. exercise-card.js, prescribed-session.js, workout.css and
+ *   three exercise files. "Other ways to do this" on the card. All already
+ *   precached; cache bump only.
+ *
  * 08 Sep 2026 v494
  *
  * v494 - SCOPE-1. privacy.js and onboarding-thread-data.js. The app says
@@ -3359,7 +3365,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v494";
+const CACHE_NAME = "alongside-v495";
 
 const SHELL_URLS = [
 
