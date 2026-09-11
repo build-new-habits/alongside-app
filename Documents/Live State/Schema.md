@@ -1,4 +1,33 @@
 # Alongside — Data Schema Reference
+## 08 Sep 2026 v1.59
+
+> **v1.59, 08 Sep 2026 — GUIDANCE-1.** New top-level field
+> **`guidanceShownAt`** — ISO string, or `null` if the general-guidance
+> line has never been shown.
+>
+> **Why it exists.** The statement that this app's advice is general and
+> that somebody should speak to their GP or an exercise professional
+> lived in exactly two places: the closing beat of onboarding, said once
+> and never again, and the Terms page, which almost nobody opens.
+>
+> Amy, the physiotherapist, on the proposed three-question red-flag
+> screen: those questions *"only take into account some red flags"*, and
+> **"to protect yourself you might be better off saying something like:
+> the advice given by this app is generic, prior to starting any exercise
+> programme you should seek guidance from your GP or exercise
+> professional."**
+>
+> ⚫ **So the statement carries the weight the screen was going to
+> carry** — which means it cannot be said once at signup and then never
+> again. Graeme: *"To have a disclaimer in the terms and onboarding only
+> is a concern. I think it needs a one liner regularly, not necessarily
+> every session."*
+>
+> 🔴 **Thirty days, and deliberately not every session.** A line that
+> appears every time is a line nobody reads — the same argument that
+> keeps a live region from firing when nothing has happened. The interval
+> is what preserves its meaning.
+
 ## 08 Sep 2026 v1.58
 
 > **v1.58 — LOG-CLASS-1.** No field changes. Records that the class
@@ -131,7 +160,7 @@
 
 ## 06 Sep 2026 v1.51
 
-**File:** `js/store.js` (confirmed live version: **v66, 08 Sep 2026**)
+**File:** `js/store.js` (confirmed live version: **v67, 08 Sep 2026**)
 
 > **v1.47, 06 Sep 2026 — CR-1.** `conditions[]` gains three ids and loses one. `chronic-fatigue` is **retired**; `persistent-fatigue`, `me-cfs` and `long-covid` replace it. No field shape changed — `conditions` is still `string[]` and `conditionMeta` is still keyed by condition id.
 >

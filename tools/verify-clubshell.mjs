@@ -477,6 +477,73 @@ console.log("\nTEST 11 - A11Y-HOME: Home can be read by heading");
      "wrapping the button cost it its disclosure semantics");
 }
 
+console.log("\nTEST 12 - GUIDANCE-1: the general-guidance line returns");
+
+// The statement that this app's advice is general, and that somebody
+// should speak to their GP or an exercise professional, lived in exactly
+// two places: the closing beat of onboarding -- said once, at signup --
+// and the Terms page, which almost nobody opens.
+//
+// Amy, the physiotherapist, on the three-question red-flag screen this
+// replaces: those questions "only take into account some red flags", and
+// "to protect yourself you might be better off saying something like:
+// the advice given by this app is generic, prior to starting any
+// exercise programme you should seek guidance from your GP or exercise
+// professional."
+//
+// Graeme: "To have a disclaimer in the terms and onboarding only is a
+// concern. I think it needs a one liner regularly, not necessarily every
+// session."
+
+{
+  const said = (c) => /advice in this app is general/i.test(c.textContent || "");
+
+  // home() clears localStorage every call, so every render through it is
+  // "never shown before" and the interval can never be observed. The
+  // first version of this test used it and 12c/12d failed against a
+  // fixture that was resetting the very field under test.
+  function homeKeepingState() {
+    const c = document.createElement("div");
+    document.body.appendChild(c);
+    TodayView({ navigate: () => {} }).mount(c);
+    return c;
+  }
+
+  localStorage.clear(); store.init(); store.set("tier", "personal");
+  const first = homeKeepingState();
+  ok("12pc. positive control: Home rendered", !!first.querySelector(".club-row"));
+
+  ok("12a. somebody who has never seen it, sees it", said(first),
+     "the line that carries the red-flag screen's weight never appears");
+
+  ok("12b. and the store records that it was shown",
+     !!store.get("guidanceShownAt"),
+     "not stamped, so it would appear on every single render");
+
+  // 🔴 NOT EVERY SESSION. A line that appears every time is a line
+  // nobody reads -- the same argument that keeps a live region from
+  // firing when nothing has happened.
+  const second = homeKeepingState();
+  ok("12c. and does not appear again immediately", !said(second),
+     "repetition without occasion trains people to look past it, and the " +
+     "one time it matters it has already become furniture");
+
+  store.set("guidanceShownAt", new Date(Date.now() - 29 * 86400000).toISOString());
+  ok("12d. nor at 29 days", !said(homeKeepingState()), "interval not honoured");
+
+  store.set("guidanceShownAt", new Date(Date.now() - 31 * 86400000).toISOString());
+  ok("12e. but does at 31", said(homeKeepingState()),
+     "the interval never expires, so it is said once and never again — " +
+     "which is the fault this exists to fix");
+
+  // It is the product speaking about its own limits, not the coach.
+  const line = homeKeepingState().querySelector(".today-guidance");
+  ok("12f. and it is not in the coach's first person",
+     !line || !/\bI\b|\bI'\w/.test(line.textContent || ""),
+     "the coach says 'I' all over this app; this is the product being " +
+     "plain about what it is, and the difference in voice is the point");
+}
+
 console.log(fails === 0
   ? "\nCLUB-SHELL: all assertions pass\n"
   : `\nCLUB-SHELL: ${fails} FAILED\n`);

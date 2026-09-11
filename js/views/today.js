@@ -1,5 +1,13 @@
 /**
  * today.js
+ * 08 Sep 2026 v39
+ *
+ * v39 - GUIDANCE-1. The general-guidance line, every thirty days. It
+ *   lived only in onboarding's closing beat and the Terms page, and it
+ *   now carries the weight the three-question red-flag screen was going
+ *   to carry -- on the physiotherapist's advice that a partial screen
+ *   protects less than a plain statement.
+ *
  * 08 Sep 2026 v38
  *
  * v38 - TIMETABLE-1. The Guided class room reaches the classes.
@@ -817,6 +825,9 @@ export function TodayView(router) {
     }
 
     renderHome(container);
+    // GUIDANCE-1. Stamped only if the line actually reached the screen,
+    // so a render that suppressed it does not reset the thirty days.
+    _markGuidanceShown(container);
   }
 
   function _resolveState() {
@@ -1719,6 +1730,67 @@ export function TodayView(router) {
    * built on demand -- a row that assembles itself on tap is a row a
    * screen reader has to be told about twice.
    */
+
+/**
+ * GUIDANCE-1, 08 Sep 2026. The general-guidance line, every thirty days.
+ *
+ * ── WHY IT IS HERE AND NOT IN THE TERMS ──────────────────────────────
+ *
+ * The statement that this app's advice is general, and that somebody
+ * should speak to their GP or an exercise professional, lived in exactly
+ * two places: the closing beat of onboarding -- said once, at signup,
+ * and never again -- and the Terms page, which almost nobody opens.
+ *
+ * Amy, the physiotherapist, on the three-question red-flag screen that
+ * was going to be built instead: those questions "only take into account
+ * some red flags", and "to protect yourself you might be better off
+ * saying something like: the advice given by this app is generic, prior
+ * to starting any exercise programme you should seek guidance from your
+ * GP or exercise professional."
+ *
+ * 🔴 So this line now carries the weight that screen was going to carry,
+ * and a line carrying that weight cannot be said once at signup.
+ *
+ * Graeme: "To have a disclaimer in the terms and onboarding only is a
+ * concern. I think it needs a one liner regularly, not necessarily every
+ * session."
+ *
+ * ── THIRTY DAYS, AND DELIBERATELY NOT EVERY SESSION ──────────────────
+ *
+ * A line that appears every time is a line nobody reads. It is the same
+ * argument that keeps a live region from firing when nothing has
+ * happened: repetition without occasion trains people to look past it,
+ * and the one time it matters it has already become furniture.
+ *
+ * ⚫ The wording is close to Amy's own rather than rewritten into the
+ * coach's voice. Graeme: "I would rather send out your words than mine."
+ * It is also NOT in the coach's first person -- the coach says "I" all
+ * over this app, and this is the product speaking about its own limits,
+ * which is a different voice on purpose.
+ */
+const GUIDANCE_DAYS = 30;
+
+function _guidanceLine() {
+  const last = store.get('guidanceShownAt');
+  if (last) {
+    const days = (Date.now() - new Date(last).getTime()) / 86400000;
+    if (days < GUIDANCE_DAYS) return '';
+  }
+  return `
+    <p class="today-guidance" role="note">
+      The advice in this app is general. Before starting any exercise
+      programme it is worth seeking guidance from your GP or an exercise
+      professional.
+    </p>`;
+}
+
+/** Stamped only when it was actually put on screen. */
+function _markGuidanceShown(root) {
+  if (root && root.querySelector('.today-guidance')) {
+    store.set('guidanceShownAt', new Date().toISOString());
+  }
+}
+
   function roomRow({ id, title, what, summary, facts, action }) {
     return `
       <div class="club-row" data-room-id="${id}">
@@ -1973,6 +2045,7 @@ export function TodayView(router) {
     });
 
     return `
+      ${_guidanceLine()}
       <p class="today-chooser-q">What do you want to do today?</p>
       <p class="today-chooser-sub">Four ways in. Open any one to see what it would give you today.</p>
       <div class="club-rooms">${guided}${pt}${own}${quick}</div>
@@ -2010,6 +2083,7 @@ export function TodayView(router) {
 
   function chooser() {
     return `
+      ${_guidanceLine()}
       <p class="today-chooser-q">What do you want to do today?</p>
       ${tileGrid()}
 
