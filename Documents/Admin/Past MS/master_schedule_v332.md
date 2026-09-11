@@ -1,12 +1,12 @@
 # Alongside: Move — Master Schedule
-## 11 Sep 2026 v333
+## 11 Sep 2026 v332
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v332.md`. Remove v332 on upload.
+Supersedes `master_schedule_v331.md`. Remove v331 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
-> **Live: `alongside-v496`, 142 gates, `store.js` v67, `Schema.md` v1.60, cold start blueprint v101.** Read that blueprint after this block.
+> **Live: `alongside-v494`, 140 gates, `store.js` v67, `Schema.md` v1.59, cold start blueprint v99.** Read that blueprint after this block.
 >
 > **Claude's pre-beta BUILD scope is complete.** CLUB 9 of 9 plus QUICK-INPUTS, GUIDED-COPY, DEVICE-1, DEVICE-2, ARC-LED, ARC-PLAIN — `v452` → `v466` on 06 Sep. **QUICK-BUILD-2/3 `v467`, CHECKIN-3 and PROPOSAL-1/2 `v468` — 08 Sep.**
 >
@@ -21,8 +21,7 @@ Supersedes `master_schedule_v332.md`. Remove v332 on upload.
 > | 🟡 **3** | **Your own — the "using bit"** | Graeme: *"I can't seem to be able to save my own series of sessions. No place for history to exist of recall."* Saving, editing, deleting and the list are done; **once somebody has fifteen saved sessions it is a flat list with no filtering or classification.** Not blocking beta |
 > | 🟡 **4** | **Class eight onwards** | Not urgent — Graeme: *"we have something testable, so I'm not in a rush."* Every remaining strand is at least TOUCHED by an existing class, so ranking by need no longer discriminates and a different selection rule is needed |
 > | 🟠 **SOCIAL** | **Social advertising pack** | 🆕 **11 Sep.** `alongside_social_ad_pack_11sep2026_v1.md` — poster, three carousel slides, five 30-second film scripts with screen plans. **Nothing posts until the four blockers in its §9 clear**, two of which are red |
-> | ✅ **PROPOSAL-3** | **A harder day, then ten movements** | 🟢 **Closed 11 Sep, `v496`.** Reproduced exactly on a bare free account before anything was touched. BOTH causes were real: the phase bias overwrote the check-in on every mount, AND `session-builder.js` never read `todayIntensity` at all. A low day now builds a smaller working section, a longer settle, and a coach line saying why. `verify-proposal3` mounts the screen, as asked. **Two things still for Graeme: the coach line wording, and whether a low day should also cap DIFFICULTY** |
-> | 🟢 **ADAPT-1** | **Other ways to do this** | 🆕 **Shipped 11 Sep, `v495`.** Ease-off and go-further options on the exercise card, as stated options the person chooses — the app never selects one. Nine entries from Graeme's PT session, plus three cue corrections. **Open: Graeme's read of the wording, and a professional's agreement before the eight held adaptations ship** |
+> | 🔴 **PROPOSAL-3** | **A harder day, then ten movements** | 🆕 **11 Sep.** Energy 2/10, mood 3/10 on the live build: check-in said *"A harder day"*, proposal offered **Glute Focus, 30–40 mins, 10 movements**. May be a bare test account; may be `todayIntensity` overwritten by phase bias. **Needs an executing gate, not a source check** |
 > | 🟡 **5** | **Changelog** | ✅ **Decision already taken a month ago: RESUME.** It was still listed here as an open question, which it was not |
 > | ✅ | ~~Device pass~~ · ~~class contract~~ · ~~seven classes~~ · ~~the player~~ · ~~the timetable~~ · ~~class logging~~ · ~~Home headings~~ · ~~the cwd trap~~ · ~~the five outside tools~~ | All shipped 08 Sep. See the records below |
 >
@@ -69,18 +68,6 @@ Supersedes `master_schedule_v332.md`. Remove v332 on upload.
 > #### 🟠 A finding about this document itself
 >
 > `master_schedule.md` was **edited in place on 11 Sep without a version bump** — commit `0a95c8b` moved the live line to `v494` while the header still said v331, and `Past MS/master_schedule_v331.md` held a different, earlier v331. The true final v331 has now been archived over it. `verify-schedule-drift` compares this file's header to its own footer, so **both agreed and both were wrong**, which is the same class of fault as the START HERE table drifting three times in one day.
->
-> ### 🟢 SHIPPED SINCE v332 — ADAPT-1 `v495` and PROPOSAL-3 `v496`
->
-> **ADAPT-1 — other ways to do this.** A collapsed disclosure at the end of DO holding an entry's ways to ease off and ways to go further, plus a one-line pointer under the caution when something is sore and the exercise has ways to ease off. Graeme's steer, 10 Sep, from his own PT session: she did not say do this one, she said here are your options. **No store field and nothing recorded about which option was used**, which is also why no regulatory question arises — the information is offered and the choice stays with the person. "To go further" is withheld when the exercise works a sore area and in Gentle Care; prescribed exercises show nothing, because the clinician owns those. Nine entries adapted, three cue corrections (the Bulgarian split squat listed the trainer's glute cue as a fault). Exercise Entry Standard v4, `Schema.md` v1.60, `verify-adapt1` with 31 executing assertions and ten reversals.
->
-> ⚫ **It covers a real limit in `verify-card3`.** Test 2c forbids `<details>` in the `doBody` SOURCE slice; this disclosure is built above that slice, so 2c cannot see it. `verify-adapt1` 2.3 asserts on rendered html instead that both hazard blocks sit before, and outside, any disclosure.
->
-> 🟠 **One assertion passed for the wrong reason and was caught by its own reversal** — 3.12 allowed the pointer nested inside the caution paragraph. Strengthened until the reversal failed. Same class as the two noted below on PROPOSAL-3.
->
-> **PROPOSAL-3 — see the row above.** Also worth recording: the master schedule's own PROPOSAL-3 note guessed at one cause. Both guesses were right, and there were two of them.
->
-> 🔵 **Still open from the ADAPT-1 work, none blocking:** `CONTRA-AUDIT` (at least 17 pairs where a gentler entry is contraindicated for something its harder sibling allows — the library disagrees with itself), `FEED-READER` (the "That was too hard" button may be read by nothing live since TWO-ENGINE; static reading only, must be driven by execution), and possible duplicate entries `dead-bug`/`dead-bug-progression-3` and `90-90-hip-stretch`/`hip-90-90-stretch`.
 >
 > ### 🟢 SHIPPED SINCE v330 — CLASS-6, `v486`. Unsticking is live. Seven classes, 29 of 33 aims served.
 >
@@ -8762,4 +8749,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 11 Sep 2026 v333*
+*Build New Habits · Alongside: Move · Master Schedule · 11 Sep 2026 v332*
