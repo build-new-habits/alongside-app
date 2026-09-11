@@ -1,6 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 08 Sep 2026 v492
+ *
+ * v492 - TARGET-3. progress.js v15. The weekly target is shown only if
+ *   the person set one. Already precached; cache bump only.
+ *
  * 08 Sep 2026 v491
  *
  * v491 - LOG-CLASS-1. class-player.js v3, progress.js v14. A class that
@@ -51,7 +56,7 @@
  *   Class 004 "Bending" is live, which completes Graeme's arc: trunk
  *   strength, a back that copes, trusting your body again.
  *
- *   Caught by precache-check.mjs again — fourth new file the verify-*
+ *   Caught by verify-precache-check.mjs again — fourth new file the verify-*
  *   suite could not see.
  *
  * 08 Sep 2026 v483
@@ -87,7 +92,7 @@
  *   and the four under js/data/classes/. The guided class data contract
  *   and the three written classes as data.
  *
- *   Caught by precache-check.mjs, which sits outside the verify-* suite.
+ *   Caught by verify-precache-check.mjs, which sits outside the verify-* suite.
  *   Third time it has caught a new file the 133 gates could not.
  *
  * 08 Sep 2026 v478
@@ -148,7 +153,7 @@
  *   own; the Your own room's counted button leads to it instead of to
  *   the builder. today.js and router.js also changed.
  *
- *   The new view was caught by precache-check.mjs, not by the 128 verify
+ *   The new view was caught by verify-precache-check.mjs, not by the 128 verify
  *   gates -- that tool sits OUTSIDE the verify-* suite. A view that is
  *   routed to but not precached fails on offline launch, which is the
  *   one condition this file exists for.
@@ -280,7 +285,7 @@
  *   fires its own request, and the fetch handler only falls back to the
  *   cached shell for mode === "navigate", so offline the request simply
  *   fails. Its ten sibling layout files were all listed; this one was
- *   the exception, and tools/precache-check.mjs had been red on main
+ *   the exception, and tools/verify-verify-precache-check.mjs had been red on main
  *   because of it. It self-heals via the runtime cache.put on the first
  *   online load, but that window reopens on EVERY cache bump, which is
  *   what made it worth a line rather than a comment.
@@ -857,7 +862,7 @@
  * only, writes nothing. tools/verify-chap2.mjs is the first gate in the
  * suite that EXECUTES a view rather than reading its source, which is
  * the gap that let four moments ship into one of eleven views on 15 Aug
- * with every gate green. Also: schema-check.mjs v2 — its field diff had
+ * with every gate green. Also: verify-schema-check.mjs v2 — its field diff had
  * been slicing an empty string since it was written, hiding nine
  * undocumented store fields. Schema.md v1.34, now current at store.js
  * v52.
@@ -2011,7 +2016,7 @@
  *
  * variables.css v3 -> v4, display-prefs.js v1 -> v2, settings.js v18 ->
  * v19, display-preferences.css v1 -> v2, index.html pre-paint script
- * extended. tools/contrast-check.mjs v1 -> v2 now runs the full matrix
+ * extended. tools/verify-verify-contrast-check.mjs v1 -> v2 now runs the full matrix
  * against ALL THREE schemes -- every pairing measured, worst 4.68:1.
  * Cache bump only, no new files.
  *
@@ -2194,7 +2199,7 @@
  * every card hover state was affected too. Fixed at the token, not in 15
  * places. css/components/checkin-conversation.css v8 -> v9: corrects the
  * measurements in its own header, which the token change invalidated.
- * New tools/contrast-check.mjs gates the whole matrix. Cache bump only.
+ * New tools/verify-verify-contrast-check.mjs gates the whole matrix. Cache bump only.
  *
  * 12 Aug 2026 v266
  * The two "logged, not fixed" items from DIC-1, actually fixed. Graeme
@@ -3342,7 +3347,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v491";
+const CACHE_NAME = "alongside-v492";
 
 const SHELL_URLS = [
 
