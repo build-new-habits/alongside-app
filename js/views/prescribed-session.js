@@ -3,6 +3,13 @@
  *
  * 11 Aug 2026 v5
  *
+ * 11 Sep 2026 v10
+ *
+ * v10 - ADAPT-1. Tells the card this exercise is prescribed, so "Other
+ *   ways to do this" does not render here. Prescribed exercises injected
+ *   into built sessions carry isPrescribed themselves; this view resolves
+ *   the plain library entry by id, so it has to say so.
+ *
  * 31 Aug 2026 v9
  *
  * v9 - CARD-3. Three pages, and a live crash fixed on the way through.
@@ -263,6 +270,10 @@ export function render() {
           return renderExerciseCard(fullEx, {
             idPrefix: `ps-${fullEx.id}`,
             page:     currentCardPage,
+            // ADAPT-1. This view resolves the plain library entry by id, so
+            // it carries no isPrescribed flag of its own. Without this the
+            // card would offer alternatives to an exercise a clinician set.
+            prescribed: true,
             lastTime: lastLine(ex),
             doSlot: `
               <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(fullEx.youtube || (ex.name + " exercise form"))}"

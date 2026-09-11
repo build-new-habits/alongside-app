@@ -1,6 +1,6 @@
 # Exercise Entry Standard
 
-**13 Aug 2026 v3**
+**11 Sep 2026 v4**
 
 Build New Habits · Alongside: Move · Live State
 
@@ -117,7 +117,8 @@ now preserves the entry's own library. Any future filter reading
 ### Optional
 
 `perSide`, `duration`, `holdSeconds`, `credits`, `affectsAreas`, `caution`,
-`equipmentOptional`, `rehabPhase`, `activationTarget`, `movementPattern`.
+`equipmentOptional`, `rehabPhase`, `activationTarget`, `movementPattern`,
+`adaptations`.
 
 ### `contentType` — deliberately not required
 
@@ -225,7 +226,7 @@ goes wrong and what to do instead.
 watchOut: [
   "Your back rounding as you lower — stop the movement where your back is still flat, even if that is only halfway down",
   "Feeling this in your lower back rather than the back of your thighs, which usually means the hips are not moving back far enough",
-  "Bending the knees to reach lower — the knees stay softly bent and still throughout",
+  "Knees drifting forward so it turns into a squat — set your knee bend at the start, keep it there, and move your hips instead",
   "Any sharp pain in the back, at any point: put the weight down and leave this one for today"
 ]
 ```
@@ -235,6 +236,76 @@ watchOut: [
 Not a contraindication list — that is `contraindications`, which is
 structural and machine-read. `watchOut` is human-read, in the moment, by
 someone mid-set.
+
+---
+
+## `adaptations` — other ways to do this
+
+**New field, optional.** Added 11 Sep 2026, ADAPT-1.
+
+```javascript
+adaptations: {
+  easeOff: ["If ..."],   // 1-3 items
+  further: ["When ..."]  // 1-3 items
+}
+```
+
+Either list may be absent. Rendered on the card's DO page under "Other
+ways to do this", collapsed by default.
+
+### What it is
+
+The other ways a trainer would offer: the same exercise with the set-up
+changed so it asks less or more. They are options the person chooses.
+**The app never chooses one for them.** That line is what keeps this
+field information rather than instruction, and it is not a style
+preference.
+
+### Rules
+
+1. **Options, never instructions.** No "should", "must", "need to" or
+   "have to".
+2. **`easeOff` items start with "If"** and name what the person notices,
+   then the change. **`further` items start with "When"** and name what
+   feels steady, then the change.
+3. **A set-up change, not an amount.** Going less far, more slowly or for
+   less time belongs in `watchOut`. Adding weight is load, not an
+   adaptation.
+4. **No ranking words:** easy, easier, hard, harder, beginner, advanced,
+   intermediate, modified, regression, progression, basic, proper.
+5. **Never kilos.** P4 applies here exactly as it does to `load`.
+6. **One to three items per list, 60 words at most each**, short enough to
+   read on the floor mid-set.
+7. **Contraindications still decide who is offered the exercise.** An
+   adaptation never makes an excluded exercise acceptable, and must not
+   read as though it does.
+8. **Source recorded in the commit message:** professional guidance,
+   existing entry, or reviewed proposal. Unreviewed proposals do not ship.
+
+### Display rules
+
+- Not shown on prescribed exercises. The clinician owns those.
+- `further` is not shown when the exercise works an area the person has
+  said is sore today, or in Gentle Care.
+- When the card shows a caution and the exercise has `easeOff` items, a
+  one-line pointer sits under the caution.
+
+### Worked example — side plank from the knee
+
+```javascript
+adaptations: {
+  further: [
+    "When this feels steady, straighten your top leg in line with your body and lift it a few centimetres off the floor, driving up through the knee that stays down."
+  ]
+}
+```
+
+### What it is not
+
+Not a second `watchOut`. `watchOut` is what goes wrong and its
+correction, read mid-set whether or not anybody went looking.
+`adaptations` are chosen on purpose, by someone who has decided today
+needs something different.
 
 ---
 
@@ -391,4 +462,4 @@ since that is where absence of a warning carries real physical risk.
 
 ---
 
-*Build New Habits · Alongside: Move · Exercise Entry Standard · 11 Aug 2026 v1*
+*Build New Habits · Alongside: Move · Exercise Entry Standard · 11 Sep 2026 v4*

@@ -1,6 +1,14 @@
 /* ============================================
    WORKOUT STYLES
    css/components/workout.css
+   11 Sep 2026 v14
+
+   v14 - ADAPT-1. .xcard-adapt, the collapsed "Other ways to do this"
+   disclosure at the end of DO, and .xcard-adapt-pointer, the line that
+   sits under the caution. Deliberately NOT styled like a hazard: these
+   are options somebody may want, not something they must read. See the
+   block at the end of this file.
+
    08 Sep 2026 v13
 
    v13 - TIMER-1. .xcard-timer-done, the visible form of the status
@@ -1490,4 +1498,39 @@
   background: var(--color-surface-2, var(--color-surface));
   color: var(--color-text);
   font-weight: 600;
+}
+
+/* ============================================
+   ADAPT-1 - OTHER WAYS TO DO THIS
+   ============================================ */
+
+/* A plain bordered block, not a hazard box. The rose treatment belongs to
+   .xcard-block--hazard and borrowing it here would make an option look
+   like a warning. */
+.xcard-adapt {
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md, 8px);
+}
+
+/* 44px minimum target. `display` is left alone on purpose: setting flex
+   removes the native disclosure triangle in some browsers, and that
+   triangle is how open and closed state is shown without relying on
+   colour. */
+.xcard-adapt-summary {
+  min-height: 44px;
+  padding: var(--space-2) 0;
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.xcard-adapt-summary:focus-visible {
+  outline: 3px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+.xcard-adapt-pointer {
+  margin-top: var(--space-2);
+  color: var(--color-text);
 }

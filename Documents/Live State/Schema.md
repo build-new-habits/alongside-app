@@ -1,5 +1,17 @@
 # Alongside — Data Schema Reference
-## 08 Sep 2026 v1.59
+## 11 Sep 2026 v1.60
+
+> **v1.60, 11 Sep 2026 — ADAPT-1. No store field, and that is the point.**
+> Exercise entries gain an optional `adaptations` object — the other ways
+> to do an exercise, offered as options on the card. It is static content,
+> documented in the cross-reference below and defined in the Exercise
+> Entry Standard v4.
+>
+> **Nothing is recorded about which option somebody used.** No new field,
+> no migration, no write path. The app offers; the person chooses; the
+> choice is theirs and is not kept. Anything that later wanted to
+> *remember* a choice would be a store change and a new decision, not an
+> extension of this one.
 
 > **v1.59, 08 Sep 2026 — GUIDANCE-1.** New top-level field
 > **`guidanceShownAt`** — ISO string, or `null` if the general-guidance
@@ -685,6 +697,10 @@ Two fields were added to that standard on 11 Aug 2026:
 
 - `watchOut` — `string[]`, the failure modes and their correction. Previously absent from all 461 entries and all four private pools; had never existed.
 - `load` — `string`, effort-relative weight guidance. **Never an absolute weight**, per Locked Principle P4: an absolute target is an interpretation of load, and a benchmark with a verdict attached.
+
+One field was added on 11 Sep 2026 (ADAPT-1):
+
+- `adaptations` — `{ easeOff?: string[], further?: string[] }`, optional. The other ways to do the exercise, shown on the card's DO page under "Other ways to do this". Options the person chooses; the app never selects one for them. `further` is withheld when the exercise works an area the person has said is sore today and in Gentle Care, and the whole block is withheld on prescribed exercises. Canonical definition in the Exercise Entry Standard v4; the exact set of entries carrying it is held by `tools/verify-adapt1.mjs`.
 
 Baseline at time of writing, from `Documents/Admin/Templates/validate-exercise-entries.mjs`: 461 entries, 0 carrying `watchOut`, 49 loaded exercises missing `load`/`sets`/`reps`. CON-9 backfills, equipment-requiring exercises first.
 
