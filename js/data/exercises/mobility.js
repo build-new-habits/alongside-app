@@ -55,6 +55,11 @@ export const MOBILITY = [
       'Holding your breath, which makes everything tighter',
       'Forcing the range on one side to match the other; sides are rarely equal'
     ],
+    adaptations: {
+      further: [
+        "When the front of your hip feels settled, add a rock: send your hips back towards your back heel, keeping your front foot flat, until you feel the back of your front leg. Rock slowly between the two. Getting all the way back is not the point."
+      ]
+    },
     load: 'Bodyweight. Progress by holding longer, not by pushing harder.',
     credits: 30,
     sets: 2,
@@ -723,6 +728,11 @@ export const MOBILITY = [
       'Holding your breath, which makes everything tighter',
       'Forcing the range on one side to match the other; sides are rarely equal'
     ],
+    adaptations: {
+      further: [
+        "When this feels settled, try it kneeling: one knee down on a cushion, the other leg straight out to the side with its foot flat, hands or fists on the floor in front. Push your hips back until you feel the inside of the straight leg."
+      ]
+    },
     load: 'Bodyweight. Progress by holding longer, not by pushing harder.',
     credits: 20
   },
