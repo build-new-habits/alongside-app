@@ -1,6 +1,12 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 08 Sep 2026 v493
+ *
+ * v493 - GUIDANCE-1. store.js v67, today.js v39, club-rooms.css v5. The
+ *   general-guidance line returns every thirty days. All already
+ *   precached; cache bump only.
+ *
  * 08 Sep 2026 v492
  *
  * v492 - TARGET-3. progress.js v15. The weekly target is shown only if
@@ -3347,7 +3353,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v492";
+const CACHE_NAME = "alongside-v493";
 
 const SHELL_URLS = [
 
