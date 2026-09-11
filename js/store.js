@@ -1,5 +1,10 @@
 /**
  * store.js - Data persistence layer
+ * 08 Sep 2026 v67
+ *
+ * v67 - GUIDANCE-1. guidanceShownAt: when the general-guidance line was
+ *   last shown. Thirty days between showings.
+ *
  * 08 Sep 2026 v66
  *
  * v66 - PLAYER-1. activeClass: the only state a class in progress
@@ -1133,6 +1138,8 @@ export const store = {
       // ── SESSION BUILDER ───────────────────────────────────────
       generatedSession: saved.generatedSession || { session: null, builtAt: null, inputs: {} },
 
+      guidanceShownAt: saved.guidanceShownAt || null,
+
       // PLAYER-1. Defaulted on rehydrate like every other nested object.
       activeClass: saved.activeClass || {
         id: null, lighter: false, sectionIndex: 0, beatIndex: 0, startedAt: null
@@ -2089,6 +2096,12 @@ export const store = {
         builtAt: null,
         inputs:  {}
       },
+
+      // ── GENERAL GUIDANCE REMINDER ─────────────────────────────
+      // GUIDANCE-1, 08 Sep 2026. When the general-guidance line was
+      // last shown. null means never. Thirty days between showings:
+      // a line that appears every session is a line nobody reads.
+      guidanceShownAt: null,
 
       // ── GUIDED CLASS ──────────────────────────────────────────
       // PLAYER-1, 08 Sep 2026. The only state a class in progress
