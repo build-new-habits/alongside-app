@@ -10,31 +10,32 @@ Supersedes `master_schedule_v330.md`. Remove v330 on upload.
 >
 > **Claude's pre-beta BUILD scope is complete.** CLUB 9 of 9 plus QUICK-INPUTS, GUIDED-COPY, DEVICE-1, DEVICE-2, ARC-LED, ARC-PLAIN — `v452` → `v466` on 06 Sep. **QUICK-BUILD-2/3 `v467`, CHECKIN-3 and PROPOSAL-1/2 `v468` — 08 Sep.**
 >
-> ### What is actually open, 08 Sep 2026
+> ### The three live workstreams, in the order Claude recommended
 >
-> ⚠️ **Rebuilt from the repo, not edited.** The table this replaces listed classes five, six and seven as pending when all three were live, still carried the Home-heading item that `A11Y-HOME` closed, and had four rows numbered "2". **Third time in one day it went stale.** A workstream table nothing checks drifts exactly like a version line nothing checks — see the note at the end of this block.
->
-> | | What | State |
+> | # | What | State |
 > |---|---|---|
-> | 🔴 **1** | **PAR-Q+ / RED-FLAG** | **Graeme's call, and the most serious thing outstanding. Zero code.** A three-item red-flag screen with a hard stop, before somebody starts. The clinical reviewer's reasoning is a reversal of Claude's earlier position: asking *"where does it hurt"* and *"how long"* is already a triage interaction, so declining to screen afterwards is not neutrality but **implicit false reassurance to somebody with cauda equina syndrome, progressive neurological deficit or malignancy.** The reviewer's word for not doing it was *"indefensible"*. Schedule says "response in hand, held" — parked, not resolved |
-> | 🟡 **2** | **Settings and Progress review** | Check both still say what is true and point at nothing retired. Not yet started |
-> | 🟡 **3** | **Your own — the "using bit"** | Graeme: *"I can't seem to be able to save my own series of sessions. No place for history to exist of recall."* Saving, editing, deleting and the list are done; **once somebody has fifteen saved sessions it is a flat list with no filtering or classification.** Not blocking beta |
-> | 🟡 **4** | **Class eight onwards** | Not urgent — Graeme: *"we have something testable, so I'm not in a rush."* Every remaining strand is at least TOUCHED by an existing class, so ranking by need no longer discriminates and a different selection rule is needed |
-> | 🟡 **5** | **Changelog** | ✅ **Decision already taken a month ago: RESUME.** It was still listed here as an open question, which it was not |
-> | ✅ | ~~Device pass~~ · ~~class contract~~ · ~~seven classes~~ · ~~the player~~ · ~~the timetable~~ · ~~class logging~~ · ~~Home headings~~ · ~~the cwd trap~~ · ~~the five outside tools~~ | All shipped 08 Sep. See the records below |
+> | ✅ | ~~**Device pass**~~ | **COMPLETE, 8 of 8, 08 Sep.** 15 defects in shipped code, plus 6 more from Graeme's handset. See the tally below |
+> | ✅ | ~~**Class data contract**~~ | **FIXED 08 Sep, CLASS-1, `v479`.** All three classes are in as data and validating. See below |
+> | ✅ | ~~**Class four — "Bending"**~~ | **LIVE, `v484`.** Graeme read it and approved the shape and voice. **His arc is now fully served.** Three questions still open on the document — the name, "about forty times", and whether the lighter line is needed — each a one-line edit |
+> | ✅ | ~~**Transcribe 005 and 006**~~ | **LIVE, `v485`. Six classes.** 26 of 33 aims now have at least one served strand |
+> | ✅ | ~~**Class seven — "Unsticking"**~~ | **LIVE, `v486`. Seven classes; 29 of 33 aims served.** "See you Thursday" caught by Graeme and removed before it shipped |
+> | 2 | 🟡 **Class eight onwards** | All remaining strands are at least TOUCHED by an existing class: `not-overdoing` (8, Stopping Early), `self-kindness` (7, Ground), `winding-down` (7, Out). **A different selection rule is needed from here** — need alone stops discriminating |
+> | 2 | 🟡 **Class five — "Standing Up"** | **DRAFTED, awaiting Graeme on the voice.** `alongside_class_005_standing_up_08sep2026_v1_DRAFT.md`. Serves `leg-strength` — **both the next strand in Graeme's own aim and the most-wanted unserved strand across all 33 (12 aims)**. Three open questions |
+> | 3 | 🟡 **Class six — "Out"** | **DRAFTED, and it strained the contract in five places.** `alongside_class_006_out_08sep2026_v1_DRAFT.md`. Serves `being-outside`. **Two strains fixed (CLASS-3); three are decisions for Graeme** |
+> | 4 | 🟡 **Class seven onwards** | Next unserved by need: `hip-range` (8 aims), `not-overdoing` (8 — but already touched by Stopping Early), `self-kindness` (7), `winding-down` (7) | Three classes written (`alongside_class_001/002/003`); **fix the contract against them before a fourth is written.** Nothing is built for classes yet. Decisions already taken are further down this document: the mapping unit is the STRAND not the aim; extend `practice-library.js` rather than building beside it; PACING (spec §4b) |
+> | 2 | 🟡 **Class content** | **Graeme's.** His arc first, then expand — six to eight more plus lighter variants |
+> | + | 🟠 **RED-FLAG** | **No code at all.** Waits on Graeme's PAR-Q+ call |
 >
-> ### The four rooms, as they stand
+> ⚫ **Classes cannot ship for beta; the device pass could, and has.** That is why it went first.
 >
-> | Room | State |
+> ### 🔵 Smaller things still open, none of them blocking
+>
+> | | |
 > |---|---|
-> **Guided class** | **Complete for beta.** Seven classes reachable from Home, playable, safety-filtered, lighter variants, honest lengths, logged to Progress, ending on the coach moment |
-> **One to one** | **Complete, and the most improved on 08 Sep.** It now asks where you are and how long you have, and both are changeable. Before that it proposed barbell work to somebody in a kitchen |
-> **Your own** | **Works.** Build, save, edit, delete, start. The gap is item 3 above |
-> **Quick build** | **Complete.** A length, the coach's assumptions, all of them changeable. It does follow the arc — `chooseSessionType` resolves through the arc first |
->
-> ⚫ **The honest caveat across all four: everything above is verified by mounting and playing surfaces under test. No beta tester has touched any of it.**
->
-> 🔴 **This table has now gone stale three times in one day**, and each time it was corrected by hand. `verify-blueprint` checks the START HERE line against the repo because that drift was found twice; **this table has no equivalent and is drifting for the same reason.** A candidate for the same treatment.
+> 🟠 **Home has one heading for the whole screen** | Just the greeting. The club rooms are disclosure buttons carrying no heading, so **Home cannot be skimmed by heading** — the one screen everybody starts on. The standard pattern is `<h2><button aria-expanded>` wrapping each room head. Same family as `A11Y-HEADER`, but a different shape of change |
+> 🟠 **49 gates read cwd-relative** | Green from the repo root, reading nothing from anywhere else. **A trap, not a live fault:** a session running the suite by full path from elsewhere sees ~70 red and concludes the app is broken. Four fixed so far, one at a time as each gate is opened |
+> 🟠 **The five tools outside the `verify-*` suite** | `schedule-drift`, `precache-check`, `schema-check`, `contrast-check`, `audit-gate-proxies`. **They have caught two live faults nobody would otherwise have seen** — a stale schedule and an unprecached view — because nothing runs them by default. Folding them into the standard run is a small change with a proven return |
+> 🟡 **Changelog stale since March** | Resume or retire — Graeme's call |
 
 > ### 🟢 SHIPPED SINCE v330 — CLASS-6, `v486`. Unsticking is live. Seven classes, 29 of 33 aims served.
 >

@@ -1,5 +1,16 @@
 /**
  * progress.js
+ * 08 Sep 2026 v15
+ *
+ * v15 - TARGET-3. The weekly target is shown only if the person SET one.
+ *   getProgressStats() returns strategicGoal.weeklySessionTarget or 3
+ *   with no check on whether it was ever chosen, so Progress told
+ *   somebody who had never set a target that they were "0 of 3 this
+ *   week" -- a shortfall against a commitment they never made, on the
+ *   screen they open to see how they are doing. today.js has guarded
+ *   this since TARGET-2: "setAt is the honest test of whether it was
+ *   ever a choice." Also "1 sessions completed".
+ *
  * 08 Sep 2026 v14
  *
  * v14 - LOG-CLASS-1. Two echoing fallthroughs and a plural.
@@ -686,9 +697,30 @@ export function ProgressView(router) {
 
         <p class="progress-programme__phase-message">${stats.phaseMessage}</p>
 
+        <!--
+          TARGET-3, 08 Sep 2026. The weekly target is shown only if the
+          person SET one.
+
+          getProgressStats() returns strategicGoal.weeklySessionTarget
+          or 3, with no check on whether it was ever chosen.
+          (No backticks in this comment: it sits inside a template
+          literal, and a stray one closes it. Second time today.) So Progress told somebody who had
+          never set a target that they were "0 of 3 this week" — a
+          shortfall against a commitment they never made, on the screen
+          they open to see how they are doing.
+
+          today.js has guarded this since TARGET-2 and says why:
+          "setAt is the honest test of whether it was ever a choice."
+          Progress did not. Same rule, same source of truth.
+
+          The count of sessions stays either way. That is a fact about
+          what they did; the target is a claim about what they meant to.
+        -->
         <div class="progress-programme__stats">
-          <span>${stats.totalSessions} sessions completed</span>
-          <span>${stats.sessionsThisWeek} of ${stats.weeklyTarget} this week</span>
+          <span>${stats.totalSessions} session${stats.totalSessions === 1 ? '' : 's'} completed</span>
+          ${store.get('strategicGoal.setAt')
+            ? `<span>${stats.sessionsThisWeek} of ${stats.weeklyTarget} this week</span>`
+            : `<span>${stats.sessionsThisWeek} this week</span>`}
         </div>
 
         ${recentMissed.length > 0 ? `
@@ -1111,7 +1143,10 @@ export function ProgressView(router) {
           ? [
               `Active programme: ${stats.programmeName}`,
               `Programme week: ${stats.currentWeek} / 12`,
-              `Sessions this week: ${stats.sessionsThisWeek} (target: ${stats.weeklyTarget})`,
+              // TARGET-3. Same rule: no target named unless one was set.
+              store.get('strategicGoal.setAt')
+                ? `Sessions this week: ${stats.sessionsThisWeek} (target: ${stats.weeklyTarget})`
+                : `Sessions this week: ${stats.sessionsThisWeek}`,
               `Total programme sessions: ${stats.totalSessions}`,
             ].join('\n')
           : 'No active programme.',

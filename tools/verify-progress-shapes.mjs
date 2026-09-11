@@ -202,6 +202,71 @@ ok("6c. the shapes section sits at the same level as its siblings",
      ? `it is an h${shapesHead.level}; Share your progress and Your weight are h2`
      : "the shapes heading is missing entirely");
 
+// ── 7. NO TARGET IS CLAIMED THAT NOBODY SET ─────────────────────────────
+console.log("\nTEST 7 - Progress does not invent a weekly target");
+
+// TARGET-3, 08 Sep 2026. getProgressStats() returns
+// strategicGoal.weeklySessionTarget or 3, with no check on whether it
+// was ever chosen -- so Progress told somebody who had never set a
+// target that they were "0 of 3 this week". A shortfall against a
+// commitment they never made, on the screen they open to see how they
+// are doing.
+//
+// today.js has guarded this since TARGET-2 and says why: "setAt is the
+// honest test of whether it was ever a choice."
+
+// view() clears localStorage itself, so anything set before calling it
+// is wiped. The first version of this test did exactly that and threw.
+function viewWith(extra) {
+  localStorage.clear();
+  store.init();
+  store.set("tier", "personal");
+  store.set("activityLog", []);
+  for (const [k, v] of Object.entries(extra)) store.set(k, v);
+  const c = document.createElement("div");
+  document.body.appendChild(c);
+  ProgressView({ navigate: () => {} }).mount(c);
+  return c;
+}
+
+{
+  // programmeId, not id. getProgressStats() early-returns on
+  // `!ap?.programmeId`, so the first version of this fixture produced no
+  // programme block at all -- and 7a passed VACUOUSLY, asserting the
+  // absence of a line on a screen that was not rendering the block it
+  // lives in. Checked because 7b failing made no sense otherwise.
+  const prog = {
+    programmeId: "build-your-base",
+    startedAt:   new Date().toISOString(),
+    currentWeek: 1
+  };
+  const c = viewWith({ activeProgramme: prog });
+  const txt = (c.textContent || "").replace(/\s+/g, " ");
+
+  ok("7pc. positive control: the programme block rendered",
+     /this week/i.test(txt),
+     "no weekly line at all, so 7a below would pass against a screen that " +
+     "never rendered the block — which is exactly what it did first time");
+
+  ok("7a. with no target set, none is named",
+     !/of \d+ this week/.test(txt),
+     `"${(txt.match(/\d+ of \d+ this week/) || [""])[0]}" — a target nobody ` +
+     `chose, presented as theirs`);
+
+  // And the opposite error: somebody who DID set one wants to see it.
+  const c2 = viewWith({
+    activeProgramme: prog,
+    strategicGoal: {
+      weeklySessionTarget: 4,
+      setAt: new Date().toISOString(),
+      targetSetAt: new Date().toISOString()
+    }
+  });
+  ok("7b. and with one set, it IS shown",
+     /of 4 this week/.test((c2.textContent || "").replace(/\s+/g, " ")),
+     "taking away a target somebody chose is the opposite error");
+}
+
 console.log(fails === 0
   ? "\nPROGRESS: all assertions pass\n"
   : `\nPROGRESS: ${fails} FAILED\n`);
