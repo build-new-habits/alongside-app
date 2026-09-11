@@ -17,13 +17,26 @@
  */
 import fs from "node:fs";
 
+// GATE-PATH, 08 Sep 2026. Paths resolved from import.meta.url, not the
+// working directory.
+//
+// 72 of 139 gates read files by a path relative to process.cwd(), so
+// they were green from the repo root and read NOTHING from anywhere
+// else. Not a live fault -- every session so far has run them from the
+// root -- but an expensive trap: a session running the suite by full
+// path from elsewhere sees most of it red and reasonably concludes the
+// app is broken.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
+
 let fails = 0;
 const check = (n, fn) => { try { fn(); console.log("  PASS  " + n); }
   catch (e) { fails++; console.log("  FAIL  " + n + "\n        " + e.message); } };
 const ok = (c, m) => { if (!c) throw new Error(m); };
 const eq = (a, b, m) => { if (a !== b) throw new Error(`${m}\n        got: ${a}  want: ${b}`); };
 
-const s = fs.readFileSync("js/views/settings.js", "utf8");
+const s = fs.readFileSync(_gatePath("js/views/settings.js"), "utf8");
 
 console.log("\nTEST 1 - three sections, Graeme's grouping");
 // 18 Aug 2026 (COACH-TILE). Was eq(ids.length, 3). A fourth row was
@@ -86,13 +99,13 @@ check("it sits in App Controls, not Settings", () => {
 
 console.log("\nTEST 4 - nothing scrolls, so nothing hides");
 check("the index does not overflow", () => {
-  const css = fs.readFileSync("css/components/settings.css", "utf8");
+  const css = fs.readFileSync(_gatePath("css/components/settings.css"), "utf8");
   const rule = css.slice(css.indexOf(".settings-index {"), css.indexOf("}", css.indexOf(".settings-index {")));
   ok(/flex-direction: column/.test(rule), "must stack vertically");
   ok(!/overflow-x/.test(rule), "horizontal overflow is the fault being fixed");
 });
 check("rows clear the 44px touch floor", () => {
-  const css = fs.readFileSync("css/components/settings.css", "utf8");
+  const css = fs.readFileSync(_gatePath("css/components/settings.css"), "utf8");
   const rule = css.slice(css.indexOf(".settings-index__row {"), css.indexOf("}", css.indexOf(".settings-index__row {")));
   const m = rule.match(/min-height:\s*(\d+)px/);
   ok(m && parseInt(m[1], 10) >= 44, "WCAG 2.2 AA 2.5.8");
@@ -115,7 +128,7 @@ check("the index is not sticky", () => {
 
 console.log("\nTEST 6 - NAV-6: Home does not duplicate the bottom nav");
 check("no tile routes to a nav destination except the flagged one", () => {
-  const home = fs.readFileSync("js/views/today.js", "utf8");
+  const home = fs.readFileSync(_gatePath("js/views/today.js"), "utf8");
   // LOBBY-1a added a leading `kind:` to every door, and this pattern
   // assumed `id:` came first -- so it matched nothing and reported "no
   // tiles found" rather than passing silently. That is the gate working:
@@ -135,14 +148,14 @@ check("no tile routes to a nav destination except the flagged one", () => {
      `screen while Home is not: ${dup.map(d => `${d.label} -> ${d.route}`).join(", ")}`);
 });
 check("the Progress tile stays removed", () => {
-  const home = fs.readFileSync("js/views/today.js", "utf8");
+  const home = fs.readFileSync(_gatePath("js/views/today.js"), "utf8");
   ok(!/id: 'progress', label: 'Progress'/.test(home),
      "it was the only tile duplicating the nav by name as well as route");
 });
 
 console.log("\nTEST 7 - VER-2: the version comes from the running worker");
 check("settings asks, rather than inferring from cache names", () => {
-  const s2 = fs.readFileSync("js/views/settings.js", "utf8");
+  const s2 = fs.readFileSync(_gatePath("js/views/settings.js"), "utf8");
   ok(/postMessage\(\{ type: 'GET_VERSION' \}\)/.test(s2),
      "reading caches.keys() answers which caches EXIST, not which is serving " +
      "the page - during an update both do, and About reported a build the " +
@@ -150,7 +163,7 @@ check("settings asks, rather than inferring from cache names", () => {
   ok(!/const cacheNames = await caches\.keys\(\)/.test(s2), "old inference still present");
 });
 check("the worker answers", () => {
-  const sw = fs.readFileSync("sw.js", "utf8");
+  const sw = fs.readFileSync(_gatePath("sw.js"), "utf8");
   ok(/event\.data\?\.type === "GET_VERSION"/.test(sw), "no handler - settings would time out");
   ok(/CACHE_NAME\.replace\("alongside-", ""\)/.test(sw), "must report its OWN cache name");
 });
@@ -172,7 +185,7 @@ check("no section carries more than four tabs", () => {
   }
 });
 check("the strip wraps rather than scrolls", () => {
-  const css = fs.readFileSync("css/components/settings.css", "utf8");
+  const css = fs.readFileSync(_gatePath("css/components/settings.css"), "utf8");
   const rule = css.slice(css.indexOf(".settings-subtabs {"),
                          css.indexOf("}", css.indexOf(".settings-subtabs {")));
   ok(/flex-wrap: wrap/.test(rule), "must wrap");

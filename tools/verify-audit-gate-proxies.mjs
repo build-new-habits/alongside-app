@@ -1,5 +1,5 @@
 /**
- * tools/audit-gate-proxies.mjs
+ * tools/verify-audit-gate-proxies.mjs
  * 18 Aug 2026 v1
  *
  * SWEEP-1. An audit of the gate suite, for the fault the gate suite
@@ -36,8 +36,13 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
+// GATE-PATH, 08 Sep 2026. Resolved from import.meta.url, not the cwd.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
+
 const dir   = new URL('.', import.meta.url).pathname;
-const files = fs.readdirSync(dir)
+const files = fs.readdirSync(_gatePath(dir))
   .filter(f => f.endsWith('.mjs') && !f.startsWith('audit-'))
   .sort();
 
@@ -90,13 +95,13 @@ const CATEGORIES = [
 // know whether the code it reads is reachable at all — which is the
 // fault that let onUnmount's missing caller survive twelve weeks.
 const executes = f =>
-  /jsdom|JSDOM/.test(fs.readFileSync(path.join(dir, f), 'utf8'));
+  /jsdom|JSDOM/.test(fs.readFileSync(_gatePath(path.join(dir, f)), 'utf8'));
 
 const hits = [];
 let sourceOnly = 0;
 
 for (const f of files) {
-  const src = fs.readFileSync(path.join(dir, f), 'utf8');
+  const src = fs.readFileSync(_gatePath(path.join(dir, f)), 'utf8');
   if (!executes(f)) sourceOnly++;
   src.split('\n').forEach((line, i) => {
     if (/^\s*(\/\/|\*|\/\*)/.test(line)) return;

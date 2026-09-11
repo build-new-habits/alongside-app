@@ -29,6 +29,11 @@ import fs from "node:fs";
 // localStorage on every set(), so the CR-2 checks cannot drive real state
 // without a DOM -- and driving real state is the whole point of them.
 import { createRequire as __cr } from "node:module";
+
+// GATE-PATH, 08 Sep 2026. Resolved from import.meta.url, not the cwd.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
 const __require = __cr(import.meta.url);
 const { JSDOM } = __require("jsdom");
 const dom = new JSDOM("<!doctype html>", { url: "https://x/" });
@@ -38,8 +43,8 @@ Object.defineProperty(globalThis,"localStorage",{value:dom.window.localStorage,c
 
 const strip = s => s.replace(/\/\*[\s\S]*?\*\//g, "")
                     .replace(/^\s*\/\/[^\n]*$/gm, "");
-const read = f => strip(fs.readFileSync(f, "utf8"));
-const raw  = f => fs.readFileSync(f, "utf8");
+const read = f => strip(fs.readFileSync(_gatePath(f), "utf8"));
+const raw  = f => fs.readFileSync(_gatePath(f), "utf8");
 
 let fails = 0;
 const check = (name, source, fn) => {

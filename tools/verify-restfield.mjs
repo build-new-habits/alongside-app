@@ -30,6 +30,19 @@ import fs from "node:fs";
 const B = new URL("../js/", import.meta.url).href;
 const { EXERCISES } = await import(B + "data/exercises/index.js");
 
+// GATE-PATH, 08 Sep 2026. Paths resolved from import.meta.url, not the
+// working directory.
+//
+// 72 of 139 gates read files by a path relative to process.cwd(), so
+// they were green from the repo root and read NOTHING from anywhere
+// else. Not a live fault -- every session so far has run them from the
+// root -- but an expensive trap: a session running the suite by full
+// path from elsewhere sees most of it red and reasonably concludes the
+// app is broken.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
+
 let fails = 0;
 const ok = (name, cond, detail = "") => {
   console.log(`  ${cond ? "PASS" : "FAIL"}  ${name}`);
@@ -93,7 +106,7 @@ for (const [label, file, v] of [
   ["3a. core-session", "js/views/core-session.js", "ex"],
   ["3b. yoga-session", "js/views/yoga-session.js", "pose"]
 ]) {
-  const src = fs.readFileSync(file, "utf8");
+  const src = fs.readFileSync(_gatePath(file), "utf8");
   ok(`${label} coerces before comparing`,
      /const _rest = Number\(/.test(src) && /Number\.isFinite\(_rest\) && _rest > 0/.test(src),
      `${file} still compares the raw value`);
@@ -105,7 +118,7 @@ for (const [label, file, v] of [
 // ── 4. THE DISPLAY ──────────────────────────────────────────────────────
 console.log("\nTEST 4 - a number on screen carries its unit");
 
-const gp = fs.readFileSync("js/views/gym-programme.js", "utf8");
+const gp = fs.readFileSync(_gatePath("js/views/gym-programme.js"), "utf8");
 ok("4a. rest is rendered through a labeller",
    /_restLabel\(exercise\)/.test(gp),
    "the raw number is printed, so a card reads '45 rest' with no unit. " +
@@ -120,7 +133,7 @@ ok("4b. and the labeller says 'active' in words",
 // ── 5. THE CONTRACT ─────────────────────────────────────────────────────
 console.log("\nTEST 5 - the field is declared, so a fourth format cannot arrive quietly");
 
-const fc = fs.readFileSync("js/data/field-contract.js", "utf8");
+const fc = fs.readFileSync(_gatePath("js/data/field-contract.js"), "utf8");
 ok("5a. exercise.rest is in the field contract", /"exercise\.rest"/.test(fc),
    "three formats coexisted precisely because this field had no contract");
 ok("5b. exercise.restStyle is too", /"exercise\.restStyle"/.test(fc));

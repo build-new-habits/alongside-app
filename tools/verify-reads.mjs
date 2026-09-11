@@ -22,6 +22,10 @@
  */
 import fs from "node:fs";
 
+// GATE-PATH, 08 Sep 2026. Resolved from import.meta.url, not the cwd.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
 const _mem = {};
 globalThis.localStorage = {
   getItem: k => (k in _mem ? _mem[k] : null),
@@ -111,7 +115,7 @@ check("the gap read requires an actual gap", () => {
 });
 
 check("free users never reach a read", () => {
-  const sr = fs.readFileSync("js/data/session-rationale.js", "utf8");
+  const sr = fs.readFileSync(_gatePath("js/data/session-rationale.js"), "utf8");
   ok(/tier === "free"\) return null/.test(sr) || /if \(tier === "free"\)/.test(sr),
      "session-rationale.js does not gate the read on tier. These lines are the " +
      "Personal-tier difference in kind; free must not receive them");
@@ -120,7 +124,7 @@ check("free users never reach a read", () => {
 console.log("\nVOICE-3 — withheld lines stay withheld until their data exists");
 
 check("lines with no honest signal are documented, not quietly dropped", () => {
-  const src = fs.readFileSync("js/data/personal-reads.js", "utf8");
+  const src = fs.readFileSync(_gatePath("js/data/personal-reads.js"), "utf8");
   ok(/WITHHELD/.test(src),
      "the WITHHELD block is gone. Three approved lines have no computable " +
      "signal yet; deleting the record of why means somebody re-writes them " +

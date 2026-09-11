@@ -24,7 +24,7 @@ import fs from "node:fs";
 const strip = s => s.replace(/\/\*[\s\S]*?\*\//g, "")
                     .replace(/<!--[\s\S]*?-->/g, "")
                     .replace(/^\s*\/\/[^\n]*$/gm, "");
-const read = f => strip(fs.readFileSync(`js/views/${f}.js`, "utf8"));
+const read = f => strip(fs.readFileSync(_gatePath(`js/views/${f}.js`), "utf8"));
 const mem = {};
 globalThis.localStorage = {
   getItem: k => (k in mem ? mem[k] : null),
@@ -32,6 +32,19 @@ globalThis.localStorage = {
   removeItem: k => { delete mem[k]; },
 };
 const { EXERCISES: EX } = await import(__REPO + "/js/data/exercises/index.js");
+
+// GATE-PATH, 08 Sep 2026. Paths resolved from import.meta.url, not the
+// working directory.
+//
+// 72 of 139 gates read files by a path relative to process.cwd(), so
+// they were green from the repo root and read NOTHING from anywhere
+// else. Not a live fault -- every session so far has run them from the
+// root -- but an expensive trap: a session running the suite by full
+// path from elsewhere sees most of it red and reasonably concludes the
+// app is broken.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
 
 let fails = 0;
 const check = (n, fn) => { try { fn(); console.log("  PASS  " + n); }
@@ -58,7 +71,7 @@ check("it has a session clock (PT-3)", () => {
   ok(/let sessionStartTime = null;/.test(ps), "no clock, so durationMins would be undefined");
   ok(/sessionStartTime === null\) sessionStartTime = Date\.now\(\)/.test(ps),
      "unguarded latch would restart the clock on every navigate back");
-  ok(/sessionStartTime = null;\s*\/\/ PT-3/.test(fs.readFileSync("js/views/prescribed-session.js","utf8")),
+  ok(/sessionStartTime = null;\s*\/\/ PT-3/.test(fs.readFileSync(_gatePath("js/views/prescribed-session.js"),"utf8")),
      "clock must reset between sessions");
 });
 
@@ -89,7 +102,7 @@ for (const [v, mode] of [["walk-session","distance"],["running-session","distanc
        "needs a stable synthetic id, or every session is an orphaned entry");
   });
 check("these modes never ask for duration", () => {
-  const shared = fs.readFileSync("js/session-log.js", "utf8");
+  const shared = fs.readFileSync(_gatePath("js/session-log.js"), "utf8");
   for (const mode of ["distance", "lengths"]) {
     const m = shared.match(new RegExp(`if \\(mode === "${mode}"\\) \\{[\\s\\S]*?\\n  \\}`));
     ok(m, `${mode} branch not found`);

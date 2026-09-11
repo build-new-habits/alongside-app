@@ -44,15 +44,28 @@ globalThis.localStorage = {
 };
 const { EXERCISES } = await import(__REPO + "/js/data/exercises/index.js");
 
+// GATE-PATH, 08 Sep 2026. Paths resolved from import.meta.url, not the
+// working directory.
+//
+// 72 of 139 gates read files by a path relative to process.cwd(), so
+// they were green from the repo root and read NOTHING from anywhere
+// else. Not a live fault -- every session so far has run them from the
+// root -- but an expensive trap: a session running the suite by full
+// path from elsewhere sees most of it red and reasonably concludes the
+// app is broken.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
+
 let fails = 0;
 const check = (n, fn) => { try { fn(); console.log("  PASS  " + n); }
   catch (e) { fails++; console.log("  FAIL  " + n + "\n        " + e.message); } };
 const ok = (c, m) => { if (!c) throw new Error(m); };
 
-const src = fs.readFileSync("js/session-builder.js", "utf8");
+const src = fs.readFileSync(_gatePath("js/session-builder.js"), "utf8");
 
-const idx = fs.readFileSync("js/data/exercises/index.js", "utf8");
-const gen = fs.readFileSync("js/data/workoutGenerator.js", "utf8");
+const idx = fs.readFileSync(_gatePath("js/data/exercises/index.js"), "utf8");
+const gen = fs.readFileSync(_gatePath("js/data/workoutGenerator.js"), "utf8");
 
 console.log("\nTEST 1 - ONE rule, shared by BOTH engines");
 check("isSessionLength() is defined once, in the shared module", () => {
@@ -120,7 +133,7 @@ check("the filter runs FIRST, before equipment and conditions", () => {
 console.log("\nTEST 5 - contentType is still load-bearing, so it must not be retired");
 check("both live readers still exist", () => {
   ok(/contentType === "practice"/.test(idx), "the shared rule's tag half is the reader now");
-  const cat = fs.readFileSync("js/data/session-categories.js", "utf8");
+  const cat = fs.readFileSync(_gatePath("js/data/session-categories.js"), "utf8");
   ok(/contentType === ['"]activation['"]/.test(cat), "session-categories reader gone");
 });
 

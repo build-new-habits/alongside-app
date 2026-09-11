@@ -1,5 +1,5 @@
 /**
- * tools/schedule-drift.mjs
+ * tools/verify-schedule-drift.mjs
  * 18 Aug 2026 v2
  *
  * v2 - Header/footer version agreement on master_schedule.md. v141
@@ -29,6 +29,11 @@
  * asserts are dead, and reports any that are demonstrably alive.
  */
 import fs from "node:fs";
+
+// GATE-PATH, 08 Sep 2026. Resolved from import.meta.url, not the cwd.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
 
 // ── HEADER / FOOTER AGREEMENT, added 18 Aug 2026 ─────────────────────
 //
@@ -64,15 +69,15 @@ import fs from "node:fs";
 import path from "node:path";
 
 const SCHEDULE = "Documents/Admin/master_schedule.md";
-const md = fs.readFileSync(SCHEDULE, "utf8");
+const md = fs.readFileSync(_gatePath(SCHEDULE), "utf8");
 
 // Live code, comments stripped: a symbol named only in a comment that
 // DISCUSSES it being dead is not a live use.
-const walk = d => fs.readdirSync(d, { withFileTypes: true }).flatMap(e =>
+const walk = d => fs.readdirSync(_gatePath(d), { withFileTypes: true }).flatMap(e =>
   e.isDirectory() ? walk(path.join(d, e.name))
                   : (e.name.endsWith(".js") ? [path.join(d, e.name)] : []));
 const code = walk("js")
-  .map(f => fs.readFileSync(f, "utf8")
+  .map(f => fs.readFileSync(_gatePath(f), "utf8")
     .replace(/\/\*[\s\S]*?\*\//g, "")
     .replace(/^\s*\/\/[^\n]*$/gm, ""))
   .join("\n");

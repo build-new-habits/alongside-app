@@ -1,5 +1,5 @@
 /**
- * tools/schema-check.mjs
+ * tools/verify-schema-check.mjs
  * 16 Aug 2026 v2
  *
  * v2 - The field diff had never run. See the note at the extraction
@@ -16,13 +16,26 @@
  * drift survived a commit titled "Schema.md brought current" — a human reading
  * a long document cannot reliably spot a missing field, and should not have to.
  *
- * Usage: node tools/schema-check.mjs
+ * Usage: node tools/verify-schema-check.mjs
  * Exit 1 on any mismatch, so it can gate a commit.
  */
 import fs from 'fs';
 
-const storeSrc  = fs.readFileSync('js/store.js', 'utf8');
-const schemaSrc = fs.readFileSync('Documents/Live State/Schema.md', 'utf8');
+// GATE-PATH, 08 Sep 2026. Paths resolved from import.meta.url, not the
+// working directory.
+//
+// 72 of 139 gates read files by a path relative to process.cwd(), so
+// they were green from the repo root and read NOTHING from anywhere
+// else. Not a live fault -- every session so far has run them from the
+// root -- but an expensive trap: a session running the suite by full
+// path from elsewhere sees most of it red and reasonably concludes the
+// app is broken.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
+
+const storeSrc  = fs.readFileSync(_gatePath('js/store.js'), 'utf8');
+const schemaSrc = fs.readFileSync(_gatePath('Documents/Live State/Schema.md'), 'utf8');
 
 // 1. Version agreement
 const storeVer  = (storeSrc.match(/^ \* \d{1,2} \w{3} \d{4} (v\d+)/m) || [])[1];

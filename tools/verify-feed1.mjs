@@ -34,6 +34,19 @@ const { store } = await import(__REPO + "/js/store.js");
 store.init();
 const { applyFeedbackWeighting } = await import(__REPO + "/js/data/exercises/index.js");
 
+// GATE-PATH, 08 Sep 2026. Paths resolved from import.meta.url, not the
+// working directory.
+//
+// 72 of 139 gates read files by a path relative to process.cwd(), so
+// they were green from the repo root and read NOTHING from anywhere
+// else. Not a live fault -- every session so far has run them from the
+// root -- but an expensive trap: a session running the suite by full
+// path from elsewhere sees most of it red and reasonably concludes the
+// app is broken.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
+
 let fails = 0;
 const check = (n, fn) => { try { fn(); console.log("  PASS  " + n); }
   catch (e) { fails++; console.log("  FAIL  " + n + "\n        " + e.message); } };
@@ -85,7 +98,7 @@ check("invalid values are rejected", () => {
 });
 
 console.log("\nTEST 3 - it is NOT a rating");
-const ctrl = fs.readFileSync("js/exercise-feedback.js", "utf8");
+const ctrl = fs.readFileSync(_gatePath("js/exercise-feedback.js"), "utf8");
 check("no stars, scores or scales", () => {
   for (const w of ["star", "rating", "out of 10", "score this", "rate "])
     ok(!new RegExp(w, "i").test(ctrl.replace(/\/\*[\s\S]*?\*\//g, "")),
@@ -104,13 +117,13 @@ check("exactly two feedback values, matching the reader's contract", () => {
 console.log("\nTEST 4 - rendered and wired on every card-shaped view");
 for (const v of ["workout", "core-session", "prescribed-session", "gym-programme"])
   check(`${v}`, () => {
-    const s = fs.readFileSync(`js/views/${v}.js`, "utf8");
+    const s = fs.readFileSync(_gatePath(`js/views/${v}.js`), "utf8");
     ok(/renderFeedbackControl\(/.test(s), "control not rendered");
     ok(/attachFeedbackEvents\(/.test(s), "rendered but never wired - taps would do nothing");
   });
 check("NOT on restoration views", () => {
   for (const v of ["breathing-session", "quiet-session"])
-    ok(!/renderFeedbackControl/.test(fs.readFileSync(`js/views/${v}.js`, "utf8")),
+    ok(!/renderFeedbackControl/.test(fs.readFileSync(_gatePath(`js/views/${v}.js`), "utf8")),
        `${v}: asking whether restoration was too easy is a category error`);
 });
 

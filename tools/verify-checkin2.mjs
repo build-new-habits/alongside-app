@@ -23,10 +23,15 @@ const check = (n, fn) => { try { fn(); console.log("  PASS  " + n); }
 const ok = (c, m) => { if (!c) throw new Error(m); };
 const strip = s => s.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
 
-const store   = strip(fs.readFileSync("js/store.js", "utf8"));
-const conds   = strip(fs.readFileSync("js/data/conditions.js", "utf8"));
-const checkin = strip(fs.readFileSync("js/views/checkin.js", "utf8"));
-const rationale = strip(fs.readFileSync("js/data/session-rationale.js", "utf8"));
+
+// GATE-PATH, 08 Sep 2026. Resolved from import.meta.url, not the cwd.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
+const store   = strip(fs.readFileSync(_gatePath("js/store.js"), "utf8"));
+const conds   = strip(fs.readFileSync(_gatePath("js/data/conditions.js"), "utf8"));
+const checkin = strip(fs.readFileSync(_gatePath("js/views/checkin.js"), "utf8"));
+const rationale = strip(fs.readFileSync(_gatePath("js/data/session-rationale.js"), "utf8"));
 
 const { soreAreaOptions, CONDITIONS } = await import("../js/data/conditions.js");
 

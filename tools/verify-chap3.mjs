@@ -36,6 +36,19 @@ const SM = await import(B + 'data/session-moments.js');
 const { EXERCISES } = await import(B + 'data/exercises/index.js');
 const { MyProgrammeView } = await import(B + 'views/my-programme.js');
 
+// GATE-PATH, 08 Sep 2026. Paths resolved from import.meta.url, not the
+// working directory.
+//
+// 72 of 139 gates read files by a path relative to process.cwd(), so
+// they were green from the repo root and read NOTHING from anywhere
+// else. Not a live fault -- every session so far has run them from the
+// root -- but an expensive trap: a session running the suite by full
+// path from elsewhere sees most of it red and reasonably concludes the
+// app is broken.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
+
 let failures = 0;
 const check = (n, ok, d = '') => { console.log(`${ok?'PASS':'FAIL'}  ${n}${d?' — '+d:''}`); if (!ok) failures++; };
 const ago = d => new Date(Date.now() - d * 864e5).toISOString();
@@ -268,7 +281,7 @@ check('nobody mid-chapter sees a hinge',
 // ── 9. One chain, not two ────────────────────────────────────────────
 check('gym-programme no longer carries its own chain map',
   !/const PROGRESSIONS\s*=/.test(
-    (await import('node:fs')).readFileSync('js/views/gym-programme.js', 'utf8')),
+    (await import('node:fs')).readFileSync(_gatePath('js/views/gym-programme.js'), 'utf8')),
   'four of eight entries disagreed with programmes.js');
 check('and the shared successor matches what My Programme renders',
   PE.chapterSuccessor('beginner-fitness')?.id === 'back-to-strength' &&

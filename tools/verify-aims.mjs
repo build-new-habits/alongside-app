@@ -32,11 +32,24 @@ import { AIMS, STRANDS, SITUATIONS, aimById, strandsForAim, zonesForStrands, ses
   from "../js/data/aims.js";
 import { STRETCH_ZONES, SESSION_TYPES } from "../js/session-builder.js";
 
+// GATE-PATH, 08 Sep 2026. Paths resolved from import.meta.url, not the
+// working directory.
+//
+// 72 of 139 gates read files by a path relative to process.cwd(), so
+// they were green from the repo root and read NOTHING from anywhere
+// else. Not a live fault -- every session so far has run them from the
+// root -- but an expensive trap: a session running the suite by full
+// path from elsewhere sees most of it red and reasonably concludes the
+// app is broken.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
+
 let fails = 0;
 const check = (n, fn) => { try { fn(); console.log("  PASS  " + n); }
   catch (e) { fails++; console.log("  FAIL  " + n + "\n        " + e.message); } };
 const ok = (c, m) => { if (!c) throw new Error(m); };
-const raw = fs.readFileSync("js/data/aims.js", "utf8")
+const raw = fs.readFileSync(_gatePath("js/data/aims.js"), "utf8")
   .replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
 
 console.log("\nTEST 1 - everything resolves");
@@ -143,7 +156,7 @@ check("4c. a mind strand is actionable, not a mood", () => {
 });
 
 check("4d. mind strands point at In Step movements that exist", () => {
-  const src = fs.readFileSync("js/data/in-step-scenarios.js", "utf8");
+  const src = fs.readFileSync(_gatePath("js/data/in-step-scenarios.js"), "utf8");
   const real = ["solo", "partner", "floor", "environment"].filter(m =>
     new RegExp(`["']${m}["']`).test(src));
   ok(real.length === 4, `in-step-scenarios.js no longer defines all four movements (found ${real.join(", ")})`);
@@ -213,7 +226,7 @@ check("6d. every aim is reachable by somebody", () => {
 });
 
 check("6e. the whole vocabulary stays one tap away", () => {
-  const view = fs.readFileSync("js/views/arc-setup.js", "utf8")
+  const view = fs.readFileSync(_gatePath("js/views/arc-setup.js"), "utf8")
     .replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
   ok(/id="as-all-btn"/.test(view),
      "there is no escape to the full list. Filtering without an escape is the app deciding " +

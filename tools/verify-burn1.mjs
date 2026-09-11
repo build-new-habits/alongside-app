@@ -40,6 +40,19 @@ const { store } = await import(__REPO + "/js/store.js");
 store.init();
 const { detectBurnout } = await import(__REPO + "/js/data/checkin.js");
 
+// GATE-PATH, 08 Sep 2026. Paths resolved from import.meta.url, not the
+// working directory.
+//
+// 72 of 139 gates read files by a path relative to process.cwd(), so
+// they were green from the repo root and read NOTHING from anywhere
+// else. Not a live fault -- every session so far has run them from the
+// root -- but an expensive trap: a session running the suite by full
+// path from elsewhere sees most of it red and reasonably concludes the
+// app is broken.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
+
 let fails = 0;
 const check = (n, fn) => { try { fn(); console.log("  PASS  " + n); }
   catch (e) { fails++; console.log("  FAIL  " + n + "\n        " + e.message); } };
@@ -82,8 +95,8 @@ check("the original boolean threshold still registers", () => {
 });
 
 console.log("\nTEST 4 - call sites");
-const gen = fs.readFileSync("js/data/workoutGenerator.js", "utf8");
-const cp  = fs.readFileSync("js/views/coach-proposal.js", "utf8");
+const gen = fs.readFileSync(_gatePath("js/data/workoutGenerator.js"), "utf8");
+const cp  = fs.readFileSync(_gatePath("js/views/coach-proposal.js"), "utf8");
 check("workoutGenerator passes the history", () =>
   ok(/detectBurnout\(store\.get\("checkinHistory"\)/.test(gen),
      "an argument-less call returns none for everybody"));

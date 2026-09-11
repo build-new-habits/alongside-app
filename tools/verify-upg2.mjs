@@ -17,10 +17,23 @@
  */
 import fs from "node:fs";
 
+// GATE-PATH, 08 Sep 2026. Paths resolved from import.meta.url, not the
+// working directory.
+//
+// 72 of 139 gates read files by a path relative to process.cwd(), so
+// they were green from the repo root and read NOTHING from anywhere
+// else. Not a live fault -- every session so far has run them from the
+// root -- but an expensive trap: a session running the suite by full
+// path from elsewhere sees most of it red and reasonably concludes the
+// app is broken.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
+
 const strip = s => s.replace(/\/\*[\s\S]*?\*\//g, "")
                     .replace(/<!--[\s\S]*?-->/g, "")
                     .replace(/^\s*\/\/[^\n]*$/gm, "");
-const read = f => strip(fs.readFileSync(f, "utf8"));
+const read = f => strip(fs.readFileSync(_gatePath(f), "utf8"));
 
 let fails = 0;
 const check = (name, fn) => {
@@ -30,9 +43,9 @@ const check = (name, fn) => {
 const ok = (c, m) => { if (!c) throw new Error(m); };
 
 const view = read("js/views/upgrade.js");
-const css  = fs.readFileSync("css/components/upgrade-page.css", "utf8");
-const main = fs.readFileSync("css/main.css", "utf8");
-const sw   = fs.readFileSync("sw.js", "utf8");
+const css  = fs.readFileSync(_gatePath("css/components/upgrade-page.css"), "utf8");
+const main = fs.readFileSync(_gatePath("css/main.css"), "utf8");
+const sw   = fs.readFileSync(_gatePath("sw.js"), "utf8");
 
 console.log("\nA2 — the page states a price and asks for a decision");
 
@@ -87,8 +100,8 @@ check("no statement describes an unbuilt feature", () => {
     [/exercise library opens|every movement available/i, null,
      "an exercise-library tier gate — deliberately never built, see TIER-D"]
   ];
-  const js = fs.readFileSync("js/session-builder.js", "utf8") +
-             fs.readFileSync("js/views/in-step.js", "utf8");
+  const js = fs.readFileSync(_gatePath("js/session-builder.js"), "utf8") +
+             fs.readFileSync(_gatePath("js/views/in-step.js"), "utf8");
   for (const [claim, evidence, label] of claims) {
     if (!claim.test(view)) continue;
     ok(evidence && new RegExp(evidence).test(js),

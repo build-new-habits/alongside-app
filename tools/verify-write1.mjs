@@ -56,13 +56,26 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
+// GATE-PATH, 08 Sep 2026. Paths resolved from import.meta.url, not the
+// working directory.
+//
+// 72 of 139 gates read files by a path relative to process.cwd(), so
+// they were green from the repo root and read NOTHING from anywhere
+// else. Not a live fault -- every session so far has run them from the
+// root -- but an expensive trap: a session running the suite by full
+// path from elsewhere sees most of it red and reasonably concludes the
+// app is broken.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
+
 let failures = 0;
 const check = (n, ok, d = '') => {
   console.log(`${ok ? 'PASS' : 'FAIL'}  ${n}${d ? ' — ' + d : ''}`);
   if (!ok) failures++;
 };
 
-const storeSrc = fs.readFileSync('js/store.js', 'utf8');
+const storeSrc = fs.readFileSync(_gatePath('js/store.js'), 'utf8');
 const defStart = storeSrc.indexOf('\n  getDefaults() {');
 const block    = defStart < 0 ? '' : storeSrc.slice(defStart);
 const iReturn  = block.indexOf('return {');
@@ -70,17 +83,17 @@ const iClose   = iReturn < 0 ? -1 : block.indexOf('\n    };', iReturn);
 const body     = (iReturn >= 0 && iClose > iReturn) ? block.slice(iReturn, iClose) : '';
 const fields   = [...body.matchAll(/^      ([a-zA-Z][\w]*)\s*:/gm)].map(m => m[1]);
 
-// Same self-check schema-check.mjs learned the hard way: an extraction
+// Same self-check verify-schema-check.mjs learned the hard way: an extraction
 // that silently returns nothing must fail loudly, not pass quietly.
 check('the field list was actually extracted', fields.length >= 50,
   `${fields.length} top-level fields`);
 
 let all = '';
 (function walk(dir) {
-  for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+  for (const e of fs.readdirSync(_gatePath(dir), { withFileTypes: true })) {
     const p = path.join(dir, e.name);
     if (e.isDirectory()) walk(p);
-    else if (e.name.endsWith('.js')) all += fs.readFileSync(p, 'utf8');
+    else if (e.name.endsWith('.js')) all += fs.readFileSync(_gatePath(p), 'utf8');
   }
 })('js');
 // Comments stripped, so a changelog entry naming a dead field cannot

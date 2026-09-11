@@ -26,6 +26,19 @@ import { EXERCISES } from "../js/data/exercises/index.js";
 import { matchCategory } from "../js/data/session-categories.js";
 import { SESSION_TYPES, STRETCH_ZONES, zonesWithCoverage, zoneContentCount } from "../js/session-builder.js";
 
+// GATE-PATH, 08 Sep 2026. Paths resolved from import.meta.url, not the
+// working directory.
+//
+// 72 of 139 gates read files by a path relative to process.cwd(), so
+// they were green from the repo root and read NOTHING from anywhere
+// else. Not a live fault -- every session so far has run them from the
+// root -- but an expensive trap: a session running the suite by full
+// path from elsewhere sees most of it red and reasonably concludes the
+// app is broken.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
+
 let fails = 0;
 const check = (n, fn) => { try { fn(); console.log("  PASS  " + n); }
   catch (e) { fails++; console.log("  FAIL  " + n + "\n        " + e.message); } };
@@ -39,9 +52,9 @@ const strip = t => t
   .replace(/\/\*[\s\S]*?\*\//g, "")
   .replace(/^\s*\/\/.*$/gm, "")
   .replace(/<!--[\s\S]*?-->/g, "");
-const read = p => strip(fs.readFileSync(p, "utf8"));
+const read = p => strip(fs.readFileSync(_gatePath(p), "utf8"));
 
-const raw = fs.readFileSync("js/session-builder.js", "utf8");
+const raw = fs.readFileSync(_gatePath("js/session-builder.js"), "utf8");
 // Comments stripped for anything that COUNTS occurrences. This file
 // documents _filterCandidates() heavily, and counting prose as call
 // sites is the third time that mistake has been made today.

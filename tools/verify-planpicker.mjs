@@ -43,6 +43,19 @@ const { isPremium }  = await import(B + "auth.js");
 const PE             = await import(B + "data/programmeEngine.js");
 const { planOptionsFor } = await import(B + "data/plan-options.js");
 
+// GATE-PATH, 08 Sep 2026. Paths resolved from import.meta.url, not the
+// working directory.
+//
+// 72 of 139 gates read files by a path relative to process.cwd(), so
+// they were green from the repo root and read NOTHING from anywhere
+// else. Not a live fault -- every session so far has run them from the
+// root -- but an expensive trap: a session running the suite by full
+// path from elsewhere sees most of it red and reasonably concludes the
+// app is broken.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
+
 let fails = 0;
 const ok = (name, cond, detail = "") => {
   console.log(`  ${cond ? "PASS" : "FAIL"}  ${name}`);
@@ -105,7 +118,7 @@ ok("1c. and Plan's is genuinely different, so 1b is not a coincidence",
 // ── 2. THE PICKER LEFT ONBOARDING ───────────────────────────────────────
 console.log("\nTEST 2 - nobody is asked to commit before they have moved");
 
-const equip = fs.readFileSync("js/views/onboarding/equipment.js", "utf8");
+const equip = fs.readFileSync(_gatePath("js/views/onboarding/equipment.js"), "utf8");
 const liveNav = equip.split("\n")
   .filter(l => !/^\s*(\*|\/\/)/.test(l))
   .filter(l => /navigate\(["']onboarding\/frequency["']\)/.test(l));
@@ -113,7 +126,7 @@ ok("2a. equipment no longer routes to the frequency step", liveNav.length === 0,
    "the standalone finish button still leads to frequency -> plan-select, which " +
    "is the path Graeme met");
 
-const freq = fs.readFileSync("js/views/onboarding/frequency.js", "utf8");
+const freq = fs.readFileSync(_gatePath("js/views/onboarding/frequency.js"), "utf8");
 const liveToPicker = freq.split("\n")
   .filter(l => !/^\s*(\*|\/\/)/.test(l))
   .filter(l => /navigate\(["']onboarding\/plan-select["']\)/.test(l));
@@ -121,13 +134,13 @@ ok("2b. and frequency no longer routes to the picker", liveToPicker.length === 0
 
 // Retired, not deleted. The file is the record of what onboarding asked.
 ok("2c. plan-select.js still exists, retired not deleted",
-   fs.existsSync("js/views/onboarding/plan-select.js"),
+   fs.existsSync(_gatePath("js/views/onboarding/plan-select.js")),
    "deleting it deletes the record of what new users were asked to commit to");
 
 // ── 3. THE PICKER IS REACHABLE WHERE IT NOW BELONGS ─────────────────────
 console.log("\nTEST 3 - Guided class is the way in");
 
-const todaySrc = fs.readFileSync("js/views/today.js", "utf8");
+const todaySrc = fs.readFileSync(_gatePath("js/views/today.js"), "utf8");
 const guidedBlock = todaySrc.slice(todaySrc.indexOf("id: 'guided', title: 'Guided class'"));
 // 08 Sep 2026, TIMETABLE-1. The slice was 3000 characters, and comments
 // added to that block pushed the button past it -- a source-text
@@ -148,7 +161,7 @@ ok("3a-2. and the classes are reachable from the same room",
 
 ok("3b. and goal-setup is programme-select, not the retired picker",
    /'goal-setup':\s*\{\s*path:\s*'\.\/views\/programme-select\.js'/
-     .test(fs.readFileSync("js/router.js", "utf8")),
+     .test(fs.readFileSync(_gatePath("js/router.js"), "utf8")),
    "goal-setup points at plan-select.js, which writes six activeProgramme " +
    "fields directly instead of calling startChapter()");
 
@@ -163,7 +176,7 @@ const opts = planOptionsFor ? planOptionsFor() : null;
 // what the copy USED to say. A gate that cannot tell a string from a
 // note about a string will either be silenced or will silence the
 // history, and both are worse than the fault it exists to catch.
-const optSrc = fs.readFileSync("js/data/plan-options.js", "utf8")
+const optSrc = fs.readFileSync(_gatePath("js/data/plan-options.js"), "utf8")
   .split("\n").filter(l => !/^\s*(\*|\/\/|\/\*)/.test(l)).join("\n");
 
 ok("4a. no option is framed as a commitment", !/Full commitment/.test(optSrc),

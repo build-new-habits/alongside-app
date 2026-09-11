@@ -21,6 +21,19 @@
  */
 import fs from "node:fs";
 
+// GATE-PATH, 08 Sep 2026. Paths resolved from import.meta.url, not the
+// working directory.
+//
+// 72 of 139 gates read files by a path relative to process.cwd(), so
+// they were green from the repo root and read NOTHING from anywhere
+// else. Not a live fault -- every session so far has run them from the
+// root -- but an expensive trap: a session running the suite by full
+// path from elsewhere sees most of it red and reasonably concludes the
+// app is broken.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
+
 const VIEWS = ["walk-session","running-session","yoga-session","gym-programme",
                "swim-session","core-session","workout","quiet-session","cycle-session"];
 
@@ -28,7 +41,7 @@ let fails = 0;
 const check = (n, fn) => { try { fn(); console.log("  PASS  " + n); }
   catch (e) { fails++; console.log("  FAIL  " + n + "\n        " + e.message); } };
 const ok = (c, m) => { if (!c) throw new Error(m); };
-const read = v => fs.readFileSync(`js/views/${v}.js`, "utf8");
+const read = v => fs.readFileSync(_gatePath(`js/views/${v}.js`), "utf8");
 
 console.log("\nTEST 1 - every session view offers a no-save exit");
 for (const v of VIEWS)
@@ -66,7 +79,7 @@ for (const v of VIEWS) {
 
 console.log("\nTEST 3 - it stays the least prominent of the three");
 check("styled as the quietest option", () => {
-  const css = fs.readFileSync("css/components/session-guard.css", "utf8");
+  const css = fs.readFileSync(_gatePath("css/components/session-guard.css"), "utf8");
   const rule = css.slice(css.indexOf(".session-exit-discard {"),
                          css.indexOf("}", css.indexOf(".session-exit-discard {")));
   ok(/--color-text-secondary/.test(rule), "should be quieter than 'Exit and save'");

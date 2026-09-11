@@ -38,6 +38,11 @@
 import { createRequire as __cr } from "node:module";
 const __require = __cr(import.meta.url);
 import fs from 'node:fs';
+
+// GATE-PATH, 08 Sep 2026. Resolved from import.meta.url, not the cwd.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
 import path from 'node:path';
 const { JSDOM } = __require("jsdom");
 
@@ -141,9 +146,9 @@ check('and the late milestone faces backwards',
 //    contradiction live: My Programme was tested, Progress was not.
 const viewDir = 'js/views';
 const offenders = [];
-for (const f of fs.readdirSync(viewDir)) {
+for (const f of fs.readdirSync(_gatePath(viewDir))) {
   if (!f.endsWith('.js')) continue;
-  const src = fs.readFileSync(path.join(viewDir, f), 'utf8');
+  const src = fs.readFileSync(_gatePath(path.join(viewDir, f)), 'utf8');
   // Comments stripped, so a file explaining why it has NO countdown does
   // not read as one having a countdown. A gate must survive its own
   // documentation.

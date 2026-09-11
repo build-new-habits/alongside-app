@@ -24,6 +24,19 @@
  */
 import fs from "node:fs";
 
+// GATE-PATH, 08 Sep 2026. Paths resolved from import.meta.url, not the
+// working directory.
+//
+// 72 of 139 gates read files by a path relative to process.cwd(), so
+// they were green from the repo root and read NOTHING from anywhere
+// else. Not a live fault -- every session so far has run them from the
+// root -- but an expensive trap: a session running the suite by full
+// path from elsewhere sees most of it red and reasonably concludes the
+// app is broken.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
+
 let fails = 0;
 const check = (n, fn) => { try { fn(); console.log("  PASS  " + n); }
   catch (e) { fails++; console.log("  FAIL  " + n + "\n        " + e.message); } };
@@ -33,12 +46,12 @@ const strip = s => s
   .replace(/^\s*\/\/.*$/gm, "")
   .replace(/<!--[\s\S]*?-->/g, "");
 
-const router = strip(fs.readFileSync("js/router.js", "utf8"));
+const router = strip(fs.readFileSync(_gatePath("js/router.js"), "utf8"));
 
 console.log("\nTEST 1 - the screen is gone, not merely unreachable");
 
 check("1a. the file does not exist", () => {
-  ok(!fs.existsSync("js/views/intention.js"),
+  ok(!fs.existsSync(_gatePath("js/views/intention.js")),
      "js/views/intention.js is still on disk. A retired screen that still loads is " +
      "what kept this open across six weeks and five reports.");
 });
@@ -49,10 +62,10 @@ check("1b. the route is not registered", () => {
 });
 
 check("1c. nothing navigates to it", () => {
-  const files = fs.readdirSync("js/views").filter(f => f.endsWith(".js"));
+  const files = fs.readdirSync(_gatePath("js/views")).filter(f => f.endsWith(".js"));
   const bad = [];
   for (const f of files) {
-    const src = strip(fs.readFileSync("js/views/" + f, "utf8"));
+    const src = strip(fs.readFileSync(_gatePath("js/views/" + f), "utf8"));
     if (src.includes('navigate("intention")') || src.includes("navigate('intention')")) bad.push(f);
     if (/["']quietReturnRoute["']\s*\)\s*\|\|\s*["']intention["']/.test(src)) bad.push(f + " (fallback)");
   }
@@ -64,10 +77,10 @@ check("1d. the shell does not precache it and the CSS is gone", () => {
   // names the path in prose. Reading the file raw made the gate fail on
   // the correct state -- caught by post-push verification, which is the
   // only run that saw the header and the assertion together.
-  const sw = strip(fs.readFileSync("sw.js", "utf8"));
+  const sw = strip(fs.readFileSync(_gatePath("sw.js"), "utf8"));
   ok(!sw.includes("views/intention.js"),
      "sw.js precaches a file that no longer exists -- offline install would fail");
-  const css = fs.readFileSync("css/base/global.css", "utf8");
+  const css = fs.readFileSync(_gatePath("css/base/global.css"), "utf8");
   ok(!css.includes("intention"), "dead .intention-* rules survive in global.css");
 });
 
@@ -77,7 +90,7 @@ check("2. every session view returns to today", () => {
   const views = ["walk-session", "running-session", "yoga-session", "swim-session",
                  "core-session", "cycle-session", "quiet-session", "checkin-mini"];
   for (const v of views) {
-    const src = strip(fs.readFileSync(`js/views/${v}.js`, "utf8"));
+    const src = strip(fs.readFileSync(_gatePath(`js/views/${v}.js`), "utf8"));
     ok(src.includes('navigate("today")') || src.includes('|| "today"'),
        `${v}.js has no route home to today`);
   }

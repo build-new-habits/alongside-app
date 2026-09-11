@@ -5,7 +5,7 @@
  * v2 - Also checks the MASTER SCHEDULE's "> **Live:" line against the
  *   repo. That line is the first thing a new session reads -- before the
  *   blueprint this gate was written for -- and it had no check behind it
- *   at all. schedule-drift.mjs compares that document's header to its own
+ *   at all. verify-schedule-drift.mjs compares that document's header to its own
  *   FOOTER, not to the repo, so the line could name any version and stay
  *   green.
  *
@@ -137,7 +137,7 @@ console.log("\nThe blueprint's live-state table vs the files themselves\n");
 // is live, and it is the FIRST line a new session reads -- before the
 // blueprint this gate was built for.
 //
-// It had no check behind it at all. schedule-drift.mjs compares that
+// It had no check behind it at all. verify-schedule-drift.mjs compares that
 // document's header to its own FOOTER, not to the repo, so the line can
 // name any version it likes and stay green.
 //

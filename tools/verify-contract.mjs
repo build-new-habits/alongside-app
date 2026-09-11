@@ -42,6 +42,19 @@ import path from "node:path";
 
 const { FIELD_CONTRACT } = await import("../js/data/field-contract.js");
 
+// GATE-PATH, 08 Sep 2026. Paths resolved from import.meta.url, not the
+// working directory.
+//
+// 72 of 139 gates read files by a path relative to process.cwd(), so
+// they were green from the repo root and read NOTHING from anywhere
+// else. Not a live fault -- every session so far has run them from the
+// root -- but an expensive trap: a session running the suite by full
+// path from elsewhere sees most of it red and reasonably concludes the
+// app is broken.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
+
 const TYPEOF_WORDS = new Set(["object", "string", "number", "boolean", "function", "undefined", "symbol", "bigint"]);
 const SESSION_CATEGORIES = new Set([
   "squat-pattern", "hip-hinge", "horizontal-pull", "horizontal-push",
@@ -59,12 +72,12 @@ const ok = (c, m) => { if (!c) throw new Error(m); };
 
 const strip = s => s.replace(/\/\*[\s\S]*?\*\//g, "")
                     .replace(/^\s*\/\/[^\n]*$/gm, "");
-const walk = d => fs.readdirSync(d, { withFileTypes: true })
+const walk = d => fs.readdirSync(_gatePath(d), { withFileTypes: true })
   .flatMap(e => e.isDirectory() ? walk(path.join(d, e.name)) : [path.join(d, e.name)]);
 
 const FILES = walk("js")
   .filter(f => f.endsWith(".js") && !f.endsWith("field-contract.js"));
-const SRC = Object.fromEntries(FILES.map(f => [f, strip(fs.readFileSync(f, "utf8"))]));
+const SRC = Object.fromEntries(FILES.map(f => [f, strip(fs.readFileSync(_gatePath(f), "utf8"))]));
 
 console.log("\nCONTRACT — no comparison against a value the field cannot hold");
 
@@ -155,7 +168,7 @@ check("every declared writer file exists and is reachable", () => {
   // the sheets sheet-manager.js mounts. If a file cannot be reached from
   // an entry point the app can actually navigate to, it cannot be a
   // writer, however much code it contains.
-  const routerSrc = fs.readFileSync("js/router.js", "utf8");
+  const routerSrc = fs.readFileSync(_gatePath("js/router.js"), "utf8");
   const roots = new Set();
   for (const m of routerSrc.matchAll(/path:\s*'\.\/([^']+)'/g)) roots.add("js/" + m[1]);
   const sheetMgr = SRC["js/views/onboarding/sheet-manager.js"] || "";
@@ -181,7 +194,7 @@ check("every declared writer file exists and is reachable", () => {
       const path = w.trim().split(":")[0].split(" ")[0];
       if (!path.endsWith(".js") || path.includes("*")) continue;
       const full = path.startsWith("js/") ? path : `js/${path}`;
-      if (!fs.existsSync(full)) {
+      if (!fs.existsSync(_gatePath(full))) {
         bad.push(`${field}: declared writer ${path} DOES NOT EXIST`);
       } else if (!seen.has(full)) {
         bad.push(`${field}: declared writer ${path} exists but is NOT REACHABLE from any registered route`);

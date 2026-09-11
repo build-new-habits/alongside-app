@@ -47,6 +47,19 @@ const { store }           = await import(BASE + 'store.js');
 const { TodayView }       = await import(BASE + 'views/today.js');
 const { MyProgrammeView } = await import(BASE + 'views/my-programme.js');
 
+// GATE-PATH, 08 Sep 2026. Paths resolved from import.meta.url, not the
+// working directory.
+//
+// 72 of 139 gates read files by a path relative to process.cwd(), so
+// they were green from the repo root and read NOTHING from anywhere
+// else. Not a live fault -- every session so far has run them from the
+// root -- but an expensive trap: a session running the suite by full
+// path from elsewhere sees most of it red and reasonably concludes the
+// app is broken.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
+
 let failures = 0;
 const check = (n, ok, d = '') => {
   console.log(`${ok ? 'PASS' : 'FAIL'}  ${n}${d ? ' — ' + d : ''}`);
@@ -76,17 +89,17 @@ function mountWith(View, seed) {
 // 1. The route exists, and points at something real
 // ─────────────────────────────────────────────────────────────────────
 
-const routerSrc = fs.readFileSync('js/router.js', 'utf8');
+const routerSrc = fs.readFileSync(_gatePath('js/router.js'), 'utf8');
 const entry = routerSrc.match(/'my-programme':\s*\{\s*path:\s*'([^']+)',\s*fn:\s*'([^']+)'/);
 check('the router declares a my-programme route', !!entry);
 if (entry) {
   const filePath = 'js/' + entry[1].replace(/^\.\//, '');
-  check('and its path points at a file that exists', fs.existsSync(filePath), filePath);
+  check('and its path points at a file that exists', fs.existsSync(_gatePath(filePath)), filePath);
   // The 04 Aug session-builder bug: a route pointed at a filename that
   // had never existed, so import() threw before anything else ran and
   // the route could not have worked on any device, ever.
   check('and the file really exports the factory the router names',
-    fs.existsSync(filePath) && new RegExp(`export function ${entry[2]}\\b`).test(fs.readFileSync(filePath, 'utf8')),
+    fs.existsSync(_gatePath(filePath)) && new RegExp(`export function ${entry[2]}\\b`).test(fs.readFileSync(_gatePath(filePath), 'utf8')),
     entry[2]);
 }
 check('the nav tab agrees with how you got there',
@@ -118,7 +131,7 @@ const row = el.querySelector('.today-programme-row');
 
 check('the cog is gone from Home', !el.querySelector('.today-settings-link'));
 check('and Settings is still reachable from the bottom nav',
-  /data-nav="settings"/.test(fs.readFileSync('index.html', 'utf8')),
+  /data-nav="settings"/.test(fs.readFileSync(_gatePath('index.html'), 'utf8')),
   'removing the only route to a screen would be a regression, not a tidy-up');
 // Both branches, executed. The first fixture has not checked in today,
 // so Home offers "Check in" -- I asserted "Update check-in" against it

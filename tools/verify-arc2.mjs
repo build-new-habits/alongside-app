@@ -22,13 +22,26 @@
  */
 import fs from "node:fs";
 
+// GATE-PATH, 08 Sep 2026. Paths resolved from import.meta.url, not the
+// working directory.
+//
+// 72 of 139 gates read files by a path relative to process.cwd(), so
+// they were green from the repo root and read NOTHING from anywhere
+// else. Not a live fault -- every session so far has run them from the
+// root -- but an expensive trap: a session running the suite by full
+// path from elsewhere sees most of it red and reasonably concludes the
+// app is broken.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
+
 let fails = 0;
 const check = (n, fn) => { try { fn(); console.log("  PASS  " + n); }
   catch (e) { fails++; console.log("  FAIL  " + n + "\n        " + e.message); } };
 const ok = (c, m) => { if (!c) throw new Error(m); };
 const strip = t => t
   .replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "").replace(/<!--[\s\S]*?-->/g, "");
-const read = p => strip(fs.readFileSync(p, "utf8"));
+const read = p => strip(fs.readFileSync(_gatePath(p), "utf8"));
 
 const arc = read("js/views/stretch-arc.js");
 
@@ -49,7 +62,7 @@ check("1c. the route is registered and reachable", () => {
   const mc = read("js/views/mobility-conditioning.js");
   ok(mc.includes('navigate("stretch-arc")'),
      "nothing navigates to the arc, so it exists and cannot be found");
-  ok(fs.readFileSync("sw.js", "utf8").includes("views/stretch-arc.js"),
+  ok(fs.readFileSync(_gatePath("sw.js"), "utf8").includes("views/stretch-arc.js"),
      "the shell does not precache it, so it breaks offline and on a stale install");
 });
 

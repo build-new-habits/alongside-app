@@ -23,19 +23,32 @@
  */
 import fs from "node:fs";
 
+// GATE-PATH, 08 Sep 2026. Paths resolved from import.meta.url, not the
+// working directory.
+//
+// 72 of 139 gates read files by a path relative to process.cwd(), so
+// they were green from the repo root and read NOTHING from anywhere
+// else. Not a live fault -- every session so far has run them from the
+// root -- but an expensive trap: a session running the suite by full
+// path from elsewhere sees most of it red and reasonably concludes the
+// app is broken.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
+
 let fails = 0;
 const check = (n, fn) => { try { fn(); console.log("  PASS  " + n); }
   catch (e) { fails++; console.log("  FAIL  " + n + "\n        " + e.message); } };
 const ok = (c, m) => { if (!c) throw new Error(m); };
 
-const views = fs.readdirSync("js/views").filter(f => f.endsWith(".js"));
+const views = fs.readdirSync(_gatePath("js/views")).filter(f => f.endsWith(".js"));
 const strip = s => s.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/[^\n]*$/gm, "");
 
 console.log("\nTEST 1 - one write path");
 check("no view writes activityLog directly", () => {
   const offenders = [];
   for (const f of views) {
-    const s = strip(fs.readFileSync(`js/views/${f}`, "utf8"));
+    const s = strip(fs.readFileSync(_gatePath(`js/views/${f}`), "utf8"));
     // reflect.js UPDATES an existing entry in place, which is not a
     // creation and legitimately does not go through logActivity().
     if (f === "reflect.js") continue;
@@ -46,14 +59,14 @@ check("no view writes activityLog directly", () => {
      `exerciseHistory handling: ${offenders.join(", ")}`);
 });
 check("reflect.js only ever updates, never appends", () => {
-  const s = strip(fs.readFileSync("js/views/reflect.js", "utf8"));
+  const s = strip(fs.readFileSync(_gatePath("js/views/reflect.js"), "utf8"));
   ok(!/log\.push\(/.test(s), "appending directly would bypass every guard");
 });
 
 console.log("\nTEST 2 - no local function shadows store.logActivity()");
 for (const f of views)
   check(`${f} does not shadow it`, () => {
-    const s = strip(fs.readFileSync(`js/views/${f}`, "utf8"));
+    const s = strip(fs.readFileSync(_gatePath(`js/views/${f}`), "utf8"));
     ok(!/function logActivity\s*\(/.test(s),
        "a local logActivity() makes this file read as compliant to any grep " +
        "for the name - which is exactly how morning-session.js hid for months");
@@ -63,7 +76,7 @@ console.log("\nTEST 3 - field names progress.js can actually read");
 check("no activity entry writes `duration` instead of `durationMins`", () => {
   const offenders = [];
   for (const f of views) {
-    const s = strip(fs.readFileSync(`js/views/${f}`, "utf8"));
+    const s = strip(fs.readFileSync(_gatePath(`js/views/${f}`), "utf8"));
     for (const m of s.matchAll(/store\.logActivity\(\{[\s\S]{0,900}?\n\s*\}\)/g))
       if (/\n\s*duration:\s/.test(m[0])) offenders.push(f);
     // Entries built as a variable then passed in.
@@ -74,7 +87,7 @@ check("no activity entry writes `duration` instead of `durationMins`", () => {
      `progress.js sums durationMins - these count as zero minutes: ${[...new Set(offenders)].join(", ")}`);
 });
 check("progress.js still sums durationMins (the field this gate protects)", () => {
-  const s = fs.readFileSync("js/views/progress.js", "utf8");
+  const s = fs.readFileSync(_gatePath("js/views/progress.js"), "utf8");
   ok(/durationMins/.test(s), "if this changed, the whole gate needs revisiting");
 });
 

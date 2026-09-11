@@ -1,4 +1,5 @@
 /**
+
  * tools/verify-swap1.mjs
  * 05 Sep 2026 v2
  *
@@ -47,6 +48,10 @@
 import fs from "node:fs";
 import { JSDOM } from "jsdom";
 
+// GATE-PATH, 08 Sep 2026. Resolved from import.meta.url, not the cwd.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
 const dom = new JSDOM(
   '<!doctype html><html><body><div id="main-content"></div></body></html>',
   { url: "https://example.org/" }
@@ -70,7 +75,7 @@ function reverses(label, fn) {
   ok(`[reversal] ${label}`, threwOrFalse);
 }
 
-const read = f => fs.readFileSync(f, "utf8");
+const read = f => fs.readFileSync(_gatePath(f), "utf8");
 const $  = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
 const click = el => el.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }));
