@@ -293,6 +293,28 @@
 }
 
 /* The whole head is the target, not a chevron somebody has to hit. */
+/* GUIDANCE-1, 08 Sep 2026. The general-guidance line on Home, shown
+   every thirty days.
+
+   ⚫ QUIET, NOT HIDDEN, AND NOT A WARNING. It is not styled as an alert:
+   this is the product being plain about what it is, not the app telling
+   somebody something is wrong. A red banner every thirty days would make
+   an ordinary statement feel like a hazard, and would be ignored faster.
+
+   It carries the weight the three-question red-flag screen was going to
+   carry, on the physiotherapist's advice, so it has to be readable --
+   secondary colour, not a whisper. Contrast is checked by
+   verify-contrast-check like every other token use. */
+.today-guidance {
+  margin: 0 0 var(--space-4);
+  padding: var(--space-3);
+  border-left: 3px solid var(--color-border);
+  border-radius: var(--radius-sm, 6px);
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+  color: var(--color-text-secondary);
+}
+
 /* A11Y-HOME, 08 Sep 2026. The h2 that wraps each room's button.
 
    margin: 0 is load-bearing, exactly as it was for A11Y-HEADER: an h2
