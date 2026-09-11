@@ -1,8 +1,8 @@
 # Alongside: Move — Master Schedule
-## 08 Sep 2026 v331
+## 11 Sep 2026 v332
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v330.md`. Remove v330 on upload.
+Supersedes `master_schedule_v331.md`. Remove v331 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
@@ -20,6 +20,8 @@ Supersedes `master_schedule_v330.md`. Remove v330 on upload.
 > | 🟡 **2** | **Settings and Progress review** | Check both still say what is true and point at nothing retired. Not yet started |
 > | 🟡 **3** | **Your own — the "using bit"** | Graeme: *"I can't seem to be able to save my own series of sessions. No place for history to exist of recall."* Saving, editing, deleting and the list are done; **once somebody has fifteen saved sessions it is a flat list with no filtering or classification.** Not blocking beta |
 > | 🟡 **4** | **Class eight onwards** | Not urgent — Graeme: *"we have something testable, so I'm not in a rush."* Every remaining strand is at least TOUCHED by an existing class, so ranking by need no longer discriminates and a different selection rule is needed |
+> | 🟠 **SOCIAL** | **Social advertising pack** | 🆕 **11 Sep.** `alongside_social_ad_pack_11sep2026_v1.md` — poster, three carousel slides, five 30-second film scripts with screen plans. **Nothing posts until the four blockers in its §9 clear**, two of which are red |
+> | 🔴 **PROPOSAL-3** | **A harder day, then ten movements** | 🆕 **11 Sep.** Energy 2/10, mood 3/10 on the live build: check-in said *"A harder day"*, proposal offered **Glute Focus, 30–40 mins, 10 movements**. May be a bare test account; may be `todayIntensity` overwritten by phase bias. **Needs an executing gate, not a source check** |
 > | 🟡 **5** | **Changelog** | ✅ **Decision already taken a month ago: RESUME.** It was still listed here as an open question, which it was not |
 > | ✅ | ~~Device pass~~ · ~~class contract~~ · ~~seven classes~~ · ~~the player~~ · ~~the timetable~~ · ~~class logging~~ · ~~Home headings~~ · ~~the cwd trap~~ · ~~the five outside tools~~ | All shipped 08 Sep. See the records below |
 >
@@ -36,6 +38,37 @@ Supersedes `master_schedule_v330.md`. Remove v330 on upload.
 >
 > 🔴 **This table has now gone stale three times in one day**, and each time it was corrected by hand. `verify-blueprint` checks the START HERE line against the repo because that drift was found twice; **this table has no equivalent and is drifting for the same reason.** A candidate for the same treatment.
 
+> ### 🟠 NEW SINCE v331 — the social advertising pack, and two things it found
+>
+> **`Documents/Admin/alongside_social_ad_pack_11sep2026_v1.md`.** Poster and three carousel slides rendered from the live build, five 30-second films scripted shot by shot against real routes and real on-screen copy. **No code touched.**
+>
+> #### 🔴 It cannot post yet, and two of the reasons are not marketing problems
+>
+> | | Blocker | Why it is red |
+> |---|---|---|
+> **1** | **The website sign-up form is a placeholder** and says so in its own text | A coming-soon post with nowhere to go spends the one first impression this product gets |
+> **2** | **The homepage says the app "detects the early signs" of burnout and "responds with restoration"** | That is monitoring plus a response to a state, in public, on the page every advert points at. The intended purpose statement exists to catch exactly this sentence |
+> **3** | The homepage's rotating quotes read as testimonials | No beta tester has used the product |
+> **4** | PROPOSAL-3, below | The most persuasive film available is the harder-days film, and it cannot honestly be recorded until this is resolved |
+>
+> #### 🟠 Decisions taken inside the pack, because they had sat undecided since 04 Aug
+>
+> The comms brief flagged social scope as needing decisions before drafting and nobody made them. Taken, with reasoning in §2: **Instagram and Facebook first, LinkedIn reframed for organisations, TikTok after beta · organic before any spend · Alongside's own voice, not per-organisation taster material · no date in any asset.** Reverse any of them deliberately, not by drift.
+>
+> #### ⚫ The speed-up in the brief, argued against
+>
+> Graeme's brief asked for sped-up zooms between screens. **Used once, in F1, and nowhere else.** Fast inter-screen motion is the grammar of the adverts this product defines itself against, and it costs the audience it is aimed at. The time comes from trimming each screen's settling animation instead, which is invisible and buys back four or five seconds a film.
+>
+> ### 🔴 PROPOSAL-3 — a harder day, then ten movements
+>
+> Free account on `alongside-v494`: energy **2/10**, mood **3/10**, 7 hours poor sleep. Check-in summarised it right — *"A harder day"* — and the suggested session was **Glute Focus, 30 to 40 minutes, 10 movements**, described as loading the posterior chain progressively. Breathing and Short walk sat underneath it.
+>
+> May be an artefact of a test account with no onboarding answers. But `_generateOptions()` passes `energyScore` only to the **fallback** path and writes `todayIntensity` from the phase bias before building, which is the BUILD-5 shape: **a value read from a field its writer never set.** ⚫ **Whatever the cause, the screen a person meets on their worst day is the screen this product is entirely about.**
+>
+> #### 🟠 A finding about this document itself
+>
+> `master_schedule.md` was **edited in place on 11 Sep without a version bump** — commit `0a95c8b` moved the live line to `v494` while the header still said v331, and `Past MS/master_schedule_v331.md` held a different, earlier v331. The true final v331 has now been archived over it. `verify-schedule-drift` compares this file's header to its own footer, so **both agreed and both were wrong**, which is the same class of fault as the START HERE table drifting three times in one day.
+>
 > ### 🟢 SHIPPED SINCE v330 — CLASS-6, `v486`. Unsticking is live. Seven classes, 29 of 33 aims served.
 >
 > ### 🔴 "See you Thursday" — caught by Graeme, before it shipped
@@ -8612,6 +8645,10 @@ Source: Task Inventory Section J v3 (23 Jul 2026 reprioritisation). Now maintain
 | Business — BIZ-9 (IP/trademark) | Deprioritised 29 Jul per Alex; still deprioritised. 🟡 **Raised at the 10 Aug solicitor consultation as planned** — no advice given yet. | Await Natalie's response. Do not chase separately. | None urgent. |
 | Business — BIZ-5 (solicitor: Privacy Policy + ToS) | 🟡 **Solicitor engaged, 10 Aug** — Natalie, 30-minute introductory call, all four areas covered. Moves from "no solicitor identified" to "awaiting scope, priorities and costs." **Not closed — no advice received yet.** See the Solicitor Consultation section above for the full record and the five follow-up actions. | Send/confirm the six-document pack; restate the beta-minimum vs launch-minimum split **in writing** as two lists, not one combined answer; ask for a safeguarding reviewer referral. | Awaiting Natalie's written response. |
 | Business — Severe pain Rest/Adapt choice liability question | 🆕 **New, 04 Aug.** Graeme's reasoning for the new Severe-pain choice feature (`coach-proposal.js` v17): an actively-chosen, recorded "rest offered, user chose to continue" pattern may reduce liability if a user is injured after choosing to adapt. The interaction and audit trail are built — whether it actually holds up legally is unverified, flagged in the code comments as a real legal question, not assumed. | 🟠 **Not confirmed raised at the 10 Aug consultation** — not mentioned in Graeme's account of the meeting, so assume not covered. Add it to the follow-up email; it's a cheap addition to an existing thread. | Awaiting Natalie. |
+| Marketing — Social advertising pack | 🟢 **Scoped and drafted, 11 Sep** (`alongside_social_ad_pack_11sep2026_v1.md`). Poster + 3 carousel slides rendered from the live build; five 30-second films scripted with screen plans; platform, sequencing and no-date decisions taken. | Graeme records the five films. Blockers in §9 first. | Blocked on the sign-up form and the burnout wording. |
+| Website — sign-up form not wired | 🔴 **Confirmed live, 11 Sep.** The homepage states in its own text that the form is a placeholder until the mailing list connection is ready. Kit is a live service. | Wire it. | **Blocks every social post.** |
+| Website — burnout wording outside the intended purpose statement | 🔴 **New, 11 Sep.** Homepage: "detects the early signs" and "responds with restoration". Monitoring plus response to a state. | Reword one paragraph. | Blocks paid traffic. |
+| Website — homepage quotes read as testimonials | 🟡 **New, 11 Sep.** No beta tester has used the product. | Reframe or remove. | Before any advert points at the page. |
 | Marketing — LinkedIn presence | New, unscoped, 29 Jul. BNH business page + Graeme's personal profile. | Scope whenever Graeme's ready to start. | Not booked. |
 | Infra — INF-7 (breach response process) | Reconfirmed open, 27 Jul. No procedure written. | Write short internal procedure. | Same trigger as BIZ-3. |
 | Infra — Supabase account 2FA | New, 27 Jul. | Graeme's own action. | None. |
@@ -8712,4 +8749,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 08 Sep 2026 v331*
+*Build New Habits · Alongside: Move · Master Schedule · 11 Sep 2026 v332*
