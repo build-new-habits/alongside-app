@@ -18,12 +18,25 @@
  */
 import fs from "node:fs";
 
+// GATE-PATH, 08 Sep 2026. Paths resolved from import.meta.url, not the
+// working directory.
+//
+// 72 of 139 gates read files by a path relative to process.cwd(), so
+// they were green from the repo root and read NOTHING from anywhere
+// else. Not a live fault -- every session so far has run them from the
+// root -- but an expensive trap: a session running the suite by full
+// path from elsewhere sees most of it red and reasonably concludes the
+// app is broken.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
+
 let fails = 0;
 const check = (n, fn) => { try { fn(); console.log("  PASS  " + n); }
   catch (e) { fails++; console.log("  FAIL  " + n + "\n        " + e.message); } };
 const ok = (c, m) => { if (!c) throw new Error(m); };
 
-const sw = fs.readFileSync("sw.js", "utf8");
+const sw = fs.readFileSync(_gatePath("sw.js"), "utf8");
 const code = sw.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/[^\n]*$/gm, "");
 
 console.log("\nTEST 1 - no global cache lookups");

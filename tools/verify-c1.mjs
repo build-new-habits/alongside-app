@@ -34,6 +34,19 @@ globalThis.localStorage = {
   removeItem: k => { delete mem[k]; },
 };
 const { store } = await import(__REPO + "/js/store.js");
+
+// GATE-PATH, 08 Sep 2026. Paths resolved from import.meta.url, not the
+// working directory.
+//
+// 72 of 139 gates read files by a path relative to process.cwd(), so
+// they were green from the repo root and read NOTHING from anywhere
+// else. Not a live fault -- every session so far has run them from the
+// root -- but an expensive trap: a session running the suite by full
+// path from elsewhere sees most of it red and reasonably concludes the
+// app is broken.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
 store.init();
 
 let fails = 0;
@@ -95,8 +108,8 @@ console.log("\nTEST 5 - 'skip' must never reach the store");
 // W3-A, 14 Aug 2026. The capability questions moved from the unreachable
 // views/onboarding/lifestyle.js to thread.js steps 9a-9d, and that file
 // is now deleted. These assertions follow the implementation.
-const writer = fs.readFileSync("js/views/onboarding/thread.js", "utf8");
-const data   = fs.readFileSync("js/data/onboarding-thread-data.js", "utf8");
+const writer = fs.readFileSync(_gatePath("js/views/onboarding/thread.js"), "utf8");
+const data   = fs.readFileSync(_gatePath("js/data/onboarding-thread-data.js"), "utf8");
 
 check("the writer converts 'skip' to null before saving", () =>
   ok(/capability\.legPower' && value === 'skip'\)\s*\n?\s*\?\s*null/.test(writer) ||

@@ -39,9 +39,22 @@ for (const k of ["navigator", "localStorage"])
 
 const B = new URL("../js/", import.meta.url).href;
 const { EXERCISES } = await import(B + "data/exercises/index.js");
+
+// GATE-PATH, 08 Sep 2026. Paths resolved from import.meta.url, not the
+// working directory.
+//
+// 72 of 139 gates read files by a path relative to process.cwd(), so
+// they were green from the repo root and read NOTHING from anywhere
+// else. Not a live fault -- every session so far has run them from the
+// root -- but an expensive trap: a session running the suite by full
+// path from elsewhere sees most of it red and reasonably concludes the
+// app is broken.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
 const C             = await import(B + "data/conditions.js");
 
-const cp = fs.readFileSync("js/views/coach-proposal.js", "utf8");
+const cp = fs.readFileSync(_gatePath("js/views/coach-proposal.js"), "utf8");
 const code = cp.split("\n").filter(l => !/^\s*(\*|\/\/|\/\*)/.test(l)).join("\n");
 
 let fails = 0;
@@ -118,7 +131,7 @@ ok("2b. mild still says nothing was changed",
 // ── 3. THE TWO SCREENS AGREE ────────────────────────────────────────────
 console.log("\nTEST 3 - the proposal and the exercise card no longer contradict");
 
-const rat = fs.readFileSync("js/data/session-rationale.js", "utf8");
+const rat = fs.readFileSync(_gatePath("js/data/session-rationale.js"), "utf8");
 ok("3a. the exercise card still tells the truth about a sore area",
    /is sore today, and this one works it/.test(rat),
    "the card was changed to match the proposal. THE CARD WAS THE TRUTHFUL ONE - " +

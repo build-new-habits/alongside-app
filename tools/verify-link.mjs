@@ -1,4 +1,5 @@
 /**
+
  * tools/verify-link.mjs
  * 22 Aug 2026 v2
  * CHOOSER-1. Known-failure list emptied -- goal-setup.js retired.
@@ -52,6 +53,10 @@ import { fileURLToPath } from "node:url";
 import fs from "node:fs";
 import path from "node:path";
 
+// GATE-PATH, 08 Sep 2026. Resolved from import.meta.url, not the cwd.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
 // Resolved from this file, never hardcoded. Fourteen gates in this suite
 // hardcode /home/claude/repo and will read a copy you are not editing.
 const require = createRequire(import.meta.url);
@@ -92,7 +97,7 @@ if (typeof dom.window.matchMedia !== "function") {
 }
 
 function walk(dir, out = []) {
-  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+  for (const entry of fs.readdirSync(_gatePath(dir), { withFileTypes: true })) {
     const p = path.join(dir, entry.name);
     if (entry.isDirectory()) walk(p, out);
     else if (entry.name.endsWith(".js")) out.push(p);

@@ -32,6 +32,11 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
+// GATE-PATH, 08 Sep 2026. Resolved from import.meta.url, not the cwd.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
+
 let failures = 0;
 const check = (n, ok, d = '') => {
   console.log(`${ok ? 'PASS' : 'FAIL'}  ${n}${d ? ' — ' + d : ''}`);
@@ -42,8 +47,8 @@ const root = new URL('../', import.meta.url).pathname;
 // PRICE-3, 18 Aug 2026. Truth moved out of the view into
 // js/data/pricing.js, so the number exists once in the app rather than
 // once per screen that mentions it. This gate follows the truth.
-const priceSrc   = fs.readFileSync(path.join(root, 'js/data/pricing.js'), 'utf8');
-const upgradeSrc = fs.readFileSync(path.join(root, 'js/views/upgrade.js'), 'utf8');
+const priceSrc   = fs.readFileSync(_gatePath(path.join(root, 'js/data/pricing.js')), 'utf8');
+const upgradeSrc = fs.readFileSync(_gatePath(path.join(root, 'js/views/upgrade.js')), 'utf8');
 
 // ── 1. The source of truth is a single pair of constants ─────────────
 
@@ -79,7 +84,7 @@ const RETIRED = ['9.99', '89', '4.99']
 const EXCLUDED = ['Archive', 'Past MS', 'node_modules', '.git'];
 
 function walk(dir, out = []) {
-  for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+  for (const e of fs.readdirSync(_gatePath(dir), { withFileTypes: true })) {
     if (EXCLUDED.includes(e.name)) continue;
     const full = path.join(dir, e.name);
     if (e.isDirectory()) walk(full, out);
@@ -105,14 +110,14 @@ for (const file of walk(root)) {
   // whether an old price is presented as current. Kept deliberately
   // narrow: this exact string, not a fuzzy match, so it cannot become a
   // way to silence the gate by accident.
-  const raw = fs.readFileSync(file, 'utf8');
+  const raw = fs.readFileSync(_gatePath(file), 'utf8');
   if (raw.includes('SUPERSEDED PRICING')) { superseded.push(rel); continue; }
   // Comments explaining WHY a price was retired are not published
   // prices. Stripping them is what lets the reasoning stay in the file
   // without the gate shouting about its own explanation -- the same
   // fault caught in verify-is2.mjs earlier today, where an assertion
   // matched the comment describing the fix.
-  const src = fs.readFileSync(file, 'utf8')
+  const src = fs.readFileSync(_gatePath(file), 'utf8')
     .replace(/\/\*[\s\S]*?\*\//g, '')
     .replace(/^\s*(\/\/|\*).*$/gm, '')
     .replace(/<!--[\s\S]*?-->/g, '');
@@ -127,7 +132,7 @@ for (const file of walk(root)) {
 // number for weeks and only a price CHANGE revealed it.
 const declarers = walk(path.join(root, 'js'))
   .filter(f => !f.endsWith('data/pricing.js'))
-  .filter(f => /const PRICE_(MONTHLY|ANNUAL)\s*=/.test(fs.readFileSync(f, 'utf8')))
+  .filter(f => /const PRICE_(MONTHLY|ANNUAL)\s*=/.test(fs.readFileSync(_gatePath(f), 'utf8')))
   .map(f => path.relative(root, f));
 check('2b no view declares its own price constant',
   declarers.length === 0, declarers.join(', '));
@@ -168,7 +173,7 @@ for (const file of walk(root)) {
   const rel = path.relative(root, file);
   if (rel === 'tools/verify-price.mjs') continue;
   if (rel === 'Documents/Admin/master_schedule.md') continue;
-  const raw = fs.readFileSync(file, 'utf8');
+  const raw = fs.readFileSync(_gatePath(file), 'utf8');
   if (raw.includes('SUPERSEDED PRICING')) continue;
   const src = raw
     .replace(/\/\*[\s\S]*?\*\//g, '')

@@ -21,6 +21,19 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
+// GATE-PATH, 08 Sep 2026. Paths resolved from import.meta.url, not the
+// working directory.
+//
+// 72 of 139 gates read files by a path relative to process.cwd(), so
+// they were green from the repo root and read NOTHING from anywhere
+// else. Not a live fault -- every session so far has run them from the
+// root -- but an expensive trap: a session running the suite by full
+// path from elsewhere sees most of it red and reasonably concludes the
+// app is broken.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
+
 let failures = 0;
 const check = (n, ok, d='') => { console.log(`${ok?'PASS':'FAIL'}  ${n}${d?' — '+d:''}`); if(!ok) failures++; };
 
@@ -31,7 +44,7 @@ const strip = s => s
   .replace(/"(?:[^"\\]|\\.)*"/g, '""')
   .replace(/'(?:[^'\\]|\\.)*'/g, "''");
 
-const walk = d => fs.readdirSync(d, { withFileTypes: true }).flatMap(e =>
+const walk = d => fs.readdirSync(_gatePath(d), { withFileTypes: true }).flatMap(e =>
   e.isDirectory() ? walk(path.join(d, e.name))
   : e.name.endsWith('.js') ? [path.join(d, e.name)] : []);
 
@@ -58,7 +71,7 @@ const files = [...walk('js/views'), ...walk('js/data'), 'js/session-log.js', 'js
 const offenders = [];
 
 for (const f of files) {
-  const raw = fs.readFileSync(f, 'utf8');
+  const raw = fs.readFileSync(_gatePath(f), 'utf8');
   // Assignments read from the STRIPPED source, so HTML attributes inside
   // template literals do not read as assignments. Declarations read from
   // the RAW source, because the template-literal strip cannot handle the
@@ -98,7 +111,7 @@ check('no module assigns an identifier it never declares',
     : `${files.length} files scanned — modules are strict mode, so an undeclared assignment throws`);
 
 // The specific one that shipped, asserted by name so it cannot recur silently.
-const cs = fs.readFileSync('js/views/core-session.js', 'utf8');
+const cs = fs.readFileSync(_gatePath('js/views/core-session.js'), 'utf8');
 check('core-session declares pendingSkipOffer',
   /let\s+pendingSkipOffer\b/.test(cs),
   'the one that shipped as a ReferenceError');
@@ -106,7 +119,7 @@ check('core-session declares pendingSkipOffer',
 // SHARED-1. The baseline state moved to data/session-moments.js, so it
 // must NOT still be here — two definitions of a coach moment is how they
 // drift apart.
-const sm = fs.readFileSync('js/data/session-moments.js', 'utf8');
+const sm = fs.readFileSync(_gatePath('js/data/session-moments.js'), 'utf8');
 check('the baseline state lives in session-moments, not core-session',
   /let\s+baselineAnswers\b/.test(sm) && !/let\s+baselineAnswers\b/.test(cs));
 

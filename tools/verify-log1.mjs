@@ -13,8 +13,21 @@
  */
 import fs from "node:fs";
 
+// GATE-PATH, 08 Sep 2026. Paths resolved from import.meta.url, not the
+// working directory.
+//
+// 72 of 139 gates read files by a path relative to process.cwd(), so
+// they were green from the repo root and read NOTHING from anywhere
+// else. Not a live fault -- every session so far has run them from the
+// root -- but an expensive trap: a session running the suite by full
+// path from elsewhere sees most of it red and reasonably concludes the
+// app is broken.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
+
 const strip = s => s.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/[^\n]*$/gm, "");
-const read  = f => strip(fs.readFileSync(f, "utf8"));
+const read  = f => strip(fs.readFileSync(_gatePath(f), "utf8"));
 
 let fails = 0;
 const check = (n, fn) => { try { fn(); console.log("  PASS  " + n); }
@@ -105,7 +118,7 @@ check("the old .gp-lift rules are gone, not left dead", () =>
 console.log("\nSCROLL-1 - a new card starts at the top");
 for (const v of ["workout", "core-session", "prescribed-session", "gym-programme", "yoga-session"])
   check(`${v} scrolls up on advance`, () => {
-    const s = fs.readFileSync(`js/views/${v}.js`, "utf8");
+    const s = fs.readFileSync(_gatePath(`js/views/${v}.js`), "utf8");
     const advances = (s.match(/(current(Exercise)?Index)\+\+;/g) || []).length;
     const scrolls  = (s.match(/scrollToTop\(\);/g) || []).length;
     ok(advances > 0, "no advance point found - the regex has drifted");
@@ -117,22 +130,22 @@ for (const v of ["workout", "core-session", "prescribed-session", "gym-programme
        "not imported");
   });
 check("one definition, not five", () => {
-  const src = fs.readFileSync("js/session-log.js", "utf8");
+  const src = fs.readFileSync(_gatePath("js/session-log.js"), "utf8");
   ok(/export function scrollToTop/.test(src), "helper missing from the shared module");
   for (const v of ["workout", "core-session", "yoga-session"])
-    ok(!/function scrollToTop/.test(fs.readFileSync(`js/views/${v}.js`, "utf8")),
+    ok(!/function scrollToTop/.test(fs.readFileSync(_gatePath(`js/views/${v}.js`), "utf8")),
        `${v} declares its own - five copies is how four of them drift`);
 });
 check("instant, not smooth", () => {
-  const src = fs.readFileSync("js/session-log.js", "utf8");
+  const src = fs.readFileSync(_gatePath("js/session-log.js"), "utf8");
   ok(/behavior: "instant"/.test(src),
      "a smooth scroll from the bottom of one card to the top of the next " +
      "animates past everything between, which reads as a lurch");
 });
 
 console.log("\nLOG-6 - the note is readable back before saving");
-const slog = fs.readFileSync("js/session-log.js", "utf8");
-const slogCss = fs.readFileSync("css/components/session-log.css", "utf8");
+const slog = fs.readFileSync(_gatePath("js/session-log.js"), "utf8");
+const slogCss = fs.readFileSync(_gatePath("css/components/session-log.css"), "utf8");
 check("the note is a textarea, not a one-line input", () => {
   ok(/<textarea class="slog__input slog__input--note"/.test(slog),
      "an input shows a few characters at a time whatever its width");
@@ -181,7 +194,7 @@ check("a saved note is readable when shown back", () => {
 
 console.log("\nLOG-5 - the note field takes the space it needs");
 check("note is not a fixed-width number box", () => {
-  const css = fs.readFileSync("css/components/session-log.css", "utf8");
+  const css = fs.readFileSync(_gatePath("css/components/session-log.css"), "utf8");
   ok(/\.slog__input--note \{/.test(css), "no note modifier");
   const rule = css.slice(css.indexOf(".slog__input--note {"), css.indexOf("}", css.indexOf(".slog__input--note {")));
   ok(/flex: 1 1 100%/.test(rule), "must take a full row of its own");
@@ -190,7 +203,7 @@ check("note is not a fixed-width number box", () => {
 check("the markup tags the note field", () =>
   // LOG-6 replaced the conditional class with a dedicated textarea
   // branch, so the class is now literal rather than computed.
-  ok(/<textarea class="slog__input slog__input--note"/.test(fs.readFileSync("js/session-log.js", "utf8")),
+  ok(/<textarea class="slog__input slog__input--note"/.test(fs.readFileSync(_gatePath("js/session-log.js"), "utf8")),
      "class never applied"));
 
 console.log(fails === 0 ? "\nALL PASS\n" : `\n${fails} FAILURE(S)\n`);

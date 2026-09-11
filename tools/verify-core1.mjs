@@ -35,6 +35,19 @@ store.init();
 const SR = await import(__REPO + "/js/data/session-rationale.js");
 const { EXERCISES } = await import(__REPO + "/js/data/exercises/index.js");
 
+// GATE-PATH, 08 Sep 2026. Paths resolved from import.meta.url, not the
+// working directory.
+//
+// 72 of 139 gates read files by a path relative to process.cwd(), so
+// they were green from the repo root and read NOTHING from anywhere
+// else. Not a live fault -- every session so far has run them from the
+// root -- but an expensive trap: a session running the suite by full
+// path from elsewhere sees most of it red and reasonably concludes the
+// app is broken.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
+
 let fails = 0;
 const check = (n, fn) => { try { fn(); console.log("  PASS  " + n); }
   catch (e) { fails++; console.log("  FAIL  " + n + "\n        " + e.message); } };
@@ -116,17 +129,17 @@ console.log("\nTEST 5 - rendered on every card-shaped view");
 // unchanged, which is that a caution actually reaches every card-shaped
 // view. It now checks the chain rather than a duplicated call.
 check("the shared card calls bodyCaution and renders the markup", () => {
-  const s = fs.readFileSync("js/exercise-card.js", "utf8");
+  const s = fs.readFileSync(_gatePath("js/exercise-card.js"), "utf8");
   ok(/bodyCaution\(/.test(s), "the shared card never calls it - the caution would never appear anywhere");
   ok(/exercise-caution/.test(s), "no markup");
 });
 for (const v of ["workout", "core-session", "prescribed-session", "gym-programme"])
   check(`${v} renders the shared card`, () => {
-    const s = fs.readFileSync(`js/views/${v}.js`, "utf8");
+    const s = fs.readFileSync(_gatePath(`js/views/${v}.js`), "utf8");
     ok(/renderExerciseCard\(/.test(s), "does not render the shared card - the caution would never appear here");
   });
 check("the alias table exists in exactly one place", () => {
-  const src = fs.readFileSync("js/data/session-rationale.js", "utf8");
+  const src = fs.readFileSync(_gatePath("js/data/session-rationale.js"), "utf8");
   // Match the MAP entry specifically. A looser grep also caught
   // _conditionLabel's lookup table, which is a different thing entirely.
   const n = (src.match(/"plantar-fasciitis":\s*\["/g) || []).length;

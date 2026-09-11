@@ -28,7 +28,20 @@
 
 import fs from "node:fs";
 
-const html = fs.readFileSync("index.html", "utf8");
+// GATE-PATH, 08 Sep 2026. Paths resolved from import.meta.url, not the
+// working directory.
+//
+// 72 of 139 gates read files by a path relative to process.cwd(), so
+// they were green from the repo root and read NOTHING from anywhere
+// else. Not a live fault -- every session so far has run them from the
+// root -- but an expensive trap: a session running the suite by full
+// path from elsewhere sees most of it red and reasonably concludes the
+// app is broken.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
+
+const html = fs.readFileSync(_gatePath("index.html"), "utf8");
 const hatch = html.slice(html.indexOf(".hidden-nav-escape {"),
                          html.indexOf("}", html.indexOf(".hidden-nav-escape {")));
 
@@ -94,9 +107,9 @@ for (const sel of [".workout-header", ".ci-thread"]) {
 // .session-header -- three selectors that appear nowhere in the app. The
 // gutter would have been reserved on nothing while the rule looked
 // thorough.
-const viewSrc = fs.readdirSync("js/views")
+const viewSrc = fs.readdirSync(_gatePath("js/views"))
   .filter(f => f.endsWith(".js"))
-  .map(f => fs.readFileSync(`js/views/${f}`, "utf8")).join("\n");
+  .map(f => fs.readFileSync(_gatePath(`js/views/${f}`), "utf8")).join("\n");
 const ghosts = gutterRules.filter(sel => !viewSrc.includes(`class="${sel.slice(1)}`));
 ok("3b. and no gutter is reserved on a class that does not exist",
    ghosts.length === 0,
@@ -141,7 +154,7 @@ const corners = [
 ];
 
 for (const [sel, file, why] of corners) {
-  const src = fs.readFileSync(file, "utf8");
+  const src = fs.readFileSync(_gatePath(file), "utf8");
   const rule = src.slice(src.indexOf(sel + " {"),
                          src.indexOf("}", src.indexOf(sel + " {")));
   ok(`6a. ${sel} clears the hatch`,

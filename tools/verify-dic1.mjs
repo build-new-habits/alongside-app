@@ -22,6 +22,19 @@ import { dirname as __d, resolve as __r } from "node:path";
 const __REPO = __r(__d(__f(import.meta.url)), "..");
 import fs from "node:fs";
 
+// GATE-PATH, 08 Sep 2026. Paths resolved from import.meta.url, not the
+// working directory.
+//
+// 72 of 139 gates read files by a path relative to process.cwd(), so
+// they were green from the repo root and read NOTHING from anywhere
+// else. Not a live fault -- every session so far has run them from the
+// root -- but an expensive trap: a session running the suite by full
+// path from elsewhere sees most of it red and reasonably concludes the
+// app is broken.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
+
 let fails = 0;
 const check = (name, fn) => {
   try { fn(); console.log("  PASS  " + name); }
@@ -33,10 +46,10 @@ const eq = (a, b, m) => { if (a !== b) throw new Error(`${m}\n        got: ${a}\
 // look like four code faults both times.
 const ok = (c, m) => { if (!c) throw new Error(m); };
 
-const checkin  = fs.readFileSync("js/views/checkin.js", "utf8");
-const builder  = fs.readFileSync("js/session-builder.js", "utf8");
-const storeSrc = fs.readFileSync("js/store.js", "utf8");
-const today    = fs.readFileSync("js/views/today.js", "utf8");
+const checkin  = fs.readFileSync(_gatePath("js/views/checkin.js"), "utf8");
+const builder  = fs.readFileSync(_gatePath("js/session-builder.js"), "utf8");
+const storeSrc = fs.readFileSync(_gatePath("js/store.js"), "utf8");
+const today    = fs.readFileSync(_gatePath("js/views/today.js"), "utf8");
 
 console.log("\nTEST 1 - cross-file value contract");
 check("checkin VARIETY_CHOICES values == session-builder VARIETY_NOVELTY keys", () => {
@@ -112,7 +125,7 @@ check("a bogus value is rejected by validation on reload", () => {
 console.log("\nTEST 7 - CI-SPACE: panel clearance agrees across JS and CSS");
 check("PANEL_CLEARANCE matches .ci-thread's padding-bottom", () => {
   const js  = checkin.match(/PANEL_CLEARANCE = ([0-9.]+)/);
-  const css = fs.readFileSync("css/components/checkin-conversation.css", "utf8")
+  const css = fs.readFileSync(_gatePath("css/components/checkin-conversation.css"), "utf8")
                 .match(/padding: var\(--space-5\) var\(--space-4\) (\d+)vh/);
   ok(js && css, "one of the two values is missing");
   eq(Math.round(parseFloat(js[1]) * 100), parseInt(css[1], 10),
@@ -124,7 +137,7 @@ check("scroll anchors per message rather than always to the top", () => {
 });
 
 console.log("\nTEST 8 - SB-META: no 'undefined' can reach the session overview");
-const sbui = fs.readFileSync("js/views/session-builder-ui.js", "utf8");
+const sbui = fs.readFileSync(_gatePath("js/views/session-builder-ui.js"), "utf8");
 check("exercise meta is built from guarded parts", () => {
   ok(/function _exerciseMeta/.test(sbui), "helper missing");
   ok(!/\$\{ex\.sets\} sets/.test(sbui),
@@ -133,7 +146,7 @@ check("exercise meta is built from guarded parts", () => {
 });
 check("the coach's section rationale is styled as the coach", () => {
   ok(/sb-section-why coach-voice/.test(sbui), "class missing");
-  const css = fs.readFileSync("css/components/workout.css", "utf8");
+  const css = fs.readFileSync(_gatePath("css/components/workout.css"), "utf8");
   const rule = css.slice(css.indexOf(".sb-section-why {"), css.indexOf("}", css.indexOf(".sb-section-why {")));
   ok(/--color-primary/.test(rule),
      "text-secondary makes the coach's own reasoning look like UI chrome");

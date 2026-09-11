@@ -9,6 +9,19 @@
  */
 import fs from "node:fs";
 
+// GATE-PATH, 08 Sep 2026. Paths resolved from import.meta.url, not the
+// working directory.
+//
+// 72 of 139 gates read files by a path relative to process.cwd(), so
+// they were green from the repo root and read NOTHING from anywhere
+// else. Not a live fault -- every session so far has run them from the
+// root -- but an expensive trap: a session running the suite by full
+// path from elsewhere sees most of it red and reasonably concludes the
+// app is broken.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
+
 let fails = 0;
 const check = (n, fn) => { try { fn(); console.log("  PASS  " + n); }
   catch (e) { fails++; console.log("  FAIL  " + n + "\n        " + e.message); } };
@@ -26,17 +39,17 @@ const ok = (c, m) => { if (!c) throw new Error(m); };
 const stripHtmlComments = s => s.replace(/<!--[\s\S]*?-->/g, "");
 const stripCssComments  = s => s.replace(/\/\*[\s\S]*?\*\//g, "");
 
-const htmlRaw = fs.readFileSync("index.html", "utf8");
+const htmlRaw = fs.readFileSync(_gatePath("index.html"), "utf8");
 const html    = stripHtmlComments(htmlRaw);
-const prefs  = fs.readFileSync("js/display-prefs.js", "utf8");
-const setts  = fs.readFileSync("js/views/settings.js", "utf8");
-const varsRaw = fs.readFileSync("css/base/variables.css", "utf8");
+const prefs  = fs.readFileSync(_gatePath("js/display-prefs.js"), "utf8");
+const setts  = fs.readFileSync(_gatePath("js/views/settings.js"), "utf8");
+const varsRaw = fs.readFileSync(_gatePath("css/base/variables.css"), "utf8");
 const vars    = stripCssComments(varsRaw);
-const mainC  = stripCssComments(fs.readFileSync("css/main.css", "utf8"));
-const reset  = stripCssComments(fs.readFileSync("css/base/reset.css", "utf8"));
+const mainC  = stripCssComments(fs.readFileSync(_gatePath("css/main.css"), "utf8"));
+const reset  = stripCssComments(fs.readFileSync(_gatePath("css/base/reset.css"), "utf8"));
 // sw.js: strip block comments so a SHELL_URLS check cannot be satisfied
 // by a changelog entry that merely names the file.
-const sw     = fs.readFileSync("sw.js", "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
+const sw     = fs.readFileSync(_gatePath("sw.js"), "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
 
 const pairs = src => {
   const m = {};
@@ -125,12 +138,12 @@ check("Settings exposes the control", () => {
 
 console.log("\nTEST 3c - DISP-2, the text scale actually reaches everything");
 check("no hardcoded font-size escapes the scale", () => {
-  const glob = (d) => fs.readdirSync(d, { withFileTypes: true }).flatMap(e =>
+  const glob = (d) => fs.readdirSync(_gatePath(d), { withFileTypes: true }).flatMap(e =>
     e.isDirectory() ? glob(`${d}/${e.name}`) : (e.name.endsWith(".css") ? [`${d}/${e.name}`] : []));
   const offenders = [];
   for (const f of glob("css")) {
     if (f.endsWith("variables.css")) continue;   // tokens scale already; wrapping twice would square it
-    const src = fs.readFileSync(f, "utf8");
+    const src = fs.readFileSync(_gatePath(f), "utf8");
     const m = src.match(/font-size:\s*[0-9.]+(px|rem)(?!\s*\*)/g);
     if (m) offenders.push(`${f} (${m.length})`);
   }
@@ -140,12 +153,12 @@ check("no hardcoded font-size escapes the scale", () => {
 
 console.log("\nTEST 3d - DISP-3, the app's own 13px floor is enforced");
 check("no text is smaller than --text-xs", () => {
-  const glob = (d) => fs.readdirSync(d, { withFileTypes: true }).flatMap(e =>
+  const glob = (d) => fs.readdirSync(_gatePath(d), { withFileTypes: true }).flatMap(e =>
     e.isDirectory() ? glob(`${d}/${e.name}`) : (e.name.endsWith(".css") ? [`${d}/${e.name}`] : []));
   const tiny = [];
   for (const f of glob("css")) {
     if (f.endsWith("variables.css")) continue;
-    fs.readFileSync(f, "utf8").split("\n").forEach((line, i) => {
+    fs.readFileSync(_gatePath(f), "utf8").split("\n").forEach((line, i) => {
       const m = line.match(/font-size:\s*(?:calc\()?([0-9.]+)(px|rem)/);
       if (!m) return;
       const px = parseFloat(m[1]) * (m[2] === "rem" ? 16 : 1);

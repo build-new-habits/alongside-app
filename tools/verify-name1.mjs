@@ -32,6 +32,11 @@ import { createRequire as __cr } from "node:module";
 const __require = __cr(import.meta.url);
 import fs from 'node:fs';
 import path from 'node:path';
+
+// GATE-PATH, 08 Sep 2026. Resolved from import.meta.url, not the cwd.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
 const { JSDOM } = __require("jsdom");
 
 let failures = 0;
@@ -47,7 +52,7 @@ const check = (n, ok, d = '') => {
 const ALLOWED = /personalBests|showPersonalBests|Personal best|Personal Capacity/;
 
 function walk(dir, out = []) {
-  for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+  for (const e of fs.readdirSync(_gatePath(dir), { withFileTypes: true })) {
     const full = path.join(dir, e.name);
     if (e.isDirectory()) walk(full, out);
     else if (e.name.endsWith('.js')) out.push(full);
@@ -73,7 +78,7 @@ function stripComments(src) {
 const jsRoot  = new URL('../js/', import.meta.url).pathname;
 const offenders = [];
 for (const file of walk(jsRoot)) {
-  const lines = stripComments(fs.readFileSync(file, 'utf8')).split('\n');
+  const lines = stripComments(fs.readFileSync(_gatePath(file), 'utf8')).split('\n');
   lines.forEach((line, i) => {
     if (!/Personal/.test(line)) return;
     if (ALLOWED.test(line)) return;

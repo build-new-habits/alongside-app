@@ -23,6 +23,19 @@
  */
 import fs from "node:fs";
 
+// GATE-PATH, 08 Sep 2026. Paths resolved from import.meta.url, not the
+// working directory.
+//
+// 72 of 139 gates read files by a path relative to process.cwd(), so
+// they were green from the repo root and read NOTHING from anywhere
+// else. Not a live fault -- every session so far has run them from the
+// root -- but an expensive trap: a session running the suite by full
+// path from elsewhere sees most of it red and reasonably concludes the
+// app is broken.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
+
 const BANNED = [
   ["sits with you",          "therapy register - try 'how do you feel about that'"],
   ["sit with that",          "instructs somebody what to do with a feeling"],
@@ -86,18 +99,18 @@ const EXEMPT = [
 ];
 
 const FILES = [
-  ...fs.readdirSync("js/data").filter(f => f.endsWith(".js")).map(f => `js/data/${f}`),
+  ...fs.readdirSync(_gatePath("js/data")).filter(f => f.endsWith(".js")).map(f => `js/data/${f}`),
   // C1: the exercise library is where the presumed-clinician copy lived.
-  ...fs.readdirSync("js/data/exercises").filter(f => f.endsWith(".js")).map(f => `js/data/exercises/${f}`),
-  ...fs.readdirSync("js/views").filter(f => f.endsWith(".js")).map(f => `js/views/${f}`),
-  ...fs.readdirSync("js/views/onboarding").filter(f => f.endsWith(".js")).map(f => `js/views/onboarding/${f}`),
+  ...fs.readdirSync(_gatePath("js/data/exercises")).filter(f => f.endsWith(".js")).map(f => `js/data/exercises/${f}`),
+  ...fs.readdirSync(_gatePath("js/views")).filter(f => f.endsWith(".js")).map(f => `js/views/${f}`),
+  ...fs.readdirSync(_gatePath("js/views/onboarding")).filter(f => f.endsWith(".js")).map(f => `js/views/onboarding/${f}`),
 ];
 
 let fails = 0;
 const found = [];
 
 for (const f of FILES) {
-  let src = fs.readFileSync(f, "utf8");
+  let src = fs.readFileSync(_gatePath(f), "utf8");
   // Comments are working notes and legitimately quote the phrases they ban.
   src = src.replace(/\/\*[\s\S]*?\*\//g, m => "\n".repeat((m.match(/\n/g) || []).length))
            .replace(/^\s*\/\/[^\n]*$/gm, "");
@@ -142,8 +155,8 @@ if (uniq.length) {
 // The failure mode to guard is not a bad line -- it is a pool quietly
 // shrinking back to one, which nothing else would ever notice.
 {
-  const sb  = fs.readFileSync("js/session-builder.js", "utf8");
-  const sr  = fs.readFileSync("js/data/session-rationale.js", "utf8");
+  const sb  = fs.readFileSync(_gatePath("js/session-builder.js"), "utf8");
+  const sr  = fs.readFileSync(_gatePath("js/data/session-rationale.js"), "utf8");
   let poolFails = 0;
 
   const poolCheck = (label, src, name, min) => {

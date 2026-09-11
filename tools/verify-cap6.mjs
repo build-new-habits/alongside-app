@@ -41,6 +41,19 @@ try {
 const { store }        = await import("../js/store.js");
 const { buildSession } = await import("../js/session-builder.js");
 
+// GATE-PATH, 08 Sep 2026. Paths resolved from import.meta.url, not the
+// working directory.
+//
+// 72 of 139 gates read files by a path relative to process.cwd(), so
+// they were green from the repo root and read NOTHING from anywhere
+// else. Not a live fault -- every session so far has run them from the
+// root -- but an expensive trap: a session running the suite by full
+// path from elsewhere sees most of it red and reasonably concludes the
+// app is broken.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
+
 let fails = 0;
 const check = (name, fn) => {
   try { fn(); console.log(`  PASS  ${name}`); }
@@ -81,7 +94,7 @@ const NEVER_ASKED  = { chairRise: null, floorAccess: null, bothFeet: null,
 console.log("\nCAP-6 — the library is tagged");
 
 check("every seated entry carries adaptive: true", () => {
-  const src = fs.readFileSync("js/data/exercises/seated.js", "utf8");
+  const src = fs.readFileSync(_gatePath("js/data/exercises/seated.js"), "utf8");
   const ids  = (src.match(/\bid: '/g) || []).length;
   const tags = (src.match(/adaptive: true/g) || []).length;
   ok(tags >= ids,
@@ -126,7 +139,7 @@ check("silence is never read as capability", () => {
   // at full weight. Same fail-safe direction as every other gate: the
   // cost of being wrong here is a capable person seeing a seated warm-up;
   // the cost the other way is somebody who needs it not being offered it.
-  const src = fs.readFileSync("js/session-builder.js", "utf8");
+  const src = fs.readFileSync(_gatePath("js/session-builder.js"), "utf8");
   // 13 Aug 2026: was fn.slice(0, 500) — a fixed character window that
   // broke the moment the function gained a comment explaining itself.
   // The assertion stayed true; the gate stopped being able to see it.
@@ -146,7 +159,7 @@ check("silence is never read as capability", () => {
 console.log("\nCAP-6 — the reserved cardio slot obeys the same rules");
 
 check("the warm-up pulse slot does not shadow pickFrom", () => {
-  const src = fs.readFileSync("js/session-builder.js", "utf8");
+  const src = fs.readFileSync(_gatePath("js/session-builder.js"), "utf8");
   ok(!/const pickFrom = machine\.length/.test(src),
      "the reserved cardio-warmup slot declares `const pickFrom`, shadowing the " +
      "selector function of the same name. That shadow is why the bypass read " +

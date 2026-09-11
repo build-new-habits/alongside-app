@@ -58,17 +58,30 @@ store.init();
 const { resolveEquipment } = await import(__REPO + "/js/data/equipment-map.js");
 const { EXERCISES, filterByEquipment } = await import(__REPO + "/js/data/exercises/index.js");
 
+// GATE-PATH, 08 Sep 2026. Paths resolved from import.meta.url, not the
+// working directory.
+//
+// 72 of 139 gates read files by a path relative to process.cwd(), so
+// they were green from the repo root and read NOTHING from anywhere
+// else. Not a live fault -- every session so far has run them from the
+// root -- but an expensive trap: a session running the suite by full
+// path from elsewhere sees most of it red and reasonably concludes the
+// app is broken.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
+
 let fails = 0;
 const check = (n, fn) => { try { fn(); console.log("  PASS  " + n); }
   catch (e) { fails++; console.log("  FAIL  " + n + "\n        " + e.message); } };
 const ok = (c, m) => { if (!c) throw new Error(m); };
 
 // ── Everything read from source, nothing typed ────────────────────────
-const catSrc = fs.readFileSync("js/data/equipment.js", "utf8");
+const catSrc = fs.readFileSync(_gatePath("js/data/equipment.js"), "utf8");
 const CATALOGUE = [...catSrc.matchAll(/\{\s*id:\s*'([a-z0-9-]+)',\s*name:\s*'([^']+)'/g)]
   .map(m => ({ id: m[1], name: m[2] }));
 
-const sbSrc = fs.readFileSync("js/views/session-builder-ui.js", "utf8");
+const sbSrc = fs.readFileSync(_gatePath("js/views/session-builder-ui.js"), "utf8");
 const OPTIONS = [...sbSrc.matchAll(/\{ id: "([a-z-]+)",\s+label: "([^"]+)" \}/g)]
   .map(m => ({ id: m[1], label: m[2] }));
 
@@ -195,7 +208,7 @@ check("owning nothing still leaves bodyweight work", () => {
 
 console.log("\nLINK 7 - one map, one vocabulary");
 check("only one equipment map file exists", () => {
-  const maps = fs.readdirSync("js/data").filter(f => /equipment.*map/i.test(f));
+  const maps = fs.readdirSync(_gatePath("js/data")).filter(f => /equipment.*map/i.test(f));
   ok(maps.length === 1, `${maps.length}: ${maps.join(", ")}`);
 });
 check("every consumer resolves before comparing", () => {
@@ -204,7 +217,7 @@ check("every consumer resolves before comparing", () => {
     ["js/data/exercises/index.js", "exercises/index"],
     ["js/views/session-builder-ui.js", "session-builder-ui"],
   ]) {
-    const s = fs.readFileSync(f, "utf8");
+    const s = fs.readFileSync(_gatePath(f), "utf8");
     ok(/resolveEquipment\(/.test(s), `${label} compares raw ids`);
   }
 });

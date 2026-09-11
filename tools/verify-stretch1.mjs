@@ -21,6 +21,19 @@ import { matchCategory } from "../js/data/session-categories.js";
 import { SESSION_TYPES } from "../js/session-builder.js";
 import fs from "node:fs";
 
+// GATE-PATH, 08 Sep 2026. Paths resolved from import.meta.url, not the
+// working directory.
+//
+// 72 of 139 gates read files by a path relative to process.cwd(), so
+// they were green from the repo root and read NOTHING from anywhere
+// else. Not a live fault -- every session so far has run them from the
+// root -- but an expensive trap: a session running the suite by full
+// path from elsewhere sees most of it red and reasonably concludes the
+// app is broken.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
+
 let fails = 0;
 const check = (n, fn) => { try { fn(); console.log("  PASS  " + n); }
   catch (e) { fails++; console.log("  FAIL  " + n + "\n        " + e.message); } };
@@ -133,7 +146,7 @@ check("4b. no two main categories are near-duplicates", () => {
 });
 
 check("4c. stretch declares its own shape so the presets cannot invert it", () => {
-  const src = fs.readFileSync("js/session-builder.js", "utf8");
+  const src = fs.readFileSync(_gatePath("js/session-builder.js"), "utf8");
   ok(/const TYPE_COUNTS\s*=/.test(src), "no per-type counts; the presets set the shape alone");
   const at = src.indexOf("const TYPE_COUNTS");
   const block = src.slice(at, src.indexOf("};", at));

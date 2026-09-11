@@ -43,6 +43,19 @@ Object.defineProperty(globalThis, 'localStorage', { value: dom.window.localStora
 const BASE = new URL('../js/', import.meta.url).href;
 const { store }  = await import(BASE + 'store.js');
 const { router } = await import(BASE + 'router.js');
+
+// GATE-PATH, 08 Sep 2026. Paths resolved from import.meta.url, not the
+// working directory.
+//
+// 72 of 139 gates read files by a path relative to process.cwd(), so
+// they were green from the repo root and read NOTHING from anywhere
+// else. Not a live fault -- every session so far has run them from the
+// root -- but an expensive trap: a session running the suite by full
+// path from elsewhere sees most of it red and reasonably concludes the
+// app is broken.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
 globalThis.router = router;
 dom.window.router = router;
 
@@ -99,15 +112,15 @@ check('a view that throws on the way out does not block the navigation',
 // The inverse assertion, and the one that would have caught the
 // original fault. A view exporting onUnmount is making a claim about
 // cleanup; if the router cannot reach it, the claim is false.
-const routerSrc = fs.readFileSync('js/router.js', 'utf8');
+const routerSrc = fs.readFileSync(_gatePath('js/router.js'), 'utf8');
 check('navigate() reaches onUnmount through the view cache',
   /viewCache\[this\.currentView\]/.test(routerSrc) && /onUnmount\(\)/.test(routerSrc),
   'read from the cache, not from a local that may be empty');
 
-const exporters = fs.readdirSync('js/views')
+const exporters = fs.readdirSync(_gatePath('js/views'))
   .filter(f => f.endsWith('.js'))
   .filter(f => /export function onUnmount|export const onUnmount/
-    .test(fs.readFileSync(path.join('js/views', f), 'utf8')));
+    .test(fs.readFileSync(_gatePath(path.join('js/views', f)), 'utf8')));
 check('every view exporting onUnmount is registered in the router',
   exporters.every(f => routerSrc.includes(`views/${f}`)),
   exporters.join(', ') || 'none export one');

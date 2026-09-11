@@ -1,5 +1,5 @@
 /**
- * tools/contrast-check.mjs
+ * tools/verify-verify-contrast-check.mjs
  * 12 Aug 2026 v2
  *
  * v2 - SCHEME-1. Runs the full matrix against all three schemes (dark,
@@ -12,11 +12,24 @@
  * -- never a restatement of them -- and asserts every text token clears
  * WCAG 2.2 AA against every surface token it can land on.
  *
- * Exits 1 on any failure, so it can gate a commit like schema-check.mjs.
+ * Exits 1 on any failure, so it can gate a commit like verify-schema-check.mjs.
  */
 import fs from "node:fs";
 
-const src = fs.readFileSync("css/base/variables.css", "utf8");
+// GATE-PATH, 08 Sep 2026. Paths resolved from import.meta.url, not the
+// working directory.
+//
+// 72 of 139 gates read files by a path relative to process.cwd(), so
+// they were green from the repo root and read NOTHING from anywhere
+// else. Not a live fault -- every session so far has run them from the
+// root -- but an expensive trap: a session running the suite by full
+// path from elsewhere sees most of it red and reasonably concludes the
+// app is broken.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
+
+const src = fs.readFileSync(_gatePath("css/base/variables.css"), "utf8");
 
 // SCHEME-1. Three palettes now, not one, and every pairing in each must
 // clear AA. A scheme that only LOOKS fine is exactly how the removed

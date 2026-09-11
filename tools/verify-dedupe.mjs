@@ -43,6 +43,19 @@ const { store }        = await import("../js/store.js");
 const { buildSession } = await import("../js/session-builder.js");
 const { EXERCISES }    = await import("../js/data/exercises/index.js");
 
+// GATE-PATH, 08 Sep 2026. Paths resolved from import.meta.url, not the
+// working directory.
+//
+// 72 of 139 gates read files by a path relative to process.cwd(), so
+// they were green from the repo root and read NOTHING from anywhere
+// else. Not a live fault -- every session so far has run them from the
+// root -- but an expensive trap: a session running the suite by full
+// path from elsewhere sees most of it red and reasonably concludes the
+// app is broken.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
+
 let fails = 0;
 const check = (name, fn) => {
   try { fn(); console.log(`  PASS  ${name}`); }
@@ -80,12 +93,12 @@ check("nothing references a retired id", () => {
     "cardio-shadow-boxing", "seated-band-row", "hip-flexor-sofa-stretch",
     "breathing-478", "gym-hip-thrust-barbell", "ab-wheel-rollout",
     "world-greatest-stretch", "romanian-deadlift"];
-  const walk = d => fs.readdirSync(d, { withFileTypes: true })
+  const walk = d => fs.readdirSync(_gatePath(d), { withFileTypes: true })
     .flatMap(e => e.isDirectory() ? walk(`${d}/${e.name}`) : [`${d}/${e.name}`]);
   const files = walk("js").filter(f => f.endsWith(".js") && !f.includes("data/exercises"));
   const hits = [];
   for (const f of files) {
-    const s = fs.readFileSync(f, "utf8");
+    const s = fs.readFileSync(_gatePath(f), "utf8");
     for (const r of RETIRED)
       if (new RegExp(`["']${r}["']`).test(s)) hits.push(`${f} -> ${r}`);
   }
@@ -121,7 +134,7 @@ check("no session repeats a name, across 7 types x 4 builds", () => {
 });
 
 check("the name guard is present in selection", () =>
-  ok(/usedNames/.test(fs.readFileSync("js/session-builder.js", "utf8")),
+  ok(/usedNames/.test(fs.readFileSync(_gatePath("js/session-builder.js"), "utf8")),
      "pickFrom() no longer filters on name. `chosen` is a Set of IDS, so " +
      "identity is checked by id while the person reads the name — three " +
      "legitimate same-movement pairs remain by design and this is what " +

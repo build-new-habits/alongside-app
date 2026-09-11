@@ -203,14 +203,19 @@ check("floors only delay, never accelerate", () => {
 });
 
 console.log("\nTEST 8 - reflect.js wiring");
-const reflect = fs.readFileSync("js/views/reflect.js", "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
+
+// GATE-PATH, 08 Sep 2026. Resolved from import.meta.url, not the cwd.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
+const reflect = fs.readFileSync(_gatePath("js/views/reflect.js"), "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
 check("fireEmpathyPrompt persists empathyLastPrompt", () =>
   ok(/store\.set\("empathyLastPrompt"/.test(reflect),
      "without this the repeat cap can never trigger"));
 check("modulo selection is gone", () =>
   ok(!/atStage % pool\.length/.test(reflect), "old rotation still present"));
 check("store.js declares empathyLastPrompt", () =>
-  ok(fs.readFileSync("js/store.js", "utf8").includes("empathyLastPrompt:"),
+  ok(fs.readFileSync(_gatePath("js/store.js"), "utf8").includes("empathyLastPrompt:"),
      "reader without a writer, again"));
 check("reflect.js passes atStage into the matcher", () =>
   ok(/selectEmpathyPrompt\(stageNum, ctx, lastFired, atStage\)/.test(reflect),
