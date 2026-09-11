@@ -1,6 +1,13 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
+ * 11 Sep 2026 v50
+ *
+ * v50 - PROPOSAL-3. todayIntensity finally has a reader here. A low-energy
+ *   day builds a smaller working section and a longer settle, and the
+ *   coach says so. Downward only: "high" adds nothing. See
+ *   _applyTodayIntensity() and verify-proposal3.
+ *
  * 08 Sep 2026 v49
  *
  * v49 - LOCATION-1. equipmentForLocation(): the one answer to "what kit
@@ -926,6 +933,50 @@ export const ALLOCATION_PRESETS = [
   { id: "strength", label: "Mostly strength",  description: "Less warm-up and stretching, more work.", warmupMult: 0.6, mainMult: 1.3, cooldownMult: 0.7 },
   { id: "mobility", label: "Mostly mobility",  description: "More warm-up and stretching, less load.", warmupMult: 1.5, mainMult: 0.7, cooldownMult: 1.4 }
 ];
+
+/**
+ * PROPOSAL-3, 11 Sep 2026. Today's answer reaches the shape of the session.
+ *
+ * WHAT WAS BROKEN. Energy 2/10 and mood 3/10 on a free account produced
+ * Glute Focus, 25-35 minutes, ten movements, described as loading the
+ * posterior chain progressively. Reproduced exactly before anything was
+ * changed: check-in wrote todayIntensity "low" from the energy score, the
+ * proposal screen overwrote it with the free tier's constant "moderate"
+ * before building, and this file never read the field at all. So a
+ * low-energy day and a good one built the identical session, and the
+ * screen a person meets on their worst day is the screen this product is
+ * entirely about.
+ *
+ * DOWNWARD ONLY, deliberately, matching WRITE-1's rule in data/checkin.js.
+ * A high-intensity programme week cannot add work on a day somebody has
+ * told us is hard. "high" and "moderate" therefore change nothing here --
+ * this function can only ever take work away.
+ *
+ * WHAT IT DOES NOT TOUCH.
+ *   - The duration they asked for. They said how long they have; it is not
+ *     this file's place to shorten their time because they are tired.
+ *   - The warm-up. It is the gentle, protective part of the session, and
+ *     taking it away on a hard day would be exactly backwards.
+ *   - The difficulty ceiling. Capping how hard the individual movements
+ *     may be on a low day is a real question and a bigger one; it is
+ *     logged, not decided here.
+ *
+ * The cool-down gains one. A shorter working section with a longer settle
+ * is the shape, not simply less session.
+ */
+function _todayIntensity() {
+  const v = store.get("todayIntensity");
+  return (v === "low" || v === "moderate" || v === "high") ? v : null;
+}
+
+function _applyTodayIntensity(counts) {
+  if (_todayIntensity() !== "low") return counts;
+  return {
+    warmup:   counts.warmup,
+    main:     Math.max(2, Math.round(counts.main * 0.6)),
+    cooldown: counts.cooldown + 1
+  };
+}
 
 function _applyPreset(counts, presetId) {
   const preset = ALLOCATION_PRESETS.find(p => p.id === presetId) || ALLOCATION_PRESETS[0];
@@ -2980,7 +3031,15 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
   const userEquipment  = equipmentOverride || store.get("equipment") || [];
   const equipSet       = resolveEquipment(userEquipment);
   const conditionSet   = buildActiveConditionSet();
-  const counts         = _applyPreset(_baseCounts(durationMins, sessionType) || EXERCISE_COUNT[30], preset);
+  // PROPOSAL-3. The intensity step runs AFTER the preset. The two are
+  // multiplicative, so they commute almost everywhere and the order looks
+  // arbitrary -- the reversal of this line passed the first draft of
+  // verify-proposal3 for exactly that reason. What the order actually buys
+  // is the FLOOR: _applyTodayIntensity's Math.max(2, ...) is the last word,
+  // so "mostly mobility" at 15 minutes cannot take a low day down to a
+  // single working movement, which the other order allows through
+  // _applyPreset's own floor of one. verify-proposal3 test 6a holds it.
+  const counts         = _applyTodayIntensity(_applyPreset(_baseCounts(durationMins, sessionType) || EXERCISE_COUNT[30], preset));
   const conditionNote  = buildConditionNote(sessionType);
 
   // ── Prescribed exercises injection ──────────────────────────────────────────
@@ -3554,6 +3613,17 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
     equipNote = "With your equipment today I've built the best session I can. Some categories have limited options — focus on the movements you have.";
   }
 
+  // PROPOSAL-3. P1: the coach never withholds what it can see. A session
+  // quietly made smaller is the same fault as an exclusion applied
+  // silently -- the person told us something and is owed the connection.
+  // WORDING NOT YET APPROVED BY GRAEME. Voice is the product and coach
+  // lines are his; this follows the pattern of equipNote and
+  // prescribedNote, which are written in this file, but it should be read
+  // before beta.
+  const lowEnergyNote = _todayIntensity() === "low"
+    ? "You told me your energy is low today, so there is less of the working part and a longer settle at the end. Easing off is the useful thing to do here, not a compromise."
+    : null;
+
   // Build prescribed note for coach line
   let prescribedNote = null;
   if (hasPrescribed) {
@@ -3570,7 +3640,7 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
     durationMins,
     Array.from(conditionSet),
     userEquipment,
-    [conditionNote, equipNote, prescribedNote].filter(Boolean).join(" ") || null
+    [conditionNote, lowEnergyNote, equipNote, prescribedNote].filter(Boolean).join(" ") || null
   );
 
   // Calculate estimated duration

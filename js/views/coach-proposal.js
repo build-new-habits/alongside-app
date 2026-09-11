@@ -1,5 +1,12 @@
 /**
  * coach-proposal.js
+ * 11 Sep 2026 v26
+ *
+ * v26 - PROPOSAL-3. The phase bias may no longer overwrite what the
+ *   check-in said. On free it is the constant "moderate", so an energy
+ *   score of 2 wrote "low" and this screen replaced it seconds later,
+ *   before building. The gentler of the two now wins.
+ *
  * 08 Sep 2026 v25
  *
  * v25 - LOCATION-1. One to one asked where you are, and let you say.
@@ -1479,6 +1486,28 @@ export function CoachProposalView(router) {
     // (renderGentlerOffer below), and the step down is applied only if
     // it is accepted.
     let effectiveIntensity = phaseBias.intensityBias;
+
+    // PROPOSAL-3, 11 Sep 2026. The phase bias may not raise today above
+    // what the person just told us.
+    //
+    // _generateOptions() writes this value to todayIntensity on every
+    // mount of this screen. On free, getPhaseBias() is the constant
+    // { intensityBias: "moderate" } -- so check-in wrote "low" from an
+    // energy score of 2, and this screen overwrote it with "moderate"
+    // seconds later, before building. Reproduced on a bare account before
+    // the fix: energy 2/10, mood 3/10, and the session offered was Glute
+    // Focus, ten movements.
+    //
+    // The gentler of the two wins. A programme week that says "low" still
+    // lowers a good day; a week that says "high" cannot add work to a hard
+    // one. Same downward-only rule as WRITE-1 and _applyTodayIntensity().
+    const INTENSITY_RANK   = { low: 0, moderate: 1, high: 2 };
+    const checkinIntensity = store.get('todayIntensity');
+    if (checkinIntensity in INTENSITY_RANK &&
+        INTENSITY_RANK[checkinIntensity] < (INTENSITY_RANK[effectiveIntensity] ?? 1)) {
+      effectiveIntensity = checkinIntensity;
+    }
+
     if (reEntryCtx?.needsGentlerStart) {
       effectiveIntensity = getReEntryIntensity(reEntryCtx.context, effectiveIntensity);
     } else if (reEntryCtx?.offersGentlerStart && gentlerAccepted) {
