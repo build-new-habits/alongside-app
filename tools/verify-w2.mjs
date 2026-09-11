@@ -30,6 +30,19 @@ Object.defineProperty(globalThis, 'localStorage',
 
 const BASE = new URL('../js/', import.meta.url).href;
 const { store } = await import(BASE + 'store.js');
+
+// GATE-PATH, 08 Sep 2026. Paths resolved from import.meta.url, not the
+// working directory.
+//
+// 72 of 139 gates read files by a path relative to process.cwd(), so
+// they were green from the repo root and read NOTHING from anywhere
+// else. Not a live fault -- every session so far has run them from the
+// root -- but an expensive trap: a session running the suite by full
+// path from elsewhere sees most of it red and reasonably concludes the
+// app is broken.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
 const ci  = await import(BASE + 'data/checkin.js');
 const sb  = await import(BASE + 'session-builder.js');
 const ex  = await import(BASE + 'data/exercises/index.js');
@@ -88,8 +101,8 @@ for (const [level, ceiling] of Object.entries(CEILINGS)) {
 // bias must reflect TODAY, and yesterday's answer must not survive into
 // today. A derived value satisfies that by construction, so the test is
 // that nothing stores it at all.
-const chkSrc = readFileSync('js/data/checkin.js', 'utf8');
-const genSrc = readFileSync('js/data/workoutGenerator.js', 'utf8');
+const chkSrc = readFileSync(_gatePath('js/data/checkin.js'), 'utf8');
+const genSrc = readFileSync(_gatePath('js/data/workoutGenerator.js'), 'utf8');
 
 check('W2-2 the bias is derived, so it cannot go stale',
   /export function coachBias\(/.test(chkSrc),

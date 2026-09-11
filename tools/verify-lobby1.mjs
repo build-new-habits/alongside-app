@@ -26,6 +26,19 @@
  */
 import fs from "node:fs";
 
+// GATE-PATH, 08 Sep 2026. Paths resolved from import.meta.url, not the
+// working directory.
+//
+// 72 of 139 gates read files by a path relative to process.cwd(), so
+// they were green from the repo root and read NOTHING from anywhere
+// else. Not a live fault -- every session so far has run them from the
+// root -- but an expensive trap: a session running the suite by full
+// path from elsewhere sees most of it red and reasonably concludes the
+// app is broken.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
+
 let fails = 0;
 const check = (n, fn) => { try { fn(); console.log("  PASS  " + n); }
   catch (e) { fails++; console.log("  FAIL  " + n + "\n        " + e.message); } };
@@ -33,8 +46,8 @@ const ok = (c, m) => { if (!c) throw new Error(m); };
 const strip = t => t
   .replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "").replace(/<!--[\s\S]*?-->/g, "");
 
-const today = strip(fs.readFileSync("js/views/today.js", "utf8"));
-const css   = fs.readFileSync("css/layouts/today.css", "utf8");
+const today = strip(fs.readFileSync(_gatePath("js/views/today.js"), "utf8"));
+const css   = fs.readFileSync(_gatePath("css/layouts/today.css"), "utf8");
 
 const doors = [...today.matchAll(/\{\s*kind:\s*'(session|reference)',\s*id:\s*'([a-z-]+)'[\s\S]{0,200}?requiresCheckin:\s*(true|false)/g)]
   .map(m => ({ kind: m[1], id: m[2], checkin: m[3] === "true" }));
@@ -126,7 +139,7 @@ check("6a. Home shows no session count and no weekly target", () => {
   ok(!today.includes("today-week-count__number"),
      "the week counter is back on Home. A bare count is still a score, and the lobby is " +
      "where somebody arrives, not where they are marked.");
-  const mp = strip(fs.readFileSync("js/views/my-programme.js", "utf8"));
+  const mp = strip(fs.readFileSync(_gatePath("js/views/my-programme.js"), "utf8"));
   ok(!/aim for \$\{[^}]*weeklySessionTarget/.test(mp),
      "My Programme displays a weekly session target again");
 });
@@ -196,7 +209,7 @@ check("7e. the offer sits above the reference rows", () => {
 console.log("\nTEST 8 - unlit is not failed");
 
 check("8. an untouched strand does not read as disabled", () => {
-  const css = fs.readFileSync("css/layouts/today.css", "utf8");
+  const css = fs.readFileSync(_gatePath("css/layouts/today.css"), "utf8");
   const at = css.indexOf(".today-arc__strand {");
   ok(at > -1, "no strand styling");
   const rule = css.slice(at, css.indexOf("}", at));
@@ -209,7 +222,7 @@ check("8. an untouched strand does not read as disabled", () => {
 console.log("\nTEST 9 - My Programme shows the arc when there is one");
 
 check("9. the aim replaces the goal list", () => {
-  const mp = strip(fs.readFileSync("js/views/my-programme.js", "utf8"));
+  const mp = strip(fs.readFileSync(_gatePath("js/views/my-programme.js"), "utf8"));
   ok(mp.includes("aimById"), "My Programme cannot read the arc");
   // Anchor on the DEFINITION, not the first mention. The bare name
   // matched the call site 40 lines earlier and measured the wrong
@@ -301,7 +314,7 @@ check("10c. the invitation routes through the check-in only when one is owed", (
 console.log("\nTEST 11 - the session space keeps the escape");
 
 check("11. sessions are reachable, below the suggestion", () => {
-  const cp = strip(fs.readFileSync("js/views/coach-proposal.js", "utf8"));
+  const cp = strip(fs.readFileSync(_gatePath("js/views/coach-proposal.js"), "utf8"));
   // Count them: one button removed still leaves three, and the naive
   // presence check passed.
   const escapes = (cp.match(/data-else="/g) || []).length;

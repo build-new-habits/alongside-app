@@ -40,6 +40,19 @@ globalThis.localStorage = {
   removeItem: k => { delete mem[k]; },
 };
 const { store } = await import(__REPO + "/js/store.js");
+
+// GATE-PATH, 08 Sep 2026. Paths resolved from import.meta.url, not the
+// working directory.
+//
+// 72 of 139 gates read files by a path relative to process.cwd(), so
+// they were green from the repo root and read NOTHING from anywhere
+// else. Not a live fault -- every session so far has run them from the
+// root -- but an expensive trap: a session running the suite by full
+// path from elsewhere sees most of it red and reasonably concludes the
+// app is broken.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
 store.init();
 
 let fails = 0;
@@ -72,7 +85,7 @@ check("junk in resolves to empty, not a crash", () => {
 console.log("\nTEST 2 - every surface uses it");
 for (const [f, label] of [["js/views/today.js", "Home"], ["js/views/progress.js", "Progress"]])
   check(`${label} counts completions only`, () => {
-    const s = fs.readFileSync(f, "utf8");
+    const s = fs.readFileSync(_gatePath(f), "utf8");
     ok(/store\.completedSessions\(/.test(s), "still counting raw activityLog");
     // E2, 13 Aug 2026. This was `ok(via >= 2, ...)` -- a FLOOR, asserting
     // that at least two reads were compliant rather than that all were.
@@ -94,15 +107,15 @@ for (const [f, label] of [["js/views/today.js", "Home"], ["js/views/progress.js"
        "clinician -- must come from one rule");
   });
 check("Home and Progress agree by construction", () => {
-  const a = fs.readFileSync("js/views/today.js", "utf8");
-  const b = fs.readFileSync("js/views/progress.js", "utf8");
+  const a = fs.readFileSync(_gatePath("js/views/today.js"), "utf8");
+  const b = fs.readFileSync(_gatePath("js/views/progress.js"), "utf8");
   ok(/completedSessions/.test(a) && /completedSessions/.test(b),
      "if either counts differently the two screens disagree again");
 });
 
 console.log("\nTEST 2b - the empathy arc counts real sessions only");
 check("reflect.js getSessionCount excludes partials", () => {
-  const s = fs.readFileSync("js/views/reflect.js", "utf8");
+  const s = fs.readFileSync(_gatePath("js/views/reflect.js"), "utf8");
   const fn = s.slice(s.indexOf("function getSessionCount"), s.indexOf("// EMP-1 thresholds"));
   ok(/completedSessions/.test(fn),
      "a session opened and abandoned moved somebody toward their next empathy " +
@@ -112,7 +125,7 @@ check("reflect.js getSessionCount excludes partials", () => {
 
 console.log("\nTEST 3 - partials are still RECORDED, just not counted");
 check("nothing filters partials out of activityLog itself", () => {
-  const s = fs.readFileSync("js/store.js", "utf8");
+  const s = fs.readFileSync(_gatePath("js/store.js"), "utf8");
   ok(!/activityLog.*filter.*status !== 'partial'/.test(s),
      "a partial is a real record - it is how the app knows you started, " +
      "and continuity reads it. It is just not a session you did");

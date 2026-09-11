@@ -36,10 +36,23 @@
  */
 import fs from "node:fs";
 
+// GATE-PATH, 08 Sep 2026. Paths resolved from import.meta.url, not the
+// working directory.
+//
+// 72 of 139 gates read files by a path relative to process.cwd(), so
+// they were green from the repo root and read NOTHING from anywhere
+// else. Not a live fault -- every session so far has run them from the
+// root -- but an expensive trap: a session running the suite by full
+// path from elsewhere sees most of it red and reasonably concludes the
+// app is broken.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
+
 const strip = s => s.replace(/\/\*[\s\S]*?\*\//g, "")
                     .replace(/<!--[\s\S]*?-->/g, "")
                     .replace(/^\s*\/\/[^\n]*$/gm, "");
-const read = f => strip(fs.readFileSync(f, "utf8"));
+const read = f => strip(fs.readFileSync(_gatePath(f), "utf8"));
 
 let fails = 0;
 const check = (name, fn) => {
@@ -221,12 +234,12 @@ check("no tier check reaches exercise selection", () => {
 console.log("\nTIER-F — one destination, one name");
 
 check("Wellbeing is called Wellbeing everywhere a user can read it", () => {
-  const html = fs.readFileSync("index.html", "utf8")
+  const html = fs.readFileSync(_gatePath("index.html"), "utf8")
                  .replace(/<!--[\s\S]*?-->/g, "");
   ok(!/<span class="nav-label">Noticing<\/span>/.test(html),
      "the bottom-nav tab still says 'Noticing' while the Home door says " +
      "'Wellbeing' — same route, two names, reads as two features");
-  const noticing = fs.readFileSync("js/views/noticing.js", "utf8");
+  const noticing = fs.readFileSync(_gatePath("js/views/noticing.js"), "utf8");
   ok(!/<h1 class="sr-only">Noticing<\/h1>/.test(noticing),
      "the screen-reader heading still says 'Noticing'. A sighted user never " +
      "sees it, which is how it drifted — but it is the first thing a screen " +
@@ -326,18 +339,18 @@ console.log("\nORIENT-1 — Home reads what the person told onboarding");
 check("the orientation line uses real goal ids", () => {
   // Five times on this project an invented-but-plausible id has silently
   // produced wrong behaviour. These are checked against the live list.
-  const src = fs.readFileSync("js/views/today.js", "utf8");
+  const src = fs.readFileSync(_gatePath("js/views/today.js"), "utf8");
   const m = src.match(/WELLBEING_GOALS = new Set\(\[([\s\S]*?)\]\)/);
   ok(m, "WELLBEING_GOALS is gone — Home no longer reads goals at all");
   const used = [...m[1].matchAll(/'([a-z-]+)'/g)].map(x => x[1]);
-  const real = fs.readFileSync("js/data/goals.js", "utf8");
+  const real = fs.readFileSync(_gatePath("js/data/goals.js"), "utf8");
   const bad = used.filter(g => !new RegExp(`id: '${g}'`).test(real));
   ok(bad.length === 0,
      `goal id(s) that do not exist in js/data/goals.js: ${bad.join(", ")}`);
 });
 
 check("orientation stops once somebody has found their way", () => {
-  const src = fs.readFileSync("js/views/today.js", "utf8");
+  const src = fs.readFileSync(_gatePath("js/views/today.js"), "utf8");
   ok(/sessionsSoFar < ORIENTATION_SESSIONS/.test(src),
      "the orientation line has no session limit. It is orientation, not a nudge — " +
      "somebody who has been here a fortnight has found the doors, and a coach " +

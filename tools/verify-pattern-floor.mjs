@@ -51,6 +51,19 @@ const reverses = (m, fn) => ok("[reversal] " + m, !fn());
 
 const { EXERCISES } = await import("../js/data/exercises/index.js");
 
+// GATE-PATH, 08 Sep 2026. Paths resolved from import.meta.url, not the
+// working directory.
+//
+// 72 of 139 gates read files by a path relative to process.cwd(), so
+// they were green from the repo root and read NOTHING from anywhere
+// else. Not a live fault -- every session so far has run them from the
+// root -- but an expensive trap: a session running the suite by full
+// path from elsewhere sees most of it red and reasonably concludes the
+// app is broken.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
+
 console.log("\nPATTERN-FLOOR — every pattern offers a real choice on common kit\n");
 
 const COMMON = new Set(["bench", "dumbbell", "resistance-band"]);
@@ -82,7 +95,7 @@ reverses("and not accidentally empty",
 // builder applies. If that filter is ever inverted or dropped, this gate's
 // population silently stops matching what a person is offered.
 const fs = await import("node:fs");
-const sb = fs.readFileSync("js/session-builder.js", "utf8");
+const sb = fs.readFileSync(_gatePath("js/session-builder.js"), "utf8");
 ok("session-builder still excludes rehab entries only where generalPurpose is absent",
   /sourceLibrary\s*===\s*"rehabilitation"\s*&&\s*ex\.generalPurpose\s*!==\s*true/.test(sb));
 

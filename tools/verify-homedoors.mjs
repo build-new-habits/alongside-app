@@ -55,6 +55,19 @@ const { store }      = await import(B + "store.js");
 const { isPremium }  = await import(B + "auth.js");
 const { TodayView }  = await import(B + "views/today.js");
 
+// GATE-PATH, 08 Sep 2026. Paths resolved from import.meta.url, not the
+// working directory.
+//
+// 72 of 139 gates read files by a path relative to process.cwd(), so
+// they were green from the repo root and read NOTHING from anywhere
+// else. Not a live fault -- every session so far has run them from the
+// root -- but an expensive trap: a session running the suite by full
+// path from elsewhere sees most of it red and reasonably concludes the
+// app is broken.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
+
 let fails = 0;
 const ok = (name, cond, detail = "") => {
   console.log(`  ${cond ? "PASS" : "FAIL"}  ${name}`);
@@ -131,7 +144,7 @@ ok("2c. and that engine really does have a stretch type",
    SESSION_TYPES.some(t => t.id === "stretch"),
    `session-builder types: ${SESSION_TYPES.map(t => t.id).join(", ")}`);
 
-const wg = fs.readFileSync("js/data/workoutGenerator.js", "utf8");
+const wg = fs.readFileSync(_gatePath("js/data/workoutGenerator.js"), "utf8");
 ok("2d. and the coach-proposal engine still does not, so the door matters",
    !/getWorkoutName[\s\S]{0,200}stretch/.test(wg),
    "workoutGenerator now has a stretch type. If that is deliberate this " +
@@ -183,7 +196,7 @@ ok("4c. free still gets its fallback",
 // ── 5. THE ESCAPE HATCH OUTRANKS THE MODALS ─────────────────────────────
 console.log("\nTEST 5 - ESCAPE-Z: the way out is on top");
 
-const html = fs.readFileSync("index.html", "utf8");
+const html = fs.readFileSync(_gatePath("index.html"), "utf8");
 const hatchBlock = html.slice(html.indexOf(".hidden-nav-escape {"),
                               html.indexOf("}", html.indexOf(".hidden-nav-escape {")));
 const hatchZ = Number((hatchBlock.match(/z-index:\s*(\d+)/) || [])[1]);
@@ -195,10 +208,10 @@ ok("5a. the escape hatch declares a z-index", Number.isFinite(hatchZ),
 // goes stale the first time something outranks it.
 const allZ = [];
 const files = ["index.html",
-  ...fs.readdirSync("css/components").map(f => `css/components/${f}`),
-  ...fs.readdirSync("css/layouts").map(f => `css/layouts/${f}`)];
+  ...fs.readdirSync(_gatePath("css/components")).map(f => `css/components/${f}`),
+  ...fs.readdirSync(_gatePath("css/layouts")).map(f => `css/layouts/${f}`)];
 for (const f of files) {
-  const src = fs.readFileSync(f, "utf8");
+  const src = fs.readFileSync(_gatePath(f), "utf8");
   for (const m of src.matchAll(/z-index:\s*(\d+)/g)) {
     if (f === "index.html" && Number(m[1]) === hatchZ) continue;
     allZ.push({ f, z: Number(m[1]) });
@@ -211,7 +224,7 @@ ok("5b. and it sits above everything else in the app", hatchZ > highest.z,
    `under a modal again -- the state Graeme met as "I can't exit it back to the home page".`);
 
 // The specific one that caused it, named, so a future reader knows why.
-const cpCss = fs.readFileSync("css/components/coach-proposal.css", "utf8");
+const cpCss = fs.readFileSync(_gatePath("css/components/coach-proposal.css"), "utf8");
 const panelZ = Number((cpCss.slice(cpCss.indexOf(".cp-preview-panel {"))
   .match(/z-index:\s*(\d+)/) || [])[1]);
 ok("5c. specifically above coach-proposal's preview panel", hatchZ > panelZ,

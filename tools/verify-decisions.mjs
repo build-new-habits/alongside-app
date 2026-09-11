@@ -44,11 +44,24 @@
  */
 import fs from "node:fs";
 
+// GATE-PATH, 08 Sep 2026. Paths resolved from import.meta.url, not the
+// working directory.
+//
+// 72 of 139 gates read files by a path relative to process.cwd(), so
+// they were green from the repo root and read NOTHING from anywhere
+// else. Not a live fault -- every session so far has run them from the
+// root -- but an expensive trap: a session running the suite by full
+// path from elsewhere sees most of it red and reasonably concludes the
+// app is broken.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
+
 const strip = s => s.replace(/\/\*[\s\S]*?\*\//g, "")
                     .replace(/<!--[\s\S]*?-->/g, "")
                     .replace(/^\s*\/\/[^\n]*$/gm, "");
-const read = f => strip(fs.readFileSync(f, "utf8"));
-const raw  = f => fs.readFileSync(f, "utf8");
+const read = f => strip(fs.readFileSync(_gatePath(f), "utf8"));
+const raw  = f => fs.readFileSync(_gatePath(f), "utf8");
 
 let fails = 0;
 const check = (decision, source, fn) => {
@@ -158,7 +171,7 @@ check("No view defines its own exercise pool", "Locked Principles P5", () => {
     // safety filter runs.
     "yoga-session.js": 60,
   };
-  for (const f of fs.readdirSync("js/views").filter(x => x.endsWith(".js"))) {
+  for (const f of fs.readdirSync(_gatePath("js/views")).filter(x => x.endsWith(".js"))) {
     const s = read(`js/views/${f}`);
     const inline = (s.match(/\{\s*id:\s*["'][a-z0-9-]+["'],\s*\n?\s*name:/g) || []).length
                  + (s.match(/\{ id: ["'][a-z0-9-]+["'],\s+name:/g) || []).length;
@@ -182,7 +195,7 @@ check("No voice picker is exposed anywhere", "Founding decision, locked permanen
 console.log("\nREADER-WITHOUT-A-WRITER \u2014 the pattern that keeps recurring");
 
 const store = read("js/store.js");
-const allJs = fs.readdirSync("js", { recursive: true })
+const allJs = fs.readdirSync(_gatePath("js"), { recursive: true })
   .filter(f => typeof f === "string" && f.endsWith(".js"))
   .map(f => read(`js/${f}`)).join("\n");
 
@@ -220,7 +233,7 @@ check("Grounding moments never appear on the severe-pain path", "GM-1", () => {
 console.log("\nTIER INTEGRITY \u2014 the bypass is never advertised");
 
 check("No view publishes the developer bypass gesture", "A1, 13 Aug 2026", () => {
-  const views = fs.readdirSync("js/views", { recursive: true })
+  const views = fs.readdirSync(_gatePath("js/views"), { recursive: true })
     .filter(f => typeof f === "string" && f.endsWith(".js"));
 
   // Two distinct rules, and the distinction is the whole check.

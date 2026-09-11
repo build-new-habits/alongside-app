@@ -52,6 +52,19 @@ const { isPremium } = await import(B + "auth.js");
 const SS            = await import(B + "data/saved-sessions.js");
 const SB            = await import(B + "session-builder.js");
 const { TodayView } = await import(B + "views/today.js");
+
+// GATE-PATH, 08 Sep 2026. Paths resolved from import.meta.url, not the
+// working directory.
+//
+// 72 of 139 gates read files by a path relative to process.cwd(), so
+// they were green from the repo root and read NOTHING from anywhere
+// else. Not a live fault -- every session so far has run them from the
+// root -- but an expensive trap: a session running the suite by full
+// path from elsewhere sees most of it red and reasonably concludes the
+// app is broken.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
 const EX            = await import(B + "data/exercises/index.js");
 
 let fails = 0;
@@ -253,7 +266,7 @@ ok("4b-f. and it says why instead",
 // ── 5. THE COACH DOES NOT READ IT ───────────────────────────────────────
 console.log("\nTEST 5 - saving is a decision about a session, not about a person");
 
-const choiceSrc = fs.readFileSync("js/data/session-choice.js", "utf8");
+const choiceSrc = fs.readFileSync(_gatePath("js/data/session-choice.js"), "utf8");
 ok("5a. chooseSessionType does not read savedSessions",
    !/savedSessions/.test(choiceSrc),
    "the coach is treating a saved session as a preference signal. Saving " +
@@ -262,10 +275,10 @@ ok("5a. chooseSessionType does not read savedSessions",
 // ── 6. SCHEMA BEFORE CODE ───────────────────────────────────────────────
 console.log("\nTEST 6 - declared, defaulted, and defended on rehydrate");
 
-const schema = fs.readFileSync("Documents/Live State/Schema.md", "utf8");
+const schema = fs.readFileSync(_gatePath("Documents/Live State/Schema.md"), "utf8");
 ok("6a. savedSessions is in Schema.md", /### `savedSessions`/.test(schema));
 
-const storeSrc = fs.readFileSync("js/store.js", "utf8");
+const storeSrc = fs.readFileSync(_gatePath("js/store.js"), "utf8");
 ok("6b. it has a default", /savedSessions:\s*\[\]/.test(storeSrc));
 ok("6c. and is defended on rehydrate",
    /Array\.isArray\(saved\.savedSessions\)/.test(storeSrc),

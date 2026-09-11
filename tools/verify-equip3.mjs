@@ -35,18 +35,31 @@ globalThis.localStorage = {
 };
 const { resolveEquipment } = await import(__REPO + "/js/data/equipment-map.js");
 
+// GATE-PATH, 08 Sep 2026. Paths resolved from import.meta.url, not the
+// working directory.
+//
+// 72 of 139 gates read files by a path relative to process.cwd(), so
+// they were green from the repo root and read NOTHING from anywhere
+// else. Not a live fault -- every session so far has run them from the
+// root -- but an expensive trap: a session running the suite by full
+// path from elsewhere sees most of it red and reasonably concludes the
+// app is broken.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
+
 let fails = 0;
 const check = (n, fn) => { try { fn(); console.log("  PASS  " + n); }
   catch (e) { fails++; console.log("  FAIL  " + n + "\n        " + e.message); } };
 const ok = (c, m) => { if (!c) throw new Error(m); };
 
 // REAL catalogue — every id somebody can actually tick in Settings.
-const catalogue = fs.readFileSync("js/data/equipment.js", "utf8");
+const catalogue = fs.readFileSync(_gatePath("js/data/equipment.js"), "utf8");
 const CATALOGUE_IDS = [...catalogue.matchAll(/\{ id: '([a-z0-9-]+)', name: '([^']+)'/g)]
   .map(m => ({ id: m[1], name: m[2] }));
 
 // REAL session-screen options.
-const sbSrc = fs.readFileSync("js/views/session-builder-ui.js", "utf8");
+const sbSrc = fs.readFileSync(_gatePath("js/views/session-builder-ui.js"), "utf8");
 const OPTIONS = [...sbSrc.matchAll(/\{ id: "([a-z-]+)",\s+label: "([^"]+)" \}/g)]
   .map(m => ({ id: m[1], label: m[2] }));
 
@@ -150,7 +163,7 @@ check("tick state goes through resolveEquipment", () => {
 console.log("\nTEST 6 - SW-2: install must bypass the HTTP cache");
 // Comments legitimately quote the pattern they are documenting. Third
 // gate today to flag its own change note; strip first, then test.
-const sw = fs.readFileSync("sw.js", "utf8")
+const sw = fs.readFileSync(_gatePath("sw.js"), "utf8")
   .replace(/\/\*[\s\S]*?\*\//g, "")
   .replace(/^\s*\/\/[^\n]*$/gm, "");
 check("shell files are fetched with cache:reload", () => {

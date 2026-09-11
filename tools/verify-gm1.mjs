@@ -27,6 +27,19 @@ globalThis.localStorage = {
   removeItem: k => { delete mem[k]; },
 };
 const { store } = await import(__REPO + "/js/store.js");
+
+// GATE-PATH, 08 Sep 2026. Paths resolved from import.meta.url, not the
+// working directory.
+//
+// 72 of 139 gates read files by a path relative to process.cwd(), so
+// they were green from the repo root and read NOTHING from anywhere
+// else. Not a live fault -- every session so far has run them from the
+// root -- but an expensive trap: a session running the suite by full
+// path from elsewhere sees most of it red and reasonably concludes the
+// app is broken.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
 store.init();
 const GM = await import(__REPO + "/js/data/grounding-moments.js");
 
@@ -145,16 +158,16 @@ check("the same moment never appears twice running", () => {
 });
 
 console.log("\nTEST 6 - wiring");
-const wo = fs.readFileSync("js/views/workout.js", "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
-const sw = fs.readFileSync("sw.js", "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
-const mc = fs.readFileSync("css/main.css", "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
+const wo = fs.readFileSync(_gatePath("js/views/workout.js"), "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
+const sw = fs.readFileSync(_gatePath("sw.js"), "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
+const mc = fs.readFileSync(_gatePath("css/main.css"), "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
 check("workout.js selects once per render", () =>
   ok(/const groundingMoment = selectMoment\(/.test(wo), "would reshuffle on every timer tick"));
 check("workout.js records on mount, not at render", () =>
   ok(/recordMomentShown\(m, sc\)/.test(wo), "a moment never shown would count as seen"));
 check("dismissal is wired", () => ok(/dismissMoment\(m\.id\)/.test(wo), "dismiss does nothing"));
 check("store declares the grounding field", () =>
-  ok(/grounding: \{ lastSession/.test(fs.readFileSync("js/store.js", "utf8")), "reader without a writer, again"));
+  ok(/grounding: \{ lastSession/.test(fs.readFileSync(_gatePath("js/store.js"), "utf8")), "reader without a writer, again"));
 check("stylesheet imported and precached", () => {
   ok(/components\/grounding-moments\.css/.test(mc), "index.html links only main.css");
   ok(/components\/grounding-moments\.css/.test(sw), "offline styling would drop");

@@ -30,10 +30,23 @@ const strip = s => s.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "
 const VIEWS = ["js/views/workout.js", "js/views/prescribed-session.js", "js/views/gym-programme.js"];
 const { resolveTiming, parsePrescribedSeconds, formatTime } = await import("../js/exercise-timing.js");
 
+// GATE-PATH, 08 Sep 2026. Paths resolved from import.meta.url, not the
+// working directory.
+//
+// 72 of 139 gates read files by a path relative to process.cwd(), so
+// they were green from the repo root and read NOTHING from anywhere
+// else. Not a live fault -- every session so far has run them from the
+// root -- but an expensive trap: a session running the suite by full
+// path from elsewhere sees most of it red and reasonably concludes the
+// app is broken.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
+
 console.log("\nTEST 1 - one resolver, no local copies");
 
 for (const f of VIEWS) {
-  const src = strip(fs.readFileSync(f, "utf8"));
+  const src = strip(fs.readFileSync(_gatePath(f), "utf8"));
   check(f + " uses the shared resolver", () => {
     ok(src.includes("resolveTiming("), "does not call resolveTiming");
   });
@@ -45,7 +58,7 @@ for (const f of VIEWS) {
 
 check("no view reads exercise.duration directly for timing", () => {
   for (const f of VIEWS) {
-    const src = strip(fs.readFileSync(f, "utf8"));
+    const src = strip(fs.readFileSync(_gatePath(f), "utf8"));
     ok(!/if\s*\(\s*exercise\.duration\s*\)/.test(src),
        f + " branches on exercise.duration directly, bypassing the resolver");
   }
@@ -84,7 +97,7 @@ check("bird-dog runs for 90 seconds, not 3", () => {
 });
 
 check("the resolver never reads holdSeconds at all", () => {
-  const src = strip(fs.readFileSync("js/exercise-timing.js", "utf8"));
+  const src = strip(fs.readFileSync(_gatePath("js/exercise-timing.js"), "utf8"));
   ok(!src.includes("holdSeconds"), "exercise-timing.js references holdSeconds; it must not");
 });
 

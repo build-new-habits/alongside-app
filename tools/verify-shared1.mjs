@@ -30,13 +30,26 @@ Object.defineProperty(globalThis, 'localStorage', { value: dom.window.localStora
 
 const BASE = new URL('../js/', import.meta.url).href;
 const { store } = await import(BASE + 'store.js');
+
+// GATE-PATH, 08 Sep 2026. Paths resolved from import.meta.url, not the
+// working directory.
+//
+// 72 of 139 gates read files by a path relative to process.cwd(), so
+// they were green from the repo root and read NOTHING from anywhere
+// else. Not a live fault -- every session so far has run them from the
+// root -- but an expensive trap: a session running the suite by full
+// path from elsewhere sees most of it red and reasonably concludes the
+// app is broken.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
 const SM = await import(BASE + 'data/session-moments.js');
 
 let failures = 0;
 const check = (n, ok, d='') => { console.log(`${ok?'PASS':'FAIL'}  ${n}${d?' — '+d:''}`); if(!ok) failures++; };
 
 // ── One home, and it is the shared one ───────────────────────
-const reflect = fs.readFileSync('js/views/reflect.js', 'utf8');
+const reflect = fs.readFileSync(_gatePath('js/views/reflect.js'), 'utf8');
 check('reflect.js renders the moments',
   /renderSessionMoments\(/.test(reflect) && /\$\{renderSessionMoments/.test(reflect),
   'defined AND composed');
@@ -50,9 +63,9 @@ check('every repaint site re-wires the controls', wirings >= repaints - 1,
   `${repaints} repaints, ${wirings} wirings`);
 
 // ── Every session view reaches it ────────────────────────────
-const views = fs.readdirSync('js/views').filter(f => f.endsWith('.js'));
+const views = fs.readdirSync(_gatePath('js/views')).filter(f => f.endsWith('.js'));
 const SESSION_VIEWS = views.filter(f => {
-  const s = fs.readFileSync(path.join('js/views', f), 'utf8');
+  const s = fs.readFileSync(_gatePath(path.join('js/views', f)), 'utf8');
   return /store\.logActivity\(\{/.test(s) && /type:\s*["'](?!checkin)/.test(s);
 });
 check('there are session views to check', SESSION_VIEWS.length >= 8,
@@ -60,7 +73,7 @@ check('there are session views to check', SESSION_VIEWS.length >= 8,
 
 const orphans = [];
 for (const f of SESSION_VIEWS) {
-  const s = fs.readFileSync(path.join('js/views', f), 'utf8');
+  const s = fs.readFileSync(_gatePath(path.join('js/views', f)), 'utf8');
   const routesToReflect = /navigate\(["']reflect["']\)/.test(s);
   const rendersItself   = /renderSessionMoments\(/.test(s);
   if (!routesToReflect && !rendersItself) orphans.push(f);
@@ -72,7 +85,7 @@ check('every session view routes to reflect or renders the moments itself',
 
 // ── No second copy ───────────────────────────────────────────
 const dupes = views.filter(f => {
-  const s = fs.readFileSync(path.join('js/views', f), 'utf8');
+  const s = fs.readFileSync(_gatePath(path.join('js/views', f)), 'utf8');
   return /firstSessionRecognition\(|shouldOfferBaseline\(/.test(s);
 });
 check('the moments are defined in exactly one place', dupes.length === 0,

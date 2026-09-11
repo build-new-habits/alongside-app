@@ -19,12 +19,25 @@
  */
 import fs from "node:fs";
 
+// GATE-PATH, 08 Sep 2026. Paths resolved from import.meta.url, not the
+// working directory.
+//
+// 72 of 139 gates read files by a path relative to process.cwd(), so
+// they were green from the repo root and read NOTHING from anywhere
+// else. Not a live fault -- every session so far has run them from the
+// root -- but an expensive trap: a session running the suite by full
+// path from elsewhere sees most of it red and reasonably concludes the
+// app is broken.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
+
 let fails = 0;
 const check = (n, fn) => { try { fn(); console.log("  PASS  " + n); }
   catch (e) { fails++; console.log("  FAIL  " + n + "\n        " + e.message); } };
 const ok = (c, m) => { if (!c) throw new Error(m); };
 
-const css = fs.readFileSync("css/components/onboarding-thread.css", "utf8");
+const css = fs.readFileSync(_gatePath("css/components/onboarding-thread.css"), "utf8");
 const box = css.slice(css.indexOf(".ob-consent__checkbox {"),
                       css.indexOf(".ob-consent__label"));
 
@@ -50,7 +63,7 @@ check("unchecked has a visible border", () =>
 
 console.log("\nTEST 2 - it stays a real checkbox");
 check("still an input, not a div", () => {
-  const html = fs.readFileSync("js/views/onboarding/thread.js", "utf8");
+  const html = fs.readFileSync(_gatePath("js/views/onboarding/thread.js"), "utf8");
   ok(/<input type="checkbox" id="ob-consent-check"/.test(html),
      "semantics and keyboard behaviour must survive the restyle");
   ok(/<label for="ob-consent-check"/.test(html), "label must stay associated");
@@ -60,7 +73,7 @@ check("focus is still visible", () =>
      "appearance:none removes the native focus ring"));
 
 console.log("\nTEST 3 - EQUIP-2: an empty scope falls back rather than showing nothing");
-const sb = fs.readFileSync("js/views/session-builder-ui.js", "utf8");
+const sb = fs.readFileSync(_gatePath("js/views/session-builder-ui.js"), "utf8");
 check("falls back to the other scope", () =>
   ok(/const usingFallback = matching\.length === 0 && other\.length > 0;/.test(sb),
      "an empty list is not a safer answer than a slightly wrong one here - " +

@@ -36,6 +36,19 @@ import { createRequire as __cr } from "node:module";
 const __require = __cr(import.meta.url);
 import fs from 'node:fs';
 const { JSDOM } = __require("jsdom");
+
+// GATE-PATH, 08 Sep 2026. Paths resolved from import.meta.url, not the
+// working directory.
+//
+// 72 of 139 gates read files by a path relative to process.cwd(), so
+// they were green from the repo root and read NOTHING from anywhere
+// else. Not a live fault -- every session so far has run them from the
+// root -- but an expensive trap: a session running the suite by full
+// path from elsewhere sees most of it red and reasonably concludes the
+// app is broken.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
 const dom = new JSDOM('<!doctype html>', { url: 'https://build-new-habits.github.io/alongside-app/' });
 globalThis.window = dom.window; globalThis.document = dom.window.document;
 Object.defineProperty(globalThis, 'navigator', { value: dom.window.navigator, configurable: true, writable: true });
@@ -110,7 +123,7 @@ check('somebody without hypermobility still gets stretches',
 //
 // EXPECTED TO FAIL when somebody fixes them — that is the design. The
 // message tells the next person what to do.
-const src = fs.readFileSync('js/data/conditions.js', 'utf8');
+const src = fs.readFileSync(_gatePath('js/data/conditions.js'), 'utf8');
 for (const id of ['chronic-fatigue', 'fibromyalgia', 'osteoporosis']) {
   const referenced = pool.some(e =>
     (e.avoid || e.contraindications || []).includes(id) || (e.caution || []).includes(id)

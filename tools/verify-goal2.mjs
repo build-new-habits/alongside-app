@@ -30,10 +30,23 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
+// GATE-PATH, 08 Sep 2026. Paths resolved from import.meta.url, not the
+// working directory.
+//
+// 72 of 139 gates read files by a path relative to process.cwd(), so
+// they were green from the repo root and read NOTHING from anywhere
+// else. Not a live fault -- every session so far has run them from the
+// root -- but an expensive trap: a session running the suite by full
+// path from elsewhere sees most of it red and reasonably concludes the
+// app is broken.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
+
 let failures = 0;
 const check = (n, ok, d='') => { console.log(`${ok?'PASS':'FAIL'}  ${n}${d?' — '+d:''}`); if(!ok) failures++; };
 
-const storeSrc = fs.readFileSync('js/store.js', 'utf8');
+const storeSrc = fs.readFileSync(_gatePath('js/store.js'), 'utf8');
 const start = storeSrc.indexOf('\n  getDefaults() {');
 const blk   = start < 0 ? '' : storeSrc.slice(start);
 const i     = blk.indexOf('return {');
@@ -45,10 +58,10 @@ check('the defaults were extracted', topLevel.size >= 50, `${topLevel.size} top-
 
 let all = '';
 (function walk(dir) {
-  for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+  for (const e of fs.readdirSync(_gatePath(dir), { withFileTypes: true })) {
     const p = path.join(dir, e.name);
     if (e.isDirectory()) walk(p);
-    else if (e.name.endsWith('.js')) all += fs.readFileSync(p, 'utf8');
+    else if (e.name.endsWith('.js')) all += fs.readFileSync(_gatePath(p), 'utf8');
   }
 })('js');
 all = all.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
@@ -90,7 +103,7 @@ check('and the primary goal is read from where it is written',
 const { EXERCISES, isSessionLength } = await import(new URL('../js/data/exercises/index.js', import.meta.url));
 const { matchCategory } = await import(new URL('../js/data/session-categories.js', import.meta.url));
 
-const sbSrc = fs.readFileSync('js/session-builder.js', 'utf8');
+const sbSrc = fs.readFileSync(_gatePath('js/session-builder.js'), 'utf8');
 const declared = new Set();
 for (const m of sbSrc.matchAll(/(?:warmupCategories|mainCategories|cooldownCategories):\s*\[([^\]]*)\]/g))
   for (const c of m[1].matchAll(/["']([a-z0-9-]+)["']/g)) declared.add(c[1]);

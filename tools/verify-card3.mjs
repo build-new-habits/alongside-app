@@ -26,20 +26,33 @@
  */
 import fs from "node:fs";
 
+// GATE-PATH, 08 Sep 2026. Paths resolved from import.meta.url, not the
+// working directory.
+//
+// 72 of 139 gates read files by a path relative to process.cwd(), so
+// they were green from the repo root and read NOTHING from anywhere
+// else. Not a live fault -- every session so far has run them from the
+// root -- but an expensive trap: a session running the suite by full
+// path from elsewhere sees most of it red and reasonably concludes the
+// app is broken.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
+
 let fails = 0;
 const check = (n, fn) => { try { fn(); console.log("  PASS  " + n); }
   catch (e) { fails++; console.log("  FAIL  " + n + "\n        " + e.message); } };
 const ok = (c, m) => { if (!c) throw new Error(m); };
 const strip = s => s.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
 
-const cardRaw = fs.readFileSync("js/exercise-card.js", "utf8");
+const cardRaw = fs.readFileSync(_gatePath("js/exercise-card.js"), "utf8");
 const card    = strip(cardRaw);
-const timing  = strip(fs.readFileSync("js/exercise-timing.js", "utf8"));
+const timing  = strip(fs.readFileSync(_gatePath("js/exercise-timing.js"), "utf8"));
 
 const VIEWS = ["js/views/workout.js", "js/views/prescribed-session.js",
                "js/views/gym-programme.js", "js/views/core-session.js"];
 const src = {};
-for (const v of VIEWS) src[v] = strip(fs.readFileSync(v, "utf8"));
+for (const v of VIEWS) src[v] = strip(fs.readFileSync(_gatePath(v), "utf8"));
 
 // The action-bar ids each view binds by. Renaming one silently unbinds a
 // control, which is the failure this whole slot design exists to avoid.
@@ -213,7 +226,7 @@ check("5d. the hazard block is visually distinct from ordinary prose", () => {
   const body = card.slice(i, card.indexOf("].join", i));
   ok(body.includes("xcard-block--hazard"),
      "the hazard section has no modifier class; it renders as one more grey block");
-  const css = fs.readFileSync("css/components/workout.css", "utf8");
+  const css = fs.readFileSync(_gatePath("css/components/workout.css"), "utf8");
   ok(css.includes(".xcard-block--hazard"), "the modifier class has no styling");
   ok(css.includes("--color-danger"), "the hazard box does not use the danger token");
   // The accent must not be the only thing carrying the text's legibility.

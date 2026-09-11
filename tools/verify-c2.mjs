@@ -44,6 +44,19 @@ const { store }        = await import("../js/store.js");
 const { buildSession } = await import("../js/session-builder.js");
 const { EXERCISES }    = await import("../js/data/exercises/index.js");
 
+// GATE-PATH, 08 Sep 2026. Paths resolved from import.meta.url, not the
+// working directory.
+//
+// 72 of 139 gates read files by a path relative to process.cwd(), so
+// they were green from the repo root and read NOTHING from anywhere
+// else. Not a live fault -- every session so far has run them from the
+// root -- but an expensive trap: a session running the suite by full
+// path from elsewhere sees most of it red and reasonably concludes the
+// app is broken.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
+
 let fails = 0;
 const check = (name, fn) => {
   try { fn(); console.log(`  PASS  ${name}`); }
@@ -78,7 +91,7 @@ check("every rehabilitation entry is decided either way", () => {
   // tag and therefore contains the string, which made the count 62 the
   // moment the change note was written. A gate that counts its own
   // documentation is a gate that fails on a comment.
-  const src = fs.readFileSync("js/data/exercises/rehabilitation.js", "utf8")
+  const src = fs.readFileSync(_gatePath("js/data/exercises/rehabilitation.js"), "utf8")
                 .replace(/\/\*[\s\S]*?\*\//g, "")
                 .replace(/^\s*\/\/[^\n]*$/gm, "");
   const tagged = (src.match(/generalPurpose: true/g) || []).length;
@@ -91,7 +104,7 @@ check("every rehabilitation entry is decided either way", () => {
 });
 
 check("absent means false — a new entry is condition-only by default", () => {
-  const src = fs.readFileSync("js/session-builder.js", "utf8");
+  const src = fs.readFileSync(_gatePath("js/session-builder.js"), "utf8");
   ok(/generalPurpose !== true/.test(src),
      "the filter tests for something other than `!== true`, so an entry with " +
      "generalPurpose: undefined could pass. Absent must fail safe");
@@ -149,7 +162,7 @@ check("sessions are not thinned by the filter", () => {
 console.log("\nC2 — the overwrite trap stays closed");
 
 check("the source library is preserved before category is reassigned", () => {
-  const src = fs.readFileSync("js/session-builder.js", "utf8");
+  const src = fs.readFileSync(_gatePath("js/session-builder.js"), "utf8");
   ok(/sourceLibrary: ex\.category/.test(src),
      "matched.push no longer preserves the entry's own library. `category` is " +
      "overwritten with the SESSION category, so any filter reading ex.category " +

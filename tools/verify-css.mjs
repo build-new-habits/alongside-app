@@ -25,7 +25,12 @@
 import fs from "node:fs";
 import path from "node:path";
 
-const walk = (d, ext) => fs.readdirSync(d, { withFileTypes: true }).flatMap(e =>
+// GATE-PATH, 08 Sep 2026. Resolved from import.meta.url, not the cwd.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
+
+const walk = (d, ext) => fs.readdirSync(_gatePath(d), { withFileTypes: true }).flatMap(e =>
   e.isDirectory() ? walk(path.join(d, e.name), ext)
                   : (e.name.endsWith(ext) ? [path.join(d, e.name)] : []));
 
@@ -34,7 +39,7 @@ const strip = s => s.replace(/\/\*[\s\S]*?\*\//g, "");
 // Classes rendered by views
 const used = new Map();
 for (const f of [...walk("js/views", ".js"), "js/exercise-feedback.js", "js/session-log.js"]) {
-  const src = strip(fs.readFileSync(f, "utf8"));
+  const src = strip(fs.readFileSync(_gatePath(f), "utf8"));
   for (const m of src.matchAll(/class="([^"${}]+)"/g))
     for (const c of m[1].split(/\s+/))
       if (c) (used.get(c) || used.set(c, new Set()).get(c)).add(path.basename(f));
@@ -43,7 +48,7 @@ for (const f of [...walk("js/views", ".js"), "js/exercise-feedback.js", "js/sess
 // Classes defined in CSS
 const defined = new Set();
 for (const f of walk("css", ".css"))
-  for (const m of strip(fs.readFileSync(f, "utf8")).matchAll(/\.([a-zA-Z][\w-]*)/g))
+  for (const m of strip(fs.readFileSync(_gatePath(f), "utf8")).matchAll(/\.([a-zA-Z][\w-]*)/g))
     defined.add(m[1]);
 
 const missing = [...used.keys()].filter(c => !defined.has(c)).sort();

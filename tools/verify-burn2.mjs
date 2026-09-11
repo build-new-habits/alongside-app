@@ -43,6 +43,19 @@ const { store } = await import(__REPO + "/js/store.js");
 store.init();
 const { checkinData } = await import(__REPO + "/js/data/checkin.js");
 
+// GATE-PATH, 08 Sep 2026. Paths resolved from import.meta.url, not the
+// working directory.
+//
+// 72 of 139 gates read files by a path relative to process.cwd(), so
+// they were green from the repo root and read NOTHING from anywhere
+// else. Not a live fault -- every session so far has run them from the
+// root -- but an expensive trap: a session running the suite by full
+// path from elsewhere sees most of it red and reasonably concludes the
+// app is broken.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
+
 let fails = 0;
 const check = (n, fn) => { try { fn(); console.log("  PASS  " + n); }
   catch (e) { fails++; console.log("  FAIL  " + n + "\n        " + e.message); } };
@@ -59,10 +72,10 @@ console.log("\nTEST 1 - one definition, not three");
 // NOTHING outside checkin.js may define burnout. A second definition is
 // what the original BURN-2 fix existed to prevent, and deleting the file
 // removed one candidate rather than the rule.
-const allSrc = fs.readdirSync("js/data").filter(f => f.endsWith(".js"))
-  .map(f => ["js/data/" + f, fs.readFileSync("js/data/" + f, "utf8")])
-  .concat(fs.readdirSync("js/views").filter(f => f.endsWith(".js"))
-    .map(f => ["js/views/" + f, fs.readFileSync("js/views/" + f, "utf8")]));
+const allSrc = fs.readdirSync(_gatePath("js/data")).filter(f => f.endsWith(".js"))
+  .map(f => ["js/data/" + f, fs.readFileSync(_gatePath("js/data/" + f), "utf8")])
+  .concat(fs.readdirSync(_gatePath("js/views")).filter(f => f.endsWith(".js"))
+    .map(f => ["js/views/" + f, fs.readFileSync(_gatePath("js/views/" + f), "utf8")]));
 check("only checkin.js defines burnout", () => {
   const definers = allSrc
     .filter(([f, s]) => /function detectBurnout/.test(s))
@@ -109,7 +122,7 @@ console.log("\nTEST 3 - the SESSION is still graded by burnout level");
 // not just today" any more. It was already saying it to nobody, so
 // this is not a regression -- but it is a real gap and it is flagged
 // in the master schedule, not buried here.
-const genSrc = fs.readFileSync("js/data/workoutGenerator.js", "utf8");
+const genSrc = fs.readFileSync(_gatePath("js/data/workoutGenerator.js"), "utf8");
 
 check("'high' narrows the pool, 'moderate' does not", () => {
   ok(/burnout\.level === "high"/.test(genSrc),

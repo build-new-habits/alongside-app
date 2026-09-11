@@ -33,6 +33,11 @@ import { createRequire as __cr } from "node:module";
 const __require = __cr(import.meta.url);
 import fs from 'node:fs';
 import path from 'node:path';
+
+// GATE-PATH, 08 Sep 2026. Resolved from import.meta.url, not the cwd.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
 const { JSDOM } = __require("jsdom");
 
 const dom = new JSDOM('<!doctype html><div id="main-content"></div>',
@@ -104,7 +109,7 @@ const strip = s => s
   .replace(/<!--[\s\S]*?-->/g, '');
 
 function walk(dir, out = []) {
-  for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+  for (const e of fs.readdirSync(_gatePath(dir), { withFileTypes: true })) {
     const full = path.join(dir, e.name);
     if (e.isDirectory()) walk(full, out);
     else if (e.name.endsWith('.js')) out.push(full);
@@ -118,7 +123,7 @@ function walk(dir, out = []) {
 const offenders = [];
 for (const file of walk(path.join(root, 'js'))) {
   const rel = path.relative(root, file);
-  const src = strip(fs.readFileSync(file, 'utf8'));
+  const src = strip(fs.readFileSync(_gatePath(file), 'utf8'));
   // store.js holds the migration and is the one place allowed to name it.
   if (rel === 'js/store.js') continue;
   if (rel === 'js/data/field-contract.js') continue;
@@ -127,22 +132,22 @@ for (const file of walk(path.join(root, 'js'))) {
 check('6  no live code outside the migration still branches on "athlete"',
   offenders.length === 0, offenders.join(', '));
 
-const auth = strip(fs.readFileSync(path.join(root, 'js/auth.js'), 'utf8'));
+const auth = strip(fs.readFileSync(_gatePath(path.join(root, 'js/auth.js')), 'utf8'));
 check('7  isAthlete() is gone — a predicate nothing asked, for a state nothing granted',
   !/function isAthlete/.test(auth));
 
-const settings = strip(fs.readFileSync(path.join(root, 'js/views/settings.js'), 'utf8'));
+const settings = strip(fs.readFileSync(_gatePath(path.join(root, 'js/views/settings.js')), 'utf8'));
 check('8  the dev tier switcher has no way back into it',
   !/data-dev-tier="athlete"/.test(settings));
 
 // ── The contract records it rather than forgetting it ────────────────
 
-const contract = fs.readFileSync(path.join(root, 'js/data/field-contract.js'), 'utf8');
+const contract = fs.readFileSync(_gatePath(path.join(root, 'js/data/field-contract.js')), 'utf8');
 check('9  the contract still DECLARES it retired, so the migration stays legible',
   /retired:\s*\[[^\]]*["']athlete["']/.test(contract),
   'a retired value that is not declared becomes an untracked special case');
 
-const schema = fs.readFileSync(path.join(root, 'Documents/Live State/Schema.md'), 'utf8');
+const schema = fs.readFileSync(_gatePath(path.join(root, 'Documents/Live State/Schema.md')), 'utf8');
 check('10 and the schema says what happens to somebody who held it',
   /ATHLETE-RETIRE/.test(schema) && /migrat/i.test(schema));
 

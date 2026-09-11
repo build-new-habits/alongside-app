@@ -29,12 +29,17 @@ import { focusBudget, zoneMatcher, fillFocusedSlots } from "../js/session-builde
 import { STRETCH_ZONES } from "../js/session-builder.js";
 import { GOAL_CATEGORIES } from "../js/data/goals.js";
 
+// GATE-PATH, 08 Sep 2026. Resolved from import.meta.url, not the cwd.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
+
 let fails = 0;
 const check = (n, fn) => { try { fn(); console.log("  PASS  " + n); }
   catch (e) { fails++; console.log("  FAIL  " + n + "\n        " + e.message); } };
 const ok = (c, m) => { if (!c) throw new Error(m); };
 const strip = t => t.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
-const read = p => strip(fs.readFileSync(p, "utf8"));
+const read = p => strip(fs.readFileSync(_gatePath(p), "utf8"));
 
 console.log("\nTEST 1 - the map points at things that exist");
 
@@ -112,7 +117,7 @@ check("3. the mapping has exactly one home", () => {
   // the map stops being one edit, and that is the property worth keeping.
   const files = [];
   const walk = d => {
-    for (const f of fs.readdirSync(d, { withFileTypes: true })) {
+    for (const f of fs.readdirSync(_gatePath(d), { withFileTypes: true })) {
       if (f.isDirectory()) walk(`${d}/${f.name}`);
       else if (f.name.endsWith(".js")) files.push(`${d}/${f.name}`);
     }
@@ -209,7 +214,7 @@ check("5d. the picker reads a field something actually writes", () => {
   // is fine, losing it is not. The two-file version passed when one was
   // broken, because the other still matched.
   const all = [];
-  const walk = d => { for (const f of fs.readdirSync(d, { withFileTypes: true })) {
+  const walk = d => { for (const f of fs.readdirSync(_gatePath(d), { withFileTypes: true })) {
     if (f.isDirectory()) walk(`${d}/${f.name}`); else if (f.name.endsWith(".js")) all.push(`${d}/${f.name}`); } };
   walk("js");
   const writers = all.filter(f => /\bset\(\s*['"]goals['"]\s*,/.test(read(f)));
@@ -223,7 +228,7 @@ check("5e. no view reads a store field that no longer exists", () => {
   // stops. That shipped, and it is the same silent-failure shape as the
   // reader-without-a-writer in 5d.
   const files = [];
-  const walk = d => { for (const f of fs.readdirSync(d, { withFileTypes: true })) {
+  const walk = d => { for (const f of fs.readdirSync(_gatePath(d), { withFileTypes: true })) {
     if (f.isDirectory()) walk(`${d}/${f.name}`); else if (f.name.endsWith(".js")) files.push(`${d}/${f.name}`); } };
   walk("js");
   const dead = files.filter(f => !f.endsWith("store.js") && /get\(["']stretchArc["']\)/.test(read(f)));

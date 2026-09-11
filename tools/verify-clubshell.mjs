@@ -34,7 +34,20 @@ const B = new URL("../js/", import.meta.url).href;
 const { store }     = await import(B + "store.js");
 const { isPremium } = await import(B + "auth.js");
 const { TodayView } = await import(B + "views/today.js");
-const today = fs.readFileSync("js/views/today.js", "utf8");
+
+// GATE-PATH, 08 Sep 2026. Paths resolved from import.meta.url, not the
+// working directory.
+//
+// 72 of 139 gates read files by a path relative to process.cwd(), so
+// they were green from the repo root and read NOTHING from anywhere
+// else. Not a live fault -- every session so far has run them from the
+// root -- but an expensive trap: a session running the suite by full
+// path from elsewhere sees most of it red and reasonably concludes the
+// app is broken.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
+const today = fs.readFileSync(_gatePath("js/views/today.js"), "utf8");
 
 let fails = 0;
 const ok = (name, cond, detail = "") => {
@@ -151,7 +164,7 @@ ok("3d. and the name always comes before the description", order,
 // ── 4. TAP TARGETS ──────────────────────────────────────────────────────
 console.log("\nTEST 4 - WCAG 2.5.8, and nothing launches by accident");
 
-const css = fs.readFileSync("css/components/club-rooms.css", "utf8");
+const css = fs.readFileSync(_gatePath("css/components/club-rooms.css"), "utf8");
 ok("4a. actions declare a 44px minimum", /min-height:\s*44px/.test(css),
    "below the WCAG 2.2 AA minimum target size");
 ok("4b. keyboard focus is visible on them", /focus-visible/.test(css));
@@ -183,7 +196,7 @@ ok("6c. the chip writes a duration preselect",
    "the chip navigates without carrying the answer, so the builder asks again - " +
    "which tells somebody their first answer was not heard");
 
-const sbui = fs.readFileSync("js/views/session-builder-ui.js", "utf8");
+const sbui = fs.readFileSync(_gatePath("js/views/session-builder-ui.js"), "utf8");
 ok("6d. and the builder reads it", /pre\.durationMins/.test(sbui),
    "written but never read - the writer-without-reader half of the same class");
 ok("6e. and clears it, so it cannot pin a later build",
@@ -191,7 +204,7 @@ ok("6e. and clears it, so it cannot pin a later build",
    "a preselect that persists silently pins every later build to a duration " +
    "chosen days earlier");
 
-const schema = fs.readFileSync("Documents/Live State/Schema.md", "utf8");
+const schema = fs.readFileSync(_gatePath("Documents/Live State/Schema.md"), "utf8");
 ok("6f. and the field is declared", /sessionBuilderPreselect\.durationMins/.test(schema),
    "schema before code");
 
@@ -289,7 +302,7 @@ ok("8e. and the phase it names is real data",
 // Both are the same class: a sentence claiming something that is not so.
 console.log("\nTEST 9 - DEVICE-1: the screen does not name what is not there");
 
-const todaySrc9 = fs.readFileSync("js/views/today.js", "utf8");
+const todaySrc9 = fs.readFileSync(_gatePath("js/views/today.js"), "utf8");
 const code9 = todaySrc9.split("\n").filter(l => !/^\s*(\*|\/\/|\/\*)/.test(l)).join("\n");
 
 // The orientation line named "Unsure" -- a door renamed twice since.
@@ -332,7 +345,7 @@ ok("9c. full-coverage is only claimed when there are strands to cover",
 // Plan is the arc" on the Plan tier's own home screen.
 console.log("\nTEST 10 - ARC-LED: Home does not nominate a session");
 
-const arcLed = fs.readFileSync("js/views/today.js", "utf8")
+const arcLed = fs.readFileSync(_gatePath("js/views/today.js"), "utf8")
   .split("\n").filter(l => !/^\s*(\*|\/\/|\/\*|<!--)/.test(l)).join("\n");
 
 ok("10a. no room carries a suggested flag",
@@ -380,7 +393,7 @@ ok("10f. the note names which strands have not come up",
    "thing to fail on a phone in daylight");
 
 // One colour, one meaning. Teal is interactive across the whole app.
-const clubCss = fs.readFileSync("css/components/club-rooms.css", "utf8");
+const clubCss = fs.readFileSync(_gatePath("css/components/club-rooms.css"), "utf8");
 const litRule = clubCss.slice(clubCss.indexOf(".today-arc__strand--lit"),
                               clubCss.indexOf("}", clubCss.indexOf(".today-arc__strand--lit")));
 ok("10f-2. and a lit strand is not painted the interactive colour",

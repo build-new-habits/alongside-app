@@ -40,6 +40,19 @@ const { store } = await import(__REPO + "/js/store.js");
 store.init();
 const { resolveIntensity } = await import(__REPO + "/js/data/checkin.js");
 
+// GATE-PATH, 08 Sep 2026. Paths resolved from import.meta.url, not the
+// working directory.
+//
+// 72 of 139 gates read files by a path relative to process.cwd(), so
+// they were green from the repo root and read NOTHING from anywhere
+// else. Not a live fault -- every session so far has run them from the
+// root -- but an expensive trap: a session running the suite by full
+// path from elsewhere sees most of it red and reasonably concludes the
+// app is broken.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
+
 let fails = 0;
 const check = (n, fn) => { try { fn(); console.log("  PASS  " + n); }
   catch (e) { fails++; console.log("  FAIL  " + n + "\n        " + e.message); } };
@@ -67,7 +80,7 @@ check("garbage in resolves safely", () => {
 
 console.log("\nTEST 2 - the store field is declared and validated");
 check("proposalBias is in store.js defaults", () =>
-  ok(/proposalBias:\s+null/.test(fs.readFileSync("js/store.js", "utf8")),
+  ok(/proposalBias:\s+null/.test(fs.readFileSync(_gatePath("js/store.js"), "utf8")),
      "undeclared fields are invisible to anyone reading the field list - that is how this went nine days"));
 check("only valid values survive a reload", () => {
   store.set("proposalBias", "chaos");
@@ -79,8 +92,8 @@ check("only valid values survive a reload", () => {
 });
 
 console.log("\nTEST 3 - reader and writer both exist (PT-12 pattern)");
-const gen = fs.readFileSync("js/data/workoutGenerator.js", "utf8");
-const chk = fs.readFileSync("js/data/checkin.js", "utf8");
+const gen = fs.readFileSync(_gatePath("js/data/workoutGenerator.js"), "utf8");
+const chk = fs.readFileSync(_gatePath("js/data/checkin.js"), "utf8");
 
 // BIAS-2, 16 Aug 2026. This test used to assert that coach-reflection.js
 // CONTAINED a store.set("proposalBias") -- reading the file's source

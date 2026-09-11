@@ -19,6 +19,19 @@
  */
 import fs from "node:fs";
 
+// GATE-PATH, 08 Sep 2026. Paths resolved from import.meta.url, not the
+// working directory.
+//
+// 72 of 139 gates read files by a path relative to process.cwd(), so
+// they were green from the repo root and read NOTHING from anywhere
+// else. Not a live fault -- every session so far has run them from the
+// root -- but an expensive trap: a session running the suite by full
+// path from elsewhere sees most of it red and reasonably concludes the
+// app is broken.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
+
 let fails = 0;
 const check = (n, fn) => { try { fn(); console.log("  PASS  " + n); }
   catch (e) { fails++; console.log("  FAIL  " + n + "\n        " + e.message); } };
@@ -31,9 +44,9 @@ const strip = s => s
   .replace(/^\s*\/\/.*$/gm, "")
   .replace(/<!--[\s\S]*?-->/g, "");
 
-const ui  = strip(fs.readFileSync("js/views/session-builder-ui.js", "utf8"));
-const sb  = strip(fs.readFileSync("js/session-builder.js", "utf8"));
-const css = fs.readFileSync("css/components/session-shared.css", "utf8");
+const ui  = strip(fs.readFileSync(_gatePath("js/views/session-builder-ui.js"), "utf8"));
+const sb  = strip(fs.readFileSync(_gatePath("js/session-builder.js"), "utf8"));
+const css = fs.readFileSync(_gatePath("css/components/session-shared.css"), "utf8");
 
 console.log("\nTEST 1 - the question is asked at the door");
 

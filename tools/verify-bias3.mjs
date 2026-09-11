@@ -35,6 +35,11 @@ import { createRequire as __cr } from "node:module";
 const __require = __cr(import.meta.url);
 
 import fs from "node:fs";
+
+// GATE-PATH, 08 Sep 2026. Resolved from import.meta.url, not the cwd.
+const _GATE_ROOT = new URL("../", import.meta.url);
+const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
+
 const { JSDOM } = __require("jsdom");
 
 const dom = new JSDOM("<!doctype html><div></div>",
@@ -115,14 +120,14 @@ for (const [label, seed] of [
   const facade = facadeBlock.slice(0, facadeBlock.indexOf("};"));
 
   const jsDir = new URL("../js/", import.meta.url);
-  const walk = dir => fs.readdirSync(dir, { withFileTypes: true }).flatMap(d =>
+  const walk = dir => fs.readdirSync(_gatePath(dir), { withFileTypes: true }).flatMap(d =>
     d.isDirectory() ? walk(new URL(d.name + "/", dir))
                     : (d.name.endsWith(".js") ? [new URL(d.name, dir)] : []));
 
   const used = new Set();
   for (const f of walk(jsDir)) {
     if (f.pathname.endsWith("/data/checkin.js")) continue;
-    const s = fs.readFileSync(f, "utf8");
+    const s = fs.readFileSync(_gatePath(f), "utf8");
     if (!/checkinData/.test(s)) continue;
     for (const m of s.matchAll(/checkinData\.(\w+)\s*\(/g)) used.add(m[1]);
   }
@@ -143,7 +148,7 @@ for (const [label, seed] of [
     if (new RegExp(`\\b${n}\\b`).test(facade)) return false;
     return !walk(jsDir).some(f =>
       !f.pathname.endsWith("/data/checkin.js") &&
-      new RegExp(`\\b${n}\\b`).test(fs.readFileSync(f, "utf8")));
+      new RegExp(`\\b${n}\\b`).test(fs.readFileSync(_gatePath(f), "utf8")));
   });
   if (orphans.length) {
     console.log(`  NOTE  ${orphans.length} named export(s) with no caller and not on ` +
