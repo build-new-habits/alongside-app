@@ -1,6 +1,12 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 11 Sep 2026 v496
+ *
+ * v496 - PROPOSAL-3. session-builder.js and coach-proposal.js. A low-energy
+ *   day builds a smaller working section. Both already precached; cache
+ *   bump only.
+ *
  * 11 Sep 2026 v495
  *
  * v495 - ADAPT-1. exercise-card.js, prescribed-session.js, workout.css and
@@ -3365,7 +3371,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v495";
+const CACHE_NAME = "alongside-v496";
 
 const SHELL_URLS = [
 
