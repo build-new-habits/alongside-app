@@ -1,5 +1,11 @@
 /**
  * js/data/onboarding-thread-data.js
+ * 08 Sep 2026 v13
+ *
+ * v13 - SCOPE-1. Onboarding says plainly that the app is not the right
+ *   tool for somebody being treated for something, or living with a
+ *   condition where the wrong movement costs weeks. Names no conditions.
+ *
  * 06 Sep 2026 v12
  *   CR-4a. General pre-start statement added to step 14 -- the only step
  *   every person reaches. Adopts the physiotherapist's steer that the
@@ -850,7 +856,35 @@ export const STEPS = {
     // disclaimer. A wall of legal text at the end of a warm conversation
     // reads as the product protecting itself, which is the opposite of
     // what this is for -- and is the reading her own framing invited.
-    coach: "Right. I think that's everything I need.\n\nI know that was a lot of questions. But I wanted to do it properly — because what you've told me is actually going to change what I put in front of you. Not just today. Every time.\n\nOne last thing, and I'd rather say it plainly. What I suggest is general. It's built from what you've told me, but I can't see you move and I don't know your history the way a person could. Before starting anything new it's worth a word with your GP or someone qualified — particularly if you're managing something, or it's been a while. I'd rather say that now than have you assume I know more about you than I do.\n\nI'm glad you're here, [name]. Let's see what we can do.",
+    //
+    // ── SCOPE-1, 08 Sep 2026. THE SECOND PARAGRAPH ───────────────────
+    //
+    // Amy's closing advice, and the strongest thing in her whole reply:
+    // "avoid giving exercise advice to complex health groups where the
+    // risk is higher like those mentioned CFS, long covid, EDS and
+    // people with uncontrolled pain."
+    //
+    // Graeme: "I agree. This is a generic app. Perhaps we should have in
+    // onboarding or something about this, and that it isn't appropriate
+    // for more serious conditions."
+    //
+    // 🔴 IT NAMES NO CONDITIONS, deliberately. A list reads as an
+    // exclusion notice -- somebody scanning for their diagnosis, finding
+    // it, and being told they are not welcome. It also goes stale, and
+    // it invites the app to look like it is making a judgement about
+    // named illnesses, which is the thing this product does not do.
+    //
+    // What it describes instead is the SITUATION: being treated for
+    // something, or living with a condition where the wrong movement on
+    // the wrong day costs weeks. Somebody in that position recognises
+    // themselves without being sorted into a category, and somebody who
+    // is not in it reads past without alarm.
+    //
+    // ⚫ "What you need is a plan built for you by a person. Not this."
+    // Said as a fact about the tool rather than about them -- the same
+    // register as the coach's other limits, and the opposite of a
+    // rejection.
+    coach: "Right. I think that's everything I need.\n\nI know that was a lot of questions. But I wanted to do it properly — because what you've told me is actually going to change what I put in front of you. Not just today. Every time.\n\nOne last thing, and I'd rather say it plainly. What I suggest is general. It's built from what you've told me, but I can't see you move and I don't know your history the way a person could. Before starting anything new it's worth a word with your GP or someone qualified — particularly if you're managing something, or it's been a while. I'd rather say that now than have you assume I know more about you than I do.\n\nAnd there are things I'm not the right tool for. If you're being treated for something, or living with a condition where the wrong movement on the wrong day sets you back for weeks, what you need is a plan built for you by a person. Not this. I'd rather tell you that than quietly get it wrong.\n\nI'm glad you're here, [name]. Let's see what we can do.",
     // [name] replaced by thread.js using store.get('name').
   },
 };

@@ -1,5 +1,10 @@
 /**
  * privacy.js - Privacy and Terms (in-app summary)
+ * 08 Sep 2026 v3
+ *
+ * v3 - SCOPE-1. Terms name the conditions this app is not designed to
+ *   guide exercise for, on the reviewing physiotherapist's advice.
+ *
  * 11 Aug 2026 v2
  *
  * v2 — WOW-0. Two factual corrections and a reframe.
@@ -104,6 +109,36 @@ export function render() {
           not a substitute for professional medical advice, diagnosis, or treatment.
           If you have a medical condition, please consult a qualified professional
           before beginning any exercise programme.
+        </p>
+        <!--
+          SCOPE-1, 08 Sep 2026. What this app is NOT for.
+
+          Amy, the physiotherapist who reviewed it: "avoid giving exercise
+          advice to complex health groups where the risk is higher like
+          those mentioned CFS, long covid, EDS and people with
+          uncontrolled pain." On ME/CFS specifically: "exercise for this
+          population is out of the scope of an app... these people need
+          support and guidance from specialist teams."
+
+          🔴 Named here and NOT in onboarding, and that split is
+          deliberate. Terms is where somebody goes to find out exactly
+          what they are agreeing to, and vagueness there is unhelpful --
+          so the conditions are named. Onboarding is a conversation, and
+          a list of diagnoses in it reads as an exclusion notice, so it
+          describes the situation instead.
+
+          Same fact, twice, pitched at what each surface is for.
+        -->
+        <p class="text-secondary" style="margin-top: var(--space-3);">
+          Alongside is a general movement app. It is not designed for, and should
+          not be used to guide exercise for, conditions where individual clinical
+          judgement is required — including ME/CFS, long COVID, Ehlers-Danlos
+          syndromes and hypermobility spectrum disorders, and pain that is not
+          under control. Exercise in these circumstances can make symptoms
+          worse, and what is safe differs from person to person in ways a general
+          app cannot account for. If this describes you, please seek individual
+          guidance from a specialist team or an exercise professional rather than
+          relying on this app.
         </p>
         <p class="text-secondary" style="margin-top: var(--space-3);">
           By using Alongside you agree to use it in accordance with these terms.
