@@ -1,6 +1,36 @@
 /**
  * js/exercise-card.js
- * 06 Sep 2026 v5
+ * 11 Sep 2026 v6
+ *
+ * v6 -- ADAPT-1. "Other ways to do this": the ease-off and go-further
+ * options an entry carries, in a collapsed disclosure at the END of DO,
+ * plus a one-line pointer under the caution when the person has told us
+ * something is sore and this exercise has ways to ease off.
+ *
+ * OPTIONS, NOT A DECISION. The app does not choose an adaptation for
+ * anybody and records nothing about which one they used. Graeme's steer,
+ * 10 Sep, from his own session with a personal trainer: she did not say
+ * do this one, she said here are your options, and if you feel this
+ * happening you can do that. That is the whole feature. It is also why
+ * there is no store field and no regulatory question to raise -- the
+ * information is offered and the choice stays with the person.
+ *
+ * WHERE IT SITS, AND WHY IT IS LAST. The safety order on DO is caution,
+ * hazards, "If it hurts", then everything else, and it does not move.
+ * Adaptations are everything else. The disclosure is built ABOVE the
+ * doBody array and inserted at its end, so nothing in the hazard cluster
+ * is ever inside a <details> -- verify-adapt1 test 2.3 asserts that on
+ * RENDERED html, which is a stronger guarantee than verify-card3's 2c
+ * source slice and the reason this file could not simply rely on it.
+ *
+ * WHAT IS WITHHELD, AND WHAT NEVER IS. "To go further" is not shown when
+ * the exercise works an area they have said is sore today, or in Gentle
+ * Care: a prompt to do more does not belong in front of somebody who has
+ * just told us that part of them hurts. Ease-off options are never
+ * withheld from anyone. Prescribed exercises show nothing at all --
+ * swapExerciseInSession() already refuses to touch them and the builder
+ * never overrides them, so offering alternatives here would be the app
+ * quietly arguing with a clinician.
  *
  * v5 -- CR-5. HURT_AND_ACHE: what to do if it hurts during, and that
  * aching afterwards is normal. On EVERY exercise, not just the 94
@@ -98,7 +128,7 @@ const HURT_AND_ACHE_HTML =
   `<ul class="exercise-section-list">${HURT_AND_ACHE.map(s => `<li>${s}</li>`).join("")}</ul>`;
 
 
-import { bodyCaution } from "./data/session-rationale.js";
+import { bodyCaution, soreAreaLoaded } from "./data/session-rationale.js";
 import { getDisplayPref } from "./display-prefs.js";
 
 function esc(s) {
@@ -117,6 +147,10 @@ const PAGES = [
 ];
 
 const BACK_TO = { do: "decide", note: "do" };
+
+function _lines(v) {
+  return Array.isArray(v) ? v.filter(s => typeof s === "string" && s.trim()) : [];
+}
 
 function list(cls, items) {
   return `<ul class="${cls}">${items.map(i => `<li>${esc(i)}</li>`).join("")}</ul>`;
@@ -144,6 +178,11 @@ function section(label, body, mod) {
  * @param {string} opts.adjustSlot  view-supplied controls for DECIDE
  * @param {string} opts.doSlot      view-supplied timer and video for DO
  * @param {string} opts.noteSlot    view-supplied log block etc for NOTE
+ * @param {boolean} opts.prescribed  true when the card is rendering a
+ *                                   clinician-set exercise that carries no
+ *                                   isPrescribed flag of its own, as in
+ *                                   prescribed-session.js, which resolves
+ *                                   the plain library entry by id
  */
 export function renderExerciseCard(exercise, opts = {}) {
   if (!exercise) return "";
@@ -152,6 +191,29 @@ export function renderExerciseCard(exercise, opts = {}) {
   const full = _fullAlways();
 
   const caution  = bodyCaution(exercise);
+
+  // ADAPT-1. Options the person chooses. Built here, above doBody, so the
+  // hazard cluster can never end up inside the disclosure.
+  const prescribed = exercise.isPrescribed === true || opts.prescribed === true;
+  const adapt      = (!prescribed && exercise.adaptations) || {};
+  const easeOff    = _lines(adapt.easeOff);
+  // Withheld today, not removed: it is there again on a better day.
+  const further    = (soreAreaLoaded(exercise) || exercise._gentleCare)
+    ? [] : _lines(adapt.further);
+
+  const adaptBlock = (easeOff.length || further.length) ? `
+    <details class="xcard-block xcard-adapt"${full ? " open" : ""}>
+      <summary class="xcard-adapt-summary">Other ways to do this</summary>
+      ${easeOff.length ? `<p class="exercise-section-label">To ease off</p>${list("exercise-section-list", easeOff)}` : ""}
+      ${further.length ? `<p class="exercise-section-label">To go further</p>${list("exercise-section-list", further)}` : ""}
+    </details>` : "";
+
+  // Only where the person is already being spoken to about today, and only
+  // when there is something to ease off TO. A pointer to nothing is worse
+  // than silence.
+  const adaptPointer = (caution && easeOff.length && (full || page !== "note"))
+    ? `<p class="xcard-adapt-pointer">There are other ways to do this one ${(full || page === "do") ? "below" : "on the next page"}. Have a look and see if any of them make sense today.</p>`
+    : "";
   const cues     = Array.isArray(exercise.cues) ? exercise.cues : [];
   const leadCue  = cues[0] || exercise.coaching || "";
   const restCues = cues.slice(1);
@@ -242,6 +304,7 @@ export function renderExerciseCard(exercise, opts = {}) {
       (exercise.instructions && exercise.instructions.length) ? list("exercise-section-list", exercise.instructions) : ""),
     section("More on form", restCues.length ? list("exercise-section-list", restCues) : ""),
     hold ? section("Pace", hold) : "",
+    adaptBlock,
     opts.doSlot || "",
   ].join("");
 
@@ -257,7 +320,8 @@ export function renderExerciseCard(exercise, opts = {}) {
   // times across three screenshots: "all these 2 relevant?" It belongs
   // on DECIDE, where the decision it informs is being made.
   const pinned = `
-    ${caution ? `<p class="exercise-caution" role="note">${caution}</p>` : ""}`;
+    ${caution ? `<p class="exercise-caution" role="note">${caution}</p>` : ""}
+    ${adaptPointer}`;
 
   // "Show everything" flattens the pages rather than landing on one.
   // Somebody who has asked for all of it should not be walked through

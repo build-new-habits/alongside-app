@@ -94,6 +94,12 @@ export const STRENGTH = [
       'Over-arching at the top rather than finishing level',
       'Hips dropping to one side, which usually means one glute is doing more work'
     ],
+    adaptations: {
+      further: [
+        "When this feels steady, loop a resistance band just above your knees and keep pressing your knees out against it, all the way up and all the way down.",
+        "When your knees stay out against the band without drifting in, try lifting one foot and bridging on the other leg, keeping your hips level."
+      ]
+    },
     load: 'Bodyweight. Progress by holding longer at the top or moving to single leg.',
     credits: 45
   },
@@ -177,6 +183,12 @@ export const STRENGTH = [
       'Holding your breath; breathe out as you extend',
       'Moving quickly, which lets momentum do the work'
     ],
+    adaptations: {
+      easeOff: [
+        "If your lower back lifts as your arm and leg move together, move one limb at a time instead — right arm, left arm, right leg, left leg — as slowly as you can.",
+        "If your back still lifts, hold a yoga block or a firm cushion against your knees with both hands and press into it. Keep that press going with whatever stays on the block while one limb moves away."
+      ]
+    },
     load: 'Bodyweight. Progress by extending further while the back stays flat.',
     credits: 50,
     sets: 3,
@@ -515,20 +527,26 @@ export const STRENGTH = [
     duration: 90,
     perSide: true,
     instructions: [
-      'Stand about a metre in front of a chair or bench',
-      'Place your right foot behind you on the bench, laces down',
-      'Lower your right knee toward the floor in a lunge',
-      'Keep your front shin vertical and torso upright',
-      'Drive through your front heel to stand',
-      'Complete 3 sets of 8 reps each side'
+      "Stand with your back to a chair or bench, a long stride in front of it",
+      "Place the top of your right foot on the bench behind you, laces down",
+      "Check your front foot is far enough forward that your front knee will stay above your ankle as you lower",
+      "Lean your chest slightly forward, keeping your back straight",
+      "Lower your right knee towards the floor, driving your hips backwards rather than your front knee forwards",
+      "Push through your whole front foot to stand. Complete 3 sets of 8 reps each side"
     ],
-    coaching: 'Find your foot position before adding weight — too close and the front knee travels far forward, too far and you feel it in the hip flexor.',
+    coaching: "Lean in a little and drive back — staying very upright and letting the front knee travel moves the work into the front of your thigh instead.",
     why: 'One of the highest-loading single-leg exercises. Builds quad and glute strength that transfers directly to sport and daily life.',
         watchOut: [
-      'Front knee collapsing inward',
-      'Leaning forward, which turns it into a hinge',
-      'Back foot placed too close, which crowds the front knee'
+      "Front knee travelling past your toes — move your front foot further forward",
+      "Chest dropping towards your front thigh — a slight lean with a straight back is plenty",
+      "Front knee drifting inwards — go shallower and keep the knee in line with your middle toes"
     ],
+    adaptations: {
+      further: [
+        "When this feels steady, hold a dumbbell in the hand on the same side as your back foot, arm long by your side. Keep the slight lean and the drive backwards.",
+        "When one dumbbell feels steady, hold one in each hand. A pair lighter than the single dumbbell you have been using is a good place to start."
+      ]
+    },
     load: 'Bodyweight until you can complete all reps without wobbling, then add light weight.',
     credits: 75
   },
@@ -927,7 +945,7 @@ export const STRENGTH = [
         watchOut: [
       'Squatting rather than pushing the hips back',
       'Rounding the back at the bottom — stop where it is still flat',
-      'Bending the knees more as you go down'
+      "Letting your knees bend more as you go down — set a small bend at the start and keep it while your hips travel back"
     ],
     load: 'Bodyweight. This is a pattern to learn before it is an exercise to load.',
     credits: 30
@@ -2758,12 +2776,12 @@ export const STRENGTH = [
       'Drive hips forward to return',
       'Complete 3 sets of 10 reps'
     ],
-    coaching: 'Dumbbells allow a slightly wider or narrower path than a barbell — useful if hip structure makes a barbell RDL awkward.',
+    coaching: "Keep a real bend in your knees and push your bottom back towards the wall behind you — that is what moves the work out of your lower back and into your glutes.",
     why: 'Builds hamstring and glute strength in the hinge pattern with lighter, more accessible equipment than a barbell.',
         watchOut: [
       'Back rounding as you lower — stop where it is still flat',
-      'Feeling this in the lower back rather than the hamstrings',
-      'Bending the knees to reach lower; they stay softly bent and still',
+      "Feeling it in your lower back rather than your bottom and the backs of your legs — bend your knees a little more and send your hips further back",
+      "Knees drifting forward so it turns into a squat — set your knee bend at the start, keep it there, and move your hips instead",
       'Any sharp back pain: put the weights down for today'
     ],
     load: 'Heavy enough that your hamstrings clearly work, light enough that your back never rounds.',
@@ -3670,6 +3688,12 @@ export const STRENGTH = [
       "The bottom shoulder sinking down towards your ear, which usually means you have stopped pushing through the elbow",
       "Any shoulder pain in the supporting arm: come down and try this from your knees instead today"
     ],
+    adaptations: {
+      easeOff: [
+        "If your shoulder or hips cannot hold the line today, come down onto your bottom knee, bent at a right angle with that thigh in line with your body. Keep your top leg straight with its foot on the floor.",
+        "If that still feels like too much today, bend both knees and lift your hips from there."
+      ]
+    },
     load: "Bodyweight. Progress by holding for longer, or by stacking the feet rather than staggering them.",
     sets: 3,
     reps: "20 seconds each side",

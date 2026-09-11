@@ -369,6 +369,11 @@ export const REHABILITATION = [
       "If your hamstring cramps, bring the working foot slightly closer in and squeeze the glute before lifting",
       "If you cannot keep the hips level at all yet, go back to the two-foot bridge for a few weeks. This is the harder version, not the next rep"
     ],
+    adaptations: {
+      easeOff: [
+        "If your standing knee drifts inwards as you lift, go back to both feet with a resistance band just above your knees, pressing out against it, until your knees stay out on their own."
+      ]
+    },
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 40,
     sets: 3,
@@ -3279,6 +3284,11 @@ export const REHABILITATION = [
       "If your hips slide out to the side, keep them square and bend less",
       "If you feel it in the front of your shoulder rather than your side, lower the raised arm a little"
     ],
+    adaptations: {
+      further: [
+        "When this feels settled, cross your right ankle in front of your left before you reach over, so the stretch runs further down your side and around your right hip. Swap both when you change sides, and stand near a wall if crossed feet feel wobbly."
+      ]
+    },
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 20
   },
@@ -3370,6 +3380,13 @@ export const REHABILITATION = [
       "If your shoulder aches, check your elbow is directly under it rather than in front",
       "If your hips sag partway through, come down and rest rather than finishing the hold badly. The last five seconds of a collapsed plank teach nothing"
     ],
+    adaptations: {
+      further: [
+        "When this feels steady, straighten your top leg in line with your body and lift it a few centimetres off the floor, driving up through the knee that stays down.",
+        "When that feels steady, lift your top leg higher, until your shoulder, hip and foot make one long line. You will feel it in the side of your bottom.",
+        "When that feels steady too, keep the leg lifted and turn it slightly so your toes point towards the floor. Turn from your hip rather than your ankle."
+      ]
+    },
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 35,
     sets: 2,
