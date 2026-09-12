@@ -1,5 +1,5 @@
 # Alongside: Move — Cold Start Blueprint
-## 12 Sep 2026 v104
+## 12 Sep 2026 v105
 
 Build New Habits | Everything a chat with no memory needs to pick this up and build confidently.
 
@@ -49,7 +49,7 @@ git clone --depth 1 https://x-access-token:$TOKEN@github.com/build-new-habits/al
 | `Documents/Live State/Schema.md` | Store fields. **Must match `store.js`** |
 | `Documents/Business/` | Governing documents — see below |
 | `Documents/Archive/` | Stale, kept not deleted |
-| `tools/verify-*.mjs` | 145 gates |
+| `tools/verify-*.mjs` | 146 gates |
 | `js/` | Vanilla ES modules, no framework, no bundler |
 
 **Governing documents, in read order:**
@@ -70,9 +70,9 @@ git clone --depth 1 https://x-access-token:$TOKEN@github.com/build-new-habits/al
 |---|---|
 | `store.js` | v67 |
 | `Schema.md` | v1.60 |
-| `sw.js` | **v499**, cache `alongside-v499` |
+| `sw.js` | **v500**, cache `alongside-v500` |
 | `router.js` | v22 · `my-programme.js` v8 · `today.js` v25 · `settings.js` v36 · `progress.js` v11 · `onboarding/thread.js` v13 |
-| Gates | **145, all green** — from the repo root. See the cwd row in §9 |
+| Gates | **146, all green** — from the repo root. See the cwd row in §9 |
 
 🟢 **This table is now GATED.** `tools/verify-blueprint.mjs` compares every version above against the file that carries it and goes red on any drift, naming the row to change.
 

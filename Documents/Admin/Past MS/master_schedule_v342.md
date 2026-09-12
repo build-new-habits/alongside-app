@@ -1,12 +1,12 @@
 # Alongside: Move — Master Schedule
-## 12 Sep 2026 v343
+## 12 Sep 2026 v342
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v342.md`. Remove v342 on upload.
+Supersedes `master_schedule_v341.md`. Remove v341 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
-> **Live: `alongside-v500`, 146 gates, `store.js` v67, `Schema.md` v1.60, cold start blueprint v105.** Read that blueprint after this block.
+> **Live: `alongside-v499`, 145 gates, `store.js` v67, `Schema.md` v1.60, cold start blueprint v104.** Read that blueprint after this block.
 >
 > **Claude's pre-beta BUILD scope is complete.** CLUB 9 of 9 plus QUICK-INPUTS, GUIDED-COPY, DEVICE-1, DEVICE-2, ARC-LED, ARC-PLAIN — `v452` → `v466` on 06 Sep. **QUICK-BUILD-2/3 `v467`, CHECKIN-3 and PROPOSAL-1/2 `v468` — 08 Sep.**
 >
@@ -90,22 +90,6 @@ Supersedes `master_schedule_v342.md`. Remove v342 on upload.
 > **Order:** ✅ TIMER-2 (shipped `v497`) → GYM-REACH-1 (diagnose only) → SEARCH-1a (vocabulary, no UI) → GYM-REACH-2 → SEARCH-1b → CARD-4 → GYM-MIX-1. **Before beta: the first three.**
 >
 > ⚫ **The session the plan called TIMER-1 shipped as TIMER-2.** `tools/verify-timer1.mjs` has existed since 08 Sep and covers something else — the countdown's automatic move to NOTE announcing itself. The collision was found at gate-writing time, and renaming the new work was the safe direction.
->
-> ### 🟢 PRAC-2 — SHIPPED 12 Sep, `v500`. Decision 1 taken and built. 28 practices → 155.
->
-> **Reachable now means BUILDABLE.** `practice-library.js` asked "does any session type match this by category" and stopped; the builder then drops anything ten minutes or longer. So a 20-minute rowing session matched `conditioning`, counted as reachable, and was built by nothing. **136 entries appeared nowhere in the app.**
->
-> ⚫ **The Gym type changed the answer, and the fix reads it rather than hardcoding it.** GYM-MIX-1's feature slot is the one place a long item IS buildable, so the nine machine blocks genuinely have a home and are not listed as stranded. **155, not 164.**
->
-> **Groups shipped in the same change, because they had to** — closing the gap alone puts 81 items in one cardio list. Now: Running 33, Recovery 32, Cardio and conditioning 25, Grounding and calm 21, Swimming 15, Warm-ups 11, Circuits 10, Cycling 8. Largest is 33.
->
-> 🟠 **The weak point, stated:** swimming and cycling split structurally (movement pattern, needs a bike), but **running leans on an id prefix**. Name matching alone was the first attempt and filed **twelve running sessions as conditioning** — "C25K — Week 1 Session", "400m Intervals", "Hill Repeat Session", "Cadence Drill", "Stride-Outs". Prefixes are an authoring convention, not a guarantee, so `verify-prac2` 4a pins six named ids: a change of convention fails the gate rather than quietly emptying the group.
->
-> 🔵 **An unrecognised cardio practice falls INTO the general group** rather than out of the listing. Visible in the wrong place beats invisible in the right one.
->
-> ⚫ **Third time this shape has appeared:** the 28 that created `practice-library.js` in August, the machine blocks this morning, and these 136.
->
-> 🔵 **Still open: decisions 2 and 3** — the search box, and the image placeholder with the four-page card.
 >
 > ### 🟢 GYM-MIX-1 — SHIPPED 12 Sep, `v499`. Decision 4 taken and built.
 >
@@ -8921,4 +8905,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 12 Sep 2026 v343*
+*Build New Habits · Alongside: Move · Master Schedule · 12 Sep 2026 v342*
