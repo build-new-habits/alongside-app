@@ -1,6 +1,13 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 12 Sep 2026 v497
+ *
+ * v497 - TIMER-2. exercise-timing.js, workout.js and workout.css. A counted
+ *   exercise shows its sets and reps and a set counter that moves, instead
+ *   of a countdown labelled with a set it never reaches. All already
+ *   precached; cache bump only.
+ *
  * 11 Sep 2026 v496
  *
  * v496 - PROPOSAL-3. session-builder.js and coach-proposal.js. A low-energy
@@ -3371,7 +3378,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v496";
+const CACHE_NAME = "alongside-v497";
 
 const SHELL_URLS = [
 
