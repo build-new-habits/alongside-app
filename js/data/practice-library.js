@@ -1,6 +1,28 @@
 /**
  * data/practice-library.js
  *
+ * 12 Sep 2026 v2
+ *
+ * v2 - PRAC-2. The reachability test now applies the builder's OWN length
+ * rule, and cardio splits into groups.
+ *
+ *   WHAT WAS WRONG. reachableByAnySessionType() asked "does any session
+ *   type match this by category" and stopped. session-builder.js then
+ *   drops anything ten minutes or longer through isSessionLength(). So a
+ *   20-minute rowing session matched `conditioning`, was counted
+ *   reachable, and was built by nothing. Each rule assumed the other one
+ *   held them, and 136 entries appeared NOWHERE in the app -- 90 cardio,
+ *   21 recovery, 9 mobility, 9 mindfulness, 7 strength. Brisk Walk,
+ *   Steady Cycling, HIIT 30:30, every couch-to-5K week. This route showed
+ *   28 of 164.
+ *
+ *   Third time this shape has appeared: the 28 that created this file in
+ *   August, the machine blocks on 12 Sep, and these.
+ *
+ *   GROUPS SHIPPED IN THE SAME CHANGE, and had to. Closing the gap alone
+ *   takes cardio from 5 items to 81 in a single list, which is the same
+ *   "I could not get to what I wanted" problem in a different room.
+ *
  * 18 Aug 2026 v1
  *
  * PRAC-1. The way in to the whole practices — the items the exercise
@@ -76,7 +98,7 @@
  * raised to remove. The intensity is stated on the group instead.
  */
 
-import { EXERCISES, isSessionLength } from './exercises/index.js';
+import { EXERCISES, isSessionLength, isCardioMachine } from './exercises/index.js';
 import { matchCategory } from './session-categories.js';
 import { getActiveConditionIds, getExerciseSafetyTier } from './conditions.js';
 import { SESSION_TYPES } from '../session-builder.js';
@@ -97,11 +119,79 @@ function reachableByAnySessionType() {
     ];
     for (const cat of cats) {
       for (const section of ['warmup', 'main', 'cooldown']) {
-        for (const ex of matchCategory(EXERCISES, cat, section)) reachable.add(ex.id);
+        for (const ex of matchCategory(EXERCISES, cat, section)) {
+          // PRAC-2, 12 Sep 2026. THE BUILDER'S OWN LENGTH RULE, APPLIED HERE.
+          //
+          // This function asked "does any session type match this by
+          // category" and stopped there -- but session-builder.js then drops
+          // anything ten minutes or longer through isSessionLength(). So a
+          // 20-minute rowing session matched `conditioning`, was counted
+          // reachable, and was never built by anything. 136 entries fell
+          // into that gap and appeared NOWHERE: 90 cardio, 21 recovery, 9
+          // mobility, 9 mindfulness, 7 strength. Brisk Walk, Steady Cycling,
+          // HIIT 30:30, Walk-Run Intervals, every couch-to-5K week.
+          //
+          // Each rule had assumed the other one held them. Reachable now
+          // means BUILDABLE, which is what the word was always claiming.
+          if (!isSessionLength(ex)) reachable.add(ex.id);
+        }
+      }
+    }
+
+    // GYM-MIX-1's feature slot is the one place a long item IS buildable,
+    // so the nine machine blocks genuinely do have a home now and are not
+    // stranded. Reading the slot rather than naming the type keeps this
+    // true for the next type that declares one.
+    const slot = type.featureSlot;
+    if (slot?.allowSessionLength) {
+      for (const cat of (slot.categories || [])) {
+        for (const ex of matchCategory(EXERCISES, cat, 'main')) {
+          if (!slot.requiresEquipment || isCardioMachine(ex)) reachable.add(ex.id);
+        }
       }
     }
   }
   return reachable;
+}
+
+/**
+ * PRAC-2. Which group a practice belongs in.
+ *
+ * Everything is grouped by its library category, as before, EXCEPT cardio.
+ * Closing the gap above took cardio from 5 items to 81, and one list of 81
+ * is the same "I could not get to what I wanted" problem in a different
+ * room. So cardio splits by what you would actually be doing.
+ *
+ * HOW EACH SPLIT IS DECIDED, AND HOW SURE IT IS:
+ *
+ *   Swimming   movementPattern === 'swim'. Structural; certain.
+ *   Cycling    needs a bike. Structural; certain.
+ *   Running    THE ID PREFIX, then the name. The only heuristic here --
+ *              running and cycling are both `locomotion` and nothing
+ *              structural separates them.
+ *
+ *              Name alone was the first attempt and it was not good
+ *              enough: it put "C25K - Week 1 Session", "400m Intervals",
+ *              "Hill Repeat Session", "Cadence Drill" and "Stride-Outs"
+ *              in the general cardio group. Twelve running sessions filed
+ *              as conditioning. The `run-` and `c25k-` id prefixes are an
+ *              authoring convention rather than a guarantee, which is why
+ *              verify-prac2 pins a named list of running ids: if the
+ *              convention changes, that gate fails rather than the group
+ *              quietly emptying.
+ *   Cardio     everything else, which is where a new entry lands by
+ *              default. Failing INTO the general group is the safe
+ *              direction: a new practice is visible in the wrong group
+ *              rather than invisible in the right one.
+ */
+export function practiceGroupFor(ex) {
+  if (!ex) return 'cardio';
+  if (ex.category !== 'cardio') return ex.category;
+  if (ex.movementPattern === 'swim') return 'swimming';
+  if ((ex.equipment || []).includes('bicycle')) return 'cycling';
+  if (/^(run|c25k)-/.test(ex.id || '')) return 'running';
+  if (/\b(run|runs|running|jog|jogging|sprint|sprints|couch to 5k|c25k|5k|10k|parkrun|strides)\b/i.test(ex.name || '')) return 'running';
+  return 'cardio';
 }
 
 /**
@@ -149,6 +239,31 @@ const GROUP_META = {
     description: 'Whole circuit sessions, start to finish. These are hard work by design.',
     movement: true,
     order: 4
+  },
+  // PRAC-2, 12 Sep 2026. The groups that arrived when the gap closed.
+  running: {
+    label: 'Running',
+    description: 'Whole runs, from first-week walk-runs to longer efforts.',
+    movement: true,
+    order: 5
+  },
+  cardio: {
+    label: 'Cardio and conditioning',
+    description: 'Whole sessions to get your heart going. Walks, intervals, circuits and games.',
+    movement: true,
+    order: 6
+  },
+  swimming: {
+    label: 'Swimming',
+    description: 'Pool sessions and drill sets, start to finish.',
+    movement: true,
+    order: 7
+  },
+  cycling: {
+    label: 'Cycling',
+    description: 'Rides and turbo sessions. You will need a bike.',
+    movement: true,
+    order: 8
   }
 };
 
@@ -178,8 +293,10 @@ export function getPracticeGroups({ conditionIds = [], painScores = {} } = {}) {
   for (const ex of getStandalonePractices()) {
     const safety = getExerciseSafetyTier(ex, active);
     if (safety === 'avoid') continue;
-    if (!byCategory.has(ex.category)) byCategory.set(ex.category, []);
-    byCategory.get(ex.category).push({ ...ex, safety });
+    // PRAC-2. Grouped by practiceGroupFor(), not raw category.
+    const groupId = practiceGroupFor(ex);
+    if (!byCategory.has(groupId)) byCategory.set(groupId, []);
+    byCategory.get(groupId).push({ ...ex, safety });
   }
 
   return [...byCategory.entries()]
