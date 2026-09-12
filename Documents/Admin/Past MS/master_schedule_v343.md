@@ -1,12 +1,12 @@
 # Alongside: Move — Master Schedule
-## 12 Sep 2026 v344
+## 12 Sep 2026 v343
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v343.md`. Remove v343 on upload.
+Supersedes `master_schedule_v342.md`. Remove v342 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
-> **Live: `alongside-v501`, 147 gates, `store.js` v67, `Schema.md` v1.60, cold start blueprint v106.** Read that blueprint after this block.
+> **Live: `alongside-v500`, 146 gates, `store.js` v67, `Schema.md` v1.60, cold start blueprint v105.** Read that blueprint after this block.
 >
 > **Claude's pre-beta BUILD scope is complete.** CLUB 9 of 9 plus QUICK-INPUTS, GUIDED-COPY, DEVICE-1, DEVICE-2, ARC-LED, ARC-PLAIN — `v452` → `v466` on 06 Sep. **QUICK-BUILD-2/3 `v467`, CHECKIN-3 and PROPOSAL-1/2 `v468` — 08 Sep.**
 >
@@ -90,20 +90,6 @@ Supersedes `master_schedule_v343.md`. Remove v343 on upload.
 > **Order:** ✅ TIMER-2 (shipped `v497`) → GYM-REACH-1 (diagnose only) → SEARCH-1a (vocabulary, no UI) → GYM-REACH-2 → SEARCH-1b → CARD-4 → GYM-MIX-1. **Before beta: the first three.**
 >
 > ⚫ **The session the plan called TIMER-1 shipped as TIMER-2.** `tools/verify-timer1.mjs` has existed since 08 Sep and covers something else — the countdown's automatic move to NOTE announcing itself. The collision was found at gate-writing time, and renaming the new work was the safe direction.
->
-> ### 🟢 SEARCH-1b — SHIPPED 12 Sep, `v501`. Decision 2 taken and built.
->
-> **A search box in the swap sheet**, over muscle words and exercise names at once. `muscle-search.js` (v498) now has its first caller.
->
-> ⚫ **It always says what it did**, which is why the vocabulary shipped first: it **names the area it searched** (lats → upper-back is BROADER, and unstated it looks wrong), it says when it **does not know a word** rather than showing something adjacent, and it **explains an empty panel** when a known word finds nothing — a different sentence from not knowing the word.
->
-> 🔵 The search is a way through one list, not a setting: cleared when the sheet closes and when a body area is tapped. The chips stay on screen while searching, so the way back never disappears with the results.
->
-> 🟠 **Three things the gate caught, all invisible to a source check.** **The caret:** `rerender()` replaces the whole view on every keystroke, so the cursor jumped to the start and typing "lats" gave "stal". **A broken fixture reading as a broken feature:** the first test typed "row" into a slot whose pool had no rowing movement, so a correct "I don't know that word" looked like a fault. **A vacuous test:** test 7 skipped itself whenever its term happened to match, and deleting the empty-result branch left the gate green — it now tries several thin terms and fails if none reaches the branch.
->
-> ⚫ **And one that failed for the wrong reason:** the build is asynchronous, so the first draft read the DOM while the screen still said "Building your full body, one moment".
->
-> 🔵 **CARD-4 is the last one**, and the biggest: four pages, hazards on their own page, an image placeholder with an enforced expiry. It rewrites `exercise-card.js`, which ADAPT-1 changed this week, and the existing card gates (`verify-card3`, `verify-card-tdz`, `verify-adapt1`, `verify-core1`, `verify-clinical-response`) all assert three pages. **It needs its own session and its own blueprint.**
 >
 > ### 🟢 PRAC-2 — SHIPPED 12 Sep, `v500`. Decision 1 taken and built. 28 practices → 155.
 >
@@ -8935,4 +8921,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 12 Sep 2026 v344*
+*Build New Habits · Alongside: Move · Master Schedule · 12 Sep 2026 v343*
