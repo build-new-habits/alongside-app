@@ -1,8 +1,8 @@
 # Alongside: Move — Master Schedule
-## 12 Sep 2026 v336
+## 12 Sep 2026 v335
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v335.md`. Remove v335 on upload.
+Supersedes `master_schedule_v334.md`. Remove v334 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
@@ -72,15 +72,7 @@ Supersedes `master_schedule_v335.md`. Remove v335 on upload.
 >
 > ### 🔴 DEVICE TEST, 12 Sep — Graeme's own gym session. Four findings, all verified. Nothing built.
 >
-> Full write-up: `Documents/Business/alongside_device_test_findings_12sep2026_v1.md`. **Build plan: `alongside_device_test_build_plan_12sep2026_v1.md`** — eight sessions, ordered by readiness and harm, with four decisions marked.
->
-> **Order:** TIMER-SETS-1 → GYM-REACH-1 (diagnose only) → GYM-REACH-2 → SEARCH-1a (vocabulary, no UI) → TIMER-SETS-2 → SEARCH-1b → CARD-4 → GYM-MIX-1. **Before beta: 1, 2 and 4 only.** If one thing ships, it is TIMER-SETS-1.
->
-> 🔵 **GYM-REACH-1 has already ruled out five causes** by execution on 12 Sep: not the category matchers (118 conditioning entries include all five machines), not equipment (`exerciseIsAvailable()` true for every machine with the gym set resolved), not difficulty/energy/impact/balance/position, not session length (16 candidates at 20, 40 and 60 minutes), not `sectionRules` (cardio declares none). **118 candidates become 16 somewhere inside `_filterCandidates` or the pool build, and that stage has not been named.** Diagnosis session instruments each stage and reports; no fix in the same session.
->
-> ⚫ **One gate the whole set needs, built once in GYM-REACH-2:** *declared, available, and never offered* is the shape of this fault and nothing tests for it. It should cover every equipment-gated entry, not just the machines.
->
-> ⚫ **CARD-4 rewrites `exercise-card.js`, which ADAPT-1 has just changed.** One session touches that file, not two — so if CARD-4 is happening, the image slot is designed in then, even if it renders nothing.
+> Full write-up: `Documents/Business/alongside_device_test_findings_12sep2026_v1.md`.
 >
 > | Task | What | Status |
 > |---|---|---|
@@ -8813,4 +8805,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 12 Sep 2026 v336*
+*Build New Habits · Alongside: Move · Master Schedule · 12 Sep 2026 v335*
