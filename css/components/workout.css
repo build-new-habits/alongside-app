@@ -1,6 +1,13 @@
 /* ============================================
    WORKOUT STYLES
    css/components/workout.css
+   12 Sep 2026 v15
+
+   v15 - TIMER-2. .set-progress and .set-progress-value, the set counter on
+   a counted exercise. It sits in the flex row with sets x reps and rest,
+   and it is the only one of the three that CHANGES as the person works --
+   which is why it carries role="status" in the markup.
+
    11 Sep 2026 v14
 
    v14 - ADAPT-1. .xcard-adapt, the collapsed "Other ways to do this"
@@ -399,8 +406,18 @@
 }
 
 .reps-info,
-.rest-info {
+.rest-info,
+.set-progress {
   text-align: center;
+}
+
+/* TIMER-2. Deliberately quieter than .reps-value: the prescription is the
+   headline, and this is where you are in it. */
+.set-progress-value {
+  display: block;
+  font-size: var(--text-2xl);
+  font-weight: var(--font-bold);
+  color: var(--color-text-secondary);
 }
 
 .reps-value {
