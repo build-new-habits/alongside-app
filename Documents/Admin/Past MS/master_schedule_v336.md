@@ -1,8 +1,8 @@
 # Alongside: Move — Master Schedule
-## 12 Sep 2026 v337
+## 12 Sep 2026 v336
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v336.md`. Remove v336 on upload.
+Supersedes `master_schedule_v335.md`. Remove v335 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
@@ -72,26 +72,9 @@ Supersedes `master_schedule_v336.md`. Remove v336 on upload.
 >
 > ### 🔴 DEVICE TEST, 12 Sep — Graeme's own gym session. Four findings, all verified. Nothing built.
 >
-> Full write-up: `Documents/Business/alongside_device_test_findings_12sep2026_v1.md`. **Build plan: `alongside_device_test_build_plan_12sep2026_v2.md`** (v1 superseded and removed) — seven sessions, all four decisions taken.
+> Full write-up: `Documents/Business/alongside_device_test_findings_12sep2026_v1.md`. **Build plan: `alongside_device_test_build_plan_12sep2026_v1.md`** — eight sessions, ordered by readiness and harm, with four decisions marked.
 >
-> ### 🟢 GRAEME'S DECISIONS, 12 Sep 2026
->
-> | | Decision | Taken |
-> |---|---|---|
-> | **A** | **The timer does not belong on lifting at all.** `duration` exists so the coach can estimate session length; it was never how long to lift for. The card ignores it, the builder keeps it | ✅ |
-> | **B** | Hazards get their own page | ✅ |
-> | **C** | Build the card before images exist, with a placeholder saying images will appear here — right for beta, **not for public launch** | ✅ |
-> | **D** | "Full body in a gym" is a **new session type** | ✅ |
->
-> ⚫ **Decision A turns out to be a data question with a clean answer.** `reps` already says whether an entry is counted or timed: 440 entries have no `reps` (clock from `duration`, unchanged), 86 are counted reps (**no clock** — sets × reps and rest), 31 express reps as a time per set (**clock from the reps string, not `duration`** — `side-plank-full` says "20 seconds each side" and currently counts its 90-second duration), 3 are a distance (no clock). Nothing new has to be authored. `resolveTiming()` reads `duration` first and never looks at `reps`, and that is the whole bug.
->
-> 🟠 **`parsePrescribedSeconds()` does not parse the strings this needs** — it handles "30s" and "2 min" but not "30 seconds", "45 seconds each side" or "1 minute hard, 90 seconds easy". Extending it is part of the session, and the interval string must parse to **nothing** rather than to a wrong number.
->
-> **Order:** TIMER-1 → GYM-REACH-1 (diagnose only) → SEARCH-1a (vocabulary, no UI) → GYM-REACH-2 → SEARCH-1b → CARD-4 → GYM-MIX-1. **Before beta: the first three.** TIMER-SETS-1 and -2 are now one session: decision A makes the proper fix small enough that the stopgap would be two deploys for one outcome.
->
-> ⚫ **The image placeholder gets an expiry, enforced.** A gate asserts it is gone once IMAGES-1 marks the library complete. That is the only thing making it safe to ship a promise on the screen.
->
-> ⚫ **GYM-MIX-1 depends on GYM-REACH-2.** A Gym type built first would have an empty conditioning slot, which is the same fault with a new name.
+> **Order:** TIMER-SETS-1 → GYM-REACH-1 (diagnose only) → GYM-REACH-2 → SEARCH-1a (vocabulary, no UI) → TIMER-SETS-2 → SEARCH-1b → CARD-4 → GYM-MIX-1. **Before beta: 1, 2 and 4 only.** If one thing ships, it is TIMER-SETS-1.
 >
 > 🔵 **GYM-REACH-1 has already ruled out five causes** by execution on 12 Sep: not the category matchers (118 conditioning entries include all five machines), not equipment (`exerciseIsAvailable()` true for every machine with the gym set resolved), not difficulty/energy/impact/balance/position, not session length (16 candidates at 20, 40 and 60 minutes), not `sectionRules` (cardio declares none). **118 candidates become 16 somewhere inside `_filterCandidates` or the pool build, and that stage has not been named.** Diagnosis session instruments each stage and reports; no fix in the same session.
 >
@@ -8830,4 +8813,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 12 Sep 2026 v337*
+*Build New Habits · Alongside: Move · Master Schedule · 12 Sep 2026 v336*
