@@ -1,12 +1,12 @@
 # Alongside: Move — Master Schedule
-## 12 Sep 2026 v338
+## 12 Sep 2026 v337
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v337.md`. Remove v337 on upload.
+Supersedes `master_schedule_v336.md`. Remove v336 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
-> **Live: `alongside-v497`, 143 gates, `store.js` v67, `Schema.md` v1.60, cold start blueprint v102.** Read that blueprint after this block.
+> **Live: `alongside-v496`, 142 gates, `store.js` v67, `Schema.md` v1.60, cold start blueprint v101.** Read that blueprint after this block.
 >
 > **Claude's pre-beta BUILD scope is complete.** CLUB 9 of 9 plus QUICK-INPUTS, GUIDED-COPY, DEVICE-1, DEVICE-2, ARC-LED, ARC-PLAIN — `v452` → `v466` on 06 Sep. **QUICK-BUILD-2/3 `v467`, CHECKIN-3 and PROPOSAL-1/2 `v468` — 08 Sep.**
 >
@@ -87,19 +87,7 @@ Supersedes `master_schedule_v337.md`. Remove v337 on upload.
 >
 > 🟠 **`parsePrescribedSeconds()` does not parse the strings this needs** — it handles "30s" and "2 min" but not "30 seconds", "45 seconds each side" or "1 minute hard, 90 seconds easy". Extending it is part of the session, and the interval string must parse to **nothing** rather than to a wrong number.
 >
-> **Order:** ✅ TIMER-2 (shipped `v497`) → GYM-REACH-1 (diagnose only) → SEARCH-1a (vocabulary, no UI) → GYM-REACH-2 → SEARCH-1b → CARD-4 → GYM-MIX-1. **Before beta: the first three.**
->
-> ⚫ **The session the plan called TIMER-1 shipped as TIMER-2.** `tools/verify-timer1.mjs` has existed since 08 Sep and covers something else — the countdown's automatic move to NOTE announcing itself. The collision was found at gate-writing time, and renaming the new work was the safe direction.
->
-> ### 🟢 TIMER-2 — SHIPPED 12 Sep, `v497`. The clock belongs to the exercise, not to lifting.
->
-> A counted exercise now shows `3 × 10`, the rest between sets, and a **set counter that moves** on a tap of "Set 1 done". The last set opens reflection, because that is the end of the exercise. "Set 1 of 3" as a timer label is gone rather than corrected — with no clock there is nothing for it to count. Timed exercises are untouched, and `side-plank-full` finally counts its own 20 seconds instead of its 90-second `duration`.
->
-> ⚫ **Two ordering decisions inside `classifyReps()`, both load-bearing:** distance is checked before time, or "30 metres" reads as thirty minutes; and an interval prescription ("1 minute hard, 90 seconds easy", 8 entries) returns **nothing** rather than its first number — a resolver that grabs 60 and silently drops the rest is worse than no clock.
->
-> 🟠 **Two gate mistakes caught by their own reversals, recorded because both are the pass-for-the-wrong-reason class:** test 6 began as a regex over `workout.js` and would have passed on every day the label was broken, so it now taps through a real Lat Pulldown in a mounted session; and deleting `currentSet = 1` from `resetTimer()` left the gate green, because a one-exercise fixture can never see a counter carried over. A two-exercise fixture now proves the next lift starts at set one.
->
-> 🔵 **Still Graeme's, from the same device test:** the 13 fixed swap groups remain the only way to reach an alternative (SEARCH-1a next), and machine cardio is still unreachable (GYM-REACH-1 next).
+> **Order:** TIMER-1 → GYM-REACH-1 (diagnose only) → SEARCH-1a (vocabulary, no UI) → GYM-REACH-2 → SEARCH-1b → CARD-4 → GYM-MIX-1. **Before beta: the first three.** TIMER-SETS-1 and -2 are now one session: decision A makes the proper fix small enough that the stopgap would be two deploys for one outcome.
 >
 > ⚫ **The image placeholder gets an expiry, enforced.** A gate asserts it is gone once IMAGES-1 marks the library complete. That is the only thing making it safe to ship a promise on the screen.
 >
@@ -8842,4 +8830,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 12 Sep 2026 v338*
+*Build New Habits · Alongside: Move · Master Schedule · 12 Sep 2026 v337*
