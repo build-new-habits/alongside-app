@@ -1,6 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 12 Sep 2026 v499
+ *
+ * v499 - GYM-MIX-1. session-builder.js. A ninth session type, Gym: one long
+ *   machine block then lifting. Already precached; cache bump only.
+ *
  * 12 Sep 2026 v498
  *
  * v498 - SEARCH-1a. NEW FILE precached: js/data/muscle-search.js, the
@@ -3386,7 +3391,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v498";
+const CACHE_NAME = "alongside-v499";
 
 const SHELL_URLS = [
 
