@@ -53,6 +53,10 @@ const click = el => el && el.dispatchEvent(new dom.window.MouseEvent("click", { 
 const wait = ms => new Promise(r => setTimeout(r, ms));
 const KIT = ["dumbbells", "bench"];
 const ui = await import("../js/views/session-builder-ui.js");
+// GYM-MIX-1, 12 Sep 2026. Was a hardcoded 8 in two places and broke the day
+// a ninth session type shipped. Derived now, as verify-tiergh already does:
+// the assertion is "every type has a tile", not "there are eight types".
+const { SESSION_TYPES: _TYPES } = await import("../js/session-builder.js");
 const paint = () => { document.getElementById("main-content").innerHTML = ui.render(); ui.onMount(); };
 
 async function toPreview() {
@@ -73,7 +77,7 @@ const btn = $("#sb-rebuild-btn");
 ok("the exit control is present", !!btn);
 ok("it is labelled for building again, not for leaving", /different one/i.test(btn.textContent));
 click(btn); await wait(200);
-ok("it lands on the TYPE PICKER, where the build started", $$(".sb-type-tile").length === 8);
+ok("it lands on the TYPE PICKER, where the build started", $$(".sb-type-tile").length === _TYPES.length);
 ok("it does not linger on the preview", !$("#sb-go-btn"));
 reverses("it does not skip ahead to duration", () => $$(".sb-duration-btn").length > 0);
 
@@ -105,7 +109,7 @@ click(gbtn); await wait(200);
 router.navigate = realNavigate;
 ok("it actually LEAVES the builder at severe pain", navCalls.includes("today"));
 reverses("it does not drop the person back on the picker behind a closed door",
-  () => $$(".sb-type-tile").length === 8 && navCalls.length === 0);
+  () => $$(".sb-type-tile").length === _TYPES.length && navCalls.length === 0);
 
 console.log("\n────────────────────────────────\n" + pass + " passed, " + fail + " failed");
 if (fails.length) { fails.forEach(f => console.log("  - " + f)); process.exit(1); }

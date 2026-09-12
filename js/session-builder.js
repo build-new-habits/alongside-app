@@ -1,6 +1,25 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
+ * 12 Sep 2026 v51
+ *
+ * v51 - GYM-MIX-1. A ninth session type: Gym. One long machine block, then
+ *   lifting -- the session Graeme could not build, because Full Body
+ *   reached no machine past the warm-up and Cardio reached no weights.
+ *
+ *   The ten-minute rule is NOT loosened. _filterCandidates() takes an
+ *   `opts.allowSessionLength` that one slot may ask for, and
+ *   verify-gymmix1 test 1b asserts no other type ever builds a
+ *   ten-minute-plus item.
+ *
+ *   TWO FAULTS FOUND BY BUILDING SESSIONS, not by reading this file. The
+ *   first draft let any long cardio entry fill the slot, so a gym session
+ *   opened with HIIT 30:30, Run Strides, and -- with no machine declared
+ *   -- Dance Freestyle. And _trimToDuration() removes the longest main
+ *   item first, which is by definition the machine block: it was deleted
+ *   on 10 of 12 thirty-minute builds, leaving exactly the session he
+ *   complained about.
+ *
  * 11 Sep 2026 v50
  *
  * v50 - PROPOSAL-3. todayIntensity finally has a reader here. A low-energy
@@ -919,7 +938,7 @@
 
 import { store } from "./store.js";
 import { resolveEquipment, exerciseIsAvailable } from "./data/equipment-map.js";
-import { EXERCISES, isSessionLength } from "./data/exercises/index.js";
+import { EXERCISES, isSessionLength, isCardioMachine } from "./data/exercises/index.js";
 import { matchCategory } from "./data/session-categories.js";
 import { buildRationale } from "./data/session-rationale.js";
 import { getZoneStatus, getPainBand, getCondition, getExcludedConditions } from "./data/conditions.js";
@@ -1449,6 +1468,29 @@ export const SESSION_TYPES = [
     cooldownCategories: ["child-pose", "supine-rotation"]
   },
   {
+    // GYM-MIX-1, 12 Sep 2026. Graeme's own gym session, which the app
+    // could not build: cross trainer, lat pulldowns, dead bugs, treadmill.
+    // Full Body reached no machine past the warm-up, and Cardio reached no
+    // weights at all, so a normal gym visit fell between two types.
+    //
+    // The shape is ONE long machine block and then lifting, because that
+    // is what the library actually holds -- every machine entry is 15 to
+    // 30 minutes and there are no short ones. featureSlot is how the long
+    // block gets in; see _filterCandidates and buildSession.
+    id:          "gym",
+    label:       "Gym",
+    icon:        "\uD83C\uDFCB\uFE0F",
+    description: "A machine block, then lifting. Built for a gym floor.",
+    warmupCategories:   ["cardio-warmup", "activation", "thoracic-mobility"],
+    featureSlot: {
+      categories:         ["conditioning", "interval", "easy-cardio"],
+      allowSessionLength: true,
+      requiresEquipment:  true
+    },
+    mainCategories:     ["horizontal-pull", "horizontal-push", "squat-pattern", "hip-hinge", "core-stability", "single-leg"],
+    cooldownCategories: ["hip-flexor-stretch", "chest-stretch", "hamstring-stretch"]
+  },
+  {
     id:          "cardio",
     label:       "Cardio",
     icon:        "🏃",
@@ -1548,6 +1590,16 @@ const EXERCISE_COUNT = {
 // Stretch: the held positions ARE the session. The warm-up exists only
 // so nobody stretches cold, which takes one or two things, not three.
 const TYPE_COUNTS = {
+  // GYM-MIX-1. The feature block is 15 to 30 minutes on its own, so the
+  // lifting section is deliberately short. These are the counts BEFORE the
+  // feature slot is added, so a 45-minute gym session is one machine
+  // block, three lifts, a warm-up and a stretch.
+  gym: {
+    15: { warmup: 1, main: 2, cooldown: 1 },
+    30: { warmup: 1, main: 3, cooldown: 1 },
+    45: { warmup: 1, main: 3, cooldown: 2 },
+    60: { warmup: 2, main: 5, cooldown: 2 }
+  },
   stretch: {
     15: { warmup: 1, main: 5,  cooldown: 1 },
     30: { warmup: 2, main: 7,  cooldown: 2 },
@@ -1952,12 +2004,29 @@ function _trimToDuration(warmup, prescribed, main, cooldown, targetMins) {
   const total = () => [...warmup, ...prescribed, ...main, ...cooldown]
     .reduce((a, e) => a + _exerciseMins(e), 0);
 
+  // GYM-MIX-1. The feature block is exempt from trimming.
+  //
+  // This loop removes the LONGEST item in main first, and a gym session's
+  // machine block is by definition the longest thing in it -- so the trim
+  // deleted the one exercise the session is built around, every time, and
+  // the first three test builds came back as lifting sessions with a
+  // warm-up on a bike. Found by building sessions, not by reading this.
   const trimmed = [...main];
-  while (total() > targetMins * TOLERANCE && trimmed.length > MIN_MAIN) {
-    let worstIdx = 0;
-    for (let i = 1; i < trimmed.length; i++) {
-      if (_exerciseMins(trimmed[i]) > _exerciseMins(trimmed[worstIdx])) worstIdx = i;
+  // The feature block is never the thing removed, and it does not count
+  // towards the floor either -- MIN_MAIN is about how many real working
+  // movements are left, and a 25-minute machine block is not one of three
+  // lifts.
+  const isFeature   = ex => ex?._feature === true;
+  const workingLeft = () => trimmed.filter(ex => !isFeature(ex)).length;
+
+  while (total() > targetMins * TOLERANCE && workingLeft() > MIN_MAIN) {
+    let worstIdx = -1;
+    for (let i = 0; i < trimmed.length; i++) {
+      if (isFeature(trimmed[i])) continue;
+      if (worstIdx === -1 || isFeature(trimmed[worstIdx]) ||
+          _exerciseMins(trimmed[i]) > _exerciseMins(trimmed[worstIdx])) worstIdx = i;
     }
+    if (worstIdx === -1 || isFeature(trimmed[worstIdx])) break;
     trimmed.splice(worstIdx, 1);
     main.length = 0;
     main.push(...trimmed);
@@ -2045,7 +2114,22 @@ function _difficulty(ex) {
   return 10;
 }
 
-function _filterCandidates(categories, section, equipSet, conditionSet, sectionRules) {
+/**
+ * GYM-MIX-1, 12 Sep 2026. `opts.allowSessionLength` lifts the ten-minute
+ * rule FOR ONE SLOT, and nothing else lifts it.
+ *
+ * isSessionLength() exists because a 60-minute cardio build once returned
+ * two different weeks of the same couch-to-5K programme stacked on top of
+ * each other (DATA-1). It is right, and it is why every machine cardio
+ * block -- all of them 15 to 30 minutes -- is invisible to this builder.
+ *
+ * A gym session is the one shape where a single long block is the point
+ * rather than an accident: you get on the cross trainer for twenty
+ * minutes, then you lift. So the exemption is passed in per call, by the
+ * one slot that asks for it, rather than the rule being softened where
+ * everything can reach it.
+ */
+function _filterCandidates(categories, section, equipSet, conditionSet, sectionRules, opts = {}) {
   const ceiling = _difficultyCeiling();
   const prefs   = store.get("exercisePreferences") || {};
 
@@ -2384,7 +2468,7 @@ function _filterCandidates(categories, section, equipSet, conditionSet, sectionR
     // had NO exclusion at all. Two engines, one definition -- a second
     // copy here is how the two would drift, and drift is the fault this
     // whole rule exists to catch.
-    if (isSessionLength(ex)) return false;
+    if (isSessionLength(ex) && !opts.allowSessionLength) return false;
 
     if (prefs[ex.id]?.preference === "avoid") return false;
     if (impactGated && isImpact(ex)) return false;
@@ -2467,7 +2551,27 @@ export function buildCandidatePools({ sessionType, durationMins, equipmentOverri
   const counts         = _applyPreset(baseCounts, preset);
 
   function poolFor(categories, section, count) {
-    const candidates = _filterCandidates(categories, section, equipSet, conditionSet, type.sectionRules?.[section]);
+    // GYM-MIX-1. The main pool carries the feature candidates too.
+    //
+    // SWAP-1's gate proves every built exercise is in its own section's
+    // candidate pool (0 of 1,101 absent). buildSession() puts the feature
+    // block in `main`, so if this pool did not hold it, that proof would
+    // break the day a gym session was built -- and the swap sheet would
+    // offer no way to change the longest item in the session.
+    const featureCandidates = (section === "main" && type.featureSlot)
+      ? _filterCandidates(
+          type.featureSlot.categories, "main", equipSet, conditionSet,
+          type.sectionRules?.main,
+          { allowSessionLength: type.featureSlot.allowSessionLength === true }
+        ).filter(ex => isSessionLength(ex) &&
+                       (!type.featureSlot.requiresEquipment || isCardioMachine(ex)))
+      : [];
+
+    const candidates = [
+      ...featureCandidates,
+      ..._filterCandidates(categories, section, equipSet, conditionSet, type.sectionRules?.[section])
+        .filter(ex => !featureCandidates.some(f => f.id === ex.id))
+    ];
     const recommendedIds = new Set();
 
     // ARC-3. The focused slots are claimed BEFORE one-per-category, or
@@ -3076,6 +3180,64 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
   // warm-up looks different when it does.
   const pulseRaiser = pulseRaiserDecision(sessionType);
 
+  /**
+   * GYM-MIX-1. One long block for a type that declares a featureSlot.
+   *
+   * Returns [] for every other session type, so nothing else in the app
+   * changes shape. Returns [] too when the person has no machine: a gym
+   * session without a machine is a lifting session, which is what the
+   * lifts section already builds, rather than an error or an empty slot.
+   */
+  function _selectFeature(sessionTypeDef, equipSetIn, conditionSetIn, alreadyChosen) {
+    const slot = sessionTypeDef.featureSlot;
+    if (!slot) return [];
+
+    const candidates = _filterCandidates(
+      slot.categories, "main", equipSetIn, conditionSetIn,
+      sessionTypeDef.sectionRules?.main,
+      { allowSessionLength: slot.allowSessionLength === true }
+    ).filter(ex => !alreadyChosen.has(ex.id));
+
+    // The long ones are the point. A five-minute warm-up entry technically
+    // matches these categories, and picking it would give a gym session a
+    // pulse-raiser where its machine block should be.
+    // Long AND on a machine. Both halves are load-bearing, and the first
+    // draft had neither: a Gym session opened with HIIT 30:30, Run Strides
+    // and -- with no machine at all -- Dance Freestyle. All three are real
+    // cardio and none of them is a gym floor.
+    const longEnough = candidates.filter(ex => isSessionLength(ex));
+    const onMachine  = longEnough.filter(ex => isCardioMachine(ex));
+
+    // requiresEquipment: a long block that needs no kit is a thing you
+    // could do in a park, so it does not open a session built for a gym.
+    // If the person has no machine there is simply no feature block, and
+    // the session is the lifting -- which is the honest answer rather than
+    // a substitute nobody asked for.
+    const pool = slot.requiresEquipment ? onMachine : longEnough;
+    if (!pool.length) return [];
+
+    // 'less' is honoured here by hand, because pickFrom() -- which does
+    // continuity, mastery and preference weighting properly -- is declared
+    // inside selectFromCategories() and is not reachable from this scope.
+    //
+    // STATED RATHER THAN HIDDEN: this slot therefore gets preference
+    // handling and nothing else. It is the same gap SEL-1 already records
+    // against the reserved pulse-raiser slot, and the right fix for both is
+    // to lift pickFrom() out, which is not this session's job. 'avoid' is
+    // already gone: _filterCandidates() removes it above.
+    const prefs   = store.get("exercisePreferences") || {};
+    const wanted  = pool.filter(ex => prefs[ex.id]?.preference !== "less");
+    const choices = wanted.length ? wanted : pool;
+
+    const picked = choices[Math.floor(Math.random() * choices.length)];
+    if (!picked) return [];
+    alreadyChosen.add(picked.id);
+    // _feature marks it for _trimToDuration, which would otherwise remove
+    // it first -- see the note there. Spread, never mutated: these objects
+    // come from the shared library by reference.
+    return [{ ...picked, _feature: true }];
+  }
+
   function selectFromCategories(categories, section, count, alreadyChosen) {
     const chosen = alreadyChosen || new Set();
     const prefs  = store.get("exercisePreferences") || {};
@@ -3604,7 +3766,17 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
   // cool-down; the warm-up floor and the reserved pulse-raiser slot are
   // rules, and a preference must not disturb a rule.
   const mainCategories    = focusOrderedCategories(type.mainCategories);
-  const mainExercises     = [...prescribed, ...selectFromCategories(mainCategories, "main", adjustedCounts.main, alreadyChosen)];
+
+  // GYM-MIX-1. The feature block, if this type has one. Exactly one item,
+  // exempt from the ten-minute rule, and it LEADS the main section: you
+  // get on the machine, then you lift.
+  //
+  // It is claimed before the lifts so it cannot lose its slot to them, and
+  // its id goes into alreadyChosen so nothing picks it twice.
+  const featureExercises = _selectFeature(type, equipSet, conditionSet, alreadyChosen);
+
+  const mainExercises     = [...prescribed, ...featureExercises,
+                             ...selectFromCategories(mainCategories, "main", adjustedCounts.main, alreadyChosen)];
   const cooldownExercises = selectFromCategories(type.cooldownCategories, "cooldown", adjustedCounts.cooldown, alreadyChosen);
 
   // If equipment mismatch is severe, add a coach note
