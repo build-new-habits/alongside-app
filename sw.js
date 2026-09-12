@@ -1,6 +1,14 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 12 Sep 2026 v498
+ *
+ * v498 - SEARCH-1a. NEW FILE precached: js/data/muscle-search.js, the
+ *   everyday and technical words for each body area. Nothing imports it
+ *   yet -- the search input is SEARCH-1b -- but a file on disk and not in
+ *   this list is an offline launch failure waiting for the day something
+ *   does.
+ *
  * 12 Sep 2026 v497
  *
  * v497 - TIMER-2. exercise-timing.js, workout.js and workout.css. A counted
@@ -3378,7 +3386,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v497";
+const CACHE_NAME = "alongside-v498";
 
 const SHELL_URLS = [
 
@@ -3607,6 +3615,7 @@ const SHELL_URLS = [
   "/alongside-app/js/data/exercises/recovery.js",
   "/alongside-app/js/data/exercises/mindfulness.js",
   "/alongside-app/js/data/practice-library.js",
+  "/alongside-app/js/data/muscle-search.js",
 
   // Assets
   "/alongside-app/assets/images/logo-icon-small.png",
