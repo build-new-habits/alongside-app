@@ -1,6 +1,13 @@
 /* ============================================================
    session-shared.css
    css/components/session-shared.css
+   12 Sep 2026 v9
+
+   v9 - SEARCH-1b. .sb-swap-search and its label, input and status line.
+        The status is a role="status" region and is ALWAYS in the DOM,
+        empty when there is nothing to say -- a live region inserted at
+        the moment it gains text is frequently not announced at all.
+
    08 Sep 2026 v8
 
    v8 - A11Y-HEADER. .workout-header-title is a real heading now, in all
@@ -802,4 +809,50 @@
   color: var(--color-text);
   line-height: var(--leading-relaxed, 1.6);
   opacity: 1;
+}
+
+/* ============================================================
+   SEARCH-1b - SEARCHING THE SWAP SHEET
+   ============================================================ */
+
+.sb-swap-search {
+  margin-bottom: var(--space-3);
+}
+
+/* Visible, not a placeholder standing in for one. A placeholder vanishes
+   the moment somebody types, which is when they most need to know what
+   the box does. */
+.sb-swap-search-label {
+  display: block;
+  margin-bottom: var(--space-1);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+.sb-swap-search-input {
+  width: 100%;
+  min-height: 48px;                /* WCAG 2.2 target size, as the chips */
+  padding: var(--space-2) var(--space-3);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md, 8px);
+  background: var(--color-bg-card);
+  color: var(--color-text);
+  font: inherit;
+}
+
+.sb-swap-search-input:focus-visible {
+  outline: 3px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+/* Empty most of the time, and that is deliberate: the element stays put
+   so the region exists before it has anything to announce. */
+.sb-swap-search-status:empty {
+  display: none;
+}
+
+.sb-swap-search-status {
+  margin: var(--space-2) 0;
+  font-size: var(--text-sm);
+  color: var(--color-text);
 }
