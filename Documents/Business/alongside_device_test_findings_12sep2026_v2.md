@@ -1,5 +1,5 @@
 # Alongside: Move — Device Test Findings
-## 12 Sep 2026 v1
+## 12 Sep 2026 v2
 
 Build New Habits | Graeme's own gym session on `alongside-v496`. Four findings, each checked against the live code before it was written down. **Nothing has been changed.**
 
@@ -112,3 +112,62 @@ The fourth is a redesign with two decisions inside it.
 2. **Do the hazards get their own page**, knowing that makes them swipeable?
 3. **Do you want the four-page card built before there are images**, with the slot empty?
 4. **Is "full body in a gym" a new session type, or a change to how the existing ones are built?**
+
+---
+
+## 9. GYM-REACH-1: the diagnosis. Added 12 Sep 2026, `v497`
+
+**No fix in this session**, as the plan required. The cause is named, and it is not what section 1 assumed.
+
+### 9.1 The cause: `isSessionLength()`
+
+`js/data/exercises/index.js`:
+
+```javascript
+export function isSessionLength(ex) {
+  return ex?.contentType === "practice" || (ex?.duration || 0) >= 600;
+}
+```
+
+`session-builder.js` drops anything it returns true for. **Every machine cardio block is 15 to 30 minutes**, so every one is excluded:
+
+| Entry | Duration |
+|---|---|
+| `gym-treadmill-incline-walk`, `cardio-rowing-intervals` | 1800s |
+| `gym-treadmill-intervals` | 1500s |
+| `rowing-machine`, `cardio-rowing-easy`, `cardio-assault-bike`, `gym-cross-trainer-intervals`, `gym-stair-climber-steady` | 1200s |
+| `gym-stair-climber-intervals` | 900s |
+
+And the four machine entries that **do** appear are the four under ten minutes: the easy warm-ups, 240 to 300 seconds. That is the whole of it.
+
+**This rule is deliberate and it is right.** DATA-1, 12 Aug: a 25-minute treadmill block is not one of ten slots in a 40-minute session, and the rule exists because a single 60-minute cardio build once returned two different weeks of the same couch-to-5K programme stacked on top of each other. **So GYM-REACH-2 as scoped — "fix the filter" — is the wrong fix.** Nothing is broken in `_filterCandidates`.
+
+### 9.2 The real fault: 136 entries fall between two rules
+
+Long content is supposed to have a home. `practice-library.js` derives it:
+
+```javascript
+return EXERCISES.filter(ex => isSessionLength(ex) && !reachable.has(ex.id));
+```
+
+`reachable` is computed from category matches across every session type — **and it does not apply the builder's own length rule.** So the machines match `conditioning`, the practice library concludes a session type can reach them, and the builder then drops them for length. Each rule assumes the other has them.
+
+**Measured: 136 entries sit in that gap.** By library category: cardio 90, recovery 21, mobility 9, mindfulness 9, strength 7. Among them: `brisk-walk`, `cycling-steady`, `hiit-30-30`, `walk-run-intervals`, `stair-climbing`, `dance-freestyle`, `mobility-flow-5min`, and all nine machine blocks.
+
+**Zero of the 136 appear under Practices**, which shows 28. Authored content, reachable by nothing.
+
+This is the same shape as PRAC-1 in August, which found 28 whole practices no view referenced. The door built then only fits what the derivation lets through.
+
+### 9.3 One smaller thing
+
+`stair-climber` is in `CARDIO_MACHINES` and on two entries, but **neither equipment picker offers it** — not onboarding, not the session builder. Those two entries are unavailable to everybody regardless of the length rule.
+
+**Not a fault:** the builder UI's `bike` and `cross-trainer` ids resolve correctly to the data's `exercise-bike` and `elliptical` through `EQUIPMENT_IMPLIES`. Checked, because a vocabulary mismatch was the obvious suspect.
+
+### 9.4 What follows
+
+| Row | Revised |
+|---|---|
+| **GYM-REACH-2** | **Rescoped.** Not a filter fix. Make `reachableByAnySessionType()` honest — apply the same length rule the builder applies — so the 136 stop falling between the two. Expect the Practices list to grow from 28 to around 164, which is a content-shape question before it is a code change |
+| **GYM-MIX-1** | **Unblocked, and now the right home for the machines.** A Gym session type needs a shape with room for one long block, rather than ten short slots. That is what Graeme wanted: cross trainer, lat pulldowns, dead bugs, treadmill |
+| **New: EQUIP-STAIR** | Add `stair-climber` to both equipment pickers, or retire the two entries |

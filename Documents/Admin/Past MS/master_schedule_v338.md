@@ -1,8 +1,8 @@
 # Alongside: Move — Master Schedule
-## 12 Sep 2026 v339
+## 12 Sep 2026 v338
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v338.md`. Remove v338 on upload.
+Supersedes `master_schedule_v337.md`. Remove v337 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
@@ -90,26 +90,6 @@ Supersedes `master_schedule_v338.md`. Remove v338 on upload.
 > **Order:** ✅ TIMER-2 (shipped `v497`) → GYM-REACH-1 (diagnose only) → SEARCH-1a (vocabulary, no UI) → GYM-REACH-2 → SEARCH-1b → CARD-4 → GYM-MIX-1. **Before beta: the first three.**
 >
 > ⚫ **The session the plan called TIMER-1 shipped as TIMER-2.** `tools/verify-timer1.mjs` has existed since 08 Sep and covers something else — the countdown's automatic move to NOTE announcing itself. The collision was found at gate-writing time, and renaming the new work was the safe direction.
->
-> ### 🔴 GYM-REACH-1 — DIAGNOSED 12 Sep. Not a filter fault, and the real one is much bigger.
->
-> Written up in `alongside_device_test_findings_12sep2026_v2.md` §9. **No fix in this session, as planned.**
->
-> **The cause is `isSessionLength()`** in `js/data/exercises/index.js`: `contentType === "practice" || duration >= 600`. Every machine cardio block is 15 to 30 minutes, so every one is excluded from the generative builder — and the only four machine entries that DO appear are the four easy warm-ups, at 240 to 300 seconds. That is the whole of it.
->
-> ⚫ **That rule is deliberate and it is right.** DATA-1, 12 Aug: a 25-minute treadmill block is not one of ten slots in a 40-minute session, and the rule exists because a 60-minute cardio build once returned two weeks of the same couch-to-5K programme stacked. **So GYM-REACH-2 as originally scoped — "fix the filter" — was the wrong fix. Nothing in `_filterCandidates` is broken.**
->
-> 🔴 **THE REAL FAULT: 136 entries fall between two rules.** `practice-library.js` homes long content by excluding whatever is "reachable by any session type" — computed from category matches, **without applying the builder's own length rule**. So the machines match `conditioning`, practices concludes a session type can reach them, and the builder then drops them for length. Each rule assumes the other has them. Measured: **136 entries, none of which appear anywhere.** Cardio 90, recovery 21, mobility 9, mindfulness 9, strength 7 — including `brisk-walk`, `cycling-steady`, `hiit-30-30`, `walk-run-intervals`, `stair-climbing`, `dance-freestyle` and all nine machine blocks. Practices shows 28.
->
-> ⚫ **Same shape as PRAC-1 in August**, which found 28 whole practices no view referenced. The door built then only fits what the derivation lets through.
->
-> | Row | Revised |
-> |---|---|
-> | 🟠 **GYM-REACH-2** | **Rescoped.** Make `reachableByAnySessionType()` honest — apply the same length rule the builder applies. Practices would grow from 28 to roughly 164, which is a **content-shape question for Graeme before it is a code change** |
-> | 🟡 **GYM-MIX-1** | **Unblocked, and now the right home for the machines.** A Gym type needs a shape with room for ONE long block, not ten short slots. Exactly what Graeme wanted: cross trainer, lat pulldowns, dead bugs, treadmill |
-> | 🟠 **EQUIP-STAIR** | `stair-climber` is in `CARDIO_MACHINES` and on two entries, and **neither equipment picker offers it**. Add it, or retire the two entries |
->
-> 🔵 **Checked and NOT a fault:** the builder UI's `bike` and `cross-trainer` ids resolve correctly to the data's `exercise-bike` and `elliptical` through `EQUIPMENT_IMPLIES`. A vocabulary mismatch was the obvious suspect and it is clean.
 >
 > ### 🟢 TIMER-2 — SHIPPED 12 Sep, `v497`. The clock belongs to the exercise, not to lifting.
 >
@@ -8862,4 +8842,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 12 Sep 2026 v339*
+*Build New Habits · Alongside: Move · Master Schedule · 12 Sep 2026 v338*
