@@ -1,12 +1,12 @@
 # Alongside: Move — Master Schedule
-## 12 Sep 2026 v340
+## 12 Sep 2026 v339
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v339.md`. Remove v339 on upload.
+Supersedes `master_schedule_v338.md`. Remove v338 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
-> **Live: `alongside-v498`, 144 gates, `store.js` v67, `Schema.md` v1.60, cold start blueprint v103.** Read that blueprint after this block.
+> **Live: `alongside-v497`, 143 gates, `store.js` v67, `Schema.md` v1.60, cold start blueprint v102.** Read that blueprint after this block.
 >
 > **Claude's pre-beta BUILD scope is complete.** CLUB 9 of 9 plus QUICK-INPUTS, GUIDED-COPY, DEVICE-1, DEVICE-2, ARC-LED, ARC-PLAIN — `v452` → `v466` on 06 Sep. **QUICK-BUILD-2/3 `v467`, CHECKIN-3 and PROPOSAL-1/2 `v468` — 08 Sep.**
 >
@@ -90,18 +90,6 @@ Supersedes `master_schedule_v339.md`. Remove v339 on upload.
 > **Order:** ✅ TIMER-2 (shipped `v497`) → GYM-REACH-1 (diagnose only) → SEARCH-1a (vocabulary, no UI) → GYM-REACH-2 → SEARCH-1b → CARD-4 → GYM-MIX-1. **Before beta: the first three.**
 >
 > ⚫ **The session the plan called TIMER-1 shipped as TIMER-2.** `tools/verify-timer1.mjs` has existed since 08 Sep and covers something else — the countdown's automatic move to NOTE announcing itself. The collision was found at gate-writing time, and renaming the new work was the safe direction.
->
-> ### 🟢 SEARCH-1a — SHIPPED 12 Sep, `v498`. The words people use. No UI.
->
-> `js/data/muscle-search.js`: 31 areas, roughly 170 terms, everyday and technical. `areasForTerm()` resolves a word; `searchByTerm()` returns exercises ranked by how central the area is to the entry, the same rule `swapGroupFor()` uses. **Nothing imports it yet** — the input box is SEARCH-1b — because a box on top of no synonyms returns nothing for the first word a gym-goer types.
->
-> ⚫ **Three kinds of mapping, written into the file.** EXACT ("quads" → `quadriceps`). **BROADER** ("lats" → `upper-back`: there is no latissimus area, so results are right but wider than the word — **SEARCH-1b must name the area it searched**). **REFUSED**: anything unknown returns `[]`, so the caller says it does not know the word rather than showing something adjacent.
->
-> 🔵 **"obliques" maps to nothing on purpose**, recorded in `KNOWN_UNMAPPED`. Rotation and anti-rotation work is spread across `abdominals` and `core` in ways that need reading entry by entry, and guessing would put side bends in front of somebody who asked for oblique work.
->
-> ⚫ **Every gate assertion ends at a real exercise, not at an area.** `cardiovascular` has one entry, `sciatica` one, `shin-splints` two — a term can resolve perfectly and still show a blank screen, and that is the failure worth catching.
->
-> 🟠 **Two faults the gate caught in Claude's own first draft:** the resolver matched when the QUERY started with a known term as well as the other way round, so "lattisimuss" resolved to `upper-back` and "backpack" would have resolved to back — a typo landing on a real answer is exactly the silent near-miss the file exists to avoid. And deleting the three-character floor left the gate green, with one letter resolving to a dozen areas. Both now held by assertions with their reversals proven.
 >
 > ### 🔴 GYM-REACH-1 — DIAGNOSED 12 Sep. Not a filter fault, and the real one is much bigger.
 >
@@ -8874,4 +8862,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 12 Sep 2026 v340*
+*Build New Habits · Alongside: Move · Master Schedule · 12 Sep 2026 v339*
