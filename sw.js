@@ -1,6 +1,12 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 12 Sep 2026 v500
+ *
+ * v500 - PRAC-2. practice-library.js. The 136 practices that were reachable
+ *   by nothing now appear, in eight groups. Already precached; cache bump
+ *   only.
+ *
  * 12 Sep 2026 v499
  *
  * v499 - GYM-MIX-1. session-builder.js. A ninth session type, Gym: one long
@@ -3391,7 +3397,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v499";
+const CACHE_NAME = "alongside-v500";
 
 const SHELL_URLS = [
 
