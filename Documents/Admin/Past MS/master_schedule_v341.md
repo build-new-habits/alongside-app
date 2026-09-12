@@ -1,12 +1,12 @@
 # Alongside: Move — Master Schedule
-## 12 Sep 2026 v342
+## 12 Sep 2026 v341
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v341.md`. Remove v341 on upload.
+Supersedes `master_schedule_v340.md`. Remove v340 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
-> **Live: `alongside-v499`, 145 gates, `store.js` v67, `Schema.md` v1.60, cold start blueprint v104.** Read that blueprint after this block.
+> **Live: `alongside-v498`, 144 gates, `store.js` v67, `Schema.md` v1.60, cold start blueprint v103.** Read that blueprint after this block.
 >
 > **Claude's pre-beta BUILD scope is complete.** CLUB 9 of 9 plus QUICK-INPUTS, GUIDED-COPY, DEVICE-1, DEVICE-2, ARC-LED, ARC-PLAIN — `v452` → `v466` on 06 Sep. **QUICK-BUILD-2/3 `v467`, CHECKIN-3 and PROPOSAL-1/2 `v468` — 08 Sep.**
 >
@@ -90,24 +90,6 @@ Supersedes `master_schedule_v341.md`. Remove v341 on upload.
 > **Order:** ✅ TIMER-2 (shipped `v497`) → GYM-REACH-1 (diagnose only) → SEARCH-1a (vocabulary, no UI) → GYM-REACH-2 → SEARCH-1b → CARD-4 → GYM-MIX-1. **Before beta: the first three.**
 >
 > ⚫ **The session the plan called TIMER-1 shipped as TIMER-2.** `tools/verify-timer1.mjs` has existed since 08 Sep and covers something else — the countdown's automatic move to NOTE announcing itself. The collision was found at gate-writing time, and renaming the new work was the safe direction.
->
-> ### 🟢 GYM-MIX-1 — SHIPPED 12 Sep, `v499`. Decision 4 taken and built.
->
-> **A ninth session type, Gym:** machine warm-up, one long machine block, two to three lifts, a stretch. The session Graeme could not build — Full Body reached no machine past the warm-up, Cardio reached no weights.
->
-> ⚫ **The ten-minute rule is NOT loosened.** `_filterCandidates()` takes an `opts.allowSessionLength` that **one slot** may ask for. `verify-gymmix1` 1b asserts no other type ever builds a ten-minute-plus item, and reversing the exemption to a global one turns it red with six examples.
->
-> 🟠 **Two faults found by BUILDING sessions, not by reading code.** The first draft let any long cardio fill the slot, so a Gym session opened with HIIT 30:30, Run Strides and — with no machine declared — **Dance Freestyle**. And `_trimToDuration()` removes the longest main item first, which is by definition the machine block: **it deleted the block on 10 of 12 thirty-minute builds**, leaving exactly the session he complained about.
->
-> 🔵 **With no machine there is no block**, and the session is the lifting. A long bodyweight substitute in a gym session is not an answer.
->
-> ⚫ **`buildCandidatePools()` mirrors the builder**, or SWAP-1's proof breaks the day a gym session is built and the longest item has no swap.
->
-> 🟠 **Honest note carried in the gate:** the block is protected twice over and either half alone holds, so reversing ONE leaves the gate green. Reversing both turns three assertions red. Recorded rather than papered over.
->
-> ⚫ **Three other gates updated, all broken by a ninth type existing:** `verify-picker-exit` hardcoded 8 tiles in two places (now derived from `SESSION_TYPES.length` — the assertion is "every type has a tile"), `verify-twoengine` eight → nine, and `verify-sectionrules` asserted `sectionRules` was the LAST parameter of `_filterCandidates`, which it no longer is.
->
-> 🔵 **Decisions 1, 2 and 3 remain open** — Practices 28 → 164, the search box, the image placeholder.
 >
 > ### 🟡 FOUR OPEN DECISIONS — options and recommendations, 12 Sep
 >
@@ -8905,4 +8887,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 12 Sep 2026 v342*
+*Build New Habits · Alongside: Move · Master Schedule · 12 Sep 2026 v341*
