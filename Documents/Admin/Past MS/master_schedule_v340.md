@@ -1,8 +1,8 @@
 # Alongside: Move — Master Schedule
-## 12 Sep 2026 v341
+## 12 Sep 2026 v340
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v340.md`. Remove v340 on upload.
+Supersedes `master_schedule_v339.md`. Remove v339 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
@@ -90,19 +90,6 @@ Supersedes `master_schedule_v340.md`. Remove v340 on upload.
 > **Order:** ✅ TIMER-2 (shipped `v497`) → GYM-REACH-1 (diagnose only) → SEARCH-1a (vocabulary, no UI) → GYM-REACH-2 → SEARCH-1b → CARD-4 → GYM-MIX-1. **Before beta: the first three.**
 >
 > ⚫ **The session the plan called TIMER-1 shipped as TIMER-2.** `tools/verify-timer1.mjs` has existed since 08 Sep and covers something else — the countdown's automatic move to NOTE announcing itself. The collision was found at gate-writing time, and renaming the new work was the safe direction.
->
-> ### 🟡 FOUR OPEN DECISIONS — options and recommendations, 12 Sep
->
-> `Documents/Business/alongside_open_decisions_12sep2026_v1.md`. All four are Graeme's; none is built.
->
-> | | Decision | Claude's recommendation |
-> |---|---|---|
-> | **1** | **Practices, 28 → 164.** 136 entries reachable by nothing: cardio 90, recovery 21, mobility 9, mindfulness 9, strength 7. 45 are 10–15 min, 26 are over 30. 45 are equipment-gated | **Close the rule gap AND add groups in one session** — the rule change alone puts 90 cardio entries into four groups that have no home for them, which is a worse screen than today. Equipment filtering second, separately |
-> | **2** | **SEARCH-1b placement** | **Swap sheet first** (where he hit the wall), Library after beta. Three requirements whatever the placement: name the area it searched, say when it does not know a word, never empty the panel silently |
-> | **3** | **Image placeholder wording** | **Point at the video that already exists** — all 560 entries carry one — rather than an apology beside it. **The expiry gate is not optional**: without it, "not for public launch" becomes permanent by default |
-> | **4** | **Gym session shape** | **One long machine block plus lifts**: machine warm-up, one 15–25 min conditioning block, 2–3 lifts, core, stretch. The only option needing no new content. Needs an `isSessionLength()` exemption **scoped to that slot**, not a loosening of the rule everywhere |
->
-> ⚫ **If only one is taken: decision 4.** It is the session he met in a gym, the content exists, and it depends on nothing else.
 >
 > ### 🟢 SEARCH-1a — SHIPPED 12 Sep, `v498`. The words people use. No UI.
 >
@@ -8887,4 +8874,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 12 Sep 2026 v341*
+*Build New Habits · Alongside: Move · Master Schedule · 12 Sep 2026 v340*
