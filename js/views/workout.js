@@ -1,6 +1,26 @@
 /**
  * workout.js - Workout Execution View
- * 08 Sep 2026 v18
+ * 12 Sep 2026 v19
+ *
+ * v19 - TIMER-2. The clock belongs to the exercise, not to lifting.
+ *
+ *   Lat Pulldown, in Graeme's own gym session on v496: three sets of ten,
+ *   and a four-minute countdown labelled "Set 1 of 3". He started it
+ *   thinking it timed one set. Nothing advanced that label -- there was no
+ *   set two -- and when it ran out the card moved to reflection with two
+ *   sets still to do. The sets-and-reps display he should have seen lived
+ *   in a branch resolveTiming() made unreachable, so he never saw "10
+ *   reps" at all.
+ *
+ *   Now: a counted exercise shows 3 x 10, the rest between sets, and a set
+ *   counter that MOVES on a tap of "Set 1 done". The last set opens
+ *   reflection, because that is the end of the exercise. "Set 1 of 3" as a
+ *   timer label is gone rather than corrected -- with no clock there is
+ *   nothing for it to count. A timed exercise is untouched.
+ *
+ *   THE LAST SET HAS ITS OWN BUTTON. An earlier draft hid the control once
+ *   the final set was reached, so three sets took two taps and the third
+ *   ended some other way.
  *
  * v18 - TIMER-1. The one automatic move in a session now says so.
  *   Device pass, task 7.
@@ -320,6 +340,11 @@ let timerStarted = false; // Timer doesn't start until user taps Start
 // exercise they have not done. Reset on every exercise change.
 let currentCardPage = "decide";
 
+// TIMER-2, 12 Sep 2026. Which set the person is on, 1-based. Only ever
+// read on a counted exercise -- a stretch has sets in the data too, but
+// nobody counts their way through a stretch, so the clock still owns it.
+let currentSet = 1;
+
 /**
  * TIMER-1, 08 Sep 2026. True only when the COUNTDOWN moved the person to
  * the note page, never when they tapped Done themselves.
@@ -504,10 +529,21 @@ export function render() {
             </button>
           ` : ""}
 
+          <!-- TIMER-2. One set at a time, on a counted exercise with more
+               than one. The old flow gave no way to say "that is one done":
+               the clock ran out and the exercise was over, whether you had
+               done one set or three. -->
+          ${_setsRemaining(exercise) ? `
+            <button class="btn btn-accent btn-large btn-full" id="wo-set-done-btn">
+              Set ${currentSet} done \u2192
+            </button>
+          ` : ""}
+
           <!-- Rendered whether or not there is a clock. A timer that has
-               not finished must not trap somebody who has. -->
+               not finished must not trap somebody who has, and neither
+               must a set counter: this is always the way out. -->
           <button class="btn btn-primary btn-large btn-full" id="wo-done-btn">
-            Done \u2192
+            ${_setsRemaining(exercise) ? "Finish this one \u2192" : "Done \u2192"}
           </button>
         ` : ""}
 
@@ -558,15 +594,65 @@ function renderNoWorkout() {
   `;
 }
 
+/**
+ * TIMER-2. Three shapes, and the data already says which.
+ *
+ * The old first branch showed a countdown for anything with a `duration`,
+ * which is everything -- and labelled it "Set 1 of N" when the entry had
+ * sets. Nothing advanced that label; there was no set two. Graeme met it
+ * on Lat Pulldown: a four-minute clock for three sets of ten, and the
+ * reflection page when it ran out.
+ *
+ * Now: a counted exercise gets its sets and reps and a set counter that
+ * MOVES, a timed one gets a clock of the right length, and a distance
+ * gets the distance. "Set 1 of 3" is gone rather than made accurate --
+ * with no clock there is nothing for it to count down.
+ */
+/**
+ * TIMER-2. True when this exercise counts sets AND there are sets left.
+ *
+ * Counted only. A stretch carries `sets: 2` in the data too, but nobody
+ * taps their way through a stretch -- the clock owns those, exactly as
+ * before.
+ */
+function _setsRemaining(exercise) {
+  const t = resolveTiming(exercise);
+  if (t.shape !== "counted") return false;
+  const sets = exercise.sets || 1;
+  // <= and not <: the LAST set gets a "Set 3 done" button too. An earlier
+  // draft hid it on the final set, so the person tapped "Set 1 done",
+  // "Set 2 done", and then had to work out that the third set ended some
+  // other way. Three sets, three taps.
+  return sets > 1 && currentSet <= sets;
+}
+
 function renderExerciseTarget(exercise) {
-  if (resolveTiming(exercise).seconds) {
+  const timing = resolveTiming(exercise);
+
+  if (timing.seconds) {
     const sets = exercise.sets || 1;
     return `
       <div class="timer-display">
         <div class="timer-circle">
-          <span class="timer-value" id="timer-display">${formatTime(timeRemaining || resolveTiming(exercise).seconds)}</span>
-          <span class="timer-label">${sets > 1 ? `Set 1 of ${sets}` : "About this long"}</span>
+          <span class="timer-value" id="timer-display">${formatTime(timeRemaining || timing.seconds)}</span>
+          <span class="timer-label">${sets > 1 ? `${sets} sets, this long each` : "About this long"}</span>
         </div>
+      </div>
+    `;
+  } else if (exercise.reps && timing.shape === "distance") {
+    const sets = exercise.sets || 1;
+    return `
+      <div class="reps-display">
+        <div class="reps-info">
+          <span class="reps-value">${sets} \u00D7 ${exercise.reps}</span>
+          <span class="reps-label">sets</span>
+        </div>
+        ${exercise.rest ? `
+          <div class="rest-info">
+            <span class="rest-value">${exercise.rest}s</span>
+            <span class="rest-label">rest between sets</span>
+          </div>
+        ` : ""}
       </div>
     `;
   } else if (exercise.reps) {
@@ -578,6 +664,11 @@ function renderExerciseTarget(exercise) {
           <span class="reps-value">${sets} \u00D7 ${reps}</span>
           <span class="reps-label">sets \u00D7 reps</span>
         </div>
+        ${sets > 1 ? `
+          <div class="set-progress" role="status">
+            <span class="set-progress-value">Set ${Math.min(currentSet, sets)} of ${sets}</span>
+          </div>
+        ` : ""}
         ${exercise.rest ? `
           <div class="rest-info">
             <span class="rest-value">${exercise.rest}s</span>
@@ -731,6 +822,20 @@ export function onMount() {
   // CARD-3. Forward, and deliberately without touching the clock.
   document.getElementById("wo-begin-btn")?.addEventListener("click", () => {
     currentCardPage = "do";
+    scrollToTop();
+    router.navigate("workout");
+  });
+
+  // TIMER-2. Each tap is one set. The last set does not advance the
+  // counter into nothing -- it opens NOTE, because that IS the end of the
+  // exercise. Reflection after the last set, not after the first.
+  document.getElementById("wo-set-done-btn")?.addEventListener("click", () => {
+    const sets = exercise.sets || 1;
+    if (currentSet < sets) {
+      currentSet++;
+    } else {
+      currentCardPage = "note";   // the last set IS the end of the exercise
+    }
     scrollToTop();
     router.navigate("workout");
   });
@@ -917,6 +1022,9 @@ function resetTimer() {
   pauseTimer();
   timeRemaining = 0;
   timerStarted  = false;
+  // TIMER-2. A new exercise starts at set one. Without this, set 3 of the
+  // last exercise carries in and the counter opens on the final set.
+  currentSet    = 1;
   finishedByTimer = false;   // TIMER-1. A new exercise inherits nothing.
   // CARD-3. A new exercise always starts on DECIDE. Both advance paths
   // (complete and skip) come through here, so this is the one place it
