@@ -1,8 +1,8 @@
 # Alongside: Move — Master Schedule
-## 12 Sep 2026 v335
+## 12 Sep 2026 v334
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v334.md`. Remove v334 on upload.
+Supersedes `master_schedule_v333.md`. Remove v333 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
@@ -69,20 +69,6 @@ Supersedes `master_schedule_v334.md`. Remove v334 on upload.
 > #### 🟠 A finding about this document itself
 >
 > `master_schedule.md` was **edited in place on 11 Sep without a version bump** — commit `0a95c8b` moved the live line to `v494` while the header still said v331, and `Past MS/master_schedule_v331.md` held a different, earlier v331. The true final v331 has now been archived over it. `verify-schedule-drift` compares this file's header to its own footer, so **both agreed and both were wrong**, which is the same class of fault as the START HERE table drifting three times in one day.
->
-> ### 🔴 DEVICE TEST, 12 Sep — Graeme's own gym session. Four findings, all verified. Nothing built.
->
-> Full write-up: `Documents/Business/alongside_device_test_findings_12sep2026_v1.md`.
->
-> | Task | What | Status |
-> |---|---|---|
-> | 🟠 **GYM-REACH-1** | **Machine cardio is unreachable from the builder.** With every machine declared, a Cardio session offers 16 main candidates — jumping jacks, shadow boxing, eleven agility drills — and **no machine at any duration**. Strength types reach machines only in the WARM-UP pool, and only the four "easy" entries. So `gym-treadmill-intervals`, `gym-cross-trainer-intervals`, `gym-treadmill-incline-walk`, `rowing-machine` and `cardio-assault-bike` cannot be reached at all. ⚫ **Not the category rules** — `matchCategory(EXERCISES, "conditioning")` returns 118 including all five machines, so something in `_filterCandidates` drops them. **Cause not identified and not guessed at**; diagnosis session first, no fix in the same session | 🟠 Flagged Issue |
-> | 🟡 **GYM-MIX-1** | **No session shape mixes a machine block, weights and stretches.** Every type is a fixed recipe of slot categories. Graeme wanted cross trainer, lat pulldowns, dead bugs and the treadmill in one session and there is no shape for it. 🔵 Note: Cardio sessions DO carry stretches, so that half of the report was not quite right — it is weights that cannot join cardio | 🟡 Double Check |
-> | 🟡 **SEARCH-1** | **No search or filter anywhere in the builder.** The swap sheet's 13 fixed body-area groups are the only route. `affectsAreas` (31 values) is the only muscle-level vocabulary and has no synonyms: nothing maps "lats" to `upper-back` or "thighs" to `quadriceps`/`hamstring`. **Vocabulary before input box** — a search that returns nothing for "lats" is worse than no search | 🟡 Double Check |
-> | 🟠 **TIMER-SETS-1** | **The countdown on a sets exercise is telling people something untrue.** `resolveTiming()` returns `duration` whenever it exists, so `gym-lat-pulldown` (`duration: 240`, `sets: 3`, `reps: 10`) shows a 4-minute countdown **labelled "Set 1 of 3"** that never advances, then drops the person on the reflection page. `sets × reps` and rest render in the other branch, which that exercise never reaches — he never saw "10 reps" at all. **131 entries carry both duration and sets/reps; 118 have more than one set.** And **no entry in the library lacks a `duration`**, so `renderExerciseTarget()`'s reps branch — the one that shows `sets × reps` and rest — is unreachable with today's data. Measured: 560 entries checked, 0 without a duration. **Smallest of the four and the only one where the app states a falsehood — do this first** | 🟠 Flagged Issue |
-> | 🟡 **TIMER-SETS-2** | Set-by-set progression: set one done, set two, set three, then reflection. Needs Graeme's answer first: **what is the timer FOR on a lifting exercise** — rest between sets, or nothing? | 🟡 Double Check |
-> | 🟡 **CARD-4** | **Four pages instead of three:** overview / what to watch out for / the exercise with instructions, video and images / reflection. Graeme's reasoning: DO is now a long scroll past warnings, so people flick through it. ⚫ **The counter-argument, for him to weigh:** hazards on their own page become swipeable, where today you pass them on the way to what you want. **CR-5's rule that `HURT_AND_ACHE` renders on EVERY page must survive any reshuffle** | 🟡 Double Check |
-> | 🟡 **IMAGES-1** | **Zero entries carry any image field**; all 560 carry `youtube`. A content project — 560 entries, ours or properly licensed, each matching its coaching cue — not a card change. Can precede or follow CARD-4 | 🟡 Double Check |
 >
 > ### 🔴 FEED-READER — CLOSED 12 Sep. The button is read by nothing. Proven by execution.
 >
@@ -8805,4 +8791,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 12 Sep 2026 v335*
+*Build New Habits · Alongside: Move · Master Schedule · 12 Sep 2026 v334*
