@@ -93,7 +93,11 @@ check("1b. the three reported faults are covered", () => {
 console.log("\nTEST 2 - declared rules actually reach the filter");
 
 check("2a. _filterCandidates accepts and applies them", () => {
-  ok(/function _filterCandidates\([^)]*sectionRules\)/.test(src),
+  // GYM-MIX-1, 12 Sep 2026: the signature gained a trailing `opts`
+  // argument for the scoped isSessionLength exemption, so sectionRules is
+  // no longer the last parameter. The assertion is that it is THERE, not
+  // that it is last.
+  ok(/function _filterCandidates\([^)]*\bsectionRules\b[^)]*\)/.test(src),
      "_filterCandidates does not take sectionRules");
   ok(src.includes("_applySectionRules(matched, sectionRules)"),
      "the rules are never applied to the candidate list -- declared and inert");

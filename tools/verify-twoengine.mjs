@@ -164,7 +164,8 @@ const built = SB.buildSession({ sessionType: pick.sessionType, durationMins: 30 
 ok("2a. the chain picks one of the eight types", TYPE_IDS.includes(pick.sessionType),
    `picked "${pick.sessionType}"; the old engine only ever had three focuses`);
 
-ok("2b. and there are eight of them, not three", TYPE_IDS.length === 8,
+// GYM-MIX-1, 12 Sep 2026: nine, with the Gym type added.
+ok("2b. and there are nine of them, not three", TYPE_IDS.length === 9,
    `SESSION_TYPES holds ${TYPE_IDS.length}`);
 
 // workoutGenerator reports duration as a NUMBER from calculateDuration(),
