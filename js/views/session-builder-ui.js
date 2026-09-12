@@ -1,7 +1,31 @@
 /**
  * js/views/session-builder-ui.js - Session Builder UI
  *
- * 08 Sep 2026 v21
+ * 12 Sep 2026 v22
+ *
+ * v22 - SEARCH-1b. A search box in the swap sheet.
+ *
+ *   Graeme, in a gym on 12 Sep: the thirteen body-area chips were the only
+ *   way to reach an alternative, and he wanted to search by muscle --
+ *   "lats", "quads" -- in everyday or technical words. SEARCH-1a shipped
+ *   the vocabulary; this is the box.
+ *
+ *   ONE SEARCH OVER TWO THINGS. A muscle word goes through the vocabulary
+ *   ("lats" -> upper-back), and an exercise name matches directly, because
+ *   somebody who knows it is called a Lat Pulldown will type that.
+ *
+ *   IT ALWAYS SAYS WHAT IT DID. The area it searched -- "lats" returning
+ *   upper-back work is an explanation when stated and a surprise when not;
+ *   that it does not know a word, rather than showing something adjacent;
+ *   and why a panel is empty when a known word finds nothing.
+ *
+ *   THE CARET IS PUT BACK BY HAND. rerender() replaces the whole view on
+ *   every keystroke, so without it the cursor jumps to the start and
+ *   typing "lats" gives you "stal". Found by driving the box, not by
+ *   reading this.
+ *
+ *   The search is a way through one list, not a setting: it clears when
+ *   the sheet closes and when a body area is tapped.
  *
  * v21 - A11Y-HEADER. The .workout-header-title span is an h1, with
  *   the other ten views that carried it. session-shared.css v8 adds the
@@ -433,6 +457,11 @@ import { router }                         from "../router.js";
 import { SESSION_TYPES, ALLOCATION_PRESETS, buildSession, buildCandidatePools, buildSessionFromSelection, buildSessionFromSaved, severeZoneToday, zonesWithCoverage } from "../session-builder.js";
 // SWAP-1. The grouping, the soreness levels and the replacement all live
 // in the engine, so this file holds the words and none of the rules.
+import { searchByTerm } from "../data/muscle-search.js";
+// SEARCH-1b. The shared escaper, rather than a fourth copy of it: this
+// interpolates something the person typed, which is the one string in
+// this file that is not ours.
+import { escapeHtml } from "../data/plan-options.js";
 import { swapAlternatives, swapExerciseInSession, soreScoresToday, soreLevelFor,
          SWAP_GROUP_CAP, SORE_BLOCK_FLOOR }   from "../session-builder.js";
 import { getConditionName }                   from "../data/conditions.js";
@@ -519,6 +548,10 @@ let editingSavedId    = null;
 // the pool the session came from without calling any builder again.
 let candidatePools    = null;
 let swapIndex         = null;       // flat index into builtSession.exercises, or null
+// SEARCH-1b, 12 Sep 2026. What the person typed in the swap sheet, and
+// nothing else. Not stored, not remembered between sheets: it is a way
+// through this list, not a preference.
+let swapQuery         = "";
 let swapGroupId       = null;       // which body-area group the sheet is showing
 let swapShowAll       = false;      // the escape: everything in this section
 let swapExpanded      = false;      // past SWAP_GROUP_CAP within one group
@@ -644,6 +677,60 @@ export function render() {
  * not. Parts are collected and joined, so an exercise with only a
  * duration shows only a duration.
  */
+/**
+ * SEARCH-1b. One search over two things a person might type.
+ *
+ * A muscle word goes through SEARCH-1a's vocabulary -- "lats" resolves to
+ * upper-back, "quads" to quadriceps -- and an exercise name matches
+ * directly, because somebody who knows what a Lat Pulldown is called will
+ * type that instead.
+ *
+ * The result says WHICH it was and which areas it searched, so the sheet
+ * can tell the person. "Lats" returning upper-back work is an explanation
+ * when it is stated and a surprise when it is not: SEARCH-1a's own file
+ * calls that mapping BROADER and says the caller must name the area.
+ *
+ * An unknown word returns nothing, deliberately. The vocabulary refuses
+ * what it does not know so this can say so, rather than showing something
+ * adjacent that looks like an answer.
+ */
+/**
+ * SEARCH-1b. What the box says about what it did.
+ *
+ * Three things it must always do, and each of them is a sentence here:
+ * name the area it searched (because "lats" returns upper-back work),
+ * say plainly when it does not know a word, and never leave an empty
+ * panel without explaining it.
+ */
+function _searchStatus(found, count, query) {
+  const safe = escapeHtml(query);
+
+  if (found.unknown) {
+    return `I don't know &ldquo;${safe}&rdquo;. Try a muscle like lats or quads, or part of an exercise name &mdash; or pick a body area below.`;
+  }
+  if (count === 0) {
+    return `Nothing in this section matches &ldquo;${safe}&rdquo; today. Everything else is either already in your session or ruled out by what you've told me. The body areas below are still there.`;
+  }
+
+  const areaNames = (found.areas || []).map(a => (getConditionName(a) || a).replace(/-/g, " ").toLowerCase());
+  const where = areaNames.length ? ` Searched ${_andList(areaNames)}.` : "";
+  return `${count} ${count === 1 ? "movement" : "movements"} for &ldquo;${safe}&rdquo;.${where}`;
+}
+
+function _swapSearch(query, pool) {
+  const q = query.toLowerCase().trim();
+
+  const byName = pool.filter(ex => (ex.name || "").toLowerCase().includes(q));
+  const { areas, exercises: byArea } = searchByTerm(q, pool);
+
+  // Name matches lead: they are exact, and somebody typing a name wants
+  // that thing. Area matches follow, with no repeats.
+  const seen   = new Set(byName.map(e => e.id));
+  const merged = [...byName, ...byArea.filter(e => !seen.has(e.id))];
+
+  return { exercises: merged, areas, nameHits: byName.length, unknown: !areas.length && !byName.length };
+}
+
 function _exerciseMeta(ex, opts = {}) {
   const parts = [];
   if (ex.sets) parts.push(`${ex.sets} set${ex.sets === 1 ? "" : "s"}`);
@@ -1625,12 +1712,25 @@ function renderSwapSheet() {
   // tapped exercise's own area, then whatever is actually there. Only
   // groups that EXIST are ever selected, so this cannot land on nothing
   // while something remains.
+  // SEARCH-1b. Typing overrides the group chips entirely.
+  //
+  // Graeme, in a gym on 12 Sep: thirteen fixed body-area groups were the
+  // only way to reach an alternative, and he wanted to search by muscle
+  // -- "lats", "quads" -- in everyday or technical words. The vocabulary
+  // for that shipped in SEARCH-1a; this is the box.
+  const query      = swapQuery.trim();
+  const searching  = query.length > 0;
+  const everything = groups.flatMap(g => g.items);
+  const found      = searching ? _swapSearch(query, everything) : null;
+
   const has      = id => groups.some(g => g.id === id);
   const activeId = swapShowAll
     ? null
     : (has(swapGroupId) ? swapGroupId : (has(leadGroupId) ? leadGroupId : groups[0]?.id || null));
   const active   = groups.find(g => g.id === activeId) || null;
-  const shown    = swapShowAll ? groups.flatMap(g => g.items) : (active?.items || []);
+  const shown    = searching
+    ? found.exercises
+    : (swapShowAll ? everything : (active?.items || []));
   // The cap applies within a group only. "Everything in this section" is
   // the escape, and an escape that was itself capped would not be one.
   const capped   = (swapShowAll || swapExpanded) ? shown : shown.slice(0, SWAP_GROUP_CAP);
@@ -1665,6 +1765,23 @@ function renderSwapSheet() {
       ${header}
 
       <p class="sb-coach-line">Something else for the ${word}?</p>
+
+      <!-- SEARCH-1b. A real search input: type="search", labelled, and the
+           result count announced politely. The chips stay on screen while
+           searching so the way back is always visible. -->
+      <div class="sb-swap-search">
+        <label class="sb-swap-search-label" for="sb-swap-search">
+          Search by muscle or name
+        </label>
+        <input class="sb-swap-search-input" type="search" id="sb-swap-search"
+               value="${escapeHtml(swapQuery)}" autocomplete="off"
+               placeholder="lats, quads, lat pulldown"
+               aria-describedby="sb-swap-search-status">
+      </div>
+
+      <p class="sb-swap-search-status" id="sb-swap-search-status" role="status">
+        ${searching ? _searchStatus(found, shown.length, query) : ""}
+      </p>
 
       <div class="sb-swap-groups" role="group" aria-label="Choose a body area">
         ${groups.map(g => {
@@ -2442,17 +2559,35 @@ export function onMount() {
 
   document.getElementById("sb-swap-close-btn")?.addEventListener("click", () => {
     swapIndex = null;
+    swapQuery = "";             // SEARCH-1b: a way through one list, not a setting
     rerender();
   });
 
   document.querySelectorAll("[data-swap-group]").forEach(btn => {
     btn.addEventListener("click", () => {
+      swapQuery    = "";        // SEARCH-1b: tapping an area is leaving the search
       swapGroupId  = btn.dataset.swapGroup;
       swapShowAll  = false;
       swapExpanded = false;
       rerender();
     });
   });
+
+  // SEARCH-1b. `input` rather than a submit, so results narrow as you
+  // type. The caret is put back where it was: rerender() replaces the
+  // whole view, so without this the cursor jumps to the start on every
+  // keystroke and typing "lats" gives you "stal".
+  const _searchBox = document.getElementById("sb-swap-search");
+  if (_searchBox) {
+    _searchBox.addEventListener("input", (e) => {
+      const pos = e.target.selectionStart;
+      swapQuery    = e.target.value;
+      swapExpanded = false;
+      rerender();
+      const again = document.getElementById("sb-swap-search");
+      if (again) { again.focus(); try { again.setSelectionRange(pos, pos); } catch { /* not all input types allow it */ } }
+    });
+  }
 
   document.getElementById("sb-swap-all-btn")?.addEventListener("click", () => {
     swapShowAll  = !swapShowAll;
