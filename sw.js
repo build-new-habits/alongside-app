@@ -1,6 +1,12 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 12 Sep 2026 v501
+ *
+ * v501 - SEARCH-1b. session-builder-ui.js and session-shared.css. A search
+ *   box in the swap sheet. muscle-search.js was precached at v498 and now
+ *   has its first caller. Cache bump only.
+ *
  * 12 Sep 2026 v500
  *
  * v500 - PRAC-2. practice-library.js. The 136 practices that were reachable
@@ -3397,7 +3403,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v500";
+const CACHE_NAME = "alongside-v501";
 
 const SHELL_URLS = [
 
