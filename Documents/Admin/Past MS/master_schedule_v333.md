@@ -1,8 +1,8 @@
 # Alongside: Move — Master Schedule
-## 12 Sep 2026 v334
+## 11 Sep 2026 v333
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v333.md`. Remove v333 on upload.
+Supersedes `master_schedule_v332.md`. Remove v332 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
@@ -70,35 +70,6 @@ Supersedes `master_schedule_v333.md`. Remove v333 on upload.
 >
 > `master_schedule.md` was **edited in place on 11 Sep without a version bump** — commit `0a95c8b` moved the live line to `v494` while the header still said v331, and `Past MS/master_schedule_v331.md` held a different, earlier v331. The true final v331 has now been archived over it. `verify-schedule-drift` compares this file's header to its own footer, so **both agreed and both were wrong**, which is the same class of fault as the START HERE table drifting three times in one day.
 >
-> ### 🔴 FEED-READER — CLOSED 12 Sep. The button is read by nothing. Proven by execution.
->
-> **"That was too hard" and "That was too easy" reach no live decision.** Suspected on 10 Sep from reading the code; the rule is that nothing is reported open until execution proves it, so it was driven:
->
-> | What was run | Result |
-> |---|---|
-> | `store.get` instrumented, then `buildSession()` six times across six session types | **0 reads of `exerciseFeedback`** |
-> | Same, `buildSessionFromSelection()` | **0 reads** |
-> | Eight most-served exercises tapped "too hard" five times each via the real writer, then 40 builds | 138 appearances, against a clean run-to-run range of 135–156. **Inside the noise** |
-> | `getSuitableExercises()` called directly with the same data | Weighting applied correctly: `programmeScore` 0.5 on the marked ids |
->
-> ⚫ **So the reader works and is unreachable.** `applyFeedbackWeighting()` is called only by `getSuitableExercises()`, which is called only by `workoutGenerator.js`, which no live route has called since TWO-ENGINE on 06 Sep. The person taps a button that says the coach is listening, and nothing is.
->
-> 🔵 **Graeme's decision, two options, neither built:** retire the button, or wire the signal into the live builder. The second is a product decision about how much a past session should shape the next one — the exercise-versions work proposed "twice in five opens one step gentler", which he has not adopted. **Until one is chosen the button stays as it is**, because removing an affordance and repurposing it are both changes he should choose.
->
-> ### 🟢 CONTRA-AUDIT — REPORT DELIVERED 12 Sep. 17 inversions, 2 probable duplicates. No data changed.
->
-> `Documents/Business/alongside_contraindication_audit_12sep2026_v1.md`, with `Documents/Admin/Templates/audit-contraindications.mjs` to regenerate it.
->
-> **Seventeen pairs where the GENTLER entry is excluded for a condition the HARDER one allows** — three hip abductions all exclude `hip-acute` while the standing version does not; the barbell overhead press allows `lower-back-acute` while the seated band press does not; `dead-bug` carries **no contraindications at all** while the arms-only version written for a sore back excludes one.
->
-> ⚫ **Nobody is exposed by this today** — each entry is still filtered on its own. The consequence is that on a bad day the app withholds the easier option and keeps the harder one. **The direction of each fix is a clinical judgement and the report decides none of them.**
->
-> 🟠 **The pattern:** in most pairs the stricter entry is from the rehabilitation library and the looser from strength. Two files written at different times to different standards, and the person meeting them does not know which file an exercise came from.
->
-> 🔵 **Probable duplicates:** `90-90-hip-stretch`/`hip-90-90-stretch` (same stretch, two ids, disagreeing on position, areas and whether `glutes-acute` excludes or cautions) and `dead-bug`/`dead-bug-progression-3` (same movement at d2 and d4). Recommendation is to retire one of each once a reviewer says which is better written.
->
-> ⚫ **No gate written, on purpose.** A gate now would freeze whichever side of each pair happens to be in the data. It follows the answers, not the other way round.
->
 > ### 🟢 SHIPPED SINCE v332 — ADAPT-1 `v495` and PROPOSAL-3 `v496`
 >
 > **ADAPT-1 — other ways to do this.** A collapsed disclosure at the end of DO holding an entry's ways to ease off and ways to go further, plus a one-line pointer under the caution when something is sore and the exercise has ways to ease off. Graeme's steer, 10 Sep, from his own PT session: she did not say do this one, she said here are your options. **No store field and nothing recorded about which option was used**, which is also why no regulatory question arises — the information is offered and the choice stays with the person. "To go further" is withheld when the exercise works a sore area and in Gentle Care; prescribed exercises show nothing, because the clinician owns those. Nine entries adapted, three cue corrections (the Bulgarian split squat listed the trainer's glute cue as a fault). Exercise Entry Standard v4, `Schema.md` v1.60, `verify-adapt1` with 31 executing assertions and ten reversals.
@@ -109,7 +80,7 @@ Supersedes `master_schedule_v333.md`. Remove v333 on upload.
 >
 > **PROPOSAL-3 — see the row above.** Also worth recording: the master schedule's own PROPOSAL-3 note guessed at one cause. Both guesses were right, and there were two of them.
 >
-> 🔵 **Both of the ADAPT-1 follow-ups are now resolved as far as Claude can take them** — see the FEED-READER and CONTRA-AUDIT sections above. What remains on each is a decision, not work.
+> 🔵 **Still open from the ADAPT-1 work, none blocking:** `CONTRA-AUDIT` (at least 17 pairs where a gentler entry is contraindicated for something its harder sibling allows — the library disagrees with itself), `FEED-READER` (the "That was too hard" button may be read by nothing live since TWO-ENGINE; static reading only, must be driven by execution), and possible duplicate entries `dead-bug`/`dead-bug-progression-3` and `90-90-hip-stretch`/`hip-90-90-stretch`.
 >
 > ### 🟢 SHIPPED SINCE v330 — CLASS-6, `v486`. Unsticking is live. Seven classes, 29 of 33 aims served.
 >
@@ -8791,4 +8762,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 12 Sep 2026 v334*
+*Build New Habits · Alongside: Move · Master Schedule · 11 Sep 2026 v333*
