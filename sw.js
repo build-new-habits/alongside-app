@@ -1,6 +1,12 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 13 Sep 2026 v503
+ *
+ * v503 - CONTRA-FIX. Four exercise data files. Fourteen entries inherit
+ *   their gentler sibling's exclusions; this only ever removes offers.
+ *   Already precached; cache bump only.
+ *
  * 13 Sep 2026 v502
  *
  * v502 - CARD-4. The exercise card becomes four pages -- decide, watch,
@@ -3411,7 +3417,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v502";
+const CACHE_NAME = "alongside-v503";
 
 const SHELL_URLS = [
 
