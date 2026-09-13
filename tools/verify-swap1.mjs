@@ -334,8 +334,25 @@ console.log("\n7. Driving the real view — the preview leads and the 188-item l
 // lower-back at 3 supplies the marked-but-choosable case in the same
 // run — both branches, one fixture. Section 9 now ASSERTS both are
 // non-empty rather than trusting them to be.
-store.set("conditions", ["lower-back", "glutes"]);
-store.set("conditionPainScores", { "lower-back": 3, glutes: 7 });
+// CONTRA-FIX, 13 Sep 2026. abdominals at 7, not glutes.
+//
+// Measured over twenty runs each way: this gate failed 0/20 before
+// CONTRA-FIX and 2/20 after, then threw on the next line. The cause is
+// that change and is worth stating plainly -- CONTRA-FIX added
+// `glutes-acute` to several entries, and at a score of 7 a
+// contraindicated entry is filtered OUT of the pool rather than surviving
+// to be MARKED blocked. The glutes fixture went from comfortable to three
+// blocked options in a pool of seventy-three, so which slot surfaced one
+// became a coin toss.
+//
+// Measured across ten sore areas, abdominals at 7 leaves 26 blocked and
+// 30 marked in a pool of 101 -- the widest margin available, and by a
+// distance. lower-back at 3 still supplies the marked-but-choosable case
+// in the same run, exactly as before. This is the same vacuous-fixture
+// family section 9's own comment describes for shoulders; it has simply
+// moved to the area with the most room in it.
+store.set("conditions", ["lower-back", "abdominals"]);
+store.set("conditionPainScores", { "lower-back": 3, abdominals: 7 });
 store.set("equipment", KIT);
 const ui = await import("../js/views/session-builder-ui.js");
 const paint = () => { document.getElementById("main-content").innerHTML = ui.render(); ui.onMount(); };
