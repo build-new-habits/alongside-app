@@ -1,12 +1,12 @@
 # Alongside: Move — Master Schedule
-## 13 Sep 2026 v346
+## 12 Sep 2026 v345
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v345.md`. Remove v345 on upload.
+Supersedes `master_schedule_v344.md`. Remove v344 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
-> **Live: `alongside-v502`, 148 gates, `store.js` v67, `Schema.md` v1.60, cold start blueprint v107.** Read that blueprint after this block.
+> **Live: `alongside-v501`, 147 gates, `store.js` v67, `Schema.md` v1.60, cold start blueprint v106.** Read that blueprint after this block.
 >
 > **Claude's pre-beta BUILD scope is complete.** CLUB 9 of 9 plus QUICK-INPUTS, GUIDED-COPY, DEVICE-1, DEVICE-2, ARC-LED, ARC-PLAIN — `v452` → `v466` on 06 Sep. **QUICK-BUILD-2/3 `v467`, CHECKIN-3 and PROPOSAL-1/2 `v468` — 08 Sep.**
 >
@@ -87,7 +87,7 @@ Supersedes `master_schedule_v345.md`. Remove v345 on upload.
 >
 > 🟠 **`parsePrescribedSeconds()` does not parse the strings this needs** — it handles "30s" and "2 min" but not "30 seconds", "45 seconds each side" or "1 minute hard, 90 seconds easy". Extending it is part of the session, and the interval string must parse to **nothing** rather than to a wrong number.
 >
-> **Order:** ✅ TIMER-2 (`v497`) → GYM-REACH-1 (diagnose only) → SEARCH-1a (vocabulary, no UI) → GYM-REACH-2 → ✅ SEARCH-1b (`v501`) → ✅ CARD-4 (`v502`, 13 Sep) → GYM-MIX-1. **Before beta: GYM-REACH-1 and SEARCH-1a.**
+> **Order:** ✅ TIMER-2 (shipped `v497`) → GYM-REACH-1 (diagnose only) → SEARCH-1a (vocabulary, no UI) → GYM-REACH-2 → SEARCH-1b → CARD-4 → GYM-MIX-1. **Before beta: the first three.**
 >
 > ⚫ **The session the plan called TIMER-1 shipped as TIMER-2.** `tools/verify-timer1.mjs` has existed since 08 Sep and covers something else — the countdown's automatic move to NOTE announcing itself. The collision was found at gate-writing time, and renaming the new work was the safe direction.
 >
@@ -103,50 +103,9 @@ Supersedes `master_schedule_v345.md`. Remove v345 on upload.
 >
 > ⚫ **And one that failed for the wrong reason:** the build is asynchronous, so the first draft read the DOM while the screen still said "Building your full body, one moment".
 >
-> ### 🟢 CARD-4 — what was built, and what the blueprint got wrong. 13 Sep 2026, `alongside-v502`.
+> ### 🟡 CARD-4 — BLUEPRINT WRITTEN 12 Sep, NOT BUILT. Decisions B and C taken.
 >
-> Four pages — **decide → watch out → do → note**. The hazard cluster has its own page. An image slot is on DO with an honest placeholder and an enforced expiry. `tools/verify-card4.mjs` written first and **run red (31 pass / 24 fail, every control green so it was provably reaching real code)**, then brought to **55 / 0**. Gates 147 → 148, all 148 green.
->
-> `exercise-card.js` **v7** · `workout.css` **v16** · `workout.js` · `gym-programme.js` · `core-session.js` · `prescribed-session.js` · `verify-card3` · `verify-card-tdz` · `verify-timer1` · `verify-timer2` · cold start blueprint **v107** · `sw.js` **v502**, alone.
->
-> #### 🔴 Three things the blueprint asserted that were not true of the live code
->
-> | | Claim | Reality |
-> |---|---|---|
-> **1** | "Touches all six card players" (§4, §7.11, and this schedule's own line at v345) | **Four.** Only `workout`, `gym-programme`, `core-session` and `prescribed-session` import the shared card. `prescribed.js` and `morning-session.js` have their own local `renderExerciseCard()` and were never migrated. The blueprint's own grep counts — 48 `currentCardPage`, 28 `"decide"` — are correct and are reachable **only** from the four, so the counts were measured and the "six" was written from the file list. §2 said *five*, §4 listed six, §7.11 said six. `verify-card4` test 11.1 now pins the consumer set at exactly four |
-> **2** | "`HURT_AND_ACHE` is in `pinned`, so it should follow" (§5.2) | **It was not.** It was a section inside `doBody` — DO only. Taken at its word, moving the hazards to WATCH would have stripped "if it hurts" off the page where somebody is actually moving. Rule 1 was therefore a **behaviour change**, and load-bearing. It is in `pinned` now, on all four pages |
-> **3** | "The five existing gates" (§6) | **Wrong five.** `verify-adapt1`, `verify-core1` and `verify-clinical-response` all stayed green untouched. The two that broke — `verify-timer1` and `verify-timer2` — were not listed, and they are the gates that actually mount and play the views |
->
-> ⚫ **The CR-5 phrase had drifted.** The comment in `exercise-card.js` records the physiotherapist's "always" as meaning *every exercise, not just the 94 rehab entries*. "Every page" is a later mutation of that phrase, which this schedule then repeated. It is now true of the code either way, but the provenance is worth keeping straight.
->
-> #### 🟢 The two timer gates came back stronger, not weaker
->
-> Both used to tap `#wo-begin-btn` and assume they had landed on DO. They now walk the real route and assert a tally: **every route to DO passed through the warnings page, 4 of 4** in each gate. §6's rule — change the assertion, never weaken it — held everywhere; `verify-card3`'s hazard checks followed the hazards to WATCH rather than being relaxed, and gained two new ones (2a2, 2b2).
->
-> #### Reversals, all run before commit
->
-> Unpin `HURT_AND_ACHE` → 8 red · `watchOut` back onto DO → 4.2 red · `BACK_TO.do = "decide"` → 8.3 red · alt on the placeholder → 9.4 and 9.5 red. The expiry reversal runs **in-process** as test 10.2: it doctors the registry with an image field and confirms the placeholder becomes disallowed. All 560 entries carry `youtube` and **zero** carry any image field, so the placeholder's sentence is true today and the tripwire starts green.
->
-> #### ⚫ Open for Graeme, on device
->
-> Step forward and back through all four pages; confirm VoiceOver announces each change. **And judge the density:** `HURT_AND_ACHE` is ~60 words now repeated on every page. CUE-UNPIN is on record with Graeme objecting to a much shorter pinned repeat ("all these 2 relevant?"). The call made was that safety text earns the repetition where coaching text did not — the failure mode of repetition is irritation, of absence is injury. **Reverse it deliberately if it reads as noise.**
->
-> ### 🔴 HAZARD-MORNING — `morning-session.js` shows no safety guidance at all. NOT FIXED.
->
-> Found during CARD-4's session-start checklist. **`morning-session.js` renders a real do-the-exercise card — name, sets, reps, timer, a `<details>` guide, next button — with no caution line and no `HURT_AND_ACHE` anywhere in it.** Somebody doing a morning session gets none of the guidance CR-5 exists to provide. Pre-existing, not caused by CARD-4, and untouched by it.
->
-> `prescribed.js` is **not** in scope — its local card is a list-summary (name, prescription, physio notes, weekly dots), not a do-the-exercise card, and hazards do not belong there.
->
-> **Why it was not folded into CARD-4:** that session was already a card rewrite, four views, five gates amended and one written. §6 warns about assertions being weakened rather than changed, and that pressure arrives at the end of long sessions. Adding a second safety-critical surface mid-session is how it wins. **This is a decision to sequence it, not to defer it indefinitely** — "logged, not fixed" is this document's own documented failure mode, which is why this is red and booked rather than a Double Check row.
->
-> `verify-card4` test 11.2 holds the tripwire: the day either local-card view starts importing the shared card, test 11.1 goes red and somebody has to come back and read this.
->
-> **Its own session. Next after GYM-REACH-1 and SEARCH-1a unless Graeme reorders.**
->
->
-> ### 🟢 CARD-4 — SHIPPED 13 Sep 2026, `alongside-v502`. Gates 147 → 148.
->
-> Built per `Documents/Admin/alongside_blueprint_CARD-4_12sep2026_v1.md`. Full record immediately above. **Three of the blueprint's own claims were false against live code and were corrected in the build, not worked around.** Not on-device confirmed.
+> `Documents/Admin/alongside_blueprint_CARD-4_12sep2026_v1.md`. **Start a fresh session for this one** — it rewrites `exercise-card.js` (which ADAPT-1 changed this week), touches all six card players, and five existing gates assert three pages.
 >
 > Four pages: decide → watch out → do → note. The hazard cluster moves to its own page. An image slot arrives on DO with a placeholder pointing at the video every entry already carries, and **an enforced expiry** — the gate asserts the placeholder is gone once any entry has an image field, which is the only thing making it safe to ship a promise on screen.
 >
@@ -260,8 +219,8 @@ Supersedes `master_schedule_v345.md`. Remove v345 on upload.
 > | 🟡 **SEARCH-1** | **No search or filter anywhere in the builder.** The swap sheet's 13 fixed body-area groups are the only route. `affectsAreas` (31 values) is the only muscle-level vocabulary and has no synonyms: nothing maps "lats" to `upper-back` or "thighs" to `quadriceps`/`hamstring`. **Vocabulary before input box** — a search that returns nothing for "lats" is worse than no search | 🟡 Double Check |
 > | 🟠 **TIMER-SETS-1** | **The countdown on a sets exercise is telling people something untrue.** `resolveTiming()` returns `duration` whenever it exists, so `gym-lat-pulldown` (`duration: 240`, `sets: 3`, `reps: 10`) shows a 4-minute countdown **labelled "Set 1 of 3"** that never advances, then drops the person on the reflection page. `sets × reps` and rest render in the other branch, which that exercise never reaches — he never saw "10 reps" at all. **131 entries carry both duration and sets/reps; 118 have more than one set.** And **no entry in the library lacks a `duration`**, so `renderExerciseTarget()`'s reps branch — the one that shows `sets × reps` and rest — is unreachable with today's data. Measured: 560 entries checked, 0 without a duration. **Smallest of the four and the only one where the app states a falsehood — do this first** | 🟠 Flagged Issue |
 > | 🟡 **TIMER-SETS-2** | Set-by-set progression: set one done, set two, set three, then reflection. Needs Graeme's answer first: **what is the timer FOR on a lifting exercise** — rest between sets, or nothing? | 🟡 Double Check |
-> | 🟢 **CARD-4** | ✅ **Shipped 13 Sep, `v502`.** **Four pages instead of three:** overview / what to watch out for / the exercise with instructions, video and images / reflection. Graeme's reasoning: DO is now a long scroll past warnings, so people flick through it. ⚫ **The counter-argument, for him to weigh:** hazards on their own page become swipeable, where today you pass them on the way to what you want. **CR-5's rule that `HURT_AND_ACHE` renders on EVERY page must survive any reshuffle** — it did not hold before this session (it was on DO only) and now does, pinned | 🟢 Shipped |
-> | 🟡 **IMAGES-1** | **Zero entries carry any image field**; all 560 carry `youtube`. A content project — 560 entries, ours or properly licensed, each matching its coaching cue — not a card change. **CARD-4 shipped the slot on 13 Sep with an enforced expiry: `verify-card4` test 10 goes red the moment any entry gains an image field, so IMAGES-1 cannot land without the placeholder being removed deliberately** | 🟡 Double Check |
+> | 🟡 **CARD-4** | **Four pages instead of three:** overview / what to watch out for / the exercise with instructions, video and images / reflection. Graeme's reasoning: DO is now a long scroll past warnings, so people flick through it. ⚫ **The counter-argument, for him to weigh:** hazards on their own page become swipeable, where today you pass them on the way to what you want. **CR-5's rule that `HURT_AND_ACHE` renders on EVERY page must survive any reshuffle** | 🟡 Double Check |
+> | 🟡 **IMAGES-1** | **Zero entries carry any image field**; all 560 carry `youtube`. A content project — 560 entries, ours or properly licensed, each matching its coaching cue — not a card change. Can precede or follow CARD-4 | 🟡 Double Check |
 >
 > ### 🔴 FEED-READER — CLOSED 12 Sep. The button is read by nothing. Proven by execution.
 >
@@ -8984,4 +8943,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 13 Sep 2026 v346*
+*Build New Habits · Alongside: Move · Master Schedule · 12 Sep 2026 v345*

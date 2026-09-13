@@ -112,6 +112,7 @@ if (threw !== null) {
 }
 
 const decideHtml = renderExerciseCard(EX, { page: "decide" });
+const watchHtml  = renderExerciseCard(EX, { page: "watch" });   // CARD-4
 const doHtml     = renderExerciseCard(EX, { page: "do" });
 const noteHtml   = renderExerciseCard(EX, { page: "note" });
 const flatHtml   = renderExerciseCard(EX, { full: true });
@@ -133,12 +134,26 @@ ok("caution IS pinned to NOTE", /exercise-caution/.test(noteHtml));
 ok("the flat \"show everything\" card carries the lead cue once",
    (flatHtml.match(new RegExp(LEAD_CUE, "g")) || []).length === 1);
 
-// ── 4. Safety order survives: hazards before instructions on DO ─────
-const iWatch = doHtml.indexOf("Knees falling inwards");
+// ── 4. Safety order survives across the CARD-4 page split ──────────
+//
+// The exercise-specific hazard is on WATCH now, not DO, so the old
+// single-page ordering check cannot be run as written. The guarantee it
+// protected is intact and is asserted in two halves instead: the
+// hazard is reachable on its own page, and the UNIVERSAL hazard
+// (HURT_AND_ACHE, pinned by CARD-4) still renders above the
+// instructions on the page where somebody is actually moving.
+const iWatch = watchHtml.indexOf("Knees falling inwards");
 const iInstr = doHtml.indexOf("Hold the weight at your chest");
-ok("FIXTURE REACHES BOTH: hazard and instruction are on the DO page",
+ok("FIXTURE REACHES BOTH: the hazard is on WATCH and the instruction is on DO",
    iWatch > -1 && iInstr > -1);
-ok("hazards render before instructions on DO", iWatch < iInstr);
+ok("the exercise hazard is NOT left on DO",
+   doHtml.indexOf("Knees falling inwards") === -1);
+ok("the universal hazard renders before the instructions on DO", (() => {
+  const iHurt = doHtml.indexOf("If it hurts");
+  return iHurt > -1 && iHurt < iInstr;
+})());
+ok("and the exercise hazard precedes nothing explanatory on WATCH",
+   watchHtml.indexOf("Hold the weight at your chest") === -1);
 
 // ── 5. Secondary source guard: declaration precedes use ─────────────
 // Positional, indexOf against indexOf, on comment-stripped source, so a
