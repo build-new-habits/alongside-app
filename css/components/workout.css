@@ -1,6 +1,24 @@
 /* ============================================
    WORKOUT STYLES
    css/components/workout.css
+   13 Sep 2026 v16
+
+   v16 - CARD-4. .xcard-image and .xcard-image-note, the image slot on DO.
+
+   There are no photographs yet -- zero of the 560 entries carry an image
+   field -- so this styles a PROMISE, not a picture. Deliberately not a
+   grey placeholder rectangle: an empty box shaped like an image reads as
+   something that failed to load, and the whole point is that nothing is
+   broken. It is a quiet bordered note in muted body text, closer to a
+   caption than to a missing asset.
+
+   It is also not styled like a hazard, and not like the caution. It
+   carries no urgency and must not compete with the two blocks that do.
+
+   The slot disappears entirely once images exist -- verify-card4 test 10
+   fails the moment any entry gains an image field, which is what stops
+   "right for beta, not for public launch" becoming permanent.
+
    12 Sep 2026 v15
 
    v15 - TIMER-2. .set-progress and .set-progress-value, the set counter on
@@ -51,7 +69,7 @@
 
    .xcard-step is the small "Decide / Do / Note" label. It is aria-hidden
    in the markup because the card's region label already carries "step 1
-   of 3"; the visible text is orientation for sighted users and would
+   of 4"; the visible text is orientation for sighted users and would
    otherwise be announced twice.
 
    .xcard-back keeps the 48px target the tabs had. Going back is the one
@@ -1551,3 +1569,35 @@
   margin-top: var(--space-2);
   color: var(--color-text);
 }
+
+
+/* ── CARD-4. The image slot on DO ──────────────────────────────────────
+   A promise, not a picture. See the header note.
+
+   Contrast: the note text uses --color-text-muted on the card
+   background, which the 03 Aug site-wide audit measured at 3.91:1 to
+   8.05:1 across every background token -- above 4.5:1 on the surfaces
+   this block renders on, so it clears WCAG 2.2 AA 1.4.3 as body text.
+   The border is decorative and carries nothing the sentence does not,
+   so it is not held to 1.4.11.
+
+   No fixed height and no aspect-ratio box: nothing is loading, so
+   reserving space for it would be reserving space for a thing that does
+   not exist. It sizes to its sentence. */
+.xcard-image {
+  padding: var(--space-3);
+  border: 1px dashed var(--color-text-muted);
+  border-radius: var(--radius-md, 8px);
+  background: transparent;
+}
+
+.xcard-image-note {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm, 0.875rem);
+  line-height: 1.5;
+}
+
+/* Reduced motion, forced colours and print all inherit sensibly here:
+   there is no animation, no colour-only meaning, and the dashed border
+   is preserved by forced-colors as a system border. Nothing to override. */

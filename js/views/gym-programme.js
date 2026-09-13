@@ -911,6 +911,17 @@ export function GymProgrammeView(router) {
             </button>
           ` : ''}
 
+          <!-- CARD-4. The step out of the warnings. DECIDE now leads here
+               and this leads on to DO, so moving forward still passes the
+               hazards before the instructions -- the property the old
+               single-page layout had for free and a separate page could
+               easily have lost. -->
+          ${currentCardPage === "watch" ? `
+            <button class="btn btn-accent btn-large btn-full" id="gp-watch-btn">
+              Got it \u2014 show me how \u2192
+            </button>
+          ` : ''}
+
           ${currentCardPage === "do" ? `
             ${hasTimer ? `
               <button class="btn btn-large btn-full ${timerStarted ? 'btn-secondary' : 'btn-accent'}"
@@ -1037,6 +1048,14 @@ export function GymProgrammeView(router) {
 
     // CARD-3. Forward, and deliberately without touching the clock.
     document.getElementById('gp-begin-btn')?.addEventListener('click', () => {
+      currentCardPage = "watch";
+      scrollToTop();
+      renderCurrentExercise(container, session, stats, sessionType);
+    });
+
+    // CARD-4. WATCH -> DO. Same shape as the handler above it, and
+    // deliberately without touching the clock.
+    document.getElementById('gp-watch-btn')?.addEventListener('click', () => {
       currentCardPage = "do";
       scrollToTop();
       renderCurrentExercise(container, session, stats, sessionType);
@@ -1059,7 +1078,7 @@ export function GymProgrammeView(router) {
         const _pfx = (ev.detail && ev.detail.prefix) || "";
         if (!_pfx.startsWith("gp-")) return;
         const to = ev.detail && ev.detail.page;
-        if (to !== "decide" && to !== "do") return;
+        if (to !== "decide" && to !== "watch" && to !== "do") return;
         currentCardPage = to;
         scrollToTop();
         if (_ctx) renderCurrentExercise(_ctx.container, _ctx.session, _ctx.stats, _ctx.sessionType);

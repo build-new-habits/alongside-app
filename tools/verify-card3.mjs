@@ -124,29 +124,54 @@ check("1c. no page body may contain the caution", () => {
   }
 });
 
-console.log("\nTEST 2 - hazards are on DO, unhidden, and first");
+// CARD-4, 13 Sep 2026. The hazards moved to a page of their own, so
+// these checks follow them to WATCH rather than being relaxed. The
+// safety ORDER they existed to protect is unchanged and is now asserted
+// structurally: WATCH comes before DO in PAGES, and HURT_AND_ACHE is
+// pinned above every page body. Runtime proof of all of it is in
+// verify-card4 tests 2, 4 and 8.
+console.log("\nTEST 2 - hazards are on WATCH, unhidden, and ahead of DO");
 
-check("2a. watchOut renders in the DO body", () => {
+check("2a. watchOut renders in the WATCH body", () => {
+  const i = card.indexOf("const watchBody =");
+  ok(i > -1, "no watchBody");
+  const body = card.slice(i, card.indexOf("].join", i));
+  ok(body.includes("watchOut"), "the hazard list is not on WATCH -- CARD-4 moved it there");
+});
+
+check("2a2. and no longer on DO", () => {
   const i = card.indexOf("const doBody =");
   ok(i > -1, "no doBody");
   const body = card.slice(i, card.indexOf("].join", i));
-  ok(body.includes("watchOut"), "the hazard list is not on DO -- this is the CARD-2 regression");
+  ok(!body.includes("watchOut"), "the hazard list is still on DO; CARD-4 moved it to WATCH");
 });
 
-check("2b. watchOut precedes the explanatory text", () => {
-  const i = card.indexOf("const doBody =");
-  const body = card.slice(i, card.indexOf("].join", i));
-  const haz = body.indexOf("watchOut");
-  const ins = body.indexOf("instructions");
-  ok(haz > -1 && ins > -1, "a section is missing from DO");
-  ok(haz < ins, "instructions render before the hazards; safety order is caution, hazards, then the rest");
+check("2b. the warnings page comes before the instructions page", () => {
+  const p = card.indexOf("const PAGES =");
+  ok(p > -1, "no PAGES");
+  const pages = card.slice(p, card.indexOf("];", p));
+  const w = pages.indexOf('"watch"'), d = pages.indexOf('"do"');
+  ok(w > -1 && d > -1, "a page is missing from PAGES");
+  ok(w < d, "DO precedes WATCH; moving forward would reach the instructions before the warnings");
 });
 
-check("2c. nothing gates the hazard list behind an interaction", () => {
-  const i = card.indexOf("const doBody =");
-  const body = card.slice(i, card.indexOf("].join", i));
-  for (const bad of ["<details", "<summary", "hidden", "aria-expanded", "data-xcard-back"]) {
-    ok(!body.includes(bad), "DO wraps its content in " + bad + "; the hazards must need no interaction");
+check("2b2. the universal hazard is pinned, so it precedes every page body", () => {
+  const i = card.indexOf("const pinned =");
+  ok(i > -1, "no pinned block");
+  const body = card.slice(i, card.indexOf("`;", i));
+  ok(body.includes("HURT_AND_ACHE"),
+     "HURT_AND_ACHE is not pinned; CR-5 requires it on every page, and CARD-4 moved the hazards off DO");
+});
+
+check("2c. nothing gates either hazard behind an interaction", () => {
+  for (const which of ["const watchBody =", "const doBody ="]) {
+    const i = card.indexOf(which);
+    const body = card.slice(i, card.indexOf("].join", i));
+    for (const bad of ["<details", "<summary", "hidden", "aria-expanded", "data-xcard-back"]) {
+      ok(!body.includes(bad),
+         which.replace("const ", "").replace(" =", "") + " wraps its content in " + bad +
+         "; the hazards must need no interaction");
+    }
   }
 });
 
@@ -222,10 +247,14 @@ check("5b. no trend, delta, arrow or session count anywhere in the card", () => 
 });
 
 check("5d. the hazard block is visually distinct from ordinary prose", () => {
-  const i = card.indexOf("const doBody =");
-  const body = card.slice(i, card.indexOf("].join", i));
+  // CARD-4: watchOut lives in watchBody now, and HURT_AND_ACHE in pinned.
+  // Both must keep the modifier.
+  const slice = (marker, end) => card.slice(card.indexOf(marker), card.indexOf(end, card.indexOf(marker)));
+  const body = slice("const watchBody =", "].join");
   ok(body.includes("xcard-block--hazard"),
      "the hazard section has no modifier class; it renders as one more grey block");
+  ok(slice("const pinned =", "`;").includes("xcard-block--hazard"),
+     "the pinned hurt-and-ache block has no hazard modifier");
   const css = fs.readFileSync(_gatePath("css/components/workout.css"), "utf8");
   ok(css.includes(".xcard-block--hazard"), "the modifier class has no styling");
   ok(css.includes("--color-danger"), "the hazard box does not use the danger token");
