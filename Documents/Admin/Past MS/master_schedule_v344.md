@@ -1,8 +1,8 @@
 # Alongside: Move — Master Schedule
-## 12 Sep 2026 v345
+## 12 Sep 2026 v344
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v344.md`. Remove v344 on upload.
+Supersedes `master_schedule_v343.md`. Remove v343 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
@@ -103,15 +103,7 @@ Supersedes `master_schedule_v344.md`. Remove v344 on upload.
 >
 > ⚫ **And one that failed for the wrong reason:** the build is asynchronous, so the first draft read the DOM while the screen still said "Building your full body, one moment".
 >
-> ### 🟡 CARD-4 — BLUEPRINT WRITTEN 12 Sep, NOT BUILT. Decisions B and C taken.
->
-> `Documents/Admin/alongside_blueprint_CARD-4_12sep2026_v1.md`. **Start a fresh session for this one** — it rewrites `exercise-card.js` (which ADAPT-1 changed this week), touches all six card players, and five existing gates assert three pages.
->
-> Four pages: decide → watch out → do → note. The hazard cluster moves to its own page. An image slot arrives on DO with a placeholder pointing at the video every entry already carries, and **an enforced expiry** — the gate asserts the placeholder is gone once any entry has an image field, which is the only thing making it safe to ship a promise on screen.
->
-> ⚫ **The blueprint carries the argument AGAINST the change as well as for it**, so it is not rediscovered: hazards on their own page become swipeable, where today you pass them on the way to what you want. Graeme's counter — a page people scroll past fast is not being read either — is held by keeping the page ORDER and keeping `HURT_AND_ACHE` on every page.
->
-> 🟠 **The failure to expect:** each of the six players holds its OWN `currentCardPage` (48 references) and its own forward and back handlers. A view that still thinks `do` follows `decide` skips the warnings entirely, which is the opposite of the point.
+> 🔵 **CARD-4 is the last one**, and the biggest: four pages, hazards on their own page, an image placeholder with an enforced expiry. It rewrites `exercise-card.js`, which ADAPT-1 changed this week, and the existing card gates (`verify-card3`, `verify-card-tdz`, `verify-adapt1`, `verify-core1`, `verify-clinical-response`) all assert three pages. **It needs its own session and its own blueprint.**
 >
 > ### 🟢 PRAC-2 — SHIPPED 12 Sep, `v500`. Decision 1 taken and built. 28 practices → 155.
 >
@@ -8943,4 +8935,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 12 Sep 2026 v345*
+*Build New Habits · Alongside: Move · Master Schedule · 12 Sep 2026 v344*
