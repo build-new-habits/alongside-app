@@ -1,6 +1,14 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 13 Sep 2026 v502
+ *
+ * v502 - CARD-4. The exercise card becomes four pages -- decide, watch,
+ *   do, note -- the hazard cluster moves to a page of its own, and an
+ *   image slot arrives on DO with a placeholder that has an enforced
+ *   expiry. All six touched files (exercise-card.js, workout.css and the
+ *   four card players) were already precached; cache bump only.
+ *
  * 12 Sep 2026 v501
  *
  * v501 - SEARCH-1b. session-builder-ui.js and session-shared.css. A search
@@ -3403,7 +3411,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v501";
+const CACHE_NAME = "alongside-v502";
 
 const SHELL_URLS = [
 
