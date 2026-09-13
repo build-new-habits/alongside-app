@@ -214,6 +214,25 @@ console.log("\nTEST 6 — the player, driven: sets one at a time, no false label
     return true;
   };
 
+  // ── CARD-4, 13 Sep 2026 ────────────────────────────────────────────
+  // DECIDE no longer leads straight to DO: the warnings page sits
+  // between them, which is the whole point of CARD-4. This gate used to
+  // tap begin and assume it had landed on DO.
+  //
+  // toDo() walks the REAL route instead of reaching around it, and
+  // counts the times it genuinely passed through WATCH. The tally is
+  // asserted at the end, so if the order is ever reversed this goes red
+  // rather than quietly skipping a page. Stronger than the assertion it
+  // replaces, not weaker.
+  let _watchPassed = 0, _toDoCalls = 0;
+  const toDo = () => {
+    _toDoCalls++;
+    tap("#wo-begin-btn");
+    const onWatch = !!main.querySelector("#wo-watch-btn");
+    if (onWatch) { _watchPassed++; tap("#wo-watch-btn"); }
+    return onWatch;
+  };
+
   localStorage.clear();
   store.init();
   store.set("tier", "personal");
@@ -230,7 +249,7 @@ console.log("\nTEST 6 — the player, driven: sets one at a time, no false label
      /Lat Pulldown/i.test(T()) && !!main.querySelector("#wo-begin-btn"),
      `screen reads: ${T().slice(0, 140)}`);
 
-  tap("#wo-begin-btn");
+  toDo();
 
   ok("6a. no clock on it at all", !main.querySelector("#timer-toggle-btn"),
      "a counted exercise must not offer a countdown");
@@ -265,12 +284,12 @@ console.log("\nTEST 6 — the player, driven: sets one at a time, no false label
   store.set("generatedSession", { session: built, builtAt: new Date().toISOString(), inputs: {} });
   store.set("activeSession", built);
   paint();
-  tap("#wo-begin-btn");
+  toDo();
   tap("#wo-set-done-btn"); tap("#wo-set-done-btn"); tap("#wo-set-done-btn");
   ok("6l. CONTROL: the first exercise really did reach reflection on its last set",
      !!main.querySelector("#complete-exercise-btn"), T().slice(0, 140));
   tap("#complete-exercise-btn");
-  tap("#wo-begin-btn");
+  toDo();
   ok("6m. the next exercise starts at set one, not where the last one ended",
      /Set 1 of/.test(T()) && !/Set (2|3|4) of/.test(T()), T().slice(0, 200));
 
@@ -293,12 +312,18 @@ console.log("\nTEST 6 — the player, driven: sets one at a time, no false label
   store.set("activeSession", built);
   store.set("generatedSession", { session: built, builtAt: new Date().toISOString(), inputs: {} });
   paint();
-  tap("#wo-begin-btn");
+  toDo();
   ok("6j. a plank still gets its clock and no set buttons",
      !!main.querySelector("#timer-toggle-btn") && !main.querySelector("#wo-set-done-btn"),
      T().slice(0, 140));
   ok("6k. and is not labelled with a set number that cannot advance",
      !/Set 1 of/.test(T()), T().slice(0, 140));
+
+  // CARD-4. Asserted once, covering every toDo() in this block.
+  ok("CARD-4. every route to DO passed through the warnings page (" +
+     _watchPassed + " of " + _toDoCalls + ")",
+     _toDoCalls > 0 && _watchPassed === _toDoCalls,
+     "a run reached DO without passing WATCH");
 }
 
 console.log(`\n  ${fails === 0 ? "ALL PASS" : fails + " RED"}\n`);

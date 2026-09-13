@@ -522,6 +522,17 @@ export function render() {
           </button>
         ` : ""}
 
+          <!-- CARD-4. The step out of the warnings. DECIDE now leads here
+               and this leads on to DO, so moving forward still passes the
+               hazards before the instructions -- the property the old
+               single-page layout had for free and a separate page could
+               easily have lost. -->
+        ${currentCardPage === "watch" ? `
+          <button class="btn btn-accent btn-large btn-full" id="wo-watch-btn">
+            Got it \u2014 show me how \u2192
+          </button>
+        ` : ""}
+
         ${currentCardPage === "do" ? `
           ${resolveTiming(exercise).seconds ? `
             <button class="btn btn-large btn-full ${timerStarted ? "btn-secondary" : "btn-accent"}" id="timer-toggle-btn" aria-live="polite">
@@ -821,6 +832,14 @@ export function onMount() {
 
   // CARD-3. Forward, and deliberately without touching the clock.
   document.getElementById("wo-begin-btn")?.addEventListener("click", () => {
+    currentCardPage = "watch";
+    scrollToTop();
+    router.navigate("workout");
+  });
+
+  // CARD-4. WATCH -> DO. Same shape as the handler above it, and
+  // deliberately without touching the clock.
+  document.getElementById("wo-watch-btn")?.addEventListener("click", () => {
     currentCardPage = "do";
     scrollToTop();
     router.navigate("workout");
@@ -863,7 +882,7 @@ export function onMount() {
       const _pfx = (ev.detail && ev.detail.prefix) || "";
       if (!_pfx.startsWith("wo-")) return;
       const to = ev.detail && ev.detail.page;
-      if (to !== "decide" && to !== "do") return;
+      if (to !== "decide" && to !== "watch" && to !== "do") return;
       // TIMER-1. Any page move the person makes clears the notice, so
       // going back to Do and returning does not re-announce a countdown
       // that already finished.

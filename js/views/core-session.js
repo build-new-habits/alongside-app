@@ -726,6 +726,17 @@ function renderExercise() {
           </button>
         ` : ""}
 
+          <!-- CARD-4. The step out of the warnings. DECIDE now leads here
+               and this leads on to DO, so moving forward still passes the
+               hazards before the instructions -- the property the old
+               single-page layout had for free and a separate page could
+               easily have lost. -->
+        ${currentCardPage === "watch" ? `
+          <button class="btn btn-accent btn-large btn-full" id="cs-watch-btn">
+            Got it \u2014 show me how \u2192
+          </button>
+        ` : ""}
+
         ${currentCardPage === "do" ? `
           ${hasTimer ? `
             <button class="btn btn-large btn-full ${timerRunning ? "btn-secondary" : "btn-accent"}"
@@ -1247,6 +1258,14 @@ export function onMount() {
 
   // CARD-3. Forward, and deliberately without touching the clock.
   document.getElementById("cs-begin-btn")?.addEventListener("click", () => {
+    currentCardPage = "watch";
+    scrollToTop();
+    rerender();
+  });
+
+  // CARD-4. WATCH -> DO. Same shape as the handler above it, and
+  // deliberately without touching the clock.
+  document.getElementById("cs-watch-btn")?.addEventListener("click", () => {
     currentCardPage = "do";
     scrollToTop();
     rerender();
@@ -1271,7 +1290,7 @@ export function onMount() {
       const _pfx = (ev.detail && ev.detail.prefix) || "";
       if (!_pfx.startsWith("cs-")) return;
       const to = ev.detail && ev.detail.page;
-      if (to !== "decide" && to !== "do") return;
+      if (to !== "decide" && to !== "watch" && to !== "do") return;
       currentCardPage = to;
       scrollToTop();
       rerender();

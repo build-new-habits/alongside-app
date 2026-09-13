@@ -92,6 +92,26 @@ const tap = (sel) => {
   return true;
 };
 
+// ── CARD-4, 13 Sep 2026 ──────────────────────────────────────────────
+// DECIDE no longer leads straight to DO: the warnings page sits between
+// them, which is the whole point of CARD-4. These gates used to tap
+// begin and assume they had landed on DO.
+//
+// toDo() walks the REAL route instead of reaching around it, and counts
+// the times it genuinely passed through WATCH. The tally is asserted at
+// the end of the file, so if the order is ever reversed -- or a view
+// starts sending DECIDE straight to DO again -- this goes red rather
+// than quietly skipping a page. Stronger than the assertion it
+// replaces, not weaker.
+let _watchPassed = 0, _toDoCalls = 0;
+const toDo = () => {
+  _toDoCalls++;
+  tap("#wo-begin-btn");
+  const onWatch = !!main.querySelector("#wo-watch-btn");
+  if (onWatch) { _watchPassed++; tap("#wo-watch-btn"); }
+  return onWatch;
+};
+
 /** Live regions with actual content in them. An empty one announces nothing. */
 const spokenRegions = () =>
   [...main.querySelectorAll('[role="status"], [role="alert"], [aria-live]')]
@@ -133,7 +153,7 @@ ok("1pc. positive control: the session mounted on an exercise",
    /1 of/.test(T()) && !!main.querySelector("#wo-begin-btn"),
    `screen reads: ${T().slice(0, 120)}`);
 
-tap("#wo-begin-btn");
+toDo();
 ok("1a. and reaches the DO page with a timer",
    !!main.querySelector("#timer-toggle-btn"),
    "no timer on this exercise - the fixture must use one that has a duration");
@@ -169,7 +189,7 @@ ok("1f. and it is visible, not screen-reader-only",
 console.log("\nTEST 2 - tapping Done is not announced at");
 
 freshSession();
-tap("#wo-begin-btn");
+toDo();
 tap("#wo-done-btn");
 ok("2pc. positive control: Done reaches the same NOTE page",
    !!main.querySelector("#complete-exercise-btn"),
@@ -184,7 +204,7 @@ ok("2a. and says nothing about time being up",
 console.log("\nTEST 3 - leaving mid-countdown stops the clock");
 
 freshSession();
-tap("#wo-begin-btn");
+toDo();
 tap("#timer-toggle-btn");
 ok("3pc. positive control: a countdown is running to be stopped",
    liveIntervals.size === 1);
@@ -202,7 +222,7 @@ ok("3b. and the countdown is cleared", liveIntervals.size === 0,
 console.log("\nTEST 4 - the notice does not follow the person to the next exercise");
 
 freshSession();
-tap("#wo-begin-btn");
+toDo();
 tap("#timer-toggle-btn");
 tick(1200);
 ok("4pc. positive control: the notice is showing before we move on",
@@ -211,6 +231,13 @@ tap("#complete-exercise-btn");
 ok("4a. the next exercise starts clean",
    !spokenRegions().some(t => /time up/i.test(t)),
    "the notice carried over to an exercise whose timer has not run");
+
+
+// CARD-4. Asserted once, covering every toDo() above.
+ok("CARD-4. every route to DO passed through the warnings page (" +
+   _watchPassed + " of " + _toDoCalls + ")",
+   _toDoCalls > 0 && _watchPassed === _toDoCalls,
+   "a run reached DO without passing WATCH");
 
 console.log(fails === 0
   ? "\nTIMER-1: all assertions pass\n"

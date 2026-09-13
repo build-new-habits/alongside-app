@@ -1,6 +1,34 @@
 /**
  * js/exercise-card.js
- * 11 Sep 2026 v6
+ * 13 Sep 2026 v7
+ *
+ * v7 -- CARD-4. FOUR pages, not three: decide, watch out, do, note. The
+ * hazard cluster moves to a page of its own, and an image slot arrives
+ * on DO with an honest placeholder and an enforced expiry.
+ *
+ * Graeme, after a gym session on 12 Sep: DO had become a long scroll
+ * past warnings to reach the thing you came for, so people flick
+ * through it. The counter-argument is recorded in the blueprint and is
+ * real -- hazards on their own page can be swiped past -- which is why
+ * the page ORDER still puts watch before do, and why HURT_AND_ACHE is
+ * now pinned to every page rather than living on one of them.
+ *
+ * TWO THINGS THE BLUEPRINT GOT WRONG, CORRECTED HERE ON PURPOSE:
+ *
+ *   1. It said HURT_AND_ACHE was already in `pinned` and would follow
+ *      for free. It was not -- it was a section in `doBody`, so it was
+ *      on DO only. Rule 1 was therefore a behaviour change, and a
+ *      load-bearing one. See the note at `pinned`.
+ *
+ *   2. It said six views consume this card. Four do. prescribed.js and
+ *      morning-session.js each have their own local renderExerciseCard()
+ *      and were never migrated. morning-session.js renders a real
+ *      do-the-exercise card with NO caution and NO hurt-and-ache at all,
+ *      which is a live CR-5 gap -- logged red, not closed here.
+ *      verify-card4 test 11 pins the consumer set at exactly four so
+ *      neither fact can go quiet.
+ *
+ * Gate: tools/verify-card4.mjs.
  *
  * v6 -- ADAPT-1. "Other ways to do this": the ease-off and go-further
  * options an entry carries, in a collapsed disclosure at the END of DO,
@@ -140,13 +168,23 @@ function _fullAlways() {
   try { return getDisplayPref("fullInstructions") === "on"; } catch { return false; }
 }
 
+// CARD-4, 13 Sep 2026. Four pages, not three. The hazards get one of
+// their own because DO had become a long scroll past warnings to reach
+// the thing you came for, and a page people flick through is not being
+// read either.
+//
+// THE ORDER IS THE SAFETY PROPERTY. decide -> watch -> do. Somebody
+// moving forward still passes the warnings before the instructions,
+// which is the guarantee the old layout had and the one a separate page
+// could easily have lost.
 const PAGES = [
-  { key: "decide", label: "Decide" },
-  { key: "do",     label: "Do"     },
-  { key: "note",   label: "Note"   },
+  { key: "decide", label: "Decide"      },
+  { key: "watch",  label: "Watch out"   },
+  { key: "do",     label: "Do"          },
+  { key: "note",   label: "Note"        },
 ];
 
-const BACK_TO = { do: "decide", note: "do" };
+const BACK_TO = { watch: "decide", do: "watch", note: "do" };
 
 function _lines(v) {
   return Array.isArray(v) ? v.filter(s => typeof s === "string" && s.trim()) : [];
@@ -269,46 +307,56 @@ export function renderExerciseCard(exercise, opts = {}) {
   // Safety render order, non-negotiable: caution (pinned, above) first,
   // hazards before any explanatory text, feedback last. watchOut is the
   // first thing in this page body and nothing hides it.
-  const doBody = [
-    // Given its own rose-tinted box on Graeme's call, 31 Aug. It was
-    // reading as one more grey section among several, which is the
-    // problem CARD-3 was meant to fix and only half fixed: moving the
-    // hazards into view is not the same as making them look different
-    // from the instructions underneath them.
+  // CARD-4. The exercise-specific hazard, on its own page now.
+  //
+  // Given its own rose-tinted box on Graeme's call, 31 Aug. It was
+  // reading as one more grey section among several, which is the
+  // problem CARD-3 was meant to fix and only half fixed: moving the
+  // hazards into view is not the same as making them look different
+  // from the instructions underneath them.
+  //
+  // HURT_AND_ACHE is NOT here. It moved into `pinned` -- see the note
+  // there. So WATCH carries both hazard blocks (this one in its body,
+  // that one pinned above it) and DO carries the universal one only.
+  const watchBody = [
     section("What to watch for",
       (exercise.watchOut && exercise.watchOut.length) ? list("exercise-watchout-list", exercise.watchOut) : "",
       "xcard-block--hazard"),
-    // CR-5, 06 Sep 2026. Two things the physiotherapist said should be on
-    // every exercise, and were on none: what to do if it hurts while you
-    // are doing it, and that aching afterwards is expected.
-    //
-    // ONE SHARED BLOCK, NOT 94 COPIES. rehabilitation.js v9 already made
-    // this argument about its load line and it holds here: a generic line
-    // that is ACCURATE is not the same fault as a generic line that
-    // teaches nothing. These two are true of every entry in the library,
-    // so duplicating them per-entry would add 551 strings and no meaning,
-    // and would guarantee they drift apart.
-    //
-    // ON EVERY EXERCISE, NOT JUST REHABILITATION. Her word was \"always\".
-    // The CLINICAL-RESPONSE blueprint scoped CR-5 to the 94 rehab entries;
-    // that was narrower than the steer and narrower than the need. Someone
-    // in a strength session can hurt themselves too, and category is not a
-    // reason to withhold it.
-    //
-    // It sits directly under watchOut and above the instructions, because
-    // the safety cluster is the point. It does NOT diagnose, and its
-    // escalation phrasing matches SAFEGUARD-1 exactly rather than
-    // inventing a third register.
-    section("If it hurts", HURT_AND_ACHE_HTML, "xcard-block--hazard"),
+  ].join("");
+
+  // CARD-4. The image slot. There are no images yet -- zero of the 560
+  // entries carry any image field -- so this is an honest placeholder,
+  // not a grey box and not a broken <img>.
+  //
+  // It is deliberately NOT announced as an image: no <img>, no
+  // role="img", no alt text. There is no picture to describe, and a
+  // screen reader saying "image" about a promise is a lie told twice.
+  //
+  // It points at the video because every one of the 560 entries carries
+  // a `youtube` value, so the sentence is true today and hands the
+  // person something that works right now.
+  //
+  // THE EXPIRY IS ENFORCED, NOT INTENDED. verify-card4 test 10 asserts
+  // this placeholder is ABSENT the moment any entry carries an image
+  // field. Without that, "right for beta, not for public launch"
+  // becomes permanent by default, and the tripwire is the only thing
+  // making it safe to ship a promise on the screen.
+  const imageSlot = `
+    <div class="xcard-block xcard-image">
+      <p class="xcard-image-note">Photographs are being added. For now, the video shows the movement.</p>
+    </div>`;
+
+  const doBody = [
     section("How to get there",
       (exercise.instructions && exercise.instructions.length) ? list("exercise-section-list", exercise.instructions) : ""),
     section("More on form", restCues.length ? list("exercise-section-list", restCues) : ""),
+    imageSlot,
     hold ? section("Pace", hold) : "",
     adaptBlock,
     opts.doSlot || "",
   ].join("");
 
-  const bodies = { decide, do: doBody, note: opts.noteSlot || "" };
+  const bodies = { decide, watch: watchBody, do: doBody, note: opts.noteSlot || "" };
 
   // CUE-UNPIN, 02 Sep 2026. The CAUTION stays pinned to all three
   // pages: a safety line you have navigated away from is more hidden
@@ -319,19 +367,44 @@ export function renderExerciseCard(exercise, opts = {}) {
   // -- appeared on DECIDE, DO and NOTE. Graeme, 2 Sep, seeing it three
   // times across three screenshots: "all these 2 relevant?" It belongs
   // on DECIDE, where the decision it informs is being made.
+  //
+  // CARD-4, 13 Sep 2026. HURT_AND_ACHE JOINS IT, and this is a
+  // behaviour change, not a tidy-up.
+  //
+  // The CARD-4 blueprint said HURT_AND_ACHE was already in `pinned` and
+  // so would follow the reshuffle for free. It was not. It was a
+  // section inside `doBody`, so it rendered on DO and nowhere else.
+  // Moving the hazard cluster to WATCH without this would have taken
+  // "what to do if it hurts" OFF the page where somebody is actually
+  // moving -- the exact reverse of what CR-5 is for.
+  //
+  // CUE-UNPIN's test is the one to apply, and this passes it where the
+  // lead cue failed: the lead cue was coaching, and repeating it three
+  // times was noise. These two lines are safety, they are true of every
+  // entry, and the cost of repetition is irritation while the cost of
+  // absence is injury. It is pinned for the same reason the caution is.
+  //
+  // On WATCH this lands directly above the exercise-specific watchOut,
+  // so that page carries both hazard blocks in the old safety order.
   const pinned = `
     ${caution ? `<p class="exercise-caution" role="note">${caution}</p>` : ""}
+    ${section("If it hurts", HURT_AND_ACHE_HTML, "xcard-block--hazard")}
     ${adaptPointer}`;
 
   // "Show everything" flattens the pages rather than landing on one.
   // Somebody who has asked for all of it should not be walked through
-  // three screens to get it.
+  // four screens to get it.
+  //
+  // CARD-4. watchBody joins the flattened order in its page position, so
+  // the flat view keeps the same safety sequence as the paged one:
+  // caution and if-it-hurts pinned above, then decide, then what to
+  // watch for, then the instructions.
   if (full) {
     return `
   <div class="exercise-card exercise-card--flat" data-xcard="${p}"
        role="region" aria-label="Exercise guidance for ${esc(exercise.name)}">
     ${pinned}
-    ${decide}${doBody}${bodies.note}
+    ${decide}${watchBody}${doBody}${bodies.note}
   </div>`;
   }
 
@@ -341,7 +414,7 @@ export function renderExerciseCard(exercise, opts = {}) {
   <div class="exercise-card exercise-card--paged" data-xcard="${p}"
        data-xcard-page="${page}"
        role="region"
-       aria-label="Exercise guidance for ${esc(exercise.name)} \u2014 step ${PAGES.findIndex(x => x.key === page) + 1} of 3">
+       aria-label="Exercise guidance for ${esc(exercise.name)} \u2014 step ${PAGES.findIndex(x => x.key === page) + 1} of ${PAGES.length}">
     ${pinned}
 
     <p class="xcard-step" aria-hidden="true">${PAGES.find(x => x.key === page).label}</p>
