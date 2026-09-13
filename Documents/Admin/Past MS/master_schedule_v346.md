@@ -1,28 +1,14 @@
 # Alongside: Move — Master Schedule
-## 13 Sep 2026 v347
+## 13 Sep 2026 v346
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v346.md`. Remove v346 on upload.
+Supersedes `master_schedule_v345.md`. Remove v345 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
-> **Live: `alongside-v503`, 149 gates, `store.js` v67, `Schema.md` v1.60, cold start blueprint v108.** Read that blueprint after this block.
+> **Live: `alongside-v502`, 148 gates, `store.js` v67, `Schema.md` v1.60, cold start blueprint v107.** Read that blueprint after this block.
 >
 > **Claude's pre-beta BUILD scope is complete.** CLUB 9 of 9 plus QUICK-INPUTS, GUIDED-COPY, DEVICE-1, DEVICE-2, ARC-LED, ARC-PLAIN — `v452` → `v466` on 06 Sep. **QUICK-BUILD-2/3 `v467`, CHECKIN-3 and PROPOSAL-1/2 `v468` — 08 Sep.**
->
-> ### 🟢 CONTRA-FIX — SHIPPED 13 Sep, `v503`. Seventeen inversions closed, data only.
->
-> **The harder version inherits the gentler version's exclusions.** 14 entries, 18 inherited exclusions. Three hip abductions excluded `hip-acute` while the standing version did not; `barbell-overhead-press` allowed `lower-back-acute` while the seated band press did not; **`dead-bug` carried no exclusions at all** while the arms-only progression written for a sore back excluded one.
->
-> ⚫ **Shipped ahead of clinical review, on Graeme's decision, and the DIRECTION is what makes that defensible.** This change only ever REMOVES offers from people who have declared an acute condition. It cannot put anything in front of anybody that was not already there. `verify-contrafix` test 3 asserts that direction and is the most important test in the file. The real risk is over-restriction, and test 4 is the carve-out: every tightened pattern still holds something for that condition, thinnest case two.
->
-> 🔵 **Still for a reviewer, none of it blocking:** whether any pair should have loosened instead, whether `dead-bug` needs more than its one exclusion, and the two duplicate pairs.
->
-> 🟠 **This change broke `verify-swap1`, and the fix is recorded rather than glossed.** Measured twenty runs each way: 0/20 failures before, 2/20 after. Adding `glutes-acute` to several entries means that at a score of 7 they are filtered OUT of the pool rather than surviving to be MARKED blocked, so that gate's fixture fell to three blocked options in a pool of 73 and which slot surfaced one became a coin toss. Measured across ten sore areas and moved the fixture to **abdominals at 7** — 26 blocked, 30 marked, pool of 101. Twenty clean runs after. Two earlier attempts are recorded as rejected: re-ranking slot selection (4/16), reversing the persona (14/14 failures).
->
-> 🟠 **Claude's first draft of test 4 was wrong and is recorded.** It asserted no pattern is empty for any condition and went red on five combinations — `lunge`/`knee-acute`, `squat`/`knee-acute` and three others. All five predate this change and all are deliberate: nobody with an acutely painful knee should be lunging. A test that fails on correct content is a test that gets switched off.
->
-> 🔵 **Approved 13 Sep, not yet built:** the low-energy coach line rewrite, energy-weighted selection on a low day (NOT a difficulty cap — `difficultyLevel` measures coordination, not effort), and wiring the "too hard" button to deprioritise-and-open-adaptations rather than retiring it.
 >
 > ### What is actually open, 08 Sep 2026
 >
@@ -8998,4 +8984,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 13 Sep 2026 v347*
+*Build New Habits · Alongside: Move · Master Schedule · 13 Sep 2026 v346*
