@@ -1,28 +1,14 @@
 # Alongside: Move — Master Schedule
-## 13 Sep 2026 v348
+## 13 Sep 2026 v347
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v347.md`. Remove v347 on upload.
+Supersedes `master_schedule_v346.md`. Remove v346 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
-> **Live: `alongside-v504`, 150 gates, `store.js` v67, `Schema.md` v1.60, cold start blueprint v109.** Read that blueprint after this block.
+> **Live: `alongside-v503`, 149 gates, `store.js` v67, `Schema.md` v1.60, cold start blueprint v108.** Read that blueprint after this block.
 >
 > **Claude's pre-beta BUILD scope is complete.** CLUB 9 of 9 plus QUICK-INPUTS, GUIDED-COPY, DEVICE-1, DEVICE-2, ARC-LED, ARC-PLAIN — `v452` → `v466` on 06 Sep. **QUICK-BUILD-2/3 `v467`, CHECKIN-3 and PROPOSAL-1/2 `v468` — 08 Sep.**
->
-> ### 🟢 ENERGY-1 and the FEED-1 READER — SHIPPED 13 Sep, `v504`. All three approved items built.
->
-> **The low-energy coach line, rewritten and this time approved.** It explained the machinery and then argued with a thought the person may not have had ("not a compromise"), which plants it. Now: *"You said your energy's low today, so this is shorter than usual with more time to settle at the end."*
->
-> **A low day prefers movements that ask LESS ENERGY — and deliberately NOT a difficulty cap.** `difficultyLevel` mostly measures coordination, so a difficulty-5 movement can be easy work done precisely; capping it on a tired day filters the wrong axis.
->
-> **"That was too hard" finally reaches a decision.** Two of the last five taps: the builder offers that exercise less often, and the card opens "Other ways to do this" unasked. Wired, not retired — removing a button people already press is the worse move.
->
-> ⚫ **Neither signal drops or empties anything.** Both share the probabilistic shape of the 'less' preference they sit beside. Test 5g marks EVERY option a narrow type can reach and asserts the session still builds; the reversal that turns the preference into a filter is caught by that and nothing else.
->
-> 🟠 **Four test mistakes of Claude's, recorded in the gate rather than quietly fixed, because all four looked convincing.** Test 5 v1 compared appearance counts across twelve builds and passed with the weighting DELETED. Test 5 v2 marked every candidate in the section POOL but one and failed at 0% — the code was right, the filter runs per CATEGORY inside `pickFrom()`. Test 2d asserted every pick sits below its section pool's median and failed at ~37% on correct code, the same misreading. And two assertions were measured on samples too small for probabilistic mechanisms — 2b failed one run in four at ten builds, 5c one in eight — both widened to 25 and checked over twelve clean runs.
->
-> 🔵 **`verify-proposal3`'s 4b asserted the OLD wording.** Changed WITH the decision rather than loosened: it now asserts the line must not reassure unprompted.
 >
 > ### 🟢 CONTRA-FIX — SHIPPED 13 Sep, `v503`. Seventeen inversions closed, data only.
 >
@@ -9012,4 +8998,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 13 Sep 2026 v348*
+*Build New Habits · Alongside: Move · Master Schedule · 13 Sep 2026 v347*
