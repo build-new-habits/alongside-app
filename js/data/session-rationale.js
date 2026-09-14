@@ -7,6 +7,13 @@
  *   users, and null when no signal genuinely holds, so silence means
  *   there was nothing true to say rather than nothing written.
  *
+ * 13 Sep 2026 v3
+ *
+ * v3 - FEED-1 READER. tooHardRecently(): two of the last five taps of
+ * "That was too hard" on one exercise. It lives here because BOTH callers
+ * need it -- session-builder.js to offer the exercise less often, and
+ * exercise-card.js to open the ways to ease off.
+ *
  * 13 Aug 2026 v2
  *
  * v2 - VOICE-2. Warm-up and cool-down purpose become rotating pools of
@@ -501,6 +508,37 @@ export function soreAreaLoaded(exercise) {
  * Deliberately not a warning and not a barrier. P7: name what we know,
  * leave the decision theirs.
  */
+/**
+ * FEED-1 READER, 13 Sep 2026. Has this exercise been called too hard
+ * lately?
+ *
+ * FEED-READER (12 Sep) proved by execution that "That was too hard" and
+ * "That was too easy" reached NO live decision: the only reader sat
+ * behind workoutGenerator.js, which no live route has called since
+ * TWO-ENGINE. Somebody tapped a button that said the coach was listening,
+ * and nothing was.
+ *
+ * Graeme's decision, 13 Sep: wire it, do not retire it. Removing a button
+ * people are already pressing is the worse move.
+ *
+ * TWO of the LAST FIVE, not one and not ever. One hard day is a hard day;
+ * twice in five is a pattern. store.logExerciseFeedback() caps the log at
+ * 200 entries globally and this reads the last five for one exercise,
+ * which is the window the store's own comment already describes.
+ *
+ * It lives here rather than in session-builder.js because BOTH callers
+ * need it: the builder, to offer the exercise less often, and
+ * exercise-card.js, to open "Other ways to do this" without being asked.
+ * The card already imports this module.
+ */
+export function tooHardRecently(exerciseId) {
+  if (!exerciseId) return false;
+  const log = store.get("exerciseFeedback");
+  if (!Array.isArray(log)) return false;
+  const lastFive = log.filter(e => e?.exerciseId === exerciseId).slice(-5);
+  return lastFive.filter(e => e.feedback === "too-hard").length >= 2;
+}
+
 export function bodyCaution(exercise) {
   // TWO LEVELS, matching P7's existing model rather than inventing a
   // parallel one. Graeme's ask was "when conditions flag we provide a

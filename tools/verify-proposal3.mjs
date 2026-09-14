@@ -206,10 +206,20 @@ ok("3e. the session Graeme was offered is no longer offered: not ten movements",
 // ════════════════════════════════════════════════════════════════════
 console.log("\nTEST 4 — the coach says why, rather than quietly doing less");
 
+// ENERGY-1, 13 Sep 2026. The wording changed, and 4b changed WITH it
+// rather than being loosened to accommodate it.
+//
+// The line PROPOSAL-3 shipped said "Easing off is the useful thing to do
+// here, not a compromise" -- and its own comment admitted the wording was
+// unapproved. Graeme's rewrite drops that clause on the grounds that
+// arguing with a thought is a way of planting it. So 4b now asserts the
+// opposite of what it used to: the line must NOT reassure unprompted.
+// 4a still holds the thing that has not changed -- the coach says why.
 ok("4a. the coach line names the low-energy day",
-   /energy is low/i.test(hard.coach), hard.coach.slice(0, 160));
-ok("4b. and frames easing off as useful rather than a compromise",
-   /not a compromise/i.test(hard.coach));
+   /energy/i.test(hard.coach) && /low/i.test(hard.coach), hard.coach.slice(0, 160));
+ok("4b. and does not argue with a thought the person may not have had",
+   !/not a compromise/i.test(hard.coach) && !/useful thing/i.test(hard.coach),
+   hard.coach.slice(0, 160));
 ok("4c. it does not claim to know anything it was not told",
    !/mood|sleep|tired|exhaust/i.test(hard.coach), hard.coach.slice(0, 160));
 

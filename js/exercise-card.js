@@ -1,5 +1,11 @@
 /**
  * js/exercise-card.js
+ * 13 Sep 2026 v8
+ *
+ * v8 - FEED-1 READER. Two taps of "That was too hard" in the last five
+ * open "Other ways to do this" without being asked. It OPENS the
+ * disclosure; it does not choose an adaptation. ADAPT-1's rule stands.
+ *
  * 13 Sep 2026 v7
  *
  * v7 -- CARD-4. FOUR pages, not three: decide, watch out, do, note. The
@@ -156,7 +162,7 @@ const HURT_AND_ACHE_HTML =
   `<ul class="exercise-section-list">${HURT_AND_ACHE.map(s => `<li>${s}</li>`).join("")}</ul>`;
 
 
-import { bodyCaution, soreAreaLoaded } from "./data/session-rationale.js";
+import { bodyCaution, soreAreaLoaded, tooHardRecently } from "./data/session-rationale.js";
 import { getDisplayPref } from "./display-prefs.js";
 
 function esc(s) {
@@ -239,8 +245,22 @@ export function renderExerciseCard(exercise, opts = {}) {
   const further    = (soreAreaLoaded(exercise) || exercise._gentleCare)
     ? [] : _lines(adapt.further);
 
+  // FEED-1 READER, 13 Sep 2026. Twice in the last five taps of "That was
+  // too hard" opens this without being asked.
+  //
+  // The button had no live reader at all until today (FEED-READER, 12
+  // Sep). Wired rather than retired, and this is the half that shows: the
+  // ease-off options are already in front of the person instead of one tap
+  // away. The session builder does the other half by offering the exercise
+  // less often.
+  //
+  // It OPENS the disclosure; it does not choose an adaptation. ADAPT-1's
+  // rule stands -- the app never picks one, and nothing is recorded about
+  // which one was used.
+  const openedByFeedback = easeOff.length > 0 && tooHardRecently(exercise.id);
+
   const adaptBlock = (easeOff.length || further.length) ? `
-    <details class="xcard-block xcard-adapt"${full ? " open" : ""}>
+    <details class="xcard-block xcard-adapt"${(full || openedByFeedback) ? " open" : ""}>
       <summary class="xcard-adapt-summary">Other ways to do this</summary>
       ${easeOff.length ? `<p class="exercise-section-label">To ease off</p>${list("exercise-section-list", easeOff)}` : ""}
       ${further.length ? `<p class="exercise-section-label">To go further</p>${list("exercise-section-list", further)}` : ""}
