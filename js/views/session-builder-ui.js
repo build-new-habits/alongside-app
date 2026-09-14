@@ -608,7 +608,14 @@ const EQUIPMENT_OPTIONS = [
   { id: "bike",             label: "Stationary bike" },
   { id: "treadmill",        label: "Treadmill" },
   { id: "cross-trainer",    label: "Cross trainer" },
-  { id: "rowing-machine",   label: "Rowing machine" }
+  { id: "rowing-machine",   label: "Rowing machine" },
+  // EQUIP-STAIR, 13 Sep 2026. The onboarding picker has offered a stair
+  // climber since it was written; this list had not, so two entries
+  // (gym-stair-climber-steady, gym-stair-climber-intervals) were
+  // unreachable for anybody who set their kit here rather than there.
+  // Both are machine blocks, so GYM-MIX-1's feature slot is the only
+  // route to them and this was the only thing standing in the way.
+  { id: "stair-climber",    label: "Stair climber" }
 ];
 
 // ── Render ────────────────────────────────────────────────────────────────────
