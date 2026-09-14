@@ -1,6 +1,25 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
+ * 13 Sep 2026 v52
+ *
+ * v52 - ENERGY-1 and the FEED-1 reader. Two signals the app collected and
+ *   never acted on.
+ *
+ *   A low-energy day now prefers movements that ask LESS ENERGY. Not a
+ *   difficulty cap: difficultyLevel mostly measures coordination, so a
+ *   difficulty-5 movement can be easy work done precisely, and capping it
+ *   filters the wrong axis.
+ *
+ *   "That was too hard", twice in the last five, offers an exercise less
+ *   often -- never drops it. FEED-READER proved on 12 Sep that this button
+ *   reached no live decision at all.
+ *
+ *   Both sit beside the 'less' preference and share its probabilistic
+ *   shape, so neither can empty a slot.
+ *
+ *   The low-energy coach line is rewritten and, this time, approved.
+ *
  * 12 Sep 2026 v51
  *
  * v51 - GYM-MIX-1. A ninth session type: Gym. One long machine block, then
@@ -940,7 +959,7 @@ import { store } from "./store.js";
 import { resolveEquipment, exerciseIsAvailable } from "./data/equipment-map.js";
 import { EXERCISES, isSessionLength, isCardioMachine } from "./data/exercises/index.js";
 import { matchCategory } from "./data/session-categories.js";
-import { buildRationale } from "./data/session-rationale.js";
+import { buildRationale, tooHardRecently } from "./data/session-rationale.js";
 import { getZoneStatus, getPainBand, getCondition, getExcludedConditions } from "./data/conditions.js";
 import { focusOrderedCategories } from "./data/week-focus.js";
 
@@ -3547,6 +3566,42 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
         if (notLess.length > 0) candidates = notLess;
       }
 
+      // ── FEED-1 READER, 13 Sep 2026 ──────────────────────────────────
+      // "That was too hard", twice in the last five, offers the exercise
+      // less often. It is NEVER dropped: same probabilistic shape as
+      // 'less' above, and for the same reason -- somebody who wants it
+      // gone has the other button. A trainer does not stop giving you side
+      // planks because one was hard; she keeps your knee down for a while,
+      // which is what exercise-card.js now does with the same signal.
+      //
+      // FEED-READER proved on 12 Sep that this button reached no live
+      // decision at all: its only reader sat behind workoutGenerator.js,
+      // which nothing has called since TWO-ENGINE.
+      if (Math.random() < LESS_SUPPRESSION) {
+        const notHard = candidates.filter(e => !tooHardRecently(e.id));
+        if (notHard.length > 0) candidates = notHard;
+      }
+
+      // ── ENERGY-1, 13 Sep 2026 ───────────────────────────────────────
+      // On a low-energy day, prefer the movements that ask less.
+      //
+      // NOT a difficulty ceiling, which was the obvious move and the wrong
+      // one: difficultyLevel mostly measures coordination and technique,
+      // so a difficulty-5 movement can be easy work done precisely, and
+      // capping it on a tired day filters the wrong axis. energyRequired
+      // is the field that means what this wants.
+      //
+      // A preference, not a filter -- it drops to the lower half of what
+      // is actually available rather than to an absolute number, so a
+      // section can never be emptied by it. PROPOSAL-3 already shortened
+      // the working part; this is about which movements fill what is left.
+      if (_todayIntensity() === "low") {
+        const levels = candidates.map(e => e.energyRequired || 0).sort((a, b) => a - b);
+        const median = levels[Math.floor(levels.length / 2)];
+        const easier = candidates.filter(e => (e.energyRequired || 0) <= median);
+        if (easier.length > 0) candidates = easier;
+      }
+
       // ── CAP-6 (C3), 13 Aug 2026 ──────────────────────────────────────
       // Adapted content is de-prioritised for somebody who does not need
       // it. Same shape as the 'less' rule directly above, deliberately:
@@ -3792,8 +3847,15 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
   // lines are his; this follows the pattern of equipNote and
   // prescribedNote, which are written in this file, but it should be read
   // before beta.
+  // ENERGY-1, 13 Sep 2026. Rewritten, and shorter.
+  //
+  // The first version explained the machinery ("less of the working part")
+  // and then argued with a thought the person may not have had ("not a
+  // compromise"), which is a way of planting it. Graeme approved this
+  // wording on 13 Sep; the previous line shipped unapproved and said so in
+  // its own comment.
   const lowEnergyNote = _todayIntensity() === "low"
-    ? "You told me your energy is low today, so there is less of the working part and a longer settle at the end. Easing off is the useful thing to do here, not a compromise."
+    ? "You said your energy's low today, so this is shorter than usual with more time to settle at the end."
     : null;
 
   // Build prescribed note for coach line
