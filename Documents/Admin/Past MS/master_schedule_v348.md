@@ -1,39 +1,14 @@
 # Alongside: Move — Master Schedule
-## 13 Sep 2026 v349
+## 13 Sep 2026 v348
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v348.md`. Remove v348 on upload.
+Supersedes `master_schedule_v347.md`. Remove v347 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
-> **Live: `alongside-v505`, 151 gates, `store.js` v67, `Schema.md` v1.60, cold start blueprint v110.** Read that blueprint after this block.
+> **Live: `alongside-v504`, 150 gates, `store.js` v67, `Schema.md` v1.60, cold start blueprint v109.** Read that blueprint after this block.
 >
 > **Claude's pre-beta BUILD scope is complete.** CLUB 9 of 9 plus QUICK-INPUTS, GUIDED-COPY, DEVICE-1, DEVICE-2, ARC-LED, ARC-PLAIN — `v452` → `v466` on 06 Sep. **QUICK-BUILD-2/3 `v467`, CHECKIN-3 and PROPOSAL-1/2 `v468` — 08 Sep.**
->
-> ### 🟢 EQUIP-STAIR — SHIPPED 13 Sep, `v505`. And a correction to Claude's own finding.
->
-> 🟠 **The 12 Sep write-up was half wrong, and the error was Claude's.** It said *neither* equipment picker offered a stair climber. Onboarding has offered one all along — the probe read `EQUIPMENT` from `data/equipment.js`, which does not exist (the export is `EQUIPMENT_CATEGORIES`), so `JSON.stringify(undefined)` made the regex report false.
->
-> The real gap was narrower and real: the **session builder's own kit list** carried bike, treadmill, cross trainer and rowing machine but not the stair climber, so two entries were unreachable for anybody who set their equipment there rather than in onboarding.
->
-> ⚫ **Gated generally, not just fixed.** Third reachability fault in a week — machine cardio, 136 practices, this. `verify-equipstair` asserts every id in `CARDIO_MACHINES` is declarable from at least one picker, so the next one fails there rather than being found by somebody standing in a gym.
->
-> ### 🟢 LAUNCH READINESS — logged 13 Sep
->
-> ✅ **HMRC self-assessment registration is DONE** (code received 13 Sep). BIZ-1 closed. **BIZ-3 (ICO) is no longer gated** — and the note at §"ICO registration may not be as blocked as assumed" stands: the fee attaches to being a controller, not to HMRC status, so it may never have been blocked at all.
->
-> **What each remaining workstream is actually waiting on:**
->
-> | Workstream | Waiting on |
-> |---|---|
-> | **Supabase** | Nothing. The schema blueprint (31 Jul) was design-only by scope; standing it up is the next step, and Stripe sits behind it |
-> | **Policies for legal review** | Drafted. Solicitor engaged, awaiting scope and quote — Graeme's to chase |
-> | **Website** | Largely built; `/upgrade` finished 03 Aug. Checkout wiring depends on Supabase and Stripe |
-> | **Email** | Kit and Zoho already live as processors. Missing: Article 28 written terms |
-> | **ICO registration** | Nothing now |
-> | **Beta** | The DPIA's own list — Article 28 terms with four processors, breach and complaints procedures and logs, **a Sentry scrubbing gate (Claude's, reversal-tested)**, children's access assessment, reviewer roles filled or the decision to proceed recorded, week-two user consultation, and **R12: who acts if Graeme cannot — still unanswered** |
->
-> 🟠 **R12 is the one to push on.** A one-person business processing special-category data needs a named person, and it is a conversation rather than a document.
 >
 > ### 🟢 ENERGY-1 and the FEED-1 READER — SHIPPED 13 Sep, `v504`. All three approved items built.
 >
@@ -280,7 +255,7 @@ Supersedes `master_schedule_v348.md`. Remove v348 on upload.
 >
 > | Row | Revised |
 > |---|---|
-> | ✅ **GYM-REACH-2** | **CLOSED 13 Sep — already done by PRAC-2 on 12 Sep, `v500`.** This row survived a day as an open item describing shipped work, which is how somebody ends up rebuilding it. Original text: rescoped to make `reachableByAnySessionType()` honest
+> | 🟠 **GYM-REACH-2** | **Rescoped.** Make `reachableByAnySessionType()` honest — apply the same length rule the builder applies. Practices would grow from 28 to roughly 164, which is a **content-shape question for Graeme before it is a code change** |
 > | 🟡 **GYM-MIX-1** | **Unblocked, and now the right home for the machines.** A Gym type needs a shape with room for ONE long block, not ten short slots. Exactly what Graeme wanted: cross trainer, lat pulldowns, dead bugs, treadmill |
 > | 🟠 **EQUIP-STAIR** | `stair-climber` is in `CARDIO_MACHINES` and on two entries, and **neither equipment picker offers it**. Add it, or retire the two entries |
 >
@@ -9037,4 +9012,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 13 Sep 2026 v349*
+*Build New Habits · Alongside: Move · Master Schedule · 13 Sep 2026 v348*
