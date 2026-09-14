@@ -1,6 +1,12 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 13 Sep 2026 v505
+ *
+ * v505 - EQUIP-STAIR. session-builder-ui.js. The stair climber can be
+ *   declared in the builder's own kit list. Already precached; cache bump
+ *   only.
+ *
  * 13 Sep 2026 v504
  *
  * v504 - ENERGY-1 and the FEED-1 reader. session-builder.js,
@@ -3424,7 +3430,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v504";
+const CACHE_NAME = "alongside-v505";
 
 const SHELL_URLS = [
 
