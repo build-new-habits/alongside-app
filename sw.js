@@ -1,6 +1,13 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 13 Sep 2026 v504
+ *
+ * v504 - ENERGY-1 and the FEED-1 reader. session-builder.js,
+ *   exercise-card.js and data/session-rationale.js. A low day asks less
+ *   energy; "that was too hard" finally reaches a decision. All already
+ *   precached; cache bump only.
+ *
  * 13 Sep 2026 v503
  *
  * v503 - CONTRA-FIX. Four exercise data files. Fourteen entries inherit
@@ -3417,7 +3424,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v503";
+const CACHE_NAME = "alongside-v504";
 
 const SHELL_URLS = [
 
