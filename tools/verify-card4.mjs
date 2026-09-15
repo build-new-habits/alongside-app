@@ -239,24 +239,48 @@ console.log("\nTEST 5 — DO holds the exercise, WATCH does not");
 // ════════════════════════════════════════════════════════════════════
 console.log("\nTEST 6 — other ways to do this, on DO only and outside any hazard");
 
+// CARD-5, 15 Sep 2026. Two kinds of disclosure now, so "any <details>"
+// no longer means "the adaptations disclosure". adaptOnly() strips the
+// collapsed hurt-and-ache row; every assertion below keeps its original
+// meaning against what is left.
+//
+// The amendment is conditional, not a relaxation: HURT_AND_ACHE may be
+// collapsed only because safety-gate.js reads it open once per occasion
+// and records the acknowledgement. 6.4 asserts that condition here; it
+// is asserted independently in verify-adapt1 2.5 and verify-card5.
+const adaptOnly = (html) => html.replace(/<details[^>]*xcard-hurt[\s\S]*?<\/details>/g, "");
+
 setSore({});
 {
   const H = allPages(FULL);
 
-  ok("6.1 the disclosure is on DO only",
-     H.do.includes("<details") && H.do.includes("Other ways to do this") &&
-     !H.watch.includes("<details") && !H.decide.includes("<details") &&
-     !H.note.includes("<details"));
+  ok("6.1 the adaptations disclosure is on DO only",
+     adaptOnly(H.do).includes("<details") && H.do.includes("Other ways to do this") &&
+     !adaptOnly(H.watch).includes("<details") && !adaptOnly(H.decide).includes("<details") &&
+     !adaptOnly(H.note).includes("<details"));
 
-  ok("6.2 no hazard text sits inside the disclosure", (() => {
-    const a = H.do.indexOf("<details");
-    const inner = H.do.slice(a, H.do.indexOf("</details>", a) + 10);
+  ok("6.2 no hazard text sits inside the ADAPTATIONS disclosure", (() => {
+    const h = adaptOnly(H.do);
+    const a = h.indexOf("<details");
+    const inner = h.slice(a, h.indexOf("</details>", a) + 10);
     return inner.length > 10 &&
            !inner.includes("What to watch for") && !inner.includes("If it hurts");
   })());
 
-  ok("6.3 on WATCH, the hazard block is not wrapped in a disclosure",
-     !H.watch.includes("<details"));
+  ok("6.3 on WATCH, the EXERCISE-SPECIFIC hazard is not wrapped in a disclosure", (() => {
+    const h = adaptOnly(H.watch);
+    return !h.includes("<details") && h.includes("What to watch for");
+  })());
+
+  ok("6.4 the collapse is conditional: the session gate records an acknowledgement", (() => {
+    const g = fs.readFileSync(new URL("../js/safety-gate.js", import.meta.url), "utf8");
+    return g.includes("safetyAckLog") && g.includes("HURT_AND_ACHE_VERSION") &&
+           /export function recordAcknowledgement/.test(g);
+  })());
+
+  ok("6.4b REVERSAL: hurt-and-ache is still on every page, just closed",
+     ["decide", "watch", "do", "note"].every(k =>
+       H[k].includes("xcard-hurt") && H[k].includes("If it hurts")));
 }
 
 // ════════════════════════════════════════════════════════════════════

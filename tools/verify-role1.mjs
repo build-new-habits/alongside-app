@@ -56,6 +56,9 @@ for (const [k, v] of [
 
 const B = new URL("../js/", import.meta.url).href;
 const { store } = await import(B + "store.js");
+const { HURT_AND_ACHE_VERSION: ACK_VERSION } = await import(B + "exercise-card.js");
+
+
 const sb        = await import(B + "session-builder.js");
 const workout   = await import(B + "views/workout.js");
 
@@ -68,6 +71,18 @@ const ok = (name, cond, detail = "") => {
 function fixture() {
   localStorage.clear();
   store.init();
+  // SAFETY-GATE, 15 Sep 2026. store.init() resets safetyAckLog, and the
+  // gate blocks exercise 1 until the hurt-and-ache guidance has been
+  // acknowledged -- so an un-seeded fixture lands on the gate rather
+  // than on the card it means to test. Seeded HERE, immediately after
+  // the reset: seeded any earlier and it is silently undone, which cost
+  // one debugging round on 15 Sep. verify-card5 owns the gate's own
+  // behaviour, including that an un-seeded store IS blocked.
+  store.set("safetyAckLog", [{
+    at: new Date().toISOString(),
+    textVersion: ACK_VERSION,
+    surface: "fixture"
+  }]);
   store.set("tier", "personal");
   store.set("homeEquipment", ["dumbbells", "resistance-band"]);
 }

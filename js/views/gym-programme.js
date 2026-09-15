@@ -328,6 +328,7 @@ import { store }                    from '../store.js';
 import { isPremium }                from '../auth.js';
 import { renderFeedbackControl, attachFeedbackEvents } from "../exercise-feedback.js";
 import { renderExerciseCard, attachCardEvents } from "../exercise-card.js";
+import { isGateDue, renderSafetyGate, attachSafetyGate } from "../safety-gate.js";
 import { resolveTiming, formatTime as _fmtTime } from "../exercise-timing.js";
 // EMP/LOG-1: the note block moved to js/session-log.js so workout.js can
 // reach it too. progressionInvitation is still used by the block, but it
@@ -776,6 +777,28 @@ export function GymProgrammeView(router) {
     // CARD-3. Latched so the timer and the card's Back can re-render
     // without these being threaded through every call site.
     _ctx = { container, session, stats, sessionType };
+
+    // SAFETY-GATE, 15 Sep 2026. Before exercise 1 and nowhere else.
+    //
+    // This view paints imperatively rather than returning a string, so
+    // the gate is written into the same container and attached here.
+    // _ctx is latched FIRST, deliberately: onAcknowledge re-enters
+    // renderCurrentExercise through the same path the card's Back uses,
+    // and if the context were latched after this branch that re-entry
+    // would find nothing.
+    //
+    // isGateDue() goes false the moment the acknowledgement is written,
+    // so re-entering lands on the exercise rather than looping.
+    if (currentExerciseIndex === 0 && isGateDue()) {
+      container.innerHTML = `<div class="view workout-view">${renderSafetyGate()}</div>`;
+      attachSafetyGate(container, {
+        surface: "gym-programme",
+        onAcknowledge: () => renderCurrentExercise(container, session, stats, sessionType),
+        onLeave:       () => router.navigate("today"),
+      });
+      return;
+    }
+
     const exercise    = session.exercises[currentExerciseIndex];
     const isLast      = currentExerciseIndex >= session.exercises.length - 1;
     const progress    = (currentExerciseIndex / session.exercises.length) * 100;

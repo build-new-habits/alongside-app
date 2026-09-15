@@ -162,6 +162,18 @@ console.log("\nTEST 5 — the builder's half of `duration` is untouched");
   const { store } = await import("../js/store.js");
   const { buildSession } = await import("../js/session-builder.js");
   store.init();
+  // SAFETY-GATE, 15 Sep 2026. store.init() resets safetyAckLog and the
+  // gate blocks exercise 1 until acknowledged, so an un-seeded fixture
+  // lands on the gate instead of the card under test. verify-card5 owns
+  // the gate's own behaviour, including that un-seeded IS blocked.
+  {
+    const { HURT_AND_ACHE_VERSION } = await import("../js/exercise-card.js");
+    store.set("safetyAckLog", [{
+      at: new Date().toISOString(),
+      textVersion: HURT_AND_ACHE_VERSION,
+      surface: "fixture"
+    }]);
+  }
   const EQ = ["dumbbells", "resistance-band", "bench"];
   store.set("equipment", EQ); store.set("homeEquipment", EQ);
   const s = buildSession({ sessionType: "glute", durationMins: 30, equipmentOverride: EQ, preset: null });
@@ -235,6 +247,18 @@ console.log("\nTEST 6 — the player, driven: sets one at a time, no false label
 
   localStorage.clear();
   store.init();
+  // SAFETY-GATE, 15 Sep 2026. store.init() resets safetyAckLog and the
+  // gate blocks exercise 1 until acknowledged, so an un-seeded fixture
+  // lands on the gate instead of the card under test. verify-card5 owns
+  // the gate's own behaviour, including that un-seeded IS blocked.
+  {
+    const { HURT_AND_ACHE_VERSION } = await import("../js/exercise-card.js");
+    store.set("safetyAckLog", [{
+      at: new Date().toISOString(),
+      textVersion: HURT_AND_ACHE_VERSION,
+      surface: "fixture"
+    }]);
+  }
   store.set("tier", "personal");
   store.set("homeEquipment", ["dumbbells", "resistance-band"]);
   const built = sb.buildSession({ sessionType: "glute", durationMins: 30, equipmentOverride: null, preset: null });

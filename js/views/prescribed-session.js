@@ -136,6 +136,7 @@
 import { store } from "../store.js";
 import { renderFeedbackControl, attachFeedbackEvents } from "../exercise-feedback.js";
 import { renderExerciseCard, attachCardEvents } from "../exercise-card.js";
+import { isGateDue, renderSafetyGate, attachSafetyGate } from "../safety-gate.js";
 import { resolveTiming, formatTime } from "../exercise-timing.js";
 import { renderLogBlock, attachLogEvents, scrollToTop, lastLine } from "../session-log.js";
 import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
@@ -206,6 +207,15 @@ export function render() {
 
   if (active.length === 0) {
     return renderAlreadyDone();
+  }
+
+  // SAFETY-GATE, 15 Sep 2026. Before exercise 1 and nowhere else. It sits
+  // above the card layer, which is what lets one implementation serve all
+  // six session views. isGateDue() goes false the moment the
+  // acknowledgement is written, so no view-local flag is needed -- a
+  // second source of truth is how a gate fires twice or not at all.
+  if (currentIndex === 0 && isGateDue()) {
+    return `<div class="view prescribed-session-view">${renderSafetyGate()}</div>`;
   }
 
   const ex           = active[currentIndex];
@@ -437,6 +447,16 @@ function creditsForIndex(index, total) {
 export function onMount() {
   const exercises = store.get("prescribedExercises") || [];
   const active    = exercises.filter(e => !e.completedToday);
+
+  // SAFETY-GATE. Early return -- nothing below is on screen behind it.
+  if (active.length > 0 && currentIndex === 0 && isGateDue()) {
+    attachSafetyGate(document.getElementById("app") || document, {
+      surface: "prescribed-session",
+      onAcknowledge: () => router.navigate("prescribed-session"),
+      onLeave:       () => router.navigate("today"),
+    });
+    return;
+  }
 
   // LOG-3. Re-wired per render; attachLogEvents() guards double-binding.
   if (active[currentIndex]) {

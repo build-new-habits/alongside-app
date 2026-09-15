@@ -1,7 +1,13 @@
 /* ============================================
    WORKOUT STYLES
    css/components/workout.css
-   13 Sep 2026 v16
+   15 Sep 2026 v17
+
+   v17 - CARD-5. .xcard-hurt (the collapsed hurt-and-ache row) and
+   .xcard-stepper (the four beats, made visible). The summary keeps the
+   hazard palette so a closed safety row does not read as one more
+   accordion; ahead-steps are plain text, never disabled buttons. Full
+   notes at the foot of this file.
 
    v16 - CARD-4. .xcard-image and .xcard-image-note, the image slot on DO.
 
@@ -1601,3 +1607,127 @@
 /* Reduced motion, forced colours and print all inherit sensibly here:
    there is no animation, no colour-only meaning, and the dashed border
    is preserved by forced-colors as a system border. Nothing to override. */
+
+/* ============================================================
+   CARD-5 — the collapsed hurt-and-ache row, and the stepper
+   15 Sep 2026
+
+   HURT_AND_ACHE was open on all four pages, so a ten-exercise
+   session rendered the same two paragraphs forty times. It is
+   now a closed <details> on every page — present always, open
+   on occasion. The full text is read at the session gate.
+
+   The summary keeps the hazard palette. A safety row that
+   looks like an ordinary accordion is a safety row nobody
+   opens, and this is the one disclosure on the card that is
+   not optional reading.
+   ============================================================ */
+
+.xcard-hurt > .xcard-hurt-summary {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  /* 2.5.8 Target Size (Minimum), AA in WCAG 2.2. The row is the
+     target, not the marker glyph. */
+  min-height: 44px;
+  padding: var(--space-2) 0;
+  color: var(--color-danger);
+  list-style: none;
+}
+
+/* Safari/Chrome default triangle, removed so the chevron below
+   is the single indicator rather than competing with it. */
+.xcard-hurt > .xcard-hurt-summary::-webkit-details-marker { display: none; }
+
+.xcard-hurt > .xcard-hurt-summary::after {
+  content: "\25BE";
+  font-size: var(--text-sm);
+  transition: transform 150ms ease;
+}
+
+.xcard-hurt[open] > .xcard-hurt-summary::after { transform: rotate(180deg); }
+
+/* 2.4.7 / 1.4.11. The summary is the control, so the focus ring
+   goes on it and must clear 3:1 against the hazard background. */
+.xcard-hurt > .xcard-hurt-summary:focus-visible {
+  outline: 3px solid var(--color-focus, var(--color-primary));
+  outline-offset: 2px;
+  border-radius: var(--radius-sm, 4px);
+}
+
+/* 2.3.3 Animation from Interactions. */
+@media (prefers-reduced-motion: reduce) {
+  .xcard-hurt > .xcard-hurt-summary::after { transition: none; }
+}
+
+/* ── The stepper ────────────────────────────────────────────
+   CARD-3 removed a tablist because "here are three places you
+   may go" got answered with "none of them". This is a stepper:
+   passed steps are buttons, the current one is marked, and
+   steps AHEAD are plain text — never disabled buttons, which
+   are low-contrast controls with no announced reason.
+
+   1.4.1 Use of Colour: the live step is carried by weight and
+   an underline, not by colour alone.
+   ──────────────────────────────────────────────────────────── */
+
+.xcard-stepper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+  align-items: center;
+  justify-content: center;
+  margin: 0 0 var(--space-3);
+  padding: 0;
+  list-style: none;
+}
+
+.xcard-stepper-item { display: flex; align-items: center; }
+
+.xcard-stepper-btn {
+  background: none;
+  border: none;
+  padding: var(--space-2) var(--space-1);
+  min-height: 44px;
+  font-size: var(--text-sm);
+  font-family: inherit;
+  color: var(--color-primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.xcard-stepper-btn:focus-visible {
+  outline: 3px solid var(--color-focus, var(--color-primary));
+  outline-offset: 2px;
+  border-radius: var(--radius-sm, 4px);
+}
+
+.xcard-stepper-now {
+  padding: var(--space-2) var(--space-1);
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--color-text);
+  border-bottom: 2px solid var(--color-primary);
+}
+
+/* Not a control, and must not read as a disabled one. Muted,
+   no underline, no pointer — but still above 4.5:1 on the card
+   background, because it is text somebody reads to orient
+   themselves, not decoration. */
+.xcard-stepper-ahead {
+  padding: var(--space-2) var(--space-1);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+/* Narrow phones: four labels must not wrap into a ragged block.
+   Shrinks before it wraps. */
+@media (max-width: 380px) {
+  .xcard-stepper { gap: var(--space-1) var(--space-2); }
+  .xcard-stepper-btn,
+  .xcard-stepper-now,
+  .xcard-stepper-ahead { font-size: var(--text-xs); }
+}

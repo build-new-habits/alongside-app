@@ -1,5 +1,17 @@
 /**
  * today.js
+ * 15 Sep 2026 v40
+ *
+ * v40 - SAFETY-GATE. GUIDANCE_TEXT and GUIDANCE_DAYS now come from
+ *   safety-gate.js instead of being written out here.
+ *
+ *   Not a relocation for tidiness. The session gate needs the same
+ *   sentence, and a second copy of it is precisely how eleven stop lines
+ *   ended up phrased eleven different ways. the clinical reviewer's wording exists once,
+ *   in one file, and both places that say it import it from there. The
+ *   thirty-day interval, the trigger and the behaviour here are
+ *   unchanged.
+ *
  * 08 Sep 2026 v39
  *
  * v39 - GUIDANCE-1. The general-guidance line, every thirty days. It
@@ -666,6 +678,15 @@
  */
 
 import { store }               from '../store.js';
+// SAFETY-GATE, 15 Sep 2026. One cadence in this product, not two, and
+// one copy of the clinical reviewer's wording rather than two that drift apart.
+//
+// AT THE TOP, WITH THE OTHER IMPORTS, NOT BESIDE THE CODE THAT USES IT.
+// It was first placed next to _guidanceLine(), which sits inside an
+// enclosing block -- and `node --check` PASSED, because it parses the
+// file as a script rather than as a module. Eleven gates went red on
+// the real ESM load instead.
+import { GUIDANCE_TEXT, GUIDANCE_DAYS } from '../safety-gate.js';
 import { aimById, STRANDS }    from '../data/aims.js';
 import { noticePlanJump, offerBriefPath } from '../data/pacing.js';
 import { isPremium, lockedFeature } from '../auth.js';
@@ -1768,7 +1789,7 @@ export function TodayView(router) {
  * over this app, and this is the product speaking about its own limits,
  * which is a different voice on purpose.
  */
-const GUIDANCE_DAYS = 30;
+
 
 function _guidanceLine() {
   const last = store.get('guidanceShownAt');
@@ -1777,11 +1798,7 @@ function _guidanceLine() {
     if (days < GUIDANCE_DAYS) return '';
   }
   return `
-    <p class="today-guidance" role="note">
-      The advice in this app is general. Before starting any exercise
-      programme it is worth seeking guidance from your GP or an exercise
-      professional.
-    </p>`;
+    <p class="today-guidance" role="note">${GUIDANCE_TEXT}</p>`;
 }
 
 /** Stamped only when it was actually put on screen. */

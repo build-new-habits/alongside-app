@@ -219,6 +219,7 @@ import { store } from "../store.js";
 import { firstSessionRecognition } from "../data/first-session.js";
 import { renderFeedbackControl, attachFeedbackEvents } from "../exercise-feedback.js";
 import { renderExerciseCard, attachCardEvents } from "../exercise-card.js";
+import { isGateDue, renderSafetyGate, attachSafetyGate } from "../safety-gate.js";
 import { renderLogBlock, attachLogEvents, scrollToTop, lastLine } from "../session-log.js";
 import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
 import { EXERCISES, filterByConditions } from "../data/exercises/index.js";
@@ -629,6 +630,15 @@ function renderExercise() {
   if (currentIndex >= sessionQueue.length) {
     phase = "done";
     return renderDone();
+  }
+
+  // SAFETY-GATE, 15 Sep 2026. Before exercise 1 and nowhere else. It sits
+  // above the card layer, which is what lets one implementation serve all
+  // six session views. isGateDue() goes false the moment the
+  // acknowledgement is written, so no view-local flag is needed -- a
+  // second source of truth is how a gate fires twice or not at all.
+  if (currentIndex === 0 && isGateDue()) {
+    return `<div class="view core-session-view">${renderSafetyGate()}</div>`;
   }
 
   const ex       = sessionQueue[currentIndex];
@@ -1177,6 +1187,17 @@ function rerender() {
 // ── Mount ─────────────────────────────────────────────────────────────────────
 
 export function onMount() {
+  // SAFETY-GATE. Returns early: with the gate up there is no card, timer
+  // or log block on screen, so everything below would bind to nothing.
+  if (phase === "session" && currentIndex === 0 && isGateDue()) {
+    attachSafetyGate(document.getElementById("app") || document, {
+      surface: "core-session",
+      onAcknowledge: () => router.navigate("core-session"),
+      onLeave:       () => router.navigate("today"),
+    });
+    return;
+  }
+
   // LOG-3. Re-wired per render; attachLogEvents() guards double-binding.
   if (phase === "session" && sessionQueue[currentIndex]) {
     attachLogEvents(sessionQueue[currentIndex], `cs-log-${currentIndex}`);
