@@ -1,36 +1,12 @@
 # Alongside: Move — Master Schedule
-## 15 Sep 2026 v350
+## 13 Sep 2026 v349
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v349.md`. Remove v349 on upload.
+Supersedes `master_schedule_v348.md`. Remove v348 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
-> **Live: `alongside-v506`, 152 gates, `store.js` v68, `Schema.md` v1.61, cold start blueprint v111.** Read that blueprint after this block.
->
-> ### 🟢 CARD-5 / SAFETY-GATE — SHIPPED 15 Sep, `v506`. And an amendment to a rule three gates were holding.
->
-> Graeme, on four device screenshots: *"Too many of the same things on one screen."* CARD-4 had pinned the two `HURT_AND_ACHE` lines open on all four pages two days earlier, so a ten-exercise session rendered the same two paragraphs **forty times**. GUIDANCE-1 had already written down what happens next — repetition without occasion trains people to look past it, and the one time it matters it has already become furniture.
->
-> **What shipped.** A session-level gate before exercise 1, where the text is read open and acknowledged with a deliberate tap; the card keeps it on every page as a **closed disclosure**, open in "Show everything". CR-5's guarantee — available on every exercise, always — is unchanged. What changed is whether it is open by default.
->
-> 🔴 **Three gates were amended on purpose, and the amendment is conditional.** `verify-card3` 2c, `verify-card4` 6.2 and `verify-adapt1` 2.3b all asserted flatly that no hazard text sits inside any disclosure. Each now asserts instead that `safety-gate.js` exists and records a version-stamped acknowledgement. **Delete the gate and all three go red.** Collapsing the text is legal only because the gate carries the reading, and that is now enforced by code rather than promised by a blueprint. The *exercise-specific* `watchOut` keeps the original rule untouched — never behind an interaction, ever.
->
-> ⚫ **`safetyAckLog` is evidence of notice, not a waiver.** CRA 2015 s.65: no notice excludes liability for personal injury caused by negligence. The label reads "I have read this" and `verify-card5` 4.7 fails on "accept the risk", "hold responsible", "fit to exercise" or "waive". **`textVersion` is the load-bearing field, not `at`** — `verify-card5` 3.1 hashes the two strings, so a silent text edit without a `HURT_AND_ACHE_VERSION` bump goes red.
->
-> **The gate fires on occasions, not every session** — first ever, version change, new programme, or 30 days. Same cadence constant as GUIDANCE-1, so there is one answer in this product to "how often do we say the serious thing". If that is wrong it is one constant: `GATE_DAYS = 0`.
->
-> 🟢 **A live CR-5 gap closed as a side effect.** `morning-session.js` renders exercises from its own local `renderExerciseCard()` with **no caution and no hurt-and-ache at all** — logged red by `exercise-card.js` v7 and open since. The gate sits above the card layer, so it fires there too. **CARD-LOCAL (the renderer migration) is still owed and stays red** — this makes the gap survivable, not gone.
->
-> 🟠 **A correction to Claude's own finding, again.** The 15 Sep blueprint said `prescribed.js` had the same gap. It does not. Its `renderExerciseCard()` builds a **list item** — name, prescription, physio notes, week dots, Remove — and nobody moves from that screen. Same function name, different job, found by grep and not read. `verify-card5` 6.5 asserts it stays out.
->
-> ⚫ **The stepper.** Graeme: making the four beats visible *"makes the design and pedagogy transparent"*. Built as a stepper, **not** a tablist — CARD-3 removed a tablist because "here are three places you may go" got answered with going to none of them. Passed steps are buttons, the current one carries `aria-current="step"`, steps **ahead are plain text, never disabled buttons**. The order stays the safety property.
->
-> 🟡 **Five session gates failed their own fixture-reach controls** — `verify-role1`, `verify-timer1`, `verify-timer2`, `verify-skip`, and `verify-card4` 8.3. Four because an empty store now means the gate blocks exercise 1, which is the feature proving itself from outside. Each seeds a **current-version** acknowledgement, not a bypass: bump the text and they go stale and fail again, which is correct.
->
-> 🔴 **NONE OF THIS HAS BEEN ON A PHONE.** The gates prove the text is present, closed and recorded. They prove nothing about a checkbox above a thumb-height button at 06:40, or four stepper labels on a 380px screen. **The last three card changes were all amended by device use, not by tests.**
->
-> 🟠 **BIZ-GATE, w/c 21 Sep — Graeme.** The acknowledgement wording goes to Foot Anstey with the ToS and Privacy bundle, alongside the held MHRA red-flag question. Nothing about it is settled until they have seen it.
+> **Live: `alongside-v505`, 151 gates, `store.js` v67, `Schema.md` v1.60, cold start blueprint v110.** Read that blueprint after this block.
 >
 > **Claude's pre-beta BUILD scope is complete.** CLUB 9 of 9 plus QUICK-INPUTS, GUIDED-COPY, DEVICE-1, DEVICE-2, ARC-LED, ARC-PLAIN — `v452` → `v466` on 06 Sep. **QUICK-BUILD-2/3 `v467`, CHECKIN-3 and PROPOSAL-1/2 `v468` — 08 Sep.**
 >
@@ -9061,4 +9037,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 15 Sep 2026 v350*
+*Build New Habits · Alongside: Move · Master Schedule · 13 Sep 2026 v349*

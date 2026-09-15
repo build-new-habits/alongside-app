@@ -1,5 +1,57 @@
 # Alongside — Data Schema Reference
-## 11 Sep 2026 v1.60
+## 15 Sep 2026 v1.61
+
+> **v1.61, 15 Sep 2026 — SAFETY-GATE.** New top-level field
+> **`safetyAckLog`** — an array of acknowledgement entries, empty if the
+> person has never been asked. Each entry:
+>
+> ```
+> { at: ISO string, textVersion: string, surface: string }
+> ```
+>
+> **Why it exists.** CARD-4 pinned the two `HURT_AND_ACHE` lines to all
+> four exercise pages, so across a ten-exercise session they rendered
+> forty times. Graeme, 15 Sep, on device screenshots: *"Too many of the
+> same things on one screen."* GUIDANCE-1 had already written down what
+> happens next — repetition without occasion trains people to look past
+> it, and the one time it matters it has already become furniture.
+>
+> The guidance moves to a session-level gate, read once and acknowledged
+> deliberately, and stays on every card as a collapsed disclosure. CR-5's
+> guarantee is unchanged — available on every exercise, always. What
+> changes is whether it is open by default.
+>
+> ⚫ **`textVersion` is the load-bearing field, not `at`.** A timestamp
+> alone does not establish what was on the screen, and establishing that
+> is the entire reason the log exists. It stores `HURT_AND_ACHE_VERSION`
+> as it stood at the moment of the tap. Any edit to either string bumps
+> that constant in the same commit; `verify-card5` test 4 asserts the
+> constant against a hash of the two strings, so the pairing cannot
+> silently drift.
+>
+> 🔴 **This is evidence of notice. It is not a waiver.** Under the
+> Consumer Rights Act 2015 s.65, and UCTA 1977 s.2(1) outside consumer
+> contracts, no term or notice excludes liability for death or personal
+> injury caused by negligence. The acknowledged wording is therefore
+> exactly **"I have read this"** — never "I accept the risk", never "I
+> confirm I am fit to exercise". Those are unenforceable *and* they read
+> worse in front of a court, because they evidence an intention to
+> exclude. Wording is with Foot Anstey, not settled here.
+>
+> **Capped at 200, oldest trimmed first.** At the 30-day cadence that is
+> roughly sixteen years; if the cadence were ever set to every session it
+> is roughly seven months, which is why the cap exists rather than being
+> theoretical. **The log is therefore not guaranteed complete** and
+> nothing should read it as a full history.
+>
+> **Not merged with `guidanceShownAt`.** Different statements, different
+> triggers. One timestamp for both would mean showing either one
+> suppresses the other. They share a cadence constant, not a field.
+>
+> ⚫ **Supabase note.** When the schema-design session runs, this
+> migrates as an append-only table with a *server* timestamp, not a JSON
+> blob. A client-written record is weaker evidence than a server-written
+> one, and this is the field where that difference matters most.
 
 > **v1.60, 11 Sep 2026 — ADAPT-1. No store field, and that is the point.**
 > Exercise entries gain an optional `adaptations` object — the other ways
@@ -172,7 +224,7 @@
 
 ## 06 Sep 2026 v1.51
 
-**File:** `js/store.js` (confirmed live version: **v67, 08 Sep 2026**)
+**File:** `js/store.js` (confirmed live version: **v68, 15 Sep 2026**)
 
 > **v1.47, 06 Sep 2026 — CR-1.** `conditions[]` gains three ids and loses one. `chronic-fatigue` is **retired**; `persistent-fatigue`, `me-cfs` and `long-covid` replace it. No field shape changed — `conditions` is still `string[]` and `conditionMeta` is still keyed by condition id.
 >

@@ -321,6 +321,7 @@
 import { store }         from "../store.js";
 import { renderFeedbackControl, attachFeedbackEvents } from "../exercise-feedback.js";
 import { renderExerciseCard, attachCardEvents } from "../exercise-card.js";
+import { isGateDue, renderSafetyGate, attachSafetyGate } from "../safety-gate.js";
 import { resolveTiming, formatTime } from "../exercise-timing.js";
 import { renderLogBlock, attachLogEvents, scrollToTop, lastLine } from "../session-log.js";
 import { selectMoment, recordMomentShown, dismissMoment } from "../data/grounding-moments.js";
@@ -409,6 +410,21 @@ export function render() {
   // again. A fallback that crashes is not a fallback.
   if (!Array.isArray(workout.exercises) || workout.exercises.length === 0) {
     return renderEmptyWorkout();
+  }
+
+  // SAFETY-GATE, 15 Sep 2026. Before exercise 1 and nowhere else.
+  //
+  // It sits ABOVE the card layer on purpose. CARD-5 collapsed the
+  // hurt-and-ache text on the cards because forty renders of it in one
+  // session had turned it into furniture; this is where it is read open,
+  // once per occasion, with the acknowledgement recorded.
+  //
+  // isGateDue() is false the instant recordAcknowledgement() writes, so
+  // no extra view state is needed to stop it reappearing -- the store IS
+  // the state, and a second source of truth here is how a gate ends up
+  // firing twice or not at all.
+  if (currentExerciseIndex === 0 && isGateDue()) {
+    return `<div class="view workout-view">${renderSafetyGate()}</div>`;
   }
 
   const exercise = workout.exercises[currentExerciseIndex];
@@ -743,6 +759,19 @@ export function onMount() {
   });
 
   if (empty) return;
+
+  // SAFETY-GATE. Bound before the session controls, and returns early:
+  // when the gate is up there is no card, no timer and no log block to
+  // wire, and everything below would be binding to elements that are not
+  // on the screen.
+  if (currentExerciseIndex === 0 && isGateDue()) {
+    attachSafetyGate(document.getElementById("app") || document, {
+      surface: "workout",
+      onAcknowledge: () => router.navigate("workout"),
+      onLeave:       () => router.navigate("today"),
+    });
+    return;
+  }
 
   // Latch the session clock once, on first mount with a real workout.
   if (sessionStartTime === null) sessionStartTime = Date.now();

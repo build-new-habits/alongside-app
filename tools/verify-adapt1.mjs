@@ -89,10 +89,27 @@ const ESCAPES      = { ...BOTH, id: "fx-esc",
   adaptations: { easeOff: ["If <b>this</b> happens, try that."] } };
 
 const R = (ex, opts = {}) => renderExerciseCard(ex, { idPrefix: "t", ...opts });
+// CARD-5, 15 Sep 2026. There are now TWO kinds of disclosure on a card,
+// so "any <details>" stopped being a usable proxy for "the adaptations
+// disclosure". These helpers name the one they mean.
+//
+// THE RULE THIS GATE ENFORCED HAS BEEN AMENDED ON PURPOSE. It read: no
+// hazard text sits inside any disclosure, because a disclosure can be
+// left closed. CARD-5 collapses HURT_AND_ACHE deliberately -- the full
+// text is now read open, once per occasion, at the session gate, with
+// the acknowledgement recorded. Availability on the card is what the
+// collapsed row provides; the reading happens at the gate.
+//
+// So the amendment is CONDITIONAL, not a relaxation. Test 2.5 asserts
+// safety-gate.js exists and records an acknowledgement. Delete the gate
+// and this file goes red -- which is the only thing that makes
+// collapsing the text legal in the first place.
+const adaptOnly = (html) => html.replace(/<details[^>]*xcard-hurt[\s\S]*?<\/details>/g, "");
 const between = (html) => {
-  const a = html.indexOf("<details");
+  const h = adaptOnly(html);
+  const a = h.indexOf("<details");
   if (a < 0) return "";
-  return html.slice(a, html.indexOf("</details>", a) + 10);
+  return h.slice(a, h.indexOf("</details>", a) + 10);
 };
 
 console.log("\nADAPT-1 — other ways to do this\n");
@@ -156,32 +173,46 @@ const doBoth = R(BOTH, { page: "do" });
 ok("2.0 FIXTURE REACH: both item texts render on DO",
    doBoth.includes("keep both feet on the floor") && doBoth.includes("lift one foot"));
 ok("2.1 one disclosure, labelled, with both groups",
-   doBoth.includes("<details") &&
+   adaptOnly(doBoth).includes("<details") &&
    doBoth.includes("Other ways to do this") &&
    doBoth.includes("To ease off") && doBoth.includes("To go further") &&
-   (doBoth.match(/<details/g) || []).length === 1);
+   (adaptOnly(doBoth).match(/<details/g) || []).length === 1);
 
 ok("2.1b an entry with no adaptations renders no disclosure",
-   !R(NONE, { page: "do" }).includes("<details"));
+   !adaptOnly(R(NONE, { page: "do" })).includes("<details"));
 
 setSore({ "lower-back": 5 });
 ok("2.2 no empty disclosure: further-only, worked area sore, renders nothing",
-   !R(FURTHER_ONLY, { page: "do" }).includes("<details"));
+   !adaptOnly(R(FURTHER_ONLY, { page: "do" })).includes("<details"));
 
-ok("2.3a hazards render before any disclosure", (() => {
-  const h = R(BOTH, { page: "do" });
+ok("2.3a hazards render before the adaptations disclosure", (() => {
+  const h = adaptOnly(R(BOTH, { page: "do" }));
   const d = h.indexOf("<details");
-  return d > -1 && h.indexOf("What to watch for") < d && h.indexOf("If it hurts") < d;
+  return d > -1 && h.indexOf("If it hurts") < d;
 })());
-ok("2.3b no hazard text sits inside the disclosure", (() => {
+ok("2.3b no hazard text sits inside the ADAPTATIONS disclosure", (() => {
   const inner = between(R(BOTH, { page: "do" }));
   return inner.length > 0 && !inner.includes("What to watch for") && !inner.includes("If it hurts");
 })());
 
+// CARD-5. The amendment's condition, asserted rather than trusted. The
+// hurt disclosure may be collapsed ONLY because the session gate carries
+// the reading and records it. If safety-gate.js stops recording an
+// acknowledgement, collapsing the text is no longer defensible and this
+// goes red.
+const gateSrc = strip(fs.readFileSync(new URL("../js/safety-gate.js", import.meta.url), "utf8"));
+ok("2.5 the collapse is conditional: safety-gate.js records an acknowledgement",
+   gateSrc.includes("safetyAckLog") &&
+   gateSrc.includes("HURT_AND_ACHE_VERSION") &&
+   /export function recordAcknowledgement/.test(gateSrc));
+ok("2.5b REVERSAL: a gate that renders the text but records nothing is not enough",
+   !/recordAcknowledgement[\s\S]{0,400}TODO/.test(gateSrc) &&
+   gateSrc.includes("store.set(\"safetyAckLog\""));
+
 setSore({});
-ok("2.4 DECIDE and NOTE carry no disclosure",
-   !R(BOTH, { page: "decide" }).includes("<details") &&
-   !R(BOTH, { page: "note", noteSlot: "<p>note</p>" }).includes("<details"));
+ok("2.4 DECIDE and NOTE carry no adaptations disclosure",
+   !adaptOnly(R(BOTH, { page: "decide" })).includes("<details") &&
+   !adaptOnly(R(BOTH, { page: "note", noteSlot: "<p>note</p>" })).includes("<details"));
 
 // "Show everything" is a stored display preference, not a card option.
 // Passing { full: true } proves nothing -- the card never reads it. This
@@ -236,8 +267,8 @@ setSore({ "lower-back": 5 });
 ok("3.9 prescribed: nothing, by either route", (() => {
   const a = R({ ...BOTH, isPrescribed: true }, { page: "do" });
   const b = R(BOTH, { page: "do", prescribed: true });
-  return !a.includes("<details") && !/other ways to do this one/.test(a) &&
-         !b.includes("<details") && !/other ways to do this one/.test(b);
+  return !adaptOnly(a).includes("<details") && !/other ways to do this one/.test(a) &&
+         !adaptOnly(b).includes("<details") && !/other ways to do this one/.test(b);
 })());
 
 ok("3.10 Gentle Care: ways to ease off stay, To go further does not", (() => {
