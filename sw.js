@@ -1,6 +1,22 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 15 Sep 2026 v506
+ *
+ * v506 - CARD-5 / SAFETY-GATE. ONE NEW FILE PRECACHED: js/safety-gate.js.
+ *   Nine files touched: store.js, exercise-card.js, today.js, four
+ *   session views, and two stylesheets.
+ *
+ *   The hurt-and-ache guidance stops being open on all four exercise
+ *   pages -- forty renders of the same two paragraphs in a ten-exercise
+ *   session -- and becomes a closed disclosure on the card plus a
+ *   session-level gate where it is read once and acknowledged.
+ *
+ *   OFFLINE MATTERS MORE HERE THAN USUAL. If safety-gate.js fails to
+ *   load, the views that import it fail to load, and a session that
+ *   cannot start is the whole product not starting. It is precached for
+ *   that reason, not for speed.
+ *
  * 13 Sep 2026 v505
  *
  * v505 - EQUIP-STAIR. session-builder-ui.js. The stair climber can be
@@ -3430,7 +3446,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v505";
+const CACHE_NAME = "alongside-v506";
 
 const SHELL_URLS = [
 
@@ -3501,6 +3517,7 @@ const SHELL_URLS = [
   "/alongside-app/js/session-log.js",
   "/alongside-app/js/exercise-feedback.js",
   "/alongside-app/js/exercise-card.js",
+  "/alongside-app/js/safety-gate.js",
   "/alongside-app/js/exercise-timing.js",
   "/alongside-app/js/display-prefs.js",
   "/alongside-app/js/tts.js",
