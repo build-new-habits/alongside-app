@@ -1,5 +1,65 @@
 /**
  * js/exercise-card.js
+ * 15 Sep 2026 v9
+ *
+ * v9 - CARD-5. HURT_AND_ACHE stops being open on four pages, and the
+ * pages get a stepper.
+ *
+ * TWO DAYS AFTER v7 PINNED IT, AND THIS IS NOT A REVERSAL OF IT.
+ * v7's argument stands: the cost of repetition is irritation, the cost
+ * of absence is injury. What v7 could not know is the arithmetic. Four
+ * pages times ten exercises is forty renders of the same two paragraphs
+ * in one session, sitting above the thing the page was opened for.
+ * Graeme, 15 Sep, on device: "Too many of the same things on one
+ * screen."
+ *
+ * GUIDANCE-1 had already written the answer eight days earlier about a
+ * different line: repetition without occasion trains people to look past
+ * it, and the one time it matters it has already become furniture.
+ *
+ * So the text is still pinned to every page. It is now a collapsed
+ * <details> instead of an open block -- one row instead of twelve lines.
+ * CR-5's word was "always", and always is satisfied by present and one
+ * tap away; it was never satisfied by unread. The full text is read
+ * properly once per occasion at the session gate (safety-gate.js), which
+ * is where the deliberate acknowledgement is recorded.
+ *
+ * FLAT VIEW OPENS IT. "Show everything" means everything. Somebody who
+ * has asked for all of it gets it open, same as every other section.
+ *
+ * HURT_AND_ACHE_VERSION IS NEW AND IS LOAD-BEARING. safety-gate.js
+ * stamps it into every acknowledgement, because a timestamp alone does
+ * not establish what was on the screen. RULE: any edit to a string
+ * inside HURT_AND_ACHE bumps this constant IN THE SAME COMMIT.
+ * verify-card5 test 4 asserts it against a hash of the two strings, so
+ * the pairing cannot drift quietly.
+ *
+ * THE STEPPER. Graeme, 15 Sep: making the four pages visible "makes the
+ * design and pedagogy transparent". He is right that nothing currently
+ * tells you an exercise HAS a shape -- "2 of 10" locates you in the
+ * session and nothing locates you in the exercise.
+ *
+ * But CARD-3 already removed exactly this once. v2's tablist offered
+ * lateral navigation, and on device the honest response to "here are
+ * three places you may go" turned out to be going to none of them. So
+ * this is a STEPPER, not a tablist, and the difference is what the
+ * labels DO:
+ *
+ *   - pages already passed are real buttons, and re-reading costs nothing
+ *   - the current page carries aria-current="step"
+ *   - pages AHEAD are plain text, not disabled buttons
+ *
+ * Ahead-steps are not controls at all, because a control that looks
+ * tappable and is not is worse than no control. The order stays the
+ * safety property: somebody moving forward still passes the warnings
+ * before the instructions, which is the whole of why v7 split them.
+ *
+ * The Back button STAYS. It is not redundant with the stepper -- Back
+ * sits at the bottom under the thumb, the stepper sits at the top for
+ * orientation. Both dispatch the same xcard:page event, so the view
+ * remains the single owner of page state. Nothing is removed in the
+ * same session as something is added.
+ *
  * 13 Sep 2026 v8
  *
  * v8 - FEED-1 READER. Two taps of "That was too hard" in the last five
@@ -158,8 +218,30 @@ export const HURT_AND_ACHE = [
   "Aching for a day or two afterwards is normal, especially if this is new to you. I can't give you medical support \u2014 if it is worse than when you started, or it is still there after a few days, it's worth getting someone to look at it."
 ];
 
+/**
+ * CARD-5, 15 Sep 2026. Bumped whenever either string above changes.
+ * safety-gate.js stamps this into safetyAckLog so a record establishes
+ * WHAT was acknowledged, not merely that something was.
+ */
+export const HURT_AND_ACHE_VERSION = "2026-09-06.1";
+
 const HURT_AND_ACHE_HTML =
   `<ul class="exercise-section-list">${HURT_AND_ACHE.map(s => `<li>${s}</li>`).join("")}</ul>`;
+
+/**
+ * Native <details>. Not a hand-rolled toggle: <summary> already carries
+ * the role, the expanded state and keyboard operation, and 4.1.2 is free
+ * rather than reimplemented. The hazard modifier stays on the summary
+ * row so it reads as a warning rather than as one more accordion.
+ *
+ * `open` when flattened -- see the header.
+ */
+function hurtBlock(open) {
+  return `<details class="xcard-block xcard-block--hazard xcard-hurt"${open ? " open" : ""}>
+      <summary class="exercise-section-label xcard-hurt-summary">If it hurts</summary>
+      ${HURT_AND_ACHE_HTML}
+    </details>`;
+}
 
 
 import { bodyCaution, soreAreaLoaded, tooHardRecently } from "./data/session-rationale.js";
@@ -198,6 +280,50 @@ function _lines(v) {
 
 function list(cls, items) {
   return `<ul class="${cls}">${items.map(i => `<li>${esc(i)}</li>`).join("")}</ul>`;
+}
+
+/**
+ * CARD-5, 15 Sep 2026. The four beats, made visible.
+ *
+ * Passed steps carry data-xcard-STEP, not data-xcard-back. They dispatch
+ * the same xcard:page event, so the view stays the single owner of page
+ * state -- but the attribute is distinct, because verify-card4 test 8.3
+ * identifies THE Back button by data-xcard-back, and four elements
+ * sharing it made that assertion read the wrong one. Found by the gate
+ * on the first run, which is what it is for.
+ *
+ * Ahead steps are <span>, deliberately: a disabled button is a
+ * low-contrast control with no announced reason, and a control that
+ * looks tappable and is not is worse than no control at all.
+ *
+ * aria-current="step" marks the live one. The state is carried by mark,
+ * weight and element type, not by colour alone -- 1.4.1.
+ *
+ * The <ol> is the structure a screen reader needs; the list markers are
+ * off in CSS.
+ */
+function stepper(page, prefix) {
+  const now = PAGES.findIndex(x => x.key === page);
+  const items = PAGES.map((pg, i) => {
+    if (i < now) {
+      return `<li class="xcard-stepper-item xcard-stepper-item--done">
+        <button type="button" class="xcard-stepper-btn"
+                data-xcard-step="${pg.key}"
+                aria-label="Back to ${esc(pg.label)}">${esc(pg.label)}</button>
+      </li>`;
+    }
+    if (i === now) {
+      return `<li class="xcard-stepper-item xcard-stepper-item--now">
+        <span class="xcard-stepper-now" aria-current="step">${esc(pg.label)}</span>
+      </li>`;
+    }
+    return `<li class="xcard-stepper-item xcard-stepper-item--ahead">
+      <span class="xcard-stepper-ahead">${esc(pg.label)}</span>
+    </li>`;
+  }).join("");
+
+  return `<ol class="xcard-stepper" id="${prefix}-stepper"
+      aria-label="Steps in this exercise">${items}</ol>`;
 }
 
 function section(label, body, mod) {
@@ -408,7 +534,7 @@ export function renderExerciseCard(exercise, opts = {}) {
   // so that page carries both hazard blocks in the old safety order.
   const pinned = `
     ${caution ? `<p class="exercise-caution" role="note">${caution}</p>` : ""}
-    ${section("If it hurts", HURT_AND_ACHE_HTML, "xcard-block--hazard")}
+    ${hurtBlock(full)}
     ${adaptPointer}`;
 
   // "Show everything" flattens the pages rather than landing on one.
@@ -437,7 +563,7 @@ export function renderExerciseCard(exercise, opts = {}) {
        aria-label="Exercise guidance for ${esc(exercise.name)} \u2014 step ${PAGES.findIndex(x => x.key === page) + 1} of ${PAGES.length}">
     ${pinned}
 
-    <p class="xcard-step" aria-hidden="true">${PAGES.find(x => x.key === page).label}</p>
+    ${stepper(page, p)}
 
     <div class="xcard-page" id="${p}-page-${page}">
       ${bodies[page] || `<p class="xcard-empty">Nothing here for this one.</p>`}
@@ -467,14 +593,18 @@ export function attachCardEvents(root) {
   el.__xcardBound = true;
 
   el.addEventListener("click", ev => {
-    const btn = ev.target.closest("[data-xcard-back]");
+    const btn = ev.target.closest("[data-xcard-back], [data-xcard-step]");
     if (!btn || !el.contains(btn)) return;
     const card = btn.closest(".exercise-card");
     if (!card) return;
     ev.preventDefault();
+    // CARD-5. Two attributes, one event. The stepper gets no dispatch
+    // path of its own -- one owner of page state, exactly as before.
+    const target = btn.getAttribute("data-xcard-back")
+                || btn.getAttribute("data-xcard-step");
     card.dispatchEvent(new CustomEvent("xcard:page", {
       bubbles: true,
-      detail: { page: btn.getAttribute("data-xcard-back"), prefix: card.dataset.xcard },
+      detail: { page: target, prefix: card.dataset.xcard },
     }));
   });
 }

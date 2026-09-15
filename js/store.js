@@ -1,5 +1,27 @@
 /**
  * store.js - Data persistence layer
+ * 15 Sep 2026 v68
+ *
+ * v68 - SAFETY-GATE. safetyAckLog: the record of deliberate
+ *   acknowledgement of the hurt-and-ache guidance. Append-only within a
+ *   cap of 200, oldest trimmed first.
+ *
+ *   `textVersion` is the load-bearing field, not `at`. A timestamp alone
+ *   does not establish WHAT was on the screen, and establishing that is
+ *   the entire reason this field exists. Any edit to a string inside
+ *   HURT_AND_ACHE bumps HURT_AND_ACHE_VERSION in the same commit;
+ *   verify-card5 test 4 asserts it against a hash of the two strings.
+ *
+ *   NOT MERGED WITH guidanceShownAt, deliberately. The gate and the
+ *   general-guidance line are different statements with different
+ *   triggers. One timestamp for both would mean showing either one
+ *   suppresses the other. They share a cadence constant, not a field.
+ *
+ *   The cap is real, not theoretical: at GATE_DAYS = 30 two hundred
+ *   entries is about sixteen years, but if the cadence is ever set to
+ *   every session it is about seven months. Trimming is recorded in
+ *   Schema.md so nobody later reads this log as complete.
+ *
  * 08 Sep 2026 v67
  *
  * v67 - GUIDANCE-1. guidanceShownAt: when the general-guidance line was
@@ -1140,6 +1162,11 @@ export const store = {
 
       guidanceShownAt: saved.guidanceShownAt || null,
 
+      // SAFETY-GATE. Array, not object. A non-array in storage is
+      // discarded rather than coerced -- a malformed acknowledgement log
+      // is worse than an empty one, because an empty one is honest.
+      safetyAckLog: Array.isArray(saved.safetyAckLog) ? saved.safetyAckLog : [],
+
       // PLAYER-1. Defaulted on rehydrate like every other nested object.
       activeClass: saved.activeClass || {
         id: null, lighter: false, sectionIndex: 0, beatIndex: 0, startedAt: null
@@ -2102,6 +2129,18 @@ export const store = {
       // last shown. null means never. Thirty days between showings:
       // a line that appears every session is a line nobody reads.
       guidanceShownAt: null,
+
+      // ── SAFETY ACKNOWLEDGEMENT ────────────────────────
+      // SAFETY-GATE, 15 Sep 2026. Every time somebody has read and
+      // acknowledged the hurt-and-ache guidance before a session.
+      // Entries: { at, textVersion, surface }. Empty means never asked.
+      //
+      // This is evidence of notice and nothing more. It is not a waiver:
+      // under the Consumer Rights Act 2015 s.65 no term or notice
+      // excludes liability for personal injury caused by negligence, so
+      // the wording acknowledged is "I have read this" and never
+      // "I accept the risk". See safety-gate.js.
+      safetyAckLog: [],
 
       // ── GUIDED CLASS ──────────────────────────────────────────
       // PLAYER-1, 08 Sep 2026. The only state a class in progress

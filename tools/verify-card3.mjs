@@ -159,11 +159,33 @@ check("2b2. the universal hazard is pinned, so it precedes every page body", () 
   const i = card.indexOf("const pinned =");
   ok(i > -1, "no pinned block");
   const body = card.slice(i, card.indexOf("`;", i));
-  ok(body.includes("HURT_AND_ACHE"),
+  // CARD-5: pinned now calls hurtBlock() rather than inlining the HTML.
+  // The guarantee is unchanged -- present on every page -- so the
+  // assertion follows the indirection rather than being weakened.
+  ok(body.includes("hurtBlock("),
      "HURT_AND_ACHE is not pinned; CR-5 requires it on every page, and CARD-4 moved the hazards off DO");
+  const h = card.indexOf("function hurtBlock");
+  ok(h > -1, "hurtBlock() is gone; pinned points at nothing");
+  ok(card.slice(h, h + 500).includes("HURT_AND_ACHE_HTML"),
+     "hurtBlock() does not render HURT_AND_ACHE; the pin is a shell");
 });
 
-check("2c. nothing gates either hazard behind an interaction", () => {
+// CARD-5, 15 Sep 2026. AMENDED, AND THE AMENDMENT IS NARROW.
+//
+// This read "nothing gates EITHER hazard behind an interaction". The
+// exercise-specific watchOut is still ungated and always will be. The
+// universal HURT_AND_ACHE now sits in a closed <details>, on purpose:
+// four pages times ten exercises was forty renders of the same two
+// paragraphs, and GUIDANCE-1 already recorded what repetition without
+// occasion does to a safety line.
+//
+// What makes that defensible is not this file relaxing -- it is
+// safety-gate.js reading the text open, once per occasion, and
+// recording the acknowledgement. verify-adapt1 test 2.5 asserts that
+// condition, and verify-card5 asserts it again from the other side.
+//
+// The EXERCISE-SPECIFIC hazard keeps the original rule unchanged.
+check("2c. the exercise-specific hazard is never behind an interaction", () => {
   for (const which of ["const watchBody =", "const doBody ="]) {
     const i = card.indexOf(which);
     const body = card.slice(i, card.indexOf("].join", i));
@@ -253,8 +275,13 @@ check("5d. the hazard block is visually distinct from ordinary prose", () => {
   const body = slice("const watchBody =", "].join");
   ok(body.includes("xcard-block--hazard"),
      "the hazard section has no modifier class; it renders as one more grey block");
-  ok(slice("const pinned =", "`;").includes("xcard-block--hazard"),
+  // CARD-5: the modifier moved with the markup into hurtBlock().
+  const hb = card.indexOf("function hurtBlock");
+  const h = card.slice(hb, hb + 500);
+  ok(h.includes("xcard-block--hazard"),
      "the pinned hurt-and-ache block has no hazard modifier");
+  ok(h.includes("xcard-hurt-summary"),
+     "the collapsed summary row carries no hazard styling hook; it reads as one more accordion");
   const css = fs.readFileSync(_gatePath("css/components/workout.css"), "utf8");
   ok(css.includes(".xcard-block--hazard"), "the modifier class has no styling");
   ok(css.includes("--color-danger"), "the hazard box does not use the danger token");

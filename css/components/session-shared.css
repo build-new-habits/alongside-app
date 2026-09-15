@@ -1,6 +1,12 @@
 /* ============================================================
    session-shared.css
    css/components/session-shared.css
+   15 Sep 2026 v10
+
+   v10 - SAFETY-GATE. .safety-gate and its parts: the before-you-start
+   dialog, read once per occasion and acknowledged deliberately. Same
+   rose grammar as .xcard-block--hazard. Notes at the foot of this file.
+
    12 Sep 2026 v9
 
    v9 - SEARCH-1b. .sb-swap-search and its label, input and status line.
@@ -855,4 +861,133 @@
   margin: var(--space-2) 0;
   font-size: var(--text-sm);
   color: var(--color-text);
+}
+
+/* ============================================================
+   SAFETY-GATE — the before-you-start dialog
+   15 Sep 2026
+
+   Read once per occasion rather than skimmed forty times, and
+   acknowledged deliberately. The acknowledgement is evidence of
+   notice and nothing more: under the Consumer Rights Act 2015
+   s.65 no notice excludes liability for personal injury caused
+   by negligence, which is why the label reads "I have read
+   this" and never "I accept the risk".
+
+   Same rose grammar as .xcard-block--hazard. One visual
+   language for "this is not ordinary text", not a new
+   treatment per surface.
+   ============================================================ */
+
+.safety-gate {
+  max-width: 34rem;
+  margin: 0 auto;
+  padding: var(--space-4) var(--space-3) var(--space-6);
+}
+
+.gate-kicker {
+  margin: 0 0 var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+/* tabindex="-1" for programmatic focus on mount. The outline is
+   suppressed only for that case — a heading is not a control
+   and a ring on it reads as an error. Keyboard focus of real
+   controls below is unaffected. */
+.gate-title {
+  margin: 0 0 var(--space-4);
+  font-size: var(--text-2xl);
+}
+.gate-title:focus { outline: none; }
+
+.gate-block--hazard {
+  padding: var(--space-3);
+  border-left: 4px solid var(--color-danger);
+  border-radius: var(--radius-md, 8px);
+  background: var(--color-danger-light);
+}
+
+.gate-block-label {
+  margin: 0 0 var(--space-2);
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  letter-spacing: 0.04em;
+  color: var(--color-danger);
+}
+
+.gate-lines { margin: 0; padding-left: var(--space-4); }
+.gate-lines li + li { margin-top: var(--space-3); }
+
+.gate-guidance {
+  margin: var(--space-4) 0 0;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+/* The label is the target, not the 22px box — 2.5.8. */
+.gate-ack {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 48px;
+  margin: var(--space-5) 0 var(--space-2);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md, 8px);
+  cursor: pointer;
+}
+
+.gate-ack input[type="checkbox"] {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  margin: 0;
+  accent-color: var(--color-primary);
+}
+
+.gate-ack:focus-within {
+  outline: 3px solid var(--color-focus, var(--color-primary));
+  outline-offset: 2px;
+}
+
+/* aria-live region. Always in the DOM so the announcement is
+   the text changing, not the element appearing — a region
+   inserted at the same moment it is populated is unreliably
+   announced. min-height reserves the space so nothing shifts
+   under a thumb when the message arrives. */
+.gate-error {
+  min-height: 1.5rem;
+  margin: 0 0 var(--space-3);
+  font-size: var(--text-sm);
+  color: var(--color-danger);
+}
+
+/* NOT a fixed bottom bar. 2.4.11 Focus Not Obscured: the
+   session views' own sticky action bars are exactly the hazard
+   this avoids — a focused checkbox must not sit behind one. */
+.gate-start { width: 100%; }
+
+.gate-leave {
+  display: block;
+  width: 100%;
+  min-height: 44px;
+  margin-top: var(--space-3);
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: var(--text-base);
+  color: var(--color-primary);
+  cursor: pointer;
+}
+
+.gate-leave:focus-visible {
+  outline: 3px solid var(--color-focus, var(--color-primary));
+  outline-offset: 2px;
+  border-radius: var(--radius-sm, 4px);
+}
+
+@media (prefers-contrast: more) {
+  .gate-block--hazard { border-left-width: 6px; }
+  .gate-ack { border-width: 2px; }
 }

@@ -83,6 +83,7 @@ const click = el => el.dispatchEvent(new dom.window.MouseEvent("click", { bubble
 
 const fs = await import("node:fs");
 const { store } = await import("../js/store.js");
+const { HURT_AND_ACHE_VERSION: ACK_VERSION } = await import("../js/exercise-card.js");
 const { router } = await import("../js/router.js");
 const gp = await import("../js/views/gym-programme.js");
 
@@ -96,6 +97,18 @@ const mount = () => {
   store.set("generatedSession", JSON.parse(JSON.stringify(SESSION)));
   store.set("gymProgrammeSession", "A");
   store.set("exerciseFeedback", []);
+  // SAFETY-GATE, 15 Sep 2026. The gate blocks exercise 1 until the
+  // hurt-and-ache guidance is acknowledged, so an un-seeded fixture
+  // lands on the gate rather than on the DECIDE page this file tests.
+  // A CURRENT-version acknowledgement, not a bypass: bump
+  // HURT_AND_ACHE_VERSION and this goes stale and fails again, which is
+  // correct -- a change to the safety text should make every session
+  // fixture notice. verify-card5 owns the gate's own behaviour.
+  store.set("safetyAckLog", [{
+    at: new Date().toISOString(),
+    textVersion: ACK_VERSION,
+    surface: "fixture"
+  }]);
   gp.GymProgrammeView(router).mount(el);
 };
 

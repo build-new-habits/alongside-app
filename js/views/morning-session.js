@@ -64,6 +64,7 @@
  */
 
 import { store }         from "../store.js";
+import { isGateDue, renderSafetyGate, attachSafetyGate } from "../safety-gate.js";
 import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
 import { getZoneStatus } from "../data/conditions.js";
 import {
@@ -467,6 +468,22 @@ function renderOverview() {
 function renderSession() {
   const session = getMorningSession(selectedWeek, selectedSlot);
   if (!session) return renderSelect();
+
+  // SAFETY-GATE, 15 Sep 2026. THIS VIEW IS THE REASON THE GATE LIVES
+  // ABOVE THE CARD LAYER.
+  //
+  // exercise-card.js v7 logged it red and did not close it: this view
+  // renders its exercises from a LOCAL renderExerciseCard() that carries
+  // no caution and no hurt-and-ache at all. Somebody doing a morning
+  // session has been seeing no safety text whatsoever.
+  //
+  // The gate sits above the renderer, so it fires here exactly as it
+  // does in the four views that use the shared card, and that gap is
+  // closed today. The local-renderer migration is still owed and stays
+  // logged red -- CARD-LOCAL. This makes the gap survivable, not gone.
+  if (currentBlock === "warmup" && currentIndex === 0 && isGateDue()) {
+    return `<div class="view workout-view">${renderSafetyGate()}</div>`;
+  }
 
   const total   = countTotalSteps(session);
   const current = getCurrentStepNumber(session);
@@ -950,6 +967,18 @@ function handleClick(e) {
     timerRunning   = false;
 
     if (!session) { viewState = "select"; rerender(); return; }
+
+    // SAFETY-GATE. Bound before the session controls; with the gate up
+    // there is no card, timer or block bar on screen for them to find.
+    if (viewState === "session" && currentBlock === "warmup"
+        && currentIndex === 0 && isGateDue()) {
+      attachSafetyGate(document.getElementById("app") || document, {
+        surface: "morning-session",
+        onAcknowledge: () => rerender(),
+        onLeave:       () => router.navigate("today"),
+      });
+      return;
+    }
 
     if (viewState === "session") {
       advance(session);
