@@ -1,36 +1,12 @@
 # Alongside: Move — Master Schedule
-## 16 Sep 2026 v352
+## 16 Sep 2026 v351
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v351.md`. Remove v351 on upload.
+Supersedes `master_schedule_v350.md`. Remove v350 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
-> **Live: `alongside-v508`, 153 gates, `store.js` v68, `Schema.md` v1.61, cold start blueprint v113.** Read that blueprint after this block.
->
-> ### 🔴 PROPOSAL-LOC — SHIPPED 16 Sep, `v508`. Two of the three proposal cards were never generated.
->
-> Graeme, having told the coach *at the gym, 40 minutes*: offered a 15-minute breathing session and a 20-minute walk. *"The likely good is I'm at the gym to work out."*
->
-> **The cause was a leftover `while` loop**, not a scoring or location bug:
->
-> ```js
-> while (options.length < 3) options.push(_getFallbackOption(options.length));
-> ```
->
-> `_getFallbackOption` takes **one argument — an index** — into a fixed array of Mobility / Breathing / Short walk. No location, no energy, no arc, no check-in, and `exercises: []` on every entry. TWO-ENGINE cut the engine to a single built session on 06 Sep and left the loop in place, so **for ten days two of three slots came from that array.** The tell was on screen the whole time: both alternates captioned *"A steady option for today."* — the same string literal twice.
->
-> 🔴 **Twelve gates covered this screen and every one passed.** They assert that cards *render* — units, plurals, a marked suggestion, a start route. **None asserted where a card's content came from.** A card made of fiction renders exactly as well as a card made of a session. That is the gap `verify-proposal-loc` exists to close, and it is worth reading as a general lesson about this suite.
->
-> **Alternates are now built** through `buildSession()` with the same location-scoped equipment and the same available time as the primary, varying only `sessionType`, ordered by where the person actually is — gym leans to load-bearing work, home to what a room allows. **Where the engine cannot produce one, the slot is dropped.** One real option beats one real option and two fictions.
->
-> ⚫ `_getFallbackOption()` is **kept**, and still serves the build-failed path where a canned suggestion beats a blank screen. What it no longer does is pad a successful build.
->
-> 🟢 **Measured, not assumed:** all eight gym session types build at 40 minutes with a normal gym kit — full, upper, lower, core, glute, mobility, stretch, cardio. So three real cards is the ordinary case, not the lucky one.
->
-> 🟡 **`verify-proposal1` lost its positive control and said so.** Its singular-movement check depended on the Short walk fallback existing — and its own comment predicted this: *"if that card ever stops appearing, the singular case stops being exercised."* It went red on the first run. Synthesising a replacement card was tried and rejected as asserting against itself; the singular case is now asserted at its source, `_movementsLabel()`, with the reverse proven.
->
-> ⚫ **Gate red before green, performed:** the pad loop was deliberately reinstated and `verify-proposal-loc` 0.1 and 0.3 went red, then reverted.
+> **Live: `alongside-v507`, 152 gates, `store.js` v68, `Schema.md` v1.61, cold start blueprint v112.** Read that blueprint after this block.
 >
 > ### 🔴 GATE-ALL — SHIPPED 16 Sep, `v507`. CARD-5 covered five views. There were thirteen.
 >
@@ -9119,4 +9095,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v352*
+*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v351*
