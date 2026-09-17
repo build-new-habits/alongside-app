@@ -59,6 +59,7 @@ for (const [k, v] of [
 
 const B = new URL("../js/", import.meta.url).href;
 const { store }     = await import(B + "store.js");
+const { HURT_AND_ACHE_VERSION: ACK_VERSION } = await import(B + "exercise-card.js");
 const { CLASSES }   = await import(B + "data/classes/index.js");
 const { TodayView } = await import(B + "views/today.js");
 const L             = await import(B + "views/class-list.js");
@@ -88,6 +89,16 @@ realRouter.navigate = (r) => navs.push(r);
 function seed({ programme = false, injured = false } = {}) {
   localStorage.clear();
   store.init();
+  // SAFETY-GATE, GATE-ALL 16 Sep 2026. The gate fires on the class
+  // player's first section and beat, so an un-seeded fixture lands on it
+  // rather than on the class under test. A CURRENT-version
+  // acknowledgement, not a bypass: bump HURT_AND_ACHE_VERSION and this
+  // goes stale and fails again, which is correct.
+  store.set("safetyAckLog", [{
+    at: new Date().toISOString(),
+    textVersion: ACK_VERSION,
+    surface: "fixture"
+  }]);
   store.set("tier", "personal");
   store.set("name", "Graeme");
   store.set("arc", {
@@ -275,6 +286,16 @@ console.log("\nTEST 5b - finishing a class reaches Progress");
 {
   localStorage.clear();
   store.init();
+  // SAFETY-GATE, GATE-ALL 16 Sep 2026. The gate fires on the class
+  // player's first section and beat, so an un-seeded fixture lands on it
+  // rather than on the class under test. A CURRENT-version
+  // acknowledgement, not a bypass: bump HURT_AND_ACHE_VERSION and this
+  // goes stale and fails again, which is correct.
+  store.set("safetyAckLog", [{
+    at: new Date().toISOString(),
+    textVersion: ACK_VERSION,
+    surface: "fixture"
+  }]);
   store.set("tier", "personal");
 
   P.startClass("class-ground-001");
@@ -325,6 +346,16 @@ console.log("\nTEST 5c - leaving part-way is a partial, not nothing");
 {
   localStorage.clear();
   store.init();
+  // SAFETY-GATE, GATE-ALL 16 Sep 2026. The gate fires on the class
+  // player's first section and beat, so an un-seeded fixture lands on it
+  // rather than on the class under test. A CURRENT-version
+  // acknowledgement, not a bypass: bump HURT_AND_ACHE_VERSION and this
+  // goes stale and fails again, which is correct.
+  store.set("safetyAckLog", [{
+    at: new Date().toISOString(),
+    textVersion: ACK_VERSION,
+    surface: "fixture"
+  }]);
   store.set("tier", "personal");
   P.startClass("class-ground-001");
   main.innerHTML = P.render();
@@ -347,6 +378,16 @@ console.log("\nTEST 5d - leaving immediately records nothing");
 {
   localStorage.clear();
   store.init();
+  // SAFETY-GATE, GATE-ALL 16 Sep 2026. The gate fires on the class
+  // player's first section and beat, so an un-seeded fixture lands on it
+  // rather than on the class under test. A CURRENT-version
+  // acknowledgement, not a bypass: bump HURT_AND_ACHE_VERSION and this
+  // goes stale and fails again, which is correct.
+  store.set("safetyAckLog", [{
+    at: new Date().toISOString(),
+    textVersion: ACK_VERSION,
+    surface: "fixture"
+  }]);
   store.set("tier", "personal");
   P.startClass("class-ground-001");
   main.innerHTML = P.render();
