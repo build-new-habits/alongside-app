@@ -1,6 +1,25 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 16 Sep 2026 v509
+ *
+ * v509 - STRETCH-FOCUS. NO NEW APP FILES. yoga-session.js and
+ *   session-shared.css.
+ *
+ *   Stretch sessions had no target. Graeme did the triage by hand --
+ *   skipping poses that were not serving his lower back and keeping the
+ *   ones that were -- and said users should not have to find a way.
+ *
+ *   A target row sits above the existing style cards: Back and hips,
+ *   Legs, Shoulders and arms, All over. Preselected from the check-in,
+ *   so the common case is one tap. All 67 stretch and mobility poses
+ *   already carried affectsAreas, so this was wiring, not tagging.
+ *
+ *   The target SORTS rather than filters. Nothing is removed.
+ *
+ *   New gate, not precached (tools/ never is):
+ *   tools/verify-stretch-focus.mjs. 154 gates.
+ *
  * 16 Sep 2026 v508
  *
  * v508 - PROPOSAL-LOC. NO NEW APP FILES. coach-proposal.js v27.
@@ -3478,7 +3497,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v508";
+const CACHE_NAME = "alongside-v509";
 
 const SHELL_URLS = [
 
