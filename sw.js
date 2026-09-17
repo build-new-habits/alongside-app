@@ -1,6 +1,21 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 16 Sep 2026 v507
+ *
+ * v507 - GATE-ALL. NO NEW FILES. Eight session views now mount the
+ *   safety gate: yoga, breathing, quiet (mindful mode), walk, running,
+ *   cycle, swim and the class player.
+ *
+ *   CARD-5 wired the five views that use the shared exercise card and
+ *   verify-card5 pinned that list at five, claiming it was every
+ *   movement view. It was every view the grep found. Graeme went to
+ *   stretch the next morning and got no gate at all.
+ *
+ *   js/safety-gate.js was already precached at v506, which is the only
+ *   reason this is a cache bump rather than a precache change. Eleven
+ *   files touched, none new.
+ *
  * 15 Sep 2026 v506
  *
  * v506 - CARD-5 / SAFETY-GATE. ONE NEW FILE PRECACHED: js/safety-gate.js.
@@ -3446,7 +3461,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v506";
+const CACHE_NAME = "alongside-v507";
 
 const SHELL_URLS = [
 
