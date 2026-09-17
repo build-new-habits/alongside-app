@@ -104,11 +104,15 @@ const mount = () => {
   // HURT_AND_ACHE_VERSION and this goes stale and fails again, which is
   // correct -- a change to the safety text should make every session
   // fixture notice. verify-card5 owns the gate's own behaviour.
-  store.set("safetyAckLog", [{
-    at: new Date().toISOString(),
-    textVersion: ACK_VERSION,
-    surface: "fixture"
-  }]);
+  store.set("safetyAckLog",
+    // GATE-TAPER, 16 Sep 2026. ONE acknowledgement no longer clears the
+    // gate: it fires every session for the first TAPER_SESSIONS (5),
+    // then monthly. A fixture needs the floor, not a single entry.
+    Array.from({ length: 5 }, () => ({
+      at: new Date().toISOString(),
+      textVersion: ACK_VERSION,
+      surface: "fixture"
+    })));
   gp.GymProgrammeView(router).mount(el);
 };
 
