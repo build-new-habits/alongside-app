@@ -1,24 +1,12 @@
 # Alongside: Move — Master Schedule
-## 16 Sep 2026 v354
+## 16 Sep 2026 v353
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v353.md`. Remove v353 on upload.
+Supersedes `master_schedule_v352.md`. Remove v352 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
-> **Live: `alongside-v510`, 154 gates, `store.js` v68, `Schema.md` v1.61, cold start blueprint v115.** Read that blueprint after this block.
->
-> ### 🟢 GATE-TAPER + CARD-DECIDE — SHIPPED 16 Sep, `v510`. The two halves of the cadence question.
->
-> **GATE-TAPER.** Graeme: *"What if we had the before you start message every time for a week, then the 30 days?"* Right, and for a reason the guidance states about itself — *"especially if this is new to you."* Risk is front-loaded: unfamiliar movements, and no calibration yet on what normal aching feels like. The habituation objection that set `GATE_DAYS = 30` holds for an **indefinite** repeat and does not hold for a **bounded** one. Five exposures then a monthly refresh is a different thing from two hundred.
->
-> ⚫ **Counted in SESSIONS, not days — a change to the proposal.** A week is calendar time; exposure is what matters. Someone training twice in their first week would get two readings then drop to monthly, a thinner floor than someone training daily — and they are the one who is *less* practised. `TAPER_SESSIONS = 5` gives everyone the same floor.
->
-> ⚫ **A text change restarts the taper**, because new wording is new to them — the same argument the taper rests on. Implemented by counting only entries at the **current** `HURT_AND_ACHE_VERSION`, so it needs no extra field and cannot drift out of step with the version stamp. `verify-card5` 0.8 proves fifty old-version entries do not count; 0.9 proves the taper is bounded and does not fire forever.
->
-> **CARD-DECIDE.** With the taper carrying week one, the question was the 29 days after it — when the only safety text on screen was a closed row nobody opens. **Present-but-unread is the state CARD-5 existed to end, not a second version of it**; we would have swapped "ignored because repeated" for "ignored because hidden". The disclosure is now **open on Decide, closed on Watch out, Do and Note**. Decide is where somebody decides whether to do the movement at all, and it is first, so it is passed once per exercise before any instruction. Ten renders where it is relevant beats forty where it is not, and beats zero.
->
-> 🟡 **Five session fixtures went red again**, and correctly: one seeded acknowledgement no longer clears a gate that fires for the first five. Each now seeds the floor rather than a bypass. Third time this week a safety change has been proven from outside by tests that know nothing about it.
+> **Live: `alongside-v509`, 154 gates, `store.js` v68, `Schema.md` v1.61, cold start blueprint v114.** Read that blueprint after this block.
 >
 > ### 🟢 STRETCH-FOCUS — SHIPPED 16 Sep, `v509`. Stretch sessions now have a target.
 >
@@ -9153,4 +9141,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v354*
+*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v353*

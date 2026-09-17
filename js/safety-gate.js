@@ -1,5 +1,12 @@
 /**
  * js/safety-gate.js
+ * 16 Sep 2026 v2
+ *
+ * v2 - GATE-TAPER. Every session for the first five acknowledgements of
+ *   the current wording, then every 30 days. See TAPER_SESSIONS for why
+ *   it is counted in sessions rather than days, and why only
+ *   current-version entries count.
+ *
  * 15 Sep 2026 v1
  *
  * SAFETY-GATE. The hurt-and-ache guidance, read once before a session
@@ -98,6 +105,34 @@ export const GUIDANCE_TEXT =
 export const GUIDANCE_DAYS = 30;
 export const GATE_DAYS = 30;
 
+/**
+ * GATE-TAPER, 16 Sep 2026. Every session for the first five, then 30 days.
+ *
+ * Graeme: "What if we had the before you start message every time for a
+ * week, then the 30 days?" Right, and for a reason the text states about
+ * itself -- "especially if this is new to you". Risk is front-loaded:
+ * unfamiliar movements, and no calibration yet on what normal aching
+ * feels like. A cadence that treats week one like month six ignores what
+ * the guidance is already saying.
+ *
+ * The habituation objection that set GATE_DAYS = 30 holds for an
+ * INDEFINITE repeat and does not hold for a bounded one. Five exposures
+ * then a monthly refresh is a different thing from two hundred.
+ *
+ * ⚫ COUNTED IN SESSIONS, NOT DAYS, and that is the change to Graeme's
+ * proposal. A week is calendar time; exposure is what matters. Someone
+ * who trains twice in their first week would get two readings and then
+ * drop to monthly -- a thinner floor than someone training daily, and
+ * they are the one who is LESS practised, not more. Sessions give
+ * everyone the same floor regardless of how often they train.
+ *
+ * ⚫ A TEXT CHANGE RESTARTS THE TAPER. New wording is new to them, which
+ * is the same argument the taper rests on. Implemented by counting only
+ * entries at the CURRENT version, so it needs no extra field and cannot
+ * drift out of step with the version stamp.
+ */
+export const TAPER_SESSIONS = 5;
+
 /** Oldest trimmed first. See Schema.md v1.61 -- the log is not complete. */
 const ACK_CAP = 200;
 
@@ -111,6 +146,11 @@ function _daysSince(iso) {
 function _log() {
   const l = store.get("safetyAckLog");
   return Array.isArray(l) ? l : [];
+}
+
+/** GATE-TAPER. Entries at the current wording only -- see TAPER_SESSIONS. */
+function _acknowledgedAtCurrentVersion() {
+  return _log().filter(e => e && e.textVersion === HURT_AND_ACHE_VERSION).length;
 }
 
 function _newest() {
@@ -130,6 +170,13 @@ export function isGateDue() {
   const last = _newest();
   if (!last) return true;
   if (last.textVersion !== HURT_AND_ACHE_VERSION) return true;
+
+  // GATE-TAPER. Only acknowledgements of the CURRENT wording count, so a
+  // text change restarts the taper without a second field to keep in
+  // step. Below the floor the other triggers are not consulted at all --
+  // during the taper the gate fires whatever the calendar says.
+  if (_acknowledgedAtCurrentVersion() < TAPER_SESSIONS) return true;
+
   if (_daysSince(last.at) > GATE_DAYS) return true;
 
   try {

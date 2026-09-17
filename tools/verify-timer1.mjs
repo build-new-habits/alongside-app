@@ -142,11 +142,15 @@ function freshSession() {
   // the reset: seeded any earlier and it is silently undone, which cost
   // one debugging round on 15 Sep. verify-card5 owns the gate's own
   // behaviour, including that an un-seeded store IS blocked.
-  store.set("safetyAckLog", [{
-    at: new Date().toISOString(),
-    textVersion: ACK_VERSION,
-    surface: "fixture"
-  }]);
+  store.set("safetyAckLog",
+    // GATE-TAPER, 16 Sep 2026. ONE acknowledgement no longer clears the
+    // gate: it fires every session for the first TAPER_SESSIONS (5),
+    // then monthly. A fixture needs the floor, not a single entry.
+    Array.from({ length: 5 }, () => ({
+      at: new Date().toISOString(),
+      textVersion: ACK_VERSION,
+      surface: "fixture"
+    })));
   store.set("tier", "personal");
   store.set("homeEquipment", ["dumbbells", "resistance-band"]);
   const built = sb.buildSession({

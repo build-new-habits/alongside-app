@@ -94,11 +94,15 @@ function seed({ programme = false, injured = false } = {}) {
   // rather than on the class under test. A CURRENT-version
   // acknowledgement, not a bypass: bump HURT_AND_ACHE_VERSION and this
   // goes stale and fails again, which is correct.
-  store.set("safetyAckLog", [{
-    at: new Date().toISOString(),
-    textVersion: ACK_VERSION,
-    surface: "fixture"
-  }]);
+  store.set("safetyAckLog",
+    // GATE-TAPER, 16 Sep 2026. ONE acknowledgement no longer clears the
+    // gate: it fires every session for the first TAPER_SESSIONS (5),
+    // then monthly. A fixture needs the floor, not a single entry.
+    Array.from({ length: 5 }, () => ({
+      at: new Date().toISOString(),
+      textVersion: ACK_VERSION,
+      surface: "fixture"
+    })));
   store.set("tier", "personal");
   store.set("name", "Graeme");
   store.set("arc", {
@@ -291,11 +295,15 @@ console.log("\nTEST 5b - finishing a class reaches Progress");
   // rather than on the class under test. A CURRENT-version
   // acknowledgement, not a bypass: bump HURT_AND_ACHE_VERSION and this
   // goes stale and fails again, which is correct.
-  store.set("safetyAckLog", [{
-    at: new Date().toISOString(),
-    textVersion: ACK_VERSION,
-    surface: "fixture"
-  }]);
+  store.set("safetyAckLog",
+    // GATE-TAPER, 16 Sep 2026. ONE acknowledgement no longer clears the
+    // gate: it fires every session for the first TAPER_SESSIONS (5),
+    // then monthly. A fixture needs the floor, not a single entry.
+    Array.from({ length: 5 }, () => ({
+      at: new Date().toISOString(),
+      textVersion: ACK_VERSION,
+      surface: "fixture"
+    })));
   store.set("tier", "personal");
 
   P.startClass("class-ground-001");
@@ -351,11 +359,15 @@ console.log("\nTEST 5c - leaving part-way is a partial, not nothing");
   // rather than on the class under test. A CURRENT-version
   // acknowledgement, not a bypass: bump HURT_AND_ACHE_VERSION and this
   // goes stale and fails again, which is correct.
-  store.set("safetyAckLog", [{
-    at: new Date().toISOString(),
-    textVersion: ACK_VERSION,
-    surface: "fixture"
-  }]);
+  store.set("safetyAckLog",
+    // GATE-TAPER, 16 Sep 2026. ONE acknowledgement no longer clears the
+    // gate: it fires every session for the first TAPER_SESSIONS (5),
+    // then monthly. A fixture needs the floor, not a single entry.
+    Array.from({ length: 5 }, () => ({
+      at: new Date().toISOString(),
+      textVersion: ACK_VERSION,
+      surface: "fixture"
+    })));
   store.set("tier", "personal");
   P.startClass("class-ground-001");
   main.innerHTML = P.render();
@@ -383,11 +395,15 @@ console.log("\nTEST 5d - leaving immediately records nothing");
   // rather than on the class under test. A CURRENT-version
   // acknowledgement, not a bypass: bump HURT_AND_ACHE_VERSION and this
   // goes stale and fails again, which is correct.
-  store.set("safetyAckLog", [{
-    at: new Date().toISOString(),
-    textVersion: ACK_VERSION,
-    surface: "fixture"
-  }]);
+  store.set("safetyAckLog",
+    // GATE-TAPER, 16 Sep 2026. ONE acknowledgement no longer clears the
+    // gate: it fires every session for the first TAPER_SESSIONS (5),
+    // then monthly. A fixture needs the floor, not a single entry.
+    Array.from({ length: 5 }, () => ({
+      at: new Date().toISOString(),
+      textVersion: ACK_VERSION,
+      surface: "fixture"
+    })));
   store.set("tier", "personal");
   P.startClass("class-ground-001");
   main.innerHTML = P.render();
