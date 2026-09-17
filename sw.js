@@ -1,6 +1,23 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 16 Sep 2026 v508
+ *
+ * v508 - PROPOSAL-LOC. NO NEW APP FILES. coach-proposal.js v27.
+ *
+ *   Two of the three cards on the proposal screen were never generated.
+ *   A leftover `while (options.length < 3)` padded the list from
+ *   _getFallbackOption(index), a fixed array of Mobility / Breathing /
+ *   Short walk with exercises: [] on every entry. TWO-ENGINE cut the
+ *   engine to one built session on 06 Sep and left the loop behind.
+ *
+ *   Alternates now go through buildSession() with the same
+ *   location-scoped equipment and available time as the primary. Where
+ *   the engine cannot produce one, the slot is dropped.
+ *
+ *   New gate, not precached (tools/ is never precached):
+ *   tools/verify-proposal-loc.mjs. 153 gates.
+ *
  * 16 Sep 2026 v507
  *
  * v507 - GATE-ALL. NO NEW FILES. Eight session views now mount the
@@ -3461,7 +3478,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v507";
+const CACHE_NAME = "alongside-v508";
 
 const SHELL_URLS = [
 
