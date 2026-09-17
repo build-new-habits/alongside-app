@@ -1,34 +1,12 @@
 # Alongside: Move — Master Schedule
-## 16 Sep 2026 v353
+## 16 Sep 2026 v352
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v352.md`. Remove v352 on upload.
+Supersedes `master_schedule_v351.md`. Remove v351 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
-> **Live: `alongside-v509`, 154 gates, `store.js` v68, `Schema.md` v1.61, cold start blueprint v114.** Read that blueprint after this block.
->
-> ### 🟢 STRETCH-FOCUS — SHIPPED 16 Sep, `v509`. Stretch sessions now have a target.
->
-> Graeme, after a stretch session: *"I skipped some of the exercises that I thought weren't doing that and I focused on the exercises in the suggestions that I thought did do it. So I managed to find a way — but I don't think we should be giving that to our users to find a way."*
->
-> **Ground-truthed before designing, and the news was good:** all **67 of 67** stretch and mobility poses already carry `affectsAreas`, across twenty areas including `lower-back`, `hip`, `hamstring`, `glutes`, `shoulder` and `rotator-cuff`. No tagging pass, no migration — this was wiring.
->
-> **`FOCUS_TYPES` asked the wrong question.** It offers practice *style* — Flexibility, Strength, Balance, Recovery. In all three of Graeme's own examples he never cared about flexibility-versus-balance; he cared about **where**. So a target row is added ABOVE the style cards and the style question is left intact: improvements extend, they do not relocate.
->
-> **Four targets:** Back and hips, Legs, Shoulders and arms, All over. **Preselected from the check-in**, so the common case stays one tap rather than two, and computed on render rather than latched — the check-in changes between visits and a stale preselection is worse than none.
->
-> ⚫ **The arc is deliberately NOT the default.** Graeme's own case decided it: arc is trunk strength, but the day he had DOMS in his arms the arc was not what that day was about. The check-in is the freshest real signal; the arc is not.
->
-> ⚫ **The target SORTS, it does not filter.** Poses matching the target come first; nothing is removed. Filtering would silently shrink a session and hide movements the person might still want, which is the opposite of the complaint — he wanted the useful ones surfaced, not the rest deleted.
->
-> 🟡 **SAVE-IN-MOMENT already existed, and only in one place.** Graeme: *"I think saving the session would be good. Kinda like building my own but in the moment."* `saveSession()` is Plan-gated and wired at the END of a yoga session — you cannot name a session you have not done. The audit found it is offered in **`yoga-session.js` only**. Twelve views cannot save at all.
->
-> 🔴 **SAVE-ALL** — `workout`, `core-session`, `gym-programme`, `prescribed-session`, `morning-session`, `class-player`, `walk`, `running`, `cycle`, `swim`, `breathing`, `quiet`. Saving reads like a product-wide feature and is a yoga-and-builder feature. **Same shape as GATE-ALL.** Scheduled as its own block — twelve views is a session in itself, and bolting it onto a feature build is exactly how the five-view list happened. `verify-stretch-focus` TEST 4 prints the owed list on every run so it cannot go quiet.
->
-> 🟡 **STRETCH-WHY, not built.** Each pose's card should say why it is in today's session — `session-rationale.js` already writes that sentence for workouts and stretch sessions never call it. The sort surfaces the right poses; the line would explain them. Separate concern, touches the pose renderer.
->
-> ⚫ **Recovered work, disclosed.** A turn writing this feature failed mid-flight; the files were on disk, uncommitted and absent from `git log`. It was reviewed as untrusted before being adopted — ESM load, its own 24 assertions, full suite — rather than committed on the assumption it was finished.
+> **Live: `alongside-v508`, 153 gates, `store.js` v68, `Schema.md` v1.61, cold start blueprint v113.** Read that blueprint after this block.
 >
 > ### 🔴 PROPOSAL-LOC — SHIPPED 16 Sep, `v508`. Two of the three proposal cards were never generated.
 >
@@ -9141,4 +9119,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v353*
+*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v352*

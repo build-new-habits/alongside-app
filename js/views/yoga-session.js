@@ -1,5 +1,30 @@
 /**
- * yoga-session.js - Guided Yoga and Pilates Session
+ * yoga-session.js
+ * 16 Sep 2026 v-STRETCH-FOCUS
+ *
+ * STRETCH-FOCUS + SAVE-IN-MOMENT, 16 Sep 2026.
+ *
+ * Graeme, after a stretch session with a bad lower back: "I skipped some
+ * of the exercises that I thought weren't doing that and focused on the
+ * ones I thought did. So I managed to find a way, but I don't think we
+ * should be giving that to our users to find a way."
+ *
+ * FOCUS_TYPES asked practice STYLE. It still does, unchanged. What was
+ * missing is WHERE -- in none of the cases he described did he care
+ * about flexibility versus balance. TARGET_AREAS sits above it on the
+ * same screen, preselected from the check-in, so the common case is one
+ * tap rather than two.
+ *
+ * The target SORTS rather than filters: a hard filter hands back a
+ * three-pose session when the pool is thin, and a short session reads as
+ * the app having nothing for you.
+ *
+ * SAVE-IN-MOMENT offers saveSession() at the END of the session. 🟡 ONE
+ * VIEW, deliberately -- SAVE-ALL carries it across the rest, and
+ * verify-stretch-focus LISTS which views offer it rather than pinning a
+ * count. GATE-ALL is four days old and that is exactly how five views
+ * got pinned as thirteen.
+ * - Guided Yoga and Pilates Session
  * 08 Sep 2026 v6
  *
  * v6 - A11Y-HEADER. The .workout-header-title span is an h1. It was a
@@ -152,6 +177,8 @@
 
 import { store } from "../store.js";
 import { isGateDue, renderSafetyGate, attachSafetyGate } from "../safety-gate.js";
+import { saveSession } from "../data/saved-sessions.js";
+import { isPremium } from "../auth.js";
 import { EXERCISES } from "../data/exercises/index.js";
 import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
 import { renderLogBlock, attachLogEvents, scrollToTop } from "../session-log.js";
@@ -162,6 +189,28 @@ export const centered = false;
 // ── Session state ─────────────────────────────────────────────────────────────
 let phase         = "focus";    // "focus" | "duration" | "overview" | "session" | "rest" | "done"
 let selectedFocus = null;
+
+/**
+ * STRETCH-FOCUS, 16 Sep 2026. WHAT this is for, as opposed to what KIND
+ * of practice it is.
+ *
+ * Graeme, after a stretch session: "What am I doing stretching for? Is
+ * there an area of the body I'm doing stretching for?" He had turned up
+ * with a bad lower back, worked out for himself which of the offered
+ * poses served it, and skipped the rest. "I managed to find a way, but I
+ * don't think we should be giving that to our users to find a way."
+ *
+ * FOCUS_TYPES was already here and asks practice STYLE -- flexibility,
+ * strength, balance, recovery. It is kept, unchanged. In none of the
+ * cases he described did he care about flexibility versus balance; he
+ * cared about WHERE. That is the question that was missing, not a
+ * replacement for the one that was there.
+ *
+ * All 67 stretch and mobility poses already carry affectsAreas, so this
+ * is wiring rather than a content pass. Ground-truthed before designing,
+ * not assumed.
+ */
+let selectedTarget = null;
 let selectedMins  = null;
 // ── P5 / YOGA-1, 12 Aug 2026 ───────────────────────────────────────────────
 //
@@ -431,7 +480,68 @@ const EXERCISE_COUNT = { 20: 5, 30: 7, 45: 10 };
 
 // ── Session builder ───────────────────────────────────────────────────────────
 
-function buildSession(focusId, durationMins) {
+/**
+ * STRETCH-FOCUS. Target groups, not raw affectsAreas.
+ *
+ * Twenty area tags is a correct vocabulary for a database and a bad one
+ * for somebody standing on a mat. These are the groupings people
+ * actually arrive with -- "my back and hips", "my legs", "my shoulders"
+ * -- each mapping to the tags underneath.
+ *
+ * "All over" is a real answer and carries no areas, which is what makes
+ * it a no-op filter rather than a special case elsewhere in the build.
+ */
+const TARGET_AREAS = [
+  { id: "back-hips", label: "Back and hips", icon: "\uD83E\uDDD8",
+    areas: ["lower-back", "spine", "hip", "hip-flexor", "glutes", "piriformis", "upper-back", "thoracic"] },
+  { id: "legs",      label: "Legs",          icon: "\uD83E\uDDB5",
+    areas: ["hamstring", "quadriceps", "calves", "adductors", "knee", "ankle-foot"] },
+  { id: "shoulders", label: "Shoulders and arms", icon: "\uD83D\uDCAA",
+    areas: ["shoulder", "rotator-cuff", "wrist-elbow", "chest-pecs", "triceps-biceps"] },
+  { id: "all",       label: "All over",      icon: "\u2728", areas: [] }
+];
+
+/**
+ * STRETCH-FOCUS. The target the check-in already implies, or null.
+ *
+ * Reads the same sore-area signal bodyCaution() reads, through the same
+ * AREA_ALIASES, so the preselection and the caution on the card cannot
+ * disagree about what is sore.
+ *
+ * 🔴 IT DOES NOT FALL BACK TO THE ARC, and that is the decision rather
+ * than an omission. Graeme: "maybe today I've got DOMS from having done
+ * too many arm exercises yesterday... and that's my arms, not my lower
+ * back. And my lower back is my arc." Some days the arc is not what
+ * today is about. A fresh signal beats a standing one; with no fresh
+ * signal, nothing is preselected and the person is asked.
+ */
+function _impliedTarget() {
+  const conditions = store.get("conditions") || [];
+  const scores     = store.get("conditionPainScores") || {};
+  const sore       = conditions.filter(id => (scores[id] || 0) >= 4);
+  if (!sore.length) return null;
+
+  const ALIASES = {
+    "lower-back": ["lower-back", "spine"],
+    "upper-back": ["upper-back", "thoracic"],
+    "sciatica":   ["lower-back", "glutes", "hamstring", "piriformis"],
+    "it-band":    ["hip", "knee"],
+    "shin-splints": ["calves", "ankle-foot"],
+    "achilles":   ["calves", "ankle-foot"],
+    "plantar-fasciitis": ["ankle-foot", "calves"],
+    "biceps-triceps": ["triceps-biceps"],
+    "wrist-elbow": ["wrist-elbow"]
+  };
+
+  for (const id of sore) {
+    const areas = ALIASES[id] || [id];
+    const hit = TARGET_AREAS.find(t => t.areas.some(a => areas.includes(a)));
+    if (hit) return hit.id;
+  }
+  return null;
+}
+
+function buildSession(focusId, durationMins, targetId) {
   const pool        = EXERCISE_POOLS[focusId] || [];
   const conditions  = store.get("conditions")          || [];
   const painScores  = store.get("conditionPainScores") || {};
@@ -455,7 +565,19 @@ function buildSession(focusId, durationMins) {
     return !contra.some(c => activeConditions.has(c));
   });
 
-  return safe.slice(0, targetCount);
+  // STRETCH-FOCUS. Sort, do not filter.
+  //
+  // A hard filter would hand back a three-pose session when the pool is
+  // thin, and a short session reads as the app having nothing for you.
+  // Sorting puts what serves the target first and keeps the rest behind
+  // it, so the count holds and the priority is honest. Graeme did this
+  // sorting by hand and skipped the tail; now the tail is the tail.
+  const target = TARGET_AREAS.find(t => t.id === targetId);
+  if (!target || !target.areas.length) return safe.slice(0, targetCount);
+
+  const hits = safe.filter(ex => (ex.affectsAreas || []).some(a => target.areas.includes(a)));
+  const rest = safe.filter(ex => !hits.includes(ex));
+  return [...hits, ...rest].slice(0, targetCount);
 }
 
 // ── Render ────────────────────────────────────────────────────────────────────
@@ -485,6 +607,30 @@ export function render() {
 
 function renderFocusSelector() {
   const name = store.get("name") || "";
+
+  // STRETCH-FOCUS. Preselected from the check-in where there is one, so
+  // the common case stays ONE tap, not two. Computed on render rather
+  // than latched, because the check-in can change between visits and a
+  // stale preselection is worse than none.
+  if (selectedTarget === null) selectedTarget = _impliedTarget();
+  const implied = selectedTarget !== null;
+
+  const targetRow = `
+      <p class="cs-focus-question" id="ys-target-q">What's this for today?</p>
+      ${implied ? `<p class="text-sm text-muted" style="margin-bottom: var(--space-2);">
+        Picked from your check-in. Change it if today is about something else.
+      </p>` : ""}
+      <div class="cs-target-grid" role="group" aria-labelledby="ys-target-q">
+        ${TARGET_AREAS.map(t => `
+          <button class="cs-target-card${t.id === selectedTarget ? " is-selected" : ""}"
+                  data-target="${t.id}"
+                  aria-pressed="${t.id === selectedTarget ? "true" : "false"}">
+            <span class="cs-focus-icon" aria-hidden="true">${t.icon}</span>
+            <span class="cs-focus-label">${t.label}</span>
+          </button>
+        `).join("")}
+      </div>`;
+
   return `
     <div class="view core-session-view">
       <div class="workout-header">
@@ -495,11 +641,14 @@ function renderFocusSelector() {
       <div class="card card-coach" style="margin-bottom: var(--space-5);">
         <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
         <p class="coach-message-text">
-          ${name ? name + ". " : ""}What kind of practice today?
+          ${name ? name + ". " : ""}Two quick things and we'll begin.
         </p>
       </div>
 
-      <div class="cs-focus-grid" role="group" aria-label="Choose your practice focus">
+      ${targetRow}
+
+      <p class="cs-focus-question" id="ys-style-q">And what kind of practice?</p>
+      <div class="cs-focus-grid" role="group" aria-labelledby="ys-style-q">
         ${FOCUS_TYPES.map(f => `
           <button class="cs-focus-card" data-focus="${f.id}"
                   aria-label="${f.label}: ${f.description}">
@@ -761,6 +910,57 @@ function renderRest() {
 
 // ── Done ──────────────────────────────────────────────────────────────────────
 
+/**
+ * SAVE-IN-MOMENT, 16 Sep 2026. Keep what you just did.
+ *
+ * Graeme: "I think saving the session would be good. Kinda like building
+ * my own but in the moment."
+ *
+ * saveSession() already exists and is already Plan-gated -- YOUR-OWN
+ * built it for sessions assembled in advance. Nothing new is needed to
+ * store one; what was missing is being ASKED at the moment the session
+ * is worth keeping, which is the moment it ends rather than before it
+ * begins.
+ *
+ * AFTER the session, never before. Offering "save this" on the overview
+ * asks somebody to commit to a session they have not done yet, and the
+ * ones worth keeping are the ones that turned out well.
+ *
+ * 🟡 THIS IS ONE VIEW, DELIBERATELY, AND IT IS NOT THE PATTERN YET.
+ * GATE-ALL is four days old: CARD-5 wired five views, a gate pinned the
+ * five as complete, and stretching went uncovered until Graeme found it.
+ * So this is not being pinned as done anywhere. SAVE-ALL is logged on
+ * the master schedule to carry it across the other session views, and
+ * verify-stretch-focus LISTS which views offer it rather than asserting
+ * a number -- a count would launder this scope into a decision.
+ */
+function _renderSaveBlock() {
+  // Free accounts get nothing here, not a locked control. savedSessions()
+  // returns [] for free by design, so a teaser would offer a door with
+  // no room behind it.
+  if (!isPremium()) return "";
+
+  const focus  = FOCUS_TYPES.find(f => f.id === selectedFocus);
+  const target = TARGET_AREAS.find(t => t.id === selectedTarget);
+  const suggested = [focus?.label || "Stretch",
+                     target && target.id !== "all" ? target.label.toLowerCase() : null]
+                    .filter(Boolean).join(" \u2014 ");
+
+  return `
+    <div class="ys-save-block" id="ys-save-block">
+      <p class="cs-focus-question">Keep this one?</p>
+      <p class="text-sm text-muted" style="margin-bottom: var(--space-2);">
+        It will be in Your own, ready to repeat.
+      </p>
+      <label class="sr-only" for="ys-save-name">Name for this session</label>
+      <input type="text" id="ys-save-name" class="ys-save-name"
+             value="${suggested}" maxlength="60"
+             autocomplete="off" enterkeyhint="done">
+      <p class="ys-save-status" id="ys-save-status" role="status" aria-live="polite"></p>
+      <button class="btn btn-secondary btn-full" id="ys-save-btn">Save this session</button>
+    </div>`;
+}
+
 function renderDone() {
   const name    = store.get("name") || "";
   const focus   = FOCUS_TYPES.find(f => f.id === selectedFocus);
@@ -789,6 +989,8 @@ function renderDone() {
           </p>
         </div>
       </div>
+
+      ${_renderSaveBlock()}
 
       <div style="display: flex; flex-direction: column; gap: var(--space-3); margin-top: var(--space-6);">
         <button class="btn btn-primary btn-full" id="ys-reflect-btn">
@@ -1120,9 +1322,57 @@ export function onMount() {
     showExitConfirm();
   });
 
+  // STRETCH-FOCUS. The target row selects in place and does NOT advance
+  // the phase -- it is a choice on the same screen as the style cards,
+  // not a step in front of them. Advancing here would turn one screen
+  // into two and add the friction this was meant to remove.
+  // SAVE-IN-MOMENT. saveSession() returns a reason rather than throwing,
+  // and every reason here is something the person should be told --
+  // "empty" and "name" are both recoverable in the moment.
+  document.getElementById("ys-save-btn")?.addEventListener("click", () => {
+    const input  = document.getElementById("ys-save-name");
+    const status = document.getElementById("ys-save-status");
+    const btn    = document.getElementById("ys-save-btn");
+    const res = saveSession(input?.value || "", {
+      id:           "yoga",
+      sessionType:  "yoga",
+      durationMins: selectedMins,
+      exercises:    sessionQueue
+    });
+
+    if (res.ok) {
+      if (status) status.textContent = "Saved. It's in Your own.";
+      if (btn) { btn.disabled = true; btn.textContent = "Saved"; }
+      if (input) input.disabled = true;
+      return;
+    }
+    if (status) {
+      status.textContent =
+        res.reason === "name"  ? "Give it a name first."
+      : res.reason === "empty" ? "There is nothing to save from this one."
+      : res.reason === "tier"  ? "Saving sessions is part of the Plan."
+      : "That didn't save. Try again.";
+    }
+    if (res.reason === "name") input?.focus();
+  });
+
+  document.querySelectorAll(".cs-target-card").forEach(btn => {
+    btn.addEventListener("click", () => {
+      selectedTarget = btn.dataset.target;
+      rerender();
+      // Focus returns to the pressed control, or a rerender drops the
+      // keyboard user back at the top of the page mid-choice.
+      document.querySelector(`.cs-target-card[data-target="${selectedTarget}"]`)?.focus();
+    });
+  });
+
   document.querySelectorAll(".cs-focus-card").forEach(btn => {
     btn.addEventListener("click", () => {
       selectedFocus = btn.dataset.focus;
+      // A style tap with no target chosen means "all over" -- an
+      // unanswered optional question is an answer, not a blocker. The
+      // person is trying to start a stretch session, not fill a form.
+      if (selectedTarget === null) selectedTarget = "all";
       phase = "duration";
       rerender();
     });
@@ -1152,7 +1402,7 @@ export function onMount() {
   document.querySelectorAll(".cs-duration-card").forEach(btn => {
     btn.addEventListener("click", () => {
       selectedMins = parseInt(btn.dataset.mins);
-      sessionQueue = buildSession(selectedFocus, selectedMins);
+      sessionQueue = buildSession(selectedFocus, selectedMins, selectedTarget);
       currentIndex = 0;
       creditsEarned = 0;
       timeRemaining = 0;
