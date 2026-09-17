@@ -1,5 +1,37 @@
 /**
  * coach-proposal.js
+ * 16 Sep 2026 v27
+ *
+ * v27 - PROPOSAL-LOC. The two alternate cards were never generated.
+ *
+ *   A padding loop -- while (options.length < 3) -- filled the empty
+ *   slots from _getFallbackOption(index), a FIXED ARRAY of Mobility /
+ *   Breathing / Short walk taking nothing but a position. No location,
+ *   no energy, no arc, no check-in, and exercises: [] on all three.
+ *
+ *   TWO-ENGINE (06 Sep) deliberately cut the engine to one built
+ *   session and left the loop in place. Its own comment says three was
+ *   never a decision, just an artefact of three hardcoded focuses. So
+ *   for ten days this screen showed one real proposal and two canned
+ *   ones, and the tell was in plain sight: BOTH alternates captioned
+ *   "A steady option for today.", the same string literal twice.
+ *
+ *   Graeme, having said at the gym, 40 minutes: offered a 15-minute
+ *   breathing session and a 20-minute walk. "The likely good is I'm at
+ *   the gym to work out."
+ *
+ *   Alternates are now built through buildSession() with the same
+ *   location-scoped equipment and duration as the primary, varying only
+ *   sessionType, ordered by where the person actually is. WHERE THE
+ *   ENGINE CANNOT PRODUCE ONE, THE SLOT IS DROPPED -- one real option
+ *   beats one real option and two fictions. A card advertising "3
+ *   MOVEMENTS" over an empty exercise list is a claim the coach cannot
+ *   meet.
+ *
+ *   _getFallbackOption() is KEPT and still serves _getFallbackOptions()
+ *   on the build-failed path, where a canned suggestion is better than a
+ *   blank screen. What it no longer does is pad a successful build.
+ *
  * 11 Sep 2026 v26
  *
  * v26 - PROPOSAL-3. The phase bias may no longer overwrite what the
@@ -1518,10 +1550,29 @@ export function CoachProposalView(router) {
     // Door 1's preview cards (v8), already returned in priority order.
     // v9: effectiveIntensity and availTime are now genuinely applied —
     // see _generateOptions().
+    // PROPOSAL-LOC, 16 Sep 2026. THE PADDING LOOP IS GONE.
+    //
+    // It read: while (options.length < 3) push(_getFallbackOption(n)).
+    // _getFallbackOption takes ONE argument, an index, into a fixed array
+    // of Mobility / Breathing / Short walk. No location, no energy, no
+    // arc, no check-in, and exercises: [] on every one.
+    //
+    // TWO-ENGINE reduced the engine to a single built session on purpose
+    // -- its own comment says three was never a decision, it was an
+    // artefact of three hardcoded focuses -- and left this loop behind.
+    // So for ten days the screen filled two of its three slots from a
+    // hardcoded list. Graeme, after saying "at the gym, 40 minutes":
+    // offered a breathing session and a short walk, both captioned "A
+    // steady option for today."
+    //
+    // Alternates are now BUILT, through the same engine, with the same
+    // location-scoped equipment and the same duration as the primary.
+    // Where the engine cannot produce one, THE SLOT IS DROPPED. One real
+    // option beats one real option and two fictions -- a card promising
+    // "3 MOVEMENTS" for a session carrying an empty exercise list is a
+    // claim the coach cannot meet, and FAULTLESS is the standing rule.
     let options = _generateOptions(energyScore, effectiveIntensity, availTime);
-    while (options.length < 3) {
-      options.push(_getFallbackOption(options.length));
-    }
+    options = _withBuiltAlternates(options);
 
     // Build greeting
     const greeting = _buildGreeting(name, feelingWord);
@@ -1869,6 +1920,84 @@ export function CoachProposalView(router) {
       rationale:     'A steady option for today.',
       exercises:     []
     }));
+  }
+
+  /**
+   * PROPOSAL-LOC, 16 Sep 2026. Two more real sessions, or fewer cards.
+   *
+   * Same arguments as _buildCoachSuggestion(): the location-scoped
+   * equipment list and the person's available time. The only thing that
+   * varies is sessionType, so an alternate is a genuine answer to "what
+   * else could I do here today" rather than a different screen's idea of
+   * a fallback.
+   *
+   * ORDER IS DELIBERATE and follows what the person said, not a fixed
+   * list. At the gym the alternates lean to what a gym is for; at home
+   * they lean to what a room allows. The primary's own type is skipped,
+   * and so is anything the builder cannot fill today.
+   *
+   * NO PADDING. If only one builds, one card shows. The screen already
+   * speaks arrays of any length -- TWO-ENGINE made it do so -- and a
+   * short honest list is the point rather than a degradation of it.
+   */
+  function _withBuiltAlternates(options) {
+    const primary = options[0];
+    if (!primary) return options;
+
+    const atGym = _currentLocation() === 'gym';
+
+    // Gym: load-bearing work first, then what a gym also supports.
+    // Home: what a room allows, in the same spirit.
+    const ORDER = atGym
+      ? ['full', 'upper', 'lower', 'core', 'glute', 'mobility', 'stretch', 'cardio']
+      : ['core', 'mobility', 'stretch', 'full', 'cardio', 'glute'];
+
+    const taken = new Set([primary.sessionType, primary.inputs?.chosenType].filter(Boolean));
+    const args  = {
+      durationMins:      _getAvailableTimeMinutes(),
+      equipmentOverride: equipmentForLocation(_currentLocation()).list,
+      preset:            store.get('sessionPreset') || null
+    };
+
+    const out = [primary];
+    for (const sessionType of ORDER) {
+      if (out.length >= 3) break;
+      if (taken.has(sessionType)) continue;
+
+      let built = null;
+      try {
+        built = buildSession({ ...args, sessionType });
+      } catch (e) {
+        console.warn('coach-proposal: alternate build failed for ' + sessionType, e);
+        continue;
+      }
+
+      // An empty or near-empty build is a slot to drop, not a card to
+      // show. buildSession() may also hand back Gentle Care or an
+      // out-of-scope session instead of the type asked for; offering that
+      // twice alongside the primary would be the coach repeating itself
+      // in three different fonts.
+      if (!built || !Array.isArray(built.exercises) || built.exercises.length === 0) continue;
+      const delivered = built.id || sessionType;
+      if (taken.has(delivered)) continue;
+      taken.add(delivered);
+      taken.add(sessionType);
+
+      out.push({
+        id:            built.id || `coach-alt-${sessionType}`,
+        name:          built.title,
+        subtitle:      built.subtitle || null,
+        duration:      built.duration,
+        exerciseCount: built.exercises.length,
+        exercises:     built.exercises,
+        rationale:     built.coachLine || built.rationale || '',
+        sessionType:   delivered,
+        inputs:        { ...(primary.inputs || {}), chosenType: sessionType, reason: 'alternate' },
+        _pools:        buildCandidatePools({ ...args, sessionType })
+      });
+    }
+
+    return out;
   }
 
   function _getFallbackOption(index) {

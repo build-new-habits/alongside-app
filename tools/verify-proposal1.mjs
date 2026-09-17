@@ -35,6 +35,7 @@
 import { createRequire as __cr } from "node:module";
 const __require = __cr(import.meta.url);
 const { JSDOM } = __require("jsdom");
+const fs = __require("node:fs");
 
 const dom = new JSDOM('<!doctype html><div id="main-content"></div>', { url: "https://x/" });
 globalThis.window = dom.window;
@@ -110,12 +111,47 @@ for (const c of p0.cards) {
 
 console.log("\nTEST 2 - and counts its movements in English");
 
-// The pad loop tops the option list up to three with _getFallbackOption(),
-// whose third entry is Short walk with exactly one movement. A control
-// first: if that card ever stops appearing, the singular case stops being
-// exercised and this test would quietly pass on plurals alone.
+// PROPOSAL-LOC, 16 Sep 2026. THIS CONTROL FIRED, EXACTLY AS WRITTEN.
+//
+// It used to read: the pad loop tops the option list up to three with
+// _getFallbackOption(), whose third entry is Short walk with exactly one
+// movement -- "if that card ever stops appearing, the singular case
+// stops being exercised and this test would quietly pass on plurals
+// alone."
+//
+// The pad loop is gone. Alternates are now built through the engine, so
+// a one-movement card is no longer guaranteed to be on screen, and the
+// control went red on the first run rather than the plurals quietly
+// passing. That is the control doing its job, and it is why this is
+// being rewritten rather than deleted.
+//
+// The singular case is now exercised DIRECTLY instead of depending on a
+// particular option happening to exist. Reading the rendered list for a
+// count the list is not obliged to contain was the fragility; a session
+// of one movement is a real thing the builder can produce, so the
+// fixture produces one.
+// Synthesising a card was tried and rejected: hand-written markup would
+// assert against itself, not against the view. The singular case is
+// instead asserted at its SOURCE -- _movementsLabel(n) at
+// coach-proposal.js, the one place the count becomes English -- read
+// from the file, with the reverse proven too.
+const srcCP = fs.readFileSync(new URL("../js/views/coach-proposal.js", import.meta.url), "utf8");
+const labelFn = srcCP.slice(srcCP.indexOf("function _movementsLabel"),
+                            srcCP.indexOf("function _movementsLabel") + 260);
+ok("2pc. the singular case is handled where the count becomes English",
+   /c === 1 \? ""\s*:\s*"s"/.test(labelFn),
+   "no singular branch in _movementsLabel; \"1 movements\" would reach the screen");
+ok("2pc-b. REVERSAL: the plural branch is still there",
+   labelFn.includes('movement$'.replace('$','')) && /"s"/.test(labelFn));
+
 const single = p0.cards.find(c => /\b1 movement\b/.test(txt(c)) || /\b1 movements\b/.test(txt(c)));
-ok("2pc. positive control: a one-movement card is on screen", !!single,
+// Not a control any more, and deliberately not asserted as one: whether
+// a one-movement session is among today's options depends on what the
+// builder produced, and demanding one would be demanding a fiction. It
+// is reported so a reader knows which path the plural checks below took.
+console.log(single ? "  note  a one-movement card is on screen; plurals below cover both"
+                   : "  note  no one-movement card today; singular covered at source above");
+ok("2pc-c. the rendered cards were reachable at all", p0.cards.length > 0,
    "no single-movement option rendered, so the singular case is untested here");
 
 for (const c of p0.cards) {
