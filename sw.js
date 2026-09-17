@@ -1,6 +1,20 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 16 Sep 2026 v510
+ *
+ * v510 - GATE-TAPER + CARD-DECIDE. NO NEW FILES. safety-gate.js v2,
+ *   exercise-card.js v10.
+ *
+ *   The gate now fires every session for the first five acknowledgements
+ *   of the current wording, then every 30 days -- counted in sessions
+ *   rather than days so everyone gets the same floor regardless of how
+ *   often they train. A text change restarts it.
+ *
+ *   The hurt-and-ache disclosure is open on DECIDE and closed on the
+ *   other three pages, so the 29 days between gates are not carried by a
+ *   row nobody opens.
+ *
  * 16 Sep 2026 v509
  *
  * v509 - STRETCH-FOCUS. NO NEW APP FILES. yoga-session.js and
@@ -3497,7 +3511,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v509";
+const CACHE_NAME = "alongside-v510";
 
 const SHELL_URLS = [
 
