@@ -36,6 +36,7 @@
  */
 
 import { store } from "../store.js";
+import { isGateDue, renderSafetyGate, attachSafetyGate } from "../safety-gate.js";
 import { renderLogBlock, attachLogEvents } from "../session-log.js";
 import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
 
@@ -127,6 +128,13 @@ export function render() {
   if (phase === "ride-type") return renderRideTypeSelector();
   if (phase === "type")      return renderSessionTypeSelector();
   if (phase === "duration")  return renderDurationSelector();
+  // SAFETY-GATE, GATE-ALL 16 Sep 2026. On the OVERVIEW phase, not the
+  // active one. These are continuous activities with no indexed first
+  // exercise, so "before exercise 1" has no meaning here -- the honest
+  // equivalent is the last screen before the movement starts.
+  if (phase === "overview" && isGateDue()) {
+    return `<div class="view">${renderSafetyGate()}</div>`;
+  }
   if (phase === "overview")  return renderCycleOverview();
   if (phase === "cycling")   return renderCycling();
   if (phase === "done")      return renderDone();
@@ -490,6 +498,17 @@ function rerender() {
 }
 
 export function onMount() {
+  // SAFETY-GATE. Bound before the session controls; with the gate up
+  // there is no overview, timer or log block for them to find.
+  if (phase === "overview" && isGateDue()) {
+    attachSafetyGate(document.getElementById("app") || document, {
+      surface: "cycle-session",
+      onAcknowledge: () => router.navigate("cycle-session"),
+      onLeave:       () => router.navigate("today"),
+    });
+    return;
+  }
+
   // LOG-4. Only present on the done screen; attachLogEvents() no-ops when
   // the block is absent and guards double-binding when it is not.
   attachLogEvents(LOG_SUBJECT, "cycle-log");

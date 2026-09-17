@@ -82,6 +82,7 @@
  */
 
 import { store } from '../store.js';
+import { isGateDue, renderSafetyGate, attachSafetyGate } from '../safety-gate.js';
 import { router } from '../router.js';
 import { CLASSES } from '../data/classes/index.js';
 import { sectionsFor, voiceFor, durationLabel,
@@ -188,6 +189,19 @@ export function render() {
       </div>`;
   }
 
+  // SAFETY-GATE, GATE-ALL 16 Sep 2026. A guided class is movement, so it
+  // gets the gate. CARD-5 logged this as an open scoping question and
+  // that was the wrong call -- "does this need a scoping decision" is
+  // itself the answer when the screen has somebody moving on it.
+  //
+  // At the first section and beat only: a class resumed mid-way has
+  // already passed it, and a gate that fires on resume would land in the
+  // middle of a practice, which is the one place it must not.
+  const _st0 = _state();
+  if (_st0.sectionIndex === 0 && _st0.beatIndex === 0 && isGateDue()) {
+    return `<div class="view class-player">${renderSafetyGate()}</div>`;
+  }
+
   const st  = _state();
   const sec = _sections[st.sectionIndex];
 
@@ -275,6 +289,18 @@ export function onMount() {
 
   const root = document.getElementById('main-content');
   if (!root) return;
+
+  // SAFETY-GATE, GATE-ALL. Early return -- the class controls are not on
+  // screen behind the gate.
+  const _s = _state();
+  if (_s.sectionIndex === 0 && _s.beatIndex === 0 && isGateDue()) {
+    attachSafetyGate(root, {
+      surface: 'class-player',
+      onAcknowledge: () => router.navigate('class-player'),
+      onLeave:       () => leave(),
+    });
+    return;
+  }
 
   root.querySelector('#cp-exit')?.addEventListener('click', leave);
   root.querySelector('#cp-home')?.addEventListener('click', leave);

@@ -103,6 +103,7 @@
  */
 
 import { store }  from "../store.js";
+import { isGateDue, renderSafetyGate, attachSafetyGate } from "../safety-gate.js";
 // SHARED-1. See breathing-session.js. Both completion screens in this
 // view get the moments; missing one would mean a first journal entry is
 // marked and a first breathing practice is not.
@@ -384,6 +385,12 @@ function renderMode() {
   if (!mode || mode === "selector") return renderModeSelector();
   if (mode === "breathing")  return renderBreathingMode();
   if (mode === "journal")    return renderJournalMode();
+  // SAFETY-GATE, GATE-ALL 16 Sep 2026. Mindful mode only, and that is a
+  // decision rather than an oversight. The other modes in this route are
+  // journalling and short breathing prompts -- reading and typing, with
+  // no body in them. Mindful mode is a timed practice somebody holds a
+  // position through, which is where hurt-and-ache applies.
+  if (mode === "mindful" && isGateDue()) return renderSafetyGate();
   if (mode === "mindful")    return renderMindfulMode();
   if (mode === "rest")       return renderRestMode();
   return renderBreathingMode();
@@ -1046,6 +1053,16 @@ export function onMount() {
   // narrowly to mode === "mindful" mid-timer - the short breathing/
   // journal exercises elsewhere in this same route are unaffected and
   // remain completion-only by design (unchanged).
+  // SAFETY-GATE, GATE-ALL. Early return before the guard and the timer.
+  if (mode === "mindful" && isGateDue()) {
+    attachSafetyGate(document.getElementById("app") || document, {
+      surface: "quiet-session",
+      onAcknowledge: () => router.navigate("quiet-session"),
+      onLeave:       () => router.navigate("today"),
+    });
+    return;
+  }
+
   mountSessionGuard({
     isActive: () => mode === "mindful" && mindfulStarted && !mindfulComplete,
     label:    "mindful session",

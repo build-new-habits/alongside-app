@@ -151,6 +151,7 @@
  */
 
 import { store } from "../store.js";
+import { isGateDue, renderSafetyGate, attachSafetyGate } from "../safety-gate.js";
 import { EXERCISES } from "../data/exercises/index.js";
 import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
 import { renderLogBlock, attachLogEvents, scrollToTop } from "../session-log.js";
@@ -463,6 +464,17 @@ export function render() {
   if (phase === "focus")    return renderFocusSelector();
   if (phase === "duration") return renderDurationSelector();
   if (phase === "overview") return renderSessionOverview();
+  // SAFETY-GATE, GATE-ALL 16 Sep 2026. Before the first item, and there
+  // only. CARD-5 mounted this in the five views that use the shared
+  // exercise card, and verify-card5 TEST 6 then pinned that list at five
+  // with a comment claiming it was every movement view. It was not: it
+  // was every view the grep found. Graeme went to stretch and got no
+  // gate at all.
+  //
+  // The gate belongs to MOVEMENT, not to the card component.
+  if (phase === "session" && currentIndex === 0 && isGateDue()) {
+    return `<div class="view core-session-view">${renderSafetyGate()}</div>`;
+  }
   if (phase === "session")  return renderPose();
   if (phase === "rest")     return renderRest();
   if (phase === "done")     return renderDone();
@@ -1069,6 +1081,17 @@ export function onMount() {
     label:    "yoga session",
     onExit:   () => { savePartialSession(); resetSession(); router.navigate("reflect"); }
   });
+  // SAFETY-GATE. Early return -- with the gate up there is no pose, log
+  // block or timer on screen for anything below to bind to.
+  if (phase === "session" && currentIndex === 0 && isGateDue()) {
+    attachSafetyGate(document.getElementById("app") || document, {
+      surface: "yoga-session",
+      onAcknowledge: () => router.navigate("yoga-session"),
+      onLeave:       () => router.navigate("today"),
+    });
+    return;
+  }
+
   // LOG-2. Re-wired per render; attachLogEvents() guards double-binding.
   if (phase === "session" && sessionQueue[currentIndex]) {
     attachLogEvents(sessionQueue[currentIndex], `ys-log-${currentIndex}`);
