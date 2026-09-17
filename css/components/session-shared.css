@@ -1,6 +1,12 @@
 /* ============================================================
    session-shared.css
    css/components/session-shared.css
+   16 Sep 2026 v11
+
+   v11 - STRETCH-FOCUS. .cs-target-grid, .cs-target-card and
+   .cs-focus-question: the "what's this for today?" row above the
+   practice-style cards. Notes at the foot of this file.
+
    15 Sep 2026 v10
 
    v10 - SAFETY-GATE. .safety-gate and its parts: the before-you-start
@@ -990,4 +996,107 @@
 @media (prefers-contrast: more) {
   .gate-block--hazard { border-left-width: 6px; }
   .gate-ack { border-width: 2px; }
+}
+
+/* ============================================================
+   STRETCH-FOCUS — the target row
+   16 Sep 2026
+
+   "What am I doing stretching for? Is there an area of the body
+   I'm doing stretching for?" The style cards below this row ask
+   what KIND of practice; this asks WHERE, which is the question
+   people actually arrive with.
+
+   A horizontal row, not another stacked column. It sits above
+   four full-width style cards and must read as a different
+   question rather than as four more of the same — and four
+   short labels fit a phone across.
+   ============================================================ */
+
+.cs-focus-question {
+  margin: 0 0 var(--space-2);
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--color-text);
+}
+
+.cs-target-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+  margin: 0 0 var(--space-5);
+}
+
+.cs-target-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  /* 2.5.8 Target Size (Minimum). */
+  min-height: 64px;
+  padding: var(--space-3) var(--space-2);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md, 8px);
+  font-family: inherit;
+  font-size: var(--text-sm);
+  color: var(--color-text);
+  text-align: center;
+  cursor: pointer;
+}
+
+/* 1.4.1 Use of Colour. Selected is carried by border WEIGHT and
+   text weight as well as colour, and aria-pressed carries it to
+   anyone not looking at the screen at all. */
+.cs-target-card.is-selected {
+  border-width: 2px;
+  border-color: var(--color-primary);
+  font-weight: var(--font-semibold);
+  color: var(--color-primary);
+}
+
+.cs-target-card:focus-visible {
+  outline: 3px solid var(--color-focus, var(--color-primary));
+  outline-offset: 2px;
+}
+
+@media (prefers-contrast: more) {
+  .cs-target-card.is-selected { border-width: 3px; }
+}
+
+/* SAVE-IN-MOMENT, 16 Sep 2026. Offered at the END of a session, never
+   before it: the ones worth keeping are the ones that turned out well. */
+.ys-save-block {
+  margin-top: var(--space-6);
+  padding: var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md, 8px);
+}
+
+.ys-save-name {
+  width: 100%;
+  min-height: 48px;
+  padding: var(--space-3);
+  margin-bottom: var(--space-2);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm, 4px);
+  font-family: inherit;
+  font-size: var(--text-base);
+  color: var(--color-text);
+}
+
+.ys-save-name:focus-visible {
+  outline: 3px solid var(--color-focus, var(--color-primary));
+  outline-offset: 2px;
+}
+
+/* Always in the DOM so the live region announces a CHANGE rather than
+   an insertion, and the space is reserved so nothing shifts on save. */
+.ys-save-status {
+  min-height: 1.5rem;
+  margin: 0 0 var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
 }
