@@ -1,5 +1,11 @@
 /**
  * js/exercise-card.js
+ * 16 Sep 2026 v10
+ *
+ * v10 - CARD-DECIDE. The hurt-and-ache disclosure is OPEN on DECIDE and
+ *   closed on WATCH, DO and NOTE. Reasoning at hurtBlock(). Ten renders
+ *   where it is relevant beats forty where it is not, and beats zero.
+ *
  * 15 Sep 2026 v9
  *
  * v9 - CARD-5. HURT_AND_ACHE stops being open on four pages, and the
@@ -233,6 +239,23 @@ const HURT_AND_ACHE_HTML =
  * the role, the expanded state and keyboard operation, and 4.1.2 is free
  * rather than reimplemented. The hazard modifier stays on the summary
  * row so it reads as a warning rather than as one more accordion.
+ *
+ * OPEN ON DECIDE, closed on WATCH, DO and NOTE. CARD-DECIDE, 16 Sep.
+ *
+ * With the taper, week one is carried by the gate. The question is the
+ * 29 days after it, when the only safety text on screen is a closed row
+ * nobody opens. Present-but-unread is the state CARD-5 was meant to end,
+ * not a second version of it -- we would have swapped "ignored because
+ * repeated" for "ignored because hidden".
+ *
+ * Decide is the page where somebody is deciding whether to do this
+ * movement at all, so it is the one page where the text is doing work
+ * rather than decorating. It is also first, so it is passed once per
+ * exercise before any instruction -- the same ordering argument that
+ * made CARD-4 split the pages in the first place.
+ *
+ * The cost is honest: ten exercises still means ten renders. Ten in the
+ * place it is relevant beats forty in places it is not, and beats zero.
  *
  * `open` when flattened -- see the header.
  */
@@ -534,7 +557,7 @@ export function renderExerciseCard(exercise, opts = {}) {
   // so that page carries both hazard blocks in the old safety order.
   const pinned = `
     ${caution ? `<p class="exercise-caution" role="note">${caution}</p>` : ""}
-    ${hurtBlock(full)}
+    ${hurtBlock(full || page === "decide")}
     ${adaptPointer}`;
 
   // "Show everything" flattens the pages rather than landing on one.

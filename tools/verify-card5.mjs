@@ -45,7 +45,7 @@ const {
 } = await import("../js/exercise-card.js");
 const {
   isGateDue, renderSafetyGate, attachSafetyGate,
-  recordAcknowledgement, GATE_DAYS, GUIDANCE_TEXT
+  recordAcknowledgement, GATE_DAYS, GUIDANCE_TEXT, TAPER_SESSIONS
 } = await import("../js/safety-gate.js");
 const { EXERCISES } = await import("../js/data/exercises/index.js");
 
@@ -68,6 +68,14 @@ const ackEntry = (over = {}) => ({
 });
 const setLog = l => store.set("safetyAckLog", l);
 
+// GATE-TAPER, 16 Sep 2026. The gate fires every session for the first
+// TAPER_SESSIONS acknowledgements of the CURRENT wording, then monthly.
+// So "a satisfied gate" is no longer one entry -- it is the floor. Tests
+// about the OTHER triggers have to clear the taper first or they measure
+// the taper instead of the trigger they name.
+const atFloor = (over = {}) => Array.from({ length: TAPER_SESSIONS },
+  (_, i) => ackEntry(i === TAPER_SESSIONS - 1 ? over : {}));
+
 store.init();
 
 console.log("\nCARD-5 / SAFETY-GATE\n");
@@ -83,24 +91,45 @@ console.log("TEST 0 — FIXTURE REACH: each trigger is reached separately");
   const empty = isGateDue();
 
   setLog([ackEntry()]);
+  const belowFloor = isGateDue();
+
+  setLog(atFloor());
   const current = isGateDue();
 
-  setLog([ackEntry({ textVersion: "0000-00-00.0" })]);
+  setLog(atFloor({ textVersion: "0000-00-00.0" }));
   const stale = isGateDue();
 
-  setLog([ackEntry({ at: daysAgo(GATE_DAYS + 1) })]);
+  setLog(atFloor({ at: daysAgo(GATE_DAYS + 1) }));
   const old = isGateDue();
 
-  setLog([ackEntry({ at: daysAgo(GATE_DAYS - 1) })]);
+  setLog(atFloor({ at: daysAgo(GATE_DAYS - 1) }));
   const withinWindow = isGateDue();
 
   ok("0.1 empty log fires", empty === true);
-  ok("0.2 REVERSAL: a current acknowledgement does NOT fire", current === false);
+  ok("0.2 one acknowledgement is NOT enough -- the taper floor fires",
+     belowFloor === true);
+  ok("0.2b REVERSAL: at the floor, a current acknowledgement does NOT fire",
+     current === false);
   ok("0.3 version mismatch fires, on its own", stale === true);
   ok("0.4 age beyond GATE_DAYS fires, on its own", old === true);
   ok("0.5 REVERSAL: one day inside the window does not fire", withinWindow === false);
-  ok("0.6 the four branches are distinguishable, not one always-true path",
-     empty && !current && stale && old && !withinWindow);
+  ok("0.6 the branches are distinguishable, not one always-true path",
+     empty && belowFloor && !current && stale && old && !withinWindow);
+
+  // The taper is counted in SESSIONS, not days, and it counts only the
+  // CURRENT wording -- so a text change restarts it with no second field
+  // to fall out of step.
+  ok("0.7 four current acknowledgements still fire; five do not",
+     (() => { setLog(Array.from({ length: 4 }, () => ackEntry())); const four = isGateDue();
+              setLog(Array.from({ length: 5 }, () => ackEntry())); const five = isGateDue();
+              return four === true && five === false; })());
+
+  ok("0.8 a text change restarts the taper: fifty OLD-version entries do not count",
+     (() => { setLog(Array.from({ length: 50 }, () => ackEntry({ textVersion: "0000-00-00.0" })));
+              return isGateDue() === true; })());
+
+  ok("0.9 REVERSAL: the taper is bounded -- it does not fire forever",
+     (() => { setLog(Array.from({ length: 20 }, () => ackEntry())); return isGateDue() === false; })());
 }
 
 // ════════════════════════════════════════════════════════════════════
@@ -110,10 +139,22 @@ setLog([ackEntry()]);
 {
   const H = allPages();
 
-  ok("1.1 hurt-and-ache is on ALL FOUR pages, closed",
-     PAGES.every(p => H[p].includes("xcard-hurt") &&
-                      H[p].includes("If it hurts") &&
-                      !/<details[^>]*xcard-hurt[^>]*\sopen/.test(H[p])));
+  // CARD-DECIDE, 16 Sep 2026. Open on DECIDE, closed on the other three.
+  // With the taper carrying week one, the 29 days after it would leave a
+  // closed row as the only safety text on screen -- present but unread,
+  // which is the state CARD-5 existed to end rather than a second
+  // version of it. Decide is where somebody is deciding whether to do
+  // the movement at all, and it is first, so it is passed once per
+  // exercise before any instruction.
+  ok("1.1a hurt-and-ache is on ALL FOUR pages",
+     PAGES.every(p => H[p].includes("xcard-hurt") && H[p].includes("If it hurts")));
+
+  ok("1.1b OPEN on decide",
+     /<details[^>]*xcard-hurt[^>]*\sopen/.test(H.decide));
+
+  ok("1.1c REVERSAL: closed on watch, do and note -- ten renders, not forty",
+     ["watch", "do", "note"].every(p =>
+       !/<details[^>]*xcard-hurt[^>]*\sopen/.test(H[p])));
 
   ok("1.2 REVERSAL: it is genuinely present, not just the summary word",
      PAGES.every(p => HURT_AND_ACHE.every(s => H[p].includes(s))));
@@ -221,7 +262,10 @@ console.log("\nTEST 5 — the record");
 
   ok("5.2 `at` is a real ISO timestamp", !isNaN(new Date(e.at).getTime()));
 
-  ok("5.3 writing it satisfies the gate", isGateDue() === false);
+  ok("5.3 one write does NOT satisfy the gate during the taper",
+     isGateDue() === true);
+  ok("5.3b writing up to the floor does satisfy it",
+     (() => { setLog(atFloor()); return isGateDue() === false; })());
 
   ok("5.4 REVERSAL: an entry carrying a stale version does NOT satisfy it",
      (() => { setLog([ackEntry({ textVersion: "0000-00-00.0" })]);

@@ -168,11 +168,15 @@ console.log("\nTEST 5 — the builder's half of `duration` is untouched");
   // the gate's own behaviour, including that un-seeded IS blocked.
   {
     const { HURT_AND_ACHE_VERSION } = await import("../js/exercise-card.js");
-    store.set("safetyAckLog", [{
-      at: new Date().toISOString(),
-      textVersion: HURT_AND_ACHE_VERSION,
-      surface: "fixture"
-    }]);
+    store.set("safetyAckLog",
+      // GATE-TAPER, 16 Sep 2026. ONE acknowledgement no longer clears the
+      // gate: it fires every session for the first TAPER_SESSIONS (5),
+      // then monthly. A fixture needs the floor, not a single entry.
+      Array.from({ length: 5 }, () => ({
+        at: new Date().toISOString(),
+        textVersion: HURT_AND_ACHE_VERSION,
+        surface: "fixture"
+      })));
   }
   const EQ = ["dumbbells", "resistance-band", "bench"];
   store.set("equipment", EQ); store.set("homeEquipment", EQ);
@@ -253,11 +257,15 @@ console.log("\nTEST 6 — the player, driven: sets one at a time, no false label
   // the gate's own behaviour, including that un-seeded IS blocked.
   {
     const { HURT_AND_ACHE_VERSION } = await import("../js/exercise-card.js");
-    store.set("safetyAckLog", [{
-      at: new Date().toISOString(),
-      textVersion: HURT_AND_ACHE_VERSION,
-      surface: "fixture"
-    }]);
+    store.set("safetyAckLog",
+      // GATE-TAPER, 16 Sep 2026. ONE acknowledgement no longer clears the
+      // gate: it fires every session for the first TAPER_SESSIONS (5),
+      // then monthly. A fixture needs the floor, not a single entry.
+      Array.from({ length: 5 }, () => ({
+        at: new Date().toISOString(),
+        textVersion: HURT_AND_ACHE_VERSION,
+        surface: "fixture"
+      })));
   }
   store.set("tier", "personal");
   store.set("homeEquipment", ["dumbbells", "resistance-band"]);
