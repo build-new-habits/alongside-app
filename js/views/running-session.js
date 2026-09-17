@@ -73,6 +73,7 @@
  */
 
 import { store } from "../store.js";
+import { isGateDue, renderSafetyGate, attachSafetyGate } from "../safety-gate.js";
 import { renderLogBlock, attachLogEvents } from "../session-log.js";
 import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
 import { checkpointSession, getResumableSession, clearCheckpoint, computeElapsedSeconds } from "../session-resume.js";
@@ -255,7 +256,14 @@ export function render() {
   if (phase === "type")     return renderTypeSelector();
   if (phase === "resume")   return renderResumePrompt();
   if (phase === "duration") return renderDurationSelector();
-  if (phase === "overview") return renderRunOverview();
+  // SAFETY-GATE, GATE-ALL 16 Sep 2026. On the OVERVIEW phase, not the
+  // active one. These are continuous activities with no indexed first
+  // exercise, so "before exercise 1" has no meaning here -- the honest
+  // equivalent is the last screen before the movement starts.
+  if (phase === "overview" && isGateDue()) {
+    return `<div class="view">${renderSafetyGate()}</div>`;
+  }
+  if (phase === "overview")  return renderRunOverview();
   if (phase === "running")  return renderRunning();
   if (phase === "done")     return renderDone();
   return renderTypeSelector();
@@ -938,6 +946,17 @@ function rerender() {
 // ── Mount ─────────────────────────────────────────────────────────────────────
 
 export function onMount() {
+  // SAFETY-GATE. Bound before the session controls; with the gate up
+  // there is no overview, timer or log block for them to find.
+  if (phase === "overview" && isGateDue()) {
+    attachSafetyGate(document.getElementById("app") || document, {
+      surface: "running-session",
+      onAcknowledge: () => router.navigate("running-session"),
+      onLeave:       () => router.navigate("today"),
+    });
+    return;
+  }
+
   // LOG-4. Only present on the done screen; attachLogEvents() no-ops when
   // the block is absent and guards double-binding when it is not.
   attachLogEvents(LOG_SUBJECT, "run-log");

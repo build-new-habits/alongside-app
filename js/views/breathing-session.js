@@ -45,6 +45,7 @@
  */
 
 import { store }  from "../store.js";
+import { isGateDue, renderSafetyGate, attachSafetyGate } from "../safety-gate.js";
 // SHARED-1. This view does not route to reflect.js, so it renders the
 // moments itself. No exerciseIds: a breathing session has nothing to ask
 // how it felt, so the baseline correctly does not appear, and mindful
@@ -308,6 +309,15 @@ function resetSession() {
 export function render() {
   if (phase === "picker")   return renderPicker();
   if (phase === "duration") return renderDuration();
+  // SAFETY-GATE, GATE-ALL 16 Sep 2026. Breathing is IN, and it is the
+  // one that reads oddly. It is in because the text says stop if
+  // something hurts and get seen if it persists, and somebody lying on
+  // their back breathing is not a place where that stops being true. A
+  // list that trims the quiet ones invites the next person to trim
+  // further.
+  if (phase === "session" && isGateDue()) {
+    return `<div class="view">${renderSafetyGate()}</div>`;
+  }
   if (phase === "session")  return renderSession();
   if (phase === "done")     return renderDone();
   return renderPicker();
@@ -484,6 +494,17 @@ function rerender() {
 // ── Mount ─────────────────────────────────────────────────────────────────────
 
 export function onMount() {
+  // SAFETY-GATE, GATE-ALL. Early return -- with the gate up there is no
+  // breathing UI for anything below to bind to.
+  if (phase === "session" && isGateDue()) {
+    attachSafetyGate(document.getElementById("app") || document, {
+      surface: "breathing-session",
+      onAcknowledge: () => rerender(),
+      onLeave:       () => router.navigate("today"),
+    });
+    return;
+  }
+
   // 23 Jul 2026 v2 (BUILD-3 Section 4): this file never imported
   // session-guard.js, so the device back gesture during an active session
   // bypassed the on-screen Exit button's existing partial-save logic

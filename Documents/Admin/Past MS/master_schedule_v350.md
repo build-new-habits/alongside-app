@@ -1,46 +1,12 @@
 # Alongside: Move — Master Schedule
-## 16 Sep 2026 v351
+## 15 Sep 2026 v350
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v350.md`. Remove v350 on upload.
+Supersedes `master_schedule_v349.md`. Remove v349 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
-> **Live: `alongside-v507`, 152 gates, `store.js` v68, `Schema.md` v1.61, cold start blueprint v112.** Read that blueprint after this block.
->
-> ### 🔴 GATE-ALL — SHIPPED 16 Sep, `v507`. CARD-5 covered five views. There were thirteen.
->
-> Graeme, the morning after CARD-5 shipped: *"I went to do stretching and didn't get the warning page."* He was right, and the cause was mine. CARD-5 wired the five views that use the shared exercise card, and `verify-card5` TEST 6 then **pinned that list at five with a comment claiming it was every movement view.** It was not. It was every view the grep found.
->
-> 🔴 **The gate made the oversight look deliberate.** A future session reading "pinned at exactly five" would have asserted five and never asked why swimming was absent. **A pin records a decision, so pinning an oversight launders it into one.** That is the standing risk in any file that pins a list, and it is now written into `verify-card5` where the next person will meet it.
->
-> **Eight views added:** `yoga-session` (the one Graeme hit), `breathing-session`, `quiet-session` (mindful mode), `walk-session`, `running-session`, `cycle-session`, `swim-session`, `class-player`.
->
-> **Membership is now decided by one question: does somebody move on this screen?** Not: does it render an exercise card. Three shapes, each asserted against the shape it actually has rather than the list being loosened until it passes — indexed views gate on exercise 0; the continuous ones (walk, run, cycle, swim) have no indexed first exercise and gate on the **overview phase**, the last screen before movement starts; `class-player` gates on first section *and* first beat, so a resumed class is never interrupted mid-practice.
->
-> ⚫ **Deliberately absent, each with a stated reason in the gate:** `prescribed.js` (list item, nobody moves from it), `stretch-arc.js` (the arc surface, no exercise rendering — **came off the list on reading, third name-based list to be wrong this week**), `class-list` and `saved-sessions` (pickers), and `quiet-session`'s non-mindful modes (journalling and short breathing prompts are reading and typing, with no body in them).
->
-> ⚫ **Breathing is IN, and that was a close call.** It reads oddly. It is in because the text says stop if something hurts and get seen if it persists, and somebody lying on their back breathing is not a place where that stops being true. A list that trims the quiet ones invites the next person to trim further.
->
-> 🟢 **New TEST 6.6 is the check that would have caught the original error.** Not "are the listed views wired" but **"is anything NOT listed rendering movement"** — it walks `js/views/`, excludes a named out-list, and fails on anything else that touches `renderExerciseCard` or `sessionQueue`. A new session view can no longer be added without either being wired or being explicitly excused.
->
-> 🟡 **Honest limit: the eight new views are asserted by source slice, not by execution.** TEST 6 proves they import, render, attach, and gate on the right condition. It does not drive them. No item is reported open until driven by execution, and the same applies to reporting one closed — **a device pass on stretch, a class and a walk is still owed.**
->
-> 🟡 `verify-timetable` failed its own fixture at four seed sites once the class player gated — the feature proving itself from outside again. Seeded with a current-version acknowledgement, not a bypass.
->
-> ### Queued, in order
->
-> | ID | Task | Status |
-> |---|---|---|
-> | PROPOSAL-LOC | `_fallbackOptions()` in `coach-proposal.js` never reads `sessionLocation` — breathing and a walk offered after "at the gym, 40 minutes". Alternates should be generated like the primary. | 🔴 Next |
-> | STRETCH-FOCUS | Stretch sessions have no target. `yoga-session.js` already HAS a `focus` phase, but it asks practice *style*, not what part of you needs this today, and nothing connects it to check-in, sore areas or the arc. **Extends that selector; does not add a second question.** New block — touch-once collision with GATE-ALL on `yoga-session.js`. | 🟡 |
-> | GATE-TAPER | Gate every session for the first **five acknowledged sessions**, then 30 days. Counted in sessions, not days: a week is calendar time, exposure is what matters, and someone training twice that week would otherwise get a thinner floor than someone training daily. A text change restarts the taper. | 🟡 |
-> | CARD-DECIDE | Disclosure **open on Decide, closed on Watch out / Do / Note.** Ten renders where it is relevant beats forty where it is not, and beats zero. Graeme agreed 15 Sep. | 🟡 |
-> | CAPTURE-1 | Build-as-you-go. Text field focused on open, recents, then equipment groups. **Two targets per result:** tap the name → Decide (walk the pages); tap "just log it" → Note. Same card, different entry page, chosen per exercise. Lives inside **Your own**, not a fifth door. | 🟡 |
-> | PROGRESS-ARC | **Contribution is computed from the exercise, never from how the session was created.** Graeme: *"absolutely everything should go towards progress 100%."* Splits into "you turned up" (every entry, equal weight) and arc **coverage, not score** — "Trunk strength: touched three times." Needs `exerciseHistory` entries associated to strands; ground-truth whether exercises are already area-tagged before assuming a migration. | 🟡 Largest |
-> | DIC-TIER | The variety question in `checkin.js` has **no tier check at all** — ungated, not a considered position. Decided Plan-only: it is entirely about continuity across sessions, and "Free is today, the Plan is the arc". | 🟡 |
-> | CARD-LOCAL | `morning-session.js` local `renderExerciseCard()` — no caution, no hurt-and-ache. Gate makes it survivable, not gone. | 🔴 Open since 13 Sep |
-> | CARD-6 | `bodyCaution` repeats verbatim across consecutive exercises working the same sore area. | 🟡 |
+> **Live: `alongside-v506`, 152 gates, `store.js` v68, `Schema.md` v1.61, cold start blueprint v111.** Read that blueprint after this block.
 >
 > ### 🟢 CARD-5 / SAFETY-GATE — SHIPPED 15 Sep, `v506`. And an amendment to a rule three gates were holding.
 >
@@ -9095,4 +9061,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v351*
+*Build New Habits · Alongside: Move · Master Schedule · 15 Sep 2026 v350*

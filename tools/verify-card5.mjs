@@ -243,37 +243,102 @@ console.log("\nTEST 5 — the record");
 // ════════════════════════════════════════════════════════════════════
 console.log("\nTEST 6 — every movement view mounts it");
 
-// Pinned at exactly five, in the style of verify-card4 test 11. A new
-// session view that renders exercises must be added here on purpose.
-// prescribed.js is NOT in this list: its local renderExerciseCard()
-// builds a LIST ITEM -- name, prescription, physio notes, week dots,
-// Remove -- and nobody moves from that screen. Same function name,
-// different job, which is exactly how it got mis-called a CR-5 gap on
-// 15 Sep before it was read.
+// GATE-ALL, 16 Sep 2026. WAS PINNED AT FIVE, AND THE FIVE WERE WRONG.
+//
+// CARD-5 wired the five views that use the shared exercise card and this
+// test pinned them with a comment claiming it covered every movement
+// view. It did not. It covered every view the grep found. Graeme went to
+// do stretching the next morning and got no gate at all, because
+// yoga-session.js renders poses rather than exercise cards.
+//
+// 🔴 The gate made the error look deliberate. A future session reading
+// "pinned at exactly five" would have asserted five and never asked why
+// swimming was absent. That is the failure mode to watch for in this
+// file: a pin records a decision, so pinning an oversight launders it
+// into one.
+//
+// The list is now thirteen, and membership is decided by ONE question:
+// does somebody move on this screen? Not: does it render an exercise
+// card.
+//
+// Deliberately absent, each for a stated reason:
+//   prescribed.js   - its renderExerciseCard() builds a LIST ITEM.
+//                     Nobody moves from it. Same name, different job.
+//   stretch-arc.js  - the arc surface, starting and stopping an arc.
+//                     No exercise rendering at all.
+//   class-list.js   - a picker.
+//   saved-sessions.js - a picker.
+//   quiet-session.js non-mindful modes - journalling and short breathing
+//                     prompts are reading and typing, with no body in
+//                     them. Mindful mode IS in, and is asserted below.
 {
   const VIEWS = [
     "workout.js", "core-session.js", "prescribed-session.js",
-    "gym-programme.js", "morning-session.js"
+    "gym-programme.js", "morning-session.js",
+    "yoga-session.js", "breathing-session.js", "quiet-session.js",
+    "walk-session.js", "running-session.js", "cycle-session.js",
+    "swim-session.js", "class-player.js"
   ];
   const src = Object.fromEntries(VIEWS.map(v =>
     [v, fs.readFileSync(new URL("../js/views/" + v, import.meta.url), "utf8")]));
 
-  ok("6.1 all five import the gate",
-     VIEWS.every(v => /import \{[^}]*isGateDue[^}]*\} from "\.\.\/safety-gate\.js"/.test(src[v])));
+  ok("6.1 all thirteen import the gate",
+     VIEWS.every(v => /import \{[^}]*isGateDue[^}]*\} from ['"]\.\.\/safety-gate\.js['"]/.test(src[v])));
 
   ok("6.2 all five render it and all five attach it",
      VIEWS.every(v => src[v].includes("renderSafetyGate()") &&
                       src[v].includes("attachSafetyGate(")));
 
   ok("6.3 each declares its own surface, so the log says WHERE",
-     VIEWS.every(v => new RegExp('surface:\\s*"' + v.replace(".js", "") + '"').test(src[v])));
+     VIEWS.every(v => new RegExp("surface:\\s*['\"]" + v.replace(".js", "") + "['\"]").test(src[v])));
 
-  ok("6.4 it is gated on the FIRST exercise, not every one",
-     VIEWS.every(v => /(currentExerciseIndex|currentIndex)\s*===\s*0\s*&&\s*isGateDue\(\)/.test(src[v])));
+  // Not one shape any more. Indexed views gate on index 0; the
+  // continuous ones (walk, run, cycle, swim) have no indexed first
+  // exercise, so they gate on the OVERVIEW phase -- the last screen
+  // before movement starts, which is the honest equivalent. Each view is
+  // asserted against the shape it actually has, rather than the list
+  // being loosened to whatever passes.
+  const INDEXED = ["workout.js", "core-session.js", "prescribed-session.js",
+                   "gym-programme.js", "morning-session.js", "yoga-session.js"];
+  const OVERVIEW = ["walk-session.js", "running-session.js",
+                    "cycle-session.js", "swim-session.js"];
+
+  ok("6.4a indexed views gate on the FIRST exercise, not every one",
+     INDEXED.every(v => /(currentExerciseIndex|currentIndex)\s*===\s*0\s*&&\s*isGateDue\(\)/.test(src[v])));
+
+  ok("6.4b continuous views gate on the overview, before movement starts",
+     OVERVIEW.every(v => /phase === "overview"[\s\S]{0,20}&&\s*isGateDue\(\)/.test(src[v])));
+
+  ok("6.4c class-player gates on the first section AND first beat, so a resumed class is not interrupted mid-practice",
+     /sectionIndex === 0 && _st0\.beatIndex === 0 && isGateDue\(\)/.test(src["class-player.js"]));
+
+  ok("6.4d quiet-session gates mindful mode only",
+     /mode === "mindful" && isGateDue\(\)/.test(src["quiet-session.js"]));
 
   ok("6.5 REVERSAL: prescribed.js is deliberately absent", (() => {
     const p = fs.readFileSync(new URL("../js/views/prescribed.js", import.meta.url), "utf8");
     return !p.includes("safety-gate.js");
+  })());
+
+  ok("6.5b REVERSAL: stretch-arc.js is deliberately absent -- it is the arc surface, not a session", (() => {
+    const s = fs.readFileSync(new URL("../js/views/stretch-arc.js", import.meta.url), "utf8");
+    return !s.includes("safety-gate.js") && !s.includes("renderExerciseCard");
+  })());
+
+  // The check that would have caught the original error. Not "are the
+  // listed views wired" -- "is anything NOT listed rendering movement".
+  ok("6.6 no session view is wired to movement without being on this list", (() => {
+    const dir = new URL("../js/views/", import.meta.url);
+    const all = fs.readdirSync(dir).filter(f => f.endsWith(".js"));
+    const KNOWN_OUT = ["prescribed.js", "stretch-arc.js", "class-list.js",
+                       "saved-sessions.js", "session-builder-ui.js", "today.js"];
+    const missing = all.filter(f => {
+      if (VIEWS.includes(f) || KNOWN_OUT.includes(f)) return false;
+      const t = fs.readFileSync(new URL(f, dir), "utf8");
+      return /renderExerciseCard|sessionQueue\[/.test(t);
+    });
+    if (missing.length) console.log("      unlisted movement views: " + missing.join(", "));
+    return missing.length === 0;
   })());
 }
 
