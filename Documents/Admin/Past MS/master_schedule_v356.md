@@ -1,26 +1,12 @@
 # Alongside: Move — Master Schedule
-## 16 Sep 2026 v357
+## 16 Sep 2026 v356
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v356.md`. Remove v356 on upload.
+Supersedes `master_schedule_v355.md`. Remove v355 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
-> **Live: `alongside-v513`, 155 gates, `store.js` v69, `Schema.md` v1.62, cold start blueprint v118.** Read that blueprint after this block.
->
-> ### 🟢 SAVE-HANDOFF — SHIPPED 16 Sep, `v513`. The named exception is gone, and the gate is why.
->
-> SAVE-ALL put "Keep this one?" on `reflect.js` and read the session from `generatedSession`. That works for builder-generated views and not for ones that assemble their own queue, so `yoga-session.js` kept a private save implementation. `verify-save-all` 5.2 pinned it as a **named exception**, and **5.2b was written to go red the day that copy disappeared** — so removing it would force the allowance to be removed with it, rather than a stale exemption sitting in the gate for months permitting a copy that no longer existed.
->
-> 🟢 **5.2b fired on the first run after the deletion.** The allowance is gone and the rule is now unconditional: **no view keeps a private save implementation.**
->
-> **`lastFinishedSession`** (`store.js` v69, `Schema.md` v1.62) is the one way a view hands what just happened to `reflect.js`. Single-slot, overwritten each session; `activityLog` holds the history.
->
-> ⚫ **Not merged with `generatedSession`, deliberately.** That field is a **proposal** — what the coach built, whether or not it was done, and it outlives the day it was built for. This is a **record** of what finished. Reading a proposal as a record is the bug the date-guard in `save-block.js` exists to paper over; a separate field removes the need for the paper. `verify-save-all` 4b.4 asserts the record wins over a same-day proposal.
->
-> ⚫ **The `generatedSession` fallback stays.** Rewriting eleven builder-generated views to also write the record would be eleven edits for no behaviour change — precisely the churn SAVE-ALL was written to avoid.
->
-> 🟡 **`verify-stretch-focus` TEST 4 was rewritten, not deleted.** Its four assertions described a save block living in the yoga view: rendered after the session, reusing `saveSession()`, silent for free accounts, reporting every refusal. All true that morning and all obsolete by the evening. The behaviour they protected still exists and is asserted in `verify-save-all`, against the module that now owns it. What TEST 4 asserts now is **this view's half of the contract** — that it writes the handoff, with real exercises, or its save silently vanishes and nothing else would notice.
+> **Live: `alongside-v512`, 155 gates, `store.js` v68, `Schema.md` v1.61, cold start blueprint v117.** Read that blueprint after this block.
 >
 > ### 🟢 CARD-LOCAL — SHIPPED 16 Sep, `v512`. The oldest open safety item is closed.
 >
@@ -9201,4 +9187,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v357*
+*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v356*
