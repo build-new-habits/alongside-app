@@ -1,6 +1,19 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 16 Sep 2026 v512
+ *
+ * v512 - CARD-LOCAL. NO NEW FILES. exercise-card.js v11 and
+ *   morning-session.js.
+ *
+ *   The oldest open safety item. morning-session.js renders its
+ *   exercises from a local card and carried no caution and no
+ *   hurt-and-ache at all -- logged red 13 Sep, open since. GATE-ALL made
+ *   it survivable; between gate occasions the screen still had nothing.
+ *
+ *   hurtBlock() is exported from the shared card and rendered on the
+ *   local one: one implementation, one copy of the words.
+ *
  * 16 Sep 2026 v511
  *
  * v511 - SAVE-ALL. ONE NEW FILE PRECACHED: js/save-block.js.
@@ -3524,7 +3537,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v511";
+const CACHE_NAME = "alongside-v512";
 
 const SHELL_URLS = [
 
