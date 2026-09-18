@@ -1,30 +1,12 @@
 # Alongside: Move — Master Schedule
-## 16 Sep 2026 v355
+## 16 Sep 2026 v354
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v354.md`. Remove v354 on upload.
+Supersedes `master_schedule_v353.md`. Remove v353 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
-> **Live: `alongside-v511`, 155 gates, `store.js` v68, `Schema.md` v1.61, cold start blueprint v116.** Read that blueprint after this block.
->
-> ### 🟢 SAVE-ALL — SHIPPED 16 Sep, `v511`. One screen, not twelve views.
->
-> Graeme: *"I think saving the session would be good. Kinda like building my own but in the moment."* `saveSession()` already existed, Plan-gated; SAVE-IN-MOMENT offered it at the end of a yoga session — and only there.
->
-> 🔴 **The obvious fix was to add the block to the other twelve views, and it was the wrong fix.** GATE-ALL was one day old. CARD-5 wired five views by hand, a gate pinned the five as complete, and stretching went uncovered until Graeme walked into it. Adding the same block twelve times buys the same failure, one view at a time.
->
-> **Eleven views route to `reflect.js` when a session ends.** So the offer lives there, once, in `js/save-block.js`, and appears when the session is savable. A walk lands on the same screen and gets nothing — not because a list excludes walks, but because a walk has no exercise ids and `saveSession()` would refuse it. ⚫ **The capability decides, not a list somebody maintains by hand**, and `verify-save-all` asserts that rule rather than a count of views.
->
-> ⚫ **The audit shrank the job twice, both times by reading rather than grepping.** "Twelve views" was a grep. Six have no exercise list at all (`walk`, `running`, `cycle`, `swim`, `breathing`, `class-player`). `quiet-session`'s seven "exercises" are breathing prompts, not movements. What remained was not four views but one screen.
->
-> 🔴 **Prescribed sessions are excluded on content grounds, not capability.** They route to reflect and they *do* carry real exercise ids, so the capability test alone would offer them. Copying a physiotherapist's prescription into a session the person owns — and can then edit — quietly launders a clinical instruction into a personal preset. Asserted twice, plus a third assertion that the *reason* is still written in the file, because an unexplained exclusion is one a later session deletes as a bug.
->
-> 🟡 **One known private implementation remains, named rather than tolerated silently.** `yoga-session.js` builds its save from `sessionQueue`; the shared block reads `generatedSession`, which yoga never writes. Deleting yoga's copy would have silently removed saving from the only view that had it. `verify-save-all` 5.2 pins it as a **named exception** — a *third* implementation goes red — and 5.2b goes red if yoga's copy disappears, so a stale allowance cannot be left behind.
->
-> 🟡 **SAVE-HANDOFF** — give every session view one way to hand its finished session to `reflect.js`, then delete yoga's copy and the allowance with it. Needs a store field, so schema first.
->
-> 🟢 Free accounts get nothing there rather than a locked control, matching `savedSessions()` returning `[]` by design. Asserted, with the reverse proven.
+> **Live: `alongside-v510`, 154 gates, `store.js` v68, `Schema.md` v1.61, cold start blueprint v115.** Read that blueprint after this block.
 >
 > ### 🟢 GATE-TAPER + CARD-DECIDE — SHIPPED 16 Sep, `v510`. The two halves of the cadence question.
 >
@@ -9171,4 +9153,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v355*
+*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v354*
