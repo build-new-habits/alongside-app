@@ -1,11 +1,11 @@
 # Alongside: Move — On-Device Testing Schedule
-## 16 Sep 2026 v2
+## 16 Sep 2026 v3
 
 Build New Habits | Everything below is code-complete, gated and pushed to `main`. It is waiting on a real device and nothing else.
 
 **v1 (03 Aug) described `sw.js v188` and was 326 cache versions stale.** It has been replaced rather than appended to — a stale checklist is worse than none, because it gets worked through and believed.
 
-**Before starting:** Settings → version label should read **`v514`**. If it does not, the service worker has not updated: force-refresh, or reinstall the PWA. Everything below tests `v506`–`v514` and will give false results against an older worker.
+**Before starting:** Settings → version label should read **`v515`**. If it does not, the service worker has not updated: force-refresh, or reinstall the PWA. Everything below tests `v506`–`v514` and will give false results against an older worker.
 
 > 🔴 **Why this matters more than usual.** Nine pushes landed on 16 Sep and **not one has been on a phone.** The gates prove structure — that text is present, that a branch is reachable, that a field is written. They prove nothing about whether a checkbox sits above your thumb at 06:40, or whether four labels fit a 380px screen. **The last three card changes were all amended by device use, not by tests.**
 
@@ -51,7 +51,8 @@ To see it, clear the acknowledgement: Settings → dev panel → clear `safetyAc
 - [ ] The stepper shows four labels: Decide · Watch out · Do · Note.
 - [ ] **Four labels fit without wrapping badly at your screen width.**
 - [ ] Passed steps are tappable; steps ahead are plain text and do nothing.
-- [ ] The caution line reads **"felt sore"**, not "is sore".
+- [ ] The caution line reads **"felt sore"**, not "is sore". 🔴 This was reported fixed on 15 Sep and was not — `session-rationale.js` never reached a commit until `v515`.
+- [ ] **Two consecutive exercises working the same sore area do not read identically.** Graeme's first screenshots had Stationary Bike and Treadmill carrying word-for-word the same caution.
 
 ---
 
