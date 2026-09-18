@@ -132,10 +132,38 @@ ok("2b. mild still says nothing was changed",
 console.log("\nTEST 3 - the proposal and the exercise card no longer contradict");
 
 const rat = fs.readFileSync(_gatePath("js/data/session-rationale.js"), "utf8");
+// CARD-6, 16 Sep 2026. AMENDED, AND THE GUARANTEE IS UNCHANGED.
+//
+// This pinned the literal string "is sore today, and this one works it".
+// The guarantee it exists to hold is that THE CARD STILL SAYS THIS
+// EXERCISE WORKS THE SORE AREA -- that the contradiction with the
+// proposal was never repaired by silencing the honest half.
+//
+// What changed is only how that sentence is spelled. "is sore today"
+// was ungrammatical for every plural area ("Your glutes IS sore"), and
+// there are now three variants so two consecutive exercises do not read
+// identically. Pinning one literal would have forced the grammar fault
+// to stay in order to keep this green.
+//
+// So the assertion moves to the claim rather than the wording: every
+// variant must still name the area AND say this exercise works it.
+// Asserted across all three, so a future variant cannot quietly drop it.
+const soreFn = rat.slice(rat.indexOf("function _soreLine"),
+                         rat.indexOf("export function progressionInvitation"));
+// Counted over the whole function, not per template literal: each
+// variant is built by concatenating two strings, so a per-literal count
+// finds six fragments rather than three sentences.
+const labelRefs = (soreFn.match(/\$\{label\}/g) || []).length;
+const areaClaims = (soreFn.match(/works it|works your|loads your/g) || []).length;
 ok("3a. the exercise card still tells the truth about a sore area",
-   /is sore today, and this one works it/.test(rat),
+   labelRefs >= 3 && areaClaims >= 3,
    "the card was changed to match the proposal. THE CARD WAS THE TRUTHFUL ONE - " +
    "fixing the contradiction by silencing the honest half is the wrong repair");
+
+ok("3a-r. REVERSAL: the ungrammatical original is gone from the file",
+   !/is sore today/.test(rat),
+   "\"Your glutes IS sore today\" -- specified as fixed on 15 Sep, reported as " +
+   "done, listed in the testing schedule, and never committed until v515");
 
 ok("3b. and the proposal no longer contradicts it",
    !/worked around/i.test(moderateBlock));

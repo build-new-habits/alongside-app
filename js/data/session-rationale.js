@@ -556,8 +556,7 @@ export function bodyCaution(exercise) {
   // generally, say nothing when we know nothing.
   const id = soreAreaLoaded(exercise);
   if (id) {
-    return `Your ${_conditionLabel(id)} is sore today, and this one works it. ` +
-           `Go by how it feels rather than by how it went last time — easing off here is the useful thing to do, not a compromise.`;
+    return _soreLine(_conditionLabel(id), exercise);
   }
 
   // KNOWS GENERALLY. Something is sore, just not what this exercise works.
@@ -570,6 +569,55 @@ export function bodyCaution(exercise) {
   }
 
   return null;
+}
+
+/**
+ * CARD-6, 16 Sep 2026. The same sentence, twice in a row, is a stuck record.
+ *
+ * Graeme's first screenshots showed exercise 1 (Stationary Bike) and
+ * exercise 2 (Treadmill) carrying an IDENTICAL caution. Two consecutive
+ * cardio-warmups both working a declared sore area is correct behaviour;
+ * saying it in the same words twice is not. It reads as a template
+ * rather than as the coach having noticed something.
+ *
+ * ⚫ VARIED BY EXERCISE, NOT BY COUNTER. A rotating index would need
+ * session state threaded through a pure function, and would also change
+ * the wording on a re-render or a Back tap -- a sentence that rewrites
+ * itself while you are reading it is worse than one that repeats. The
+ * variant is derived from the exercise id instead: stable for a given
+ * exercise forever, and different between two different exercises, which
+ * is exactly the case that was broken.
+ *
+ * 🔴 GRAMMAR, AND THIS ONE SHIPPED BROKEN FOR DAYS. The original read
+ * "Your glutes IS sore today" -- singular verb, plural noun, visible in
+ * three of the four screenshots. It was specified in the CARD-5
+ * blueprint on 15 Sep, described as done, and written into the testing
+ * schedule as a check -- but session-rationale.js was never in a commit.
+ * The fix is "FELT sore", which is number-agnostic, so it is correct for
+ * glutes, hamstrings and knees as well as back and shoulder without an
+ * agreement table. Past tense is also accurate: they told us at
+ * check-in, earlier.
+ *
+ * Every variant carries the same two commitments -- go by feel, and
+ * easing off is useful rather than a compromise. The wording moves; the
+ * meaning does not.
+ */
+function _soreLine(label, exercise) {
+  const VARIANTS = [
+    `Your ${label} felt sore today, and this one works it. ` +
+    `Go by how it feels rather than by how it went last time — easing off here is the useful thing to do, not a compromise.`,
+
+    `This one works your ${label}, which you flagged this morning. ` +
+    `Let how it feels today set the level — backing off is the useful thing to do here, not a compromise.`,
+
+    `Another one that loads your ${label}. ` +
+    `Go by feel rather than by last time — easing off is the right call here, not a compromise.`
+  ];
+
+  const id = String(exercise?.id || exercise?.name || "");
+  let h = 0;
+  for (let i = 0; i < id.length; i++) h = ((h << 5) - h + id.charCodeAt(i)) | 0;
+  return VARIANTS[Math.abs(h) % VARIANTS.length];
 }
 
 export function progressionInvitation(exercise) {
@@ -638,7 +686,7 @@ export function progressionInvitation(exercise) {
     // Direct, because we know. Names the reason, so it does not read as
     // arbitrary caution, and keeps the exercise rather than removing it --
     // taking the pressure off is usually better than taking it away.
-    return `You said your ${name} is sore today, and this one works it. Consider taking some weight off rather than skipping it — keeping the movement without the load is what helps it settle.`;
+    return `You said your ${name} felt sore today, and this one works it. Consider taking some weight off rather than skipping it — keeping the movement without the load is what helps it settle.`;
   }
 
   if (sore.length > 0) {
