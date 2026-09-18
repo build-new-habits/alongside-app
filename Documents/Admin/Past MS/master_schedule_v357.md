@@ -1,28 +1,12 @@
 # Alongside: Move — Master Schedule
-## 16 Sep 2026 v358
+## 16 Sep 2026 v357
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v357.md`. Remove v357 on upload.
+Supersedes `master_schedule_v356.md`. Remove v356 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
-> **Live: `alongside-v514`, 156 gates, `store.js` v69, `Schema.md` v1.62, cold start blueprint v119.** Read that blueprint after this block.
->
-> ### 🟢 STRETCH-WHY — SHIPPED 16 Sep, `v514`. And a near-miss worth more than the feature.
->
-> Graeme: *"What am I doing stretching for? How does it connect to my arc?"*
->
-> 🔴 **A line on every pose is the wrong answer.** If somebody picks "Back and hips" and the next screen is Cat-Cow, saying it works the back is forty renders of the obvious — the exact mistake CARD-5 spent a week undoing. Nothing is said where the answer is already on screen.
->
-> **STRETCH-FOCUS sorts rather than filters, so the non-matching poses are still in the session, further down — and those are precisely the ones Graeme skipped.** Sorting moved his triage down the list; this removes it. Three cases, at most one line: a declared sore area this pose works; a pose that does **not** match today's target, saying what it *is* for so skipping it is a choice rather than a puzzle; or the arc connection — deliberately last, because some days the arc is not what the day is about.
->
-> 🔴 **THE NEAR-MISS, AND IT IS THE REAL ENTRY.** The first draft of `_poseWhy()` had three branches. **Two read store fields that do not exist** — `soreAreas`, and `strands` as objects on `activeProgramme`. Both were present, commented, plausible, and would have returned nothing for every user forever. **A source-slice gate would have passed on both.**
->
-> They were caught by checking the store, not by a test. The correct sources were already exported: `soreAreaLoaded()` owns the `>= 4` threshold and the area aliases (so a back flagged `lower-back` matches a pose tagged `spine`), and `STRANDS` is what `today.js` reads for "What it's made of". Hand-rolling either would have drifted from `bodyCaution()` the first time one changed.
->
-> 🟢 **So `verify-stretch-why` DRIVES the function rather than reading it** — every assertion sets real store state and reads what comes back. `_poseWhy()` is exported for that reason alone, a deliberate exception recorded at the function. Same family as PROPOSAL-LOC: **twelve gates asserted that cards render and none asserted where their content came from.** Code that is present and dead passes every source-slice check ever written.
->
-> 🟡 **Third feature this week where the finding was "the field I assumed does not exist"** — `todayIntensity` and `exerciseFeedback` were the same shape. Ground-truthing the store belongs in the session checklist as a required step, not a diligence.
+> **Live: `alongside-v513`, 155 gates, `store.js` v69, `Schema.md` v1.62, cold start blueprint v118.** Read that blueprint after this block.
 >
 > ### 🟢 SAVE-HANDOFF — SHIPPED 16 Sep, `v513`. The named exception is gone, and the gate is why.
 >
@@ -9217,4 +9201,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v358*
+*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v357*
