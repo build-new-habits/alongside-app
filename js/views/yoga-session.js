@@ -182,6 +182,12 @@
  */
 
 import { store } from "../store.js";
+// STRETCH-WHY, 16 Sep 2026. Both imported rather than reimplemented:
+// soreAreaLoaded() owns the >= 4 threshold and the area aliases, and
+// STRANDS is the same source today.js reads for "What it's made of".
+// A second copy of either drifts the first time one changes.
+import { soreAreaLoaded } from "../data/session-rationale.js";
+import { STRANDS } from "../data/aims.js";
 import { isGateDue, renderSafetyGate, attachSafetyGate } from "../safety-gate.js";
 import { isPremium } from "../auth.js";
 import { EXERCISES } from "../data/exercises/index.js";
@@ -764,6 +770,111 @@ function renderDurationSelector() {
 
 // ── Pose view ─────────────────────────────────────────────────────────────────
 
+/**
+ * STRETCH-WHY, 16 Sep 2026. Why THIS pose, in THIS session, today.
+ *
+ * Graeme: "What am I doing stretching for? Is there an area of the body
+ * I'm doing stretching for? How does it connect to my arc?"
+ *
+ * 🔴 A LINE ON EVERY POSE IS THE WRONG ANSWER. If somebody picked "Back
+ * and hips" and the next screen is Cat-Cow, saying it works the back is
+ * forty renders of the obvious -- the exact mistake CARD-5 spent a week
+ * undoing. So nothing is said where the answer is already on screen.
+ *
+ * STRETCH-FOCUS sorts rather than filters, so the poses that do NOT
+ * match the chosen target are still in the session, further down. THOSE
+ * are the ones with no stated reason, and they are precisely the ones
+ * Graeme skipped: "I skipped some of the exercises that I thought
+ * weren't doing that." Sorting moved his triage down the list. This
+ * removes it.
+ *
+ * Three cases, in priority order, at most one line:
+ *   1. a declared sore area this pose works -- the freshest real signal
+ *   2. it does not match today's target, so say what it IS for
+ *   3. it feeds the arc -- the connection he asked for, and the only
+ *      place the arc is mentioned in a stretch session
+ *
+ * Silent when the pose matches the target and nothing else applies,
+ * which is the common case and should stay wordless.
+ *
+ * EXPORTED FOR THE GATE, and that is a deliberate exception to keeping
+ * helpers private. Both of this function's first-draft branches read
+ * store fields that do not exist and would have returned nothing for
+ * every user forever. A source-slice gate would have passed on both:
+ * the code was present, well-commented and dead. verify-stretch-why
+ * drives it with real store state instead, and it cannot do that
+ * through renderPose() without a full session fixture.
+ */
+export function _poseWhy(pose) {
+  const areas = Array.isArray(pose.affectsAreas) ? pose.affectsAreas : [];
+  if (!areas.length) return "";
+
+  // 1. Sore areas come first: what they told us this morning outranks
+  //    what they chose a minute ago.
+  // 🔴 soreAreaLoaded() IS THE ONLY CORRECT SOURCE, and the first draft
+  // of this function did not use it. It read a store field called
+  // soreAreas THAT DOES NOT EXIST, so this branch would have returned
+  // nothing for every user forever -- a feature that looks built and is
+  // dead. Ground-truthed against store.js before it shipped.
+  //
+  // It reads `conditions` and `conditionPainScores`, applies the >= 4
+  // threshold, and resolves through AREA_ALIASES so a back flagged as
+  // "lower-back" matches a pose tagged `spine`. Hand-rolling any of that
+  // would have drifted from bodyCaution() the first time either changed.
+  try {
+    const hit = soreAreaLoaded(pose);
+    if (hit) {
+      return `You flagged ${_areaWords(hit)} today. This one works it — go by how it feels.`;
+    }
+  } catch { /* no check-in today */ }
+
+  const target = TARGET_AREAS.find(t => t.id === selectedTarget);
+
+  // 2. The leftovers. Say what it IS for, so a pose that is not today's
+  //    priority is a choice rather than a puzzle.
+  if (target && target.areas.length && !areas.some(a => target.areas.includes(a))) {
+    return `Not ${target.label.toLowerCase()} — this one is for ${_areaWords(areas[0])}. Skip it if today is not the day.`;
+  }
+
+  // 3. The arc. Deliberately last: some days the arc is not what the day
+  //    is about, which is why it is not the default target either.
+  // The arc lives in store `arc` with strand IDS, resolved through
+  // STRANDS from data/aims.js -- the same source today.js uses for "What
+  // it's made of". The first draft read activeProgramme.strands as
+  // objects; activeProgramme has no strands at all, so this branch was
+  // dead too. BOTH dead branches were found by checking the store rather
+  // than by a gate, which is why the gate for this drives them with real
+  // fixtures instead of reading the source.
+  try {
+    const arc = store.get("arc") || {};
+    const ids = Array.isArray(arc.strands) ? arc.strands : [];
+    const feeds = ids
+      .map(id => STRANDS[id])
+      .find(s => s && Array.isArray(s.zones) && s.zones.some(z => _zoneTouches(z, areas)));
+    if (feeds && feeds.label) {
+      return `This one also feeds ${feeds.label.toLowerCase()}.`;
+    }
+  } catch { /* no arc */ }
+
+  return "";
+}
+
+/**
+ * Strand zones are coarse ("hips", "calves-ankles"); affectsAreas are
+ * fine ("hip-flexor", "piriformis", "ankle-foot"). A substring match
+ * either way connects them without a second alias table to keep in step
+ * with the one in session-rationale.js.
+ */
+function _zoneTouches(zone, areas) {
+  const z = String(zone || "");
+  return areas.some(a => a === z || a.includes(z) || z.includes(a));
+}
+
+/** "lower back", "hip flexor" -- ids are hyphenated, people are not. */
+function _areaWords(id) {
+  return String(id || "").replace(/-/g, " ");
+}
+
 function renderPose() {
   if (currentIndex >= sessionQueue.length) {
     finaliseSession();
@@ -804,6 +915,9 @@ function renderPose() {
         </div>
 
         <h1 class="exercise-name">${pose.name}</h1>
+
+        ${(() => { const w = _poseWhy(pose);
+                   return w ? `<p class="ys-pose-why" role="note">${w}</p>` : ""; })()}
 
         <div class="exercise-meta">
           ${hasTimer ? `<span class="meta-tag">${pose.holdSeconds}s hold</span>` : `<span class="meta-tag">Flowing</span>`}

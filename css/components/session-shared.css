@@ -1,7 +1,12 @@
 /* ============================================================
    session-shared.css
    css/components/session-shared.css
-   16 Sep 2026 v11
+   16 Sep 2026 v12
+
+   v12 - STRETCH-WHY. .ys-pose-why, one line under a pose name saying
+   why it is in today's session. Notes at the foot of this file.
+
+   v11
 
    v11 - STRETCH-FOCUS. .cs-target-grid, .cs-target-card and
    .cs-focus-question: the "what's this for today?" row above the
@@ -1173,4 +1178,17 @@
 @media (prefers-contrast: more) {
   .save-block,
   .save-block-name { border-width: 2px; }
+}
+
+/* STRETCH-WHY, 16 Sep 2026. One line, under the pose name, saying why
+   this one is here today. Quiet: it explains, it does not instruct, and
+   it is absent far more often than present. */
+.ys-pose-why {
+  margin: 0 0 var(--space-3);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--color-text-muted);
+  border-left: 3px solid var(--color-primary);
+  padding-left: var(--space-3);
+  text-align: left;
 }
