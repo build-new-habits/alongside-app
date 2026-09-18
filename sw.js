@@ -1,6 +1,22 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 16 Sep 2026 v515
+ *
+ * v515 - CARD-6. NO NEW APP FILES. data/session-rationale.js.
+ *
+ *   "Your glutes IS sore today" -- a fault the CARD-5 blueprint
+ *   specified as fixed, conversation reported as done, and the testing
+ *   schedule listed as a check. session-rationale.js was never in a
+ *   commit. Now "felt sore", which is number-agnostic.
+ *
+ *   The caution also varied: two consecutive exercises working the same
+ *   sore area carried identical wording. Three variants, chosen by
+ *   exercise id so the sentence is stable across re-renders.
+ *
+ *   New gate, not precached (tools/ never is):
+ *   tools/verify-card6.mjs. 157 gates.
+ *
  * 16 Sep 2026 v514
  *
  * v514 - STRETCH-WHY. NO NEW APP FILES. yoga-session.js and
@@ -3562,7 +3578,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v514";
+const CACHE_NAME = "alongside-v515";
 
 const SHELL_URLS = [
 
