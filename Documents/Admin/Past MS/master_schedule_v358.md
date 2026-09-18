@@ -1,40 +1,12 @@
 # Alongside: Move — Master Schedule
-## 16 Sep 2026 v359
+## 16 Sep 2026 v358
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v358.md`. Remove v358 on upload.
+Supersedes `master_schedule_v357.md`. Remove v357 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
 > **Live: `alongside-v514`, 156 gates, `store.js` v69, `Schema.md` v1.62, cold start blueprint v119.** Read that blueprint after this block.
->
-> ### 🔴 ON-DEVICE TESTING SCHEDULE v2 — `Documents/Admin/alongside_testing_schedule_03aug2026_v1.md`. NINE PUSHES, NONE TESTED.
->
-> **v1 described `sw.js v188` and was 326 cache versions stale.** Replaced rather than appended to: a stale checklist is worse than none, because it gets worked through and believed.
->
-> v2 covers `v506`–`v514` in six sections, roughly 30 minutes end to end, ordered so the stretch flow that started the week comes early. It states plainly what the gates prove and what they do not — **structure, not thumb reach; presence, not legibility at 06:40.**
->
-> ⚫ **§0 lists the recorded decisions that will LOOK like bugs on device** — the free variety question and the absent save control on free — so they are not "fixed" during a testing pass. That section exists because DIC-TIER was nearly changed against a decision recorded five weeks earlier.
->
-> 🔴 `DEV_PANEL_ENABLED` is still hardcoded `true` at `settings.js:463`. Deliberately left on for this pass, because the dev panel is how several checks are performed. **Must be fixed before any tester install.**
->
-> ### 🟢 DIC-TIER — CLOSED 16 Sep WITH NO CODE CHANGE. The decision already existed and I did not look.
->
-> Graeme, on the variety question firing during check-in: *"Why am I being asked this? Surely this is a Free user question?"*
->
-> 🔴 **I answered that it was ungated and "not a considered position", and decided it should be Plan-only. Both halves were wrong.** The reasoning I gave — continuity across sessions is what the Plan is — sounds right and fails at the level of detail that matters.
->
-> **Destination architecture §8, 12 Aug, decided it deliberately:** *"Free is: the coach decides, but asks the one question a human coach would."* The boundary is explicit and it is not about continuity in general — it is about **which** continuity:
->
-> > *"He asks about **last time**. He never asks about **March** — because you have not told him about March."*
->
-> Three-week continuity is the Plan. *Last time* is what any coach asks, and it is what stops free being a random generator. §8 also states the commercial reason: **free sessions must vary, because identical Monday/Wednesday/Friday is a poor session rather than a limited one, and nobody returns for week two.**
->
-> `verify-decisions` went red on the first run after the change — *"check-in must not be tier-aware"* — with the decision and its source cited in the failure. **Reverted. No code change.** The v351 entry above has been retracted in place rather than left to be found later.
->
-> 🟠 **PROCESS, and this is the second time this week.** Before deciding anything that looks like a product gap: **grep `Documents/Business/` and `verify-decisions.mjs` for a recorded decision.** `verify-decisions` exists to hold exactly these, and I met it by tripping over it rather than by looking. Added to the session checklist and to the testing plan below.
->
-> 🟡 **Graeme's actual question still stands, and it is not about tiers.** The variety question *reads* as a Plan feature while being deliberately free — it is the most coach-like moment in the free experience and nothing on screen says so. **DIC-SIGNAL**, logged not built: needs Graeme's judgement on whether free users should know the coach is asking them something, or whether calling attention to it cheapens it.
 >
 > ### 🟢 STRETCH-WHY — SHIPPED 16 Sep, `v514`. And a near-miss worth more than the feature.
 >
@@ -188,7 +160,7 @@ Supersedes `master_schedule_v358.md`. Remove v358 on upload.
 > | CARD-DECIDE | Disclosure **open on Decide, closed on Watch out / Do / Note.** Ten renders where it is relevant beats forty where it is not, and beats zero. Graeme agreed 15 Sep. | 🟡 |
 > | CAPTURE-1 | Build-as-you-go. Text field focused on open, recents, then equipment groups. **Two targets per result:** tap the name → Decide (walk the pages); tap "just log it" → Note. Same card, different entry page, chosen per exercise. Lives inside **Your own**, not a fifth door. | 🟡 |
 > | PROGRESS-ARC | **Contribution is computed from the exercise, never from how the session was created.** Graeme: *"absolutely everything should go towards progress 100%."* Splits into "you turned up" (every entry, equal weight) and arc **coverage, not score** — "Trunk strength: touched three times." Needs `exerciseHistory` entries associated to strands; ground-truth whether exercises are already area-tagged before assuming a migration. | 🟡 Largest |
-> | DIC-TIER | 🔴 **THE ENTRY THAT WAS HERE WAS WRONG AND HAS BEEN RETRACTED — see the 16 Sep DIC-TIER block above.** It read that the variety question was ungated and "not a considered position", and recorded a decision to make it Plan-only. It IS a considered position, recorded in destination architecture §8 on 12 Aug, and `verify-decisions` holds it. No code change. | 🟢 Closed, no change |
+> | DIC-TIER | The variety question in `checkin.js` has **no tier check at all** — ungated, not a considered position. Decided Plan-only: it is entirely about continuity across sessions, and "Free is today, the Plan is the arc". | 🟡 |
 > | CARD-LOCAL | `morning-session.js` local `renderExerciseCard()` — no caution, no hurt-and-ache. Gate makes it survivable, not gone. | 🔴 Open since 13 Sep |
 > | CARD-6 | `bodyCaution` repeats verbatim across consecutive exercises working the same sore area. | 🟡 |
 >
@@ -9245,4 +9217,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v359*
+*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v358*
