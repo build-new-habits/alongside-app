@@ -1,24 +1,12 @@
 # Alongside: Move — Master Schedule
-## 16 Sep 2026 v360
+## 16 Sep 2026 v359
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v359.md`. Remove v359 on upload.
+Supersedes `master_schedule_v358.md`. Remove v358 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
-> **Live: `alongside-v515`, 157 gates, `store.js` v69, `Schema.md` v1.62, cold start blueprint v120.** Read that blueprint after this block.
->
-> ### 🟢 CARD-6 — SHIPPED 16 Sep, `v515`. And a fix that three documents said was already done.
->
-> 🔴 **THE GRAMMAR FAULT WAS NEVER FIXED.** *"Your glutes IS sore today"* — singular verb, plural noun — was visible in three of Graeme's four screenshots on 15 Sep. It was specified in the CARD-5 blueprint §5.2, described in conversation as done, and written into the on-device testing schedule v2 as a check to perform. **`session-rationale.js` was never in a commit.** A spec, a claim and a test-plan line all agreed it was fixed; nothing had executed it.
->
-> ⚫ **This is the same family as the STRETCH-WHY dead branches and PROPOSAL-LOC's padding loop, and it is the week's real theme: agreement is not evidence.** A document saying a thing is done, a gate reading source that looks right, and a conversation summarising it as shipped are three forms of the same non-check. The fix is `felt sore` — number-agnostic, so it is correct for glutes, hamstrings and knees as well as back and shoulder without an agreement table, and past tense is accurate because they told us at check-in.
->
-> **The repetition.** Graeme's screenshots showed exercise 1 (Stationary Bike) and exercise 2 (Treadmill) carrying an **identical** caution. Two consecutive cardio-warmups both working a declared sore area is correct behaviour; saying it in the same words twice reads as a template rather than as the coach having noticed something. Three variants now, ⚫ **derived from the exercise id, not a rotating counter** — a counter would need session state threaded through a pure function and would rewrite the sentence on a re-render or a Back tap, and **a sentence that changes while you are reading it is worse than one that repeats.**
->
-> 🟢 `verify-card6` asserts every variant keeps both commitments — go by feel, easing off is not a compromise — so varying the wording cannot quietly drop what the sentence is for. It also asserts the fault from **both** sides: absent from source, and absent from every rendered line, because the strings are built by concatenation and source-checking alone is what let this survive.
->
-> 🟡 **Honest limit, stated in the gate:** two non-consecutive exercises can still collide. The complaint was a stuck record back to back; threading session state through a pure function to fix a repeat five exercises apart costs more than it returns.
+> **Live: `alongside-v514`, 156 gates, `store.js` v69, `Schema.md` v1.62, cold start blueprint v119.** Read that blueprint after this block.
 >
 > ### 🔴 ON-DEVICE TESTING SCHEDULE v2 — `Documents/Admin/alongside_testing_schedule_03aug2026_v1.md`. NINE PUSHES, NONE TESTED.
 >
@@ -9257,4 +9245,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v360*
+*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v359*
