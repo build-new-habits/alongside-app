@@ -1,6 +1,19 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 16 Sep 2026 v514
+ *
+ * v514 - STRETCH-WHY. NO NEW APP FILES. yoga-session.js and
+ *   session-shared.css.
+ *
+ *   One line under a pose name saying why it is in today's session, and
+ *   only where the answer is not already on screen. The poses that do
+ *   NOT match the chosen target had no stated reason, and they are the
+ *   ones Graeme skipped.
+ *
+ *   New gate, not precached (tools/ never is):
+ *   tools/verify-stretch-why.mjs. 156 gates.
+ *
  * 16 Sep 2026 v513
  *
  * v513 - SAVE-HANDOFF. NO NEW FILES. store.js v69, save-block.js,
@@ -3549,7 +3562,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v513";
+const CACHE_NAME = "alongside-v514";
 
 const SHELL_URLS = [
 
