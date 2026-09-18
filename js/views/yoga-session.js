@@ -19,11 +19,17 @@
  * three-pose session when the pool is thin, and a short session reads as
  * the app having nothing for you.
  *
- * SAVE-IN-MOMENT offers saveSession() at the END of the session. 🟡 ONE
- * VIEW, deliberately -- SAVE-ALL carries it across the rest, and
- * verify-stretch-focus LISTS which views offer it rather than pinning a
- * count. GATE-ALL is four days old and that is exactly how five views
- * got pinned as thirteen.
+ * SAVE-HANDOFF, 16 Sep 2026. This view no longer has a save block of its
+ * own. It writes lastFinishedSession when the session completes and
+ * reflect.js offers "Keep this one?" from there, along with every other
+ * session in the app.
+ *
+ * The private implementation existed because this view assembles its own
+ * queue, so generatedSession never described it. verify-save-all 5.2
+ * pinned that as a NAMED exception rather than tolerating it quietly,
+ * and 5.2b was written to go red the day the copy disappeared -- so
+ * removing it forces the allowance to be removed with it, instead of a
+ * stale exemption sitting in the gate for months.
  * - Guided Yoga and Pilates Session
  * 08 Sep 2026 v6
  *
@@ -177,7 +183,6 @@
 
 import { store } from "../store.js";
 import { isGateDue, renderSafetyGate, attachSafetyGate } from "../safety-gate.js";
-import { saveSession } from "../data/saved-sessions.js";
 import { isPremium } from "../auth.js";
 import { EXERCISES } from "../data/exercises/index.js";
 import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
@@ -910,57 +915,6 @@ function renderRest() {
 
 // ── Done ──────────────────────────────────────────────────────────────────────
 
-/**
- * SAVE-IN-MOMENT, 16 Sep 2026. Keep what you just did.
- *
- * Graeme: "I think saving the session would be good. Kinda like building
- * my own but in the moment."
- *
- * saveSession() already exists and is already Plan-gated -- YOUR-OWN
- * built it for sessions assembled in advance. Nothing new is needed to
- * store one; what was missing is being ASKED at the moment the session
- * is worth keeping, which is the moment it ends rather than before it
- * begins.
- *
- * AFTER the session, never before. Offering "save this" on the overview
- * asks somebody to commit to a session they have not done yet, and the
- * ones worth keeping are the ones that turned out well.
- *
- * 🟡 THIS IS ONE VIEW, DELIBERATELY, AND IT IS NOT THE PATTERN YET.
- * GATE-ALL is four days old: CARD-5 wired five views, a gate pinned the
- * five as complete, and stretching went uncovered until Graeme found it.
- * So this is not being pinned as done anywhere. SAVE-ALL is logged on
- * the master schedule to carry it across the other session views, and
- * verify-stretch-focus LISTS which views offer it rather than asserting
- * a number -- a count would launder this scope into a decision.
- */
-function _renderSaveBlock() {
-  // Free accounts get nothing here, not a locked control. savedSessions()
-  // returns [] for free by design, so a teaser would offer a door with
-  // no room behind it.
-  if (!isPremium()) return "";
-
-  const focus  = FOCUS_TYPES.find(f => f.id === selectedFocus);
-  const target = TARGET_AREAS.find(t => t.id === selectedTarget);
-  const suggested = [focus?.label || "Stretch",
-                     target && target.id !== "all" ? target.label.toLowerCase() : null]
-                    .filter(Boolean).join(" \u2014 ");
-
-  return `
-    <div class="ys-save-block" id="ys-save-block">
-      <p class="cs-focus-question">Keep this one?</p>
-      <p class="text-sm text-muted" style="margin-bottom: var(--space-2);">
-        It will be in Your own, ready to repeat.
-      </p>
-      <label class="sr-only" for="ys-save-name">Name for this session</label>
-      <input type="text" id="ys-save-name" class="ys-save-name"
-             value="${suggested}" maxlength="60"
-             autocomplete="off" enterkeyhint="done">
-      <p class="ys-save-status" id="ys-save-status" role="status" aria-live="polite"></p>
-      <button class="btn btn-secondary btn-full" id="ys-save-btn">Save this session</button>
-    </div>`;
-}
-
 function renderDone() {
   const name    = store.get("name") || "";
   const focus   = FOCUS_TYPES.find(f => f.id === selectedFocus);
@@ -990,7 +944,6 @@ function renderDone() {
         </div>
       </div>
 
-      ${_renderSaveBlock()}
 
       <div style="display: flex; flex-direction: column; gap: var(--space-3); margin-top: var(--space-6);">
         <button class="btn btn-primary btn-full" id="ys-reflect-btn">
@@ -1102,6 +1055,24 @@ function finaliseSession() {
   store.set("totalCredits",       (store.get("totalCredits") || 0) + creditsEarned);
   store.set("lastWorkoutCredits", creditsEarned);
   store.set("lastWorkoutName",    "Yoga & Pilates");
+
+  // SAVE-HANDOFF, 16 Sep 2026. Hand the finished session to reflect.js
+  // instead of carrying a private save block. This view assembles its
+  // own queue, so generatedSession never described it -- which is why it
+  // kept its own implementation and why verify-save-all 5.2 pinned that
+  // as a named exception. The exception ends here.
+  store.set("lastFinishedSession", {
+    at: new Date().toISOString(),
+    session: {
+      id:           "yoga",
+      sessionType:  "yoga",
+      title:        [FOCUS_TYPES.find(f => f.id === selectedFocus)?.label || "Yoga",
+                     TARGET_AREAS.find(t => t.id === selectedTarget && t.id !== "all")?.label.toLowerCase()]
+                    .filter(Boolean).join(" \u2014 "),
+      durationMins: selectedMins,
+      exercises:    sessionQueue
+    }
+  });
 
   // 30 Jul 2026 (Core Session investigation follow-up, logged 30 Jul, fixed
   // same session on request): same id-reuse bug found in core-session.js
@@ -1326,36 +1297,6 @@ export function onMount() {
   // the phase -- it is a choice on the same screen as the style cards,
   // not a step in front of them. Advancing here would turn one screen
   // into two and add the friction this was meant to remove.
-  // SAVE-IN-MOMENT. saveSession() returns a reason rather than throwing,
-  // and every reason here is something the person should be told --
-  // "empty" and "name" are both recoverable in the moment.
-  document.getElementById("ys-save-btn")?.addEventListener("click", () => {
-    const input  = document.getElementById("ys-save-name");
-    const status = document.getElementById("ys-save-status");
-    const btn    = document.getElementById("ys-save-btn");
-    const res = saveSession(input?.value || "", {
-      id:           "yoga",
-      sessionType:  "yoga",
-      durationMins: selectedMins,
-      exercises:    sessionQueue
-    });
-
-    if (res.ok) {
-      if (status) status.textContent = "Saved. It's in Your own.";
-      if (btn) { btn.disabled = true; btn.textContent = "Saved"; }
-      if (input) input.disabled = true;
-      return;
-    }
-    if (status) {
-      status.textContent =
-        res.reason === "name"  ? "Give it a name first."
-      : res.reason === "empty" ? "There is nothing to save from this one."
-      : res.reason === "tier"  ? "Saving sessions is part of the Plan."
-      : "That didn't save. Try again.";
-    }
-    if (res.reason === "name") input?.focus();
-  });
-
   document.querySelectorAll(".cs-target-card").forEach(btn => {
     btn.addEventListener("click", () => {
       selectedTarget = btn.dataset.target;

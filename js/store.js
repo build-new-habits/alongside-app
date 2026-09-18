@@ -1,5 +1,29 @@
 /**
  * store.js - Data persistence layer
+ * 16 Sep 2026 v69
+ *
+ * v69 - SAVE-HANDOFF. lastFinishedSession: the one way a session view
+ *   hands what just happened to reflect.js.
+ *
+ *   SAVE-ALL put "Keep this one?" on reflect.js and read the session
+ *   from generatedSession, which works for the builder-generated views
+ *   and not for the ones that assemble their own queue. yoga-session.js
+ *   therefore kept a private save implementation, pinned in
+ *   verify-save-all 5.2 as a NAMED exception rather than tolerated
+ *   silently. This field is what lets that exception go.
+ *
+ *   { at: ISO, session: { title, durationMins, exercises: [{id}] } }
+ *
+ *   NOT MERGED WITH generatedSession, deliberately. That field is a
+ *   PROPOSAL -- what the coach built, whether or not it was done, and it
+ *   outlives the day it was built for. This one is a RECORD of what
+ *   finished. Reading a proposal as a record is the bug the date-guard
+ *   in save-block.js exists to paper over; a separate field removes the
+ *   need for the paper.
+ *
+ *   Single-slot, not a log. activityLog already keeps the history; this
+ *   is a handoff between two screens and is overwritten every session.
+ *
  * 15 Sep 2026 v68
  *
  * v68 - SAFETY-GATE. safetyAckLog: the record of deliberate
@@ -1162,6 +1186,12 @@ export const store = {
 
       guidanceShownAt: saved.guidanceShownAt || null,
 
+      // SAVE-HANDOFF. A malformed handoff is discarded rather than
+      // coerced -- offering to save something unreadable is worse than
+      // not offering.
+      lastFinishedSession: (saved.lastFinishedSession && typeof saved.lastFinishedSession === "object")
+        ? saved.lastFinishedSession : null,
+
       // SAFETY-GATE. Array, not object. A non-array in storage is
       // discarded rather than coerced -- a malformed acknowledgement log
       // is worse than an empty one, because an empty one is honest.
@@ -2129,6 +2159,12 @@ export const store = {
       // last shown. null means never. Thirty days between showings:
       // a line that appears every session is a line nobody reads.
       guidanceShownAt: null,
+
+      // SAVE-HANDOFF, 16 Sep 2026. What just finished, handed from the
+      // session view to reflect.js so "Keep this one?" can be offered
+      // without each view carrying its own save implementation.
+      // Overwritten every session; activityLog holds the history.
+      lastFinishedSession: null,
 
       // ── SAFETY ACKNOWLEDGEMENT ────────────────────────
       // SAFETY-GATE, 15 Sep 2026. Every time somebody has read and

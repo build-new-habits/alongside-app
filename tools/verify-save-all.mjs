@@ -198,6 +198,40 @@ console.log("\nTEST 4 — it saves, and it says so");
 }
 
 // ════════════════════════════════════════════════════════════════════
+console.log("\nTEST 4b — the handoff, so a view needs no save code of its own");
+
+{
+  store.set("tier", "personal");
+  store.set("generatedSession", null);
+  store.set("currentActivityEntry", { type: "yoga" });
+  store.set("lastFinishedSession", { at: today(), session: REAL });
+
+  ok("4b.1 a finished session with no generatedSession is still savable",
+     renderSaveBlock().includes("data-save-block"),
+     "this is the whole point of SAVE-HANDOFF: a view that assembles its own " +
+     "queue can offer a save without carrying one");
+
+  ok("4b.2 REVERSAL: yesterday's handoff is not offered today", (() => {
+    store.set("lastFinishedSession",
+      { at: new Date(Date.now() - 86400000).toISOString(), session: REAL });
+    return renderSaveBlock() === "";
+  })());
+
+  ok("4b.3 a malformed handoff is ignored, not coerced", (() => {
+    store.set("lastFinishedSession", { at: today(), session: { title: "x" } });
+    return renderSaveBlock() === "";
+  })());
+
+  ok("4b.4 the handoff wins over a stale proposal", (() => {
+    store.set("generatedSession",
+      { session: { title: "Old", exercises: [{ id: "squat" }] }, builtAt: today() });
+    store.set("lastFinishedSession", { at: today(), session: REAL });
+    const s = savableSession();
+    return s && s.title === "Core";
+  })(), "generatedSession is a PROPOSAL and may never have been done; " +
+        "lastFinishedSession is a RECORD of what finished");
+}
+
 console.log("\nTEST 5 — one implementation, and the shared screen carries it");
 
 {
@@ -216,29 +250,25 @@ console.log("\nTEST 5 — one implementation, and the shared screen carries it")
     const t = fs.readFileSync(new URL(f, dir), "utf8");
     return /saveSession\s*\(/.test(t);
   });
-  // 🟡 ONE KNOWN EXCEPTION, NAMED RATHER THAN TOLERATED SILENTLY.
+  // SAVE-HANDOFF, 16 Sep 2026. THE ALLOWANCE IS GONE, AND 5.2b IS WHY.
   //
-  // yoga-session.js builds its save from sessionQueue. The shared block
-  // reads generatedSession, which yoga never writes -- so deleting
-  // yoga's copy would silently remove saving from the only view that
-  // had it. It stays until SAVE-HANDOFF gives every view one way to
-  // hand its session to reflect.js.
+  // This file used to permit ONE named exception: yoga-session.js kept a
+  // private save implementation because it assembles its own queue and
+  // generatedSession never described it. 5.2b was written to go red the
+  // day that copy disappeared -- so that removing it would FORCE the
+  // allowance to be removed with it, instead of a stale exemption
+  // sitting in the gate for months quietly permitting a copy that no
+  // longer existed.
   //
-  // Pinned as a NAMED exception, not a count: if a THIRD implementation
-  // appears, this goes red. That is the difference between recording a
-  // decision and laundering an oversight into one.
-  const EXPECTED = ["yoga-session.js"];
-  const unexpected = copies.filter(f => !EXPECTED.includes(f));
+  // It fired on the first run after the copy was deleted. The allowance
+  // is now gone and the rule is unconditional: NO view keeps a private
+  // save implementation. lastFinishedSession (store v69, Schema v1.62)
+  // is the one way a view hands its session to reflect.js.
   if (copies.length) console.log("      views with their own save call: " + copies.join(", "));
-  ok("5.2 only the one known private save implementation remains",
-     unexpected.length === 0,
-     "a new private copy: " + unexpected.join(", ") + ". A second copy drifts " +
-     "from the first, and then a third is added to match whichever one " +
-     "somebody read");
-  ok("5.2b REVERSAL: the exception is still real, so it cannot be quietly dropped",
-     copies.includes("yoga-session.js"),
-     "yoga's copy is gone -- if SAVE-HANDOFF landed, remove it from EXPECTED " +
-     "here rather than leaving a stale allowance behind");
+  ok("5.2 no session view keeps a private save implementation",
+     copies.length === 0,
+     "private copies: " + copies.join(", ") + ". A second copy drifts from the " +
+     "first, and then a third is added to match whichever one somebody read");
 
   const sw = fs.readFileSync(new URL("../sw.js", import.meta.url), "utf8");
   ok("5.3 js/save-block.js is precached", sw.includes("js/save-block.js"),

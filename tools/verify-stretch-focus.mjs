@@ -134,45 +134,45 @@ ok("3.3 all-over changes nothing", /!target\.areas\.length\) return safe\.slice\
 ok("3.4 the target actually reaches the build", /buildSession\(selectedFocus, selectedMins, selectedTarget\)/.test(src));
 
 // ════════════════════════════════════════════════════════════════════
-console.log("\nTEST 4 — SAVE-IN-MOMENT, scoped honestly");
+console.log("\nTEST 4 — saving, now handed off rather than owned here");
 
+// SAVE-HANDOFF, 16 Sep 2026. THESE ASSERTIONS ALL FIRED, AND CORRECTLY.
+//
+// They described a save block that lived in THIS view: rendered after
+// the session, reusing saveSession(), silent for free accounts,
+// reporting every refusal reason. All true on 16 Sep, and all obsolete
+// by the end of the same day.
+//
+// yoga-session.js no longer saves anything. It writes
+// lastFinishedSession when the session completes, and reflect.js -- the
+// one screen every session ends on -- offers "Keep this one?" from
+// there. The behaviour these tests protected still exists; it is
+// asserted in verify-save-all, against the module that now owns it.
+//
+// 🔴 What is asserted HERE is the handoff itself, because that is this
+// view's half of the contract. A view that stops writing the record
+// silently loses its save, and nothing else would notice.
 {
-  ok("4.1 yoga-session offers it, after the session and not before", (() => {
-    const i = src.indexOf("function _renderSaveBlock");
-    const done = src.indexOf("function renderDone");
-    return i > -1 && src.includes("saveSession(") && done > i &&
-           !/renderSessionOverview[\s\S]{0,1500}ys-save-btn/.test(src);
-  })(), "offering it on the overview asks somebody to commit to a session they " +
-        "have not done yet");
+  ok("4.1 the finished session is handed off when it completes",
+     /store\.set\("lastFinishedSession"/.test(src),
+     "without this, yoga silently loses saving and no other gate can tell");
 
-  ok("4.2 it reuses saveSession(), rather than writing savedSessions directly",
-     /import \{ saveSession \} from "\.\.\/data\/saved-sessions\.js"/.test(src) &&
-     !src.includes('store.set("savedSessions"'),
-     "a second writer would drift from the first the moment either changed");
+  ok("4.2 the handoff carries real exercises, not a label", (() => {
+    const i = src.indexOf('store.set("lastFinishedSession"');
+    const body = src.slice(i, i + 700);
+    return /exercises:\s*sessionQueue/.test(body) && /durationMins:/.test(body);
+  })(), "saveSession() needs exercise ids; a handoff without them offers a " +
+        "button that always fails");
 
-  ok("4.3 free accounts get nothing, not a locked control",
-     /if \(!isPremium\(\)\) return "";/.test(src),
-     "savedSessions() returns [] for free by design, so a teaser offers a door " +
-     "with no room behind it");
+  ok("4.3 the target and focus reach the suggested name", (() => {
+    const i = src.indexOf('store.set("lastFinishedSession"');
+    const body = src.slice(i, i + 700);
+    return /FOCUS_TYPES/.test(body) && /TARGET_AREAS/.test(body);
+  })(), "the name somebody accepts without typing should say what they chose");
 
-  ok("4.4 every failure reason is reported to the person",
-     ["name", "empty", "tier"].every(r => src.includes(`"${r}"`)) &&
-     src.includes('aria-live="polite"'));
-
-  // Not a count. See the header.
-  const VIEWS = ["workout.js", "core-session.js", "gym-programme.js", "yoga-session.js",
-                 "walk-session.js", "running-session.js", "cycle-session.js",
-                 "swim-session.js", "breathing-session.js", "morning-session.js",
-                 "prescribed-session.js", "quiet-session.js", "class-player.js"];
-  const offers = VIEWS.filter(v =>
-    fs.readFileSync(new URL("../js/views/" + v, import.meta.url), "utf8").includes("saveSession("));
-  console.log("       saving is offered in: " + offers.join(", "));
-  console.log("       still owed (SAVE-ALL): " + VIEWS.filter(v => !offers.includes(v)).join(", "));
-
-  ok("4.5 yoga is in that list", offers.includes("yoga-session.js"));
-  // No assertion on the size of that list, deliberately. See the header:
-  // pinning a scope turns it into a decision nobody made. The two lines
-  // printed above are the record.
+  ok("4.4 REVERSAL: this view keeps no save implementation of its own",
+     !src.includes("saveSession(") && !src.includes("_renderSaveBlock"),
+     "the private copy is back; verify-save-all 5.2 owns that rule now");
 }
 
 // ════════════════════════════════════════════════════════════════════

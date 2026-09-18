@@ -53,6 +53,20 @@ import { store } from "./store.js";
 import { isPremium } from "./auth.js";
 import { saveSession } from "./data/saved-sessions.js";
 
+function _isToday(iso) {
+  if (!iso) return false;
+  const d = new Date(iso);
+  return !isNaN(d.getTime()) && d.toDateString() === new Date().toDateString();
+}
+
+/** The same test saveSession() applies, applied before offering. */
+function _validate(built) {
+  if (!built || !Array.isArray(built.exercises)) return null;
+  if (built.exercises.filter(e => e && e.id).length === 0) return null;
+  if (built.isPrescribed || built.prescribedBy) return null;
+  return built;
+}
+
 function esc(s) {
   return String(s == null ? "" : s)
     .replace(/&/g, "&amp;").replace(/</g, "&lt;")
@@ -68,13 +82,28 @@ function esc(s) {
  * today's name.
  */
 export function savableSession() {
+  // SAVE-HANDOFF, 16 Sep 2026. lastFinishedSession FIRST.
+  //
+  // It is a record of what finished; generatedSession is a proposal that
+  // may never have been done and outlives the day it was built for. Any
+  // view can write the record, which is what lets a view that assembles
+  // its own queue offer a save without carrying its own implementation.
+  //
+  // The fallback stays: the builder-generated views work through
+  // generatedSession today and rewriting all of them to write the record
+  // as well would be eleven edits for no behaviour change, which is
+  // precisely the churn SAVE-ALL was written to avoid.
+  const handoff = store.get("lastFinishedSession");
+  if (handoff && handoff.session && _isToday(handoff.at)) {
+    const h = _validate(handoff.session);
+    if (h) return h;
+  }
+
   const gen = store.get("generatedSession") || {};
   const built = gen.session || null;
   if (!built) return null;
 
-  const builtToday = gen.builtAt
-    && new Date(gen.builtAt).toDateString() === new Date().toDateString();
-  if (!builtToday) return null;
+  if (!_isToday(gen.builtAt)) return null;
 
   // The same test saveSession() applies, applied before offering rather
   // than after pressing. A button that always fails is worse than no
