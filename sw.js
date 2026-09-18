@@ -1,6 +1,19 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 16 Sep 2026 v511
+ *
+ * v511 - SAVE-ALL. ONE NEW FILE PRECACHED: js/save-block.js.
+ *
+ *   "Keep this one?" now appears on reflect.js -- the one screen every
+ *   session ends on -- instead of only at the end of a yoga session. It
+ *   renders when the session is savable and stays silent when it is
+ *   not, so a walk gets nothing without a list saying so.
+ *
+ *   PRECACHING MATTERS HERE: reflect.js imports it, and reflect.js is
+ *   where eleven session views land. A module that fails to load takes
+ *   the end of every session down with it.
+ *
  * 16 Sep 2026 v510
  *
  * v510 - GATE-TAPER + CARD-DECIDE. NO NEW FILES. safety-gate.js v2,
@@ -3511,7 +3524,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v510";
+const CACHE_NAME = "alongside-v511";
 
 const SHELL_URLS = [
 
@@ -3583,6 +3596,7 @@ const SHELL_URLS = [
   "/alongside-app/js/exercise-feedback.js",
   "/alongside-app/js/exercise-card.js",
   "/alongside-app/js/safety-gate.js",
+  "/alongside-app/js/save-block.js",
   "/alongside-app/js/exercise-timing.js",
   "/alongside-app/js/display-prefs.js",
   "/alongside-app/js/tts.js",
