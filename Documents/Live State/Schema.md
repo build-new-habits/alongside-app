@@ -1,5 +1,38 @@
 # Alongside — Data Schema Reference
-## 15 Sep 2026 v1.61
+## 16 Sep 2026 v1.62
+
+> **v1.62, 16 Sep 2026 — SAVE-HANDOFF.** New top-level field
+> **`lastFinishedSession`** — the one way a session view hands what just
+> happened to `reflect.js`.
+>
+> ```
+> { at: ISO string, session: { title, durationMins, exercises: [{ id }] } }
+> ```
+>
+> **Why it exists.** SAVE-ALL put "Keep this one?" on `reflect.js`, the
+> one screen every session ends on, and read the session from
+> `generatedSession`. That works for builder-generated views and not for
+> the ones that assemble their own queue, so `yoga-session.js` kept a
+> private save implementation — pinned in `verify-save-all` 5.2 as a
+> **named exception** rather than tolerated silently. This field is what
+> lets that exception go.
+>
+> ⚫ **Not merged with `generatedSession`, deliberately.**
+> `generatedSession` is a **proposal**: what the coach built, whether or
+> not it was done, and it outlives the day it was built for. This is a
+> **record** of what finished. Reading a proposal as a record is the bug
+> the date-guard in `save-block.js` exists to paper over; a separate
+> field removes the need for the paper.
+>
+> **Single-slot, not a log.** `activityLog` already holds the history.
+> This is a handoff between two screens and is overwritten every session,
+> so nothing should read it as a record of anything but the most recent
+> finish.
+>
+> **Malformed values are discarded on rehydrate rather than coerced** —
+> offering to save something unreadable is worse than not offering.
+
+> **v1.61, 15 Sep 2026
 
 > **v1.61, 15 Sep 2026 — SAFETY-GATE.** New top-level field
 > **`safetyAckLog`** — an array of acknowledgement entries, empty if the
@@ -224,7 +257,7 @@
 
 ## 06 Sep 2026 v1.51
 
-**File:** `js/store.js` (confirmed live version: **v68, 15 Sep 2026**)
+**File:** `js/store.js` (confirmed live version: **v69, 16 Sep 2026**)
 
 > **v1.47, 06 Sep 2026 — CR-1.** `conditions[]` gains three ids and loses one. `chronic-fatigue` is **retired**; `persistent-fatigue`, `me-cfs` and `long-covid` replace it. No field shape changed — `conditions` is still `string[]` and `conditionMeta` is still keyed by condition id.
 >
