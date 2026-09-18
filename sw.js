@@ -1,6 +1,18 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 16 Sep 2026 v513
+ *
+ * v513 - SAVE-HANDOFF. NO NEW FILES. store.js v69, save-block.js,
+ *   yoga-session.js.
+ *
+ *   lastFinishedSession is the one way a session view hands what just
+ *   happened to reflect.js. yoga-session.js no longer carries a save
+ *   implementation of its own -- it writes the record and reflect.js
+ *   offers the save, like every other session.
+ *
+ *   Schema.md v1.62 first, then the code that reads the field.
+ *
  * 16 Sep 2026 v512
  *
  * v512 - CARD-LOCAL. NO NEW FILES. exercise-card.js v11 and
@@ -3537,7 +3549,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v512";
+const CACHE_NAME = "alongside-v513";
 
 const SHELL_URLS = [
 
