@@ -364,6 +364,19 @@ console.log("\nTEST 6 — every movement view mounts it");
     return !p.includes("safety-gate.js");
   })());
 
+  // CARD-LOCAL, 16 Sep 2026. The gap GATE-ALL made survivable is now
+  // closed. The session gate fires on occasions; between occasions this
+  // view had no safety text at all, because it renders its own card.
+  ok("6.5a CR-5: morning-session.js renders the hurt-and-ache block on its local card", (() => {
+    const t = fs.readFileSync(new URL("../js/views/morning-session.js", import.meta.url), "utf8");
+    return /import \{ hurtBlock \}/.test(t) && /hurtBlock\(true\)/.test(t);
+  })());
+
+  ok("6.5a-r REVERSAL: it is OPEN there, not collapsed", (() => {
+    const t = fs.readFileSync(new URL("../js/views/morning-session.js", import.meta.url), "utf8");
+    return /hurtBlock\(true\)/.test(t) && !/hurtBlock\(false\)/.test(t);
+  })(), "a single-screen card is the equivalent of DECIDE, and CARD-DECIDE opens it there");
+
   ok("6.5b REVERSAL: stretch-arc.js is deliberately absent -- it is the arc surface, not a session", (() => {
     const s = fs.readFileSync(new URL("../js/views/stretch-arc.js", import.meta.url), "utf8");
     return !s.includes("safety-gate.js") && !s.includes("renderExerciseCard");
