@@ -1,81 +1,128 @@
 # Alongside: Move — On-Device Testing Schedule
-## 03 Aug 2026 v1
+## 16 Sep 2026 v2
 
-Build New Habits | Everything below is code-complete and pushed to `main`, waiting only on a real device. Ordered by how much is riding on each item, not by how long each takes — the `userTier` and `upgrade.js` items are quick even though they're listed first.
+Build New Habits | Everything below is code-complete, gated and pushed to `main`. It is waiting on a real device and nothing else.
 
-**Before starting:** confirm the app has pulled the latest service worker (`sw.js` should read `v188` — check via Settings' version label, or force-refresh/reinstall the PWA if it still shows an older number).
+**v1 (03 Aug) described `sw.js v188` and was 326 cache versions stale.** It has been replaced rather than appended to — a stale checklist is worse than none, because it gets worked through and believed.
 
----
+**Before starting:** Settings → version label should read **`v514`**. If it does not, the service worker has not updated: force-refresh, or reinstall the PWA. Everything below tests `v506`–`v514` and will give false results against an older worker.
 
-## 1. `userTier` fix — quick, 2 minutes
-
-**What's being tested:** Personal-tier session-builder options should now unlock for Personal/Athlete tier, not show locked.
-
-- [ ] Settings → triple-tap the version label to open the dev tier-switcher panel.
-- [ ] Switch to **Personal**.
-- [ ] Open the session builder (the "build your own session" flow, not the coach proposal).
-- [ ] Confirm the previously-locked options (marked "Personal tier" in the aria-label) now render as available, not locked.
-- [ ] Switch back to **Free** and confirm they correctly show locked again (the fix shouldn't have broken the free-tier gating itself).
-
-**If this fails:** the fix was a one-line field-name change (`userTier` → `tier`) — if it's still locked on Personal, the most likely cause is a stale service worker still serving the old `session-builder-ui.js`. Force-refresh before assuming the code fix is wrong.
+> 🔴 **Why this matters more than usual.** Nine pushes landed on 16 Sep and **not one has been on a phone.** The gates prove structure — that text is present, that a branch is reachable, that a field is written. They prove nothing about whether a checkbox sits above your thumb at 06:40, or whether four labels fit a 380px screen. **The last three card changes were all amended by device use, not by tests.**
 
 ---
 
-## 2. `upgrade.js` crash check — quick, 1 minute
+## 0. The recorded decisions — read before judging anything below
 
-**Not fixed yet** — this is a check to confirm the bug is real and reproducible before it gets scoped as its own fix, not a test of a fix.
+Two items on this list will look wrong on device and are not.
 
-- [ ] Navigate to the Upgrade/membership screen from wherever it's currently reachable (Settings, or a locked-feature prompt).
-- [ ] Note whether it crashes, shows a blank screen, or silently fails.
+- **The variety question during check-in** ("something like last time / different / mix it up") **is free, deliberately.** Destination architecture §8: *"Free is: the coach decides, but asks the one question a human coach would."* The boundary is *last time*, never *March*. If it feels like a Plan feature, that is 🟡 **DIC-SIGNAL** — a presentation question — not a tiering bug.
+- **Saving a session is Plan-only, and free gets nothing rather than a locked control.** `savedSessions()` returns `[]` for free by design, so a teaser would be a door with no room behind it.
 
-Report back what actually happens — the code trace says it should throw on `store.getUserTier()` being undefined, but confirming the real on-screen behaviour (crash vs. silent blank vs. something else) will shape how urgently this needs fixing.
-
----
-
-## 3. BUILD-GP — `gym-programme.js` exit-guard + activity fix — the longest item
-
-**What's being tested:** the additive fix from 31 Jul — exit protection, `activityLog` visibility, and `reflect.js` no longer silently discarding answers, for a real structured-programme ("Build Your Base," etc.) session.
-
-- [ ] **Back-gesture exit mid-session.** Start a real gym-programme session, get partway through, use the phone's back gesture. Confirm the Stay/Exit-and-save overlay appears (not an instant exit).
-- [ ] **"Exit and save."** Choose it. Confirm a `status: "partial"` entry gets written with the correct `exercisesCount` (checkable via Settings' dev panel or by checking Progress shows something for today).
-- [ ] **On-screen Exit button.** Same overlay, same save behaviour, this time from the button rather than back-gesture.
-- [ ] **Genuine "Session done" completion.** Complete a full session properly. Confirm Home says "you moved today" (this previously didn't work — gym-programme sessions were invisible to `activityLog`).
-- [ ] **Progress screen.** Confirm the completed session shows up in Progress's recent-activity observations.
-- [ ] **Reflect answers.** After a genuine completion, answer `reflect.js`'s questions (feel / pain change / note / mood after). Confirm: (a) the *matching* `activityLog` entry gets the answers, not a stale one from a different session; (b) the question text is the gym-specific one ("I want to know what it actually felt like in there"), not a generic fallback.
-- [ ] **Quick regression glance.** Week 6 mid-programme moment, Week 12 reflection, and A/B session-type alternation — none of today's changes touched this logic, but worth a glance since it's the same file.
+⚫ **If any behaviour here looks like a gap, check `Documents/Business/` and `tools/verify-decisions.mjs` before concluding it is one.** DIC-TIER was "fixed" on 16 Sep against a decision recorded on 12 Aug, and only `verify-decisions` caught it.
 
 ---
 
-## 4. BUILD-3 remaining session-view exit-guard files — batch, formality expected
+## 1. The safety gate — the big one, ~10 minutes
 
-**Already confirmed on-device (30 Jul), don't re-test:** `core-session.js`, `yoga-session.js` — both got a full pass during the 30 Jul testing session, including the id-reuse and stuck-screen fixes found along the way.
+**What is being tested:** GATE-ALL, GATE-TAPER, CARD-DECIDE (`v507`, `v510`).
 
-**Still needs a first on-device pass** — code confirmed clean twice via review, this is genuinely expected to be a formality, but "should work" isn't the standing to close on:
+To see it, clear the acknowledgement: Settings → dev panel → clear `safetyAckLog`, or use a fresh install.
 
-- [ ] `workout.js` (v6) — back-gesture and on-screen Exit both show the confirmation overlay; partial-exit saves correctly.
-- [ ] `cycle-session.js`
-- [ ] `running-session.js`
-- [ ] `swim-session.js`
-- [ ] `walk-session.js`
-- [ ] `quiet-session.js`
-- [ ] `breathing-session.js`
-- [ ] `prescribed-session.js`
+- [ ] Start any session. "Before you start" appears **before the first exercise**.
+- [ ] The checkbox and "Start the session" are **both comfortably reachable with a thumb** — this is the one I most expect to be wrong.
+- [ ] Press "Start the session" **without ticking**. The button is not disabled; an error appears and focus moves to the checkbox.
+- [ ] "Not now" leaves the session rather than trapping you.
+- [ ] Tick, start. The session begins.
+- [ ] **Start a second session the same day. The gate appears again.** This is the taper, not a bug — first five sessions, then every 30 days.
+- [ ] **Go to stretching specifically.** This is the one that had no gate at all until `v507`.
+- [ ] Try a **guided class** and a **walk**. Both should gate.
 
-For each: start a session, back-gesture out partway through, confirm the overlay appears and "Exit and save" genuinely saves a partial entry. A quick pass per file — these all share the same fixed pattern, so if the first two or three pass cleanly the rest are very likely fine, but each one should still get an actual tap-through rather than being assumed from the others.
-
----
-
-## 5. Small confirmations, low stakes
-
-- [ ] **Reflect textarea sizing/contrast.** Code confirmed correct (11.87:1 contrast). Just needs a visual glance after a cache-clear/reinstall to close out — not expected to show anything.
-- [ ] **Yoga/Core Session CSS visual check.** The `.session-exit-overlay`/`.session-exit-card` styling fix (30 Jul) was confirmed working in the core/yoga on-device pass — if you happen to be testing the other 8 files above anyway, a glance that the overlay looks right (not unstyled) on each is worth doing at the same time rather than a separate pass.
+**If the gate does NOT appear:** check `safetyAckLog` — five current-version entries means the taper is satisfied and it will not fire again for 30 days. That is correct behaviour, not a failure.
 
 ---
 
-## 6. Suggested order for a single testing session
+## 2. The exercise card — ~5 minutes
 
-If doing this in one sitting rather than spread out: **1 → 2 → 3 → 4 → 5**, roughly 25–35 minutes total for a careful pass. Items 1 and 2 are genuinely quick and worth doing first since they're the most consequential (real bug, real paying-user impact) even though they're small. Item 3 is the longest single block. Item 4 is repetitive but low-risk. Item 5 can be folded into item 4's pass rather than done separately.
+**What is being tested:** CARD-5, CARD-DECIDE, the stepper (`v506`, `v510`).
+
+- [ ] On **Decide**, "If it hurts" is **open**.
+- [ ] On **Watch out**, **Do** and **Note**, it is **closed** — one row, rose-coloured, with a chevron.
+- [ ] Tapping the closed row opens it. It still reads as a warning, not as an ordinary accordion. 🔴 **If it reads as a generic expander, say so — that is the whole risk of collapsing it.**
+- [ ] The stepper shows four labels: Decide · Watch out · Do · Note.
+- [ ] **Four labels fit without wrapping badly at your screen width.**
+- [ ] Passed steps are tappable; steps ahead are plain text and do nothing.
+- [ ] The caution line reads **"felt sore"**, not "is sore".
 
 ---
 
-*Build New Habits · Alongside: Move · On-Device Testing Schedule · 03 Aug 2026 v1*
+## 3. Morning session — ~3 minutes
+
+**What is being tested:** CARD-LOCAL (`v512`). Red since 13 Sep.
+
+- [ ] Start a morning session. **"If it hurts" is on the exercise card, open.**
+- [ ] Before `v512` this screen had no safety text at all. If it still has none, the fix did not reach the device.
+
+---
+
+## 4. The coach proposal — ~5 minutes
+
+**What is being tested:** PROPOSAL-LOC (`v508`).
+
+- [ ] Check in, say **at the gym**, 40 minutes.
+- [ ] Three options appear, **all three plausible at a gym.**
+- [ ] 🔴 **No breathing session. No short walk.** Those were the hardcoded fallbacks.
+- [ ] Each card's movement count matches what the session actually contains.
+- [ ] Repeat **at home** and confirm the alternates change accordingly.
+- [ ] Fewer than three cards is **correct behaviour**, not a bug — a slot the engine could not fill is dropped rather than padded.
+
+---
+
+## 5. Stretch — ~5 minutes
+
+**What is being tested:** STRETCH-FOCUS, STRETCH-WHY (`v509`, `v514`). This is the flow that started the week.
+
+- [ ] Flag a sore area at check-in, then open a stretch session.
+- [ ] **"What's this for today?" appears with your flagged area already selected.**
+- [ ] Changing the target re-orders the poses; **nothing is removed** — the session length stays the same.
+- [ ] Poses matching the target come first.
+- [ ] A pose that does **not** match carries a line saying what it *is* for, and that skipping it is fine.
+- [ ] A pose that **does** match says nothing extra. 🟡 **If every pose carries a line, that is the failure mode — tell me.**
+- [ ] Where a pose works your flagged area, it says so.
+
+---
+
+## 6. Saving a session — ~3 minutes
+
+**What is being tested:** SAVE-ALL, SAVE-HANDOFF (`v511`, `v513`).
+
+- [ ] Finish **any** session. On the reflection screen, **"Keep this one?"** appears with a suggested name.
+- [ ] Save it. The message says so, and the button becomes "Saved".
+- [ ] It is in **Your own**.
+- [ ] Clear the name and save. It refuses **and says why**.
+- [ ] Finish a **yoga** session. Same block, same screen — it no longer has its own.
+- [ ] Finish a **walk**. **No save block** — a walk has no movements to keep.
+- [ ] On **free**, no block at all, not a locked one.
+
+---
+
+## 7. Suggested order for one session
+
+1. §0 — read the two recorded decisions first.
+2. §1 safety gate, from a cleared `safetyAckLog`.
+3. §5 stretch — the flow that started all of this.
+4. §4 proposal, at the gym.
+5. §2 card, §3 morning, §6 saving as you pass through them.
+
+**~30 minutes end to end.**
+
+---
+
+## 8. Still open, and not testable here
+
+- 🔴 `DEV_PANEL_ENABLED` is hardcoded `true` at `settings.js:463`. **Must be fixed before any tester install.** The dev panel is how several checks above are performed, so it is deliberately still on for this pass.
+- 🟠 Gate wording to Foot Anstey with the ToS bundle.
+- 🔴 R12 — who acts if Graeme cannot.
+
+---
+
+*Build New Habits · Alongside: Move · On-Device Testing Schedule · 16 Sep 2026 v2*
