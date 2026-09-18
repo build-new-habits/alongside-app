@@ -1,28 +1,12 @@
 # Alongside: Move — Master Schedule
-## 16 Sep 2026 v356
+## 16 Sep 2026 v355
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v355.md`. Remove v355 on upload.
+Supersedes `master_schedule_v354.md`. Remove v354 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
-> **Live: `alongside-v512`, 155 gates, `store.js` v68, `Schema.md` v1.61, cold start blueprint v117.** Read that blueprint after this block.
->
-> ### 🟢 CARD-LOCAL — SHIPPED 16 Sep, `v512`. The oldest open safety item is closed.
->
-> `morning-session.js` renders its exercises from a local card of its own and carried **no caution and no hurt-and-ache at all**. Logged red by `exercise-card.js` v7 on 13 September and open since. GATE-ALL made it survivable by mounting the session gate above the card layer — but the gate fires on occasions, and **between occasions that screen had nothing.**
->
-> **`hurtBlock()` is now exported** from the shared card and rendered on the local one. Migrating the whole view to `renderExerciseCard()` is a rewrite; borrowing the safety block is not, and it means the two views share **one implementation and one copy of the words** rather than a second set that drifts.
->
-> ⚫ **Open, not collapsed, and that is not a departure from CARD-DECIDE.** That rule opens the block on DECIDE and closes it on the three pages after, because those come later within one exercise. This card has no page model — it is a single screen, so it is the equivalent of DECIDE, and DECIDE is where the block is open.
->
-> 🟢 **`verify-card4` test 11 fired exactly as it was written to.** Its own note read: *"the day either file starts importing the shared card, 11.1 goes red and somebody has to come back and read this."* That day was today, and coming back to read it is how the gap got closed rather than forgotten. **This is the counter-example to the CARD-5 pin** — a pin that names what it is guarding and why produces a fix; a pin that records a count launders an oversight.
->
-> The consumer set was **split, not loosened**: four full consumers that use `renderExerciseCard()`, one partial that takes the safety block only. 11.1b goes red if morning-session starts importing the card itself (that would be a migration needing proper work), and **11.1c goes red if it imports the block and never renders it** — which would satisfy the letter of the fix while leaving the gap exactly where it was.
->
-> ⚫ `prescribed.js` remains a list view and needs neither the card nor the block. Third restatement this week, now asserted in two files.
->
-> 🟡 **The caution line is rendered defensively.** A morning-session entry is not always a library exercise, so `bodyCaution()` is called in a try and silence is preferred to a generic line.
+> **Live: `alongside-v511`, 155 gates, `store.js` v68, `Schema.md` v1.61, cold start blueprint v116.** Read that blueprint after this block.
 >
 > ### 🟢 SAVE-ALL — SHIPPED 16 Sep, `v511`. One screen, not twelve views.
 >
@@ -9187,4 +9171,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v356*
+*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v355*
