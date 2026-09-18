@@ -65,6 +65,11 @@
 
 import { store }         from "../store.js";
 import { isGateDue, renderSafetyGate, attachSafetyGate } from "../safety-gate.js";
+// CARD-LOCAL, 16 Sep 2026. The same block the shared exercise card uses,
+// imported rather than copied -- one implementation, one copy of the
+// words. See hurtBlock() in exercise-card.js.
+import { hurtBlock } from "../exercise-card.js";
+import { bodyCaution } from "../data/session-rationale.js";
 import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
 import { getZoneStatus } from "../data/conditions.js";
 import {
@@ -653,6 +658,21 @@ function renderCardioCard(session) {
   `;
 }
 
+/**
+ * CARD-LOCAL. bodyCaution() expects a library exercise; a
+ * morning-session entry may be a bare { name, sets, reps } with no
+ * affectsAreas, in which case there is nothing to say and saying
+ * something generic would be worse than silence.
+ */
+function _localCaution(ex) {
+  try {
+    const line = bodyCaution(ex);
+    return line ? `<p class="exercise-caution" role="note">${line}</p>` : "";
+  } catch {
+    return "";
+  }
+}
+
 function renderExerciseCard(ex, session) {
   const blockArr  = getBlockArray(session, currentBlock);
   const isLast    = currentIndex >= blockArr.length - 1;
@@ -678,6 +698,31 @@ function renderExerciseCard(ex, session) {
       </div>
 
       <h1 class="exercise-name">${ex.name}</h1>
+
+      <!--
+        CARD-LOCAL, 16 Sep 2026. CR-5 CLOSED FOR THIS VIEW.
+
+        exercise-card.js v7 logged it red and did not close it: this view
+        builds its exercises from a local card and carried NO caution and
+        NO hurt-and-ache at all. Somebody doing a morning session saw no
+        safety text whatsoever, from 13 September until today.
+
+        GATE-ALL made that survivable by mounting the session gate above
+        the card layer. It did not close it -- the gate fires on
+        occasions, and between occasions this screen had nothing.
+
+        OPEN, NOT COLLAPSED, and that is not a departure from
+        CARD-DECIDE. That rule opens the block on DECIDE and closes it on
+        the three pages after, because those come later in one exercise.
+        This card has no page model: it is a single screen, so it is the
+        equivalent of DECIDE, and DECIDE is where the block is open.
+
+        The caution is rendered where the exercise resolves to one. A
+        morning-session entry is not always a library exercise, so
+        bodyCaution() is called defensively rather than assumed.
+      -->
+      ${_localCaution(ex)}
+      ${hurtBlock(true)}
 
       <div class="exercise-meta">
         ${ex.sets && ex.sets > 0 ? `<span class="meta-tag">${ex.sets} sets</span>` : ""}

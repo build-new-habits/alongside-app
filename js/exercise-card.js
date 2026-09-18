@@ -1,5 +1,11 @@
 /**
  * js/exercise-card.js
+ * 16 Sep 2026 v11
+ *
+ * v11 - CARD-LOCAL. hurtBlock() is exported so morning-session.js can
+ *   render the same safety block on its own local card. One
+ *   implementation, one copy of the words, no second set to drift.
+ *
  * 16 Sep 2026 v10
  *
  * v10 - CARD-DECIDE. The hurt-and-ache disclosure is OPEN on DECIDE and
@@ -258,8 +264,15 @@ const HURT_AND_ACHE_HTML =
  * place it is relevant beats forty in places it is not, and beats zero.
  *
  * `open` when flattened -- see the header.
+ *
+ * EXPORTED for CARD-LOCAL, 16 Sep 2026. morning-session.js renders its
+ * exercises from a local card of its own and has carried NO safety text
+ * at all since CR-5 -- logged red by v7 and open since 13 September.
+ * Migrating that view to this card is a rewrite; giving it this block is
+ * not, and it means the two views share one implementation and one copy
+ * of the words rather than a second set that drifts.
  */
-function hurtBlock(open) {
+export function hurtBlock(open) {
   return `<details class="xcard-block xcard-block--hazard xcard-hurt"${open ? " open" : ""}>
       <summary class="exercise-section-label xcard-hurt-summary">If it hurts</summary>
       ${HURT_AND_ACHE_HTML}

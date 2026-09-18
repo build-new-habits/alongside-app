@@ -430,23 +430,55 @@ console.log("\nTEST 11 — the players, and that there are exactly four of them"
     /from\s*"\.\.\/exercise-card\.js"/.test(fs.readFileSync(`js/views/${f}`, "utf8")))
     .sort();
 
-  const EXPECTED = ["core-session.js", "gym-programme.js",
-                    "prescribed-session.js", "workout.js"];
+  // CARD-LOCAL, 16 Sep 2026. THIS ASSERTION FIRED, EXACTLY AS PREDICTED.
+  //
+  // The note below used to end: "the day either file starts importing
+  // the shared card, 11.1 goes red and somebody has to come back and
+  // read this." That day was today, and coming back to read it is how
+  // the CR-5 gap in morning-session.js got closed rather than forgotten.
+  //
+  // morning-session.js now imports hurtBlock() from the shared card. It
+  // is NOT a full consumer: it still renders its own do-the-exercise
+  // card and does not use renderExerciseCard(). So the set is split
+  // rather than the count loosened -- loosening it would have thrown
+  // away the tripwire that produced this fix.
+  const FULL    = ["core-session.js", "gym-programme.js",
+                   "prescribed-session.js", "workout.js"];
+  const PARTIAL = ["morning-session.js"];
+  const EXPECTED = [...FULL, ...PARTIAL].sort();
 
   ok("11.0 CONTROL: " + files.length + " view files scanned, more than the four",
      files.length > 4);
 
-  ok("11.1 the consumer set is exactly the four known players" +
+  ok("11.1 the consumer set is exactly the known players" +
      (consumers.join(",") === EXPECTED.join(",") ? "" : "  [" + consumers.join(", ") + "]"),
      consumers.length === EXPECTED.length &&
      consumers.every((f, i) => f === EXPECTED[i]));
 
-  // prescribed.js and morning-session.js are NOT players. morning-session.js
-  // renders its own do-the-exercise card with no caution and no
-  // HURT_AND_ACHE at all -- a live CR-5 gap, pre-existing and logged as a
-  // red item, not closed here. This assertion exists so that gap cannot be
-  // quietly forgotten: the day either file starts importing the shared
-  // card, 11.1 goes red and somebody has to come back and read this.
+  ok("11.1a the four full consumers use renderExerciseCard()",
+     FULL.every(f => /renderExerciseCard/.test(fs.readFileSync(`js/views/${f}`, "utf8"))));
+
+  ok("11.1b morning-session.js takes the SAFETY BLOCK ONLY, not the card", (() => {
+    const t = fs.readFileSync("js/views/morning-session.js", "utf8");
+    return /import \{ hurtBlock \}/.test(t) &&
+           !/renderExerciseCard\s*\}?\s*from\s*"\.\.\/exercise-card\.js"/.test(t);
+  })(), "if it now imports the card itself, this is a migration and test 11.2 " +
+        "below needs rewriting rather than passing by accident");
+
+  ok("11.1c REVERSAL: CR-5 is actually closed there -- the block reaches the card", (() => {
+    const t = fs.readFileSync("js/views/morning-session.js", "utf8");
+    return /hurtBlock\(true\)/.test(t);
+  })(), "importing it and never rendering it would satisfy 11.1b while " +
+        "leaving the gap exactly where it was");
+
+  // Both still render their own cards, so neither holds the shared page
+  // state. morning-session.js borrowing the safety block does not change
+  // that, and if it ever does, this goes red and the borrowing has become
+  // a migration that needs doing properly.
+  //
+  // prescribed.js remains a LIST view -- name, prescription, physio
+  // notes, week dots, Remove. Nobody moves from it, so it needs neither
+  // the card nor the block.
   ok("11.2 the two local-card views still hold no shared page state",
      ["prescribed.js", "morning-session.js"].every(f =>
        !/currentCardPage/.test(fs.readFileSync(`js/views/${f}`, "utf8"))));
