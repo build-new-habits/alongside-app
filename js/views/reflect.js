@@ -136,6 +136,10 @@
  */
 
 import { store }          from "../store.js";
+// SAVE-ALL, 16 Sep 2026. Eleven views route here when a session ends,
+// so the "keep this one?" offer lives here once rather than being
+// copied into each of them. See js/save-block.js for why that matters.
+import { renderSaveBlock, attachSaveBlock } from "../save-block.js";
 import { router }         from "../router.js";
 // EMPATHY_PROMPTS no longer imported: v4 moved pool access into
 // selectEmpathyPrompt(), so this view never touches the pool directly.
@@ -697,6 +701,8 @@ export function render() {
                   aria-label="Your reflection">${openText}</textarea>
       </div>
 
+      ${renderSaveBlock()}
+
       <button class="btn btn-primary btn-large btn-full" id="reflect-done-btn"
               style="margin-top: var(--space-4);">
         Done
@@ -730,6 +736,11 @@ function _sessionExerciseIds(entry) {
 }
 
 export function onMount() {
+  // SAVE-ALL. Before the reflection handlers: the block guards its own
+  // double-binding, and binding it first means a save is available even
+  // if something below throws.
+  attachSaveBlock(document.getElementById("app") || document);
+
   // NOTE: this reset to "reflect" runs on every mount, including the
   // remounts triggered by saveAndSummarise() and resolveEmpathyPrompt()
   // after they've already set stage to "empathy" or "summary" and
