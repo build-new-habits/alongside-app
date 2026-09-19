@@ -1,6 +1,22 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 16 Sep 2026 v517
+ *
+ * v517 - ABYSS. router.js v27.
+ *
+ *   A blank screen with a dead home button. Three faults, compounding:
+ *   the session guard outlived its view so the escape hatch rendered a
+ *   confirm card into a wiped container; an empty render was not
+ *   treated as a failure; and the recovery button used an inline
+ *   onclick referencing a global.
+ *
+ *   The router now dismounts the guard on every navigation, treats an
+ *   unpainted container as a failure, builds and binds its recovery
+ *   button, and reports a six-route breadcrumb with any failure.
+ *
+ *   New gate, not precached: tools/verify-abyss.mjs. 159 gates.
+ *
  * 16 Sep 2026 v516
  *
  * v516 - GATE-BOX + DIC-FREE. css/base/reset.css, session-shared.css,
@@ -3594,7 +3610,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v516";
+const CACHE_NAME = "alongside-v517";
 
 const SHELL_URLS = [
 
