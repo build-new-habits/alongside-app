@@ -1,5 +1,42 @@
 /**
  * router.js
+ * 16 Sep 2026 v27
+ *
+ * v27 - ABYSS. Graeme, on device: "I exited without saving and got stuck
+ *   here. Home button doesn't work. There's nothing here. I'm in the
+ *   abyss." A blank screen with no way out.
+ *
+ *   THREE FAULTS, COMPOUNDING. Each is survivable alone.
+ *
+ *   1. THE GUARD OUTLIVES ITS VIEW. session-guard.js keeps module-level
+ *      state and is dismounted by the VIEW that mounted it. A view that
+ *      leaves by any path other than its own exit button never
+ *      dismounts. The guard then stays "active" forever.
+ *
+ *      #hidden-nav-home-btn calls requestExit(), which asks the guard
+ *      first -- and a stale active guard answers by rendering a confirm
+ *      card into a container that has just been wiped. So the home
+ *      button was not dead. It was doing something invisible.
+ *
+ *      navigate() now dismounts the guard on every route change. The
+ *      guard belongs to a session, and leaving the view ends it.
+ *
+ *   2. AN EMPTY RENDER WAS NOT A FAILURE. The catch below only fires if
+ *      render() THROWS. A view returning "" -- or mounting nothing --
+ *      produced a blank container and no error, which is exactly the
+ *      screen Graeme photographed. Emptiness is now checked for and
+ *      treated as a failure.
+ *
+ *   3. THE RECOVERY BUTTON USED AN INLINE onclick REFERENCING App.
+ *      Inline handlers are the first thing a Content-Security-Policy
+ *      removes, and App is a global set in app.js -- so the one control
+ *      on the error screen depended on two things that can be absent
+ *      exactly when everything else has gone wrong. Bound properly now.
+ *
+ *   BREADCRUMB. The last six routes are kept and reported with any
+ *   failure, so the next report arrives with its own path rather than
+ *   needing somebody to reconstruct three taps from memory.
+ *
  * 08 Sep 2026 v26
  *
  * v26 - SAVED-1. 'saved-sessions' registered, mapped back to 'today'
@@ -460,6 +497,23 @@ export const router = {
 
     this._setActiveNav(viewName);
 
+    // ABYSS 1. The guard belongs to a session; leaving the view ends it.
+    // Without this a view that exits by any path other than its own
+    // button leaves the guard active forever, and every later press of
+    // the home escape hatch renders a confirm card into a wiped
+    // container instead of going home.
+    // Loaded lazily and cached: session-guard.js imports router.js, so a
+    // static import here would close a cycle. This file has no static
+    // imports at all for the same family of reasons.
+    try {
+      if (!this._guard) this._guard = await import('./session-guard.js');
+      this._guard.dismountSessionGuard();
+    } catch { /* never block a navigation */ }
+
+    // ABYSS breadcrumb. Six is enough to see the path into a failure and
+    // short enough to read in a Sentry tag.
+    this._trail = (this._trail || []).concat(viewName).slice(-6);
+
     try {
       if (!this.viewCache[viewName]) {
         const { path } = VIEW_NAMES[viewName];
@@ -488,20 +542,60 @@ export const router = {
         throw new Error(`View factory for "${viewName}" is not a function`);
       }
 
+      // ABYSS 2. An empty render is a failure, and used to be silence.
+      // Checked AFTER mounting so it catches both patterns: a factory
+      // that mounts nothing, and a render() that returns "".
+      //
+      // textContent, not innerHTML: a container holding only a wrapper
+      // div is still an empty screen to the person looking at it.
+      const painted = (container.textContent || '').trim().length > 0
+                   || container.querySelector('img, svg, canvas, input, button');
+      if (!painted) {
+        throw new Error(`View "${viewName}" rendered nothing`);
+      }
+
       container.setAttribute('tabindex', '-1');
       container.focus({ preventScroll: false });
       setTimeout(() => container.removeAttribute('tabindex'), 100);
 
     } catch (err) {
       console.error(`Router: failed to mount view "${viewName}"`, err);
-      container.innerHTML = `
-        <div class="router-error" role="alert">
-          <p>Something went wrong loading this page.</p>
-          <button onclick="App.router.navigate('today')" class="btn btn-primary">
-            Go home
-          </button>
-        </div>
-      `;
+
+      // Reported with the path that led here, so the next one arrives
+      // with its own evidence.
+      try {
+        if (window.Sentry) {
+          window.Sentry.captureException(err, {
+            tags:  { feature: 'router', view: viewName },
+            extra: { trail: (this._trail || []).join(' \u2192 ') }
+          });
+        }
+      } catch { /* reporting must not throw */ }
+
+      // ABYSS 3. Built and bound, not an inline onclick referencing a
+      // global. This is the one control on the screen and it has to work
+      // when everything else has not.
+      container.innerHTML = '';
+      const wrap = document.createElement('div');
+      wrap.className = 'router-error';
+      wrap.setAttribute('role', 'alert');
+
+      const p = document.createElement('p');
+      p.textContent = 'Something went wrong loading this page.';
+
+      const btn = document.createElement('button');
+      btn.className = 'btn btn-primary';
+      btn.type = 'button';
+      btn.textContent = 'Go home';
+      btn.addEventListener('click', () => {
+        try { this._guard?.dismountSessionGuard(); } catch { /* best effort */ }
+        this.navigate('today');
+      });
+
+      wrap.appendChild(p);
+      wrap.appendChild(btn);
+      container.appendChild(wrap);
+      btn.focus();
     }
   },
 

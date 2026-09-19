@@ -1,28 +1,12 @@
 # Alongside: Move — Master Schedule
-## 16 Sep 2026 v362
+## 16 Sep 2026 v361
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v361.md`. Remove v361 on upload.
+Supersedes `master_schedule_v360.md`. Remove v360 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
-> **Live: `alongside-v517`, 159 gates, `store.js` v69, `Schema.md` v1.62, cold start blueprint v122.** Read that blueprint after this block.
->
-> ### 🔴 ABYSS — SHIPPED 16 Sep, `v517`. Found without the video, because it was three faults and not a path.
->
-> Graeme: *"I exited without saving and got stuck here. Home button doesn't work. There's nothing here. I'm in the abyss."* He offered to record it. **The better answer was to stop hunting the route and fix the class**, because a blank screen with a dead exit should be impossible regardless of which view breaks.
->
-> **Three faults, each survivable alone, each living in the seam between two files — which is why no gate covered any of them.**
->
-> 1. 🔴 **The guard outlives its view.** `session-guard.js` keeps module-level state and is dismounted by the view that mounted it. A view leaving by any path other than its own exit button never dismounts, so the guard stays active forever. `#hidden-nav-home-btn` calls `requestExit()`, which **asks the guard first** — and a stale active guard answers by rendering a confirm card into a container that has just been wiped. **The home button was never dead. It was doing something invisible.** `navigate()` now dismounts on every route change.
-> 2. 🔴 **An empty render was not a failure.** The router's catch only fired on a *throw*. A view returning `""` produced a blank container and no error — exactly the screen photographed. Emptiness is now checked after mounting and treated as a failure, reading `textContent` rather than markup, because a container holding an empty wrapper div is still a blank screen to the person looking at it.
-> 3. 🔴 **The recovery button used an inline `onclick` referencing a global.** The one control on the error screen depended on inline handlers surviving CSP *and* `window.App` existing — two things that can be absent exactly when everything else has gone wrong. Built and bound now, it dismounts the guard before navigating, and takes focus.
->
-> 🟢 **BREADCRUMB.** The last six routes are kept and reported with any failure. The next report arrives with its own path instead of asking somebody to reconstruct three taps from memory.
->
-> ⚫ `verify-abyss` asserts the **contract, not the route**: whatever breaks, the person gets a way out. A gate pinning "the blank screen after exiting a session" would have fixed one path and left the class. It also holds 1.4 as a deliberate tripwire — if the guard ever becomes stateless the test should be retired on purpose, not left passing by accident.
->
-> **Gate red before green performed:** the empty-render throw was removed and two assertions went red; restored.
+> **Live: `alongside-v516`, 158 gates, `store.js` v69, `Schema.md` v1.62, cold start blueprint v121.** Read that blueprint after this block.
 >
 > ### 🔴 GATE-BOX — SHIPPED 16 Sep, `v516`. EVERY CHECKBOX IN THE APP WAS INVISIBLE.
 >
@@ -9301,4 +9285,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v362*
+*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v361*
