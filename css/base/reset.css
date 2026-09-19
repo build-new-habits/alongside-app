@@ -50,8 +50,32 @@ ul, ol {
   list-style: none;
 }
 
-/* Remove iOS input styling */
-input, textarea {
+/* Remove iOS input styling.
+   
+   🔴 GATE-BOX, 16 Sep 2026. THIS RULE MADE EVERY CHECKBOX IN THE APP
+   INVISIBLE, AND HAD DONE SINCE IT WAS WRITTEN.
+
+   `appearance: none` on a checkbox does not restyle the box, it removes
+   it. There was nothing to tick, nothing to show a tick, and any
+   accent-color had no control left to colour. Found on device by Graeme
+   on the safety gate -- "it was really hard to say I agree, not sure
+   what I did correctly other than keep tapping" -- but the gate was the
+   NEWEST of four:
+
+     - onboarding/thread.js  "I have read and agree to the Privacy
+                              Policy and Terms of Service"  <- consent
+     - session-builder-ui.js  equipment selection
+     - conditions-update.js   recommendation checkboxes
+     - safety-gate.js         the acknowledgement
+
+   The consent one matters beyond usability: every account created so far
+   agreed to the terms by tapping a box they could not see. Logged for
+   the Foot Anstey bundle.
+
+   The fix is scoped to the controls that need stripping rather than
+   applied to `input` wholesale. Checkboxes and radios keep their native
+   appearance, because for those the native appearance IS the control. */
+input:not([type="checkbox"]):not([type="radio"]), textarea {
   -webkit-appearance: none;
   appearance: none;
   border-radius: 0;

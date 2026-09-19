@@ -285,6 +285,9 @@
  */
 
 import { store }           from "../store.js";
+// DIC-FREE, 16 Sep 2026. The drop-in question is the FREE coach's
+// question. See _shouldAskVariety().
+import { isPremium }       from "../auth.js";
 import { checkinData }     from "../data/checkin.js";
 import { resolveOpening }  from "../data/checkin-openings.js";
 import { CONDITIONS, getPainBand, soreAreaOptions } from "../data/conditions.js";
@@ -935,7 +938,35 @@ export function CheckinView(router) {
     });
   }
 
+  /**
+   * DIC-FREE, 16 Sep 2026. FREE ONLY. Not a tightening of free -- a
+   * correction to the Plan.
+   *
+   * Graeme, on being asked it repeatedly on a Plan account: "Why do we
+   * have this again? I keep asking. This should be Free level only. It
+   * shouldn't be part of the Plan."
+   *
+   * 🔴 I GOT THIS BACKWARDS ON 15 SEP and proposed making it Plan-only,
+   * which verify-decisions correctly rejected. Reverting was right;
+   * stopping there was not, because the actual fault was left in place.
+   *
+   * Destination architecture §8 is titled "Free — the drop-in coach",
+   * and defines this as the FREE experience's coach moment: free cannot
+   * reason about an arc, so the coach asks the one question a human
+   * coach would. "He asks about last time. He never asks about March —
+   * because you have not told him about March."
+   *
+   * On the Plan there IS an arc. The coach is meant to decide FROM it.
+   * Asking a Plan user the same question every session is the coach
+   * admitting it has not looked -- and it is the opposite of "Free is
+   * today, the Plan is the arc".
+   *
+   * ⚫ So free keeps it exactly as §8 specifies, and it is removed from
+   * the Plan where it never belonged. verify-decisions still holds:
+   * the free path is untouched.
+   */
   function _shouldAskVariety() {
+    if (isPremium()) return false;
     return SESSION_DOORS.includes(store.get("pendingDoorRoute")) && _hasRecentHistory();
   }
 
