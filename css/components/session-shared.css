@@ -944,6 +944,7 @@
 
 /* The label is the target, not the 22px box — 2.5.8. */
 .gate-ack {
+  position: relative;
   display: flex;
   align-items: center;
   gap: var(--space-3);
@@ -961,6 +962,37 @@
   height: 24px;
   margin: 0;
   accent-color: var(--color-primary);
+
+  /* GATE-BOX, 16 Sep 2026. The cause was in css/base/reset.css, which
+     stripped `appearance` from every input and so deleted the box
+     itself. Fixed there, for all four checkboxes in the app. This
+     declaration is kept as a local guarantee for the one control where
+     an invisible box is a safety failure rather than an annoyance. */
+  -webkit-appearance: checkbox;
+  appearance: checkbox;
+  border-radius: 4px;
+}
+
+/* Belt and braces: if a browser still refuses to paint the native box,
+   the label row shows the state in a second channel. Not decoration --
+   1.4.1, the state must not be carried by one mechanism alone. */
+.gate-ack::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-md, 8px);
+  pointer-events: none;
+}
+
+.gate-ack:has(input:checked) {
+  border-color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 12%, transparent);
+}
+
+.gate-ack:has(input:checked) span::after {
+  content: " \2713";
+  color: var(--color-primary);
+  font-weight: var(--font-semibold);
 }
 
 .gate-ack:focus-within {
