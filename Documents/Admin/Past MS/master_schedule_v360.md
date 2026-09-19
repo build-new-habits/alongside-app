@@ -1,40 +1,12 @@
 # Alongside: Move — Master Schedule
-## 16 Sep 2026 v361
+## 16 Sep 2026 v360
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v360.md`. Remove v360 on upload.
+Supersedes `master_schedule_v359.md`. Remove v359 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
-> **Live: `alongside-v516`, 158 gates, `store.js` v69, `Schema.md` v1.62, cold start blueprint v121.** Read that blueprint after this block.
->
-> ### 🔴 GATE-BOX — SHIPPED 16 Sep, `v516`. EVERY CHECKBOX IN THE APP WAS INVISIBLE.
->
-> Graeme, on the safety gate: *"It was really hard to say I agree. Not sure what I did correctly other than keep tapping."* He was not failing to tick it. **There was nothing there.**
->
-> `css/base/reset.css` applied `appearance: none` to every `input` to strip iOS styling. On a checkbox that does not restyle the box — **it deletes it.** Nothing to tick, nothing to show a tick, and `accent-color` left with no control to colour.
->
-> **Four controls, and the gate was the newest of them:**
-> - `js/views/onboarding/thread.js` — *"I have read and agree to the Privacy Policy and Terms of Service"*
-> - `js/views/session-builder-ui.js` — equipment selection
-> - `js/views/conditions-update.js` — recommendation checkboxes
-> - `js/safety-gate.js` — the acknowledgement
->
-> 🟠 **BIZ-CONSENT, for Foot Anstey, with the gate wording.** Every account created so far agreed to the Terms and Privacy Policy by tapping a box they could not see. That is a record problem rather than a usability one and belongs in the same bundle.
->
-> ⚫ **No JS gate could ever have caught this.** The markup was correct, the handlers were correct, the ARIA was correct. The control was deleted by a stylesheet three directories away. `verify-gatebox` asserts the **CSS contract** instead, and lists every file rendering a checkbox so a new one shows up rather than being silently covered or silently missed. The gate's row also now carries its checked state in a second channel (1.4.1) — which is what would have made this visible on device even with the box gone.
->
-> Fixed at the reset, scoped so text inputs keep the iOS stripping they rely on. Radios excluded too: same failure mode, not yet used.
->
-> ### 🟢 DIC-FREE — SHIPPED 16 Sep, `v516`. I had this backwards twice.
->
-> Graeme, asked the drop-in question every session on a Plan account: *"Why do we have this again? I keep asking. This should be Free level only. It shouldn't be part of the Plan."*
->
-> Destination architecture §8 is titled **"Free — the drop-in coach"** and is scoped to free throughout: *"Free is: the coach decides, but asks the one question a human coach would."* It never grants the question to the Plan. On the Plan there IS an arc, and the coach is meant to decide **from** it — asking every session is the coach admitting it has not looked.
->
-> 🔴 **On 15 Sep I proposed the opposite, Plan-only. `verify-decisions` rejected it and I reverted — and stopping there left the actual fault live.** Reverting a wrong fix is not the same as fixing the thing. The free path is untouched; the question is removed from the Plan, where §8 never put it.
->
-> **The decision assertion was amended, not relaxed.** It read *"check-in must not be tier-aware"*, which cannot distinguish *taken from free* — what §8 protects — from *taken from the Plan*, which §8 never granted. It now tests the guarantee, **plus an inversion check that goes red if anyone tries `!isPremium()` again**, which is exactly the 15 Sep mistake.
+> **Live: `alongside-v515`, 157 gates, `store.js` v69, `Schema.md` v1.62, cold start blueprint v120.** Read that blueprint after this block.
 >
 > ### 🟢 CARD-6 — SHIPPED 16 Sep, `v515`. And a fix that three documents said was already done.
 >
@@ -9285,4 +9257,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v361*
+*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v360*

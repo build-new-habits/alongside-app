@@ -91,7 +91,41 @@ check("Grounding moments are free", `${DEST} §18`, () => {
 check("The drop-in coach question is free", `${DEST} §8`, () => {
   const c = read("js/views/checkin.js");
   ok(/_showVarietyBeat/.test(c), "the free coach question is missing");
-  ok(!/isPremium/.test(c), "check-in must not be tier-aware");
+
+  // DIC-FREE, 16 Sep 2026. AMENDED, AND THE DECISION IS UNCHANGED.
+  //
+  // This asserted "check-in must not be tier-aware" as the mechanism for
+  // holding §8. The DECISION §8 records is that the drop-in question
+  // belongs to FREE -- "Free is: the coach decides, but asks the one
+  // question a human coach would." §8 is scoped to free throughout and
+  // says nothing about the Plan asking it.
+  //
+  // A blanket no-tier-check cannot tell "taken away from free" -- the
+  // thing §8 protects -- from "taken away from the Plan", which §8 never
+  // granted. On device Graeme was asked it every session on a Plan
+  // account: "Why do we have this again? I keep asking. This should be
+  // Free level only. It shouldn't be part of the Plan."
+  //
+  // 🔴 On 15 Sep I proposed the OPPOSITE -- Plan-only -- and this file
+  // correctly rejected it. Reverting was right; stopping there was not,
+  // because the real fault was left in place. The assertion now tests
+  // the guarantee rather than one implementation of it: FREE MUST STILL
+  // REACH THE QUESTION.
+  const varietyFn = c.slice(c.indexOf("function _shouldAskVariety"),
+                            c.indexOf("function _shouldAskVariety") + 1600);
+  ok(!/isPremium\(\)\s*\)\s*return false;[\s\S]{0,40}$/.test("") &&
+     /if \(isPremium\(\)\) return false;/.test(varietyFn),
+     "the gate is not the free-only form; check it has not become a paywall");
+  ok(!/!isPremium\(\)/.test(varietyFn),
+     "INVERTED: !isPremium() would paywall the free coach question, which is " +
+     "exactly what §8 forbids and what was proposed on 15 Sep");
+  // The import is expected; anything BEYOND the import and this one
+  // function is a tier check that §8 does not sanction.
+  const rest = c.replace(varietyFn, "")
+                .replace(/import \{ isPremium \}[^\n]*\n/, "");
+  ok(!/isPremium/.test(rest),
+     "a tier check has appeared elsewhere in check-in; §8 scopes tier-awareness " +
+     "to this one question and nothing else in the flow");
 });
 
 console.log("\nP1 \u2014 the coach never sells");
