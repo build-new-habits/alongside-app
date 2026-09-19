@@ -1,6 +1,18 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 16 Sep 2026 v518
+ *
+ * v518 - ARC-VISIBLE. coach-proposal.js and coach-proposal.css.
+ *
+ *   The proposal screen now names the arc it was built from, using the
+ *   aim label already shown on Today. The arc has shaped these
+ *   proposals since the programme engine landed and nothing said so.
+ *
+ *   It names the ARC, not a strand: strands[0] is the first in the arc,
+ *   not the one today's session serves, and naming it would be a claim
+ *   the screen cannot check.
+ *
  * 16 Sep 2026 v517
  *
  * v517 - ABYSS. router.js v27.
@@ -3610,7 +3622,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v517";
+const CACHE_NAME = "alongside-v518";
 
 const SHELL_URLS = [
 
