@@ -1,6 +1,22 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 16 Sep 2026 v516
+ *
+ * v516 - GATE-BOX + DIC-FREE. css/base/reset.css, session-shared.css,
+ *   views/checkin.js.
+ *
+ *   EVERY CHECKBOX IN THE APP WAS INVISIBLE. reset.css stripped
+ *   `appearance` from every input; on a checkbox that deletes the box.
+ *   Four controls affected, including the onboarding consent box for
+ *   the Privacy Policy and Terms.
+ *
+ *   The drop-in coach question is free-only, per destination
+ *   architecture section 8. It was firing on the Plan, where the coach
+ *   should be deciding from the arc rather than asking.
+ *
+ *   New gate, not precached: tools/verify-gatebox.mjs. 158 gates.
+ *
  * 16 Sep 2026 v515
  *
  * v515 - CARD-6. NO NEW APP FILES. data/session-rationale.js.
@@ -3578,7 +3594,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v515";
+const CACHE_NAME = "alongside-v516";
 
 const SHELL_URLS = [
 
