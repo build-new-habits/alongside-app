@@ -1,24 +1,12 @@
 # Alongside: Move — Master Schedule
-## 16 Sep 2026 v363
+## 16 Sep 2026 v362
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v362.md`. Remove v362 on upload.
+Supersedes `master_schedule_v361.md`. Remove v361 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
-> **Live: `alongside-v518`, 159 gates, `store.js` v69, `Schema.md` v1.62, cold start blueprint v123.** Read that blueprint after this block.
->
-> ### 🟢 ARC-VISIBLE — SHIPPED 16 Sep, `v518`. The arc was doing the work and never said so.
->
-> Graeme: *"I guess it's using the arc. The coach doesn't explicitly say that it's using the arc, at least not enough to notice. Perhaps a heading or subheading like 'based on your arc'."*
->
-> The proposal screen now reads **"Based on your arc — 'Build a core that actually holds me up'."** — the aim label, which is already the headline on Today, so it uses the words the person recognises rather than a second vocabulary. Invisible work reads as no work, and this is "Free is today, the Plan is the arc" made legible at the one moment it is actually true.
->
-> 🔴 **The first draft said "leaning on trunk strength" and was cut before it shipped.** `strands[0]` is the first strand in the arc, **not the one today's session serves** — the line would have been plausible, readable, and sometimes wrong. That is the PROPOSAL-LOC padding loop in miniature: text the coach cannot stand behind. It names the arc, which is true every time, and stops.
->
-> 🟢 **`verify-css` caught the missing style** before it reached a screen: the class had no rule, so the line would have rendered as unstyled text and errored nowhere. Set apart by a rule rather than colour alone (1.4.1), because it is the product naming its own machinery rather than the coach speaking.
->
-> 🟡 **STRETCH-VIA-COACH is bigger than it looks, and is scoped as its own block.** When the coach proposes a stretch session it routes to `workout.js`, the generic exercise-list view; the target question lives in `yoga-session.js`. A reroute will not do it — `yoga-session` assembles its own queue and would discard the built session. The fix is extracting `TARGET_AREAS`, the check-in preselection and the sort into a shared module so both paths use ONE implementation. Same shape as SAVE-ALL. Touches `yoga-session.js`, so touch-once puts it in its own session.
+> **Live: `alongside-v517`, 159 gates, `store.js` v69, `Schema.md` v1.62, cold start blueprint v122.** Read that blueprint after this block.
 >
 > ### 🔴 ABYSS — SHIPPED 16 Sep, `v517`. Found without the video, because it was three faults and not a path.
 >
@@ -9313,4 +9301,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v363*
+*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v362*

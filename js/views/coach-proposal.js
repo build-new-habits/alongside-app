@@ -570,6 +570,10 @@
  */
 
 import { store }             from '../store.js';
+// ARC-VISIBLE, 16 Sep 2026. Same source today.js reads for "What it's
+// made of", so the proposal names the arc in the words the person
+// already sees on Home rather than a second vocabulary.
+import { aimById, STRANDS } from "../data/aims.js";
 import { getActiveVoice, getTimingRules } from '../data/coach-voice.js';
 import { getPhaseBias, getReEntryContext, getMissedSessionOffer,
          captureReturnContext, clearReturnContext,
@@ -961,6 +965,7 @@ export function CoachProposalView(router) {
           <p class="cp-preview-panel__sub">
             Adapted for your check-in \u2014 pick the one that feels right.
           </p>
+          ${_arcLine()}
           <!--
             LOCATION-1, 08 Sep 2026. What the coach assumed, and a way to
             say otherwise.
@@ -2016,6 +2021,64 @@ export function CoachProposalView(router) {
       rationale:     'A steady option for today.',
       exercises:     []
     };
+  }
+
+  /**
+   * ARC-VISIBLE, 16 Sep 2026. Say that the arc is doing the work.
+   *
+   * Graeme: "I guess it's using the arc. The coach doesn't explicitly
+   * say that it's using the arc, at least not enough to notice. Perhaps
+   * a heading or subheading like 'based on your arc'."
+   *
+   * 🔴 The arc HAS been shaping these proposals since the programme
+   * engine landed. Nothing on this screen said so, so the work was
+   * invisible -- and invisible work reads as no work. This is the
+   * governing sentence, "Free is today, the Plan is the arc", made
+   * legible at the one moment it is actually true.
+   *
+   * ⚫ IT REPORTS, IT DOES NOT PROMISE. The line names the arc and the
+   * strand the coach is leaning on ONLY when both are really there.
+   * Silent otherwise -- a permanent "based on your arc" caption on a
+   * screen the arc did not shape would be the same class of fault as the
+   * padding loop in PROPOSAL-LOC: a claim the coach cannot meet.
+   *
+   * Not in the coach's first person. This is the product naming its own
+   * machinery, the same voice the guidance line uses.
+   */
+  function _arcLine() {
+    try {
+      const arc = store.get('arc') || {};
+      const ids = Array.isArray(arc.strands) ? arc.strands : [];
+      if (!ids.length) return '';
+
+      const aim = arc.aimId ? aimById(arc.aimId) : null;
+      const strandLabels = ids
+        .map(id => (STRANDS[id] || {}).label)
+        .filter(Boolean);
+      if (!strandLabels.length) return '';
+
+      // 🔴 NAMES THE ARC, NOT A STRAND. The first draft said "leaning on
+      // <strandLabels[0]>", which is a claim this screen cannot check:
+      // strands[0] is the first in the arc, not the one today's session
+      // serves. Naming the wrong strand would be the padding loop from
+      // PROPOSAL-LOC in miniature -- plausible text the coach cannot
+      // stand behind.
+      //
+      // The aim label is a full sentence and is already the headline on
+      // Today ("Build a core that actually holds me up"), so quoting it
+      // here uses the words the person already recognises instead of a
+      // second vocabulary. Without an aim, the arc is still named: the
+      // arc IS doing the work either way, and that is the whole point.
+      const aimName = aim && aim.label ? aim.label : null;
+
+      const text = aimName
+        ? `Based on your arc \u2014 \u201c${aimName}\u201d.`
+        : `Based on your arc.`;
+
+      return `<p class="cp-preview-panel__arc" role="note">${text}</p>`;
+    } catch {
+      return '';
+    }
   }
 
   function _routeForOption(option) {
