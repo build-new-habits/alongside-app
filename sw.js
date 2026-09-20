@@ -1,6 +1,16 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 16 Sep 2026 v528
+ *
+ * v528 - BLANK-TIMING. router.js v28.
+ *
+ *   v517's empty-render check ran immediately after mount. check-in
+ *   builds its conversation over time, so at that instant the container
+ *   IS empty -- and a working view got the recovery screen. Deferred
+ *   now, and only judged if that view is still on screen. Recovery
+ *   extracted so both paths share one routine.
+ *
  * 16 Sep 2026 v527
  *
  * v527 - DIC-SIGNAL. views/today.js, layouts/today.css.
@@ -3732,7 +3742,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v527";
+const CACHE_NAME = "alongside-v528";
 
 const SHELL_URLS = [
 
