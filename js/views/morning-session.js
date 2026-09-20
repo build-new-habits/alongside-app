@@ -68,7 +68,14 @@ import { isGateDue, renderSafetyGate, attachSafetyGate } from "../safety-gate.js
 // CARD-LOCAL, 16 Sep 2026. The same block the shared exercise card uses,
 // imported rather than copied -- one implementation, one copy of the
 // words. See hurtBlock() in exercise-card.js.
-import { hurtBlock } from "../exercise-card.js";
+// Aliased: this view has its own renderExerciseCard() for the screen
+// around the movement, and borrows the shared one for the movement
+// itself. Two different jobs, two names, no shadowing.
+import { hurtBlock, renderExerciseCard as renderSharedBody } from "../exercise-card.js";
+// CARD-LOCAL, 16 Sep 2026. Morning exercises name themselves; the
+// library names them differently. See morning-library-map.js.
+import { libraryExerciseFor } from "../data/morning-library-map.js";
+import { EXERCISES } from "../data/exercises/index.js";
 import { bodyCaution } from "../data/session-rationale.js";
 import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
 import { getZoneStatus } from "../data/conditions.js";
@@ -673,6 +680,42 @@ function _localCaution(ex) {
   }
 }
 
+/**
+ * CARD-LOCAL, 16 Sep 2026. How to do it, where the library knows.
+ *
+ * A morning session showed the name, the sets and reps, and a coach
+ * note. Every other session also showed how to do the movement, what to
+ * watch for on that one specifically, and how to ease off or go
+ * further. So this screen handed somebody a movement they might not
+ * know and said nothing about doing it.
+ *
+ * ⚫ THE VIEW KEEPS ITS OWN STRUCTURE. The block badge, the
+ * warmup/cardio/strength shape and this screen's flow are genuinely
+ * local and a rewrite of them was never the job. What is borrowed is
+ * the exercise BODY -- flattened, because this card has no page model.
+ *
+ * 🟠 162 OF 190 MOVEMENTS RESOLVE. The rest are supersets, circuits,
+ * and eight movements the library does not describe yet. Those keep the
+ * caution and the hurt-and-ache block and nothing more, which is
+ * honest: showing less is better than showing another movement's
+ * instructions. verify-cardlocal prints the gap on every run.
+ */
+function _movementGuidance(ex) {
+  let lib = null;
+  try { lib = libraryExerciseFor(ex, EXERCISES); } catch { /* fall through */ }
+
+  // No match: exactly what this screen showed before, and no invention.
+  if (!lib) return hurtBlock(true);
+
+  // The library describes the movement; the programme prescribes THIS
+  // session's dose. Merged in that order so the programme wins on sets,
+  // reps and rest, and the library supplies everything it has no
+  // opinion about.
+  const merged = { ...lib, ...ex, name: ex.name || lib.name };
+
+  return renderSharedBody(merged, { idPrefix: "ms-card", full: true });
+}
+
 function renderExerciseCard(ex, session) {
   const blockArr  = getBlockArray(session, currentBlock);
   const isLast    = currentIndex >= blockArr.length - 1;
@@ -722,7 +765,7 @@ function renderExerciseCard(ex, session) {
         bodyCaution() is called defensively rather than assumed.
       -->
       ${_localCaution(ex)}
-      ${hurtBlock(true)}
+      ${_movementGuidance(ex)}
 
       <div class="exercise-meta">
         ${ex.sets && ex.sets > 0 ? `<span class="meta-tag">${ex.sets} sets</span>` : ""}

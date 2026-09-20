@@ -367,10 +367,23 @@ console.log("\nTEST 6 — every movement view mounts it");
   // CARD-LOCAL, 16 Sep 2026. The gap GATE-ALL made survivable is now
   // closed. The session gate fires on occasions; between occasions this
   // view had no safety text at all, because it renders its own card.
-  ok("6.5a CR-5: morning-session.js renders the hurt-and-ache block on its local card", (() => {
+  // CARD-LOCAL, 16 Sep 2026. CR-5 still holds, by two routes now.
+  //
+  // Where a movement resolves to the library, the SHARED card carries
+  // the hurt-and-ache block as it does everywhere else. Where it does
+  // not -- supersets, circuits, eight movements the library has yet to
+  // describe -- hurtBlock() still renders directly. Both paths are
+  // asserted, because covering only one would let the other go dark.
+  ok("6.5a CR-5: the matched path carries it via the shared card", (() => {
     const t = fs.readFileSync(new URL("../js/views/morning-session.js", import.meta.url), "utf8");
-    return /import \{ hurtBlock \}/.test(t) && /hurtBlock\(true\)/.test(t);
+    return /renderSharedBody\(merged/.test(t);
   })());
+
+  ok("6.5a-2 CR-5: and the UNMATCHED path still renders it directly", (() => {
+    const t = fs.readFileSync(new URL("../js/views/morning-session.js", import.meta.url), "utf8");
+    return /if \(!lib\) return hurtBlock\(true\);/.test(t);
+  })(), "a superset or a movement the library does not describe must not " +
+        "silently lose the safety block along with the instructions");
 
   ok("6.5a-r REVERSAL: it is OPEN there, not collapsed", (() => {
     const t = fs.readFileSync(new URL("../js/views/morning-session.js", import.meta.url), "utf8");

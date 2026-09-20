@@ -1,32 +1,12 @@
 # Alongside: Move — Master Schedule
-## 16 Sep 2026 v379
+## 16 Sep 2026 v378
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v378.md`. Remove v378 on upload.
+Supersedes `master_schedule_v377.md`. Remove v377 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
-> **Live: `alongside-v534`, 167 gates, `store.js` v74, `Schema.md` v1.67, cold start blueprint v139.** Read that blueprint after this block.
->
-> ### 🟢 CARD-LOCAL — SHIPPED 16 Sep, `v534`. Open since 13 Sep, and it was never a renderer migration.
->
-> Graeme, when told it was too big for tonight: *"Why can't we fix this? If it needs fixing it needs fixing, right?"* **He was right and the caution was misplaced.**
->
-> A morning session showed the name, sets and reps, and a coach note. Every other session also showed **how to do the movement, what to watch for on that one specifically, and how to ease off or go further**. So this screen handed somebody a movement they might not know and said nothing about doing it. 🔴 Part of it was a **safety** gap: CARD-3's rule is that exercise-specific hazards are never behind an interaction — here they were not behind anything, they were **absent**.
->
-> 🔴 **Why the "tidy-up" framing was wrong.** `morning-programme.js` names its own exercises — ids like `u1` mean nothing to the library — so **only 93 of 190 resolved by name.** Swapping the renderer alone would have given half the movements full guidance and left the other half bare, which on a 06:40 screen is **worse** than being consistently sparse: you learn to expect help and then it stops.
->
-> 🔴 **Automatic matching is not available here.** A token-overlap matcher was tried and offered **"Dumbbell Shoulder Press" → "Press-Up"** — different movements, and that match would have put press-up instructions on a weight held overhead. Every alias is hand-written and hand-checked. **The single biggest cause was vocabulary: the library says "Press-Up" where the programme says "Push-Up".** UK naming.
->
-> ⚫ **Plus one mechanical rule that IS safe:** a parenthetical is a prescription, not a different movement. "Pallof Press (band)" is a Pallof Press. It cannot invent a match — "Dumbbell Bench Press (with bench)" strips to a name the library lacks and stays unmatched.
->
-> **Coverage: 93 → 162 of 190 (85%).** The view keeps its own screen — block badge, warmup/cardio/strength shape — and borrows the shared card for the movement **body**, flattened. The programme's dose wins over the library's description.
->
-> 🟠 **The remaining 28 are named, not mysterious:** supersets and circuits (two movements or none — returning the first half would put one movement's instructions on a card describing two), and **nine movements the library does not describe yet** — Bear Hold, Hammer Curl, EZ Bar Curl, Dumbbell Bench Press, Plank to Push-Up, Tricep Dips, Front Raise, Lateral Raise. `MORNING_MISSING_FROM_LIBRARY` holds them and the gate prints them every run so they cannot go quiet. **For the clinical reviewer, with AROUND-REVIEW.**
->
-> 🟢 **Both tripwires fired as written.** `verify-card4` 11.1b said *"if it now imports the card itself, this is a migration and needs rewriting rather than passing by accident"* — today. `verify-card5` 6.5a needed splitting, because CR-5 now holds by two routes and covering one would let the other go dark. 🟢 **And the new gate caught an omission in my own list** — "EZ Bar or Cable Curl" was a third movement I had not named.
->
-> ⚫ **1.2 asserts coverage is NOT 100%.** Claiming everything resolves would mean something is being matched that should not be.
+> **Live: `alongside-v533`, 166 gates, `store.js` v74, `Schema.md` v1.67, cold start blueprint v138.** Read that blueprint after this block.
 >
 > ### 🟢 FULL TRACE — 16 Sep, `v532`. Driven end to end, and it found one more.
 >
@@ -9572,4 +9552,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v379*
+*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v378*
