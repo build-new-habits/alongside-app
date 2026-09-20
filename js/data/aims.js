@@ -511,6 +511,46 @@ export function zonesForStrands(strandIds) {
   return out;
 }
 
+/**
+ * ARC-EVERYTHING, 16 Sep 2026. Exercise areas -> arc zones.
+ *
+ * `affectsAreas` on an exercise is fine-grained (twenty values:
+ * hip-flexor, piriformis, thoracic...). Arc zones are coarse (eight:
+ * hips, upper-back...). Nothing joined them, so a session could work a
+ * person's hips all morning and the arc never heard about it.
+ *
+ * ⚫ THIS TABLE LIVES HERE, beside the zones it maps onto, and not in a
+ * fourth file. There are already two area-alias tables in this codebase
+ * (session-rationale.js and stretch-target.js, logged as ALIAS-ONE) and
+ * this is a DIFFERENT mapping -- area to zone, not condition to area --
+ * so it is a new relationship rather than a third copy of an old one.
+ *
+ * Unmapped areas are dropped rather than guessed at. An arc strand
+ * lighting because something was loosely nearby is worse than it not
+ * lighting: the whole value of "lit" is that it means something
+ * happened.
+ */
+const AREA_TO_ZONE = {
+  "lower-back": "lower-back", "spine": "lower-back",
+  "upper-back": "upper-back", "thoracic": "upper-back",
+  "chest-pecs": "chest",
+  "shoulder": "neck-shoulders", "rotator-cuff": "neck-shoulders",
+  "hip": "hips", "hip-flexor": "hips", "adductors": "hips",
+  "glutes": "glutes", "piriformis": "glutes",
+  "hamstring": "hamstrings",
+  "calves": "calves-ankles", "ankle-foot": "calves-ankles"
+};
+
+/** Arc zones the given exercise areas touch, de-duplicated, in order. */
+export function zonesForAreas(areas) {
+  const out = [];
+  for (const a of areas || []) {
+    const z = AREA_TO_ZONE[a];
+    if (z && !out.includes(z)) out.push(z);
+  }
+  return out;
+}
+
 /** Session types the chosen strands suit, same ordering rule. */
 export function sessionTypesForStrands(strandIds) {
   const out = [];
