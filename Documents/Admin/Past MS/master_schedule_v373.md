@@ -1,24 +1,12 @@
 # Alongside: Move — Master Schedule
-## 16 Sep 2026 v374
+## 16 Sep 2026 v373
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v373.md`. Remove v373 on upload.
+Supersedes `master_schedule_v372.md`. Remove v372 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
-> **Live: `alongside-v528`, 164 gates, `store.js` v71, `Schema.md` v1.64, cold start blueprint v133.** Read that blueprint after this block.
->
-> ### 🔴 BLANK-TIMING — SHIPPED 16 Sep, `v528`. The abyss fix broke check-in within a day.
->
-> Graeme, on the recovery screen: *"This is me doing a check in."*
->
-> ABYSS added a check that an unpainted container is a failure rather than silence. It ran **immediately after mount**. 🔴 **Check-in builds its conversation over time** — the coach's first line arrives after a short delay, the way a real message thread does — so the instant it mounts the container **is** empty. The check declared a working view broken and showed the recovery screen where the coach should have been.
->
-> ⚫ **The principle was right and the timing was wrong. A blank screen a second after opening is a fault. A blank screen in the same instant is a view that has not spoken yet.** The check now runs after a beat, and only judges the view still on screen — somebody may have navigated on during the delay, and replacing the screen they asked for would be a second bug wearing the first one's clothes.
->
-> ⚫ **Deferred means it cannot throw** — by the time it fires the mount's `try/catch` has long exited — so recovery was extracted into `_recover()` and **both paths now share one routine.** Two recovery screens would drift, and one of them is what somebody sees when everything else has already gone wrong.
->
-> 🟡 **The honest lesson: a safety net added without device use caught the app instead of a fault.** ABYSS shipped in the same batch of eight that had never been on a phone. It did its job — Graeme was not stranded, he got a working way out — but it fired on the wrong thing, and only a real check-in found that.
+> **Live: `alongside-v527`, 164 gates, `store.js` v71, `Schema.md` v1.64, cold start blueprint v132.** Read that blueprint after this block.
 >
 > ### 🔴 CARD-LOCAL — SCOPED 16 Sep, NOT BUILT. It is a content gap, not duplication.
 >
@@ -9480,4 +9468,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v374*
+*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v373*
