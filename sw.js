@@ -1,6 +1,22 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 16 Sep 2026 v519
+ *
+ * v519 - STRETCH-VIA-COACH. ONE NEW FILE PRECACHED:
+ *   js/stretch-target.js.
+ *
+ *   A coach-proposed stretch session routes to workout.js, so the
+ *   target question built into yoga-session.js was unreachable from the
+ *   1-to-1 path. TARGET_AREAS, impliedTarget() and the sort now live in
+ *   a shared module; both paths import it and neither owns it.
+ *
+ *   The coach path orders silently from the check-in and says so on the
+ *   card. It does not ask -- a four-option question on a proposal card
+ *   turns a proposal into a form.
+ *
+ *   New gate: tools/verify-stretch-coach.mjs. 160 gates.
+ *
  * 16 Sep 2026 v518
  *
  * v518 - ARC-VISIBLE. coach-proposal.js and coach-proposal.css.
@@ -3622,7 +3638,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v518";
+const CACHE_NAME = "alongside-v519";
 
 const SHELL_URLS = [
 
@@ -3695,6 +3711,7 @@ const SHELL_URLS = [
   "/alongside-app/js/exercise-card.js",
   "/alongside-app/js/safety-gate.js",
   "/alongside-app/js/save-block.js",
+  "/alongside-app/js/stretch-target.js",
   "/alongside-app/js/exercise-timing.js",
   "/alongside-app/js/display-prefs.js",
   "/alongside-app/js/tts.js",
