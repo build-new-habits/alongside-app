@@ -581,6 +581,9 @@ import { aimById, STRANDS } from "../data/aims.js";
 // STRETCH-VIA-COACH, 16 Sep 2026. The same target knowledge the stretch
 // door uses. See js/stretch-target.js.
 import { impliedTarget, sortByTarget, targetById, isStretchLike } from "../stretch-target.js";
+// PURPOSE-ASK, 16 Sep 2026. The line now answers "what's today for?"
+// rather than always naming the arc.
+import { purposeLine } from "../data/purpose.js";
 import { getActiveVoice, getTimingRules } from '../data/coach-voice.js';
 import { getPhaseBias, getReEntryContext, getMissedSessionOffer,
          captureReturnContext, clearReturnContext,
@@ -973,7 +976,6 @@ export function CoachProposalView(router) {
             Adapted for your check-in \u2014 pick the one that feels right.
           </p>
           ${_arcLine()}
-          ${_kindPicker()}
           <!--
             LOCATION-1, 08 Sep 2026. What the coach assumed, and a way to
             say otherwise.
@@ -1170,22 +1172,6 @@ export function CoachProposalView(router) {
     panel.querySelectorAll('[data-option-id]').forEach(card => {
       card.addEventListener('click', () => {
         selectedOptionId = card.dataset.optionId;
-        _rerenderPanel(container);
-      });
-    });
-
-    // ASK-KIND. Rebuilds, for the same reason LOCATION-1 rebuilds when an
-    // assumption changes: a proposal that no longer matches what it says
-    // it was built for is worse than one that never said.
-    //
-    // Tapping the chosen kind again clears it and the arc takes over
-    // once more -- an ask made by accident must be un-makeable.
-    panel.querySelectorAll('[data-kind]').forEach(chip => {
-      chip.addEventListener('click', () => {
-        const id = chip.dataset.kind;
-        const now = store.get('requestedSessionType') || null;
-        store.set('requestedSessionType', now === id ? null : id);
-        selectedOptionId = null;
         _rerenderPanel(container);
       });
     });
@@ -2152,50 +2138,34 @@ export function CoachProposalView(router) {
     return `Ordered around ${t.label.toLowerCase()}, from your check-in.`;
   }
 
+  // ASK-KIND's picker was REMOVED here, 16 Sep 2026, on the day it
+  // shipped. Graeme: "the 'something else' is almost invisible and
+  // completely the wrong thing."
+  //
+  // He was right on both counts. It offered a different SHAPE of session
+  // when the missing question was WHY somebody was training today, and it
+  // hid that behind a collapsed link under the heading. PURPOSE-ASK asks
+  // the real question properly, in the check-in, in the coach's voice.
+  //
+  // Its store field requestedSessionType is KEPT and is now the answer to
+  // PURPOSE-ASK's second question. The plumbing was right; the question
+  // was wrong.
+
   /**
-   * ASK-KIND. Eight kinds, and the one in play marked.
+   * PURPOSE-ASK, 16 Sep 2026. ONE LINE, FIVE MEANINGS.
    *
-   * Below the cards, not above: the suggestion is still the coach's
-   * opening move and should be read first. This is the answer to "not
-   * today, thanks" -- which is a different question from "which of
-   * these three", and the cards already answer that one.
+   * ARC-VISIBLE made this say "Based on your arc" because the arc WAS
+   * always the reason -- it was the only one the coach had. Now the
+   * person says why, so the line says what they said.
    *
-   * "Gym" is left out, as in capture: it says WHERE, not what.
+   * Falls back to the arc line when no purpose was given: free accounts
+   * never see the question, and a Plan session started without a
+   * check-in still has an arc behind it.
    */
-  const KINDS = [
-    { id: 'full',     label: 'Full body' },
-    { id: 'upper',    label: 'Upper body' },
-    { id: 'lower',    label: 'Lower body' },
-    { id: 'core',     label: 'Core' },
-    { id: 'glute',    label: 'Glutes' },
-    { id: 'cardio',   label: 'Cardio' },
-    { id: 'mobility', label: 'Mobility' },
-    { id: 'stretch',  label: 'Stretch' }
-  ];
-
-  function _kindPicker() {
-    const current = store.get('requestedSessionType') || null;
-    return `
-      <details class="cp-kind"${current ? ' open' : ''}>
-        <summary class="cp-kind__summary">Something else today?</summary>
-        <ul class="cp-kind__list" role="group" aria-label="Ask for a kind of session">
-          ${KINDS.map(k => `
-            <li>
-              <button type="button" class="cp-kind__chip${current === k.id ? ' is-selected' : ''}"
-                      data-kind="${k.id}" aria-pressed="${current === k.id ? 'true' : 'false'}">
-                ${k.label}
-              </button>
-            </li>`).join('')}
-        </ul>
-        <p class="cp-kind__note">
-          ${current
-            ? 'Just for today. Your arc picks up again tomorrow.'
-            : 'Ask for one and I\u2019ll build around it instead.'}
-        </p>
-      </details>`;
-  }
-
   function _arcLine() {
+    const said = purposeLine();
+    if (said) return `<p class=\"cp-preview-panel__arc\" role=\"note\">${said}</p>`;
+
     try {
       const arc = store.get('arc') || {};
       const ids = Array.isArray(arc.strands) ? arc.strands : [];

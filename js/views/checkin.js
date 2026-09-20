@@ -288,6 +288,11 @@ import { store }           from "../store.js";
 // DIC-FREE, 16 Sep 2026. The drop-in question is the FREE coach's
 // question. See _shouldAskVariety().
 import { isPremium }       from "../auth.js";
+// PURPOSE-ASK, 16 Sep 2026. The coach asks WHY today, then what would
+// help -- and recommends, rather than offering a menu. See
+// js/data/purpose.js.
+import { PURPOSES, formsFor, areaOptions, needsAreaQuestion,
+         recommendation, sessionTypeForForm, clearPurpose } from "../data/purpose.js";
 import { checkinData }     from "../data/checkin.js";
 import { resolveOpening }  from "../data/checkin-openings.js";
 import { CONDITIONS, getPainBand, soreAreaOptions } from "../data/conditions.js";
@@ -329,6 +334,12 @@ export function CheckinView(router) {
   // ── Mount ───────────────────────────────────────────────────────────────────
 
   function mount(container) {
+    // PURPOSE-ASK. Cleared at the START of every check-in, not carried.
+    // A purpose is a fact about today, like the check-in itself, and
+    // yesterday's reason as a default is the same class of fault as
+    // reading a proposal as a record.
+    clearPurpose();
+
     _container   = container;
     _conditions  = store.get("conditions") || [];
     _name        = (store.get("name") || "").split(" ")[0] || "";
@@ -884,6 +895,15 @@ export function CheckinView(router) {
       await _showVarietyBeat();   // continues to _showActionButtons() itself
       return;
     }
+
+    // PURPOSE-ASK. The Plan's version of the same moment: not "same or
+    // different", but "what is today FOR". Free keeps the drop-in
+    // question -- destination architecture §8, held by verify-decisions.
+    if (isPremium()) {
+      await _showPurposeBeat();   // continues to _showActionButtons() itself
+      return;
+      return;
+    }
     _showActionButtons();
   }
 
@@ -968,6 +988,126 @@ export function CheckinView(router) {
   function _shouldAskVariety() {
     if (isPremium()) return false;
     return SESSION_DOORS.includes(store.get("pendingDoorRoute")) && _hasRecentHistory();
+  }
+
+  // ── PURPOSE-ASK ─────────────────────────────────────────────────────
+
+  async function _showPurposeBeat() {
+    await _showCoachBubble("Last thing. What's today for?");
+    await new Promise(r => setTimeout(r, T.PANEL_DELAY));
+    _showChoicePanel(
+      "What today is for",
+      PURPOSES.map(p => ({ value: p.id, label: p.label, sub: p.sub })),
+      async (choice) => {
+        store.set("todayPurpose", choice.value);
+        _showUserBubble(choice.label);
+        await new Promise(r => setTimeout(r, T.PANEL_DELAY));
+
+        // Q1b, only when we do not already know -- see
+        // needsAreaQuestion(). Asking again when they answered three
+        // questions ago is the coach not listening.
+        if (needsAreaQuestion(choice.value)) return _showAreaBeat(choice.value);
+
+        // A niggle with exactly one flagged area: take it silently.
+        if (choice.value === "niggle") {
+          const scores = store.get("conditionPainScores") || {};
+          const only = (store.get("conditions") || []).filter(id => (scores[id] || 0) >= 4);
+          if (only.length === 1) store.set("todayPurposeArea", only[0]);
+        }
+        return _showFormBeat(choice.value);
+      }
+    );
+  }
+
+  async function _showAreaBeat(purposeId) {
+    await _showCoachBubble(purposeId === "niggle" ? "Whereabouts?" : "Which part of you?");
+    await new Promise(r => setTimeout(r, T.PANEL_DELAY));
+    _showChoicePanel(
+      "Which area",
+      areaOptions().map(a => ({ value: a.id, label: a.label, sub: "" })),
+      async (choice) => {
+        store.set("todayPurposeArea", choice.value);
+        _showUserBubble(choice.label);
+        await new Promise(r => setTimeout(r, T.PANEL_DELAY));
+        return _showFormBeat(purposeId);
+      }
+    );
+  }
+
+  /**
+   * Q2. A RECOMMENDATION, NOT A MENU.
+   *
+   * Graeme: "Coach should make a suggestion based on all the pain data
+   * etc... and these are gold marked."
+   *
+   * 🔴 With no evidence, rec is null and nothing is marked. The gold
+   * mark means "I have a reason" and must never mean "I have to pick
+   * something" -- on day one there is no flag history and no activity
+   * types, and inventing confidence there is the failure mode of every
+   * app this product exists as an alternative to.
+   */
+  async function _showFormBeat(purposeId) {
+    // "Just moving" has already answered this one.
+    if (purposeId === "gentle") {
+      store.set("requestedSessionType", "mobility");
+      return _showActionButtons();
+    }
+
+    const area = store.get("todayPurposeArea");
+    const rec  = recommendation(purposeId, area);
+
+    await _showCoachBubble(rec ? rec.reason : "What would help most today?");
+    await new Promise(r => setTimeout(r, T.PANEL_DELAY));
+
+    _showChoicePanel(
+      "What would help most",
+      formsFor(purposeId).map(f => ({
+        value: f.id, label: f.label, sub: "",
+        recommended: !!rec && rec.formId === f.id
+      })),
+      async (choice) => {
+        store.set("requestedSessionType", sessionTypeForForm(choice.value));
+        _showUserBubble(choice.label);
+        await new Promise(r => setTimeout(r, T.PANEL_DELAY));
+        _showActionButtons();
+      }
+    );
+  }
+
+  /**
+   * One panel builder for all three questions.
+   *
+   * The variety beat below keeps its own because it predates this and is
+   * FREE-ONLY -- section 8 surface, held by verify-decisions, and not
+   * worth touching to save a few lines.
+   */
+  function _showChoicePanel(ariaLabel, choices, onPick) {
+    const panel = _buildPanel(`
+      <div class="ci-choices" role="group" aria-label="${_esc(ariaLabel)}">
+        ${choices.map(c => `
+          <button type="button" class="ci-choice${c.recommended ? " ci-choice--rec" : ""}"
+                  data-choice="${_esc(c.value)}">
+            ${c.recommended ? `<span class="ci-choice__rec">Suggested</span>` : ""}
+            <span class="ci-choice__label">${_esc(c.label)}</span>
+            ${c.sub ? `<span class="ci-choice__sub">${_esc(c.sub)}</span>` : ""}
+          </button>
+        `).join("")}
+      </div>
+    `);
+
+    panel.querySelectorAll("[data-choice]").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        const choice = choices.find(c => String(c.value) === btn.dataset.choice);
+        if (!choice) return;
+        _closePanel(panel);
+        _fadePastBubbles();
+        await new Promise(r => setTimeout(r, REDUCED_MOTION ? 0 : 400));
+        await onPick(choice);
+      });
+    });
+
+    _openPanel(panel);
+    setTimeout(() => panel.querySelector("[data-choice]")?.focus({ preventScroll: true }), 150);
   }
 
   async function _showVarietyBeat() {
