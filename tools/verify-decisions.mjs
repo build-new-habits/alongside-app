@@ -144,6 +144,36 @@ check("No upgrade language inside a coach card", "Locked Principles P1/P2", () =
   }
 });
 
+// DIC-SIGNAL, 16 Sep 2026. Graeme asked for a line telling free users
+// the coach could do more in the Plan: "I can learn more what you need
+// and help you towards your goals in the Plan tier."
+//
+// P1 above blocks that inside a coach card, and the free drop-in
+// question IS one. Selling in the coach's voice, to somebody mid-habit
+// -- the question only fires with history inside 21 days, so it reaches
+// people already returning -- is the moment most likely to read as a
+// bait-and-switch rather than an offer.
+//
+// 🔴 The real fault was a PARITY one, in a different place. The free arc
+// invitation's aria-label has always said "About the arc, part of the
+// Plan". The visible text never did. A screen-reader user learned which
+// tier it belonged to; a sighted user tapped an invitation and landed on
+// an upgrade page with no warning.
+//
+// The tier is now NAMED there, and nowhere near the coach.
+check("The tier is named where a free user can see it", "WCAG 1.3.1 / DIC-SIGNAL", () => {
+  const t = read("js/views/today.js");
+  const i = t.indexOf('aria-label="About the arc, part of the Plan"');
+  ok(i !== -1, "the free arc invitation is gone or renamed; this check needs rereading");
+  const block = t.slice(i, i + 1600);
+  ok(/today-arc__tier/.test(block),
+     "the aria-label says which tier this is and the visible text does not \u2014 " +
+     "the same information must arrive by every route");
+  ok(!/upgrade now|subscri|free trial|only \u00a3/i.test(block),
+     "it names the tier; it does not argue for it. The invitation above is the " +
+     "argument, in the coach's own words");
+});
+
 console.log("\nP4 \u2014 the app may display load; the coach never interprets it");
 
 check("No delta, comparison or verdict language in the log", "Locked Principles P4", () => {
