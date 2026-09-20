@@ -1,32 +1,12 @@
 # Alongside: Move — Master Schedule
-## 16 Sep 2026 v373
+## 16 Sep 2026 v372
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v372.md`. Remove v372 on upload.
+Supersedes `master_schedule_v371.md`. Remove v371 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
 > **Live: `alongside-v527`, 164 gates, `store.js` v71, `Schema.md` v1.64, cold start blueprint v132.** Read that blueprint after this block.
->
-> ### 🔴 CARD-LOCAL — SCOPED 16 Sep, NOT BUILT. It is a content gap, not duplication.
->
-> **In plain terms, because that matters here: a morning session shows the exercise name, the sets and reps, and a coach note. Every other kind of session also shows how to do the movement, what to watch out for on that specific exercise, and how to make it easier or harder. So if a morning session gives somebody a movement they do not already know, the app tells them nothing about how to do it.**
->
-> It has been logged since 13 Sep as a renderer migration — a tidying job. **It is not.** `morning-session.js` renders **none** of `watchOut`, `instructions`, `adaptations`, `coaching`, `video` or `holdSeconds`.
->
-> 🔴 **Part of it is a safety gap and not merely a content one.** CARD-3's rule is that the exercise-specific hazards are never behind an interaction. On this screen they are not behind anything — **they are absent.** The universal hurt-and-ache block is there since `v512`; the *"gripping the rails rounds your back"* line is not. GATE-ALL and CARD-LOCAL's `v512` fix both covered the UNIVERSAL guidance and neither touched the per-exercise one.
->
-> ⚫ **THE RECOMMENDATION IS NOT TO MIGRATE THE VIEW. Migrate the CARD.** A full migration means rebuilding this view's block state machine around the four-page model, `currentCardPage`, the stepper and the timer wiring — a rewrite of a working view. Instead the local renderer keeps what is genuinely local (the block badge, the warmup/cardio/strength structure) and **calls the shared card for the exercise body**, rendered flattened the way "Show everything" already does. One implementation, no state-machine rewrite.
->
-> 🟡 **Device pass on a morning session FIRST.** It is the first thing all day worth seeing before changing, rather than after.
->
-> ---
->
-> ### 🟠 COMMUNICATION — noted 16 Sep, Graeme
->
-> *"I'm happy to go with your recommendation mainly because you describe technical stuff and names of things I don't know."*
->
-> **Agreement given on that basis is not agreement.** Product decisions today have been consistently good — the free question, the arc counting everything, capture as you go — and were made when the choice was put in terms of what happens on screen. **Lead with what the person sees and what changes for them; file names and IDs belong in the commit, not the conversation.**
 >
 > ### 🟢 DIC-SIGNAL — SHIPPED 16 Sep, `v527`. The message, in the place where it is fair.
 >
@@ -9468,4 +9448,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v373*
+*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v372*
