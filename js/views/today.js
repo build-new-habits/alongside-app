@@ -2034,7 +2034,33 @@ function _markGuidanceShown(root) {
                              data-route="saved-sessions" data-door-id="own"
                              data-requires-checkin="false"
                              aria-label="Your other ${saved.length - 1} saved session${saved.length - 1 === 1 ? '' : 's'}. Opens the full list.">Your other ${saved.length - 1} session${saved.length - 1 === 1 ? '' : 's'}</button>
-                   ` : ''}`
+                   ` : ''}
+                   <!--
+                     YOUR-OWN-CREATE, 16 Sep 2026. Graeme, on device:
+                     "How do I build my own?"
+
+                     He could not, from this room. "Build your first"
+                     existed ONLY in the empty branch below. The moment a
+                     first session was saved the button vanished and never
+                     came back, so a room whose entire purpose is sessions
+                     you put together yourself offered only Start and a
+                     list -- no way to put another one together.
+
+                     A one-branch affordance: correct on the day it was
+                     written, wrong from the second session onwards, and
+                     invisible to anyone who had ever saved one. The same
+                     shape as CARD-5's five views -- a thing that is true
+                     of the state it was authored in.
+
+                     Ghost rather than secondary: Start is the primary
+                     action here and this must not compete with it. The
+                     wording differs from the empty branch on purpose --
+                     "another" is accurate once one exists, and "Build
+                     your first" would be a small lie.
+                   -->
+                   <button class="btn btn-ghost btn-full club-room__go"
+                           data-route="session-builder" data-door-id="own"
+                           data-requires-checkin="false">Build another</button>`
         })
       : roomRow({
           id: 'own', title: 'Your own',
