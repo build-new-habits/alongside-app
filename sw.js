@@ -1,6 +1,16 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 16 Sep 2026 v527
+ *
+ * v527 - DIC-SIGNAL. views/today.js, layouts/today.css.
+ *
+ *   The free arc invitation's aria-label said "part of the Plan" and
+ *   its visible text did not, so a screen-reader user knew which tier
+ *   it was and a sighted user did not. Named now, quietly, on the
+ *   invitation -- and nowhere near the coach, because Locked Principles
+ *   P1/P2 keep selling out of the coach's voice.
+ *
  * 16 Sep 2026 v526
  *
  * v526 - CAPTURE-2. views/capture.js, components/capture.css.
@@ -3722,7 +3732,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v526";
+const CACHE_NAME = "alongside-v527";
 
 const SHELL_URLS = [
 
