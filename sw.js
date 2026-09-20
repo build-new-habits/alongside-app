@@ -1,6 +1,20 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 16 Sep 2026 v530
+ *
+ * v530 - ASK-KIND + EXIT-LOOP. store.js v72, Schema.md v1.65,
+ *   coach-proposal.js, today.js, six session views.
+ *
+ *   ASK-KIND: the coach never asked what kind of session somebody
+ *   wanted. requestedSessionType overrides the arc for one session.
+ *
+ *   EXIT-LOOP: "exit without saving" already went to Today; Home
+ *   re-routed straight back to the proposal. declinedProposalAt tells
+ *   "interrupted" from "no, not this one".
+ *
+ *   New gate: tools/verify-ask-kind.mjs. 165 gates.
+ *
  * 16 Sep 2026 v529
  *
  * v529 - BLANK-QUESTION. router.js v29.
@@ -3751,7 +3765,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v529";
+const CACHE_NAME = "alongside-v530";
 
 const SHELL_URLS = [
 
