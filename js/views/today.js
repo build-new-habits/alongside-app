@@ -2180,6 +2180,7 @@ function _markGuidanceShown(root) {
 
     const aim     = aimById(arc.aimId);
     const worked  = arc.zonesWorked || {};
+    const typesDone = arc.typesWorked || {};
     const strands = (arc.strands || []).map(id => ({
       label: (STRANDS[id] || {}).label,
       // A strand counts as touched when any zone it leans on has been
@@ -2194,8 +2195,27 @@ function _markGuidanceShown(root) {
       // history it did not earn is the same dishonesty as the sore-zone
       // marking, and it also robs day one of the thing that makes it
       // worth seeing: everything still ahead.
+      // ARC-EVERYTHING, 16 Sep 2026. TWO CHANNELS, because the strands
+      // are two kinds.
+      //
+      // 🔴 This asked only about ZONES. 18 of the 30 strands carry no
+      // zones at all -- they carry sessionTypes -- so [].some() was
+      // false forever and Trunk strength, Staying-power and Pacing
+      // yourself COULD NOT LIGHT, whatever anybody did. Graeme's first
+      // screenshot said "Trunk strength and Trusting your body again
+      // haven't come up yet" in a week he had done strength work. The
+      // arc was not behind; it could not see.
+      //
+      // Body strands still light from zones worked. Capability strands
+      // light from the type of session done. Either counts, and the
+      // startedAt guard is applied to both -- ARC-COVERAGE found a
+      // brand-new arc showing a strand already lit because of a session
+      // two days before it existed, and that must not come back through
+      // the new channel.
       lit: ((STRANDS[id] || {}).zones || [])
              .some(z => worked[z] && (!arc.startedAt || worked[z] >= arc.startedAt))
+        || ((STRANDS[id] || {}).sessionTypes || [])
+             .some(t => typesDone[t] && (!arc.startedAt || typesDone[t] >= arc.startedAt))
     })).filter(x => x.label);
 
     const notYet = strands.filter(x => !x.lit).map(x => x.label);

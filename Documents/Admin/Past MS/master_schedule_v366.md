@@ -1,33 +1,12 @@
 # Alongside: Move — Master Schedule
-## 16 Sep 2026 v367
+## 16 Sep 2026 v366
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v366.md`. Remove v366 on upload.
+Supersedes `master_schedule_v365.md`. Remove v365 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
-> **Live: `alongside-v522`, 162 gates, `store.js` v71, `Schema.md` v1.64, cold start blueprint v127.** Read that blueprint after this block.
->
-> ### 🔴 ARC-EVERYTHING — SHIPPED 16 Sep, `v522`. PROGRESS-ARC was not a redesign. The arc could not see.
->
-> Graeme: *"Absolutely everything should go towards progress 100%. I've turned up. That's number one. I've done a session. That's number two."*
->
-> **Ground-truthed before designing, and it changed the job entirely.** Two structural faults, neither visible in a source slice:
->
-> 1. 🔴 **`markZonesWorked()` had ONE caller in the whole app** — the stretch-zone picker in `session-builder-ui.js`. Every workout, core session, gym programme, class, walk and morning session marked **nothing**. The arc could only ever see stretching.
-> 2. 🔴 **`lit` asked only about ZONES, and 18 of 30 strands carry none.** They carry `sessionTypes`, which nothing read. `[].some()` is false forever, so **Trunk strength, Staying-power and Pacing yourself were incapable of lighting** whatever anybody did.
->
-> **Graeme's very first screenshot, five days ago, said *"Trunk strength and Trusting your body again haven't come up yet"* in a week he had done strength work. The arc was not behind. It could not see.** That screenshot was evidence of this bug and was read as a design question about the arc card.
->
-> ⚫ **Two channels, because the strands are genuinely two kinds.** Body strands light from the areas the movements worked (`affectsAreas` → zones via new `zonesForAreas()` in `data/aims.js`); capability strands light from the type of session done. Either counts. **Dates, never counts** — ARC-1's decision, kept: a strand is lit or it is not, a fact about the plan rather than a score.
->
-> ⚫ **Credited from `logActivity()`**, the single write path, after the dedupe check so a rejected duplicate credits nothing twice — and wrapped, because the log is the record and the arc is commentary on it. **Eleven views each remembering to call it is how `markZonesWorked()` ended up with one caller.**
->
-> ⚫ **First import ever added to `store.js`.** It has been import-free since it was written, which is worth keeping deliberately rather than by habit. `data/aims.js` imports nothing, so this closes no cycle, and the alternative was a **fourth** area-mapping table. One import beats one more table to keep in step.
->
-> 🟢 **`startedAt` guard applies to the new channel too.** ARC-COVERAGE found a brand-new arc showing a strand already lit from a session two days before it existed; TEST 3 asserts that cannot return through the new door. Unmapped areas are **dropped, not guessed at** — a strand lighting because something was loosely nearby is worse than it not lighting.
->
-> **Measured: one core session lights `back-resilience` and `trunk-strength`, and leaves the three it did not touch unlit.**
+> **Live: `alongside-v521`, 161 gates, `store.js` v70, `Schema.md` v1.63, cold start blueprint v126.** Read that blueprint after this block.
 >
 > ### 🔴 ALWAYS-CORE — SHIPPED 16 Sep, `v521`. The rotation never rotated.
 >
@@ -9376,4 +9355,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v367*
+*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v366*

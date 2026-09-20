@@ -1,5 +1,54 @@
 # Alongside — Data Schema Reference
-## 16 Sep 2026 v1.63
+## 16 Sep 2026 v1.64
+
+> **v1.64, 16 Sep 2026 — ARC-EVERYTHING.** New nested field
+> **`arc.typesWorked`** — `{ [sessionType]: "YYYY-MM-DD" }`, the
+> capability channel, parallel to the existing `arc.zonesWorked`.
+>
+> Graeme: *"Absolutely everything should go towards progress 100%. I've
+> turned up. That's number one. I've done a session. That's number two."*
+>
+> 🔴 **Two faults made that impossible, and both were structural.**
+>
+> 1. `markZonesWorked()` had **exactly one caller in the whole app** —
+>    the stretch-zone picker in `session-builder-ui.js`. Every workout,
+>    core session, gym programme, class, walk and morning session marked
+>    nothing. **The arc could only see stretching.**
+> 2. Today's `lit` asked only whether a strand's **zones** had been
+>    worked. **18 of 30 strands carry no zones** — they carry
+>    `sessionTypes` — so `[].some()` was false forever and Trunk
+>    strength, Staying-power and Pacing yourself were **incapable of
+>    lighting**, whatever anybody did. Graeme's first screenshot said
+>    *"Trunk strength and Trusting your body again haven't come up yet"*
+>    in a week he had done strength work. **The arc was not behind. It
+>    could not see.**
+>
+> ⚫ **Two channels, because the strands are genuinely two kinds.** Body
+> strands light from the areas the movements worked (`affectsAreas`
+> mapped to zones by `zonesForAreas()` in `data/aims.js`); capability
+> strands light from the type of session it was. Either counts.
+>
+> ⚫ **Dates, never counts** — ARC-1's decision, kept. A strand is lit or
+> it is not, which is a fact about the plan rather than a score.
+>
+> ⚫ **Written by `markSessionWorked()`, called from `logActivity()`** —
+> the single write path, after the dedupe check so a rejected duplicate
+> credits nothing twice. Eleven views each remembering to call it is how
+> `markZonesWorked()` ended up with one caller. Wrapped: a session must
+> be logged even if crediting the arc fails, because the log is the
+> record and the arc is commentary on it.
+>
+> ⚫ **Nested under `arc`**, so it shares the arc's lifecycle — a new arc
+> starts clean rather than inheriting credit from the one before it. The
+> `startedAt` guard applies to this channel too: ARC-COVERAGE found a
+> brand-new arc showing a strand already lit from a session two days
+> before it existed, and that must not return through a new door.
+>
+> **Contribution is computed from what was DONE, never from how the
+> session was created.** A session somebody built, one the coach
+> proposed, and one captured afterwards all count the same.
+
+> **v1.63, 16 Sep 2026
 
 > **v1.63, 16 Sep 2026 — ALWAYS-CORE.** No new field. **`store.js` v70
 > now does what this document already said it did.**
@@ -287,7 +336,7 @@
 
 ## 06 Sep 2026 v1.51
 
-**File:** `js/store.js` (confirmed live version: **v70, 16 Sep 2026**)
+**File:** `js/store.js` (confirmed live version: **v71, 16 Sep 2026**)
 
 > **v1.47, 06 Sep 2026 — CR-1.** `conditions[]` gains three ids and loses one. `chronic-fatigue` is **retired**; `persistent-fatigue`, `me-cfs` and `long-covid` replace it. No field shape changed — `conditions` is still `string[]` and `conditionMeta` is still keyed by condition id.
 >

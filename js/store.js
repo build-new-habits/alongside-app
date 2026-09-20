@@ -1,5 +1,19 @@
+import { zonesForAreas } from "./data/aims.js";
+
 /**
  * store.js - Data persistence layer
+ * 16 Sep 2026 v71
+ *
+ * v71 - ARC-EVERYTHING. arc.typesWorked, and markSessionWorked() called
+ *   from logActivity() so every session credits the arc.
+ *
+ *   FIRST IMPORT IN THIS FILE. store.js has been import-free since it
+ *   was written, and that is worth keeping on purpose rather than by
+ *   habit -- it is the leaf every other module depends on. data/aims.js
+ *   imports NOTHING, so this closes no cycle, and the alternative was a
+ *   fourth copy of an area-mapping table. One import beats one more
+ *   table to keep in step.
+ *
  * 16 Sep 2026 v70
  *
  * v70 - ALWAYS-CORE. logActivity() stamps sessionType onto the entry.
@@ -1195,6 +1209,11 @@ export const store = {
       generatedSession: saved.generatedSession || { session: null, builtAt: null, inputs: {} },
 
       guidanceShownAt: saved.guidanceShownAt || null,
+
+      // ARC-EVERYTHING. Capability strands, dated like zonesWorked.
+      // Nested under arc so it shares the arc's lifecycle: a new arc
+      // starts with a clean slate rather than inheriting credit from
+      // the one before it.
 
       // SAVE-HANDOFF. A malformed handoff is discarded rather than
       // coerced -- offering to save something unreadable is worse than
@@ -2797,6 +2816,75 @@ export const store = {
    * making coverage depend on finishing would quietly reintroduce
    * completion pressure through the back door.
    */
+  /**
+   * ARC-EVERYTHING, 16 Sep 2026. Everything counts towards the arc.
+   *
+   * Graeme: "Absolutely everything should go towards progress 100%...
+   * I've turned up. That's number one. I've done a session. That's
+   * number two."
+   *
+   * 🔴 TWO FAULTS MADE THAT IMPOSSIBLE, and both were structural.
+   *
+   *   1. markZonesWorked() had exactly ONE caller in the whole app --
+   *      the stretch-zone picker in session-builder-ui.js. Every
+   *      workout, core session, gym programme, class, walk and morning
+   *      session marked nothing. The arc could only see stretching.
+   *
+   *   2. `lit` on Today asks whether any of a strand's ZONES has been
+   *      worked. 18 of 30 strands carry NO zones -- they carry
+   *      sessionTypes instead. [].some() is false forever, so Trunk
+   *      strength, Staying-power and Pacing yourself were incapable of
+   *      lighting no matter what anybody did.
+   *
+   *      Graeme's first screenshot said "Trunk strength and Trusting
+   *      your body again haven't come up yet" in a week he had done
+   *      strength work. The arc was not behind. It could not see.
+   *
+   * ⚫ TWO CHANNELS, BECAUSE THE STRANDS ARE GENUINELY TWO KINDS. Body
+   * strands light from the areas the exercises worked; capability
+   * strands light from the type of session it was. Both are DATES, never
+   * counts -- a strand is lit or it is not, which is a fact about the
+   * plan rather than a score, and that decision is ARC-1's, kept.
+   *
+   * ⚫ CALLED FROM logActivity(), the single write path. Eleven views
+   * each remembering to call this is how markZonesWorked ended up with
+   * one caller in the first place.
+   *
+   * Contribution is computed from WHAT WAS DONE, never from how the
+   * session was created -- so a session somebody built themselves, one
+   * the coach proposed, and one captured afterwards all count the same.
+   */
+  markSessionWorked(session) {
+    if (!session) return;
+    const arc = this.get("arc") || {};
+    if (!arc.aimId) return;              // nothing to credit yet
+    const today = new Date().toISOString().split("T")[0];
+
+    // Capability strands: the type of session it was.
+    const type = session.sessionType || null;
+    if (type) {
+      const types = { ...(arc.typesWorked || {}) };
+      types[type] = today;
+      arc.typesWorked = types;
+    }
+
+    // Body strands: the areas its movements actually worked.
+    const areas = [];
+    for (const ex of (session.exercises || [])) {
+      for (const a of (ex && ex.affectsAreas) || []) {
+        if (!areas.includes(a)) areas.push(a);
+      }
+    }
+    const zones = zonesForAreas(areas);
+    if (zones.length) {
+      const worked = { ...(arc.zonesWorked || {}) };
+      for (const z of zones) worked[z] = today;
+      arc.zonesWorked = worked;
+    }
+
+    if (type || zones.length) this.set("arc", arc);
+  },
+
   markZonesWorked(zoneIds) {
     if (!Array.isArray(zoneIds) || !zoneIds.length) return;
     const arc   = this.get("arc") || {};
@@ -2884,6 +2972,24 @@ export const store = {
       ...entry,
       sessionType: _inferredType
     };
+
+    // ARC-EVERYTHING, 16 Sep 2026. Credit the arc here, at the single
+    // write path, so every door counts without each view remembering to.
+    // markZonesWorked() had ONE caller for exactly that reason.
+    //
+    // After the dedupe check above, so a rejected duplicate credits
+    // nothing twice. Wrapped: a session must be logged even if crediting
+    // the arc fails, because the log is the record and the arc is the
+    // commentary on it.
+    try {
+      const fin = this.get('lastFinishedSession');
+      const gen = this.get('generatedSession');
+      const src = (fin && fin.session) || (gen && gen.session) || null;
+      this.markSessionWorked({
+        sessionType: _inferredType,
+        exercises:   (src && src.exercises) || entry.exercises || []
+      });
+    } catch { /* the log is the record; the arc is commentary on it */ }
 
     // EMPTY-SESSION GUARD (11 Aug 2026). Graeme: "I opened a session and
     // without completing one session at all I exited. It saved it."
