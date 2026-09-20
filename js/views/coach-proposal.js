@@ -973,6 +973,7 @@ export function CoachProposalView(router) {
             Adapted for your check-in \u2014 pick the one that feels right.
           </p>
           ${_arcLine()}
+          ${_kindPicker()}
           <!--
             LOCATION-1, 08 Sep 2026. What the coach assumed, and a way to
             say otherwise.
@@ -1169,6 +1170,22 @@ export function CoachProposalView(router) {
     panel.querySelectorAll('[data-option-id]').forEach(card => {
       card.addEventListener('click', () => {
         selectedOptionId = card.dataset.optionId;
+        _rerenderPanel(container);
+      });
+    });
+
+    // ASK-KIND. Rebuilds, for the same reason LOCATION-1 rebuilds when an
+    // assumption changes: a proposal that no longer matches what it says
+    // it was built for is worse than one that never said.
+    //
+    // Tapping the chosen kind again clears it and the arc takes over
+    // once more -- an ask made by accident must be un-makeable.
+    panel.querySelectorAll('[data-kind]').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const id = chip.dataset.kind;
+        const now = store.get('requestedSessionType') || null;
+        store.set('requestedSessionType', now === id ? null : id);
+        selectedOptionId = null;
         _rerenderPanel(container);
       });
     });
@@ -1867,7 +1884,31 @@ export function CoachProposalView(router) {
     // it exists. Kept as one call site per path rather than one shared
     // wrapper, because the two paths shape their option objects
     // differently and a wrapper would have to know both.
-    const { sessionType, reason, inputs } = chooseSessionType();
+    // 🔴 ASK-KIND, 16 Sep 2026. THE PERSON GETS TO SAY.
+    //
+    // Graeme, Monday: "Perhaps asking the kind of session before
+    // check-in would be good. The type of session on offer. In the gym I
+    // might do core, strength, mobility and stretching."
+    //
+    // Graeme, Friday, for the third time: "Still only core. How does the
+    // coach know I want core and not cardio or strength?"
+    //
+    // It did not. It inferred from the arc and never asked. When it kept
+    // landing on core I fixed the ROTATION -- twice -- which was a real
+    // bug and never the thing he was asking for. The rotation also only
+    // advances on COMPLETED sessions, so somebody testing, or somebody
+    // who opens the app and changes their mind, sees the arc's first
+    // type forever.
+    //
+    // ⚫ A request OVERRIDES the arc rather than arguing with it. The arc
+    // still decides when nobody has said otherwise, which is the whole
+    // Plan promise. Saying "cardio" today does not edit the arc; it
+    // spends one session differently, and tomorrow the arc resumes.
+    const requested = store.get('requestedSessionType') || null;
+    const chosen = chooseSessionType();
+    const sessionType = requested || chosen.sessionType;
+    const reason      = requested ? 'asked-for' : chosen.reason;
+    const inputs      = { ...chosen.inputs, requestedSessionType: requested };
 
     // LOCATION-1, 08 Sep 2026. equipmentOverride was null here, which
     // falls back to the flat `equipment` field -- and
@@ -2109,6 +2150,49 @@ export function CoachProposalView(router) {
     const t = option && option.stretchTarget ? targetById(option.stretchTarget) : null;
     if (!t) return '';
     return `Ordered around ${t.label.toLowerCase()}, from your check-in.`;
+  }
+
+  /**
+   * ASK-KIND. Eight kinds, and the one in play marked.
+   *
+   * Below the cards, not above: the suggestion is still the coach's
+   * opening move and should be read first. This is the answer to "not
+   * today, thanks" -- which is a different question from "which of
+   * these three", and the cards already answer that one.
+   *
+   * "Gym" is left out, as in capture: it says WHERE, not what.
+   */
+  const KINDS = [
+    { id: 'full',     label: 'Full body' },
+    { id: 'upper',    label: 'Upper body' },
+    { id: 'lower',    label: 'Lower body' },
+    { id: 'core',     label: 'Core' },
+    { id: 'glute',    label: 'Glutes' },
+    { id: 'cardio',   label: 'Cardio' },
+    { id: 'mobility', label: 'Mobility' },
+    { id: 'stretch',  label: 'Stretch' }
+  ];
+
+  function _kindPicker() {
+    const current = store.get('requestedSessionType') || null;
+    return `
+      <details class="cp-kind"${current ? ' open' : ''}>
+        <summary class="cp-kind__summary">Something else today?</summary>
+        <ul class="cp-kind__list" role="group" aria-label="Ask for a kind of session">
+          ${KINDS.map(k => `
+            <li>
+              <button type="button" class="cp-kind__chip${current === k.id ? ' is-selected' : ''}"
+                      data-kind="${k.id}" aria-pressed="${current === k.id ? 'true' : 'false'}">
+                ${k.label}
+              </button>
+            </li>`).join('')}
+        </ul>
+        <p class="cp-kind__note">
+          ${current
+            ? 'Just for today. Your arc picks up again tomorrow.'
+            : 'Ask for one and I\u2019ll build around it instead.'}
+        </p>
+      </details>`;
   }
 
   function _arcLine() {

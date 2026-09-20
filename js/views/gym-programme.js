@@ -1326,6 +1326,7 @@ export function GymProgrammeView(router) {
       overlay.remove();
       dismountSessionGuard();
       cleanupSession();
+      store.set('declinedProposalAt', new Date().toISOString());
       router.navigate('today');
     });
   }
