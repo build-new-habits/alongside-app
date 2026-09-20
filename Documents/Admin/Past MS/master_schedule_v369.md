@@ -1,24 +1,12 @@
 # Alongside: Move — Master Schedule
-## 16 Sep 2026 v370
+## 16 Sep 2026 v369
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v369.md`. Remove v369 on upload.
+Supersedes `master_schedule_v368.md`. Remove v368 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
-> **Live: `alongside-v525`, 164 gates, `store.js` v71, `Schema.md` v1.64, cold start blueprint v130.** Read that blueprint after this block.
->
-> ### 🟢 ALIAS-ONE — SHIPPED 16 Sep, `v525`. They had already diverged.
->
-> Two tables answered *"what does a sore X cover"*: `AREA_ALIASES` in `session-rationale.js` and a copy in `stretch-target.js`, added when STRETCH-FOCUS was built.
->
-> 🔴 **By the time it was looked at they disagreed in one entry.** `session-rationale.js` maps achilles to `["calves", "achilles", "ankle-foot"]`; the copy had dropped `"achilles"`. **And "achilles" is a real `affectsAreas` value in the library** — so the two tables genuinely disagreed about which exercises load a flagged achilles. That is how the caution on a card and the preselection on a selector come to say different things about the same body on the same morning.
->
-> ⚫ **The merge was proven behaviour-identical BEFORE it was made, not after.** `impliedTarget()` maps aliases onto `TARGET_AREAS`, and "achilles" appears in **no** `TARGET_AREA` — so adding it to the stretch side changes nothing that can resolve. A de-duplication with zero behaviour change is the only kind worth doing to clinical surface without asking first. All six aliases verified to resolve to the same target before and after.
->
-> `session-rationale.js` owns it, because the `>= 4` threshold and `soreAreaLoaded()` already live there and the table is meaningless apart from them.
->
-> 🔴 **The no-third-copy check caught its own false positive first.** Matching on `"sciatica": [` flagged `data/muscle-search.js` — which is **not** a copy: it maps areas to the **words people type** ("shins", "plantar"), a different relationship that is correctly separate. **A detector that cannot tell two tables apart would have pushed somebody into merging things that should not be merged.** Tightened to the actual signature: a condition resolving to exercise *areas*.
+> **Live: `alongside-v524`, 164 gates, `store.js` v71, `Schema.md` v1.64, cold start blueprint v129.** Read that blueprint after this block.
 >
 > ### 🔴 INTENSITY-SPACE — SHIPPED 16 Sep, `v524`. The energy slider was decorative.
 >
@@ -9422,4 +9410,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v370*
+*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v369*

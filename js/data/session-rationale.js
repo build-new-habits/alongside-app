@@ -479,7 +479,34 @@ function _distinctPatterns(exercises) {
 
 // Condition ids and affectsAreas share most of their vocabulary. These are
 // the ones that do not line up by name.
-const AREA_ALIASES = {
+/**
+ * ALIAS-ONE, 16 Sep 2026. EXPORTED, so there is one of these.
+ *
+ * stretch-target.js carried a second copy for impliedTarget(), added
+ * when STRETCH-FOCUS was built. By the time STRETCH-VIA-COACH extracted
+ * that module the two had ALREADY DIVERGED in one entry: this table maps
+ * achilles to ["calves", "achilles", "ankle-foot"], the copy dropped
+ * "achilles".
+ *
+ * 🔴 That was not harmless-looking-but-harmless. "achilles" IS a real
+ * affectsAreas value in the library, so the two tables genuinely
+ * disagreed about which exercises load a flagged achilles. Two tables
+ * answering "what does a sore X cover" is how the caution on a card and
+ * the preselection on a selector come to say different things about the
+ * same body on the same morning.
+ *
+ * ⚫ THE MERGE IS BEHAVIOUR-IDENTICAL, and that was checked rather than
+ * assumed: impliedTarget() maps aliases onto TARGET_AREAS, and
+ * "achilles" appears in no TARGET_AREA, so adding it to the stretch side
+ * changes nothing that can resolve. A de-duplication with zero
+ * behaviour change is the only kind worth doing to clinical surface
+ * without asking first.
+ *
+ * This file stays the owner because it is where the >= 4 threshold and
+ * soreAreaLoaded() already live -- the alias table is meaningless apart
+ * from them.
+ */
+export const AREA_ALIASES = {
   "lower-back":        ["lower-back", "spine"],
   "upper-back":        ["upper-back", "thoracic"],
   "sciatica":          ["lower-back", "glutes", "hamstring", "piriformis"],

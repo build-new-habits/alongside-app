@@ -120,6 +120,62 @@ ok("2.5 only stretch-like sessions are touched",
    !isStretchLike({}),
    "a strength session has a target in a different sense and must not get this");
 
+console.log("\nTEST 2b — ALIAS-ONE: there is one alias table, not two");
+
+{
+  const sr = strip(read("js/data/session-rationale.js"));
+  const st = strip(read("js/stretch-target.js"));
+
+  ok("2b.1 session-rationale.js owns and exports it",
+     /export const AREA_ALIASES = \{/.test(sr),
+     "it owns it because the >= 4 threshold and soreAreaLoaded() live there; " +
+     "the table is meaningless apart from them");
+
+  ok("2b.2 stretch-target.js imports rather than declaring one",
+     /import \{ AREA_ALIASES \}/.test(st) && !/const ALIASES\s*=/.test(st),
+     "a second copy is how these two DIVERGED in the first place -- by 16 Sep " +
+     "they already disagreed about achilles");
+
+  ok("2b.3 REVERSAL: no third copy anywhere in js/", (() => {
+    const dirs = ["js", "js/views", "js/data"];
+    const copies = [];
+    for (const d of dirs) {
+      let files = [];
+      try { files = fs.readdirSync(new URL("../" + d + "/", import.meta.url)); } catch { continue; }
+      for (const f of files) {
+        if (!f.endsWith(".js") || (d === "js/data" && f === "session-rationale.js")) continue;
+        let t = ""; try { t = read(d + "/" + f); } catch { continue; }
+        // 🔴 The first form of this test matched on "sciatica": [ alone
+        // and flagged data/muscle-search.js, which is NOT a copy: it maps
+        // areas to the WORDS PEOPLE TYPE ("shins", "plantar"), a
+        // different relationship that is correctly separate. A detector
+        // that cannot tell two tables apart would have pushed somebody
+        // into merging things that should not be merged.
+        //
+        // The signature of THIS table is a condition resolving to
+        // exercise AREAS -- sciatica to glutes and hamstring.
+        if (/"sciatica":\s*\[[^\]]*"hamstring"/.test(t)) copies.push(d + "/" + f);
+      }
+    }
+    if (copies.length) console.log("      alias copies: " + copies.join(", "));
+    return copies.length === 0;
+  })());
+
+  ok("2b.4 the merged table still resolves every alias to a target", (() => {
+    const before = {
+      "lower-back": "back-hips", "sciatica": "back-hips", "achilles": "legs",
+      "shin-splints": "legs", "wrist-elbow": "shoulders", "it-band": "back-hips"
+    };
+    for (const [cond, expected] of Object.entries(before)) {
+      store.set("conditions", [cond]);
+      store.set("conditionPainScores", { [cond]: 5 });
+      if (impliedTarget() !== expected) return false;
+    }
+    return true;
+  })(), "the merge was checked as behaviour-identical before it was made; this " +
+        "keeps it that way");
+}
+
 console.log("\nTEST 3 — the properties the sort must keep");
 
 ok("3.1 nothing is dropped", (() => {
