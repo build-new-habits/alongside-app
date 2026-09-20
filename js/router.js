@@ -1,5 +1,14 @@
 /**
  * router.js
+ * 16 Sep 2026 v29
+ *
+ * v29 - BLANK-QUESTION. The blank check asks whether the container is
+ *   EMPTY, not whether it has text. v27 asked about text immediately;
+ *   v28 asked about text 800ms later; check-in writes its markup at
+ *   once but its first WORDS arrive up to two and a half seconds in, so
+ *   v28 failed too. A bigger number would have been a better guess.
+ *   The question was wrong, not the timing.
+ *
  * 16 Sep 2026 v28
  *
  * v28 - BLANK-TIMING. v27's empty-render check ran immediately after
@@ -575,15 +584,28 @@ export const router = {
       // try/catch below has long since exited -- it calls the same
       // recovery path directly.
       //
-      // textContent, not innerHTML: a container holding only a wrapper
-      // div is still an empty screen to the person looking at it.
+      // 🔴 AND IT ASKS ABOUT MARKUP, NOT TEXT -- the second correction to
+      // this check in one day, and the first two were both guesses.
+      //
+      // v27 asked "is there text" immediately. v28 asked the same
+      // question 800ms later. Check-in writes its markup AT ONCE -- 484
+      // characters of thread shell -- but the coach's first WORDS arrive
+      // between one and two and a half seconds, like a real message. So
+      // it still failed, and chasing it with a bigger number would only
+      // have been a better guess.
+      //
+      // The question was wrong. A container holding half a kilobyte of
+      // structure is not blank; it is a view mid-render. The failure
+      // this check exists for is a container with NOTHING in it, which
+      // is what Graeme photographed.
+      //
+      // So: is the container empty. Text may take as long as it likes.
       const _blankCheckFor = viewName;
       setTimeout(() => {
         // Somebody may have navigated on in the meantime; only judge the
         // view that is still there.
         if (this.currentView !== _blankCheckFor) return;
-        const painted = (container.textContent || '').trim().length > 0
-                     || container.querySelector('img, svg, canvas, input, button');
+        const painted = (container.innerHTML || '').trim().length > 0;
         if (!painted) this._recover(container, viewName,
           new Error(`View "${viewName}" rendered nothing`));
       }, 800);

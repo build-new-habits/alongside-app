@@ -103,18 +103,32 @@ ok("2.1d both paths use ONE recovery routine",
    "two recovery screens would drift, and one of them is the screen somebody " +
    "sees when everything else has already gone wrong");
 
-ok("2.2 the check reads TEXT, not markup", (() => {
-  const i = router.indexOf("rendered nothing");
-  const body = router.slice(Math.max(0, i - 600), i);
-  return /textContent/.test(body);
-})(), "a container holding only an empty wrapper div is still a blank screen " +
-      "to the person looking at it");
+// 🔴 CORRECTED TWICE IN ONE DAY, AND BOTH EARLIER VERSIONS WERE GUESSES.
+//
+// v27 asked "is there TEXT" immediately after mount. v28 asked the same
+// question 800ms later. check-in writes its markup AT ONCE -- 484
+// characters of thread shell -- but the coach's first WORDS arrive
+// between one and two and a half seconds, like a real message. So v28
+// failed too, and a bigger number would only have been a better guess.
+//
+// The question was wrong, not the timing. A container holding half a
+// kilobyte of structure is not blank; it is a view mid-render. The
+// failure this exists for is a container with NOTHING in it.
+ok("2.2 the check asks whether the container is EMPTY, not whether it has text",
+   /innerHTML \|\| ''\)\.trim\(\)\.length > 0/.test(router),
+   "asking about text fails any view whose content arrives progressively, and " +
+   "check-in is one");
 
-ok("2.3 and allows a view that is legitimately image-only", (() => {
+ok("2.2a REVERSAL: it no longer reads textContent for this",
+   !/textContent \|\| ''\)\.trim\(\)\.length > 0\s*\n?\s*\|\|/.test(router),
+   "the text-based form is the version that broke check-in");
+
+ok("2.3 the check is deferred AND asks about markup, so both corrections hold", (() => {
   const i = router.indexOf("rendered nothing");
-  const body = router.slice(Math.max(0, i - 600), i);
-  return /img|svg|canvas|input|button/.test(body);
-})(), "a screen can be a chart or a single control and still not be empty");
+  const body = router.slice(Math.max(0, i - 1200), i);
+  return /setTimeout/.test(body) && /innerHTML/.test(body) && !/textContent/.test(body);
+})(), "structure without text yet is exactly the state check-in is in at 300ms, " +
+      "and either correction alone still fails it");
 
 console.log("\nTEST 3 — the way out always works");
 
