@@ -1,0 +1,152 @@
+/* ============================================================
+   CAPTURE — build as you go, or log what you just did
+   css/components/capture.css
+   16 Sep 2026 v1
+
+   Standing at a machine. Everything here is sized for a thumb
+   and a glance, not for browsing.
+   ============================================================ */
+
+.capture-view { padding-bottom: var(--space-8); }
+
+/* Focused on open, so the first thing somebody can do is type. */
+.cap-search {
+  width: 100%;
+  min-height: 52px;
+  margin-bottom: var(--space-2);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md, 8px);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-family: inherit;
+  font-size: var(--text-base);
+}
+
+.cap-search:focus-visible {
+  outline: 3px solid var(--color-focus, var(--color-primary));
+  outline-offset: 2px;
+}
+
+/* Always present so the count is announced by the text changing
+   rather than by the element appearing, and the space is
+   reserved so results do not jump under a thumb. */
+.cap-status {
+  min-height: 1.25rem;
+  margin: 0 0 var(--space-3);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.cap-heading {
+  margin: var(--space-5) 0 var(--space-2);
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+}
+
+.cap-results, .cap-areas, .cap-done { margin: 0; padding: 0; list-style: none; }
+
+/* TWO TARGETS, ONE ROW. The name walks the card; "Just log it"
+   skips to the note. Both are real buttons at 48px, because
+   this row is the whole feature and a mis-tap here means
+   walking four pages you did not want. WCAG 2.5.8. */
+.cap-result {
+  display: flex;
+  align-items: stretch;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+.cap-result__name {
+  flex: 1;
+  min-height: 52px;
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md, 8px);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-family: inherit;
+  font-size: var(--text-base);
+  text-align: left;
+  cursor: pointer;
+}
+
+/* Quieter, and narrower: the card-walk is the fuller answer and
+   should read as the main one. Not a colour-only distinction --
+   the border and the width differ too (1.4.1). */
+.cap-result__log {
+  flex: none;
+  min-height: 52px;
+  padding: 0 var(--space-3);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-md, 8px);
+  background: none;
+  color: var(--color-text-muted);
+  font-family: inherit;
+  font-size: var(--text-sm);
+  cursor: pointer;
+}
+
+.cap-result__name:focus-visible,
+.cap-result__log:focus-visible,
+.cap-area:focus-visible,
+.cap-done__remove:focus-visible {
+  outline: 3px solid var(--color-focus, var(--color-primary));
+  outline-offset: 2px;
+}
+
+.cap-areas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.cap-area {
+  min-height: 48px;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: none;
+  color: var(--color-text);
+  font-family: inherit;
+  font-size: var(--text-sm);
+  cursor: pointer;
+}
+
+.cap-done__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  min-height: 48px;
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--color-border);
+  font-size: var(--text-base);
+  color: var(--color-text);
+}
+
+.cap-done__remove {
+  min-height: 44px;
+  padding: 0 var(--space-2);
+  border: none;
+  background: none;
+  color: var(--color-primary);
+  font-family: inherit;
+  font-size: var(--text-sm);
+  cursor: pointer;
+}
+
+.cap-empty, .cap-empty-note {
+  margin: var(--space-4) 0;
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--color-text-muted);
+}
+
+#cap-finish { margin-top: var(--space-5); }
+
+@media (prefers-contrast: more) {
+  .cap-search, .cap-result__name, .cap-result__log, .cap-area { border-width: 2px; }
+}

@@ -1,30 +1,12 @@
 # Alongside: Move — Master Schedule
-## 16 Sep 2026 v368
+## 16 Sep 2026 v367
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v367.md`. Remove v367 on upload.
+Supersedes `master_schedule_v366.md`. Remove v366 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
-> **Live: `alongside-v523`, 163 gates, `store.js` v71, `Schema.md` v1.64, cold start blueprint v128.** Read that blueprint after this block.
->
-> ### 🟢 CAPTURE-1 — SHIPPED 16 Sep, `v523`. The last item on the list.
->
-> Graeme: *"I'm in the gym, I did a thing, record it"* — and the other half, *"I'm in the gym (or at home) I want to do..... I'll guide you. But the selection needs to be quick and easy so a user can go: machine, lat pull downs, select, trigger cards."*
->
-> ⚫ **ONE FEATURE, TWO DOORS, NOT TWO FEATURES.** Same running session either way; the only difference is whether you pick the movement before or after. Graeme's own framing decided the shape — *"I'm at the machine, do I know it or do I not, do I need coaching or do I not"* — so the **picker result carries both answers**: tap the name to walk the card, tap "just log it" to land in the list. Chosen per exercise, in the moment. **No mode**, because a mode would satisfy "capture exists" and fail the person standing at the machine.
->
-> **The selection IS the feature.** One text field focused on open; recents underneath (in a gym you repeat yourself); body areas as the fallback. ⚫ The search is **not new** — `searchByTerm()` already matches names and muscles, built for mid-session swap. A second search would drift from it, and SAVE-ALL is one day old for exactly that reason.
->
-> 🔴 **It counts in full.** Graeme, asked whether a captured session should count as much as a proposed one: *"I'd say full too."* It writes `lastFinishedSession` and calls `logActivity()` like everything else, so ARC-EVERYTHING credits it without knowing which door it came from — which **is** the rule: contribution computed from what was done, never from how the session was created. ⚫ `sessionType` is **not invented**: a captured set of movements is not one of the builder's eight types, and claiming one would light a strand nothing earned. The body channel still credits from the areas the movements work.
->
-> ⚫ **The safety gate is load-bearing here in a way it is not elsewhere.** Every other session has a known list, so the gate fires before exercise 1 of something planned. A capture session has no list until somebody makes one, so the gate is the only thing standing before the first movement.
->
-> 🔴 **Fourth dead-branch catch of the day.** `exerciseHistory` is a **map** `{ [id]: { n, first, last, best } }`, not an array — deliberately, so selection can ask "how often, how recently" without scanning thousands of entries on a phone. The first draft walked it backwards as an array and would have shown an empty Recent list for every user forever. Caught by reading `store.js`, not by a test.
->
-> ⚫ **Lives in Your own, not a fifth room on Home.** Four card grammars was the CLUB v1 lesson. `verify-capture` 5.3 pins the room row itself — counting `roomRow()` calls was tried first and is the wrong proxy, because the Your own room has two branches and seven calls produce four rooms.
->
-> 🟡 **Not built, and worth knowing:** a captured session with no movements at all — a walk logged afterwards — credits nothing, because it has neither a type nor areas. The optional "anything in particular?" question discussed with Graeme would close that. Logged as **CAPTURE-2**.
+> **Live: `alongside-v522`, 162 gates, `store.js` v71, `Schema.md` v1.64, cold start blueprint v127.** Read that blueprint after this block.
 >
 > ### 🔴 ARC-EVERYTHING — SHIPPED 16 Sep, `v522`. PROGRESS-ARC was not a redesign. The arc could not see.
 >
@@ -9394,4 +9376,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v368*
+*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v367*
