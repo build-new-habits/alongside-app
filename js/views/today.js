@@ -2176,6 +2176,31 @@ function _markGuidanceShown(root) {
             Tell me what you want to be able to do, and I'll hold it and work
             towards it with you.
           </span>
+          <!--
+            DIC-SIGNAL, 16 Sep 2026. Say which tier this is, in the place
+            where saying it is fair.
+
+            Graeme wanted a line telling free users the coach could do
+            more in the Plan. Locked Principles P1/P2 -- the coach never
+            sells -- blocks that inside a coach card, and the free
+            drop-in question IS one. Selling in the coach's voice, to
+            somebody mid-habit, is the moment most likely to read as a
+            bait-and-switch rather than an offer.
+
+            🔴 BUT THERE WAS A REAL FAULT HERE, AND IT IS A PARITY ONE.
+            The aria-label on this button has always said "About the
+            arc, part of the Plan". The visible text never did. So a
+            screen-reader user learned which tier this belonged to and a
+            sighted user did not -- they tapped an invitation and landed
+            on an upgrade page with no warning. WCAG 2.2 AA 1.3.1: the
+            same information, by every route.
+
+            So the line names the tier and stops. It does not argue for
+            it. The invitation above is already the argument, in the
+            coach's own words, and it is better than anything a sales
+            line would add.
+          -->
+          <span class="today-arc__tier">Part of the Plan</span>
         </button>`;
     }
 

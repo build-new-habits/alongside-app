@@ -1,24 +1,12 @@
 # Alongside: Move — Master Schedule
-## 16 Sep 2026 v372
+## 16 Sep 2026 v371
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v371.md`. Remove v371 on upload.
+Supersedes `master_schedule_v370.md`. Remove v370 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
-> **Live: `alongside-v527`, 164 gates, `store.js` v71, `Schema.md` v1.64, cold start blueprint v132.** Read that blueprint after this block.
->
-> ### 🟢 DIC-SIGNAL — SHIPPED 16 Sep, `v527`. The message, in the place where it is fair.
->
-> Graeme wanted free users told the coach could do more: *"I think it's generous, and advertising at the premium level. Might be worth having a quiet line like 'I can learn more what you need and help you towards your goals in the Plan tier'."*
->
-> 🔴 **That line was declined where he suggested it, and `verify-decisions` names the reason.** **Locked Principles P1/P2 — the coach never sells** — is asserted directly against `checkin.js`, and the free drop-in question **is** a coach card. The question only fires with history inside 21 days, so it reaches people **already returning**: selling to somebody mid-habit, in the coach's voice, is the moment most likely to read as a bait-and-switch rather than an offer. The free tier's one coach gesture works *because* nothing is attached to it.
->
-> 🔴 **But there was a real fault, in a different place, and it is a parity one.** The free arc invitation's `aria-label` has always said *"About the arc, part of the Plan"*. **The visible text never did.** So a screen-reader user learned which tier it belonged to and a sighted user did not — they tapped an invitation and landed on an upgrade page with no warning. **WCAG 2.2 AA 1.3.1: the same information, by every route.**
->
-> The tier is now named there — *"Part of the Plan"*, quiet, small, uppercase — and nowhere near the coach. ⚫ **It labels; it does not argue.** The invitation above it is already the argument, in the coach's own words: *"Tell me what you want to be able to do, and I'll hold it and work towards it with you."* A sales line would add nothing to that and would cost the one moment where free feels like being looked after.
->
-> 🟢 **Recorded in `verify-decisions`**, with an assertion that the tier stays named there and that no selling language joins it. The reasoning for declining the coach-card version is written down, so the next session does not re-open it — the DIC-TIER lesson, applied in advance for once.
+> **Live: `alongside-v526`, 164 gates, `store.js` v71, `Schema.md` v1.64, cold start blueprint v131.** Read that blueprint after this block.
 >
 > ### 🟢 CAPTURE-2 — SHIPPED 16 Sep, `v526`. Asking is not inventing.
 >
@@ -9448,4 +9436,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v372*
+*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v371*
