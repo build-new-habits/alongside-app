@@ -1,6 +1,15 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 16 Sep 2026 v526
+ *
+ * v526 - CAPTURE-2. views/capture.js, components/capture.css.
+ *
+ *   A captured session credited the body channel only, so it could
+ *   never light a capability strand -- 18 of the 30 in the library. One
+ *   optional question at the end, "What was this, roughly?", makes the
+ *   answer the person's rather than a guess.
+ *
  * 16 Sep 2026 v525
  *
  * v525 - ALIAS-ONE. data/session-rationale.js, stretch-target.js.
@@ -3713,7 +3722,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v525";
+const CACHE_NAME = "alongside-v526";
 
 const SHELL_URLS = [
 
