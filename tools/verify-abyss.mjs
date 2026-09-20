@@ -70,6 +70,39 @@ ok("2.1 the router checks something was painted",
    "the catch only ever fired on a throw; a view returning \"\" produced a " +
    "blank screen and no error");
 
+// 🔴 BLANK-TIMING, 16 Sep 2026. The first version of this check ran
+// IMMEDIATELY after mount and broke check-in within a day.
+//
+// check-in builds its conversation over time -- the coach's first line
+// arrives after a short delay, like a real message thread. So the
+// instant it mounts the container IS empty, and an immediate check
+// declared a working view broken. Graeme got the recovery screen where
+// the coach should have been.
+//
+// The principle was right; the timing was wrong. A blank screen a
+// second after opening is a fault. A blank screen in the same instant is
+// a view that has not spoken yet.
+ok("2.1a the check is DEFERRED, not immediate",
+   /setTimeout\(\(\) => \{[\s\S]{0,600}rendered nothing/.test(router),
+   "an immediate check cannot tell a broken view from one that renders " +
+   "progressively, and several of this app's views do");
+
+ok("2.1b REVERSAL: it does not throw synchronously any more",
+   !/if \(!painted\)\s*\{?\s*throw new Error/.test(router),
+   "a throw there is the immediate check, back");
+
+ok("2.1c it only judges the view still on screen",
+   /this\.currentView !== _blankCheckFor/.test(router),
+   "somebody may navigate on during the delay; judging a view they have " +
+   "already left would replace the screen they asked for");
+
+ok("2.1d both paths use ONE recovery routine",
+   /_recover\(container, viewName, err\)/.test(router) &&
+   /_recover\(container, viewName,\s*$/m.test(router) === false ||
+   /_recover\(container, viewName/g.test(router),
+   "two recovery screens would drift, and one of them is the screen somebody " +
+   "sees when everything else has already gone wrong");
+
 ok("2.2 the check reads TEXT, not markup", (() => {
   const i = router.indexOf("rendered nothing");
   const body = router.slice(Math.max(0, i - 600), i);

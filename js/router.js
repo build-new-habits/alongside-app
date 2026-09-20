@@ -1,5 +1,12 @@
 /**
  * router.js
+ * 16 Sep 2026 v28
+ *
+ * v28 - BLANK-TIMING. v27's empty-render check ran immediately after
+ *   mount and broke check-in, which builds its conversation over time.
+ *   Deferred, guarded on the view still being current, and recovery
+ *   extracted into _recover() so both paths share one routine.
+ *
  * 16 Sep 2026 v27
  *
  * v27 - ABYSS. Graeme, on device: "I exited without saving and got stuck
@@ -548,22 +555,57 @@ export const router = {
       }
 
       // ABYSS 2. An empty render is a failure, and used to be silence.
-      // Checked AFTER mounting so it catches both patterns: a factory
-      // that mounts nothing, and a render() that returns "".
+      //
+      // 🔴 CHECKED LATE, NOT IMMEDIATELY -- and the first version of this
+      // got that wrong and broke check-in within a day.
+      //
+      // check-in builds its conversation over time: the coach's first
+      // line arrives after a short delay, the way a real message thread
+      // does. So the instant it mounts the container IS empty, and an
+      // immediate check declared a working view broken. Graeme, on
+      // device: "This is me doing a check in" -- with the recovery
+      // screen instead of the coach.
+      //
+      // The principle was right and the timing was wrong. A blank screen
+      // a second after opening is a fault. A blank screen in the same
+      // instant is a view that has not spoken yet.
+      //
+      // So: one frame plus a beat, and if it is still blank THEN report.
+      // Deferred rather than thrown, because by the time it fires the
+      // try/catch below has long since exited -- it calls the same
+      // recovery path directly.
       //
       // textContent, not innerHTML: a container holding only a wrapper
       // div is still an empty screen to the person looking at it.
-      const painted = (container.textContent || '').trim().length > 0
-                   || container.querySelector('img, svg, canvas, input, button');
-      if (!painted) {
-        throw new Error(`View "${viewName}" rendered nothing`);
-      }
+      const _blankCheckFor = viewName;
+      setTimeout(() => {
+        // Somebody may have navigated on in the meantime; only judge the
+        // view that is still there.
+        if (this.currentView !== _blankCheckFor) return;
+        const painted = (container.textContent || '').trim().length > 0
+                     || container.querySelector('img, svg, canvas, input, button');
+        if (!painted) this._recover(container, viewName,
+          new Error(`View "${viewName}" rendered nothing`));
+      }, 800);
 
       container.setAttribute('tabindex', '-1');
       container.focus({ preventScroll: false });
       setTimeout(() => container.removeAttribute('tabindex'), 100);
 
     } catch (err) {
+      this._recover(container, viewName, err);
+    }
+  },
+
+  /**
+   * ABYSS. The way out, wherever the failure came from.
+   *
+   * Shared by the mount catch and the deferred blank check, so both
+   * produce the same screen with the same working button rather than two
+   * recovery paths that can drift.
+   */
+  _recover(container, viewName, err) {
+    {
       console.error(`Router: failed to mount view "${viewName}"`, err);
 
       // Reported with the path that led here, so the next one arrives
