@@ -394,7 +394,11 @@ export function renderExerciseCard(exercise, opts = {}) {
   if (!exercise) return "";
   const p    = opts.idPrefix || "xcard";
   const page = PAGES.some(x => x.key === opts.page) ? opts.page : "decide";
-  const full = _fullAlways();
+  // CARD-LOCAL, 16 Sep 2026. morning-session.js renders one screen per
+  // movement with no page model, so it asks for the flattened card --
+  // the same shape "Show everything" already produces. Opt-in, so no
+  // existing caller changes.
+  const full = _fullAlways() || opts.full === true;
 
   const caution  = bodyCaution(exercise);
 

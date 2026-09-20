@@ -458,12 +458,29 @@ console.log("\nTEST 11 — the players, and that there are exactly four of them"
   ok("11.1a the four full consumers use renderExerciseCard()",
      FULL.every(f => /renderExerciseCard/.test(fs.readFileSync(`js/views/${f}`, "utf8"))));
 
-  ok("11.1b morning-session.js takes the SAFETY BLOCK ONLY, not the card", (() => {
+  // CARD-LOCAL, 16 Sep 2026. THIS FIRED, EXACTLY AS IT SAID IT WOULD.
+  //
+  // It read: "if it now imports the card itself, this is a migration and
+  // test 11.2 below needs rewriting rather than passing by accident."
+  // That day is today, and coming back to read it is how the migration
+  // got done properly instead of by half.
+  //
+  // morning-session.js now borrows the shared card for the MOVEMENT
+  // BODY, flattened, while keeping its own renderer for the screen
+  // around it -- the block badge and the warmup/cardio/strength shape,
+  // which are genuinely local. Two jobs, two names, aliased on import so
+  // neither shadows the other.
+  ok("11.1b morning-session.js borrows the BODY, and keeps its own screen", (() => {
     const t = fs.readFileSync("js/views/morning-session.js", "utf8");
-    return /import \{ hurtBlock \}/.test(t) &&
-           !/renderExerciseCard\s*\}?\s*from\s*"\.\.\/exercise-card\.js"/.test(t);
-  })(), "if it now imports the card itself, this is a migration and test 11.2 " +
-        "below needs rewriting rather than passing by accident");
+    return /renderExerciseCard as renderSharedBody/.test(t) &&
+           /function renderExerciseCard\(ex, session\)/.test(t);
+  })(), "either it has stopped borrowing the body, or its own renderer is " +
+        "gone -- and the second would mean the block structure went with it");
+
+  ok("11.1b-2 it asks for the FLATTENED card, because it has no page model",
+     /full: true/.test(fs.readFileSync("js/views/morning-session.js", "utf8")),
+     "a four-page card on a one-screen-per-movement view would show one " +
+     "quarter of the guidance and hide the rest behind pages that do not exist");
 
   ok("11.1c REVERSAL: CR-5 is actually closed there -- the block reaches the card", (() => {
     const t = fs.readFileSync("js/views/morning-session.js", "utf8");
