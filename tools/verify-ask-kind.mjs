@@ -75,8 +75,13 @@ ok("1.2 REVERSAL: the picker itself is gone",
 
 ok("1.3 the field is set by the check-in now, not a link on the proposal", (() => {
   const checkin = fs.readFileSync(new URL("../js/views/checkin.js", import.meta.url), "utf8");
-  return /store\.set\("requestedSessionType", sessionTypeForForm/.test(checkin);
-})());
+  // AROUND-AREA, 16 Sep 2026. The call now spans two lines and passes
+  // the AREA, because "build strength around it" has to know WHAT it is
+  // working around. Asserted on the call, not its formatting.
+  return /store\.set\("requestedSessionType",[\s\S]{0,120}sessionTypeForForm\(/.test(checkin) &&
+         /sessionTypeForForm\(\s*choice\.value,[\s\S]{0,80}todayPurposeArea/.test(checkin);
+})(), "the area must reach the mapping, or 'around it' builds a full-body " +
+      "session and the coach contradicts its own advice");
 
 console.log("\nTEST 2 — a request does not edit the arc");
 {

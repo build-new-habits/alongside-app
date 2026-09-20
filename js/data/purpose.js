@@ -112,7 +112,59 @@ const FORM_TO_SESSION_TYPE = {
   cardio: "cardio", gentle: "mobility"
 };
 
-export function sessionTypeForForm(formId) {
+/**
+ * 🔴 AROUND-AREA, 16 Sep 2026. "Build strength AROUND it" has to mean
+ * something.
+ *
+ * Found by tracing the whole chain rather than by a test: somebody
+ * flags a sore lower back three times, the coach says "I'd build
+ * strength around it rather than work it directly" -- and then handed
+ * them FULL BODY, which loads the back like everything else.
+ *
+ * ⚫ THE ADVICE WAS RIGHT AND THE SESSION DID NOT FOLLOW IT, which is
+ * worse than not giving the advice. A coach that contradicts itself in
+ * two screens is the thing this product exists to not be.
+ *
+ * "Around" means: load the chain that SUPPORTS the sore area, without
+ * loading the area itself. For a back that is the posterior chain --
+ * glutes and hamstrings doing the work so the back does not have to,
+ * which is what the reason text already promises.
+ *
+ * 🟠 FOR THE CLINICAL REVIEWER. This mapping is movement reasoning, not clinical
+ * prescription, and it is the kind of thing a physiotherapist should
+ * read before beta. It is deliberately coarse: four buckets, no
+ * condition-specific protocols, and no claim beyond "work near it, not
+ * on it". Logged as AROUND-REVIEW.
+ */
+const AROUND_BY_AREA = {
+  // A sore back: posterior chain takes the load instead.
+  "lower-back": "glute", "spine": "glute", "upper-back": "glute",
+  "thoracic": "glute", "back-hips": "glute", "sciatica": "glute",
+
+  // Sore hips or glutes: trunk work, off the hips.
+  "hip": "core", "hip-flexor": "core", "glutes": "core",
+  "piriformis": "core", "adductors": "core",
+
+  // Sore legs: trunk again -- there is nowhere lower to go.
+  "hamstring": "core", "quadriceps": "core", "knee": "core",
+  "calves": "core", "ankle-foot": "core", "legs": "core",
+
+  // Sore upper body: work the legs instead.
+  "shoulder": "lower", "rotator-cuff": "lower", "wrist-elbow": "lower",
+  "chest-pecs": "lower", "shoulders": "lower"
+};
+
+export function sessionTypeForForm(formId, areaId) {
+  if (formId === "around" && areaId) {
+    // Direct hit, then the coarse target it belongs to.
+    if (AROUND_BY_AREA[areaId]) return AROUND_BY_AREA[areaId];
+    const target = TARGET_AREAS.find(t => t.id === areaId);
+    if (target) {
+      const hit = target.areas.find(a => AROUND_BY_AREA[a]);
+      if (hit) return AROUND_BY_AREA[hit];
+    }
+    // Unknown area: fall through rather than guess at a body part.
+  }
   return FORM_TO_SESSION_TYPE[formId] || null;
 }
 
@@ -155,6 +207,19 @@ export function areaOptions() {
 }
 
 function _words(id) { return String(id || "").replace(/-/g, " "); }
+
+/**
+ * An area's name as a person would say it.
+ *
+ * A coarse target has a LABEL ("Back and hips") and an id
+ * ("back-hips"). Hyphen-stripping the id gives "back hips", which is
+ * the app reading its own filing system aloud. Conditions have no
+ * label, so those fall back to the id, which is already readable.
+ */
+function _areaWords(id) {
+  const t = TARGET_AREAS.find(x => x.id === id);
+  return t ? t.label.toLowerCase() : _words(id);
+}
 
 /**
  * The name the person used, not the bucket the app sorts by.
@@ -321,6 +386,35 @@ export function recommendation(purposeId, areaId) {
   return null;
 }
 
+/**
+ * How each answer reads in the middle of a sentence.
+ *
+ * 🔴 The labels are VERB PHRASES -- "Stretch it out", "Move gently,
+ * nothing loaded" -- and slotting them after "asked for" produced
+ * "asked for stretch it out". Written out per answer rather than
+ * generated, because there are seven of them and the sentence has to
+ * read like a person wrote it.
+ */
+const FORM_SHORT = {
+  around:   "strength around it",
+  mobility: "range of movement",
+  stretch:  "stretching",
+  gentle:   "gentle movement",
+  strength: "strength",
+  cardio:   "cardio",
+  mixed:    "a bit of each"
+};
+
+const FORM_TAILS = {
+  around:   ", and asked to build strength around it",
+  mobility: ", and asked to work on range of movement",
+  stretch:  ", and asked to stretch it out",
+  gentle:   ", and asked to keep it moving without loading it",
+  strength: ", and asked for strength",
+  cardio:   ", and asked for cardio",
+  mixed:    ", and asked for a bit of each"
+};
+
 function _typeWords(counts) {
   const names = Object.keys(counts);
   if (!names.length) return "nothing";
@@ -350,8 +444,19 @@ export function purposeLine() {
   const form    = store.get("requestedSessionType");
   if (!purpose) return "";
 
-  const formWords = form ? (TYPE_WORDS[form] || _words(form)) : null;
-  const tail = formWords ? `, and asked for ${formWords}` : "";
+  // AROUND-AREA. The FORM answered, where we have it, because
+  // "build strength around it" flattened to "strength" lost the word
+  // that made the recommendation worth giving.
+  // Two shapes, because the sentence needs both. `tail` appends to
+  // "Because you flagged your lower back…"; `short` drops into
+  // "general fitness — cardio today", where a second "asked" would
+  // say it twice.
+  const formId = store.get("todayForm");
+  const short  = formId ? (FORM_SHORT[formId] || null)
+               : (form ? (TYPE_WORDS[form] || _words(form)) : null);
+  const tail   = formId ? (FORM_TAILS[formId] || "")
+               : (short ? `, and asked for ${short}` : "");
+  const formWords = short;
 
   switch (purpose) {
     case "arc": {
@@ -369,14 +474,14 @@ export function purposeLine() {
     }
     case "niggle":
       return area
-        ? `Because you flagged your ${_words(area)}${tail}.`
+        ? `Because you flagged your ${_areaWords(area)}${tail}.`
         : `Because something was niggling${tail}.`;
     case "area":
       // Same "asked" twice problem as general, above.
       if (!area) return `Because you asked for a particular area${tail}.`;
       return formWords
-        ? `Because you asked for ${_words(area)} \u2014 ${formWords} today.`
-        : `Because you asked for ${_words(area)}.`;
+        ? `Because you asked for ${_areaWords(area)} \u2014 ${formWords} today.`
+        : `Because you asked for ${_areaWords(area)}.`;
     case "general":
       // Not `${tail}` here: "you asked for general fitness, and asked
       // for cardio" says "asked" twice. The coach should read like one
@@ -393,6 +498,7 @@ export function purposeLine() {
 
 /** Cleared at the start of every check-in. A purpose is about today. */
 export function clearPurpose() {
+  store.set("todayForm", null);
   store.set("todayPurpose", null);
   store.set("todayPurposeArea", null);
   store.set("requestedSessionType", null);
