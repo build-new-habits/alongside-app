@@ -574,6 +574,9 @@ import { store }             from '../store.js';
 // made of", so the proposal names the arc in the words the person
 // already sees on Home rather than a second vocabulary.
 import { aimById, STRANDS } from "../data/aims.js";
+// STRETCH-VIA-COACH, 16 Sep 2026. The same target knowledge the stretch
+// door uses. See js/stretch-target.js.
+import { impliedTarget, sortByTarget, targetById, isStretchLike } from "../stretch-target.js";
 import { getActiveVoice, getTimingRules } from '../data/coach-voice.js';
 import { getPhaseBias, getReEntryContext, getMissedSessionOffer,
          captureReturnContext, clearReturnContext,
@@ -1070,6 +1073,8 @@ export function CoachProposalView(router) {
         <span class="cp-preview-card__meta">${durationText}</span>
         <span class="cp-preview-card__meta">${movementsText}</span>
         <p class="cp-preview-card__why">${option.rationale}</p>
+        ${(() => { const n = _stretchTargetNote(option);
+                   return n ? `<p class="cp-preview-card__target">${n}</p>` : ''; })()}
       </button>
     `;
   }
@@ -1853,6 +1858,11 @@ export function CoachProposalView(router) {
    * gate green while every swap affordance silently vanished.
    */
   function _buildCoachSuggestion() {
+    // STRETCH-VIA-COACH. The primary gets the same ordering as the
+    // alternates; _applyStretchTarget() is called on `built` below, once
+    // it exists. Kept as one call site per path rather than one shared
+    // wrapper, because the two paths shape their option objects
+    // differently and a wrapper would have to know both.
     const { sessionType, reason, inputs } = chooseSessionType();
 
     // LOCATION-1, 08 Sep 2026. equipmentOverride was null here, which
@@ -1878,6 +1888,9 @@ export function CoachProposalView(router) {
     const built = buildSession(args);
     if (!built) return _getFallbackOptions(5, null);
 
+    // STRETCH-VIA-COACH. Same ordering as the alternates get.
+    _applyStretchTarget(built);
+
     // SEVERE-1 / CR-2. buildSession() may return Gentle Care or an
     // out-of-scope session instead of the type it was handed, and when it
     // does the type the chain chose is no longer what the person is being
@@ -1894,6 +1907,10 @@ export function CoachProposalView(router) {
       exercises:     built.exercises || [],
       rationale:     built.coachLine || built.rationale || '',
       sessionType:   delivered,
+      // STRETCH-VIA-COACH. Carried onto the option so the card can say
+      // which target was applied. Absent on everything that is not a
+      // stretch session, which is what keeps the note silent.
+      stretchTarget: built.stretchTarget || null,
       inputs:        { ...inputs, chosenType: sessionType, reason },
       _pools:        buildCandidatePools(args)
     }];
@@ -1988,6 +2005,8 @@ export function CoachProposalView(router) {
       taken.add(delivered);
       taken.add(sessionType);
 
+      _applyStretchTarget(built);
+
       out.push({
         id:            built.id || `coach-alt-${sessionType}`,
         name:          built.title,
@@ -1997,6 +2016,10 @@ export function CoachProposalView(router) {
         exercises:     built.exercises,
         rationale:     built.coachLine || built.rationale || '',
         sessionType:   delivered,
+      // STRETCH-VIA-COACH. Carried onto the option so the card can say
+      // which target was applied. Absent on everything that is not a
+      // stretch session, which is what keeps the note silent.
+      stretchTarget: built.stretchTarget || null,
         inputs:        { ...(primary.inputs || {}), chosenType: sessionType, reason: 'alternate' },
         _pools:        buildCandidatePools({ ...args, sessionType })
       });
@@ -2045,6 +2068,45 @@ export function CoachProposalView(router) {
    * Not in the coach's first person. This is the product naming its own
    * machinery, the same voice the guidance line uses.
    */
+  /**
+   * STRETCH-VIA-COACH, 16 Sep 2026. A stretch session the coach proposes
+   * gets the same ordering as one reached through the stretch door.
+   *
+   * Graeme: "I never get a chance to state what I want to do with
+   * stretching... I didn't get any body part or shape options for
+   * stretch."
+   *
+   * ⚫ ORDERS, DOES NOT ASK. The stretch door asks because it has a
+   * screen to ask on; this path has a proposal card, and putting a
+   * four-option question on a card somebody is scanning would make the
+   * proposal a form. So the check-in's implied target is applied
+   * silently, and the card SAYS SO -- see _stretchTargetNote(). The
+   * person can still change it once inside.
+   *
+   * 🔴 SILENT WHEN THERE IS NO SIGNAL. With nothing sore, impliedTarget()
+   * returns null and the order is untouched. Reordering around a guess
+   * and then captioning it would be the padding-loop mistake again.
+   *
+   * Mutates the built session in place, which is what the caller expects
+   * -- the alternates are built and handed on in the same loop.
+   */
+  function _applyStretchTarget(built) {
+    try {
+      if (!built || !isStretchLike(built)) return;
+      const id = impliedTarget();
+      if (!id) return;
+      built.exercises = sortByTarget(built.exercises, id);
+      built.stretchTarget = id;
+    } catch { /* ordering is an improvement, never a blocker */ }
+  }
+
+  /** Says which target was applied, in the words the selector uses. */
+  function _stretchTargetNote(option) {
+    const t = option && option.stretchTarget ? targetById(option.stretchTarget) : null;
+    if (!t) return '';
+    return `Ordered around ${t.label.toLowerCase()}, from your check-in.`;
+  }
+
   function _arcLine() {
     try {
       const arc = store.get('arc') || {};

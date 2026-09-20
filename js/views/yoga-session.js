@@ -188,6 +188,10 @@ import { store } from "../store.js";
 // A second copy of either drifts the first time one changes.
 import { soreAreaLoaded } from "../data/session-rationale.js";
 import { STRANDS } from "../data/aims.js";
+// STRETCH-VIA-COACH, 16 Sep 2026. TARGET_AREAS and the implied-target
+// logic moved to a shared module so the coach-proposed path can use the
+// same one. This view keeps the selector UI; the knowledge is shared.
+import { TARGET_AREAS, impliedTarget, sortByTarget } from "../stretch-target.js";
 import { isGateDue, renderSafetyGate, attachSafetyGate } from "../safety-gate.js";
 import { isPremium } from "../auth.js";
 import { EXERCISES } from "../data/exercises/index.js";
@@ -502,55 +506,6 @@ const EXERCISE_COUNT = { 20: 5, 30: 7, 45: 10 };
  * "All over" is a real answer and carries no areas, which is what makes
  * it a no-op filter rather than a special case elsewhere in the build.
  */
-const TARGET_AREAS = [
-  { id: "back-hips", label: "Back and hips", icon: "\uD83E\uDDD8",
-    areas: ["lower-back", "spine", "hip", "hip-flexor", "glutes", "piriformis", "upper-back", "thoracic"] },
-  { id: "legs",      label: "Legs",          icon: "\uD83E\uDDB5",
-    areas: ["hamstring", "quadriceps", "calves", "adductors", "knee", "ankle-foot"] },
-  { id: "shoulders", label: "Shoulders and arms", icon: "\uD83D\uDCAA",
-    areas: ["shoulder", "rotator-cuff", "wrist-elbow", "chest-pecs", "triceps-biceps"] },
-  { id: "all",       label: "All over",      icon: "\u2728", areas: [] }
-];
-
-/**
- * STRETCH-FOCUS. The target the check-in already implies, or null.
- *
- * Reads the same sore-area signal bodyCaution() reads, through the same
- * AREA_ALIASES, so the preselection and the caution on the card cannot
- * disagree about what is sore.
- *
- * 🔴 IT DOES NOT FALL BACK TO THE ARC, and that is the decision rather
- * than an omission. Graeme: "maybe today I've got DOMS from having done
- * too many arm exercises yesterday... and that's my arms, not my lower
- * back. And my lower back is my arc." Some days the arc is not what
- * today is about. A fresh signal beats a standing one; with no fresh
- * signal, nothing is preselected and the person is asked.
- */
-function _impliedTarget() {
-  const conditions = store.get("conditions") || [];
-  const scores     = store.get("conditionPainScores") || {};
-  const sore       = conditions.filter(id => (scores[id] || 0) >= 4);
-  if (!sore.length) return null;
-
-  const ALIASES = {
-    "lower-back": ["lower-back", "spine"],
-    "upper-back": ["upper-back", "thoracic"],
-    "sciatica":   ["lower-back", "glutes", "hamstring", "piriformis"],
-    "it-band":    ["hip", "knee"],
-    "shin-splints": ["calves", "ankle-foot"],
-    "achilles":   ["calves", "ankle-foot"],
-    "plantar-fasciitis": ["ankle-foot", "calves"],
-    "biceps-triceps": ["triceps-biceps"],
-    "wrist-elbow": ["wrist-elbow"]
-  };
-
-  for (const id of sore) {
-    const areas = ALIASES[id] || [id];
-    const hit = TARGET_AREAS.find(t => t.areas.some(a => areas.includes(a)));
-    if (hit) return hit.id;
-  }
-  return null;
-}
 
 function buildSession(focusId, durationMins, targetId) {
   const pool        = EXERCISE_POOLS[focusId] || [];
@@ -583,12 +538,7 @@ function buildSession(focusId, durationMins, targetId) {
   // Sorting puts what serves the target first and keeps the rest behind
   // it, so the count holds and the priority is honest. Graeme did this
   // sorting by hand and skipped the tail; now the tail is the tail.
-  const target = TARGET_AREAS.find(t => t.id === targetId);
-  if (!target || !target.areas.length) return safe.slice(0, targetCount);
-
-  const hits = safe.filter(ex => (ex.affectsAreas || []).some(a => target.areas.includes(a)));
-  const rest = safe.filter(ex => !hits.includes(ex));
-  return [...hits, ...rest].slice(0, targetCount);
+  return sortByTarget(safe, targetId).slice(0, targetCount);
 }
 
 // ── Render ────────────────────────────────────────────────────────────────────
@@ -623,7 +573,7 @@ function renderFocusSelector() {
   // the common case stays ONE tap, not two. Computed on render rather
   // than latched, because the check-in can change between visits and a
   // stale preselection is worse than none.
-  if (selectedTarget === null) selectedTarget = _impliedTarget();
+  if (selectedTarget === null) selectedTarget = impliedTarget();
   const implied = selectedTarget !== null;
 
   const targetRow = `

@@ -282,6 +282,18 @@
   color: var(--color-text-muted);
 }
 
+/* STRETCH-VIA-COACH, 16 Sep 2026. Says which target the coach ordered a
+   stretch session around, in the words the stretch door's selector
+   uses. Present only when a check-in signal actually drove it -- a
+   caption on an unordered session would be a claim the card cannot
+   meet. */
+.cp-preview-card__target {
+  margin: var(--space-2) 0 0;
+  font-size: var(--text-xs);
+  line-height: 1.4;
+  color: var(--color-text-muted);
+}
+
 .cp-preview-cards {
   display: flex;
   flex-direction: column;
