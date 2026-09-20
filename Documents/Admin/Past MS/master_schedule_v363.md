@@ -1,26 +1,12 @@
 # Alongside: Move — Master Schedule
-## 16 Sep 2026 v364
+## 16 Sep 2026 v363
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v363.md`. Remove v363 on upload.
+Supersedes `master_schedule_v362.md`. Remove v362 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
-> **Live: `alongside-v519`, 160 gates, `store.js` v69, `Schema.md` v1.62, cold start blueprint v124.** Read that blueprint after this block.
->
-> ### 🟢 STRETCH-VIA-COACH — SHIPPED 16 Sep, `v519`. Monday's feature was unreachable from the path he uses.
->
-> Graeme, testing 1-to-1: *"I never get a chance to state what I want to do with stretching... I didn't get any body part or shape options for stretch."*
->
-> **A coach-proposed stretch session routes to `workout.js`**, the generic exercise-list view. The target logic lived in `yoga-session.js`. So STRETCH-FOCUS, built Monday, could only ever be reached through the stretch door.
->
-> 🔴 **Not a reroute** — `yoga-session` assembles its own queue and would discard the session the coach built. 🔴 **And not a second copy** — SAVE-ALL is one day old and exists precisely because a second implementation of saving drifted from the first. **`js/stretch-target.js`**: `TARGET_AREAS`, `impliedTarget()`, `sortByTarget()`, `isStretchLike()`. Both paths import it; neither declares any of it.
->
-> ⚫ **The coach path ORDERS, it does not ASK.** The stretch door has a screen to ask on; this path has a proposal card, and a four-option question on a card somebody is scanning turns a proposal into a form. The check-in's implied target is applied silently to the primary **and** both alternates, and **the card says so** — *"Ordered around back and hips, from your check-in."* Silent when nothing is sore: reordering around a guess and captioning it is the padding-loop mistake in another costume.
->
-> 🔴 **Extraction found drift, as extraction usually does.** `_impliedTarget()` carried its **own copy of the area aliases** — lower-back→spine, sciatica→glutes/hamstring — a second table beside `AREA_ALIASES` in `session-rationale.js`. Two tables answering "what does a sore lower back cover" is how the caution on a card and the preselection on a selector come to disagree about the same body. 🟡 **ALIAS-ONE** logged: they are still two, because `session-rationale.js` does not export its one, and merging them changes what `bodyCaution()` matches — clinical surface, not refactoring.
->
-> 🟢 **`verify-stretch-coach` guards the thing that matters, not the symptom.** Not "both paths have a target", which is satisfiable by copying — **1.4 walks `js/` and fails on any third copy anywhere.** `verify-stretch-focus`'s five moved assertions were retargeted to the module rather than deleted: what they test is unchanged, only the file is.
+> **Live: `alongside-v518`, 159 gates, `store.js` v69, `Schema.md` v1.62, cold start blueprint v123.** Read that blueprint after this block.
 >
 > ### 🟢 ARC-VISIBLE — SHIPPED 16 Sep, `v518`. The arc was doing the work and never said so.
 >
@@ -9327,4 +9313,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v364*
+*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v363*

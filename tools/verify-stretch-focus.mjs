@@ -42,9 +42,18 @@ const B = new URL("../js/", import.meta.url).href;
 const { store } = await import(B + "store.js");
 const { EXERCISES } = await import(B + "data/exercises/index.js");
 
+// STRETCH-VIA-COACH, 16 Sep 2026. The KNOWLEDGE moved, the view kept
+// the selector. TARGET_AREAS, impliedTarget() and the sort now live in
+// js/stretch-target.js so the coach-proposed path uses the same one --
+// a second copy is how SAVE-ALL's drift started, one day earlier.
+//
+// These assertions follow the logic to where it lives. What they test is
+// unchanged; only the file is. `src` stays pointed at the view, because
+// several tests below are genuinely about this view's selector UI.
 const raw   = fs.readFileSync(new URL("../js/views/yoga-session.js", import.meta.url), "utf8");
 const strip = s => s.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
 const src   = strip(raw);
+const target = strip(fs.readFileSync(new URL("../js/stretch-target.js", import.meta.url), "utf8"));
 
 console.log("\nSTRETCH-FOCUS / SAVE-IN-MOMENT\n");
 
@@ -68,8 +77,8 @@ console.log("TEST 0 — FIXTURE REACH: the data this rests on is really there");
 console.log("\nTEST 1 — the target question exists and is separate from style");
 
 ok("1.1 TARGET_AREAS is declared, with an all-over option carrying no areas",
-   /const TARGET_AREAS = \[/.test(src) &&
-   /id: "all",[\s\S]{0,120}areas: \[\]/.test(src));
+   /export const TARGET_AREAS = \[/.test(target) &&
+   /id: "all",[\s\S]{0,120}areas: \[\]/.test(target));
 
 ok("1.2 FOCUS_TYPES is UNCHANGED and still offered",
    /const FOCUS_TYPES = \[/.test(src) &&
@@ -92,20 +101,20 @@ ok("1.4 REVERSAL: choosing a target does NOT advance the phase", (() => {
 console.log("\nTEST 2 — preselected from the check-in, and never from the arc");
 
 ok("2.1 the implied target reads the sore-area signal",
-   /function _impliedTarget/.test(src) &&
-   src.includes('store.get("conditionPainScores")') &&
-   />= 4/.test(src));
+   /export function impliedTarget/.test(target) &&
+   target.includes('store.get("conditionPainScores")') &&
+   />= 4/.test(target));
 
 ok("2.2 🔴 REVERSAL: it does NOT fall back to the arc", (() => {
-  const i = src.indexOf("function _impliedTarget");
-  const body = src.slice(i, src.indexOf("function buildSession", i));
+  const i = target.indexOf("export function impliedTarget");
+  const body = target.slice(i, target.indexOf("export function targetById", i));
   return !/arc|strand|aimById/i.test(body);
 })(), 'Graeme: "maybe today I\'ve got DOMS... that\'s my arms, not my lower back. ' +
       'And my lower back is my arc." A fresh signal beats a standing one');
 
 ok("2.3 nothing sore means nothing preselected, not a default", (() => {
-  const i = src.indexOf("function _impliedTarget");
-  const body = src.slice(i, src.indexOf("function buildSession", i));
+  const i = target.indexOf("export function impliedTarget");
+  const body = target.slice(i, target.indexOf("export function targetById", i));
   return /if \(!sore\.length\) return null/.test(body);
 })());
 
@@ -118,9 +127,9 @@ ok("2.4 an unanswered target is treated as all-over, not as a blocker",
 console.log("\nTEST 3 — the target SORTS the session, it does not shorten it");
 
 ok("3.1 matching poses come first, the rest stay behind them",
-   /const hits = safe\.filter/.test(src) &&
-   /const rest = safe\.filter/.test(src) &&
-   /\[\.\.\.hits, \.\.\.rest\]\.slice\(0, targetCount\)/.test(src));
+   /const hits = \[\], rest = \[\]/.test(target) &&
+   /hits\.concat\(rest\)/.test(target) &&
+   /sortByTarget\(safe, targetId\)\.slice\(0, targetCount\)/.test(src));
 
 ok("3.2 🔴 REVERSAL: it is not a hard filter", (() => {
   const i = src.indexOf("function buildSession(focusId");
@@ -129,7 +138,10 @@ ok("3.2 🔴 REVERSAL: it is not a hard filter", (() => {
 })(), "a hard filter hands back a three-pose session when the pool is thin, and a " +
       "short session reads as the app having nothing for you");
 
-ok("3.3 all-over changes nothing", /!target\.areas\.length\) return safe\.slice\(0, targetCount\)/.test(src));
+ok("3.3 all-over changes nothing",
+   /!target \|\| !target\.areas\.length\) return items\.slice\(\)/.test(target),
+   "\"All over\" must be a no-preference answer, not a fifth filter -- it carries " +
+   "no areas, so the list comes back in its original order");
 
 ok("3.4 the target actually reaches the build", /buildSession\(selectedFocus, selectedMins, selectedTarget\)/.test(src));
 
