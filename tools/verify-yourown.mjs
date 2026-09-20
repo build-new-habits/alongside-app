@@ -183,6 +183,38 @@ const fullRoom = home().querySelector('[data-room-id="own"]');
 
 ok("4c. the newest is on the card", /Easy evening/.test(fullRoom.textContent),
    fullRoom.textContent.replace(/\s+/g, " ").slice(0, 140));
+
+// YOUR-OWN-CREATE, 16 Sep 2026. Graeme, on device: "How do I build my
+// own?" He could not, from this room.
+//
+// 🔴 "Build your first" existed ONLY in the empty branch. The moment a
+// first session was saved the button vanished and never came back -- so
+// the room whose whole purpose is sessions you put together yourself
+// offered only Start and a list. A one-branch affordance: correct on the
+// day it was written, wrong from the second session onwards, and
+// invisible to anyone who had ever saved one.
+//
+// 4a above passed throughout, because it only ever looked at the EMPTY
+// state. That is the lesson worth keeping: a test that checks one branch
+// certifies one branch.
+ok("4c-1. a populated room still offers a way to build another",
+   /Build another/.test(fullRoom.textContent),
+   "the room whose purpose is sessions you put together yourself must always " +
+   "let you put another one together");
+
+ok("4c-2. and it points at the builder, not the list",
+   !!fullRoom.querySelector('[data-route="session-builder"]'),
+   "a count button opening the builder was SAVED-1's bug in reverse");
+
+ok("4c-3. REVERSAL: it does not displace Start as the primary action", (() => {
+  const primary = fullRoom.querySelector('.btn-primary');
+  return primary && /^Start/.test(primary.textContent.trim());
+})(), "Start is what somebody came to this room for; building another is the " +
+      "quieter second door");
+
+ok("4c-4. the wording differs from the empty branch, because it is a different claim",
+   !/Build your first/.test(fullRoom.textContent),
+   "\"your first\" would be a small lie once one exists");
 ok("4d. and it can be started from the card",
    !!fullRoom.querySelector("[data-saved-id]"));
 

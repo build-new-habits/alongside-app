@@ -1,26 +1,12 @@
 # Alongside: Move — Master Schedule
-## 16 Sep 2026 v365
+## 16 Sep 2026 v364
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v364.md`. Remove v364 on upload.
+Supersedes `master_schedule_v363.md`. Remove v363 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
-> **Live: `alongside-v520`, 160 gates, `store.js` v69, `Schema.md` v1.62, cold start blueprint v125.** Read that blueprint after this block.
->
-> ### 🟢 YOUR-OWN-CREATE — SHIPPED 16 Sep, `v520`. A one-branch affordance.
->
-> Graeme, on device: *"How do I build my own?"* He could not, from that room.
->
-> 🔴 **"Build your first" existed ONLY in the empty branch.** The moment a first session was saved the button vanished and never came back — so the room whose entire purpose is *sessions you put together yourself* offered only **Start** and **Your other N sessions**. Building a second one was unreachable from it.
->
-> Correct on the day it was written, wrong from the second session onwards, and **invisible to anyone who had ever saved one** — which is everyone it matters to.
->
-> ⚫ **The same shape as CARD-5's five views: a thing that is true of the state it was authored in.** `verify-yourown` 4a passed throughout, because it only ever looked at the empty state. **A test that checks one branch certifies one branch**, and that is the lesson worth keeping from this one.
->
-> "Build another" is a **ghost** button, not a secondary: Start is what somebody came to the room for and this must not compete with it. The wording differs from the empty branch deliberately — *"your first"* would be a small lie once one exists. Four assertions added, including one that fails if it ever displaces Start as the primary action.
->
-> **Gate red before green performed:** the button was removed and two assertions went red; restored.
+> **Live: `alongside-v519`, 160 gates, `store.js` v69, `Schema.md` v1.62, cold start blueprint v124.** Read that blueprint after this block.
 >
 > ### 🟢 STRETCH-VIA-COACH — SHIPPED 16 Sep, `v519`. Monday's feature was unreachable from the path he uses.
 >
@@ -9341,4 +9327,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v365*
+*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v364*
