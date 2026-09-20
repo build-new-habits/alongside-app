@@ -1,7 +1,21 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 16 Sep 2026 v533
+ * 16 Sep 2026 v534
+ *
+ * v534 - CARD-LOCAL. ONE NEW FILE PRECACHED:
+ *   js/data/morning-library-map.js. exercise-card.js, morning-session.js.
+ *
+ *   Morning sessions showed a movement's name, sets and reps and
+ *   nothing about how to do it -- including no exercise-specific
+ *   hazards, which was a safety gap and not only a content one.
+ *
+ *   The programme names its exercises differently from the library, so
+ *   only 93 of 190 resolved. A hand-written alias map plus a
+ *   strip-the-qualifier rule takes it to 162. The view keeps its own
+ *   screen and borrows the shared card for the movement body.
+ *
+ *   New gate: tools/verify-cardlocal.mjs. 167 gates.
  *
  * v533 - AROUND-AREA. store.js v74, Schema.md v1.67, data/purpose.js,
  *   views/checkin.js.
@@ -3806,7 +3820,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v533";
+const CACHE_NAME = "alongside-v534";
 
 const SHELL_URLS = [
 
@@ -3882,6 +3896,7 @@ const SHELL_URLS = [
   "/alongside-app/js/save-block.js",
   "/alongside-app/js/stretch-target.js",
   "/alongside-app/js/data/purpose.js",
+  "/alongside-app/js/data/morning-library-map.js",
   "/alongside-app/js/views/capture.js",
   "/alongside-app/js/exercise-timing.js",
   "/alongside-app/js/display-prefs.js",
