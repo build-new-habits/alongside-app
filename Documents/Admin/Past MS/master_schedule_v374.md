@@ -1,26 +1,12 @@
 # Alongside: Move — Master Schedule
-## 16 Sep 2026 v375
+## 16 Sep 2026 v374
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v374.md`. Remove v374 on upload.
+Supersedes `master_schedule_v373.md`. Remove v373 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
-> **Live: `alongside-v529`, 164 gates, `store.js` v71, `Schema.md` v1.64, cold start blueprint v134.** Read that blueprint after this block.
->
-> ### 🔴 BLANK-QUESTION — SHIPPED 16 Sep, `v529`. Third attempt, and the first two were guesses.
->
-> Graeme: *"I still get something went wrong in the check-in after choosing one to one."*
->
-> **v27** asked *"is there any text"* immediately after mount. **v28** asked the same question 800ms later. **Both failed**, because check-in writes its markup **at once** — 484 characters of thread shell — while the coach's first **words** arrive between one and two and a half seconds, the way a real message does.
->
-> ⚫ **Chasing it with a bigger number would only have been a better guess. The question was wrong, not the timing.** A container holding half a kilobyte of structure is not blank; it is a view mid-render. The failure this check exists for is a container with **nothing** in it — which is exactly what Graeme photographed the first time.
->
-> It now asks whether the container is **empty**. Text may take as long as it likes. The deferral stays as margin.
->
-> 🟡 **And a correction to yesterday's entry.** BLANK-TIMING was written up as "the principle was right and the timing was wrong". **That was half true and it made the detector less sensitive rather than fixing the fault.** The detector was reporting a genuine blank screen; it just could not tell "blank" from "not finished talking".
->
-> 🔴 **Measured this time rather than reasoned about:** check-in at 300ms has markup and no text; at 2.5s it has 93 characters of text. Both earlier versions fail that; this one passes.
+> **Live: `alongside-v528`, 164 gates, `store.js` v71, `Schema.md` v1.64, cold start blueprint v133.** Read that blueprint after this block.
 >
 > ### 🔴 BLANK-TIMING — SHIPPED 16 Sep, `v528`. The abyss fix broke check-in within a day.
 >
@@ -9494,4 +9480,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v375*
+*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v374*
