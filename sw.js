@@ -1,7 +1,23 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 16 Sep 2026 v532
+ * 16 Sep 2026 v533
+ *
+ * v533 - AROUND-AREA. store.js v74, Schema.md v1.67, data/purpose.js,
+ *   views/checkin.js.
+ *
+ *   "Build strength around it" built a FULL BODY session, which loads
+ *   the sore area like everything else -- the coach giving advice and
+ *   contradicting it one screen later. Now area-aware: a sore back
+ *   loads the posterior chain, hips and legs load the trunk, a shoulder
+ *   loads the legs.
+ *
+ *   New field todayForm: what the person answered, before translation.
+ *
+ *   🔴 SEPARATE CACHE VERSION FROM v532, deliberately. v532 shipped
+ *   PURPOSE-ARC-LABEL earlier in the same session; these changes landed
+ *   on top of it. A device already holding v532 would never have
+ *   re-fetched them.
  *
  * v532 - PURPOSE-ARC-LABEL. data/purpose.js.
  *
@@ -3790,7 +3806,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v532";
+const CACHE_NAME = "alongside-v533";
 
 const SHELL_URLS = [
 
