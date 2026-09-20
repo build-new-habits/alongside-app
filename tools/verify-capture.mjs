@@ -140,6 +140,43 @@ console.log("\nTEST 4 — it counts in full, through the ordinary path");
      "and claiming one would light an arc strand nothing earned");
 }
 
+console.log("\nTEST 4b — CAPTURE-2: asking is not inventing");
+
+{
+  const src = fs.readFileSync(new URL("../js/views/capture.js", import.meta.url), "utf8");
+
+  ok("4b.1 the kind question exists and is optional",
+     /What was this, roughly\?/.test(src) && /Optional\./.test(src),
+     "CAPTURE-1 credited the body channel only, so a captured session could " +
+     "never light a capability strand -- 18 of the 30 in the library");
+
+  ok("4b.2 it is asked LAST, after the movements", (() => {
+    return src.indexOf("So far today") < src.indexOf("What was this, roughly?");
+  })(), "somebody cannot say what a session was before they have done it, and " +
+        "asking first turns a picker into a form");
+
+  ok("4b.3 sessionType is set ONLY when they said so",
+     /if \(kind\) session\.sessionType = kind;/.test(src),
+     "absent otherwise, exactly as CAPTURE-1 shipped it -- nothing claims a " +
+     "kind of work that was never declared");
+
+  ok("4b.4 REVERSAL: nothing infers a kind from the movements",
+     !/sessionType:\s*["'](core|full|upper|lower|stretch|mobility|cardio|glute)["']/.test(src),
+     "inferring would light an arc strand on a guess; asking makes the answer " +
+     "the person's, which is the same stated-not-inferred rule this app " +
+     "applies everywhere else");
+
+  ok("4b.5 an answer given by accident can be taken back",
+     /kind === k\.dataset\.kind\) \? null :/.test(src),
+     "otherwise the only way out of a mis-tap is to leave and start again");
+
+  ok("4b.6 the state is carried for a screen reader, not by colour",
+     /aria-pressed=/.test(src));
+
+  ok("4b.7 \"Gym\" is not offered", !/id: "gym"/.test(src),
+     "it describes WHERE, not what, and no arc strand leans on it");
+}
+
 console.log("\nTEST 5 — reachable, and not a fifth room");
 {
   const today  = fs.readFileSync(new URL("../js/views/today.js", import.meta.url), "utf8");

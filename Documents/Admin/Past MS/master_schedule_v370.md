@@ -1,26 +1,12 @@
 # Alongside: Move — Master Schedule
-## 16 Sep 2026 v371
+## 16 Sep 2026 v370
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v370.md`. Remove v370 on upload.
+Supersedes `master_schedule_v369.md`. Remove v369 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
-> **Live: `alongside-v526`, 164 gates, `store.js` v71, `Schema.md` v1.64, cold start blueprint v131.** Read that blueprint after this block.
->
-> ### 🟢 CAPTURE-2 — SHIPPED 16 Sep, `v526`. Asking is not inventing.
->
-> 🔴 **The gap was bigger than the walk case it was logged as.** CAPTURE-1 credited the **body** channel from the movements' areas and deliberately did not invent a `sessionType` — a captured set of movements is not one of the builder's eight types. That was right, and it left a hole: **capability strands light from `sessionTypes`, and 18 of the 30 strands are capability strands.** A captured session could never light Trunk strength, Staying-power or Pacing yourself, however much work went into it.
->
-> ⚫ **The fix is not inference. It is asking, once, at the end.** The answer is then the person's, so it can credit the arc honestly — the same **stated, not inferred** rule this app applies to everything else it records. Null until they say; skipping is a first-class answer rather than a nag, and costs only the capability half of the credit.
->
-> **Asked last, after the movements.** Somebody cannot say what a session was before they have done it, and asking first would turn a picker into a form.
->
-> ⚫ **Eight kinds, not the builder's nine. "Gym" is left out** — it describes *where*, not what, and no arc strand leans on it.
->
-> 🟢 **A mis-tap can be taken back**: tapping the chosen answer again clears it. Otherwise the only way out of an accidental tap is to leave and start over. State carried by `aria-pressed` plus border and weight, never colour alone.
->
-> **Measured: a capture declared as "Core" now credits `typesWorked: core` and `zonesWorked: lower-back, upper-back` — both channels, from one session.**
+> **Live: `alongside-v525`, 164 gates, `store.js` v71, `Schema.md` v1.64, cold start blueprint v130.** Read that blueprint after this block.
 >
 > ### 🟢 ALIAS-ONE — SHIPPED 16 Sep, `v525`. They had already diverged.
 >
@@ -9436,4 +9422,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v371*
+*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v370*

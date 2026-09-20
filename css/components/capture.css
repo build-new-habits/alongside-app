@@ -150,3 +150,14 @@
 @media (prefers-contrast: more) {
   .cap-search, .cap-result__name, .cap-result__log, .cap-area { border-width: 2px; }
 }
+
+/* CAPTURE-2, 16 Sep 2026. The optional "what was this" answer, shown
+   selected. A pressed chip, not a checkbox: aria-pressed carries the
+   state for a screen reader and the border and weight carry it for
+   everyone else, so it is never colour alone (1.4.1). */
+.cap-area.is-selected {
+  border-color: var(--color-primary);
+  border-width: 2px;
+  color: var(--color-primary);
+  font-weight: var(--font-semibold);
+}
