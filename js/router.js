@@ -279,6 +279,11 @@ const VIEW_NAMES = {
   // names the ones you already have. There was nowhere else for it to
   // go: no list view existed and no route pointed at one.
   'saved-sessions':    { path: './views/saved-sessions.js',  fn: 'SavedSessionsView'   },
+  // CAPTURE-1, 16 Sep 2026. Build as you go, or log what you just did.
+  // Reached from the Your own room; not a fifth door on Home -- four
+  // card grammars was the CLUB v1 lesson and five rooms would be the
+  // same mistake in a different place.
+  'capture':           { path: './views/capture.js',         fn: 'CaptureView'         },
   'my-programme':      { path: './views/my-programme.js',     fn: 'MyProgrammeView'     },
   // THREAD-1a. The hard conversation is ENTERED from My Programme's
   // invitation, never opened over the top of it.

@@ -2060,7 +2060,22 @@ function _markGuidanceShown(root) {
                    -->
                    <button class="btn btn-ghost btn-full club-room__go"
                            data-route="session-builder" data-door-id="own"
-                           data-requires-checkin="false">Build another</button>`
+                           data-requires-checkin="false">Build another</button>
+                   <!--
+                     CAPTURE-1, 16 Sep 2026. Graeme: "I'm in the gym, I
+                     did a thing, record it" -- and the other half, "I
+                     want to do..... I'll guide you."
+
+                     It lives HERE, in Your own, rather than becoming a
+                     fifth room on Home. Four card grammars was the CLUB
+                     v1 lesson; five rooms would be the same mistake in a
+                     different place. This room is already "sessions you
+                     put together yourself" -- doing that as you go is
+                     the same sentence, not a new one.
+                   -->
+                   <button class="btn btn-ghost btn-full club-room__go"
+                           data-route="capture" data-door-id="own"
+                           data-requires-checkin="false">As you go</button>`
         })
       : roomRow({
           id: 'own', title: 'Your own',
