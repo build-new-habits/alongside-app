@@ -798,6 +798,39 @@ export const workoutGenerator = {
     }
 
     // ── 2. Intensity-derived base params ────────────────────────────────────
+    //
+    // 🔴 INTENSITY-SPACE, 16 Sep 2026. TWO VOCABULARIES MET HERE AND ONE
+    // OF THEM WAS SILENTLY DISCARDED.
+    //
+    // `intensity` arrives from checkinData.resolveIntensity(), which
+    // returns "low" | "moderate" | "high" -- the space Schema.md
+    // documents and store.todayIntensity holds. intensityParams below is
+    // keyed "recovery" | "gentle" | "moderate" | "challenging".
+    //
+    // Only "moderate" existed in both. "low" and "high" matched nothing,
+    // so intensityParams[intensity] was undefined and the
+    // `|| intensityParams.moderate` fallback fired -- meaning A CHECK-IN
+    // SAYING EXHAUSTED AND ONE SAYING FLYING PRODUCED THE IDENTICAL
+    // SESSION: six exercises, maxEnergy 7. The energy slider has been
+    // decorative on this path.
+    //
+    // It was flagged in coach-proposal.js v9 as "NOT INVESTIGATED,
+    // FLAGGING FOR WHOEVER NEXT TOUCHES checkin.js OR schema.md" and
+    // sat there. Schema.md was right; this table speaks the other
+    // language.
+    //
+    // ⚫ TRANSLATED AT THE BOUNDARY, not by renaming the keys. The keys
+    // are also the space `intensityBias` uses (programme phase, per the
+    // JSDoc above), so renaming them would break that instead. Both
+    // vocabularies are accepted here and neither caller has to change.
+    //
+    // ⚫ "low" MAPS TO gentle, NOT recovery. recovery is a coach decision
+    // -- burnout, or a programme phase saying so -- and must not be
+    // reachable from an energy slider reading 3. Somebody having a flat
+    // morning gets a lighter session, not a recovery protocol.
+    const INTENSITY_SPACE = { low: "gentle", high: "challenging" };
+    const _intensity = INTENSITY_SPACE[intensity] || intensity;
+
     const intensityParams = {
       recovery:    { exerciseCount: 4, maxEnergy: 3,  includeWarmup: true, includeCooldown: true, focusOnRecovery: true  },
       gentle:      { exerciseCount: 5, maxEnergy: 5,  includeWarmup: true, includeCooldown: true, focusOnRecovery: false },
@@ -805,7 +838,10 @@ export const workoutGenerator = {
       challenging: { exerciseCount: 7, maxEnergy: 10, includeWarmup: true, includeCooldown: true, focusOnRecovery: false }
     };
 
-    const base = { ...( intensityParams[intensity] || intensityParams.moderate ), difficultyFloor: 1 };
+    // Falls back to moderate for anything unrecognised, as before -- but
+    // now only genuinely unknown values land there, rather than two
+    // thirds of the documented space.
+    const base = { ...( intensityParams[_intensity] || intensityParams.moderate ), difficultyFloor: 1 };
 
     // ── 3. Cycle phase modifiers — additive, never override burnout ─────────
     // Menstruation: reduce maxEnergy, favour recovery focus

@@ -1,28 +1,12 @@
 # Alongside: Move — Master Schedule
-## 16 Sep 2026 v369
+## 16 Sep 2026 v368
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v368.md`. Remove v368 on upload.
+Supersedes `master_schedule_v367.md`. Remove v367 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
-> **Live: `alongside-v524`, 164 gates, `store.js` v71, `Schema.md` v1.64, cold start blueprint v129.** Read that blueprint after this block.
->
-> ### 🔴 INTENSITY-SPACE — SHIPPED 16 Sep, `v524`. The energy slider was decorative.
->
-> Graeme: *"It's only ever in these moments that I remember them."* The first logged item taken off the list turned out to be live.
->
-> **Two vocabularies met in `getWorkoutParams()` and one was silently discarded.** `intensity` arrives from `resolveIntensity()` as **`low | moderate | high`** — the space `Schema.md` documents and `store.todayIntensity` holds. `intensityParams` is keyed **`recovery | gentle | moderate | challenging`**.
->
-> 🔴 **Only "moderate" existed in both.** "low" and "high" matched nothing, `intensityParams[intensity]` was `undefined`, and the `|| intensityParams.moderate` fallback fired — so **a check-in saying exhausted and one saying flying produced the identical session: six exercises, maxEnergy 7.**
->
-> ⚫ **The most expensive kind of default:** everything kept working and nothing responded. `session-builder.js` has its own separate `_todayIntensity()` check that *does* understand `"low"`, which is why the fault was partly masked.
->
-> **It was flagged in `coach-proposal.js` v9 on 08 Sep as *"NOT INVESTIGATED, FLAGGING FOR WHOEVER NEXT TOUCHES checkin.js OR schema.md"* and sat there for eight days.** The note guessed the mismatch was in `checkin.js` or the schema. Both were right; the fault was downstream. The note has been replaced with the finding rather than deleted.
->
-> ⚫ **Translated at the boundary, not by renaming the keys** — those keys are also `intensityBias`'s space (programme phase), so renaming would have broken that instead. Both vocabularies are accepted and no caller changes. ⚫ **`low` maps to `gentle`, NOT `recovery`**: recovery is a coach decision — burnout, or a phase saying so — and must not be reachable from an energy slider reading 3. A flat morning earns a lighter session, not a recovery protocol.
->
-> 🟢 **`verify-intensity-space` drives the whole chain** from a check-in energy value through to the session shape, because a source check would have passed on the broken code: the table was well formed, the fallback deliberate, every line correct. **Measured: `low 5@5, moderate 6@7, high 7@10`; energy 2 → low, energy 9 → high.**
+> **Live: `alongside-v523`, 163 gates, `store.js` v71, `Schema.md` v1.64, cold start blueprint v128.** Read that blueprint after this block.
 >
 > ### 🟢 CAPTURE-1 — SHIPPED 16 Sep, `v523`. The last item on the list.
 >
@@ -9410,4 +9394,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v369*
+*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v368*
