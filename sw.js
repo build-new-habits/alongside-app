@@ -1,6 +1,15 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 16 Sep 2026 v520
+ *
+ * v520 - YOUR-OWN-CREATE. views/today.js.
+ *
+ *   "Build your first" existed only in the empty branch of the Your own
+ *   room, so once a session was saved there was no way to build
+ *   another. A ghost "Build another" button now sits under Start in the
+ *   populated branch.
+ *
  * 16 Sep 2026 v519
  *
  * v519 - STRETCH-VIA-COACH. ONE NEW FILE PRECACHED:
@@ -3638,7 +3647,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v519";
+const CACHE_NAME = "alongside-v520";
 
 const SHELL_URLS = [
 
