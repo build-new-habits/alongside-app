@@ -1,6 +1,19 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 16 Sep 2026 v524
+ *
+ * v524 - INTENSITY-SPACE. data/workoutGenerator.js,
+ *   views/coach-proposal.js.
+ *
+ *   resolveIntensity() returns low|moderate|high; intensityParams is
+ *   keyed recovery|gentle|moderate|challenging. Only "moderate" existed
+ *   in both, so low and high fell through the moderate fallback and a
+ *   check-in saying exhausted produced the same session as one saying
+ *   flying. Translated at the boundary.
+ *
+ *   New gate: tools/verify-intensity-space.mjs. 164 gates.
+ *
  * 16 Sep 2026 v523
  *
  * v523 - CAPTURE-1. TWO NEW FILES PRECACHED: js/views/capture.js and
@@ -3688,7 +3701,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v523";
+const CACHE_NAME = "alongside-v524";
 
 const SHELL_URLS = [
 
