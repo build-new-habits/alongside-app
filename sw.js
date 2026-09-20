@@ -1,6 +1,21 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 16 Sep 2026 v522
+ *
+ * v522 - ARC-EVERYTHING. store.js v71, data/aims.js, views/today.js,
+ *   Schema.md v1.64.
+ *
+ *   Everything now counts towards the arc. markZonesWorked() had one
+ *   caller in the whole app, so the arc could only see stretching; and
+ *   `lit` asked only about zones, which 18 of 30 strands do not have,
+ *   so those could never light at all.
+ *
+ *   Two channels now: areas worked, and the type of session done. Both
+ *   credited from logActivity(), the single write path.
+ *
+ *   New gate: tools/verify-arc-everything.mjs. 162 gates.
+ *
  * 16 Sep 2026 v521
  *
  * v521 - ALWAYS-CORE. store.js v70, Schema.md v1.63.
@@ -3659,7 +3674,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v521";
+const CACHE_NAME = "alongside-v522";
 
 const SHELL_URLS = [
 
