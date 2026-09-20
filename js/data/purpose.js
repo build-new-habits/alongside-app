@@ -50,6 +50,9 @@ import { TARGET_AREAS } from "../stretch-target.js";
 // PURPOSE-ASK. The one alias table, imported rather than copied --
 // ALIAS-ONE merged two of these this morning and a third would undo it.
 import { AREA_ALIASES } from "./session-rationale.js";
+// PURPOSE-ASK. The same source today.js reads for the arc headline, so
+// the proposal names the arc in the words already on Home.
+import { aimById } from "./aims.js";
 
 /** Q1. The one that has never been asked. */
 export const PURPOSES = [
@@ -352,9 +355,16 @@ export function purposeLine() {
 
   switch (purpose) {
     case "arc": {
+      // 🔴 arc.aimLabel DOES NOT EXIST. The arc stores aimId; the label
+      // comes from aimById(), which is what today.js and ARC-VISIBLE
+      // both already use. The first draft read a field that was never
+      // written, so this always fell to the generic "your arc" -- the
+      // sixth dead branch found by driving the code today, and the
+      // second this hour.
       const arc = store.get("arc") || {};
-      return arc.aimLabel
-        ? `Because you're working towards \u201c${arc.aimLabel}\u201d${tail}.`
+      const aim = arc.aimId ? aimById(arc.aimId) : null;
+      return (aim && aim.label)
+        ? `Because you're working towards \u201c${aim.label}\u201d${tail}.`
         : `Because you're working towards your arc${tail}.`;
     }
     case "niggle":
