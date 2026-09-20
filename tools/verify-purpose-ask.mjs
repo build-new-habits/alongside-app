@@ -223,14 +223,77 @@ console.log("\nTEST 5 — it reaches the proposal, and ASK-KIND is gone");
   ok("5.6 and changes with the purpose", P.purposeLine() !== line);
 }
 
+console.log("\nTEST 5b — AROUND-AREA: the session follows the advice");
+{
+  // 🔴 Found by tracing, not by a test: the coach said "I'd build
+  // strength around it rather than work it directly" and then handed
+  // over FULL BODY, which loads the back like everything else. The
+  // advice was right and the session did not follow it.
+  ok("5b.1 a sore back builds the posterior chain, not full body",
+     P.sessionTypeForForm("around", "lower-back") === "glute",
+     "glutes and hamstrings doing the work so the back does not have to -- " +
+     "which is what the reason text already promises");
+
+  ok("5b.2 the coarse target resolves the same way",
+     P.sessionTypeForForm("around", "back-hips") === "glute");
+
+  ok("5b.3 sore hips or legs load the trunk instead",
+     P.sessionTypeForForm("around", "hip") === "core" &&
+     P.sessionTypeForForm("around", "hamstring") === "core");
+
+  ok("5b.4 a sore shoulder loads the legs",
+     P.sessionTypeForForm("around", "shoulder") === "lower");
+
+  ok("5b.5 REVERSAL: it is NEVER the same as plain strength",
+     ["lower-back", "hip", "shoulder"].every(a =>
+       P.sessionTypeForForm("around", a) !== P.sessionTypeForForm("strength", a)),
+     "if these agree, 'around it' has stopped meaning anything");
+
+  ok("5b.6 an unknown area falls through rather than guessing at a body part",
+     P.sessionTypeForForm("around", "not-a-real-area") === "full");
+
+  ok("5b.7 and the line SAYS 'around it', not just 'strength'", (() => {
+    reset();
+    store.set("todayPurpose", "niggle");
+    store.set("todayPurposeArea", "lower-back");
+    store.set("todayForm", "around");
+    return /around it/.test(P.purposeLine());
+  })(), "flattening it to 'strength' loses the word that made the " +
+        "recommendation worth giving");
+
+  ok("5b.8 every form produces a sentence, not a label dropped into one", (() => {
+    reset();
+    store.set("todayPurpose", "niggle");
+    store.set("todayPurposeArea", "lower-back");
+    return ["around", "mobility", "stretch", "gentle"].every(f => {
+      store.set("todayForm", f);
+      const l = P.purposeLine();
+      return l && !/asked for stretch it out|asked for move gently/.test(l);
+    });
+  })(), "the labels are verb phrases; 'asked for stretch it out' is what " +
+        "happens when they are dropped into a noun slot");
+
+  ok("5b.9 an area is named by its label, not its id", (() => {
+    reset();
+    store.set("todayPurpose", "area");
+    store.set("todayPurposeArea", "back-hips");
+    store.set("todayForm", "stretch");
+    const l = P.purposeLine();
+    return /back and hips/.test(l) && !/back hips/.test(l.replace("back and hips", ""));
+  })(), "'back hips' is the app reading its own filing system aloud");
+}
+
 console.log("\nTEST 6 — a purpose is a fact about today");
 {
   reset();
   store.set("todayPurpose", "general");
   store.set("todayPurposeArea", "back-hips");
   P.clearPurpose();
-  ok("6.1 clearPurpose empties both fields",
-     store.get("todayPurpose") === null && store.get("todayPurposeArea") === null,
+  store.set("todayForm", "around");
+  P.clearPurpose();
+  ok("6.1 clearPurpose empties all three fields",
+     store.get("todayPurpose") === null && store.get("todayPurposeArea") === null &&
+     store.get("todayForm") === null,
      "yesterday's reason is not a default");
 }
 

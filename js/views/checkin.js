@@ -1066,7 +1066,11 @@ export function CheckinView(router) {
         recommended: !!rec && rec.formId === f.id
       })),
       async (choice) => {
-        store.set("requestedSessionType", sessionTypeForForm(choice.value));
+        // AROUND-AREA. The AREA matters: "build strength around it"
+        // means load what supports the sore part, not the whole body.
+        store.set("todayForm", choice.value);
+        store.set("requestedSessionType",
+          sessionTypeForForm(choice.value, store.get("todayPurposeArea")));
         _showUserBubble(choice.label);
         await new Promise(r => setTimeout(r, T.PANEL_DELAY));
         _showActionButtons();

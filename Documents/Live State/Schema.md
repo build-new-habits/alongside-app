@@ -1,5 +1,36 @@
 # Alongside — Data Schema Reference
-## 16 Sep 2026 v1.66
+## 16 Sep 2026 v1.67
+
+> **v1.67, 16 Sep 2026 — AROUND-AREA.** New top-level field
+> **`todayForm`** — the Q2 answer as the person gave it, before it is
+> translated into a session type.
+>
+> 🔴 **Found by tracing the whole chain, not by a test.** Somebody flags
+> a sore lower back three times, the coach correctly says *"I'd build
+> strength around it rather than work it directly"* — and then handed
+> them **Full Body**, which loads the back like everything else. **The
+> advice was right and the session did not follow it**, which is worse
+> than not giving the advice.
+>
+> `requestedSessionType` holds what the answer *becomes*. It could not
+> hold what the answer *was*: "build strength around it" and "strength"
+> both resolve to a session type, and only `todayForm` tells them apart.
+> The proposal line needs that difference, because it is the whole point
+> of the recommendation.
+>
+> ⚫ **"Around" is now area-aware.** A sore back loads the posterior
+> chain (`glute`); sore hips or legs load the trunk (`core`); a sore
+> shoulder loads the legs (`lower`). Unknown areas fall through rather
+> than guessing at a body part.
+>
+> 🟠 **AROUND-REVIEW, for the clinical reviewer.** That mapping is movement reasoning,
+> not clinical prescription — four coarse buckets, no condition-specific
+> protocols, no claim beyond "work near it, not on it". A
+> physiotherapist should read it before beta.
+>
+> Cleared with the other purpose fields at the start of each check-in.
+
+> **v1.66, 16 Sep 2026
 
 > **v1.66, 16 Sep 2026 — PURPOSE-ASK.** Two new top-level fields:
 > **`todayPurpose`** (`arc | niggle | area | general | gentle`, or null)
@@ -426,7 +457,7 @@
 
 ## 06 Sep 2026 v1.51
 
-**File:** `js/store.js` (confirmed live version: **v73, 16 Sep 2026**)
+**File:** `js/store.js` (confirmed live version: **v74, 16 Sep 2026**)
 
 > **v1.47, 06 Sep 2026 — CR-1.** `conditions[]` gains three ids and loses one. `chronic-fatigue` is **retired**; `persistent-fatigue`, `me-cfs` and `long-covid` replace it. No field shape changed — `conditions` is still `string[]` and `conditionMeta` is still keyed by condition id.
 >

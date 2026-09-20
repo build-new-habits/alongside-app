@@ -1,12 +1,30 @@
 # Alongside: Move — Master Schedule
-## 16 Sep 2026 v377
+## 16 Sep 2026 v378
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v376.md`. Remove v376 on upload.
+Supersedes `master_schedule_v377.md`. Remove v377 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
-> **Live: `alongside-v531`, 166 gates, `store.js` v73, `Schema.md` v1.66, cold start blueprint v136.** Read that blueprint after this block.
+> **Live: `alongside-v532`, 166 gates, `store.js` v73, `Schema.md` v1.66, cold start blueprint v137.** Read that blueprint after this block.
+>
+> ### 🟢 FULL TRACE — 16 Sep, `v532`. Driven end to end, and it found one more.
+>
+> Graeme: *"Is this all fixed? Trace this fully."* Seven stages driven from a second clone rather than asserted.
+>
+> | Stage | Result |
+> |---|---|
+> | Check-in loads | markup at 400ms — the abyss check no longer fires |
+> | Purpose questions | five purposes; general offers cardio; gentle skips the form question |
+> | Asking for cardio | arc would pick core, request wins, **cardio** |
+> | Proposal line | four purposes, four different lines |
+> | Exit loop | interrupted → back to proposal; **exit without saving → home** |
+> | Arc credit | one core session lights `back-resilience` and `trunk-strength` |
+> | Rotation | next suggestion **mobility**, having been core |
+>
+> 🔴 **And the trace found a sixth dead branch.** `purposeLine()` read **`arc.aimLabel`** — a field that does not exist. The arc stores `aimId`; the label comes from `aimById()`, which `today.js` and ARC-VISIBLE both already use. So the arc line **always** fell to the generic *"your arc"*, never naming the aim, exactly as the mockup promised it would. Now: *"Because you're working towards 'Get back to my sport without my back flaring up', and asked for strength."*
+>
+> ⚫ **That is six dead branches in one day, every one found by running the code and none by reading it.** `soreAreas`, `activeProgramme.strands`, `exerciseHistory` as an array, `sessionType` never written, `timesFlagged` in the wrong vocabulary, and now `arc.aimLabel`. **The pattern is always the same: a field assumed rather than checked, in code that reads correctly.**
 >
 > ### 🟢 PURPOSE-ASK — SHIPPED 16 Sep, `v531`. The coach asks why, then recommends what.
 >
@@ -9534,4 +9552,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v377*
+*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v378*

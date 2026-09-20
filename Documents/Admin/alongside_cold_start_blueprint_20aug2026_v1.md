@@ -68,8 +68,8 @@ git clone --depth 1 https://x-access-token:$TOKEN@github.com/build-new-habits/al
 
 | | Version |
 |---|---|
-| `store.js` | v73 |
-| `Schema.md` | v1.66 |
+| `store.js` | v74 |
+| `Schema.md` | v1.67 |
 | `sw.js` | **v532**, cache `alongside-v532` |
 | `router.js` | v22 · `my-programme.js` v8 · `today.js` v25 · `settings.js` v36 · `progress.js` v11 · `onboarding/thread.js` v13 |
 | `exercise-card.js` | **v7** — CARD-4, four pages. `workout.css` v16 |

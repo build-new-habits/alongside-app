@@ -2,7 +2,11 @@ import { zonesForAreas } from "./data/aims.js";
 
 /**
  * store.js - Data persistence layer
- * 16 Sep 2026 v73
+ * 16 Sep 2026 v74
+ *
+ * v74 - AROUND-AREA. todayForm: the form answered, before translation.
+ *   "Build strength around it" and "strength" both become a session
+ *   type; only this tells them apart, and the proposal line needs to.
  *
  * v73 - PURPOSE-ASK. todayPurpose and todayPurposeArea: WHY this
  *   session, as the person said it.
@@ -1253,6 +1257,13 @@ export const store = {
       // check-in.
       todayPurpose:     null,
       todayPurposeArea: null,
+      // AROUND-AREA, 16 Sep 2026. The FORM they answered, before
+      // translation. requestedSessionType holds what it becomes; this
+      // holds what they said. "Build strength around it" and "strength"
+      // both become a session type, and only this tells them apart --
+      // which the proposal line needs, because that difference is the
+      // whole point of the recommendation.
+      todayForm:        null,
 
       // ASK-KIND, 16 Sep 2026. A session type the person asked for
       // instead of the one the arc chose, or null. Spends ONE session
@@ -1272,6 +1283,7 @@ export const store = {
 
       // PURPOSE-ASK. Why today's session, and where, as they said it.
       todayPurpose:     saved.todayPurpose     || null,
+      todayForm:        saved.todayForm        || null,
       todayPurposeArea: saved.todayPurposeArea || null,
 
       // ASK-KIND. The kind of session the person asked for, for today.

@@ -6,7 +6,7 @@ Supersedes `master_schedule_v377.md`. Remove v377 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
-> **Live: `alongside-v532`, 166 gates, `store.js` v73, `Schema.md` v1.66, cold start blueprint v137.** Read that blueprint after this block.
+> **Live: `alongside-v532`, 166 gates, `store.js` v74, `Schema.md` v1.67, cold start blueprint v137.** Read that blueprint after this block.
 >
 > ### 🟢 FULL TRACE — 16 Sep, `v532`. Driven end to end, and it found one more.
 >
