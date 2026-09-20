@@ -42,6 +42,12 @@
  */
 
 import { store } from "./store.js";
+// ALIAS-ONE, 16 Sep 2026. Imported, not copied. This module carried its
+// own alias table until today and it had ALREADY diverged from the one
+// in session-rationale.js by a single entry -- achilles. Two tables
+// answering "what does a sore X cover" is how a card's caution and a
+// selector's preselection come to disagree about the same body.
+import { AREA_ALIASES } from "./data/session-rationale.js";
 
 /**
  * Four targets, deliberately coarse.
@@ -61,18 +67,6 @@ export const TARGET_AREAS = [
   { id: "all",       label: "All over",      icon: "\u2728", areas: [] }
 ];
 
-/** See the header: a second copy of the stretch-side aliases. ALIAS-ONE. */
-const ALIASES = {
-  "lower-back":        ["lower-back", "spine"],
-  "upper-back":        ["upper-back", "thoracic"],
-  "sciatica":          ["lower-back", "glutes", "hamstring", "piriformis"],
-  "it-band":           ["hip", "knee"],
-  "shin-splints":      ["calves", "ankle-foot"],
-  "achilles":          ["calves", "ankle-foot"],
-  "plantar-fasciitis": ["ankle-foot", "calves"],
-  "biceps-triceps":    ["triceps-biceps"],
-  "wrist-elbow":       ["wrist-elbow"]
-};
 
 /**
  * The target the check-in already implies, or null.
@@ -94,7 +88,7 @@ export function impliedTarget() {
   if (!sore.length) return null;
 
   for (const id of sore) {
-    const areas = ALIASES[id] || [id];
+    const areas = AREA_ALIASES[id] || [id];
     const hit = TARGET_AREAS.find(t => t.areas.some(a => areas.includes(a)));
     if (hit) return hit.id;
   }
