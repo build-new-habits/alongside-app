@@ -1,6 +1,15 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 16 Sep 2026 v529
+ *
+ * v529 - BLANK-QUESTION. router.js v29.
+ *
+ *   Third attempt at the blank-screen check and the first two were
+ *   guesses. It now asks whether the container is EMPTY rather than
+ *   whether it has TEXT. check-in writes markup at once but its first
+ *   words arrive up to 2.5s in, so both earlier versions failed it.
+ *
  * 16 Sep 2026 v528
  *
  * v528 - BLANK-TIMING. router.js v28.
@@ -3742,7 +3751,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v528";
+const CACHE_NAME = "alongside-v529";
 
 const SHELL_URLS = [
 
