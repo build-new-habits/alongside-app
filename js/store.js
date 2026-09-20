@@ -2,6 +2,20 @@ import { zonesForAreas } from "./data/aims.js";
 
 /**
  * store.js - Data persistence layer
+ * 16 Sep 2026 v73
+ *
+ * v73 - PURPOSE-ASK. todayPurpose and todayPurposeArea: WHY this
+ *   session, as the person said it.
+ *
+ *   The coach assumed the reason was always the arc. Everything
+ *   downstream followed from one hardcoded purpose, which is why the
+ *   answer kept being core -- and why three fixes at the wrong level
+ *   (ALWAYS-CORE, PROPOSAL-LOC, ASK-KIND) all missed.
+ *
+ *   Cleared at the start of each check-in, not carried. A purpose is a
+ *   fact about TODAY, like the check-in itself; yesterday's reason is
+ *   not a default.
+ *
  * 16 Sep 2026 v72
  *
  * v72 - EXIT-LOOP + ASK-KIND. declinedProposalAt, and
@@ -1233,6 +1247,13 @@ export const store = {
 
       guidanceShownAt: saved.guidanceShownAt || null,
 
+      // PURPOSE-ASK, 16 Sep 2026. The answer to "what's today for?" --
+      // arc | niggle | area | general | gentle -- and the body area it
+      // concerns, where one applies. Both cleared at the start of every
+      // check-in.
+      todayPurpose:     null,
+      todayPurposeArea: null,
+
       // ASK-KIND, 16 Sep 2026. A session type the person asked for
       // instead of the one the arc chose, or null. Spends ONE session
       // differently; it does not edit the arc, and the arc resumes as
@@ -1248,6 +1269,10 @@ export const store = {
       // Nested under arc so it shares the arc's lifecycle: a new arc
       // starts with a clean slate rather than inheriting credit from
       // the one before it.
+
+      // PURPOSE-ASK. Why today's session, and where, as they said it.
+      todayPurpose:     saved.todayPurpose     || null,
+      todayPurposeArea: saved.todayPurposeArea || null,
 
       // ASK-KIND. The kind of session the person asked for, for today.
       requestedSessionType: saved.requestedSessionType || null,

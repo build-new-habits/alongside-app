@@ -119,13 +119,27 @@ check("The drop-in coach question is free", `${DEST} §8`, () => {
   ok(!/!isPremium\(\)/.test(varietyFn),
      "INVERTED: !isPremium() would paywall the free coach question, which is " +
      "exactly what §8 forbids and what was proposed on 15 Sep");
-  // The import is expected; anything BEYOND the import and this one
-  // function is a tier check that §8 does not sanction.
+  // PURPOSE-ASK, 16 Sep 2026. A SECOND tier check now exists, and it is
+  // named rather than the rule being loosened.
+  //
+  // §8 says the drop-in question is FREE. It does not say free is the
+  // only thing that may branch on tier -- and the Plan's version of that
+  // same moment is a different question entirely: "what's today for?",
+  // which needs an arc to mean anything.
+  //
+  // So both branches are pinned. Free must still reach _showVarietyBeat,
+  // the Plan must reach _showPurposeBeat, and NOTHING ELSE in this file
+  // may branch on tier. A third check goes red here.
+  ok(/isPremium\(\)\)\s*\{\s*\n\s*await _showPurposeBeat/.test(c),
+     "the Plan branch is missing or has been rewired; §8's free question and " +
+     "the Plan's purpose question are two halves of one moment");
+
   const rest = c.replace(varietyFn, "")
-                .replace(/import \{ isPremium \}[^\n]*\n/, "");
+                .replace(/import \{ isPremium \}[^\n]*\n/, "")
+                .replace(/if \(isPremium\(\)\) \{[\s\S]{0,400}?_showPurposeBeat\(\);[^\n]*\n/, "");
   ok(!/isPremium/.test(rest),
-     "a tier check has appeared elsewhere in check-in; §8 scopes tier-awareness " +
-     "to this one question and nothing else in the flow");
+     "a THIRD tier check has appeared in check-in; §8 sanctions exactly two -- " +
+     "the free drop-in question and the Plan's purpose question");
 });
 
 console.log("\nP1 \u2014 the coach never sells");

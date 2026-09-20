@@ -45,38 +45,38 @@ const today = read("js/views/today.js");
 store.init();
 console.log("\nASK-KIND / EXIT-LOOP\n");
 
-console.log("TEST 1 — the person can ask for a kind");
+console.log("TEST 1 — the person can ask, and is now ASKED");
 
-ok("1.1 a requested type is read before the arc's choice",
+// SUPERSEDED BY PURPOSE-ASK, SAME DAY. These assertions described
+// "Something else today?" -- a collapsed picker under the proposal
+// heading, offering eight shapes of session.
+//
+// Graeme, within hours: "the 'something else' is almost invisible and
+// completely the wrong thing." He was right twice. It offered a
+// different SHAPE when the missing question was WHY somebody was
+// training today, and it hid that behind a link.
+//
+// The picker is gone. The question is asked properly, in the check-in,
+// in the coach's voice -- see verify-purpose-ask. What is asserted HERE
+// is the half that survived: requestedSessionType still reaches the
+// builder and still overrides the arc. The plumbing was right; the
+// question was wrong.
+
+ok("1.1 a requested type still overrides the arc's choice",
    /store\.get\('requestedSessionType'\)/.test(prop) &&
    /const sessionType = requested \|\| chosen\.sessionType/.test(prop),
-   "the arc must still decide when nobody has said otherwise -- that is the " +
-   "whole Plan promise -- but a request has to win when there is one");
+   "the arc must still decide when nobody has said otherwise, but a request " +
+   "has to win when there is one");
 
-ok("1.2 every kind is offered, not just the three the engine picks", (() => {
-  const i = prop.indexOf("const KINDS = [");
-  const body = prop.slice(i, i + 700);
-  return ["full", "upper", "lower", "core", "glute", "cardio", "mobility", "stretch"]
-    .every(k => body.includes(`'${k}'`));
-})(), "at home the engine only ever offered core, mobility and stretch, so " +
-      "strength and cardio were unreachable whatever somebody wanted");
+ok("1.2 REVERSAL: the picker itself is gone",
+   !/_kindPicker/.test(prop) && !/data-kind=/.test(prop),
+   "if it is back, PURPOSE-ASK and it are both asking and the person answers " +
+   "the same thing twice");
 
-ok("1.3 \"gym\" is not offered", !/id: 'gym'/.test(prop),
-   "it says WHERE, not what -- same call as capture");
-
-ok("1.4 asking again clears it, so the arc takes back over",
-   /now === id \? null : id/.test(prop),
-   "an ask made by accident must be un-makeable");
-
-ok("1.5 it is collapsed and sits BELOW the cards", (() => {
-   return /<details class=\\?"cp-kind\\?"/.test(prop) &&
-          prop.indexOf("cp-preview-cards") < prop.indexOf("_kindPicker()") === false
-       || /_kindPicker\(\)/.test(prop);
-})(), "the suggestion is still the coach's opening move and should be read first");
-
-ok("1.6 the copy says it is for today only",
-   /Your arc picks up again tomorrow/.test(prop),
-   "a request spends ONE session differently; it must not read as editing the arc");
+ok("1.3 the field is set by the check-in now, not a link on the proposal", (() => {
+  const checkin = fs.readFileSync(new URL("../js/views/checkin.js", import.meta.url), "utf8");
+  return /store\.set\("requestedSessionType", sessionTypeForForm/.test(checkin);
+})());
 
 console.log("\nTEST 2 — a request does not edit the arc");
 {

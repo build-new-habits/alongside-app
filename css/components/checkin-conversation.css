@@ -763,3 +763,40 @@
     transform: none;
   }
 }
+
+/* ============================================================
+   PURPOSE-ASK, 16 Sep 2026. The suggested option.
+
+   Graeme: "Coach should make a suggestion based on all the pain
+   data etc... and these are gold marked."
+
+   Gold, matching SUGGESTED FOR TODAY on the proposal cards, so
+   the same idea looks the same in both places.
+
+   The mark is carried by the badge, the border weight AND the
+   word "Suggested" — never by colour alone (1.4.1). The other
+   options keep their normal styling and remain fully
+   selectable: this is a recommendation, not a default.
+   ============================================================ */
+
+.ci-choice--rec {
+  border-color: var(--color-warning, #fbbf24);
+  border-width: 2px;
+  position: relative;
+}
+
+.ci-choice__rec {
+  display: inline-block;
+  margin-bottom: var(--space-1);
+  padding: 2px 10px;
+  border-radius: var(--radius-sm, 6px);
+  background: var(--color-warning, #fbbf24);
+  color: #412402;
+  font-size: var(--text-xs);
+  font-weight: var(--font-semibold);
+  letter-spacing: 0.04em;
+}
+
+@media (prefers-contrast: more) {
+  .ci-choice--rec { border-width: 3px; }
+}

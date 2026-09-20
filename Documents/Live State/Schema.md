@@ -1,5 +1,52 @@
 # Alongside — Data Schema Reference
-## 16 Sep 2026 v1.65
+## 16 Sep 2026 v1.66
+
+> **v1.66, 16 Sep 2026 — PURPOSE-ASK.** Two new top-level fields:
+> **`todayPurpose`** (`arc | niggle | area | general | gentle`, or null)
+> and **`todayPurposeArea`** (a `TARGET_AREAS` id or condition id, or
+> null).
+>
+> Graeme, after three fixes at the wrong level: *"The coach still doesn't
+> ask what I want. Like, work towards my arc, conditions, body zone,
+> general fitness, etc. There are lots of reasons to work out but the
+> coach never asks."*
+>
+> 🔴 **The coach assumed the reason was always the arc.** Everything
+> downstream followed from one hardcoded purpose, which is why the answer
+> kept being core. ALWAYS-CORE fixed the rotation, PROPOSAL-LOC fixed the
+> alternates, ASK-KIND offered a different *shape* of session — all real
+> bugs, none of them the question. **The repetition was the signal and it
+> was read as a reminder.**
+>
+> ⚫ **Cleared at the start of every check-in, not carried.** A purpose
+> is a fact about today, like the check-in itself. Yesterday's reason is
+> not a default, and a stale one would be the same class of fault as
+> reading `generatedSession` as a record.
+>
+> ⚫ **`requestedSessionType` is reused** as the answer to the second
+> question rather than adding a third field. ASK-KIND's plumbing was
+> right; the question it asked was wrong.
+>
+> **What may be reasoned from, all of it already recorded:**
+> `checkinHistory[date].conditionLevels` (how often and how recently an
+> area was flagged), `conditionPainScores` (today), `activityLog[]`
+> `sessionType` and `completedAt` (live since ALWAYS-CORE), and
+> `arc.zonesWorked` / `arc.typesWorked` (live since ARC-EVERYTHING).
+>
+> 🔴 **The honesty rule.** A recommendation's reason must be something
+> the person told the app, said back to them — *"you've flagged this
+> three times in a fortnight"*, never *"this is what your body needs"*.
+> Same rule as the caution line on the exercise cards, and the same
+> reason: the second kind is a diagnosis. `verify-purpose-ask` enforces
+> it against a word list.
+>
+> 🔴 **With no history there is no recommendation.** On day one the
+> options are offered unmarked. The gold mark means *"I have a reason"*
+> and must never mean *"I have to pick something"* — inventing confidence
+> is the failure mode of every app this product exists as an alternative
+> to.
+
+> **v1.65, 16 Sep 2026
 
 > **v1.65, 16 Sep 2026 — ASK-KIND + EXIT-LOOP.** Two new top-level
 > fields, both answering things Graeme reported more than once.
@@ -379,7 +426,7 @@
 
 ## 06 Sep 2026 v1.51
 
-**File:** `js/store.js` (confirmed live version: **v72, 16 Sep 2026**)
+**File:** `js/store.js` (confirmed live version: **v73, 16 Sep 2026**)
 
 > **v1.47, 06 Sep 2026 — CR-1.** `conditions[]` gains three ids and loses one. `chronic-fatigue` is **retired**; `persistent-fatigue`, `me-cfs` and `long-covid` replace it. No field shape changed — `conditions` is still `string[]` and `conditionMeta` is still keyed by condition id.
 >

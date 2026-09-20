@@ -1,32 +1,12 @@
 # Alongside: Move — Master Schedule
-## 16 Sep 2026 v377
+## 16 Sep 2026 v376
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v376.md`. Remove v376 on upload.
+Supersedes `master_schedule_v375.md`. Remove v375 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
-> **Live: `alongside-v531`, 166 gates, `store.js` v73, `Schema.md` v1.66, cold start blueprint v136.** Read that blueprint after this block.
->
-> ### 🟢 PURPOSE-ASK — SHIPPED 16 Sep, `v531`. The coach asks why, then recommends what.
->
-> Spec: `Documents/Admin/alongside_purpose_ask_spec_16sep2026_v1.md`.
->
-> 🔴 **The coach assumed the reason was always the arc.** Everything downstream followed from one hardcoded purpose, which is why the answer kept being core. **Three fixes were made at the wrong level first** — ALWAYS-CORE (the rotation), PROPOSAL-LOC (the alternates), ASK-KIND ("something else today?"). Each was a real bug. **None was the question.** Graeme asked four times across five days, ending: *"The coach still doesn't ask what I want... there are lots of reasons to work out but the coach never asks."*
->
-> **Two questions at the end of the check-in.** Q1: what is today for — arc, a niggle, a particular area, general fitness, just moving. Q1b: **where, only when the app does not already know** — skipped entirely when exactly one area was flagged at check-in, because asking again three questions later is the coach not listening. Q2: what would help.
->
-> ⚫ **Q2 is a RECOMMENDATION, not a menu** — Graeme's correction, and the better design: *"Coach should make a suggestion based on all the pain data etc... and these are gold marked."* One option marked with a reason; the rest sit below it and can be chosen freely. Four neutral options ask somebody to be their own physiotherapist.
->
-> 🔴 **THE HONESTY RULE.** A reason must be something the person told the app, said back to them. *"You've flagged this three times in a fortnight"* — yes. *"This is what your body needs"* — never. `verify-purpose-ask` 3.2 fails on a word list including needs, weak, ready for, imbalance, corrective, with 3.3 proving the list would catch one.
->
-> 🔴 **DAY ONE SAYS NOTHING.** With no history there is nothing to reason from, so no option is marked. **The gold mark means "I have a reason" and must never mean "I have to pick something"** — that is every fitness app this product exists as an alternative to.
->
-> 🔴 **FIFTH DEAD BRANCH OF THE DAY, caught by driving it.** `timesFlagged()` looked up `conditionLevels["back-hips"]` — a coarse TARGET_AREAS id — while check-in records conditions (`"lower-back"`). **It returned null for everybody.** Twelve days of flag history produced no recommendation. Same family as ALIAS-ONE, one layer up. A source read would have passed: a recommendation that never fires looks exactly like one that does.
->
-> 🟢 **And it says it in THEIR words.** The first working version read *"you've flagged your back hips three times"* — the app's bucket, not the name they used. Reasons now name the condition actually flagged. The honesty rule includes the words.
->
-> ⚫ **ASK-KIND is removed.** Graeme: *"almost invisible and completely the wrong thing."* Its store field `requestedSessionType` is kept and becomes Q2's answer — the plumbing was right, the question was wrong.
+> **Live: `alongside-v530`, 165 gates, `store.js` v72, `Schema.md` v1.65, cold start blueprint v135.** Read that blueprint after this block.
 >
 > ### 🔴 ASK-KIND — SHIPPED 16 Sep, `v530`. He asked on Monday and I built a rotation instead.
 >
@@ -9534,4 +9514,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v377*
+*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v376*
