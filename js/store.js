@@ -1,5 +1,15 @@
 /**
  * store.js - Data persistence layer
+ * 16 Sep 2026 v70
+ *
+ * v70 - ALWAYS-CORE. logActivity() stamps sessionType onto the entry.
+ *
+ *   Schema.md already said this field was "Written by
+ *   store.logActivity()". It was not, so recentSessionTypes() was
+ *   permanently empty, and chooseSessionType()'s rotation was a
+ *   deterministic pick of the arc's first type. Graeme got core, every
+ *   session, for as long as he used it.
+ *
  * 16 Sep 2026 v69
  *
  * v69 - SAVE-HANDOFF. lastFinishedSession: the one way a session view
@@ -2832,9 +2842,47 @@ export const store = {
       return null;
     }
 
+    // ALWAYS-CORE, 16 Sep 2026. STAMP sessionType, BECAUSE NOTHING DID.
+    //
+    // Graeme, testing the 1-to-1 path: "The options are core, mobility
+    // and stretch. It seems to always be core."
+    //
+    // It always was. chooseSessionType() step 2 picks the first arc type
+    // NOT in recentSessionTypes(), and recentSessionTypes() filters the
+    // activity log on validType(e.sessionType) -- a field no view ever
+    // wrote. So `recent` was permanently [], firstUnused() always
+    // returned arcTypes[0], and a rotation that reads as a rotation was a
+    // deterministic pick of the first element wearing the reason
+    // "arc-gap". Three sessions in, still core.
+    //
+    // 🔴 Schema.md §activityLog[].sessionType ALREADY SAID "Written by
+    // store.logActivity(), from the sessionType supplied by whichever
+    // builder produced the session." It was not. The documentation and
+    // the reader agreed; nothing executed. Same shape as CARD-6's grammar
+    // fix, which three documents also called done.
+    //
+    // ⚫ STAMPED HERE, NOT IN ELEVEN VIEWS. logActivity() is the single
+    // write path and the schema already names it as the writer. Eleven
+    // call sites each remembering to pass a field is how five views got
+    // wired and called thirteen.
+    //
+    // An explicit sessionType on the entry always wins: a caller that
+    // knows better than the store should not be overruled by it.
+    const _inferredType = (() => {
+      if (entry.sessionType) return entry.sessionType;
+      try {
+        const fin = this.get('lastFinishedSession');
+        if (fin && fin.session && fin.session.sessionType) return fin.session.sessionType;
+        const gen = this.get('generatedSession');
+        if (gen && gen.session && gen.session.sessionType) return gen.session.sessionType;
+      } catch { /* absent is normal -- see Schema.md, not back-filled */ }
+      return null;
+    })();
+
     const finalEntry = {
       id: entry.id || (new Date().toISOString() + '_' + Math.random().toString(36).slice(2, 6)),
-      ...entry
+      ...entry,
+      sessionType: _inferredType
     };
 
     // EMPTY-SESSION GUARD (11 Aug 2026). Graeme: "I opened a session and
