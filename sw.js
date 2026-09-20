@@ -1,6 +1,22 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 16 Sep 2026 v531
+ *
+ * v531 - PURPOSE-ASK. ONE NEW FILE PRECACHED: js/data/purpose.js.
+ *   store.js v73, Schema.md v1.66, checkin.js, coach-proposal.js,
+ *   checkin-conversation.css.
+ *
+ *   The coach assumed the reason for training was always the arc. It
+ *   now asks -- arc, a niggle, an area, general fitness, just moving --
+ *   and then RECOMMENDS a form with a reason drawn from what the person
+ *   has actually told it. No history, no recommendation.
+ *
+ *   ASK-KIND's "Something else today?" is removed; its store field
+ *   becomes the answer to the second question.
+ *
+ *   New gate: tools/verify-purpose-ask.mjs. 166 gates.
+ *
  * 16 Sep 2026 v530
  *
  * v530 - ASK-KIND + EXIT-LOOP. store.js v72, Schema.md v1.65,
@@ -3765,7 +3781,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v530";
+const CACHE_NAME = "alongside-v531";
 
 const SHELL_URLS = [
 
@@ -3840,6 +3856,7 @@ const SHELL_URLS = [
   "/alongside-app/js/safety-gate.js",
   "/alongside-app/js/save-block.js",
   "/alongside-app/js/stretch-target.js",
+  "/alongside-app/js/data/purpose.js",
   "/alongside-app/js/views/capture.js",
   "/alongside-app/js/exercise-timing.js",
   "/alongside-app/js/display-prefs.js",
