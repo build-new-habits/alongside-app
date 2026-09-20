@@ -73,6 +73,41 @@ export const centered = false;
 /** What has been captured this session. Cleared when the view is left. */
 let captured = [];
 let query    = "";
+/**
+ * CAPTURE-2, 16 Sep 2026. What kind of session this was, if they say.
+ *
+ * 🔴 CAPTURE-1 credited the BODY channel from the movements' areas and
+ * deliberately did not invent a sessionType -- a captured set of
+ * movements is not one of the builder's eight types. That was right, and
+ * it left a hole: capability strands light from sessionTypes, and 18 of
+ * the 30 strands in the library are capability strands. A captured
+ * session could never light Trunk strength, Staying-power or Pacing
+ * yourself, however much work went into it.
+ *
+ * ⚫ ASKING IS NOT INVENTING. The answer is the person's, so it can
+ * credit the arc honestly -- the same distinction that governs what this
+ * app records anywhere: stated, not inferred. Null until they say, and
+ * skipping is a first-class answer rather than a nag.
+ */
+let kind = null;
+
+/**
+ * CAPTURE-2. A short list, not the builder's nine.
+ *
+ * "Gym" is left out: it describes WHERE, not what, and no arc strand
+ * leans on it. The rest are the types capability strands actually name,
+ * in the words somebody would use about the session they just did.
+ */
+const CAPTURE_KINDS = [
+  { id: "full",     label: "Full body" },
+  { id: "upper",    label: "Upper body" },
+  { id: "lower",    label: "Lower body" },
+  { id: "core",     label: "Core" },
+  { id: "glute",    label: "Glutes" },
+  { id: "cardio",   label: "Cardio" },
+  { id: "mobility", label: "Mobility" },
+  { id: "stretch",  label: "Stretching" }
+];
 
 function esc(s) {
   return String(s == null ? "" : s)
@@ -207,6 +242,29 @@ export function render() {
                       aria-label="Remove ${esc(c.name)}">Remove</button>
             </li>`).join("")}
         </ul>
+        <!--
+          CAPTURE-2. Optional, and last: somebody cannot say what a
+          session was before they have done it, and asking first would
+          turn a picker into a form. Skipping costs nothing except the
+          capability half of the credit, which is the honest trade.
+        -->
+        <h2 class="cap-heading" id="cap-kind-h">What was this, roughly?</h2>
+        <ul class="cap-areas" role="group" aria-labelledby="cap-kind-h">
+          ${CAPTURE_KINDS.map(k => `
+            <li>
+              <button type="button" class="cap-area${kind === k.id ? " is-selected" : ""}"
+                      data-kind="${esc(k.id)}"
+                      aria-pressed="${kind === k.id ? "true" : "false"}">
+                ${esc(k.label)}
+              </button>
+            </li>`).join("")}
+        </ul>
+        <p class="cap-empty">
+          ${kind
+            ? "That lets it count towards the parts of your arc this kind of session builds."
+            : "Optional. Without it, this still counts for the areas you worked."}
+        </p>
+
         <button type="button" class="btn btn-primary btn-full" id="cap-finish">
           Finish \u2014 ${captured.length} ${captured.length === 1 ? "movement" : "movements"}
         </button>
@@ -238,14 +296,18 @@ function rerender() {
 function finish() {
   if (!captured.length) return;
 
-  store.set("lastFinishedSession", {
-    at: new Date().toISOString(),
-    session: {
-      id:        "capture",
-      title:     "Your own, as you went",
-      exercises: captured.map(c => ({ id: c.id, affectsAreas: c.affectsAreas || [] }))
-    }
-  });
+  // CAPTURE-2. sessionType is included ONLY if they said so. Absent
+  // otherwise, exactly as CAPTURE-1 shipped it: the body channel still
+  // credits from the areas, and nothing claims a kind of work that was
+  // never declared.
+  const session = {
+    id:        "capture",
+    title:     "Your own, as you went",
+    exercises: captured.map(c => ({ id: c.id, affectsAreas: c.affectsAreas || [] }))
+  };
+  if (kind) session.sessionType = kind;
+
+  store.set("lastFinishedSession", { at: new Date().toISOString(), session });
 
   store.logActivity({
     type:        "capture",
@@ -255,6 +317,7 @@ function finish() {
 
   captured = [];
   query = "";
+  kind = null;
   router.navigate("reflect");
 }
 
@@ -320,6 +383,16 @@ export function onMount() {
     if (area) {
       const t = TARGET_AREAS.find(x => x.id === area.dataset.area);
       if (t) { query = (t.areas[0] || "").replace(/-/g, " "); rerender(); }
+      return;
+    }
+
+    const k = ev.target.closest("[data-kind]");
+    if (k) {
+      // Tapping the chosen one again clears it: a question somebody
+      // answered by accident must be un-answerable, or the only way out
+      // is to leave and start again.
+      kind = (kind === k.dataset.kind) ? null : k.dataset.kind;
+      rerender();
       return;
     }
 
