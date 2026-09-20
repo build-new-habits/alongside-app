@@ -1,6 +1,18 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 16 Sep 2026 v525
+ *
+ * v525 - ALIAS-ONE. data/session-rationale.js, stretch-target.js.
+ *
+ *   Two condition-to-area alias tables, already diverged by one entry
+ *   (achilles), and "achilles" is a real affectsAreas value -- so they
+ *   genuinely disagreed about which exercises load it. Merged into one,
+ *   owned by session-rationale.js where the threshold lives.
+ *
+ *   Proven behaviour-identical before merging: "achilles" is in no
+ *   TARGET_AREA, so the stretch side resolves exactly as before.
+ *
  * 16 Sep 2026 v524
  *
  * v524 - INTENSITY-SPACE. data/workoutGenerator.js,
@@ -3701,7 +3713,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v524";
+const CACHE_NAME = "alongside-v525";
 
 const SHELL_URLS = [
 
