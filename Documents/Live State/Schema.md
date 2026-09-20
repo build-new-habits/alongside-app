@@ -1,5 +1,35 @@
 # Alongside — Data Schema Reference
-## 16 Sep 2026 v1.62
+## 16 Sep 2026 v1.63
+
+> **v1.63, 16 Sep 2026 — ALWAYS-CORE.** No new field. **`store.js` v70
+> now does what this document already said it did.**
+>
+> 🔴 The entry for `activityLog[].sessionType` below has stated since
+> 06 Sep that it is *"Written by `store.logActivity()`, from the
+> `sessionType` supplied by whichever builder produced the session."*
+> **It was not written by anything.** No view passed it and
+> `logActivity()` did not infer it, so the field was `null` on every
+> entry ever created.
+>
+> The consequence was not cosmetic. `recentSessionTypes()` filters the
+> log on `validType(e.sessionType)`, so it returned `[]` permanently;
+> `chooseSessionType()` step 2 picks the first arc type **not** in that
+> list; and a rotation that reads as a rotation was a deterministic pick
+> of `arcTypes[0]`. Graeme got **core, every session** — *"It seems to
+> always be core."* It always was.
+>
+> ⚫ **Stamped in `logActivity()`, not in eleven views.** It is the
+> single write path and this document already names it as the writer.
+> Eleven call sites each remembering to pass a field is how five views
+> got wired and called thirteen. An explicit `sessionType` on the entry
+> still wins: a caller that knows better than the store is not overruled
+> by it.
+>
+> **Still not back-filled.** Existing entries stay `null`, exactly as the
+> entry below says, and the chain must keep treating absence as its
+> normal early state.
+
+> **v1.62, 16 Sep 2026
 
 > **v1.62, 16 Sep 2026 — SAVE-HANDOFF.** New top-level field
 > **`lastFinishedSession`** — the one way a session view hands what just
@@ -257,7 +287,7 @@
 
 ## 06 Sep 2026 v1.51
 
-**File:** `js/store.js` (confirmed live version: **v69, 16 Sep 2026**)
+**File:** `js/store.js` (confirmed live version: **v70, 16 Sep 2026**)
 
 > **v1.47, 06 Sep 2026 — CR-1.** `conditions[]` gains three ids and loses one. `chronic-fatigue` is **retired**; `persistent-fatigue`, `me-cfs` and `long-covid` replace it. No field shape changed — `conditions` is still `string[]` and `conditionMeta` is still keyed by condition id.
 >

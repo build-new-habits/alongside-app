@@ -1,26 +1,12 @@
 # Alongside: Move — Master Schedule
-## 16 Sep 2026 v366
+## 16 Sep 2026 v365
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v365.md`. Remove v365 on upload.
+Supersedes `master_schedule_v364.md`. Remove v364 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
-> **Live: `alongside-v521`, 161 gates, `store.js` v70, `Schema.md` v1.63, cold start blueprint v126.** Read that blueprint after this block.
->
-> ### 🔴 ALWAYS-CORE — SHIPPED 16 Sep, `v521`. The rotation never rotated.
->
-> Graeme, testing 1-to-1: *"The options are core, mobility and stretch. It seems to always be core."* **It always was.**
->
-> `chooseSessionType()` step 2 picks the first arc type **not** in `recentSessionTypes()`. `recentSessionTypes()` filters the activity log on `validType(e.sessionType)` — **a field no view ever wrote.** So `recent` was permanently `[]`, `firstUnused()` always returned `arcTypes[0]`, and a rotation that reads like a rotation was a deterministic pick of the first element **wearing the reason `"arc-gap"`**. Graeme's arc resolves to `core, mobility, full, lower, glute, cardio`. He got core. Every session. For as long as he used it.
->
-> 🔴 **`Schema.md` has said since 06 Sep that this field is "Written by `store.logActivity()`".** It was not. The documentation, the reader and the chooser all agreed; nothing executed. **Same shape as CARD-6's grammar fix, which three documents also called done** — and the third instance today of "the field I assumed does not exist".
->
-> ⚫ **Stamped in `logActivity()`, not in eleven views.** It is the single write path and the schema already names it as the writer; eleven call sites each remembering to pass a field is how five views got wired and called thirteen. An explicit `sessionType` on the entry still wins, and with nothing to infer from it stays `null` rather than guessing — the chain must keep treating absence as its normal early state.
->
-> 🟢 **`verify-always-core` DRIVES four sessions in a row** and asserts they are four different types. Not "is `sessionType` in the source" — the source was always fine. **The only proof that a rotation rotates is running it.** It also asserts the first is still core and the reason still starts with `arc`, because turning an arc-led choice into a shuffle would be a different bug wearing this fix as a disguise.
->
-> Measured: `core → mobility → full → lower`.
+> **Live: `alongside-v520`, 160 gates, `store.js` v69, `Schema.md` v1.62, cold start blueprint v125.** Read that blueprint after this block.
 >
 > ### 🟢 YOUR-OWN-CREATE — SHIPPED 16 Sep, `v520`. A one-branch affordance.
 >
@@ -9355,4 +9341,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v366*
+*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v365*
