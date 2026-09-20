@@ -1,6 +1,15 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 16 Sep 2026 v532
+ *
+ * v532 - PURPOSE-ARC-LABEL. data/purpose.js.
+ *
+ *   purposeLine() read arc.aimLabel, a field that does not exist -- the
+ *   arc stores aimId and the label comes from aimById(). The arc line
+ *   always fell to a generic "your arc" and never named the aim. Found
+ *   by driving the full flow, not by reading it.
+ *
  * 16 Sep 2026 v531
  *
  * v531 - PURPOSE-ASK. ONE NEW FILE PRECACHED: js/data/purpose.js.
@@ -3781,7 +3790,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v531";
+const CACHE_NAME = "alongside-v532";
 
 const SHELL_URLS = [
 
