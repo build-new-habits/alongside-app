@@ -196,6 +196,28 @@ console.log("\nTEST 5 — it reaches the proposal, and ASK-KIND is gone");
   console.log("       " + JSON.stringify(line));
   ok("5.5 the line names the reason they gave", !!line && /lower back/.test(line));
 
+  // 🔴 The first draft read arc.aimLabel, a field that does not exist --
+  // the arc stores aimId and the label comes from aimById(). So the arc
+  // line always fell to the generic "your arc". Sixth dead branch of the
+  // day, found by driving it.
+  ok("5.5a the ARC line names the aim, not just 'your arc'", (() => {
+    reset();
+    store.set("arc", { active: true, aimId: "sport-without-flaring", strands: [] });
+    store.set("todayPurpose", "arc");
+    store.set("requestedSessionType", "strength");
+    const l = P.purposeLine();
+    return !!l && /back flaring up/.test(l);
+  })(), "the aim is already the headline on Today; the proposal must use the " +
+        "same words rather than a generic fallback");
+
+  ok("5.5b REVERSAL: with no aim it still says something", (() => {
+    reset();
+    store.set("arc", { active: true, aimId: null, strands: [] });
+    store.set("todayPurpose", "arc");
+    const l = P.purposeLine();
+    return !!l && l.length > 10;
+  })());
+
   store.set("todayPurpose", "gentle");
   store.set("requestedSessionType", null);
   ok("5.6 and changes with the purpose", P.purposeLine() !== line);
