@@ -1,6 +1,18 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 16 Sep 2026 v521
+ *
+ * v521 - ALWAYS-CORE. store.js v70, Schema.md v1.63.
+ *
+ *   logActivity() now stamps sessionType onto the entry. Schema.md has
+ *   said it did since 06 Sep; nothing wrote it, so
+ *   recentSessionTypes() was permanently empty and the session-type
+ *   rotation was a deterministic pick of the arc's first type. Core,
+ *   every session.
+ *
+ *   New gate: tools/verify-always-core.mjs. 161 gates.
+ *
  * 16 Sep 2026 v520
  *
  * v520 - YOUR-OWN-CREATE. views/today.js.
@@ -3647,7 +3659,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v520";
+const CACHE_NAME = "alongside-v521";
 
 const SHELL_URLS = [
 
