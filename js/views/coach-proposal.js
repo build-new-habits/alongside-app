@@ -465,18 +465,22 @@
  *   master schedule (Appendix Q), not something fixable in
  *   _routeForOption() alone. No change made here.
  *
- *   NOT INVESTIGATED, FLAGGING FOR WHOEVER NEXT TOUCHES checkin.js OR
- *   schema.md: schema.md documents todayIntensity's value space as
- *   "low | moderate | high", but the code (both here and in
- *   workoutGenerator.js's intensityParams table) expects
- *   "recovery | gentle | moderate | challenging". Writing
- *   effectiveIntensity (already in the gentle/moderate/challenging space,
- *   per programmeEngine's getPhaseBias()/getReEntryIntensity()) into
- *   store.todayIntensity is internally consistent with this file and
- *   workoutGenerator.js, but if checkin.js writes todayIntensity in the
- *   low/moderate/high space documented in schema.md, there may be a
- *   separate, pre-existing mismatch there — not ground-truthed this
- *   session, checkin.js not opened.
+ *   RESOLVED 16 Sep 2026, INTENSITY-SPACE. The note below stood here
+ *   unexamined for eight days and it was pointing at a real fault, in a
+ *   different place than it guessed.
+ *
+ *   schema.md was RIGHT: todayIntensity is "low | moderate | high", and
+ *   checkin.js writes that space. The mismatch was downstream, in
+ *   workoutGenerator.js's intensityParams table, keyed "recovery |
+ *   gentle | moderate | challenging". Only "moderate" existed in both,
+ *   so "low" and "high" matched nothing and fell through the
+ *   `|| intensityParams.moderate` fallback -- meaning a check-in saying
+ *   exhausted and one saying flying produced THE IDENTICAL SESSION.
+ *
+ *   Fixed by translating at that boundary rather than renaming the keys,
+ *   because the keys are also intensityBias's space. See
+ *   tools/verify-intensity-space.mjs, which drives the whole chain from
+ *   a check-in energy value rather than reading source.
  *
  * v8 — Door redesign (Door 1 only — Graeme's redesign brief, this session).
  *   Root problem being fixed: the old three-doors model computed one
