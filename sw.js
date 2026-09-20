@@ -1,6 +1,20 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 16 Sep 2026 v523
+ *
+ * v523 - CAPTURE-1. TWO NEW FILES PRECACHED: js/views/capture.js and
+ *   css/components/capture.css.
+ *
+ *   Build as you go, or log what you just did. One picker, two targets
+ *   per result: the name walks the exercise card, "just log it" adds it
+ *   straight to the list. Reached from the Your own room.
+ *
+ *   It writes lastFinishedSession and calls logActivity() like every
+ *   other session, so the arc credits it in full.
+ *
+ *   New gate: tools/verify-capture.mjs. 163 gates.
+ *
  * 16 Sep 2026 v522
  *
  * v522 - ARC-EVERYTHING. store.js v71, data/aims.js, views/today.js,
@@ -3674,7 +3688,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v522";
+const CACHE_NAME = "alongside-v523";
 
 const SHELL_URLS = [
 
@@ -3737,6 +3751,7 @@ const SHELL_URLS = [
   "/alongside-app/css/components/tier-gating.css",
   "/alongside-app/css/components/practices.css",
   "/alongside-app/css/components/club-rooms.css",
+  "/alongside-app/css/components/capture.css",
 
   // Core JS
   "/alongside-app/js/app.js",
@@ -3748,6 +3763,7 @@ const SHELL_URLS = [
   "/alongside-app/js/safety-gate.js",
   "/alongside-app/js/save-block.js",
   "/alongside-app/js/stretch-target.js",
+  "/alongside-app/js/views/capture.js",
   "/alongside-app/js/exercise-timing.js",
   "/alongside-app/js/display-prefs.js",
   "/alongside-app/js/tts.js",
