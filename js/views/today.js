@@ -859,6 +859,31 @@ export function TodayView(router) {
     // pending proposal if there's nothing pending.
     if (_sessionCompletedToday()) return 'default';
 
+    // 🔴 EXIT-LOOP, 16 Sep 2026. LEAVING A SESSION MUST MEAN LEAVING IT.
+    //
+    // Graeme: "I 'exit without saving' and get chucked back to the coach
+    // proposal again and get stuck. Surely it's simple. Wire 'exit
+    // without saving' to the home screen?"
+    //
+    // It already was. All six session views send "exit without saving"
+    // to Today. THIS is what sent him back: a proposal accepted inside
+    // the last ten minutes, with no completed session, resolves to
+    // 'proposal-accepted' and Home re-routes to the proposal instead of
+    // rendering. So Exit worked and Home undid it, for ten minutes or
+    // until something was finished.
+    //
+    // The bounce exists for somebody INTERRUPTED -- a phone call
+    // mid-session, come back, carry on. It never allowed for somebody
+    // who said NO, NOT THIS ONE. Those two look identical from the
+    // store, so the difference has to be recorded when they leave.
+    //
+    // declinedProposalAt is that record. Set by the session views'
+    // discard path; cleared whenever a new proposal is accepted.
+    const declined = store.get('declinedProposalAt');
+    if (declined && lastProposal && new Date(declined) >= new Date(lastProposal)) {
+      return 'default';
+    }
+
     if (lastProposal) {
       const proposalDate = new Date(lastProposal);
       const minsAgo      = (Date.now() - proposalDate.getTime()) / 60000;

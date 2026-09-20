@@ -2,6 +2,29 @@ import { zonesForAreas } from "./data/aims.js";
 
 /**
  * store.js - Data persistence layer
+ * 16 Sep 2026 v72
+ *
+ * v72 - EXIT-LOOP + ASK-KIND. declinedProposalAt, and
+ *   requestedSessionType.
+ *
+ *   ASK-KIND: Graeme, three times in a week -- "How does the coach know
+ *   I want core and not cardio or strength?" It did not. It inferred
+ *   from the arc and never asked. A request overrides the arc for one
+ *   session and does not edit it.
+ *
+ *   EXIT-LOOP: declinedProposalAt records when somebody left a session
+ *   without saving.
+ *
+ *   Home re-routes to the proposal for ten minutes after one is
+ *   accepted, so an interrupted session can be resumed. That made
+ *   "exit without saving" impossible to obey: Exit sent you to Today and
+ *   Today sent you straight back. Graeme, stuck in it: "Surely it's
+ *   simple. Wire 'exit without saving' to the home screen?" It already
+ *   was. Home was undoing it.
+ *
+ *   Interrupted and declined look identical in the store, so the
+ *   difference has to be recorded at the moment somebody leaves.
+ *
  * 16 Sep 2026 v71
  *
  * v71 - ARC-EVERYTHING. arc.typesWorked, and markSessionWorked() called
@@ -1210,10 +1233,28 @@ export const store = {
 
       guidanceShownAt: saved.guidanceShownAt || null,
 
+      // ASK-KIND, 16 Sep 2026. A session type the person asked for
+      // instead of the one the arc chose, or null. Spends ONE session
+      // differently; it does not edit the arc, and the arc resumes as
+      // soon as it is cleared.
+      requestedSessionType: null,
+
+      // EXIT-LOOP, 16 Sep 2026. ISO timestamp of the last "exit without
+      // saving", or null. Compared against lastProposalDate, so a NEWER
+      // proposal clears it without needing to be reset anywhere.
+      declinedProposalAt: null,
+
       // ARC-EVERYTHING. Capability strands, dated like zonesWorked.
       // Nested under arc so it shares the arc's lifecycle: a new arc
       // starts with a clean slate rather than inheriting credit from
       // the one before it.
+
+      // ASK-KIND. The kind of session the person asked for, for today.
+      requestedSessionType: saved.requestedSessionType || null,
+
+      // EXIT-LOOP. When a proposal was last declined, so Home can tell
+      // "interrupted, take me back" from "no, not this one".
+      declinedProposalAt: saved.declinedProposalAt || null,
 
       // SAVE-HANDOFF. A malformed handoff is discarded rather than
       // coerced -- offering to save something unreadable is worse than

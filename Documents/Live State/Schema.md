@@ -1,5 +1,48 @@
 # Alongside — Data Schema Reference
-## 16 Sep 2026 v1.64
+## 16 Sep 2026 v1.65
+
+> **v1.65, 16 Sep 2026 — ASK-KIND + EXIT-LOOP.** Two new top-level
+> fields, both answering things Graeme reported more than once.
+>
+> **`requestedSessionType`** — a session type the person asked for
+> instead of the one the arc chose, or `null`.
+>
+> Graeme, three times in a week: *"How does the coach know I want core
+> and not cardio or strength?"* **It did not. It inferred from the arc
+> and never asked.** When it kept landing on core the ROTATION was fixed
+> — twice — which was a real bug and never the thing being asked for.
+> The rotation also only advances on **completed** sessions, so somebody
+> testing, or somebody who opens the app and changes their mind, sees the
+> arc's first type forever.
+>
+> ⚫ **A request overrides the arc; it does not edit it.** One session
+> spent differently, and the arc resumes as soon as the field is cleared.
+> The arc still decides whenever nobody has said otherwise, which is the
+> whole Plan promise.
+>
+> ---
+>
+> **`declinedProposalAt`** — ISO timestamp of the last "exit without
+> saving", or `null`.
+>
+> Graeme, stuck: *"I 'exit without saving' and get chucked back to the
+> coach proposal again and get stuck. Surely it's simple. Wire 'exit
+> without saving' to the home screen?"* 🔴 **It already was.** All six
+> session views send that button to Today. **Home was undoing it:** a
+> proposal accepted inside ten minutes with no completed session resolves
+> to `proposal-accepted`, and Home re-routes to the proposal instead of
+> rendering.
+>
+> That bounce exists for somebody **interrupted** — phone call
+> mid-session, come back, carry on. It never allowed for somebody who
+> said **no, not this one**, and the two look identical in the store. So
+> the difference is recorded when they leave.
+>
+> ⚫ **Compared against `lastProposalDate` rather than cleared
+> anywhere** — a newer proposal outranks an older decline by being
+> newer, so nothing has to remember to reset it.
+
+> **v1.64, 16 Sep 2026
 
 > **v1.64, 16 Sep 2026 — ARC-EVERYTHING.** New nested field
 > **`arc.typesWorked`** — `{ [sessionType]: "YYYY-MM-DD" }`, the
@@ -336,7 +379,7 @@
 
 ## 06 Sep 2026 v1.51
 
-**File:** `js/store.js` (confirmed live version: **v71, 16 Sep 2026**)
+**File:** `js/store.js` (confirmed live version: **v72, 16 Sep 2026**)
 
 > **v1.47, 06 Sep 2026 — CR-1.** `conditions[]` gains three ids and loses one. `chronic-fatigue` is **retired**; `persistent-fatigue`, `me-cfs` and `long-covid` replace it. No field shape changed — `conditions` is still `string[]` and `conditionMeta` is still keyed by condition id.
 >

@@ -1,32 +1,12 @@
 # Alongside: Move — Master Schedule
-## 16 Sep 2026 v376
+## 16 Sep 2026 v375
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v375.md`. Remove v375 on upload.
+Supersedes `master_schedule_v374.md`. Remove v374 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
-> **Live: `alongside-v530`, 165 gates, `store.js` v72, `Schema.md` v1.65, cold start blueprint v135.** Read that blueprint after this block.
->
-> ### 🔴 ASK-KIND — SHIPPED 16 Sep, `v530`. He asked on Monday and I built a rotation instead.
->
-> Graeme, Monday: *"Perhaps asking the kind of session before check-in would be good. The type of session on offer. In the gym I might do core, strength, mobility and stretching."*
->
-> Graeme, Friday, for the third time: *"Still only core. How does the coach know I want core and not cardio or strength?"* — and *"This is becoming ridiculous. I'm saying the same thing too often."*
->
-> 🔴 **He was right and the repetition was the signal.** It never asked. It inferred from the arc. When it kept landing on core, ALWAYS-CORE fixed the **rotation** — a genuine bug, and the field it depends on is written now — and it still was not the thing being asked for.
->
-> ⚫ **Two compounding reasons "still core" stayed true after a working fix.** The rotation only advances on **completed** sessions, and Graeme has been testing: opening proposals, exiting, hitting errors, never finishing. So there was no history to rotate away from. **And at home the engine only ever offered core, mobility and stretch** — strength and cardio were unreachable whatever anybody wanted.
->
-> **`requestedSessionType`** now overrides the arc's choice, offered as eight kinds under "Something else today?". ⚫ **A request spends ONE session differently; it does not edit the arc**, and the arc resumes the moment it is cleared. Tapping the chosen kind again clears it. Collapsed and below the cards, because the suggestion is still the coach's opening move.
->
-> ### 🔴 EXIT-LOOP — SHIPPED 16 Sep, `v530`. "Surely it's simple. Wire it to the home screen?" It already was.
->
-> **All six session views already sent "exit without saving" to Today. Home was undoing it.** A proposal accepted inside ten minutes with no completed session resolves to `proposal-accepted`, and Home re-routes to the proposal instead of rendering — so Exit worked and Home reversed it, for ten minutes or until something was finished.
->
-> The bounce exists for somebody **interrupted** — phone call mid-session, come back, carry on — and never allowed for somebody who said **no, not this one**. The two are identical in the store, so **`declinedProposalAt`** records the difference at the moment they leave. ⚫ Compared against `lastProposalDate` rather than cleared anywhere, so a newer proposal outranks an older decline by being newer.
->
-> 🟠 **Both of these were reported more than once before being fixed, and that is the finding worth keeping.** Graeme: *"This is why I prefer to test once it's all done... you just seem to be making the same mistake regardless of which chat I'm in."* **A repeated report is not a reminder. It is evidence the first fix answered a different question.**
+> **Live: `alongside-v529`, 164 gates, `store.js` v71, `Schema.md` v1.64, cold start blueprint v134.** Read that blueprint after this block.
 >
 > ### 🔴 BLANK-QUESTION — SHIPPED 16 Sep, `v529`. Third attempt, and the first two were guesses.
 >
@@ -9514,4 +9494,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v376*
+*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v375*

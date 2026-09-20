@@ -282,6 +282,83 @@
   color: var(--color-text-muted);
 }
 
+/* ============================================================
+   ASK-KIND, 16 Sep 2026. "Something else today?"
+
+   Graeme asked three times how the coach knew he wanted core
+   rather than cardio or strength. It did not — it inferred from
+   the arc and never asked.
+
+   Collapsed by default and placed BELOW the cards: the
+   suggestion is still the coach's opening move and should be
+   read first. This answers "not today, thanks", which is a
+   different question from "which of these three".
+   ============================================================ */
+
+.cp-kind { margin: var(--space-4) 0 var(--space-2); }
+
+.cp-kind__summary {
+  cursor: pointer;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  font-size: var(--text-sm);
+  color: var(--color-primary);
+  list-style: none;
+}
+
+.cp-kind__summary::-webkit-details-marker { display: none; }
+.cp-kind__summary::after { content: " \25BE"; margin-left: var(--space-1); }
+.cp-kind[open] .cp-kind__summary::after { content: " \25B4"; }
+
+.cp-kind__summary:focus-visible,
+.cp-kind__chip:focus-visible {
+  outline: 3px solid var(--color-focus, var(--color-primary));
+  outline-offset: 2px;
+}
+
+.cp-kind__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cp-kind__chip {
+  min-height: 48px;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: none;
+  color: var(--color-text);
+  font-family: inherit;
+  font-size: var(--text-sm);
+  cursor: pointer;
+}
+
+/* Marked by border weight and text weight as well as colour, so
+   the chosen one is not carried by colour alone (1.4.1).
+   aria-pressed carries it for a screen reader. */
+.cp-kind__chip.is-selected {
+  border-color: var(--color-primary);
+  border-width: 2px;
+  color: var(--color-primary);
+  font-weight: var(--font-semibold);
+}
+
+.cp-kind__note {
+  margin: var(--space-3) 0 0;
+  font-size: var(--text-xs);
+  line-height: 1.4;
+  color: var(--color-text-muted);
+}
+
+@media (prefers-contrast: more) {
+  .cp-kind__chip { border-width: 2px; }
+}
+
 /* STRETCH-VIA-COACH, 16 Sep 2026. Says which target the coach ordered a
    stretch session around, in the words the stretch door's selector
    uses. Present only when a check-in signal actually drove it -- a

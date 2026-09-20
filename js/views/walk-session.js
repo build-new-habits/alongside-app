@@ -785,6 +785,12 @@ function showExitConfirm() {
     overlay.remove();
     dismountSessionGuard();
     resetSession();
+    // EXIT-LOOP, 16 Sep 2026. Record the DECLINE, not just the exit.
+    // Home re-routes to the proposal for ten minutes after one is
+    // accepted so an interrupted session can be resumed; without this
+    // it re-routed people who had just said no, and navigating to Today
+    // was undone the instant it happened.
+    store.set("declinedProposalAt", new Date().toISOString());
     router.navigate("today");
   });
 }
