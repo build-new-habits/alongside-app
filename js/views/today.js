@@ -7,7 +7,7 @@
  *
  *   Not a relocation for tidiness. The session gate needs the same
  *   sentence, and a second copy of it is precisely how eleven stop lines
- *   ended up phrased eleven different ways. the clinical reviewer's wording exists once,
+ *   ended up phrased eleven different ways. The clinical wording exists once,
  *   in one file, and both places that say it import it from there. The
  *   thirty-day interval, the trigger and the behaviour here are
  *   unchanged.
@@ -679,7 +679,7 @@
 
 import { store }               from '../store.js';
 // SAFETY-GATE, 15 Sep 2026. One cadence in this product, not two, and
-// one copy of the clinical reviewer's wording rather than two that drift apart.
+// one copy of the clinical wording rather than two that drift apart.
 //
 // AT THE TOP, WITH THE OTHER IMPORTS, NOT BESIDE THE CODE THAT USES IT.
 // It was first placed next to _guidanceLine(), which sits inside an
@@ -1787,7 +1787,7 @@ export function TodayView(router) {
  * two places: the closing beat of onboarding -- said once, at signup,
  * and never again -- and the Terms page, which almost nobody opens.
  *
- * the clinical reviewer, the physiotherapist, on the three-question red-flag screen that
+ * Clinical advice on the three-question red-flag screen that
  * was going to be built instead: those questions "only take into account
  * some red flags", and "to protect yourself you might be better off
  * saying something like: the advice given by this app is generic, prior
@@ -1808,7 +1808,7 @@ export function TodayView(router) {
  * happened: repetition without occasion trains people to look past it,
  * and the one time it matters it has already become furniture.
  *
- * ⚫ The wording is close to the clinical reviewer's own rather than rewritten into the
+ * ⚫ The wording is close to the clinical wording rather than rewritten into the
  * coach's voice. Graeme: "I would rather send out your words than mine."
  * It is also NOT in the coach's first person -- the coach says "I" all
  * over this app, and this is the product speaking about its own limits,

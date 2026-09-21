@@ -93,13 +93,13 @@ console.log("\nTEST 1b — CL-6: bench dips are out, and nothing teaches one");
 {
   const dips = all.filter(e => /\bdips?\b/i.test(e.name));
   ok("1b.1 no bench dip anywhere in the morning programme", dips.length === 0,
-     "the clinical reviewer: 'Bench dips would not be my preferred choice for a general beginner " +
+     "Clinical advice: 'Bench dips would not be my preferred choice for a general beginner " +
      "programme; use an easier-to-scale triceps exercise instead.'");
 
   // 🔴 The interrupted turn renamed the exercise to a pushdown and left its
   // guide describing a bench dip -- "hands on bench behind you, lower until
   // elbows at 90 degrees". The screen would have said pushdown and taught
-  // the exact movement the clinical reviewer removed.
+  // the exact movement the clinical advice removed.
   const stale = all.filter(e =>
     /pushdown/i.test(e.name) &&
     /bench|behind you|dip/i.test(JSON.stringify(e.guide || "") + (e.coachNote || "")));

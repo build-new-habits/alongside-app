@@ -226,7 +226,7 @@ console.log("\nTEST 5 — it reaches the proposal, and ASK-KIND is gone");
 
 console.log("\nTEST 5b — CLINICAL-REVIEW: no body part is chosen for loading");
 {
-  // 🔴 the clinical reviewer, reviewing, 16 Sep 2026:
+  // 🔴 In clinical review, 16 Sep 2026:
   //   "I would not support fixed mappings from a reported sore area to a
   //    specific training focus. A self-reported sore area does not
   //    provide enough information to determine what should or should
@@ -262,7 +262,7 @@ console.log("\nTEST 5b — CLINICAL-REVIEW: no body part is chosen for loading")
   ok("5b.6 no reason advises working around, or not working, an area", (() => {
     const reasons = (code.match(/reason: `[^`]+`/g) || []).join(" ");
     return !/around it|work it directly|without loading it|rather than work/i.test(reasons);
-  })(), "the clinical reviewer: 'avoid wording that says the app is strengthening around a " +
+  })(), "Clinical advice: 'avoid wording that says the app is strengthening around a " +
         "problem or advises users not to work an area directly'");
 
   // 🔴 CL-4. This assertion originally looked for the stop advice INSIDE
@@ -271,13 +271,13 @@ console.log("\nTEST 5b — CLINICAL-REVIEW: no body part is chosen for loading")
   // reporting a sore back with nothing recorded yet, with no stop advice
   // at all: the exact person it is for. The advice now stands alone and
   // is asserted as such.
-  ok("5b.7 the stop-and-seek line names all three of the clinical reviewer's conditions",
+  ok("5b.7 the stop-and-seek line names all three of the conditions in the clinical advice",
      /Stop if it gets worse/.test(P.SAFETY_LINE) &&
      /keeps coming back/.test(P.SAFETY_LINE) &&   // persistent
      /getting worse/.test(P.SAFETY_LINE) &&       // worsening
      /worries you/.test(P.SAFETY_LINE) &&         // concerning
      /someone to look at it/.test(P.SAFETY_LINE),
-     "the clinical reviewer: 'include clear advice to stop if symptoms increase and to seek " +
+     "Clinical advice: 'include clear advice to stop if symptoms increase and to seek " +
      "assessment for persistent, worsening, or concerning symptoms'");
 
   ok("5b.7a it is shown for a sore OR a particular area",
@@ -319,7 +319,7 @@ console.log("\nTEST 5b — CLINICAL-REVIEW: no body part is chosen for loading")
 
 console.log("\nTEST 5c — the SEVERE-pain screen, under the same principle");
 {
-  // Predates the clinical reviewer's review and was not in her pack, but falls squarely
+  // Predates the clinical review and was not in her pack, but falls squarely
   // under it. It said "What I can do is work around them" and promised
   // "I'll keep well clear of the affected area" -- a judgement a
   // self-report cannot support, in her words.
@@ -331,12 +331,12 @@ console.log("\nTEST 5c — the SEVERE-pain screen, under the same principle");
 
   ok("5c.1 it no longer says it will work around the area",
      !/work around/i.test(sev.replace(/\/\/.*$/gm, "")),
-     "the clinical reviewer: 'avoid wording that says the app is strengthening around a " +
+     "Clinical advice: 'avoid wording that says the app is strengthening around a " +
      "problem or advises users not to work an area directly'");
 
   ok("5c.2 it no longer promises to keep clear of the area",
      !/keep well clear|keep clear of/i.test(btn),
-     "the clinical reviewer: 'a self-reported sore area does not provide enough information " +
+     "Clinical advice: 'a self-reported sore area does not provide enough information " +
      "to determine what should or should not be loaded'");
 
   ok("5c.3 it offers something gentler, in her words",

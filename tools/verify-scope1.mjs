@@ -4,7 +4,7 @@
  *
  * SCOPE-1. The app says what it is not for.
  *
- * the clinical reviewer, the physiotherapist who reviewed it, closing her reply: "avoid
+ * The clinical advice, closing the reply: "avoid
  * giving exercise advice to complex health groups where the risk is
  * higher like those mentioned CFS, long covid, EDS and people with
  * uncontrolled pain." On ME/CFS specifically: "exercise for this

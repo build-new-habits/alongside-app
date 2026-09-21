@@ -1,30 +1,16 @@
 # Alongside: Move — Master Schedule
-## 16 Sep 2026 v382
+## 16 Sep 2026 v381
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v381.md`. Remove v381 on upload.
+Supersedes `master_schedule_v380.md`. Remove v380 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
-> **Live: `alongside-v536`, 167 gates, `store.js` v74, `Schema.md` v1.67, cold start blueprint v141.** Read that blueprint after this block.
->
-> ### 🔴 REVIEWER-ANON — 16 Sep, `v536`. The clinical reviewer is never named, and never recorded as signing anything off.
->
-> Graeme: *"Please don't sign this to the reviewer though. That's exactly the reason she didn't want to be a named reviewer and I've noticed you've used her name a few times. Remove name references from all docs please."*
->
-> 🔴 **This repository is PUBLIC** (confirmed via the GitHub API). So the name was readable by anyone — in `Documents/`, in commit messages, and **in app code served to every device**: the privacy page carried it in an HTML comment inside its template, which is written into the page itself and visible in the page source.
->
-> **Removed from 26 files**, including five case variants (a label written as `CLINICAL-REVIEW` was missed by a case-sensitive search and is now `CLINICAL-REVIEW`). Replaced with **"clinical review" / "clinical advice"** rather than mechanically, and every changed sentence read afterwards. Two files renamed so the name is not in the path. **The Word document was binary and invisible to text search** — it carried the name on its title line **and in its hidden document properties**, which travel with the file. Regenerated as v2.
->
-> 🔴 **An unpushed "WORDING SIGNED OFF BY [reviewer]" record was discarded, not edited.** The outcome is now recorded as **advice received, not a sign-off**: responsibility for every sentence stays with Build New Habits, and nothing may be described as "clinically approved" or "reviewed by a physiotherapist" anywhere. That framing is what protects the reviewer.
->
-> 🟠 **STILL IN THE PUBLIC COMMIT HISTORY.** Removing it from current files stops it going forward; it does not remove it from git history. Doing that means rewriting history and force-pushing — destructive, and forks, clones and caches may retain it anyway. **Graeme's decision, not taken unilaterally.** 🟠 Also worth his decision: whether `Documents/` belongs in a public repository at all.
->
-> 🟡 Gendered pronouns referring to the reviewer remain in some older documents. They do not name anyone and were left, but flagged.
+> **Live: `alongside-v535`, 167 gates, `store.js` v74, `Schema.md` v1.67, cold start blueprint v140.** Read that blueprint after this block.
 >
 > ### 🟢 CLINICAL-REVIEW — IMPLEMENTED 16 Sep, `v535`. AROUND-REVIEW is CLOSED: the answer was don't build it.
 >
-> Decision record: `Documents/Business/alongside_clinical_feedback_16sep2026_v3.md` (v2). **Her words are recorded verbatim there and everything traces back to them.**
+> Decision record: `Documents/Business/alongside_clinical_feedback_16sep2026_v1.md` (v2). **Her words are recorded verbatim there and everything traces back to them.**
 >
 > Clinical advice: *"I would not support fixed mappings from a reported sore area to a specific training focus. A self-reported sore area does not provide enough information to determine what should or should not be loaded, and the wording risks being interpreted as rehabilitation advice."*
 >
@@ -44,7 +30,7 @@ Supersedes `master_schedule_v381.md`. Remove v381 on upload.
 >
 > 🟡 CL-5 says "throughout". The **162 descriptions already in the library** were never reviewed against it; they remain under the August 95-exercise audit.
 >
-> ### 🟠 CLINICAL FOLLOW-UP PACK — READY FOR CLINICAL REVIEW, 16 Sep. `Documents/Business/alongside_clinical_review_followup_16sep2026_v2.docx`
+> ### 🟠 CLINICAL FOLLOW-UP PACK — READY FOR CLINICAL REVIEW, 16 Sep. `Documents/Business/alongside_clinical_review_followup_16sep2026_v1.docx`
 >
 > Graeme: *"Knowing the workload of [the clinical reviewer], she needs your best recommendations to review... She can then adjust and review rather than create. This respects her time. She'll need reminding what this is."*
 >
@@ -9626,4 +9612,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v382*
+*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v381*

@@ -5,7 +5,7 @@
  * appeared in, replaced by a tricep rope pushdown on the same cable
  * station the paired curl already uses.
  *
- * the clinical reviewer: "Bench dips would not be my preferred choice for a general
+ * Clinical advice: "Bench dips would not be my preferred choice for a general
  * beginner programme; use an easier-to-scale triceps exercise instead."
  * The research pack had found a 2022 motion-capture study putting the
  * bench dip at about 101% of a person's own maximum shoulder extension
@@ -452,7 +452,7 @@ export const MORNING_PROGRAMME = {
               // said pushdown and taught a dip. Caught on review of an
               // interrupted turn's uncommitted work, not by a test.
               //
-              // Written to the clinical reviewer's principles: simple cues, a comfortable
+              // Written to the clinical principles: simple cues, a comfortable
               // controlled range, no single fixed position for everyone.
               guide: { description: "Rope pushdown: stand facing the high cable, elbows by your sides, and straighten your arms down through a comfortable range. Then straight to cable curls on the same station.", cues: ["Elbows stay by your sides", "Move through a range that feels comfortable", "Controlled on the way back up"], youtube: "tricep rope pushdown cable" } }
           ],

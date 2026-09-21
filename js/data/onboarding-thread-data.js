@@ -859,7 +859,7 @@ export const STEPS = {
     //
     // ── SCOPE-1, 08 Sep 2026. THE SECOND PARAGRAPH ───────────────────
     //
-    // the clinical reviewer's closing advice, and the strongest thing in her whole reply:
+    // the closing clinical advice, and the strongest thing in her whole reply:
     // "avoid giving exercise advice to complex health groups where the
     // risk is higher like those mentioned CFS, long covid, EDS and
     // people with uncontrolled pain."

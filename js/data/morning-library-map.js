@@ -128,7 +128,7 @@ export function libraryExerciseFor(morningExercise, EXERCISES) {
 }
 
 /**
- * 🟠 STILL ABSENT FROM THE LIBRARY, for the content session with the clinical reviewer.
+ * 🟠 STILL ABSENT FROM THE LIBRARY, for the next clinical review session.
  *
  * These are movements the programme prescribes and the library does not
  * describe. They are not naming problems and must not be aliased to
@@ -142,10 +142,11 @@ export const MORNING_MISSING_FROM_LIBRARY = [];
 /**
  * CLINICAL-REVIEW, 16 Sep 2026. THE LIST ABOVE IS EMPTY, AND THAT IS THE POINT.
  *
- * It held nine movements the library did not describe. the clinical reviewer reviewed the
- * drafts ("generally sensible and the layout works") and eight were
- * added to the library, written to her principles -- simple cues, a
- * comfortable controlled range, no single fixed position for everyone.
+ * It held nine movements the library did not describe. Clinical review
+ * found the drafts "generally sensible and the layout works", and eight
+ * were added to the library, written to the principles it set out --
+ * simple cues, a comfortable controlled range, no single fixed position
+ * for everyone.
  *
  * The ninth, Tricep Dips (bench), is not missing: it was REMOVED from
  * the programme on her advice (CL-6) and replaced with a rope pushdown,

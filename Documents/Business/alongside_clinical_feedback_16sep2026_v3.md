@@ -1,10 +1,10 @@
 # Clinical feedback — follow-up pack
 
-**16 Sep 2026 v2**
+**16 Sep 2026 v3**
 
 Build New Habits · Alongside: Move · Clinical decision record
 
-Response to `alongside_clinical_review_followup_16sep2026_v1.docx`. Recorded verbatim below, then broken into the decisions it makes. **Her words are the source; everything in the build traces back to this file.**
+Response to `alongside_clinical_review_followup_16sep2026_v2.docx`. Recorded verbatim below, then broken into the decisions it makes. **Her words are the source; everything in the build traces back to this file.**
 
 ---
 
@@ -64,6 +64,14 @@ She approved the *direction*. These are the exact sentences written to follow it
 4. **The severe-pain screen**, not in her original pack: *"…What I can do is keep today gentle, or we can call it a rest day."* followed by the same stop-and-seek line, and the Adapt button: *"Something gentler, that asks less of the sore area."*
 5. **The eight exercises' adaptations**, restyled — e.g. Dumbbell Bench Press: *"If you feel it at the front or top of your shoulder, lower the weights less far."*
 
+## Status of the wording list, 16 Sep 2026
+
+The list above went back for clinical review and **came back with no changes requested.**
+
+⚫ **This is advice received, not a sign-off, and it must never be written up as one.** The reviewer gave this informally and **declined to be a named or formal reviewer** — precisely so that their review would not function as approval. **Responsibility for every sentence the app shows stays with Build New Habits.** Do not describe any of this wording as "clinically approved", "signed off" or "reviewed by a physiotherapist" in the app, on the website, in marketing, or in any document.
+
+⚫ **The reviewer is never named** — in documents, code comments, commit messages, gate strings or file names. This repository is public.
+
 ## What it does not close
 
 - 🟡 CL-5 says "throughout". The 162 descriptions already in the library were not in this pack and have not been reviewed against it. They sit under the August 95-exercise audit.
@@ -72,4 +80,4 @@ She approved the *direction*. These are the exact sentences written to follow it
 
 ---
 
-*Build New Habits · Alongside: Move · Clinical feedback record · 16 Sep 2026 v2*
+*Build New Habits · Alongside: Move · Clinical feedback record · 16 Sep 2026 v3*

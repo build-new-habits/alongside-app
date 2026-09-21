@@ -113,7 +113,7 @@ export function render() {
         <!--
           SCOPE-1, 08 Sep 2026. What this app is NOT for.
 
-          the clinical reviewer, the physiotherapist who reviewed it: "avoid giving exercise
+          Clinical advice: "avoid giving exercise
           advice to complex health groups where the risk is higher like
           those mentioned CFS, long covid, EDS and people with
           uncontrolled pain." On ME/CFS specifically: "exercise for this

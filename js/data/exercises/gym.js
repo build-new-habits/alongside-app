@@ -437,7 +437,7 @@ export const GYM = [
   // CLINICAL-REVIEW, 16 Sep 2026. Three of the nine movements the morning
   // programme prescribed and the library had never described. See the
   // matching block in strength.js for the principles applied and their
-  // source. ⚫ Our application of the clinical reviewer's principles, not her wording.
+  // source. ⚫ Our application of the clinical principles, not her wording.
   // ════════════════════════════════════════════════════════════════════
 
   {

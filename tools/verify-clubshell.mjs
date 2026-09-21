@@ -484,7 +484,7 @@ console.log("\nTEST 12 - GUIDANCE-1: the general-guidance line returns");
 // two places: the closing beat of onboarding -- said once, at signup --
 // and the Terms page, which almost nobody opens.
 //
-// the clinical reviewer, the physiotherapist, on the three-question red-flag screen this
+// Clinical advice on the three-question red-flag screen this
 // replaces: those questions "only take into account some red flags", and
 // "to protect yourself you might be better off saying something like:
 // the advice given by this app is generic, prior to starting any

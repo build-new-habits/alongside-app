@@ -85,7 +85,7 @@ export const PURPOSES = [
  * MODIFICATION, NOT A TREATMENT CHOICE.
  *
  * They were: range of movement, BUILD STRENGTH AROUND IT, stretch it
- * out, move gently. the clinical reviewer, reviewing:
+ * out, move gently. In clinical review:
  *
  *   "I would not support fixed mappings from a reported sore area to a
  *    specific training focus. A self-reported sore area does not provide
@@ -145,7 +145,7 @@ const FORM_TO_SESSION_TYPE = {
  * 🔴 CLINICAL-REVIEW, 16 Sep 2026. AROUND_BY_AREA IS GONE.
  *
  * It mapped a sore area to a training focus -- a sore back to glutes,
- * sore hips to core, a sore shoulder to legs. the clinical reviewer: "I would not support
+ * sore hips to core, a sore shoulder to legs. Clinical advice: "I would not support
  * fixed mappings from a reported sore area to a specific training
  * focus." Her reason is the one the research pack had already half
  * found: a self-reported sore area does not tell the app enough to
@@ -172,7 +172,7 @@ export function sessionTypeForForm(formId) {
 /**
  * 🔴 CL-4, 16 Sep 2026. THE STOP-AND-SEEK LINE, SHOWN EVERY TIME.
  *
- * the clinical reviewer: "Include clear advice to stop if symptoms increase and to seek
+ * Clinical advice: "Include clear advice to stop if symptoms increase and to seek
  * assessment for persistent, worsening, or concerning symptoms."
  *
  * The first implementation put this INSIDE the recommendation reason --
@@ -370,7 +370,7 @@ export function recommendation(purposeId, areaId) {
     // 🔴 CLINICAL-REVIEW, 16 Sep 2026. Every reason here used to tell the
     // person what to do with the sore part -- "I'd build strength around
     // it rather than work it directly", "keeping it moving without
-    // loading it". the clinical reviewer: "Avoid wording that says the app is
+    // loading it". Clinical advice: "Avoid wording that says the app is
     // strengthening around a problem or advises users not to work an
     // area directly."
     //

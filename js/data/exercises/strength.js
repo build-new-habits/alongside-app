@@ -3771,7 +3771,7 @@ export const STRENGTH = [
   // three are in gym.js; bench dips were REMOVED from the programme
   // rather than added here.
   //
-  // Drafted for the clinical reviewer in the clinical follow-up pack and reviewed by her:
+  // Drafted in the clinical follow-up pack and reviewed:
   // "The exercise descriptions are generally sensible and the layout
   // works. I would apply the same principles throughout: use simple
   // movement cues, encourage a comfortable and controlled range, and
