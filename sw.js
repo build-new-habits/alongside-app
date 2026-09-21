@@ -1,7 +1,13 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 16 Sep 2026 v535
+ * 16 Sep 2026 v536
+ *
+ * v536 - REVIEWER-ANON. Comments and one privacy-page template changed
+ *   across js/. The clinical reviewer's name was in the privacy page's
+ *   HTML comment -- written into the page itself -- and in comments in
+ *   code served to every device. Removed; this bump makes devices
+ *   replace the old files rather than keep serving them.
  *
  * v535 - CLINICAL-REVIEW. purpose.js, checkin.js, coach-proposal.js,
  *   morning-programme.js, morning-library-map.js, exercises/strength.js,
@@ -3830,7 +3836,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v535";
+const CACHE_NAME = "alongside-v536";
 
 const SHELL_URLS = [
 
