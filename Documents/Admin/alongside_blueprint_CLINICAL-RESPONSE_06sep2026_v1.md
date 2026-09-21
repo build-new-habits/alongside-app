@@ -9,10 +9,10 @@ Build New Habits | Alongside: Move | Opens against master schedule v288, `alongs
 ## 0. What this responds to
 
 `alongside_Move_-_clinical_advice_-_nine_questions_21aug2026_v4.pdf`, returned annotated
-by the clinical reviewer, a physiotherapist, on or before 06 Sep 2026.
+in clinical review, on or before 06 Sep 2026.
 
 **Provenance, stated precisely because the last file that got this wrong is still being
-corrected.** the clinical reviewer is a named physiotherapist who read the nine-questions document and
+corrected.** A physiotherapist read the nine-questions document and
 answered seven of nine in writing. She is NOT a signed-off clinical reviewer, she
 declined the reviewer role, and she declined to be named on the safety page. Nothing in
 this blueprint may be attributed to "the reviewing physiotherapist" as authority. Where
@@ -30,7 +30,7 @@ covid, EDS and people with uncontrolled pain.
 ## 1. The decision taken, and by whom
 
 **Graeme delegated the call on 06 Sep 2026.** The route chosen is **exclusion, not
-caveat**, for the high-risk populations the clinical reviewer names.
+caveat**, for the high-risk populations the clinical advice names.
 
 **The reasoning, so it can be argued with later.** Three routes were on the table:
 exclude, caveat-and-keep, or hold beta for a paid clinical development role.
@@ -46,7 +46,7 @@ the product was built for. That cost is accepted knowingly, not overlooked.
 
 **What this does not do.** It does not make the product clinically reviewed. The
 critical path in v288 read *clinical pack sent -> reviewer answers -> red-flag screen
-built -> beta*. the clinical reviewer's answers do not clear that path; they narrow what has to be
+built -> beta*. the clinical answers do not clear that path; they narrow what has to be
 decided on it. A paid professional is still required before public launch.
 
 ---
@@ -55,11 +55,11 @@ decided on it. A paid professional is still required before public launch.
 
 | ID | Item | Files | Clinical judgement required |
 |---|---|---|---|
-| CR-1 | Split `chronic-fatigue` into `persistent-fatigue` and `me-cfs`; add `long-covid` | `js/data/conditions.js`, `Schema.md`, `js/store.js` (migration) | None — the clinical reviewer states they are different populations |
+| CR-1 | Split `chronic-fatigue` into `persistent-fatigue` and `me-cfs`; add `long-covid` | `js/data/conditions.js`, `Schema.md`, `js/store.js` (migration) | None — the clinical advice states they are different populations |
 | CR-2 | Exclusion path for `me-cfs` and `long-covid` at onboarding | `js/data/onboarding-thread-data.js`, `js/views/onboarding/thread.js` | None — a statement of product limits |
 | CR-3 | Caveat copy for `hypermobility` (keep the existing stretch block) | `js/data/onboarding-thread-data.js` | None — adapted from EDS Society published wording |
 | CR-4 | General pre-start statement, added to the red-flag screen, not replacing it | RED-FLAG (zero code today) | **Yes, partially — see §4** |
-| CR-5 | Standing pattern on rehab entries: what to do if it hurts during, expect to ache after | `js/data/exercises/*` | None — the clinical reviewer's direct steer, generic |
+| CR-5 | Standing pattern on rehab entries: what to do if it hurts during, expect to ache after | `js/data/exercises/*` | None — the clinical direct steer, generic |
 | CR-6 | Record what stays open, loudly | `Documents/Admin/master_schedule.md` | n/a |
 
 **Touch-once check.** No file in this list appears in another scheduled session in this
@@ -83,7 +83,7 @@ Copy is drafted in full at build time. The register, fixed here so it cannot dri
 - **A reason, not just a refusal.** The app adapts to how you feel today. For ME/CFS
   that mechanism is the problem, not the solution.
 - **A destination.** NICE guideline signpost and the ME Association's activity and
-  exercise page, both of which the clinical reviewer cited.
+  exercise page, both of which the clinical advice cited.
 - **Nurturing voice throughout.** No other register exists and none is added here.
 - **Not paywalled.** Safety never is.
 - **No streak, no shame, no comparison.** Standard.
@@ -93,9 +93,9 @@ is a scope statement about sessions, not an ejection from the product.
 
 ---
 
-## 4. Where this blueprint departs from the clinical reviewer's advice, and why
+## 4. Where this blueprint departs from the clinical advice, and why
 
-**Q1, the red-flag screen.** the clinical reviewer suggests the three questions cover only some red flags,
+**Q1, the red-flag screen.** The clinical advice suggests the three questions cover only some red flags,
 and that a general statement — the advice is generic, see your GP or an exercise
 professional before starting — may serve better.
 
@@ -115,7 +115,7 @@ this blueprint that a professional should overturn if they disagree.**
 
 ## 5. What stays open — nothing here is closed by this session
 
-| Open item | Status after the clinical reviewer | Blocked on |
+| Open item | Status after clinical review | Blocked on |
 |---|---|---|
 | Pain thresholds (the live 6/7/8 contradiction) | **Not answered.** She raised baseline instead: 1->6 is not the same event as 4->6 | Clinical input, plus a baseline field the app does not have |
 | Sleep modification | Agreed in principle, refused a number, said it needs evidence not instinct | Sourced evidence review |
@@ -123,8 +123,8 @@ this blueprint that a professional should overturn if they disagree.**
 | Home equipment gaps (Q9) | **Not answered** | Content work, low clinical risk |
 | Fibromyalgia, osteoporosis | Still zero entries in any avoid/caution list | Clinical input |
 | Progression | Usable rules given: RPE-based, 6-8 weeks for strength, progress when 10 reps feel easy, ROM adapts faster, goal-dependent | Build capacity, not clinical input. **Post-beta** |
-| Photo or video per exercise | the clinical reviewer: always include one | 551 entries. Not pre-beta. Own stream |
-| Named clinical reviewer | **Still unidentified.** the clinical reviewer declined | Graeme |
+| Photo or video per exercise | Clinical advice: always include one | 551 entries. Not pre-beta. Own stream |
+| Named clinical reviewer | **Still unidentified.** The clinical review declined | Graeme |
 
 **PROVENANCE remains open.** Most clinical guidance in this product is still AI-generated
 and unverified. Seven answers from one physiotherapist who declined the role does not
@@ -157,7 +157,7 @@ DEV_PANEL_ENABLED (separate, and still a prerequisite before any tester install)
 
 ## 8. One thing for Graeme, not Claude
 
-the clinical reviewer gave real time to this and asked to be contacted with queries. Two things worth
+Real time was given to this, with an offer to be contacted with queries. Two things worth
 sending back: a thank-you, and one question — whether she knows a physiotherapist or
 exercise professional who would take this on as **paid** work. She declined on time
 grounds, not on interest. That is the highest-leverage outstanding action now, ahead of

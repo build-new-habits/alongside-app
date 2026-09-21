@@ -2,7 +2,7 @@
 
 **Proposal for review · 08 Sep 2026 · Alongside: Move**
 
-the clinical reviewer asked: *"I presume the scores are compared to baseline? If they have 3-4/10 baseline and today they are 6/10, that is different to if the pain score goes from 1-2/10 up to 6/10."*
+The clinical review asked: *"I presume the scores are compared to baseline? If they have 3-4/10 baseline and today they are 6/10, that is different to if the pain score goes from 1-2/10 up to 6/10."*
 
 **She is right about the clinical reality and my recommendation is still not to build it.** The reasoning is below, along with the one thing that genuinely is wrong and should be fixed.
 
@@ -10,9 +10,9 @@ the clinical reviewer asked: *"I presume the scores are compared to baseline? If
 
 ## 1. What the app actually does today
 
-the clinical reviewer's document describes an older version. Two of the three things she flagged are already fixed:
+The clinical document describes an older version. Two of the three things she flagged are already fixed:
 
-| | the clinical reviewer saw | Now |
+| | Reviewed | Now |
 |---|---|---|
 | At 6, nothing happens | ✅ fixed | 6 is **subacute** — base + subacute contraindications active |
 | 7 treated inconsistently | 🔴 **still live** | See below |
@@ -45,7 +45,7 @@ Consider somebody whose pain sits at 6–7 most days.
 - **Absolute:** they get the safer variants. Blunt, and sometimes more cautious than they need.
 - **Baseline:** 6 is *their normal*, so the app offers a full session — **it has decided that their chronic pain is fine.**
 
-The second is the app forming a view about somebody's long-term condition and acting on it. It is exactly the judgement the clinical reviewer said needs training, and exactly what she warned against for *"people with uncontrolled pain"*.
+The second is the app forming a view about somebody's long-term condition and acting on it. It is exactly the judgement the clinical advice said needs training, and exactly what she warned against for *"people with uncontrolled pain"*.
 
 ⚫ **The errors are not symmetrical.** Being too cautious costs somebody a harder session. Being too confident costs them a flare they did not need.
 
@@ -53,7 +53,7 @@ The second is the app forming a view about somebody's long-term condition and ac
 
 How many days establish one? Rolling mean or median? What about somebody whose pain is genuinely variable — is their baseline 3, or 7, or both? What happens in week one, when there is no history?
 
-Every one of those is a decision with clinical consequences, and the clinical reviewer's own standard applies:
+Every one of those is a decision with clinical consequences, and the clinical standard applies:
 
 > *"I don't think you can be giving it from your own judgement/opinion. It needs to be backed up with facts/evidence/references."*
 
@@ -63,7 +63,7 @@ Every one of those is a decision with clinical consequences, and the clinical re
 
 ## 3. The real problem baseline was trying to solve
 
-There is a genuine case underneath the clinical reviewer's question, and it should not be lost:
+There is a genuine case underneath the clinical question, and it should not be lost:
 
 > **Somebody with chronic pain at 7 is permanently locked out of most of the app.**
 
@@ -87,13 +87,13 @@ That is the right shape, and it is better than baseline for the reason that matt
 | **2** | **Extend the Rest/Adapt choice to 7**, not just 8+. That is where the chronic-pain lockout actually bites, and it hands the judgement to the person rather than computing it | Medium |
 | **3** | **Do not build baseline** — and record why, so it is not revived as an obvious improvement | — |
 
-⚫ **Item 2 is the one that answers the clinical reviewer's concern.** It gives somebody with a long-standing 7 a way through that does not require the app to decide their pain is acceptable.
+⚫ **Item 2 is the one that answers the clinical concern.** It gives somebody with a long-standing 7 a way through that does not require the app to decide their pain is acceptable.
 
 ---
 
 ## 5. What I am not confident about
 
-**Whether 7 should be the ease-off line at all.** the clinical reviewer declined to give a number — *"this is tricky as very subjective for each individual"* — and she is the only person who has looked at this with training. The current 7 came from matching a check-in boundary, not from evidence.
+**Whether 7 should be the ease-off line at all.** The clinical review declined to give a number — *"this is tricky as very subjective for each individual"* — and she is the only person who has looked at this with training. The current 7 came from matching a check-in boundary, not from evidence.
 
 🔴 **So item 1 makes the app self-consistent. It does not make it right.** Those are different, and only someone qualified can close the gap. That is the person you said you might be able to bring in.
 

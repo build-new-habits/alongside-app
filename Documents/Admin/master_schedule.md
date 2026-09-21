@@ -12,7 +12,7 @@ Supersedes `master_schedule_v380.md`. Remove v380 on upload.
 >
 > Decision record: `Documents/Business/alongside_clinical_feedback_16sep2026_v1.md` (v2). **Her words are recorded verbatim there and everything traces back to them.**
 >
-> the clinical reviewer: *"I would not support fixed mappings from a reported sore area to a specific training focus. A self-reported sore area does not provide enough information to determine what should or should not be loaded, and the wording risks being interpreted as rehabilitation advice."*
+> Clinical advice: *"I would not support fixed mappings from a reported sore area to a specific training focus. A self-reported sore area does not provide enough information to determine what should or should not be loaded, and the wording risks being interpreted as rehabilitation advice."*
 >
 > **Six decisions, CL-1 to CL-6, all implemented and gated.** The area mapping is deleted. A niggle now offers *A lighter session · Something general · Just keep moving gently · I'll choose myself*. Every recommendation says what the person told the app and suggests something lighter — never a part to load or spare. **A stop-and-seek line appears as its own message every time**, including on day one. Eight exercises added to the library in simple cues and a comfortable range. **Bench dips removed**, replaced by a rope pushdown.
 >
@@ -26,13 +26,13 @@ Supersedes `master_schedule_v380.md`. Remove v380 on upload.
 >
 > **Coverage of morning sessions: 162 → 171 of 190.** The list of movements missing from the library is **empty**; what remains is pairs, circuits and one "X or Y" choice.
 >
-> 🟠 **Goes back to the clinical reviewer as a five-minute list, not a pack.** She approved the direction; she has not seen the exact sentences, including the severe-pain screen. The list is in the decision record.
+> 🟠 **Goes back for clinical review as a five-minute list, not a pack.** The direction was approved; the exact sentences had not been seen, including the severe-pain screen. The list is in the decision record.
 >
 > 🟡 CL-5 says "throughout". The **162 descriptions already in the library** were never reviewed against it; they remain under the August 95-exercise audit.
 >
-> ### 🟠 CLINICAL FOLLOW-UP PACK — READY FOR THE CLINICAL REVIEWER, 16 Sep. `Documents/Business/alongside_clinical_review_followup_16sep2026_v1.docx`
+> ### 🟠 CLINICAL FOLLOW-UP PACK — READY FOR CLINICAL REVIEW, 16 Sep. `Documents/Business/alongside_clinical_review_followup_16sep2026_v1.docx`
 >
-> Graeme: *"Knowing the workload of the clinical reviewer, she needs your best recommendations to review... She can then adjust and review rather than create. This respects her time. She'll need reminding what this is."*
+> Graeme: *"Knowing the workload of [the clinical reviewer], she needs your best recommendations to review... She can then adjust and review rather than create. This respects her time. She'll need reminding what this is."*
 >
 > **Two bounded parts, each with a tick-box decision grid** so she can respond without writing prose: **A** — the "build strength around it" mapping (AROUND-REVIEW), estimated 20–30 min; **B** — the nine exercises the library has never described, estimated 45–60 min. **Opens with a reminder of what Alongside is**, since she last saw it in August, and follows the August pack's audit template so it is familiar.
 >
@@ -62,7 +62,7 @@ Supersedes `master_schedule_v380.md`. Remove v380 on upload.
 >
 > **Coverage: 93 → 162 of 190 (85%).** The view keeps its own screen — block badge, warmup/cardio/strength shape — and borrows the shared card for the movement **body**, flattened. The programme's dose wins over the library's description.
 >
-> 🟠 **The remaining 28 are named, not mysterious:** supersets and circuits (two movements or none — returning the first half would put one movement's instructions on a card describing two), and **nine movements the library does not describe yet** — Bear Hold, Hammer Curl, EZ Bar Curl, Dumbbell Bench Press, Plank to Push-Up, Tricep Dips, Front Raise, Lateral Raise. `MORNING_MISSING_FROM_LIBRARY` holds them and the gate prints them every run so they cannot go quiet. **For the clinical reviewer, with AROUND-REVIEW.**
+> 🟠 **The remaining 28 are named, not mysterious:** supersets and circuits (two movements or none — returning the first half would put one movement's instructions on a card describing two), and **nine movements the library does not describe yet** — Bear Hold, Hammer Curl, EZ Bar Curl, Dumbbell Bench Press, Plank to Push-Up, Tricep Dips, Front Raise, Lateral Raise. `MORNING_MISSING_FROM_LIBRARY` holds them and the gate prints them every run so they cannot go quiet. **For clinical review, with AROUND-REVIEW.**
 >
 > 🟢 **Both tripwires fired as written.** `verify-card4` 11.1b said *"if it now imports the card itself, this is a migration and needs rewriting rather than passing by accident"* — today. `verify-card5` 6.5a needed splitting, because CR-5 now holds by two routes and covering one would let the other go dark. 🟢 **And the new gate caught an omission in my own list** — "EZ Bar or Cable Curl" was a third movement I had not named.
 >

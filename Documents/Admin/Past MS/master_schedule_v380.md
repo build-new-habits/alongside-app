@@ -8,9 +8,9 @@ Supersedes `master_schedule_v379.md`. Remove v379 on upload.
 >
 > **Live: `alongside-v534`, 167 gates, `store.js` v74, `Schema.md` v1.67, cold start blueprint v139.** Read that blueprint after this block.
 >
-> ### 🟠 CLINICAL FOLLOW-UP PACK — READY FOR THE CLINICAL REVIEWER, 16 Sep. `Documents/Business/alongside_clinical_review_followup_16sep2026_v1.docx`
+> ### 🟠 CLINICAL FOLLOW-UP PACK — READY FOR CLINICAL REVIEW, 16 Sep. `Documents/Business/alongside_clinical_review_followup_16sep2026_v1.docx`
 >
-> Graeme: *"Knowing the workload of the clinical reviewer, she needs your best recommendations to review... She can then adjust and review rather than create. This respects her time. She'll need reminding what this is."*
+> Graeme: *"Knowing the workload of [the clinical reviewer], she needs your best recommendations to review... She can then adjust and review rather than create. This respects her time. She'll need reminding what this is."*
 >
 > **Two bounded parts, each with a tick-box decision grid** so she can respond without writing prose: **A** — the "build strength around it" mapping (AROUND-REVIEW), estimated 20–30 min; **B** — the nine exercises the library has never described, estimated 45–60 min. **Opens with a reminder of what Alongside is**, since she last saw it in August, and follows the August pack's audit template so it is familiar.
 >
@@ -40,7 +40,7 @@ Supersedes `master_schedule_v379.md`. Remove v379 on upload.
 >
 > **Coverage: 93 → 162 of 190 (85%).** The view keeps its own screen — block badge, warmup/cardio/strength shape — and borrows the shared card for the movement **body**, flattened. The programme's dose wins over the library's description.
 >
-> 🟠 **The remaining 28 are named, not mysterious:** supersets and circuits (two movements or none — returning the first half would put one movement's instructions on a card describing two), and **nine movements the library does not describe yet** — Bear Hold, Hammer Curl, EZ Bar Curl, Dumbbell Bench Press, Plank to Push-Up, Tricep Dips, Front Raise, Lateral Raise. `MORNING_MISSING_FROM_LIBRARY` holds them and the gate prints them every run so they cannot go quiet. **For the clinical reviewer, with AROUND-REVIEW.**
+> 🟠 **The remaining 28 are named, not mysterious:** supersets and circuits (two movements or none — returning the first half would put one movement's instructions on a card describing two), and **nine movements the library does not describe yet** — Bear Hold, Hammer Curl, EZ Bar Curl, Dumbbell Bench Press, Plank to Push-Up, Tricep Dips, Front Raise, Lateral Raise. `MORNING_MISSING_FROM_LIBRARY` holds them and the gate prints them every run so they cannot go quiet. **For clinical review, with AROUND-REVIEW.**
 >
 > 🟢 **Both tripwires fired as written.** `verify-card4` 11.1b said *"if it now imports the card itself, this is a migration and needs rewriting rather than passing by accident"* — today. `verify-card5` 6.5a needed splitting, because CR-5 now holds by two routes and covering one would let the other go dark. 🟢 **And the new gate caught an omission in my own list** — "EZ Bar or Cable Curl" was a third movement I had not named.
 >

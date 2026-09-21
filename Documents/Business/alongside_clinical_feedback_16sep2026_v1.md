@@ -1,4 +1,4 @@
-# Clinical feedback — the clinical reviewer — follow-up pack
+# Clinical feedback — follow-up pack
 
 **16 Sep 2026 v2**
 
@@ -51,7 +51,7 @@ Response to `alongside_clinical_review_followup_16sep2026_v1.docx`. Recorded ver
 - 🔴 **The pushdown replacement was going to teach a bench dip.** Its name was changed and its instructions were not: *"hands on bench behind you, lower until elbows at 90 degrees"*. Caught before it shipped and now guarded.
 - 🟡 **The first stop-and-seek implementation missed first-day users** — it only appeared inside a recommendation, and a recommendation needs history. Moved to its own message.
 
-## ⚠️ Wording the clinical reviewer has NOT seen — for a quick check before beta
+## ⚠️ Wording not yet clinically reviewed — for a quick check before beta
 
 She approved the *direction*. These are the exact sentences written to follow it. **About five minutes' reading.**
 
@@ -67,7 +67,7 @@ She approved the *direction*. These are the exact sentences written to follow it
 ## What it does not close
 
 - 🟡 CL-5 says "throughout". The 162 descriptions already in the library were not in this pack and have not been reviewed against it. They sit under the August 95-exercise audit.
-- 🟡 **the clinical reviewer has not seen the wording above.** It should go back to her as that list, not as another pack.
+- 🟡 **The wording has not been clinically reviewed above.** It should go back to her as that list, not as another pack.
 - 🟡 **The severe-pain screen** was reworded under her principle but was never put to her. Item 4 above.
 
 ---

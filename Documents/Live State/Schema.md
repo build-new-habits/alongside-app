@@ -23,7 +23,7 @@
 > shoulder loads the legs (`lower`). Unknown areas fall through rather
 > than guessing at a body part.
 >
-> 🟠 **AROUND-REVIEW, for the clinical reviewer.** That mapping is movement reasoning,
+> 🟠 **AROUND-REVIEW, for clinical review.** That mapping is movement reasoning,
 > not clinical prescription — four coarse buckets, no condition-specific
 > protocols, no claim beyond "work near it, not on it". A
 > physiotherapist should read it before beta.
@@ -307,7 +307,7 @@
 > lived in exactly two places: the closing beat of onboarding, said once
 > and never again, and the Terms page, which almost nobody opens.
 >
-> the clinical reviewer, the physiotherapist, on the proposed three-question red-flag
+> Clinical advice on the proposed three-question red-flag
 > screen: those questions *"only take into account some red flags"*, and
 > **"to protect yourself you might be better off saying something like:
 > the advice given by this app is generic, prior to starting any exercise
