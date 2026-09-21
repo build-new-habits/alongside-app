@@ -583,7 +583,7 @@ import { aimById, STRANDS } from "../data/aims.js";
 import { impliedTarget, sortByTarget, targetById, isStretchLike } from "../stretch-target.js";
 // PURPOSE-ASK, 16 Sep 2026. The line now answers "what's today for?"
 // rather than always naming the arc.
-import { purposeLine } from "../data/purpose.js";
+import { purposeLine, safetyLineFor } from "../data/purpose.js";
 import { getActiveVoice, getTimingRules } from '../data/coach-voice.js';
 import { getPhaseBias, getReEntryContext, getMissedSessionOffer,
          captureReturnContext, clearReturnContext,
@@ -757,10 +757,31 @@ export function CoachProposalView(router) {
     const plural = names.length > 1;
     const them   = plural ? 'them' : 'it';
 
+    // 🔴 CLINICAL-REVIEW / CL-1, CL-3, CL-4, 16 Sep 2026. This screen predates
+    // the review and was not in her pack, but it falls squarely under her
+    // principle.
+    //
+    // It said "What I can do is work around them", and the Adapt button
+    // promised "I'll keep well clear of the affected area". the clinical reviewer: "A
+    // self-reported sore area does not provide enough information to
+    // determine what should or should not be loaded", and "avoid
+    // wording that says the app is strengthening around a problem or
+    // advises users not to work an area directly."
+    //
+    // ⚫ THE CODE WAS ALREADY DOING THE RIGHT THING; THE WORDS OVERCLAIMED
+    // IT. Measured: at a back pain of 8 the ordinary build becomes
+    // "Something gentler today" -- three movements, none loading the
+    // back, nothing contraindicated. That IS her "lower-intensity session
+    // that reduces demand on the area concerned". So the promise now
+    // says that, in her words, and no more.
+    //
+    // It also had half of CL-4 -- a pointer to someone who can look at it
+    // -- and never said to stop if it got worse. On the most serious
+    // screen in the app that was the half that mattered most.
     return `I can see ${_joinNames(names)} ${plural ? 'are' : 'is'} really difficult today. ` +
            `I can't give you medical support \u2014 that isn't something I can do. ` +
-           `What I can do is work around ${them}, or we can call today a rest day. ` +
-           `If you need more than that, it's worth finding someone who can look at ${them} properly.`;
+           `What I can do is keep today gentle, or we can call it a rest day. ` +
+           safetyLineFor(them);
   }
 
   function renderSevereChoice() {
@@ -773,9 +794,9 @@ export function CoachProposalView(router) {
             <span class="cp-missed-offer__sub">Nothing pushed today \u2014 the right call some days</span>
           </button>
           <button class="cp-missed-offer__btn" data-severe-choice="adapt"
-                  aria-label="Adapt around it and continue with a session">
+                  aria-label="Adapt and continue with something gentler">
             Adapt and continue
-            <span class="cp-missed-offer__sub">I'll keep well clear of the affected area</span>
+            <span class="cp-missed-offer__sub">Something gentler, that asks less of the sore area</span>
           </button>
         </div>
       </div>

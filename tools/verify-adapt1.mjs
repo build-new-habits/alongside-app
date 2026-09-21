@@ -49,6 +49,26 @@ const { setDisplayPref } = await import("../js/display-prefs.js");
 const byId = new Map(EXERCISES.map(e => [e.id, e]));
 
 // The exact set. Update deliberately when a reviewed entry is added.
+//
+// CLINICAL-REVIEW, 16 Sep 2026. EIGHT ADDED, and this is the deliberate update
+// the comment above asks for rather than a loosening.
+//
+// These are the eight new library entries from the clinical follow-up
+// pack (bench dips excluded -- CL-6 took them out of the programme).
+// the clinical reviewer's verdict on the drafts: "generally sensible and the layout
+// works", with principles to apply throughout -- simple cues, a
+// comfortable and controlled range, no single fixed position (CL-5).
+//
+// 🟠 WHAT SHE REVIEWED AND WHAT IS HERE ARE NOT WORD-FOR-WORD THE SAME.
+// She saw the SUBSTANCE ("lighter weight; one arm at a time"). The code
+// carries it in this app's house voice -- ease-off tied to a sign the
+// person notices ("If…"), go-further to readiness ("When…") -- which is
+// her CL-5 principle in practice but not text she has read. Logged in
+// the decision record as going back to her before beta.
+//
+// "Use heavier weights" was dropped from dumbbell-bench-press in the
+// rewrite: 1.5 bars load prescriptions, and a load increase is not
+// something a sign-based line can honestly recommend.
 const ADAPTED_IDS = [
   "adductor-stretch-standing",
   "bulgarian-split-squat",
@@ -59,6 +79,15 @@ const ADAPTED_IDS = [
   "ql-stretch-side-bend",
   "side-plank-full",
   "side-plank-modified",
+  // CLINICAL-REVIEW additions:
+  "bear-hold",
+  "cable-curl",
+  "dumbbell-bench-press",
+  "ez-bar-curl",
+  "front-raise",
+  "hammer-curl",
+  "lateral-raise",
+  "plank-to-push-up",
 ].sort();
 
 const BANNED     = /\b(easy|easier|easiest|hard|harder|hardest|beginner|advanced|intermediate|modified|regression|progression|basic|proper)\b/i;

@@ -34,7 +34,7 @@ const ok = (m, c, d = "") => { if (c) { pass++; console.log("  ok   " + m); }
 const B = new URL("../js/", import.meta.url).href;
 const { EXERCISES } = await import(B + "data/exercises/index.js");
 const { MORNING_PROGRAMME } = await import(B + "data/morning-programme.js");
-const { libraryExerciseFor, MORNING_NAME_ALIASES, MORNING_MISSING_FROM_LIBRARY } =
+const { libraryExerciseFor, MORNING_NAME_ALIASES, MORNING_MISSING_FROM_LIBRARY, isChoiceOrPair } =
   await import(B + "data/morning-library-map.js");
 const read = p => fs.readFileSync(new URL("../" + p, import.meta.url), "utf8");
 
@@ -61,8 +61,11 @@ ok("0.2 and some of them resolve", matched.length > 0,
    "exactly as bare as it was");
 
 console.log("\nTEST 1 — coverage, pinned so it cannot quietly fall");
-ok("1.1 at least 160 of the programme's movements resolve", matched.length >= 160,
-   "got " + matched.length + ". Before the name map it was 93");
+// CLINICAL-REVIEW raised this from 160 to 170. Eight library entries were
+// added after her review, and the pin moves with them so the gain cannot
+// quietly drain away again.
+ok("1.1 at least 170 of the programme's movements resolve", matched.length >= 170,
+   "got " + matched.length + ". Before the name map it was 93; after it, 162");
 ok("1.2 REVERSAL: it is NOT claiming everything resolves", matched.length < all.length,
    "supersets and circuits are two movements or none, and eight movements " +
    "the library has yet to describe. Claiming 100% would mean something is " +
@@ -72,12 +75,40 @@ ok("1.2 REVERSAL: it is NOT claiming everything resolves", matched.length < all.
   const unresolved = [...new Set(all.filter(ex => !libraryExerciseFor(ex, EXERCISES)).map(e => e.name))];
   console.log("       still unresolved (" + unresolved.length + "): " +
               unresolved.slice(0, 6).join(" | ") + (unresolved.length > 6 ? " …" : ""));
-  ok("1.3 what is left is supersets, circuits, or a named absence", (() => {
+  ok("1.3 what is left is a pair, a circuit, a choice, or a named absence", (() => {
     return unresolved.every(n =>
-      /superset|circuit/i.test(n) ||
+      isChoiceOrPair(n) ||
       MORNING_MISSING_FROM_LIBRARY.some(m => n.toLowerCase().includes(m.toLowerCase())));
   })(), "anything else is a naming problem that should have been in the alias " +
         "map, not left as a content gap");
+
+  ok("1.4 CLINICAL-REVIEW: no movement is still missing from the library",
+     MORNING_MISSING_FROM_LIBRARY.length === 0,
+     "eight were added after her review and bench dips were removed from the " +
+     "programme; if this list refills, a new gap has appeared and she should " +
+     "see it");
+}
+
+console.log("\nTEST 1b — CL-6: bench dips are out, and nothing teaches one");
+{
+  const dips = all.filter(e => /\bdips?\b/i.test(e.name));
+  ok("1b.1 no bench dip anywhere in the morning programme", dips.length === 0,
+     "the clinical reviewer: 'Bench dips would not be my preferred choice for a general beginner " +
+     "programme; use an easier-to-scale triceps exercise instead.'");
+
+  // 🔴 The interrupted turn renamed the exercise to a pushdown and left its
+  // guide describing a bench dip -- "hands on bench behind you, lower until
+  // elbows at 90 degrees". The screen would have said pushdown and taught
+  // the exact movement the clinical reviewer removed.
+  const stale = all.filter(e =>
+    /pushdown/i.test(e.name) &&
+    /bench|behind you|dip/i.test(JSON.stringify(e.guide || "") + (e.coachNote || "")));
+  ok("1b.2 REVERSAL: no pushdown carries bench-dip instructions", stale.length === 0,
+     "renaming an exercise without rewriting its guide shows one movement's " +
+     "name over another's instructions");
+
+  ok("1b.3 the replacement is the rope pushdown, which scales by a pin",
+     all.some(e => /Tricep Rope Pushdown/.test(e.name)));
 }
 
 console.log("\nTEST 2 — no alias points somewhere wrong");

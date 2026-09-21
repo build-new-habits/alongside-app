@@ -137,18 +137,30 @@ export function libraryExerciseFor(morningExercise, EXERCISES) {
  * Listed here rather than in a document so the gate can print them and
  * they cannot go quiet.
  */
-export const MORNING_MISSING_FROM_LIBRARY = [
-  "Bear Hold",
-  "Hammer Curl",
-  "EZ Bar Curl",
-  // Written as an either/or in the programme -- "EZ Bar or Cable Curl".
-  // Listed separately because that exact string is what appears on the
-  // screen, and the gate matches on what appears.
-  "EZ Bar or Cable Curl",
-  "Cable Curl",
-  "Dumbbell Bench Press",
-  "Plank to Push-Up",
-  "Tricep Dips",
-  "Front Raise",
-  "Lateral Raise"
-];
+export const MORNING_MISSING_FROM_LIBRARY = [];
+
+/**
+ * CLINICAL-REVIEW, 16 Sep 2026. THE LIST ABOVE IS EMPTY, AND THAT IS THE POINT.
+ *
+ * It held nine movements the library did not describe. the clinical reviewer reviewed the
+ * drafts ("generally sensible and the layout works") and eight were
+ * added to the library, written to her principles -- simple cues, a
+ * comfortable controlled range, no single fixed position for everyone.
+ *
+ * The ninth, Tricep Dips (bench), is not missing: it was REMOVED from
+ * the programme on her advice (CL-6) and replaced with a rope pushdown,
+ * which scales by moving a pin.
+ *
+ * Left exported and empty rather than deleted, so a future movement the
+ * library lacks has somewhere to go and the gate still prints it.
+ *
+ * What remains unresolved is supersets, circuits, and one either/or --
+ * "EZ Bar or Cable Curl" -- which is a CHOICE between two movements the
+ * library now describes separately. Showing one of them would be
+ * choosing for the person. See isChoiceOrPair() below.
+ */
+
+/** A superset, a circuit, or an "X or Y" choice: not one movement. */
+export function isChoiceOrPair(name) {
+  return /superset|circuit/i.test(name || "") || /\s+or\s+/i.test(name || "");
+}

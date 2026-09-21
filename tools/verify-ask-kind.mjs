@@ -78,10 +78,12 @@ ok("1.3 the field is set by the check-in now, not a link on the proposal", (() =
   // AROUND-AREA, 16 Sep 2026. The call now spans two lines and passes
   // the AREA, because "build strength around it" has to know WHAT it is
   // working around. Asserted on the call, not its formatting.
-  return /store\.set\("requestedSessionType",[\s\S]{0,120}sessionTypeForForm\(/.test(checkin) &&
-         /sessionTypeForForm\(\s*choice\.value,[\s\S]{0,80}todayPurposeArea/.test(checkin);
-})(), "the area must reach the mapping, or 'around it' builds a full-body " +
-      "session and the coach contradicts its own advice");
+  // CLINICAL-REVIEW, 16 Sep 2026. It used to assert the AREA was passed in,
+  // so "around it" could pick a body part. the clinical reviewer ruled the mapping out, so
+  // this now asserts the opposite: no area reaches the mapping at all.
+  return /store\.set\("requestedSessionType", sessionTypeForForm\(choice\.value\)\)/.test(checkin) &&
+         !/sessionTypeForForm\(\s*choice\.value,/.test(checkin);
+})(), "passing an area is the door the body-part mapping would come back through");
 
 console.log("\nTEST 2 — a request does not edit the arc");
 {
