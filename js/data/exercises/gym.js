@@ -431,7 +431,146 @@ export const GYM = [
     ],
     load: 'Heavy enough that your grip is the thing that limits you, not your back or your posture.',
     credits: 60
-  }
+  },
+
+  // ════════════════════════════════════════════════════════════════════
+  // CLINICAL-REVIEW, 16 Sep 2026. Three of the nine movements the morning
+  // programme prescribed and the library had never described. See the
+  // matching block in strength.js for the principles applied and their
+  // source. ⚫ Our application of the clinical reviewer's principles, not her wording.
+  // ════════════════════════════════════════════════════════════════════
+
+  {
+    id: 'ez-bar-curl',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
+    name: 'EZ Bar Curl',
+    youtube: 'ez bar curl technique',
+    category: 'strength',
+    contentType: 'exercise',
+    movementPattern: 'pull',
+    // No "ez-bar" in the equipment list; an EZ bar is a barbell, and a
+    // straight bar works if that is what is there.
+    equipment: ['barbell'],
+    equipmentOptional: [],
+    affectsAreas: ['triceps-biceps', 'wrist-elbow'],
+    contraindications: ['wrist-elbow-acute'],
+    energyRequired: 3,
+    difficultyLevel: 2,
+    duration: 60,
+    perSide: false,
+    instructions: [
+      'Stand holding the bar in front of your thighs, with a grip that feels comfortable on your wrists',
+      'Bend your elbows to bring the bar up, as far as feels comfortable',
+      'Lower it slowly'
+    ],
+    coaching: 'The angled grips on an EZ bar are there to suit your wrists. Use whichever feels better.',
+    why: 'Works the muscles at the front of the upper arm.',
+    watchOut: [
+      'Leaning back to lift the bar',
+      'Any pain at the elbow or wrist'
+    ],
+    adaptations: {
+      easeOff: [
+        "If you find yourself leaning back to lift the bar, use less weight."
+      ],
+      further: [
+        "When every rep feels controlled, take longer over lowering the bar."
+      ]
+    },
+    load: 'Moderate. Choose a weight you can control all the way down.',
+    credits: 25
+  },
+
+  {
+    id: 'cable-curl',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
+    name: 'Cable Curl',
+    youtube: 'cable bicep curl technique',
+    category: 'strength',
+    contentType: 'exercise',
+    movementPattern: 'pull',
+    equipment: ['cable-machine'],
+    equipmentOptional: [],
+    affectsAreas: ['triceps-biceps', 'wrist-elbow'],
+    contraindications: ['wrist-elbow-acute'],
+    energyRequired: 3,
+    difficultyLevel: 1,
+    duration: 60,
+    perSide: false,
+    instructions: [
+      'Stand facing a low cable, holding the handle or bar',
+      'Bend your elbows to bring it up, as far as feels comfortable',
+      'Lower it slowly'
+    ],
+    coaching: 'Moving the pin up or down the stack is the easiest way to get the weight right.',
+    why: 'Works the front of the upper arm, and a cable keeps the load steady through the whole movement.',
+    watchOut: [
+      'Leaning back to lift the weight',
+      'Any pain at the elbow or wrist'
+    ],
+    adaptations: {
+      easeOff: [
+        "If you find yourself leaning back to move the handle, move the pin to a lighter weight."
+      ],
+      further: [
+        "When every rep feels controlled, take longer over lowering the handle."
+      ]
+    },
+    load: 'Moderate. Easy to adjust on the stack.',
+    credits: 25
+  },
+
+  {
+    id: 'dumbbell-bench-press',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
+    name: 'Dumbbell Bench Press',
+    youtube: 'dumbbell bench press technique',
+    category: 'strength',
+    contentType: 'exercise',
+    movementPattern: 'push',
+    equipment: ['dumbbell', 'bench'],
+    equipmentOptional: [],
+    affectsAreas: ['chest-pecs', 'shoulder', 'triceps-biceps'],
+    contraindications: ['shoulder-acute', 'chest-pecs-acute'],
+    energyRequired: 5,
+    difficultyLevel: 2,
+    duration: 60,
+    perSide: false,
+    // CLINICAL-REVIEW. The draft said "elbows at roughly 45 degrees". That is
+    // exactly the one-fixed-position instruction she asked us to avoid,
+    // and the research pack had already noted the guidance rests mainly
+    // on expert opinion. Replaced with a comfort-led cue.
+    instructions: [
+      'Lie on a bench with your feet on the floor, a dumbbell in each hand at chest level',
+      'Press the weights up until your arms are straight',
+      'Lower them slowly, as far as feels comfortable',
+      'Find the elbow position that feels right for your shoulders'
+    ],
+    coaching: 'How low you go is up to how your shoulders feel, not a fixed point.',
+    why: 'Works the chest, the front of the shoulders and the backs of the arms.',
+    watchOut: [
+      'Bouncing the weights at the bottom',
+      'Any pain at the front or top of the shoulder'
+    ],
+    adaptations: {
+      easeOff: [
+        "If you feel it at the front or top of your shoulder, lower the weights less far.",
+        "If that does not settle it, try a floor press instead, where the floor limits how far you go.",
+        "If the weights wobble on the way up, use lighter ones."
+      ],
+      further: [
+        "When every rep feels steady, take longer over lowering them."
+      ]
+    },
+    load: 'Moderate. Choose weights you can lower under control.',
+    credits: 35
+  },
 
 ];
 

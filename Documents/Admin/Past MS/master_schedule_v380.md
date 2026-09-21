@@ -1,34 +1,12 @@
 # Alongside: Move — Master Schedule
-## 16 Sep 2026 v381
+## 16 Sep 2026 v380
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v380.md`. Remove v380 on upload.
+Supersedes `master_schedule_v379.md`. Remove v379 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
-> **Live: `alongside-v535`, 167 gates, `store.js` v74, `Schema.md` v1.67, cold start blueprint v140.** Read that blueprint after this block.
->
-> ### 🟢 CLINICAL-REVIEW — IMPLEMENTED 16 Sep, `v535`. AROUND-REVIEW is CLOSED: the answer was don't build it.
->
-> Decision record: `Documents/Business/alongside_clinical_feedback_16sep2026_v1.md` (v2). **Her words are recorded verbatim there and everything traces back to them.**
->
-> the clinical reviewer: *"I would not support fixed mappings from a reported sore area to a specific training focus. A self-reported sore area does not provide enough information to determine what should or should not be loaded, and the wording risks being interpreted as rehabilitation advice."*
->
-> **Six decisions, CL-1 to CL-6, all implemented and gated.** The area mapping is deleted. A niggle now offers *A lighter session · Something general · Just keep moving gently · I'll choose myself*. Every recommendation says what the person told the app and suggests something lighter — never a part to load or spare. **A stop-and-seek line appears as its own message every time**, including on day one. Eight exercises added to the library in simple cues and a comfortable range. **Bench dips removed**, replaced by a rope pushdown.
->
-> 🔴 **Three faults found while implementing, none in her reply:**
->
-> - **The severe-pain screen said exactly what she objected to** — *"work around them"*, and *"I'll keep well clear of the affected area"*. It predates the review and was never in her pack. ⚫ **The code was already right**: at a back pain of 8 the build becomes "Something gentler today", three movements, none loading the back. Only the words overclaimed. Reworded to her own phrase, and it now says **stop if it gets worse** — before, it only said to see someone, on the most serious screen in the app.
-> - **The pushdown replacement was going to teach a bench dip.** Name changed, instructions not: *"hands on bench behind you, lower until elbows at 90 degrees."* The screen would have named one movement and taught the one she removed.
-> - **The first stop-and-seek implementation missed first-day users**, because it lived inside a recommendation and a recommendation needs history.
->
-> ⚫ **Eight exercises' adaptations rewritten into the house voice** — ease-off tied to a sign the person notices (*"If…"*), go-further to readiness (*"When…"*). `verify-adapt1` caught the first draft using *"have to"* and *"harder"*, an instruction and a ranking.
->
-> **Coverage of morning sessions: 162 → 171 of 190.** The list of movements missing from the library is **empty**; what remains is pairs, circuits and one "X or Y" choice.
->
-> 🟠 **Goes back to the clinical reviewer as a five-minute list, not a pack.** She approved the direction; she has not seen the exact sentences, including the severe-pain screen. The list is in the decision record.
->
-> 🟡 CL-5 says "throughout". The **162 descriptions already in the library** were never reviewed against it; they remain under the August 95-exercise audit.
+> **Live: `alongside-v534`, 167 gates, `store.js` v74, `Schema.md` v1.67, cold start blueprint v139.** Read that blueprint after this block.
 >
 > ### 🟠 CLINICAL FOLLOW-UP PACK — READY FOR THE CLINICAL REVIEWER, 16 Sep. `Documents/Business/alongside_clinical_review_followup_16sep2026_v1.docx`
 >
@@ -9612,4 +9590,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v381*
+*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v380*

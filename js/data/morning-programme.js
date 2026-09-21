@@ -1,6 +1,17 @@
 /**
  * morning-programme.js - Six-Week Beach-Fit Morning Programme Data
  *
+ * CLINICAL-REVIEW, 16 Sep 2026. Bench dips removed from both supersets they
+ * appeared in, replaced by a tricep rope pushdown on the same cable
+ * station the paired curl already uses.
+ *
+ * the clinical reviewer: "Bench dips would not be my preferred choice for a general
+ * beginner programme; use an easier-to-scale triceps exercise instead."
+ * The research pack had found a 2022 motion-capture study putting the
+ * bench dip at about 101% of a person's own maximum shoulder extension
+ * range -- the only dip variation past end-range. A pushdown scales by
+ * moving a pin, which is exactly what "easier to scale" asks for.
+ *
  * Three session slots per week:
  *   MON — home session (45 mins, 6:15-7:00am)
  *   WED — gym cardio session (60 mins, 6:30-7:30am)
@@ -434,8 +445,16 @@ export const MORNING_PROGRAMME = {
               guide: { description: "Lie on flat bench, dumbbells at chest height, elbows at 45 degrees. Press to full extension. Lower slowly to chest.", cues: ["Feet flat on floor", "Elbows at 45 degrees", "4 second lower"], youtube: "dumbbell bench press proper form" } },
             { id: "u2", name: "Seated Cable Row (heavy)", sets: 4, reps: "8", rest: "75s", coachNote: "Heaviest row of the programme. Increase the stack. Hold 1 second at the end of each rep." },
             { id: "u3", name: "Dumbbell Shoulder Press (standing)", sets: 3, reps: "10", rest: "60s", coachNote: "Standing adds core demand. Brace before every rep. Do not lean back." },
-            { id: "u4", name: "Tricep Dips (bench) + Cable Curl superset", sets: 3, reps: "10 each", rest: "45s", coachNote: "Bodyweight dips off a bench then straight to cable curls. Arms finish the session.",
-              guide: { description: "Hands on bench behind you, feet forward. Lower until elbows at 90 degrees. Press back up.", cues: ["Keep your back close to the bench", "Lower slowly", "Controlled press back up"], youtube: "tricep dip bench bodyweight" } }
+            { id: "u4", name: "Tricep Rope Pushdown + Cable Curl superset", sets: 3, reps: "10 each", rest: "45s", coachNote: "Rope pushdowns then straight to cable curls, same cable station. Arms finish the session.",
+              // 🔴 The name was changed to the pushdown and this guide was
+              // left describing BENCH DIPS -- "hands on bench behind you,
+              // lower until elbows at 90 degrees". The screen would have
+              // said pushdown and taught a dip. Caught on review of an
+              // interrupted turn's uncommitted work, not by a test.
+              //
+              // Written to the clinical reviewer's principles: simple cues, a comfortable
+              // controlled range, no single fixed position for everyone.
+              guide: { description: "Rope pushdown: stand facing the high cable, elbows by your sides, and straighten your arms down through a comfortable range. Then straight to cable curls on the same station.", cues: ["Elbows stay by your sides", "Move through a range that feels comfortable", "Controlled on the way back up"], youtube: "tricep rope pushdown cable" } }
           ],
           core: [
             { id: "c1", name: "Bird Dog + Light Dumbbell", sets: 3, reps: "10 each side", rest: "30s", coachNote: "Hold 2kg in extending hand. Anti-extension added to anti-rotation." },
@@ -507,7 +526,7 @@ export const MORNING_PROGRAMME = {
             { id: "u1", name: "Dumbbell Bench Press", sets: 4, reps: "8", rest: "75s", coachNote: "Heaviest set of the programme." },
             { id: "u2", name: "Seated Cable Row (heavy)", sets: 4, reps: "8", rest: "75s", coachNote: "Personal best weight if possible." },
             { id: "u3", name: "Dumbbell Shoulder Press (standing)", sets: 3, reps: "10", rest: "60s", coachNote: "Standing, heavy, braced." },
-            { id: "u4", name: "Tricep Dips + Cable Curl superset", sets: 3, reps: "10 each", rest: "45s", coachNote: "Final time. Make it count." }
+            { id: "u4", name: "Tricep Rope Pushdown + Cable Curl superset", sets: 3, reps: "10 each", rest: "45s", coachNote: "Final time. Make it count." }
           ],
           core: [
             { id: "c1", name: "Bird Dog + Dumbbell", sets: 3, reps: "10 each side", rest: "30s", coachNote: "Final progression." },

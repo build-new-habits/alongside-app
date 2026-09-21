@@ -1999,7 +1999,20 @@ export const STRENGTH = [
     equipment: ['barbell', 'bench'],
     equipmentOptional: [],
     affectsAreas: ['chest-pecs', 'triceps-biceps', 'shoulder'],
-    contraindications: ['shoulder-acute'],
+    // CONTRA-TIGHTEN, 16 Sep 2026. 'chest-pecs-acute' ADDED.
+    //
+    // This entry lists chest-pecs FIRST in affectsAreas and did not
+    // exclude an acute chest condition. It surfaced when the new
+    // Dumbbell Bench Press (difficulty 2) arrived with that exclusion:
+    // verify-contrafix flagged the EASIER variation as stricter than
+    // the harder one, which would have refused somebody the dumbbells
+    // and then offered them the bar.
+    //
+    // ⚫ Fixed in the safe direction -- the harder one tightened, the
+    // easier one not loosened. Adding a restriction can only make the
+    // app offer this to fewer people; removing one from the dumbbell
+    // version would have made it offer that to more.
+    contraindications: ['shoulder-acute', 'chest-pecs-acute'],
     energyRequired: 7,
     difficultyLevel: 3,
     duration: 120,
@@ -3750,6 +3763,240 @@ export const STRENGTH = [
     reps: "25 seconds each side",
     rest: 60,
     credits: 55
-  }
+  },
+
+  // ════════════════════════════════════════════════════════════════════
+  // CLINICAL-REVIEW, 16 Sep 2026. Five of the nine movements the morning
+  // programme prescribed and the library had never described. The other
+  // three are in gym.js; bench dips were REMOVED from the programme
+  // rather than added here.
+  //
+  // Drafted for the clinical reviewer in the clinical follow-up pack and reviewed by her:
+  // "The exercise descriptions are generally sensible and the layout
+  // works. I would apply the same principles throughout: use simple
+  // movement cues, encourage a comfortable and controlled range, and
+  // avoid implying that one fixed position or technique is right for
+  // every user."
+  //
+  // Those three principles are applied below, and the drafts were
+  // changed to meet them -- most visibly, no fixed joint angles and no
+  // single "correct" position. ⚫ These are our application of her
+  // principles, NOT her wording, and she has not seen the final text.
+  // ════════════════════════════════════════════════════════════════════
+
+  {
+    id: 'hammer-curl',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
+    name: 'Hammer Curl',
+    youtube: 'dumbbell hammer curl technique',
+    category: 'strength',
+    contentType: 'exercise',
+    movementPattern: 'pull',
+    equipment: ['dumbbell'],
+    equipmentOptional: [],
+    affectsAreas: ['triceps-biceps', 'wrist-elbow'],
+    contraindications: ['wrist-elbow-acute'],
+    energyRequired: 3,
+    difficultyLevel: 1,
+    duration: 60,
+    perSide: false,
+    instructions: [
+      'Stand holding a dumbbell in each hand at your sides, palms facing in',
+      'Bend your elbows to bring the weights up, as far as feels comfortable',
+      'Lower them slowly',
+      'Keep your upper arms fairly still throughout'
+    ],
+    coaching: 'Slow and steady matters more than how high the weights go.',
+    why: 'Works the muscles that bend the elbow, with the palms facing in, which many people find easier on the wrists than a standard curl.',
+    watchOut: [
+      'Swinging your body to get the weight up',
+      'Any pain at the elbow or wrist'
+    ],
+    adaptations: {
+      easeOff: [
+        "If your body starts to swing to lift the weight, use a lighter one, or none at all.",
+        "If one side tires before the other, work one arm at a time."
+      ],
+      further: [
+        "When every rep feels smooth and controlled, take longer over lowering the weights."
+      ]
+    },
+    load: 'Light to moderate. Choose a weight you can control all the way down.',
+    credits: 25
+  },
+
+  {
+    id: 'front-raise',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
+    name: 'Front Raise',
+    youtube: 'dumbbell front raise technique',
+    category: 'strength',
+    contentType: 'exercise',
+    movementPattern: 'push',
+    equipment: ['dumbbell'],
+    equipmentOptional: [],
+    affectsAreas: ['shoulder'],
+    contraindications: ['shoulder-acute'],
+    energyRequired: 3,
+    difficultyLevel: 1,
+    duration: 60,
+    perSide: false,
+    instructions: [
+      'Stand holding a light dumbbell in each hand in front of your thighs',
+      'Keeping a soft bend in your elbows, lift your arms forward',
+      'Go only as high as feels comfortable',
+      'Lower them slowly'
+    ],
+    coaching: 'There is no set height to reach. Stop where it feels controlled.',
+    why: 'Works the front of the shoulder, which is used whenever you reach forward or lift something in front of you.',
+    watchOut: [
+      'Swinging the body to lift the weights',
+      'Any pinching or pain at the top or front of the shoulder'
+    ],
+    adaptations: {
+      easeOff: [
+        "If you feel a pinch at the top of your shoulder, stop lower down — a lower lift still counts.",
+        "If you find yourself swinging to lift them, use a lighter weight, or none at all."
+      ],
+      further: [
+        "When the lift feels smooth all the way up, lower the weights more slowly."
+      ]
+    },
+    load: 'Light. Small movements respond to control rather than heavy weight.',
+    credits: 25
+  },
+
+  {
+    id: 'lateral-raise',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
+    name: 'Lateral Raise',
+    youtube: 'dumbbell lateral raise technique',
+    category: 'strength',
+    contentType: 'exercise',
+    movementPattern: 'push',
+    equipment: ['dumbbell'],
+    equipmentOptional: [],
+    affectsAreas: ['shoulder'],
+    contraindications: ['shoulder-acute'],
+    energyRequired: 3,
+    difficultyLevel: 1,
+    duration: 60,
+    perSide: false,
+    instructions: [
+      'Stand holding a light dumbbell in each hand at your sides',
+      'With a soft bend in your elbows, lift your arms out to the sides',
+      'Go only as high as feels comfortable',
+      'Lower them slowly'
+    ],
+    coaching: 'Let comfort set the height, not a target.',
+    why: 'Works the side of the shoulder, used for lifting your arms away from your body.',
+    watchOut: [
+      'Swinging the body to lift the weights',
+      'Shrugging your shoulders up towards your ears',
+      'Any pinching or pain at the top of the shoulder'
+    ],
+    adaptations: {
+      easeOff: [
+        "If you feel a pinch at the top of your shoulder, lift to a lower height.",
+        "If your shoulders rise towards your ears, use a lighter weight or raise one arm at a time."
+      ],
+      further: [
+        "When the lift feels smooth all the way up, lower the weights more slowly."
+      ]
+    },
+    load: 'Light. Small movements respond to control rather than heavy weight.',
+    credits: 25
+  },
+
+  {
+    id: 'plank-to-push-up',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
+    name: 'Plank to Push-Up',
+    youtube: 'plank to push up technique',
+    category: 'strength',
+    contentType: 'exercise',
+    movementPattern: 'anti-rotation',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['abdominals', 'shoulder', 'triceps-biceps', 'wrist-elbow'],
+    contraindications: ['wrist-elbow-acute', 'shoulder-acute', 'lower-back-acute'],
+    energyRequired: 5,
+    difficultyLevel: 3,
+    duration: 60,
+    perSide: false,
+    instructions: [
+      'Start on your forearms in a plank, in whatever position feels steady',
+      'Place one hand, then the other, on the floor and press up onto straight arms',
+      'Lower back down to your forearms one arm at a time',
+      'Swap which arm leads each time'
+    ],
+    coaching: 'Move slowly enough that your hips stay fairly still.',
+    why: 'Asks your trunk to stay steady while your arms change position underneath you.',
+    watchOut: [
+      'Your hips rocking side to side',
+      'Any pain in the lower back, wrists or shoulders'
+    ],
+    adaptations: {
+      easeOff: [
+        "If your hips rock from side to side, place your feet wider apart for a steadier base.",
+        "If it still feels unsteady, do it from your knees instead of your feet."
+      ],
+      further: [
+        "When your hips stay level through every change of position, bring your feet closer together."
+      ]
+    },
+    load: 'Bodyweight.',
+    credits: 35
+  },
+
+  {
+    id: 'bear-hold',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
+    name: 'Bear Hold',
+    youtube: 'bear hold core exercise',
+    category: 'strength',
+    contentType: 'exercise',
+    movementPattern: 'isometric',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['abdominals', 'shoulder', 'wrist-elbow'],
+    contraindications: ['wrist-elbow-acute', 'knee-acute'],
+    energyRequired: 3,
+    difficultyLevel: 1,
+    duration: 45,
+    perSide: false,
+    instructions: [
+      'Start on your hands and knees, with your toes tucked under',
+      'Lift your knees just a little off the floor',
+      'Hold, breathing steadily',
+      'Lower your knees to rest'
+    ],
+    coaching: 'Keep breathing. Holding your breath makes it harder, not better.',
+    why: 'A low-load way to work your trunk and shoulders together.',
+    watchOut: [
+      'Holding your breath',
+      'Any pain in the wrists or lower back'
+    ],
+    adaptations: {
+      easeOff: [
+        "If you find yourself holding your breath, hold for less time and rest your knees down between holds."
+      ],
+      further: [
+        "When you can breathe steadily all the way through, hold for longer."
+      ]
+    },
+    load: 'Bodyweight.',
+    credits: 25
+  },
 
 ];

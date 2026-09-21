@@ -292,7 +292,8 @@ import { isPremium }       from "../auth.js";
 // help -- and recommends, rather than offering a menu. See
 // js/data/purpose.js.
 import { PURPOSES, formsFor, areaOptions, needsAreaQuestion,
-         recommendation, sessionTypeForForm, clearPurpose } from "../data/purpose.js";
+         recommendation, sessionTypeForForm, intensityForForm, clearPurpose,
+         SAFETY_LINE, needsSafetyLine } from "../data/purpose.js";
 import { checkinData }     from "../data/checkin.js";
 import { resolveOpening }  from "../data/checkin-openings.js";
 import { CONDITIONS, getPainBand, soreAreaOptions } from "../data/conditions.js";
@@ -1057,6 +1058,10 @@ export function CheckinView(router) {
     const rec  = recommendation(purposeId, area);
 
     await _showCoachBubble(rec ? rec.reason : "What would help most today?");
+    // CL-4. Every time the purpose is about a sore or particular area --
+    // not only when there is history to recommend from. Day one is when
+    // somebody most needs to hear it.
+    if (needsSafetyLine(purposeId)) await _showCoachBubble(SAFETY_LINE);
     await new Promise(r => setTimeout(r, T.PANEL_DELAY));
 
     _showChoicePanel(
@@ -1066,12 +1071,44 @@ export function CheckinView(router) {
         recommended: !!rec && rec.formId === f.id
       })),
       async (choice) => {
-        // AROUND-AREA. The AREA matters: "build strength around it"
-        // means load what supports the sore part, not the whole body.
+        // CLINICAL-REVIEW, 16 Sep 2026. No area is passed any more: the app is
+        // not allowed to decide what to load based on where somebody is
+        // sore. A lighter or gentle answer lowers today's intensity
+        // instead -- activity modification, which is what she asked for.
         store.set("todayForm", choice.value);
-        store.set("requestedSessionType",
-          sessionTypeForForm(choice.value, store.get("todayPurposeArea")));
+        store.set("requestedSessionType", sessionTypeForForm(choice.value));
+        const lower = intensityForForm(choice.value);
+        if (lower) store.set("todayIntensity", lower);
         _showUserBubble(choice.label);
+        await new Promise(r => setTimeout(r, T.PANEL_DELAY));
+
+        // 🔴 CL-2, "user-selected". "I'll choose myself" used to set
+        // nothing and fall straight through -- so the arc chose, and the
+        // proposal then said "you chose the session yourself". The coach
+        // claiming a choice the person never made. Now it asks.
+        if (choice.value === "choose") return _showChooseKindBeat();
+        _showActionButtons();
+      }
+    );
+  }
+
+  /**
+   * CL-2. The user-selected path: they pick the kind, the app does not.
+   *
+   * Uses the same kinds the general-fitness purpose offers, so there is
+   * one vocabulary for "what kind of session" rather than two.
+   */
+  async function _showChooseKindBeat() {
+    await _showCoachBubble("Which would you like?");
+    await new Promise(r => setTimeout(r, T.PANEL_DELAY));
+    _showChoicePanel(
+      "Which kind of session",
+      formsFor("general").map(f => ({ value: f.id, label: f.label, sub: "", recommended: false })),
+      async (pick) => {
+        // todayForm stays "choose" -- it is what they answered, and the
+        // proposal line says so. The KIND they picked becomes the type.
+        store.set("requestedSessionType", sessionTypeForForm(pick.value));
+        _showUserBubble(pick.label);
         await new Promise(r => setTimeout(r, T.PANEL_DELAY));
         _showActionButtons();
       }
@@ -1213,7 +1250,13 @@ export function CheckinView(router) {
     store.updateConditionPainScores({ ..._checkin.conditionLevels });
     checkinData.saveCheckin(_checkin);
     store.set("lastCheckin.timestamp", new Date().toISOString());
-    store.set("todayIntensity", checkinData.getSuggestedIntensity(_checkin));
+    // 🔴 CL-2, "lower-intensity". This ran AFTER the purpose questions
+    // and overwrote "A lighter session" with the energy-based value --
+    // so the coach said "you asked for a lighter session" and then built
+    // a normal one. A lighter answer is honoured here now, and it can
+    // only ever LOWER: a lighter request never raises anything.
+    const asked = intensityForForm(store.get("todayForm"));
+    store.set("todayIntensity", asked || checkinData.getSuggestedIntensity(_checkin));
   }
 
   // ─────────────────────────────────────────────────────────────────────────

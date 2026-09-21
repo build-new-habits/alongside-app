@@ -58,8 +58,10 @@ import { aimById } from "./aims.js";
 export const PURPOSES = [
   { id: "arc",     label: "Working towards my arc",
     sub: "Keep building the thing you're building" },
+  // CLINICAL-REVIEW, 16 Sep 2026. Was "Work around it, or work on it". Both
+  // halves were the problem she named: the app deciding what to load.
   { id: "niggle",  label: "Something's niggling",
-    sub: "Work around it, or work on it" },
+    sub: "Take it a bit easier today" },
   { id: "area",    label: "A particular area",
     sub: "You pick the part of you" },
   { id: "general", label: "General fitness",
@@ -78,18 +80,42 @@ export const PURPOSES = [
  * `gentle` is absent on purpose: "just moving" has already answered
  * this, and asking again is the coach not listening.
  */
+/**
+ * 🔴 CLINICAL-REVIEW, 16 Sep 2026. THE NIGGLE AND AREA OPTIONS ARE ACTIVITY
+ * MODIFICATION, NOT A TREATMENT CHOICE.
+ *
+ * They were: range of movement, BUILD STRENGTH AROUND IT, stretch it
+ * out, move gently. the clinical reviewer, reviewing:
+ *
+ *   "I would not support fixed mappings from a reported sore area to a
+ *    specific training focus. A self-reported sore area does not provide
+ *    enough information to determine what should or should not be
+ *    loaded, and the wording risks being interpreted as rehabilitation
+ *    advice. I would keep this at the level of activity modification:
+ *    offer a lower-intensity, general, or user-selected session that
+ *    reduces demand on the area concerned."
+ *
+ * So the four options are now exactly her three, plus the gentle one
+ * the product already had. None of them names a body part to load or
+ * to avoid. The session builder's existing condition handling and the
+ * caution line on each card still respond to the flagged area -- that
+ * is the "reduces demand on the area" half, and it was already there.
+ *
+ * ⚫ Recorded as her REVIEW COMMENTS, not a sign-off. She did not sign
+ * anything off, and nothing here claims she did.
+ */
 export const FORMS = {
   niggle: [
-    { id: "mobility", label: "Range of movement" },
-    { id: "around",   label: "Build strength around it" },
-    { id: "stretch",  label: "Stretch it out" },
-    { id: "gentle",   label: "Move gently, nothing loaded" }
+    { id: "lighter", label: "A lighter session" },
+    { id: "general", label: "Something general" },
+    { id: "gentle",  label: "Just keep moving gently" },
+    { id: "choose",  label: "I'll choose myself" }
   ],
   area: [
-    { id: "mobility", label: "Range of movement" },
-    { id: "around",   label: "Build strength around it" },
-    { id: "stretch",  label: "Stretch it out" },
-    { id: "gentle",   label: "Move gently, nothing loaded" }
+    { id: "lighter", label: "A lighter session" },
+    { id: "general", label: "Something general" },
+    { id: "gentle",  label: "Just keep moving gently" },
+    { id: "choose",  label: "I'll choose myself" }
   ],
   arc: [
     { id: "strength", label: "Strength" },
@@ -107,65 +133,84 @@ export const FORMS = {
 
 /** Q2's answers map onto the builder's session types. */
 const FORM_TO_SESSION_TYPE = {
-  strength: "full", around: "full", mixed: "full",
-  mobility: "mobility", stretch: "stretch",
-  cardio: "cardio", gentle: "mobility"
+  strength: "full", mixed: "full", mobility: "mobility", stretch: "stretch",
+  cardio: "cardio", gentle: "mobility",
+  // CLINICAL-REVIEW. Activity modification. "lighter" and "choose" deliberately
+  // carry NO session type: the arc's own choice stands, and the person
+  // either takes it at lower intensity or picks from the cards.
+  lighter: null, general: "full", choose: null
 };
 
 /**
- * 🔴 AROUND-AREA, 16 Sep 2026. "Build strength AROUND it" has to mean
- * something.
+ * 🔴 CLINICAL-REVIEW, 16 Sep 2026. AROUND_BY_AREA IS GONE.
  *
- * Found by tracing the whole chain rather than by a test: somebody
- * flags a sore lower back three times, the coach says "I'd build
- * strength around it rather than work it directly" -- and then handed
- * them FULL BODY, which loads the back like everything else.
+ * It mapped a sore area to a training focus -- a sore back to glutes,
+ * sore hips to core, a sore shoulder to legs. the clinical reviewer: "I would not support
+ * fixed mappings from a reported sore area to a specific training
+ * focus." Her reason is the one the research pack had already half
+ * found: a self-reported sore area does not tell the app enough to
+ * decide what should or should not be loaded. The evidence was
+ * low-certainty for the back and pointed the other way for the
+ * shoulder, and the pack said so -- but the answer was to remove the
+ * mapping, not to tune it.
  *
- * ⚫ THE ADVICE WAS RIGHT AND THE SESSION DID NOT FOLLOW IT, which is
- * worse than not giving the advice. A coach that contradicts itself in
- * two screens is the thing this product exists to not be.
- *
- * "Around" means: load the chain that SUPPORTS the sore area, without
- * loading the area itself. For a back that is the posterior chain --
- * glutes and hamstrings doing the work so the back does not have to,
- * which is what the reason text already promises.
- *
- * 🟠 FOR THE CLINICAL REVIEWER. This mapping is movement reasoning, not clinical
- * prescription, and it is the kind of thing a physiotherapist should
- * read before beta. It is deliberately coarse: four buckets, no
- * condition-specific protocols, and no claim beyond "work near it, not
- * on it". Logged as AROUND-REVIEW.
+ * sessionTypeForForm() takes no area now. There is nothing about a
+ * body part it is allowed to decide.
  */
-const AROUND_BY_AREA = {
-  // A sore back: posterior chain takes the load instead.
-  "lower-back": "glute", "spine": "glute", "upper-back": "glute",
-  "thoracic": "glute", "back-hips": "glute", "sciatica": "glute",
+export function sessionTypeForForm(formId) {
+  return Object.prototype.hasOwnProperty.call(FORM_TO_SESSION_TYPE, formId)
+    ? FORM_TO_SESSION_TYPE[formId] : null;
+}
 
-  // Sore hips or glutes: trunk work, off the hips.
-  "hip": "core", "hip-flexor": "core", "glutes": "core",
-  "piriformis": "core", "adductors": "core",
+/**
+ * CLINICAL-REVIEW. "A lighter session" and "just keep moving gently" mean a
+ * lower-intensity session -- the first of the three things she named.
+ * INTENSITY-SPACE made "low" reach the generator properly this
+ * morning; without that, this would have been a label that changed
+ * nothing.
+ */
+/**
+ * 🔴 CL-4, 16 Sep 2026. THE STOP-AND-SEEK LINE, SHOWN EVERY TIME.
+ *
+ * the clinical reviewer: "Include clear advice to stop if symptoms increase and to seek
+ * assessment for persistent, worsening, or concerning symptoms."
+ *
+ * The first implementation put this INSIDE the recommendation reason --
+ * and a recommendation only exists when there is history. So on day one,
+ * somebody reporting a sore back got no stop advice at all, which is
+ * the exact person it is for. Found on review of an interrupted turn's
+ * work, by asking what a first-day user would see.
+ *
+ * Now separate, and shown whenever the purpose is about a sore or
+ * particular area, whether or not there is anything to recommend.
+ *
+ * ⚫ It names all three of her words -- keeps coming back (persistent),
+ * getting worse (worsening), anything that worries you (concerning) --
+ * and echoes HURT_AND_ACHE's "worth getting someone to look at it", so
+ * the app says one thing about this rather than two.
+ */
+/**
+ * One wording, two grammatical numbers. The severe-pain screen can name
+ * more than one condition, and "Stop if it gets worse" about two
+ * things at once is a small grammar fault on the most serious screen in
+ * the app. Built from one function so both places say the same thing.
+ */
+export function safetyLineFor(them = "it") {
+  const plural = them === "them";
+  return `Stop if ${plural ? "they get" : "it gets"} worse. ` +
+         `If ${plural ? "they keep" : "it keeps"} coming back, ` +
+         `${plural ? "are" : "is"} getting worse, or anything about ` +
+         `${them} worries you, it's worth getting someone to look at ${them}.`;
+}
 
-  // Sore legs: trunk again -- there is nowhere lower to go.
-  "hamstring": "core", "quadriceps": "core", "knee": "core",
-  "calves": "core", "ankle-foot": "core", "legs": "core",
+export const SAFETY_LINE = safetyLineFor("it");
 
-  // Sore upper body: work the legs instead.
-  "shoulder": "lower", "rotator-cuff": "lower", "wrist-elbow": "lower",
-  "chest-pecs": "lower", "shoulders": "lower"
-};
+export function needsSafetyLine(purposeId) {
+  return purposeId === "niggle" || purposeId === "area";
+}
 
-export function sessionTypeForForm(formId, areaId) {
-  if (formId === "around" && areaId) {
-    // Direct hit, then the coarse target it belongs to.
-    if (AROUND_BY_AREA[areaId]) return AROUND_BY_AREA[areaId];
-    const target = TARGET_AREAS.find(t => t.id === areaId);
-    if (target) {
-      const hit = target.areas.find(a => AROUND_BY_AREA[a]);
-      if (hit) return AROUND_BY_AREA[hit];
-    }
-    // Unknown area: fall through rather than guess at a body part.
-  }
-  return FORM_TO_SESSION_TYPE[formId] || null;
+export function intensityForForm(formId) {
+  return (formId === "lighter" || formId === "gentle") ? "low" : null;
 }
 
 export function formsFor(purposeId) {
@@ -322,23 +367,43 @@ export function recommendation(purposeId, areaId) {
     // that includes the name they used for it.
     const said = _spokenArea(areaId);
 
-    // Repeatedly sore: work around it rather than into it.
+    // 🔴 CLINICAL-REVIEW, 16 Sep 2026. Every reason here used to tell the
+    // person what to do with the sore part -- "I'd build strength around
+    // it rather than work it directly", "keeping it moving without
+    // loading it". the clinical reviewer: "Avoid wording that says the app is
+    // strengthening around a problem or advises users not to work an
+    // area directly."
+    //
+    // Now each reason says what they TOLD us, and suggests a lighter
+    // session -- activity modification, her words -- without naming a
+    // body part to load or spare.
+    //
+    // ⚫ THE STOP-AND-SEEK ADVICE IS NOT HERE, deliberately. It was, in
+    // the first implementation, and that meant a first-day user -- who
+    // has no history and so gets no recommendation -- got no stop
+    // advice at all. It now lives in SAFETY_LINE, shown as its own
+    // message whenever the purpose concerns a sore or particular area.
+    // These reasons say what somebody TOLD us; that line says what to
+    // do if it gets worse. Keeping them apart means neither repeats the
+    // other.
     if (times >= 3) {
-      return { formId: "around",
+      return { formId: "lighter",
         reason: `You've flagged your ${said} ${times} times in the last fortnight. ` +
-                `I'd build strength around it rather than work it directly.` };
+                `A lighter session may suit today.` };
     }
     if (times === 2) {
-      return { formId: "mobility",
+      return { formId: "lighter",
         reason: `That's the second time you've flagged your ${said} this fortnight. ` +
-                `Range of movement first, and see how it goes.` };
+                `A lighter session may suit today.` };
     }
     // Flagged once, and it is today's. Nothing historical to lean on, so
     // the reason is today's own answer rather than a pattern.
     if (times === 1 && flaggedAreas().includes(areaId)) {
       return { formId: "gentle",
-        reason: `You flagged it this morning, and it hasn't come up before this fortnight. ` +
-                `Keeping it moving without loading it is the useful thing today.` };
+        // No "stop if it gets worse" here: SAFETY_LINE follows this
+        // message immediately and says it. Two consecutive messages
+        // saying the same thing reads as the app not listening to itself.
+        reason: `You flagged it this morning. Something gentle may suit today.` };
     }
     return null;
   }
@@ -396,20 +461,26 @@ export function recommendation(purposeId, areaId) {
  * read like a person wrote it.
  */
 const FORM_SHORT = {
-  around:   "strength around it",
+  lighter:  "a lighter session",
+  general:  "something general",
+  gentle:   "gentle movement",
+  choose:   "your own choice",
   mobility: "range of movement",
   stretch:  "stretching",
-  gentle:   "gentle movement",
   strength: "strength",
   cardio:   "cardio",
   mixed:    "a bit of each"
 };
 
 const FORM_TAILS = {
-  around:   ", and asked to build strength around it",
+  // CLINICAL-REVIEW. The "around it" tail is gone with the option. Nothing
+  // here describes what is being done TO the sore part.
+  lighter:  ", and asked for a lighter session",
+  general:  ", and asked for something general",
+  gentle:   ", and asked to keep moving gently",
+  choose:   ", and chose the session yourself",
   mobility: ", and asked to work on range of movement",
-  stretch:  ", and asked to stretch it out",
-  gentle:   ", and asked to keep it moving without loading it",
+  stretch:  ", and asked to stretch",
   strength: ", and asked for strength",
   cardio:   ", and asked for cardio",
   mixed:    ", and asked for a bit of each"
