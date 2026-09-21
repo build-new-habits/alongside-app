@@ -1,30 +1,12 @@
 # Alongside: Move — Master Schedule
-## 16 Sep 2026 v380
+## 16 Sep 2026 v379
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v379.md`. Remove v379 on upload.
+Supersedes `master_schedule_v378.md`. Remove v378 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
 > **Live: `alongside-v534`, 167 gates, `store.js` v74, `Schema.md` v1.67, cold start blueprint v139.** Read that blueprint after this block.
->
-> ### 🟠 CLINICAL FOLLOW-UP PACK — READY FOR THE CLINICAL REVIEWER, 16 Sep. `Documents/Business/alongside_clinical_review_followup_16sep2026_v1.docx`
->
-> Graeme: *"Knowing the workload of the clinical reviewer, she needs your best recommendations to review... She can then adjust and review rather than create. This respects her time. She'll need reminding what this is."*
->
-> **Two bounded parts, each with a tick-box decision grid** so she can respond without writing prose: **A** — the "build strength around it" mapping (AROUND-REVIEW), estimated 20–30 min; **B** — the nine exercises the library has never described, estimated 45–60 min. **Opens with a reminder of what Alongside is**, since she last saw it in August, and follows the August pack's audit template so it is familiar.
->
-> 🔴 **Researching it changed what we are asking.** Every reference was retrieved and its abstract read — **none appraised**, and the document says so, because the August pack recorded that an earlier draft invented a loading rule and attributed it to a clinician.
->
-> - **The back mapping** rests on **very low to uncertain** evidence for hip strengthening in low back pain, and one RCT found adding hip treatment gave **no additional benefit** over treating the back. NICE NG59 recommends exercise but names no muscle group.
-> - 🔴 **The shoulder mapping may run against the evidence entirely.** For rotator-cuff-related shoulder pain the evidence is for exercising **the shoulder itself**. "Train the legs instead" is not rehabilitation, and may steer people away from the loading that would help.
-> - 🔴 **The recommendation sentence the app currently shows** — *"I'd build strength around it rather than work it directly"* — **may claim more certainty than the evidence supports.** Put to her explicitly.
->
-> 🔴 **Tricep Dips (bench) is recommended for REPLACEMENT, not description.** A 2022 motion-capture study found the bench dip takes the shoulder to **~101% of the person's own maximum extension range** — the only dip variation past end-range — with the anterior capsule as the proposed concern. It is in Graeme's own programme. Listed first for that reason.
->
-> ⚫ **Until she reviews them, the nine show no instructions** — only the general hurt-and-ache guidance. Showing less beats showing an unreviewed description, and the pack says so.
->
-> 🟠 **Graeme to send.** No clinical sign-off exists for any of it; nothing here closes AROUND-REVIEW.
 >
 > ### 🟢 CARD-LOCAL — SHIPPED 16 Sep, `v534`. Open since 13 Sep, and it was never a renderer migration.
 >
@@ -9590,4 +9572,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v380*
+*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v379*
