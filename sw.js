@@ -1,7 +1,17 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 16 Sep 2026 v534
+ * 16 Sep 2026 v535
+ *
+ * v535 - CLINICAL-REVIEW. purpose.js, checkin.js, coach-proposal.js,
+ *   morning-programme.js, morning-library-map.js, exercises/strength.js,
+ *   exercises/gym.js.
+ *
+ *   Clinical feedback implemented. No fixed mapping from a sore area to
+ *   a training focus; activity modification only; a stop-and-seek line
+ *   shown every time; eight exercises added; bench dips replaced by a
+ *   rope pushdown. The severe-pain screen reworded under the same
+ *   principle, and now says stop if it gets worse.
  *
  * v534 - CARD-LOCAL. ONE NEW FILE PRECACHED:
  *   js/data/morning-library-map.js. exercise-card.js, morning-session.js.
@@ -3820,7 +3830,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v534";
+const CACHE_NAME = "alongside-v535";
 
 const SHELL_URLS = [
 
