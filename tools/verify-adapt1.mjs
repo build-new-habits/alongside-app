@@ -55,7 +55,7 @@ const byId = new Map(EXERCISES.map(e => [e.id, e]));
 //
 // These are the eight new library entries from the clinical follow-up
 // pack (bench dips excluded -- CL-6 took them out of the programme).
-// the clinical reviewer's verdict on the drafts: "generally sensible and the layout
+// The clinical verdict on the drafts: "generally sensible and the layout
 // works", with principles to apply throughout -- simple cues, a
 // comfortable and controlled range, no single fixed position (CL-5).
 //

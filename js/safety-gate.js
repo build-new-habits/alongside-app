@@ -95,7 +95,7 @@ import { HURT_AND_ACHE, HURT_AND_ACHE_VERSION } from "./exercise-card.js";
  *
  * ⚫ It is NOT in the coach's first person. The coach says "I" all over
  * this app; this is the product speaking about its own limits, which is
- * a different voice on purpose. the clinical reviewer's own words, near enough verbatim.
+ * a different voice on purpose. The clinical wording, near enough verbatim.
  */
 export const GUIDANCE_TEXT =
   "The advice in this app is general. Before starting any exercise " +

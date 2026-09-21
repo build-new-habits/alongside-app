@@ -762,7 +762,7 @@ export function CoachProposalView(router) {
     // principle.
     //
     // It said "What I can do is work around them", and the Adapt button
-    // promised "I'll keep well clear of the affected area". the clinical reviewer: "A
+    // promised "I'll keep well clear of the affected area". Clinical advice: "A
     // self-reported sore area does not provide enough information to
     // determine what should or should not be loaded", and "avoid
     // wording that says the app is strengthening around a problem or
