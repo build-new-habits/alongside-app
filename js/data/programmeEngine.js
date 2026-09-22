@@ -768,6 +768,37 @@ export function plannedFocusToday() {
   const slot = seq.find(s => s && s.day === today && !s.completed);
   if (!slot || !slot.type) return null;
 
+  // 🔴 WEEK-PLAN-LIVE, 16 Sep 2026. Work list item 2c.
+  //
+  // This returned 'cardio', 'mobility', or 'strength' for EVERYTHING
+  // else -- and 'strength' is not a session type, so the chooser fell to
+  // 'programme-default' and built full body. A planned core, upper,
+  // lower, glute or stretch day got full body. That is the fault PLAN-1
+  // fixed on 12 Aug ("declare Tuesday as core work and be offered
+  // whatever"), back again: PLAN-1's gate tested it through
+  // workoutGenerator.js, which nothing calls.
+  //
+  // A declared type that is a real session type now passes through as
+  // itself. Hard-coded rather than imported from session-builder.js,
+  // to keep this module out of that import graph; verify-week-plan-live
+  // iterates SESSION_TYPES itself, so a type added there and not here
+  // fails the gate rather than drifting silently.
+  //
+  // 'gym' is not here on purpose: it says WHERE, not what.
+  //
+  // ⚫ ONLY WHEN THE PERSON CHOSE IT. A type the APP derived keeps
+  // PLAN-1's coarse rule, deliberately: "a body-part session maps to
+  // strength -- a wrong guess costs a reordered list, not a wrong
+  // session." verify-plan1 pins that and still passes. The first draft
+  // of this fix honoured every type, derived or chosen; verify-plan1
+  // went red and was right to.
+  //
+  // A plan saved before `chosen` existed has no record of who decided,
+  // so it is treated as a guess -- the safe default, and exactly the
+  // behaviour it had before.
+  const PLANNABLE = ['glute', 'upper', 'lower', 'full', 'core', 'cardio', 'mobility', 'stretch'];
+  if (slot.chosen === true && PLANNABLE.includes(slot.type)) return slot.type;
+
   if (slot.type === 'cardio')   return 'cardio';
   if (slot.type === 'mobility') return 'mobility';
   return 'strength';

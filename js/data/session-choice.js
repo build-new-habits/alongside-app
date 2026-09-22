@@ -131,7 +131,13 @@ export function chooseSessionType() {
   inputs.arcSessionTypes = arcTypes;
 
   if (focus) {
-    const direct = FOCUS_DIRECT[focus];
+    // WEEK-PLAN-LIVE, 16 Sep 2026. A planned day that names a real
+    // session type IS that session type. FOCUS_DIRECT only knew cardio
+    // and mobility, so a planned core day went through the arc and, with
+    // no arc, to full body -- the other half of the fault in
+    // plannedFocusToday(). Both had to change: fixing either alone left
+    // the gate red, which is how this second half was found.
+    const direct = FOCUS_DIRECT[focus] || (focus !== "gym" ? validType(focus) : null);
     if (direct && validType(direct)) {
       return { sessionType: direct, reason: "programme", inputs };
     }
