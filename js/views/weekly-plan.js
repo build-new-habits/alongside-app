@@ -136,14 +136,20 @@ export function WeeklyPlanView(router) {
     let sequenceIndex = 0;
     const sessionSequence = DAYS.map(day => {
       const slot = days[day] || {};
+      // WEEK-PLAN-LIVE, 16 Sep 2026. `chosen` records WHO decided the
+      // type. The two branches below stored a guess and a choice in the
+      // same field with nothing to tell them apart, so the reader had to
+      // treat both one way. PLAN-1 chose "coarse" -- right for a guess
+      // ("a wrong guess costs a reordered list, not a wrong session"),
+      // wrong for somebody who picked Core and got full body.
       if (slot.type === 'gym' && !slot.sessionType && sessionTypes[sequenceIndex]) {
         const suggestedType = sessionTypes[sequenceIndex];
         sequenceIndex++;
-        return { day, type: suggestedType, declaredDuration: slot.durationMins, completed: false };
+        return { day, type: suggestedType, chosen: false, declaredDuration: slot.durationMins, completed: false };
       }
       if (slot.type === 'gym' && slot.sessionType) {
         sequenceIndex++;
-        return { day, type: slot.sessionType, declaredDuration: slot.durationMins, completed: false };
+        return { day, type: slot.sessionType, chosen: true, declaredDuration: slot.durationMins, completed: false };
       }
       return null;
     }).filter(Boolean);
