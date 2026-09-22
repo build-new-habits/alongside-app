@@ -110,8 +110,21 @@ check('W2-2 the bias is derived, so it cannot go stale',
 check('W2-2 nothing stores a bias that could survive a day',
   !/store\.set\(['"]proposalBias/.test(chkSrc + genSrc),
   'a stored bias is a bias that can be written once and read for ever');
+// GENTLE-SIGNALS, 16 Sep 2026. This read the SOURCE for the literal
+// `e.date < today` -- and that expression was part of the fault: `date`
+// is a field no activity entry has, so the whole count was always zero.
+// The rule it guarded -- today is excluded -- was right and is kept.
+// It is now asserted by BEHAVIOUR: log today and yesterday, and the run
+// must be one day, not two.
 check('W2-2 and today is excluded from the run it counts',
-  /e\.date < today/.test(chkSrc),
+  /d < today/.test(chkSrc) && (await (async () => {
+    const { store } = await import(new URL("../js/store.js", import.meta.url).href);
+    const { consecutiveActiveDays } = await import(new URL("../js/data/checkin.js", import.meta.url).href);
+    localStorage.clear(); store.init();
+    store.logActivity({ type: "workout", completedAt: new Date(Date.now() - 86400000).toISOString() });
+    store.logActivity({ type: "workout", completedAt: new Date().toISOString() });
+    return consecutiveActiveDays() === 1;
+  })()),
   'counting today would soften the very session about to be done');
 
 

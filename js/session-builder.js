@@ -964,7 +964,7 @@ import { getZoneStatus, getPainBand, getCondition, getExcludedConditions } from 
 import { focusOrderedCategories } from "./data/week-focus.js";
 // BURNOUT-LIVE, 16 Sep 2026. checkin.js imports only the store, so this
 // closes no cycle.
-import { detectBurnout } from "./data/checkin.js";
+import { detectBurnout, coachBias, consecutiveActiveDays, coldStartBias } from "./data/checkin.js";
 
 // ── Allocation presets (05 Aug 2026) ──────────────────────────────────────────
 // Scales EXERCISE_COUNT's warmup/main/cooldown split. Warmup always floors at
@@ -1044,10 +1044,66 @@ function _burnoutActive() {
   } catch { return false; }
 }
 
-/** The intensity the session is SHAPED by: today's, or low if the week says so. */
-function _sessionIntensity() {
-  return _burnoutActive() ? "low" : _todayIntensity();
+/**
+ * 🔴 GENTLE-SIGNALS, 16 Sep 2026. Work list items 2b and 2d.
+ *
+ * Every "go gentler" signal except today's energy was dead on this
+ * path, each proven only against workoutGenerator.js:
+ *
+ *   sleep       check-in asks it; nothing read it (SLEEP-1, 18 Aug)
+ *   streak      coachBias() had no caller, and consecutiveActiveDays()
+ *               counted a field no activity entry has -- always zero
+ *   declared    coldStartBias()'s only caller was resolveIntensity(),
+ *               called only by the dead generator. The sign-up stress
+ *               question has never changed a session
+ *   burnout     BURNOUT-LIVE (2a), folded in here
+ *
+ * ⚫ ONE RULE, ONE REASON. The first match wins, in this order, and
+ * only its sentence is said: several signals at once must not become
+ * several sentences about being tired. Today's own words outrank last
+ * night, which outranks the week, which outranks the run of days, which
+ * outranks something said at sign-up.
+ *
+ * Each signal is read through the function that already owned it --
+ * coachBias(), coldStartBias(), detectBurnout() -- so the thresholds
+ * stay where they were decided, not copied here.
+ */
+function _gentleReason() {
+  if (_todayIntensity() === "low") return { id: "today" };
+  try {
+    const todayKey = new Date().toISOString().split("T")[0];
+    const entry = (store.get("checkinHistory") || {})[todayKey] || {};
+    if (entry.sleepQuality === "poor") return { id: "sleep" };
+  } catch { /* no check-in today: nothing to read */ }
+  if (_burnoutActive()) return { id: "burnout" };
+  try {
+    if (coachBias() === "lighter") return { id: "streak", days: consecutiveActiveDays() };
+  } catch { /* history unreadable: not a reason */ }
+  try {
+    if (coldStartBias() === "lighter") return { id: "declared" };
+  } catch { /* no declaration: not a reason */ }
+  return null;
 }
+
+/** The intensity the session is SHAPED by: low if any gentle reason applies. */
+function _sessionIntensity() {
+  return _gentleReason() ? "low" : _todayIntensity();
+}
+
+/**
+ * What the coach says -- ONE line, for the reason that won.
+ *
+ * Every line repeats what the person reported and names no condition.
+ * The app says what it was told; it does not label anybody.
+ * 🟡 Draft wording, all of it, for the end-of-list review.
+ */
+const GENTLE_LINES = {
+  today:    () => "You said your energy's low today, so this is shorter than usual with more time to settle at the end.",
+  sleep:    () => "You said you slept badly, so I've kept this gentler today.",
+  burnout:  () => "Your check-ins this week have mostly been low on energy, so I've kept this gentler even though today feels better.",
+  streak:   r  => `You've moved ${r.days} days in a row, so today's a lighter one to let that settle.`,
+  declared: () => "You told me things have been running low lately, so I'm starting you gently."
+};
 
 function _applyTodayIntensity(counts) {
   if (_sessionIntensity() !== "low") return counts;
@@ -3896,19 +3952,10 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
   // compromise"), which is a way of planting it. Graeme approved this
   // wording on 13 Sep; the previous line shipped unapproved and said so in
   // its own comment.
-  const lowEnergyNote = _todayIntensity() === "low"
-    ? "You said your energy's low today, so this is shorter than usual with more time to settle at the end."
-    : null;
-
-  // BURNOUT-LIVE. Said only when the week, not today, is the reason --
-  // somebody who reported a better day must not be told their energy is
-  // low. It repeats what they reported and names no condition: the app
-  // says what it was told, it does not label anybody.
-  //
-  // 🟡 Draft wording. Goes in the end-of-list review with the rest.
-  const burnoutNote = (_burnoutActive() && !lowEnergyNote)
-    ? "Your check-ins this week have mostly been low on energy, so I've kept this gentler even though today feels better."
-    : null;
+  // GENTLE-SIGNALS. One reason, one sentence. Replaces the separate
+  // low-energy and burnout notes, which could otherwise both fire.
+  const gentle = _gentleReason();
+  const gentleNote = gentle ? GENTLE_LINES[gentle.id](gentle) : null;
 
   // Build prescribed note for coach line
   let prescribedNote = null;
@@ -3926,7 +3973,7 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
     durationMins,
     Array.from(conditionSet),
     userEquipment,
-    [conditionNote, lowEnergyNote, burnoutNote, equipNote, prescribedNote].filter(Boolean).join(" ") || null
+    [conditionNote, gentleNote, equipNote, prescribedNote].filter(Boolean).join(" ") || null
   );
 
   // Calculate estimated duration

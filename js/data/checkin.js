@@ -232,7 +232,19 @@ export function coachBias() {
 export function consecutiveActiveDays() {
   const log = store.get('activityLog') || [];
   const today = new Date().toISOString().split('T')[0];
-  const activeDates = new Set(log.filter(e => e.date && e.date < today).map(e => e.date));
+  // 🔴 GENTLE-SIGNALS, 16 Sep 2026. THIS READ A FIELD NO ENTRY HAS.
+  //
+  // It counted `e.date`. store.logActivity() writes id, type,
+  // completedAt and sessionType -- no `date`. So this returned 0 for
+  // every user, always, and coachBias() ("three days running -> go
+  // lighter") could never fire even had anything called it. Found by
+  // logging an activity and reading back its fields, which is the
+  // eighth time this session that a field assumed to exist did not.
+  //
+  // `date` is still honoured first, for any caller that sets one;
+  // completedAt is the field every entry actually carries.
+  const dayOf = e => e && (e.date || (typeof e.completedAt === 'string' ? e.completedAt.slice(0, 10) : null));
+  const activeDates = new Set(log.map(dayOf).filter(d => d && d < today));
   let count = 0;
   const cursor = new Date();
   cursor.setDate(cursor.getDate() - 1);
