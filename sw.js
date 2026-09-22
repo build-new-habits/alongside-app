@@ -1,7 +1,17 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 16 Sep 2026 v537
+ * 16 Sep 2026 v538
+ *
+ * v538 - WEEK-PLAN-LIVE. weekly-plan.js, programmeEngine.js,
+ *   session-choice.js.
+ *
+ *   A day the person planned as Core got a full-body session. The plan
+ *   now records whether the person chose a day's type or the app
+ *   guessed it; a choice is honoured exactly, a guess stays coarse as
+ *   PLAN-1 decided.
+ *
+ *   New gate: tools/verify-week-plan-live.mjs. 169 gates.
  *
  * v537 - BURNOUT-LIVE. session-builder.js.
  *
@@ -3845,7 +3855,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v537";
+const CACHE_NAME = "alongside-v538";
 
 const SHELL_URLS = [
 
