@@ -1,7 +1,16 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 16 Sep 2026 v536
+ * 16 Sep 2026 v537
+ *
+ * v537 - BURNOUT-LIVE. session-builder.js.
+ *
+ *   Burnout was detected but, on the live path, changed only the
+ *   coach's opening sentence. The session is now shaped by the gentler
+ *   of today and the week, so a better day after a burnt-out week stays
+ *   gentle. The coach says why, without claiming today's energy is low.
+ *
+ *   New gate: tools/verify-burnout-live.mjs. 168 gates.
  *
  * v536 - REVIEWER-ANON. Comments and one privacy-page template changed
  *   across js/. The clinical reviewer's name was in the privacy page's
@@ -3836,7 +3845,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v536";
+const CACHE_NAME = "alongside-v537";
 
 const SHELL_URLS = [
 
