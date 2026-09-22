@@ -1,7 +1,17 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 16 Sep 2026 v538
+ * 16 Sep 2026 v539
+ *
+ * v539 - GENTLE-SIGNALS. session-builder.js, data/checkin.js.
+ *
+ *   Poor sleep, several training days in a row, and low energy declared
+ *   at sign-up now each make a session gentler, alongside today's energy
+ *   and a burnout week. One rule, one reason: the coach gives only the
+ *   most relevant sentence. The day count read a field no activity has,
+ *   so it had always been zero.
+ *
+ *   New gate: tools/verify-gentle-signals.mjs. 170 gates.
  *
  * v538 - WEEK-PLAN-LIVE. weekly-plan.js, programmeEngine.js,
  *   session-choice.js.
@@ -3855,7 +3865,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v538";
+const CACHE_NAME = "alongside-v539";
 
 const SHELL_URLS = [
 
