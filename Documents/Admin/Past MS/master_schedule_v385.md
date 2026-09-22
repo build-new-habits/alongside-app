@@ -1,8 +1,8 @@
 # Alongside: Move — Master Schedule
-## 16 Sep 2026 v386
+## 16 Sep 2026 v385
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v385.md`. Remove v385 on upload.
+Supersedes `master_schedule_v384.md`. Remove v384 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
@@ -25,12 +25,10 @@ Supersedes `master_schedule_v385.md`. Remove v385 on upload.
 >
 > | # | Item | Investigate first | Build / fix | Proven by (Claude, in code) | Done |
 > |---|---|---|---|---|---|
-> | **1** | **ENERGY-LIVE** — on a low day, easier movements | ✅ **INVESTIGATED 16 Sep: ALREADY BUILT, by ENERGY-1 on 13 Sep** — the same day it was approved. The audit's *"approved, never built"* came from a schedule line written that morning and never updated. **Measured over 25 builds each:** a low day has 3 main movements instead of 4, 3 cool-down instead of 2, and easier main work (core 4.8 → 3.9 effort). The audit's *"9 / 9 / 9"* was real and misleading — the low day swaps a hard movement for a cool-down, so the TOTAL is unchanged | — | `verify-energy1` — builds real sessions through `buildSession`, passing | ✅ |
-> | **1b** | **GOOD-DAY** — a good day currently gets exactly what a normal day gets | Found while investigating item 1 | 🔵 **Graeme's decision, not a build yet.** Claude's recommendation: **a small response at most** — boom-and-bust is the documented risk for the fatigue and perimenopause personas, so a good day should not be amplified much | — | Moved to "needs a decision" |
-> | **2** | **DEAD-GATES** — checks that prove behaviour in code nothing runs | 🔴 **INVESTIGATED 16 Sep — much bigger than one file.** `workoutGenerator.js` has had no caller since TWO-ENGINE; **FEED-READER found that on 12 Sep**, and it was still "fixed" today. **Ten gates prove behaviour against it:** seven read its source (`bias1`, `burn1`, `burn2`, `data1`, `sleep1`, `w2`, `homedoors`), three import it (`plan1`, `bias3`, `intensity-space`). Each one's behaviour must be found on the LIVE path, or it does not exist | For each of the ten: find the behaviour on the live path, or add it (see 2a), then re-point the gate at the live path. **Then delete the dead generator** so nobody fixes it again; move `AVAILABLE_TIME_WINDOW_MINUTES` | Every gate re-pointed runs the live path. A final gate asserts `workoutGenerator.js` is gone and nothing imports it | ☐ |
-> | **2a** | 🔴 **BURNOUT-LIVE** — found inside item 2 | **Confirmed 16 Sep:** `detectBurnout()` works (a week of energy 2, stress 9 → *high*), but **on the live path it changes only the coach's opening sentence.** The session is built as normal. BURN-1's protection — short, recovery-focused — lives only in the dead generator. Partial cover: a LOW-ENERGY day still gets the gentler session. **The gap is burnout plus a better day**: a full normal session, the boom-and-bust BURN-1 existed to prevent, for the perimenopause persona it was found tracing | Carry burnout into the live builder: a detected burnout week keeps sessions gentle even when today feels better | Gate builds through the live path with a burnout week and a good day today; asserts the session is gentler than the same day without the burnout history. Reversal: remove the history → normal session | ☐ |
-> | **3** | **LOW-LINE** — what the coach says on a low day | ✅ **Already built by ENERGY-1, 13 Sep.** Shorter, and no longer argues with a thought the person may not have had | — | `verify-energy1` 1a–1d | ✅ |
-> | **4** | **TOO-HARD** — "too hard" moves that exercise down and opens its easier options | ✅ **Already built by ENERGY-1, 13 Sep.** Twice in the last five: offered less often, and the card opens "Other ways to do this" by itself | — | `verify-energy1` 4e–5g | ✅ |
+> | **1** | **ENERGY-LIVE** — on a low day, easier movements; on a good day, more | How `session-builder.js` picks candidates; whether `todayIntensity` reaches it at all; PROG-1's finding that phase intensity *"reaches coach-proposal and not the session-builder door"* | Energy-weighted selection in `session-builder.js`. Weighted by `energyRequired`, **not** a `difficultyLevel` cap (that measures coordination, not effort) | New `verify-energy-live`: builds 20 sessions at each of low / moderate / high **through the same call `coach-proposal.js` makes**; asserts mean effort low < moderate < high by a set margin. Reversal: remove the weighting → red. Call-site check included | ☐ |
+> | **2** | **INTENSITY-DEAD** — remove the code fixed this morning that nothing uses | Which `workoutGenerator` methods have any caller. Measured so far: only the constant `AVAILABLE_TIME_WINDOW_MINUTES` | Remove the dead methods; move the constant; retire or rewrite `verify-intensity-space`, which currently certifies dead code | Gate asserts no exported function in that file lacks a caller, and the constant still resolves | ☐ |
+> | **3** | **LOW-LINE** — what the coach says on a low day | Where the line lives and every place it renders | Rewrite, in the coach voice. Wording goes in the end-of-list review | Gate: a low check-in shows the new line; it passes the existing voice rules | ☐ |
+> | **4** | **TOO-HARD** — "too hard" moves that exercise down and opens its easier options | What the button does today in each card player (`gym-programme.js` notes it was retired) | Deprioritise in the next build; open "Other ways to do this" | Gate taps "too hard" in a mounted session, then asserts the exercise ranks lower in the next build and the easier options are open | ☐ |
 >
 > ## Stage 2 — The gym
 >
@@ -79,7 +77,6 @@ Supersedes `master_schedule_v385.md`. Remove v385 on upload.
 > | Item | Why it is not above |
 > |---|---|
 > | 🔴 **RED-FLAG** — red-flag screen with a hard stop, plus the rehab landing | **Blocked on the solicitor** (the MHRA question). The most serious item open. **Graeme: chase it.** Enters the list at the top the moment it is unblocked |
-> | 🔵 **GOOD-DAY** — whether a good day should get more | Found in item 1. Recommendation: little or nothing, because of boom-and-bust |
 > | 🔵 **REST-1** — rest between sets | Needs Graeme's design decision first |
 > | 🔵 **CLASS-8+** — more classes | Needs Graeme's decision; not urgent |
 > | 🟡 **IMAGES-1** — exercise images | Before public launch, not beta |
@@ -101,7 +98,7 @@ Supersedes `master_schedule_v385.md`. Remove v385 on upload.
 >
 > | | What | Evidence |
 > |---|---|---|
-> | ~~ENERGY-LIVE~~ | 🟢 **WRONG — corrected by work list item 1, same day.** A low day does change the session; the equal totals hid it. Section B below was also wrong: all three items shipped as ENERGY-1 on 13 Sep | — |
+> | 🔴 **ENERGY-LIVE** | How you feel barely changes the coach's session | Measured above. **The real fix is the 13 Sep approval below** — energy-weighted selection in `session-builder.js`. Same job. Related: PROG-1, *"phase intensity reaches coach-proposal and not the session-builder door — attempted, reverted, unproven"* |
 > | 🔴 **GYM-REACH-1** | **Cardio at the gym offers no machines.** Treadmill never appears anywhere | Built with treadmill, bike, elliptical, rower declared: Cardio 30/45 min → 10/13 movements, **zero machines**. Gym type works (cross trainer, rower). **Worse since PURPOSE-ASK**, which routes "general fitness → cardio" straight into it. Diagnosed 12 Sep, never fixed |
 >
 > ### B. Approved and never built — Graeme, 13 Sep
@@ -9771,4 +9768,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v386*
+*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v385*
