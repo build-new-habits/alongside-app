@@ -1,8 +1,8 @@
 # Alongside: Move — Master Schedule
-## 16 Sep 2026 v385
+## 16 Sep 2026 v384
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v384.md`. Remove v384 on upload.
+Supersedes `master_schedule_v383.md`. Remove v383 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
@@ -14,8 +14,8 @@ Supersedes `master_schedule_v384.md`. Remove v384 on upload.
 >
 > ## The rules for this list
 >
-> 1. **No device testing until item 15.** Every row is proven by Claude in code. Graeme tests everything at once, at the end, against one checklist.
-> 2. 🔴 **If Graeme reports something from the screen before item 15, Claude checks this list FIRST and says so plainly** — *"that's item 6, not built yet; you're not meant to be seeing it fixed"* — and carries on with the current item. **Graeme asked for this challenge explicitly.** Agreeing to fix it on the spot is how the list gets abandoned.
+> 1. **No device testing until item 14.** Every row is proven by Claude in code. Graeme tests everything at once, at the end, against one checklist.
+> 2. 🔴 **If Graeme reports something from the screen before item 14, Claude checks this list FIRST and says so plainly** — *"that's item 6, not built yet; you're not meant to be seeing it fixed"* — and carries on with the current item. **Graeme asked for this challenge explicitly.** Agreeing to fix it on the spot is how the list gets abandoned.
 > 3. **A finding that is genuinely NOT on the list is added to the bottom, not started** — unless it is a safety fault, which goes to the top with a sentence saying why.
 > 4. **Top to bottom. No side quests.** New ideas are logged at the bottom.
 > 5. 🔴 **Every gate must drive the code path the screen actually uses, and prove that path has a live caller.** INTENSITY-SPACE passed on a function nothing calls. A test of a helper is not a test of the feature.
@@ -53,22 +53,12 @@ Supersedes `master_schedule_v384.md`. Remove v384 on upload.
 > |---|---|---|---|---|---|
 > | **12** | **WEB-CLAIMS** — homepage monitoring claim, testimonial-like quotes, sign-up form | Where the website lives and whether Claude can reach it; the Kit sign-up needs Graeme's account | Remove *"detects the early signs"* / *"responds with restoration"*; stop quotes reading as testimonials; connect sign-up or say why not | Gate scans the site text for banned claims (detect, early signs, diagnose, monitor) and asserts no quote is presented as a user testimonial | ☐ |
 >
-> ## Stage 5 — The personas, before Graeme
->
-> Graeme, 16 Sep: *"I want to run the personas through again and get feedback from them — what they like, what they dislike, how much they would recommend the app… particularly the value they think it has. That has been one of the things that has helped us discover problems."*
->
-> | # | Item | Investigate first | Build / fix | Proven by | Done |
-> |---|---|---|---|---|---|
-> | **13** | **PERSONA-RUN** — Wave 2, on the finished app | Wave 1's method and six personas (`alongside_brief_persona-tracing-wave1_11aug2026_v1.md`); the full matrix (`alongside_persona_usecase_matrix_05jul2026_v2.md`); which personas the changes since `v515` affect most | **Claude writes the Wave 2 brief. It is RUN IN A FRESH, SEPARATE CHAT with no history of this build**, as Wave 1 was — the builder tracing its own work straight after writing it is marking its own homework. Each persona, over three weeks of real, irregular use, reports: **what they like · what they dislike · how likely they are to recommend it (0–10, with the reason) · what they think it is worth, against the real Free and Plan prices** | Every claim cites the route and the on-screen text it rests on. **Every problem found is reproduced in code by Claude before it is accepted**, then added to this list above item 14 | ☐ |
->
-> 🟠 **What the persona scores are, and are not.** Simulated people traced through code. **Excellent at finding problems** — that is what Wave 1 proved. **Not evidence of what real people would pay or recommend**, so the recommend scores and perceived value are **never quoted as research, on the website, or in marketing.** Real value evidence comes from beta testers.
->
-> ## Stage 6 — Ready for Graeme
+> ## Stage 5 — Ready for Graeme
 >
 > | # | Item | Build / fix | Proven by | Done |
 > |---|---|---|---|---|
-> | **14** | **DEV-PANEL** — dev switch off | `DEV_PANEL_ENABLED = false` | Gate asserts it is false in the shipped file | ☐ |
-> | **15** | **TEST-PLAN** — one checklist for everything since `v515`, route by route, in plain language | Rewrite the testing schedule against the finished list, including anything the personas found | Every row above maps to at least one check | ☐ |
+> | **13** | **DEV-PANEL** — dev switch off | `DEV_PANEL_ENABLED = false` | Gate asserts it is false in the shipped file | ☐ |
+> | **14** | **TEST-PLAN** — one checklist for everything since `v515`, route by route, in plain language | Rewrite the testing schedule against the finished list | Every row above maps to at least one check | ☐ |
 >
 > ➡️ **Then, and only then: Graeme's device test.** Findings from it start a new list.
 >
@@ -9768,4 +9758,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v385*
+*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v384*
