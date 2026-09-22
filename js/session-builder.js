@@ -962,6 +962,9 @@ import { matchCategory } from "./data/session-categories.js";
 import { buildRationale, tooHardRecently } from "./data/session-rationale.js";
 import { getZoneStatus, getPainBand, getCondition, getExcludedConditions } from "./data/conditions.js";
 import { focusOrderedCategories } from "./data/week-focus.js";
+// BURNOUT-LIVE, 16 Sep 2026. checkin.js imports only the store, so this
+// closes no cycle.
+import { detectBurnout } from "./data/checkin.js";
 
 // ── Allocation presets (05 Aug 2026) ──────────────────────────────────────────
 // Scales EXERCISE_COUNT's warmup/main/cooldown split. Warmup always floors at
@@ -1007,8 +1010,47 @@ function _todayIntensity() {
   return (v === "low" || v === "moderate" || v === "high") ? v : null;
 }
 
+/**
+ * 🔴 BURNOUT-LIVE, 16 Sep 2026. Work list item 2a.
+ *
+ * detectBurnout() has worked since BURN-1 (12 Aug): a week of low energy
+ * reads as burnout. But on this path -- the one every coach proposal
+ * takes -- it changed only the coach's opening sentence. The session
+ * was built as normal. BURN-1's protection lived in workoutGenerator.js,
+ * which nothing has called since TWO-ENGINE, and verify-burn1/2 proved
+ * it there. They passed while the protection existed for nobody.
+ *
+ * A low-energy DAY already got the gentler session. The gap was burnout
+ * plus a better day: a full, normal session, the boom-and-bust BURN-1
+ * was built to prevent -- found tracing the perimenopause persona, the
+ * person whose energy is least predictable.
+ *
+ * ⚫ THE GENTLER OF TODAY AND THE WEEK SHAPES THE SESSION. The same rule
+ * coach-proposal already applies to phase intensity: "the gentler of the
+ * two wins." It reuses the low-day machinery, which is proven, rather
+ * than adding a second gentle shape to keep in step.
+ *
+ * ⚫ MODERATE AND HIGH ARE TREATED ALIKE here. BURN-1's dead version cut
+ * high burnout to four exercises; the low-day shape is close, and
+ * conservative in the right direction. A finer split is a decision, not
+ * a fix.
+ *
+ * This decides the SHAPE only. What the coach SAYS stays tied to what
+ * the person reported -- see _burnoutNote.
+ */
+function _burnoutActive() {
+  try {
+    return detectBurnout(store.get("checkinHistory") || {}).level !== "none";
+  } catch { return false; }
+}
+
+/** The intensity the session is SHAPED by: today's, or low if the week says so. */
+function _sessionIntensity() {
+  return _burnoutActive() ? "low" : _todayIntensity();
+}
+
 function _applyTodayIntensity(counts) {
-  if (_todayIntensity() !== "low") return counts;
+  if (_sessionIntensity() !== "low") return counts;
   return {
     warmup:   counts.warmup,
     main:     Math.max(2, Math.round(counts.main * 0.6)),
@@ -3595,7 +3637,7 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
       // is actually available rather than to an absolute number, so a
       // section can never be emptied by it. PROPOSAL-3 already shortened
       // the working part; this is about which movements fill what is left.
-      if (_todayIntensity() === "low") {
+      if (_sessionIntensity() === "low") {
         const levels = candidates.map(e => e.energyRequired || 0).sort((a, b) => a - b);
         const median = levels[Math.floor(levels.length / 2)];
         const easier = candidates.filter(e => (e.energyRequired || 0) <= median);
@@ -3858,6 +3900,16 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
     ? "You said your energy's low today, so this is shorter than usual with more time to settle at the end."
     : null;
 
+  // BURNOUT-LIVE. Said only when the week, not today, is the reason --
+  // somebody who reported a better day must not be told their energy is
+  // low. It repeats what they reported and names no condition: the app
+  // says what it was told, it does not label anybody.
+  //
+  // 🟡 Draft wording. Goes in the end-of-list review with the rest.
+  const burnoutNote = (_burnoutActive() && !lowEnergyNote)
+    ? "Your check-ins this week have mostly been low on energy, so I've kept this gentler even though today feels better."
+    : null;
+
   // Build prescribed note for coach line
   let prescribedNote = null;
   if (hasPrescribed) {
@@ -3874,7 +3926,7 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
     durationMins,
     Array.from(conditionSet),
     userEquipment,
-    [conditionNote, lowEnergyNote, equipNote, prescribedNote].filter(Boolean).join(" ") || null
+    [conditionNote, lowEnergyNote, burnoutNote, equipNote, prescribedNote].filter(Boolean).join(" ") || null
   );
 
   // Calculate estimated duration
