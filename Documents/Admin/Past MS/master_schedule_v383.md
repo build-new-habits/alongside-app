@@ -1,80 +1,14 @@
 # Alongside: Move — Master Schedule
-## 16 Sep 2026 v384
+## 16 Sep 2026 v383
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v383.md`. Remove v383 on upload.
+Supersedes `master_schedule_v382.md`. Remove v382 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
 > **Live: `alongside-v536`, 167 gates, `store.js` v74, `Schema.md` v1.67, cold start blueprint v141.** Read that blueprint after this block.
 >
-> # 🧭 THE WORK LIST — 16 Sep 2026. Work from THIS, top to bottom, and nothing else.
->
-> Graeme: *"I keep testing something, finding something, we get derailed... then we never come back. So I don't want to test anything until the end. I want a really clean list. What needs to be investigated? What needs to be built and fixed? And how is it going to be tested through reading the code, through running the test, your end."*
->
-> ## The rules for this list
->
-> 1. **No device testing until item 14.** Every row is proven by Claude in code. Graeme tests everything at once, at the end, against one checklist.
-> 2. 🔴 **If Graeme reports something from the screen before item 14, Claude checks this list FIRST and says so plainly** — *"that's item 6, not built yet; you're not meant to be seeing it fixed"* — and carries on with the current item. **Graeme asked for this challenge explicitly.** Agreeing to fix it on the spot is how the list gets abandoned.
-> 3. **A finding that is genuinely NOT on the list is added to the bottom, not started** — unless it is a safety fault, which goes to the top with a sentence saying why.
-> 4. **Top to bottom. No side quests.** New ideas are logged at the bottom.
-> 5. 🔴 **Every gate must drive the code path the screen actually uses, and prove that path has a live caller.** INTENSITY-SPACE passed on a function nothing calls. A test of a helper is not a test of the feature.
-> 6. **A row is done only when:** its gate was run red before the fix and green after · the full suite passes from a clean clone · the row below is ticked with the cache version it shipped in.
->
-> ## Stage 1 — How you feel changes what the coach gives you
->
-> | # | Item | Investigate first | Build / fix | Proven by (Claude, in code) | Done |
-> |---|---|---|---|---|---|
-> | **1** | **ENERGY-LIVE** — on a low day, easier movements; on a good day, more | How `session-builder.js` picks candidates; whether `todayIntensity` reaches it at all; PROG-1's finding that phase intensity *"reaches coach-proposal and not the session-builder door"* | Energy-weighted selection in `session-builder.js`. Weighted by `energyRequired`, **not** a `difficultyLevel` cap (that measures coordination, not effort) | New `verify-energy-live`: builds 20 sessions at each of low / moderate / high **through the same call `coach-proposal.js` makes**; asserts mean effort low < moderate < high by a set margin. Reversal: remove the weighting → red. Call-site check included | ☐ |
-> | **2** | **INTENSITY-DEAD** — remove the code fixed this morning that nothing uses | Which `workoutGenerator` methods have any caller. Measured so far: only the constant `AVAILABLE_TIME_WINDOW_MINUTES` | Remove the dead methods; move the constant; retire or rewrite `verify-intensity-space`, which currently certifies dead code | Gate asserts no exported function in that file lacks a caller, and the constant still resolves | ☐ |
-> | **3** | **LOW-LINE** — what the coach says on a low day | Where the line lives and every place it renders | Rewrite, in the coach voice. Wording goes in the end-of-list review | Gate: a low check-in shows the new line; it passes the existing voice rules | ☐ |
-> | **4** | **TOO-HARD** — "too hard" moves that exercise down and opens its easier options | What the button does today in each card player (`gym-programme.js` notes it was retired) | Deprioritise in the next build; open "Other ways to do this" | Gate taps "too hard" in a mounted session, then asserts the exercise ranks lower in the next build and the easier options are open | ☐ |
->
-> ## Stage 2 — The gym
->
-> | # | Item | Investigate first | Build / fix | Proven by | Done |
-> |---|---|---|---|---|---|
-> | **5** | **GYM-REACH-1** — cardio at the gym uses the machines, and the treadmill appears | Why the Cardio recipe has no slot a machine block can fill (`isSessionLength()` excludes long blocks by design); what the Gym type does that Cardio does not | Cardio at a location with machines gets one machine block, the way Gym does | New `verify-gym-reach`: **"declared, available, never offered"** — for every declared machine, it appears within N builds. Reversal: undeclare a machine → it never appears. Covers every equipment-gated entry, as the 12 Sep plan asked | ☐ |
-> | **6** | **EQUIP-STAIR** — stair climber can be declared | Every equipment id used by any exercise versus every id any picker offers | Add to the onboarding picker, or retire the entries | Gate: every equipment id used by the library is offered by at least one picker | ☐ |
->
-> ## Stage 3 — Smaller jobs
->
-> | # | Item | Investigate first | Build / fix | Proven by | Done |
-> |---|---|---|---|---|---|
-> | **7** | **SAVE-HANDOFF** — every session type records what you finished | Which builder views still rely on the `generatedSession` fallback | Write `lastFinishedSession` at completion | Extend `verify-save-all`: each view, driven to completion, writes the handoff | ☐ |
-> | **8** | **OWN-LIST** — find a saved session when you have lots | The saved-sessions view's list | Search and newest-first | Gate mounts 20 saved sessions, types, asserts the list narrows and order holds | ☐ |
-> | **9** | **SETTINGS-PROGRESS** — both screens say what is true | Every link and label on both | Fix whatever is found | Gate walks every route on both screens and asserts each is registered and live; asserts no retired feature is named | ☐ |
-> | **10** | **CL-5-ALL** — the 162 existing exercise descriptions follow the clinical principles | Scan by code for fixed angles, "always", "must", "exactly", single fixed positions | Reword what is flagged | The same scan becomes a gate across the whole library | ☐ |
-> | **11** | **AUG-UNKNOWNS** — CAP-6, DATA-2, PT-4, NAV-2, CSS ratchet, DISP-3 | Each one: open, closed, or obsolete | Close or move to this list | Each gets a one-line status with its evidence | ☐ |
->
-> ## Stage 4 — Website
->
-> | # | Item | Investigate first | Build / fix | Proven by | Done |
-> |---|---|---|---|---|---|
-> | **12** | **WEB-CLAIMS** — homepage monitoring claim, testimonial-like quotes, sign-up form | Where the website lives and whether Claude can reach it; the Kit sign-up needs Graeme's account | Remove *"detects the early signs"* / *"responds with restoration"*; stop quotes reading as testimonials; connect sign-up or say why not | Gate scans the site text for banned claims (detect, early signs, diagnose, monitor) and asserts no quote is presented as a user testimonial | ☐ |
->
-> ## Stage 5 — Ready for Graeme
->
-> | # | Item | Build / fix | Proven by | Done |
-> |---|---|---|---|---|
-> | **13** | **DEV-PANEL** — dev switch off | `DEV_PANEL_ENABLED = false` | Gate asserts it is false in the shipped file | ☐ |
-> | **14** | **TEST-PLAN** — one checklist for everything since `v515`, route by route, in plain language | Rewrite the testing schedule against the finished list | Every row above maps to at least one check | ☐ |
->
-> ➡️ **Then, and only then: Graeme's device test.** Findings from it start a new list.
->
-> ## Not in the working order — and why
->
-> | Item | Why it is not above |
-> |---|---|
-> | 🔴 **RED-FLAG** — red-flag screen with a hard stop, plus the rehab landing | **Blocked on the solicitor** (the MHRA question). The most serious item open. **Graeme: chase it.** Enters the list at the top the moment it is unblocked |
-> | 🔵 **REST-1** — rest between sets | Needs Graeme's design decision first |
-> | 🔵 **CLASS-8+** — more classes | Needs Graeme's decision; not urgent |
-> | 🟡 **IMAGES-1** — exercise images | Before public launch, not beta |
-> | ⚪ **Graeme's, not code** | Solicitor bundle incl. BIZ-CONSENT · R12 · GitHub Support purge · whether `Documents/` should be public |
->
-> ---
->
-> ## 📋 WHAT IS ACTUALLY OPEN — AUDIT, 16 Sep 2026. The evidence behind the list above.
+> ## 📋 WHAT IS ACTUALLY OPEN — AUDIT, 16 Sep 2026. Rebuilt by EXECUTION, not by reading this document.
 >
 > Graeme: *"I feel like there is stuff that we've still got to build, and we have moved away from doing them... an absolute deep down search."* **He was right.** Sources: this schedule, the device-test build plan, the code, the gates, past chats — and **every "is it fixed?" answered by running the app, not by finding a SHIPPED line.**
 >
@@ -9758,4 +9692,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v384*
+*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v383*
