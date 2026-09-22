@@ -1,78 +1,12 @@
 # Alongside: Move — Master Schedule
-## 16 Sep 2026 v383
+## 16 Sep 2026 v382
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v382.md`. Remove v382 on upload.
+Supersedes `master_schedule_v381.md`. Remove v381 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
 > **Live: `alongside-v536`, 167 gates, `store.js` v74, `Schema.md` v1.67, cold start blueprint v141.** Read that blueprint after this block.
->
-> ## 📋 WHAT IS ACTUALLY OPEN — AUDIT, 16 Sep 2026. Rebuilt by EXECUTION, not by reading this document.
->
-> Graeme: *"I feel like there is stuff that we've still got to build, and we have moved away from doing them... an absolute deep down search."* **He was right.** Sources: this schedule, the device-test build plan, the code, the gates, past chats — and **every "is it fixed?" answered by running the app, not by finding a SHIPPED line.**
->
-> ### 🔴 CORRECTION FIRST — INTENSITY-SPACE (`v524`) FIXED DEAD CODE
->
-> **The energy slider is NOT fixed on the live path**, despite the `v524` entry below saying so. `workoutGenerator.getWorkoutParams()` — the function corrected and gated that day — **has no callers.** The only thing any screen imports from `workoutGenerator.js` is the constant `AVAILABLE_TIME_WINDOW_MINUTES`. The coach uses `session-builder.js`. `verify-intensity-space` called the function directly, so it passed on a fix nobody runs.
->
-> **Measured on the live builder, 16 Sep:** full body, 30 min, home — low / moderate / high give **9 / 9 / 9 movements** at mean effort **~3.0 / 3.3 / 3.4**. A flat day and a flying day get essentially the same session. **Seventh dead branch of the session, and the only one reported to Graeme as fixed.**
->
-> ### A. Live faults — wrong on screen today
->
-> | | What | Evidence |
-> |---|---|---|
-> | 🔴 **ENERGY-LIVE** | How you feel barely changes the coach's session | Measured above. **The real fix is the 13 Sep approval below** — energy-weighted selection in `session-builder.js`. Same job. Related: PROG-1, *"phase intensity reaches coach-proposal and not the session-builder door — attempted, reverted, unproven"* |
-> | 🔴 **GYM-REACH-1** | **Cardio at the gym offers no machines.** Treadmill never appears anywhere | Built with treadmill, bike, elliptical, rower declared: Cardio 30/45 min → 10/13 movements, **zero machines**. Gym type works (cross trainer, rower). **Worse since PURPOSE-ASK**, which routes "general fitness → cardio" straight into it. Diagnosed 12 Sep, never fixed |
->
-> ### B. Approved and never built — Graeme, 13 Sep
->
-> | | What |
-> |---|---|
-> | 🟠 **LOW-SELECT** | Energy-weighted selection on a low day — **not** a difficulty cap (`difficultyLevel` is coordination, not effort). = the ENERGY-LIVE fix |
-> | 🟠 **LOW-LINE** | Rewrite of the low-energy coach line |
-> | 🟠 **TOO-HARD** | "Too hard" to deprioritise the exercise and open its easier options, rather than being retired |
->
-> ### C. Safety — the most serious, and blocked on a decision
->
-> | | What | Blocked on |
-> |---|---|---|
-> | 🔴 **RED-FLAG** | A three-item red-flag screen with a hard stop before somebody starts. **Clinical advice called not screening "indefensible"**: asking where it hurts is already triage, so not screening afterwards is implicit false reassurance. **Not built.** Rehab landing with it: duration question, 6-week redirect, MIN-2 | Foot Anstey — whether it changes the MHRA position. **Needs chasing** |
->
-> ### D. Smaller build items
->
-> | | What |
-> |---|---|
-> | 🟡 **EQUIP-STAIR** | Stair climber is in the session builder's list but **missing from the onboarding equipment picker** |
-> | 🟡 **OWN-LIST** | "Your own" has no search or sort — unwieldy past ~15 saved sessions |
-> | 🟡 **SETTINGS-PROGRESS** | Review that both still say what is true. **Never started** since 08 Sep |
-> | 🟡 **SAVE-HANDOFF** | Full builder views still rely on the `generatedSession` fallback |
-> | 🟡 **CL-5-ALL** | The 162 existing descriptions never checked against the clinical principles |
-> | 🟠 **DEV-PANEL** | `DEV_PANEL_ENABLED = true` (`settings.js:492`). One line; **blocks every tester install** |
->
-> ### E. Design first — a decision, then a build
->
-> | | What |
-> |---|---|
-> | 🔵 **REST-1** | Rest between sets has no UI. Graeme's steer: a countdown is one wrong decision from a shame mechanic |
-> | 🔵 **CLASS-8+** | Class eight onwards. Not urgent |
->
-> ### F. Website — two are regulatory, not cosmetic
->
-> | | What |
-> |---|---|
-> | 🔴 **WEB-CLAIM** | Homepage says the app **"detects the early signs"** of burnout and **"responds with restoration"** — monitoring plus a response to a state, in public |
-> | 🟠 **WEB-QUOTES** | Rotating quotes read as testimonials; no tester has used the product |
-> | 🟠 **WEB-SIGNUP** | Sign-up form is a placeholder (Kit embed never connected) |
-> | 🟡 **IMAGES-1** | Exercise images. Before PUBLIC launch; the placeholder has an enforced expiry |
->
-> ### G. Graeme's — not code
->
-> Phone test of `v536` (nothing since `v515` on a device) · solicitor bundle incl. BIZ-CONSENT · R12 · GitHub Support purge of old commit links · whether `Documents/` belongs in a public repo.
->
-> ⚪ **Not verified, carried from an August table:** CAP-6, DATA-2, PT-4, NAV-2 pointers, CSS ratchet, DISP-3. Listed as unknown rather than claimed open or closed.
->
-> ⚫ **The lesson, and it is the same one as all week: a SHIPPED line is a claim.** Four of the items above had one nearby, or a status table calling them handled. Only running the app told the truth.
 >
 > ### 🔴 REVIEWER-ANON — 16 Sep, `v536`. The clinical reviewer is never named, and never recorded as signing anything off.
 >
@@ -9692,4 +9626,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v383*
+*Build New Habits · Alongside: Move · Master Schedule · 16 Sep 2026 v382*
