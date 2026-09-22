@@ -88,7 +88,18 @@ function checkedIn(energy, mood) {
   store.set("homeEquipment", ["dumbbells", "resistance-band"]);
   store.set("availableTime", "standard");
   store.set("lastCheckin.timestamp", new Date().toISOString());
-  const checkin = { energy, mood, sleepHours: 7, sleepQuality: "poor" };
+  // GENTLE-SIGNALS, 16 Sep 2026. Was sleepQuality: "poor".
+  //
+  // That value was inert when this gate was written: nothing on the
+  // live path read sleep. Once poor sleep began making a session gentler
+  // (work list 2b), this fixture's "moderate day" silently became a
+  // poor-sleep day, and 1a -- "a moderate day builds the full-size
+  // session" -- went red for the right reason.
+  //
+  // Corrected to "good" because this gate is about ENERGY, not sleep.
+  // Nothing it asserts was loosened; poor sleep is proven separately in
+  // verify-gentle-signals.
+  const checkin = { energy, mood, sleepHours: 7, sleepQuality: "good" };
   store.set("checkinHistory", { [today()]: checkin });
   store.set("lastCheckin.energy", energy);
   // Exactly what checkin.js does on submit.
