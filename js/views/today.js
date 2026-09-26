@@ -1,6 +1,24 @@
 /**
  * today.js
- * 15 Sep 2026 v40
+ * 26 Sep 2026 v41
+ *
+ * v41 - EXIT-HOME. Arriving at Home from inside the app means you chose
+ *   Home, so Home stays. Only a cold open (the app launched with nothing
+ *   behind it) may send you back into a session you accepted.
+ *
+ *   Graeme, 26 Sep: "It doesn't go back to the home page when I've done
+ *   a one-to-one workout with the coach. It just sticks there and I
+ *   can't get out of it."
+ *
+ *   EXIT-LOOP (v530) fixed this one screen at a time: six session views
+ *   each wrote declinedProposalAt. The coach one-to-one opens a seventh,
+ *   workout.js, which never did -- nor morning, cycle, quiet, breathing.
+ *   Every screen that forgot left somebody stuck, and "Exit and save"
+ *   bounced from ALL of them because a partial entry is not "done".
+ *   Decided here instead, once, from the router's own record of where
+ *   you came from; the decline is still written, so closing the app
+ *   after leaving and reopening within ten minutes also stays on Home.
+ *   See tools/verify-exit-home.mjs.
  *
  * v40 - SAFETY-GATE. GUIDANCE_TEXT and GUIDANCE_DAYS now come from
  *   safety-gate.js instead of being written out here.
@@ -858,6 +876,30 @@ export function TodayView(router) {
     // Session already completed today takes priority — never route to a
     // pending proposal if there's nothing pending.
     if (_sessionCompletedToday()) return 'default';
+
+    // 🔴 EXIT-HOME, 26 Sep 2026. YOU CAME HERE, SO YOU STAY HERE.
+    //
+    // The bounce below is for the app opening COLD after an interruption
+    // -- a phone call killed it mid-session. A cold open has nothing in
+    // router.history. Anything else means the person got to Home from a
+    // screen inside the app: an Exit button, "Back to Today", the house
+    // icon, the nav bar. Every one of those is a choice to be on Home.
+    //
+    // Asked of the router rather than of each session view, because
+    // asking each view is how the coach one-to-one was missed: EXIT-LOOP
+    // reached six screens and the seventh kept people stuck for ten days.
+    //
+    // The decline is recorded too, so closing the app after leaving and
+    // reopening inside ten minutes does not put them straight back in.
+    const cameFromInsideApp = Array.isArray(router?.history) && router.history.length > 0;
+    if (cameFromInsideApp) {
+      const alreadyDeclined = store.get('declinedProposalAt');
+      if (lastProposal &&
+          !(alreadyDeclined && new Date(alreadyDeclined) >= new Date(lastProposal))) {
+        store.set('declinedProposalAt', new Date().toISOString());
+      }
+      return 'default';
+    }
 
     // 🔴 EXIT-LOOP, 16 Sep 2026. LEAVING A SESSION MUST MEAN LEAVING IT.
     //
