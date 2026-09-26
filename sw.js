@@ -1,7 +1,16 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 16 Sep 2026 v539
+ * 26 Sep 2026 v540
+ *
+ * v540 - EXIT-HOME. views/today.js.
+ *
+ *   Leaving a coach one-to-one by any route now lands on Home and stays
+ *   there. Home decides from where you came, rather than each session
+ *   screen remembering to say so -- the screen the coach one-to-one
+ *   uses was the one that never did.
+ *
+ *   New gate: tools/verify-exit-home.mjs. 171 gates.
  *
  * v539 - GENTLE-SIGNALS. session-builder.js, data/checkin.js.
  *
@@ -3865,7 +3874,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v539";
+const CACHE_NAME = "alongside-v540";
 
 const SHELL_URLS = [
 
