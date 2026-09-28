@@ -1,7 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 28 Sep 2026 v562
+ * 28 Sep 2026 v563
+ *
+ * v563 - F5 + F6. No new files. Changed: session-builder, display-prefs,
+ *   index.html, settings, checkin, thread-runner, onboarding/thread,
+ *   class-player. 195 gates.
  *
  * v562 - Findings F1-F4. No new files. Changed: views/capture.js,
  *   views/today.js, views/session-builder-ui.js, components/club-rooms.css,
@@ -4005,7 +4009,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v562";
+const CACHE_NAME = "alongside-v563";
 
 const SHELL_URLS = [
 
