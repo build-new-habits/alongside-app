@@ -1,6 +1,21 @@
 /**
  * tools/verify-proposal-loc.mjs
- * 16 Sep 2026 v1
+ * 28 Sep 2026 v2
+ *
+ * v2 - SMOOTH-P2a. The alternate cards are gone. The plan screen shows
+ *   ONE built plan, and "Something different today" builds another kind
+ *   on request -- through the same _buildCoachSuggestion(), with the same
+ *   location-scoped kit and the same length. So the rules this file
+ *   exists for are asserted where that work now happens:
+ *     0.4  the build-FAILED path is _getFallbackOptions() (plural). v1
+ *          named the singular _getFallbackOption, which was the PADDING
+ *          helper, not the failure path; it is deleted with the padding.
+ *     0.5  another kind is a rebuild through the builder, not a list.
+ *     1.x  location scope and length on the one build path.
+ *     2.x  no padding; an empty list never shows a movement count; the
+ *          current kind is never offered back.
+ *   Test 3 is unchanged. Nothing loosened; 1.1-2.3 now read the function
+ *   that runs, where v1 read one that no longer exists.
  *
  * PROPOSAL-LOC. The alternate cards are built, not padded.
  *
@@ -79,55 +94,59 @@ ok("0.2 REVERSAL: the check is real, not a phrasing coincidence",
 ok("0.3 _getFallbackOption is not called on a successful build",
    !/options\.push\(\s*_getFallbackOption/.test(code));
 
-ok("0.4 _getFallbackOption still EXISTS for the build-failed path",
-   /function _getFallbackOption\(/.test(code) &&
-   /_getFallbackOptions\(/.test(code),
+ok("0.4 the build-failed path still exists (_getFallbackOptions)",
+   /function _getFallbackOptions\(/.test(code) &&
+   /catch \(e\) \{[^}]*_getFallbackOptions\(/.test(bodyOf("_generateOptions")),
    "removed entirely; a build failure now shows a blank screen, which is worse");
 
-ok("0.5 alternates go through the builder",
-   /_withBuiltAlternates/.test(code) &&
-   /function _withBuiltAlternates/.test(code));
+ok("0.5 another kind goes through the builder", (() => {
+  const i = code.indexOf("[data-different-kind]').forEach");
+  const handler = i > -1 ? code.slice(i, code.indexOf("});\n    });", i)) : "";
+  return /requestedSessionType/.test(handler) && /_rebuildAndRerender\(/.test(handler) &&
+         /store\.get\('requestedSessionType'\)/.test(bodyOf("_buildCoachSuggestion"));
+})(), "a different kind that is not built by the same builder is a card from a list again");
 
 // ════════════════════════════════════════════════════════════════════
-console.log("\nTEST 1 — alternates carry the same location scope as the primary");
+console.log("\nTEST 1 — every plan carries the location scope and the length");
 
-ok("1.1 the alternate args use equipmentForLocation, not the flat field", (() => {
-  const body = bodyOf("_withBuiltAlternates");
+ok("1.1 the build args use equipmentForLocation, not the flat field", (() => {
+  const body = bodyOf("_buildCoachSuggestion");
   return body.includes("equipmentForLocation(_currentLocation())") &&
          !/equipmentOverride:\s*null/.test(body);
-})(), "LOCATION-1 fixed exactly this on the primary; an alternate built against " +
-      "the union of home and gym kit proposes a barbell to somebody in a kitchen");
+})(), "LOCATION-1 fixed exactly this; a plan built against the union of home and gym " +
+      "kit proposes a barbell to somebody in a kitchen");
 
-ok("1.2 and the same available time, not a hardcoded minimum", (() => {
-  const body = bodyOf("_withBuiltAlternates");
+ok("1.2 and the person's available time, not a hardcoded minimum", (() => {
+  const body = bodyOf("_buildCoachSuggestion");
   return body.includes("_getAvailableTimeMinutes()") &&
          !/Math\.min\(\s*\d+\s*,/.test(body);
 })(), "a fixed Math.min is how a 40-minute gym session became a 15-minute breather");
 
-ok("1.3 the order depends on where the person is", (() => {
-  const body = bodyOf("_withBuiltAlternates");
-  return /_currentLocation\(\)\s*===\s*'gym'/.test(body) && /ORDER/.test(body);
+ok("1.3 the kinds offered depend on where the person is", (() => {
+  const body = bodyOf("_renderDifferent");
+  return /_currentLocation\(\)/.test(body) && /here === 'gym'/.test(body);
 })());
 
 // ════════════════════════════════════════════════════════════════════
-console.log("\nTEST 2 — a slot is dropped rather than filled with a fiction");
+console.log("\nTEST 2 — no padding, and no claim over an empty list");
 
-ok("2.1 an empty exercise list is skipped, not shown", (() => {
-  const body = bodyOf("_withBuiltAlternates");
-  return /built\.exercises\.length === 0\)\s*continue/.test(body);
-})(), "a card advertising movements over an empty list is a claim the coach cannot meet");
+ok("2.1 an empty exercise list shows no movement count", (() => {
+  const body = bodyOf("_renderPlan");
+  return /list\.length\s*\?/.test(body);
+})(), "a plan advertising movements over an empty list is a claim the coach cannot meet");
 
-ok("2.2 REVERSAL: it does not simply cap at three and pad below", (() => {
-  const body = bodyOf("_withBuiltAlternates");
-  return !/_getFallbackOption/.test(body);
+ok("2.2 REVERSAL: one build, nothing pushed onto it", (() => {
+  const body = bodyOf("buildProposal");
+  return /const options = _generateOptions\(/.test(body) && !/options\.push\(/.test(body) &&
+         !/function _withBuiltAlternates|function _getFallbackOption\(/.test(code);
 })());
 
-ok("2.3 the primary's own type is never offered back as an alternative", (() => {
-  const body = bodyOf("_withBuiltAlternates");
-  return /taken\.has\(sessionType\)\)\s*continue/.test(body) &&
-         /taken\.has\(delivered\)\)\s*continue/.test(body);
+ok("2.3 today's own kind is never offered back as something different", (() => {
+  const body = bodyOf("_renderDifferent");
+  return /t\.id !== _deliveredType\(option\)/.test(body) &&
+         /startsWith\(`\$\{t\}-`\)/.test(bodyOf("_deliveredType"));
 })(), "buildSession may hand back Gentle Care instead of the type asked for, so the " +
-      "DELIVERED id has to be checked too, not just the requested one");
+      "DELIVERED type has to be checked, not just the requested one");
 
 // ════════════════════════════════════════════════════════════════════
 console.log("\nTEST 3 — the engine can actually produce these types at a gym");

@@ -1,6 +1,16 @@
 /**
  * tools/verify-proposal1.mjs
- * 08 Sep 2026 v1
+ * 28 Sep 2026 v2
+ *
+ * v2 - SMOOTH-P2a. The three cards became one plan (spec 4.3), so tests
+ *   0-4 read the plan: it renders (0a), nobody has to choose before
+ *   Start (0b, which replaces "the suggested card is marked" -- there is
+ *   nothing to mark), its length is in minutes (1), its count is English
+ *   (2), and every chip's accessible name contains its visible text (3,
+ *   the same 2.5.3 rule the cards had, on the controls that now carry
+ *   values). 4a no longer taps a card first: Start is enabled on arrival;
+ *   the fresh fixture ticks the safety note the plan now carries.
+ *   Test 5 is unchanged. Nothing loosened.
  *
  * PROPOSAL-1 and PROPOSAL-2. The end of the One to one journey.
  *
@@ -84,57 +94,35 @@ async function openProposal() {
   const navs = [];
   mod.CoachProposalView({ navigate: (r) => navs.push(r) }).mount(main);
   await new Promise(r => setTimeout(r, 1200));
-  return { navs, cards: [...main.querySelectorAll(".cp-preview-card")] };
+  return { navs, cards: [...main.querySelectorAll(".cp-plan")] };
 }
 
 // ── 0. CONTROL ──────────────────────────────────────────────────────────
 console.log("\nTEST 0 - the proposal rendered");
 
 const p0 = await openProposal();
-ok("0a. option cards are on screen", p0.cards.length >= 2,
-   `${p0.cards.length} cards - every assertion below would measure nothing`);
-ok("0b. and the suggested one is marked",
-   p0.cards.some(c => /Suggested for today/i.test(txt(c))),
-   "no recommended card, so the person is asked to choose with no steer");
+ok("0a. the plan is on screen, with its exercises", p0.cards.length === 1 &&
+   main.querySelectorAll(".cp-plan__row").length > 0,
+   `${p0.cards.length} plans - every assertion below would measure nothing`);
+const start0 = main.querySelector("#cp-preview-start");
+ok("0b. and it is already chosen: Start works without picking anything",
+   !!start0 && !start0.disabled && !main.querySelector('[role="radio"]'),
+   "the person is asked to choose before they can start");
 
-// ── 1. WHAT THE CARDS SAY ───────────────────────────────────────────────
-console.log("\nTEST 1 - every card states a length in the same units");
+// ── 1. WHAT THE PLAN SAYS ───────────────────────────────────────────────
+console.log("\nTEST 1 - the plan states its length in minutes");
 
-for (const c of p0.cards) {
-  const metas = [...c.querySelectorAll(".cp-preview-card__meta")].map(txt);
-  const dur   = metas[0] || "";
-  ok(`1. "${txt(c.querySelector(".cp-preview-card__name"))}" gives its length in minutes`,
-     dur.length > 0 && !/^\d+$/.test(dur) && /min/i.test(dur),
-     `reads "${dur}" - a generated option renders "25-35 mins" beside it, ` +
-     `so a bare number is the only thing on screen without units`);
-}
+const meta = txt(main.querySelector(".cp-plan__meta") || { textContent: "" });
+const dur  = meta.split("\u00B7")[0].trim();
+ok(`1. "${txt(main.querySelector(".cp-plan__title"))}" gives its length in minutes`,
+   dur.length > 0 && !/^\d+$/.test(dur) && /min/i.test(dur),
+   `reads "${dur}" - a bare number is the one thing on screen without units`);
 
 console.log("\nTEST 2 - and counts its movements in English");
 
-// PROPOSAL-LOC, 16 Sep 2026. THIS CONTROL FIRED, EXACTLY AS WRITTEN.
-//
-// It used to read: the pad loop tops the option list up to three with
-// _getFallbackOption(), whose third entry is Short walk with exactly one
-// movement -- "if that card ever stops appearing, the singular case
-// stops being exercised and this test would quietly pass on plurals
-// alone."
-//
-// The pad loop is gone. Alternates are now built through the engine, so
-// a one-movement card is no longer guaranteed to be on screen, and the
-// control went red on the first run rather than the plurals quietly
-// passing. That is the control doing its job, and it is why this is
-// being rewritten rather than deleted.
-//
-// The singular case is now exercised DIRECTLY instead of depending on a
-// particular option happening to exist. Reading the rendered list for a
-// count the list is not obliged to contain was the fragility; a session
-// of one movement is a real thing the builder can produce, so the
-// fixture produces one.
-// Synthesising a card was tried and rejected: hand-written markup would
-// assert against itself, not against the view. The singular case is
-// instead asserted at its SOURCE -- _movementsLabel(n) at
-// coach-proposal.js, the one place the count becomes English -- read
-// from the file, with the reverse proven too.
+// The singular case is asserted at its SOURCE -- _movementsLabel(n), the
+// one place the count becomes English -- because whether today's plan
+// has exactly one movement depends on the builder (PROPOSAL-LOC note).
 const srcCP = fs.readFileSync(new URL("../js/views/coach-proposal.js", import.meta.url), "utf8");
 const labelFn = srcCP.slice(srcCP.indexOf("function _movementsLabel"),
                             srcCP.indexOf("function _movementsLabel") + 260);
@@ -143,44 +131,35 @@ ok("2pc. the singular case is handled where the count becomes English",
    "no singular branch in _movementsLabel; \"1 movements\" would reach the screen");
 ok("2pc-b. REVERSAL: the plural branch is still there",
    labelFn.includes('movement$'.replace('$','')) && /"s"/.test(labelFn));
+ok("2pc-c. the rendered plan was reachable at all", p0.cards.length > 0);
+ok(`2. the plan is not "1 movements"`, !/\b1 movements\b/.test(meta), meta);
+const rowsN = main.querySelectorAll(".cp-plan__row").length;
+ok("2b. and the count it states is the number of rows it shows",
+   new RegExp(`\\b${rowsN} movements?\\b`).test(meta), `${rowsN} rows, meta "${meta}"`);
 
-const single = p0.cards.find(c => /\b1 movement\b/.test(txt(c)) || /\b1 movements\b/.test(txt(c)));
-// Not a control any more, and deliberately not asserted as one: whether
-// a one-movement session is among today's options depends on what the
-// builder produced, and demanding one would be demanding a fiction. It
-// is reported so a reader knows which path the plural checks below took.
-console.log(single ? "  note  a one-movement card is on screen; plurals below cover both"
-                   : "  note  no one-movement card today; singular covered at source above");
-ok("2pc-c. the rendered cards were reachable at all", p0.cards.length > 0,
-   "no single-movement option rendered, so the singular case is untested here");
+console.log("\nTEST 3 - every chip announces its own visible text");
 
-for (const c of p0.cards) {
-  const t = txt(c);
-  ok(`2. "${txt(c.querySelector(".cp-preview-card__name"))}" is not "1 movements"`,
-     !/\b1 movements\b/.test(t), t.slice(0, 120));
-}
-
-console.log("\nTEST 3 - the accessible name matches what is on the card");
-
-for (const c of p0.cards) {
+const chips = [...main.querySelectorAll(".cp-assumptions__change")];
+ok("3pc. the chips are there", chips.length >= 2);
+for (const c of chips) {
   const label = c.getAttribute("aria-label") || "";
-  const metas = [...c.querySelectorAll(".cp-preview-card__meta")].map(txt);
-  ok(`3. "${txt(c.querySelector(".cp-preview-card__name"))}" announces its own visible text`,
-     metas.every(m => !m || label.includes(m)),
-     `card shows ${JSON.stringify(metas)}, announces "${label}" - the label was ` +
-     `built from a separate interpolation, so the two could drift`);
+  ok(`3. "${txt(c)}" is in its accessible name`, label.includes(txt(c)),
+     `shows "${txt(c)}", announces "${label}" - WCAG 2.5.3, the two were built separately`);
 }
 
 // ── 4. START SESSION ────────────────────────────────────────────────────
 console.log("\nTEST 4 - Start Session goes to the session, not through Home");
 
 const p4 = await openProposal();
-p4.cards[0].dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }));
-await new Promise(r => setTimeout(r, 80));
 const startBtn = main.querySelector("#cp-preview-start");
-ok("4a. selecting a card enables Start Session",
+// A fresh account has never read the safety note, so the plan asks for
+// the tick first (verify-plan-list test 6 owns that). Ticked here so
+// this test measures where Start GOES.
+const ack = main.querySelector("#cp-ack-box");
+if (ack) { ack.checked = true; ack.dispatchEvent(new dom.window.Event("change")); }
+ok("4a. Start is enabled on arrival",
    !!startBtn && !startBtn.disabled,
-   "Start is still disabled after a selection, so nothing below is reachable");
+   "Start is disabled, so nothing below is reachable");
 startBtn.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }));
 await new Promise(r => setTimeout(r, 3000));
 

@@ -1,6 +1,13 @@
 /**
  * js/exercise-timing.js
- * 12 Sep 2026 v2
+ * 28 Sep 2026 v3
+ *
+ * v3 -- SMOOTH-P2a. A reps string with NO NUMBER in it ("each side") is
+ *   not a count. It was classed "counted", so 90-90 Hip Stretch
+ *   (sets 2, reps "each side", duration 90) had no clock in the player
+ *   and read "2 × each side" on the new plan list -- a count of nothing.
+ *   Now it has no reps shape, and the clock comes from `duration`, the
+ *   same as any other timed stretch. Anything with a digit is unchanged.
  *
  * v2 -- TIMER-2. The clock belongs to the exercise, not to lifting.
  *
@@ -112,6 +119,8 @@ export function classifyReps(reps) {
   if (reps === null || reps === undefined) return null;
   const s = String(reps).trim().toLowerCase();
   if (!s) return null;
+  // v3. No digit, no count: "each side" says how, not how many.
+  if (!/\d/.test(s)) return null;
 
   if (/\b(hard|easy|fast|slow|sprint|jog|walk)\b/.test(s) && /\d/.test(s)) return "interval";
   if (/\d\s*(m|metre|meter|metres|meters|km|kilometre|kilometres)\b/.test(s)) return "distance";

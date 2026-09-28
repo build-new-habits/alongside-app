@@ -1,6 +1,38 @@
 /**
  * coach-proposal.js
- * 16 Sep 2026 v27
+ * 28 Sep 2026 v28
+ *
+ * v28 - SMOOTH-P2a. Today's plan: every exercise, named, before Start.
+ *
+ *   Graeme, 27 Sep, tracing the Plan route: "I'm not sold on what the
+ *   plan is when the coach proposes... too many decisions. It feels
+ *   rough." Spec 4.3 (alongside_smooth_path_spec_27sep2026_v2).
+ *
+ *   Measured on v542: up to three cards -- a name, "25-35 mins",
+ *   "7 movements", a sentence -- and Start disabled until a card was
+ *   tapped. Nobody could see what they were agreeing to.
+ *
+ *   Now: one plan, selected on arrival. Every exercise named, grouped
+ *   Warm up / Main / Cool down with minutes, sets x reps or a time, and
+ *   (Plan) what they logged last time and a swap on every row. Where /
+ *   Length / Focus chips; "Something different today" holds Shorter,
+ *   Easier, Harder, another kind, another place and a class. The
+ *   alternates build and "Or pick your own" are gone -- those choices
+ *   live in the sheet now, one tap from the plan rather than a menu in
+ *   front of it.
+ *
+ *   THE SAFETY NOTE STAYS A TICK-BOX. The spec's draft had "Got it --
+ *   start" record the acknowledgement. The acknowledgement is the
+ *   record that notice was given ("I have read this", with the wording
+ *   version), so when the gate is due the full note and the same
+ *   tick-box sit in the plan's dock. One tap more on those sessions
+ *   only; the player then does not ask again (GATE-ONCE).
+ *
+ *   Free: the same list, no swaps, no weights, no sheet, no arc line;
+ *   "Pick something else" goes Home.
+ *
+ *   Where: a gym-only person no longer lands on "At home". Start
+ *   remembers where they trained.
  *
  * v27 - PROPOSAL-LOC. The two alternate cards were never generated.
  *
@@ -598,7 +630,15 @@ import { getConditionName }  from '../data/conditions.js';
 // behaviour, and stays -- it is the window the check-in's time answer is
 // interpreted through and has nothing to do with which builder runs.
 import { AVAILABLE_TIME_WINDOW_MINUTES } from '../data/workoutGenerator.js';
-import { buildSession, buildCandidatePools, equipmentForLocation } from '../session-builder.js';
+import { buildSession, buildCandidatePools, equipmentForLocation,
+         swapAlternatives, swapExerciseInSession, soreLevelFor,
+         soreScoresToday, SESSION_TYPES } from '../session-builder.js';
+// SMOOTH-P2a. The plan carries the safety note when it is due.
+import { isGateDue, isGuidanceDue, recordAcknowledgement,
+         GUIDANCE_TEXT } from '../safety-gate.js';
+import { HURT_AND_ACHE }     from '../exercise-card.js';
+import { resolveTiming }     from '../exercise-timing.js';
+import { isPremium }         from '../auth.js';
 import { chooseSessionType, lineIsSupported } from '../data/session-choice.js';
 
 // DOOR_COPY, renderDoorFront(), renderBypassDoor(), handleDoorChoice(),
@@ -637,6 +677,16 @@ export function CoachProposalView(router) {
   let previewOpen           = false;
   let currentPreviewOptions = [];
   let selectedOptionId      = null;
+
+  // ── SMOOTH-P2a plan state ────────────────────────────────────────────────
+  // swapState[index] = { original, alts, pos }. Built on the first swap of
+  // a row, against the ORIGINAL exercise, so cycling is stable.
+  let swapState  = {};
+  // -1 easier, 0 as built, +1 harder. Sets only (spec 4.3).
+  let adjust     = 0;
+  let statusMsg  = '';
+  let ackTicked  = false;
+  let ackError   = '';
 
   // ── Mount ──────────────────────────────────────────────────────────────────
 
@@ -692,7 +742,7 @@ export function CoachProposalView(router) {
 
     if (proposal && !hasBlockingBanner) {
       currentPreviewOptions = proposal.options;
-      selectedOptionId      = null;
+      selectedOptionId      = proposal.options[0]?.id || null;   // SMOOTH-P2a
       previewOpen           = true;
     }
 
@@ -915,33 +965,14 @@ export function CoachProposalView(router) {
              above, no door tap needed (Phase C, 04 Aug 2026) -->
         ${renderPreviewPanel()}
 
-        <!-- LOBBY-1c. THE SESSION SPACE'S ESCAPE.
-             Home lost its session tiles when it became a lobby, so this
-             is where they went. It is deliberately BELOW the suggestion
-             and quieter than it: the coach leads, and choosing for
-             yourself is one tap rather than a menu you must get past.
-
-             Two escapes exist, not one. This is for somebody who has
-             decided -- fast, short, four things. Library is for
-             somebody looking around. Collapsing them would trade a
-             front-door problem for a back-door one. -->
-        <p class="cp-else-label">Or pick your own</p>
-        <div class="cp-else" role="group" aria-label="Choose your own session">
-          <button class="cp-else__btn" data-else="session-builder">Strength &amp; cardio</button>
-          <button class="cp-else__btn" data-else="mobility-conditioning">Mobility &amp; stretch</button>
-          <button class="cp-else__btn" data-else="yoga-session">Yoga &amp; Pilates</button>
-          <button class="cp-else__btn" data-else="library">Something quieter</button>
-        </div>
+        <!-- SMOOTH-P2a. "Or pick your own" was here (LOBBY-1c). Its
+             four doors now live in "Something different today" on the
+             plan itself: one tap from the plan, not a menu beside it. -->
 
       </div>
     `;
 
     attachEvents(container);
-    container.querySelectorAll('[data-else]').forEach(btn => {
-      // No check-in gate here: getting to this screen required one, so
-      // asking again would be the second toll in a minute.
-      btn.addEventListener('click', () => router.navigate(btn.dataset.else));
-    });
   }
 
   function attachSevereChoiceEvents(container) {
@@ -965,6 +996,8 @@ export function CoachProposalView(router) {
   // ── Door 1 preview panel (v8) ────────────────────────────────────────────
 
   function renderPreviewPanel() {
+    const option  = currentPreviewOptions[0] || null;
+    const premium = isPremium();
     return `
       <div id="cp-preview-panel"
            class="cp-preview-panel ${previewOpen ? 'is-open' : ''}"
@@ -974,7 +1007,7 @@ export function CoachProposalView(router) {
            ${previewOpen ? '' : 'hidden'}>
         <div class="cp-preview-panel__backdrop"></div>
         <div class="cp-preview-panel__content">
-          <button class="cp-preview-panel__close" id="cp-preview-close" aria-label="Close">\u2715</button>
+          <button class="cp-preview-panel__close" id="cp-preview-close" aria-label="Close">✕</button>
 
           ${proposal ? `
             <div class="cp-coach-block cp-coach-block--in-panel" aria-live="polite">
@@ -988,37 +1021,18 @@ export function CoachProposalView(router) {
             </div>
           ` : ''}
 
-          <!-- LOCATION-1. h1, not h2. This screen had NO h1 at all: its
-               outline began at h2, so somebody navigating by heading met
-               the page with no top level to orient from. WCAG 2.2 AA
-               1.3.1. Styling is on the class, so nothing moves. -->
-          <h1 id="cp-preview-title" class="cp-preview-panel__title">Today\u2019s session</h1>
-          <p class="cp-preview-panel__sub">
-            Adapted for your check-in \u2014 pick the one that feels right.
-          </p>
-          ${_arcLine()}
-          <!--
-            LOCATION-1, 08 Sep 2026. What the coach assumed, and a way to
-            say otherwise.
+          <!-- LOCATION-1. h1: this screen's top level. WCAG 2.2 AA 1.3.1. -->
+          <h1 id="cp-preview-title" class="cp-preview-panel__title">Today’s plan</h1>
+          ${option ? `<p class="cp-plan__sentence">${_planSentence(option)}</p>` : ''}
+          ${premium ? _arcLine() : ''}
 
-            Graeme, on a handset: "It works though. I can't change
-            anything though if I wanted to." Quick build has shown its
-            assumptions with everything adjustable since QUICK-BUILD; One
-            to one handed over a session and offered no way to alter its
-            length, where you are, or the kit.
-
-            Location matters most because it is the only one the coach
-            CANNOT infer (CLUB spec v2 6.2), and because getting it wrong
-            proposed a barbell to somebody in a kitchen.
-
-            Same row shape as the quick scaffold on purpose. It is the
-            same idea -- here is what I assumed, change it -- and a second
-            visual language for it would be a second thing to learn.
-          -->
+          <!-- LOCATION-1 / SMOOTH-P2a. What the coach assumed, one tap to
+               change each. Focus opens "Something different today". -->
           <ul class="cp-assumptions">
             ${[
               ['Where',  'cp-loc',  _locationLabel(_currentLocation())],
-              ['Length', 'cp-time', `${_getAvailableTimeMinutes()} mins`]
+              ['Length', 'cp-time', `${_getAvailableTimeMinutes()} min`],
+              ...(premium && option ? [['Focus', 'cp-focus', _focusLabel(option)]] : [])
             ].map(([label, id, value]) => `
               <li class="cp-assumptions__row">
                 <span class="cp-assumptions__label">${label}</span>
@@ -1029,22 +1043,228 @@ export function CoachProposalView(router) {
               </li>`).join('')}
           </ul>
 
-          <div class="cp-preview-cards" role="radiogroup" aria-label="Choose today's session">
-            ${currentPreviewOptions.map((opt, i) => renderPreviewCard(opt, i === 0)).join('')}
-          </div>
-          <div class="cp-preview-panel__actions">
-            <button class="btn btn-ghost" id="cp-preview-not-today" aria-label="Not today \u2014 close">
-              Not today
-            </button>
-            <button class="btn btn-primary" id="cp-preview-start"
-                    aria-label="Start session"
-                    ${selectedOptionId ? '' : 'disabled'}>
-              Start Session
-            </button>
-          </div>
+          ${option ? _renderPlan(option, premium) : ''}
+
+          <p id="cp-plan-status" class="sr-only" role="status" aria-live="polite">${statusMsg}</p>
+
+          ${premium && option ? _renderDifferent(option) : ''}
+
+          ${_renderDock(premium)}
         </div>
       </div>
     `;
+  }
+
+  // ── SMOOTH-P2a. The plan list ─────────────────────────────────────────────
+
+  const SECTION_LABELS = { warmup: 'Warm up', main: 'Main', cooldown: 'Cool down' };
+
+  /**
+   * The exercises as they will start: swaps applied, then Easier/Harder.
+   *
+   * Sets only (spec 4.3). An exercise with no sets in the library is one
+   * set to the player (workout.js: `exercise.sets || 1`), so Harder makes
+   * it two -- the player already runs "2 sets, this long each". A timed
+   * exercise's clock is per set and is NOT stretched; a counted one's
+   * `duration` is only an estimate and is scaled so the minutes stay true.
+   */
+  function _planExercises(option) {
+    return (option?.exercises || []).map(ex => {
+      if (!adjust || (ex.section || 'main') !== 'main' || ex.isPrescribed) return ex;
+      const sets = Number(ex.sets) || 1;
+      const next = Math.max(1, sets + adjust);
+      if (next === sets) return ex;
+      const timed = !!resolveTiming(ex).seconds;
+      const dur   = Number(ex.duration);
+      return { ...ex, sets: next,
+               ...(!timed && dur > 0 ? { duration: Math.round(dur * next / sets) } : {}) };
+    });
+  }
+
+  /**
+   * How much, in the same terms the player will use (resolveTiming, the
+   * one timing source): sets x reps when counted, a time when timed.
+   * Read aloud as "3 sets of 10" -- a screen reader says "×" as
+   * "multiplied by".
+   */
+  function _dose(ex) {
+    const sets = Number(ex.sets) || 1;
+    const reps = ex.reps == null ? '' : String(ex.reps).trim();
+    const t    = resolveTiming(ex);
+    if (!t.seconds && reps) {
+      const side = ex.perSide && /^\d+$/.test(reps) ? ' each side' : '';
+      return { text: `${sets} \u00D7 ${reps}${side}`,
+               spoken: `${sets} ${sets === 1 ? 'set' : 'sets'} of ${reps}${side}` };
+    }
+    const secs = t.seconds || Number(ex.duration) || 0;
+    if (!(secs > 0)) return { text: '', spoken: '' };
+    const each   = secs < 90 ? `${Math.round(secs)} sec` : `${Math.round(secs / 60)} min`;
+    const spoken = each.replace('sec', 'seconds').replace('min', 'minutes');
+    return sets > 1
+      ? { text: `${sets} \u00D7 ${each}`, spoken: `${sets} sets of ${spoken}` }
+      : { text: each, spoken };
+  }
+
+  function _groupMinutes(list) {
+    const secs = list.reduce((n, ex) => {
+      const t = resolveTiming(ex);
+      return n + (t.seconds ? t.seconds * (Number(ex.sets) || 1) : (Number(ex.duration) || 0));
+    }, 0);
+    return Math.max(1, Math.round(secs / 60));
+  }
+
+  /** P4: flat, no verb, no delta. Plan only. */
+  function _lastText(ex) {
+    const last = store.lastLift(ex.id);
+    if (!last || last.weight === undefined) return '';
+    return `Last: ${last.weight} ${last.unit || 'kg'}${last.reps !== undefined ? ` · ${last.reps} reps` : ''}`;
+  }
+
+  /** Honesty rule: only what they told the app today. */
+  function _soreText(ex) {
+    const s = soreLevelFor(ex, soreScoresToday());
+    if (s.level !== 'marked') return '';
+    const names = s.areas.map(a => String(getConditionName(a) || a).toLowerCase());
+    return `Works your ${_joinNames(names)}, which you said ${names.length > 1 ? 'are' : 'is'} sore today.`;
+  }
+
+  function _renderPlan(option, premium) {
+    const list = _planExercises(option);
+    const rowsBySection = ['warmup', 'main', 'cooldown']
+      .map(sec => ({ sec, items: list.map((ex, i) => ({ ex, i })).filter(r => (r.ex.section || 'main') === sec) }))
+      .filter(g => g.items.length);
+    const note = _stretchTargetNote(option);
+
+    return `
+      <section class="cp-plan" aria-labelledby="cp-plan-title">
+        <h2 id="cp-plan-title" class="cp-plan__title" tabindex="-1">${option.name}</h2>
+        <p class="cp-plan__meta">${list.length
+          // The same minutes the groups below add up to. The builder's own
+          // range ("35–45 mins") sat above groups totalling 21 on the first
+          // device render -- two numbers for one plan.
+          ? `About ${rowsBySection.reduce((n, g) => n + _groupMinutes(g.items.map(r => r.ex)), 0)} min · ${_movementsLabel(list.length)}`
+          : _durationLabel(option.duration)}</p>
+        ${note ? `<p class="cp-plan__target">${note}</p>` : ''}
+        ${rowsBySection.map(g => `
+          <h3 class="cp-plan__group-title">${SECTION_LABELS[g.sec]} · ${_groupMinutes(g.items.map(r => r.ex))} min</h3>
+          <ol class="cp-plan__list">
+            ${g.items.map(({ ex, i }) => {
+              const dose = _dose(ex);
+              const last = premium ? _lastText(ex) : '';
+              const sore = _soreText(ex);
+              const canSwap = premium && !ex.isPrescribed;
+              return `
+                <li class="cp-plan__row" data-plan-index="${i}" data-exercise-id="${ex.id}"
+                    data-section="${ex.section || 'main'}" data-sets="${Number(ex.sets) || 1}"
+                    data-areas="${(ex.affectsAreas || []).join(',')}">
+                  <div class="cp-plan__text">
+                    <span class="cp-plan__name">${ex.name}</span>
+                    <span class="cp-plan__dose"><span aria-hidden="true">${dose.text}</span><span class="sr-only">${dose.spoken}</span></span>
+                    ${last ? `<span class="cp-plan__last">${last}</span>` : ''}
+                    ${sore ? `<span class="cp-plan__why">${sore}</span>` : ''}
+                  </div>
+                  ${canSwap ? `<button class="btn btn-ghost cp-plan__swap" data-swap="${i}"
+                          aria-label="Swap ${ex.name}">Swap</button>` : ''}
+                </li>`;
+            }).join('')}
+          </ol>`).join('')}
+      </section>`;
+  }
+
+  /**
+   * The session type this plan really is. buildSession() ids are
+   * "<type>-<timestamp>" (e.g. "glute-1790576872105"), so option.sessionType
+   * holds that id, never a bare type. When the builder swapped in
+   * something else (Gentle Care, out of scope), the id no longer starts
+   * with the type that was asked for, and this returns null.
+   */
+  function _deliveredType(option) {
+    const t = option?.inputs?.chosenType;
+    return t && String(option.id || '').startsWith(`${t}-`) ? t : null;
+  }
+
+  function _focusLabel(option) {
+    const t = SESSION_TYPES.find(x => x.id === _deliveredType(option));
+    return t ? t.label : option.name;
+  }
+
+  /**
+   * The coach's one sentence. A request made on this screen wins and is
+   * said back; otherwise the builder's own line, which is already held to
+   * the honesty rule (lineIsSupported, PURPOSE-ASK's banned words).
+   */
+  function _planSentence(option) {
+    const req = store.get('requestedSessionType');
+    const t   = req ? SESSION_TYPES.find(x => x.id === req) : null;
+    if (t && _deliveredType(option) === req) return `You asked for ${t.label.toLowerCase()} today.`;
+    return option.rationale || '';
+  }
+
+  // ── SMOOTH-P2a. Something different today ────────────────────────────────
+  // Native <details>: the role, expanded state and keyboard come free
+  // (4.1.2), and it needs no focus trap of its own inside the panel's.
+
+  function _renderDifferent(option) {
+    const here   = _currentLocation();
+    const kinds  = SESSION_TYPES.filter(t => t.id !== _deliveredType(option) && (t.id !== 'gym' || here === 'gym'));
+    const places = ['home', 'gym', 'outside'].filter(l => l !== here);
+    const btn = (attr, label) => `<button class="btn btn-secondary cp-different__btn" ${attr}>${label}</button>`;
+    return `
+      <details class="cp-different">
+        <summary class="cp-different__summary">Something different today</summary>
+        <div class="cp-different__body">
+          <p class="cp-different__label" id="cp-diff-this">This, but</p>
+          <div class="cp-different__row" role="group" aria-labelledby="cp-diff-this">
+            ${btn('data-different="shorter"', 'Shorter (20 min)')}
+            ${btn(`data-different="easier" aria-pressed="${adjust < 0}"`, 'Easier')}
+            ${btn(`data-different="harder" aria-pressed="${adjust > 0}"`, 'Harder')}
+          </div>
+          <p class="cp-different__label" id="cp-diff-kind">A different kind</p>
+          <div class="cp-different__row" role="group" aria-labelledby="cp-diff-kind">
+            ${kinds.map(t => btn(`data-different-kind="${t.id}"`, t.label)).join('')}
+          </div>
+          <p class="cp-different__label" id="cp-diff-where">Somewhere else</p>
+          <div class="cp-different__row" role="group" aria-labelledby="cp-diff-where">
+            ${places.map(l => btn(`data-different-loc="${l}"`, _locationLabel(l))).join('')}
+          </div>
+          <div class="cp-different__row">
+            ${btn('data-different="class"', 'A class instead')}
+          </div>
+        </div>
+      </details>`;
+  }
+
+  // ── SMOOTH-P2a. The dock ─────────────────────────────────────────────────
+  // When the gate is due, the same note and the same tick-box the player's
+  // gate uses (safety-gate.js), so the record means the same thing
+  // wherever it was made. Start is never disabled: an unticked Start says
+  // why and moves focus to the box (3.3.1), exactly as the gate does.
+
+  function _renderDock(premium) {
+    const due = isGateDue();
+    const guidance = due && isGuidanceDue()
+      ? `<p class="gate-guidance" role="note">${GUIDANCE_TEXT}</p>` : '';
+    return `
+      <div class="cp-dock">
+        ${due ? `
+          <p class="cp-dock__label">Before you start</p>
+          <ul class="cp-dock__lines">${HURT_AND_ACHE.map(l => `<li>${l}</li>`).join('')}</ul>
+          ${guidance}
+          <label class="gate-ack" for="cp-ack-box">
+            <input type="checkbox" id="cp-ack-box" ${ackTicked ? 'checked' : ''}>
+            <span>I have read this.</span>
+          </label>
+          <p class="gate-error" id="cp-ack-error" role="status" aria-live="assertive">${ackError}</p>
+        ` : `
+          <p class="cp-dock__line">If something hurts — sharp, or building as you go — stop that one. Aching afterwards is normal.</p>
+        `}
+        <div class="cp-preview-panel__actions">
+          <button class="btn btn-ghost" id="cp-preview-not-today">
+            ${premium ? 'Not today' : 'Pick something else'}
+          </button>
+          <button class="btn btn-primary" id="cp-preview-start">Start</button>
+        </div>
+      </div>`;
   }
 
   /**
@@ -1083,30 +1303,6 @@ export function CoachProposalView(router) {
     return `${c} movement${c === 1 ? "" : "s"}`;
   }
 
-  function renderPreviewCard(option, isRecommended) {
-    const selected = option.id === selectedOptionId;
-    // Computed once and used in both the visible text and the accessible
-    // name. Two separate expressions would be two things to keep in step,
-    // and WCAG 2.5.3 depends on them agreeing.
-    const durationText  = _durationLabel(option.duration);
-    const movementsText = _movementsLabel(option.exerciseCount);
-    return `
-      <button class="cp-preview-card ${selected ? 'cp-preview-card--selected' : ''} ${isRecommended ? 'cp-preview-card--recommended' : ''}"
-              role="radio"
-              aria-checked="${selected ? 'true' : 'false'}"
-              data-option-id="${option.id}"
-              aria-label="${option.name}, ${durationText}, ${movementsText}${isRecommended ? ', suggested for today' : ''}">
-        ${isRecommended ? '<span class="cp-preview-card__badge">Suggested for today</span>' : ''}
-        <span class="cp-preview-card__name">${option.name}</span>
-        <span class="cp-preview-card__meta">${durationText}</span>
-        <span class="cp-preview-card__meta">${movementsText}</span>
-        <p class="cp-preview-card__why">${option.rationale}</p>
-        ${(() => { const n = _stretchTargetNote(option);
-                   return n ? `<p class="cp-preview-card__target">${n}</p>` : ''; })()}
-      </button>
-    `;
-  }
-
   // ── Preview panel close (v8; open handled directly in mount(), 04 Aug 2026) ──
 
   /**
@@ -1141,31 +1337,30 @@ export function CoachProposalView(router) {
     if (navigateHome) router.navigate('today');
   }
 
-  function _rerenderPanel(container) {
+  function _rerenderPanel(container, showPlan = false) {
     const existing = container.querySelector('#cp-preview-panel');
     if (existing) {
       existing.outerHTML = renderPreviewPanel();
       attachPreviewEvents(container);
+      // SMOOTH-P2a. "One tap rebuilds the plan AND SHOWS IT": the sheet
+      // closes (it re-renders closed) and focus goes to the plan's name.
+      if (showPlan) container.querySelector('#cp-plan-title')?.focus();
     }
   }
 
   /**
-   * LOCATION-1, 08 Sep 2026. An assumption changed, so the proposal is
-   * rebuilt against it.
-   *
-   * Showing "Where: Gym" above three options built for a living room
-   * would be worse than showing nothing: the strip would be describing a
-   * session that does not exist.
-   *
-   * selectedOptionId is cleared deliberately. The options are new
-   * objects with new ids, so a retained selection points at nothing while
-   * leaving Start enabled -- a button that looks ready and does nothing.
+   * LOCATION-1, 08 Sep 2026. An assumption changed, so the plan is
+   * rebuilt against it. SMOOTH-P2a: the new plan is selected at once --
+   * there is one, and Start is never disabled -- and earlier swaps are
+   * dropped, because they were swaps of exercises no longer on it.
    */
-  function _rebuildAndRerender(container) {
+  function _rebuildAndRerender(container, message = '', showPlan = false) {
     proposal              = buildProposal();
     currentPreviewOptions = proposal.options;
-    selectedOptionId      = null;
-    _rerenderPanel(container);
+    selectedOptionId      = proposal.options[0]?.id || null;
+    swapState             = {};
+    statusMsg             = message;
+    _rerenderPanel(container, showPlan);
   }
 
   function _previewKeydown(e) {
@@ -1190,24 +1385,14 @@ export function CoachProposalView(router) {
     panel.querySelector('#cp-preview-close')?.addEventListener('click', () => closePreviewPanel(container));
     panel.querySelector('#cp-preview-not-today')?.addEventListener('click', () => closePreviewPanel(container));
 
-    panel.querySelectorAll('[data-option-id]').forEach(card => {
-      card.addEventListener('click', () => {
-        selectedOptionId = card.dataset.optionId;
-        _rerenderPanel(container);
-      });
-    });
-
-    // LOCATION-1. Changing an assumption REBUILDS the options, because a
-    // proposal that no longer matches what it says it was built for is
-    // worse than one that never said. Cycling rather than opening a
-    // picker: three locations and four lengths, on a panel that already
-    // traps focus -- a second layer inside it would need its own trap and
-    // its own way out.
+    // LOCATION-1. Changing an assumption REBUILDS the plan, because a
+    // plan that no longer matches what it says it was built for is worse
+    // than one that never said.
     panel.querySelector('#cp-loc')?.addEventListener('click', () => {
       const order = ['home', 'gym', 'outside'];
       const next  = order[(order.indexOf(_currentLocation()) + 1) % order.length];
       store.set('sessionLocation', next);
-      _rebuildAndRerender(container);
+      _rebuildAndRerender(container, `Now planned for ${_locationLabel(next).toLowerCase()}.`);
     });
 
     panel.querySelector('#cp-time')?.addEventListener('click', () => {
@@ -1215,16 +1400,126 @@ export function CoachProposalView(router) {
       const cur  = store.get('availableTime');
       const i    = cats.indexOf(cur);
       store.set('availableTime', cats[(i + 1) % cats.length]);
-      _rebuildAndRerender(container);
+      _rebuildAndRerender(container, `Now ${_getAvailableTimeMinutes()} minutes.`);
+    });
+
+    // Focus opens the sheet rather than cycling: there are nine kinds,
+    // and cycling through nine to reach one is a worse menu than a menu.
+    panel.querySelector('#cp-focus')?.addEventListener('click', () => {
+      const d = panel.querySelector('details.cp-different');
+      if (!d) return;
+      d.open = true;
+      d.querySelector('[data-different-kind]')?.focus();
+    });
+
+    panel.querySelectorAll('[data-swap]').forEach(btn => {
+      btn.addEventListener('click', () => _swapRow(container, Number(btn.dataset.swap)));
+    });
+
+    panel.querySelectorAll('[data-different]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const what = btn.dataset.different;
+        if (what === 'class') { closePreviewPanel(container, { navigateHome: false }); router.navigate('classes'); return; }
+        if (what === 'shorter') {
+          store.set('availableTime', 'quick');
+          _rebuildAndRerender(container, 'Here’s a 20-minute plan.', true);
+          return;
+        }
+        adjust = what === 'harder' ? Math.min(1, adjust + 1) : Math.max(-1, adjust - 1);
+        statusMsg = adjust > 0 ? 'One more set on each main exercise.'
+                  : adjust < 0 ? 'One set fewer on each main exercise.'
+                  : 'Back to the sets as planned.';
+        _rerenderPanel(container, true);
+      });
+    });
+
+    // ASK-KIND rule: a request spends today differently; the arc is not
+    // edited. clearPurpose() clears it at the next check-in.
+    panel.querySelectorAll('[data-different-kind]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        store.set('requestedSessionType', btn.dataset.differentKind);
+        _rebuildAndRerender(container, 'Here’s the new plan.', true);
+      });
+    });
+
+    panel.querySelectorAll('[data-different-loc]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        store.set('sessionLocation', btn.dataset.differentLoc);
+        _rebuildAndRerender(container, 'Here’s the new plan.', true);
+      });
+    });
+
+    const box = panel.querySelector('#cp-ack-box');
+    box?.addEventListener('change', () => {
+      ackTicked = box.checked;
+      ackError  = '';
+      const err = panel.querySelector('#cp-ack-error');
+      if (err) err.textContent = '';
     });
 
     panel.querySelector('#cp-preview-start')?.addEventListener('click', () => {
-      if (!selectedOptionId) return;
-      const chosen = currentPreviewOptions.find(o => o.id === selectedOptionId);
-      if (chosen) handlePreviewStart(chosen, container);
+      const chosen = currentPreviewOptions.find(o => o.id === selectedOptionId) || currentPreviewOptions[0];
+      if (!chosen) return;
+      // Same rule, same words as safety-gate.js's attachSafetyGate().
+      if (panel.querySelector('#cp-ack-box')) {
+        if (!ackTicked) {
+          ackError = 'Confirm you have read this before starting.';
+          const err = panel.querySelector('#cp-ack-error');
+          if (err) err.textContent = ackError;
+          panel.querySelector('#cp-ack-box')?.focus();
+          return;
+        }
+        if (panel.querySelector('.gate-guidance')) {
+          try { store.set('guidanceShownAt', new Date().toISOString()); } catch { /* non-fatal */ }
+        }
+        recordAcknowledgement('coach-plan');
+      }
+      handlePreviewStart(chosen, container);
     });
 
     panel.addEventListener('keydown', _trapFocus);
+  }
+
+  /**
+   * SMOOTH-P2a. Swap cycles this row's alternatives: same section, same
+   * kit (the pool was built with this plan's arguments), the exercise's
+   * own swap group first. Anything blocked by today's sore answer is left
+   * out, exactly as selection leaves it out. Past the last, the original
+   * comes back.
+   */
+  function _swapRow(container, index) {
+    const option = currentPreviewOptions[0];
+    if (!option || !option._pools) return;
+    const current = option.exercises[index];
+    if (!current || current.isPrescribed) return;
+
+    if (!swapState[index]) {
+      const scores = soreScoresToday();
+      const { groups, leadGroupId } = swapAlternatives({
+        pool:         option._pools,
+        section:      current.section || 'main',
+        current,
+        inSessionIds: option.exercises.map(e => e.id)
+      });
+      const lead = groups.filter(g => g.id === leadGroupId).flatMap(g => g.items);
+      const alts = (lead.length ? lead : groups.flatMap(g => g.items))
+        .filter(ex => soreLevelFor(ex, scores).level !== 'blocked');
+      swapState[index] = { original: current, alts, pos: -1 };
+    }
+
+    const st = swapState[index];
+    if (!st.alts.length) {
+      statusMsg = `Nothing else fits here today, so ${current.name} stays.`;
+      _rerenderPanel(container);
+      return;
+    }
+    st.pos = st.pos + 1 >= st.alts.length ? -1 : st.pos + 1;
+    const next = st.pos === -1 ? st.original : st.alts[st.pos];
+    const swapped = swapExerciseInSession(option, index, next);
+    option.exercises = swapped.exercises;
+    statusMsg = st.pos === -1 ? `Back to ${next.name}.` : `Swapped to ${next.name}.`;
+    _rerenderPanel(container);
+    container.querySelector(`[data-swap="${index}"]`)?.focus();
   }
 
   function handlePreviewStart(option, container) {
@@ -1258,6 +1553,13 @@ export function CoachProposalView(router) {
     // about the session, and persisting it would put a full candidate
     // pool into localStorage on every proposal.
     const { _pools, ...session } = option;
+    // SMOOTH-P2a. What starts is what was shown: swaps are already on
+    // option.exercises; Easier/Harder are applied here, the same function
+    // the list was drawn from.
+    session.exercises     = _planExercises(option);
+    session.exerciseCount = session.exercises.length;
+    // Where they trained becomes the next plan's default (spec 4.3).
+    store.set('sessionLocation', _currentLocation());
 
     store.set('generatedSession', {
       session,
@@ -1432,7 +1734,8 @@ export function CoachProposalView(router) {
         // patch .cp-doors and broke when the element stopped existing.
         proposal              = buildProposal();
         currentPreviewOptions = proposal.options;
-        selectedOptionId      = null;
+        selectedOptionId      = proposal.options[0]?.id || null;
+        swapState = {};
         render(container);
       });
     });
@@ -1476,7 +1779,8 @@ export function CoachProposalView(router) {
     // same gating mount() applies, in case both banners existed together.
     if (!(missedOffer && !choiceMade)) {
       currentPreviewOptions = proposal.options;
-      selectedOptionId      = null;
+      selectedOptionId      = proposal.options[0]?.id || null;
+      swapState = {};
       previewOpen           = true;
     }
 
@@ -1496,7 +1800,8 @@ export function CoachProposalView(router) {
     // there'd been nothing to resolve.
     if (proposal && !(reEntryCtx && !reEntryCtx.contextCaptured)) {
       currentPreviewOptions = proposal.options;
-      selectedOptionId      = null;
+      selectedOptionId      = proposal.options[0]?.id || null;
+      swapState = {};
       previewOpen           = true;
     }
     render(container);
@@ -1609,8 +1914,10 @@ export function CoachProposalView(router) {
     // option beats one real option and two fictions -- a card promising
     // "3 MOVEMENTS" for a session carrying an empty exercise list is a
     // claim the coach cannot meet, and FAULTLESS is the standing rule.
-    let options = _generateOptions(energyScore, effectiveIntensity, availTime);
-    options = _withBuiltAlternates(options);
+    // SMOOTH-P2a. One plan. The alternates build (PROPOSAL-LOC) is gone:
+    // "Something different today" builds another kind on request instead
+    // of three being built on every visit and two thrown away.
+    const options = _generateOptions(energyScore, effectiveIntensity, availTime);
 
     // Build greeting
     const greeting = _buildGreeting(name, feelingWord);
@@ -1997,108 +2304,6 @@ export function CoachProposalView(router) {
   }
 
   /**
-   * PROPOSAL-LOC, 16 Sep 2026. Two more real sessions, or fewer cards.
-   *
-   * Same arguments as _buildCoachSuggestion(): the location-scoped
-   * equipment list and the person's available time. The only thing that
-   * varies is sessionType, so an alternate is a genuine answer to "what
-   * else could I do here today" rather than a different screen's idea of
-   * a fallback.
-   *
-   * ORDER IS DELIBERATE and follows what the person said, not a fixed
-   * list. At the gym the alternates lean to what a gym is for; at home
-   * they lean to what a room allows. The primary's own type is skipped,
-   * and so is anything the builder cannot fill today.
-   *
-   * NO PADDING. If only one builds, one card shows. The screen already
-   * speaks arrays of any length -- TWO-ENGINE made it do so -- and a
-   * short honest list is the point rather than a degradation of it.
-   */
-  function _withBuiltAlternates(options) {
-    const primary = options[0];
-    if (!primary) return options;
-
-    const atGym = _currentLocation() === 'gym';
-
-    // Gym: load-bearing work first, then what a gym also supports.
-    // Home: what a room allows, in the same spirit.
-    const ORDER = atGym
-      ? ['full', 'upper', 'lower', 'core', 'glute', 'mobility', 'stretch', 'cardio']
-      : ['core', 'mobility', 'stretch', 'full', 'cardio', 'glute'];
-
-    const taken = new Set([primary.sessionType, primary.inputs?.chosenType].filter(Boolean));
-    const args  = {
-      durationMins:      _getAvailableTimeMinutes(),
-      equipmentOverride: equipmentForLocation(_currentLocation()).list,
-      preset:            store.get('sessionPreset') || null
-    };
-
-    const out = [primary];
-    for (const sessionType of ORDER) {
-      if (out.length >= 3) break;
-      if (taken.has(sessionType)) continue;
-
-      let built = null;
-      try {
-        built = buildSession({ ...args, sessionType });
-      } catch (e) {
-        console.warn('coach-proposal: alternate build failed for ' + sessionType, e);
-        continue;
-      }
-
-      // An empty or near-empty build is a slot to drop, not a card to
-      // show. buildSession() may also hand back Gentle Care or an
-      // out-of-scope session instead of the type asked for; offering that
-      // twice alongside the primary would be the coach repeating itself
-      // in three different fonts.
-      if (!built || !Array.isArray(built.exercises) || built.exercises.length === 0) continue;
-      const delivered = built.id || sessionType;
-      if (taken.has(delivered)) continue;
-      taken.add(delivered);
-      taken.add(sessionType);
-
-      _applyStretchTarget(built);
-
-      out.push({
-        id:            built.id || `coach-alt-${sessionType}`,
-        name:          built.title,
-        subtitle:      built.subtitle || null,
-        duration:      built.duration,
-        exerciseCount: built.exercises.length,
-        exercises:     built.exercises,
-        rationale:     built.coachLine || built.rationale || '',
-        sessionType:   delivered,
-      // STRETCH-VIA-COACH. Carried onto the option so the card can say
-      // which target was applied. Absent on everything that is not a
-      // stretch session, which is what keeps the note silent.
-      stretchTarget: built.stretchTarget || null,
-        inputs:        { ...(primary.inputs || {}), chosenType: sessionType, reason: 'alternate' },
-        _pools:        buildCandidatePools({ ...args, sessionType })
-      });
-    }
-
-    return out;
-  }
-
-  function _getFallbackOption(index) {
-    const opt = [
-      { label: 'Mobility',  type: 'yoga-session',  durationMins: 20, exerciseCount: 4 },
-      { label: 'Breathing', type: 'quiet-session',  durationMins: 15, exerciseCount: 3 },
-      { label: 'Short walk',type: 'walk-session',   durationMins: 20, exerciseCount: 1 },
-    ][index] || { label: 'Movement', type: 'workout', durationMins: 20, exerciseCount: 4 };
-
-    return {
-      id:            `fallback-${opt.type}-${Date.now()}-${index}`,
-      name:          opt.label,
-      type:          opt.type,
-      duration:      opt.durationMins,
-      exerciseCount: opt.exerciseCount,
-      rationale:     'A steady option for today.',
-      exercises:     []
-    };
-  }
-
-  /**
    * ARC-VISIBLE, 16 Sep 2026. Say that the arc is doing the work.
    *
    * Graeme: "I guess it's using the arc. The coach doesn't explicitly
@@ -2312,9 +2517,20 @@ export function CoachProposalView(router) {
          :                     'At home';
   }
 
+  /**
+   * SMOOTH-P2a. Where they last trained; with nothing recorded, the gym
+   * when their only kit is at a gym, or they told us the gym is how they
+   * move. Measured on v542: a person whose only declared kit was a full
+   * gym was planned "At home", bodyweight.
+   */
   function _currentLocation() {
     const loc = store.get('sessionLocation');
-    return loc === 'gym' || loc === 'outside' ? loc : 'home';
+    if (loc === 'gym' || loc === 'outside' || loc === 'home') return loc;
+    const gym   = store.get('gymEquipment')  || [];
+    const home  = store.get('homeEquipment') || [];
+    const ident = store.get('movementIdentity') || [];
+    if (gym.length && (!home.length || (Array.isArray(ident) && ident.includes('gym')))) return 'gym';
+    return 'home';
   }
 
   // ── Public interface ───────────────────────────────────────────────────────

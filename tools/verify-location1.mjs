@@ -1,6 +1,13 @@
 /**
  * tools/verify-location1.mjs
- * 08 Sep 2026 v1
+ * 28 Sep 2026 v2
+ *
+ * v2 - SMOOTH-P2a. Test 5 follows the screen from three cards to one
+ *   plan: it waits for plan rows (.cp-plan__row) instead of card names,
+ *   and Start is pressed without choosing a card first (there is none).
+ *   A fresh account must tick the safety note the plan now carries, so
+ *   startAndInspect() ticks it. Every assertion about WHAT is proposed
+ *   where is unchanged.
  *
  * LOCATION-1. A session must not propose kit you do not have where you
  * are.
@@ -204,7 +211,7 @@ async function proposeAt(location) {
   CoachProposalView({ navigate: () => {} }).mount(main);
   // Wait for the build rather than betting on a clock.
   for (let waited = 0; waited < 8000; waited += 25) {
-    if (main.querySelector(".cp-preview-card__name")) break;
+    if (main.querySelector(".cp-plan__row")) break;
     await new Promise(r => setTimeout(r, 25));
   }
   return main;
@@ -212,8 +219,8 @@ async function proposeAt(location) {
 
 await proposeAt("home");
 
-ok("5pc. positive control: the proposal rendered options",
-   !!main.querySelector(".cp-preview-card__name"),
+ok("5pc. positive control: the proposal rendered its plan",
+   !!main.querySelector(".cp-plan__row"),
    "no options on screen - everything below measures nothing");
 
 ok("5a. it shows where it thinks you are",
@@ -234,8 +241,8 @@ ok("5d. and the screen has an h1 to orient from",
    "page with no top level. WCAG 2.2 AA 1.3.1");
 
 // THE ONE. Read off the options the proposal actually built.
-const proposedAtHome = [...document.querySelectorAll(".cp-preview-card")].length;
-ok("5e. positive control: options were built to inspect", proposedAtHome > 0);
+const proposedAtHome = [...document.querySelectorAll(".cp-plan__row")].length;
+ok("5e. positive control: a plan was built to inspect", proposedAtHome > 0);
 
 // Started, and the SESSION THE VIEW HANDED OVER is inspected.
 //
@@ -245,9 +252,9 @@ ok("5e. positive control: options were built to inspect", proposedAtHome > 0);
 // because the assertion was building its own correct session and then
 // checking that one. Reversal testing is what showed it up.
 async function startAndInspect() {
-  const card = main.querySelector("[data-option-id]");
-  if (!card) return null;
-  card.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }));
+  if (!main.querySelector(".cp-plan__row")) return null;
+  const ack = main.querySelector("#cp-ack-box");
+  if (ack) { ack.checked = true; ack.dispatchEvent(new dom.window.Event("change")); }
   const start = main.querySelector("#cp-preview-start");
   if (!start || start.hasAttribute("disabled")) return null;
   start.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }));
@@ -272,7 +279,7 @@ async function startAndInspect() {
 await proposeAt("outside");
 
 ok("5f-pc. positive control: the proposal rendered at outside",
-   !!main.querySelector(".cp-preview-card__name"),
+   !!main.querySelector(".cp-plan__row"),
    "no options - the assertions below measure nothing");
 
 ok("5f. it says so on the screen",

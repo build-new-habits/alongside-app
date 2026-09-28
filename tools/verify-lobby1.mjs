@@ -1,6 +1,15 @@
 /**
  * tools/verify-lobby1.mjs
- * 03 Sep 2026 v1
+ * 28 Sep 2026 v2
+ *
+ * v2 - SMOOTH-P2a. Test 11's escape moved. "Or pick your own" (four
+ *   doors beside the suggestion) became "Something different today" on
+ *   the plan: every other session kind, somewhere else, and a class, one
+ *   tap from the plan (spec 4.3). The rule it protects is unchanged --
+ *   choice is not removed, and it sits BELOW the coach's plan, never in
+ *   front of it -- so it is asserted on the new markup: the kinds are
+ *   built from SESSION_TYPES (every kind but today's, so more than four),
+ *   a class is offered, and the sheet renders after the plan list.
  *
  * LOBBY-1a. The lobby rule, made enforceable.
  *
@@ -315,17 +324,18 @@ console.log("\nTEST 11 - the session space keeps the escape");
 
 check("11. sessions are reachable, below the suggestion", () => {
   const cp = strip(fs.readFileSync(_gatePath("js/views/coach-proposal.js"), "utf8"));
-  // Count them: one button removed still leaves three, and the naive
-  // presence check passed.
-  const escapes = (cp.match(/data-else="/g) || []).length;
-  ok(escapes >= 4,
-     `${escapes} ways to pick your own. The session tiles left Home and must land here — ` +
-     `removing choice is not the same as hiding it.`);
-  const label = cp.indexOf("cp-else-label");
-  const start = cp.indexOf("cp-preview-start");
-  ok(label > -1, "no escape label");
-  ok(start === -1 || label > cp.indexOf("cp-acknowledgement"),
-     "the escape renders above the coach's suggestion, which makes it a menu again");
+  // SMOOTH-P2a. The kinds are generated from SESSION_TYPES minus today's,
+  // so the count is asserted on the live list, not on markup literals.
+  const kindsFromTypes = /SESSION_TYPES\.filter\(t => t\.id !== _deliveredType\(option\)/.test(cp) &&
+                         /data-different-kind=/.test(cp);
+  ok(kindsFromTypes,
+     "the plan does not offer the other session kinds. The session tiles left Home and must " +
+     "land here — removing choice is not the same as hiding it.");
+  ok(/data-different="class"/.test(cp), "no way to a class from the plan");
+  const plan  = cp.indexOf("${option ? _renderPlan(option, premium) : ''}");
+  const sheet = cp.indexOf("${premium && option ? _renderDifferent(option) : ''}");
+  ok(plan > -1 && sheet > plan,
+     "the choices render above the coach's plan, which makes it a menu again");
 });
 
 console.log("\nTEST 11 - TIER-HOME: free and Plan are different screens");

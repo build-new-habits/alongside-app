@@ -1,6 +1,14 @@
 /**
  * tools/verify-stretch-coach.mjs
- * 16 Sep 2026 v1
+ * 28 Sep 2026 v2
+ *
+ * v2 - SMOOTH-P2a. There are no alternate cards any more: one plan, and
+ *   another kind is built on request from "Something different today",
+ *   through the same _buildCoachSuggestion(). 2.2 now asserts that the
+ *   one build path orders (the call is in _buildCoachSuggestion's body,
+ *   not merely named somewhere). 2.3 follows the caption from the card
+ *   to the plan (.cp-plan__target). Nothing loosened: both were
+ *   satisfiable before by the definition line alone.
  *
  * STRETCH-VIA-COACH. One target implementation, reached from both paths.
  *
@@ -98,12 +106,16 @@ ok("1.4 REVERSAL: no third copy anywhere in js/", (() => {
 console.log("\nTEST 2 — the coach path orders, and says so");
 
 ok("2.1 a proposed stretch session is ordered", /_applyStretchTarget\(built\)/.test(prop));
-ok("2.2 on BOTH the primary and the alternates",
-   (prop.match(/_applyStretchTarget\(built\)/g) || []).length >= 2,
-   "ordering only the suggestion leaves the other two cards unordered and " +
-   "silently different");
-ok("2.3 and the card says which target was applied",
-   /_stretchTargetNote\(option\)/.test(prop) && /cp-preview-card__target/.test(prop),
+const buildBody = (() => {
+  const i = prop.indexOf("function _buildCoachSuggestion(");
+  const j = prop.indexOf("\n  function ", i + 10);
+  return i > -1 ? prop.slice(i, j > -1 ? j : undefined) : "";
+})();
+ok("2.2 every plan the coach builds is ordered (the one build path calls it)",
+   buildBody.length > 0 && /_applyStretchTarget\(built\)/.test(buildBody),
+   "a plan built without the ordering is silently different from the stretch door's");
+ok("2.3 and the plan says which target was applied",
+   /_stretchTargetNote\(option\)/.test(prop) && /cp-plan__target/.test(prop),
    "ordering a session around a signal and not saying so is the same silence " +
    "Graeme reported about the arc");
 

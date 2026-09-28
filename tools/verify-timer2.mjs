@@ -1,6 +1,12 @@
 /**
  * tools/verify-timer2.mjs
- * 12 Sep 2026 v1
+ * 28 Sep 2026 v2
+ *
+ * v2 - SMOOTH-P2a. "each side" (no number) moves from counted to null.
+ *   Counted meant no clock AND nothing to count: 90-90 Hip Stretch showed
+ *   "2 × each side" and ran without a timer. With no reps shape it falls
+ *   to `duration`, like plank (0e). 1c proves it now gets its clock;
+ *   "10 each side" stays counted. Every other case is unchanged.
  *
  * TIMER-2. The clock belongs to the exercise, not to lifting.
  *
@@ -87,7 +93,7 @@ ok("0e. plank: sets, no reps — the case that must NOT change",
 console.log("\nTEST 1 — classifyReps reads the four shapes");
 
 const cases = [
-  ["10", "counted"], ["12", "counted"], ["each side", "counted"],
+  ["10", "counted"], ["12", "counted"], ["each side", null],
   ["10 each side", "counted"], ["5 segments", "counted"],
   ["30 seconds", "timed"], ["45 seconds each side", "timed"], ["2 minutes", "timed"],
   ["20 seconds each side", "timed"], ["30s", "timed"],
@@ -103,6 +109,9 @@ for (const [input, want] of cases) {
 }
 ok("1a. every shape classified correctly" + (bad.length ? "  [" + bad.join("; ") + "]" : ""), bad.length === 0);
 ok("1b. metres are not minutes", classifyReps("30 metres") === "distance");
+ok("1c. a wordless reps string gets the exercise's own clock",
+   resolveTiming({ reps: "each side", sets: 2, duration: 90 }).seconds === 90 &&
+   resolveTiming({ reps: "10 each side", sets: 2, duration: 90 }).seconds === null);
 
 console.log("\nTEST 2 — the counted exercise loses its clock");
 
