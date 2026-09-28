@@ -1,6 +1,10 @@
 /**
  * tools/verify-plan-dose.mjs
- * 28 Sep 2026 v1
+ * 28 Sep 2026 v2
+ *
+ * v2 - FLAKY-PLANDOSE. Test 2 builds until it has a sample (at least
+ *   eight default-dosed moves, up to forty builds). 2b had failed on an
+ *   empty sample under load, never on a wrong dose. No assertion changed.
  *
  * SMOOTH-P2b, PLAN-DOSE and GYM-KIT. The plan says how much, fills the
  * time asked for, and a gym gets gym moves.
@@ -93,7 +97,12 @@ console.log("\nTEST 2 - three sets of ten; eight to twelve on a harder day; two 
 // instructions state a dose, that wins (test 2f).
 const doseOn = (intensity) => {
   const out = [];
-  for (let i = 0; i < 6; i++) {
+  // FLAKY-PLANDOSE, 28 Sep: six builds on a high day sometimes held no
+  // default-dosed main move at all (every pick carried its own written
+  // dose), so 2b failed on an EMPTY sample. Build until there are at
+  // least eight to inspect, up to forty builds. Every one is still held
+  // to the same rule; only the sample is made sure to exist.
+  for (let i = 0; i < 40 && (i < 6 || out.length < 8); i++) {
     fresh(intensity);
     const s = SB.buildSession({ sessionType: "full", durationMins: 40, equipmentOverride: FULL_GYM });
     out.push(...mainOf(s).filter(e => e._defaultDose && e._doseFrom !== "instructions"));
