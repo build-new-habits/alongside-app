@@ -1,7 +1,16 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 28 Sep 2026 v542
+ * 28 Sep 2026 v543
+ *
+ * v543 - SMOOTH-P2a. views/coach-proposal.js, exercise-timing.js,
+ *   css/components/coach-proposal.css.
+ *
+ *   Today's plan names every exercise before Start, with sets and reps
+ *   or a time, and Start works on arrival. Swap, last weight and
+ *   "Something different today" on the Plan; free sees the same list.
+ *
+ *   New gate: tools/verify-plan-list.mjs. 175 gates.
  *
  * v542 - SMOOTH-P1. views/checkin.js, views/settings.js, data/pacing.js,
  *   css/components/checkin-conversation.css.
@@ -3897,7 +3906,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v542";
+const CACHE_NAME = "alongside-v543";
 
 const SHELL_URLS = [
 
