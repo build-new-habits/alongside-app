@@ -1,7 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 28 Sep 2026 v556
+ * 28 Sep 2026 v557
+ *
+ * v557 - Work list 5, 6, 7. No new files. Changed: session-builder,
+ *   data/equipment-map, save-block, views/workout, views/gym-programme.
+ *   188 gates.
  *
  * v556 - Work list 2e. NEW FILE precached: js/data/time-windows.js.
  *   REMOVED from precache (deleted): js/data/workoutGenerator.js,
@@ -3983,7 +3987,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v556";
+const CACHE_NAME = "alongside-v557";
 
 const SHELL_URLS = [
 
