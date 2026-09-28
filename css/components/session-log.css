@@ -1,7 +1,10 @@
 /* ============================================================
    session-log.css
    css/components/session-log.css
-   15 Aug 2026 v2
+   28 Sep 2026 v3
+
+   v3 - SMOOTH-P2c. .slog__stepper / .slog__step: − and + either side of
+        the weight, 44px each, so a change is a tap rather than a keyboard.
 
 
    v2 - PB-1. .slog__best, styled identically to the last-note line so a
@@ -144,4 +147,30 @@
   flex: 1 1 100%;
   font-size: var(--text-xs);
   color: var(--color-text-secondary);
+}
+
+
+/* SMOOTH-P2c. The weight stepper. The buttons carry their own names
+   ("2.5 kg less"), so the symbols are never the only label. */
+.slog__stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.slog__step {
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-elevated);
+  color: var(--color-text);
+  font-size: var(--text-lg);
+  line-height: 1;
+  cursor: pointer;
+}
+
+.slog__step:focus-visible {
+  outline: 3px solid var(--color-border-focus);
+  outline-offset: 2px;
 }

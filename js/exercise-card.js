@@ -1,6 +1,34 @@
 /**
  * js/exercise-card.js
- * 16 Sep 2026 v11
+ * 28 Sep 2026 v12
+ *
+ * v12 - SMOOTH-P2c. layout: "flow", one screen per exercise, for the
+ *   coach's player (workout.js). Spec 4.4.
+ *
+ *   Graeme, 27 Sep, tracing the Plan route: "too many pages before you
+ *   get to the exercises. Too many decisions... It feels rough." Each
+ *   exercise was four pages -- Decide, Watch out, Do, Note -- and three
+ *   taps before the first rep, with the full hurt-and-ache text open at
+ *   the top of Decide.
+ *
+ *   THE SAFETY ORDER IS KEPT, ON ONE PAGE. The person's own caution
+ *   (bodyCaution) is first; "Watch for" (watchOut) comes before "How to
+ *   do it"; nothing hazard-bearing is inside a closed disclosure except
+ *   the universal hurt-and-ache text, which is one tap away as "If it
+ *   hurts".
+ *
+ *   WHY THE HURT-AND-ACHE TEXT CAN CLOSE HERE (CARD-DECIDE's worry, met).
+ *   CARD-DECIDE opened it on Decide because after the taper the only
+ *   safety text on screen was a closed row nobody opens. On this route
+ *   the plan now carries its short form in the dock EVERY session
+ *   ("If something hurts -- sharp, or building as you go -- stop that
+ *   one. Aching afterwards is normal."), and the full note with the
+ *   tick-box whenever the gate is due (coach-proposal v28). So it is read
+ *   once per session in the place the decision is made, not ten times
+ *   between sets.
+ *
+ *   The paged layout is unchanged for the three other consumers
+ *   (gym-programme, core-session, prescribed-session).
  *
  * v11 - CARD-LOCAL. hurtBlock() is exported so morning-session.js can
  *   render the same safety block on its own local card. One
@@ -591,6 +619,39 @@ export function renderExerciseCard(exercise, opts = {}) {
        role="region" aria-label="Exercise guidance for ${esc(exercise.name)}">
     ${pinned}
     ${decide}${watchBody}${doBody}${bodies.note}
+  </div>`;
+  }
+
+  // SMOOTH-P2c. One screen: caution, the lead cue and last time, what to
+  // watch for, then how to do it -- the same safety order as the pages,
+  // without the page turns. "How to do it" is open; the options and the
+  // universal hurt-and-ache text are one tap away.
+  if (opts.layout === "flow") {
+    const how = [
+      (exercise.instructions && exercise.instructions.length) ? list("exercise-section-list", exercise.instructions) : "",
+      restCues.length ? list("exercise-section-list xcard-more-form", restCues) : "",
+      hold,
+    ].join("");
+    const pointer = (caution && easeOff.length)
+      ? `<p class="xcard-adapt-pointer">There are other ways to do this one below. Have a look and see if any of them make sense today.</p>`
+      : "";
+    return `
+  <div class="exercise-card exercise-card--flow" data-xcard="${p}"
+       role="region" aria-label="How to do ${esc(exercise.name)}">
+    ${caution ? `<p class="exercise-caution" role="note">${caution}</p>` : ""}
+    ${pointer}
+    ${cueBlock}
+    ${lastBlock}${loadBlock}
+    ${opts.adjustSlot || ""}
+    ${watchBody}
+    ${how ? `<details class="xcard-block xcard-how" open>
+      <summary class="xcard-how-summary">How to do it</summary>
+      ${how}
+    </details>` : ""}
+    ${adaptBlock}
+    ${hurtBlock(false)}
+    ${opts.doSlot || ""}
+    ${opts.noteSlot || ""}
   </div>`;
   }
 

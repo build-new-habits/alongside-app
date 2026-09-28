@@ -1,6 +1,16 @@
 /**
  * tools/verify-card3.mjs
- * 31 Aug 2026 v1
+ * 28 Sep 2026 v2
+ *
+ * v2 - SMOOTH-P2c. workout.js left the page model for one screen per
+ *   exercise (spec 4.4; exercise-card.js v12 layout "flow"). Tests 3, 4b
+ *   and 11 keep asserting the page model on the three views still on it,
+ *   and assert the SAME property on workout.js in the form it now takes:
+ *   3w skip is offered only before the exercise is done; 4w nothing but
+ *   the Start button starts the clock; 11w no page handler, so it cannot
+ *   answer for another view's card. 2d holds the safety order inside the
+ *   flow layout: caution, then what to watch for, outside any
+ *   disclosure, before "How to do it". Nothing loosened.
  *
  * Gate for CARD-3. Replaces verify-card2.mjs, which is deleted rather
  * than left passing against a tab model that no longer exists.
@@ -53,6 +63,9 @@ const VIEWS = ["js/views/workout.js", "js/views/prescribed-session.js",
                "js/views/gym-programme.js", "js/views/core-session.js"];
 const src = {};
 for (const v of VIEWS) src[v] = strip(fs.readFileSync(_gatePath(v), "utf8"));
+// SMOOTH-P2c. Still on the four-page model.
+const PAGED = VIEWS.filter(v => v !== "js/views/workout.js");
+const WO = src["js/views/workout.js"];
 
 // The action-bar ids each view binds by. Renaming one silently unbinds a
 // control, which is the failure this whole slot design exists to avoid.
@@ -197,9 +210,29 @@ check("2c. the exercise-specific hazard is never behind an interaction", () => {
   }
 });
 
+check("2d. flow layout: caution, then what to watch for, outside any disclosure, before how to do it", () => {
+  const i = card.indexOf('opts.layout === "flow"');
+  ok(i > -1, "no flow layout");
+  const body = card.slice(i, card.indexOf("const backTo", i));
+  const c = body.indexOf("exercise-caution"), w = body.indexOf("${watchBody}"), h = body.indexOf("How to do it");
+  ok(c > -1 && w > -1 && h > -1, "flow layout is missing caution, watchBody or How to do it");
+  ok(c < w && w < h, "the flow layout puts instructions before the hazards");
+  const before = body.slice(0, w);
+  ok((before.match(/<details/g) || []).length === (before.match(/<\/details>/g) || []).length,
+     "what to watch for sits inside a disclosure");
+});
+
 console.log("\nTEST 3 - Skip is on DECIDE and nowhere else");
 
-for (const v of VIEWS) {
+check("3w. workout.js (one screen) offers skip only before the exercise is done", () => {
+  const at = WO.indexOf("${exerciseDone ? `");
+  ok(at > -1, "workout.js has no done/not-done action branch");
+  const elseAt = WO.indexOf("` : `", at);
+  const skipAt = WO.indexOf('id="skip-exercise-btn"', at);
+  ok(elseAt > -1 && skipAt > elseAt, "skip renders once the exercise is done");
+});
+
+for (const v of PAGED) {
   check("3. " + v.split("/").pop() + " renders skip on DECIDE only", () => {
     const t = src[v];
     const skipId = IDS[v].find(x => x.includes("skip"));
@@ -222,7 +255,15 @@ check("4a. the card never starts a timer", () => {
   }
 });
 
-for (const v of VIEWS) {
+check("4w. workout.js: only the Start button starts the clock", () => {
+  const calls = [...WO.matchAll(/(?<!function )startTimer\(\)/g)].map(m => m.index);
+  const handler = WO.indexOf('getElementById("timer-toggle-btn")');
+  ok(handler > -1, "no timer toggle handler");
+  ok(calls.length > 0 && calls.every(i => i > handler && i < handler + 400),
+     "startTimer() is called somewhere other than the Start button's handler");
+});
+
+for (const v of PAGED) {
   check("4b. " + v.split("/").pop() + "'s forward-to-DO handler does not start the clock", () => {
     const t = src[v];
     const at = t.indexOf('currentCardPage = "do"');
@@ -337,7 +378,11 @@ const PREFIX = {
   "js/views/workout.js": "wo-", "js/views/prescribed-session.js": "ps-",
   "js/views/gym-programme.js": "gp-", "js/views/core-session.js": "cs-",
 };
-for (const v of VIEWS) {
+check("11w. workout.js binds no page handler, so it answers for no other view's card", () => {
+  ok(!WO.includes('addEventListener("xcard:page"'), "workout.js still listens for xcard:page");
+});
+
+for (const v of PAGED) {
   check("11. " + v.split("/").pop() + " ignores other views' cards", () => {
     const t = src[v];
     const at = t.indexOf('addEventListener("xcard:page"');

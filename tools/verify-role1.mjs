@@ -1,6 +1,12 @@
 /**
  * tools/verify-role1.mjs
- * 08 Sep 2026 v1
+ * 28 Sep 2026 v2
+ *
+ * v2 - SMOOTH-P2c. The coach's player shows the section as a quiet label
+ *   (.wo-flow__section, "Warm up" / "Main" / "Cool down") instead of the
+ *   emoji pill, and the raw category tag under the name is gone. Tests 2
+ *   and 4 read the label; 4c asserts no raw category id is printed. The
+ *   rule is unchanged: a miss prints nothing, never its own input.
  *
  * ROLE-1. A card must never print the word "undefined".
  *
@@ -151,17 +157,16 @@ ok("2pc. positive control: the card rendered",
    (main.textContent || "").trim().length > 0,
    "empty container - the assertions below measure nothing");
 
-const badge = main.querySelector(".exercise-role-badge");
-ok("2a. the badge is present on the first exercise", !!badge,
-   "no .exercise-role-badge - a session that HAS a role is not showing it");
-ok("2b. and reads a real label", !!badge && /Warm Up|Main|Cool Down|Accessory|Finisher/.test(badge.textContent),
-   `badge reads: "${badge ? badge.textContent.trim() : "-"}"`);
-ok("2c. its class carries the role, not the word",
+const badge = main.querySelector(".wo-flow__section");
+ok("2a. the section label is present on the first exercise", !!badge,
+   "no .wo-flow__section - a session that HAS a section is not showing it");
+ok("2b. and reads a real label", !!badge && /^(Warm up|Main|Cool down)$/.test(badge.textContent.trim()),
+   `label reads: "${badge ? badge.textContent.trim() : "-"}"`);
+ok("2c. its class carries no role word",
    !!badge && !/undefined/.test(badge.className),
    `class="${badge ? badge.className : "-"}"`);
-ok("2d. and its accessible name does not say undefined",
-   !!badge && !/undefined/i.test(badge.getAttribute("aria-label") || ""),
-   `aria-label="${badge ? badge.getAttribute("aria-label") : "-"}"`);
+ok("2d. and it is text, not an announced control",
+   !!badge && !badge.getAttribute("aria-label") && badge.tagName === "P");
 
 ok("2e. the word appears NOWHERE in the rendered card",
    !/undefined/i.test(main.innerHTML),
@@ -176,7 +181,7 @@ console.log("\nTEST 3 - an exercise with no role produces an empty slot, not a w
 fixture();
 const stripped = {
   ...built,
-  exercises: (built.exercises || []).map(({ role, ...rest }) => rest)
+  exercises: (built.exercises || []).map(({ role, section, ...rest }) => rest)
 };
 store.set("generatedSession", { session: stripped, builtAt: new Date().toISOString(), inputs: {} });
 store.set("activeSession", stripped);
@@ -184,6 +189,8 @@ main.innerHTML = workout.render();
 
 ok("3pc. positive control: the roleless card still rendered",
    (main.textContent || "").trim().length > 0, "empty container");
+// The section field is what the flow label reads; strip it too, so this
+// is still the roleless case that shipped.
 ok("3a. no badge element is emitted at all",
    !main.querySelector(".exercise-role-badge"),
    "an empty styled pill remains, and its aria-label announces a control " +
@@ -214,7 +221,7 @@ console.log("\nTEST 4 - an unknown role token is never printed raw");
 fixture();
 const tokened = {
   ...built,
-  exercises: (built.exercises || []).map(e => ({ ...e, role: "cardio-warmup" }))
+  exercises: (built.exercises || []).map(({ section, ...e }) => ({ ...e, role: "cardio-warmup" }))
 };
 store.set("generatedSession", { session: tokened, builtAt: new Date().toISOString(), inputs: {} });
 store.set("activeSession", tokened);
@@ -222,12 +229,24 @@ main.innerHTML = workout.render();
 
 ok("4pc. positive control: the card rendered", (main.textContent || "").trim().length > 0,
    "empty container");
-ok("4a. the raw token is not shown as a badge",
-   !/cardio-warmup/i.test((main.querySelector(".exercise-role-badge") || {}).textContent || ""),
+ok("4a. the raw token is not shown as a label",
+   !/cardio-warmup/i.test((main.querySelector(".wo-flow__section") || {}).textContent || "") &&
+   !main.querySelector(".wo-flow__section"),
    "an internal id is being displayed to a person as though it were a label");
 ok("4b. and no badge element is emitted for it",
    !main.querySelector(".exercise-role-badge"),
    "a badge with no styling class and an internal token inside it");
+
+// SMOOTH-P2c. The category id ("chest-stretch", "hip-hinge") and a
+// points badge sat under the name as tags. Neither is for the person.
+fixture();
+store.set("generatedSession", { session: built, builtAt: new Date().toISOString(), inputs: {} });
+main.innerHTML = workout.render();
+const cat = (built.exercises[0] || {}).category || "";
+ok("4c. no raw category id and no points badge under the name",
+   cat.length > 0 && !main.querySelector(".exercise-meta .meta-tag") &&
+   !(main.querySelector(".exercise-display")?.textContent || "").includes(cat) &&
+   !/\u2B50/.test(main.innerHTML), `category "${cat}"`);
 
 console.log(fails === 0
   ? "\nROLE-1: all assertions pass\n"

@@ -1,6 +1,13 @@
 /**
  * js/session-log.js
- * 20 Aug 2026 v7
+ * 28 Sep 2026 v8
+ *
+ * v8 - SMOOTH-P2c. The log starts where they left off. Spec 4.4: "the
+ *   stepper's starting value is the last logged weight". Every number
+ *   field is pre-filled from lastLift(); text (a note, a band colour) is
+ *   not, because a note is about that day. Weight gets − and + buttons
+ *   (2.5 kg / 5 lb, the usual plate step) so a change is a tap, not a
+ *   keyboard. Saving still writes exactly what is in the fields.
  *
  * v7 - R4 / decision 7.1. PERSONAL BESTS ARE FREE. bestLine()'s
  *   isPremium() check and its import are removed. A best is a fact the
@@ -288,6 +295,11 @@ export function renderLogBlock(exercise, idPrefix = "slog", mode) {
   if (!exercise?.id) return "";
 
   const fields = performanceFields(exercise, mode);
+  // SMOOTH-P2c. Where they left off. Numbers only -- see the header.
+  const last = store.lastLift(exercise.id) || {};
+  const prefill = f => (f.type === "number" && typeof last[f.key] === "number") ? ` value="${last[f.key]}"` : "";
+  const unit = store.get("weightUnit") || "kg";
+  const plate = unit === "lb" ? 5 : 2.5;
 
   // The invitation sits with the note, because this is the moment the
   // person is deciding what to use. Invitational, never a number, and it
@@ -311,13 +323,19 @@ export function renderLogBlock(exercise, idPrefix = "slog", mode) {
                       data-perf-key="${f.key}"></textarea>
             <span class="slog__remaining" aria-live="polite"></span>
           ` : `
+            ${f.key === "weight" ? `<span class="slog__stepper">
+              <button type="button" class="slog__step" data-step-for="${idPrefix}-${f.key}" data-step="-${plate}"
+                      aria-label="${plate} ${esc(unit)} less">\u2212</button>` : ""}
             <input class="slog__input" id="${idPrefix}-${f.key}"
                    type="${f.type}"
                    inputmode="${f.type === "number" ? "decimal" : "text"}"
                    ${f.step ? `min="0" step="${f.step}"` : ""}
                    ${f.maxlength ? `maxlength="${f.maxlength}"` : ""}
-                   autocomplete="off"
+                   autocomplete="off"${prefill(f)}
                    data-perf-key="${f.key}">
+            ${f.key === "weight" ? `<button type="button" class="slog__step" data-step-for="${idPrefix}-${f.key}" data-step="${plate}"
+                      aria-label="${plate} ${esc(unit)} more">+</button>
+            </span>` : ""}
           `}
         `).join("")}
         <button class="btn btn-secondary slog__save" id="${idPrefix}-save"
@@ -384,6 +402,20 @@ export function attachLogEvents(exercise, idPrefix = "slog") {
     }
     autogrow(el);
     remaining(el);
+  });
+
+  // SMOOTH-P2c. − / + on the weight. Never below zero; rounds to the
+  // plate step's precision so 2.5 + 2.5 does not become 5.000000001.
+  document.querySelectorAll(`[data-step-for="${idPrefix}-weight"]`).forEach(btn => {
+    if (btn.dataset.wired === "1") return;
+    btn.dataset.wired = "1";
+    btn.addEventListener("click", () => {
+      const input = document.getElementById(btn.dataset.stepFor);
+      if (!input) return;
+      const next = Math.max(0, (parseFloat(input.value) || 0) + parseFloat(btn.dataset.step));
+      input.value = String(Math.round(next * 100) / 100);
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+    });
   });
 
   const saveBtn = document.getElementById(`${idPrefix}-save`);

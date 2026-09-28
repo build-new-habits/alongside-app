@@ -2,9 +2,11 @@
  * css/components/session-guard.css
  * Session back-gesture guard — confirmation card styles
  *
- * 30 Jul 2026 v2
+ * 28 Sep 2026 v3
  *
  * CHANGELOG
+ * 28 Sep 2026 v3 — SMOOTH-P2c. .session-exit-title: the coach's sheet is
+ *   a titled dialog ("Leave this session?") with three plain choices.
  * 30 Jul 2026 v2 — Added .session-exit-* styles. Found missing while
  *   fixing the gym exit-guard gap (workout.js, same session): the
  *   on-screen Exit button's coach-voiced confirmation card (a SEPARATE
@@ -210,4 +212,13 @@
 .session-exit-discard:focus-visible {
   color: var(--color-text);
   background: var(--color-bg-hover);
+}
+
+
+/* SMOOTH-P2c. The exit sheet's title -- the dialog's accessible name. */
+.session-exit-title {
+  margin: 0 0 var(--space-4, 1.5rem);
+  font-size: var(--text-lg, 1.125rem);
+  font-weight: 700;
+  color: var(--color-text-primary, #FFFFFF);
 }

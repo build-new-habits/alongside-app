@@ -1,6 +1,11 @@
 /**
  * tools/verify-timer2.mjs
- * 28 Sep 2026 v2
+ * 28 Sep 2026 v3
+ *
+ * v3 - SMOOTH-P2c. Test 6's toDo() walked Decide -> Watch out -> Do.
+ *   The player is one screen now, so it asserts the controls are there
+ *   on arrival, and the CARD-4 tally becomes the one-screen safety order
+ *   (watch-for before how-to). Every sets-and-reps assertion unchanged.
  *
  * v2 - SMOOTH-P2a. "each side" (no number) moves from counted to null.
  *   Counted meant no clock AND nothing to count: 90-90 Hip Stretch showed
@@ -252,10 +257,13 @@ console.log("\nTEST 6 — the player, driven: sets one at a time, no false label
   let _watchPassed = 0, _toDoCalls = 0;
   const toDo = () => {
     _toDoCalls++;
-    tap("#wo-begin-btn");
-    const onWatch = !!main.querySelector("#wo-watch-btn");
-    if (onWatch) { _watchPassed++; tap("#wo-watch-btn"); }
-    return onWatch;
+    // SMOOTH-P2c. One screen: nothing to tap before the exercise, and
+    // the hazards still come before the instructions on it.
+    const oneScreen = !main.querySelector("#wo-begin-btn") && !main.querySelector("#wo-watch-btn") &&
+      !!main.querySelector("#wo-done-btn");
+    const html = main.innerHTML, w = html.indexOf("What to watch for"), h = html.indexOf("How to do it");
+    if (oneScreen && (w === -1 || w < h)) _watchPassed++;
+    return oneScreen;
   };
 
   localStorage.clear();
@@ -287,7 +295,7 @@ console.log("\nTEST 6 — the player, driven: sets one at a time, no false label
   paint();
 
   ok("6pc. POSITIVE CONTROL: the session mounted on Lat Pulldown",
-     /Lat Pulldown/i.test(T()) && !!main.querySelector("#wo-begin-btn"),
+     /Lat Pulldown/i.test(T()) && !!main.querySelector("#wo-done-btn"),
      `screen reads: ${T().slice(0, 140)}`);
 
   toDo();
@@ -361,10 +369,10 @@ console.log("\nTEST 6 — the player, driven: sets one at a time, no false label
      !/Set 1 of/.test(T()), T().slice(0, 140));
 
   // CARD-4. Asserted once, covering every toDo() in this block.
-  ok("CARD-4. every route to DO passed through the warnings page (" +
+  ok("SMOOTH-P2c. every exercise was one screen, hazards before how-to (" +
      _watchPassed + " of " + _toDoCalls + ")",
      _toDoCalls > 0 && _watchPassed === _toDoCalls,
-     "a run reached DO without passing WATCH");
+     "a Start-this-one step came back, or instructions render above what to watch for");
 }
 
 console.log(`\n  ${fails === 0 ? "ALL PASS" : fails + " RED"}\n`);

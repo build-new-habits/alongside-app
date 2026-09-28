@@ -2180,6 +2180,26 @@ export function exerciseSeconds(ex) {
   return (ex.sets || 3) * 90;
 }
 
+/**
+ * "3 sets of 8 reps", "3 sets of 10 each side", "3 sets of 8 to 10 reps",
+ * "3 sets of 30 seconds" -- read from the entry's instructions, last
+ * line first. Returns { sets, reps, side } or null.
+ */
+function _writtenDose(ex) {
+  const lines = Array.isArray(ex?.instructions) ? [...ex.instructions].reverse() : [];
+  for (const line of lines) {
+    const m = String(line).match(/(\d+)\s+sets?\s+of\s+(\d+(?:\s*(?:\u2013|-|to)\s*\d+)?)\s*(reps?|repetitions|seconds?|secs?)?\s*(each\s+(?:side|leg|arm))?/i);
+    if (!m) continue;
+    const sets = parseInt(m[1], 10);
+    if (!(sets > 0 && sets <= 6)) continue;
+    const range = m[2].replace(/\s*(?:\u2013|-|to)\s*/, "\u2013");
+    const unit  = m[3] && /^s/i.test(m[3]) ? " seconds" : "";
+    const side  = m[4] ? ` ${m[4].toLowerCase().replace(/\s+/g, " ")}` : "";
+    return { sets, reps: `${range}${unit}`, side };
+  }
+  return null;
+}
+
 /** Whole-exercise time for a dosed move: the work, and a rest between sets. */
 function _doseSeconds(sets, workPerSet, rest) {
   return sets * workPerSet + Math.max(0, sets - 1) * rest;
@@ -2210,6 +2230,20 @@ export function withDefaultDose(ex, intensity) {
   if (!DOSE_PATTERNS.has(ex.movementPattern)) return ex;
   if (DOSE_SKIP_CATEGORIES.has(ex.category)) return ex;
   const level = intensity || _sessionIntensity() || "moderate";
+  // The entry's own words win. About ninety library entries write their
+  // dose into the last instruction -- "Complete 3 sets of 8 reps" -- and
+  // a plan saying 3 × 10 above an instruction saying 3 sets of 8 is two
+  // answers on one screen. A gentle day still takes a set off.
+  const written = _writtenDose(ex);
+  if (written) {
+    const wsets = level === "low" ? Math.max(2, written.sets - 1) : written.sets;
+    const wside = written.side || (ex.perSide && /^[\d\u2013-]+$/.test(written.reps) ? " each side" : "");
+    const rest  = Number(ex.rest) > 0 ? Number(ex.rest) : 60;
+    const work  = 10 * 4 * (wside ? 2 : 1);
+    return { ...ex, sets: wsets, reps: `${written.reps}${wside}`, rest,
+             duration: _doseSeconds(wsets, work, rest), _doseWork: work,
+             _defaultDose: true, _doseFrom: "instructions" };
+  }
   const sets  = Number(ex.sets) > 0 ? Number(ex.sets) : (level === "low" ? 2 : 3);
   const reps  = level === "high" ? "8\u201312" : "10";
   const side  = ex.perSide ? " each side" : "";

@@ -89,10 +89,16 @@ ok("1b. holds, carries, stretches and cardio keep their clock", timedDosed.size 
 
 // ── 2. THE DEFAULT, BY DAY ──────────────────────────────────────────────
 console.log("\nTEST 2 - three sets of ten; eight to twelve on a harder day; two sets on a gentle one");
+// The default applies where the entry says nothing; where its own
+// instructions state a dose, that wins (test 2f).
 const doseOn = (intensity) => {
-  fresh(intensity);
-  const s = SB.buildSession({ sessionType: "full", durationMins: 40, equipmentOverride: FULL_GYM });
-  return mainOf(s).filter(e => e._defaultDose);
+  const out = [];
+  for (let i = 0; i < 6; i++) {
+    fresh(intensity);
+    const s = SB.buildSession({ sessionType: "full", durationMins: 40, equipmentOverride: FULL_GYM });
+    out.push(...mainOf(s).filter(e => e._defaultDose && e._doseFrom !== "instructions"));
+  }
+  return out;
 };
 const mod = doseOn("moderate"), hi = doseOn("high"), lo = doseOn("low");
 ok("2a. moderate: 3 × 10", mod.length > 0 && mod.every(e => e.sets === 3 && /^10\b/.test(e.reps)), JSON.stringify(mod.map(e => [e.sets, e.reps])));
@@ -101,6 +107,18 @@ ok("2c. gentle day: 2 × 10", lo.length > 0 && lo.every(e => e.sets === 2 && /^1
 ok("2d. one-sided moves say each side", mod.length > 0 && [...mod, ...hi, ...lo].filter(e => e.perSide).every(e => /each side/.test(e.reps)));
 ok("2e. the library entry itself is never changed (the dose is on the session's copy)",
    mod.length > 0 && mod.every(e => { const lib = EXERCISES.find(x => x.id === e.id); return lib && lib.reps == null && lib !== e; }));
+
+const writtenLib = EXERCISES.filter(e => e.reps == null && (e.instructions || []).some(l => /\d+ sets? of \d+/.test(l)));
+let wChecked = 0, wWrong = [];
+for (const lib of writtenLib) {
+  const d = SB.withDefaultDose({ ...lib, section: "main" }, "moderate");
+  if (!d._defaultDose) continue;
+  wChecked++;
+  const m = (lib.instructions || []).join(" ").match(/(\d+) sets? of (\d+)/);
+  if (!(d._doseFrom === "instructions" && String(d.sets) === m[1] && String(d.reps).startsWith(m[2]))) wWrong.push(`${lib.name}: ${d.sets} × ${d.reps}`);
+}
+ok("2f. where the entry's own instructions state a dose, the plan uses it", wChecked > 20 && wWrong.length === 0,
+   `${wChecked} checked; ${wWrong.slice(0, 6).join("; ")}`);
 
 // ── 3. THE TIME ASKED FOR ───────────────────────────────────────────────
 console.log("\nTEST 3 - the session fills the time asked for (within 15% either way)");

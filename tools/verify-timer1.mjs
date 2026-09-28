@@ -1,6 +1,13 @@
 /**
  * tools/verify-timer1.mjs
- * 08 Sep 2026 v1
+ * 28 Sep 2026 v2
+ *
+ * v2 - SMOOTH-P2c. The coach's player is one screen per exercise, so
+ *   there is no route to walk to DO: the clock and Done are on the first
+ *   screen. toDo() now ASSERTS that (no Start-this-one, no Watch-out
+ *   page, the controls present), and the CARD-4 tally is replaced by the
+ *   same safety property on the one screen: what to watch for renders
+ *   before how to do it. Every timer assertion is unchanged.
  *
  * TIMER-1. The one automatic move in a session says so.
  *
@@ -109,10 +116,13 @@ const tap = (sel) => {
 let _watchPassed = 0, _toDoCalls = 0;
 const toDo = () => {
   _toDoCalls++;
-  tap("#wo-begin-btn");
-  const onWatch = !!main.querySelector("#wo-watch-btn");
-  if (onWatch) { _watchPassed++; tap("#wo-watch-btn"); }
-  return onWatch;
+  // SMOOTH-P2c. One screen: nothing to tap before the exercise, and
+  // the hazards still come before the instructions on it.
+  const oneScreen = !main.querySelector("#wo-begin-btn") && !main.querySelector("#wo-watch-btn") &&
+    !!main.querySelector("#wo-done-btn");
+  const html = main.innerHTML, w = html.indexOf("What to watch for"), h = html.indexOf("How to do it");
+  if (oneScreen && (w === -1 || w < h)) _watchPassed++;
+  return oneScreen;
 };
 
 /** Live regions with actual content in them. An empty one announces nothing. */
@@ -169,7 +179,7 @@ console.log("\nTEST 1 - the countdown running out is announced");
 
 const built = freshSession();
 ok("1pc. positive control: the session mounted on an exercise",
-   /1 of/.test(T()) && !!main.querySelector("#wo-begin-btn"),
+   /1 of/.test(T()) && !!main.querySelector("#wo-done-btn"),
    `screen reads: ${T().slice(0, 120)}`);
 
 toDo();
@@ -253,10 +263,10 @@ ok("4a. the next exercise starts clean",
 
 
 // CARD-4. Asserted once, covering every toDo() above.
-ok("CARD-4. every route to DO passed through the warnings page (" +
+ok("SMOOTH-P2c. every exercise was one screen, hazards before how-to (" +
    _watchPassed + " of " + _toDoCalls + ")",
    _toDoCalls > 0 && _watchPassed === _toDoCalls,
-   "a run reached DO without passing WATCH");
+   "a Start-this-one step came back, or instructions render above what to watch for");
 
 console.log(fails === 0
   ? "\nTIMER-1: all assertions pass\n"

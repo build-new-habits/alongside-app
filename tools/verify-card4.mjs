@@ -1,6 +1,14 @@
 /**
  * tools/verify-card4.mjs
- * 13 Sep 2026 v1
+ * 28 Sep 2026 v2
+ *
+ * v2 - SMOOTH-P2c. workout.js moved to one screen per exercise (spec
+ *   4.4, exercise-card.js layout "flow"). Tests 7 and 8 keep the page
+ *   rules for the three views still on pages; for workout.js, 7.1 now
+ *   asserts the set-done control renders only while the exercise is
+ *   unfinished, and 8.9 that it uses the flow layout and keeps no page
+ *   state (a half-migrated view with both is the fault to catch). The
+ *   consumer set (test 11) is unchanged at four. Nothing loosened.
  *
  * CARD-4. The exercise card becomes four pages -- decide, watch, do,
  * note -- the hazards get a page of their own, and an image slot arrives
@@ -300,15 +308,16 @@ console.log("\nTEST 7 — the per-set control stays on DO (TIMER-2)");
      Object.values(src).every(s => s.length > 2000 &&
        /import\s*\{[^}]*renderExerciseCard[^}]*\}\s*from\s*"\.\.\/exercise-card\.js"/.test(s)));
 
-  ok("7.1 workout.js keeps the set-done control inside the DO branch", (() => {
+  ok("7.1 workout.js (one screen) renders set-done only while the exercise is unfinished", (() => {
     const s = src["workout.js"];
-    const a = s.indexOf('currentCardPage === "do"');
-    const b = s.indexOf('currentCardPage === "note"', a);
-    return a > -1 && b > a && s.slice(a, b).includes("wo-set-done-btn");
+    const a = s.indexOf("${exerciseDone ? `");
+    const e = a > -1 ? s.indexOf("` : `", a) : -1;
+    return a > -1 && e > a && !s.slice(a, e).includes("wo-set-done-btn") &&
+           s.indexOf("wo-set-done-btn", e) > e;
   })());
 
-  ok("7.2 the set-done control appears in no WATCH branch",
-     Object.values(src).every(s => {
+  ok("7.2 the set-done control appears in no WATCH branch (paged views)",
+     Object.entries(src).filter(([k]) => k !== "workout.js").every(([, s]) => {
        const a = s.indexOf('currentCardPage === "watch"');
        if (a < 0) return false;
        const b = s.indexOf('currentCardPage === "do"', a);
@@ -334,11 +343,16 @@ console.log("\nTEST 8 — moving forward passes the warnings; Back goes one page
   ok("8.4 Back from NOTE goes to DO",
      /data-xcard-back="do"/.test(H.note));
 
-  const VIEWS = ["workout", "gym-programme", "core-session", "prescribed-session"];
+  // SMOOTH-P2c. workout.js is one screen now; see 8.9.
+  const VIEWS = ["gym-programme", "core-session", "prescribed-session"];
   const src = Object.fromEntries(
     VIEWS.map(v => [v, strip(fs.readFileSync(`js/views/${v}.js`, "utf8"))]));
+  const wo = strip(fs.readFileSync("js/views/workout.js", "utf8"));
 
-  ok("8.5 CONTROL: four view sources read and each holds page state",
+  ok("8.9 workout.js uses the one-screen layout and keeps no page state",
+     /layout:\s*"flow"/.test(wo) && !/currentCardPage/.test(wo));
+
+  ok("8.5 CONTROL: three paged view sources read and each holds page state",
      VIEWS.every(v => src[v].length > 2000 && /currentCardPage/.test(src[v])));
 
   ok("8.6 no view sends DECIDE straight to DO", (() => {

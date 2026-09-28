@@ -1,6 +1,29 @@
 /**
  * workout.js - Workout Execution View
- * 12 Sep 2026 v19
+ * 28 Sep 2026 v20
+ *
+ * v20 - SMOOTH-P2c. One screen per exercise. Spec 4.4.
+ *
+ *   Each exercise was four pages (Decide, Watch out, Do, Note): three
+ *   taps before the first rep, the full hurt-and-ache text open at the
+ *   top of every one, a raw category id ("chest-stretch") and a points
+ *   badge under the name. Graeme, 27 Sep: "too many pages before you get
+ *   to the exercises... It feels rough."
+ *
+ *   Now: the section, the name, then WHAT TO DO -- 3 × 10 and "Set 1 of
+ *   3", or the clock -- with last time's numbers already in the log. The
+ *   card below keeps the safety order on one page (exercise-card.js v12).
+ *   A counted exercise is one tap per set; a timed one is Start, and the
+ *   clock ends it. When it is done, the same screen offers "How was
+ *   that?" and "Next: <name>" -- no page turn.
+ *
+ *   Taps to the first rep, from the plan: one. Was three.
+ *
+ *   EXIT is one sheet with three choices, and every one lands on Home or
+ *   the finish: Keep going · End it here and save · Leave without
+ *   saving. "Carry on later" joins it with Home's Carry-on card in P3 --
+ *   offering it before Home can show it would be a promise with nothing
+ *   behind it.
  *
  * v19 - TIMER-2. The clock belongs to the exercise, not to lifting.
  *
@@ -323,7 +346,7 @@ import { renderFeedbackControl, attachFeedbackEvents } from "../exercise-feedbac
 import { renderExerciseCard, attachCardEvents } from "../exercise-card.js";
 import { isGateDue, renderSafetyGate, attachSafetyGate } from "../safety-gate.js";
 import { resolveTiming, formatTime } from "../exercise-timing.js";
-import { renderLogBlock, attachLogEvents, scrollToTop, lastLine } from "../session-log.js";
+import { renderLogBlock, attachLogEvents, scrollToTop } from "../session-log.js";
 import { selectMoment, recordMomentShown, dismissMoment } from "../data/grounding-moments.js";
 import { checkinData }   from "../data/checkin.js";
 import { recordSession } from "../data/programmeEngine.js";
@@ -336,10 +359,15 @@ let timerInterval = null;
 let timeRemaining = 0;
 let timerStarted = false; // Timer doesn't start until user taps Start
 
-// CARD-3. "decide" | "do" | "note". Ephemeral UI state, deliberately not
-// in the store: surviving a reload would put somebody back on NOTE for an
-// exercise they have not done. Reset on every exercise change.
-let currentCardPage = "decide";
+// SMOOTH-P2c. Replaces CARD-3's page ("decide" | "watch" | "do" |
+// "note"). One screen now; the only state is whether this exercise is
+// finished, which decides what the actions offer. Ephemeral, reset on
+// every exercise change, never stored -- same reasons as before.
+let exerciseDone = false;
+
+// SMOOTH-P2c. Move focus to the new exercise's name after a change, so a
+// screen reader starts at the top of the new card (2.4.3).
+let focusName = false;
 
 // TIMER-2, 12 Sep 2026. Which set the person is on, 1-based. Only ever
 // read on a counted exercise -- a stretch has sets in the data too, but
@@ -439,56 +467,42 @@ export function render() {
   const isLastExercise = currentExerciseIndex === workout.exercises.length - 1;
   const progress = ((currentExerciseIndex) / workout.exercises.length) * 100;
 
+  const next = workout.exercises[currentExerciseIndex + 1] || null;
+  const sectionLabel = SECTION_LABELS[exercise.section || exercise.role] || "";
+  const timed = !!resolveTiming(exercise).seconds;
+
   return `
-    <div class="view workout-view">
-      <!-- Header with progress -->
+    <div class="view workout-view wo-flow">
       <div class="workout-header">
         <button class="btn btn-ghost" id="exit-workout-btn" aria-label="Exit workout">\u2715 Exit</button>
-        <div class="workout-progress-info" aria-label="Exercise ${currentExerciseIndex + 1} of ${workout.exercises.length}">
+        <div class="workout-progress-info">
           <span>${currentExerciseIndex + 1} of ${workout.exercises.length}</span>
         </div>
       </div>
 
-      <!-- Progress bar -->
-      <div class="workout-progress-bar" role="progressbar" aria-valuenow="${Math.round(progress)}" aria-valuemin="0" aria-valuemax="100" aria-label="Workout progress">
+      <div class="workout-progress-bar" role="progressbar" aria-valuenow="${Math.round(progress)}" aria-valuemin="0" aria-valuemax="100" aria-label="Workout progress: exercise ${currentExerciseIndex + 1} of ${workout.exercises.length}">
         <div class="workout-progress-fill" style="width: ${progress}%"></div>
       </div>
 
-      <!-- Exercise display -->
       <div class="exercise-display">
-        ${(() => {
-          // ROLE-1. No label means no element. Emptying the text alone
-          // would leave a styled pill with an aria-label reading
-          // "Exercise type: " -- an announced control with nothing in it,
-          // which is worse for a screen reader than the missing badge.
-          const roleLabel = formatRole(exercise.role);
-          if (!roleLabel) return "";
-          return `<div class="exercise-role-badge ${exercise.role}" aria-label="Exercise type: ${roleLabel}">${roleLabel}</div>`;
-        })()}
+        ${sectionLabel ? `<p class="wo-flow__section">${sectionLabel}</p>` : ""}
+        <h1 class="exercise-name" id="wo-exercise-name" tabindex="-1">${exercise.name}</h1>
 
-        <h1 class="exercise-name">${exercise.name}</h1>
-
-        <div class="exercise-meta">
-          ${exercise.perSide ? "<span class=\"meta-tag\">Each side</span>" : ""}
-          <span class="meta-tag">${exercise.category}</span>
-          <span class="meta-tag">+${exercise.credits} \u2B50</span>
+        <div class="exercise-target">
+          ${renderExerciseTarget(exercise)}
         </div>
 
-        <!-- CARD-3. Three pages, one job each. The target and the video
-             are DO material -- they belong beside the movement, not above
-             the decision to attempt it. The log block, the grounding
-             moment and the feedback control are NOTE, feedback last.
-             Nothing safety-bearing is page-scoped: bodyCaution renders on
-             all three pages, inside the card. -->
+        ${finishedByTimer ? `
+          <p class="xcard-timer-done" role="status">That is the time up on ${exercise.name}.</p>
+        ` : ""}
+
+        ${renderLogBlock(exercise, `wo-log-${currentExerciseIndex}`)}
+
         ${renderExerciseCard(exercise, {
           idPrefix: `wo-${currentExerciseIndex}`,
-          page:     currentCardPage,
-          lastTime: lastLine(exercise),
+          layout:   "flow",
+          lastTime: "",
           doSlot: `
-            <div class="exercise-target">
-              ${renderExerciseTarget(exercise)}
-            </div>
-
             <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(exercise.youtube || (exercise.name + " exercise form"))}"
                target="_blank"
                rel="noopener noreferrer"
@@ -496,23 +510,12 @@ export function render() {
                aria-label="Watch how to do ${exercise.name} on YouTube (opens in new tab)">
               <span class="youtube-icon" aria-hidden="true">\u25B6\uFE0F</span>
               Watch how to do this
-            </a>`,
-          noteSlot: `
-            <!-- TIMER-1. The announcement for the one automatic move.
-                 role="status" is polite: it waits for a gap rather than
-                 cutting across whatever is being read. It renders only
-                 when the countdown brought them here. -->
-            ${finishedByTimer ? `
-              <p class="xcard-timer-done" role="status">
-                That is the time up on ${exercise.name}.
-              </p>
-            ` : ""}
+            </a>`
+        })}
 
-            <!-- Session notes. LOG-1: this used to exist only in
-                 gym-programme.js, so a coach-built session offered no way
-                 to write anything down. -->
-            ${renderLogBlock(exercise, `wo-log-${currentExerciseIndex}`)}
-
+        ${exerciseDone ? `
+          <div class="wo-flow__done" role="group" aria-label="${exercise.name} done">
+            ${renderFeedbackControl(exercise)}
             ${groundingMoment ? `
               <aside class="gmoment" aria-label="Something to notice">
                 <p class="gmoment__text">${groundingMoment.text}</p>
@@ -520,65 +523,35 @@ export function render() {
                         aria-label="Do not show this one again">Not for me</button>
               </aside>
             ` : ""}
-
-            ${renderFeedbackControl(exercise)}`
-        })}
+          </div>
+        ` : ""}
       </div>
 
-      <!-- Action buttons. Ids unchanged; WHICH of them renders is what
-           CARD-3 changed. Skip is on DECIDE only. -->
+      <!-- SMOOTH-P2c. What the thumb needs, and nothing else. -->
       <div class="workout-actions">
-        ${currentCardPage === "decide" ? `
-          <button class="btn btn-accent btn-large btn-full" id="wo-begin-btn">
-            Start this one \u2192
+        ${exerciseDone ? `
+          <button class="btn btn-primary btn-large btn-full" id="complete-exercise-btn">
+            ${isLastExercise ? "Finish the session" : `Next: ${next.name} \u2192`}
           </button>
-
-          <button class="btn btn-ghost btn-small" id="skip-exercise-btn">
-            Skip this one
-          </button>
-        ` : ""}
-
-          <!-- CARD-4. The step out of the warnings. DECIDE now leads here
-               and this leads on to DO, so moving forward still passes the
-               hazards before the instructions -- the property the old
-               single-page layout had for free and a separate page could
-               easily have lost. -->
-        ${currentCardPage === "watch" ? `
-          <button class="btn btn-accent btn-large btn-full" id="wo-watch-btn">
-            Got it \u2014 show me how \u2192
-          </button>
-        ` : ""}
-
-        ${currentCardPage === "do" ? `
-          ${resolveTiming(exercise).seconds ? `
+        ` : `
+          ${timed ? `
             <button class="btn btn-large btn-full ${timerStarted ? "btn-secondary" : "btn-accent"}" id="timer-toggle-btn" aria-live="polite">
-              ${!timerStarted ? "\u25B6 Start Timer" : (timerInterval ? "\u23F8 Pause" : "\u25B6 Resume")}
+              ${!timerStarted ? "\u25B6 Start" : (timerInterval ? "\u23F8 Pause" : "\u25B6 Resume")}
             </button>
           ` : ""}
-
-          <!-- TIMER-2. One set at a time, on a counted exercise with more
-               than one. The old flow gave no way to say "that is one done":
-               the clock ran out and the exercise was over, whether you had
-               done one set or three. -->
           ${_setsRemaining(exercise) ? `
             <button class="btn btn-accent btn-large btn-full" id="wo-set-done-btn">
-              Set ${currentSet} done \u2192
+              Set ${currentSet} done
             </button>
           ` : ""}
-
-          <!-- Rendered whether or not there is a clock. A timer that has
-               not finished must not trap somebody who has, and neither
-               must a set counter: this is always the way out. -->
-          <button class="btn btn-primary btn-large btn-full" id="wo-done-btn">
-            ${_setsRemaining(exercise) ? "Finish this one \u2192" : "Done \u2192"}
+          <!-- Always a way to say "done": a clock that has not finished
+               must not trap somebody who has, and neither must a set
+               counter. -->
+          <button class="btn ${timed || _setsRemaining(exercise) ? "btn-secondary" : "btn-primary btn-large"} btn-full" id="wo-done-btn">
+            ${_setsRemaining(exercise) ? "Finish this one" : "Done"}
           </button>
-        ` : ""}
-
-        ${currentCardPage === "note" ? `
-          <button class="btn btn-primary btn-large btn-full" id="complete-exercise-btn">
-            ${isLastExercise ? "\uD83C\uDF89 Complete Workout" : "Next Exercise \u2192"}
-          </button>
-        ` : ""}
+          <button class="btn btn-ghost btn-small" id="skip-exercise-btn">Skip this one</button>
+        `}
       </div>
     </div>
   `;
@@ -683,24 +656,24 @@ function renderExerciseTarget(exercise) {
       </div>
     `;
   } else if (exercise.reps) {
+    // SMOOTH-P2c. One big line -- "3 × 10" -- and the words under it.
+    // "3 × 10 each side" wrapped to four lines in a three-column row on a
+    // phone; the number is what is read at arm's length, the rest is
+    // read once.
     const sets = exercise.sets || 3;
-    const reps = exercise.reps || 10;
+    const reps = String(exercise.reps || 10);
+    const m    = reps.match(/^\s*([\d\u2013\-]+)\s*(.*)$/);
+    const big  = m ? m[1] : reps;
+    const tail = m ? m[2] : "";
+    const sub  = [tail, exercise.rest ? `${exercise.rest}s rest between sets` : ""].filter(Boolean).join(" \u00B7 ");
     return `
-      <div class="reps-display">
-        <div class="reps-info">
-          <span class="reps-value">${sets} \u00D7 ${reps}</span>
-          <span class="reps-label">sets \u00D7 reps</span>
-        </div>
+      <div class="reps-display wo-target">
+        <p class="reps-value">${sets} \u00D7 ${big}</p>
+        ${sub ? `<p class="reps-label">${sub}</p>` : ""}
         ${sets > 1 ? `
-          <div class="set-progress" role="status">
+          <p class="set-progress" role="status">
             <span class="set-progress-value">Set ${Math.min(currentSet, sets)} of ${sets}</span>
-          </div>
-        ` : ""}
-        ${exercise.rest ? `
-          <div class="rest-info">
-            <span class="rest-value">${exercise.rest}s</span>
-            <span class="rest-label">rest between sets</span>
-          </div>
+          </p>
         ` : ""}
       </div>
     `;
@@ -712,34 +685,14 @@ function renderExerciseTarget(exercise) {
 // identical copies, and the shared one also floors null to 0:00 rather
 // than rendering "NaN:NaN".
 
-/**
- * ROLE-1, 08 Sep 2026. Returns "" for anything it does not recognise.
- *
- * It used to end `roles[role] || role`, which passes the input straight
- * through when the lookup misses. For an absent role that input is
- * `undefined`, and a template literal stringifies it: the badge above
- * every exercise name in every coach-built session read UNDEFINED, and
- * the same expression fed `class="exercise-role-badge undefined"` and
- * `aria-label="Exercise type: undefined"`, so it was spoken as well as
- * shown.
- *
- * The stamp at assembly in session-builder.js is the real fix. This is
- * the floor underneath it: sessions cached before today carry no role,
- * and any future builder that forgets the stamp must produce an empty
- * slot rather than a word no reader can make sense of. A fallthrough
- * that echoes its own input cannot fail safely -- it will always print
- * whatever it was given, which for a miss is the thing you least want.
- */
-function formatRole(role) {
-  const roles = {
-    warmup:    "\uD83D\uDD25 Warm Up",
-    main:      "\uD83D\uDCAA Main",
-    accessory: "\uD83C\uDFAF Accessory",
-    finisher:  "\uD83C\uDFC1 Finisher",
-    cooldown:  "\uD83E\uDDD8 Cool Down"
-  };
-  return roles[role] || "";
-}
+// ROLE-1's formatRole() is retired with the badge (SMOOTH-P2c). Its rule
+// survives in SECTION_LABELS: a lookup that misses prints NOTHING, never
+// its own input -- verify-role1 tests 3 and 4 hold it.
+// SMOOTH-P2c. Plain words, no emoji, no pill: the badge read "COOL
+// DOWN" in blue on navy (below 3:1). The section is context, not an
+// instruction, so it is a quiet label above the name.
+const SECTION_LABELS = { warmup: "Warm up", main: "Main", cooldown: "Cool down",
+                         accessory: "Main", finisher: "Main" };
 
 export function onMount() {
   const workout = _getWorkout();
@@ -859,67 +812,28 @@ export function onMount() {
     skipExercise();
   });
 
-  // CARD-3. Forward, and deliberately without touching the clock.
-  document.getElementById("wo-begin-btn")?.addEventListener("click", () => {
-    currentCardPage = "watch";
-    scrollToTop();
-    router.navigate("workout");
-  });
-
-  // CARD-4. WATCH -> DO. Same shape as the handler above it, and
-  // deliberately without touching the clock.
-  document.getElementById("wo-watch-btn")?.addEventListener("click", () => {
-    currentCardPage = "do";
-    scrollToTop();
-    router.navigate("workout");
-  });
-
-  // TIMER-2. Each tap is one set. The last set does not advance the
-  // counter into nothing -- it opens NOTE, because that IS the end of the
-  // exercise. Reflection after the last set, not after the first.
+  // TIMER-2. Each tap is one set. The last set ends the exercise.
   document.getElementById("wo-set-done-btn")?.addEventListener("click", () => {
     const sets = exercise.sets || 1;
     if (currentSet < sets) {
       currentSet++;
     } else {
-      currentCardPage = "note";   // the last set IS the end of the exercise
+      exerciseDone = true;   // the last set IS the end of the exercise
     }
-    scrollToTop();
     router.navigate("workout");
   });
 
   document.getElementById("wo-done-btn")?.addEventListener("click", () => {
-    currentCardPage = "note";
-    scrollToTop();
+    pauseTimer();
+    exerciseDone = true;
     router.navigate("workout");
   });
 
-  // Back is announced by the card, not performed by it: the page number
-  // has one owner and it is this file.
-  //
-  // Bound once. onMount re-fires on every navigate and #app outlives the
-  // render, so an unguarded addEventListener here stacks a new handler per
-  // exercise -- the same class of leak attachCardEvents guards against.
-  const _root = document.getElementById("app") || document;
-  if (!_root.__woPageBound) {
-    _root.__woPageBound = true;
-    _root.addEventListener("xcard:page", ev => {
-      // Every view binds this on the shared #app root and none is ever
-      // removed, so a handler from a view you visited earlier is still
-      // live. Without this prefix check, Back inside one session fires
-      // another view's handler and navigates you out of it.
-      const _pfx = (ev.detail && ev.detail.prefix) || "";
-      if (!_pfx.startsWith("wo-")) return;
-      const to = ev.detail && ev.detail.page;
-      if (to !== "decide" && to !== "watch" && to !== "do") return;
-      // TIMER-1. Any page move the person makes clears the notice, so
-      // going back to Do and returning does not re-announce a countdown
-      // that already finished.
-      finishedByTimer = false;
-      currentCardPage = to;
-      scrollToTop();
-      router.navigate("workout");
-    });
+  // SMOOTH-P2c. A new exercise starts at its name, for eyes and for
+  // screen readers alike.
+  if (focusName) {
+    focusName = false;
+    document.getElementById("wo-exercise-name")?.focus({ preventScroll: true });
   }
 }
 
@@ -930,66 +844,63 @@ export function onMount() {
 // 23 Jul 2026). Added 30 Jul 2026 as part of the gym exit-guard gap fix.
 
 function showExitConfirm() {
+  if (document.getElementById("session-exit-overlay")) return;
+  const opener = document.activeElement;
   const overlay = document.createElement("div");
   overlay.className = "session-exit-overlay";
   overlay.id        = "session-exit-overlay";
   overlay.setAttribute("role", "dialog");
   overlay.setAttribute("aria-modal", "true");
-  overlay.setAttribute("aria-label", "Exit workout confirmation");
+  overlay.setAttribute("aria-labelledby", "exit-sheet-title");
+  // SMOOTH-P2c. One sheet, three choices, every one lands somewhere
+  // known: back in the session, on the finish screen, or on Home.
+  // "Carry on later" joins in P3 with the Home card that makes it true.
+  //
+  // EXIT-1 (12 Aug) still holds: leaving without saving is always
+  // offered, at the smallest visual weight -- available, not encouraged.
   overlay.innerHTML = `
     <div class="session-exit-card">
-      <div class="session-exit-coach-row">
-        <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
-        <p class="session-exit-coach-text">
-          Hold on — if you leave now this session won’t be saved. Are you sure?
-        </p>
-      </div>
+      <h2 class="session-exit-title" id="exit-sheet-title">Leave this session?</h2>
       <div class="session-exit-actions">
-        <button class="btn btn-primary btn-full" id="exit-confirm-stay"
-                aria-label="Stay in workout">
-          Stay in session
+        <button class="btn btn-primary btn-full" id="exit-confirm-stay">Keep going</button>
+        <button class="btn btn-secondary btn-full" id="exit-confirm-leave">
+          End it here and save
         </button>
-        <button class="btn btn-ghost btn-full" id="exit-confirm-leave"
-                aria-label="Exit and save progress so far">
-          Exit and save progress
-        </button>
-        <!-- EXIT-1, 12 Aug 2026. Graeme, device pass part 4: "I started
-             quite a few to see if it was those. When I exited it asked me
-             to save. I need to be able to exit and not save. That's why my
-             sessions have shot up, but I haven't done any."
-
-             The shared session-guard.js has had this third option since
-             21 May. NINE views each built their own two-button dialog
-             instead and none of them included it, so opening a session to
-             look at it and backing out ALWAYS wrote a partial entry.
-             Graeme's own count reached 7 of 3 from sessions he never did.
-
-             Deliberately the smallest visual weight of the three -- the
-             option is available, not encouraged -- matching
-             .sg-exit-discard's existing treatment rather than inventing
-             one. -->
-        <button class="btn btn-ghost btn-full session-exit-discard" id="exit-confirm-discard"
-                aria-label="Exit without saving this session">
-          Exit without saving
+        <button class="btn btn-ghost btn-full session-exit-discard" id="exit-confirm-discard">
+          Leave without saving
         </button>
       </div>
     </div>
   `;
 
   document.body.appendChild(overlay);
+  const stay = document.getElementById("exit-confirm-stay");
+  stay?.focus();
 
-  document.getElementById("exit-confirm-stay").addEventListener("click", () => {
-    overlay.remove();
+  const close = () => { overlay.remove(); opener?.focus?.(); };
+
+  // Focus stays in the sheet (2.1.2 / 2.4.3); Escape is Keep going.
+  overlay.addEventListener("keydown", e => {
+    if (e.key === "Escape") { e.preventDefault(); close(); return; }
+    if (e.key !== "Tab") return;
+    const f = [...overlay.querySelectorAll("button")];
+    const i = f.indexOf(document.activeElement);
+    if (e.shiftKey && i <= 0) { e.preventDefault(); f[f.length - 1].focus(); }
+    else if (!e.shiftKey && i === f.length - 1) { e.preventDefault(); f[0].focus(); }
   });
 
-  document.getElementById("exit-confirm-leave").addEventListener("click", () => {
+  stay?.addEventListener("click", close);
+
+  // Saves what was done and goes to the finish screen.
+  document.getElementById("exit-confirm-leave")?.addEventListener("click", () => {
     overlay.remove();
     savePartialSession();
     cleanupWorkout();
     router.navigate("reflect");
   });
 
-  // EXIT-1. Discard: leave WITHOUT writing a partial entry.
+  // EXIT-1. Discard: leave WITHOUT writing a partial entry. Home records
+  // the decline itself (EXIT-HOME), so it does not bounce back here.
   document.getElementById("exit-confirm-discard")?.addEventListener("click", () => {
     overlay.remove();
     dismountSessionGuard();
@@ -1013,7 +924,7 @@ function startTimer() {
       // forward move; every other transition is a tap.
       // TIMER-1. Which is exactly why it has to say so.
       finishedByTimer = true;
-      currentCardPage = "note";
+      exerciseDone = true;
       router.navigate("workout");
     }
   }, 1000);
@@ -1074,10 +985,10 @@ function resetTimer() {
   // last exercise carries in and the counter opens on the final set.
   currentSet    = 1;
   finishedByTimer = false;   // TIMER-1. A new exercise inherits nothing.
-  // CARD-3. A new exercise always starts on DECIDE. Both advance paths
-  // (complete and skip) come through here, so this is the one place it
-  // needs to happen.
-  currentCardPage = "decide";
+  // A new exercise starts unfinished, at its name. Both advance paths
+  // (complete and skip) come through here.
+  exerciseDone = false;
+  focusName    = true;
 }
 
 /**
@@ -1185,7 +1096,7 @@ function cleanupWorkout() {
   currentExerciseIndex = 0;
   timeRemaining = 0;
   timerStarted  = false;
-  currentCardPage = "decide";   // CARD-3. Index resets here, so the page must too.
+  exerciseDone = false;   // Index resets here, so this must too.
   // TIMER-1. And so must this. Without it, finishing a countdown, leaving,
   // and starting a NEW session showed "that is the time up on ..." on the
   // first exercise the person reached the note page for -- announcing a

@@ -1,7 +1,13 @@
 /* ============================================
    WORKOUT STYLES
    css/components/workout.css
-   15 Sep 2026 v17
+   28 Sep 2026 v18
+
+   v18 - SMOOTH-P2c. .wo-flow: one screen per exercise. A quiet section
+   label replaces the role pill (its cool-down colour was below 3:1 on
+   navy); the target leads; the card reads left-aligned, because centred
+   paragraphs are hard to track line to line. .xcard-how is the open
+   "How to do it" disclosure; .wo-flow__done holds "How was that?".
 
    v17 - CARD-5. .xcard-hurt (the collapsed hurt-and-ache row) and
    .xcard-stepper (the four beats, made visible). The summary keeps the
@@ -1730,4 +1736,101 @@
   .xcard-stepper-btn,
   .xcard-stepper-now,
   .xcard-stepper-ahead { font-size: var(--text-xs); }
+}
+
+
+/* ============================================
+   SMOOTH-P2c - ONE SCREEN PER EXERCISE
+   ============================================ */
+
+.wo-flow .exercise-display { text-align: left; }
+
+.wo-flow__section {
+  margin: var(--space-4) 0 var(--space-1);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--color-text-secondary);
+}
+
+.wo-flow .exercise-name {
+  margin: 0 0 var(--space-4);
+  line-height: 1.2;
+}
+
+.wo-flow .exercise-name:focus { outline: none; }
+.wo-flow .exercise-name:focus-visible {
+  outline: 3px solid var(--color-border-focus);
+  outline-offset: 4px;
+}
+
+.wo-flow .exercise-target {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--space-4);
+}
+
+.exercise-card--flow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+  text-align: left;
+}
+
+.xcard-how {
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md, 8px);
+}
+
+.xcard-how-summary {
+  min-height: 44px;
+  padding: var(--space-2) 0;
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.xcard-how-summary:focus-visible {
+  outline: 3px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+.xcard-how .exercise-section-list { margin: var(--space-2) 0 0; line-height: 1.55; }
+.xcard-how .xcard-more-form { color: var(--color-text-secondary); }
+
+.wo-flow__done {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-5, 1.5rem);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
+}
+
+.wo-flow .youtube-link { align-self: flex-start; }
+
+/* SMOOTH-P2c. The counted target: one big line, then the words. */
+.wo-flow .wo-target {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+}
+.wo-flow .wo-target .reps-value { margin: 0; line-height: 1; }
+.wo-flow .wo-target .reps-label {
+  margin: 0;
+  font-size: var(--text-base);
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+.wo-flow .wo-target .set-progress {
+  margin: var(--space-1) 0 0;
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  font-weight: 600;
+  color: var(--color-text);
 }
