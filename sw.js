@@ -1,7 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 28 Sep 2026 v564
+ * 28 Sep 2026 v565
+ *
+ * v565 - F7 CSS-ZERO + LANDMARK. New: css/components/finish.css.
+ *   Removed: views/workout-complete.js (never a route). Changed: main.css
+ *   and 25 views (nested role="main" removed). 196 gates.
  *
  * v564 - MOUNT-FAULT. No new files. Changed: views/community-impact.js,
  *   views/annual-reflection.js (both crashed on open). 196 gates.
@@ -4012,7 +4016,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v564";
+const CACHE_NAME = "alongside-v565";
 
 const SHELL_URLS = [
 
@@ -4078,6 +4082,7 @@ const SHELL_URLS = [
   "/alongside-app/css/components/practices.css",
   "/alongside-app/css/components/club-rooms.css",
   "/alongside-app/css/components/capture.css",
+  "/alongside-app/css/components/finish.css",
 
   // Core JS
   "/alongside-app/js/app.js",
@@ -4109,7 +4114,6 @@ const SHELL_URLS = [
   "/alongside-app/js/views/checkin-mini.js",
   "/alongside-app/js/views/coach-proposal.js",
   "/alongside-app/js/views/workout.js",
-  "/alongside-app/js/views/workout-complete.js",
   "/alongside-app/js/views/progress.js",
   "/alongside-app/js/views/settings.js",
   "/alongside-app/js/views/weekly-plan.js",
