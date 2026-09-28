@@ -1,5 +1,9 @@
 /*
  * css/components/settings.css
+ * 28 Sep 2026 v12
+ *   SMOOTH-P5. .tier-table: Free and the Plan side by side. On a phone
+ *   each row stacks, and each cell carries its column's name.
+ *
  * 28 Sep 2026 v11
  *   SMOOTH-P4c. The one page: .settings-lede, .settings-group,
  *   .settings-row (a row that opens its screen, with its current value)
@@ -1060,3 +1064,18 @@ button.settings-row:focus-visible { outline: 3px solid var(--color-border-focus)
 .settings-cond__name { font-weight: 600; color: var(--color-text); }
 .settings-cond__meta { font-size: var(--text-sm); color: var(--color-text-secondary); }
 .settings-cond__btn { flex: none; min-height: 44px; }
+
+
+/* ── SMOOTH-P5. The one table ───────────────────────────────── */
+.tier-table { width: 100%; margin: var(--space-4) 0; border-collapse: collapse; font-size: var(--text-sm); color: var(--color-text); }
+.tier-table__caption { text-align: left; margin-bottom: var(--space-2); font-weight: 700; color: var(--color-text); }
+.tier-table th, .tier-table td { padding: var(--space-2); vertical-align: top; text-align: left; border-bottom: 1px solid var(--color-border); line-height: 1.45; }
+.tier-table thead th { color: var(--color-text-secondary); font-weight: 600; }
+.tier-table tbody th { font-weight: 600; }
+@media (max-width: 640px) {
+  .tier-table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .tier-table tr { display: block; padding: var(--space-3) 0; border-bottom: 1px solid var(--color-border); }
+  .tier-table th, .tier-table td { display: block; padding: 2px 0; border: none; }
+  .tier-table tbody th { font-size: var(--text-base); margin-bottom: var(--space-1); }
+  .tier-table td::before { content: attr(data-label) ": "; font-weight: 600; color: var(--color-text-secondary); }
+}

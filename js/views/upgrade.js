@@ -1,6 +1,16 @@
 /**
  * upgrade.js - Upgrade / Membership view
- * 20 Aug 2026 v12
+ * 28 Sep 2026 v13
+ *
+ * v13 - SMOOTH-P5. The statements come from js/data/tier-table.js, the
+ *   one table Free and the Plan are described by (spec 4.11): what the
+ *   Plan adds is every row that differs, in that row's own words, and
+ *   what free keeps is every row that is the same. The page cannot say
+ *   something the table does not, and verify-plan-claims drives the app
+ *   to prove every row. The seven hand-written statements (and their
+ *   per-line proofs) are replaced; two of them described things free has
+ *   too ("the session changes when your day does", "it remembers your
+ *   conditions") and now sit where they belong -- in what free keeps.
  *
  * v12 - PLAIN-2. Three statements added, all verified against the live
  *   build and each naming the file that makes it true. Two of the seven
@@ -176,6 +186,7 @@
 import { store }  from "../store.js";
 import { router } from "../router.js";
 import { PRICE_MONTHLY, PRICE_ANNUAL } from "../data/pricing.js";
+import { PLAN_ADDS, FREE_KEEPS } from "../data/tier-table.js";
 
 export const centered = false;
 
@@ -215,32 +226,10 @@ export const centered = false;
 //     and the best line this product has. It goes up the day it ships.
 // Both stay in the marketing narrative. Neither goes on a page that
 // takes money until it is true.
-const STATEMENTS = [
-  // onboarding writes strategicGoal.targetDescription/targetDate;
-  // my-programme.js renders it. Free never sets one.
-  "You tell the coach where you're heading \u2014 a distance, a date, something you want to be able to do again, or just a direction.",
-  // gym-programme.js + programmeEngine.js chaptersDone: a completed
-  // chapter offers a successor that reasons from where the last one
-  // ended. CONT-1 gives movements that recur. This says what those two
-  // actually do and does NOT say the sessions get harder -- they do
-  // not yet, for anybody.
-  "Sessions follow on from one another instead of each starting fresh.",
-  // checkin.js + coach-proposal.js: energy, pain, time and feeling word
-  // are collected before every session and change what is built.
-  // ALSO TRUE ON FREE -- included because it describes the coaching
-  // relationship the page is selling, not because it is withheld.
-  "The session changes when your day does. Tired, sore, short of time, flat -- you say so, and it adapts.",
-  // conditions.js + prescribedExercises: told once, held permanently,
-  // never re-asked.
-  "It remembers your conditions and injuries, so you never have to say them twice.",
-  // programmeEngine.js getReEntryContext() -- REENTRY-2, 20 Aug 2026.
-  "If you have been away, it does not start you over. You come back where you left off, gentler if you need it.",
-  // progress.js: the free narrative stops after line 1; the 30- and
-  // 90-day windows and the type breakdown are the Plan's.
-  "Your progress becomes something the coach reads back to you \u2014 what has changed across months, not a list of what you did.",
-  // community-impact.js:143 -- "one credit per completed session, two
-  // on the Plan".
-  "Every session you finish counts double towards where the five percent goes.",
+// SMOOTH-P5. The table's differing rows, in their own words.
+const STATEMENTS = PLAN_ADDS;
+
+// The history below is kept: it is why the table exists.
   // WITHDRAWN 13 Aug 2026, same day it shipped. This said:
   //
   //   "And the long practices open up — the ones that go somewhere over
@@ -265,7 +254,7 @@ const STATEMENTS = [
   //
   // Goes back in when the mind destinations ship, alongside P11 in
   // personal-reads.js, which is waiting on the same thing.
-];
+
 
 export function render() {
   const tier   = store.get("tier") || "free";
@@ -363,9 +352,12 @@ export function render() {
            true as of R4, 20 Aug 2026. -->
       <section class="upgrade-block" aria-label="What stays free">
         <p class="upgrade-body">
-          And free stays exactly as it is: every session, every safety feature,
-          and choosing what you do. Nothing is taken away.
+          And free stays exactly as it is. Nothing is taken away. These are the
+          same on both, and always will be:
         </p>
+        <ul class="upgrade-keeps">
+          ${FREE_KEEPS.map(r => `<li><strong>${r.area}.</strong> ${r.free}.</li>`).join("")}
+        </ul>
       </section>
 
       <!-- PRICING. Honest, calm, no pressure. No badge on either option:

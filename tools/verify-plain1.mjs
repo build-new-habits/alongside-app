@@ -1,6 +1,12 @@
 /**
  * tools/verify-plain1.mjs
- * 20 Aug 2026 v1
+ * 28 Sep 2026 v2
+ *
+ * v2 - SMOOTH-P5. Section 6: the statements now come from the one table
+ *   (js/data/tier-table.js). The habit this checked -- every claim names
+ *   its evidence -- is kept, one level stronger: every row that differs
+ *   must name the gate that proves it, and verify-plan-claims TEST 3 runs
+ *   those proofs on both tiers.
  *
  * PLAIN-1 GATE — conversion copy may not sell what the product gives
  * away, and may not promise what the product has not built.
@@ -139,13 +145,15 @@ for (const [name, src] of [["upgrade.js", upgradeCopy], ["settings.js", settings
 // a comment naming the file that makes it true. This asserts the habit
 // survives: a statement added without evidence is the exact fault this
 // gate exists for.
-const block = upgrade.slice(upgrade.indexOf("const STATEMENTS = ["),
-                            upgrade.indexOf("];", upgrade.indexOf("const STATEMENTS = [")));
-const statementLines = block.split("\n").filter(l => /^\s*"/.test(l));
-const commentLines   = block.split("\n").filter(l => /^\s*\/\//.test(l));
-check("every upgrade STATEMENT is preceded by evidence naming a live file",
-  statementLines.length > 0 && commentLines.length >= statementLines.length,
-  `${statementLines.length} statements, ${commentLines.length} comment lines`);
+const tableSrc = fs.readFileSync(new URL("../js/data/tier-table.js", import.meta.url), "utf8");
+const { TIER_TABLE } = await import(new URL("../js/data/tier-table.js", import.meta.url).href);
+const differing = TIER_TABLE.filter(r => !r.same);
+check("the upgrade statements come from the one table", /const STATEMENTS = PLAN_ADDS;/.test(upgrade) && /from "\.\.\/data\/tier-table\.js"/.test(upgrade));
+check("every row that differs names the gate that proves it",
+  differing.length > 0 && differing.every(r => /verify-[a-z0-9-]+/.test(r.proof || "") && (r.says || "").length > 10),
+  differing.filter(r => !/verify-/.test(r.proof || "")).map(r => r.id).join(", "));
+check("and every gate it names exists",
+  differing.every(r => (r.proof.match(/verify-[a-z0-9-]+/g) || []).every(g => fs.existsSync(new URL(`./${g}.mjs`, import.meta.url)))));
 
 console.log(failures === 0
   ? "\nPLAIN-1 GATE GREEN\n"

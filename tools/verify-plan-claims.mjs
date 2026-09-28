@@ -1,6 +1,13 @@
 /**
  * tools/verify-plan-claims.mjs
- * 28 Sep 2026 v2
+ * 28 Sep 2026 v3
+ *
+ * v3 - SMOOTH-P5. EVERY PLACE THE PLAN IS DESCRIBED AGREES WITH ONE TABLE,
+ *   AND EVERY ROW OF THE TABLE IS TRUE. js/data/tier-table.js is the table
+ *   (spec 4.11). TEST 3 drives the app on both tiers and proves each row;
+ *   TEST 4 checks the upgrade page and Settings › Your plan say exactly
+ *   what the table says -- no more, and nothing another page withdrew.
+ *   Tests 0-2 unchanged.
  *
  * v2 - SMOOTH-P4c. Settings is one page: About > Plan and About > App
  *   are now row screens ("Your plan", "App version"), opened by a row
@@ -30,11 +37,13 @@ const { JSDOM } = __require("jsdom");
 const dom = new JSDOM('<!doctype html><div id="app"></div>', { url: "https://x/" });
 globalThis.window = dom.window;
 globalThis.document = dom.window.document;
-for (const k of ["navigator", "localStorage", "HTMLElement", "Node", "Event", "CustomEvent"])
+for (const k of ["navigator", "localStorage", "HTMLElement", "Node", "Event", "CustomEvent", "MouseEvent", "KeyboardEvent"])
   Object.defineProperty(globalThis, k, { value: dom.window[k], configurable: true, writable: true });
 dom.window.matchMedia = q => ({ matches: false, media: q, addEventListener() {}, removeEventListener() {}, addListener() {}, removeListener() {} });
 dom.window.scrollTo = () => {};
 globalThis.history = dom.window.history;
+globalThis.location = dom.window.location;
+dom.window.HTMLElement.prototype.scrollIntoView = () => {};
 
 const root = new URL("../", import.meta.url);
 const swText = fs.readFileSync(new URL("sw.js", root), "utf8");
@@ -100,6 +109,104 @@ await wait(400);
 const label2 = app.querySelector("#settings-version")?.textContent.trim() || "";
 ok("2d. REVERSAL: with nothing to read, it says so plainly instead of inventing a version",
    /not available/i.test(label2) && !/unknown/i.test(label2), `shows "${label2}"`);
+
+// ── 3. EVERY ROW IS TRUE ────────────────────────────────────────────────
+console.log("\nTEST 3 - every row of the one table, driven on both tiers");
+const T = await import(B + "data/tier-table.js");
+const { TodayView } = await import(B + "views/today.js");
+const { CoachProposalView } = await import(B + "views/coach-proposal.js");
+const { ProgressView } = await import(B + "views/progress.js");
+const SS = await import(B + "data/saved-sessions.js");
+const CI = await import(B + "views/community-impact.js");
+const { HURT_AND_ACHE_VERSION } = await import(B + "exercise-card.js");
+const box = document.getElementById("app");
+const txt = el => (el?.textContent || "").replace(/\s+/g, " ").trim();
+function tierFixture(tier) {
+  localStorage.clear(); store.init();
+  store.set("onboardingComplete", true); store.set("name", "Test"); store.set("tier", tier);
+  store.set("safetyAckLog", Array.from({ length: 5 }, () => ({ at: new Date().toISOString(), textVersion: HURT_AND_ACHE_VERSION, surface: "fixture" })));
+  store.set("gymEquipment", ["barbell", "bench-flat", "dumbbells-medium"]); store.set("sessionLocation", "gym");
+  store.set("liftLog", { "barbell-bench-press": [{ at: new Date(Date.now() - 86400000).toISOString(), weight: 40, unit: "kg", reps: 10 }] });
+}
+const mountView = V => { box.innerHTML = ""; V({ navigate() {}, back() {}, history: ["x"] }).mount(box); return box; };
+const rows = Object.fromEntries(T.TIER_TABLE.map(r => [r.id, r]));
+ok("3pc. the table has the spec's rows, and Wellbeing and Safety are the same on both",
+   ["home", "checkin", "plan", "know-what", "as-you-go", "progress", "coming-back", "wellbeing", "safety"].every(id => rows[id]) &&
+   rows.wellbeing.same && rows.safety.same && rows.checkin.same);
+
+tierFixture("free"); mountView(TodayView);
+const freeHome = { doors: box.querySelectorAll(".home-door").length, tiles: box.querySelectorAll("[data-door-id]").length, pick: !!box.querySelector('[data-action="start-today"]') };
+tierFixture("personal"); mountView(TodayView);
+const planDoors = [...box.querySelectorAll(".home-door__title")].map(txt);
+ok("3.home  free: any kind of session, or the coach suggests one; the Plan: three ways in",
+   freeHome.doors === 0 && freeHome.tiles >= 3 && freeHome.pick &&
+   JSON.stringify(planDoors) === JSON.stringify(["Tell me what to do", "I know what I want", "Make it up as I go"]), JSON.stringify({ freeHome, planDoors }));
+ok("3.as-you-go  only the Plan has Make it up as I go", freeHome.doors === 0 && planDoors.includes("Make it up as I go"));
+
+const planScreen = tier => { tierFixture(tier); store.set("availableTime", "standard"); mountView(CoachProposalView); return box; };
+planScreen("free");
+const fp = { rows: box.querySelectorAll(".cp-plan__row").length, swap: box.querySelectorAll("[data-swap]").length, diff: !!box.querySelector(".cp-different"), start: !!box.querySelector("#cp-preview-start"), last: /Last:/.test(txt(box)) };
+planScreen("personal");
+const pp = { rows: box.querySelectorAll(".cp-plan__row").length, swap: box.querySelectorAll("[data-swap]").length, diff: !!box.querySelector(".cp-different") };
+ok("3.plan  free: one session, every exercise named, Start; the Plan: swaps and something different",
+   fp.rows > 0 && fp.start && fp.swap === 0 && !fp.diff && !fp.last && pp.rows > 0 && pp.swap > 0 && pp.diff, JSON.stringify({ fp, pp }));
+
+tierFixture("free"); store.set("savedSessions", [{ id: "s", name: "Mine", exerciseIds: ["barbell-bench-press"], createdAt: new Date().toISOString() }]);
+const freeSaved = SS.savedSessions().length, freeSave = SS.saveSession("x", { exercises: [{ id: "barbell-bench-press" }] }).ok;
+tierFixture("personal"); store.set("savedSessions", [{ id: "s", name: "Mine", exerciseIds: ["barbell-bench-press"], createdAt: new Date().toISOString() }]);
+ok("3.saved  saving sessions is the Plan's; free builds any session itself", freeSaved === 0 && freeSave === false && SS.savedSessions().length === 1);
+
+const ARC = { active: true, aimId: "floor-unaided", strands: ["leg-strength"], startedAt: new Date(Date.now() - 7 * 86400000).toISOString(), zonesWorked: {}, typesWorked: {} };
+tierFixture("free"); store.set("arc", ARC); mountView(ProgressView);
+const fProg = { arc: !!box.querySelector("#pr-arc-h"), tabs: box.querySelectorAll(".progress-tab").length, share: /Share your progress/.test(txt(box)), thirty: /last 30 days/.test(txt(box)) || /Nothing logged/.test(txt(box)) };
+tierFixture("personal"); store.set("arc", ARC); mountView(ProgressView);
+const pProg = { arc: !!box.querySelector("#pr-arc-h"), windows: [...box.querySelectorAll("[data-window]")].map(b => b.dataset.window).join(",") };
+ok("3.progress  free: 30 days and sharing; the Plan: the arc read back, 30 or 90 days",
+   !fProg.arc && fProg.tabs === 0 && fProg.share && fProg.thirty && pProg.arc && pProg.windows === "30,90", JSON.stringify({ fProg, pProg }));
+ok("3.arc  only the Plan reads back where you are heading", !fProg.arc && pProg.arc);
+
+const withCheckpoint = tier => {
+  tierFixture(tier);
+  store.set("generatedSession", { session: { id: "upper-1", title: "Upper Body", exercises: [{ id: "a", name: "Row" }, { id: "b", name: "Press" }] }, builtAt: "x" });
+  store.set("activeSessionCheckpoint", { sessionType: "workout", sessionId: "upper-1|x", index: 1, set: 1, startedAt: new Date().toISOString(), checkpointedAt: new Date().toISOString() });
+  mountView(TodayView); return !!box.querySelector(".home-carry");
+};
+ok("3.coming-back  a session left part-way carries on from Home on the Plan, not on free", withCheckpoint("personal") && !withCheckpoint("free"));
+const pe = fs.readFileSync(new URL("js/data/programmeEngine.js", root), "utf8");
+const reentry = pe.slice(pe.indexOf("export function getReEntryContext"), pe.indexOf("export function", pe.indexOf("export function getReEntryContext") + 10));
+ok("3.coming-back  and the gentler start after time away is BOTH tiers' (no tier check in getReEntryContext)", reentry.length > 200 && !/isPremium/.test(reentry));
+
+const credits = tier => { tierFixture(tier); box.innerHTML = ""; try { CI.CommunityImpactView(box); } catch {} return (txt(box).match(/Credits per session (\d)/) || [])[1]; };
+ok("3.impact  once on free, twice on the Plan", credits("free") === "1" && credits("personal") === "2", `${credits("free")} / ${credits("personal")}`);
+
+const strip2 = f => fs.readFileSync(new URL(f, root), "utf8").replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:"'`])\/\/.*$/gm, "$1").replace(/<!--[\s\S]*?-->/g, "");
+ok("3.wellbeing  nothing in Wellbeing checks the tier", ["js/views/noticing.js", "js/views/breathing-session.js", "js/views/journal-entry.js", "js/views/in-step.js", "js/views/quiet-session.js"]
+   .every(f => !/isPremium\(|store\.get\(['"]tier['"]\)/.test(strip2(f)) || (f.endsWith("in-step.js") && !/isPremium\(\)\s*\?\s*[^:]*scenario/i.test(strip2(f)))));
+ok("3.safety  nothing that keeps people safe checks the tier", ["js/safety-gate.js", "js/data/red-flag.js", "js/views/red-flag.js"].every(f => !/isPremium\(|['"]tier['"]/.test(strip2(f))));
+
+// ── 4. EVERY PAGE SAYS WHAT THE TABLE SAYS ─────────────────────────────
+console.log("\nTEST 4 - the upgrade page and Settings › Your plan say the table, and only the table");
+const UP = await import(B + "views/upgrade.js");
+tierFixture("free");
+box.innerHTML = UP.render();
+const changes = [...box.querySelectorAll(".upgrade-change")].map(txt);
+const plain = s => s.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
+ok("4a. the upgrade page's statements are exactly the table's differing rows", JSON.stringify(changes) === JSON.stringify(T.PLAN_ADDS.map(plain)) && changes.length === T.TIER_TABLE.filter(r => !r.same).length,
+   JSON.stringify(changes).slice(0, 200));
+ok("4b. it names the arc first -- what the Plan is", changes[0] === plain(rows.arc.says));
+const keeps = [...box.querySelectorAll(".upgrade-keeps li")].map(txt);
+ok("4c. and lists what free keeps: the rows that are the same", keeps.length === T.FREE_KEEPS.length && T.FREE_KEEPS.every((r, i) => keeps[i].startsWith(r.area)));
+ok("4d. no statement on it is also true of free (it is not in a 'same' row)", !T.FREE_KEEPS.some(r => changes.includes(plain(r.plan))));
+for (const tier of ["free", "personal"]) {
+  tierFixture(tier);
+  const app = await openPanel(null, "about-plan");
+  const trs = [...app.querySelectorAll("[data-tier-row]")];
+  ok(`4e. Settings › Your plan (${tier}) shows the table, row for row`, trs.length === T.TIER_TABLE.length &&
+     trs.every((tr, i) => tr.dataset.tierRow === T.TIER_TABLE[i].id && txt(tr.querySelector("td")) === T.TIER_TABLE[i].free));
+  ok(`4f. and no withdrawn claim (${tier})`, !WITHDRAWN.some(re => re.test(txt(app))));
+}
+ok("4g. REVERSAL: a withdrawn claim added to the table would be caught", WITHDRAWN.some(re => re.test(T.TIER_TABLE.map(r => r.plan).join(" ") + " and the long practices open up")));
+ok("4h. the table itself makes no withdrawn claim", !WITHDRAWN.some(re => re.test(JSON.stringify(T.TIER_TABLE))));
 
 console.log("");
 if (fails) { console.log(`PLAN-CLAIMS: ${fails} FAILED, ${passes} passed`); process.exit(1); }

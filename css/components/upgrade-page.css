@@ -1,5 +1,9 @@
 /*
  * css/components/upgrade-page.css
+ * 28 Sep 2026 v3
+ *
+ * v3 - SMOOTH-P5. .upgrade-keeps: what free keeps, from the one table.
+ *
  * 18 Aug 2026 v2
  *
  * v2 - IMPACT-COLOUR. .upgrade-body--impact, teal, for the five-percent
@@ -170,3 +174,8 @@
 
 /* Reduced motion is respected by having none: nothing on this page
    animates, per the doc's Design Notes. Recorded so it stays that way. */
+
+/* SMOOTH-P5. What free keeps, listed from the one table. */
+.upgrade-keeps { margin: 0 0 var(--space-3); padding-left: 1.25rem; color: var(--color-text-secondary); line-height: 1.6; }
+.upgrade-keeps li { margin-bottom: var(--space-2); }
+.upgrade-keeps strong { color: var(--color-text-primary); }

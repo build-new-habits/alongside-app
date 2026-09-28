@@ -1,6 +1,9 @@
 /**
  * settings.js
- * 28 Sep 2026 v38
+ * 28 Sep 2026 v39
+ *
+ * v39 - SMOOTH-P5. Your plan shows the one table (tier-table.js) for
+ *   both tiers instead of its own paragraphs about the Plan.
  *
  * v38 - SMOOTH-P4c. Settings is one page. Spec 4.10.
  *
@@ -498,6 +501,7 @@ import { isPremium }      from '../auth.js';
 import { toKg, fromKg } from '../data/weight-targets.js';
 import { PRICE_MONTHLY, PRICE_ANNUAL } from "../data/pricing.js";
 import { offeredGoals, getGoalLabel } from '../data/goals.js';
+import { tierTableHtml } from '../data/tier-table.js';
 import { getProgramme, PROGRAMMES }      from '../data/programmes.js';
 import { getProgressStats }              from '../data/programmeEngine.js';
 import { getBeat3Script }                from '../data/beat3-scripts.js';
@@ -580,7 +584,7 @@ export function SettingsView(router) {
             <button class="btn btn-ghost" id="settings-back-btn" aria-label="Back to Settings">&larr; Settings</button>
           </div>
           <h1 class="settings-title" tabindex="-1">${_esc(screen.title)}</h1>
-          <div class="settings-screen">${screen.render()}</div>
+          <div class="settings-screen">${_withoutRepeatedTitle(screen.render(), screen.title)}</div>
         ` : `
           <h1 class="settings-title" tabindex="-1">Settings</h1>
           <p class="settings-lede">Changes save as you make them.</p>
@@ -597,6 +601,15 @@ export function SettingsView(router) {
   }
 
   // ── SMOOTH-P4c. The one page ──────────────────────────────────────────────
+
+  /**
+   * A panel opened as a screen starts with its own h2, which repeats the
+   * screen's h1 word for word ("Your plan" / "Your plan"). Said twice to
+   * a screen reader and seen twice on the page; the repeat is dropped.
+   */
+  function _withoutRepeatedTitle(html, title) {
+    return html.replace(new RegExp(`\\s*<h2 class="settings-section__heading">\\s*${title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*</h2>`), '');
+  }
 
   /** Row screens: an existing panel each, or one part of one. */
   const SCREENS = {
@@ -1847,12 +1860,13 @@ export function SettingsView(router) {
           <p class="settings-plan-current__tier">${_esc(tierLabel)}</p>
         </div>
 
+        <!-- SMOOTH-P5. The one table (js/data/tier-table.js), not a
+             second description of it. C2 was a claim corrected on one page
+             and left standing on this one; now there is only the table. -->
+        ${tierTableHtml(_esc)}
+
         ${isPaid ? `
           <div class="settings-plan-block">
-            <p>The coach knows where you're heading and builds towards it.
-               Sessions follow on from one another, it remembers your
-               conditions and injuries, and your progress is read back to
-               you across months.</p>
             <p>Five percent of what you pay goes to causes this community
                chooses.</p>
           </div>
@@ -1864,50 +1878,6 @@ export function SettingsView(router) {
             </p>
           </div>
         ` : `
-          <div class="settings-plan-block">
-            <p>Free is a real session. The coach reads how you are today and
-               builds you something — it holds nothing back from the session
-               itself. Everything that keeps you safe is free and always
-               will be.</p>
-          </div>
-
-          <!-- PLAIN-1, 20 Aug 2026. THREE FALSEHOODS REMOVED FROM THIS
-               BLOCK, all of them live on a page asking people to buy.
-
-               1. "Sessions become yours -- the kind, the length, and how
-                  the time is spent." R4 moved all three to FREE the same
-                  morning. Selling what the product gives away.
-
-               2. "And the longer practices open up." This is the exact
-                  statement WITHDRAWN from upgrade.js v6 on 13 Aug for
-                  being untrue -- in-step.js contains isPremium() once,
-                  only to decide whether to render the upgrade door. It
-                  was removed from one page and left standing on this
-                  one, which is how a correction becomes half a
-                  correction.
-
-               3. "The yearly rate holds until the end of November 2026."
-                  PRICE-2 retired that on 18 Aug. A deadline that had
-                  already passed, on a purchase page.
-
-               Replacements are checked against the live build, and each
-               names the file that makes it true. -->
-          <div class="settings-plan-block">
-            <h3 class="settings-plan-block__heading">What the Plan adds</h3>
-            <!-- strategicGoal, written at onboarding, rendered by my-programme.js -->
-            <p>You tell the coach where you're heading, and it builds towards
-               that rather than only meeting today.</p>
-            <!-- programmeEngine.js chaptersDone + successor offer; CONT-1 -->
-            <p>Sessions follow on from one another instead of each starting
-               fresh.</p>
-            <!-- progress.js: free stops after narrative line 1 -->
-            <p>Your progress becomes something the coach reads back to you:
-               what's changed across months, not a list of what you did.</p>
-            <!-- community-impact.js:143 -->
-            <p>And every session you finish counts double towards where the
-               five percent goes.</p>
-          </div>
-
           <div class="settings-plan-block">
             <p class="settings-plan-price">${PRICE_MONTHLY} a month, or ${PRICE_ANNUAL} for the year.</p>
             <p class="text-sm text-muted">
