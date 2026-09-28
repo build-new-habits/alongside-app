@@ -1,7 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 28 Sep 2026 v559
+ * 28 Sep 2026 v560
+ *
+ * v560 - Work list 10, CL-5-ALL. No new files. Changed: ten exercise
+ *   library files (descriptions reworded). 191 gates.
  *
  * v559 - Work list 9. No new files. Changed: views/progress.js,
  *   layouts/progress.css, components/club-rooms.css. 190 gates.
@@ -3993,7 +3996,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v559";
+const CACHE_NAME = "alongside-v560";
 
 const SHELL_URLS = [
 
