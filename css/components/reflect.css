@@ -2,7 +2,12 @@
    REFLECT VIEW STYLES
    css/components/reflect.css
 
-   19 Jul 2026 v1
+   28 Sep 2026 v2
+
+   v2 - SMOOTH-P2d. The finish screen: .finish-stats (what was done, in
+   one quiet line under the heading) and .finish-more (the note and mood,
+   one tap away). The disclosure keeps its native marker so open and
+   closed are not shown by colour alone.
 
    New file (S4-B3-3 completion). .reflect-textarea and .reflect-chips
    were confirmed via GitHub code search to have NO existing CSS
@@ -53,3 +58,50 @@
   gap: var(--space-3);
   width: 100%;
 }
+
+
+/* SMOOTH-P2d. One finish screen. */
+.finish-view .view-header h1 { margin-bottom: var(--space-1); }
+
+.finish-stats {
+  margin: 0;
+  font-size: var(--text-base);
+  color: var(--color-text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.finish-more {
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md, 8px);
+}
+
+.finish-more__summary {
+  min-height: 44px;
+  padding: var(--space-2) 0;
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.finish-more__summary:focus-visible {
+  outline: 3px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+.finish-more[open] .reflect-textarea { min-height: 96px; }
+
+/* Air between the questions, and a coach line that sits beside its
+   icon rather than under a large one. */
+.finish-view .reflect-section,
+.finish-view .finish-coach-card,
+.finish-view .finish-more { margin-top: var(--space-5, 1.5rem); }
+.finish-view .reflect-section-label { margin-bottom: var(--space-3); }
+.finish-coach-card {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+.finish-coach-card[hidden] { display: none; }
+.finish-coach-card .coach-icon-small { width: 36px; height: 36px; flex-shrink: 0; }
+.finish-coach-card .coach-message-text { margin: 0; }

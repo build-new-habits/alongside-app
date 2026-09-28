@@ -950,6 +950,8 @@ function completeExercise() {
   completed.push({
     exerciseId:  exercise.id,
     credits:     exercise.credits,
+    // SMOOTH-P2d. What the finish screen counts ("6 sets").
+    sets:        Number(exercise.sets) || 1,
     completedAt: new Date().toISOString()
   });
   store.set("workoutProgress", completed);
@@ -1004,7 +1006,13 @@ function savePartialSession() {
   const workout = _getWorkout();
   if (!workout) return;
 
-  const progress       = store.get("workoutProgress") || [];
+  const progress       = [...(store.get("workoutProgress") || [])];
+  // SMOOTH-P2d. An exercise finished but not yet moved on from counts:
+  // the sets were done, the person just had not tapped Next.
+  const current = workout.exercises[currentExerciseIndex];
+  if (exerciseDone && current && !progress.some(p => p.exerciseId === current.id)) {
+    progress.push({ exerciseId: current.id, credits: current.credits, sets: Number(current.sets) || 1 });
+  }
   const creditsEarned  = progress.reduce((sum, e) => sum + (e.credits || 0), 0);
   const nowIso         = new Date().toISOString();
 
@@ -1019,6 +1027,7 @@ function savePartialSession() {
     isEvent:        false,
     eventName:      null,
     exercisesCount: progress.length,
+    setsDone:       progress.reduce((n, e) => n + (e.sets || 1), 0),
     creditsEarned
   });
 
@@ -1066,7 +1075,10 @@ function completeWorkout() {
     eventName:    null,
     // CONT-1: which exercises, not only how many. Routed into
     // exerciseHistory by logActivity() on completion only.
-    exerciseIds:  (workout.exercises || []).map(e => e.id).filter(Boolean)
+    exerciseIds:  (workout.exercises || []).map(e => e.id).filter(Boolean),
+    // SMOOTH-P2d. For "That's today done": what was actually done.
+    exercisesCount: progress.length,
+    setsDone:       progress.reduce((n, e) => n + (e.sets || 1), 0)
   });
   if (activityEntry) {
     store.set("currentActivityEntry", activityEntry);

@@ -1,7 +1,27 @@
 /**
  * reflect.js - Reflect Screen
  *
- * 13 Aug 2026 v6
+ * 28 Sep 2026 v7
+ *
+ * v7 - SMOOTH-P2d. One finish screen. Spec 4.4.
+ *
+ *   Measured on v545: "So, how was that?" with a feel question, a pain
+ *   question, a mood slider already set to a value nobody chose -- and
+ *   saved as their mood -- a writing prompt and "Done"; then a SECOND
+ *   screen, "Done", with a coach line and "Back to Today".
+ *
+ *   Now one screen: "That's today done." (or "Saved what you did." for a
+ *   session ended early), what was done ("2 moves · 6 sets · 34 min"),
+ *   the session moments, "How did it feel?" -- and the coach's line
+ *   answers the tap right there, in a polite live region, instead of on
+ *   a second page. Pain stays for anyone with a condition. Mood and the
+ *   note are one tap away under "Add a note". "Back to Home" saves what
+ *   was said and goes Home; the empathy prompt still gets its own screen
+ *   on the occasions it is due, then Home.
+ *
+ *   NOTHING IS RECORDED THAT WAS NOT SAID. moodAfter is stored only if the
+ *   slider was moved; before, every finish wrote the check-in mood (or 5)
+ *   as "mood after", and the empathy matcher read it as an answer.
  *
  * v6 - EMP-4. The empathy cadence is time-aware as well as
  *   session-aware. Persona 2.12 completed seven sessions in three weeks
@@ -156,7 +176,7 @@ let stage        = "reflect";
 let feelAnswer    = null;
 let painAnswer    = null;
 let openText      = "";
-let moodAfter     = 5;
+let moodAfter     = null;   // SMOOTH-P2d: null until the slider is moved
 let _momentsMounted = false;   // SHARED-1
 let empathyPrompt = null; // { stage, text } | null - set by saveAndSummarise() if one should fire
 
@@ -483,6 +503,16 @@ function skipEmpathyPrompt(sessionCount) {
   store.set("lastEmpathyPromptAt", new Date().toISOString());
 }
 
+/**
+ * SMOOTH-P2d. HONESTY RULE: the coach may say it has noted something (it
+ * is saved) but not that it will USE it. Nothing in the app reads `feel`
+ * or `painChange` -- grepped 28 Sep -- so "I will remember that when I
+ * plan your next session" and "We will factor it in next time" were
+ * promises with nothing behind them, now on the one finish screen where
+ * everybody reads them. The clauses are cut, nothing added in their
+ * place; the lines are flagged for Graeme's voice review. If a planner
+ * ever reads these answers, the promise can come back with it.
+ */
 function buildSummary(entry, feel, pain, moodAfterValue) {
   const log       = store.get("activityLog") || [];
   const thisWeek  = log.filter(e => {
@@ -511,11 +541,11 @@ function buildSummary(entry, feel, pain, moodAfterValue) {
     return "I noticed things felt better today than usual. That is worth paying attention to -- your body is responding.";
   }
   if (pain === "worse" || pain === "sharp") {
-    return "Things were harder today and you showed up anyway. I have noted that. We will factor it in next time.";
+    return "Things were harder today and you showed up anyway. I have noted that.";
   }
 
   if (moodLift !== null && moodLift >= 3) {
-    return "Your mood has shifted since this morning -- that is exactly the kind of thing worth noticing. I will remember that this works for you.";
+    return "Your mood has shifted since this morning -- that is exactly the kind of thing worth noticing.";
   }
 
   if (type === "rest") {
@@ -548,8 +578,8 @@ function buildSummary(entry, feel, pain, moodAfterValue) {
   if (type === "coach-session" || type === "gym" || type === "gym-programme" || type === "morning-session") {
     if (feel === "strong") {
       return durRef
-        ? "Strong session. " + durRef + " of real work. I will remember that for next time."
-        : "Strong session. I will remember that when I plan what comes next.";
+        ? "Strong session. " + durRef + " of real work."
+        : "Strong session.";
     }
     if (feel === "hard" || feel === "struggled") {
       return "Hard sessions count just as much as easy ones. You finished it. That is what matters.";
@@ -564,7 +594,7 @@ function buildSummary(entry, feel, pain, moodAfterValue) {
   if (feel === "strong") {
     return sessionCount >= 3
       ? "That is " + sessionCount + " sessions this week. You are building something real here."
-      : "You were strong today. I will remember that when I plan your next session.";
+      : "You were strong today.";
   }
   if (feel === "hard" || feel === "tough") {
     return "Hard sessions count just as much as easy ones. You finished it. That is what matters.";
@@ -574,7 +604,7 @@ function buildSummary(entry, feel, pain, moodAfterValue) {
     return "That is " + sessionCount + " sessions this week. Consistency is exactly how this works.";
   }
 
-  return "Done. I have noted how today went and I will use it next time.";
+  return "Done. I have noted how today went.";
 }
 
 export function render() {
@@ -613,40 +643,32 @@ export function render() {
       </div>`;
   }
 
-  if (stage === "summary") {
-    const summary = buildSummary(entry, feelAnswer, painAnswer, moodAfter);
-    return `
-      <div class="view reflect-view">
-        <div class="view-header">
-          <h1>Done</h1>
-        </div>
-        ${renderSessionMoments({ exerciseIds: _sessionExerciseIds(entry) })}
-        <div class="card card-coach reflect-coach-card">
-          <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
-          <p class="coach-message-text">${summary}</p>
-        </div>
-        <button class="btn btn-primary btn-large btn-full" id="reflect-finish-btn"
-                style="margin-top: var(--space-4);">
-          Back to Today
-        </button>
-      </div>`;
-  }
+  // SMOOTH-P2d. One screen. The summary stage is gone: the coach's line
+  // answers "How did it feel?" on this screen (#finish-coach).
+  const partial   = entry.status === "partial";
+  const moves     = Number(entry.exercisesCount) || 0;
+  const sets      = Number(entry.setsDone) || 0;
+  const mins      = Number(entry.durationMins) || 0;
+  const statBits  = [
+    moves ? `${moves} ${moves === 1 ? "move" : "moves"}` : "",
+    sets  ? `${sets} ${sets === 1 ? "set" : "sets"}`     : "",
+    mins  ? `${mins} min`                                : ""
+  ].filter(Boolean);
+  const moodShown = typeof moodAfter === "number" ? moodAfter : _startMood();
 
   return `
-    <div class="view reflect-view">
+    <div class="view reflect-view finish-view">
 
       <div class="view-header">
-        <h1>${name ? name : "How was that?"}</h1>
+        <h1>${partial ? "Saved what you did." : "That\u2019s today done."}</h1>
+        ${statBits.length ? `<p class="finish-stats">${statBits.join(" \u00B7 ")}</p>` : ""}
       </div>
 
-      <div class="card card-coach reflect-coach-card">
-        <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
-        <p class="coach-message-text">${question}</p>
-      </div>
+      ${renderSessionMoments({ exerciseIds: _sessionExerciseIds(entry) })}
 
       <div class="reflect-section">
-        <p class="reflect-section-label">How did it feel?</p>
-        <div class="reflect-chips" role="group" aria-label="How it felt">
+        <p class="reflect-section-label" id="finish-feel-label">How did it feel?</p>
+        <div class="reflect-chips" role="group" aria-labelledby="finish-feel-label">
           ${feelOpts.map(o => `
             <button class="chip ${feelAnswer === o.v ? "selected" : ""}"
                     data-feel="${o.v}"
@@ -659,8 +681,8 @@ export function render() {
 
       ${hasConds ? `
         <div class="reflect-section">
-          <p class="reflect-section-label">Any pain or discomfort?</p>
-          <div class="reflect-chips" role="group" aria-label="Pain level">
+          <p class="reflect-section-label" id="finish-pain-label">Any pain or discomfort?</p>
+          <div class="reflect-chips" role="group" aria-labelledby="finish-pain-label">
             ${PAIN_OPTIONS.map(o => `
               <button class="chip chip--sm ${painAnswer === o.v ? "selected" : ""}"
                       data-pain="${o.v}"
@@ -672,48 +694,49 @@ export function render() {
         </div>
       ` : ""}
 
-      <div class="reflect-section">
-        <p class="reflect-section-label">How's your mood right now?</p>
+      <div class="card card-coach reflect-coach-card finish-coach-card" ${(feelAnswer || painAnswer) ? "" : "hidden"}>
+        <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
+        <p class="coach-message-text" id="finish-coach" aria-live="polite">${(feelAnswer || painAnswer) ? buildSummary(entry, feelAnswer, painAnswer, moodAfter) : ""}</p>
+      </div>
+
+      <details class="finish-more reflect-section">
+        <summary class="finish-more__summary">Add a note</summary>
+        <p class="reflect-section-label" id="finish-mood-label">How's your mood right now?</p>
         <div class="reflect-mood-slider-block">
           <div class="reflect-mood-display" aria-live="polite" aria-atomic="true">
-            <span class="reflect-mood-number" id="reflect-mood-number">${moodAfter}</span>
-            <span class="reflect-mood-label" id="reflect-mood-label">${MOOD_LABELS[moodAfter] || "Okay"}</span>
+            <span class="reflect-mood-number" id="reflect-mood-number">${moodShown}</span>
+            <span class="reflect-mood-label" id="reflect-mood-label">${typeof moodAfter === "number" ? (MOOD_LABELS[moodAfter] || "Okay") : "Move the slider to set it"}</span>
           </div>
           <input type="range" id="reflect-mood-slider" class="checkin-slider"
-                 min="1" max="10" value="${moodAfter}"
-                 aria-label="Mood right now, 1 struggling to 10 fantastic"
-                 aria-valuetext="${MOOD_LABELS[moodAfter] || "Okay"}">
+                 min="1" max="10" value="${moodShown}"
+                 aria-labelledby="finish-mood-label"
+                 aria-valuetext="${typeof moodAfter === "number" ? (MOOD_LABELS[moodAfter] || "Okay") : "Not set"}">
           <div class="checkin-slider-ends" aria-hidden="true">
             <span>Struggling</span><span>Fantastic</span>
           </div>
         </div>
-      </div>
-
-      <div class="reflect-section">
-        <div class="card card-coach reflect-wellbeing-card">
-          <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
-          <p class="coach-message-text reflect-invitation">${invitation}</p>
-        </div>
+        <p class="coach-message-text reflect-invitation" id="finish-note-label">${invitation}</p>
         <textarea id="reflect-open-text"
                   class="reflect-textarea"
-                  placeholder="Whatever comes to mind... or just tap Done."
-                  rows="4"
-                  aria-label="Your reflection">${openText}</textarea>
-      </div>
+                  rows="3"
+                  aria-labelledby="finish-note-label">${openText}</textarea>
+      </details>
 
       ${renderSaveBlock()}
 
       <button class="btn btn-primary btn-large btn-full" id="reflect-done-btn"
               style="margin-top: var(--space-4);">
-        Done
-      </button>
-      <button class="btn btn-ghost btn-full" id="reflect-skip-btn"
-              style="margin-top: var(--space-2);">
-        Skip reflection
+        Back to Home
       </button>
 
     </div>
   `;
+}
+
+/** Where the mood slider starts: today's check-in, else the middle. Shown, never stored. */
+function _startMood() {
+  const c = store.get("lastCheckin") || {};
+  return typeof c.mood === "number" ? c.mood : 5;
 }
 
 /**
@@ -763,8 +786,8 @@ export function onMount() {
   // moment the first chip was tapped.
   if (!_momentsMounted) { resetSessionMoments(); _momentsMounted = true; }
 
-  const checkin = store.get("lastCheckin") || {};
-  moodAfter = (typeof checkin.mood === "number") ? checkin.mood : 5;
+  // SMOOTH-P2d. Not an answer until they give one.
+  moodAfter = null;
 
   const view = document.querySelector(".reflect-view");
   if (!view) return;
@@ -772,7 +795,7 @@ export function onMount() {
   const moodSlider = document.getElementById("reflect-mood-slider");
   if (moodSlider) {
     moodSlider.addEventListener("input", e => {
-      moodAfter = parseInt(e.target.value);
+      moodAfter = parseInt(e.target.value, 10);   // moved: now it is an answer
       const numEl = document.getElementById("reflect-mood-number");
       const labEl = document.getElementById("reflect-mood-label");
       if (numEl) numEl.textContent = moodAfter;
@@ -791,6 +814,7 @@ export function onMount() {
         c.classList.toggle("selected", sel);
         c.setAttribute("aria-pressed", sel);
       });
+      _sayCoachLine(view);
       return;
     }
 
@@ -802,14 +826,13 @@ export function onMount() {
         c.classList.toggle("selected", sel);
         c.setAttribute("aria-pressed", sel);
       });
+      _sayCoachLine(view);
       return;
     }
 
     const doneBtn = e.target.closest("#reflect-done-btn");
     if (doneBtn) { saveAndSummarise(); return; }
 
-    const skipBtn = e.target.closest("#reflect-skip-btn");
-    if (skipBtn) { saveAndSummarise(); return; }
 
     const empathyContinueBtn = e.target.closest("#empathy-continue-btn");
     if (empathyContinueBtn) { resolveEmpathyPrompt(false); return; }
@@ -817,11 +840,16 @@ export function onMount() {
     const empathySkipBtn = e.target.closest("#empathy-skip-btn");
     if (empathySkipBtn) { resolveEmpathyPrompt(true); return; }
 
-    const finishBtn = e.target.closest("#reflect-finish-btn");
-    if (finishBtn) {
-      router.navigate("today");
-    }
   });
+}
+
+/** SMOOTH-P2d. The coach answers the tap on the same screen. */
+function _sayCoachLine(view) {
+  const card = view.querySelector(".finish-coach-card");
+  const line = view.querySelector("#finish-coach");
+  if (!card || !line) return;
+  card.hidden = false;
+  line.textContent = buildSummary(store.get("currentActivityEntry") || {}, feelAnswer, painAnswer, moodAfter);
 }
 
 function saveAndSummarise() {
@@ -869,12 +897,14 @@ function saveAndSummarise() {
   const sessionCount = getSessionCount();
   const candidate = getEmpathyPromptForSession(sessionCount);
 
-  if (candidate) {
-    empathyPrompt = candidate;
-    stage = "empathy";
-  } else {
-    stage = "summary";
+  // SMOOTH-P2d. No summary screen: Home, unless the empathy prompt is
+  // due, which keeps its own screen on the occasions it fires.
+  if (!candidate) {
+    router.navigate("today");
+    return;
   }
+  empathyPrompt = candidate;
+  stage = "empathy";
 
   const main = document.getElementById("main-content");
   if (main) {
@@ -897,15 +927,9 @@ function resolveEmpathyPrompt(wasSkipped) {
   }
 
   empathyPrompt = null;
-  stage = "summary";
+  stage = "reflect";
+  // SMOOTH-P2d. Straight Home; the summary screen is folded away.
+  router.navigate("today");
+  return;
 
-  const main = document.getElementById("main-content");
-  if (main) {
-    main.innerHTML = render();
-    onMount();
-    // SHARED-1. Re-wire the moment controls after every repaint. Both
-    // repaint sites in this file get this; missing one would leave the
-    // baseline chips dead on whichever path took the other.
-    attachSessionMoments(main, _repaintMoments);
-  }
 }
