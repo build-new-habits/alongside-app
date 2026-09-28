@@ -1,5 +1,9 @@
 /*
  * css/layouts/progress.css
+ * 28 Sep 2026 v7
+ *   Work list 9. .progress-export__status (Copied, said under the
+ *   buttons) and .progress-export__fallback (the text to copy when the
+ *   clipboard is not allowed; replaces an alert()).
  * 28 Sep 2026 v6
  *   SMOOTH-P4a. .pr-* -- the arc read back, and the one bar chart both
  *   tiers share. One hue (the primary teal) on the ground; a check-in
@@ -321,11 +325,6 @@
   outline-offset: 2px;
 }
 
-.progress-export__confirm {
-  font-size: var(--text-sm);
-  color: var(--color-primary);
-  margin: 0;
-}
 
 /* Locked export */
 .progress-export--locked {
@@ -570,3 +569,28 @@
 }
 /* The whole is the outline; with nothing in it, nothing is drawn. */
 .pr-bar__track[style*="--h:0%"]::before { display: none; }
+
+/* v7, work list 9. Copied is said where the button is. */
+.progress-export__status {
+  min-height: 1.5em;
+  margin: var(--space-3) 0 0;
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+}
+
+.progress-export__fallback {
+  margin-top: var(--space-3);
+}
+
+.progress-export__fallback-label {
+  display: block;
+  margin-bottom: var(--space-2);
+  color: var(--color-text);
+  line-height: 1.5;
+}
+
+.progress-export__text {
+  font-family: inherit;
+  line-height: 1.5;
+  resize: vertical;
+}

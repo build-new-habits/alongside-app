@@ -1,6 +1,16 @@
 /**
  * progress.js
- * 28 Sep 2026 v16
+ * 28 Sep 2026 v17
+ *
+ * v17 - Work list 9, found by pressing every control. Share your
+ *   progress: when copying is not allowed, the fallback was a browser
+ *   alert() (the comment said "an accessible dialog"; it was not one):
+ *   a box that cannot be selected on most phones, so the text could not
+ *   be copied at all. It is now the text itself, in a labelled read-only
+ *   field under the buttons, selected and focused. And "Copied" was
+ *   announced at the TOP of the page, in the coach's words, while the
+ *   person was at the bottom pressing the button; it is now said under
+ *   the buttons, in a status line that is always there.
  *
  * v16 - SMOOTH-P4a. Progress reads the arc back. Spec 4.8.
  *
@@ -952,6 +962,11 @@ export function ProgressView(router) {
             For a professional
           </button>
         </div>
+        <p class="progress-export__status" role="status" aria-live="polite" data-export-status></p>
+        <div class="progress-export__fallback" data-export-fallback hidden>
+          <label for="progress-export-text" class="progress-export__fallback-label">Copying isn't allowed here, so here is the text. Select it and copy it.</label>
+          <textarea id="progress-export-text" class="form-input progress-export__text" readonly rows="8"></textarea>
+        </div>
       </section>
     `;
   }
@@ -1278,7 +1293,7 @@ export function ProgressView(router) {
     const goalLabels = goals.map(g => getGoalLabel(g)).join(', ');
     const text       = _buildExportText(type, name, recent, stats, goalLabels, activeWindow);
 
-    // Write to clipboard — graceful fallback to alert
+    // Write to clipboard — if not allowed, show the text to copy (v17)
     if (navigator.clipboard) {
       navigator.clipboard.writeText(text).then(() => {
         _showExportConfirmation(type);
@@ -1353,21 +1368,32 @@ export function ProgressView(router) {
 
   function _showExportConfirmation(type) {
     const labels = { self: 'your version', friend: 'the friend version', professional: 'the professional version' };
-    // Announce to screen reader via existing aria-live region if present
-    const narrative = document.querySelector('.progress-narrative');
-    if (narrative) {
-      const msg = document.createElement('p');
-      msg.setAttribute('aria-live', 'polite');
-      msg.textContent = `Copied to clipboard — ${labels[type] || 'your progress'}.`;
-      msg.className = 'progress-export__confirm';
-      narrative.appendChild(msg);
-      setTimeout(() => msg.remove(), 3000);
+    // v17. Said where the button is, in a status line that is always in
+    // the page (a live region added at the moment of speaking is often
+    // not read). Cleared after a while so the next copy is announced too.
+    const status = document.querySelector('[data-export-status]');
+    const fb = document.querySelector('[data-export-fallback]');
+    if (fb) fb.hidden = true;
+    if (status) {
+      status.textContent = `Copied ${labels[type] || 'your progress'}. Paste it wherever you like.`;
+      clearTimeout(_showExportConfirmation._t);
+      _showExportConfirmation._t = setTimeout(() => { status.textContent = ''; }, 6000);
     }
   }
 
   function _fallbackExport(text) {
-    // Last resort — show in a pre block in an accessible dialog
-    alert('Copy the text below:\n\n' + text);
+    // v17. Was alert(): not selectable on most phones, so nothing could
+    // be copied. The text itself, in a labelled read-only field, selected
+    // and focused so one Copy finishes the job.
+    const fb = document.querySelector('[data-export-fallback]');
+    const area = fb?.querySelector('textarea');
+    if (!fb || !area) return;
+    area.value = text;
+    fb.hidden = false;
+    const status = document.querySelector('[data-export-status]');
+    if (status) status.textContent = '';
+    area.focus();
+    area.select();
   }
 
   // ── Utilities ──────────────────────────────────────────────────────────────

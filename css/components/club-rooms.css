@@ -4,7 +4,9 @@
  *
  * v5 - Work list 8, OWN-LIST. .own-search: Find a session, above the
  *   saved list from six sessions. The field reuses .form-input (44px,
- *   the focus ring); these rules only place it and its count.
+ *   the focus ring); these rules only place it and its count. The
+ *   browser's own clear button (a blue x in Chrome and Safari) is drawn
+ *   in the app's secondary text colour instead, 24px (WCAG 2.2 2.5.8).
  *
  * 08 Sep 2026 v4
  *
@@ -576,4 +578,23 @@
 
 .club-rooms > li[hidden] {
   display: none;
+}
+
+/* The field's clear button, in the app's colours rather than the
+   browser's blue. The shape is a mask, so the colour is a token and
+   follows the theme. */
+.own-search__input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  margin-left: var(--space-2);
+  cursor: pointer;
+  background-color: var(--color-text-secondary);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 6l12 12M18 6L6 18' stroke='black' stroke-width='2.5' stroke-linecap='round'/%3E%3C/svg%3E") center / 16px no-repeat;
+          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 6l12 12M18 6L6 18' stroke='black' stroke-width='2.5' stroke-linecap='round'/%3E%3C/svg%3E") center / 16px no-repeat;
+}
+
+.own-search__input::-webkit-search-cancel-button:hover {
+  background-color: var(--color-text);
 }
