@@ -1,7 +1,15 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 28 Sep 2026 v547
+ * 28 Sep 2026 v548
+ *
+ * v548 - SMOOTH-P2e. views/coach-proposal.js, views/workout.js,
+ *   css/components/coach-proposal.css, workout.css.
+ *
+ *   A good day is offered more (never given it), a planned walk, run,
+ *   swim, cycle, yoga or mindfulness day leads with that session, and a
+ *   rest is suggested after each set. New gate:
+ *   tools/verify-plan-offers.mjs. 179 gates.
  *
  * v547 - session-builder.js. A gentle day keeps its low-energy choices:
  *   the gym-kit preference no longer applies on a low day.
@@ -3930,7 +3938,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v547";
+const CACHE_NAME = "alongside-v548";
 
 const SHELL_URLS = [
 
