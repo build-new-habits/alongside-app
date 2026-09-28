@@ -1,6 +1,9 @@
 /**
  * tools/verify-player-flow.mjs
- * 28 Sep 2026 v2
+ * 28 Sep 2026 v3
+ *
+ * v3 - SMOOTH-P3a. The exit sheet has four choices: "Carry on later"
+ *   joins it (4b). Nothing else changed.
  *
  * v2 - SMOOTH-P2e, REST-1 (test 5). Graeme, 28 Sep: "the suggestion
  *   should be given." A suggested rest after each set that ends on
@@ -128,13 +131,15 @@ fresh([ROW]);
 ok("3e. REVERSAL: nothing logged, nothing pre-filled", (main.querySelector('[data-perf-key="weight"]')?.value || "") === "");
 
 // ── 4. THE EXIT ─────────────────────────────────────────────────────────
-console.log("\nTEST 4 - Exit: three choices, each lands somewhere known");
+console.log("\nTEST 4 - Exit: four choices, each lands somewhere known");
 fresh([ROW, { ...ROW, id: "fixture-2", name: "Goblet Squat" }]);
 tap("#exit-workout-btn");
 const sheet = document.querySelector("#session-exit-overlay");
 const labels = [...(sheet?.querySelectorAll("button") || [])].map(b => b.textContent.trim());
 ok("4a. the sheet is a titled dialog", sheet?.getAttribute("role") === "dialog" && /Leave this session/.test(document.getElementById(sheet?.getAttribute("aria-labelledby") || "x")?.textContent || ""));
-ok("4b. three plain choices", JSON.stringify(labels) === JSON.stringify(["Keep going", "End it here and save", "Leave without saving"]), JSON.stringify(labels));
+// v3: SMOOTH-P3a adds "Carry on later" (spec 4.1, coming back), second,
+// after staying. Its landing and its resume are driven in verify-home-plan 3.
+ok("4b. four plain choices", JSON.stringify(labels) === JSON.stringify(["Keep going", "Carry on later", "End it here and save", "Leave without saving"]), JSON.stringify(labels));
 ok("4c. focus starts on Keep going", document.activeElement?.id === "exit-confirm-stay");
 sheet?.dispatchEvent(new dom.window.KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
 ok("4d. Escape keeps going", !document.querySelector("#session-exit-overlay") && navs.length === 0);

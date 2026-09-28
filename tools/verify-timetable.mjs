@@ -1,5 +1,13 @@
 /**
  * tools/verify-timetable.mjs
+ * 28 Sep 2026 v2
+ *
+ * v2 - SMOOTH-P3a. The Guided class room left Plan Home (spec 4.1); the
+ *   classes are the "Join a class" link under the three doors. Test 1
+ *   now finds that link. Same three properties: Home offers a way to the
+ *   classes, tapping it goes to the timetable, and it needs no
+ *   twelve-week shape chosen (the fixture has none, asserted).
+ *
  * 08 Sep 2026 v1
  *
  * TIMETABLE-1. Home reaches the classes, and a class can be started.
@@ -129,12 +137,12 @@ console.log("\nTEST 1 - the room named for classes leads to them");
 seed();
 homeRoom();
 
-const goBtn = main.querySelector('[data-door-id="guided"][data-route="classes"]');
-ok("1pc. positive control: Home rendered the Guided class room",
-   !!main.querySelector('[data-room-id="guided"]'),
-   "no guided room at all - everything below measures nothing");
+const goBtn = main.querySelector('.home-link[data-route="classes"]');
+ok("1pc. positive control: Home rendered Plan's doors and links",
+   main.querySelectorAll(".home-door").length === 3 && main.querySelectorAll(".home-link").length > 0,
+   "not Plan's Home - everything below measures nothing");
 
-ok("1a. it offers a way to the classes", !!goBtn,
+ok("1a. it offers a way to the classes", !!goBtn && /class/i.test(goBtn.textContent),
    "THE FAULT: seven playable classes and the room named for them led " +
    "somewhere else. Every class gate was green throughout, because they " +
    "all asked whether the data was right, not whether anybody could reach it");
@@ -148,7 +156,7 @@ if (goBtn) {
 // Classes do not depend on a programme. This branch used to say
 // "Nothing chosen yet" and offer only the programme picker.
 ok("1c. and it does so WITHOUT a twelve-week shape chosen",
-   !!goBtn,
+   !!goBtn && !(store.get("activeProgramme") || {}).programmeId,
    "a class no more depends on a programme than a yoga class at a gym " +
    "depends on having signed up for a course");
 

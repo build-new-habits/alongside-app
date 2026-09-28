@@ -1,6 +1,11 @@
 /**
  * router.js
- * 28 Sep 2026 v31
+ * 28 Sep 2026 v32
+ *
+ * v32 - SMOOTH-P3b. 'know-what' registered ("I know what I want", Plan
+ *   Home's second door), mapped to the Home tab. Not a session, so not
+ *   guarded: the guard meets the person when the session they chose
+ *   starts.
  *
  * v31 - RED-FLAG. One guard, here, before any exercise route mounts: if
  *   the red-flag screen is due, or an answer stopped exercise and it has
@@ -314,6 +319,8 @@ const VIEW_NAMES = {
   // card grammars was the CLUB v1 lesson and five rooms would be the
   // same mistake in a different place.
   'capture':           { path: './views/capture.js',         fn: 'CaptureView'         },
+  // SMOOTH-P3b. "I know what I want", Plan Home's second door.
+  'know-what':         { path: './views/know-what.js',       fn: 'KnowWhatView'        },
   'my-programme':      { path: './views/my-programme.js',     fn: 'MyProgrammeView'     },
   // THREAD-1a. The hard conversation is ENTERED from My Programme's
   // invitation, never opened over the top of it.
@@ -418,6 +425,8 @@ const NAV_MAP = {
   // for the same reason NAV-8 moved the Library there: the highlighted
   // tab must agree with the door somebody came through.
   'saved-sessions': 'today',
+  // SMOOTH-P3b. A Home door, so the Home tab stays lit.
+  'know-what': 'today',
   // PRAC-1. Reached from the Library, which maps to Today. Mapping it
   // to Wellbeing would repeat the NAV-8 fault from the other side --
   // the tab would disagree with the door somebody came through.

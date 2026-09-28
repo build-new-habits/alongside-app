@@ -1,5 +1,11 @@
 /**
  * js/views/saved-sessions.js
+ * 28 Sep 2026 v4
+ *
+ * v4 - SMOOTH-P3b. The movement count is what still exists, not what was
+ *   saved (OWN-1, which had been fixed only on Home's card). Reached now
+ *   from "Or one you saved (n)" on I know what I want.
+ *
  * 08 Sep 2026 v3
  *
  * v3 - SAVED-2. Edit and delete, on Graeme's decision.
@@ -149,7 +155,12 @@ function _agoLabel(iso) {
 
 function _row(rec) {
   const { exercises, missing } = resolveSavedSession(rec);
-  const count = Array.isArray(rec.exerciseIds) ? rec.exerciseIds.length : 0;
+  // OWN-1 on the list, 28 Sep 2026. The count was exerciseIds.length --
+  // what was SAVED, not what still exists. OWN-1 fixed this on Home's
+  // Your own card on 08 Sep and left this copy; with the card gone
+  // (SMOOTH-P3a) this list is the only place it is said. Found when
+  // verify-yourown 4b moved here.
+  const count = exercises.length;
 
   // SAVED-1b, 08 Sep 2026. EVERY movement gone is not the same as some.
   //

@@ -1,6 +1,17 @@
 /**
  * tools/verify-homedoors.mjs
- * 06 Sep 2026 v1
+ * 28 Sep 2026 v2
+ *
+ * v2 - SMOOTH-P3a/b. Plan's Home is three doors (spec 4.1), and the
+ *   session kinds live one door in, on "I know what I want" (4.6). The
+ *   property this gate exists for -- STRETCH AND THE EIGHT-TYPE ENGINE
+ *   STAY REACHABLE ON PLAN -- is now asserted by DRIVING the route:
+ *   Home -> I know what I want -> Stretch -> Show me the plan, through
+ *   the real views, ending on a stretch plan built by session-builder.
+ *   That is stronger than v1's "the tile is on Home": v1 could not see
+ *   what the tile opened. Test 1 counts the doors and checks they are
+ *   usable; 2a/2b drive the routes; 2c/2d unchanged. 3b now also counts
+ *   the one-line arc. Tests 4 and 5 unchanged.
  *
  * HOME-DOORS and ESCAPE-Z.
  *
@@ -49,6 +60,11 @@ Object.defineProperty(globalThis, "navigator",
   { value: dom.window.navigator, configurable: true, writable: true });
 Object.defineProperty(globalThis, "localStorage",
   { value: dom.window.localStorage, configurable: true, writable: true });
+for (const k of ["HTMLElement", "Node", "Event", "MouseEvent", "KeyboardEvent", "CustomEvent"])
+  Object.defineProperty(globalThis, k, { value: dom.window[k], configurable: true, writable: true });
+dom.window.matchMedia = q => ({ matches: false, media: q, addEventListener() {}, removeEventListener() {}, addListener() {}, removeListener() {} });
+dom.window.scrollTo = () => {};
+dom.window.HTMLElement.prototype.scrollIntoView = () => {};
 
 const B = new URL("../js/", import.meta.url).href;
 const { store }      = await import(B + "store.js");
@@ -103,14 +119,11 @@ ok("0b. the free fixture is actually on free", isPremium() === false,
 console.log("\nTEST 1 - Plan's Home has the session doors");
 
 const plan = home("personal");
-const planDoors = [...plan.c.querySelectorAll("[data-door-id]")];
+const planDoors = [...plan.c.querySelectorAll(".home-door")];
 
-ok("1a. Plan's Home renders session doors at all", planDoors.length > 0,
-   "Plan's Home has no door grid. This is the LOBBY-1c state: one button " +
-   "into coach-proposal and nothing else.");
-
-// Count them. A presence check passed with the grid down to one tile.
-ok("1b. and it is the full set, not a remnant", planDoors.length >= 4,
+ok("1a. Plan's Home renders its doors", planDoors.length > 0,
+   "Plan's Home has no doors. This is the LOBBY-1c state: nothing but one way in.");
+ok("1b. and it is the full set, not a remnant", planDoors.length === 3,
    `${planDoors.length} door(s) on Plan's Home`);
 
 // VISIBLE AND CLICKABLE, not merely present. jsdom computes no CSS, so a
@@ -124,21 +137,38 @@ ok("1c. and they are usable, not just present", usable.length === planDoors.leng
    `${planDoors.length - usable.length} door(s) present but hidden or disabled`);
 
 // ── 2. STRETCH IS REACHABLE ─────────────────────────────────────────────
-console.log("\nTEST 2 - the eight-type engine is reachable from Home");
+console.log("\nTEST 2 - the eight-type engine is reachable from Home, driven");
 
-const routes = planDoors.map(d => d.dataset.route);
-ok("2a. the Mobility & Conditioning door is on Plan's Home",
-   routes.includes("mobility-conditioning"),
-   "the only route to a Stretch session. coach-proposal cannot build one: " +
-   "workoutGenerator.getWorkoutName() has three names and stretch is not among them.");
+const { KnowWhatView } = await import(B + "views/know-what.js");
+const { CoachProposalView } = await import(B + "views/coach-proposal.js");
+{
+  localStorage.clear(); store.init(); store.set("tier", "personal"); store.set("onboardingComplete", true);
+  // Its own container: tests 3 and 4 read the Plan render still in #c.
+  const c = document.createElement("div"); document.body.appendChild(c);
+  const navs = [];
+  const r = { history: ["x"], back() {}, navigate(v) {
+    navs.push(v); c.innerHTML = "";
+    if (v === "know-what") KnowWhatView(r).mount(c);
+    if (v === "coach-proposal") CoachProposalView(r).mount(c);
+  } };
+  TodayView(r).mount(c);
+  c.querySelector('[data-action="know-what"]')?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }));
+  const stretch = c.querySelector('input[name="kind"][value="stretch"]');
+  if (stretch) { stretch.checked = true; stretch.dispatchEvent(new dom.window.Event("change", { bubbles: true })); }
+  c.querySelector(".kw-form")?.dispatchEvent(new dom.window.Event("submit", { bubbles: true, cancelable: true }));
+  const sentence = (c.querySelector(".cp-plan__sentence")?.textContent || "").trim();
+  ok("2a. Home -> I know what I want -> Stretch reaches a stretch plan",
+     navs.join(">") === "know-what>coach-proposal" && /^You asked for stretching,/.test(sentence) &&
+     c.querySelectorAll(".cp-plan__row").length > 0,
+     `${navs.join(">")} | ${sentence}. The only route to a Stretch session must not quietly go.`);
 
-ok("2b. and the strength/cardio door too",
-   routes.includes("session-builder"),
-   "session-builder.js is the engine holding sessionVariety, exercisePreferences " +
-   "and SECTION-RULES. workoutGenerator.js reads none of them.");
+  c.innerHTML = ""; KnowWhatView(r).mount(c);
+  const routes = [...c.querySelectorAll("[data-kw-route]")].map(b => b.dataset.kwRoute);
+  ok("2b. and the builder and Mobility & Conditioning are one tap on from there",
+     routes.includes("session-builder") && routes.includes("mobility-conditioning"),
+     `routes: ${routes.join(", ")}`);
+}
 
-// The claim in 2a is only worth making if the type list really does
-// contain stretch. Read it rather than trusting the comment above.
 const { SESSION_TYPES } = await import(B + "session-builder.js");
 ok("2c. and that engine really does have a stretch type",
    SESSION_TYPES.some(t => t.id === "stretch"),
@@ -165,7 +195,7 @@ ok("3a. the coach-picks fallback is still offered on Plan",
    "mistake in the other direction.");
 
 ok("3b. the arc panel appears exactly once on Plan",
-   plan.c.querySelectorAll(".today-arc, .today-arc--active, .today-arc--offer").length <= 1,
+   plan.c.querySelectorAll(".today-arc, .today-arc--active, .today-arc--offer, .home-arc").length <= 1,
    "the arc renders twice: arcPanel() is called above the chooser AND inside it");
 
 // Counted as a SET of elements, not as two filters added together: the
@@ -173,7 +203,7 @@ ok("3b. the arc panel appears exactly once on Plan",
 // summing the two filters counted the same node twice and reported a
 // duplicate that was not there. Caught by reversal.
 const wellbeingCount = new Set([
-  ...planDoors.filter(d => d.dataset.doorId === "wellbeing"),
+  ...[...plan.c.querySelectorAll("[data-door-id]")].filter(d => d.dataset.doorId === "wellbeing"),
   ...[...plan.c.querySelectorAll('[data-route="noticing"]')]
 ]).size;
 ok("3c. Wellbeing is offered once on Plan, not twice", wellbeingCount <= 1,

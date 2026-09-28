@@ -1,5 +1,13 @@
 /**
  * tools/verify-arc-door.mjs
+ * 28 Sep 2026 v2
+ *
+ * v2 - SMOOTH-P3a. Plan Home shows the arc as one line (.home-arc), not
+ *   the panel (.today-arc). The Plan half of the fixture check now reads
+ *   the chip: active arc -> opens the arc with the aim's words; no arc ->
+ *   the setup entrance. Every free assertion is unchanged -- free still
+ *   renders arcPanel(), and the tier rule inside it is still asserted.
+ *
  * 06 Sep 2026 v1
  *
  * ARC-DOOR. Free gets the door. Never the arc.
@@ -61,11 +69,11 @@ console.log("\nARC-DOOR — free gets the door, never the arc\n");
 // FIXTURE INTEGRITY FIRST. The previous investigation set aimId without
 // active, landed on the offer branch, and reported no leak.
 store.set("tier","personal"); store.set("arc",ACTIVE_ARC); paint();
-const paidEl=document.querySelector(".today-arc");
-ok("FIXTURE REACHES THE ACTIVE BRANCH: Plan renders today-arc--active",
-  paidEl && /today-arc--active/.test(paidEl.className));
+const paidEl=document.querySelector(".home-arc");
+ok("FIXTURE REACHES THE ACTIVE BRANCH: Plan's arc line opens the arc, with the aim",
+  paidEl && paidEl.dataset.route==="stretch-arc" && /Build a core that actually holds me up/.test(paidEl.textContent));
 reverses("the fixture is not quietly on the offer branch (the fault that hid this)",
-  ()=>/today-arc--offer/.test(paidEl.className));
+  ()=>/home-arc--offer/.test(paidEl.className));
 
 store.set("tier","free"); paint();
 const freeEl=document.querySelector(".today-arc");
@@ -83,7 +91,7 @@ reverses("free cannot walk into arc setup from Home",
 
 // Plan with no arc keeps the real setup entrance.
 store.set("tier","personal"); store.set("arc",{}); paint();
-const setupEl=document.querySelector(".today-arc");
+const setupEl=document.querySelector(".home-arc");
 ok("Plan without an arc still gets the SETUP entrance",
   setupEl && setupEl.dataset.route==="arc-setup");
 

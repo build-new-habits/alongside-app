@@ -1,6 +1,33 @@
 /**
  * today.js
- * 26 Sep 2026 v41
+ * 28 Sep 2026 v42
+ *
+ * v42 - SMOOTH-P3a. Plan Home is three doors. Spec 4.1.
+ *
+ *   Graeme, 27 Sep: "too many pages before you get to the exercises. Too
+ *   many decisions." Plan Home was the arc panel, four expandable rooms
+ *   (Guided class, One to one, Your own, Quick build), "Or go straight
+ *   to" with four tiles, then reference rows: fifteen-odd things to read
+ *   before the first choice, and it scrolled.
+ *
+ *   Now: the greeting and one coach line, a small arc chip, and three
+ *   doors -- Tell me what to do (filled) · I know what I want · Make it up
+ *   as I go -- with three quiet links under them: Join a class, Something
+ *   for the mind, Library. Nothing is deleted from the app: classes,
+ *   saved sessions, the builder, capture and Library are all one tap
+ *   from here.
+ *
+ *   COMING BACK. When a session was left with "Carry on later", or the
+ *   app was closed mid-session, a Carry-on card replaces the first door:
+ *   the session, where they were, Carry on and Finish here. The other
+ *   doors sit under "Or instead". A cold reopen with a session to carry
+ *   on shows Home with the card rather than bouncing to the old proposal.
+ *
+ *   Free Home is unchanged (P5 cross-checks it).
+ *
+ *   SMOOTH-P3b (same version, not yet committed): "I know what I want"
+ *   opens the new know-what screen, and "Tell me what to do" clears any
+ *   kind asked for there, so the coach really does decide.
  *
  * v41 - EXIT-HOME. Arriving at Home from inside the app means you chose
  *   Home, so Home stays. Only a cold open (the app launched with nothing
@@ -696,6 +723,7 @@
  */
 
 import { store }               from '../store.js';
+import { getResumableSession } from '../session-resume.js';
 // SAFETY-GATE, 15 Sep 2026. One cadence in this product, not two, and
 // one copy of the clinical wording rather than two that drift apart.
 //
@@ -876,6 +904,10 @@ export function TodayView(router) {
     // Session already completed today takes priority — never route to a
     // pending proposal if there's nothing pending.
     if (_sessionCompletedToday()) return 'default';
+
+    // SMOOTH-P3a. A session to carry on is shown on Home as a card, never
+    // bounced into the old proposal (the reopen-to-proposal finding).
+    if (_carryOn()) return 'default';
 
     // 🔴 EXIT-HOME, 26 Sep 2026. YOU CAME HERE, SO YOU STAY HERE.
     //
@@ -1126,7 +1158,7 @@ export function TodayView(router) {
              is why the taxonomy is visible here and hidden on Plan: the
              "coach weaves body and mind" argument only holds where there
              IS a coach doing the weaving. -->
-        ${isPremium() ? arcPanel() : ''}
+        ${isPremium() ? _arcChip() : ''}
 
         <!-- MY PROGRAMME ROW REMOVED, LOBBY-1c, 03 Sep 2026.
              It read "Your goals and where you are up to" and sat
@@ -1150,9 +1182,9 @@ export function TodayView(router) {
 
              The invitation states the price of entry, so the check-in
              is consented to rather than sprung. -->
-        ${isPremium() ? clubRooms() : chooser() + arcPanel()}
+        ${isPremium() ? _planDoors() : chooser() + arcPanel()}
 
-        <div class="today-reference" role="group" aria-label="Reference and settings">
+        ${isPremium() ? '' : `<div class="today-reference" role="group" aria-label="Reference and settings">
           <!-- On free, Wellbeing is promoted into "Settle your mind"
                above, so repeating it here would be the duplication this
                screen exists to remove. On Plan it stays a reference row,
@@ -1168,7 +1200,7 @@ export function TodayView(router) {
               <span class="today-ref-row__chevron" aria-hidden="true">\u203A</span>
             </button>
           `).join('')}
-        </div>
+        </div>`}
 
         <!-- STRAY CHECK-IN LINKS REMOVED, LOBBY-1c, 03 Sep 2026.
              They floated between the reference rows and the nav with
@@ -1202,72 +1234,30 @@ export function TodayView(router) {
     // LOBBY-1c. The one way through to the session space. Routes via
     // the check-in when one is owed and straight through when it is
     // not — a second check-in in a day is a toll, not care.
-    // ARC-LED, 06 Sep 2026. Rows open IN PLACE. No rerender: a rerender
-    // would rebuild the row under the finger that just tapped it and
-    // throw keyboard focus back to the top of the screen.
-    //
-    // aria-expanded moves with the hidden attribute. One without the
-    // other is the state being visible to sighted users and not to
-    // anybody else.
-    container.querySelectorAll('[data-room-toggle]').forEach(head => {
-      head.addEventListener('click', () => {
-        const detail = container.querySelector(
-          `#club-row-${head.dataset.roomToggle}-detail`);
-        if (!detail) return;
-        const opening = detail.hasAttribute('hidden');
-        if (opening) detail.removeAttribute('hidden');
-        else detail.setAttribute('hidden', '');
-        head.setAttribute('aria-expanded', String(opening));
-      });
-    });
+    // SMOOTH-P3a. The room toggles, Quick build's chips and the room's
+    // saved-session Start went with the rooms. Saved sessions start from
+    // saved-sessions.js, whose start path was already identical.
 
-    // CLUB-SHELL. The chip IS the answer to Quick build's one question,
-    // so it must carry it -- asking again in the builder would tell
-    // somebody their first answer was not heard.
-    // YOUR-OWN. Ids are resolved against the LIVE library at start, so a
-    // saved session picks up safety corrections rather than carrying a
-    // frozen copy of the database. An exercise that has since gone is
-    // dropped and the session still starts -- refusing to start would
-    // punish somebody for a change they did not make.
-    container.querySelectorAll('[data-saved-id]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const rec = savedSessions().find(s => s.id === btn.dataset.savedId);
-        if (!rec) return;
-        const { exercises } = resolveSavedSession(rec);
-        if (!exercises.length) return;
-        markSavedSessionUsed(rec.id);
-        store.set('generatedSession', {
-          session: {
-            id:          rec.sessionType || 'own',
-            title:       rec.name,
-            duration:    rec.durationMins ? `${rec.durationMins} mins` : null,
-            exercises,
-            sessionType: rec.sessionType || null
-          },
-          builtAt: new Date().toISOString(),
-          inputs:  { savedSessionId: rec.id }
-        });
-        store.set('usingGeneratedSession', true);
-        router.navigate('gym-programme');
+    // SMOOTH-P3a. The other two doors, and coming back.
+    container.querySelector('[data-action="know-what"]')
+      ?.addEventListener('click', () => router.navigate('know-what'));
+    container.querySelector('[data-action="as-i-go"]')
+      ?.addEventListener('click', () => router.navigate('capture'));
+    container.querySelector('[data-action="carry-on"]')
+      ?.addEventListener('click', () => router.navigate('workout'));
+    container.querySelector('[data-action="carry-finish"]')
+      ?.addEventListener('click', async () => {
+        const w = await import('./workout.js');
+        w.finishFromHome();
       });
-    });
-
-    container.querySelectorAll('[data-quick-mins]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const mins = Number(btn.dataset.quickMins);
-        if (!Number.isFinite(mins) || mins <= 0) return;
-        // QUICK-BUILD. mode:'quick' sends the builder to its single
-        // scaffold screen rather than the six question phases. Without
-        // it the card's "tell me how long and I fill the rest in" is
-        // followed immediately by six more questions.
-        store.set('sessionBuilderPreselect',
-                  { durationMins: mins, mode: 'quick', returnTo: 'today' });
-        router.navigate('session-builder');
-      });
-    });
 
     container.querySelector('[data-action="start-today"]')
       ?.addEventListener('click', () => {
+        // SMOOTH-P3b. "Tell me what to do" means the coach decides, so a
+        // kind asked for earlier on "I know what I want" does not ride
+        // along into it. Checked-in people skip clearPurpose(), which
+        // is the only other place the request is cleared.
+        store.set('requestedSessionType', null);
         if (_checkedInToday()) {
           router.navigate('coach-proposal');
         } else {
@@ -1531,7 +1521,8 @@ export function TodayView(router) {
         //
         // Named per tier now, from the control actually on that screen.
         return isPremium()
-          ? "If you'd rather not choose, One to one lets me decide today."
+          // SMOOTH-P3a. The door on this screen now is "Tell me what to do".
+          ? "If you'd rather not choose, \u2018Tell me what to do\u2019 lets me decide today."
           : "If you'd rather not choose, \u2018Not sure?\u2019 lets me decide today.";
       }
 
@@ -1875,307 +1866,102 @@ function _markGuidanceShown(root) {
   }
 }
 
-  function roomRow({ id, title, what, summary, facts, action }) {
-    return `
-      <div class="club-row" data-room-id="${id}">
-        <!--
-          A11Y-HOME, 08 Sep 2026. The h2 wraps the button, which is the
-          WAI-ARIA accordion pattern.
+  // SMOOTH-P3a. roomRow() and clubRooms() -- the four CLUB rooms --
+  // were removed from Plan Home by spec 4.1 and had no other caller.
+  // Everything they led to is still reached: classes (Join a class),
+  // the coach (Tell me what to do), saved sessions, the builder, the
+  // twelve-week shape and Mobility & Conditioning (I know what I want),
+  // and capture (Make it up as I go).
 
-          Home had ONE heading for the entire screen -- the greeting --
-          so the one page everybody starts on could not be skimmed by
-          heading at all. Four rooms, and a screen reader user had no way
-          to jump between them. WCAG 2.2 AA 1.3.1: these are the page's
-          sections, and they existed in presentation only.
-
-          THE HEADING WRAPS THE BUTTON RATHER THAN SITTING INSIDE IT.
-          A heading nested inside an interactive element is not reliably
-          exposed, and the alternative -- shrinking the button to just
-          the title so the heading could be short -- would take the tap
-          target away from the rest of the row, where people already
-          press. That removal would be the change, not an improvement.
-
-          It makes the heading text long: "Guided class. A twelve-week
-          shape. I fit your sessions to it. Nothing chosen yet." That
-          reads as a virtue rather than a cost -- CLUB spec v2 3.1 exists
-          because you should not have to OPEN a room to learn what it is,
-          and navigating by heading now tells you.
-        -->
-        <h2 class="club-row__heading">
-        <button class="club-row__head"
-                type="button"
-                aria-expanded="false"
-                aria-controls="club-row-${id}-detail"
-                data-room-toggle="${id}">
-          <span class="club-row__text">
-            <span class="club-row__title">${_esc(title)}</span>
-            <!-- SLOT 2, AND IT STAYS ON THE CLOSED ROW. The first draft
-                 of this layout put "what the room is" inside the
-                 expanded detail and showed only state when closed --
-                 so you had to open a room to learn what it was. That is
-                 the "find out by doing" fault CLUB spec v2 3.1 reversed
-                 v1 over, reintroduced by a layout change. verify-
-                 clubshell 3b caught it. -->
-            <span class="club-row__what">${_esc(what)}</span>
-            ${summary ? `<span class="club-row__summary">${_esc(summary)}</span>` : ''}
-          </span>
-          <span class="club-row__chev" aria-hidden="true">\u25be</span>
-        </button>
-        </h2>
-        <div class="club-row__detail" id="club-row-${id}-detail" hidden>
-          ${facts && facts.length ? `
-            <ul class="club-row__facts">
-              ${facts.map(f => `<li>${_esc(f)}</li>`).join('')}
-            </ul>` : ''}
-          ${action}
-        </div>
-      </div>`;
+  /**
+   * SMOOTH-P3a. The session to carry on, if there is one: a workout
+   * checkpoint (session-resume.js, the one active-session slot) that
+   * belongs to the session still loaded. A checkpoint for a session that
+   * has since been replaced is not offered -- it would resume the wrong
+   * thing.
+   */
+  function _carryOn() {
+    const cp  = getResumableSession('workout');
+    const gen = store.get('generatedSession');
+    const ses = gen?.session;
+    if (!cp || !ses || !Array.isArray(ses.exercises) || !ses.exercises.length) return null;
+    const key = `${ses.id || ses.name || 'session'}|${gen.builtAt || ''}`;
+    if (cp.sessionId !== key) return null;
+    const total = ses.exercises.length;
+    const index = Math.min(Math.max(0, Number(cp.index) || 0), total - 1);
+    return {
+      name:  ses.title || cp.name || 'Your session',
+      next:  ses.exercises[index]?.name || '',
+      index, total,
+    };
   }
 
-  function clubRooms() {
-    const prog     = store.get('activeProgramme') || {};
-    const progMeta = prog.programmeId ? getProgramme(prog.programmeId) : null;
-    // GUIDED-COPY. plannedFocusToday() is no longer called here. It reads
-    // activeProgramme.sessionSequence, which is empty for every
-    // programme, so it returned null every time and the only thing it
-    // drove was a permanent "Nothing scheduled today".
-    //
-    // The import stays: session-choice.js's chain still calls it, and it
-    // becomes real the moment classes exist.
+  /** Replaces the first door when there is a session to come back to. */
+  function _carryOnCard(c) {
+    const pos = `${c.index + 1} of ${c.total}`;
+    return `
+      <section class="home-carry" aria-labelledby="home-carry-title">
+        <p class="home-carry__kicker">Carry on</p>
+        <h2 class="home-carry__title" id="home-carry-title">${_esc(c.name)}</h2>
+        <p class="home-carry__next">Next: ${_esc(c.next)} \u00b7 ${pos}</p>
+        <div class="home-carry__bar" role="img" aria-label="Exercise ${pos}">
+          <div class="home-carry__fill" style="width:${Math.round((c.index / c.total) * 100)}%"></div>
+        </div>
+        <button class="btn btn-primary btn-large btn-full" data-action="carry-on">Carry on</button>
+        <button class="btn btn-ghost btn-full" data-action="carry-finish">Finish here and save</button>
+      </section>`;
+  }
 
-    // GUIDED-COPY, 06 Sep 2026. THE CARD STOPS PROMISING A COURSE.
-    //
-    // It said "A set course. Same shape each week." All eight entries in
-    // programmes.js have an EMPTY sessionSequence. A programme is four
-    // phases each carrying a bias -- intensityBias, focusBias -- plus a
-    // label and a coach message. It is a twelve-week TUNING OF THE
-    // GENERATOR, not a course. The copy was written against a room
-    // nobody had looked inside. Graeme, on device: "There is no Class
-    // content to follow. No programme." There is not.
-    //
-    // "Nothing scheduled today" was the same fault one layer down.
-    // plannedFocusToday() reads activeProgramme.sessionSequence, which
-    // is empty for EVERY programme, so that line rendered every single
-    // day and the card could never be the suggested one. It described
-    // an absence as though a schedule existed and today happened to be
-    // empty.
-    //
-    // The facts now come from the phase, which is real data: its label,
-    // what it leans towards, how far in you are. Nothing here claims a
-    // session exists.
-    //
-    // THE ROOM KEEPS ITS NAME. Real classes are specified and coming --
-    // Documents/Admin/alongside_spec_guided_class_06sep2026_v1.md --
-    // and renaming now and back later is churn. What had to stop was
-    // the DESCRIPTION promising something behind the door.
-    const phase = progMeta ? getPhaseForWeek(progMeta, prog.currentWeek || 1) : null;
-
-    const guided = progMeta
-      ? roomRow({
-          id: 'guided', title: 'Guided class',
-          // TIMETABLE-1. The room is named for classes and now contains
-          // them, so it says so. It described only the twelve-week shape
-          // while the classes it is named for sat unreachable.
-          // The summary is what the row shows CLOSED, so it carries the
-          // one fact worth deciding on rather than the room's slogan.
-          what: 'Drop into a class. It knows what you\u2019re working towards.',
-          summary: `${progMeta.name} \u00b7 ${prog.currentWeek || 1} week${(prog.currentWeek || 1) === 1 ? '' : 's'} in`,
-          facts: [
-            phase ? `${phase.label} \u2014 ${phase.description}` : 'A twelve-week shape',
-            phase ? `Leaning ${phase.intensityBias}, towards ${_joinPlain(phase.focusBias)}` : '',
-            // COUNTDOWN-1: progress made, never distance remaining.
-            // "Week 3 of 12" is distance remaining wearing a position's
-            // clothes, and the gate caught it within the hour.
-            `You are ${prog.currentWeek || 1} week${(prog.currentWeek || 1) === 1 ? '' : 's'} in`
-          ].filter(Boolean),
-          // TIMETABLE-1, 08 Sep 2026. THE CLASSES WERE UNREACHABLE.
-          //
-          // Seven classes existed as data and this room -- the one named
-          // for them -- led to the programme instead. Graeme: "when you
-          // tell me there's classes in folders but it doesn't get
-          // anywhere, that makes me worried."
-          //
-          // Classes first, because that is what the room is called and
-          // what CLUB spec v2 6.1 says it holds. The twelve-week shape
-          // is still here, underneath, where somebody who wants it can
-          // find it.
-          action: `<button class="btn btn-primary btn-full club-room__go"
-                           data-route="classes" data-door-id="guided"
-                           data-requires-checkin="false">See the classes</button>
-                   <button class="btn btn-secondary btn-full club-room__go"
-                           data-route="my-programme" data-door-id="guided"
-                           data-requires-checkin="false">See your shape</button>`
-        })
-      // EMPTY STATE. An invitation, and it states the cost before it is
-      // paid -- CLUB spec v2 3.5.
-      // TIMETABLE-1. NOT AN EMPTY STATE ANY MORE.
-      //
-      // This branch used to say "Nothing chosen yet" and offer only the
-      // programme picker -- so somebody without a twelve-week shape
-      // could not reach a class at all. Classes do not depend on a
-      // programme any more than a yoga class at a gym depends on having
-      // signed up for a course. The classes come first here too; the
-      // shape is the second button, for anybody who wants one.
-      : roomRow({
-          id: 'guided', title: 'Guided class',
-          what: 'Drop into a class. It knows what you\u2019re working towards.',
-          summary: `${CLASSES.length} classes`,
-          facts: ['Same class for everybody, fitted to your arc',
-                  'Ten to twenty minutes',
-                  'A shorter version of each one, for the days that need it'],
-          action: `<button class="btn btn-primary btn-full club-room__go"
-                           data-route="classes" data-door-id="guided"
-                           data-requires-checkin="false">See the classes</button>
-                   <button class="btn btn-secondary btn-full club-room__go"
-                           data-route="goal-setup" data-door-id="guided"
-                           data-requires-checkin="false">Choose a twelve-week shape</button>`
-        });
-
-    const pt = roomRow({
-      id: 'pt', title: 'One to one',
-      what: 'I pick it, around how you are today.',
-      summary: 'Check in first',
-      facts: ['4 questions, about a minute',
-              'Then one session, suggested'],
-      action: `<button class="btn btn-primary btn-full club-room__go"
-                       data-route="coach-proposal" data-door-id="pt"
-                       data-requires-checkin="true">Check in</button>`
-    });
-
-    // YOUR-OWN, 06 Sep 2026. No longer a shell.
-    //
-    // ONE on the card, the rest behind a COUNTED button -- "Your other 2
-    // sessions", never "More". A count tells you whether it is worth the
-    // tap; "More" makes you tap to find out.
-    const saved = savedSessions();
-    // OWN-1, 08 Sep 2026. Three faults in the facts and the action below.
-    //
-    // 1. The count was `exerciseIds.length` -- the count SAVED, not the
-    //    count that still exists. resolveSavedSession() has always
-    //    returned `missing` and this caller dropped it on the floor, so
-    //    the card could promise nine movements and hand over seven.
-    //
-    // 2. "1 movements". Same unguarded interpolation PROPOSAL-1 fixed on
-    //    the proposal card the same day, in a second place.
-    //
-    // 3. A session whose movements have ALL gone offered a Start button
-    //    that did nothing: the handler below ends
-    //    `if (!exercises.length) return;`, a silent no-op. SAVED-1b fixed
-    //    exactly this on the saved-sessions list and left the copy here,
-    //    which is the branch-and-a-half pattern GUIDED-COPY and DEVICE-1
-    //    are both on record for.
-    const top = saved[0] || null;
-    const topResolved = top ? resolveSavedSession(top) : { exercises: [], missing: 0 };
-    const topCount    = topResolved.exercises.length;
-    const topRunnable = topCount > 0;
-
-    const own = saved.length
-      ? roomRow({
-          id: 'own', title: 'Your own',
-          what: 'Sessions you put together yourself.',
-          summary: saved[0].name,
-          facts: [
-            saved[0].durationMins ? `${saved[0].durationMins} minutes` : 'Your own length',
-            `${topCount} movement${topCount === 1 ? '' : 's'}`,
-            topResolved.missing > 0
-              ? `${topResolved.missing} no longer in the library`
-              : (saved[0].lastUsedAt ? `Last done ${_daysAgoLabel(saved[0].lastUsedAt)}` : 'Not done yet')
-          ],
-          action: `${topRunnable ? `
-                     <button class="btn btn-primary btn-full club-room__go"
-                             data-saved-id="${saved[0].id}">Start ${_esc(saved[0].name)}</button>
-                   ` : `
-                     <p class="club-room__note" role="status">
-                       None of the movements in this one are in the library any
-                       more, so there is nothing left to start.
-                     </p>
-                   `}
-                   ${saved.length > 1 ? `
-                     <!-- SAVED-1, 08 Sep 2026. Was data-route="session-builder":
-                          a button naming sessions you already have, which
-                          opened the screen for making a new one. There was
-                          nowhere else for it to go until saved-sessions
-                          existed. A count is a promise, and this is where it
-                          is now kept. -->
-                     <button class="btn btn-secondary btn-full club-room__go"
-                             data-route="saved-sessions" data-door-id="own"
-                             data-requires-checkin="false"
-                             aria-label="Your other ${saved.length - 1} saved session${saved.length - 1 === 1 ? '' : 's'}. Opens the full list.">Your other ${saved.length - 1} session${saved.length - 1 === 1 ? '' : 's'}</button>
-                   ` : ''}
-                   <!--
-                     YOUR-OWN-CREATE, 16 Sep 2026. Graeme, on device:
-                     "How do I build my own?"
-
-                     He could not, from this room. "Build your first"
-                     existed ONLY in the empty branch below. The moment a
-                     first session was saved the button vanished and never
-                     came back, so a room whose entire purpose is sessions
-                     you put together yourself offered only Start and a
-                     list -- no way to put another one together.
-
-                     A one-branch affordance: correct on the day it was
-                     written, wrong from the second session onwards, and
-                     invisible to anyone who had ever saved one. The same
-                     shape as CARD-5's five views -- a thing that is true
-                     of the state it was authored in.
-
-                     Ghost rather than secondary: Start is the primary
-                     action here and this must not compete with it. The
-                     wording differs from the empty branch on purpose --
-                     "another" is accurate once one exists, and "Build
-                     your first" would be a small lie.
-                   -->
-                   <button class="btn btn-ghost btn-full club-room__go"
-                           data-route="session-builder" data-door-id="own"
-                           data-requires-checkin="false">Build another</button>
-                   <!--
-                     CAPTURE-1, 16 Sep 2026. Graeme: "I'm in the gym, I
-                     did a thing, record it" -- and the other half, "I
-                     want to do..... I'll guide you."
-
-                     It lives HERE, in Your own, rather than becoming a
-                     fifth room on Home. Four card grammars was the CLUB
-                     v1 lesson; five rooms would be the same mistake in a
-                     different place. This room is already "sessions you
-                     put together yourself" -- doing that as you go is
-                     the same sentence, not a new one.
-                   -->
-                   <button class="btn btn-ghost btn-full club-room__go"
-                           data-route="capture" data-door-id="own"
-                           data-requires-checkin="false">As you go</button>`
-        })
-      : roomRow({
-          id: 'own', title: 'Your own',
-          what: 'Sessions you put together yourself.',
-          summary: 'Nothing saved yet',
-          facts: ['You choose the type, length and kit', 'Save one and it stays here'],
-          action: `<button class="btn btn-primary btn-full club-room__go"
-                           data-route="session-builder" data-door-id="own"
-                           data-requires-checkin="false">Build your first</button>`
-        });
-
-    // The assumptions are shown BEFORE the chips, not discovered after.
-    const quick = roomRow({
-      id: 'quick', title: 'Quick build',
-      what: 'Tell me how long. I fill the rest in.',
-      summary: 'How long have you got?',
-      facts: ['At home, no equipment', 'You can change the place and kit next'],
-      action: `
-        <div class="club-room__chips" role="group" aria-label="How long have you got?">
-          ${[15, 30, 45, 60].map(m => `
-            <button class="btn btn-secondary club-room__chip"
-                    data-quick-mins="${m}"
-                    aria-label="${m} minutes">${m} min</button>`).join('')}
-        </div>`
-    });
-
+  /**
+   * The three doors. The first is the filled one -- unless there is a
+   * session to carry on, in which case that card leads and all three sit
+   * quietly under "Or instead".
+   */
+  function _planDoors() {
+    const carry = _carryOn();
+    const checkedIn = _checkedInToday();
+    const door = (action, title, sub, primary) => `
+      <button class="home-door ${primary ? 'home-door--primary' : ''}" data-action="${action}">
+        <span class="home-door__title">${title}</span>
+        <span class="home-door__sub">${sub}</span>
+      </button>`;
+    // GUIDANCE-1 goes with the doors: it was in the rooms, and the rooms
+    // were the only Plan place it was said. Found by verify-clubshell 12a.
     return `
       ${_guidanceLine()}
-      <p class="today-chooser-q">What do you want to do today?</p>
-      <p class="today-chooser-sub">Four ways in. Open any one to see what it would give you today.</p>
-      <div class="club-rooms">${guided}${pt}${own}${quick}</div>
-      <p class="today-group-label">Or go straight to</p>
-      ${tileGrid()}`;
+      ${carry ? _carryOnCard(carry) : ''}
+      ${carry ? '<p class="home-doors__or" id="home-doors-label">Or instead</p>' : '<h2 class="sr-only" id="home-doors-label">What would you like to do?</h2>'}
+      <div class="home-doors" role="group" aria-labelledby="home-doors-label">
+        ${door('start-today', 'Tell me what to do',
+               checkedIn ? 'You\u2019ve checked in \u2014 straight to your plan' : 'Three quick questions, then your plan',
+               !carry)}
+        ${door('know-what', 'I know what I want', 'Pick the kind of session and how long', false)}
+        ${door('as-i-go', 'Make it up as I go', 'Log each move as you do it', false)}
+      </div>
+      <p class="home-links">
+        <button class="home-link" data-route="classes" data-requires-checkin="false">Join a class</button>
+        <button class="home-link" data-route="noticing" data-requires-checkin="false">Something for the mind</button>
+        <button class="home-link" data-route="library" data-requires-checkin="false">Library</button>
+      </p>`;
+  }
+
+  /** The arc, in one line. Opens the arc; sets one up if there is none. */
+  function _arcChip() {
+    const arc = store.get('arc') || {};
+    // An active arc always opens the arc, whether or not its aim still
+    // resolves; offering setup to somebody who has one would start them
+    // again. The aim's own words, else the arc's stored label.
+    const label = arc.active ? ((arc.aimId && aimById(arc.aimId)?.label) || arc.label || 'your arc') : null;
+    return label
+      ? `<button class="home-arc" data-route="stretch-arc" data-requires-checkin="false"
+                 aria-label="Your arc: working towards ${_esc(label)}">
+           <span class="home-arc__label">Working towards</span>
+           <span class="home-arc__aim">${_esc(label)}</span>
+         </button>`
+      : `<button class="home-arc home-arc--offer" data-route="arc-setup" data-requires-checkin="false">
+           <span class="home-arc__label">Your arc</span>
+           <span class="home-arc__aim">Tell me what you want to be able to do</span>
+         </button>`;
   }
 
   function tileGrid() {

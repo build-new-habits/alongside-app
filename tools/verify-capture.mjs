@@ -1,5 +1,12 @@
 /**
  * tools/verify-capture.mjs
+ * 28 Sep 2026 v2
+ *
+ * v2 - SMOOTH-P3a. The Your own room left Plan Home; capture is now the
+ *   third door, "Make it up as I go". 5.2 finds that door and its route;
+ *   5.3 pins the rule it guarded -- no extra card grammar on Home -- on
+ *   the doors: exactly three, so a fourth is a decision, not a drift.
+ *
  * 16 Sep 2026 v1
  *
  * CAPTURE-1. Build as you go, or log what you just did.
@@ -182,16 +189,14 @@ console.log("\nTEST 5 — reachable, and not a fifth room");
   const today  = fs.readFileSync(new URL("../js/views/today.js", import.meta.url), "utf8");
   const router = fs.readFileSync(new URL("../js/router.js", import.meta.url), "utf8");
   ok("5.1 the route is registered", /'capture':\s*\{\s*path: '\.\/views\/capture\.js'/.test(router));
-  ok("5.2 reached from the Your own room", /data-route="capture"/.test(today));
-  // Counting roomRow() calls is the WRONG proxy and was tried first: the
-  // Your own room has two branches, empty and populated, so seven calls
-  // produce four rooms. What is actually pinned is the ROW ITSELF -- the
-  // four rooms Home assembles, in order.
-  ok("5.3 REVERSAL: it is not a fifth room on Home",
-     /<div class="club-rooms">\$\{guided\}\$\{pt\}\$\{own\}\$\{quick\}<\/div>/.test(today),
-     "four card grammars was the CLUB v1 lesson; five rooms would be the " +
-     "same mistake in a different place. If a room is legitimately added, " +
-     "change this line on purpose rather than loosening the count");
+  ok("5.2 reached from Home's third door, Make it up as I go",
+     /door\('as-i-go', 'Make it up as I go'/.test(today) &&
+     /data-action="as-i-go"\]'\)\s*\?\.addEventListener\('click', \(\) => router\.navigate\('capture'\)\)/.test(today));
+  const doorsFn = today.slice(today.indexOf("function _planDoors"), today.indexOf("function _arcChip"));
+  ok("5.3 REVERSAL: it is not a fourth door on Home",
+     (doorsFn.match(/\$\{door\('/g) || []).length === 3,
+     "three doors is spec 4.1. If a door is legitimately added, change this " +
+     "line on purpose rather than loosening the count");
   ok("5.4 and its stylesheet is imported",
      /components\/capture\.css/.test(fs.readFileSync(new URL("../css/main.css", import.meta.url), "utf8")));
 }

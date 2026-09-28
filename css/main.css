@@ -1,5 +1,7 @@
 /* main.css
- * 28 Sep 2026 v26
+ * 28 Sep 2026 v27
+ *
+ * v27 - SMOOTH-P3b. components/know-what.css imported.
  *
  * v26 - RED-FLAG. components/red-flag.css imported.
  *
@@ -141,6 +143,7 @@
 @import 'components/upgrade-page.css';
 @import 'components/practices.css';
 @import 'components/red-flag.css';
+@import 'components/know-what.css';   /* SMOOTH-P3b, 28 Sep 2026 */
 /* PLAYER-1, 08 Sep 2026. The guided class player. A component file not
    imported here is dead on arrival, per this file's own note. */
 @import 'components/class-list.css';

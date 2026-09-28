@@ -2,7 +2,15 @@ import { zonesForAreas } from "./data/aims.js";
 
 /**
  * store.js - Data persistence layer
- * 28 Sep 2026 v75
+ * 28 Sep 2026 v76
+ *
+ * v76 - SMOOTH-P3a. activeSessionCheckpoint declared. session-resume.js
+ *   has written it since 03 Aug (running-session pilot) and it survived
+ *   only through the ...saved spread, undeclared and undocumented. The
+ *   coach's player now writes it too ("Carry on later", and a cold
+ *   reopen mid-session), and Home reads it for the Carry-on card, so it
+ *   is load-bearing and gets a default and a Schema entry. Shape is
+ *   session-resume.js's: { sessionType, startedAt, checkpointedAt, ...fields }.
  *
  * v75 - RED-FLAG. redFlag: the red-flag screen's record. One object,
  *   not a log -- it holds the latest screen and, when an answer stopped
@@ -2310,6 +2318,9 @@ export const store = {
       // the wording acknowledged is "I have read this" and never
       // "I accept the risk". See safety-gate.js.
       safetyAckLog: [],
+
+      // SMOOTH-P3a. The one resumable-session slot. See v76.
+      activeSessionCheckpoint: null,
 
       // RED-FLAG, 28 Sep 2026. See js/data/red-flag.js and the v75 note.
       redFlag: { screenedAt: null, areas: [], textVersion: null, level: null, flaggedAt: null, clearedAt: null },

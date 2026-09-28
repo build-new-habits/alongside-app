@@ -1,5 +1,14 @@
 /**
  * tools/verify-saved1.mjs
+ * 28 Sep 2026 v2
+ *
+ * v2 - SMOOTH-P3a/b. The Your own room left Plan Home (spec 4.1) and the
+ *   counted button moved to "I know what I want" as "Or one you saved
+ *   (n)" (spec 4.6). Test 3 now mounts that screen. The promise is the
+ *   same and so are the checks: the count is the real count, the button
+ *   does not open the builder, it opens the list, tapping it navigates
+ *   there, and the route is registered.
+ *
  * 08 Sep 2026 v1
  *
  * SAVED-1. The Your own room's count is a promise, and this is where it
@@ -166,25 +175,29 @@ ok("2b-d. and the session is still listed, not hidden",
    "it vanish answers a question they did not ask");
 
 // ── 3. THE COUNTED BUTTON REACHES IT ────────────────────────────────────
-console.log("\nTEST 3 - the Your own room's counted button leads here");
+console.log("\nTEST 3 - the counted button on I know what I want leads here");
 
 // The defect was never in a view. It was in where a button pointed.
 fixture();
 const navs = [];
-TodayView({ navigate: (r) => navs.push(r) }).mount(main);
+const { KnowWhatView } = await import(B + "views/know-what.js");
+KnowWhatView({ navigate: (r) => navs.push(r) }).mount(main);
 
 const counted = [...main.querySelectorAll("button")]
-  .find(b => /Your other \d+ session/.test(b.textContent || ""));
+  .find(b => /Or one you saved \(\d+\)/.test(b.textContent || ""));
 
-ok("3pc. positive control: the counted button is on Home", !!counted,
-   "no 'Your other N sessions' button - test 3 measures nothing");
+ok("3pc. positive control: the counted button is there", !!counted,
+   "no 'Or one you saved (n)' button - test 3 measures nothing");
+ok("3pc-2. and its count is the real count",
+   !!counted && new RegExp(`\\(${FIXTURE.length}\\)`).test(counted.textContent),
+   counted ? counted.textContent.trim() : "-");
 ok("3a. it does not point at the builder",
-   !!counted && counted.dataset.route !== "session-builder",
+   !!counted && counted.dataset.kwRoute !== "session-builder",
    "a button naming sessions you already have opens the screen for making " +
    "a new one - this is the fault verbatim");
 ok("3b. it points at the saved-sessions list",
-   !!counted && counted.dataset.route === "saved-sessions",
-   `data-route="${counted ? counted.dataset.route : "-"}"`);
+   !!counted && counted.dataset.kwRoute === "saved-sessions",
+   `data-kw-route="${counted ? counted.dataset.kwRoute : "-"}"`);
 
 if (counted) {
   counted.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }));

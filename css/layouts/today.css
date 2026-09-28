@@ -1,5 +1,12 @@
 /*
  * css/layouts/today.css
+ * 28 Sep 2026 v8
+ *   SMOOTH-P3a. Plan Home: .home-arc (the arc in one line), .home-doors /
+ *   .home-door (three doors, the first filled), .home-links (three quiet
+ *   links), .home-carry (the Carry-on card). Every door is at least 64px
+ *   tall and says what happens next in its second line, so the choice is
+ *   made on words rather than on colour (1.4.1).
+ *
  * 03 Sep 2026 v7
  *   LOBBY-1a. .today-reference / .today-ref-row.
  *
@@ -527,4 +534,130 @@
    free is not a smaller version of the screen, it is a different one. */
 .today-door--pick {
   min-height: 48px;
+}
+
+
+/* ============================================================
+   SMOOTH-P3a. Plan Home: three doors.
+   ============================================================ */
+
+.home-arc {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  width: 100%;
+  margin: var(--space-2) 0 var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  min-height: 48px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full, 999px);
+  color: var(--color-text);
+  text-align: left;
+  cursor: pointer;
+}
+.home-arc__label { font-size: var(--text-sm); color: var(--color-text-secondary); }
+.home-arc__aim   { font-weight: 600; line-height: 1.3; }
+.home-arc:focus-visible { outline: 3px solid var(--color-border-focus); outline-offset: 2px; }
+
+.home-doors {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.home-door {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  width: 100%;
+  min-height: 72px;
+  padding: var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg, 16px);
+  color: var(--color-text);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.12s, transform 0.12s;
+}
+.home-door:hover { border-color: var(--color-primary); }
+.home-door:active { transform: scale(0.99); }
+.home-door:focus-visible { outline: 3px solid var(--color-border-focus); outline-offset: 2px; }
+.home-door__title { font-size: var(--text-lg); font-weight: 700; line-height: 1.25; }
+.home-door__sub   { font-size: var(--text-sm); color: var(--color-text-secondary); line-height: 1.4; }
+
+.home-door--primary {
+  /* The same fill and text as .btn-primary, so the primary action looks
+     like the primary action everywhere and meets the same contrast. */
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+  border-color: var(--color-primary);
+  color: var(--color-text-inverse);
+}
+.home-door--primary .home-door__sub { color: inherit; opacity: 0.85; }
+
+.home-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-1) var(--space-4);
+  margin: var(--space-4) 0 0;
+}
+.home-link {
+  min-height: 44px;
+  padding: 0 var(--space-2);
+  background: none;
+  border: none;
+  color: var(--color-primary);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.home-link:focus-visible { outline: 3px solid var(--color-border-focus); outline-offset: 2px; }
+
+.home-doors__or {
+  margin: var(--space-5, 1.5rem) 0 var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+.home-carry {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border: 2px solid var(--color-primary);
+  border-radius: var(--radius-lg, 16px);
+  background: var(--color-surface);
+}
+.home-carry__kicker { margin: 0; font-size: var(--text-sm); font-weight: 600; color: var(--color-primary); }
+.home-carry__title  { margin: 0; font-size: var(--text-xl); color: var(--color-text); }
+.home-carry__next   { margin: 0; color: var(--color-text-secondary); }
+.home-carry__bar    { height: 6px; background: var(--color-border); border-radius: 999px; overflow: hidden; margin: var(--space-1) 0 var(--space-2); }
+.home-carry__fill   { height: 100%; background: var(--color-primary); }
+
+@media (prefers-reduced-motion: reduce) {
+  .home-door { transition: none; }
+  .home-door:active { transform: none; }
+}
+
+/* SMOOTH-P3a. With a session to carry on, the other doors step back:
+   one line each, so the card and all three still fit a phone. */
+.home-carry ~ .home-doors .home-door { min-height: 52px; padding: var(--space-3) var(--space-4); }
+.home-carry ~ .home-doors .home-door__sub { display: none; }
+.home-carry ~ .home-doors .home-door__title { font-size: var(--text-base); }
+.home-carry .btn-large { min-height: 52px; }
+
+/* SMOOTH-P3a. The general-guidance line (GUIDANCE-1, once a month) sits
+   above the doors on Plan Home. Compact there, so on the day it shows
+   the three doors still fit a phone. Same words, same role="note". */
+.today-guidance:has(~ .home-doors) {
+  margin: 0 0 var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-sm);
+  line-height: 1.45;
 }

@@ -1,6 +1,16 @@
 /**
  * workout.js - Workout Execution View
- * 28 Sep 2026 v21
+ * 28 Sep 2026 v22
+ *
+ * v22 - SMOOTH-P3a. Carry on later, and coming back.
+ *
+ *   The exit sheet gains "Carry on later": the session is kept exactly
+ *   where it is and the person goes Home, where a Carry-on card brings
+ *   them back to the same exercise and set. The place is checkpointed on
+ *   every exercise and set through session-resume.js (the one resumable
+ *   slot, 3-hour expiry), so a phone call that kills the app mid-session
+ *   comes back to the same place too -- not to the old proposal.
+ *   Finishing, ending and leaving without saving all clear it.
  *
  * v21 - SMOOTH-P2e, REST-1. Graeme, 28 Sep: "the suggestion should be
  *   given." After each set but the last, the screen suggests the rest
@@ -361,6 +371,7 @@ import { selectMoment, recordMomentShown, dismissMoment } from "../data/groundin
 import { checkinData }   from "../data/checkin.js";
 import { recordSession } from "../data/programmeEngine.js";
 import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
+import { checkpointSession, getResumableSession, clearCheckpoint } from "../session-resume.js";
 
 export const centered = false;
 
@@ -439,8 +450,40 @@ function _getWorkout() {
   return store.get("generatedSession")?.session || null;
 }
 
+// SMOOTH-P3a. Checked once per session, on the first render: a matching
+// checkpoint puts the person back where they left off.
+let _resumeChecked = false;
+
+function _restoreFromCheckpoint(workout) {
+  if (_resumeChecked || !workout || !Array.isArray(workout.exercises)) return;
+  _resumeChecked = true;
+  const cp = getResumableSession("workout");
+  if (!cp || cp.sessionId !== _sessionKey(workout)) return;
+  const i = Number(cp.index);
+  if (Number.isInteger(i) && i >= 0 && i < workout.exercises.length) {
+    currentExerciseIndex = i;
+    currentSet = Math.max(1, Number(cp.set) || 1);
+  }
+}
+
+/** This session and no other: the id plus when it was built (saved sessions share ids). */
+function _sessionKey(workout) {
+  return `${workout?.id || workout?.name || "session"}|${store.get("generatedSession")?.builtAt || ""}`;
+}
+
+function _checkpoint(workout) {
+  if (!workout) return;
+  checkpointSession("workout", {
+    sessionId: _sessionKey(workout),
+    index:     currentExerciseIndex,
+    set:       currentSet,
+    name:      workout.title || workout.name || "Your session",
+  });
+}
+
 export function render() {
   const workout = _getWorkout();
+  _restoreFromCheckpoint(workout);
 
   if (!workout) {
     return renderNoWorkout();
@@ -761,6 +804,8 @@ export function onMount() {
 
   // Latch the session clock once, on first mount with a real workout.
   if (sessionStartTime === null) sessionStartTime = Date.now();
+  // SMOOTH-P3a. Where they are, every time the screen changes.
+  _checkpoint(workout);
 
   // LOG-1. Re-wired on every mount because the view re-renders per
   // exercise; attachLogEvents() guards against double-binding itself.
@@ -907,7 +952,7 @@ function showExitConfirm() {
   overlay.setAttribute("role", "dialog");
   overlay.setAttribute("aria-modal", "true");
   overlay.setAttribute("aria-labelledby", "exit-sheet-title");
-  // SMOOTH-P2c. One sheet, three choices, every one lands somewhere
+  // SMOOTH-P2c / P3a. One sheet, four choices, every one lands somewhere
   // known: back in the session, on the finish screen, or on Home.
   // "Carry on later" joins in P3 with the Home card that makes it true.
   //
@@ -918,6 +963,7 @@ function showExitConfirm() {
       <h2 class="session-exit-title" id="exit-sheet-title">Leave this session?</h2>
       <div class="session-exit-actions">
         <button class="btn btn-primary btn-full" id="exit-confirm-stay">Keep going</button>
+        <button class="btn btn-secondary btn-full" id="exit-confirm-later">Carry on later</button>
         <button class="btn btn-secondary btn-full" id="exit-confirm-leave">
           End it here and save
         </button>
@@ -945,6 +991,17 @@ function showExitConfirm() {
   });
 
   stay?.addEventListener("click", close);
+
+  // SMOOTH-P3a. Keep everything, go Home. Nothing is saved as done and
+  // nothing is cleared; Home shows the Carry-on card from the checkpoint.
+  document.getElementById("exit-confirm-later")?.addEventListener("click", () => {
+    overlay.remove();
+    pauseTimer();
+    _clearRest();
+    _checkpoint(_getWorkout());
+    dismountSessionGuard();
+    router.navigate("today");
+  });
 
   // Saves what was done and goes to the finish screen.
   document.getElementById("exit-confirm-leave")?.addEventListener("click", () => {
@@ -1058,6 +1115,20 @@ function resetTimer() {
  * completeWorkout()'s existing convention — this file has no running
  * elapsed-time tracker.
  */
+/**
+ * SMOOTH-P3a. "Finish here" on Home's Carry-on card: save what was done
+ * as a part-session, exactly as the exit sheet's "End it here and save"
+ * does -- the same two functions, not a copy -- and go to the finish.
+ */
+export function finishFromHome() {
+  const workout = _getWorkout();
+  if (!workout) { clearCheckpoint(); router.navigate("today"); return; }
+  _restoreFromCheckpoint(workout);
+  savePartialSession();
+  cleanupWorkout();
+  router.navigate("reflect");
+}
+
 function savePartialSession() {
   const workout = _getWorkout();
   if (!workout) return;
@@ -1159,6 +1230,8 @@ function completeWorkout() {
 
 function cleanupWorkout() {
   dismountSessionGuard();
+  clearCheckpoint();        // SMOOTH-P3a. Finished, ended or left: nothing to carry on.
+  _resumeChecked = false;
   pauseTimer();
   sessionStartTime = null;
   currentExerciseIndex = 0;

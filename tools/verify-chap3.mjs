@@ -1,5 +1,11 @@
 /**
  * tools/verify-chap3.mjs
+ * 28 Sep 2026 v3
+ * SMOOTH-P3a. Plan Home's way through to moving is the three doors
+ * (.home-door), not the room buttons or tiles. The property -- a hinge
+ * card must not block the way through -- is unchanged; the selector now
+ * finds the doors on Plan as well as the tiles on free.
+ *
  * 21 Aug 2026 v2
  * GATE-PATH. Path resolution only -- no assertion changed.
  *
@@ -216,13 +222,13 @@ check('with all three ways out offered',
 // three routes to moving satisfies it, so this passes on either tier
 // without asserting which one the fixture happens to be on.
 const doorsGrid = atHingeHome.c.querySelector(
-  '[data-action="start-today"], .club-room__go, [data-door-id]');
+  '.home-door, [data-action="start-today"], .club-room__go, [data-door-id]');
 const doorsHidden = !doorsGrid
   || doorsGrid.hasAttribute('hidden')
   || doorsGrid.disabled
   || /display:\s*none|visibility:\s*hidden/.test(doorsGrid.getAttribute('style') || '');
 check('the way through still works underneath it',
-  atHingeHome.c.querySelectorAll('[data-door-id]').length > 0 && !doorsHidden,
+  atHingeHome.c.querySelectorAll('.home-door, [data-door-id]').length > 0 && !doorsHidden,
   'gym-programme blocked the session until an option was chosen');
 
 // No countdown and no verdict, at the moment most likely to produce one.

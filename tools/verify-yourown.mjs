@@ -1,6 +1,18 @@
 /**
  * tools/verify-yourown.mjs
- * 08 Sep 2026 v2
+ * 28 Sep 2026 v3
+ *
+ * v3 - SMOOTH-P3a/b. The Your own ROOM left Plan Home (spec 4.1). What
+ *   it held now lives in two places: "I know what I want" (the way to
+ *   build one, and the counted way to the ones you saved) and the saved-
+ *   sessions list (each session, its facts, Start). Tests 4 and 4b now
+ *   mount those, with every property kept: an inviting empty state; a
+ *   way to build another that survives the first save and points at the
+ *   builder; the newest first; startable; counted, never "More"; the
+ *   count is what still exists; one movement is singular; gone movements
+ *   said out loud; no dead Start. 4b-b WENT RED on the list -- it had
+ *   OWN-1's saved-not-existing count all along -- and saved-sessions.js
+ *   v4 fixes it.
  *
  * v2 - OWN-1. Test 4b: the card counts what is THERE, not what was
  *   saved; one movement is singular; and a session whose movements have
@@ -156,117 +168,87 @@ ok("3c. and free cannot read a leftover list either",
    SS.savedSessions().length === 0,
    "the tier check is only on the writer, so a downgraded account still sees them");
 
-// ── 4. THE ROOM ─────────────────────────────────────────────────────────
-console.log("\nTEST 4 - the Your own room stops being a shell");
+// ── 4. WHERE THE ROOM WENT ──────────────────────────────────────────────
+console.log("\nTEST 4 - building and keeping your own, after the room");
 
-function home() {
+const { KnowWhatView } = await import(B + "views/know-what.js");
+const LIST = await import(B + "views/saved-sessions.js");
+function knowWhat() {
   const c = document.createElement("div");
   document.body.appendChild(c);
-  TodayView({ navigate: () => {} }).mount(c);
-  return c;
+  const navs = [];
+  KnowWhatView({ navigate: v => navs.push(v) }).mount(c);
+  return { c, navs };
+}
+function list() {
+  let m = document.getElementById("main-content");
+  if (!m) { m = document.createElement("div"); m.id = "main-content"; document.body.appendChild(m); }
+  m.innerHTML = LIST.render();
+  try { LIST.onMount(); } catch {}
+  return m;
 }
 
 seed();
-const emptyRoom = home().querySelector('[data-room-id="own"]');
-ok("4a. the empty state invites rather than apologises",
-   /Build your first/.test(emptyRoom.textContent),
-   emptyRoom.textContent.replace(/\s+/g, " ").slice(0, 120));
-ok("4b. and no longer says saving is not built",
-   !/comes soon/i.test(emptyRoom.textContent),
-   "the shell copy survived the room being filled");
+const empty = knowWhat();
+const buildBtn = [...empty.c.querySelectorAll("[data-kw-route]")].find(b => b.dataset.kwRoute === "session-builder");
+ok("4a. with nothing saved, it invites you to build one",
+   !!buildBtn && /Build your own/.test(buildBtn.textContent));
+ok("4b. and no longer says saving is not built", !/comes soon/i.test(empty.c.textContent));
 
 seed();
 SS.saveSession("Tuesday legs", build());
 SS.saveSession("Sprint prep", build());
 SS.saveSession("Easy evening", build());
-const fullRoom = home().querySelector('[data-room-id="own"]');
+const full = knowWhat();
+const fullList = list();
 
-ok("4c. the newest is on the card", /Easy evening/.test(fullRoom.textContent),
-   fullRoom.textContent.replace(/\s+/g, " ").slice(0, 140));
+ok("4c. the newest is first on the list",
+   (fullList.querySelector("h2.club-room__name")?.textContent || "").trim() === "Easy evening",
+   fullList.textContent.replace(/\s+/g, " ").slice(0, 140));
 
-// YOUR-OWN-CREATE, 16 Sep 2026. Graeme, on device: "How do I build my
-// own?" He could not, from this room.
-//
-// 🔴 "Build your first" existed ONLY in the empty branch. The moment a
-// first session was saved the button vanished and never came back -- so
-// the room whose whole purpose is sessions you put together yourself
-// offered only Start and a list. A one-branch affordance: correct on the
-// day it was written, wrong from the second session onwards, and
-// invisible to anyone who had ever saved one.
-//
-// 4a above passed throughout, because it only ever looked at the EMPTY
-// state. That is the lesson worth keeping: a test that checks one branch
-// certifies one branch.
-ok("4c-1. a populated room still offers a way to build another",
-   /Build another/.test(fullRoom.textContent),
-   "the room whose purpose is sessions you put together yourself must always " +
-   "let you put another one together");
-
-ok("4c-2. and it points at the builder, not the list",
-   !!fullRoom.querySelector('[data-route="session-builder"]'),
-   "a count button opening the builder was SAVED-1's bug in reverse");
-
-ok("4c-3. REVERSAL: it does not displace Start as the primary action", (() => {
-  const primary = fullRoom.querySelector('.btn-primary');
-  return primary && /^Start/.test(primary.textContent.trim());
-})(), "Start is what somebody came to this room for; building another is the " +
-      "quieter second door");
-
-ok("4c-4. the wording differs from the empty branch, because it is a different claim",
-   !/Build your first/.test(fullRoom.textContent),
-   "\"your first\" would be a small lie once one exists");
-ok("4d. and it can be started from the card",
-   !!fullRoom.querySelector("[data-saved-id]"));
+// YOUR-OWN-CREATE, 16 Sep 2026: "Build your first" existed only in the
+// empty branch, so a way to build vanished with the first save. The same
+// check on the populated state, where it now lives.
+const buildAgain = [...full.c.querySelectorAll("[data-kw-route]")].find(b => b.dataset.kwRoute === "session-builder");
+ok("4c-1. with sessions saved, there is still a way to build another", !!buildAgain);
+ok("4c-2. and it points at the builder, not the list", buildAgain?.dataset.kwRoute === "session-builder");
+ok("4c-3. REVERSAL: it does not displace the primary action",
+   /Show me the plan/.test(full.c.querySelector(".btn-primary")?.textContent || "") &&
+   !buildAgain?.classList.contains("btn-primary"));
+ok("4c-4. \"your first\" is not said once one exists", !/your first/i.test(full.c.textContent));
+ok("4d. and each can be started from the list", fullList.querySelectorAll("[data-saved-id]").length === 3);
 
 // COUNTED, never "More". A count tells you whether it is worth the tap.
-ok("4e. the rest are behind a COUNTED button",
-   /Your other 2 sessions/.test(fullRoom.textContent),
+ok("4e. the saved ones are behind a COUNTED button",
+   /Or one you saved \(3\)/.test(full.c.textContent),
    '"More" makes somebody tap to find out whether it was worth tapping');
-ok("4f. and the word More is not used for it",
-   !/>\s*More\s*</.test(fullRoom.innerHTML));
+ok("4f. and the word More is not used for it", !/>\s*More\s*</.test(full.c.innerHTML));
 
-// ── 4b. THE CARD TELLS THE TRUTH ABOUT WHAT IS IN THE SESSION ───────────
-console.log("\nTEST 4b - the card counts what is THERE, not what was saved");
+// ── 4b. THE LIST TELLS THE TRUTH ABOUT WHAT IS IN THE SESSION ───────────
+console.log("\nTEST 4b - the list counts what is THERE, not what was saved");
 
-// OWN-1, 08 Sep 2026. Three faults in this one block:
-//
-//   The count was exerciseIds.length -- what was SAVED, not what still
-//   exists. resolveSavedSession() has always returned `missing` and this
-//   caller dropped it, so the card could promise nine movements and hand
-//   over seven.
-//
-//   "1 movements" -- the same unguarded interpolation PROPOSAL-1 fixed on
-//   the proposal card the same day, in a second place.
-//
-//   And a session whose movements had ALL gone offered a Start button
-//   that did nothing: the handler ends `if (!exercises.length) return;`,
-//   a silent no-op. SAVED-1b fixed exactly this on the saved-sessions
-//   list and left this copy behind -- the branch-and-a-half pattern
-//   GUIDED-COPY and DEVICE-1 are both on record for.
-
-function ownRoomWith(sessions) {
+// OWN-1, 08 Sep 2026, fixed then on Home's card only. The count was
+// exerciseIds.length -- what was SAVED, not what still exists; "1
+// movements"; and a Start that did nothing when every movement had gone.
+function listWith(sessions) {
   seed();
   store.set("savedSessions", sessions);
-  return home().querySelector('[data-room-id="own"]');
+  return list();
 }
 const day = "2026-09-01T10:00:00Z";
 const liveIds = EX.EXERCISES.slice(0, 3).map(e => e.id);
 
-const oneRoom = ownRoomWith([
+const oneRoom = listWith([
   { id: "one", name: "Just the one", sessionType: "glute", durationMins: 15,
     exerciseIds: [liveIds[0]], createdAt: day, lastUsedAt: null }
 ]);
-ok("4b-pc. positive control: the room rendered the session",
-   /Just the one/.test(oneRoom.textContent), "the room is empty");
-// No leading \b. Adjacent block elements concatenate in textContent --
-// "15 minutes" runs straight into "1 movement", so there is no word
-// boundary before the digit and \b1 never matches. Both of these
-// assertions first failed on that and the code was right throughout.
+ok("4b-pc. positive control: the list rendered the session",
+   /Just the one/.test(oneRoom.textContent), "the list is empty");
 ok("4b-a. one movement is singular",
    /1 movement(?!s)/.test(oneRoom.textContent),
    oneRoom.textContent.replace(/\s+/g, " ").slice(0, 140));
 
-const partRoom = ownRoomWith([
+const partRoom = listWith([
   { id: "part", name: "Half gone", sessionType: "glute", durationMins: 30,
     exerciseIds: [liveIds[0], "RETIRED-1", "RETIRED-2"], createdAt: day, lastUsedAt: null }
 ]);
@@ -275,22 +257,19 @@ ok("4b-b. the count is what STILL EXISTS, not what was saved",
    `saved 3 ids, 1 resolves: ${partRoom.textContent.replace(/\s+/g, " ").slice(0, 140)}`);
 ok("4b-c. and the ones that have gone are said out loud",
    /no longer in the library/.test(partRoom.textContent),
-   "the card promises movements it cannot hand over");
+   "the list promises movements it cannot hand over");
 ok("4b-d. it can still be started", !!partRoom.querySelector("[data-saved-id]"),
-   "some movements missing is not a reason to refuse - that would punish " +
-   "somebody for a change they did not make");
+   "some movements missing is not a reason to refuse");
 
-const goneRoom = ownRoomWith([
+const goneRoom = listWith([
   { id: "gone", name: "Old favourite", sessionType: "glute", durationMins: 30,
     exerciseIds: ["RETIRED-1", "RETIRED-2"], createdAt: day, lastUsedAt: null }
 ]);
-ok("4b-pc2. positive control: the all-gone session is still on the card",
+ok("4b-pc2. positive control: the all-gone session is still listed",
    /Old favourite/.test(goneRoom.textContent),
    "the row vanished - it is still the person's session");
 ok("4b-e. NO start button when there is nothing to start",
-   !goneRoom.querySelector("[data-saved-id]"),
-   "a button that does nothing when tapped, silently. This is the shape " +
-   "STUCK-1 was, and SAVED-1b already fixed it one file over");
+   !goneRoom.querySelector("[data-saved-id]"));
 ok("4b-f. and it says why instead",
    /nothing left to start/.test(goneRoom.textContent),
    goneRoom.textContent.replace(/\s+/g, " ").slice(0, 160));

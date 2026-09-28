@@ -1,6 +1,13 @@
 /**
  * tools/verify-lobby1.mjs
- * 28 Sep 2026 v2
+ * 28 Sep 2026 v3
+ *
+ * v3 - SMOOTH-P3a. Plan's arc is the one-line _arcChip() and Plan's
+ *   choices are _planDoors(), in the same tier ternaries arcPanel() and
+ *   clubRooms() sat in. Anchors 7a, 10a, 11a and 11d moved to the new
+ *   names; each property -- Plan leads with its arc, free is offered it
+ *   beneath its chooser, the tiers are different screens, the choice sits
+ *   above the reference rows -- is asserted unchanged.
  *
  * v2 - SMOOTH-P2a. Test 11's escape moved. "Or pick your own" (four
  *   doors beside the suggestion) became "Something different today" on
@@ -164,7 +171,7 @@ check("7a. the arc panel is on Home", () => {
   // arc moved out of it and each tier places it explicitly -- above on
   // Plan, below on free. Both branches asserted separately: one regex
   // over the whole file passed with a tier's arc deleted.
-  ok(/isPremium\(\) \? arcPanel\(\) : ''/.test(today),
+  ok(/isPremium\(\) \? _arcChip\(\) : ''/.test(today),
      "Plan's Home does not render the arc");
   // CLUB-SHELL, 06 Sep 2026. Free's arc moved into the same ternary that
   // chooses the chooser, because Plan now renders clubRooms() instead.
@@ -262,7 +269,7 @@ check("10a. session tiles have left PLAN's Home", () => {
   //
   // The original property is unchanged where it applies -- Plan's Home
   // is still an arc and an invitation, nothing else.
-  const at = today.indexOf("${isPremium() ? arcPanel()");
+  const at = today.indexOf("${isPremium() ? _arcChip()");
   ok(at > -1, "Home no longer branches on tier");
   // HOME-DOORS, 06 Sep 2026. THIS ASSERTION IS INVERTED, deliberately.
   // It used to require that Plan's Home had NO tiles. On device the
@@ -276,13 +283,16 @@ check("10a. session tiles have left PLAN's Home", () => {
   // chooser(), and BOTH render tileGrid(). The tiles are what LOBBY-1c
   // removed and what verify-homedoors exists to protect; the rooms are
   // an addition above them, not a replacement.
-  ok(/clubRooms\(\)/.test(today), "Plan's Home does not render the rooms");
-  ok(/function tileGrid/.test(today), "there is no tile grid");
-  const roomsAt = today.indexOf("function clubRooms");
-  const roomsBody = today.slice(roomsAt, today.indexOf("function tileGrid", roomsAt));
-  ok(/tileGrid\(\)/.test(roomsBody),
-     "the rooms do not render the tiles beneath them, so Plan loses the direct " +
-     "routes again - which is LOBBY-1c with better comments");
+  // SMOOTH-P3a. Plan renders _planDoors(). The direct routes the tiles
+  // carried now sit one door in, on "I know what I want" -- driven, not
+  // read, by verify-clubshell 2a and verify-know-what 7. Here: the doors
+  // are what Plan renders, and the second door is the way to them.
+  ok(/_planDoors\(\)/.test(today), "Plan's Home does not render the doors");
+  ok(/function tileGrid/.test(today), "there is no tile grid (free still renders it)");
+  const doorsAt = today.indexOf("function _planDoors");
+  const doorsBody = today.slice(doorsAt, today.indexOf("function _arcChip", doorsAt));
+  ok(doorsAt > -1 && /door\('know-what'/.test(doorsBody),
+     "Plan's doors have no way to the direct routes, which is LOBBY-1c with better comments");
 });
 
 check("10b. one invitation, and it names the price of entry", () => {
@@ -344,13 +354,13 @@ check("11a. Home branches on tier at all", () => {
   // Decided 3 Sep and unbuilt until 5 Sep: both tiers rendered an
   // identical Home, which is the one thing the design said it must
   // never be. Free is not Plan with a panel swapped.
-  ok(/isPremium\(\) \? arcPanel\(\)/.test(today),
+  ok(/isPremium\(\) \? _arcChip\(\)/.test(today),
      "the arc panel renders on both tiers, so free is Plan with a panel swapped");
   // HOME-DOORS. The tiers no longer differ in their CALL TO ACTION --
   // both get the doors, which is what Plan lost on 04 Sep. They differ
   // in the arc: Plan leads with it, free is offered it beneath the
   // doors. Asserted as two positions, not one branch.
-  const arcPlan = today.indexOf("isPremium() ? arcPanel() : ''");
+  const arcPlan = today.indexOf("isPremium() ? _arcChip() : ''");
   const arcFree = today.indexOf("chooser() + arcPanel()");
   ok(arcPlan > -1 && arcFree > -1 && arcPlan < arcFree,
      "the arc sits in the same place on both tiers, so free is Plan with a panel swapped");
@@ -403,7 +413,7 @@ check("11d. the offer is above the reference rows on free", () => {
   // "${chooser()}" no longer appears. Located by the ternary instead,
   // and BOTH tiers checked -- finding one above the reference rows says
   // nothing about the other.
-  const callAt = today.indexOf("isPremium() ? clubRooms() : chooser()");
+  const callAt = today.indexOf("isPremium() ? _planDoors() : chooser()");
   const refAt  = today.indexOf("today-reference");
   ok(callAt > -1 && refAt > -1 && callAt < refAt,
      "the chooser renders below the reference rows");

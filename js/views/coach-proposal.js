@@ -1,6 +1,10 @@
 /**
  * coach-proposal.js
- * 28 Sep 2026 v30
+ * 28 Sep 2026 v31
+ *
+ * v31 - SMOOTH-P3b. A request is said back whole: "You asked for
+ *   strength, full body, 40 minutes." (spec 4.6), in the words it was
+ *   asked in. The one change to this file in P3.
  *
  * v30 - SMOOTH-P2e. Two of Graeme's 28 Sep decisions.
  *
@@ -1213,10 +1217,18 @@ export function CoachProposalView(router) {
    * said back; otherwise the builder's own line, which is already held to
    * the honesty rule (lineIsSupported, PURPOSE-ASK's banned words).
    */
+  // SMOOTH-P3b. The request said back in the words the person chose
+  // it in: "strength, full body", not the builder's "Full Body".
+  const ASKED_WORDS = {
+    full: 'strength, full body', upper: 'strength, upper body', lower: 'strength, lower body',
+    glute: 'strength, glutes', core: 'core', cardio: 'cardio', mobility: 'mobility', stretch: 'stretching',
+  };
   function _planSentence(option) {
     const req = store.get('requestedSessionType');
     const t   = req ? SESSION_TYPES.find(x => x.id === req) : null;
-    if (t && _deliveredType(option) === req) return `You asked for ${t.label.toLowerCase()} today.`;
+    if (t && _deliveredType(option) === req) {
+      return `You asked for ${ASKED_WORDS[req] || t.label.toLowerCase()}, ${_getAvailableTimeMinutes()} minutes.`;
+    }
     return option.rationale || '';
   }
 

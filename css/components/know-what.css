@@ -1,0 +1,152 @@
+/* ============================================================
+   css/components/know-what.css
+   28 Sep 2026 v1
+
+   SMOOTH-P3b. "I know what I want".
+
+   Six kind tiles in a two-column grid, then rows of chips. Every choice
+   is a native radio or checkbox inside its label, so the whole chip is
+   the target (48px tall) and state is the browser's own. The checked
+   chip is bold with a 2px border as well as coloured, so it never rests
+   on colour alone (1.4.1). Focus shows on the chip (focus-within).
+   ============================================================ */
+
+.kw-view {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding-bottom: var(--space-8);
+}
+
+.kw-title {
+  margin: var(--space-4) 0 0;
+  font-size: var(--text-2xl, 1.5rem);
+  line-height: 1.2;
+  color: var(--color-text);
+}
+.kw-title:focus { outline: none; }
+.kw-title:focus-visible { outline: 3px solid var(--color-border-focus); outline-offset: 4px; }
+
+.kw-form { display: flex; flex-direction: column; gap: var(--space-4); }
+
+.kw-q { margin: 0; padding: 0; border: 0; min-width: 0; }
+.kw-q--inner { margin-top: var(--space-3); }
+.kw-q__legend {
+  float: left;
+  width: 100%;
+  padding: 0;
+  margin-bottom: var(--space-2);
+  font-weight: 600;
+  color: var(--color-text);
+}
+.kw-q__opt { font-weight: 400; font-size: var(--text-sm); color: var(--color-text-secondary); margin-left: var(--space-1); }
+
+.kw-tiles {
+  clear: both;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+}
+
+.kw-chips { clear: both; display: flex; flex-wrap: wrap; gap: var(--space-2); }
+
+.kw-tile,
+.kw-chip {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface, var(--color-bg));
+  color: var(--color-text);
+  cursor: pointer;
+  text-align: center;
+  line-height: 1.25;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+.kw-tile { min-height: 64px; font-size: var(--text-lg); font-weight: 600; }
+
+/* The input stays in the accessibility tree and takes focus; the chip draws it. */
+.kw-tile input,
+.kw-chip input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  margin: 0;
+  cursor: pointer;
+}
+
+.kw-tile:has(input:checked),
+.kw-chip:has(input:checked) {
+  border-width: 2px;
+  border-color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 14%, var(--color-surface, transparent));
+  font-weight: 700;
+}
+.kw-tile:has(input:checked)::after {
+  /* On the big tiles, a tick as well. Chips are too narrow for one to
+     clear the text; there the 2px border and bold weight carry it. */
+  content: "\2713";
+  position: absolute;
+  top: 4px;
+  right: 8px;
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+/* Even rows: a set of answers reads as one question, never a ragged
+   wrap with one option stranded on a line of its own. */
+.kw-chips--2 { display: grid; grid-template-columns: repeat(2, 1fr); }
+.kw-chips--3 { display: grid; grid-template-columns: repeat(3, 1fr); }
+.kw-chips--4 { display: grid; grid-template-columns: repeat(4, 1fr); }
+.kw-chips--2 .kw-chip, .kw-chips--3 .kw-chip, .kw-chips--4 .kw-chip { padding: 0 var(--space-2); }
+.kw-tile:focus-within,
+.kw-chip:focus-within { outline: 3px solid var(--color-border-focus); outline-offset: 2px; }
+.kw-tile:hover,
+.kw-chip:hover { border-color: var(--color-primary); }
+
+.kw-hint,
+.kw-note {
+  margin: var(--space-2) 0 0;
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.45;
+}
+
+.kw-more {
+  display: block;
+  margin: var(--space-3) 0 var(--space-1);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+.kw-select {
+  width: 100%;
+  min-height: 48px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface, var(--color-bg));
+  color: var(--color-text);
+  font-size: var(--text-base);
+}
+.kw-select:focus-visible { outline: 3px solid var(--color-border-focus); outline-offset: 2px; }
+
+.kw-error { margin: 0; min-height: 1.25rem; color: var(--color-text); font-weight: 600; }
+.kw-error:empty { min-height: 0; }
+
+.kw-foot { display: flex; flex-direction: column; gap: var(--space-3); margin-top: var(--space-2); }
+.kw-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-1) var(--space-4);
+  margin: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kw-tile, .kw-chip { transition: none; }
+}

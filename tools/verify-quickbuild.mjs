@@ -1,5 +1,17 @@
 /**
  * tools/verify-quickbuild.mjs
+ * 28 Sep 2026 v3
+ *
+ * v3 - SMOOTH-P3a/b. The Quick build ROOM left Plan Home by decision
+ *   (spec 4.1); "tell me how long and I fill the rest in" is now "I know
+ *   what I want" (spec 4.6, verify-know-what). So tests 0b and 1 -- the
+ *   Home chip writing the preselect -- have no chip to tap and are
+ *   RETIRED, replaced by 0b: Home offers no quick chips, and the length
+ *   question now lives on the know-what screen. The builder's quick
+ *   scaffold is still in session-builder-ui.js with no caller; tests 2-9
+ *   still hold it to its promises (they drive it by preselect) until the
+ *   scaffold is removed. Logged as QUICK-SCAFFOLD-ORPHAN.
+ *
  * 08 Sep 2026 v2
  *
  * v2 - QUICK-BUILD-2/3. Tests 6, 7 and 8 MOUNT the builder.
@@ -86,24 +98,12 @@ console.log("\nTEST 0 - the chips are actually on the screen being measured");
 const { c, navs } = home();
 const chips = [...c.querySelectorAll("[data-quick-mins]")];
 ok("0a. the Plan fixture is on Plan", isPremium() === true);
-ok("0b. and Quick build rendered its chips", chips.length >= 3,
-   `${chips.length} chips - every assertion below would be measuring an absent room`);
-
-// ── 1. THE CHIP ASKS FOR THE ROOM'S OWN SCREEN ──────────────────────────
-console.log("\nTEST 1 - one tap, one screen");
-
-chips[1].click();
-const pre = store.get("sessionBuilderPreselect");
-
-ok("1a. the chip writes a preselect", !!pre, "nothing was stored, so the tap carried nothing");
-ok("1b. carrying the duration the person tapped",
-   Number(pre.durationMins) === Number(chips[1].dataset.quickMins),
-   `chip said ${chips[1].dataset.quickMins}, store says ${pre && pre.durationMins}`);
-ok("1c. and asking for quick mode",
-   pre.mode === "quick",
-   'without mode:"quick" the builder walks six question phases after the ' +
-   'card promised to fill the rest in');
-ok("1d. and it navigates to the builder", navs.includes("session-builder"), navs.join(", "));
+ok("0b. Plan Home no longer carries Quick build's chips (retired by spec 4.1)", chips.length === 0 &&
+   c.querySelectorAll(".home-door").length === 3, `${chips.length} chips`);
+{
+  const { LENGTHS } = await import("../js/views/know-what.js");
+  ok("0c. the length question lives on I know what I want", Array.isArray(LENGTHS) && LENGTHS.length >= 3);
+}
 
 // ── 2. THE BUILDER HONOURS IT ───────────────────────────────────────────
 console.log("\nTEST 2 - the mode reaches a screen of its own");
