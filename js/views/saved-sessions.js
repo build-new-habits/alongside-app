@@ -1,6 +1,16 @@
 /**
  * js/views/saved-sessions.js
- * 28 Sep 2026 v4
+ * 28 Sep 2026 v5
+ *
+ * v5 - Work list 8, OWN-LIST. Find a saved session when you have lots.
+ *   From six saved, a labelled search field above the list narrows it
+ *   as you type -- by the session's name or by a movement in it, so
+ *   "goblet" finds the one with the goblet squat. Newest first holds as
+ *   it narrows. The count ("2 of 20 sessions") is said once, politely,
+ *   after typing settles, not on every keystroke. Nothing matching says
+ *   so and offers Clear the search. The search survives a delete and
+ *   is cleared when you leave. Filtering hides rows rather than
+ *   re-rendering, so the field keeps focus and the caret. verify-own-list.
  *
  * v4 - SMOOTH-P3b. The movement count is what still exists, not what was
  *   saved (OWN-1, which had been fixed only on Home's card). Reached now
@@ -128,6 +138,30 @@ import {
  */
 let confirmingDeleteId = null;
 
+/**
+ * OWN-LIST. What the person has typed into Find a session. Module state,
+ * like confirmingDeleteId: it survives a delete's repaint, and onUnmount
+ * clears it, so coming back starts with the whole list.
+ */
+let query = '';
+let announceTimer = null;
+
+/** A search field only once the list is long enough to need one. */
+const SEARCH_FROM = 6;
+
+const _norm = s => String(s || '').toLowerCase().replace(/\s+/g, ' ').trim();
+
+/** Everything a person might search a session by: its name and its movements. */
+function _haystack(rec) {
+  const { exercises } = resolveSavedSession(rec);
+  return _norm([rec.name, ...exercises.map(e => e.name)].join(' | '));
+}
+
+function _countText(matching, total) {
+  if (!_norm(query)) return '';
+  return matching ? `${matching} of ${total} sessions` : 'No sessions match';
+}
+
 export const centered = false;
 
 function _esc(s) {
@@ -201,8 +235,10 @@ function _row(rec) {
   // how a screen reader user moves through a list of things they are
   // looking for one of. It carries the club-room__name class, so it
   // looks identical to the room it was reached from.
+  const hay = _haystack(rec);
+  const hide = _norm(query) && !hay.includes(_norm(query));
   return `
-    <li class="club-room">
+    <li class="club-room" data-search="${_esc(hay)}"${hide ? ' hidden' : ''}>
       <h2 class="club-room__name">${_esc(rec.name)}</h2>
       <ul class="club-room__facts">
         ${facts.map(f => `<li>${_esc(f)}</li>`).join('')}
@@ -304,6 +340,13 @@ export function render() {
       `;
   }
 
+  // OWN-LIST. A list shrunk below the threshold loses its field, so the
+  // search it held goes too -- a filter nobody can see is a trap.
+  const searchable = list.length >= SEARCH_FROM;
+  if (!searchable) query = '';
+  const q = _norm(query);
+  const matching = q ? list.filter(r => _haystack(r).includes(q)).length : list.length;
+
   return `
     <div class="view saved-sessions-view">
       <div class="view-header">
@@ -311,6 +354,25 @@ export function render() {
         <p class="text-secondary">
           ${list.length} saved, newest first.
         </p>
+      </div>
+
+      ${searchable ? `
+        <div class="own-search" role="search">
+          <label for="own-search" class="own-search__label">Find a session</label>
+          <input id="own-search" type="search" class="form-input own-search__input"
+                 autocomplete="off" autocapitalize="none" spellcheck="false"
+                 enterkeyhint="search"
+                 placeholder="A name, or a movement in it"
+                 aria-describedby="own-count"
+                 value="${_esc(query)}">
+          <p id="own-count" class="own-search__count" aria-live="polite"
+             data-own-count>${_esc(_countText(matching, list.length))}</p>
+        </div>
+      ` : ''}
+
+      <div class="card own-search__none" data-own-none${q && !matching ? '' : ' hidden'}>
+        <p>No saved session has “<span data-own-q>${_esc(query.trim())}</span>” in its name or its movements.</p>
+        <button type="button" class="btn btn-secondary" data-own-clear>Clear the search</button>
       </div>
 
       <ul class="club-rooms" style="list-style:none;padding:0;">
@@ -323,6 +385,39 @@ export function render() {
 export function onMount() {
   const root = document.getElementById('main-content');
   if (!root) return;
+
+  // OWN-LIST. Filter in place: hiding rows, not repainting, so the field
+  // keeps its focus and caret while somebody types.
+  const field = root.querySelector('#own-search');
+  const applyFilter = () => {
+    const q = _norm(query);
+    const rows = [...root.querySelectorAll('.club-rooms > li[data-search]')];
+    let matching = 0;
+    rows.forEach(li => {
+      const hit = !q || li.dataset.search.includes(q);
+      li.hidden = !hit;
+      if (hit) matching++;
+    });
+    const none = root.querySelector('[data-own-none]');
+    if (none) {
+      none.hidden = !(q && matching === 0);
+      const shownQ = none.querySelector('[data-own-q]');
+      if (shownQ) shownQ.textContent = query.trim();
+    }
+    // Said once, after typing settles: a live region rewritten on every
+    // keystroke is read out on every keystroke.
+    clearTimeout(announceTimer);
+    announceTimer = setTimeout(() => {
+      const live = root.querySelector('[data-own-count]');
+      if (live) live.textContent = _countText(matching, rows.length);
+    }, 400);
+  };
+  field?.addEventListener('input', () => { query = field.value; applyFilter(); });
+  root.querySelector('[data-own-clear]')?.addEventListener('click', () => {
+    query = '';
+    if (field) { field.value = ''; field.focus(); }
+    applyFilter();
+  });
 
   // SAVED-1. The same start path today.js uses, deliberately identical:
   // resolve against the LIVE library so a saved session picks up safety
@@ -405,4 +500,11 @@ export function onMount() {
       root.querySelector('h1')?.focus();
     });
   });
+}
+
+/** OWN-LIST. Leaving clears the search, so coming back shows everything. */
+export function onUnmount() {
+  query = '';
+  confirmingDeleteId = null;
+  clearTimeout(announceTimer);
 }

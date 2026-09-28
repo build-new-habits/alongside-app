@@ -1,5 +1,11 @@
 /**
  * club-rooms.css
+ * 28 Sep 2026 v5
+ *
+ * v5 - Work list 8, OWN-LIST. .own-search: Find a session, above the
+ *   saved list from six sessions. The field reuses .form-input (44px,
+ *   the focus ring); these rules only place it and its count.
+ *
  * 08 Sep 2026 v4
  *
  * v4 - A11Y-HOME. .club-row__heading, the h2 wrapping each room's
@@ -531,4 +537,43 @@
   font-size: var(--text-sm);
   line-height: 1.5;
   margin: var(--space-2) 0 0;
+}
+
+/* ── OWN-LIST, 28 Sep 2026. Find a session ──────────────────────────────
+   A visible label, not a placeholder standing in for one (WCAG 2.2 AA
+   3.3.2): the placeholder only suggests what to type. The count sits
+   under the field it describes, quiet until there is a search. */
+.own-search {
+  margin: 0 0 var(--space-4);
+}
+
+.own-search__label {
+  display: block;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: var(--space-1);
+}
+
+.own-search__input {
+  font-size: var(--text-base);
+}
+
+.own-search__count {
+  min-height: 1.5em;
+  margin: var(--space-2) 0 0;
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+}
+
+.own-search__none {
+  margin-bottom: var(--space-4);
+}
+
+.own-search__none p {
+  margin: 0 0 var(--space-3);
+  line-height: 1.5;
+}
+
+.club-rooms > li[hidden] {
+  display: none;
 }
