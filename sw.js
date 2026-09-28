@@ -1,7 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 28 Sep 2026 v546
+ * 28 Sep 2026 v547
+ *
+ * v547 - session-builder.js. A gentle day keeps its low-energy choices:
+ *   the gym-kit preference no longer applies on a low day.
  *
  * v546 - SMOOTH-P2d. views/reflect.js, views/workout.js,
  *   css/components/reflect.css.
@@ -3927,7 +3930,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v546";
+const CACHE_NAME = "alongside-v547";
 
 const SHELL_URLS = [
 
