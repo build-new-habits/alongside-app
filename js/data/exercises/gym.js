@@ -1,5 +1,12 @@
 /**
  * data/exercises/gym.js
+ * 28 Sep 2026 v3
+ *
+ * v3 - Work list 10, CL-5-ALL. Descriptions reworded to the clinical
+ *   principle: simple cues, a comfortable and controlled range, no single
+ *   fixed position ("about 90°", "as far as is comfortable", "keep it
+ *   steady"). What each exercise is has not changed. verify-cl5-all.
+ *
  * 11 Aug 2026 v2
  *
  * v2 - Cable Pallof Press added at Graeme's request. Two band versions
@@ -155,7 +162,7 @@ export const GYM = [
     coaching: 'Push and pull the handles rather than just holding them. The cross trainer is one of the few machines that can work your whole body at once, and most people waste half of it.',
     why: 'Gets your heart and lungs working hard with no impact through the joints at all, which makes it a genuinely good option on days when running or jumping does not feel available.',
     watchOut: [
-      'Short, choppy strides when the resistance goes up — better to lower the resistance and keep the full range',
+      'Short, choppy strides when the resistance goes up — better to lower the resistance and keep the long stride',
       'Letting the arms go passive, so the upper body stops contributing',
       'Leaning your weight onto the fixed centre bars rather than staying upright'
     ],
@@ -764,7 +771,7 @@ GYM.push(
       'Stand a step back with a slight forward lean, elbows pinned to your sides',
       'Push both hands down until your arms are straight, letting the rope split apart at the bottom',
       'Hold the bottom for a moment and squeeze',
-      'Let your hands rise slowly until your forearms are parallel to the floor'
+      'Let your hands rise slowly until your forearms are about parallel to the floor'
     ],
     coaching: 'Your elbows should not move at all. If they drift forward or flare out, the weight is too heavy and your shoulders have started helping.',
     why: 'Strengthens the back of the upper arm, which is what actually gives the arm shape and what does most of the work in any pressing movement.',
@@ -1047,7 +1054,7 @@ GYM.push(
       'Set two dumbbells on the floor about shoulder-width apart',
       'Take a press-up position gripping the handles, feet wider than usual for stability',
       'Brace your stomach and squeeze your backside so your body is one straight line',
-      'Row one dumbbell up to your ribs while keeping your hips completely still',
+      'Row one dumbbell up to your ribs while keeping your hips steady',
       'Lower it under control and repeat on the other side'
     ],
     coaching: 'Widen your feet. A narrow stance makes the hips swing, and the whole exercise is about the hips not swinging.',
@@ -1768,10 +1775,10 @@ GYM.push(
       'Grip the bars and press up until your arms are straight, shoulders down',
       'Lean your chest forward very slightly and bend your knees behind you',
       'Lower yourself over three counts until your upper arms are roughly parallel to the floor',
-      'Stop there rather than going as deep as you can',
+      'Stop there rather than going deeper',
       'Press back up without locking the elbows hard at the top'
     ],
-    coaching: 'Depth is where dips go wrong. Upper arms parallel to the floor is plenty — going deeper puts the shoulder in a position it has no strength in.',
+    coaching: 'Depth is where dips go wrong. Upper arms about parallel to the floor is plenty — going deeper puts the shoulder in a position it has no strength in.',
     why: 'One of the strongest upper-body pushing exercises there is, and it builds the chest, shoulders and triceps together.',
     watchOut: [
       'Going too deep, which is the most common cause of shoulder trouble from dips',

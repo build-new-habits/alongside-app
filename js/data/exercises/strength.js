@@ -1,5 +1,12 @@
 /**
  * data/exercises/strength.js
+ * 28 Sep 2026 v8
+ *
+ * v8 - Work list 10, CL-5-ALL. Descriptions reworded to the clinical
+ *   principle: simple cues, a comfortable and controlled range, no single
+ *   fixed position ("about 90°", "as far as is comfortable", "keep it
+ *   steady"). What each exercise is has not changed. verify-cl5-all.
+ *
  * 15 Aug 2026 v7
  *
  * v7 - DIFF-1. Six technically demanding lifts re-rated. Power Clean,
@@ -145,7 +152,7 @@ export const STRENGTH = [
     description: "On hands and knees, brace your core. Extend your right arm and left leg simultaneously, holding for 3 seconds. Return slowly. Repeat on the opposite side.",
     cues: [
       "Keep your hips level — no rotation",
-      "Your extended arm and leg should be parallel to the floor",
+      "Reach your arm and leg out long, about level with the floor — lower is fine",
       "Draw your belly button gently toward your spine before you move",
       "The 3-second hold is where the work happens"
     ],
@@ -169,14 +176,14 @@ export const STRENGTH = [
     duration: 90,
     perSide: true,
     instructions: [
-      'Lie on your back, arms pointing to ceiling, knees bent at 90° in the air',
+      'Lie on your back, arms pointing to ceiling, knees bent at about 90° in the air',
       'Press your lower back firmly into the floor - keep it there',
       'Slowly lower your right arm and left leg toward the floor simultaneously',
       'Stop just before your back lifts off the floor',
       'Return to start and switch sides',
       'Complete 8 reps each side'
     ],
-    coaching: 'The lower back must stay flat. Smaller movement is better than losing that contact.',
+    coaching: 'Keep the lower back flat. A smaller movement is better than losing that contact.',
     why: 'Trains deep core stability - the foundation for all other movements.',
         watchOut: [
       'Lower back lifting off the floor as the limbs extend — reduce the range until it stays down',
@@ -195,7 +202,7 @@ export const STRENGTH = [
     reps: "8 each side",
     holdSeconds: 0,
     rest: 45,
-    description: "Lie on your back, arms pointing to the ceiling, knees bent to 90 degrees above your hips. Slowly lower opposite arm and leg toward the floor — keeping your lower back pressed firmly down. Return and repeat on the other side.",
+    description: "Lie on your back, arms pointing to the ceiling, knees bent to about 90 degrees above your hips. Slowly lower opposite arm and leg toward the floor — keeping your lower back pressed firmly down. Return and repeat on the other side.",
     cues: [
       "Lower back stays in contact with the floor throughout",
       "Breathe out as you lower the limbs",
@@ -266,7 +273,7 @@ export const STRENGTH = [
       'For an easier option, drop to your knees',
       'Complete 3 sets of 8-12 reps'
     ],
-    coaching: 'Elbows at 45° protects your shoulders - not flared out wide.',
+    coaching: 'Elbows at about 45° protects your shoulders - not flared out wide.',
     why: 'Builds chest, shoulder and tricep strength using just your bodyweight.',
         watchOut: [
       'Hips sagging towards the floor or piking upwards',
@@ -299,7 +306,7 @@ export const STRENGTH = [
       'Place your right hand and knee on a bench or chair for support',
       'Hold a dumbbell in your left hand, arm hanging down',
       'Pull the dumbbell up toward your hip, leading with your elbow',
-      'Keep your back flat and parallel to the floor',
+      'Keep your back flat, roughly parallel to the floor',
       'Lower slowly and repeat',
       'Complete 3 sets of 10 reps each side'
     ],
@@ -311,7 +318,7 @@ export const STRENGTH = [
       'Twisting the torso to help the weight up, which is the sign to go lighter',
       'Rushing the lowering; it should take about twice as long as the pull'
     ],
-    load: 'Heavy enough that the last two reps are hard, light enough that your back stays completely still.',
+    load: 'Heavy enough that the last two reps are hard, light enough that your back stays steady.',
     credits: 60
   },
 
@@ -380,7 +387,7 @@ export const STRENGTH = [
     duration: 60,
     perSide: true,
     instructions: [
-      'Lie on your side, hips stacked, knees bent at 45°',
+      'Lie on your side, hips stacked, knees bent at about 45°',
       'Keep your feet together throughout',
       'Rotate your top knee open toward the ceiling, like a clamshell opening',
       'Keep your hips from rolling back',
@@ -390,7 +397,7 @@ export const STRENGTH = [
     coaching: 'The movement is small - quality matters more than range. If you feel it in your hip, you\'re doing it right.',
     why: 'Activates the gluteus medius - essential for knee and hip stability.',
         watchOut: [
-      'The pelvis rolling backwards as the knee opens; it should stay completely still',
+      'The pelvis rolling backwards as the knee opens; keep it steady',
       'Opening further than your hip allows, which just rotates the trunk',
       'Rushing the return'
     ],
@@ -459,7 +466,7 @@ export const STRENGTH = [
     instructions: [
       'Place your hands on a wall, counter, or bench — the higher the surface, the easier',
       'Walk your feet back until your body forms a straight line',
-      'Lower your chest toward the surface, keeping elbows at 45°',
+      'Lower your chest toward the surface, keeping elbows at about 45°',
       'Push back to the start',
       'Complete 3 sets of 12 reps'
     ],
@@ -494,7 +501,7 @@ export const STRENGTH = [
     instructions: [
       'Place your feet on a chair or bench behind you, hands on the floor',
       'Body forms a straight inclined line — hips do not pike up',
-      'Lower your chest toward the floor, elbows at 45°',
+      'Lower your chest toward the floor, elbows at about 45°',
       'Push back up',
       'Complete 3 sets of 8 to 10 reps'
     ],
@@ -569,7 +576,7 @@ export const STRENGTH = [
     duration: 90,
     perSide: false,
     instructions: [
-      'Stand with feet wider than shoulder-width, toes turned out at 45°',
+      'Stand with feet wider than shoulder-width, toes turned out at about 45°',
       'Hold one dumbbell vertically with both hands between your legs',
       'Sit down into the squat, keeping your chest tall and knees tracking over toes',
       'Drive through your heels to stand',
@@ -786,7 +793,7 @@ export const STRENGTH = [
       'Make it easier by bending your knees, harder by elevating your feet',
       'Complete 3 sets of 10 reps'
     ],
-    coaching: 'The table edge must be secure. Test it before loading. A dining table works well.',
+    coaching: 'Check the table is sturdy and will not tip before you pull on it. A dining table works well.',
     why: 'A bodyweight row that builds upper back and bicep strength with no equipment. The horizontal pull pattern is underused and counteracts the forward posture from sitting.',
         watchOut: [
       'Hips sagging towards the floor',
@@ -899,7 +906,7 @@ export const STRENGTH = [
     perSide: true,
     instructions: [
       'Hold one dumbbell in your right hand at your side',
-      'Walk forward for 20 metres, keeping your torso perfectly upright',
+      'Walk forward for 20 metres, keeping your torso tall',
       'The weight will try to pull you sideways — resist it with your core',
       'Walk back, then switch hands',
       'Complete 3 lengths each side'
@@ -1014,7 +1021,7 @@ export const STRENGTH = [
     perSide: false,
     instructions: [
       'Hold a kettlebell by the horns (sides of the handle) at chest height',
-      'Stand with feet slightly wider than hip-width, toes turned out 30 degrees',
+      'Stand with feet slightly wider than hip-width, toes turned out about 30 degrees',
       'Squat down, driving the knees out over the toes',
       'At the bottom, let the elbows press against the inner knees to open the hips',
       'Drive through the heels to stand',
@@ -1092,7 +1099,7 @@ export const STRENGTH = [
       'Lower with control back to the rack position',
       'Complete 5 reps each side, 3 sets'
     ],
-    coaching: 'The single-arm press challenges core anti-rotation — the whole body must resist the tendency to lean away from the load. Stay tall.',
+    coaching: 'The single-arm press challenges core anti-rotation — the whole body works to stop you leaning away from the load. Stay tall.',
     why: 'Builds shoulder strength and pressing power with an additional core stability demand that bilateral pressing does not provide.',
         watchOut: [
       'Arching the lower back to get the bell up',
@@ -1121,8 +1128,8 @@ export const STRENGTH = [
     duration: 180,
     perSide: true,
     instructions: [
-      'Lie on your back, right arm pressing the bell to the ceiling, left arm at 45 degrees',
-      'Right leg bent at 90 degrees, left leg straight',
+      'Lie on your back, right arm pressing the bell to the ceiling, left arm at about 45 degrees',
+      'Right leg bent at about 90 degrees, left leg straight',
       'Roll to your left elbow, then left hand, as you sit up',
       'Lift your hips off the floor into a bridge',
       'Sweep the left leg back to a lunge position',
@@ -1301,7 +1308,7 @@ export const STRENGTH = [
     perSide: true,
     instructions: [
       'Press the kettlebell overhead in the right hand, arm locked',
-      'Turn both feet 45 degrees to the left',
+      'Turn both feet about 45 degrees to the left',
       'Hinge at the hip to the left, keeping the right arm vertical and your eyes on the bell',
       'Lower the left hand down the left leg toward the floor',
       'Return to standing by driving through the right hip',
@@ -1383,7 +1390,7 @@ export const STRENGTH = [
       'Leaning back as the bell passes behind',
       'Rushing the hand-off behind your back'
     ],
-    load: 'Light enough that your hips stay completely still.',
+    load: 'Light enough that your hips stay steady.',
     credits: 40
   },
 
@@ -1557,7 +1564,7 @@ export const STRENGTH = [
     instructions: [
       'Stand on a box or step',
       'Step off — do not jump off',
-      'The instant both feet contact the floor, jump as high as possible immediately',
+      'The instant both feet land, spring straight back up',
       'Minimise ground contact time — the quicker the better',
       'Rest fully between reps — 45 to 60 seconds',
       'Complete 3 sets of 5 reps'
@@ -1736,7 +1743,7 @@ export const STRENGTH = [
     instructions: [
       'Stand with a medicine ball held overhead',
       'Pull the core tight, then slam the ball into the floor as hard as possible',
-      'Follow through — hinge at the hip and let the arms travel all the way down',
+      'Follow through — hinge at the hip and let the arms follow the ball down',
       'Catch the ball on the bounce and raise it overhead immediately',
       'Complete 3 sets of 10 reps'
     ],
@@ -1804,7 +1811,7 @@ export const STRENGTH = [
     perSide: true,
     instructions: [
       'Stand on your right foot',
-      'Hop forward as far as possible, landing on the right foot',
+      'Hop forward, landing on the right foot',
       'Stick the landing — absorb it fully before the next hop',
       'Complete 5 hops in a row, then rest',
       'Measure total distance or just focus on landing control',
@@ -1970,7 +1977,7 @@ export const STRENGTH = [
       'Grip just wider than shoulder-width, elbows pointing back and slightly down',
       'Unrack, step back, feet shoulder-width with toes turned slightly out',
       'Inhale, brace the core, sit back and down — knees tracking over toes',
-      'Descend until thighs are parallel to the floor or lower',
+      'Lower as far as you can control with a flat back — around parallel for many people, and higher is fine',
       'Drive through the heels to stand',
       'Complete 3 sets of 5 reps'
     ],
@@ -2059,7 +2066,7 @@ export const STRENGTH = [
     instructions: [
       'Hold the bar at shoulder height, grip just outside shoulder-width',
       'Elbows slightly in front of the bar — not flared wide',
-      'Take a breath and brace the core hard — the spine must not extend',
+      'Take a breath and brace your middle — keep your ribs down so your back does not arch',
       'Press the bar straight up, moving your head back slightly to allow the bar to pass the face',
       'Once past the forehead, press straight up and slightly back',
       'Lower with control to shoulder height',
@@ -2102,7 +2109,7 @@ export const STRENGTH = [
       'Lower with control — do not let the bar pull the torso forward',
       'Complete 3 sets of 8 reps'
     ],
-    coaching: 'The lower back must not round under load — if it does, reduce the weight or reduce the forward lean angle.',
+    coaching: 'If your lower back starts to round, reduce the weight or lean forward a little less.',
     why: 'The barbell row builds upper back thickness and strength — the essential counterpart to any pressing programme and a primary postural strength exercise.',
         watchOut: [
       'Standing up as you pull, so the torso angle changes rep to rep',
@@ -2175,7 +2182,7 @@ export const STRENGTH = [
       'Sit on the floor with your upper back against a bench, barbell across your hips',
       'Use a pad on the bar for comfort',
       'Feet flat on the floor, about hip-width apart',
-      'Drive through the heels to lift the hips until the torso is parallel to the floor',
+      'Drive through the heels to lift the hips until the torso is roughly parallel to the floor',
       'Squeeze the glutes hard at the top',
       'Lower with control — hips do not touch the floor between reps',
       'Complete 3 sets of 10 reps'
@@ -2442,7 +2449,7 @@ export const STRENGTH = [
       'Stand on the middle of a band, hold the ends in each hand',
       'Hinge at the hip — push hips back, back flat, band tight',
       'Drive the hips forward to return to standing — squeeze the glutes at the top',
-      'The band should provide meaningful resistance through the full range',
+      'The band should give steady resistance through the whole movement',
       'Complete 3 sets of 15 reps'
     ],
     coaching: 'Ideal for learning the hip hinge pattern before adding barbell load, or for training at home with no heavy equipment.',
@@ -2589,7 +2596,7 @@ export const STRENGTH = [
       'Stand sideways to the anchor, hold the band in one hand',
       'Step away until the band is taut',
       'Pull the band to your hip — elbow travelling back',
-      'The opposite hand is free — core must resist rotation',
+      'The opposite hand is free — your middle works to stop you twisting',
       'Complete 12 reps each side, 3 sets'
     ],
     coaching: 'The anti-rotation demand makes this more effective for core development than a cable or dumbbell row from a supported position.',
@@ -2659,12 +2666,12 @@ export const STRENGTH = [
     perSide: false,
     instructions: [
       'Anchor the band at head height or above',
-      'Hold both ends, elbows bent at 90 degrees, pinned to the sides',
+      'Hold both ends, elbows bent at about 90 degrees, pinned to the sides',
       'Push both hands down toward the hips until the arms are straight',
       'Control the return — elbows stay pinned',
       'Complete 3 sets of 15 reps'
     ],
-    coaching: 'The elbows must not move — if they drift forward, you are using shoulder flexion rather than tricep extension.',
+    coaching: 'Keep the elbows by your sides — if they drift forward, your shoulders take over from the back of your arms.',
     why: 'A direct tricep isolation exercise that complements pressing movements and builds elbow extension strength for pushing, throwing, and overhead sport.',
         watchOut: [
       'Elbows travelling forward as you push',
@@ -2972,7 +2979,7 @@ export const STRENGTH = [
     duration: 90,
     perSide: false,
     instructions: [
-      'Set a bench to 45 degrees incline',
+      'Set a bench to about 45 degrees incline',
       'Lie face down, one dumbbell in each hand hanging below the bench',
       'Row both dumbbells to your lower ribs simultaneously',
       'Squeeze the shoulder blades at the top',
@@ -3010,7 +3017,7 @@ export const STRENGTH = [
     perSide: false,
     instructions: [
       'Hold a dumbbell vertically at chest height with both hands',
-      'Squat down until thighs are parallel or below',
+      'Squat down as low as you can control — around parallel, or wherever is comfortable',
       'Pause at the bottom for 3 seconds — stay tight, do not relax',
       'Drive through the heels to stand',
       '3 sets of 8 reps'
@@ -3083,7 +3090,7 @@ export const STRENGTH = [
     instructions: [
       'Press a dumbbell overhead in one hand, arm locked out',
       'Walk forward for 20 to 30 metres maintaining the arm position',
-      'The core must work hard to prevent side-bending',
+      'Your middle works hard to stop you bending to the side',
       'Return and switch arms',
       '3 sets each side'
     ],
@@ -3242,13 +3249,13 @@ export const STRENGTH = [
     instructions: [
       'Begin with assisted: hold a pole or doorframe for balance',
       'Stand on one leg, the other leg extended forward',
-      'Lower slowly on the standing leg — as deep as possible',
+      'Lower slowly on the standing leg — only as deep as you can control',
       'Drive through the heel to stand',
       'Progress to unassisted as strength and balance allow',
       '3 sets of 5 each side'
     ],
     coaching: 'The pistol squat demands ankle mobility, hip flexibility, and single-leg strength simultaneously. Progress is slow — that is normal.',
-    why: 'One of the most demanding single-leg exercises — requires full range of motion strength through the entire lower body. A legitimate marker of functional lower body fitness.',
+    why: 'One of the most demanding single-leg exercises — asks for strength and control through the whole lower body. A legitimate marker of functional lower body fitness.',
         watchOut: [
       'Skipping ahead in the progression before the current stage is comfortable',
       'Knee collapsing inward at the bottom',
@@ -3316,7 +3323,7 @@ export const STRENGTH = [
     perSide: false,
     instructions: [
       'Stand with your back against a wall',
-      'Slide down until thighs are parallel to the floor — knees at 90 degrees',
+      'Slide down until your knees are bent at about 90 degrees, or higher if that is more comfortable',
       'Feet flat, knees directly over ankles — not forward',
       'Hold as long as possible',
       'Build toward 60 seconds, then extend further',
@@ -3374,7 +3381,7 @@ export const STRENGTH = [
     rest: 60,
     description: "Lie on your back. Press your lower back into the floor. Lift your arms overhead and your legs off the floor. Hold the position — you should look like a shallow dish.",
     cues: [
-      "Lower back must stay in contact with the floor",
+      "Keep your lower back in gentle contact with the floor",
       "Legs higher if your back lifts — reduce the lever arm",
       "Arms by your sides is an easier variation",
       "Breathe — do not hold your breath"
@@ -3461,7 +3468,7 @@ export const STRENGTH = [
       "Put your left knee and left hand on a bench so your back is flat and roughly parallel with the floor",
       "Hold a dumbbell in your right hand, arm hanging straight down",
       "Pull the dumbbell towards the bottom of your ribs, keeping your elbow close to your body",
-      "Lower it all the way down until your arm is straight",
+      "Lower it slowly until your arm is straight",
       "Complete all reps on one side, then swap"
     ],
     coaching: "Keep your shoulders level with each other the whole way through — the moment one shoulder rotates up towards the ceiling, your back has stopped doing the work.",
@@ -3621,7 +3628,7 @@ export const STRENGTH = [
       "Press both hands straight out in front of you, hold for a moment, then bring them back to your chest"
     ],
     coaching: "The band is trying to twist you towards the anchor and your whole job is to refuse — nothing above your hips should move while your arms do.",
-    why: "Most middle work asks you to bend or curl. This asks you to stay exactly where you are while something pulls you sideways, which is what your middle mostly does in real life.",
+    why: "Most middle work asks you to bend or curl. This asks you to stay where you are while something pulls you sideways, which is what your middle mostly does in real life.",
     watchOut: [
       "Your shoulders rotating towards the anchor as you press — step closer to reduce the pull until they stay square",
       "The front knee drifting inwards; keep it pointing the same way as your foot",
@@ -3656,7 +3663,7 @@ export const STRENGTH = [
       "Set up on your forearms and toes with your elbows under your shoulders and your feet wide",
       "Brace your stomach so your body makes one flat line from shoulders to heels",
       "Slide one arm forward along the floor until it is nearly straight in front of you",
-      "Hold for a moment with your hips completely still, then bring it back",
+      "Hold for a moment with your hips steady, then bring it back",
       "Alternate sides for the set number of reps"
     ],
     coaching: "Push down firmly through the arm that stays on the floor — that is what stops your hips tipping, and it is the difference between this working and this wobbling.",

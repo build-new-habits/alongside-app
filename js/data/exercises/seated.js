@@ -50,6 +50,13 @@
  * changes who these are OFFERED to first, never who can have them.
  *
  * data/exercises/seated.js
+ * 28 Sep 2026 v2
+ *
+ * v2 - Work list 10, CL-5-ALL. Descriptions reworded to the clinical
+ *   principle: simple cues, a comfortable and controlled range, no single
+ *   fixed position ("about 90°", "as far as is comfortable", "keep it
+ *   steady"). What each exercise is has not changed. verify-cl5-all.
+ *
  * 11 Aug 2026 v1
  *
  * CAP-4 — the seated and supported library. Fourteenth discipline file.
@@ -426,7 +433,7 @@ export const SEATED = [
     why: 'Raises your heart rate quickly and works the shoulders, chest and trunk together. It is also one of the few things that feels genuinely energetic while seated.',
     watchOut: [
       'Locking the elbow at the end of the punch — stop just short of straight',
-      'Punching from the shoulder only, with the trunk staying completely still',
+      'Punching from the shoulder only, with no turn through the trunk',
       'Speeding up until the punches stop reaching full extension'
     ],
     load: 'Bodyweight to start. Light dumbbells only once four rounds feel comfortable, and expect to need considerably lighter than you would guess.',
@@ -1682,10 +1689,10 @@ SEATED.push(
       'Continue for three minutes'
     ],
     coaching: 'Make the circles as big as they will comfortably go. A small shrug is not a warm-up, it is a fidget.',
-    why: 'Warms the shoulder joint through its full range before you ask anything of it, which matters most for anybody whose arms do the work their legs might otherwise.',
+    why: 'Warms the shoulder joint through its range before you ask anything of it, which matters most for anybody whose arms do the work their legs might otherwise.',
     watchOut: [
       'Circles shrinking to a shrug',
-      'Rushing rather than moving slowly through the full range',
+      'Rushing rather than moving slowly through a comfortable range',
       'Any clicking with pain: reduce the size of the circle'
     ],
     load: 'No weight.', credits: 25 }

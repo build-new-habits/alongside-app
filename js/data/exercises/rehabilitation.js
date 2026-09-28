@@ -1,5 +1,12 @@
 /**
  * data/exercises/rehabilitation.js
+ * 28 Sep 2026 v10
+ *
+ * v10 - Work list 10, CL-5-ALL. Descriptions reworded to the clinical
+ *   principle: simple cues, a comfortable and controlled range, no single
+ *   fixed position ("about 90°", "as far as is comfortable", "keep it
+ *   steady"). What each exercise is has not changed. verify-cl5-all.
+ *
  * 13 Aug 2026 v9
  *
  * v9 - C1b COMPLETE. All 94 entries now carry their own watchOut and
@@ -232,7 +239,7 @@ export const REHABILITATION = [
     reps: "15 each side",
     holdSeconds: 2,
     rest: 30,
-    description: "Lie on your side, hips and knees bent to 45 degrees. Keeping your feet together, lift your top knee as high as you can without your pelvis rolling back. Hold 2 seconds. Lower slowly.",
+    description: "Lie on your side, hips and knees bent to about 45 degrees. Keeping your feet together, lift your top knee as high as you can without your pelvis rolling back. Hold 2 seconds. Lower slowly.",
     cues: [
       "Your pelvis should not move — if it does, reduce the range",
       "The movement is from the hip, not the lower back",
@@ -264,7 +271,7 @@ export const REHABILITATION = [
     perSide: true,
     instructions: [
       'Loop a resistance band just above your knees',
-      'Lie on your side, hips stacked, knees bent at 45°',
+      'Lie on your side, hips stacked, knees bent at about 45°',
       'Press against the band as you open your top knee toward the ceiling',
       'Keep your feet together and hips from rolling',
       'Lower slowly — do not let the band snap back',
@@ -412,7 +419,7 @@ export const REHABILITATION = [
     perSide: true,
     instructions: [
       'Start on hands and knees, wrists under shoulders, knees under hips',
-      'Keep your right knee bent at 90° throughout',
+      'Keep your right knee bent at about 90° throughout',
       'Lift your right leg, driving the heel toward the ceiling',
       'Stop when your hip is fully extended — do not arch your lower back',
       'Lower slowly and repeat',
@@ -453,7 +460,7 @@ export const REHABILITATION = [
     instructions: [
       'Start on hands and knees, wrists under shoulders, knees under hips',
       'Keeping your knee bent, lift your right leg out to the side',
-      'Raise until your thigh is parallel to the floor',
+      'Raise your knee out to the side, up to about hip height',
       'Keep your hips level and core engaged throughout',
       'Lower slowly and repeat',
       'Complete 15 reps each side'
@@ -462,7 +469,7 @@ export const REHABILITATION = [
     why: 'Works the gluteus medius from a different angle than clamshells — together they give full hip stabiliser coverage.',
         watchOut: [
       "If you are leaning away to lift higher, keep your weight even and accept a lower leg",
-      "If the knee straightens as it rises, hold the 90 degree bend. A straight leg makes it a different exercise",
+      "If the knee straightens as it rises, keep it bent. A straight leg makes it a different exercise",
       "If you feel a pinch at the front of the hip, come down and shorten the range — that pinch is a signal, not something to work through"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
@@ -573,7 +580,7 @@ export const REHABILITATION = [
     instructions: [
       'Loop a resistance band just above your knees or ankles',
       'Stand in a quarter-squat, feet shoulder-width apart',
-      'Walk forward, stepping each foot out and forward at 45°',
+      'Walk forward, stepping each foot out and forward at about 45°',
       'Keep your knees tracking over your toes and pushing out against the band',
       'Walk 10 steps forward, then 10 steps back',
       'Complete 3 sets'
@@ -582,7 +589,7 @@ export const REHABILITATION = [
     why: 'Trains the glutes to stabilise the hip and knee during walking and running movements — exactly what they need to do in sport.',
         watchOut: [
       "If your knees track inward as you step, lighter band, wider stance",
-      "If you are walking normally with a band on, exaggerate the outward angle. The 45 degree step is the whole point of it",
+      "If you are walking normally with a band on, exaggerate the outward angle. The angled step is the whole point of it",
       "If your lower back is working, you have straightened up. Stay in the quarter-squat throughout"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
@@ -614,7 +621,7 @@ export const REHABILITATION = [
       'Sit on the floor with your upper back resting against a sofa or bench',
       'Feet flat on the floor, knees bent at about 90°',
       'Squeeze your glutes and drive your hips up toward the ceiling',
-      'At the top, your torso should be parallel to the floor',
+      'At the top, your torso should be roughly level with the floor',
       'Hold for 2 seconds, squeezing hard',
       'Lower slowly and repeat for 12 reps, 3 sets'
     ],
@@ -658,7 +665,7 @@ export const REHABILITATION = [
       'Return and repeat on the left side',
       'That is one rep — complete 10 reps total, 3 sets'
     ],
-    coaching: 'Hips staying perfectly still is the whole challenge. Start with tiny lifts and build range over time.',
+    coaching: 'Keeping the hips level is the whole challenge. Start with tiny lifts and build range over time.',
     why: 'Combines glute strength with the core stability needed to keep hips level during single-leg movements.',
         watchOut: [
       "If your hips drop when a foot comes up, you have found the limit. Hold the bridge and lift the foot less far",
@@ -1147,7 +1154,7 @@ export const REHABILITATION = [
     coaching: 'This works the hamstrings from a lengthened position — which is where most hamstring injuries happen. Start small with the range.',
     why: 'Trains the hamstrings eccentrically through a functional range, building resilience for running and jumping.',
         watchOut: [
-      "If your hips drop as the heels travel out, you have gone as far as you can hold. Come back in and stop there",
+      "If your hips drop as the heels travel out, you have reached your range for today. Come back in and stop there",
       "If you cannot drag your heels back, you slid out too far. Shorten it",
       "If the hamstring cramps, that usually means the range is longer than it is ready for. Shorten it rather than pushing on"
     ],
@@ -1469,7 +1476,7 @@ export const REHABILITATION = [
     perSide: false,
     instructions: [
       'Sit in a chair with feet flat on the floor, hip-width apart',
-      'Slowly raise both heels as high as you can, pressing through the balls of your feet',
+      'Slowly raise both heels as high as is comfortable, pressing through the balls of your feet',
       'Hold at the top for 1 second',
       'Lower slowly — take 3 counts to come down',
       'Complete 3 sets of 15 reps'
@@ -1550,12 +1557,12 @@ export const REHABILITATION = [
     instructions: [
       'Stand near a wall for balance support',
       'Shift your weight onto your right foot, left foot lightly lifted',
-      'Slowly rise onto the ball of your right foot as high as you can',
+      'Slowly rise onto the ball of your right foot as high as is comfortable',
       'Hold for 1 second at the top',
       'Lower slowly — 3 counts down',
       'Complete 3 sets of 12 reps each side'
     ],
-    coaching: 'Full range matters — press all the way up, lower all the way down. Half reps build half the strength.',
+    coaching: 'Rise and lower slowly through a range you can control. When that feels easy, go a little higher and a little lower.',
     why: 'Progresses from eccentric-only to full concentric and eccentric loading — the next step in returning the calf and Achilles to full strength.',
         watchOut: [
       "If you cannot get all the way up, hold the wall with both hands. Height with support beats a half rep without",
@@ -1640,7 +1647,7 @@ export const REHABILITATION = [
     why: 'The bent-knee version targets the soleus — the deeper calf muscle whose tendon blends into the Achilles. Essential for complete Achilles rehabilitation.',
         watchOut: [
       "If you are pushing back up on the painful side, use the other foot. Only the lowering is the exercise",
-      "If your knee straightens as you lower, you have switched to the other calf muscle. Hold the 30 degree bend throughout",
+      "If your knee straightens as you lower, you have switched to the other calf muscle. Keep that slight bend throughout",
       "If the pain sits right on the heel bone rather than a few centimetres up the tendon, do the drops from flat ground instead of off a step",
       "Judge it by the next morning: if stiffness or pain is worse than usual, halve the sets next time",
       "If you feel a sudden sharp snap, or you get swelling, a marked limp, or pain climbing above about 5 out of 10, stop. I can't give you medical support and that is past what I can help with — please speak to someone today"
@@ -1678,7 +1685,7 @@ export const REHABILITATION = [
       'Hold for 30 seconds, then switch sides',
       'Repeat 3 times each side'
     ],
-    coaching: 'The heel must stay flat on the floor — that is what gives the stretch. If the heel lifts, step the foot closer.',
+    coaching: 'Keep the back heel down on the floor — that is what gives the stretch. If the heel lifts, step the foot closer.',
     why: 'Maintains calf and Achilles flexibility during rehabilitation — reduced flexibility is a significant risk factor for re-injury.',
         watchOut: [
       "If your back heel lifts, step in closer. A shorter stance with the heel down does more than a long one with it up",
@@ -1912,7 +1919,7 @@ export const REHABILITATION = [
     duration: 90,
     perSide: false,
     instructions: [
-      'Stand with feet closer than shoulder-width, toes turned out at 45°',
+      'Stand with feet closer than shoulder-width, toes turned out at about 45°',
       'Lower into a squat, pushing your knees out over your little toes',
       'Only go as deep as feels comfortable — even a small range is fine',
       'At the bottom, pause for 1 second',
@@ -2159,7 +2166,7 @@ export const REHABILITATION = [
       'Complete 3 sets of 20 reps',
       'Progress to standing with back against wall once seated is easy'
     ],
-    coaching: 'You will feel this in the muscle running along the outer shin. That is exactly where it should be.',
+    coaching: 'You will feel this in the muscle running along the outer shin. That is the muscle doing the work.',
     why: 'Strengthens the tibialis anterior — the muscle most involved in shin splints. Directly addresses the source of the pain.',
         watchOut: [
       "If your heels lift as your toes come up, press them down. Heels stay planted throughout",
@@ -2314,7 +2321,7 @@ export const REHABILITATION = [
       'Stand on your right leg, hands on hips',
       'While keeping your balance, reach your left foot forward as far as you can — touch the floor lightly',
       'Return to centre without putting full weight on the left foot',
-      'Reach to the side — as far as you can',
+      'Reach to the side — as far as you can while keeping your balance',
       'Return, then reach diagonally behind you',
       'Each of the three directions is one rep — complete 5 full reps each side'
     ],
@@ -2398,7 +2405,7 @@ export const REHABILITATION = [
     perSide: true,
     instructions: [
       'Anchor a resistance band at elbow height beside you',
-      'Hold the band in your right hand, elbow bent at 90°, upper arm against your side',
+      'Hold the band in your right hand, elbow bent at about 90°, upper arm against your side',
       'Keep your elbow tucked in and rotate your forearm away from your body',
       'Move slowly — 2 seconds out, 2 seconds back',
       'Complete 3 sets of 15 reps each side'
@@ -2438,7 +2445,7 @@ export const REHABILITATION = [
     perSide: true,
     instructions: [
       'Anchor a resistance band at elbow height on the opposite side to your working arm',
-      'Hold the band in your right hand, elbow bent at 90°, upper arm against your side',
+      'Hold the band in your right hand, elbow bent at about 90°, upper arm against your side',
       'Rotate your forearm toward your body against the band resistance',
       'Move slowly — 2 seconds in, 2 seconds back',
       'Complete 3 sets of 15 reps each side'
@@ -2477,7 +2484,7 @@ export const REHABILITATION = [
     perSide: false,
     instructions: [
       'Stand with your back flat against a wall, feet slightly out from the wall',
-      'Press your arms against the wall, elbows at 90° — like a goalpost position',
+      'Press your arms against the wall, elbows at about 90° — like a goalpost position',
       'Slowly slide both arms up the wall as high as you can while keeping contact',
       'Keep your lower back, upper back and arms touching the wall throughout',
       'Slide back down slowly',
@@ -2529,7 +2536,7 @@ export const REHABILITATION = [
         watchOut: [
       "If your body twists or leans to help the arm around, stand against a wall so you can feel yourself staying still",
       "If the arm speeds up through part of the circle, that is where the control runs out. Slow that section down rather than skipping it",
-      "If you cannot get all the way round, go as far as you can and reverse. A partial circle done well beats a full one thrown",
+      "If you cannot get all the way round, go as far as is comfortable and reverse. A partial circle done well beats a full one thrown",
       "If you feel a catch or a click with pain, stop. I can't give you medical support — it's worth getting someone to look at it"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
@@ -2561,7 +2568,7 @@ export const REHABILITATION = [
       'Lie face down on a mat, arms at your sides',
       'Y position: Lift both arms diagonally overhead — thumbs up — hold 2 seconds',
       'Lower, then T position: Lift both arms straight out to the sides — hold 2 seconds',
-      'Lower, then W position: Bend elbows to 90°, lift upper arms to shoulder height — hold 2 seconds',
+      'Lower, then W position: Bend elbows to about 90°, lift upper arms to shoulder height — hold 2 seconds',
       'That is one Y-T-W rep',
       'Complete 3 sets of 8 reps'
     ],
@@ -2640,7 +2647,7 @@ export const REHABILITATION = [
     duration: 60,
     perSide: false,
     instructions: [
-      'Stand in a doorway, arms raised to shoulder height, elbows bent at 90°',
+      'Stand in a doorway, arms raised to shoulder height, elbows bent at about 90°',
       'Place forearms on the door frame',
       'Step one foot forward and lean gently into the doorway',
       'Feel the stretch across the front of the chest and shoulders',
@@ -2682,7 +2689,7 @@ export const REHABILITATION = [
     instructions: [
       'Sit or stand, right arm extended forward at shoulder height',
       'Make a gentle fist',
-      'Slowly circle the wrist through its full range — as big a circle as possible',
+      'Slowly circle the wrist through a comfortable range — as big a circle as feels easy',
       'Move at about 5 seconds per full circle',
       'Complete 5 circles clockwise and 5 anticlockwise each side'
     ],
@@ -2759,11 +2766,11 @@ export const REHABILITATION = [
     duration: 60,
     perSide: true,
     instructions: [
-      'Sit with your right elbow bent at 90°, upper arm against your side',
+      'Sit with your right elbow bent at about 90°, upper arm against your side',
       'Hold a light object like a pen or small water bottle',
       'Rotate your palm to face the ceiling — supination',
       'Then rotate your palm to face the floor — pronation',
-      'Move slowly through the full range, pausing at each end for 1 second',
+      'Move slowly through a comfortable range, pausing at each end for 1 second',
       'Complete 15 slow reps each side, 3 sets'
     ],
     coaching: 'The weight of even a light object adds enough load to make this therapeutic. As strength returns, use a slightly heavier object.',
@@ -2950,7 +2957,7 @@ export const REHABILITATION = [
     duration: 90,
     perSide: true,
     instructions: [
-      'Lie on your back, arms pointing to the ceiling, knees bent at 90° lifted in the air',
+      'Lie on your back, arms pointing to the ceiling, knees bent at about 90° lifted in the air',
       'Press your lower back firmly into the floor — keep it there throughout',
       'Slowly lower your right arm toward the floor overhead',
       'Hold for 2 seconds — back stays flat',
@@ -2970,7 +2977,7 @@ export const REHABILITATION = [
     reps: "8 each side",
     holdSeconds: 0,
     rest: 30,
-    description: "Lie on your back, arms pointing to the ceiling, knees bent to 90 degrees above your hips. Slowly lower one arm overhead toward the floor — keeping your lower back pressed firmly down. Return. Alternate sides.",
+    description: "Lie on your back, arms pointing to the ceiling, knees bent to about 90 degrees above your hips. Slowly lower one arm overhead toward the floor — keeping your lower back pressed firmly down. Return. Alternate sides.",
     cues: [
       "Arms only in this version — legs stay still",
       "Lower back stays in contact with the floor throughout",
@@ -3001,7 +3008,7 @@ export const REHABILITATION = [
     duration: 90,
     perSide: true,
     instructions: [
-      'Lie on your back, arms to the ceiling, knees at 90° in the air',
+      'Lie on your back, arms to the ceiling, knees at about 90° in the air',
       'Press your lower back into the floor',
       'Slowly extend your right leg out straight — heel hovering above the floor',
       'Hold for 2 seconds',
@@ -3009,7 +3016,7 @@ export const REHABILITATION = [
       'Complete 8 reps each side, 3 sets'
     ],
     coaching: 'Leg only this time. Harder than it looks — the longer lever of the leg challenges the lower back more than the arm.',
-    why: 'Progresses dead bug to leg extension — the pattern used in walking and running where the core must prevent the back from arching.',
+    why: 'Progresses dead bug to leg extension — the pattern used in walking and running where your middle works to stop the back arching.',
         watchOut: [
       "If your back lifts as the leg extends, keep the heel higher. The height of the heel is your dial",
       "If your ribs flare up as you extend, breathe out through the movement and keep them down",
@@ -3041,7 +3048,7 @@ export const REHABILITATION = [
     duration: 90,
     perSide: true,
     instructions: [
-      'Lie on your back, arms to the ceiling, knees at 90° in the air',
+      'Lie on your back, arms to the ceiling, knees at about 90° in the air',
       'Press your lower back into the floor',
       'Simultaneously lower your right arm overhead and extend your left leg out',
       'Hold for 2 seconds — opposite limbs working together',
@@ -3120,7 +3127,7 @@ export const REHABILITATION = [
     reps: "6 each side",
     holdSeconds: 5,
     rest: 45,
-    description: "On hands and knees. Brace your core gently. Extend one arm and the opposite leg until both are parallel to the floor. Hold 5 seconds. Return slowly. Alternate sides.",
+    description: "On hands and knees. Brace your core gently. Extend one arm and the opposite leg until both are about level with the floor. Hold 5 seconds. Return slowly. Alternate sides.",
     cues: [
       "Keep your hips level throughout — no rotation",
       "Extend from the hip and shoulder, not from the spine",
@@ -3809,7 +3816,7 @@ export const REHABILITATION = [
       'Lie face down on a bench or floor',
       'Y: raise both arms to form a Y — thumbs up — 10 reps',
       'T: raise both arms to form a T — thumbs up — 10 reps',
-      'W: bend elbows to 90 degrees and raise, squeezing shoulder blades — 10 reps',
+      'W: bend elbows to about 90 degrees and raise, squeezing shoulder blades — 10 reps',
       'Use a very light weight or no weight to start',
       'Complete 3 sets of each'
     ],

@@ -1,5 +1,12 @@
 /**
  * data/exercises/cardio.js
+ * 28 Sep 2026 v4
+ *
+ * v4 - Work list 10, CL-5-ALL. Descriptions reworded to the clinical
+ *   principle: simple cues, a comfortable and controlled range, no single
+ *   fixed position ("about 90°", "as far as is comfortable", "keep it
+ *   steady"). What each exercise is has not changed. verify-cl5-all.
+ *
  * 11 Aug 2026 v3
  *
  * v3 - CON-9. watchOut and load added to the 26 general cardio entries. Written to the Exercise
@@ -524,7 +531,7 @@ export const CARDIO = [
     why: 'High-intensity interval training produces significant cardiovascular and metabolic adaptation in a shorter time than steady-state cardio.',
         watchOut: [
       'Going flat out on the first round and fading badly',
-      'Standing completely still in the recovery rather than moving gently',
+      'Standing still in the recovery rather than moving gently',
       'Continuing once form has clearly gone'
     ],
     load: 'Hard enough that the last round is a real effort, sustainable enough that you complete it.',
@@ -1006,7 +1013,7 @@ export const CARDIO = [
       'Build to a steady, easy pace and keep going for five minutes',
       'Let the handles move with your stride rather than pushing them separately'
     ],
-    coaching: 'Use the whole stride rather than short choppy steps — the full range is what actually warms the hips and shoulders.',
+    coaching: 'Use a long, easy stride rather than short choppy steps — that is what actually warms the hips and shoulders.',
     why: 'Low impact and full body. It warms the shoulders and upper back as well as the legs, which matters if there is pressing or pulling later in the session.',
     watchOut: [
       'Short, quick steps instead of a full stride, which warms almost nothing',

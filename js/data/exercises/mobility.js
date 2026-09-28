@@ -1,5 +1,12 @@
 /**
  * data/exercises/mobility.js
+ * 28 Sep 2026 v4
+ *
+ * v4 - Work list 10, CL-5-ALL. Descriptions reworded to the clinical
+ *   principle: simple cues, a comfortable and controlled range, no single
+ *   fixed position ("about 90°", "as far as is comfortable", "keep it
+ *   steady"). What each exercise is has not changed. verify-cl5-all.
+ *
  * 10 Aug 2026 v3
  *
  * v3 — Added tailored YouTube search terms to all 38 exercises
@@ -130,8 +137,8 @@ export const MOBILITY = [
     duration: 90,
     perSide: true,
     instructions: [
-      'Sit with front leg bent 90° in front, back leg 90° behind',
-      'Keep both knees at right angles',
+      'Sit with your front leg bent in front of you and your back leg bent behind, each knee at roughly a right angle',
+      'Let both knees bend to roughly a right angle, or less if your hips ask for it',
       'Sit tall, then gently lean forward over front shin',
       'Hold 45 seconds each side'
     ],
@@ -149,7 +156,7 @@ export const MOBILITY = [
     reps: "each side",
     holdSeconds: 60,
     rest: 30,
-    description: "Sit on the floor with one leg in front at 90 degrees, one leg to the side at 90 degrees. Sit tall and hold the position. After 30 seconds, lean gently forward over the front shin.",
+    description: "Sit on the floor with one leg bent in front of you and the other bent out to the side, each at roughly a right angle, or wherever is comfortable. Sit tall and hold the position. After 30 seconds, lean gently forward over the front shin.",
     cues: [
       "Both hips should be in contact with the floor",
       "Sit tall before you lean — do not collapse into the position",
@@ -176,7 +183,7 @@ export const MOBILITY = [
     duration: 60,
     perSide: true,
     instructions: [
-      'Lie on your side, knees bent at 90°',
+      'Lie on your side, knees bent at about 90°',
       'Extend arms in front, palms together',
       'Keeping hips still, rotate top arm open to the other side',
       'Follow your hand with your eyes',
@@ -378,7 +385,7 @@ export const MOBILITY = [
       'Stand tall, hands on hips or light touch on wall',
       'Lift your right knee to hip height in front of you',
       'Slowly arc the knee out to the side, keeping it at hip height',
-      'Continue the arc behind you as far as you can',
+      'Continue the arc behind you as far as is comfortable',
       'Return the same way — or continue the full circle',
       'Move as slowly as possible, maintaining active tension throughout',
       'Complete 5 circles each direction each side'
@@ -397,11 +404,11 @@ export const MOBILITY = [
     reps: "5 each side",
     holdSeconds: 0,
     rest: 30,
-    description: "Standing on one leg, draw the biggest circle you can with your lifted knee — forward, out to the side, behind you, and back. Move slowly through the full range. The standing leg stays completely still.",
+    description: "Standing on one leg, draw the biggest circle you can with your lifted knee — forward, out to the side, behind you, and back. Move slowly, through a range that feels comfortable. Keep the standing leg steady.",
     cues: [
       "Move as slowly as possible — speed hides restriction",
-      "Keep your upper body completely still",
-      "The standing hip, knee, and foot stay exactly where they are",
+      "Keep your upper body steady",
+      "Keep the standing hip, knee and foot steady",
       "This is exploration — find where you run out of range and breathe into it"
     ],
   },
@@ -426,7 +433,7 @@ export const MOBILITY = [
     instructions: [
       'Sit or stand, right foot lifted slightly off the floor',
       'Draw large circles with your toes — as big a circle as the ankle allows',
-      'Move slowly and with intention through the full range',
+      'Move slowly and with intention through a comfortable range',
       'Complete 10 circles clockwise and 10 anticlockwise each ankle'
     ],
     coaching: 'Especially useful first thing in the morning or before any lower body exercise. 2 minutes total.',
@@ -459,7 +466,7 @@ export const MOBILITY = [
     duration: 120,
     perSide: false,
     instructions: [
-      'Stand with feet slightly wider than hip-width, toes turned out 30 to 45°',
+      'Stand with feet slightly wider than hip-width, toes turned out about 30 to 45°',
       'Lower into a deep squat — as low as you can go while keeping heels on the floor',
       'Hold your heels together with both hands to help stay upright',
       'Hold for 30 to 60 seconds, breathing deeply',
@@ -1043,14 +1050,14 @@ export const MOBILITY = [
     duration: 90,
     perSide: true,
     instructions: [
-      'Sit on the floor with both knees bent to 90 degrees — front leg with knee forward, back leg with knee to the side',
-      'Both shins are at 90 degrees to your thighs',
+      'Sit on the floor with both knees bent to roughly a right angle — front leg with knee forward, back leg with knee to the side',
+      'Both shins sit at roughly a right angle to your thighs, or wherever is comfortable',
       'Sit tall over the front hip — resist the urge to lean away',
       'Hold for 60 to 90 seconds, then switch sides',
       'Gradually work toward sitting upright with no lean'
     ],
     coaching: 'Most people cannot sit upright in 90-90 at first. Use a folded blanket under the front hip if it is raised off the floor.',
-    why: 'The 90-90 position simultaneously stretches both internal and external hip rotation — addressing the full range of hip mobility in one position.',
+    why: 'The 90-90 position stretches both inward and outward hip rotation at once, so one position works both directions.',
         watchOut: [
       'Bouncing into the stretch rather than holding it still',
       'Pushing to the point of pain; a stretch should feel like a strong pull, never sharp',
@@ -1194,7 +1201,7 @@ export const MOBILITY = [
     instructions: [
       'Hold a resistance band or stick wide — wider than shoulder-width',
       'With straight arms, raise the band from in front of the body over the head',
-      'Continue the arc behind the body as far as possible',
+      'Continue the arc behind the body as far as is comfortable',
       'Return over the head back to the front',
       'Gradually narrow the grip as the range improves',
       'Complete 10 reps each direction'
@@ -1277,7 +1284,7 @@ export const MOBILITY = [
       'Complete 10 circles each direction on each leg'
     ],
     coaching: 'The torso staying still is the key challenge. If the torso rotates with the leg, you are not mobilising the hip — you are mobilising the lumbar spine.',
-    why: 'Develops active hip circumduction — the full range of motion needed for kicking, stepping over obstacles, and fluid lower body movement.',
+    why: 'Develops active hip circles — the range of movement needed for kicking, stepping over obstacles, and fluid lower body movement.',
         watchOut: [
       'Moving faster than you can control, which turns mobility work into momentum',
       'Forcing range rather than working to the edge of what is comfortable',
@@ -1307,7 +1314,7 @@ export const MOBILITY = [
     duration: 90,
     perSide: true,
     instructions: [
-      'Lie on your side in the foetal position — knees together at 90 degrees',
+      'Lie on your side in the foetal position — knees together at about 90 degrees',
       'Extend both arms forward, palms stacked',
       'Take the top arm and open it to the side — rotating the thoracic spine',
       'Let the arm reach behind, looking to follow it',

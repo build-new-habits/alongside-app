@@ -20,6 +20,13 @@
  * available through cardio sessions and the sport pathways.
  **
  * data/exercises/sport_conditioning.js
+ * 28 Sep 2026 v3
+ *
+ * v3 - Work list 10, CL-5-ALL. Descriptions reworded to the clinical
+ *   principle: simple cues, a comfortable and controlled range, no single
+ *   fixed position ("about 90°", "as far as is comfortable", "keep it
+ *   steady"). What each exercise is has not changed. verify-cl5-all.
+ *
  * 11 Aug 2026 v2
  *
  * v2 - CON-9. watchOut and load added to all 43 entries. Written to the Exercise
@@ -438,7 +445,7 @@ export const SPORT_CONDITIONING = [
     duration: 120,
     perSide: false,
     instructions: [
-      'Stand facing a wall, hands on the wall at shoulder height, body at 45 degrees',
+      'Stand facing a wall, hands on the wall at shoulder height, body at about 45 degrees',
       'Drive one knee up to hip height rapidly — hold for 1 second',
       'Return and drive the opposite knee',
       'Once the pattern is established, alternate rapidly — simulating sprint drive phase',
@@ -679,7 +686,7 @@ export const SPORT_CONDITIONING = [
       'Work in 20-second rounds, switch roles',
       'Complete 6 rounds each role'
     ],
-    coaching: 'The leader should stay low and use fakes — the mirror must not cross their feet. This is the closest thing to actual defensive situation in training.',
+    coaching: 'The leader should stay low and use fakes — the mirror tries not to cross their feet. This is the closest thing to actual defensive situation in training.',
     why: 'Reactive agility training that mirrors the actual demands of individual defensive sport. Cannot be replicated by any cone drill because it involves genuine unpredictability.',
         watchOut: [
       'Planting on a straight leg when changing direction, which is where knees get hurt',

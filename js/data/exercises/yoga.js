@@ -1,5 +1,12 @@
 /**
  * data/exercises/yoga.js
+ * 28 Sep 2026 v5
+ *
+ * v5 - Work list 10, CL-5-ALL. Descriptions reworded to the clinical
+ *   principle: simple cues, a comfortable and controlled range, no single
+ *   fixed position ("about 90°", "as far as is comfortable", "keep it
+ *   steady"). What each exercise is has not changed. verify-cl5-all.
+ *
  * 11 Aug 2026 v4
  *
  * v4 - All 30 entries in this file given a real difficultyLevel. They
@@ -107,9 +114,9 @@ export const YOGA = [
     duration: 60,
     perSide: true,
     instructions: [
-      'Step your right foot forward between your hands, left foot back at 45°',
+      'Step your right foot forward between your hands, left foot back at about 45°',
       'Ground the outer edge of the back foot',
-      'Bend the front knee to 90° — knee over ankle',
+      'Bend the front knee to about 90° — knee over ankle',
       'Rise up and lift your arms overhead, palms facing in',
       'Square your hips toward the front as much as possible',
       'Hold for 5 breaths, then switch sides'
@@ -146,7 +153,7 @@ export const YOGA = [
     perSide: true,
     instructions: [
       'Stand with feet wide — about a leg length apart',
-      'Turn your right foot out 90°, left foot in slightly',
+      'Turn your right foot out about 90°, left foot in slightly',
       'Bend the right knee over the right ankle',
       'Extend arms out to each side at shoulder height, palms down',
       'Gaze over your right hand',
@@ -183,7 +190,7 @@ export const YOGA = [
     duration: 60,
     perSide: true,
     instructions: [
-      'Stand with feet wide, right foot turned out 90°, left foot slightly in',
+      'Stand with feet wide, right foot turned out about 90°, left foot slightly in',
       'Reach your right arm forward and hinge at the hip to the right',
       'Lower the right hand to your shin, ankle, or the floor — wherever it lands without strain',
       'Extend the left arm straight up, creating a long line',
@@ -405,7 +412,7 @@ export const YOGA = [
     instructions: [
       'From Triangle Pose on the right side, bend your front knee and step your back foot in',
       'Place your right hand on the floor about 30 cm in front of your right foot',
-      'Lift your left leg parallel to the floor',
+      'Lift your left leg to about hip height',
       'Open your hips, stacking the left hip over the right',
       'Extend the left arm to the ceiling',
       'Hold for 3 to 5 breaths, then switch sides'
@@ -482,10 +489,10 @@ export const YOGA = [
       'Stand on your right foot with a soft bend in the knee',
       'Hinge forward from the hip, extending your left leg behind you',
       'Reach arms forward or out to the sides for balance',
-      'Aim for your torso and back leg to be parallel to the floor',
+      'Let your torso and back leg come towards parallel with the floor',
       'Hold for 3 to 5 breaths, then switch sides'
     ],
-    coaching: 'The hips want to open — keep them level. A 45-degree lean with level hips is better than a fully horizontal torso with one hip open.',
+    coaching: 'The hips want to open — keep them level. A partial lean with level hips is better than a fully horizontal torso with one hip open.',
     why: 'The most demanding of the Warrior poses — builds single-leg strength, glute strength, and balance simultaneously.',
         watchOut: [
       'Hips opening to the side rather than staying square to the floor',
@@ -516,8 +523,8 @@ export const YOGA = [
     perSide: false,
     instructions: [
       'Sit with knees bent, feet flat on the floor',
-      'Lean back slightly and lift your feet, shins parallel to the floor',
-      'Extend your arms forward, parallel to the floor',
+      'Lean back slightly and lift your feet, shins roughly parallel to the floor',
+      'Reach your arms forward, about level with the floor',
       'If possible, straighten your legs — hold at whatever angle maintains a long spine',
       'Hold for 5 breaths, then lower with control'
     ],
@@ -528,7 +535,7 @@ export const YOGA = [
       'Neck straining forwards',
       'Holding the breath'
     ],
-    load: 'Bodyweight. Keep the knees bent and the shins parallel to the floor to begin.',
+    load: 'Bodyweight. Keep the knees bent and the shins roughly parallel to the floor to begin.',
     credits: 50
   },
 

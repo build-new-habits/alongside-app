@@ -1,5 +1,12 @@
 /**
  * data/exercises/swimming_cycling.js
+ * 28 Sep 2026 v3
+ *
+ * v3 - Work list 10, CL-5-ALL. Descriptions reworded to the clinical
+ *   principle: simple cues, a comfortable and controlled range, no single
+ *   fixed position ("about 90°", "as far as is comfortable", "keep it
+ *   steady"). What each exercise is has not changed. verify-cl5-all.
+ *
  * 11 Aug 2026 v2
  *
  * v2 - CON-9. watchOut and load added to all 22 entries. Written to the Exercise
@@ -558,7 +565,7 @@ export const SWIMMING_CYCLING = [
       'The glide is where breaststroke is won or lost — do not rush into the next stroke',
       'Complete 4 × 50 metres'
     ],
-    coaching: 'Breaststroke is the most technically complex stroke. The pull and kick must be sequenced correctly — simultaneous movement kills efficiency.',
+    coaching: 'Breaststroke is the most technically complex stroke. The pull and kick work best one after the other — pull, breathe, kick, glide — rather than together.',
     why: 'The most common recreational stroke. Correct technique dramatically reduces effort and knee stress. The glide phase is essential and most beginners rush it.',
         watchOut: [
       'Rushing the drill so it becomes ordinary swimming again',
@@ -707,7 +714,7 @@ export const SWIMMING_CYCLING = [
       'Repeat 10 times',
       'Cool down: 10 minutes easy spinning'
     ],
-    coaching: 'The recovery interval must be truly easy — if you are still breathing hard when the work interval starts, you are going too hard or recovering too short.',
+    coaching: 'Keep the recovery interval truly easy — if you are still breathing hard when the work interval starts, you are going too hard or recovering too short.',
     why: 'High-intensity cycling intervals improve VO2 max and anaerobic capacity. Highly time-efficient — significant cardiovascular adaptation in under 30 minutes.',
         watchOut: [
       'Going maximal on the first interval',

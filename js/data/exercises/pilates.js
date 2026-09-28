@@ -1,5 +1,12 @@
 /**
  * data/exercises/pilates.js
+ * 28 Sep 2026 v3
+ *
+ * v3 - Work list 10, CL-5-ALL. Descriptions reworded to the clinical
+ *   principle: simple cues, a comfortable and controlled range, no single
+ *   fixed position ("about 90°", "as far as is comfortable", "keep it
+ *   steady"). What each exercise is has not changed. verify-cl5-all.
+ *
  * 11 Aug 2026 v2
  *
  * v2 - CON-9. watchOut and load added to all 17 remaining entries. Written to the Exercise
@@ -48,12 +55,12 @@ export const PILATES = [
     duration: 60,
     perSide: false,
     instructions: [
-      'Lie on your back and bring your knees to tabletop — shins parallel to the floor',
+      'Lie on your back and bring your knees to tabletop — shins roughly parallel to the floor',
       'Curl your head and shoulders off the mat, reaching arms long by your sides',
       'Pump your arms up and down in small movements — 5 counts up, 5 counts down',
       'Breathe in for 5 pumps, out for 5 pumps',
       'Complete 10 full breath cycles — 100 pumps total',
-      'For more challenge, extend legs to 45 degrees'
+      'For more challenge, extend legs to about 45 degrees'
     ],
     coaching: 'Keep the lower back pressed into the mat. If it arches, bring the knees in closer or bend them more.',
     why: 'The foundational Pilates exercise — warms up the abdominal muscles and trains breath coordination with movement.',
@@ -124,7 +131,7 @@ export const PILATES = [
     perSide: true,
     instructions: [
       'Lie on your back, curl head and shoulders off the mat',
-      'Draw right knee to chest, hands on shin — left leg extends long at 45 degrees',
+      'Draw right knee to chest, hands on shin — left leg extends long at about 45 degrees',
       'Switch: left knee in, right leg extends',
       'Keep the lower back pressed to the mat throughout',
       'Move in a smooth, rhythmic pattern',
@@ -161,7 +168,7 @@ export const PILATES = [
     perSide: false,
     instructions: [
       'Lie on your back, curl head and shoulders up, knees drawn to chest',
-      'Inhale: extend both arms overhead and both legs out at 45 degrees simultaneously',
+      'Inhale: extend both arms overhead and both legs out at about 45 degrees simultaneously',
       'Exhale: circle arms around and draw knees back to chest',
       'Keep the curl in the upper body throughout',
       'Complete 8 to 10 reps'
@@ -348,7 +355,7 @@ export const PILATES = [
       'Lie on your side, body in a straight line, head resting on your arm',
       'Kick the top leg forward as far as it will go — pulse twice at the front',
       'Swing the leg back as far as comfortable — pulse once at the back',
-      'Keep the pelvis completely still throughout — the movement is only in the hip',
+      'Keep the pelvis steady throughout — the movement comes from the hip',
       'Complete 10 reps, then switch sides'
     ],
     coaching: 'The pelvis staying still is the whole challenge. If it rocks, reduce the swing range.',
@@ -421,7 +428,7 @@ export const PILATES = [
     perSide: true,
     instructions: [
       'Lie on your back, right leg extended to the ceiling, left leg flat on the floor',
-      'Anchor your pelvis into the mat — it must not move',
+      'Anchor your pelvis into the mat and keep it steady',
       'Draw 5 circles with the right leg — clockwise',
       'Draw 5 circles anticlockwise',
       'Keep the circles large enough to feel the hip working but small enough to keep the pelvis still',
