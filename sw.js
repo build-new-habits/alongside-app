@@ -1,7 +1,13 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 28 Sep 2026 v555
+ * 28 Sep 2026 v556
+ *
+ * v556 - Work list 2e. NEW FILE precached: js/data/time-windows.js.
+ *   REMOVED from precache (deleted): js/data/workoutGenerator.js,
+ *   js/data/exercises.js. Changed: coach-proposal, know-what, checkin,
+ *   exercises/index, session-rationale, exercise-feedback, goals, store.
+ *   187 gates.
  *
  * v555 - SMOOTH-P5. NEW FILE precached: js/data/tier-table.js. Changed:
  *   views/upgrade.js, views/settings.js, components/settings.css,
@@ -3977,7 +3983,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v555";
+const CACHE_NAME = "alongside-v556";
 
 const SHELL_URLS = [
 
@@ -4104,7 +4110,6 @@ const SHELL_URLS = [
   // neither the gap nor the three dead entries were ever noticed.
   "/alongside-app/js/data/empathy-transfer.js",
   "/alongside-app/js/data/equipment-map.js",
-  "/alongside-app/js/data/exercises.js",
   "/alongside-app/js/data/exercises/gym.js",
   "/alongside-app/js/data/exercises/seated.js",
   "/alongside-app/js/data/exercises/sport_conditioning.js",
@@ -4200,7 +4205,7 @@ const SHELL_URLS = [
   "/alongside-app/js/data/weight-targets.js",
   "/alongside-app/js/data/plan-options.js",
   "/alongside-app/js/data/pricing.js",
-  "/alongside-app/js/data/workoutGenerator.js",
+  "/alongside-app/js/data/time-windows.js",
   "/alongside-app/js/data/programmeEngine.js",
   "/alongside-app/js/data/programmes.js",
   "/alongside-app/js/data/signal-words.js",
