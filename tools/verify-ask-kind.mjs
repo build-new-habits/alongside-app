@@ -1,5 +1,9 @@
 /**
  * tools/verify-ask-kind.mjs
+ * 28 Sep 2026 v2
+ *
+ * v2 - SMOOTH-P1. 1.3 rewritten for the three-question check-in; see the note there.
+ *
  * 16 Sep 2026 v1
  *
  * ASK-KIND and EXIT-LOOP. Two things Graeme reported more than once.
@@ -73,17 +77,16 @@ ok("1.2 REVERSAL: the picker itself is gone",
    "if it is back, PURPOSE-ASK and it are both asking and the person answers " +
    "the same thing twice");
 
-ok("1.3 the field is set by the check-in now, not a link on the proposal", (() => {
-  const checkin = fs.readFileSync(new URL("../js/views/checkin.js", import.meta.url), "utf8");
-  // AROUND-AREA, 16 Sep 2026. The call now spans two lines and passes
-  // the AREA, because "build strength around it" has to know WHAT it is
-  // working around. Asserted on the call, not its formatting.
-  // CLINICAL-REVIEW, 16 Sep 2026. It used to assert the AREA was passed in,
-  // so "around it" could pick a body part. Clinical review ruled the mapping out, so
-  // this now asserts the opposite: no area reaches the mapping at all.
-  return /store\.set\("requestedSessionType", sessionTypeForForm\(choice\.value\)\)/.test(checkin) &&
-         !/sessionTypeForForm\(\s*choice\.value,/.test(checkin);
-})(), "passing an area is the door the body-part mapping would come back through");
+// SMOOTH-P1, 28 Sep 2026. Graeme's decision after the prototype: the
+// check-in is three questions and no longer asks what today is for, so
+// it no longer writes requestedSessionType. The check-in RESETS it
+// (clearPurpose) so yesterday's request never carries over; the writer
+// moves to the plan screen's "Something different today" in P2.
+ok("1.3 the check-in resets the request and no longer sets it (SMOOTH-P1)", (() => {
+  const checkin = fs.readFileSync(new URL("../js/views/checkin.js", import.meta.url), "utf8")
+    .replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:])\/\/.*$/gm, "$1");
+  return /clearPurpose\(\)/.test(checkin) && !/store\.set\(\s*["']requestedSessionType["']/.test(checkin);
+})(), "a check-in that sets the request is asking a question Graeme removed");
 
 console.log("\nTEST 2 — a request does not edit the arc");
 {

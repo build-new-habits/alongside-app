@@ -1,5 +1,21 @@
 /**
  * tools/verify-quick1.mjs
+ * 28 Sep 2026 v4
+ *
+ * v4 - SMOOTH-P1. The brief/full choice is gone: every check-in is the
+ *   short one (three questions). Retired here, with their guarantees
+ *   moved rather than dropped:
+ *     - "energy and mood are still asked", "the coach speaks first" and
+ *       "PAIN IS NOT COMPRESSIBLE" -> verify-checkin-three (TEST 0, 1, 4:
+ *       driven in the real conversation, a listed condition is always
+ *       offered first).
+ *     - the brief branch and the Settings control -> removed with the
+ *       feature (Settings no longer offers it).
+ *   Kept: the stored field is still validated on load (it stays for one
+ *   release), and burnout still works without sleep data.
+ *   The Home offer (QUICK-2) is retired: it pointed to the Settings
+ *   control that no longer exists. Asserted below as never offered.
+ *
  * 21 Aug 2026 v3
  * GATE-PATH. Path resolution only -- no assertion changed.
  *
@@ -59,40 +75,6 @@ store.init();
 check('a corrupted value is corrected on load',
   ['full', 'brief'].includes(store.get('sessionPace')),
   store.get('sessionPace'));
-check('and an unknown value fails safe as the FULL path meanwhile',
-  /=== 'brief'/.test(src),
-  "_briefPath() tests for 'brief', so anything else takes the long route");
-
-// ── The branch ───────────────────────────────────────────────
-const branch = src.slice(src.indexOf('if (_briefPath())'), src.indexOf('_showFeelingWordPanel();', src.indexOf('if (_briefPath())')));
-check('the brief path branches after mood, not before it', branch.length > 0);
-check('and it skips the feeling word, sleep and variety',
-  /_finishConversation\(\)|_showConditionsPanel\(\)/.test(branch) &&
-  !/_showFeelingWordPanel\(\)|_showSleepPanel\(\)|_showVarietyPanel\(\)/.test(branch));
-
-// The non-negotiables.
-const beforeBranch = src.slice(0, src.indexOf('if (_briefPath())'));
-check('energy is still asked on the brief path',
-  /_showEnergyPanel/.test(beforeBranch),
-  'the source of todayIntensity');
-check('mood is still asked on the brief path',
-  /_showMoodPanel/.test(beforeBranch),
-  'energy and mood are what detectBurnout() actually reads');
-check('the coach still responds before the branch',
-  /_showCoachBubble\(_moodBridge/.test(beforeBranch),
-  '"coach speaks first" is the line this feature may not cross');
-// 18 Aug 2026 (QUICK-3). This was a {0,200} character window between the
-// two, and QUICK-3's added pause and its comment pushed the real code
-// past it — the gate went red on a change that did not alter the
-// behaviour it guards at all. A distance in characters is not the
-// property being asserted; ORDER is. Rewritten to test that, so the
-// assertion survives anything written between them and still fails if
-// the panel is ever dropped or moved above the condition test.
-const painIdx  = branch.indexOf('_conditions.length > 0');
-const panelIdx = branch.indexOf('_showConditionsPanel()');
-check('PAIN IS NOT COMPRESSIBLE — asked at either setting',
-  painIdx !== -1 && panelIdx > painIdx,
-  'somebody with a declared condition is not offered a shortcut past it');
 
 // ── Burnout still works on the brief path ────────────────────
 // Five brief check-ins: energy and mood only, no sleep.
@@ -107,72 +89,22 @@ for (let i = 5; i >= 1; i--) {
 check('burnout is still detected without sleep data',
   ci.detectBurnout().level !== 'none', ci.detectBurnout().level);
 
-// ── Reachable ────────────────────────────────────────────────
-check('Settings exposes the control', /data-field="sessionPace"/.test(settings));
-check('and saves it', /store\.set\('sessionPace', p\)/.test(settings));
-check('the control is validated on save',
-  /p === 'full' \|\| p === 'brief'/.test(settings));
-check('the hint tells her pain is still asked',
-  /still ask about pain/.test(settings),
-  'otherwise choosing short feels like opting out of safety');
-
-// It must not ask her every time. Asserted on the CONSTRUCT: the
-// predicate reads the stored preference, and the brief branch renders no
-// panel of its own. The first version of this searched the source for
-// "have you got time" and failed — because my own explanatory comment
-// contains the phrase. Seventh time a check in this project has matched
-// prose instead of code.
-const pred = src.slice(src.indexOf('function _briefPath()'),
-                       src.indexOf('function _showEnergyPanel()'));
-check('the pace is read from storage, not asked for',
-  /store\.get\('sessionPace'\)/.test(pred), pred.trim().split('\n').pop());
-check('the brief branch renders no extra question',
-  !/_buildPanel\(/.test(branch),
-  'asking would be the friction she is complaining about');
-
-// ── QUICK-2: the offer, because Settings is not discovery ────
+// ── QUICK-2: RETIRED (SMOOTH-P1) ─────────────────────────────
+// The offer named a Settings control that no longer exists. It must not
+// appear to anyone, however many check-ins they have done.
 const P = await import(BASE + 'data/pacing.js');
-function seedCheckins(n) {
-  localStorage.clear(); store.init();
+localStorage.clear(); store.init();
+{
   const h = {};
-  for (let i = 0; i < n; i++) {
+  for (let i = 0; i < 20; i++) {
     const d = new Date(Date.now() - i * 86400000).toISOString().split('T')[0];
     h[d] = { energy: 6, mood: 6, date: d };
   }
   store.set('checkinHistory', h);
 }
-
-seedCheckins(3);
-check('not offered to somebody two weeks in', P.offerBriefPath() === null,
-  'offering it early would be the app deciding she is in a hurry');
-
-seedCheckins(6);
-const offer = P.offerBriefPath();
-check('offered after a run of full check-ins', offer !== null,
-  offer ? offer.body.slice(0, 55) : '');
-check('and only once, ever', P.offerBriefPath() === null,
-  'somebody who ignored the offer has answered it');
-
-seedCheckins(6);
-store.set('sessionPace', 'brief');
-check('never offered to somebody already using it', P.offerBriefPath() === null);
-
-seedCheckins(6);
-const body = P.offerBriefPath().body;
-check('the offer names what she gives up',
-  /know a bit less/.test(body),
-  'selling it without the trade would be a small dishonesty');
-check('it says where to find it',
-  /Settings/.test(body));
-
-const todaySrc = fs.readFileSync(new URL('../js/views/today.js', import.meta.url), 'utf8');
-check('offered on Home, not inside the check-in',
-  /offerBriefPath\(\)/.test(todaySrc) &&
-  !/offerBriefPath/.test(fs.readFileSync(new URL('../js/views/checkin.js', import.meta.url), 'utf8')),
-  'interrupting the long thing to ask about its length would be self-defeating');
-check('and it does not displace the pacing line',
-  /planJump \? null : offerBriefPath\(\)/.test(todaySrc),
-  'a plan-jump nudge matters more than a settings tip');
+check('the retired offer is never made, even after twenty check-ins', P.offerBriefPath() === null);
+check('REVERSAL: the offer is a live call site on Home, so retiring it here is what hides it',
+  /offerBriefPath\(\)/.test(fs.readFileSync(new URL('../js/views/today.js', import.meta.url), 'utf8')));
 
 console.log(failures === 0 ? '\nQUICK-1 GATE GREEN' : `\nQUICK-1 GATE RED — ${failures} failure(s)`);
 process.exit(failures === 0 ? 0 : 1);

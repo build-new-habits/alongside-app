@@ -74,8 +74,10 @@ check('3  the answer is still stored — the claim went, the data did not',
   /sleepQuality:\s*data\.sleepQuality/.test(checkinData));
 
 const checkinView = fs.readFileSync(path.join(root, 'js/views/checkin.js'), 'utf8');
-check('4  and the full check-in still asks',
-  /_showSleepPanel\(\)/.test(strip(checkinView)));
+// SMOOTH-P1, 28 Sep 2026: sleep is optional, one link away, and asked
+// only if the person offers it. Driven in verify-checkin-three TEST 5.
+check('4  and the check-in still lets you say how you slept (optional since SMOOTH-P1)',
+  /_askSleep\(\)/.test(strip(checkinView)));
 
 // ── COACH-TILE ───────────────────────────────────────────────────────
 

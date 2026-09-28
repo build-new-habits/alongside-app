@@ -1,6 +1,13 @@
 /**
  * pacing.js - Proactive pacing
- * 15 Aug 2026 v2
+ * 28 Sep 2026 v3
+ *
+ * v3 - SMOOTH-P1. offerBriefPath() is retired: it always returns null.
+ *   Every check-in is now the short one (three questions), and the
+ *   Settings control this tip pointed to is gone, so the offer would
+ *   send people looking for something that does not exist. Kept as a
+ *   function so Home's call stays valid until Smooth Path P3 rebuilds
+ *   Home and removes the call.
  *
  * v2 - QUICK-2. offerBriefPath(). The short check-in existed only in
  *   Settings, and persona 2.16 will never browse Settings.
@@ -239,26 +246,9 @@ export function noticePlanJump() {
  * @returns {{heading:string, body:string}|null}
  */
 export function offerBriefPath() {
-  if (store.get('sessionPace') !== 'full') return null;
-  if ((store.get('pacing') || {}).briefOfferedAt) return null;
-
-  // Six check-ins is roughly a fortnight of turning up. Enough for the
-  // length to have become a thing she notices, not so many that the
-  // offer arrives after she has already stopped.
-  const checkins = Object.keys(store.get('checkinHistory') || {}).length;
-  if (checkins < 6) return null;
-
-  const pacing = { ...(store.get('pacing') || {}) };
-  pacing.briefOfferedAt = new Date().toISOString();
-  store.set('pacing', pacing);
-
-  return {
-    heading: "Something I can change",
-    // Names the trade honestly rather than selling it. She is giving
-    // something up, and pretending otherwise would be the kind of small
-    // dishonesty this product avoids.
-    body: "If these check-ins feel long, I can ask you two questions instead of five — energy and mood, and nothing else. I would know a bit less about your week, and you would be moving sooner. It is in Settings under \u201CHow you like things\u201D whenever you want it."
-  };
+  // SMOOTH-P1: retired -- see the v3 header. The body that chose when to
+  // offer, and the text it offered, are in git history (v2).
+  return null;
 }
 
 export const _EXERCISE_TYPES = EXERCISE_TYPES;

@@ -177,7 +177,16 @@ const BASELINE = new Set([
   // direction is for the caution to FIRE, not to be suppressed. A reader
   // added only to satisfy a gate would have made the safety behaviour
   // worse.
-  'conditionMeta'
+  'conditionMeta',
+
+  // 'sessionPace' -- ADDED 28 Sep 2026, SMOOTH-P1, as a RETIREMENT, the
+  // proposalBias shape below: every check-in is now the short one, the
+  // Settings control and the reader are gone, and the field stays
+  // DECLARED in getDefaults() for one release so existing installs load
+  // cleanly. A DATED PROMISE: removed from store.js with Smooth Path P4
+  // (store.js is touched there). The check further down holds it at no
+  // reader and no writer until then.
+  'sessionPace'
 ]);
 
 const added = oneEnded.filter(k => !BASELINE.has(k));
@@ -192,6 +201,11 @@ check('the baseline is still accurate', fixed.length === 0,
   fixed.length
     ? `${fixed.join(', ')} now connected — remove from BASELINE in this file`
     : 'nothing to prune');
+
+// SMOOTH-P1. sessionPace is retired the same way.
+check('sessionPace has no reader and no writer (retired, SMOOTH-P1)',
+  !/get\(['"]sessionPace|set\(['"]sessionPace/.test(all),
+  'the brief/full choice is gone; anything reading it is reading a setting nobody can change');
 
 // proposalBias is retired and should stay gone. It is in the baseline
 // only because the field is still DECLARED in getDefaults(); the reader

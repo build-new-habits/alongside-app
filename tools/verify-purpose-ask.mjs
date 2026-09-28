@@ -186,8 +186,11 @@ console.log("\nTEST 5 — it reaches the proposal, and ASK-KIND is gone");
      /requestedSessionType/.test(prop),
      "the field was right; the question was wrong");
 
-  ok("5.4 check-in asks and records the purpose",
-     /todayPurpose/.test(checkin));
+  // SMOOTH-P1, 28 Sep 2026. Graeme removed the purpose questions from the
+  // check-in after the prototype ("3 questions in that style is
+  // perfect"). The coach infers purpose; the check-in only clears it.
+  ok("5.4 check-in resets the purpose and no longer asks it (SMOOTH-P1)",
+     /clearPurpose\(\)/.test(checkin) && !/What's today for/.test(checkin));
 
   reset();
   store.set("todayPurpose", "niggle");
@@ -289,8 +292,11 @@ console.log("\nTEST 5b — CLINICAL-REVIEW: no body part is chosen for loading")
   })(), "the first implementation only gave stop advice where there was history, " +
         "which left the first-day user with none");
 
-  ok("5b.7c check-in actually renders it, independent of the recommendation",
-     /if \(needsSafetyLine\(purposeId\)\) await _showCoachBubble\(SAFETY_LINE\)/
+  // SMOOTH-P1. The line now follows a sore answer at check-in, which is
+  // where the person tells the coach something hurts. Driven for real in
+  // verify-checkin-three 4d; this pins that the render call exists.
+  ok("5b.7c check-in actually renders it when something is sore",
+     /_showCoachBubble\(SAFETY_LINE\)/
        .test(fs.readFileSync(new URL("../js/views/checkin.js", import.meta.url), "utf8")),
      "a constant nothing renders is the dead-branch pattern this session has " +
      "found five times");

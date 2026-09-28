@@ -1,6 +1,31 @@
 /**
  * js/views/checkin.js
- * 28 Sep 2026 v18
+ * 28 Sep 2026 v19
+ *
+ * v19 - SMOOTH-P1. Three questions, one tap each. Spec §4.2.
+ *
+ *   Graeme, 27 Sep, after the prototype: "3 questions in that style is
+ *   perfect. Forget the word selection."
+ *
+ *   Energy, mood, anything sore -- asked inline in the conversation as a
+ *   row of answers, so no panel slides over what the coach just said.
+ *   That is what the "I'm ready" and "Next" taps existed to prevent, so
+ *   they go too. Nothing is preset: both sliders started at 5 and 5
+ *   counted as low (F3). The answers map onto the 1-10 scale at points
+ *   chosen so every threshold downstream lands on the side it did before
+ *   (ENERGY_CHIPS). A sore area asks one "how bad" question whose answers
+ *   sit inside getPainBand()'s bands, so the severe-pain safety rules are
+ *   untouched, and the coach says the CL-4 safety line. Sleep is optional,
+ *   one link away. The third answer goes straight on; the "See what I'm
+ *   thinking" stop remains only for people with prescribed exercises,
+ *   where it is a real choice.
+ *
+ *   Gone from this route: the feeling word, sleep hours, "What's today
+ *   for?" and "What would help most?" (the coach infers purpose from the
+ *   arc and history; the plan screen lets the person change it), and the
+ *   brief/full pace preference (every check-in is now the short one).
+ *   Free keeps its drop-in question (destination architecture §8).
+ *   See tools/verify-checkin-three.mjs.
  *
  * v18 - STALE-CHECKIN (Smooth Path P0, F2). Leaving a check-in leaves
  *   nothing behind.
@@ -302,13 +327,12 @@ import { isPremium }       from "../auth.js";
 // PURPOSE-ASK, 16 Sep 2026. The coach asks WHY today, then what would
 // help -- and recommends, rather than offering a menu. See
 // js/data/purpose.js.
-import { PURPOSES, formsFor, areaOptions, needsAreaQuestion,
-         recommendation, sessionTypeForForm, intensityForForm, clearPurpose,
-         SAFETY_LINE, needsSafetyLine } from "../data/purpose.js";
+// SMOOTH-P1: the purpose questions are gone from the check-in; only the
+// reset and the clinical safety line are still used here.
+import { intensityForForm, clearPurpose, SAFETY_LINE } from "../data/purpose.js";
 import { checkinData }     from "../data/checkin.js";
 import { resolveOpening }  from "../data/checkin-openings.js";
-import { CONDITIONS, getPainBand, soreAreaOptions } from "../data/conditions.js";
-import { WORD_SETS, getQuadrant, detectSignalWord } from "../data/feelings.js";
+import { CONDITIONS, soreAreaOptions } from "../data/conditions.js";
 
 export function CheckinView(router) {
 
@@ -326,6 +350,7 @@ export function CheckinView(router) {
   // STALE-CHECKIN. False once the person has left; a panel built by a
   // timer that fires afterwards is never attached to the page.
   let _alive      = false;
+  let _sleepGiven = false;   // SMOOTH-P1
   let _container  = null;
   let _thread     = null;
   let _conditions = [];
@@ -334,8 +359,8 @@ export function CheckinView(router) {
   let _checkin = {
     energy:          5,
     mood:            5,
-    sleepHours:      7,
-    sleepQuality:    "okay",
+    sleepHours:      null,   // SMOOTH-P1: only what the person told us
+    sleepQuality:    null,
     conditionLevels: {},
     notes:           "",
     feelingWord:     null,
@@ -363,17 +388,12 @@ export function CheckinView(router) {
     _name        = (store.get("name") || "").split(" ")[0] || "";
     _selectedTime = store.get("availableTime") || null;   // read-only now
 
-    // Pre-fill from today's existing check-in or yesterday's sleep data
-    const existing = checkinData.getTodaysCheckin();
-    if (existing) {
-      _checkin = { ..._checkin, ...existing };
-    } else {
-      const history = checkinData.getHistory(1) || [];
-      if (history[0]?.sleepHours) {
-        _checkin.sleepHours  = history[0].sleepHours;
-        _checkin.sleepQuality = history[0].sleepQuality || "okay";
-      }
-    }
+    // SMOOTH-P1. Nothing is pre-filled: every answer is today's, given
+    // today. A redone check-in starts clean rather than from this
+    // morning's answers, which it would otherwise silently resubmit.
+    _checkin = { ..._checkin, energy: null, mood: null, sleepHours: null,
+                 sleepQuality: null, conditionLevels: {} };
+    _sleepGiven = false;
 
     container.innerHTML = `
       <div class="ci-view">
@@ -393,499 +413,167 @@ export function CheckinView(router) {
   }
 
   // ─────────────────────────────────────────────────────────────────────────
-  // OPENING NARRATIVE (D2)
+  // SMOOTH-P1 — THREE QUESTIONS, ONE TAP EACH
   // ─────────────────────────────────────────────────────────────────────────
+
+  // Each answer -> the 1-10 scale everything downstream reads. Chosen so
+  // every threshold lands on the side the old slider value did:
+  //   getSuggestedIntensity  <=3 low, <=6 moderate, else high
+  //   detectBurnout          5-day average <=2.5 high, <=4 moderate
+  //   getQuadrant            >=6 counts as high
+  // "Okay" is 6, not 5: the middle answer is not treated as low (F3).
+  const ENERGY_CHIPS = [
+    { label: "Running on empty", value: 2 },
+    { label: "Low",              value: 3 },
+    { label: "Okay",             value: 6 },
+    { label: "Good",             value: 7 },
+    { label: "Full of it",       value: 9 },
+  ];
+  const MOOD_CHIPS = [
+    { label: "Struggling",  value: 2 },
+    { label: "Low",         value: 3 },
+    { label: "Okay",        value: 6 },
+    { label: "Pretty good", value: 7 },
+    { label: "Great",       value: 9 },
+  ];
+  // "How bad?" -> a pain score inside each of getPainBand()'s bands above
+  // none, so the severe-pain rules (zone severe at >=7, band severe at
+  // >=8) respond exactly as they did to the slider.
+  const PAIN_CHIPS = [
+    { label: "A little",   value: 4 },   // mild 3-5
+    { label: "Quite sore", value: 6 },   // moderate 6-7, below the severe zone
+    { label: "Bad",        value: 8 },   // severe
+  ];
+  // Offered after the person's own conditions. Everything else is one tap
+  // further, under "Somewhere else".
+  const COMMON_AREAS = ["lower-back", "knee", "shoulder", "hip", "upper-back"];
 
   async function _runOpening() {
     const opening = resolveOpening();
     await _showCoachBubble(opening.b1);
-    if (opening.b2) {
-      await _showCoachBubble(opening.b2);
-    }
-    // READY BUTTON (11 Aug 2026). Graeme: "The conversation in mood and
-    // energy is too fast and I can't read what the coach is saying.
-    // Perhaps a button to trigger the slider?"
-    //
-    // The energy panel used to open 400ms after the last coach bubble.
-    // That is fine for somebody who skims and wrong for everybody else:
-    // a panel sliding up over the thread while you are still reading is
-    // the app taking the conversation back off you.
-    //
-    // The person opens it when they are ready. No timer, no auto-advance,
-    // and no penalty for taking a while -- which for a product built for
-    // people who need a moment is the whole point.
-    _showReadyButton("I'm ready", _showEnergyPanel);
+    if (opening.b2) await _showCoachBubble(opening.b2);
+    if (!_alive) return;
+
+    await _showCoachBubble("How's your energy today?");
+    const energy = await _askChips("Your energy today", ENERGY_CHIPS);
+    if (!energy) return;
+    _checkin.energy = energy.value;
+
+    await _showCoachBubble("And your mood alongside that?");
+    const mood = await _askChips("Your mood today", MOOD_CHIPS);
+    if (!mood) return;
+    _checkin.mood = mood.value;
+
+    await _askSore();
   }
 
   /**
-   * A single tap that advances the conversation. Removes itself on use,
-   * so the thread reads as a conversation afterwards rather than as a
-   * trail of dead buttons.
-   */
-  function _showReadyButton(label, onReady) {
-    const wrap = document.createElement("div");
-    wrap.className = "ci-ready";
-    wrap.innerHTML = `
-      <button type="button" class="btn btn-secondary ci-ready__btn">${label}</button>
-    `;
-    _thread.appendChild(wrap);
-    wrap.querySelector("button").addEventListener("click", () => {
-      wrap.remove();
-      onReady();
-    });
-    _scrollToNewElement(wrap);
-  }
-
-  // ─────────────────────────────────────────────────────────────────────────
-  // ENERGY PANEL
-  // ─────────────────────────────────────────────────────────────────────────
-
-  /**
-   * QUICK-1. Is this a short check-in?
+   * One question's answers, inline in the thread. Resolves with the
+   * chosen answer; the row is replaced by the person's answer as a user
+   * bubble, so the thread reads as a conversation afterwards.
    *
-   * Reads the stored preference rather than asking every time. Asking
-   * "have you got time?" before every session would itself be the
-   * friction 2.16 is complaining about, and it would make her declare
-   * her own busyness daily, which is its own small indignity.
-   *
-   * Changed in Settings, under "How you like things".
+   * `extra` adds a quiet link that resolves with { extra: true } instead
+   * (used for the optional sleep question).
    */
-  function _briefPath() {
-    return store.get('sessionPace') === 'brief';
-  }
-
-  // QUICK-3. Pause between a coach question and the panel that answers
-  // it, on paths with no confirm button of their own.
-  const _PANEL_BEAT_MS = 700;
-
-  function _showEnergyPanel() {
-    const val     = _checkin.energy;
-    const hour    = new Date().getHours();
-    const greeting = hour < 12 ? "Morning" : hour < 17 ? "Afternoon" : "Evening";
-    const nameStr  = _name ? `, ${_esc(_name)}` : "";
-
-    const panel = _buildPanel(`
-      <p class="ci-panel-q">${greeting}${nameStr}. How's your energy today?</p>
-      <div class="ci-slider-wrap">
-        <div class="ci-value-row" aria-live="polite" aria-atomic="true">
-          <span class="ci-value-emoji" id="ci-e-emoji" aria-hidden="true">${checkinData.getEnergyEmoji(val)}</span>
-          <span class="ci-value-num"   id="ci-e-num">${val}</span>
-          <span class="ci-value-label" id="ci-e-label">${checkinData.getEnergyLabel(val)}</span>
+  function _askChips(ariaLabel, chips, { note = null, extra = null } = {}) {
+    return new Promise(resolve => {
+      if (!_alive) return resolve(null);
+      const wrap = document.createElement("div");
+      wrap.className = "ci-chips";
+      wrap.innerHTML = `
+        <div class="ci-chips__row" role="group" aria-label="${_esc(ariaLabel)}">
+          ${chips.map((c, i) => `<button type="button" class="ci-chip" data-i="${i}">${_esc(c.label)}</button>`).join("")}
         </div>
-        <input type="range" id="ci-energy-slider" class="ci-slider"
-               min="1" max="10" value="${val}"
-               aria-label="Energy level, 1 exhausted to 10 energised"
-               aria-valuetext="${checkinData.getEnergyLabel(val)}">
-        <div class="ci-slider-ends" aria-hidden="true">
-          <span>Exhausted</span><span>Energised</span>
-        </div>
-      </div>
-      <button class="btn btn-primary btn-large btn-full" id="ci-energy-confirm"
-              aria-label="Confirm energy level">Next</button>
-    `);
-
-    const slider = panel.querySelector("#ci-energy-slider");
-    slider.addEventListener("input", () => {
-      const n = parseInt(slider.value);
-      _checkin.energy = n;
-      panel.querySelector("#ci-e-emoji").textContent  = checkinData.getEnergyEmoji(n);
-      panel.querySelector("#ci-e-num").textContent    = n;
-      panel.querySelector("#ci-e-label").textContent  = checkinData.getEnergyLabel(n);
-      slider.setAttribute("aria-valuetext", checkinData.getEnergyLabel(n));
-    });
-
-    panel.querySelector("#ci-energy-confirm").addEventListener("click", async () => {
-      _closePanel(panel);
-      _fadePastBubbles();
-      await new Promise(r => setTimeout(r, REDUCED_MOTION ? 0 : 400));
-      _showUserBubble(`${checkinData.getEnergyEmoji(_checkin.energy)} ${_checkin.energy}/10 — ${checkinData.getEnergyLabel(_checkin.energy)}`);
-      await _showCoachBubble(_energyBridge(_checkin.energy));
-      _showReadyButton("Next", _showMoodPanel);
-    });
-
-    _openPanel(panel);
-    setTimeout(() => slider.focus(), 350);
-  }
-
-  // ─────────────────────────────────────────────────────────────────────────
-  // MOOD PANEL
-  // ─────────────────────────────────────────────────────────────────────────
-
-  function _showMoodPanel() {
-    const val = _checkin.mood;
-
-    const panel = _buildPanel(`
-      <p class="ci-panel-q">How's your mood?</p>
-      <div class="ci-slider-wrap">
-        <div class="ci-value-row" aria-live="polite" aria-atomic="true">
-          <span class="ci-value-emoji" id="ci-m-emoji" aria-hidden="true">${checkinData.getMoodEmoji(val)}</span>
-          <span class="ci-value-num"   id="ci-m-num">${val}</span>
-          <span class="ci-value-label" id="ci-m-label">${checkinData.getMoodLabel(val)}</span>
-        </div>
-        <input type="range" id="ci-mood-slider" class="ci-slider"
-               min="1" max="10" value="${val}"
-               aria-label="Mood, 1 struggling to 10 great"
-               aria-valuetext="${checkinData.getMoodLabel(val)}">
-        <div class="ci-slider-ends" aria-hidden="true">
-          <span>Struggling</span><span>Great</span>
-        </div>
-      </div>
-      <button class="btn btn-primary btn-large btn-full" id="ci-mood-confirm"
-              aria-label="Confirm mood">Next</button>
-    `);
-
-    const slider = panel.querySelector("#ci-mood-slider");
-    slider.addEventListener("input", () => {
-      const n = parseInt(slider.value);
-      _checkin.mood = n;
-      panel.querySelector("#ci-m-emoji").textContent = checkinData.getMoodEmoji(n);
-      panel.querySelector("#ci-m-num").textContent   = n;
-      panel.querySelector("#ci-m-label").textContent = checkinData.getMoodLabel(n);
-      slider.setAttribute("aria-valuetext", checkinData.getMoodLabel(n));
-    });
-
-    panel.querySelector("#ci-mood-confirm").addEventListener("click", async () => {
-      _closePanel(panel);
-      _fadePastBubbles();
-      await new Promise(r => setTimeout(r, REDUCED_MOTION ? 0 : 400));
-      _showUserBubble(`${checkinData.getMoodEmoji(_checkin.mood)} ${_checkin.mood}/10 — ${checkinData.getMoodLabel(_checkin.mood)}`);
-      await _showCoachBubble(_moodBridge(_checkin.mood));
-
-      // ── QUICK-1 (15 Aug 2026) ─────────────────────────────────────
-      //
-      // Persona 2.16 — parent of young children, short windows only,
-      // "wants the workout, not conversation". Her unprompted sentence
-      // in the would-they-tell-someone audit was "it talks too much",
-      // and she is in the tertiary market the thesis names, currently
-      // served worse than personas the product is not aimed at.
-      //
-      // The brief path stops here: energy and mood are in, which is
-      // everything detectBurnout() reads and the source of
-      // todayIntensity. The feeling word, sleep and variety questions
-      // are enrichment and wait for a day she has time.
-      //
-      // The coach has still spoken first, and has still responded to
-      // both answers. That is the part that does not compress.
-      //
-      // Conditions are NOT skipped — see _briefPath(). Somebody with a
-      // declared condition is asked about pain regardless of pace.
-      if (_briefPath()) {
-        if (_conditions.length > 0) {
-          await _showCoachBubble("One thing before we go. How's the pain today?");
-          // QUICK-3. The full path has a beat here that the brief path
-          // did not: the sleep panel's own confirm button. Without it the
-          // coach's question and the panel answering it arrived in the
-          // same instant. _PANEL_BEAT_MS is a read-the-question pause,
-          // not decoration -- it is the difference between being asked
-          // and being processed. Zero under prefers-reduced-motion, where
-          // the panel's own entrance is already instant.
-          await new Promise(r => setTimeout(r, REDUCED_MOTION ? 0 : _PANEL_BEAT_MS));
-          _showConditionsPanel();
-        } else {
-          await _finishConversation();
-        }
-        return;
-      }
-
-      _showFeelingWordPanel();
-    });
-
-    _openPanel(panel);
-    setTimeout(() => slider.focus(), 350);
-  }
-
-  // ─────────────────────────────────────────────────────────────────────────
-  // FEELING WORD PANEL (F1 — Quadrant Word Check-In)
-  // ─────────────────────────────────────────────────────────────────────────
-
-  function _showFeelingWordPanel() {
-    const quadrant = getQuadrant(_checkin.energy, _checkin.mood);
-    const words    = WORD_SETS[quadrant];
-    let expanded   = false;
-
-    function chipsHtml(showExpanded) {
-      const list = showExpanded ? [...words.core, ...words.expanded] : words.core;
-      return list.map(w => `
-        <button type="button" class="ci-quality-chip" data-word="${_esc(w)}"
-                role="radio" aria-checked="${_checkin.feelingWord === w}">
-          ${_esc(w)}
-        </button>
-      `).join("");
-    }
-
-    const panel = _buildPanel(`
-      <p class="ci-panel-q">Is there a word for how you're feeling?</p>
-      <div class="ci-quality-chips" id="ci-feeling-chips"
-           role="radiogroup" aria-label="Feeling word"
-           style="display:flex;flex-wrap:wrap;gap:var(--space-2);">
-        ${chipsHtml(false)}
-      </div>
-      <button type="button" class="btn btn-ghost btn-full" id="ci-feeling-more"
-              aria-expanded="false" style="margin-top:var(--space-3);">
-        More words
-      </button>
-      <button type="button" class="btn btn-ghost btn-full" id="ci-feeling-skip"
-              style="margin-top:var(--space-2);">
-        Can't find a word today
-      </button>
-      <button class="btn btn-primary btn-large btn-full" id="ci-feeling-confirm"
-              style="margin-top:var(--space-4);display:none;"
-              aria-label="Confirm feeling word">Next</button>
-    `);
-
-    function wireChips() {
-      panel.querySelectorAll("[data-word]").forEach(chip => {
-        chip.addEventListener("click", () => {
-          _checkin.feelingWord     = chip.dataset.word;
-          _checkin.feelingQuadrant = quadrant;
-          panel.querySelectorAll("[data-word]").forEach(c => {
-            const sel = c === chip;
-            c.classList.toggle("selected", sel);
-            c.setAttribute("aria-checked", sel);
-          });
-          panel.querySelector("#ci-feeling-confirm").style.display = "block";
-
-          // Dormant safeguarding check. Fires and logs for dev
-          // visibility only — no user-facing response until the Crisis
-          // & Safeguarding Policy (v6) is signed off. See Appendix L.
-          if (detectSignalWord(_checkin.feelingWord)) {
-            console.log("[safeguarding] signal word detected (dormant, no UI action):", _checkin.feelingWord);
-          }
-        });
-      });
-    }
-    wireChips();
-
-    panel.querySelector("#ci-feeling-more").addEventListener("click", () => {
-      expanded = !expanded;
-      const btn = panel.querySelector("#ci-feeling-more");
-      btn.setAttribute("aria-expanded", expanded);
-      btn.textContent = expanded ? "Fewer words" : "More words";
-      panel.querySelector("#ci-feeling-chips").innerHTML = chipsHtml(expanded);
-      wireChips();
-    });
-
-    panel.querySelector("#ci-feeling-skip").addEventListener("click", async () => {
-      _checkin.feelingWord     = null;
-      _checkin.feelingQuadrant = quadrant;
-      _closePanel(panel);
-      _fadePastBubbles();
-      await new Promise(r => setTimeout(r, REDUCED_MOTION ? 0 : 400));
-      // CHECKIN-3. The sleep panel used to open in silence here.
-      await _showCoachBubble(_sleepBridge(_checkin.mood));
-      // QUICK-3's remedy for exactly this shape: a coach line and the
-      // panel answering it must not land in the same instant.
-      await new Promise(r => setTimeout(r, REDUCED_MOTION ? 0 : _PANEL_BEAT_MS));
-      _showSleepPanel();
-    });
-
-    panel.querySelector("#ci-feeling-confirm").addEventListener("click", async () => {
-      _closePanel(panel);
-      _fadePastBubbles();
-      await new Promise(r => setTimeout(r, REDUCED_MOTION ? 0 : 400));
-      _showUserBubble(_checkin.feelingWord);
-      // CHECKIN-3. Same line on the other branch of the same panel.
-      await _showCoachBubble(_sleepBridge(_checkin.mood));
-      await new Promise(r => setTimeout(r, REDUCED_MOTION ? 0 : _PANEL_BEAT_MS));
-      _showSleepPanel();
-    });
-
-    _openPanel(panel);
-  }
-
-  // ─────────────────────────────────────────────────────────────────────────
-  // SLEEP PANEL
-  // ─────────────────────────────────────────────────────────────────────────
-
-  function _showSleepPanel() {
-    const existing  = checkinData.getTodaysCheckin();
-    const prefilled = !existing && (checkinData.getHistory(1) || [])[0]?.sleepHours;
-    const note      = prefilled ? " I've pre-filled this from yesterday — adjust if needed." : "";
-
-    const panel = _buildPanel(`
-      <p class="ci-panel-q">How long did you sleep?${note}</p>
-      <div class="ci-sleep-adjuster">
-        <button type="button" class="ci-sleep-btn" id="ci-sleep-minus"
-                aria-label="Decrease sleep hours">&#8722;</button>
-        <div class="ci-sleep-display" aria-live="polite"
-             aria-label="${_checkin.sleepHours} hours">
-          <span class="ci-sleep-num" id="ci-sleep-num">${_checkin.sleepHours}</span>
-          <span class="ci-sleep-unit">hrs</span>
-        </div>
-        <button type="button" class="ci-sleep-btn" id="ci-sleep-plus"
-                aria-label="Increase sleep hours">&#43;</button>
-      </div>
-      <div class="ci-quality-wrap">
-        <p class="ci-quality-label">How was the quality?</p>
-        <div class="ci-quality-chips" role="group" aria-label="Sleep quality">
-          ${["Poor","Okay","Good"].map(q => `
-            <button type="button"
-                    class="ci-quality-chip ${_checkin.sleepQuality === q.toLowerCase() ? "selected" : ""}"
-                    data-quality="${q.toLowerCase()}"
-                    aria-pressed="${_checkin.sleepQuality === q.toLowerCase()}">${q}</button>
-          `).join("")}
-        </div>
-      </div>
-      <button class="btn btn-primary btn-large btn-full" id="ci-sleep-confirm"
-              style="margin-top:var(--space-4);" aria-label="Confirm sleep">Next</button>
-    `);
-
-    panel.querySelector("#ci-sleep-minus").addEventListener("click", () => {
-      _checkin.sleepHours = Math.max(0, _checkin.sleepHours - 0.5);
-      panel.querySelector("#ci-sleep-num").textContent = _checkin.sleepHours;
-    });
-    panel.querySelector("#ci-sleep-plus").addEventListener("click", () => {
-      _checkin.sleepHours = Math.min(14, _checkin.sleepHours + 0.5);
-      panel.querySelector("#ci-sleep-num").textContent = _checkin.sleepHours;
-    });
-    panel.querySelectorAll(".ci-quality-chip").forEach(chip => {
-      chip.addEventListener("click", () => {
-        _checkin.sleepQuality = chip.dataset.quality;
-        panel.querySelectorAll(".ci-quality-chip").forEach(c => {
-          c.classList.toggle("selected", c === chip);
-          c.setAttribute("aria-pressed", c === chip);
-        });
-      });
-    });
-
-    panel.querySelector("#ci-sleep-confirm").addEventListener("click", async () => {
-      _closePanel(panel);
-      _fadePastBubbles();
-      await new Promise(r => setTimeout(r, REDUCED_MOTION ? 0 : 400));
-      _showUserBubble(`${_checkin.sleepHours} hours — ${_checkin.sleepQuality}`);
-      if (_conditions.length > 0) {
-        await _showCoachBubble("One more thing. How's the pain today?");
-        _showConditionsPanel();
-      } else {
-        await _finishConversation();
-      }
-    });
-
-    _openPanel(panel);
-  }
-
-  // ─────────────────────────────────────────────────────────────────────────
-  // CONDITIONS PANEL
-  // ─────────────────────────────────────────────────────────────────────────
-
-  function _showConditionsPanel() {
-    const rows = _conditions.map(id => {
-      const cond  = CONDITIONS.find(c => c.id === id);
-      const level = _checkin.conditionLevels[id] !== undefined ? _checkin.conditionLevels[id] : 0;
-      const band  = getPainBand(level);
-      return `
-        <div class="ci-condition-row" data-condition="${id}">
-          <p class="ci-condition-name">
-            <span aria-hidden="true">${cond?.icon || ""}</span>
-            ${_esc(cond?.name || id)}
-          </p>
-          <div class="ci-slider-wrap ci-slider-wrap--condition">
-            <div class="ci-value-row" aria-live="polite" aria-atomic="true">
-              <span class="ci-value-num"   id="ci-cond-num-${id}">${level}</span>
-              <span class="ci-value-label ci-value-label--${band.id}" id="ci-cond-label-${id}">${band.label}</span>
-            </div>
-            <input type="range" class="ci-slider" id="ci-cond-slider-${id}"
-                   data-condition="${id}"
-                   min="0" max="10" value="${level}"
-                   aria-label="Pain level for ${_esc(cond?.name || id)}, 0 none to 10 severe"
-                   aria-valuetext="${band.label}">
-            <div class="ci-slider-ends" aria-hidden="true">
-              <span>None</span><span>Severe</span>
-            </div>
-          </div>
-        </div>
+        ${note ? `<p class="ci-chips__note">${_esc(note)}</p>` : ""}
+        ${extra ? `<button type="button" class="ci-chips__extra" data-extra="1">${_esc(extra)}</button>` : ""}
       `;
-    }).join("");
+      _thread.appendChild(wrap);
+      _scrollToNewElement(wrap);
+      setTimeout(() => wrap.querySelector(".ci-chip")?.focus({ preventScroll: true }), 150);
 
-    // CHECKIN-2a. Before this, the sliders were fixed at whatever was
-    // declared at onboarding, and they are the ONLY input to bodyCaution --
-    // so a shoulder that flared on a Tuesday could be loaded all week with
-    // a silent card. It sits on this sheet rather than behind Settings
-    // because the moment somebody needs it is the moment they are already
-    // reporting.
-    //
-    // The wording avoids "condition" deliberately. Asking somebody to
-    // classify themselves before they can move a slider is a barrier, and
-    // most of what belongs here is a tweak rather than a diagnosis.
-    const _addable = soreAreaOptions(_conditions);
-    const addBlock = _addable.length ? `
-      <div class="ci-add-area">
-        <button type="button" class="ci-add-area__btn" id="ci-add-area-btn"
-                aria-expanded="false" aria-controls="ci-add-area-list">
-          Something else sore today?
-        </button>
-        <ul class="ci-add-area__list" id="ci-add-area-list" role="list" hidden>
-          ${_addable.map(o => `
-            <li>
-              <button type="button" class="ci-add-area__opt" data-area="${_esc(o.id)}">
-                <span aria-hidden="true">${o.icon || ""}</span>
-                <span>${_esc(o.name)}</span>
-              </button>
-            </li>`).join("")}
-        </ul>
-      </div>` : "";
-
-    const panel = _buildPanel(`
-      <div id="ci-cond-rows">${rows}</div>
-      ${addBlock}
-      <button class="btn btn-primary btn-large btn-full" id="ci-cond-confirm"
-              style="margin-top:var(--space-4);" aria-label="Confirm pain levels">Next</button>
-    `);
-
-    const addBtn = panel.querySelector("#ci-add-area-btn");
-    if (addBtn) {
-      const list = panel.querySelector("#ci-add-area-list");
-      addBtn.addEventListener("click", () => {
-        const open = addBtn.getAttribute("aria-expanded") === "true";
-        addBtn.setAttribute("aria-expanded", open ? "false" : "true");
-        if (open) list.setAttribute("hidden", ""); else list.removeAttribute("hidden");
+      wrap.addEventListener("click", ev => {
+        const btn = ev.target.closest("button");
+        if (!btn || !wrap.contains(btn)) return;
+        wrap.remove();
+        if (btn.dataset.extra) return resolve({ extra: true });
+        const chip = chips[+btn.dataset.i];
+        _fadePastBubbles();
+        _showUserBubble(chip.label);
+        resolve(chip);
       });
-      panel.querySelectorAll(".ci-add-area__opt").forEach(opt => {
-        opt.addEventListener("click", () => {
-          const id = opt.dataset.area;
-          if (!store.addSoreArea(id)) return;
-          _conditions = store.get("conditions") || [];
-          _checkin.conditionLevels[id] = _checkin.conditionLevels[id] ?? 0;
-          // Re-render the sheet so the new slider appears in place, then
-          // move focus onto it -- the person asked for it, so it should be
-          // the thing under their hand, not something they must hunt for.
-          _showConditionsPanel();
-          const slider = document.getElementById(`ci-cond-slider-${id}`);
-          if (slider) slider.focus();
-        });
-      });
+    });
+  }
+
+  const _areaName = id => (CONDITIONS.find(c => c.id === id)?.name) || id;
+
+  async function _askSore() {
+    // A listed condition not named today is quiet today.
+    _conditions.forEach(id => { _checkin.conditionLevels[id] = 0; });
+
+    const declared = _conditions.filter(id => CONDITIONS.some(c => c.id === id));
+    const common   = COMMON_AREAS.filter(id => !declared.includes(id) && CONDITIONS.some(c => c.id === id));
+    const note = declared.length === 1
+      ? `${_areaName(declared[0])} comes first because it's the one you've told me about before.`
+      : declared.length > 1
+        ? "Those come first because they're the ones you've told me about before."
+        : null;
+
+    await _showCoachBubble("Anything sore or niggling today?");
+    const named = [];
+    let first = true;
+    while (_alive) {
+      const chips = [
+        ...declared.filter(id => !named.includes(id)).map(id => ({ label: _areaName(id), id })),
+        first ? { label: "Nothing today", id: null } : { label: "That's it", id: null },
+        ...common.filter(id => !named.includes(id)).map(id => ({ label: _areaName(id), id })),
+        { label: "Somewhere else", id: "__more" },
+      ];
+      const pick = await _askChips(first ? "Anything sore today" : "Anything else sore",
+                                   chips,
+                                   { note: first ? note : null,
+                                     extra: (!_sleepGiven && first) ? "Add how you slept (optional)" : null });
+      if (!pick) return;
+      if (pick.extra) { await _askSleep(); continue; }
+      let area = pick;
+      if (area.id === "__more") {
+        await _showCoachBubble("Where?");
+        const rest = soreAreaOptions([...declared, ...common, ...named])
+          .map(o => ({ label: o.name, id: o.id }));
+        area = await _askChips("Where it's sore", rest);
+        if (!area) return;
+      }
+      if (!area.id) break;
+      await _askHowBad(area.id);
+      named.push(area.id);
+      if (named.length === 1) await _showCoachBubble(SAFETY_LINE);   // CL-4
+      await _showCoachBubble("Anything else?");
+      first = false;
     }
+    if (_alive) await _finishConversation();
+  }
 
-    panel.querySelectorAll(".ci-slider[data-condition]").forEach(slider => {
-      slider.addEventListener("input", () => {
-        const condId = slider.dataset.condition;
-        const n       = parseInt(slider.value);
-        const band    = getPainBand(n);
-        _checkin.conditionLevels[condId] = n;
-        const numEl   = panel.querySelector(`#ci-cond-num-${condId}`);
-        const labelEl = panel.querySelector(`#ci-cond-label-${condId}`);
-        numEl.textContent   = n;
-        labelEl.textContent = band.label;
-        labelEl.className   = `ci-value-label ci-value-label--${band.id}`;
-        slider.setAttribute("aria-valuetext", band.label);
-      });
-    });
+  async function _askHowBad(id) {
+    await _showCoachBubble(`How bad is it today?`);
+    const c = await _askChips(`How sore your ${_areaName(id)} is`, PAIN_CHIPS);
+    if (!c) return;
+    if (!_conditions.includes(id)) {
+      // CHECKIN-2a behaviour, kept: a newly sore area joins the list so
+      // the next check-in asks about it first.
+      store.addSoreArea(id);
+      _conditions = store.get("conditions") || [];
+    }
+    _checkin.conditionLevels[id] = c.value;
+  }
 
-    panel.querySelector("#ci-cond-confirm").addEventListener("click", async () => {
-      _closePanel(panel);
-      _fadePastBubbles();
-      await new Promise(r => setTimeout(r, REDUCED_MOTION ? 0 : 400));
-      const summary = _conditions.map(id => {
-        const cond   = CONDITIONS.find(c => c.id === id);
-        const level  = _checkin.conditionLevels[id] !== undefined ? _checkin.conditionLevels[id] : 0;
-        const band   = getPainBand(level);
-        return `${cond?.name || id}: ${band.label.toLowerCase()}`;
-      }).join(", ");
-      _showUserBubble(summary);
-      await _finishConversation();
-    });
-
-    _openPanel(panel);
+  async function _askSleep() {
+    await _showCoachBubble("How did you sleep?");
+    const s = await _askChips("How you slept", [
+      { label: "Poor", value: "poor" }, { label: "Okay", value: "okay" }, { label: "Good", value: "good" }
+    ]);
+    if (!s) return;
+    _checkin.sleepQuality = s.value;
+    _sleepGiven = true;
+    await _showCoachBubble("Thanks. Anything sore or niggling today?");
   }
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -909,20 +597,28 @@ export function CheckinView(router) {
   async function _finishConversation() {
     await _showCoachBubble(_buildSummary());
     await new Promise(r => setTimeout(r, T.PANEL_DELAY));
+    if (!_alive) return;
     if (_shouldAskVariety()) {
-      await _showVarietyBeat();   // continues to _showActionButtons() itself
+      await _showVarietyBeat();   // continues to _continue() itself
       return;
     }
+    // SMOOTH-P1. No purpose questions: on the Plan the coach decides from
+    // the arc and history, and the plan screen lets the person change it.
+    _continue();
+  }
 
-    // PURPOSE-ASK. The Plan's version of the same moment: not "same or
-    // different", but "what is today FOR". Free keeps the drop-in
-    // question -- destination architecture §8, held by verify-decisions.
-    if (isPremium()) {
-      await _showPurposeBeat();   // continues to _showActionButtons() itself
-      return;
-      return;
-    }
-    _showActionButtons();
+  /**
+   * SMOOTH-P1. The third answer goes straight on. "See what I'm thinking"
+   * was a tap that asked nothing; it stays only where it is a real
+   * choice -- somebody with exercises from a physio.
+   */
+  function _continue() {
+    const prescribed = store.get("prescribedExercises");
+    if (Array.isArray(prescribed) && prescribed.length > 0) return _showActionButtons();
+    _saveAll();
+    const pending = store.get("pendingDoorRoute");
+    store.set("pendingDoorRoute", null);
+    router.navigate(pending || "today");
   }
 
   // ───────────────────────────────────────────────────────
@@ -1008,166 +704,6 @@ export function CheckinView(router) {
     return SESSION_DOORS.includes(store.get("pendingDoorRoute")) && _hasRecentHistory();
   }
 
-  // ── PURPOSE-ASK ─────────────────────────────────────────────────────
-
-  async function _showPurposeBeat() {
-    await _showCoachBubble("Last thing. What's today for?");
-    await new Promise(r => setTimeout(r, T.PANEL_DELAY));
-    _showChoicePanel(
-      "What today is for",
-      PURPOSES.map(p => ({ value: p.id, label: p.label, sub: p.sub })),
-      async (choice) => {
-        store.set("todayPurpose", choice.value);
-        _showUserBubble(choice.label);
-        await new Promise(r => setTimeout(r, T.PANEL_DELAY));
-
-        // Q1b, only when we do not already know -- see
-        // needsAreaQuestion(). Asking again when they answered three
-        // questions ago is the coach not listening.
-        if (needsAreaQuestion(choice.value)) return _showAreaBeat(choice.value);
-
-        // A niggle with exactly one flagged area: take it silently.
-        if (choice.value === "niggle") {
-          const scores = store.get("conditionPainScores") || {};
-          const only = (store.get("conditions") || []).filter(id => (scores[id] || 0) >= 4);
-          if (only.length === 1) store.set("todayPurposeArea", only[0]);
-        }
-        return _showFormBeat(choice.value);
-      }
-    );
-  }
-
-  async function _showAreaBeat(purposeId) {
-    await _showCoachBubble(purposeId === "niggle" ? "Whereabouts?" : "Which part of you?");
-    await new Promise(r => setTimeout(r, T.PANEL_DELAY));
-    _showChoicePanel(
-      "Which area",
-      areaOptions().map(a => ({ value: a.id, label: a.label, sub: "" })),
-      async (choice) => {
-        store.set("todayPurposeArea", choice.value);
-        _showUserBubble(choice.label);
-        await new Promise(r => setTimeout(r, T.PANEL_DELAY));
-        return _showFormBeat(purposeId);
-      }
-    );
-  }
-
-  /**
-   * Q2. A RECOMMENDATION, NOT A MENU.
-   *
-   * Graeme: "Coach should make a suggestion based on all the pain data
-   * etc... and these are gold marked."
-   *
-   * 🔴 With no evidence, rec is null and nothing is marked. The gold
-   * mark means "I have a reason" and must never mean "I have to pick
-   * something" -- on day one there is no flag history and no activity
-   * types, and inventing confidence there is the failure mode of every
-   * app this product exists as an alternative to.
-   */
-  async function _showFormBeat(purposeId) {
-    // "Just moving" has already answered this one.
-    if (purposeId === "gentle") {
-      store.set("requestedSessionType", "mobility");
-      return _showActionButtons();
-    }
-
-    const area = store.get("todayPurposeArea");
-    const rec  = recommendation(purposeId, area);
-
-    await _showCoachBubble(rec ? rec.reason : "What would help most today?");
-    // CL-4. Every time the purpose is about a sore or particular area --
-    // not only when there is history to recommend from. Day one is when
-    // somebody most needs to hear it.
-    if (needsSafetyLine(purposeId)) await _showCoachBubble(SAFETY_LINE);
-    await new Promise(r => setTimeout(r, T.PANEL_DELAY));
-
-    _showChoicePanel(
-      "What would help most",
-      formsFor(purposeId).map(f => ({
-        value: f.id, label: f.label, sub: "",
-        recommended: !!rec && rec.formId === f.id
-      })),
-      async (choice) => {
-        // CLINICAL-REVIEW, 16 Sep 2026. No area is passed any more: the app is
-        // not allowed to decide what to load based on where somebody is
-        // sore. A lighter or gentle answer lowers today's intensity
-        // instead -- activity modification, which is what she asked for.
-        store.set("todayForm", choice.value);
-        store.set("requestedSessionType", sessionTypeForForm(choice.value));
-        const lower = intensityForForm(choice.value);
-        if (lower) store.set("todayIntensity", lower);
-        _showUserBubble(choice.label);
-        await new Promise(r => setTimeout(r, T.PANEL_DELAY));
-
-        // 🔴 CL-2, "user-selected". "I'll choose myself" used to set
-        // nothing and fall straight through -- so the arc chose, and the
-        // proposal then said "you chose the session yourself". The coach
-        // claiming a choice the person never made. Now it asks.
-        if (choice.value === "choose") return _showChooseKindBeat();
-        _showActionButtons();
-      }
-    );
-  }
-
-  /**
-   * CL-2. The user-selected path: they pick the kind, the app does not.
-   *
-   * Uses the same kinds the general-fitness purpose offers, so there is
-   * one vocabulary for "what kind of session" rather than two.
-   */
-  async function _showChooseKindBeat() {
-    await _showCoachBubble("Which would you like?");
-    await new Promise(r => setTimeout(r, T.PANEL_DELAY));
-    _showChoicePanel(
-      "Which kind of session",
-      formsFor("general").map(f => ({ value: f.id, label: f.label, sub: "", recommended: false })),
-      async (pick) => {
-        // todayForm stays "choose" -- it is what they answered, and the
-        // proposal line says so. The KIND they picked becomes the type.
-        store.set("requestedSessionType", sessionTypeForForm(pick.value));
-        _showUserBubble(pick.label);
-        await new Promise(r => setTimeout(r, T.PANEL_DELAY));
-        _showActionButtons();
-      }
-    );
-  }
-
-  /**
-   * One panel builder for all three questions.
-   *
-   * The variety beat below keeps its own because it predates this and is
-   * FREE-ONLY -- section 8 surface, held by verify-decisions, and not
-   * worth touching to save a few lines.
-   */
-  function _showChoicePanel(ariaLabel, choices, onPick) {
-    const panel = _buildPanel(`
-      <div class="ci-choices" role="group" aria-label="${_esc(ariaLabel)}">
-        ${choices.map(c => `
-          <button type="button" class="ci-choice${c.recommended ? " ci-choice--rec" : ""}"
-                  data-choice="${_esc(c.value)}">
-            ${c.recommended ? `<span class="ci-choice__rec">Suggested</span>` : ""}
-            <span class="ci-choice__label">${_esc(c.label)}</span>
-            ${c.sub ? `<span class="ci-choice__sub">${_esc(c.sub)}</span>` : ""}
-          </button>
-        `).join("")}
-      </div>
-    `);
-
-    panel.querySelectorAll("[data-choice]").forEach(btn => {
-      btn.addEventListener("click", async () => {
-        const choice = choices.find(c => String(c.value) === btn.dataset.choice);
-        if (!choice) return;
-        _closePanel(panel);
-        _fadePastBubbles();
-        await new Promise(r => setTimeout(r, REDUCED_MOTION ? 0 : 400));
-        await onPick(choice);
-      });
-    });
-
-    _openPanel(panel);
-    setTimeout(() => panel.querySelector("[data-choice]")?.focus({ preventScroll: true }), 150);
-  }
-
   async function _showVarietyBeat() {
     await _showCoachBubble(
       "Want to do something like last time, or shall we do something different today?"
@@ -1198,7 +734,7 @@ export function CheckinView(router) {
         await new Promise(r => setTimeout(r, REDUCED_MOTION ? 0 : 400));
         _showUserBubble(choice.label);
         await new Promise(r => setTimeout(r, T.PANEL_DELAY));
-        _showActionButtons();
+        _continue();
       });
     });
 
@@ -1455,69 +991,9 @@ export function CheckinView(router) {
   // BRIDGE LINES AND SUMMARY
   // ─────────────────────────────────────────────────────────────────────────
 
-  function _energyBridge(energy) {
-    if (energy >= 8) return "Good energy. Let's see what else is going on.";
-    if (energy >= 6) return "Solid. How about your mood?";
-    if (energy >= 4) return "Okay, I hear that. How's your mood sitting alongside that?";
-    return "That's low. I want to understand the full picture.";
-  }
-
-  // QUICK-3, 18 Aug 2026. All three of these lines asked about sleep,
-  // and were spoken BEFORE the brief-path check below decided not to ask
-  // about sleep. On a brief check-in the coach put a question to the
-  // person and then answered nothing, moving straight to conditions. It
-  // reads as not being listened to, which is the one thing this check-in
-  // exists to avoid.
-  //
-  // The brief path gets its own lines. They acknowledge the mood and
-  // close, because on the brief path there genuinely is nothing more to
-  // ask -- energy and mood are everything detectBurnout() and
-  // todayIntensity read.
-  /**
-   * CHECKIN-3, 08 Sep 2026. The full path's three lines asked about
-   * SLEEP, and the panel that opened next was the feeling word. The
-   * coach asked a question and then asked a different one, and the
-   * sleep panel arrived afterwards in silence -- its own bridge line
-   * had been spent one panel too early.
-   *
-   * This is QUICK-3's fault, one path over. v15 found _moodBridge()
-   * asking about sleep on the BRIEF path, gave the brief path its own
-   * three lines, and left the full path's three still naming a panel
-   * that no longer came next. Verified on one branch.
-   *
-   * The established pattern here is that the coach ASKS and the panel
-   * then repeats the question -- _energyBridge() asks "How's your mood
-   * sitting alongside that?" and the mood panel says "How's your mood?".
-   * These follow it, and leave room for the skip the panel offers.
-   */
-  function _moodBridge(mood) {
-    if (_briefPath()) {
-      if (mood >= 8) return "Good. That's enough for me to work with.";
-      if (mood >= 5) return "Alright. I've got what I need.";
-      return "Understood. I'll keep that in mind for today.";
-    }
-    if (mood >= 8) return "Good. Is there a word for how that feels?";
-    if (mood >= 5) return "Alright. Is there a word for how you're feeling today?";
-    return "Understood. Is there a word for it, or not really?";
-  }
-
-  /**
-   * CHECKIN-3. The three sleep lines, unchanged, moved to the transition
-   * that actually opens the sleep panel. Both exits from the feeling
-   * word panel use it -- skip and confirm -- because a fix applied to
-   * one branch of a two-branch panel is the exact thing GUIDED-COPY did
-   * on 06 Sep and DEVICE-1 did an hour before DEVICE-2.
-   */
-  function _sleepBridge(mood) {
-    if (mood >= 8) return "Good. And sleep — how was last night?";
-    if (mood >= 5) return "Alright. How did you sleep?";
-    return "Understood. Sleep affects everything — tell me about last night.";
-  }
-
   function _buildSummary() {
     const e    = _checkin.energy;
     const m    = _checkin.mood;
-    const s    = _checkin.sleepHours;
     const tl   = { micro: "10 minutes", quick: "20 minutes", short: "30 minutes",
                    standard: "40 minutes", long: "50 minutes", open: "an hour or more" };
 
@@ -1528,9 +1004,11 @@ export function CheckinView(router) {
     else if (e <= 3 || m <= 3) line = "A harder day";
     else                     line = "A moderate day";
 
-    if (s >= 8)      line += ", well rested.";
-    else if (s >= 6) line += `, ${s} hours sleep.`;
-    else             line += ", lighter sleep than usual.";
+    // SMOOTH-P1. Sleep is mentioned only when the person told us.
+    const q = _checkin.sleepQuality;
+    if (q === "good")      line += ", and you slept well.";
+    else if (q === "poor") line += ", and a poor night's sleep.";
+    else                   line += ".";
 
     if (_selectedTime) line += ` You have ${tl[_selectedTime] || _selectedTime} today.`;   // only if set elsewhere
     line += " I'll have something ready for you.";

@@ -130,13 +130,15 @@ check("The drop-in coach question is free", `${DEST} §8`, () => {
   // So both branches are pinned. Free must still reach _showVarietyBeat,
   // the Plan must reach _showPurposeBeat, and NOTHING ELSE in this file
   // may branch on tier. A third check goes red here.
-  ok(/isPremium\(\)\)\s*\{\s*\n\s*await _showPurposeBeat/.test(c),
-     "the Plan branch is missing or has been rewired; §8's free question and " +
-     "the Plan's purpose question are two halves of one moment");
+  // SMOOTH-P1, 28 Sep 2026. The Plan no longer asks "what's today for?"
+  // (Graeme, after the prototype). So the ONLY tier branch left in the
+  // check-in is the free drop-in question, and that is what is pinned:
+  // free reaches it, and nothing else in the file branches on tier.
+  ok(!/_showPurposeBeat/.test(c),
+     "the Plan's purpose question is back; SMOOTH-P1 removed it");
 
   const rest = c.replace(varietyFn, "")
-                .replace(/import \{ isPremium \}[^\n]*\n/, "")
-                .replace(/if \(isPremium\(\)\) \{[\s\S]{0,400}?_showPurposeBeat\(\);[^\n]*\n/, "");
+                .replace(/import \{ isPremium \}[^\n]*\n/, "");
   ok(!/isPremium/.test(rest),
      "a THIRD tier check has appeared in check-in; §8 sanctions exactly two -- " +
      "the free drop-in question and the Plan's purpose question");

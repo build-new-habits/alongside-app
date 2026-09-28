@@ -100,15 +100,22 @@ check("the picker is offered on the conditions sheet", () => {
 });
 
 check("no free-text entry anywhere in the flow", () => {
-  const block = checkin.slice(checkin.indexOf("ci-add-area"), checkin.indexOf("ci-cond-confirm"));
+  // SMOOTH-P1: the add-area flow now lives in _askSore(). Sliced by the
+  // function, and the slice is asserted non-empty -- the old markers had
+  // gone, and an empty slice passed this check vacuously.
+  const block = checkin.slice(checkin.indexOf("async function _askSore"), checkin.indexOf("async function _askHowBad"));
+  ok(block.length > 200, "the sore question was not found; this check would pass on nothing");
   ok(!/<input[^>]*type=["']text["']/.test(block), "free text input - an unmatched id saves and silently never fires a caution");
   ok(!/contenteditable/.test(block), "contenteditable in the add-area block");
 });
 
-check("the control is a real disclosure", () => {
-  const block = checkin.slice(checkin.indexOf("ci-add-area"), checkin.indexOf("ci-cond-confirm"));
-  ok(block.includes("aria-expanded"), "no aria-expanded");
-  ok(block.includes("aria-controls"), "no aria-controls");
+check("somewhere else opens every other area as answers (SMOOTH-P1)", () => {
+  // Was a disclosure button inside the pain panel. The three-question
+  // check-in has no panel: "Somewhere else" is an answer that asks
+  // "Where?" and offers every remaining area from soreAreaOptions().
+  const block = checkin.slice(checkin.indexOf("async function _askSore"), checkin.indexOf("async function _askHowBad"));
+  ok(/"Somewhere else"/.test(block), "no way to name an area that is not listed");
+  ok(/soreAreaOptions\(/.test(block), "the full area list is not what it offers");
 });
 
 console.log("\nTEST 4 - the caution still reads the field");

@@ -51,9 +51,13 @@ const builder  = fs.readFileSync(_gatePath("js/session-builder.js"), "utf8");
 const storeSrc = fs.readFileSync(_gatePath("js/store.js"), "utf8");
 const today    = fs.readFileSync(_gatePath("js/views/today.js"), "utf8");
 
+// SMOOTH-P1, 28 Sep 2026. Scoped to the VARIETY_CHOICES block: the
+// check-in now has other answers with a `value` (sleep: "poor" etc.), and
+// matching the whole file compared the wrong list.
+const VARIETY_BLOCK = checkin.slice(checkin.indexOf("const VARIETY_CHOICES"), checkin.indexOf("];", checkin.indexOf("const VARIETY_CHOICES")));
 console.log("\nTEST 1 - cross-file value contract");
 check("checkin VARIETY_CHOICES values == session-builder VARIETY_NOVELTY keys", () => {
-  const mine = [...checkin.matchAll(/value:\s*"([a-z]+)"/g)].map(m => m[1]).sort();
+  const mine = [...VARIETY_BLOCK.matchAll(/value:\s*"([a-z]+)"/g)].map(m => m[1]).sort();
   const nov  = builder.match(/const VARIETY_NOVELTY\s*=\s*\{([^}]*)\}/)[1];
   const keys = [...nov.matchAll(/([a-z]+)\s*:/g)].map(m => m[1]).sort();
   eq(mine.join(","), keys.join(","), "values the question writes must be values selection reads");
@@ -61,7 +65,7 @@ check("checkin VARIETY_CHOICES values == session-builder VARIETY_NOVELTY keys", 
 check("those values are all accepted by store.js's validation whitelist", () => {
   const wl = storeSrc.match(/\[([^\]]*)\]\.includes\(saved\.sessionVariety\)/)[1];
   const allowed = [...wl.matchAll(/'([a-z]+)'/g)].map(m => m[1]).sort();
-  const mine = [...checkin.matchAll(/value:\s*"([a-z]+)"/g)].map(m => m[1]).sort();
+  const mine = [...VARIETY_BLOCK.matchAll(/value:\s*"([a-z]+)"/g)].map(m => m[1]).sort();
   eq(mine.join(","), allowed.join(","), "a value outside the whitelist is silently discarded on next load");
 });
 

@@ -12,6 +12,10 @@
  *   back to reading CACHE_NAME from sw.js itself, and says "Version not
  *   available" rather than inventing a string, if even that fails.
  *   See tools/verify-plan-claims.mjs.
+ *   SMOOTH-P1 (same version, same day). "How much should the coach ask
+ *   before a session?" is removed: every check-in is now the short one
+ *   (three questions), so there is nothing left to choose. sessionPace
+ *   stays in the store for one release and is no longer read.
  *
  * v36 - TIER-VISIBLE. The tier a device is in was displayed in exactly
  *   one place: inside the developer panel, which is hidden behind an
@@ -978,7 +982,6 @@ export function SettingsView(router) {
 
   function renderPreferencesSection() {
     const variety = store.get('sessionVariety') || 'balanced';
-    const pace    = store.get('sessionPace') || 'full';   // QUICK-1
     const prefs   = store.get('exercisePreferences') || {};
     const entries = Object.entries(prefs)
       .map(([id, v]) => ({ id, ...v, name: getExerciseName(id) }))
@@ -1018,22 +1021,6 @@ export function SettingsView(router) {
           <p class="settings-section__sub">
             ${_esc(VARIETY_OPTIONS.find(o => o.id === variety)?.hint || '')}
           </p>
-        </fieldset>
-
-        <fieldset class="settings-field settings-capability__group">
-          <legend class="settings-label">How much should the coach ask before a session?</legend>
-          <p class="settings-section__sub" id="pref-pace-hint">
-            The short version asks how your energy and mood are, and
-            nothing else. If you have told me about a condition, I will
-            still ask about pain either way.
-          </p>
-          <select class="settings-select"
-                  id="settings-pref-pace"
-                  data-field="sessionPace"
-                  aria-describedby="pref-pace-hint">
-            <option value="full"${pace === 'full' ? ' selected' : ''}>The usual — energy, mood, sleep, how you're feeling</option>
-            <option value="brief"${pace === 'brief' ? ' selected' : ''}>Short — energy and mood only</option>
-          </select>
         </fieldset>
 
         <div class="settings-field">
@@ -2423,9 +2410,6 @@ export function SettingsView(router) {
       case 'save-preferences': {
         const v = container.querySelector('[data-field="sessionVariety"]')?.value;
         if (v) store.set('sessionVariety', v);
-        // QUICK-1
-        const p = container.querySelector('[data-field="sessionPace"]')?.value;
-        if (p === 'full' || p === 'brief') store.set('sessionPace', p);
         _showToast('Saved — the coach will use this from your next session', container);
         break;
       }

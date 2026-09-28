@@ -1,6 +1,12 @@
 /**
  * tools/verify-checkin-unmount.mjs
- * 28 Sep 2026 v1
+ * 28 Sep 2026 v2
+ *
+ * v2 - SMOOTH-P1. The three questions are now answered inline, so the
+ *   only panel the check-in still builds on document.body is the FREE
+ *   drop-in question ("like last time, or something different?"). The
+ *   fixture now reaches that panel: a free user, on the way to a session
+ *   door, with recent exercise history. Every assertion is unchanged.
  *
  * SMOOTH-P0 F2, STALE-CHECKIN. Leaving a check-in leaves nothing behind.
  *
@@ -59,9 +65,19 @@ async function waitFor(fn, ms = 4000) {
 
 // Mount the real view in the real router's cache, so router.navigate()
 // runs the real onUnmount path when the person leaves.
+const tapLabel = async re => {
+  const find = () => [...document.querySelectorAll("#app button")].find(x => re.test(x.textContent.trim()));
+  await waitFor(find);
+  const b = find();
+  if (b) { b.click(); await wait(30); }
+  return !!b;
+};
+
 async function startCheckin() {
   localStorage.clear(); store.init();
-  store.set("onboardingComplete", true); store.set("name", "Test"); store.set("tier", "personal");
+  store.set("onboardingComplete", true); store.set("name", "Test"); store.set("tier", "free");
+  store.set("pendingDoorRoute", "coach-proposal");
+  store.recordExercises(["goblet-squat"]);
   document.querySelectorAll(".ci-panel, .ci-overlay").forEach(n => n.remove());
   const app = document.getElementById("app"); app.innerHTML = "";
   const view = CheckinView({ navigate: v => router.navigate(v), back() {} });
@@ -70,10 +86,8 @@ async function startCheckin() {
   router.history = [];
   router._mountView = async () => {};           // the destination's mount is not under test
   view.mount(app);
-  // Answer "I'm ready" if the opener asks, then wait for a question panel.
-  await waitFor(() => [...document.querySelectorAll("button")].some(b => /ready/i.test(b.textContent)) || leftovers() > 0);
-  const ready = [...document.querySelectorAll("button")].find(b => /ready/i.test(b.textContent));
-  if (ready) ready.click();
+  // Three answers, then the free drop-in question opens as a panel.
+  await tapLabel(/^Okay$/); await tapLabel(/^Okay$/); await tapLabel(/^Nothing today$/);
   return waitFor(() => document.querySelector(".ci-panel"));
 }
 
