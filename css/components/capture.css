@@ -1,7 +1,10 @@
 /* ============================================================
    CAPTURE — Make it up as I go
    css/components/capture.css
-   28 Sep 2026 v2
+   28 Sep 2026 v3
+
+   v3 - F4, HATCH-GUTTER. The gutter's 64px fallback removed (the
+   variable is declared, 68px, in index.html :root).
 
    v2 - SMOOTH-P3c. The freestyle session: a bar (Exit · clock ·
    Finish), what is done so far, the current move with its set
@@ -27,7 +30,7 @@
   margin: 0 calc(-1 * var(--space-4)) var(--space-3);
   /* The Home hatch sits top-right on a screen with no nav; Finish
      never runs under it. */
-  padding: var(--space-2) var(--escape-hatch-gutter, 64px) var(--space-2) var(--space-4);
+  padding: var(--space-2) var(--escape-hatch-gutter) var(--space-2) var(--space-4);
   background: var(--color-bg);
   border-bottom: 1px solid var(--color-border);
 }

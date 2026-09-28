@@ -1,6 +1,10 @@
 /**
  * today.js
- * 28 Sep 2026 v43
+ * 28 Sep 2026 v44
+ *
+ * v44 - F1, FREESTYLE-RELOAD. The Carry-on card also offers a "Make it up
+ *   as I go" session waiting in the active-session slot: what is done so
+ *   far, Carry on (back into it) and Finish here and save.
  *
  * v43 - SMOOTH-P4a. The arc chip opens Progress, where the arc is read
  *   back (spec 4.1: "Arc chip → Progress, arc section"). Change my arc
@@ -728,6 +732,7 @@
 
 import { store }               from '../store.js';
 import { getResumableSession } from '../session-resume.js';
+import { carryOnSummary } from './capture.js';   // F1: a freestyle session to carry on
 // SAFETY-GATE, 15 Sep 2026. One cadence in this product, not two, and
 // one copy of the clinical wording rather than two that drift apart.
 //
@@ -1248,10 +1253,10 @@ export function TodayView(router) {
     container.querySelector('[data-action="as-i-go"]')
       ?.addEventListener('click', () => router.navigate('capture'));
     container.querySelector('[data-action="carry-on"]')
-      ?.addEventListener('click', () => router.navigate('workout'));
+      ?.addEventListener('click', e => router.navigate(e.currentTarget.dataset.carry === 'capture' ? 'capture' : 'workout'));
     container.querySelector('[data-action="carry-finish"]')
-      ?.addEventListener('click', async () => {
-        const w = await import('./workout.js');
+      ?.addEventListener('click', async e => {
+        const w = await import(e.currentTarget.dataset.carry === 'capture' ? './capture.js' : './workout.js');
         w.finishFromHome();
       });
 
@@ -1500,7 +1505,11 @@ export function TodayView(router) {
     // Fires only in the first few sessions. Orientation, not a nudge:
     // somebody who has been here a fortnight has found the doors.
     const sessionsSoFar = activityLog.length;
-    if (sessionsSoFar < ORIENTATION_SESSIONS) {
+    // F3, GUIDANCE-FOLD. On the one day a month the general-guidance line
+    // shows, it is the note on this screen: an orientation line as well
+    // pushed the last of Plan Home under the nav (912px at 390 x 844).
+    // Orientation runs for four sessions, so it is back tomorrow.
+    if (sessionsSoFar < ORIENTATION_SESSIONS && !(isPremium() && _guidanceDue())) {
       const goals = store.get('goals') || [];
       if (goals.some(g => WELLBEING_GOALS.has(g))) {
         return "Wellbeing is where the breathing and the quieter practices live \u2014 that might be the door for you.";
@@ -1548,11 +1557,18 @@ export function TodayView(router) {
       // The coach speaks instead. Orientation, not a nudge -- it names
       // where the thing they asked for lives, once, in the first few
       // sessions, and then stops.
+      // F3, 28 Sep. These named the FREE tiles on both tiers; since
+      // SMOOTH-P3a Plan Home has three doors and neither tile is on it.
+      // Named per tier, from the control actually on the screen.
       if (goals.some(g => STRENGTH_GOALS.has(g))) {
-        return "Cardio, Core & Strength is the door for what you said you're after.";
+        return isPremium()
+          ? "\u2018I know what I want\u2019 is where you pick strength, and how long."
+          : "Cardio, Core & Strength is the door for what you said you're after.";
       }
       if (goals.some(g => MOVEMENT_GOALS.has(g))) {
-        return "Mobility & Conditioning is where the gentler movement lives \u2014 that might be the door for you.";
+        return isPremium()
+          ? "\u2018I know what I want\u2019 has the gentler kinds \u2014 mobility, stretching and yoga."
+          : "Mobility & Conditioning is where the gentler movement lives \u2014 that might be the door for you.";
       }
       // Everything else, including 'build-habit' alone. Says the true
       // thing rather than guessing a door: the smallest session is the
@@ -1853,12 +1869,15 @@ export function TodayView(router) {
  */
 
 
-function _guidanceLine() {
+/** Whether the general-guidance line is due on this render. */
+function _guidanceDue() {
   const last = store.get('guidanceShownAt');
-  if (last) {
-    const days = (Date.now() - new Date(last).getTime()) / 86400000;
-    if (days < GUIDANCE_DAYS) return '';
-  }
+  if (!last) return true;
+  return (Date.now() - new Date(last).getTime()) / 86400000 >= GUIDANCE_DAYS;
+}
+
+function _guidanceLine() {
+  if (!_guidanceDue()) return '';
   return `
     <p class="today-guidance" role="note">${GUIDANCE_TEXT}</p>`;
 }
@@ -1885,6 +1904,11 @@ function _markGuidanceShown(root) {
    * thing.
    */
   function _carryOn() {
+    // F1, FREESTYLE-RELOAD. A freestyle session in the slot is offered
+    // the same way: what has been done, Carry on, Finish here and save.
+    const fs = carryOnSummary();
+    if (fs) return { freestyle: true, name: 'Make it up as I go',
+                     done: `${fs.moves} move${fs.moves === 1 ? '' : 's'} \u00b7 ${fs.sets} set${fs.sets === 1 ? '' : 's'} so far` };
     const cp  = getResumableSession('workout');
     const gen = store.get('generatedSession');
     const ses = gen?.session;
@@ -1902,6 +1926,14 @@ function _markGuidanceShown(root) {
 
   /** Replaces the first door when there is a session to come back to. */
   function _carryOnCard(c) {
+    if (c.freestyle) return `
+      <section class="home-carry" aria-labelledby="home-carry-title">
+        <p class="home-carry__kicker">Carry on</p>
+        <h2 class="home-carry__title" id="home-carry-title">${_esc(c.name)}</h2>
+        <p class="home-carry__next">${_esc(c.done)}</p>
+        <button class="btn btn-primary btn-large btn-full" data-action="carry-on" data-carry="capture">Carry on</button>
+        <button class="btn btn-ghost btn-full" data-action="carry-finish" data-carry="capture">Finish here and save</button>
+      </section>`;
     const pos = `${c.index + 1} of ${c.total}`;
     return `
       <section class="home-carry" aria-labelledby="home-carry-title">

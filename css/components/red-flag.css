@@ -1,6 +1,10 @@
 /* ============================================================
    css/components/red-flag.css
-   28 Sep 2026 v1
+   28 Sep 2026 v2
+
+   v2 - F4, HATCH-GUTTER. The gutter's 64px fallback removed: the
+   variable is declared (index.html :root, 68px), so the fallback was
+   never used and only disagreed with it.
 
    RED-FLAG. The "before you start" safety screen and its stop.
 
@@ -22,7 +26,7 @@
 .rf-title {
   margin: var(--space-4) 0 0;
   /* The Home hatch sits top-right; the title never runs under it. */
-  padding-right: var(--escape-hatch-gutter, 64px);
+  padding-right: var(--escape-hatch-gutter);
   font-size: var(--text-2xl, 1.5rem);
   line-height: 1.2;
   color: var(--color-text);

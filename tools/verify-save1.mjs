@@ -1,5 +1,11 @@
 /**
  * tools/verify-save1.mjs
+ * 28 Sep 2026 v3
+ *
+ * v3 - F2. Reaches the preview by the builder's own route (type, where,
+ *   how long, build, coach) instead of the quick scaffold, which was
+ *   removed as unreachable. No assertion changed.
+ *
  * 08 Sep 2026 v2
  *
  * v2 - Waits for the preview to ARRIVE rather than for 1600ms, after
@@ -109,10 +115,19 @@ async function reachPreview({ tier = "personal" } = {}) {
     sessionType: "glute", durationMins: 30, equipmentOverride: null, preset: null
   });
   store.set("generatedSession", { session: built, builtAt: new Date().toISOString(), inputs: {} });
-  store.set("sessionBuilderPreselect", { mode: "quick", durationMins: 30, returnTo: "today" });
+  // v3, F2: was the quick scaffold's Build it -- a screen nothing reaches
+  // since SMOOTH-P3a, now removed. The route a person takes instead:
+  // type, where, how long, build, coach picks.
   main.innerHTML = view.render();
   view.onMount();
-  click("#sb-quick-build");
+  [...document.querySelectorAll(".sb-type-tile")].find(b => b.dataset.type === "glute")
+    ?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }));
+  click("#sb-location-continue-btn");
+  [...document.querySelectorAll(".sb-duration-btn")].find(b => b.dataset.mins === "30")
+    ?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }));
+  click("#sb-build-btn");
+  [...document.querySelectorAll(".sb-buildmode-btn")].find(b => b.dataset.mode === "coach")
+    ?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }));
   // Wait for the PREVIEW to arrive, not for a number of milliseconds.
   // verify-checkin3 shipped with a flat 60ms wait on 08 Sep: green five
   // times out of five on an idle box, twelve assertions red inside a

@@ -1,6 +1,15 @@
 /**
  * js/views/session-builder-ui.js - Session Builder UI
  *
+ * 28 Sep 2026 v23
+ *
+ * v23 - F2, QUICK-SCAFFOLD-ORPHAN. The quick scaffold is removed: its
+ *   only entry was Home's Quick build room, which left in SMOOTH-P3a, so
+ *   nothing could reach it (renderQuickScaffold, _quickReturn and its
+ *   five calls, quickMode, quickInputs, the sb-quick-* handlers). "I know
+ *   what I want" (know-what.js) is where a person says how long now. No
+ *   other path through the builder changes.
+ *
  * 12 Sep 2026 v22
  *
  * v22 - SEARCH-1b. A search box in the swap sheet.
@@ -452,7 +461,6 @@ import { saveSession, updateSavedSession, savedSessions, resolveSavedSession, sa
 // not whether you may build, but whether it is KEPT.
 import { isPremium } from '../auth.js';
 // QUICK-BUILD. The SAME chain One to one uses, not a second simpler one.
-import { chooseSessionType } from '../data/session-choice.js';
 import { router }                         from "../router.js";
 import { SESSION_TYPES, ALLOCATION_PRESETS, buildSession, buildCandidatePools, buildSessionFromSelection, buildSessionFromSaved, severeZoneToday, zonesWithCoverage } from "../session-builder.js";
 // SWAP-1. The grouping, the soreness levels and the replacement all live
@@ -508,22 +516,6 @@ let phase             = "type";      // "type" | "location" | "zones" | "duratio
 let selectedType      = null;
 let selectedLocation  = "home";      // "home" | "gym" -- never sticky, reset on resetState()
 let selectedDuration  = null;
-// QUICK-BUILD. quickMode is cleared by resetState() with the rest --
-// a mode that survived would turn one tap on Home into a permanent
-// change to how the builder behaves.
-let quickMode         = false;
-// QUICK-BUILD. quickInputs holds what chooseSessionType() consulted:
-// the class you are in, what the arc says is thin, what has not come up
-// lately. QUICK-INPUTS, 06 Sep 2026, now carries it through to the
-// stored record via buildSession's optional `inputs` merge.
-//
-// The note that stood here said there was no seam to carry it. THAT WAS
-// WRONG. buildSession() writes generatedSession itself and always has;
-// it was persistBuiltSession() -- the swap path -- that only rewrites an
-// existing record. Left recorded because a claim that a seam does not
-// exist is exactly the kind of thing a later session inherits and
-// designs around.
-let quickInputs       = null;
 // D3, 13 Aug 2026. Seeded from the store rather than hardcoded, and
 // written back on every choice. Persona 2.15 trains four times a week
 // and wants "Mostly strength" every time; she was re-picking it from
@@ -653,7 +645,6 @@ export function render() {
   if (phase === "type")       return renderTypePicker();
   if (phase === "location")   return renderLocationStep();
   if (phase === "zones")      return renderZonePicker();
-  if (phase === "quick")      return renderQuickScaffold();
   if (phase === "duration")   return renderDurationPicker();
   if (phase === "equipment")  return renderEquipmentCheck();
   if (phase === "buildmode")  return renderBuildModeStep();
@@ -751,90 +742,6 @@ function _exerciseMeta(ex, opts = {}) {
     parts.push(`rest ${Number(ex.rest)}s${ex.restStyle === "active" ? " active" : ""}`);
   }
   return parts.join(" &nbsp; ");
-}
-
-/**
- * QUICK-BUILD, 06 Sep 2026. The room's own screen. ONE screen, not six.
- *
- * The builder walks type, location, zones, duration, equipment,
- * buildmode. That is right for somebody who came to compose. It is wrong
- * for a room whose whole offer was "tell me how long and I fill the rest
- * in" -- answering one question and then being asked six is the opposite
- * of what the card said.
- *
- * SO EVERY ASSUMPTION IS SHOWN BEFORE THE BUILD, NOT DISCOVERED AFTER
- * IT. The type the coach picked, the length from the chip, the place and
- * the kit -- all on screen, all changeable, one button. The Home card
- * already said "You can change the place and kit next"; this is that
- * promise, and it has to be kept on the very next screen or it was
- * decoration.
- *
- * THE TYPE IS NAMED AND CHANGEABLE. A coach that picks silently and
- * cannot be corrected is not a coach handing you a frame, it is a coach
- * deciding for you -- which is the thing the four rooms exist to stop.
- */
-function renderQuickScaffold() {
-  const typeMeta = SESSION_TYPES.find(x => x.id === selectedType);
-  // QUICK-BUILD-3, 08 Sep 2026. Was store.get("equipment") -- the flat
-  // merged list, read regardless of where the person said they were. At
-  // the gym it showed the home kit, and its count never matched the
-  // ticks sitting behind its own "Kit" button. Same resolver the
-  // equipment step uses, so the number here IS what is there.
-  const kit = (_resolvedEquipment().currentEquip || [])
-    .filter(id => id && id !== "none");
-  const kitLabel = kit.length === 0
-    ? "Nothing needed"
-    : `${kit.length} thing${kit.length === 1 ? "" : "s"} you have`;
-
-  return `
-    <div class="view session-builder-view">
-
-      <div class="workout-header">
-        <button class="btn btn-ghost" id="sb-quick-back" aria-label="Back to Today">
-          &larr; Back
-        </button>
-        <h1 class="workout-header-title">Here's what I'd give you</h1>
-      </div>
-
-      <p class="text-secondary">Change anything that isn't right.</p>
-
-      <!--
-        QUICK-BUILD-3, 08 Sep 2026. Each row was a <span> label beside a
-        button whose only accessible name was its VALUE, so a screen
-        reader announced "Glute Focus, button" -- no indication of what
-        the value is, or that the button changes it. The "Session" label
-        beside it carried that meaning visually and nowhere else.
-
-        WCAG 2.2 AA: 1.3.1, the label/control relationship existed in
-        presentation only, and 2.4.6, a label that does not describe
-        purpose. The accessible name still CONTAINS the visible text, so
-        2.5.3 Label in Name holds and voice control still works.
-
-        Built from one row template rather than four copies: four hand-
-        written aria-labels are four things to keep in step with four
-        values, and they would drift on the first copy-paste.
-      -->
-      <ul class="sb-quick__list">      ${[
-        ["Session", "sb-quick-type",      typeMeta ? typeMeta.label : "Full Body"],
-        ["Length",  "sb-quick-duration",  selectedDuration ? `${selectedDuration} min` : "You choose"],
-        ["Where",   "sb-quick-location",  selectedLocation === "gym" ? "At the gym" : "At home"],
-        ["Kit",     "sb-quick-equipment", kitLabel]
-      ].map(([label, id, value]) => `
-        <li class="sb-quick__row">
-          <span class="sb-quick__label">${label}</span>
-          <button class="btn btn-secondary sb-quick__change" id="${id}"
-                  aria-label="${label}: ${value}. Change">
-            ${value}
-          </button>
-        </li>`).join("")
-      }
-      </ul>
-
-      <button class="btn btn-primary btn-large btn-full" id="sb-quick-build">
-        Build it
-      </button>
-    </div>
-  `;
 }
 
 function renderLocationStep() {
@@ -1828,31 +1735,6 @@ function rerender() {
   }
 }
 
-/**
- * QUICK-BUILD-2, 08 Sep 2026.
- *
- * In quick mode every step is a DETOUR from the scaffold, not a station
- * on a route. The scaffold's own comment already said each change button
- * "drops into the ONE existing step for that answer and comes back
- * here". The outbound leg was built; the return leg never was, so
- * correcting one assumption dropped the person into the full six-question
- * flow -- and the duration picker then asked "How long have you got
- * today?" of somebody who had answered exactly that on a time chip two
- * taps earlier.
- *
- * Same rule the back chain below already states in its own words: never
- * enter, or leap past, a screen the person did not see.
- *
- * Returns true when it has handled the transition, so each call site
- * reads `if (_quickReturn()) return;` and the normal flow underneath is
- * left exactly as it was for every non-quick path.
- */
-function _quickReturn() {
-  if (!quickMode) return false;
-  phase = "quick";
-  rerender();
-  return true;
-}
 
 // ── Build and navigate ────────────────────────────────────────────────────────
 
@@ -1871,7 +1753,7 @@ function triggerBuild() {
       // type. On every other path the person chose it themselves, and
       // recording a consultation that did not happen would be the same
       // overclaim in the other direction.
-      inputs:            quickMode ? quickInputs : null
+      inputs:            null
     });
 
     if (!builtSession) {
@@ -2046,8 +1928,6 @@ function persistBuiltSession() {
 }
 
 function resetState() {
-  quickMode   = false;
-  quickInputs = null;
   phase                = "type";
   selectedType         = null;
   selectedLocation      = "home";
@@ -2173,39 +2053,10 @@ export function onMount() {
       // uses -- the class you are in, then what the arc says is thin,
       // then what has not come up lately. A second, simpler chooser
       // here would be a second thing to keep in step with that one.
-      if (pre.mode === "quick") {
-        quickMode = true;
-        const chosen = chooseSessionType();
-        selectedType = chosen.sessionType;
-        quickInputs  = { ...chosen.inputs, chosenType: chosen.sessionType, reason: chosen.reason };
-        phase = "quick";
-      }
       if (!pre.type) {
         store.set("sessionBuilderPreselect", null);
       }
 
-      // QUICK-BUILD-2, 08 Sep 2026. The branch above set phase = "quick"
-      // and then fell through without re-rendering.
-      //
-      // The router calls render() BEFORE onMount(), so the type picker
-      // was already on screen by the time the phase changed. Nothing
-      // re-rendered it. THE SCAFFOLD HAS NEVER BEEN SEEN BY ANYBODY:
-      // tapping a time chip landed on the eight-way type picker asking
-      // "Tell me what you want to work on today" -- the exact screen
-      // QUICK-BUILD was written to replace, one screen after a card
-      // promising "Tell me how long. I fill the rest in".
-      //
-      // The pre.type branch below has always ended `rerender(); return;`
-      // for precisely this reason. Quick mode was the one entry that set
-      // a phase and trusted a render that had already happened.
-      //
-      // AFTER the clear above, never before. Returning early with the
-      // preselect still in the store would pin every later build to a
-      // duration tapped days ago -- the fault the comment above guards.
-      if (quickMode) {
-        rerender();
-        return;
-      }
     }
 
     if (pre && pre.type && SESSION_TYPES.some(t => t.id === pre.type)) {
@@ -2260,7 +2111,6 @@ export function onMount() {
     // location to type, equipment to duration -- every one of which a
     // quick user never saw. Backing out of the type picker would have
     // landed on the door, silently abandoning the length they gave.
-    if (_quickReturn()) return;
     if (phase === "type") {
       // Captured BEFORE resetState(), which nulls it. Read after, this
       // always fell through to "today" and the door was silently lost.
@@ -2346,7 +2196,6 @@ export function onMount() {
       // QUICK-BUILD-2. In quick mode the picker was opened to CORRECT the
       // coach's type, so the answer goes back to the scaffold rather than
       // walking on into a flow the person never chose to enter.
-      if (_quickReturn()) return;
       phase = "location";
       rerender();
     });
@@ -2384,7 +2233,6 @@ export function onMount() {
   document.getElementById("sb-location-continue-btn")?.addEventListener("click", () => {
     // QUICK-BUILD-2. Back to the scaffold: the place was the one thing
     // being corrected.
-    if (_quickReturn()) return;
     // ZONE-1. Only Stretch asks. Every other type goes straight on, so
     // no existing flow gains a step.
     phase = selectedType === "stretch" ? "zones" : "duration";
@@ -2399,7 +2247,6 @@ export function onMount() {
       // builds the session there and then. In quick mode a length was
       // already given on the time chip; this screen was opened to change
       // it, and changing it must not also start the build.
-      if (_quickReturn()) return;
       // R4, 20 Aug 2026. The `else` that stood here forced
       // selectedDuration = 30, copied the flat saved equipment list into
       // the override and called triggerBuild() immediately -- so a free
@@ -2513,7 +2360,6 @@ export function onMount() {
     // QUICK-BUILD-2. The ticks are kept, then back to the scaffold. The
     // build-mode question belongs to the compose flow; quick build has
     // one button and it is on the scaffold.
-    if (_quickReturn()) return;
     phase = "buildmode";
     rerender();
   });
@@ -2629,33 +2475,6 @@ export function onMount() {
       swapIndex = null;
       rerender();
     });
-  });
-
-  // ── QUICK-BUILD, 06 Sep 2026 ────────────────────────────────────────
-  // Each "change" button drops into the ONE existing step for that
-  // answer and comes back here. Reusing the real steps rather than
-  // building inline editors: a second location picker would be a second
-  // thing to keep in step with the first, and the location step already
-  // knows things this screen does not.
-  document.getElementById("sb-quick-build")?.addEventListener("click", () => {
-    triggerBuild();
-  });
-  document.getElementById("sb-quick-type")?.addEventListener("click", () => {
-    phase = "type"; rerender();
-  });
-  document.getElementById("sb-quick-duration")?.addEventListener("click", () => {
-    phase = "duration"; rerender();
-  });
-  document.getElementById("sb-quick-location")?.addEventListener("click", () => {
-    phase = "location"; rerender();
-  });
-  document.getElementById("sb-quick-equipment")?.addEventListener("click", () => {
-    phase = "equipment"; rerender();
-  });
-  // Back goes to the door that sent us, not one step into a flow the
-  // person never walked -- BACK-DOOR, 31 Aug.
-  document.getElementById("sb-quick-back")?.addEventListener("click", () => {
-    router.navigate(entryDoor || "today");
   });
 
   // YOUR-OWN. Wired here, alongside the other preview buttons, so it

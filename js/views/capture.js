@@ -1,6 +1,13 @@
 /**
  * js/views/capture.js
- * 28 Sep 2026 v2
+ * 28 Sep 2026 v3
+ *
+ * v3 - F1, FREESTYLE-RELOAD. The session survives the app closing: each
+ *   logged set writes the one active-session slot (session-resume.js),
+ *   a reopened view picks it back up ("Carried on where you were."), and
+ *   Home offers it with the same Carry-on card the coach's player uses
+ *   (carryOnSummary, finishFromHome). Leaving without saving clears it;
+ *   an empty freestyle never displaces a coach session's carry-on.
  *
  * v2 - SMOOTH-P3c. "Make it up as I go". Spec 4.7.
  *
@@ -73,6 +80,7 @@ import { performanceFields } from "../session-log.js";
 import { hurtBlock } from "../exercise-card.js";
 import { isGateDue, renderSafetyGate, attachSafetyGate } from "../safety-gate.js";
 import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
+import { checkpointSession, getResumableSession, clearCheckpoint } from "../session-resume.js";
 
 export const centered = false;
 
@@ -110,6 +118,61 @@ let status    = "";
 let focusNext = null;   // selector to focus after the next paint
 let clock     = null;
 let guarded   = false;  // the back-gesture guard, mounted once per visit
+
+/**
+ * F1, FREESTYLE-RELOAD. The session lives in memory while the app is
+ * open; this puts it in the one active-session slot (session-resume.js)
+ * as each set is logged, so closing the app loses nothing. Written only
+ * once there is a set: an empty freestyle is nothing to come back to,
+ * and must not displace a coach session waiting to be carried on.
+ */
+function _persist() {
+  if (!totalSets()) return;
+  checkpointSession("freestyle", {
+    moves:     moves.map(m => ({ id: m.id, sets: m.sets })),
+    current:   current ? { id: current.id, sets: current.sets } : null,
+    kind,
+    startedAt: new Date(startedAt || Date.now()).toISOString(),
+  });
+}
+
+/** A reopened app: pick the session back up from the slot, if it is ours. */
+function _restore() {
+  if (startedAt || moves.length || current) return false;
+  const cp = getResumableSession("freestyle");
+  if (!cp) return false;
+  moves = (Array.isArray(cp.moves) ? cp.moves : []).filter(m => m && byId(m.id)).map(m => ({ id: m.id, sets: Array.isArray(m.sets) ? m.sets : [] }));
+  current = cp.current && byId(cp.current.id)
+    ? { id: cp.current.id, sets: Array.isArray(cp.current.sets) ? cp.current.sets : [], last: store.lastLift(cp.current.id) || null }
+    : null;
+  kind = cp.kind || null;
+  startedAt = Date.parse(cp.startedAt) || Date.now();
+  status = "Carried on where you were.";
+  return true;
+}
+
+/** Only our own checkpoint is cleared; a coach session's is left alone. */
+function _clearOurs() {
+  if (store.get("activeSessionCheckpoint")?.sessionType === "freestyle") clearCheckpoint();
+}
+
+/** What the Home card says about a freestyle session waiting, or null. */
+export function carryOnSummary() {
+  const cp = getResumableSession("freestyle");
+  if (!cp) return null;
+  const list = [...(cp.moves || []), ...(cp.current && (cp.current.sets || []).length ? [cp.current] : [])];
+  const sets = list.reduce((n, m) => n + (m.sets || []).length, 0);
+  if (!sets) return null;
+  return { moves: list.length, sets };
+}
+
+/** Home's "Finish here and save" for a freestyle session: save it, then the finish screen. */
+export function finishFromHome() {
+  _restore();
+  saveFreestyle();
+  _end();
+  router.navigate("reflect");
+}
 
 function _reset() {
   moves = []; current = null; startedAt = null; query = ""; kind = null;
@@ -261,6 +324,7 @@ function _pick(id) {
   query = "";
   status = "";
   focusNext = "#fs-move-name";
+  _persist();
 }
 
 function _logSet(root) {
@@ -281,6 +345,7 @@ function _logSet(root) {
   current.sets.push({ ...entry, at: new Date().toISOString() });
   status = `Set ${current.sets.length} logged: ${setText(entry)}.`;
   focusNext = "#fs-log";
+  _persist();
 }
 
 // ── Rendering ───────────────────────────────────────────────────────────
@@ -362,6 +427,7 @@ export function render() {
   if (startedAt && Date.now() - startedAt > STALE_MS) _reset();
   // CAPTURE-1. The gate stands before the first movement -- see the header.
   if (isGateDue()) return `<div class="view capture-view">${renderSafetyGate()}</div>`;
+  _restore();
   if (!startedAt) startedAt = Date.now();
 
   const loc  = currentLocation();
@@ -468,6 +534,7 @@ export function saveFreestyle() {
 function _end() {
   clearInterval(clock); clock = null;
   dismountSessionGuard(); guarded = false;
+  _clearOurs();
   _reset();
 }
 
