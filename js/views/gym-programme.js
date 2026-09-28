@@ -1,5 +1,11 @@
 /**
  * gym-programme.js
+ * 28 Sep 2026 v13
+ *
+ * v13 - Work list 7, SAVE-HANDOFF. A part-way save records which
+ *   exercises were done, so the finish screen can still offer "Keep this
+ *   one?" (save-block.js v2 checks the session that just finished).
+ *
  * 06 Sep 2026 v12
  *
  * v12 - SKIP. "Skip this one" no longer writes a difficulty reason to
@@ -1514,6 +1520,12 @@ export function GymProgrammeView(router) {
       status:         'partial',
       durationMins,
       exercisesCount: doneCount,
+      // SAVE-HANDOFF (work list 7). What was done, so the finish screen
+      // can tell this was today's session and offer to keep it. Partial
+      // ids are not routed into exerciseHistory (store.logActivity).
+      exerciseIds:    [...completedExerciseIndices]
+                        .map(i => session.exercises[i]?.id)
+                        .filter(Boolean),
       moodAfter:      null,
       isEvent:        false,
       eventName:      null,

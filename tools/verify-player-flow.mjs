@@ -1,6 +1,11 @@
 /**
  * tools/verify-player-flow.mjs
- * 28 Sep 2026 v3
+ * 28 Sep 2026 v4
+ *
+ * v4 - Work list 7, SAVE-HANDOFF. 4h: ending part-way records what was
+ *   done, and the finish screen offers to keep the session. 4i: so does
+ *   finishing it -- measured on v556, neither did, because the player
+ *   cleared the plan before the finish screen read it.
  *
  * v3 - SMOOTH-P3a. The exit sheet has four choices: "Carry on later"
  *   joins it (4b). Nothing else changed.
@@ -43,6 +48,7 @@ const { store } = await import(B + "store.js");
 const SB = await import(B + "session-builder.js");
 const { HURT_AND_ACHE_VERSION } = await import(B + "exercise-card.js");
 const workout = await import(B + "views/workout.js");
+const { savableSession } = await import(B + "save-block.js");
 
 let fails = 0, passes = 0;
 const ok = (name, cond, detail = "") => {
@@ -157,6 +163,9 @@ const log = store.get("activityLog") || [];
 ok("4g. End it here and save goes to the finish, saving what was done",
    navs.at(-1) === "reflect" && log.length === b2 + 1 && log.at(-1).status === "partial" && log.at(-1).exercisesCount === 1,
    `${JSON.stringify(navs)} ${JSON.stringify(log.at(-1))}`);
+ok("4h. and records what was done, so the finish screen offers to keep this session",
+   JSON.stringify(log.at(-1)?.exerciseIds) === JSON.stringify(["fixture-row"]) && !!savableSession(),
+   `${JSON.stringify(log.at(-1)?.exerciseIds)}; offered: ${!!savableSession()}`);
 
 // ── 5. REST-1: A SUGGESTED REST ─────────────────────────────────────────
 console.log("\nTEST 5 - after a set, a suggested rest that never pushes");
@@ -180,6 +189,15 @@ tap("#wo-set-done-btn"); tap("#wo-set-done-btn");
 ok("5f. no rest after the last set: the exercise is done", !main.querySelector(".wo-rest") && !!main.querySelector("#complete-exercise-btn"));
 tap("#complete-exercise-btn");
 ok("5g. the next exercise starts without a rest", main.querySelector(".exercise-name")?.textContent === "Goblet Squat" && !main.querySelector(".wo-rest"));
+
+// 4i sits last: finishing the session ends the player, and test 5 needs
+// it running.
+console.log("\nTEST 4i - finishing offers to keep it");
+fresh([ROW]);
+tap("#wo-set-done-btn"); tap("#wo-set-done-btn"); tap("#wo-set-done-btn"); tap("#complete-exercise-btn");
+ok("4i. finishing the whole plan: the finish screen offers to keep it (it never could: the plan was cleared first)",
+   navs.at(-1) === "reflect" && savableSession()?.exercises?.[0]?.id === "fixture-row",
+   `${JSON.stringify(navs)}; offered: ${!!savableSession()}`);
 
 console.log("");
 if (fails) { console.log(`PLAYER-FLOW: ${fails} FAILED, ${passes} passed`); process.exit(1); }

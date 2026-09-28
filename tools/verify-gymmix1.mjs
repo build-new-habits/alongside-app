@@ -1,5 +1,15 @@
 /**
  * tools/verify-gymmix1.mjs
+ * 28 Sep 2026 v2
+ *
+ * v2 - Work list 5, GYM-REACH-1. Test 1 said "no other session type has a
+ *   feature slot". Cardio now has one, by decision: every machine block
+ *   is 15-30 minutes, so Cardio at a gym offered no machine at all
+ *   (measured: 0 in 240 builds). The scoping this test exists for is
+ *   kept, stated exactly: the slot is on Gym and Cardio only, both need a
+ *   machine, and a long item in a Cardio session is only ever that one
+ *   machine block. No other type builds a ten-minute-plus item.
+ *
  * 12 Sep 2026 v1
  *
  * GYM-MIX-1. A session type for a gym floor: one long machine block, then
@@ -86,18 +96,24 @@ ok("0c. CONTROL: the machine blocks really are over the ten-minute rule",
 console.log("\nTEST 1 — the exemption is scoped, not a loosening");
 
 {
-  const others = SB.SESSION_TYPES.filter(t => t.id !== "gym");
-  ok("1a. no other session type has a feature slot", others.every(t => !t.featureSlot));
+  const SLOTTED = ["gym", "cardio"];   // v2: cardio by work list 5
+  const others = SB.SESSION_TYPES.filter(t => !SLOTTED.includes(t.id));
+  ok("1a. only Gym and Cardio have a feature slot, and both need a machine",
+     others.every(t => !t.featureSlot) &&
+     SLOTTED.every(id => SB.SESSION_TYPES.find(t => t.id === id)?.featureSlot?.requiresEquipment === true));
 
   let leaked = [];
   setKit(GYM);
-  for (const t of others) {
+  for (const t of SB.SESSION_TYPES.filter(t => t.id !== "gym")) {
     for (let i = 0; i < 4; i++) {
       const s = SB.buildSession({ sessionType: t.id, durationMins: 45, equipmentOverride: GYM, preset: null });
-      for (const ex of (s.exercises || [])) if (isSessionLength(ex)) leaked.push(t.id + ":" + ex.id);
+      const long = (s.exercises || []).filter(ex => isSessionLength(ex));
+      // Cardio may carry its ONE machine block; anything else long is a leak.
+      const allowed = t.id === "cardio" && long.length === 1 && isCardioMachine(long[0]) ? 1 : 0;
+      for (const ex of long.slice(allowed)) leaked.push(t.id + ":" + ex.id);
     }
   }
-  ok("1b. no other type ever builds a ten-minute-plus item" +
+  ok("1b. no other type ever builds a ten-minute-plus item (Cardio: only its one machine block)" +
      (leaked.length ? "  [" + [...new Set(leaked)].slice(0, 6).join(", ") + "]" : ""),
      leaked.length === 0, "the rule this session exempts must still hold everywhere else");
 }

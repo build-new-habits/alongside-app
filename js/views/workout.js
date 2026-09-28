@@ -1,6 +1,13 @@
 /**
  * workout.js - Workout Execution View
- * 28 Sep 2026 v22
+ * 28 Sep 2026 v23
+ *
+ * v23 - Work list 7, SAVE-HANDOFF. Finishing, or ending part-way and
+ *   saving, writes lastFinishedSession before cleanupWorkout() clears
+ *   generatedSession -- until now the finish screen could never offer
+ *   "Keep this one?" after a coach or builder session. The part-way entry
+ *   also records which exercises were done (exerciseIds), so the offer
+ *   can tell this session is what just finished (save-block.js v2).
  *
  * v22 - SMOOTH-P3a. Carry on later, and coming back.
  *
@@ -1155,11 +1162,31 @@ function savePartialSession() {
     eventName:      null,
     exercisesCount: progress.length,
     setsDone:       progress.reduce((n, e) => n + (e.sets || 1), 0),
+    // SAVE-HANDOFF (work list 7). What was done, so the finish screen can
+    // tell this was today's plan and offer to keep it. A partial entry's
+    // ids are not routed into exerciseHistory (store.logActivity).
+    exerciseIds:    progress.map(p => p.exerciseId).filter(Boolean),
     creditsEarned
   });
 
   if (activityEntry) {
     store.set("currentActivityEntry", activityEntry);
+  }
+  _handOff(nowIso);
+}
+
+/**
+ * SAVE-HANDOFF, work list 7. The finish screen offers "Keep this one?"
+ * from lastFinishedSession, because cleanupWorkout() clears
+ * generatedSession before it gets there -- so after a coach or builder
+ * session the offer never appeared. Written on both ways of finishing
+ * (all done, or ending part-way and saving); never on leaving without
+ * saving. The whole plan is what is kept: it is a session to repeat.
+ */
+function _handOff(atIso) {
+  const w = _getWorkout();
+  if (w && Array.isArray(w.exercises) && w.exercises.length) {
+    store.set("lastFinishedSession", { at: atIso, session: w });
   }
 }
 
@@ -1223,6 +1250,7 @@ function completeWorkout() {
   store.set("lastWorkoutCredits", creditsEarned);
   store.set("lastWorkoutName",    workout.name);
 
+  _handOff(nowIso);   // SAVE-HANDOFF: before cleanupWorkout() clears the plan
   cleanupWorkout();
   // Route through reflect.js for post-session reflection.
   router.navigate("reflect");

@@ -1,7 +1,12 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
- * 28 Sep 2026 v54
+ * 28 Sep 2026 v55
+ *
+ * v55 - Work list 5, GYM-REACH-1. Cardio gets Gym's feature slot: one
+ *   machine block when a machine is declared, and only a block that
+ *   leaves `leaveMins` (15) for the rest, so the session fits the time.
+ *   Somebody with a treadmill had never been offered it in Cardio.
  *
  * v54 - GYM-KIT is off on a gentle day. It narrowed the main pool to
  *   loaded moves before ENERGY-1's low-energy weighting ran, so a low day
@@ -1650,6 +1655,18 @@ export const SESSION_TYPES = [
     icon:        "🏃",
     description: "Conditioning and cardiovascular work. No heavy loading.",
     warmupCategories:   ["lower-mobility"],
+    // GYM-REACH-1, 28 Sep 2026 (work list 5). Every machine block is 15 to
+    // 30 minutes, so the ten-minute rule kept all of them out of Cardio:
+    // somebody with a treadmill never saw it. Gym's own mechanism, needing
+    // a machine, so Cardio at home with none is exactly as it was.
+    // leaveMins: the block must leave this much for the warm-up, a few
+    // moves and the cool-down, so the session fits the time asked for.
+    featureSlot: {
+      categories:         ["conditioning", "interval", "easy-cardio"],
+      allowSessionLength: true,
+      requiresEquipment:  true,
+      leaveMins:          15
+    },
     mainCategories:     ["conditioning", "interval", "power", "easy-cardio", "swim"],
     cooldownCategories: ["static-stretch", "self-massage", "breathing-cool"]
   },
@@ -3522,7 +3539,13 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
     // If the person has no machine there is simply no feature block, and
     // the session is the lifting -- which is the honest answer rather than
     // a substitute nobody asked for.
-    const pool = slot.requiresEquipment ? onMachine : longEnough;
+    const machinesOk = slot.requiresEquipment ? onMachine : longEnough;
+    // GYM-REACH-1. A slot that says how much room to leave takes only a
+    // block that fits: a 25-minute treadmill run is not a 20-minute
+    // session. None fits -> no block, and the session is built as usual.
+    const pool = slot.leaveMins
+      ? machinesOk.filter(ex => _exerciseMins(ex) <= Number(durationMins) - slot.leaveMins)
+      : machinesOk;
     if (!pool.length) return [];
 
     // 'less' is honoured here by hand, because pickFrom() -- which does

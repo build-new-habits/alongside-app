@@ -1,5 +1,14 @@
 /**
  * js/save-block.js
+ * 28 Sep 2026 v2
+ *
+ * v2 - Work list 7, SAVE-HANDOFF. The generatedSession fallback is
+ *   offered only when the last session finished today WAS that proposal
+ *   (it shares an exercise with it), and so is the lastFinishedSession
+ *   handoff. A walk after a morning plan offered to save the plan nobody
+ *   did. Read from the activity log, which every
+ *   session view writes when it finishes, so no view needs handoff code.
+ *
  * 16 Sep 2026 v1
  *
  * SAVE-ALL. "Keep this one?" — offered once, on the screen every session
@@ -59,6 +68,26 @@ function _isToday(iso) {
   return !isNaN(d.getTime()) && d.toDateString() === new Date().toDateString();
 }
 
+/**
+ * SAVE-HANDOFF, 28 Sep 2026. Is `built` the session that just finished?
+ *
+ * The latest entry logged today decides -- every session view logs one
+ * when it finishes, before its finish screen. It must share an exercise
+ * with `built` (part of it counts: ending early is still that session).
+ * A walk after a morning plan, or a class after a saved yoga flow, is
+ * not that session, so neither is offered. Nothing logged today leaves
+ * the offer as it was.
+ */
+function _justFinished(built) {
+  const lastToday = (store.get("activityLog") || [])
+    .filter(e => e && _isToday(e.completedAt || e.date))
+    .at(-1);
+  if (!lastToday) return true;
+  const planned = new Set((built.exercises || []).map(e => e && e.id).filter(Boolean));
+  const done = Array.isArray(lastToday.exerciseIds) ? lastToday.exerciseIds : [];
+  return done.some(id => planned.has(id));
+}
+
 /** The same test saveSession() applies, applied before offering. */
 function _validate(built) {
   if (!built || !Array.isArray(built.exercises)) return null;
@@ -96,7 +125,7 @@ export function savableSession() {
   const handoff = store.get("lastFinishedSession");
   if (handoff && handoff.session && _isToday(handoff.at)) {
     const h = _validate(handoff.session);
-    if (h) return h;
+    if (h && _justFinished(h)) return h;
   }
 
   const gen = store.get("generatedSession") || {};
@@ -110,6 +139,10 @@ export function savableSession() {
   // button.
   if (!Array.isArray(built.exercises)) return null;
   if (built.exercises.filter(e => e && e.id).length === 0) return null;
+
+  // SAVE-HANDOFF, 28 Sep. The proposal is only "this one" if it is what
+  // just finished (see _justFinished).
+  if (!_justFinished(built)) return null;
 
   // Prescribed work is excluded on content grounds, not capability -- see
   // the header. The entry records its own type, so this reads what the

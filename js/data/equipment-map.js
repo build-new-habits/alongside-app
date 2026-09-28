@@ -1,5 +1,10 @@
 /**
  * data/equipment-map.js
+ * 28 Sep 2026 v3
+ *
+ * v3 - Work list 6. UNSATISFIABLE_TAGS emptied: every tag it named is
+ *   declarable now. No behaviour change.
+ *
  * 12 Aug 2026 v2
  *
  * v2 - EQUIP-3. The session equipment screen's own vocabulary added. CON-2
@@ -236,11 +241,11 @@ export const EQUIPMENT_IMPLIES = {
  * equipment.js, or re-tag the small number of exercises that need it.
  * Logged for CON-4, not fixed here (touch-once).
  */
-export const UNSATISFIABLE_TAGS = [
-  "agility-ladder",
-  "reaction-ball",
-  "nordic-walking-poles"
-];
+// Work list 6, 28 Sep 2026: EMPTY. All three tags once listed here
+// (agility-ladder, reaction-ball, nordic-walking-poles) can now be
+// declared in onboarding, so the list was telling the next reader
+// something false. verify-equipstair 4c keeps it honest.
+export const UNSATISFIABLE_TAGS = [];
 
 /**
  * Expand a user's ticked equipment into the full set of capability tags

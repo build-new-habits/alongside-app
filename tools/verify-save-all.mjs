@@ -1,5 +1,15 @@
 /**
  * tools/verify-save-all.mjs
+ * 28 Sep 2026 v2
+ *
+ * v2 - Work list 7, SAVE-HANDOFF. TEST 4c: the fallback to today's
+ *   proposal (generatedSession) is offered only when what just finished
+ *   WAS that proposal. Measured on v556: build a plan in the morning, go
+ *   for a walk instead, and the walk's finish screen offered "Keep this
+ *   one?" for the plan that was never done. The rule reads the activity
+ *   log -- the one record every session view writes when it finishes --
+ *   so no view needs its own handoff code (SAVE-ALL's principle).
+ *
  * 16 Sep 2026 v1
  *
  * SAVE-ALL. The offer is governed by a capability, not by a list.
@@ -230,6 +240,34 @@ console.log("\nTEST 4b — the handoff, so a view needs no save code of its own"
     return s && s.title === "Core";
   })(), "generatedSession is a PROPOSAL and may never have been done; " +
         "lastFinishedSession is a RECORD of what finished");
+}
+
+console.log("\nTEST 4c — the proposal is offered only if it is what just finished");
+{
+  const logToday = entry => store.set("activityLog", [...(store.get("activityLog") || []),
+    { completedAt: today(), ...entry }]);
+  store.set("lastFinishedSession", null);
+  store.set("activityLog", []);
+  withSession(REAL);
+  logToday({ type: "walk", exerciseIds: [] });
+  ok("4c.1 a walk after this morning's plan: no offer for the plan nobody did",
+     renderSaveBlock() === "" && savableSession() === null);
+  logToday({ type: "workout", exerciseIds: ["plank", "dead-bug"] });
+  ok("4c.2 REVERSAL: finishing the plan (even part of it) offers it",
+     renderSaveBlock().includes("data-save-block"));
+  logToday({ type: "workout", exerciseIds: ["goblet-squat"] });
+  ok("4c.3 a different session finished since: not offered",
+     savableSession() === null);
+  store.set("activityLog", []);
+  ok("4c.4 nothing logged today: unchanged (the proposal is offered, as before)",
+     !!savableSession());
+  store.set("generatedSession", null);
+  store.set("lastFinishedSession", { at: today(), session: REAL });
+  logToday({ type: "walk", exerciseIds: [] });
+  ok("4c.5 and a handoff from earlier today is not offered after a walk either",
+     savableSession() === null);
+  store.set("lastFinishedSession", null);
+  store.set("activityLog", []);
 }
 
 console.log("\nTEST 5 — one implementation, and the shared screen carries it");

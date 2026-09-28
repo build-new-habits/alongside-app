@@ -1,5 +1,17 @@
 /**
  * tools/verify-equipstair.mjs
+ * 28 Sep 2026 v2
+ *
+ * v2 - Work list 6. The row asked for "every equipment id used by any
+ *   exercise is offered by at least one picker"; v1 checked the cardio
+ *   machines only. TEST 4 checks every tag in the library, and that
+ *   equipment-map's UNSATISFIABLE_TAGS -- the list of tags nobody can
+ *   declare -- names nothing that can in fact be declared. Measured: all
+ *   48 library tags are declarable, and all three "unsatisfiable" tags
+ *   are declarable now (the pickers gained them after the list was
+ *   written), so the
+ *   list was telling the next reader something false.
+ *
  * 13 Sep 2026 v1
  *
  * EQUIP-STAIR. Every machine an exercise needs can actually be declared.
@@ -41,7 +53,7 @@ const ok = (name, cond, detail = "") => {
 
 const { EXERCISES, CARDIO_MACHINES } = await import("../js/data/exercises/index.js");
 const { EQUIPMENT_CATEGORIES } = await import("../js/data/equipment.js");
-const { resolveEquipment, exerciseIsAvailable } = await import("../js/data/equipment-map.js");
+const { resolveEquipment, exerciseIsAvailable, UNSATISFIABLE_TAGS } = await import("../js/data/equipment-map.js");
 
 const onboardingIds = EQUIPMENT_CATEGORIES.flatMap(c => (c.items || []).map(i => i.id));
 const builderSrc = fs.readFileSync("js/views/session-builder-ui.js", "utf8");
@@ -82,6 +94,20 @@ console.log("\nTEST 3 — the two stair entries can actually be reached");
   ok("3b. and declaring it makes them available",
      stairs.every(e => exerciseIsAvailable(e, kit)),
      stairs.filter(e => !exerciseIsAvailable(e, kit)).map(e => e.id).join(", "));
+}
+
+console.log("\nTEST 4 — every piece of kit the library asks for can be declared");
+{
+  const declarable = new Set(onboardingIds.flatMap(id => [...resolveEquipment([id])]));
+  const tags = [...new Set(EXERCISES.flatMap(e => e.equipment || []))];
+  ok("4a. CONTROL: the library asks for a real range of kit", tags.length > 30, `${tags.length}`);
+  const missing = tags.filter(t => !declarable.has(t) && !(UNSATISFIABLE_TAGS || []).includes(t));
+  ok("4b. every tag is declarable in onboarding, or named as a known gap" +
+     (missing.length ? `  [${missing.join(", ")}]` : ""), missing.length === 0);
+  const stale = (UNSATISFIABLE_TAGS || []).filter(t => declarable.has(t));
+  ok("4c. and the known-gap list names nothing that can be declared" +
+     (stale.length ? `  [${stale.join(", ")}]` : ""), stale.length === 0,
+     "a gap list that is wrong is worse than none: it tells the next person not to look");
 }
 
 console.log(`\n  ${fails === 0 ? "ALL PASS" : fails + " RED"}\n`);
