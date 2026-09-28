@@ -1,6 +1,10 @@
 /**
  * gym-programme.js
- * 28 Sep 2026 v13
+ * 28 Sep 2026 v14
+ *
+ * v14 - F7 LANDMARK. role="main" (and its label) removed from the view's
+ *   wrapper: index.html's <main> is the one main landmark; a second,
+ *   nested inside it, is announced twice and fails landmark rules.
  *
  * v13 - Work list 7, SAVE-HANDOFF. A part-way save records which
  *   exercises were done, so the finish screen can still offer "Keep this
@@ -1190,7 +1194,7 @@ export function GymProgrammeView(router) {
 
   function renderNoSession(container, stats) {
     container.innerHTML = `
-      <div class="gp-no-session" role="main">
+      <div class="gp-no-session">
         <p class="gp-no-session__message">
           No session generated yet. Go back and complete your check-in.
         </p>

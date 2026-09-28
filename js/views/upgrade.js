@@ -1,6 +1,10 @@
 /**
  * upgrade.js - Upgrade / Membership view
- * 28 Sep 2026 v13
+ * 28 Sep 2026 v14
+ *
+ * v14 - F7 LANDMARK. role="main" (and its label) removed from the view's
+ *   wrapper: index.html's <main> is the one main landmark; a second,
+ *   nested inside it, is announced twice and fails landmark rules.
  *
  * v13 - SMOOTH-P5. The statements come from js/data/tier-table.js, the
  *   one table Free and the Plan are described by (spec 4.11): what the
@@ -265,7 +269,7 @@ export function render() {
   // way back, not a pitch they have already accepted.
   if (isPaid) {
     return `
-      <div class="view upgrade-view" role="main" aria-label="Your plan">
+      <div class="view upgrade-view">
         <div class="view-header">
           <button class="btn btn-ghost" data-action="upgrade-back" aria-label="Go back">
             &larr; Back
@@ -292,7 +296,7 @@ export function render() {
   }
 
   return `
-    <div class="view upgrade-view" role="main" aria-label="The Plan">
+    <div class="view upgrade-view">
 
       <div class="view-header">
         <button class="btn btn-ghost" data-action="upgrade-back" aria-label="Go back">

@@ -1,6 +1,10 @@
 /**
  * views/community-impact.js
- * 28 Sep 2026 v5
+ * 28 Sep 2026 v6
+ *
+ * v6 - F7 LANDMARK. role="main" (and its label) removed from the view's
+ *   wrapper: index.html's <main> is the one main landmark; a second,
+ *   nested inside it, is announced twice and fails landmark rules.
  *
  * v5 - F7. Mounts the way the router calls it (it crashed on open).
  *
@@ -121,7 +125,7 @@ function _render(container) {
   const completed = log.filter(e => e.status !== 'partial').length;
 
   container.innerHTML = `
-    <div class="view community-impact-view" role="main" aria-labelledby="ci-title">
+    <div class="view community-impact-view">
 
       <div class="workout-header">
         <button class="btn btn-ghost" id="ci-back-btn" aria-label="Go back">

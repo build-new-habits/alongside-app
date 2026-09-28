@@ -1,6 +1,10 @@
 /**
  * js/views/arc-setup.js
- * 03 Sep 2026 v1
+ * 28 Sep 2026 v2
+ *
+ * v2 - F7 LANDMARK. role="main" (and its label) removed from the view's
+ *   wrapper: index.html's <main> is the one main landmark; a second,
+ *   nested inside it, is announced twice and fails landmark rules.
  *
  * ARC-3-SETUP. The four questions that build an arc.
  *
@@ -60,7 +64,7 @@ export function ArcSetupView(router) {
 
   function render(container) {
     container.innerHTML = `
-      <div class="mc-view" role="main" aria-label="Setting up your arc">
+      <div class="mc-view">
         <div class="mc-header">
           <button class="btn btn-ghost" id="as-back-btn" aria-label="Back">&larr; Back</button>
           <span class="mc-header-title">Your arc</span>

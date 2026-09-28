@@ -1,7 +1,11 @@
 /**
  * views/practices.js - Guided Practices
  *
- * 18 Aug 2026 v1
+ * 28 Sep 2026 v2
+ *
+ * v2 - F7 LANDMARK. role="main" (and its label) removed from the view's
+ *   wrapper: index.html's <main> is the one main landmark; a second,
+ *   nested inside it, is announced twice and fails landmark rules.
  *
  * PRAC-1. The door for the 28 whole practices that no view referenced.
  *
@@ -159,7 +163,7 @@ export function PracticesView(router) {
 
   function shell(title, backLabel, body) {
     return `
-      <div class="view practices-view" role="main" aria-label="Practices">
+      <div class="view practices-view">
         <div class="practices-header">
           <button class="btn btn-ghost btn-small practices-back-btn"
                   id="practices-back-btn" aria-label="${esc(backLabel)}">

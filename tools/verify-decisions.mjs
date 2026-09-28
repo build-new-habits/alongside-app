@@ -1,5 +1,10 @@
 /**
  * tools/verify-decisions.mjs
+ * 28 Sep 2026 v3
+ *
+ * v3 - F7. workout-complete.js was never a route and is deleted; the
+ *   no-streaks check reads reflect.js, the finish screen people see.
+ *
  * 13 Aug 2026 v2
  *
  * v2 - A1. Two checks added after the 13 Aug persona trace found that
@@ -206,7 +211,7 @@ check("No delta, comparison or verdict language in the log", "Locked Principles 
 });
 
 check("No streaks anywhere in the app", "Locked Principles / founding rules", () => {
-  for (const f of ["js/views/today.js", "js/views/progress.js", "js/views/workout-complete.js"]) {
+  for (const f of ["js/views/today.js", "js/views/progress.js", "js/views/reflect.js"]) {   // v3: workout-complete.js deleted (dead, F7); reflect.js is the finish screen
     const s = read(f);
     ok(!/\bstreak\b/i.test(s), `${f} references a streak`);
   }

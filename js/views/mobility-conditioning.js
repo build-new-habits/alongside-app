@@ -1,7 +1,11 @@
 /**
  * mobility-conditioning.js - Mobility & Conditioning
  *
- * 03 Sep 2026 v5
+ * 28 Sep 2026 v6
+ *
+ * v6 - F7 LANDMARK. role="main" (and its label) removed from the view's
+ *   wrapper: index.html's <main> is the one main landmark; a second,
+ *   nested inside it, is announced twice and fails landmark rules.
  *
  * v5 - ARC-2. A Stretch arc card above the one-off Stretch card. The arc
  *   is the thing that spans weeks; the card below it is today.
@@ -76,7 +80,7 @@ export function MobilityConditioningView(router) {
     const tagged      = prescribed.filter(e => getEntryConditionIds(e).length > 0);
 
     container.innerHTML = `
-      <div class="mc-view" role="main" aria-label="Mobility and Conditioning">
+      <div class="mc-view">
         <div class="mc-header">
           <button class="btn btn-ghost" id="mc-back-btn" aria-label="Back to Home">&larr; Back</button>
           <span class="mc-header-title">Mobility &amp; Conditioning</span>

@@ -1,6 +1,11 @@
 /**
  * journal-entry.js
- * 28 Sep 2026 v5
+ * 28 Sep 2026 v6
+ *
+ * v6 - F7 LANDMARK. role="main" (and its label) removed from the view's
+ *   wrapper: index.html's <main> is the one main landmark; a second,
+ *   nested inside it, is announced twice and fails landmark rules.
+ *
  * v5 - SMOOTH-P4b. The privacy line is on the screen where people write:
  *   "Only you can read your journal. The coach never reads it." (spec
  *   4.9). It was true since v3 and said nowhere a person would see it.
@@ -141,7 +146,7 @@ export function JournalEntryView(router) {
     if (entryType) store.set('journalEntryType', null);
 
     container.innerHTML = `
-      <div class="journal-entry-view" role="main" aria-label="New journal entry">
+      <div class="journal-entry-view">
 
         <header class="je-header">
           <button class="je-back-btn btn btn-ghost"

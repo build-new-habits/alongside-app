@@ -1,6 +1,10 @@
 /**
  * weekly-plan.js
- * 05 Jul 2026 v3
+ * 28 Sep 2026 v4
+ *
+ * v4 - F7 LANDMARK. role="main" (and its label) removed from the view's
+ *   wrapper: index.html's <main> is the one main landmark; a second,
+ *   nested inside it, is announced twice and fails landmark rules.
  *
  * Weekly plan view. The user's declared week shape.
  *
@@ -167,7 +171,7 @@ export function WeeklyPlanView(router) {
     const plannedCount  = DAYS.filter(d => days[d]?.type === 'gym').length;
 
     container.innerHTML = `
-      <div class="weekly-plan-view" role="main" aria-label="Your weekly plan">
+      <div class="weekly-plan-view">
 
         <header class="wp-header">
           <h1 class="wp-title">My Week</h1>

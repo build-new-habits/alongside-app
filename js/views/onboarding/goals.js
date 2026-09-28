@@ -1,6 +1,10 @@
 /**
  * onboarding/goals.js
- * 28 Sep 2026 v3
+ * 28 Sep 2026 v4
+ *
+ * v4 - F7 LANDMARK. role="main" (and its label) removed from the view's
+ *   wrapper: index.html's <main> is the one main landmark; a second,
+ *   nested inside it, is announced twice and fails landmark rules.
  *
  * v3 - SMOOTH-P4c. The list comes from offeredGoals(): no "Tone up", and
  *   "Lose weight" only when weight tracking is on (spec 8).
@@ -44,7 +48,7 @@ export function GoalsView(router) {
     const hasSelection = selectedGoals.length > 0;
 
     container.innerHTML = `
-      <div class="onboarding-view" role="main" aria-label="Your goals">
+      <div class="onboarding-view">
 
         <header class="onboarding-header">
           <h1 class="onboarding-step-title">What are you working towards?</h1>

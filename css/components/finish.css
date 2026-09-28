@@ -1,0 +1,325 @@
+/* css/components/finish.css
+ * 28 Sep 2026 v1
+ *
+ * F7, CSS-ZERO. Every class a view renders has a rule, or is named in
+ * verify-css as a hook with its reason. These are the ones that were
+ * rendering as a draft: stacked cards touching, an unbulleted list,
+ * definition lists run together, a loading spinner that was never drawn,
+ * the prescribed week dots that were never drawn.
+ *
+ * Tokens only. Every text colour here sits on --color-bg or
+ * --color-bg-card and uses the text tokens already checked for 4.5:1.
+ */
+
+/* ── Stacked cards on the long reading screens ───────────────────────── */
+.privacy-view > .card + .card,
+.community-impact-view > .card + .card,
+.community-impact-view > .card + section,
+.community-impact-view > section + section,
+.annual-reflection-view .card + .card,
+.prescribed-view .card + .card {
+  margin-top: var(--space-4);
+}
+
+/* ── Privacy ─────────────────────────────────────────────────────────── */
+.privacy-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+}
+.privacy-header h1 { margin: 0; font-size: var(--text-2xl); }
+.privacy-back-btn { min-height: 44px; }
+.privacy-section p + p { margin-top: var(--space-3); }
+.privacy-heading {
+  font-size: var(--text-lg);
+  font-weight: var(--font-semibold);
+  margin: 0 0 var(--space-3);
+}
+.privacy-list {
+  list-style: disc;
+  padding-left: var(--space-5);
+  margin: 0;
+}
+.privacy-list li + li { margin-top: var(--space-2); }
+
+/* ── Your impact (community-impact.js) ───────────────────────────────── */
+.ci-total__heading,
+.ci-breakdown__heading,
+.ci-pillars__heading,
+.ci-howto__heading,
+.ci-commitment__heading,
+.ar-kinds__heading {
+  font-size: var(--text-lg);
+  font-weight: var(--font-semibold);
+  margin: 0 0 var(--space-3);
+}
+.ci-total { text-align: center; }
+.ci-total__number {
+  font-size: var(--text-4xl);
+  font-weight: var(--font-bold);
+  line-height: var(--leading-tight);
+  color: var(--color-primary);
+  margin: 0;
+}
+.ci-total__sub { color: var(--color-text-secondary); margin: var(--space-2) 0 0; }
+
+.ci-breakdown__list,
+.ar-figures__list { margin: 0; }
+.ci-breakdown__row,
+.ar-figures__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-4);
+  padding: var(--space-2) 0;
+}
+.ci-breakdown__row + .ci-breakdown__row,
+.ar-figures__row + .ar-figures__row { border-top: 1px solid var(--color-border-light); }
+.ci-breakdown__row dt,
+.ar-figures__row dt { color: var(--color-text-secondary); }
+.ci-breakdown__row dd,
+.ar-figures__row dd { margin: 0; font-weight: var(--font-semibold); text-align: right; }
+.ci-breakdown__row--total { border-top: 1px solid var(--color-border) !important; }
+.ci-breakdown__row--total dt,
+.ci-breakdown__row--total dd { color: var(--color-text); font-weight: var(--font-bold); }
+
+.ci-breakdown__note,
+.ci-commitment__note,
+.ar-sofar__note {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  margin: var(--space-3) 0 0;
+}
+.ci-pillars__intro { color: var(--color-text-secondary); margin: 0 0 var(--space-3); }
+.ci-pillar + .ci-pillar { margin-top: var(--space-3); }
+.ci-pillar__title {
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  margin: 0 0 var(--space-1);
+}
+.ci-pillar__body { margin: 0; color: var(--color-text-secondary); }
+.ci-howto p,
+.ci-commitment p { margin: 0 0 var(--space-3); }
+.ci-howto .btn { margin-top: var(--space-2); }
+
+/* ── Your year (annual-reflection.js) ────────────────────────────────── */
+.ar-sofar__line { font-size: var(--text-lg); margin: 0; }
+.ar-kinds p,
+.ar-close p { margin: 0; }
+
+/* ── Prescribed exercises (prescribed.js) ────────────────────────────── */
+.prescribed-view-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+  padding-right: var(--escape-hatch-gutter);
+}
+.prescribed-view-header h1 { margin: 0; font-size: var(--text-2xl); }
+.prescribed-back-top { min-height: 44px; }
+.prescribed-list-section { margin-top: var(--space-5); }
+.prescribed-list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+.prescribed-credits-badge {
+  font-size: var(--text-sm);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-primary);
+  color: var(--color-text);
+}
+.prescribed-exercise-list--done { margin-top: var(--space-4); opacity: 0.85; }
+.prescribed-exercise-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+.prescribed-exercise-name-wrap { display: flex; align-items: center; gap: var(--space-2); min-width: 0; }
+.prescribed-exercise-name { font-weight: var(--font-semibold); }
+.prescribed-done-tick { color: var(--color-success); font-weight: var(--font-bold); }
+/* Each exercise is a card (it was plain text on the page). */
+.prescribed-view .prescribed-exercise-card {
+  list-style: none;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  margin-top: 0;
+}
+.prescribed-view .prescribed-exercise-card--done { opacity: 0.75; }
+.prescribed-view .prescribed-exercise-list { padding: 0; }
+/* Remove was a 24px text button. 44px, and plainly a button. */
+.prescribed-view .prescribed-remove-btn {
+  min-height: 44px;
+  min-width: 44px;
+  flex-shrink: 0;
+  border: 1px solid var(--color-border);
+  font-size: var(--text-sm);
+  padding: var(--space-2) var(--space-3);
+}
+.prescribed-exercise-prescription,
+.prescribed-by,
+.prescribed-condition-tag { margin: var(--space-2) 0 0; }
+.prescribed-exercise-notes {
+  margin-top: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-left: 3px solid var(--color-primary);
+  background: var(--color-surface);
+  border-radius: var(--radius-sm);
+}
+.prescribed-notes-label { display: block; font-weight: var(--font-semibold); }
+.prescribed-exercise-history {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+.prescribed-empty-card { text-align: center; }
+
+/* The week dots: seven, filled for each day done. Never a streak --
+   the count of a week, not a run of days. */
+.week-dots { display: inline-flex; gap: 4px; }
+.week-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-text-muted);
+}
+.week-dot--filled { background: var(--color-primary); border-color: var(--color-primary); }
+
+/* The add form. .form-field, .form-label and .form-input live in
+   checkin.css; these are the pieces only this form uses. */
+.form-row { display: flex; gap: var(--space-3); }
+.form-field-half { flex: 1 1 0; min-width: 0; }
+.form-required { color: var(--color-danger); }
+.form-required-note { margin: var(--space-3) 0 0; }
+.form-textarea { min-height: 96px; resize: vertical; font-family: inherit; }
+@media (max-width: 360px) {
+  .form-row { flex-direction: column; gap: 0; }
+}
+
+/* ── The builder (session-builder-ui.js) ─────────────────────────────── */
+.sb-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+.sb-header-title { font-size: var(--text-xl); font-weight: var(--font-semibold); }
+.sb-exercise-list { display: flex; flex-direction: column; gap: var(--space-2); }
+.sb-section-label {
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+  margin: var(--space-2) 0 0;
+}
+.sb-exercise-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md);
+  text-align: left;
+  color: var(--color-text);
+}
+.sb-exercise-left { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.sb-exercise-name { font-weight: var(--font-medium); }
+.sb-exercise-meta { display: block; }
+.sb-equipment-label:has(.sb-equipment-check:focus-visible) {
+  outline: 3px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+/* The loading spinner was never drawn. With motion reduced it is a
+   still ring -- the words above it already say what is happening. */
+.sb-loading-spinner {
+  width: 32px;
+  height: 32px;
+  margin: var(--space-5) auto;
+  border-radius: var(--radius-full);
+  border: 3px solid var(--color-border);
+  border-top-color: var(--color-primary);
+  animation: sb-spin 0.9s linear infinite;
+}
+@keyframes sb-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .sb-loading-spinner { animation: none; }
+}
+
+/* ── Finish (reflect.js) ─────────────────────────────────────────────── */
+.reflect-mood-display {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+.reflect-mood-number {
+  font-size: var(--text-2xl);
+  font-weight: var(--font-bold);
+  color: var(--color-primary);
+  min-width: 2ch;
+}
+.reflect-mood-label { color: var(--color-text-secondary); }
+.reflect-invitation { margin: var(--space-4) 0 var(--space-2); }
+
+/* ── Small pieces ────────────────────────────────────────────────────── */
+.btn-sm {
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-sm);
+  min-height: 44px;
+}
+.settings-btn--destructive { color: var(--color-danger); }
+.settings-btn--destructive:hover,
+.settings-btn--destructive:focus-visible { background: var(--color-danger-light); }
+
+.settings-about-story p { margin: 0 0 var(--space-3); line-height: var(--leading-relaxed); }
+.settings-about-signoff {
+  font-style: italic;
+  font-weight: var(--font-semibold);
+  margin-bottom: var(--space-4) !important;
+}
+
+.my-programme-aim { font-size: var(--text-lg); font-weight: var(--font-semibold); margin: 0 0 var(--space-2); }
+.my-programme-marker { font-style: italic; color: var(--color-text-secondary); margin: var(--space-2) 0 0; }
+
+.mc-card__chev {
+  margin-left: auto;
+  font-size: var(--text-xl);
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+
+.section-label {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+  color: var(--color-text-secondary);
+  margin: var(--space-5) 0 var(--space-3);
+}
+
+.onboarding-step-sub { color: var(--color-text-secondary); margin: var(--space-2) 0 var(--space-4); }
+
+.gym-youtube-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-top: var(--space-2);
+  color: var(--color-primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.coach-voice { color: var(--color-primary); }
+
+.progress-programme__milestones { margin-top: var(--space-4); }

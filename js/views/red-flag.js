@@ -1,6 +1,10 @@
 /**
  * js/views/red-flag.js
- * 28 Sep 2026 v1
+ * 28 Sep 2026 v2
+ *
+ * v2 - F7 LANDMARK. role="main" (and its label) removed from the view's
+ *   wrapper: index.html's <main> is the one main landmark; a second,
+ *   nested inside it, is announced twice and fails landmark rules.
  *
  * RED-FLAG. The "before you start" safety screen and its stop. The
  * rules, the wording and the reasons are in js/data/red-flag.js; this
@@ -46,7 +50,7 @@ export function RedFlagView(router) {
 
   function renderAsk() {
     return `
-      <div class="view rf-view" role="main" aria-labelledby="rf-title">
+      <div class="view rf-view">
         <h1 class="rf-title" id="rf-title" tabindex="-1">Before you start</h1>
         <p class="rf-intro">${RED_FLAG_INTRO}</p>
         <form class="rf-form" novalidate>
@@ -96,7 +100,7 @@ export function RedFlagView(router) {
       ? `<a class="btn btn-primary btn-large btn-full rf-call" href="tel:999">Call 999</a>`
       : `<a class="btn btn-primary btn-large btn-full rf-call" href="tel:111">Call NHS 111</a>`;
     return `
-      <div class="view rf-view rf-view--stop" role="main" aria-labelledby="rf-title">
+      <div class="view rf-view rf-view--stop">
         <h1 class="rf-title" id="rf-title" tabindex="-1">${m.title}</h1>
         <p class="rf-body">${m.body}</p>
         ${call}

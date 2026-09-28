@@ -1,6 +1,11 @@
 /**
  * js/views/onboarding/plan-select.js
- * 22 Aug 2026 v2
+ * 28 Sep 2026 v3
+ *
+ * v3 - F7 LANDMARK. role="main" (and its label) removed from the view's
+ *   wrapper: index.html's <main> is the one main landmark; a second,
+ *   nested inside it, is announced twice and fails landmark rules.
+ *
  * CHOOSER-1. Option building and card markup moved to
  * js/data/plan-options.js so the post-onboarding chooser
  * (views/programme-select.js) presents the identical three options
@@ -70,7 +75,7 @@ export function PlanSelectView(router) {
     }
 
     container.innerHTML = `
-      <div class="onboarding-view" role="main">
+      <div class="onboarding-view">
 
         <div class="onboarding-header">
           <button class="btn btn-ghost" data-action="back"

@@ -1,6 +1,10 @@
 /**
  * js/views/onboarding/thread.js
- * 28 Sep 2026 v14
+ * 28 Sep 2026 v15
+ *
+ * v15 - F7 LANDMARK. role="main" (and its label) removed from the view's
+ *   wrapper: index.html's <main> is the one main landmark; a second,
+ *   nested inside it, is announced twice and fails landmark rules.
  *
  * v14 - F6, REDUCE-MOTION-ROW. Reduced motion is read from
  *   display-prefs.js prefersReducedMotion(): the device, or the new
@@ -277,7 +281,7 @@ export function ThreadView(router) {
       <header class="ob-header" aria-label="Alongside: Move">
         <span class="ob-header__wordmark">Alongside: Move</span>
       </header>
-      <div class="ob-thread" role="main" aria-label="Alongside onboarding">
+      <div class="ob-thread">
         <div class="ob-thread__scroll"
              id="ob-thread-scroll"
              aria-live="polite"

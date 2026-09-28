@@ -1,7 +1,11 @@
 /**
  * conditions-update.js - Conditions Update
  *
- * 04 Aug 2026 v7
+ * 28 Sep 2026 v8
+ *
+ * v8 - F7 LANDMARK. role="main" (and its label) removed from the view's
+ *   wrapper: index.html's <main> is the one main landmark; a second,
+ *   nested inside it, is announced twice and fails landmark rules.
  *
  * v7 — Updated for conditionProgrammes.js v3's multi-condition entries.
  *   "mine" filter (which exercises show on this condition's card) now
@@ -178,7 +182,7 @@ export function ConditionsUpdateView(router) {
     const foldIn       = store.get("conditionFoldInLevel");
 
     container.innerHTML = `
-      <div class="cu-view" role="main" aria-label="Conditions Update">
+      <div class="cu-view">
         <div class="cu-header">
           <button class="btn btn-ghost" data-action="back" aria-label="Back to Home">&larr; Back</button>
           <span class="cu-header-title">Conditions Update</span>

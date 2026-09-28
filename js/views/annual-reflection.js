@@ -1,6 +1,11 @@
 /**
  * views/annual-reflection.js
- * 28 Sep 2026 v3
+ * 28 Sep 2026 v4
+ *
+ * v4 - F7. What you did most names kinds in words, not type ids.
+ *   F7 LANDMARK. role="main" (and its label) removed from the view's
+ *   wrapper: index.html's <main> is the one main landmark; a second,
+ *   nested inside it, is announced twice and fails landmark rules.
  *
  * v3 - F7. Mounts the way the router calls it (it crashed on open).
  *
@@ -77,7 +82,7 @@ function _render(container) {
   const hasYear  = daysIn >= 365;
 
   container.innerHTML = `
-    <div class="view annual-reflection-view" role="main" aria-labelledby="ar-title">
+    <div class="view annual-reflection-view">
 
       <div class="workout-header">
         <button class="btn btn-ghost" id="ar-back-btn" aria-label="Go back">
@@ -153,6 +158,20 @@ function _renderNotYet(firstAt, daysIn) {
  * moved two hundred are both years, and this page is not the place that
  * decides which was better.
  */
+// The log stores a type id ("quiet-session"); people read words. F7:
+// the page said "workout (41)".
+const KIND_LABELS = {
+  workout: 'Sessions with the coach', freestyle: 'Made up as you went',
+  'prescribed-session': 'Prescribed exercises', 'quiet-session': 'Quiet sessions',
+  breathing: 'Breathing', walk: 'Walks', run: 'Runs', cycle: 'Rides',
+  swim: 'Swims', yoga: 'Yoga', stretch: 'Stretching', class: 'Classes',
+};
+function _kindLabel(k) {
+  if (KIND_LABELS[k]) return KIND_LABELS[k];
+  const w = String(k || 'other').replace(/[-_]+/g, ' ');
+  return w.charAt(0).toUpperCase() + w.slice(1);
+}
+
 function _renderYear(log, dates) {
   const yearAgo  = Date.now() - 365 * DAY;
   const inYear   = log.filter(e => {
@@ -169,7 +188,7 @@ function _renderYear(log, dates) {
   const topKinds = Object.entries(kinds)
     .sort((a, b) => b[1] - a[1])
     .slice(0, 3)
-    .map(([k, n]) => `${k} (${n})`);
+    .map(([k, n]) => `${_kindLabel(k)} (${n})`);
 
   const months = new Set(inYear.map(e =>
     new Date(e.completedAt || e.date).toISOString().slice(0, 7)));

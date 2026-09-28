@@ -1,5 +1,7 @@
 /* main.css
- * 28 Sep 2026 v27
+ * 28 Sep 2026 v28
+ *
+ * v28 - F7 CSS-ZERO. components/finish.css imported.
  *
  * v27 - SMOOTH-P3b. components/know-what.css imported.
  *
@@ -150,6 +152,7 @@
 @import 'components/class-player.css';
 @import 'components/club-rooms.css';   /* CLUB-SHELL, 06 Sep 2026 */
 @import 'components/capture.css';      /* CAPTURE-1,  16 Sep 2026 */
+@import 'components/finish.css';       /* F7 CSS-ZERO, 28 Sep 2026 */
 /* Content-gated — add when content sessions complete */
 /* D3:  @import 'components/home-threshold.css';       */
 /* D10: @import 'components/community-impact.css';     */

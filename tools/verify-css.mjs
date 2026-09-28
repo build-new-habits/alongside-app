@@ -1,5 +1,16 @@
 /**
  * tools/verify-css.mjs
+ * 28 Sep 2026 v3
+ *
+ * v3 - F7, CSS-ZERO. Budget 0. css/components/finish.css styles every
+ *   visual family that was rendering as a draft (privacy, Your impact,
+ *   Your year, prescribed, the builder's preview and spinner, finish,
+ *   and the singles). What remains unstyled is named below in HOOKS,
+ *   each with its reason: a view scope, a JS hook on an element already
+ *   styled by another class, or a wrapper/modifier that needs no rule.
+ *   A hook name that gains a rule, or stops being rendered, fails too,
+ *   so the list cannot rot.
+ *
  * 28 Sep 2026 v2
  *
  * v2 - Work list 11. Budget locked at 130 (it had fallen to 130 and the
@@ -57,10 +68,32 @@ for (const f of walk("css", ".css"))
   for (const m of strip(fs.readFileSync(_gatePath(f), "utf8")).matchAll(/\.([a-zA-Z][\w-]*)/g))
     defined.add(m[1]);
 
-const missing = [...used.keys()].filter(c => !defined.has(c)).sort();
+// Classes with no rule ON PURPOSE. Each reason says why none is needed.
+const SCOPE = "view scope: the wrapper is styled by .view / the page layout";
+const HOOK  = "JS hook: the element is styled by the class beside it (.card, .btn, .ci-slider)";
+const WRAP  = "wrapper or modifier: groups or marks state; its children carry the styling";
+const HOOKS = { "in-step-view": SCOPE,
+  "prescribed-session-view": SCOPE,
+  "programme-select-view": SCOPE, "saved-sessions-view": SCOPE, "sb-view": SCOPE,
+  "rf-view--stop": SCOPE, "reflect-view": SCOPE,
+  "bs-duration-btn": HOOK, "bs-type-card": HOOK, "cu-severity-slider": HOOK,
+  "is-movement-card": HOOK, "is-option-btn": HOOK, "mini-pain-slider": HOOK,
+  "ms-timer-btn": HOOK, "quiet-back-btn": HOOK, "sb-buildmode-btn": HOOK,
+  "sb-duration-btn": HOOK, "sb-type-tile": HOOK,
+  "today-header": WRAP, "progress-body": WRAP, "activity-log-form": WRAP,
+  "activity-log-picker": WRAP, "mc-programme-group": WRAP, "is-intro": WRAP,
+  "reflect-coach-card": WRAP, "checkin-coach-card": WRAP,
+  "gp-moment--glance": WRAP, "gp-moment--reflection": WRAP,
+  "home-arc--offer": WRAP, "today-arc--active": WRAP, "today-arc--offer": WRAP,
+  "noticing-section": WRAP, "onboarding-continue": WRAP, "reflect-mood-slider-block": WRAP,
+  "prescribed-add-section": WRAP,
+  "ar-figures": HOOK, "ar-sofar": HOOK, "ci-breakdown": HOOK, "ci-pillars": WRAP,
+};
 
-// Ratchet. Lower this as families are fixed; never raise it.
-const BUDGET = 130;   // 174 -> 157 (CSS-1, .ws-*) -> 131 (CSS-2, .cs-*/.gym-*) -> 130 (locked 28 Sep, work list 11)
+const missing = [...used.keys()].filter(c => !defined.has(c) && !HOOKS[c]).sort();
+
+// Ratchet. It reached 0 with F7; it stays there.
+const BUDGET = 0;   // 174 -> 157 (CSS-1) -> 131 (CSS-2) -> 130 (work list 11) -> 0 (F7 CSS-ZERO, 28 Sep)
 
 console.log(`\nclasses rendered by views: ${used.size}`);
 console.log(`classes defined in CSS:    ${defined.size}`);
@@ -81,6 +114,16 @@ if (missing.length > BUDGET) {
   console.log("  PASS  no new undefined classes");
 }
 
+// The hook list cannot rot: every name must still be rendered, and still
+// have no rule (a hook that gained a rule is a style, not a hook).
+const staleHooks = Object.keys(HOOKS).filter(c => !used.has(c) || defined.has(c));
+if (staleHooks.length) {
+  fails++;
+  console.log(`\n  FAIL  HOOKS entries that are no longer hooks (not rendered, or now styled): ${staleHooks.join(", ")}`);
+} else {
+  console.log(`  PASS  ${Object.keys(HOOKS).length} named hooks, each still rendered and each with its reason`);
+}
+
 // The families already fixed must stay fixed, whatever the budget says.
 const LOCKED = ["ws-type-grid", "ws-type-card", "ws-type-icon", "ws-type-label",
                 "ws-type-desc", "ws-duration-grid", "ws-duration-card",
@@ -95,7 +138,12 @@ const LOCKED = ["ws-type-grid", "ws-type-card", "ws-type-icon", "ws-type-label",
                 "cs-duration-card", "cs-duration-label", "cs-duration-desc",
                 "cs-duration-count", "gym-exercise-card", "gym-exercise-name",
                 "gym-exercises-list", "gym-card-meta-row", "gym-card-chevron",
-                "workout-header-title", "exercise-cue", "yoga-session-view"];
+                "workout-header-title", "exercise-cue", "yoga-session-view",
+                // F7. The ones people would notice first.
+                "privacy-list", "ci-breakdown__row", "ci-total__number",
+                "ar-figures__row", "prescribed-remove-btn", "week-dot",
+                "sb-loading-spinner", "sb-exercise-item", "reflect-mood-number",
+                "btn-sm", "settings-btn--destructive"];
 const regressed = LOCKED.filter(c => !defined.has(c));
 if (regressed.length) {
   fails++;

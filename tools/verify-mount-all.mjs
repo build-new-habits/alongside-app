@@ -1,5 +1,13 @@
 /**
  * tools/verify-mount-all.mjs
+ * 28 Sep 2026 v2
+ *
+ * v2 - F7 LANDMARK. 30 views put role="main" on their wrapper, inside
+ *   index.html's <main>: two main landmarks on every screen, the second
+ *   nested. Every mounted route is now also required to add no main
+ *   landmark of its own. And Your year says "Sessions with the coach",
+ *   not "workout (5)".
+ *
  * 28 Sep 2026 v1
  *
  * F7 found it: "Where the five percent goes" and "Your year" crashed the
@@ -80,7 +88,7 @@ console.error = (...a) => { const t = a.map(String).join(" "); if (/failed to mo
 
 console.log(`\nMounting ${ROUTES.length} registered routes the way the router does\n`);
 ok("0. the registry was read", ROUTES.length > 50 && ROUTES.includes("community-impact"));
-const broken = [];
+const broken = []; const extraMain = [];
 for (const r of ROUTES) {
   if (SKIP[r]) continue;
   fixture(); recovered = null; main.innerHTML = "";
@@ -89,9 +97,17 @@ for (const r of ROUTES) {
   const text = (main.textContent || "").replace(/\s+/g, " ").trim();
   const fellOver = !!recovered || /Something went wrong loading this page/.test(text);
   if (fellOver) broken.push(`${r}: ${recovered || text.slice(0, 80)}`);
+  if (main.querySelector('[role="main"], main')) extraMain.push(r);
 }
 console.error = origConsoleError;
 ok("1. every registered screen mounts without falling to the recovery screen", broken.length === 0, broken.join("\n        "));
+ok("3. no screen adds a second main landmark inside the page's <main>", extraMain.length === 0, extraMain.join(", "));
+ok("4. Your year names what you did in words, not type ids",
+   await (async () => {
+     fixture(); main.innerHTML = ""; await router._mountView("annual-reflection");
+     const t = (main.querySelector(".ar-kinds")?.textContent || "").replace(/\s+/g, " ");
+     return /Sessions with the coach \(5\)/.test(t) && !/\bworkout \(/.test(t);
+   })());
 ok("2. REVERSAL-style fixture reach: the two that crashed now show their own headings",
    await (async () => {
      fixture(); main.innerHTML = ""; await router._mountView("community-impact");

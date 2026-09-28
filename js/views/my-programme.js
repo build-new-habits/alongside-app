@@ -1,7 +1,11 @@
 /**
  * my-programme.js - My Programme
  *
- * 22 Aug 2026 v8
+ * 28 Sep 2026 v9
+ *
+ * v9 - F7 LANDMARK. role="main" (and its label) removed from the view's
+ *   wrapper: index.html's <main> is the one main landmark; a second,
+ *   nested inside it, is announced twice and fails landmark rules.
  *
  * v8 - WEIGHT-1b. A weight target, when the person has turned tracking
  *   on. Only then, and never otherwise.
@@ -208,7 +212,7 @@ export function MyProgrammeView(router) {
     ].filter(Boolean);
 
     container.innerHTML = `
-      <div class="my-programme-view" role="main" aria-label="My Programme">
+      <div class="my-programme-view">
 
         <header class="my-programme-header">
           <h1 class="my-programme-title">My Programme</h1>

@@ -1,6 +1,10 @@
 /**
  * today.js
- * 28 Sep 2026 v44
+ * 28 Sep 2026 v45
+ *
+ * v45 - F7 LANDMARK. role="main" (and its label) removed from the view's
+ *   wrapper: index.html's <main> is the one main landmark; a second,
+ *   nested inside it, is announced twice and fails landmark rules.
  *
  * v44 - F1, FREESTYLE-RELOAD. The Carry-on card also offers a "Make it up
  *   as I go" session waiting in the active-session slot: what is done so
@@ -1113,7 +1117,7 @@ export function TodayView(router) {
       : _buildCoachLine();
 
     container.innerHTML = `
-      <div class="today-view" role="main" aria-label="Today">
+      <div class="today-view">
 
         <header class="today-header">
           <h1 class="today-greeting">${_esc(greeting)}</h1>

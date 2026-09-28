@@ -1,6 +1,10 @@
 /**
  * settings.js
- * 28 Sep 2026 v40
+ * 28 Sep 2026 v41
+ *
+ * v41 - F7 LANDMARK. role="main" (and its label) removed from the view's
+ *   wrapper: index.html's <main> is the one main landmark; a second,
+ *   nested inside it, is announced twice and fails landmark rules.
  *
  * v40 - F6, REDUCE-MOTION-ROW. Display › Reduce motion: off follows the
  *   device (as the app always has), on reduces motion here too.
@@ -583,7 +587,7 @@ export function SettingsView(router) {
   function render(container) {
     const screen = activeScreen && SCREENS[activeScreen] ? SCREENS[activeScreen] : null;
     container.innerHTML = `
-      <div class="settings-view" role="main" aria-label="Settings">
+      <div class="settings-view">
         ${screen ? `
           <div class="settings-section-header">
             <button class="btn btn-ghost" id="settings-back-btn" aria-label="Back to Settings">&larr; Settings</button>

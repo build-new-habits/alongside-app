@@ -1,6 +1,10 @@
 /**
  * progress.js
- * 28 Sep 2026 v17
+ * 28 Sep 2026 v18
+ *
+ * v18 - F7 LANDMARK. role="main" (and its label) removed from the view's
+ *   wrapper: index.html's <main> is the one main landmark; a second,
+ *   nested inside it, is announced twice and fails landmark rules.
  *
  * v17 - Work list 9, found by pressing every control. Share your
  *   progress: when copying is not allowed, the fallback was a browser
@@ -335,7 +339,7 @@ export function ProgressView(router) {
     const stats = getProgressStats();
 
     container.innerHTML = `
-      <div class="progress-view" role="main" aria-label="Your progress">
+      <div class="progress-view">
 
         <header class="progress-header">
           <h1 class="progress-title">Progress</h1>

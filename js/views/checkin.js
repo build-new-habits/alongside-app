@@ -1,6 +1,10 @@
 /**
  * js/views/checkin.js
- * 28 Sep 2026 v21
+ * 28 Sep 2026 v22
+ *
+ * v22 - F7 LANDMARK. role="main" (and its label) removed from the view's
+ *   wrapper: index.html's <main> is the one main landmark; a second,
+ *   nested inside it, is announced twice and fails landmark rules.
  *
  * v21 - F6, REDUCE-MOTION-ROW. Reduced motion is read from
  *   display-prefs.js prefersReducedMotion(): the device, or the new
@@ -407,8 +411,6 @@ export function CheckinView(router) {
       <div class="ci-view">
         <div class="ci-thread"
              id="ci-thread"
-             role="main"
-             aria-label="Daily check-in"
              aria-live="polite"
              aria-atomic="false"
              aria-relevant="additions">

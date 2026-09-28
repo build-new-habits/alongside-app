@@ -1,6 +1,10 @@
 /**
  * js/views/onboarding/frequency.js
- * 26 Jun 2026 v1
+ * 28 Sep 2026 v2
+ *
+ * v2 - F7 LANDMARK. role="main" (and its label) removed from the view's
+ *   wrapper: index.html's <main> is the one main landmark; a second,
+ *   nested inside it, is announced twice and fails landmark rules.
  *
  * Onboarding — weekly frequency selection.
  * Inserted between equipment.js and plan-select.js.
@@ -39,7 +43,7 @@ export function FrequencyView(router) {
 
   function render(container) {
     container.innerHTML = `
-      <div class="onboarding-view" role="main">
+      <div class="onboarding-view">
 
         <div class="onboarding-header">
           <button class="btn btn-ghost" data-action="back"

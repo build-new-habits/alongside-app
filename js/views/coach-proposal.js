@@ -1,6 +1,10 @@
 /**
  * coach-proposal.js
- * 28 Sep 2026 v33
+ * 28 Sep 2026 v34
+ *
+ * v34 - F7 LANDMARK. role="main" (and its label) removed from the view's
+ *   wrapper: index.html's <main> is the one main landmark; a second,
+ *   nested inside it, is announced twice and fails landmark rules.
  *
  * v33 - FEELINGS-RETIRE. No longer reads lastCheckin.feelingWord (the word
  *   question went in SMOOTH-P1; nothing here used the value anyway).
@@ -927,7 +931,7 @@ export function CoachProposalView(router) {
     // nothing to propose until Rest or Adapt is actively chosen.
     if (severeChoicePending) {
       container.innerHTML = `
-        <div class="cp-view" role="main" aria-label="Severe pain — choose how to proceed">
+        <div class="cp-view">
           <div class="cp-coach-block" aria-live="polite">
             <div class="cp-greeting">${_buildSevereChoiceLine(severeChoicePending)}</div>
           </div>
@@ -942,7 +946,7 @@ export function CoachProposalView(router) {
     // No session doors; gentle alternatives only.
     if (severeChoiceResolved === 'rest') {
       container.innerHTML = `
-        <div class="cp-view" role="main" aria-label="Today is a rest day">
+        <div class="cp-view">
           <div class="cp-coach-block" aria-live="polite">
             <div class="cp-greeting">${_buildRestDayLine()}</div>
           </div>
@@ -954,7 +958,7 @@ export function CoachProposalView(router) {
     }
 
     container.innerHTML = `
-      <div class="cp-view" role="main" aria-label="Your coaching proposal for today">
+      <div class="cp-view">
 
         <!-- Re-entry banner (illness/long gap) -->
         ${reEntryCtx && !reEntryCtx.contextCaptured ? renderReturnDoor() : ''}

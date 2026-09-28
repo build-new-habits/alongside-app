@@ -1,7 +1,11 @@
 /**
  * js/views/session-builder-ui.js - Session Builder UI
  *
- * 28 Sep 2026 v23
+ * 28 Sep 2026 v24
+ *
+ * v24 - F7 LANDMARK. role="main" (and its label) removed from the view's
+ *   wrapper: index.html's <main> is the one main landmark; a second,
+ *   nested inside it, is announced twice and fails landmark rules.
  *
  * v23 - F2, QUICK-SCAFFOLD-ORPHAN. The quick scaffold is removed: its
  *   only entry was Home's Quick build room, which left in SMOOTH-P3a, so
@@ -964,7 +968,7 @@ function renderZonePicker() {
     .map(id => (zones.find(z => z.id === id) || {}).label)
     .filter(Boolean);
   return `
-    <div class="sb-view" role="main">
+    <div class="sb-view">
       <div class="sb-header">
         <button class="btn btn-ghost" id="sb-back-btn" aria-label="Go back">&larr; Back</button>
         <span class="sb-header-title">Stretch</span>

@@ -1,6 +1,10 @@
 /**
  * js/views/stretch-arc.js
- * 03 Sep 2026 v2
+ * 28 Sep 2026 v3
+ *
+ * v3 - F7 LANDMARK. role="main" (and its label) removed from the view's
+ *   wrapper: index.html's <main> is the one main landmark; a second,
+ *   nested inside it, is announced twice and fails landmark rules.
  *
  * v2 - ARC-3-SETUP. Start routes to the four questions when no aim has
  *   been set. Shows the aim and strands once one has.
@@ -79,7 +83,7 @@ export function StretchArcView(router) {
     const notYet   = available.filter(id => !worked[id]);
 
     container.innerHTML = `
-      <div class="mc-view" role="main" aria-label="Stretch arc">
+      <div class="mc-view">
         <div class="mc-header">
           <button class="btn btn-ghost" id="sa-back-btn" aria-label="Back">&larr; Back</button>
           <span class="mc-header-title">Stretch arc</span>

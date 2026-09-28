@@ -1,6 +1,10 @@
 /**
  * js/views/programme-select.js
- * 22 Aug 2026 v1
+ * 28 Sep 2026 v2
+ *
+ * v2 - F7 LANDMARK. role="main" (and its label) removed from the view's
+ *   wrapper: index.html's <main> is the one main landmark; a second,
+ *   nested inside it, is announced twice and fails landmark rules.
  *
  * CHOOSER-1. Choosing a programme AFTER onboarding.
  *
@@ -85,7 +89,7 @@ export function ProgrammeSelectView(router) {
       // Nothing matched. Say so plainly and let the person leave --
       // never strand them on an empty screen.
       container.innerHTML = `
-        <div class="view" role="main">
+        <div class="view">
           <h1 tabindex="-1" id="chooser-heading">Choosing what is next</h1>
           <p>I could not put together options just now. Your current plan is unchanged.</p>
           <button class="btn btn-primary btn-large btn-full" data-action="back">
@@ -100,7 +104,7 @@ export function ProgrammeSelectView(router) {
     }
 
     container.innerHTML = `
-      <div class="view programme-select-view" role="main" aria-label="Choose your next programme">
+      <div class="view programme-select-view">
 
         <div class="view-header">
           <button class="btn btn-ghost" data-action="back"
