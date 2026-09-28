@@ -1,4 +1,8 @@
 /* main.css
+ * 28 Sep 2026 v26
+ *
+ * v26 - RED-FLAG. components/red-flag.css imported.
+ *
  * 22 Aug 2026 v24
  *   THREAD-1a. layouts/goal-review.css -- the hard conversation's own
  *   screen. Two rules; everything inside the thread reuses onboarding's
@@ -136,6 +140,7 @@
 @import 'components/upgrade-door.css';
 @import 'components/upgrade-page.css';
 @import 'components/practices.css';
+@import 'components/red-flag.css';
 /* PLAYER-1, 08 Sep 2026. The guided class player. A component file not
    imported here is dead on arrival, per this file's own note. */
 @import 'components/class-list.css';

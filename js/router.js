@@ -1,6 +1,15 @@
 /**
  * router.js
- * 28 Sep 2026 v30
+ * 28 Sep 2026 v31
+ *
+ * v31 - RED-FLAG. One guard, here, before any exercise route mounts: if
+ *   the red-flag screen is due, or an answer stopped exercise and it has
+ *   not been cleared, the person goes to 'red-flag' first and on to where
+ *   they were going afterwards. Here rather than in fourteen session
+ *   views for the reason GATE-ONCE gave: one place to check beats
+ *   fourteen places to remember. Lazily imported like the gate. A guard
+ *   that throws does NOT block the navigation -- except that it logs, and
+ *   the screen's own gate proves it runs.
  *
  * v30 - GATE-ONCE. Reaching a hub screen (Home, Progress, Wellbeing,
  *   Settings, Library) ends the safety note's session, so the next
@@ -355,6 +364,8 @@ const VIEW_NAMES = {
   'prescribed':         { path: './views/prescribed.js',        fn: 'PrescribedView'        },
   'prescribed-session': { path: './views/prescribed-session.js',fn: 'PrescribedSessionView' },
   'practices':          { path: './views/practices.js',        fn: 'PracticesView'         },
+  // RED-FLAG, 28 Sep 2026. Reached only through the guard in navigate().
+  'red-flag':           { path: './views/red-flag.js',         fn: 'RedFlagView'           },
 };
 
 const hideNavViews = new Set([
@@ -373,11 +384,13 @@ const hideNavViews = new Set([
   // PRAC-1. A practice is read start to finish; the nav bar is one
   // more thing on the screen while somebody is trying to settle.
   'practices',
+  // RED-FLAG. Nothing else on the screen while this is read.
+  'red-flag',
 ]);
 
 const NAV_MAP = {
   'today': 'today', 'checkin': 'today', 'checkin-mini': 'today',
-  'coach-proposal': 'today',
+  'coach-proposal': 'today', 'red-flag': 'today',
   'home-threshold': 'today', 'reflect': 'today',
   'workout': 'today', 'gym-programme': 'today', 'morning-session': 'today',
   'core-session': 'today', 'yoga-session': 'today', 'walk-session': 'today',
@@ -435,6 +448,16 @@ export const router = {
     if (!VIEW_NAMES[viewName]) {
       console.warn(`Router: unknown view "${viewName}" — falling back to today`);
       viewName = 'today';
+    }
+
+    // RED-FLAG, 28 Sep 2026. Before exercise, the screen if it is due,
+    // and the stop if one is unresolved. See js/data/red-flag.js.
+    try {
+      if (!this._rf) this._rf = await import('./data/red-flag.js');
+      const to = this._rf.guardRoute(viewName);
+      if (to) viewName = to;
+    } catch (err) {
+      console.error('Router: red-flag guard failed', err);
     }
 
     // BACK-STACK, 31 Aug 2026. `fromBack` marks a navigation that is

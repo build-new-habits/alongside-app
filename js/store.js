@@ -2,7 +2,21 @@ import { zonesForAreas } from "./data/aims.js";
 
 /**
  * store.js - Data persistence layer
- * 16 Sep 2026 v74
+ * 28 Sep 2026 v75
+ *
+ * v75 - RED-FLAG. redFlag: the red-flag screen's record. One object,
+ *   not a log -- it holds the latest screen and, when an answer stopped
+ *   exercise, the stop and whether it has been cleared.
+ *
+ *     { screenedAt, areas, textVersion, level, flaggedAt, clearedAt }
+ *
+ *   level is null (nothing flagged), "emergency" (question 1: A&E / 999)
+ *   or "advice" (any other yes, or any "not sure": stop, call NHS 111).
+ *   areas is the pain areas the screen covered, so a NEW area asks again.
+ *   textVersion, like safetyAckLog's, establishes WHAT was asked. The
+ *   answers themselves are not kept: the level is what the app acts on,
+ *   and bladder or bowel answers are more than the product needs to hold.
+ *   Malformed values are discarded on rehydrate.
  *
  * v74 - AROUND-AREA. todayForm: the form answered, before translation.
  *   "Build strength around it" and "strength" both become a session
@@ -1304,6 +1318,18 @@ export const store = {
       // is worse than an empty one, because an empty one is honest.
       safetyAckLog: Array.isArray(saved.safetyAckLog) ? saved.safetyAckLog : [],
 
+      // RED-FLAG. An object with the six known keys, or the default.
+      redFlag: (saved.redFlag && typeof saved.redFlag === 'object' && !Array.isArray(saved.redFlag))
+        ? {
+            screenedAt:  typeof saved.redFlag.screenedAt  === 'string' ? saved.redFlag.screenedAt  : null,
+            areas:       Array.isArray(saved.redFlag.areas) ? saved.redFlag.areas.filter(a => typeof a === 'string') : [],
+            textVersion: typeof saved.redFlag.textVersion === 'string' ? saved.redFlag.textVersion : null,
+            level:       ['emergency', 'advice'].includes(saved.redFlag.level) ? saved.redFlag.level : null,
+            flaggedAt:   typeof saved.redFlag.flaggedAt   === 'string' ? saved.redFlag.flaggedAt   : null,
+            clearedAt:   typeof saved.redFlag.clearedAt   === 'string' ? saved.redFlag.clearedAt   : null,
+          }
+        : { screenedAt: null, areas: [], textVersion: null, level: null, flaggedAt: null, clearedAt: null },
+
       // PLAYER-1. Defaulted on rehydrate like every other nested object.
       activeClass: saved.activeClass || {
         id: null, lighter: false, sectionIndex: 0, beatIndex: 0, startedAt: null
@@ -2284,6 +2310,9 @@ export const store = {
       // the wording acknowledged is "I have read this" and never
       // "I accept the risk". See safety-gate.js.
       safetyAckLog: [],
+
+      // RED-FLAG, 28 Sep 2026. See js/data/red-flag.js and the v75 note.
+      redFlag: { screenedAt: null, areas: [], textVersion: null, level: null, flaggedAt: null, clearedAt: null },
 
       // ── GUIDED CLASS ──────────────────────────────────────────
       // PLAYER-1, 08 Sep 2026. The only state a class in progress
