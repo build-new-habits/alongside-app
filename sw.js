@@ -1,7 +1,12 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 28 Sep 2026 v552
+ * 28 Sep 2026 v553
+ *
+ * v553 - SMOOTH-P4b. No new files. Changed: views/noticing.js,
+ *   views/breathing-session.js, views/journal-entry.js,
+ *   components/noticing.css, components/journal-entry.css. Wellbeing
+ *   suggests one practice. New gate: verify-wellbeing-suggest. 186 gates.
  *
  * v552 - SMOOTH-P4a. NEW FILE precached: js/data/arc-readback.js.
  *   Changed: views/progress.js, layouts/progress.css, views/today.js.
@@ -3962,7 +3967,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v552";
+const CACHE_NAME = "alongside-v553";
 
 const SHELL_URLS = [
 
