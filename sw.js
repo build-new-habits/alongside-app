@@ -1,7 +1,13 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 28 Sep 2026 v543
+ * 28 Sep 2026 v544
+ *
+ * v544 - SMOOTH-P2b (builder). session-builder.js, views/coach-proposal.js.
+ *
+ *   Strength moves say sets and reps (3 x 10 by default), the plan fills
+ *   the time asked for, and a gym session leads with weights and
+ *   machines. New gate: tools/verify-plan-dose.mjs. 176 gates.
  *
  * v543 - SMOOTH-P2a. views/coach-proposal.js, exercise-timing.js,
  *   css/components/coach-proposal.css.
@@ -3906,7 +3912,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v543";
+const CACHE_NAME = "alongside-v544";
 
 const SHELL_URLS = [
 
