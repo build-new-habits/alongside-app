@@ -1,7 +1,12 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 28 Sep 2026 v554
+ * 28 Sep 2026 v555
+ *
+ * v555 - SMOOTH-P5. NEW FILE precached: js/data/tier-table.js. Changed:
+ *   views/upgrade.js, views/settings.js, components/settings.css,
+ *   components/upgrade-page.css. One table for Free and the Plan.
+ *   187 gates.
  *
  * v554 - SMOOTH-P4c. No new files. Changed: views/settings.js, store.js,
  *   data/goals.js, views/onboarding/goals.js, views/privacy.js,
@@ -3972,7 +3977,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v554";
+const CACHE_NAME = "alongside-v555";
 
 const SHELL_URLS = [
 
@@ -4124,6 +4129,7 @@ const SHELL_URLS = [
   "/alongside-app/js/views/practices.js",
   "/alongside-app/js/views/red-flag.js",
   "/alongside-app/js/data/arc-readback.js",
+  "/alongside-app/js/data/tier-table.js",
   "/alongside-app/js/views/know-what.js",
   "/alongside-app/js/data/red-flag.js",
   "/alongside-app/js/views/my-programme.js",
