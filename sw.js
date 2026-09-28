@@ -1,7 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 28 Sep 2026 v565
+ * 28 Sep 2026 v566
+ *
+ * v566 - F8 CLASS-8. New: data/classes/class-putting-down-008.js,
+ *   class-getting-going-009.js, class-from-the-feet-010.js. Changed:
+ *   classes/index.js, router.js, safety-gate.js, finish.css. 196 gates.
  *
  * v565 - F7 CSS-ZERO + LANDMARK. New: css/components/finish.css.
  *   Removed: views/workout-complete.js (never a route). Changed: main.css
@@ -4016,7 +4020,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v565";
+const CACHE_NAME = "alongside-v566";
 
 const SHELL_URLS = [
 
@@ -4183,6 +4187,9 @@ const SHELL_URLS = [
   "/alongside-app/js/data/classes/class-standing-up-005.js",
   "/alongside-app/js/data/classes/class-out-006.js",
   "/alongside-app/js/data/classes/class-unsticking-007.js",
+  "/alongside-app/js/data/classes/class-putting-down-008.js",
+  "/alongside-app/js/data/classes/class-getting-going-009.js",
+  "/alongside-app/js/data/classes/class-from-the-feet-010.js",
   "/alongside-app/js/views/class-player.js",
   "/alongside-app/js/views/class-list.js",
   "/alongside-app/css/components/class-list.css",
