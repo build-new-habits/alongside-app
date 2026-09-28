@@ -1,7 +1,12 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 28 Sep 2026 v553
+ * 28 Sep 2026 v554
+ *
+ * v554 - SMOOTH-P4c. No new files. Changed: views/settings.js, store.js,
+ *   data/goals.js, views/onboarding/goals.js, views/privacy.js,
+ *   data/field-contract.js, components/settings.css. Settings on one
+ *   page. New gate: verify-settings-inventory. 187 gates.
  *
  * v553 - SMOOTH-P4b. No new files. Changed: views/noticing.js,
  *   views/breathing-session.js, views/journal-entry.js,
@@ -3967,7 +3972,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v553";
+const CACHE_NAME = "alongside-v554";
 
 const SHELL_URLS = [
 
