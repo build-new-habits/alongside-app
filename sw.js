@@ -1,7 +1,13 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 28 Sep 2026 v549
+ * 28 Sep 2026 v550
+ *
+ * v550 - SMOOTH-P3a + P3b. NEW FILES precached: js/views/know-what.js,
+ *   css/components/know-what.css. Changed: today.js, workout.js,
+ *   router.js, coach-proposal.js, saved-sessions.js, store.js, today.css,
+ *   main.css. Plan Home is three doors; Carry on later; I know what I
+ *   want. New gates: verify-home-plan, verify-know-what. 182 gates.
  *
  * v549 - RED-FLAG. NEW FILES precached: js/data/red-flag.js,
  *   js/views/red-flag.js, css/components/red-flag.css. Changed: store.js,
@@ -3946,7 +3952,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v549";
+const CACHE_NAME = "alongside-v550";
 
 const SHELL_URLS = [
 
@@ -3976,6 +3982,7 @@ const SHELL_URLS = [
   "/alongside-app/css/components/journal-entry.css",
   "/alongside-app/css/components/reflect.css",
   "/alongside-app/css/components/red-flag.css",
+  "/alongside-app/css/components/know-what.css",
   "/alongside-app/css/components/nav-fix.css",
   "/alongside-app/css/components/onboarding-thread.css",
   "/alongside-app/css/components/sheet-manager.css",
@@ -4096,6 +4103,7 @@ const SHELL_URLS = [
   "/alongside-app/js/views/library.js",
   "/alongside-app/js/views/practices.js",
   "/alongside-app/js/views/red-flag.js",
+  "/alongside-app/js/views/know-what.js",
   "/alongside-app/js/data/red-flag.js",
   "/alongside-app/js/views/my-programme.js",
   "/alongside-app/js/session-builder.js",
