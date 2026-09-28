@@ -1,7 +1,17 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 28 Sep 2026 v541
+ * 28 Sep 2026 v542
+ *
+ * v542 - SMOOTH-P1. views/checkin.js, views/settings.js, data/pacing.js,
+ *   css/components/checkin-conversation.css.
+ *
+ *   The check-in is three questions, one tap each: energy, mood,
+ *   anything sore. Answered inline, nothing preset, sleep optional. A sore
+ *   area asks how bad and the coach says the safety line. The third answer
+ *   goes straight on to the plan.
+ *
+ *   New gate: tools/verify-checkin-three.mjs. Two retired. 174 gates.
  *
  * v541 - SMOOTH-P0. safety-gate.js, router.js, views/checkin.js,
  *   views/breathing-session.js, views/quiet-session.js, views/noticing.js,
@@ -3887,7 +3897,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v541";
+const CACHE_NAME = "alongside-v542";
 
 const SHELL_URLS = [
 
