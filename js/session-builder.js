@@ -1,7 +1,12 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
- * 28 Sep 2026 v53
+ * 28 Sep 2026 v54
+ *
+ * v54 - GYM-KIT is off on a gentle day. It narrowed the main pool to
+ *   loaded moves before ENERGY-1's low-energy weighting ran, so a low day
+ *   could ask MORE energy than an ordinary one (verify-energy1 2b, 7 of
+ *   16 loaded runs). Found while widening two sampled gates, 28 Sep.
  *
  * v53 - SMOOTH-P2b. PLAN-DOSE and GYM-KIT. The plan says how much, fills
  *   the time asked for, and a gym gets gym moves.
@@ -3823,7 +3828,14 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
         // band face pull can turn up at a gym (spec 4.3: "bands remain
         // possible") -- the MIN_CHOICE lesson again, a preference that
         // never yields becomes a rule.
-        if (section === "main" && GYM_SESSION_TYPES.has(sessionType) && Math.random() < GYM_KIT_PREFERENCE) {
+        //
+        // NOT ON A GENTLE DAY. Narrowing to loaded moves narrows away the
+        // low-energy ones, so ENERGY-1's preference had nothing to choose
+        // from: verify-energy1 2b measured a low day asking MORE energy
+        // than an ordinary one in 7 of 16 runs after v544. A gentle day
+        // keeps ENERGY-1's pool.
+        if (section === "main" && GYM_SESSION_TYPES.has(sessionType) &&
+            _sessionIntensity() !== "low" && Math.random() < GYM_KIT_PREFERENCE) {
           const withLoad = pool.filter(_usesLoad);
           if (withLoad.length >= MIN_CHOICE) candidates = withLoad;
         }

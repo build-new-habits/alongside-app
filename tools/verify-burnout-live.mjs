@@ -1,6 +1,10 @@
 /**
  * tools/verify-burnout-live.mjs
- * 16 Sep 2026 v1
+ * 28 Sep 2026 v2
+ *
+ * v2 - N 25 -> 80. Failed once in a fresh-clone run after v544 (the
+ *   top-up widened session sizes); the thresholds are unchanged. More
+ *   builds, not a lower bar.
  *
  * BURNOUT-LIVE. Work list item 2a.
  *
@@ -40,7 +44,7 @@ const { store } = await import(B + "store.js");
 const { buildSession, equipmentForLocation } = await import(B + "session-builder.js");
 const { detectBurnout } = await import(B + "data/checkin.js");
 
-const N = 25;
+const N = 80;
 const day = n => new Date(Date.now() - n * 86400000).toISOString().split("T")[0];
 
 function reset(history, today) {
