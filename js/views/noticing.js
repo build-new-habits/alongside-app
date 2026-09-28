@@ -1,6 +1,20 @@
 /**
  * js/views/noticing.js - Wellbeing Hub Landing View
  *
+ * 28 Sep 2026 v7 - SMOOTH-P4b. Spec 4.9.
+ *   The heading says Wellbeing. One coach line, read from TODAY'S CHECK-IN
+ *   ONLY, and a "Suggested now" card: one breathing practice, a length,
+ *   and Start -- which begins it in one tap. Then This week's question
+ *   and Anytime as before; the Journal tile says what it is ("Write
+ *   anything. Only you can read it.").
+ *
+ *   ⚫ THE SUGGESTION NEVER READS THE JOURNAL. suggestNow() takes the
+ *   check-in as its only argument and is exported so a gate can prove it:
+ *   the Journal Privacy Rule (Appendix D) -- no analysis, no monitoring,
+ *   no exceptions -- applies to the coach choosing a practice as much as
+ *   to anything else. Nothing here reads journal TEXT; the count of
+ *   entries under "Your reflections" is unchanged.
+ *
  * 28 Sep 2026 v6 - C4 (Smooth Path P0). The weekly card was labelled with
  *   its internal theme name ("Personal Capacity", "Interdependence"...).
  *   It now reads "This week's question". The theme is still recorded
@@ -71,6 +85,8 @@
 
 import { store }  from "../store.js";
 import { router } from "../router.js";
+import { getTodaysCheckin } from "../data/checkin.js";
+import { startBreathing, BREATHING_TYPES } from "./breathing-session.js";
 // In Step became free on 12 Aug 2026 (Destination Architecture sections
 // 9 and 18), and it was the only gated card on this screen -- so
 // isPremium() and lockedFeature() are no longer used here. Removed rather
@@ -173,6 +189,39 @@ function formatDate(iso) {
   return d.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" });
 }
 
+// ── SMOOTH-P4b. Suggested now ─────────────────────────────────────────────────
+
+/**
+ * One practice, and the coach's line for it, from today's check-in ONLY.
+ *
+ * The argument is the whole input. Energy and mood use the check-in's own
+ * 1-10 scale (checkin.js chips: Low 3, Struggling 2, Okay 6, Good 7...).
+ * Nothing claims what a practice will do to anybody's body (C1): each
+ * line says what it is and leaves it at "might help".
+ */
+export function suggestNow(checkin) {
+  const e = Number(checkin?.energy), m = Number(checkin?.mood);
+  const has = Number.isFinite(e) || Number.isFinite(m);
+  if (!has) {
+    return { type: "box", mins: 3,
+      line: "Whenever you want a few minutes to settle, this is here." };
+  }
+  if (Number.isFinite(m) && m <= 3) {
+    return { type: "exhale", mins: 3,
+      line: "You said today's been heavy going. Three minutes of slow breathing might help settle it." };
+  }
+  if (Number.isFinite(e) && e <= 3) {
+    return { type: "resonance", mins: 3,
+      line: "You said your energy is low today. Slow, even breathing asks nothing of you." };
+  }
+  if (Number.isFinite(e) && e >= 7 && Number.isFinite(m) && m >= 7) {
+    return { type: "box", mins: 3,
+      line: "You said you're feeling good today. A few even breaths is a way to notice it." };
+  }
+  return { type: "box", mins: 3,
+    line: "You checked in today. Three minutes of box breathing is here if it helps." };
+}
+
 // ── Render ────────────────────────────────────────────────────────────────────
 
 export function render() {
@@ -180,6 +229,9 @@ export function render() {
   const weekData      = getCurrentWeekPrompt();
   const recentEntries = getRecentEntries(3);
   const totalEntries  = (store.get("journalEntries") || []).length;
+  // The check-in, and nothing else. See suggestNow().
+  const sug     = suggestNow(getTodaysCheckin());
+  const sugType = BREATHING_TYPES.find(t => t.id === sug.type) || BREATHING_TYPES[0];
 
   return `
     <div class="view noticing-view">
@@ -191,13 +243,19 @@ export function render() {
            hears on arriving, and hearing "Noticing" after tapping
            "Wellbeing" is precisely the two-features-one-destination
            confusion this change exists to remove. -->
-      <h1 class="sr-only">Wellbeing</h1>
-
       <div class="view-header">
-        <p class="text-secondary" style="margin: 0;">
-          Good to see you${name ? ", " + name : ""}.
-        </p>
+        <h1 class="wb-title">Wellbeing</h1>
+        <p class="wb-coach">${sug.line}</p>
       </div>
+
+      <!-- SMOOTH-P4b. One practice, one tap. -->
+      <section class="card wb-suggest" aria-labelledby="wb-suggest-h">
+        <h2 class="wb-suggest__kicker" id="wb-suggest-h">Suggested now</h2>
+        <p class="wb-suggest__name">${sugType.label} \u00b7 ${sug.mins} min</p>
+        <p class="wb-suggest__desc">${sugType.description}</p>
+        <button class="btn btn-primary btn-full" id="wb-start"
+                aria-label="Start ${sugType.label}, ${sug.mins} minutes">Start</button>
+      </section>
 
       <!-- ── This Week ────────────────────────────────────────── -->
       <section class="noticing-section" aria-labelledby="this-week-heading">
@@ -267,14 +325,14 @@ export function render() {
                   style="display: flex; align-items: center; gap: var(--space-4);
                          text-align: left; width: 100%; cursor: pointer;
                          background: var(--color-surface);"
-                  aria-label="Journal and reflect">
+                  aria-label="Journal — write anything. Only you can read it.">
             <span style="font-size: 2rem; flex-shrink: 0; line-height: 1;"
                   aria-hidden="true">📝</span>
             <div style="flex: 1; min-width: 0;">
               <p style="font-size: var(--text-lg); font-weight: var(--font-semibold);
-                        margin-bottom: var(--space-1);">Journal and reflect</p>
+                        margin-bottom: var(--space-1);">Journal</p>
               <p class="text-secondary" style="font-size: var(--text-sm);">
-                Guided prompts or free writing. Stays private.
+                Write anything. Only you can read it.
               </p>
             </div>
             <span style="color: var(--color-primary); font-size: 1.25rem;"
@@ -370,6 +428,12 @@ export function render() {
 // ── Mount ─────────────────────────────────────────────────────────────────────
 
 export function onMount() {
+  // SMOOTH-P4b. Straight into the suggested practice.
+  document.getElementById("wb-start")?.addEventListener("click", () => {
+    const sug = suggestNow(getTodaysCheckin());
+    startBreathing(sug.type, sug.mins);
+  });
+
   document.getElementById("noticing-breathe-btn")?.addEventListener("click", () => {
     router.navigate("breathing-session");
   });

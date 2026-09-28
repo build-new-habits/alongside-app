@@ -1,6 +1,14 @@
 /**
  * js/views/breathing-session.js - Guided Breathing Session
  *
+ * 28 Sep 2026 v6
+ *
+ * v6 - SMOOTH-P4b. startBreathing(type, mins): Wellbeing's "Suggested
+ *   now" Start goes straight into a running practice -- one tap, no
+ *   picker, no duration step (spec 4.9). The safety gate still stands in
+ *   front when it is due, exactly as on the picker route, and the
+ *   practice starts once it is acknowledged.
+ *
  * 28 Sep 2026 v5
  *
  * v5 - BREATH-CLAIMS (Smooth Path P0, C1). Every type's tagline,
@@ -316,6 +324,28 @@ function resetSession() {
   elapsed      = 0;
 }
 
+/** The practices, for Wellbeing's suggestion to name. */
+export const BREATHING_TYPES = TYPES;
+
+/** Set when a practice is started from outside; onMount starts the clock. */
+let pendingStart = false;
+
+/**
+ * SMOOTH-P4b. Start a practice from Wellbeing in one tap. Sets the
+ * choice, then navigates; onMount begins the session once the screen
+ * (or the safety gate in front of it) is up.
+ */
+export function startBreathing(typeId, mins) {
+  if (!TYPES.some(t => t.id === typeId)) return false;
+  resetSession();
+  selectedType = typeId;
+  selectedMins = Number(mins) || 3;
+  phase        = "session";
+  pendingStart = true;
+  router.navigate("breathing-session");
+  return true;
+}
+
 // ── Render ────────────────────────────────────────────────────────────────────
 
 export function render() {
@@ -534,6 +564,12 @@ export function onMount() {
       router.navigate("noticing");
     }
   });
+
+  // SMOOTH-P4b. Started from Wellbeing: the clock begins now, once.
+  if (phase === "session" && pendingStart && !sessionInterval) {
+    pendingStart = false;
+    requestAnimationFrame(() => startSession());
+  }
 
   // Back button
   document.getElementById("bs-back-btn")?.addEventListener("click", () => {

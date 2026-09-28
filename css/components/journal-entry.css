@@ -1,5 +1,10 @@
 /*
  * css/components/journal-entry.css
+ * 28 Sep 2026 v2
+ *
+ * v2 - SMOOTH-P4b. .je-privacy: the line under the title, where people
+ *   write. Secondary ink, not a warning -- it is a promise, said plainly.
+ *
  * 25 Jun 2026 v1
  *
  * Styles for journal-entry.js v2.
@@ -118,3 +123,6 @@
 
 .je-footer { padding: var(--space-4); margin-top: auto; }
 .je-save-btn { width: 100%; min-height: 52px; font-size: var(--text-base); }
+
+/* SMOOTH-P4b. The privacy line, where people write. */
+.je-privacy { margin: 0 0 var(--space-3); font-size: var(--text-sm); line-height: 1.5; color: var(--color-text-secondary); }

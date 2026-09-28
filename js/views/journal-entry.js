@@ -1,6 +1,11 @@
 /**
  * journal-entry.js
- * 11 Aug 2026 v4
+ * 28 Sep 2026 v5
+ * v5 - SMOOTH-P4b. The privacy line is on the screen where people write:
+ *   "Only you can read your journal. The coach never reads it." (spec
+ *   4.9). It was true since v3 and said nowhere a person would see it.
+ *   The Back button says Wellbeing, the tab it returns to.
+ *
  *
  * v4 — PT-12. Reads journalEntryType, which three call sites have been
  *   writing since the Noticing Hub was built and nothing has ever read.
@@ -141,11 +146,13 @@ export function JournalEntryView(router) {
         <header class="je-header">
           <button class="je-back-btn btn btn-ghost"
                   data-action="back"
-                  aria-label="Back to noticing hub">
+                  aria-label="Back to Wellbeing">
             ← Back
           </button>
           <h1 class="je-title">${_esc(prompt.title)}</h1>
         </header>
+
+        <p class="je-privacy" id="je-privacy">Only you can read your journal. The coach never reads it.</p>
 
         <!-- Text input -->
         <div class="je-input-block">
@@ -159,6 +166,7 @@ export function JournalEntryView(router) {
             rows="8"
             aria-required="false"
             aria-label="Journal entry — write anything"
+            aria-describedby="je-privacy"
             placeholder="${_esc(prompt.placeholder)}"
             maxlength="5000"
           >${_esc(currentText)}</textarea>
