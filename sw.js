@@ -1,7 +1,12 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 28 Sep 2026 v551
+ * 28 Sep 2026 v552
+ *
+ * v552 - SMOOTH-P4a. NEW FILE precached: js/data/arc-readback.js.
+ *   Changed: views/progress.js, layouts/progress.css, views/today.js.
+ *   Progress reads the arc back. New gate: verify-progress-agree.
+ *   185 gates.
  *
  * v551 - SMOOTH-P3c. No new files. Changed: views/capture.js,
  *   components/capture.css, store.js, router.js, data/red-flag.js.
@@ -3957,7 +3962,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v551";
+const CACHE_NAME = "alongside-v552";
 
 const SHELL_URLS = [
 
@@ -4108,6 +4113,7 @@ const SHELL_URLS = [
   "/alongside-app/js/views/library.js",
   "/alongside-app/js/views/practices.js",
   "/alongside-app/js/views/red-flag.js",
+  "/alongside-app/js/data/arc-readback.js",
   "/alongside-app/js/views/know-what.js",
   "/alongside-app/js/data/red-flag.js",
   "/alongside-app/js/views/my-programme.js",
