@@ -1,7 +1,20 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 26 Sep 2026 v540
+ * 28 Sep 2026 v541
+ *
+ * v541 - SMOOTH-P0. safety-gate.js, router.js, views/checkin.js,
+ *   views/breathing-session.js, views/quiet-session.js, views/noticing.js,
+ *   views/settings.js, data/in-step-scenarios.js.
+ *
+ *   The safety note is asked once per session instead of five times in
+ *   a row for new users. A check-in left part-way leaves nothing on
+ *   screen. Breathing and In Step copy says what to do, without body
+ *   claims or named authorities. Settings no longer promises Wellbeing
+ *   practices that do not exist, and shows a real version number.
+ *
+ *   New gates: verify-gate-once, verify-checkin-unmount,
+ *   verify-wellbeing-claims, verify-plan-claims. 175 gates.
  *
  * v540 - EXIT-HOME. views/today.js.
  *
@@ -3874,7 +3887,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v540";
+const CACHE_NAME = "alongside-v541";
 
 const SHELL_URLS = [
 
