@@ -1,6 +1,9 @@
 /**
  * onboarding/goals.js
- * 23 Jun 2026 v2
+ * 28 Sep 2026 v3
+ *
+ * v3 - SMOOTH-P4c. The list comes from offeredGoals(): no "Tone up", and
+ *   "Lose weight" only when weight tracking is on (spec 8).
  *
  * Onboarding step: goals. Full rewrite with expanded categorised goal list.
  * Uses GOAL_CATEGORIES from js/data/goals.js — single source of truth.
@@ -25,7 +28,7 @@
  */
 
 import { store }          from '../../store.js';
-import { GOAL_CATEGORIES } from '../../data/goals.js';
+import { offeredGoals } from '../../data/goals.js';
 
 export function GoalsView(router) {
 
@@ -51,7 +54,7 @@ export function GoalsView(router) {
         </header>
 
         <div class="goals-categories">
-          ${GOAL_CATEGORIES.map((cat, idx) => `
+          ${offeredGoals({ weightTracking: store.get('weightTracking') === true, selected: selectedGoals }).map((cat, idx) => `
             <section class="goals-category"
                      aria-labelledby="goals-cat-${idx}">
               <h2 class="goals-category__heading"

@@ -1,5 +1,11 @@
 /**
  * tools/verify-w3a.mjs
+ * 28 Sep 2026 v3
+ * SMOOTH-P4c. No Save buttons: the capability handler is _saveCapability(),
+ *   run the moment a capability field changes. "Settings SAVES f" reads
+ *   that function; "reachable from a control" now asserts the change
+ *   handler calls it for capability fields.
+ *
  * 21 Aug 2026 v2
  * GATE-PATH. Path resolution only -- no assertion changed.
  *
@@ -178,17 +184,17 @@ check('Settings renders a capability editor',
 // file has been satisfied by an explanatory comment rather than by code.
 // A comment mentioning capability.legPower is not an editor for it.
 const capHandler = settingsSrc.slice(
-  settingsSrc.indexOf("case 'save-capability'"),
-  settingsSrc.indexOf("case 'save-fitness-level'"));
+  settingsSrc.indexOf("function _saveCapability(container) {"),
+  settingsSrc.indexOf("function handleAction(action, container) {"));
 for (const f of ['balanceWorry', 'chairRise', 'legPower', 'floorAccess']) {
   check(`Settings RENDERS an editor for ${f}`,
     new RegExp(`group\\(\\s*'${f}'`).test(settingsSrc));
   check(`Settings SAVES ${f}`,
     new RegExp(`'${f}'`).test(capHandler),
-    'must appear inside the save-capability handler, not merely in prose');
+    'must appear inside _saveCapability(), not merely in prose');
 }
 check('the save handler is reachable from a control',
-  /data-action="save-capability"/.test(settingsSrc));
+  /field\.startsWith\('capability\.'\)\)\s*\{\s*_saveCapability\(container\)/.test(settingsSrc));
 
 check('Settings imports the shared vocabularies rather than redefining them',
   /BALANCE_CHIPS[\s\S]{0,200}from '\.\.\/data\/onboarding-thread-data\.js'/.test(settingsSrc) &&

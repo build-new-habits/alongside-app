@@ -1,5 +1,14 @@
 /*
  * css/components/settings.css
+ * 28 Sep 2026 v11
+ *   SMOOTH-P4c. The one page: .settings-lede, .settings-group,
+ *   .settings-row (a row that opens its screen, with its current value)
+ *   and .settings-row--switch (a switch that works in place); the
+ *   conditions list with It's better now / It's back (.settings-cond).
+ *   Every row is at least 56px, the whole row is the target, and a value
+ *   is text, never colour alone. The index and sub-tab rules below are
+ *   no longer rendered and are left for one release (touch-once).
+ *
  * 22 Aug 2026 v10
  *   WEIGHT-1b. .settings-unit-picker (kg / lb / st & lb),
  *   .settings-weight-stone (the composite stone-and-pounds input) and
@@ -989,3 +998,65 @@
   color: var(--color-text-muted);
   flex-shrink: 0;
 }
+
+
+/* ============================================================
+   SMOOTH-P4c — Settings on one page, 28 Sep 2026
+   ============================================================ */
+.settings-lede { margin: 0 0 var(--space-4); color: var(--color-text-secondary); }
+.settings-group { margin: 0 0 var(--space-5); }
+.settings-group__title {
+  margin: 0 0 var(--space-2);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--color-text-secondary);
+}
+.settings-rows { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--color-border); }
+.settings-rows > li { border-bottom: 1px solid var(--color-border); }
+.settings-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: 56px;
+  padding: var(--space-2) var(--space-1);
+  background: none;
+  border: none;
+  color: var(--color-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+button.settings-row:hover { background: var(--color-bg-hover); }
+button.settings-row:focus-visible { outline: 3px solid var(--color-border-focus); outline-offset: -3px; }
+.settings-row__text { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.settings-row__label { color: var(--color-text); }
+.settings-row__sub { font-size: var(--text-sm); color: var(--color-text-secondary); line-height: 1.4; }
+.settings-row__value {
+  flex: none;
+  max-width: 45%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+}
+.settings-row__chevron { flex: none; color: var(--color-text-secondary); font-size: var(--text-lg); }
+.settings-row--switch { cursor: default; }
+.settings-row--switch .settings-row__text { cursor: pointer; }
+.settings-screen { margin-top: var(--space-2); }
+
+.settings-conds { margin: var(--space-3) 0; padding: 0; list-style: none; }
+.settings-cond {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+.settings-cond__text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.settings-cond__name { font-weight: 600; color: var(--color-text); }
+.settings-cond__meta { font-size: var(--text-sm); color: var(--color-text-secondary); }
+.settings-cond__btn { flex: none; min-height: 44px; }

@@ -3,6 +3,9 @@
  * 28 Sep 2026 v3
  * SMOOTH-P3c. liftLog leaves the baseline: capture.js v2 reads it.
  * SMOOTH-P4a. conditionMeta leaves it too: Progress reads addedAt.
+ * SMOOTH-P4c. sessionPace leaves it: the field is removed (store v78).
+ *   ageBand, gender and showPersonalBests join it: written through the
+ *   one data-field/data-toggle handler, which a text scan cannot see.
  *
  * 22 Aug 2026 v2
  * WEIGHT-1a, 22 Aug 2026. `weightTracking` added — declared dark, writer
@@ -145,6 +148,14 @@ const BASELINE = new Set([
   // So this entry is not debt awaiting payment. It is a limit of what a
   // text scan can prove about a dynamic write, and it stays.
   'weightTracking',
+  // ageBand, gender, showPersonalBests -- ADDED 28 Sep 2026, SMOOTH-P4c.
+  // Their writer is real and driven: Settings saves every [data-field]
+  // and [data-toggle] the moment it changes, through one handler that
+  // writes store.set(el.dataset.field, ...). A text scan cannot see a
+  // key held in markup; verify-settings-inventory 2c/2j DRIVE the writes.
+  // The Save handlers that named them literally are gone with the Save
+  // buttons. Same limit as weightTracking above -- not debt.
+  'ageBand', 'gender', 'showPersonalBests',
   // targetDate — MIGRATION-ONLY as of 22 Aug 2026 (CHOOSER-1). Read by
   // store.js's one-way TARGET-4 migration for historic installs; its
   // writer was retired with onboarding/goal-setup.js, which had never
@@ -170,14 +181,8 @@ const BASELINE = new Set([
   // A display, which is the safe direction the 29 Aug note asked for --
   // nothing reads it to suppress a caution.
 
-  // 'sessionPace' -- ADDED 28 Sep 2026, SMOOTH-P1, as a RETIREMENT, the
-  // proposalBias shape below: every check-in is now the short one, the
-  // Settings control and the reader are gone, and the field stays
-  // DECLARED in getDefaults() for one release so existing installs load
-  // cleanly. A DATED PROMISE: removed from store.js with Smooth Path P4
-  // (store.js is touched there). The check further down holds it at no
-  // reader and no writer until then.
-  'sessionPace'
+  // 'sessionPace' -- removed 28 Sep 2026 (SMOOTH-P4c): the field itself is
+  // gone from the store (v78), its release of tolerance spent.
 ]);
 
 const added = oneEnded.filter(k => !BASELINE.has(k));

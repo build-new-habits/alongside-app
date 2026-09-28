@@ -1,6 +1,12 @@
 /**
  * privacy.js - Privacy and Terms (in-app summary)
- * 08 Sep 2026 v3
+ * 28 Sep 2026 v4
+ *
+ * v4 - SMOOTH-P4c. Your rights say how to use them: access and taking
+ *   your data with you are Settings > Download your data (a file of
+ *   everything, journal included, made and kept on the device); deleting
+ *   is Reset all data. Self-serve, both -- the same wording goes to the
+ *   solicitor in the Privacy Policy v4 (12g).
  *
  * v3 - SCOPE-1. Terms name the conditions this app is not designed to
  *   guide exercise for, on the reviewing physiotherapist's advice.
@@ -94,10 +100,14 @@ export function render() {
       <div class="privacy-section card">
         <h2 class="privacy-heading">Your rights</h2>
         <p class="text-secondary">
-          You have the right to access, correct, or delete your data at any time.
-          You can reset the app entirely from Settings, which removes all your data
-          from your device. Once cloud backup is available, full account deletion
-          will remove your data from our servers within 30 days.
+          You have the right to access, correct, or delete your data at any time,
+          and you can do all three yourself. <strong>Settings &rsaquo; Download your
+          data</strong> makes a file of everything the app keeps about you, your
+          journal included. It is made on your device and saved there; nothing is
+          sent anywhere to make it. You can correct anything in Settings, and
+          <strong>Reset all data</strong> removes it all from your device. Once
+          cloud backup is available, full account deletion will remove your data
+          from our servers within 30 days.
         </p>
       </div>
 

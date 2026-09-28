@@ -1,5 +1,8 @@
 /**
  * tools/verify-pb1.mjs
+ * 28 Sep 2026 v4
+ * SMOOTH-P4c. "Settings has the toggle" reads the page's in-place switch.
+ *
  * 21 Aug 2026 v3
  * GATE-PATH. Path resolution only -- no assertion changed.
  *
@@ -148,7 +151,9 @@ const css = fs.readFileSync(new URL('../css/components/session-log.css', import.
 
 // ── Reachable ────────────────────────────────────────────────
 const settings = fs.readFileSync(new URL('../js/views/settings.js', import.meta.url), 'utf8');
-check('Settings has the toggle', /data-action="toggle-pb"/.test(settings));
+// SMOOTH-P4c: the toggle is now the page's in-place switch (one handler
+// with every other switch), not its own action.
+check('Settings has the toggle', /field: 'showPersonalBests'/.test(settings) || /data-toggle="showPersonalBests"/.test(settings));
 check('and it is separate from session notes',
   /showPersonalBests/.test(settings) && /liftLogEnabled/.test(settings),
   'somebody using notes as a memory aid did not ask to be shown a best');

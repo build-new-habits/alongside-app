@@ -1,6 +1,10 @@
 /**
  * tools/verify-quick1.mjs
- * 28 Sep 2026 v4
+ * 28 Sep 2026 v5
+ * v5 - SMOOTH-P4c. sessionPace is removed from the store (v78), its one
+ *   release of tolerance spent. The three schema checks on it retire;
+ *   in their place: the field is gone from a fresh install AND from an
+ *   old one that still carried it. Burnout-without-sleep is unchanged.
  *
  * v4 - SMOOTH-P1. The brief/full choice is gone: every check-in is the
  *   short one (three questions). Retired here, with their guarantees
@@ -60,26 +64,17 @@ const check = (n, ok, d='') => { console.log(`${ok?'PASS':'FAIL'}  ${n}${d?' —
 const src      = fs.readFileSync(new URL('../js/views/checkin.js', import.meta.url), 'utf8');
 const settings = fs.readFileSync(new URL('../js/views/settings.js', import.meta.url), 'utf8');
 
-// ── Schema ───────────────────────────────────────────────────
+// ── Schema: retired, and gone ───────────────────────────────
 localStorage.clear(); store.init();
-check('the default is the full check-in', store.get('sessionPace') === 'full',
-  'nobody is opted into the short one without choosing it');
-store.set('sessionPace', 'brief');
-check('the preference persists', store.get('sessionPace') === 'brief');
-// Validation lives in mergeWithDefaults(), which runs on LOAD — so a
-// stray value is corrected on the next open, not on write. Tested the
-// way it actually happens rather than the way I first assumed it did.
-localStorage.clear(); store.init();
-store.set('sessionPace', 'nonsense');
+check('a fresh install has no sessionPace', store.get('sessionPace') === undefined);
+localStorage.setItem('alongside_user', JSON.stringify({ sessionPace: 'brief', name: 'Old' }));
 store.init();
-check('a corrupted value is corrected on load',
-  ['full', 'brief'].includes(store.get('sessionPace')),
-  store.get('sessionPace'));
+check('an old install that carried it loses it on load', store.get('sessionPace') === undefined && store.get('name') === 'Old',
+  String(store.get('sessionPace')));
 
 // ── Burnout still works on the brief path ────────────────────
 // Five brief check-ins: energy and mood only, no sleep.
 localStorage.clear(); store.init();
-store.set('sessionPace', 'brief');
 for (let i = 5; i >= 1; i--) {
   const d = new Date(Date.now() - i * 86400000).toISOString().split('T')[0];
   const h = store.get('checkinHistory') || {};

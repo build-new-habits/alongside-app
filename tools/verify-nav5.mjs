@@ -1,6 +1,17 @@
 /**
  * tools/verify-nav5.mjs
- * 12 Aug 2026 v1
+ * 28 Sep 2026 v2
+ *
+ * v2 - SMOOTH-P4c. The sections and sub-tabs are retired: Settings is one
+ *   page of grouped rows, two levels at most, no tabs (spec 4.10). NAV-5
+ *   and NAV-7's source-shape checks (section ids, PANEL_LABEL, tab
+ *   semantics, the sub-tab strip CSS) have nothing left to read and are
+ *   retired. What they were FOR is kept and now DRIVEN on the real page:
+ *   session notes and equipment are findable by name on it; every row
+ *   screen is reachable and none is orphaned; rows clear the touch floor;
+ *   an in-place action keeps you where you are; reopening Settings shows
+ *   the page, not the last screen. TEST 6 and 7 (Home tiles, the version)
+ *   are unchanged.
  *
  * NAV-5. Three sections, not seven tabs.
  *
@@ -36,94 +47,75 @@ const check = (n, fn) => { try { fn(); console.log("  PASS  " + n); }
 const ok = (c, m) => { if (!c) throw new Error(m); };
 const eq = (a, b, m) => { if (a !== b) throw new Error(`${m}\n        got: ${a}  want: ${b}`); };
 
-const s = fs.readFileSync(_gatePath("js/views/settings.js"), "utf8");
+import { createRequire as __cr } from "node:module";
+const __require = __cr(import.meta.url);
+const { JSDOM } = __require("jsdom");
+const dom = new JSDOM('<!doctype html><div id="main-content"></div>', { url: "https://x/" });
+globalThis.window = dom.window; globalThis.document = dom.window.document;
+for (const k of ["navigator", "localStorage", "HTMLElement", "Node", "CustomEvent", "Event", "MouseEvent"])
+  Object.defineProperty(globalThis, k, { value: dom.window[k], configurable: true, writable: true });
+dom.window.matchMedia = q => ({ matches: false, media: q, addEventListener() {}, removeEventListener() {}, addListener() {}, removeListener() {} });
+globalThis.history = dom.window.history; globalThis.location = dom.window.location;
+const { store } = await import(new URL("../js/store.js", import.meta.url).href);
+const { SettingsView } = await import(new URL("../js/views/settings.js", import.meta.url).href);
+const main = document.getElementById("main-content");
+const txt = el => (el?.textContent || "").replace(/\s+/g, " ").trim();
+const click = el => el?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }));
+localStorage.clear(); store.init(); store.set("tier", "personal"); store.set("onboardingComplete", true);
+const page = () => { main.innerHTML = ""; SettingsView({ navigate() {}, back() {} }).mount(main); };
 
-console.log("\nTEST 1 - three sections, Graeme's grouping");
-// 18 Aug 2026 (COACH-TILE). Was eq(ids.length, 3). A fourth row was
-// added and this went red -- correctly, it caught the change. But
-// "exactly three" was never the property. The reasoning in this file's
-// own header is "nothing scrolls, so nothing hides", which is a CEILING,
-// not a count. Four rows do not scroll on a phone; the landing had a
-// screen of empty space below three.
-//
-// So it now asserts the ceiling and the required ids. A fifth row still
-// passes; a sixth does not, and by then somebody should be asked.
-check("few enough rows that nothing scrolls", () => {
-  const ids = [...s.matchAll(/^\s{6}id: '(\w+)',\n\s+label: '/gm)].map(m => m[1]);
-  ok(ids.length <= 5, `sections: ${ids.join(", ")} — the landing must not scroll`);
-  for (const want of ["controls", "settings", "coaching", "about"])
-    ok(ids.includes(want), `missing "${want}"`);
-});
-check("each row explains what is inside", () => {
-  const ids  = [...s.matchAll(/^\s{6}id: '(\w+)',\n\s+label: '/gm)].map(m => m[1]);
-  const subs = [...s.matchAll(/sub: '([^']+)'/g)].map(m => m[1]);
-  // Tied to the section count rather than hardcoded, so adding a row can
-  // never quietly ship without its description.
-  eq(subs.length, ids.length, "every section needs a description");
-  ok(subs.some(x => /session notes/i.test(x)),
-     "App Controls must NAME session notes - 'App Controls' alone does not " +
-     "tell you it is in there, which is the exact problem being fixed");
-  ok(subs.some(x => /equipment/i.test(x)), "Settings must name equipment");
-  // COACH-TILE, same rule applied to the new row: "Your Coaching" alone
-  // does not tell anybody their capability answers are in there.
-  ok(subs.some(x => /what your body can do/i.test(x)),
-     "Your Coaching must NAME the capability questions");
-});
+console.log("\nTEST 1 - what Graeme could not find is named on the page");
+page();
+const labels = [...main.querySelectorAll(".settings-row__label")].map(txt);
+check("session notes is a row of its own, by name", () => ok(labels.includes("Session notes"), labels.join(", ")));
+check("equipment is a row of its own, with what is saved", () =>
+  ok(labels.includes("Equipment") && /Gym \d+ · Home \d+/.test(txt(main.querySelector('[data-open="equipment"]'))), "no Equipment row with its count"));
+check("the capability questions are named", () => ok(labels.includes("What your body can do"), "not named"));
 
-console.log("\nTEST 2 - every panel is reachable, none orphaned");
-check("sections and router agree", () => {
-  const referenced = [...s.matchAll(/panels: \[([^\]]+)\]/g)]
-    .flatMap(m => m[1].replace(/[ ']/g, "").split(","));
-  // \w excludes hyphens, so about-story/-app/-data read as unrouted when
-  // they are routed. Panel ids are kebab-case; the pattern must be too.
-  const routed = [...s.matchAll(/case '([\w-]+)':\s+return render/g)].map(m => m[1]);
-  const missing = referenced.filter(p => !routed.includes(p));
-  const orphan  = routed.filter(p => !referenced.includes(p));
-  ok(missing.length === 0, `referenced but not routed: ${missing.join(", ")}`);
-  ok(orphan.length === 0,
-     `routed but unreachable - a panel nobody can open: ${orphan.join(", ")}`);
+console.log("\nTEST 2 - every screen is reachable, none orphaned");
+const src = fs.readFileSync(_gatePath("js/views/settings.js"), "utf8");
+const screens = [...src.slice(src.indexOf("const SCREENS = {"), src.indexOf("const _label")).matchAll(/^\s{4}'?([\w-]+)'?:\s*\{ title:/gm)].map(m => m[1]);
+const opened = new Set([...main.querySelectorAll("[data-open]")].map(b => b.dataset.open));
+store.set("onboarding.primaryTerritory", "body"); page();
+[...main.querySelectorAll("[data-open]")].forEach(b => opened.add(b.dataset.open));
+store.set("weightTracking", true); store.set("checkInNotification.enabled", true); page();
+[...main.querySelectorAll("[data-open]")].forEach(b => opened.add(b.dataset.open));
+check("the page opens only screens that exist", () => {
+  const bad = [...opened].filter(k => !screens.includes(k));
+  ok(screens.length > 10 && bad.length === 0, `unknown: ${bad.join(", ")}`);
 });
-
-console.log("\nTEST 3 - session notes is no longer a lodger");
-check("it has its own panel", () => {
-  ok(/case 'liftlog':\s+return renderLiftLogPanel/.test(s), "no liftlog route");
-  ok(!/renderEquipmentPanel\(\) \+ renderLiftLogPanel\(\)/.test(s),
-     "still appended to Equipment - it is a behaviour toggle, not a fact " +
-     "about what you own, and it was filed there because Equipment was the " +
-     "smallest panel");
+check("every screen is opened from the page -- none orphaned", () => {
+  const orphan = screens.filter(k => !opened.has(k) && k !== "reflection");
+  ok(orphan.length === 0, `a screen nobody can open: ${orphan.join(", ")}`);
 });
-check("it sits in App Controls, not Settings", () => {
-  const controls = s.slice(s.indexOf("id: 'controls'"), s.indexOf("id: 'settings'"));
-  ok(/'liftlog'/.test(controls), "session notes should be a control, not a preference");
+check("every screen renders something", () => {
+  for (const k of opened) {
+    page(); click(main.querySelector(`[data-open="${k}"]`));
+    ok(txt(main.querySelector(".settings-screen")).length > 20, `${k} is empty`);
+  }
 });
 
-console.log("\nTEST 4 - nothing scrolls, so nothing hides");
-check("the index does not overflow", () => {
-  const css = fs.readFileSync(_gatePath("css/components/settings.css"), "utf8");
-  const rule = css.slice(css.indexOf(".settings-index {"), css.indexOf("}", css.indexOf(".settings-index {")));
-  ok(/flex-direction: column/.test(rule), "must stack vertically");
-  ok(!/overflow-x/.test(rule), "horizontal overflow is the fault being fixed");
-});
+console.log("\nTEST 3 - nothing hides");
+check("no tabs, no horizontal strip", () => { page(); ok(!main.querySelector("[role=tablist]"), "a tab strip is back"); });
 check("rows clear the 44px touch floor", () => {
   const css = fs.readFileSync(_gatePath("css/components/settings.css"), "utf8");
-  const rule = css.slice(css.indexOf(".settings-index__row {"), css.indexOf("}", css.indexOf(".settings-index__row {")));
+  const rule = css.slice(css.indexOf(".settings-row {"), css.indexOf("}", css.indexOf(".settings-row {")));
   const m = rule.match(/min-height:\s*(\d+)px/);
   ok(m && parseInt(m[1], 10) >= 44, "WCAG 2.2 AA 2.5.8");
 });
 
-console.log("\nTEST 5 - re-renders do not bounce back to the index");
-check("in-section actions keep their section", () => {
-  ok(!/activeTab = 'display';\s*\n\s*render\(container\)/.test(s),
-     "Display reset would return to the index mid-action");
-  ok(!/activeTab = 'notify';\s*\n\s*render\(container\)/.test(s),
-     "toggling reminders would return to the index mid-toggle");
-  ok(/activeSection = 'settings'/.test(s) && /activeSection = 'controls'/.test(s),
-     "both deep links should set the section instead");
+console.log("\nTEST 4 - in-place actions keep you where you are");
+check("toggling the reminder stays on the page", () => {
+  page(); click(main.querySelector("#settings-checkin-notif"));
+  ok(!!main.querySelector(".settings-lede") && document.activeElement?.id === "settings-checkin-notif", "bounced");
 });
-check("the index is not sticky", () => {
-  ok(/let activeSection = null;/.test(s),
-     "opening Settings should show the index, not drop somebody back where " +
-     "they were last time wondering where everything went");
+check("resetting display stays on Display", () => {
+  page(); click(main.querySelector('[data-open="display"]')); click(main.querySelector("#disp-reset"));
+  ok(/^Display$/.test(txt(main.querySelector(".settings-title"))), "left the Display screen");
+});
+check("reopening Settings shows the page, not the last screen", () => {
+  page(); click(main.querySelector('[data-open="equipment"]')); page();
+  ok(!!main.querySelector(".settings-lede"), "sticky");
 });
 
 console.log("\nTEST 6 - NAV-6: Home does not duplicate the bottom nav");
@@ -166,69 +158,6 @@ check("the worker answers", () => {
   const sw = fs.readFileSync(_gatePath("sw.js"), "utf8");
   ok(/event\.data\?\.type === "GET_VERSION"/.test(sw), "no handler - settings would time out");
   ok(/CACHE_NAME\.replace\("alongside-", ""\)/.test(sw), "must report its OWN cache name");
-});
-
-console.log("\nTEST 8 - NAV-7: sub-tabs, and they cannot hide");
-check("every panel has a short label", () => {
-  const referenced = [...s.matchAll(/panels: \[([^\]]+)\]/g)]
-    .flatMap(m => m[1].replace(/[ ']/g, "").split(","));
-  const labels = s.slice(s.indexOf("const PANEL_LABEL"), s.indexOf("let activePanel"));
-  for (const p of referenced)
-    ok(new RegExp(`["']?${p}["']?:`).test(labels), `no tab label for "${p}"`);
-});
-check("no section carries more than four tabs", () => {
-  for (const m of s.matchAll(/panels: \[([^\]]+)\]/g)) {
-    const n = m[1].split(",").length;
-    ok(n <= 4,
-       `${n} tabs - five or more is where the old strip started scrolling ` +
-       `and hiding its own contents`);
-  }
-});
-check("the strip wraps rather than scrolls", () => {
-  const css = fs.readFileSync(_gatePath("css/components/settings.css"), "utf8");
-  const rule = css.slice(css.indexOf(".settings-subtabs {"),
-                         css.indexOf("}", css.indexOf(".settings-subtabs {")));
-  ok(/flex-wrap: wrap/.test(rule), "must wrap");
-  ok(!/overflow-x/.test(rule),
-     "a wrapped tab is ugly; a scrolled one is invisible, and invisible is " +
-     "what made Equipment unfindable");
-});
-check("a one-panel section shows no tabs", () =>
-  ok(/panels\.length < 2 \? "" :/.test(s),
-     "one tab is not a choice, it is decoration"));
-check("About is split, and every part is routed", () => {
-  // 13 Aug 2026, A3. Was pinned to the exact literal
-  // `'about-story', 'about-app', 'about-data'`, so adding a FOURTH panel
-  // (about-plan) failed a check about the other three. That is the gate
-  // asserting an incidental ordering rather than the decision it guards
-  // -- NAV-5's decision is that About is several panels and each one is
-  // reachable, not that they sit in a particular sequence.
-  //
-  // Loosened to test membership and routing rather than sequence.
-  // Deliberately NOT extended to check that each listed id has a case in
-  // renderPanel(): the existing "sections and router agree" check below
-  // already does exactly that, and proved it by failing correctly when
-  // about-plan's case was removed during this build. A second copy of a
-  // working assertion is upkeep with no coverage.
-  const group = s.match(/panels:\s*\[([^\]]*'about-story'[^\]]*)\]/);
-  ok(group, "the About section no longer lists its panels");
-  const ids = [...group[1].matchAll(/'([^']+)'/g)].map(m => m[1]);
-  for (const id of ["about-story", "about-app", "about-data"])
-    ok(ids.includes(id), `${id} dropped from the About section`);
-  for (const part of ["story", "app", "data"])
-    ok(new RegExp(`renderAboutPanel\\("${part}"\\)`).test(s), `${part} not routed`);
-});
-check("changing section resets to its first tab", () =>
-  ok(/activePanel   = null;/.test(s),
-     "otherwise somebody re-enters a section on a tab they never chose"));
-check("in-section actions keep their tab", () => {
-  ok(/activePanel   = 'display';/.test(s), "Display reset would jump tabs");
-  ok(/activePanel   = 'notify';/.test(s), "reminders toggle would jump tabs");
-});
-check("sub-tabs carry tab semantics", () => {
-  ok(/role="tablist"/.test(s) && /role="tab"/.test(s) && /role="tabpanel"/.test(s),
-     "screen readers need the relationship, not just buttons");
-  ok(/aria-selected="\$\{id === open\}"/.test(s), "no selected state announced");
 });
 
 console.log(fails === 0 ? "\nALL PASS\n" : `\n${fails} FAILURE(S)\n`);

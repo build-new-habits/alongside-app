@@ -1,6 +1,12 @@
 /**
  * tools/verify-tier-visible.mjs
- * 06 Sep 2026 v1
+ * 28 Sep 2026 v2
+ *
+ * v2 - SMOOTH-P4c. Settings is one page. The plan line still lives on
+ *   the profile screen (opened by the Name row), and the page's "Your
+ *   plan" row now says the tier too -- asserted here with the line. The
+ *   dev switcher is reached through the App version row's screen instead
+ *   of a section and a tab. Every assertion is kept.
  *
  * TIER-VISIBLE. The device never hides which plan it is in.
  *
@@ -76,15 +82,19 @@ const click = el => el && el.dispatchEvent(new dom.window.MouseEvent("click",{bu
 // which is how the first draft of this gate "found" no plan line at all.
 const paint = () => {
   SettingsView(router).mount(document.getElementById("main-content"));
-  const section = document.querySelector('[data-section="settings"]');
-  if (!section) throw new Error("FIXTURE FAULT: settings section row not found");
-  section.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }));
-  const tab = document.querySelector('[data-tab="profile"], [data-panel="profile"]');
-  if (tab) tab.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }));
+  const row = document.querySelector('[data-open="profile"]');
+  if (!row) throw new Error("FIXTURE FAULT: the profile row not found");
+  row.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }));
 };
+const pageRow = () => { SettingsView(router).mount(document.getElementById("main-content"));
+  return (document.querySelector('[data-open="about-plan"] .settings-row__value')?.textContent || "").trim(); };
 
 console.log("\nTIER-VISIBLE — the device never hides which plan it is in\n");
 
+store.set("tier","free");
+ok("the page's Your plan row says Free", pageRow() === "Free");
+store.set("tier","personal");
+ok("and the Plan says The Plan", pageRow() === "The Plan");
 store.set("tier","free"); paint();
 const free = $("#settings-plan-line");
 ok("FIXTURE REACHES IT: the line renders on the profile panel", !!free);
@@ -122,16 +132,9 @@ const planLineBefore = $("#settings-plan-line");
 ok("the plan line is on screen before the switch", !!planLineBefore);
 
 SettingsView(router).mount(document.getElementById("main-content"));
-const aboutRow = document.querySelector('[data-section="about"]');
-ok("FIXTURE REACHES IT: the About section row exists", !!aboutRow);
-click(aboutRow);
-// The About section opens on "about-story". The version label -- and so
-// the triple-tap gesture -- only renders on "about-app". Clicking the
-// section row alone lands on the wrong panel, which is how the previous
-// draft found the dev BUTTON in the markup but not the version label.
-const appPanel = document.querySelector('[data-panel="about-app"]');
-ok("FIXTURE REACHES IT: the About > App panel row exists", !!appPanel);
-click(appPanel);
+const appRow = document.querySelector('[data-open="about-app"]');
+ok("FIXTURE REACHES IT: the App version row exists", !!appRow);
+click(appRow);
 const versionEl = $("#settings-version");
 ok("FIXTURE REACHES IT: the version label is on the About panel", !!versionEl);
 click(versionEl); click(versionEl); click(versionEl);

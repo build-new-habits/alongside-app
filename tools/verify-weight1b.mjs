@@ -1,5 +1,12 @@
 /**
  * tools/verify-weight1b.mjs
+ * 28 Sep 2026 v4
+ * SMOOTH-P4c. Settings is one page; the profile screen (opened by the
+ *   Name row) still carries the weight section, so the harness opens it
+ *   with one tap instead of a section and a tab. There is no Save button:
+ *   section 5 fires the field's change, which is what saves now. No
+ *   assertion changed.
+ *
  * 22 Aug 2026 v3
  * Section 8: the log in Progress and the sustained-rate note. Until
  * this, observedRateBreach() had no caller -- the rule was written,
@@ -87,9 +94,7 @@ async function mount(state) {
   // and reported "the toggle exists on the Plan: FAIL" against correct
   // code. Read the navigation, do not guess at it -- fourth fixture
   // fault of the day, same shape every time.
-  el.querySelector('[data-section="settings"]')?.dispatchEvent(new dom.window.Event("click"));
-  await wait(80);
-  el.querySelector('[data-panel="profile"]')?.dispatchEvent(new dom.window.Event("click"));
+  el.querySelector('[data-open="profile"]')?.dispatchEvent(new dom.window.Event("click"));
   await wait(80);
   return el;
 }
@@ -193,7 +198,7 @@ section("5. Whatever is typed, kilograms is what is stored");
   // Pounds in.
   let el = await mount(base({ weightTracking: true, weightUnit: "lb" }));
   el.querySelector("#settings-weight-now").value = "176.37";
-  el.querySelector('[data-action="save-profile"]').dispatchEvent(new dom.window.Event("click"));
+  el.querySelector("#settings-weight-now").dispatchEvent(new dom.window.Event("change"));  // P4c: saves on change
   await wait(80);
   ok("176.37 lb stored as ~80 kg", Math.abs(store.get("weight") - 80) < 0.05,
      String(store.get("weight")));
@@ -202,7 +207,7 @@ section("5. Whatever is typed, kilograms is what is stored");
   el = await mount(base({ weightTracking: true, weightUnit: "st" }));
   el.querySelector("#settings-weight-now").value = "12";
   el.querySelector("#settings-weight-now-lb").value = "8";
-  el.querySelector('[data-action="save-profile"]').dispatchEvent(new dom.window.Event("click"));
+  el.querySelector("#settings-weight-now").dispatchEvent(new dom.window.Event("change"));  // P4c: saves on change
   await wait(80);
   ok("12 st 8 lb stored as ~79.8 kg", Math.abs(store.get("weight") - toKg({ st: 12, lb: 8 }, "st")) < 0.05,
      String(store.get("weight")));
@@ -210,14 +215,14 @@ section("5. Whatever is typed, kilograms is what is stored");
   // Kilograms in.
   el = await mount(base({ weightTracking: true, weightUnit: "kg" }));
   el.querySelector("#settings-weight-now").value = "80";
-  el.querySelector('[data-action="save-profile"]').dispatchEvent(new dom.window.Event("click"));
+  el.querySelector("#settings-weight-now").dispatchEvent(new dom.window.Event("change"));  // P4c: saves on change
   await wait(80);
   ok("80 kg stored as 80", Math.abs(store.get("weight") - 80) < 0.001, String(store.get("weight")));
 
   // Clearing removes it. Somebody deleting their weight is deleting it.
   el = await mount(base({ weightTracking: true, weightUnit: "kg", weight: 80 }));
   el.querySelector("#settings-weight-now").value = "";
-  el.querySelector('[data-action="save-profile"]').dispatchEvent(new dom.window.Event("click"));
+  el.querySelector("#settings-weight-now").dispatchEvent(new dom.window.Event("change"));  // P4c: saves on change
   await wait(80);
   ok("clearing the field clears the value", store.get("weight") === null,
      String(store.get("weight")));

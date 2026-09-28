@@ -1,6 +1,8 @@
 /**
  * data/field-contract.js
- * 14 Aug 2026 v2
+ * 28 Sep 2026 v3
+ *
+ * v3 - SMOOTH-P4c. sessionPace removed (store.js v78).
  *
  * v2 - W3-A / W3-D. Capability writers repointed from the unreachable
  *   views/onboarding/lifestyle.js to thread.js steps 9a-9d, and
@@ -176,12 +178,8 @@ export const FIELD_CONTRACT = {
     meaning: "Whether the person is SHOWN their best, not whether one is kept — bests are recorded either way, so turning this on later reveals what they have already done rather than starting from nothing. Default false: for personas 2.5, 2.8 and 2.13 a visible best is a target to fall short of."
   },
 
-  // QUICK-1, 15 Aug 2026. Matrix gap 8, open since 05 Jul.
-  "sessionPace": {
-    values: ["full", "brief"],
-    writer: "views/settings.js",
-    meaning: "How much the coach asks before a session. 'brief' asks energy and mood only — the two inputs detectBurnout() reads. It NEVER compresses the pain question for somebody with a declared condition, and it never removes the coach's first line."
-  },
+  // sessionPace removed 28 Sep 2026 (SMOOTH-P4c, store.js v78): retired
+  // with the brief/full choice in SMOOTH-P1.
 
   // CARDIAC-1, 14 Aug 2026.
   "exerciseClearance": {

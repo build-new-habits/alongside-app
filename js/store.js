@@ -2,7 +2,19 @@ import { zonesForAreas } from "./data/aims.js";
 
 /**
  * store.js - Data persistence layer
- * 28 Sep 2026 v77
+ * 28 Sep 2026 v78
+ *
+ * v78 - SMOOTH-P4c. Two changes, schema first (Schema.md v1.71).
+ *   conditionsResolved: [{ id, resolvedAt }] -- NEW. "It's better now" in
+ *   Settings moves a condition here: it leaves `conditions` (active ids
+ *   only; 25 readers depend on that shape, so it is not reshaped), so
+ *   the coach stops planning around it, and it is KEPT, not deleted.
+ *   "It's back" restores it. The person decides; the app never
+ *   concludes a condition is better. resolveCondition() / reopenCondition().
+ *   sessionPace: REMOVED. Retired in v74 (SMOOTH-P1) with one release of
+ *   tolerance; that release has passed. Removed from the defaults, and
+ *   deleted from stored data on load (the ...saved spread would
+ *   otherwise carry it for ever).
  *
  * v77 - SMOOTH-P3c. activityLog entries of type "freestyle" (Make it up
  *   as I go) are new. No new field. One rule in logActivity(): a session
@@ -975,7 +987,7 @@ export const store = {
 
   mergeWithDefaults(saved) {
     const defaults = this.getDefaults();
-    return {
+    return this._dropRetired({
       ...defaults,
       ...saved,
 
@@ -995,6 +1007,11 @@ export const store = {
         this._migrateConditionMetaKeys(saved.conditionMeta),
         this._migrateConditionIds(saved.conditions)
       ),
+
+      // SMOOTH-P4c. Only well-formed records survive a load.
+      conditionsResolved: Array.isArray(saved.conditionsResolved)
+        ? saved.conditionsResolved.filter(r => r && typeof r.id === 'string' && r.id && typeof r.resolvedAt === 'string')
+        : [],
 
       // ── ONBOARDING (top-level flags stay top-level) ───────────
       // v7: primaryTerritory, threadStartedAt, threadCompletedAt
@@ -1415,10 +1432,7 @@ export const store = {
         ? { ...defaults.pacing, ...saved.pacing }
         : { ...defaults.pacing },
 
-      // QUICK-1
-      sessionPace: ['full', 'brief'].includes(saved.sessionPace)
-        ? saved.sessionPace
-        : defaults.sessionPace,
+      // QUICK-1's sessionPace: removed in v78 -- see mergeWithDefaults().
 
       // CHAP-1
       programme: (saved.programme && typeof saved.programme === 'object')
@@ -1572,7 +1586,17 @@ export const store = {
       // honest direction; a retirement must never take something away
       // from somebody who did nothing wrong.
       tier:       saved.tier === 'athlete' ? 'personal' : (saved.tier || 'free')
-    };
+    });
+  },
+
+  /**
+   * Retired fields leave stored data on load. The ...saved spread keeps
+   * any key it is given, so a field removed only from the defaults
+   * would ride along in every install for ever.
+   */
+  _dropRetired(data) {
+    delete data.sessionPace;   // v78, SMOOTH-P4c (retired v74, SMOOTH-P1)
+    return data;
   },
 
   getDefaults() {
@@ -1681,6 +1705,7 @@ export const store = {
 
       // ── CONDITIONS ───────────────────────────────────────────
       conditions: [],             // ids, ACTIVE ONLY. 25 readers depend on this shape — do not reshape it.
+      conditionsResolved: [],     // SMOOTH-P4c: [{ id, resolvedAt }]. "It's better now" -- the person's call, kept not deleted. See Schema.md v1.71.
       conditionMeta: {},          // CHECKIN-2a: { [id]: { addedAt, source, status, dormantAt, lastSoreAt, reportDays, quietRun, asks } }. Dormant ids leave `conditions` and stay here. See Schema.md.
       conditionPainScores: {},
       conditionReflections: [],   // { conditionId, text, loggedAt } — NOT Journal. Deliberately distinct field/namespace so it can never inherit the Journal Privacy Rule by accident. Coach-readable by design.
@@ -2002,7 +2027,7 @@ export const store = {
       //
       // The coach still speaks first. Once, briefly. That is the line
       // this feature is not allowed to cross.
-      sessionPace: 'full',   // 'full' | 'brief'
+      // sessionPace: removed v78 (SMOOTH-P4c). See _dropRetired().
 
       // YOUR-OWN, 06 Sep 2026. Sessions the person built and kept, in
       // the order they made them. Schema.md v1.50 is the contract.
@@ -2541,6 +2566,44 @@ export const store = {
             lastSoreAt: null, reportDays: 0, quietRun: 0, asks: 0
           }
     };
+    this.data.updatedAt = new Date().toISOString();
+    this.save();
+    return true;
+  },
+
+  /**
+   * SMOOTH-P4c. "It's better now". The person's call, never the app's.
+   * The id leaves `conditions`, so the coach stops planning around it,
+   * and is kept in conditionsResolved with the date. Its meta and
+   * history are untouched, so "It's back" loses nothing.
+   */
+  resolveCondition(id) {
+    const list = Array.isArray(this.data.conditions) ? this.data.conditions : [];
+    if (!list.includes(id)) return false;
+    this.data.conditions = list.filter(c => c !== id);
+    const res = (this.data.conditionsResolved || []).filter(r => r.id !== id);
+    this.data.conditionsResolved = [...res, { id, resolvedAt: new Date().toISOString() }];
+    const meta = { ...(this.data.conditionMeta || {}) };
+    if (meta[id]) meta[id] = { ...meta[id], status: "resolved" };
+    this.data.conditionMeta = meta;
+    const scores = { ...(this.data.conditionPainScores || {}) };
+    delete scores[id];
+    this.data.conditionPainScores = scores;
+    this.data.updatedAt = new Date().toISOString();
+    this.save();
+    return true;
+  },
+
+  /** "It's back": the condition returns to the active list, as it was. */
+  reopenCondition(id) {
+    const res = this.data.conditionsResolved || [];
+    if (!res.some(r => r.id === id)) return false;
+    this.data.conditionsResolved = res.filter(r => r.id !== id);
+    const list = Array.isArray(this.data.conditions) ? this.data.conditions : [];
+    if (!list.includes(id)) this.data.conditions = [...list, id];
+    const meta = { ...(this.data.conditionMeta || {}) };
+    if (meta[id]) meta[id] = { ...meta[id], status: "active", dormantAt: null };
+    this.data.conditionMeta = meta;
     this.data.updatedAt = new Date().toISOString();
     this.save();
     return true;

@@ -1,5 +1,13 @@
 /**
  * tools/verify-sleep1.mjs
+ * 28 Sep 2026 v3
+ * SMOOTH-P4c. COACH-TILE's door was a fourth landing row; Settings is now
+ *   one page, and the three dials are rows of their own under "You" and
+ *   "How the coach works" -- one tap, not two. Checks 5-10 follow them:
+ *   each is a named row, each opens its own screen, each saves with no
+ *   Save button (the property check 8 guarded), and Profile still does
+ *   not render them twice. Checks 1-4 (SLEEP-1) unchanged.
+ *
  * 21 Aug 2026 v2
  * GATE-PATH. Path resolution only -- no assertion changed.
  *
@@ -113,38 +121,25 @@ store.set('onboarding.primaryTerritory', 'trust-rupture');
 const settings = SettingsMod.SettingsView(router);
 settings.mount(el);
 
-const rows = [...el.querySelectorAll('[data-section]')];
-check('5  the Settings landing offers four rows, not three',
-  rows.length === 4, rows.map(r => r.dataset.section).join(', '));
+const click = x => x?.dispatchEvent(new dom.window.MouseEvent('click', { bubbles: true }));
+const rowLabels = [...el.querySelectorAll('.settings-row__label')].map(r => r.textContent.trim());
+check('5  the three dials are rows on the one page, by name',
+  ['What your body can do', 'How much sessions change', 'Your reflection'].every(l => rowLabels.includes(l)), rowLabels.join(', '));
 
-// Exact label, not a substring. A reversal that renamed it "Your
-// Coachingx" passed the substring version -- a weak assertion that
-// happened to be true rather than one that tested the thing.
-const coachingRow = rows.find(r => r.dataset.section === 'coaching');
-const coachingLabel = coachingRow?.querySelector('.settings-index__label')?.textContent.trim();
-check('6  COACH-TILE: "Your Coaching" is one of them',
-  coachingLabel === 'Your Coaching', coachingLabel || 'row missing');
+const open = key => { SettingsMod.SettingsView(router).mount(el); click(el.querySelector(`[data-open="${key}"]`)); return el.textContent.replace(/\s+/g, ' ').trim(); };
+check('6  What your body can do opens its own screen', /What your body can do today/.test(open('capability')));
+check('7  and so do the other two',
+  /How you like things/.test(open('preferences')) && /Your reflection/.test(open('reflection')),
+  'preferences, reflection');
 
-// Click it, and read what a person would see.
-coachingRow?.click();
-const flat = el.textContent.replace(/\s+/g, ' ').trim();
+open('capability');
+const capSel = el.querySelector('[data-field="capability.chairRise"]');
+if (capSel) { capSel.value = capSel.options[1].value; capSel.dispatchEvent(new dom.window.Event('change', { bubbles: true })); }
+check('8  they save as they change -- no Save button, and nothing lost',
+  !el.querySelector('[data-action^="save-"]') && store.get('capability.chairRise') === capSel?.value);
 
-check('7  and it holds all three sections that were buried in Profile',
-  /What your body can do today/.test(flat) &&
-  /How you like things/.test(flat) &&
-  /Your reflection/.test(flat),
-  'capability, preferences, reflection');
-
-check('8  the save buttons came with them — a moved panel that cannot save is worse than a buried one',
-  !!el.querySelector('[data-action="save-capability"]') &&
-  !!el.querySelector('[data-action="save-preferences"]'));
-
-// The inverse: Profile must not still render them, or they exist twice
-// and two Save buttons write the same fields from two screens.
-SettingsMod.SettingsView(router).mount(el);
-[...el.querySelectorAll('[data-section]')].find(r => r.dataset.section === 'settings')?.click();
-const settingsFlat = el.textContent.replace(/\s+/g, ' ').trim();
-check('9  COACH-TILE (inverse): Profile no longer renders them too',
+const settingsFlat = open('profile');
+check('9  COACH-TILE (inverse): Profile does not render them too',
   !/What your body can do today/.test(settingsFlat));
 
 check('10 but Profile keeps what is genuinely a fact about you',

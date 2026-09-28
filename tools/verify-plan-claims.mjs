@@ -1,6 +1,11 @@
 /**
  * tools/verify-plan-claims.mjs
- * 28 Sep 2026 v1
+ * 28 Sep 2026 v2
+ *
+ * v2 - SMOOTH-P4c. Settings is one page: About > Plan and About > App
+ *   are now row screens ("Your plan", "App version"), opened by a row
+ *   rather than a section and a tab. The harness opens them that way.
+ *   No assertion changed.
  *
  * SMOOTH-P0 C2 and C3. What the app says about the Plan is true, and the
  * version label never reads "vunknown".
@@ -55,22 +60,18 @@ const { SettingsView } = await import(B + "views/settings.js");
 // DRAFTED notes are the source; a claim goes back only when it ships.
 const WITHDRAWN = [/long practices/i, /mind destinations/i, /reflects back what'?s changed/i, /stops being realistic/i];
 
-async function openPanel(sectionId, panelId) {
+async function openPanel(_unused, screenId) {
   const app = document.getElementById("app"); app.innerHTML = "";
   SettingsView({ navigate() {}, back() {} }).mount(app);
   await wait(50);
-  app.querySelector(`[data-section="${sectionId}"]`)?.click();
-  await wait(50);
-  const tab = app.querySelector(`[data-panel="${panelId}"]`);
-  if (tab) tab.click();
+  app.querySelector(`[data-open="${screenId}"]`)?.click();
   await wait(300);
   return app;
 }
 
 console.log("\nTEST 0 - the fixture reaches the panels it names");
 localStorage.clear(); store.init(); store.set("name", "Test"); store.set("tier", "personal"); store.set("onboardingComplete", true);
-const sections = [...fs.readFileSync(new URL("js/views/settings.js", root), "utf8").matchAll(/id:\s*'([a-z-]+)'[^}]*panels:\s*\[([^\]]*)\]/g)];
-const aboutId = (sections.find(m => /about-plan/.test(m[2])) || [])[1] || "about";
+const aboutId = "page";
 let app = await openPanel(aboutId, "about-plan");
 ok("0a. About > Plan rendered for a Plan user", /You are on/.test(app.textContent), `section id tried: ${aboutId}`);
 ok("0b. REVERSAL: the withdrawn-claim list catches the old sentence",

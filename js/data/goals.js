@@ -1,6 +1,13 @@
 /**
  * goals.js
- * 23 Jun 2026 v2
+ * 28 Sep 2026 v3
+ *
+ * v3 - SMOOTH-P4c, decided 27 Sep (spec 8). offeredGoals(): the list a
+ *   person is shown. "Tone up" is no longer offered. "Lose weight" is
+ *   offered only when weight tracking is switched on, so nobody meets
+ *   body weight by default. Goals already saved are kept, still shown
+ *   selected (so they can be taken off) and still honoured -- the
+ *   entries stay in GOAL_CATEGORIES so every label and mapping resolves.
  *
  * Expanded goal list for onboarding and programme matching.
  * v2 replaces the original flat array with a categorised structure that:
@@ -124,6 +131,7 @@ export const GOAL_CATEGORIES = [
       },
       {
         id: 'tone-up',
+        retired: true,   // SMOOTH-P4c: not offered; kept so saved goals resolve
         label: 'Tone up',
         icon: '📊',
         engineGoalId: 'build-muscle',
@@ -382,3 +390,17 @@ export const GOALS = GOAL_CATEGORIES.flatMap(cat =>
 // Legacy getProgrammesForGoals using flat goal IDs (not engine IDs)
 // Kept for any view that calls it with raw goal IDs from store.goals[]
 export { getProgrammesForGoals } from './programmes.js';
+
+/**
+ * SMOOTH-P4c. The categories as a person is shown them. Retired goals
+ * and Lose weight (without weight tracking) are left out -- unless the
+ * person already has them, in which case they stay, selected, so they can
+ * be seen and taken off. Empty categories are dropped.
+ */
+export function offeredGoals({ weightTracking = false, selected = [] } = {}) {
+  const keep = g => selected.includes(g.id) ||
+    (!g.retired && (g.id !== 'lose-weight' || weightTracking === true));
+  return GOAL_CATEGORIES
+    .map(cat => ({ ...cat, goals: cat.goals.filter(keep) }))
+    .filter(cat => cat.goals.length);
+}

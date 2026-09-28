@@ -1,6 +1,35 @@
 /**
  * settings.js
- * 28 Sep 2026 v37
+ * 28 Sep 2026 v38
+ *
+ * v38 - SMOOTH-P4c. Settings is one page. Spec 4.10.
+ *
+ *   "Changes save as you make them." Eight groups -- You, Goals and your
+ *   week, How the coach works, Reminders, Optional tracking, Display,
+ *   Your plan and your data, About -- and every row shows its current
+ *   value. Switches work in place. Tapping a row opens its own screen,
+ *   where the existing explanatory copy now lives. TWO LEVELS AT MOST, NO
+ *   TABS, NO SAVE BUTTONS: the six Save buttons are gone and every
+ *   control writes the moment it changes, announced as "Saved" in a
+ *   polite live region. NAV-5's sections and NAV-7's sub-tabs are
+ *   retired with it; their panel renderers are the row screens.
+ *
+ *   NOTHING DROPPED. tools/fixtures/settings-inventory-v553.json lists
+ *   every control the v553 Settings rendered, captured by rendering it;
+ *   verify-settings-inventory requires each one within two taps of this
+ *   page, except the six Save buttons, which it requires to be GONE.
+ *
+ *   NEW: Download your data -- a file of everything the app keeps,
+ *   journal included, built on the device and saved there. Graeme, 28
+ *   Sep: "I don't want to have to do this manually through email. I'm a
+ *   sole trader." Shown (LEGAL-AS-APPROVED); its wording goes into the
+ *   privacy policy for the solicitor (12g).
+ *
+ *   NEW: It's better now / It's back, per condition (conditionsResolved,
+ *   store.js v78): the person's call, never the app's.
+ *
+ *   Goals: "Tone up" is no longer offered; "Lose weight" only with weight
+ *   tracking on (offeredGoals()). Goals already chosen stay.
  *
  * v37 - Smooth Path P0, C2 and C3.
  *   C2 PLAN-CLAIM. About > Plan said the Plan opens "the long practices
@@ -468,7 +497,7 @@ import { store }          from '../store.js';
 import { isPremium }      from '../auth.js';
 import { toKg, fromKg } from '../data/weight-targets.js';
 import { PRICE_MONTHLY, PRICE_ANNUAL } from "../data/pricing.js";
-import { GOAL_CATEGORIES, getGoalLabel } from '../data/goals.js';
+import { offeredGoals, getGoalLabel } from '../data/goals.js';
 import { getProgramme, PROGRAMMES }      from '../data/programmes.js';
 import { getProgressStats }              from '../data/programmeEngine.js';
 import { getBeat3Script }                from '../data/beat3-scripts.js';
@@ -484,6 +513,9 @@ import { openSheet }                     from './onboarding/sheet-manager.js';
 // ("bodyweight-nordic-curl-progression") would be useless and slightly
 // insulting; the list has to say what they actually skipped.
 import { EXERCISES } from '../data/exercises/index.js';
+import { CONDITIONS } from '../data/conditions.js';
+import { aimById } from '../data/aims.js';
+import { conditionReadback, shortDate } from '../data/arc-readback.js';
 
 import {
   AGE_CHIPS,
@@ -497,7 +529,6 @@ import {
 
 export function SettingsView(router) {
 
-  let activeTab        = 'profile';
   // A1, 13 Aug 2026. The tier switcher is a developer tool. It stays
   // reachable during beta because Graeme and testers genuinely need it,
   // and it is never advertised anywhere in user-facing copy. Flip to
@@ -510,133 +541,15 @@ export function SettingsView(router) {
   let devTapTimer       = null;
   let reflectionExpanded = false;
 
-  /**
-   * NAV-5, 12 Aug 2026. Three sections, not seven tabs.
-   *
-   * Graeme, device pass part 4: "Changing equipment and turning on session
-   * notes really hard to find. Like really really hard."
-   *
-   * Both lived in the Equipment tab, FOURTH of seven, in a strip that
-   * scrolled horizontally with the scrollbar hidden -- so Profile,
-   * Programme and Conditions sat off-screen with nothing saying they
-   * existed. Two of the three things he could not find in the whole app
-   * were in here.
-   *
-   * HIS GROUPING, agreed in conversation: "we divide into app controls,
-   * about, and settings." It names a distinction the tabs never made.
-   * Programme (how often the coach expects you) and Display (text size)
-   * sat adjacent as if they were the same kind of thing. They are not --
-   * one is a coaching decision, the other an accessibility preference.
-   *
-   * That missing rule is why Session notes ended up appended to Equipment
-   * in the first place: Equipment was the smallest panel, 855 characters
-   * and one control, so a behaviour toggle got filed by convenience.
-   *
-   * WHY A LIST AND NOT HOME TILES. He proposed About and App Controls as
-   * tiles on Home. Home already carries eight; ten would be a longer list
-   * to scan, and these are the least-used destinations in the product --
-   * you set reminders once and read the story once. The actual failure was
-   * that Equipment was scrolled OUT OF VIEW, not that Settings was hard to
-   * reach; Settings is already one tap from the bottom nav. Three rows,
-   * nothing off-screen, nothing can hide.
-   */
-  // NAV-5. null = the index. Not sticky: reopening Settings shows the
-  // index, so somebody who went in for Display once is not dropped back
-  // into Display next time wondering where everything went.
-  let activeSection = null;
+  // NAV-5 (three sections) and NAV-7 (sub-tabs inside them) are retired
+  // by SMOOTH-P4c: one page, two levels, no tabs. The reasoning they
+  // recorded -- nothing may scroll out of sight, session notes and
+  // equipment must be findable by name -- is kept on the page itself and
+  // asserted by verify-nav5 v2 and verify-settings-inventory.
 
-  const _section = id => SECTIONS.find(s => s.id === id) || SECTIONS[0];
-
-  // NAV-7. Short labels deliberately: four must fit across a phone
-  // without scrolling, and a label that needs truncating is a label that
-  // will hide.
-  const PANEL_LABEL = {
-    notify:     "Reminders",
-    liftlog:    "Notes",
-    programme:  "Programme",
-    profile:    "Profile",
-    conditions: "Conditions",
-    equipment:  "Equipment",
-    display:    "Display",
-    "about-story": "Story",
-    "about-plan":  "Plan",
-    "about-app":   "App",
-    "about-data":  "Data",
-    coaching:      "Coaching",
-  };
-
-  // NAV-7. Which sub-tab is open, per section. Resets when the section
-  // changes so nobody re-enters a section on a tab they do not remember
-  // choosing.
-  let activePanel = null;
-
-  /**
-   * NAV-7, 12 Aug 2026. Sub-tabs inside each section.
-   *
-   * Graeme: "Inside the three doors in settings are just long scrollable
-   * pages. Can these be sectioned into slideable tabs to keep it clean?"
-   *
-   * Yes -- and safely, which it would not have been before NAV-5. The old
-   * strip failed because SEVEN tabs could not fit and scrolled with the
-   * scrollbar hidden, so three of them were invisible. Three and four fit
-   * across a phone without scrolling, and the CSS below has no
-   * overflow-x, so if a label ever grows past the width it wraps rather
-   * than hiding.
-   *
-   * Each `panels` entry becomes one tab. About was a single 24,000-
-   * character panel rather than several, so it is split by what the
-   * content actually is: the story, the app itself, and your data.
-   */
-  const SECTIONS = [
-    {
-      id: 'controls',
-      label: 'App Controls',
-      sub: 'Reminders, session notes, and your programme',
-      panels: ['notify', 'liftlog', 'programme'],
-    },
-    {
-      id: 'settings',
-      label: 'Settings',
-      sub: 'Your profile, conditions, equipment and display',
-      panels: ['profile', 'conditions', 'equipment', 'display'],
-    },
-    {
-      // COACH-TILE, 18 Aug 2026. Graeme, on device: the Settings landing
-      // has "loads of space" and these controls were buried three levels
-      // down inside Profile, underneath name and age band.
-      //
-      // They are the highest-value controls in the product -- capability
-      // decides what the coach will and will not put in front of you,
-      // and the two preference controls decide how much a session
-      // changes and how much the coach asks before one. Filing them
-      // under "Profile" made them read as personal details rather than
-      // as the dials they are, which is the same findability fault NAV-5
-      // fixed for session notes.
-      id: 'coaching',
-      label: 'Your Coaching',
-      sub: 'What your body can do, how sessions are built, and your reflection',
-      panels: ['coaching'],
-    },
-    {
-      id: 'about',
-      label: 'About',
-      sub: 'The story behind Alongside, policies and your plan',
-      panels: ['about-story', 'about-plan', 'about-app', 'about-data'],
-    },
-  ];
-
-  // Kept so deep links and the developer bypass still resolve.
-  const TABS = [
-    { id: 'profile',     label: 'Profile'     },
-    { id: 'programme',   label: 'Programme'   },
-    { id: 'conditions',  label: 'Conditions'  },
-    { id: 'equipment',   label: 'Equipment'   },
-    { id: 'notify',      label: 'Reminders'   },
-    { id: 'display',     label: 'Display'     },
-    { id: 'about',       label: 'About'       },
-    { id: 'about-plan',  label: 'Your plan'   },
-    { id: 'coaching',    label: 'Your Coaching' },
-  ];
+  // SMOOTH-P4c. null = the one page; otherwise the row screen open.
+  let activeScreen = null;
+  let focusAfter   = null;    // selector to focus after the next render
 
   // v11 — My Movement rebuild. Matches store.js's movementIdentity
   // string[] values. "mixed" is handled separately, below, since it's
@@ -659,75 +572,215 @@ export function SettingsView(router) {
   // ── Render ─────────────────────────────────────────────────────────────────
 
   function render(container) {
+    const screen = activeScreen && SCREENS[activeScreen] ? SCREENS[activeScreen] : null;
     container.innerHTML = `
       <div class="settings-view" role="main" aria-label="Settings">
-
-        ${activeSection === null ? `
-
-          <h1 class="settings-title">Settings</h1>
-
-          <!-- NAV-5. Three rows. Nothing scrolls, so nothing hides. -->
-          <nav class="settings-index" aria-label="Settings sections">
-            ${SECTIONS.map(s => `
-              <button class="settings-index__row" data-section="${s.id}">
-                <span class="settings-index__text">
-                  <span class="settings-index__label">${s.label}</span>
-                  <span class="settings-index__sub">${s.sub}</span>
-                </span>
-                <span class="settings-index__chevron" aria-hidden="true">&rsaquo;</span>
-              </button>
-            `).join('')}
-          </nav>
-
-        ` : `
-
+        ${screen ? `
           <div class="settings-section-header">
-            <button class="btn btn-ghost" id="settings-back-btn"
-                    aria-label="Back to all settings">
-              &larr; Settings
-            </button>
+            <button class="btn btn-ghost" id="settings-back-btn" aria-label="Back to Settings">&larr; Settings</button>
           </div>
-          <h1 class="settings-title">${_section(activeSection).label}</h1>
-
-          ${(() => {
-            // NAV-7. Sub-tabs. Safe here in a way the old seven-tab strip
-            // was not: three and four fit across a phone, and the CSS has
-            // no overflow-x, so a label can never scroll out of sight.
-            const panels = _section(activeSection).panels;
-            const open   = panels.includes(activePanel) ? activePanel : panels[0];
-
-            // A single-panel section gets no tabs at all. One tab is not a
-            // choice, it is decoration.
-            const tabs = panels.length < 2 ? "" : `
-              <div class="settings-subtabs" role="tablist"
-                   aria-label="${_section(activeSection).label} sections">
-                ${panels.map(id => `
-                  <button class="settings-subtab ${id === open ? "settings-subtab--active" : ""}"
-                          role="tab"
-                          aria-selected="${id === open}"
-                          aria-controls="settings-panel-${id}"
-                          data-panel="${id}">
-                    ${PANEL_LABEL[id] || id}
-                  </button>
-                `).join("")}
-              </div>`;
-
-            return `
-              ${tabs}
-              <div class="settings-panels">
-                <div class="settings-panel settings-panel--active"
-                     role="tabpanel" id="settings-panel-${open}">
-                  ${renderPanel(open)}
-                </div>
-              </div>`;
-          })()}
-
+          <h1 class="settings-title" tabindex="-1">${_esc(screen.title)}</h1>
+          <div class="settings-screen">${screen.render()}</div>
+        ` : `
+          <h1 class="settings-title" tabindex="-1">Settings</h1>
+          <p class="settings-lede">Changes save as you make them.</p>
+          ${renderPage()}
         `}
-
+        <p class="sr-only" id="settings-saved" role="status" aria-live="polite"></p>
       </div>
     `;
-
     attachEvents(container);
+    if (focusAfter) {
+      const sel = focusAfter; focusAfter = null;
+      container.querySelector(sel)?.focus();
+    }
+  }
+
+  // ── SMOOTH-P4c. The one page ──────────────────────────────────────────────
+
+  /** Row screens: an existing panel each, or one part of one. */
+  const SCREENS = {
+    profile:      { title: 'Your profile',            render: () => renderProfilePanel() },
+    movement:     { title: 'How you move',            render: () => `<div class="settings-section">${renderMovementSection()}</div>` },
+    conditions:   { title: 'Conditions and injuries', render: () => renderConditionsPanel() },
+    equipment:    { title: 'Equipment',               render: () => renderEquipmentPanel() },
+    capability:   { title: 'What your body can do',   render: () => `<div class="settings-section">${renderCapabilitySection()}</div>` },
+    preferences:  { title: 'How sessions are built',  render: () => `<div class="settings-section">${renderPreferencesSection()}</div>` },
+    reflection:   { title: 'Your reflection',         render: () => `<div class="settings-section">${renderReflectionSection()}</div>` },
+    programme:    { title: 'Goals and your week',     render: () => renderProgrammePanel() },
+    notes:        { title: 'Session notes',           render: () => renderLiftLogPanel() },
+    notify:       { title: 'Reminders',               render: () => renderNotifyPanel() },
+    weight:       { title: 'Your weight',             render: () => `<div class="settings-section">${_weightSection(store.get('weightTracking') === true, store.get('weightUnit') || 'kg', store.get('weight'))}</div>` },
+    display:      { title: 'Display',                 render: () => renderDisplayPanel() },
+    'about-plan': { title: 'Your plan',               render: () => renderPanel('about-plan') },
+    'about-story':{ title: 'Why Alongside exists',    render: () => renderPanel('about-story') },
+    'about-app':  { title: 'The app',                 render: () => renderPanel('about-app') },
+    'about-data': { title: 'How your data is kept',   render: () => renderPanel('about-data') },
+  };
+
+  const _label = (list, id, fallback) => (list.find(x => x.id === id) || {}).label || fallback;
+
+  function _row({ label, value = '', open, go, action, focus, sub = '' }) {
+    const attrs = open ? `data-open="${open}"${focus ? ` data-focus="${_esc(focus)}"` : ''}`
+                : go   ? `data-go="${go}"`
+                :        `data-action="${action}"`;
+    return `
+      <li>
+        <button class="settings-row" ${attrs}>
+          <span class="settings-row__text">
+            <span class="settings-row__label">${_esc(label)}</span>
+            ${sub ? `<span class="settings-row__sub">${_esc(sub)}</span>` : ''}
+          </span>
+          ${value !== '' ? `<span class="settings-row__value">${_esc(value)}</span>` : ''}
+          <span class="settings-row__chevron" aria-hidden="true">&rsaquo;</span>
+        </button>
+      </li>`;
+  }
+
+  /** A switch that works in place. `disp` writes a display preference. */
+  function _rowSwitch({ id, label, sub = '', field, disp }) {
+    const on = disp ? getDisplayPref(disp) === 'on' : store.get(field) === true;
+    return `
+      <li class="settings-row settings-row--switch">
+        <label class="settings-row__text" for="${id}">
+          <span class="settings-row__label">${_esc(label)}</span>
+          ${sub ? `<span class="settings-row__sub">${_esc(sub)}</span>` : ''}
+        </label>
+        <button class="settings-toggle ${on ? 'settings-toggle--on' : ''}" id="${id}" role="switch"
+                aria-checked="${on ? 'true' : 'false'}"
+                ${disp ? `data-disp-toggle="${disp}"` : `data-toggle="${field}"`}
+                aria-label="${_esc(label)} ${on ? 'on' : 'off'}">
+          <span class="settings-toggle__track" aria-hidden="true"></span>
+        </button>
+      </li>`;
+  }
+
+  function _group(title, rows) {
+    const id = 'sg-' + title.toLowerCase().replace(/[^a-z]+/g, '-');
+    return `
+      <section class="settings-group" aria-labelledby="${id}">
+        <h2 class="settings-group__title" id="${id}">${_esc(title)}</h2>
+        <ul class="settings-rows">${rows.filter(Boolean).join('')}</ul>
+      </section>`;
+  }
+
+  function renderPage() {
+    const premium  = isPremium();
+    const gym      = (store.get('gymEquipment')  || []).length;
+    const home     = (store.get('homeEquipment') || []).length;
+    const conds    = store.get('conditions') || [];
+    const moves    = store.get('movementIdentity') || [];
+    const cap      = store.get('capability') || {};
+    const arc      = store.get('arc') || {};
+    const aim      = arc.active && arc.aimId ? aimById(arc.aimId) : null;
+    const goals    = store.get('goals') || [];
+    const target   = store.get('strategicGoal.setAt') ? store.get('strategicGoal.weeklySessionTarget') : null;
+    const prog     = store.get('activeProgramme') || {};
+    const progMeta = prog.programmeId ? getProgramme(prog.programmeId) : null;
+    const prefs    = Object.keys(store.get('exercisePreferences') || {}).length;
+    const VARIETY  = [{ id: 'familiar', label: 'Mostly the same' }, { id: 'balanced', label: 'A bit of both' }, { id: 'varied', label: 'Something different' }];
+    const reminder = store.get('checkInNotification') || {};
+    const scheme   = getDisplayPref('scheme') || 'dark';
+    const ageLbl   = _label(AGE_CHIPS, store.get('ageBand'), 'Not set');
+    const GENDERS  = [{ id: 'female', label: 'Female' }, { id: 'male', label: 'Male' }, { id: 'non-binary', label: 'Non-binary' }, { id: 'other', label: 'Other' }];
+    const level    = store.get('fitnessLevel');
+
+    return `
+      ${_group('You', [
+        _row({ label: 'Name', value: store.get('name') || 'Not set', open: 'profile', focus: '#settings-name' }),
+        _row({ label: 'Age range', value: ageLbl, open: 'profile', focus: '#settings-agebandsel' }),
+        _row({ label: 'Gender', value: _label(GENDERS, store.get('gender'), 'Prefer not to say'), open: 'profile', focus: '#settings-gender' }),
+        _row({ label: 'How you move', value: moves.length ? moves.map(m => _label(MOVEMENT_IDENTITIES, m, m === 'mixed' ? 'A mix' : m)).join(', ') : 'Not set', open: 'movement' }),
+        _row({ label: 'Conditions and injuries', value: conds.length ? `${conds.length} listed` : 'None', open: 'conditions' }),
+        _row({ label: 'Equipment', value: `Gym ${gym} · Home ${home}`, open: 'equipment' }),
+        _row({ label: 'What your body can do', value: cap.askedAt ? 'Answered' : 'Not answered', open: 'capability' }),
+      ])}
+
+      ${_group('Goals and your week', [
+        premium ? _row({ label: 'Your arc', value: aim ? aim.label : 'Not set', go: aim ? 'stretch-arc' : 'arc-setup' }) : '',
+        _row({ label: 'Goals', value: goals.length ? `${goals.length} chosen` : 'None', open: 'programme', focus: '.settings-goal-chip' }),
+        _row({ label: 'Sessions per week', value: target ? String(target) : 'Not set', open: 'programme', focus: '#settings-weekly-target' }),
+        _row({ label: 'Your week', action: 'open-weekly-plan' }),
+        _row({ label: 'Activity level', value: level ? String(level).replace(/-/g, ' ') : 'Not set', open: 'programme', focus: '#settings-fitness-level' }),
+        _row({ label: 'Programme', value: progMeta ? progMeta.name : 'None', open: 'programme' }),
+      ])}
+
+      ${_group('How the coach works', [
+        _row({ label: 'How much sessions change', value: _label(VARIETY, store.get('sessionVariety') || 'balanced', 'A bit of both'), open: 'preferences', focus: '#settings-pref-variety' }),
+        _row({ label: 'Exercises you asked to change', value: prefs ? String(prefs) : 'None', open: 'preferences' }),
+        _rowSwitch({ id: 'settings-lift-log', label: 'Session notes', sub: 'Note what you did on each exercise.', field: 'liftLogEnabled' }),
+        _rowSwitch({ id: 'settings-pb', label: 'Show your best', sub: 'Beside your last note. Off unless you want it.', field: 'showPersonalBests' }),
+        _row({ label: 'About session notes', open: 'notes' }),
+        renderReflectionSection() ? _row({ label: 'Your reflection', open: 'reflection' }) : '',
+      ])}
+
+      ${_group('Reminders', [
+        _rowSwitch({ id: 'settings-checkin-notif', label: 'Check-in reminder', field: 'checkInNotification.enabled' }),
+        reminder.enabled ? _row({ label: 'Reminder time', value: reminder.time || 'Not set', open: 'notify', focus: '#settings-notif-time' }) : '',
+        _rowSwitch({ id: 'settings-water-reminder', label: 'Water reminder', field: 'waterReminderEnabled' }),
+      ])}
+
+      ${_group('Optional tracking', [
+        _rowSwitch({ id: 'settings-hormonal', label: 'Cycle-aware coaching', sub: 'Off unless you turn it on.', field: 'hormonalTracking' }),
+        premium ? _rowSwitch({ id: 'settings-weight-tracking', label: 'Weight tracking', sub: 'Off unless you turn it on. Only you see it, and I will never ask you to weigh yourself.', field: 'weightTracking' }) : '',
+        premium && store.get('weightTracking') === true ? _row({ label: 'Your weight and units', open: 'weight' }) : '',
+      ])}
+
+      ${_group('Display', [
+        _row({ label: 'Colour scheme', value: (s => s.charAt(0).toUpperCase() + s.slice(1))(scheme.replace(/-/g, ' ')), open: 'display' }),
+        _row({ label: 'Text size', value: formatDisplayValue('textScale', getDisplayPref('textScale')), open: 'display', focus: '#disp-text-scale' }),
+        _row({ label: 'Line and letter spacing', open: 'display', focus: '#disp-leading-scale' }),
+        _rowSwitch({ id: 'disp-underline', label: 'Underline links', disp: 'underline' }),
+        _rowSwitch({ id: 'disp-focus', label: 'Stronger focus outlines', disp: 'focus' }),
+        _rowSwitch({ id: 'disp-full-instructions', label: 'Always show full instructions', disp: 'fullInstructions' }),
+      ])}
+
+      ${_group('Your plan and your data', [
+        _row({ label: 'Your plan', value: premium ? 'The Plan' : 'Free', open: 'about-plan' }),
+        _row({ label: 'Your impact', sub: 'Where the 5% goes.', action: 'nav-impact' }),
+        _row({ label: 'Activity log', action: 'nav-activity-log' }),
+        _row({ label: 'Download your data', sub: 'A file of everything the app keeps about you, your journal included. Saved on this device.', action: 'download-data' }),
+        _row({ label: 'How your data is kept', open: 'about-data' }),
+        _row({ label: 'Privacy policy', action: 'nav-privacy' }),
+        _row({ label: 'Reset all data', action: 'reset-data' }),
+      ])}
+
+      ${_group('About', [
+        _row({ label: 'Why Alongside exists', open: 'about-story' }),
+        _row({ label: 'App version', value: swVersion ? 'v' + swVersion : 'Checking…', open: 'about-app' }),
+      ])}`;
+  }
+
+  /** Announce a save. Polite, once. */
+  function _saved(container, msg = 'Saved') {
+    const el = container.querySelector('#settings-saved');
+    if (!el) return;
+    el.textContent = '';
+    setTimeout(() => { el.textContent = msg; }, 20);
+  }
+
+  /** Everything the app keeps, as a file, built and saved on this device. */
+  function downloadData(container) {
+    const data = {
+      exportedAt: new Date().toISOString(),
+      about: 'Everything Alongside: Move keeps about you on this device, including your journal. Nothing here was sent anywhere to make this file.',
+      store: JSON.parse(localStorage.getItem('alongside_user') || '{}'),
+      display: (() => { const o = {}; for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k && k !== 'alongside_user' && /^alongside/i.test(k)) o[k] = localStorage.getItem(k); } return o; })(),
+    };
+    const text = JSON.stringify(data, null, 2);
+    const name = `alongside-data-${new Date().toISOString().slice(0, 10)}.json`;
+    try {
+      const blob = new Blob([text], { type: 'application/json' });
+      const url  = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = name; a.hidden = true;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      _saved(container, `Your file, ${name}, is downloading. It is saved on this device only.`);
+    } catch (err) {
+      _saved(container, 'The file could not be made on this device.');
+    }
+    return { name, text };
   }
 
   // ── Panel router ───────────────────────────────────────────────────────────
@@ -842,11 +895,7 @@ export function SettingsView(router) {
 
         ${_weightSection(weightTracking, weightUnit, weightKg)}
 
-        <button class="settings-save-btn btn btn-primary"
-                data-action="save-profile"
-                aria-label="Save profile changes">
-          Save changes
-        </button>
+        <!-- SMOOTH-P4c: the Save button that was here is gone; this saves as it changes. -->
 
         ${renderMovementSection()}
       </div>
@@ -1049,11 +1098,7 @@ export function SettingsView(router) {
           `}
         </div>
 
-        <button class="settings-save-btn btn btn-primary"
-                data-action="save-preferences"
-                aria-label="Save how you like things">
-          Save
-        </button>
+        <!-- SMOOTH-P4c: the Save button that was here is gone; this saves as it changes. -->
       </div>
     `;
   }
@@ -1127,11 +1172,7 @@ export function SettingsView(router) {
                 'If the floor is not somewhere you want to be, the coach builds around it.',
                 FLOOR_ACCESS_CHIPS)}
 
-        <button class="settings-save-btn btn btn-primary"
-                data-action="save-capability"
-                aria-label="Save what your body can do today">
-          Save
-        </button>
+        <!-- SMOOTH-P4c: the Save button that was here is gone; this saves as it changes. -->
       </div>
     `;
   }
@@ -1174,11 +1215,7 @@ export function SettingsView(router) {
         aria-label="A mix of things — don't ask me to pick">
         A mix of things
       </button>
-      <button class="settings-save-btn btn btn-primary"
-              data-action="save-movement"
-              aria-label="Save how you move">
-        Save
-      </button>
+        <!-- SMOOTH-P4c: the Save button that was here is gone; this saves as it changes. -->
     `;
   }
 
@@ -1299,7 +1336,7 @@ export function SettingsView(router) {
           Your programme won't be affected until you next review it.
         </p>
         <div class="settings-goals-groups" role="group" aria-label="Select your goals">
-          ${GOAL_CATEGORIES.map(cat => `
+          ${offeredGoals({ weightTracking: store.get('weightTracking') === true, selected: goals }).map(cat => `
             <div class="settings-goals-category">
               <p class="settings-goals-category__label">${_esc(cat.label)}</p>
               <div class="settings-goals-grid">
@@ -1318,11 +1355,7 @@ export function SettingsView(router) {
             </div>
           `).join('')}
         </div>
-        <button class="settings-save-btn btn btn-primary"
-                data-action="save-goals"
-                aria-label="Save goal changes">
-          Save goals
-        </button>
+        <!-- SMOOTH-P4c: the Save button that was here is gone; this saves as it changes. -->
 
         <!-- Activity level -->
         <h2 class="settings-section__heading">Activity level</h2>
@@ -1342,11 +1375,7 @@ export function SettingsView(router) {
             <option value="very-active" ${fitnessLevel === 'very-active' ? 'selected' : ''}>Very active — intensive training most days</option>
           </select>
         </div>
-        <button class="settings-save-btn btn btn-primary"
-                data-action="save-fitness-level"
-                aria-label="Save activity level">
-          Save
-        </button>
+        <!-- SMOOTH-P4c: the Save button that was here is gone; this saves as it changes. -->
 
         <!-- Coach (S1 — Nurturing only, permanently. No picker.) -->
         <h2 class="settings-section__heading">Your coach</h2>
@@ -1379,23 +1408,52 @@ export function SettingsView(router) {
 
   function renderConditionsPanel() {
     const conditions = store.get('conditions') || [];
+    const resolved   = store.get('conditionsResolved') || [];
+    const meta       = store.get('conditionMeta') || {};
+    const history    = store.get('checkinHistory') || {};
+    const nameOf = id => (CONDITIONS.find(c => c.id === id) || {}).name || id;
+    const latest = id => {
+      const r = conditionReadback(id, { history, meta });
+      return r.lastMentioned ? `Last mentioned at check-in ${shortDate(`${r.lastMentioned}T12:00:00`)}` : 'Not mentioned at a check-in yet';
+    };
     return `
       <div class="settings-section">
-        <h2 class="settings-section__heading">Conditions and injuries</h2>
         <p class="settings-section__sub">
-          The coach adapts every session around what you've listed here.
-          Add or remove conditions at any time.
+          The coach adapts every session around what's listed here. When
+          something is better, say so and I'll stop planning around it.
+          Nothing is deleted: if it comes back, it comes back as it was.
         </p>
-        <button class="btn btn-primary"
-                data-action="edit-conditions"
-                aria-label="Edit your conditions and injuries">
-          Edit conditions
-        </button>
-        ${conditions.length > 0 ? `
-          <ul class="settings-conditions-list" aria-label="Your conditions">
-            ${conditions.map(c => `<li class="settings-conditions-item">${_esc(c)}</li>`).join('')}
+        ${conditions.length ? `
+          <ul class="settings-conds" aria-label="Your conditions">
+            ${conditions.map(id => `
+              <li class="settings-cond">
+                <span class="settings-cond__text">
+                  <span class="settings-cond__name">${_esc(nameOf(id))}</span>
+                  <span class="settings-cond__meta">${meta[id]?.addedAt ? `Since ${_esc(shortDate(`${meta[id].addedAt}T12:00:00`))} · ` : ''}${_esc(latest(id))}</span>
+                </span>
+                <button class="btn btn-secondary settings-cond__btn" data-resolve="${_esc(id)}"
+                        aria-label="${_esc(nameOf(id))}: it's better now">It's better now</button>
+              </li>`).join('')}
           </ul>
         ` : `<p class="settings-empty">No conditions listed.</p>`}
+        ${resolved.length ? `
+          <h2 class="settings-section__heading">Better now</h2>
+          <ul class="settings-conds" aria-label="Conditions you've said are better">
+            ${resolved.map(r => `
+              <li class="settings-cond">
+                <span class="settings-cond__text">
+                  <span class="settings-cond__name">${_esc(nameOf(r.id))}</span>
+                  <span class="settings-cond__meta">Better since ${_esc(shortDate(r.resolvedAt))}</span>
+                </span>
+                <button class="btn btn-ghost settings-cond__btn" data-reopen="${_esc(r.id)}"
+                        aria-label="${_esc(nameOf(r.id))}: it's back">It's back</button>
+              </li>`).join('')}
+          </ul>` : ''}
+        <button class="btn btn-primary"
+                data-action="edit-conditions"
+                aria-label="Add or change your conditions and injuries">
+          Add or change conditions
+        </button>
       </div>
     `;
   }
@@ -1458,11 +1516,11 @@ export function SettingsView(router) {
           </label>
           <button
             class="settings-toggle ${pbOn ? 'settings-toggle--on' : ''}"
-            id="settings-pb"
-            data-action="toggle-pb"
+            id="settings-pb-note"
+            data-toggle="showPersonalBests"
             role="switch"
             aria-checked="${pbOn ? 'true' : 'false'}"
-            aria-label="Show your best">
+            aria-label="Show your best ${pbOn ? 'on' : 'off'}">
             <span class="settings-toggle__track" aria-hidden="true"></span>
           </button>
         </div>
@@ -2029,13 +2087,15 @@ export function SettingsView(router) {
     // place. Deliberately not blocking the render: the About panel should
     // appear immediately and fill this in a moment later, rather than
     // holding the whole screen for a cache lookup.
-    if (activeSection === 'about' && swVersion === null) {
+    if (swVersion === null && (activeScreen === null || activeScreen === 'about-app')) {
       _readSwVersion().then(v => {
         // VER-1b. The cache name is "alongside-v294", so stripping the
         // prefix leaves "v294" -- already carrying its own v. The
         // template adds another, which shipped as "vv294". Strip it here
         // so the ONE place that formats a version does it once.
         swVersion = v ? v.replace(/^v/, '') : null;
+        const row = container.querySelector('[data-open="about-app"] .settings-row__value');
+        if (row) row.textContent = swVersion ? 'v' + swVersion : 'Not available';
         const el = container.querySelector('#settings-version');
         if (el) {
           el.textContent = swVersion ? 'v' + swVersion : 'Version not available';
@@ -2044,50 +2104,60 @@ export function SettingsView(router) {
       });
     }
 
-    // NAV-5. Index -> section.
-    container.querySelectorAll('[data-section]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        activeSection = btn.dataset.section;
-        activePanel   = null;   // NAV-7: always open a section on its first tab
-        render(container);
-        // Focus the heading, not the back button: a screen reader should
-        // hear where it has arrived before how to leave.
-        container.querySelector('.settings-title')?.focus();
-      });
-    });
-
-    // NAV-7. Sub-tab switching.
-    container.querySelectorAll('[data-panel]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        activePanel = btn.dataset.panel;
-        render(container);
-        container.querySelector(`[data-panel="${activePanel}"]`)?.focus();
-      });
-    });
-
-    // Section -> index.
-    document.getElementById('settings-back-btn')?.addEventListener('click', () => {
-      activeSection = null;
+    // SMOOTH-P4c. It's better now / It's back. The person's call.
+    container.querySelectorAll('[data-resolve]').forEach(btn => btn.addEventListener('click', () => {
+      const name = (CONDITIONS.find(c => c.id === btn.dataset.resolve) || {}).name || btn.dataset.resolve;
+      store.resolveCondition(btn.dataset.resolve);
+      focusAfter = `[data-reopen="${btn.dataset.resolve}"]`;
       render(container);
-      container.querySelector('.settings-index__row')?.focus();
-    });
+      _saved(container, `${name} moved to Better now. I'll stop planning around it.`);
+    }));
+    container.querySelectorAll('[data-reopen]').forEach(btn => btn.addEventListener('click', () => {
+      const name = (CONDITIONS.find(c => c.id === btn.dataset.reopen) || {}).name || btn.dataset.reopen;
+      store.reopenCondition(btn.dataset.reopen);
+      focusAfter = `[data-resolve="${btn.dataset.reopen}"]`;
+      render(container);
+      _saved(container, `${name} is back on your list.`);
+    }));
 
-    // Legacy [data-tab] switching, kept for the developer bypass panel.
-    container.querySelectorAll('[data-tab]').forEach(btn => {
+    // SMOOTH-P4c. Page -> row screen, and back. Two levels, no more.
+    container.querySelectorAll('[data-open]').forEach(btn => {
       btn.addEventListener('click', () => {
-        activeTab = btn.dataset.tab;
+        activeScreen = btn.dataset.open;
+        focusAfter = btn.dataset.focus || '.settings-title';
         render(container);
       });
     });
+    container.querySelectorAll('[data-go]').forEach(btn => {
+      btn.addEventListener('click', () => router.navigate(btn.dataset.go));
+    });
+    document.getElementById('settings-back-btn')?.addEventListener('click', () => {
+      const from = activeScreen;
+      activeScreen = null;
+      focusAfter = `[data-open="${from}"]`;
+      render(container);
+    });
 
-    // Field saves (inputs and selects)
+    // SMOOTH-P4c. Every field saves the moment it changes -- no Save.
+    // Text saves as it is typed too, so leaving never loses a word.
     container.querySelectorAll('[data-field]').forEach(el => {
-      el.addEventListener('change', () => {
+      const save = () => {
         const field = el.dataset.field;
+        if (field.startsWith('capability.')) { _saveCapability(container); _saved(container); return; }
         const value = el.type === 'checkbox' ? el.checked : el.value;
         store.set(field, el.type === 'number' ? Number(value) : value);
-      });
+        _saved(container);
+      };
+      el.addEventListener('change', save);
+      if (el.tagName === 'INPUT' && el.type === 'text') {
+        let t = null;
+        el.addEventListener('input', () => { clearTimeout(t); t = setTimeout(save, 400); });
+      }
     });
+
+    // WEIGHT-1b's conversion, now on change rather than on a Save.
+    container.querySelectorAll('#settings-weight-now, #settings-weight-now-lb').forEach(el =>
+      el.addEventListener('change', () => { _saveWeight(container); _saved(container); }));
 
     // Display preferences (DISP-1). Separate from [data-toggle] below
     // because these write to localStorage via display-prefs.js, not to
@@ -2144,10 +2214,6 @@ export function SettingsView(router) {
 
     container.querySelector('#disp-reset')?.addEventListener('click', () => {
       resetDisplayPrefs();
-      // NAV-5. Stay where we are: Display lives inside the Settings
-      // section now, so re-rendering must not bounce back to the index.
-      activeSection = 'settings';
-      activePanel   = 'display';   // NAV-7: stay on the tab the action came from
       render(container);
       container.querySelector('#disp-status').textContent = 'Display settings reset to defaults';
       container.querySelector('#disp-reset')?.focus();
@@ -2164,27 +2230,12 @@ export function SettingsView(router) {
         btn.classList.toggle('settings-toggle--on', next);
         const label = btn.getAttribute('aria-label') || '';
         btn.setAttribute('aria-label', label.replace(next ? 'off' : 'on', next ? 'on' : 'off'));
-        // Re-render notifications panel to show/hide time input
-        // WEIGHT-1b. Turning tracking on reveals the unit picker and the
-        // weight field beneath it, so the panel has to re-render. Same
-        // branch the reminders toggle uses -- reusing it rather than
-        // forking the handler.
-        if (field === 'weightTracking') {
-          // 'profile' is a PANEL id; the SECTION holding it is
-          // 'settings'. Setting activeSection = 'profile' bounced the
-          // person out of their profile into Reminders mid-toggle --
-          // precisely what the NAV-5 note below warns about, repeated
-          // by the next person to touch this handler.
-          activeSection = 'settings';
-          activePanel   = 'profile';
-          render(container);
-          return;
-        }
-        if (field === 'checkInNotification.enabled') {
-          // NAV-5. Reminders lives in App Controls now; re-rendering must
-          // not bounce back to the index mid-toggle.
-          activeSection = 'controls';
-          activePanel   = 'notify';   // NAV-7: stay on the tab the action came from
+        _saved(container, `${(btn.getAttribute('aria-label') || '').replace(/\s(on|off)$/, '')} ${next ? 'on' : 'off'}. Saved.`);
+        // SMOOTH-P4c. These two reveal a row beneath them (the reminder
+        // time; your weight and units), so the screen is drawn again and
+        // focus goes back to the switch that was pressed.
+        if (field === 'weightTracking' || field === 'checkInNotification.enabled') {
+          focusAfter = `#${btn.id}`;
           render(container);
         }
       });
@@ -2196,9 +2247,9 @@ export function SettingsView(router) {
     container.querySelectorAll('[data-weight-unit]').forEach(btn => {
       btn.addEventListener('click', () => {
         store.set('weightUnit', btn.dataset.weightUnit);
-        activeSection = 'settings';
-        activePanel   = 'profile';
+        focusAfter = `[data-weight-unit="${btn.dataset.weightUnit}"]`;
         render(container);
+        _saved(container);
       });
     });
 
@@ -2208,6 +2259,8 @@ export function SettingsView(router) {
         btn.classList.toggle('settings-goal-chip--selected');
         const checked = btn.classList.contains('settings-goal-chip--selected');
         btn.setAttribute('aria-checked', checked ? 'true' : 'false');
+        store.set('goals', [...container.querySelectorAll('[data-goal][aria-checked="true"]')].map(b => b.dataset.goal));
+        _saved(container);
       });
     });
 
@@ -2242,6 +2295,8 @@ export function SettingsView(router) {
             mixedBtn.setAttribute('aria-checked', 'false');
           }
         }
+        store.set('movementIdentity', [...container.querySelectorAll('[data-movement][aria-checked="true"]')].map(b => b.dataset.movement));
+        _saved(container);
       });
     });
 
@@ -2330,23 +2385,10 @@ export function SettingsView(router) {
 
   // ── Action handlers ────────────────────────────────────────────────────────
 
-  function handleAction(action, container) {
-    switch (action) {
+  // SMOOTH-P4c. What the Save buttons did, now run as each thing changes.
 
-      case 'save-profile': {
-        const name   = container.querySelector('[data-field="name"]')?.value;
-        const age    = container.querySelector('[data-field="ageBand"]')?.value;
-        const gender = container.querySelector('[data-field="gender"]')?.value;
-        if (name  !== undefined) store.set('name', name);
-        if (age   !== undefined) store.set('ageBand', age);
-        if (gender !== undefined) store.set('gender', gender);
-
-        // WEIGHT-1b. CONVERT ON THE WAY IN, ALWAYS. Whatever unit the
-        // person types in, kilograms is what is stored -- so no consumer
-        // downstream can compare 80 against 176.
-        //
-        // A cleared field clears the value. Somebody removing their
-        // weight is removing it, not leaving the old one behind.
+  /** WEIGHT-1b: convert on the way in, always; a cleared field clears it. */
+  function _saveWeight(container) {
         if (isPremium() && store.get('weightTracking') === true) {
           const unit = store.get('weightUnit') || 'kg';
           const main = container.querySelector('#settings-weight-now');
@@ -2369,52 +2411,10 @@ export function SettingsView(router) {
           }
         }
 
-        _showToast('Profile saved', container);
-        break;
-      }
+  }
 
-      case 'toggle-reflection': {
-        reflectionExpanded = !reflectionExpanded;
-        render(container);
-        const toggleBtn = container.querySelector('#settings-reflection-toggle');
-        if (toggleBtn) toggleBtn.focus();
-        break;
-      }
-
-      case 'save-goals': {
-        const selectedGoals = [...container.querySelectorAll('[data-goal][aria-checked="true"]')]
-          .map(b => b.dataset.goal);
-        store.set('goals', selectedGoals);
-        _showToast('Goals updated', container);
-        break;
-      }
-
-      case 'save-movement': {
-        const selectedMovement = [...container.querySelectorAll('[data-movement][aria-checked="true"]')]
-          .map(b => b.dataset.movement);
-        store.set('movementIdentity', selectedMovement);
-        _showToast('How you move, updated', container);
-        break;
-      }
-
-      case 'toggle-pb': {
-        const next = store.get('showPersonalBests') !== true;
-        store.set('showPersonalBests', next);
-        render(container);
-        attachEvents(container);
-        _showToast(next ? 'I will show your best alongside your notes'
-                        : 'Bests hidden — still recorded if you want them later', container);
-        break;
-      }
-
-      case 'save-preferences': {
-        const v = container.querySelector('[data-field="sessionVariety"]')?.value;
-        if (v) store.set('sessionVariety', v);
-        _showToast('Saved — the coach will use this from your next session', container);
-        break;
-      }
-
-      case 'save-capability': {
+  /** W3-A2: "" is stored as null, and askedAt moves both ways. */
+  function _saveCapability(container) {
         // W3-A2. Empty string means "Not answered" and must be stored as
         // null, not "". capabilityProfile() tests `c.legPower || default`
         // and `balanceWorry === 'no' || === null`; an empty string is
@@ -2451,16 +2451,24 @@ export function SettingsView(router) {
           store.set('capability.askedAt', null);
         }
 
-        _showToast('Saved — the coach will use this from your next session', container);
+  }
+
+  function handleAction(action, container) {
+    switch (action) {
+
+      case 'toggle-reflection': {
+        reflectionExpanded = !reflectionExpanded;
+        render(container);
+        const toggleBtn = container.querySelector('#settings-reflection-toggle');
+        if (toggleBtn) toggleBtn.focus();
         break;
       }
 
-      case 'save-fitness-level': {
-        const level = container.querySelector('[data-field="fitnessLevel"]')?.value;
-        if (level) store.set('fitnessLevel', level);
-        _showToast('Activity level updated', container);
-        break;
-      }
+
+
+
+
+
 
       case 'change-programme':
         router.navigate('goal-setup');
@@ -2508,6 +2516,10 @@ export function SettingsView(router) {
         // (no vanished nav, no nonsensical destination, unlike the old
         // openSheet('onboarding/conditions') bug this replaces).
         router.navigate('conditions-update');
+        break;
+
+      case 'download-data':
+        downloadData(container);
         break;
 
       case 'edit-equipment':

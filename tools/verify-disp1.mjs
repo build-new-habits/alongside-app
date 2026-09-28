@@ -1,6 +1,10 @@
 /**
  * tools/verify-disp1.mjs
- * 12 Aug 2026 v1
+ * 28 Sep 2026 v2
+ *
+ * v2 - SMOOTH-P4c. Display is a row screen on the one Settings page, not
+ *   a tab: "'display' tab declared" now reads the SCREENS entry. Same
+ *   property -- the screen exists and is routed.
  *
  * Gate for DISP-1. The highest-risk thing here is the duplicated key and
  * default block: index.html's pre-paint script cannot import the module,
@@ -180,7 +184,7 @@ check("display-prefs.js precached in sw.js", () =>
   eq(sw.includes("js/display-prefs.js"), true, "offline launch would break the Settings tab"));
 
 console.log("\nTEST 5 - Settings tab wiring");
-check("'display' tab declared", () => eq(/id:\s*'display'/.test(setts), true, "tab missing"));
+check("'display' screen declared", () => eq(/^\s*display:\s*\{ title: 'Display'/m.test(setts), true, "screen missing"));
 check("'display' routed in renderPanel", () => eq(/case 'display':/.test(setts), true, "tab would render empty"));
 check("live region uses a class that exists", () => {
   const cls = setts.match(/id="disp-status" class="([a-z-]+)"/)[1];
