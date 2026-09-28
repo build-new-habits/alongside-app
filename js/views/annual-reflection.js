@@ -1,5 +1,9 @@
 /**
  * views/annual-reflection.js
+ * 28 Sep 2026 v3
+ *
+ * v3 - F7. Mounts the way the router calls it (it crashed on open).
+ *
  * 08 Sep 2026 v2
  *
  * v2 - A11Y-HEADER. The .workout-header-title span is an h1. It was a
@@ -46,7 +50,21 @@ import { router } from '../router.js';
 
 const DAY = 86400000;
 
-export function AnnualReflectionView(container) {
+/**
+ * F7, 28 Sep 2026. MOUNT FAULT, found by screenshotting every screen:
+ * the router calls AnnualReflectionView(router).mount(container), and this took a
+ * CONTAINER as its argument and returned nothing -- so opening
+ * Your year (Progress) showed "Something went wrong loading this page", for
+ * everybody. The gates called it with a container directly, which is
+ * why they stayed green. Both shapes now work; verify-mount-all mounts
+ * every registered route the way the router does.
+ */
+export function AnnualReflectionView(arg) {
+  if (arg && typeof arg.querySelector === "function") _render(arg);
+  return { mount: _render };
+}
+
+function _render(container) {
   const log = (store.get('activityLog') || []).filter(e => e.status !== 'partial');
 
   const dates = log

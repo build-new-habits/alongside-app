@@ -1,5 +1,9 @@
 /**
  * views/community-impact.js
+ * 28 Sep 2026 v5
+ *
+ * v5 - F7. Mounts the way the router calls it (it crashed on open).
+ *
  * 08 Sep 2026 v4
  *
  * v4 - A11Y-HEADER. The .workout-header-title span is an h1. It was a
@@ -89,7 +93,21 @@ const PILLARS = [
   }
 ];
 
-export function CommunityImpactView(container) {
+/**
+ * F7, 28 Sep 2026. MOUNT FAULT, found by screenshotting every screen:
+ * the router calls CommunityImpactView(router).mount(container), and this took a
+ * CONTAINER as its argument and returned nothing -- so opening
+ * Where the five percent goes (Settings › Your impact, and the Plan table's impact row) showed "Something went wrong loading this page", for
+ * everybody. The gates called it with a container directly, which is
+ * why they stayed green. Both shapes now work; verify-mount-all mounts
+ * every registered route the way the router does.
+ */
+export function CommunityImpactView(arg) {
+  if (arg && typeof arg.querySelector === "function") _render(arg);
+  return { mount: _render };
+}
+
+function _render(container) {
   const community = store.get('community') || {};
   const credits   = community.credits || 0;
   const tier      = store.get('tier') || 'free';
