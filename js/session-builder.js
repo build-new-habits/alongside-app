@@ -1,7 +1,13 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
- * 28 Sep 2026 v55
+ * 28 Sep 2026 v56
+ *
+ * v56 - F5, FLAKY-PLANDOSE-2. When the distinct main moves run out, the
+ *   top-up adds a cool-down stretch, then a fourth set on moves whose
+ *   3 x 10 is our default (never a dose the entry states), so a
+ *   bodyweight Upper Body hour at home fills the hour instead of coming
+ *   back at 50 minutes one build in five.
  *
  * v55 - Work list 5, GYM-REACH-1. Cardio gets Gym's feature slot: one
  *   machine block when a machine is declared, and only a block that
@@ -2337,16 +2343,41 @@ function _trimToDuration(warmup, prescribed, main, cooldown, targetMins) {
  * same preferences). A gentle day is never padded -- shorter is the
  * point of it. Stops when nothing else fits rather than repeating.
  */
-function _topUpToDuration(warmup, main, cooldown, targetMins, nextMain) {
+function _topUpToDuration(warmup, main, cooldown, targetMins, nextMain, nextCool) {
   if (_sessionIntensity() === "low") return main;
   const total = () => [...warmup, ...main, ...cooldown].reduce((a, e) => a + _exerciseMins(e), 0);
-  for (let guard = 0; guard < 16 && total() < targetMins * 0.85; guard++) {
+  const low = targetMins * 0.85, high = targetMins * 1.15;
+  for (let guard = 0; guard < 16 && total() < low; guard++) {
     const more = (nextMain() || []).map(ex => withDefaultDose(ex));
     if (!more.length) break;
     // Never overshoot the upper bound to reach the lower one: a move that
     // would is passed over, and the next candidate is tried.
-    if (total() + _exerciseMins(more[0]) > targetMins * 1.15) continue;
+    if (total() + _exerciseMins(more[0]) > high) continue;
     main.push(...more);
+  }
+
+  // F5, 28 Sep 2026 (FLAKY-PLANDOSE-2). When the distinct moves run out --
+  // a bodyweight Upper Body hour at home has a pool of twelve -- the
+  // session came back ten minutes short (41 of 200 builds). Two steps,
+  // in this order, and never a repeated move:
+  //   1. one more cool-down stretch, while the cool-down pool has one;
+  //   2. a fourth set on a move whose dose is OURS (3 x 10 by default),
+  //      one move at a time, never on a dose the entry states itself.
+  // A gentle day never gets here (above).
+  for (let guard = 0; guard < 3 && total() < low && typeof nextCool === "function"; guard++) {
+    const more = nextCool() || [];
+    if (!more.length || total() + _exerciseMins(more[0]) > high) break;
+    cooldown.push(...more);
+  }
+  const tried = new Set();
+  for (let guard = 0; guard < main.length && total() < low; guard++) {
+    const idx = main.findIndex((ex, i) => !tried.has(i) && ex?._defaultDose && ex._doseFrom !== "instructions" && Number(ex.sets) === 3);
+    if (idx === -1) break;
+    tried.add(idx);
+    const ex = main[idx];
+    const next = { ...ex, sets: 4, _extraSet: true, duration: _doseSeconds(4, ex._doseWork || 40, Number(ex.rest) || 60) };
+    if (total() - _exerciseMins(ex) + _exerciseMins(next) > high) continue;
+    main[idx] = next;
   }
   return main;
 }
@@ -4219,7 +4250,8 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
   const trimTarget = _sessionIntensity() === "low" ? Math.round(durationMins * 0.75) : durationMins;
   _trimToDuration(warmupExercises, [], mainExercises, cooldownExercises, trimTarget);
   _topUpToDuration(warmupExercises, mainExercises, cooldownExercises, durationMins,
-                   () => selectFromCategories(mainCategories, "main", 1, alreadyChosen));
+                   () => selectFromCategories(mainCategories, "main", 1, alreadyChosen),
+                   () => selectFromCategories(type.cooldownCategories, "cooldown", 1, alreadyChosen));
   // ROLE-1. See _withRole above. This is the coach route -- One to one,
   // quick build, the four doors -- and the one the screenshots came from.
   const allExercises = [

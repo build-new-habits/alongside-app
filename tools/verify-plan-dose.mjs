@@ -1,6 +1,13 @@
 /**
  * tools/verify-plan-dose.mjs
- * 28 Sep 2026 v2
+ * 28 Sep 2026 v3
+ *
+ * v3 - F5 (FLAKY-PLANDOSE-2). 3u: the case that made test 3 flake. A
+ *   bodyweight Upper Body hour at home ran out of distinct moves (a pool
+ *   of 12) and came back at about 50 minutes in 41 of 200 builds.
+ *   Measured over 200 builds, it must now land within 15% every time,
+ *   without repeating a move and without touching a dose the entry
+ *   states itself. Test 3 unchanged.
  *
  * v2 - FLAKY-PLANDOSE. Test 2 builds until it has a sample (at least
  *   eight default-dosed moves, up to forty builds). 2b had failed on an
@@ -146,6 +153,21 @@ for (const [label, kit] of [["full gym", FULL_GYM], ["bodyweight at home", []]])
     ok(`3. ${label}, ${d} min: at least 9 in 10 builds land within 15%`, inRange / n >= 0.9,
        `${inRange}/${n} in range; outside: ${got.filter(m => m < d * 0.85 || m > d * 1.15).join(",")}`);
   }
+}
+// F5. The pool that runs out: bodyweight Upper Body at home.
+{
+  let inRange = 0, repeats = 0, stated = 0; const got = [];
+  for (let i = 0; i < 200; i++) {
+    fresh();
+    const b = SB.buildSession({ sessionType: "upper", durationMins: 60, equipmentOverride: [] });
+    const m = mins(b); got.push(Math.round(m));
+    if (m >= 51 && m <= 69) inRange++;
+    const ids = b.exercises.map(e => e.id); if (new Set(ids).size !== ids.length) repeats++;
+    if (b.exercises.some(e => e._doseFrom === "instructions" && e._extraSet)) stated++;
+  }
+  ok("3u. bodyweight Upper Body at home, 60 min: every one of 200 builds lands within 15%", inRange === 200,
+     `${inRange}/200; outside: ${got.filter(m => m < 51 || m > 69).slice(0, 12).join(",")}`);
+  ok("3u2. with no move repeated, and no stated dose changed", repeats === 0 && stated === 0, `${repeats} repeats, ${stated} stated doses changed`);
 }
 fresh("low");
 const gentle = SB.buildSession({ sessionType: "full", durationMins: 40, equipmentOverride: FULL_GYM });

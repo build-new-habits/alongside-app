@@ -1,5 +1,11 @@
 /**
  * js/views/onboarding/thread.js
+ * 28 Sep 2026 v14
+ *
+ * v14 - F6, REDUCE-MOTION-ROW. Reduced motion is read from
+ *   display-prefs.js prefersReducedMotion(): the device, or the new
+ *   Settings switch. Same timings; one reader.
+ *
  * 22 Aug 2026 v13
  *   CONSENT-2. The consent gate no longer reaches outside the view, and
  *   no longer has an unguarded dereference.
@@ -202,6 +208,7 @@
  *     collapsed to 0ms.
  *   - Sheet focus trap handled by sheet-manager.js.
  */
+import { prefersReducedMotion } from '../../display-prefs.js';
 
 import { store }              from '../../store.js';
 import { getBeat3Script }     from '../../data/beat3-scripts.js';
@@ -232,7 +239,7 @@ import { openSheet }          from './sheet-manager.js';
 // MOTION PREFERENCE
 // ─────────────────────────────────────────────────────────────────────────────
 
-const REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const REDUCED_MOTION = prefersReducedMotion();   // F6: the device, or Settings
 
 // Timing constants — collapsed to near-zero when motion is reduced
 const T = {

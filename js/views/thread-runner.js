@@ -1,5 +1,11 @@
 /**
  * js/views/thread-runner.js
+ * 28 Sep 2026 v2
+ *
+ * v2 - F6, REDUCE-MOTION-ROW. Reduced motion is read from
+ *   display-prefs.js prefersReducedMotion(): the device, or the new
+ *   Settings switch. Same timings; one reader.
+ *
  * 22 Aug 2026 v1
  *
  * THREAD-1a — the coach's conversation, as a component.
@@ -52,11 +58,9 @@
  *     input   { kind: 'text'|'date', label, value?, maxlength? }
  *     next    stepId | (answer, ctx) => stepId | null   (null ends it)
  */
+import { prefersReducedMotion } from '../display-prefs.js';
 
-const REDUCED_MOTION =
-  typeof window !== 'undefined' && window.matchMedia
-    ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    : false;
+const REDUCED_MOTION = prefersReducedMotion();   // F6: the device, or Settings (read when first loaded)
 
 /**
  * Timing. EVERY value collapses to zero under prefers-reduced-motion --

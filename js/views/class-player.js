@@ -1,6 +1,12 @@
 /**
  * js/views/class-player.js
  *
+ * 28 Sep 2026 v4
+ *
+ * v4 - F6, REDUCE-MOTION-ROW. Reduced motion is read from
+ *   display-prefs.js prefersReducedMotion(): the device, or the new
+ *   Settings switch. Same timings; one reader.
+ *
  * 08 Sep 2026 v3
  *
  * v3 - LOG-CLASS-1. A class that was done is RECORDED, and finishing
@@ -80,6 +86,7 @@
  *     animation and are left alone.
  *   · The exit is a real button, always present, never behind a hold.
  */
+import { prefersReducedMotion } from '../display-prefs.js';
 
 import { store } from '../store.js';
 import { isGateDue, renderSafetyGate, attachSafetyGate } from '../safety-gate.js';
@@ -112,9 +119,7 @@ let _paused    = false;
 let _remaining = 0;   // ms left of the current beat when paused
 let _startedAt = 0;   // when the current beat's timer began
 
-const REDUCED = () =>
-  typeof window.matchMedia === 'function' &&
-  window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const REDUCED = () => prefersReducedMotion();   // F6: the device, or Settings
 
 function _esc(v) {
   return String(v == null ? '' : v)

@@ -1,6 +1,12 @@
 /**
  * js/display-prefs.js
- * 29 Aug 2026 v3
+ * 28 Sep 2026 v4
+ * v4 - F6, REDUCE-MOTION-ROW (Graeme, 28 Sep: add it). New key
+ *   `reduceMotion`: "off" follows the device (as the app always has),
+ *   "on" reduces motion here too. On, every stylesheet rule written for
+ *   prefers-reduced-motion is applied (copied from the sheets, so the two
+ *   cannot drift), the root gets .reduce-motion, and prefersReducedMotion()
+ *   -- now the one reader for the JS views -- answers true.
  *
  * v3 - CARD-1. New key `fullInstructions`. When "on", the exercise card
  *   renders every section expanded regardless of phase or familiarity.
@@ -60,6 +66,7 @@ export const DISPLAY_KEYS = {
   underline:     "alongside-underline-links",
   focus:         "alongside-enhanced-focus",
   fullInstructions: "alongside-full-instructions",
+  reduceMotion:  "alongside-reduce-motion",
 };
 
 export const DISPLAY_DEFAULTS = {
@@ -77,6 +84,9 @@ export const DISPLAY_DEFAULTS = {
   // full text is one tap away at every level, and nothing safety-bearing
   // is ever collapsed. See alongside_blueprint_CARD-1_29aug2026_v1.md.
   fullInstructions: "off",
+  // F6. "off" means follow the device's own setting, which the app has
+  // always honoured. "on" reduces motion here whatever the device says.
+  reduceMotion:  "off",
 };
 
 // Ranges are deliberately conservative at the bottom end: nothing here
@@ -159,6 +169,59 @@ export function applyDisplayPrefs() {
 
   root.classList.toggle("underline-links", getDisplayPref("underline") === "on");
   root.classList.toggle("enhanced-focus",  getDisplayPref("focus")     === "on");
+  _applyReduceMotion(getDisplayPref("reduceMotion") === "on");
+}
+
+/**
+ * F6, REDUCE-MOTION-ROW. True when motion should be reduced: the switch
+ * in Settings is on, OR the device asks for it (as the app always did).
+ * The one reader for every view that times or animates in JS.
+ */
+export function prefersReducedMotion() {
+  if (getDisplayPref("reduceMotion") === "on") return true;
+  try {
+    return typeof window.matchMedia === "function" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  } catch { return false; }
+}
+
+/**
+ * The switch behaves EXACTLY as the device setting does: every rule the
+ * stylesheets already hold inside @media (prefers-reduced-motion: reduce)
+ * is copied, unwrapped, into one <style>. Read from the sheets rather
+ * than written a second time, so the two can never drift -- a new
+ * reduced-motion rule anywhere is covered the day it is written.
+ */
+export const REDUCE_MOTION_STYLE_ID = "reduce-motion-rules";
+function _reducedMotionCss() {
+  const out = [];
+  const walk = rules => {
+    for (const r of rules || []) {
+      // main.css pulls every component sheet in with @import.
+      if (r.styleSheet) { try { walk(r.styleSheet.cssRules); } catch { /* not ours */ } continue; }
+      const media = r.media?.mediaText || r.conditionText || "";
+      if (r.cssRules && /prefers-reduced-motion\s*:\s*reduce/i.test(media)) {
+        for (const inner of r.cssRules) out.push(inner.cssText);
+      } else if (r.cssRules && !/prefers-reduced-motion/i.test(media)) {
+        walk(r.cssRules);
+      }
+    }
+  };
+  for (const sheet of Array.from(document.styleSheets || [])) {
+    if (sheet.ownerNode?.id === REDUCE_MOTION_STYLE_ID) continue;
+    try { walk(sheet.cssRules); } catch { /* a cross-origin sheet: not ours */ }
+  }
+  return out.join("\n");
+}
+function _applyReduceMotion(on) {
+  const root = document.documentElement;
+  root.classList.toggle("reduce-motion", on);
+  const existing = document.getElementById(REDUCE_MOTION_STYLE_ID);
+  if (!on) { existing?.remove(); return; }
+  const css = _reducedMotionCss();
+  const el = existing || Object.assign(document.createElement("style"), { id: REDUCE_MOTION_STYLE_ID });
+  el.textContent = css;
+  if (!existing) document.head.appendChild(el);
 }
 
 /**

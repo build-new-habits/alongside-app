@@ -1,5 +1,9 @@
-<!-- index.html | 21 Jul 2026 v2 -->
+<!-- index.html | 28 Sep 2026 v4 -->
 <!--
+  v4 — F6, REDUCE-MOTION-ROW, 28 Sep 2026. The pre-paint script applies
+  Reduce motion (alongside-reduce-motion) with the other display
+  settings, so .reduce-motion is on the root before first paint.
+
   v3 — HATCH-OVERLAP, 06 Sep 2026. ESCAPE-Z raised the hatch above every
   modal so it could be tapped; that fixed reachability and made the
   overlap worse, because it now sits on top of whatever is in the
@@ -156,7 +160,8 @@
           letterSpacing: "alongside-letter-spacing",
           underline:     "alongside-underline-links",
           focus:         "alongside-enhanced-focus",
-          fullInstructions: "alongside-full-instructions"
+          fullInstructions: "alongside-full-instructions",
+          reduceMotion:  "alongside-reduce-motion"
         };
         var D = {
           scheme:        "dark",
@@ -165,7 +170,8 @@
           letterSpacing: "0",
           underline:     "off",
           focus:         "off",
-          fullInstructions: "off"
+          fullInstructions: "off",
+          reduceMotion:  "off"
         };
         var g = function (k, d) { var v = localStorage.getItem(k); return v === null ? d : v; };
         var r = document.documentElement;
@@ -180,6 +186,7 @@
         r.style.setProperty("--user-letter-spacing", g(K.letterSpacing, D.letterSpacing) + "em");
         if (g(K.underline, D.underline) === "on") r.classList.add("underline-links");
         if (g(K.focus,     D.focus)     === "on") r.classList.add("enhanced-focus");
+        if (g(K.reduceMotion, D.reduceMotion) === "on") r.classList.add("reduce-motion");
       } catch (e) { /* private mode, storage disabled: defaults stand */ }
     })();
   </script>

@@ -1,5 +1,11 @@
 /**
  * js/views/checkin.js
+ * 28 Sep 2026 v21
+ *
+ * v21 - F6, REDUCE-MOTION-ROW. Reduced motion is read from
+ *   display-prefs.js prefersReducedMotion(): the device, or the new
+ *   Settings switch. Same timings; one reader.
+ *
  * 28 Sep 2026 v20
  *
  * v20 - FEELINGS-RETIRE. The check-in object no longer carries a
@@ -324,6 +330,7 @@
  */
 
 import { store }           from "../store.js";
+import { prefersReducedMotion } from "../display-prefs.js";
 // DIC-FREE, 16 Sep 2026. The drop-in question is the FREE coach's
 // question. See _shouldAskVariety().
 import { isPremium }       from "../auth.js";
@@ -340,7 +347,7 @@ import { CONDITIONS, soreAreaOptions } from "../data/conditions.js";
 export function CheckinView(router) {
 
   // ── Motion preference (matches OB-THREAD timing constants) ─────────────────
-  const REDUCED_MOTION = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const REDUCED_MOTION = prefersReducedMotion();   // F6: the device, or Settings
   const T = {
     TYPING_SHOW:  REDUCED_MOTION ? 0 :  300,
     TYPING_MIN:   REDUCED_MOTION ? 0 :  900,

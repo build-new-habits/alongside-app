@@ -1,5 +1,10 @@
 /**
  * settings.js
+ * 28 Sep 2026 v40
+ *
+ * v40 - F6, REDUCE-MOTION-ROW. Display › Reduce motion: off follows the
+ *   device (as the app always has), on reduces motion here too.
+ *
  * 28 Sep 2026 v39
  *
  * v39 - SMOOTH-P5. Your plan shows the one table (tier-table.js) for
@@ -746,6 +751,8 @@ export function SettingsView(router) {
         _rowSwitch({ id: 'disp-underline', label: 'Underline links', disp: 'underline' }),
         _rowSwitch({ id: 'disp-focus', label: 'Stronger focus outlines', disp: 'focus' }),
         _rowSwitch({ id: 'disp-full-instructions', label: 'Always show full instructions', disp: 'fullInstructions' }),
+        // F6. Off follows the device, which the app always has.
+        _rowSwitch({ id: 'disp-reduce-motion', label: 'Reduce motion', disp: 'reduceMotion' }),
       ])}
 
       ${_group('Your plan and your data', [
@@ -1670,6 +1677,9 @@ export function SettingsView(router) {
 
         ${_dispToggle("fullInstructions", "disp-full-instructions", "Always show full instructions",
           "Exercise cards normally open the parts you need and tuck the rest away. Turn this on to see everything, every time")}
+
+        ${_dispToggle("reduceMotion", "disp-reduce-motion", "Reduce motion",
+          "The app already follows your device's setting. Turn this on to keep movement on screen to a minimum here as well: no sliding, fading or typing dots")}
 
         <button class="btn btn-secondary" id="disp-reset" type="button"
                 style="margin-top: var(--space-4);">
