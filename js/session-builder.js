@@ -1,7 +1,37 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
- * 13 Sep 2026 v52
+ * 28 Sep 2026 v53
+ *
+ * v53 - SMOOTH-P2b. PLAN-DOSE and GYM-KIT. The plan says how much, fills
+ *   the time asked for, and a gym gets gym moves.
+ *
+ *   Found building P2a: most main-block strength moves carry no sets or
+ *   reps in the library, so the plan and the player said "Barbell Hip
+ *   Thrust · 2 min". Graeme, 28 Sep: "Default for exercises. Yes. Users
+ *   can always put stuff in notes or make changes."
+ *
+ *   withDefaultDose(): a counted strength pattern with no reps gets
+ *   3 × 10 (8–12 on a harder day, 2 sets on a gentle one), "each side"
+ *   when one-sided, 60s rest unless the entry says otherwise. A copy --
+ *   the library entry is never touched. Holds, carries, cardio, yoga,
+ *   Pilates and stretches keep their clock. Swaps get the same dose.
+ *
+ *   The time asked for. 20, 40 and 50 minutes were not keys in the count
+ *   table and fell back to the 30-minute shape: a 40-minute request built
+ *   about 21 minutes while the coach said "around 40". Counts now
+ *   interpolate, and a normal or harder day tops the main block up until
+ *   it is within 15% of the time asked for. A gentle day is never padded
+ *   -- shorter is the point of it.
+ *
+ *   exerciseSeconds(): the one time estimate, exported so the plan screen
+ *   adds up minutes exactly as the builder trims them.
+ *
+ *   Gym kit. CON-8 preferred "any equipment", and a band counts, so a
+ *   full gym built band rows beside an unused rack. In the main block of
+ *   a strength session, weights and machines now lead when there are at
+ *   least MIN_CHOICE of them; otherwise any kit; otherwise everything.
+ *   Bands stay possible wherever weights are thin.
  *
  * v52 - ENERGY-1 and the FEED-1 reader. Two signals the app collected and
  *   never acted on.
@@ -1473,10 +1503,12 @@ export function swapExerciseInSession(session, index, replacement) {
   // second, staler opinion about what the coach suggested inside the
   // session record.
   const { recommended, ...clean } = replacement;
+  // SMOOTH-P2b. A swapped-in strength move gets the same dose as a picked
+  // one. The original comes back exactly as it was (it already has one).
   return {
     ...session,
     exercises: session.exercises.map((ex, i) =>
-      i === index ? { ...clean, section: target.section } : ex),
+      i === index ? withDefaultDose({ ...clean, section: target.section }) : ex),
   };
 }
 
@@ -1728,7 +1760,20 @@ const TYPE_COUNTS = {
 function _baseCounts(durationMins, sessionType) {
   const perType = TYPE_COUNTS[sessionType];
   if (perType && perType[durationMins]) return perType[durationMins];
-  return EXERCISE_COUNT[durationMins];
+  if (EXERCISE_COUNT[durationMins]) return EXERCISE_COUNT[durationMins];
+  // SMOOTH-P2b. The check-in offers 10, 20, 30, 40, 50 and 60 minutes and
+  // this table only knew 15, 30, 45 and 60, so 20, 40 and 50 fell back to
+  // the 30-minute shape. Interpolated between the neighbours instead.
+  const table = perType || EXERCISE_COUNT;
+  const keys  = Object.keys(table).map(Number).sort((a, b) => a - b);
+  const d     = Number(durationMins);
+  if (!Number.isFinite(d) || !keys.length) return undefined;
+  if (d <= keys[0]) return table[keys[0]];
+  if (d >= keys[keys.length - 1]) return table[keys[keys.length - 1]];
+  const hi = keys.find(k => k > d), lo = keys[keys.indexOf(hi) - 1];
+  const f  = (d - lo) / (hi - lo);
+  const mix = k => Math.round(table[lo][k] + (table[hi][k] - table[lo][k]) * f);
+  return { warmup: mix("warmup"), main: mix("main"), cooldown: mix("cooldown") };
 }
 
 // ── Coach line templates ───────────────────────────────────────────────────────
@@ -2109,9 +2154,69 @@ function intentPriority(ex) {
 // safety rule, not a suggestion. Tolerance is 15%: a session should feel
 // like the time asked for, not be padded or clipped to the minute.
 function _exerciseMins(ex) {
-  return ex.duration
-    ? (ex.duration * (ex.sets || 1) / 60)
-    : ((ex.sets || 3) * 1.5);
+  return exerciseSeconds(ex) / 60;
+}
+
+/**
+ * SMOOTH-P2b. The one time estimate, exported so the plan screen's
+ * minutes are the builder's minutes.
+ *
+ * ⚫ CORRECTED, not just moved. It multiplied `duration` by `sets` for
+ * everything. Measured on the library: an entry WITH reps carries its
+ * whole time in `duration` -- Seated Chair Press, 3 × 8, duration 180 --
+ * so it was counted as nine minutes. Every trim decision was made
+ * against that, which is part of how a 20-minute request came out at 28.
+ * C3's own note says sets multiply rep-based work only when there is no
+ * duration; this is that rule, applied.
+ *
+ *   reps and a duration  -> the duration is the whole exercise
+ *   a duration, no reps  -> a clock, run once per set (the player's rule)
+ *   neither              -> a minute and a half a set
+ */
+export function exerciseSeconds(ex) {
+  if (!ex) return 0;
+  if (ex.duration && ex.reps != null) return ex.duration;
+  if (ex.duration) return ex.duration * (ex.sets || 1);
+  return (ex.sets || 3) * 90;
+}
+
+/** Whole-exercise time for a dosed move: the work, and a rest between sets. */
+function _doseSeconds(sets, workPerSet, rest) {
+  return sets * workPerSet + Math.max(0, sets - 1) * rest;
+}
+
+// ── SMOOTH-P2b: the default dose ──────────────────────────────────────────
+
+/** Strength patterns counted in reps. Anything else keeps its clock. */
+const DOSE_PATTERNS = new Set([
+  "hinge", "squat", "lunge", "push", "pull",
+  "hip-extension", "hip-abduction", "calf-raise"
+]);
+/** Categories that are timed whatever their pattern says. */
+const DOSE_SKIP_CATEGORIES = new Set([
+  "conditioning", "easy-cardio", "cardio-warmup",
+  "pilates", "loaded-carry"
+]);
+
+/**
+ * A counted strength move with no reps gets the default, on a COPY.
+ * Graeme, 28 Sep: three sets of ten; eight to twelve on a harder day.
+ * Two sets on a gentle day, the same direction as _applyTodayIntensity.
+ * Per-set duration: about four seconds a rep, plus the rest.
+ */
+export function withDefaultDose(ex, intensity) {
+  if (!ex || ex.isPrescribed || ex._feature || ex.reps != null) return ex;
+  if ((ex.section || "main") !== "main") return ex;
+  if (!DOSE_PATTERNS.has(ex.movementPattern)) return ex;
+  if (DOSE_SKIP_CATEGORIES.has(ex.category)) return ex;
+  const level = intensity || _sessionIntensity() || "moderate";
+  const sets  = Number(ex.sets) > 0 ? Number(ex.sets) : (level === "low" ? 2 : 3);
+  const reps  = level === "high" ? "8\u201312" : "10";
+  const side  = ex.perSide ? " each side" : "";
+  const rest  = Number(ex.rest) > 0 ? Number(ex.rest) : 60;
+  const work  = 10 * 4 * (ex.perSide ? 2 : 1);
+  return { ...ex, sets, reps: `${reps}${side}`, rest,
+           duration: _doseSeconds(sets, work, rest), _doseWork: work, _defaultDose: true };
 }
 
 function _trimToDuration(warmup, prescribed, main, cooldown, targetMins) {
@@ -2148,6 +2253,45 @@ function _trimToDuration(warmup, prescribed, main, cooldown, targetMins) {
     main.length = 0;
     main.push(...trimmed);
   }
+
+  // SMOOTH-P2b. At the floor of three and still long -- a 20-minute
+  // session of three lifts at 3 × 10 -- take a set off the defaulted
+  // moves, longest first, down to two. Fewer sets, not fewer movements:
+  // the floor is about variety, and volume is what is over. Only the
+  // default dose is touched; a set count the library or a specialist
+  // wrote is never reduced.
+  for (let guard = 0; guard < 12 && total() > targetMins * TOLERANCE; guard++) {
+    let idx = -1;
+    for (let i = 0; i < main.length; i++) {
+      const ex = main[i];
+      if (!ex?._defaultDose || !(ex.sets > 2)) continue;
+      if (idx === -1 || _exerciseMins(ex) > _exerciseMins(main[idx])) idx = i;
+    }
+    if (idx === -1) break;
+    const ex = main[idx], sets = ex.sets - 1;
+    main[idx] = { ...ex, sets, duration: _doseSeconds(sets, ex._doseWork || 40, Number(ex.rest) || 60) };
+  }
+  return main;
+}
+
+/**
+ * SMOOTH-P2b. The other half of _trimToDuration(): a normal or harder day
+ * is filled until it is within 15% of the time asked for, one main
+ * exercise at a time, from the same selection (same kit, same rules,
+ * same preferences). A gentle day is never padded -- shorter is the
+ * point of it. Stops when nothing else fits rather than repeating.
+ */
+function _topUpToDuration(warmup, main, cooldown, targetMins, nextMain) {
+  if (_sessionIntensity() === "low") return main;
+  const total = () => [...warmup, ...main, ...cooldown].reduce((a, e) => a + _exerciseMins(e), 0);
+  for (let guard = 0; guard < 16 && total() < targetMins * 0.85; guard++) {
+    const more = (nextMain() || []).map(ex => withDefaultDose(ex));
+    if (!more.length) break;
+    // Never overshoot the upper bound to reach the lower one: a move that
+    // would is passed over, and the next candidate is tried.
+    if (total() + _exerciseMins(more[0]) > targetMins * 1.15) continue;
+    main.push(...more);
+  }
   return main;
 }
 
@@ -2175,6 +2319,14 @@ const GYM_SESSION_TYPES = new Set(["lower", "upper", "full", "core", "glute"]);
 // stop agreeing.
 function _offDisciplineForGym(ex) {
   return CROSS_DISCIPLINE.has(ex.movementPattern) || ex.discipline === "sport";
+}
+
+// SMOOTH-P2b GYM-KIT. Weights or a machine -- not a band, not a mat.
+const _SOFT_KIT = new Set(["foam-roller", "massage-gun", "stability-ball", "yoga-mat",
+                           "gym-membership", "step-platform", "fitness-studio"]);
+const GYM_KIT_PREFERENCE = 0.85;
+function _usesLoad(ex) {
+  return (ex.equipment || []).some(q => !/band/.test(q) && !_SOFT_KIT.has(q));
 }
 
 /**
@@ -2968,7 +3120,8 @@ export function buildSessionFromSelection({ sessionType, durationMins, selectedI
   // selected id that passes their filter and _trimToDuration() sets the
   // final length, so dropping a second copy leaves the trim more room
   // for the person's other picks rather than shortening the session.
-  const mainExercises     = chosenFrom(type.mainCategories,     "main");
+  // SMOOTH-P2b. The person's own picks get the same default dose.
+  const mainExercises     = chosenFrom(type.mainCategories,     "main").map(ex => withDefaultDose(ex));
   let   warmupExercises   = chosenFrom(type.warmupCategories,   "warmup");
   const cooldownExercises = chosenFrom(type.cooldownCategories, "cooldown");
 
@@ -3628,6 +3781,18 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
       if (preferEquipment) {
         const withKit = pool.filter(e => (e.equipment || []).length > 0);
         if (withKit.length >= MIN_CHOICE) candidates = withKit;
+        // SMOOTH-P2b GYM-KIT. A band is "equipment" to CON-8, so a full
+        // gym built band rows beside an unused rack. In a strength
+        // session's main block, weights and machines lead when there are
+        // enough of them to still be a choice. Preferred, not compulsory:
+        // about one pick in seven still comes from the wider pool, so a
+        // band face pull can turn up at a gym (spec 4.3: "bands remain
+        // possible") -- the MIN_CHOICE lesson again, a preference that
+        // never yields becomes a rule.
+        if (section === "main" && GYM_SESSION_TYPES.has(sessionType) && Math.random() < GYM_KIT_PREFERENCE) {
+          const withLoad = pool.filter(_usesLoad);
+          if (withLoad.length >= MIN_CHOICE) candidates = withLoad;
+        }
       }
 
       // Mastery escape: if every candidate here is past the ceiling and
@@ -3929,7 +4094,8 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
   const featureExercises = _selectFeature(type, equipSet, conditionSet, alreadyChosen);
 
   const mainExercises     = [...prescribed, ...featureExercises,
-                             ...selectFromCategories(mainCategories, "main", adjustedCounts.main, alreadyChosen)];
+                             ...selectFromCategories(mainCategories, "main", adjustedCounts.main, alreadyChosen)]
+                             .map(ex => withDefaultDose(ex));
   const cooldownExercises = selectFromCategories(type.cooldownCategories, "cooldown", adjustedCounts.cooldown, alreadyChosen);
 
   // If equipment mismatch is severe, add a coach note
@@ -3977,7 +4143,14 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
   );
 
   // Calculate estimated duration
-  _trimToDuration(warmupExercises, [], mainExercises, cooldownExercises, durationMins);
+  // SMOOTH-P2b. A gentle day is "shorter than usual" (GENTLE_LINES), so
+  // it is trimmed to three quarters of the time asked for, and never
+  // topped up. Before the counts table interpolated, this happened by
+  // accident at 40 and 50 minutes; now it is a rule.
+  const trimTarget = _sessionIntensity() === "low" ? Math.round(durationMins * 0.75) : durationMins;
+  _trimToDuration(warmupExercises, [], mainExercises, cooldownExercises, trimTarget);
+  _topUpToDuration(warmupExercises, mainExercises, cooldownExercises, durationMins,
+                   () => selectFromCategories(mainCategories, "main", 1, alreadyChosen));
   // ROLE-1. See _withRole above. This is the coach route -- One to one,
   // quick build, the four doors -- and the one the screenshots came from.
   const allExercises = [

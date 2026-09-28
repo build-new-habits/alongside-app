@@ -1,6 +1,12 @@
 /**
  * coach-proposal.js
- * 28 Sep 2026 v28
+ * 28 Sep 2026 v29
+ *
+ * v29 - SMOOTH-P2b. The plan's minutes are the builder's: _groupMinutes()
+ *   adds session-builder's exerciseSeconds(), the one estimate, instead
+ *   of a second sum that disagreed with it. Easier / Harder rescale a
+ *   rep-based move's whole-exercise time; a clock-run move's time already
+ *   scales with its sets.
  *
  * v28 - SMOOTH-P2a. Today's plan: every exercise, named, before Start.
  *
@@ -632,7 +638,7 @@ import { getConditionName }  from '../data/conditions.js';
 import { AVAILABLE_TIME_WINDOW_MINUTES } from '../data/workoutGenerator.js';
 import { buildSession, buildCandidatePools, equipmentForLocation,
          swapAlternatives, swapExerciseInSession, soreLevelFor,
-         soreScoresToday, SESSION_TYPES } from '../session-builder.js';
+         soreScoresToday, SESSION_TYPES, exerciseSeconds } from '../session-builder.js';
 // SMOOTH-P2a. The plan carries the safety note when it is due.
 import { isGateDue, isGuidanceDue, recordAcknowledgement,
          GUIDANCE_TEXT } from '../safety-gate.js';
@@ -1074,10 +1080,11 @@ export function CoachProposalView(router) {
       const sets = Number(ex.sets) || 1;
       const next = Math.max(1, sets + adjust);
       if (next === sets) return ex;
-      const timed = !!resolveTiming(ex).seconds;
-      const dur   = Number(ex.duration);
+      // exerciseSeconds(): with reps, `duration` is the whole exercise, so
+      // it scales; without, it is a per-set clock and the sets scale it.
+      const dur = Number(ex.duration);
       return { ...ex, sets: next,
-               ...(!timed && dur > 0 ? { duration: Math.round(dur * next / sets) } : {}) };
+               ...(ex.reps != null && dur > 0 ? { duration: Math.round(dur * next / sets) } : {}) };
     });
   }
 
@@ -1106,10 +1113,7 @@ export function CoachProposalView(router) {
   }
 
   function _groupMinutes(list) {
-    const secs = list.reduce((n, ex) => {
-      const t = resolveTiming(ex);
-      return n + (t.seconds ? t.seconds * (Number(ex.sets) || 1) : (Number(ex.duration) || 0));
-    }, 0);
+    const secs = list.reduce((n, ex) => n + exerciseSeconds(ex), 0);
     return Math.max(1, Math.round(secs / 60));
   }
 
