@@ -1,6 +1,16 @@
 /**
  * workout.js - Workout Execution View
- * 28 Sep 2026 v20
+ * 28 Sep 2026 v21
+ *
+ * v21 - SMOOTH-P2e, REST-1. Graeme, 28 Sep: "the suggestion should be
+ *   given." After each set but the last, the screen suggests the rest
+ *   the exercise carries ("Rest about 60s") with a quiet count that ends
+ *   on "Ready when you are." It NEVER moves the person on, never counts
+ *   past zero and never records anything: the next set is one tap away
+ *   the whole time. The 16 Sep steer holds -- a countdown is one wrong
+ *   decision from a shame mechanic -- so this one only ever suggests.
+ *   Only the end is announced (polite); a live region that ticks every
+ *   second would talk over the person the whole rest.
  *
  * v20 - SMOOTH-P2c. One screen per exercise. Spec 4.4.
  *
@@ -365,6 +375,21 @@ let timerStarted = false; // Timer doesn't start until user taps Start
 // every exercise change, never stored -- same reasons as before.
 let exerciseDone = false;
 
+// SMOOTH-P2e, REST-1. When the suggested rest ends (ms since epoch), or
+// null when no rest is running. Never stored.
+let restUntil = null;
+let restInterval = null;
+
+function _clearRest() {
+  if (restInterval) clearInterval(restInterval);
+  restInterval = null;
+  restUntil = null;
+}
+
+function _restLeft() {
+  return restUntil ? Math.max(0, Math.ceil((restUntil - Date.now()) / 1000)) : 0;
+}
+
 // SMOOTH-P2c. Move focus to the new exercise's name after a change, so a
 // screen reader starts at the top of the new card (2.4.3).
 let focusName = false;
@@ -494,6 +519,14 @@ export function render() {
 
         ${finishedByTimer ? `
           <p class="xcard-timer-done" role="status">That is the time up on ${exercise.name}.</p>
+        ` : ""}
+
+        ${restUntil && !exerciseDone ? `
+          <div class="wo-rest" role="group" aria-labelledby="wo-rest-label">
+            <p class="wo-rest__label" id="wo-rest-label">Rest about ${Number(exercise.rest) || 60}s</p>
+            <p class="wo-rest__count" id="wo-rest-count" aria-hidden="true"${_restLeft() === 0 ? " hidden" : ""}>${formatTime(_restLeft())}</p>
+            <p class="wo-rest__ready" id="wo-rest-ready" role="status" aria-live="polite">${_restLeft() === 0 ? "Ready when you are." : ""}</p>
+          </div>
         ` : ""}
 
         ${renderLogBlock(exercise, `wo-log-${currentExerciseIndex}`)}
@@ -815,16 +848,38 @@ export function onMount() {
   // TIMER-2. Each tap is one set. The last set ends the exercise.
   document.getElementById("wo-set-done-btn")?.addEventListener("click", () => {
     const sets = exercise.sets || 1;
+    _clearRest();
     if (currentSet < sets) {
       currentSet++;
+      // REST-1. A suggestion, with its own clock -- see the header.
+      restUntil = Date.now() + (Number(exercise.rest) || 60) * 1000;
     } else {
       exerciseDone = true;   // the last set IS the end of the exercise
     }
     router.navigate("workout");
   });
 
+  // REST-1. The quiet count. Updates the number only; announces once, at
+  // the end, and then stops. Nothing here navigates.
+  if (restUntil && !restInterval && document.getElementById("wo-rest-count")) {
+    restInterval = setInterval(() => {
+      const left  = _restLeft();
+      const count = document.getElementById("wo-rest-count");
+      const ready = document.getElementById("wo-rest-ready");
+      if (!count || !ready) { _clearRest(); return; }
+      count.textContent = formatTime(left);
+      if (left === 0) {
+        clearInterval(restInterval);
+        restInterval = null;
+        count.hidden = true;
+        ready.textContent = "Ready when you are.";
+      }
+    }, 1000);
+  }
+
   document.getElementById("wo-done-btn")?.addEventListener("click", () => {
     pauseTimer();
+    _clearRest();
     exerciseDone = true;
     router.navigate("workout");
   });
@@ -991,6 +1046,7 @@ function resetTimer() {
   // (complete and skip) come through here.
   exerciseDone = false;
   focusName    = true;
+  _clearRest();   // REST-1. A new exercise starts without a rest.
 }
 
 /**
@@ -1109,6 +1165,7 @@ function cleanupWorkout() {
   timeRemaining = 0;
   timerStarted  = false;
   exerciseDone = false;   // Index resets here, so this must too.
+  _clearRest();           // REST-1. And nothing keeps counting after they leave.
   // TIMER-1. And so must this. Without it, finishing a countdown, leaving,
   // and starting a NEW session showed "that is the time up on ..." on the
   // first exercise the person reached the note page for -- announcing a

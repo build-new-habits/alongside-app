@@ -1,6 +1,10 @@
 /*
  * css/components/coach-proposal.css
- * 28 Sep 2026 v10
+ * 28 Sep 2026 v11
+ *
+ * v11 - SMOOTH-P2e. .cp-planned (what they planned, first) and .cp-offer
+ *   (a good day's one-line offer). Both are words and a button, never a
+ *   colour alone.
  *
  * v10 - SMOOTH-P2a. Today's plan: .cp-plan (the named list, grouped
  *   Warm up / Main / Cool down), .cp-different (Something different
@@ -711,3 +715,31 @@
   color: var(--color-text);
   line-height: 1.5;
 }
+
+
+/* SMOOTH-P2e. Their planned session leads; the coach's plan follows. */
+.cp-planned {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-primary) 8%, transparent);
+}
+.cp-planned__title { margin: 0; font-weight: 700; color: var(--color-text); font-size: var(--text-lg); }
+.cp-planned__or { margin: var(--space-2) 0 0; font-size: var(--text-sm); color: var(--color-text-secondary); }
+
+/* SMOOTH-P2e. A good day is offered more, in one line. */
+.cp-offer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border-left: 3px solid var(--color-primary);
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+}
+.cp-offer__text { margin: 0; color: var(--color-text); line-height: 1.5; }
+.cp-offer .btn { min-height: 44px; }

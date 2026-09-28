@@ -1,7 +1,10 @@
 /* ============================================
    WORKOUT STYLES
    css/components/workout.css
-   28 Sep 2026 v18
+   28 Sep 2026 v19
+
+   v19 - SMOOTH-P2e. .wo-rest: the suggested rest after a set. Quiet by
+   design -- secondary text, no colour change at zero, no pulse.
 
    v18 - SMOOTH-P2c. .wo-flow: one screen per exercise. A quiet section
    label replaces the role pill (its cool-down colour was below 3:1 on
@@ -1834,3 +1837,19 @@
   font-weight: 600;
   color: var(--color-text);
 }
+
+
+/* SMOOTH-P2e, REST-1. A suggestion, styled like one. */
+.wo-rest {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  margin: 0 0 var(--space-4);
+  padding: var(--space-3);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-md);
+}
+.wo-rest__label { margin: 0; color: var(--color-text-secondary); }
+.wo-rest__count { margin: 0; font-size: var(--text-xl); font-variant-numeric: tabular-nums; color: var(--color-text); }
+.wo-rest__ready { margin: 0; min-height: 1.25rem; color: var(--color-text); font-weight: 600; }

@@ -1,6 +1,20 @@
 /**
  * coach-proposal.js
- * 28 Sep 2026 v29
+ * 28 Sep 2026 v30
+ *
+ * v30 - SMOOTH-P2e. Two of Graeme's 28 Sep decisions.
+ *
+ *   GOOD-DAY: "the offer of suggestion should be there." On a day the
+ *   person told us their energy is Good or Full of it, the plan is the
+ *   same size and ONE line offers more: "One more set on each" (the same
+ *   step as Harder). Offered, never given -- boom-and-bust is the
+ *   documented risk for the fatigue and perimenopause personas. Plan only.
+ *
+ *   WEEK-DOORS: offer both. A day planned as a walk, run, swim, cycle,
+ *   yoga or mindfulness leads with that session ("You planned a walk
+ *   today" · Start the walk). The coach cannot build those, so it had
+ *   been proposing Full Body over the top of their plan. The coach's
+ *   session stays underneath as the alternative.
  *
  * v29 - SMOOTH-P2b. The plan's minutes are the builder's: _groupMinutes()
  *   adds session-builder's exerciseSeconds(), the one estimate, instead
@@ -628,7 +642,7 @@ import { getPhaseBias, getReEntryContext, getMissedSessionOffer,
          recordSession, advanceWeekIfNeeded,
          getReEntryIntensity, applyMissedSessionAdaptation }  from '../data/programmeEngine.js';
 import { getProgramme }      from '../data/programmes.js';
-import { detectBurnout }     from '../data/checkin.js';
+import { detectBurnout, getTodaysCheckin } from '../data/checkin.js';
 import { getPrimaryEngineGoal } from '../data/goals.js';
 import { getConditionName }  from '../data/conditions.js';
 // TWO-ENGINE, 06 Sep 2026. workoutGenerator.js is no longer imported
@@ -1029,8 +1043,10 @@ export function CoachProposalView(router) {
 
           <!-- LOCATION-1. h1: this screen's top level. WCAG 2.2 AA 1.3.1. -->
           <h1 id="cp-preview-title" class="cp-preview-panel__title">Today’s plan</h1>
+          ${premium ? _renderPlanned() : ''}
           ${option ? `<p class="cp-plan__sentence">${_planSentence(option)}</p>` : ''}
           ${premium ? _arcLine() : ''}
+          ${premium && option ? _renderGoodDayOffer() : ''}
 
           <!-- LOCATION-1 / SMOOTH-P2a. What the coach assumed, one tap to
                change each. Focus opens "Something different today". -->
@@ -1202,6 +1218,56 @@ export function CoachProposalView(router) {
     const t   = req ? SESSION_TYPES.find(x => x.id === req) : null;
     if (t && _deliveredType(option) === req) return `You asked for ${t.label.toLowerCase()} today.`;
     return option.rationale || '';
+  }
+
+  // ── SMOOTH-P2e. What they planned, and a good day ────────────────────────
+
+  /** Sessions the coach does not build, and where each one lives. */
+  const OWN_SESSIONS = {
+    walk:        { route: 'walk-session',    noun: 'a walk',         go: 'Start the walk'  },
+    run:         { route: 'running-session', noun: 'a run',          go: 'Start the run'   },
+    swim:        { route: 'swim-session',    noun: 'a swim',         go: 'Start the swim'  },
+    cycle:       { route: 'cycle-session',   noun: 'a ride',         go: 'Start the ride'  },
+    yoga:        { route: 'yoga-session',    noun: 'yoga',           go: 'Start yoga'      },
+    mindfulness: { route: 'quiet-session',   noun: 'mindfulness',    go: 'Start mindfulness' },
+  };
+
+  function _plannedToday() {
+    const DAYS = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
+    const slot = store.get(`weeklyPlan.days.${DAYS[new Date().getDay()]}`) || {};
+    if (!slot || slot.type === 'rest' || !OWN_SESSIONS[slot.sessionType]) return null;
+    return { id: slot.sessionType, ...OWN_SESSIONS[slot.sessionType] };
+  }
+
+  /**
+   * WEEK-DOORS. Their plan first, the coach's second. Nothing is claimed
+   * beyond what they set: the words are "you planned", from weeklyPlan.
+   */
+  function _renderPlanned() {
+    const p = _plannedToday();
+    if (!p) return '';
+    return `
+      <div class="cp-planned" role="group" aria-labelledby="cp-planned-title">
+        <p class="cp-planned__title" id="cp-planned-title">You planned ${p.noun} today.</p>
+        <button class="btn btn-primary btn-full" id="cp-planned-start" data-planned-route="${p.route}">${p.go}</button>
+        <p class="cp-planned__or">Or the coach\u2019s session instead:</p>
+      </div>`;
+  }
+
+  /**
+   * GOOD-DAY. Only from what they told us this morning (energy Good = 7,
+   * Full of it = 9), only while nothing has been added, and never applied
+   * without the tap.
+   */
+  function _renderGoodDayOffer() {
+    if (adjust !== 0) return '';
+    const c = getTodaysCheckin() || {};
+    if (!(Number(c.energy) >= 7)) return '';
+    return `
+      <div class="cp-offer" role="note">
+        <p class="cp-offer__text">You said your energy\u2019s good today. The plan stays as it is \u2014 if you\u2019d like a bit more:</p>
+        <button class="btn btn-secondary" id="cp-offer-more">One more set on each</button>
+      </div>`;
   }
 
   // ── SMOOTH-P2a. Something different today ────────────────────────────────
@@ -1414,6 +1480,17 @@ export function CoachProposalView(router) {
       if (!d) return;
       d.open = true;
       d.querySelector('[data-different-kind]')?.focus();
+    });
+
+    panel.querySelector('#cp-planned-start')?.addEventListener('click', e => {
+      closePreviewPanel(container, { navigateHome: false });
+      router.navigate(e.currentTarget.dataset.plannedRoute);
+    });
+
+    panel.querySelector('#cp-offer-more')?.addEventListener('click', () => {
+      adjust = 1;
+      statusMsg = 'One more set on each main exercise.';
+      _rerenderPanel(container, true);
     });
 
     panel.querySelectorAll('[data-swap]').forEach(btn => {

@@ -1,6 +1,11 @@
 /**
  * tools/verify-player-flow.mjs
- * 28 Sep 2026 v1
+ * 28 Sep 2026 v2
+ *
+ * v2 - SMOOTH-P2e, REST-1 (test 5). Graeme, 28 Sep: "the suggestion
+ *   should be given." A suggested rest after each set that ends on
+ *   "Ready when you are", never moves the person on, never blocks the
+ *   next set, and is not offered after the last set.
  *
  * SMOOTH-P2c. The coach's player: one screen per exercise, the dose up
  * front, last time already in the log, and an exit that always lands
@@ -147,6 +152,29 @@ const log = store.get("activityLog") || [];
 ok("4g. End it here and save goes to the finish, saving what was done",
    navs.at(-1) === "reflect" && log.length === b2 + 1 && log.at(-1).status === "partial" && log.at(-1).exercisesCount === 1,
    `${JSON.stringify(navs)} ${JSON.stringify(log.at(-1))}`);
+
+// ── 5. REST-1: A SUGGESTED REST ─────────────────────────────────────────
+console.log("\nTEST 5 - after a set, a suggested rest that never pushes");
+fresh([{ ...ROW, rest: 2 }, { ...ROW, id: "fixture-2", name: "Goblet Squat", rest: 2 }]);
+ok("5pc. REVERSAL: no rest before the first set", !main.querySelector(".wo-rest"));
+tap("#wo-set-done-btn");
+const rest = main.querySelector(".wo-rest");
+ok("5a. after a set, the rest is suggested in words", !!rest && /Rest about 2s/.test(rest.textContent));
+ok("5b. the next set is one tap away during it", /Set 2 done/.test(main.querySelector("#wo-set-done-btn")?.textContent || ""));
+ok("5c. the count is not read out every second", main.querySelector("#wo-rest-count")?.getAttribute("aria-hidden") === "true" &&
+   (main.querySelector("#wo-rest-ready")?.textContent || "") === "");
+const navsBeforeRest = navs.length;
+await new Promise(r => setTimeout(r, 3200));
+ok("5d. at the end it says \"Ready when you are.\" once, politely",
+   /Ready when you are/.test(main.querySelector("#wo-rest-ready")?.textContent || "") &&
+   main.querySelector("#wo-rest-ready")?.getAttribute("aria-live") === "polite" &&
+   main.querySelector("#wo-rest-count")?.hidden === true);
+ok("5e. and nothing moved: same exercise, same set", main.querySelector(".exercise-name")?.textContent === "Dumbbell Row" && /Set 2 of 3/.test(T()) && navs.length === navsBeforeRest,
+   `${main.querySelector(".exercise-name")?.textContent} ${JSON.stringify(navs)}`);
+tap("#wo-set-done-btn"); tap("#wo-set-done-btn");
+ok("5f. no rest after the last set: the exercise is done", !main.querySelector(".wo-rest") && !!main.querySelector("#complete-exercise-btn"));
+tap("#complete-exercise-btn");
+ok("5g. the next exercise starts without a rest", main.querySelector(".exercise-name")?.textContent === "Goblet Squat" && !main.querySelector(".wo-rest"));
 
 console.log("");
 if (fails) { console.log(`PLAYER-FLOW: ${fails} FAILED, ${passes} passed`); process.exit(1); }
