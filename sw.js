@@ -1,7 +1,12 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 28 Sep 2026 v560
+ * 28 Sep 2026 v561
+ *
+ * v561 - Work list 11 + FEELINGS-RETIRE. REMOVED from precache
+ *   (deleted): js/data/feelings.js, js/data/signal-words.js. Changed:
+ *   store, data/checkin, data/checkin-openings, views/checkin,
+ *   views/coach-proposal. 192 gates.
  *
  * v560 - Work list 10, CL-5-ALL. No new files. Changed: ten exercise
  *   library files (descriptions reworded). 191 gates.
@@ -3996,7 +4001,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v560";
+const CACHE_NAME = "alongside-v561";
 
 const SHELL_URLS = [
 
@@ -4221,9 +4226,7 @@ const SHELL_URLS = [
   "/alongside-app/js/data/time-windows.js",
   "/alongside-app/js/data/programmeEngine.js",
   "/alongside-app/js/data/programmes.js",
-  "/alongside-app/js/data/signal-words.js",
   "/alongside-app/js/data/grounding-moments.js",
-  "/alongside-app/js/data/feelings.js",
   "/alongside-app/js/data/coach-voice.js",
 
   // Exercise database
