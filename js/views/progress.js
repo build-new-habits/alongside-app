@@ -1,6 +1,30 @@
 /**
  * progress.js
- * 08 Sep 2026 v15
+ * 28 Sep 2026 v16
+ *
+ * v16 - SMOOTH-P4a. Progress reads the arc back. Spec 4.8.
+ *
+ *   PLAN, top to bottom: Your arc · week n (the aim, one coach sentence);
+ *   What you've told me about (each sore-able condition: since when,
+ *   mentions at check-in this week and when they started, a six-week
+ *   chart, and "This is what you've told me at check-in. It isn't a
+ *   diagnosis."); From your logged weights (first → latest, facts only);
+ *   What your arc works on (each strand with a DATE, never a count);
+ *   Change my arc. Then Everything you've done.
+ *
+ *   EVERYTHING YOU'VE DONE is one block for both tiers: the coach's line,
+ *   the sessions number, a six-week chart. Counts come from
+ *   store.completedSessions() only (COUNT-1). Plan switches 30 / 90 days.
+ *
+ *   FREE sees 30 days, not 14, and nothing locked: the padlocked 30/90
+ *   tabs are gone. Its coach line says what was done and the most common
+ *   kind ("You've moved 10 times in the last 30 days, mostly strength.").
+ *   Last, a quiet card: what the Plan adds here.
+ *
+ *   The read-back is js/data/arc-readback.js: pure functions over data
+ *   already kept. No new tracking. Charts are one hue, a sentence before
+ *   each, an accessible name on every bar, and a value on the first and
+ *   last bar only.
  *
  * v15 - TARGET-3. The weekly target is shown only if the person SET one.
  *   getProgressStats() returns strategicGoal.weeklySessionTarget or 3
@@ -243,6 +267,11 @@ import { SESSION_TYPES }    from '../session-builder.js';
 import { getProgressStats } from '../data/programmeEngine.js';
 import { getGoalLabel }     from '../data/goals.js';
 import { toKg, formatWeight, observedRateBreach } from '../data/weight-targets.js';
+import { aimById } from '../data/aims.js';
+import { CONDITIONS, soreAreaOptions } from '../data/conditions.js';
+import { EXERCISES } from '../data/exercises/index.js';
+import { conditionReadback, liftReadback, strandReadback, arcWeek, sessionsByWeek,
+         sessionsInWindow, shortDate } from '../data/arc-readback.js';
 
 // Set by _rateNote when it renders the sustained-rate note, committed by
 // _commitRateRaise once the markup is on screen. It is a fact about this
@@ -262,7 +291,8 @@ export function ProgressView(router) {
   // shape at all. Fourteen days holds about four of his sessions, which
   // has a shape. The difference that matters is not the window; it is
   // what the coach DOES with it (see _buildObservation).
-  const FREE_WINDOW = 14;
+  // SMOOTH-P4a. Free sees 30 days and nothing locked (spec 4.8).
+  const FREE_WINDOW = 30;
   const PAID_DEFAULT = 30;
 
   // Initialised per tier at first render rather than at module load.
@@ -299,12 +329,16 @@ export function ProgressView(router) {
 
         <header class="progress-header">
           <h1 class="progress-title">Progress</h1>
-          ${renderWindowTabs(tier)}
         </header>
 
         <div class="progress-body">
+          ${premium ? renderArcReadback() : ''}
+
+          <h2 class="pr-title" id="pr-done-h">Everything you\u2019ve done</h2>
+          ${premium ? renderWindowTabs(tier) : ''}
           ${renderCoachNarrative(stats, tier, name)}
           ${renderActivitySummary(tier)}
+          ${renderSessionsChart()}
           ${renderSessionShapes(tier)}
           ${stats.hasActiveProgramme ? renderProgrammeProgress(stats) : ''}
           <!-- R4 / decision 7.2, 20 Aug 2026. Was:
@@ -331,6 +365,8 @@ export function ProgressView(router) {
                   aria-label="Look back across your year">
             Your year
           </button>
+
+          ${premium ? '' : renderPlanCard()}
         </div>
 
       </div>
@@ -482,30 +518,21 @@ export function ProgressView(router) {
   // ── Window tabs (Personal only) ────────────────────────────────────────────
 
   function renderWindowTabs(tier) {
-    const premium = tier === 'personal';   // ATHLETE-RETIRE
-    // Free sees its fortnight, plus 30 and 90 as visible, tappable
-    // locked options — not hidden features. WOW-4's principle that
-    // nothing is a dead end: a locked control explains itself and offers
-    // a route, rather than being absent or inert.
-    const windows = premium ? [30, 90] : [FREE_WINDOW, 30, 90];
+    // SMOOTH-P4a. Plan only, 30 or 90. Free sees 30 days and nothing
+    // locked -- the padlocked tabs made the free screen a sales page.
+    const windows = [30, 90];
     return `
-      <div class="progress-tabs"
-           role="tablist"
-           aria-label="Lookback window">
-        ${windows.map(w => {
-          const locked = !premium && w !== FREE_WINDOW;
-          return `
+      <div class="progress-tabs" role="tablist" aria-label="How far back">
+        ${windows.map(w => `
           <button
-            class="progress-tab ${activeWindow === w ? 'progress-tab--active' : ''}${locked ? ' progress-tab--locked' : ''}"
+            class="progress-tab ${activeWindow === w ? 'progress-tab--active' : ''}"
             role="tab"
             id="tab-${w}"
             aria-selected="${activeWindow === w ? 'true' : 'false'}"
             aria-controls="panel-${w}"
-            ${locked ? 'data-route="upgrade"' : `data-window="${w}"`}
-            aria-label="${w} days${locked ? ' \u2014 part of the Plan, tap to learn more' : ''}">
-            ${w} days${locked ? ' \uD83D\uDD12' : ''}
-          </button>`;
-        }).join('')}
+            data-window="${w}">
+            ${w} days
+          </button>`).join('')}
       </div>
     `;
   }
@@ -526,8 +553,7 @@ export function ProgressView(router) {
       <section class="progress-narrative"
                aria-label="Coach observations"
                id="panel-${activeWindow}"
-               role="tabpanel"
-               aria-labelledby="tab-${activeWindow}">
+               ${tier === 'free' ? '' : `role="tabpanel" aria-labelledby="tab-${activeWindow}"`}>
         <div class="progress-narrative__text">
           ${observation.lines.map(line => `<p>${line}</p>`).join('')}
         </div>
@@ -747,6 +773,163 @@ export function ProgressView(router) {
 
   // ── Export block ───────────────────────────────────────────────────────────
 
+  // ── SMOOTH-P4a. The arc, read back (Plan) ──────────────────────────────
+
+  /**
+   * One bar chart, one hue. A sentence first, so the chart is never the
+   * only carrier of the number; every bar has an accessible name; a value
+   * is shown on the first and last bar only. `of` draws the whole (all
+   * check-ins that week) as an outline behind the filled part.
+   */
+  function _chart({ id, summary, bars, title }) {
+    const max = Math.max(1, ...bars.map(b => Math.max(b.value, b.of || 0)));
+    return `
+      <figure class="pr-chart" aria-labelledby="${id}-cap">
+        <figcaption class="pr-chart__summary" id="${id}-cap">${_esc(summary)}</figcaption>
+        <ol class="pr-bars" aria-label="${_esc(title)}">
+          ${bars.map((b, i) => {
+            const edge = i === 0 || i === bars.length - 1;
+            return `
+            <li class="pr-bar" title="${_esc(b.label)}">
+              <span class="sr-only">${_esc(b.label)}</span>
+              <span class="pr-bar__value" aria-hidden="true">${edge ? _esc(String(b.value)) : ''}</span>
+              <span class="pr-bar__track" aria-hidden="true" style="--h:${Math.round(((b.of ?? b.value) / max) * 100)}%">
+                <span class="pr-bar__fill" style="--f:${Math.round((b.value / max) * 100)}%"></span>
+              </span>
+              <span class="pr-bar__week" aria-hidden="true">${edge ? _esc(shortDate(b.start)) : ''}</span>
+            </li>`;
+          }).join('')}
+        </ol>
+      </figure>`;
+  }
+
+  /** Conditions the check-in asks about: the sore-able ones the person listed. */
+  function _soreConditions() {
+    const soreable = new Set(soreAreaOptions([]).map(o => o.id));
+    return (store.get('conditions') || []).filter(id => soreable.has(id));
+  }
+
+  function renderArcReadback() {
+    const arc   = store.get('arc') || {};
+    const aim   = arc.active && arc.aimId ? aimById(arc.aimId) : null;
+    const now   = new Date();
+
+    if (!aim) {
+      return `
+        <section class="pr-block" aria-labelledby="pr-arc-h">
+          <h2 class="pr-title" id="pr-arc-h">Your arc</h2>
+          <p class="pr-coach">Tell me what you want to be able to do, and this is where it lives — what you’re working towards and what has come up.</p>
+          <button class="btn btn-secondary btn-full" data-route="arc-setup">Set up your arc</button>
+        </section>
+        ${_conditionsBlock(now)}
+        ${_liftsBlock()}`;
+    }
+
+    const week    = arcWeek(arc, now);
+    const strands = strandReadback(arc, now);
+    const latest  = strands.filter(s => s.last).sort((a, b) => b.last.localeCompare(a.last))[0];
+    const coach   = !strands.length ? ''
+      : latest ? `${latest.label} came up most recently, ${latest.text.replace(/^Worked /, '')}.`
+      : 'Nothing has come up yet. All of it is still ahead of you.';
+
+    return `
+      <section class="pr-block" aria-labelledby="pr-arc-h">
+        <h2 class="pr-title" id="pr-arc-h">Your arc${week ? ` · week ${week}` : ''}</h2>
+        <p class="pr-aim">Working towards “${_esc(aim.label)}”</p>
+        ${coach ? `<p class="pr-coach">${_esc(coach)}</p>` : ''}
+      </section>
+
+      ${_conditionsBlock(now)}
+      ${_liftsBlock()}
+
+      ${strands.length ? `
+        <section class="pr-block" aria-labelledby="pr-strands-h">
+          <h2 class="pr-title" id="pr-strands-h">What your arc works on</h2>
+          <ul class="pr-strands">
+            ${strands.map(s => `
+              <li class="pr-strand">
+                <span class="pr-strand__name">${_esc(s.label)}</span>
+                <span class="pr-strand__when">${_esc(s.text)}</span>
+              </li>`).join('')}
+          </ul>
+          <p class="pr-note">Nothing is behind. “Not yet” means it hasn’t come up since your arc began.</p>
+        </section>` : ''}
+
+      <button class="btn btn-secondary btn-full pr-change" data-route="stretch-arc">Change my arc</button>`;
+  }
+
+  function _conditionsBlock(now) {
+    const ids = _soreConditions();
+    if (!ids.length) return '';
+    const history = store.get('checkinHistory') || {};
+    const meta    = store.get('conditionMeta') || {};
+    return `
+      <section class="pr-block" aria-labelledby="pr-told-h">
+        <h2 class="pr-title" id="pr-told-h">What you’ve told me about</h2>
+        ${ids.map(id => {
+          const r    = conditionReadback(id, { history, meta, now });
+          const name = CONDITIONS.find(c => c.id === id)?.name || id;
+          return `
+            <div class="pr-condition">
+              <h3 class="pr-condition__name">${_esc(name)}</h3>
+              ${r.since ? `<p class="pr-condition__since">Since ${_esc(shortDate(`${r.since}T12:00:00`))}</p>` : ''}
+              <p class="pr-condition__lines">${r.lines.map(_esc).join(' ')}</p>
+              ${_chart({
+                id: `pr-c-${id}`,
+                title: `${name}: mentions at check-in, week by week`,
+                summary: `Mentions at check-in over the last six weeks, out of all your check-ins each week.`,
+                bars: r.weeks.map(w => ({ start: w.start, value: w.mentioned, of: w.checkins,
+                  label: `Week of ${shortDate(w.start)}: mentioned on ${w.mentioned} of ${w.checkins} check-in${w.checkins === 1 ? '' : 's'}` }))
+              })}
+            </div>`;
+        }).join('')}
+        <p class="pr-note">This is what you’ve told me at check-in. It isn’t a diagnosis.</p>
+      </section>`;
+  }
+
+  function _liftsBlock() {
+    const rows = liftReadback(store.get('liftLog') || {}, EXERCISES);
+    if (!rows.length) return '';
+    return `
+      <section class="pr-block" aria-labelledby="pr-lifts-h">
+        <h2 class="pr-title" id="pr-lifts-h">From your logged weights</h2>
+        <p class="pr-note">First time you logged it, and the latest.</p>
+        <ul class="pr-lifts">
+          ${rows.map(r => `
+            <li class="pr-lift">
+              <span class="pr-lift__name">${_esc(r.name)}</span>
+              <span class="pr-lift__text">${_esc(r.text)}</span>
+            </li>`).join('')}
+        </ul>
+      </section>`;
+  }
+
+  /** Six weeks of completed sessions, both tiers. COUNT-1. */
+  function renderSessionsChart() {
+    const completed = store.completedSessions(store.get('activityLog'));
+    const weeks = sessionsByWeek(completed, { weeks: 6 });
+    const total = weeks.reduce((n, w) => n + w.total, 0);
+    return _chart({
+      id: 'pr-sessions',
+      title: 'Sessions, week by week',
+      summary: total
+        ? `${total} session${total === 1 ? '' : 's'} over the last six weeks, week by week.`
+        : 'No sessions in the last six weeks yet.',
+      bars: weeks.map(w => ({ start: w.start, value: w.total,
+        label: `Week of ${shortDate(w.start)}: ${w.total} session${w.total === 1 ? '' : 's'}` }))
+    });
+  }
+
+  /** Free: last, quiet. Nothing greyed out, nothing locked. */
+  function renderPlanCard() {
+    return `
+      <section class="pr-block pr-plan-card" aria-labelledby="pr-plan-h">
+        <h2 class="pr-title" id="pr-plan-h">On the Plan</h2>
+        <p class="pr-coach">Your goal lives here too: what you’re working towards, what you’ve told me about, and what your logged weights show.</p>
+        <button class="btn btn-ghost btn-full" data-route="upgrade">What the Plan adds</button>
+      </section>`;
+  }
+
   function renderExportBlock() {
     return `
       <section class="progress-export" aria-label="Export your progress">
@@ -835,6 +1018,10 @@ export function ProgressView(router) {
 
     container.querySelector('#progress-year-btn')
       ?.addEventListener('click', () => router.navigate('annual-reflection'));
+
+    // SMOOTH-P4a. Change my arc, Set up your arc, What the Plan adds.
+    container.querySelectorAll('[data-route]').forEach(btn =>
+      btn.addEventListener('click', () => router.navigate(btn.dataset.route)));
     // R4: the locked-export tap handler is gone with its renderer.
   }
 
@@ -882,12 +1069,16 @@ export function ProgressView(router) {
                  : windowDays === 90 ? 'over the last 90 days'
                  : 'in this window';
 
+    // SMOOTH-P4a. The most common kind, said plainly: a fact, not a verdict.
+    const { topKind } = sessionsInWindow(recent, { days: windowDays + 1 });
+    // Free only: the Plan's read below already names the lean, in its own words.
+    const mostly = tier === 'free' && topKind && count > 1 ? `, mostly ${_shapeLabel(topKind).toLowerCase()}` : '';
     if (count === 0) {
       lines.push('Nothing logged in this window. Whenever you\'re ready — the app is here.');
     } else if (count === 1) {
-      lines.push(`One session ${period}.`);
+      lines.push(`You\'ve moved once ${period}.`);
     } else {
-      lines.push(`That\'s ${count} ${period}.`);
+      lines.push(`You\'ve moved ${count} times ${period}${mostly}.`);
     }
 
     if (tier === 'free' || !lines.length) return { lines: lines.length ? lines : ['Keep going.'] };

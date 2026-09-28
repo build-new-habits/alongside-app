@@ -1,6 +1,10 @@
 /**
  * today.js
- * 28 Sep 2026 v42
+ * 28 Sep 2026 v43
+ *
+ * v43 - SMOOTH-P4a. The arc chip opens Progress, where the arc is read
+ *   back (spec 4.1: "Arc chip → Progress, arc section"). Change my arc
+ *   is there.
  *
  * v42 - SMOOTH-P3a. Plan Home is three doors. Spec 4.1.
  *
@@ -1953,7 +1957,7 @@ function _markGuidanceShown(root) {
     // again. The aim's own words, else the arc's stored label.
     const label = arc.active ? ((arc.aimId && aimById(arc.aimId)?.label) || arc.label || 'your arc') : null;
     return label
-      ? `<button class="home-arc" data-route="stretch-arc" data-requires-checkin="false"
+      ? `<button class="home-arc" data-route="progress" data-requires-checkin="false"
                  aria-label="Your arc: working towards ${_esc(label)}">
            <span class="home-arc__label">Working towards</span>
            <span class="home-arc__aim">${_esc(label)}</span>

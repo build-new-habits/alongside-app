@@ -1,6 +1,13 @@
 /**
  * tools/verify-tier.mjs
- * 20 Aug 2026 v2
+ * 28 Sep 2026 v3
+ *
+ * v3 - SMOOTH-P4a. "free is a fortnight" becomes "free is 30 days, and
+ *   the Plan's difference is the arc, not a bigger number". Graeme
+ *   accepted the Smooth Path spec on 27 Sep (4.8, 4.11: free Progress
+ *   is 30 days, nothing locked). What this check guarded -- that the
+ *   Plan is not sold as a longer window -- is kept: the Plan's Progress
+ *   must carry the arc read-back, which free's must not.
  *
  * TIER-A/B/C/F GATE — the free boundary is where the boundary document
  * says it is.
@@ -293,10 +300,13 @@ check("PERSONAL BESTS are free, and still off by default", () => {
      "product exists to serve");
 });
 
-check("free is a fortnight", () =>
-  ok(/const FREE_WINDOW\s*=\s*14/.test(progress),
-     "the free window is not 14 days. Section 4.1: if free is fourteen days " +
-     "and Personal is ninety, we are selling a bigger number"));
+check("free is 30 days, and the Plan's difference is the arc", () => {
+  ok(/const FREE_WINDOW\s*=\s*30/.test(progress),
+     "the free window is not 30 days (Smooth Path spec 4.8 / 4.11)");
+  ok(/\$\{premium \? renderArcReadback\(\) : ''\}/.test(progress),
+     "the Plan's Progress no longer leads with the arc read-back, so the only " +
+     "difference left is a bigger number -- which is what this check exists to stop");
+});
 
 check("free RECORDS — no appraisal attached to a count", () => {
   // These fired on a number crossing a threshold: nine sessions got

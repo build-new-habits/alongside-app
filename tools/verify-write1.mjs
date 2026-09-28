@@ -2,6 +2,7 @@
  * tools/verify-write1.mjs
  * 28 Sep 2026 v3
  * SMOOTH-P3c. liftLog leaves the baseline: capture.js v2 reads it.
+ * SMOOTH-P4a. conditionMeta leaves it too: Progress reads addedAt.
  *
  * 22 Aug 2026 v2
  * WEIGHT-1a, 22 Aug 2026. `weightTracking` added — declared dark, writer
@@ -164,25 +165,10 @@ const BASELINE = new Set([
   'weeklyReview','waterLog','waterSettings','coachOffers','unwellMode',
   'foodPrompts','practiceHistory',
 
-  // 'conditionMeta' -- ADDED 29 Aug 2026, CHECKIN-2a.
-  //
-  // Written by store.addSoreArea() and normalised by
-  // _migrateConditionMeta(). It has no reader yet because its reader IS
-  // CHECKIN-2b -- resolution, quiet-run tracking and the noticing ask.
-  //
-  // This is the proposalBias shape and I am not pretending otherwise.
-  // The mitigation is not this comment; it is the CHECKIN-2b row in the
-  // master schedule. A DATED PROMISE, not permission: if 2b has shipped
-  // and this line is still here, the baseline is lying. If 2b is
-  // abandoned, the field must be removed rather than left sitting.
-  //
-  // Considered and rejected: inventing a reader in soreAreaLoaded that
-  // skips conditions whose meta says dormant. That reads well and is
-  // wrong -- if `conditions` and `conditionMeta` ever disagree, the safe
-  // direction is for the caution to FIRE, not to be suppressed. A reader
-  // added only to satisfy a gate would have made the safety behaviour
-  // worse.
-  'conditionMeta',
+  // 'conditionMeta' -- removed 28 Sep 2026. SMOOTH-P4a reads it: Progress
+  // says "Since 19 Aug" for each condition from conditionMeta[id].addedAt.
+  // A display, which is the safe direction the 29 Aug note asked for --
+  // nothing reads it to suppress a caution.
 
   // 'sessionPace' -- ADDED 28 Sep 2026, SMOOTH-P1, as a RETIREMENT, the
   // proposalBias shape below: every check-in is now the short one, the

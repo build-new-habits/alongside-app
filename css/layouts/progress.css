@@ -1,5 +1,12 @@
 /*
  * css/layouts/progress.css
+ * 28 Sep 2026 v6
+ *   SMOOTH-P4a. .pr-* -- the arc read back, and the one bar chart both
+ *   tiers share. One hue (the primary teal) on the ground; a check-in
+ *   week is an outline, the mentions in it the fill, so the whole and
+ *   the part read without a second colour. A value on the first and last
+ *   bar only; every bar is named for a screen reader in the markup.
+ *
  * 22 Aug 2026 v5
  *   WEIGHT-1b. .progress-weight -- the log and the sustained-rate note.
  *
@@ -482,3 +489,84 @@
   background: var(--color-bg-card);
   border-radius: var(--radius-md);
 }
+
+
+/* ── SMOOTH-P4a. The arc, read back ─────────────────────────── */
+.pr-block { margin: var(--space-6, 2rem) 0 0; }
+.pr-title { margin: var(--space-6, 2rem) 0 var(--space-2); font-size: var(--text-lg); color: var(--color-text); }
+.pr-block > .pr-title:first-child { margin-top: 0; }
+.pr-aim { margin: 0 0 var(--space-2); font-size: var(--text-lg); font-weight: 600; color: var(--color-text); }
+.pr-coach { margin: 0 0 var(--space-3); line-height: 1.55; color: var(--color-text); }
+.pr-note { margin: var(--space-2) 0 0; font-size: var(--text-sm); line-height: 1.5; color: var(--color-text-secondary); }
+.pr-change { margin-top: var(--space-4); }
+/* Free: last and quiet, set apart by a rule rather than a box. */
+.pr-plan-card { padding-top: var(--space-4); border-top: 1px solid var(--color-border); }
+
+.pr-condition { padding: var(--space-4) 0; border-bottom: 1px solid var(--color-border); }
+.pr-condition__name { margin: 0; font-size: var(--text-base); color: var(--color-text); }
+.pr-condition__since { margin: 2px 0 0; font-size: var(--text-sm); color: var(--color-text-secondary); }
+.pr-condition__lines { margin: var(--space-2) 0 0; line-height: 1.5; color: var(--color-text); }
+
+.pr-strands, .pr-lifts { margin: 0; padding: 0; list-style: none; }
+.pr-strand, .pr-lift {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+.pr-strand__name, .pr-lift__name { color: var(--color-text); }
+.pr-strand__when, .pr-lift__text { flex: none; color: var(--color-text-secondary); font-variant-numeric: tabular-nums; text-align: right; }
+
+/* ── The shared chart ─────────────────────────────────────────── */
+.pr-chart { margin: var(--space-3) 0 0; }
+.pr-chart__summary { margin: 0 0 var(--space-2); font-size: var(--text-sm); color: var(--color-text-secondary); }
+.pr-bars {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: var(--space-2);
+  align-items: end;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.pr-bar { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.pr-bar__value, .pr-bar__week {
+  display: block;
+  height: 1.3em;
+  line-height: 1.3;
+  white-space: nowrap;
+  font-size: var(--text-xs, 0.75rem);
+  color: var(--color-text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+.pr-bar__track {
+  position: relative;
+  display: block;
+  width: 100%;
+  max-width: 28px;
+  height: 64px;
+}
+/* The whole: an outline as tall as the week's count. */
+.pr-bar__track::before {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: var(--h);
+  border: 1px solid var(--color-primary);
+  border-radius: 4px 4px 0 0;
+  opacity: 0.55;
+}
+/* The part: filled, anchored to the baseline. */
+.pr-bar__fill {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: var(--f);
+  background: var(--color-primary);
+  border-radius: 4px 4px 0 0;
+}
+/* The whole is the outline; with nothing in it, nothing is drawn. */
+.pr-bar__track[style*="--h:0%"]::before { display: none; }
