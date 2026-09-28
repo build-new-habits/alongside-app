@@ -1,7 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 28 Sep 2026 v561
+ * 28 Sep 2026 v562
+ *
+ * v562 - Findings F1-F4. No new files. Changed: views/capture.js,
+ *   views/today.js, views/session-builder-ui.js, components/club-rooms.css,
+ *   red-flag.css, capture.css. 194 gates.
  *
  * v561 - Work list 11 + FEELINGS-RETIRE. REMOVED from precache
  *   (deleted): js/data/feelings.js, js/data/signal-words.js. Changed:
@@ -4001,7 +4005,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v561";
+const CACHE_NAME = "alongside-v562";
 
 const SHELL_URLS = [
 
