@@ -1,6 +1,9 @@
 /**
  * coach-proposal.js
- * 28 Sep 2026 v32
+ * 28 Sep 2026 v33
+ *
+ * v33 - FEELINGS-RETIRE. No longer reads lastCheckin.feelingWord (the word
+ *   question went in SMOOTH-P1; nothing here used the value anyway).
  *
  * v32 - Work list 2e. AVAILABLE_TIME_WINDOW_MINUTES now comes from
  *   data/time-windows.js; workoutGenerator.js is deleted (same numbers).
@@ -1926,9 +1929,6 @@ export function CoachProposalView(router) {
   function buildProposal() {
     const voice        = getActiveVoice();
     const name         = store.get('name') || '';
-    const energy       = store.get('lastCheckin.feelingWord')
-                           ? store.get('lastCheckin.feelingWord')
-                           : null;
     const energyScore  = _getCheckinEnergy();
     const moodScore    = _getCheckinMood();
     const painScores   = store.get('conditionPainScores') || {};
@@ -1950,7 +1950,6 @@ export function CoachProposalView(router) {
     // primary was silently replaced. The chosen one leads when it is
     // still one of their goals.
     const primaryGoal  = chosenPrimaryEngineGoal(goals, store.get('strategicGoal'));
-    const feelingWord  = store.get('lastCheckin.feelingWord');
 
     // Pain override check
     const conditionNarrative = _buildConditionNarrative(conditions, painScores);
@@ -2026,7 +2025,7 @@ export function CoachProposalView(router) {
     const options = _generateOptions(energyScore, effectiveIntensity, availTime);
 
     // Build greeting
-    const greeting = _buildGreeting(name, feelingWord);
+    const greeting = _buildGreeting(name);
 
     // Build reflection (last 48h activity)
     const reflection = _buildReflection();
@@ -2038,7 +2037,7 @@ export function CoachProposalView(router) {
     const constraint = conditionNarrative;
 
     // Build intro line
-    const intro = _buildIntro(primaryGoal, feelingWord, burnout, reEntryCtx);
+    const intro = _buildIntro(primaryGoal, burnout, reEntryCtx);
 
     return {
       greeting,
@@ -2051,7 +2050,7 @@ export function CoachProposalView(router) {
 
   // ── Greeting ───────────────────────────────────────────────────────────────
 
-  function _buildGreeting(name, feelingWord) {
+  function _buildGreeting(name) {
     const hour = new Date().getHours();
     const timeGreeting = hour < 12 ? 'Morning'
                        : hour < 17 ? 'Afternoon'
@@ -2124,7 +2123,7 @@ export function CoachProposalView(router) {
 
   // ── Intro line ─────────────────────────────────────────────────────────────
 
-  function _buildIntro(primaryGoal, feelingWord, burnout, reEntryCtx) {
+  function _buildIntro(primaryGoal, burnout, reEntryCtx) {
     // 2e. These said "three options" -- the choice of three went with the
     // old engine; since SMOOTH-P2a the coach offers ONE plan with every
     // exercise named. The burnout line now says what the check-ins said,

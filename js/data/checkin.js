@@ -1,6 +1,8 @@
 /**
  * checkin.js
- * 28 Sep 2026 v7
+ * 28 Sep 2026 v8
+ *
+ * v8 - FEELINGS-RETIRE. saveCheckin() stores no feeling word or quadrant.
  *
  * v7 - Work list 2e. resolveIntensity() removed with the engine that was
  *   its only caller (see where it stood, below getSuggestedIntensity).
@@ -292,7 +294,9 @@ export function saveCheckin(data) {
 
   // Write to checkinHistory (keyed by ISO date)
   const history = store.get('checkinHistory') || {};
-  history[todayKey] = { ...data, date: today, savedAt: new Date().toISOString() };
+  // FEELINGS-RETIRE: a feeling word is never stored, whatever a caller passes.
+  const { feelingWord: _fw, feelingQuadrant: _fq, ...kept } = data || {};
+  history[todayKey] = { ...kept, date: today, savedAt: new Date().toISOString() };
   store.set('checkinHistory', history);
 
   // Write to lastCheckin
@@ -303,8 +307,6 @@ export function saveCheckin(data) {
     mood:            data.mood,
     sleepHours:      data.sleepHours,
     sleepQuality:    data.sleepQuality,
-    feelingWord:     data.feelingWord     || null,
-    feelingQuadrant: data.feelingQuadrant || null,
     unwell:          data.unwell          || false,
     completed:       true,
   });

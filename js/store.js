@@ -2,7 +2,14 @@ import { zonesForAreas } from "./data/aims.js";
 
 /**
  * store.js - Data persistence layer
- * 28 Sep 2026 v79
+ * 28 Sep 2026 v80
+ *
+ * v80 - FEELINGS-RETIRE (Schema.md v1.73). lastCheckin.feelingWord,
+ *   lastCheckin.feelingQuadrant and checkin.feelingWordDepth REMOVED, and
+ *   any feelingWord / feelingQuadrant in checkinHistory entries dropped on
+ *   load. Graeme retired the word question on 27 Sep (SMOOTH-P1); the
+ *   words stayed stored, one line could still say one back, and Download
+ *   your data still carried them.
  *
  * v79 - Work list 2e. proposalBias REMOVED (Schema.md v1.72). Declared by
  *   BIAS-1, written by nothing since BIAS-2 (16 Aug), and read only by
@@ -1219,8 +1226,6 @@ export const store = {
         ? {
             ...defaults.lastCheckin,
             ...saved.lastCheckin,
-            feelingWord:     saved.lastCheckin.feelingWord     ?? null,
-            feelingQuadrant: saved.lastCheckin.feelingQuadrant ?? null,
             unwell:          saved.lastCheckin.unwell          ?? false,
             timestamp:       saved.lastCheckin.timestamp       ?? null
           }
@@ -1603,6 +1608,22 @@ export const store = {
   _dropRetired(data) {
     delete data.sessionPace;   // v78, SMOOTH-P4c (retired v74, SMOOTH-P1)
     delete data.proposalBias;  // v79, work list 2e (read only by the dead engine)
+    // v80, FEELINGS-RETIRE. The word question went in SMOOTH-P1; no word
+    // somebody chose before then is kept, shown or downloaded.
+    if (data.lastCheckin && typeof data.lastCheckin === 'object') {
+      delete data.lastCheckin.feelingWord;
+      delete data.lastCheckin.feelingQuadrant;
+    }
+    if (data.checkin && typeof data.checkin === 'object') delete data.checkin.feelingWordDepth;
+    if (data.checkinHistory && typeof data.checkinHistory === 'object') {
+      for (const k of Object.keys(data.checkinHistory)) {
+        const e = data.checkinHistory[k];
+        if (e && typeof e === 'object' && ('feelingWord' in e || 'feelingQuadrant' in e)) {
+          const { feelingWord, feelingQuadrant, ...rest } = e;
+          data.checkinHistory[k] = rest;
+        }
+      }
+    }
     return data;
   },
 
@@ -2205,7 +2226,6 @@ export const store = {
       checkin: {
         lastOpeningMode:      null,
         openingModeHistory:   [],
-        feelingWordDepth:     1,
         lastMilestoneNoticed: null
       },
 
@@ -2246,8 +2266,6 @@ export const store = {
 
       // ── LAST CHECK-IN ─────────────────────────────────────────
       lastCheckin: {
-        feelingWord:     null,
-        feelingQuadrant: null,
         unwell:          false,
         timestamp:       null
       },

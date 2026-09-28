@@ -1,5 +1,10 @@
 /**
  * tools/verify-checkin-three.mjs
+ * 28 Sep 2026 v2
+ *
+ * v2 - FEELINGS-RETIRE. data/feelings.js is deleted; the word list 2a
+ *   looks for is kept in this file. No assertion changed.
+ *
  * 28 Sep 2026 v1
  *
  * SMOOTH-P1. The check-in is three questions, one tap each.
@@ -38,7 +43,9 @@ const B = new URL("../js/", import.meta.url).href;
 const { store } = await import(B + "store.js");
 const { CheckinView } = await import(B + "views/checkin.js");
 const { checkinData, getQuadrant } = await import(B + "data/checkin.js");
-const { WORD_SETS } = await import(B + "data/feelings.js");
+// FEELINGS-RETIRE: data/feelings.js is deleted. The fifty words its sets
+// held, kept here so this check still has something to look for.
+const RETIRED_WORDS = ["energised","motivated","excited","alive","confident","ready","good","happy","strong","focused","capable","inspired","purposeful","joyful","tense","frustrated","anxious","overwhelmed","restless","irritable","stressed","wired","scattered","trapped","calm","content","settled","soft","grateful","restored","okay","peaceful","relaxed","grounded","drained","flat","heavy","sad","lonely","defeated","tired","foggy","low","exhausted","empty","numb","depleted","hopeless","desperate","worthless"];
 const { SAFETY_LINE } = await import(B + "data/purpose.js");
 
 let fails = 0, passes = 0;
@@ -114,7 +121,7 @@ ok("1e. the answers are stored on the scale the engine reads",
 
 // ── 2. WHAT IS NO LONGER ASKED ──────────────────────────────────────────
 console.log("\nTEST 2 - no feeling word, no purpose questions, sleep only if offered");
-const allWords = Object.values(WORD_SETS).flatMap(s => [...s.core, ...s.expanded]).map(w => w.toLowerCase());
+const allWords = RETIRED_WORDS;
 const shown = threadText().toLowerCase();
 ok("2a. no feeling-word question was asked", !/is there a word/i.test(shown) &&
    !allWords.some(w => new RegExp(`\\b${w}\\b`).test(labelsNow().join(" ").toLowerCase())));

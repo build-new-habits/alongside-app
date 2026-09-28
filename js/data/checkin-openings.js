@@ -1,7 +1,12 @@
 /**
  * js/data/checkin-openings.js
- * 15 Aug 2026 v5
+ * 28 Sep 2026 v6
  *
+ * v6 - FEELINGS-RETIRE. The feeling-word carry line is removed: the word
+ *   question went in SMOOTH-P1, and this line would still have said a
+ *   word stored before then back to somebody at their next check-in.
+ *
+ * 15 Aug 2026 v5 *
  * v5 - STREAK-1. The seven-check-in milestone claimed "Seven days in a
  *   row" on a COUNT, not consecutive days, stored a key called `streak-7`
  *   in a product that promises no streaks, and said "Seven" at fourteen
@@ -108,9 +113,6 @@ const REFLECTION_VARIANTS = [
   { id: 'active-quiet-pattern', careMode: true,
     b1: "Have you noticed a pattern where you move well for a while, then there's a quieter period?",
     b2: "Is that pattern deliberate, or are there reasons you want to share?" },
-  { id: 'feeling-word-carry',   careMode: true, requiresField: 'lastFeelingWord',
-    b1: "Last time you said you were feeling {lastFeelingWord}. I've been holding onto that.",
-    b2: "I want to know if that's still around, or if something's shifted." },
   { id: 'steady-improvement',   careMode: false,
     b1: "Have you noticed the last couple of weeks have looked different from the weeks before? More settled.",
     b2: "I want to understand what today feels like from inside that." },
@@ -457,9 +459,9 @@ function _resolveDayOne() {
 function _resolveReflection(checkinHistory, historyKeys) {
   const last3 = historyKeys.slice(-3).map(k => checkinHistory[k]);
 
-  // Priority-ordered matching
-  const feelingWord = store.get('lastCheckin.feelingWord');
-  if (feelingWord) return _reflectionV('feeling-word-carry', { lastFeelingWord: feelingWord });
+  // Priority-ordered matching. (FEELINGS-RETIRE, 28 Sep: the
+  // "Last time you said you were feeling {word}" line went with the word
+  // question, which SMOOTH-P1 removed from the check-in.)
 
   if (_energyTrend(last3) === 'declining')       return _reflectionV('energy-declining');
   if (_moodDecliningEnergyStable(last3))          return _reflectionV('mood-declining');

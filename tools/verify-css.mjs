@@ -1,5 +1,11 @@
 /**
  * tools/verify-css.mjs
+ * 28 Sep 2026 v2
+ *
+ * v2 - Work list 11. Budget locked at 130 (it had fallen to 130 and the
+ *   gate was asking for the gain to be locked in). CSS-ZERO, on the
+ *   finish list, takes it to 0: each class styled or marked as a hook.
+ *
  * 12 Aug 2026 v1
  *
  * CSS-1. Every class a view renders must have a rule somewhere.
@@ -54,7 +60,7 @@ for (const f of walk("css", ".css"))
 const missing = [...used.keys()].filter(c => !defined.has(c)).sort();
 
 // Ratchet. Lower this as families are fixed; never raise it.
-const BUDGET = 131;   // 174 -> 157 (CSS-1, .ws-*) -> 131 (CSS-2, .cs-*/.gym-*)
+const BUDGET = 130;   // 174 -> 157 (CSS-1, .ws-*) -> 131 (CSS-2, .cs-*/.gym-*) -> 130 (locked 28 Sep, work list 11)
 
 console.log(`\nclasses rendered by views: ${used.size}`);
 console.log(`classes defined in CSS:    ${defined.size}`);

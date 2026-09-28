@@ -1,6 +1,9 @@
 /**
  * js/views/checkin.js
- * 28 Sep 2026 v19
+ * 28 Sep 2026 v20
+ *
+ * v20 - FEELINGS-RETIRE. The check-in object no longer carries a
+ *   feelingWord field (always null since SMOOTH-P1).
  *
  * v19 - SMOOTH-P1. Three questions, one tap each. Spec §4.2.
  *
@@ -363,8 +366,6 @@ export function CheckinView(router) {
     sleepQuality:    null,
     conditionLevels: {},
     notes:           "",
-    feelingWord:     null,
-    feelingQuadrant: null,
   };
   // _selectedTime and TIME_OPTIONS removed 11 Aug 2026 with the time panel.
   // The summary line still reads availableTime if something else has set it
