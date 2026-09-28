@@ -1,6 +1,11 @@
 /**
  * router.js
- * 16 Sep 2026 v29
+ * 28 Sep 2026 v30
+ *
+ * v30 - GATE-ONCE. Reaching a hub screen (Home, Progress, Wellbeing,
+ *   Settings, Library) ends the safety note's session, so the next
+ *   session is asked again during the taper. Lazily imported and cached,
+ *   like the session guard, because this file keeps no static imports.
  *
  * v29 - BLANK-QUESTION. The blank check asks whether the container is
  *   EMPTY, not whether it has text. v27 asked about text immediately;
@@ -412,6 +417,9 @@ const NAV_MAP = {
   'community-impact': 'settings', 'annual-reflection': 'settings',
 };
 
+// GATE-ONCE. The screens that mean a session is over.
+const GATE_SESSION_ENDS = new Set(['today', 'progress', 'noticing', 'settings', 'library']);
+
 export const router = {
 
   currentView: null,
@@ -461,6 +469,15 @@ export const router = {
     if (!opts.fromBack && this.currentView && this.currentView !== viewName) {
       this.history.push(this.currentView);
       if (this.history.length > 20) this.history.shift();
+    }
+
+    // GATE-ONCE. A hub screen ends the session the safety note was
+    // acknowledged for. Never allowed to block a navigation.
+    if (GATE_SESSION_ENDS.has(viewName)) {
+      try {
+        if (!this._gate) this._gate = await import('./safety-gate.js');
+        this._gate.endGateSession();
+      } catch { /* never block a navigation */ }
     }
 
     this.currentView = viewName;

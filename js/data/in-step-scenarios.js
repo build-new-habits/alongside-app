@@ -1,5 +1,12 @@
 /**
  * js/data/in-step-scenarios.js
+ * 28 Sep 2026 v2
+ *
+ * v2 - BREATH-CLAIMS (Smooth Path P0, C1). The Environment introduction
+ *   cited "Plumbly's work (2024) on nervous system regulation". A named
+ *   source for a claim the app cannot check is the same fault as the
+ *   breathing copy; the sentence now says the same thing plainly.
+ *
  * 09 Aug 2026 v1
  *
  * "In Step" — Noticing Hub feature, Personal tier.
@@ -194,7 +201,7 @@ export const MOVEMENTS = [
     acknowledgement:
       "None of these is the right one. Learning you have options, even here, is what this is for.",
     learnWhy:
-      "Plumbly's work (2024) on nervous system regulation describes adapting to what's outside your control as a trainable state, not a fixed trait. Practising flexibility with small disruptions — weather, timing, plans changing without your consent — builds the same capacity larger disruptions ask for.",
+      "Adapting to what's outside your control can be practised; it is not something you either have or don't. Practising flexibility with small disruptions — weather, timing, plans changing without your consent — builds the same capacity larger disruptions ask for.",
     scenarios: [
       {
         id: "environment-1",

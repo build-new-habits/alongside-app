@@ -1,6 +1,17 @@
 /**
  * js/views/checkin.js
- * 08 Sep 2026 v17
+ * 28 Sep 2026 v18
+ *
+ * v18 - STALE-CHECKIN (Smooth Path P0, F2). Leaving a check-in leaves
+ *   nothing behind.
+ *
+ *   Traced 27 Sep: press the house button mid-question and the energy
+ *   question stayed open over Home and every later screen, covering
+ *   Quick build's "Build it". The panels are built on document.body,
+ *   outside the container the router wipes, and this view had no
+ *   onUnmount. Now: onUnmount removes every panel and overlay, and a
+ *   panel scheduled by a timer before leaving is never attached after.
+ *   See tools/verify-checkin-unmount.mjs.
  *
  * v17 - CHECKIN-3. The coach asked one question and opened the panel
  *   for a different one. Device pass, task 4.
@@ -312,6 +323,9 @@ export function CheckinView(router) {
   };
 
   // ── State ───────────────────────────────────────────────────────────────────
+  // STALE-CHECKIN. False once the person has left; a panel built by a
+  // timer that fires afterwards is never attached to the page.
+  let _alive      = false;
   let _container  = null;
   let _thread     = null;
   let _conditions = [];
@@ -335,6 +349,9 @@ export function CheckinView(router) {
   // ── Mount ───────────────────────────────────────────────────────────────────
 
   function mount(container) {
+    _removeAllPanels();
+    _alive = true;
+
     // PURPOSE-ASK. Cleared at the START of every check-in, not carried.
     // A purpose is a fact about today, like the check-in itself, and
     // yesterday's reason as a default is the same class of fault as
@@ -1279,9 +1296,22 @@ export function CheckinView(router) {
     panel.innerHTML = `<div class="ci-panel-handle" aria-hidden="true"></div>${innerHtml}`;
     panel._overlay  = overlay;
 
-    document.body.appendChild(overlay);
-    document.body.appendChild(panel);
+    // STALE-CHECKIN. Built but never attached once the person has left.
+    if (_alive) {
+      document.body.appendChild(overlay);
+      document.body.appendChild(panel);
+    }
     return panel;
+  }
+
+  // STALE-CHECKIN. Every panel and overlay this view put on the page.
+  function _removeAllPanels() {
+    document.querySelectorAll(".ci-panel, .ci-overlay").forEach(n => n.remove());
+  }
+
+  function onUnmount() {
+    _alive = false;
+    _removeAllPanels();
   }
 
   function _openPanel(panel) {
@@ -1522,5 +1552,5 @@ export function CheckinView(router) {
 
   // ─────────────────────────────────────────────────────────────────────────
 
-  return { mount };
+  return { mount, onUnmount };
 }

@@ -1,6 +1,13 @@
 /**
  * tools/verify-card5.mjs
- * 15 Sep 2026 v1
+ * 28 Sep 2026 v2
+ *
+ * v2 - GATE-ONCE. An acknowledgement now covers the rest of the session
+ *   it was given in (see verify-gate-once). The log-rule assertions below
+ *   are about the NEXT session, so each acknowledgement here is followed
+ *   by endGateSession() -- what the router does on reaching Home. Nothing
+ *   asserted is loosened: 5.3 still proves one acknowledgement does not
+ *   satisfy the taper for the next session.
  *
  * CARD-5 / SAFETY-GATE.
  *
@@ -45,7 +52,7 @@ const {
 } = await import("../js/exercise-card.js");
 const {
   isGateDue, renderSafetyGate, attachSafetyGate,
-  recordAcknowledgement, GATE_DAYS, GUIDANCE_TEXT, TAPER_SESSIONS
+  recordAcknowledgement, GATE_DAYS, GUIDANCE_TEXT, TAPER_SESSIONS, endGateSession
 } = await import("../js/safety-gate.js");
 const { EXERCISES } = await import("../js/data/exercises/index.js");
 
@@ -253,6 +260,7 @@ console.log("\nTEST 5 — the record");
 {
   setLog([]);
   const e = recordAcknowledgement("workout");
+  endGateSession(); // GATE-ONCE: the assertions below are about the next session
   const log = store.get("safetyAckLog");
 
   ok("5.1 exactly one entry, with all three fields",
@@ -262,7 +270,7 @@ console.log("\nTEST 5 — the record");
 
   ok("5.2 `at` is a real ISO timestamp", !isNaN(new Date(e.at).getTime()));
 
-  ok("5.3 one write does NOT satisfy the gate during the taper",
+  ok("5.3 one write does NOT satisfy the gate for the next session during the taper",
      isGateDue() === true);
   ok("5.3b writing up to the floor does satisfy it",
      (() => { setLog(atFloor()); return isGateDue() === false; })());
@@ -273,6 +281,7 @@ console.log("\nTEST 5 — the record");
 
   setLog(Array.from({ length: 201 }, (_, i) => ackEntry({ surface: "s" + i })));
   recordAcknowledgement("newest");
+  endGateSession();
   const capped = store.get("safetyAckLog");
   ok("5.5 capped at 200, oldest trimmed first",
      capped.length === 200 &&

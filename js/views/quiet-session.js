@@ -1,6 +1,12 @@
 /**
  * quiet-session.js - Something Quieter View
  *
+ * 28 Sep 2026 v7 - BREATH-CLAIMS (Smooth Path P0, C1). This file's older
+ *   breathing mode carried the same claims as breathing-session.js, some
+ *   stronger: a named neuroscientist, "drop your heart rate measurably",
+ *   "the braking system of the nervous system", HRV as "a marker of
+ *   nervous system health". Rewritten as what to do. Patterns unchanged.
+ *
  * 15 Aug 2026 v6
  *
  * v6 - SHARED-1. Both completion screens render the end-of-session
@@ -120,7 +126,7 @@ const BREATHING_EXERCISES = [
     id: "box",
     name: "Box Breathing",
     icon: "\uD83D\uDFE6",
-    coachIntro: "Box breathing is used by military, surgeons, and athletes to bring the nervous system back into balance quickly. It works by equalising the four phases of breath, which activates the parasympathetic system and quiets the stress response. Four seconds each way.",
+    coachIntro: "Four seconds each way: in, hold, out, hold. If four feels long, make all four shorter.",
     why: "Four equal sides of four seconds each. In, hold, out, hold. The symmetry itself is the mechanism.",
     phases: [
       { label: "Breathe in", seconds: 4, colour: "var(--color-primary)" },
@@ -135,8 +141,8 @@ const BREATHING_EXERCISES = [
     id: "478",
     name: "4-7-8 Breathing",
     icon: "\uD83C\uDF19",
-    coachIntro: "The 4-7-8 technique was developed by Dr Andrew Weil as a portable tool for anxiety and sleep. The extended hold and long exhale activate the vagus nerve and drop your heart rate measurably within a few cycles. It feels unusual at first. Stick with it.",
-    why: "The 7-second hold and 8-second exhale are longer than comfort usually allows. That discomfort is where the benefit lives.",
+    coachIntro: "In for 4, hold for 7, out for 8. It can feel unusual at first. If the hold is too long, shorten it.",
+    why: "A longer hold and a long, slow out-breath. Nothing needs to strain.",
     phases: [
       { label: "Breathe in", seconds: 4,  colour: "var(--color-primary)" },
       { label: "Hold", seconds: 7,  colour: "var(--color-warning)" },
@@ -149,8 +155,8 @@ const BREATHING_EXERCISES = [
     id: "sigh",
     name: "Physiological Sigh",
     icon: "\uD83D\uDCA8",
-    coachIntro: "The physiological sigh is the fastest known method to reduce acute stress. Stanford neuroscientist Andrew Huberman has documented this. It is what your body does automatically when it is overwhelmed. Two inhales through the nose, followed by a long slow exhale through the mouth. One to three cycles is enough.",
-    why: "The double inhale fully inflates the lungs and deflates the air sacs. The long exhale dumps CO2, the signal your nervous system reads as stress. One breath can shift your state.",
+    coachIntro: "Two short breaths in through the nose, the second topping up the first, then a long slow breath out through the mouth. One to three rounds is enough.",
+    why: "Two in, one long out. You do this naturally sometimes without noticing.",
     phases: [
       { label: "First inhale (nose)", seconds: 2, colour: "var(--color-primary)" },
       { label: "Second inhale (nose)", seconds: 1, colour: "var(--color-primary)" },
@@ -163,8 +169,8 @@ const BREATHING_EXERCISES = [
     id: "resonance",
     name: "Resonance Breathing",
     icon: "\uD83C\uDF00",
-    coachIntro: "Resonance breathing sits at 5.5 breaths per minute, which is the rate that maximises heart rate variability in most people. HRV is one of the strongest markers of nervous system health and recovery. This rate also appears in ancient practices across traditions without those traditions knowing the mechanism. Six breaths per minute is close enough. Breathe in for five and a half seconds, out for five and a half.",
-    why: "This is the frequency at which your cardiovascular, respiratory, and nervous systems synchronise. Ten minutes here creates measurable recovery effects.",
+    coachIntro: "About five and a half seconds in and five and a half seconds out. Six breaths a minute is close enough.",
+    why: "Slow and even. Let it feel like a wave, rising and falling without effort.",
     phases: [
       { label: "Breathe in", seconds: 5, colour: "var(--color-primary)" },
       { label: "Breathe out", seconds: 6, colour: "var(--color-text-secondary)" }
@@ -176,7 +182,7 @@ const BREATHING_EXERCISES = [
     id: "extended-exhale",
     name: "Extended Exhale",
     icon: "\uD83C\uDF43",
-    coachIntro: "The simplest and most accessible of all breathing techniques. The exhale is the braking system of the nervous system. Inhale activates. Exhale calms. Double the exhale, you double the calming signal. No special training needed. You can do this in a meeting, on a bus, or before a difficult conversation.",
+    coachIntro: "The simplest pattern here: breathe out for longer than you breathe in. You can do it anywhere, in a meeting or on a bus.",
     why: "Inhale for four, exhale for eight. The ratio matters more than the exact numbers. Just make the out breath longer than the in breath.",
     phases: [
       { label: "Breathe in", seconds: 4, colour: "var(--color-primary)" },
@@ -335,7 +341,7 @@ function renderModeSelector() {
           <span class="quiet-mode-icon" aria-hidden="true">\uD83C\uDF2C</span>
           <div>
             <h3>Breathing</h3>
-            <p class="text-sm text-muted">Calm your nervous system. Five techniques, guided timers.</p>
+            <p class="text-sm text-muted">Five breathing patterns, with a guided timer.</p>
           </div>
         </div>
         <span class="quiet-mode-arrow" aria-hidden="true">&rsaquo;</span>

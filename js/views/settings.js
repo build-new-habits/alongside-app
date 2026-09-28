@@ -1,6 +1,17 @@
 /**
  * settings.js
- * 06 Sep 2026 v36
+ * 28 Sep 2026 v37
+ *
+ * v37 - Smooth Path P0, C2 and C3.
+ *   C2 PLAN-CLAIM. About > Plan said the Plan opens "the long practices
+ *   in Wellbeing" -- withdrawn from the upgrade page on 13 Aug because it
+ *   is not true (upgrade.js, the WITHDRAWN note). Settings kept it for six
+ *   weeks. The block now makes only claims upgrade.js has verified.
+ *   C3 VERSION. With no controlling service worker (first open, private
+ *   browsing, a blocked worker) the label read "vunknown". It now falls
+ *   back to reading CACHE_NAME from sw.js itself, and says "Version not
+ *   available" rather than inventing a string, if even that fails.
+ *   See tools/verify-plan-claims.mjs.
  *
  * v36 - TIER-VISIBLE. The tier a device is in was displayed in exactly
  *   one place: inside the developer panel, which is hidden behind an
@@ -1699,6 +1710,17 @@ export function SettingsView(router) {
   // screen cannot drift from the build the phone is actually on.
   let swVersion = null;
 
+  // C3, 28 Sep 2026. No controlling worker: read the cache name from the
+  // file that defines it rather than show "vunknown". Same single source.
+  async function _readVersionFromFile() {
+    try {
+      const res = await fetch('./sw.js', { cache: 'no-store' });
+      if (!res.ok) return null;
+      const m = (await res.text()).match(/CACHE_NAME\s*=\s*["']alongside-(v\d+)["']/);
+      return m ? m[1] : null;
+    } catch { return null; }
+  }
+
   async function _readSwVersion() {
     // VER-2, 12 Aug 2026. ASK THE CONTROLLING WORKER, do not infer.
     //
@@ -1711,7 +1733,7 @@ export function SettingsView(router) {
     // at exactly the moment somebody checks it.
     try {
       const sw = navigator.serviceWorker?.controller;
-      if (!sw) return null;
+      if (!sw) return await _readVersionFromFile();
       return await new Promise(resolve => {
         const timer = setTimeout(() => resolve(null), 1200);
         const onMessage = e => {
@@ -1782,9 +1804,10 @@ export function SettingsView(router) {
 
         ${isPaid ? `
           <div class="settings-plan-block">
-            <p>Everything is open to you — every session type, every length,
-               the full picture of your progress, and the long practices in
-               Wellbeing.</p>
+            <p>The coach knows where you're heading and builds towards it.
+               Sessions follow on from one another, it remembers your
+               conditions and injuries, and your progress is read back to
+               you across months.</p>
             <p>Five percent of what you pay goes to causes this community
                chooses.</p>
           </div>
@@ -2025,11 +2048,11 @@ export function SettingsView(router) {
         // prefix leaves "v294" -- already carrying its own v. The
         // template adds another, which shipped as "vv294". Strip it here
         // so the ONE place that formats a version does it once.
-        swVersion = (v || 'unknown').replace(/^v/, '');
+        swVersion = v ? v.replace(/^v/, '') : null;
         const el = container.querySelector('#settings-version');
         if (el) {
-          el.textContent = 'v' + swVersion;
-          el.setAttribute('aria-label', 'App version ' + swVersion);
+          el.textContent = swVersion ? 'v' + swVersion : 'Version not available';
+          el.setAttribute('aria-label', swVersion ? 'App version ' + swVersion : 'App version not available');
         }
       });
     }

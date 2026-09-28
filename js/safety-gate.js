@@ -1,5 +1,24 @@
 /**
  * js/safety-gate.js
+ * 28 Sep 2026 v3
+ *
+ * v3 - GATE-ONCE (Smooth Path P0, F1). An acknowledgement covers the rest
+ *   of the session it was given in.
+ *
+ *   Traced 27 Sep: a new user had to tick the note and press Start FIVE
+ *   times before the first exercise. Every session view shows the gate
+ *   on `index === 0 && isGateDue()` and re-navigates to itself on
+ *   acknowledge, on the promise -- written in fourteen views -- that
+ *   isGateDue() goes false the moment the acknowledgement is written.
+ *   GATE-TAPER (v2) broke that promise: during the first five sessions the
+ *   gate is due whatever the log says, so each re-mount asked again.
+ *
+ *   Fixed here once rather than in fourteen views. The session ends when
+ *   the router reaches a hub screen (endGateSession(), called from
+ *   router.navigate), so the taper is unchanged: the NEXT session still
+ *   shows the note. In memory only: a reload is a new session.
+ *   See tools/verify-gate-once.mjs.
+ *
  * 16 Sep 2026 v2
  *
  * v2 - GATE-TAPER. Every session for the first five acknowledgements of
@@ -166,7 +185,18 @@ function _newest() {
  * that appears spuriously is the fastest possible route back to the
  * reflex tap this design exists to avoid.
  */
+/**
+ * GATE-ONCE. Set by recordAcknowledgement(), cleared by endGateSession().
+ * While set, the session in progress has been acknowledged and the gate
+ * is not due again, whatever the taper says.
+ */
+let _sessionAckAt = null;
+
+/** GATE-ONCE. Called by the router when a hub screen is reached. */
+export function endGateSession() { _sessionAckAt = null; }
+
 export function isGateDue() {
+  if (_sessionAckAt) return false;
   const last = _newest();
   if (!last) return true;
   if (last.textVersion !== HURT_AND_ACHE_VERSION) return true;
@@ -262,6 +292,9 @@ export function renderSafetyGate() {
  * would look identical to nobody ever having acknowledged anything.
  */
 export function recordAcknowledgement(surface) {
+  // GATE-ONCE. Before the write, so a storage failure cannot bring the
+  // note back on the very next screen.
+  _sessionAckAt = new Date().toISOString();
   const entry = {
     at: new Date().toISOString(),
     textVersion: HURT_AND_ACHE_VERSION,

@@ -1,6 +1,18 @@
 /**
  * js/views/breathing-session.js - Guided Breathing Session
  *
+ * 28 Sep 2026 v5
+ *
+ * v5 - BREATH-CLAIMS (Smooth Path P0, C1). Every type's tagline,
+ *   description and coach line now says what to do, plainly. They named
+ *   a real person and institution ("Dr Andrew Weil's technique",
+ *   "Researched at Stanford") and made body claims the app cannot stand
+ *   behind: parasympathetic system, CO2 levels, HRV, vagus nerve, "the
+ *   fastest known way to reduce stress". Same class as WEB-CLAIMS. The
+ *   breathing patterns themselves are unchanged. The closing line no
+ *   longer tells people what their nervous system will remember.
+ *   See tools/verify-wellbeing-claims.mjs.
+ *
  * 08 Sep 2026 v4
  *
  * v4 - A11Y-HEADER. The .workout-header-title span is an h1. It was a
@@ -78,9 +90,9 @@ const TYPES = [
     id:          "box",
     label:       "Box breathing",
     icon:        "◻",
-    tagline:     "Calm the nervous system",
-    description: "Equal counts of inhale, hold, exhale, hold. Used by military and athletes for focus under pressure.",
-    coachIntro:  "Box breathing gives your nervous system a pattern to follow. Breathe in for 4, hold for 4, out for 4, hold for 4. The box is steady. So will you be.",
+    tagline:     "Even and steady",
+    description: "Even counts: in, hold, out, hold. Four each.",
+    coachIntro:  "Breathe in for 4, hold for 4, out for 4, hold for 4. Four even sides. If a count feels long, make all four shorter.",
     cycle: [
       { label: "Breathe in",  seconds: 4, cue: "Inhale slowly through your nose" },
       { label: "Hold",        seconds: 4, cue: "Chest open, shoulders down" },
@@ -92,9 +104,9 @@ const TYPES = [
     id:          "478",
     label:       "4-7-8",
     icon:        "✦",
-    tagline:     "Deep relaxation",
-    description: "Dr Andrew Weil's technique. A longer hold and extended exhale activate the parasympathetic system.",
-    coachIntro:  "The 4-7-8 breath is intentionally slower than it feels comfortable at first. 4 in, 7 hold, 8 out. The long exhale is where the release happens — let it be slow.",
+    tagline:     "A long, slow out-breath",
+    description: "In for 4, hold for 7, out for 8. A longer hold and a long, slow out-breath.",
+    coachIntro:  "4 in, 7 hold, 8 out. It can feel slow at first. If the hold is too long, shorten it — nothing needs to strain.",
     cycle: [
       { label: "Breathe in",  seconds: 4,  cue: "In through your nose, quietly" },
       { label: "Hold",        seconds: 7,  cue: "Hold gently — do not strain" },
@@ -105,9 +117,9 @@ const TYPES = [
     id:          "sigh",
     label:       "Physiological sigh",
     icon:        "∿",
-    tagline:     "Instant stress release",
-    description: "Researched at Stanford. A double inhale through the nose fully inflates the lungs, then a long exhale deflates the air sacs and resets CO2 levels.",
-    coachIntro:  "The physiological sigh is the fastest known way to reduce stress in real time. Two short inhales through the nose — the second tops up the lungs — then a long exhale. Your body already knows how to do this.",
+    tagline:     "Two in, one long out",
+    description: "Two breaths in through the nose, the second a short top-up, then one long breath out.",
+    coachIntro:  "Two short breaths in through the nose, the second one topping up the first, then a long breath out. You do this naturally sometimes without noticing.",
     cycle: [
       { label: "Inhale",        seconds: 2, cue: "In through your nose" },
       { label: "Top up",        seconds: 1, cue: "One more short inhale — fill the lungs" },
@@ -119,9 +131,9 @@ const TYPES = [
     id:          "resonance",
     label:       "Resonance breathing",
     icon:        "≋",
-    tagline:     "Optimise heart rate variability",
-    description: "5.5 second inhale, 5.5 second exhale. Matches the body's natural resonance frequency, improving HRV.",
-    coachIntro:  "Resonance breathing is the rhythm your heart rate variability responds to most. 5.5 seconds in, 5.5 seconds out. Let it feel like a wave — rising and falling without effort.",
+    tagline:     "Slow and even",
+    description: "About five and a half seconds in, five and a half seconds out.",
+    coachIntro:  "5.5 seconds in, 5.5 seconds out. Let it feel like a wave, rising and falling without effort.",
     cycle: [
       { label: "Breathe in",  seconds: 5.5, cue: "In through your nose, smooth and steady" },
       { label: "Breathe out", seconds: 5.5, cue: "Out through your nose or mouth, equally steady" }
@@ -131,9 +143,9 @@ const TYPES = [
     id:          "exhale",
     label:       "Extended exhale",
     icon:        "⟶",
-    tagline:     "Activate the rest response",
-    description: "Inhale slightly shorter than exhale. The exhale activates the vagus nerve and slows the heart.",
-    coachIntro:  "The exhale is where the calm lives. Four seconds in, six seconds out. The longer exhale signals safety to your nervous system. Let the out-breath lead.",
+    tagline:     "Out for longer than in",
+    description: "Four seconds in, six seconds out.",
+    coachIntro:  "Four seconds in, six seconds out. Let the out-breath lead.",
     cycle: [
       { label: "Breathe in",  seconds: 4, cue: "In through your nose" },
       { label: "Breathe out", seconds: 6, cue: "Out slowly — longer than the in-breath" }
@@ -460,7 +472,7 @@ function renderDone() {
         <div>
           <p class="coach-message-text">
             ${name ? name + " — " : ""}${selectedMins} ${selectedMins === 1 ? "minute" : "minutes"} of ${type?.label?.toLowerCase() || "breathing"}.
-            That is ${selectedMins} minutes your nervous system will remember.
+            That time was yours.
           </p>
           ${creditsEarned > 0
             ? `<p class="text-sm text-muted" style="margin-top: var(--space-2);">+${creditsEarned} credits</p>`

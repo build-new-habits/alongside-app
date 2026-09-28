@@ -1,6 +1,11 @@
 /**
  * js/views/noticing.js - Wellbeing Hub Landing View
  *
+ * 28 Sep 2026 v6 - C4 (Smooth Path P0). The weekly card was labelled with
+ *   its internal theme name ("Personal Capacity", "Interdependence"...).
+ *   It now reads "This week's question". The theme is still recorded
+ *   with the entry (line ~152); it is simply not shown as a label.
+ *
  * 13 Aug 2026 - TIER-F. Screen-reader heading follows the nav label.
  *
  * 10 Aug 2026 v5:
@@ -203,7 +208,7 @@ export function render() {
         </h2>
 
         <div class="card" style="margin-bottom: var(--space-2);">
-          <p class="text-xs text-muted" style="margin-bottom: var(--space-2);">${weekData.theme}</p>
+          <p class="text-xs text-muted" style="margin-bottom: var(--space-2);">This week's question</p>
           <p style="font-size: var(--text-base); line-height: 1.6;
                     margin-bottom: var(--space-4);">${weekData.prompt}</p>
           <button class="btn btn-ghost btn-small" id="noticing-weekly-journal-btn"
