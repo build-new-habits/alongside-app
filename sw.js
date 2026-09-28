@@ -1,7 +1,14 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 28 Sep 2026 v545
+ * 28 Sep 2026 v546
+ *
+ * v546 - SMOOTH-P2d. views/reflect.js, views/workout.js,
+ *   css/components/reflect.css.
+ *
+ *   One finish screen: "That's today done.", what was done, an optional
+ *   "How did it feel?" answered on the same screen, Back to Home.
+ *   New gate: tools/verify-finish.mjs. 178 gates.
  *
  * v545 - SMOOTH-P2c. views/workout.js, exercise-card.js, session-log.js,
  *   session-builder.js, css/components/workout.css, session-log.css,
@@ -3920,7 +3927,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v545";
+const CACHE_NAME = "alongside-v546";
 
 const SHELL_URLS = [
 
