@@ -1,5 +1,11 @@
 /**
  * tools/verify-write1.mjs
+ * 28 Sep 2026 v4
+ * Work list 2e. proposalBias leaves the baseline: the field is removed
+ *   (store v79), not connected -- its one reader went with the dead
+ *   engine. The no-reader-no-writer check below stays, so it cannot
+ *   quietly return.
+ *
  * 28 Sep 2026 v3
  * SMOOTH-P3c. liftLog leaves the baseline: capture.js v2 reads it.
  * SMOOTH-P4a. conditionMeta leaves it too: Progress reads addedAt.
@@ -171,7 +177,7 @@ const BASELINE = new Set([
   // weekFocus removed 17 Aug: CHAP-1 step 4 connected it. This is the
   // gate working as intended — the baseline shrinks as fields are fixed,
   // and it insists on being pruned rather than drifting out of date.
-  'onboardingStep','age','sessionMode','mindfulPromptDepth','proposalBias',
+  'onboardingStep','age','sessionMode','mindfulPromptDepth',
   'activityPreferences','noticingPreferences','noticingProgress','safeguarding',
   'weeklyReview','waterLog','waterSettings','coachOffers','unwellMode',
   'foodPrompts','practiceHistory',
@@ -183,6 +189,9 @@ const BASELINE = new Set([
 
   // 'sessionPace' -- removed 28 Sep 2026 (SMOOTH-P4c): the field itself is
   // gone from the store (v78), its release of tolerance spent.
+
+  // 'proposalBias' -- removed 28 Sep 2026 (work list 2e): the field is
+  // gone from the store (v79) with resolveIntensity(), its only reader.
 ]);
 
 const added = oneEnded.filter(k => !BASELINE.has(k));
@@ -203,9 +212,8 @@ check('sessionPace has no reader and no writer (retired, SMOOTH-P1)',
   !/get\(['"]sessionPace|set\(['"]sessionPace/.test(all),
   'the brief/full choice is gone; anything reading it is reading a setting nobody can change');
 
-// proposalBias is retired and should stay gone. It is in the baseline
-// only because the field is still DECLARED in getDefaults(); the reader
-// and the clearer were both removed with BIAS-2.
+// proposalBias is retired and should stay gone. Removed from the store
+// itself in v79 (2e); the reader and the clearer went with BIAS-2.
 check('proposalBias has no reader and no writer',
   !/get\(['"]proposalBias|set\(['"]proposalBias/.test(all),
   'BIAS-2 retired it; the bias is derived by coachBias() now');

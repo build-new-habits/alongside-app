@@ -1,6 +1,10 @@
 /**
  * tools/verify-know-what.mjs
- * 28 Sep 2026 v1
+ * 28 Sep 2026 v2
+ *
+ * v2 - Work list 2e. The time windows are read from data/time-windows.js,
+ *   where they now live; the old engine that held them is deleted. No
+ *   assertion changed.
  *
  * SMOOTH-P3b. "I know what I want". Spec 4.6.
  *
@@ -32,7 +36,7 @@ const { store } = await import(B + "store.js");
 const { TodayView } = await import(B + "views/today.js");
 const KW = await import(B + "views/know-what.js");
 const { CoachProposalView } = await import(B + "views/coach-proposal.js");
-const { AVAILABLE_TIME_WINDOW_MINUTES } = await import(B + "data/workoutGenerator.js");
+const { AVAILABLE_TIME_WINDOW_MINUTES } = await import(B + "data/time-windows.js");
 const { getActiveConditionIds, getExerciseSafetyTier } = await import(B + "data/conditions.js");
 const { EXERCISES } = await import(B + "data/exercises/index.js");
 const gate = await import(B + "safety-gate.js");

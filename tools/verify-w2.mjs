@@ -1,5 +1,12 @@
 /**
  * tools/verify-w2.mjs
+ * 28 Sep 2026 v3
+ *
+ * v3 - Work list 2e. W2-2's "nothing stores a bias" read checkin.js and
+ *   workoutGenerator.js; the second is deleted, and two files was never
+ *   "nothing". It now reads every app module. W2-1 already drove the
+ *   live builder and is unchanged.
+ *
  * 21 Aug 2026 v2
  * GATE-PATH. Path resolution only -- no assertion changed.
  *
@@ -102,13 +109,17 @@ for (const [level, ceiling] of Object.entries(CEILINGS)) {
 // today. A derived value satisfies that by construction, so the test is
 // that nothing stores it at all.
 const chkSrc = readFileSync(_gatePath('js/data/checkin.js'), 'utf8');
-const genSrc = readFileSync(_gatePath('js/data/workoutGenerator.js'), 'utf8');
+// 2e: every app module (was checkin.js + the retired engine).
+import { readdirSync as _rd } from 'node:fs';
+const _walk = d => _rd(_gatePath(d), { withFileTypes: true }).flatMap(e =>
+  e.isDirectory() ? _walk(d + e.name + '/') : (e.name.endsWith('.js') ? [readFileSync(_gatePath(d + e.name), 'utf8')] : []));
+const allSrc = _walk('js/').join('\n');
 
 check('W2-2 the bias is derived, so it cannot go stale',
   /export function coachBias\(/.test(chkSrc),
   'coachBias() missing');
 check('W2-2 nothing stores a bias that could survive a day',
-  !/store\.set\(['"]proposalBias/.test(chkSrc + genSrc),
+  allSrc.length > 100000 && !/store\.set\(['"]proposalBias/.test(allSrc),
   'a stored bias is a bias that can be written once and read for ever');
 // GENTLE-SIGNALS, 16 Sep 2026. This read the SOURCE for the literal
 // `e.date < today` -- and that expression was part of the fault: `date`

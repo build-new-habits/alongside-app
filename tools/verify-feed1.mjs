@@ -1,5 +1,17 @@
 /**
  * tools/verify-feed1.mjs
+ * 28 Sep 2026 v3
+ *
+ * v3 - Work list 2e. TESTS 1-2 drove applyFeedbackWeighting(), which was
+ *   called only by getSuitableExercises(), called only by the deleted
+ *   workoutGenerator.js: a reader no session ever reached. Re-pointed at
+ *   the two LIVE readers in data/session-rationale.js --
+ *   tooHardRecently() (session-builder offers the move less often;
+ *   exercise-card opens easier ways in) and tooEasyLast() (the player's
+ *   log suggests a step up; verify-dead-generator TEST 5 drives it).
+ *   Same thresholds: two of the last five for too-hard, so one hard day
+ *   moves nothing (P4). TEST 3 unchanged.
+ *
  * 21 Aug 2026 v2
  * GATE-PATH. Path resolution only -- no assertion changed.
  *
@@ -32,7 +44,7 @@ globalThis.localStorage = {
 };
 const { store } = await import(__REPO + "/js/store.js");
 store.init();
-const { applyFeedbackWeighting } = await import(__REPO + "/js/data/exercises/index.js");
+const { tooHardRecently, tooEasyLast } = await import(__REPO + "/js/data/session-rationale.js");
 
 // GATE-PATH, 08 Sep 2026. Paths resolved from import.meta.url, not the
 // working directory.
@@ -52,27 +64,29 @@ const check = (n, fn) => { try { fn(); console.log("  PASS  " + n); }
   catch (e) { fails++; console.log("  FAIL  " + n + "\n        " + e.message); } };
 const ok = (c, m) => { if (!c) throw new Error(m); };
 
-console.log("\nTEST 1 - the weighting now runs on real data");
-check("two 'too-hard' entries deprioritise the exercise", () => {
+console.log("\nTEST 1 - the live readers act on real data");
+check("two 'too-hard' entries: the builder offers it less", () => {
   store.set("exerciseFeedback", []);
   store.logExerciseFeedback("squat", "too-hard");
   store.logExerciseFeedback("squat", "too-hard");
-  const [out] = applyFeedbackWeighting([{ id: "squat", programmeScore: 1 }]);
-  ok(out.programmeScore <= 0.5, `score ${out.programmeScore} - the reader needs 2 of the last 5`);
+  ok(tooHardRecently("squat") === true, "the reader needs 2 of the last 5");
 });
-check("two 'too-easy' entries upweight it", () => {
+check("a 'too-easy' entry: the coach suggests a step up next time", () => {
   store.set("exerciseFeedback", []);
   store.logExerciseFeedback("row", "too-easy");
-  store.logExerciseFeedback("row", "too-easy");
-  const [out] = applyFeedbackWeighting([{ id: "row", programmeScore: 1 }]);
-  ok(out.programmeScore >= 1.5, `score ${out.programmeScore}`);
+  ok(tooEasyLast("row") === true, "one tap is the person's own word; it changes a suggestion, not the offer");
 });
 check("ONE hard day changes nothing (P4)", () => {
   store.set("exerciseFeedback", []);
   store.logExerciseFeedback("press", "too-hard");
-  const [out] = applyFeedbackWeighting([{ id: "press", programmeScore: 1 }]);
-  ok(out.programmeScore === 1,
+  ok(tooHardRecently("press") === false,
      "a single bad day must not move selection - two of five is the threshold");
+});
+check("the live readers are wired: the builder and the log", () => {
+  const sb = fs.readFileSync(_gatePath("js/session-builder.js"), "utf8");
+  const sr = fs.readFileSync(_gatePath("js/data/session-rationale.js"), "utf8");
+  ok(/candidates\.filter\(e => !tooHardRecently\(e\.id\)\)/.test(sb), "session-builder no longer reads too-hard");
+  ok(/const tooEasy = tooEasyLast\(exercise\.id\)/.test(sr), "progressionInvitation no longer reads too-easy");
 });
 
 console.log("\nTEST 2 - it can be withdrawn");
@@ -87,9 +101,9 @@ check("clearExerciseFeedback removes ALL entries for that exercise", () => {
      "leaving entries behind means the undo silently did nothing");
   ok(left.some(e => e.exerciseId === "other"), "must not clear other exercises");
 });
-check("after clearing, the weighting reverts", () => {
-  const [out] = applyFeedbackWeighting([{ id: "plank", programmeScore: 1 }]);
-  ok(out.programmeScore === 1, "still weighted after being withdrawn");
+check("after clearing, the readers let it go", () => {
+  ok(tooHardRecently("plank") === false, "still read as too hard after being withdrawn");
+  ok(tooEasyLast("other") === true, "and the other exercise keeps its word");
 });
 check("invalid values are rejected", () => {
   store.set("exerciseFeedback", []);

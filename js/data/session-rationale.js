@@ -1,6 +1,14 @@
 /**
  * data/session-rationale.js
-' * 13 Aug 2026 v3
+ * 28 Sep 2026 v4
+ *
+ * v4 - Work list 2e, TOO-EASY-LIVE. "That was too easy" answered "I'll
+ *   push this on", and the only thing that read a too-easy tap was
+ *   applyFeedbackWeighting(), called only by the dead engine. Now
+ *   tooEasyLast() reads it, and progressionInvitation() -- shown in the
+ *   log on every exercise screen -- suggests a step up the next time,
+ *   on a settled day. Sore and low days still win: the day is read first.
+ *
  *
  * v3 - VOICE-3 / D2. buildRationale() now returns a fourth field,
  *   `read` - the Personal-tier observation across time. Null for free
@@ -566,6 +574,20 @@ export function tooHardRecently(exerciseId) {
   return lastFive.filter(e => e.feedback === "too-hard").length >= 2;
 }
 
+/**
+ * 2e, TOO-EASY-LIVE. The person's LAST word on this exercise was "too
+ * easy". One tap is enough here, unlike too-hard: it only changes what
+ * the coach suggests, never what is offered, and the person still
+ * chooses the weight. A later too-hard tap replaces it.
+ */
+export function tooEasyLast(exerciseId) {
+  if (!exerciseId) return false;
+  const log = store.get("exerciseFeedback");
+  if (!Array.isArray(log)) return false;
+  const mine = log.filter(e => e?.exerciseId === exerciseId);
+  return mine.length > 0 && mine[mine.length - 1].feedback === "too-easy";
+}
+
 export function bodyCaution(exercise) {
   // TWO LEVELS, matching P7's existing model rather than inventing a
   // parallel one. Graeme's ask was "when conditions flag we provide a
@@ -664,7 +686,10 @@ export function progressionInvitation(exercise) {
 
   // Nothing to build on yet. Say so plainly rather than inventing a
   // starting point -- the note is the thing that makes next time useful.
-  if (!last) {
+  // 2e. Said too easy last time: go on to read the day even with no
+  // weight logged, because the suggestion does not need a number.
+  const tooEasy = tooEasyLast(exercise.id);
+  if (!last && !tooEasy) {
     return stats.n >= 1
       ? "Worth noting what you use today. It gives us something to go on next time."
       : null;
@@ -727,6 +752,15 @@ export function progressionInvitation(exercise) {
 
   if (intensity === "low") {
     return "Matching last time would be a good session today. On a day like this, holding steady is the achievement.";
+  }
+
+  // 2e, TOO-EASY-LIVE. Below every reading of the day (sore, rebuilding,
+  // low energy), so their words hold; above the intent and the
+  // familiarity rules, because the person said it themselves.
+  if (tooEasy) {
+    return last
+      ? "You said this was too easy last time, so try a step up today: a little more weight, or a few more reps."
+      : "You said this was too easy last time, so try a step up today: a few more reps, or a harder way to do it.";
   }
 
   if (intent === "maintain") {

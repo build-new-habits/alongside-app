@@ -1,5 +1,10 @@
 /**
  * tools/verify-hyper1.mjs
+ * 28 Sep 2026 v3
+ * Work list 2e. The library is read from data/exercises/index.js; the
+ *   data/exercises.js shim that forwarded to it is deleted. No assertion
+ *   changed.
+ *
  * 21 Aug 2026 v2
  * GATE-PATH. Path resolution only -- no assertion changed.
  *
@@ -57,7 +62,7 @@ Object.defineProperty(globalThis, 'localStorage', { value: dom.window.localStora
 const BASE = new URL('../js/', import.meta.url).href;
 const C  = await import(BASE + 'data/conditions.js');
 const EX = await import(BASE + 'data/exercises/index.js');
-const ALL = (await import(BASE + 'data/exercises.js'));
+const ALL = EX;   // 2e: data/exercises.js was a shim to this module, deleted with the dead engine
 
 let failures = 0;
 const check = (n, ok, d = '') => {

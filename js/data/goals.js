@@ -1,7 +1,11 @@
 /**
  * goals.js
- * 28 Sep 2026 v3
+ * 28 Sep 2026 v4
  *
+ * v4 - Work list 2e. chosenPrimaryEngineGoal(): the coach route honours
+ *   the goal the person chose as primary (GOAL-2 on the live path).
+ *
+ * 28 Sep 2026 v3 *
  * v3 - SMOOTH-P4c, decided 27 Sep (spec 8). offeredGoals(): the list a
  *   person is shown. "Tone up" is no longer offered. "Lose weight" is
  *   offered only when weight tracking is switched on, so nobody meets
@@ -329,6 +333,20 @@ export function getPrimaryEngineGoal(goalIds = []) {
     if (engineGoals.includes(p)) return p;
   }
   return 'feel-good';
+}
+
+/**
+ * 2e, 28 Sep 2026. The engine goal for the coach route: the goal the
+ * person CHOSE as primary leads, when it is still one of their goals;
+ * otherwise the fixed priority order above. GOAL-2 (17 Aug) fixed this
+ * only in the dead engine; the live route took the priority order and
+ * silently replaced a chosen primary.
+ * @param {string[]} goalIds
+ * @param {{primaryGoal?: string}|null} strategicGoal
+ */
+export function chosenPrimaryEngineGoal(goalIds = [], strategicGoal = null) {
+  const chosen = strategicGoal && strategicGoal.primaryGoal;
+  return getPrimaryEngineGoal(chosen && goalIds.includes(chosen) ? [chosen] : goalIds);
 }
 
 /**

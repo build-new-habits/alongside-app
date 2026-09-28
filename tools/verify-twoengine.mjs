@@ -1,5 +1,19 @@
 /**
  * tools/verify-twoengine.mjs
+ * 28 Sep 2026 v3
+ *
+ * v3 - Work list 2e: the old engine is DELETED, deliberately, so nobody
+ *   fixes it again. Four assertions change, each with its reason:
+ *   1b  the time window constant is imported from data/time-windows.js
+ *       (its new home), no longer from the engine.
+ *   1e  was "retired, not deleted". The record it protected is kept in
+ *       Documents/Archive/workoutGenerator_retired_28sep2026.js, outside
+ *       the app; now asserted there, and asserted gone from js/.
+ *   3c  "the retired engine still cannot produce a stretch" RETIRED with
+ *       the engine; 3a/3b prove stretch is reachable.
+ *   4a-c keep the positive half (session-builder reads each); the
+ *       "and the old engine does not" half went with the file.
+ *
  * 08 Sep 2026 v2
  *
  * v2 - Two fixes, neither about two-engine.
@@ -120,9 +134,9 @@ ok("1a. no live import of the workoutGenerator object",
 // The CONSTANT may stay. Asserted positively so a later tidy-up that
 // removes it fails here rather than silently changing how the check-in's
 // time answer is interpreted.
-ok("1b. but AVAILABLE_TIME_WINDOW_MINUTES is still imported",
-   /AVAILABLE_TIME_WINDOW_MINUTES\s*\}\s*from\s*'\.\.\/data\/workoutGenerator\.js'/.test(cp),
-   "the time window constant was removed with the engine - it is not engine behaviour");
+ok("1b. but AVAILABLE_TIME_WINDOW_MINUTES is still imported, from its own module",
+   /AVAILABLE_TIME_WINDOW_MINUTES\s*\}\s*from\s*'\.\.\/data\/time-windows\.js'/.test(cp),
+   "the time window constant is not engine behaviour; 2e moved it to data/time-windows.js");
 
 // 08 Sep 2026. Was /import\s*\{\s*buildSession,\s*buildCandidatePools\s*\}/
 // -- an exact-shape match that broke the moment LOCATION-1 imported a
@@ -147,11 +161,11 @@ const liveCallers = _dir("js/views").map(f => `js/views/${f}`)
 ok("1d. generateDailyOptions has zero live callers", liveCallers.length === 0,
    `still called from: ${liveCallers.join(", ")}`);
 
-ok("1e. and it was retired, not deleted",
-   /generateDailyOptions\(\)\s*\{/.test(_read("js/data/workoutGenerator.js")),
-   "the function is gone. Retire is not delete - it is the record of what the " +
-   "route did for three months, and the three hardcoded focuses are the reason " +
-   "stretch was unreachable");
+ok("1e. and it is gone from the app, with its record kept outside it",
+   !fs.existsSync(new URL("js/data/workoutGenerator.js", _R)) &&
+   /generateDailyOptions\(\)\s*\{/.test(_read("Documents/Archive/workoutGenerator_retired_28sep2026.js")),
+   "2e deleted the engine so nobody fixes it again; the archive copy is the record " +
+   "of what the route did for three months (three hardcoded focuses, no stretch)");
 
 // ── 2. THE SESSION IS BUILT BY THE GOOD ENGINE ──────────────────────────
 // Proven by a PROPERTY only session-builder produces, not by a name.
@@ -190,11 +204,8 @@ ok("3b. and a stretch session actually builds",
    !!stretch && (stretch.exercises || []).length > 0,
    "buildSession('stretch') produced nothing");
 
-const wg = _read("js/data/workoutGenerator.js");
-ok("3c. and the retired engine still cannot produce one, so this mattered",
-   !/getWorkoutName[\s\S]{0,200}stretch/.test(wg),
-   "workoutGenerator gained a stretch type - if deliberate, retire this " +
-   "assertion with the reason recorded rather than deleting it");
+// 3c RETIRED 28 Sep (2e): it asserted the retired engine could not
+// produce a stretch. The engine is deleted; 3a and 3b are the proof.
 
 // ── 4. THE THREE THE OLD ENGINE READ ZERO TIMES ─────────────────────────
 console.log("\nTEST 4 - variety, preferences and section rules are live here");
@@ -206,8 +217,8 @@ for (const [label, needle] of [
   ["4c. SECTION-RULES",        "SECTION-RULES"]
 ]) {
   ok(`${label} is read by the engine the coach now uses`,
-     sbSrc.includes(needle) && !wg.includes(needle),
-     `"${needle}": session-builder ${sbSrc.includes(needle)}, workoutGenerator ${wg.includes(needle)}`);
+     sbSrc.includes(needle),
+     `"${needle}": session-builder ${sbSrc.includes(needle)}`);
 }
 
 // Behavioural, not textual: the person's own variety answer must change

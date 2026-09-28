@@ -1,6 +1,9 @@
 /**
  * js/views/know-what.js
- * 28 Sep 2026 v1
+ * 28 Sep 2026 v2
+ *
+ * v2 - Work list 2e. The time windows come from data/time-windows.js
+ *   (the old engine that held them is deleted). Same numbers.
  *
  * SMOOTH-P3b. "I know what I want". Spec 4.6.
  *
@@ -48,7 +51,7 @@
 import { store } from "../store.js";
 import { CONDITIONS, soreAreaOptions } from "../data/conditions.js";
 import { savedSessions } from "../data/saved-sessions.js";
-import { AVAILABLE_TIME_WINDOW_MINUTES } from "../data/workoutGenerator.js";
+import { AVAILABLE_TIME_WINDOW_MINUTES } from "../data/time-windows.js";
 
 export const KINDS = [
   { id: "strength", label: "Strength" },

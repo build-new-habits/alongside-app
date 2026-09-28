@@ -2,7 +2,15 @@ import { zonesForAreas } from "./data/aims.js";
 
 /**
  * store.js - Data persistence layer
- * 28 Sep 2026 v78
+ * 28 Sep 2026 v79
+ *
+ * v79 - Work list 2e. proposalBias REMOVED (Schema.md v1.72). Declared by
+ *   BIAS-1, written by nothing since BIAS-2 (16 Aug), and read only by
+ *   checkin.js resolveIntensity(), whose only caller was the deleted
+ *   workoutGenerator.js. The "go gentler" signals it once carried are
+ *   derived live in session-builder.js _gentleReason(). Dropped from
+ *   stored data on load, like sessionPace.
+ *
  *
  * v78 - SMOOTH-P4c. Two changes, schema first (Schema.md v1.71).
  *   conditionsResolved: [{ id, resolvedAt }] -- NEW. "It's better now" in
@@ -1179,9 +1187,7 @@ export const store = {
       lastEmpathyPromptAt: typeof saved.lastEmpathyPromptAt === 'string'
         ? saved.lastEmpathyPromptAt
         : null,
-      proposalBias: ['rest', 'lighter'].includes(saved.proposalBias)
-        ? saved.proposalBias
-        : null,
+      // proposalBias: removed v79 (work list 2e). See _dropRetired().
       empathyPromptSkips: typeof saved.empathyPromptSkips === 'number'
         ? saved.empathyPromptSkips
         : 0,
@@ -1596,6 +1602,7 @@ export const store = {
    */
   _dropRetired(data) {
     delete data.sessionPace;   // v78, SMOOTH-P4c (retired v74, SMOOTH-P1)
+    delete data.proposalBias;  // v79, work list 2e (read only by the dead engine)
     return data;
   },
 
@@ -2223,14 +2230,8 @@ export const store = {
       // the coaching voice in proportion to how few sessions somebody
       // does, which is exactly backwards for the people this is for.
       lastEmpathyPromptAt: null,    // ISO string | null
-      // BIAS-1, 12 Aug 2026. Written by coach-reflection.js since 03 Aug and
-      // never declared here, so it existed only by virtue of store.set()
-      // creating arbitrary paths. It survives a reload (mergeWithDefaults
-      // spreads saved values) but was invisible to anybody reading this
-      // file for the field list, which is how it stayed unread for nine days.
-      //
-      // 'rest' | 'lighter' | null. Read by data/checkin.js resolveIntensity().
-      proposalBias:             null,
+      // proposalBias: removed v79 (work list 2e). Its only reader,
+      // resolveIntensity(), went with the dead engine. See _dropRetired().
       empathyPromptSkips:       0,  // integer, consecutive skip streak —
                                      // resets to 0 on any non-skip response
       // EMP-1. Which prompt last fired, and how many times running.

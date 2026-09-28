@@ -1,5 +1,16 @@
 /**
  * tools/verify-plan1.mjs
+ * 28 Sep 2026 v3
+ *
+ * v3 - Work list 2e. TESTS 2-4 asked workoutGenerator.getWorkoutFocusOrder()
+ *   -- an engine nothing had called since 6 Sep. Re-pointed at the chooser
+ *   the coach route runs, data/session-choice.js chooseSessionType():
+ *   a planned day leads (reason "programme"), no plan leaves the rest of
+ *   the chain to decide, malformed data never throws. "The other two are
+ *   still offered" is now "Something different today" on the plan,
+ *   driven by verify-plan-list; a planned core or upper day being THAT
+ *   session is verify-week-plan-live. TEST 1 unchanged.
+ *
  * 21 Aug 2026 v2
  * GATE-PATH. Path resolution only -- no assertion changed.
  *
@@ -33,8 +44,7 @@ Object.defineProperty(globalThis,'localStorage',{value:dom.window.localStorage,c
 const B = new URL('../js/', import.meta.url).href;
 const { store } = await import(B + 'store.js');
 const PE = await import(B + 'data/programmeEngine.js');
-const WG = (await import(B + 'data/workoutGenerator.js')).default
-        || (await import(B + 'data/workoutGenerator.js')).workoutGenerator;
+const SC = await import(B + 'data/session-choice.js');
 
 let failures = 0;
 const check = (n, ok, d='') => { console.log(`${ok?'PASS':'FAIL'}  ${n}${d?' — ':''}${d}`); if(!ok) failures++; };
@@ -63,22 +73,20 @@ seed([{ day: today, type: 'glute', completed: false }]);
 check('a body-part session maps to strength', PE.plannedFocusToday() === 'strength',
   'the map is coarse on purpose — a wrong guess costs a reordered list, not a wrong session');
 
-// ── 2. It reaches the generator's ORDERING ───────────────────────────
+// ── 2. It reaches the chooser the coach route runs ───────────────────
 seed([{ day: today, type: 'cardio', completed: false }]);
-check('and the planned focus leads the coach\'s three options',
-  WG.getWorkoutFocusOrder()[0] === 'cardio',
-  WG.getWorkoutFocusOrder().join(' > '));
-
-check('while the other two are still offered',
-  WG.getWorkoutFocusOrder().length === 3 &&
-  new Set(WG.getWorkoutFocusOrder()).size === 3,
-  'a preference, not a replacement — a plan made on Sunday must not trap somebody on Tuesday');
+{ const pick = SC.chooseSessionType();
+  check('and the planned day is the session the coach picks',
+    pick.sessionType === 'cardio' && pick.reason === 'programme',
+    `${pick.sessionType} (${pick.reason})`); }
 
 // ── 3. It does NOT fire when there is no plan ────────────────────────
 seed([]);
 check('no sequence, no override', PE.plannedFocusToday() === null);
-check('and the phase bias still decides',
-  WG.getWorkoutFocusOrder().length === 3);
+{ const pick = SC.chooseSessionType();
+  check('and the rest of the chain decides',
+    !!pick.sessionType && !String(pick.reason).startsWith('programme'),
+    `${pick.sessionType} (${pick.reason})`); }
 
 seed([{ day: 'Thursday' === today ? 'Friday' : 'Thursday', type: 'cardio', completed: false }]);
 check('a plan for a DIFFERENT day is not applied today',
@@ -94,7 +102,7 @@ check('and a session already done today is not re-offered',
 for (const bad of [null, 'not-an-array', [null], [{}], [{ day: today }]]) {
   seed(bad);
   let threw = null;
-  try { PE.plannedFocusToday(); WG.getWorkoutFocusOrder(); } catch (e) { threw = e; }
+  try { PE.plannedFocusToday(); SC.chooseSessionType(); } catch (e) { threw = e; }
   check(`malformed sequence does not break the coach: ${JSON.stringify(bad)}`,
     !threw, threw ? String(threw) : '');
 }

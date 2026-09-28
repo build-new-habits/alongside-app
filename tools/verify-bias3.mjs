@@ -1,5 +1,17 @@
 /**
  * tools/verify-bias3.mjs
+ * 28 Sep 2026 v3
+ *
+ * v3 - Work list 2e. TEST 2 executed workoutGenerator.generateDailyOptions()
+ *   -- which nothing had called since 6 Sep, so "the generator must
+ *   actually run" guarded a function no person could reach. RETIRED with
+ *   the engine. 4b ("'lighter' lowers a high intensity") RETIRED with
+ *   resolveIntensity(); the live consequence of 'lighter' -- a gentler
+ *   session and one sentence saying why -- is driven by
+ *   verify-gentle-signals 1.3/1.4. New 2: the live builder imports the
+ *   bias functions BY NAME, so the facade trap this gate was written for
+ *   cannot recur there. TESTS 1, 3, 4a, 4c and 5 unchanged.
+ *
  * 21 Aug 2026 v2
  * GATE-PATH. Path resolution only -- no assertion changed.
  *
@@ -52,8 +64,6 @@ for (const k of ["navigator", "localStorage"])
 const BASE = new URL("../js/", import.meta.url).href;
 const { store }       = await import(BASE + "store.js");
 const { checkinData } = await import(BASE + "data/checkin.js");
-const wgMod           = await import(BASE + "data/workoutGenerator.js");
-const generator       = wgMod.workoutGenerator || wgMod.default;
 
 let failures = 0;
 const check = (name, ok, detail = "") => {
@@ -63,39 +73,27 @@ const check = (name, ok, detail = "") => {
 
 const fresh = () => { localStorage.clear(); store.init(); };
 
-console.log("\nBIAS-3 — the generator must actually run\n");
+console.log("\nBIAS-3 — the bias reaches the path that runs\n");
 
 // ── 1. THE BUG ITSELF ────────────────────────────────────────────────
 fresh();
 check("checkinData.coachBias is callable through the facade",
   typeof checkinData.coachBias === "function",
-  "workoutGenerator reaches this module ONLY through the facade");
+  "anything reaching this module through the facade finds it");
 check("checkinData.consecutiveActiveDays is callable through the facade",
   typeof checkinData.consecutiveActiveDays === "function");
 
-// ── 2. THE CONSEQUENCE — the whole generator, executed ───────────────
+// ── 2. THE LIVE CALLER ───────────────────────────────────────────────
 //
-// This is the assertion that matters. Not "is the call present" but
-// "does the function complete". Three scenarios, because a throw on
-// line 3 would take all of them down identically.
-for (const [label, seed] of [
-  ["a cold-start user", () => {}],
-  ["somebody mid-programme", () => {
-    store.set("todayIntensity", "high");
-    store.set("activeProgramme.currentWeek", 4);
-  }],
-  ["somebody three days in a row", () => {
-    const d = n => new Date(Date.now() - n * 864e5).toISOString().split("T")[0];
-    store.set("activityLog", [{ date: d(1) }, { date: d(2) }, { date: d(3) }]);
-  }],
-]) {
-  fresh(); seed();
-  let options = null, threw = null;
-  try { options = generator.generateDailyOptions(); }
-  catch (e) { threw = e.message; }
-  check(`generateDailyOptions() completes for ${label}`,
-    !threw && Array.isArray(options) && options.length > 0,
-    threw ? `THREW: ${threw}` : `${options?.length ?? 0} options`);
+// 2e, 28 Sep. Was: generateDailyOptions() completes -- the engine is
+// deleted. The live builder reaches these by NAMED import, which cannot
+// be missing from a facade, and it calls them.
+{
+  const sb = fs.readFileSync(_gatePath("js/session-builder.js"), "utf8");
+  const line = (sb.match(/import\s*\{[^}]*\}\s*from\s*"\.\/data\/checkin\.js"/) || [""])[0];
+  check("the live builder imports coachBias and consecutiveActiveDays by name",
+    /\bcoachBias\b/.test(line) && /\bconsecutiveActiveDays\b/.test(line), line);
+  check("and calls them", /coachBias\(\) === "lighter"/.test(sb) && /consecutiveActiveDays\(\)/.test(sb));
 }
 
 // ── 3. THE STRUCTURAL GUARD ──────────────────────────────────────────
@@ -169,9 +167,6 @@ for (const [label, seed] of [
   check("three consecutive days produces a 'lighter' bias",
     checkinData.coachBias() === "lighter",
     `got ${JSON.stringify(checkinData.coachBias())}`);
-  check("and 'lighter' actually lowers a high intensity",
-    checkinData.resolveIntensity("high", checkinData.coachBias()) === "moderate");
-
   fresh();
   check("one day is not a run — no bias",
     checkinData.coachBias() === null);
@@ -211,6 +206,6 @@ for (const [label, seed] of [
 }
 
 console.log(failures === 0
-  ? "\nBIAS-3 GATE GREEN — the generator runs\n"
+  ? "\nBIAS-3 GATE GREEN — the bias reaches the path that runs\n"
   : `\nBIAS-3 GATE RED — ${failures} failure(s)\n`);
 process.exit(failures === 0 ? 0 : 1);

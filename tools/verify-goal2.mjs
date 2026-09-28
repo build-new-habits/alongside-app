@@ -1,5 +1,17 @@
 /**
  * tools/verify-goal2.mjs
+ * 28 Sep 2026 v2
+ *
+ * v2 - Work list 2e. "The primary goal is read from where it is written"
+ *   was satisfied by ONE line: workoutGenerator.js's
+ *   store.get("strategicGoal.primaryGoal"). When that engine was deleted
+ *   the check went red -- correctly, and it found the fault: the live
+ *   coach route never read the chosen primary at all. It took the first
+ *   goal in a fixed priority list, so GOAL-2's bug had been live on the
+ *   route Plan users take since TWO-ENGINE (6 Sep). Now the check DRIVES
+ *   chosenPrimaryEngineGoal() and asserts coach-proposal calls it with
+ *   the stored strategicGoal. Everything else unchanged.
+ *
  * 17 Aug 2026 v1
  *
  * GOAL-2. No store read may point at a path that does not exist.
@@ -85,9 +97,21 @@ check('nothing reads the phantom `goal` object',
   !/\bget\((['"])goal\./.test(all),
   'strategicGoal is the real home; `goal.` never existed');
 
-check('and the primary goal is read from where it is written',
-  /store\.get\("strategicGoal\.primaryGoal"\)/.test(all),
-  'otherwise a chosen primary is silently replaced by goals[0]');
+{
+  const G = await import(new URL('../js/data/goals.js', import.meta.url).href);
+  const f = G.chosenPrimaryEngineGoal;
+  const goals = ['feel-better', 'get-stronger'];   // priority alone picks build-muscle
+  const byPriority = typeof f === 'function' ? f(goals, null) : null;
+  const chosen = typeof f === 'function' ? f(goals, { primaryGoal: 'feel-better' }) : null;
+  check('and the primary goal is read from where it is written',
+    typeof f === 'function' && chosen === G.getPrimaryEngineGoal(['feel-better']) && chosen !== byPriority,
+    `no choice: ${byPriority}, chose feel-better: ${chosen} -- otherwise a chosen primary is silently replaced`);
+  check('a chosen primary that is no longer one of their goals does not lead',
+    typeof f === 'function' && f(goals, { primaryGoal: 'balance' }) === byPriority);
+  const cpSrc = fs.readFileSync(new URL('../js/views/coach-proposal.js', import.meta.url), 'utf8');
+  check('and the coach route asks it, with what is stored',
+    /chosenPrimaryEngineGoal\(goals, store\.get\('strategicGoal'\)\)/.test(cpSrc));
+}
 
 // ── AUDIT-2. Whole sessions are not orphans. ────────────────────────
 //

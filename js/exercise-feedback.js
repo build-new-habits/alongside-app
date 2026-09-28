@@ -1,5 +1,15 @@
 /**
  * js/exercise-feedback.js
+ * 28 Sep 2026 v2
+ *
+ * v2 - Work list 2e. The answers say what the app actually does.
+ *   "I'll push this on" was kept by nothing live (its reader went with
+ *   the dead engine); it is now "I'll suggest a step up next time", and
+ *   session-rationale.js progressionInvitation() does, on a settled day.
+ *   "I'll ease this off" after one tap was not true either: the builder
+ *   waits for two of the last five (P4: one hard day moves nothing), so
+ *   it now says "if it keeps happening, I'll ease it off".
+ *
  * 12 Aug 2026 v1
  *
  * FEED-1. "Too hard" / "too easy" on the exercise card.
@@ -66,21 +76,21 @@ export function renderFeedbackControl(exercise) {
               class="ex-feedback__btn ${set === "too-hard" ? "is-set" : ""}"
               data-feedback="too-hard" data-feedback-id="${id}"
               aria-pressed="${set === "too-hard"}">
-        ${set === "too-hard" ? "Noted \u2014 I'll ease this off" : "That was too hard"}
+        ${set === "too-hard" ? "Noted \u2014 if it keeps happening, I'll ease it off" : "That was too hard"}
       </button>
       <button type="button"
               class="ex-feedback__btn ${set === "too-easy" ? "is-set" : ""}"
               data-feedback="too-easy" data-feedback-id="${id}"
               aria-pressed="${set === "too-easy"}">
-        ${set === "too-easy" ? "Noted \u2014 I'll push this on" : "That was too easy"}
+        ${set === "too-easy" ? "Noted \u2014 I'll suggest a step up next time" : "That was too easy"}
       </button>
     </div>
   `;
 }
 
 const LABEL = {
-  "too-hard": { off: "That was too hard", on: "Noted \u2014 I'll ease this off" },
-  "too-easy": { off: "That was too easy", on: "Noted \u2014 I'll push this on" },
+  "too-hard": { off: "That was too hard", on: "Noted \u2014 if it keeps happening, I'll ease it off" },
+  "too-easy": { off: "That was too easy", on: "Noted \u2014 I'll suggest a step up next time" },
 };
 
 /** Repaints both buttons from the store. */

@@ -1,5 +1,15 @@
 /**
  * tools/verify-burn1.mjs
+ * 28 Sep 2026 v3
+ *
+ * v3 - Work list 2e. TEST 4 read workoutGenerator.js, which nothing had
+ *   called since 6 Sep. Re-pointed at every LIVE caller, found by
+ *   scanning the app rather than typed: each passes the history, and the
+ *   builder reads .level. "The recovery pool gate is reachable" is
+ *   retired with the engine: the live builder treats moderate and high
+ *   alike (a recorded decision, BURNOUT-LIVE), and verify-burnout-live
+ *   drives the session it shapes. TESTS 1-3 unchanged.
+ *
  * 21 Aug 2026 v2
  * GATE-PATH. Path resolution only -- no assertion changed.
  *
@@ -68,7 +78,7 @@ check("shape is { level, avgEnergy }", () => {
   ok(typeof r === "object" && r !== null, "a boolean makes every .level read undefined");
   ok("level" in r && "avgEnergy" in r, "missing keys");
 });
-check("grades map to what workoutGenerator branches on", () => {
+check("grades map to what the live callers branch on", () => {
   eq(detectBurnout(hist([8, 7, 8, 7, 8])).level, "none",     "good week");
   eq(detectBurnout(hist([4, 3, 4, 4, 3])).level, "moderate", "a rough patch");
   eq(detectBurnout(hist([2, 2, 3, 2, 1])).level, "high",     "sustained exhaustion");
@@ -95,22 +105,27 @@ check("the original boolean threshold still registers", () => {
 });
 
 console.log("\nTEST 4 - call sites");
-const gen = fs.readFileSync(_gatePath("js/data/workoutGenerator.js"), "utf8");
 const cp  = fs.readFileSync(_gatePath("js/views/coach-proposal.js"), "utf8");
-check("workoutGenerator passes the history", () =>
-  ok(/detectBurnout\(store\.get\("checkinHistory"\)/.test(gen),
-     "an argument-less call returns none for everybody"));
+const sb  = fs.readFileSync(_gatePath("js/session-builder.js"), "utf8");
+const _strip = s => s.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/[^\n]*$/gm, "");
+const _walk = d => fs.readdirSync(_gatePath(d), { withFileTypes: true }).flatMap(e =>
+  e.isDirectory() ? _walk(d + e.name + "/") : (e.name.endsWith(".js") ? [d + e.name] : []));
+const callers = _walk("js/").filter(f => f !== "js/data/checkin.js")
+  .map(f => [f, _strip(fs.readFileSync(_gatePath(f), "utf8"))])
+  .filter(([, s]) => /detectBurnout\(/.test(s));
+check("the scan finds the live callers (fixture reach)", () =>
+  ok(callers.length >= 3 && callers.some(([f]) => f === "js/session-builder.js"),
+     "found: " + callers.map(([f]) => f).join(", ")));
 check("no argument-less call survives anywhere", () => {
-  for (const [f, s] of [["workoutGenerator.js", gen], ["coach-proposal.js", cp]])
-    ok(!/detectBurnout\(\)/.test(s.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/[^\n]*$/gm, "")),
-       `${f} still calls it with no argument`);
+  for (const [f, s] of callers)
+    ok(!/detectBurnout\(\)/.test(s), `${f} still calls it with no argument`);
 });
 check("coach-proposal reads .level rather than truthiness", () =>
   ok(/burnoutState\.level !== 'none'/.test(cp),
      "an object is always truthy, so a raw truthy test would report burnout for everybody"));
-check("the recovery pool gate is reachable", () =>
-  ok(/recoveryMode: burnout\.level === "high"/.test(gen),
-     "this is what filterToRecoveryPool() hangs off"));
+check("and so does the builder that shapes the session", () =>
+  ok(/detectBurnout\(store\.get\("checkinHistory"\) \|\| \{\}\)\.level !== "none"/.test(sb),
+     "verify-burnout-live drives what this shapes"));
 
 console.log(fails === 0 ? "\nALL PASS\n" : `\n${fails} FAILURE(S)\n`);
 process.exit(fails === 0 ? 0 : 1);

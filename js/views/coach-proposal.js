@@ -1,6 +1,13 @@
 /**
  * coach-proposal.js
- * 28 Sep 2026 v31
+ * 28 Sep 2026 v32
+ *
+ * v32 - Work list 2e. AVAILABLE_TIME_WINDOW_MINUTES now comes from
+ *   data/time-windows.js; workoutGenerator.js is deleted (same numbers).
+ *   Found by re-pointing verify-goal2 at the live path: this route
+ *   ignored the goal the person chose as primary (GOAL-2, fixed only in
+ *   the dead engine) -- it now leads. And the intro lines said "three
+ *   options", which the coach has not offered since SMOOTH-P2a.
  *
  * v31 - SMOOTH-P3b. A request is said back whole: "You asked for
  *   strength, full body, 40 minutes." (spec 4.6), in the words it was
@@ -647,13 +654,14 @@ import { getPhaseBias, getReEntryContext, getMissedSessionOffer,
          getReEntryIntensity, applyMissedSessionAdaptation }  from '../data/programmeEngine.js';
 import { getProgramme }      from '../data/programmes.js';
 import { detectBurnout, getTodaysCheckin } from '../data/checkin.js';
-import { getPrimaryEngineGoal } from '../data/goals.js';
+import { chosenPrimaryEngineGoal } from '../data/goals.js';
 import { getConditionName }  from '../data/conditions.js';
 // TWO-ENGINE, 06 Sep 2026. workoutGenerator.js is no longer imported
 // here. AVAILABLE_TIME_WINDOW_MINUTES is a CONSTANT, not engine
 // behaviour, and stays -- it is the window the check-in's time answer is
 // interpreted through and has nothing to do with which builder runs.
-import { AVAILABLE_TIME_WINDOW_MINUTES } from '../data/workoutGenerator.js';
+// 2e, 28 Sep: it has its own module now, and the old engine is gone.
+import { AVAILABLE_TIME_WINDOW_MINUTES } from '../data/time-windows.js';
 import { buildSession, buildCandidatePools, equipmentForLocation,
          swapAlternatives, swapExerciseInSession, soreLevelFor,
          soreScoresToday, SESSION_TYPES, exerciseSeconds } from '../session-builder.js';
@@ -1936,7 +1944,12 @@ export function CoachProposalView(router) {
     const burnoutState = detectBurnout(store.get('checkinHistory') || {});
     const burnout      = burnoutState.level !== 'none';
     const phaseBias    = getPhaseBias();
-    const primaryGoal  = getPrimaryEngineGoal(goals);
+    // 2e / GOAL-2 on the live path. GOAL-2 (17 Aug) made the dead engine
+    // honour the goal the person CHOSE as primary; this route never did --
+    // it took the first goal in a fixed priority list, so a chosen
+    // primary was silently replaced. The chosen one leads when it is
+    // still one of their goals.
+    const primaryGoal  = chosenPrimaryEngineGoal(goals, store.get('strategicGoal'));
     const feelingWord  = store.get('lastCheckin.feelingWord');
 
     // Pain override check
@@ -2112,8 +2125,12 @@ export function CoachProposalView(router) {
   // ── Intro line ─────────────────────────────────────────────────────────────
 
   function _buildIntro(primaryGoal, feelingWord, burnout, reEntryCtx) {
+    // 2e. These said "three options" -- the choice of three went with the
+    // old engine; since SMOOTH-P2a the coach offers ONE plan with every
+    // exercise named. The burnout line now says what the check-ins said,
+    // the same words the builder uses, never "your body".
     if (burnout) {
-      return 'Your body has been running low. Today is for gentle movement only.';
+      return 'Your check-ins this week have mostly been low on energy, so today is a gentler one.';
     }
     if (reEntryCtx?.needsGentlerStart) {
       return 'Welcome back. Starting gently — that\'s the right call after being unwell.';
@@ -2124,14 +2141,14 @@ export function CoachProposalView(router) {
 
     // Goal-connected intro
     const goalIntros = {
-      'feel-good':       'Here\'s what might help you feel it today.',
-      'build-muscle':    'Three options for today — the programme is building.',
-      'weight-loss':     'Here\'s today — three different ways to move.',
-      'improve-cardio':  'Three options. All of them move the cardio work forward.',
-      'flexibility':     'Three ways to work on range and ease today.',
-      'balance':         'Three options — all of them build the stability work.',
-      'injury-recovery': 'Three options — all adapted to where your body is today.',
-      'return-to-fitness': 'Three options for today. All of them count.',
+      'feel-good':       'Here\'s something to help you feel it today.',
+      'build-muscle':    'Here\'s today. The programme is building.',
+      'weight-loss':     'Here\'s today\'s session.',
+      'improve-cardio':  'Here\'s today. It moves the cardio work forward.',
+      'flexibility':     'Here\'s today, for range and ease.',
+      'balance':         'Here\'s today. It builds the stability work.',
+      'injury-recovery': 'Here\'s today, adapted to where your body is.',
+      'return-to-fitness': 'Here\'s today. All of it counts.',
     };
 
     return goalIntros[primaryGoal] || 'Here\'s what I\'d suggest for today.';

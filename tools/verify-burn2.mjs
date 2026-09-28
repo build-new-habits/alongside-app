@@ -1,5 +1,15 @@
 /**
  * tools/verify-burn2.mjs
+ * 28 Sep 2026 v3
+ *
+ * v3 - Work list 2e. TEST 3 read workoutGenerator.js, which nothing had
+ *   called since 6 Sep, so "'high' narrows the pool" was true of a file
+ *   nobody ran. Re-pointed at session-builder.js, which shapes the
+ *   session: it reads the ONE definition, and treats moderate and high
+ *   alike (BURNOUT-LIVE's recorded decision: "a finer split is a
+ *   decision, not a fix"). The session itself is driven by
+ *   verify-burnout-live. TESTS 1-2 unchanged.
+ *
  * 21 Aug 2026 v2
  * GATE-PATH. Path resolution only -- no assertion changed.
  *
@@ -104,7 +114,7 @@ for (const [label, es] of SCENARIOS)
        `session changes (level ${level}) while the coach says nothing`);
   });
 
-console.log("\nTEST 3 - the SESSION is still graded by burnout level");
+console.log("\nTEST 3 - the SESSION is shaped by burnout, on the live path");
 
 // BIAS-2, 16 Aug 2026. Tests 3 and 4 asserted the graded burnout COPY
 // -- "low for a while now, not just today" -- which lived in
@@ -122,17 +132,15 @@ console.log("\nTEST 3 - the SESSION is still graded by burnout level");
 // not just today" any more. It was already saying it to nobody, so
 // this is not a regression -- but it is a real gap and it is flagged
 // in the master schedule, not buried here.
-const genSrc = fs.readFileSync(_gatePath("js/data/workoutGenerator.js"), "utf8");
+const sbSrc = fs.readFileSync(_gatePath("js/session-builder.js"), "utf8");
 
-check("'high' narrows the pool, 'moderate' does not", () => {
-  ok(/burnout\.level === "high"/.test(genSrc),
-     "no high branch — a flat week and a fortnight of exhaustion would be served alike");
-  ok(/recoveryMode:\s*burnout\.level === "high"/.test(genSrc),
-     "recoveryMode should follow the high level");
+check("the live builder shapes the session on any level but none", () => {
+  ok(/detectBurnout\(store\.get\("checkinHistory"\) \|\| \{\}\)\.level !== "none"/.test(sbSrc),
+     "moderate and high are treated alike on the live path - a recorded decision, not an omission");
 });
 
 check("and the grading is read from ONE definition", () => {
-  ok(/checkinData\.detectBurnout\(/.test(genSrc),
-     "must defer to checkin.js's detectBurnout, not re-derive a level");
+  ok(/import\s*\{[^}]*\bdetectBurnout\b[^}]*\}\s*from\s*"\.\/data\/checkin\.js"/.test(sbSrc),
+     "must import checkin.js's detectBurnout, not re-derive a level");
 });
 

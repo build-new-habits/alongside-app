@@ -1,5 +1,14 @@
 /**
  * tools/verify-skip.mjs
+ * 28 Sep 2026 v2
+ *
+ * v2 - Work list 2e. Section 4 proved the weighting still moved through
+ *   applyFeedbackWeighting(), whose only route in was the deleted
+ *   workoutGenerator.js -- a reader no session reached. Re-pointed at
+ *   the live reader, session-rationale.js tooHardRecently(), which the
+ *   builder uses to offer the move less often. Same threshold, same
+ *   reversal. Sections 1-3 unchanged.
+ *
  * 06 Sep 2026 v1
  *
  * SKIP. A skip is a skip. It is not a difficulty rating.
@@ -171,26 +180,21 @@ for (const v of ["workout", "gym-programme", "core-session", "prescribed-session
     /renderFeedbackControl\s*\(/.test(vs) && /attachFeedbackEvents\s*\(/.test(vs));
 }
 
-// And it still MOVES the weighting, on data the person actually gave.
-const ex = await import("../js/data/exercises/index.js");
-const weight = ex.applyFeedbackWeighting;
-ok("FIXTURE REACHES THE READER: applyFeedbackWeighting is exported",
-  typeof weight === "function");
-if (typeof weight === "function") {
+// And it still MOVES the live reader, on data the person actually gave.
+// (2e: was applyFeedbackWeighting(), reachable only from the dead engine.)
+const sr = await import("../js/data/session-rationale.js");
+const hard = sr.tooHardRecently;
+ok("FIXTURE REACHES THE READER: tooHardRecently is exported", typeof hard === "function");
+if (typeof hard === "function") {
   const now = new Date().toISOString();
   store.set("exerciseFeedback", [
     { exerciseId: "goblet-squat", feedback: "too-hard", at: now },
     { exerciseId: "goblet-squat", feedback: "too-hard", at: now },
   ]);
-  const pool = weight([{ id: "goblet-squat", programmeScore: 1 },
-                       { id: "band-row",     programmeScore: 1 }]);
-  const squat = pool.find(e => e.id === "goblet-squat");
-  const row   = pool.find(e => e.id === "band-row");
-  ok("two EXPLICIT too-hard entries still deprioritise that exercise",
-    squat && squat.programmeScore === 0.5);
-  ok("and an untouched exercise is left alone", row && row.programmeScore === 1);
-  reverses("the weighting is not inert (which would make the removal look safe wrongly)",
-    () => squat && squat.programmeScore === 1);
+  ok("two EXPLICIT too-hard entries still mean the builder offers it less", hard("goblet-squat") === true);
+  ok("and an untouched exercise is left alone", hard("band-row") === false);
+  reverses("the reader is not inert (which would make the removal look safe wrongly)",
+    () => hard("goblet-squat") === false);
 }
 
 console.log("\n  " + pass + " passed, " + fail + " failed");

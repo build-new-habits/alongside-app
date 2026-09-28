@@ -1,5 +1,14 @@
 /**
  * tools/verify-data1.mjs
+ * 28 Sep 2026 v3
+ *
+ * v3 - Work list 2e. "Both engines" was one engine and a file nothing
+ *   ran. TEST 1's third check read workoutGenerator.js and TEST 4 read
+ *   getSuitableExercises() -- both deleted with the engine. TEST 4 now
+ *   DRIVES the live builder: every session type's candidate pools are
+ *   built and none holds session-length content. Reversal: with the
+ *   builder's isSessionLength filter removed, 4a goes red.
+ *
  * 21 Aug 2026 v2
  * GATE-PATH. Path resolution only -- no assertion changed.
  *
@@ -65,9 +74,8 @@ const ok = (c, m) => { if (!c) throw new Error(m); };
 const src = fs.readFileSync(_gatePath("js/session-builder.js"), "utf8");
 
 const idx = fs.readFileSync(_gatePath("js/data/exercises/index.js"), "utf8");
-const gen = fs.readFileSync(_gatePath("js/data/workoutGenerator.js"), "utf8");
 
-console.log("\nTEST 1 - ONE rule, shared by BOTH engines");
+console.log("\nTEST 1 - ONE rule, in the shared module, used by the live builder");
 check("isSessionLength() is defined once, in the shared module", () => {
   ok(/export function isSessionLength/.test(idx), "not exported from exercises/index.js");
   ok(/contentType === "practice"/.test(idx), "tag half missing");
@@ -78,13 +86,6 @@ check("session-builder uses the shared rule, not its own copy", () => {
   ok(!/\(ex\.duration \|\| 0\) >= 600\) return false/.test(src),
      "still holds a private copy - two definitions is how they drift");
 });
-check("getSuitableExercises applies it, so workoutGenerator is covered too", () => {
-  ok(/pool = pool\.filter\(ex => !isSessionLength\(ex\)\)/.test(idx),
-     "workoutGenerator has NO exclusion of its own - it relies entirely on this");
-  ok(!/contentType/.test(gen),
-     "if workoutGenerator grows its own rule, that is a third definition");
-});
-
 console.log("\nTEST 2 - nothing long enough to be a session can be a component");
 check("no entry of 10+ minutes is component-eligible", () => {
   const bad = EXERCISES.filter(e =>
@@ -119,16 +120,28 @@ check("600s not 300s, because 5-minute components are legitimate", () => {
      "no 5-minute entries exist, so the 600 threshold may be arbitrary - re-check");
 });
 
-console.log("\nTEST 4 - both engines actually produce clean pools");
-check("getSuitableExercises returns no session-length content", async () => {
-  ok(/pool = pool\.filter\(ex => !isSessionLength/.test(idx), "filter missing");
-});
-check("the filter runs FIRST, before equipment and conditions", () => {
-  const f = idx.indexOf("!isSessionLength(ex)");
-  const e = idx.indexOf("filterByEquipment(pool");
-  ok(f !== -1 && e !== -1 && f < e,
-     "running it late means every count the caller sees is inflated by content it cannot use");
-});
+console.log("\nTEST 4 - the live builder's pools are clean, for every session type");
+{
+  const { store } = await import(__REPO + "/js/store.js");
+  store.init();
+  const SB = await import(__REPO + "/js/session-builder.js");
+  const { isSessionLength } = await import(__REPO + "/js/data/exercises/index.js");
+  const byId = new Map(EXERCISES.map(e => [e.id, e]));
+  let seen = 0; const leaks = [];
+  for (const { id } of SB.SESSION_TYPES) {
+    for (const mins of [20, 40, 60]) {
+      const pools = SB.buildCandidatePools({ sessionType: id, durationMins: mins }) || {};
+      for (const [section, list] of Object.entries(pools)) {
+        if (!Array.isArray(list)) continue;
+        for (const e of list) { seen++; if (isSessionLength(byId.get(e.id) || e)) leaks.push(`${id}/${section}: ${e.id}`); }
+      }
+    }
+  }
+  check("fixture reach: the pools hold real candidates", () =>
+    ok(seen > 500, `only ${seen} candidates seen - the builder may not have run`));
+  check("4a. no candidate in any pool is session-length content", () =>
+    ok(leaks.length === 0, leaks.slice(0, 5).join(", ")));
+}
 
 console.log("\nTEST 5 - contentType is still load-bearing, so it must not be retired");
 check("both live readers still exist", () => {

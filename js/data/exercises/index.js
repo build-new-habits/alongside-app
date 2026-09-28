@@ -3,9 +3,18 @@
  * Central exercise registry — imports all category files and exports a
  * single EXERCISES array plus the filter functions the app uses.
  *
- * workoutGenerator.js imports from './exercises.js' which maps to this file.
  * No changes needed elsewhere in the app when new category files are added —
  * just import the new array here and spread it into EXERCISES.
+ *
+ * 28 Sep 2026 v1.10
+ *   Work list 2e. getSuitableExercises() and the chain only it called
+ *   (filterByEnergy, filterToRecoveryPool, filterByFitnessLevel,
+ *   applyFeedbackWeighting) and getCautionExercises() are removed with
+ *   workoutGenerator.js, their only caller, and the ./exercises.js shim
+ *   that forwarded here. The live builder (session-builder.js) filters
+ *   with filterByEquipment, filterByConditions and isSessionLength, which
+ *   stay. A too-hard tap is read live by session-rationale.js
+ *   tooHardRecently(); a too-easy tap by tooEasyLast() (2e).
  *
  * 26 Aug 2026 v1.9
  *   SWAP-0. CARDIO_MACHINES, isCardioMachine() and getSwapCandidates().
@@ -128,9 +137,8 @@ import { SPORT_CONDITIONING } from './sport_conditioning.js';
 import { GYM }               from './gym.js';
 import { SEATED }            from './seated.js';
 
-import { getActiveConditionIds, getExerciseSafetyTier } from '../conditions.js';
+import { getExerciseSafetyTier } from '../conditions.js';
 import { resolveEquipment, exerciseIsAvailable } from '../equipment-map.js';
-import { store }                  from '../../store.js';
 
 export const EXERCISES = [
   ...MOBILITY,
@@ -219,109 +227,9 @@ export function filterByConditions(exercises, activeConditionIds) {
   return { safe, caution };
 }
 
-/**
- * Filter by energy level from daily check-in.
- * Five-tier scale:
- *   1–2  Rest day  — energyRequired ≤ 2 only
- *   3–4  Easy      — energyRequired ≤ 4
- *   5–6  Steady    — energyRequired ≤ 6
- *   7–8  Good      — energyRequired ≤ 8
- *   9–10 High      — all exercises available
- */
-export function filterByEnergy(exercises, userEnergy) {
-  return exercises.filter(exercise => exercise.energyRequired <= userEnergy);
-}
 
-/**
- * Filter to Recovery Mode pool — used when burnout is detected.
- * Returns only exercises with energyRequired ≤ 3.
- */
-export function filterToRecoveryPool(exercises) {
-  return exercises.filter(exercise => exercise.energyRequired <= 3);
-}
 
-/**
- * Apply structural energyRequired ceiling based on the user's fitness level.
- * This represents who the person IS at baseline — separate from how they feel today.
- *
- * The daily energy gate (filterByEnergy) applies on top of this.
- * The lower of the two ceilings always wins.
- *
- * @param {Object[]} exercises  — exercise pool
- * @param {string}   fitnessLevel — activityLevel from onboarding
- * @returns {Object[]} filtered pool
- */
-export function filterByFitnessLevel(exercises, fitnessLevel) {
-  const ceilings = {
-    "sedentary":   5,
-    "light":       7,
-    "moderate":    8,
-    "active":      10,
-    "very-active": 10,
-    // 11 Aug 2026 — "returning" is the fifth ACTIVITY_CHIP option
-    // ("Coming back after a break") written by onboarding Step 9. It had
-    // no key here, so it silently resolved to moderate via the ?? below.
-    // Set to 6: below moderate, above light. Someone returning after a
-    // break has capacity, but should not be met at their old level on
-    // day one.
-    "returning":   6
-  };
 
-  const ceiling = ceilings[fitnessLevel] ?? ceilings["moderate"];
-
-  // Full pool — no ceiling to apply
-  if (ceiling >= 10) return exercises;
-
-  return exercises.filter(ex => ex.energyRequired <= ceiling);
-}
-
-/**
- * Apply feedback-based weighting to exercise pool.
- * Reads exerciseFeedback from store and adjusts programmeScore on exercises
- * that have received consistent too-hard or too-easy feedback recently.
- *
- * Looks at the last 5 feedback entries per exercise:
- *   2+ "too-hard" entries → programmeScore 0.5 (deprioritised in pickMultiple)
- *   2+ "too-easy" entries → programmeScore 1.5 (upweighted)
- *   No consistent signal  → programmeScore unchanged (or 1 if unset)
- *
- * @param {Object[]} exercises — exercise pool (may already have programmeScore from phase bias)
- * @returns {Object[]} exercises with feedback-adjusted programmeScore
- */
-export function applyFeedbackWeighting(exercises) {
-  const allFeedback = store.get("exerciseFeedback") || [];
-  if (allFeedback.length === 0) return exercises;
-
-  // Build a map of exerciseId → last 5 feedback entries
-  const feedbackMap = {};
-  allFeedback.forEach(entry => {
-    if (!feedbackMap[entry.exerciseId]) feedbackMap[entry.exerciseId] = [];
-    feedbackMap[entry.exerciseId].push(entry);
-  });
-
-  // Keep only the 5 most recent entries per exercise
-  Object.keys(feedbackMap).forEach(id => {
-    feedbackMap[id] = feedbackMap[id].slice(-5);
-  });
-
-  return exercises.map(ex => {
-    const entries = feedbackMap[ex.id];
-    if (!entries || entries.length === 0) return ex;
-
-    const tooHardCount = entries.filter(e => e.feedback === "too-hard").length;
-    const tooEasyCount = entries.filter(e => e.feedback === "too-easy").length;
-
-    let feedbackScore = ex.programmeScore || 1;
-
-    if (tooHardCount >= 2) {
-      feedbackScore = Math.min(feedbackScore, 0.5);
-    } else if (tooEasyCount >= 2) {
-      feedbackScore = Math.max(feedbackScore, 1.5);
-    }
-
-    return { ...ex, programmeScore: feedbackScore };
-  });
-}
 
 /**
  * Get suitable exercises based on all user factors.
@@ -428,74 +336,4 @@ export function getSwapCandidates(exercise, userEquipment = [], pool = EXERCISES
   return (owned.length > 0 ? owned : matched).sort(byCloseness);
 }
 
-export function getSuitableExercises(userProfile, checkinData) {
-  let pool = [...EXERCISES];
 
-  // 0. DATA-1b. Whole sessions are not components. This runs FIRST so
-  //    every filter below works on a pool that could actually be
-  //    assembled into a session -- and so the count the caller sees is
-  //    honest.
-  //
-  //    CORRECTION, 17 Aug 2026. This said standalone content "is reached
-  //    through the Library, Mobility & Conditioning and the
-  //    single-activity views, which do not come through here."
-  //
-  //    Verified by mounting the Library and scanning every view: it is
-  //    NOT. All 28 standalone items are referenced by no view at all.
-  //
-  //    This comment is why the gap survived — the code said the route
-  //    existed, so nobody checked. Same shape as workoutGenerator's
-  //    changelog claiming a Gentle Care bypass that was not there. A
-  //    confident comment is not evidence. The route is specified in the
-  //    master schedule and not yet built.
-  pool = pool.filter(ex => !isSessionLength(ex));
-
-  // 1. Equipment filter
-  pool = filterByEquipment(pool, userProfile.equipment || []);
-
-  // 2. Condition safety filter — 3-tier
-  //    Resolve phase-aware condition IDs from base conditions + today's pain
-  const painScores = checkinData?.painScores || {};
-  const activeConditionIds = getActiveConditionIds(
-    userProfile.conditions || [],
-    painScores
-  );
-  const { safe, caution } = filterByConditions(pool, activeConditionIds);
-
-  // Combine safe and caution pools — caution exercises carry _cautionActive flag
-  // The workout generator can deprioritise or modify them as needed
-  pool = [...safe, ...caution];
-
-  // 3. Fitness level structural ceiling — who the person IS at baseline
-  //    Applied before the daily energy gate so both ceilings compound correctly
-  if (userProfile.fitnessLevel) {
-    pool = filterByFitnessLevel(pool, userProfile.fitnessLevel);
-  }
-
-  // 4. Energy filter — how they feel TODAY (lower ceiling wins)
-  if (checkinData?.energy) {
-    pool = filterByEnergy(pool, checkinData.energy);
-  }
-
-  // 5. Recovery Mode override — burnout detection
-  if (checkinData?.recoveryMode) {
-    pool = filterToRecoveryPool(pool);
-  }
-
-  // 6. Apply feedback-based weighting (too-hard / too-easy history)
-  //    Adjusts programmeScore so pickMultiple() deprioritises / upweights accordingly
-  pool = applyFeedbackWeighting(pool);
-
-  return pool;
-}
-
-/**
- * Get caution exercises only — used by workout view to display
- * modification notes alongside exercises that have _cautionActive: true.
- *
- * @param {Object[]} exercises — the final workout exercise list
- * @returns {Object[]} exercises with active caution flags
- */
-export function getCautionExercises(exercises) {
-  return exercises.filter(ex => ex._cautionActive === true);
-}

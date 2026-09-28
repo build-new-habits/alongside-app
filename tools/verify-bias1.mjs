@@ -1,5 +1,20 @@
 /**
  * tools/verify-bias1.mjs
+ * 28 Sep 2026 v3
+ *
+ * v3 - Work list 2e. This gate proved the bias against workoutGenerator.js,
+ *   which nothing had called since 6 Sep. Re-pointed:
+ *   - TEST 1 (resolveIntensity's steps) RETIRED with the function: its
+ *     only caller was the dead engine. The live rule is one reason at a
+ *     time in session-builder.js _gentleReason(), DRIVEN by
+ *     verify-gentle-signals (1.3 three days in a row -> gentler, 3.1 two
+ *     is not enough). A unit test of a helper nothing calls is rule 5's
+ *     exact fault.
+ *   - TEST 2 now asserts proposalBias is RETIRED (store v79): not a
+ *     default, dropped from stored data on load. It had no writer since
+ *     16 Aug and its one reader went with the engine.
+ *   - TEST 3 asserts the derived bias has a LIVE reader: the builder.
+ *
  * 21 Aug 2026 v2
  * GATE-PATH. Path resolution only -- no assertion changed.
  *
@@ -38,7 +53,6 @@ globalThis.localStorage = {
 };
 const { store } = await import(__REPO + "/js/store.js");
 store.init();
-const { resolveIntensity } = await import(__REPO + "/js/data/checkin.js");
 
 // GATE-PATH, 08 Sep 2026. Paths resolved from import.meta.url, not the
 // working directory.
@@ -59,41 +73,23 @@ const check = (n, fn) => { try { fn(); console.log("  PASS  " + n); }
 const eq = (a, b, m) => { if (a !== b) throw new Error(`${m}\n        got: ${a}  want: ${b}`); };
 const ok = (c, m) => { if (!c) throw new Error(m); };
 
-console.log("\nTEST 1 - the bias actually changes the outcome");
-check("no bias leaves intensity alone", () => {
-  for (const i of ["low", "moderate", "high"]) eq(resolveIntensity(i, null), i, i);
-});
-check("'lighter' steps DOWN one notch, never to the floor", () => {
-  eq(resolveIntensity("high", "lighter"), "moderate",
-     "a good day in a burnout pattern must not be overridden entirely - P7, authority never scales");
-  eq(resolveIntensity("moderate", "lighter"), "low", "moderate");
-  eq(resolveIntensity("low", "lighter"), "low", "already at the floor");
-});
-check("'rest' goes to the gentlest available", () => {
-  for (const i of ["low", "moderate", "high"]) eq(resolveIntensity(i, "rest"), "low", i);
-});
-check("garbage in resolves safely", () => {
-  eq(resolveIntensity(undefined, undefined), "moderate", "no input");
-  eq(resolveIntensity("chaos", "chaos"), "moderate", "unknown values");
-  eq(resolveIntensity("high", "chaos"), "high", "unknown bias must not silently lighten");
-});
-
-console.log("\nTEST 2 - the store field is declared and validated");
-check("proposalBias is in store.js defaults", () =>
-  ok(/proposalBias:\s+null/.test(fs.readFileSync(_gatePath("js/store.js"), "utf8")),
-     "undeclared fields are invisible to anyone reading the field list - that is how this went nine days"));
-check("only valid values survive a reload", () => {
-  store.set("proposalBias", "chaos");
+console.log("\nTEST 2 - the stored field is retired, and stays gone");
+check("proposalBias is not in store.js defaults", () =>
+  ok(!("proposalBias" in store.getDefaults()),
+     "a declared field nothing reads is how this went nine days the first time"));
+check("a stored value from an old install is dropped on load", () => {
+  mem["alongside_user"] = JSON.stringify({ ...JSON.parse(mem["alongside_user"] || "{}"), proposalBias: "lighter" });
   store.init();
-  eq(store.get("proposalBias"), null, "an invalid bias must not persist");
-  store.set("proposalBias", "lighter");
-  store.init();
-  eq(store.get("proposalBias"), "lighter", "a valid bias must survive");
+  eq(store.get("proposalBias"), undefined, "a retired field must not ride along in every install for ever");
 });
 
 console.log("\nTEST 3 - reader and writer both exist (PT-12 pattern)");
-const gen = fs.readFileSync(_gatePath("js/data/workoutGenerator.js"), "utf8");
 const chk = fs.readFileSync(_gatePath("js/data/checkin.js"), "utf8");
+const sb  = fs.readFileSync(_gatePath("js/session-builder.js"), "utf8");
+// 2e: every app module, so "nothing stores it" means nothing, not two files.
+const _walk = d => fs.readdirSync(_gatePath(d), { withFileTypes: true }).flatMap(e =>
+  e.isDirectory() ? _walk(d + e.name + "/") : (e.name.endsWith(".js") ? [fs.readFileSync(_gatePath(d + e.name), "utf8")] : []));
+const all = _walk("js/").join("\n");
 
 // BIAS-2, 16 Aug 2026. This test used to assert that coach-reflection.js
 // CONTAINED a store.set("proposalBias") -- reading the file's source
@@ -107,14 +103,22 @@ const chk = fs.readFileSync(_gatePath("js/data/checkin.js"), "utf8");
 check("the bias is derived, not stored", () =>
   ok(/export function coachBias\(/.test(chk), "coachBias() gone"));
 check("nothing stores it any more", () =>
-  ok(!/store\.set\(['\"]proposalBias/.test(chk + gen),
+  ok(!/store\.set\(['\"]proposalBias/.test(all),
      "a stored bias is a bias that can silently stop being written"));
-check("workoutGenerator uses the derived value", () =>
-  ok(/checkinData\.coachBias\(\)/.test(gen),
-     "and not store.get(\"proposalBias\"), which returned null for twelve days"));
-check("it is combined, not substituted", () =>
-  ok(/resolveIntensity\(/.test(gen),
-     "must combine with todayIntensity, not replace it - they encode different things"));
+// 2e. Were "workoutGenerator uses the derived value" and "it is
+// combined, not substituted" -- both true of a file nothing ran. The
+// live reader is the builder, and it is combined there too: coachBias()
+// is ONE reason among five, and today's own words outrank it.
+check("the live builder reads the derived value", () =>
+  ok(/import\s*\{[^}]*\bcoachBias\b[^}]*\}\s*from\s*"\.\/data\/checkin\.js"/.test(sb) &&
+     /coachBias\(\) === "lighter"/.test(sb),
+     "session-builder.js must import coachBias and act on 'lighter'"));
+check("it is one reason, below today's own energy", () => {
+  const body = sb.slice(sb.indexOf("function _gentleReason()"));
+  ok(body.indexOf('_todayIntensity() === "low"') > -1 &&
+     body.indexOf('_todayIntensity() === "low"') < body.indexOf("coachBias()"),
+     "today's words must outrank a run of days - verify-gentle-signals 2.x drives the order");
+});
 
 console.log(fails === 0 ? "\nALL PASS\n" : `\n${fails} FAILURE(S)\n`);
 process.exit(fails === 0 ? 0 : 1);

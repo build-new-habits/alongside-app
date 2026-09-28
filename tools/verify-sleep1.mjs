@@ -1,5 +1,15 @@
 /**
  * tools/verify-sleep1.mjs
+ * 28 Sep 2026 v4
+ *
+ * v4 - Work list 2e. Checks 1-2 read workoutGenerator.js, which nothing
+ *   had called since 6 Sep. SLEEP-1's rule -- the coach may mention sleep
+ *   only if the session reads it -- now holds across EVERY app module,
+ *   and specifically for the live builder, which does both since
+ *   GENTLE-SIGNALS (2b): it reads sleepQuality and says "You said you
+ *   slept badly". verify-gentle-signals 1.1-1.2 drive that. Checks 3-10
+ *   unchanged.
+ *
  * 28 Sep 2026 v3
  * SMOOTH-P4c. COACH-TILE's door was a fourth landing row; Settings is now
  *   one page, and the three dials are rows of their own under "You" and
@@ -49,7 +59,11 @@ const check = (n, ok, d = '') => {
 };
 
 const root = new URL('../', import.meta.url).pathname;
-const gen  = fs.readFileSync(path.join(root, 'js/data/workoutGenerator.js'), 'utf8');
+// 2e: every app module, not the retired engine.
+const _walk = d => fs.readdirSync(path.join(root, d), { withFileTypes: true }).flatMap(e =>
+  e.isDirectory() ? _walk(path.join(d, e.name)) : (e.name.endsWith('.js') ? [path.join(d, e.name)] : []));
+const APP = _walk('js').map(f => [f, fs.readFileSync(path.join(root, f), 'utf8')]);
+const sbSrc = fs.readFileSync(path.join(root, 'js/session-builder.js'), 'utf8');
 
 const strip = s => s
   .replace(/\/\*[\s\S]*?\*\//g, '')
@@ -57,20 +71,21 @@ const strip = s => s
 
 // ── SLEEP-1 ──────────────────────────────────────────────────────────
 
-const genBody = strip(gen);
+const allBody = APP.map(([, t]) => strip(t)).join('\n');
 
-check('1  SLEEP-1: the engine claims no adaptation it does not perform',
-  !/adjusted for your poor sleep/i.test(genBody),
-  'sleepQuality reaches no intensity, filter or duration logic anywhere');
+check('1  SLEEP-1: nothing in the app claims an adaptation it does not perform',
+  !/adjusted for your poor sleep/i.test(allBody) && APP.length > 100,
+  `${APP.length} modules scanned`);
 
-// The inverse, and the more durable half: if a reader is ever added
-// back, the claim may return with it. This asserts the RELATIONSHIP,
-// so the gate stays honest either way rather than banning a sentence.
-const readsSleep = /sleepQuality/.test(genBody);
-const claimsSleep = /\bsleep\b/i.test(
-  (genBody.match(/parts\.push\([^)]*\)/g) || []).join(' '));
-check('2  SLEEP-1 (the rule): the engine may mention sleep only if it reads it',
-  !claimsSleep || readsSleep,
+// The rule, on the path that runs: the builder may mention sleep only
+// because it reads it. Asserted as a RELATIONSHIP, so the gate stays
+// honest either way rather than banning a sentence.
+const sbBody = strip(sbSrc);
+const lines = sbBody.slice(sbBody.indexOf('const GENTLE_LINES'), sbBody.indexOf('};', sbBody.indexOf('const GENTLE_LINES')));
+const readsSleep = /sleepQuality === "poor"/.test(sbBody);
+const claimsSleep = /slept/i.test(lines);
+check('2  SLEEP-1 (the rule): the live builder mentions sleep only because it reads it',
+  lines.length > 100 && (!claimsSleep || readsSleep),
   `reads sleepQuality: ${readsSleep}, mentions sleep in coach copy: ${claimsSleep}`);
 
 // The question is still ASKED and still STORED. Removing the claim must

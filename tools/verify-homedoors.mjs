@@ -1,6 +1,13 @@
 /**
  * tools/verify-homedoors.mjs
- * 28 Sep 2026 v2
+ * 28 Sep 2026 v3
+ *
+ * v3 - Work list 2e. 2d ("the coach-proposal engine still has no stretch
+ *   type, so the door matters") read workoutGenerator.js. RETIRED, with
+ *   the reason it asked for: that engine is deleted, the coach route
+ *   builds through session-builder.js (verify-twoengine), and 2a drives
+ *   the stretch route end to end. Nothing else changed.
+ *
  *
  * v2 - SMOOTH-P3a/b. Plan's Home is three doors (spec 4.1), and the
  *   session kinds live one door in, on "I know what I want" (4.6). The
@@ -174,11 +181,8 @@ ok("2c. and that engine really does have a stretch type",
    SESSION_TYPES.some(t => t.id === "stretch"),
    `session-builder types: ${SESSION_TYPES.map(t => t.id).join(", ")}`);
 
-const wg = fs.readFileSync(_gatePath("js/data/workoutGenerator.js"), "utf8");
-ok("2d. and the coach-proposal engine still does not, so the door matters",
-   !/getWorkoutName[\s\S]{0,200}stretch/.test(wg),
-   "workoutGenerator now has a stretch type. If that is deliberate this " +
-   "assertion should be retired with the reason recorded, not deleted.");
+// 2d RETIRED 28 Sep (work list 2e): it asserted the retired engine still
+// had no stretch type. That engine is deleted; 2a proves the route.
 
 // ── 3. NOTHING WAS TRADED AWAY TO GET THEM BACK ─────────────────────────
 console.log("\nTEST 3 - the invitation survived, and nothing doubled");
