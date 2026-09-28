@@ -1,7 +1,15 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 28 Sep 2026 v548
+ * 28 Sep 2026 v549
+ *
+ * v549 - RED-FLAG. NEW FILES precached: js/data/red-flag.js,
+ *   js/views/red-flag.js, css/components/red-flag.css. Changed: store.js,
+ *   router.js, css/main.css.
+ *
+ *   The "before you start" safety screen and its stop, before any
+ *   exercise, for anyone who reports pain. New gate:
+ *   tools/verify-redflag.mjs. 180 gates.
  *
  * v548 - SMOOTH-P2e. views/coach-proposal.js, views/workout.js,
  *   css/components/coach-proposal.css, workout.css.
@@ -3938,7 +3946,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v548";
+const CACHE_NAME = "alongside-v549";
 
 const SHELL_URLS = [
 
@@ -3967,6 +3975,7 @@ const SHELL_URLS = [
   "/alongside-app/css/components/gym-programme.css",
   "/alongside-app/css/components/journal-entry.css",
   "/alongside-app/css/components/reflect.css",
+  "/alongside-app/css/components/red-flag.css",
   "/alongside-app/css/components/nav-fix.css",
   "/alongside-app/css/components/onboarding-thread.css",
   "/alongside-app/css/components/sheet-manager.css",
@@ -4086,6 +4095,8 @@ const SHELL_URLS = [
   "/alongside-app/js/views/privacy.js",
   "/alongside-app/js/views/library.js",
   "/alongside-app/js/views/practices.js",
+  "/alongside-app/js/views/red-flag.js",
+  "/alongside-app/js/data/red-flag.js",
   "/alongside-app/js/views/my-programme.js",
   "/alongside-app/js/session-builder.js",
   "/alongside-app/js/data/session-choice.js",
