@@ -1,7 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 28 Sep 2026 v563
+ * 28 Sep 2026 v564
+ *
+ * v564 - MOUNT-FAULT. No new files. Changed: views/community-impact.js,
+ *   views/annual-reflection.js (both crashed on open). 196 gates.
  *
  * v563 - F5 + F6. No new files. Changed: session-builder, display-prefs,
  *   index.html, settings, checkin, thread-runner, onboarding/thread,
@@ -4009,7 +4012,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v563";
+const CACHE_NAME = "alongside-v564";
 
 const SHELL_URLS = [
 
