@@ -1,7 +1,15 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 28 Sep 2026 v544
+ * 28 Sep 2026 v545
+ *
+ * v545 - SMOOTH-P2c. views/workout.js, exercise-card.js, session-log.js,
+ *   session-builder.js, css/components/workout.css, session-log.css,
+ *   session-guard.css.
+ *
+ *   The coach's player is one screen per exercise: the dose first, last
+ *   weight pre-filled, one tap a set, and a three-choice exit sheet.
+ *   New gate: tools/verify-player-flow.mjs. 177 gates.
  *
  * v544 - SMOOTH-P2b (builder). session-builder.js, views/coach-proposal.js.
  *
@@ -3912,7 +3920,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v544";
+const CACHE_NAME = "alongside-v545";
 
 const SHELL_URLS = [
 
