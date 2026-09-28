@@ -1,12 +1,12 @@
 /**
  * tools/verify-mount-all.mjs
- * 28 Sep 2026 v2
+ * 28 Sep 2026 v3
  *
  * v2 - F7 LANDMARK. 30 views put role="main" on their wrapper, inside
  *   index.html's <main>: two main landmarks on every screen, the second
  *   nested. Every mounted route is now also required to add no main
  *   landmark of its own. And Your year says "Sessions with the coach",
- *   not "workout (5)".
+ *   not "workout (5)". v3 (F8): every screen opens at the top (5).
  *
  * 28 Sep 2026 v1
  *
@@ -108,6 +108,11 @@ ok("4. Your year names what you did in words, not type ids",
      const t = (main.querySelector(".ar-kinds")?.textContent || "").replace(/\s+/g, " ");
      return /Sessions with the coach \(5\)/.test(t) && !/\bworkout \(/.test(t);
    })());
+const rsrc = fs.readFileSync(new URL("js/router.js", R), "utf8").replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+ok("5. every screen opens at the top: the reset is instant and focus does not scroll",
+   (rsrc.match(/scrollTo\(\{ top: 0, left: 0, behavior: 'instant' \}\)/g) || []).length === 2 &&
+   !/scrollTo\(0, 0\)/.test(rsrc) && /container\.focus\(\{ preventScroll: true \}\)/.test(rsrc),
+   "reset.css makes scrolling smooth; a smooth reset followed by focus stops part-way down");
 ok("2. REVERSAL-style fixture reach: the two that crashed now show their own headings",
    await (async () => {
      fixture(); main.innerHTML = ""; await router._mountView("community-impact");

@@ -1,6 +1,13 @@
 /**
  * router.js
- * 28 Sep 2026 v33
+ * 28 Sep 2026 v34
+ *
+ * v34 - F8 (found starting a class from a scrolled list). A new screen
+ *   could open part-way down. reset.css sets scroll-behavior: smooth, so
+ *   scrollTo(0,0) ANIMATED, and focusing <main> straight after cancelled
+ *   the animation where it stood: the class player opened 124px down,
+ *   the safety screen's heading off the top. The reset is now instant,
+ *   and focus no longer scrolls.
  *
  * v33 - SMOOTH-P3c. 'capture' (Make it up as I go) is a session now: the
  *   nav hides while it runs, like the player, and it maps to Home.
@@ -603,13 +610,13 @@ export const router = {
       if (typeof mod[fn] === 'function') {
         const view = mod[fn](this);
         container.innerHTML = '';
-        window.scrollTo(0, 0);
+        window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
         view.mount(container);
 
       // ── Old pattern ───────────────────────────────────────────────────────
       } else if (typeof mod.render === 'function') {
         container.innerHTML = mod.render();
-        window.scrollTo(0, 0);
+        window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
         if (typeof mod.onMount === 'function') {
           mod.onMount();
         }
@@ -666,7 +673,7 @@ export const router = {
       }, 800);
 
       container.setAttribute('tabindex', '-1');
-      container.focus({ preventScroll: false });
+      container.focus({ preventScroll: true });
       setTimeout(() => container.removeAttribute('tabindex'), 100);
 
     } catch (err) {

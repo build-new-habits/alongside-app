@@ -1,6 +1,12 @@
 /**
  * data/classes/index.js
  *
+ * 28 Sep 2026 v3
+ *
+ * v3 - F8, CLASS-8. Classes 008-010 added: Putting the Day Down
+ *   (winding-down), Getting Going (getting-going), From the Feet
+ *   (ankle-range).
+ *
  * 08 Sep 2026 v2
  *
  * v2 - TIMETABLE-1. blockedBy is de-duplicated. Steady Round uses a
@@ -60,6 +66,9 @@ import { CLASS_BENDING_004 }        from './class-bending-004.js';
 import { CLASS_STANDING_UP_005 }    from './class-standing-up-005.js';
 import { CLASS_OUT_006 }            from './class-out-006.js';
 import { CLASS_UNSTICKING_007 }     from './class-unsticking-007.js';
+import { CLASS_PUTTING_DOWN_008 }   from './class-putting-down-008.js';
+import { CLASS_GETTING_GOING_009 }  from './class-getting-going-009.js';
+import { CLASS_FROM_THE_FEET_010 }  from './class-from-the-feet-010.js';
 
 export const CLASSES = Object.freeze([
   CLASS_GROUND_001,
@@ -68,7 +77,10 @@ export const CLASSES = Object.freeze([
   CLASS_BENDING_004,
   CLASS_STANDING_UP_005,
   CLASS_OUT_006,
-  CLASS_UNSTICKING_007
+  CLASS_UNSTICKING_007,
+  CLASS_PUTTING_DOWN_008,
+  CLASS_GETTING_GOING_009,
+  CLASS_FROM_THE_FEET_010
 ]);
 
 const byId = new Map(EXERCISES.map(e => [e.id, e]));

@@ -1,5 +1,11 @@
 /**
  * tools/verify-class-contract.mjs
+ * 28 Sep 2026 v2
+ *
+ * v2 - F8. Protected lines for classes 008-010. Test 8: from 008 the
+ *   review document is RENDERED from the data (tools/render-class-doc.mjs),
+ *   and must match a fresh rendering, so script and document cannot drift.
+ *
  * 08 Sep 2026 v1
  *
  * CLASS-1. The guided class data contract, and the three classes it was
@@ -428,7 +434,20 @@ const LINES = [
    "anybody who then did not do it on Thursday"],
   ["class-bending-004",         "not a today question",
    "the alternative — 'this will strengthen your back' — is a claim the class " +
-   "cannot verify and this person has been promised it before by somebody wrong"]
+   "cannot verify and this person has been promised it before by somebody wrong"],
+  ["class-putting-down-008",   "This isn't a sleep class",
+   "the same refusal, where people most want it broken: a class that " +
+   "promises sleep is broken by the first bad night, and the person blames " +
+   "themselves for doing it wrong"],
+  ["class-getting-going-009",  "Both count the same",
+   "no energy promise. Some days movement wakes you up and some days it " +
+   "does not; the class counts the starting, which already happened"],
+  ["class-from-the-feet-010",  "a question for weeks from now, not today",
+   "the same refusal, and the one before it: a difference between sides is " +
+   "information, not a problem to fix today"],
+  ["class-from-the-feet-010",  "it's information, not a problem",
+   "said before it happens, so one ankle moving less arrives as expected " +
+   "rather than as a worry"]
 ];
 
 // 🔴 THREE OF THE FOUR CLASSES NOW CARRY THE SAME REFUSAL, in different
@@ -574,6 +593,23 @@ ok("7c. sitOut is not used as a safety route",
    !/sitOut/.test(src.split("classSafety")[1] || ""),
    "sitOut means the person MAY skip. Using it as the app's answer to an " +
    "unsafe movement turns a considered exclusion into a shrug");
+
+// ── 8. THE REVIEW DOCUMENT IS THE DATA, RENDERED ────────────────────────
+console.log("\nTEST 8 - from 008, the review document matches the data exactly");
+{
+  const R = await import(new URL("./render-class-doc.mjs", import.meta.url).href);
+  const h = await R.helpers();
+  const fsx = __cr(import.meta.url)("node:fs");
+  const ids = Object.keys(R.RENDERED);
+  ok("8pc. positive control: rendered classes exist in the set", ids.every(id => all.some(c => c.id === id)) && ids.length >= 3);
+  for (const id of ids) {
+    const cls = all.find(c => c.id === id);
+    const p = R.docPathFor(id);
+    const onDisk = fsx.existsSync(p) ? fsx.readFileSync(p, "utf8") : "";
+    ok(`8. ${id}: document matches the data`, !!cls && onDisk === R.renderClassDoc(cls, h),
+       "the script changed and the review document did not: run node tools/render-class-doc.mjs");
+  }
+}
 
 console.log(fails === 0
   ? "\nCLASS-1: all assertions pass\n"

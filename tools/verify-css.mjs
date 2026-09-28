@@ -1,5 +1,11 @@
 /**
  * tools/verify-css.mjs
+ * 28 Sep 2026 v4
+ *
+ * v4 - F8. Reads every file under js/, not only js/views: the safety
+ *   screen's Start button and the whole update banner were unstyled out
+ *   of its sight. Five more hooks, each with its reason.
+ *
  * 28 Sep 2026 v3
  *
  * v3 - F7, CSS-ZERO. Budget 0. css/components/finish.css styles every
@@ -55,7 +61,10 @@ const strip = s => s.replace(/\/\*[\s\S]*?\*\//g, "");
 
 // Classes rendered by views
 const used = new Map();
-for (const f of [...walk("js/views", ".js"), "js/exercise-feedback.js", "js/session-log.js"]) {
+// v4: EVERY JS file. It read js/views plus two files, and the safety
+// screen every new user sees (js/safety-gate.js) and the update banner
+// (js/app.js) rendered unstyled outside its sight.
+for (const f of walk("js", ".js")) {
   const src = strip(fs.readFileSync(_gatePath(f), "utf8"));
   for (const m of src.matchAll(/class="([^"${}]+)"/g))
     for (const c of m[1].split(/\s+/))
@@ -87,6 +96,10 @@ const HOOKS = { "in-step-view": SCOPE,
   "home-arc--offer": WRAP, "today-arc--active": WRAP, "today-arc--offer": WRAP,
   "noticing-section": WRAP, "onboarding-continue": WRAP, "reflect-mood-slider-block": WRAP,
   "prescribed-add-section": WRAP,
+  "btn-quiet": "styled by .gate-leave beside it (session-shared.css)",
+  "gate-block": WRAP, "exercise-card--paged": WRAP, "locked-badge-label": WRAP,
+  "tts-icon": "an emoji glyph inside a styled button", "update-banner-icon": "an emoji glyph; the row is styled", "tts-icon--playing": WRAP,
+  "xcard-stepper-item--done": WRAP, "xcard-stepper-item--now": WRAP, "xcard-stepper-item--ahead": WRAP,
   "ar-figures": HOOK, "ar-sofar": HOOK, "ci-breakdown": HOOK, "ci-pillars": WRAP,
 };
 
@@ -113,6 +126,20 @@ if (missing.length > BUDGET) {
 } else {
   console.log("  PASS  no new undefined classes");
 }
+
+// A button variant without the .btn base renders as a flat strip: no
+// padding, no radius, no 44px. Found on the safety screen (v4).
+const bare = [];
+for (const f of walk("js", ".js")) {
+  const src = strip(fs.readFileSync(_gatePath(f), "utf8"));
+  for (const m of src.matchAll(/class="([^"]*)"/g)) {
+    const cs = m[1].split(/\s+/);
+    if (cs.some(c => /^btn-(primary|secondary|ghost|small|large|full|xs|sm)$/.test(c)) && !cs.includes("btn"))
+      bare.push(`${path.basename(f)}: ${m[1].slice(0, 60)}`);
+  }
+}
+if (bare.length) { fails++; console.log(`\n  FAIL  button variant without the .btn base: ${bare.join("; ")}`); }
+else console.log("  PASS  every button variant sits on the .btn base");
 
 // The hook list cannot rot: every name must still be rendered, and still
 // have no rule (a hook that gained a rule is a style, not a hook).

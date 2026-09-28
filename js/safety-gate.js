@@ -1,6 +1,10 @@
 /**
  * js/safety-gate.js
- * 28 Sep 2026 v3
+ * 28 Sep 2026 v4
+ *
+ * v4 - F8 (found screenshotting a class). Start the session rendered as
+ *   a flat strip: it carried .btn-primary without the .btn base. verify-css
+ *   read js/views only, and this file is not a view.
  *
  * v3 - GATE-ONCE (Smooth Path P0, F1). An acknowledgement covers the rest
  *   of the session it was given in.
@@ -273,7 +277,7 @@ export function renderSafetyGate() {
 
       <p class="gate-error" data-gate-error role="status" aria-live="assertive"></p>
 
-      <button type="button" class="btn-primary gate-start" data-gate-start>
+      <button type="button" class="btn btn-primary gate-start" data-gate-start>
         Start the session
       </button>
       <button type="button" class="btn-quiet gate-leave" data-gate-leave>

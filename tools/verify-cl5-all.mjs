@@ -1,5 +1,9 @@
 /**
  * tools/verify-cl5-all.mjs
+ * 28 Sep 2026 v2
+ *
+ * v2 - F8. Test 3: every line of every guided class, same rules.
+ *
  * 28 Sep 2026 v1
  *
  * Work list 10, CL-5-ALL. Every exercise description follows the
@@ -93,6 +97,21 @@ for (const r of RULES) {
 }
 const stale = Object.keys(EXEMPT).filter(w => !strings.some(s => s.where === w && RULES.some(r => r.test(s.t))));
 ok("2x. every exemption still points at a sentence that needs it", stale.length === 0, stale.join(", "));
+
+// ── 3. THE CLASSES ──────────────────────────────────────────────────────
+// v2, F8. A class says the same things out loud that a card says in
+// print, so the same principle applies to every screen, voice and
+// lighter line in every class. Written when classes 008-010 were added.
+console.log("\nTEST 3 - no class line breaks CL-5");
+const { CLASSES } = await import(B + "data/classes/index.js");
+const lines = CLASSES.flatMap(c => c.sections.flatMap(s => s.beats.flatMap((b, i) =>
+  ["screen", "voice", "lighterVoice", "stopCue"].filter(f => typeof b[f] === "string")
+    .map(f => ({ where: `${c.id}/${s.id}[${i}].${f}`, t: b[f] })))));
+ok("3pc. every class, every line", CLASSES.length >= 10 && lines.length > 150, `${CLASSES.length} classes, ${lines.length} lines`);
+for (const r of RULES) {
+  const hits = lines.filter(s => r.test(s.t));
+  ok(`3.${r.id}: none`, hits.length === 0, hits.map(s => `${s.where}: ${s.t.slice(0, 90)}`).join("\n        "));
+}
 
 console.log("");
 if (fails) { console.log(`CL5-ALL: ${fails} FAILED, ${passes} passed`); process.exit(1); }

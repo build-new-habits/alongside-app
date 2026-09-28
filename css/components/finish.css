@@ -1,5 +1,9 @@
 /* css/components/finish.css
- * 28 Sep 2026 v1
+ * 28 Sep 2026 v2
+ *
+ * v2 - F8. The update banner ("A new version of Alongside is ready")
+ *   had no rules at all: verify-css now reads every JS file, not only
+ *   views, and found it.
  *
  * F7, CSS-ZERO. Every class a view renders has a rule, or is named in
  * verify-css as a hook with its reason. These are the ones that were
@@ -323,3 +327,21 @@
 .coach-voice { color: var(--color-primary); }
 
 .progress-programme__milestones { margin-top: var(--space-4); }
+
+/* ── The update banner (app.js) ──────────────────────────────────────── */
+.update-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin: var(--space-3) var(--content-padding, var(--space-4));
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-lg);
+}
+.update-banner-content { display: flex; align-items: center; gap: var(--space-2); min-width: 0; }
+.update-banner-text { margin: 0; color: var(--color-text); }
+.update-banner-actions { display: flex; gap: var(--space-2); }
+.update-banner-actions .btn { min-height: 44px; }
