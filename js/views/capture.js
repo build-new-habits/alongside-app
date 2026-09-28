@@ -1,104 +1,93 @@
 /**
  * js/views/capture.js
- * 16 Sep 2026 v1
+ * 28 Sep 2026 v2
  *
- * CAPTURE-1. Build as you go, or log what you just did.
+ * v2 - SMOOTH-P3c. "Make it up as I go". Spec 4.7.
  *
- * Graeme, on what the app could not do: "I'm in the gym, I did a thing,
- * record it" -- and "I'm in the gym (or at home) I want to do..... I'll
- * guide you. But the selection needs to be quick and easy so a user can
- * go - machine, lat pull downs, select, trigger cards."
+ *   The third door on Plan Home. Somebody in a gym who knows what they
+ *   want to do next and wants the app to keep up, not lead:
  *
- * ── ONE FEATURE, TWO DOORS, NOT TWO FEATURES ─────────────────────────
+ *     Exit · running clock · Finish
+ *     the moves done so far, with their sets ("40 kg × 10 · 40 × 10")
+ *     the current move: Set n · last time, weight and reps pre-filled,
+ *       − / + on each, Log set n, the sets logged so far
+ *     Next move: three suggestions and a search box
  *
- * The same running session either way. The only difference is whether
- * you pick the movement before you do it or after.
+ *   ONE FILE, EXTENDED, NOT A SECOND ONE. CAPTURE-1 already was "build as
+ *   you go"; the spec's freestyle.js would have been a second screen for
+ *   the same sentence. What changed is the shape: v1 kept a list of
+ *   names and walked each one through the player; v2 logs every SET on
+ *   the move card itself, so the person never leaves the screen. v1's
+ *   two targets per result ("walk the card" / "just log it") become one:
+ *   the card is here, with "How to do it" folded under the move.
  *
- * Graeme's own framing decided the shape: "I'm at the machine, do I know
- * it or do I not, do I need coaching or do I not." Asking that as a
- * question would put a decision in front of somebody already standing at
- * the machine. So the PICKER RESULT CARRIES BOTH ANSWERS:
+ *   LOG SET writes the lift log through store.logLift() -- the same
+ *   helper the player's log block uses -- one entry per set. Nothing
+ *   computes, compares or narrates the numbers (P4).
  *
- *   tap the name      -> walk the card (the PT on the gym floor)
- *   tap "just log it" -> straight into the list (you know this one)
+ *   FINISH writes ONE activity entry, type "freestyle", through
+ *   store.logActivity(): completedAt, duration, exerciseIds, moves and
+ *   sets. So Progress, the arc and COUNT-1 see it as a completed session
+ *   like any other, and the finish screen shows "3 moves · 9 sets".
+ *   A freestyle entry never INHERITS a session type from whatever the
+ *   builder last made (store.js v77): only what the person said.
  *
- * Chosen per exercise, in the moment. No mode, no setting.
+ *   EXIT without Finish: Keep going · Save what I did · Leave without
+ *   saving. Saving writes the same entry and goes Home.
  *
- * ── THE SELECTION IS THE FEATURE ─────────────────────────────────────
+ *   KIT. The search and the suggestions only offer what the kit at this
+ *   location allows -- the builder's own answer (equipmentForLocation,
+ *   resolveEquipment, exerciseIsAvailable), not a second one. Where is
+ *   on screen with a Change, because it decides what is offered.
  *
- * Standing at a machine, anything that makes you scroll a library has
- * already failed. So, in order down the screen:
+ *   SORE. A move that loads an area the person said is sore today is
+ *   SHOWN, with a note, not hidden -- they are choosing (10 Sep
+ *   adaptation decision): "You mentioned your knee today — this one
+ *   loads it." The same rule the plan's swap uses (soreLevelFor).
  *
- *   1. one text field, focused on open. "lat" finds Lat Pulldown in
- *      three characters. Typing beats tapping through a hierarchy, and
- *      it is one control rather than a tree to learn.
- *   2. recents. In a gym you repeat yourself; this is a one-tap hit most
- *      of the time.
- *   3. body areas, for when you do not know the name of the thing in
- *      front of you. The fallback, not the primary.
+ *   SUGGESTIONS. What the person usually does after the current move,
+ *   read from their own lift log's order (no new field). With no such
+ *   history: three from the builder's main pool for this location,
+ *   labelled as ideas rather than as habits. Never mixed under one
+ *   heading, because "what you usually do" must be true of every line.
  *
- * ⚫ THE SEARCH IS NOT NEW. searchByTerm() already matches names AND
- * muscles -- built for mid-session swap. A second search would drift
- * from it, and SAVE-ALL is one day old for exactly that reason.
+ *   SAFETY. The acknowledgement gate stands before the first move, as
+ *   in v1, because a session with no list has nothing else in front of
+ *   it. The red-flag guard now covers this route (red-flag.js). The
+ *   "If it hurts" block is open on the first move card and closed on
+ *   the rest, as on the player.
  *
- * ── EVERYTHING COUNTS ────────────────────────────────────────────────
- *
- * Graeme: "Absolutely everything should go towards progress 100%... I've
- * turned up. That's number one. I've done a session. That's number two."
- * And on a captured session counting as much as a proposed one: "I'd say
- * full too."
- *
- * So this writes lastFinishedSession and calls logActivity() exactly as
- * every other session does. ARC-EVERYTHING credits the arc from there,
- * and knows nothing about which door the session came from -- which IS
- * the rule: contribution is computed from what was done, never from how
- * the session was created.
- *
- * ⚫ THE SAFETY GATE IS LOAD-BEARING HERE in a way it is not elsewhere.
- * Every other session has a known list, so the gate fires before
- * exercise 1 of something planned. A capture session has no list at all
- * until somebody makes one, so the gate is the only thing standing
- * before the first movement. Mounted at the top of the picker, before
- * anything can be added.
+ * 16 Sep 2026 v1 - CAPTURE-1 / CAPTURE-2. Build as you go, or log what
+ *   you just did. Search over names and muscles, recents, body areas;
+ *   the optional "What was this, roughly?" question, which is kept.
  */
 
 import { store } from "../store.js";
 import { EXERCISES } from "../data/exercises/index.js";
+import { CONDITIONS } from "../data/conditions.js";
 import { searchByTerm } from "../data/muscle-search.js";
+import { resolveEquipment, exerciseIsAvailable } from "../data/equipment-map.js";
+import { equipmentForLocation, buildCandidatePools, soreScoresToday, soreLevelFor, SORE_BLOCK_FLOOR }
+  from "../session-builder.js";
+import { performanceFields } from "../session-log.js";
+import { hurtBlock } from "../exercise-card.js";
 import { isGateDue, renderSafetyGate, attachSafetyGate } from "../safety-gate.js";
-import { TARGET_AREAS } from "../stretch-target.js";
+import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
 
 export const centered = false;
 
-/** What has been captured this session. Cleared when the view is left. */
-let captured = [];
-let query    = "";
-/**
- * CAPTURE-2, 16 Sep 2026. What kind of session this was, if they say.
- *
- * 🔴 CAPTURE-1 credited the BODY channel from the movements' areas and
- * deliberately did not invent a sessionType -- a captured set of
- * movements is not one of the builder's eight types. That was right, and
- * it left a hole: capability strands light from sessionTypes, and 18 of
- * the 30 strands in the library are capability strands. A captured
- * session could never light Trunk strength, Staying-power or Pacing
- * yourself, however much work went into it.
- *
- * ⚫ ASKING IS NOT INVENTING. The answer is the person's, so it can
- * credit the arc honestly -- the same distinction that governs what this
- * app records anywhere: stated, not inferred. Null until they say, and
- * skipping is a first-class answer rather than a nag.
- */
-let kind = null;
+/** A session left idle this long is not resumed; it starts fresh. */
+const STALE_MS = 6 * 3600 * 1000;
+/** Two sets further apart than this are not "after" each other. */
+const AFTER_WINDOW_MS = 3 * 3600 * 1000;
 
 /**
- * CAPTURE-2. A short list, not the builder's nine.
- *
- * "Gym" is left out: it describes WHERE, not what, and no arc strand
- * leans on it. The rest are the types capability strands actually name,
- * in the words somebody would use about the session they just did.
+ * CAPTURE-2, kept. What kind of session this was, if they say. Asking is
+ * not inventing: the answer is the person's, so it can credit the arc's
+ * capability strands honestly. Null until they say; skipping costs only
+ * that half of the credit.
  */
-const CAPTURE_KINDS = [
+export const CAPTURE_KINDS = [
   { id: "full",     label: "Full body" },
   { id: "upper",    label: "Upper body" },
   { id: "lower",    label: "Lower body" },
@@ -109,170 +98,332 @@ const CAPTURE_KINDS = [
   { id: "stretch",  label: "Stretching" }
 ];
 
+// ── Session state. Module-level, so it survives moving around the app
+// and coming back through the third door; cleared on Finish, Save or
+// Leave, and when stale. ─────────────────────────────────────────────────
+let moves     = [];     // [{ id, sets: [entry] }] -- filed moves, in order
+let current   = null;   // { id, sets: [entry], last: entry|null }
+let startedAt = null;
+let query     = "";
+let kind      = null;
+let status    = "";
+let focusNext = null;   // selector to focus after the next paint
+let clock     = null;
+let guarded   = false;  // the back-gesture guard, mounted once per visit
+
+function _reset() {
+  moves = []; current = null; startedAt = null; query = ""; kind = null;
+  status = ""; focusNext = null;
+}
+
 function esc(s) {
   return String(s == null ? "" : s)
     .replace(/&/g, "&amp;").replace(/</g, "&lt;")
     .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
-/**
- * Recents, most recently done first.
- *
- * Read from exerciseHistory rather than from the activity log, because
- * the log records SESSIONS and this needs MOVEMENTS.
- *
- * 🔴 exerciseHistory IS A MAP, NOT AN ARRAY: { [id]: { n, first, last,
- * best } }, deliberately, so selection can ask "how often, how recently"
- * without scanning thousands of entries on a phone. The first draft of
- * this function treated it as an array and walked it backwards -- which
- * would have returned an empty list for every user forever, exactly like
- * STRETCH-WHY's two dead branches this morning. Ground-truthed against
- * store.js rather than assumed, which is now the fourth time today that
- * check has paid.
- *
- * Silent when there are none: a "Recent" heading over an empty list
- * tells somebody the app expected something of them that has not
- * happened.
- */
-function recentExercises(limit = 6) {
-  let hist = null;
-  try { hist = store.get("exerciseHistory"); } catch { return []; }
-  if (!hist || typeof hist !== "object") return [];
+const byId = id => EXERCISES.find(e => e.id === id) || null;
+const _areaName = id => (CONDITIONS.find(c => c.id === id)?.name || id.replace(/-/g, " ")).toLowerCase();
 
-  return Object.entries(hist)
-    .filter(([, v]) => v && v.last)
-    .sort((a, b) => new Date(b[1].last) - new Date(a[1].last))
-    .map(([id]) => EXERCISES.find(e => e.id === id))
-    .filter(Boolean)                 // gone from the library; say nothing
-    .slice(0, limit);
+// ── Where, and what the kit there allows ─────────────────────────────────
+
+export function currentLocation() {
+  const loc = store.get("sessionLocation");
+  if (loc === "gym" || loc === "home" || loc === "outside") return loc;
+  const gym   = store.get("gymEquipment")  || [];
+  const home  = store.get("homeEquipment") || [];
+  const ident = store.get("movementIdentity") || [];
+  if (gym.length && (!home.length || (Array.isArray(ident) && ident.includes("gym")))) return "gym";
+  return "home";
+}
+const PLACE_WORDS = { gym: "At the gym", home: "At home", outside: "Outside, with nothing to hand" };
+
+/** The exercises the kit here allows. The builder's own rule. */
+export function availableHere(location = currentLocation()) {
+  const kit = resolveEquipment(equipmentForLocation(location).list);
+  return EXERCISES.filter(e => exerciseIsAvailable(e, kit));
 }
 
-function results() {
-  const q = query.trim().toLowerCase();
-  if (q.length < 2) return [];
-  const byName = EXERCISES.filter(e => (e.name || "").toLowerCase().includes(q));
-  const { exercises: byArea } = searchByTerm(q, EXERCISES);
+/** Search over names and muscles, kit-filtered. */
+export function searchHere(q, location = currentLocation()) {
+  const t = String(q || "").trim().toLowerCase();
+  if (t.length < 2) return { found: [], anyKit: 0 };
+  const byName = EXERCISES.filter(e => (e.name || "").toLowerCase().includes(t));
+  const { exercises: byArea } = searchByTerm(t, EXERCISES);
   const seen = new Set(byName.map(e => e.id));
-  return [...byName, ...byArea.filter(e => !seen.has(e.id))].slice(0, 12);
+  const all  = [...byName, ...byArea.filter(e => !seen.has(e.id))];
+  const here = new Set(availableHere(location).map(e => e.id));
+  return { found: all.filter(e => here.has(e.id)).slice(0, 12), anyKit: all.length };
 }
 
+// ── Sore ────────────────────────────────────────────────────────────────
+
+/** The note for a move that loads a sore area, or "". */
+export function soreNote(ex) {
+  const scores = soreScoresToday();
+  const { level, areas } = soreLevelFor(ex, scores);
+  if (level === "none") return "";
+  const area = areas.slice().sort((a, b) => scores[b] - scores[a])[0];
+  return scores[area] >= SORE_BLOCK_FLOOR
+    ? `You said your ${_areaName(area)} is bad today — this one loads it.`
+    : `You mentioned your ${_areaName(area)} today — this one loads it.`;
+}
+
+// ── Suggestions ─────────────────────────────────────────────────────────
+
 /**
- * One result, two targets.
- *
- * The name is the button that walks the card; "just log it" is a
- * separate control beside it. Two targets rather than one row with a
- * mode, because the choice is per exercise and belongs in the moment.
+ * What the person usually does after `afterId`, from the order of their
+ * own lift log: a set of B logged within three hours after a set of A,
+ * on a move change, counts once. Most frequent first.
  */
-function resultRow(ex) {
+export function usuallyAfter(afterId) {
+  const log = store.get("liftLog") || {};
+  const sets = [];
+  for (const [id, list] of Object.entries(log)) {
+    for (const e of list || []) { const t = new Date(e.at).getTime(); if (Number.isFinite(t)) sets.push({ id, t }); }
+  }
+  sets.sort((a, b) => a.t - b.t);
+  const counts = {};
+  for (let i = 1; i < sets.length; i++) {
+    const a = sets[i - 1], b = sets[i];
+    if (a.id !== afterId || b.id === afterId || b.t - a.t > AFTER_WINDOW_MS) continue;
+    counts[b.id] = (counts[b.id] || 0) + 1;
+  }
+  return Object.entries(counts).sort((x, y) => y[1] - x[1]).map(([id]) => id);
+}
+
+/** Up to three to offer next, and the honest heading for them. */
+export function suggestions(location = currentLocation()) {
+  const done = new Set([...moves.map(m => m.id), current?.id].filter(Boolean));
+  const here = new Set(availableHere(location).map(e => e.id));
+  const anchor = current || moves[moves.length - 1] || null;
+  if (anchor) {
+    const ids = usuallyAfter(anchor.id).filter(id => here.has(id) && !done.has(id)).slice(0, 3);
+    if (ids.length) {
+      return { heading: `What you usually do after ${byId(anchor.id)?.name || "that"}`, list: ids.map(byId).filter(Boolean) };
+    }
+  }
+  if (!anchor) {
+    // Nothing done yet: what they have done most recently, if anything --
+    // in a gym you repeat yourself (v1's Recent). Lift log and the
+    // exercise history both, newest first.
+    const when = {};
+    for (const [id, list] of Object.entries(store.get("liftLog") || {})) {
+      const t = Math.max(...(list || []).map(e => new Date(e.at).getTime()).filter(Number.isFinite));
+      if (Number.isFinite(t)) when[id] = t;
+    }
+    for (const [id, v] of Object.entries(store.get("exerciseHistory") || {})) {
+      const t = new Date(v?.last).getTime();
+      if (Number.isFinite(t) && !(when[id] > t)) when[id] = t;
+    }
+    const recent = Object.keys(when).sort((a, b) => when[b] - when[a]).filter(id => here.has(id)).slice(0, 3);
+    if (recent.length) return { heading: "Recently", list: recent.map(byId).filter(Boolean) };
+  }
+  let pools = null;
+  try { pools = buildCandidatePools({ sessionType: "full", durationMins: 30, equipmentOverride: equipmentForLocation(location).list }); } catch { pools = null; }
+  const main = (pools?.main || []).filter(e => here.has(e.id) && !done.has(e.id));
+  // At a gym, kit first: somebody standing among the racks did not come
+  // for a glute bridge. Stable order otherwise (recommended first).
+  const kitFirst = location === "gym" ? (e => (e.equipment || []).length ? 0 : 1) : (() => 0);
+  const pick = [...main].sort((a, b) => kitFirst(a) - kitFirst(b) || (b.recommended ? 1 : 0) - (a.recommended ? 1 : 0)).slice(0, 3);
+  return { heading: location === "gym" ? "Ideas for the gym" : location === "outside" ? "Ideas for outside" : "Ideas for home", list: pick };
+}
+
+// ── Sets ────────────────────────────────────────────────────────────────
+
+/** "40 kg × 10", "12 reps", "level 6 · 10 min" -- flat, no verdict (P4). */
+export function setText(e, withUnit = true) {
+  if (!e) return "";
+  if (typeof e.weight === "number" && typeof e.reps === "number")
+    return `${e.weight}${withUnit ? ` ${e.unit || store.get("weightUnit") || "kg"}` : ""} × ${e.reps}`;
+  const bits = [];
+  if (typeof e.weight === "number") bits.push(`${e.weight} ${e.unit || "kg"}`);
+  if (typeof e.reps === "number")   bits.push(`${e.reps} reps`);
+  if (e.tension)                    bits.push(e.tension);
+  if (typeof e.level === "number")  bits.push(`level ${e.level}`);
+  if (typeof e.speed === "number")  bits.push(`speed ${e.speed}`);
+  if (typeof e.incline === "number") bits.push(`${e.incline}% incline`);
+  if (typeof e.durationMins === "number") bits.push(`${e.durationMins} min`);
+  if (typeof e.distance === "number") bits.push(`${e.distance} distance`);
+  return bits.join(" · ") || (e.note ? "noted" : "");
+}
+const setsLine = sets => sets.map((s, i) => setText(s, i === 0)).join(" · ");
+
+const totalSets = () => moves.reduce((n, m) => n + m.sets.length, 0) + (current ? current.sets.length : 0);
+const allMoves  = () => [...moves, ...(current && current.sets.length ? [current] : [])];
+
+/** File the current move (if it had sets) and start `id`. */
+function _pick(id) {
+  const ex = byId(id);
+  if (!ex) return;
+  if (current && current.sets.length) moves.push({ id: current.id, sets: current.sets });
+  current = { id, sets: [], last: store.lastLift(id) || null };
+  query = "";
+  status = "";
+  focusNext = "#fs-move-name";
+}
+
+function _logSet(root) {
+  const ex = byId(current.id);
+  const entry = {};
+  root.querySelectorAll("[data-fs-key]").forEach(input => {
+    const raw = input.value;
+    if (raw === "" || raw == null) return;
+    entry[input.dataset.fsKey] = input.type === "number" ? parseFloat(raw) : raw;
+  });
+  if (!Object.keys(entry).length) {
+    status = "Put in what you did first — even just the reps.";
+    focusNext = "[data-fs-key]";
+    return;
+  }
+  if (typeof entry.weight === "number") entry.unit = store.get("weightUnit") || "kg";
+  store.logLift(ex.id, entry);            // no-op if lift notes are off; the session still has it
+  current.sets.push({ ...entry, at: new Date().toISOString() });
+  status = `Set ${current.sets.length} logged: ${setText(entry)}.`;
+  focusNext = "#fs-log";
+}
+
+// ── Rendering ───────────────────────────────────────────────────────────
+
+function _elapsed() {
+  if (!startedAt) return "0:00";
+  const s = Math.max(0, Math.floor((Date.now() - startedAt) / 1000));
+  const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
+  return h ? `${h}:${String(m).padStart(2, "0")}:${String(sec).padStart(2, "0")}` : `${m}:${String(sec).padStart(2, "0")}`;
+}
+
+function _field(f, value) {
+  const id = `fs-f-${f.key}`;
+  if (f.type !== "number") {
+    return `
+      <div class="fs-field fs-field--text">
+        <label class="fs-field__label" for="${id}">${esc(f.label)}</label>
+        <input class="fs-field__input" id="${id}" type="text" data-fs-key="${f.key}"
+               maxlength="${f.maxlength || 60}" value="${esc(value ?? "")}">
+      </div>`;
+  }
+  const unit = store.get("weightUnit") || "kg";
+  const step = f.key === "weight" ? (unit === "lb" ? 5 : 2.5) : Number(f.step) || 1;
+  const name = f.label.replace(/\s*\(.*\)$/, "");
   return `
-    <li class="cap-result">
-      <button type="button" class="cap-result__name" data-walk="${esc(ex.id)}">
-        ${esc(ex.name)}
-      </button>
-      <button type="button" class="cap-result__log" data-log="${esc(ex.id)}"
-              aria-label="Just log ${esc(ex.name)}, without the instructions">
-        Just log it
+    <div class="fs-field">
+      <label class="fs-field__label" for="${id}">${esc(f.label)}</label>
+      <div class="fs-stepper">
+        <button type="button" class="fs-step" data-fs-step="${id}" data-step="-${step}" aria-label="${esc(name)} down ${step}">−</button>
+        <input class="fs-field__input" id="${id}" type="number" inputmode="decimal" step="${f.step || "any"}" min="0"
+               data-fs-key="${f.key}" value="${value ?? ""}">
+        <button type="button" class="fs-step" data-fs-step="${id}" data-step="${step}" aria-label="${esc(name)} up ${step}">+</button>
+      </div>
+    </div>`;
+}
+
+function _moveCard() {
+  const ex = byId(current.id);
+  const n  = current.sets.length + 1;
+  const prev = current.sets[current.sets.length - 1] || current.last || {};
+  const fields = performanceFields(ex).filter(f => f.key !== "note");
+  const note = soreNote(ex);
+  // Open on the first move, closed on the rest -- as the player does.
+  const first = moves.length === 0;
+  return `
+    <section class="fs-move" aria-labelledby="fs-move-name">
+      <h2 class="fs-move__name" id="fs-move-name" tabindex="-1">${esc(ex.name)}</h2>
+      ${note ? `<p class="fs-sore" role="note">${esc(note)}</p>` : ""}
+      <p class="fs-move__set">Set ${n}${current.last ? ` · last time ${esc(setText(current.last))}` : ""}</p>
+      <div class="fs-fields">${fields.map(f => _field(f, prev[f.key])).join("")}</div>
+      <button type="button" class="btn btn-primary btn-large btn-full" id="fs-log">Log set ${n}</button>
+      <p class="fs-status" id="fs-status" role="status" aria-live="polite">${esc(status)}</p>
+      ${current.sets.length ? `
+        <ol class="fs-sets" aria-label="Sets logged on ${esc(ex.name)}">
+          ${current.sets.map((s, i) => `<li><span class="fs-sets__n">Set ${i + 1}</span> ${esc(setText(s))}</li>`).join("")}
+        </ol>` : ""}
+      ${Array.isArray(ex.instructions) && ex.instructions.length ? `
+        <details class="fs-how">
+          <summary>How to do it</summary>
+          <ol>${ex.instructions.map(s => `<li>${esc(s)}</li>`).join("")}</ol>
+        </details>` : ""}
+      ${hurtBlock(first)}
+    </section>`;
+}
+
+function _row(ex) {
+  const note = soreNote(ex);
+  return `
+    <li>
+      <button type="button" class="fs-pick__btn" data-pick="${esc(ex.id)}"
+              ${note ? `aria-describedby="fs-note-${esc(ex.id)}"` : ""}>
+        <span class="fs-pick__name">${esc(ex.name)}</span>
+        ${note ? `<span class="fs-pick__note" id="fs-note-${esc(ex.id)}">${esc(note)}</span>` : ""}
       </button>
     </li>`;
 }
 
 export function render() {
-  // CAPTURE-1. Before anything can be added -- see the header.
-  if (isGateDue()) {
-    return `<div class="view capture-view">${renderSafetyGate()}</div>`;
-  }
+  if (startedAt && Date.now() - startedAt > STALE_MS) _reset();
+  // CAPTURE-1. The gate stands before the first movement -- see the header.
+  if (isGateDue()) return `<div class="view capture-view">${renderSafetyGate()}</div>`;
+  if (!startedAt) startedAt = Date.now();
 
-  const recent = recentExercises();
-  const found  = results();
-  const q      = query.trim();
+  const loc  = currentLocation();
+  const done = allMoves();
+  const sug  = suggestions(loc);
+  const q    = query.trim();
+  const { found, anyKit } = searchHere(q, loc);
 
   return `
-    <div class="view capture-view">
-      <div class="view-header">
-        <h1>What did you do?</h1>
-        <p class="text-sm text-muted">
-          Add them as you go, or afterwards. It all counts the same.
-        </p>
-      </div>
+    <div class="view capture-view" data-freestyle>
+      <header class="fs-bar">
+        <button type="button" class="btn btn-ghost fs-bar__exit" id="fs-exit">Exit</button>
+        <span class="fs-bar__clock" id="fs-clock" aria-hidden="true">${_elapsed()}</span>
+        <button type="button" class="btn btn-secondary fs-bar__finish" id="fs-finish">Finish</button>
+      </header>
+      <h1 class="sr-only">Make it up as I go</h1>
+      <p class="fs-error" id="fs-error" role="alert"></p>
 
-      <label class="sr-only" for="cap-search">Search for a movement</label>
-      <input type="search" id="cap-search" class="cap-search"
-             placeholder="Type a movement or a muscle"
-             value="${esc(query)}" autocomplete="off" enterkeyhint="search">
-
-      <p class="cap-status" id="cap-status" role="status" aria-live="polite">
-        ${q.length >= 2
-          ? `${found.length} ${found.length === 1 ? "movement" : "movements"} for \u201c${esc(q)}\u201d.`
-          : ""}
+      <p class="fs-where">${esc(PLACE_WORDS[loc])}
+        <button type="button" class="fs-where__change" id="fs-where" aria-label="Change where you are. Now: ${esc(PLACE_WORDS[loc])}">Change</button>
       </p>
 
-      ${found.length ? `
-        <ul class="cap-results">${found.map(resultRow).join("")}</ul>
-      ` : q.length >= 2 ? `
-        <p class="cap-empty">
-          Nothing matching \u201c${esc(q)}\u201d. Try a muscle \u2014 lats, quads \u2014 or
-          part of the name.
-        </p>
-      ` : ""}
+      ${moves.length ? `
+        <h2 class="fs-heading">Done so far</h2>
+        <ul class="fs-done">
+          ${moves.map(m => `
+            <li class="fs-done__row"><span class="fs-done__name">${esc(byId(m.id)?.name || m.id)}</span>
+              <span class="fs-done__sets">${esc(setsLine(m.sets))}</span></li>`).join("")}
+        </ul>` : ""}
 
-      ${(!q && recent.length) ? `
-        <h2 class="cap-heading">Recent</h2>
-        <ul class="cap-results">${recent.map(resultRow).join("")}</ul>
-      ` : ""}
+      ${current ? _moveCard() : ""}
 
-      ${!q ? `
-        <h2 class="cap-heading">Or by body area</h2>
-        <ul class="cap-areas">
-          ${TARGET_AREAS.filter(t => t.areas.length).map(t => `
-            <li>
-              <button type="button" class="cap-area" data-area="${esc(t.id)}">
-                ${esc(t.label)}
-              </button>
-            </li>`).join("")}
-        </ul>
-      ` : ""}
+      <section class="fs-next" aria-labelledby="fs-next-h">
+        <h2 class="fs-heading" id="fs-next-h">${current || moves.length ? "Next move" : "First move"}</h2>
+        ${sug.list.length && !q ? `
+          <p class="fs-sub">${esc(sug.heading)}</p>
+          <ul class="fs-picks">${sug.list.map(_row).join("")}</ul>` : ""}
+        <label class="fs-sub fs-search-label" for="cap-search">Or search a move or a muscle</label>
+        <input type="search" id="cap-search" class="cap-search" placeholder="Bench press, lats, quads…"
+               value="${esc(query)}" autocomplete="off" enterkeyhint="search">
+        <p class="cap-status" id="cap-status" role="status" aria-live="polite">${q.length >= 2
+          ? (found.length
+              ? `${found.length} ${found.length === 1 ? "move" : "moves"} you can do ${esc(PLACE_WORDS[loc].split(",")[0].toLowerCase())}.`
+              : anyKit
+                ? `Nothing for “${esc(q)}” with the kit you have ${esc(PLACE_WORDS[loc].split(",")[0].toLowerCase())}.`
+                : `Nothing matching “${esc(q)}”. Try a muscle — lats, quads — or part of the name.`)
+          : ""}</p>
+        ${found.length ? `<ul class="fs-picks">${found.map(_row).join("")}</ul>` : ""}
+      </section>
 
-      ${captured.length ? `
-        <h2 class="cap-heading">So far today</h2>
-        <ul class="cap-done">
-          ${captured.map((c, i) => `
-            <li class="cap-done__row">
-              <span>${esc(c.name)}</span>
-              <button type="button" class="cap-done__remove" data-remove="${i}"
-                      aria-label="Remove ${esc(c.name)}">Remove</button>
-            </li>`).join("")}
-        </ul>
-        <!--
-          CAPTURE-2. Optional, and last: somebody cannot say what a
-          session was before they have done it, and asking first would
-          turn a picker into a form. Skipping costs nothing except the
-          capability half of the credit, which is the honest trade.
-        -->
-        <h2 class="cap-heading" id="cap-kind-h">What was this, roughly?</h2>
-        <ul class="cap-areas" role="group" aria-labelledby="cap-kind-h">
-          ${CAPTURE_KINDS.map(k => `
-            <li>
-              <button type="button" class="cap-area${kind === k.id ? " is-selected" : ""}"
-                      data-kind="${esc(k.id)}"
-                      aria-pressed="${kind === k.id ? "true" : "false"}">
-                ${esc(k.label)}
-              </button>
-            </li>`).join("")}
-        </ul>
-        <p class="cap-empty">
-          ${kind
+      ${done.length ? `
+        <details class="fs-kind"${kind ? " open" : ""}>
+          <summary>What was this, roughly? <span class="fs-sub">Optional</span></summary>
+          <ul class="cap-areas" role="group" aria-label="What kind of session this was">
+            ${CAPTURE_KINDS.map(k => `
+              <li><button type="button" class="cap-area${kind === k.id ? " is-selected" : ""}"
+                          data-kind="${esc(k.id)}" aria-pressed="${kind === k.id}">${esc(k.label)}</button></li>`).join("")}
+          </ul>
+          <p class="fs-sub">${kind
             ? "That lets it count towards the parts of your arc this kind of session builds."
-            : "Optional. Without it, this still counts for the areas you worked."}
-        </p>
-
-        <button type="button" class="btn btn-primary btn-full" id="cap-finish">
-          Finish \u2014 ${captured.length} ${captured.length === 1 ? "movement" : "movements"}
-        </button>
-      ` : `
-        <p class="cap-empty-note">
-          Nothing added yet. Find the first one above.
-        </p>
-      `}
+            : "Without it, this still counts for the areas you worked."}</p>
+        </details>` : ""}
     </div>`;
 }
 
@@ -283,43 +434,82 @@ function rerender() {
   onMount();
 }
 
-/**
- * Finish.
- *
- * Writes the same record every other session writes, so logActivity()
- * credits the arc without knowing this came from capture. sessionType is
- * deliberately absent rather than invented: a captured set of movements
- * is not one of the builder's eight types, and claiming one would light
- * an arc strand nothing earned. The BODY channel still credits, from the
- * areas the movements actually work -- which is the honest half.
- */
-function finish() {
-  if (!captured.length) return;
+// ── Saving ──────────────────────────────────────────────────────────────
 
-  // CAPTURE-2. sessionType is included ONLY if they said so. Absent
-  // otherwise, exactly as CAPTURE-1 shipped it: the body channel still
-  // credits from the areas, and nothing claims a kind of work that was
-  // never declared.
-  const session = {
-    id:        "capture",
-    title:     "Your own, as you went",
-    exercises: captured.map(c => ({ id: c.id, affectsAreas: c.affectsAreas || [] }))
-  };
+/** One activity entry for the whole session. Returns it, or null if nothing was done. */
+export function saveFreestyle() {
+  const list = allMoves();
+  if (!list.length) return null;
+  const nowIso = new Date().toISOString();
+  const exercises = list.map(m => { const ex = byId(m.id); return { id: m.id, affectsAreas: ex?.affectsAreas || [] }; });
+
+  // What the arc credits from, exactly as CAPTURE-1 did. sessionType only
+  // if they said so; store.js v77 stops a freestyle entry inheriting one.
+  const session = { id: "freestyle", title: "Made up as I went", exercises };
   if (kind) session.sessionType = kind;
+  store.set("lastFinishedSession", { at: nowIso, session });
 
-  store.set("lastFinishedSession", { at: new Date().toISOString(), session });
-
-  store.logActivity({
-    type:        "capture",
-    completedAt: new Date().toISOString(),
-    exercises:   captured.map(c => ({ id: c.id, affectsAreas: c.affectsAreas || [] }))
+  const entry = store.logActivity({
+    type:           "freestyle",
+    date:           nowIso,
+    completedAt:    nowIso,
+    durationMins:   startedAt ? Math.max(1, Math.round((Date.now() - startedAt) / 60000)) : null,
+    moodAfter:      null,
+    exerciseIds:    list.map(m => m.id),
+    exercisesCount: list.length,
+    setsDone:       list.reduce((n, m) => n + m.sets.length, 0),
+    ...(kind ? { sessionType: kind } : {})
   });
-
-  captured = [];
-  query = "";
-  kind = null;
-  router.navigate("reflect");
+  if (entry) store.set("currentActivityEntry", entry);
+  return entry;
 }
+
+/** Stop the clock and the guard and clear the session. The caller navigates. */
+function _end() {
+  clearInterval(clock); clock = null;
+  dismountSessionGuard(); guarded = false;
+  _reset();
+}
+
+function showExitSheet() {
+  if (document.getElementById("session-exit-overlay")) return;
+  const opener = document.activeElement;
+  const overlay = document.createElement("div");
+  overlay.className = "session-exit-overlay";
+  overlay.id = "session-exit-overlay";
+  overlay.setAttribute("role", "dialog");
+  overlay.setAttribute("aria-modal", "true");
+  overlay.setAttribute("aria-labelledby", "exit-sheet-title");
+  const any = totalSets() > 0;
+  overlay.innerHTML = `
+    <div class="session-exit-card">
+      <h2 class="session-exit-title" id="exit-sheet-title">Leave this session?</h2>
+      <div class="session-exit-actions">
+        <button class="btn btn-primary btn-full" id="exit-confirm-stay">Keep going</button>
+        ${any ? `<button class="btn btn-secondary btn-full" id="exit-confirm-save">Save what I did</button>` : ""}
+        <button class="btn btn-ghost btn-full session-exit-discard" id="exit-confirm-discard">
+          ${any ? "Leave without saving" : "Leave"}
+        </button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  const stay = overlay.querySelector("#exit-confirm-stay");
+  stay?.focus();
+  const close = () => { overlay.remove(); opener?.focus?.(); };
+  overlay.addEventListener("keydown", e => {
+    if (e.key === "Escape") { e.preventDefault(); close(); return; }
+    if (e.key !== "Tab") return;
+    const f = [...overlay.querySelectorAll("button")];
+    const i = f.indexOf(document.activeElement);
+    if (e.shiftKey && i <= 0) { e.preventDefault(); f[f.length - 1].focus(); }
+    else if (!e.shiftKey && i === f.length - 1) { e.preventDefault(); f[0].focus(); }
+  });
+  stay?.addEventListener("click", close);
+  overlay.querySelector("#exit-confirm-save")?.addEventListener("click", () => { overlay.remove(); saveFreestyle(); _end(); router.navigate("today"); });
+  overlay.querySelector("#exit-confirm-discard")?.addEventListener("click", () => { overlay.remove(); _end(); router.navigate("today"); });
+}
+
+// ── Events ──────────────────────────────────────────────────────────────
 
 export function onMount() {
   if (isGateDue()) {
@@ -330,16 +520,30 @@ export function onMount() {
     });
     return;
   }
+  const root = document.getElementById("main-content") || document;
+
+  // Once per visit: each mount pushes a history entry, and a re-render is
+  // not a new visit. The router dismounts it on the way out.
+  if (!guarded) {
+    guarded = true;
+    mountSessionGuard({
+      isActive: () => totalSets() > 0,
+      onExit:   () => { saveFreestyle(); _end(); router.navigate("today"); },
+      label:    "session"
+    });
+  }
+
+  clearInterval(clock);
+  clock = setInterval(() => {
+    const el = document.getElementById("fs-clock");
+    if (!el) { clearInterval(clock); clock = null; return; }
+    el.textContent = _elapsed();
+  }, 1000);
 
   const search = document.getElementById("cap-search");
   if (search) {
-    // Focused on open: somebody standing at a machine should be able to
-    // type immediately. Not on a re-render, which would steal focus back
-    // from whatever they just pressed.
-    if (!query) { try { search.focus(); } catch { /* non-fatal */ } }
-
     let t = null;
-    search.addEventListener("input", (e) => {
+    search.addEventListener("input", e => {
       query = e.target.value;
       clearTimeout(t);
       // Debounced: re-rendering on every keystroke loses the caret.
@@ -352,57 +556,59 @@ export function onMount() {
     });
   }
 
-  const root = document.getElementById("main-content") || document;
+  if (root.dataset.fsWired !== "1") {
+    root.dataset.fsWired = "1";
+    root.addEventListener("click", ev => {
+      if (!document.querySelector("[data-freestyle]")) return;
+      const t = ev.target;
+      const pick = t.closest("[data-pick]");
+      if (pick) { _pick(pick.dataset.pick); rerender(); return; }
 
-  root.addEventListener("click", (ev) => {
-    const log = ev.target.closest("[data-log]");
-    if (log) {
-      const ex = EXERCISES.find(e => e.id === log.dataset.log);
-      if (ex) { captured.push(ex); query = ""; rerender(); }
-      return;
-    }
+      const step = t.closest("[data-fs-step]");
+      if (step) {
+        const input = document.getElementById(step.dataset.fsStep);
+        if (!input) return;
+        const next = Math.max(0, (parseFloat(input.value) || 0) + parseFloat(step.dataset.step));
+        input.value = String(Math.round(next * 100) / 100);
+        return;
+      }
+      if (t.closest("#fs-log")) { _logSet(root); rerender(); return; }
 
-    const walk = ev.target.closest("[data-walk]");
-    if (walk) {
-      const ex = EXERCISES.find(e => e.id === walk.dataset.walk);
-      if (!ex) return;
-      // Reuses the exercise card rather than building a second one: a
-      // one-movement session handed to the view that already knows how
-      // to walk Decide, Watch out, Do and Note.
-      captured.push(ex);
-      store.set("generatedSession", {
-        session: { id: "capture-one", title: ex.name, exercises: [ex] },
-        builtAt: new Date().toISOString(),
-        inputs:  { from: "capture" }
-      });
-      router.navigate("workout");
-      return;
-    }
+      if (t.closest("#fs-where")) {
+        const order = ["home", "gym", "outside"];
+        const next = order[(order.indexOf(currentLocation()) + 1) % order.length];
+        store.set("sessionLocation", next);
+        status = "";
+        focusNext = "#fs-where";
+        rerender();
+        return;
+      }
+      const k = t.closest("[data-kind]");
+      if (k) { kind = kind === k.dataset.kind ? null : k.dataset.kind; focusNext = `[data-kind="${k.dataset.kind}"]`; rerender(); return; }
 
-    const area = ev.target.closest("[data-area]");
-    if (area) {
-      const t = TARGET_AREAS.find(x => x.id === area.dataset.area);
-      if (t) { query = (t.areas[0] || "").replace(/-/g, " "); rerender(); }
-      return;
-    }
+      if (t.closest("#fs-exit")) { showExitSheet(); return; }
+      if (t.closest("#fs-finish")) {
+        if (!totalSets()) {
+          const err = document.getElementById("fs-error");
+          if (err) err.textContent = "Log a set first. To leave without one, use Exit.";
+          return;
+        }
+        saveFreestyle();
+        _end();
+        // The finish screen, as every session: "That's today done."
+        router.navigate("reflect");
+      }
+    });
+  }
 
-    const k = ev.target.closest("[data-kind]");
-    if (k) {
-      // Tapping the chosen one again clears it: a question somebody
-      // answered by accident must be un-answerable, or the only way out
-      // is to leave and start again.
-      kind = (kind === k.dataset.kind) ? null : k.dataset.kind;
-      rerender();
-      return;
-    }
-
-    const rm = ev.target.closest("[data-remove]");
-    if (rm) {
-      captured.splice(Number(rm.dataset.remove), 1);
-      rerender();
-      return;
-    }
-
-    if (ev.target.closest("#cap-finish")) finish();
-  });
+  if (focusNext) {
+    const sel = focusNext; focusNext = null;
+    document.querySelector(sel)?.focus?.({ preventScroll: false });
+  } else if (!current && !moves.length && search && !query) {
+    // Standing at a machine: type straight away (v1).
+    try { search.focus({ preventScroll: true }); } catch { /* non-fatal */ }
+  }
 }
+
+/** Router hook: stop the clock when the view goes. The session itself is kept. */
+export function onUnmount() { clearInterval(clock); clock = null; guarded = false; }

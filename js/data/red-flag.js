@@ -1,6 +1,9 @@
 /**
  * js/data/red-flag.js
- * 28 Sep 2026 v1
+ * 28 Sep 2026 v2
+ *
+ * v2 - SMOOTH-P3c. 'capture' (Make it up as I go) is guarded: it is
+ *   exercise, and v1's list predates it being a session. Twelve routes.
  *
  * RED-FLAG. The red-flag screen: three questions, asked before exercise
  * of anyone who has told the app something is sore, and a hard stop on
@@ -95,7 +98,7 @@ const DAYS_30 = 30 * 86400000;
 export const EXERTIONAL_ROUTES = new Set([
   "workout", "gym-programme", "morning-session", "core-session", "yoga-session",
   "walk-session", "running-session", "cycle-session", "swim-session",
-  "prescribed-session", "class-player",
+  "prescribed-session", "class-player", "capture",
 ]);
 
 /** Where somebody was going when the screen stepped in. Module state: a reload starts again from Home. */

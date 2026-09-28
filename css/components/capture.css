@@ -1,15 +1,181 @@
 /* ============================================================
-   CAPTURE — build as you go, or log what you just did
+   CAPTURE — Make it up as I go
    css/components/capture.css
-   16 Sep 2026 v1
+   28 Sep 2026 v2
 
-   Standing at a machine. Everything here is sized for a thumb
-   and a glance, not for browsing.
+   v2 - SMOOTH-P3c. The freestyle session: a bar (Exit · clock ·
+   Finish), what is done so far, the current move with its set
+   steppers, and the next move. v1's two-target result rows and
+   remove buttons are gone with the flow that used them.
+
+   Standing at a machine. Everything here is sized for a thumb and
+   a glance: every control is at least 48px (2.5.8), steppers are
+   56px, and nothing states anything by colour alone (1.4.1).
    ============================================================ */
 
 .capture-view { padding-bottom: var(--space-8); }
 
-/* Focused on open, so the first thing somebody can do is type. */
+/* ── The bar ─────────────────────────────────────────────── */
+.fs-bar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0 calc(-1 * var(--space-4)) var(--space-3);
+  /* The Home hatch sits top-right on a screen with no nav; Finish
+     never runs under it. */
+  padding: var(--space-2) var(--escape-hatch-gutter, 64px) var(--space-2) var(--space-4);
+  background: var(--color-bg);
+  border-bottom: 1px solid var(--color-border);
+}
+.fs-bar__exit, .fs-bar__finish { min-height: 48px; }
+.fs-bar__clock {
+  justify-self: center;
+  font-size: var(--text-xl);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text);
+}
+
+.fs-error { margin: 0; color: var(--color-text); font-weight: 600; }
+.fs-error:empty { display: none; }
+
+.fs-where {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: 0 0 var(--space-3);
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+}
+.fs-where__change {
+  min-height: 44px;
+  padding: 0 var(--space-2);
+  background: none;
+  border: none;
+  color: var(--color-primary);
+  font: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.fs-heading {
+  margin: var(--space-5) 0 var(--space-2);
+  font-size: var(--text-lg);
+  color: var(--color-text);
+}
+.fs-sub { margin: 0 0 var(--space-2); font-size: var(--text-sm); color: var(--color-text-secondary); }
+
+/* ── Done so far ─────────────────────────────────────────── */
+.fs-done { margin: 0; padding: 0; list-style: none; }
+.fs-done__row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+.fs-done__name { font-weight: 600; color: var(--color-text); }
+.fs-done__sets { font-size: var(--text-sm); color: var(--color-text-secondary); font-variant-numeric: tabular-nums; }
+
+/* ── The current move ────────────────────────────────────── */
+.fs-move {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+  padding: var(--space-4);
+  border: 2px solid var(--color-primary);
+  border-radius: var(--radius-lg, 16px);
+  background: var(--color-surface);
+}
+.fs-move__name { margin: 0; font-size: var(--text-xl); color: var(--color-text); }
+.fs-move__name:focus { outline: none; }
+.fs-move__name:focus-visible { outline: 3px solid var(--color-border-focus); outline-offset: 4px; }
+.fs-move__set { margin: 0; color: var(--color-text-secondary); font-variant-numeric: tabular-nums; }
+
+.fs-sore {
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border-left: 3px solid var(--color-warning, var(--color-border));
+  color: var(--color-text);
+  font-size: var(--text-sm);
+}
+
+.fs-fields { display: grid; grid-template-columns: 1fr; gap: var(--space-3); }
+.fs-field { display: flex; flex-direction: column; gap: var(--space-1); min-width: 0; }
+.fs-field--text { grid-column: 1 / -1; }
+.fs-field__label { font-size: var(--text-sm); color: var(--color-text-secondary); }
+.fs-stepper { display: grid; grid-template-columns: 56px 1fr 56px; gap: var(--space-2); }
+.fs-step {
+  min-height: 56px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md, 8px);
+  background: none;
+  color: var(--color-text);
+  font-size: var(--text-xl);
+  cursor: pointer;
+}
+.fs-field__input {
+  min-width: 0;
+  min-height: 56px;
+  padding: 0 var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md, 8px);
+  background: var(--color-bg);
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--text-lg);
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.fs-field--text .fs-field__input { text-align: left; }
+
+.fs-status { margin: 0; min-height: 1.25rem; font-size: var(--text-sm); color: var(--color-text); }
+.fs-sets { margin: 0; padding: 0; list-style: none; font-variant-numeric: tabular-nums; color: var(--color-text); }
+.fs-sets li { padding: var(--space-1) 0; }
+.fs-sets__n { display: inline-block; min-width: 3.5em; color: var(--color-text-secondary); }
+
+.fs-how summary, .fs-kind summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  cursor: pointer;
+  color: var(--color-text);
+  font-weight: 600;
+}
+.fs-how ol { margin: var(--space-2) 0 0; padding-left: 1.25rem; line-height: 1.5; color: var(--color-text); }
+.fs-kind { margin-top: var(--space-5); }
+
+/* ── Next move ───────────────────────────────────────────── */
+.fs-next { margin-top: var(--space-2); }
+.fs-picks { margin: 0 0 var(--space-3); padding: 0; list-style: none; display: flex; flex-direction: column; gap: var(--space-2); }
+.fs-pick__btn {
+  width: 100%;
+  min-height: 52px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md, 8px);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.fs-pick__btn:hover { border-color: var(--color-primary); }
+.fs-pick__name { font-weight: 600; }
+.fs-pick__note { font-size: var(--text-sm); color: var(--color-text-secondary); }
+
 .cap-search {
   width: 100%;
   min-height: 52px;
@@ -22,87 +188,13 @@
   font-family: inherit;
   font-size: var(--text-base);
 }
+.fs-search-label { display: block; margin-top: var(--space-3); }
 
-.cap-search:focus-visible {
-  outline: 3px solid var(--color-focus, var(--color-primary));
-  outline-offset: 2px;
-}
+/* The count is announced by the live region rather than by the element
+   appearing, and the space is reserved so results do not jump. */
+.cap-status { min-height: 1.25rem; margin: 0 0 var(--space-3); font-size: var(--text-sm); color: var(--color-text-secondary); }
 
-/* Always present so the count is announced by the text changing
-   rather than by the element appearing, and the space is
-   reserved so results do not jump under a thumb. */
-.cap-status {
-  min-height: 1.25rem;
-  margin: 0 0 var(--space-3);
-  font-size: var(--text-sm);
-  color: var(--color-text-muted);
-}
-
-.cap-heading {
-  margin: var(--space-5) 0 var(--space-2);
-  font-size: var(--text-sm);
-  font-weight: var(--font-semibold);
-  letter-spacing: 0.04em;
-  color: var(--color-text-muted);
-}
-
-.cap-results, .cap-areas, .cap-done { margin: 0; padding: 0; list-style: none; }
-
-/* TWO TARGETS, ONE ROW. The name walks the card; "Just log it"
-   skips to the note. Both are real buttons at 48px, because
-   this row is the whole feature and a mis-tap here means
-   walking four pages you did not want. WCAG 2.5.8. */
-.cap-result {
-  display: flex;
-  align-items: stretch;
-  gap: var(--space-2);
-  margin-bottom: var(--space-2);
-}
-
-.cap-result__name {
-  flex: 1;
-  min-height: 52px;
-  padding: var(--space-3);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md, 8px);
-  background: var(--color-surface);
-  color: var(--color-text);
-  font-family: inherit;
-  font-size: var(--text-base);
-  text-align: left;
-  cursor: pointer;
-}
-
-/* Quieter, and narrower: the card-walk is the fuller answer and
-   should read as the main one. Not a colour-only distinction --
-   the border and the width differ too (1.4.1). */
-.cap-result__log {
-  flex: none;
-  min-height: 52px;
-  padding: 0 var(--space-3);
-  border: 1px dashed var(--color-border);
-  border-radius: var(--radius-md, 8px);
-  background: none;
-  color: var(--color-text-muted);
-  font-family: inherit;
-  font-size: var(--text-sm);
-  cursor: pointer;
-}
-
-.cap-result__name:focus-visible,
-.cap-result__log:focus-visible,
-.cap-area:focus-visible,
-.cap-done__remove:focus-visible {
-  outline: 3px solid var(--color-focus, var(--color-primary));
-  outline-offset: 2px;
-}
-
-.cap-areas {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-}
-
+.cap-areas { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: var(--space-2); }
 .cap-area {
   min-height: 48px;
   padding: 0 var(--space-4);
@@ -114,50 +206,17 @@
   font-size: var(--text-sm);
   cursor: pointer;
 }
+/* CAPTURE-2. Selected: aria-pressed for a screen reader, border and
+   weight for everyone else -- never colour alone. */
+.cap-area.is-selected { border-color: var(--color-primary); border-width: 2px; color: var(--color-primary); font-weight: var(--font-semibold); }
 
-.cap-done__row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-2);
-  min-height: 48px;
-  padding: var(--space-2) 0;
-  border-bottom: 1px solid var(--color-border);
-  font-size: var(--text-base);
-  color: var(--color-text);
+.fs-bar__exit:focus-visible, .fs-bar__finish:focus-visible, .fs-where__change:focus-visible,
+.fs-step:focus-visible, .fs-field__input:focus-visible, .fs-pick__btn:focus-visible,
+.cap-search:focus-visible, .cap-area:focus-visible, .fs-how summary:focus-visible, .fs-kind summary:focus-visible {
+  outline: 3px solid var(--color-border-focus, var(--color-primary));
+  outline-offset: 2px;
 }
-
-.cap-done__remove {
-  min-height: 44px;
-  padding: 0 var(--space-2);
-  border: none;
-  background: none;
-  color: var(--color-primary);
-  font-family: inherit;
-  font-size: var(--text-sm);
-  cursor: pointer;
-}
-
-.cap-empty, .cap-empty-note {
-  margin: var(--space-4) 0;
-  font-size: var(--text-sm);
-  line-height: 1.5;
-  color: var(--color-text-muted);
-}
-
-#cap-finish { margin-top: var(--space-5); }
 
 @media (prefers-contrast: more) {
-  .cap-search, .cap-result__name, .cap-result__log, .cap-area { border-width: 2px; }
-}
-
-/* CAPTURE-2, 16 Sep 2026. The optional "what was this" answer, shown
-   selected. A pressed chip, not a checkbox: aria-pressed carries the
-   state for a screen reader and the border and weight carry it for
-   everyone else, so it is never colour alone (1.4.1). */
-.cap-area.is-selected {
-  border-color: var(--color-primary);
-  border-width: 2px;
-  color: var(--color-primary);
-  font-weight: var(--font-semibold);
+  .cap-search, .cap-area, .fs-step, .fs-field__input, .fs-pick__btn { border-width: 2px; }
 }

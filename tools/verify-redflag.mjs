@@ -1,6 +1,9 @@
 /**
  * tools/verify-redflag.mjs
- * 28 Sep 2026 v1
+ * 28 Sep 2026 v2
+ *
+ * v2 - SMOOTH-P3c. Twelve exercise routes: 'capture' (Make it up as I
+ *   go) joins. 2a counts twelve and drives every one.
  *
  * RED-FLAG. The "before you start" safety screen and its hard stop,
  * built as approved (Graeme, 28 Sep: "Continue as if approved").
@@ -91,7 +94,7 @@ ok("1d. fibromyalgia is pain: asked", await go("workout") === "red-flag");
 console.log("\nTEST 2 - every way into exercise goes through it; breathing does not");
 const missed = [];
 for (const r of RF.EXERTIONAL_ROUTES) { fixture({ conditions: ["lower-back"] }); if (await go(r) !== "red-flag") missed.push(r); }
-ok("2a. all eleven exercise routes are guarded", RF.EXERTIONAL_ROUTES.size === 11 && missed.length === 0, missed.join(", "));
+ok("2a. all twelve exercise routes are guarded", RF.EXERTIONAL_ROUTES.size === 12 && RF.EXERTIONAL_ROUTES.has("capture") && missed.length === 0, missed.join(", "));
 for (const r of ["quiet-session", "breathing-session", "practices", "noticing", "journal-entry"]) {
   fixture({ conditions: ["lower-back"] });
   ok(`2b. ${r} is not exercise and is never stopped`, await go(r) === r);

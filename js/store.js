@@ -2,7 +2,16 @@ import { zonesForAreas } from "./data/aims.js";
 
 /**
  * store.js - Data persistence layer
- * 28 Sep 2026 v76
+ * 28 Sep 2026 v77
+ *
+ * v77 - SMOOTH-P3c. activityLog entries of type "freestyle" (Make it up
+ *   as I go) are new. No new field. One rule in logActivity(): a session
+ *   the person put together themselves -- "freestyle", and CAPTURE-1's
+ *   "capture" -- never INHERITS a sessionType from lastFinishedSession or
+ *   generatedSession. Its type is what they said, or nothing. Before
+ *   this, a freestyle session with no kind given would have been stamped
+ *   with whatever the builder last made -- the coach claiming a kind of
+ *   work nobody declared.
  *
  * v76 - SMOOTH-P3a. activeSessionCheckpoint declared. session-resume.js
  *   has written it since 03 Aug (running-session pilot) and it survived
@@ -3076,6 +3085,8 @@ export const store = {
     // knows better than the store should not be overruled by it.
     const _inferredType = (() => {
       if (entry.sessionType) return entry.sessionType;
+      // v77. Put together by the person: stated or nothing, never inferred.
+      if (entry.type === 'freestyle' || entry.type === 'capture') return null;
       try {
         const fin = this.get('lastFinishedSession');
         if (fin && fin.session && fin.session.sessionType) return fin.session.sessionType;

@@ -1,6 +1,17 @@
 /**
  * tools/verify-capture.mjs
- * 28 Sep 2026 v2
+ * 28 Sep 2026 v3
+ *
+ * v3 - SMOOTH-P3c. capture.js v2 is "Make it up as I go": sets are logged
+ *   on the move card itself, so there is no longer a player to walk a
+ *   move through. TEST 2's two targets per result ("walk the card" /
+ *   "just log it") therefore RETIRE; what they protected -- no mode, a
+ *   choice made per move in the moment -- is kept as 2.1-2.3: one tap
+ *   picks the move, the how-to is folded into its card, no mode toggle.
+ *   TEST 3's recents now come from the lift log and the exercise history
+ *   and are kit-filtered (heading "Recently"); every property is kept.
+ *   TEST 4b's anchors follow the new markup. Behaviour is driven in
+ *   verify-freestyle.
  *
  * v2 - SMOOTH-P3a. The Your own room left Plan Home; capture is now the
  *   third door, "Make it up as I go". 5.2 finds that door and its route;
@@ -46,7 +57,10 @@ const { EXERCISES } = await import(B + "data/exercises/index.js");
 const { HURT_AND_ACHE_VERSION } = await import(B + "exercise-card.js");
 const cap = await import(B + "views/capture.js");
 
-const EX = EXERCISES[0];
+// v3: recents are kit-filtered and this fixture declares no kit, so the
+// fixture moves are bodyweight ones.
+const BW = EXERCISES.filter(e => !(e.equipment || []).length);
+const EX = BW[0];
 const acked = () => Array.from({ length: 5 }, () => ({
   at: new Date().toISOString(), textVersion: HURT_AND_ACHE_VERSION, surface: "fixture"
 }));
@@ -80,20 +94,15 @@ console.log("\nTEST 1 — the safety gate stands before the first movement");
      /id="cap-search"/.test(cap.render()));
 }
 
-console.log("\nTEST 2 — two targets per result, not a mode");
+console.log("\nTEST 2 — one tap picks a move; no mode");
 {
   reset();
   store.set("exerciseHistory", { [EX.id]: { n: 1, last: new Date().toISOString() } });
   const h = cap.render();
-  ok("2.1 the name walks the card", /data-walk="/.test(h));
-  ok("2.2 and a separate control just logs it", /data-log="/.test(h));
-  ok("2.3 BOTH on the same row", (() => {
-    const m = h.match(/<li class="cap-result">[\s\S]*?<\/li>/);
-    return m && /data-walk=/.test(m[0]) && /data-log=/.test(m[0]);
-  })(), "the choice is per exercise and belongs in the moment; a mode would " +
-        "put a decision in front of somebody already standing at the machine");
-
+  ok("2.1 a result is one button that picks the move", new RegExp(`data-pick="${EX.id}"`).test(h));
   const src = fs.readFileSync(new URL("../js/views/capture.js", import.meta.url), "utf8");
+  ok("2.2 the how-to is folded into the move card, not a second screen",
+     /<details class="fs-how">/.test(src) && !/router\.navigate\("workout"\)/.test(src));
   ok("2.4 REVERSAL: there is no mode toggle anywhere",
      !/captureMode|data-mode=|setMode\(/.test(src),
      "a mode would satisfy 'capture exists' and fail the person at the machine");
@@ -106,7 +115,7 @@ console.log("\nTEST 3 — recents read the REAL shape of exerciseHistory");
   // have returned nothing for every user forever -- the same dead-branch
   // shape as STRETCH-WHY's two, caught by checking store.js.
   reset();
-  const a = EXERCISES[0], b = EXERCISES[1];
+  const a = BW[0], b = BW[1];
   store.set("exerciseHistory", {
     [a.id]: { n: 1, last: "2026-09-01T10:00:00.000Z" },
     [b.id]: { n: 1, last: "2026-09-15T10:00:00.000Z" }
@@ -118,13 +127,13 @@ console.log("\nTEST 3 — recents read the REAL shape of exerciseHistory");
      "next tap");
   ok("3.3 REVERSAL: an empty history shows no Recent heading", (() => {
     reset();
-    return !/Recent</.test(cap.render());
+    return !/>Recently</.test(cap.render());
   })(), "a heading over an empty list tells somebody the app expected " +
         "something of them that has not happened");
   ok("3.4 an id no longer in the library is dropped, not rendered blank", (() => {
     reset();
     store.set("exerciseHistory", { "gone-from-library": { n: 1, last: new Date().toISOString() } });
-    return !/Recent</.test(cap.render());
+    return !/>Recently</.test(cap.render());
   })());
 }
 
@@ -141,8 +150,11 @@ console.log("\nTEST 4 — it counts in full, through the ordinary path");
      /affectsAreas/.test(src),
      "without areas a captured session could only ever credit the capability " +
      "channel, and half of Graeme's arc would stay dark");
+  // v3: scoped to what is WRITTEN (saveSession). The ideas list asks the
+  // builder's pool for a full-body shape, which is a question, not a claim.
+  const saveSrc = src.slice(src.indexOf("export function saveFreestyle"), src.indexOf("function _end"));
   ok("4.4 sessionType is NOT invented for a captured session",
-     !/sessionType:\s*["'](core|full|upper|lower|stretch|mobility|cardio|glute)["']/.test(src),
+     saveSrc.length > 200 && !/sessionType:\s*["'](core|full|upper|lower|stretch|mobility|cardio|glute)["']/.test(saveSrc),
      "a captured set of movements is not one of the builder's eight types, " +
      "and claiming one would light an arc strand nothing earned");
 }
@@ -153,12 +165,12 @@ console.log("\nTEST 4b — CAPTURE-2: asking is not inventing");
   const src = fs.readFileSync(new URL("../js/views/capture.js", import.meta.url), "utf8");
 
   ok("4b.1 the kind question exists and is optional",
-     /What was this, roughly\?/.test(src) && /Optional\./.test(src),
+     /What was this, roughly\?/.test(src) && /Optional</.test(src),
      "CAPTURE-1 credited the body channel only, so a captured session could " +
      "never light a capability strand -- 18 of the 30 in the library");
 
   ok("4b.2 it is asked LAST, after the movements", (() => {
-    return src.indexOf("So far today") < src.indexOf("What was this, roughly?");
+    return src.indexOf('class="fs-next"') > -1 && src.indexOf('class="fs-next"') < src.lastIndexOf("What was this, roughly?");
   })(), "somebody cannot say what a session was before they have done it, and " +
         "asking first turns a picker into a form");
 
@@ -167,14 +179,15 @@ console.log("\nTEST 4b — CAPTURE-2: asking is not inventing");
      "absent otherwise, exactly as CAPTURE-1 shipped it -- nothing claims a " +
      "kind of work that was never declared");
 
+  const saveSrc4 = src.slice(src.indexOf("export function saveFreestyle"), src.indexOf("function _end"));
   ok("4b.4 REVERSAL: nothing infers a kind from the movements",
-     !/sessionType:\s*["'](core|full|upper|lower|stretch|mobility|cardio|glute)["']/.test(src),
+     saveSrc4.length > 200 && !/sessionType:\s*["'](core|full|upper|lower|stretch|mobility|cardio|glute)["']/.test(saveSrc4),
      "inferring would light an arc strand on a guess; asking makes the answer " +
      "the person's, which is the same stated-not-inferred rule this app " +
      "applies everywhere else");
 
   ok("4b.5 an answer given by accident can be taken back",
-     /kind === k\.dataset\.kind\) \? null :/.test(src),
+     /kind === k\.dataset\.kind \? null :/.test(src),
      "otherwise the only way out of a mis-tap is to leave and start again");
 
   ok("4b.6 the state is carried for a screen reader, not by colour",

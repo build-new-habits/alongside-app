@@ -1,5 +1,8 @@
 /**
  * tools/verify-write1.mjs
+ * 28 Sep 2026 v3
+ * SMOOTH-P3c. liftLog leaves the baseline: capture.js v2 reads it.
+ *
  * 22 Aug 2026 v2
  * WEIGHT-1a, 22 Aug 2026. `weightTracking` added — declared dark, writer
  * lands with WEIGHT-1b. Dated promise, not permission. See the note at
@@ -150,7 +153,9 @@ const BASELINE = new Set([
   'trainingIntent','exerciseClearance','lifestyle','gymProgrammeWeek','liftLogEnabled',
   'mindfulPromptFrequency','speechRate','checkInNotification','noticingWeekInCycle',
   'journalSettings','waterReminderEnabled','lastWaterReminder','community',
-  'liftLog','personalBests','updatedAt',
+  // liftLog removed 28 Sep: SMOOTH-P3c reads it directly (capture.js v2,
+  // what you usually do next and what you did recently).
+  'personalBests','updatedAt',
   // weekFocus removed 17 Aug: CHAP-1 step 4 connected it. This is the
   // gate working as intended — the baseline shrinks as fields are fixed,
   // and it insists on being pruned rather than drifting out of date.

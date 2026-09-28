@@ -1,6 +1,8 @@
 /**
  * tools/verify-card4.mjs
- * 28 Sep 2026 v2
+ * 28 Sep 2026 v3
+ *
+ * v3 - SMOOTH-P3c. capture.js joins PARTIAL (borrows hurtBlock only).
  *
  * v2 - SMOOTH-P2c. workout.js moved to one screen per exercise (spec
  *   4.4, exercise-card.js layout "flow"). Tests 7 and 8 keep the page
@@ -458,7 +460,10 @@ console.log("\nTEST 11 — the players, and that there are exactly four of them"
   // away the tripwire that produced this fix.
   const FULL    = ["core-session.js", "gym-programme.js",
                    "prescribed-session.js", "workout.js"];
-  const PARTIAL = ["morning-session.js"];
+  // SMOOTH-P3c, 28 Sep 2026. capture.js ("Make it up as I go") borrows
+  // hurtBlock() for its move card, as morning-session.js does, and does
+  // not use renderExerciseCard(): its card is sets on one screen.
+  const PARTIAL = ["capture.js", "morning-session.js"];
   const EXPECTED = [...FULL, ...PARTIAL].sort();
 
   ok("11.0 CONTROL: " + files.length + " view files scanned, more than the four",

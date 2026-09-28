@@ -1,6 +1,9 @@
 /**
  * router.js
- * 28 Sep 2026 v32
+ * 28 Sep 2026 v33
+ *
+ * v33 - SMOOTH-P3c. 'capture' (Make it up as I go) is a session now: the
+ *   nav hides while it runs, like the player, and it maps to Home.
  *
  * v32 - SMOOTH-P3b. 'know-what' registered ("I know what I want", Plan
  *   Home's second door), mapped to the Home tab. Not a session, so not
@@ -393,6 +396,8 @@ const hideNavViews = new Set([
   'practices',
   // RED-FLAG. Nothing else on the screen while this is read.
   'red-flag',
+  // SMOOTH-P3c. A session in progress, with its own Exit and Finish.
+  'capture',
 ]);
 
 const NAV_MAP = {
@@ -427,6 +432,7 @@ const NAV_MAP = {
   'saved-sessions': 'today',
   // SMOOTH-P3b. A Home door, so the Home tab stays lit.
   'know-what': 'today',
+  'capture': 'today',
   // PRAC-1. Reached from the Library, which maps to Today. Mapping it
   // to Wellbeing would repeat the NAV-8 fault from the other side --
   // the tab would disagree with the door somebody came through.
