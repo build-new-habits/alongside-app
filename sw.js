@@ -1,7 +1,12 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 28 Sep 2026 v550
+ * 28 Sep 2026 v551
+ *
+ * v551 - SMOOTH-P3c. No new files. Changed: views/capture.js,
+ *   components/capture.css, store.js, router.js, data/red-flag.js.
+ *   Make it up as I go. New gates: verify-freestyle, verify-taps.
+ *   184 gates.
  *
  * v550 - SMOOTH-P3a + P3b. NEW FILES precached: js/views/know-what.js,
  *   css/components/know-what.css. Changed: today.js, workout.js,
@@ -3952,7 +3957,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v550";
+const CACHE_NAME = "alongside-v551";
 
 const SHELL_URLS = [
 
