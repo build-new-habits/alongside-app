@@ -1,7 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 29 Sep 2026 v577
+ * 29 Sep 2026 v578
+ *
+ * v578 - P10 FINISH-LINES. New: tools/verify-finish-lines.mjs. Changed:
+ *   reflect, data/empathy-transfer, session-builder-ui. 205 gates.
  *
  * v577 - P9 PLAN-SENTENCES. New: tools/verify-plan-sentences.mjs.
  *   Changed: session-builder.js. 204 gates.
@@ -4059,7 +4062,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v577";
+const CACHE_NAME = "alongside-v578";
 
 const SHELL_URLS = [
 
