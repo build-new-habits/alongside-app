@@ -1,5 +1,11 @@
 /**
  * checkin.js
+ * 29 Sep 2026 v9
+ *
+ * v9 - P13. saveCheckin() ends by running store.lapseQuietSoreAreas():
+ *   an area tapped once at a check-in leaves the list after three quiet
+ *   check-ins on consecutive days. verify-sore-lapse.
+ *
  * 28 Sep 2026 v8
  *
  * v8 - FEELINGS-RETIRE. saveCheckin() stores no feeling word or quadrant.
@@ -310,6 +316,10 @@ export function saveCheckin(data) {
     unwell:          data.unwell          || false,
     completed:       true,
   });
+
+  // P13. With today's answers saved, an area tapped once at a check-in
+  // and quiet for three days running leaves the list.
+  store.lapseQuietSoreAreas();
 }
 
 // ─── Quadrant derivation ──────────────────────────────────────────────────────

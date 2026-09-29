@@ -1,5 +1,13 @@
 /**
  * tools/verify-hard1b.mjs
+ * 29 Sep 2026 v3
+ *
+ * v3 - P13 (store v83). Scores now carry the day they were given, and
+ *   stored scores from another day -- or with no day -- are cleared on
+ *   load. The pain fixtures wrote scores with no day, so the load rightly
+ *   dropped them. They now write what the app writes: today's scores,
+ *   dated today. No assertion changed.
+ *
  * 22 Aug 2026 v2
  * THREAD-1a. The three options moved OFF this screen into the
  * conversation at views/goal-review-thread.js. What this gate now
@@ -65,6 +73,7 @@ const iso = d => new Date(Date.now() + d * 86400000).toISOString();
 const day = d => iso(d).slice(0, 10);
 
 /** Off-course state: matured, date well out, rate under the floor. */
+const LOCAL_TODAY = (d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`)(new Date());
 function offCourseState(tier = "personal", over = {}) {
   const log = [];
   for (let i = 0; i < 5; i++) {
@@ -196,7 +205,7 @@ section("4. Suppression is visible where it matters — the screen");
   const cases = [
     ["burnout high", { checkinHistory: Object.fromEntries(
         Array.from({ length: 5 }, (_, i) => [day(-i), { mood: 2, energy: 2 }])) }],
-    ["severe pain", { conditionPainScores: { "low-back-pain": 8 } }],
+    ["severe pain", { conditionPainScores: { "low-back-pain": 8 }, conditionPainScoresOn: LOCAL_TODAY }],
     ["care opening", { checkin: { lastOpeningMode: "care" } }],
     ["bottom band", { checkinHistory: { [day(0)]: { mood: 3, energy: 7 } } }]
   ];
@@ -208,14 +217,14 @@ section("4. Suppression is visible where it matters — the screen");
 
   // ...and the target itself is still shown. Suppression silences the
   // CONVERSATION, never the person's own goal.
-  const { el } = await mount(offCourseState("personal", { conditionPainScores: { x: 9 } }));
+  const { el } = await mount(offCourseState("personal", { conditionPainScores: { x: 9 }, conditionPainScoresOn: LOCAL_TODAY }));
   ok("the target is still displayed while suppressed", txt(el).includes("Quantocks"));
 }
 
 // ── 5. Suppression never consumes the throttle ──────────────────────
 section("5. A suppressed offer leaves the throttle untouched");
 {
-  const { store } = await mount(offCourseState("personal", { conditionPainScores: { x: 9 } }));
+  const { store } = await mount(offCourseState("personal", { conditionPainScores: { x: 9 }, conditionPainScoresOn: LOCAL_TODAY }));
   ok("lastOfferedAt still null after a suppressed render",
      store.get("strategicGoal.review").lastOfferedAt === null,
      String(store.get("strategicGoal.review").lastOfferedAt));
