@@ -1,7 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 29 Sep 2026 v567
+ * 29 Sep 2026 v568
+ *
+ * v568 - P0h LIBRARY WORDING. No new files. Changed: eleven
+ *   exercise library files (148 lines, four names). 195 gates.
  *
  * v567 - P0 SCOPE-MINOR. New: js/data/scope-statement.js. Removed:
  *   views/conditions-update.js, data/conditionProgrammes.js,
@@ -4026,7 +4029,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v567";
+const CACHE_NAME = "alongside-v568";
 
 const SHELL_URLS = [
 
