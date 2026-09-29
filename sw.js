@@ -1,7 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 29 Sep 2026 v582
+ * 29 Sep 2026 v583
+ *
+ * v583 - P15. Balance "No" no longer means no squats
+ *   (store v84, onboarding-thread-data v17).
  *
  * v582 - P14. The check-in asks three questions (checkin v24);
  *   Settings holds session variety (settings v44).
@@ -4075,7 +4078,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v582";
+const CACHE_NAME = "alongside-v583";
 
 const SHELL_URLS = [
 
