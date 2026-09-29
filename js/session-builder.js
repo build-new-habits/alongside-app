@@ -1,7 +1,14 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
- * 29 Sep 2026 v63
+ * 29 Sep 2026 v64
+ *
+ * v64 - P24, DOSE (persona finding W2-20). _writtenDose() reads the other
+ *   ways the library writes a dose ("Complete 10 reps each side, 3 sets",
+ *   "then switch sides", "Take 10 steps right, then 10 steps left" with
+ *   "Complete 3 sets", "3 sets of each", "Hold for 30 to 60 seconds").
+ *   35 entries got 3 x 10 on top of their own dose; all 102 that state
+ *   one now keep it. What the words leave out keeps the default.
  *
  * v63 - P19, "MOSTLY THE SAME" (persona finding W2-14). Four changes, all
  *   in selection:
@@ -2320,9 +2327,9 @@ export function exerciseSeconds(ex) {
  * line first. Returns { sets, reps, side } or null.
  */
 function _writtenDose(ex) {
-  const lines = Array.isArray(ex?.instructions) ? [...ex.instructions].reverse() : [];
+  const lines = Array.isArray(ex?.instructions) ? [...ex.instructions].map(String).reverse() : [];
   for (const line of lines) {
-    const m = String(line).match(/(\d+)\s+sets?\s+of\s+(\d+(?:\s*(?:\u2013|-|to)\s*\d+)?)\s*(reps?|repetitions|seconds?|secs?)?\s*(each\s+(?:side|leg|arm))?/i);
+    const m = line.match(/(\d+)\s+sets?\s+of\s+(\d+(?:\s*(?:\u2013|-|to)\s*\d+)?)\s*(reps?|repetitions|seconds?|secs?)?\s*(each\s+(?:side|leg|arm))?/i);
     if (!m) continue;
     const sets = parseInt(m[1], 10);
     if (!(sets > 0 && sets <= 6)) continue;
@@ -2331,7 +2338,44 @@ function _writtenDose(ex) {
     const side  = m[4] ? ` ${m[4].toLowerCase().replace(/\s+/g, " ")}` : "";
     return { sets, reps: `${range}${unit}`, side };
   }
-  return null;
+
+  // P24, 29 Sep 2026. The other ways the library writes a dose. 35 counted
+  // strength entries said it in words the line above does not read, and
+  // got 3 x 10 on top of their own: "Complete 10 reps each side, 3 sets",
+  // "Complete 15 reps each side", "Complete 10 reps on the right, then 10
+  // on the left", "Take 10 steps right, then 10 steps left -- that is one
+  // set" + "Complete 3 sets", "Hold for 30 to 60 seconds". Read from the
+  // last lines first, sets and reps separately; whatever is not said keeps
+  // the default (withDefaultDose).
+  const RANGE = "(\\d+(?:\\s*(?:\\u2013|-|to)\\s*\\d+)?)";
+  const norm  = r => r.replace(/\s*(?:\u2013|-|to)\s*/, "\u2013");
+  const all   = lines.join(" | ");
+  let sets = null, reps = null, side = "", hold = null;
+  for (const line of lines) {
+    if (sets === null) {
+      const m = line.match(/\b(\d)\s+sets?\b/i);
+      if (m && +m[1] > 0 && +m[1] <= 6) sets = +m[1];
+    }
+    if (reps === null) {
+      const m = line.match(new RegExp(`(?:complete|repeat for)\\s+${RANGE}\\s+(?:slow\\s+|full\\s+)?(?:reps?|repetitions|swings|steps|figure-8 patterns|patterns)\\b`, "i"))
+             || line.match(new RegExp(`\\btake\\s+${RANGE}\\s+steps\\b`, "i"))
+             || line.match(new RegExp(`\\b${RANGE}\\s+reps?\\b`, "i"));
+      if (m) {
+        reps = norm(m[1]);
+        const each = line.match(/\beach\s+(side|leg|arm|direction|way)\b/i);
+        if (each) side = ` each ${each[1].toLowerCase()}`;
+        else if (/then switch sides|on the right, then \d+ on the left|right, then \d+ steps left/i.test(line)) side = " each side";
+      }
+    }
+    if (hold === null) {
+      const h = line.match(/\bhold for (\d+)(?:\s*(?:\u2013|-|to)\s*(\d+))?\s+seconds\b/i);
+      if (h && +(h[2] || h[1]) >= 10) hold = { lo: +h[1], hi: h[2] ? +h[2] : null };
+    }
+  }
+  if (reps !== null && !side && /sets? of each\b/i.test(all)) side = " of each";
+  if (reps === null && hold) return { sets, reps: hold.hi ? `${hold.lo}\u2013${hold.hi} seconds` : `${hold.lo} seconds`, side: "", holdSeconds: hold.hi || hold.lo };
+  if (reps === null && sets === null) return null;
+  return { sets, reps, side };
 }
 
 /** Whole-exercise time for a dosed move: the work, and a rest between sets. */
@@ -2370,11 +2414,15 @@ export function withDefaultDose(ex, intensity) {
   // answers on one screen. A gentle day still takes a set off.
   const written = _writtenDose(ex);
   if (written) {
-    const wsets = level === "low" ? Math.max(2, written.sets - 1) : written.sets;
-    const wside = written.side || (ex.perSide && /^[\d\u2013-]+$/.test(written.reps) ? " each side" : "");
+    // P24. Whatever the words leave out keeps the default: sets by the
+    // day, reps 10; a single hold with no sets is done once.
+    const base  = written.sets ?? (written.holdSeconds ? 1 : (level === "low" ? 2 : 3));
+    const wsets = written.sets == null ? base : (level === "low" ? Math.max(2, written.sets - 1) : written.sets);
+    const wreps = written.reps ?? (level === "high" ? "8\u201312" : "10");
+    const wside = written.side || (ex.perSide && /^[\d\u2013-]+$/.test(wreps) ? " each side" : "");
     const rest  = Number(ex.rest) > 0 ? Number(ex.rest) : 60;
-    const work  = 10 * 4 * (wside ? 2 : 1);
-    return { ...ex, sets: wsets, reps: `${written.reps}${wside}`, rest,
+    const work  = written.holdSeconds ? written.holdSeconds * (wside ? 2 : 1) : 10 * 4 * (wside ? 2 : 1);
+    return { ...ex, sets: wsets, reps: `${wreps}${wside}`, rest,
              duration: _doseSeconds(wsets, work, rest), _doseWork: work,
              _defaultDose: true, _doseFrom: "instructions" };
   }

@@ -1,5 +1,11 @@
 /**
  * tools/verify-dead-generator.mjs
+ * 29 Sep 2026 v2
+ *
+ * v2 - P24. Settings is a third reader of the time windows ("How long
+ *   you usually have"). 2b names it; the rule -- every reader imports the
+ *   one constant from data/time-windows.js -- is unchanged.
+ *
  * 28 Sep 2026 v1
  *
  * Work list 2e. DEAD-GATES, retired and re-pointed.
@@ -82,8 +88,8 @@ ok("2a. js/data/time-windows.js exports the same six windows",
    JSON.stringify(TW.AVAILABLE_TIME_WINDOW_MINUTES) === JSON.stringify({ micro: 10, quick: 20, short: 30, standard: 40, long: 50, open: 60 }),
    JSON.stringify(TW.AVAILABLE_TIME_WINDOW_MINUTES));
 const readers = JS.filter(f => /\bAVAILABLE_TIME_WINDOW_MINUTES\b/.test(strip(read(f))) && f !== "js/data/time-windows.js");
-ok("2b. both live readers import it from there",
-   readers.sort().join(",") === "js/views/coach-proposal.js,js/views/know-what.js" &&
+ok("2b. every live reader imports it from there",
+   readers.sort().join(",") === "js/views/coach-proposal.js,js/views/know-what.js,js/views/settings.js" &&
    readers.every(f => /import\s*\{[^}]*AVAILABLE_TIME_WINDOW_MINUTES[^}]*\}\s*from\s*['"]\.\.\/data\/time-windows\.js['"]/.test(read(f))),
    readers.join(", "));
 

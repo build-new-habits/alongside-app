@@ -1,6 +1,14 @@
 /**
  * yoga-session.js
- * 29 Sep 2026 v10
+ * 29 Sep 2026 v11
+ *
+ * v11 - P24, LENGTH (persona finding W2-20). The length cards said
+ *   "20 min · 5 poses"; poses hold 45-60 seconds, so that was about five
+ *   minutes, and fewer poses when a style had fewer that fit. Each card
+ *   now says what its session is -- "About 5 min · 5 poses" -- from the
+ *   session built for it before the card is shown, and plays exactly
+ *   that one. A card that would repeat the one before (the style ran out
+ *   of poses) is not shown. yogaSessionSeconds() is the one sum.
  *
  * v10 - P17, MOBILITY DOOR (persona finding W2-12). The pose pool now
  *   passes the builder's personFilter() -- equipment, floor, balance,
@@ -520,6 +528,23 @@ const EXERCISE_POOLS = {
 
 const EXERCISE_COUNT = { 20: 5, 30: 7, 45: 10 };
 
+/**
+ * P24. How long a list of poses takes: each hold, and the rest between
+ * poses (none after the last). The one sum behind every length the view
+ * states, so a label cannot say something the session is not.
+ */
+export function yogaSessionSeconds(poses) {
+  const list = Array.isArray(poses) ? poses : [];
+  return list.reduce((t, p, i) => t + (Number(p.holdSeconds) || 0) + (i < list.length - 1 ? (Number(p.rest) || 0) : 0), 0);
+}
+const _aboutMins = poses => `About ${Math.max(1, Math.round(yogaSessionSeconds(poses) / 60))} min`;
+/** The session being offered or played, for the one sum above. */
+export function currentSessionSeconds() { return yogaSessionSeconds(sessionQueue); }
+
+// P24. The sessions offered on the length cards, built when the style is
+// chosen, so each card says what it is and plays exactly that.
+let _offered = {};
+
 // ── Session builder ───────────────────────────────────────────────────────────
 
 /**
@@ -682,14 +707,14 @@ function renderSessionOverview() {
         <button class="btn btn-ghost" id="ys-back-btn" aria-label="Back to duration">
           \u2190 Back
         </button>
-        <h1 class="workout-header-title">${focus?.label || "Yoga"} \u2014 ${selectedMins} min</h1>
+        <h1 class="workout-header-title">${focus?.label || "Yoga"} \u2014 ${_aboutMins(sessionQueue)}</h1>
       </div>
 
       <div class="card card-coach" style="margin-bottom: var(--space-4);">
         <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
         <p class="coach-message-text">${focus?.coachIntro || "Your session is ready."}</p>
         <p class="text-sm text-muted" style="margin-top: var(--space-2);">
-          ${sessionQueue.length} poses. Work through them in order, or take your time with any that feel right to linger on.
+          ${_aboutMins(sessionQueue)} · ${sessionQueue.length} poses. Work through them in order, or take your time with any that feel right to linger on.
         </p>
       </div>
 
@@ -734,6 +759,21 @@ function renderSessionOverview() {
   `;
 }
 
+/**
+ * P24. One card per distinct session: when a style runs out of poses the
+ * longer lengths build the same list, and two cards offering one session
+ * under different names is the fault this replaces.
+ */
+function _offeredCards() {
+  const out = [];
+  for (const d of DURATIONS) {
+    const poses = _offered[d.mins] || (_offered[d.mins] = buildSession(selectedFocus, d.mins, selectedTarget));
+    if (out.length && out[out.length - 1].poses.length >= poses.length) continue;
+    out.push({ d, poses });
+  }
+  return out;
+}
+
 function renderDurationSelector() {
   const focus = FOCUS_TYPES.find(f => f.id === selectedFocus);
   return `
@@ -749,13 +789,13 @@ function renderDurationSelector() {
       </div>
 
       <div class="cs-duration-grid" role="group" aria-label="Choose session duration">
-        ${DURATIONS.map(d => `
+        ${_offeredCards().map(({ d, poses }) => `
           <button class="cs-duration-card" data-mins="${d.mins}"
-                  aria-label="${d.label}: ${d.description}">
-            <span class="cs-duration-label">${d.label}</span>
+                  aria-label="${_aboutMins(poses)}, ${poses.length} poses: ${d.description}">
+            <span class="cs-duration-label">${_aboutMins(poses)}</span>
             <span class="cs-duration-desc">${d.description}</span>
             <span class="cs-duration-count text-xs text-muted">
-              ${EXERCISE_COUNT[d.mins]} poses
+              ${poses.length} pose${poses.length === 1 ? "" : "s"}
             </span>
           </button>
         `).join("")}
@@ -1437,6 +1477,7 @@ export function onMount() {
       // unanswered optional question is an answer, not a blocker. The
       // person is trying to start a stretch session, not fill a form.
       if (selectedTarget === null) selectedTarget = "all";
+      _offered = {};   // P24: built fresh for this style and target
       phase = "duration";
       rerender();
     });
@@ -1466,7 +1507,8 @@ export function onMount() {
   document.querySelectorAll(".cs-duration-card").forEach(btn => {
     btn.addEventListener("click", () => {
       selectedMins = parseInt(btn.dataset.mins);
-      sessionQueue = buildSession(selectedFocus, selectedMins, selectedTarget);
+      // P24. Exactly the session the card described.
+      sessionQueue = _offered[selectedMins] || buildSession(selectedFocus, selectedMins, selectedTarget);
       currentIndex = 0;
       creditsEarned = 0;
       timeRemaining = 0;

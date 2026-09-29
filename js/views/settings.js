@@ -1,6 +1,13 @@
 /**
  * settings.js
- * 29 Sep 2026 v45
+ * 29 Sep 2026 v46
+ *
+ * v46 - P24, LENGTH (persona finding W2-20). Nothing asked how long a
+ *   session somebody has: the plan assumed 30 minutes and its Length
+ *   control cycles through six values. "How long you usually have", a
+ *   real choice beside "How much sessions change"; it writes availableTime,
+ *   the value the plan starts from; the plan's Length writes the same
+ *   value, and the hint says so. Onboarding is not made longer for it.
  *
  * v45 - P19, "MOSTLY THE SAME". The option's hint said "About two thirds of
  *   a session repeats from the last one"; the setting now holds the warm-
@@ -527,6 +534,7 @@
  *   role="separator". All chips minimum 44px touch target.
  */
 
+import { AVAILABLE_TIME_WINDOW_MINUTES } from '../data/time-windows.js';
 import { store }          from '../store.js';
 import { isPremium }      from '../auth.js';
 import { toKg, fromKg } from '../data/weight-targets.js';
@@ -761,6 +769,7 @@ export function SettingsView(router) {
 
       ${_group('How the coach works', [
         _row({ label: 'How much sessions change', value: _label(VARIETY, store.get('sessionVariety') || 'balanced', 'A bit of both'), open: 'preferences', focus: '#settings-pref-variety' }),
+        _row({ label: 'How long you usually have', value: `${AVAILABLE_TIME_WINDOW_MINUTES[store.get('availableTime')] ?? 30} minutes`, open: 'preferences', focus: '#settings-usual-length' }),
         _row({ label: 'Exercises you asked to change', value: prefs ? String(prefs) : 'None', open: 'preferences' }),
         _rowSwitch({ id: 'settings-lift-log', label: 'Session notes', sub: 'Note what you did on each exercise.', field: 'liftLogEnabled' }),
         _rowSwitch({ id: 'settings-pb', label: 'Show your best', sub: 'Beside your last note. Off unless you want it.', field: 'showPersonalBests' }),
@@ -1127,6 +1136,20 @@ export function SettingsView(router) {
             ${_esc(VARIETY_OPTIONS.find(o => o.id === variety)?.hint || '')}
           </p>
         </fieldset>
+
+        <!-- P24. The length the coach's plan starts from. -->
+        <div class="settings-field">
+          <label class="settings-label" for="settings-usual-length">How long you usually have</label>
+          <p class="settings-section__sub" id="usual-length-hint">
+            The coach's plan starts from this. Changing Length on the plan changes it here too.
+          </p>
+          <select class="settings-select" id="settings-usual-length" data-field="availableTime"
+                  aria-describedby="usual-length-hint">
+            ${Object.entries(AVAILABLE_TIME_WINDOW_MINUTES).map(([id, mins]) => `
+              <option value="${id}"${(store.get('availableTime') || 'short') === id ? ' selected' : ''}>${mins} minutes</option>
+            `).join('')}
+          </select>
+        </div>
 
         <div class="settings-field">
           <h3 class="settings-label">Exercises you have asked me to change</h3>

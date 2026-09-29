@@ -1,6 +1,11 @@
 /**
  * tools/verify-mobility-door.mjs
- * 29 Sep 2026 v1
+ * 29 Sep 2026 v2
+ *
+ * v2 - P24. Yoga no longer shows a length card that would repeat the one
+ *   before (a style that ran out of poses built the same list three times
+ *   under three lengths). "Every focus and length was walked" now asks for
+ *   at least one list per focus, which is every distinct session offered.
  *
  * P17, MOBILITY DOOR AND CORE SESSION (persona finding W2-12). "Start a
  * Mobility Session -- Yoga, Pilates, stretching, warmups" opened a Core
@@ -174,7 +179,7 @@ console.log("\nTEST 1 - \"Start a Mobility Session\" opens a mobility session");
 for (const [label, path, T] of [["core session", "views/core-session.js", "2"], ["yoga session", "views/yoga-session.js", "3"]]) {
   console.log(`\nTEST ${T} - the ${label}, for somebody seated, off the floor, with no kit`);
   const r = await sweep(path, true);
-  ok(`${T}pc. every focus and length was walked`, r.focuses.length >= 4 && r.lists >= 8, `${r.focuses.join(",")}; ${r.lists} lists, ${r.names} moves`);
+  ok(`${T}pc. every focus and length was walked`, r.focuses.length >= 4 && r.lists >= r.focuses.length, `${r.focuses.join(",")}; ${r.lists} lists, ${r.names} moves`);
   ok(`${T}pc2. every listed move is a library entry`, r.unknown.length === 0, r.unknown.join(", "));
   ok(`${T}a. nothing listed that the shared filters would keep from them`, r.bad.length === 0, `${r.bad.length}: ${r.bad.slice(0, 8).join("; ")}`);
   ok(`${T}a2. where nothing fits, it says so and offers another choice`, r.honest === r.empties.length, `${r.honest} of ${r.empties.length} empty lists: ${r.empties.join(",")}`);
@@ -185,7 +190,7 @@ for (const [label, path, T] of [["core session", "views/core-session.js", "2"], 
   ok(`${T}c. no kit and a balance worry (the persona's case): sessions, and none of them breaks the filters`,
      mid.names > 0 && mid.bad.length === 0, `${mid.names} moves; ${mid.bad.slice(0, 6).join("; ")}`);
   const o = await sweep(path, false);
-  ok(`${T}b. control: clear answers and a full kit, every list has moves`, o.lists >= 8 && o.empties.length === 0 && o.names > 0, `${o.lists} lists, empties ${o.empties.join(",")}`);
+  ok(`${T}b. control: clear answers and a full kit, every list has moves`, o.lists >= o.focuses.length && o.empties.length === 0 && o.names > 0, `${o.lists} lists, empties ${o.empties.join(",")}`);
 }
 
 console.log("");
