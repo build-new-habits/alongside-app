@@ -1,7 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 29 Sep 2026 v587
+ * 29 Sep 2026 v588
+ *
+ * v588 - P20. Coming back after a week is asked about on every tier
+ *   (programmeEngine v9, coach-proposal v39).
  *
  * v587 - P19. "Mostly the same" holds the warm-up, section and dose
  *   (session-builder v63, store v85, settings v45).
@@ -4090,7 +4093,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v587";
+const CACHE_NAME = "alongside-v588";
 
 const SHELL_URLS = [
 
