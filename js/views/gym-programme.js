@@ -1,6 +1,10 @@
 /**
  * gym-programme.js
- * 29 Sep 2026 v15
+ * 29 Sep 2026 v16
+ *
+ * v16 - P12. The programme badge ("Build Your Base · Week 2 · Session A")
+ *   is shown on the Plan only; on Free a leftover programme shapes
+ *   nothing, so naming its week was a claim. verify-free-programme.
  *
  * v15 - P3, FREE-BUILDER-UPGRADE (persona finding W2-3). A Free user with
  *   no programme ("Decide later" at onboarding) who built a session and
@@ -859,7 +863,7 @@ export function GymProgrammeView(router) {
                Week 0 of nothing, session B of no sequence.
                The badge now renders only when there is a genuine
                programme week to name. -->
-          ${Number(stats.currentWeek) > 0 ? `
+          ${Number(stats.currentWeek) > 0 && isPremium() ? `
             <div class="exercise-role-badge main" aria-label="${_esc(stats.programmeName || 'Gym programme')}">
               \uD83C\uDFCB ${_esc(stats.programmeName || 'Your programme')} \u00B7 Week ${stats.currentWeek} \u00B7 Session ${sessionType}
             </div>

@@ -1,6 +1,11 @@
 /**
  * progress.js
- * 29 Sep 2026 v20
+ * 29 Sep 2026 v21
+ *
+ * v21 - P12, FREE PROGRAMME. The programme block (weeks in, "4 of 3 this
+ *   week", milestones, a second session count) is the Plan's. On Free a
+ *   programme left over from an old onboarding shaped nothing, yet
+ *   Progress scored against it. Free has one count. verify-free-programme.
  *
  * v20 - P7. Types are named by the one label map (data/activity-labels.js):
  *   "mostly gym" and raw type words came from a map keyed on names
@@ -365,7 +370,7 @@ export function ProgressView(router) {
           ${renderActivitySummary(tier)}
           ${renderSessionsChart()}
           ${renderSessionShapes(tier)}
-          ${stats.hasActiveProgramme ? renderProgrammeProgress(stats) : ''}
+          ${stats.hasActiveProgramme && premium ? renderProgrammeProgress(stats) : ''}
           <!-- R4 / decision 7.2, 20 Aug 2026. Was:
                  tier === 'personal' ? renderExportBlock() : renderExportLocked()
                UK GDPR gives a right of access and portability regardless

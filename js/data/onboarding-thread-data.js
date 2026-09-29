@@ -1,6 +1,11 @@
 /**
  * js/data/onboarding-thread-data.js
- * 29 Sep 2026 v15
+ * 29 Sep 2026 v16
+ *
+ * v16 - P12, FREE PROGRAMME (Graeme's accepted recommendation, 28 Sep).
+ *   Step 13 -- the programme choice -- is shown on the Plan only. On Free a
+ *   programme shaped nothing, yet it was offered to everybody as "exactly
+ *   where I'd have started you". verify-free-programme.
  *
  * v15 - P11, ONBOARDING ECHOES (persona finding W2-10). Answers are said
  *   back in words: goals by their labels and sore areas by their names
@@ -766,6 +771,8 @@ export const STEPS = {
     id: 13,
     type: 'sheet',
     sheetView: 'onboarding/plan-select',
+    // P12. A programme is part of the Plan; on Free it shapes nothing.
+    showIf: (storeData) => storeData.tier === 'personal',
     storeField: 'activeProgramme',
     summaryType: 'programme',
     skipLabel: 'Decide later',

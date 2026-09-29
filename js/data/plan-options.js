@@ -1,6 +1,14 @@
 /**
  * js/data/plan-options.js
- * 06 Sep 2026 v2
+ * 29 Sep 2026 v3
+ *
+ * v3 - P12. The suggestion reads the person. It took the first programme
+ *   matching ANY goal in the library's own order, so somebody regularly
+ *   training who asked for strength and cardio was offered Couch to
+ *   Cardio. Now the programme for their FIRST goal leads, and the
+ *   beginner programmes lead for "Mostly sitting", "A little walking" and
+ *   "Coming back after a break" and follow for everybody else.
+ *   verify-free-programme.
  *
  * v2 - COMMIT-COPY. Three phrases on the picker, all off-voice.
  *
@@ -55,11 +63,30 @@ import { toEngineGoals }         from "./goals.js";
  *
  * @returns {Array<object>} three options, or [] if nothing matched
  */
+// P12. Programmes written for a first step back into moving.
+const BEGINNER = new Set(["beginner-fitness", "couch-to-cardio", "feel-good-foundation", "back-to-strength"]);
+const NEW_TO_IT = new Set(["sedentary", "light", "returning"]);
+
+function _serves(p, engineIds) {
+  return p.engineGoals ? p.engineGoals.some(g => engineIds.includes(g)) : (p.suitableFor || []).some(g => engineIds.includes(g));
+}
+
+/** First goal first; beginner programmes first only for people new to it. */
+function rankForPerson(programmes, goals) {
+  const level   = store.get("fitnessLevel") || (store.get("lifestyle") || {}).activityLevel || null;
+  const first   = toEngineGoals(goals.slice(0, 1));
+  const newToIt = level ? NEW_TO_IT.has(level) : true;
+  const score = p => (_serves(p, first) ? 2 : 0) + (BEGINNER.has(p.id) === newToIt ? 1 : 0);
+  return programmes.map((p, i) => ({ p, i, s: score(p) }))
+    .sort((a, b) => b.s - a.s || a.i - b.i)
+    .map(x => x.p);
+}
+
 export function buildPlanOptions() {
   const goals        = store.get("goals") || [];
   const weeklyTarget = store.get("strategicGoal.weeklySessionTarget") || 3;
   const engineGoals  = toEngineGoals(goals);
-  const programmes   = getProgrammesForGoals(engineGoals);
+  const programmes   = rankForPerson(getProgrammesForGoals(engineGoals), goals);
   const best         = programmes[0];
 
   if (!best) return [];
