@@ -1,5 +1,12 @@
 /**
  * data/exercises/mobility.js
+ * 29 Sep 2026 v5
+ *
+ * v5 - P0h. Descriptions say what a movement does, not what it treats:
+ *   no rehab, healing, pain relief, recovery phases, named diagnoses
+ *   or clinical use. Which exercises exist, and for whom, is
+ *   unchanged. verify-scope-minor TEST 7.
+ *
  * 28 Sep 2026 v4
  *
  * v4 - Work list 10, CL-5-ALL. Descriptions reworded to the clinical
@@ -55,7 +62,7 @@ export const MOBILITY = [
       'Hold for 30 seconds, then switch sides'
     ],
     coaching: 'Keep your back straight - don\'t lean forward. The stretch should be in the front of your hip.',
-    why: 'Tight hip flexors from sitting contribute to back pain and limit mobility.',
+    why: 'Long hours sitting can leave the front of the hips feeling tight. This stretch opens them up and frees your stride.',
         watchOut: [
       'Bouncing into the stretch rather than holding it still',
       'Pushing to the point of pain; a stretch should feel like a strong pull, never sharp',
@@ -242,7 +249,7 @@ export const MOBILITY = [
       'Complete 15 swings, then turn and swing the other leg'
     ],
     coaching: 'This is a dynamic movement — loose and rhythmic, not forced. Think of a pendulum, not a stretch.',
-    why: 'Warms up the hip joint through its sagittal plane range before exercise — reduces injury risk and improves stride length.',
+    why: 'Warms up the hip joint through its forward-and-back range before exercise, and loosens your stride.',
         watchOut: [
       'Moving faster than you can control, which turns mobility work into momentum',
       'Forcing range rather than working to the edge of what is comfortable',
@@ -619,7 +626,7 @@ export const MOBILITY = [
       'Hold for 30 seconds each side, repeat twice'
     ],
     coaching: 'Knees together is the cue — when the right knee drifts out, the stretch shifts from quad to hip. Both are fine, but know which you are doing.',
-    why: 'Maintains quadriceps length — important for knee health, running efficiency, and reducing anterior knee pain.',
+    why: 'Lengthens the front of the thigh. Useful for runners and anyone whose quads feel tight after sitting or training.',
         watchOut: [
       'Bouncing into the stretch rather than holding it still',
       'Pushing to the point of pain; a stretch should feel like a strong pull, never sharp',
@@ -728,7 +735,7 @@ export const MOBILITY = [
       'Hold for 30 seconds each side, repeat 3 times'
     ],
     coaching: 'The further apart your feet, the deeper the stretch. Start conservative and widen over time.',
-    why: 'Tight adductors contribute to groin strain, hip impingement, and movement restriction. Important for running, lateral movement, and hip health.',
+    why: 'Opens up the inner thigh, which can feel tight and restrict side-to-side movement. Useful for running, lateral movement and hip mobility.',
         watchOut: [
       'Bouncing into the stretch rather than holding it still',
       'Pushing to the point of pain; a stretch should feel like a strong pull, never sharp',
@@ -944,7 +951,7 @@ export const MOBILITY = [
       'Complete daily for best results'
     ],
     coaching: 'The alphabet drill exposes which ankle directions are restricted — letters that feel limited show where to focus. Do it daily, not occasionally.',
-    why: 'Ankle dorsiflexion restriction is one of the most common mobility limitations and contributes to knee pain, hip compensation, and running injury. Regular mobilisation prevents this.',
+    why: 'Stiff ankles are one of the most common mobility limits, and the knees and hips often work around them. Regular ankle work keeps the range you have.',
         watchOut: [
       'Moving faster than you can control, which turns mobility work into momentum',
       'Forcing range rather than working to the edge of what is comfortable',
@@ -1247,7 +1254,7 @@ export const MOBILITY = [
       'Complete 3 full cycles'
     ],
     coaching: 'Move to the edge of comfortable range, not beyond it. The neck is not a joint to force. Particularly important for people who spend long periods at a screen.',
-    why: 'Maintains cervical spine range of motion in all planes — preventing the stiffness that leads to headaches, shoulder tension, and restricted movement.',
+    why: 'Moves the neck gently in every direction — a good way to ease the stiffness that builds up from screens and desks.',
         watchOut: [
       'Moving faster than you can control, which turns mobility work into momentum',
       'Forcing range rather than working to the edge of what is comfortable',
@@ -1371,7 +1378,7 @@ export const MOBILITY = [
       'Hold for 45 to 60 seconds each side'
     ],
     coaching: 'This can be done on a chair at a desk — completely discreet. Do it at the end of any long sitting period.',
-    why: 'The most accessible deep hip rotator stretch — targets the piriformis and gluteus medius. Particularly effective for people with sciatic tension or piriformis syndrome.',
+    why: 'The most accessible deep hip rotator stretch — it reaches the piriformis and gluteus medius, deep in the back of the hip.',
         watchOut: [
       'Bouncing into the stretch rather than holding it still',
       'Pushing to the point of pain; a stretch should feel like a strong pull, never sharp',

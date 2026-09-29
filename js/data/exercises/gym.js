@@ -1,5 +1,12 @@
 /**
  * data/exercises/gym.js
+ * 29 Sep 2026 v4
+ *
+ * v4 - P0h. Descriptions say what a movement does, not what it treats:
+ *   no rehab, healing, pain relief, recovery phases, named diagnoses
+ *   or clinical use. Which exercises exist, and for whom, is
+ *   unchanged. verify-scope-minor TEST 7.
+ *
  * 28 Sep 2026 v3
  *
  * v3 - Work list 10, CL-5-ALL. Descriptions reworded to the clinical
@@ -981,7 +988,7 @@ GYM.push(
     coaching: 'Elbows at forty-five degrees, not flared straight out to the sides. That single angle is what keeps the shoulder joint comfortable while the chest still does the work.',
     why: 'The incline shifts the work to the upper chest and shoulders, which is the area that most changes how the upper body looks and holds itself. It is also gentler on the shoulder than flat pressing.',
     watchOut: [
-      'Elbows flaring straight out to the sides, which is the most common cause of shoulder pain in pressing',
+      'Elbows flaring straight out to the sides, which puts the shoulders in an awkward position under load',
       'Arching the lower back off the bench to move heavier weight',
       'Banging the dumbbells together at the top; bring them near, not into each other',
       'Bench set too steep, above about forty-five degrees, which turns it into a shoulder press'

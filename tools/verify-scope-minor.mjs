@@ -1,5 +1,18 @@
 /**
  * tools/verify-scope-minor.mjs
+ * 29 Sep 2026 v2
+ *   P0h. TEST 7 added: the exercise library's own words. About 120 entries
+ *   described what a movement treats rather than what it does ("used in
+ *   patellofemoral pain rehabilitation", "reduce pain during the acute
+ *   phase", "clinically used for breathing conditions"), and three names
+ *   said Rehab. The test reads every human-readable field of every entry,
+ *   renders every entry through the real exercise card, and walks the real
+ *   practices screen, so a field that reaches a person is proved to reach
+ *   them. Internal tags (ids, category, contraindications, rehabPhase and
+ *   the like) are not words anyone reads and are not scanned. Safety lines
+ *   that route to a professional are allowed by name, never by pattern.
+ *   Before/after list: Documents/Business/alongside_p0h_library_rewording_29sep2026_v1.md
+ *
  * 29 Sep 2026 v1
  *
  * P0, SCOPE-MINOR. Alongside works around minor aches and injuries. It is
@@ -191,6 +204,72 @@ CONDITIONS.forEach(c => sources.push(c.name));
 const late = sources.map(t => [t, banned(t)]).filter(([, b]) => b);
 ok("6b. nor in onboarding, goals, aims, programmes or the sore-area names", sources.length > 100 && late.length === 0,
    late.slice(0, 6).map(([t, b]) => `"${b}" in ${t.slice(0, 70)}`).join("\n        ") || `${sources.length} strings`);
+
+// ── 7. THE EXERCISE LIBRARY (P0h) ───────────────────────────────────────
+console.log("\nTEST 7 - the exercise library describes what a movement does, not what it treats");
+const { EXERCISES } = await import(B + "data/exercises/index.js");
+const { renderExerciseCard } = await import(B + "exercise-card.js");
+// Tags and ids: read by code, never shown as words.
+const INTERNAL = new Set(["id", "category", "contentType", "rehabPhase", "movementPattern", "equipment",
+  "equipmentOptional", "affectsAreas", "load", "energyRequired", "difficultyLevel", "impact", "balanceDemand",
+  "position", "discipline", "restStyle", "contraindications", "caution", "activationTarget", "credits",
+  "perSide", "adaptive", "tempo", "rest", "sets", "reps", "holdSeconds", "duration"]);
+// The P0 vocabulary, widened for a library: treatment and phase words,
+// named diagnoses, clinical use, health-outcome claims. Plain safety words
+// ("any shoulder pain: come down") are not claims and are not caught.
+const LIB_BAN = /\bprescri\w*|\brehab\w*|\bheal(ed|ing|s)?\b|reduc\w* (\w+ ){0,3}pain|pain relief|relieve\w*|recover(y|ing)? from (an |your )?injur\w*|\btreatments?\b|\btherap(y|ies|eutic\w*)\b|diagnos\w*|clinical\w*|symptom\w*|\b(sub)?acute\b|surgery|post-?op\b|patellofemoral|tendinopath\w*|tendinitis|sciatica|syndrome|tennis elbow|golfer'?s elbow|impingement|subluxation|\bACL\b|rotator cuff issues|discogenic|disc pressure|asthma|breathing conditions|\bdepression\b|\banxiety\b|insomnia|trauma|dissociation|chronic pain|hypermob\w*|prolapse|leakage|arthritis|osteo\w*|\bCBT\b|ADHD|injury prevention|prevent\w* (\w+ ){0,3}(injur\w*|strains?|problems)|(reduc|lower)\w* (the )?(\w+ ){0,3}(injury|re-?injury|strain) risk|re-?injur\w*|recurrence|return(ing)? to sport|after (\w+ ){0,3}injur\w*|(for|contribut\w* to|linked to|causes?|with|in) (\w+ ){0,2}(knee|back|neck|hip|shoulder|leg) pain\b|headaches|\bphysio(s|therap\w*)?\b|kneecap tracking|(knee|back|limb|breathing|heart|medical|health) conditions?\b|cardiovascular (health|risk)|mental health/i;
+// Routing to a person is the scope statement's own instruction. Named, so
+// nothing else slips through on its back.
+const LIB_ALLOWED = [new RegExp(SCOPE.SCOPE_ADVICE.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g"), /\b(a|your) GP or physio\b/g, /isn[’']t a diagnosis/g];
+const libBanned = s => { let x = String(s); for (const a of LIB_ALLOWED) x = x.replace(a, ""); const m = x.match(LIB_BAN); return m ? m[0] : null; };
+const libFields = [];
+const walkLib = (o, path, id) => {
+  if (typeof o === "string") libFields.push([id, path, o]);
+  else if (Array.isArray(o)) o.forEach((x, i) => walkLib(x, `${path}[${i}]`, id));
+  else if (o && typeof o === "object") for (const [k, v] of Object.entries(o)) walkLib(v, `${path}.${k}`, id);
+};
+for (const e of EXERCISES) for (const [k, v] of Object.entries(e)) if (!INTERNAL.has(k)) walkLib(v, k, e.id);
+ok("7pc. positive control: the whole library was read", EXERCISES.length >= 560 && libFields.length > 5000, `${EXERCISES.length} entries, ${libFields.length} strings`);
+// Reversal, in the harness: the rule catches what P0h found.
+ok("7rv. reversal: the rule catches the old wording", ["used in patellofemoral pain rehabilitation", "reduce pain during the acute phase", "clinically used for breathing conditions", "Bird Dog — Core Rehab", "Contrast Therapy"].every(s => libBanned(s))
+   && !libBanned("Any shoulder pain: come down and use a band instead") && !libBanned("Conditions vary — compare similar days") && !libBanned(SCOPE.SCOPE_ADVICE));
+const libHits = libFields.map(([id, path, s]) => [id, path, libBanned(s)]).filter(([, , b]) => b);
+ok("7a. no field of any entry claims to treat, diagnose or heal", libHits.length === 0,
+   `${libHits.length} fields in ${new Set(libHits.map(h => h[0])).size} entries: ` + libHits.slice(0, 8).map(h => `${h[0]}.${h[1]} "${h[2]}"`).join("; "));
+// The card is the live reader for name, coaching, watch-outs, steps and
+// options: render every entry through it.
+const cardHits = [];
+const holder = document.createElement("div");
+for (const e of EXERCISES) {
+  holder.innerHTML = renderExerciseCard(e, { full: true });
+  const b = libBanned(visible(holder));
+  if (b) cardHits.push(`${e.id}: "${b}"`);
+}
+holder.innerHTML = renderExerciseCard(EXERCISES.find(e => e.coaching && e.watchOut?.length), { full: true });
+ok("7b-pc. the card shows coaching and watch-outs", holder.querySelectorAll("li").length > 0 && txt(holder).length > 200);
+ok("7b. nor on any exercise card", cardHits.length === 0, cardHits.slice(0, 8).join("; "));
+// The practices screen is the live reader for `why`. Walk it: every group,
+// every practice, as a person would.
+fixture({ tier: "personal" });
+const practiceTexts = [];
+const mountPractices = async () => { main.innerHTML = ""; await router._mountView("practices"); await wait(10); };
+await mountPractices();
+const groupCount = main.querySelectorAll("[data-group]").length;
+for (let g = 0; g < groupCount; g++) {
+  await mountPractices();
+  click(main.querySelectorAll("[data-group]")[g]); await wait(5);
+  const itemCount = main.querySelectorAll("[data-practice]").length;
+  for (let i = 0; i < itemCount; i++) {
+    await mountPractices();
+    click(main.querySelectorAll("[data-group]")[g]); await wait(5);
+    click(main.querySelectorAll("[data-practice]")[i]); await wait(5);
+    practiceTexts.push(visible(main));
+  }
+}
+const withWhy = EXERCISES.filter(e => e.why && practiceTexts.some(t => t.includes(e.why))).length;
+ok("7c-pc. the practices screen was walked and shows `why`", groupCount > 2 && practiceTexts.length > 20 && withWhy > 20, `${groupCount} groups, ${practiceTexts.length} practices, ${withWhy} whys on screen`);
+const pracHits = practiceTexts.map(libBanned).filter(Boolean);
+ok("7c. nor on any practice screen", pracHits.length === 0, [...new Set(pracHits)].join(", "));
 
 console.log("");
 if (fails) { console.log(`SCOPE-MINOR: ${fails} FAILED, ${passes} passed`); process.exit(1); }

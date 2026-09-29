@@ -1,5 +1,12 @@
 /**
  * data/exercises/cardio.js
+ * 29 Sep 2026 v5
+ *
+ * v5 - P0h. Descriptions say what a movement does, not what it treats:
+ *   no rehab, healing, pain relief, recovery phases, named diagnoses
+ *   or clinical use. Which exercises exist, and for whom, is
+ *   unchanged. verify-scope-minor TEST 7.
+ *
  * 28 Sep 2026 v4
  *
  * v4 - Work list 10, CL-5-ALL. Descriptions reworded to the clinical
@@ -421,7 +428,7 @@ export const CARDIO = [
       'Cool down with 5 minutes at easy pace'
     ],
     coaching: 'Steady cycling is genuinely restorative — it builds aerobic base without taxing the nervous system the way intervals do.',
-    why: 'Low-impact cardiovascular exercise that builds aerobic base. Particularly good for people with lower limb conditions who cannot run.',
+    why: 'Low-impact cardiovascular exercise that builds an aerobic base. A good option on days when running does not suit your legs.',
         watchOut: [
       'Saddle too low, which crowds the knee',
       'Rocking side to side in the saddle, usually a sign the seat is too high',
@@ -457,7 +464,7 @@ export const CARDIO = [
       'Return feeling energised, not exhausted'
     ],
     coaching: 'Walking is underrated. A brisk 30-minute walk provides meaningful cardiovascular benefit and is sustainable for almost anyone.',
-    why: 'Moderate-intensity walking reduces cardiovascular risk, improves mood, and supports metabolic health. The most evidence-backed low-barrier exercise there is.',
+    why: 'Walking at a pace that raises your breathing builds fitness, and many people find it lifts their mood. The lowest-barrier exercise there is.',
         watchOut: [
       'Looking down at your feet rather than ahead',
       'Very long strides, which are less efficient than quicker shorter ones',
@@ -491,7 +498,7 @@ export const CARDIO = [
       'Keep moving for at least 10 minutes',
       'The only rule is to keep moving'
     ],
-    coaching: 'This absolutely counts as exercise. Research shows dance has equivalent cardiovascular and mental health benefits to structured cardio.',
+    coaching: 'This absolutely counts as exercise. Dancing raises your heart rate just as structured cardio does — and plenty of people find it lifts their mood too.',
     why: 'Cardiovascular exercise disguised as fun. Improves coordination, mood, and heart health — and has a high adherence rate because people actually enjoy it.',
         watchOut: [
       'Pushing through a movement that twinges rather than changing it',

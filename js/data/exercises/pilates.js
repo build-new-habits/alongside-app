@@ -1,5 +1,12 @@
 /**
  * data/exercises/pilates.js
+ * 29 Sep 2026 v4
+ *
+ * v4 - P0h. Descriptions say what a movement does, not what it treats:
+ *   no rehab, healing, pain relief, recovery phases, named diagnoses
+ *   or clinical use. Which exercises exist, and for whom, is
+ *   unchanged. verify-scope-minor TEST 7.
+ *
  * 28 Sep 2026 v3
  *
  * v3 - Work list 10, CL-5-ALL. Descriptions reworded to the clinical
@@ -285,7 +292,7 @@ export const PILATES = [
       'Complete 5 reps'
     ],
     coaching: 'Unlike Cobra, the Swan in Pilates emphasises extending through the full spine — feel it from the tailbone through the crown of the head.',
-    why: 'Strengthens the back extensors and opens the chest — the antidote to forward flexion posture. Used in rehabilitation and performance alike.',
+    why: 'Strengthens the back extensors and opens the chest — a counterbalance to rounded, forward posture.',
         watchOut: [
       'Moving faster than you can control, which turns mobility work into momentum',
       'Forcing range rather than working to the edge of what is comfortable',

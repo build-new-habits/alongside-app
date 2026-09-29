@@ -1,5 +1,12 @@
 /**
  * data/exercises/swimming_cycling.js
+ * 29 Sep 2026 v4
+ *
+ * v4 - P0h. Descriptions say what a movement does, not what it treats:
+ *   no rehab, healing, pain relief, recovery phases, named diagnoses
+ *   or clinical use. Which exercises exist, and for whom, is
+ *   unchanged. verify-scope-minor TEST 7.
+ *
  * 28 Sep 2026 v3
  *
  * v3 - Work list 10, CL-5-ALL. Descriptions reworded to the clinical
@@ -242,7 +249,7 @@ export const SWIMMING_CYCLING = [
       'Complete 4 × 50 metres'
     ],
     coaching: 'This drill is entirely about the recovery — the part of the stroke above water. A high elbow recovery sets up a better entry and catch.',
-    why: 'Trains the high elbow recovery that prevents shoulder impingement and sets up the forward reach. Particularly useful for swimmers with shoulder issues.',
+    why: 'Trains the high elbow recovery, which keeps the shoulder in a comfortable position and sets up the forward reach.',
         watchOut: [
       'Rushing the drill so it becomes ordinary swimming again',
       'Holding the breath through the length rather than exhaling steadily into the water',

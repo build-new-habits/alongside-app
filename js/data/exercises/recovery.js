@@ -1,5 +1,12 @@
 /**
  * data/exercises/recovery.js
+ * 29 Sep 2026 v2
+ *
+ * v2 - P0h. Descriptions say what a movement does, not what it treats:
+ *   no rehab, healing, pain relief, recovery phases, named diagnoses
+ *   or clinical use. Which exercises exist, and for whom, is
+ *   unchanged. Names: Contrast Therapy is Hot and Cold Contrast. verify-scope-minor TEST 7.
+ *
  * 10 Aug 2026 v1
  *
  * v1 — First version header on this file. Added tailored YouTube search
@@ -154,7 +161,7 @@ export const RECOVERY = [
       'Roll for 60 seconds per leg'
     ],
     coaching: 'Roll slowly — about 1 inch per second. Fast rolling doesn\'t release the muscle.',
-    why: 'Reduces quad tightness that can contribute to knee pain and limited hip mobility.',
+    why: 'Eases tightness through the front of the thigh, which can free up how the knee and hip move.',
         watchOut: [
       'Rolling directly over a joint or bone rather than the muscle',
       'Pressing so hard you tense up, which stops the muscle releasing',
@@ -310,7 +317,7 @@ export const RECOVERY = [
       'Repeat for 4 cycles to start, building to 8 over time'
     ],
     coaching: 'The long exhale is what makes this work. If 7 and 8 feel too long, halve all the numbers.',
-    why: 'The extended exhale activates the rest-and-digest system, reducing anxiety and helping with sleep.',
+    why: 'The long out-breath switches on the body’s rest-and-digest response, which can help you settle and get ready for sleep.',
         watchOut: [
       'Forcing the breath rather than letting it lengthen naturally',
       'Lifting the shoulders on the in-breath instead of expanding the ribs',
@@ -497,7 +504,7 @@ export const RECOVERY = [
       'Repeat for 3 minutes'
     ],
     coaching: 'This is especially useful if you feel short of breath or anxious. It gives you control over your breathing rate.',
-    why: 'Pursed lip breathing slows breathing, keeps airways open longer, and is clinically used for breathing conditions including asthma.',
+    why: 'Pursed lip breathing slows the out-breath and gives your breathing a steady rhythm. Useful for catching your breath during or after effort.',
         watchOut: [
       'Forcing the breath rather than letting it lengthen naturally',
       'Lifting the shoulders on the in-breath instead of expanding the ribs',
@@ -610,7 +617,7 @@ export const RECOVERY = [
       'Breathe out slowly — this is one round',
       'Do 2 to 3 rounds'
     ],
-    coaching: 'Stop immediately if you feel dizzy. This is not suitable if you are pregnant or have heart or breathing conditions.',
+    coaching: 'Stop straight away if you feel dizzy. If you are pregnant, or have anything affecting your heart or breathing, speak to a GP or physio before trying this one.',
     why: 'The rapid breathing increases oxygen and wakes up the body — good for low-energy moments when you need a gentle boost.',
         watchOut: [
       'Forcing the breath rather than letting it lengthen naturally',
@@ -685,7 +692,7 @@ export const RECOVERY = [
       'Continue for 5 minutes'
     ],
     coaching: 'Losing count is not failing — noticing that you lost count is the practice. Each time you return to 1 is a small win.',
-    why: 'Gives the mind a simple anchor. Particularly useful for anxiety, racing thoughts, or difficulty settling before sleep.',
+    why: 'Gives the mind a simple anchor. Useful when thoughts are racing or when it is hard to settle before sleep.',
         watchOut: [
       'Forcing the breath rather than letting it lengthen naturally',
       'Lifting the shoulders on the in-breath instead of expanding the ribs',
@@ -744,8 +751,8 @@ export const RECOVERY = [
     position: 'any',
     impact: false,
     balanceDemand: false,
-    name: 'Contrast Therapy',
-    youtube: 'contrast therapy technique',
+    name: 'Hot and Cold Contrast',
+    youtube: 'hot and cold contrast recovery technique',
     category: 'recovery',
     contentType: 'practice',
     movementPattern: 'grounding',
@@ -766,7 +773,7 @@ export const RECOVERY = [
       'Use after heavy training sessions or competition'
     ],
     coaching: 'The alternating temperatures create a pumping effect on circulation — hot dilates blood vessels, cold constricts them. This mechanical action clears metabolic waste from muscle tissue.',
-    why: 'Contrast therapy accelerates recovery by increasing tissue blood flow via vascular oscillation. Used by professional teams post-match to reduce delayed onset muscle soreness.',
+    why: 'Alternating hot and cold changes blood flow through the muscles. Many sports teams use it after matches, and plenty of people find their legs feel fresher afterwards.',
         watchOut: [
       'Forcing the breath rather than letting it lengthen naturally',
       'Lifting the shoulders on the in-breath instead of expanding the ribs',
@@ -913,7 +920,7 @@ export const RECOVERY = [
       'Work: glutes, upper back, calves, and plantar fascia (foot)'
     ],
     coaching: 'The pressure should produce a "good pain" — uncomfortable but clearly beneficial. Avoid directly on bones or joints.',
-    why: 'Trigger point therapy releases myofascial adhesions that restrict movement and cause referred pain. A ball allows deeper pressure and more precision than a foam roller.',
+    why: 'Pressing into tight spots with a ball lets you work on knots that restrict movement. A ball gives deeper pressure and more precision than a foam roller.',
         watchOut: [
       'Forcing the breath rather than letting it lengthen naturally',
       'Lifting the shoulders on the in-breath instead of expanding the ribs',
@@ -1140,7 +1147,7 @@ export const RECOVERY = [
       'Do not use immediately after hard training — allow 30 to 60 minutes'
     ],
     coaching: 'Sauna exposure should feel challenging but safe. Any dizziness, nausea, or excessive discomfort means exit immediately.',
-    why: "Regular sauna use has strong evidence for cardiovascular health, growth hormone release, heat shock protein production, and mood improvement. Dr Rhonda Patrick's research is particularly comprehensive on this.",
+    why: 'Regular sauna use warms the muscles and raises the heart rate gently. Many people find it helps them unwind after training.',
         watchOut: [
       'Forcing the breath rather than letting it lengthen naturally',
       'Lifting the shoulders on the in-breath instead of expanding the ribs',

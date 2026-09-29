@@ -1,5 +1,12 @@
 /**
  * data/exercises/strength.js
+ * 29 Sep 2026 v9
+ *
+ * v9 - P0h. Descriptions say what a movement does, not what it treats:
+ *   no rehab, healing, pain relief, recovery phases, named diagnoses
+ *   or clinical use. Which exercises exist, and for whom, is
+ *   unchanged. verify-scope-minor TEST 7.
+ *
  * 28 Sep 2026 v8
  *
  * v8 - Work list 10, CL-5-ALL. Descriptions reworded to the clinical
@@ -430,7 +437,7 @@ export const STRENGTH = [
       'Alternate legs or complete all reps on one side before switching',
       'Complete 3 sets of 10 reps each leg'
     ],
-    coaching: 'Stepping back is gentler on the knee than stepping forward - good for most knee conditions.',
+    coaching: 'Stepping back is usually gentler on the knee than stepping forward, which makes this a good lunge to start with.',
     why: 'Builds single-leg strength and balance with less knee stress than a forward lunge.',
         watchOut: [
       'Front knee travelling far past the toes',
@@ -1279,7 +1286,7 @@ export const STRENGTH = [
       'Complete 5 circles clockwise, then 5 anticlockwise'
     ],
     coaching: 'Move slowly — the tempo of a halo determines whether it is a warm-up or a shoulder drill. Fast halos are mostly momentum. Slow halos are work.',
-    why: 'Improves shoulder girdle mobility and scapular control. Excellent as a warm-up before upper body work or as shoulder rehabilitation.',
+    why: 'Improves shoulder girdle mobility and control of the shoulder blades. A good warm-up before upper body work.',
         watchOut: [
       'Letting the bell drift far from your head, which strains the shoulders',
       'Ribs flaring and the back arching as the bell passes behind',
@@ -1712,7 +1719,7 @@ export const STRENGTH = [
       'Walk back to recover fully — at least 90 seconds',
       'Complete 4 to 6 build-ups'
     ],
-    coaching: 'Build-ups are how sprinters warm up and how recreational runners safely explore top speed. The gradual build reduces hamstring strain risk.',
+    coaching: 'Build-ups are how sprinters warm up and how recreational runners safely explore top speed. The gradual build gives the hamstrings time to get ready.',
     why: 'Safely introduces maximum velocity running. Progressive acceleration allows the body to reach top speed safely — sudden standing starts are where hamstring injuries happen.',
         watchOut: [
       'Going to full speed from the first stride rather than building into it',
@@ -1817,7 +1824,7 @@ export const STRENGTH = [
       'Measure total distance or just focus on landing control',
       'Complete 3 sets each side'
     ],
-    coaching: 'Single-leg hop testing is used clinically to assess return-to-sport readiness after knee injury. It is also excellent training.',
+    coaching: 'Hopping on one leg asks the hip, knee and ankle to work together. It is excellent training for landing and balance.',
     why: 'The gold-standard test of single-leg power and landing control. The ability to hop for distance and stick the landing indicates robust lower limb function.',
         watchOut: [
       'Landing on a straight leg',
@@ -1889,7 +1896,7 @@ export const STRENGTH = [
       'Vary the stop — sometimes stop into a squat, sometimes pivot and change direction',
       'Complete 8 to 10 reps'
     ],
-    coaching: 'Most running injuries happen during deceleration, not acceleration. Practising controlled stopping builds the eccentric strength that prevents them.',
+    coaching: 'Slowing down asks more of the legs than speeding up. Practising controlled stopping builds the strength to brake well.',
     why: 'Deceleration strength is one of the most undertrained qualities in sport. The eccentric quad and glute demand in stopping is greater than in any running stride.',
         watchOut: [
       'Stopping stiff-legged rather than sinking into the hips',
@@ -2033,7 +2040,7 @@ export const STRENGTH = [
       'Drive back up — bar path slightly back toward the rack',
       'Complete 3 sets of 5 reps with a spotter for heavy loads'
     ],
-    coaching: 'The shoulder blade retraction is the most important setup cue — it creates a stable base and reduces shoulder impingement risk significantly.',
+    coaching: 'The shoulder blade retraction is the most important setup cue — it creates a stable base and keeps the shoulders in a supported position.',
     why: 'The bench press is the primary horizontal pushing strength exercise. Builds chest, shoulder, and tricep strength with a loading capacity unmatched by bodyweight pressing.',
         watchOut: [
       'Bouncing the bar off the chest',
@@ -2149,7 +2156,7 @@ export const STRENGTH = [
       'Complete 3 sets of 8 reps'
     ],
     coaching: 'The difference between an RDL and a deadlift: the RDL starts from standing and emphasises the eccentric loading of the hamstrings. The stretch at the bottom is the point.',
-    why: 'The Romanian deadlift is the primary hamstring strength exercise in most programmes — builds the eccentric hamstring strength that prevents hamstring strains in sport.',
+    why: 'The Romanian deadlift is the main hamstring strength exercise in most programmes — it builds strength as the hamstrings lengthen, which sport asks a lot of.',
         watchOut: [
       'Your back rounding as you lower — stop where your back is still flat',
       'Feeling this in the lower back rather than the hamstrings, which means the hips are not moving back far enough',
@@ -2344,7 +2351,7 @@ export const STRENGTH = [
       'Complete 3 sets of 20 reps'
     ],
     coaching: 'Keep the arms straight throughout — bending the elbows turns it into an arm exercise. The movement comes from the shoulder blades.',
-    why: 'One of the most effective exercises for rear deltoid and mid-trap strength — the muscles that counteract forward posture and shoulder impingement.',
+    why: 'One of the most effective exercises for rear deltoid and mid-trap strength — the muscles that pull against a forward, rounded posture.',
         watchOut: [
       'Shrugging the shoulders up as you pull',
       'Bending the elbows, which turns it into a row',
@@ -2526,7 +2533,7 @@ export const STRENGTH = [
       'Complete 3 sets of 15 reps'
     ],
     coaching: 'Keep the torso upright throughout — the temptation is to lean back to help the pull. The movement should come from the arms and shoulder blades only.',
-    why: 'A fully accessible rowing exercise requiring only a band and the floor. Builds the upper back strength that counteracts desk posture and shoulder impingement.',
+    why: 'A fully accessible rowing exercise needing only a band and the floor. Builds the upper back strength that balances out desk posture.',
         watchOut: [
       'Leaning back to start the pull',
       'Rounding the back as you return',
@@ -2563,7 +2570,7 @@ export const STRENGTH = [
       'Complete 3 sets each way'
     ],
     coaching: 'The glutes should be working hard by the third or fourth step. If not, use a heavier band or widen the stance.',
-    why: 'Directly activates the glute medius — the hip abductor most responsible for knee stability and lateral movement. Used in ACL prevention protocols worldwide.',
+    why: 'Directly works the glute medius — the hip muscle that steadies the knee and powers side-to-side movement. A common part of warm-ups for field sports.',
         watchOut: [
       'Standing up tall between steps, which lets the tension off',
       'Feet dragging rather than stepping',
@@ -2914,7 +2921,7 @@ export const STRENGTH = [
       '3 sets of 15 reps — use lighter weight than you expect'
     ],
     coaching: 'Most people use far too much weight for this. Lower trap activation requires a very light load and precise movement — not heavier weight and momentum.',
-    why: 'Directly trains the lower trapezius — one of the most underactive muscles in desk workers and a primary cause of shoulder impingement and neck pain.',
+    why: 'Directly trains the lower trapezius — a muscle that gets little work in people who sit at desks, and a big part of how the shoulder blade moves well.',
         watchOut: [
       'Shrugging as you raise',
       'Arching the back to help the weights up',
@@ -3292,7 +3299,7 @@ export const STRENGTH = [
       '3 sets of 5 reps — full recovery between sets'
     ],
     coaching: 'The Nordic curl is extremely demanding — most people need the hand assist for months before a full unassisted rep is possible. The assisted version still delivers major hamstring gains.',
-    why: 'The Nordic curl has the strongest evidence base of any hamstring injury prevention exercise. Eccentric hamstring strength built here directly reduces hamstring strain risk in sport.',
+    why: 'One of the hardest hamstring exercises there is. It builds strength as the hamstring lengthens, which is what sprinting and sport ask of it.',
         watchOut: [
       'Falling rather than lowering; you should control every inch',
       'Bending at the hips to make it easier, which removes the point',
@@ -3330,7 +3337,7 @@ export const STRENGTH = [
       'Complete 3 holds with equal rest'
     ],
     coaching: 'Wall sits are harder than they look after 30 seconds. The quads burn — that is the point. Focus on keeping the back flat on the wall.',
-    why: 'Isometric quad strength directly supports knee health and is used in patellofemoral pain rehabilitation. A simple, effective strength and endurance exercise.',
+    why: 'A simple, effective way to build quad strength and endurance by holding still. You choose how deep to sit, so you control how hard it is.',
         watchOut: [
       'Sliding down as you tire rather than holding position',
       'Knees drifting past the toes',

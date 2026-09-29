@@ -20,6 +20,13 @@
  * available through cardio sessions and the sport pathways.
  **
  * data/exercises/sport_conditioning.js
+ * 29 Sep 2026 v4
+ *
+ * v4 - P0h. Descriptions say what a movement does, not what it treats:
+ *   no rehab, healing, pain relief, recovery phases, named diagnoses
+ *   or clinical use. Which exercises exist, and for whom, is
+ *   unchanged. verify-scope-minor TEST 7.
+ *
  * 28 Sep 2026 v3
  *
  * v3 - Work list 10, CL-5-ALL. Descriptions reworded to the clinical
@@ -735,7 +742,7 @@ export const SPORT_CONDITIONING = [
       'Build-up runs: 3 × 40 metres at increasing effort (60%, 75%, 85%)'
     ],
     coaching: 'This warm-up sequence has been developed over decades by athletic trainers. Do not skip any component — the order matters.',
-    why: 'A systematic pre-sport warm-up reduces injury risk, improves neuromuscular activation, and prepares the cardiovascular system for competition effort.',
+    why: 'A systematic pre-sport warm-up wakes up the muscles, raises your heart rate and gets your body ready for competition effort.',
         watchOut: [
       'Moving faster than you can control, which turns mobility work into momentum',
       'Forcing range rather than working to the edge of what is comfortable',
@@ -777,7 +784,7 @@ export const SPORT_CONDITIONING = [
       'Build-up jog to sprint over 30 metres'
     ],
     coaching: 'This warm-up specifically activates the glutes and hip stabilisers before loading the lower body. Particularly important for runners and footballers.',
-    why: 'Glute and hip activation before lower body sport reduces ACL injury risk and improves performance quality by ensuring the primary power muscles are firing correctly.',
+    why: 'Glute and hip activation before lower body sport gets the main power muscles firing, ready for jumping, cutting and sprinting.',
         watchOut: [
       'Moving faster than you can control, which turns mobility work into momentum',
       'Forcing range rather than working to the edge of what is comfortable',
@@ -818,8 +825,8 @@ export const SPORT_CONDITIONING = [
       'Thoracic rotation from hands and knees: 10 each side',
       'Light shadow swings or throws: 20 reps at 50%, 10 at 75%'
     ],
-    coaching: 'Throwing and striking sports put exceptional demand on the rotator cuff. This warm-up is not optional — it is injury prevention.',
-    why: 'Upper body sport creates shoulder impingement risk when the rotator cuff and scapular stabilisers are not activated before loading. This sequence addresses that directly.',
+    coaching: 'Throwing and striking sports ask a lot of the rotator cuff. Warming it up first is worth every minute.',
+    why: 'Upper body sport loads the shoulder hard. This sequence wakes up the rotator cuff and shoulder blade muscles before they take that load.',
         watchOut: [
       'Moving faster than you can control, which turns mobility work into momentum',
       'Forcing range rather than working to the edge of what is comfortable',
@@ -1708,7 +1715,7 @@ export const SPORT_CONDITIONING = [
       '10. Leg swings lateral × 15 each',
       '11. Build-up runs × 4 × 50m at 60%, 70%, 80%, 90%'
     ],
-    coaching: 'This is a 20-minute warm-up used by professional sports teams worldwide. Every minute of it reduces injury risk and improves performance quality.',
+    coaching: 'This is a 20-minute warm-up of the kind professional sports teams use. Every minute of it gets your body ready to play well.',
     why: 'A complete dynamic warm-up that progressively increases tissue temperature, activates neuromuscular pathways, and rehearses sport-specific movement patterns before loading.',
         watchOut: [
       'Moving faster than you can control, which turns mobility work into momentum',

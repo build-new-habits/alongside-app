@@ -1,5 +1,12 @@
 /**
  * data/exercises/yoga.js
+ * 29 Sep 2026 v6
+ *
+ * v6 - P0h. Descriptions say what a movement does, not what it treats:
+ *   no rehab, healing, pain relief, recovery phases, named diagnoses
+ *   or clinical use. Which exercises exist, and for whom, is
+ *   unchanged. verify-scope-minor TEST 7.
+ *
  * 28 Sep 2026 v5
  *
  * v5 - Work list 10, CL-5-ALL. Descriptions reworded to the clinical
@@ -307,7 +314,7 @@ export const YOGA = [
       'Hold for 5 breaths, then lower slowly'
     ],
     coaching: 'The height of the lift depends on your back flexibility — even a few centimetres is the full pose. Never force range here.',
-    why: 'A gentle backbend that opens the chest and counteracts the rounded posture of sitting. Also used therapeutically for lower back pain.',
+    why: 'A gentle backbend that opens the chest and counteracts the rounded posture of sitting.',
         watchOut: [
       'Moving faster than you can control, which turns mobility work into momentum',
       'Forcing range rather than working to the edge of what is comfortable',
@@ -936,7 +943,7 @@ export const YOGA = [
       'Savasana with eye pillow — 10 minutes'
     ],
     coaching: 'Restorative yoga is designed to activate the parasympathetic nervous system. Do not substitute yin for restorative — they are different practices with different aims.',
-    why: 'Restorative yoga has strong evidence for reducing cortisol, improving sleep quality, and managing anxiety. The supported positions allow the body to release without effort.',
+    why: 'Restorative yoga uses supported positions so the body can release without effort. Many people find it calming and helpful for sleep.',
         watchOut: [
       'Bouncing into the stretch rather than holding it still',
       'Pushing to the point of pain; a stretch should feel like a strong pull, never sharp',
@@ -1130,7 +1137,7 @@ export const YOGA = [
       'Rest in natural breath for 2 minutes'
     ],
     coaching: 'Pranayama requires consistent practice to produce its effects. Ten minutes daily is more valuable than an hour once a week.',
-    why: 'Pranayama practices directly modulate the autonomic nervous system through breathing mechanics and vagal nerve stimulation — producing measurable reductions in cortisol and anxiety.',
+    why: 'Pranayama uses slow, controlled breathing to shift the body towards its rest-and-digest state. Many people feel calmer afterwards.',
         watchOut: [
       'Forcing the breath rather than letting it lengthen naturally',
       'Lifting the shoulders on the in-breath instead of expanding the ribs',
@@ -1168,7 +1175,7 @@ export const YOGA = [
       'Standing if able: mountain pose — 1 minute'
     ],
     coaching: 'Chair yoga is not a compromise. It is a specific practice that makes yoga accessible to everyone regardless of mobility level, injury, or setting.',
-    why: 'Chair yoga maintains spinal mobility, hip flexibility, and body awareness for people who cannot access floor-based practice. Evidence shows benefits for older adults and chronic pain populations.',
+    why: 'Chair yoga keeps the spine mobile, the hips flexible and body awareness sharp, with no need to get down to the floor.',
         watchOut: [
       'Moving faster than you can control, which turns mobility work into momentum',
       'Forcing range rather than working to the edge of what is comfortable',
@@ -1208,7 +1215,7 @@ export const YOGA = [
       'High lunge left — 60 seconds'
     ],
     coaching: 'These are strength poses, not stretches — maintain full muscular engagement throughout. Warrior 2 held for 90 seconds is genuinely demanding.',
-    why: 'Hip strength yoga combines the flexibility benefits of yoga with the strength demands of held positions. Develops the hip stability that reduces injury risk in all sports.',
+    why: 'Hip strength yoga combines the flexibility of yoga with the strength demands of held positions. Builds hip stability that every sport uses.',
         watchOut: [
       'Hips dropping or rotating during the single-leg work',
       'Gripping with the toes rather than spreading the weight through the foot',

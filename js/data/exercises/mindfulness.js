@@ -1,5 +1,12 @@
 /**
  * data/exercises/mindfulness.js
+ * 29 Sep 2026 v2
+ *
+ * v2 - P0h. Descriptions say what a movement does, not what it treats:
+ *   no rehab, healing, pain relief, recovery phases, named diagnoses
+ *   or clinical use. Which exercises exist, and for whom, is
+ *   unchanged. verify-scope-minor TEST 7.
+ *
  * 10 Aug 2026 v1
  *
  * v1 — First version header on this file. Added tailored YouTube search
@@ -49,7 +56,7 @@ export const MINDFULNESS = [
       'Continue for 5 minutes'
     ],
     coaching: 'The mind wandering is not failure. Noticing it has wandered and returning is the practice. You can do this thousands of times in one session.',
-    why: 'The foundation of mindfulness practice. Trains the attention to return to the present moment — the core skill that reduces anxiety and improves focus.',
+    why: 'The foundation of mindfulness practice. Trains the attention to return to the present moment — the core skill for feeling calmer and more focused.',
         watchOut: [
       'Forcing the breath rather than letting it lengthen naturally',
       'Lifting the shoulders on the in-breath instead of expanding the ribs',
@@ -87,7 +94,7 @@ export const MINDFULNESS = [
       'Take 10 minutes to move from head to feet'
     ],
     coaching: 'You are not trying to relax — you are just noticing. Relaxation often follows, but it is not the goal. Just observe.',
-    why: 'Body scanning builds interoception — awareness of internal body states. Reduces dissociation, improves stress response, and helps identify where tension accumulates.',
+    why: 'Body scanning builds interoception — awareness of what is happening inside your body. It helps you notice stress and where tension gathers.',
         watchOut: [
       'Forcing the breath rather than letting it lengthen naturally',
       'Lifting the shoulders on the in-breath instead of expanding the ribs',
@@ -124,7 +131,7 @@ export const MINDFULNESS = [
       'After 2 minutes, rest in the feeling that has been cultivated'
     ],
     coaching: 'Directing kindness toward yourself is the hardest part for most people. Do it anyway. Even if it feels hollow at first, it works over time.',
-    why: 'Loving-kindness meditation reduces self-criticism, increases compassion, and reduces symptoms of depression and anxiety — well supported by clinical research.',
+    why: 'Loving-kindness meditation practises warmth towards yourself and others. Many people find it softens self-criticism over time.',
         watchOut: [
       'Forcing the breath rather than letting it lengthen naturally',
       'Lifting the shoulders on the in-breath instead of expanding the ribs',
@@ -160,8 +167,8 @@ export const MINDFULNESS = [
       'Notice 1 thing you can taste',
       'Take a slow breath and notice how you feel now compared to when you started'
     ],
-    coaching: 'This takes about 3 minutes and works quickly. Use it when anxiety spikes, when overwhelmed, or when you cannot settle before sleep.',
-    why: 'Grounds attention in the present sensory moment — directly interrupts anxiety and rumination by engaging the senses rather than thoughts.',
+    coaching: 'This takes about 3 minutes and works quickly. Use it when worry spikes, when you feel overwhelmed, or when you cannot settle before sleep.',
+    why: 'Grounds attention in what your senses notice right now — a way to step out of worry and looping thoughts.',
         watchOut: [
       'Forcing the breath rather than letting it lengthen naturally',
       'Lifting the shoulders on the in-breath instead of expanding the ribs',
@@ -198,7 +205,7 @@ export const MINDFULNESS = [
       'After the face, rest in the whole-body relaxation for 2 minutes'
     ],
     coaching: 'The contrast between tension and release is what trains the nervous system. You are teaching your body what relaxed actually feels like.',
-    why: 'PMR is one of the most clinically validated techniques for anxiety, insomnia, and chronic pain. Effective within a single session and builds with practice.',
+    why: 'PMR tenses and releases each muscle group in turn, so you learn what letting go of tension feels like. Many people feel calmer after a single session, and it builds with practice.',
         watchOut: [
       'Forcing the breath rather than letting it lengthen naturally',
       'Lifting the shoulders on the in-breath instead of expanding the ribs',
@@ -271,7 +278,7 @@ export const MINDFULNESS = [
       'When you return, carry the feeling with you for a moment before opening your eyes'
     ],
     coaching: 'The place can be completely imaginary. It just needs to feel safe to you. There is no wrong answer.',
-    why: 'A foundational technique in trauma-informed therapy. Creates a reliable internal resource for self-regulation — particularly useful for anxiety and hyperarousal.',
+    why: 'Builds a calm place in your imagination that you can return to — a reliable way to steady yourself when things feel like too much.',
         watchOut: [
       'Forcing the breath rather than letting it lengthen naturally',
       'Lifting the shoulders on the in-breath instead of expanding the ribs',
@@ -308,7 +315,7 @@ export const MINDFULNESS = [
       'Continue for 10 minutes'
     ],
     coaching: 'Noting creates a tiny gap between experience and reaction. That gap is where freedom lives. The labels help the mind process rather than ruminate.',
-    why: 'Noting practice is particularly effective for anxiety and ADHD — it gives the busy mind a job while training present-moment awareness.',
+    why: 'Noting gives a busy mind a job — naming what comes up — while training present-moment awareness. Useful for restless, fast-moving thoughts.',
         watchOut: [
       'Forcing the breath rather than letting it lengthen naturally',
       'Lifting the shoulders on the in-breath instead of expanding the ribs',
@@ -345,7 +352,7 @@ export const MINDFULNESS = [
       'Continue for 2 minutes'
     ],
     coaching: 'This works in meetings, on public transport, or wherever you are. Nobody needs to know you are doing it.',
-    why: 'A brief, discreet grounding technique for moments of acute anxiety or dissociation. Works quickly and requires no preparation.',
+    why: 'A brief, discreet grounding technique for moments when you feel overwhelmed or far away from yourself. Works quickly and needs no preparation.',
         watchOut: [
       'Forcing the breath rather than letting it lengthen naturally',
       'Lifting the shoulders on the in-breath instead of expanding the ribs',
@@ -381,7 +388,7 @@ export const MINDFULNESS = [
       'Continue for 5 minutes with this one object'
     ],
     coaching: 'The exercise is deliberately simple — the simplicity is the point. Ordinary objects become extraordinary when you actually look.',
-    why: 'Trains focused present-moment awareness using a concrete anchor. Useful for people who find eyes-closed meditation difficult or anxiety-provoking.',
+    why: 'Trains focused present-moment awareness using something you can see. Useful for people who find eyes-closed meditation difficult or uncomfortable.',
         watchOut: [
       'Forcing the breath rather than letting it lengthen naturally',
       'Lifting the shoulders on the in-breath instead of expanding the ribs',
@@ -428,7 +435,7 @@ export const MINDFULNESS = [
       'If you reach the top without falling asleep, start again from the feet'
     ],
     coaching: 'If you fall asleep before finishing, that is success. Most people do not reach the top more than once.',
-    why: 'The body scan activates the parasympathetic nervous system and reduces the cortisol associated with pre-sleep rumination. Clinically used for insomnia.',
+    why: 'The body scan switches on the rest-and-digest system and releases physical tension, which can make it easier to drift off.',
         watchOut: [
       'Forcing the breath rather than letting it lengthen naturally',
       'Lifting the shoulders on the in-breath instead of expanding the ribs',
@@ -503,7 +510,7 @@ export const MINDFULNESS = [
       'For the rest of the day, when worried thoughts arise, remind yourself: they are already written down, they have their time'
     ],
     coaching: 'This feels counterintuitive. But containing worry to a specific time actually reduces it — the brain relaxes when it knows worries will not be forgotten.',
-    why: 'Scheduled worry time is a CBT technique shown to reduce generalised anxiety and improve sleep. It externalises the worry and gives the mind permission to rest at other times.',
+    why: 'Scheduled worry time gives worries a set time and place. Writing them down lets the mind rest at other times, including at bedtime.',
         watchOut: [
       'Forcing the breath rather than letting it lengthen naturally',
       'Lifting the shoulders on the in-breath instead of expanding the ribs',
@@ -540,7 +547,7 @@ export const MINDFULNESS = [
       'Continue for 10 minutes'
     ],
     coaching: 'Mindful walking is a great alternative for people who struggle with seated meditation. The movement gives the mind something concrete to anchor to.',
-    why: 'Combines the physical benefits of movement with the mental benefits of mindfulness. Particularly effective for restless minds or people with ADHD.',
+    why: 'Combines the physical benefits of movement with the calm of mindfulness. Particularly good for restless minds that find sitting still hard.',
         watchOut: [
       'Forcing the breath rather than letting it lengthen naturally',
       'Lifting the shoulders on the in-breath instead of expanding the ribs',
@@ -577,7 +584,7 @@ export const MINDFULNESS = [
       'Stay with this for 5 minutes'
     ],
     coaching: 'Self-compassion is not self-indulgence or giving up. Research consistently shows it produces better outcomes than self-criticism — more motivation, more resilience, less burnout.',
-    why: 'Self-compassion practice reduces shame, anxiety, and depression while increasing motivation. Based on the work of Dr Kristin Neff. Particularly relevant for neurodivergent adults.',
+    why: 'Self-compassion practice means speaking to yourself the way you would to a friend. It builds motivation without shame. Based on the work of Dr Kristin Neff, and particularly relevant for neurodivergent adults.',
         watchOut: [
       'Forcing the breath rather than letting it lengthen naturally',
       'Lifting the shoulders on the in-breath instead of expanding the ribs',
@@ -688,7 +695,7 @@ export const MINDFULNESS = [
       'Notice any resistance — that is normal. Stay with the feeling anyway'
     ],
     coaching: 'The specificity matters. Generic gratitude skims the surface. Specific, sensory details help the brain register the experience as genuinely positive.',
-    why: 'Gratitude practice reliably improves sleep quality, reduces symptoms of depression, and increases life satisfaction. Most effective when done consistently over time.',
+    why: 'Noticing what went well shifts attention towards the good in a day. Many people find it helps them sleep and feel more settled when done regularly.',
         watchOut: [
       'Forcing the breath rather than letting it lengthen naturally',
       'Lifting the shoulders on the in-breath instead of expanding the ribs',
@@ -724,7 +731,7 @@ export const MINDFULNESS = [
       'If the mind wanders, return to counting',
       'Continue for 10 minutes total'
     ],
-    coaching: 'The extended version deepens the calming effect. Used by emergency services and military for acute stress regulation. The hold phases are where the nervous system resets.',
+    coaching: 'The extended version deepens the calming effect. Used by emergency services and the military to steady themselves under stress. The hold phases are where the body settles.',
     why: 'Extended box breathing reduces cortisol, lowers blood pressure, and improves heart rate variability — all measurable markers of stress reduction. More effective than a shorter session.',
         watchOut: [
       'Forcing the breath rather than letting it lengthen naturally',

@@ -1,5 +1,13 @@
 /**
  * data/exercises/rehabilitation.js
+ * 29 Sep 2026 v11
+ *
+ * v11 - P0h. Descriptions say what a movement does, not what it treats:
+ *   no rehab, healing, pain relief, recovery phases, named diagnoses
+ *   or clinical use. Which exercises exist, and for whom, is
+ *   unchanged. Names: Romanian Deadlift — Light
+ *   Load, Bird Dog — Gentle Core, Breathing Retraining (ids unchanged). verify-scope-minor TEST 7.
+ *
  * 28 Sep 2026 v10
  *
  * v10 - Work list 10, CL-5-ALL. Descriptions reworded to the clinical
@@ -278,7 +286,7 @@ export const REHABILITATION = [
       'Complete 15 reps each side'
     ],
     coaching: 'Choose a band that makes the last 3 reps feel genuinely hard. Too easy means too light a band.',
-    why: 'The resistance band increases gluteus medius activation compared to bodyweight alone — more effective for rehab and strength building.',
+    why: 'The resistance band makes the gluteus medius work harder than bodyweight alone — more effective for building strength.',
         watchOut: [
       "If the band snaps the knee shut on the way back, it is too strong for now. Use a lighter one and control the return",
       "If your hips are rocking to get the knee higher, the band is winning. Lighter band, smaller range",
@@ -370,7 +378,7 @@ export const REHABILITATION = [
       'Complete 10 reps, then switch legs'
     ],
     coaching: 'Hips staying level is the challenge. If they drop, go back to the two-legged version and build more strength first.',
-    why: 'Single-leg work reveals and corrects side-to-side glute strength imbalances — important for runners and anyone with hip or knee pain.',
+    why: 'Single-leg work shows up and evens out differences in glute strength between your two sides — useful for runners and anyone who notices one side doing more.',
         watchOut: [
       "If the lifted hip drops, you have found the actual limit. Lower and reset rather than finishing the set crooked",
       "If your hamstring cramps, bring the working foot slightly closer in and squeeze the glute before lifting",
@@ -426,7 +434,7 @@ export const REHABILITATION = [
       'Complete 15 reps each side'
     ],
     coaching: 'Think about pressing the ceiling with your heel, not just swinging the leg up. Your back should stay flat.',
-    why: 'Isolates glute max with minimal load on other structures — ideal for glute rehab and activation.',
+    why: 'Isolates glute max with very little load on anything else — ideal for waking up the glutes and building strength gently.',
         watchOut: [
       "If your lower back arches to get the leg higher, stop lower. The range comes from the hip, and it is smaller than it looks",
       "If your hips rotate open, square them to the floor and take less height",
@@ -546,7 +554,7 @@ export const REHABILITATION = [
       'Complete 3 sets'
     ],
     coaching: 'Stay low throughout. Standing up straight makes it too easy and loses the glute engagement.',
-    why: 'One of the most effective glute med exercises. Used in knee rehab, hip rehab, and as a warm-up before running and jumping.',
+    why: 'One of the most effective glute med exercises. A good warm-up before running and jumping, and a steady builder of hip strength.',
         watchOut: [
       "If your knees fall inward, the band has won. Lighter band, and push the knees out against it as you step",
       "If you have stood up out of the squat, sink back down. Standing tall takes the glutes out of it entirely",
@@ -626,7 +634,7 @@ export const REHABILITATION = [
       'Lower slowly and repeat for 12 reps, 3 sets'
     ],
     coaching: 'The range of motion is bigger than a glute bridge because your shoulders are elevated. You will feel the difference.',
-    why: 'The hip thrust produces the highest glute activation of any exercise — it is the gold standard for glute development and rehab.',
+    why: 'The hip thrust works the glutes harder than almost any other exercise — a staple for glute strength.',
         watchOut: [
       "If your ribs flare and your back arches at the top, tuck your chin and think about lifting with the hips only",
       "If it is mostly hamstrings, walk your feet in a little and squeeze at the top for a second",
@@ -827,7 +835,7 @@ export const REHABILITATION = [
       'Repeat for 15 reps'
     ],
     coaching: 'This is the simplest glute activation there is. It can be done sitting at a desk, lying in bed, or standing at a bus stop.',
-    why: 'Isometric contractions re-establish the brain-to-muscle connection — especially useful after injury or long periods of inactivity.',
+    why: 'Squeezing and holding builds the brain-to-muscle connection — especially useful when coming back after time away from exercise.',
         watchOut: [
       "If you are squeezing your stomach or thighs too, let those go and find the glutes on their own. It takes a few attempts",
       "If you are holding your breath, breathe out through the squeeze",
@@ -867,7 +875,7 @@ export const REHABILITATION = [
       'Complete 15 reps each side'
     ],
     coaching: 'The lift only needs to be a few inches. Squeezing the glute before you lift means the glute does the work, not the lower back.',
-    why: 'A safe starting point for glute activation after injury — minimal load, no compression on the spine.',
+    why: 'A gentle starting point for glute work — very little load and no compression on the spine.',
         watchOut: [
       "If your lower back is arching, you are lifting too high. A few inches is genuinely the whole range",
       "If your pelvis rocks to one side, press both hip bones into the floor and lift less",
@@ -912,8 +920,8 @@ export const REHABILITATION = [
       'Release and rest for 5 seconds',
       'Complete 10 reps, then repeat on the left side'
     ],
-    coaching: 'Start gently — 30 to 50% effort. Isometric work is safe in the acute phase because there is no movement through the injured tissue.',
-    why: 'Isometric contractions maintain hamstring strength and reduce pain during the acute phase without stressing the injury.',
+    coaching: 'Start gently — 30 to 50% effort. Nothing moves, so you choose how hard to press and can keep it comfortable.',
+    why: 'Holding a hamstring contraction without moving keeps the muscle working with very little strain. A gentle way to keep hamstring strength when bigger movements do not feel right.',
         watchOut: [
       "If your foot slides along the floor, you are pushing harder than you need to. Ease off until the foot stays put — the effort is meant to go nowhere",
       "If you find yourself holding your breath, count the hold out loud. It is hard to hold your breath and speak at the same time",
@@ -954,7 +962,7 @@ export const REHABILITATION = [
       'Repeat 3 times each side'
     ],
     coaching: 'A stretch should feel like a pull, never a sharp pain. If it is sharp, bend the knee more until it is just a gentle tension.',
-    why: 'Restores hamstring length gently during the subacute phase — important for returning to normal movement patterns.',
+    why: 'Lengthens the hamstring gently while you lie supported — a comfortable way to work back towards your usual range.',
         watchOut: [
       "If it has started to hurt rather than pull, you have gone past where this works. Bend the knee slightly and stay there",
       "If your other hip is lifting off the floor, you are borrowing range from your back. Keep that hip down and accept a shorter stretch",
@@ -994,7 +1002,7 @@ export const REHABILITATION = [
       'Complete 15 reps, then switch legs'
     ],
     coaching: 'The quad staying tight is what protects the hamstring here. If the knee bends, the hamstring is doing more work than it should be at this stage.',
-    why: 'Builds hamstring control through a safe range — a standard progression in physiotherapy after hamstring strain.',
+    why: 'Builds hamstring control through a range you choose — a steady, low-load way to work the back of the leg.',
         watchOut: [
       "If the knee bends as the leg rises, lower it until the knee locks again. The straight knee is the exercise; the height is not",
       "If your lower back arches off the floor, press it down before you lift, and stop the leg lower",
@@ -1032,7 +1040,7 @@ export const REHABILITATION = [
       'Lower slowly — take 3 counts to come down',
       'Complete 12 reps each side, 3 sets'
     ],
-    coaching: 'The slow lowering (eccentric phase) is where most of the rehab benefit comes from. Do not rush it.',
+    coaching: 'The slow lowering (the eccentric phase) is where most of the benefit comes from. Take your time with it.',
     why: 'Rebuilds hamstring strength through active range of motion — the next step after isometric work.',
         watchOut: [
       "If your hips lift off the floor, you have run out of range and started borrowing. Stop where the hips stay down",
@@ -1048,8 +1056,8 @@ export const REHABILITATION = [
     position: 'standing',
     impact: false,
     balanceDemand: false,
-    name: 'Romanian Deadlift — Rehab Load',
-    youtube: 'romanian deadlift - rehab load exercise technique',
+    name: 'Romanian Deadlift — Light Load',
+    youtube: 'romanian deadlift light load exercise technique',
     category: 'rehabilitation',
     contentType: 'rehabilitation',
     rehabPhase: 'subacute',
@@ -1072,8 +1080,8 @@ export const REHABILITATION = [
       'Drive hips forward to return to standing',
       'Complete 3 sets of 10 reps at a pace that feels controlled'
     ],
-    coaching: 'Use the lightest weight that still feels like work. This is rehab, not a strength session — range and control matter more than load.',
-    why: 'Progressive hamstring loading through a lengthened position — one of the most effective exercises for hamstring injury rehabilitation.',
+    coaching: 'Use the lightest weight that still feels like work. This one is about range and control rather than strength — both matter more than load here.',
+    why: 'Loads the hamstrings gently through a lengthened position — a steady way to build strength and control at the back of the leg.',
         watchOut: [
       "If your lower back starts to round, that is your stopping point. Come back up. It will move lower over weeks",
       "If it feels like a squat, your knees are bending. Push your hips backwards instead of dropping down",
@@ -1113,7 +1121,7 @@ export const REHABILITATION = [
       'Complete 3 sets of 5 reps — quality over quantity'
     ],
     coaching: 'This is a hard exercise even for fit people. The hands are there to help — use them. The eccentric lowering is the goal, not the return.',
-    why: 'Nordic curls are the most evidence-backed exercise for hamstring injury prevention and rehabilitation. The eccentric loading rebuilds tendon strength.',
+    why: 'The assisted version of one of the hardest hamstring exercises. The slow lowering builds strength as the hamstring lengthens.',
         watchOut: [
       "If you fold at the waist, you are falling from the hips rather than the knees. Squeeze your glutes and keep a straight line from knee to head",
       "If you drop suddenly partway down, you went past what you can hold. Catch yourself earlier next time — earlier is progress, not failure",
@@ -1208,7 +1216,7 @@ export const REHABILITATION = [
     balanceDemand: true,
     name: 'Single-Leg Deadlift',
     generalPurpose: true,   // C2, approved 13 Aug 2026
-    youtube: 'single-leg deadlift - rehab exercise technique',
+    youtube: 'single-leg deadlift exercise technique',
     category: 'rehabilitation',
     contentType: 'rehabilitation',
     rehabPhase: 'maintenance',
@@ -1320,7 +1328,7 @@ export const REHABILITATION = [
     why: 'Hamstring tightness is often partly neural, not just muscular. Neural flossing addresses both and is particularly useful when the hamstring feels tight but not torn.',
         watchOut: [
       "If you are holding the end position, do not. One second and back — this is a pumping movement, not a stretch",
-      "If it brings on the symptom you are trying to settle, stop for today. I can't give you medical support — if it keeps happening, it's worth getting someone to look at it",
+      "If it brings on tingling or pain down the leg, stop for today. I can't give you medical support — if it keeps happening, it's worth getting someone to look at it",
       "If you are doing more because it feels productive, do less. Little and often does more here than a long session",
       "If pins and needles, burning or numbness increase or travel further down the leg, stop. I can't give you medical support — it's worth getting someone to look at it"
     ],
@@ -1357,7 +1365,7 @@ export const REHABILITATION = [
       'Keep the stride short — longer strides increase hamstring load',
       'Complete 3 sets of 10 reps each leg, rest 60 seconds between sets'
     ],
-    coaching: 'Short strides are deliberate here — as the hamstring heals, you can progressively lengthen them over weeks.',
+    coaching: 'Short strides are deliberate here. As this starts to feel easy, you can lengthen them gradually over the weeks.',
     why: 'Returns the hamstring to functional loading through normal gait patterns — a key step before returning to running.',
         watchOut: [
       "If the front knee travels inward, slow down and point it over the middle of your foot",
@@ -1397,7 +1405,7 @@ export const REHABILITATION = [
       'Complete 10 reps each side, 3 sets'
     ],
     coaching: 'This is harder than it looks. Start with a lower surface if needed. The adductor and hamstring work together here — both benefit.',
-    why: 'Strengthens the inner thigh and hamstring together — clinically used for groin and hamstring injury prevention in sport.',
+    why: 'Strengthens the inner thigh and hamstring together — a staple for field and court sports that ask a lot of side-to-side movement.',
         watchOut: [
       "If your hips roll backwards, you have turned it into a half-lying position. Stack the hips and shorten the range",
       "If you cannot control the lift, move the support closer to your knee. Full length is the last version, not the first",
@@ -1481,8 +1489,8 @@ export const REHABILITATION = [
       'Lower slowly — take 3 counts to come down',
       'Complete 3 sets of 15 reps'
     ],
-    coaching: 'The slow lowering is where the healing happens. Do not let the heels drop quickly.',
-    why: 'Safe starting point for calf loading after acute injury — seated position removes body weight load while still working the muscle.',
+    coaching: 'The slow lowering is where most of the work happens. Let the heels come down slowly.',
+    why: 'A gentle starting point for calf work — sitting takes your body weight off while still working the muscle.',
         watchOut: [
       "If your heels come off the chair rather than your toes staying down, you are pushing your feet forward. Keep the balls of the feet planted",
       "If you are bouncing, hold the top for a full second. The pause is where the work is",
@@ -1521,7 +1529,7 @@ export const REHABILITATION = [
       'Complete 3 sets of 15 reps each side'
     ],
     coaching: 'The lowering phase is the entire point. Rising on two feet is just resetting — all the work is in the slow single-leg descent.',
-    why: 'Eccentric heel drops are the most evidence-backed treatment for Achilles tendinopathy. The slow lengthening under load remodels and strengthens the tendon.',
+    why: 'Slow heel drops load the calf and Achilles as they lengthen. The slow lowering under load builds strength in the muscle and tendon.',
         watchOut: [
       "If you are rising back up on the working side, use both feet. Only the lowering is the exercise",
       "If the pain sits right on the heel bone rather than a few centimetres up the tendon, do the drops from flat ground instead of off a step",
@@ -1602,7 +1610,7 @@ export const REHABILITATION = [
       'Complete 3 sets of 15 reps each side',
       'This targets the gastrocnemius — the upper calf muscle'
     ],
-    coaching: 'Some mild discomfort is expected during Achilles rehab. Sharp pain means stop. Mild ache during and after is normal at this stage.',
+    coaching: 'A mild ache during and after is normal with this one. Sharp pain means stop.',
     why: 'The straight-knee version targets the gastrocnemius — the larger, outer calf muscle that attaches directly to the Achilles tendon.',
         watchOut: [
       "If you are pushing back up on the painful side, use the other foot. Only the lowering is the exercise",
@@ -1644,7 +1652,7 @@ export const REHABILITATION = [
       'This targets the soleus — the lower, deeper calf muscle'
     ],
     coaching: 'Do both the straight and bent-knee versions — they target different parts of the calf and both connect to the Achilles.',
-    why: 'The bent-knee version targets the soleus — the deeper calf muscle whose tendon blends into the Achilles. Essential for complete Achilles rehabilitation.',
+    why: 'The bent-knee version works the soleus — the deeper calf muscle whose tendon joins the Achilles. Doing both versions works the whole calf.',
         watchOut: [
       "If you are pushing back up on the painful side, use the other foot. Only the lowering is the exercise",
       "If your knee straightens as you lower, you have switched to the other calf muscle. Keep that slight bend throughout",
@@ -1686,7 +1694,7 @@ export const REHABILITATION = [
       'Repeat 3 times each side'
     ],
     coaching: 'Keep the back heel down on the floor — that is what gives the stretch. If the heel lifts, step the foot closer.',
-    why: 'Maintains calf and Achilles flexibility during rehabilitation — reduced flexibility is a significant risk factor for re-injury.',
+    why: 'Keeps the calf and Achilles flexible. Useful after running, walking or any calf work.',
         watchOut: [
       "If your back heel lifts, step in closer. A shorter stance with the heel down does more than a long one with it up",
       "If your back knee bends, straighten it — bending it moves the stretch to a different muscle",
@@ -1764,7 +1772,7 @@ export const REHABILITATION = [
       'Complete the full alphabet on the right, then switch to the left'
     ],
     coaching: 'This looks simple but covers every direction your ankle moves. It is one of the best all-round ankle mobility exercises there is.',
-    why: 'Restores ankle range of motion and proprioception \u2014 your sense of where the joint is \u2014 after injury — safe in the acute phase because there is no load through the joint.',
+    why: 'Moves the ankle round in every direction and trains your sense of where the joint is. No load goes through the ankle, so it is a gentle place to start.',
         watchOut: [
       "If your whole leg is swinging, rest the leg on something so only the foot can move",
       "If the letters are getting small, slow down and make them bigger. The range is the exercise",
@@ -1802,8 +1810,8 @@ export const REHABILITATION = [
       'Keep your right heel flat on the floor throughout',
       'Hold for 2 seconds, step back, repeat 15 times each side'
     ],
-    coaching: 'The band provides a small distraction to the ankle joint that helps restore range. This is a common physio technique.',
-    why: 'Improves ankle dorsiflexion range — limited dorsiflexion is linked to calf tightness, Achilles problems, knee pain, and running injuries.',
+    coaching: 'The band gently draws the ankle joint forward, which helps it move through its range.',
+    why: 'Improves how far the shin can move forward over the foot. Stiff ankles often leave the calves, knees and running stride doing extra work.',
         watchOut: [
       "If your whole leg turns to pull the foot, keep the knee still and move only from the ankle",
       "If the band drags your foot back quickly, control the return. Both directions count",
@@ -1843,7 +1851,7 @@ export const REHABILITATION = [
       'Roll for 60 seconds per leg'
     ],
     coaching: 'Roll slowly — about one inch per second. Tender spots mean the tissue needs more time there, not faster movement.',
-    why: 'Reduces calf tension and improves tissue quality — supports Achilles health and reduces injury recurrence risk.',
+    why: 'Eases calf tension and can leave the lower leg feeling looser. Useful after running or long days on your feet.',
         watchOut: [
       "If it is sharply painful rather than uncomfortable, take some weight off with your hands or drop the other foot to the floor",
       "If you are rolling fast, slow right down. Stopping on a tender spot for a few breaths does more than travelling up and down",
@@ -1888,7 +1896,7 @@ export const REHABILITATION = [
       'Complete 15 reps each side, 3 sets'
     ],
     coaching: 'The squeeze at full extension activates the VMO — the teardrop-shaped muscle on the inner quad that stabilises the kneecap.',
-    why: 'Terminal knee extensions specifically target the VMO, which is often weak in knee pain. Strengthening it improves kneecap tracking and reduces pain.',
+    why: 'Works the VMO — the inner part of the quad that controls the last part of straightening the knee.',
         watchOut: [
       "If your whole leg moves back, keep your foot planted and straighten only the knee",
       "If you are locking the knee hard at the end, squeeze the thigh instead. The last few degrees are the point, not the lock",
@@ -1966,7 +1974,7 @@ export const REHABILITATION = [
       'Complete 10 reps each side, 3 sets'
     ],
     coaching: 'Watch your knee in a mirror if possible. It should track straight — not collapsing inward. Slowing down helps keep it honest.',
-    why: 'Eccentric step-downs are a benchmark test and treatment for knee pain. The slow lowering builds quad and glute control under load.',
+    why: 'Slow step-downs build quad and glute control as you lower. A good test of how steady your knee feels — and good training for stairs.',
         watchOut: [
       "If your knee caves inward as you lower, slow down and keep it tracking over your second toe. Lower the step if it still caves",
       "If you are dropping rather than lowering, count four seconds down. The slow lowering is the entire exercise",
@@ -2007,7 +2015,7 @@ export const REHABILITATION = [
       'Complete 3 holds with 30 seconds rest between'
     ],
     coaching: 'Find the angle that produces a muscle burn but no knee pain. That is your working range — stay there.',
-    why: 'Isometric quad loading reduces knee pain while building strength — safe in acute and early subacute phases when movement is painful.',
+    why: 'Holding a squat against the wall builds quad strength with no movement through the knee. You choose how deep to sit, so you control how hard it is.',
         watchOut: [
       "If your knees pass your toes, walk your feet further from the wall",
       "If your lower back arches away from the wall, tuck your ribs down and hold higher",
@@ -2048,7 +2056,7 @@ export const REHABILITATION = [
       'Roll for 60 to 90 seconds per side'
     ],
     coaching: 'The IT band itself cannot be stretched — it is a thick band of connective tissue. You are releasing the muscles around it. It will be tender.',
-    why: 'Reduces tension in the lateral thigh and TFL muscle, which can reduce pain along the IT band. Most effective when combined with glute strengthening.',
+    why: 'Eases tension along the outside of the thigh and the TFL muscle. Works well alongside glute strengthening.',
         watchOut: [
       "If it is sharply painful, take weight off through the front foot. Grinding through does not make it work faster",
       "If you are rolling quickly, slow down and pause where it is tender",
@@ -2203,7 +2211,7 @@ export const REHABILITATION = [
       'At the top, shift your weight forward and lower back down by pulling your toes up — heel drop',
       'This combines a calf raise with a tibialis raise in one movement',
       'Complete 3 sets of 15 reps',
-      'Rest at least 48 hours between sessions while shins are symptomatic'
+      'Rest at least 48 hours between sessions while your shins feel sore'
     ],
     coaching: 'This is a progression — only start it once the tibialis raise is pain-free. Do not push through sharp shin pain.',
     why: 'Balances strength between the calf and tibialis anterior — the imbalance between these two muscles is a primary cause of shin splints.',
@@ -2247,7 +2255,7 @@ export const REHABILITATION = [
       'Complete 3 holds each side'
     ],
     coaching: 'Wobbling is the point — it means your stabilisers are working. Only hold a wall if you are about to fall.',
-    why: 'Restores proprioception — the body\'s sense of joint position. Lost after any lower limb injury and essential to recover before returning to sport.',
+    why: 'Trains proprioception — the body’s sense of where the joints are. It underpins balance in everyday life and in sport.',
         watchOut: [
       "If you are gripping with your toes, spread them and press the whole foot down instead",
       "If you touch down repeatedly, hold a wall with one finger. One finger is enough to steady you and still leaves the work to your leg",
@@ -2286,7 +2294,7 @@ export const REHABILITATION = [
       'The kneecap should move freely — if it feels stuck in one direction, spend more time there'
     ],
     coaching: 'This only works when the quad is completely relaxed. If the muscle is on, the kneecap is locked in place.',
-    why: 'Maintains kneecap mobility during rehabilitation and recovery from surgery. A stuck kneecap contributes to pain and limits knee flexion.',
+    why: 'Keeps the kneecap moving freely. A kneecap that feels stuck can limit how far the knee bends.',
         watchOut: [
       "If the kneecap will not move, your thigh is still switched on. Shake the leg out and try again with it completely soft",
       "If you are pressing hard, ease off. This is a gentle glide, not a push",
@@ -2326,7 +2334,7 @@ export const REHABILITATION = [
       'Each of the three directions is one rep — complete 5 full reps each side'
     ],
     coaching: 'Distance matters less than control. A short, controlled reach is better than a long one that makes you hop or twist.',
-    why: 'The Y-balance test is used clinically to assess injury risk and rehabilitation progress. As an exercise it builds the full lower limb stability needed to return to sport.',
+    why: 'Reaching in three directions on one leg builds the stability of the whole leg — the hip, knee and ankle working together.',
         watchOut: [
       "If you put weight on the reaching foot, you have reached too far. Touch lightly or not at all",
       "If your standing knee caves inward, reach shorter and keep it over your foot",
@@ -2371,7 +2379,7 @@ export const REHABILITATION = [
       'Switch arms and repeat'
     ],
     coaching: 'This is a passive exercise — the arm swings like a pendulum, not an active movement. Any muscular effort defeats the purpose.',
-    why: 'Creates gentle traction on the shoulder joint, reducing pain and maintaining range of motion in the acute phase when active movement is too painful.',
+    why: 'Lets the arm hang and swing so the shoulder moves with no effort from the muscles around it. A very gentle way to keep the shoulder moving.',
         watchOut: [
       "If your arm feels tense or you are lifting it, let it go completely. The arm is dead weight — your body swings, the arm follows",
       "If you are swinging hard, make the circles smaller. This is meant to open the joint gently, not stretch it",
@@ -2411,7 +2419,7 @@ export const REHABILITATION = [
       'Complete 3 sets of 15 reps each side'
     ],
     coaching: 'The elbow stays glued to your side. The moment it lifts, you are using the wrong muscles.',
-    why: 'Strengthens the infraspinatus and teres minor — two of the four rotator cuff muscles. Weakness here is the most common cause of shoulder impingement.',
+    why: 'Strengthens the infraspinatus and teres minor — two of the four rotator cuff muscles, which keep the shoulder steady as the arm moves.',
         watchOut: [
       "If your elbow drifts away from your side, tuck a rolled towel between elbow and ribs and hold it there. Losing that contact turns it into a different exercise",
       "If your shoulder shrugs up as you rotate, use a lighter band and keep the shoulder relaxed down",
@@ -2450,7 +2458,7 @@ export const REHABILITATION = [
       'Move slowly — 2 seconds in, 2 seconds back',
       'Complete 3 sets of 15 reps each side'
     ],
-    coaching: 'Same rule as external rotation — elbow stays against your side. Do both internal and external in every shoulder rehab session.',
+    coaching: 'Same rule as external rotation — elbow stays against your side. Doing both together works the rotator cuff evenly.',
     why: 'Strengthens the subscapularis — the rotator cuff muscle on the front of the shoulder. Balance between internal and external rotation is critical for shoulder health.',
         watchOut: [
       "If your elbow leaves your side, tuck a rolled towel there and keep hold of it",
@@ -2573,7 +2581,7 @@ export const REHABILITATION = [
       'Complete 3 sets of 8 reps'
     ],
     coaching: 'These are small movements with low weight — the difficulty comes from volume and holding position, not from load.',
-    why: 'Directly targets the lower and mid trapezius — muscles that are almost always weak in people with shoulder and neck pain from sitting.',
+    why: 'Directly works the lower and mid trapezius — muscles that often get little work in people who sit a lot.',
         watchOut: [
       "If your head lifts and your neck strains, rest your forehead on a rolled towel and leave it there",
       "If your lower back arches to help the arms up, press your hips into the floor and lift the arms less",
@@ -2614,7 +2622,7 @@ export const REHABILITATION = [
       'Complete 3 sets of 15 reps'
     ],
     coaching: 'Most people have never felt this movement before. It takes a few reps to find it. If arms are bending, it is a press-up — not a scapular press-up.',
-    why: 'Activates the serratus anterior — the muscle that holds the shoulder blade against the ribcage. Weakness here causes winging and shoulder impingement.',
+    why: 'Works the serratus anterior — the muscle that holds the shoulder blade against the ribcage and helps it move well.',
         watchOut: [
       "If your elbows bend at all, you have turned it into a press-up. Arms stay locked straight throughout",
       "If your hips sag or pike up, tighten your middle and keep a straight line from head to heels",
@@ -2693,7 +2701,7 @@ export const REHABILITATION = [
       'Move at about 5 seconds per full circle',
       'Complete 5 circles clockwise and 5 anticlockwise each side'
     ],
-    coaching: 'This is a daily maintenance exercise — 2 minutes a day prevents most wrist problems from building up.',
+    coaching: 'This is a daily maintenance exercise — two minutes a day keeps the wrists moving well.',
     why: 'Maintains wrist joint health and range of motion. Particularly useful for anyone who types, uses a mouse, or does press-ups regularly.',
         watchOut: [
       "If your forearm is rotating, hold it still with your other hand so only the wrist moves",
@@ -2734,7 +2742,7 @@ export const REHABILITATION = [
       'Switch sides and repeat'
     ],
     coaching: 'Gentle and sustained is the goal. These stretches work best when held for at least 20 seconds.',
-    why: 'Maintains wrist flexor and extensor length — important for preventing and managing tennis elbow, golfer\'s elbow and repetitive strain.',
+    why: 'Keeps the forearm muscles that bend and straighten the wrist supple — useful for anyone who types, grips or lifts a lot.',
         watchOut: [
       "If you feel it in the joint rather than along the forearm, ease off and bend the wrist less",
       "If you are pulling hard, lighten the pressure. Twenty seconds gentle does more than five seconds forced",
@@ -2773,8 +2781,8 @@ export const REHABILITATION = [
       'Move slowly through a comfortable range, pausing at each end for 1 second',
       'Complete 15 slow reps each side, 3 sets'
     ],
-    coaching: 'The weight of even a light object adds enough load to make this therapeutic. As strength returns, use a slightly heavier object.',
-    why: 'Restores forearm rotation — commonly restricted after wrist or elbow injury. Essential for almost every upper body movement.',
+    coaching: 'Even a light object adds enough load to make this work. As it gets easier, use a slightly heavier one.',
+    why: 'Trains the forearm turning palm-up and palm-down — a movement almost every upper body task relies on.',
         watchOut: [
       "If your elbow swings out from your side, tuck it in and hold it there",
       "If your shoulder is turning, keep it still — the movement is forearm only",
@@ -2814,7 +2822,7 @@ export const REHABILITATION = [
       'Complete 15 reps each hand, 3 sets'
     ],
     coaching: 'Release completely between reps — full release is as important as the squeeze for building endurance.',
-    why: 'Rebuilds grip strength after wrist or elbow injury. Grip strength is also a reliable indicator of overall upper limb health.',
+    why: 'Builds grip strength with nothing more than a towel. Grip is part of almost every lift and carry.',
         watchOut: [
       "If you are squeezing at maximum effort, drop to about two thirds. This one responds to repetition, not force",
       "If your forearm cramps, release fully between reps and rest longer",
@@ -2862,7 +2870,7 @@ export const REHABILITATION = [
       'Complete 15 reps'
     ],
     coaching: 'This is a tiny movement — it should not involve lifting your hips. Just a gentle rocking of the pelvis.',
-    why: 'Activates the deep abdominal muscles that support the lumbar spine — the starting point for all lower back rehabilitation.',
+    why: 'Wakes up the deep abdominal muscles that support the lower back — a gentle starting point for core work.',
         watchOut: [
       "If you cannot feel the gap close, put one hand under your lower back so you can feel it press down. Most people find this by touch before they find it by feel",
       "If your buttocks or thighs are doing the squeezing, let them go and use only your stomach",
@@ -2914,7 +2922,7 @@ export const REHABILITATION = [
       'Continue for 2 minutes'
     ],
     coaching: 'The engagement is gentle — about 20% of maximum. If you are holding your breath or gripping hard, you are doing too much.',
-    why: 'The deep core — transversus abdominis and pelvic floor — activates with the breath. This re-establishes that connection after injury or inactivity.',
+    why: 'The deep core — transversus abdominis and pelvic floor — works with the breath. This builds that connection, especially useful when coming back to exercise after time away.',
         watchOut: [
       "If your chest hand is rising and your belly hand is still, you are breathing high. Slow the breath right down and let the belly go first",
       "If you are pulling your belly hard toward your spine, ease off. This is a gentle draw-in, not a brace",
@@ -3082,7 +3090,7 @@ export const REHABILITATION = [
     position: 'floor',
     impact: false,
     balanceDemand: false,
-    name: 'Bird Dog — Core Rehab',
+    name: 'Bird Dog — Gentle Core',
     // NOT generalPurpose. Caught by the rename: stripping "— Core Rehab"
     // collided with the existing general `bird-dog` in strength.js, which
     // is the signal that this entry is redundant for anybody without a
@@ -3090,7 +3098,7 @@ export const REHABILITATION = [
     // its own bug. Keeps the clinical name, because here the name is
     // doing real work.
     
-    youtube: 'bird dog - core rehab exercise technique',
+    youtube: 'bird dog core exercise technique',
     category: 'rehabilitation',
     contentType: 'rehabilitation',
     rehabPhase: 'subacute',
@@ -3114,7 +3122,7 @@ export const REHABILITATION = [
       'Complete 10 reps each side, 3 sets'
     ],
     coaching: 'Imagine a glass of water on your lower back. Do not spill it.',
-    why: 'Trains the deep spinal stabilisers in a low-load, safe position. A standard first-line exercise in lower back rehabilitation worldwide.',
+    why: 'Trains the deep muscles that steady the spine, in a low-load, supported position. A staple first core exercise.',
         watchOut: [
       "If your hips rotate as the leg goes back, lower the leg. Level hips matter more than a high leg",
       "If your lower back sags, tighten your middle gently and lift the leg only to hip height",
@@ -3164,8 +3172,8 @@ export const REHABILITATION = [
       'Lower slowly',
       'Complete 10 reps'
     ],
-    coaching: 'This is a directional exercise — it helps some back conditions and not others. If it increases leg pain or makes symptoms worse, stop and see a physio.',
-    why: 'McKenzie extension reduces disc pressure and is one of the most evidence-backed treatments for discogenic lower back pain and sciatica.',
+    coaching: 'This is a directional exercise — it suits some backs and not others. If it sends pain into your leg or makes things worse, stop and speak to a GP or physio.',
+    why: 'A gentle backward bend of the lower back while lying face down. Many people find it eases stiffness after long periods of sitting.',
         watchOut: [
       "If your hips peel off the floor, or your back muscles grip instead of your arms pressing, keep your pelvis heavy and relaxed and press only through your palms",
       "Even a few inches is fine. Height is not the point",
@@ -3249,7 +3257,7 @@ export const REHABILITATION = [
       'Complete 10 reps each side'
     ],
     coaching: 'Move from your mid-back, not just your shoulders. Imagine your spine is the axis of rotation.',
-    why: 'Maintains spinal rotation mobility and reduces stiffness — safe in the acute phase because it is unloaded and low range.',
+    why: 'Keeps the spine rotating freely and eases stiffness. Unloaded and low range, so it is a gentle one.',
         watchOut: [
       "If your hips turn with your shoulders, plant both feet and hold the chair with the opposite hand to keep them still",
       "If you are forcing the last bit of rotation, stop where it is comfortable. This is a mobility drill, not a stretch to win",
@@ -3335,7 +3343,7 @@ export const REHABILITATION = [
       'Complete 3 sets of 5 reps'
     ],
     coaching: 'The hands under the back are not for comfort — they hold the natural spinal curve that protects the discs. Without them, this becomes a harmful crunch.',
-    why: 'Developed by spine researcher Stuart McGill — activates the rectus abdominis while maintaining spinal alignment. Safer than sit-ups or crunches for most back conditions.',
+    why: 'Developed by spine researcher Stuart McGill — works the front of the abdominals while the spine stays in a neutral position. A gentler option than sit-ups or crunches for many people.',
         watchOut: [
       "If your lower back flattens into the floor, you have lost the point of it. Keep your hands underneath and keep the natural arch there",
       "If you are lifting high, come down. A few centimetres is the whole range — this is not a sit-up",
@@ -3386,7 +3394,7 @@ export const REHABILITATION = [
       'Complete 3 holds each side'
     ],
     coaching: 'The modified version from knees is completely valid. Build the hold time before progressing to full side plank from feet.',
-    why: 'Trains the lateral core — the quadratus lumborum and obliques — which resist sideways bending forces on the spine. Part of the McGill Big Three for back rehabilitation.',
+    why: 'Trains the side of the core — the quadratus lumborum and obliques — which resist bending sideways. Part of the McGill Big Three core series.',
         watchOut: [
       "If your hips roll backwards, push them forward and hold a shorter time. The line matters more than the seconds",
       "If your shoulder aches, check your elbow is directly under it rather than in front",
@@ -3452,7 +3460,7 @@ export const REHABILITATION = [
       'Repeat 10 times, 3 sets per day'
     ],
     coaching: 'Most people hold their breath or tense their glutes and thighs instead. Check: can you still breathe freely? If not, reduce the effort.',
-    why: 'Strengthens the pelvic floor — the hammock of muscles supporting the bladder, bowel, and reproductive organs. Weak pelvic floor contributes to leakage, prolapse risk, and low back instability.',
+    why: 'Strengthens the pelvic floor — the hammock of muscles supporting the bladder, bowel and reproductive organs, and part of how the core steadies the lower back.',
         watchOut: [
       "If your buttocks clench, your thighs grip, or you find yourself holding your breath, place a hand on your lower belly and keep your glutes completely soft",
       "If you feel a sensation of pushing downward or outward rather than lifting, breathe in naturally and — as you exhale — imagine drawing the base of your pelvis up toward your ribs like a gentle lift",
@@ -3491,7 +3499,7 @@ export const REHABILITATION = [
       'Repeat 3 times'
     ],
     coaching: 'Quick flicks train the fast-twitch pelvic floor fibres — the ones that respond to a cough, sneeze, or jump. Both slow holds and quick flicks are needed.',
-    why: 'The fast-twitch pelvic floor muscles prevent leakage during sudden pressure increases. Slow holds alone do not train this.',
+    why: 'The fast-twitch pelvic floor muscles react to sudden pressure, such as a cough, sneeze or jump. Slow holds alone do not train this.',
         watchOut: [
       "If the tension stays on between reps and the muscles never fully let go, think of it as snap up, completely let go",
       "If you cannot feel the release between each flick, slow to a two-second cycle, or go back to basic contractions until the release is obvious",
@@ -3618,8 +3626,8 @@ export const REHABILITATION = [
       'Hold the mid-range position with gentle muscular effort — do not lock out',
       'Spend 5 minutes practising finding and holding neutral alignment'
     ],
-    coaching: 'People with hypermobility often unconsciously rest in their ligaments rather than their muscles. This practice builds the habit of active mid-range holding.',
-    why: 'Proprioception — the sense of joint position — is often reduced in hypermobility. Training it is the foundation of managing hypermobile joints safely.',
+    coaching: 'Some people rest their weight in their joints rather than their muscles without noticing. This practice builds the habit of holding the middle of the range with muscle.',
+    why: 'Proprioception — the sense of joint position — is a skill, and it can be trained. This is the foundation for joints that feel steady and controlled.',
         watchOut: [
       "If you cannot tell where neutral is for a joint, move it to both extremes and settle in the middle. Neutral is easier to find by contrast",
       "If you find yourself pushing joints into their end range while checking, come back. Noticing is the exercise, not stretching",
@@ -3657,7 +3665,7 @@ export const REHABILITATION = [
       'Hold for 20 seconds, then stand normally',
       'Repeat 5 times each side'
     ],
-    coaching: 'This tiny bend is doing a lot. Locking the knee out is easy — holding it slightly bent with muscular control takes real work for hypermobile joints.',
+    coaching: 'This tiny bend is doing a lot. Locking the knee out is easy — holding it slightly bent with muscle takes real work, especially if your joints bend further than most.',
     why: 'Trains the quads to actively stabilise the knee rather than relying on the ligaments. Reduces knee hyperextension, pain, and instability.',
         watchOut: [
       "If the knee keeps snapping back to locked, you are relaxing the thigh. Keep a light squeeze the whole time",
@@ -3698,7 +3706,7 @@ export const REHABILITATION = [
       'Begin to notice this position throughout the day and return to it when shoulders drift'
     ],
     coaching: 'Think of your shoulder blades sliding into back pockets. The movement is subtle — not a big retraction.',
-    why: 'Creates active shoulder girdle stability — essential for hypermobile shoulders that rely on passive structures and are prone to subluxation and pain.',
+    why: 'Builds active steadiness around the shoulder blade — helpful for shoulders that feel loose or move further than most.',
         watchOut: [
       "If your shoulders lift toward your ears, you are shrugging rather than packing. Think down and back, and much gentler than feels useful",
       "If you are squeezing hard, halve it. This is a light engagement you could hold while talking",
@@ -3737,8 +3745,8 @@ export const REHABILITATION = [
       'Hold for 30 seconds, switch sides',
       'Complete 3 holds each side'
     ],
-    coaching: 'Most hypermobile people stand by hanging into the hip — ligaments taking the load. This builds the muscular alternative.',
-    why: 'Single-leg hip stability is essential for every step taken, for stairs, and for any sport. Building it reduces hip pain and the risk of joint damage over time.',
+    coaching: 'Many people stand by hanging into one hip, letting the joint take the load. This builds the muscular alternative.',
+    why: 'Single-leg hip stability is part of every step, every stair and every sport. This builds it steadily.',
         watchOut: [
       "If your hip hikes up or drops, put your hands on your hip bones so you can feel them level",
       "If you are gripping your buttock hard, ease off. Steady beats tight here",
@@ -3780,8 +3788,8 @@ export const REHABILITATION = [
       'Return to slight bend slowly',
       'Complete 3 sets of 15 reps each side'
     ],
-    coaching: 'Terminal extension specifically targets the VMO — the inner quad muscle most affected by knee injury and most responsible for knee stability.',
-    why: 'Knee terminal extension is a core exercise in ACL and patellofemoral rehabilitation — it restores the final degrees of extension strength without loading the joint in vulnerable positions.',
+    coaching: 'Terminal extension targets the VMO — the inner quad muscle that controls the last part of straightening the knee and keeps it steady.',
+    why: 'Builds strength in the final part of straightening the knee, without loading the joint in a deep bend.',
         watchOut: [
       "If your whole leg moves back, keep your foot planted and straighten only the knee",
       "If you are locking the knee hard at the end, squeeze the thigh instead",
@@ -3821,7 +3829,7 @@ export const REHABILITATION = [
       'Complete 3 sets of each'
     ],
     coaching: 'The Y-T-W directly targets the lower and middle trapezius — muscles almost universally undertrained and responsible for shoulder stability.',
-    why: 'Y-T-W is a clinical rehabilitation staple for shoulder impingement, rotator cuff issues, and postural dysfunction. Restores scapular control and stability.',
+    why: 'Raising the arms in a Y, T and W shape trains the muscles that control the shoulder blades. Good for posture and shoulder steadiness.',
         watchOut: [
       "If your head lifts and your neck strains, rest your forehead down and leave it there",
       "If your lower back arches, press the hips into the bench or floor and lift the arms less",
@@ -3860,8 +3868,8 @@ export const REHABILITATION = [
       'Progress levels only when the current level is fully controlled',
       'Complete 3 sets at whatever level is currently appropriate'
     ],
-    coaching: 'Ankle sprains damage the nerves that tell you where your foot is as much as they damage the ligaments. Restoring balance and proprioception prevents re-injury more than any other intervention.',
-    why: 'Proprioception training is the most important component of ankle sprain rehabilitation — people who skip this step have very high re-injury rates within the first year of return to sport.',
+    coaching: 'Balance is a skill the ankle learns. Training where your foot is, not only how strong it is, makes the whole ankle steadier.',
+    why: 'Balance and proprioception training builds a steadier ankle for walking, running and sport — especially useful if your ankle has ever felt wobbly.',
         watchOut: [
       "If you are wobbling constantly at one level, stay there rather than moving up. The levels are a ladder, not a schedule",
       "If you touch down often with eyes closed, go back to eyes open. Closing them removes most of your balance information",
@@ -3899,8 +3907,8 @@ export const REHABILITATION = [
       'Complete 3 sets of 20 reps',
       'Then flip the forearm over for extension: palm down, raise the back of the hand'
     ],
-    coaching: 'Start lighter than feels necessary. Wrist tendons are slow to recover and easy to re-injure with too much load too soon.',
-    why: "Wrist flexor and extensor strengthening restores the forearm strength balance disrupted by tennis elbow, golfer's elbow, and repetitive strain injuries.",
+    coaching: 'Start lighter than feels necessary. Wrist tendons respond slowly to load, so build up gradually.',
+    why: 'Strengthens the forearm muscles that bend and straighten the wrist, keeping them balanced — useful for anyone who grips, types or lifts a lot.',
         watchOut: [
       "If your forearm lifts off the table, hold it down with your other hand. Only the wrist moves",
       "If you are dropping the weight quickly, control the lowering. That half matters more",
@@ -3939,7 +3947,7 @@ export const REHABILITATION = [
       'Repeat 10 times'
     ],
     coaching: 'This is a subtle exercise — not a strong chin tuck. The deep cervical flexors are small and fatigue quickly. Quality of activation is everything.',
-    why: 'Deep cervical flexor weakness is present in almost all people with neck pain and headaches. This specific activation exercise is the cornerstone of neck pain rehabilitation.',
+    why: 'Works the small, deep muscles at the front of the neck that hold the head steady. Useful for anyone who spends long hours looking at screens.',
         watchOut: [
       "If the muscles along the front and sides of your neck stand out like cables, or your head lifts off the floor, the big muscles have taken over. Make the nod much smaller",
       "Think of a tiny nod — five to ten degrees, as if saying yes very slightly. Tongue resting on the roof of your mouth, teeth slightly apart",
@@ -3978,7 +3986,7 @@ export const REHABILITATION = [
       'Lower with control — resist the band pulling the leg back',
       'Complete 3 sets of 15 reps each side'
     ],
-    coaching: 'Hip flexor weakness is often overlooked in lower back and hip pain rehabilitation. It is one of the most important muscles for gait, stair climbing, and running.',
+    coaching: 'Hip flexor strength is often overlooked. These muscles matter for walking, climbing stairs and running.',
     why: 'Hip flexor strength — not just flexibility — is essential for healthy hip mechanics. Weakness leads to compensatory patterns that drive knee, hip, and lower back pain.',
         watchOut: [
       "If your back arches as the knee comes up, tuck your ribs down and lift the knee lower",
@@ -4020,7 +4028,7 @@ export const REHABILITATION = [
       'Add a resistance band around the knees for additional load'
     ],
     coaching: 'Lateral hip strength is the foundation of lower limb health — it affects knee alignment, IT band tension, and lower back stability all at once.',
-    why: 'Lateral hip weakness is implicated in patellofemoral pain, IT band syndrome, gluteal tendinopathy, and lower back pain. A single rehabilitation series addresses all of these.',
+    why: 'Strengthens the side of the hip, which steadies the pelvis and knee with every step. A single series that works the whole lateral hip.',
         watchOut: [
       "If your form falls apart partway through, stop there rather than finishing the numbers. The last exercise is the hardest and comes when the others are tired on purpose",
       "If the single-leg touch-down has your knee falling inward, hold a wall and go less deep, or leave that part out until the rest is comfortable",
@@ -4037,7 +4045,7 @@ export const REHABILITATION = [
     balanceDemand: false,
     name: 'Thoracic Mobility',
     generalPurpose: true,   // C2, approved 13 Aug 2026
-    youtube: 'thoracic mobility - rehabilitation exercise technique',
+    youtube: 'thoracic mobility exercise technique',
     category: 'rehabilitation',
     contentType: 'exercise',
     movementPattern: 'extension',
@@ -4057,10 +4065,10 @@ export const REHABILITATION = [
       'Thread the needle from hands and knees: 10 each side',
       'Wall slides: 10 reps',
       'Open book from side-lying: 10 each side',
-      'Complete daily in the early phases of rehabilitation'
+      'Daily practice works well when you are starting out'
     ],
-    coaching: 'Thoracic stiffness is a primary contributor to neck pain, shoulder impingement, and lower back pain — often overlooked in rehabilitation programs that treat these in isolation.',
-    why: 'Thoracic mobility restoration is foundational for shoulder, neck, and lower back rehabilitation. Improving thoracic movement reduces compensatory demands on adjacent joints.',
+    coaching: 'Stiffness in the upper back is easy to overlook. When the upper back moves well, the neck, shoulders and lower back have less work to do.',
+    why: 'Gets the upper back moving. When it moves well, the joints above and below it do less work to make up for it.',
         watchOut: [
       "If your lower back is doing the arching on the foam roller, bend your knees and keep your hips on the floor. The movement belongs in the upper back",
       "If the roller is painful on your spine, you have it too low or you are pressing too hard. Keep it between the shoulder blades and support your head",
@@ -4076,8 +4084,8 @@ export const REHABILITATION = [
     position: 'floor',
     impact: false,
     balanceDemand: false,
-    name: 'Breathing Retraining — Rehabilitation',
-    youtube: 'breathing retraining - rehabilitation exercise technique',
+    name: 'Breathing Retraining',
+    youtube: 'diaphragmatic breathing retraining technique',
     category: 'rehabilitation',
     contentType: 'exercise',
     movementPattern: 'breath-awareness',
@@ -4101,8 +4109,8 @@ export const REHABILITATION = [
       'Practice 10 minutes of belly-only breathing',
       'Once established lying down, practice seated, then standing'
     ],
-    coaching: 'Diaphragmatic breathing restores intra-abdominal pressure regulation — the foundation of core stability. Without it, all other core rehabilitation is built on unstable ground.',
-    why: 'Altered breathing patterns are found in almost all people with chronic lower back pain and postural dysfunction. Restoring diaphragmatic breathing is the first step in core rehabilitation.',
+    coaching: 'Breathing low into the belly helps regulate the pressure inside the abdomen — the foundation of core stability that other core work builds on.',
+    why: 'Many people breathe mostly into the upper chest. Relearning to breathe low into the belly is a good first step in core work.',
         watchOut: [
       "If the chest hand rises first, slow the breath down and start the inhale by letting the belly go soft",
       "If you feel lightheaded, you are breathing too deeply. Smaller, slower breaths",
@@ -4142,7 +4150,7 @@ export const REHABILITATION = [
       'Complete 10 very slow reps each side'
     ],
     coaching: 'Neural flossing creates movement of the nerve through its pathway — like flossing between teeth. If any movement produces sharp radiating pain, stop immediately.',
-    why: 'Neural mobilisation techniques improve nerve mobility and reduce neural tension in sciatica rehabilitation. Evidence shows superior outcomes compared to stretching alone.',
+    why: 'A gentle sliding movement for the sciatic nerve that runs down the back of the leg. It helps the nerve glide freely as the leg and neck move.',
         watchOut: [
       "If you are holding at the end, release it. A pump, not a stretch",
       "If pain travels further down the leg, stop. I can't give you medical support — it's worth getting someone to look at it",
