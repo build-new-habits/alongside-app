@@ -1,5 +1,12 @@
 /**
  * tools/verify-card5.mjs
+ * 29 Sep 2026 v3
+ *
+ * v3 - P23. 6.2 read the literal text "renderSafetyGate()"; breathing and
+ *   quiet-session now call renderSafetyGate({ practice: true }) for the
+ *   practice wording. It reads any call. What it requires -- every view
+ *   renders and attaches the gate -- is unchanged.
+ *
  * 28 Sep 2026 v2
  *
  * v2 - GATE-ONCE. An acknowledgement now covers the rest of the session
@@ -339,7 +346,7 @@ console.log("\nTEST 6 — every movement view mounts it");
      VIEWS.every(v => /import \{[^}]*isGateDue[^}]*\} from ['"]\.\.\/safety-gate\.js['"]/.test(src[v])));
 
   ok("6.2 all five render it and all five attach it",
-     VIEWS.every(v => src[v].includes("renderSafetyGate()") &&
+     VIEWS.every(v => /renderSafetyGate\((\{ practice: true \})?\)/.test(src[v]) &&
                       src[v].includes("attachSafetyGate(")));
 
   ok("6.3 each declares its own surface, so the log says WHERE",

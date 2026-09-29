@@ -1,5 +1,10 @@
 /**
  * js/exercise-card.js
+ * 29 Sep 2026 v13
+ *
+ * v13 - P23. HURT_AND_ACHE_PRACTICE: the same advice phrased for a
+ *   practice (breathing, mindful sitting or lying), for the safety gate.
+ *
  * 28 Sep 2026 v12
  *
  * v12 - SMOOTH-P2c. layout: "flow", one screen per exercise, for the
@@ -256,6 +261,20 @@
 export const HURT_AND_ACHE = [
   "If something hurts while you are doing it \u2014 sharp, or building as you go \u2014 stop that movement. Discomfort that settles when you stop is usually fine to work near. Pain that grows is not.",
   "Aching for a day or two afterwards is normal, especially if this is new to you. I can't give you medical support \u2014 if it is worse than when you started, or it is still there after a few days, it's worth getting someone to look at it."
+];
+
+/**
+ * P23, 29 Sep 2026. The same advice for a practice -- breathing, mindful
+ * sitting or lying -- where there is no "movement" to stop and no
+ * exercise to ache after. Before a breathing practice the note said
+ * "Before your first exercise ... stop that movement". What to do is
+ * unchanged: stop if something hurts and get it seen if it lasts; the
+ * verb fits what the person is doing. Same HURT_AND_ACHE_VERSION: one
+ * piece of advice, two phrasings. Change both together.
+ */
+export const HURT_AND_ACHE_PRACTICE = [
+  "If something hurts while you are doing it \u2014 sharp, or building as you go \u2014 stop, and move to a position that doesn't hurt. Discomfort that settles when you shift is usually fine. Pain that grows is not.",
+  "I can't give you medical support \u2014 if something is worse than when you started, or it is still there after a few days, it's worth getting someone to look at it."
 ];
 
 /**

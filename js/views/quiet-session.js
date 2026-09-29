@@ -7,6 +7,11 @@
  *   "the braking system of the nervous system", HRV as "a marker of
  *   nervous system health". Rewritten as what to do. Patterns unchanged.
  *
+ * 29 Sep 2026 v7
+ *
+ * v7 - P23. The safety note before mindful practice is worded for a
+ *   practice ("Before your practice"), not for an exercise.
+ *
  * 15 Aug 2026 v6
  *
  * v6 - SHARED-1. Both completion screens render the end-of-session
@@ -396,7 +401,7 @@ function renderMode() {
   // journalling and short breathing prompts -- reading and typing, with
   // no body in them. Mindful mode is a timed practice somebody holds a
   // position through, which is where hurt-and-ache applies.
-  if (mode === "mindful" && isGateDue()) return renderSafetyGate();
+  if (mode === "mindful" && isGateDue()) return renderSafetyGate({ practice: true });
   if (mode === "mindful")    return renderMindfulMode();
   if (mode === "rest")       return renderRestMode();
   return renderBreathingMode();

@@ -1,5 +1,15 @@
 /**
  * js/safety-gate.js
+ * 29 Sep 2026 v5
+ *
+ * v5 - P23, PRACTICE WORDING (persona finding W2-19). Gating breathing
+ *   and mindful practice was a decision; the wording was not. Before a
+ *   breathing practice the note said "Before your first exercise" and
+ *   "stop that movement". renderSafetyGate({ practice: true }) heads it
+ *   "Before your practice" and uses HURT_AND_ACHE_PRACTICE; the
+ *   acknowledgement records variant 'practice' (Schema v1.79). Same
+ *   textVersion, so both wordings count toward one taper.
+ *
  * 28 Sep 2026 v4
  *
  * v4 - F8 (found screenshotting a class). Start the session rendered as
@@ -106,7 +116,7 @@
  */
 
 import { store } from "./store.js";
-import { HURT_AND_ACHE, HURT_AND_ACHE_VERSION } from "./exercise-card.js";
+import { HURT_AND_ACHE, HURT_AND_ACHE_PRACTICE, HURT_AND_ACHE_VERSION } from "./exercise-card.js";
 
 /**
  * GUIDANCE-1's line, hoisted here so there is one copy rather than two.
@@ -249,8 +259,10 @@ function esc(s) {
  *
  * There is no timeout. 2.2.1, and also plain decency.
  */
-export function renderSafetyGate() {
-  const lines = HURT_AND_ACHE
+export function renderSafetyGate({ practice = false } = {}) {
+  // P23. A practice (breathing, mindful) gets the same advice, phrased for
+  // sitting or lying rather than for an exercise.
+  const lines = (practice ? HURT_AND_ACHE_PRACTICE : HURT_AND_ACHE)
     .map(s => `<li>${esc(s)}</li>`).join("");
 
   const guidance = isGuidanceDue()
@@ -259,8 +271,8 @@ export function renderSafetyGate() {
 
   return `
     <div class="safety-gate" role="dialog" aria-modal="true"
-         aria-labelledby="gate-h" data-safety-gate>
-      <p class="gate-kicker">Before your first exercise</p>
+         aria-labelledby="gate-h" data-safety-gate${practice ? ' data-gate-variant="practice"' : ''}>
+      <p class="gate-kicker">${practice ? 'Before your practice' : 'Before your first exercise'}</p>
       <h2 class="gate-title" id="gate-h" tabindex="-1">Before you start</h2>
 
       <div class="gate-block gate-block--hazard">
@@ -295,7 +307,7 @@ export function renderSafetyGate() {
  * one failure mode that makes this entire feature worthless, and it
  * would look identical to nobody ever having acknowledged anything.
  */
-export function recordAcknowledgement(surface) {
+export function recordAcknowledgement(surface, variant) {
   // GATE-ONCE. Before the write, so a storage failure cannot bring the
   // note back on the very next screen.
   _sessionAckAt = new Date().toISOString();
@@ -304,6 +316,8 @@ export function recordAcknowledgement(surface) {
     textVersion: HURT_AND_ACHE_VERSION,
     surface: String(surface || "unknown")
   };
+  // P23. Which wording was read. Absent means the movement wording.
+  if (variant === "practice") entry.variant = "practice";
 
   try {
     const prog = store.get("activeProgramme");
@@ -367,7 +381,7 @@ export function attachSafetyGate(root, opts) {
         return;
       }
       clearError();
-      recordAcknowledgement(opts.surface);
+      recordAcknowledgement(opts.surface, el.getAttribute("data-gate-variant"));
       if (typeof opts.onAcknowledge === "function") opts.onAcknowledge();
     });
   }

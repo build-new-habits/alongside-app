@@ -1,6 +1,11 @@
 /**
  * js/views/breathing-session.js - Guided Breathing Session
  *
+ * 29 Sep 2026 v7
+ *
+ * v7 - P23. The safety note before a practice is worded for a practice
+ *   ("Before your practice"), not for an exercise.
+ *
  * 28 Sep 2026 v6
  *
  * v6 - SMOOTH-P4b. startBreathing(type, mins): Wellbeing's "Suggested
@@ -358,7 +363,7 @@ export function render() {
   // list that trims the quiet ones invites the next person to trim
   // further.
   if (phase === "session" && isGateDue()) {
-    return `<div class="view">${renderSafetyGate()}</div>`;
+    return `<div class="view">${renderSafetyGate({ practice: true })}</div>`;
   }
   if (phase === "session")  return renderSession();
   if (phase === "done")     return renderDone();
