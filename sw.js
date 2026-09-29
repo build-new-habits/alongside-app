@@ -1,7 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 29 Sep 2026 v589
+ * 29 Sep 2026 v590
+ *
+ * v590 - P22. A Classes door on Free Home; the class list says what can
+ *   be done seated, and reads today's pain scores (class-list v2).
  *
  * v589 - P21. Built and saved sessions play in the coach's player; the
  *   saved list reads the log (workout v28, saved-sessions v6).
@@ -4096,7 +4099,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v589";
+const CACHE_NAME = "alongside-v590";
 
 const SHELL_URLS = [
 
