@@ -1,5 +1,12 @@
 /**
  * coach-proposal.js
+ * 29 Sep 2026 v38
+ *
+ * v38 - P7, "SINCE YESTERDAY". The recap names the actual day ("Earlier
+ *   today" / "Yesterday") instead of a 48-hour window, and says each
+ *   activity in words from data/activity-labels.js, the one map.
+ *   verify-activity-labels.
+ *
  * 29 Sep 2026 v37
  *
  * v37 - P6, DURATION-LABEL. The header added up minutes that had each
@@ -689,6 +696,7 @@ import { AVAILABLE_TIME_WINDOW_MINUTES } from '../data/time-windows.js';
 import { buildSession, buildCandidatePools, equipmentForLocation,
          swapAlternatives, swapExerciseInSession, soreLevelFor,
          soreScoresToday, SESSION_TYPES, exerciseSeconds } from '../session-builder.js';
+import { activityPhrase, joinList, daysAgo } from '../data/activity-labels.js';
 // SMOOTH-P2a. The plan carries the safety note when it is due.
 import { isGateDue, isGuidanceDue, recordAcknowledgement,
          GUIDANCE_TEXT } from '../safety-gate.js';
@@ -2069,7 +2077,7 @@ export function CoachProposalView(router) {
     // Build greeting
     const greeting = _buildGreeting(name);
 
-    // Build reflection (last 48h activity)
+    // Build reflection (today, or else yesterday -- P7)
     const reflection = _buildReflection();
 
     // Build constraint message — one combined, severity-ordered
@@ -2107,60 +2115,24 @@ export function CoachProposalView(router) {
     return `${timeGreeting}${displayName}.`;
   }
 
-  // ── Reflection (last 48h activity) ────────────────────────────────────────
+  // ── Reflection: the most recent day, today or yesterday ─────────────────
+  //
+  // P7. Was "Since yesterday, you did ..." over a 48-hour window, so two
+  // days ago counted as yesterday, and a map keyed on type names nothing
+  // writes ("you did gym" at home, "mindfulness", "walk"). Now it names
+  // the actual day, from the one label map (data/activity-labels.js).
 
   function _buildReflection() {
     const activityLog = store.get('activityLog') || [];
-    const cutoff      = Date.now() - (48 * 60 * 60 * 1000);
-    const recent      = activityLog.filter(entry => {
-      const ts = entry.completedAt || entry.loggedAt || entry.date;
-      return ts && new Date(ts).getTime() > cutoff;
-    });
-
-    if (recent.length === 0) return null;
-
-    const ACTIVITY_LABELS = {
-      'workout':          'strength work',
-      'morning-session':  'morning movement',
-      'yoga-session':     'yoga',
-      'walk-session':     'a walk',
-      'running-session':  'a run',
-      'cycle-session':    'cycling',
-      'swim-session':     'swimming',
-      'core-session':     'core work',
-      'quiet-session':    'a breathing session',
-      'breathing-session':'a breathing session',
-      'gym-programme':    'gym work',
-      'coach-session':    'a coaching session',   // v11 — was leaking raw as "coach-session"
-    };
-
-    // v11: fallback for any type not in the map above — hyphens to spaces
-    // rather than leaking the literal raw type string into coach copy.
-    function _humanizeActivityType(type) {
-      return String(type).replace(/-/g, ' ');
-    }
-
-    // Deduplicate by type
-    const typesSeen = new Set();
-    const uniqueTypes = [];
-    recent.forEach(entry => {
-      const type = entry.type || entry.activityType || 'movement';
-      if (!typesSeen.has(type)) {
-        typesSeen.add(type);
-        uniqueTypes.push(ACTIVITY_LABELS[type] || _humanizeActivityType(type));
-      }
-    });
-
-    const voice = getActiveVoice();
-
-    if (uniqueTypes.length === 1) {
-      return `Since yesterday, you did ${uniqueTypes[0]}.`;
-    }
-    if (uniqueTypes.length === 2) {
-      return `Since yesterday, you did ${uniqueTypes[0]} and ${uniqueTypes[1]}.`;
-    }
-    const last = uniqueTypes.pop();
-    return `Since yesterday, you did ${uniqueTypes.join(', ')}, and ${last}.`;
+    const byDay = [0, 1].map(d => activityLog.filter(e => {
+      const ts = e && (e.completedAt || e.loggedAt || e.date);
+      return ts && e.status !== 'partial' && daysAgo(ts) === d;
+    }));
+    const day = byDay[0].length ? 0 : byDay[1].length ? 1 : null;
+    if (day === null) return null;
+    const phrases = [];
+    byDay[day].forEach(e => { const p = activityPhrase(e); if (!phrases.includes(p)) phrases.push(p); });
+    return `${day === 0 ? 'Earlier today' : 'Yesterday'} you did ${joinList(phrases)}.`;
   }
 
   // ── Intro line ─────────────────────────────────────────────────────────────

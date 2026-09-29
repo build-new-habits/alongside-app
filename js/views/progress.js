@@ -1,6 +1,12 @@
 /**
  * progress.js
- * 29 Sep 2026 v19
+ * 29 Sep 2026 v20
+ *
+ * v20 - P7. Types are named by the one label map (data/activity-labels.js):
+ *   "mostly gym" and raw type words came from a map keyed on names
+ *   nothing writes. Free's "mostly ..." counts by what a person would
+ *   call it, so a built lower-body session reads "lower body".
+ *   verify-activity-labels.
  *
  * v19 - P0, SCOPE-MINOR. The per-area "What you've told me about" charts
  *   are removed (charting an injury over time is monitoring it). The
@@ -288,6 +294,7 @@ import { getGoalLabel }     from '../data/goals.js';
 import { toKg, formatWeight, observedRateBreach } from '../data/weight-targets.js';
 import { aimById } from '../data/aims.js';
 import { EXERCISES } from '../data/exercises/index.js';
+import { activityNoun } from '../data/activity-labels.js';
 import { liftReadback, strandReadback, arcWeek, sessionsByWeek,
          sessionsInWindow, shortDate } from '../data/arc-readback.js';
 
@@ -1061,9 +1068,10 @@ export function ProgressView(router) {
                  : 'in this window';
 
     // SMOOTH-P4a. The most common kind, said plainly: a fact, not a verdict.
-    const { topKind } = sessionsInWindow(recent, { days: windowDays + 1 });
+    // P7: counted by what a person would call it (activity-labels.js).
+    const { topKind } = sessionsInWindow(recent, { days: windowDays + 1, kindOf: e => activityNoun(e) });
     // Free only: the Plan's read below already names the lean, in its own words.
-    const mostly = tier === 'free' && topKind && count > 1 ? `, mostly ${_shapeLabel(topKind).toLowerCase()}` : '';
+    const mostly = tier === 'free' && topKind && count > 1 ? `, mostly ${topKind}` : '';
     if (count === 0) {
       lines.push('Nothing logged in this window. Whenever you\'re ready — the app is here.');
     } else if (count === 1) {
@@ -1388,31 +1396,9 @@ export function ProgressView(router) {
     }, {});
   }
 
+  // P7. The one label map. Was its own, keyed on names nothing writes.
   function _formatType(type) {
-    const MAP = {
-      'workout':          'strength',
-      'morning-session':  'morning movement',
-      'yoga-session':     'yoga',
-      'walk-session':     'walking',
-      'running-session':  'running',
-      'cycle-session':    'cycling',
-      'swim-session':     'swimming',
-      'core-session':     'core work',
-      'quiet-session':    'breathing',
-      'gym-programme':    'gym',
-      'class':            'guided class',
-    };
-    // LOG-CLASS-1, 08 Sep 2026. Was `MAP[type] || type` -- the same
-    // echoing fallthrough ROLE-1 fixed in workout.js, in a second file.
-    // It printed raw internal tokens to a person: a class logged with a
-    // strand id showed "trunk-strength" in "What you have been doing".
-    //
-    // A miss now returns a readable fallback rather than the id. Not "",
-    // because unlike a badge this line is a list of what somebody did
-    // and an entry silently vanishing from their own record is worse
-    // than one labelled plainly.
-    if (MAP[type]) return MAP[type];
-    return String(type || '').replace(/[-_]/g, ' ').trim() || 'movement';
+    return activityNoun({ type });
   }
 
   return { mount };

@@ -1,6 +1,11 @@
 /**
  * today.js
- * 29 Sep 2026 v46
+ * 29 Sep 2026 v47
+ *
+ * v47 - P7. The line about yesterday names the activity from the one
+ *   label map (data/activity-labels.js), on the local calendar day. It
+ *   said "You did movement yesterday" after a breathing session: its own
+ *   map was keyed on type names nothing writes. verify-activity-labels.
  *
  * v46 - P0, SCOPE-MINOR. The one-time scope notice (scopeNoticeDue); the Conditions Update tile is My exercises.
  *
@@ -770,6 +775,7 @@ import { savedSessions, resolveSavedSession, markSavedSessionUsed }
   from '../data/saved-sessions.js';
 import { detectBurnout }       from '../data/checkin.js';
 import { proposeWeekFocus }    from '../data/week-focus.js';
+import { activityPhrase, daysAgo } from '../data/activity-labels.js';
 
 export function TodayView(router) {
 
@@ -1457,27 +1463,14 @@ export function TodayView(router) {
       return "It's been a flatter few days than usual. I'll go a bit easier with what I suggest.";
     }
 
+    // P7. The local calendar day, and the one label map.
     const yesterdaySessions = activityLog.filter(e => {
       const ts = e.completedAt || e.loggedAt || e.date;
-      return ts && new Date(ts).toISOString().split('T')[0] === yesterday;
+      return ts && e.status !== 'partial' && daysAgo(ts) === 1;
     });
 
     if (yesterdaySessions.length > 0) {
-      const type = yesterdaySessions[0].type || 'session';
-      const TYPE_LABELS = {
-        'workout':         'strength work',
-        'morning-session': 'movement',
-        'yoga-session':    'yoga',
-        'walk-session':    'a walk',
-        'running-session': 'a run',
-        'cycle-session':   'cycling',
-        'swim-session':    'swimming',
-        'core-session':    'core work',
-        'quiet-session':   'breathing',
-        'gym-programme':   'a gym session',
-      };
-      const label = TYPE_LABELS[type] || 'movement';
-      return `You did ${label} yesterday.`;
+      return `You did ${activityPhrase(yesterdaySessions[0])} yesterday.`;
     }
 
     const recentCheckins = Object.keys(checkinHistory)
