@@ -1,7 +1,19 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
- * 29 Sep 2026 v59
+ * 29 Sep 2026 v60
+ *
+ * v60 - P9, PLAN SENTENCES (persona finding W2-10). The sentence over a
+ *   plan named movements the plan did not have ("Hinging, bridging,
+ *   stepping" with no step; "Push, pull, squat, hinge, brace" with half
+ *   missing) and claimed changes it had not made ("I've reduced overhead
+ *   and heavy pressing" above a Barbell Bench Press at shoulder 5/10,
+ *   where pressing is never removed). Chosen by rotation before the
+ *   session was even trimmed. Now: a line that names movements carries
+ *   what it needs (LINE_NEEDS) and is chosen from the FINISHED list; a
+ *   sore-area note is said only when the plan bears it out, and otherwise
+ *   says plainly that the area is sore and anything can be swapped.
+ *   verify-plan-sentences.
  *
  * v59 - P6, DURATION-LABEL (persona finding W2-8). buildSession() and
  *   buildSessionFromSelection() labelled length from an older inline sum
@@ -1937,12 +1949,48 @@ function _rotationIndex() {
   } catch { return 0; }
 }
 
-function generateCoachLine(sessionType, durationMins, conditions, equipment, conditionNote) {
-  const type = SESSION_TYPES.find(t => t.id === sessionType);
+// P9. What a line claims about the plan, as a test on its main exercises.
+const _mp       = e => e && e.movementPattern;
+const _isHinge  = e => _mp(e) === "hinge";
+const _isSquat  = e => _mp(e) === "squat";
+const _isSingle = e => _mp(e) === "lunge" || /single[- ]leg|split|step[- ]?up|lunge|pistol|bulgarian/i.test(e?.name || "");
+const _isBridge = e => _mp(e) === "hip-extension" || /bridge|thrust/i.test(e?.name || "");
+const _isStep   = e => /step/i.test(e?.name || "") || _mp(e) === "lunge";
+const _isPush   = e => _mp(e) === "push";
+const _isPull   = e => _mp(e) === "pull";
+const _isBrace  = e => /^anti-|isometric/.test(_mp(e) || "");
+const _has      = (m, f) => m.some(f);
+const _allFour  = m => [_isPush, _isPull, e => _isSquat(e) || _isSingle(e), _isHinge].every(f => _has(m, f));
+const _beforeSingle = (m, f) => { const s = m.findIndex(_isSingle); return s > 0 && m.slice(0, s).some(f); };
 
-  const pool = COACH_LINES[sessionType];
-  const line0 = pool && pool.length
-    ? pool[_rotationIndex() % pool.length](durationMins)
+// [session type, template index] -> what the plan must contain. A line not
+// listed names no movement and is always true.
+const LINE_NEEDS = {
+  "full:0": _allFour, "full:1": _allFour, "full:3": _allFour, "full:7": _allFour,
+  "full:2": m => [_isPush, _isPull, _isSquat, _isHinge, _isBrace].every(f => _has(m, f)),
+  "lower:0": m => _has(m, _isSquat) && _has(m, _isHinge) && _has(m, _isSingle),
+  "lower:2": m => _beforeSingle(m, e => _isSquat(e) || _isHinge(e)),
+  "lower:3": m => _has(m, _isSquat) && _has(m, _isHinge),
+  "lower:6": m => _has(m, _isSingle) && m.length > 0 && _mp(m[m.length - 1]) === "calf-raise",
+  "upper:0": m => _has(m, _isPush) && _has(m, _isPull), "upper:1": m => _has(m, _isPush) && _has(m, _isPull),
+  "upper:2": m => _has(m, _isPull), "upper:3": m => _has(m, _isPush) && _has(m, _isPull),
+  "upper:5": m => _has(m, _isPush) && _has(m, _isPull), "upper:7": m => _has(m, _isPush) && _has(m, _isPull),
+  "core:1": m => m.filter(_isBrace).length * 2 > m.length,
+  "core:3": m => _has(m, e => _mp(e) === "anti-rotation") && _has(m, e => _mp(e) === "anti-extension"),
+  "glute:1": m => _has(m, _isHinge) && _has(m, _isBridge) && _has(m, _isStep),
+  "glute:5": m => _beforeSingle(m, e => _isBridge(e) || _isHinge(e)),
+};
+
+function generateCoachLine(sessionType, durationMins, exercises, conditionNote) {
+  const type = SESSION_TYPES.find(t => t.id === sessionType);
+  const main = (exercises || []).filter(e => (e.section || "main") === "main");
+
+  // P9. Only lines that are true of this plan, in the same rotation.
+  const pool = (COACH_LINES[sessionType] || [])
+    .map((fn, i) => ({ fn, needs: LINE_NEEDS[`${sessionType}:${i}`] }))
+    .filter(x => !x.needs || x.needs(main));
+  const line0 = pool.length
+    ? pool[_rotationIndex() % pool.length].fn(durationMins)
     : `${durationMins}-minute ${type?.label || ""} session, built for you today.`;
   let line = line0;
 
@@ -2049,7 +2097,18 @@ export function pulseRaiserDecision(sessionType) {
   return { include: true, reason: null };
 }
 
-function buildConditionNote(sessionType) {
+// P9. Each note's claim, as a test on the finished plan.
+const _touches = (e, area) => (e.affectsAreas || []).includes(area);
+const NOTE_TRUE = {
+  "lower-back-acute": all => !all.some(e => (e.contraindications || []).includes("lower-back-acute")),
+  "lower-back":       all => !all.some(e => e.difficultyLevel >= 3 && _touches(e, "lower-back")),
+  "knee":             all => !all.some(e => _isSingle(e) && _touches(e, "knee")),
+  "shoulder":         all => !all.some(e => _touches(e, "shoulder") && (_isPush(e) || /press|overhead|get-?up|snatch|jerk/i.test(e.name || ""))),
+  "hamstring":        all => !all.some(e => _isHinge(e) && e.difficultyLevel >= 3),
+};
+const AREA_WORDS = { "lower-back": "lower back", knee: "knee", shoulder: "shoulder", hamstring: "hamstring" };
+
+function buildConditionNote(sessionType, exercises = []) {
   const conditions = store.get("conditions")          || [];
   const painScores = store.get("conditionPainScores") || {};
 
@@ -2063,21 +2122,18 @@ function buildConditionNote(sessionType) {
   const note = relevant
     .map(id => {
       const pain = painScores[id] || 0;
-      if (id.includes("lower-back")) {
-        return pain >= 7
-          ? "Your lower back is significant today — I've removed everything that loads the spine under flexion."
-          : "Your lower back is present — I've kept loading conservative.";
+      const area = ["lower-back", "knee", "shoulder", "hamstring"].find(a => id.includes(a));
+      if (!area) return null;
+      const key  = area === "lower-back" && pain >= 7 ? "lower-back-acute" : area;
+      // P9. Said only when the plan bears it out.
+      if (!NOTE_TRUE[key](exercises)) {
+        return `Your ${AREA_WORDS[area]} is sore today — go by how it feels, and swap anything that loads it.`;
       }
-      if (id.includes("knee")) {
-        return "With your knee, I've avoided deep single-leg loading. Listen to any sharp signals.";
-      }
-      if (id.includes("shoulder")) {
-        return "Your shoulder is considered — I've reduced overhead and heavy pressing.";
-      }
-      if (id.includes("hamstring")) {
-        return "With your hamstring, I've kept hip extension loading controlled.";
-      }
-      return null;
+      if (key === "lower-back-acute") return "Your lower back is significant today — I've removed everything that loads the spine under flexion.";
+      if (area === "lower-back") return "Your lower back is present — I've kept loading conservative.";
+      if (area === "knee")       return "With your knee, I've avoided deep single-leg loading. Listen to any sharp signals.";
+      if (area === "shoulder")   return "Your shoulder is considered — I've reduced overhead and heavy pressing.";
+      return "With your hamstring, I've kept hip extension loading controlled.";
     })
     .filter(Boolean)
     .join(" ");
@@ -3411,7 +3467,6 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
   // single working movement, which the other order allows through
   // _applyPreset's own floor of one. verify-proposal3 test 6a holds it.
   const counts         = _applyTodayIntensity(_applyPreset(_baseCounts(durationMins, sessionType) || EXERCISE_COUNT[30], preset));
-  const conditionNote  = buildConditionNote(sessionType);
 
   // ── My exercises (P0, 29 Sep 2026) ─────────────────────────────────────────
   // Previously every active entry in prescribedExercises was injected into
@@ -4117,13 +4172,7 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
 
   const prescribedNote = null;   // P0: nothing is "prescribed"
 
-  const coachLine = generateCoachLine(
-    sessionType,
-    durationMins,
-    Array.from(conditionSet),
-    userEquipment,
-    [conditionNote, gentleNote, equipNote, prescribedNote].filter(Boolean).join(" ") || null
-  );
+  // P9: the coach line is chosen below, from the finished list.
 
   // Calculate estimated duration
   // SMOOTH-P2b. A gentle day is "shorter than usual" (GENTLE_LINES), so
@@ -4156,6 +4205,14 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
   // silently is exactly what Locked Principle P1 forbids: the coach never
   // withholds what it can see. The structural exemptions (cardio, mobility)
   // carry no reason and add nothing here, correctly.
+  // P9. Chosen from the finished list, so it can only name what is in it.
+  const conditionNote = buildConditionNote(sessionType, allExercises);
+  const coachLine = generateCoachLine(
+    sessionType,
+    durationMins,
+    allExercises,
+    [conditionNote, gentleNote, equipNote, prescribedNote].filter(Boolean).join(" ") || null
+  );
   const coachLineWithWarmupNote = pulseRaiser.reason
     ? `${coachLine} ${pulseRaiser.reason}`
     : coachLine;
