@@ -1,7 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 29 Sep 2026 v583
+ * 29 Sep 2026 v584
+ *
+ * v584 - P16. Exercise tags agree with their instructions; partner drills
+ *   are never proposed (session-builder v61, six exercise files).
  *
  * v583 - P15. Balance "No" no longer means no squats
  *   (store v84, onboarding-thread-data v17).
@@ -4078,7 +4081,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v583";
+const CACHE_NAME = "alongside-v584";
 
 const SHELL_URLS = [
 
