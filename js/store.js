@@ -3,7 +3,16 @@ import { RETIRED_CONDITIONS } from "./data/scope-statement.js";
 
 /**
  * store.js - Data persistence layer
- * 29 Sep 2026 v82
+ * 29 Sep 2026 v83
+ *
+ * v83 - P13, SORE-BECOMES-CONDITION (Schema.md v1.76). NEW:
+ *   conditionPainScoresOn, the local day the scores were given, written
+ *   by updateConditionPainScores(); on load, scores from another day are
+ *   cleared (_expireOldScores). NEW: lapseQuietSoreAreas(), run after a
+ *   check-in is saved -- an area that joined through a check-in goes
+ *   dormant after three consecutive-day check-ins reporting it at 0,
+ *   the lifecycle CHECKIN-2a declared and nothing ever ran. Areas the
+ *   person listed themselves never lapse.
  *
  * v82 - P2, SESSION-TYPE-ID (Schema.md v1.75). activityLog[].sessionType
  *   held session ids ("glute-1791180600000") from the coach's plan, and
@@ -1030,7 +1039,7 @@ export const store = {
 
   mergeWithDefaults(saved) {
     const defaults = this.getDefaults();
-    return this._repairSessionTypes(this._dropRetired({
+    return this._expireOldScores(this._repairSessionTypes(this._dropRetired({
       ...defaults,
       ...saved,
 
@@ -1412,6 +1421,7 @@ export const store = {
       conditionPainScores: (saved.conditionPainScores && typeof saved.conditionPainScores === 'object')
         ? saved.conditionPainScores
         : {},
+      conditionPainScoresOn: saved.conditionPainScoresOn || null,   // P13, v83
 
       // ── CONDITION REFLECTIONS / FOLD-IN (new 04 Aug 2026, Home Nav Phase A) ──
       // conditionReflections: deliberately separate from journalEntries above —
@@ -1614,7 +1624,24 @@ export const store = {
       // honest direction; a retirement must never take something away
       // from somebody who did nothing wrong.
       tier:       saved.tier === 'athlete' ? 'personal' : (saved.tier || 'free')
-    }));
+    })));
+  },
+
+  /** P13, v83. The local day, "YYYY-MM-DD". */
+  _localDay(d = new Date()) {
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  },
+
+  /**
+   * P13, v83. Scores describe the day they were given. From another day
+   * -- or with no day at all, as before v83 -- they are not today's.
+   */
+  _expireOldScores(data) {
+    if (data.conditionPainScoresOn !== this._localDay()) {
+      data.conditionPainScores = {};
+      data.conditionPainScoresOn = null;
+    }
+    return data;
   },
 
   /**
@@ -1812,6 +1839,7 @@ export const store = {
       conditionsResolved: [],     // SMOOTH-P4c: [{ id, resolvedAt }]. "It's better now" -- the person's call, kept not deleted. See Schema.md v1.71.
       conditionMeta: {},          // CHECKIN-2a: { [id]: { addedAt, source, status, dormantAt, lastSoreAt, reportDays, quietRun, asks } }. Dormant ids leave `conditions` and stay here. See Schema.md.
       conditionPainScores: {},
+      conditionPainScoresOn: null,  // P13, v83: the local day the scores were given
       severePainChoices: [],      // { date, conditionIds, choice: 'rest'|'adapt', chosenAt } — active choice record, see mergeWithDefaults() note
       pendingDoorRoute: null,     // route name to continue to once check-in/check-in-mini completes — set by today.js when a session-generating door is tapped, cleared by checkin.js/checkin-mini.js on completion
 
@@ -2701,6 +2729,50 @@ export const store = {
 
   updateConditionPainScores(painScores) {
     this.data.conditionPainScores = { ...painScores };
+    this.data.conditionPainScoresOn = this._localDay();   // P13
+    this.data.updatedAt = new Date().toISOString();
+    this.save();
+  },
+
+  /**
+   * P13, v83. The CHECKIN-2a lifecycle, run after each check-in is saved.
+   *
+   * For an area that joined the list through a check-in tap (source
+   * "checkin"), count the check-ins on consecutive days, back from the
+   * latest, that each reported it at 0 -- a positively quiet day; a
+   * missed day ends the run, as Schema.md has always said. Three, and it
+   * leaves `conditions` for `conditionMeta` as dormant. Areas the person
+   * listed themselves are theirs to change and never lapse.
+   */
+  lapseQuietSoreAreas() {
+    const history = this.data.checkinHistory || {};
+    const meta = { ...(this.data.conditionMeta || {}) };
+    let conditions = Array.isArray(this.data.conditions) ? [...this.data.conditions] : [];
+    const keyFor = d => d.toISOString().split("T")[0];   // saveCheckin's key
+    const today = new Date();
+    for (const id of [...conditions]) {
+      const m = meta[id];
+      if (!m || m.source !== "checkin" || m.status === "dormant") continue;
+      let quiet = 0, lastSore = m.lastSoreAt || null, reportDays = 0;
+      for (const [k, e] of Object.entries(history)) {
+        if (Number(e?.conditionLevels?.[id]) > 0) { reportDays++; if (!lastSore || k > lastSore) lastSore = k; }
+      }
+      for (let i = 0; i < 400; i++) {
+        const day = new Date(today.getTime() - i * 864e5);
+        const lv = history[keyFor(day)]?.conditionLevels?.[id];
+        if (lv === 0) { quiet++; continue; }
+        break;
+      }
+      const next = { ...m, quietRun: quiet, lastSoreAt: lastSore, reportDays };
+      if (quiet >= 3) {
+        next.status = "dormant";
+        next.dormantAt = this._localDay(today);
+        conditions = conditions.filter(c => c !== id);
+      }
+      meta[id] = next;
+    }
+    this.data.conditionMeta = meta;
+    this.data.conditions = conditions;
     this.data.updatedAt = new Date().toISOString();
     this.save();
   },
