@@ -3,7 +3,13 @@ import { RETIRED_CONDITIONS } from "./data/scope-statement.js";
 
 /**
  * store.js - Data persistence layer
- * 29 Sep 2026 v84
+ * 29 Sep 2026 v85
+ *
+ * v85 - P19, "MOSTLY THE SAME" (Schema.md v1.78). exerciseHistory[id]
+ *   .section: the section a move was last completed in, from the
+ *   exerciseSections map a finished session's entry may carry.
+ *   logActivity() forwards the map to recordExercises() and does not
+ *   store it on the entry. exerciseStats() returns section.
  *
  * v84 - P15, BALANCE "NO" (Schema.md v1.77). capabilityProfile(): an
  *   unanswered legPower is 'limited' only when chairRise was ANSWERED
@@ -3383,6 +3389,11 @@ export const store = {
 
     if (isEmptyPartial) return null;
 
+    // P19. Where each move was done, for exerciseHistory only: forwarded
+    // below, never stored on the entry.
+    const exerciseSections = finalEntry.exerciseSections;
+    delete finalEntry.exerciseSections;
+
     this.data.activityLog = [...log, finalEntry];
     this.data.updatedAt = new Date().toISOString();
     this.save();
@@ -3393,7 +3404,7 @@ export const store = {
     // excluded deliberately -- an abandoned session did not teach
     // anything and must not make an exercise look familiar.
     if (finalEntry.status !== 'partial' && Array.isArray(finalEntry.exerciseIds)) {
-      this.recordExercises(finalEntry.exerciseIds, finalEntry.performance);
+      this.recordExercises(finalEntry.exerciseIds, finalEntry.performance, exerciseSections);
     }
 
     // ── MOOD-1 (15 Aug 2026, moment-of-delight audit) ──────────────────
@@ -3459,7 +3470,7 @@ export const store = {
    * @param {string[]} exerciseIds
    * @param {Object}   [performance] optional { [exerciseId]: {weight,reps,unit} }
    */
-  recordExercises(exerciseIds, performance) {
+  recordExercises(exerciseIds, performance, sections) {
     if (!Array.isArray(exerciseIds) || exerciseIds.length === 0) return;
     const now = new Date().toISOString();
     const history = { ...(this.data.exerciseHistory || {}) };
@@ -3473,6 +3484,11 @@ export const store = {
         last:  now
       };
       if (prev.best) entry.best = prev.best;
+      // P19. The section it was done in, when the player said; otherwise
+      // whatever was known before.
+      const sec = sections && sections[id];
+      if (sec === 'warmup' || sec === 'main' || sec === 'cooldown') entry.section = sec;
+      else if (prev.section) entry.section = prev.section;
 
       const perf = performance && performance[id];
       if (perf && typeof perf.weight === 'number' && perf.weight > 0) {
@@ -3650,7 +3666,7 @@ export const store = {
     const daysSince = h.last
       ? Math.floor((Date.now() - new Date(h.last).getTime()) / 86400000)
       : null;
-    return { n: h.n || 0, last: h.last || null, daysSince, seen: true };
+    return { n: h.n || 0, last: h.last || null, daysSince, seen: true, section: h.section || null };
   },
 
   /**
