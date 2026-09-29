@@ -1,6 +1,13 @@
 /**
  * js/data/onboarding-thread-data.js
- * 29 Sep 2026 v14
+ * 29 Sep 2026 v15
+ *
+ * v15 - P11, ONBOARDING ECHOES (persona finding W2-10). Answers are said
+ *   back in words: goals by their labels and sore areas by their names
+ *   ("Feel better, More energy"; "Knee, Lower back"). generateSummary()
+ *   is handed stored ids, whatever its comment said. And 9a no longer
+ *   says "One more thing" with several questions still to come.
+ *   verify-onboarding-echoes.
  *
  * v14 - P0, SCOPE-MINOR (Graeme, 29 Sep). Step 8 asks about sore or
  *   injured areas, not "health conditions", and carries the scope
@@ -105,6 +112,7 @@
  */
 
 import { getConditionName } from "./conditions.js";
+import { getGoalLabel } from "./goals.js";
 import { SCOPE_TITLE, SCOPE_BODY, SCOPE_ADVICE } from "./scope-statement.js";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -595,7 +603,7 @@ export const STEPS = {
     chips: BALANCE_CHIPS,
     storeField: 'capability.balanceWorry',
     summaryType: 'balanceWorry',
-    coach: "One more thing, and then I'll stop asking questions.\n\nDo you ever worry about losing your balance?\n\nThere's no wrong answer here. Plenty of people say yes and are perfectly capable — it just changes which things I'd put in front of you early on.",
+    coach: "A few more, and then I'll stop asking questions.\n\nDo you ever worry about losing your balance?\n\nThere's no wrong answer here. Plenty of people say yes and are perfectly capable — it just changes which things I'd put in front of you early on.",
     coachAfter: {
       answered: null, // dynamic — see generateBalanceAck()
     },
@@ -955,10 +963,10 @@ export function generateSummary(type, value, storeData) {
     }
 
     case 'goals': {
-      // value: string[] of goal IDs
-      // Thread.js passes the human-readable labels, not IDs, from goals.js
+      // value: string[] of goal IDs -- stored ids, NOT labels (P11: the
+      // comment here said labels, and the thread echoed "feel-better").
       if (!value || value.length === 0) return "I'd rather come back to this later.";
-      return value.join(', ');
+      return value.map(id => getGoalLabel(id) || id).join(', ');
     }
 
     case 'conditions': {
@@ -966,10 +974,12 @@ export function generateSummary(type, value, storeData) {
       // W2-4, 14 Aug 2026: this said "names (human-readable)". It does not --
       // views/onboarding/conditions.js writes c.id. Comment was wrong, code right.
       if (!value || value.length === 0) return 'Nothing to flag.';
-      if (value.length === 1) return value[0];
-      if (value.length === 2) return value.join(', ');
-      const others = value.length - 2;
-      return `${value[0]}, ${value[1]}, and ${others} other${others > 1 ? 's' : ''}`;
+      // P11. Their names, not the ids ("lower-back").
+      const n = value.map(id => getConditionName(id) || id);
+      if (n.length === 1) return n[0];
+      if (n.length === 2) return n.join(', ');
+      const others = n.length - 2;
+      return `${n[0]}, ${n[1]}, and ${others} other${others > 1 ? 's' : ''}`;
     }
 
     case 'activityLevel': {

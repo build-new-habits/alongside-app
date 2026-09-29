@@ -1,6 +1,10 @@
 /**
  * tools/verify-write1.mjs
- * 29 Sep 2026 v5
+ * 29 Sep 2026 v6
+ *
+ * v6 - P11. `lifestyle` leaves the one-ended baseline: Settings now reads
+ *   the activity level onboarding writes there. The gate asked for this
+ *   itself; the baseline only ever shrinks.
  *
  * v5 - P0. exerciseClearance removed from the baseline with the field.
  *
@@ -172,7 +176,7 @@ const BASELINE = new Set([
   // loaded. Do NOT connect a new writer: dated targets now belong to
   // strategicGoal, and R2-a makes them Plan-only.
   'targetDate',
-  'trainingIntent','lifestyle','gymProgrammeWeek','liftLogEnabled',
+  'trainingIntent','gymProgrammeWeek','liftLogEnabled',
   'mindfulPromptFrequency','speechRate','checkInNotification','noticingWeekInCycle',
   'journalSettings','waterReminderEnabled','lastWaterReminder','community',
   // liftLog removed 28 Sep: SMOOTH-P3c reads it directly (capture.js v2,

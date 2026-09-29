@@ -1,6 +1,14 @@
 /**
  * settings.js
- * 29 Sep 2026 v42
+ * 29 Sep 2026 v43
+ *
+ * v43 - P11. Activity level is one answer. Onboarding writes
+ *   lifestyle.activityLevel; this screen showed and wrote only
+ *   fitnessLevel, so it said "Not set" after it was answered, and its
+ *   list lacked "Coming back after a break". It now shows the value the
+ *   coach reads (fitnessLevel, else lifestyle.activityLevel), in the words
+ *   it was chosen in (ACTIVITY_CHIPS), and a change writes both.
+ *   verify-onboarding-echoes.
  *
  * v42 - P0, SCOPE-MINOR. "Sore or injured areas" (was Conditions and injuries), with the scope statement; Add or change opens the sore-areas sheet (Conditions Update is retired).
  *
@@ -537,6 +545,7 @@ import { conditionReadback, shortDate } from '../data/arc-readback.js';
 
 import {
   AGE_CHIPS,
+  ACTIVITY_CHIPS,
   BALANCE_CHIPS,
   CHAIR_RISE_CHIPS,
   FLOOR_ACCESS_CHIPS,
@@ -544,6 +553,14 @@ import {
 } from '../data/onboarding-thread-data.js';
 
 // ─── View registration ────────────────────────────────────────────────────────
+
+// P11. Activity level: the value the coach reads, in onboarding's words.
+// "Very active" is not an onboarding answer but can be set here or by the
+// assessment, so it stays on the list.
+const ACTIVITY_LEVELS = [...ACTIVITY_CHIPS, { id: 'very-active', label: 'Very active, training most days' }];
+function _activityLevel() {
+  return store.get('fitnessLevel') || (store.get('lifestyle') || {}).activityLevel || null;
+}
 
 export function SettingsView(router) {
 
@@ -710,7 +727,7 @@ export function SettingsView(router) {
     const scheme   = getDisplayPref('scheme') || 'dark';
     const ageLbl   = _label(AGE_CHIPS, store.get('ageBand'), 'Not set');
     const GENDERS  = [{ id: 'female', label: 'Female' }, { id: 'male', label: 'Male' }, { id: 'non-binary', label: 'Non-binary' }, { id: 'other', label: 'Other' }];
-    const level    = store.get('fitnessLevel');
+    const level    = _activityLevel();
 
     return `
       ${_group('You', [
@@ -728,7 +745,7 @@ export function SettingsView(router) {
         _row({ label: 'Goals', value: goals.length ? `${goals.length} chosen` : 'None', open: 'programme', focus: '.settings-goal-chip' }),
         _row({ label: 'Sessions per week', value: target ? String(target) : 'Not set', open: 'programme', focus: '#settings-weekly-target' }),
         _row({ label: 'Your week', action: 'open-weekly-plan' }),
-        _row({ label: 'Activity level', value: level ? String(level).replace(/-/g, ' ') : 'Not set', open: 'programme', focus: '#settings-fitness-level' }),
+        _row({ label: 'Activity level', value: level ? _label(ACTIVITY_LEVELS, level, level) : 'Not set', open: 'programme', focus: '#settings-fitness-level' }),
         _row({ label: 'Programme', value: progMeta ? progMeta.name : 'None', open: 'programme' }),
       ])}
 
@@ -1291,7 +1308,7 @@ export function SettingsView(router) {
   function renderProgrammePanel() {
     const stats        = getProgressStats();
     const goals        = store.get('goals') || [];
-    const fitnessLevel = store.get('fitnessLevel') || 'moderate';
+    const fitnessLevel = _activityLevel() || 'moderate';
     const weeklyTarget = store.get('strategicGoal.weeklySessionTarget') || 3;
     const tier         = store.get('tier') || 'free';
 
@@ -1397,11 +1414,7 @@ export function SettingsView(router) {
                   id="settings-fitness-level"
                   data-field="fitnessLevel"
                   aria-label="Your current activity level">
-            <option value="sedentary"   ${fitnessLevel === 'sedentary'   ? 'selected' : ''}>Sedentary — mostly sitting</option>
-            <option value="light"       ${fitnessLevel === 'light'       ? 'selected' : ''}>Light — some walking or gentle activity</option>
-            <option value="moderate"    ${fitnessLevel === 'moderate'    ? 'selected' : ''}>Moderate — exercise a few times a week</option>
-            <option value="active"      ${fitnessLevel === 'active'      ? 'selected' : ''}>Active — regular training</option>
-            <option value="very-active" ${fitnessLevel === 'very-active' ? 'selected' : ''}>Very active — intensive training most days</option>
+            ${ACTIVITY_LEVELS.map(c => `<option value="${c.id}" ${fitnessLevel === c.id ? 'selected' : ''}>${c.label}</option>`).join('')}
           </select>
         </div>
         <!-- SMOOTH-P4c: the Save button that was here is gone; this saves as it changes. -->
@@ -2136,6 +2149,8 @@ export function SettingsView(router) {
         if (field.startsWith('capability.')) { _saveCapability(container); _saved(container); return; }
         const value = el.type === 'checkbox' ? el.checked : el.value;
         store.set(field, el.type === 'number' ? Number(value) : value);
+        // P11. One answer: onboarding's field changes with it.
+        if (field === 'fitnessLevel') store.set('lifestyle.activityLevel', value);
         _saved(container);
       };
       el.addEventListener('change', save);
