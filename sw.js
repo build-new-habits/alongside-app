@@ -1,7 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 29 Sep 2026 v572
+ * 29 Sep 2026 v573
+ *
+ * v573 - P5 PRESCRIBED-CRASH proof. New: tools/verify-my-exercises-play.mjs.
+ *   No app files changed. 200 gates.
  *
  * v572 - P4 FREE-CARRY-ON. New: tools/verify-free-carry-on.mjs.
  *   Changed: views/workout.js. 199 gates.
@@ -4043,7 +4046,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v572";
+const CACHE_NAME = "alongside-v573";
 
 const SHELL_URLS = [
 
