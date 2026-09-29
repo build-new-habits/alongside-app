@@ -1,7 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 29 Sep 2026 v568
+ * 29 Sep 2026 v569
+ *
+ * v569 - P1 REDUCED-MOTION-SHEET. New: tools/verify-sheet-close.mjs,
+ *   tools/chromium-sheets.mjs. Changed: onboarding/sheet-manager.js.
+ *   196 gates.
  *
  * v568 - P0h LIBRARY WORDING. No new files. Changed: eleven
  *   exercise library files (148 lines, four names). 195 gates.
@@ -4029,7 +4033,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v568";
+const CACHE_NAME = "alongside-v569";
 
 const SHELL_URLS = [
 
