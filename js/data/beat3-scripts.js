@@ -1,6 +1,12 @@
 /**
  * js/data/beat3-scripts.js
- * 29 Sep 2026 v2
+ * 29 Sep 2026 v3
+ *
+ * v3 - P20, RE-ENTRY. The promise matches the rule: "When you come back
+ *   after a week or more, I'm going to ask what happened" (the app works
+ *   out how long itself, so it no longer says it will ask that), and
+ *   "you can let it pass" (the question is optional; it said "You'll just
+ *   have to tell me"). verify-reentry holds the two together.
  *
  * v2 - P0, SCOPE-MINOR. "six weeks recovering from injury" is "six weeks away".
  *
@@ -90,7 +96,7 @@ export const beat3Scripts = {
 
       "I will never treat time away as failure. I will never ask you to pick up where you left off as though nothing happened. What I will do is ask how you are when you come back, take that seriously, and work out what makes sense from there. The gap doesn't define the story. What you do next does.",
 
-      "When you come back, I'm going to ask what happened and how long you were out. Not because I'm keeping score — but because a week with flu lands differently on the body than six weeks away, and I want to start from the right place for you. You won't have to justify yourself. You'll just have to tell me, and I'll take it from there."
+      "When you come back after a week or more, I'm going to ask what happened. Not because I'm keeping score — but because a week with flu lands differently on the body than six weeks away, and I want to start from the right place for you. You won't have to justify yourself, and you can let it pass. If you tell me, I'll take it from there."
     ]
   },
 

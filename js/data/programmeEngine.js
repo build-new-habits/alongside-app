@@ -1,5 +1,15 @@
 /**
  * programmeEngine.js
+ * 29 Sep 2026 v9
+ *
+ * v9 - P20, RE-ENTRY (persona finding W2-15). getReEntryContext() read the
+ *   gap from progressLog, which only a programme writes: on Free, with no
+ *   programme, nobody was ever asked what happened, though onboarding
+ *   promises "When you come back, I'm going to ask what happened". The gap
+ *   is now from the last thing in the activity log (or a programme
+ *   session, whichever is later), counted in calendar days: last Monday
+ *   evening to this Monday morning is seven days, not six.
+ *
  * 06 Sep 2026 v8
  *
  * v8 - PLAN-PICKER-TIER. plannedFocusToday() and getPhaseBias() are
@@ -96,6 +106,7 @@
  */
 
 import { store }          from '../store.js';
+import { daysAgo }        from './activity-labels.js';
 // PLAN-PICKER-TIER, 06 Sep 2026. See plannedFocusToday() and
 // getPhaseBias() below for why the tier check lives at the read.
 import { isPremium }      from '../auth.js';
@@ -310,12 +321,22 @@ export function getMilestoneMessage(milestoneId) {
  * @returns {Object|null} { gapDays, context, needsGentlerStart } | null
  */
 export function getReEntryContext() {
-  const log = store.get('progressLog') || [];
-  if (log.length === 0) return null;
+  // P20. The last time the person did anything the app knows about: the
+  // activity log (every tier, every kind of session) or a programme
+  // session, whichever is later. Nothing at all is a first session, not
+  // a return.
+  const times = [];
+  for (const e of (store.get('activityLog') || [])) {
+    const t = e && (e.completedAt || e.date);
+    if (t && !isNaN(new Date(t))) times.push(new Date(t).getTime());
+  }
+  for (const e of (store.get('progressLog') || [])) {
+    if (e && e.date && !isNaN(new Date(e.date))) times.push(new Date(e.date).getTime());
+  }
+  if (times.length === 0) return null;
 
-  const lastSessionDate = new Date(log[log.length - 1].date);
-  const today           = new Date();
-  const gapDays         = Math.floor((today - lastSessionDate) / (1000 * 60 * 60 * 24));
+  // Calendar days, as the person counts them (activity-labels.daysAgo).
+  const gapDays = daysAgo(new Date(Math.max(...times)));
 
   if (gapDays < REENTRY_GAP_DAYS) return null;
 

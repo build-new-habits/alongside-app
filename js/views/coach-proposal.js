@@ -1,6 +1,13 @@
 /**
  * coach-proposal.js
- * 29 Sep 2026 v38
+ * 29 Sep 2026 v39
+ *
+ * v39 - P20, RE-ENTRY (persona finding W2-15). With the gap now read
+ *   from the activity log (programmeEngine v9), Free is asked what
+ *   happened too. What they answer is said back in the plan panel, where
+ *   it is read: "after an injury" for "Was injured" (it said "after being
+ *   unwell"), and a taken gentler start is confirmed: "A notch gentler
+ *   today, as you chose, and we build from there."
  *
  * v38 - P7, "SINCE YESTERDAY". The recap names the actual day ("Earlier
  *   today" / "Yesterday") instead of a 48-hour window, and says each
@@ -1083,6 +1090,7 @@ export function CoachProposalView(router) {
                   <span class="cp-constraint__icon" aria-hidden="true">🌱</span>
                   <p>${proposal.constraint}</p>
                 </div>` : ''}
+              ${proposal.reentryLine ? `<p class="cp-proposal-intro">${proposal.reentryLine}</p>` : ''}
             </div>
           ` : ''}
 
@@ -2089,11 +2097,17 @@ export function CoachProposalView(router) {
     // Build intro line
     const intro = _buildIntro(primaryGoal, burnout, reEntryCtx);
 
+    // P20. The return, said where it will be read: the plan panel opens
+    // once the return question is answered, and it never showed the intro.
+    const reentryLine = (reEntryCtx && (reEntryCtx.needsGentlerStart ||
+      (reEntryCtx.offersGentlerStart && gentlerAccepted))) ? intro : null;
+
     return {
       greeting,
       reflection,
       constraint,
       intro,
+      reentryLine,
       options,
     };
   }
@@ -2144,6 +2158,14 @@ export function CoachProposalView(router) {
     // the same words the builder uses, never "your body".
     if (burnout) {
       return 'Your check-ins this week have mostly been low on energy, so today is a gentler one.';
+    }
+    // P20. The offer they took, confirmed rather than silently applied.
+    if (reEntryCtx?.offersGentlerStart && gentlerAccepted) {
+      return 'Welcome back. A notch gentler today, as you chose, and we build from there.';
+    }
+    // P20. Said as it was: "Was injured" is not "being unwell".
+    if (reEntryCtx?.needsGentlerStart && reEntryCtx.context === 'injury') {
+      return 'Welcome back. Starting gently — that\'s the right call after an injury.';
     }
     if (reEntryCtx?.needsGentlerStart) {
       return 'Welcome back. Starting gently — that\'s the right call after being unwell.';
