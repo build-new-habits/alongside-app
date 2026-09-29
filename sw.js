@@ -1,7 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 29 Sep 2026 v573
+ * 29 Sep 2026 v574
+ *
+ * v574 - P6 DURATION-LABEL. New: tools/verify-duration-label.mjs.
+ *   Changed: session-builder.js, views/coach-proposal.js. 201 gates.
  *
  * v573 - P5 PRESCRIBED-CRASH proof. New: tools/verify-my-exercises-play.mjs.
  *   No app files changed. 200 gates.
@@ -4046,7 +4049,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v573";
+const CACHE_NAME = "alongside-v574";
 
 const SHELL_URLS = [
 
