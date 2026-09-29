@@ -1,7 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 29 Sep 2026 v569
+ * 29 Sep 2026 v570
+ *
+ * v570 - P2 SESSION-TYPE-ID. New: tools/verify-session-type-live.mjs.
+ *   Changed: store (v82), session-builder, coach-proposal, workout,
+ *   yoga-session. 197 gates.
  *
  * v569 - P1 REDUCED-MOTION-SHEET. New: tools/verify-sheet-close.mjs,
  *   tools/chromium-sheets.mjs. Changed: onboarding/sheet-manager.js.
@@ -4033,7 +4037,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v569";
+const CACHE_NAME = "alongside-v570";
 
 const SHELL_URLS = [
 
