@@ -3,7 +3,20 @@ import { RETIRED_CONDITIONS } from "./data/scope-statement.js";
 
 /**
  * store.js - Data persistence layer
- * 29 Sep 2026 v81
+ * 29 Sep 2026 v82
+ *
+ * v82 - P2, SESSION-TYPE-ID (Schema.md v1.75). activityLog[].sessionType
+ *   held session ids ("glute-1791180600000") from the coach's plan, and
+ *   logActivity() filled a missing type from lastFinishedSession -- at
+ *   logging time the PREVIOUS session -- so walks and breathing inherited
+ *   the last strength session. Now logActivity() takes an explicit type,
+ *   else the hand-off if it has not been logged yet (it is marked
+ *   loggedAt once used, or once a duplicate is rejected), else, for a
+ *   workout, the session in the player; never an older one. The arc is
+ *   credited from the same source. workout.js now hands off BEFORE
+ *   logging. On load (_repairSessionTypes):
+ *   an id becomes its type; a strength type on an entry that is not a
+ *   workout is cleared; arc.typesWorked id keys merge into their type.
  *
  * v81 - P0, SCOPE-MINOR (Schema.md v1.74). Alongside works around minor
  *   aches and injuries and is not designed around medical conditions
@@ -1017,7 +1030,7 @@ export const store = {
 
   mergeWithDefaults(saved) {
     const defaults = this.getDefaults();
-    return this._dropRetired({
+    return this._repairSessionTypes(this._dropRetired({
       ...defaults,
       ...saved,
 
@@ -1601,7 +1614,49 @@ export const store = {
       // honest direction; a retirement must never take something away
       // from somebody who did nothing wrong.
       tier:       saved.tier === 'athlete' ? 'personal' : (saved.tier || 'free')
-    });
+    }));
+  },
+
+  /**
+   * P2, v82. The eight session types the chooser reads (session-builder.js
+   * SESSION_TYPES; not imported, which would be a cycle --
+   * verify-session-type-live checks the two lists agree).
+   */
+  SESSION_TYPE_IDS: ['glute', 'upper', 'lower', 'full', 'core', 'gym', 'cardio', 'mobility', 'stretch'],
+
+  /**
+   * P2, v82. Session ids stored as types, and types borrowed from the
+   * previous session, are repaired on load. See the header.
+   */
+  _repairSessionTypes(data) {
+    const ids = this.SESSION_TYPE_IDS;
+    const asType = v => {
+      if (typeof v !== 'string') return v;
+      const m = v.match(/^([a-z]+)-\d{10,}$/);
+      return (m && ids.includes(m[1])) ? m[1] : v;
+    };
+    // Entries that run a built session. Anything else carrying one of the
+    // eight types can only have had it borrowed.
+    const RUNS_A_BUILT_SESSION = ['workout', 'gym', 'core-session'];
+    if (Array.isArray(data.activityLog)) {
+      data.activityLog = data.activityLog.map(e => {
+        if (!e || typeof e !== 'object' || e.sessionType == null) return e;
+        let st = asType(e.sessionType);
+        if (ids.includes(st) && !RUNS_A_BUILT_SESSION.includes(e.type)
+            && e.type !== 'freestyle' && e.type !== 'capture') st = null;
+        return st === e.sessionType ? e : { ...e, sessionType: st };
+      });
+    }
+    const tw = data.arc && data.arc.typesWorked;
+    if (tw && typeof tw === 'object') {
+      const out = {};
+      for (const [k, d] of Object.entries(tw)) {
+        const key = asType(k);
+        if (!out[key] || String(d) > String(out[key])) out[key] = d;
+      }
+      data.arc = { ...data.arc, typesWorked: out };
+    }
+    return data;
   },
 
   /**
@@ -3138,6 +3193,10 @@ export const store = {
 
     if (isDupe) {
       console.warn('Store: logActivity rejected a likely duplicate write', entry);
+      // v82, P2. The session is logged already; its hand-off must not be
+      // lent to whatever is logged next.
+      const fin = this.get('lastFinishedSession');
+      if (fin && !fin.loggedAt) this.set('lastFinishedSession', { ...fin, loggedAt: new Date().toISOString() });
       return null;
     }
 
@@ -3167,17 +3226,37 @@ export const store = {
     //
     // An explicit sessionType on the entry always wins: a caller that
     // knows better than the store should not be overruled by it.
+    // v82, P2. Where the session being logged is described: a session
+    // handed off in this same moment (yoga, capture write it just before
+    // logging), or -- for a workout -- the one in the player. NEVER an
+    // older lastFinishedSession: at logging time that is the previous
+    // session, and borrowing it stamped the last strength session onto
+    // every walk and breathing session that followed.
+    const _thisSession = (() => {
+      try {
+        // The hand-off is this session only until it has been logged once,
+        // and only if nothing already in the log is as recent -- a
+        // hand-off written AFTER its own log entry (before v82) is not.
+        const fin = this.get('lastFinishedSession');
+        const at  = fin && Date.parse(fin.at);
+        const log = Array.isArray(this.data.activityLog) ? this.data.activityLog : [];
+        const newer = log.some(e => e && Date.parse(e.completedAt || e.date) >= at);
+        if (fin && fin.session && at && !fin.loggedAt && !newer) {
+          this.set('lastFinishedSession', { ...fin, loggedAt: new Date().toISOString() });
+          return fin.session;
+        }
+        if (entry.type === 'workout') {
+          const gen = this.get('generatedSession');
+          if (gen && gen.session) return gen.session;
+        }
+      } catch { /* absent is normal -- see Schema.md, not back-filled */ }
+      return null;
+    })();
     const _inferredType = (() => {
       if (entry.sessionType) return entry.sessionType;
       // v77. Put together by the person: stated or nothing, never inferred.
       if (entry.type === 'freestyle' || entry.type === 'capture') return null;
-      try {
-        const fin = this.get('lastFinishedSession');
-        if (fin && fin.session && fin.session.sessionType) return fin.session.sessionType;
-        const gen = this.get('generatedSession');
-        if (gen && gen.session && gen.session.sessionType) return gen.session.sessionType;
-      } catch { /* absent is normal -- see Schema.md, not back-filled */ }
-      return null;
+      return (_thisSession && _thisSession.sessionType) || null;
     })();
 
     const finalEntry = {
@@ -3195,12 +3274,9 @@ export const store = {
     // the arc fails, because the log is the record and the arc is the
     // commentary on it.
     try {
-      const fin = this.get('lastFinishedSession');
-      const gen = this.get('generatedSession');
-      const src = (fin && fin.session) || (gen && gen.session) || null;
       this.markSessionWorked({
         sessionType: _inferredType,
-        exercises:   (src && src.exercises) || entry.exercises || []
+        exercises:   (_thisSession && _thisSession.exercises) || entry.exercises || []
       });
     } catch { /* the log is the record; the arc is commentary on it */ }
 
