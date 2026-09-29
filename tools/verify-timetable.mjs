@@ -1,5 +1,13 @@
 /**
  * tools/verify-timetable.mjs
+ * 29 Sep 2026 v3
+ *
+ * v3 - P22. Test 4's fixture wrote store "painScores", a field that does
+ *   not exist -- the same wrong name the class list read, so the two
+ *   agreed and the test passed while a real severe score (the app writes
+ *   conditionPainScores) never held a class back. It writes the real
+ *   field now; the assertion is unchanged.
+ *
  * 28 Sep 2026 v2
  *
  * v2 - SMOOTH-P3a. The Guided class room left Plan Home (spec 4.1); the
@@ -120,7 +128,7 @@ function seed({ programme = false, injured = false } = {}) {
   });
   if (injured) {
     store.set("conditions", ["lower-back"]);
-    store.set("painScores", { "lower-back": 9 });
+    store.set("conditionPainScores", { "lower-back": 9 });
   }
   navs.length = 0;
 }

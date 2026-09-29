@@ -1,6 +1,14 @@
 /**
  * tools/verify-settings-progress.mjs
- * 29 Sep 2026 v4
+ * 29 Sep 2026 v5
+ *
+ * v5 - The 3c flake, found rather than waited out. Reproduced under load
+ *   (7 and 12 of 16 parallel runs): focus was taken by the Back button of
+ *   the goals sheet, which test 0 opened while pressing every control and
+ *   never closed. Test 0's presses run without yielding, so each sheet's
+ *   50 ms focus timer fired at the first await -- inside 3c when 3b
+ *   finished quickly. Test 3 now starts from a clean page: open sheets
+ *   closed, pending timers run. No assertion changed; 16 of 16 pass.
  *
  * v4 - Flake, not a loosening. The polls in 3b and 3c gave up after 2 s;
  *   a fresh-clone run of all 213 gates, eight at a time, took longer and
@@ -181,6 +189,12 @@ ok("2b. REVERSAL: the scan can see one", retiredIn("Try Quick build").length ===
 console.log("\nTEST 3 - Share your progress: Copied is said where you are; no alert()");
 const progSrc = fs.readFileSync(new URL("js/views/progress.js", R), "utf8").replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
 ok("3a. no alert() anywhere on Progress (not selectable on most phones)", !/\balert\(/.test(progSrc));
+// v5. Test 0 left sheets open with focus timers pending; start clean.
+for (let i = 0; i < 5 && document.querySelector(".sheet-panel.is-open"); i++) {
+  document.dispatchEvent(new dom.window.KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+  await wait(400);
+}
+await wait(300);
 fixture("personal"); main.innerHTML = ""; ProgressView(rtr).mount(main);
 let copied = null;
 Object.defineProperty(globalThis.navigator, "clipboard", { value: { writeText: t => { copied = t; return Promise.resolve(); } }, configurable: true });

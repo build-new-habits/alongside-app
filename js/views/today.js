@@ -1,6 +1,10 @@
 /**
  * today.js
- * 29 Sep 2026 v47
+ * 29 Sep 2026 v48
+ *
+ * v48 - P22, CLASSES ON FREE (persona finding W2-18). A Classes door among
+ *   Free's "Move your body" tiles; the Plan keeps "Join a class".
+ *
  *
  * v47 - P7. The line about yesterday names the activity from the one
  *   label map (data/activity-labels.js), on the local calendar day. It
@@ -861,6 +865,11 @@ export function TodayView(router) {
     // door above. NAV-3's finding stands: yoga was hard to find, and a
     // paywall on top of that was a second wall on the same door.
     { kind: 'session', id: 'yoga', label: 'Yoga & Pilates', icon: '\uD83E\uDDD8\u200D\u2640\uFE0F', route: 'yoga-session', requiresCheckin: false },
+    // P22, 29 Sep 2026 (persona finding W2-18). Classes run the same for
+    // everybody and suit 2.11 and 2.14 best; the Plan had "Join a class",
+    // Free had no way in. Graeme: classes are the same for everybody, so
+    // Free gets the door. No check-in: a class is chosen, not proposed.
+    { kind: 'session', id: 'classes', label: 'Classes', icon: '\uD83D\uDDD3\uFE0F', route: 'classes', requiresCheckin: false },
     // TIER-F, 13 Aug 2026 -- RESOLVED. The flag below stood since
     // NAV-6. The door and the bottom-nav tab route to the same view;
     // the nav label is now "Wellbeing" too (index.html), so the two

@@ -1,6 +1,18 @@
 /**
  * js/views/class-list.js
  *
+ * 29 Sep 2026 v2
+ *
+ * v2 - P22, CLASSES ON FREE (persona finding W2-18). The list gave a
+ *   class's position ("floor") and never said it could be done seated,
+ *   though the class declares it (seatedRoute, class-contract: "somebody
+ *   who cannot get to the floor needs to know before they start"). Each
+ *   class that declares a seated route, or is seated throughout, now says
+ *   "can be done seated" on its line and in its Start button's name.
+ *   Reached from Free Home too (today.js). And pain scores are read
+ *   from conditionPainScores: the list read 'painScores', which does not
+ *   exist, so a severe score never held a class back.
+ *
  * 08 Sep 2026 v1
  *
  * TIMETABLE-1. Every class, on a board, pick one.
@@ -78,7 +90,10 @@ function _arcStrands() {
 function _conditions() {
   return {
     conditionIds: store.get('conditions') || [],
-    painScores:   store.get('painScores') || {}
+    // P22. The field is conditionPainScores; 'painScores' does not exist,
+    // so a severe score never reached classSafety() and a class that should
+    // be held for an acutely sore area was offered.
+    painScores:   store.get('conditionPainScores') || {}
   };
 }
 
@@ -92,6 +107,8 @@ export function render() {
     return {
       cls,
       safety,
+      // P22. The class's own declaration (class-contract seatedRoute).
+      seatable: cls.seatedRoute === true || cls.position === 'seated',
       sections: secs.length,
       length: durationLabel(cls),
       // Named, never used to reorder. See the header.
@@ -117,7 +134,7 @@ export function render() {
             <li class="class-list__row">
               <h2 class="class-list__name">${_esc(r.cls.title)}</h2>
               <p class="class-list__facts">
-                ${_esc(r.length)} · ${r.sections} parts · ${_esc(r.cls.position)}
+                ${_esc(r.length)} · ${r.sections} parts · ${_esc(r.cls.position)}${r.seatable && r.cls.position !== 'seated' ? ' · can be done seated' : ''}
               </p>
               <p class="class-list__serves">
                 ${r.inArc
@@ -132,7 +149,7 @@ export function render() {
               <div class="class-list__actions">
                 <button class="btn btn-primary btn-full"
                         data-start="${_esc(r.cls.id)}"
-                        aria-label="Start ${_esc(r.cls.title)}, ${_esc(r.length)}">
+                        aria-label="Start ${_esc(r.cls.title)}, ${_esc(r.length)}${r.seatable ? ', can be done seated' : ''}">
                   Start ${_esc(r.cls.title)}
                 </button>
                 ${r.cls.lighter ? `
