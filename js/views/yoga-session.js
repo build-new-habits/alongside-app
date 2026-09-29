@@ -1,6 +1,11 @@
 /**
  * yoga-session.js
- * 29 Sep 2026 v11
+ * 29 Sep 2026 v12
+ *
+ * v12 - P25. A leftover entry from the last session is not spread into
+ *   this one: store.pendingActivityEntry() decides (id and exercises
+ *   were carried over).
+ *
  *
  * v11 - P24, LENGTH (persona finding W2-20). The length cards said
  *   "20 min · 5 poses"; poses hold 45-60 seconds, so that was about five
@@ -1237,8 +1242,9 @@ function finaliseSession() {
   // pending entry carrying `status` is a stale leftover, not genuine
   // upstream data — discard it entirely rather than spread it (which
   // would reuse its id and other now-irrelevant fields).
-  const rawPending = store.get("currentActivityEntry");
-  const pending     = (rawPending && !rawPending.status) ? rawPending : null;
+  // P25. Only a genuinely pending entry (store.pendingActivityEntry):
+  // judging by status alone let the coach's player's entry through.
+  const pending     = store.pendingActivityEntry();
   const nowIso      = new Date().toISOString();
 
   const activityEntry = store.logActivity({
@@ -1376,8 +1382,9 @@ function showExitConfirm() {
  * above; see that function's comment for full reasoning.
  */
 function savePartialSession() {
-  const rawPending = store.get("currentActivityEntry");
-  const pending     = (rawPending && !rawPending.status) ? rawPending : null;
+  // P25. Only a genuinely pending entry (store.pendingActivityEntry):
+  // judging by status alone let the coach's player's entry through.
+  const pending     = store.pendingActivityEntry();
   const nowIso      = new Date().toISOString();
 
   const activityEntry = store.logActivity({

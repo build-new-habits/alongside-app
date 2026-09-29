@@ -1,6 +1,12 @@
 /**
  * pacing.js - Proactive pacing
- * 28 Sep 2026 v3
+ * 29 Sep 2026 v4
+ *
+ * v4 - P25 (persona finding W2-20). Make it up as I go ("freestyle") and
+ *   classes are movement and now count; a practice counts when its
+ *   practice is movement (a yoga flow, a run), not when it is breathing
+ *   or grounding, which stay uncounted as decision 4a says. Six sessions
+ *   in three weeks read "about 1 a week".
  *
  * v3 - SMOOTH-P1. offerBriefPath() is retired: it always returns null.
  *   Every check-in is now the short one (three questions), and the
@@ -51,6 +57,7 @@
  * her how her body feels.
  */
 
+import { EXERCISES } from './exercises/index.js';
 import { store } from '../store.js';
 
 /**
@@ -64,7 +71,22 @@ import { store } from '../store.js';
 const EXERCISE_TYPES = new Set([
   'core-session', 'prescribed-session', 'workout', 'gym',
   'morning-session', 'yoga', 'run', 'walk', 'swim', 'cycle',
+  // P25. Movement, and left out: Make it up as I go, and classes.
+  'freestyle', 'class',
 ]);
+
+/**
+ * P25. A practice is movement or it is not: a yoga flow or a run counts,
+ * a breathing or grounding practice does not (decision 4a). Read from the
+ * practice itself, the one id its entry names.
+ */
+const _STILL_PATTERNS = new Set(['breath-awareness', 'grounding', 'meditation', 'body-scan']);
+function _isMovement(e) {
+  if (EXERCISE_TYPES.has(e.type)) return true;
+  if (e.type !== 'practice') return false;
+  const ex = EXERCISES.find(x => x.id === (e.exerciseIds || [])[0]);
+  return !!ex && !_STILL_PATTERNS.has(ex.movementPattern) && ex.category !== 'mindfulness';
+}
 
 /**
  * Explicitly NOT counted, per matrix decision 4a.
@@ -110,7 +132,7 @@ export function todaysExerciseCount() {
   const today = _today();
   return log.filter(e =>
     _dayOf(e) === today &&
-    EXERCISE_TYPES.has(e.type) &&
+    _isMovement(e) &&
     !UNCAPPED_TYPES.has(e.type)
   ).length;
 }
@@ -169,7 +191,7 @@ export function recentWeeklyAverage(weeks = 3) {
   const recent = log.filter(e => {
     const ts = e.completedAt || e.loggedAt || e.date;
     return ts && new Date(ts).getTime() >= cutoff &&
-           EXERCISE_TYPES.has(e.type) && !UNCAPPED_TYPES.has(e.type);
+           _isMovement(e) && !UNCAPPED_TYPES.has(e.type);
   });
   // Fewer than two weeks of anything is not a pattern.
   const first = store.get('createdAt');

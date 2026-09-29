@@ -1,5 +1,8 @@
 /*
  * css/layouts/progress.css
+ * 29 Sep 2026 v8
+ *   P25. .pr-lifts-more: every lift past the first eight, one tap away.
+ *   The summary is a real control: full width, 44px tall, focus visible.
  * 28 Sep 2026 v7
  *   Work list 9. .progress-export__status (Copied, said under the
  *   buttons) and .progress-export__fallback (the text to copy when the
@@ -594,3 +597,20 @@
   line-height: 1.5;
   resize: vertical;
 }
+
+/* P25. Lifts past the first eight. <details> is native: the expanded state
+   and keyboard operation come with it (WCAG 4.1.2). Target size 2.5.8. */
+.pr-lifts-more { margin-top: var(--space-3, 12px); }
+.pr-lifts-more > summary {
+  cursor: pointer;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  color: var(--color-primary, inherit);
+}
+.pr-lifts-more > summary:focus-visible {
+  outline: 3px solid var(--color-focus, currentColor);
+  outline-offset: 2px;
+}
+.pr-lifts-more[open] > summary { margin-bottom: var(--space-2, 8px); }

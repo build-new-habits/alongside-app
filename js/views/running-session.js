@@ -1,6 +1,12 @@
 /**
  * running-session.js - Guided Running Session
  *
+ * 29 Sep 2026 v6
+ *
+ * v6 - P25. A leftover entry from the last session is not spread into
+ *   this one: store.pendingActivityEntry() decides (id and exercises
+ *   were carried over).
+ *
  * 08 Sep 2026 v5
  *
  * v5 - A11Y-HEADER. The .workout-header-title span is an h1. It was a
@@ -770,7 +776,9 @@ function endSession() {
 
   // 23 Jul 2026 v3 (BUILD-3): migrated to store.logActivity(), matching
   // yoga-session.js v4's confirmed-working pattern.
-  const pending = store.get("currentActivityEntry");
+  // P25. Only a genuinely pending entry: the leftover of the last
+  // session carried its id and exercises into this one.
+  const pending = store.pendingActivityEntry();
   const nowIso  = new Date().toISOString();
 
   const activityEntry = store.logActivity({
@@ -920,7 +928,9 @@ function showExitConfirm() {
 // yoga-session.js v4's confirmed-working pattern. `elapsed` is a genuine
 // running counter in this file, so durationMins is computed for real.
 function savePartialSession() {
-  const pending = store.get("currentActivityEntry");
+  // P25. Only a genuinely pending entry: the leftover of the last
+  // session carried its id and exercises into this one.
+  const pending = store.pendingActivityEntry();
   const nowIso  = new Date().toISOString();
 
   const activityEntry = store.logActivity({

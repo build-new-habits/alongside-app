@@ -1,5 +1,14 @@
 /**
  * js/data/arc-readback.js
+ * 29 Sep 2026 v2
+ *
+ * v2 - P25 (persona finding W2-20). liftReadback() compares each day's
+ *   BEST set -- heaviest, then most reps -- on the first day and the
+ *   latest. It compared the first and last entries logged, and the last
+ *   set of a day is often the lighter one: 70 kg one day, 75 then 55 the
+ *   latest, read "60 kg -> 55 kg". And no limit by default: Progress
+ *   decides how many to show at once, not this.
+ *
  * 28 Sep 2026 v1
  *
  * SMOOTH-P4a. What Progress reads back. Spec 4.8.
@@ -125,25 +134,44 @@ function _headline(e, kind) {
 }
 
 /**
- * First logged -> latest, per exercise with two or more entries.
+ * First day logged -> latest day, per exercise logged on two or more days.
  * [{ id, name, first, latest, text }] newest first, at most `limit`.
- * The measure compared is the first one BOTH entries carry, so a row
- * never sets a weight against a rep count.
+ * Each day is its best set (P25): heaviest, then most reps; for other
+ * measures, the most. The measure compared is the first one BOTH days
+ * carry, so a row never sets a weight against a rep count.
  */
-export function liftReadback(liftLog = {}, exercises = [], limit = 8) {
+const _KINDS = ["weight", "reps", "level", "durationMins", "distance"];
+function _localDay(at) {
+  const d = new Date(at);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+function _bestOfDay(entries) {
+  const num = (e, k) => (typeof e[k] === "number" ? e[k] : -Infinity);
+  return entries.slice().sort((a, b) => {
+    for (const k of _KINDS) { const d = num(b, k) - num(a, k); if (d) return d; }
+    return String(b.at).localeCompare(String(a.at));
+  })[0];
+}
+export function liftReadback(liftLog = {}, exercises = [], limit = Infinity) {
   const byId = new Map((exercises || []).map(e => [e.id, e]));
   const rows = [];
   for (const [id, list] of Object.entries(liftLog || {})) {
-    const sorted = (list || []).filter(e => e && e.at).slice().sort((a, b) => String(a.at).localeCompare(String(b.at)));
-    if (sorted.length < 2) continue;
-    const first = sorted[0], latest = sorted[sorted.length - 1];
-    const kind = ["weight", "reps", "level", "durationMins", "distance"]
-      .find(k => typeof first[k] === "number" && typeof latest[k] === "number");
+    const days = new Map();
+    for (const e of (list || [])) {
+      if (!e || !e.at) continue;
+      const k = _localDay(e.at);
+      if (!days.has(k)) days.set(k, []);
+      days.get(k).push(e);
+    }
+    if (days.size < 2) continue;
+    const keys = [...days.keys()].sort();
+    const first = _bestOfDay(days.get(keys[0])), latest = _bestOfDay(days.get(keys[keys.length - 1]));
+    const kind = _KINDS.find(k => typeof first[k] === "number" && typeof latest[k] === "number");
     if (!kind) continue;
     const k = kind === "durationMins" ? "duration" : kind;
     const name = byId.get(id)?.name;
     if (!name) continue;
-    rows.push({ id, name, first, latest, text: `${_headline(first, k)} → ${_headline(latest, k)}` });
+    rows.push({ id, name, first, latest, text: `${_headline(first, k)} \u2192 ${_headline(latest, k)}` });
   }
   return rows.sort((a, b) => String(b.latest.at).localeCompare(String(a.latest.at))).slice(0, limit);
 }

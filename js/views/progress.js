@@ -1,6 +1,12 @@
 /**
  * progress.js
- * 29 Sep 2026 v21
+ * 29 Sep 2026 v22
+ *
+ * v22 - P25 (persona finding W2-20). Lifts: every one (eight shown, the
+ *   rest under "All N lifts"; it stopped at eight), and each day's best
+ *   set compared (arc-readback v2) -- "Your best set the first day you
+ *   logged it, and on the latest day."
+ *
  *
  * v21 - P12, FREE PROGRAMME. The programme block (weeks in, "4 of 3 this
  *   week", milestones, a second session count) is the Plan's. On Free a
@@ -888,17 +894,24 @@ export function ProgressView(router) {
   function _liftsBlock() {
     const rows = liftReadback(store.get('liftLog') || {}, EXERCISES);
     if (!rows.length) return '';
-    return `
-      <section class="pr-block" aria-labelledby="pr-lifts-h">
-        <h2 class="pr-title" id="pr-lifts-h">From your logged weights</h2>
-        <p class="pr-note">First time you logged it, and the latest.</p>
-        <ul class="pr-lifts">
-          ${rows.map(r => `
+    // P25. Every lift. Eight at once, the rest one tap away -- it stopped
+    // at eight and the others were simply not there.
+    const SHOWN = 8;
+    const li = r => `
             <li class="pr-lift">
               <span class="pr-lift__name">${_esc(r.name)}</span>
               <span class="pr-lift__text">${_esc(r.text)}</span>
-            </li>`).join('')}
-        </ul>
+            </li>`;
+    return `
+      <section class="pr-block" aria-labelledby="pr-lifts-h">
+        <h2 class="pr-title" id="pr-lifts-h">From your logged weights</h2>
+        <p class="pr-note">Your best set the first day you logged it, and on the latest day.</p>
+        <ul class="pr-lifts">${rows.slice(0, SHOWN).map(li).join('')}</ul>
+        ${rows.length > SHOWN ? `
+          <details class="pr-lifts-more">
+            <summary>All ${rows.length} lifts</summary>
+            <ul class="pr-lifts">${rows.slice(SHOWN).map(li).join('')}</ul>
+          </details>` : ''}
       </section>`;
   }
 
