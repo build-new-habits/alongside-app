@@ -1,7 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 29 Sep 2026 v580
+ * 29 Sep 2026 v581
+ *
+ * v581 - P13 SORE-LAPSE. New: tools/verify-sore-lapse.mjs. Changed: store
+ *   (v83), data/checkin.js. 208 gates.
  *
  * v580 - P12 FREE-PROGRAMME. New: tools/verify-free-programme.mjs. Changed:
  *   onboarding-thread-data, progress (v21), gym-programme,
@@ -4069,7 +4072,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v580";
+const CACHE_NAME = "alongside-v581";
 
 const SHELL_URLS = [
 
