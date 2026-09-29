@@ -1,7 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 29 Sep 2026 v594
+ * 29 Sep 2026 v595
+ *
+ * v595 - P26 SMALLER. Run door on Free, Your arc screen, red-flag
+ *   Not now, gym in the activity log, weight tier row, no-count lighter-day
+ *   line with local active days, no save offer for a kept session.
  *
  * v594 - P25. Every lift and its working set; pacing counts all movement;
  *   no reused ids (store v86, arc-readback v2, pacing v4).
@@ -4111,7 +4115,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v594";
+const CACHE_NAME = "alongside-v595";
 
 const SHELL_URLS = [
 
