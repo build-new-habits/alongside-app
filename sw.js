@@ -1,7 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 29 Sep 2026 v579
+ * 29 Sep 2026 v580
+ *
+ * v580 - P12 FREE-PROGRAMME. New: tools/verify-free-programme.mjs. Changed:
+ *   onboarding-thread-data, progress (v21), gym-programme,
+ *   plan-options. 207 gates.
  *
  * v579 - P11 ONBOARDING-ECHOES. New: tools/verify-onboarding-echoes.mjs.
  *   Changed: data/onboarding-thread-data, settings (v43). 206 gates.
@@ -4065,7 +4069,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v579";
+const CACHE_NAME = "alongside-v580";
 
 const SHELL_URLS = [
 
