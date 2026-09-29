@@ -1,6 +1,15 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
+ * 29 Sep 2026 v59
+ *
+ * v59 - P6, DURATION-LABEL (persona finding W2-8). buildSession() and
+ *   buildSessionFromSelection() labelled length from an older inline sum
+ *   that counted `duration` x `sets` even where `duration` is the whole
+ *   exercise, widened to a ten-minute range: a 30-minute session read
+ *   "66–76 mins". Both now use exerciseSeconds(), the one sum, and say
+ *   "About N mins". verify-duration-label.
+ *
  * 29 Sep 2026 v58
  *
  * v58 - P2, SESSION-TYPE-ID. Every built session carries `sessionType`,
@@ -3224,15 +3233,13 @@ export function buildSessionFromSelection({ sessionType, durationMins, selectedI
     ..._withRole(cooldownExercises, "cooldown")
   ];
 
-  const estMins = Math.round(allExercises.reduce((acc, ex) => {
-    // C3 (12 Aug 2026) — see the note at the parallel call site below. This
-    // is buildSessionFromSelection()'s copy; the two must stay in step.
-    const dur = ex.duration
-      ? (ex.duration * (ex.sets || 1) / 60)
-      : ((ex.sets || 3) * 1.5);
-    return acc + dur;
-  }, 0));
-  const durationStr = `${Math.max(estMins - 5, durationMins - 5)}–${Math.max(estMins + 5, durationMins + 5)} mins`;
+  // P6. The one sum -- exerciseSeconds(), the same the plan screen, the
+  // trim and the player use -- and a label that says it. Was an inline
+  // sum that multiplied `duration` by `sets` even where `duration` is the
+  // whole exercise, widened to a ten-minute range: "66–76 mins" on a
+  // 30-minute session.
+  const estMins     = Math.max(1, Math.round(allExercises.reduce((n, ex) => n + exerciseSeconds(ex), 0) / 60));
+  const durationStr = `About ${estMins} mins`;
 
   const session = {
     id:       `${sessionType}-${Date.now()}`,
@@ -4136,17 +4143,13 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
     ..._withRole(cooldownExercises, "cooldown")
   ];
 
-  const estMins = Math.round(allExercises.reduce((acc, ex) => {
-    // C3 (12 Aug 2026) — a duration-based exercise carries its own TOTAL
-    // time. `sets || 3` was tripling it: a 20-minute run counted as 60, a
-    // 30-minute C25K session as 90, which is how a 60-minute request came
-    // back labelled "552–562 mins". Sets only multiply rep-based work.
-    const dur = ex.duration
-      ? (ex.duration * (ex.sets || 1) / 60)
-      : ((ex.sets || 3) * 1.5);
-    return acc + dur;
-  }, 0));
-  const durationStr = `${Math.max(estMins - 5, durationMins - 5)}–${Math.max(estMins + 5, durationMins + 5)} mins`;
+  // P6. The one sum -- exerciseSeconds(), the same the plan screen, the
+  // trim and the player use -- and a label that says it. Was an inline
+  // sum that multiplied `duration` by `sets` even where `duration` is the
+  // whole exercise, widened to a ten-minute range: "66–76 mins" on a
+  // 30-minute session.
+  const estMins     = Math.max(1, Math.round(allExercises.reduce((n, ex) => n + exerciseSeconds(ex), 0) / 60));
+  const durationStr = `About ${estMins} mins`;
 
   // PT-19 — when the pulse-raiser is deliberately left out for a reason the
   // person gave us (unwell, acute pain), say so. An exclusion applied

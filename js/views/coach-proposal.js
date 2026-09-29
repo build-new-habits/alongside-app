@@ -1,6 +1,13 @@
 /**
  * coach-proposal.js
- * 29 Sep 2026 v36
+ * 29 Sep 2026 v37
+ *
+ * v37 - P6, DURATION-LABEL. The header added up minutes that had each
+ *   been rounded per section, so it could sit more than a minute off the
+ *   plan's real length ("About 33" for 31.5). Now the total is rounded
+ *   once and the sections are shared out to add up to it exactly (largest
+ *   remainder), so the header and the section titles still agree.
+ *   verify-duration-label.
  *
  * v36 - P2, SESSION-TYPE-ID. The plan records the TYPE it delivers
  *   (built.sessionType), not the session id. "glute-1791180600000" was
@@ -1158,9 +1165,20 @@ export function CoachProposalView(router) {
       : { text: each, spoken };
   }
 
-  function _groupMinutes(list) {
-    const secs = list.reduce((n, ex) => n + exerciseSeconds(ex), 0);
-    return Math.max(1, Math.round(secs / 60));
+  /**
+   * P6. Minutes per section that add up to the rounded total: floor each,
+   * then give the spare minutes to the largest remainders. Each section is
+   * within a minute of its own time and the header is within half a
+   * minute of the plan's.
+   */
+  function _sectionMinutes(groups) {
+    const exact = groups.map(g => g.reduce((n, ex) => n + exerciseSeconds(ex), 0) / 60);
+    const total = Math.max(1, Math.round(exact.reduce((a, b) => a + b, 0)));
+    const mins  = exact.map(m => Math.max(1, Math.floor(m)));
+    let spare   = total - mins.reduce((a, b) => a + b, 0);
+    const order = exact.map((m, i) => [m - Math.floor(m), i]).sort((a, b) => b[0] - a[0]);
+    for (let k = 0; spare > 0 && k < order.length; k++, spare--) mins[order[k][1]] += 1;
+    return { total: mins.reduce((a, b) => a + b, 0), mins };
   }
 
   /** P4: flat, no verb, no delta. Plan only. */
@@ -1184,6 +1202,7 @@ export function CoachProposalView(router) {
       .map(sec => ({ sec, items: list.map((ex, i) => ({ ex, i })).filter(r => (r.ex.section || 'main') === sec) }))
       .filter(g => g.items.length);
     const note = _stretchTargetNote(option);
+    const split = _sectionMinutes(rowsBySection.map(g => g.items.map(r => r.ex)));
 
     return `
       <section class="cp-plan" aria-labelledby="cp-plan-title">
@@ -1192,11 +1211,11 @@ export function CoachProposalView(router) {
           // The same minutes the groups below add up to. The builder's own
           // range ("35–45 mins") sat above groups totalling 21 on the first
           // device render -- two numbers for one plan.
-          ? `About ${rowsBySection.reduce((n, g) => n + _groupMinutes(g.items.map(r => r.ex)), 0)} min · ${_movementsLabel(list.length)}`
+          ? `About ${split.total} min · ${_movementsLabel(list.length)}`
           : _durationLabel(option.duration)}</p>
         ${note ? `<p class="cp-plan__target">${note}</p>` : ''}
-        ${rowsBySection.map(g => `
-          <h3 class="cp-plan__group-title">${SECTION_LABELS[g.sec]} · ${_groupMinutes(g.items.map(r => r.ex))} min</h3>
+        ${rowsBySection.map((g, gi) => `
+          <h3 class="cp-plan__group-title">${SECTION_LABELS[g.sec]} · ${split.mins[gi]} min</h3>
           <ol class="cp-plan__list">
             ${g.items.map(({ ex, i }) => {
               const dose = _dose(ex);
