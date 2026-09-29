@@ -1,5 +1,9 @@
 /**
  * js/data/checkin-openings.js
+ * 29 Sep 2026 v7
+ *
+ * v7 - P0, SCOPE-MINOR. The injury opener no longer says "you're rebuilding".
+ *
  * 28 Sep 2026 v6
  *
  * v6 - FEELINGS-RETIRE. The feeling-word carry line is removed: the word
@@ -285,7 +289,7 @@ const DAY_ONE = [
   { trigger: 'past-failure',       careMode: false, b1: "Do you remember telling me that you've tried to build this before and it hasn't stuck?",        b2: "I want to ask — what feels different this time, if anything?" },
   { trigger: 'feel-good',          careMode: false, b1: "Do you remember telling me that feeling good in your body is what matters most to you?",        b2: "I was wondering — what does feeling good actually look like for you? Not in general. Today." },
   { trigger: 'return-to-fitness',  careMode: false, b1: "Do you remember telling me you're coming back to this after some time away?",                   b2: "I was wondering how it feels to be standing at that starting line again." },
-  { trigger: 'injury-recovery',    careMode: true,  b1: "Do you remember telling me your body's been through something and you're rebuilding?",          b2: "I'm holding that. I was wondering how you're feeling about starting today." },
+  { trigger: 'injury-recovery',    careMode: true,  b1: "Do you remember telling me your body's been through something?",          b2: "I'm holding that. I was wondering how you're feeling about starting today." },
   { trigger: 'chronic-condition',  careMode: true,  b1: "Do you remember telling me about what your body's been dealing with? I haven't forgotten.",    b2: "I was wondering — how is it today, going into your first session?" },
   // 11 Aug 2026 (PT-1 follow-up) — was 'hormonal-change', age-gated, and
   // phrased "Do you remember telling me..." for something the person had

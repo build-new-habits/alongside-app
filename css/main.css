@@ -1,5 +1,8 @@
 /* main.css
- * 28 Sep 2026 v28
+ * 29 Sep 2026 v29
+ *
+ * v29 - P0. layouts/conditions-update.css removed with its view;
+ *   scope-statement styles in components/finish.css.
  *
  * v28 - F7 CSS-ZERO. components/finish.css imported.
  *
@@ -105,7 +108,7 @@
 @import 'layouts/today.css';
 @import 'layouts/my-programme.css';
 @import 'layouts/goal-review.css';
-@import 'layouts/conditions-update.css';
+/* P0, 29 Sep 2026: layouts/conditions-update.css removed with the view. */
 @import 'layouts/library.css';
 @import 'layouts/mobility-conditioning.css';
 /* Components */

@@ -1,5 +1,9 @@
 /**
  * js/views/checkin.js
+ * 29 Sep 2026 v23
+ *
+ * v23 - P0, SCOPE-MINOR. "I'll do my own exercises", not "I have prescribed exercises to do".
+ *
  * 28 Sep 2026 v22
  *
  * v22 - F7 LANDMARK. role="main" (and its label) removed from the view's
@@ -768,7 +772,7 @@ export function CheckinView(router) {
       </button>
       <button class="btn btn-ghost btn-full" id="ci-prescribed-btn"
               style="margin-top:var(--space-3);">
-        I have prescribed exercises to do
+        I'll do my own exercises
       </button>
     `;
     _thread.appendChild(wrap);

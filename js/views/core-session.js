@@ -1,6 +1,10 @@
 /**
  * core-session.js - Guided Core Session
  *
+ * 29 Sep 2026 v15
+ *
+ * v15 - P0, SCOPE-MINOR. The "Rehab — Safe for back pain, post-injury" focus is "Gentle — for days when everything feels sensitive".
+ *
  * 08 Sep 2026 v14
  *
  * v14 - A11Y-HEADER. The .workout-header-title span is an h1. It was a
@@ -300,10 +304,10 @@ const FOCUS_TYPES = [
   },
   {
     id:          "rehab",
-    label:       "Rehab",
-    icon:        "\uD83E\uDE7A",
-    description: "Gentle, low-load. Safe for back pain, post-injury, or when everything feels sensitive.",
-    coachIntro:  "This session is gentle by design. We're working with your body, not against it. If anything feels sharp rather than achy, stop. There is nothing here that requires pushing through pain.",
+    label:       "Gentle",
+    icon:        "\uD83C\uDF31",
+    description: "Low-load, for days when everything feels sensitive.",
+    coachIntro:  "This session is gentle by design. If anything feels sharp rather than achy, stop that one. Nothing here needs pushing through pain.",
     colour:      "#FB923C"
   }
 ];

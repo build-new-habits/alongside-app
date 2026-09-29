@@ -1,5 +1,15 @@
 /**
- * prescribed.js - Prescribed Exercises View
+ * prescribed.js - My exercises
+ *
+ * 29 Sep 2026 v1.5
+ *
+ * v1.5 - P0, SCOPE-MINOR (Graeme, 29 Sep). "Prescribed Exercises" is now
+ *   "My exercises": the person's own list, from wherever they came -- a
+ *   physio, a class, a video. The app does not build it, does not say who
+ *   gave it, and does not say what it is for. Removed: "Prescribed by",
+ *   "Physio notes" (now Notes), the "For: condition" tag, the Conditions
+ *   Update tagging, and every professional-origin line. Graeme: "It is
+ *   really just me writing down the exercises I want to do."
  *
  * 04 Aug 2026 v1.4
  *
@@ -61,8 +71,6 @@
  */
 
 import { store } from "../store.js";
-import { getConditionName } from "../data/conditions.js";
-import { getEntryConditionIds } from "../data/conditionProgrammes.js";
 
 export const centered = false;
 
@@ -91,33 +99,23 @@ let showAddForm = false;
  * @param {number} energy    - today's energy score
  * @param {string|null} origin - store.get('prescribedExercisesOrigin')
  */
-function buildCoachLine(exercises, energy, origin) {
+function buildCoachLine(exercises, energy) {
   const active = exercises.filter(e => !e.completedToday);
   const done   = exercises.filter(e => e.completedToday);
-  const isSelf = origin === "self";
 
   if (exercises.length === 0) {
-    return isSelf
-      ? "Building your own plan for something that's going on? Add exercises here \u2014 I'll keep them separate from your regular sessions and remind you they're here each time you check in."
-      : "If your physio or consultant has given you exercises to do, you can add them here. I'll keep them separate from your regular sessions and remind you they're here each time you check in.";
+    return "Keep your own exercises here \u2014 anything you want to come back to. I'll keep them separate from your other sessions, and if something's sore on the day I'll tell you which ones load it.";
   }
-
   if (done.length > 0 && active.length === 0) {
-    return "You've done all your prescribed exercises today. That matters -- consistency with these is exactly what your professional is counting on. Well done.";
+    return "That's all of them done today.";
   }
-
   if (done.length > 0 && active.length > 0) {
-    return "Good progress -- you've completed " + done.length + " so far today. " + active.length + " still to go. Take your time.";
+    return "You've done " + done.length + " so far today, " + active.length + " still here. No rush.";
   }
-
-  // None done yet
   if (energy !== null && energy <= 3) {
-    return "I know your energy is low today. These exercises matter -- even a gentle run-through at low effort is better than skipping. But listen to your body and do what you can.";
+    return "Low energy today. Do what feels right \u2014 some of them, all of them, or none.";
   }
-
-  return isSelf
-    ? "These are the exercises you've chosen. I'll keep them here, separate from your regular sessions \u2014 you know your body best, I'm just here to help you show up for them."
-    : "These are your prescribed exercises. I'll keep them here, separate from everything else. Your professional knows your situation -- I'm just here to help you show up for them.";
+  return "Your exercises, as you set them. If something's sore today, I'll tell you which ones load it.";
 }
 
 // ── Render ────────────────────────────────────────────────────────────────────
@@ -128,8 +126,7 @@ export function render() {
   const done       = exercises.filter(e => e.completedToday);
   const checkin    = store.get("lastCheckin") || {};
   const energy     = checkin.energy || null;
-  const origin     = store.get("prescribedExercisesOrigin");
-  const coachLine  = buildCoachLine(exercises, energy, origin);
+  const coachLine  = buildCoachLine(exercises, energy);
   const creditsAvail = Math.min(active.length * CREDITS_PER_EXERCISE, CREDITS_MAX);
 
   return `
@@ -142,7 +139,7 @@ export function render() {
                 aria-label="Back to choices">
           &larr; Back to choices
         </button>
-        <h1>Prescribed Exercises</h1>
+        <h1>My exercises</h1>
       </div>
 
       <!-- ── Coach card ───────────────────────────────────────────────────── -->
@@ -162,7 +159,7 @@ export function render() {
         <button class="btn btn-ghost btn-full" id="px-toggle-form-btn"
                 aria-expanded="${showAddForm}"
                 aria-controls="px-add-form-wrap">
-          ${showAddForm ? "Cancel" : "+ Add prescribed exercise"}
+          ${showAddForm ? "Cancel" : "+ Add an exercise"}
         </button>
 
         <div id="px-add-form-wrap" class="${showAddForm ? "" : "hidden"}" aria-live="polite">
@@ -188,8 +185,7 @@ function renderEmptyState() {
   return `
     <div class="card prescribed-empty-card" role="note">
       <p class="text-secondary">
-        No prescribed exercises added yet. Use the button below to add the
-        exercises your physio or consultant has given you.
+        Nothing here yet. Add an exercise with the button below.
       </p>
     </div>
   `;
@@ -211,25 +207,25 @@ function renderExerciseList(active, done, creditsAvail) {
             : ""}
         </div>
 
-        <ul class="prescribed-exercise-list" aria-label="Prescribed exercises to do today">
+        <ul class="prescribed-exercise-list" aria-label="Your exercises to do today">
           ${active.map((ex, i) => renderExerciseCard(ex, i, false)).join("")}
         </ul>
 
         <button class="btn btn-primary btn-large btn-full" id="px-start-session-btn"
                 style="margin-top: var(--space-4);"
-                aria-label="Start prescribed exercise session">
+                aria-label="Start my exercises">
           Start Session
         </button>
       ` : `
         <div class="card" role="note" style="margin-bottom: var(--space-4);">
-          <p class="text-secondary">All prescribed exercises done for today.</p>
+          <p class="text-secondary">All done for today.</p>
         </div>
       `}
 
       ${done.length > 0 ? `
         <h2 class="section-heading" style="margin-top: var(--space-6);">Completed today</h2>
         <ul class="prescribed-exercise-list prescribed-exercise-list--done"
-            aria-label="Completed prescribed exercises">
+            aria-label="Completed today">
           ${done.map((ex, i) => renderExerciseCard(ex, i, true)).join("")}
         </ul>
       ` : ""}
@@ -265,7 +261,7 @@ function renderExerciseCard(ex, index, isDone) {
         ${!isDone ? `
           <button class="btn btn-ghost btn-xs prescribed-remove-btn"
                   data-exercise-id="${ex.id}"
-                  aria-label="Remove ${ex.name} from prescribed exercises">
+                  aria-label="Remove ${ex.name} from my exercises">
             Remove
           </button>
         ` : ""}
@@ -279,17 +275,9 @@ function renderExerciseCard(ex, index, isDone) {
 
       ${ex.notes ? `
         <div class="prescribed-exercise-notes">
-          <span class="prescribed-notes-label text-sm">Physio notes:</span>
+          <span class="prescribed-notes-label text-sm">Notes:</span>
           <p class="text-sm">${ex.notes}</p>
         </div>
-      ` : ""}
-
-      ${ex.prescribedBy ? `
-        <p class="prescribed-by text-sm text-muted">Prescribed by: ${ex.prescribedBy}</p>
-      ` : ""}
-
-      ${ex.conditionId || (Array.isArray(ex.conditionIds) && ex.conditionIds.length) ? `
-        <p class="prescribed-condition-tag text-sm text-muted">For: ${getEntryConditionIds(ex).map(getConditionName).join(", ")}</p>
       ` : ""}
 
       <div class="prescribed-exercise-history text-sm text-muted"
@@ -373,7 +361,7 @@ function getWeekStart(date) {
 function renderAddForm() {
   return `
     <form id="px-add-form" class="prescribed-add-form" novalidate
-          aria-label="Add prescribed exercise">
+          aria-label="Add an exercise">
 
       <div class="form-field" style="margin-top: var(--space-4);">
         <label class="form-label" for="px-name">
@@ -416,7 +404,7 @@ function renderAddForm() {
       </div>
 
       <div class="form-field">
-        <label class="form-label" for="px-notes">Notes from your physio</label>
+        <label class="form-label" for="px-notes">Notes</label>
         <textarea
           id="px-notes"
           class="form-input form-textarea"
@@ -425,16 +413,6 @@ function renderAddForm() {
         ></textarea>
       </div>
 
-      <div class="form-field">
-        <label class="form-label" for="px-prescribed-by">Prescribed by</label>
-        <input
-          type="text"
-          id="px-prescribed-by"
-          class="form-input"
-          placeholder="e.g. Sarah at PhysioPlus, Mr Jones (consultant)"
-          autocomplete="off"
-        >
-      </div>
 
       <p class="form-required-note text-sm text-muted">
         <span aria-hidden="true">*</span> Required
@@ -511,7 +489,6 @@ function saveExercise() {
   const setsEl         = document.getElementById("px-sets");
   const repsEl         = document.getElementById("px-reps");
   const notesEl        = document.getElementById("px-notes");
-  const prescribedByEl = document.getElementById("px-prescribed-by");
 
   const name = nameEl?.value?.trim();
   if (!name) {
@@ -524,16 +501,6 @@ function saveExercise() {
   const sets        = setsEl?.value        ? parseInt(setsEl.value)         : null;
   const reps        = repsEl?.value?.trim()         || null;
   const notes       = notesEl?.value?.trim()        || null;
-  const prescribedBy = prescribedByEl?.value?.trim() || null;
-
-  // Fix, 04 Aug 2026: single-use context flag, not sticky. Reads the
-  // condition a Conditions Update card set right before navigating
-  // here (js/views/conditions-update.js's "Build my own"), tags this
-  // one entry with it, then clears it immediately — so a later,
-  // unrelated visit to this screen from a different path never gets
-  // silently tagged with a stale condition from an earlier session.
-  const activeCondition = store.get("prescribedExercisesActiveCondition");
-  if (activeCondition) store.set("prescribedExercisesActiveCondition", null);
 
   const exercise = {
     id:             "px-" + Date.now(),
@@ -544,12 +511,10 @@ function saveExercise() {
     active:         true,
     completedToday: false,
     completedAt:    null,
-    prescribedAt:   new Date().toISOString(),
+    addedAt:        new Date().toISOString(),
     ...(sets            !== null ? { sets }                    : {}),
     ...(reps            !== null ? { reps }                    : {}),
     ...(notes           !== null ? { notes }                   : {}),
-    ...(prescribedBy    !== null ? { prescribedBy }             : {}),
-    ...(activeCondition           ? { conditionIds: [activeCondition] } : {})
   };
 
   const existing = store.get("prescribedExercises") || [];
@@ -568,7 +533,7 @@ function removeExercise(id) {
   const ex = exercises.find(e => e.id === id);
   if (!ex) return;
 
-  if (!confirm("Remove \"" + ex.name + "\" from your prescribed exercises?")) return;
+  if (!confirm("Remove \"" + ex.name + "\" from your exercises?")) return;
 
   store.set("prescribedExercises", exercises.filter(e => e.id !== id));
   rerender();

@@ -1,7 +1,14 @@
 /**
- * prescribed-session.js - Prescribed Exercise Session View
+ * prescribed-session.js - My exercises, played
  *
- * 11 Aug 2026 v5
+ * 29 Sep 2026 v11
+ *
+ * v11 - P0, SCOPE-MINOR + P5 PRESCRIBED-CRASH. Plays the person's own
+ *   list ("My exercises"): no "Prescribed" badge, no "Notes from your
+ *   physio". On a sore day it says which ones load the sore area and
+ *   leaves the choice to them (Graeme: "we're not doing that one today
+ *   because your back is pretty sore and this one loads it"). Finishing
+ *   an exercise no longer skips the next one or crashes at the end.
  *
  * 11 Sep 2026 v10
  *
@@ -218,6 +225,8 @@ export function render() {
     return `<div class="view prescribed-session-view">${renderSafetyGate()}</div>`;
   }
 
+  // Never read past the list, whatever state a return visit finds.
+  if (currentIndex > active.length - 1) currentIndex = active.length - 1;
   const ex           = active[currentIndex];
   const isLast       = currentIndex >= active.length - 1;
   const progress     = (currentIndex / active.length) * 100;
@@ -233,7 +242,7 @@ export function render() {
 
       <!-- Header -->
       <div class="workout-header">
-        <button class="btn btn-ghost" id="ps-exit-btn" aria-label="Exit prescribed session">
+        <button class="btn btn-ghost" id="ps-exit-btn" aria-label="Exit my exercises">
           \u2715 Exit
         </button>
         <div class="workout-progress-info" aria-label="Exercise ${currentIndex + 1} of ${active.length}">
@@ -250,16 +259,13 @@ export function render() {
 
       <!-- Exercise display -->
       <div class="exercise-display">
-        <div class="exercise-role-badge main" aria-label="Prescribed exercise">
-          \uD83E\uDE7A Prescribed
-        </div>
 
         <h1 class="exercise-name">${ex.name}</h1>
 
         ${contraFlag ? `
           <div class="ps-contra-flag" role="status" aria-live="polite">
             <span class="ps-contra-flag__icon" aria-hidden="true">\uD83C\uDF31</span>
-            <p>${contraFlag.conditionName} is flagged today \u2014 this one's usually best approached carefully, or skipped, when that's the case.</p>
+            <p>You said your ${contraFlag.conditionName.toLowerCase()} is sore, and this one usually loads it. You might leave it today.</p>
           </div>
         ` : ""}
 
@@ -330,7 +336,7 @@ export function render() {
 
           ${ex.notes ? `
             <div class="exercise-instructions card">
-              <h3>Notes from your physio</h3>
+              <h3>Your notes</h3>
               <p>${ex.notes}</p>
             </div>
           ` : ""}
@@ -398,7 +404,7 @@ function renderAlreadyDone() {
         <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
         <div>
           <h2>All done!</h2>
-          <p>You have already completed all your prescribed exercises today. See you tomorrow.</p>
+          <p>That's all of your exercises done for today.</p>
           <button class="btn btn-primary" id="ps-back-btn" style="margin-top: var(--space-4);">
             Back to choices
           </button>
@@ -486,7 +492,7 @@ export function onMount() {
   // already used for its on-screen Exit button.
   mountSessionGuard({
     isActive: () => true,
-    label:    "prescribed session",
+    label:    "your exercises",
     onExit:   () => {
       savePartialSession();
       router.back();
@@ -645,9 +651,20 @@ function completeExercise(active) {
   progress.push({ exerciseId: ex.id, credits });
   store.set("prescribedSessionProgress", progress);
 
-  advanceSession(active);
+  // P5 (29 Sep). The finished exercise has just LEFT the active list, so
+  // the next one is already at currentIndex. Advancing the index as well
+  // skipped every other exercise and then read past the end of the list
+  // ("1 of 8, 2 of 7, 3 of 6, 4 of 5", then a crash: persona 2.1).
+  if (currentIndex >= active.length - 1) {
+    completeSession(active);
+  } else {
+    scrollToTop();
+    resetTimer();
+    router.navigate("prescribed-session");
+  }
 }
 
+// Skip leaves the exercise in the active list, so the index moves on.
 function advanceSession(active) {
   if (currentIndex >= active.length - 1) {
     completeSession(active);
@@ -672,7 +689,7 @@ function completeSession(active) {
 
   // Stash data for the reflection / completion screens
   store.set("lastWorkoutCredits", creditsEarned);
-  store.set("lastWorkoutName",    "Prescribed Session");
+  store.set("lastWorkoutName",    "My exercises");
 
   // PRESC-1, 12 Aug 2026. This function did not log the session at all.
   // It awarded credits and navigated away, so a FINISHED prescribed
@@ -691,7 +708,7 @@ function completeSession(active) {
   const nowIso = new Date().toISOString();
   store.logActivity({
     type:           "prescribed-session",
-    source:         "coach-recommended",
+    source:         "own",
     sessionEnd:     nowIso,
     completedAt:    nowIso,
     status:         "completed",
@@ -759,7 +776,7 @@ function savePartialSession() {
   if (activityEntry) {
     store.set("totalCredits", (store.get("totalCredits") || 0) + creditsEarned);
     store.set("lastWorkoutCredits", creditsEarned);
-    store.set("lastWorkoutName",    "Prescribed Session");
+    store.set("lastWorkoutName",    "My exercises");
     store.set("currentActivityEntry", activityEntry);
   }
 

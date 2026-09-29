@@ -1,5 +1,12 @@
 /**
- * verify-dupesection.mjs — 05 Sep 2026 v1
+ * verify-dupesection.mjs — 29 Sep 2026 v2
+ *
+ * v2 - P0, SCOPE-MINOR. Test 8 inverted: My exercises are no longer
+ *   injected into built sessions, so an entry on the person's own list
+ *   never appears in a coach or builder session at all, and nothing in
+ *   one is marked prescribed.
+ *
+ * 05 Sep 2026 v1
  *
  * DUPE-SECTION. One exercise must appear ONCE in a session.
  *
@@ -396,15 +403,12 @@ reset();
     const session = SB.buildSessionFromSelection({
       sessionType: "full", durationMins: 45, selectedIds: ids, equipmentOverride: KIT
     });
-    ok(!!session, "8a. a session builds with a prescribed exercise present");
+    ok(!!session, "8a. a session builds with an entry on My exercises present");
     if (session) {
-      const hits = session.exercises.filter(ex => ex.id === target.id);
-      ok(hits.length === 1,
-         `8b. prescribed exercise ${target.id} appears exactly once (found ${hits.length})`);
-      ok(hits.length === 1 && hits[0].isPrescribed === true,
-         "8c. the surviving copy is the PRESCRIBED one, not an engine pick that displaced it");
-      ok(session.exercises.some(ex => ex.isPrescribed === true),
-         "8d. the session actually contains prescribed work, so 8b is not vacuous");
+      ok(!session.exercises.some(ex => ex.isPrescribed === true || ex.category === "prescribed"),
+         "8b. nothing in the built session is carried over from My exercises (P0)");
+      ok(!/prescri/i.test(session.coachLine || "") ,
+         "8c. and the coach line does not mention prescribed work");
     }
     store.set("prescribedExercises", []);
   }

@@ -1,6 +1,15 @@
 /**
  * conditions.js — Condition definitions for onboarding and check-in
  *
+ * 29 Sep 2026 v1.7
+ *   P0, SCOPE-MINOR (Graeme, 29 Sep). Alongside works around minor aches
+ *   and injuries; it is not designed around medical conditions. Removed as
+ *   choices: heart condition, osteoporosis, fibromyalgia, hypermobility,
+ *   breathing / asthma, pelvic floor, ME / CFS, long covid, something
+ *   else (RETIRED_CONDITIONS, data/scope-statement.js). Their rules go
+ *   with them: the ME/CFS and long covid exclusion and the hypermobility
+ *   stretch rule. 'Anxiety / Stress sensitivity' is now 'Stress'.
+ *
  * 06 Sep 2026 v1.6
  *   CR-1. `chronic-fatigue` split into `persistent-fatigue`, `me-cfs`
  *   and `long-covid`. See the block comment at the GENERAL HEALTH entries.
@@ -131,7 +140,7 @@
  * resolves to no real body area produces a slider that saves and silently
  * never fires a caution.
  */
-export const SORE_AREA_PICKER_EXCEPTIONS = ["pelvic-floor"];
+export const SORE_AREA_PICKER_EXCEPTIONS = [];   // P0: pelvic floor retired
 
 export function soreAreaOptions(alreadyActive = []) {
   const taken = new Set(alreadyActive);
@@ -187,54 +196,24 @@ export const CONDITIONS = [
   // has and must never try to. It offers three honest labels and takes
   // the answer at face value.
   { id: 'persistent-fatigue', name: 'Ongoing tiredness or low energy', icon: '😴', area: 'general', hasPhase: false, zone: 'systemic' },
-  { id: 'me-cfs',           name: 'ME / CFS', icon: '🔋', area: 'general', hasPhase: false, zone: 'systemic' },
-  { id: 'long-covid',       name: 'Long covid', icon: '🌫️', area: 'general', hasPhase: false, zone: 'systemic' },
-  { id: 'anxiety',          name: 'Anxiety / Stress sensitivity', icon: '😰', area: 'general', hasPhase: false, zone: 'systemic' },
-  { id: 'breathing',        name: 'Breathing / Asthma',     icon: '🌬️', area: 'general', hasPhase: false, zone: 'systemic' },
-  { id: 'fibromyalgia',     name: 'Fibromyalgia',           icon: '⚡', area: 'general', hasPhase: false, zone: 'systemic' },
-  { id: 'hypermobility',    name: 'Hypermobility / EDS',    icon: '🤸', area: 'general', hasPhase: false, zone: 'systemic' },
-  { id: 'osteoporosis',     name: 'Osteoporosis / Low bone density', icon: '🦴', area: 'general', hasPhase: false, zone: 'systemic' },
-  { id: 'cardiovascular-condition', name: 'Heart condition', icon: '❤️', area: 'general', hasPhase: false, zone: 'systemic' },
-  { id: 'pelvic-floor',     name: 'Pelvic floor',           icon: '🫁', area: 'general', hasPhase: false, zone: 'systemic' },
+  { id: 'anxiety',          name: 'Stress', icon: '😰', area: 'general', hasPhase: false, zone: 'systemic' },
 
   // HORMONAL
   { id: 'perimenopause',    name: 'Perimenopause symptoms', icon: '🌙', area: 'hormonal', hasPhase: false, zone: 'systemic' },
   { id: 'menopause',        name: 'Menopause symptoms',     icon: '🌙', area: 'hormonal', hasPhase: false, zone: 'systemic' },
 
   // CATCH-ALL
-  { id: 'other',            name: 'Something else',         icon: '❓', area: 'other',    hasPhase: false, zone: 'systemic' }
 ];
 
 // ─────────────────────────────────────────────────────────────
-// CR-1, 06 Sep 2026. THE CONDITIONS THIS APP DECLINES TO BUILD FOR.
-//
-// A statement about the product's limits, not a claim about the person.
-// The app adapts sessions to how you feel today; for these conditions
-// that mechanic is the hazard. It has no pacing or energy-envelope
-// model, and building one needs clinical input this product does not
-// have.
-//
-// The person keeps their account and everything not gated on this. It
-// is a scope statement about sessions, not an ejection.
-//
-// NOT PAYWALLED, and the check must never sit behind isPremium().
-export const EXCLUDED_CONDITIONS = new Set(['me-cfs', 'long-covid']);
-
-/**
- * True when the person has declared a condition this app does not build
- * sessions for. Reads declared conditions only -- never journal content,
- * never inferred signal.
- */
-export function hasExcludedCondition(conditions) {
-  if (!Array.isArray(conditions)) return false;
-  return conditions.some(id => EXCLUDED_CONDITIONS.has(id));
-}
-
-/** The declared excluded condition ids, for copy that names them. */
-export function getExcludedConditions(conditions) {
-  if (!Array.isArray(conditions)) return [];
-  return conditions.filter(id => EXCLUDED_CONDITIONS.has(id));
-}
+// P0 (29 Sep 2026): the ME/CFS and long covid exclusion is gone with
+// the conditions. The app no longer asks about medical conditions at
+// all; the scope statement (data/scope-statement.js) tells everybody to
+// speak to a professional instead. These stay as no-ops so a stored id
+// from an older install can never reach a session builder as a rule.
+export const EXCLUDED_CONDITIONS = new Set();
+export function hasExcludedCondition() { return false; }
+export function getExcludedConditions() { return []; }
 
 // ─────────────────────────────────────────────────────────────
 // PHASE-AWARE VARIANTS
@@ -404,9 +383,6 @@ export function getExerciseSafetyTier(exercise, activeConditions) {
   // it errs toward excluding a safe exercise rather than serving an
   // unsafe one, which is the right direction for the error. Sharpening
   // it needs a field the library does not have.
-  if (activeConditions.includes('hypermobility') && exercise.movementPattern === 'stretch') {
-    return 'avoid';
-  }
 
   const avoid   = exercise.avoid   || exercise.contraindications || [];
   const caution = exercise.caution || [];

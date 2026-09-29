@@ -1,5 +1,9 @@
 /**
  * data/session-rationale.js
+ * 29 Sep 2026 v5
+ *
+ * v5 - P0, SCOPE-MINOR. Goal phrases no longer promise to settle pain or rebuild what was lost.
+ *
  * 28 Sep 2026 v4
  *
  * v4 - Work list 2e, TOO-EASY-LIVE. "That was too easy" answered "I'll
@@ -96,8 +100,8 @@ const GOAL_FOCUS = {
   "balance":             { needs: ["balance", "mobility"], says: "your balance" },
   "improve-posture":     { needs: ["strength", "mobility"], says: "how you hold yourself" },
   "prevent-injury":      { needs: ["mobility", "strength"], says: "keeping you out of trouble" },
-  "reduce-pain":         { needs: ["mobility"],            says: "settling the pain down" },
-  "injury-recovery":     { needs: ["rehabilitation"],      says: "rebuilding what you have lost" },
+  "reduce-pain":         { needs: ["mobility"],            says: "moving without aggravating it" },
+  "injury-recovery":     { needs: ["rehabilitation"],      says: "keeping you moving around it" },
   "return-to-fitness":   { needs: ["cardio", "strength"],  says: "finding your way back" },
   "return-after-illness":{ needs: ["mobility"],            says: "getting back on your feet" },
   "move-more":           { needs: ["cardio"],              says: "simply moving more" },

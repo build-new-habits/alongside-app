@@ -1,5 +1,8 @@
 /* css/components/finish.css
- * 28 Sep 2026 v2
+ * 29 Sep 2026 v3
+ *
+ * v3 - P0. .scope-statement (onboarding, Settings, the one-time Home
+ *   notice) and .scope-notice.
  *
  * v2 - F8. The update banner ("A new version of Alongside is ready")
  *   had no rules at all: verify-css now reads every JS file, not only
@@ -345,3 +348,23 @@
 .update-banner-text { margin: 0; color: var(--color-text); }
 .update-banner-actions { display: flex; gap: var(--space-2); }
 .update-banner-actions .btn { min-height: 44px; }
+
+/* ── The scope statement (P0, data/scope-statement.js) ───────────────── */
+.scope-statement {
+  margin: var(--space-4) 0;
+  padding: var(--space-4);
+  border-left: 3px solid var(--color-primary);
+  background: var(--color-bg-card);
+  border-radius: var(--radius-md);
+}
+.scope-statement__title {
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  margin: 0 0 var(--space-2);
+}
+.scope-statement__body,
+.scope-statement__advice { margin: 0; line-height: var(--leading-relaxed); }
+.scope-statement__advice { margin-top: var(--space-2); font-weight: var(--font-medium); }
+.scope-notice .btn { margin-top: var(--space-3); }
+.scope-notice > p { margin: 0; }
+.scope-notice__lead { font-weight: var(--font-semibold); }

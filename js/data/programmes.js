@@ -1,5 +1,9 @@
 /**
  * programmes.js
+ * 29 Sep 2026 v6
+ *
+ * v6 - P0, SCOPE-MINOR. Back to Strength no longer promises to reduce pain or talks about recovery or flare-ups; it says what sessions do.
+ *
  * 18 Aug 2026 v5
  *
  * v5 - NAMING-1. Three successor programmes renamed. `Build`, `Open` and
@@ -251,8 +255,8 @@ export const PROGRAMMES = [
     // Strength rebuilt, then built on.
     nextProgrammeId: 'build',
     name: 'Back to Strength',
-    tagline: 'Rebuild confidence and reduce pain over 12 weeks',
-    description: 'Designed for people managing pain, injury recovery, or returning after a long break. Every session adapts to your condition report.',
+    tagline: 'Keep moving, gently, around a niggle or after a break',
+    description: 'For when something is niggling or you are coming back after a long break. Sessions leave out what loads a sore area on the day.',
     icon: '🩹',
     engineGoals: ['injury-recovery'],
     durationWeeks: 12,
@@ -264,8 +268,8 @@ export const PROGRAMMES = [
         name: 'build',
         label: 'Gentle Start',
         weeks: [1, 2, 3, 4],
-        description: 'Low intensity, high safety. Rebuilding the movement habit without flare-ups.',
-        coachMessage: 'We move gently and intentionally. Pain reduction is progress, even on rest days.',
+        description: 'Low intensity. Getting the movement habit back, gently.',
+        coachMessage: 'We move gently and intentionally. Rest days count too.',
         intensityBias: 'gentle',
         focusBias: ['mobility', 'strength'],
         milestones: [
@@ -277,8 +281,8 @@ export const PROGRAMMES = [
         name: 'push',
         label: 'Building Capacity',
         weeks: [5, 6, 7, 8],
-        description: 'Gradually increasing strength in safe ranges.',
-        coachMessage: 'Building capacity carefully. If something hurts — we back off. Always.',
+        description: 'Gradually building strength, in ranges that feel comfortable.',
+        coachMessage: 'Building carefully. If something hurts, stop that one.',
         intensityBias: 'gentle',
         focusBias: ['strength', 'mobility'],
         milestones: [

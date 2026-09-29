@@ -1,5 +1,11 @@
 /**
  * tools/verify-checkin2.mjs
+ * 29 Sep 2026 v2
+ *
+ * v2 - P0, SCOPE-MINOR. Pelvic floor was the one exception to "body areas
+ *   only"; it is retired with the other medical conditions, so the picker
+ *   offers body areas and nothing else.
+ *
  * 29 Aug 2026 v1
  *
  * Gate for CHECKIN-2a.
@@ -43,12 +49,13 @@ check("every option resolves to a catalogue entry", () => {
     ok(ids.has(o.id), `${o.id} is not in CONDITIONS - its slider would never fire a caution`);
 });
 
-check("systemic conditions are excluded, pelvic-floor excepted", () => {
+check("only body areas are offered (P0: no exceptions)", () => {
   const opts = soreAreaOptions([]).map(o => o.id);
   ok(!opts.includes("fibromyalgia"), "fibromyalgia offered as a today-sore area");
   ok(!opts.includes("menopause"), "menopause offered as a today-sore area");
   ok(!opts.includes("other"), "`other` offered - it resolves to no real body area");
-  ok(opts.includes("pelvic-floor"), "pelvic-floor missing; it is the explicit exception");
+  ok(!opts.includes("pelvic-floor"), "pelvic-floor offered; it was retired in P0");
+  ok(!opts.includes("persistent-fatigue") && !opts.includes("anxiety"), "an everyday state offered as a sore area");
 });
 
 check("shoulder is offerable - the case that started this", () => {

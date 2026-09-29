@@ -1,5 +1,9 @@
 /**
  * tools/verify-redflag.mjs
+ * 29 Sep 2026 v3
+ *
+ * v3 - P0. 1d: fibromyalgia is retired; a scored id that is not a body area is never asked the spinal questions.
+ *
  * 28 Sep 2026 v2
  *
  * v2 - SMOOTH-P3c. Twelve exercise routes: 'capture' (Make it up as I
@@ -87,8 +91,8 @@ fixture({ conditions: ["anxiety", "perimenopause"] });
 ok("1b. a listed condition that is not pain: straight in", await go("workout") === "workout");
 fixture({ scores: { knee: 4 } });
 ok("1c. a sore knee in today's check-in: asked", await go("workout") === "red-flag");
-fixture({ conditions: ["fibromyalgia"] });
-ok("1d. fibromyalgia is pain: asked", await go("workout") === "red-flag");
+fixture({ conditions: [], scores: { "cardiovascular-condition": 8 } });
+ok("1d. P0: a scored id that is not a body area is never asked the spinal questions", await go("workout") !== "red-flag");
 
 // ── 2. EVERY EXERCISE ROUTE, AND ONLY THOSE ─────────────────────────────
 console.log("\nTEST 2 - every way into exercise goes through it; breathing does not");

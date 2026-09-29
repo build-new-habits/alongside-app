@@ -1,7 +1,13 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
- * 28 Sep 2026 v56
+ * 29 Sep 2026 v57
+ *
+ * v57 - P0, SCOPE-MINOR (Graeme, 29 Sep). The app is not designed around
+ *   medical conditions. Removed: the exercise-clearance gate (CARDIAC-1),
+ *   the ME/CFS and long covid out-of-scope card (CR-2), and the injection
+ *   of My exercises into every coach session with "as prescribed, not
+ *   mine to change". Sore-area filtering is unchanged: that is the job.
  *
  * v56 - F5, FLAKY-PLANDOSE-2. When the distinct main moves run out, the
  *   top-up adds a cool-down stretch, then a fourth set on moves whose
@@ -1006,7 +1012,7 @@ import { resolveEquipment, exerciseIsAvailable } from "./data/equipment-map.js";
 import { EXERCISES, isSessionLength, isCardioMachine } from "./data/exercises/index.js";
 import { matchCategory } from "./data/session-categories.js";
 import { buildRationale, tooHardRecently } from "./data/session-rationale.js";
-import { getZoneStatus, getPainBand, getCondition, getExcludedConditions } from "./data/conditions.js";
+import { getZoneStatus, getPainBand, getCondition } from "./data/conditions.js";
 import { focusOrderedCategories } from "./data/week-focus.js";
 // BURNOUT-LIVE, 16 Sep 2026. checkin.js imports only the store, so this
 // closes no cycle.
@@ -2678,30 +2684,8 @@ function _filterCandidates(categories, section, equipSet, conditionSet, sectionR
   // stated intent above: keeping what function exists is worth more than
   // protecting it into disuse.
   const LEG_PATTERNS = ["squat", "hinge", "lunge", "locomotion", "step"];
-  /**
-   * CARDIAC-1. Is this person waiting on a professional's yes?
-   * 'not-sure' is treated as 'not-yet' -- the coach says so out loud in
-   * generateClearanceAck(), so this is not a hidden decision.
-   */
-  const _needsClearance = () => {
-    const c = store.get("exerciseClearance");
-    return c === "not-yet" || c === "not-sure";
-  };
-
-  /**
-   * CARDIAC-1. Loaded strength work: external resistance, or a strength
-   * movement heavy enough to drive a large blood-pressure response.
-   *
-   * Bodyweight mobility, seated work and walking are deliberately NOT
-   * caught. The line is external load and maximal effort, not "strength".
-   */
-  const _isLoadedStrength = ex => {
-    const equip = ex.equipment || [];
-    const LOADED = /barbell|dumbbell|kettlebell|weight|machine|cable|smith|leg-press|plate/i;
-    if (equip.some(e => LOADED.test(String(e)))) return true;
-    if (ex.category === "strength" && (ex.difficultyLevel ?? 0) >= 4) return true;
-    return false;
-  };
+  // P0 (29 Sep): the exercise-clearance gate went with the medical conditions
+  // that asked it. The scope statement sends anyone unsure to a professional.
 
   const _loadsLegs = ex =>
     _needsLegs(ex) && (
@@ -2862,7 +2846,6 @@ function _filterCandidates(categories, section, equipSet, conditionSet, sectionR
     // null is NOT a gate. It means the question was never asked, which is
     // true of everyone who declared no relevant condition. Reading it as
     // 'not-yet' would quietly restrict the whole userbase.
-    if (_needsClearance() && _isLoadedStrength(ex)) return false;
 
     if (section === "main" && !withinCeiling(ex)) return false;
     if (section === "warmup" && useCeilingOnWarmup && !withinCeiling(ex)) return false;
@@ -3127,10 +3110,6 @@ export function buildSessionFromSelection({ sessionType, durationMins, selectedI
   // person can reasonably overrule about themselves. Whether this app has
   // a pacing model is not -- that is a fact about the product, and no
   // answer the person gives can change it. There is no override.
-  {
-    const excluded = getExcludedConditions(store.get("conditions") || []);
-    if (excluded.length > 0) return outOfScopeSession(excluded, durationMins);
-  }
 
   // SEVERE-1. The self-directed route gets the same answer. Putting the
   // bypass only on buildSession() would have made it a safety rule that
@@ -3149,17 +3128,10 @@ export function buildSessionFromSelection({ sessionType, durationMins, selectedI
   const conditionSet   = buildActiveConditionSet();
   const idSet          = new Set(selectedIds || []);
 
-  const prescribed = (store.get("prescribedExercises") || [])
-    .filter(ex => ex.active !== false)
-    .map(ex => ({
-      id: ex.id, name: ex.name, section: "main", category: "prescribed",
-      sets: ex.sets || 3, reps: ex.reps || ex.hold || "As prescribed",
-      tempo: "As prescribed", rest: "As needed",
-      description: ex.description || ex.notes || "As prescribed by your specialist.",
-      cues: ex.notes ? [ex.notes] : ["Follow your specialist's guidance for this exercise"],
-      youtube: null, equipment: [], contraindications: [], difficultyLevel: 1,
-      isPrescribed: true, prescribedBy: ex.prescribedBy || null
-    }));
+  // P0 (29 Sep): My exercises are the person's own session, not folded
+  // into the coach's. See buildSession().
+  const prescribed = [];
+
 
   // DUPE-SECTION, 05 Sep 2026. ONE EXERCISE, ONE APPEARANCE.
   //
@@ -3399,86 +3371,8 @@ function gentleCareSession(zone, durationMins) {
   };
 }
 
-/**
- * CR-2, 06 Sep 2026. THE OUT-OF-SCOPE CARD.
- *
- * Returned instead of a session when the person has declared a condition
- * in EXCLUDED_CONDITIONS. It is not a gentler session and must never be
- * mistaken for one.
- *
- * WHY THIS EXISTS. Move's whole method is adapting today's session to
- * how you feel today. For ME/CFS and long covid that method is the
- * hazard: post-exertional malaise is not load intolerance, so a session
- * that feels manageable on the day can cost days afterwards. Pacing
- * against an energy envelope is a different model, it needs clinical
- * input this product does not have, and inventing it would be worse than
- * declining.
- *
- * WHY IT RUNS BEFORE SEVERE-1, WHICH IS NOT AN ORDERING PREFERENCE.
- * Gentle Care offers box breathing, a body scan AND a mindful walk. The
- * walk is the problem. Handing an exertion suggestion, however small, to
- * someone with post-exertional malaise is the exact failure this card
- * exists to prevent, so this check must resolve before Gentle Care can
- * be reached. Breathing and grounding stay: they are wellbeing, not
- * exertion, and withdrawing them would be a punishment rather than a
- * scope statement.
- *
- * THE COACH DOES NOT DIAGNOSE, and this card does not either. It names
- * only what the person themselves declared, says what the app is doing
- * and why, and points outward. It does not say what is wrong with them,
- * does not assess severity, and does not tell them what they can manage.
- *
- * NOT PAYWALLED. The check sits ahead of every tier gate in this file.
- *
- * PROVENANCE. Follows written answers from a named physiotherapist,
- * 06 Sep 2026, who declined the reviewer role and declined naming. Her
- * position is consistent with NICE NG206 and the ME Association's
- * activity and exercise guidance, both of which she cited. Steers, not
- * clinical sign-off.
- */
-function outOfScopeSession(declaredIds, durationMins) {
-  const pick = (id, category) =>
-    EXERCISES.find(e => e.id === id) ||
-    EXERCISES.find(e => e.category === category) ||
-    null;
-
-  // Breathing and grounding only. NO mindful-walk, and no other entry
-  // that asks the body for anything. See the block comment above.
-  const items = [
-    pick("box-breathing", "recovery"),
-    pick("body-scan-short", "mindfulness")
-  ].filter(Boolean).map(e => ({
-    ...e,
-    section: "warmup",
-    _outOfScope: true
-  }));
-
-  return {
-    id: "out-of-scope",
-    title: "This part isn't built for you yet",
-    subtitle: "",
-    duration: durationMins || 10,
-    outOfScope: true,
-    outOfScopeConditions: declaredIds,
-    coachLine:
-      "I'm not going to build you movement sessions, and I want to be straight with you " +
-      "about why.\n\nThe way I work is to look at how you are today and adjust from there. " +
-      "For what you've told me you're managing, that approach can do harm rather than " +
-      "good \u2014 doing what feels possible on the day is exactly how people end up paying " +
-      "for it later. Working safely needs pacing built around you by someone who knows " +
-      "your history, and I can't be that.\n\nSo I'm not going to guess. Breathing and " +
-      "grounding are still here whenever you want them, and everything else in the app " +
-      "is yours as normal.",
-    exercises: items,
-    rationale: []
-  };
-}
 
 export function buildSession({ sessionType, durationMins, equipmentOverride, preset, ignoreSevere, inputs }) {
-  // CR-2. Before SEVERE-1, and that order is load-bearing -- see
-  // outOfScopeSession(). Gentle Care offers a walk; this must resolve first.
-  const excluded = getExcludedConditions(store.get("conditions") || []);
-  if (excluded.length > 0) return outOfScopeSession(excluded, durationMins);
 
   // SEVERE-1. Before anything else, and before any pool is built.
   if (SEVERE_BYPASS_ENABLED && !ignoreSevere) {
@@ -3503,32 +3397,14 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
   const counts         = _applyTodayIntensity(_applyPreset(_baseCounts(durationMins, sessionType) || EXERCISE_COUNT[30], preset));
   const conditionNote  = buildConditionNote(sessionType);
 
-  // ── Prescribed exercises injection ──────────────────────────────────────────
-  // Active prescribed exercises are included in every session, regardless of
-  // session type. They are placed in the warmup or main section depending on
-  // their nature. The coach names them explicitly in the coach line.
-  // The engine never removes or overrides prescribed exercises.
+  // ── My exercises (P0, 29 Sep 2026) ─────────────────────────────────────────
+  // Previously every active entry in prescribedExercises was injected into
+  // every session "as prescribed, not mine to change" -- a Cardio request
+  // came back with no cardio (persona 2.1). The list is now the person's
+  // own session, started from My exercises or the check-in; the coach's
+  // session is the coach's.
+  const prescribed = [];
 
-  const prescribed = (store.get("prescribedExercises") || [])
-    .filter(ex => ex.active !== false)
-    .map(ex => ({
-      id:          ex.id,
-      name:        ex.name,
-      section:     "main",    // default; could be made smarter later
-      category:    "prescribed",
-      sets:        ex.sets        || 3,
-      reps:        ex.reps        || ex.hold || "As prescribed",
-      tempo:       "As prescribed",
-      rest:        "As needed",
-      description: ex.description || ex.notes || "As prescribed by your specialist.",
-      cues:        ex.notes ? [ex.notes] : ["Follow your specialist's guidance for this exercise"],
-      youtube:     null,
-      equipment:   [],
-      contraindications: [],
-      difficultyLevel: 1,
-      isPrescribed:    true,
-      prescribedBy:    ex.prescribedBy || null
-    }));
 
   const hasPrescribed = prescribed.length > 0;
 
@@ -4223,16 +4099,7 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
   const gentle = _gentleReason();
   const gentleNote = gentle ? GENTLE_LINES[gentle.id](gentle) : null;
 
-  // Build prescribed note for coach line
-  let prescribedNote = null;
-  if (hasPrescribed) {
-    const prescribers = [...new Set(prescribed.map(p => p.prescribedBy).filter(Boolean))];
-    if (prescribers.length > 0) {
-      prescribedNote = `I've included your prescribed exercises from ${prescribers.join(" and ")}. Do these as written — they are not mine to change.`;
-    } else {
-      prescribedNote = `I've included your prescribed exercises at the start of the main session. Do these as written.`;
-    }
-  }
+  const prescribedNote = null;   // P0: nothing is "prescribed"
 
   const coachLine = generateCoachLine(
     sessionType,

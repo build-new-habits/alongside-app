@@ -1,5 +1,9 @@
 /**
  * js/data/beat3-scripts.js
+ * 29 Sep 2026 v2
+ *
+ * v2 - P0, SCOPE-MINOR. "six weeks recovering from injury" is "six weeks away".
+ *
  * 28 Jun 2026 v1
  *
  * Onboarding Beat 3 reflection scripts — Nurturing voice.
@@ -86,7 +90,7 @@ export const beat3Scripts = {
 
       "I will never treat time away as failure. I will never ask you to pick up where you left off as though nothing happened. What I will do is ask how you are when you come back, take that seriously, and work out what makes sense from there. The gap doesn't define the story. What you do next does.",
 
-      "When you come back, I'm going to ask what happened and how long you were out. Not because I'm keeping score — but because a week with flu lands differently on the body than six weeks recovering from injury, and I want to start from the right place for you. You won't have to justify yourself. You'll just have to tell me, and I'll take it from there."
+      "When you come back, I'm going to ask what happened and how long you were out. Not because I'm keeping score — but because a week with flu lands differently on the body than six weeks away, and I want to start from the right place for you. You won't have to justify yourself. You'll just have to tell me, and I'll take it from there."
     ]
   },
 

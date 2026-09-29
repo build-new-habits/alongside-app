@@ -1,5 +1,9 @@
 /**
  * tools/verify-write1.mjs
+ * 29 Sep 2026 v5
+ *
+ * v5 - P0. exerciseClearance removed from the baseline with the field.
+ *
  * 28 Sep 2026 v4
  * Work list 2e. proposalBias leaves the baseline: the field is removed
  *   (store v79), not connected -- its one reader went with the dead
@@ -168,7 +172,7 @@ const BASELINE = new Set([
   // loaded. Do NOT connect a new writer: dated targets now belong to
   // strategicGoal, and R2-a makes them Plan-only.
   'targetDate',
-  'trainingIntent','exerciseClearance','lifestyle','gymProgrammeWeek','liftLogEnabled',
+  'trainingIntent','lifestyle','gymProgrammeWeek','liftLogEnabled',
   'mindfulPromptFrequency','speechRate','checkInNotification','noticingWeekInCycle',
   'journalSettings','waterReminderEnabled','lastWaterReminder','community',
   // liftLog removed 28 Sep: SMOOTH-P3c reads it directly (capture.js v2,

@@ -1,5 +1,9 @@
 /**
  * tools/verify-mount-all.mjs
+ * 29 Sep 2026 v4
+ *
+ * v4 - P0. 50 routes after Conditions Update was retired: the registry check reads >= 50.
+ *
  * 28 Sep 2026 v3
  *
  * v2 - F7 LANDMARK. 30 views put role="main" on their wrapper, inside
@@ -87,7 +91,7 @@ const origConsoleError = console.error;
 console.error = (...a) => { const t = a.map(String).join(" "); if (/failed to mount view/i.test(t)) recovered = t.slice(0, 220); };
 
 console.log(`\nMounting ${ROUTES.length} registered routes the way the router does\n`);
-ok("0. the registry was read", ROUTES.length > 50 && ROUTES.includes("community-impact"));
+ok("0. the registry was read", ROUTES.length >= 50 && ROUTES.includes("community-impact"));
 const broken = []; const extraMain = [];
 for (const r of ROUTES) {
   if (SKIP[r]) continue;

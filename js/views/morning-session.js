@@ -1,6 +1,10 @@
 /**
  * morning-session.js - Morning Session View
  *
+ * 29 Sep 2026 v4
+ *
+ * v4 - P0, SCOPE-MINOR. "adjusted to protect those areas" is "left out the options that load it".
+ *
  * 11 Aug 2026 v3
  *
  * v3 — PT-12. Three reads of "checkin.energy" corrected to
@@ -147,7 +151,7 @@ function getCardioRoute() {
 }
 
 function getCardioRouteLabel(route) {
-  if (route === "flare")   return "Pain-aware options (glutes/back/hamstrings flagged)";
+  if (route === "flare")   return "Options that leave out what loads a sore area";
   if (route === "fatigue") return "Lower intensity options (energy is low today)";
   return "Full options";
 }
@@ -620,7 +624,7 @@ function renderCardioCard(session) {
         <div class="ms-routing-notice" role="alert" aria-live="polite">
           <span class="ms-routing-icon" aria-hidden="true">${route === "flare" ? "\u26A0\uFE0F" : "\uD83D\uDC99"}</span>
           <p>${route === "flare"
-            ? "I can see some pain flagged in your check-in. I have adjusted your cardio options to protect those areas."
+            ? "You said something is sore today, so I have left out the cardio options that load it."
             : "Energy is low today. I have given you gentler options - moving is still the right call."
           }</p>
         </div>

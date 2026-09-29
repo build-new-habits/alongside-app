@@ -1,6 +1,10 @@
 /**
  * js/views/session-builder-ui.js - Session Builder UI
  *
+ * 29 Sep 2026 v25
+ *
+ * v25 - P0, SCOPE-MINOR. "Prescribed for you — I don't change these" removed; own exercises are not in built sessions.
+ *
  * 28 Sep 2026 v24
  *
  * v24 - F7 LANDMARK. role="main" (and its label) removed from the view's
@@ -1409,9 +1413,6 @@ function _previewRow(row, opts = {}) {
     return `
       <div class="sb-exercise-item" role="listitem">
         ${inner}
-        ${ex.isPrescribed ? `
-          <span class="sb-exercise-note text-xs">Prescribed for you &mdash; I don't change these.</span>
-        ` : ""}
       </div>`;
   }
 

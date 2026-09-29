@@ -1,5 +1,9 @@
 /**
  * js/data/aims.js
+ * 29 Sep 2026 v3
+ *
+ * v3 - P0, SCOPE-MINOR. "Build back gently after being ill" is "Get going again after being unwell".
+ *
  * 03 Sep 2026 v2
  *
  * v2 - SITUATIONS. Rewritten after device testing.
@@ -198,7 +202,7 @@ export const AIMS = {
     },
     {
       id: "after-illness",
-      label: "Build back gently after being ill",
+      label: "Get going again after being unwell",
       // Persona 2.5, post-cardiac. "Gently" is in the label because the
       // fear of overdoing it is the barrier, not the exercise.
       situations: ["returning", "managing", "starting"],

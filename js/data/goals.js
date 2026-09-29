@@ -1,6 +1,10 @@
 /**
  * goals.js
- * 28 Sep 2026 v4
+ * 29 Sep 2026 v5
+ *
+ * v5 - P0, SCOPE-MINOR. "Reduce pain" retired (kept so saved goals
+ *   resolve, relabelled); "Recover from an injury" is "Keep moving around
+ *   a niggle". The app does not offer to reduce pain or bring about recovery.
  *
  * v4 - Work list 2e. chosenPrimaryEngineGoal(): the coach route honours
  *   the goal the person chose as primary (GOAL-2 on the live path).
@@ -204,14 +208,15 @@ export const GOAL_CATEGORIES = [
       },
       {
         id: 'reduce-pain',
-        label: 'Reduce pain',
-        icon: '🩹',
+        retired: true,   // P0 (29 Sep): not offered; kept so saved goals resolve
+        label: 'Move without aggravating a niggle',
+        icon: '🌱',
         engineGoalId: 'injury-recovery',
       },
       {
         id: 'injury-recovery',
-        label: 'Recover from an injury',
-        icon: '🏥',
+        label: 'Keep moving around a niggle',   // P0: was "Recover from an injury"
+        icon: '🌱',
         engineGoalId: 'injury-recovery',
       },
       {

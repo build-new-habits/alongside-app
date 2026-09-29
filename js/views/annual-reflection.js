@@ -1,5 +1,9 @@
 /**
  * views/annual-reflection.js
+ * 29 Sep 2026 v5
+ *
+ * v5 - P0, SCOPE-MINOR. 'Your own exercises', not 'Prescribed exercises'.
+ *
  * 28 Sep 2026 v4
  *
  * v4 - F7. What you did most names kinds in words, not type ids.
@@ -162,7 +166,7 @@ function _renderNotYet(firstAt, daysIn) {
 // the page said "workout (41)".
 const KIND_LABELS = {
   workout: 'Sessions with the coach', freestyle: 'Made up as you went',
-  'prescribed-session': 'Prescribed exercises', 'quiet-session': 'Quiet sessions',
+  'prescribed-session': 'Your own exercises', 'quiet-session': 'Quiet sessions',
   breathing: 'Breathing', walk: 'Walks', run: 'Runs', cycle: 'Rides',
   swim: 'Swims', yoga: 'Yoga', stretch: 'Stretching', class: 'Classes',
 };

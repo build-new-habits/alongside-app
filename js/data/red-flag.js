@@ -1,6 +1,10 @@
 /**
  * js/data/red-flag.js
- * 28 Sep 2026 v2
+ * 29 Sep 2026 v3
+ *
+ * v3 - P0, SCOPE-MINOR. Fibromyalgia retired; a scored id counts only if
+ *   it is a body area (persona 2.5: a heart condition triggered the
+ *   spinal questions).
  *
  * v2 - SMOOTH-P3c. 'capture' (Make it up as I go) is guarded: it is
  *   exercise, and v1's list predates it being a session. Twelve routes.
@@ -115,10 +119,11 @@ function _record() {
  * menopause, fatigue and the like are real and listed, but they are not
  * what these three questions are about; asking someone who listed
  * perimenopause about bladder control before a walk would be alarming
- * and teach people to tap through. Fibromyalgia is pain and is included.
+ * and teach people to tap through. (Fibromyalgia was included until P0,
+ * 29 Sep, which retired it with the other medical conditions.)
  */
 const PAIN_CONDITIONS = new Set(
-  CONDITIONS.filter(c => ["lower", "back", "upper"].includes(c.area)).map(c => c.id).concat(["fibromyalgia"])
+  CONDITIONS.filter(c => ["lower", "back", "upper"].includes(c.area)).map(c => c.id)
 );
 
 /** The pain areas the person has told us about: listed pain conditions and today's sore areas. */
@@ -126,7 +131,9 @@ export function reportedPainAreas() {
   const out = new Set();
   for (const c of (store.get("conditions") || [])) if (PAIN_CONDITIONS.has(c)) out.add(c);
   const scores = store.get("conditionPainScores") || {};
-  for (const [area, n] of Object.entries(scores)) if (Number(n) > 0) out.add(area);
+  // P0: only body areas. A scored id outside them (a heart condition, in
+  // Wave 2) sent people through bladder and groin questions.
+  for (const [area, n] of Object.entries(scores)) if (Number(n) > 0 && PAIN_CONDITIONS.has(area)) out.add(area);
   return [...out];
 }
 

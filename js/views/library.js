@@ -1,6 +1,10 @@
 /**
  * library.js - Library Page
  *
+ * 29 Sep 2026 v9
+ *
+ * v9 - P0, SCOPE-MINOR. "Prescribed — from your physio or specialist" is "My exercises — your own list".
+ *
  * 20 Aug 2026 v8
  *
  * v8 - R4. SELF-DIRECTION IS FREE. Ten of the eleven tier tags in this
@@ -316,9 +320,9 @@ const GUIDED_CATEGORIES = [
   },
   {
     id:          "prescribed",
-    label:       "Prescribed",
-    icon:        "\uD83E\uDE7A",
-    description: "Exercises from your physio or specialist",
+    label:       "My exercises",
+    icon:        "\uD83D\uDCCB",
+    description: "Your own list of exercises",
     sessions: [],
     directTarget: "prescribed"
   },

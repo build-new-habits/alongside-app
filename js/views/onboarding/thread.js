@@ -1,5 +1,9 @@
 /**
  * js/views/onboarding/thread.js
+ * 29 Sep 2026 v16
+ *
+ * v16 - P0, SCOPE-MINOR. Step 8a (exercise clearance) is gone; its acknowledgement wiring removed.
+ *
  * 28 Sep 2026 v15
  *
  * v15 - F7 LANDMARK. role="main" (and its label) removed from the view's
@@ -231,7 +235,6 @@ import {
   generateFrequencyAck,
   generateBalanceAck,
   generateIntentAck,
-  generateClearanceAck,
   BALANCE_CHIPS,
   CHAIR_RISE_CHIPS,
   FLOOR_ACCESS_CHIPS,
@@ -1417,10 +1420,6 @@ export function ThreadView(router) {
       return generateIntentAck(value);
     }
 
-    // Step 8a — exercise clearance: dynamic ack (CARDIAC-1)
-    if (step.id === '8a') {
-      return generateClearanceAck(value);
-    }
 
     return step.coachAfter?.answered || null;
   }

@@ -1,6 +1,11 @@
 /**
  * progress.js
- * 28 Sep 2026 v18
+ * 29 Sep 2026 v19
+ *
+ * v19 - P0, SCOPE-MINOR. The per-area "What you've told me about" charts
+ *   are removed (charting an injury over time is monitoring it). The
+ *   professional share is described as plain and structured, not
+ *   "clinical-friendly".
  *
  * v18 - F7 LANDMARK. role="main" (and its label) removed from the view's
  *   wrapper: index.html's <main> is the one main landmark; a second,
@@ -282,9 +287,8 @@ import { getProgressStats } from '../data/programmeEngine.js';
 import { getGoalLabel }     from '../data/goals.js';
 import { toKg, formatWeight, observedRateBreach } from '../data/weight-targets.js';
 import { aimById } from '../data/aims.js';
-import { CONDITIONS, soreAreaOptions } from '../data/conditions.js';
 import { EXERCISES } from '../data/exercises/index.js';
-import { conditionReadback, liftReadback, strandReadback, arcWeek, sessionsByWeek,
+import { liftReadback, strandReadback, arcWeek, sessionsByWeek,
          sessionsInWindow, shortDate } from '../data/arc-readback.js';
 
 // Set by _rateNote when it renders the sustained-rate note, committed by
@@ -817,12 +821,6 @@ export function ProgressView(router) {
       </figure>`;
   }
 
-  /** Conditions the check-in asks about: the sore-able ones the person listed. */
-  function _soreConditions() {
-    const soreable = new Set(soreAreaOptions([]).map(o => o.id));
-    return (store.get('conditions') || []).filter(id => soreable.has(id));
-  }
-
   function renderArcReadback() {
     const arc   = store.get('arc') || {};
     const aim   = arc.active && arc.aimId ? aimById(arc.aimId) : null;
@@ -835,7 +833,6 @@ export function ProgressView(router) {
           <p class="pr-coach">Tell me what you want to be able to do, and this is where it lives — what you’re working towards and what has come up.</p>
           <button class="btn btn-secondary btn-full" data-route="arc-setup">Set up your arc</button>
         </section>
-        ${_conditionsBlock(now)}
         ${_liftsBlock()}`;
     }
 
@@ -853,7 +850,6 @@ export function ProgressView(router) {
         ${coach ? `<p class="pr-coach">${_esc(coach)}</p>` : ''}
       </section>
 
-      ${_conditionsBlock(now)}
       ${_liftsBlock()}
 
       ${strands.length ? `
@@ -872,34 +868,10 @@ export function ProgressView(router) {
       <button class="btn btn-secondary btn-full pr-change" data-route="stretch-arc">Change my arc</button>`;
   }
 
-  function _conditionsBlock(now) {
-    const ids = _soreConditions();
-    if (!ids.length) return '';
-    const history = store.get('checkinHistory') || {};
-    const meta    = store.get('conditionMeta') || {};
-    return `
-      <section class="pr-block" aria-labelledby="pr-told-h">
-        <h2 class="pr-title" id="pr-told-h">What you’ve told me about</h2>
-        ${ids.map(id => {
-          const r    = conditionReadback(id, { history, meta, now });
-          const name = CONDITIONS.find(c => c.id === id)?.name || id;
-          return `
-            <div class="pr-condition">
-              <h3 class="pr-condition__name">${_esc(name)}</h3>
-              ${r.since ? `<p class="pr-condition__since">Since ${_esc(shortDate(`${r.since}T12:00:00`))}</p>` : ''}
-              <p class="pr-condition__lines">${r.lines.map(_esc).join(' ')}</p>
-              ${_chart({
-                id: `pr-c-${id}`,
-                title: `${name}: mentions at check-in, week by week`,
-                summary: `Mentions at check-in over the last six weeks, out of all your check-ins each week.`,
-                bars: r.weeks.map(w => ({ start: w.start, value: w.mentioned, of: w.checkins,
-                  label: `Week of ${shortDate(w.start)}: mentioned on ${w.mentioned} of ${w.checkins} check-in${w.checkins === 1 ? '' : 's'}` }))
-              })}
-            </div>`;
-        }).join('')}
-        <p class="pr-note">This is what you’ve told me at check-in. It isn’t a diagnosis.</p>
-      </section>`;
-  }
+  // P0, SCOPE-MINOR (29 Sep 2026). "What you've told me about" -- a chart
+  // per sore area, week by week -- is removed. Charting an injury over
+  // time is monitoring it, which is a medical purpose; Alongside only
+  // asks what is sore TODAY and leaves out what loads it.
 
   function _liftsBlock() {
     const rows = liftReadback(store.get('liftLog') || {}, EXERCISES);
@@ -939,7 +911,7 @@ export function ProgressView(router) {
     return `
       <section class="pr-block pr-plan-card" aria-labelledby="pr-plan-h">
         <h2 class="pr-title" id="pr-plan-h">On the Plan</h2>
-        <p class="pr-coach">Your goal lives here too: what you’re working towards, what you’ve told me about, and what your logged weights show.</p>
+        <p class="pr-coach">Your goal lives here too: what you’re working towards, what has come up, and what your logged weights show.</p>
         <button class="btn btn-ghost btn-full" data-route="upgrade">What the Plan adds</button>
       </section>`;
   }
@@ -962,7 +934,7 @@ export function ProgressView(router) {
           </button>
           <button class="progress-export__btn"
                   data-export="professional"
-                  aria-label="Export for a professional — structured, clinical-friendly format">
+                  aria-label="The version to share with someone who helps you train — plain and structured">
             For a professional
           </button>
         </div>

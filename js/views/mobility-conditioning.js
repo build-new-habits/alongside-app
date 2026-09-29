@@ -1,7 +1,11 @@
 /**
  * mobility-conditioning.js - Mobility & Conditioning
  *
- * 28 Sep 2026 v6
+ * 29 Sep 2026 v7
+ *
+ * v7 - P0, SCOPE-MINOR. "My Conditions Programme" (coach-built, grouped by
+ *   condition, edited in the retired Conditions Update) is now "My
+ *   exercises": the person's own list, one tap to it.
  *
  * v6 - F7 LANDMARK. role="main" (and its label) removed from the view's
  *   wrapper: index.html's <main> is the one main landmark; a second,
@@ -64,20 +68,16 @@
  */
 
 import { store } from "../store.js";
-import { getConditionName } from "../data/conditions.js";
-import { getEntryConditionIds } from "../data/conditionProgrammes.js";
 
 export function MobilityConditioningView(router) {
 
-  let programmeExpanded = false;
 
   function mount(container) {
     render(container);
   }
 
   function render(container) {
-    const prescribed = store.get("prescribedExercises") || [];
-    const tagged      = prescribed.filter(e => getEntryConditionIds(e).length > 0);
+    const mine = store.get("prescribedExercises") || [];
 
     container.innerHTML = `
       <div class="mc-view">
@@ -96,7 +96,7 @@ export function MobilityConditioningView(router) {
           </span>
         </button>
 
-        ${_renderProgrammeCard(tagged)}
+        ${_renderMyExercisesCard(mine)}
 
         <button class="mc-card" id="mc-arc" aria-label="Stretch arc">
           <span class="mc-card__icon" aria-hidden="true">\uD83E\uDDED</span>
@@ -129,68 +129,24 @@ export function MobilityConditioningView(router) {
     attachEvents(container);
   }
 
-  function _renderProgrammeCard(tagged) {
-    if (tagged.length === 0) {
-      return `
-        <div class="mc-card mc-card--static" aria-label="My Conditions Programme, not created">
-          <span class="mc-card__icon" aria-hidden="true">\uD83E\uDE79</span>
-          <span class="mc-card__text">
-            <span class="mc-card__label">My Conditions Programme</span>
-            <span class="mc-card__sub">Not created yet</span>
-          </span>
-          <button class="mc-card__link" id="mc-goto-conditions-update">
-            Build one in Conditions Update
-          </button>
-        </div>
-      `;
-    }
-
-    const byCondition = {};
-    tagged.forEach(e => {
-      // An entry can now serve more than one condition (04 Aug 2026,
-      // real exercise reuse) — it appears under each heading it
-      // genuinely belongs to, not just the first/only one, so the
-      // grouped view honestly reflects what the exercise is doing.
-      getEntryConditionIds(e).forEach(conditionId => {
-        (byCondition[conditionId] ||= []).push(e);
-      });
-    });
-
+  // P0 (29 Sep 2026). Was "My Conditions Programme", built by the coach
+  // for a condition and grouped by condition. Now the person's own list,
+  // whatever it came from; the app does not build it or say what it is for.
+  function _renderMyExercisesCard(mine) {
     return `
-      <div class="mc-card mc-card--static">
-        <button class="mc-programme-toggle" id="mc-programme-toggle"
-                aria-expanded="${programmeExpanded}" aria-controls="mc-programme-body">
-          <span class="mc-card__icon" aria-hidden="true">\uD83E\uDE79</span>
-          <span class="mc-card__text">
-            <span class="mc-card__label">My Conditions Programme</span>
-            <span class="mc-card__sub">${tagged.length} exercise${tagged.length === 1 ? "" : "s"} saved \u2014 tap to find out more</span>
-          </span>
-          <span class="mc-programme-toggle__chevron" aria-hidden="true">&rsaquo;</span>
-        </button>
-
-        ${programmeExpanded ? `
-          <div class="mc-programme-body" id="mc-programme-body">
-            ${Object.entries(byCondition).map(([conditionId, exercises]) => `
-              <div class="mc-programme-group">
-                <p class="mc-programme-group__heading">${getConditionName(conditionId)}</p>
-                <ul class="mc-programme-group__list">
-                  ${exercises.map(e => `<li>${e.name}</li>`).join("")}
-                </ul>
-              </div>
-            `).join("")}
-            <p class="mc-programme-edit-note">
-              Want to change what's here, your goal, or how it folds into your sessions?
-              Edit it in Conditions Update.
-            </p>
-            <div class="mc-programme-actions">
-              <button class="btn btn-ghost" id="mc-goto-conditions-update-2">Conditions Update</button>
-              <button class="btn btn-primary" id="mc-start-programme">Start this programme</button>
-            </div>
-          </div>
-        ` : ""}
-      </div>
+      <button class="mc-card" id="mc-my-exercises" aria-label="My exercises">
+        <span class="mc-card__icon" aria-hidden="true">\uD83D\uDCCB</span>
+        <span class="mc-card__text">
+          <span class="mc-card__label">My exercises</span>
+          <span class="mc-card__sub">${mine.length
+            ? `${mine.length} exercise${mine.length === 1 ? "" : "s"} you've added`
+            : "Keep a list of your own exercises"}</span>
+        </span>
+        <span class="mc-card__chev" aria-hidden="true">&#8250;</span>
+      </button>
     `;
   }
+
 
   function attachEvents(container) {
     container.querySelector("#mc-back-btn")?.addEventListener("click", () => {
@@ -232,21 +188,8 @@ export function MobilityConditioningView(router) {
       router.navigate("library");
     });
 
-    container.querySelector("#mc-goto-conditions-update")?.addEventListener("click", () => {
-      router.navigate("conditions-update");
-    });
-
-    container.querySelector("#mc-goto-conditions-update-2")?.addEventListener("click", () => {
-      router.navigate("conditions-update");
-    });
-
-    container.querySelector("#mc-start-programme")?.addEventListener("click", () => {
-      router.navigate("prescribed-session");
-    });
-
-    container.querySelector("#mc-programme-toggle")?.addEventListener("click", () => {
-      programmeExpanded = !programmeExpanded;
-      render(container);
+    container.querySelector("#mc-my-exercises")?.addEventListener("click", () => {
+      router.navigate("prescribed");
     });
   }
 

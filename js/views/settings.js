@@ -1,5 +1,9 @@
 /**
  * settings.js
+ * 29 Sep 2026 v42
+ *
+ * v42 - P0, SCOPE-MINOR. "Sore or injured areas" (was Conditions and injuries), with the scope statement; Add or change opens the sore-areas sheet (Conditions Update is retired).
+ *
  * 28 Sep 2026 v41
  *
  * v41 - F7 LANDMARK. role="main" (and its label) removed from the view's
@@ -527,6 +531,7 @@ import { openSheet }                     from './onboarding/sheet-manager.js';
 // insulting; the list has to say what they actually skipped.
 import { EXERCISES } from '../data/exercises/index.js';
 import { CONDITIONS } from '../data/conditions.js';
+import { scopeStatementHTML } from '../data/scope-statement.js';
 import { aimById } from '../data/aims.js';
 import { conditionReadback, shortDate } from '../data/arc-readback.js';
 
@@ -624,7 +629,7 @@ export function SettingsView(router) {
   const SCREENS = {
     profile:      { title: 'Your profile',            render: () => renderProfilePanel() },
     movement:     { title: 'How you move',            render: () => `<div class="settings-section">${renderMovementSection()}</div>` },
-    conditions:   { title: 'Conditions and injuries', render: () => renderConditionsPanel() },
+    conditions:   { title: 'Sore or injured areas', render: () => renderConditionsPanel() },
     equipment:    { title: 'Equipment',               render: () => renderEquipmentPanel() },
     capability:   { title: 'What your body can do',   render: () => `<div class="settings-section">${renderCapabilitySection()}</div>` },
     preferences:  { title: 'How sessions are built',  render: () => `<div class="settings-section">${renderPreferencesSection()}</div>` },
@@ -713,7 +718,7 @@ export function SettingsView(router) {
         _row({ label: 'Age range', value: ageLbl, open: 'profile', focus: '#settings-agebandsel' }),
         _row({ label: 'Gender', value: _label(GENDERS, store.get('gender'), 'Prefer not to say'), open: 'profile', focus: '#settings-gender' }),
         _row({ label: 'How you move', value: moves.length ? moves.map(m => _label(MOVEMENT_IDENTITIES, m, m === 'mixed' ? 'A mix' : m)).join(', ') : 'Not set', open: 'movement' }),
-        _row({ label: 'Conditions and injuries', value: conds.length ? `${conds.length} listed` : 'None', open: 'conditions' }),
+        _row({ label: 'Sore or injured areas', value: conds.length ? `${conds.length} listed` : 'None', open: 'conditions' }),
         _row({ label: 'Equipment', value: `Gym ${gym} · Home ${home}`, open: 'equipment' }),
         _row({ label: 'What your body can do', value: cap.askedAt ? 'Answered' : 'Not answered', open: 'capability' }),
       ])}
@@ -1443,12 +1448,13 @@ export function SettingsView(router) {
     return `
       <div class="settings-section">
         <p class="settings-section__sub">
-          The coach adapts every session around what's listed here. When
-          something is better, say so and I'll stop planning around it.
-          Nothing is deleted: if it comes back, it comes back as it was.
+          The coach leaves out movements likely to load what's listed here.
+          When something is better, say so and I'll stop planning around it.
+          If it comes back, add it again.
         </p>
+        ${scopeStatementHTML({ heading: 'h2', id: 'settings-scope' })}
         ${conditions.length ? `
-          <ul class="settings-conds" aria-label="Your conditions">
+          <ul class="settings-conds" aria-label="Your sore or injured areas">
             ${conditions.map(id => `
               <li class="settings-cond">
                 <span class="settings-cond__text">
@@ -1459,10 +1465,10 @@ export function SettingsView(router) {
                         aria-label="${_esc(nameOf(id))}: it's better now">It's better now</button>
               </li>`).join('')}
           </ul>
-        ` : `<p class="settings-empty">No conditions listed.</p>`}
+        ` : `<p class="settings-empty">Nothing listed.</p>`}
         ${resolved.length ? `
           <h2 class="settings-section__heading">Better now</h2>
-          <ul class="settings-conds" aria-label="Conditions you've said are better">
+          <ul class="settings-conds" aria-label="Areas you've said are better">
             ${resolved.map(r => `
               <li class="settings-cond">
                 <span class="settings-cond__text">
@@ -1475,8 +1481,8 @@ export function SettingsView(router) {
           </ul>` : ''}
         <button class="btn btn-primary"
                 data-action="edit-conditions"
-                aria-label="Add or change your conditions and injuries">
-          Add or change conditions
+                aria-label="Add or change your sore or injured areas">
+          Add or change areas
         </button>
       </div>
     `;
@@ -2488,18 +2494,13 @@ export function SettingsView(router) {
         break;
 
       case 'edit-conditions':
-        // Fix, 04 Aug 2026 (Phase D-2): now routes to the real Conditions
-        // Update screen (conditions-update.js) instead of the limited
-        // onboarding sheet, which only ever let you toggle which
-        // conditions exist — nothing about severity, goals, or a
-        // programme. Matches the original spec: Settings' panel is a
-        // shortcut into the same destination Home's Conditions Update
-        // door uses, not a separate UI. conditions-update.js has its own
-        // "Back" button, which returns to Home rather than back to
-        // Settings specifically — a small known rough edge, not a bug
-        // (no vanished nav, no nonsensical destination, unlike the old
-        // openSheet('onboarding/conditions') bug this replaces).
-        router.navigate('conditions-update');
+        // P0 (29 Sep 2026). The conditions-update screen is retired (it
+        // tracked severity, set healing goals and built programmes for a
+        // condition). The sore-areas sheet is the one place to change
+        // the list, from onboarding and from here.
+        openSheet('onboarding/conditions', () => {
+          render(container);
+        });
         break;
 
       case 'download-data':

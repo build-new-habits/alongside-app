@@ -1,5 +1,9 @@
 /**
  * today.js
+ * 29 Sep 2026 v46
+ *
+ * v46 - P0, SCOPE-MINOR. The one-time scope notice (scopeNoticeDue); the Conditions Update tile is My exercises.
+ *
  * 28 Sep 2026 v45
  *
  * v45 - F7 LANDMARK. role="main" (and its label) removed from the view's
@@ -749,6 +753,7 @@ import { GUIDANCE_TEXT, GUIDANCE_DAYS } from '../safety-gate.js';
 import { aimById, STRANDS }    from '../data/aims.js';
 import { noticePlanJump, offerBriefPath } from '../data/pacing.js';
 import { isPremium, lockedFeature } from '../auth.js';
+import { scopeStatementHTML } from '../data/scope-statement.js';
 // GUIDED-COPY, 06 Sep 2026. plannedFocusToday dropped from this import.
 // CLUB-SHELL added it so Guided class could say what the class was for
 // TODAY -- but it reads activeProgramme.sessionSequence, which is empty
@@ -872,7 +877,7 @@ export function TodayView(router) {
     // The real question is whether these should share a name, and that is
     // Graeme's call, not a cleanup.
     { kind: 'reference', id: 'wellbeing', label: 'Wellbeing', icon: '\uD83C\uDF3F', route: 'noticing', requiresCheckin: false },
-    { kind: 'reference', id: 'conditions-update', label: 'Conditions Update', icon: '\uD83E\uDE79', route: 'conditions-update', requiresCheckin: false },
+    { kind: 'reference', id: 'my-exercises', label: 'My exercises', icon: '\uD83D\uDCCB', route: 'prescribed', requiresCheckin: false },
     // NAV-6, 12 Aug 2026. Progress tile REMOVED. Graeme: "why do we have
     // a progress tile when we have a tab? You're right about it looking
     // cluttered."
@@ -1256,6 +1261,8 @@ export function TodayView(router) {
       ?.addEventListener('click', () => router.navigate('know-what'));
     container.querySelector('[data-action="as-i-go"]')
       ?.addEventListener('click', () => router.navigate('capture'));
+    container.querySelector('[data-action="scope-ok"]')
+      ?.addEventListener('click', () => { store.set('scopeNoticeDue', false); mount(container); });
     container.querySelector('[data-action="carry-on"]')
       ?.addEventListener('click', e => router.navigate(e.currentTarget.dataset.carry === 'capture' ? 'capture' : 'workout'));
     container.querySelector('[data-action="carry-finish"]')
@@ -1880,6 +1887,23 @@ function _guidanceDue() {
   return (Date.now() - new Date(last).getTime()) / 86400000 >= GUIDANCE_DAYS;
 }
 
+/**
+ * P0, SCOPE-MINOR (29 Sep 2026). Shown once to anybody whose stored
+ * conditions included one the app no longer offers (store.js v81 drops
+ * it and sets scopeNoticeDue). It says what the app is for and where to
+ * go instead, and goes when they say so. Free and Plan alike.
+ */
+function _scopeNotice() {
+  if (!store.get('scopeNoticeDue')) return '';
+  return `
+    <section class="card scope-notice" aria-labelledby="scope-notice-h" data-scope-notice>
+      <p class="scope-notice__lead">Something has changed in Alongside, and it affects something you told me about.</p>
+      ${scopeStatementHTML({ heading: 'h2', id: 'scope-notice' })}
+      <p>I've taken it off your list, so I'm no longer planning around it.</p>
+      <button class="btn btn-primary btn-full" data-action="scope-ok">Understood</button>
+    </section>`;
+}
+
 function _guidanceLine() {
   if (!_guidanceDue()) return '';
   return `
@@ -1968,6 +1992,7 @@ function _markGuidanceShown(root) {
     // GUIDANCE-1 goes with the doors: it was in the rooms, and the rooms
     // were the only Plan place it was said. Found by verify-clubshell 12a.
     return `
+      ${_scopeNotice()}
       ${_guidanceLine()}
       ${carry ? _carryOnCard(carry) : ''}
       ${carry ? '<p class="home-doors__or" id="home-doors-label">Or instead</p>' : '<h2 class="sr-only" id="home-doors-label">What would you like to do?</h2>'}
@@ -2034,6 +2059,7 @@ function _markGuidanceShown(root) {
 
   function chooser() {
     return `
+      ${_scopeNotice()}
       ${_guidanceLine()}
       <p class="today-chooser-q">What do you want to do today?</p>
       ${tileGrid()}

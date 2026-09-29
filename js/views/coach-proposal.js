@@ -1,5 +1,9 @@
 /**
  * coach-proposal.js
+ * 29 Sep 2026 v35
+ *
+ * v35 - P0, SCOPE-MINOR. "Let me tell you" opens the sore-areas sheet (Conditions Update is retired) and rebuilds the plan with what they said.
+ *
  * 28 Sep 2026 v34
  *
  * v34 - F7 LANDMARK. role="main" (and its label) removed from the view's
@@ -678,6 +682,7 @@ import { isGateDue, isGuidanceDue, recordAcknowledgement,
 import { HURT_AND_ACHE }     from '../exercise-card.js';
 import { resolveTiming }     from '../exercise-timing.js';
 import { isPremium }         from '../auth.js';
+import { openSheet }         from './onboarding/sheet-manager.js';
 import { chooseSessionType, lineIsSupported } from '../data/session-choice.js';
 
 // DOOR_COPY, renderDoorFront(), renderBypassDoor(), handleDoorChoice(),
@@ -1741,7 +1746,7 @@ export function CoachProposalView(router) {
       <div class="cp-return-door" role="region" aria-label="After an injury">
         <p class="cp-return-door__message">
           Since you were injured &mdash; is anything still sore, or anything you
-          would rather I left out today? Tell me and I will work around it.
+          would rather I left out today? Tell me where and I will leave out what loads it.
         </p>
         <div class="cp-return-door__chips" role="group"
              aria-label="Anything still sore?">
@@ -1851,7 +1856,15 @@ export function CoachProposalView(router) {
     container.querySelectorAll('[data-hurts]').forEach(btn => {
       btn.addEventListener('click', () => {
         if (btn.dataset.hurts === 'tell') {
-          router.navigate('conditions-update');
+          // P0 (29 Sep): the sore-areas sheet, not the retired
+          // conditions-update screen. The plan is rebuilt with what they said.
+          openSheet('onboarding/conditions', () => {
+            reEntryCtx = { ...reEntryCtx, asksWhatHurts: false };
+            proposal = buildProposal();
+            currentPreviewOptions = proposal.options;
+            selectedOptionId = proposal.options[0]?.id || null;
+            render(container);
+          });
           return;
         }
         // "Nothing to flag" clears only the ASK, never the step down.

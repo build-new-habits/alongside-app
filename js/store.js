@@ -1,7 +1,22 @@
 import { zonesForAreas } from "./data/aims.js";
+import { RETIRED_CONDITIONS } from "./data/scope-statement.js";
 
 /**
  * store.js - Data persistence layer
+ * 29 Sep 2026 v81
+ *
+ * v81 - P0, SCOPE-MINOR (Schema.md v1.74). Alongside works around minor
+ *   aches and injuries and is not designed around medical conditions
+ *   (Graeme, 29 Sep; Documents/Admin/alongside_scope_minor-injury_29sep2026_v1.md).
+ *   On load: retired condition ids (data/scope-statement.js) leave
+ *   conditions, conditionMeta, conditionPainScores and conditionsResolved,
+ *   and scopeNoticeDue is set so the person sees the statement once.
+ *   Entries the app built for a condition (prescribedBy "coach" /
+ *   "coach-recommended") leave prescribedExercises; the person's own stay,
+ *   without prescribedBy. REMOVED: exerciseClearance, conditionGoals,
+ *   conditionFoldInLevel, conditionReflections, prescribedExercisesOrigin,
+ *   prescribedExercisesActiveCondition. NEW: scopeNoticeDue.
+ *
  * 28 Sep 2026 v80
  *
  * v80 - FEELINGS-RETIRE (Schema.md v1.73). lastCheckin.feelingWord,
@@ -1388,13 +1403,7 @@ export const store = {
       // ── CONDITION REFLECTIONS / FOLD-IN (new 04 Aug 2026, Home Nav Phase A) ──
       // conditionReflections: deliberately separate from journalEntries above —
       // not Journal content, coach-readable by design. See schema.md.
-      conditionReflections: Array.isArray(saved.conditionReflections) ? saved.conditionReflections : [],
-      conditionFoldInLevel: ['partial', 'mostly', 'all'].includes(saved.conditionFoldInLevel)
-        ? saved.conditionFoldInLevel
-        : null,
-      conditionGoals: (saved.conditionGoals && typeof saved.conditionGoals === 'object')
-        ? saved.conditionGoals
-        : {},
+      // v81: conditionReflections, conditionFoldInLevel, conditionGoals removed (P0).
 
       // ── SEVERE PAIN CHOICE (new 04 Aug 2026, Pain Input Redesign follow-up) ──
       // { date: 'YYYY-MM-DD', conditionIds: [...sorted], choice: 'rest'|'adapt',
@@ -1404,12 +1413,7 @@ export const store = {
       // any change re-prompts rather than silently reusing a stale choice.
       severePainChoices: Array.isArray(saved.severePainChoices) ? saved.severePainChoices : [],
       pendingDoorRoute: typeof saved.pendingDoorRoute === 'string' ? saved.pendingDoorRoute : null,
-      prescribedExercisesOrigin: ['professional', 'self'].includes(saved.prescribedExercisesOrigin)
-        ? saved.prescribedExercisesOrigin
-        : null,
-      prescribedExercisesActiveCondition: typeof saved.prescribedExercisesActiveCondition === 'string'
-        ? saved.prescribedExercisesActiveCondition
-        : null,
+      scopeNoticeDue: saved.scopeNoticeDue === true,
       exerciseHistory: (saved.exerciseHistory && typeof saved.exerciseHistory === 'object' && !Array.isArray(saved.exerciseHistory))
         ? saved.exerciseHistory
         : {},
@@ -1606,6 +1610,23 @@ export const store = {
    * would ride along in every install for ever.
    */
   _dropRetired(data) {
+    // v81, P0 SCOPE-MINOR. See the header.
+    for (const k of ['exerciseClearance', 'conditionGoals', 'conditionFoldInLevel',
+                     'conditionReflections', 'prescribedExercisesOrigin',
+                     'prescribedExercisesActiveCondition']) delete data[k];
+    const retired = new Set(RETIRED_CONDITIONS);
+    const had = Array.isArray(data.conditions) && data.conditions.some(id => retired.has(id));
+    if (Array.isArray(data.conditions)) data.conditions = data.conditions.filter(id => !retired.has(id));
+    for (const f of ['conditionMeta', 'conditionPainScores']) {
+      if (data[f] && typeof data[f] === 'object') for (const id of retired) delete data[f][id];
+    }
+    if (Array.isArray(data.conditionsResolved)) data.conditionsResolved = data.conditionsResolved.filter(r => !retired.has(r.id));
+    if (had) data.scopeNoticeDue = true;
+    if (Array.isArray(data.prescribedExercises)) {
+      data.prescribedExercises = data.prescribedExercises
+        .filter(e => e && e.prescribedBy !== 'coach' && e.prescribedBy !== 'coach-recommended')
+        .map(({ prescribedBy, conditionIds, conditionId, ...rest }) => rest);
+    }
     delete data.sessionPace;   // v78, SMOOTH-P4c (retired v74, SMOOTH-P1)
     delete data.proposalBias;  // v79, work list 2e (read only by the dead engine)
     // v80, FEELINGS-RETIRE. The word question went in SMOOTH-P1; no word
@@ -1736,15 +1757,10 @@ export const store = {
       conditionsResolved: [],     // SMOOTH-P4c: [{ id, resolvedAt }]. "It's better now" -- the person's call, kept not deleted. See Schema.md v1.71.
       conditionMeta: {},          // CHECKIN-2a: { [id]: { addedAt, source, status, dormantAt, lastSoreAt, reportDays, quietRun, asks } }. Dormant ids leave `conditions` and stay here. See Schema.md.
       conditionPainScores: {},
-      conditionReflections: [],   // { conditionId, text, loggedAt } — NOT Journal. Deliberately distinct field/namespace so it can never inherit the Journal Privacy Rule by accident. Coach-readable by design.
-      conditionFoldInLevel: null, // 'partial' | 'mostly' | 'all' | null — null = static-only, not folded into Cardio/Core/Strength sessions
-      conditionGoals: {},         // { [conditionId]: { goalType: 'healed'|'cope'|'improve', note, setAt } } — felt-sense, not numeric; see Phase D blueprint v2, decision D-1
       severePainChoices: [],      // { date, conditionIds, choice: 'rest'|'adapt', chosenAt } — active choice record, see mergeWithDefaults() note
       pendingDoorRoute: null,     // route name to continue to once check-in/check-in-mini completes — set by today.js when a session-generating door is tapped, cleared by checkin.js/checkin-mini.js on completion
 
       // ── PRESCRIBED EXERCISES ORIGIN ───────────────────────────
-      prescribedExercisesOrigin: null, // 'professional' | 'self' | null — set once when prescribedExercises first goes empty -> non-empty; see Phase D blueprint v2, decision D-2
-      prescribedExercisesActiveCondition: null, // conditionId | null — single-use, set by conditions-update.js's "Build my own" right before navigating to prescribed.js, cleared immediately once read; tags the next-added entry with conditionId
       // Read by exercises/index.js applyFeedbackWeighting() since v1.3 and
       // never declared here — one of the undeclared fields PT-10 flagged as
       // a Supabase-migration loss risk. Declared v21, and given a writer
@@ -1908,7 +1924,6 @@ export const store = {
       // mobility and walking stay open at every value, because the harm
       // of withholding those from somebody who is anxious about their
       // heart is real and the risk of providing them is not.
-      exerciseClearance: null,
 
       // ── PROACTIVE PACING (PACE-1, 15 Aug 2026) ────────────────
       //
@@ -2098,7 +2113,8 @@ export const store = {
 
       // ── EQUIPMENT ────────────────────────────────────────────
       equipment: [],
-      prescribedExercises: [],
+      prescribedExercises: [],   // the person's own list ("My exercises"). v81: never app-built; no prescribedBy.
+      scopeNoticeDue: false,     // v81, P0: true once after a retired condition is dropped; the statement is shown, then cleared.
 
       // ── STRATEGIC GOAL ───────────────────────────────────────
       strategicGoal: {
@@ -2650,20 +2666,6 @@ export const store = {
     this.data.severePainChoices = [...(this.data.severePainChoices || []), entry];
     this.save();
     return entry;
-  },
-
-  // Sets or clears a per-condition goal (04 Aug 2026, Phase D-1). Felt-sense,
-  // not numeric — see Phase D blueprint v2, decision D-1. goalType null
-  // clears the goal for that condition (the "not sure yet" / skip path).
-  setConditionGoal(conditionId, goalType, note = '') {
-    const goals = { ...(this.data.conditionGoals || {}) };
-    if (!goalType) {
-      delete goals[conditionId];
-    } else {
-      goals[conditionId] = { goalType, note, setAt: new Date().toISOString() };
-    }
-    this.data.conditionGoals = goals;
-    this.save();
   },
 
   // Sets or clears a per-exercise preference (04 Aug 2026). Binary

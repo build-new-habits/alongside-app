@@ -1,5 +1,14 @@
 /**
  * js/data/onboarding-thread-data.js
+ * 29 Sep 2026 v14
+ *
+ * v14 - P0, SCOPE-MINOR (Graeme, 29 Sep). Step 8 asks about sore or
+ *   injured areas, not "health conditions", and carries the scope
+ *   statement (data/scope-statement.js). Step 8a (exercise clearance),
+ *   its chips and acknowledgement, and the hypermobility caveat are
+ *   removed with the medical conditions they served. The 'recover'
+ *   intent is reworded: "Get going again after time away".
+ *
  * 08 Sep 2026 v13
  *
  * v13 - SCOPE-1. Onboarding says plainly that the app is not the right
@@ -96,6 +105,7 @@
  */
 
 import { getConditionName } from "./conditions.js";
+import { SCOPE_TITLE, SCOPE_BODY, SCOPE_ADVICE } from "./scope-statement.js";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // HARD BEFORE — chips and phrase map
@@ -169,15 +179,9 @@ export const RETURNING_AFTER_CHIPS = [
 export const INTENT_CHIPS = [
   { id: 'improve',  label: 'Build something — get stronger or fitter' },
   { id: 'maintain', label: 'Hold on to what I have'                   },
-  { id: 'recover',  label: 'Come back from something'                 },
+  { id: 'recover',  label: 'Get going again after time away'          },
 ];
 
-// CARDIAC-1, 14 Aug 2026. See step 8a.
-export const CLEARANCE_CHIPS = [
-  { id: 'cleared',   label: "Yes — I've been told it's fine"  },
-  { id: 'not-yet',   label: "No, not yet"                      },
-  { id: 'not-sure',  label: "I'm not sure"                     },
-];
 
 export const BALANCE_CHIPS = [
   { id: 'no',        label: 'No, not really' },
@@ -221,26 +225,9 @@ export const LEG_POWER_CHIPS = [
  * could plausibly differ from "obviously yes". It is not a list of
  * "serious" conditions and must not become one.
  */
-// CARDIAC-1. Conditions where "have you been cleared to exercise alone?"
-// is a question worth asking. Deliberately NOT a list of "serious"
-// conditions -- a stiff shoulder does not belong here and neither does a
-// managed condition that has nothing to do with exertion. The test is
-// whether an unsupervised progressive load could plausibly be the wrong
-// thing without someone having said otherwise.
-const CLEARANCE_RELEVANT_CONDITIONS = new Set([
-  'cardiovascular-condition', 'breathing', 'osteoporosis',
-  // CR-1, 06 Sep 2026. `chronic-fatigue` split three ways. All three
-  // stay here: me-cfs and long-covid are excluded before a session is
-  // ever built, but the clearance question is asked earlier in the
-  // thread, and a set that silently stopped matching would be a live
-  // question quietly ceasing to fire.
-  'persistent-fatigue', 'me-cfs', 'long-covid', 'fibromyalgia', 'pelvic-floor',
-]);
 
 const MOBILITY_RELEVANT_CONDITIONS = new Set([
-  'hip', 'knee', 'ankle-foot', 'lower-back', 'sciatica', 'osteoporosis',
-  'hypermobility', 'fibromyalgia', 'persistent-fatigue', 'me-cfs', 'long-covid',
-  'cardiovascular-condition',
+  'hip', 'knee', 'ankle-foot', 'lower-back', 'sciatica', 'persistent-fatigue',
   'calves', 'achilles', 'plantar-fasciitis', 'it-band', 'shin-splints',
 ]);
 
@@ -523,57 +510,14 @@ export const STEPS = {
     summaryType: 'conditions',
     skipLabel: 'Skip for now',
     openLabel: "Yes, let's do this",
-    coach: "Before I start suggesting things for you to actually do — I want to make sure I'm not about to recommend something that makes things worse for your body.\n\nInjuries, health conditions, anything you're managing or being careful around — even things you don't think of as a big deal. Would you be willing to tell me about them?\n\nIt genuinely changes what I'm going to suggest for you.",
+    coach: "Before I start suggesting things for you to actually do — is anything sore, or an injury you're being careful around? A tight hamstring, a back that grumbles, a knee you don't quite trust.\n\nTell me where, and I'll leave out the movements that are likely to make it worse.\n\n" + SCOPE_TITLE + " " + SCOPE_BODY + " " + SCOPE_ADVICE,
     coachAfter: {
-      answered: "Thank you for telling me. I'll work around both of those — you won't have to remind me.",
+      answered: "Thank you for telling me. I'll leave out movements that are likely to load those — you won't have to remind me.",
       // Note: coachAfter.answered is a template here — thread.js should replace
       // "both of those" with the actual count if more or fewer than two.
       // Simpler approach: thread.js uses a single dynamic string built from conditions[].
       // See generateConditionsAck() below.
       skipped:  "Okay — no problem at all. If anything comes to mind later, you can add it in your settings and I'll adjust from there. I just wanted to ask.",
-    },
-  },
-
-  // ── Step 8a — Exercise clearance (CARDIAC-1, 14 Aug 2026) ────────────────
-  //
-  // Persona 2.5, traced 14 Aug: she declares a heart condition and the
-  // coach says "It genuinely changes what I'm going to suggest for you."
-  // It did not. Exactly three of 545 exercise entries reference
-  // cardiovascular-condition and all three are session-length, so the
-  // buildable pool changed by zero exercises at every pain level. There
-  // was also no medical-review pathway anywhere in the codebase.
-  //
-  // WHAT THIS PRODUCT CAN HONESTLY DO
-  //
-  // Not treat heart conditions. What it can do is Phase IV maintenance --
-  // the self-managed stage after supervised cardiac rehab ends, where
-  // people are explicitly encouraged to keep going on their own and where
-  // most of them fall off a cliff when the six-week programme stops. The
-  // app already holds the right mechanism for it: the talk test, "warm,
-  // slightly breathless, but able to speak a few words", appears across
-  // cardio, running, seated and swimming entries. That is the standard
-  // for unsupervised moderate intensity without a heart-rate monitor.
-  //
-  // The thing that separates safe from unsafe here is not exercise
-  // selection. It is whether the person has been cleared. So we ask.
-  //
-  // Asked of anyone declaring a condition where the answer changes what
-  // we should offer -- not cardiac alone, because the same reasoning
-  // holds for anyone mid-treatment or recently discharged.
-  //
-  // A "no" is NOT a refusal. Wellbeing, breathing and walking stay open.
-  // What waits is loaded strength work, and the coach says why.
-  '8a': {
-    id: '8a',
-    type: 'inline-chips-single',
-    chips: CLEARANCE_CHIPS,
-    storeField: 'exerciseClearance',
-    summaryType: 'exerciseClearance',
-    showIf: (storeData) => (storeData.conditions || []).some(
-      id => CLEARANCE_RELEVANT_CONDITIONS.has(id)),
-    coach: "One thing I should ask, and then I'll stop.\n\nHas a doctor, physio or rehab team told you it's okay for you to exercise on your own?\n\nI ask because it changes what I'll put in front of you, and because I'd rather ask than assume. There's no wrong answer.",
-    coachAfter: {
-      answered: null, // dynamic — see generateClearanceAck()
     },
   },
 
@@ -897,7 +841,7 @@ export const STEPS = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const STEP_ORDER = [0, 1, 2, '2b', '3a', '3b', 4, 5, 6, 7, 8,
-                           '8a', 9,
+                           9,
                            '9a', '9b', '9c', '9d', '9e', '9f',
                            10, 11, 12, 13, 14];
 
@@ -931,27 +875,11 @@ export const STEP_ORDER = [0, 1, 2, '2b', '3a', '3b', 4, 5, 6, 7, 8,
  * demanding than what 'improve' selects for a deconditioned person, not
  * less.
  */
-/**
- * Coach acknowledgement after the clearance question (CARDIAC-1).
- *
- * The 'not-yet' and 'not-sure' branches are the careful ones. They must
- * be a redirect, not a rejection, and they must not frighten somebody who
- * has just told us about their heart. Neither line diagnoses, neither
- * says "you cannot", and both name something we WILL do today.
- */
-export function generateClearanceAck(value) {
-  if (value === 'cleared')
-    return "Good — that's what I needed to know. I'll keep you at a pace where you could still hold a conversation, and I'll never skip the warm-up or the wind-down.";
-  if (value === 'not-yet')
-    return "That's completely fine, and thank you for saying. I'll hold off on the heavier strength work until someone who knows your history has said yes. Everything else is open — walking, mobility, breathing, the wellbeing practices — and those are genuinely worth doing.";
-  return "No problem at all. I'll treat it as a not-yet for now, which just means I'll leave the heavier strength work aside until you know. Everything else is open, and it's worth asking your GP or rehab team next time you speak to them.";
-}
-
 export function generateIntentAck(value) {
   if (value === 'maintain')
     return "Good. That means I'll keep putting the things that matter in front of you — carrying, gripping, getting up and down — rather than quietly making everything easier.";
   if (value === 'recover')
-    return "Understood. We'll rebuild rather than push, and I'll lean on the movements that are designed for exactly that.";
+    return "Understood. We'll build back steadily rather than push.";
   return "Right then. We'll build.";
 }
 
@@ -967,13 +895,9 @@ export function generateSummary(type, value, storeData) {
     // ── W3-A capability summaries ──────────────────────────────────
     // The user bubble repeats their answer back. It must never editorialise:
     // "Yes, sometimes" is what they said, not "you have balance problems".
-    case 'exerciseClearance':
-      return { 'cleared': "Yes, I've been told it's fine", 'not-yet': 'Not yet',
-               'not-sure': "Not sure" }[value] || 'Not answered';
-
     case 'trainingIntent':
       return { 'improve': 'Build something', 'maintain': "Hold on to what I've got",
-               'recover': 'Come back from something' }[value] || 'Not answered';
+               'recover': 'Get going again after time away' }[value] || 'Not answered';
 
     case 'returningAfter':
       return { 'injury': 'An injury', 'illness': 'Illness',
@@ -1140,17 +1064,9 @@ export function generateSummary(type, value, storeData) {
  * because there is no guidance to write one from and inventing it would
  * be worse than the gap.
  */
-const CONDITION_CAVEATS = {
-  hypermobility:
-    "One more thing, since you mentioned hypermobility.\n\nI'm going to hold stretches " +
-    "back for you. With hypermobile joints, more range usually isn't the thing that " +
-    "helps \u2014 steadiness around the joint tends to matter more. I'd rather be careful " +
-    "here than clever, so I've left them out rather than picked through them.\n\nAnd I " +
-    "should be straight about my limits. Hypermobility looks different in everybody, and " +
-    "I'm working from general guidance, not from anything about you. If it affects you " +
-    "much, someone who can actually see how you move will do far better than I can. " +
-    "Nothing I suggest is a substitute for that.",
-};
+// P0 (29 Sep): the hypermobility caveat went with the condition. Kept as
+// an empty map so generateConditionCaveats() stays a stable export.
+const CONDITION_CAVEATS = {};
 
 /**
  * The caveat text for a set of declared conditions, or "" if none apply.
@@ -1164,6 +1080,8 @@ export function generateConditionCaveats(conditions) {
     .filter(Boolean)
     .join("\n\n");
 }
+
+const EVERYDAY_STATES = new Set(['persistent-fatigue', 'anxiety', 'perimenopause', 'menopause']);
 
 export function generateConditionsAck(conditions) {
   const caveats = generateConditionCaveats(conditions);
@@ -1183,12 +1101,18 @@ export function generateConditionsAck(conditions) {
     // back to the id for anything unrecognised, so a condition added
     // without a definition degrades to the old behaviour instead of
     // rendering "undefined".
-    return withCaveats(`Thank you for telling me. I'll work around ${getConditionName(conditions[0])} \u2014 you won't have to remind me.`);
+    // P0. A body area is something movements load; an everyday state
+    // (tiredness, stress, peri/menopause) is not, so it gets its own line.
+    const name = getConditionName(conditions[0]);
+    if (EVERYDAY_STATES.has(conditions[0])) {
+      return withCaveats(`Thank you for telling me about ${name.toLowerCase()}. I'll keep it in mind day to day \u2014 you won't have to remind me.`);
+    }
+    return withCaveats(`Thank you for telling me. I'll leave out movements that are likely to load your ${name.toLowerCase()} \u2014 you won't have to remind me.`);
   }
   if (conditions.length === 2) {
-    return withCaveats(`Thank you for telling me. I'll work around both of those \u2014 you won't have to remind me.`);
+    return withCaveats(`Thank you for telling me. I'll leave out movements that are likely to load either of those \u2014 you won't have to remind me.`);
   }
-  return withCaveats(`Thank you for telling me. I'll work around all of those \u2014 you won't have to remind me.`);
+  return withCaveats(`Thank you for telling me. I'll leave out movements that are likely to load any of those \u2014 you won't have to remind me.`);
 }
 
 /**

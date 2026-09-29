@@ -1,5 +1,9 @@
 /**
  * tools/verify-settings-progress.mjs
+ * 29 Sep 2026 v2
+ *
+ * v2 - P0. 50 routes after Conditions Update was retired.
+ *
  * 28 Sep 2026 v1
  *
  * Work list 9, SETTINGS-PROGRESS. Both screens say what is true.
@@ -141,7 +145,7 @@ for (const tier of ["personal", "free"]) {
 ok("0a. every Settings screen a row opens was opened (and there are many)", screenKeys.size >= 12 && [...screenKeys].every(k => screensOpened.has(k)),
    [...screenKeys].filter(k => !screensOpened.has(k)).join(", ") || [...screensOpened].join(", "));
 ok("0b. a real number of controls pressed, and real navigation seen", pressed > 200 && allNavs.length > 10, `${pressed} pressed, ${allNavs.length} navigations`);
-ok("0c. the registry was read", REG.size > 50 && REG.has("today"), `${REG.size} routes`);
+ok("0c. the registry was read", REG.size >= 50 && REG.has("today"), `${REG.size} routes`);
 
 // ── 1. EVERY DESTINATION IS LIVE ────────────────────────────────────────
 console.log("\nTEST 1 - every link and button goes somewhere that exists");

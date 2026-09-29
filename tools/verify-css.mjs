@@ -1,6 +1,9 @@
 /**
  * tools/verify-css.mjs
- * 28 Sep 2026 v4
+ * 29 Sep 2026 v5
+ *
+ * v5 - P0. Two hooks left with the screens that rendered them
+ *   (conditions-update, the conditions programme card).
  *
  * v4 - F8. Reads every file under js/, not only js/views: the safety
  *   screen's Start button and the whole update banner were unstyled out
@@ -85,12 +88,12 @@ const HOOKS = { "in-step-view": SCOPE,
   "prescribed-session-view": SCOPE,
   "programme-select-view": SCOPE, "saved-sessions-view": SCOPE, "sb-view": SCOPE,
   "rf-view--stop": SCOPE, "reflect-view": SCOPE,
-  "bs-duration-btn": HOOK, "bs-type-card": HOOK, "cu-severity-slider": HOOK,
+  "bs-duration-btn": HOOK, "bs-type-card": HOOK,
   "is-movement-card": HOOK, "is-option-btn": HOOK, "mini-pain-slider": HOOK,
   "ms-timer-btn": HOOK, "quiet-back-btn": HOOK, "sb-buildmode-btn": HOOK,
   "sb-duration-btn": HOOK, "sb-type-tile": HOOK,
   "today-header": WRAP, "progress-body": WRAP, "activity-log-form": WRAP,
-  "activity-log-picker": WRAP, "mc-programme-group": WRAP, "is-intro": WRAP,
+  "activity-log-picker": WRAP, "is-intro": WRAP,
   "reflect-coach-card": WRAP, "checkin-coach-card": WRAP,
   "gp-moment--glance": WRAP, "gp-moment--reflection": WRAP,
   "home-arc--offer": WRAP, "today-arc--active": WRAP, "today-arc--offer": WRAP,

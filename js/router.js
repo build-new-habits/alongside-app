@@ -1,6 +1,10 @@
 /**
  * router.js
- * 28 Sep 2026 v34
+ * 29 Sep 2026 v35
+ *
+ * v35 - P0, SCOPE-MINOR. 'conditions-update' retired: it tracked severity,
+ *   set healing goals and built programmes for a condition. Sore areas
+ *   are changed in the one sheet (onboarding/conditions).
  *
  * v34 - F8 (found starting a class from a scrolled list). A new screen
  *   could open part-way down. reset.css sets scroll-behavior: smooth, so
@@ -361,7 +365,6 @@ const VIEW_NAMES = {
   // it. import(path) would throw before ever reaching the old/new pattern
   // detection below, so this route could never have worked, on any device.
   'session-builder':   { path: './views/session-builder-ui.js',  fn: 'SessionBuilderView'  },
-  'conditions-update': { path: './views/conditions-update.js',   fn: 'ConditionsUpdateView' },
   'mobility-conditioning': { path: './views/mobility-conditioning.js', fn: 'MobilityConditioningView' },
   'stretch-arc':          { path: './views/stretch-arc.js',           fn: 'StretchArcView'          },
   'arc-setup':            { path: './views/arc-setup.js',             fn: 'ArcSetupView'            },

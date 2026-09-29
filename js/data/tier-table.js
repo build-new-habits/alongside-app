@@ -1,6 +1,9 @@
 /**
  * js/data/tier-table.js
- * 28 Sep 2026 v1
+ * 29 Sep 2026 v2
+ *
+ * v2 - P0, SCOPE-MINOR. The progress row no longer offers "what you have
+ *   told me at check-in": the per-area charts were removed.
  *
  * SMOOTH-P5. Free and the Plan: the one table everything must agree with.
  * Spec 4.11.
@@ -76,8 +79,8 @@ export const TIER_TABLE = [
     id: "progress",
     area: "Progress",
     free: "Your sessions over the last 30 days, and a way to share them",
-    plan: "Your arc read back to you: what has come up, what you have told me at check-in, your logged weights, over 30 or 90 days",
-    says: "Progress reads your arc back to you: what has come up, what you've told me at check-in, and what your logged weights show.",
+    plan: "Your arc read back to you: what has come up and your logged weights, over 30 or 90 days",
+    says: "Progress reads your arc back to you: what has come up, and what your logged weights show.",
     proof: "verify-plan-claims 3.progress, verify-progress-agree",
   },
   {

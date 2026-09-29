@@ -1,5 +1,9 @@
 /**
  * tools/verify-tier.mjs
+ * 29 Sep 2026 v4
+ *
+ * v4 - P0. The never-gated door is My exercises, not the retired Conditions Update.
+ *
  * 28 Sep 2026 v3
  *
  * v3 - SMOOTH-P4a. "free is a fortnight" becomes "free is 30 days, and
@@ -175,11 +179,11 @@ check("NO Home door is gated at all", () => {
 });
 
 check("SAFETY: nothing safety-critical is ever gated", () => {
-  // The direction that matters more. Conditions Update is how somebody
-  // tells the coach they are hurting; the coach proposal is the free
+  // The direction that matters more. My exercises is how somebody keeps
+  // their own list (P0 retired Conditions Update); the coach proposal is the free
   // tier's whole point; Wellbeing carries the crisis-adjacent content.
   for (const [id, why] of [
-    ["conditions-update", "it is how somebody tells the coach they are hurting"],
+    ["my-exercises",      "somebody's own exercises are never paywalled"],
     ["unsure",            "the coach deciding IS the free tier"],
     ["wellbeing",         "safety-critical features are never paywalled"],
     ["cardio-core-strength", "it is the free session"]

@@ -1,5 +1,10 @@
 /**
  * tools/verify-checkin-three.mjs
+ * 29 Sep 2026 v3
+ *
+ * v3 - P0, SCOPE-MINOR. The option is "I'll do my own exercises", not
+ *   "prescribed". Test 6 looks for that, and that nothing says prescribed.
+ *
  * 28 Sep 2026 v2
  *
  * v2 - FEELINGS-RETIRE. data/feelings.js is deleted; the word list 2a
@@ -183,8 +188,9 @@ ok("5b. a given answer is stored", (checkinData.getTodaysCheckin() || {}).sleepQ
 console.log("\nTEST 6 - someone with prescribed exercises still gets that choice");
 ({ navs } = setup({ prescribed: true }));
 await tap(/^Okay$/); await tap(/^Okay$/); await tap(/^Nothing today$/);
-const pres = await waitFor(() => labelsNow().some(l => /prescribed/i.test(l)));
-ok("6a. the prescribed option is offered", !!pres && navs.length === 0, JSON.stringify(labelsNow()));
+const pres = await waitFor(() => labelsNow().some(l => /my own exercises/i.test(l)));
+ok("6a. someone with their own exercises is offered them", !!pres && navs.length === 0, JSON.stringify(labelsNow()));
+ok("6b. and nothing on the check-in says prescribed", !labelsNow().some(l => /prescri/i.test(l)), JSON.stringify(labelsNow()));
 
 console.log("");
 if (fails) { console.log(`CHECKIN-THREE: ${fails} FAILED, ${passes} passed`); process.exit(1); }

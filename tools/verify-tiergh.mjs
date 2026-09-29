@@ -1,5 +1,9 @@
 /**
  * tools/verify-tiergh.mjs
+ * 29 Sep 2026 v4
+ *
+ * v4 - P0. Check 14 reads My exercises (prescribed.js, prescribed-session.js) now Conditions Update is retired.
+ *
  * 21 Aug 2026 v3
  * GATE-PATH. Path resolution only -- no assertion changed.
  *
@@ -373,10 +377,13 @@ check('15b R4: including the professional export, for a physio or GP',
 
 // ── The exception, asserted so it cannot be "tidied up" later ─────────
 
-const cuSrc = fs.readFileSync(new URL('../js/views/conditions-update.js', import.meta.url), 'utf8');
-check('14 conditions-update.js is NOT tier-gated — prescribed work is free',
+// P0 (29 Sep 2026): conditions-update.js is retired. The same principle
+// now holds for My exercises (prescribed.js / prescribed-session.js).
+const cuSrc = ['../js/views/prescribed.js', '../js/views/prescribed-session.js']
+  .map(f => fs.readFileSync(new URL(f, import.meta.url), 'utf8')).join('\n');
+check('14 My exercises is NOT tier-gated — somebody\'s own list is free',
   !/isPremium|lockedFeature/.test(cuSrc),
-  'condition programmes are permanently free on ethical grounds');
+  'somebody\'s own exercises are permanently free on ethical grounds');
 
 console.log(failures === 0
   ? `\nAll checks green.`

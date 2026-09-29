@@ -1,5 +1,12 @@
 /**
  * tools/verify-progress-agree.mjs
+ * 29 Sep 2026 v2
+ *
+ * v2 - P0, SCOPE-MINOR. Test 2 inverted. "What you've told me about"
+ *   charted each sore area week by week; charting an injury over time is
+ *   monitoring it, so the section is gone. The gate now requires that it
+ *   stays gone, on the Plan with sore areas and history present.
+ *
  * 28 Sep 2026 v1
  *
  * SMOOTH-P4a. Progress, with the arc (Plan) and without (free). Spec 4.8.
@@ -104,7 +111,7 @@ ok("1f. and its bars add up to it", bars.reduce((n, b) => n + b.total, 0) === in
 ok("1g. REVERSAL: counted with partials it would not agree", LOG.filter(e => new Date(e.completedAt) >= weeks[0].start).length !== inSix);
 
 // ── 2. CONDITIONS ───────────────────────────────────────────────────────
-console.log("\nTEST 2 - what you've told me about: mentions, never a verdict");
+console.log("\nTEST 2 - P0: no chart of a sore area over time");
 const hist = {};
 // This week: 3 check-ins, knee on 1. When they started (5 weeks back): 5 check-ins, knee on 4.
 const thisMon = RB.weekStart(new Date(NOW));
@@ -117,34 +124,10 @@ for (let i = 0; i < 5; i++) hist[RB.dayKey(startWeek.getTime() + i * D + 12 * 36
 const metaK = { knee: { addedAt: RB.dayKey(startWeek), status: "active" }, "lower-back": { addedAt: RB.dayKey(startWeek), status: "active" } };
 fixture({ conditions: ["knee", "lower-back", "anxiety"], history: hist, meta: metaK });
 progress();
-const told = main.querySelector('[aria-labelledby="pr-told-h"]');
-const thisCount = Object.keys(hist).filter(k => new Date(`${k}T12:00:00`) >= thisMon).length;
-ok("2pc. positive control: the section is there, one block per sore-able condition (not anxiety)", !!told &&
-   told.querySelectorAll(".pr-condition").length === 2, txt(told).slice(0, 120));
-const knee = [...told.querySelectorAll(".pr-condition")].find(c => /Knee/.test(txt(c.querySelector("h3"))));
-ok("2a. \"Mentioned on 1 of N check-ins this week. It was 4 of 5 when you started.\"",
-   txt(knee.querySelector(".pr-condition__lines")).startsWith(`Mentioned on 1 of ${thisCount} check-in${thisCount === 1 ? "" : "s"} this week. It was 4 of 5 when you started.`),
-   txt(knee.querySelector(".pr-condition__lines")));
-ok("2b. since when", /^Since \d+ \w+/.test(txt(knee.querySelector(".pr-condition__since"))));
-ok("2c. \"It isn't a diagnosis.\"", /This is what you’ve told me at check-in\. It isn’t a diagnosis\./.test(txt(told)));
-const oldHist = { [key(30)]: { energy: 5, mood: 5, conditionLevels: { knee: 4 } }, [key(1)]: { energy: 5, mood: 5, conditionLevels: {} } };
-const r = RB.conditionReadback("knee", { history: oldHist, meta: {}, now: new Date(NOW) });
-ok("2d. a condition not mentioned lately says since when", r.lines.some(l => new RegExp(`^Not mentioned since ${RB.shortDate(`${key(30)}T12:00:00`)}\\.$`).test(l)), r.lines.join(" | "));
-// The whole text of the section, across fixtures, against the banned words.
-const scans = [txt(told), ...["knee", "lower-back"].flatMap(id => [
-  RB.conditionReadback(id, { history: hist, meta: metaK, now: new Date(NOW) }).lines.join(" "),
-  RB.conditionReadback(id, { history: oldHist, meta: {}, now: new Date(NOW) }).lines.join(" "),
-  RB.conditionReadback(id, { history: {}, meta: {}, now: new Date(NOW) }).lines.join(" ")])];
-ok("2e. never improving, healing, better, recovered", scans.every(t => !RB.BANNED_WORDS.test(t)), scans.find(t => RB.BANNED_WORDS.test(t)));
-ok("2f. REVERSAL: the scan does catch a judgement word", RB.BANNED_WORDS.test(txt(told) + " Your knee is improving.") &&
-   RB.BANNED_WORDS.test("Nearly recovered") && RB.BANNED_WORDS.test("feeling better"));
-const barsK = [...knee.querySelectorAll(".pr-bar")];
-ok("2g. a six-week chart, every bar named with week and value", barsK.length === 6 &&
-   barsK.every(b => /^Week of \d+ \w+: mentioned on \d+ of \d+ check-ins?$/.test(txt(b.querySelector(".sr-only")))),
-   barsK.map(b => txt(b.querySelector(".sr-only"))).join(" | "));
-ok("2h. a sentence before the chart", !!knee.querySelector("figcaption.pr-chart__summary") &&
-   knee.querySelector("figure").firstElementChild.tagName === "FIGCAPTION");
-ok("2i. values on the first and last bar only", barsK.map(b => txt(b.querySelector(".pr-bar__value")) !== "").join() === "true,false,false,false,false,true");
+ok("2pc. positive control: the Plan read-back rendered, with sore areas and weeks of check-ins in the store",
+   !!main.querySelector("#pr-arc-h") && Object.keys(hist).length >= 6);
+ok("2a. no \"What you've told me about\" section", !main.querySelector('[aria-labelledby="pr-told-h"], #pr-told-h, .pr-condition'));
+ok("2b. and no sentence anywhere on Progress tracks a sore area", !/mentioned on \d+ of|when you started\.|It isn’t a diagnosis/i.test(txt(main)), txt(main).slice(0, 160));
 
 // ── 3. WEIGHT ───────────────────────────────────────────────────────────
 console.log("\nTEST 3 - no weight card unless weight tracking is on");
@@ -201,7 +184,7 @@ ok("7a. one h1, no level skipped", heads.filter(h => h === 1).length === 1 && he
 ok("7b. in the spec's order", (() => {
   const t = [...main.querySelectorAll("h2")].map(txt);
   const at = s => t.findIndex(x => x.startsWith(s));
-  return at("Your arc") < at("What you’ve told me about") && at("What you’ve told me about") < at("From your logged weights") &&
+  return at("Your arc") < at("From your logged weights") &&
          at("From your logged weights") < at("What your arc works on") && at("What your arc works on") < at("Everything you’ve done");
 })(), [...main.querySelectorAll("h2")].map(txt).join(" | "));
 

@@ -1,6 +1,8 @@
 /**
  * data/field-contract.js
- * 28 Sep 2026 v3
+ * 29 Sep 2026 v4
+ *
+ * v4 - P0, SCOPE-MINOR. exerciseClearance removed (store.js v81).
  *
  * v3 - SMOOTH-P4c. sessionPace removed (store.js v78).
  *
@@ -181,12 +183,9 @@ export const FIELD_CONTRACT = {
   // sessionPace removed 28 Sep 2026 (SMOOTH-P4c, store.js v78): retired
   // with the brief/full choice in SMOOTH-P1.
 
-  // CARDIAC-1, 14 Aug 2026.
-  "exerciseClearance": {
-    values: ["cleared", "not-yet", "not-sure", null],
-    writer: "views/onboarding/thread.js (step 8a, CLEARANCE_CHIPS)",
-    meaning: "Whether a professional has said unsupervised exercise is okay. null means NOT ASKED and must never be read as 'not-yet' — most people are never asked. Gates LOADED STRENGTH only; mobility, walking, breathing and bodyweight stay open at every value."
-  },
+  // exerciseClearance removed 29 Sep 2026 (P0, store.js v81) with the
+  // medical conditions it was asked about.
+
 
   "trainingIntent": {
     values: ["improve", "maintain", "recover"],

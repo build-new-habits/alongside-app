@@ -1,5 +1,9 @@
 /**
  * tools/verify-settings-inventory.mjs
+ * 29 Sep 2026 v2
+ *
+ * v2 - P0. "Reduce pain" retired like Tone up; the row is "Sore or injured areas".
+ *
  * 28 Sep 2026 v1
  *
  * SMOOTH-P4c. Settings on one page. Spec 4.10.
@@ -82,9 +86,9 @@ const groups = [...main.querySelectorAll(".settings-group__title")].map(txt);
 ok("0b. the eight groups, in the spec's order", JSON.stringify(groups) === JSON.stringify(["You", "Goals and your week", "How the coach works", "Reminders", "Optional tracking", "Display", "Your plan and your data", "About"]), JSON.stringify(groups));
 ok("0c. no tabs anywhere on it", !main.querySelector('[role="tablist"], [role="tab"]'));
 const val = label => txt([...main.querySelectorAll(".settings-row")].find(r => txt(r.querySelector(".settings-row__label")) === label)?.querySelector(".settings-row__value"));
-ok("0d. rows show their current value (Equipment: Gym 2 · Home 1; Conditions: 2 listed; Name: T)",
-   val("Equipment") === "Gym 2 · Home 1" && val("Conditions and injuries") === "2 listed" && val("Name") === "T",
-   `${val("Equipment")} | ${val("Conditions and injuries")} | ${val("Name")}`);
+ok("0d. rows show their current value (Equipment: Gym 2 · Home 1; Sore or injured areas: 2 listed; Name: T)",
+   val("Equipment") === "Gym 2 · Home 1" && val("Sore or injured areas") === "2 listed" && val("Name") === "T",
+   `${val("Equipment")} | ${val("Sore or injured areas")} | ${val("Name")}`);
 
 // ── 1. THE INVENTORY ────────────────────────────────────────────────────
 console.log("\nTEST 1 - every v553 control is within two taps; the Save buttons are gone");
@@ -112,6 +116,9 @@ const RETIRED = {
   // Spec 8, decided 27 Sep: Tone up is no longer offered. 4a proves it
   // absent and 4d that anybody who already has it keeps it.
   "data-goal=tone-up": true,
+  // P0, 29 Sep (Graeme): "Reduce pain" is not offered -- the app does not
+  // offer to reduce pain. Retired like Tone up; saved goals still resolve.
+  "data-goal=reduce-pain": true,
 };
 const missing = INV.filter(c => !/^data-action=save-/.test(c.control))
   .filter(c => !RETIRED[c.control])
