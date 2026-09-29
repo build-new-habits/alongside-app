@@ -1,6 +1,11 @@
 /**
  * js/data/onboarding-thread-data.js
- * 29 Sep 2026 v16
+ * 29 Sep 2026 v17
+ *
+ * v17 - P15, BALANCE "NO" (persona finding W2-6). Step 9b, the chair
+ *   question, is also shown whenever the balance answer is "No" (accepted
+ *   28 Sep). A fit person who said "No" was never asked it and was then
+ *   treated as unable to load her legs; store.js v84 closes that half.
  *
  * v16 - P12, FREE PROGRAMME (Graeme's accepted recommendation, 28 Sep).
  *   Step 13 -- the programme choice -- is shown on the Plan only. On Free a
@@ -620,8 +625,11 @@ export const STEPS = {
     chips: CHAIR_RISE_CHIPS,
     storeField: 'capability.chairRise',
     summaryType: 'chairRise',
-    // Revealed only when the answer could plausibly not be "obviously yes".
-    showIf: (storeData) => _capabilityQuestionsApply(storeData),
+    // Revealed when the answer could plausibly not be "obviously yes" --
+    // and, P15, whenever balance was answered "No": what her legs are
+    // ready for is asked, not assumed from an answer about balance.
+    showIf: (storeData) => _capabilityQuestionsApply(storeData)
+      || ((storeData || {}).capability || {}).balanceWorry === 'no',
     coach: "Can you get up from a chair without pushing off with your hands?\n\nI ask because it tells me something about what your legs are ready for — more than age or how often you exercise does.",
     coachAfter: {
       answered: "Thank you. That's genuinely useful.",

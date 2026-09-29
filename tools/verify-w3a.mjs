@@ -1,5 +1,12 @@
 /**
  * tools/verify-w3a.mjs
+ * 29 Sep 2026 v4
+ * P15. The chair question (9b) is now also asked whenever balance is
+ *   answered "No" (accepted 28 Sep, W2-6): a fit person who said "No" was
+ *   never asked it and was then treated as unable to load her legs. The
+ *   two routes that pinned "no chair question" for fit, active people now
+ *   expect 9b; the floor question (9d) is still not asked of them.
+ *
  * 28 Sep 2026 v3
  * SMOOTH-P4c. No Save buttons: the capability handler is _saveCapability(),
  *   run the moment a capability field changes. "Settings SAVES f" reads
@@ -98,11 +105,11 @@ const PERSONAS = [
   // [name, fixture, answers, expected steps]
   ['2.6 footballer, active, no worries',
    { ageBand: '35-44', 'lifestyle.activityLevel': 'active', conditions: [] },
-   { '9a': 'no' }, ['9a', '9f']],
+   { '9a': 'no', '9b': 'yes' }, ['9a', '9b', '9f']],   // P15
 
   ['2.3 sprinter — OUT OF SCOPE at 18+, kept as the youngest adult band',
    { ageBand: '18-24', 'lifestyle.activityLevel': 'very-active', conditions: [] },
-   { '9a': 'no' }, ['9a', '9f']],
+   { '9a': 'no', '9b': 'yes' }, ['9a', '9b', '9f']],   // P15
 
   ['2.10 Dad, 76, frail — caught by age even saying no',
    { ageBand: '75plus', 'lifestyle.activityLevel': 'light', conditions: [] },
