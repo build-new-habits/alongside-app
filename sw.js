@@ -1,7 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 29 Sep 2026 v593
+ * 29 Sep 2026 v594
+ *
+ * v594 - P25. Every lift and its working set; pacing counts all movement;
+ *   no reused ids (store v86, arc-readback v2, pacing v4).
  *
  * v593 - P24. Yoga says how long it is; entries keep their own dose; a
  *   usual length in Settings (session-builder v64, settings v46).
@@ -4108,7 +4111,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v593";
+const CACHE_NAME = "alongside-v594";
 
 const SHELL_URLS = [
 
