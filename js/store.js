@@ -3,7 +3,13 @@ import { RETIRED_CONDITIONS } from "./data/scope-statement.js";
 
 /**
  * store.js - Data persistence layer
- * 29 Sep 2026 v83
+ * 29 Sep 2026 v84
+ *
+ * v84 - P15, BALANCE "NO" (Schema.md v1.77). capabilityProfile(): an
+ *   unanswered legPower is 'limited' only when chairRise was ANSWERED
+ *   'not-easily' or 'no'. It keyed on chairRise !== 'yes', so an unasked
+ *   chair question (null) made a fit person's legs unloadable -- 0 of 20
+ *   Lower builds had a squat or hinge.
  *
  * v83 - P13, SORE-BECOMES-CONDITION (Schema.md v1.76). NEW:
  *   conditionPainScoresOn, the local day the scores were given, written
@@ -3618,7 +3624,13 @@ export const store = {
     // capability screen is assumed limited -- assuming limitation of
     // everyone would be both wrong and insulting, which was the correct
     // half of the v29 reasoning and is preserved.
-    const legPowerUnknown = needsSeated || (asked && c.chairRise !== 'yes');
+    // P15, 29 Sep 2026. "Not yes" included "never asked": chairRise is
+    // null for somebody who was not shown the chair question (balance
+    // "No", young, active, nothing sore), and her legs came out not
+    // loadable -- no squats, no hinges. Only an ANSWER that says rising
+    // is hard counts. Still gated on `asked`.
+    const chairHard = c.chairRise === 'not-easily' || c.chairRise === 'no';
+    const legPowerUnknown = needsSeated || (asked && chairHard);
     const legPowerDefault = legPowerUnknown ? 'limited' : 'full';
     const legPower     = c.legPower || legPowerDefault;
     const legsUsable   = legPower !== 'none';

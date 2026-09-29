@@ -1,5 +1,13 @@
 /**
  * tools/verify-decisions.mjs
+ * 29 Sep 2026 v5
+ *
+ * v5 - P15. C1-SAFETY's pin follows store.js v84: the legPower fail-safe
+ *   covers everyone who ANSWERED that rising from a chair is hard. It
+ *   keyed on chairRise !== 'yes', which also caught people never asked
+ *   (null) -- a fit person's legs came out unloadable. The protected
+ *   group is unchanged; verify-balance-no drives both sides.
+ *
  * 29 Sep 2026 v4
  *
  * v4 - P14. The drop-in variety question is removed from the check-in on
@@ -276,9 +284,12 @@ for (const field of ["sessionVariety", "empathyLastPrompt", "grounding", "liftLo
 
 console.log("\nSAFETY \u2014 never paywalled, never silently weakened");
 
-check("The capability fail-safe covers everyone the question is asked of", "C1-SAFETY, store.js v33", () => {
-  ok(/asked && c\.chairRise !== 'yes'/.test(store),
-     "the legPower default no longer matches the question's trigger \u2014 this served loaded leg work to somebody who could not stand from a chair");
+check("The capability fail-safe covers everyone who says rising is hard", "C1-SAFETY, store.js v33; P15, v84", () => {
+  // P15: the trigger is an ANSWER that rising is hard -- 'not-easily' as
+  // well as 'no' (the C1-SAFETY widening) -- never an unasked question.
+  ok(/const chairHard = c\.chairRise === 'not-easily' \|\| c\.chairRise === 'no';/.test(store) &&
+     /needsSeated \|\| \(asked && chairHard\)/.test(store),
+     "the legPower default no longer covers 'not easily' and 'no' from a chair \u2014 this served loaded leg work to somebody who could not stand from a chair");
 });
 
 check("Grounding moments never appear on the severe-pain path", "GM-1", () => {
