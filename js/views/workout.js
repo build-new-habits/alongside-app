@@ -1,5 +1,17 @@
 /**
  * workout.js - Workout Execution View
+ * 29 Sep 2026 v25
+ *
+ * v25 - P4, FREE-CARRY-ON (persona finding W2-4). Three changes:
+ *   - "Carry on later" is offered on the Plan only. Free has no Carry-on
+ *     card to come back to (the tier table), so the choice went nowhere.
+ *   - On the Plan it says it keeps for 3 hours (session-resume.js
+ *     STALE_MS), instead of quietly expiring.
+ *   - A session that is not the checkpointed one starts with no progress.
+ *     A session left without finishing kept its workoutProgress, and the
+ *     next one finished with the old moves counted in ("13 moves" for 10).
+ *   verify-free-carry-on.
+ *
  * 29 Sep 2026 v24
  *
  * v24 - P2, SESSION-TYPE-ID. The hand-off (lastFinishedSession) is written
@@ -387,6 +399,7 @@ import { checkinData }   from "../data/checkin.js";
 import { recordSession } from "../data/programmeEngine.js";
 import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
 import { checkpointSession, getResumableSession, clearCheckpoint } from "../session-resume.js";
+import { isPremium }     from "../auth.js";
 
 export const centered = false;
 
@@ -473,7 +486,12 @@ function _restoreFromCheckpoint(workout) {
   if (_resumeChecked || !workout || !Array.isArray(workout.exercises)) return;
   _resumeChecked = true;
   const cp = getResumableSession("workout");
-  if (!cp || cp.sessionId !== _sessionKey(workout)) return;
+  // P4. Not the checkpointed session, so a new one: whatever progress an
+  // unfinished session left behind is not this session's.
+  if (!cp || cp.sessionId !== _sessionKey(workout)) {
+    store.set("workoutProgress", null);
+    return;
+  }
   const i = Number(cp.index);
   if (Number.isInteger(i) && i >= 0 && i < workout.exercises.length) {
     currentExerciseIndex = i;
@@ -970,6 +988,8 @@ function showExitConfirm() {
   // SMOOTH-P2c / P3a. One sheet, four choices, every one lands somewhere
   // known: back in the session, on the finish screen, or on Home.
   // "Carry on later" joins in P3 with the Home card that makes it true.
+  // P4: and only where that card is -- the Plan. It keeps for 3 hours
+  // (session-resume.js STALE_MS), and says so.
   //
   // EXIT-1 (12 Aug) still holds: leaving without saving is always
   // offered, at the smallest visual weight -- available, not encouraged.
@@ -978,7 +998,8 @@ function showExitConfirm() {
       <h2 class="session-exit-title" id="exit-sheet-title">Leave this session?</h2>
       <div class="session-exit-actions">
         <button class="btn btn-primary btn-full" id="exit-confirm-stay">Keep going</button>
-        <button class="btn btn-secondary btn-full" id="exit-confirm-later">Carry on later</button>
+        ${isPremium() ? `<button class="btn btn-secondary btn-full" id="exit-confirm-later" aria-describedby="exit-later-note">Carry on later</button>
+        <p class="text-muted text-sm" id="exit-later-note">It keeps for 3 hours.</p>` : ""}
         <button class="btn btn-secondary btn-full" id="exit-confirm-leave">
           End it here and save
         </button>
