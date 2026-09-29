@@ -3,7 +3,13 @@ import { RETIRED_CONDITIONS } from "./data/scope-statement.js";
 
 /**
  * store.js - Data persistence layer
- * 29 Sep 2026 v85
+ * 29 Sep 2026 v86
+ *
+ * v86 - P25, ONE ID PER ENTRY (Schema.md v1.80). logActivity() never
+ *   writes a second entry with an id already in the log; it gives it a
+ *   new one. pendingActivityEntry(): currentActivityEntry, but only while
+ *   it is genuinely pending (not logged, no status) -- the check yoga did
+ *   by status alone and walk, run, swim and cycle did not do at all.
  *
  * v85 - P19, "MOSTLY THE SAME" (Schema.md v1.78). exerciseHistory[id]
  *   .section: the section a move was last completed in, from the
@@ -3343,9 +3349,14 @@ export const store = {
       return (_thisSession && _thisSession.sessionType) || null;
     })();
 
+    // P25, v86. One id per entry: an id already in the log (a leftover
+    // entry spread into a new session) is replaced, never repeated.
+    const _idTaken = entry.id && log.some(e => e && e.id === entry.id);
+    if (_idTaken) console.warn('Store: logActivity gave a new id to an entry reusing', entry.id);
     const finalEntry = {
-      id: entry.id || (new Date().toISOString() + '_' + Math.random().toString(36).slice(2, 6)),
       ...entry,
+      // After the spread, so a reused id cannot win back.
+      id: (!_idTaken && entry.id) || (new Date().toISOString() + '_' + Math.random().toString(36).slice(2, 6)),
       sessionType: _inferredType
     };
 
@@ -3470,6 +3481,19 @@ export const store = {
    * @param {string[]} exerciseIds
    * @param {Object}   [performance] optional { [exerciseId]: {weight,reps,unit} }
    */
+  /**
+   * P25, v86. currentActivityEntry, but only while it is genuinely pending:
+   * not already in the log, and not a finished entry. A leftover of the
+   * last session is neither the start of this one nor anything to spread.
+   */
+  pendingActivityEntry() {
+    const p = this.data.currentActivityEntry;
+    if (!p || typeof p !== 'object') return null;
+    if (p.status) return null;
+    if (p.id && (this.data.activityLog || []).some(e => e && e.id === p.id)) return null;
+    return p;
+  },
+
   recordExercises(exerciseIds, performance, sections) {
     if (!Array.isArray(exerciseIds) || exerciseIds.length === 0) return;
     const now = new Date().toISOString();
