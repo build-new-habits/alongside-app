@@ -1,5 +1,13 @@
 /**
  * yoga-session.js
+ * 29 Sep 2026 v9
+ *
+ * v9 - P2, SESSION-TYPE-ID. Both logActivity() calls say sessionType
+ *   "yoga" themselves. store.logActivity() no longer borrows a type from
+ *   lastFinishedSession, which at logging time is usually the PREVIOUS
+ *   session. (Header brought to the DD Mon YYYY vN rule; the entry below
+ *   was v7 in all but name.)
+ *
  * 16 Sep 2026 v-STRETCH-FOCUS
  *
  * STRETCH-FOCUS + SAVE-IN-MOMENT, 16 Sep 2026.
@@ -1158,6 +1166,7 @@ function finaliseSession() {
   const activityEntry = store.logActivity({
     ...(pending || { type: "yoga", source: "self-directed" }),
     type:         "yoga",
+    sessionType:  "yoga",
     sessionEnd:   nowIso,
     completedAt:  nowIso,
     status:       "completed",
@@ -1296,6 +1305,7 @@ function savePartialSession() {
   const activityEntry = store.logActivity({
     ...(pending || { type: "yoga", source: "self-directed" }),
     type:         "yoga",
+    sessionType:  "yoga",
     sessionEnd:   nowIso,
     completedAt:  nowIso,
     status:       "partial",

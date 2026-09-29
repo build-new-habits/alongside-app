@@ -1,6 +1,12 @@
 /**
  * coach-proposal.js
- * 29 Sep 2026 v35
+ * 29 Sep 2026 v36
+ *
+ * v36 - P2, SESSION-TYPE-ID. The plan records the TYPE it delivers
+ *   (built.sessionType), not the session id. "glute-1791180600000" was
+ *   unreadable to the chooser, so every plan was the first type again:
+ *   Glute Focus on Free, the arc's first strand on the Plan. Gentle Care
+ *   is still recorded as itself. verify-session-type-live.
  *
  * v35 - P0, SCOPE-MINOR. "Let me tell you" opens the sore-areas sheet (Conditions Update is retired) and rebuilds the plan with what they said.
  *
@@ -2381,7 +2387,9 @@ export function CoachProposalView(router) {
     // does the type the chain chose is no longer what the person is being
     // offered. Recording the requested type as though it were delivered
     // would be the coach claiming a decision it did not get to make.
-    const delivered = built.id || sessionType;
+    // P2: the TYPE, never the id. Gentle Care is not a type anybody
+    // chose; it is recorded as itself and the chooser ignores it.
+    const delivered = built.gentleCare ? built.id : (built.sessionType || sessionType);
 
     return [{
       id:            built.id || `coach-${sessionType}`,

@@ -1,5 +1,13 @@
 /**
  * workout.js - Workout Execution View
+ * 29 Sep 2026 v24
+ *
+ * v24 - P2, SESSION-TYPE-ID. The hand-off (lastFinishedSession) is written
+ *   BEFORE logActivity(), on both ways of finishing, so the log describes
+ *   this session. Written after, it was still there when the NEXT thing
+ *   was logged -- a walk, a breathing session -- and lent it this
+ *   session's type. store.logActivity() marks it logged once used.
+ *
  * 28 Sep 2026 v23
  *
  * v23 - Work list 7, SAVE-HANDOFF. Finishing, or ending part-way and
@@ -1150,6 +1158,7 @@ function savePartialSession() {
   const creditsEarned  = progress.reduce((sum, e) => sum + (e.credits || 0), 0);
   const nowIso         = new Date().toISOString();
 
+  _handOff(nowIso);   // P2: before the log, so the log describes this session
   const activityEntry = store.logActivity({
     type:           "workout",
     date:           nowIso,
@@ -1172,7 +1181,6 @@ function savePartialSession() {
   if (activityEntry) {
     store.set("currentActivityEntry", activityEntry);
   }
-  _handOff(nowIso);
 }
 
 /**
@@ -1219,6 +1227,7 @@ function completeWorkout() {
   // meant reflect.js's find-and-update-by-id logic silently found nothing
   // and never saved feel/mood/pain answers for Gym sessions. Confirmed bug,
   // fixed here. See v5 changelog above for full detail.
+  _handOff(nowIso);   // SAVE-HANDOFF, and P2: before the log (see v24)
   const activityEntry = store.logActivity({
     date:         nowIso,
     completedAt:  nowIso,
@@ -1250,7 +1259,6 @@ function completeWorkout() {
   store.set("lastWorkoutCredits", creditsEarned);
   store.set("lastWorkoutName",    workout.name);
 
-  _handOff(nowIso);   // SAVE-HANDOFF: before cleanupWorkout() clears the plan
   cleanupWorkout();
   // Route through reflect.js for post-session reflection.
   router.navigate("reflect");

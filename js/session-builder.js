@@ -1,7 +1,14 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
- * 29 Sep 2026 v57
+ * 29 Sep 2026 v58
+ *
+ * v58 - P2, SESSION-TYPE-ID. Every built session carries `sessionType`,
+ *   one of the eight SESSION_TYPES ids. The coach's plan recorded
+ *   `built.id` ("glute-1791180600000") as the type because nothing else
+ *   was there to record; the chooser could not read it and proposed the
+ *   same session every time. Gentle Care carries none (it is not a type
+ *   anybody chose). verify-session-type-live.
  *
  * v57 - P0, SCOPE-MINOR (Graeme, 29 Sep). The app is not designed around
  *   medical conditions. Removed: the exercise-clearance gate (CARDIAC-1),
@@ -3093,6 +3100,7 @@ export function buildSessionFromSaved({ sessionType, durationMins, exercises, ti
 
   return {
     id:        `${sessionType || "own"}-${Date.now()}`,
+    sessionType: type.id,
     title:     title || type.label,
     subtitle:  durationMins ? `Yours — ${durationMins} mins` : "Yours",
     duration:  durationMins ? `${durationMins} mins` : null,
@@ -3228,6 +3236,7 @@ export function buildSessionFromSelection({ sessionType, durationMins, selectedI
 
   const session = {
     id:       `${sessionType}-${Date.now()}`,
+    sessionType: type.id,
     title:    type.label,
     subtitle: `Built by you today — ${durationMins} mins`,
     duration: durationStr,
@@ -4150,6 +4159,7 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
 
   const session = {
     id:       `${sessionType}-${Date.now()}`,
+    sessionType: type.id,
     title:    `${type.label}`,
     subtitle: `Built for you today — ${durationMins} mins`,
     duration: durationStr,

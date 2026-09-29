@@ -1,6 +1,16 @@
 /**
  * tools/verify-always-core.mjs
- * 16 Sep 2026 v1
+ * 29 Sep 2026 v2
+ *
+ * v2 - P2, SESSION-TYPE-ID. This gate stayed green while every real
+ *   session was recorded as "glute-1791180600000": it fed a bare type
+ *   through lastFinishedSession -- a shape the app never writes, down the
+ *   path that was lending the previous session's type to the next entry.
+ *   It now feeds what the app writes: a real built session in the player
+ *   (generatedSession, as the coach's plan leaves it), logged as a
+ *   workout, sessions on separate occasions in the past. Nothing
+ *   loosened. The full loop through the real screens is
+ *   verify-session-type-live.
  *
  * ALWAYS-CORE. The rotation has to actually rotate.
  *
@@ -41,16 +51,22 @@ const { store } = await import(B + "store.js");
 const { AIMS } = await import(B + "data/aims.js");
 const { chooseSessionType, recentSessionTypes, arcSessionTypes } =
   await import(B + "data/session-choice.js");
+const { buildSession } = await import(B + "session-builder.js");
 
 const AIM = AIMS.list.find(a => a.id === "sport-without-flaring") || AIMS.list[0];
 function reset() {
   localStorage.clear(); store.init();
   store.set("arc", { aimId: AIM.id, strands: AIM.strands });
 }
+// What the coach's plan leaves in the player: a real built session.
+function playing(sessionType) {
+  const session = buildSession({ sessionType, durationMins: 30 });
+  store.set("generatedSession", { session, builtAt: new Date().toISOString() });
+  return session;
+}
 function finish(sessionType, i) {
-  store.set("lastFinishedSession",
-    { at: new Date().toISOString(), session: { sessionType, exercises: [{ id: "x" }] } });
-  store.logActivity({ type: "workout", completedAt: new Date(Date.now() + i * 60000).toISOString() });
+  playing(sessionType);
+  store.logActivity({ type: "workout", completedAt: new Date(Date.now() - (10 - i) * 3600e3).toISOString() });
 }
 
 store.init();
@@ -95,10 +111,10 @@ console.log("\nTEST 1 — four sessions in a row are not the same session");
 console.log("\nTEST 2 — the field is actually written, by the single write path");
 {
   reset();
-  store.set("lastFinishedSession",
-    { at: new Date().toISOString(), session: { sessionType: "glute", exercises: [{ id: "x" }] } });
+  const s = playing("glute");
   store.logActivity({ type: "workout", completedAt: new Date().toISOString() });
 
+  ok("2.0 the built session's id is not its type (the shape that hid the bug)", s.id !== "glute" && /^glute-\d+$/.test(s.id), s.id);
   ok("2.1 logActivity stamps sessionType onto the entry",
      (store.get("activityLog") || []).slice(-1)[0].sessionType === "glute",
      "Schema.md said this was written by logActivity() and it was not");
@@ -109,8 +125,7 @@ console.log("\nTEST 2 — the field is actually written, by the single write pat
 
   ok("2.3 an explicit sessionType on the entry wins", (() => {
     reset();
-    store.set("lastFinishedSession",
-      { at: new Date().toISOString(), session: { sessionType: "core", exercises: [{ id: "x" }] } });
+    playing("core");
     store.logActivity({ type: "workout", sessionType: "cardio", completedAt: new Date().toISOString() });
     return (store.get("activityLog") || []).slice(-1)[0].sessionType === "cardio";
   })(), "a caller that knows better than the store must not be overruled by it");
