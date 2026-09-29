@@ -1,6 +1,13 @@
 /**
  * gym-programme.js
- * 28 Sep 2026 v14
+ * 29 Sep 2026 v15
+ *
+ * v15 - P3, FREE-BUILDER-UPGRADE (persona finding W2-3). A Free user with
+ *   no programme ("Decide later" at onboarding) who built a session and
+ *   pressed Let's go was sent to the upgrade page, and Back looped back
+ *   to it. The gate is about STARTING A PROGRAMME: a session the person
+ *   put together themselves plays on any plan. The redirect now replaces
+ *   this screen in the back stack, so Back leaves it.
  *
  * v14 - F7 LANDMARK. role="main" (and its label) removed from the view's
  *   wrapper: index.html's <main> is the one main landmark; a second,
@@ -404,8 +411,15 @@ export function GymProgrammeView(router) {
     // every user who has ever opened the app and the guard would never
     // have fired. Caught before shipping by reading the default rather
     // than assuming null.
-    if (!isPremium() && !store.hasActiveProgramme()) {
-      router.navigate('upgrade');
+    //
+    // P3. NOR IS IT ABOUT A SESSION THEY BUILT. The builder's Let's go
+    // hands over through usingGeneratedSession; that session is theirs
+    // and plays on any plan. And the redirect REPLACES this screen, or
+    // Back returns here and is redirected again.
+    const ownSession = store.get('usingGeneratedSession') === true &&
+      (store.get('generatedSession')?.session?.exercises || []).length > 0;
+    if (!isPremium() && !store.hasActiveProgramme() && !ownSession) {
+      router.navigate('upgrade', { replace: true });
       return;
     }
 

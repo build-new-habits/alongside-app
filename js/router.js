@@ -1,6 +1,12 @@
 /**
  * router.js
- * 29 Sep 2026 v35
+ * 29 Sep 2026 v36
+ *
+ * v36 - P3, FREE-BUILDER-UPGRADE. navigate(view, { replace: true }): the
+ *   new view takes the place of the current one instead of stacking on
+ *   it. For a view that redirects while mounting -- gym-programme sending
+ *   somebody to the upgrade page -- so that Back leaves the redirect
+ *   rather than re-entering it and being redirected again, a loop.
  *
  * v35 - P0, SCOPE-MINOR. 'conditions-update' retired: it tracked severity,
  *   set healing goals and built programmes for a condition. Sore areas
@@ -490,7 +496,9 @@ export const router = {
     // anything -- not onto the browser stack, not onto ours -- or the
     // act of retreating adds a step, which is why back only ever worked
     // once. See back() below.
-    if (!opts.fromBack) {
+    if (opts.replace) {
+      history.replaceState({ view: viewName }, '', `#${viewName}`);
+    } else if (!opts.fromBack) {
       history.pushState({ view: viewName }, '', `#${viewName}`);
     }
 
@@ -514,7 +522,8 @@ export const router = {
       }
     }
 
-    if (!opts.fromBack && this.currentView && this.currentView !== viewName) {
+    // P3. A replace leaves the view it replaces off the back stack.
+    if (!opts.fromBack && !opts.replace && this.currentView && this.currentView !== viewName) {
       this.history.push(this.currentView);
       if (this.history.length > 20) this.history.shift();
     }
