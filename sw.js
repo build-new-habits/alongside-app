@@ -1,7 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 29 Sep 2026 v590
+ * 29 Sep 2026 v591
+ *
+ * v591 - End review. The chair question says it is asked of everybody
+ *   (onboarding-thread-data v18).
  *
  * v590 - P22. A Classes door on Free Home; the class list says what can
  *   be done seated, and reads today's pain scores (class-list v2).
@@ -4099,7 +4102,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v590";
+const CACHE_NAME = "alongside-v591";
 
 const SHELL_URLS = [
 
