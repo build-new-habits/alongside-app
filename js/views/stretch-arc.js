@@ -1,6 +1,13 @@
 /**
  * js/views/stretch-arc.js
- * 28 Sep 2026 v3
+ * 29 Sep 2026 v4
+ *
+ * v4 - P26, THE ARC SCREEN SAYS WHAT THE ARC IS (persona finding W2-20).
+ *   Accepting a strength arc landed here on a screen titled "Stretch arc",
+ *   listing stretch zones and offering "Stretch now". An arc with an aim
+ *   is now "Your arc": the aim, each strand with when it last came up (a
+ *   date, never a count; data/arc-readback.js), and "Start today's
+ *   session". An arc with no aim is still the stretch tracker.
  *
  * v3 - F7 LANDMARK. role="main" (and its label) removed from the view's
  *   wrapper: index.html's <main> is the one main landmark; a second,
@@ -50,6 +57,7 @@ import { STRETCH_ZONES, zonesWithCoverage } from "../session-builder.js";
 import { zonesForGoal, STRETCH_GOAL_ZONES } from "../data/stretch-goal-zones.js";
 import { getGoalLabel } from "../data/goals.js";
 import { aimById, STRANDS } from "../data/aims.js";
+import { strandReadback } from "../data/arc-readback.js";
 
 const aimLabel    = id => (aimById(id) || {}).label || "";
 const strandLabel = id => (STRANDS[id] || {}).label || "";
@@ -86,10 +94,10 @@ export function StretchArcView(router) {
       <div class="mc-view">
         <div class="mc-header">
           <button class="btn btn-ghost" id="sa-back-btn" aria-label="Back">&larr; Back</button>
-          <span class="mc-header-title">Stretch arc</span>
+          <span class="mc-header-title">${arc.active && arc.aimId ? "Your arc" : "Stretch arc"}</span>
         </div>
 
-        ${arc.active ? renderRunning() : renderOff()}
+        ${arc.active ? (arc.aimId ? renderAimed() : renderRunning()) : renderOff()}
       </div>`;
 
     function renderOff() {
@@ -139,6 +147,32 @@ export function StretchArcView(router) {
 
         <button class="btn btn-primary btn-large btn-full" id="sa-start-btn">
           Start
+        </button>`;
+    }
+
+    // P26. An arc with an aim: the aim, its strands, and today's session.
+    function renderAimed() {
+      const strands = strandReadback(arc);
+      return `
+        <p class="sb-coach-line">Working towards ${esc(aimLabel(arc.aimId))}.</p>
+
+        ${strands.length ? `
+          <div class="sa-panel">
+            <span class="exercise-section-label">What it works on</span>
+            <ul class="sa-list">
+              ${strands.map(r => `<li><span>${esc(r.label)}</span><span class="sa-when">${esc(r.text)}</span></li>`).join("")}
+            </ul>
+            <p class="sa-note">Nothing owed here \u2014 it's when each last came up, not a target.</p>
+          </div>
+        ` : ""}
+        ${arc.marker ? `<p class="sa-note">\u201C${esc(arc.marker)}\u201D</p>` : ""}
+
+        <button class="btn btn-primary btn-large btn-full" id="sa-today-btn">
+          Start today's session
+        </button>
+
+        <button class="btn btn-ghost btn-full" id="sa-stop-btn">
+          Stop the arc
         </button>`;
     }
 
@@ -218,6 +252,16 @@ export function StretchArcView(router) {
       // not start from nothing.
       store.set("arc", { ...store.get("arc"), active: false });
       render(container);
+    });
+
+    container.querySelector("#sa-today-btn")?.addEventListener("click", () => {
+      // The coach's plan leans on the arc; it asks how today is first.
+      if (store.checkedInToday()) {
+        router.navigate("coach-proposal");
+      } else {
+        store.set("pendingDoorRoute", "coach-proposal");
+        router.navigate("checkin");
+      }
     });
 
     container.querySelector("#sa-stretch-btn")?.addEventListener("click", () => {

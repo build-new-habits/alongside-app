@@ -1,5 +1,11 @@
 /**
  * activity-log.js - Universal Activity Logging View
+ * 29 Sep 2026 v2
+ *
+ * v2 - P26 (persona finding W2-20). A Strength group with "Gym or
+ *   weights": the log had cardio, classes, sport and outdoor, and nothing
+ *   for the gym. Logged as type "gym", which pacing counts;
+ *   activity-labels reads a hand-logged one as "a gym session".
  *
  * v0.1 — Stub (S4-3 full build pending)
  *
@@ -22,6 +28,9 @@ const ACTIVITY_GROUPS = [
     { id: "cycle", label: "Cycle", icon: "\uD83D\uDEB4" },
     { id: "swim", label: "Swim", icon: "\uD83C\uDFCA" },
     { id: "row", label: "Row", icon: "\uD83D\uDEA3" },
+  ]},
+  { group: "Strength", items: [
+    { id: "gym", label: "Gym or weights", icon: "\uD83C\uDFCB\uFE0F" },
   ]},
   { group: "Classes", items: [
     { id: "body-balance", label: "Body Balance", icon: "\uD83E\uDDD8" },

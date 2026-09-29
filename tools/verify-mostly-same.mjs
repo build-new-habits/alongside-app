@@ -1,6 +1,12 @@
 /**
  * tools/verify-mostly-same.mjs
- * 29 Sep 2026 v1
+ * 29 Sep 2026 v2
+ *
+ * v2 - P26. Sessions a day apart were, with the lighter-day rule working
+ *   again (data/checkin.js v10), every third one a lighter day: fewer
+ *   sets and a shorter session, by design. That is not what this gate
+ *   measures, so the sessions are two days apart, which no gentle rule
+ *   reads. verify-gentle-signals covers the lighter day.
  *
  * P19, "MOSTLY THE SAME" (persona finding W2-14). Persona 2.14 chose
  * "Mostly the same each time" for predictability. Measured over ten
@@ -141,7 +147,7 @@ function run(type, variety, runs = 5) {
         }
       }
       // Recorded exactly as the players record a finished session.
-      nextDay();
+      nextDay(); nextDay();   // every other day: see v2
       store.logActivity({ type: "workout", status: "completed", date: new Date().toISOString(), completedAt: new Date().toISOString(),
         sessionType: type, exerciseIds: ex.map(e => e.id), exerciseSections: Object.fromEntries(ex.map(e => [e.id, sec(e)])),
         exercisesCount: ex.length });

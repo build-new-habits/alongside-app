@@ -1,6 +1,12 @@
 /**
  * js/data/tier-table.js
- * 29 Sep 2026 v2
+ * 29 Sep 2026 v3
+ *
+ * v3 - P26 (persona finding W2-20). A weight row. Weight tracking is the
+ *   Plan's (WEIGHT-1b) and "Lose weight" is offered only with it on (spec
+ *   section 8), so "Lose weight" could not be chosen on Free -- and the
+ *   Plan page never said weight tracking was there. Proof: verify-plan-
+ *   claims 3.weight.
  *
  * v2 - P0, SCOPE-MINOR. The progress row no longer offers "what you have
  *   told me at check-in": the per-area charts were removed.
@@ -82,6 +88,14 @@ export const TIER_TABLE = [
     plan: "Your arc read back to you: what has come up and your logged weights, over 30 or 90 days",
     says: "Progress reads your arc back to you: what has come up, and what your logged weights show.",
     proof: "verify-plan-claims 3.progress, verify-progress-agree",
+  },
+  {
+    id: "weight",
+    area: "Weight",
+    free: "Not included",
+    plan: "Weight tracking, off unless you turn it on; then losing weight can be a goal",
+    says: "Weight tracking, off unless you turn it on, and only you see it; with it on, losing weight can be one of your goals.",
+    proof: "verify-plan-claims 3.weight, verify-small-ones 5",
   },
   {
     id: "coming-back",

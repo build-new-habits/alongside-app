@@ -1,6 +1,10 @@
 /**
  * today.js
- * 29 Sep 2026 v48
+ * 29 Sep 2026 v49
+ *
+ * v49 - P26, RUN ON FREE (persona finding W2-20). A Run door among Free's
+ *   "Move your body" tiles. Running was the main goal of persona 2.1 and
+ *   Free had no way to it but the Plan's session picker.
  *
  * v48 - P22, CLASSES ON FREE (persona finding W2-18). A Classes door among
  *   Free's "Move your body" tiles; the Plan keeps "Join a class".
@@ -869,6 +873,10 @@ export function TodayView(router) {
     // everybody and suit 2.11 and 2.14 best; the Plan had "Join a class",
     // Free had no way in. Graeme: classes are the same for everybody, so
     // Free gets the door. No check-in: a class is chosen, not proposed.
+    // P26, 29 Sep 2026. Run: persona 2.1's main goal had no door on Free.
+    // No check-in: a run is chosen, not proposed. The red-flag screen
+    // still comes first where it applies (router).
+    { kind: 'session', id: 'run', label: 'Run', icon: '\uD83C\uDFC3', route: 'running-session', requiresCheckin: false },
     { kind: 'session', id: 'classes', label: 'Classes', icon: '\uD83D\uDDD3\uFE0F', route: 'classes', requiresCheckin: false },
     // TIER-F, 13 Aug 2026 -- RESOLVED. The flag below stood since
     // NAV-6. The door and the bottom-nav tab route to the same view;

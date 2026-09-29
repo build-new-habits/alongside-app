@@ -1,6 +1,11 @@
 /**
  * js/save-block.js
- * 28 Sep 2026 v2
+ * 29 Sep 2026 v3
+ *
+ * v3 - P26 (persona finding W2-20). "Keep this one?" is not offered for a
+ *   session already kept: one started from the saved list
+ *   (inputs.savedSessionId), or one whose exercises are exactly a saved
+ *   session's. Both paths, the handoff and generatedSession.
  *
  * v2 - Work list 7, SAVE-HANDOFF. The generatedSession fallback is
  *   offered only when the last session finished today WAS that proposal
@@ -60,7 +65,7 @@
 
 import { store } from "./store.js";
 import { isPremium } from "./auth.js";
-import { saveSession } from "./data/saved-sessions.js";
+import { saveSession, savedSessions } from "./data/saved-sessions.js";
 
 function _isToday(iso) {
   if (!iso) return false;
@@ -86,6 +91,21 @@ function _justFinished(built) {
   const planned = new Set((built.exercises || []).map(e => e && e.id).filter(Boolean));
   const done = Array.isArray(lastToday.exerciseIds) ? lastToday.exerciseIds : [];
   return done.some(id => planned.has(id));
+}
+
+/**
+ * P26. Already kept: the same set of exercises as a saved session. Order
+ * is not compared -- a saved session played back is the same session.
+ */
+function _alreadySaved(built) {
+  const ids = new Set((built.exercises || []).map(e => e && e.id).filter(Boolean));
+  if (!ids.size) return false;
+  let list = [];
+  try { list = savedSessions() || []; } catch { return false; }
+  return list.some(s => {
+    const own = new Set((s && s.exerciseIds) || []);
+    return own.size === ids.size && [...ids].every(id => own.has(id));
+  });
 }
 
 /** The same test saveSession() applies, applied before offering. */
@@ -125,12 +145,15 @@ export function savableSession() {
   const handoff = store.get("lastFinishedSession");
   if (handoff && handoff.session && _isToday(handoff.at)) {
     const h = _validate(handoff.session);
-    if (h && _justFinished(h)) return h;
+    if (h && _justFinished(h)) return _alreadySaved(h) ? null : h;
   }
 
   const gen = store.get("generatedSession") || {};
   const built = gen.session || null;
   if (!built) return null;
+
+  // P26. Started from the saved list: it is kept already.
+  if (gen.inputs && gen.inputs.savedSessionId) return null;
 
   if (!_isToday(gen.builtAt)) return null;
 
@@ -150,6 +173,8 @@ export function savableSession() {
   const type = String((store.get("currentActivityEntry") || {}).type || "");
   if (/prescribed/i.test(type)) return null;
   if (built.isPrescribed || built.prescribedBy) return null;
+
+  if (_alreadySaved(built)) return null;
 
   return built;
 }

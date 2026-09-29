@@ -1,5 +1,10 @@
 /**
  * tools/verify-gentle-signals.mjs
+ * 29 Sep 2026 v2
+ *
+ * v2 - P26. 1.4: the lighter-day line counts nothing. "3 days in a row"
+ *   was a streak; it now says it noticed, with no number.
+ *
  * 16 Sep 2026 v1
  *
  * GENTLE-SIGNALS. Work list items 2b and 2d, built as one rule.
@@ -91,7 +96,7 @@ ok("1.2 ...and says it was the sleep", /slept badly/i.test(p.line), p.line);
 
 base({ streak: 3 }); p = profile();
 ok("1.3 three days in a row -> gentler", gentle(p, ref), `main ${p.main.toFixed(1)}, cool ${p.cool.toFixed(1)}`);
-ok("1.4 ...and says how many days", /3 days in a row/i.test(p.line), p.line);
+ok("1.4 ...and says why, counting nothing", /moving a lot lately/i.test(p.line) && !/in a row|\d+ days/i.test(p.line), p.line);
 
 base({ declared: "exhausted", checkins: 1 }); p = profile();
 ok("1.5 declared exhausted at sign-up, first days -> gentler", gentle(p, ref), `main ${p.main.toFixed(1)}`);

@@ -1,6 +1,9 @@
 /**
  * tools/verify-plan-claims.mjs
- * 28 Sep 2026 v3
+ * 29 Sep 2026 v4
+ *
+ * v4 - P26. 3.weight: the weight-tracking switch is in Settings on the
+ *   Plan and not on free, and "Lose weight" is offered only with it on.
  *
  * v3 - SMOOTH-P5. EVERY PLACE THE PLAN IS DESCRIBED AGREES WITH ONE TABLE,
  *   AND EVERY ROW OF THE TABLE IS TRUE. js/data/tier-table.js is the table
@@ -178,6 +181,11 @@ ok("3.coming-back  and the gentler start after time away is BOTH tiers' (no tier
 
 const credits = tier => { tierFixture(tier); box.innerHTML = ""; try { CI.CommunityImpactView(box); } catch {} return (txt(box).match(/Credits per session (\d)/) || [])[1]; };
 ok("3.impact  once on free, twice on the Plan", credits("free") === "1" && credits("personal") === "2", `${credits("free")} / ${credits("personal")}`);
+
+const { offeredGoals } = await import(B + "data/goals.js");
+const weightSwitch = tier => { tierFixture(tier); mountView(SettingsView); return !!box.querySelector("#settings-weight-tracking"); };
+const offersLose = on => offeredGoals({ weightTracking: on }).some(c => c.goals.some(g => g.id === "lose-weight"));
+ok("3.weight  weight tracking is the Plan's; losing weight is a goal only with it on", weightSwitch("personal") && !weightSwitch("free") && offersLose(true) && !offersLose(false));
 
 const strip2 = f => fs.readFileSync(new URL(f, root), "utf8").replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:"'`])\/\/.*$/gm, "$1").replace(/<!--[\s\S]*?-->/g, "");
 ok("3.wellbeing  nothing in Wellbeing checks the tier", ["js/views/noticing.js", "js/views/breathing-session.js", "js/views/journal-entry.js", "js/views/in-step.js", "js/views/quiet-session.js"]

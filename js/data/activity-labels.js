@@ -1,6 +1,10 @@
 /**
  * js/data/activity-labels.js
- * 29 Sep 2026 v1
+ * 29 Sep 2026 v2
+ *
+ * v2 - P26. A gym session somebody logs by hand (the activity log's "Gym
+ *   or weights", type "gym", source "self-logged") reads "a gym session",
+ *   not "a session you built": they did not build it here.
  *
  * P7. ONE map from what the app logs to what a person reads.
  *
@@ -64,6 +68,11 @@ const LABELS = {
 
 const FALLBACK = ["some activity", "other activity"];
 
+// P26. Logged by hand from the activity log: a gym visit, not a session
+// the builder put together.
+const SELF_GYM = ["a gym session", "gym sessions"];
+const selfGym = e => e?.type === "gym" && e?.source === "self-logged";
+
 function builtKind(entry) {
   const t = entry && SESSION_TYPES.find(s => s.id === entry.sessionType && s.id !== "gym");
   return t ? t.label.toLowerCase() : null;
@@ -71,6 +80,7 @@ function builtKind(entry) {
 
 /** "a walk", "a lower body session", "a breathing practice". */
 export function activityPhrase(entry) {
+  if (selfGym(entry)) return SELF_GYM[0];
   const kind = (entry?.type === "workout" || entry?.type === "gym" || entry?.type === "gym-programme") && builtKind(entry);
   if (kind) return `a ${kind} session`;
   return (LABELS[entry?.type] || FALLBACK)[0];
@@ -78,6 +88,7 @@ export function activityPhrase(entry) {
 
 /** "walking", "lower body", "breathing" -- for counts and "mostly ...". */
 export function activityNoun(entry) {
+  if (selfGym(entry)) return SELF_GYM[1];
   const kind = (entry?.type === "workout" || entry?.type === "gym" || entry?.type === "gym-programme") && builtKind(entry);
   if (kind) return kind;
   return (LABELS[entry?.type] || FALLBACK)[1];

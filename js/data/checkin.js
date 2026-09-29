@@ -1,6 +1,12 @@
 /**
  * checkin.js
- * 29 Sep 2026 v9
+ * 29 Sep 2026 v10
+ *
+ * v10 - P26 (persona finding W2-20). consecutiveActiveDays() counts local
+ *   calendar days. It compared `date` whole -- and the players write
+ *   `date` as a full timestamp, so no entry ever matched and the
+ *   lighter-day rule stayed off -- and it used UTC days, so an evening
+ *   session in a time zone ahead of UTC landed on the wrong day.
  *
  * v9 - P13. saveCheckin() ends by running store.lapseQuietSoreAreas():
  *   an area tapped once at a check-in leaves the list after three quiet
@@ -213,7 +219,9 @@ export function coachBias() {
  */
 export function consecutiveActiveDays() {
   const log = store.get('activityLog') || [];
-  const today = new Date().toISOString().split('T')[0];
+  // P26. Local calendar days throughout, as a person counts them.
+  const local = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  const today = local(new Date());
   // 🔴 GENTLE-SIGNALS, 16 Sep 2026. THIS READ A FIELD NO ENTRY HAS.
   //
   // It counted `e.date`. store.logActivity() writes id, type,
@@ -225,7 +233,18 @@ export function consecutiveActiveDays() {
   //
   // `date` is still honoured first, for any caller that sets one;
   // completedAt is the field every entry actually carries.
-  const dayOf = e => e && (e.date || (typeof e.completedAt === 'string' ? e.completedAt.slice(0, 10) : null));
+  //
+  // P26, 29 Sep 2026. And `date` is written by the players as a full
+  // timestamp, so compared whole it never matched a day. Now: the local
+  // day of completedAt, else of date; a bare "YYYY-MM-DD" is taken as it
+  // is (new Date() would read it as UTC midnight).
+  const dayOf = e => {
+    const v = e && (e.completedAt || e.date);
+    if (typeof v !== 'string' || !v) return null;
+    if (/^\d{4}-\d{2}-\d{2}$/.test(v)) return v;
+    const d = new Date(v);
+    return isNaN(d) ? null : local(d);
+  };
   const activeDates = new Set(log.map(dayOf).filter(d => d && d < today));
   let count = 0;
   const cursor = new Date();
@@ -233,7 +252,7 @@ export function consecutiveActiveDays() {
   // Bounded. An unbounded while-loop over a Set that could be seeded
   // with odd data is a hang, not a bug report.
   for (let i = 0; i < 400; i++) {
-    const dateStr = cursor.toISOString().split('T')[0];
+    const dateStr = local(cursor);
     if (!activeDates.has(dateStr)) break;
     count++;
     cursor.setDate(cursor.getDate() - 1);

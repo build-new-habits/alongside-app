@@ -1,6 +1,11 @@
 /**
  * js/views/red-flag.js
- * 28 Sep 2026 v2
+ * 29 Sep 2026 v3
+ *
+ * v3 - P26, A WAY OUT (persona finding W2-20). The questions had no way
+ *   out but answering. "Not now" goes Home without answering: nothing is
+ *   recorded, the session asked for is dropped (not left to open later),
+ *   and the screen comes first again next time.
  *
  * v2 - F7 LANDMARK. role="main" (and its label) removed from the view's
  *   wrapper: index.html's <main> is the one main landmark; a second,
@@ -67,6 +72,7 @@ export function RedFlagView(router) {
             </fieldset>`).join("")}
           <p class="rf-error" id="rf-error" role="alert">${error}</p>
           <button type="submit" class="btn btn-primary btn-large btn-full" id="rf-continue">Continue</button>
+          <button type="button" class="btn btn-ghost btn-full" id="rf-not-now">Not now</button>
         </form>
         <p class="rf-always">${RED_FLAG_ALWAYS}</p>
       </div>`;
@@ -76,6 +82,13 @@ export function RedFlagView(router) {
     const form = container.querySelector(".rf-form");
     form?.addEventListener("change", e => {
       if (e.target.name) answers[e.target.name] = e.target.value;
+    });
+    container.querySelector("#rf-not-now")?.addEventListener("click", () => {
+      // Nothing recorded: not answering is not an answer. The session
+      // asked for is dropped, so it does not open by itself later.
+      takePendingRoute();
+      answers = {}; error = "";
+      router.navigate("today");
     });
     form?.addEventListener("submit", e => {
       e.preventDefault();

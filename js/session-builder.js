@@ -1,7 +1,13 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
- * 29 Sep 2026 v64
+ * 29 Sep 2026 v65
+ *
+ * v65 - P26 (persona finding W2-20). The lighter-day line counted days:
+ *   "You've moved N days in a row" is a streak, which the product never
+ *   does. Latent until now -- a date bug in consecutiveActiveDays() kept
+ *   the rule off (data/checkin.js v10). It says what it noticed, with no
+ *   count.
  *
  * v64 - P24, DOSE (persona finding W2-20). _writtenDose() reads the other
  *   ways the library writes a dose ("Complete 10 reps each side, 3 sets",
@@ -1192,7 +1198,7 @@ function _gentleReason() {
   } catch { /* no check-in today: nothing to read */ }
   if (_burnoutActive()) return { id: "burnout" };
   try {
-    if (coachBias() === "lighter") return { id: "streak", days: consecutiveActiveDays() };
+    if (coachBias() === "lighter") return { id: "streak" };
   } catch { /* history unreadable: not a reason */ }
   try {
     if (coldStartBias() === "lighter") return { id: "declared" };
@@ -1216,7 +1222,8 @@ const GENTLE_LINES = {
   today:    () => "You said your energy's low today, so this is shorter than usual with more time to settle at the end.",
   sleep:    () => "You said you slept badly, so I've kept this gentler today.",
   burnout:  () => "Your check-ins this week have mostly been low on energy, so I've kept this gentler even though today feels better.",
-  streak:   r  => `You've moved ${r.days} days in a row, so today's a lighter one to let that settle.`,
+  // P26. No count: a number of days is a streak, however kindly said.
+  streak:   () => "You've been moving a lot lately, so today's a lighter one to let that settle.",
   declared: () => "You told me things have been running low lately, so I'm starting you gently."
 };
 
