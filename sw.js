@@ -1,7 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 29 Sep 2026 v586
+ * 29 Sep 2026 v587
+ *
+ * v587 - P19. "Mostly the same" holds the warm-up, section and dose
+ *   (session-builder v63, store v85, settings v45).
  *
  * v586 - P18. Skipping in the coach's player offers Less often / Not again
  *   (workout v26).
@@ -4087,7 +4090,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v586";
+const CACHE_NAME = "alongside-v587";
 
 const SHELL_URLS = [
 
