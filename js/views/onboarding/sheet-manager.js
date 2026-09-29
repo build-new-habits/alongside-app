@@ -1,6 +1,17 @@
 /**
  * js/views/onboarding/sheet-manager.js
- * 29 Jun 2026 v3
+ * 29 Sep 2026 v4
+ *
+ * v4 — P1, REDUCED-MOTION-SHEET (persona finding W2-2). A sheet only
+ *   finished closing on `transitionend`. With reduced motion on (the
+ *   phone's setting, or Display › Reduce motion) there is no transition,
+ *   the event never comes, and the sheet never finished: onboarding
+ *   stalled at its first sheet, and Settings › Equipment and the
+ *   sore-areas sheet stalled the same way. Now the close finishes at once
+ *   when the panel has no transition, and otherwise on transitionend or a
+ *   fallback just after the transition's own length, whichever is first,
+ *   and only once. A close that finishes after a new sheet has opened
+ *   leaves the new sheet alone. verify-sheet-close.
  *
  * v3 — Real root cause of the equipment step (S4/S5) found and fixed,
  *   after equipment.js source was finally read directly rather than
@@ -96,6 +107,7 @@ let _content      = null;  // HTMLElement — .sheet-content inside the panel
 let _triggerEl    = null;  // HTMLElement — element that opened the sheet (focus return)
 let _doneCallback = null;  // function(result) — called on close
 let _isOpen       = false;
+let _openSeq      = 0;     // bumped on every open; a late close checks it
 
 // Old-pattern views (conditions.js) call the bare global window.router.navigate
 // directly — there is no router argument to intercept. While such a view is
@@ -184,6 +196,7 @@ export async function openSheet(viewKey, onDone, triggerEl = null) {
   _doneCallback = onDone;
   _triggerEl    = triggerEl || document.activeElement;
   _isOpen       = true;
+  _openSeq     += 1;
 
   // Clear previous content
   _content.innerHTML = '';
@@ -334,23 +347,48 @@ function _close(result) {
   _overlay.classList.remove('is-open');
   _panel.classList.remove('is-open');
 
-  // Wait for close animation then clean up and fire callback
-  const panel = _panel;
-  panel.addEventListener('transitionend', function handler() {
-    panel.removeEventListener('transitionend', handler);
-    _content.innerHTML = '';
+  // Finish once the close animation is over -- or at once when there is
+  // none. Reduced motion removes the transition, and transitionend never
+  // fires for a transition that does not exist (P1).
+  const panel    = _panel;
+  const seq      = _openSeq;
+  const trigger  = _triggerEl;
+  const callback = _doneCallback;
+  _doneCallback  = null;
+  let finished   = false;
+  let timer      = null;
 
-    // Return focus to trigger element
-    if (_triggerEl && typeof _triggerEl.focus === 'function') {
-      _triggerEl.focus();
+  const finish = () => {
+    if (finished) return;
+    finished = true;
+    panel.removeEventListener('transitionend', onEnd);
+    if (timer) clearTimeout(timer);
+    // A new sheet opened while this one was closing: it owns the content,
+    // the focus and the panel now. Only the old callback is still ours.
+    if (seq === _openSeq) {
+      _content.innerHTML = '';
+      if (trigger && typeof trigger.focus === 'function') trigger.focus();
     }
+    if (typeof callback === 'function') callback(result);
+  };
+  const onEnd = (e) => { if (e.target === panel) finish(); };
 
-    // Fire callback
-    if (typeof _doneCallback === 'function') {
-      _doneCallback(result);
-      _doneCallback = null;
-    }
-  }, { once: true });
+  const ms = _transitionMs(panel);
+  if (ms <= 0) { finish(); return; }
+  panel.addEventListener('transitionend', onEnd);
+  timer = setTimeout(finish, ms + 100);
+}
+
+// Longest transition on the element, duration plus delay, in ms.
+function _transitionMs(el) {
+  let cs;
+  try { cs = getComputedStyle(el); } catch { return 0; }
+  const list = v => String(v || '0s').split(',').map(s => {
+    const n = parseFloat(s);
+    return isNaN(n) ? 0 : (/ms\s*$/.test(s) ? n : n * 1000);
+  });
+  const d = list(cs.transitionDuration), dl = list(cs.transitionDelay);
+  return Math.max(0, ...d.map((x, i) => x + (dl[i % dl.length] || 0)));
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
