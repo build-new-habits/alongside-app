@@ -1,6 +1,15 @@
 /**
  * workout.js - Workout Execution View
- * 29 Sep 2026 v25
+ * 29 Sep 2026 v26
+ *
+ * v26 - P18, "NOT AGAIN" (persona finding W2-13). Settings promises: "When
+ *   you skip something, the coach offers to see it less often -- or not
+ *   at all." This player had a Skip button and nothing after it. Now the
+ *   next card asks, by name, "Want me to change how often X comes up?" --
+ *   Less often / Not again / Leave it -- the core session's offer, the
+ *   same store call (setExercisePreference, source 'skip'). Skipping the
+ *   last move asks on a short screen, then finishes. The question is
+ *   view state only: it never carries into another session.
  *
  * v25 - P4, FREE-CARRY-ON (persona finding W2-4). Three changes:
  *   - "Carry on later" is offered on the Plan only. Free has no Carry-on
@@ -404,6 +413,10 @@ import { isPremium }     from "../auth.js";
 export const centered = false;
 
 let currentExerciseIndex = 0;
+// P18. The move just skipped, waiting for "how often should it come up?".
+// finishAfterOffer: it was the last move, so answering ends the session.
+let pendingSkipOffer = null;
+let finishAfterOffer = false;
 let timerInterval = null;
 let timeRemaining = 0;
 let timerStarted = false; // Timer doesn't start until user taps Start
@@ -556,6 +569,17 @@ export function render() {
     return `<div class="view workout-view">${renderSafetyGate()}</div>`;
   }
 
+  // P18. The last move was skipped: ask, then the answer finishes.
+  if (finishAfterOffer && pendingSkipOffer) {
+    return `
+    <div class="view workout-view wo-flow">
+      <div class="workout-header">
+        <button class="btn btn-ghost" id="exit-workout-btn" aria-label="Exit workout">\u2715 Exit</button>
+      </div>
+      ${_renderSkipOffer()}
+    </div>`;
+  }
+
   const exercise = workout.exercises[currentExerciseIndex];
 
   // GM-1. Chosen once per render, so the card does not shuffle moments
@@ -584,6 +608,8 @@ export function render() {
       <div class="workout-progress-bar" role="progressbar" aria-valuenow="${Math.round(progress)}" aria-valuemin="0" aria-valuemax="100" aria-label="Workout progress: exercise ${currentExerciseIndex + 1} of ${workout.exercises.length}">
         <div class="workout-progress-fill" style="width: ${progress}%"></div>
       </div>
+
+      ${_renderSkipOffer()}
 
       <div class="exercise-display">
         ${sectionLabel ? `<p class="wo-flow__section">${sectionLabel}</p>` : ""}
@@ -664,6 +690,26 @@ export function render() {
       </div>
     </div>
   `;
+}
+
+/**
+ * P18. The core session's skip offer, in this player: a binary instruction
+ * to the app, not a rating (skip/dislike spec section 6). Reversible in
+ * Settings ("Exercises you asked to change").
+ */
+function _renderSkipOffer() {
+  if (!pendingSkipOffer) return "";
+  const name = String(pendingSkipOffer.name || "that one")
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  return `
+    <div class="cs-skip-offer" role="group" aria-label="Tell the coach about skipping ${name}">
+      <p class="cs-skip-offer__line">Want me to change how often ${name} comes up?</p>
+      <div class="cs-skip-offer__actions">
+        <button class="btn btn-ghost btn-small" data-skip-pref="less" aria-label="Offer ${name} less often">Less often</button>
+        <button class="btn btn-ghost btn-small" data-skip-pref="avoid" aria-label="Never offer ${name} again">Not again</button>
+        <button class="btn btn-ghost btn-small" data-skip-pref="dismiss" aria-label="Leave it as it is">Leave it</button>
+      </div>
+    </div>`;
 }
 
 // EMPTY-1. Distinct from renderNoWorkout(): that one means "you have
@@ -923,6 +969,21 @@ export function onMount() {
     skipExercise();
   });
 
+  // P18. The answer to "how often should it come up?".
+  document.querySelectorAll("[data-skip-pref]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const choice = btn.dataset.skipPref;
+      const ex = pendingSkipOffer;
+      const finish = finishAfterOffer;
+      pendingSkipOffer = null; finishAfterOffer = false;
+      if (ex && ex.id && (choice === "less" || choice === "avoid")) {
+        store.setExercisePreference(ex.id, choice, "skip");
+      }
+      if (finish) completeWorkout();
+      else router.navigate("workout");
+    });
+  });
+
   // TIMER-2. Each tap is one set. The last set ends the exercise.
   document.getElementById("wo-set-done-btn")?.addEventListener("click", () => {
     const sets = exercise.sets || 1;
@@ -1092,6 +1153,7 @@ function updateTimerDisplay() {
 
 function completeExercise() {
   const workout = _getWorkout();
+  pendingSkipOffer = null;   // P18: not answered is "leave it"
   const exercise = workout.exercises[currentExerciseIndex];
 
   const completed = store.get("workoutProgress") || [];
@@ -1116,10 +1178,19 @@ function completeExercise() {
 
 function skipExercise() {
   const workout = _getWorkout();
+  const skipped = workout.exercises[currentExerciseIndex] || null;
 
   if (currentExerciseIndex >= workout.exercises.length - 1) {
+    // P18. Ask before finishing; the answer finishes (see onMount).
+    if (skipped) {
+      pendingSkipOffer = skipped; finishAfterOffer = true;
+      pauseTimer();
+      router.navigate("workout");
+      return;
+    }
     completeWorkout();
   } else {
+    pendingSkipOffer = skipped;   // P18: asked on the next card
     currentExerciseIndex++;
   scrollToTop();   // SCROLL-1: a new card starts at the top
     resetTimer();
@@ -1292,6 +1363,7 @@ function cleanupWorkout() {
   pauseTimer();
   sessionStartTime = null;
   currentExerciseIndex = 0;
+  pendingSkipOffer = null; finishAfterOffer = false;   // P18: never carries over
   timeRemaining = 0;
   timerStarted  = false;
   exerciseDone = false;   // Index resets here, so this must too.
