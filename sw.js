@@ -1,7 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 29 Sep 2026 v570
+ * 29 Sep 2026 v571
+ *
+ * v571 - P3 FREE-BUILDER-UPGRADE. New: tools/verify-free-builder.mjs.
+ *   Changed: router.js (v36), views/gym-programme.js. 198 gates.
  *
  * v570 - P2 SESSION-TYPE-ID. New: tools/verify-session-type-live.mjs.
  *   Changed: store (v82), session-builder, coach-proposal, workout,
@@ -4037,7 +4040,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v570";
+const CACHE_NAME = "alongside-v571";
 
 const SHELL_URLS = [
 
