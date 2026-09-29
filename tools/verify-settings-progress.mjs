@@ -1,6 +1,12 @@
 /**
  * tools/verify-settings-progress.mjs
- * 29 Sep 2026 v2
+ * 29 Sep 2026 v3
+ *
+ * v3 - Flake, not a loosening. 3b and 3c waited a fixed 20 ms for the
+ *   clipboard promise to settle; under the parallel suite that was
+ *   sometimes too short and 3c failed (twice on 29 Sep; 3 of 3 alone).
+ *   They now wait until the result is on screen, up to 2 seconds. The
+ *   assertions are unchanged.
  *
  * v2 - P0. 50 routes after Conditions Update was retired.
  *
@@ -172,11 +178,14 @@ ok("3a. no alert() anywhere on Progress (not selectable on most phones)", !/\bal
 fixture("personal"); main.innerHTML = ""; ProgressView(rtr).mount(main);
 let copied = null;
 Object.defineProperty(globalThis.navigator, "clipboard", { value: { writeText: t => { copied = t; return Promise.resolve(); } }, configurable: true });
-click(main.querySelector('[data-export="friend"]')); await wait(20);
+const until = async (fn, ms = 2000) => { const end = Date.now() + ms; while (!fn() && Date.now() < end) await wait(10); };
+click(main.querySelector('[data-export="friend"]'));
+await until(() => /Copied/.test(txt(main.querySelector(".progress-export [data-export-status]"))));
 const status = main.querySelector(".progress-export [data-export-status]");
 ok("3b. copying says so under the buttons, politely", !!copied && /^Copied the friend version\./.test(txt(status)) && status.getAttribute("role") === "status", txt(status));
 Object.defineProperty(globalThis.navigator, "clipboard", { value: { writeText: () => Promise.reject(new Error("denied")) }, configurable: true });
-click(main.querySelector('[data-export="self"]')); await wait(20);
+click(main.querySelector('[data-export="self"]'));
+await until(() => { const a = main.querySelector("[data-export-fallback] textarea"); return !!a && document.activeElement === a; });
 const area = main.querySelector("[data-export-fallback] textarea");
 ok("3c. copying refused: the text itself, labelled, focused and selected", !!area && !area.closest("[hidden]") && area.value.length > 40 &&
    document.activeElement === area && !!main.querySelector(`label[for="${area.id}"]`), area?.value.slice(0, 40));

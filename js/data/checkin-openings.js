@@ -1,6 +1,21 @@
 /**
  * js/data/checkin-openings.js
- * 29 Sep 2026 v7
+ * 29 Sep 2026 v8
+ *
+ * v8 - P8, INVENTED CHECK-IN LINES (persona finding W2-10). An opener is
+ *   said only when its fact is true.
+ *   - The weekday rotation fallback is gone. When nothing matched, it
+ *     picked lines that each assert a fact about the person ("Last time
+ *     you did less than planned", "this particular morning" at 6 pm):
+ *     20 of 28 weekday-and-hour combinations said something untrue. Now
+ *     a reflection with nothing true to say gives way to a neutral line.
+ *   - Removed, because no condition anywhere could make them true:
+ *     better-than-expected, session-adjusted, morning-pattern.
+ *   - positive-week / mixed-mood-week said "you moved three / four times
+ *     last week" -- fixed numbers, chosen by counting CHECK-INS. They now
+ *     say the real count, of check-ins.
+ *   - A gap of 3 to 6 days is acknowledged (GAP_SHORT), without blame.
+ *   verify-checkin-openers.
  *
  * v7 - P0, SCOPE-MINOR. The injury opener no longer says "you're rebuilding".
  *
@@ -85,14 +100,11 @@ import { store } from '../store.js';
 
 const REFLECTION_VARIANTS = [
   { id: 'positive-week',        careMode: false,
-    b1: "Have you noticed you moved three times last week — and you said you felt good after each one?",
+    b1: "You've checked in {n} times this past week, and your mood has been good each time.",
     b2: "I'm curious if today has the same feel to it, or if something's shifted." },
   { id: 'mixed-mood-week',      careMode: false,
-    b1: "You moved four times last week — and your mood fluctuated afterwards. Sometimes up, sometimes not.",
+    b1: "You've checked in {n} times this past week, and your mood has moved around. Sometimes up, sometimes not.",
     b2: "I want to understand where today starts before I suggest anything." },
-  { id: 'better-than-expected', careMode: false,
-    b1: "Last time you said you felt better than you expected. I logged that.",
-    b2: "I want to know if today's starting from the same place, or somewhere different." },
   { id: 'worse-than-expected',  careMode: true,
     b1: "You told me last session didn't feel great afterwards.",
     b2: "I'm not going to assume today's the same. How are you feeling going in?" },
@@ -105,12 +117,6 @@ const REFLECTION_VARIANTS = [
   { id: 'mood-improving-flat',  careMode: false,
     b1: "I've noticed your mood's been a little better each check-in, even when the energy hasn't followed.",
     b2: "I want to check in on that before we figure out today." },
-  { id: 'morning-pattern',      careMode: false,
-    b1: "Have you noticed that you nearly always come to this in the mornings? I like that habit.",
-    b2: "I'm curious how this particular morning is sitting." },
-  { id: 'session-adjusted',     careMode: false,
-    b1: "Last time you did less than planned, but you finished. You didn't quit — you adjusted.",
-    b2: "That stuck with me. I'm curious how today's arriving." },
   { id: 'low-in-better-out',    careMode: false,
     b1: "Last time you said you weren't sure you wanted to start — but you did, and you felt better after.",
     b2: "I'm curious if today feels similar going in." },
@@ -257,6 +263,13 @@ const ARRIVAL_LOW = [
   { b1: "You showed up. That's all I needed.",                              b2: null },
 ];
 
+// P8. Three to six days since the last check-in: said, never weighed.
+const GAP_SHORT = [
+  { b1: "It's been {n} days since we last checked in. Nothing to make up — let's just start with today.", b2: null },
+  { b1: "Good to see you. It's been {n} days, and that's fine. We'll start from where you are now.", b2: null },
+  { b1: "{n} days since your last check-in. Whatever they held, today is its own day.", b2: null },
+];
+
 const ARRIVAL_RETURN = [
   { b1: "Hey. Nice to see you. There's no expectation — but if you want to tell me why you've been away, I'm ready to listen.", b2: null },
   { b1: "You came back. Whatever brought you here, it was enough.",         b2: null },
@@ -349,6 +362,11 @@ export function resolveOpening() {
   if (lastEnergy !== null && lastMood !== null && lastEnergy <= 3 && lastMood <= 3) {
     return _pick(ARRIVAL_LOW, 'simple-arrival', true);
   }
+  // P8. A few days away is said, not skipped over as if yesterday.
+  if (gapDays >= 3) {
+    const o = _pick(GAP_SHORT, 'simple-arrival', false);
+    return { ...o, b1: o.b1.replace('{n}', gapDays) };
+  }
   // Note: abandoned-opens trigger requires store.checkin.abandonedOpens
   // (not in schema v7). See ARRIVAL_ABANDONED above. Add once schema updated.
 
@@ -381,7 +399,8 @@ export function resolveOpening() {
   _writeMode(chosen);
 
   switch (chosen) {
-    case 'reflection': return _resolveReflection(checkinHistory, historyKeys);
+    // P8. A reflection with nothing true to say gives way to a neutral line.
+    case 'reflection': return _resolveReflection(checkinHistory, historyKeys) || _resolveHumanistic();
     case 'real-world': return _resolveRealWorld();
     case 'imaginary':  return _resolveImaginary();
     default:           return _resolveHumanistic();
@@ -490,16 +509,17 @@ function _resolveReflection(checkinHistory, historyKeys) {
   if (lastWeekCount >= 3) {
     const moods      = _lastWeekMoods(historyKeys, checkinHistory);
     const allPositive = moods.every(m => m >= 6);
-    return _reflectionV(allPositive ? 'positive-week' : 'mixed-mood-week');
+    return _reflectionV(allPositive ? 'positive-week' : 'mixed-mood-week', { n: lastWeekCount });
   }
 
-  // Day-of-week rotation fallback
-  const fallbacks = ['better-than-expected','session-adjusted','steady-improvement','positive-week','morning-pattern','mixed-mood-week','energy-improving'];
-  return _reflectionV(fallbacks[new Date().getDay() % fallbacks.length]);
+  // P8. Nothing true to reflect on. The weekday rotation that stood here
+  // chose a line that asserted something anyway.
+  return null;
 }
 
 function _reflectionV(id, replacements = {}) {
-  let v = REFLECTION_VARIANTS.find(r => r.id === id) || REFLECTION_VARIANTS[0];
+  const v = REFLECTION_VARIANTS.find(r => r.id === id);
+  if (!v) return null;
   let b1 = v.b1;
   let b2 = v.b2;
   for (const [key, val] of Object.entries(replacements)) {
