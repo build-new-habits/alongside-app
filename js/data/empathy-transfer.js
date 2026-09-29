@@ -1,6 +1,17 @@
 /**
  * data/empathy-transfer.js - Empathy Transfer Prompt Pool
- * 13 Aug 2026 v5
+ * 29 Sep 2026 v6
+ *
+ * v6 - P10, FINISH LINES (persona finding W2-10). Conditions made true;
+ *   no prompt text changed (Graeme's wording stands).
+ *   - goodEnergy now also needs a check-in today, a session done to the
+ *     end, and nothing said to be sore today. "Nothing was in your way
+ *     today" was said after a sore check-in and an early finish, and
+ *     "You had the energy today" to somebody who never said.
+ *   - Prompt C ("You adjust and continue. That's a particular kind of
+ *     intelligence") REQUIRES the adjusting pattern it describes; it was
+ *     only preferred, so session count alone could say it.
+ *   verify-finish-lines.
  *
  * v5 - VOICE-2. Twelve positive-context prompts added to stage 1, all
  *   requiring goodEnergy so none can fire on a hard day. E1 had
@@ -184,7 +195,7 @@ export const EMPATHY_PROMPTS = {
     // Prompt C — when: after 6+ completed sessions, when the user has shown a pattern of adjusting rather than skipping
     {
       text: "The way you train tells me something. Not about your fitness — about how you meet difficulty. You don't avoid it. You adjust and continue. That's a particular kind of intelligence. I think you know that.",
-      requires: ["minSessions:6"],
+      requires: ["minSessions:6", "adjusting"],   // P10: what it describes
       prefers:  ["adjusting"]
     },
     // Prompt D — when: after a particularly difficult session or a return after a longer gap
@@ -497,7 +508,10 @@ function conditionHolds(cond, ctx) {
 
     // Check-in, second.
     case "lowEnergy":           return ctx.lowEnergy === true;
-    case "goodEnergy":          return ctx.lowEnergy === false && ctx.struggled === false;
+    // P10. A good day is one they told us about, finished, and did not
+    // report anything sore on.
+    case "goodEnergy":          return ctx.checkedInToday === true && ctx.lowEnergy === false &&
+                                       ctx.struggled === false && ctx.partial !== true && ctx.soreToday !== true;
     case "checkedInToday":      return ctx.checkedInToday === true;
     case "coachAdjusted":       return ctx.coachAdjusted === true;   // EMP-2
 

@@ -1,7 +1,11 @@
 /**
  * js/views/session-builder-ui.js - Session Builder UI
  *
- * 29 Sep 2026 v25
+ * 29 Sep 2026 v26
+ *
+ * v26 - P10. The sore-zone note says the area the person named at
+ *   check-in ("your knee"), not the zone it maps to ("Quads").
+ *   verify-finish-lines.
  *
  * v25 - P0, SCOPE-MINOR. "Prescribed for you — I don't change these" removed; own exercises are not in built sessions.
  *
@@ -954,6 +958,10 @@ function renderZonePicker() {
   const soreZones = new Set(
     zones.filter(z => z.areas.some(a => soreAreas.has(a))).map(z => z.id)
   );
+  // P10. In their words: the areas they named that these zones cover.
+  const soreNames = [...soreAreas]
+    .filter(a => zones.some(z => soreZones.has(z.id) && z.areas.includes(a)))
+    .map(a => String(getConditionName(a) || a).toLowerCase());
 
   // ARC-RENAME REGRESSION, 04 Sep 2026. This read store.get("stretchArc")
   // at HEAD, and that field stopped existing in store.js v63 -- it was
@@ -1008,8 +1016,8 @@ function renderZonePicker() {
 
       ${soreZones.size ? `
         <p class="sb-zone-note" id="${p_soreNote}">
-          You told me ${[...soreZones].map(id => (zones.find(z => z.id === id) || {}).label).filter(Boolean).join(" and ")}
-          ${soreZones.size === 1 ? "is" : "are"} sore today. Still fine to choose \u2014 I'll keep it gentle.
+          You told me your ${soreNames.join(" and ")}
+          ${soreNames.length === 1 ? "is" : "are"} sore today. Still fine to choose \u2014 I'll keep it gentle.
         </p>
       ` : ""}
 

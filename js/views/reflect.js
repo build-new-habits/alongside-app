@@ -1,6 +1,15 @@
 /**
  * reflect.js - Reflect Screen
  *
+ * 29 Sep 2026 v8
+ *
+ * v8 - P10, FINISH LINES (persona finding W2-10). "You finished it" is
+ *   said only when they did: a session ended early hears that stopping
+ *   when they needed to is part of it. The empathy context now knows
+ *   whether the session was partial and whether something was sore at
+ *   today's check-in, so a "good day" reflection is never said after
+ *   either (data/empathy-transfer.js v6). verify-finish-lines.
+ *
  * 28 Sep 2026 v7
  *
  * v7 - SMOOTH-P2d. One finish screen. Spec 4.4.
@@ -352,10 +361,16 @@ function buildEmpathyContext(sessionCount) {
     && new Date(gen.builtAt).toDateString() === new Date().toDateString();
   const coachAdjusted = Boolean(builtToday && gen.session?.rationale?.adjusted);
 
+  // P10. What a "good day" reflection would contradict: a session ended
+  // early, or something the person said was sore at today's check-in.
+  const partial   = (store.get("currentActivityEntry") || {}).status === "partial";
+  const scores    = store.get("conditionPainScores") || {};
+  const soreToday = checkedInToday && Object.values(scores).some(n => Number(n) > 0);
+
   return {
     sessionCount, struggled, lowEnergy, checkedInToday,
     returning, sustainedDifficulty, variablePattern, adjusting, gentleSession,
-    coachAdjusted,
+    coachAdjusted, partial, soreToday,
   };
 }
 
@@ -513,6 +528,13 @@ function skipEmpathyPrompt(sessionCount) {
  * place; the lines are flagged for Graeme's voice review. If a planner
  * ever reads these answers, the promise can come back with it.
  */
+// P10. "You finished it" only when they did.
+function _hardLine(entry) {
+  return entry && entry.status === "partial"
+    ? "Hard sessions count just as much as easy ones. Stopping when you needed to is part of it."
+    : "Hard sessions count just as much as easy ones. You finished it. That is what matters.";
+}
+
 function buildSummary(entry, feel, pain, moodAfterValue) {
   const log       = store.get("activityLog") || [];
   const thisWeek  = log.filter(e => {
@@ -582,7 +604,7 @@ function buildSummary(entry, feel, pain, moodAfterValue) {
         : "Strong session.";
     }
     if (feel === "hard" || feel === "struggled") {
-      return "Hard sessions count just as much as easy ones. You finished it. That is what matters.";
+      return _hardLine(entry);
     }
     if (feel === "right") {
       return durRef
@@ -597,7 +619,7 @@ function buildSummary(entry, feel, pain, moodAfterValue) {
       : "You were strong today.";
   }
   if (feel === "hard" || feel === "tough") {
-    return "Hard sessions count just as much as easy ones. You finished it. That is what matters.";
+    return _hardLine(entry);
   }
 
   if (sessionCount >= 3) {
