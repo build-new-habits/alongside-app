@@ -1,7 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 29 Sep 2026 v578
+ * 29 Sep 2026 v579
+ *
+ * v579 - P11 ONBOARDING-ECHOES. New: tools/verify-onboarding-echoes.mjs.
+ *   Changed: data/onboarding-thread-data, settings (v43). 206 gates.
  *
  * v578 - P10 FINISH-LINES. New: tools/verify-finish-lines.mjs. Changed:
  *   reflect, data/empathy-transfer, session-builder-ui. 205 gates.
@@ -4062,7 +4065,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v578";
+const CACHE_NAME = "alongside-v579";
 
 const SHELL_URLS = [
 
