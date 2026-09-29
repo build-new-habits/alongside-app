@@ -1,6 +1,12 @@
 /**
  * settings.js
- * 29 Sep 2026 v44
+ * 29 Sep 2026 v45
+ *
+ * v45 - P19, "MOSTLY THE SAME". The option's hint said "About two thirds of
+ *   a session repeats from the last one"; the setting now holds the warm-
+ *   up, sections and doses and repeats about nine tenths, measured over
+ *   ten sessions. It says so: "Most of each session repeats from the last
+ *   one, and it starts the same way. A move changes now and then."
  *
  * v44 - P14. The check-in no longer asks how much sessions should change;
  *   this row is the one place it is set. Its hint said "The coach also
@@ -1088,7 +1094,7 @@ export function SettingsView(router) {
 
     const VARIETY_OPTIONS = [
       { id: 'familiar', label: 'Mostly the same each time',
-        hint: 'About two thirds of a session repeats from the last one.' },
+        hint: 'Most of each session repeats from the last one, and it starts the same way. A move changes now and then.' },
       { id: 'balanced', label: 'A bit of both',
         hint: 'Some familiar work, some new. This is the default.' },
       { id: 'varied',   label: 'Something different each time',

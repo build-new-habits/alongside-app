@@ -1,7 +1,22 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
- * 29 Sep 2026 v62
+ * 29 Sep 2026 v63
+ *
+ * v63 - P19, "MOSTLY THE SAME" (persona finding W2-14). Four changes, all
+ *   in selection:
+ *   - SECTION. A move the person has done keeps the section they did it
+ *     in (exerciseHistory .section, store v85), on every setting: a warm-
+ *     up stretch is not tomorrow's cool-down with a different dose.
+ *   - "Mostly the same" holds the warm-up and cool-down too
+ *     (SECTION_SCALE familiar 0.15 -> 0), and among familiar moves prefers
+ *     the ones done LAST TIME, not the least-met -- that rule rotated the
+ *     warm-up through everything seen in three weeks.
+ *   - Mastery, for "mostly the same", lets at most two moves go per
+ *     session (the two done most often), not every move that reached it
+ *     together (a 10% session after a run of 90% ones).
+ *   - A move is never chosen beside its own suffixed twin ("Clamshell"
+ *     and "Clamshell — Glute Activation").
  *
  * v62 - P17, MOBILITY DOOR (persona finding W2-12). The person's own gates
  *   (partner, "not again", impact, floor, balance, seated, legs) are
@@ -3566,6 +3581,11 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
     return [{ ...picked, _feature: true }];
   }
 
+  // P19. Decided once per session (first section to ask), used by every
+  // section: which mastered moves "mostly the same" lets go of today.
+  let _familiarRelease;
+  let _familiarLatest;
+
   function selectFromCategories(categories, section, count, alreadyChosen) {
     const chosen = alreadyChosen || new Set();
     const prefs  = store.get("exercisePreferences") || {};
@@ -3639,6 +3659,20 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
         if (GYM_SESSION_TYPES.has(sessionType)) {
           const onDiscipline = pulsePool.filter(e => !_offDisciplineForGym(e));
           if (onDiscipline.length > 0) pulsePool = onDiscipline;
+        }
+
+        // P19. "Mostly the same" opens as last time did: the pulse-raiser
+        // done most recently, if it is still in reach. Read directly --
+        // `variety` and isAnchor() are declared below this slot.
+        if ((store.get("sessionVariety") || "balanced") === "familiar") {
+          const recent = pulsePool.filter(e => {
+            const q = store.exerciseStats(e.id);
+            return q.seen && q.daysSince !== null && q.daysSince <= 21 && (!q.section || q.section === "warmup");
+          });
+          if (recent.length > 0) {
+            const latest = recent.reduce((m, e) => (store.exerciseStats(e.id).last || "") > m ? store.exerciseStats(e.id).last : m, "");
+            pulsePool = recent.filter(e => store.exerciseStats(e.id).last === latest);
+          }
         }
 
         const chosenPulse = pulsePool[Math.floor(Math.random() * pulsePool.length)];
@@ -3759,9 +3793,14 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
     // third of the section rotation; 'balanced' and 'varied' are
     // unchanged, so 2.15's slot anchoring and 2.13's novelty are both
     // untouched -- she chose neither of those settings.
-    const SECTION_SCALE = { familiar: 0.15, balanced: 1.0, varied: 1.0 };
+    // P19, 29 Sep 2026: familiar 0.15 -> 0. "Mostly the same" measured the
+    // warm-up as last time's in 0 of 72 transitions; the opening is what
+    // persona 2.14 notices first.
+    const SECTION_SCALE = { familiar: 0, balanced: 1.0, varied: 1.0 };
     const sectionScale = SECTION_SCALE[variety] ?? 1.0;
-    const noveltyRate = Math.min(
+    // P19. "Mostly the same" opens exactly as last time: no novel slot in
+    // the warm-up. Warm-ups still rotate, gradually, through mastery.
+    const noveltyRate = (variety === "familiar" && section === "warmup") ? 0 : Math.min(
       1,
       baseNovelty + (SECTION_NOVELTY[section] ?? 0) * sectionScale
     );
@@ -3790,10 +3829,33 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
     // session, not by reading the file.
     const wantsGymDiscipline = GYM_SESSION_TYPES.has(sessionType);
 
+    // P19. "Mostly the same": mastery rotates at most TWO moves out per
+    // session -- the two done most often among last time's -- instead of
+    // every move that reached the threshold together (measured: a 10%
+    // session after a run of 90% ones). A mastered move that was not in
+    // last time's session has already rotated out and stays out.
+    if (_familiarRelease === undefined) {
+      _familiarRelease = null;
+      if (variety === "familiar") {
+        const h = store.get("exerciseHistory") || {};
+        const latest = Object.values(h).reduce((m, v) => (v.last || "") > m ? v.last : m, "");
+        _familiarLatest = latest;
+        _familiarRelease = new Set(Object.entries(h)
+          .filter(([, v]) => (v.n || 0) >= MASTERY_THRESHOLD && v.last === latest)
+          .sort((a, b) => (b[1].n || 0) - (a[1].n || 0) || String(a[1].first).localeCompare(String(b[1].first)) || a[0].localeCompare(b[0]))
+          .slice(0, 2).map(([id]) => id));
+      }
+    }
+    const _mastered = (ex, s) => {
+      if (s.n < MASTERY_THRESHOLD) return false;
+      if (variety !== "familiar") return true;
+      return s.last !== _familiarLatest || _familiarRelease.has(ex.id);
+    };
+
     function isAnchor(ex) {
       const s = store.exerciseStats(ex.id);
       if (!s.seen) return false;
-      if (s.n >= MASTERY_THRESHOLD) return false;
+      if (_mastered(ex, s)) return false;
       if (s.daysSince !== null && s.daysSince > CONTINUITY_WINDOW_DAYS) return false;
       return true;
     }
@@ -3819,9 +3881,26 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
       // `matched.push({ ...ex })` created by spreading one entry into
       // several per-category copies. That one was invisible to an
       // identity check; this one is invisible to an id check.
-      const usedNames = new Set(selected.map(e => e.name));
-      const distinct = pool.filter(e => !usedNames.has(e.name));
+      // P19: the whole session so far, not only this section.
+      const usedNames = new Set([...selected.map(e => e.name),
+        ...[...chosen].map(id => (EXERCISES.find(x => x.id === id) || {}).name).filter(Boolean)]);
+      // P19. Nor a move beside its own suffixed twin: "Clamshell" and
+      // "Clamshell — Glute Activation" are one movement to the person.
+      // Two suffixed variants (Leg Swing — Lateral / — Forward and Back)
+      // are different movements and stay allowed.
+      const _plain = n => String(n).toLowerCase().trim();
+      const _stem  = n => _plain(n).split(/\s+[—–-]\s+/)[0].trim();
+      const usedPlain = new Set([...usedNames].map(_plain));
+      const usedStems = new Set([...usedNames].map(_stem));
+      const distinct = pool.filter(e => !usedNames.has(e.name) &&
+        !usedPlain.has(_stem(e.name)) && !usedStems.has(_plain(e.name)));
       if (distinct.length > 0) pool = distinct;
+
+      // P19. A move the person has done keeps its section: a warm-up
+      // stretch is not tomorrow's cool-down with a different dose.
+      // Preference, never emptying the pool.
+      const inSection = pool.filter(e => { const q = store.exerciseStats(e.id).section; return !q || q === section; });
+      if (inSection.length > 0) pool = inSection;
 
       // Equipment preference (CON-8) decides WHICH pool we choose from,
       // continuity decides which member of it.
@@ -3982,6 +4061,13 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
 
       if (Math.random() >= noveltyRate) {
         const anchors = candidates.filter(isAnchor);
+        // P19. "Mostly the same": last time's moves first.
+        if (anchors.length > 0 && variety === "familiar") {
+          const lastOf = e => store.exerciseStats(e.id).last || "";
+          const latest = anchors.reduce((m, e) => lastOf(e) > m ? lastOf(e) : m, "");
+          const recent = anchors.filter(e => lastOf(e) === latest);
+          return recent[Math.floor(Math.random() * recent.length)];
+        }
         if (anchors.length > 0) {
           // Among anchors, prefer the one met least often, so a person
           // building familiarity across several movements does not get

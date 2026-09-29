@@ -1,6 +1,10 @@
 /**
  * workout.js - Workout Execution View
- * 29 Sep 2026 v26
+ * 29 Sep 2026 v27
+ *
+ * v27 - P19, "MOSTLY THE SAME" (persona finding W2-14). A finished
+ *   session tells the store which section each move was done in
+ *   (exerciseSections), so a familiar move stays in its section.
  *
  * v26 - P18, "NOT AGAIN" (persona finding W2-13). Settings promises: "When
  *   you skip something, the coach offers to see it less often -- or not
@@ -1331,6 +1335,10 @@ function completeWorkout() {
     // CONT-1: which exercises, not only how many. Routed into
     // exerciseHistory by logActivity() on completion only.
     exerciseIds:  (workout.exercises || []).map(e => e.id).filter(Boolean),
+    // P19. Where each was done, so a familiar move keeps its section.
+    // Forwarded to exerciseHistory by logActivity(); not stored on the entry.
+    exerciseSections: Object.fromEntries((workout.exercises || []).filter(e => e && e.id)
+      .map(e => [e.id, e.section || e.role || "main"])),
     // SMOOTH-P2d. For "That's today done": what was actually done.
     exercisesCount: progress.length,
     setsDone:       progress.reduce((n, e) => n + (e.sets || 1), 0)

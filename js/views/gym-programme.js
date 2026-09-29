@@ -1,6 +1,10 @@
 /**
  * gym-programme.js
- * 29 Sep 2026 v16
+ * 29 Sep 2026 v17
+ *
+ * v17 - P19, "MOSTLY THE SAME" (persona finding W2-14). A finished
+ *   session tells the store which section each move was done in
+ *   (exerciseSections), so a familiar move stays in its section.
  *
  * v16 - P12. The programme badge ("Build Your Base · Week 2 · Session A")
  *   is shown on the Plan only; on Free a leftover programme shapes
@@ -1281,6 +1285,12 @@ export function GymProgrammeView(router) {
       exerciseIds:    [...completedExerciseIndices]
                         .map(i => session.exercises[i]?.id)
                         .filter(Boolean),
+      // P19. Where each was done, so a familiar move keeps its section.
+      // Forwarded to exerciseHistory by logActivity(); not stored.
+      exerciseSections: Object.fromEntries([...completedExerciseIndices]
+                        .map(i => session.exercises[i])
+                        .filter(e => e && e.id)
+                        .map(e => [e.id, e.section || e.role || 'main'])),
       moodAfter:      null,
       isEvent:        false,
       eventName:      null,
