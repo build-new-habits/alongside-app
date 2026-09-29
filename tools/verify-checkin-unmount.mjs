@@ -1,6 +1,13 @@
 /**
  * tools/verify-checkin-unmount.mjs
- * 29 Sep 2026 v3
+ * 29 Sep 2026 v4
+ *
+ * v4 - My v3 fault, found by a fresh-clone run under load. Tests 1 and 2
+ *   counted lines in the check-in's OWN container after leaving -- a
+ *   container the stubbed router never clears, though the real one does
+ *   as the next screen mounts. A line already in flight landed there:
+ *   invisible to anybody, red here. They now do what test 3 does: put the
+ *   next screen in the container, and assert it stays alone.
  *
  * v3 - P14. The variety question was the last panel the check-in built on
  *   document.body, and it is gone: every answer is inline. The fault this
@@ -94,7 +101,6 @@ const tapLabel = async re => {
 // Everything on the page outside #app: where a leftover would sit.
 const outside = () => [...document.body.children].filter(n => n.id !== "app").length;
 const BASE_OUTSIDE = outside();
-const bubbles = () => document.querySelectorAll("#app .ci-bubble, #app [class*='ci-bubble'], #app .ci-choice, #app button").length;
 
 async function startCheckin() {
   localStorage.clear(); store.init();
@@ -121,20 +127,23 @@ ok("0a. the first question was answered in the check-in", answered);
 // ── 1. LEAVING BY THE HOUSE BUTTON ──────────────────────────────────────
 console.log("\nTEST 1 - leave mid-question for Home");
 await router.navigate("today");
-const atLeave = bubbles();
+// What the router does as the next screen mounts (stubbed above).
+const nextScreen = () => { const a = document.getElementById("app"); a.innerHTML = "<p id='next-stand-in'>Next</p>"; };
+const alone = () => { const a = document.getElementById("app"); return a.children.length === 1 && !!a.querySelector("#next-stand-in"); };
+nextScreen();
 await wait(2500);
 ok("1a. nothing is left on the page outside the view", leftovers() === 0 && outside() === BASE_OUTSIDE,
    `${leftovers()} panel/overlay, ${outside() - BASE_OUTSIDE} extra node(s) on document.body`);
-ok("1b. nothing the check-in scheduled lands after leaving", bubbles() === atLeave, `${atLeave} -> ${bubbles()}`);
+ok("1b. nothing the check-in scheduled lands on the next screen", alone(), document.getElementById("app").innerHTML.slice(0, 160));
 
 // ── 2. EVERY OTHER WAY OUT ──────────────────────────────────────────────
 console.log("\nTEST 2 - every other way out");
 for (const dest of ["progress", "noticing", "settings", "coach-proposal", "session-builder"]) {
   await startCheckin();
   await router.navigate(dest);
-  const n = bubbles();
+  nextScreen();
   await wait(1500);
-  ok(`2. leaving for ${dest} leaves nothing behind`, leftovers() === 0 && outside() === BASE_OUTSIDE && bubbles() === n);
+  ok(`2. leaving for ${dest} leaves nothing behind`, leftovers() === 0 && outside() === BASE_OUTSIDE && alone());
 }
 
 // ── 3. NOTHING OPENS LATER ──────────────────────────────────────────────
