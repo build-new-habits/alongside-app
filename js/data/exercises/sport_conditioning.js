@@ -20,7 +20,13 @@
  * available through cardio sessions and the sport pathways.
  **
  * data/exercises/sport_conditioning.js
- * 29 Sep 2026 v4
+ * 29 Sep 2026 v5
+ *
+ * v5 - P16, DATA TAGS (W2-6). Sprint, cutting and jumping drills are
+ *   impact; circuits with press-ups or burpees, and the two cool-downs
+ *   that lie supine, are floor; drills that need
+ *   another person carry partner: true, which the builder never proposes.
+ *   verify-data-tags reads every entry.
  *
  * v4 - P0h. Descriptions say what a movement does, not what it treats:
  *   no rehab, healing, pain relief, recovery phases, named diagnoses
@@ -107,7 +113,7 @@ export const SPORT_CONDITIONING = [
   {
     id: 'drill-t-drill',
     position: 'standing',
-    impact: false,
+    impact: true,
     balanceDemand: false,
     name: 'T-Drill',
     youtube: 't-drill technique',
@@ -472,7 +478,7 @@ export const SPORT_CONDITIONING = [
   {
     id: 'saq-falling-start',
     position: 'standing',
-    impact: false,
+    impact: true,
     balanceDemand: false,
     name: 'Falling Start',
     youtube: 'falling start drill technique',
@@ -513,6 +519,7 @@ export const SPORT_CONDITIONING = [
     position: 'standing',
     impact: true,
     balanceDemand: false,
+    partner: true,   // P16: needs another person
     name: 'Resisted Sprint — Partner or Sled',
     youtube: 'resisted sprint - partner or sled drill technique',
     category: 'cardio',
@@ -670,6 +677,7 @@ export const SPORT_CONDITIONING = [
     position: 'standing',
     impact: false,
     balanceDemand: false,
+    partner: true,   // P16: needs another person
     name: 'Mirror Drill',
     youtube: 'mirror drill technique',
     category: 'cardio',
@@ -712,7 +720,7 @@ export const SPORT_CONDITIONING = [
   {
     id: 'sport-warmup-general',
     position: 'standing',
-    impact: false,
+    impact: true,
     balanceDemand: false,
     name: 'General Pre-Sport Warm-Up',
     youtube: 'general pre-sport warm-up drill technique',
@@ -756,7 +764,7 @@ export const SPORT_CONDITIONING = [
   {
     id: 'sport-warmup-lower-body',
     position: 'standing',
-    impact: false,
+    impact: true,
     balanceDemand: false,
     name: 'Lower Body Activation Warm-Up',
     youtube: 'lower body activation warm-up drill technique',
@@ -839,7 +847,7 @@ export const SPORT_CONDITIONING = [
 
   {
     id: 'sport-cooldown-general',
-    position: 'standing',
+    position: 'floor',
     impact: false,
     balanceDemand: false,
     name: 'General Post-Sport Cool-Down',
@@ -882,7 +890,7 @@ export const SPORT_CONDITIONING = [
 
   {
     id: 'sport-cooldown-running',
-    position: 'standing',
+    position: 'floor',
     impact: true,
     balanceDemand: false,
     name: 'Post-Run Cool-Down Routine',
@@ -925,8 +933,9 @@ export const SPORT_CONDITIONING = [
   {
     id: 'sport-session-football-conditioning',
     position: 'standing',
-    impact: false,
+    impact: true,
     balanceDemand: false,
+    partner: true,   // P16: needs another person
     name: 'Football Conditioning Session',
     youtube: 'football conditioning session drill technique',
     category: 'cardio',
@@ -1009,7 +1018,7 @@ export const SPORT_CONDITIONING = [
   {
     id: 'drill-cutting-movement',
     position: 'standing',
-    impact: false,
+    impact: true,
     balanceDemand: false,
     name: 'Cutting Drill',
     youtube: 'cutting drill technique',
@@ -1049,7 +1058,7 @@ export const SPORT_CONDITIONING = [
   {
     id: 'drill-zig-zag-run',
     position: 'standing',
-    impact: false,
+    impact: true,
     balanceDemand: false,
     name: 'Zig-Zag Run',
     youtube: 'zig-zag run drill technique',
@@ -1166,8 +1175,9 @@ export const SPORT_CONDITIONING = [
   {
     id: 'drill-partner-chase',
     position: 'standing',
-    impact: false,
+    impact: true,
     balanceDemand: false,
+    partner: true,   // P16: needs another person
     name: 'Partner Chase Drill',
     youtube: 'partner chase drill technique',
     category: 'cardio',
@@ -1243,8 +1253,9 @@ export const SPORT_CONDITIONING = [
   {
     id: 'drill-defensive-footwork',
     position: 'standing',
-    impact: false,
+    impact: true,
     balanceDemand: false,
+    partner: true,   // P16: needs another person
     name: 'Defensive Footwork Circuit',
     youtube: 'defensive footwork circuit drill technique',
     category: 'cardio',
@@ -1289,8 +1300,8 @@ export const SPORT_CONDITIONING = [
 
   {
     id: 'circuit-amrap-bodyweight',
-    position: 'standing',
-    impact: false,
+    position: 'floor',
+    impact: true,
     balanceDemand: false,
     name: 'AMRAP Bodyweight Circuit',
     youtube: 'amrap bodyweight circuit drill technique',
@@ -1330,7 +1341,7 @@ export const SPORT_CONDITIONING = [
 
   {
     id: 'circuit-emom-strength',
-    position: 'standing',
+    position: 'floor',
     impact: false,
     balanceDemand: false,
     name: 'EMOM Strength Circuit',
@@ -1370,8 +1381,8 @@ export const SPORT_CONDITIONING = [
 
   {
     id: 'sport-conditioning-tabata',
-    position: 'standing',
-    impact: false,
+    position: 'floor',
+    impact: true,
     balanceDemand: false,
     name: 'Tabata — Sport Conditioning',
     youtube: 'tabata - sport conditioning drill technique',
@@ -1410,8 +1421,8 @@ export const SPORT_CONDITIONING = [
 
   {
     id: 'power-endurance-circuit',
-    position: 'standing',
-    impact: false,
+    position: 'floor',
+    impact: true,
     balanceDemand: false,
     name: 'Power Endurance Circuit',
     youtube: 'power endurance circuit drill technique',
@@ -1685,7 +1696,7 @@ export const SPORT_CONDITIONING = [
   {
     id: 'sport-warmup-dynamic-full',
     position: 'standing',
-    impact: false,
+    impact: true,
     balanceDemand: false,
     name: 'Dynamic Warm-Up — Full Session',
     youtube: 'dynamic warm-up - full session drill technique',
@@ -1891,7 +1902,7 @@ export const SPORT_CONDITIONING = [
 
   {
     id: 'strength-endurance-circuit',
-    position: 'standing',
+    position: 'floor',
     impact: false,
     balanceDemand: false,
     name: 'Strength-Endurance Circuit',
@@ -2052,7 +2063,7 @@ export const SPORT_CONDITIONING = [
   {
     id: 'conditioning-high-low',
     position: 'standing',
-    impact: false,
+    impact: true,
     balanceDemand: false,
     name: 'High-Low Conditioning',
     youtube: 'high-low conditioning drill technique',

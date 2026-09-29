@@ -1,6 +1,11 @@
 /**
  * data/exercises/cardio.js
- * 29 Sep 2026 v5
+ * 29 Sep 2026 v6
+ *
+ * v6 - P16, DATA TAGS (W2-6). Tags now agree with the words: Burpee and the
+ *   HIIT and circuit sessions (burpees, mountain climbers) are floor;
+ *   Jumping Jacks, Skipping and those sessions are impact.
+ *   verify-data-tags reads every entry.
  *
  * v5 - P0h. Descriptions say what a movement does, not what it treats:
  *   no rehab, healing, pain relief, recovery phases, named diagnoses
@@ -48,7 +53,7 @@ export const CARDIO = [
   {
     id: 'jumping-jacks',
     position: 'standing',
-    impact: false,
+    impact: true,
     balanceDemand: false,
     name: 'Jumping Jacks',
     youtube: 'jumping jacks exercise technique',
@@ -152,7 +157,7 @@ export const CARDIO = [
 
   {
     id: 'burpee',
-    position: 'standing',
+    position: 'floor',
     impact: true,
     balanceDemand: false,
     name: 'Burpee',
@@ -226,7 +231,7 @@ export const CARDIO = [
   {
     id: 'skipping-rope',
     position: 'standing',
-    impact: false,
+    impact: true,
     balanceDemand: false,
     name: 'Skipping',
     youtube: 'skipping exercise technique',
@@ -511,8 +516,8 @@ export const CARDIO = [
 
   {
     id: 'hiit-30-30',
-    position: 'standing',
-    impact: false,
+    position: 'floor',
+    impact: true,
     balanceDemand: false,
     name: 'HIIT — 30:30 Intervals',
     youtube: 'hiit - 3030 intervals exercise technique',
@@ -805,8 +810,8 @@ export const CARDIO = [
 
   {
     id: 'cardio-circuit-training',
-    position: 'standing',
-    impact: false,
+    position: 'floor',
+    impact: true,
     balanceDemand: false,
     name: 'Cardio Circuit — No Equipment',
     youtube: 'cardio circuit - no equipment exercise technique',
@@ -880,8 +885,8 @@ export const CARDIO = [
 
   {
     id: 'cardio-hiit-session',
-    position: 'standing',
-    impact: false,
+    position: 'floor',
+    impact: true,
     balanceDemand: false,
     name: 'HIIT — 20 Minute Session',
     youtube: 'hiit - 20 minute session exercise technique',

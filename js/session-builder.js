@@ -1,7 +1,12 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
- * 29 Sep 2026 v60
+ * 29 Sep 2026 v61
+ *
+ * v61 - P16, DATA TAGS (persona finding W2-6). _filterCandidates never
+ *   proposes an exercise flagged partner: true -- Alongside is used alone.
+ *   With the corrected floor and impact tags, the existing capability
+ *   filters now keep those moves from people they are not for.
  *
  * v60 - P9, PLAN SENTENCES (persona finding W2-10). The sentence over a
  *   plan named movements the plan did not have ("Hinging, bridging,
@@ -2883,6 +2888,9 @@ function _filterCandidates(categories, section, equipSet, conditionSet, sectionR
     if (isSessionLength(ex) && !opts.allowSessionLength) return false;
 
     if (prefs[ex.id]?.preference === "avoid") return false;
+    // P16. Alongside is used alone: a drill that needs another person is
+    // never proposed (Mirror Drill, Partner Chase, Resisted Sprint...).
+    if (ex.partner === true) return false;
     if (impactGated && isImpact(ex)) return false;
     if (cap.asked && !cap.floorSafe   && isFloor(ex))   return false;
     if (cap.asked && !cap.balanceSafe && isBalance(ex)) return false;

@@ -1,6 +1,10 @@
 /**
  * data/exercises/mobility.js
- * 29 Sep 2026 v5
+ * 29 Sep 2026 v6
+ *
+ * v6 - P16, DATA TAGS (W2-6). 90-90 Hip Stretch ("Sit on the floor"),
+ *   World's Greatest Stretch ("knee on the floor") and Inchworm (a plank)
+ *   are tagged floor. verify-data-tags reads every entry.
  *
  * v5 - P0h. Descriptions say what a movement does, not what it treats:
  *   no rehab, healing, pain relief, recovery phases, named diagnoses
@@ -127,7 +131,7 @@ export const MOBILITY = [
 
   {
     id: '90-90-hip-stretch',
-    position: 'seated',
+    position: 'floor',
     impact: false,
     balanceDemand: false,
     name: '90-90 Hip Stretch',
@@ -298,7 +302,7 @@ export const MOBILITY = [
 
   {
     id: 'inchworm',
-    position: 'standing',
+    position: 'floor',
     impact: false,
     balanceDemand: false,
     name: 'Inchworm',
@@ -798,7 +802,7 @@ export const MOBILITY = [
 
   {
     id: 'worlds-greatest-stretch',
-    position: 'standing',
+    position: 'floor',
     impact: false,
     balanceDemand: false,
     name: "World's Greatest Stretch",

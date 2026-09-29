@@ -1,5 +1,12 @@
 /**
  * tools/verify-gym-reach.mjs
+ * 29 Sep 2026 v2
+ *
+ * v2 - P16. A second, named exception to test 4: an entry flagged
+ *   partner: true is never proposed (Alongside is used alone), so it is
+ *   "declared, available, never offered" by design. 4e holds that line:
+ *   the only partner entries out of the pools are the flagged ones.
+ *
  * 28 Sep 2026 v1
  *
  * Work list 5. GYM-REACH-1: cardio at the gym uses the machines, and the
@@ -150,12 +157,16 @@ ok("4a. fixture reach: a real set of kit-gated entries", components.length > 120
 // marked generalPurpose; conditionProgrammes.js offers them by the area
 // they work. So an exception must have an area, or nothing can reach it.
 const rehab = e => e.category === "rehabilitation" && e.generalPurpose !== true;
-const unoffered = components.filter(e => !pooled.has(e.id) && !rehab(e));
+// P16. Needs another person: never proposed, by design.
+const partner = e => e.partner === true;
+const unoffered = components.filter(e => !pooled.has(e.id) && !rehab(e) && !partner(e));
 ok("4b. every kit-gated component is offered by some session type when its kit is declared",
    unoffered.length === 0, unoffered.map(e => `${e.id}[${e.equipment}]`).join(", "));
 const rehabOnly = components.filter(e => !pooled.has(e.id) && rehab(e));
 ok("4c. the only exceptions are rehabilitation entries, each with an area a condition programme can reach it by",
    rehabOnly.every(e => (e.affectsAreas || []).length > 0), rehabOnly.map(e => `${e.id}:${(e.affectsAreas || []).join("/")}`).join(", "));
+ok("4e. and no partner-flagged entry reaches a pool", !components.some(e => partner(e) && pooled.has(e.id)),
+   components.filter(e => partner(e) && pooled.has(e.id)).map(e => e.id).join(", "));
 const machineBlocksPooled = blocks.filter(e => pooled.has(e.id));
 ok("4d. and every long machine block is in a pool (Gym's or Cardio's feature slot)", machineBlocksPooled.length === blocks.length,
    blocks.filter(e => !pooled.has(e.id)).map(e => e.id).join(", "));

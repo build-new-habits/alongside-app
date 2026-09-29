@@ -1,5 +1,10 @@
 /**
  * data/exercises/running.js
+ * 29 Sep 2026 v3
+ *
+ * v3 - P16, DATA TAGS (W2-6). Bounding is impact ("drive into the next
+ *   bound"). verify-data-tags reads every entry.
+ *
  * 11 Aug 2026 v2
  *
  * v2 - CON-9. watchOut and load added to all 35 entries including the full C25K programme. Written to the Exercise
@@ -883,7 +888,7 @@ export const RUNNING = [
   {
     id: 'run-drill-bounding',
     position: 'standing',
-    impact: false,
+    impact: true,
     balanceDemand: false,
     name: 'Bounding',
     youtube: 'bounding running drill technique',

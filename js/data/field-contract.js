@@ -1,6 +1,8 @@
 /**
  * data/field-contract.js
- * 29 Sep 2026 v5
+ * 29 Sep 2026 v6
+ *
+ * v6 - P16. `partner` declared: a library flag, never proposed by the builder.
  *
  * v5 - P14. sessionVariety's writer is Settings; the check-in no longer asks.
  *
@@ -283,6 +285,11 @@ export const FIELD_CONTRACT = {
     meaning: "'active' means keep moving through the rest rather than stopping. It was previously smuggled into the rest string as '90s active', so migrating rest to a number would have deleted it from four exercises. Coaching content, said in words on the card, never folded back into the number."
   },
 
+  "partner": {
+    values: [true],
+    writer: "js/data/exercises/*.js (library data)",
+    meaning: "The exercise needs another person (a mirror drill, a partner chase, a partner holding a resistance band). Absent means it can be done alone. session-builder.js _filterCandidates never proposes one: Alongside is used alone. P16."
+  },
   "sessionVariety": {
     values: ["familiar", "balanced", "varied"],
     writer: "views/settings.js (How you like things; the check-in stopped asking at P14)",

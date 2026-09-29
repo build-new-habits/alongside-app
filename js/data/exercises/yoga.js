@@ -1,6 +1,9 @@
 /**
  * data/exercises/yoga.js
- * 29 Sep 2026 v6
+ * 29 Sep 2026 v7
+ *
+ * v7 - P16, DATA TAGS (W2-6). Sun Salutation B (chaturanga, upward dog) is
+ *   floor. verify-data-tags reads every entry.
  *
  * v6 - P0h. Descriptions say what a movement does, not what it treats:
  *   no rehab, healing, pain relief, recovery phases, named diagnoses
@@ -836,7 +839,7 @@ export const YOGA = [
 
   {
     id: 'yoga-sun-salutation-b',
-    position: 'standing',
+    position: 'floor',
     impact: false,
     balanceDemand: false,
     name: 'Sun Salutation B',

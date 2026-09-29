@@ -1,6 +1,10 @@
 /**
  * data/exercises/strength.js
- * 29 Sep 2026 v9
+ * 29 Sep 2026 v10
+ *
+ * v10 - P16, DATA TAGS (W2-6). Reactive Change of Direction needs a
+ *   partner to point: partner: true, which the builder never proposes.
+ *   verify-data-tags reads every entry.
  *
  * v9 - P0h. Descriptions say what a movement does, not what it treats:
  *   no rehab, healing, pain relief, recovery phases, named diagnoses
@@ -1840,6 +1844,7 @@ export const STRENGTH = [
     position: 'standing',
     impact: true,
     balanceDemand: false,
+    partner: true,   // P16: needs another person
     name: 'Reactive Change of Direction',
     youtube: 'reactive change of direction exercise technique',
     category: 'cardio',
