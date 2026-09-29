@@ -1,7 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 29 Sep 2026 v588
+ * 29 Sep 2026 v589
+ *
+ * v589 - P21. Built and saved sessions play in the coach's player; the
+ *   saved list reads the log (workout v28, saved-sessions v6).
  *
  * v588 - P20. Coming back after a week is asked about on every tier
  *   (programmeEngine v9, coach-proposal v39).
@@ -4093,7 +4096,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v588";
+const CACHE_NAME = "alongside-v589";
 
 const SHELL_URLS = [
 
