@@ -170,6 +170,10 @@ const BASELINE = new Set([
   // The Save handlers that named them literally are gone with the Save
   // buttons. Same limit as weightTracking above -- not debt.
   'ageBand', 'gender', 'showPersonalBests',
+  // sessionVariety -- ADDED 29 Sep 2026, P14. Its literal writer was the
+  // check-in's variety question, now removed; Settings writes it through
+  // the same [data-field] handler. verify-three-questions DRIVES that write.
+  'sessionVariety',
   // targetDate — MIGRATION-ONLY as of 22 Aug 2026 (CHOOSER-1). Read by
   // store.js's one-way TARGET-4 migration for historic installs; its
   // writer was retired with onboarding/goal-setup.js, which had never

@@ -1,6 +1,8 @@
 /**
  * data/field-contract.js
- * 29 Sep 2026 v4
+ * 29 Sep 2026 v5
+ *
+ * v5 - P14. sessionVariety's writer is Settings; the check-in no longer asks.
  *
  * v4 - P0, SCOPE-MINOR. exerciseClearance removed (store.js v81).
  *
@@ -283,7 +285,7 @@ export const FIELD_CONTRACT = {
 
   "sessionVariety": {
     values: ["familiar", "balanced", "varied"],
-    writer: "views/checkin.js:793",
+    writer: "views/settings.js (How you like things; the check-in stopped asking at P14)",
     meaning: "Repetition across sessions — do you want what you did last time. MUST be asked, never inferred from behaviour. Distinct from sessionPreset."
   },
   "sessionPreset": {

@@ -1,5 +1,15 @@
 /**
  * verify-dic1.mjs
+ * 29 Sep 2026 v3
+ *
+ * v3 - P14. The check-in no longer asks the variety question (Graeme,
+ *   28 Sep, W2-16): Settings is now the only writer of sessionVariety.
+ *   TEST 1's value contract is moved to Settings' options, the writer
+ *   that remains. TESTS 2 and 3 are retired: they checked
+ *   CONTINUITY_WINDOW_DAYS and SESSION_DOORS in checkin.js, constants
+ *   that existed only for the question. verify-three-questions pins the
+ *   removal. Tests 4 onward are unchanged.
+ *
  * 21 Aug 2026 v2
  * GATE-PATH. Path resolution only -- no assertion changed.
  *
@@ -51,39 +61,28 @@ const builder  = fs.readFileSync(_gatePath("js/session-builder.js"), "utf8");
 const storeSrc = fs.readFileSync(_gatePath("js/store.js"), "utf8");
 const today    = fs.readFileSync(_gatePath("js/views/today.js"), "utf8");
 
-// SMOOTH-P1, 28 Sep 2026. Scoped to the VARIETY_CHOICES block: the
-// check-in now has other answers with a `value` (sleep: "poor" etc.), and
-// matching the whole file compared the wrong list.
-const VARIETY_BLOCK = checkin.slice(checkin.indexOf("const VARIETY_CHOICES"), checkin.indexOf("];", checkin.indexOf("const VARIETY_CHOICES")));
-console.log("\nTEST 1 - cross-file value contract");
-check("checkin VARIETY_CHOICES values == session-builder VARIETY_NOVELTY keys", () => {
-  const mine = [...VARIETY_BLOCK.matchAll(/value:\s*"([a-z]+)"/g)].map(m => m[1]).sort();
+const settingsSrc = fs.readFileSync(_gatePath("js/views/settings.js"), "utf8");
+// P14. Settings is the one writer of sessionVariety; its options are the
+// values selection must read and the store must keep.
+const VARIETY_BLOCK = settingsSrc.slice(settingsSrc.indexOf("const VARIETY_OPTIONS"), settingsSrc.indexOf("];", settingsSrc.indexOf("const VARIETY_OPTIONS")));
+const writerValues = () => [...VARIETY_BLOCK.matchAll(/id:\s*'([a-z]+)'/g)].map(m => m[1]).sort();
+console.log("\nTEST 1 - cross-file value contract (Settings is the writer)");
+check("Settings VARIETY_OPTIONS ids == session-builder VARIETY_NOVELTY keys", () => {
+  const mine = writerValues();
   const nov  = builder.match(/const VARIETY_NOVELTY\s*=\s*\{([^}]*)\}/)[1];
   const keys = [...nov.matchAll(/([a-z]+)\s*:/g)].map(m => m[1]).sort();
-  eq(mine.join(","), keys.join(","), "values the question writes must be values selection reads");
+  eq(mine.join(","), keys.join(","), "values Settings writes must be values selection reads");
 });
 check("those values are all accepted by store.js's validation whitelist", () => {
   const wl = storeSrc.match(/\[([^\]]*)\]\.includes\(saved\.sessionVariety\)/)[1];
   const allowed = [...wl.matchAll(/'([a-z]+)'/g)].map(m => m[1]).sort();
-  const mine = [...VARIETY_BLOCK.matchAll(/value:\s*"([a-z]+)"/g)].map(m => m[1]).sort();
-  eq(mine.join(","), allowed.join(","), "a value outside the whitelist is silently discarded on next load");
+  eq(writerValues().join(","), allowed.join(","), "a value outside the whitelist is silently discarded on next load");
+});
+check("the check-in no longer writes it", () => {
+  eq(/sessionVariety/.test(checkin.replace(/\/\*[\s\S]*?\*\//g, "")), false, "check-in writes sessionVariety again");
 });
 
-console.log("\nTEST 2 - window constant matches the selection cutoff");
-check("checkin CONTINUITY_WINDOW_DAYS == session-builder CONTINUITY_WINDOW_DAYS", () => {
-  const a = checkin.match(/CONTINUITY_WINDOW_DAYS\s*=\s*(\d+)/)[1];
-  const b = builder.match(/CONTINUITY_WINDOW_DAYS\s*=\s*(\d+)/)[1];
-  eq(a, b, "if these diverge the question promises what selection cannot deliver");
-});
-
-console.log("\nTEST 3 - SESSION_DOORS matches today.js's requiresCheckin doors");
-check("gate covers exactly the doors that route through check-in", () => {
-  const mine = [...checkin.match(/const SESSION_DOORS = \[([^\]]*)\]/)[1]
-    .matchAll(/"([a-z-]+)"/g)].map(m => m[1]).sort();
-  const doors = [...today.matchAll(/route:\s*'([a-z-]+)',\s*requiresCheckin:\s*true/g)]
-    .map(m => m[1]).sort();
-  eq(mine.join(","), doors.join(","), "a new requiresCheckin door would silently never get the question");
-});
+// TESTS 2 and 3 retired at v3 (P14): see the header.
 
 console.log("\nTEST 4 - exerciseStats boundary behaviour (the real date maths)");
 const mem = {};

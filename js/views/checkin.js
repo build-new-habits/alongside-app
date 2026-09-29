@@ -1,6 +1,15 @@
 /**
  * js/views/checkin.js
- * 29 Sep 2026 v23
+ * 29 Sep 2026 v24
+ *
+ * v24 - P14, FOURTH QUESTION (persona finding W2-16). The drop-in
+ *   variety question ("something like last time, or something
+ *   different?") is gone from the check-in on every tier: Free heard it
+ *   every session and each answer overwrote the choice made in Settings.
+ *   Graeme accepted the recommendation (28 Sep): Settings holds the
+ *   preference ("How much sessions change"). Check-in is energy, mood,
+ *   anything sore -- and on. Supersedes the v14 and DIC-FREE notes below.
+ *   _buildPanel/_openPanel/_closePanel had no caller left and are removed.
  *
  * v23 - P0, SCOPE-MINOR. "I'll do my own exercises", not "I have prescribed exercises to do".
  *
@@ -339,9 +348,6 @@
 
 import { store }           from "../store.js";
 import { prefersReducedMotion } from "../display-prefs.js";
-// DIC-FREE, 16 Sep 2026. The drop-in question is the FREE coach's
-// question. See _shouldAskVariety().
-import { isPremium }       from "../auth.js";
 // PURPOSE-ASK, 16 Sep 2026. The coach asks WHY today, then what would
 // help -- and recommends, rather than offering a menu. See
 // js/data/purpose.js.
@@ -612,10 +618,6 @@ export function CheckinView(router) {
     await _showCoachBubble(_buildSummary());
     await new Promise(r => setTimeout(r, T.PANEL_DELAY));
     if (!_alive) return;
-    if (_shouldAskVariety()) {
-      await _showVarietyBeat();   // continues to _continue() itself
-      return;
-    }
     // SMOOTH-P1. No purpose questions: on the Plan the coach decides from
     // the arc and history, and the plan screen lets the person change it.
     _continue();
@@ -633,130 +635,6 @@ export function CheckinView(router) {
     const pending = store.get("pendingDoorRoute");
     store.set("pendingDoorRoute", null);
     router.navigate(pending || "today");
-  }
-
-  // ───────────────────────────────────────────────────────
-  // DROP-IN COACH QUESTION (DIC-1)
-  // Destination Architecture section 8. See the v14 header note for why
-  // this is a missing writer rather than a new mechanism.
-  // ───────────────────────────────────────────────────────
-
-  // Mirrors session-builder.js's own isAnchor() cutoff. If these ever
-  // diverge the question starts promising something selection cannot
-  // deliver, so they are deliberately the same number.
-  const CONTINUITY_WINDOW_DAYS = 21;
-
-  // The two Home doors with requiresCheckin: true (today.js HOME_DOORS).
-  // Both build through session-builder.js, which is what reads the answer.
-  const SESSION_DOORS = ["session-builder", "coach-proposal"];
-
-  // Values map 1:1 onto session-builder.js's VARIETY_NOVELTY keys.
-  // Copy rule 10.1 -- no internal terms. "Variety", "novelty" and
-  // "anchor" are ours; none of them appears on screen.
-  const VARIETY_CHOICES = [
-    {
-      value: "familiar",
-      label: "Something like last time",
-      sub:   "Stay with the movements you've been building on"
-    },
-    {
-      value: "varied",
-      label: "Something different",
-      sub:   "A change of pace, with movements you've not done lately"
-    },
-    {
-      value: "balanced",
-      label: "Mix it up",
-      sub:   "Some of each"
-    }
-  ];
-
-  /**
-   * Is anything still familiar? True when at least one exercise was
-   * completed inside the continuity window. exerciseHistory is written
-   * on completion only (store.js recordExercises), so a session that was
-   * built and abandoned correctly counts for nothing here.
-   */
-  function _hasRecentHistory() {
-    const history = store.get("exerciseHistory");
-    if (!history || typeof history !== "object") return false;
-    return Object.keys(history).some(id => {
-      const s = store.exerciseStats(id);
-      return s.seen && s.daysSince !== null && s.daysSince <= CONTINUITY_WINDOW_DAYS;
-    });
-  }
-
-  /**
-   * DIC-FREE, 16 Sep 2026. FREE ONLY. Not a tightening of free -- a
-   * correction to the Plan.
-   *
-   * Graeme, on being asked it repeatedly on a Plan account: "Why do we
-   * have this again? I keep asking. This should be Free level only. It
-   * shouldn't be part of the Plan."
-   *
-   * 🔴 I GOT THIS BACKWARDS ON 15 SEP and proposed making it Plan-only,
-   * which verify-decisions correctly rejected. Reverting was right;
-   * stopping there was not, because the actual fault was left in place.
-   *
-   * Destination architecture §8 is titled "Free — the drop-in coach",
-   * and defines this as the FREE experience's coach moment: free cannot
-   * reason about an arc, so the coach asks the one question a human
-   * coach would. "He asks about last time. He never asks about March —
-   * because you have not told him about March."
-   *
-   * On the Plan there IS an arc. The coach is meant to decide FROM it.
-   * Asking a Plan user the same question every session is the coach
-   * admitting it has not looked -- and it is the opposite of "Free is
-   * today, the Plan is the arc".
-   *
-   * ⚫ So free keeps it exactly as §8 specifies, and it is removed from
-   * the Plan where it never belonged. verify-decisions still holds:
-   * the free path is untouched.
-   */
-  function _shouldAskVariety() {
-    if (isPremium()) return false;
-    return SESSION_DOORS.includes(store.get("pendingDoorRoute")) && _hasRecentHistory();
-  }
-
-  async function _showVarietyBeat() {
-    await _showCoachBubble(
-      "Want to do something like last time, or shall we do something different today?"
-    );
-    await new Promise(r => setTimeout(r, T.PANEL_DELAY));
-    _showVarietyPanel();
-  }
-
-  function _showVarietyPanel() {
-    const panel = _buildPanel(`
-      <div class="ci-choices" role="group" aria-label="How today's session should feel">
-        ${VARIETY_CHOICES.map(c => `
-          <button type="button" class="ci-choice" data-variety="${c.value}">
-            <span class="ci-choice__label">${_esc(c.label)}</span>
-            <span class="ci-choice__sub">${_esc(c.sub)}</span>
-          </button>
-        `).join("")}
-      </div>
-    `);
-
-    panel.querySelectorAll("[data-variety]").forEach(btn => {
-      btn.addEventListener("click", async () => {
-        const choice = VARIETY_CHOICES.find(c => c.value === btn.dataset.variety);
-        if (!choice) return;
-        store.set("sessionVariety", choice.value);
-        _closePanel(panel);
-        _fadePastBubbles();
-        await new Promise(r => setTimeout(r, REDUCED_MOTION ? 0 : 400));
-        _showUserBubble(choice.label);
-        await new Promise(r => setTimeout(r, T.PANEL_DELAY));
-        _continue();
-      });
-    });
-
-    _openPanel(panel);
-    setTimeout(
-      () => panel.querySelector("[data-variety]")?.focus({ preventScroll: true }),
-      150
-    );
   }
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -828,31 +706,10 @@ export function CheckinView(router) {
 
   // ─────────────────────────────────────────────────────────────────────────
   // PANEL MECHANICS
-  // Bottom-sliding input panels. Each panel is built, opened, and removed.
-  // An overlay sits behind the panel for visual focus. Neither panel nor
-  // overlay uses sheet-manager.js — these are lightweight inline panels,
-  // not full view modules.
+  // P14: the last bottom panel (the variety question) is gone; every
+  // answer is inline in the thread. onUnmount still clears any panel or
+  // overlay, so a page left over from an older version is tidied too.
   // ─────────────────────────────────────────────────────────────────────────
-
-  function _buildPanel(innerHtml) {
-    const overlay = document.createElement("div");
-    overlay.className = "ci-overlay";
-    overlay.setAttribute("aria-hidden", "true");
-
-    const panel = document.createElement("div");
-    panel.className = "ci-panel";
-    panel.setAttribute("role", "dialog");
-    panel.setAttribute("aria-modal", "true");
-    panel.innerHTML = `<div class="ci-panel-handle" aria-hidden="true"></div>${innerHtml}`;
-    panel._overlay  = overlay;
-
-    // STALE-CHECKIN. Built but never attached once the person has left.
-    if (_alive) {
-      document.body.appendChild(overlay);
-      document.body.appendChild(panel);
-    }
-    return panel;
-  }
 
   // STALE-CHECKIN. Every panel and overlay this view put on the page.
   function _removeAllPanels() {
@@ -862,19 +719,6 @@ export function CheckinView(router) {
   function onUnmount() {
     _alive = false;
     _removeAllPanels();
-  }
-
-  function _openPanel(panel) {
-    requestAnimationFrame(() => {
-      panel._overlay.classList.add("is-open");
-      panel.classList.add("is-open");
-    });
-  }
-
-  function _closePanel(panel) {
-    panel.classList.remove("is-open");
-    panel._overlay.classList.remove("is-open");
-    setTimeout(() => { panel.remove(); panel._overlay.remove(); }, 350);
   }
 
   // ─────────────────────────────────────────────────────────────────────────

@@ -1,6 +1,10 @@
 /**
  * settings.js
- * 29 Sep 2026 v43
+ * 29 Sep 2026 v44
+ *
+ * v44 - P14. The check-in no longer asks how much sessions should change;
+ *   this row is the one place it is set. Its hint said "The coach also
+ *   asks this before a session" and now says what is true.
  *
  * v43 - P11. Activity level is one answer. Onboarding writes
  *   lifestyle.activityLevel; this screen showed and wrote only
@@ -1102,8 +1106,8 @@ export function SettingsView(router) {
         <fieldset class="settings-field settings-capability__group">
           <legend class="settings-label">How much should sessions change?</legend>
           <p class="settings-section__sub" id="pref-variety-hint">
-            The coach also asks this before a session. Whatever you set
-            here is the answer it starts from.
+            The sessions the coach builds start from what you choose
+            here. Change it whenever you like.
           </p>
           <select class="settings-select"
                   id="settings-pref-variety"

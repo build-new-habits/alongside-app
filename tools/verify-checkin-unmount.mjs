@@ -1,5 +1,23 @@
 /**
  * tools/verify-checkin-unmount.mjs
+ * 29 Sep 2026 v3
+ *
+ * v3 - P14. The variety question was the last panel the check-in built on
+ *   document.body, and it is gone: every answer is inline. The fault this
+ *   gate measures -- something of the check-in outliving it -- now has
+ *   one remaining shape: a coach line or answer scheduled before leaving
+ *   and painted after. So the fixture leaves MID-QUESTION (the mood
+ *   question on its way), and the gate asserts that nothing is left on
+ *   the page outside the view, and nothing the check-in scheduled lands
+ *   after the person has left. TEST 4's reversal is now the positive
+ *   control: staying, the check-in does carry on to its next question.
+ *   TEST 5 adds leaving and coming straight back: one conversation, not
+ *   two interleaved (each CheckinView keeps its own state).
+ *   Reversal note: with no panels left, un-setting _alive in onUnmount is
+ *   no longer visible on the page -- a late line goes to the detached
+ *   thread of a view the router has already replaced. TEST 1-3 hold the
+ *   page; they are not a proof of _alive itself.
+ *
  * 28 Sep 2026 v2
  *
  * v2 - SMOOTH-P1. The three questions are now answered inline, so the
@@ -73,6 +91,11 @@ const tapLabel = async re => {
   return !!b;
 };
 
+// Everything on the page outside #app: where a leftover would sit.
+const outside = () => [...document.body.children].filter(n => n.id !== "app").length;
+const BASE_OUTSIDE = outside();
+const bubbles = () => document.querySelectorAll("#app .ci-bubble, #app [class*='ci-bubble'], #app .ci-choice, #app button").length;
+
 async function startCheckin() {
   localStorage.clear(); store.init();
   store.set("onboardingComplete", true); store.set("name", "Test"); store.set("tier", "free");
@@ -86,53 +109,73 @@ async function startCheckin() {
   router.history = [];
   router._mountView = async () => {};           // the destination's mount is not under test
   view.mount(app);
-  // Three answers, then the free drop-in question opens as a panel.
-  await tapLabel(/^Okay$/); await tapLabel(/^Okay$/); await tapLabel(/^Nothing today$/);
-  return waitFor(() => document.querySelector(".ci-panel"));
+  // One answer; the next question is on its way (timers pending).
+  return tapLabel(/^Okay$/);
 }
 
 // ── 0. FIXTURE REACH ────────────────────────────────────────────────────
-console.log("\nTEST 0 - the fixture reaches an open question panel");
-const opened = await startCheckin();
-ok("0a. a question panel is open on document.body", opened && leftovers() > 0,
-   "if no panel opens, nothing below measures the fault");
+console.log("\nTEST 0 - the fixture is mid-question, with the next one scheduled");
+const answered = await startCheckin();
+ok("0a. the first question was answered in the check-in", answered);
 
 // ── 1. LEAVING BY THE HOUSE BUTTON ──────────────────────────────────────
 console.log("\nTEST 1 - leave mid-question for Home");
 await router.navigate("today");
-await wait(500);
-ok("1a. no question panel or overlay is left on the page", leftovers() === 0,
-   `${leftovers()} panel/overlay element(s) still on document.body after leaving`);
+const atLeave = bubbles();
+await wait(2500);
+ok("1a. nothing is left on the page outside the view", leftovers() === 0 && outside() === BASE_OUTSIDE,
+   `${leftovers()} panel/overlay, ${outside() - BASE_OUTSIDE} extra node(s) on document.body`);
+ok("1b. nothing the check-in scheduled lands after leaving", bubbles() === atLeave, `${atLeave} -> ${bubbles()}`);
 
 // ── 2. EVERY OTHER WAY OUT ──────────────────────────────────────────────
 console.log("\nTEST 2 - every other way out");
 for (const dest of ["progress", "noticing", "settings", "coach-proposal", "session-builder"]) {
   await startCheckin();
   await router.navigate(dest);
-  await wait(500);
-  ok(`2. leaving for ${dest} leaves nothing behind`, leftovers() === 0);
+  const n = bubbles();
+  await wait(1500);
+  ok(`2. leaving for ${dest} leaves nothing behind`, leftovers() === 0 && outside() === BASE_OUTSIDE && bubbles() === n);
 }
 
 // ── 3. NOTHING OPENS LATER ──────────────────────────────────────────────
-console.log("\nTEST 3 - a panel scheduled before leaving never opens after");
+console.log("\nTEST 3 - a line scheduled before leaving never appears after");
 localStorage.clear(); store.init(); store.set("onboardingComplete", true); store.set("name", "Test");
-document.querySelectorAll(".ci-panel, .ci-overlay").forEach(n => n.remove());
 {
   const app = document.getElementById("app"); app.innerHTML = "";
   const view = CheckinView({ navigate: v => router.navigate(v), back() {} });
   router.viewCache = { checkin: view }; router.currentView = "checkin";
   view.mount(app);
   await router.navigate("today");           // leave immediately, timers still pending
+  // What the router does as the next screen mounts (the mount itself is
+  // stubbed above): the container is emptied. A late line written to the
+  // check-in's detached thread is then written nowhere a person can see.
+  app.innerHTML = "<p id='home-stand-in'>Home</p>";
   await wait(3000);
-  ok("3a. no panel appears on Home from a timer set before leaving", leftovers() === 0);
+  ok("3a. nothing appears on the next screen from a timer set before leaving",
+     leftovers() === 0 && outside() === BASE_OUTSIDE && app.children.length === 1 && !!app.querySelector("#home-stand-in"),
+     app.innerHTML.slice(0, 160));
 }
 
-// ── 4. REVERSAL ─────────────────────────────────────────────────────────
-console.log("\nTEST 4 - reversal: staying on the check-in keeps its panel");
+// ── 4. POSITIVE CONTROL ─────────────────────────────────────────────────
+console.log("\nTEST 4 - control: staying, the check-in carries on");
 await startCheckin();
-await wait(300);
-ok("4a. while the check-in is open, its panel is there", leftovers() > 0,
-   "the fix must not remove panels from a check-in that is still running");
+ok("4a. while the check-in is open, its next question arrives", await tapLabel(/^Okay$/),
+   "if staying does not reach the next question, TEST 1-3 measure nothing");
+
+// ── 5. LEAVE AND COME STRAIGHT BACK ─────────────────────────────────────
+console.log("\nTEST 5 - leave mid-opening and come straight back: one conversation");
+{
+  localStorage.clear(); store.init(); store.set("onboardingComplete", true); store.set("name", "Test");
+  const app = document.getElementById("app"); app.innerHTML = "";
+  const v1 = CheckinView({ navigate() {}, back() {} }); v1.mount(app);
+  await wait(400); v1.onUnmount(); app.innerHTML = "";
+  const v2 = CheckinView({ navigate() {}, back() {} }); v2.mount(app);
+  await waitFor(() => app.querySelector(".ci-chips"), 9000); await wait(1500);
+  const lines = [...app.querySelectorAll(".ci-bubble--coach")].map(b => b.textContent.trim());
+  ok("5a. the energy question is asked once, with one row of answers",
+     lines.filter(t => /energy today/.test(t)).length === 1 && app.querySelectorAll(".ci-chips").length === 1, JSON.stringify(lines));
+  ok("5b. no opening line is said twice", new Set(lines).size === lines.length, JSON.stringify(lines));
+}
 
 console.log("");
 if (fails) { console.log(`CHECKIN-UNMOUNT: ${fails} FAILED, ${passes} passed`); process.exit(1); }

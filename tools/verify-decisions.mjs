@@ -1,5 +1,13 @@
 /**
  * tools/verify-decisions.mjs
+ * 29 Sep 2026 v4
+ *
+ * v4 - P14. The drop-in variety question is removed from the check-in on
+ *   every tier (Graeme, 28 Sep, accepting the persona-wave-2
+ *   recommendation W2-16): Settings holds the preference. That supersedes
+ *   the §8 record this file pinned; the new rule is pinned instead --
+ *   the check-in asks three questions and branches on nothing by tier.
+ *
  * 28 Sep 2026 v3
  *
  * v3 - F7. workout-complete.js was never a route and is deleted; the
@@ -93,60 +101,23 @@ check("Grounding moments are free", `${DEST} §18`, () => {
   ok(!/isPremium|premium|Personal/.test(g), "a tier check has crept into a free feature");
 });
 
-check("The drop-in coach question is free", `${DEST} §8`, () => {
+check("Check-in asks three questions, the same on every tier", "Graeme 28 Sep (P14, W2-16), superseding " + DEST + " §8", () => {
   const c = read("js/views/checkin.js");
-  ok(/_showVarietyBeat/.test(c), "the free coach question is missing");
-
-  // DIC-FREE, 16 Sep 2026. AMENDED, AND THE DECISION IS UNCHANGED.
-  //
-  // This asserted "check-in must not be tier-aware" as the mechanism for
-  // holding §8. The DECISION §8 records is that the drop-in question
-  // belongs to FREE -- "Free is: the coach decides, but asks the one
-  // question a human coach would." §8 is scoped to free throughout and
-  // says nothing about the Plan asking it.
-  //
-  // A blanket no-tier-check cannot tell "taken away from free" -- the
-  // thing §8 protects -- from "taken away from the Plan", which §8 never
-  // granted. On device Graeme was asked it every session on a Plan
-  // account: "Why do we have this again? I keep asking. This should be
-  // Free level only. It shouldn't be part of the Plan."
-  //
-  // 🔴 On 15 Sep I proposed the OPPOSITE -- Plan-only -- and this file
-  // correctly rejected it. Reverting was right; stopping there was not,
-  // because the real fault was left in place. The assertion now tests
-  // the guarantee rather than one implementation of it: FREE MUST STILL
-  // REACH THE QUESTION.
-  const varietyFn = c.slice(c.indexOf("function _shouldAskVariety"),
-                            c.indexOf("function _shouldAskVariety") + 1600);
-  ok(!/isPremium\(\)\s*\)\s*return false;[\s\S]{0,40}$/.test("") &&
-     /if \(isPremium\(\)\) return false;/.test(varietyFn),
-     "the gate is not the free-only form; check it has not become a paywall");
-  ok(!/!isPremium\(\)/.test(varietyFn),
-     "INVERTED: !isPremium() would paywall the free coach question, which is " +
-     "exactly what §8 forbids and what was proposed on 15 Sep");
-  // PURPOSE-ASK, 16 Sep 2026. A SECOND tier check now exists, and it is
-  // named rather than the rule being loosened.
-  //
-  // §8 says the drop-in question is FREE. It does not say free is the
-  // only thing that may branch on tier -- and the Plan's version of that
-  // same moment is a different question entirely: "what's today for?",
-  // which needs an arc to mean anything.
-  //
-  // So both branches are pinned. Free must still reach _showVarietyBeat,
-  // the Plan must reach _showPurposeBeat, and NOTHING ELSE in this file
-  // may branch on tier. A third check goes red here.
-  // SMOOTH-P1, 28 Sep 2026. The Plan no longer asks "what's today for?"
-  // (Graeme, after the prototype). So the ONLY tier branch left in the
-  // check-in is the free drop-in question, and that is what is pinned:
-  // free reaches it, and nothing else in the file branches on tier.
+  // The §8 drop-in question ("something like last time, or something
+  // different?") was the FREE coach's question. The persona trace found
+  // it asked every session and overwriting the choice made in Settings.
+  // Graeme accepted the recommendation: remove it; Settings holds the
+  // preference. So: no variety beat, no purpose beat, no tier branch.
+  ok(!/_shouldAskVariety|_showVarietyBeat|data-variety/.test(c),
+     "the fourth check-in question is back; P14 removed it (Settings holds sessionVariety)");
+  ok(!/sessionVariety"\s*,/.test(c) && !/store\.set\(\s*"sessionVariety"/.test(c),
+     "check-in writes sessionVariety; only Settings may");
   ok(!/_showPurposeBeat/.test(c),
      "the Plan's purpose question is back; SMOOTH-P1 removed it");
-
-  const rest = c.replace(varietyFn, "")
-                .replace(/import \{ isPremium \}[^\n]*\n/, "");
-  ok(!/isPremium/.test(rest),
-     "a THIRD tier check has appeared in check-in; §8 sanctions exactly two -- " +
-     "the free drop-in question and the Plan's purpose question");
+  ok(!/isPremium|getTier|\btier\b\s*===/.test(c.replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/[^\n]*/g, "")),
+     "check-in branches on tier; the three questions are the same for everyone");
+  const s = read("js/views/settings.js");
+  ok(/sessionVariety/.test(s), "Settings no longer holds the preference");
 });
 
 console.log("\nP1 \u2014 the coach never sells");
