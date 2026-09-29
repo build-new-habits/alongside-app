@@ -1,6 +1,9 @@
 /**
  * tools/verify-balance-no.mjs
- * 29 Sep 2026 v1
+ * 29 Sep 2026 v2
+ *
+ * v2 - End review (Graeme, 29 Sep). 1d: the chair question, now asked of
+ *   everybody who answers balance, says it is asked of everybody.
  *
  * P15, BALANCE "NO" = NO SQUATS (persona finding W2-6, too narrow). A fit
  * 26-year-old who answers "No, not really" to the balance question is
@@ -103,7 +106,7 @@ async function walkOnboarding() {
     if (++idle > 26) break;
   }
   const said = txt(el); el.remove();
-  return { asked, reachedEnd: /Let.s begin/.test(said) };
+  return { asked, said, reachedEnd: /Let.s begin/.test(said) };
 }
 
 const LEG = new Set(["squat", "hinge"]);
@@ -127,6 +130,7 @@ console.log("\nTEST 1 - a fit 26-year-old through the real onboarding");
   const cap = store.get("capability") || {};
   ok("1pc. the walk reached the end, and she said No to balance", walk.reachedEnd && cap.balanceWorry === "no", `${walk.reachedEnd} ${JSON.stringify(cap)}`);
   ok("1a. she is asked the chair question", walk.asked.some(q => /chair/i.test(q)) && cap.chairRise === "yes", `${walk.asked.join(" | ")}; chairRise ${cap.chairRise}`);
+  ok("1d. and it says it is a question for everybody", walk.said.includes("A quick one I ask everybody: can you get up from a chair"), walk.said.slice(walk.said.indexOf("chair") - 80, walk.said.indexOf("chair") + 40));
   ready();
   const p = store.capabilityProfile();
   ok("1b. her legs are loadable", p.legsLoadable === true, JSON.stringify(p));

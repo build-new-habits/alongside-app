@@ -1,6 +1,12 @@
 /**
  * js/data/onboarding-thread-data.js
- * 29 Sep 2026 v17
+ * 29 Sep 2026 v18
+ *
+ * v18 - End review, P15 (Graeme, 29 Sep: "I'm good with all those plans").
+ *   Since P15 the chair question reaches everyone who answers balance,
+ *   fit and active people included. It now says so as it asks: "A quick
+ *   one I ask everybody: can you get up from a chair without pushing off
+ *   with your hands?" -- a question for everyone, not a judgement of them.
  *
  * v17 - P15, BALANCE "NO" (persona finding W2-6). Step 9b, the chair
  *   question, is also shown whenever the balance answer is "No" (accepted
@@ -630,7 +636,7 @@ export const STEPS = {
     // ready for is asked, not assumed from an answer about balance.
     showIf: (storeData) => _capabilityQuestionsApply(storeData)
       || ((storeData || {}).capability || {}).balanceWorry === 'no',
-    coach: "Can you get up from a chair without pushing off with your hands?\n\nI ask because it tells me something about what your legs are ready for — more than age or how often you exercise does.",
+    coach: "A quick one I ask everybody: can you get up from a chair without pushing off with your hands?\n\nI ask because it tells me something about what your legs are ready for — more than age or how often you exercise does.",
     coachAfter: {
       answered: "Thank you. That's genuinely useful.",
     },
