@@ -1,7 +1,13 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 28 Sep 2026 v566
+ * 29 Sep 2026 v567
+ *
+ * v567 - P0 SCOPE-MINOR. New: js/data/scope-statement.js. Removed:
+ *   views/conditions-update.js, data/conditionProgrammes.js,
+ *   layouts/conditions-update.css. Changed: store (v81), conditions,
+ *   session-builder, onboarding, settings, today, progress, My exercises
+ *   and more. 195 gates.
  *
  * v566 - F8 CLASS-8. New: data/classes/class-putting-down-008.js,
  *   class-getting-going-009.js, class-from-the-feet-010.js. Changed:
@@ -4020,7 +4026,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v566";
+const CACHE_NAME = "alongside-v567";
 
 const SHELL_URLS = [
 
@@ -4033,7 +4039,6 @@ const SHELL_URLS = [
   "/alongside-app/css/layouts/onboarding-additions.css",
   "/alongside-app/css/layouts/today.css",
   "/alongside-app/css/layouts/my-programme.css",
-  "/alongside-app/css/layouts/conditions-update.css",
   "/alongside-app/css/layouts/library.css",
   "/alongside-app/css/layouts/mobility-conditioning.css",
   "/alongside-app/css/layouts/progress.css",
@@ -4110,7 +4115,6 @@ const SHELL_URLS = [
 
   // Views — main
   "/alongside-app/js/views/today.js",
-  "/alongside-app/js/views/conditions-update.js",
   "/alongside-app/js/views/mobility-conditioning.js",
   "/alongside-app/js/views/arc-setup.js",
   "/alongside-app/js/views/stretch-arc.js",
@@ -4190,6 +4194,7 @@ const SHELL_URLS = [
   "/alongside-app/js/data/classes/class-putting-down-008.js",
   "/alongside-app/js/data/classes/class-getting-going-009.js",
   "/alongside-app/js/data/classes/class-from-the-feet-010.js",
+  "/alongside-app/js/data/scope-statement.js",
   "/alongside-app/js/views/class-player.js",
   "/alongside-app/js/views/class-list.js",
   "/alongside-app/css/components/class-list.css",
@@ -4235,7 +4240,6 @@ const SHELL_URLS = [
   "/alongside-app/js/data/assessment.js",
   "/alongside-app/js/data/session-moments.js",
   "/alongside-app/js/data/conditions.js",
-  "/alongside-app/js/data/conditionProgrammes.js",
   "/alongside-app/js/data/equipment.js",
   "/alongside-app/js/data/goals.js",
   "/alongside-app/js/data/goal-review.js",
