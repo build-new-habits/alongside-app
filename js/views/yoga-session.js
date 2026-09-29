@@ -1,6 +1,14 @@
 /**
  * yoga-session.js
- * 29 Sep 2026 v9
+ * 29 Sep 2026 v10
+ *
+ * v10 - P17, MOBILITY DOOR (persona finding W2-12). The pose pool now
+ *   passes the builder's personFilter() -- equipment, floor, balance,
+ *   seated, legs, impact, partner, "not again" -- which this view never
+ *   read: Warrior III and Tree Pose for somebody worried about balance,
+ *   Downward Dog and Pigeon for somebody who cannot get to the floor.
+ *   resolvePose() now brings the library's capability tags across, not
+ *   only its contraindications. When nothing in a style fits, it says so.
  *
  * v9 - P2, SESSION-TYPE-ID. Both logActivity() calls say sessionType
  *   "yoga" themselves. store.logActivity() no longer borrows a type from
@@ -203,6 +211,7 @@ import { TARGET_AREAS, impliedTarget, sortByTarget } from "../stretch-target.js"
 import { isGateDue, renderSafetyGate, attachSafetyGate } from "../safety-gate.js";
 import { isPremium } from "../auth.js";
 import { EXERCISES } from "../data/exercises/index.js";
+import { personFilter } from "../session-builder.js";
 import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
 import { renderLogBlock, attachLogEvents, scrollToTop } from "../session-log.js";
 import { selectMoment, recordMomentShown, dismissMoment } from "../data/grounding-moments.js";
@@ -278,6 +287,16 @@ function resolvePose(entry) {
     contraindications: db.contraindications || [],
     watchOut:          db.watchOut || null,
     affectsAreas:      db.affectsAreas || [],
+    // P17. What the shared filters read. Without these every pose passed
+    // them: an entry with no position is never "floor".
+    position:          db.position,
+    impact:            db.impact,
+    balanceDemand:     db.balanceDemand,
+    equipment:         db.equipment || [],
+    movementPattern:   db.movementPattern,
+    difficultyLevel:   db.difficultyLevel,
+    energyRequired:    db.energyRequired,
+    partner:           db.partner,
   };
 }
 
@@ -532,7 +551,9 @@ function buildSession(focusId, durationMins, targetId) {
   // filter runs on this file's stale copy of the contraindications --
   // which is how somebody with an acute wrist injury was being offered
   // Downward Dog. See resolvePose() and the note above it.
-  const resolved = pool.map(resolvePose);
+  const resolved = pool.map(resolvePose)
+    // P17. The builder's own gates, and the person's kit.
+    .filter(personFilter({ equipment: store.get("equipment") || [] }));
 
   const safe = resolved.filter(ex => {
     const contra = ex.contraindications || [];
@@ -637,6 +658,23 @@ function renderFocusSelector() {
 
 function renderSessionOverview() {
   const focus = FOCUS_TYPES.find(f => f.id === selectedFocus);
+
+  // P17. The shared filters can leave a style with nothing for somebody.
+  if (sessionQueue.length === 0) {
+    return `
+    <div class="view yoga-session-view">
+      <div class="workout-header">
+        <button class="btn btn-ghost" id="ys-back-btn" aria-label="Back to duration">\u2190 Back</button>
+        <h1 class="workout-header-title">${focus?.label || "Yoga"}</h1>
+      </div>
+      <div class="card card-coach" role="status">
+        <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
+        <p class="coach-message-text">Nothing in this style fits what you've told me &mdash; about the floor, your balance, your legs or your kit.</p>
+        <p class="text-sm text-muted" style="margin-top: var(--space-2);">Choose another style, or go back to Mobility &amp; Conditioning for a session built from what does fit.</p>
+      </div>
+      <button class="btn btn-primary btn-large btn-full" id="ys-refocus-btn" style="margin-top: var(--space-6);">Choose another style</button>
+    </div>`;
+  }
 
   return `
     <div class="view yoga-session-view">
@@ -1367,6 +1405,11 @@ export function onMount() {
     if (phase === "focus")    { resetSession(); router.navigate("today"); }
     else if (phase === "duration") { phase = "focus";    rerender(); }
     else if (phase === "overview") { phase = "duration"; rerender(); }
+  });
+
+  // P17. Nothing fits: back to the style choice.
+  document.getElementById("ys-refocus-btn")?.addEventListener("click", () => {
+    phase = "focus"; sessionQueue = []; rerender();
   });
 
   document.getElementById("ys-exit-btn")?.addEventListener("click", () => {

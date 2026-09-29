@@ -1,7 +1,15 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
- * 29 Sep 2026 v61
+ * 29 Sep 2026 v62
+ *
+ * v62 - P17, MOBILITY DOOR (persona finding W2-12). The person's own gates
+ *   (partner, "not again", impact, floor, balance, seated, legs) are
+ *   lifted out of _filterCandidates, unchanged, into an exported
+ *   personFilter({ equipment }), which _filterCandidates calls. The core
+ *   and yoga sessions use the same function, so a rule cannot hold in the
+ *   builder and not there. An unused local (capabilityUnrestricted) went
+ *   with the move; the module-level _capabilityUnrestricted() is unchanged.
  *
  * v61 - P16, DATA TAGS (persona finding W2-6). _filterCandidates never
  *   proposes an exercise flagged partner: true -- Alongside is used alone.
@@ -2570,7 +2578,7 @@ function _difficulty(ex) {
  */
 function _filterCandidates(categories, section, equipSet, conditionSet, sectionRules, opts = {}) {
   const ceiling = _difficultyCeiling();
-  const prefs   = store.get("exercisePreferences") || {};
+  const allows  = personFilter();
 
   // CON-6: candidates now come from the shared 461-entry database, not from
   // this file's own EXERCISE_POOL. Section comes from which SESSION_TYPES
@@ -2639,140 +2647,6 @@ function _filterCandidates(categories, section, equipSet, conditionSet, sectionR
   //
   // The 30 untagged entries should still be tagged properly -- this is
   // a safe default, not a substitute for the data.
-  // ── IMPACT GATE (11 Aug 2026) ─────────────────────────────────────────
-  //
-  // Graeme's question: should some exercises be naturally avoided for
-  // certain age groups -- his 76-year-old parents are unlikely to do
-  // burpees or star jumps.
-  //
-  // Age is the wrong variable and a worse one. There are 76-year-olds who
-  // do burpees and 35-year-olds who cannot squat, so filtering on birth
-  // year is wrong in both directions -- and "we have decided what you can
-  // do because of your age" is precisely the shame architecture this
-  // product refuses. Capability is both more accurate and more dignified.
-  //
-  // But he was right that something was missing, and raising the
-  // difficulty ceilings proved it: at ceiling 2, a frail sedentary
-  // 76-year-old was served Lateral Hops and Wall Drive sprint mechanics,
-  // and a blank-slate beginner was served Explosive Press-Ups. Twenty-six
-  // of the twenty-seven impact-class exercises in the database are tagged
-  // difficulty 3 or lower.
-  //
-  // That is not mis-tagging. For a conditioned person a jump squat IS
-  // easy. Difficulty and impact are different axes: the risk in a
-  // plyometric is not that it is hard, it is landing force and fall risk,
-  // and neither scales with how hard the movement feels.
-  //
-  // So impact is gated separately from difficulty. Anyone who has told us
-  // they are sedentary, lightly active, or returning after a break does
-  // not get jumping, bounding, sprinting or landing work -- not because
-  // of their age, but because impact loading is the one thing that should
-  // be earned rather than defaulted into.
-  
-  const LOW_IMPACT_ONLY = new Set(["sedentary", "light", "returning"]);
-  // Unknown counts as gated, matching the same safe-default reasoning
-  // applied to untagged difficulty: someone who has told us nothing has
-  // not told us they can absorb landing forces. Persona 2.12 (blank
-  // slate, sedentary desk job, nothing to personalise against) was
-  // served a Jump Squat in her very first session on the old default.
-  const declaredLevel = store.get("fitnessLevel")
-                     || store.get("lifestyle.activityLevel")
-                     || null;
-
-  // CAP-1. The capability screen measures what a person CAN do; the
-  // activity level measures how often they move. They answer different
-  // questions and the first one wins where they disagree, because
-  // frequency is a poor proxy for capacity -- somebody can garden daily
-  // and still not get off the floor unaided.
-  const cap = store.capabilityProfile();
-
-  // CAP-6 (C3). See _capabilityUnrestricted() at module scope -- one
-  // definition, because _filterCandidates and pickFrom are separate
-  // scopes and two copies of a capability rule is how they drift.
-  // Kept as a named call rather than inlined so the reasoning below
-  // stays attached to it.
-  //
-  // "Unrestricted" means the person was ASKED and cleared
-  // every axis. Deliberately conservative on each count:
-  //
-  //   asked        -- silence is never read as capability. Somebody who
-  //                   never saw the screen keeps the adapted pool at
-  //                   full weight, same fail-safe direction as every
-  //                   other gate in this file.
-  //   impactSafe   -- bothFeet === 'yes' specifically, not merely "not no"
-  //   floorSafe    -- note this is true when floorAccess is NULL, so it
-  //                   is tested against 'yes' directly here rather than
-  //                   trusting the profile's permissive default
-  //   balanceSafe  -- same reasoning as floorSafe
-  //   legsLoadable -- the axis CAP-5 added; full leg power, not partial
-  //
-  // Any one of these unmet and the person keeps adapted content weighted
-  // normally. The cost of being wrong in that direction is somebody
-  // capable seeing a seated warm-up; the cost the other way is somebody
-  // who needs it not being offered it. Those are not symmetrical.
-  const capabilityUnrestricted = _capabilityUnrestricted();
-
-  const impactGated =
-    (cap.asked && !cap.impactSafe) ||
-    (!cap.asked && (declaredLevel === null || LOW_IMPACT_ONLY.has(declaredLevel)));
-
-  // Floor access. Without it every supine, prone and kneeling movement
-  // is not merely hard but unusable, and being handed them repeatedly is
-  // how somebody decides the app is not for them.
-  // CAP-2 RESOLVED (11 Aug 2026). These gates read real tags now.
-  //
-  // They used to match on exercise NAMES, because the database carried
-  // no position, impact or balance data and movementPattern could not
-  // stand in -- Depth Jump is tagged "squat" and "locomotion" covers
-  // both a treadmill walk and carioca. Name matching missed things, and
-  // it was verified missing them: a wheelchair user who answered "no"
-  // to the chair question was still served McGill Curl-Ups, and a man
-  // who cannot jump was still served Drop Steps.
-  //
-  // All 497 entries now carry position ('floor' | 'standing' | 'seated'
-  // | 'any'), impact (boolean) and balanceDemand (boolean). Same lesson
-  // as the 30 untagged difficulties: a derived fallback buys time and
-  // the data is what actually solves it.
-  //
-  // 'any' means the exercise imposes no position requirement -- most
-  // breathing and meditation practice, and the recovery protocols. It
-  // passes every position gate deliberately, because there is nothing
-  // to gate.
-  const isFloor   = ex => ex.position === "floor";
-  // Any exercise whose named effect is in the legs. 'limited' leg power
-  // still allows unloaded movement -- ankle circles, gentle range work --
-  // because keeping what function exists is worth more than protecting it
-  // into disuse. Only loaded leg work is withheld.
-  const LEG_AREAS = ["quadriceps", "hamstring", "calves", "glutes",
-                     "ankle-foot", "knee", "hip", "adductors", "hip-flexor"];
-  const _needsLegs = ex => {
-    const areas = ex.affectsAreas || [];
-    return LEG_AREAS.some(a => areas.includes(a)) &&
-           !areas.includes("full-body");
-  };
-  // C1 (12 Aug 2026, third-pass gate). This previously proxied "loads the
-  // legs" as "has equipment OR is difficulty 3+". The gate caught it:
-  // Seated Leg Extension is bodyweight and low-difficulty, so it passed —
-  // and it is the exact exercise the CAP-5 note exists to prevent. Loading
-  // the quadriceps IS that movement; the proxy measured the wrong thing.
-  //
-  // A leg pattern is now leg-loading on its own account. Unloaded range
-  // work — ankle circles, gentle mobility — still passes, which is the
-  // stated intent above: keeping what function exists is worth more than
-  // protecting it into disuse.
-  const LEG_PATTERNS = ["squat", "hinge", "lunge", "locomotion", "step"];
-  // P0 (29 Sep): the exercise-clearance gate went with the medical conditions
-  // that asked it. The scope statement sends anyone unsure to a professional.
-
-  const _loadsLegs = ex =>
-    _needsLegs(ex) && (
-      LEG_PATTERNS.includes(ex.movementPattern) ||
-      (ex.equipment || []).length > 0 ||
-      (ex.difficultyLevel || 1) >= 3
-    );
-
-  const isBalance = ex => ex.balanceDemand === true;
-  const isImpact = ex => ex.impact === true;
 
   const withinCeiling = ex => _difficulty(ex) <= ceiling;
   const warmupPool = section === "warmup" ? matched.filter(withinCeiling) : null;
@@ -2887,29 +2761,10 @@ function _filterCandidates(categories, section, equipSet, conditionSet, sectionR
     // whole rule exists to catch.
     if (isSessionLength(ex) && !opts.allowSessionLength) return false;
 
-    if (prefs[ex.id]?.preference === "avoid") return false;
-    // P16. Alongside is used alone: a drill that needs another person is
-    // never proposed (Mirror Drill, Partner Chase, Resisted Sprint...).
-    if (ex.partner === true) return false;
-    if (impactGated && isImpact(ex)) return false;
-    if (cap.asked && !cap.floorSafe   && isFloor(ex))   return false;
-    if (cap.asked && !cap.balanceSafe && isBalance(ex)) return false;
-    // CAP-4: somebody who cannot rise from a chair needs seated and
-    // supported work, not a gentler standing programme.
-    if (cap.asked && cap.needsSeated &&
-        ex.position !== "seated" && ex.position !== "any") return false;
-
-    // CAP-5. Legs are a separate axis from standing. An 8-week trace of a
-    // wheelchair user found him correctly given seated work and then
-    // handed Seated Leg Extension and Seated Hamstring Curl -- because
-    // "can you rise from a chair" and "do your legs work" are different
-    // questions and only the first was being asked.
-    //
-    // Derived from affectsAreas rather than a new tag: an exercise that
-    // works the quadriceps needs quadriceps, and the data already says so
-    // on all 518 entries.
-    if (cap.asked && !cap.legsUsable && _needsLegs(ex)) return false;
-    if (cap.asked && !cap.legsLoadable && _loadsLegs(ex)) return false;
+    // P17. The person's own gates -- partner, not-again, impact, floor,
+    // balance, seated, legs -- are personFilter(), shared with the core
+    // and yoga sessions so a rule cannot hold here and not there.
+    if (!allows(ex)) return false;
 
     // ── CARDIAC-1 (14 Aug 2026) ──────────────────────────────────────
     //
@@ -2946,6 +2801,161 @@ function _filterCandidates(categories, section, equipSet, conditionSet, sectionR
     }
     return true;
   });
+}
+
+/**
+ * P17, 29 Sep 2026. The person's own gates, as one predicate: partner
+ * drills, "not again", impact, floor, balance, seated-only, and legs.
+ * Lifted out of _filterCandidates unchanged so the core session and the
+ * yoga session apply exactly the rules the builder does (they had their
+ * own pools and read none of them: a foam roller for somebody with no
+ * kit, floor work for somebody who cannot get down). `equipment`, when
+ * given, also holds the pool to what the person has.
+ *
+ * @param {{ equipment?: string[]|null }} [opts]
+ * @returns {(ex: object) => boolean}
+ */
+export function personFilter({ equipment = null } = {}) {
+  const prefs = store.get("exercisePreferences") || {};
+  // ── IMPACT GATE (11 Aug 2026) ─────────────────────────────────────────
+  //
+  // Graeme's question: should some exercises be naturally avoided for
+  // certain age groups -- his 76-year-old parents are unlikely to do
+  // burpees or star jumps.
+  //
+  // Age is the wrong variable and a worse one. There are 76-year-olds who
+  // do burpees and 35-year-olds who cannot squat, so filtering on birth
+  // year is wrong in both directions -- and "we have decided what you can
+  // do because of your age" is precisely the shame architecture this
+  // product refuses. Capability is both more accurate and more dignified.
+  //
+  // But he was right that something was missing, and raising the
+  // difficulty ceilings proved it: at ceiling 2, a frail sedentary
+  // 76-year-old was served Lateral Hops and Wall Drive sprint mechanics,
+  // and a blank-slate beginner was served Explosive Press-Ups. Twenty-six
+  // of the twenty-seven impact-class exercises in the database are tagged
+  // difficulty 3 or lower.
+  //
+  // That is not mis-tagging. For a conditioned person a jump squat IS
+  // easy. Difficulty and impact are different axes: the risk in a
+  // plyometric is not that it is hard, it is landing force and fall risk,
+  // and neither scales with how hard the movement feels.
+  //
+  // So impact is gated separately from difficulty. Anyone who has told us
+  // they are sedentary, lightly active, or returning after a break does
+  // not get jumping, bounding, sprinting or landing work -- not because
+  // of their age, but because impact loading is the one thing that should
+  // be earned rather than defaulted into.
+
+  const LOW_IMPACT_ONLY = new Set(["sedentary", "light", "returning"]);
+  // Unknown counts as gated, matching the same safe-default reasoning
+  // applied to untagged difficulty: someone who has told us nothing has
+  // not told us they can absorb landing forces. Persona 2.12 (blank
+  // slate, sedentary desk job, nothing to personalise against) was
+  // served a Jump Squat in her very first session on the old default.
+  const declaredLevel = store.get("fitnessLevel")
+                     || store.get("lifestyle.activityLevel")
+                     || null;
+
+  // CAP-1. The capability screen measures what a person CAN do; the
+  // activity level measures how often they move. They answer different
+  // questions and the first one wins where they disagree, because
+  // frequency is a poor proxy for capacity -- somebody can garden daily
+  // and still not get off the floor unaided.
+  const cap = store.capabilityProfile();
+
+
+  const impactGated =
+    (cap.asked && !cap.impactSafe) ||
+    (!cap.asked && (declaredLevel === null || LOW_IMPACT_ONLY.has(declaredLevel)));
+
+  // Floor access. Without it every supine, prone and kneeling movement
+  // is not merely hard but unusable, and being handed them repeatedly is
+  // how somebody decides the app is not for them.
+  // CAP-2 RESOLVED (11 Aug 2026). These gates read real tags now.
+  //
+  // They used to match on exercise NAMES, because the database carried
+  // no position, impact or balance data and movementPattern could not
+  // stand in -- Depth Jump is tagged "squat" and "locomotion" covers
+  // both a treadmill walk and carioca. Name matching missed things, and
+  // it was verified missing them: a wheelchair user who answered "no"
+  // to the chair question was still served McGill Curl-Ups, and a man
+  // who cannot jump was still served Drop Steps.
+  //
+  // All 497 entries now carry position ('floor' | 'standing' | 'seated'
+  // | 'any'), impact (boolean) and balanceDemand (boolean). Same lesson
+  // as the 30 untagged difficulties: a derived fallback buys time and
+  // the data is what actually solves it.
+  //
+  // 'any' means the exercise imposes no position requirement -- most
+  // breathing and meditation practice, and the recovery protocols. It
+  // passes every position gate deliberately, because there is nothing
+  // to gate.
+  const isFloor   = ex => ex.position === "floor";
+  // Any exercise whose named effect is in the legs. 'limited' leg power
+  // still allows unloaded movement -- ankle circles, gentle range work --
+  // because keeping what function exists is worth more than protecting it
+  // into disuse. Only loaded leg work is withheld.
+  const LEG_AREAS = ["quadriceps", "hamstring", "calves", "glutes",
+                     "ankle-foot", "knee", "hip", "adductors", "hip-flexor"];
+  const _needsLegs = ex => {
+    const areas = ex.affectsAreas || [];
+    return LEG_AREAS.some(a => areas.includes(a)) &&
+           !areas.includes("full-body");
+  };
+  // C1 (12 Aug 2026, third-pass gate). This previously proxied "loads the
+  // legs" as "has equipment OR is difficulty 3+". The gate caught it:
+  // Seated Leg Extension is bodyweight and low-difficulty, so it passed —
+  // and it is the exact exercise the CAP-5 note exists to prevent. Loading
+  // the quadriceps IS that movement; the proxy measured the wrong thing.
+  //
+  // A leg pattern is now leg-loading on its own account. Unloaded range
+  // work — ankle circles, gentle mobility — still passes, which is the
+  // stated intent above: keeping what function exists is worth more than
+  // protecting it into disuse.
+  const LEG_PATTERNS = ["squat", "hinge", "lunge", "locomotion", "step"];
+  // P0 (29 Sep): the exercise-clearance gate went with the medical conditions
+  // that asked it. The scope statement sends anyone unsure to a professional.
+
+  const _loadsLegs = ex =>
+    _needsLegs(ex) && (
+      LEG_PATTERNS.includes(ex.movementPattern) ||
+      (ex.equipment || []).length > 0 ||
+      (ex.difficultyLevel || 1) >= 3
+    );
+
+  const isBalance = ex => ex.balanceDemand === true;
+  const isImpact = ex => ex.impact === true;
+
+  const equipSet = equipment ? resolveEquipment(equipment) : null;
+
+  return ex => {
+    if (prefs[ex.id]?.preference === "avoid") return false;
+    // P16. Alongside is used alone: a drill that needs another person is
+    // never proposed (Mirror Drill, Partner Chase, Resisted Sprint...).
+    if (ex.partner === true) return false;
+    if (impactGated && isImpact(ex)) return false;
+    if (cap.asked && !cap.floorSafe   && isFloor(ex))   return false;
+    if (cap.asked && !cap.balanceSafe && isBalance(ex)) return false;
+    // CAP-4: somebody who cannot rise from a chair needs seated and
+    // supported work, not a gentler standing programme.
+    if (cap.asked && cap.needsSeated &&
+        ex.position !== "seated" && ex.position !== "any") return false;
+
+    // CAP-5. Legs are a separate axis from standing. An 8-week trace of a
+    // wheelchair user found him correctly given seated work and then
+    // handed Seated Leg Extension and Seated Hamstring Curl -- because
+    // "can you rise from a chair" and "do your legs work" are different
+    // questions and only the first was being asked.
+    //
+    // Derived from affectsAreas rather than a new tag: an exercise that
+    // works the quadriceps needs quadriceps, and the data already says so
+    // on all 518 entries.
+    if (cap.asked && !cap.legsUsable && _needsLegs(ex)) return false;
+    if (cap.asked && !cap.legsLoadable && _loadsLegs(ex)) return false;
+    if (equipSet && !exerciseIsAvailable(ex, equipSet)) return false;
+    return true;
+  };
 }
 
 /**

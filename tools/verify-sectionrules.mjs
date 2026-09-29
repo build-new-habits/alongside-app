@@ -1,5 +1,12 @@
 /**
  * tools/verify-sectionrules.mjs
+ * 29 Sep 2026 v3
+ * P17. The Stretch card's preselect and check-in gate moved into
+ *   _toBuilder(type) in mobility-conditioning.js, shared with "Start a
+ *   Mobility Session" (which now opens the builder's Mobility type).
+ *   Tests 6 and 7b read the card's call and that one helper; every
+ *   requirement is unchanged. verify-mobility-door drives the helper.
+ *
  * 06 Sep 2026 v2
  *
  * SECTION-RULES.
@@ -225,8 +232,11 @@ check("6. the Mobility & Conditioning door offers Stretch", () => {
   const at = mc.indexOf('"#mc-stretch"');
   ok(at > -1, "the Stretch card is rendered but never wired");
   const handler = mc.slice(at, at + 400);
-  ok(handler.includes('type: "stretch"'), "the card preselects the wrong type");
-  ok(handler.includes('router.navigate("session-builder")'), "the card goes nowhere");
+  // P17: the card calls the shared door helper with its type.
+  const helper = mc.slice(mc.indexOf("function _toBuilder("), mc.indexOf("function _toBuilder(") + 700);
+  ok(handler.includes('_toBuilder("stretch")') && helper.includes("sessionBuilderPreselect", ) && helper.includes("{ type, returnTo"),
+     "the card preselects the wrong type");
+  ok(helper.includes('router.navigate("session-builder")'), "the card goes nowhere");
 });
 
 console.log("\nTEST 7 - the Stretch door gates on check-in and gives back a way out");
@@ -243,7 +253,9 @@ check("7a. one definition of checked-in-today", () => {
 check("7b. the Stretch card enforces the gate", () => {
   const mc = read("js/views/mobility-conditioning.js");
   const at = mc.indexOf('"#mc-stretch"');
-  const h = mc.slice(at, at + 1400);
+  // P17: the gate lives in the helper the card calls.
+  ok(mc.slice(at, at + 1400).includes('_toBuilder("stretch")'), "the Stretch card no longer goes through the gated helper");
+  const h = mc.slice(mc.indexOf("function _toBuilder("), mc.indexOf("function _toBuilder(") + 700);
   ok(h.includes("store.checkedInToday()"),
      "the Stretch card skips the check-in gate. The Cardio, Core & Strength door " +
      "enforces it for the SAME builder -- without it there is no pain data, so no " +

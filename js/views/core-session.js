@@ -1,7 +1,18 @@
 /**
  * core-session.js - Guided Core Session
  *
- * 29 Sep 2026 v15
+ * 29 Sep 2026 v16
+ *
+ * v16 - P17, MOBILITY DOOR (persona finding W2-12). Mobility & Conditioning's
+ *   "Start a Mobility Session" no longer opens this view. And the pool
+ *   now passes the builder's personFilter() -- equipment, floor, balance,
+ *   seated, legs, impact, partner, "not again" -- which it never read: a
+ *   foam roller for somebody with no kit, Plank and Dead Bug for somebody
+ *   who cannot get to the floor. When nothing in a focus fits, it says
+ *   so and offers another focus, rather than starting an empty session.
+ *   "Everything here is gentle and safe" (lower back note) now says only
+ *   what it did: "Everything here is gentle."
+ *
  *
  * v15 - P0, SCOPE-MINOR. The "Rehab — Safe for back pain, post-injury" focus is "Gentle — for days when everything feels sensitive".
  *
@@ -227,6 +238,7 @@ import { isGateDue, renderSafetyGate, attachSafetyGate } from "../safety-gate.js
 import { renderLogBlock, attachLogEvents, scrollToTop, lastLine } from "../session-log.js";
 import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
 import { EXERCISES, filterByConditions } from "../data/exercises/index.js";
+import { personFilter } from "../session-builder.js";
 import { getActiveConditionIds } from "../data/conditions.js";
 
 export const centered = false;
@@ -363,7 +375,9 @@ function buildSession(focusId, durationMins) {
   const poolIds     = EXERCISE_POOL_IDS[focusId] || [];
   const pool        = poolIds
     .map(id => EXERCISES.find(ex => ex.id === id))
-    .filter(Boolean); // defensive — should never actually drop anything
+    .filter(Boolean) // defensive — should never actually drop anything
+    // P17. The builder's own gates, and the person's kit.
+    .filter(personFilter({ equipment: store.get("equipment") || [] }));
   const conditions  = store.get("conditions")         || [];
   const painScores  = store.get("conditionPainScores") || {};
   const targetCount = EXERCISE_COUNT[durationMins]    || 5;
@@ -415,7 +429,7 @@ function buildConditionNote() {
     const pain = painScores[id] || 0;
     if (id.includes("lower-back")) {
       return pain >= 7
-        ? "Your lower back is flagging high pain today. I've removed all loaded and rotational exercises. Everything here is gentle and safe."
+        ? "Your lower back is flagging high pain today. I've removed all loaded and rotational exercises. Everything here is gentle."
         : "Your lower back has some discomfort. I've adjusted the session away from anything that loads the spine under flexion.";
     }
     if (id.includes("sciatica")) {
@@ -438,12 +452,35 @@ function buildConditionNote() {
 export function render() {
   if (phase === "focus")    return renderFocusSelector();
   if (phase === "duration") return renderDurationSelector();
+  // P17. The shared filters can leave a focus with nothing for somebody.
+  if ((phase === "overview" || phase === "intro") && sessionQueue.length === 0) return renderNothingFits();
   if (phase === "overview") return renderSessionOverview();
   if (phase === "intro")    return renderSessionIntro();
   if (phase === "session")  return renderExercise();
   if (phase === "rest")     return renderRest();
   if (phase === "done")     return renderDone();
   return renderFocusSelector();
+}
+
+// P17. Honest when nothing fits: say why in their terms, offer another focus.
+function renderNothingFits() {
+  const focus = FOCUS_TYPES.find(f => f.id === selectedFocus);
+  return `
+    <div class="view core-session-view">
+      <div class="workout-header">
+        <button class="btn btn-ghost" id="cs-nofit-back-btn" aria-label="Back to length">&larr; Back</button>
+        <h1 class="workout-header-title">${focus?.label || "Core"}</h1>
+      </div>
+      <div class="card card-coach" role="status">
+        <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
+        <div>
+          <p class="coach-message-text">Nothing in this focus fits what you've told me &mdash; about the floor, your balance, your legs or your kit.</p>
+          <p class="text-sm text-muted" style="margin-top: var(--space-3);">Choose another focus, or go back to Mobility &amp; Conditioning for a session built from what does fit.</p>
+        </div>
+      </div>
+      <button class="btn btn-primary btn-large btn-full" id="cs-refocus-btn" style="margin-top: var(--space-6);">Choose another focus</button>
+    </div>
+  `;
 }
 
 // ── Phase 1: Focus selector ───────────────────────────────────────────────────
@@ -1237,6 +1274,14 @@ export function onMount() {
 
   document.getElementById("cs-exit-btn")?.addEventListener("click", () => {
     showExitConfirm();
+  });
+
+  // P17. Nothing fits: back to the focus choice.
+  document.getElementById("cs-refocus-btn")?.addEventListener("click", () => {
+    phase = "focus"; sessionQueue = []; rerender();
+  });
+  document.getElementById("cs-nofit-back-btn")?.addEventListener("click", () => {
+    phase = "duration"; sessionQueue = []; rerender();
   });
 
   // Focus cards

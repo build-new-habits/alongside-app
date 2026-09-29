@@ -1,7 +1,14 @@
 /**
  * mobility-conditioning.js - Mobility & Conditioning
  *
- * 29 Sep 2026 v7
+ * 29 Sep 2026 v8
+ *
+ * v8 - P17, MOBILITY DOOR (persona finding W2-12). "Start a Mobility
+ *   Session" opened the Core Session ("anti-lateral-flexion"). It now
+ *   opens the builder's Mobility session, through today's check-in as the
+ *   Stretch card does, so the shared filters and today's answers apply.
+ *   Its line says what that session holds: "Hips, spine, ankles and
+ *   shoulders, with some yoga and Pilates".
  *
  * v7 - P0, SCOPE-MINOR. "My Conditions Programme" (coach-built, grouped by
  *   condition, edited in the retired Conditions Update) is now "My
@@ -92,7 +99,7 @@ export function MobilityConditioningView(router) {
           <span class="mc-card__icon" aria-hidden="true">\uD83E\uDDD8</span>
           <span class="mc-card__text">
             <span class="mc-card__label">Start a Mobility Session</span>
-            <span class="mc-card__sub">Yoga, Pilates, stretching, warmups \u2014 adapted to how you're doing today</span>
+            <span class="mc-card__sub">Hips, spine, ankles and shoulders, with some yoga and Pilates \u2014 adapted to how you're doing today</span>
           </span>
         </button>
 
@@ -148,13 +155,29 @@ export function MobilityConditioningView(router) {
   }
 
 
+  // One way into the builder from this screen, for both cards. returnTo
+  // records the door, so Back does not walk into the type picker the card
+  // exists to skip; only the day's FIRST check-in is a gate.
+  function _toBuilder(type) {
+    store.set("sessionBuilderPreselect", { type, returnTo: "mobility-conditioning" });
+    if (store.checkedInToday()) {
+      router.navigate("session-builder");
+    } else {
+      store.set("pendingDoorRoute", "session-builder");
+      router.navigate("checkin");
+    }
+  }
+
   function attachEvents(container) {
     container.querySelector("#mc-back-btn")?.addEventListener("click", () => {
       router.navigate("today");
     });
 
+    // P17. Was router.navigate("core-session"): a mobility door that opened
+    // a core session. Now the builder's Mobility type, gated on today's
+    // check-in exactly as the Stretch card below is (see its note).
     container.querySelector("#mc-start-session")?.addEventListener("click", () => {
-      router.navigate("core-session");
+      _toBuilder("mobility");
     });
 
     // STRETCH-DOOR. Preselects the type so the builder opens on duration,
@@ -175,13 +198,7 @@ export function MobilityConditioningView(router) {
       // Same rule as today.js: only the day's FIRST check-in is a gate.
       // returnTo records the door, so Back does not walk into the type
       // picker this card exists to skip.
-      store.set("sessionBuilderPreselect", { type: "stretch", returnTo: "mobility-conditioning" });
-      if (store.checkedInToday()) {
-        router.navigate("session-builder");
-      } else {
-        store.set("pendingDoorRoute", "session-builder");
-        router.navigate("checkin");
-      }
+      _toBuilder("stretch");
     });
 
     container.querySelector("#mc-log-event")?.addEventListener("click", () => {
