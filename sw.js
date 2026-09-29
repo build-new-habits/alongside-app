@@ -1,7 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 29 Sep 2026 v585
+ * 29 Sep 2026 v586
+ *
+ * v586 - P18. Skipping in the coach's player offers Less often / Not again
+ *   (workout v26).
  *
  * v585 - P17. The Mobility door opens a mobility session; core and yoga
  *   sessions use the builder's personFilter().
@@ -4084,7 +4087,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v585";
+const CACHE_NAME = "alongside-v586";
 
 const SHELL_URLS = [
 
