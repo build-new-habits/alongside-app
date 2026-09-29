@@ -1,7 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 29 Sep 2026 v575
+ * 29 Sep 2026 v576
+ *
+ * v576 - P8 INVENTED-LINES. New: tools/verify-checkin-openers.mjs.
+ *   Changed: data/checkin-openings.js. 203 gates.
  *
  * v575 - P7 SINCE-YESTERDAY. New: js/data/activity-labels.js (precached),
  *   tools/verify-activity-labels.mjs. Changed: coach-proposal, today,
@@ -4053,7 +4056,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v575";
+const CACHE_NAME = "alongside-v576";
 
 const SHELL_URLS = [
 
