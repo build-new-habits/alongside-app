@@ -1,7 +1,12 @@
 /**
  * js/views/session-builder-ui.js - Session Builder UI
  *
- * 29 Sep 2026 v26
+ * 29 Sep 2026 v27
+ *
+ * v27 - P21, PLAYERS (persona finding W2-17). Let's go plays the built
+ *   session in the coach's player (workout), not the four-page session
+ *   screen.
+ *
  *
  * v26 - P10. The sore-zone note says the area the person named at
  *   check-in ("your knee"), not the zone it maps to ("Quads").
@@ -2499,7 +2504,9 @@ export function onMount() {
   // Let's go
   document.getElementById("sb-go-btn")?.addEventListener("click", () => {
     store.set("usingGeneratedSession", true);
-    router.navigate("gym-programme");
+    // P21. One player: the coach's, one card a move (was the four-page
+    // session screen, 40+ taps a session).
+    router.navigate("workout");
   });
 
   // Build a different one

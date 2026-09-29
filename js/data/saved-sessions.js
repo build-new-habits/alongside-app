@@ -1,5 +1,16 @@
 /**
  * saved-sessions.js
+ * 29 Sep 2026 v3
+ *
+ * v3 - P21, PLAYERS (persona finding W2-17). lastDoneOf(saved): when the
+ *   person last FINISHED this session, read from the activity log -- a
+ *   finished entry that holds every move the saved session still has.
+ *   lastUsedAt was stamped when a saved session was started, finished or
+ *   not, and never when one was saved from the finish screen straight
+ *   after doing it, so the list said "Not done yet" about something just
+ *   done. markSavedSessionUsed() is no longer called; the field is left
+ *   as it is on stored records.
+ *
  * 08 Sep 2026 v2
  *
  * v2 - SAVED-2. updateSavedSession(). Graeme's decision: saved sessions
@@ -197,6 +208,30 @@ export function markSavedSessionUsed(id) {
   const next = list().map(s =>
     s && s.id === id ? { ...s, lastUsedAt: new Date().toISOString() } : s);
   store.set("savedSessions", next);
+}
+
+/**
+ * P21. When this saved session was last finished, from the activity log.
+ * A finished entry counts when it holds every move the saved session
+ * still has in the library -- which is true whether it was started from
+ * the saved list or done first and saved afterwards. Partial sessions do
+ * not count: "last done" means done.
+ *
+ * @returns {string|null} ISO time of the latest such entry
+ */
+export function lastDoneOf(saved) {
+  const ids = resolveSavedSession(saved).exercises.map(e => e.id);
+  if (ids.length === 0) return null;
+  let latest = null;
+  for (const e of (store.get("activityLog") || [])) {
+    // The store's own rule (logActivity): anything not partial is finished.
+    if (!e || e.status === "partial") continue;
+    const done = new Set(Array.isArray(e.exerciseIds) ? e.exerciseIds : []);
+    if (!ids.every(id => done.has(id))) continue;
+    const t = e.completedAt || e.date;
+    if (t && (!latest || t > latest)) latest = t;
+  }
+  return latest;
 }
 
 /**

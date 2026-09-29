@@ -1,6 +1,12 @@
 /**
  * workout.js - Workout Execution View
- * 29 Sep 2026 v27
+ * 29 Sep 2026 v28
+ *
+ * v28 - P21, PLAYERS (persona finding W2-17). Built and saved sessions now
+ *   play here (one card a move), not in the four-page session screen. The
+ *   one thing that screen had that this did not came with them: SWAP-0's
+ *   "Can't get on this? Swap it" for a busy cardio machine, which swaps in
+ *   another machine the person has and keeps the change in the session.
  *
  * v27 - P19, "MOSTLY THE SAME" (persona finding W2-14). A finished
  *   session tells the store which section each move was done in
@@ -402,6 +408,7 @@
  */
 
 import { store }         from "../store.js";
+import { isCardioMachine, getSwapCandidates } from "../data/exercises/index.js";
 import { renderFeedbackControl, attachFeedbackEvents } from "../exercise-feedback.js";
 import { renderExerciseCard, attachCardEvents } from "../exercise-card.js";
 import { isGateDue, renderSafetyGate, attachSafetyGate } from "../safety-gate.js";
@@ -421,6 +428,8 @@ let currentExerciseIndex = 0;
 // finishAfterOffer: it was the last move, so answering ends the session.
 let pendingSkipOffer = null;
 let finishAfterOffer = false;
+// P21 / SWAP-0. The machine-swap panel on the current card.
+let swapPanelOpen = false;
 let timerInterval = null;
 let timeRemaining = 0;
 let timerStarted = false; // Timer doesn't start until user taps Start
@@ -623,6 +632,8 @@ export function render() {
           ${renderExerciseTarget(exercise)}
         </div>
 
+        ${_renderSwapControl(exercise)}
+
         ${finishedByTimer ? `
           <p class="xcard-timer-done" role="status">That is the time up on ${exercise.name}.</p>
         ` : ""}
@@ -694,6 +705,64 @@ export function render() {
       </div>
     </div>
   `;
+}
+
+/**
+ * P21 / SWAP-0, from the session screen. Nothing at all unless this is a
+ * cardio machine WITH another machine the person has: an affordance that
+ * opens onto an empty list teaches people not to trust the affordances.
+ */
+function _escSwap(t) {
+  return String(t ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+function _renderSwapControl(exercise) {
+  if (!exercise || !isCardioMachine(exercise)) return "";
+  const options = getSwapCandidates(exercise, store.get("equipment") || []);
+  if (options.length === 0) return "";
+  if (!swapPanelOpen) {
+    return `
+      <div class="exercise-swap">
+        <button type="button" class="btn btn-ghost btn-small exercise-swap__btn" id="wo-swap-btn"
+                aria-expanded="false" aria-controls="wo-swap-panel">Can't get on this? Swap it</button>
+      </div>`;
+  }
+  return `
+    <div class="exercise-swap">
+      <button type="button" class="btn btn-ghost btn-small exercise-swap__btn" id="wo-swap-btn"
+              aria-expanded="true" aria-controls="wo-swap-panel">Never mind, keep ${_escSwap(exercise.name)}</button>
+      <div class="exercise-swap__panel card" id="wo-swap-panel" role="group"
+           aria-label="Choose something else instead of ${_escSwap(exercise.name)}">
+        <p class="coach-voice exercise-swap__intro">No problem \u2014 pick whatever's free.</p>
+        <ul class="exercise-swap__list">
+          ${options.map(opt => `
+            <li>
+              <button type="button" class="exercise-swap__option" data-swap-to="${_escSwap(opt.id)}">
+                <span class="exercise-swap__option-name">${_escSwap(opt.name)}</span>
+                <span class="exercise-swap__option-meta text-xs text-muted">${opt.duration ? Math.round(opt.duration / 60) + " min" : ""}</span>
+              </button>
+            </li>`).join("")}
+        </ul>
+      </div>
+    </div>`;
+}
+
+/**
+ * The swapped-in machine is the whole library entry (its own coaching,
+ * watch-outs and timer); section and reps are carried across, so the
+ * session keeps its shape -- the person swapped a machine, not a plan.
+ */
+function _applySwap(toId) {
+  const generated = store.get("generatedSession");
+  const list = generated?.session?.exercises;
+  if (!Array.isArray(list)) return;
+  const current = list[currentExerciseIndex];
+  const chosen = getSwapCandidates(current, store.get("equipment") || []).find(o => o.id === toId);
+  if (!chosen) return;
+  list[currentExerciseIndex] = { ...chosen, section: current.section, reps: current.reps ?? chosen.reps };
+  store.set("generatedSession", generated);
+  swapPanelOpen = false;
+  resetTimer();
+  router.navigate("workout");
 }
 
 /**
@@ -973,6 +1042,19 @@ export function onMount() {
     skipExercise();
   });
 
+  // P21 / SWAP-0. Toggle, then the choice.
+  document.getElementById("wo-swap-btn")?.addEventListener("click", () => {
+    swapPanelOpen = !swapPanelOpen;
+    router.navigate("workout");
+    // Focus follows what just changed, or a keyboard or screen-reader
+    // user is left on a relabelled button with no idea anything opened.
+    if (swapPanelOpen) document.querySelector(".exercise-swap__option")?.focus();
+    else document.getElementById("wo-swap-btn")?.focus();
+  });
+  document.querySelectorAll("[data-swap-to]").forEach(btn => {
+    btn.addEventListener("click", () => _applySwap(btn.getAttribute("data-swap-to")));
+  });
+
   // P18. The answer to "how often should it come up?".
   document.querySelectorAll("[data-skip-pref]").forEach(btn => {
     btn.addEventListener("click", () => {
@@ -1210,6 +1292,7 @@ function resetTimer() {
   // last exercise carries in and the counter opens on the final set.
   currentSet    = 1;
   finishedByTimer = false;   // TIMER-1. A new exercise inherits nothing.
+  swapPanelOpen   = false;   // P21. Nor an open swap panel.
   // A new exercise starts unfinished, at its name. Both advance paths
   // (complete and skip) come through here.
   exerciseDone = false;

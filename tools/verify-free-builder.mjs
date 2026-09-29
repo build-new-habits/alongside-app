@@ -1,6 +1,12 @@
 /**
  * tools/verify-free-builder.mjs
- * 29 Sep 2026 v1
+ * 29 Sep 2026 v2
+ *
+ * v2 - P21. Let's go now opens the coach's player (workout), not the
+ *   session screen (gym-programme): one player (W2-17). 1a and 4a name the
+ *   new destination; what they protect -- Free lands on the session, not
+ *   the upgrade page -- is unchanged, and test 3 (the session screen with
+ *   nothing of their own) is untouched.
  *
  * P3, FREE-BUILDER-UPGRADE (persona finding W2-3). A Free user with no
  * programme -- anybody who tapped "Decide later" at onboarding -- built a
@@ -95,7 +101,7 @@ ok("1pc. Free, and no programme (the Decide later state)", store.get("tier") ===
 {
   const r = await buildAndGo();
   ok("1pc2. the builder reached Let's go with a session", r.reached && !!r.first, JSON.stringify(r));
-  ok("1a. it lands on the session, not the upgrade page", router.currentView === "gym-programme", router.currentView);
+  ok("1a. it lands on the session, not the upgrade page", router.currentView === "workout", router.currentView);
   ok("1b. showing the first exercise of what they built", !!r.first && txt(main).includes(r.first) && !/upgrade|the plan costs|£/i.test(txt(main)), txt(main).slice(0, 160));
 }
 
@@ -116,7 +122,7 @@ console.log("\nTEST 4 - the Plan (control)");
 fixture("personal");
 {
   const r = await buildAndGo();
-  ok("4a. Let's go plays the session", router.currentView === "gym-programme" && !!r.first && txt(main).includes(r.first), `${router.currentView}`);
+  ok("4a. Let's go plays the session", router.currentView === "workout" && !!r.first && txt(main).includes(r.first), `${router.currentView}`);
 }
 
 console.log("");

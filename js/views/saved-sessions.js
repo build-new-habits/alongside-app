@@ -1,5 +1,12 @@
 /**
  * js/views/saved-sessions.js
+ * 29 Sep 2026 v6
+ *
+ * v6 - P21, PLAYERS (persona finding W2-17). Start plays in the coach's
+ *   player (workout), one card a move, not the four-page session screen.
+ *   "Last done" is read from the log (lastDoneOf) and counted in calendar
+ *   days; starting a session no longer marks it done.
+ *
  * 28 Sep 2026 v5
  *
  * v5 - Work list 8, OWN-LIST. Find a saved session when you have lots.
@@ -115,6 +122,7 @@
  * goes in the `corners` list in verify-hatchoverlap.mjs.
  */
 
+import { daysAgo } from "../data/activity-labels.js";
 import { store } from '../store.js';
 // 18 Aug 2026, library.js v6. Imported explicitly rather than read as a
 // bare name off app.js's window.router: that works in a browser and
@@ -125,7 +133,7 @@ import { isPremium } from '../auth.js';
 import {
   savedSessions,
   resolveSavedSession,
-  markSavedSessionUsed,
+  lastDoneOf,
   deleteSavedSession
 } from '../data/saved-sessions.js';
 
@@ -178,7 +186,8 @@ function _agoLabel(iso) {
   if (!iso) return null;
   const then = new Date(iso).getTime();
   if (!Number.isFinite(then)) return null;
-  const days = Math.floor((Date.now() - then) / 86400000);
+  // P21. Calendar days, as people count them (activity-labels.daysAgo).
+  const days = daysAgo(iso);
   if (days <= 0) return 'today';
   if (days === 1) return 'yesterday';
   if (days < 7)  return `${days} days ago`;
@@ -210,11 +219,13 @@ function _row(rec) {
   // says so plainly. The row stays -- the session is still the person's,
   // and hiding it would answer a question they did not ask.
   const runnable = exercises.length > 0;
+  // P21. From the log: finished, not merely started.
+  const lastDone = lastDoneOf(rec);
 
   const facts = [
     rec.durationMins ? `${rec.durationMins} minutes` : null,
     `${count} movement${count === 1 ? '' : 's'}`,
-    rec.lastUsedAt ? `Last done ${_agoLabel(rec.lastUsedAt)}` : 'Not done yet'
+    lastDone ? `Last done ${_agoLabel(lastDone)}` : 'Not done yet'
   ].filter(Boolean);
 
   // The accessible name carries the same facts the eye gets from the
@@ -431,7 +442,7 @@ export function onMount() {
       if (!rec) return;
       const { exercises } = resolveSavedSession(rec);
       if (!exercises.length) return;
-      markSavedSessionUsed(rec.id);
+      // P21: starting is not doing; "last done" comes from the log.
       store.set('generatedSession', {
         session: {
           id:          rec.sessionType || 'own',
@@ -444,7 +455,8 @@ export function onMount() {
         inputs:  { savedSessionId: rec.id }
       });
       store.set('usingGeneratedSession', true);
-      router.navigate('gym-programme');
+      // P21. One player: the coach's, one card a move.
+      router.navigate('workout');
     });
   });
 
