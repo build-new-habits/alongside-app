@@ -1,7 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 29 Sep 2026 v571
+ * 29 Sep 2026 v572
+ *
+ * v572 - P4 FREE-CARRY-ON. New: tools/verify-free-carry-on.mjs.
+ *   Changed: views/workout.js. 199 gates.
  *
  * v571 - P3 FREE-BUILDER-UPGRADE. New: tools/verify-free-builder.mjs.
  *   Changed: router.js (v36), views/gym-programme.js. 198 gates.
@@ -4040,7 +4043,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v571";
+const CACHE_NAME = "alongside-v572";
 
 const SHELL_URLS = [
 
