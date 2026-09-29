@@ -1,7 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 29 Sep 2026 v592
+ * 29 Sep 2026 v593
+ *
+ * v593 - P24. Yoga says how long it is; entries keep their own dose; a
+ *   usual length in Settings (session-builder v64, settings v46).
  *
  * v592 - P23. The safety note before a practice is worded for a practice
  *   (safety-gate v5, Schema v1.79).
@@ -4105,7 +4108,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v592";
+const CACHE_NAME = "alongside-v593";
 
 const SHELL_URLS = [
 
