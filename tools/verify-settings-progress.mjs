@@ -1,6 +1,12 @@
 /**
  * tools/verify-settings-progress.mjs
- * 29 Sep 2026 v3
+ * 29 Sep 2026 v4
+ *
+ * v4 - Flake, not a loosening. The polls in 3b and 3c gave up after 2 s;
+ *   a fresh-clone run of all 213 gates, eight at a time, took longer and
+ *   3c failed once (3 of 3 alone passed). The ceiling is now 8 s. Every
+ *   assertion is unchanged; a real failure still fails, only later.
+ *
  *
  * v3 - Flake, not a loosening. 3b and 3c waited a fixed 20 ms for the
  *   clipboard promise to settle; under the parallel suite that was
@@ -178,7 +184,7 @@ ok("3a. no alert() anywhere on Progress (not selectable on most phones)", !/\bal
 fixture("personal"); main.innerHTML = ""; ProgressView(rtr).mount(main);
 let copied = null;
 Object.defineProperty(globalThis.navigator, "clipboard", { value: { writeText: t => { copied = t; return Promise.resolve(); } }, configurable: true });
-const until = async (fn, ms = 2000) => { const end = Date.now() + ms; while (!fn() && Date.now() < end) await wait(10); };
+const until = async (fn, ms = 8000) => { const end = Date.now() + ms; while (!fn() && Date.now() < end) await wait(10); };
 click(main.querySelector('[data-export="friend"]'));
 await until(() => /Copied/.test(txt(main.querySelector(".progress-export [data-export-status]"))));
 const status = main.querySelector(".progress-export [data-export-status]");
