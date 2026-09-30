@@ -1,7 +1,12 @@
 /**
  * reflect.js - Reflect Screen
  *
- * 30 Sep 2026 v10
+ * 30 Sep 2026 v11
+ *
+ * v11 - W3-5 WORSE-POINTER (Wave 3, persona 2.1). "Worse than usual" gets
+ *   the stop-and-seek line, and no longer counts as a struggle for the
+ *   "moved through something difficult" prompt; "Better" makes no claim
+ *   about the body.
  *
  * v10 - W3-4 SORE-SCOPE. The pain question only on a day something is sore.
  *
@@ -170,6 +175,7 @@
  */
 
 import { store }          from "../store.js";
+import { SAFETY_LINE }    from "../data/purpose.js";
 // SAVE-ALL, 16 Sep 2026. Eleven views route here when a session ends,
 // so the "keep this one?" offer lives here once rather than being
 // copied into each of them. See js/save-block.js for why that matters.
@@ -315,7 +321,7 @@ function buildEmpathyContext(sessionCount) {
   const hardFeels = ["hard", "tough", "restless", "same"];
   const struggled =
     (feelAnswer !== null && hardFeels.includes(feelAnswer)) ||
-    painAnswer === "worse" ||
+    // W3-5: more pain is not a difficulty to be praised for moving through.
     (typeof moodAfter === "number" && moodAfter <= LOW_MOOD_AFTER_MAX);
 
   const checkedInToday = typeof checkin.energy === "number";
@@ -564,11 +570,14 @@ function buildSummary(entry, feel, pain, moodAfterValue) {
     ? moodAfterValue - moodBefore
     : null;
 
+  // W3-5 (Wave 3, persona 2.1). Worse is a pointer, not praise: the scope
+  // statement sends anything getting worse to a professional. Better was
+  // "your body is responding", which the app cannot know.
   if (pain === "better") {
-    return "I noticed things felt better today than usual. That is worth paying attention to -- your body is responding.";
+    return "Good to hear it felt better than usual today.";
   }
   if (pain === "worse" || pain === "sharp") {
-    return "Things were harder today and you showed up anyway. I have noted that.";
+    return "Thank you for telling me. " + SAFETY_LINE;
   }
 
   if (moodLift !== null && moodLift >= 3) {
