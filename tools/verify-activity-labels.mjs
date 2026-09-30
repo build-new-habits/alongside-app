@@ -1,5 +1,12 @@
 /**
  * tools/verify-activity-labels.mjs
+ * 30 Sep 2026 v2
+ *
+ * v2 - W3-20 TRUE-WORDS. "Mostly X" is said only when X is more than half
+ *   (it was said on a plurality, and on a tie). 4b's fixture had gym two
+ *   of five; it is now three of five. What 4b tests -- the kind in words,
+ *   not "mostly gym" -- is unchanged.
+ *
  * 29 Sep 2026 v1
  *
  * P7, "SINCE YESTERDAY". The coach's recap said "Since yesterday, you
@@ -129,7 +136,8 @@ console.log("\nTEST 3 - Home's line about yesterday");
 console.log("\nTEST 4 - Progress names each type in words");
 {
   const { ProgressView } = await import(B + "views/progress.js");
-  const LOG = [{ type: "gym", completedAt: at(4, 12) }, { type: "gym", completedAt: at(3, 12) }, { type: "mindfulness", completedAt: at(2, 12) }, { type: "outdoor-cycle", completedAt: at(1, 12) }, { type: "prescribed-session", completedAt: at(1, 14) }];
+  // W3-20: "mostly" means more than half, so three of the five are gym.
+  const LOG = [{ type: "gym", completedAt: at(4, 12) }, { type: "gym", completedAt: at(3, 12) }, { type: "gym", completedAt: at(2, 12) }, { type: "outdoor-cycle", completedAt: at(1, 12) }, { type: "prescribed-session", completedAt: at(1, 14) }];
   fixture("personal", LOG);
   main.innerHTML = ""; ProgressView(rtr).mount(main); await wait(60);
   const types = [...main.querySelectorAll(".progress-summary__type")].map(txt);

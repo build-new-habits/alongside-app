@@ -1,6 +1,8 @@
 /**
  * js/data/activity-labels.js
- * 29 Sep 2026 v2
+ * 30 Sep 2026 v3
+ *
+ * v3 - W3-20. "an upper body session", not "a upper body session".
  *
  * v2 - P26. A gym session somebody logs by hand (the activity log's "Gym
  *   or weights", type "gym", source "self-logged") reads "a gym session",
@@ -82,7 +84,7 @@ function builtKind(entry) {
 export function activityPhrase(entry) {
   if (selfGym(entry)) return SELF_GYM[0];
   const kind = (entry?.type === "workout" || entry?.type === "gym" || entry?.type === "gym-programme") && builtKind(entry);
-  if (kind) return `a ${kind} session`;
+  if (kind) return `${/^[aeiou]/i.test(kind) ? "an" : "a"} ${kind} session`;   // W3-20: "an upper body"
   return (LABELS[entry?.type] || FALLBACK)[0];
 }
 

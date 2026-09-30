@@ -1,7 +1,12 @@
 /**
  * running-session.js - Guided Running Session
  *
- * 30 Sep 2026 v7
+ * 30 Sep 2026 v8
+ *
+ * v8 - W3-20 TRUE-WORDS. The interval script is built from the length
+ *   (intervalScript): 45 and 60 minutes used the 30-minute one, so "Last
+ *   one" came at 21 minutes. No "Everything you have left". And the
+ *   "+N credits earned" line is gone (a count nothing uses).
  *
  * v7 - W3-2 RUN-SORE (Wave 3, persona 2.1). The Run door reads today. A
  *   sore area at Bad asks Rest today or Something gentler first, in the
@@ -181,7 +186,7 @@ const PROMPTS = {
     { text: "Push the effort now. 80-85% — uncomfortable but not maximal.", action: "Working" },
     { text: "Recovery. Drop the pace completely. Let the heart rate come down.", action: "Recovering" },
     { text: "Halfway through the intervals. Your form matters more when you are tired.", action: "Keep form" },
-    { text: "Last effort coming. Give it what you have left.", action: "Final push" },
+    { text: "Last effort coming. Hard but controlled.", action: "Last effort" },
     { text: "All done. Easy to the finish from here.", action: "Easing in" },
   ],
   long: [
@@ -209,30 +214,30 @@ const COOLDOWN_PROMPT = {
   isCooldown: true
 };
 
-const INTERVAL_STRUCTURE = {
-  20: [ // 20 min: 5 min easy + 4 x (2 min hard / 1.5 min easy) + 4 min easy
-    { at: 300,  type: "work",     text: "Start your first effort. 80% effort." },
-    { at: 420,  type: "recover",  text: "Recover. Walk or very easy jog." },
-    { at: 510,  type: "work",     text: "Second effort. Build to 80% again." },
-    { at: 630,  type: "recover",  text: "Recover." },
-    { at: 720,  type: "work",     text: "Third effort." },
-    { at: 840,  type: "recover",  text: "Recover." },
-    { at: 930,  type: "work",     text: "Last effort. Give it what you have." },
-    { at: 1050, type: "easy",     text: "Easy to the finish from here." },
-  ],
-  30: [ // 30 min: 5 min easy + 5 x (2 min hard / 2 min easy) + 5 min easy
-    { at: 300,  type: "work",    text: "First effort. 80% — hard but controlled." },
-    { at: 420,  type: "recover", text: "Recover. Walk or very easy jog." },
-    { at: 540,  type: "work",    text: "Second effort." },
-    { at: 660,  type: "recover", text: "Recover. Let the heart rate come down." },
-    { at: 780,  type: "work",    text: "Third effort. Stay controlled." },
-    { at: 900,  type: "recover", text: "Recover." },
-    { at: 1020, type: "work",    text: "Fourth effort." },
-    { at: 1140, type: "recover", text: "Recover." },
-    { at: 1260, type: "work",    text: "Last one. Everything you have left." },
-    { at: 1380, type: "easy",    text: "Easy to the finish." },
-  ],
-};
+/**
+ * W3-20. The interval script, built from the length asked. 45 and 60
+ * minutes used the 30-minute script, so "Last one" came at 21 minutes
+ * with half the run to go. Five minutes easy; two-minute efforts with
+ * recovery (90 s at 20 minutes, two minutes otherwise); the last effort
+ * starts at least five minutes before the end, so there is an easy
+ * finish; the last is called the last and nothing after it is an effort.
+ * No "everything you have left": hard but controlled, every time.
+ */
+const ORDINAL = ["First", "Second", "Third", "Fourth", "Fifth", "Sixth", "Seventh", "Eighth", "Ninth", "Tenth", "Eleventh", "Twelfth"];
+export function intervalScript(mins) {
+  const total = Number(mins) * 60, work = 120, rest = Number(mins) <= 20 ? 90 : 120;
+  const starts = [];
+  for (let at = 300; at <= total - 300; at += work + rest) starts.push(at);
+  const out = [];
+  starts.forEach((at, i) => {
+    const last = i === starts.length - 1;
+    out.push({ at, type: "work", text: last ? "Last effort. Hard but controlled."
+                                          : i === 0 ? "First effort. 80% -- hard but controlled." : `${ORDINAL[i] || "Next"} effort.` });
+    if (!last) out.push({ at: at + work, type: "recover", text: i === 0 ? "Recover. Walk or very easy jog." : "Recover." });
+  });
+  if (starts.length) out.push({ at: starts[starts.length - 1] + work, type: "easy", text: "Easy to the finish from here." });
+  return out;
+}
 
 // ── Condition notes ───────────────────────────────────────────────────────────
 
@@ -401,7 +406,11 @@ function renderTypeSelector() {
 
 function renderRunOverview() {
   const rt      = RUN_TYPES.find(t => t.id === selectedType);
-  const prompts = PROMPTS[selectedType] || PROMPTS.easy;
+  // W3-20. For intervals, what will actually be said: the script for this
+  // length (the prompt list is not played on an interval run).
+  const prompts = selectedType === "intervals"
+    ? intervalScript(selectedMins).map(p => ({ text: p.text, action: p.type === "work" ? "Working" : "Recovering" }))
+    : (PROMPTS[selectedType] || PROMPTS.easy);
 
   return `
     <div class="view walk-session-view">
@@ -599,9 +608,6 @@ function renderDone() {
           <p class="coach-message-text">
             ${name ? name + " \u2014 " : ""}${mins} minutes. ${completions[selectedType] || "Well done."}
           </p>
-          <p class="text-sm text-muted" style="margin-top: var(--space-3);">
-            +${creditsEarned} credits earned
-          </p>
         </div>
       </div>
 
@@ -719,7 +725,7 @@ function runTimer() {
     // cue silently. Now >= against a fired-index set, so a late tick still
     // catches up correctly instead of dropping the cue.
     if (selectedType === "intervals") {
-      const structure = INTERVAL_STRUCTURE[selectedMins] || INTERVAL_STRUCTURE[30];
+      const structure = intervalScript(selectedMins);   // W3-20
       let upcomingIdx = -1;
       for (let i = 0; i < structure.length; i++) {
         if (elapsed >= structure[i].at && !firedStructureIndices.has(i)) { upcomingIdx = i; break; }

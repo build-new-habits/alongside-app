@@ -1,6 +1,9 @@
 /**
  * progress.js
- * 29 Sep 2026 v22
+ * 30 Sep 2026 v23
+ *
+ * v23 - W3-20. The shared summary says "1 session", not "1 sessions", and under
+ *   90 minutes says minutes, not "about 0 hours".
  *
  * v22 - P25 (persona finding W2-20). Lifts: every one (eight shown, the
  *   rest under "All N lifts"; it stopped at eight), and each day's best
@@ -1316,7 +1319,7 @@ export function ProgressView(router) {
       return [
         `Progress — ${date}`,
         ``,
-        `${count} sessions in the last ${windowDays} days. ${mins} minutes of movement.`,
+        `${count} session${count === 1 ? "" : "s"} in the last ${windowDays} days. ${mins} minutes of movement.`,
         stats.hasActiveProgramme
           ? `Programme: ${stats.programmeName} — ${stats.weeksIn} weeks in, ${stats.totalSessions} sessions.`
           : '',
@@ -1330,7 +1333,7 @@ export function ProgressView(router) {
       return [
         `Here's what I've been up to with my movement practice:`,
         ``,
-        `${count} sessions over the last ${windowDays} days — about ${Math.round(mins / 60)} hours of movement total.`,
+        `${count} session${count === 1 ? "" : "s"} over the last ${windowDays} days — ${mins < 90 ? `${mins} minutes` : `about ${Math.round(mins / 60)} hours`} of movement in all.`,
         stats.hasActiveProgramme
           ? `I'm on week ${stats.currentWeek} of a 12-week programme called ${stats.programmeName}.`
           : '',

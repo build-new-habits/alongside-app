@@ -1,7 +1,12 @@
 /**
  * cycle-session.js - Guided Cycle Session
  *
- * 29 Sep 2026 v5
+ * 30 Sep 2026 v6
+ *
+ * v6 - W3-20. The "+N credits" line is gone: a count nothing uses, beside a
+ *   Community page that counts one credit per session (two on the Plan).
+ *   And the intervals finish no longer claims they "improve cycling economy
+ *   faster than any other training method" -- a claim the app cannot back.
  *
  * v5 - P25. A leftover entry from the last session is not spread into
  *   this one: store.pendingActivityEntry() decides (id and exercises
@@ -314,9 +319,8 @@ function renderDone() {
         <div>
           <h2 style="color: var(--color-primary); margin-bottom: var(--space-2);">Ride done.</h2>
           <p class="coach-message-text">
-            ${name ? name + " \u2014 " : ""}${mins} minutes. ${stype?.id === "intervals" ? "Interval sessions improve cycling economy faster than any other training method. Good work." : "Cycling is one of the lowest-impact ways to build cardiovascular fitness. That session counts."}
+            ${name ? name + " \u2014 " : ""}${mins} minutes. ${stype?.id === "intervals" ? "Intervals done: hard efforts with proper recovery between them." : "Cycling is one of the lowest-impact ways to build cardiovascular fitness. That session counts."}
           </p>
-          <p class="text-sm text-muted" style="margin-top: var(--space-3);">+${creditsEarned} credits earned</p>
         </div>
       </div>
       ${renderLogBlock(LOG_SUBJECT, "cycle-log", "distance")}

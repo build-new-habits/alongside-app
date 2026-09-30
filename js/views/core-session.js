@@ -1,7 +1,14 @@
 /**
  * core-session.js - Guided Core Session
  *
- * 29 Sep 2026 v16
+ * 30 Sep 2026 v17
+ *
+ * v17 - W3-20 (and W3-9's note). Below the acute level the sore-area lines
+ *   claimed changes ("I've kept hip extension loading light", "I've
+ *   adjusted the session away from...") that the filter does not make; they
+ *   say what is true. And the "+N credits earned" line is gone: a count
+ *   nothing uses, beside a Community page that counts one credit per
+ *   session (two on the Plan).
  *
  * v16 - P17, MOBILITY DOOR (persona finding W2-12). Mobility & Conditioning's
  *   "Start a Mobility Session" no longer opens this view. And the pool
@@ -239,7 +246,7 @@ import { renderLogBlock, attachLogEvents, scrollToTop, lastLine } from "../sessi
 import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
 import { EXERCISES, filterByConditions } from "../data/exercises/index.js";
 import { personFilter } from "../session-builder.js";
-import { getActiveConditionIds } from "../data/conditions.js";
+import { getActiveConditionIds, getConditionName } from "../data/conditions.js";
 
 export const centered = false;
 
@@ -425,23 +432,18 @@ function buildConditionNote() {
 
   if (relevant.length === 0) return null;
 
+  // W3-20. Below the acute level (7) nothing is moved out for a sore
+  // area -- the filter takes care, it does not exclude -- so the line says
+  // what is true: it is sore, go by how it feels, skip what pulls on it.
+  // At 7 and above the acute filter does leave moves out, and says so.
   const notes = relevant.map(id => {
     const pain = painScores[id] || 0;
+    const name = getConditionName(id).toLowerCase();
+    if (pain < 7) return `Your ${name} is sore today. Go by how it feels, and skip anything that pulls on it.`;
     if (id.includes("lower-back")) {
-      return pain >= 7
-        ? "Your lower back is flagging high pain today. I've removed all loaded and rotational exercises. Everything here is gentle."
-        : "Your lower back has some discomfort. I've adjusted the session away from anything that loads the spine under flexion.";
+      return "Your lower back is flagging high pain today. I've removed all loaded and rotational exercises. Everything here is gentle.";
     }
-    if (id.includes("sciatica")) {
-      return "Sciatica is present. I've avoided deep hip flexor loading and any exercises that compress the lumbar spine.";
-    }
-    if (id.includes("hamstring")) {
-      return "With your hamstring, I've kept hip extension loading light. Stop if you feel any pulling sensation down the back of the leg.";
-    }
-    if (id.includes("hip")) {
-      return "Your hip has been considered. The session avoids deep hip rotation and single-leg loading at end range.";
-    }
-    return null;
+    return `Your ${name} is bad today. I've left out the moves marked unsuitable for it at this level. Stop anything that hurts.`;
   }).filter(Boolean);
 
   return notes.length > 0 ? notes.join(" ") : null;
@@ -923,9 +925,6 @@ function renderDone() {
               : selectedFocus === "stability"
               ? "Stability work is quiet work. You won't always feel it during — you'll notice it in everything else you do."
               : "Good work."}
-          </p>
-          <p class="text-sm text-muted" style="margin-top: var(--space-3);">
-            +${creditsEarned} credits earned
           </p>
         </div>
       </div>

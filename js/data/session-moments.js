@@ -1,6 +1,10 @@
 /**
  * session-moments.js - The things the coach says when a session ends
- * 16 Aug 2026 v3
+ * 30 Sep 2026 v4
+ *
+ * v4 - W3-20. "That was your first one." only on the finish of that session:
+ *   the one completed session must be the one this finish is about. It
+ *   was said whenever one session had been completed.
  *   CHAP-1 step 3. chapterEnded is now actually passed. It was built on
  *   16 Aug and hardcoded false at every call site, which made it an
  *   integration point nothing integrated with -- the shape of a feature
@@ -134,9 +138,13 @@ export function renderSessionMoments({ exerciseIds } = {}) {
   let out = '';
 
   // 1. Recognition — fires once, ever.
-  const first = firstSessionRecognition(
+  // W3-20. And only if that one session is the one this finish is about.
+  const cur = store.get('currentActivityEntry');
+  const done = store.completedSessions(log);
+  const thisIsIt = done.length === 1 && cur && cur.id && done[0].id === cur.id;
+  const first = thisIsIt ? firstSessionRecognition(
     completedCount, store.get('onboarding.primaryTerritory')
-  );
+  ) : null;
   if (first) {
     out += card(
       `<h2 class="sm-first__heading">${esc(first.heading)}</h2>

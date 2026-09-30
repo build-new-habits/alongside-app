@@ -1,6 +1,9 @@
 /**
  * js/data/arc-readback.js
- * 29 Sep 2026 v2
+ * 30 Sep 2026 v3
+ *
+ * v3 - W3-20. sessionsInWindow() names a topKind only when it is more than
+ *   half of the sessions: "mostly X" was said on a tie.
  *
  * v2 - P25 (persona finding W2-20). liftReadback() compares each day's
  *   BEST set -- heaviest, then most reps -- on the first day and the
@@ -235,5 +238,7 @@ export function sessionsInWindow(completed = [], { days = 30, now = new Date(), 
   const kinds = {};
   for (const e of recent) { const k = kindOf(e); if (k) kinds[k] = (kinds[k] || 0) + 1; }
   const top = Object.entries(kinds).sort((a, b) => b[1] - a[1])[0];
-  return { count: recent.length, recent, topKind: top ? top[0] : null, kinds };
+  // W3-20. "Mostly" means more than half, never a tie.
+  const most = top && top[1] * 2 > recent.length ? top[0] : null;
+  return { count: recent.length, recent, topKind: most, kinds };
 }

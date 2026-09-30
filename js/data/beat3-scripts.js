@@ -1,6 +1,10 @@
 /**
  * js/data/beat3-scripts.js
- * 29 Sep 2026 v3
+ * 30 Sep 2026 v4
+ *
+ * v4 - W3-20. "Your conditions" and "your own programme" are not what the app
+ *   does since the minor-injury scope (29 Sep): "anything that's sore",
+ *   and "what I suggest will be built around you".
  *
  * v3 - P20, RE-ENTRY. The promise matches the rule: "When you come back
  *   after a week or more, I'm going to ask what happened" (the app works
@@ -113,9 +117,9 @@ export const beat3Scripts = {
 
       "With Alongside: Move, the starting point was the people those tools consistently failed. Not as an afterthought — as the foundation. And what it does goes further than finding exercises that fit. It works with your whole self — the body that shows up, the mind that's running alongside it, and whatever it is that makes movement mean something to you. All of that is welcome here. All of that is what we're working with.",
 
-      "I will never ask you to change so that you fit into the programme I offer. That defeats the whole point. What I will do is build from what's actually true for you — your body, your conditions, your energy, your history — and work from there.",
+      "I will never ask you to change so that you fit into the programme I offer. That defeats the whole point. What I will do is build from what's actually true for you — your body, anything that's sore, your energy, your history — and work from there.",
 
-      "So you will have your own programme, built for you, meeting you where you are. That's not a figure of speech — it's what the product is built on. Show me what's true for you, and I'll work with that. All of it."
+      "So what I suggest will be built around you, meeting you where you are. That's not a figure of speech — it's what the product is built on. Show me what's true for you, and I'll work with that. All of it."
     ]
   },
 

@@ -1,7 +1,10 @@
 /**
  * swim-session.js - Guided Swim Session
  *
- * 29 Sep 2026 v5
+ * 30 Sep 2026 v6
+ *
+ * v6 - W3-20. The "+N credits" line is gone: a count nothing uses, beside a
+ *   Community page that counts one credit per session (two on the Plan).
  *
  * v5 - P25. A leftover entry from the last session is not spread into
  *   this one: store.pendingActivityEntry() decides (id and exercises
@@ -305,7 +308,6 @@ function renderDone() {
           <p class="coach-message-text">
             ${name ? name + " \u2014 " : ""}${mins} minutes in the water. Swimming trains the cardiovascular system and the whole body simultaneously. Good session.
           </p>
-          <p class="text-sm text-muted" style="margin-top: var(--space-3);">+${creditsEarned} credits earned</p>
         </div>
       </div>
       ${renderLogBlock(LOG_SUBJECT, "swim-log", "lengths")}

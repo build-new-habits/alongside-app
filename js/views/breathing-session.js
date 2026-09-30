@@ -1,7 +1,10 @@
 /**
  * js/views/breathing-session.js - Guided Breathing Session
  *
- * 29 Sep 2026 v7
+ * 30 Sep 2026 v8
+ *
+ * v8 - W3-20. The "+N credits" line is gone: a count nothing uses, beside a
+ *   Community page that counts one credit per session (two on the Plan).
  *
  * v7 - P23. The safety note before a practice is worded for a practice
  *   ("Before your practice"), not for an exercise.
@@ -509,9 +512,6 @@ function renderDone() {
             ${name ? name + " — " : ""}${selectedMins} ${selectedMins === 1 ? "minute" : "minutes"} of ${type?.label?.toLowerCase() || "breathing"}.
             That time was yours.
           </p>
-          ${creditsEarned > 0
-            ? `<p class="text-sm text-muted" style="margin-top: var(--space-2);">+${creditsEarned} credits</p>`
-            : ""}
         </div>
       </div>
 

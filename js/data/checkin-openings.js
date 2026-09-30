@@ -1,6 +1,12 @@
 /**
  * js/data/checkin-openings.js
- * 29 Sep 2026 v8
+ * 30 Sep 2026 v9
+ *
+ * v9 - W3-20 TRUE-WORDS. Day one ("before your very first session") only when
+ *   nothing has been done yet: somebody who trained without checking in
+ *   was told it was their first. "The last couple of weeks... more
+ *   settled" compares two real fortnights (by date, three check-ins
+ *   each), not the last 14 check-ins however few days they covered.
  *
  * v8 - P8, INVENTED CHECK-IN LINES (persona finding W2-10). An opener is
  *   said only when its fact is true.
@@ -346,8 +352,10 @@ export function resolveOpening() {
   const lastOpeningMode = store.get('checkin.lastOpeningMode');
 
   // ── Day One (no history yet) ───────────────────────────────────────────────
+  // W3-20. A first check-in is not a first session if they have trained.
   if (totalCheckins === 0) {
-    return _resolveDayOne();
+    const trained = store.completedSessions(store.get('activityLog') || []).length > 0;
+    return trained ? _resolveHumanistic() : _resolveDayOne();
   }
 
   // ── Gap days ───────────────────────────────────────────────────────────────
@@ -503,7 +511,7 @@ function _resolveReflection(checkinHistory, historyKeys) {
   if (_moodImprovingEnergyFlat(last3))             return _reflectionV('mood-improving-flat');
 
   const last14 = historyKeys.slice(-14).map(k => checkinHistory[k]);
-  if (_steadyImprovement(last14))                  return _reflectionV('steady-improvement');
+  if (_steadyImprovement(historyKeys, checkinHistory)) return _reflectionV('steady-improvement');   // W3-20
 
   const lastWeekCount = _countLastWeek(historyKeys);
   if (lastWeekCount >= 3) {
@@ -656,11 +664,15 @@ function _hasActiveQuietPattern(historyKeys, checkinHistory) {
   return gaps >= 2;
 }
 
-function _steadyImprovement(last14) {
-  if (last14.length < 8) return false;
-  const e1 = last14.slice(0,7).map(x => x?.energy).filter(v => typeof v === 'number');
-  const e2 = last14.slice(7).map(x => x?.energy).filter(v => typeof v === 'number');
-  if (!e1.length || !e2.length) return false;
+// W3-20. "The last couple of weeks... the weeks before": two real
+// fortnights by date, at least three check-ins in each.
+function _steadyImprovement(historyKeys, checkinHistory) {
+  const now = new Date(); now.setHours(0, 0, 0, 0);
+  const ago = k => (now - new Date(k)) / 864e5;
+  const pick = (lo, hi) => historyKeys.filter(k => ago(k) >= lo && ago(k) < hi)
+    .map(k => checkinHistory[k]?.energy).filter(v => typeof v === 'number');
+  const e2 = pick(0, 14), e1 = pick(14, 28);
+  if (e1.length < 3 || e2.length < 3) return false;
   return (e2.reduce((a,b) => a+b,0)/e2.length) > (e1.reduce((a,b) => a+b,0)/e1.length) + 0.5;
 }
 

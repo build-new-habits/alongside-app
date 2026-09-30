@@ -1,7 +1,10 @@
 /**
  * js/views/session-builder-ui.js - Session Builder UI
  *
- * 30 Sep 2026 v28
+ * 30 Sep 2026 v29
+ *
+ * v29 - W3-20. Coach recommends builds with recommended: true, so the
+ *   plan does not say "You picked this one yourself".
  *
  * v28 - W3-16. Editing a saved session keeps its doses (sections, sets,
  *   reps) as edited.
@@ -1837,7 +1840,8 @@ function triggerRecommendedBuild() {
       sessionType:       selectedType,
       durationMins:      selectedDuration,
       selectedIds:       recommendedIds,
-      equipmentOverride: equipmentOverride
+      equipmentOverride: equipmentOverride,
+      recommended:       true   // W3-20: the coach's picks, in the coach's words
     });
 
     if (!builtSession) {

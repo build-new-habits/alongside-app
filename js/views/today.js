@@ -1,6 +1,9 @@
 /**
  * today.js
- * 30 Sep 2026 v50
+ * 30 Sep 2026 v51
+ *
+ * v51 - W3-20. "You moved today" only after movement: breathing, mindful
+ *   sessions and quiet practices are not movement (decision 4a).
  *
  * v50 - W3-13 INTERRUPTIONS (Schema v1.85). Free Home shows a session
  *   the phone closed, with "Save what you did" and "Don't save it" (Carry
@@ -1023,7 +1026,9 @@ export function TodayView(router) {
     // somebody they had moved. That is worse than a wrong number: it is
     // the coach claiming to have seen something that did not happen.
     const today       = _todayString();
-    const activityLog = store.completedSessions(store.get('activityLog'));
+    // W3-20. Movement only: "You moved today" after breathing was untrue.
+    const NOT_MOVEMENT = ['breathing', 'mindful', 'mindfulness', 'practice'];
+    const activityLog = store.completedSessions(store.get('activityLog')).filter(e => !NOT_MOVEMENT.includes(e.type));
     return activityLog.some(e => {
       const ts = e.completedAt || e.loggedAt || e.date;
       return ts && new Date(ts).toISOString().split('T')[0] === today;

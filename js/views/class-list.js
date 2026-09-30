@@ -1,7 +1,10 @@
 /**
  * js/views/class-list.js
  *
- * 30 Sep 2026 v3
+ * 30 Sep 2026 v4
+ *
+ * v4 - W3-20. "They know what you're working towards" only when there is
+ *   something they know: an arc. Free has none.
  *
  * v3 - S1-SEATED (found building the S1 clinical pack). "can be done
  *   seated" only where every movement step has a seated version in what
@@ -132,8 +135,8 @@ export function render() {
     <div class="view class-list">
       <h1 class="class-list__title" tabindex="-1">Classes</h1>
       <p class="class-list__intro">
-        Pick the one you want. They run the same for everybody — the
-        difference here is that they know what you're working towards.
+        Pick the one you want. They run the same for everybody${mine.length ? ` — the
+        difference here is that they know what you're working towards` : ""}.
       </p>
 
       ${open.length ? `

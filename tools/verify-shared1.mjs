@@ -1,5 +1,11 @@
 /**
  * tools/verify-shared1.mjs
+ * 30 Sep 2026 v3
+ *
+ * v3 - W3-20 TRUE-WORDS. "That was your first one" is said only on the finish
+ *   of that session: the fixture sets currentActivityEntry to the entry it
+ *   logs, as every player does. No assertion changed.
+ *
  * 21 Aug 2026 v2
  * GATE-PATH. Path resolution only -- no assertion changed.
  *
@@ -95,8 +101,10 @@ check('the moments are defined in exactly one place', dupes.length === 0,
 localStorage.clear(); store.init();
 store.set('onboarding.primaryTerritory', 'wrong-fit');
 SM.resetSessionMoments();
-store.logActivity({ type: 'core-session', status: 'completed', durationMins: 20,
-  exercisesCount: 4, completedAt: new Date().toISOString() });
+// W3-20: as the players do, the entry just logged is the one the finish
+// is about (currentActivityEntry); the recognition needs both.
+store.set('currentActivityEntry', store.logActivity({ type: 'core-session', status: 'completed', durationMins: 20,
+  exercisesCount: 4, completedAt: new Date().toISOString() }));
 const first = SM.renderSessionMoments({ exerciseIds: [] });
 check('a first session shows the recognition', /That was your first one/.test(first));
 

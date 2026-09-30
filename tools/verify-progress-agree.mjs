@@ -1,5 +1,11 @@
 /**
  * tools/verify-progress-agree.mjs
+ * 30 Sep 2026 v3
+ *
+ * v3 - W3-20 TRUE-WORDS. 1d protects that the coach line agrees with the count.
+ *   It also required ", mostly", which is now said only when one kind is
+ *   more than half; the count is what is checked.
+ *
  * 29 Sep 2026 v2
  *
  * v2 - P0, SCOPE-MINOR. Test 2 inverted. "What you've told me about"
@@ -100,7 +106,7 @@ main.querySelector('[data-window="90"]')?.dispatchEvent(new dom.window.MouseEven
 ok("1b. Plan, 90 days", number() === truth(90) && number() === 8, String(number()));
 fixture({ tier: "free" }); progress();
 ok("1c. free, 30 days: the same number as the Plan", number() === plan30);
-ok("1d. the coach line agrees with it", new RegExp(`You've moved ${plan30} times in the last 30 days, mostly`).test(txt(main.querySelector(".progress-narrative"))),
+ok("1d. the coach line agrees with it", new RegExp(`You've moved ${plan30} times in the last 30 days[,.]`).test(txt(main.querySelector(".progress-narrative"))),
    txt(main.querySelector(".progress-narrative")));
 const weeks = RB.lastWeeks(6, new Date(NOW));
 const inSix = store.completedSessions(LOG).filter(e => new Date(e.completedAt) >= weeks[0].start).length;

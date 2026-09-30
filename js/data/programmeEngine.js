@@ -1,6 +1,9 @@
 /**
  * programmeEngine.js
- * 29 Sep 2026 v9
+ * 30 Sep 2026 v10
+ *
+ * v10 - W3-20. recordSession() no longer awards the community credit;
+ *   store.logActivity() does, for every completed movement session.
  *
  * v9 - P20, RE-ENTRY (persona finding W2-15). getReEntryContext() read the
  *   gap from progressLog, which only a programme writes: on Free, with no
@@ -166,8 +169,9 @@ export function recordSession(sessionData = {}) {
     store.set('annualReflection.anniversaryDate', new Date().toISOString().split('T')[0]);
   }
 
-  // Award community credit
-  store.awardCommunityCredit();
+  // W3-20. The community credit is awarded where the session is logged
+  // (store.logActivity), for every kind of session; awarding it here too
+  // would count coach workouts twice.
 
   // Milestone check
   const milestone = _checkMilestone();

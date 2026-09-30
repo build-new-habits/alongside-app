@@ -1,7 +1,11 @@
 /**
  * reflect.js - Reflect Screen
  *
- * 30 Sep 2026 v11
+ * 30 Sep 2026 v12
+ *
+ * v12 - W3-20. "That is N sessions this week" counted part-sessions, and its week
+ *   began at the current time of day on Sunday. Completed sessions, from
+ *   the start of the day.
  *
  * v11 - W3-5 WORSE-POINTER (Wave 3, persona 2.1). "Worse than usual" gets
  *   the stop-and-seek line, and no longer counts as a struggle for the
@@ -548,11 +552,12 @@ function _hardLine(entry) {
 
 function buildSummary(entry, feel, pain, moodAfterValue) {
   const log       = store.get("activityLog") || [];
-  const thisWeek  = log.filter(e => {
-    const d = new Date(e.date);
-    const now = new Date();
-    const weekStart = new Date(now);
-    weekStart.setDate(now.getDate() - now.getDay());
+  // W3-20. Completed sessions, from the start of Sunday.
+  const thisWeek  = store.completedSessions(log).filter(e => {
+    const d = new Date(e.completedAt || e.date);
+    const weekStart = new Date();
+    weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+    weekStart.setHours(0, 0, 0, 0);
     return d >= weekStart;
   });
 

@@ -1,6 +1,9 @@
 /**
  * yoga-session.js
- * 30 Sep 2026 v13
+ * 30 Sep 2026 v14
+ *
+ * v14 - W3-20. The "+N credits" line is gone: a count nothing uses, beside a
+ *   Community page that counts one credit per session (two on the Plan).
  *
  * v13 - W3-19 YOGA-EMPTY (persona Wave 3, 2.11: cannot get to the floor).
  *   Flexibility, Balance and Recovery had nothing for her, and each
@@ -1122,9 +1125,6 @@ function renderDone() {
           </h2>
           <p class="coach-message-text">
             ${name ? name + " \u2014 " : ""}${doneMsg[selectedFocus] || "Well done."}
-          </p>
-          <p class="text-sm text-muted" style="margin-top: var(--space-3);">
-            +${creditsEarned} credits earned
           </p>
         </div>
       </div>

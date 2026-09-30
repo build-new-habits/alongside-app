@@ -1,7 +1,10 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
- * 30 Sep 2026 v76
+ * 30 Sep 2026 v77
+ *
+ * v77 - W3-20. buildSessionFromSelection({ recommended: true }) -- "Coach
+ *   recommends" -- no longer says "You picked this one yourself".
  *
  * v76 - W3-18 GYM-QUALITY (persona Wave 3: 2.4, 2.15). Measured at a gym,
  *   30 builds each: Lower Body had no strength hinge in 30 of 30 and a
@@ -3527,7 +3530,7 @@ export function buildSessionFromSaved({ sessionType, durationMins, exercises, ti
   };
 }
 
-export function buildSessionFromSelection({ sessionType, durationMins, selectedIds, equipmentOverride, ignoreSevere }) {
+export function buildSessionFromSelection({ sessionType, durationMins, selectedIds, equipmentOverride, ignoreSevere, recommended = false }) {
   // CR-2. The self-directed route gets the same answer, and gets it
   // first, for the same reason SEVERE-1 is on both entry points: a safety
   // rule honoured by one of two routes is not a safety rule.
@@ -3654,9 +3657,10 @@ export function buildSessionFromSelection({ sessionType, durationMins, selectedI
     id:       `${sessionType}-${Date.now()}`,
     sessionType: type.id,
     title:    type.label,
-    subtitle: `Built by you today — ${durationMins} mins`,
+    // W3-20. The coach's picks are not "yours".
+    subtitle: recommended ? `Suggested for you today — ${durationMins} mins` : `Built by you today — ${durationMins} mins`,
     duration: durationStr,
-    coachLine: "You picked this one yourself — here's what you chose.",
+    coachLine: recommended ? "These are the ones I'd suggest. Change any you like." : "You picked this one yourself — here's what you chose.",
     exercises: allExercises
   };
 

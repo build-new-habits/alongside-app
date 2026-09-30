@@ -1,6 +1,10 @@
 /**
  * js/views/checkin.js
- * 30 Sep 2026 v25
+ * 30 Sep 2026 v26
+ *
+ * v26 - W3-20. "You have 20 minutes today" -- nobody had said so; it is their
+ *   usual length (availableTime). It says so: "I'll plan for your usual
+ *   20 minutes."
  *
  * v25 - W3-4 SORE-SCOPE. "Anything sore today?" offers body areas only;
  *   Perimenopause symptoms was offered first and scored.
@@ -873,8 +877,8 @@ export function CheckinView(router) {
     else if (q === "poor") line += ", and a poor night's sleep.";
     else                   line += ".";
 
-    if (_selectedTime) line += ` You have ${tl[_selectedTime] || _selectedTime} today.`;   // only if set elsewhere
-    line += " I'll have something ready for you.";
+    // W3-20. Their usual length, said as that -- not a claim about today.
+    line += _selectedTime ? ` I'll plan for your usual ${tl[_selectedTime] || _selectedTime}.` : " I'll have something ready for you.";
     return line;
   }
 
