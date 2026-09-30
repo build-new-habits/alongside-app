@@ -1,7 +1,10 @@
 /**
  * reflect.js - Reflect Screen
  *
- * 29 Sep 2026 v8
+ * 30 Sep 2026 v9
+ *
+ * v9 - W3-3 CLASS-FINISH (Wave 3). Saving answers onto an existing entry keeps
+ *   its completedAt: answering how it felt moved the session to today.
  *
  * v8 - P10, FINISH LINES (persona finding W2-10). "You finished it" is
  *   said only when they did: a session ended early hears that stopping
@@ -903,7 +906,8 @@ function saveAndSummarise() {
     };
 
     if (idx !== -1) {
-      log[idx] = { ...log[idx], ...reflectFields };
+      // W3-3. Answering how it felt never moves when the session happened.
+      log[idx] = { ...log[idx], ...reflectFields, completedAt: log[idx].completedAt || reflectFields.completedAt };
       delete log[idx].energyAfter;
       store.set("activityLog", log);
     } else {

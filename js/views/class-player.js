@@ -1,7 +1,11 @@
 /**
  * js/views/class-player.js
  *
- * 28 Sep 2026 v4
+ * 30 Sep 2026 v5
+ *
+ * v5 - W3-3 CLASS-FINISH (Wave 3). The class is the finish screen's entry:
+ *   currentActivityEntry is set when the class is logged. It was never
+ *   set, so the finish showed and overwrote the previous session.
  *
  * v4 - F6, REDUCE-MOTION-ROW. Reduced motion is read from
  *   display-prefs.js prefersReducedMotion(): the device, or the new
@@ -479,7 +483,9 @@ function _logClass(status) {
     : _elapsedMins();
   const ids = [...new Set(_exerciseIdsSoFar())];
 
-  store.logActivity({
+  // W3-3. The finish screen reads currentActivityEntry; a class never set
+  // it, so the finish showed and saved over the last session.
+  const created = store.logActivity({
     type:           'class',
     date:           nowIso,
     completedAt:    nowIso,
@@ -502,6 +508,7 @@ function _logClass(status) {
     isEvent:        false,
     eventName:      null
   });
+  store.set('currentActivityEntry', created || null);
 }
 
 function _stop() {

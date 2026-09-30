@@ -1,7 +1,10 @@
 /**
  * prescribed-session.js - My exercises, played
  *
- * 29 Sep 2026 v11
+ * 30 Sep 2026 v12
+ *
+ * v12 - W3-3 CLASS-FINISH (Wave 3, persona 2.14). A finished My exercises
+ *   session is the finish screen's entry (currentActivityEntry set).
  *
  * v11 - P0, SCOPE-MINOR + P5 PRESCRIBED-CRASH. Plays the person's own
  *   list ("My exercises"): no "Prescribed" badge, no "Notes from your
@@ -706,7 +709,8 @@ function completeSession(active) {
   // -- and only when status is not "partial", which is why abandoning
   // one correctly recorded nothing.
   const nowIso = new Date().toISOString();
-  store.logActivity({
+  // W3-3. The finish screen's entry is this session, not the last one.
+  const created = store.logActivity({
     type:           "prescribed-session",
     source:         "own",
     sessionEnd:     nowIso,
@@ -717,6 +721,7 @@ function completeSession(active) {
     exerciseIds:    progress.map(e => e.exerciseId).filter(Boolean),
     creditsEarned
   });
+  store.set("currentActivityEntry", created || null);
 
   cleanupSession();
   dismountSessionGuard();
