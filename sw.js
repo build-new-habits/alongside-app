@@ -1,7 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 30 Sep 2026 v606
+ * 30 Sep 2026 v607
+ *
+ * v607 - W3-17: the aim is editable; holding on fits the person.
  *
  * v606 - W3-16: the arc reads chosen strands and freestyle work; saved sessions keep kind and doses.
  *
@@ -4141,7 +4143,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v606";
+const CACHE_NAME = "alongside-v607";
 
 const SHELL_URLS = [
 
