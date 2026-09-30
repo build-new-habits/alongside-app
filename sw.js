@@ -1,7 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 30 Sep 2026 v609
+ * 30 Sep 2026 v610
+ *
+ * v610 - W3-19: no yoga card offers 0 poses; an empty style says so first.
  *
  * v609 - W3-18: a strength hinge, balanced upper body, rest for heavy sets.
  *
@@ -4147,7 +4149,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v609";
+const CACHE_NAME = "alongside-v610";
 
 const SHELL_URLS = [
 
