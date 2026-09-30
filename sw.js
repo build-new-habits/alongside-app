@@ -1,7 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 30 Sep 2026 v604
+ * 30 Sep 2026 v605
+ *
+ * v605 - W3-15: strength moves ask for reps, not minutes.
  *
  * v604 - W3-14: ten minutes is about ten; the Gym block leaves room.
  *
@@ -4137,7 +4139,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v604";
+const CACHE_NAME = "alongside-v605";
 
 const SHELL_URLS = [
 
