@@ -1,7 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 29 Sep 2026 v595
+ * 30 Sep 2026 v596
+ *
+ * v596 - S1-LEGS, S1-SEATED, LIBRARY-TILES. Capability tags and holds,
+ *   the seated class line, the Library's At home tiles.
  *
  * v595 - P26 SMALLER. Run door on Free, Your arc screen, red-flag
  *   Not now, gym in the activity log, weight tier row, no-count lighter-day
@@ -4115,7 +4118,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v595";
+const CACHE_NAME = "alongside-v596";
 
 const SHELL_URLS = [
 
