@@ -1,7 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 30 Sep 2026 v611
+ * 30 Sep 2026 v612
+ *
+ * v612 - W3-21: Length, Where and Swap are lists; looking at a plan keeps the default place; builder and Run door start fresh.
  *
  * v611 - W3-20: fourteen untrue lines corrected; a credit for every session.
  *
@@ -4151,7 +4153,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v611";
+const CACHE_NAME = "alongside-v612";
 
 const SHELL_URLS = [
 
