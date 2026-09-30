@@ -1,7 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 30 Sep 2026 v599
+ * 30 Sep 2026 v600
+ *
+ * v600 - W3-10: the lighter day counts movement only, and can be turned down.
  *
  * v599 - W3-4 to W3-9: a sore tap is not a tracked injury; Worse gets the
  *   pointer; held stances count as loading the legs; "gentler" is gentler;
@@ -4127,7 +4129,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v599";
+const CACHE_NAME = "alongside-v600";
 
 const SHELL_URLS = [
 
