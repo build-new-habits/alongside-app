@@ -1,9 +1,16 @@
 /**
  * js/session-resume.js - Resumable Session State
  *
- * 03 Aug 2026 v1
+ * 30 Sep 2026 v2
  *
  * CHANGELOG
+ * 30 Sep 2026 v2 - W3-13 INTERRUPTIONS (Schema v1.85). A waiting session
+ *   is never dropped without a word. When its checkpoint goes stale (3
+ *   hours), or another session takes the one slot, the entry the view
+ *   left in `rescue` is written for the person -- dated when it was last
+ *   touched, its minutes without the time away (`awayMs`) -- and
+ *   `rescuedSession` tells Home to say so once. A new session no longer
+ *   inherits the old one's fields (startedAt included).
  * 03 Aug 2026 v1 - Initial implementation, pilot on running-session.js
  *   (blueprint alongside_blueprint_wakelock-resume_03aug2026_v1.md).
  *
@@ -67,7 +74,15 @@ const STALE_MS = 3 * 60 * 60 * 1000; // 3 hours - long enough to cover a
  *   calls can omit it and the existing value is preserved.
  */
 export function checkpointSession(sessionType, fields) {
-  const existing  = store.get("activeSessionCheckpoint") || {};
+  let existing = store.get("activeSessionCheckpoint") || {};
+  // W3-13. Another session, or a stale one: saved for the person first,
+  // and nothing of it carried into this one.
+  const sameSession = existing.sessionType === sessionType &&
+    (fields.sessionId === undefined || existing.sessionId === undefined || existing.sessionId === fields.sessionId);
+  if (existing.sessionType && (!sameSession || _isStale(existing))) {
+    rescueSession(existing);
+    existing = {};
+  }
   const startedAt = fields.startedAt || existing.startedAt || new Date().toISOString();
 
   store.set("activeSessionCheckpoint", {
@@ -89,13 +104,48 @@ export function getResumableSession(sessionType) {
   if (!checkpoint) return null;
   if (checkpoint.sessionType !== sessionType) return null;
 
-  const checkpointedAt = new Date(checkpoint.checkpointedAt).getTime();
-  if (isNaN(checkpointedAt) || Date.now() - checkpointedAt > STALE_MS) {
-    clearCheckpoint();
+  if (_isStale(checkpoint)) {
+    rescueSession(checkpoint);   // W3-13: saved, not dropped
     return null;
   }
 
   return checkpoint;
+}
+
+function _isStale(cp) {
+  const t = new Date(cp.checkpointedAt).getTime();
+  return isNaN(t) || Date.now() - t > STALE_MS;
+}
+
+/** W3-13. Minutes in the session: start to last touch, less the time away. */
+export function activeMinutes(cp) {
+  const start = new Date(cp.startedAt).getTime(), end = new Date(cp.checkpointedAt).getTime();
+  if (isNaN(start) || isNaN(end)) return null;
+  return Math.max(1, Math.round((end - start - (Number(cp.awayMs) || 0)) / 60000));
+}
+
+/**
+ * W3-13. Write what the waiting session's view left in `rescue`, as the
+ * person's own record, then clear the slot. Nothing done, nothing
+ * written. Returns the entry, or null.
+ */
+export function rescueSession(cp) {
+  let entry = null;
+  const r = cp && cp.rescue;
+  if (r && ((Number(r.exercisesCount) || 0) > 0 || (Number(r.setsDone) || 0) > 0)) {
+    const at = cp.checkpointedAt || new Date().toISOString();
+    const { name, ...fields } = r;
+    entry = store.logActivity({ ...fields, date: at, completedAt: at, durationMins: activeMinutes(cp), rescued: true });
+    if (entry) store.set("rescuedSession", { at: new Date().toISOString(), name: name || cp.name || null, moves: Number(r.exercisesCount) || 0 });
+  }
+  if (store.get("activeSessionCheckpoint") === cp || store.get("activeSessionCheckpoint")?.checkpointedAt === cp?.checkpointedAt) clearCheckpoint();
+  return entry;
+}
+
+/** W3-13. Home's first act: a stale session of any kind is saved now. */
+export function rescueStaleSession() {
+  const cp = store.get("activeSessionCheckpoint");
+  if (cp && _isStale(cp)) rescueSession(cp);
 }
 
 /** Clear the active checkpoint - call on completion, deliberate exit, or "start fresh". */

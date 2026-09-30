@@ -1,6 +1,13 @@
 /**
  * js/views/capture.js
- * 28 Sep 2026 v3
+ * 30 Sep 2026 v4
+ *
+ * v4 - W3-13 INTERRUPTIONS (persona Wave 3: 2.4, 2.15, 2.16). The session
+ *   waited 3 hours, then was dropped with every set in it. Now it says up
+ *   front that it keeps for 3 hours after the last set and then saves
+ *   what was logged; the checkpoint carries that entry (rescue) for
+ *   session-resume.js to write. Minutes leave out any gap of more than
+ *   30 minutes between sets (time away, not training).
  *
  * v3 - F1, FREESTYLE-RELOAD. The session survives the app closing: each
  *   logged set writes the one active-session slot (session-resume.js),
@@ -80,12 +87,10 @@ import { performanceFields } from "../session-log.js";
 import { hurtBlock } from "../exercise-card.js";
 import { isGateDue, renderSafetyGate, attachSafetyGate } from "../safety-gate.js";
 import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
-import { checkpointSession, getResumableSession, clearCheckpoint } from "../session-resume.js";
+import { checkpointSession, getResumableSession, clearCheckpoint, rescueStaleSession } from "../session-resume.js";
 
 export const centered = false;
 
-/** A session left idle this long is not resumed; it starts fresh. */
-const STALE_MS = 6 * 3600 * 1000;
 /** Two sets further apart than this are not "after" each other. */
 const AFTER_WINDOW_MS = 3 * 3600 * 1000;
 
@@ -128,12 +133,39 @@ let guarded   = false;  // the back-gesture guard, mounted once per visit
  */
 function _persist() {
   if (!totalSets()) return;
+  const list = allMoves();
   checkpointSession("freestyle", {
     moves:     moves.map(m => ({ id: m.id, sets: m.sets })),
     current:   current ? { id: current.id, sets: current.sets } : null,
     kind,
     startedAt: new Date(startedAt || Date.now()).toISOString(),
+    // W3-13. Saved as it is if nobody comes back within 3 hours.
+    awayMs:    _awayMs(false),
+    rescue: {
+      type:           "freestyle",
+      name:           "Make it up as I go",
+      exerciseIds:    list.map(m => m.id),
+      exercisesCount: list.length,
+      setsDone:       list.reduce((n, m) => n + m.sets.length, 0),
+      ...(kind ? { sessionType: kind } : {}),
+    },
   });
+}
+
+/** W3-13. A gap this long between sets is time away, not training. */
+const AWAY_GAP_MS = 30 * 60 * 1000;
+/**
+ * W3-13. Time away within the session: every gap longer than AWAY_GAP_MS
+ * between the start, each logged set and (untilNow) the present.
+ */
+function _awayMs(untilNow) {
+  const times = [startedAt || Date.now()];
+  for (const m of allMoves()) for (const e of m.sets) { const t = Date.parse(e.at); if (Number.isFinite(t)) times.push(t); }
+  times.sort((a, b) => a - b);
+  if (untilNow) times.push(Date.now());
+  let away = 0;
+  for (let i = 1; i < times.length; i++) { const gap = times[i] - times[i - 1]; if (gap > AWAY_GAP_MS) away += gap; }
+  return away;
 }
 
 /** A reopened app: pick the session back up from the slot, if it is ours. */
@@ -424,7 +456,10 @@ function _row(ex) {
 }
 
 export function render() {
-  if (startedAt && Date.now() - startedAt > STALE_MS) _reset();
+  // W3-13. A session nobody came back to within 3 hours is saved, not
+  // dropped (session-resume.js); what is in memory then starts afresh.
+  rescueStaleSession();
+  if (totalSets() && store.get("activeSessionCheckpoint")?.sessionType !== "freestyle") _reset();
   // CAPTURE-1. The gate stands before the first movement -- see the header.
   if (isGateDue()) return `<div class="view capture-view">${renderSafetyGate()}</div>`;
   _restore();
@@ -445,6 +480,8 @@ export function render() {
       </header>
       <h1 class="sr-only">Make it up as I go</h1>
       <p class="fs-error" id="fs-error" role="alert"></p>
+
+      <p class="fs-sub">If you stop part-way, this keeps for 3 hours after your last set, then I save what you\u2019ve logged.</p>
 
       <p class="fs-where">${esc(PLACE_WORDS[loc])}
         <button type="button" class="fs-where__change" id="fs-where" aria-label="Change where you are. Now: ${esc(PLACE_WORDS[loc])}">Change</button>
@@ -519,7 +556,8 @@ export function saveFreestyle() {
     type:           "freestyle",
     date:           nowIso,
     completedAt:    nowIso,
-    durationMins:   startedAt ? Math.max(1, Math.round((Date.now() - startedAt) / 60000)) : null,
+    // W3-13. Without the time away.
+    durationMins:   startedAt ? Math.max(1, Math.round((Date.now() - startedAt - _awayMs(true)) / 60000)) : null,
     moodAfter:      null,
     exerciseIds:    list.map(m => m.id),
     exercisesCount: list.length,

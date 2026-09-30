@@ -1,6 +1,12 @@
 /**
  * today.js
- * 29 Sep 2026 v49
+ * 30 Sep 2026 v50
+ *
+ * v50 - W3-13 INTERRUPTIONS (Schema v1.85). Free Home shows a session
+ *   the phone closed, with "Save what you did" and "Don't save it" (Carry
+ *   on stays the Plan's, the tier table). A session nobody came back to
+ *   within 3 hours is saved on arrival here (session-resume.js), and Home
+ *   says so once.
  *
  * v49 - P26, RUN ON FREE (persona finding W2-20). A Run door among Free's
  *   "Move your body" tiles. Running was the main goal of persona 2.1 and
@@ -752,7 +758,7 @@
  */
 
 import { store }               from '../store.js';
-import { getResumableSession } from '../session-resume.js';
+import { getResumableSession, rescueStaleSession, clearCheckpoint } from '../session-resume.js';
 import { carryOnSummary } from './capture.js';   // F1: a freestyle session to carry on
 // SAFETY-GATE, 15 Sep 2026. One cadence in this product, not two, and
 // one copy of the clinical wording rather than two that drift apart.
@@ -919,6 +925,7 @@ export function TodayView(router) {
   ];
 
   function mount(container) {
+    rescueStaleSession();   // W3-13: a session nobody came back to is saved, not dropped
     advanceWeekIfNeeded();
     // CHAP-1 step 4. Proposed HERE because Home is the one surface
     // everybody reaches. Proposing it lazily on read would mean My
@@ -1150,6 +1157,7 @@ export function TodayView(router) {
         <header class="today-header">
           <h1 class="today-greeting">${_esc(greeting)}</h1>
           ${coachLine ? `<p class="today-coach-line" role="status">${_esc(coachLine)}</p>` : ''}
+          ${_rescuedNote()}
         </header>
 
         <!-- WEEK COUNTER REMOVED, LOBBY-1b, 03 Sep 2026.
@@ -1223,7 +1231,7 @@ export function TodayView(router) {
 
              The invitation states the price of entry, so the check-in
              is consented to rather than sprung. -->
-        ${isPremium() ? _planDoors() : chooser() + arcPanel()}
+        ${isPremium() ? _planDoors() : _freeCarryCard() + chooser() + arcPanel()}
 
         ${isPremium() ? '' : `<div class="today-reference" role="group" aria-label="Reference and settings">
           <!-- On free, Wellbeing is promoted into "Settle your mind"
@@ -1292,6 +1300,14 @@ export function TodayView(router) {
       ?.addEventListener('click', async e => {
         const w = await import(e.currentTarget.dataset.carry === 'capture' ? './capture.js' : './workout.js');
         w.finishFromHome();
+      });
+
+    // W3-13. Let it go, on purpose: nothing saved, nothing waiting.
+    container.querySelector('[data-action="carry-drop"]')
+      ?.addEventListener('click', () => {
+        clearCheckpoint();
+        store.set('workoutProgress', null);
+        mount(container);
       });
 
     container.querySelector('[data-action="start-today"]')
@@ -1960,6 +1976,34 @@ function _markGuidanceShown(root) {
       next:  ses.exercises[index]?.name || '',
       index, total,
     };
+  }
+
+  /** W3-13. Said once: a waiting session was saved for them. */
+  function _rescuedNote() {
+    const r = store.get('rescuedSession');
+    if (!r) return '';
+    store.set('rescuedSession', null);
+    const n = Number(r.moves) || 0;
+    return `<p class="today-coach-line" role="status">I saved what you did in your last session${n ? `, ${n} move${n === 1 ? '' : 's'},` : ''} just as it was.</p>`;
+  }
+
+  /**
+   * W3-13. Free: a session the phone closed is shown, to save or let go.
+   * Carry on is the Plan's (tier table, "Coming back"); what was done is
+   * the person's on either tier.
+   */
+  function _freeCarryCard() {
+    const c = _carryOn();
+    if (!c) return '';
+    const what = c.freestyle ? c.done : `Stopped at ${c.index + 1} of ${c.total}`;
+    return `
+      <section class="home-carry" aria-labelledby="home-carry-title">
+        <p class="home-carry__kicker">Your last session stopped part-way</p>
+        <h2 class="home-carry__title" id="home-carry-title">${_esc(c.name)}</h2>
+        <p class="home-carry__next">${_esc(what)}</p>
+        <button class="btn btn-primary btn-full" data-action="carry-finish"${c.freestyle ? ' data-carry="capture"' : ''}>Save what you did</button>
+        <button class="btn btn-ghost btn-full" data-action="carry-drop">Don\u2019t save it</button>
+      </section>`;
   }
 
   /** Replaces the first door when there is a session to come back to. */

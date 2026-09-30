@@ -1,6 +1,9 @@
 /**
  * js/data/tier-table.js
- * 29 Sep 2026 v3
+ * 30 Sep 2026 v4
+ *
+ * v4 - W3-13. Coming back, Free: a session the phone closed can still
+ *   be saved (Save what you did on Home). Carrying on stays the Plan's.
  *
  * v3 - P26 (persona finding W2-20). A weight row. Weight tracking is the
  *   Plan's (WEIGHT-1b) and "Lose weight" is offered only with it on (spec
@@ -100,7 +103,7 @@ export const TIER_TABLE = [
   {
     id: "coming-back",
     area: "Coming back",
-    free: "A gentler start after time away",
+    free: "A gentler start after time away; a session the phone closed can still be saved",
     plan: "The same, and a session you left part-way carries on where you stopped",
     says: "Leave a session part-way and carry on later, exactly where you stopped.",
     proof: "verify-plan-claims 3.coming-back, verify-home-plan",

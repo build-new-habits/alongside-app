@@ -1,6 +1,10 @@
 /**
  * tools/verify-lobby1.mjs
- * 28 Sep 2026 v3
+ * 30 Sep 2026 v4
+ *
+ * v4 - W3-13. Free's side of the Home ternary now begins with the card
+ *   for a session the phone closed (_freeCarryCard()); 11d finds the
+ *   ternary by its Plan side. The assertion is unchanged.
  *
  * v3 - SMOOTH-P3a. Plan's arc is the one-line _arcChip() and Plan's
  *   choices are _planDoors(), in the same tier ternaries arcPanel() and
@@ -413,7 +417,7 @@ check("11d. the offer is above the reference rows on free", () => {
   // "${chooser()}" no longer appears. Located by the ternary instead,
   // and BOTH tiers checked -- finding one above the reference rows says
   // nothing about the other.
-  const callAt = today.indexOf("isPremium() ? _planDoors() : chooser()");
+  const callAt = today.indexOf("isPremium() ? _planDoors() :");
   const refAt  = today.indexOf("today-reference");
   ok(callAt > -1 && refAt > -1 && callAt < refAt,
      "the chooser renders below the reference rows");

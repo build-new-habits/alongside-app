@@ -1,6 +1,13 @@
 /**
  * workout.js - Workout Execution View
- * 30 Sep 2026 v29
+ * 30 Sep 2026 v30
+ *
+ * v30 - W3-13 INTERRUPTIONS (Schema v1.85). The checkpoint carries the
+ *   part-session entry to write if nobody comes back (rescue), so a
+ *   session the phone closed is saved, never dropped without a word.
+ *   Minutes leave out time away: "Carry on later" records when it was
+ *   taken (leftAt), and a reopened app resumes the session's own clock
+ *   (startedAt) less the time it was closed (awayMs).
  *
  * v29 - W3-12 MOSTLY-SAME (Schema v1.84). The entry says whether a gentle
  *   reason shaped the session (gentle), so "Mostly the same" never learns
@@ -497,10 +504,12 @@ let finishedByTimer = false;
 // GUARDED SET: onMount() re-fires on every router.navigate("workout")
 // (the timer toggle does exactly that), so this must only latch once.
 let sessionStartTime = null;
+// W3-13. Time away from this session (Carry on later, a closed app): not training.
+let _awayMs = 0;
 
 function elapsedMins() {
   if (!sessionStartTime) return null;
-  return Math.max(1, Math.round((Date.now() - sessionStartTime) / 60000));
+  return Math.max(1, Math.round((Date.now() - sessionStartTime - _awayMs) / 60000));
 }
 
 // v3 — single helper so every read point stays in sync.
@@ -527,6 +536,25 @@ function _restoreFromCheckpoint(workout) {
     currentExerciseIndex = i;
     currentSet = Math.max(1, Number(cp.set) || 1);
   }
+  // W3-13. A reopened app: the session's own clock, less the time closed.
+  if (sessionStartTime === null) {
+    const started = Date.parse(cp.startedAt);
+    if (!isNaN(started)) {
+      sessionStartTime = started;
+      const since = Date.parse(cp.leftAt || cp.checkpointedAt);
+      _awayMs = (Number(cp.awayMs) || 0) + (isNaN(since) ? 0 : Math.max(0, Date.now() - since));
+      checkpointSession("workout", { leftAt: null, awayMs: _awayMs });   // counted once
+    }
+  }
+}
+
+/** W3-13. Back from "Carry on later" in the same app: the time away is not training. */
+function _backFromLater(workout) {
+  const cp = getResumableSession("workout");
+  if (!cp || !cp.leftAt || cp.sessionId !== _sessionKey(workout)) return;
+  const since = Date.parse(cp.leftAt);
+  if (!isNaN(since)) _awayMs = (Number(cp.awayMs) || 0) + Math.max(0, Date.now() - since);
+  checkpointSession("workout", { leftAt: null, awayMs: _awayMs });
 }
 
 /** This session and no other: the id plus when it was built (saved sessions share ids). */
@@ -534,13 +562,28 @@ function _sessionKey(workout) {
   return `${workout?.id || workout?.name || "session"}|${store.get("generatedSession")?.builtAt || ""}`;
 }
 
-function _checkpoint(workout) {
+function _checkpoint(workout, extra = {}) {
   if (!workout) return;
+  // W3-13. What to save if nobody comes back: the part-session, as
+  // savePartialSession() would write it.
+  const progress = store.get("workoutProgress") || [];
   checkpointSession("workout", {
     sessionId: _sessionKey(workout),
     index:     currentExerciseIndex,
     set:       currentSet,
     name:      workout.title || workout.name || "Your session",
+    ...(sessionStartTime !== null ? { startedAt: new Date(sessionStartTime).toISOString() } : {}),
+    awayMs:    _awayMs,
+    rescue: {
+      type:           "workout",
+      status:         "partial",
+      name:           workout.title || workout.name || "Your session",
+      exerciseIds:    progress.map(p => p.exerciseId).filter(Boolean),
+      exercisesCount: progress.length,
+      setsDone:       progress.reduce((n, e) => n + (e.sets || 1), 0),
+      gentle:         !!workout.gentleReason,
+    },
+    ...extra,
   });
 }
 
@@ -960,6 +1003,7 @@ export function onMount() {
 
   // Latch the session clock once, on first mount with a real workout.
   if (sessionStartTime === null) sessionStartTime = Date.now();
+  else _backFromLater(workout);   // W3-13
   // SMOOTH-P3a. Where they are, every time the screen changes.
   _checkpoint(workout);
 
@@ -1150,7 +1194,7 @@ function showExitConfirm() {
       <div class="session-exit-actions">
         <button class="btn btn-primary btn-full" id="exit-confirm-stay">Keep going</button>
         ${isPremium() ? `<button class="btn btn-secondary btn-full" id="exit-confirm-later" aria-describedby="exit-later-note">Carry on later</button>
-        <p class="text-muted text-sm" id="exit-later-note">It keeps for 3 hours.</p>` : ""}
+        <p class="text-muted text-sm" id="exit-later-note">It keeps for 3 hours, then I save what you did.</p>` : ""}
         <button class="btn btn-secondary btn-full" id="exit-confirm-leave">
           End it here and save
         </button>
@@ -1185,7 +1229,7 @@ function showExitConfirm() {
     overlay.remove();
     pauseTimer();
     _clearRest();
-    _checkpoint(_getWorkout());
+    _checkpoint(_getWorkout(), { leftAt: new Date().toISOString() });   // W3-13
     dismountSessionGuard();
     router.navigate("today");
   });
@@ -1459,6 +1503,7 @@ function cleanupWorkout() {
   _resumeChecked = false;
   pauseTimer();
   sessionStartTime = null;
+  _awayMs = 0;
   currentExerciseIndex = 0;
   pendingSkipOffer = null; finishAfterOffer = false;   // P18: never carries over
   timeRemaining = 0;

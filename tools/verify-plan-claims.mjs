@@ -1,6 +1,11 @@
 /**
  * tools/verify-plan-claims.mjs
- * 29 Sep 2026 v4
+ * 30 Sep 2026 v5
+ *
+ * v5 - W3-13. Free Home now shows a session the phone closed, to save
+ *   (what was done is the person's on either tier). 3.coming-back reads
+ *   the claim itself -- Carry on is on the Plan and not on Free -- and
+ *   that Free is offered Save what you did.
  *
  * v4 - P26. 3.weight: the weight-tracking switch is in Settings on the
  *   Plan and not on free, and "Lose weight" is offered only with it on.
@@ -172,9 +177,12 @@ const withCheckpoint = tier => {
   tierFixture(tier);
   store.set("generatedSession", { session: { id: "upper-1", title: "Upper Body", exercises: [{ id: "a", name: "Row" }, { id: "b", name: "Press" }] }, builtAt: "x" });
   store.set("activeSessionCheckpoint", { sessionType: "workout", sessionId: "upper-1|x", index: 1, set: 1, startedAt: new Date().toISOString(), checkpointedAt: new Date().toISOString() });
-  mountView(TodayView); return !!box.querySelector(".home-carry");
+  mountView(TodayView);
+  return { carryOn: !!box.querySelector('[data-action="carry-on"]'), save: /Save what you did/.test(box.textContent || "") };
 };
-ok("3.coming-back  a session left part-way carries on from Home on the Plan, not on free", withCheckpoint("personal") && !withCheckpoint("free"));
+const cPlan = withCheckpoint("personal"), cFree = withCheckpoint("free");
+ok("3.coming-back  a session left part-way carries on from Home on the Plan, not on free", cPlan.carryOn && !cFree.carryOn, JSON.stringify({ cPlan, cFree }));
+ok("3.coming-back  and on free, what was done can still be saved", cFree.save);
 const pe = fs.readFileSync(new URL("js/data/programmeEngine.js", root), "utf8");
 const reentry = pe.slice(pe.indexOf("export function getReEntryContext"), pe.indexOf("export function", pe.indexOf("export function getReEntryContext") + 10));
 ok("3.coming-back  and the gentler start after time away is BOTH tiers' (no tier check in getReEntryContext)", reentry.length > 200 && !/isPremium/.test(reentry));
