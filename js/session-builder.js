@@ -1,7 +1,10 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
- * 30 Sep 2026 v67
+ * 30 Sep 2026 v68
+ *
+ * v68 - W3-7 GENTLE-NOOP. _todayIntensity() reads the programme's words:
+ *   gentle is low, challenging is high. The gentler start did nothing.
  *
  * v67 - W3-6 HELD-STANCES. A library entry flagged heldStance counts as
  *   loading the legs in personFilter.
@@ -1136,7 +1139,13 @@ export const ALLOCATION_PRESETS = [
  */
 function _todayIntensity() {
   const v = store.get("todayIntensity");
-  return (v === "low" || v === "moderate" || v === "high") ? v : null;
+  // W3-7 (Wave 3, persona 2.13). The re-entry path writes the programme's
+  // scale (programmeEngine getReEntryIntensity: gentle / moderate /
+  // challenging). Read as nothing, "A notch gentler today, as you chose"
+  // sat over an unchanged plan.
+  const SAME = { gentle: "low", challenging: "high" };
+  const w = SAME[v] || v;
+  return (w === "low" || w === "moderate" || w === "high") ? w : null;
 }
 
 /**
