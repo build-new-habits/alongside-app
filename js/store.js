@@ -3,7 +3,11 @@ import { RETIRED_CONDITIONS } from "./data/scope-statement.js";
 
 /**
  * store.js - Data persistence layer
- * 30 Sep 2026 v88
+ * 30 Sep 2026 v89
+ *
+ * v89 - W3-13 INTERRUPTIONS (Schema v1.85). New field rescuedSession: what
+ *   was saved for the person when a waiting session was not come back to
+ *   (session-resume.js), for Home to say once.
  *
  * v88 - W3-10 LIGHTER-COUNT (Schema v1.83). New field lighterDayDeclinedOn:
  *   the local day the person turned the lighter day down ("Keep my usual
@@ -2503,6 +2507,10 @@ export const store = {
 
       // SMOOTH-P3a. The one resumable-session slot. See v76.
       activeSessionCheckpoint: null,
+      // W3-13 (Schema v1.85). { at: ISO, name, moves } | null. Set when a
+      // waiting session is saved for the person; Home says so once and
+      // clears it.
+      rescuedSession: null,
 
       // RED-FLAG, 28 Sep 2026. See js/data/red-flag.js and the v75 note.
       redFlag: { screenedAt: null, areas: [], textVersion: null, level: null, flaggedAt: null, clearedAt: null },
