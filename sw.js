@@ -1,7 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 30 Sep 2026 v596
+ * 30 Sep 2026 v597
+ *
+ * v597 - W3-0. The seated class line counts only what a class says.
  *
  * v596 - S1-LEGS, S1-SEATED, LIBRARY-TILES. Capability tags and holds,
  *   the seated class line, the Library's At home tiles.
@@ -4118,7 +4120,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v596";
+const CACHE_NAME = "alongside-v597";
 
 const SHELL_URLS = [
 
