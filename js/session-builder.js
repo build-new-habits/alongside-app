@@ -1,7 +1,11 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
- * 30 Sep 2026 v69
+ * 30 Sep 2026 v70
+ *
+ * v70 - W3-10 LIGHTER-COUNT. The session records which gentle reason
+ *   shaped it (gentleReason), so the coach's screen can offer to turn the
+ *   lighter day down without guessing from its words.
  *
  * v69 - W3-9 SORE-LINES (persona Wave 3). Below the acute band the plan's
  *   sore line said "I've kept loading conservative" beside the proposal's
@@ -4425,7 +4429,9 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
     subtitle: `Built for you today — ${durationMins} mins`,
     duration: durationStr,
     coachLine: coachLineWithWarmupNote,
-    exercises: allExercises
+    exercises: allExercises,
+    // W3-10. Which gentle reason, if any, shaped this plan.
+    gentleReason: gentle ? gentle.id : null
   };
 
   // The coach explaining its own reasoning. Attached to the session so the

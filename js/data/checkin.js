@@ -1,6 +1,12 @@
 /**
  * checkin.js
- * 29 Sep 2026 v10
+ * 30 Sep 2026 v11
+ *
+ * v11 - W3-10 LIGHTER-COUNT (Schema v1.83), agreed by Graeme 30 Sep.
+ *   consecutiveActiveDays() counts movement: breathing, mindful sessions
+ *   and quiet practices are not movement (decision 4a), and a session
+ *   stopped under 10 minutes is not a day of it. coachBias() is off on a
+ *   "Full of it" day, and on a day the person turned it down.
  *
  * v10 - P26 (persona finding W2-20). consecutiveActiveDays() counts local
  *   calendar days. It compared `date` whole -- and the players write
@@ -202,10 +208,27 @@ export function getSuggestedIntensity(checkin) {
  * @returns {'lighter'|null}
  */
 export function coachBias() {
+  // W3-10. The person's own word outranks the count: "Full of it" this
+  // morning, or "Keep my usual plan" / Harder on the coach's screen today.
+  try {
+    const now = new Date();
+    const localToday = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    if (store.get('lighterDayDeclinedOn') === localToday) return null;
+    if (Number(getTodaysCheckin()?.energy) >= 9) return null;
+  } catch { /* nothing readable: the count decides */ }
   // Three is coach-reflection.js's original threshold, kept rather than
   // re-chosen. Changing a number while moving code is how a move
   // becomes a silent behaviour change.
   return consecutiveActiveDays() >= 3 ? 'lighter' : null;
+}
+
+// W3-10. Decision 4a: breathing and quiet practices are not movement.
+const NOT_MOVEMENT = new Set(['breathing', 'mindful', 'mindfulness', 'practice']);
+/** A day of movement: not a quiet practice, and not a session stopped under 10 minutes. */
+export function countsAsMovement(e) {
+  if (!e || NOT_MOVEMENT.has(e.type)) return false;
+  if (e.status === 'partial' && !(Number(e.durationMins) >= 10)) return false;
+  return true;
 }
 
 /**
@@ -245,7 +268,7 @@ export function consecutiveActiveDays() {
     const d = new Date(v);
     return isNaN(d) ? null : local(d);
   };
-  const activeDates = new Set(log.map(dayOf).filter(d => d && d < today));
+  const activeDates = new Set(log.filter(countsAsMovement).map(dayOf).filter(d => d && d < today));
   let count = 0;
   const cursor = new Date();
   cursor.setDate(cursor.getDate() - 1);

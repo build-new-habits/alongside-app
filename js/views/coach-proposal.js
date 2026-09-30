@@ -1,6 +1,10 @@
 /**
  * coach-proposal.js
- * 30 Sep 2026 v41
+ * 30 Sep 2026 v42
+ *
+ * v42 - W3-10 LIGHTER-COUNT. When the plan is a lighter day, the person can
+ *   turn it down: "Keep my usual plan" on both tiers, and Harder on the
+ *   Plan. Either records today (lighterDayDeclinedOn) and rebuilds.
  *
  * v41 - W3-4 SORE-SCOPE. The plan's lines name the area without "(6/10)".
  *
@@ -1112,6 +1116,7 @@ export function CoachProposalView(router) {
           <h1 id="cp-preview-title" class="cp-preview-panel__title">Today’s plan</h1>
           ${premium ? _renderPlanned() : ''}
           ${option ? `<p class="cp-plan__sentence">${_planSentence(option)}</p>` : ''}
+          ${option ? _renderLighterOffer(option) : ''}
           ${premium ? _arcLine() : ''}
           ${premium && option ? _renderGoodDayOffer() : ''}
 
@@ -1346,6 +1351,25 @@ export function CoachProposalView(router) {
    * Full of it = 9), only while nothing has been added, and never applied
    * without the tap.
    */
+  /**
+   * W3-10. The plan's own line says why it is lighter; this lets the
+   * person decline it. Both tiers: turning a recommendation down is not
+   * a feature to pay for.
+   */
+  function _renderLighterOffer(option) {
+    if (!option.lighter) return '';
+    return `
+      <div class="cp-offer" role="note">
+        <button class="btn btn-secondary" id="cp-lighter-decline">Keep my usual plan</button>
+      </div>`;
+  }
+
+  function _declineLighter(container) {
+    const d = new Date();
+    store.set('lighterDayDeclinedOn', `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`);
+    _rebuildAndRerender(container, 'Your usual plan, as you chose.', true);
+  }
+
   function _renderGoodDayOffer() {
     if (adjust !== 0) return '';
     const c = getTodaysCheckin() || {};
@@ -1574,6 +1598,8 @@ export function CoachProposalView(router) {
       router.navigate(e.currentTarget.dataset.plannedRoute);
     });
 
+    panel.querySelector('#cp-lighter-decline')?.addEventListener('click', () => _declineLighter(container));
+
     panel.querySelector('#cp-offer-more')?.addEventListener('click', () => {
       adjust = 1;
       statusMsg = 'One more set on each main exercise.';
@@ -1593,6 +1619,9 @@ export function CoachProposalView(router) {
           _rebuildAndRerender(container, 'Here’s a 20-minute plan.', true);
           return;
         }
+        // W3-10. On a lighter day, Harder first turns the lighter day down.
+        const opt = currentPreviewOptions?.find(o => o.id === selectedOptionId) || currentPreviewOptions?.[0];
+        if (what === 'harder' && opt?.lighter) { _declineLighter(container); return; }
         adjust = what === 'harder' ? Math.min(1, adjust + 1) : Math.max(-1, adjust - 1);
         statusMsg = adjust > 0 ? 'One more set on each main exercise.'
                   : adjust < 0 ? 'One set fewer on each main exercise.'
@@ -2432,6 +2461,8 @@ export function CoachProposalView(router) {
       // which target was applied. Absent on everything that is not a
       // stretch session, which is what keeps the note silent.
       stretchTarget: built.stretchTarget || null,
+      // W3-10. A lighter day the person can turn down.
+      lighter:       built.gentleReason === 'streak',
       inputs:        { ...inputs, chosenType: sessionType, reason },
       _pools:        buildCandidatePools(args)
     }];
