@@ -1,7 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 30 Sep 2026 v598
+ * 30 Sep 2026 v599
+ *
+ * v599 - W3-4 to W3-9: a sore tap is not a tracked injury; Worse gets the
+ *   pointer; held stances count as loading the legs; "gentler" is gentler;
+ *   no cycle-aware claim; sore lines say what the plan holds.
  *
  * v598 - W3-1 severe-day Adapt opens the plan; W3-2 the Run door reads
  *   today; W3-3 a class finish no longer rewrites the last session.
@@ -4123,7 +4127,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v598";
+const CACHE_NAME = "alongside-v599";
 
 const SHELL_URLS = [
 
