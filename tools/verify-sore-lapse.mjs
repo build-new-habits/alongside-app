@@ -1,6 +1,11 @@
 /**
  * tools/verify-sore-lapse.mjs
- * 29 Sep 2026 v1
+ * 30 Sep 2026 v2
+ *
+ * v2 - W3-4 (Schema v1.82). Test 3 held the consecutive-days rule, which
+ *   is what kept one tap listed for weeks for irregular users (Wave 3).
+ *   A missed day no longer starts the count again; verify-sore-scope
+ *   proves the new rule with gaps of days.
  *
  * P13, SORE-BECOMES-CONDITION (persona finding W2-11). One "a little
  * sore" tap at check-in made a permanent listed area: it led every later
@@ -11,8 +16,7 @@
  * fixed clock, moved forward), with the store reloaded as a phone would:
  *   1. a knee tapped once, then three quiet check-ins: it leaves the list;
  *   2. an area the person listed themselves does not lapse;
- *   3. a missed day starts the count again (the rule Schema.md has always
- *      stated for quietRun);
+ *   3. a missed day does not start the count again (v2, Schema v1.82);
  *   4. yesterday's scores are not today's;
  *   5. once lapsed, the knee no longer brings the red-flag screen.
  */
@@ -107,13 +111,13 @@ for (let d = 0; d < 4; d++) { nextDay(); await checkIn(QUIET); }
 ok("2a. four quiet check-ins later, still listed", listed("lower-back"), JSON.stringify(store.get("conditions")));
 
 // ── 3. A MISSED DAY STARTS THE COUNT AGAIN ──────────────────────────────
-console.log("\nTEST 3 - quiet days must run on, as Schema.md has always said");
+console.log("\nTEST 3 - a missed day neither counts nor breaks the run (Schema v1.82)");
 fresh();
 await checkIn([/^Knee$/, /^A little$/, /^That's it$/]);
 nextDay(); await checkIn(QUIET);
 nextDay(); await checkIn(QUIET);
 nextDay(2); await checkIn(QUIET);
-ok("3a. two quiet, a day missed, one quiet: still listed", listed("knee"));
+ok("3a. two quiet, a day missed, one quiet: it has left the list", !listed("knee"));
 
 // ── 4. YESTERDAY'S SCORES ARE NOT TODAY'S ───────────────────────────────
 console.log("\nTEST 4 - a score belongs to the day it was given");

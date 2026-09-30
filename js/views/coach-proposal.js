@@ -1,6 +1,8 @@
 /**
  * coach-proposal.js
- * 30 Sep 2026 v40
+ * 30 Sep 2026 v41
+ *
+ * v41 - W3-4 SORE-SCOPE. The plan's lines name the area without "(6/10)".
  *
  * v40 - W3-1 SEVERE-ADAPT (Wave 3, persona 2.1). After Adapt and continue on
  *   a severe day the plan opens, as it does after every other banner;
@@ -2257,13 +2259,14 @@ export function CoachProposalView(router) {
     const sentences = [];
 
     if (severeIds.length > 0) {
-      const parts  = severeIds.map(id => `${getConditionName(id)} (${painScores[id]}/10)`);
+      // W3-4. No score out of ten: nobody gave one (the chips are words).
+      const parts  = severeIds.map(id => getConditionName(id));
       const plural = severeIds.length > 1;
       sentences.push(`Your check-in flagged ${_joinNames(parts)} as Severe today \u2014 I\'ve kept things well clear of ${plural ? 'those areas' : 'that area'}.`);
     }
 
     if (moderateIds.length > 0) {
-      const parts  = moderateIds.map(id => `${getConditionName(id)} (${painScores[id] || 6}/10)`);
+      const parts  = moderateIds.map(id => getConditionName(id));
       const plural = moderateIds.length > 1;
       // CONSTRAINT-CLAIM, 06 Sep 2026. WAS: "I've worked around that."
       //

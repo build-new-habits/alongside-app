@@ -1,6 +1,8 @@
 /**
  * js/data/red-flag.js
- * 29 Sep 2026 v3
+ * 30 Sep 2026 v4
+ *
+ * v4 - W3-4 SORE-SCOPE. A check-in-sourced area counts only on a sore day.
  *
  * v3 - P0, SCOPE-MINOR. Fibromyalgia retired; a scored id counts only if
  *   it is a body area (persona 2.5: a heart condition triggered the
@@ -129,8 +131,17 @@ const PAIN_CONDITIONS = new Set(
 /** The pain areas the person has told us about: listed pain conditions and today's sore areas. */
 export function reportedPainAreas() {
   const out = new Set();
-  for (const c of (store.get("conditions") || [])) if (PAIN_CONDITIONS.has(c)) out.add(c);
   const scores = store.get("conditionPainScores") || {};
+  const meta   = store.get("conditionMeta") || {};
+  // W3-4 (Schema v1.82). An area that joined the list from a check-in tap
+  // counts only on a day it is sore; one the person listed themselves
+  // counts every day. A tap last Tuesday brought bladder and groin
+  // questions a minute after "Nothing today".
+  for (const c of (store.get("conditions") || [])) {
+    if (!PAIN_CONDITIONS.has(c)) continue;
+    if (meta[c]?.source === "checkin" && !(Number(scores[c]) > 0)) continue;
+    out.add(c);
+  }
   // P0: only body areas. A scored id outside them (a heart condition, in
   // Wave 2) sent people through bladder and groin questions.
   for (const [area, n] of Object.entries(scores)) if (Number(n) > 0 && PAIN_CONDITIONS.has(area)) out.add(area);

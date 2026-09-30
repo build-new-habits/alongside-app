@@ -1,6 +1,9 @@
 /**
  * js/views/checkin.js
- * 29 Sep 2026 v24
+ * 30 Sep 2026 v25
+ *
+ * v25 - W3-4 SORE-SCOPE. "Anything sore today?" offers body areas only;
+ *   Perimenopause symptoms was offered first and scored.
  *
  * v24 - P14, FOURTH QUESTION (persona finding W2-16). The drop-in
  *   variety question ("something like last time, or something
@@ -530,7 +533,9 @@ export function CheckinView(router) {
     // A listed condition not named today is quiet today.
     _conditions.forEach(id => { _checkin.conditionLevels[id] = 0; });
 
-    const declared = _conditions.filter(id => CONDITIONS.some(c => c.id === id));
+    // W3-4. Body areas only: perimenopause, tiredness and stress are
+    // everyday states (conditions.js), not somewhere that is sore.
+    const declared = _conditions.filter(id => CONDITIONS.some(c => c.id === id && ["lower", "back", "upper"].includes(c.area)));
     const common   = COMMON_AREAS.filter(id => !declared.includes(id) && CONDITIONS.some(c => c.id === id));
     const note = declared.length === 1
       ? `${_areaName(declared[0])} comes first because it's the one you've told me about before.`

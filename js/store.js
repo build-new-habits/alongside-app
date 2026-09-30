@@ -3,7 +3,10 @@ import { RETIRED_CONDITIONS } from "./data/scope-statement.js";
 
 /**
  * store.js - Data persistence layer
- * 29 Sep 2026 v86
+ * 30 Sep 2026 v87
+ *
+ * v87 - W3-4 SORE-SCOPE (Schema v1.82). lapseQuietSoreAreas() counts check-ins
+ *   in a row, not consecutive days: one tap stayed listed for weeks.
  *
  * v86 - P25, ONE ID PER ENTRY (Schema.md v1.80). logActivity() never
  *   writes a second entry with an id already in the log; it gives it a
@@ -2756,9 +2759,8 @@ export const store = {
    * P13, v83. The CHECKIN-2a lifecycle, run after each check-in is saved.
    *
    * For an area that joined the list through a check-in tap (source
-   * "checkin"), count the check-ins on consecutive days, back from the
-   * latest, that each reported it at 0 -- a positively quiet day; a
-   * missed day ends the run, as Schema.md has always said. Three, and it
+   * "checkin"), count the check-ins in a row, back from the latest, that
+   * each reported it at 0 -- W3-4, Schema v1.82: however far apart. Three, and it
    * leaves `conditions` for `conditionMeta` as dormant. Areas the person
    * listed themselves are theirs to change and never lapse.
    */
@@ -2775,10 +2777,14 @@ export const store = {
       for (const [k, e] of Object.entries(history)) {
         if (Number(e?.conditionLevels?.[id]) > 0) { reportDays++; if (!lastSore || k > lastSore) lastSore = k; }
       }
-      for (let i = 0; i < 400; i++) {
-        const day = new Date(today.getTime() - i * 864e5);
-        const lv = history[keyFor(day)]?.conditionLevels?.[id];
-        if (lv === 0) { quiet++; continue; }
+      // W3-4 (Schema v1.82). Check-ins in a row, however far apart: a day
+      // with no check-in neither counts nor breaks the run. Consecutive
+      // days kept one tap listed for weeks for anyone who checks in
+      // irregularly -- which is who the app is for.
+      for (const k of Object.keys(history).sort().reverse()) {
+        const lv = history[k]?.conditionLevels?.[id];
+        if (lv === undefined || lv === null) continue;
+        if (Number(lv) === 0) { quiet++; continue; }
         break;
       }
       const next = { ...m, quietRun: quiet, lastSoreAt: lastSore, reportDays };

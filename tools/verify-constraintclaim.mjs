@@ -1,5 +1,12 @@
 /**
  * tools/verify-constraintclaim.mjs
+ * 30 Sep 2026 v2
+ *
+ * v2 - W3-4 SORE-SCOPE. 1b required the score beside the name: "(6/10)"
+ *   is a number nobody gave (the check-in chips are words) and brings back
+ *   the 0-10 scale P0d removed. The line still names the area, which is
+ *   what 1b protects: silence reads as not having been heard.
+ *
  * 06 Sep 2026 v1
  *
  * CONSTRAINT-CLAIM. The coach claims only what it demonstrably did.
@@ -103,8 +110,8 @@ ok("1a. the moderate sentence does not say 'worked around'",
    "at 6 nothing is worked around - subacute applies care, not exclusion, and " +
    "the exercise card says so on the very next screen");
 
-ok("1b. it still names the condition and the score",
-   /_joinNames\(parts\)/.test(moderateBlock) && /painScores\[id\]/.test(moderateBlock),
+ok("1b. it still names the condition, with no score out of ten",
+   /_joinNames\(parts\)/.test(moderateBlock) && /getConditionName/.test(moderateBlock) && !/\/10/.test(moderateBlock),
    "going silent at 6 is worse than overclaiming: the person told the coach " +
    "about it, and silence reads as not having been heard");
 

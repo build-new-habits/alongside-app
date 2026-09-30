@@ -1,7 +1,9 @@
 /**
  * reflect.js - Reflect Screen
  *
- * 30 Sep 2026 v9
+ * 30 Sep 2026 v10
+ *
+ * v10 - W3-4 SORE-SCOPE. The pain question only on a day something is sore.
  *
  * v9 - W3-3 CLASS-FINISH (Wave 3). Saving answers onto an existing entry keeps
  *   its completedAt: answering how it felt moved the session to today.
@@ -637,7 +639,11 @@ export function render() {
   const type       = entry.type  || "other";
   const name       = entry.name;
   const conditions = store.get("conditions") || [];
-  const hasConds   = conditions.length > 0;
+  // W3-4 (Schema v1.82). Asked only when something is sore today: after
+  // every session while anything was listed, it was a pain record kept
+  // session by session.
+  const hasConds   = conditions.length > 0 &&
+    Object.values(store.get("conditionPainScores") || {}).some(n => Number(n) > 0);
 
   const question   = QUESTIONS[type] || QUESTIONS["other"];
   const feelOpts   = FEEL_OPTIONS[type] || FEEL_OPTIONS["coach-session"];

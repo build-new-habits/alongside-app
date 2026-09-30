@@ -1,5 +1,11 @@
 /**
  * tools/verify-finish.mjs
+ * 30 Sep 2026 v2
+ *
+ * v2 - W3-4 SORE-SCOPE (Schema v1.82). The pain question is asked only
+ *   when something is sore today, so test 3's fixture scores its listed
+ *   area today; verify-sore-scope proves it is not asked otherwise.
+ *
  * 28 Sep 2026 v1
  *
  * SMOOTH-P2d. One finish screen. Spec 4.4: "That's today done -- moves,
@@ -60,12 +66,13 @@ const EX = (id, name) => ({ id, name, section: "main", role: "main", category: "
   equipment: ["dumbbell"], affectsAreas: ["upper-back"], sets: 3, reps: "10", rest: 60, duration: 220,
   instructions: ["Pull"], watchOut: ["Twisting"] });
 
-function session({ conditions = [], finish = true } = {}) {
+function session({ conditions = [], finish = true, soreToday = false } = {}) {
   if (document.querySelector("#exit-workout-btn")) { tap("#exit-workout-btn"); document.querySelector("#exit-confirm-discard")?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true })); }
   localStorage.clear(); store.init();
   store.set("safetyAckLog", Array.from({ length: 5 }, () => ({ at: new Date().toISOString(), textVersion: HURT_AND_ACHE_VERSION, surface: "fixture" })));
   store.set("tier", "personal"); store.set("onboardingComplete", true); store.set("conditions", conditions);
   store.set("lastCheckin", { mood: 6, energy: 6, timestamp: new Date().toISOString() });
+  if (soreToday) { store.set("conditionPainScores", Object.fromEntries(conditions.map(c => [c, 4]))); store.set("conditionPainScoresOn", store._localDay()); }
   store.set("generatedSession", { session: { id: "s", name: "Upper Body", exercises: [EX("a", "Row"), EX("b", "Press")] }, builtAt: new Date().toISOString(), inputs: {} });
   navs = [];
   paintWorkout();
@@ -107,11 +114,11 @@ ok("2c. an unanswered feel is not recorded", e1.feel == null);
 
 // ── 3. WHAT THEY DO SAY IS KEPT ─────────────────────────────────────────
 console.log("\nTEST 3 - an answer is kept, and the coach answers it on the same screen");
-session({ conditions: ["lower-back"] });
+session({ conditions: ["lower-back"], soreToday: true });
 tap('[data-feel="strong"]');
 const said = main.querySelector("#finish-coach")?.textContent.trim() || "";
 ok("3a. tapping how it felt gets the coach's line straight away", said.length > 10 && main.querySelector("#finish-coach")?.getAttribute("aria-live") === "polite", `"${said}"`);
-ok("3b. with a condition listed, the pain question is there", main.querySelectorAll("[data-pain]").length === 4);
+ok("3b. with an area sore today, the pain question is there", main.querySelectorAll("[data-pain]").length === 4);
 tap('[data-pain="worse"]');
 const slider = main.querySelector("#reflect-mood-slider");
 slider.value = "3"; slider.dispatchEvent(new dom.window.Event("input", { bubbles: true }));
