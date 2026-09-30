@@ -1,6 +1,11 @@
 /**
  * session-choice.js
- * 30 Sep 2026 v2
+ * 30 Sep 2026 v3
+ *
+ * v3 - W3-16 ARC-AND-SAVED (persona Wave 3, 2.15). The arc's pick read every
+ *   strand of the aim; it reads the strands the person chose (arc.strands),
+ *   and the aim's only when none are recorded.
+ *
  *
  * v2 - W3-11 NOT-SURE-PICK (persona Wave 3). With no arc -- every Free
  *   person -- step 3 walked the types in library order: Glute Focus first
@@ -153,9 +158,10 @@ export function recentSessionTypes(limit = RECENT_WINDOW) {
 export function arcSessionTypes() {
   const arc = store.get("arc");
   if (!arc || !arc.aimId) return [];
-  const strands = strandsForAim(arc.aimId);
-  if (!strands || !strands.length) return [];
-  return sessionTypesForStrands(strands.map(s => (typeof s === "string" ? s : s.id)))
+  // W3-16. The strands CHOSEN, not every strand of the aim.
+  const chosen = Array.isArray(arc.strands) && arc.strands.length ? arc.strands : strandsForAim(arc.aimId);
+  if (!chosen || !chosen.length) return [];
+  return sessionTypesForStrands(chosen.map(s => (typeof s === "string" ? s : s.id)))
     .filter(validType);
 }
 

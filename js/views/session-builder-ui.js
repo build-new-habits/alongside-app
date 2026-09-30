@@ -1,7 +1,10 @@
 /**
  * js/views/session-builder-ui.js - Session Builder UI
  *
- * 29 Sep 2026 v27
+ * 30 Sep 2026 v28
+ *
+ * v28 - W3-16. Editing a saved session keeps its doses (sections, sets,
+ *   reps) as edited.
  *
  * v27 - P21, PLAYERS (persona finding W2-17). Let's go plays the built
  *   session in the coach's player (workout), not the four-page session
@@ -1909,6 +1912,7 @@ function wireSaveBlock(container) {
       ? updateSavedSession(editingSavedId, {
           name:         input.value,
           exerciseIds:  builtSession.exercises.filter(e => !e.isPrescribed).map(e => e.id),
+          exercises:    builtSession.exercises.filter(e => !e.isPrescribed),   // W3-16: doses
           durationMins: selectedDuration
         })
       : saveSession(input.value, builtSession);

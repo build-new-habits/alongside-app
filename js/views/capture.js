@@ -1,6 +1,14 @@
 /**
  * js/views/capture.js
- * 30 Sep 2026 v4
+ * 30 Sep 2026 v5
+ *
+ * v5 - W3-16 ARC-AND-SAVED (persona Wave 3, 2.15; Schema v1.86). A session
+ *   put together as it went lit no strength strand unless the person
+ *   stopped to say its kind: those strands have no body areas and light
+ *   only from the kind of session. With no kind given, the one kind its
+ *   moves fit (two or more, and at least half, of its moves) is handed to
+ *   the arc as creditTypes. The entry's own sessionType is still only
+ *   what they said (v77).
  *
  * v4 - W3-13 INTERRUPTIONS (persona Wave 3: 2.4, 2.15, 2.16). The session
  *   waited 3 hours, then was dropped with every set in it. Now it says up
@@ -81,8 +89,9 @@ import { EXERCISES } from "../data/exercises/index.js";
 import { CONDITIONS } from "../data/conditions.js";
 import { searchByTerm } from "../data/muscle-search.js";
 import { resolveEquipment, exerciseIsAvailable } from "../data/equipment-map.js";
-import { equipmentForLocation, buildCandidatePools, soreScoresToday, soreLevelFor, SORE_BLOCK_FLOOR }
+import { equipmentForLocation, buildCandidatePools, soreScoresToday, soreLevelFor, SORE_BLOCK_FLOOR, SESSION_TYPES }
   from "../session-builder.js";
+import { matchCategory } from "../data/session-categories.js";
 import { performanceFields } from "../session-log.js";
 import { hurtBlock } from "../exercise-card.js";
 import { isGateDue, renderSafetyGate, attachSafetyGate } from "../safety-gate.js";
@@ -539,6 +548,25 @@ function rerender() {
 
 // ── Saving ──────────────────────────────────────────────────────────────
 
+/**
+ * W3-16. The one kind of session these moves fit, for the arc: the type
+ * whose working categories cover the most of them -- two or more, and at
+ * least half. Specific before general on a tie; never Gym (a machine
+ * block and lifting is not a shape moves can have). Null when nothing
+ * fits clearly: no credit is better than a wrong one.
+ */
+const CREDIT_ORDER = ["lower", "upper", "core", "cardio", "mobility", "stretch", "glute", "full"];
+function _creditType(exs) {
+  let best = null, bn = 0;
+  for (const id of CREDIT_ORDER) {
+    const t = SESSION_TYPES.find(x => x.id === id);
+    if (!t) continue;
+    const n = exs.filter(ex => (t.mainCategories || []).some(c => matchCategory([ex], c).length)).length;
+    if (n > bn) { best = id; bn = n; }
+  }
+  return bn >= 2 && bn * 2 >= exs.length ? best : null;
+}
+
 /** One activity entry for the whole session. Returns it, or null if nothing was done. */
 export function saveFreestyle() {
   const list = allMoves();
@@ -550,6 +578,7 @@ export function saveFreestyle() {
   // if they said so; store.js v77 stops a freestyle entry inheriting one.
   const session = { id: "freestyle", title: "Made up as I went", exercises };
   if (kind) session.sessionType = kind;
+  else { const fit = _creditType(list.map(m => byId(m.id)).filter(Boolean)); if (fit) session.creditTypes = [fit]; }   // W3-16
   store.set("lastFinishedSession", { at: nowIso, session });
 
   const entry = store.logActivity({

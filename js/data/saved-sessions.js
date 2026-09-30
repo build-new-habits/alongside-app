@@ -1,6 +1,15 @@
 /**
  * saved-sessions.js
- * 29 Sep 2026 v3
+ * 30 Sep 2026 v4
+ *
+ * v4 - W3-16 ARC-AND-SAVED (persona Wave 3, 2.15; Schema v1.86). The kind was
+ *   stored as the plan's id ("upper-1790..."), so the rebuild could not
+ *   match it and started Glute Focus. And only ids were kept, so sections,
+ *   order, sets and reps came back as the library's. Now the kind is the
+ *   kind, and doses (section, sets, reps, duration per move) are kept
+ *   beside the ids and laid over the LIVE library entry when the session
+ *   is resolved -- still ids, so library corrections (rest included,
+ *   which is not kept) still reach a saved session.
  *
  * v3 - P21, PLAYERS (persona finding W2-17). lastDoneOf(saved): when the
  *   person last FINISHED this session, read from the activity log -- a
@@ -110,6 +119,28 @@ export function savedSessionCount() {
  * button and every failure here has something the person should be
  * told.
  */
+const KINDS = ["glute", "upper", "lower", "full", "core", "gym", "cardio", "mobility", "stretch"];
+/** W3-16. The session's kind: its sessionType, or its id's type prefix -- never the id. */
+function kindOf(built) {
+  if (KINDS.includes(built.sessionType)) return built.sessionType;
+  const m = String(built.id || "").match(/^([a-z]+)-\d{10,}$/);
+  if (m && KINDS.includes(m[1])) return m[1];
+  return KINDS.includes(built.id) ? built.id : null;
+}
+/** W3-16. Each move's section and dose, as built. */
+function dosesOf(exercises) {
+  const out = {};
+  for (const e of exercises || []) {
+    if (!e || !e.id) continue;
+    const d = { section: e.section || e.role || "main" };
+    // Not rest: that is the library's, and a corrected rest must reach
+    // a saved session (verify-yourown 1c).
+    for (const k of ["sets", "reps", "duration"]) if (e[k] !== undefined && e[k] !== null) d[k] = e[k];
+    out[e.id] = d;
+  }
+  return out;
+}
+
 export function saveSession(name, built) {
   if (!isPremium())  return { ok: false, reason: "tier" };
   if (!built || !Array.isArray(built.exercises) || built.exercises.length === 0) {
@@ -122,7 +153,8 @@ export function saveSession(name, built) {
   const record = {
     id:           `own_${new Date().toISOString()}_${Math.random().toString(36).slice(2, 6)}`,
     name:         clean,
-    sessionType:  built.id || built.sessionType || null,
+    sessionType:  kindOf(built),
+    doses:        dosesOf(built.exercises),
     durationMins: Number(built.durationMins) || null,
     equipment:    Array.isArray(store.get("equipment")) ? [...store.get("equipment")] : [],
     exerciseIds:  built.exercises.map(e => e.id).filter(Boolean),
@@ -181,7 +213,12 @@ export function updateSavedSession(id, changes = {}) {
     // they can say so.
     if (!ids || ids.length === 0) return { ok: false, reason: "empty" };
     next.exerciseIds = ids;
+    // W3-16. Doses follow the moves: a move taken out loses its dose.
+    const d = next.doses && typeof next.doses === "object" ? next.doses : {};
+    next.doses = Object.fromEntries(ids.filter(i => d[i]).map(i => [i, d[i]]));
   }
+  // W3-16. The edited session's own doses, when the editor passes them.
+  if (Array.isArray(changes.exercises)) next.doses = dosesOf(changes.exercises);
 
   if ("durationMins" in changes) {
     next.durationMins = Number(changes.durationMins) || null;
@@ -245,8 +282,11 @@ export function lastDoneOf(saved) {
  */
 export function resolveSavedSession(saved) {
   if (!saved || !Array.isArray(saved.exerciseIds)) return { exercises: [], missing: 0 };
+  // W3-16. The live library entry, with the saved section and dose laid
+  // over it: library words and corrections, the person's doses.
+  const doses = saved.doses && typeof saved.doses === "object" ? saved.doses : {};
   const found = saved.exerciseIds
-    .map(id => EXERCISES.find(e => e.id === id))
+    .map(id => { const e = EXERCISES.find(x => x.id === id); return e ? (doses[id] ? { ...e, ...doses[id] } : e) : null; })
     .filter(Boolean);
   return { exercises: found, missing: saved.exerciseIds.length - found.length };
 }

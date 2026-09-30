@@ -1,7 +1,9 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
- * 30 Sep 2026 v72
+ * 30 Sep 2026 v73
+ *
+ * v73 - W3-16. buildSessionFromSaved() keeps a saved move's own section.
  *
  * v72 - W3-14 SHORT-SESSIONS (persona Wave 3, 2.16). "10 minutes" built
  *   15 to 18: the warm-up was a fixed five to nine minutes and only the
@@ -3351,9 +3353,13 @@ export function buildSessionFromSaved({ sessionType, durationMins, exercises, ti
   if (list.length === 0) return null;
 
   const inList = (cats, ex) => Array.isArray(cats) && cats.includes(ex.category);
+  // W3-16. A saved section is the person's, and wins; only a move saved
+  // without one is placed by category, as before.
+  const said = (ex, sec) => ex.section === sec;
+  const has = ex => ["warmup", "main", "cooldown"].includes(ex.section);
 
-  const warmup   = list.filter(ex => inList(type.warmupCategories, ex));
-  const cooldown = list.filter(ex => !warmup.includes(ex) && inList(type.cooldownCategories, ex));
+  const warmup   = list.filter(ex => has(ex) ? said(ex, "warmup") : inList(type.warmupCategories, ex));
+  const cooldown = list.filter(ex => !warmup.includes(ex) && (has(ex) ? said(ex, "cooldown") : inList(type.cooldownCategories, ex)));
   const main     = list.filter(ex => !warmup.includes(ex) && !cooldown.includes(ex));
 
   const allExercises = [
