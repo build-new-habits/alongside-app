@@ -1,6 +1,9 @@
 /**
  * data/exercises/yoga.js
- * 30 Sep 2026 v8
+ * 30 Sep 2026 v9
+ *
+ * v9 - W3-6 HELD-STANCES. heldStance: true on held bent-knee or wide
+ *   stances; the builder counts them as loading the legs. verify-held-stances.
  *
  * v8 - S1-LEGS (found building the S1 clinical pack). Crescent Lunge, "back knee lowered to the floor": position floor.
  *   verify-s1-legs.
@@ -113,6 +116,7 @@ export const YOGA = [
     position: 'standing',
     impact: false,
     balanceDemand: false,
+    heldStance: true,   // W3-6: held bent-knee or wide stance; counts as loading the legs until S1 pack s.4 is answered
     name: 'Warrior I',
     youtube: 'warrior 1 yoga pose tutorial',
     category: 'mobility',
@@ -151,6 +155,7 @@ export const YOGA = [
     position: 'standing',
     impact: false,
     balanceDemand: false,
+    heldStance: true,   // W3-6: held bent-knee or wide stance; counts as loading the legs until S1 pack s.4 is answered
     name: 'Warrior II',
     youtube: 'warrior 2 yoga pose tutorial',
     category: 'mobility',
@@ -189,6 +194,7 @@ export const YOGA = [
     position: 'standing',
     impact: false,
     balanceDemand: false,
+    heldStance: true,   // W3-6: held bent-knee or wide stance; counts as loading the legs until S1 pack s.4 is answered
     name: 'Triangle Pose',
     youtube: 'triangle pose yoga tutorial',
     category: 'mobility',
@@ -374,6 +380,7 @@ export const YOGA = [
     position: 'floor',
     impact: false,
     balanceDemand: false,
+    heldStance: true,   // W3-6: held bent-knee or wide stance; counts as loading the legs until S1 pack s.4 is answered
     name: 'Crescent Lunge',
     youtube: 'crescent lunge yoga pose tutorial',
     category: 'mobility',
@@ -1197,6 +1204,7 @@ export const YOGA = [
     position: 'standing',
     impact: false,
     balanceDemand: false,
+    heldStance: true,   // W3-6: held bent-knee or wide stance; counts as loading the legs until S1 pack s.4 is answered
     name: 'Hip Strength and Stability — Yoga',
     youtube: 'hip strength and stability yoga pose tutorial',
     category: 'strength',

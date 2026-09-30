@@ -1,7 +1,10 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
- * 30 Sep 2026 v66
+ * 30 Sep 2026 v67
+ *
+ * v67 - W3-6 HELD-STANCES. A library entry flagged heldStance counts as
+ *   loading the legs in personFilter.
  *
  * v66 - S1-LEGS (found building the S1 clinical pack). A hold standing on
  *   bent legs (Wall Sit, Wall Squat Hold) loads the legs: personFilter's
@@ -2998,7 +3001,11 @@ export function personFilter({ equipment = null } = {}) {
   // to somebody who cannot rise from a chair easily: the C1 lesson again.
   // Lying and seated holds (Glute Squeeze, Hamstring Isometric Hold) are
   // not weight through the legs and still pass.
-  const _heldOnLegs = ex => ex.movementPattern === "isometric" && ex.position === "standing";
+  // W3-6 (Wave 3, persona 2.11). Held bent-knee or wide stances -- Warrior
+  // I and II, Triangle, a standing adductor stretch, a kneeling lunge --
+  // are flagged in the library (heldStance) and count the same, until
+  // the physio answers pack section 4.
+  const _heldOnLegs = ex => (ex.movementPattern === "isometric" && ex.position === "standing") || ex.heldStance === true;
   const _loadsLegs = ex =>
     _needsLegs(ex) && (
       LEG_PATTERNS.includes(ex.movementPattern) ||

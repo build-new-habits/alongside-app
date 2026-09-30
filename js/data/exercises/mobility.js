@@ -1,6 +1,9 @@
 /**
  * data/exercises/mobility.js
- * 30 Sep 2026 v7
+ * 30 Sep 2026 v8
+ *
+ * v8 - W3-6 HELD-STANCES. heldStance: true on held bent-knee or wide
+ *   stances; the builder counts them as loading the legs. verify-held-stances.
  *
  * v7 - S1-LEGS (found building the S1 clinical pack). Hip CARs, Standing Quad Stretch and Standing Hip Circles stand on one leg: balanceDemand true. Standing Hip Circles no longer asks to "Maximise the range".
  *   verify-s1-legs.
@@ -722,6 +725,7 @@ export const MOBILITY = [
     position: 'standing',
     impact: false,
     balanceDemand: false,
+    heldStance: true,   // W3-6: held bent-knee or wide stance; counts as loading the legs until S1 pack s.4 is answered
     name: 'Standing Adductor Stretch',
     youtube: 'standing adductor stretch technique',
     category: 'mobility',
