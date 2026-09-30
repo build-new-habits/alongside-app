@@ -1,7 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 30 Sep 2026 v603
+ * 30 Sep 2026 v604
+ *
+ * v604 - W3-14: ten minutes is about ten; the Gym block leaves room.
  *
  * v603 - W3-13: a session cut short is saved, never dropped; time away is not minutes.
  *
@@ -4135,7 +4137,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v603";
+const CACHE_NAME = "alongside-v604";
 
 const SHELL_URLS = [
 
