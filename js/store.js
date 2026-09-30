@@ -3,7 +3,14 @@ import { RETIRED_CONDITIONS } from "./data/scope-statement.js";
 
 /**
  * store.js - Data persistence layer
- * 30 Sep 2026 v90
+ * 30 Sep 2026 v91
+ *
+ * v91 - W3-16 ARC-AND-SAVED (Schema v1.86). savedSessions[].sessionType
+ *   held the plan's id ("upper-1790...") and is repaired to its type on
+ *   load, as activity entries were in v82. savedSessions[].doses keeps
+ *   each move's section and dose. markSessionWorked() also credits
+ *   creditTypes: the kind a freestyle session's moves fit, for the arc
+ *   only (the entry's own sessionType stays the person's to say).
  *
  * v90 - W3-13. logActivity()'s double-write guard ignores an entry saved
  *   from a checkpoint (rescued): it is another session by construction,
@@ -1707,6 +1714,14 @@ export const store = {
         return st === e.sessionType ? e : { ...e, sessionType: st };
       });
     }
+    // W3-16. A saved session stored the plan's id as its kind.
+    if (Array.isArray(data.savedSessions)) {
+      data.savedSessions = data.savedSessions.map(r => {
+        if (!r || typeof r !== 'object' || typeof r.sessionType !== 'string') return r;
+        const st = asType(r.sessionType);
+        return st === r.sessionType ? r : { ...r, sessionType: st };
+      });
+    }
     const tw = data.arc && data.arc.typesWorked;
     if (tw && typeof tw === 'object') {
       const out = {};
@@ -3243,11 +3258,13 @@ export const store = {
     if (!arc.aimId) return;              // nothing to credit yet
     const today = new Date().toISOString().split("T")[0];
 
-    // Capability strands: the type of session it was.
-    const type = session.sessionType || null;
-    if (type) {
+    // Capability strands: the type of session it was -- or, for a session
+    // put together as it went, the kind its moves fit (W3-16, creditTypes).
+    const credit = [session.sessionType, ...(Array.isArray(session.creditTypes) ? session.creditTypes : [])]
+      .filter(t => typeof t === 'string' && t);
+    if (credit.length) {
       const types = { ...(arc.typesWorked || {}) };
-      types[type] = today;
+      for (const t of credit) types[t] = today;
       arc.typesWorked = types;
     }
 
@@ -3399,7 +3416,8 @@ export const store = {
     try {
       this.markSessionWorked({
         sessionType: _inferredType,
-        exercises:   (_thisSession && _thisSession.exercises) || entry.exercises || []
+        exercises:   (_thisSession && _thisSession.exercises) || entry.exercises || [],
+        creditTypes: (_thisSession && _thisSession.creditTypes) || []   // W3-16
       });
     } catch { /* the log is the record; the arc is commentary on it */ }
 
