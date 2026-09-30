@@ -1,7 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 30 Sep 2026 v608
+ * 30 Sep 2026 v609
+ *
+ * v609 - W3-18: a strength hinge, balanced upper body, rest for heavy sets.
  *
  * v608 - "Mostly the same" keeps a warm-up move's time (short sessions fitted per move).
  *
@@ -4145,7 +4147,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v608";
+const CACHE_NAME = "alongside-v609";
 
 const SHELL_URLS = [
 
