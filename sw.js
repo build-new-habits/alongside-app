@@ -1,7 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 30 Sep 2026 v612
+ * 30 Sep 2026 v613
+ *
+ * v613 - PT-1: Inter served from the app (fonts precached); Sentry sends errors only.
  *
  * v612 - W3-21: Length, Where and Swap are lists; looking at a plan keeps the default place; builder and Run door start fresh.
  *
@@ -4153,7 +4155,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v612";
+const CACHE_NAME = "alongside-v613";
 
 const SHELL_URLS = [
 
@@ -4163,6 +4165,7 @@ const SHELL_URLS = [
 
   // CSS
   "/alongside-app/css/main.css",
+  "/alongside-app/css/base/fonts.css",
   "/alongside-app/css/layouts/onboarding-additions.css",
   "/alongside-app/css/layouts/today.css",
   "/alongside-app/css/layouts/my-programme.css",
@@ -4402,6 +4405,10 @@ const SHELL_URLS = [
   "/alongside-app/assets/images/logo-icon-square.png",
   "/alongside-app/assets/images/logo-icon-128.png",
   "/alongside-app/assets/images/logo-icon-192.png",
+  "/alongside-app/assets/fonts/inter-latin-400-normal.woff2",
+  "/alongside-app/assets/fonts/inter-latin-500-normal.woff2",
+  "/alongside-app/assets/fonts/inter-latin-600-normal.woff2",
+  "/alongside-app/assets/fonts/inter-latin-700-normal.woff2",
   "/alongside-app/assets/images/logo-icon-512.png"
 
 ];
