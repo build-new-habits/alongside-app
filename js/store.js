@@ -3,7 +3,11 @@ import { RETIRED_CONDITIONS } from "./data/scope-statement.js";
 
 /**
  * store.js - Data persistence layer
- * 30 Sep 2026 v87
+ * 30 Sep 2026 v88
+ *
+ * v88 - W3-10 LIGHTER-COUNT (Schema v1.83). New field lighterDayDeclinedOn:
+ *   the local day the person turned the lighter day down ("Keep my usual
+ *   plan" or Harder). A date, so it lapses at midnight by itself.
  *
  * v87 - W3-4 SORE-SCOPE (Schema v1.82). lapseQuietSoreAreas() counts check-ins
  *   in a row, not consecutive days: one tap stayed listed for weeks.
@@ -2050,6 +2054,11 @@ export const store = {
         // check-in. Once, ever — see offerBriefPath().
         briefOfferedAt: null // ISO string | null
       },
+
+      // W3-10 LIGHTER-COUNT, 30 Sep 2026 (Schema v1.83). The local day
+      // ('YYYY-MM-DD') the person turned the lighter day down. coachBias()
+      // reads it; only today's value means anything, so it needs no clearing.
+      lighterDayDeclinedOn: null,
 
       // ── ASSESSMENT (ASSESS-1, 15 Aug 2026) ────────────────────
       //
