@@ -1,6 +1,12 @@
 /**
  * settings.js
- * 30 Sep 2026 v47
+ * 30 Sep 2026 v48
+ *
+ * v48 - W3-17 MAINTAIN-INTENT (persona Wave 3, 2.4). "What are we aiming
+ *   at?" was asked once, at sign-up, and nothing changed it. "What you're
+ *   aiming at" is on the page, beside how sessions change, with the same
+ *   three answers onboarding offers (INTENT_CHIPS), and saves as it
+ *   changes.
  *
  * v47 - W3-8 CYCLE-CLAIM (persona Wave 3, 2.4). Settings offered
  *   "Cycle-aware coaching - Adapts sessions to your hormonal cycle" in two
@@ -541,6 +547,7 @@
  */
 
 import { AVAILABLE_TIME_WINDOW_MINUTES } from '../data/time-windows.js';
+import { INTENT_CHIPS }   from '../data/onboarding-thread-data.js';   // W3-17
 import { store }          from '../store.js';
 import { isPremium }      from '../auth.js';
 import { toKg, fromKg } from '../data/weight-targets.js';
@@ -774,6 +781,7 @@ export function SettingsView(router) {
       ])}
 
       ${_group('How the coach works', [
+        _row({ label: 'What you\u2019re aiming at', value: (INTENT_CHIPS.find(c => c.id === (store.get('trainingIntent') || 'improve')) || INTENT_CHIPS[0]).label, open: 'preferences', focus: '#settings-intent' }),
         _row({ label: 'How much sessions change', value: _label(VARIETY, store.get('sessionVariety') || 'balanced', 'A bit of both'), open: 'preferences', focus: '#settings-pref-variety' }),
         _row({ label: 'How long you usually have', value: `${AVAILABLE_TIME_WINDOW_MINUTES[store.get('availableTime')] ?? 30} minutes`, open: 'preferences', focus: '#settings-usual-length' }),
         _row({ label: 'Exercises you asked to change', value: prefs ? String(prefs) : 'None', open: 'preferences' }),
@@ -1107,6 +1115,20 @@ export function SettingsView(router) {
           None of this is about what you can do — it is about what you
           would rather the coach did. Change it whenever you like.
         </p>
+
+        <!-- W3-17. The same three answers onboarding offers. -->
+        <div class="settings-field">
+          <label class="settings-label" for="settings-intent">What you\u2019re aiming at</label>
+          <p class="settings-section__sub" id="intent-hint">
+            This shapes most of what the coach suggests. There is no better answer.
+          </p>
+          <select class="settings-select" id="settings-intent" data-field="trainingIntent"
+                  aria-describedby="intent-hint">
+            ${INTENT_CHIPS.map(c => `
+              <option value="${c.id}"${(store.get('trainingIntent') || 'improve') === c.id ? ' selected' : ''}>${_esc(c.label)}</option>
+            `).join('')}
+          </select>
+        </div>
 
         <fieldset class="settings-field settings-capability__group">
           <legend class="settings-label">How much should sessions change?</legend>

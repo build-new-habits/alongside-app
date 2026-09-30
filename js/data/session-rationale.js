@@ -1,6 +1,11 @@
 /**
  * data/session-rationale.js
- * 29 Sep 2026 v5
+ * 30 Sep 2026 v6
+ *
+ * v6 - W3-17 MAINTAIN-INTENT (persona Wave 3, 2.4). "Hold on to what I
+ *   have" always said "grip, balance, and getting up and down". With no
+ *   limits in the capability answers (the builder's own test, never age)
+ *   it says strength, power and balance.
  *
  * v5 - P0, SCOPE-MINOR. Goal phrases no longer promise to settle pain or rebuild what was lost.
  *
@@ -285,7 +290,13 @@ function _opening(exercises, intent, goals, excludedReason) {
   // Intent shapes the emphasis, and saying so makes the session legible
   // rather than arbitrary.
   if (intent === "maintain") {
-    parts.push("The emphasis is on holding onto what you have — grip, balance, and getting up and down, because those are the ones worth keeping.");
+    // W3-17. The same test as session-builder.js _capabilityUnrestricted().
+    const cap = store.capabilityProfile();
+    const noLimits = cap.asked && !cap.needsSeated && cap.legsLoadable &&
+      store.get("capability.floorAccess") === "yes" && store.get("capability.balanceWorry") === "no";
+    parts.push(noLimits
+      ? "The emphasis is on keeping what you have built: strength, power and balance, the capacities that fade first when training stops."
+      : "The emphasis is on holding onto what you have — grip, balance, and getting up and down, because those are the ones worth keeping.");
   } else if (intent === "recover") {
     parts.push("The emphasis is on rebuilding, so it is deliberately steadier than it might be.");
   }

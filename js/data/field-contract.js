@@ -193,8 +193,8 @@ export const FIELD_CONTRACT = {
 
   "trainingIntent": {
     values: ["improve", "maintain", "recover"],
-    writer: "views/onboarding/thread.js (step 9f, INTENT_CHIPS)",
-    meaning: "What the person is aiming at. 'maintain' PRIORITISES carries, grip, balance and floor transfer — it does not mean doing less. Never inferred from age or activity level; the person says."
+    writer: "views/onboarding/thread.js (step 9f, INTENT_CHIPS); views/settings.js (W3-17, #settings-intent)",
+    meaning: "What the person is aiming at. 'maintain' PRIORITISES carries, grip, balance and floor transfer — or, with no limits in the capability answers, strength, power and balance (W3-17) — it does not mean doing less. Never inferred from age or activity level; the person says."
   },
 
   "lifestyle.returningAfter": {
@@ -305,8 +305,8 @@ export const FIELD_CONTRACT = {
   // real path. A duplicate key in an object literal is legal JS and the
   // last one silently wins, so the contract had two answers and the gate
   // only ever saw one. The live entry is above, with the capability
-  // fields. Nothing writes trainingIntent in settings.js today; if that
-  // changes, add it to the entry above rather than making a second.
+  // fields. settings.js writes it since W3-17 (30 Sep); that writer is
+  // in the entry above, not a second one.
   "tier": {
     values: ["free", "personal"],   // ATHLETE-RETIRE, 18 Aug 2026
     // RETIRED VALUES. Values the field no longer accepts but which may

@@ -1,7 +1,14 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
- * 30 Sep 2026 v73
+ * 30 Sep 2026 v74
+ *
+ * v74 - W3-17 MAINTAIN-INTENT (persona Wave 3, 2.4). "Hold on to what I
+ *   have" matched "floor" in any name, so Dumbbell Floor Press and Floor
+ *   Fly led a trained person's sessions (24 in 30 plans, against 4 when
+ *   building). The pattern now means getting up from the floor. And with
+ *   no limits in the capability answers (never age), holding on leans to
+ *   strength, power and balance, not chair or sit-to-stand work.
  *
  * v73 - W3-16. buildSessionFromSaved() keeps a saved move's own section.
  *
@@ -2327,13 +2334,21 @@ function _difficultyCeiling() {
 // "recover" leans on the rehabilitation library and the phase system
 // that already exists in conditionProgrammes.js.
 
-const MAINTAIN_PRIORITY = /carry|grip|hold|balance|single-leg|sit-to-stand|chair|step-up|get ?up|floor|calf raise|power|throw|slam|reach/i;
+// W3-17. "floor" alone matched Floor Press and Floor Fly; it means
+// getting up from the floor.
+const MAINTAIN_PRIORITY = /carry|grip|hold|balance|single-leg|sit-to-stand|chair|step-up|get ?up|floor[- ]to[- ]stand|floor transfer|calf raise|power|throw|slam|reach/i;
+// W3-17. For somebody whose capability answers show no limits, holding on
+// is keeping strength, power and balance -- not chair or floor-transfer
+// work, which answers a limit they do not have. Read from what they
+// answered, never from age.
+const MAINTAIN_ASSISTED = /chair|sit-to-stand|sit to stand|get ?up|floor[- ]to[- ]stand|floor transfer|supported/i;
 const RECOVER_PRIORITY  = /rehab|progression|activation|isometric|controlled|range/i;
 
 function intentPriority(ex) {
   const trainingIntent = store.get("trainingIntent") || "improve";
   const s = ex.name + " " + (ex.id || "");
   if (trainingIntent === "maintain") {
+    if (_capabilityUnrestricted() && MAINTAIN_ASSISTED.test(s)) return false;   // W3-17
     return MAINTAIN_PRIORITY.test(s) ||
            ex.movementPattern === "carry" ||
            ex.movementPattern === "balance" ||
