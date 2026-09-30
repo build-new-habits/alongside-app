@@ -1,7 +1,20 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
- * 30 Sep 2026 v75
+ * 30 Sep 2026 v76
+ *
+ * v76 - W3-18 GYM-QUALITY (persona Wave 3: 2.4, 2.15). Measured at a gym,
+ *   30 builds each: Lower Body had no strength hinge in 30 of 30 and a
+ *   Power Clean in every one (its pattern is "hinge", so it filled the
+ *   slot); every lift rested 60 seconds; Upper Body pushed and pulled out
+ *   of balance in 7 of 30, and "Coach recommends" suggested 1 push to 5
+ *   pulls. Now _shapeMain(): Lower, Glute and Full Body include a strength
+ *   hinge whenever the kit allows one (protected from the time step, as
+ *   the machine block is), with any swing, clean or snatch after it; Upper
+ *   Body keeps pushing and pulling within one, after the time step and in
+ *   the recommended picks. _defaultRest(): a heavy barbell lift 2 minutes,
+ *   an explosive one 90 seconds, the rest 60 as before; a move's own rest
+ *   is kept. verify-gym-quality.
  *
  * v75 - W3-17 follow-up, found by verify-mostly-same 2c on a fresh clone:
  *   W3-14's warm-up and cool-down fit ran only when the whole session was
@@ -2495,6 +2508,94 @@ const DOSE_SKIP_CATEGORIES = new Set([
  * Two sets on a gentle day, the same direction as _applyTodayIntensity.
  * Per-set duration: about four seconds a rep, plus the rest.
  */
+// W3-18. Explosive lifts: a swing, clean or snatch is not the strength it
+// depends on.
+const _BALLISTIC = /swing|snatch|\bclean\b|jerk|throw|slam|jump/i;
+const _isStrengthHinge  = e => e && e.movementPattern === "hinge" && !_BALLISTIC.test(e.name || "");
+const _isBallisticHinge = e => e && e.movementPattern === "hinge" && _BALLISTIC.test(e.name || "");
+const _HEAVY_PATTERNS   = new Set(["squat", "hinge", "push", "pull", "lunge"]);
+/** W3-18. Rest that suits the lift, when the move does not state its own. */
+function _defaultRest(ex) {
+  if (Number(ex.rest) > 0) return Number(ex.rest);
+  const name = ex.name || "";
+  if (_BALLISTIC.test(name) || ex.category === "power") return 90;
+  if ((ex.equipment || []).includes("barbell") && _HEAVY_PATTERNS.has(ex.movementPattern)) return 120;
+  return 60;
+}
+// W3-18. A load: weights or a machine, as _usesLoad() (GYM-KIT) says --
+// a band pull-apart is not what a rack is for.
+const _isLoaded = e => !!e && _usesLoad(e);
+const _HINGE_TYPES = new Set(["lower", "glute", "full"]);
+const _BALANCE_TYPES = new Set(["upper", "full"]);
+/**
+ * W3-18. Shape a main list in place, from `pool` (candidates for this
+ * section, already filtered for kit, capability and sore areas):
+ *   hinge   -- a strength hinge when the pool has one; replaces an
+ *              explosive hinge standing in for it, else the last move;
+ *              explosive hinges move after it. Marked _keep.
+ *   balance -- pushing and pulling within one, the surplus's last move
+ *              replaced by the other, in place.
+ * Nothing is added or removed: the list keeps its length.
+ */
+function _shapeMain(list, typeId, pool, { hinge = true, balance = true } = {}) {
+  const taken = new Set(list.map(e => e && e.id));
+  const fresh = f => pool.find(c => f(c) && !taken.has(c.id));
+  const loadedFirst = f => pool.filter(c => f(c) && !taken.has(c.id))
+    .sort((a, b) => _isLoaded(b) - _isLoaded(a) || (b.difficultyLevel || 0) - (a.difficultyLevel || 0))[0];
+  if (hinge && _HINGE_TYPES.has(typeId) && list.length) {
+    let hi = list.findIndex(_isStrengthHinge);
+    if (hi < 0) {
+      const pick = loadedFirst(_isStrengthHinge);
+      if (pick) {
+        let at = list.findIndex(_isBallisticHinge);
+        if (at < 0) for (let i = list.length - 1; i >= 0; i--) if (!list[i]._feature && !list[i].isPrescribed) { at = i; break; }
+        if (at >= 0) { taken.delete(list[at].id); list[at] = pick; taken.add(pick.id); hi = at; }
+      }
+    }
+    if (hi >= 0) {
+      list[hi] = { ...list[hi], _keep: true };
+      // Explosive hinges after the strength hinge, in their own order.
+      const before = list.slice(0, hi).filter(_isBallisticHinge);
+      if (before.length) {
+        const rest = list.filter(e => !before.includes(e));
+        const at = rest.findIndex(_isStrengthHinge);
+        rest.splice(at + 1, 0, ...before);
+        list.length = 0; list.push(...rest);
+      }
+    }
+  }
+  if (balance && _BALANCE_TYPES.has(typeId)) {
+    for (let guard = 0; guard < 6; guard++) {
+      const push = list.filter(e => e.movementPattern === "push").length;
+      const pull = list.filter(e => e.movementPattern === "pull").length;
+      if (Math.abs(push - pull) <= 1) break;
+      const surplus = push > pull ? "push" : "pull", lack = push > pull ? "pull" : "push";
+      let at = -1;
+      for (let i = list.length - 1; i >= 0; i--) if (list[i].movementPattern === surplus && !list[i]._keep && !list[i]._feature && !list[i].isPrescribed) { at = i; break; }
+      if (at < 0) break;
+      // No longer than the move it replaces, where one fits: the session
+      // has already been fitted to its time.
+      const dosed = c => withDefaultDose({ ...c, section: "main" });
+      const room = _exerciseMins(list[at]);
+      // Loaded first, as the selection itself prefers kit (CON-8).
+      const options = pool.filter(c => c.movementPattern === lack && !taken.has(c.id))
+        .sort((a, b) => _isLoaded(b) - _isLoaded(a));
+      if (!options.length) break;
+      const loaded = _isLoaded;
+      const fits   = c => _exerciseMins(dosed(c)) <= room;
+      const byTime = (a, b) => _exerciseMins(dosed(a)) - _exerciseMins(dosed(b));
+      // A loaded move replaces a loaded one (the kit is there to be used);
+      // time is the tie-break, not the rule.
+      const want = loaded(list[at]) ? options.filter(loaded) : options;
+      const from = want.length ? want : options;
+      const pick = from.find(fits) || from.slice().sort(byTime)[0];
+      taken.delete(list[at].id); taken.add(pick.id);
+      list[at] = dosed(pick);   // always dosed: the list may already be (verify-plan-dose)
+    }
+  }
+  return list;
+}
+
 export function withDefaultDose(ex, intensity) {
   if (!ex || ex.isPrescribed || ex._feature || ex.reps != null) return ex;
   if ((ex.section || "main") !== "main") return ex;
@@ -2513,7 +2614,7 @@ export function withDefaultDose(ex, intensity) {
     const wsets = written.sets == null ? base : (level === "low" ? Math.max(2, written.sets - 1) : written.sets);
     const wreps = written.reps ?? (level === "high" ? "8\u201312" : "10");
     const wside = written.side || (ex.perSide && /^[\d\u2013-]+$/.test(wreps) ? " each side" : "");
-    const rest  = Number(ex.rest) > 0 ? Number(ex.rest) : 60;
+    const rest  = _defaultRest(ex);   // W3-18
     const work  = written.holdSeconds ? written.holdSeconds * (wside ? 2 : 1) : 10 * 4 * (wside ? 2 : 1);
     return { ...ex, sets: wsets, reps: `${wreps}${wside}`, rest,
              duration: _doseSeconds(wsets, work, rest), _doseWork: work,
@@ -2522,7 +2623,7 @@ export function withDefaultDose(ex, intensity) {
   const sets  = Number(ex.sets) > 0 ? Number(ex.sets) : (level === "low" ? 2 : 3);
   const reps  = level === "high" ? "8\u201312" : "10";
   const side  = ex.perSide ? " each side" : "";
-  const rest  = Number(ex.rest) > 0 ? Number(ex.rest) : 60;
+  const rest  = _defaultRest(ex);   // W3-18
   const work  = 10 * 4 * (ex.perSide ? 2 : 1);
   return { ...ex, sets, reps: `${reps}${side}`, rest,
            duration: _doseSeconds(sets, work, rest), _doseWork: work, _defaultDose: true };
@@ -2598,8 +2699,10 @@ function _trimToDuration(warmup, prescribed, main, cooldown, targetMins) {
   // towards the floor either -- MIN_MAIN is about how many real working
   // movements are left, and a 25-minute machine block is not one of three
   // lifts.
-  const isFeature   = ex => ex?._feature === true;
-  const workingLeft = () => trimmed.filter(ex => !isFeature(ex)).length;
+  // W3-18. A strength hinge _shapeMain() ensured is never the one
+  // removed -- but it is a working move, so it counts towards the floor.
+  const isFeature   = ex => ex?._feature === true || ex?._keep === true;
+  const workingLeft = () => trimmed.filter(ex => ex?._feature !== true).length;
 
   while (total() > targetMins * TOLERANCE && workingLeft() > MIN_MAIN) {
     let worstIdx = -1;
@@ -3248,6 +3351,15 @@ export function buildCandidatePools({ sessionType, durationMins, equipmentOverri
     for (const ex of candidates) {
       if (recommendedIds.size >= count) break;
       recommendedIds.add(ex.id);
+    }
+    // W3-18. The same shape the coach's build keeps: a strength hinge,
+    // pushing and pulling in balance. Deterministic, like the rest.
+    if (section === "main") {
+      const seen = new Set();
+      const rec = candidates.filter(ex => recommendedIds.has(ex.id) && !seen.has(ex.id) && seen.add(ex.id));
+      _shapeMain(rec, type.id, candidates);
+      recommendedIds.clear();
+      for (const ex of rec) recommendedIds.add(ex.id);
     }
     return candidates.map(ex => ({ ...ex, recommended: recommendedIds.has(ex.id) }));
   }
@@ -4552,8 +4664,16 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
   // its id goes into alreadyChosen so nothing picks it twice.
   const featureExercises = _selectFeature(type, equipSet, conditionSet, alreadyChosen);
 
-  const mainExercises     = [...prescribed, ...featureExercises,
-                             ...selectFromCategories(mainCategories, "main", adjustedCounts.main, alreadyChosen)]
+  // W3-18. The pool the shape draws on: this section's candidates, with
+  // every filter the selection used (kit, capability, sore areas).
+  const _mainPool = () => _filterCandidates(mainCategories, "main", equipSet, conditionSet, type.sectionRules?.main)
+    .filter(ex => !alreadyChosen.has(ex.id));
+  const _picked = selectFromCategories(mainCategories, "main", adjustedCounts.main, alreadyChosen);
+  // A replayed learned session carries its shape already; reshaping it
+  // would change a second move (verify-learned-session 4a).
+  if (!_learned) _shapeMain(_picked, type.id, _mainPool(), { balance: false });
+  for (const ex of _picked) alreadyChosen.add(ex.id);
+  const mainExercises     = [...prescribed, ...featureExercises, ..._picked]
                              .map(ex => withDefaultDose(ex));
   const cooldownExercises = selectFromCategories(type.cooldownCategories, "cooldown", adjustedCounts.cooldown, alreadyChosen);
 
@@ -4596,6 +4716,9 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
   _topUpToDuration(warmupExercises, mainExercises, cooldownExercises, durationMins,
                    () => selectFromCategories(mainCategories, "main", 1, alreadyChosen),
                    () => selectFromCategories(type.cooldownCategories, "cooldown", 1, alreadyChosen));
+  // W3-18. After the time step: explosive hinges after the strength one,
+  // pushing and pulling in balance -- replacing in place, never adding.
+  if (!_learned) _shapeMain(mainExercises, type.id, _mainPool().filter(ex => !mainExercises.some(m => m.id === ex.id)), { hinge: true, balance: true });
   // ROLE-1. See _withRole above. This is the coach route -- One to one,
   // quick build, the four doors -- and the one the screenshots came from.
   const allExercises = [
