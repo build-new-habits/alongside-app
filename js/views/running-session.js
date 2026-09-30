@@ -1,7 +1,15 @@
 /**
  * running-session.js - Guided Running Session
  *
- * 29 Sep 2026 v6
+ * 30 Sep 2026 v7
+ *
+ * v7 - W3-2 RUN-SORE (Wave 3, persona 2.1). The Run door reads today. A
+ *   sore area at Bad asks Rest today or Something gentler first, in the
+ *   coach's own words, and both go to the coach's screen with the choice
+ *   recorded (the severe-day choice lived only on the coach's route). A
+ *   note that says no intervals today removes Intervals and says why.
+ *   No push-through lines; the foot note no longer names a condition.
+ *   verify-run-sore.
  *
  * v6 - P25. A leftover entry from the last session is not spread into
  *   this one: store.pendingActivityEntry() decides (id and exercises
@@ -83,6 +91,8 @@ import { isGateDue, renderSafetyGate, attachSafetyGate } from "../safety-gate.js
 import { renderLogBlock, attachLogEvents } from "../session-log.js";
 import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
 import { checkpointSession, getResumableSession, clearCheckpoint, computeElapsedSeconds } from "../session-resume.js";
+import { getConditionName } from "../data/conditions.js";
+import { safetyLineFor } from "../data/purpose.js";
 
 export const centered = false;
 
@@ -165,7 +175,7 @@ const PROMPTS = {
   ],
   intervals: [
     { text: "Work phase coming up in 30 seconds. Build to about 80% effort — hard but sustainable.", action: "Ready" },
-    { text: "The effort you just pushed through is zone 4 — uncomfortable and intentionally limited. Now recover fully. Partial recovery defeats the purpose of intervals.", action: "Recovering fully" },
+    { text: "That was the hard part of this one. Now recover fully: slow right down and let your breathing settle before the next.", action: "Recovering fully" },
     { text: "Recovery now. Slow right down. This is active recovery, not rest.", action: "Recovering" },
     { text: "Next effort in 30 seconds. Controlled breathing during the recovery.", action: "Ready" },
     { text: "Push the effort now. 80-85% — uncomfortable but not maximal.", action: "Working" },
@@ -226,6 +236,52 @@ const INTERVAL_STRUCTURE = {
 
 // ── Condition notes ───────────────────────────────────────────────────────────
 
+/**
+ * W3-2. Sore areas at Bad today (the coach's severe threshold, 7). The
+ * severe-day choice is asked here too, before any run.
+ */
+function severeToday() {
+  const conditions = store.get("conditions")          || [];
+  const painScores = store.get("conditionPainScores") || {};
+  return conditions.filter(id => (painScores[id] || 0) >= 7).sort();
+}
+
+/** W3-2. A note that rules out intervals takes Intervals off the list. */
+function intervalsOffReason() {
+  const conditions = store.get("conditions")          || [];
+  const painScores = store.get("conditionPainScores") || {};
+  const id = conditions.find(c => c.includes("hamstring") && (painScores[c] || 0) >= 3);
+  return id ? `Intervals are off today: your ${getConditionName(id).toLowerCase()} is sore, so easy or long, at a pace you could talk at.` : null;
+}
+
+function renderSevereToday(ids) {
+  const names  = ids.map(getConditionName);
+  const plural = names.length > 1;
+  const joined = names.length === 1 ? names[0]
+    : names.length === 2 ? `${names[0]} and ${names[1]}`
+    : `${names.slice(0, -1).join(", ")}, and ${names[names.length - 1]}`;
+  return `
+    <div class="view walk-session-view">
+      <div class="workout-header">
+        <button class="btn btn-ghost" id="rs-back-btn" aria-label="Exit">Exit</button>
+        <h1 class="workout-header-title">Before you run</h1>
+      </div>
+      <div class="card card-coach" style="margin-bottom: var(--space-5);">
+        <p class="coach-message-text">I can see ${joined} ${plural ? "are" : "is"} really difficult today. I can't give you medical support \u2014 that isn't something I can do. What I can do is keep today gentle, or we can call it a rest day. ${safetyLineFor(plural ? "them" : "it")}</p>
+      </div>
+      <div class="ws-type-grid" role="group" aria-label="Rest or something gentler">
+        <button class="ws-type-card" data-severe-run="rest">
+          <span class="ws-type-label">Rest today</span>
+          <span class="ws-type-desc">Nothing pushed today \u2014 the right call some days</span>
+        </button>
+        <button class="ws-type-card" data-severe-run="adapt">
+          <span class="ws-type-label">Something gentler</span>
+          <span class="ws-type-desc">Something gentler, that asks less of the sore area</span>
+        </button>
+      </div>
+    </div>`;
+}
+
 function buildConditionNote() {
   const conditions = store.get("conditions")          || [];
   const painScores = store.get("conditionPainScores") || {};
@@ -246,7 +302,7 @@ function buildConditionNote() {
       notes.push("Your hamstring needs attention. No interval efforts today. Keep the pace easy and stop if you feel any pull.");
     }
     if (id.includes("plantar")) {
-      notes.push("Plantar fasciitis benefits from a slower warm-up walk. Take an extra two minutes before running.");
+      notes.push("With your foot sore, take an extra two minutes of walking before you run.");
     }
     if (id.includes("lower-back")) {
       notes.push("Your lower back is flagging. Engage your core lightly throughout and avoid leaning forward.");
@@ -259,6 +315,7 @@ function buildConditionNote() {
 // ── Render ────────────────────────────────────────────────────────────────────
 
 export function render() {
+  if (phase === "type" && severeToday().length) return renderSevereToday(severeToday());
   if (phase === "type")     return renderTypeSelector();
   if (phase === "resume")   return renderResumePrompt();
   if (phase === "duration") return renderDurationSelector();
@@ -325,8 +382,9 @@ function renderTypeSelector() {
         </p>
       </div>
 
+      ${intervalsOffReason() ? `<p class="text-sm text-secondary" style="margin-bottom: var(--space-4);">${intervalsOffReason()}</p>` : ""}
       <div class="ws-type-grid" role="group" aria-label="Choose run type">
-        ${RUN_TYPES.map(t => `
+        ${RUN_TYPES.filter(t => !(t.id === "intervals" && intervalsOffReason())).map(t => `
           <button class="ws-type-card" data-type="${t.id}"
                   aria-label="${t.label}: ${t.description}">
             <span class="ws-type-icon" aria-hidden="true">${t.icon}</span>
@@ -525,7 +583,7 @@ function renderDone() {
 
   const completions = {
     easy:      "An easy run done. You have trained your aerobic system today. That work is in the bank.",
-    intervals: "Intervals complete. The discomfort you just pushed through is exactly where fitness is built.",
+    intervals: "Intervals done. Hard efforts with proper recovery between them — that is the whole of it.",
     long:      "Long run done. That is the kind of session that compounds over months. Well run."
   };
 
@@ -1014,7 +1072,17 @@ export function onMount() {
     showExitConfirm();
   });
 
-  document.querySelectorAll(".ws-type-card").forEach(btn => {
+  // W3-2. The severe-day choice, recorded as the coach's route records it.
+  document.querySelectorAll("[data-severe-run]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const ids = severeToday();
+      store.recordSeverePainChoice(ids, btn.dataset.severeRun);
+      resetSession();
+      router.navigate("coach-proposal");
+    });
+  });
+
+  document.querySelectorAll(".ws-type-card[data-type]").forEach(btn => {
     btn.addEventListener("click", () => {
       selectedType = btn.dataset.type;
       phase        = "duration";
