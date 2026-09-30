@@ -1,6 +1,13 @@
 /**
  * yoga-session.js
- * 29 Sep 2026 v12
+ * 30 Sep 2026 v13
+ *
+ * v13 - W3-19 YOGA-EMPTY (persona Wave 3, 2.11: cannot get to the floor).
+ *   Flexibility, Balance and Recovery had nothing for her, and each
+ *   offered a length card reading "About 1 min · 0 poses": the first card
+ *   was always shown. A style with nothing that fits now says so on its
+ *   own card and cannot be chosen; no length card offers 0 poses; a style
+ *   left with none says so on the length screen too.
  *
  * v12 - P25. A leftover entry from the last session is not spread into
  *   this one: store.pendingActivityEntry() decides (id and exercises
@@ -669,14 +676,17 @@ function renderFocusSelector() {
 
       <p class="cs-focus-question" id="ys-style-q">And what kind of practice?</p>
       <div class="cs-focus-grid" role="group" aria-labelledby="ys-style-q">
-        ${FOCUS_TYPES.map(f => `
-          <button class="cs-focus-card" data-focus="${f.id}"
-                  aria-label="${f.label}: ${f.description}">
+        ${FOCUS_TYPES.map(f => {
+          // W3-19. Said on the card, before anybody chooses it.
+          const none = _styleIsEmpty(f.id);
+          return `
+          <button class="cs-focus-card" data-focus="${f.id}"${none ? " disabled" : ""}
+                  aria-label="${f.label}: ${none ? "nothing here fits what you've told me" : f.description}">
             <span class="cs-focus-icon" aria-hidden="true">${f.icon}</span>
             <span class="cs-focus-label">${f.label}</span>
-            <span class="cs-focus-desc">${f.description}</span>
-          </button>
-        `).join("")}
+            <span class="cs-focus-desc">${none ? "Nothing here fits what you\u2019ve told me" : f.description}</span>
+          </button>`;
+        }).join("")}
       </div>
     </div>
   `;
@@ -769,10 +779,17 @@ function renderSessionOverview() {
  * longer lengths build the same list, and two cards offering one session
  * under different names is the fault this replaces.
  */
+/** W3-19. Nothing in this style fits, at any length offered. */
+function _styleIsEmpty(focusId) {
+  const longest = Math.max(...DURATIONS.map(d => d.mins));
+  return buildSession(focusId, longest, selectedTarget).length === 0;
+}
+
 function _offeredCards() {
   const out = [];
   for (const d of DURATIONS) {
     const poses = _offered[d.mins] || (_offered[d.mins] = buildSession(selectedFocus, d.mins, selectedTarget));
+    if (poses.length === 0) continue;   // W3-19: never "0 poses"
     if (out.length && out[out.length - 1].poses.length >= poses.length) continue;
     out.push({ d, poses });
   }
@@ -781,6 +798,19 @@ function _offeredCards() {
 
 function renderDurationSelector() {
   const focus = FOCUS_TYPES.find(f => f.id === selectedFocus);
+  const cards = _offeredCards();
+  // W3-19. Reached with nothing in it (the target changed, say): said plainly.
+  if (cards.length === 0) return `
+    <div class="view core-session-view">
+      <div class="workout-header">
+        <button class="btn btn-ghost" id="ys-back-btn" aria-label="Back">Back</button>
+        <h1 class="workout-header-title">${focus?.label || "Yoga"}</h1>
+      </div>
+      <div class="card card-coach" role="status">
+        <p class="coach-message-text">Nothing in this style fits what you've told me &mdash; about the floor, your balance, your legs or your kit.</p>
+      </div>
+      <button class="btn btn-primary btn-large btn-full" id="ys-refocus-btn" style="margin-top: var(--space-6);">Choose another style</button>
+    </div>`;
   return `
     <div class="view core-session-view">
       <div class="workout-header">
@@ -794,7 +824,7 @@ function renderDurationSelector() {
       </div>
 
       <div class="cs-duration-grid" role="group" aria-label="Choose session duration">
-        ${_offeredCards().map(({ d, poses }) => `
+        ${cards.map(({ d, poses }) => `
           <button class="cs-duration-card" data-mins="${d.mins}"
                   aria-label="${_aboutMins(poses)}, ${poses.length} poses: ${d.description}">
             <span class="cs-duration-label">${_aboutMins(poses)}</span>

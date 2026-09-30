@@ -1,6 +1,13 @@
 /**
  * tools/verify-mobility-door.mjs
- * 29 Sep 2026 v2
+ * 30 Sep 2026 v3
+ *
+ * v3 - W3-19 YOGA-EMPTY. A yoga style with nothing that fits now says so
+ *   on its own card and cannot be chosen, so it gives no list to walk.
+ *   "Every focus and length was walked" counts the styles that can be
+ *   chosen (and still asks for four offered in all); a style that cannot
+ *   be chosen must say why (verify-yoga-empty proves the words). Nothing
+ *   else changed.
  *
  * v2 - P24. Yoga no longer shows a length card that would repeat the one
  *   before (a style that ran out of poses built the same list three times
@@ -123,7 +130,10 @@ async function sweep(path, careful) {
   let mod = await fresh(path);
   main.innerHTML = mod.render(); try { mod.onMount(); } catch {}
   const ids = [...main.querySelectorAll("[data-focus]")].map(b => b.dataset.focus);
-  for (const f of ids) {
+  // v3. A style that cannot be chosen gives no list; it must say why.
+  const closed = [...main.querySelectorAll("[data-focus]")].filter(b => b.disabled).map(b => b.dataset.focus);
+  const closedSaid = [...main.querySelectorAll("[data-focus]")].filter(b => b.disabled && /nothing here fits/i.test(b.textContent)).length;
+  for (const f of ids.filter(x => !closed.includes(x))) {
     mod = await fresh(path);
     main.innerHTML = mod.render(); try { mod.onMount(); } catch {}
     click(main.querySelector(`[data-focus="${f}"]`)); await wait(10); main.innerHTML = mod.render(); try { mod.onMount(); } catch {}
@@ -148,7 +158,7 @@ async function sweep(path, careful) {
       }
     }
   }
-  return { ...out, focuses: ids };
+  return { ...out, focuses: ids.filter(x => !closed.includes(x)), closed, closedSaid };
 }
 
 // ── 1. THE DOOR ─────────────────────────────────────────────────────────
@@ -179,7 +189,8 @@ console.log("\nTEST 1 - \"Start a Mobility Session\" opens a mobility session");
 for (const [label, path, T] of [["core session", "views/core-session.js", "2"], ["yoga session", "views/yoga-session.js", "3"]]) {
   console.log(`\nTEST ${T} - the ${label}, for somebody seated, off the floor, with no kit`);
   const r = await sweep(path, true);
-  ok(`${T}pc. every focus and length was walked`, r.focuses.length >= 4 && r.lists >= r.focuses.length, `${r.focuses.join(",")}; ${r.lists} lists, ${r.names} moves`);
+  ok(`${T}pc. every focus and length that can be chosen was walked`, r.focuses.length + r.closed.length >= 4 && r.focuses.length >= 1 && r.lists >= r.focuses.length && r.closedSaid === r.closed.length,
+     `${r.focuses.join(",")} (closed: ${r.closed.join(",") || "none"}); ${r.lists} lists, ${r.names} moves`);
   ok(`${T}pc2. every listed move is a library entry`, r.unknown.length === 0, r.unknown.join(", "));
   ok(`${T}a. nothing listed that the shared filters would keep from them`, r.bad.length === 0, `${r.bad.length}: ${r.bad.slice(0, 8).join("; ")}`);
   ok(`${T}a2. where nothing fits, it says so and offers another choice`, r.honest === r.empties.length, `${r.honest} of ${r.empties.length} empty lists: ${r.empties.join(",")}`);
