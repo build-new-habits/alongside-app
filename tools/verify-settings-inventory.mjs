@@ -1,5 +1,12 @@
 /**
  * tools/verify-settings-inventory.mjs
+ * 30 Sep 2026 v3
+ *
+ * v3 - W3-8 CYCLE-CLAIM. "Cycle-aware coaching" is retired: nothing read
+ *   hormonalTracking, so the switch claimed something the app could not
+ *   back. verify-cycle-claim proves it absent, and returns it only if a
+ *   reader of the field appears. No other control changed.
+ *
  * 29 Sep 2026 v2
  *
  * v2 - P0. "Reduce pain" retired like Tone up; the row is "Sore or injured areas".
@@ -105,7 +112,7 @@ for (const tier of ["personal", "free"]) {
     const r = main.querySelector('[data-action="toggle-reflection"]'); if (r) { click(r); controlsHere().forEach(c => reach.has(c) || reach.set(c, `page › ${k}`)); }
   }
 }
-// Two controls changed on purpose, each named with its reason, and each
+// Controls changed on purpose, each named with its reason, and each
 // checked for what replaced it -- never simply excused.
 const RENAMED = {
   // The "Show your best" switch used its own action; it is now the same
@@ -119,6 +126,10 @@ const RETIRED = {
   // P0, 29 Sep (Graeme): "Reduce pain" is not offered -- the app does not
   // offer to reduce pain. Retired like Tone up; saved goals still resolve.
   "data-goal=reduce-pain": true,
+  // W3-8, 30 Sep: nothing reads hormonalTracking, so "Cycle-aware
+  // coaching" was a claim the app could not back. verify-cycle-claim.
+  "data-toggle=hormonalTracking": true,
+  "#settings-hormonal": true,
 };
 const missing = INV.filter(c => !/^data-action=save-/.test(c.control))
   .filter(c => !RETIRED[c.control])

@@ -1,6 +1,12 @@
 /**
  * settings.js
- * 29 Sep 2026 v46
+ * 30 Sep 2026 v47
+ *
+ * v47 - W3-8 CYCLE-CLAIM (persona Wave 3, 2.4). Settings offered
+ *   "Cycle-aware coaching - Adapts sessions to your hormonal cycle" in two
+ *   places; nothing outside the store read the field, so it was a claim
+ *   the app could not back. Both switches are gone; the stored field stays
+ *   so existing data still loads.
  *
  * v46 - P24, LENGTH (persona finding W2-20). Nothing asked how long a
  *   session somebody has: the plan assumed 30 minutes and its Length
@@ -784,7 +790,6 @@ export function SettingsView(router) {
       ])}
 
       ${_group('Optional tracking', [
-        _rowSwitch({ id: 'settings-hormonal', label: 'Cycle-aware coaching', sub: 'Off unless you turn it on.', field: 'hormonalTracking' }),
         premium ? _rowSwitch({ id: 'settings-weight-tracking', label: 'Weight tracking', sub: 'Off unless you turn it on. Only you see it, and I will never ask you to weigh yourself.', field: 'weightTracking' }) : '',
         premium && store.get('weightTracking') === true ? _row({ label: 'Your weight and units', open: 'weight' }) : '',
       ])}
@@ -880,7 +885,6 @@ export function SettingsView(router) {
     const name         = store.get('name') || '';
     const ageBand      = store.get('ageBand') || '';
     const gender       = store.get('gender') || '';
-    const hormonalTracking = store.get('hormonalTracking') || false;
     const weightTracking   = store.get('weightTracking') === true;
     const weightUnit       = store.get('weightUnit') || 'kg';
     const weightKg         = store.get('weight');
@@ -942,21 +946,7 @@ export function SettingsView(router) {
           </select>
         </div>
 
-        <div class="settings-field settings-field--toggle">
-          <label class="settings-label" for="settings-hormonal">
-            Cycle-aware coaching
-            <span class="settings-label__sub">Adapts sessions to your hormonal cycle</span>
-          </label>
-          <button
-            class="settings-toggle ${hormonalTracking ? 'settings-toggle--on' : ''}"
-            id="settings-hormonal"
-            role="switch"
-            aria-checked="${hormonalTracking ? 'true' : 'false'}"
-            data-toggle="hormonalTracking"
-            aria-label="Cycle-aware coaching ${hormonalTracking ? 'on' : 'off'}">
-            <span class="settings-toggle__track" aria-hidden="true"></span>
-          </button>
-        </div>
+        <!-- W3-8: the cycle-aware switch that was here is gone; nothing read it. -->
 
         ${_weightSection(weightTracking, weightUnit, weightKg)}
 

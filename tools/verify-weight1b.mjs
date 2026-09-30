@@ -1,5 +1,11 @@
 /**
  * tools/verify-weight1b.mjs
+ * 30 Sep 2026 v5
+ * W3-8 CYCLE-CLAIM. The positive control looked for the cycle-aware
+ *   switch as the weight section's neighbour; that switch is retired
+ *   (nothing read it). The control now looks for the Gender field, the
+ *   profile panel's other neighbour. No assertion about weight changed.
+ *
  * 28 Sep 2026 v4
  * SMOOTH-P4c. Settings is one page; the profile screen (opened by the
  *   Name row) still carries the weight section, so the harness opens it
@@ -111,8 +117,8 @@ section("0. Positive control");
 {
   const el = await mount(base());
   ok("settings rendered", txt(el).length > 40, txt(el).slice(0, 80));
-  ok("the profile panel is reachable", el.querySelector("#settings-hormonal") !== null,
-     "hormonal toggle is the neighbour the weight section sits beside");
+  ok("the profile panel is reachable", el.querySelector("#settings-gender") !== null,
+     "the Gender field is the neighbour the weight section sits beside");
 }
 
 // ── 1. Free sees nothing ────────────────────────────────────────────
