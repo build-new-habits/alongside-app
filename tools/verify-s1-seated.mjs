@@ -1,6 +1,14 @@
 /**
  * tools/verify-s1-seated.mjs
- * 30 Sep 2026 v1
+ * 30 Sep 2026 v2
+ *
+ * v2 - W3-0 (Wave 3, persona 2.11). v1 counted a step's seatedAlternativeId
+ *   as its seated version -- but nothing in js/views reads that field, so
+ *   the player never offers it. Getting Going's "Sit to stand" and "Up on
+ *   your toes" give only standing words, and it said "can be done seated".
+ *   Now only words, position, an optional step or a breath count; Getting
+ *   Going joins the three that do not say it, and Ground's Thread the
+ *   Needle and Unsticking's Hip circles are named with them.
  *
  * S1-SEATED (found building the S1 clinical pack, 29 Sep). The class list
  * says "can be done seated" wherever a class DECLARES a seated route
@@ -76,8 +84,10 @@ async function go(view) { await router.navigate(view); await wait(60); }
 const { CLASSES, seatedThroughout, unseatedSteps } = await import(B + "data/classes/index.js");
 
 console.log("\nTEST 1 - which classes can be done seated, from their own words");
-const YES = ["Getting Going", "From the Feet", "Putting the Day Down", "Stopping Early"];
-const NO  = { "Ground": ["Knees side to side"], "Bending": ["Pelvic tilt", "Glute bridge"], "Unsticking": ["Hip flexor"] };
+const YES = ["From the Feet", "Putting the Day Down", "Stopping Early"];
+const NO  = { "Ground": ["Thread the Needle", "Knees side to side"], "Bending": ["Pelvic tilt", "Glute bridge"],
+              "Unsticking": ["Hip circles", "Hip flexor"],
+              "Getting Going": ["Sit to stand", "Up on your toes"] };
 const byTitle = new Map(CLASSES.map(c => [c.title, c]));
 ok("1pc. every named class exists", [...YES, ...Object.keys(NO)].every(t => byTitle.has(t)));
 for (const t of YES) ok(`1a. ${t}: every step has a seated version`, seatedThroughout(byTitle.get(t)) === true, JSON.stringify(unseatedSteps(byTitle.get(t))));

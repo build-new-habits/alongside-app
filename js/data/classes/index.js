@@ -1,7 +1,12 @@
 /**
  * data/classes/index.js
  *
- * 30 Sep 2026 v4
+ * 30 Sep 2026 v5
+ *
+ * v5 - W3-0 (Wave 3, persona 2.11). A seated ALTERNATIVE no longer counts:
+ *   nothing in js/views reads seatedAlternativeId, so the player never
+ *   offers it. Getting Going stops saying "can be done seated" until its
+ *   Sit to stand and Up on your toes words give the seated version.
  *
  * v4 - S1-SEATED. seatedThroughout() and unseatedSteps(): whether every
  *   movement step gives a seated version in its own words, alternative or
@@ -101,8 +106,8 @@ export function movementBeats(cls) {
  * going by what it SAYS? The player plays words only (seatedAlternativeId
  * has no reader there), so a declared seatedRoute is not enough: each
  * movement step needs a seated version the person can find. A step has
- * one when its movement is seated or position-free, when its seated
- * alternative is, when its own words say how to do it sitting, when its
+ * one when its movement is seated or position-free, when its own words
+ * say how to do it sitting, when its
  * words make it optional ("if that's available"), or when it is a breath.
  * Returns the titles of the steps that have none.
  */
@@ -119,7 +124,7 @@ export function unseatedSteps(cls) {
     const said = [s.title || '', ...beats.flatMap(b => [b.screen || '', b.voice || ''])].join(' ');
     const fine = moves.every(b =>
       _seatedPos(b.exerciseId) ||
-      (b.seatedAlternativeId && _seatedPos(b.seatedAlternativeId)) ||
+      // W3-0: not seatedAlternativeId. The player never reads it.
       /breath/i.test(byId.get(b.exerciseId)?.movementPattern || '') ||
       SEATED_WORDS.test(said) || OPTIONAL_WORDS.test(said));
     if (!fine) out.push(s.title);

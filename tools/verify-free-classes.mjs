@@ -1,5 +1,10 @@
 /**
  * tools/verify-free-classes.mjs
+ * 30 Sep 2026 v3
+ *
+ * v3 - W3-0. 2b's "both" example is Putting the Day Down (mixed): Getting
+ *   Going no longer says seated (verify-s1-seated v2), so three classes do.
+ *
  * 30 Sep 2026 v2
  *
  * v2 - S1-SEATED. 2a checked the list against each class's DECLARED seated
@@ -110,9 +115,9 @@ for (const r of rows) {
   if (should) { seatedShown++; if (!/seated/i.test(r.label)) wrong.push(`${r.name}: Start's name does not say seated`); }
 }
 ok("2pc. the list shows the classes", rows.length >= 8, `${rows.length}`);
-ok("2a. \"can be done seated\" exactly where every step has a seated version", wrong.length === 0 && seatedShown >= 4, `${seatedShown} seated; ${wrong.join("; ")}`);
-const going = rows.find(r => r.name === "Getting Going");
-ok("2b. Getting Going (standing, every step with a seated version) says both", !!going && /standing/.test(going.facts) && /can be done seated/.test(going.facts), going?.facts);
+ok("2a. \"can be done seated\" exactly where every step has a seated version", wrong.length === 0 && seatedShown >= 3, `${seatedShown} seated; ${wrong.join("; ")}`);
+const going = rows.find(r => r.name === "Putting the Day Down");
+ok("2b. Putting the Day Down (mixed, every step with a seated version) says both", !!going && /mixed/.test(going.facts) && /can be done seated/.test(going.facts), going?.facts);
 
 // ── 3. CONTROL ──────────────────────────────────────────────────────────
 console.log("\nTEST 3 - control: the Plan's \"Join a class\" is unchanged");
