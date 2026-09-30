@@ -1,7 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 30 Sep 2026 v597
+ * 30 Sep 2026 v598
+ *
+ * v598 - W3-1 severe-day Adapt opens the plan; W3-2 the Run door reads
+ *   today; W3-3 a class finish no longer rewrites the last session.
  *
  * v597 - W3-0. The seated class line counts only what a class says.
  *
@@ -4120,7 +4123,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v597";
+const CACHE_NAME = "alongside-v598";
 
 const SHELL_URLS = [
 
