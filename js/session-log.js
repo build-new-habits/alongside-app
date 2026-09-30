@@ -1,6 +1,15 @@
 /**
  * js/session-log.js
- * 28 Sep 2026 v8
+ * 30 Sep 2026 v9
+ *
+ * v9 - W3-15 CAPTURE-REPS (persona Wave 3, 2.4). performanceFields()
+ *   read "has a duration" as "is a hold", and almost every move carries a
+ *   duration (the time estimate): Push-up, Reverse Lunge, Glute Bridge and
+ *   59 more asked only for Minutes, in Make it up as I go and on the
+ *   player's log card. A hold is now what it says it is (an isometric, a
+ *   plank or wall sit, "hold" in the name, reps given in seconds).
+ *   Sandbag, landmine, weighted vest, ankle weights and a sled carry a
+ *   load; a banded hold asks band and minutes.
  *
  * v8 - SMOOTH-P2c. The log starts where they left off. Spec 4.4: "the
  *   stepper's starting value is the last logged weight". Every number
@@ -116,6 +125,17 @@ function esc(str) {
  * "Weight" against a plank is why a person came back next week with
  * nothing written down.
  */
+/** W3-15. Patterns that are counted in reps unless they are holds. */
+const STRENGTH_PATTERNS = new Set(["push", "pull", "squat", "hinge", "lunge", "carry",
+  "hip-extension", "calf-raise", "eccentric-control"]);
+/** W3-15. A hold is what it says it is. */
+function isHold(ex) {
+  if (!ex) return false;
+  if (ex.movementPattern === "isometric") return true;
+  if (/\b(hold|plank|isometric|wall sit)\b/i.test(ex.name || "")) return true;
+  return /\bsec(ond)?s?\b|\bhold\b/i.test(String(ex.reps || ""));
+}
+
 export function performanceFields(exercise, mode) {
   // LOG-2. Yoga takes note-and-duration only -- Graeme, 12 Aug: "yes, but
   // note-and-duration only, no reps, no level."
@@ -175,6 +195,11 @@ export function performanceFields(exercise, mode) {
     ];
   }
   if (has("resistance-band")) {
+    // W3-15. A banded hold is held, not counted.
+    if (isHold(exercise)) return [
+      { key: "tension",      label: "Band",    type: "text",   maxlength: "30" },
+      { key: "durationMins", label: "Minutes", type: "number", step: "0.5"    }
+    ];
     return [
       { key: "tension", label: "Band", type: "text",   maxlength: "30" },
       { key: "reps",    label: "Reps", type: "number", step: "1"       }
@@ -182,7 +207,9 @@ export function performanceFields(exercise, mode) {
   }
   if (has("dumbbell", "kettlebell", "barbell", "medicine-ball",
           "cable-machine", "leg-press-machine", "leg-curl-machine",
-          "chest-press-machine", "gym-membership")) {
+          "chest-press-machine", "gym-membership",
+          // W3-15. Loads the list did not know.
+          "sandbag", "landmine", "weighted-vest", "ankle-weights", "sled")) {
     const unit = store.get("weightUnit") || "kg";
     return [
       { key: "weight", label: `Weight (${unit})`, type: "number", step: "0.5" },
@@ -190,7 +217,9 @@ export function performanceFields(exercise, mode) {
     ];
   }
   // Bodyweight. A hold gets a duration, everything else gets reps.
-  if (exercise?.duration || /hold|plank|isometric/i.test(exercise?.name || "")) {
+  // W3-15. A hold by what it is -- not by carrying a duration, which
+  // nearly every move does as its time estimate.
+  if (isHold(exercise) || (exercise?.duration && !STRENGTH_PATTERNS.has(exercise?.movementPattern))) {
     return [
       { key: "durationMins", label: "Minutes", type: "number", step: "0.5"  },
       { key: "note",         label: "Note",    type: "text",   maxlength: "280", multiline: true }
