@@ -1,0 +1,39 @@
+/*
+ * css/base/fonts.css
+ * 30 Sep 2026 v1
+ *
+ * PT-1 OUTBOUND. Inter, served from the app. It came from Google Fonts on
+ * every open, which sent the phone's address to Google; the consent
+ * screen says your answers stay on your device. Same font, same four
+ * weights, latin subset (covers £, curly quotes and dashes). Files from
+ * @fontsource/inter 5.3.0, SIL Open Font License (assets/fonts/Inter-OFL.txt).
+ * font-display: swap, so text shows at once in the fallback font.
+ */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../../assets/fonts/inter-latin-400-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('../../assets/fonts/inter-latin-500-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('../../assets/fonts/inter-latin-600-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('../../assets/fonts/inter-latin-700-normal.woff2') format('woff2');
+}

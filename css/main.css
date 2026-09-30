@@ -1,5 +1,8 @@
 /* main.css
- * 29 Sep 2026 v29
+ * 30 Sep 2026 v30
+ *
+ * v30 - PT-1 OUTBOUND. base/fonts.css imported first: Inter served from
+ *   the app, not Google Fonts.
  *
  * v29 - P0. layouts/conditions-update.css removed with its view;
  *   scope-statement styles in components/finish.css.
@@ -95,6 +98,7 @@
  * v1 — Initial.
  */
 /* Base */
+@import 'base/fonts.css';
 @import 'base/variables.css';
 @import 'base/reset.css';
 @import 'base/typography.css';

@@ -1,5 +1,12 @@
-<!-- index.html | 28 Sep 2026 v4 -->
+<!-- index.html | 30 Sep 2026 v5 -->
 <!--
+  v5 — PT-1 OUTBOUND, 30 Sep 2026. Google Fonts removed: Inter is served
+  from the app (css/base/fonts.css). Sentry is initialised before its
+  loader, errors only: no personal data, no breadcrumbs (they carried
+  console output, and store.js logs activity entries with notes), no
+  replay, no tracing; beforeSend strips the user, breadcrumbs, extra
+  data and request headers. Graeme, 30 Sep: keep Sentry, locked down.
+
   v4 — F6, REDUCE-MOTION-ROW, 28 Sep 2026. The pre-paint script applies
   Reduce motion (alongside-reduce-motion) with the other display
   settings, so .reduce-motion is on the root before first paint.
@@ -44,10 +51,6 @@
   <link rel="apple-touch-icon" href="assets/images/logo-icon-180.png">
   <meta name="apple-mobile-web-app-title" content="Alongside">
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
   <link rel="stylesheet" href="css/main.css">
 
   <!--
@@ -58,7 +61,28 @@
     D8:  <link rel="stylesheet" href="css/components/annual-reflection.css">
   -->
 
-  <!-- Sentry error monitoring — EU region (js-de = Frankfurt, Germany) -->
+  <!-- Sentry error monitoring — EU region (js-de = Frankfurt, Germany).
+       PT-1: configured before the loader, errors only, nothing personal. -->
+  <script>
+    window.sentryOnLoad = function () {
+      Sentry.init({
+        sendDefaultPii: false,
+        tracesSampleRate: 0,
+        replaysSessionSampleRate: 0,
+        replaysOnErrorSampleRate: 0,
+        maxBreadcrumbs: 0,
+        beforeBreadcrumb: function () { return null; },
+        beforeSend: function (event) {
+          delete event.user;
+          delete event.breadcrumbs;
+          delete event.extra;
+          if (event.contexts) delete event.contexts.state;
+          if (event.request) { delete event.request.headers; delete event.request.cookies; delete event.request.data; }
+          return event;
+        }
+      });
+    };
+  </script>
   <script
     src="https://js-de.sentry-cdn.com/87fc9709fbce818590bbe5dcaec01586.min.js"
     crossorigin="anonymous"
