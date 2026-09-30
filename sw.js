@@ -1,7 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 30 Sep 2026 v610
+ * 30 Sep 2026 v611
+ *
+ * v611 - W3-20: fourteen untrue lines corrected; a credit for every session.
  *
  * v610 - W3-19: no yoga card offers 0 poses; an empty style says so first.
  *
@@ -4149,7 +4151,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v610";
+const CACHE_NAME = "alongside-v611";
 
 const SHELL_URLS = [
 
