@@ -1,6 +1,12 @@
 /**
  * tools/verify-short-sessions.mjs
- * 30 Sep 2026 v1
+ * 30 Sep 2026 v2
+ *
+ * v2 - session-builder v75. 3pc required that some warm-up be shortened
+ *   at 10 minutes; the warm-up now CHOOSES moves that fit, so none needs
+ *   shortening and 3pc found nothing to look at. Test 3 now checks the
+ *   property itself: every warm-up and cool-down move at 10 minutes fits
+ *   its share, or names its own length, or is counted in sets.
  *
  * W3-14 SHORT-SESSIONS (persona Wave 3: 2.16, the time-poor parent with
  * ten-minute windows). Measured on v603, 12 builds a length: "10 minutes"
@@ -99,12 +105,16 @@ const NAMES = /\b\d+\s*(min|minute|sec|second)s?\b/i;
 const words = e => [e.name, ...(e.instructions || []), e.description || "", ...(e.cues || [])].join(" ");
 const libDur = Object.fromEntries(EXERCISES.map(e => [e.id, e.duration]));
 const changedNamed = [], tooShort = [];
-let shortened = 0;
+let shortened = 0, checked = 0;
+const misfit = [];
 fresh();
 for (const t of SB.SESSION_TYPES) for (const kit of [HOME, GYM]) for (let i = 0; i < RUNS; i++) {
   if (t.id === "gym" && kit === HOME) continue;
   let s; try { s = SB.buildSession({ sessionType: t.id, durationMins: 10, equipmentOverride: kit }); } catch { continue; }
   for (const e of s.exercises.filter(x => sec(x) !== "main")) {
+    checked++;
+    const cap = Math.max(2, 10 * (sec(e) === "warmup" ? 0.2 : 0.15)) * 60;
+    if (!(Number(e.duration) <= cap) && !NAMES.test(words(EXERCISES.find(x => x.id === e.id) || e)) && !(Number(e.sets) > 1)) misfit.push(`${e.id} ${e.duration}s`);
     const lib = EXERCISES.find(x => x.id === e.id);
     if (!lib || !(Number(libDur[e.id]) > 0) || e.duration === lib.duration) continue;
     shortened++;
@@ -112,7 +122,8 @@ for (const t of SB.SESSION_TYPES) for (const kit of [HOME, GYM]) for (let i = 0;
     if (Number(e.duration) < 60) tooShort.push(`${e.id} ${e.duration}s`);
   }
 }
-ok("3pc. some warm-ups were shortened at 10 minutes", shortened > 0, String(shortened));
+ok("3pc. warm-up and cool-down moves at 10 minutes were checked", checked > 50, String(checked));
+ok("3c. every one fits its share, names its own length, or is counted in sets", misfit.length === 0, [...new Set(misfit)].slice(0, 6).join(", "));
 ok("3a. none whose own words name its length", changedNamed.length === 0, [...new Set(changedNamed)].join(", "));
 ok("3b. none below a minute", tooShort.length === 0, tooShort.slice(0, 5).join(", "));
 

@@ -6,8 +6,12 @@
  * v75 - W3-17 follow-up, found by verify-mostly-same 2c on a fresh clone:
  *   W3-14's warm-up and cool-down fit ran only when the whole session was
  *   over time, which turns on the other moves, so the same warm-up move
- *   came out at two minutes one day and four the next. The two sections
- *   are fitted to their share every time.
+ *   came out at two minutes one day and four the next. The warm-up is
+ *   fitted to its share every time, and so is the cool-down, each move
+ *   capped on its own (not by how far the others ran over) -- in sessions
+ *   of 20 minutes or less, which is what the fit is for; longer sessions
+ *   trim the main work as before W3-14. Never on a gentle day: its
+ *   warm-up is protective and its longer settle the point.
  *
  * v74 - W3-17 MAINTAIN-INTENT (persona Wave 3, 2.4). "Hold on to what I
  *   have" matched "floor" in any name, so Dumbbell Floor Press and Floor
@@ -2538,17 +2542,14 @@ function _namesItsLength(ex) {
  */
 function _fitSection(list, budgetMins, over) {
   const mins = () => list.reduce((a, e) => a + _exerciseMins(e), 0);
-  for (let guard = 0; guard < 12 && over() && mins() > budgetMins; guard++) {
-    let idx = -1;
-    for (let i = 0; i < list.length; i++) {
-      const e = list[i];
-      if (!(Number(e.duration) > 60) || Number(e.sets) > 1 || _namesItsLength(e)) continue;
-      if (idx === -1 || Number(e.duration) > Number(list[idx].duration)) idx = i;
-    }
-    if (idx === -1) break;
-    const e = list[idx];
-    const excess = (mins() - budgetMins) * 60;
-    list[idx] = { ...e, duration: Math.max(60, Math.round((Number(e.duration) - excess) / 30) * 30), _shortened: true };
+  // v75. Each timed move is capped at the section's share on its own --
+  // never shortened by how much the OTHER moves ran over, which changes
+  // whenever one of them does ("Mostly the same" must keep a move's dose).
+  const capSec = Math.max(60, Math.floor(budgetMins * 60 / 30) * 30);
+  for (let i = 0; i < list.length && over(); i++) {
+    const e = list[i];
+    if (!(Number(e.duration) > capSec) || Number(e.sets) > 1 || _namesItsLength(e)) continue;
+    list[i] = { ...e, duration: capSec, _shortened: true };
   }
   for (let guard = 0; guard < 12 && over() && mins() > budgetMins && list.length > 1; guard++) {
     let idx = -1;
@@ -2572,9 +2573,18 @@ function _trimToDuration(warmup, prescribed, main, cooldown, targetMins) {
   // on the other moves, and the same warm-up must come out the same each
   // time ("Mostly the same", verify-mostly-same 2c: a warm-up move at two
   // minutes one day and four the next).
+  // The cool-down likewise -- but never on a gentle day: its longer
+  // settle at the end is the point of that day (verify-gentle-signals,
+  // -burnout-live, -proposal3).
   const always = () => true;
-  _fitSection(warmup,   Math.max(2, targetMins * 0.2),  always);
-  _fitSection(cooldown, Math.max(2, targetMins * 0.15), always);
+  // A gentle day's warm-up is the protective part (verify-proposal3 3d),
+  // and its cool-down the longer settle: neither is fitted.
+  // Short sessions only (20 minutes or less): longer ones have room for a
+  // full warm-up, and trim the main work as they always did.
+  if (_sessionIntensity() !== "low" && Number(targetMins) <= 20) {
+    _fitSection(warmup,   Math.max(2, targetMins * 0.2),  always);
+    _fitSection(cooldown, Math.max(2, targetMins * 0.15), always);
+  }
 
   // GYM-MIX-1. The feature block is exempt from trimming.
   //
