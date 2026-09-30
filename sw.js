@@ -1,7 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 30 Sep 2026 v601
+ * 30 Sep 2026 v602
+ *
+ * v602 - W3-12: "Mostly the same" repeats the session learned, in its order.
  *
  * v601 - W3-11: the coach's pick reads goals, Mostly the same and where you are.
  *
@@ -4131,7 +4133,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v601";
+const CACHE_NAME = "alongside-v602";
 
 const SHELL_URLS = [
 
