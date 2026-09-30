@@ -3,7 +3,11 @@ import { RETIRED_CONDITIONS } from "./data/scope-statement.js";
 
 /**
  * store.js - Data persistence layer
- * 30 Sep 2026 v89
+ * 30 Sep 2026 v90
+ *
+ * v90 - W3-13. logActivity()'s double-write guard ignores an entry saved
+ *   from a checkpoint (rescued): it is another session by construction,
+ *   and must not make the session that displaced it look like its twin.
  *
  * v89 - W3-13 INTERRUPTIONS (Schema v1.85). New field rescuedSession: what
  *   was saved for the person when a waiting session was not come back to
@@ -3299,6 +3303,7 @@ export const store = {
 
     const isDupe = log.some(e => {
       if (e.type !== entry.type) return false;
+      if (e.rescued || entry.rescued) return false;   // W3-13: a rescued session is another one
       if (!e.completedAt) return false;
       const existingTime = new Date(e.completedAt).getTime();
       return Math.abs(existingTime - newCompletedAt) < dedupeWindowMs;
