@@ -1,6 +1,9 @@
 /**
  * coach-proposal.js
- * 30 Sep 2026 v42
+ * 30 Sep 2026 v43
+ *
+ * v43 - W3-11 NOT-SURE-PICK. The coach's pick is told where the session
+ *   is, so "Gym" is never picked at home.
  *
  * v42 - W3-10 LIGHTER-COUNT. When the plan is a lighter day, the person can
  *   turn it down: "Keep my usual plan" on both tiers, and Harder on the
@@ -2408,7 +2411,7 @@ export function CoachProposalView(router) {
     // Plan promise. Saying "cardio" today does not edit the arc; it
     // spends one session differently, and tomorrow the arc resumes.
     const requested = store.get('requestedSessionType') || null;
-    const chosen = chooseSessionType();
+    const chosen = chooseSessionType({ location: _currentLocation() });   // W3-11
     const sessionType = requested || chosen.sessionType;
     const reason      = requested ? 'asked-for' : chosen.reason;
     const inputs      = { ...chosen.inputs, requestedSessionType: requested };

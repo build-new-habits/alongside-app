@@ -1,5 +1,20 @@
 /**
  * session-choice.js
+ * 30 Sep 2026 v2
+ *
+ * v2 - W3-11 NOT-SURE-PICK (persona Wave 3). With no arc -- every Free
+ *   person -- step 3 walked the types in library order: Glute Focus first
+ *   for everybody, "Gym" for somebody at home, and the goals they gave
+ *   and "Mostly the same" never read. Now, after the class and the arc:
+ *     1b. "Mostly the same" (sessionVariety familiar) repeats the kind
+ *         of session they did last.
+ *     2b. Their goals lead: each engine goal names the session types
+ *         that serve it, least recent first.
+ *     3.  Otherwise least recent, Full Body first.
+ *   "Gym" is a candidate only at the gym, at every step, and at the gym
+ *   it leads (and leads a strength or weight goal). The caller
+ *   passes where the session is; with none given, home is assumed.
+ *
  * 06 Sep 2026 v1
  *
  * TWO-ENGINE. What the coach suggests, and why.
@@ -55,6 +70,7 @@ import { store } from "../store.js";
 import { SESSION_TYPES } from "../session-builder.js";
 import { plannedFocusToday } from "./programmeEngine.js";
 import { strandsForAim, sessionTypesForStrands } from "./aims.js";
+import { chosenPrimaryEngineGoal } from "./goals.js";
 
 /** How many recent sessions count as "lately". */
 export const RECENT_WINDOW = 5;
@@ -73,6 +89,48 @@ const STRENGTH_TYPES = ["glute", "upper", "lower", "core", "full"];
 
 function validType(id) {
   return SESSION_TYPES.some(t => t.id === id) ? id : null;
+}
+
+/**
+ * W3-11. The session types that serve each engine goal, in order.
+ * 🟡 A coaching judgement, not a clinical one; drafted 30 Sep for the
+ * end-of-list review.
+ */
+export const GOAL_SESSION_TYPES = {
+  "build-muscle":      ["full", "lower", "upper", "core", "glute"],
+  "weight-loss":       ["full", "cardio", "lower", "upper", "core"],
+  "improve-cardio":    ["cardio", "full", "lower"],
+  "flexibility":       ["mobility", "stretch", "core"],
+  "balance":           ["lower", "core", "mobility"],
+  "injury-recovery":   ["mobility", "core", "full"],
+  "return-to-fitness": ["full", "mobility", "cardio", "core"],
+  "feel-good":         ["full", "mobility", "cardio", "core"],
+};
+
+/** W3-11. With nothing else to go on: Full Body first, Glute Focus late. */
+const DEFAULT_ORDER = ["full", "mobility", "cardio", "lower", "upper", "core", "stretch", "glute", "gym"];
+
+/** W3-11. "Gym" is a session for a gym floor. */
+function fitsHere(type, location) {
+  return type !== "gym" || location === "gym";
+}
+
+/** W3-11. The goal's session types, if the person gave any goals. */
+export function goalSessionTypes(location = "home") {
+  const goals = store.get("goals");
+  if (!Array.isArray(goals) || !goals.length) return [];
+  const g = chosenPrimaryEngineGoal(goals, store.get("strategicGoal"));
+  const types = GOAL_SESSION_TYPES[g] || [];
+  // At the gym, a strength or weight goal leads with the gym session.
+  return (location === "gym" && GYM_LED_GOALS.includes(g) ? ["gym", ...types] : types).filter(validType);
+}
+const GYM_LED_GOALS = ["build-muscle", "weight-loss"];
+
+/** First unused, else the one least recently used. */
+function leastRecent(candidates, recent) {
+  const unused = firstUnused(candidates, recent);
+  if (unused) return unused;
+  return candidates.slice().sort((a, b) => recent.indexOf(b) - recent.indexOf(a))[0] || null;
 }
 
 /**
@@ -118,16 +176,23 @@ function firstUnused(candidates, recent) {
  *   `reason` names the step that decided, for the gate and for the
  *   coach line. `inputs` is what was read, and only what was read.
  */
-export function chooseSessionType() {
+export function chooseSessionType({ location = "home" } = {}) {
   const inputs = {};
   const recent = recentSessionTypes();
   inputs.recentSessionTypes = recent;
+  inputs.location = location;
+  const here = t => fitsHere(t, location);
+  // W3-11. Read up front, so the record says they were consulted on
+  // every path (FAULTLESS): the setting and the goals are always read.
+  inputs.sessionVariety = store.get("sessionVariety") || "balanced";
+  const goalTypes = goalSessionTypes(location).filter(here);
+  inputs.goalSessionTypes = goalTypes;
 
   // ── 1. The class you are in ─────────────────────────────────────────
   const focus = plannedFocusToday();
   inputs.plannedFocus = focus === undefined ? null : focus;
 
-  const arcTypes = arcSessionTypes();
+  const arcTypes = arcSessionTypes().filter(here);
   inputs.arcSessionTypes = arcTypes;
 
   if (focus) {
@@ -148,6 +213,13 @@ export function chooseSessionType() {
     return { sessionType: "full", reason: "programme-default", inputs };
   }
 
+  // ── 1b. "Mostly the same" ───────────────────────────────────────────
+  // W3-11. The person asked for sameness: the kind they did last.
+  if (inputs.sessionVariety === "familiar") {
+    const last = recent.find(here);
+    if (last) return { sessionType: last, reason: "familiar", inputs };
+  }
+
   // ── 2. What the arc says is thin ────────────────────────────────────
   if (arcTypes.length) {
     const unused = firstUnused(arcTypes, recent);
@@ -160,8 +232,18 @@ export function chooseSessionType() {
     if (oldest) return { sessionType: oldest, reason: "arc-rotation", inputs };
   }
 
+  // ── 2b. What they came for ──────────────────────────────────────────
+  // W3-11. No arc (every Free person): the goals they gave lead.
+  if (goalTypes.length) {
+    const g = leastRecent(goalTypes, recent);
+    if (g) return { sessionType: g, reason: "goal", inputs };
+  }
+
   // ── 3. What has not come up lately ──────────────────────────────────
-  const allTypes = SESSION_TYPES.map(t => t.id);
+  // W3-11. Full Body first, not the library's first entry.
+  const order = location === "gym" ? ["gym", ...DEFAULT_ORDER.filter(t => t !== "gym")] : DEFAULT_ORDER;
+  const allTypes = [...order, ...SESSION_TYPES.map(t => t.id).filter(t => !DEFAULT_ORDER.includes(t))]
+    .filter(t => validType(t) && here(t));
   const unusedAny = firstUnused(allTypes, recent);
   if (unusedAny) return { sessionType: unusedAny, reason: "least-recent", inputs };
 
@@ -178,7 +260,7 @@ export function chooseSessionType() {
  * Present but empty -> consulted, nothing there. The coach may say it
  *                      looked, and may not say it found something.
  */
-export const INPUT_KEYS = ["recentSessionTypes", "plannedFocus", "arcSessionTypes"];
+export const INPUT_KEYS = ["recentSessionTypes", "plannedFocus", "arcSessionTypes", "goalSessionTypes", "sessionVariety", "location"];
 
 /** True when `line` names nothing that `inputs` cannot support. */
 export function lineIsSupported(line, inputs) {

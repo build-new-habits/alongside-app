@@ -1,5 +1,11 @@
 /**
  * tools/verify-week-plan-live.mjs
+ * 30 Sep 2026 v2
+ *
+ * v2 - W3-11. The proposal now passes where the session is
+ *   (chooseSessionType({ location })); 0.1 looks for the call, not for
+ *   empty brackets. No other assertion changed.
+ *
  * 16 Sep 2026 v1
  *
  * WEEK-PLAN-LIVE. Work list item 2c.
@@ -48,7 +54,7 @@ console.log("\nWEEK-PLAN-LIVE\n");
 
 console.log("TEST 0 — FIXTURE REACH");
 ok("0.1 the proposal calls chooseSessionType, so this is the live path",
-   /chooseSessionType\(\)/.test(fs.readFileSync(new URL("../js/views/coach-proposal.js", import.meta.url), "utf8")));
+   /chooseSessionType\(/.test(fs.readFileSync(new URL("../js/views/coach-proposal.js", import.meta.url), "utf8")));
 plan("cardio");
 ok("0.2 a planned day is seen at all", chooseSessionType().inputs.plannedFocus === "cardio",
    "if nothing is seen, every assertion below is vacuous");

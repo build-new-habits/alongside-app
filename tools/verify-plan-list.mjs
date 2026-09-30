@@ -1,5 +1,13 @@
 /**
  * tools/verify-plan-list.mjs
+ * 30 Sep 2026 v2
+ *
+ * v2 - W3-11 NOT-SURE-PICK. At the gym the coach now picks the Gym
+ *   session, whose last row has no alternative, so the status left after
+ *   the swap loop is "Nothing else fits here today". 5e read only that
+ *   last status; it now reads the announcement after every swap, and
+ *   still requires the polite live region and a swap named by name.
+ *
  * 28 Sep 2026 v1
  *
  * SMOOTH-P2a. Today's plan names every exercise, and Start works on arrival.
@@ -160,12 +168,13 @@ const blockedShown = () => rows(main).filter(r => {
 ok("5a. the fixture has something sore to avoid", Object.keys(SB.soreScoresToday()).length === 2);
 const swapBtns = () => [...main.querySelectorAll("[data-swap]")];
 ok("5b. every row has a swap", rows(main).length > 0 && swapBtns().length === rows(main).length, `${swapBtns().length} swaps, ${rows(main).length} rows`);
-let cycled = false, blockedEver = [], swappedIn = 0;
+let cycled = false, blockedEver = [], swappedIn = 0; const announced = [];
 for (let r = 0; r < rows(main).length; r++) {
   const before = names(main)[r];
   const seen = [before];
   for (let n = 0; n < 40; n++) {
     swapBtns()[r]?.click(); await wait(5);
+    announced.push(txt(main.querySelector("#cp-plan-status")));
     blockedEver.push(...blockedShown());
     const now = names(main)[r];
     if (now === before) { if (seen.length > 1) cycled = true; break; }
@@ -175,7 +184,7 @@ for (let r = 0; r < rows(main).length; r++) {
 ok("5c. swapping past the last alternative returns to the original", cycled);
 ok("5d. no swap ever put a sore-today exercise on the plan", swappedIn > 0 && blockedEver.length === 0, JSON.stringify([...new Set(blockedEver)]));
 const live = main.querySelector("#cp-plan-status");
-ok("5e. a swap is announced by name", !!live && live.getAttribute("aria-live") === "polite" && /Swapped to|Back to/.test(txt(live)), txt(live));
+ok("5e. a swap is announced by name", !!live && live.getAttribute("aria-live") === "polite" && announced.some(a => /Swapped to|Back to/.test(a)), [...new Set(announced)].slice(0, 3).join(" | "));
 const shownAfterSwap = names(main);
 startEl(main).click(); await wait(2500);
 ok("5f. the swapped plan is the one that starts",
