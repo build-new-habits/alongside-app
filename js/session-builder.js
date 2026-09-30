@@ -1,7 +1,12 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
- * 29 Sep 2026 v65
+ * 30 Sep 2026 v66
+ *
+ * v66 - S1-LEGS (found building the S1 clinical pack). A hold standing on
+ *   bent legs (Wall Sit, Wall Squat Hold) loads the legs: personFilter's
+ *   _loadsLegs now says so, so "Not easily" from a chair no longer gets
+ *   them. Lying and seated holds are unchanged.
  *
  * v65 - P26 (persona finding W2-20). The lighter-day line counted days:
  *   "You've moved N days in a row" is a streak, which the product never
@@ -2987,9 +2992,17 @@ export function personFilter({ equipment = null } = {}) {
   // P0 (29 Sep): the exercise-clearance gate went with the medical conditions
   // that asked it. The scope statement sends anyone unsure to a professional.
 
+  // S1-LEGS (30 Sep). A hold standing on bent legs -- Wall Sit, Wall
+  // Squat Hold -- is a squat that does not move. Its pattern is
+  // "isometric" and its difficulty 2, so the proxy above let it through
+  // to somebody who cannot rise from a chair easily: the C1 lesson again.
+  // Lying and seated holds (Glute Squeeze, Hamstring Isometric Hold) are
+  // not weight through the legs and still pass.
+  const _heldOnLegs = ex => ex.movementPattern === "isometric" && ex.position === "standing";
   const _loadsLegs = ex =>
     _needsLegs(ex) && (
       LEG_PATTERNS.includes(ex.movementPattern) ||
+      _heldOnLegs(ex) ||
       (ex.equipment || []).length > 0 ||
       (ex.difficultyLevel || 1) >= 3
     );

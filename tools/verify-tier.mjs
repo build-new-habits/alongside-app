@@ -1,6 +1,11 @@
 /**
  * tools/verify-tier.mjs
- * 29 Sep 2026 v4
+ * 30 Sep 2026 v5
+ *
+ * v5 - LIBRARY-TILES. At home's HIIT and Strength cards opened the core
+ *   session, which is neither; HIIT is removed and Strength became Upper
+ *   body and Lower body (both already named here). The free check still
+ *   covers every self-directed card that exists.
  *
  * v4 - P0. The never-gated door is My exercises, not the retired Conditions Update.
  *
@@ -110,7 +115,7 @@ check("the ten self-directed Library surfaces are FREE", () => {
   // Named individually, because this is the change R4 made and a count
   // alone cannot say WHICH survived. Two shapes: cards inside a
   // category, and whole categories with a directTarget.
-  for (const label of ["Core", "HIIT", "Strength", "Cardio", "Mobility",
+  for (const label of ["Core", "Cardio", "Mobility",
                        "Upper body", "Lower body", "Glute Focus"]) {
     const lines = library.split("\n").filter(l =>
       new RegExp(`label:\\s*"${label}"`).test(l));

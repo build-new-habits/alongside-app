@@ -1,6 +1,9 @@
 /**
  * data/exercises/rehabilitation.js
- * 29 Sep 2026 v11
+ * 30 Sep 2026 v12
+ *
+ * v12 - S1-LEGS (found building the S1 clinical pack). Six entries that stand on one leg (Terminal Knee Extension, Knee Stability, Hip Flexor Strengthening and others): balanceDemand true.
+ *   verify-s1-legs.
  *
  * v11 - P0h. Descriptions say what a movement does, not what it treats:
  *   no rehab, healing, pain relief, recovery phases, named diagnoses
@@ -768,7 +771,7 @@ export const REHABILITATION = [
     id: 'standing-hip-abduction',
     position: 'standing',
     impact: false,
-    balanceDemand: false,
+    balanceDemand: true,
     name: 'Standing Hip Abduction',
     generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'standing hip abduction exercise technique',
@@ -1174,7 +1177,7 @@ export const REHABILITATION = [
     id: 'standing-hamstring-curl-band',
     position: 'standing',
     impact: false,
-    balanceDemand: false,
+    balanceDemand: true,
     name: 'Standing Hamstring Curl — Band',
     youtube: 'standing hamstring curl - band exercise technique',
     category: 'rehabilitation',
@@ -1871,7 +1874,7 @@ export const REHABILITATION = [
     id: 'terminal-knee-extension',
     position: 'standing',
     impact: false,
-    balanceDemand: false,
+    balanceDemand: true,
     name: 'Terminal Knee Extension',
     youtube: 'terminal knee extension exercise technique',
     category: 'rehabilitation',
@@ -3641,7 +3644,7 @@ export const REHABILITATION = [
     id: 'hypermobility-knee-stability',
     position: 'standing',
     impact: false,
-    balanceDemand: false,
+    balanceDemand: true,
     name: 'Knee Stability — Soft Knee Hold',
     youtube: 'knee stability - soft knee hold exercise technique',
     category: 'rehabilitation',
@@ -3962,7 +3965,7 @@ export const REHABILITATION = [
     id: 'rehab-hip-flexor-strengthening',
     position: 'standing',
     impact: false,
-    balanceDemand: false,
+    balanceDemand: true,
     name: 'Hip Flexor Strengthening',
     generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'hip flexor strengthening exercise technique',
@@ -4001,7 +4004,7 @@ export const REHABILITATION = [
     id: 'rehab-lateral-hip-strengthening',
     position: 'floor',
     impact: false,
-    balanceDemand: false,
+    balanceDemand: true,
     name: 'Lateral Hip Strengthening Progression',
     generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'lateral hip strengthening progression exercise technique',

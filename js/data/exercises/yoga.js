@@ -1,6 +1,9 @@
 /**
  * data/exercises/yoga.js
- * 29 Sep 2026 v7
+ * 30 Sep 2026 v8
+ *
+ * v8 - S1-LEGS (found building the S1 clinical pack). Crescent Lunge, "back knee lowered to the floor": position floor.
+ *   verify-s1-legs.
  *
  * v7 - P16, DATA TAGS (W2-6). Sun Salutation B (chaturanga, upward dog) is
  *   floor. verify-data-tags reads every entry.
@@ -368,7 +371,7 @@ export const YOGA = [
 
   {
     id: 'yoga-crescent-lunge',
-    position: 'standing',
+    position: 'floor',
     impact: false,
     balanceDemand: false,
     name: 'Crescent Lunge',

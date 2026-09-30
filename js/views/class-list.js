@@ -1,7 +1,13 @@
 /**
  * js/views/class-list.js
  *
- * 29 Sep 2026 v2
+ * 30 Sep 2026 v3
+ *
+ * v3 - S1-SEATED (found building the S1 clinical pack). "can be done
+ *   seated" only where every movement step has a seated version in what
+ *   the class says (seatedThroughout, data/classes v4). Ground, Bending and
+ *   Unsticking declared a seated route that four of their steps did not
+ *   give; until the physio's seated wording goes in, they do not say it.
  *
  * v2 - P22, CLASSES ON FREE (persona finding W2-18). The list gave a
  *   class's position ("floor") and never said it could be done seated,
@@ -62,7 +68,7 @@
 
 import { store } from '../store.js';
 import { router } from '../router.js';
-import { CLASSES, classSafety } from '../data/classes/index.js';
+import { CLASSES, classSafety, seatedThroughout } from '../data/classes/index.js';
 import { durationLabel, sectionsFor } from '../data/class-contract.js';
 import { STRANDS } from '../data/aims.js';
 import { startClass } from './class-player.js';
@@ -108,7 +114,9 @@ export function render() {
       cls,
       safety,
       // P22. The class's own declaration (class-contract seatedRoute).
-      seatable: cls.seatedRoute === true || cls.position === 'seated',
+      // S1-SEATED (30 Sep). Only where every step says how to do it
+      // sitting: a declared seatedRoute is not enough, the player plays words.
+      seatable: seatedThroughout(cls),
       sections: secs.length,
       length: durationLabel(cls),
       // Named, never used to reorder. See the header.

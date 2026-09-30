@@ -1,6 +1,9 @@
 /**
  * data/exercises/mobility.js
- * 29 Sep 2026 v6
+ * 30 Sep 2026 v7
+ *
+ * v7 - S1-LEGS (found building the S1 clinical pack). Hip CARs, Standing Quad Stretch and Standing Hip Circles stand on one leg: balanceDemand true. Standing Hip Circles no longer asks to "Maximise the range".
+ *   verify-s1-legs.
  *
  * v6 - P16, DATA TAGS (W2-6). 90-90 Hip Stretch ("Sit on the floor"),
  *   World's Greatest Stretch ("knee on the floor") and Inchworm (a plank)
@@ -379,7 +382,7 @@ export const MOBILITY = [
     id: 'hip-cars',
     position: 'standing',
     impact: false,
-    balanceDemand: false,
+    balanceDemand: true,
     name: 'Hip CARs',
     youtube: 'hip cars stretch technique',
     category: 'mobility',
@@ -609,7 +612,7 @@ export const MOBILITY = [
     id: 'standing-quad-stretch',
     position: 'standing',
     impact: false,
-    balanceDemand: false,
+    balanceDemand: true,
     name: 'Standing Quad Stretch',
     youtube: 'standing quad stretch technique',
     category: 'mobility',
@@ -1273,7 +1276,7 @@ export const MOBILITY = [
     id: 'hip-circles-standing',
     position: 'standing',
     impact: false,
-    balanceDemand: false,
+    balanceDemand: true,
     name: 'Standing Hip Circles',
     youtube: 'standing hip circles technique',
     category: 'mobility',
@@ -1290,7 +1293,7 @@ export const MOBILITY = [
     instructions: [
       'Stand on one leg, lift the other knee to hip height',
       'Draw large circles with the raised knee — clockwise and anticlockwise',
-      'Maximise the range in every direction',
+      'Keep each circle within a range that feels comfortable',
       'Keep the standing leg slightly bent and the torso still',
       'Complete 10 circles each direction on each leg'
     ],

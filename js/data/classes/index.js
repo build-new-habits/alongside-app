@@ -1,7 +1,11 @@
 /**
  * data/classes/index.js
  *
- * 28 Sep 2026 v3
+ * 30 Sep 2026 v4
+ *
+ * v4 - S1-SEATED. seatedThroughout() and unseatedSteps(): whether every
+ *   movement step gives a seated version in its own words, alternative or
+ *   position. The class list reads it.
  *
  * v3 - F8, CLASS-8. Classes 008-010 added: Putting the Day Down
  *   (winding-down), Getting Going (getting-going), From the Feet
@@ -90,6 +94,42 @@ export function movementBeats(cls) {
   return (cls.sections || [])
     .flatMap(s => s.beats || [])
     .filter(b => b.kind === 'movement' && b.exerciseId);
+}
+
+/**
+ * S1-SEATED, 30 Sep 2026. Can somebody do this whole class sitting down,
+ * going by what it SAYS? The player plays words only (seatedAlternativeId
+ * has no reader there), so a declared seatedRoute is not enough: each
+ * movement step needs a seated version the person can find. A step has
+ * one when its movement is seated or position-free, when its seated
+ * alternative is, when its own words say how to do it sitting, when its
+ * words make it optional ("if that's available"), or when it is a breath.
+ * Returns the titles of the steps that have none.
+ */
+// Instructions, not mentions: "shortened in a chair" is not a way to do it.
+const SEATED_WORDS   = /\b(seated|sitting|sit tall|or sit|stay (in the chair|sitting))\b/i;
+const OPTIONAL_WORDS = /\bif (standing is fine|that['\u2019]?s available)\b/i;
+const _seatedPos = id => { const p = byId.get(id)?.position; return p === 'seated' || p === 'any'; };
+export function unseatedSteps(cls) {
+  const out = [];
+  for (const s of cls.sections || []) {
+    const beats = s.beats || [];
+    const moves = beats.filter(b => b.kind === 'movement' && b.exerciseId);
+    if (!moves.length) continue;
+    const said = [s.title || '', ...beats.flatMap(b => [b.screen || '', b.voice || ''])].join(' ');
+    const fine = moves.every(b =>
+      _seatedPos(b.exerciseId) ||
+      (b.seatedAlternativeId && _seatedPos(b.seatedAlternativeId)) ||
+      /breath/i.test(byId.get(b.exerciseId)?.movementPattern || '') ||
+      SEATED_WORDS.test(said) || OPTIONAL_WORDS.test(said));
+    if (!fine) out.push(s.title);
+  }
+  return out;
+}
+export function seatedThroughout(cls) {
+  // Nothing to check is not the same as seated: Out is a walk.
+  if (!movementBeats(cls).length) return cls.position === 'seated';
+  return unseatedSteps(cls).length === 0;
 }
 
 /**

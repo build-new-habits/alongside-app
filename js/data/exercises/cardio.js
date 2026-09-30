@@ -1,6 +1,9 @@
 /**
  * data/exercises/cardio.js
- * 29 Sep 2026 v6
+ * 30 Sep 2026 v7
+ *
+ * v7 - S1-LEGS (found building the S1 clinical pack). Treadmill Intervals runs: impact true.
+ *   verify-s1-legs.
  *
  * v6 - P16, DATA TAGS (W2-6). Tags now agree with the words: Burpee and the
  *   HIIT and circuit sessions (burpees, mountain climbers) are floor;
@@ -588,7 +591,7 @@ export const CARDIO = [
   {
     id: 'walk-run-intervals',
     position: 'standing',
-    impact: false,
+    impact: true,
     balanceDemand: false,
     name: 'Walk-Run Intervals',
     youtube: 'walk-run intervals exercise technique',

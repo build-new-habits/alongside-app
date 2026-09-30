@@ -1,6 +1,13 @@
 /**
  * tools/verify-free-classes.mjs
- * 29 Sep 2026 v1
+ * 30 Sep 2026 v2
+ *
+ * v2 - S1-SEATED. 2a checked the list against each class's DECLARED seated
+ *   route, and so agreed with the fault the S1 pack found: three classes
+ *   declared one that four of their steps did not give. It now checks
+ *   the list against seatedThroughout() -- what the class says -- and 2b
+ *   uses Getting Going (standing, every step seated) for "both"; Ground's
+ *   new state is proven in verify-s1-seated.
  *
  * P22, CLASSES ON FREE (persona finding W2-18). Classes run the same for
  * everybody, and suit personas 2.11 and 2.14 best -- but Free Home had no
@@ -71,7 +78,7 @@ function fixture(tier) {
   router.history = []; router.currentView = null;
 }
 async function go(view) { await router.navigate(view); await wait(60); }
-const { CLASSES } = await import(B + "data/classes/index.js");
+const { CLASSES, seatedThroughout } = await import(B + "data/classes/index.js");
 
 // ── 1. THE DOOR ─────────────────────────────────────────────────────────
 console.log("\nTEST 1 - Free Home has a door to classes");
@@ -97,15 +104,15 @@ const wrong = [];
 let seatedShown = 0;
 for (const r of rows) {
   const c = byTitle.get(r.name); if (!c) continue;
-  const should = c.seatedRoute === true || c.position === "seated";
+  const should = seatedThroughout(c);
   const says = /can be done seated|\bseated\b/i.test(r.facts);
   if (should !== says) wrong.push(`${r.name}: declares ${c.seatedRoute}/${c.position}, list says "${r.facts}"`);
   if (should) { seatedShown++; if (!/seated/i.test(r.label)) wrong.push(`${r.name}: Start's name does not say seated`); }
 }
 ok("2pc. the list shows the classes", rows.length >= 8, `${rows.length}`);
-ok("2a. \"can be done seated\" exactly where the class declares it", wrong.length === 0 && seatedShown >= 4, `${seatedShown} seated; ${wrong.join("; ")}`);
-const ground = rows.find(r => r.name === "Ground");
-ok("2b. Ground (a floor class with a seated route) says both", !!ground && /floor/.test(ground.facts) && /can be done seated/.test(ground.facts), ground?.facts);
+ok("2a. \"can be done seated\" exactly where every step has a seated version", wrong.length === 0 && seatedShown >= 4, `${seatedShown} seated; ${wrong.join("; ")}`);
+const going = rows.find(r => r.name === "Getting Going");
+ok("2b. Getting Going (standing, every step with a seated version) says both", !!going && /standing/.test(going.facts) && /can be done seated/.test(going.facts), going?.facts);
 
 // ── 3. CONTROL ──────────────────────────────────────────────────────────
 console.log("\nTEST 3 - control: the Plan's \"Join a class\" is unchanged");

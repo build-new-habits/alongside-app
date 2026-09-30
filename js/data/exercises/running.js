@@ -1,6 +1,9 @@
 /**
  * data/exercises/running.js
- * 29 Sep 2026 v3
+ * 30 Sep 2026 v4
+ *
+ * v4 - S1-LEGS (found building the S1 clinical pack). Every run and jog: impact true. P16 checked jumps and sprints, never running itself.
+ *   verify-s1-legs.
  *
  * v3 - P16, DATA TAGS (W2-6). Bounding is impact ("drive into the next
  *   bound"). verify-data-tags reads every entry.
@@ -409,7 +412,7 @@ export const RUNNING = [
   {
     id: 'run-easy-20',
     position: 'standing',
-    impact: false,
+    impact: true,
     balanceDemand: false,
     name: 'Easy Run — 20 Minutes',
     youtube: 'easy run pace guide',
@@ -481,7 +484,7 @@ export const RUNNING = [
   {
     id: 'run-intervals-400m',
     position: 'standing',
-    impact: false,
+    impact: true,
     balanceDemand: false,
     name: '400m Intervals × 6',
     youtube: '400m interval training technique',
@@ -517,7 +520,7 @@ export const RUNNING = [
   {
     id: 'run-intervals-800m',
     position: 'standing',
-    impact: false,
+    impact: true,
     balanceDemand: false,
     name: '800m Intervals × 4',
     youtube: '800m interval training technique',
@@ -590,7 +593,7 @@ export const RUNNING = [
   {
     id: 'run-progression',
     position: 'standing',
-    impact: false,
+    impact: true,
     balanceDemand: false,
     name: 'Progression Run — 30 Minutes',
     youtube: 'progression run pacing guide',
@@ -626,7 +629,7 @@ export const RUNNING = [
   {
     id: 'run-hills',
     position: 'standing',
-    impact: false,
+    impact: true,
     balanceDemand: false,
     name: 'Hill Repeat Session',
     youtube: 'hill repeats running technique',
@@ -663,7 +666,7 @@ export const RUNNING = [
   {
     id: 'run-strides',
     position: 'standing',
-    impact: false,
+    impact: true,
     balanceDemand: false,
     name: 'Strides',
     youtube: 'running strides technique',
@@ -925,7 +928,7 @@ export const RUNNING = [
   {
     id: 'run-drill-cadence',
     position: 'standing',
-    impact: false,
+    impact: true,
     balanceDemand: false,
     name: 'Cadence Drill',
     youtube: 'running cadence drill technique',
@@ -1003,7 +1006,7 @@ export const RUNNING = [
   {
     id: 'run-easy-30',
     position: 'standing',
-    impact: false,
+    impact: true,
     balanceDemand: false,
     name: 'Easy Run — 30 Minutes',
     youtube: 'easy run pace guide',
@@ -1072,7 +1075,7 @@ export const RUNNING = [
   {
     id: 'run-intervals-1k',
     position: 'standing',
-    impact: false,
+    impact: true,
     balanceDemand: false,
     name: '1K Intervals × 5',
     youtube: '1k interval training guide',
@@ -1108,7 +1111,7 @@ export const RUNNING = [
   {
     id: 'run-cruise-intervals',
     position: 'standing',
-    impact: false,
+    impact: true,
     balanceDemand: false,
     name: 'Cruise Intervals',
     youtube: 'cruise intervals running guide',
@@ -1179,7 +1182,7 @@ export const RUNNING = [
   {
     id: 'run-long-60',
     position: 'standing',
-    impact: false,
+    impact: true,
     balanceDemand: false,
     name: 'Long Run — 60 Minutes',
     youtube: 'long run pacing guide',
@@ -1215,7 +1218,7 @@ export const RUNNING = [
   {
     id: 'run-long-slow-90',
     position: 'standing',
-    impact: false,
+    impact: true,
     balanceDemand: false,
     name: 'Long Slow Run — 90 Minutes',
     youtube: 'long slow run pacing guide',
@@ -1251,7 +1254,7 @@ export const RUNNING = [
   {
     id: 'run-back-to-back',
     position: 'standing',
-    impact: false,
+    impact: true,
     balanceDemand: false,
     name: 'Back-to-Back Run Days',
     youtube: 'back to back running days training guide',

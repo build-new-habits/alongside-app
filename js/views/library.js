@@ -1,7 +1,13 @@
 /**
  * library.js - Library Page
  *
- * 29 Sep 2026 v9
+ * 30 Sep 2026 v10
+ *
+ * v10 - LIBRARY-TILES and CORE-DOOR. At home: Core says what the core
+ *   session holds; HIIT removed (nothing builds one); Strength becomes
+ *   Upper body and Lower body; Mobility opens the builder's mobility
+ *   session. verify-library-tiles.
+ *
  *
  * v9 - P0, SCOPE-MINOR. "Prescribed — from your physio or specialist" is "My exercises — your own list".
  *
@@ -194,11 +200,18 @@ const GUIDED_CATEGORIES = [
       // Full Body stays first and unchanged: the coach-built session is
       // still the centre of the product. Self-direction being free does
       // not make it compulsory.
-      { label: "Core",          icon: "\uD83E\uDDD8",  target: "core-session",   note: "Choose intensity" },
-      { label: "HIIT",          icon: "\u26A1",        target: "core-session",   note: "High intensity intervals" },
-      { label: "Strength",      icon: "\uD83D\uDCAA",  target: "core-session",   note: "Bodyweight or home weights" },
+      // LIBRARY-TILES, 30 Sep 2026. HIIT, Strength and Mobility all opened
+      // the core session, which has no HIIT: labels promising a session
+      // they did not open (P17's fault, on a second door). Core is the core
+      // session's one door (CORE-DOOR) and now says what it holds. HIIT is
+      // gone: nothing here builds one. Strength becomes Upper body and
+      // Lower body, as At the gym has; Mobility opens the builder's
+      // mobility session, as the Home door does since P17.
+      { label: "Core",          icon: "\uD83E\uDDD8",  target: "core-session",   note: "Stability, strength, mobility or gentle" },
+      { label: "Upper body",    icon: "\uD83D\uDCAA",  target: "session-builder", note: "Bodyweight or home weights", preselectType: "upper" },
+      { label: "Lower body",    icon: "\uD83E\uDDB5",  target: "session-builder", note: "Bodyweight or home weights", preselectType: "lower" },
       { label: "Cardio",        icon: "\uD83C\uDFC3",  target: "walk-session",   note: "Raise the heart rate" },
-      { label: "Mobility",      icon: "\uD83C\uDF3F",  target: "core-session",   note: "Open and unlock the body" },
+      { label: "Mobility",      icon: "\uD83C\uDF3F",  target: "session-builder", note: "Hips, spine, ankles and shoulders", preselectType: "mobility" },
     ]
   },
   {

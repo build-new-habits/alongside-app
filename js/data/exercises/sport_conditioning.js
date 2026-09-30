@@ -1,4 +1,12 @@
 /*
+ * js/data/exercises/sport_conditioning.js
+ * 30 Sep 2026 v1
+ *
+ * v1 - First dated header (the file had none). S1-LEGS (found building the
+ *   S1 clinical pack): one-leg drills balanceDemand true; Figure-8 Run,
+ *   Cone Weave, Change of Pace, Max Aerobic Speed impact true.
+ *   verify-s1-legs.
+ *
  * 13 Aug 2026 - FIX-5. Every entry here now carries discipline: 'sport'.
  *
  * WHY. Persona 2.15 -- 26, barbell, rack, four gym sessions a week --
@@ -196,7 +204,7 @@ export const SPORT_CONDITIONING = [
   {
     id: 'drill-figure-8-run',
     position: 'standing',
-    impact: false,
+    impact: true,
     balanceDemand: false,
     name: 'Figure-8 Run',
     youtube: 'figure-8 run drill technique',
@@ -557,7 +565,7 @@ export const SPORT_CONDITIONING = [
   {
     id: 'saq-cone-weave',
     position: 'standing',
-    impact: false,
+    impact: true,
     balanceDemand: false,
     name: 'Cone Weave',
     youtube: 'cone weave drill technique',
@@ -765,7 +773,7 @@ export const SPORT_CONDITIONING = [
     id: 'sport-warmup-lower-body',
     position: 'standing',
     impact: true,
-    balanceDemand: false,
+    balanceDemand: true,
     name: 'Lower Body Activation Warm-Up',
     youtube: 'lower body activation warm-up drill technique',
     category: 'mobility',
@@ -1137,7 +1145,7 @@ export const SPORT_CONDITIONING = [
     id: 'drill-dot-drill',
     position: 'standing',
     impact: true,
-    balanceDemand: false,
+    balanceDemand: true,
     name: 'Dot Drill',
     youtube: 'dot drill technique',
     category: 'cardio',
@@ -1214,7 +1222,7 @@ export const SPORT_CONDITIONING = [
   {
     id: 'drill-change-of-pace',
     position: 'standing',
-    impact: false,
+    impact: true,
     balanceDemand: false,
     name: 'Change of Pace Run',
     youtube: 'change of pace run drill technique',
@@ -1580,7 +1588,7 @@ export const SPORT_CONDITIONING = [
     id: 'drill-speed-ladder-advanced',
     position: 'standing',
     impact: true,
-    balanceDemand: false,
+    balanceDemand: true,
     name: 'Speed Ladder — Advanced Patterns',
     youtube: 'speed ladder - advanced patterns drill technique',
     category: 'cardio',
@@ -1657,7 +1665,7 @@ export const SPORT_CONDITIONING = [
   {
     id: 'conditioning-max-aerobic-speed',
     position: 'standing',
-    impact: false,
+    impact: true,
     balanceDemand: false,
     name: 'Max Aerobic Speed Intervals',
     youtube: 'max aerobic speed intervals drill technique',
@@ -1945,7 +1953,7 @@ export const SPORT_CONDITIONING = [
     id: 'sport-specific-speed-ladder',
     position: 'standing',
     impact: true,
-    balanceDemand: false,
+    balanceDemand: true,
     name: 'Sport-Specific Ladder Warm-Up',
     youtube: 'sport-specific ladder warm-up drill technique',
     category: 'mobility',

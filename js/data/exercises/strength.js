@@ -1,6 +1,9 @@
 /**
  * data/exercises/strength.js
- * 29 Sep 2026 v10
+ * 30 Sep 2026 v11
+ *
+ * v11 - S1-LEGS (found building the S1 clinical pack). One-leg entries: balanceDemand true. Wall Sit holds while steady, not "as long as possible ... then extend further".
+ *   verify-s1-legs.
  *
  * v10 - P16, DATA TAGS (W2-6). Reactive Change of Direction needs a
  *   partner to point: partner: true, which the builder never proposes.
@@ -1595,7 +1598,7 @@ export const STRENGTH = [
     id: 'plyo-lateral-hop',
     position: 'standing',
     impact: true,
-    balanceDemand: false,
+    balanceDemand: true,
     name: 'Lateral Hops',
     youtube: 'lateral hops exercise technique',
     category: 'strength',
@@ -1631,7 +1634,7 @@ export const STRENGTH = [
     id: 'plyo-skater-jumps',
     position: 'standing',
     impact: true,
-    balanceDemand: false,
+    balanceDemand: true,
     name: 'Skater Jumps',
     youtube: 'skater jumps exercise technique',
     category: 'strength',
@@ -3244,7 +3247,7 @@ export const STRENGTH = [
     id: 'bodyweight-pistol-squat-progression',
     position: 'standing',
     impact: false,
-    balanceDemand: false,
+    balanceDemand: true,
     name: 'Pistol Squat Progression',
     youtube: 'pistol squat progression exercise technique',
     category: 'strength',
@@ -3337,11 +3340,11 @@ export const STRENGTH = [
       'Stand with your back against a wall',
       'Slide down until your knees are bent at about 90 degrees, or higher if that is more comfortable',
       'Feet flat, knees directly over ankles — not forward',
-      'Hold as long as possible',
-      'Build toward 60 seconds, then extend further',
+      'Hold while it still feels steady, and come up before any shaking starts',
+      'Over the weeks, build towards 30 to 60 seconds',
       'Complete 3 holds with equal rest'
     ],
-    coaching: 'Wall sits are harder than they look after 30 seconds. The quads burn — that is the point. Focus on keeping the back flat on the wall.',
+    coaching: 'Wall sits are harder than they look. Keep the back flat on the wall, and come up while it still feels steady — you do not need to reach the burn.',
     why: 'A simple, effective way to build quad strength and endurance by holding still. You choose how deep to sit, so you control how hard it is.',
         watchOut: [
       'Sliding down as you tire rather than holding position',

@@ -1,6 +1,9 @@
 /**
  * data/exercises/gym.js
- * 29 Sep 2026 v4
+ * 30 Sep 2026 v5
+ *
+ * v5 - S1-LEGS (found building the S1 clinical pack). Treadmill Intervals runs: impact true.
+ *   verify-s1-legs.
  *
  * v4 - P0h. Descriptions say what a movement does, not what it treats:
  *   no rehab, healing, pain relief, recovery phases, named diagnoses
@@ -66,7 +69,7 @@ export const GYM = [
   {
     id: 'gym-treadmill-intervals',
     position: 'standing',
-    impact: false,
+    impact: true,
     balanceDemand: false,
     name: 'Treadmill Intervals',
     youtube: 'treadmill interval workout beginners',
