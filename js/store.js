@@ -3,7 +3,13 @@ import { RETIRED_CONDITIONS } from "./data/scope-statement.js";
 
 /**
  * store.js - Data persistence layer
- * 30 Sep 2026 v91
+ * 30 Sep 2026 v92
+ *
+ * v92 - W3-20 TRUE-WORDS (Schema v1.87). community.credits is awarded by
+ *   logActivity() for every completed movement session (one on Free, two
+ *   on the Plan), as the Community page and the tier table say. It was
+ *   awarded only by the coach's workout and gym players, at most once a
+ *   day, so a class, walk, run or yoga session earned nothing.
  *
  * v91 - W3-16 ARC-AND-SAVED (Schema v1.86). savedSessions[].sessionType
  *   held the plan's id ("upper-1790...") and is repaired to its type on
@@ -3421,6 +3427,14 @@ export const store = {
       });
     } catch { /* the log is the record; the arc is commentary on it */ }
 
+    // W3-20. A community credit for every completed movement session:
+    // not breathing, mindful or quiet practices (decision 4a), not a
+    // session stopped part-way.
+    try {
+      const NOT_MOVEMENT = ['breathing', 'mindful', 'mindfulness', 'practice'];
+      if (finalEntry.status !== 'partial' && !NOT_MOVEMENT.includes(finalEntry.type)) this.awardCommunityCredit();
+    } catch { /* the log is the record */ }
+
     // EMPTY-SESSION GUARD (11 Aug 2026). Graeme: "I opened a session and
     // without completing one session at all I exited. It saved it."
     //
@@ -3754,10 +3768,9 @@ export const store = {
    * Prevents duplicate credits within the same session (same-day guard).
    */
   awardCommunityCredit() {
-    const today = new Date().toISOString().split('T')[0];
-    const lastDate = this.data.community?.lastCreditAt?.split('T')[0];
-    if (lastDate === today) return;
-
+    // W3-20. Once per completed movement session, from logActivity(),
+    // whose double-write guard is what stops a duplicate. The same-day
+    // guard here meant a second session in a day earned nothing.
     const creditsToAdd = this.data.tier === 'personal' ? 2 : 1;   // ATHLETE-RETIRE
     this.data.community.credits = (this.data.community.credits || 0) + creditsToAdd;
     this.data.community.lastCreditAt = new Date().toISOString();
