@@ -1,7 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 30 Sep 2026 v605
+ * 30 Sep 2026 v606
+ *
+ * v606 - W3-16: the arc reads chosen strands and freestyle work; saved sessions keep kind and doses.
  *
  * v605 - W3-15: strength moves ask for reps, not minutes.
  *
@@ -4139,7 +4141,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v605";
+const CACHE_NAME = "alongside-v606";
 
 const SHELL_URLS = [
 
