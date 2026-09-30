@@ -1,7 +1,13 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
- * 30 Sep 2026 v74
+ * 30 Sep 2026 v75
+ *
+ * v75 - W3-17 follow-up, found by verify-mostly-same 2c on a fresh clone:
+ *   W3-14's warm-up and cool-down fit ran only when the whole session was
+ *   over time, which turns on the other moves, so the same warm-up move
+ *   came out at two minutes one day and four the next. The two sections
+ *   are fitted to their share every time.
  *
  * v74 - W3-17 MAINTAIN-INTENT (persona Wave 3, 2.4). "Hold on to what I
  *   have" matched "floor" in any name, so Dumbbell Floor Press and Floor
@@ -2562,8 +2568,13 @@ function _trimToDuration(warmup, prescribed, main, cooldown, targetMins) {
   const over = () => total() > targetMins * TOLERANCE;
   // W3-14. The warm-up a fifth of the time, the cool-down 15%, each at
   // least two minutes -- before the main work is touched.
-  _fitSection(warmup,   Math.max(2, targetMins * 0.2),  over);
-  _fitSection(cooldown, Math.max(2, targetMins * 0.15), over);
+  // Always, not only when the session is over: whether it is over turns
+  // on the other moves, and the same warm-up must come out the same each
+  // time ("Mostly the same", verify-mostly-same 2c: a warm-up move at two
+  // minutes one day and four the next).
+  const always = () => true;
+  _fitSection(warmup,   Math.max(2, targetMins * 0.2),  always);
+  _fitSection(cooldown, Math.max(2, targetMins * 0.15), always);
 
   // GYM-MIX-1. The feature block is exempt from trimming.
   //
