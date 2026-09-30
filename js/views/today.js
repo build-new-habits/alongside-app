@@ -1,6 +1,9 @@
 /**
  * today.js
- * 30 Sep 2026 v51
+ * 30 Sep 2026 v52
+ *
+ * v52 - W3-21 NAV-SMALL. Plan Home gains "Go for a run" beside Join a
+ *   class: persona 2.4 found Run three taps deep in the Library.
  *
  * v51 - W3-20. "You moved today" only after movement: breathing, mindful
  *   sessions and quiet practices are not movement (decision 4a).
@@ -2064,6 +2067,7 @@ function _markGuidanceShown(root) {
       </div>
       <p class="home-links">
         <button class="home-link" data-route="classes" data-requires-checkin="false">Join a class</button>
+        <button class="home-link" data-route="running-session" data-requires-checkin="false">Go for a run</button>
         <button class="home-link" data-route="noticing" data-requires-checkin="false">Something for the mind</button>
         <button class="home-link" data-route="library" data-requires-checkin="false">Library</button>
       </p>`;

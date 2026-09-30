@@ -1,6 +1,9 @@
 /**
  * js/save-block.js
- * 29 Sep 2026 v3
+ * 30 Sep 2026 v4
+ *
+ * v4 - W3-21 NAV-SMALL. Says where a saved session is found: under
+ *   I know what I want. "Your own" left Plan Home with the rooms.
  *
  * v3 - P26 (persona finding W2-20). "Keep this one?" is not offered for a
  *   session already kept: one started from the saved list
@@ -195,7 +198,7 @@ export function renderSaveBlock() {
     <div class="save-block" id="save-block" data-save-block>
       <p class="save-block-title">Keep this one?</p>
       <p class="text-sm text-muted save-block-sub">
-        It will be in Your own, ready to repeat.
+        You’ll find it under I know what I want, ready to repeat.
       </p>
       <label class="sr-only" for="save-block-name">Name for this session</label>
       <input type="text" id="save-block-name" class="save-block-name"
@@ -239,7 +242,7 @@ export function attachSaveBlock(root) {
     const res = saveSession(input ? input.value : "", built);
 
     if (res && res.ok) {
-      if (status) status.textContent = "Saved. It is in Your own.";
+      if (status) status.textContent = "Saved. You’ll find it under I know what I want.";
       btn.textContent = "Saved";
       btn.disabled = true;
       if (input) input.disabled = true;

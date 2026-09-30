@@ -1,7 +1,12 @@
 /**
  * running-session.js - Guided Running Session
  *
- * 30 Sep 2026 v8
+ * 30 Sep 2026 v9
+ *
+ * v9 - W3-21 NAV-SMALL. onUnmount: leaving the Run door before a run has
+ *   started lets go of the choices, so it opens on What kind of run next
+ *   time, not on an answer from days ago (persona 2.16). A run under way
+ *   is left alone.
  *
  * v8 - W3-20 TRUE-WORDS. The interval script is built from the length
  *   (intervalScript): 45 and 60 minutes used the 30-minute one, so "Last
@@ -895,6 +900,12 @@ function resetSession() {
   firedStructureIndices = new Set();
   resumeCheckDone       = false;
   pendingResume         = null;
+}
+
+/** W3-21. Called by the router on the way out. Never ends a run in progress. */
+export function onUnmount() {
+  if (phase === "running" || sessionStarted) return;
+  resetSession();
 }
 
 function formatMMSS(seconds) {

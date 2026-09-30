@@ -1,6 +1,11 @@
 /*
  * css/components/coach-proposal.css
- * 28 Sep 2026 v11
+ * 30 Sep 2026 v12
+ *
+ * v12 - W3-21 NAV-SMALL. .cp-assumptions__choices (Length and Where as
+ *   a row of one-tap choices) and .cp-swap (Swap as a list under its
+ *   row). The chosen one is bold with a thicker border, not only
+ *   coloured; every button is at least 44px.
  *
  * v11 - SMOOTH-P2e. .cp-planned (what they planned, first) and .cp-offer
  *   (a good day's one-line offer). Both are words and a button, never a
@@ -602,6 +607,7 @@
 
 .cp-plan__row {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-3);
@@ -743,3 +749,58 @@
 }
 .cp-offer__text { margin: 0; color: var(--color-text); line-height: 1.5; }
 .cp-offer .btn { min-height: 44px; }
+
+/* ============================================================
+   W3-21, 30 Sep 2026. One-tap choices, and Swap as a list.
+   ============================================================ */
+
+.cp-assumptions__choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  padding: var(--space-2) 0;
+}
+
+.cp-choice { min-height: 44px; min-width: 44px; }
+
+.cp-choice[aria-pressed="true"] {
+  border-width: 2px;
+  font-weight: var(--font-semibold, 600);
+}
+
+.cp-swap {
+  flex-basis: 100%;
+  margin-top: var(--space-2);
+}
+
+.cp-swap__label {
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  margin: 0 0 var(--space-2);
+}
+
+.cp-swap__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.cp-swap__pick {
+  width: 100%;
+  min-height: 44px;
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  text-align: left;
+}
+
+.cp-swap__name { font-weight: var(--font-semibold, 600); }
+
+.cp-swap__dose {
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  flex-shrink: 0;
+}

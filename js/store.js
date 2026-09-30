@@ -3,7 +3,10 @@ import { RETIRED_CONDITIONS } from "./data/scope-statement.js";
 
 /**
  * store.js - Data persistence layer
- * 30 Sep 2026 v92
+ * 30 Sep 2026 v93
+ *
+ * v93 - W3-21 NAV-SMALL (Schema v1.88). requestedLocation: where "I know
+ *   what I want" asked for today's plan, read once by the plan.
  *
  * v92 - W3-20 TRUE-WORDS (Schema v1.87). community.credits is awarded by
  *   logActivity() for every completed movement session (one on Free, two
@@ -1413,6 +1416,10 @@ export const store = {
       // soon as it is cleared.
       requestedSessionType: null,
 
+      // W3-21. Where "I know what I want" asked for today's plan. Read once
+      // and cleared by the plan, so looking does not change the default.
+      requestedLocation: null,
+
       // EXIT-LOOP, 16 Sep 2026. ISO timestamp of the last "exit without
       // saving", or null. Compared against lastProposalDate, so a NEWER
       // proposal clears it without needing to be reset anywhere.
@@ -1430,6 +1437,7 @@ export const store = {
 
       // ASK-KIND. The kind of session the person asked for, for today.
       requestedSessionType: saved.requestedSessionType || null,
+      requestedLocation: ["home", "gym", "outside"].includes(saved.requestedLocation) ? saved.requestedLocation : null,
 
       // EXIT-LOOP. When a proposal was last declined, so Home can tell
       // "interrupted, take me back" from "no, not this one".

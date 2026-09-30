@@ -1,6 +1,10 @@
 /**
  * js/views/know-what.js
- * 28 Sep 2026 v2
+ * 30 Sep 2026 v3
+ *
+ * v3 - W3-21 NAV-SMALL. Where? is handed to the plan as requestedLocation
+ *   (read once there), not written as the default: a plan only looked
+ *   at no longer decides where every later plan is for (persona 2.4).
  *
  * v2 - Work list 2e. The time windows come from data/time-windows.js
  *   (the old engine that held them is deleted). Same numbers.
@@ -315,7 +319,7 @@ export function KnowWhatView(router) {
     const type = kind === "strength" ? part : kind;
     store.set("requestedSessionType", type);
     store.set("availableTime", LENGTHS.find(l => l.mins === mins)?.cat || "short");
-    store.set("sessionLocation", place);
+    store.set("requestedLocation", place);
     if (Array.isArray(sore)) {
       // Exactly the check-in's writes: a new area joins their list, and
       // the day's scores are what was said now.

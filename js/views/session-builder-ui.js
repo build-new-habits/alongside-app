@@ -1,7 +1,15 @@
 /**
  * js/views/session-builder-ui.js - Session Builder UI
  *
- * 30 Sep 2026 v29
+ * 30 Sep 2026 v30
+ *
+ * v30 - W3-21 NAV-SMALL. onUnmount resets the builder, so it never reopens
+ *   on an old preview (persona 2.16: a two-day-old plan whose Let's go
+ *   led to "No workout selected"). Mobility skips the build-mode
+ *   question, as Stretch does. With nothing saved for the place, the
+ *   equipment line says it will use bodyweight rather than "I haven't
+ *   got any equipment saved for you yet" to somebody who told us
+ *   bodyweight only.
  *
  * v29 - W3-20. Coach recommends builds with recommended: true, so the
  *   plan does not say "You picked this one yourself".
@@ -1220,7 +1228,7 @@ function renderEquipmentCheck() {
             ? `I haven't got a ${scopeWord} list saved, so I've started from your ${otherWord} kit. Untick anything you haven't got with you &mdash; I'll adjust the session. Changes here don't affect what you've saved.`
             : hasSavedEquipment
               ? `Here's your ${scopeWord} kit. Untick anything you haven't got with you &mdash; I'll adjust the session. Changes here don't affect what you've saved.`
-              : `I haven't got any equipment saved for you yet. Tick anything you have today and I'll build around it. Changes here don't affect what you've saved.`}
+              : `Nothing is saved for ${scopeWord}, so I'll build it around your bodyweight. Tick anything you have with you today and I'll use it. Changes here don't affect what you've saved.`}
         </p>
       </div>
 
@@ -1768,6 +1776,7 @@ function triggerBuild() {
 
   // Artificial pause (1.2s) makes the coach feel like she's thinking
   setTimeout(() => {
+    if (phase !== "loading") return;   // W3-21: left while it was building
     builtSession = buildSession({
       sessionType:       selectedType,
       durationMins:      selectedDuration,
@@ -1823,6 +1832,7 @@ function triggerRecommendedBuild() {
   rerender();
 
   setTimeout(() => {
+    if (phase !== "loading") return;   // W3-21: left while it was building
     candidatePools = buildCandidatePools({
       sessionType:       selectedType,
       durationMins:      selectedDuration,
@@ -1976,6 +1986,16 @@ function resetState() {
   entryDoor             = null;
   selectedZones         = [];
   zonesPrefilled        = false;
+}
+
+/**
+ * W3-21. Called by the router on the way out. The builder's choices live
+ * in this module, so without this it reopened days later on whatever was
+ * last on screen. A build still loading is let go too: its timer finds
+ * the phase changed and does nothing.
+ */
+export function onUnmount() {
+  resetState();
 }
 
 // ── Mount ─────────────────────────────────────────────────────────────────────
@@ -2383,6 +2403,13 @@ export function onMount() {
       document.querySelectorAll(".sb-equipment-check:checked")
     ).map(c => c.dataset.equipment);
     equipmentOverride = checked;
+    // W3-21. Mobility, like Stretch, does not ask how to build it: the
+    // coach builds it, and every row can still be changed on the preview.
+    if (selectedType === "mobility") {
+      buildMode = "coach";
+      triggerBuild();
+      return;
+    }
     // QUICK-BUILD-2. The ticks are kept, then back to the scaffold. The
     // build-mode question belongs to the compose flow; quick build has
     // one button and it is on the scaffold.

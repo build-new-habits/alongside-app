@@ -1,6 +1,11 @@
 /**
  * tools/verify-plan-list.mjs
- * 30 Sep 2026 v2
+ * 30 Sep 2026 v3
+ *
+ * v3 - W3-21 NAV-SMALL. Swap opens a list instead of cycling. Test 5
+ *   now picks from each row's list, then takes the original back from
+ *   the same list; the same three promises hold (the original can come
+ *   back, nothing sore today is put on, a swap is said by name).
  *
  * v2 - W3-11 NOT-SURE-PICK. At the gym the coach now picks the Gym
  *   session, whose last row has no alternative, so the status left after
@@ -153,9 +158,10 @@ ok("4a. \"Last: 40 kg\" on the row they logged", !!again && /Last: 40 kg/.test(t
 ok("4b. and on no row they did not", rows(main).filter(r => /Last:/.test(txt(r))).length === 1);
 
 // ── 5. SWAP ─────────────────────────────────────────────────────────────
-console.log("\nTEST 5 - swap cycles alternatives, and never offers something sore today");
+console.log("\nTEST 5 - swap offers alternatives, and never offers something sore today");
 fixture({ acks: 5, location: "gym", scores: { shoulder: 8, "upper-back": 8 } });
 ({ main, navs } = mount());
+await wait(80);   // the panel's own first-button focus, 50 ms after opening
 // The original plan is the builder's (its own gates cover selection).
 // What a SWAP puts there is this screen's: nothing introduced by a swap
 // may be blocked by today's sore answer.
@@ -171,17 +177,24 @@ ok("5b. every row has a swap", rows(main).length > 0 && swapBtns().length === ro
 let cycled = false, blockedEver = [], swappedIn = 0; const announced = [];
 for (let r = 0; r < rows(main).length; r++) {
   const before = names(main)[r];
-  const seen = [before];
-  for (let n = 0; n < 40; n++) {
-    swapBtns()[r]?.click(); await wait(5);
+  const picks = () => [...main.querySelectorAll("[data-swap-pick]")];
+  swapBtns()[r]?.click(); await wait(5);
+  announced.push(txt(main.querySelector("#cp-plan-status")));
+  const alts = picks().filter(b => b.dataset.swapPick !== "__original");
+  if (!alts.length) continue;
+  for (const alt of alts) {
+    const id = alt.dataset.swapPick;
+    main.querySelector(`[data-swap-pick="${id}"]`)?.click(); await wait(5);
     announced.push(txt(main.querySelector("#cp-plan-status")));
     blockedEver.push(...blockedShown());
-    const now = names(main)[r];
-    if (now === before) { if (seen.length > 1) cycled = true; break; }
-    seen.push(now); swappedIn++;
+    if (names(main)[r] !== before) swappedIn++;
+    swapBtns()[r]?.click(); await wait(5);
   }
+  main.querySelector('[data-swap-pick="__original"]')?.click(); await wait(5);
+  announced.push(txt(main.querySelector("#cp-plan-status")));
+  if (names(main)[r] === before) cycled = true;
 }
-ok("5c. swapping past the last alternative returns to the original", cycled);
+ok("5c. the original can always be taken back from the list", cycled);
 ok("5d. no swap ever put a sore-today exercise on the plan", swappedIn > 0 && blockedEver.length === 0, JSON.stringify([...new Set(blockedEver)]));
 const live = main.querySelector("#cp-plan-status");
 ok("5e. a swap is announced by name", !!live && live.getAttribute("aria-live") === "polite" && announced.some(a => /Swapped to|Back to/.test(a)), [...new Set(announced)].slice(0, 3).join(" | "));

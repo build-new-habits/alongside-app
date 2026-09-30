@@ -1,6 +1,16 @@
 /**
  * coach-proposal.js
- * 30 Sep 2026 v43
+ * 30 Sep 2026 v44
+ *
+ * v44 - W3-21 NAV-SMALL (Wave 3, personas 2.4, 2.13, 2.15, 2.16).
+ *   Length and Where open a list and one tap picks (Length cycled
+ *   30 -> 10 -> 20 ... -> 60: five or six taps). Where changes THIS plan;
+ *   the default place (sessionLocation) is written only when a session
+ *   starts, and "I know what I want" hands its place over through
+ *   requestedLocation, read once here. Swap opens a list of the
+ *   alternatives under the row, with the original offered back, instead
+ *   of cycling one tap at a time. Something different today gains
+ *   "I'll just log what I do".
  *
  * v43 - W3-11 NOT-SURE-PICK. The coach's pick is told where the session
  *   is, so "Gym" is never picked at home.
@@ -764,9 +774,14 @@ export function CoachProposalView(router) {
   let selectedOptionId      = null;
 
   // ── SMOOTH-P2a plan state ────────────────────────────────────────────────
-  // swapState[index] = { original, alts, pos }. Built on the first swap of
+  // swapState[index] = { original, alts }. Built on the first swap of
   // a row, against the ORIGINAL exercise, so cycling is stable.
   let swapState  = {};
+  // W3-21. Which row's swap list is open, and which chip list, or null.
+  let swapOpen   = null;
+  let chipOpen   = null;       // 'time' | 'loc' | null
+  // W3-21. Where THIS plan is for, when it differs from the default.
+  let planLoc    = null;
   // -1 easier, 0 as built, +1 harder. Sets only (spec 4.3).
   let adjust     = 0;
   let statusMsg  = '';
@@ -778,6 +793,15 @@ export function CoachProposalView(router) {
   function mount(container) {
     // Advance week if Monday
     advanceWeekIfNeeded();
+
+    // W3-21. Where "I know what I want" asked for, read once. Anything
+    // else starts from the default, so a plan only looked at leaves no
+    // trace on the next one.
+    const asked = store.get('requestedLocation');
+    planLoc  = (asked === 'home' || asked === 'gym' || asked === 'outside') ? asked : null;
+    if (asked != null) store.set('requestedLocation', null);
+    swapOpen = null;
+    chipOpen = null;
 
     // Check re-entry and missed session contexts
     reEntryCtx  = getReEntryContext();
@@ -1127,17 +1151,19 @@ export function CoachProposalView(router) {
                change each. Focus opens "Something different today". -->
           <ul class="cp-assumptions">
             ${[
-              ['Where',  'cp-loc',  _locationLabel(_currentLocation())],
-              ['Length', 'cp-time', `${_getAvailableTimeMinutes()} min`],
-              ...(premium && option ? [['Focus', 'cp-focus', _focusLabel(option)]] : [])
-            ].map(([label, id, value]) => `
+              ['Where',  'cp-loc',  'loc',  _locationLabel(_currentLocation())],
+              ['Length', 'cp-time', 'time', `${_getAvailableTimeMinutes()} min`],
+              ...(premium && option ? [['Focus', 'cp-focus', null, _focusLabel(option)]] : [])
+            ].map(([label, id, chip, value]) => `
               <li class="cp-assumptions__row">
                 <span class="cp-assumptions__label">${label}</span>
                 <button class="btn btn-secondary cp-assumptions__change" id="${id}"
-                        aria-label="${label}: ${value}. Change">
+                        aria-label="${label}: ${value}. Change"
+                        ${chip ? `aria-expanded="${chipOpen === chip}" aria-controls="${id}-choices"` : ''}>
                   ${value}
                 </button>
-              </li>`).join('')}
+              </li>
+              ${chip && chipOpen === chip ? _renderChipChoices(chip, id, label) : ''}`).join('')}
           </ul>
 
           ${option ? _renderPlan(option, premium) : ''}
@@ -1234,6 +1260,46 @@ export function CoachProposalView(router) {
     return `Works your ${_joinNames(names)}, which you said ${names.length > 1 ? 'are' : 'is'} sore today.`;
   }
 
+  /**
+   * W3-21. The choices for Length or Where, one tap each, in order. The
+   * current one is marked (aria-pressed and bold), not only coloured.
+   */
+  function _renderChipChoices(chip, id, label) {
+    const items = chip === 'time'
+      ? Object.values(AVAILABLE_TIME_WINDOW_MINUTES).map(m => [`data-pick-time="${m}"`, `${m} min`, m === _getAvailableTimeMinutes()])
+      : ['home', 'gym', 'outside'].map(l => [`data-pick-loc="${l}"`, _locationLabel(l), l === _currentLocation()]);
+    return `
+      <li class="cp-assumptions__choices" id="${id}-choices" role="group" aria-label="${label}">
+        ${items.map(([attr, text, on]) => `
+          <button class="btn btn-secondary cp-choice ${on ? 'cp-choice--on' : ''}" ${attr} aria-pressed="${on}">${text}</button>`).join('')}
+      </li>`;
+  }
+
+  /** W3-21. The swap list under a row: the alternatives, and the original back. */
+  function _renderSwapList(i, ex) {
+    const st = swapState[i];
+    if (!st) return '';
+    const shownId = ex.id;
+    const alts = st.alts.filter(a => a.id !== shownId);
+    const back = st.original.id !== shownId
+      ? `<li><button class="btn btn-secondary cp-swap__pick" data-swap-pick="__original">
+           <span class="cp-swap__name">Back to ${st.original.name}</span></button></li>` : '';
+    return `
+      <div class="cp-swap" id="cp-swap-${i}">
+        <p class="cp-swap__label" id="cp-swap-label-${i}">Instead of ${ex.name}</p>
+        <ul class="cp-swap__list" aria-labelledby="cp-swap-label-${i}">
+          ${back}
+          ${alts.map(a => {
+            const d = _dose(a);
+            return `<li><button class="btn btn-secondary cp-swap__pick" data-swap-pick="${a.id}">
+              <span class="cp-swap__name">${a.name}</span>
+              <span class="cp-swap__dose"><span aria-hidden="true">${d.text}</span><span class="sr-only">, ${d.spoken}</span></span>
+            </button></li>`;
+          }).join('')}
+        </ul>
+      </div>`;
+  }
+
   function _renderPlan(option, premium) {
     const list = _planExercises(option);
     const rowsBySection = ['warmup', 'main', 'cooldown']
@@ -1271,7 +1337,9 @@ export function CoachProposalView(router) {
                     ${sore ? `<span class="cp-plan__why">${sore}</span>` : ''}
                   </div>
                   ${canSwap ? `<button class="btn btn-ghost cp-plan__swap" data-swap="${i}"
-                          aria-label="Swap ${ex.name}">Swap</button>` : ''}
+                          aria-label="Swap ${ex.name}" aria-expanded="${swapOpen === i}"
+                          ${swapOpen === i ? `aria-controls="cp-swap-${i}"` : ''}>Swap</button>` : ''}
+                  ${canSwap && swapOpen === i ? _renderSwapList(i, ex) : ''}
                 </li>`;
             }).join('')}
           </ol>`).join('')}
@@ -1413,6 +1481,7 @@ export function CoachProposalView(router) {
           </div>
           <div class="cp-different__row">
             ${btn('data-different="class"', 'A class instead')}
+            ${btn('data-different="log"', 'I\u2019ll just log what I do')}
           </div>
         </div>
       </details>`;
@@ -1543,6 +1612,8 @@ export function CoachProposalView(router) {
     currentPreviewOptions = proposal.options;
     selectedOptionId      = proposal.options[0]?.id || null;
     swapState             = {};
+    swapOpen              = null;
+    chipOpen              = null;
     statusMsg             = message;
     _rerenderPanel(container, showPlan);
   }
@@ -1572,20 +1643,30 @@ export function CoachProposalView(router) {
     // LOCATION-1. Changing an assumption REBUILDS the plan, because a
     // plan that no longer matches what it says it was built for is worse
     // than one that never said.
-    panel.querySelector('#cp-loc')?.addEventListener('click', () => {
-      const order = ['home', 'gym', 'outside'];
-      const next  = order[(order.indexOf(_currentLocation()) + 1) % order.length];
-      store.set('sessionLocation', next);
-      _rebuildAndRerender(container, `Now planned for ${_locationLabel(next).toLowerCase()}.`);
-    });
+    // W3-21. Length and Where open their list; a second tap closes it.
+    // Where changes this plan only: the default is written at Start.
+    const toggleChip = (chip, id) => {
+      chipOpen = chipOpen === chip ? null : chip;
+      _rerenderPanel(container);
+      const pick = chip === 'time' ? '[data-pick-time][aria-pressed="true"]' : '[data-pick-loc][aria-pressed="true"]';
+      (chipOpen ? container.querySelector(pick) : container.querySelector(`#${id}`))?.focus();
+    };
+    panel.querySelector('#cp-loc')?.addEventListener('click', () => toggleChip('loc', 'cp-loc'));
+    panel.querySelector('#cp-time')?.addEventListener('click', () => toggleChip('time', 'cp-time'));
 
-    panel.querySelector('#cp-time')?.addEventListener('click', () => {
-      const cats = Object.keys(AVAILABLE_TIME_WINDOW_MINUTES);
-      const cur  = store.get('availableTime');
-      const i    = cats.indexOf(cur);
-      store.set('availableTime', cats[(i + 1) % cats.length]);
+    panel.querySelectorAll('[data-pick-loc]').forEach(btn => btn.addEventListener('click', () => {
+      planLoc = btn.dataset.pickLoc;
+      _rebuildAndRerender(container, `Now planned for ${_locationLabel(planLoc).toLowerCase()}.`);
+      container.querySelector('#cp-loc')?.focus();
+    }));
+
+    panel.querySelectorAll('[data-pick-time]').forEach(btn => btn.addEventListener('click', () => {
+      const mins = Number(btn.dataset.pickTime);
+      const cat  = Object.keys(AVAILABLE_TIME_WINDOW_MINUTES).find(k => AVAILABLE_TIME_WINDOW_MINUTES[k] === mins);
+      if (cat) store.set('availableTime', cat);
       _rebuildAndRerender(container, `Now ${_getAvailableTimeMinutes()} minutes.`);
-    });
+      container.querySelector('#cp-time')?.focus();
+    }));
 
     // Focus opens the sheet rather than cycling: there are nine kinds,
     // and cycling through nine to reach one is a worse menu than a menu.
@@ -1612,11 +1693,16 @@ export function CoachProposalView(router) {
     panel.querySelectorAll('[data-swap]').forEach(btn => {
       btn.addEventListener('click', () => _swapRow(container, Number(btn.dataset.swap)));
     });
+    panel.querySelectorAll('[data-swap-pick]').forEach(btn => {
+      btn.addEventListener('click', () => _swapPick(container, swapOpen, btn.dataset.swapPick));
+    });
 
     panel.querySelectorAll('[data-different]').forEach(btn => {
       btn.addEventListener('click', () => {
         const what = btn.dataset.different;
         if (what === 'class') { closePreviewPanel(container, { navigateHome: false }); router.navigate('classes'); return; }
+        // W3-21. Log it as they go: Make it up as I go.
+        if (what === 'log')   { closePreviewPanel(container, { navigateHome: false }); router.navigate('capture'); return; }
         if (what === 'shorter') {
           store.set('availableTime', 'quick');
           _rebuildAndRerender(container, 'Here’s a 20-minute plan.', true);
@@ -1644,7 +1730,7 @@ export function CoachProposalView(router) {
 
     panel.querySelectorAll('[data-different-loc]').forEach(btn => {
       btn.addEventListener('click', () => {
-        store.set('sessionLocation', btn.dataset.differentLoc);
+        planLoc = btn.dataset.differentLoc;   // W3-21: this plan, not the default
         _rebuildAndRerender(container, 'Here’s the new plan.', true);
       });
     });
@@ -1681,17 +1767,25 @@ export function CoachProposalView(router) {
   }
 
   /**
-   * SMOOTH-P2a. Swap cycles this row's alternatives: same section, same
-   * kit (the pool was built with this plan's arguments), the exercise's
-   * own swap group first. Anything blocked by today's sore answer is left
-   * out, exactly as selection leaves it out. Past the last, the original
-   * comes back.
+   * SMOOTH-P2a / W3-21. Swap opens this row's alternatives as a list:
+   * same section, same kit (the pool was built with this plan's
+   * arguments), the exercise's own swap group first. Anything blocked by
+   * today's sore answer is left out, exactly as selection leaves it out.
+   * It cycled one alternative per tap -- sixteen taps to see sixteen
+   * (persona 2.15) -- and the original came back only past the last.
    */
   function _swapRow(container, index) {
     const option = currentPreviewOptions[0];
     if (!option || !option._pools) return;
     const current = option.exercises[index];
     if (!current || current.isPrescribed) return;
+
+    if (swapOpen === index) {
+      swapOpen = null;
+      _rerenderPanel(container);
+      container.querySelector(`[data-swap="${index}"]`)?.focus();
+      return;
+    }
 
     if (!swapState[index]) {
       const scores = soreScoresToday();
@@ -1704,20 +1798,33 @@ export function CoachProposalView(router) {
       const lead = groups.filter(g => g.id === leadGroupId).flatMap(g => g.items);
       const alts = (lead.length ? lead : groups.flatMap(g => g.items))
         .filter(ex => soreLevelFor(ex, scores).level !== 'blocked');
-      swapState[index] = { original: current, alts, pos: -1 };
+      swapState[index] = { original: current, alts };
     }
 
     const st = swapState[index];
-    if (!st.alts.length) {
+    if (!st.alts.length && st.original.id === current.id) {
       statusMsg = `Nothing else fits here today, so ${current.name} stays.`;
       _rerenderPanel(container);
+      container.querySelector(`[data-swap="${index}"]`)?.focus();
       return;
     }
-    st.pos = st.pos + 1 >= st.alts.length ? -1 : st.pos + 1;
-    const next = st.pos === -1 ? st.original : st.alts[st.pos];
+    swapOpen  = index;
+    statusMsg = '';
+    _rerenderPanel(container);
+    container.querySelector(`#cp-swap-${index} [data-swap-pick]`)?.focus();
+  }
+
+  /** W3-21. One tap on the list puts that move on the plan and closes it. */
+  function _swapPick(container, index, id) {
+    const option = currentPreviewOptions[0];
+    const st = swapState[index];
+    if (!option || !st) return;
+    const next = id === '__original' ? st.original : st.alts.find(a => a.id === id);
+    if (!next) return;
     const swapped = swapExerciseInSession(option, index, next);
     option.exercises = swapped.exercises;
-    statusMsg = st.pos === -1 ? `Back to ${next.name}.` : `Swapped to ${next.name}.`;
+    swapOpen  = null;
+    statusMsg = id === '__original' ? `Back to ${next.name}.` : `Swapped to ${next.name}.`;
     _rerenderPanel(container);
     container.querySelector(`[data-swap="${index}"]`)?.focus();
   }
@@ -1935,7 +2042,7 @@ export function CoachProposalView(router) {
         proposal              = buildProposal();
         currentPreviewOptions = proposal.options;
         selectedOptionId      = proposal.options[0]?.id || null;
-        swapState = {};
+        swapState = {}; swapOpen = null;
         render(container);
       });
     });
@@ -1988,7 +2095,7 @@ export function CoachProposalView(router) {
     if (!(missedOffer && !choiceMade)) {
       currentPreviewOptions = proposal.options;
       selectedOptionId      = proposal.options[0]?.id || null;
-      swapState = {};
+      swapState = {}; swapOpen = null;
       previewOpen           = true;
     }
 
@@ -2009,7 +2116,7 @@ export function CoachProposalView(router) {
     if (proposal && !(reEntryCtx && !reEntryCtx.contextCaptured)) {
       currentPreviewOptions = proposal.options;
       selectedOptionId      = proposal.options[0]?.id || null;
-      swapState = {};
+      swapState = {}; swapOpen = null;
       previewOpen           = true;
     }
     render(container);
@@ -2720,6 +2827,7 @@ export function CoachProposalView(router) {
    * gym was planned "At home", bodyweight.
    */
   function _currentLocation() {
+    if (planLoc === 'gym' || planLoc === 'outside' || planLoc === 'home') return planLoc;   // W3-21
     const loc = store.get('sessionLocation');
     if (loc === 'gym' || loc === 'outside' || loc === 'home') return loc;
     const gym   = store.get('gymEquipment')  || [];

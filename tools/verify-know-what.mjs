@@ -1,6 +1,9 @@
 /**
  * tools/verify-know-what.mjs
- * 28 Sep 2026 v2
+ * 30 Sep 2026 v3
+ *
+ * v3 - W3-21 NAV-SMALL. Where? is handed to the plan (requestedLocation,
+ *   read once), not written as the default. 2b reads the plan's Where.
  *
  * v2 - Work list 2e. The time windows are read from data/time-windows.js,
  *   where they now live; the old engine that held them is deleted. No
@@ -125,7 +128,7 @@ choose(main.querySelector('input[name="length"][value="20"]'));
 choose(main.querySelector('input[name="place"][value="home"]'));
 submit();
 ok("2b. upper body, 20 minutes, at home", store.get("requestedSessionType") === "upper" && store.get("availableTime") === "quick" &&
-   store.get("sessionLocation") === "home" && txt(main.querySelector(".cp-plan__sentence")) === "You asked for strength, upper body, 20 minutes.",
+   /home/i.test(txt(main.querySelector("#cp-loc"))) && store.get("requestedLocation") == null && txt(main.querySelector(".cp-plan__sentence")) === "You asked for strength, upper body, 20 minutes.",
    txt(main.querySelector(".cp-plan__sentence")));
 fixture({ time: null }); fromHome();
 ok("2c. REVERSAL: nothing picked before -- 30 chosen, no \"Last time\" line", main.querySelector('input[name="length"]:checked')?.value === "30" &&
