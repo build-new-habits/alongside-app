@@ -1,7 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 30 Sep 2026 v600
+ * 30 Sep 2026 v601
+ *
+ * v601 - W3-11: the coach's pick reads goals, Mostly the same and where you are.
  *
  * v600 - W3-10: the lighter day counts movement only, and can be turned down.
  *
@@ -4129,7 +4131,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v600";
+const CACHE_NAME = "alongside-v601";
 
 const SHELL_URLS = [
 
