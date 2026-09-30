@@ -1,7 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 30 Sep 2026 v607
+ * 30 Sep 2026 v608
+ *
+ * v608 - "Mostly the same" keeps a warm-up move's time (short sessions fitted per move).
  *
  * v607 - W3-17: the aim is editable; holding on fits the person.
  *
@@ -4143,7 +4145,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v607";
+const CACHE_NAME = "alongside-v608";
 
 const SHELL_URLS = [
 
