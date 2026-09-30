@@ -1,6 +1,10 @@
 /**
  * coach-proposal.js
- * 29 Sep 2026 v39
+ * 30 Sep 2026 v40
+ *
+ * v40 - W3-1 SEVERE-ADAPT (Wave 3, persona 2.1). After Adapt and continue on
+ *   a severe day the plan opens, as it does after every other banner;
+ *   it stayed hidden, leaving nothing to tap. verify-severe-adapt.
  *
  * v39 - P20, RE-ENTRY (persona finding W2-15). With the gap now read
  *   from the activity log (programmeEngine v9), Free is asked what
@@ -953,6 +957,14 @@ export function CoachProposalView(router) {
     severeChoiceResolved = choice;
     severeChoicePending  = null;
     proposal = (severeChoiceResolved !== 'rest') ? buildProposal() : null;
+    // W3-1 (Wave 3, persona 2.1). Adapt built the gentler plan and left it
+    // in the hidden panel: only mount() and the other banners' handlers
+    // opened it. The worst day ended on a screen with nothing to tap.
+    if (proposal && !(reEntryCtx && !reEntryCtx.contextCaptured)) {
+      currentPreviewOptions = proposal.options;
+      selectedOptionId      = proposal.options[0]?.id || null;
+      previewOpen           = true;
+    }
     render(container);
   }
 
