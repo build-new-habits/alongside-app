@@ -1,7 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 30 Sep 2026 v602
+ * 30 Sep 2026 v603
+ *
+ * v603 - W3-13: a session cut short is saved, never dropped; time away is not minutes.
  *
  * v602 - W3-12: "Mostly the same" repeats the session learned, in its order.
  *
@@ -4133,7 +4135,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v602";
+const CACHE_NAME = "alongside-v603";
 
 const SHELL_URLS = [
 
