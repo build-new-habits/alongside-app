@@ -1,5 +1,13 @@
 /**
  * tools/verify-plan-sentences.mjs
+ * 30 Sep 2026 v2
+ *
+ * v2 - W3-9 SORE-LINES. The four sore-area notes below the acute band no
+ *   longer say "I've" (the builder takes care there, it does not move
+ *   things out); they say what the plan holds. The claim table follows
+ *   the new words with the SAME truth test for each: nothing changed but
+ *   the pattern that finds the sentence.
+ *
  * 29 Sep 2026 v1
  *
  * P9, PLAN SENTENCES (persona finding W2-10). The coach's sentence over a
@@ -69,11 +77,11 @@ const CLAIMS = [
   [/Pull first/,                                  m => has(m, isPull)],
   [/Bracing, anti-rotation, anti-extension/,      m => has(m, e => P(e) === "anti-rotation") && has(m, e => P(e) === "anti-extension")],
   [/Mostly holding still/,                        m => m.filter(isBrace).length * 2 > m.length],
-  [/reduced overhead and heavy pressing/,         (m, all) => !all.some(e => touches(e, "shoulder") && (isPush(e) || /press|overhead|get-?up|snatch|jerk/i.test(e.name)))],
-  [/avoided deep single-leg loading/,             (m, all) => !all.some(e => isSingle(e) && touches(e, "knee"))],
+  [/no overhead or heavy pressing in this plan/,         (m, all) => !all.some(e => touches(e, "shoulder") && (isPush(e) || /press|overhead|get-?up|snatch|jerk/i.test(e.name)))],
+  [/no deep single-leg work in this plan/,             (m, all) => !all.some(e => isSingle(e) && touches(e, "knee"))],
   [/loads the spine under flexion/,               (m, all) => !all.some(e => (e.contraindications || []).includes("lower-back-acute"))],
-  [/kept loading conservative/,                   (m, all) => !all.some(e => e.difficultyLevel >= 3 && touches(e, "lower-back"))],
-  [/kept hip extension loading controlled/,       (m, all) => !all.some(e => isHinge(e) && e.difficultyLevel >= 3)],
+  [/nothing in this plan loads it heavily/,                   (m, all) => !all.some(e => e.difficultyLevel >= 3 && touches(e, "lower-back"))],
+  [/no heavy hinging in this plan/        ,       (m, all) => !all.some(e => isHinge(e) && e.difficultyLevel >= 3)],
 ];
 function untrue(line, exercises) {
   const main = exercises.filter(e => (e.section || "main") === "main");

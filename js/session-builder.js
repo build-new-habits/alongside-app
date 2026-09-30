@@ -1,7 +1,14 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
- * 30 Sep 2026 v68
+ * 30 Sep 2026 v69
+ *
+ * v69 - W3-9 SORE-LINES (persona Wave 3). Below the acute band the plan's
+ *   sore line said "I've kept loading conservative" beside the proposal's
+ *   true "I haven't changed anything there"; measured, the builder moves
+ *   nothing out at 4 or 6. The line now says what the plan holds. And
+ *   Free was told to "swap" with no Swap: the line says skip, which
+ *   everybody has, on both tiers. verify-sore-lines.
  *
  * v68 - W3-7 GENTLE-NOOP. _todayIntensity() reads the programme's words:
  *   gentle is low, challenging is high. The gentler start did nothing.
@@ -2185,14 +2192,20 @@ function buildConditionNote(sessionType, exercises = []) {
       if (!area) return null;
       const key  = area === "lower-back" && pain >= 7 ? "lower-back-acute" : area;
       // P9. Said only when the plan bears it out.
+      // W3-9. Free has no Swap on the plan; everybody has "Skip this one".
+      // Said the same on both tiers: the builder does not read the tier
+      // (TIER-D, verify-tier), and skip is true for everybody.
       if (!NOTE_TRUE[key](exercises)) {
-        return `Your ${AREA_WORDS[area]} is sore today — go by how it feels, and swap anything that loads it.`;
+        return `Your ${AREA_WORDS[area]} is sore today — go by how it feels, and skip anything that loads it.`;
       }
       if (key === "lower-back-acute") return "Your lower back is significant today — I've removed everything that loads the spine under flexion.";
-      if (area === "lower-back") return "Your lower back is present — I've kept loading conservative.";
-      if (area === "knee")       return "With your knee, I've avoided deep single-leg loading. Listen to any sharp signals.";
-      if (area === "shoulder")   return "Your shoulder is considered — I've reduced overhead and heavy pressing.";
-      return "With your hamstring, I've kept hip extension loading controlled.";
+      // W3-9. Below the acute band the builder takes care, not moves out
+      // (measured: about as much heavy work on the area as with nothing
+      // sore). So the line says what the plan holds, never "I've".
+      if (area === "lower-back") return "Your lower back is sore today — nothing in this plan loads it heavily. Go by how it feels.";
+      if (area === "knee")       return "Your knee is sore today — there's no deep single-leg work in this plan. Go by how it feels.";
+      if (area === "shoulder")   return "Your shoulder is sore today — there's no overhead or heavy pressing in this plan. Go by how it feels.";
+      return "Your hamstring is sore today — there's no heavy hinging in this plan. Go by how it feels.";
     })
     .filter(Boolean)
     .join(" ");
