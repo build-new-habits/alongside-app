@@ -1,5 +1,13 @@
 /**
  * tools/verify-sheet-close.mjs
+ * 30 Sep 2026 v2
+ *
+ * v2 - Timing only. 5a/5b waited a fixed 60 ms for the equipment sheet,
+ *   which loads its content on demand; under the full parallel suite on a
+ *   fresh clone (v610) that was not always enough, and both failed while
+ *   passing alone. The test now waits until the sheet is open, up to two
+ *   seconds. No assertion changed.
+ *
  * 29 Sep 2026 v1
  *
  * P1, REDUCED-MOTION-SHEET (persona finding W2-2). With reduced motion on
