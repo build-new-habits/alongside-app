@@ -1,7 +1,18 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
- * 30 Sep 2026 v71
+ * 30 Sep 2026 v72
+ *
+ * v72 - W3-14 SHORT-SESSIONS (persona Wave 3, 2.16). "10 minutes" built
+ *   15 to 18: the warm-up was a fixed five to nine minutes and only the
+ *   main section was trimmed, to three moves. _trimToDuration() now fits
+ *   the warm-up (a fifth of the time) and cool-down (15%) first --
+ *   shortening a timed move whose own words name no length, never below
+ *   a minute, then leaving out the longest (never the opening move) --
+ *   and a ten-minute session may keep two main moves. The Gym session's
+ *   machine block must leave 15 minutes, as Cardio's does: it was
+ *   exempt from trimming and ran 34 to 40 minutes at any length.
+ *   verify-short-sessions.
  *
  * v71 - W3-12 MOSTLY-SAME (persona Wave 3, 2.14; Schema v1.84). "Mostly
  *   the same" anchored to whatever was done last, of any kind, in a new
@@ -1765,7 +1776,10 @@ export const SESSION_TYPES = [
     featureSlot: {
       categories:         ["conditioning", "interval", "easy-cardio"],
       allowSessionLength: true,
-      requiresEquipment:  true
+      requiresEquipment:  true,
+      // W3-14. Room for the warm-up, some lifting and the cool-down, as
+      // Cardio's: none fits, no block, and the session is the lifting.
+      leaveMins:          15
     },
     mainCategories:     ["horizontal-pull", "horizontal-push", "squat-pattern", "hip-hinge", "core-stability", "single-leg"],
     cooldownCategories: ["hip-flexor-stretch", "chest-stretch", "hamstring-stretch"]
@@ -2487,12 +2501,52 @@ export function withDefaultDose(ex, intensity) {
            duration: _doseSeconds(sets, work, rest), _doseWork: work, _defaultDose: true };
 }
 
+// W3-14. A move whose own words name its length ("Easy jog: 3 minutes")
+// is never shortened: the card would then contradict itself.
+const _NAMES_LENGTH = /\b\d+\s*(min|minute|sec|second)s?\b/i;
+function _namesItsLength(ex) {
+  return _NAMES_LENGTH.test([ex.name, ...(ex.instructions || []), ex.description || "", ...(ex.cues || [])].join(" "));
+}
+/**
+ * W3-14. Fit a warm-up or cool-down to its share of the time, only while
+ * the session is over: shorten timed moves (longest first, never below a
+ * minute, never one that names its own length), then leave out the
+ * longest -- never the first (the opening move), never the last one.
+ */
+function _fitSection(list, budgetMins, over) {
+  const mins = () => list.reduce((a, e) => a + _exerciseMins(e), 0);
+  for (let guard = 0; guard < 12 && over() && mins() > budgetMins; guard++) {
+    let idx = -1;
+    for (let i = 0; i < list.length; i++) {
+      const e = list[i];
+      if (!(Number(e.duration) > 60) || Number(e.sets) > 1 || _namesItsLength(e)) continue;
+      if (idx === -1 || Number(e.duration) > Number(list[idx].duration)) idx = i;
+    }
+    if (idx === -1) break;
+    const e = list[idx];
+    const excess = (mins() - budgetMins) * 60;
+    list[idx] = { ...e, duration: Math.max(60, Math.round((Number(e.duration) - excess) / 30) * 30), _shortened: true };
+  }
+  for (let guard = 0; guard < 12 && over() && mins() > budgetMins && list.length > 1; guard++) {
+    let idx = -1;
+    for (let i = 1; i < list.length; i++) if (idx === -1 || _exerciseMins(list[i]) > _exerciseMins(list[idx])) idx = i;
+    if (idx === -1) break;
+    list.splice(idx, 1);
+  }
+}
+
 function _trimToDuration(warmup, prescribed, main, cooldown, targetMins) {
-  const MIN_MAIN  = 3;
+  // W3-14. Ten minutes may keep two main moves; longer sessions three.
+  const MIN_MAIN  = Number(targetMins) <= 12 ? 2 : 3;
   const TOLERANCE = 1.15;
   // `prescribed` is COUNTED but never trimmed — see the call site note.
   const total = () => [...warmup, ...prescribed, ...main, ...cooldown]
     .reduce((a, e) => a + _exerciseMins(e), 0);
+  const over = () => total() > targetMins * TOLERANCE;
+  // W3-14. The warm-up a fifth of the time, the cool-down 15%, each at
+  // least two minutes -- before the main work is touched.
+  _fitSection(warmup,   Math.max(2, targetMins * 0.2),  over);
+  _fitSection(cooldown, Math.max(2, targetMins * 0.15), over);
 
   // GYM-MIX-1. The feature block is exempt from trimming.
   //
@@ -3742,8 +3796,16 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
   function selectFromCategories(categories, section, count, alreadyChosen) {
     const chosen = alreadyChosen || new Set();
     const prefs  = store.get("exercisePreferences") || {};
-    const candidates = _filterCandidates(categories, section, equipSet, conditionSet, type.sectionRules?.[section])
+    let candidates = _filterCandidates(categories, section, equipSet, conditionSet, type.sectionRules?.[section])
       .filter(ex => !chosen.has(ex.id));
+    // W3-14. Warm-up and cool-down moves that fit their share of the time
+    // (a fifth, 15%; at least two minutes), when enough of them do: a
+    // five-minute march is half of a ten-minute session.
+    if (section === "warmup" || section === "cooldown") {
+      const cap = Math.max(2, Number(durationMins) * (section === "warmup" ? 0.2 : 0.15));
+      const fit = candidates.filter(e => _exerciseMins(section === "main" ? withDefaultDose(e) : e) <= cap);
+      if (fit.length >= Math.max(1, count)) candidates = fit;
+    }
 
     // Prioritise variety across categories — one from each category first
     const selected = [];

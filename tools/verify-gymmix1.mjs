@@ -1,6 +1,13 @@
 /**
  * tools/verify-gymmix1.mjs
- * 28 Sep 2026 v2
+ * 30 Sep 2026 v3
+ *
+ * v3 - W3-14 SHORT-SESSIONS. 3a asserted that a 30-minute Gym session
+ *   keeps a 20-30 minute machine block -- the fault itself: "About 46
+ *   min" on a 30-minute plan. The Gym slot now leaves 15 minutes, as
+ *   Cardio's does. What 3a protects is unchanged and moves to 45 minutes,
+ *   where a block fits: the trim never deletes it. 3d: at 30 minutes a
+ *   block is kept only when it leaves 15 minutes.
  *
  * v2 - Work list 5, GYM-REACH-1. Test 1 said "no other session type has a
  *   feature slot". Cardio now has one, by decision: every machine block
@@ -146,16 +153,19 @@ console.log("\nTEST 3 — the block survives the duration trim");
   // always the longest. It deleted the point of the session on every build.
   const longest = [];
   for (let i = 0; i < 8; i++) {
-    const s = build(GYM, 30);          // the tightest case: a 20-30 min block in 30 mins
+    const s = build(GYM, 45);          // W3-14: a block that fits (it leaves 15 minutes)
     const f = feature(s);
     if (f) longest.push(Math.round((f.duration || 0) / 60));
   }
-  ok("3a. even a 30-minute session keeps its block", longest.length === 8,
+  ok("3a. a 45-minute session keeps its block through the trim", longest.length === 8,
      `${longest.length} of 8 survived`);
   ok("3b. CONTROL: the blocks really are longer than everything else in the session",
      longest.every(m => m >= 10), longest.join(", ") + " minutes");
   ok("3c. and the lifts are what gets trimmed instead, not stripped to nothing",
-     Array.from({ length: 4 }, () => build(GYM, 30)).every(s => main(s).slice(1).length >= 2));
+     Array.from({ length: 4 }, () => build(GYM, 45)).every(s => main(s).slice(1).length >= 2));
+  const at30 = Array.from({ length: 8 }, () => feature(build(GYM, 30))).filter(Boolean);
+  ok("3d. at 30 minutes a block is kept only when it leaves 15 minutes (W3-14)",
+     at30.every(f => (f.duration || 0) / 60 <= 15), at30.map(f => `${f.id} ${Math.round(f.duration / 60)}`).join(", "));
 }
 
 console.log("\nTEST 4 — no machine, no pretend machine");
