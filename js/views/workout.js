@@ -1,6 +1,10 @@
 /**
  * workout.js - Workout Execution View
- * 29 Sep 2026 v28
+ * 30 Sep 2026 v29
+ *
+ * v29 - W3-12 MOSTLY-SAME (Schema v1.84). The entry says whether a gentle
+ *   reason shaped the session (gentle), so "Mostly the same" never learns
+ *   a lighter day's shorter list.
  *
  * v28 - P21, PLAYERS (persona finding W2-17). Built and saved sessions now
  *   play here (one card a move), not in the four-page session screen. The
@@ -1418,6 +1422,8 @@ function completeWorkout() {
     // CONT-1: which exercises, not only how many. Routed into
     // exerciseHistory by logActivity() on completion only.
     exerciseIds:  (workout.exercises || []).map(e => e.id).filter(Boolean),
+    // W3-12. A lighter or gentler day, so it is not learned as the usual.
+    gentle:       !!workout?.gentleReason,
     // P19. Where each was done, so a familiar move keeps its section.
     // Forwarded to exerciseHistory by logActivity(); not stored on the entry.
     exerciseSections: Object.fromEntries((workout.exercises || []).filter(e => e && e.id)

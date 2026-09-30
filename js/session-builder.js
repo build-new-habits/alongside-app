@@ -1,7 +1,18 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
- * 30 Sep 2026 v70
+ * 30 Sep 2026 v71
+ *
+ * v71 - W3-12 MOSTLY-SAME (persona Wave 3, 2.14; Schema v1.84). "Mostly
+ *   the same" anchored to whatever was done last, of any kind, in a new
+ *   order each time, and a lighter day's shorter list became the new
+ *   "last time". Now it replays the session LEARNED: the last completed,
+ *   non-gentle session of the same kind in the last three weeks
+ *   (_learnedSession), section by section, in its order. One move
+ *   changes a session once the moves are established (done four times),
+ *   in its own place, never longer than the move it replaces, never in
+ *   the warm-up. A lighter day is fewer of the learned moves, in order,
+ *   and is not learned. verify-learned-session.
  *
  * v70 - W3-10 LIGHTER-COUNT. The session records which gentle reason
  *   shaped it (gentleReason), so the coach's screen can offer to turn the
@@ -3578,6 +3589,42 @@ function gentleCareSession(zone, durationMins) {
 }
 
 
+// W3-12. "Mostly the same": the session this person learned, of this kind.
+// The last completed, non-gentle session of the same sessionType within
+// CONTINUITY (three weeks), split by the section each move was done in.
+const LEARNED_WINDOW_DAYS = 21;
+const LEARNED_CHANGE_AFTER = 4;   // a move is established once done this often
+function _learnedSession(sessionType) {
+  if ((store.get("sessionVariety") || "balanced") !== "familiar") return null;
+  const log = store.get("activityLog") || [];
+  const h = store.get("exerciseHistory") || {};
+  for (let i = log.length - 1; i >= 0; i--) {
+    const e = log[i];
+    if (!e || e.sessionType !== sessionType || e.status === "partial" || e.gentle === true) continue;
+    const ids = Array.isArray(e.exerciseIds) ? e.exerciseIds.filter(Boolean) : [];
+    if (!ids.length) continue;
+    const when = new Date(e.completedAt || e.date || 0).getTime();
+    if (!(when > 0) || Date.now() - when > LEARNED_WINDOW_DAYS * 864e5) return null;
+    const out = { warmup: [], main: [], cooldown: [] };
+    for (const id of ids) (out[(h[id] && h[id].section)] || out.main).push(id);
+    return out;
+  }
+  return null;
+}
+/** W3-12. The one established move that changes today: cool-down first, from the end. */
+function _learnedRelease(learned) {
+  if (!learned) return null;
+  const c = [...learned.cooldown.map((id, pos) => ({ id, rank: 2, pos })),
+             ...learned.main.map((id, pos) => ({ id, rank: 1, pos }))];
+  let best = null, bn = -1;
+  for (const x of c) {
+    const n = store.exerciseStats(x.id).n || 0;
+    if (n < LEARNED_CHANGE_AFTER) continue;
+    if (n > bn || (n === bn && (x.rank > best.rank || (x.rank === best.rank && x.pos > best.pos)))) { best = x; bn = n; }
+  }
+  return best ? best.id : null;
+}
+
 export function buildSession({ sessionType, durationMins, equipmentOverride, preset, ignoreSevere, inputs }) {
 
   // SEVERE-1. Before anything else, and before any pool is built.
@@ -3682,6 +3729,11 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
     return [{ ...picked, _feature: true }];
   }
 
+  // W3-12. The session learned, and the one move that changes today.
+  const _learned = _learnedSession(sessionType);
+  const _releaseToday = _learnedRelease(_learned);
+  const _learnedUsed = new Set();   // each learned move is placed once, across top-up calls too
+
   // P19. Decided once per session (first section to ask), used by every
   // section: which mastered moves "mostly the same" lets go of today.
   let _familiarRelease;
@@ -3703,7 +3755,8 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
     // array would only change which category gets dropped when slots run
     // out, and the point is that this one never should. Same shape as the
     // existing warmup floor -- a rule, not a preference.
-    if (section === "warmup" && pulseRaiser.include && count > 0) {
+    // W3-12. With a learned warm-up, its own opening is replayed below.
+    if (section === "warmup" && pulseRaiser.include && count > 0 && !(_learned && _learned.warmup.length)) {
       // Must respect `chosen` like every other pick. Found by regression
       // after the duplicate fix: the reserved slot ran before the guard
       // was consulted, so the same machine warm-up could be selected
@@ -4225,6 +4278,56 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
       }
 
       return from[Math.floor(Math.random() * from.length)];
+    }
+
+    // W3-12. "Mostly the same": the learned session's moves, in its order.
+    // Each still passes every filter (it must be in `candidates`); one
+    // that no longer does, or the one changing today, is replaced in its
+    // own place, from its own category where possible.
+    if (_learned && _learned[section] && _learned[section].length) {
+      const byId = new Map();
+      for (const c of candidates) if (!byId.has(c.id)) byId.set(c.id, c);
+      // The whole learned section, not today's slot count: the session
+      // learned already fitted its time. A lighter day keeps today's
+      // (smaller) count, so it is the learned moves, fewer, in order.
+      const want = (section === "main" && _sessionIntensity() === "low") ? count
+                 : Math.max(count, _learned[section].length);
+      const slots = [];
+      for (const id of _learned[section]) {
+        if (selected.length + slots.length >= want) break;
+        if (_learnedUsed.has(id)) continue;
+        _learnedUsed.add(id);
+        if (id !== _releaseToday && chosen.has(id)) continue;
+        if (id !== _releaseToday && byId.has(id)) { slots.push(byId.get(id)); chosen.add(id); }
+        else slots.push({ _gap: true, was: id, category: byId.get(id)?.category || (EXERCISES.find(x => x.id === id) || {}).category });
+      }
+      for (let i = 0; i < slots.length; i++) {
+        if (!slots[i]._gap) continue;
+        const pool = candidates.filter(c => !chosen.has(c.id) && c.id !== slots[i].was);
+        const same = pool.filter(c => c.category === slots[i].category);
+        // No longer than the move it replaces, so fitting the time does
+        // not then take a second move out.
+        const mins = e => _exerciseMins(section === "main" ? withDefaultDose(e) : e);
+        const wasEx = EXERCISES.find(x => x.id === slots[i].was);
+        const limit = wasEx ? mins(wasEx) : Infinity;
+        const fitsSame = same.filter(c => mins(c) <= limit);
+        const fitsAny  = pool.filter(c => mins(c) <= limit);
+        // Nothing that fits: the move changing today stays (no change is
+        // better than a longer one, which the time step would answer by
+        // dropping another); a move no longer allowed is left out.
+        const pick = pickFrom(fitsSame.length ? fitsSame : fitsAny)
+                  || (slots[i].was === _releaseToday ? byId.get(slots[i].was) || null : null);
+        if (pick) chosen.add(pick.id);
+        slots[i] = pick || null;
+      }
+      for (const x of slots) if (x) { selected.push(x); usedCategories.add(x.category); }
+      // The move changing today stays out of the rest of the session,
+      // top-up too -- once its own place has been dealt with.
+      if (_releaseToday && _learned[section].includes(_releaseToday) && !selected.some(x => x.id === _releaseToday)) chosen.add(_releaseToday);
+      // The learned section stands as it is (it already fitted its time;
+      // the top-up adds only if today is genuinely short). Only when most
+      // of it is no longer allowed does the usual selection fill in.
+      if (selected.length >= Math.min(count, Math.ceil(_learned[section].length / 2))) return selected.slice(0, want);
     }
 
     // ARC-3. Same policy, same order of operations as poolFor(). The two

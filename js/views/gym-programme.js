@@ -1,6 +1,10 @@
 /**
  * gym-programme.js
- * 29 Sep 2026 v17
+ * 30 Sep 2026 v18
+ *
+ * v18 - W3-12 MOSTLY-SAME (Schema v1.84). exerciseIds in plan order (the
+ *   completed indices sorted, not the order they were ticked), and the
+ *   entry says whether a gentle reason shaped the session (gentle).
  *
  * v17 - P19, "MOSTLY THE SAME" (persona finding W2-14). A finished
  *   session tells the store which section each move was done in
@@ -1282,9 +1286,11 @@ export function GymProgrammeView(router) {
       // partial exit), which is what makes continuity-aware selection
       // possible at all. Until today the product recorded a count and
       // nothing else, so no exercise could ever become familiar.
-      exerciseIds:    [...completedExerciseIndices]
+      exerciseIds:    [...completedExerciseIndices].sort((a, b) => a - b)
                         .map(i => session.exercises[i]?.id)
                         .filter(Boolean),
+      // W3-12. A lighter or gentler day, so it is not learned as the usual.
+      gentle:         !!_st.gentleReason,
       // P19. Where each was done, so a familiar move keeps its section.
       // Forwarded to exerciseHistory by logActivity(); not stored.
       exerciseSections: Object.fromEntries([...completedExerciseIndices]
