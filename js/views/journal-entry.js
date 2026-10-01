@@ -1,6 +1,9 @@
 /**
  * journal-entry.js
- * 28 Sep 2026 v6
+ * 01 Oct 2026 v7
+ *
+ * v7 - SIGNPOST-STATIC. The support lines under Save, the same for
+ *   everybody; nothing here reads what is written.
  *
  * v6 - F7 LANDMARK. role="main" (and its label) removed from the view's
  *   wrapper: index.html's <main> is the one main landmark; a second,
@@ -78,6 +81,7 @@
  *   All touch targets minimum 44px.
  */
 
+import { supportLinesHTML } from '../data/support-lines.js';
 import { store } from '../store.js';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -223,6 +227,8 @@ export function JournalEntryView(router) {
             Save entry
           </button>
         </div>
+
+        ${supportLinesHTML("je-support")}
 
       </div>
     `;

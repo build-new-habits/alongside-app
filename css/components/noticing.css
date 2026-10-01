@@ -2,6 +2,10 @@
  * css/components/noticing.css
  * Alongside: Move — Noticing Hub view styles
  *
+ * 01 Oct 2026 v4
+ *
+ * v4 - SIGNPOST-STATIC. .support-lines, on Wellbeing and the journal.
+ *
  * 01 Oct 2026 v3
  *
  * v3 - PT-2. .journal-delete: the ask under a journal entry before it
@@ -150,3 +154,16 @@
 }
 .journal-delete p { flex-basis: 100%; margin: 0; }
 .journal-delete .btn { min-height: 44px; }
+
+/* SIGNPOST-STATIC, 01 Oct 2026. Free support, always the same. */
+.support-lines {
+  margin-top: var(--space-6);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+.support-lines__title { font-size: var(--text-lg); margin: 0 0 var(--space-2); }
+.support-lines__lede  { margin: 0 0 var(--space-3); color: var(--color-text-secondary); }
+.support-lines__list  { margin: 0; padding-left: var(--space-5); display: flex; flex-direction: column; gap: var(--space-2); line-height: 1.6; }
+.support-lines__link  { color: var(--color-primary); text-decoration: underline; }

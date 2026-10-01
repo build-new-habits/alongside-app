@@ -1,6 +1,9 @@
 /**
  * js/views/noticing.js - Wellbeing Hub Landing View
  *
+ * 01 Oct 2026 v9 - SIGNPOST-STATIC. "If you need to talk to someone" at the foot of
+ *   Wellbeing, always, the same for everybody (data/support-lines.js).
+ *
  * 01 Oct 2026 v8 - PT-2 HEALTH-CONSENT. Each of Your reflections can be
  *   deleted: Delete, then Delete it / Keep it, and "Entry deleted." is said.
  *   Only that entry goes (store.deleteJournalEntry). Entry text is escaped.
@@ -87,6 +90,7 @@
  * Nav: visible (fourth tab)
  */
 
+import { supportLinesHTML } from "../data/support-lines.js";
 import { store }  from "../store.js";
 import { router } from "../router.js";
 import { getTodaysCheckin } from "../data/checkin.js";
@@ -439,6 +443,8 @@ export function render() {
           ${journalStatus ? _escText(journalStatus) + " " : ""}Your reflections will appear here after your first journal entry.
         </p>
       `}
+
+      ${supportLinesHTML("wb-support")}
 
     </div>
   `;
