@@ -1,0 +1,5 @@
+{
+  "_version": "01 Oct 2026 v1",
+  "_howTo": "Messages for Settings › Messages. Each message: id (lower-case letters, numbers, hyphens; never reuse one), kind (app, research or news), title (up to 80 characters), body (up to 600, plain text, no < or >), publishedAt (YYYY-MM-DD), optional link { text, href } to https://buildnewhabits.co.uk or a named charity listed in js/data/messages.js, optional audience { tier: any|free|plan, minSessions }. News shows only to people who turned on News from Build New Habits. Never safety or medical content, never an offer of the Plan, never a deadline.",
+  "messages": []
+}

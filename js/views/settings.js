@@ -2,6 +2,12 @@
  * settings.js
  * 01 Oct 2026 v55
  *
+ * v55 - B4 MESSAGES. Settings › Messages: the page's first row ("New" in words
+ *   when there is one not yet seen), a screen listing them, newest first,
+ *   each with Dismiss, and the News from Build New Habits switch (off).
+ *   Opening the screen marks them seen, which clears the dot on the tab.
+ *   Rules and fetching live in js/data/messages.js.
+ *
  * v55 - B2 RESTORE-LOCK. Download your data opens a short dialog: an
  *   optional password, typed twice, with the warning that a forgotten
  *   password means nobody can open the file. With one, the file is locked
@@ -616,6 +622,7 @@ import { aimById } from '../data/aims.js';
 import { healthAllowed, healthConsentNeeded, setPendingRoute } from '../data/health-consent.js';
 import { readRestoreFile, applyRestore, describeDate } from '../data/restore.js';
 import { lockText, unlockText, isLocked, passwordProblem, lockAvailable } from '../data/file-lock.js';
+import { visibleMessages, hasUnread, markAllRead, dismissMessage, updateNavDot } from '../data/messages.js';
 import { conditionReadback, shortDate } from '../data/arc-readback.js';
 
 import {
@@ -719,6 +726,7 @@ export function SettingsView(router) {
 
   /** Row screens: an existing panel each, or one part of one. */
   const SCREENS = {
+    messages:     { title: 'Messages',                render: () => renderMessagesScreen() },
     profile:      { title: 'Your profile',            render: () => renderProfilePanel() },
     movement:     { title: 'How you move',            render: () => `<div class="settings-section">${renderMovementSection()}</div>` },
     conditions:   { title: 'Sore or injured areas', render: () => renderConditionsPanel() },
@@ -804,6 +812,7 @@ export function SettingsView(router) {
 
     return `
       ${_group('You', [
+        _row({ label: 'Messages', value: hasUnread() ? 'New' : 'Nothing new', open: 'messages' }),
         _row({ label: 'Name', value: store.get('name') || 'Not set', open: 'profile', focus: '#settings-name' }),
         _row({ label: 'Age range', value: ageLbl, open: 'profile', focus: '#settings-agebandsel' }),
         _row({ label: 'Gender', value: _label(GENDERS, store.get('gender'), 'Prefer not to say'), open: 'profile', focus: '#settings-gender' }),
@@ -902,6 +911,28 @@ export function SettingsView(router) {
       _saved(container, 'The file could not be made on this device.');
     }
     return { name, text };
+  }
+
+  /** B4. Settings › Messages: what is published, newest first, and the News switch. */
+  function renderMessagesScreen() {
+    const list = visibleMessages();
+    const items = list.map(m => `
+        <li class="settings-message" id="msg-${_esc(m.id)}">
+          <h2 class="settings-message__title">${_esc(m.title)}</h2>
+          <p class="settings-message__date">${_esc(describeDate(m.publishedAt + 'T12:00:00Z') || '')}</p>
+          <p class="settings-message__body">${_esc(m.body)}</p>
+          ${m.link ? `<p><a class="settings-message__link" href="${_esc(m.link.href)}" target="_blank" rel="noopener noreferrer">${_esc(m.link.text)}<span class="sr-only"> (opens in a new tab)</span></a></p>` : ''}
+          ${m.kind === 'research' ? `<div class="settings-message__research" data-research="${_esc(m.action)}" data-msg="${_esc(m.id)}"></div>` : ''}
+          <button class="btn btn-ghost btn-small" data-dismiss-msg="${_esc(m.id)}" aria-label="Dismiss: ${_esc(m.title)}">Dismiss</button>
+        </li>`).join('');
+    return `
+      <div class="settings-section">
+        <p class="settings-data-about">Short messages from Build New Habits: about the app, and now and then a question for you. They never contain safety or medical information, and nothing about you is sent to fetch them.</p>
+        ${list.length ? `<ul class="settings-messages">${items}</ul>` : `<p class="settings-message__none">No messages at the moment.</p>`}
+        <ul class="settings-rows">
+          ${_rowSwitch({ id: 'settings-news', label: 'News from Build New Habits', sub: 'News about the app and the causes the community supports. Off unless you turn it on.', field: 'messages.newsOn' })}
+        </ul>
+      </div>`;
   }
 
   /** B2. The file, locked with the password, saved on this device. */
@@ -2281,6 +2312,16 @@ export function SettingsView(router) {
         activeScreen = btn.dataset.open;
         focusAfter = btn.dataset.focus || '.settings-title';
         render(container);
+        // B4. Seen once the screen is open: the dot goes.
+        if (activeScreen === 'messages') markAllRead();
+      });
+    });
+    container.querySelectorAll('[data-dismiss-msg]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        dismissMessage(btn.dataset.dismissMsg);
+        focusAfter = '.settings-title';
+        render(container);
+        _saved(container, 'Dismissed.');
       });
     });
     container.querySelectorAll('[data-go]').forEach(btn => {
@@ -2391,6 +2432,13 @@ export function SettingsView(router) {
         // SMOOTH-P4c. These two reveal a row beneath them (the reminder
         // time; your weight and units), so the screen is drawn again and
         // focus goes back to the switch that was pressed.
+        // B4. News shows or hides messages, so the list and the dot change.
+        if (field === 'messages.newsOn') {
+          updateNavDot();
+          if (next) markAllRead();
+          focusAfter = `#${btn.id}`;
+          render(container);
+        }
         if (field === 'weightTracking' || field === 'checkInNotification.enabled') {
           focusAfter = `#${btn.id}`;
           render(container);

@@ -3,6 +3,12 @@ import { RETIRED_CONDITIONS } from "./data/scope-statement.js";
 
 /**
  * store.js - Data persistence layer
+ * 01 Oct 2026 v101
+ *
+ * v101 - B4 MESSAGES (Schema v1.96). messages: { list, fetchedAt, read,
+ *   dismissed, newsOn }. The last list fetched from messages.json, what has
+ *   been seen or dismissed, and the News switch (off). Nothing in it is sent.
+ *
  * 01 Oct 2026 v100
  *
  * v100 - BUNDLE-TRUE (Schema v1.95). No new fields. Found by the independent
@@ -1423,6 +1429,17 @@ export const store = {
           }
         : defaults.inStepProgress,
 
+      // v101 B4. Each part checked; anything malformed falls back.
+      messages: (saved.messages && typeof saved.messages === 'object')
+        ? {
+            list:      Array.isArray(saved.messages.list)      ? saved.messages.list      : [],
+            fetchedAt: typeof saved.messages.fetchedAt === 'string' ? saved.messages.fetchedAt : null,
+            read:      Array.isArray(saved.messages.read)      ? saved.messages.read      : [],
+            dismissed: Array.isArray(saved.messages.dismissed) ? saved.messages.dismissed : [],
+            newsOn:    saved.messages.newsOn === true,
+          }
+        : { list: [], fetchedAt: null, read: [], dismissed: [], newsOn: false },
+
       // ── JOURNAL SETTINGS ──────────────────────────────────────
       journalSettings: (saved.journalSettings && typeof saved.journalSettings === 'object')
         ? {
@@ -2544,6 +2561,9 @@ export const store = {
       journalEntries:        [],
       noticingWeekInCycle:   1,
       noticingLastTriggered: null,
+
+      // ── MESSAGES (v101, B4) ───────────────────────────────────
+      messages: { list: [], fetchedAt: null, read: [], dismissed: [], newsOn: false },
 
       // ── JOURNAL SETTINGS ──────────────────────────────────────
       journalSettings: {

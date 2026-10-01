@@ -2,6 +2,7 @@
  * css/components/settings.css
  * 01 Oct 2026 v14
  *   B2 RESTORE-LOCK. .settings-dialog__error: a form error in words, with a rule.
+ *   B4 MESSAGES. .settings-message*, .nav-dot.
  * 01 Oct 2026 v13
  *   PT-3. .settings-data-about: How your data is kept, in words.
  * 28 Sep 2026 v12
@@ -743,6 +744,24 @@
   display: flex;
   gap: var(--space-3);
   justify-content: flex-end;
+}
+
+/* B4 MESSAGES. The list, and the dot on the Settings tab. The dot is a
+   shape beside the icon; the tab's accessible name also changes to
+   "Settings, new message", so it never rests on colour alone. */
+.settings-messages { list-style: none; margin: 0 0 var(--space-5); padding: 0; display: flex; flex-direction: column; gap: var(--space-4); }
+.settings-message { padding: var(--space-4); background: var(--color-bg-elevated); border: 1px solid var(--color-border); border-radius: var(--radius-lg); }
+.settings-message__title { font-size: var(--text-base); font-weight: var(--font-bold); color: var(--color-text); margin: 0 0 var(--space-1); }
+.settings-message__date { font-size: var(--text-xs); color: var(--color-text-secondary); margin: 0 0 var(--space-2); }
+.settings-message__body { font-size: var(--text-sm); color: var(--color-text); line-height: var(--leading-relaxed); margin: 0 0 var(--space-2); white-space: pre-line; }
+.settings-message__link { color: var(--color-primary); text-decoration: underline; }
+.settings-message__research { margin: var(--space-3) 0; }
+.settings-message__none { color: var(--color-text-secondary); margin: 0 0 var(--space-5); }
+.nav-dot {
+  position: absolute; top: 6px; right: 18px;
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--color-primary);
+  border: 2px solid var(--color-bg-card);
 }
 
 /* B2 RESTORE-LOCK. A form's error, said in words (role="alert") and marked

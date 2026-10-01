@@ -1,5 +1,12 @@
 /**
  * app.js - Application entry point
+ * 01 Oct 2026 v9
+ *
+ * v9 - B4 MESSAGES. After the first screen is up, the dot on the Settings
+ *   tab is set from the messages already kept, then messages.json is
+ *   fetched (relative, nothing about the person sent) and the dot set again.
+ *   It never blocks or delays the first screen.
+ *
  * 03 Aug 2026 v8
  *
  * v8 — Tier-gating build (S4-TG, 9 May scope, implemented 03 Aug). New
@@ -33,6 +40,7 @@ import { store }              from './store.js';
 import { router }             from './router.js';
 import { requestExit }        from './session-guard.js';
 import { initPaywallListener } from './auth.js';
+import { refreshMessages, updateNavDot } from './data/messages.js';
 
 // ── Globals — set immediately, before anything else runs ──────────────────────
 window.router = router;
@@ -185,6 +193,10 @@ const App = {
     if (nav && NAV_VIEWS.has(firstView)) {
       nav.classList.remove('hidden');
     }
+
+    // B4 MESSAGES. Last, and not awaited: it must never hold the app up.
+    updateNavDot();
+    refreshMessages();
   },
 
   checkForUpdate,
