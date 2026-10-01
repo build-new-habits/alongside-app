@@ -1,6 +1,10 @@
 /**
  * tools/verify-health-consent.mjs
- * 01 Oct 2026 v2
+ * 01 Oct 2026 v3
+ *
+ * v3 - AGE-CHECK. Onboarding asks when you were born before consent; the
+ *   fixture answers as an adult (January 1990), and fixtures with consent
+ *   record an adult age. No assertion changed.
  *
  * v2 - Onboarding is mounted in its own element: its timers outlive test 1
  *   and crashed the run once in a parallel suite when main was repainted.
@@ -78,7 +82,7 @@ const go = async r => { landed = []; await router.navigate(r); await wait(10); r
 function fixture({ consent = true, health } = {}) {
   localStorage.clear(); store.init();
   store.set("onboardingComplete", true); store.set("name", "Sam"); store.set("tier", "personal");
-  if (consent) { store.set("consent.given", true); store.set("consent.at", new Date().toISOString()); }
+  if (consent) { store.set("consent.given", true); store.set("consent.at", new Date().toISOString()); store.set("consent.ageConfirmed", true); }
   if (health !== undefined) store.set("consent.health", health);
   HC?.takePendingRoute?.();
   router.currentView = "today"; router.history = [];
@@ -94,6 +98,7 @@ const View = tv.OnboardingThreadView || tv.ThreadView || Object.values(tv).find(
 // later tests repaint main (seen once under a parallel run).
 const obEl = document.createElement("div"); document.body.appendChild(obEl);
 const thread = View({ navigate() {}, back() {} }); thread.mount(obEl); await wait(2600);
+  { const mo = obEl.querySelector("#ob-age-month"), yr = obEl.querySelector("#ob-age-year"); if (mo && yr) { mo.value = "1"; yr.value = "1990"; obEl.querySelector("#ob-age-continue").dispatchEvent(new dom.window.Event("click")); await wait(20); } }
 const t1 = obEl.querySelector("#ob-consent-check"), t2 = obEl.querySelector("#ob-consent-health");
 ok("1pc. positive control: the consent screen is up", !!t1);
 ok("1a. a second tick, for health answers, with its own label",

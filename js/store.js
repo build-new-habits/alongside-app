@@ -3,7 +3,11 @@ import { RETIRED_CONDITIONS } from "./data/scope-statement.js";
 
 /**
  * store.js - Data persistence layer
- * 01 Oct 2026 v95
+ * 01 Oct 2026 v96
+ *
+ * v96 - AGE-CHECK (Schema v1.91). consent.ageConfirmed is live: true 18 or
+ *   over, false under 18 (and nothing else kept), null never asked. With
+ *   consent.ageCheckedAt and consent.ageVersion. No date of birth is stored.
  *
  * v95 - PT-3 TRUE-PRIVACY-WORDS (Schema v1.90). Perimenopause and Menopause
  *   are no longer sore areas: a stored one is dropped on load, without the
@@ -1841,10 +1845,12 @@ export const store = {
         given:         false,  // bool — affirmative tick only
         at:            null,   // ISO string|null
         policyVersion: null,   // string|null — see POLICY_VERSION in thread.js
-        // Reserved. The age gate is built but INERT — see AGE_GATE_ENABLED
-        // in thread.js. Stays null until the ToS 13+/16+ contradiction
-        // (Stream A, A1.11) is resolved and Natalie's written advice lands.
+        // AGE-CHECK, 01 Oct 2026. Live: true = 18 or over, false = under
+        // 18 (everything else deleted), null = never asked. Only the result
+        // is kept, never the date of birth. See js/data/age-check.js.
         ageConfirmed:  null,   // bool|null
+        ageCheckedAt:  null,   // ISO string|null
+        ageVersion:    null,   // string|null
         // PT-2, 01 Oct 2026. Explicit consent for health answers, apart
         // from the Privacy-and-Terms tick. given: true | false (withdrawn)
         // | null (never asked: an install from before this existed).

@@ -1,6 +1,9 @@
 /**
  * tools/verify-privacy-words.mjs
- * 01 Oct 2026 v1
+ * 01 Oct 2026 v2
+ *
+ * v2 - AGE-CHECK. Onboarding asks when you were born before consent; the
+ *   fixture answers as an adult (January 1990). No assertion changed.
  *
  * PT-3 TRUE-PRIVACY-WORDS and PT-4 QUIET-JOURNAL. Every privacy line the
  * app shows is true of what the app does (facts sheet, 30 Sep).
@@ -65,6 +68,7 @@ localStorage.clear(); store.init();
 const { ThreadView } = await import(B + "views/onboarding/thread.js");
 const obEl = document.createElement("div"); document.body.appendChild(obEl);
 ThreadView({ navigate() {} }).mount(obEl); await wait(2600);
+  { const mo = obEl.querySelector("#ob-age-month"), yr = obEl.querySelector("#ob-age-year"); if (mo && yr) { mo.value = "1"; yr.value = "1990"; obEl.querySelector("#ob-age-continue").dispatchEvent(new dom.window.Event("click")); await wait(20); } }
 const bullets = txt(obEl.querySelector(".ob-consent__list"));
 ok("1pc. positive control: the bullets are on screen", bullets.length > 40);
 ok("1a. kept on this phone, with no account and no server copy", /kept on this phone/i.test(bullets) && /no account/i.test(bullets) && /server/i.test(bullets), bullets);

@@ -1,5 +1,12 @@
 /**
  * js/views/onboarding/thread.js
+ * 01 Oct 2026 v18
+ *
+ * v18 - AGE-CHECK. The age gate is live: before consent, a neutral question
+ *   (month and year of birth, kept only as 18-or-over yes/no). Under 18
+ *   goes to the under-18 screen and nothing else is kept. AGE_GATE_ENABLED
+ *   is gone; js/data/age-check.js holds the rule.
+ *
  * 01 Oct 2026 v17
  *
  * v17 - PT-2 HEALTH-CONSENT / PT-1. A second tick, for health answers
@@ -248,6 +255,7 @@ import {
 }                             from '../../data/onboarding-thread-data.js';
 import { openSheet }          from './sheet-manager.js';
 import { HEALTH_TICK, HEALTH_NOTE, giveHealthConsent } from '../../data/health-consent.js';
+import { ageQuestionHTML, readAge, recordAge } from '../../data/age-check.js';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MOTION PREFERENCE
@@ -325,8 +333,9 @@ export function ThreadView(router) {
           // 11 Aug 2026 (WOW-0): consent is a gate, not a step. It runs
           // before Step 1 and is skipped entirely once already given, so
           // returning mid-onboarding never re-asks.
-          if (_needsConsent()) _renderConsentGate();
-          else                 _beginThread();
+          if (_needsAge())          _renderAgeGate();
+          else if (_needsConsent()) _renderConsentGate();
+          else                      _beginThread();
         }, 400);
       }, STEPS[0].durationMs);
     });
@@ -362,12 +371,36 @@ export function ThreadView(router) {
   // way to tell who needs re-consent.
   const POLICY_VERSION = '2026-10-01';
 
-  // AGE GATE — BUILT BUT INERT. Do not switch on until the ToS 13+ vs
-  // business-doc 16+ contradiction (Stream A, A1.11) is resolved AND
-  // Natalie's written advice has landed. Flipping this to true without
-  // that is worse than leaving it off: it produces an audit trail
-  // asserting an eligibility check that has no agreed rule behind it.
-  const AGE_GATE_ENABLED = false;
+  // AGE-CHECK, 01 Oct 2026. The gate is live; the rule is in
+  // js/data/age-check.js. Asked before consent, so somebody under 18 is
+  // never asked to agree to anything and nothing of theirs is kept.
+  function _needsAge() {
+    const a = store.get('consent.ageConfirmed');
+    return a !== true && a !== false;
+  }
+
+  function _renderAgeGate() {
+    _thread.innerHTML = `
+      <section class="ob-age" aria-labelledby="ob-age-heading">
+        <h1 class="ob-consent__heading" id="ob-age-heading">Before we start</h1>
+        ${ageQuestionHTML('ob-age')}
+        <button class="btn btn-primary btn-large btn-full" id="ob-age-continue">Continue</button>
+      </section>`;
+    _thread.querySelector('#ob-age-continue')?.addEventListener('click', () => {
+      const adult = readAge(_thread, 'ob-age');
+      if (adult === null) {
+        const err = _thread.querySelector('#ob-age-error');
+        if (err) err.textContent = 'Choose a month and a year.';
+        [..._thread.querySelectorAll('.age-q__select')].find(x => !x.value)?.focus();
+        return;
+      }
+      recordAge(adult);
+      if (!adult) { router.navigate('under-18'); return; }
+      if (_needsConsent()) _renderConsentGate();
+      else { _thread.innerHTML = ''; _beginThread(); }
+    });
+    _thread.querySelector('#ob-age-heading')?.focus();
+  }
 
   function _needsConsent() {
     return store.get('consent.given') !== true;
@@ -480,9 +513,6 @@ export function ThreadView(router) {
       store.set('consent.at',            new Date().toISOString());
       store.set('consent.policyVersion', POLICY_VERSION);
       giveHealthConsent();
-      if (AGE_GATE_ENABLED) {
-        // Reserved. Nothing writes ageConfirmed while the gate is inert.
-      }
       _beginThread();
     });
 

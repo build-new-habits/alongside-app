@@ -1,6 +1,9 @@
 /**
  * tools/verify-onboarding-echoes.mjs
- * 01 Oct 2026 v2
+ * 01 Oct 2026 v3
+ *
+ * v3 - AGE-CHECK. Onboarding asks when you were born before consent; the
+ *   fixture answers as an adult (January 1990). No assertion changed.
  *
  * v2 - PT-2 HEALTH-CONSENT. Onboarding's consent has a second tick, for
  *   health answers; the fixture ticks both. No assertion changed.
@@ -55,6 +58,7 @@ localStorage.clear(); store.init();
 const el = document.createElement("div"); document.body.appendChild(el);
 ThreadView(rtr).mount(el);
 await wait(2500);
+  { const mo = el.querySelector("#ob-age-month"), yr = el.querySelector("#ob-age-year"); if (mo && yr) { mo.value = "1"; yr.value = "1990"; el.querySelector("#ob-age-continue").dispatchEvent(new dom.window.Event("click")); await wait(20); } }
 const check = el.querySelector("#ob-consent-check");
 check.checked = true; check.dispatchEvent(new dom.window.Event("change"));
 { const h = el.querySelector("#ob-consent-health"); if (h) { h.checked = true; h.dispatchEvent(new dom.window.Event("change")); } }

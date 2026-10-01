@@ -1,6 +1,11 @@
 /**
  * router.js
- * 01 Oct 2026 v37
+ * 01 Oct 2026 v38
+ *
+ * v38 - AGE-CHECK. 'age-check' and 'under-18', reached only through a guard
+ *   that runs first: somebody who said they are under 18 sees only the
+ *   under-18 screen (and the privacy summary); an install from before the
+ *   check is asked once. See js/data/age-check.js.
  *
  * v37 - PT-2, HEALTH-CONSENT. 'health-consent', reached only through a
  *   guard in navigate(): before the check-in, I know what I want or the
@@ -399,6 +404,9 @@ const VIEW_NAMES = {
   'red-flag':           { path: './views/red-flag.js',         fn: 'RedFlagView'           },
   // PT-2, 01 Oct 2026. Reached only through the guard in navigate().
   'health-consent':     { path: './views/health-consent.js',   fn: 'HealthConsentView'     },
+  // AGE-CHECK, 01 Oct 2026. Reached only through the guard in navigate().
+  'age-check':          { path: './views/age-check.js',        fn: 'AgeCheckView'          },
+  'under-18':           { path: './views/under-18.js',         fn: 'Under18View'           },
 };
 
 const hideNavViews = new Set([
@@ -421,13 +429,15 @@ const hideNavViews = new Set([
   'red-flag',
   // PT-2. The same: a consent is read, not glanced at.
   'health-consent',
+  // AGE-CHECK. Nothing else to go to from either.
+  'age-check', 'under-18',
   // SMOOTH-P3c. A session in progress, with its own Exit and Finish.
   'capture',
 ]);
 
 const NAV_MAP = {
   'today': 'today', 'checkin': 'today', 'checkin-mini': 'today',
-  'coach-proposal': 'today', 'red-flag': 'today', 'health-consent': 'today',
+  'coach-proposal': 'today', 'red-flag': 'today', 'health-consent': 'today', 'age-check': 'today', 'under-18': 'today',
   'home-threshold': 'today', 'reflect': 'today',
   'workout': 'today', 'gym-programme': 'today', 'morning-session': 'today',
   'core-session': 'today', 'yoga-session': 'today', 'walk-session': 'today',
@@ -488,6 +498,16 @@ export const router = {
     if (!VIEW_NAMES[viewName]) {
       console.warn(`Router: unknown view "${viewName}" — falling back to today`);
       viewName = 'today';
+    }
+
+    // AGE-CHECK, 01 Oct 2026. First of all: under 18 sees only the
+    // under-18 screen; an install from before the check is asked once.
+    try {
+      if (!this._ac) this._ac = await import('./data/age-check.js');
+      const to = this._ac.guardRoute(viewName);
+      if (to) viewName = to;
+    } catch (err) {
+      console.error('Router: age-check guard failed', err);
     }
 
     // PT-2, 01 Oct 2026. Before a health question, health consent if it
