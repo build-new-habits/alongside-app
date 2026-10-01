@@ -1,7 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 30 Sep 2026 v613
+ * 01 Oct 2026 v614
+ *
+ * v614 - PT-2: health answers get their own consent, and Delete my health answers.
  *
  * v613 - PT-1: Inter served from the app (fonts precached); Sentry sends errors only.
  *
@@ -4155,7 +4157,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v613";
+const CACHE_NAME = "alongside-v614";
 
 const SHELL_URLS = [
 
@@ -4304,10 +4306,12 @@ const SHELL_URLS = [
   "/alongside-app/js/views/library.js",
   "/alongside-app/js/views/practices.js",
   "/alongside-app/js/views/red-flag.js",
+  "/alongside-app/js/views/health-consent.js",
   "/alongside-app/js/data/arc-readback.js",
   "/alongside-app/js/data/tier-table.js",
   "/alongside-app/js/views/know-what.js",
   "/alongside-app/js/data/red-flag.js",
+  "/alongside-app/js/data/health-consent.js",
   "/alongside-app/js/views/my-programme.js",
   "/alongside-app/js/session-builder.js",
   "/alongside-app/js/data/session-choice.js",
