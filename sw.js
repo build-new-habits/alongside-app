@@ -1,7 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 01 Oct 2026 v614
+ * 01 Oct 2026 v615
+ *
+ * v615 - PT-3/PT-4: every privacy line true; reminders gone; quiet journaling opens the real journal.
  *
  * v614 - PT-2: health answers get their own consent, and Delete my health answers.
  *
@@ -4157,7 +4159,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v614";
+const CACHE_NAME = "alongside-v615";
 
 const SHELL_URLS = [
 
