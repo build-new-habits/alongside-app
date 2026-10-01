@@ -2,6 +2,7 @@
  * tools/verify-outbound.mjs
  * 01 Oct 2026 v3
  *
+ * v3 - B3 DOMAIN: 2e reads the offline list's relative paths (sw.js v624).
  * v3 - B5 EVIDENCE. The app now has exactly one way to send something it
  *   made: js/data/evidence.js, to the survey receiver, only once the person
  *   presses Send, and only while the receiver is set. 4b-4d hold it to that:
@@ -84,9 +85,9 @@ ok("2d. the styles load it", /@import\s+(?:url\()?["']?(?:\.\/)?base\/fonts\.css
    "fonts.css is not imported by main.css or linked from the page");
 const sw = read("sw.js");
 const shell = sw.slice(sw.indexOf("const SHELL_URLS"), sw.indexOf("];", sw.indexOf("const SHELL_URLS")));
-const fontPaths = resolved.map(u => u.pathname.replace(new URL(ROOT).pathname, "/alongside-app/"));
+const fontPaths = resolved.map(u => u.pathname.replace(new URL(ROOT).pathname, "./"));
 ok("2e. the service worker keeps the font and its stylesheet for offline use",
-   fontPaths.length >= 4 && fontPaths.every(p => shell.includes(`"${p}"`)) && shell.includes('"/alongside-app/css/base/fonts.css"'),
+   fontPaths.length >= 4 && fontPaths.every(p => shell.includes(`"${p}"`)) && shell.includes('"./css/base/fonts.css"'),
    fontPaths.filter(p => !shell.includes(`"${p}"`)).join(", ") || "css/base/fonts.css missing");
 
 // ── 3. SENTRY, LOCKED DOWN ──────────────────────────────────────────────

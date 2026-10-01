@@ -936,7 +936,7 @@ export function SettingsView(router) {
     const f = figuresPayload();
     const band = f.plan_band === 'none' ? 'None (free tier)' : 'Not known yet';
     const rows = [
-      ['Free tier or the Plan', f.tier === 'plan' ? 'The Plan' : 'Free tier'],
+      ['Free tier or the Plan', f.tier !== 'free' ? 'The Plan' : 'Free tier'],
       ['Time on the Plan', band],
       ['Sessions a week, your first four weeks', String(f.first_weeks)],
       ['Sessions a week, your latest four weeks', String(f.latest_weeks)],

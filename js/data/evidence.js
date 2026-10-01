@@ -119,7 +119,8 @@ export async function sendEvidence(payload, fetchImpl = globalThis.fetch) {
       body: JSON.stringify(body),
     });
     if (!res || !res.ok) return false;
-    store.set(payload.kind === "survey" ? "evidence.surveyDone" : "evidence.figuresDone", true);
+    if (payload.kind === "survey") store.set("evidence.surveyDone", true);
+    else store.set("evidence.figuresDone", true);
     return true;
   } catch { return false; }
 }

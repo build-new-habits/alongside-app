@@ -1,5 +1,9 @@
 /**
  * tools/verify-precache-check.mjs
+ * 01 Oct 2026 v2
+ *
+ * v2 - B3 DOMAIN. The offline list is relative ("./…") from sw.js v624.
+ *
  * 12 Aug 2026 v1
  *
  * INF-CACHE gate. Walks the filesystem and compares it to SHELL_URLS in
@@ -32,13 +36,14 @@ const _GATE_ROOT = new URL("../", import.meta.url);
 const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
 
 
-const PREFIX = "/alongside-app/";
+// B3 DOMAIN, sw.js v624: the list is relative to the service worker.
+const PREFIX = "./";
 const sw = fs.readFileSync(_gatePath("sw.js"), "utf8");
 
 // Only SHELL_URLS itself, not comments elsewhere in the file.
 const block = sw.slice(sw.indexOf("const SHELL_URLS"), sw.indexOf("];", sw.indexOf("const SHELL_URLS")));
 const urls = new Set(
-  [...block.replace(/\/\/[^\n]*/g, "").matchAll(new RegExp(`"${PREFIX}([^"]+)"`, "g"))].map(m => m[1])
+  [...block.replace(/\/\/[^\n]*/g, "").matchAll(new RegExp(`"${PREFIX.replace(/\./g, "\\.")}([^"]+)"`, "g"))].map(m => m[1])
 );
 
 const walk = (dir, exts) => {

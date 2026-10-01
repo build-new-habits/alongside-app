@@ -1,5 +1,10 @@
 /**
  * tools/verify-sw1.mjs
+ * 01 Oct 2026 v2
+ *
+ * v2 - B3 DOMAIN. The offline fallback is "./index.html" (sw.js v624, every
+ *   path relative). Same rule: scoped to this version's cache.
+ *
  * 12 Aug 2026 v1
  *
  * SW-1. The current cache is the only one that may answer a fetch.
@@ -53,7 +58,7 @@ check("caches.match() appears nowhere", () => {
      `sw.js honestly reports the newest`);
 });
 check("the offline fallback is also scoped", () => {
-  ok(/cache\.match\("\/alongside-app\/index\.html"\)/.test(code),
+  ok(/cache\.match\("\.\/index\.html"\)/.test(code),
      "an offline navigation must get THIS version's shell, not any older one");
 });
 

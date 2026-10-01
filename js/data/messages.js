@@ -121,8 +121,8 @@ export function visibleMessages() {
   return all
     .filter(x => x && !dismissed.has(x.id))
     .filter(x => x.kind !== "news" || m.newsOn === true)
-    .filter(x => x.audience?.tier !== "plan" || plan)
-    .filter(x => x.audience?.tier !== "free" || !plan)
+    // "any", "free" or "plan" in the published file; the store says free/personal.
+    .filter(x => { const want = x.audience?.tier || "any"; return want === "any" || (want === "free") === !plan; })
     .filter(x => x.audience?.minSessions == null || sessions >= x.audience.minSessions)
     .filter(x => x.audience?.minPlanWeeks == null)   // not known until the pass exists
     .sort((a, b) => String(b.publishedAt).localeCompare(String(a.publishedAt)));
