@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 01 Oct 2026 v619
+ * 01 Oct 2026 v620
  *
+ * v620 - LEGAL-TRUE 2: deleting health answers also covers a target weight and check-in answers kept with sessions.
  * v619 - LEGAL-TRUE: deleting health answers covers the body answers, reset clears every key, on-device voice only.
  * v618 - CONSENT-VERSION: a changed policy is agreed to again before carrying on.
  *
@@ -4166,7 +4167,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v619";
+const CACHE_NAME = "alongside-v620";
 
 const SHELL_URLS = [
 
