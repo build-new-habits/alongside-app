@@ -1,6 +1,13 @@
 /**
  * quiet-session.js - Something Quieter View
  *
+ * 01 Oct 2026 v8 - PT-4 QUIET-JOURNAL. The Journaling card opens the real
+ *   journal (journal-entry). Its own save replaced the journalEntries array
+ *   with an object keyed by date, and the next load then emptied every
+ *   entry. It was reachable: Library > a quiet practice > Back >
+ *   Journaling. saveJournalEntry() now adds to the array, should anything
+ *   reach it.
+ *
  * 28 Sep 2026 v7 - BREATH-CLAIMS (Smooth Path P0, C1). This file's older
  *   breathing mode carried the same claims as breathing-session.js, some
  *   stronger: a named neuroscientist, "drop your heart rate measurably",
@@ -370,7 +377,7 @@ function renderModeSelector() {
           <span class="quiet-mode-icon" aria-hidden="true">\uD83D\uDCDD</span>
           <div>
             <h3>Journaling</h3>
-            <p class="text-sm text-muted">Two prompts chosen for how you are feeling today.</p>
+            <p class="text-sm text-muted">Write anything. Only you can read it.</p>
           </div>
         </div>
         <span class="quiet-mode-arrow" aria-hidden="true">&rsaquo;</span>
@@ -615,10 +622,13 @@ function saveJournalEntry() {
     if (el?.value?.trim()) entries["prompt_" + i] = { prompt, response: el.value.trim() };
   });
 
-  const todayKey = new Date().toISOString().split("T")[0];
-  const existing = store.get("journalEntries") || {};
-  existing[todayKey] = { entries, savedAt: new Date().toISOString() };
-  store.set("journalEntries", existing);
+  // PT-4. Added to the array, never replacing it with an object.
+  const text = Object.values(entries).map(e => `${e.prompt}\n${e.response}`).join("\n\n");
+  if (text) {
+    const list = Array.isArray(store.get("journalEntries")) ? store.get("journalEntries") : [];
+    list.push({ id: `j-${Date.now()}`, date: new Date().toISOString(), text: text.slice(0, 5000), tags: ["quiet"], noWords: false });
+    store.set("journalEntries", list.slice(-200));
+  }
 
   journalSaved = true;
   rerender();
@@ -1087,6 +1097,14 @@ export function onMount() {
 
   document.querySelectorAll(".quiet-mode-card").forEach(card => {
     card.addEventListener("click", () => {
+      // PT-4. The real journal, not this file's old journaling mode.
+      if (card.dataset.mode === "journal") {
+        cleanup();
+        store.set("quietMode", null);
+        store.set("journalEntryType", null);
+        router.navigate("journal-entry");
+        return;
+      }
       mode = card.dataset.mode;
       store.set("quietMode", mode);
       rerender();

@@ -1,6 +1,10 @@
 /**
  * conditions.js — Condition definitions for onboarding and check-in
  *
+ * 01 Oct 2026 v1.8
+ *   PT-3. Perimenopause and Menopause are no longer sore areas: everyday
+ *   states (W3-4), and nothing planned around them.
+ *
  * 29 Sep 2026 v1.7
  *   P0, SCOPE-MINOR (Graeme, 29 Sep). Alongside works around minor aches
  *   and injuries; it is not designed around medical conditions. Removed as
@@ -198,9 +202,9 @@ export const CONDITIONS = [
   { id: 'persistent-fatigue', name: 'Ongoing tiredness or low energy', icon: '😴', area: 'general', hasPhase: false, zone: 'systemic' },
   { id: 'anxiety',          name: 'Stress', icon: '😰', area: 'general', hasPhase: false, zone: 'systemic' },
 
-  // HORMONAL
-  { id: 'perimenopause',    name: 'Perimenopause symptoms', icon: '🌙', area: 'hormonal', hasPhase: false, zone: 'systemic' },
-  { id: 'menopause',        name: 'Menopause symptoms',     icon: '🌙', area: 'hormonal', hasPhase: false, zone: 'systemic' },
+  // HORMONAL -- PT-3, 01 Oct 2026. Perimenopause and Menopause removed:
+  // everyday states, not sore areas (W3-4), and nothing planned around
+  // them. A stored one is dropped on load (store.js _dropRetired).
 
   // CATCH-ALL
 ];

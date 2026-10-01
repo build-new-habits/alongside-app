@@ -1,5 +1,11 @@
 /**
  * tools/verify-nav5.mjs
+ * 01 Oct 2026 v3
+ *
+ * v3 - PT-3. The reminder switch is retired; staying on the page after a
+ *   switch is proved with Show your best instead (it does not repaint,
+ *   so focus is not part of the check).
+ *
  * 28 Sep 2026 v2
  *
  * v2 - SMOOTH-P4c. The sections and sub-tabs are retired: Settings is one
@@ -105,9 +111,9 @@ check("rows clear the 44px touch floor", () => {
 });
 
 console.log("\nTEST 4 - in-place actions keep you where you are");
-check("toggling the reminder stays on the page", () => {
-  page(); click(main.querySelector("#settings-checkin-notif"));
-  ok(!!main.querySelector(".settings-lede") && document.activeElement?.id === "settings-checkin-notif", "bounced");
+check("toggling a switch stays on the page", () => {
+  page(); click(main.querySelector("#settings-pb"));
+  ok(!!main.querySelector(".settings-lede") && !!main.querySelector("#settings-pb"), "bounced");
 });
 check("resetting display stays on Display", () => {
   page(); click(main.querySelector('[data-open="display"]')); click(main.querySelector("#disp-reset"));

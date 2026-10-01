@@ -3,7 +3,11 @@ import { RETIRED_CONDITIONS } from "./data/scope-statement.js";
 
 /**
  * store.js - Data persistence layer
- * 01 Oct 2026 v94
+ * 01 Oct 2026 v95
+ *
+ * v95 - PT-3 TRUE-PRIVACY-WORDS (Schema v1.90). Perimenopause and Menopause
+ *   are no longer sore areas: a stored one is dropped on load, without the
+ *   medical-conditions notice. hormonalTracking retired (nothing read it).
  *
  * v94 - PT-2 HEALTH-CONSENT (Schema v1.89). consent.health: explicit consent
  *   for health answers. deleteHealthAnswers() and deleteJournalEntry(id).
@@ -1771,6 +1775,16 @@ export const store = {
     }
     if (Array.isArray(data.conditionsResolved)) data.conditionsResolved = data.conditionsResolved.filter(r => !retired.has(r.id));
     if (had) data.scopeNoticeDue = true;
+    // PT-3, 01 Oct 2026. Everyday states, not sore areas (W3-4). Dropped
+    // quietly: the notice above is about medical conditions, which these
+    // are not.
+    const everyday = new Set(['perimenopause', 'menopause']);
+    if (Array.isArray(data.conditions)) data.conditions = data.conditions.filter(id => !everyday.has(id));
+    for (const f of ['conditionMeta', 'conditionPainScores']) {
+      if (data[f] && typeof data[f] === 'object') for (const id of everyday) delete data[f][id];
+    }
+    if (Array.isArray(data.conditionsResolved)) data.conditionsResolved = data.conditionsResolved.filter(r => !everyday.has(r.id));
+    delete data.hormonalTracking;
     if (Array.isArray(data.prescribedExercises)) {
       data.prescribedExercises = data.prescribedExercises
         .filter(e => e && e.prescribedBy !== 'coach' && e.prescribedBy !== 'coach-recommended')
@@ -1870,7 +1884,6 @@ export const store = {
       ageBand: null,
       age: null,          // DEPRECATED — kept for migration only. Do not write new values.
       gender: null,
-      hormonalTracking: false,
 
       // coachStyle: 'nurturing'|'steady'|'energetic'|'minimal'
       // Beta: Nurturing voice delivers for all style settings silently.

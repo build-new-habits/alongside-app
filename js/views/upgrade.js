@@ -1,6 +1,9 @@
 /**
  * upgrade.js - Upgrade / Membership view
- * 28 Sep 2026 v14
+ * 01 Oct 2026 v15
+ *
+ * v15 - PT-3. "All your data stays with your account": there are no
+ *   accounts. Now: it stays on this phone, whatever you decide.
  *
  * v14 - F7 LANDMARK. role="main" (and its label) removed from the view's
  *   wrapper: index.html's <main> is the one main landmark; a second,
@@ -391,8 +394,8 @@ export function render() {
         </button>
 
         <p class="upgrade-safety">
-          Nothing is lost. All your data stays with your account, whatever
-          you decide.
+          Nothing is lost. Everything you have done stays on this phone,
+          whatever you decide.
         </p>
       </div>
 

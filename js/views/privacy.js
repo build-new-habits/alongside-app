@@ -1,6 +1,14 @@
 /**
  * privacy.js - Privacy and Terms (in-app summary)
- * 28 Sep 2026 v4
+ * 01 Oct 2026 v5
+ *
+ * v5 - PT-3 TRUE-PRIVACY-WORDS. Every line checked against what the app
+ *   does (facts sheet, 30 Sep). Out: "Health conditions" (sore areas since
+ *   P0), "our servers" (there are none), "We never store more than we
+ *   need" (not provable), "we will notify you" (nothing could). In: where
+ *   it is kept (this phone, no account), Sentry and what it carries, the
+ *   journal and weight, health answers' own consent, the scope statement,
+ *   and every way to download or delete.
  *
  * v4 - SMOOTH-P4c. Your rights say how to use them: access and taking
  *   your data with you are Settings > Download your data (a file of
@@ -33,6 +41,8 @@
  * Reached from the consent gate's "read a summary here" link and from
  * Settings. Returns to previous view on back tap.
  */
+
+import { scopeStatementHTML } from "../data/scope-statement.js";
 
 export const centered = false;
 
@@ -69,21 +79,29 @@ export function render() {
       </div>
 
       <div class="privacy-section card">
-        <h2 class="privacy-heading">Your data and how we use it</h2>
+        <h2 class="privacy-heading">Where your answers are kept</h2>
         <p class="text-secondary">
-          Alongside is built on a simple principle: your data exists to help you,
-          not to help us. Here is exactly what we collect and why.
+          On this phone, in the app&rsquo;s own storage. There is no account and no
+          copy on a server. If you delete the app or clear its data, it is gone.
+        </p>
+        <p class="text-secondary" style="margin-top: var(--space-3);">
+          If something in the app breaks, a short error report goes to Sentry, the
+          service we use to fix faults, in Frankfurt. It says what broke and on which
+          screen, never what you told me. The app itself is delivered from GitHub
+          Pages, like any website. Links you tap, such as &ldquo;Watch how to do
+          this&rdquo;, open another site.
         </p>
       </div>
 
       <div class="privacy-section card">
-        <h2 class="privacy-heading">What we collect</h2>
+        <h2 class="privacy-heading">What the app keeps</h2>
         <ul class="privacy-list">
-          <li>Your name and age group — so the coach can address you personally and tailor sessions appropriately</li>
-          <li>Health conditions and pain levels — so sessions are safe and adapted for your body</li>
-          <li>Daily check-in data (energy, mood, pain) — so the coach responds to how you feel today, not how you felt last week</li>
-          <li>Session history — so the coach can notice patterns and improve over time</li>
-          <li>Equipment and goals — so sessions are practical and relevant</li>
+          <li>Your name and age group, if you give them, so the coach can talk to you properly</li>
+          <li>Your health answers, which you agree to separately: what&rsquo;s sore and how much, your check-ins (energy, mood, and sleep if you add it), so sessions leave out what is likely to make things worse</li>
+          <li>What you told me about balance and getting up and down, so sessions are safe for you</li>
+          <li>Your weight, only if you turn it on (Settings &rsaquo; Weight tracking). Only you see it</li>
+          <li>Your journal. Only you can read it; the coach never reads it</li>
+          <li>Your sessions, lifts, saved sessions, equipment and goals, so the coach can build on what you have done</li>
         </ul>
       </div>
 
@@ -93,52 +111,31 @@ export function render() {
           <li>We never sell your data to anyone</li>
           <li>We never share your data with advertisers</li>
           <li>We never use your data to make decisions about you outside of Alongside</li>
-          <li>We never store more than we need</li>
         </ul>
       </div>
 
       <div class="privacy-section card">
-        <h2 class="privacy-heading">Your rights</h2>
-        <p class="text-secondary">
-          You have the right to access, correct, or delete your data at any time,
-          and you can do all three yourself. <strong>Settings &rsaquo; Download your
-          data</strong> makes a file of everything the app keeps about you, your
-          journal included. It is made on your device and saved there; nothing is
-          sent anywhere to make it. You can correct anything in Settings, and
-          <strong>Reset all data</strong> removes it all from your device. Once
-          cloud backup is available, full account deletion will remove your data
-          from our servers within 30 days.
+        <h2 class="privacy-heading">Your rights, and how to use them</h2>
+        <ul class="privacy-list">
+          <li><strong>See it all:</strong> Settings &rsaquo; <strong>Download your data</strong> makes a file of everything the app keeps, your journal included, on this phone</li>
+          <li><strong>Correct it:</strong> anything you told me can be changed in Settings</li>
+          <li><strong>Delete your health answers:</strong> Settings &rsaquo; <strong>Delete my health answers</strong>. I will ask before keeping any again</li>
+          <li><strong>Delete a journal entry:</strong> Wellbeing &rsaquo; Your reflections &rsaquo; Delete</li>
+          <li><strong>Delete everything:</strong> Settings &rsaquo; <strong>Reset all data</strong></li>
+        </ul>
+        <p class="text-secondary text-sm" style="margin-top: var(--space-3);">
+          For anything else, write to hello@buildnewhabits.co.uk.
         </p>
       </div>
 
       <div class="privacy-section card">
         <h2 class="privacy-heading">Terms of Service</h2>
-        <p class="text-secondary">
-          Alongside is a movement companion, not a medical service. The sessions
-          and suggestions provided are for general wellness purposes only and are
-          not a substitute for professional medical advice, diagnosis, or treatment.
-          If you have a medical condition, please consult a qualified professional
-          before beginning any exercise programme.
+        ${scopeStatementHTML({ heading: "h3", id: "privacy-scope" })}
+        <p class="text-secondary" style="margin-top: var(--space-3);">
+          Alongside is a movement companion, not a medical service. Its sessions and
+          suggestions are general, and not a substitute for professional medical
+          advice, diagnosis or treatment.
         </p>
-        <!--
-          SCOPE-1, 08 Sep 2026. What this app is NOT for.
-
-          Clinical advice: "avoid giving exercise
-          advice to complex health groups where the risk is higher like
-          those mentioned CFS, long covid, EDS and people with
-          uncontrolled pain." On ME/CFS specifically: "exercise for this
-          population is out of the scope of an app... these people need
-          support and guidance from specialist teams."
-
-          🔴 Named here and NOT in onboarding, and that split is
-          deliberate. Terms is where somebody goes to find out exactly
-          what they are agreeing to, and vagueness there is unhelpful --
-          so the conditions are named. Onboarding is a conversation, and
-          a list of diagnoses in it reads as an exclusion notice, so it
-          describes the situation instead.
-
-          Same fact, twice, pitched at what each surface is for.
-        -->
         <p class="text-secondary" style="margin-top: var(--space-3);">
           Alongside is a general movement app. It is not designed for, and should
           not be used to guide exercise for, conditions where individual clinical
@@ -151,9 +148,8 @@ export function render() {
           relying on this app.
         </p>
         <p class="text-secondary" style="margin-top: var(--space-3);">
-          By using Alongside you agree to use it in accordance with these terms.
-          We reserve the right to update these terms — we will notify you of any
-          significant changes.
+          By using Alongside you agree to use it in accordance with these terms. The
+          current terms are always the ones on our website.
         </p>
       </div>
 

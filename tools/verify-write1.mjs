@@ -1,6 +1,8 @@
 /**
  * tools/verify-write1.mjs
- * 29 Sep 2026 v6
+ * 01 Oct 2026 v7
+ *
+ * v7 - PT-3. hormonalTracking left the baseline: the field is retired.
  *
  * v6 - P11. `lifestyle` leaves the one-ended baseline: Settings now reads
  *   the activity level onboarding writes there. The gate asked for this
@@ -138,7 +140,9 @@ const BASELINE = new Set([
   // the debt. This gate caught that itself, which is the direction that
   // matters: an allowlist that only ever grows is permission, not a
   // record.
-  'hormonalTracking','coachStyle','targetDescription',
+  // 'hormonalTracking' REMOVED 01 Oct 2026, PT-3: the field is retired
+  // (deleted on load), so it is no longer debt to record.
+  'coachStyle','targetDescription',
   // weightTracking — DECLARED DARK 22 Aug 2026 (WEIGHT-1a). The opt-in
   // for weight tracking. No writer until WEIGHT-1b builds the Settings
   // toggle; goal-review.js consumes it as a context argument, which this

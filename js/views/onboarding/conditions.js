@@ -1,6 +1,9 @@
 /**
  * conditions.js - Onboarding Step 5: Select conditions
  *
+ * 01 Oct 2026 v1.3
+ *   PT-3. No Hormonal group: Perimenopause and Menopause are not sore areas.
+ *
  * 29 Sep 2026 v1.2
  *
  * v1.2 - P0, SCOPE-MINOR (Graeme, 29 Sep). Asks about sore or injured
@@ -26,7 +29,6 @@ const AREA_GROUPS = [
   { area: "back",     label: "Back",          icon: "🔙" },
   { area: "upper",    label: "Upper body",    icon: "💪" },
   { area: "general",  label: "Everyday",      icon: "💙" },
-  { area: "hormonal", label: "Hormonal",      icon: "🌙" },
   { area: "other",    label: "Other",         icon: "❓" }
 ];
 

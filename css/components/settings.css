@@ -1,5 +1,7 @@
 /*
  * css/components/settings.css
+ * 01 Oct 2026 v13
+ *   PT-3. .settings-data-about: How your data is kept, in words.
  * 28 Sep 2026 v12
  *   SMOOTH-P5. .tier-table: Free and the Plan side by side. On a phone
  *   each row stacks, and each cell carries its column's name.
@@ -1079,3 +1081,14 @@ button.settings-row:focus-visible { outline: 3px solid var(--color-border-focus)
   .tier-table tbody th { font-size: var(--text-base); margin-bottom: var(--space-1); }
   .tier-table td::before { content: attr(data-label) ": "; font-weight: 600; color: var(--color-text-secondary); }
 }
+
+/* PT-3, 01 Oct 2026. How your data is kept, said before the buttons. */
+.settings-data-about {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+  line-height: 1.6;
+  color: var(--color-text);
+}
+.settings-data-about p { margin: 0; }

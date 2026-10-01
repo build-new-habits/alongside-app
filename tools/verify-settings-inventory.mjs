@@ -1,5 +1,12 @@
 /**
  * tools/verify-settings-inventory.mjs
+ * 01 Oct 2026 v4
+ *
+ * v4 - PT-3. The Reminders group is retired: nothing ever sent a reminder.
+ *   Seven groups; its controls join RETIRED; 2l (turning the reminder off
+ *   hid its time) now proves a switch changes in place, with Show your best.
+ *   verify-privacy-words proves the reminders absent.
+ *
  * 30 Sep 2026 v3
  *
  * v3 - W3-8 CYCLE-CLAIM. "Cycle-aware coaching" is retired: nothing read
@@ -90,7 +97,7 @@ console.log("\nTEST 0 - one page, grouped, saying that changes save");
 fixture(); page();
 ok("0a. \"Changes save as you make them.\"", /^Changes save as you make them\.$/.test(txt(main.querySelector(".settings-lede"))));
 const groups = [...main.querySelectorAll(".settings-group__title")].map(txt);
-ok("0b. the eight groups, in the spec's order", JSON.stringify(groups) === JSON.stringify(["You", "Goals and your week", "How the coach works", "Reminders", "Optional tracking", "Display", "Your plan and your data", "About"]), JSON.stringify(groups));
+ok("0b. the seven groups, in the spec's order (Reminders retired, PT-3)", JSON.stringify(groups) === JSON.stringify(["You", "Goals and your week", "How the coach works", "Optional tracking", "Display", "Your plan and your data", "About"]), JSON.stringify(groups));
 ok("0c. no tabs anywhere on it", !main.querySelector('[role="tablist"], [role="tab"]'));
 const val = label => txt([...main.querySelectorAll(".settings-row")].find(r => txt(r.querySelector(".settings-row__label")) === label)?.querySelector(".settings-row__value"));
 ok("0d. rows show their current value (Equipment: Gym 2 · Home 1; Sore or injured areas: 2 listed; Name: T)",
@@ -130,6 +137,13 @@ const RETIRED = {
   // coaching" was a claim the app could not back. verify-cycle-claim.
   "data-toggle=hormonalTracking": true,
   "#settings-hormonal": true,
+  // PT-3, 01 Oct: nothing ever sent a reminder. verify-privacy-words.
+  "data-field=checkInNotification.time": true,
+  "data-toggle=checkInNotification.enabled": true,
+  "data-toggle=waterReminderEnabled": true,
+  "#settings-checkin-notif": true,
+  "#settings-notif-time": true,
+  "#settings-water-reminder": true,
 };
 const missing = INV.filter(c => !/^data-action=save-/.test(c.control))
   .filter(c => !RETIRED[c.control])
@@ -177,9 +191,11 @@ ok("2j. a switch on the page works in place", store.get("liftLogEnabled") === fa
 const before = getDisplayPref("underline");
 click(main.querySelector("#disp-underline"));
 ok("2k. a display switch too", getDisplayPref("underline") !== before);
-click(main.querySelector("#settings-checkin-notif"));
-ok("2l. turning the reminder off hides its time and keeps focus on the switch", store.get("checkInNotification.enabled") === false &&
-   !main.querySelector('[data-open="notify"]') && document.activeElement?.id === "settings-checkin-notif");
+page();
+const pbBefore = store.get("showPersonalBests") === true;
+click(main.querySelector("#settings-pb"));
+ok("2l. a switch changes in place, on the page", (store.get("showPersonalBests") === true) !== pbBefore &&
+   !!main.querySelector(".settings-lede") && main.querySelector("#settings-pb")?.getAttribute("aria-checked") === String(!pbBefore));
 
 // ── 3. IT'S BETTER NOW ──────────────────────────────────────────────────
 console.log("\nTEST 3 - It's better now, and It's back: the person's call");
@@ -217,8 +233,10 @@ ok("5d. and it says so, politely", /downloading\. It is saved on this device onl
 {
   const priv = await import(B + "views/privacy.js");
   const t = priv.render().replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
-  ok("5e. the privacy page says how: Download your data, journal included, made and kept on the device",
-     /Download your data/.test(t) && /journal included/.test(t) && /saved there; nothing is sent anywhere/.test(t), t.slice(t.indexOf("Your rights"), t.indexOf("Your rights") + 300));
+  // PT-3: the page now says the file is made on this phone, beside the
+  // other ways to delete; verify-privacy-words holds the full wording.
+  ok("5e. the privacy page says how: Download your data, journal included, on this phone",
+     /Download your data/.test(t) && /journal included/.test(t) && /on this phone/.test(t), t.slice(t.indexOf("Your rights"), t.indexOf("Your rights") + 300));
 }
 
 // ── 6. TWO LEVELS, BOTH WAYS ────────────────────────────────────────────

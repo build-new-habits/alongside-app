@@ -1,6 +1,11 @@
 /**
  * settings.js
- * 01 Oct 2026 v49
+ * 01 Oct 2026 v50
+ *
+ * v50 - PT-3 TRUE-PRIVACY-WORDS. The Reminders group and panel are gone:
+ *   nothing ever sent a reminder. How your data is kept says how (this
+ *   phone, Sentry, download, delete). Display no longer says "your
+ *   account" -- there are no accounts.
  *
  * v49 - PT-2 HEALTH-CONSENT. Your plan and your data gains Delete my health
  *   answers (store.deleteHealthAnswers(): check-ins, sore areas and scores,
@@ -691,7 +696,6 @@ export function SettingsView(router) {
     reflection:   { title: 'Your reflection',         render: () => `<div class="settings-section">${renderReflectionSection()}</div>` },
     programme:    { title: 'Goals and your week',     render: () => renderProgrammePanel() },
     notes:        { title: 'Session notes',           render: () => renderLiftLogPanel() },
-    notify:       { title: 'Reminders',               render: () => renderNotifyPanel() },
     weight:       { title: 'Your weight',             render: () => `<div class="settings-section">${_weightSection(store.get('weightTracking') === true, store.get('weightUnit') || 'kg', store.get('weight'))}</div>` },
     display:      { title: 'Display',                 render: () => renderDisplayPanel() },
     'about-plan': { title: 'Your plan',               render: () => renderPanel('about-plan') },
@@ -761,7 +765,6 @@ export function SettingsView(router) {
     const progMeta = prog.programmeId ? getProgramme(prog.programmeId) : null;
     const prefs    = Object.keys(store.get('exercisePreferences') || {}).length;
     const VARIETY  = [{ id: 'familiar', label: 'Mostly the same' }, { id: 'balanced', label: 'A bit of both' }, { id: 'varied', label: 'Something different' }];
-    const reminder = store.get('checkInNotification') || {};
     const scheme   = getDisplayPref('scheme') || 'dark';
     const ageLbl   = _label(AGE_CHIPS, store.get('ageBand'), 'Not set');
     const GENDERS  = [{ id: 'female', label: 'Female' }, { id: 'male', label: 'Male' }, { id: 'non-binary', label: 'Non-binary' }, { id: 'other', label: 'Other' }];
@@ -796,12 +799,6 @@ export function SettingsView(router) {
         _rowSwitch({ id: 'settings-pb', label: 'Show your best', sub: 'Beside your last note. Off unless you want it.', field: 'showPersonalBests' }),
         _row({ label: 'About session notes', open: 'notes' }),
         renderReflectionSection() ? _row({ label: 'Your reflection', open: 'reflection' }) : '',
-      ])}
-
-      ${_group('Reminders', [
-        _rowSwitch({ id: 'settings-checkin-notif', label: 'Check-in reminder', field: 'checkInNotification.enabled' }),
-        reminder.enabled ? _row({ label: 'Reminder time', value: reminder.time || 'Not set', open: 'notify', focus: '#settings-notif-time' }) : '',
-        _rowSwitch({ id: 'settings-water-reminder', label: 'Water reminder', field: 'waterReminderEnabled' }),
       ])}
 
       ${_group('Optional tracking', [
@@ -882,7 +879,6 @@ export function SettingsView(router) {
       // what you own. Filing them together is what made it unfindable.
       case 'equipment':  return renderEquipmentPanel();
       case 'liftlog':    return renderLiftLogPanel();
-      case 'notify':     return renderNotifyPanel();
       case 'display':    return renderDisplayPanel();
       // 'about' removed with NAV-7: the section now references the three
       // split ids, so a bare 'about' case is unreachable. The gate caught
@@ -1701,8 +1697,7 @@ export function SettingsView(router) {
         <h2 class="settings-section__heading">Display</h2>
         <p class="settings-section__sub">
           Change how the app looks to suit your eyes. Everything here is kept on
-          this device only \u2014 it is never sent anywhere, and it is not part of
-          your account.
+          this phone only \u2014 it is never sent anywhere.
         </p>
 
         <p id="disp-status" class="visually-hidden" role="status" aria-live="polite"></p>
@@ -1788,65 +1783,9 @@ export function SettingsView(router) {
     `;
   }
 
-  // ── Notifications panel ────────────────────────────────────────────────────
-
-  function renderNotifyPanel() {
-    const notif   = store.get('checkInNotification') || {};
-    const water   = store.get('waterReminderEnabled') || false;
-    const enabled = notif.enabled || false;
-    const time    = notif.time || '';
-
-    return `
-      <div class="settings-section">
-        <h2 class="settings-section__heading">Reminders</h2>
-
-        <div class="settings-field settings-field--toggle">
-          <label class="settings-label" for="settings-checkin-notif">
-            Daily check-in reminder
-            <span class="settings-label__sub">A nudge to open the app and check in</span>
-          </label>
-          <button
-            class="settings-toggle ${enabled ? 'settings-toggle--on' : ''}"
-            id="settings-checkin-notif"
-            role="switch"
-            aria-checked="${enabled ? 'true' : 'false'}"
-            data-toggle="checkInNotification.enabled"
-            aria-label="Check-in reminder ${enabled ? 'on' : 'off'}">
-            <span class="settings-toggle__track" aria-hidden="true"></span>
-          </button>
-        </div>
-
-        ${enabled ? `
-          <div class="settings-field">
-            <label class="settings-label" for="settings-notif-time">Reminder time</label>
-            <input class="settings-input"
-                   id="settings-notif-time"
-                   type="time"
-                   value="${_esc(time)}"
-                   data-field="checkInNotification.time"
-                   aria-label="Check-in reminder time">
-          </div>
-        ` : ''}
-
-        <div class="settings-field settings-field--toggle">
-          <label class="settings-label" for="settings-water-reminder">
-            Pre-session water reminder
-            <span class="settings-label__sub">A prompt to drink water before each session</span>
-          </label>
-          <button
-            class="settings-toggle ${water ? 'settings-toggle--on' : ''}"
-            id="settings-water-reminder"
-            role="switch"
-            aria-checked="${water ? 'true' : 'false'}"
-            data-toggle="waterReminderEnabled"
-            aria-label="Water reminder ${water ? 'on' : 'off'}">
-            <span class="settings-toggle__track" aria-hidden="true"></span>
-          </button>
-        </div>
-
-      </div>
-    `;
-  }
+  // PT-3, 01 Oct 2026. The Reminders panel is gone: nothing ever sent a
+  // reminder. checkInNotification and waterReminderEnabled stay in the
+  // store, unwritten, for when notifications are built.
 
   // ── About panel (with developer bypass) ───────────────────────────────────
 
@@ -2072,6 +2011,11 @@ export function SettingsView(router) {
         `}
 
         ${part !== "data" ? "" : `
+        <div class="settings-data-about">
+          <p>Everything you tell Alongside is kept on this phone, in the app\u2019s own storage. There is no account and no copy on a server.</p>
+          <p>If something in the app breaks, a short error report goes to Sentry, the service we use to fix faults, in Frankfurt. It says what broke and on which screen, never what you told me.</p>
+          <p><strong>Download your data</strong> makes a file of all of it, your journal included, on this phone. <strong>Delete my health answers</strong> removes check-ins, sore areas, weight, journal and session notes. <strong>Reset all data</strong> removes everything.</p>
+        </div>
         <div class="settings-about-links">
           <button class="btn btn-ghost"
                   data-action="nav-impact"
