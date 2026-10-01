@@ -1,6 +1,9 @@
 /**
  * tools/verify-settings-inventory.mjs
- * 01 Oct 2026 v4
+ * 01 Oct 2026 v5
+ *
+ * v5 - RESTORE. 5d: the download message now also says anyone with the file
+ *   can read it.
  *
  * v4 - PT-3. The Reminders group is retired: nothing ever sent a reminder.
  *   Seven groups; its controls join RETIRED; 2l (turning the reminder off
@@ -228,7 +231,7 @@ lastBlob = null; click(row); await wait(50);
 const file = lastBlob ? JSON.parse(await lastBlob.text()) : null;
 ok("5b. a file is made on the device", !!file && !!file.exportedAt);
 ok("5c. with everything the app keeps, the journal included", file?.store?.name === "T" && file?.store?.journalEntries?.[0]?.text === "a private line");
-ok("5d. and it says so, politely", /downloading\. It is saved on this device only\./.test(txt(main.querySelector("#settings-saved"))));
+ok("5d. and it says so, politely", /downloading to this device\..*anyone who has the file can read it/.test(txt(main.querySelector("#settings-saved"))));
 
 {
   const priv = await import(B + "views/privacy.js");

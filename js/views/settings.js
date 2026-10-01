@@ -1,6 +1,13 @@
 /**
  * settings.js
- * 01 Oct 2026 v52
+ * 01 Oct 2026 v53
+ *
+ * v53 - RESTORE. Restore from a file brings a person's history to a new
+ *   device from the file Download your data saved (js/data/restore.js).
+ *   It replaces what is on this device after a confirmation that says what
+ *   the file holds; this device's age answer and agreements stay. Offered
+ *   only once the health consent is given here. Download your data now
+ *   says the file is readable by anyone who has it.
  *
  * v52 - LEGAL-TRUE 2. Delete my health answers' confirmation names a target
  *   weight, which it now deletes.
@@ -592,6 +599,7 @@ import { CONDITIONS } from '../data/conditions.js';
 import { scopeStatementHTML } from '../data/scope-statement.js';
 import { aimById } from '../data/aims.js';
 import { healthAllowed, healthConsentNeeded, setPendingRoute } from '../data/health-consent.js';
+import { readRestoreFile, applyRestore, describeDate } from '../data/restore.js';
 import { conditionReadback, shortDate } from '../data/arc-readback.js';
 
 import {
@@ -833,7 +841,8 @@ export function SettingsView(router) {
         _row({ label: 'Your plan', value: premium ? 'The Plan' : 'Free', open: 'about-plan' }),
         _row({ label: 'Your impact', sub: 'Where the 5% goes.', action: 'nav-impact' }),
         _row({ label: 'Activity log', action: 'nav-activity-log' }),
-        _row({ label: 'Download your data', sub: 'A file of everything the app keeps about you, your journal included. Saved on this device.', action: 'download-data' }),
+        _row({ label: 'Download your data', sub: 'A file of everything the app keeps about you, your journal included. Saved on this device. Anyone who has the file can read it.', action: 'download-data' }),
+        _row({ label: 'Restore from a file', sub: 'Bring your history across from a file saved with Download your data. It replaces what is on this device.', action: 'restore-data' }),
         _row({ label: 'Delete my health answers', sub: 'Check-ins, sore areas, what you told me about your body, weight, journal and notes. Your sessions and lifts stay.', action: 'delete-health' }),
         _row({ label: 'How your data is kept', open: 'about-data' }),
         _row({ label: 'Privacy policy', action: 'nav-privacy' }),
@@ -871,7 +880,7 @@ export function SettingsView(router) {
       a.href = url; a.download = name; a.hidden = true;
       document.body.appendChild(a); a.click(); a.remove();
       setTimeout(() => URL.revokeObjectURL(url), 1000);
-      _saved(container, `Your file, ${name}, is downloading. It is saved on this device only.`);
+      _saved(container, `Your file, ${name}, is downloading to this device. It holds your health answers and journal, and anyone who has the file can read it, so keep it somewhere private.`);
     } catch (err) {
       _saved(container, 'The file could not be made on this device.');
     }
@@ -2026,7 +2035,7 @@ export function SettingsView(router) {
         <div class="settings-data-about">
           <p>Everything you tell Alongside is kept on this phone, in the app\u2019s own storage. There is no account and no copy on a server.</p>
           <p>If something in the app breaks, a short error report goes to Sentry, the service we use to fix faults, in Frankfurt. It says what broke and on which screen, never what you told me.</p>
-          <p><strong>Download your data</strong> makes a file of all of it, your journal included, on this phone. <strong>Delete my health answers</strong> removes check-ins, sore areas, what you told me about your body and how you\u2019ve been, weight, journal and session notes. <strong>Reset all data</strong> removes everything.</p>
+          <p><strong>Download your data</strong> makes a file of all of it, your journal included, on this phone. <strong>Delete my health answers</strong> removes check-ins, sore areas, what you told me about your body and how you\u2019ve been, weight, journal and session notes. <strong>Reset all data</strong> removes everything. <strong>Restore from a file</strong> brings your history to a new device from a file you downloaded; nothing goes through us.</p>
         </div>
         <div class="settings-about-links">
           <button class="btn btn-ghost"
@@ -2551,6 +2560,13 @@ export function SettingsView(router) {
         downloadData(container);
         break;
 
+      case 'restore-data':
+        // RESTORE. A file holds health answers, so this device's health
+        // consent comes first.
+        if (healthConsentNeeded()) { setPendingRoute('settings'); router.navigate('health-consent'); break; }
+        _pickRestoreFile(container);
+        break;
+
       case 'edit-equipment':
         // Same fix as edit-conditions, above. equipment.js already has
         // mountContainer()/setSheetDoneCallback() exports built for this
@@ -2659,6 +2675,48 @@ export function SettingsView(router) {
       onConfirm();
     });
     dialog.querySelector('.settings-dialog__backdrop').addEventListener('click', () => dialog.remove());
+  }
+
+  // ── Restore from a file ────────────────────────────────────────────────────
+
+  /** Opens the file picker; reads, checks, confirms, then replaces. */
+  function _pickRestoreFile(container) {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json,application/json';
+    input.hidden = true;
+    input.id = 'settings-restore-input';
+    document.body.appendChild(input);
+    input.addEventListener('change', () => {
+      const file = input.files && input.files[0];
+      input.remove();
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => _offerRestore(String(reader.result || ''), container);
+      reader.onerror = () => _saved(container, 'That file could not be read, so nothing has been changed.');
+      reader.readAsText(file);
+    });
+    input.click();
+  }
+
+  function _offerRestore(text, container) {
+    const read = readRestoreFile(text);
+    if (!read.ok) { _saved(container, read.reason); return; }
+    const { exportedAt, sessions, journal } = read.summary;
+    const when = describeDate(exportedAt);
+    const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+    _confirmDestructive(
+      'Restore from this file',
+      `${when ? `This file was saved on ${when}. ` : ''}It holds ${plural(sessions, 'session', 'sessions')} and ${plural(journal, 'journal entry', 'journal entries')}. ` +
+      'Restoring replaces everything Alongside has stored on this device with what is in the file. ' +
+      'Your answer to the age question and your agreements on this device stay as they are. It cannot be undone.',
+      () => {
+        applyRestore(read.data);
+        render(container);
+        _saved(container, 'Restored. Your history from the file is on this device now.');
+      },
+      container
+    );
   }
 
   // ── Toast ──────────────────────────────────────────────────────────────────
