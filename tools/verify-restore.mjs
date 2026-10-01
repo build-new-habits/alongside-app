@@ -1,6 +1,10 @@
 /**
  * tools/verify-restore.mjs
- * 01 Oct 2026 v1
+ * 01 Oct 2026 v2
+ *
+ * v2 - B2 RESTORE-LOCK. Download your data opens a dialog first (an optional
+ *   password); 6b presses Save the file with none. Assertion unchanged.
+ *
  *
  * RESTORE. Settings › Restore from a file brings a person's history to a
  * new device from the file Download your data saved, and only that.
@@ -180,7 +184,7 @@ console.log("\nTEST 6 - Download your data says who can read the file");
 oldPhone(); mount(); await wait(20);
 const dl = main.querySelector('[data-action="download-data"]');
 ok("6a. the row says anyone with the file can read it", /Anyone who has the file can read it/.test(txt(dl)));
-click(dl); await wait(60);
+click(dl); await wait(20); click(document.getElementById("download-save")); await wait(60);
 ok("6b. so does the message after downloading", /anyone who has the file can read it/.test(txt(main.querySelector("#settings-saved"))), txt(main.querySelector("#settings-saved")));
 
 console.log(`\n${passes} passed, ${fails} failed`);

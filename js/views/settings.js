@@ -1,5 +1,14 @@
 /**
  * settings.js
+ * 01 Oct 2026 v55
+ *
+ * v55 - B2 RESTORE-LOCK. Download your data opens a short dialog: an
+ *   optional password, typed twice, with the warning that a forgotten
+ *   password means nobody can open the file. With one, the file is locked
+ *   on this device (js/data/file-lock.js) and named -locked. Restore from a
+ *   file asks for the password of a locked file before anything else; a
+ *   wrong one changes nothing. The password is never kept.
+ *
  * 01 Oct 2026 v54
  *
  * v54 - BUNDLE-TRUE. With the health consent withdrawn, Your profile offers
@@ -606,6 +615,7 @@ import { scopeStatementHTML } from '../data/scope-statement.js';
 import { aimById } from '../data/aims.js';
 import { healthAllowed, healthConsentNeeded, setPendingRoute } from '../data/health-consent.js';
 import { readRestoreFile, applyRestore, describeDate } from '../data/restore.js';
+import { lockText, unlockText, isLocked, passwordProblem, lockAvailable } from '../data/file-lock.js';
 import { conditionReadback, shortDate } from '../data/arc-readback.js';
 
 import {
@@ -847,7 +857,7 @@ export function SettingsView(router) {
         _row({ label: 'Your plan', value: premium ? 'The Plan' : 'Free', open: 'about-plan' }),
         _row({ label: 'Your impact', sub: 'Where the 5% goes.', action: 'nav-impact' }),
         _row({ label: 'Activity log', action: 'nav-activity-log' }),
-        _row({ label: 'Download your data', sub: 'A file of everything the app keeps about you, your journal included. Saved on this device. Anyone who has the file can read it.', action: 'download-data' }),
+        _row({ label: 'Download your data', sub: 'A file of everything the app keeps about you, your journal included. Saved on this device. Anyone who has the file can read it, unless you add a password.', action: 'download-data' }),
         _row({ label: 'Restore from a file', sub: 'Bring your history across from a file saved with Download your data. It replaces what is on this device.', action: 'restore-data' }),
         _row({ label: 'Delete my health answers', sub: 'Check-ins, sore areas, what you told me about your body, weight, journal and notes. Your sessions and lifts stay.', action: 'delete-health' }),
         _row({ label: 'How your data is kept', open: 'about-data' }),
@@ -870,7 +880,7 @@ export function SettingsView(router) {
   }
 
   /** Everything the app keeps, as a file, built and saved on this device. */
-  function downloadData(container) {
+  function downloadData(container, password = '') {
     const data = {
       exportedAt: new Date().toISOString(),
       about: 'Everything Alongside: Move keeps about you on this device, including your journal. Nothing here was sent anywhere to make this file.',
@@ -878,6 +888,7 @@ export function SettingsView(router) {
       display: (() => { const o = {}; for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k && k !== 'alongside_user' && /^alongside/i.test(k)) o[k] = localStorage.getItem(k); } return o; })(),
     };
     const text = JSON.stringify(data, null, 2);
+    if (password) return _saveLocked(container, text, password);
     const name = `alongside-data-${new Date().toISOString().slice(0, 10)}.json`;
     try {
       const blob = new Blob([text], { type: 'application/json' });
@@ -891,6 +902,122 @@ export function SettingsView(router) {
       _saved(container, 'The file could not be made on this device.');
     }
     return { name, text };
+  }
+
+  /** B2. The file, locked with the password, saved on this device. */
+  async function _saveLocked(container, text, password) {
+    const name = `alongside-data-${new Date().toISOString().slice(0, 10)}-locked.json`;
+    try {
+      const locked = await lockText(text, password);
+      const blob = new Blob([locked], { type: 'application/json' });
+      const url  = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = name; a.hidden = true;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      _saved(container, `Your file, ${name}, is downloading to this device. It is locked, and only your password opens it.`);
+      return { name, text: locked };
+    } catch (err) {
+      _saved(container, 'The file could not be made on this device.');
+      return null;
+    }
+  }
+
+  /**
+   * B2. A small form dialog: focus starts in it, Tab stays in it, Escape
+   * closes it, and focus goes back to what opened it.
+   */
+  function _formDialog(id, titleId, inner) {
+    document.getElementById(id)?.remove();
+    const opener = document.activeElement;
+    const dialog = document.createElement('div');
+    dialog.id = id;
+    dialog.setAttribute('role', 'dialog');
+    dialog.setAttribute('aria-modal', 'true');
+    dialog.setAttribute('aria-labelledby', titleId);
+    dialog.className = 'settings-dialog';
+    dialog.innerHTML = `<div class="settings-dialog__backdrop"></div><div class="settings-dialog__content">${inner}</div>`;
+    document.body.appendChild(dialog);
+    const close = () => { dialog.remove(); if (opener && opener.focus) opener.focus(); };
+    dialog.addEventListener('keydown', e => {
+      if (e.key === 'Escape') { close(); return; }
+      if (e.key !== 'Tab') return;
+      const f = [...dialog.querySelectorAll('input, button')].filter(el => !el.disabled);
+      if (!f.length) return;
+      if (e.shiftKey && document.activeElement === f[0]) { e.preventDefault(); f[f.length - 1].focus(); }
+      else if (!e.shiftKey && document.activeElement === f[f.length - 1]) { e.preventDefault(); f[0].focus(); }
+    });
+    (dialog.querySelector('input') || dialog.querySelector('button'))?.focus();
+    return { dialog, close };
+  }
+
+  /** B2. Download your data: an optional password first, then the file. */
+  function _openDownloadDialog(container) {
+    const canLock = lockAvailable();
+    const { dialog, close } = _formDialog('settings-download-dialog', 'download-dialog-title', `
+      <h2 class="settings-dialog__title" id="download-dialog-title">Download your data</h2>
+      <p class="settings-dialog__message">The file holds everything Alongside keeps about you on this device, your journal included. It is saved on this device; nothing is sent anywhere.</p>
+      ${canLock ? `
+      <div class="settings-field">
+        <label class="settings-label" for="download-pw">Password (optional)</label>
+        <input class="settings-input" id="download-pw" type="password" autocomplete="new-password" aria-describedby="download-pw-note">
+      </div>
+      <div class="settings-field">
+        <label class="settings-label" for="download-pw2">Type the password again</label>
+        <input class="settings-input" id="download-pw2" type="password" autocomplete="new-password">
+      </div>
+      <p class="settings-dialog__message" id="download-pw-note">With a password, the file is locked on this device and opens only with it. If you forget this password, nobody can open this file, including us. Write it down and keep it where you can find it. Without a password, anyone who has the file can read it, so keep it somewhere private.</p>
+      <p class="settings-dialog__error" id="download-pw-error" role="alert"></p>` : `
+      <p class="settings-dialog__message">This browser can’t add a password to the file. Without a password, anyone who has the file can read it, so keep it somewhere private.</p>`}
+      <div class="settings-dialog__actions">
+        <button class="btn btn-ghost" id="download-cancel">Cancel</button>
+        <button class="btn btn-primary" id="download-save">Save the file</button>
+      </div>`);
+    dialog.querySelector('#download-cancel').addEventListener('click', close);
+    dialog.querySelector('#download-save').addEventListener('click', () => {
+      const pw  = dialog.querySelector('#download-pw')?.value || '';
+      const pw2 = dialog.querySelector('#download-pw2')?.value || '';
+      const problem = passwordProblem(pw, pw2);
+      if (problem) {
+        const err = dialog.querySelector('#download-pw-error');
+        err.textContent = '';
+        setTimeout(() => { err.textContent = problem; }, 20);
+        return;
+      }
+      close();
+      downloadData(container, pw);
+    });
+  }
+
+  /** B2. A locked file: its password first; then the usual confirmation. */
+  function _askUnlock(text, container) {
+    const { dialog, close } = _formDialog('settings-unlock-dialog', 'unlock-dialog-title', `
+      <h2 class="settings-dialog__title" id="unlock-dialog-title">This file is locked</h2>
+      <p class="settings-dialog__message">It was saved with a password. Nothing changes on this device until it is opened and you have said yes.</p>
+      <div class="settings-field">
+        <label class="settings-label" for="unlock-pw">Password for this file</label>
+        <input class="settings-input" id="unlock-pw" type="password" autocomplete="current-password">
+      </div>
+      <p class="settings-dialog__error" id="unlock-error" role="alert"></p>
+      <div class="settings-dialog__actions">
+        <button class="btn btn-ghost" id="unlock-cancel">Cancel</button>
+        <button class="btn btn-primary" id="unlock-open">Open the file</button>
+      </div>`);
+    dialog.querySelector('#unlock-cancel').addEventListener('click', close);
+    const open = dialog.querySelector('#unlock-open');
+    open.addEventListener('click', async () => {
+      open.disabled = true;
+      const res = await unlockText(text, dialog.querySelector('#unlock-pw')?.value || '');
+      open.disabled = false;
+      if (!res.ok) {
+        const err = dialog.querySelector('#unlock-error');
+        err.textContent = '';
+        setTimeout(() => { err.textContent = res.reason; }, 20);
+        return;
+      }
+      dialog.remove();
+      _offerRestore(res.text, container);
+    });
   }
 
   // ── Panel router ───────────────────────────────────────────────────────────
@@ -2042,7 +2169,7 @@ export function SettingsView(router) {
         <div class="settings-data-about">
           <p>Everything you tell Alongside is kept on this phone, in the app\u2019s own storage. There is no account and no copy on a server.</p>
           <p>If something in the app breaks, a short error report goes to Sentry, the service we use to fix faults, in Frankfurt. It says what broke and on which screen, never what you told me.</p>
-          <p><strong>Download your data</strong> makes a file of all of it, your journal included, on this phone. <strong>Delete my health answers</strong> removes check-ins, sore areas, what you told me about your body and how you\u2019ve been, weight, journal and session notes. <strong>Reset all data</strong> removes everything. <strong>Restore from a file</strong> brings your history to a new device from a file you downloaded; nothing goes through us.</p>
+          <p><strong>Download your data</strong> makes a file of all of it, your journal included, on this phone; you can lock it with a password that only you know. <strong>Delete my health answers</strong> removes check-ins, sore areas, what you told me about your body and how you\u2019ve been, weight, journal and session notes. <strong>Reset all data</strong> removes everything. <strong>Restore from a file</strong> brings your history to a new device from a file you downloaded; nothing goes through us.</p>
         </div>
         <div class="settings-about-links">
           <button class="btn btn-ghost"
@@ -2564,7 +2691,7 @@ export function SettingsView(router) {
         break;
 
       case 'download-data':
-        downloadData(container);
+        _openDownloadDialog(container);
         break;
 
       case 'restore-data':
@@ -2707,6 +2834,7 @@ export function SettingsView(router) {
   }
 
   function _offerRestore(text, container) {
+    if (isLocked(text)) { _askUnlock(text, container); return; }
     const read = readRestoreFile(text);
     if (!read.ok) { _saved(container, read.reason); return; }
     const { exportedAt, sessions, journal } = read.summary;

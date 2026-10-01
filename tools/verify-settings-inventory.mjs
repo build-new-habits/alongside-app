@@ -1,5 +1,10 @@
 /**
  * tools/verify-settings-inventory.mjs
+ * 01 Oct 2026 v6
+ *
+ * v6 - B2 RESTORE-LOCK. Download your data opens a dialog first (an optional
+ *   password); 5b presses Save the file with none. Assertions unchanged.
+ *
  * 01 Oct 2026 v5
  *
  * v5 - RESTORE. 5d: the download message now also says anyone with the file
@@ -227,7 +232,7 @@ console.log("\nTEST 5 - Download your data");
 fixture(); page();
 const row = main.querySelector('[data-action="download-data"]');
 ok("5a. on the page, saying what the file holds", !!row && /your journal included/.test(txt(row)) && /Saved on this device/.test(txt(row)));
-lastBlob = null; click(row); await wait(50);
+lastBlob = null; click(row); await wait(20); click(document.getElementById("download-save")); await wait(50);
 const file = lastBlob ? JSON.parse(await lastBlob.text()) : null;
 ok("5b. a file is made on the device", !!file && !!file.exportedAt);
 ok("5c. with everything the app keeps, the journal included", file?.store?.name === "T" && file?.store?.journalEntries?.[0]?.text === "a private line");

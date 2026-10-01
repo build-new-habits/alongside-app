@@ -1,5 +1,7 @@
 /*
  * css/components/settings.css
+ * 01 Oct 2026 v14
+ *   B2 RESTORE-LOCK. .settings-dialog__error: a form error in words, with a rule.
  * 01 Oct 2026 v13
  *   PT-3. .settings-data-about: How your data is kept, in words.
  * 28 Sep 2026 v12
@@ -742,6 +744,18 @@
   gap: var(--space-3);
   justify-content: flex-end;
 }
+
+/* B2 RESTORE-LOCK. A form's error, said in words (role="alert") and marked
+   by a rule, so it never rests on colour alone. Empty, it takes no room. */
+.settings-dialog__error {
+  font-size: var(--text-sm);
+  font-weight: var(--font-bold);
+  color: var(--color-text);
+  margin: 0;
+  padding-left: var(--space-3);
+  border-left: 3px solid var(--color-danger);
+}
+.settings-dialog__error:empty { display: none; }
 
 /* ── Toast ────────────────────────────────────────────────────── */
 
