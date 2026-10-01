@@ -1,13 +1,17 @@
 /**
  * tools/verify-twoengine.mjs
- * 28 Sep 2026 v3
+ * 01 Oct 2026 v4
+ *
+ * v4 - DOCS-MOVE. Documents/ left this public repository for the private
+ *   BNH-Files repository; the files this check reads are now in docs/ (or,
+ *   for the master schedule, read through tools/bnh-files.mjs).
  *
  * v3 - Work list 2e: the old engine is DELETED, deliberately, so nobody
  *   fixes it again. Four assertions change, each with its reason:
  *   1b  the time window constant is imported from data/time-windows.js
  *       (its new home), no longer from the engine.
  *   1e  was "retired, not deleted". The record it protected is kept in
- *       Documents/Archive/workoutGenerator_retired_28sep2026.js, outside
+ *       docs/archive-code/workoutGenerator_retired_28sep2026.js, outside
  *       the app; now asserted there, and asserted gone from js/.
  *   3c  "the retired engine still cannot produce a stretch" RETIRED with
  *       the engine; 3a/3b prove stretch is reachable.
@@ -163,7 +167,7 @@ ok("1d. generateDailyOptions has zero live callers", liveCallers.length === 0,
 
 ok("1e. and it is gone from the app, with its record kept outside it",
    !fs.existsSync(new URL("js/data/workoutGenerator.js", _R)) &&
-   /generateDailyOptions\(\)\s*\{/.test(_read("Documents/Archive/workoutGenerator_retired_28sep2026.js")),
+   /generateDailyOptions\(\)\s*\{/.test(_read("docs/archive-code/workoutGenerator_retired_28sep2026.js")),
    "2e deleted the engine so nobody fixes it again; the archive copy is the record " +
    "of what the route did for three months (three hardcoded focuses, no stretch)");
 
@@ -304,7 +308,7 @@ ok("7b. and a severe zone still diverts whatever the chain chose",
 // ── 8. SCHEMA BEFORE CODE ───────────────────────────────────────────────
 console.log("\nTEST 8 - the field the chain reads is declared");
 
-const schema = _read("Documents/Live State/Schema.md");
+const schema = _read("docs/Schema.md");
 ok("8a. activityLog[].sessionType is in Schema.md",
    /activityLog\[\]\.sessionType/.test(schema),
    "the chain reads a field the schema does not declare");

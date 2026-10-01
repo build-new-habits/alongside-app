@@ -1,6 +1,10 @@
 /**
  * tools/verify-dead-generator.mjs
- * 29 Sep 2026 v2
+ * 01 Oct 2026 v3
+ *
+ * v3 - DOCS-MOVE. Documents/ left this public repository for the private
+ *   BNH-Files repository; the files this check reads are now in docs/ (or,
+ *   for the master schedule, read through tools/bnh-files.mjs).
  *
  * v2 - P24. Settings is a third reader of the time windows ("How long
  *   you usually have"). 2b names it; the rule -- every reader imports the
@@ -78,7 +82,7 @@ ok("1d. the service worker does not precache either (it would fail the install)"
 const gates = fs.readdirSync(new URL("tools/", R)).filter(f => /^verify-.*\.mjs$/.test(f) && f !== "verify-dead-generator.mjs");
 const deadReaders = gates.filter(f => /(readFileSync|_read|import)\([^)]*workoutGenerator\.js/.test(strip(read("tools/" + f))));
 ok("1e. no gate reads or imports it any more", deadReaders.length === 0, deadReaders.join(", "));
-ok("1f. the record is kept, outside the app: Documents/Archive", fs.readdirSync(new URL("Documents/Archive/", R)).some(f => /^workoutGenerator_retired_28sep2026\.js$/.test(f)));
+ok("1f. the record is kept, outside the app: docs/archive-code", fs.readdirSync(new URL("docs/archive-code/", R)).some(f => /^workoutGenerator_retired_28sep2026\.js$/.test(f)));
 ok("1g. and verify-intensity-space, which proved only that engine, is retired", !exists("tools/verify-intensity-space.mjs"));
 
 // ── 2. THE ONE CONSTANT IT HELD THAT THE APP USES ──────────────────────

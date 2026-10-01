@@ -1,6 +1,10 @@
 /**
  * tools/verify-chooser1.mjs
- * 22 Aug 2026 v1
+ * 01 Oct 2026 v2
+ *
+ * v2 - DOCS-MOVE. Documents/ left this public repository for the private
+ *   BNH-Files repository; the files this check reads are now in docs/ (or,
+ *   for the master schedule, read through tools/bnh-files.mjs).
  *
  * CHOOSER-1 — choosing a programme after onboarding.
  *
@@ -101,7 +105,7 @@ console.log("\n1. The retired view is gone and the route is repointed");
   ok("onboarding/goal-setup.js no longer exists",
      !fs.existsSync(path.join(REPO, "js/views/onboarding/goal-setup.js")));
   ok("it is archived rather than destroyed",
-     fs.existsSync(path.join(REPO, "Documents/Archive/goal-setup_retired_22aug2026.js")));
+     fs.existsSync(path.join(REPO, "docs/archive-code/goal-setup_retired_22aug2026.js")));
   const router = fs.readFileSync(path.join(REPO, "js/router.js"), "utf8");
   ok("the goal-setup route points at programme-select",
      /'goal-setup':\s*\{\s*path:\s*'\.\/views\/programme-select\.js'/.test(router));

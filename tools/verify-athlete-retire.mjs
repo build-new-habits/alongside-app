@@ -1,6 +1,10 @@
 /**
  * tools/verify-athlete-retire.mjs
- * 21 Aug 2026 v2
+ * 01 Oct 2026 v3
+ *
+ * v3 - DOCS-MOVE. Documents/ left this public repository for the private
+ *   BNH-Files repository; the files this check reads are now in docs/ (or,
+ *   for the master schedule, read through tools/bnh-files.mjs).
  * GATE-PATH. Path resolution only -- no assertion changed.
  *
  * 18 Aug 2026 v1
@@ -147,7 +151,7 @@ check('9  the contract still DECLARES it retired, so the migration stays legible
   /retired:\s*\[[^\]]*["']athlete["']/.test(contract),
   'a retired value that is not declared becomes an untracked special case');
 
-const schema = fs.readFileSync(_gatePath(path.join(root, 'Documents/Live State/Schema.md')), 'utf8');
+const schema = fs.readFileSync(_gatePath(path.join(root, 'docs/Schema.md')), 'utf8');
 check('10 and the schema says what happens to somebody who held it',
   /ATHLETE-RETIRE/.test(schema) && /migrat/i.test(schema));
 

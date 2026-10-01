@@ -1,6 +1,10 @@
 /**
  * tools/verify-price.mjs
- * 18 Aug 2026 v1
+ * 01 Oct 2026 v2
+ *
+ * v2 - DOCS-MOVE. Documents/ left this public repository for the private
+ *   BNH-Files repository; the files this check reads are now in docs/ (or,
+ *   for the master schedule, read through tools/bnh-files.mjs).
  *
  * PRICE-2. One price, everywhere.
  *
@@ -103,7 +107,6 @@ for (const file of walk(root)) {
   // record of why they were retired. Neither is a place a price is
   // published to a person.
   if (rel === 'tools/verify-price.mjs') continue;
-  if (rel === 'Documents/Admin/master_schedule.md') continue;
   // A file may declare itself superseded and be excused -- but it has to
   // SAY SO, in a banner a person reading it would see. That is the whole
   // mechanism: the sweep does not care whether a price is old, only
@@ -172,7 +175,6 @@ const pairHits = [];
 for (const file of walk(root)) {
   const rel = path.relative(root, file);
   if (rel === 'tools/verify-price.mjs') continue;
-  if (rel === 'Documents/Admin/master_schedule.md') continue;
   const raw = fs.readFileSync(_gatePath(file), 'utf8');
   if (raw.includes('SUPERSEDED PRICING')) continue;
   const src = raw

@@ -1,0 +1,1897 @@
+# Alongside — Data Schema Reference
+## 01 Oct 2026 v1.94
+
+> **v1.94, 01 Oct 2026 — LEGAL-TRUE 3** (`store.js` v99). No new fields.
+> **`deleteHealthAnswers()`** also removes **`todayIntensity`** and sets
+> **`lighterDayDeclinedOn`** to `null`; both come from the day's check-in
+> energy.
+
+> **v1.93, 01 Oct 2026 — LEGAL-TRUE 2** (`store.js` v98). No new fields.
+> **`deleteHealthAnswers()`** also clears a target weight
+> (**`strategicGoal.targetValue`**, **`targetUnit`** when `kg`, and
+> **`weightTargetBand`**), strips **`energyAtCheckin`** and
+> **`conditionScores`** from every **`progressLog`** entry, and strips
+> **`energyBefore`** from every **`activityLog`** entry.
+
+> **v1.92, 01 Oct 2026 — LEGAL-TRUE** (`store.js` v97). No new fields.
+> **`deleteHealthAnswers()`** now also resets **`capability`** and
+> **`assessment`** to their defaults, sets **`lifestyle.returningAfter`**
+> and **`lifestyle.stressLevel`** to `null`, empties
+> **`onboarding.hardBeforeSelections`** and sets
+> **`onboarding.primaryTerritory`** to `null`, and strips `note` from every
+> **`liftLog`** entry. New **`resetEverything()`** removes every
+> localStorage key starting `alongside` (the store and the display keys),
+> then `reset()`; Reset all data and an under-18 answer use it.
+
+> **v1.91, 01 Oct 2026 — AGE-CHECK** (`store.js` v96). The age gate is
+> live. **`consent.ageConfirmed`**: `true` 18 or over, `false` under 18,
+> `null` never asked (was reserved and always null). New
+> **`consent.ageCheckedAt`** (ISO) and **`consent.ageVersion`**
+> (`2026-10-01`). **No date of birth is stored**: the month and year are
+> read once by `data/age-check.js` and thrown away. On `false`,
+> `store.reset()` runs first, so nothing else of an under-18's is kept,
+> and the router shows only `under-18` (and `privacy`) on that phone.
+> An install from before the check (consent given, `ageConfirmed` null)
+> is asked once, through the router guard. Written by `data/age-check.js`
+> `recordAge()` from onboarding (`thread.js`) and `views/age-check.js`.
+
+> **v1.90, 01 Oct 2026 — PT-3, TRUE-PRIVACY-WORDS** (`store.js` v95).
+> **Perimenopause and Menopause are no longer sore areas** (W3-4 took
+> them out of the check-in; the sore-areas sheet still offered them under
+> *Hormonal*). They leave `CONDITIONS`; a stored `perimenopause` or
+> `menopause` is dropped on load from `conditions`, `conditionMeta`,
+> `conditionPainScores` and `conditionsResolved`, **without**
+> `scopeNoticeDue` (the notice is about medical conditions; these are
+> everyday states). **`hormonalTracking` retired** — nothing read it
+> since W3-8 removed its switch; deleted on load. `checkInNotification`
+> and `waterReminderEnabled` stay in the store but **nothing writes or
+> reads them**: the reminder switches are gone from Settings because
+> nothing ever sent a reminder. Back when notifications are built.
+
+> **v1.89, 01 Oct 2026 — PT-2, HEALTH-CONSENT** (`store.js` v94).
+> **`consent.health`** (new): `{ given: true|false|null, at, version,
+> withdrawnAt }`. Explicit consent for health answers (sore areas and
+> how sore, check-ins, weight, journal, session notes), separate from
+> the Privacy-and-Terms tick. Written by onboarding's second tick
+> (`thread.js`) and by `views/health-consent.js`; read by
+> `data/health-consent.js`. `given: null` with `consent.given === true`
+> means an install from before this existed: asked once, before the
+> next health question. **`store.deleteHealthAnswers()`** (Settings ›
+> *Delete my health answers*) empties `checkinHistory`, `lastCheckin`,
+> `conditions`, `conditionMeta`, `conditionsResolved`,
+> `conditionPainScores`, `severePainChoices`, `weight`, `weightLog`,
+> `journalEntries`, `absence.context` and `redFlag.areas`; removes
+> `note`, `painChange` and `moodAfter` from every `activityLog` entry;
+> keeps sessions, lifts, `capability` (it keeps sessions safe) and a
+> red-flag stop's level; and sets `consent.health` to `given: false`
+> with `withdrawnAt`, so the next health question asks again.
+> `journalEntries` entries can now be deleted one at a time
+> (`store.deleteJournalEntry(id)`, from Wellbeing).
+
+> **v1.88, 30 Sep 2026 — W3-21, NAV-SMALL** (`store.js` v93).
+> **`requestedLocation`** (new, `"home"|"gym"|"outside"|null`): where
+> *I know what I want* asked for today's plan. Written by
+> `know-what.js`; read once and cleared by `coach-proposal.js` on mount.
+> **`sessionLocation` is now written only when a session starts**
+> (`coach-proposal.js` Start, `checkin-mini.js` Step 4, `capture.js`
+> during a session). Looking at a plan, changing *Where* on it, or
+> answering *Where?* on *I know what I want* no longer changes the
+> default: persona 2.4 looked at an outdoor plan, backed out, and every
+> later plan said *Outside*.
+
+> **v1.87, 30 Sep 2026 — W3-20, TRUE-WORDS** (`store.js` v92). No new
+> field. **`community.credits` is awarded by `logActivity()`** for every
+> completed movement session (`status` not `partial`; `type` not
+> `breathing`, `mindful`, `mindfulness` or `practice`): one on Free, two
+> on the Plan, as the Community page and the tier table say. It was
+> awarded only by the coach's workout and gym players (via
+> `programmeEngine.recordSession()`), with a same-day guard, so a class,
+> walk, run or yoga session earned nothing and a second session in a day
+> earned nothing. The same-day guard is gone; `logActivity()`'s
+> double-write guard stops a duplicate. `totalCredits` (the older
+> per-activity count) is no longer shown on any finish screen.
+
+> **v1.86, 30 Sep 2026 — W3-16, ARC-AND-SAVED** (`store.js` v91).
+> **`savedSessions[].doses`** (new, optional): `{ [exerciseId]: {
+> section, sets, reps, duration } }` (not rest: the library's, so a
+> correction reaches it), written by
+> `data/saved-sessions.js` `saveSession()` / `updateSavedSession()` from
+> the session as built (or edited); `resolveSavedSession()` lays each
+> dose over the LIVE library entry, so a saved session keeps its
+> sections, order and doses and still picks up library corrections.
+> Absent on older records: they come back with the library's defaults,
+> as before. **`savedSessions[].sessionType` held the plan's id**
+> (`"upper-1790…"`) and is repaired to its type on load
+> (`_repairSessionTypes`, as activity entries since v1.80).
+> **`lastFinishedSession.session.creditTypes`** (optional, written by
+> *Make it up as I go* when no kind was given): the one session type its
+> moves fit; `markSessionWorked()` credits `arc.typesWorked` for it. The
+> activity entry's own `sessionType` stays the person's to say (v77).
+
+> **v1.85, 30 Sep 2026 — W3-13, INTERRUPTIONS** (`store.js` v89, v90). A
+> session waiting to be come back to is never dropped without a word.
+> **New field `rescuedSession`** (`{ at: ISO, name: string, moves:
+> number } | null`, default `null`): written by `session-resume.js` when
+> it saves a waiting session for the person; `views/today.js` says so
+> once and clears it. **`activityLog[].rescued`** (`boolean`, new): the
+> entry was saved from a checkpoint, not by the person's own tap.
+> **`activeSessionCheckpoint` gains three fields**, all optional:
+> `rescue` (the activity entry to write if the session is not come back
+> to: `type`, `status`, `sessionType`, `exerciseIds`, `exercisesCount`,
+> `setsDone`, `gentle`, as the view would write it), `awayMs` (time away
+> already known, left out of minutes) and `leftAt` (ISO, when *Carry on
+> later* was taken). **When it is saved:** the checkpoint is more than 3
+> hours old (`STALE_MS`), or another session takes the slot. It is dated
+> `checkpointedAt` (the last thing done), and its minutes are
+> `checkpointedAt - startedAt - awayMs`. **`logActivity()`'s double-write
+> guard ignores rescued entries** (v90): a rescued session is another
+> session, and must not make the one that displaced it look like its twin.
+
+> **v1.84, 30 Sep 2026 — W3-12, MOSTLY-SAME** (`store.js` v88, unchanged:
+> `logActivity()` keeps entry fields as given). **`activityLog[].gentle`**
+> (`boolean`, new): written by the coach's players (`views/workout.js`,
+> `views/gym-programme.js`) from the built session's `gentleReason` —
+> `true` when a gentle reason (low energy, poor sleep, a heavy week, the
+> lighter day, a declared low patch) shaped it. Absent on older entries
+> and on sessions no builder made. Read by `session-builder.js`
+> `_learnedSession()`: with *Mostly the same*, the session learned is the
+> last completed, **non-gentle** session of the same `sessionType`, so a
+> lighter day's shorter list never becomes the one repeated.
+> `exerciseIds` on these entries is in **plan order** (the gym player now
+> sorts its completed indices).
+
+> **v1.83, 30 Sep 2026 — W3-10, LIGHTER-COUNT** (`store.js` v88). **One
+> new field, `lighterDayDeclinedOn`** (`'YYYY-MM-DD' | null`, default
+> `null`): the local day the person turned the lighter day down, by
+> *Keep my usual plan* or *Harder* on the coach's screen
+> (`views/coach-proposal.js`). Read by `data/checkin.js` `coachBias()`;
+> only today's value counts, so it lapses at midnight with no clearing.
+> **Semantics of the lighter-day count** (`consecutiveActiveDays()`,
+> agreed by Graeme 30 Sep): an `activityLog` entry counts as a day of
+> movement unless its `type` is `breathing`, `mindful`, `mindfulness` or
+> `practice` (decision 4a: not movement), or its `status` is `partial`
+> with `durationMins` under 10 or missing. A *Full of it* check-in
+> (`energy` 9 or more today) turns the lighter day off.
+
+> **v1.82, 30 Sep 2026 — W3-4, SORE-SCOPE** (`store.js` v87). No field
+> change. Three semantics, all narrowing what is kept about a sore area.
+> **(1) The lapse counts check-ins, not calendar days.**
+> `store.lapseQuietSoreAreas()` moves a `source: "checkin"` area to
+> `dormant` after **three check-ins in a row that each reported it at 0**,
+> however many days apart; a day with no check-in neither counts nor
+> breaks the run (a check-in that does not mention the area is skipped).
+> Under v1.77's consecutive-days rule an irregular user never reached
+> three, and one tap stayed listed for weeks (Wave 3: 2.12, 2.13, 2.15).
+> `quietRun` is that count. **(2) The red-flag screen counts a
+> check-in-sourced area only on a day it is sore** (`red-flag.js`
+> `reportedPainAreas()`); an area the person listed themselves still
+> counts every day. **(3) `activityLog[].painChange` is asked only when
+> something is sore that day** (`reflect.js`); it was asked after every
+> session while any area was listed, a per-session pain record the scope
+> (P0d) rules out. Still stored per entry, never shown or trended.
+
+> **v1.81, 29 Sep 2026 — P26, SMALLER.** No field change. Two
+> semantics. **`activityLog[]` gains a writer of `type: "gym"`:** the
+> activity log's "Gym or weights" (`views/activity-log.js` v2), with
+> `source: "self-logged"`. `data/activity-labels.js` v2 reads that pair
+> as "a gym session"; the builder's own `gym` entries stay "a session
+> you built". **Active days are local calendar days:**
+> `consecutiveActiveDays()` (`data/checkin.js` v10) takes the local day
+> of `completedAt`, else of `date`; a bare `YYYY-MM-DD` is taken as it
+> is. It compared `date` whole, and the players write `date` as a full
+> timestamp, so the lighter-day rule never fired.
+
+> **v1.80, 29 Sep 2026 — P25, ONE ID PER ENTRY** (`store.js` v86). No
+> field change. **`activityLog[].id` is unique:** `logActivity()` gives a
+> new id to an entry whose id is already in the log. **`currentActivityEntry`
+> is pending only while it is not logged:** `store.pendingActivityEntry()`
+> returns it only when its id is not in the log and it carries no
+> `status`. Yoga judged "stale" by `status` alone, which the coach's
+> player never writes, so a yoga entry took the previous workout's id;
+> walk, run, swim and cycle spread the leftover with no check, carrying
+> its id and its `exerciseIds` into the new entry (and so into
+> `exerciseHistory` again). All five now ask the store.
+
+> **v1.79, 29 Sep 2026 — P23, PRACTICE WORDING** (no `store.js` change:
+> the store keeps log entries as written). **New, optional, on
+> `safetyAckLog` entries:** `variant: 'practice'` — the note was read in
+> its practice wording (breathing, mindful practice: *"Before your
+> practice"*, *"stop, and move to a position that doesn't hurt"*). Absent
+> means the movement wording. `textVersion` is unchanged for both: one
+> piece of advice, two phrasings, so both count toward the same taper.
+
+> **v1.78, 29 Sep 2026 — P19, "MOSTLY THE SAME"** (`store.js` v85).
+> **New, optional:** `exerciseHistory[id].section` —
+> `'warmup' | 'main' | 'cooldown'`, the section the move was last
+> completed in. Written by `recordExercises()` from a map the players
+> pass on a finished session's entry, `exerciseSections: { [id]: section }`;
+> `logActivity()` forwards it and **removes it from the stored entry**, so
+> `activityLog` gains no field. Absent on history written before v85,
+> which reads as "no section known". `exerciseStats()` returns it. Read
+> by `session-builder.js`: a familiar move stays in its section.
+
+> **v1.77, 29 Sep 2026 — P15, BALANCE "NO" = NO SQUATS** (`store.js` v84).
+> No new field. **The `capability.legPower` fail-safe keyed on an
+> unanswered question.** It resolved unanswered `legPower` to `'limited'`
+> when `asked && chairRise !== 'yes'` — and `null` is "not yes", so
+> somebody who answered balance "No" (and so was never shown the chair
+> question) had legs that were not loadable: no squats, no hinges.
+> **Now:** unanswered `legPower` resolves to `'limited'` only when
+> `chairRise` was **answered** `'not-easily'` or `'no'`; an unasked chair
+> question is not a limitation. C1-SAFETY is unchanged for the group it
+> protects. **And the chair question (onboarding 9b) is now shown
+> whenever balance is answered "No"** (`onboarding-thread-data.js` v17),
+> as well as on the existing triggers.
+
+> **v1.76, 29 Sep 2026 — P13, SORE-BECOMES-CONDITION** (`store.js` v83).
+> One "a little sore" tap at check-in made a permanent listed area: it
+> led every later check-in and brought the red-flag screen back monthly,
+> and `conditionPainScores` had no date, so yesterday's answer was read
+> as today's. **New:** `conditionPainScoresOn` (`"YYYY-MM-DD"` local, or
+> `null`) — the day the scores were given, written with them by
+> `store.updateConditionPainScores()`. **Changed:** on load, scores whose
+> day is not today (or that carry no day) are cleared: they describe a
+> day that has gone. **The dormant lifecycle declared by CHECKIN-2a is
+> now real:** `store.lapseQuietSoreAreas()`, run after each check-in is
+> saved, moves an area whose `conditionMeta` source is `checkin` to
+> `status: "dormant"` (it leaves `conditions`, its record stays) after
+> **three check-ins on consecutive days that each reported it at 0**
+> (*v1.82: three check-ins in a row, however far apart*),
+> read from `checkinHistory[].conditionLevels`. `quietRun`, `lastSoreAt`
+> and `reportDays` are kept up to date by the same method. Areas the
+> person listed themselves (onboarding or Settings) never lapse.
+
+> **v1.75, 29 Sep 2026 — P2, SESSION-TYPE-ID** (`store.js` v82). No new
+> field. **`activityLog[].sessionType` held session ids, not types.** The
+> coach's plan recorded `built.id` (`"glute-1791180600000"`), which
+> `session-choice.js` rejects, so the chooser always read "no history" and
+> proposed the first type every time (Glute Focus on Free; the arc's first
+> strand on the Plan); Progress printed *"mostly glute 1791180600000"*.
+> And `logActivity()` filled a missing type from `lastFinishedSession` —
+> at logging time the PREVIOUS session — so walks, breathing and the rest
+> inherited whatever strength session came before. **Now:** a built
+> session carries `sessionType` (one of the nine `SESSION_TYPES` ids, `gym` included); the coach's plan
+> records that; `logActivity()` infers only for a `workout` entry, from
+> the session in the player (`generatedSession`), never from
+> `lastFinishedSession`; yoga states `"yoga"` itself. **Repaired on load**
+> (`store._repairSessionTypes()`): an id of the form `<type>-<timestamp>`
+> becomes `<type>`; a strength type on an entry that is not a workout
+> (walk, run, swim, cycle, yoga, class, breathing, mindful, practice,
+> morning, My exercises) is cleared, because only the stale stamp could
+> have put it there; `arc.typesWorked` keys of the id form are merged
+> into their type, keeping the latest date.
+
+> **v1.74, 29 Sep 2026 — P0, SCOPE-MINOR** (`store.js` v81). Alongside works
+> around minor aches and injuries and is not designed around medical
+> conditions (Graeme, 29 Sep; `Documents/Admin/alongside_scope_minor-injury_29sep2026_v1.md`).
+> **New:** `scopeNoticeDue` (boolean, default `false`) — set on load when a
+> retired condition was dropped; Home shows the scope statement once and
+> clears it on "Understood". **Removed** (deleted on load by
+> `store._dropRetired()`): `exerciseClearance`, `conditionGoals`,
+> `conditionFoldInLevel`, `conditionReflections`, `prescribedExercisesOrigin`,
+> `prescribedExercisesActiveCondition`. **Changed:** retired condition ids
+> (`RETIRED_CONDITIONS`, `js/data/scope-statement.js`) are dropped from
+> `conditions`, `conditionMeta`, `conditionPainScores` and
+> `conditionsResolved`. `prescribedExercises` is the person's own list
+> ("My exercises"): entries the app built (`prescribedBy` "coach" /
+> "coach-recommended") are removed, and `prescribedBy` / `conditionIds` are
+> stripped from the rest. It is no longer injected into built sessions.
+> The key name is unchanged (internal).
+
+> **v1.73, 28 Sep 2026 — FEELINGS-RETIRE.** No new field. **Removed**
+> (`store.js` v80): `lastCheckin.feelingWord`, `lastCheckin.feelingQuadrant`,
+> `checkin.feelingWordDepth`, and any `feelingWord` / `feelingQuadrant` on a
+> `checkinHistory` entry — all deleted from stored data on load
+> (`store._dropRetired()`), and `saveCheckin()` never writes them. Graeme
+> retired the feeling-word question on 27 Sep (SMOOTH-P1); the word lists
+> (`data/feelings.js`, `data/signal-words.js`) are deleted with them. The
+> check-in stores energy, mood, anything sore, and sleep only if offered.
+
+
+> **v1.72, 28 Sep 2026 — work list 2e.** No new field.
+> **`proposalBias` removed** (`store.js` v79). Declared by BIAS-1 (v1.30),
+> written by nothing since BIAS-2 (16 Aug), and read only by
+> `checkin.js resolveIntensity()`, whose only caller was
+> `workoutGenerator.js` — which nothing had called since TWO-ENGINE (6 Sep)
+> and which is now deleted (record in `Documents/Archive`). The signals
+> it once carried are derived live by `session-builder.js _gentleReason()`.
+> Gone from the defaults and deleted from stored data on load
+> (`store._dropRetired()`), like `sessionPace`.
+>
+> **`exerciseFeedback` readers change, not the field.** `too-hard`: read by
+> `session-rationale.js tooHardRecently()` (two of the last five; the
+> builder offers the move less often). `too-easy`: now read by
+> `tooEasyLast()` (the latest word on that exercise; the player's log
+> suggests a step up on a settled day). `applyFeedbackWeighting()`, which
+> only the dead engine reached, is removed.
+
+
+> **v1.71, 28 Sep 2026 — SMOOTH-P4c.** New top-level field
+> **`conditionsResolved`** (default `[]`):
+>
+> ```
+> [{ id: string, resolvedAt: ISO }]
+> ```
+>
+> Written by `store.resolveCondition(id)` when the person taps **It's
+> better now** in Settings › Conditions and injuries, and cleared by
+> `store.reopenCondition(id)` (**It's back**). Resolving removes the id
+> from `conditions` — which stays *active ids only*, because 25 readers
+> depend on that shape — so the coach stops planning around it; sets
+> `conditionMeta[id].status` to `"resolved"` and drops today's pain
+> score for it. Nothing is deleted: the meta, the check-in history and
+> the reflections stay, so *It's back* restores it as it was. The app
+> never resolves a condition itself (spec 4.8: the person marks it; the
+> app never concludes it). Validated on load: only `{ id, resolvedAt }`
+> records with string values survive.
+>
+> **`sessionPace` removed.** Retired in v1.67 (SMOOTH-P1) with one
+> release of tolerance. Gone from the defaults and deleted from stored
+> data on load (`store._dropRetired()`), because the `...saved` spread
+> would otherwise carry it in every install.
+
+> **v1.70, 28 Sep 2026 — SMOOTH-P3c.** No new field. **`activityLog[]`
+> gains entries of `type: "freestyle"`** — *Make it up as I go*
+> (`js/views/capture.js` v2). One entry per session, written by
+> `store.logActivity()` on Finish or *Save what I did*:
+>
+> ```
+> { type: "freestyle", date: ISO, completedAt: ISO, durationMins: n,
+>   moodAfter: null, exerciseIds: [id], exercisesCount: n, setsDone: n,
+>   sessionType?: string   // only if the person said what kind it was }
+> ```
+>
+> Never `status: "partial"`: what was done is the whole session, so
+> COUNT-1's `completedSessions()` counts it. Each set is also one
+> `liftLog` entry, through `store.logLift()`, as the player writes.
+> **Rule (store.js v77):** a `freestyle` or `capture` entry's
+> `sessionType` is the person's answer or `null` — never inferred from
+> `lastFinishedSession` or `generatedSession`.
+
+> **v1.69, 28 Sep 2026 — SMOOTH-P3a.** **`activeSessionCheckpoint`**
+> declared (default `null`). Written by `js/session-resume.js` since
+> 03 Aug for the running-session pilot, it survived only through the
+> `...saved` spread and was never documented. Now the coach's player
+> writes it (*Carry on later*, and on every exercise change so a cold
+> reopen mid-session can resume) and Home reads it for the Carry-on
+> card.
+>
+> ```
+> { sessionType: string, startedAt: ISO, checkpointedAt: ISO, ...fields }
+> ```
+>
+> For `sessionType: "workout"` the fields are `{ sessionId, index, set,
+> name }`: which exercise and set to resume at, in which session. One
+> slot for the whole app; stale after 3 hours (session-resume.js).
+
+> **v1.68, 28 Sep 2026 — RED-FLAG.** New top-level field **`redFlag`**,
+> the red-flag screen's record. One object, not a log:
+>
+> ```
+> { screenedAt: ISO|null, areas: string[], textVersion: string|null,
+>   level: null|"emergency"|"advice", flaggedAt: ISO|null, clearedAt: ISO|null }
+> ```
+>
+> **Why.** Graeme, 28 Sep: build as approved. The screen asks three
+> questions of anyone who has told the app something is sore, before
+> exercise. `level` is what the app acts on: `"emergency"` (question 1
+> yes: A&E now, 999 if you cannot get there safely), `"advice"` (any
+> other yes, or any "not sure": stop exercising, call NHS 111). While a
+> level is set and `clearedAt` is empty, exercise routes stop; breathing
+> and quiet practices stay. `areas` lets a NEW sore area ask again;
+> `screenedAt` re-asks after 30 days. `textVersion` records what was
+> asked, the same way `safetyAckLog` does.
+>
+> ⚫ **The answers are not stored**, only the level. Bladder, bowel and
+> saddle-area answers are more than the product needs to keep, and the
+> level is all it acts on.
+>
+> Written by `js/data/red-flag.js` only. Malformed values are discarded
+> on rehydrate.
+
+> **v1.67, 16 Sep 2026 — AROUND-AREA.** New top-level field
+> **`todayForm`** — the Q2 answer as the person gave it, before it is
+> translated into a session type.
+>
+> 🔴 **Found by tracing the whole chain, not by a test.** Somebody flags
+> a sore lower back three times, the coach correctly says *"I'd build
+> strength around it rather than work it directly"* — and then handed
+> them **Full Body**, which loads the back like everything else. **The
+> advice was right and the session did not follow it**, which is worse
+> than not giving the advice.
+>
+> `requestedSessionType` holds what the answer *becomes*. It could not
+> hold what the answer *was*: "build strength around it" and "strength"
+> both resolve to a session type, and only `todayForm` tells them apart.
+> The proposal line needs that difference, because it is the whole point
+> of the recommendation.
+>
+> ⚫ **"Around" is now area-aware.** A sore back loads the posterior
+> chain (`glute`); sore hips or legs load the trunk (`core`); a sore
+> shoulder loads the legs (`lower`). Unknown areas fall through rather
+> than guessing at a body part.
+>
+> 🟠 **AROUND-REVIEW, for clinical review.** That mapping is movement reasoning,
+> not clinical prescription — four coarse buckets, no condition-specific
+> protocols, no claim beyond "work near it, not on it". A
+> physiotherapist should read it before beta.
+>
+> Cleared with the other purpose fields at the start of each check-in.
+
+> **v1.66, 16 Sep 2026
+
+> **v1.66, 16 Sep 2026 — PURPOSE-ASK.** Two new top-level fields:
+> **`todayPurpose`** (`arc | niggle | area | general | gentle`, or null)
+> and **`todayPurposeArea`** (a `TARGET_AREAS` id or condition id, or
+> null).
+>
+> Graeme, after three fixes at the wrong level: *"The coach still doesn't
+> ask what I want. Like, work towards my arc, conditions, body zone,
+> general fitness, etc. There are lots of reasons to work out but the
+> coach never asks."*
+>
+> 🔴 **The coach assumed the reason was always the arc.** Everything
+> downstream followed from one hardcoded purpose, which is why the answer
+> kept being core. ALWAYS-CORE fixed the rotation, PROPOSAL-LOC fixed the
+> alternates, ASK-KIND offered a different *shape* of session — all real
+> bugs, none of them the question. **The repetition was the signal and it
+> was read as a reminder.**
+>
+> ⚫ **Cleared at the start of every check-in, not carried.** A purpose
+> is a fact about today, like the check-in itself. Yesterday's reason is
+> not a default, and a stale one would be the same class of fault as
+> reading `generatedSession` as a record.
+>
+> ⚫ **`requestedSessionType` is reused** as the answer to the second
+> question rather than adding a third field. ASK-KIND's plumbing was
+> right; the question it asked was wrong.
+>
+> **What may be reasoned from, all of it already recorded:**
+> `checkinHistory[date].conditionLevels` (how often and how recently an
+> area was flagged), `conditionPainScores` (today), `activityLog[]`
+> `sessionType` and `completedAt` (live since ALWAYS-CORE), and
+> `arc.zonesWorked` / `arc.typesWorked` (live since ARC-EVERYTHING).
+>
+> 🔴 **The honesty rule.** A recommendation's reason must be something
+> the person told the app, said back to them — *"you've flagged this
+> three times in a fortnight"*, never *"this is what your body needs"*.
+> Same rule as the caution line on the exercise cards, and the same
+> reason: the second kind is a diagnosis. `verify-purpose-ask` enforces
+> it against a word list.
+>
+> 🔴 **With no history there is no recommendation.** On day one the
+> options are offered unmarked. The gold mark means *"I have a reason"*
+> and must never mean *"I have to pick something"* — inventing confidence
+> is the failure mode of every app this product exists as an alternative
+> to.
+
+> **v1.65, 16 Sep 2026
+
+> **v1.65, 16 Sep 2026 — ASK-KIND + EXIT-LOOP.** Two new top-level
+> fields, both answering things Graeme reported more than once.
+>
+> **`requestedSessionType`** — a session type the person asked for
+> instead of the one the arc chose, or `null`.
+>
+> Graeme, three times in a week: *"How does the coach know I want core
+> and not cardio or strength?"* **It did not. It inferred from the arc
+> and never asked.** When it kept landing on core the ROTATION was fixed
+> — twice — which was a real bug and never the thing being asked for.
+> The rotation also only advances on **completed** sessions, so somebody
+> testing, or somebody who opens the app and changes their mind, sees the
+> arc's first type forever.
+>
+> ⚫ **A request overrides the arc; it does not edit it.** One session
+> spent differently, and the arc resumes as soon as the field is cleared.
+> The arc still decides whenever nobody has said otherwise, which is the
+> whole Plan promise.
+>
+> ---
+>
+> **`declinedProposalAt`** — ISO timestamp of the last "exit without
+> saving", or `null`.
+>
+> Graeme, stuck: *"I 'exit without saving' and get chucked back to the
+> coach proposal again and get stuck. Surely it's simple. Wire 'exit
+> without saving' to the home screen?"* 🔴 **It already was.** All six
+> session views send that button to Today. **Home was undoing it:** a
+> proposal accepted inside ten minutes with no completed session resolves
+> to `proposal-accepted`, and Home re-routes to the proposal instead of
+> rendering.
+>
+> That bounce exists for somebody **interrupted** — phone call
+> mid-session, come back, carry on. It never allowed for somebody who
+> said **no, not this one**, and the two look identical in the store. So
+> the difference is recorded when they leave.
+>
+> ⚫ **Compared against `lastProposalDate` rather than cleared
+> anywhere** — a newer proposal outranks an older decline by being
+> newer, so nothing has to remember to reset it.
+
+> **v1.64, 16 Sep 2026
+
+> **v1.64, 16 Sep 2026 — ARC-EVERYTHING.** New nested field
+> **`arc.typesWorked`** — `{ [sessionType]: "YYYY-MM-DD" }`, the
+> capability channel, parallel to the existing `arc.zonesWorked`.
+>
+> Graeme: *"Absolutely everything should go towards progress 100%. I've
+> turned up. That's number one. I've done a session. That's number two."*
+>
+> 🔴 **Two faults made that impossible, and both were structural.**
+>
+> 1. `markZonesWorked()` had **exactly one caller in the whole app** —
+>    the stretch-zone picker in `session-builder-ui.js`. Every workout,
+>    core session, gym programme, class, walk and morning session marked
+>    nothing. **The arc could only see stretching.**
+> 2. Today's `lit` asked only whether a strand's **zones** had been
+>    worked. **18 of 30 strands carry no zones** — they carry
+>    `sessionTypes` — so `[].some()` was false forever and Trunk
+>    strength, Staying-power and Pacing yourself were **incapable of
+>    lighting**, whatever anybody did. Graeme's first screenshot said
+>    *"Trunk strength and Trusting your body again haven't come up yet"*
+>    in a week he had done strength work. **The arc was not behind. It
+>    could not see.**
+>
+> ⚫ **Two channels, because the strands are genuinely two kinds.** Body
+> strands light from the areas the movements worked (`affectsAreas`
+> mapped to zones by `zonesForAreas()` in `data/aims.js`); capability
+> strands light from the type of session it was. Either counts.
+>
+> ⚫ **Dates, never counts** — ARC-1's decision, kept. A strand is lit or
+> it is not, which is a fact about the plan rather than a score.
+>
+> ⚫ **Written by `markSessionWorked()`, called from `logActivity()`** —
+> the single write path, after the dedupe check so a rejected duplicate
+> credits nothing twice. Eleven views each remembering to call it is how
+> `markZonesWorked()` ended up with one caller. Wrapped: a session must
+> be logged even if crediting the arc fails, because the log is the
+> record and the arc is commentary on it.
+>
+> ⚫ **Nested under `arc`**, so it shares the arc's lifecycle — a new arc
+> starts clean rather than inheriting credit from the one before it. The
+> `startedAt` guard applies to this channel too: ARC-COVERAGE found a
+> brand-new arc showing a strand already lit from a session two days
+> before it existed, and that must not return through a new door.
+>
+> **Contribution is computed from what was DONE, never from how the
+> session was created.** A session somebody built, one the coach
+> proposed, and one captured afterwards all count the same.
+
+> **v1.63, 16 Sep 2026
+
+> **v1.63, 16 Sep 2026 — ALWAYS-CORE.** No new field. **`store.js` v70
+> now does what this document already said it did.**
+>
+> 🔴 The entry for `activityLog[].sessionType` below has stated since
+> 06 Sep that it is *"Written by `store.logActivity()`, from the
+> `sessionType` supplied by whichever builder produced the session."*
+> **It was not written by anything.** No view passed it and
+> `logActivity()` did not infer it, so the field was `null` on every
+> entry ever created.
+>
+> The consequence was not cosmetic. `recentSessionTypes()` filters the
+> log on `validType(e.sessionType)`, so it returned `[]` permanently;
+> `chooseSessionType()` step 2 picks the first arc type **not** in that
+> list; and a rotation that reads as a rotation was a deterministic pick
+> of `arcTypes[0]`. Graeme got **core, every session** — *"It seems to
+> always be core."* It always was.
+>
+> ⚫ **Stamped in `logActivity()`, not in eleven views.** It is the
+> single write path and this document already names it as the writer.
+> Eleven call sites each remembering to pass a field is how five views
+> got wired and called thirteen. An explicit `sessionType` on the entry
+> still wins: a caller that knows better than the store is not overruled
+> by it.
+>
+> **Still not back-filled.** Existing entries stay `null`, exactly as the
+> entry below says, and the chain must keep treating absence as its
+> normal early state.
+
+> **v1.62, 16 Sep 2026
+
+> **v1.62, 16 Sep 2026 — SAVE-HANDOFF.** New top-level field
+> **`lastFinishedSession`** — the one way a session view hands what just
+> happened to `reflect.js`.
+>
+> ```
+> { at: ISO string, session: { title, durationMins, exercises: [{ id }] } }
+> ```
+>
+> **Why it exists.** SAVE-ALL put "Keep this one?" on `reflect.js`, the
+> one screen every session ends on, and read the session from
+> `generatedSession`. That works for builder-generated views and not for
+> the ones that assemble their own queue, so `yoga-session.js` kept a
+> private save implementation — pinned in `verify-save-all` 5.2 as a
+> **named exception** rather than tolerated silently. This field is what
+> lets that exception go.
+>
+> ⚫ **Not merged with `generatedSession`, deliberately.**
+> `generatedSession` is a **proposal**: what the coach built, whether or
+> not it was done, and it outlives the day it was built for. This is a
+> **record** of what finished. Reading a proposal as a record is the bug
+> the date-guard in `save-block.js` exists to paper over; a separate
+> field removes the need for the paper.
+>
+> **Single-slot, not a log.** `activityLog` already holds the history.
+> This is a handoff between two screens and is overwritten every session,
+> so nothing should read it as a record of anything but the most recent
+> finish.
+>
+> **Malformed values are discarded on rehydrate rather than coerced** —
+> offering to save something unreadable is worse than not offering.
+
+> **v1.61, 15 Sep 2026
+
+> **v1.61, 15 Sep 2026 — SAFETY-GATE.** New top-level field
+> **`safetyAckLog`** — an array of acknowledgement entries, empty if the
+> person has never been asked. Each entry:
+>
+> ```
+> { at: ISO string, textVersion: string, surface: string }
+> ```
+>
+> **Why it exists.** CARD-4 pinned the two `HURT_AND_ACHE` lines to all
+> four exercise pages, so across a ten-exercise session they rendered
+> forty times. Graeme, 15 Sep, on device screenshots: *"Too many of the
+> same things on one screen."* GUIDANCE-1 had already written down what
+> happens next — repetition without occasion trains people to look past
+> it, and the one time it matters it has already become furniture.
+>
+> The guidance moves to a session-level gate, read once and acknowledged
+> deliberately, and stays on every card as a collapsed disclosure. CR-5's
+> guarantee is unchanged — available on every exercise, always. What
+> changes is whether it is open by default.
+>
+> ⚫ **`textVersion` is the load-bearing field, not `at`.** A timestamp
+> alone does not establish what was on the screen, and establishing that
+> is the entire reason the log exists. It stores `HURT_AND_ACHE_VERSION`
+> as it stood at the moment of the tap. Any edit to either string bumps
+> that constant in the same commit; `verify-card5` test 4 asserts the
+> constant against a hash of the two strings, so the pairing cannot
+> silently drift.
+>
+> 🔴 **This is evidence of notice. It is not a waiver.** Under the
+> Consumer Rights Act 2015 s.65, and UCTA 1977 s.2(1) outside consumer
+> contracts, no term or notice excludes liability for death or personal
+> injury caused by negligence. The acknowledged wording is therefore
+> exactly **"I have read this"** — never "I accept the risk", never "I
+> confirm I am fit to exercise". Those are unenforceable *and* they read
+> worse in front of a court, because they evidence an intention to
+> exclude. Wording is with Foot Anstey, not settled here.
+>
+> **Capped at 200, oldest trimmed first.** At the 30-day cadence that is
+> roughly sixteen years; if the cadence were ever set to every session it
+> is roughly seven months, which is why the cap exists rather than being
+> theoretical. **The log is therefore not guaranteed complete** and
+> nothing should read it as a full history.
+>
+> **Not merged with `guidanceShownAt`.** Different statements, different
+> triggers. One timestamp for both would mean showing either one
+> suppresses the other. They share a cadence constant, not a field.
+>
+> ⚫ **Supabase note.** When the schema-design session runs, this
+> migrates as an append-only table with a *server* timestamp, not a JSON
+> blob. A client-written record is weaker evidence than a server-written
+> one, and this is the field where that difference matters most.
+
+> **v1.60, 11 Sep 2026 — ADAPT-1. No store field, and that is the point.**
+> Exercise entries gain an optional `adaptations` object — the other ways
+> to do an exercise, offered as options on the card. It is static content,
+> documented in the cross-reference below and defined in the Exercise
+> Entry Standard v4.
+>
+> **Nothing is recorded about which option somebody used.** No new field,
+> no migration, no write path. The app offers; the person chooses; the
+> choice is theirs and is not kept. Anything that later wanted to
+> *remember* a choice would be a store change and a new decision, not an
+> extension of this one.
+
+> **v1.59, 08 Sep 2026 — GUIDANCE-1.** New top-level field
+> **`guidanceShownAt`** — ISO string, or `null` if the general-guidance
+> line has never been shown.
+>
+> **Why it exists.** The statement that this app's advice is general and
+> that somebody should speak to their GP or an exercise professional
+> lived in exactly two places: the closing beat of onboarding, said once
+> and never again, and the Terms page, which almost nobody opens.
+>
+> Clinical advice on the proposed three-question red-flag
+> screen: those questions *"only take into account some red flags"*, and
+> **"to protect yourself you might be better off saying something like:
+> the advice given by this app is generic, prior to starting any exercise
+> programme you should seek guidance from your GP or exercise
+> professional."**
+>
+> ⚫ **So the statement carries the weight the screen was going to
+> carry** — which means it cannot be said once at signup and then never
+> again. Graeme: *"To have a disclaimer in the terms and onboarding only
+> is a concern. I think it needs a one liner regularly, not necessarily
+> every session."*
+>
+> 🔴 **Thirty days, and deliberately not every session.** A line that
+> appears every time is a line nobody reads — the same argument that
+> keeps a live region from firing when nothing has happened. The interval
+> is what preserves its meaning.
+
+## 08 Sep 2026 v1.58
+
+> **v1.58 — LOG-CLASS-1.** No field changes. Records that the class
+> player writes to `activityLog`, and corrects a note that had been read
+> as "do not log classes".
+
+## 08 Sep 2026 v1.57
+
+> **v1.57, 08 Sep 2026 — PLAYER-1.** New nested field **`activeClass`**,
+> the only state a class in progress keeps.
+>
+> Seven classes existed as data that nothing could play: no view imported
+> them, no route reached them, and the only code calling `sectionsFor()`
+> was their own gate. This is the field the player needs.
+>
+> ```
+> activeClass: {
+>   id:           string|null,   // which class
+>   lighter:      boolean,       // running the lighter variant
+>   sectionIndex: number,        // where they are
+>   beatIndex:    number,
+>   startedAt:    string|null    // ISO
+> }
+> ```
+>
+> **`lighter` is fixed when the class starts and never changes mid-class.**
+> Switching variants halfway would drop the person into a section they
+> had not been shown or repeat one they had, and the omitted sections are
+> chosen for the shape of the whole class rather than beat by beat.
+>
+> **It is stored rather than held in module state** because a class runs
+> for fifteen minutes on a phone that will lock, take a call, or be put
+> in a pocket. Module state does not survive that; the workout view keeps
+> its progress in the store for the same reason.
+>
+> ⚫ **No count of classes completed, and no streak** — in `activeClass`.
+> Four of the seven classes exist to argue that today's result is not the
+> evidence, and a counter in the corner of the player would contradict
+> them.
+>
+> 🔴 **v1.58, 08 Sep 2026 — LOG-CLASS-1. That is about a TALLY ON THE
+> CLASS SCREEN, and it was allowed to stand in for logging at all.** The
+> player wrote nothing to `activityLog`, so Progress reported "Nothing
+> logged in this window. 0 sessions, 0 minutes" to somebody who had just
+> done a class. Not showing a count is not the same as not remembering
+> they were there, and Progress exists to answer "what have I been
+> doing". A completed class now logs `type: 'class'` with the minutes
+> actually spent; leaving part-way logs a partial.
+
+## 08 Sep 2026 v1.56
+
+> **v1.56, 08 Sep 2026 — LOCATION-1.** No new field. `sessionLocation`
+> gains the description it never had, and two readers.
+>
+> **What was wrong.** `buildSession()` has no location parameter at all:
+> location exists only as a selector for WHICH EQUIPMENT LIST is used.
+> `coach-proposal.js` passed `equipmentOverride: null`, which falls back
+> to the flat `equipment` field — and `onboarding/equipment.js` writes
+> that field as **the union of home kit and gym kit**.
+>
+> So One to one built every session against both lists at once. Measured
+> with a resistance band at home and a rack at the gym: it proposed a
+> **Barbell Back Squat** and a **Barbell Deadlift** to somebody who might
+> be standing in their kitchen. Not an edge case — the default path.
+>
+> `sessionLocation` already existed, already had a writer
+> (`checkin-mini.js` Step 4, "Where are you now?"), and was read by
+> nothing that builds a session. The wire was left hanging.
+>
+> **`"outside"` now means bodyweight**, not home kit. It is the third
+> option `checkin-mini` has always offered and the first time anything
+> building a session has had to answer it: your home dumbbells are not
+> in the park, and falling through to the home list would propose them
+> there.
+
+## 08 Sep 2026 v1.55
+
+> **v1.55, 08 Sep 2026 — SAVED-2 (edit route).** `sessionBuilderPreselect`
+> gains `"edit"` as a third `mode` alongside `"quick"` and `null`, and a
+> companion key **`savedSessionId`** naming the record being edited.
+>
+> Editing reuses the builder's PREVIEW screen rather than adding a second
+> editor. That screen already lets any movement be swapped, so loading a
+> saved session into it gives editing for free — and the alternative, a
+> separate edit UI, would be a second place where a session's contents
+> can be changed, drifting from the first the moment either moved.
+>
+> Read-once-then-cleared like the rest of the object. A `mode` that
+> persisted would leave the builder permanently editing a session
+> somebody opened once.
+
+## 08 Sep 2026 v1.54
+
+> **v1.54, 08 Sep 2026 — SAVED-2.** Entries in `savedSessions[]` gain
+> **`updatedAt`**: an ISO string, or absent for a session never edited
+> since it was saved. Written by `updateSavedSession()` when a saved
+> session's name or movements change.
+>
+> `createdAt` keeps its meaning — when the session was first saved — and
+> remains what the list orders by, so **editing a session does not move
+> it to the top**. Somebody who edits the one they use most would
+> otherwise find the list reshuffling under them for no reason they
+> asked for.
+>
+> Records written before this version have no `updatedAt`; absent and
+> `null` mean the same thing here and the view treats them alike.
+>
+> Editing OVERWRITES. There is no version history and no "v2" record —
+> a saved session is one thing that changes, which is what makes
+> `deleteSavedSession()` the only way to lose one.
+
+## 08 Sep 2026 v1.53
+
+> **v1.53, 08 Sep 2026 — SAVED-1.** No field changes. `savedSessions` gains a third reader, `views/saved-sessions.js`, and the note below records that `deleteSavedSession()` remains uncalled by choice rather than by oversight.
+
+> **v1.52, 08 Sep 2026 — ROLE-1.** Exercise objects inside
+> `generatedSession.session.exercises` gain **`role`**: one of `"warmup"`,
+> `"main"` or `"cooldown"`. `buildSession()` and
+> `buildSessionFromSelection()` already assemble their exercises from
+> separately-built warm-up, main and cool-down arrays; the grouping was
+> known at assembly and simply never stamped onto the objects, so every
+> exercise in every coach-built session reached the views with `role`
+> **undefined**. `workout.js` renders that role as the badge above the
+> exercise name, and `formatRole()` ended `return roles[role] || role` —
+> so an absent role fell through and printed the literal string
+> **`undefined`**, uppercased by CSS, on every card of every One to one
+> session, in the visible badge, in the `class` attribute and in the
+> `aria-label`. No store field is added or renamed; this documents a
+> shape that stored sessions now carry.
+
+## 06 Sep 2026 v1.51
+
+**File:** `js/store.js` (confirmed live version: **v99, 01 Oct 2026**)
+
+> **v1.47, 06 Sep 2026 — CR-1.** `conditions[]` gains three ids and loses one. `chronic-fatigue` is **retired**; `persistent-fatigue`, `me-cfs` and `long-covid` replace it. No field shape changed — `conditions` is still `string[]` and `conditionMeta` is still keyed by condition id.
+>
+> **The migration is the contract, not the ids.** `store._migrateConditionIds()` maps `chronic-fatigue` → `persistent-fatigue` **only**, and must never map it to `me-cfs` or `long-covid`. The old id covered two populations and nobody who stored it was asked which they meant, so the migration maps to the *less* restrictive target: withdrawing the product from someone who never answered the question is a worse error than leaving them where they already were. Existing users are re-asked at their next conditions update. Gated by `tools/verify-clinical-response.mjs`.
+>
+> `conditionMeta` keys migrate alongside, via `store._migrateConditionMetaKeys()`, so `addedAt`, `reportDays` and `quietRun` survive the rename rather than being reset. Where both the old and new keys exist, the **new** one wins — it was written by a real answer where the migrated one is inferred.
+>
+> New in `conditions.js` v1.6: `EXCLUDED_CONDITIONS` (`me-cfs`, `long-covid`), with `hasExcludedCondition()` and `getExcludedConditions()`. Not a store field — a derived read over declared conditions. It reads declared conditions only, never journal content and never inferred signal, and it must never sit behind `isPremium()`.
+>
+> **Provenance:** written answers from a named physiotherapist, 06 Sep 2026, who declined the reviewer role and declined naming. Steers, not clinical sign-off.
+
+> **v1.46, 06 Sep 2026 — SKIP.** `exerciseFeedback` has ONE writer, and it is the explicit two-button control. The "Skip this one" button no longer writes to it. No field shape changed; the contract narrowed, which is the part a future session needs and the part the old entry got wrong.
+>
+> **v1.45, 03 Sep 2026 — ARC-3-SETUP.** `stretchArc` is renamed **`arc`** and extended.
+>
+> **Why renamed:** the object no longer holds a stretch arc. It holds an aim and up to three strands, and a strand may be a mind strand. A field called `stretchArc` holding that is the `activation` fault again — a name that stopped describing its contents and misled every reader afterwards. Three files, five references, no users; cheap now, expensive once anybody has data. Old keys migrate on read.
+>
+> | Key | Type | Default | Meaning |
+> |---|---|---|---|
+> | `aimId` | `string \| null` | `null` | Aim id from `data/aims.js` |
+> | `strands` | `string[]` | `[]` | Up to `AIMS.maxStrands` strand ids |
+> | `marker` | `string` | `""` | The person's own answer to "how would you know it was happening?" |
+> | `goalId` | `string \| null` | `null` | Legacy, read-only |
+> | `startedAt` | `string \| null` | `null` | ISO date the arc began |
+> | `acceptedAt` | `string \| null` | `null` | When the person confirmed the arc was theirs |
+> | `provenance` | `string` | `"self"` | `"self"` or `"assigned"` |
+> | `zonesWorked` | `object` | `{}` | `{ [zoneId]: 'YYYY-MM-DD' }` — a date per zone, never a count |
+> | `active` | `boolean` | `false` | Whether an arc is running |
+>
+> **`marker` is free text and is never parsed.** It exists to be read back to the person, not measured — which is the entire reason it replaces SMART's "measurable". Measurement invites failure; noticing does not.
+>
+> **`provenance` is recorded before anything can assign an arc.** Retrofitting consent into a live feature is the expensive version, and an assigned arc that looks self-set is a consent problem rather than a feature. See the arc specification §9.
+
+> **v1.44, 31 Aug 2026 — ARC-1.** New top-level object `stretchArc`:
+>
+> | Key | Type | Default | Meaning |
+> |---|---|---|---|
+> | `goalId` | `string \| null` | `null` | Goal id from `data/goals.js` |
+> | `startedAt` | `string \| null` | `null` | ISO date the arc began |
+> | `zonesWorked` | `object` | `{}` | `{ [zoneId]: 'YYYY-MM-DD' }` — last date each zone was worked |
+> | `active` | `boolean` | `false` | Whether an arc is running |
+>
+> **`zonesWorked` holds a DATE PER ZONE, never a count.** "Shoulders last
+> came up on the 12th" is a fact about the plan. "You have done shoulders
+> three times" is a score, and this product does not keep score. The date
+> supports the coach saying *"we haven't come to shoulders yet"* without
+> ever putting a number on the person.
+>
+> **Deliberately NOT nested inside `activeProgramme`,** which reverses
+> advice given earlier the same day. That advice concerned SERIES-1, which
+> genuinely is a session sequence. The deciding argument here is lifecycle:
+> `activeProgramme` holds one programme and is cleared on completion, so a
+> nested arc would be wiped the day somebody finished an unrelated strength
+> programme.
+>
+> **There is no session list in this object, on purpose.** The arc shapes
+> what a session leans towards. It never dictates that a session is owed —
+> that would be a streak wearing a different coat.
+
+> **v1.43, 31 Aug 2026 — ZONE-1.** New field `sessionZoneFocus`: `string[]`,
+> default `[]`. The body zones chosen for today's stretch session, by zone
+> id from `STRETCH_ZONES` in `session-builder.js`.
+>
+> **Stored, not held in the view,** because the check-in gate can route
+> somebody out to `checkin.js` and back mid-flow, and a choice that did not
+> survive that would have to be asked for twice.
+>
+> **Deliberately not a preference and not a profile.** Nothing outside the
+> builder reads it, nothing accumulates from it, and it says nothing about
+> the person — only about the twenty minutes in front of them. Cleared when
+> the session is built, so it never silently shapes tomorrow.
+
+> **v1.42, 31 Aug 2026 — no field changed.** `store.js` v60 adds
+> `checkedInToday()`, a derived read over the existing
+> `lastCheckin.timestamp`. It stores nothing. It moved here from a private
+> helper in `today.js` because the Mobility & Conditioning door needed the
+> same test, and two definitions of "has this person checked in today" is
+> how two doors end up disagreeing about whether they have — one gating a
+> session on the answer and one not.
+
+---
+
+## v1.41 (22 Aug 2026) — TARGET-DEAD: one field removed
+
+`store.js` v57 → **v58**. Top-level **`targetWeight` is gone.**
+
+It had **no reader and no writer anywhere**. Its only writer lived in `onboarding/goal-setup.js`, a view that had never loaded and was retired on 22 Aug; its only readers were that same view and a dead branch of `workoutGenerator.js`, removed the same day.
+
+🔴 **Not revived, deliberately.** `strategicGoal.targetValue` + `targetUnit` is the single home for a weight target. A second home for the same fact is precisely what caused TARGET-3, and this field was one of the two homes that made TARGET-3 possible.
+
+**Nothing migrates.** The field was never written, so no install can be carrying a value. Any that somehow is simply drops it — the correct outcome for a number nothing could read.
+
+---
+
+---
+
+## v1.40 (22 Aug 2026) — WEIGHT-1b: the surfaces, and one new field
+
+`store.js` v56 → **v57**. Weight tracking is now reachable end to end: the Settings toggle, the display unit, the weight, the target, and the log.
+
+| Field | Type | Default | Purpose |
+|---|---|---|---|
+| `weightRateRaisedAt` | `string\|null` (ISO) | `null` | The coach has spoken **once** about a sustained rate of loss |
+
+### 🔴 Why the timestamp exists
+
+`observedRateBreach()` fires when logged loss runs at or above 3 lb a week for three consecutive weeks — the threshold supervised trials intervene at. Without a record that it has spoken, the note would reappear on **every render of Progress**, which is nagging somebody about the rate they are losing weight at: the worst available version of this feature.
+
+⚠️ **The flag is written AFTER the note is rendered, never before.** The first implementation set it in the save handler before re-rendering — so the render then saw the flag and drew nothing, and the note would have appeared **zero** times. A "show once" that writes its own flag too early shows never, and fails silently.
+
+### Fields that gained writers in this version
+
+`weightTracking` (Settings toggle) · `weightUnit` (display picker) · `weight` (Settings, and the most recent log entry) · `weightLog` (Progress) · `strategicGoal.targetValue` and `targetUnit` (My Programme, canonical kg) · `strategicGoal.weightTargetBand` (recorded at set-time).
+
+⚠️ **Top-level `targetWeight` is now fully dead** — no reader, no writer. Deliberately not revived: `strategicGoal.targetValue` + `targetUnit` is the single home, and a second home for the same fact is what caused TARGET-3. Booked for removal.
+
+---
+
+---
+
+## v1.39 (22 Aug 2026) — WEIGHT-1a: weight tracking, declared dark
+
+`store.js` v55 → **v56**. Authority: `alongside_weight1_build_scope_22aug2026_v1.md` v3.
+
+Weight tracking is **a feature, off by default, Plan-only**. Nothing here is read or written by any view until WEIGHT-1b.
+
+### The fields
+
+| Field | Type | Default | Purpose |
+|---|---|---|---|
+| `weightTracking` | `boolean` | `false` | The opt-in. **Off by default.** Plan-only at the surface |
+| `weight` | `number\|null` | `null` | **Canonical kilograms, always** |
+| `targetWeight` | `number\|null` | `null` | **Canonical kilograms, always** |
+| `weightUnit` | `'kg'\|'lb'\|'st'` | `'kg'` | **Display preference only.** Never affects what is stored |
+| `weightLog` | `array` | `[]` | `{ at, kg }`. Passive entry only |
+| `strategicGoal.weightTargetBand` | `string\|null` | `null` | Which band accepted the target at set-time: `silent` \| `note` \| `capped` |
+
+### 🔴 Canonical kilograms — storage only, never display
+
+Somebody who works in stone and pounds enters and sees **12 st 4 lb**. The stored value is kg. The same arrangement as storing dates in ISO and rendering "Thursday".
+
+**Why one internal unit is not optional here.** The safety bands compare a rate against a threshold. If the stored number were sometimes 80 and sometimes 176 depending on a display preference, any consumer that forgot to convert would compare the wrong quantities — and the **≥ 4 lb/week refusal is the one place in this product where being wrong by a factor of 2.2 is unacceptable.** A single canonical unit makes that class of fault impossible rather than merely unlikely.
+
+`weightUnit` gains a real writer in WEIGHT-1b. Until then it is `'kg'` and `session-log.js:179` labels the resistance field accordingly — the UNIT-1 bug, now folded in here rather than fixed separately, because it was never separable.
+
+### 🔴 `weightTargetBand` — written once, at set-time
+
+Records which band accepted a target when it was set. **If a threshold ever tightens, this is the difference between a clean audit — *these were accepted under the old band* — and re-deriving intent from dates and arithmetic months later.** Cheap now, impossible retrospectively.
+
+### ⚠️ Declared dark
+
+`weightTracking` has no writer until WEIGHT-1b. `weight`, `targetWeight` and `weightLog` had **no writers before this change and still have none** — they were declared long ago and never wired, which is what the 22 Aug audit found. WEIGHT-1a does not change that; it makes the shape correct and gates it. `tools/verify-weight1.mjs` is the tracker.
+
+---
+
+---
+
+## v1.38 (21 Aug 2026) — R1-a: the fields the hard conversation needs
+
+`store.js` v54 → **v55**. Two additions to `strategicGoal`, no migrations, no behaviour change. Detection ships dark in this session; nothing reads these fields until R1-b.
+
+Authority: `Documents/Business/alongside_r1_r2_amendment_21aug2026_v1.md` v1.
+
+### `strategicGoal.targetSetAt` — because `setAt` records a different fact
+
+`setAt` is written by `onboarding/plan-select.js:175` and `onboarding/thread.js:1260`, both at the moment the **weekly session frequency** is agreed. It is never written when a date is named.
+
+R1's maturity guard exists to stop the coach judging a target it has barely seen. Using `setAt` for that means the guard protects the wrong thing: it gives no protection at all to a date named last week through the `today.js` hinge.
+
+`targetSetAt` records **when the dated target was named**. Readers fall back to `setAt` where it is absent, so existing installs behave exactly as they would have.
+
+⚠️ **Declared here, written by nothing until R2-a.** This is a deliberate orphan for one session, tracked by `tools/verify-hard1.mjs`. R2-a adds the writers at both date-write sites.
+
+### `strategicGoal.review` — the hard conversation's own state
+
+| Field | Type | Default | Purpose |
+|---|---|---|---|
+| `lastOfferedAt` | `string\|null` (ISO) | `null` | Throttle. 28 days. **Only set when an offer was actually shown** — a suppressed offer leaves it untouched and returns on the next open |
+| `outcomes` | `array` | `[]` | One entry per resolved conversation: `{ at, choice, previousDate, newDate }`, `choice` being `moved` \| `reshaped` \| `kept` |
+
+**`outcomes` is never cleared on downgrade.** Somebody who moves their date in November and returns to free in January must find it intact. Nothing currently clears `strategicGoal` on tier change; this is a "do not break it" assertion, not new work.
+
+**Merge guarding.** The `strategicGoal` merge is an IIFE that spreads `saved.strategicGoal` over the defaults, so a corrupt saved value passes straight through. `review` is guarded explicitly — object shape checked, `outcomes` coerced to an array — the same treatment `measurementsOptIn` already gets in that block.
+
+---
+
+## v1.35 (17 Aug 2026) — TARGET-4: four names for one idea, reduced to one
+
+`store.js` v52 → **v53**. No new fields. One migration, and the reason it exists is worth more than the change.
+
+**`targetDate` and `targetDescription` existed in two places**, and were read under a third name that never existed at all:
+
+| Path | Written by | Read by |
+|---|---|---|
+| `targetDate` (top level) | `onboarding/goal-setup.js` | `goal-setup.js`, `workoutGenerator.js` |
+| `strategicGoal.targetDate` | **nothing** | `views/my-programme.js` |
+| `goal.targetDate` | **no such object** | `workoutGenerator.js` — always `undefined` |
+| `goal.primaryGoal` | **no such object** | `workoutGenerator.js` — so a chosen primary goal was silently replaced by `goals[0]` |
+
+**Found in that order, each by accident while chasing the next.** TARGET-3 made the readers tolerant, which stopped the visible bug but left the divergence: two fields, either editable, drifting apart. GOAL-2 removed the phantom third name.
+
+**TARGET-4 closes it at the source.** On load, `mergeWithDefaults()` copies the top-level pair into `strategicGoal` — **one way, and only into an empty field.** The top-level pair is never written back to and never overwrites a later answer: *a migration that can overwrite is a migration that will, on the day somebody edits the newer field first.* Idempotent, so once `strategicGoal` holds a value the copy stops.
+
+**`strategicGoal` is canonical from here.** The top-level pair stays declared for existing installs and should be considered read-only legacy.
+
+**File:** `js/store.js` (superseded header below)
+**Storage:** `localStorage` key `alongside_user`
+
+**This version supersedes:** v1.33 (13 Aug 2026).
+
+---
+
+## v1.34 (16 Aug 2026) — eleven store versions of drift, and the gate that could not see it
+
+`store.js` v41 → **v52**. Nine top-level fields were undocumented: `assessment`, `exerciseClearance`, `pacing`, `personalBests`, `programme`, `sessionMode`, `sessionPace`, `showPersonalBests`, `weekFocus`.
+
+**Why the drift got this far.** `tools/schema-check.mjs` exists precisely to stop it, and it reported the version mismatch faithfully — but its field diff had never examined anything. It anchored on `indexOf('getDefaults()')`, matching the first *mention of the name* in the header comment rather than the definition ~760 lines later, then searched for the closing brace from the start of that slice, so the end index landed before the start index and `String.slice()` returned `''`. Zero keys were extracted, so every key counted as documented and `UNDOCUMENTED` could not fire at any amount of drift.
+
+It was found by probing the extraction rather than reading the verdict. The lesson is the 15 Aug rule with one addition: **a red check is no more trustworthy than a green one.** This one was failing, for a real reason, while its main assertion was empty — and the plausible fix, bumping the version line, would have turned it green and buried all nine fields.
+
+`schema-check.mjs` is now **v2**: anchored on the definition, ended relative to the return, and it asserts its own extraction — fewer than 50 top-level fields fails loudly rather than passing quietly. Reversal-tested by renaming `getDefaults` in a scratch clone.
+
+### The nine fields
+
+| Field | Shape | Writer | Reader |
+|---|---|---|---|
+| `assessment` | `{ baseline, history[], lastOfferedAt, declined }` | `store.recordAssessment()` / `store.declineAssessment()` | `store.assessmentChange()`, `data/assessment.js` |
+| `programme` | `{ presentation, chaptersDone[], currentChapterId, hingeOfferedAt }` | none yet (CHAP-1 step 1 is schema only) | `views/my-programme.js` |
+| `weekFocus` | `{ key, proposedAt, editedByUser }` | none yet (CHAP-1 step 4) | `views/my-programme.js` |
+| ~~`exerciseClearance`~~ (removed v1.74, P0) | `'cleared' \| 'not-yet' \| 'not-sure' \| null` | `views/onboarding/thread.js` step 8a | `session-builder.js` `_needsClearance()` |
+| `pacing` | `{ noticedOn, planNudgeAt, briefOfferedAt }` | `data/pacing.js` | `data/pacing.js`, `views/today.js` |
+| `lighterDayDeclinedOn` | `'YYYY-MM-DD' \| null` (v1.83, W3-10) | `views/coach-proposal.js` (*Keep my usual plan*, *Harder*) | `data/checkin.js` `coachBias()` |
+| `rescuedSession` | `{ at, name, moves } \| null` (v1.85, W3-13) | `session-resume.js` | `views/today.js` (said once, then cleared) |
+| ~~`sessionPace`~~ | removed v1.71 (store.js v78) | — | — |
+| `sessionMode` | `'coach-led' \| 'coach-supported' \| 'free-hand'` | `views/settings.js` | session generation |
+| `personalBests` | `{ [exerciseId]: { ... } }` | `store.recordPersonalBest()` | `store.personalBest()` |
+| `showPersonalBests` | `boolean`, default `false` | `views/settings.js` | session views |
+
+**`assessment` is the one that matters most**, because it is what finally lets `fitnessLevel` move without the person editing Settings. `recordAssessment()` writes the measured level straight onto `fitnessLevel` — one field, one meaning — rather than adding a fourth level field that existing readers would not know about. There is deliberately **no score** anywhere in it: `results` holds how each movement felt in the person's own words, and `history` is capped at 12 entries because it is a record of where somebody has been, not a dataset.
+
+**`programme` and `weekFocus` are declared and written by nothing today.** That is correct for CHAP-1 step 1, and is recorded here so nobody reads their presence as evidence the hinge or the weekly focus is built. `programme.presentation` defaults to `'chapters'` and is validated to `'chapters' | 'blocks'` on load.
+
+**`showPersonalBests` is separate from `liftLogEnabled` on purpose**, and defaults off: somebody using session notes as a memory aid did not ask to be shown a best, and for personas 2.5, 2.8 and 2.13 a visible best is a target to fall short of.
+
+**v1.31 (12 Aug 2026)** — device pass. `store.js` v36 → **v38**.
+
+### `clearExerciseFeedback(exerciseId)` — NEW method, `store.js` v37
+
+Removes every `exerciseFeedback` entry for one exercise, so tapping the button already set undoes it. **A signal you cannot withdraw is one people stop giving.** Removes *all* entries for that id, not just the last — the reader looks at the last five, so leaving four behind would mean the undo silently did nothing.
+
+### `completedSessions(entries)` — NEW method, `store.js` v38
+
+**The single definition of "a session that happened":** every entry whose `status` is not `'partial'`.
+
+Added after Graeme's device pass found **three surfaces using three rules** and showing three different numbers on screen:
+
+| Surface | Counted | Showed |
+|---|---|---|
+| Home | every entry, partials included | **7** |
+| Progress | every entry in window, partials included | **7** |
+| Build Your Base | `activeProgramme.totalSessions`, completions only | **2** |
+
+Now used by `today.js` (×4), `progress.js` (×2) and `reflect.js`'s `getSessionCount()`.
+
+**Two of those reads matter more than the count.** `_sessionCompletedToday()` drives *"You moved today — that's done"*, and `getSessionCount()` drives the empathy arc — so a session opened and abandoned both told somebody they had moved and advanced them toward a prompt meant to follow real experience.
+
+**Partials remain in `activityLog`.** A partial is a real record — it is how the app knows you started, and continuity reads it. It is simply not a session you did.
+
+### `sessionBuilderPreselect.mode` — **NEW, QUICK-BUILD, 06 Sep 2026**
+
+`"quick" | "edit" | null`. Extends the existing read-once-then-cleared `sessionBuilderPreselect` object.
+
+**SAVED-2, 08 Sep 2026 — `"edit"`.** Set with a companion key `savedSessionId`. Loads that saved session into the builder's **preview** phase, where the existing swap control already lets any movement be changed, and points the save action at `updateSavedSession()` instead of `saveSession()`. **No second editor**: a separate edit screen would be a second place a session's contents can be changed, and the two would drift the first time either moved.
+
+**Why it exists.** `session-builder-ui.js` walks six question phases — type, location, zones, duration, equipment, buildmode — before it builds anything. That is right for somebody who came to compose. It is wrong for Quick build, whose entire proposition is *tell me how long and I fill the rest in*: walking six screens after answering one question is the opposite of what the room offered.
+
+`"quick"` puts the builder into a **single scaffold screen** instead: the coach's chosen type, the duration from the chip, the place and the kit — all shown, all adjustable, one button. **The assumptions are visible before the build, not discovered after it.**
+
+**Not a tier field and not a preference.** It describes how this one entry was made, which is why it is cleared on read like the rest of the object. A `mode` that persisted would turn one tap on Home into a permanent change to how the builder behaves.
+
+### `savedSessions` — **NEW, YOUR-OWN, 06 Sep 2026**
+
+`Array<SavedSession>`, newest last. Defaults to `[]`.
+
+```
+{
+  id:           string,   // "own_" + ISO timestamp + 4 random chars
+  name:         string,   // THE PERSON'S OWN WORDS. Never generated.
+  sessionType:  string,   // one of session-builder.js's eight SESSION_TYPES ids
+  durationMins: number,
+  equipment:    string[], // the equipment answer in force when it was built
+  exerciseIds:  string[], // ids only, resolved against the library at start
+  createdAt:    string,   // ISO. When first saved. The list still orders by this.
+  lastUsedAt:   string|null,
+  updatedAt:    string     // SAVED-2. ISO. ABSENT if never edited.
+}
+```
+
+**`exerciseIds`, not exercises.** Storing whole exercise objects would freeze a copy of the library inside somebody's saved session: a safety correction to an exercise, a changed contraindication, a fixed `rest` value would never reach it. **A saved session must pick up library fixes, or it becomes a private fork of the exercise database that no gate can see.** Ids are resolved at start, and any id no longer in the library is dropped with the session still starting.
+
+**`name` is the person's own words and is never generated.** This is the one room where they are the author; a helpfully auto-named session takes that back. Empty names are rejected at the writer, not silently replaced.
+
+**Tier.** Plan only, and the gate is `isPremium()` at both the writer and the reader. Free composes freely — R4, 20 Aug, reversed TIER-G on exactly that point: composing is how somebody whose body the default does not fit gets a session they can do. **What Plan buys is that it is kept**, not that it is allowed.
+
+**No count limit, no ordering by use, no "most popular".** The list is theirs in the order they made it.
+
+**Written by** `session-builder-ui.js` (save action). **Read by** `today.js` (the Your own room), `session-builder-ui.js` (start a saved session) and — **SAVED-1, 08 Sep 2026** — `views/saved-sessions.js`, the full list behind the room's counted button. **SAVED-2, 08 Sep 2026: a saved session can now be edited and deleted**, both from that list, on Graeme's decision. `updateSavedSession()` writes a changed name or a changed set of `exerciseIds` back to the **same record** and stamps `updatedAt`.
+
+**Editing overwrites; there is no version history and no "v2" record.** A saved session is one thing that changes over time — which is precisely what makes `deleteSavedSession()` the only way to lose one, and why it asks first.
+
+**`createdAt` still orders the list, not `updatedAt`.** Otherwise editing the session you use most would keep shuffling it to the top, which is the list rearranging itself for a reason nobody asked for.
+
+**Not read by the coach** — `chooseSessionType()` must not treat a saved session as a preference signal, because saving something is a decision about a session, not a statement about a person.
+
+### `sessionBuilderPreselect.durationMins` — **NEW, CLUB-SHELL, 06 Sep 2026**
+
+`number | null`. Minutes. Extends the existing `sessionBuilderPreselect` object, which already carried `{ type, returnTo }` and is read-once-then-cleared by `session-builder-ui.js`.
+
+**Why it exists.** Quick build's whole question is *how long have you got*. Without this the time chip would be a label with nothing behind it, and the person would answer the same question twice — once on the card and again in the builder. **Asking twice is worse than not asking**: it tells somebody their first answer was not heard.
+
+**Written by** `today.js` Quick build chips. **Read once and cleared** by `session-builder-ui.js`, the same pattern as `type` — a preselect that persisted would silently pin every later build to a duration chosen days earlier.
+
+`null` means no duration was preselected and the builder asks, which is its normal behaviour.
+
+### `activityLog[].sessionType` — **NEW, TWO-ENGINE, 06 Sep 2026**
+
+`string | null`. One of `session-builder.js`'s eight `SESSION_TYPES` ids: `glute`, `upper`, `lower`, `full`, `core`, `cardio`, `mobility`, `stretch`. `null` on any entry that was not a built session (a walk, a breathing session, a prescribed session).
+
+**v1.75 (P2):** it had in fact been storing the session **id** (`glute-1791180600000`) from the coach's plan, and borrowing the previous session's value for every other entry. Both fixed and repaired on load — see the v1.75 note at the top. There are nine ids, not eight: `gym` was added after this entry was written. Other values (`yoga`, `class`, `gentle-care`, a freestyle kind) may appear; the chooser ignores anything that is not one of the nine.
+
+**Why it exists.** The coach's suggestion chain needs to know what kind of session you last did, and until now nothing recorded it. `activityLog` entries carry `entry.type` — but that is the ACTIVITY type (`workout`, `walk`, `quiet`), not the session type, and reading one as the other is the field-confusion class that produced C1. `exerciseHistory` records which exercises, not which shape of session.
+
+**Written by** `store.logActivity()`, from the `sessionType` supplied by whichever builder produced the session. **Not back-filled** — every existing entry is `null`, so the chain that reads it must treat "no history" as its normal early state rather than an error. That is why the chain in `js/data/session-choice.js` falls through to the arc rather than terminating when this is empty.
+
+**Read by** `chooseSessionType()` and nothing else. **Never read by the coach to make a claim about a person** — it answers "what shape came up recently", not "what are you like".
+
+### `exerciseFeedback` — **NOW WRITTEN** (FEED-1)
+
+Previously recorded here as read-by-`applyFeedbackWeighting()`-and-never-written since v1.3. `js/exercise-feedback.js` writes it via `store.logExerciseFeedback()`. **Last of the five reader-without-writer fields closed.**
+
+**v1.30 (12 Aug 2026)** — BIAS-1. `proposalBias` declared and wired. `store.js` v34 → **v36**.
+
+### `proposalBias` — **NOW DECLARED AND READ**, `store.js` v36
+
+`'rest' | 'lighter' | null`. Written by `js/views/coach-reflection.js`; read by `js/data/workoutGenerator.js` via `resolveIntensity()`.
+
+**This entry previously read:** *"written in `coach-reflection.js` (12 sites) but read nowhere else in the codebase… clearly intending to influence the next generated proposal — but nothing downstream ever consumes it. Still open, not fixed here."* That was accurate from 03 Aug until 12 Aug.
+
+**What it carries.** `todayIntensity` is derived from check-in **energy alone**. `proposalBias` is what the coach works out from **severe pain, burnout risk, several consecutive training days, and returning after time away** — signals energy does not capture.
+
+**How they combine.** `resolveIntensity(base, bias)` in `js/data/checkin.js`:
+
+| Bias | Effect |
+|---|---|
+| `null` | intensity unchanged |
+| `'lighter'` | **one step down** — high→moderate, moderate→low, low→low |
+| `'rest'` | low |
+
+**A step, not a floor.** Somebody with high energy in a burnout pattern gets moderate, not low. Overriding a good day entirely because of a pattern would be the app deciding it knows better than the person in front of it — P7's line: confidence scales with information, authority never does.
+
+**It was also undeclared in `store.js`**, existing only because `store.set()` creates arbitrary paths. It survived reloads, but was invisible to anyone reading the file for the field list — which is how a field carrying severe-pain and burnout signals went nine days without a reader.
+
+**v1.29 (12 Aug 2026)** — GM-1. One new field, `grounding`. `store.js` v33 → **v34**.
+
+### `grounding` — **NEW, `store.js` v34**
+
+```
+grounding: { lastSession: number, lastId: string|null, shown: [], dismissed: [] }
+```
+
+| Key | Meaning |
+|---|---|
+| `lastSession` | Session count when a moment last appeared. Drives cadence |
+| `lastId` | Which one, so the same never appears twice running |
+| `shown` | Ids already seen, so the pool rotates fairly rather than repeating favourites |
+| `dismissed` | Ids the person dismissed. **Permanent — never re-offered** |
+
+**`dismissed` is not a skip and must never be counted as one.** `empathyPromptSkips` widens a gap when someone passes; this removes an item from the pool for good. Somebody who dismisses a moment has told us something, and asking again is the nagging this product exists not to do.
+
+Written and read by `js/data/grounding-moments.js`. Stored as one object because the four keys are only ever read and written together; a partial update would leave `dismissed` describing a state the rest no longer matches.
+
+**v1.28 (12 Aug 2026)** — C1. `capability.legPower` is now written for the first time, and its fail-safe widened. `store.js` v32 → **v33**.
+
+### `capability.legPower` — now ASKED, `store.js` v33
+
+`'full' | 'limited' | 'none' | null`. Written by `js/views/onboarding/lifestyle.js` v4 from a conditional question shown **only when `chairRise !== 'yes'`**. Read by `capabilityProfile()`, which derives `legsUsable` (`!== 'none'`) and `legsLoadable` (`=== 'full'`); both are consumed by two filters in `session-builder.js`.
+
+| Answer shown | Stored |
+|---|---|
+| Yes | `'full'` |
+| A little, or on good days | `'limited'` |
+| No | `'none'` |
+| I'd rather not say | **`null`** |
+
+**"I'd rather not say" stores `null`, not a fourth value.** Storing the string would be truthy, so `c.legPower || default` would skip the fail-safe — and since it matches none of the three, `legsLoadable` would be false but `legsUsable` **true by accident**.
+
+**Fail-safe, widened at v33.** Unanswered resolves to `'limited'` when `needsSeated || (asked && chairRise !== 'yes')`. It previously keyed on `needsSeated` alone (`chairRise === 'no'`), which did not cover `'not-easily'` — so somebody who said rising from a chair is not easy, then declined the question, was served fully loaded leg work. Still gated on `asked`, so nobody who never saw the capability screen is assumed limited.
+
+Covered by `tools/verify-c1.mjs`, which fails on the pre-fix code.
+
+**v1.27 (12 Aug 2026)** — EMP-1. One new field, `empathyLastPrompt`. `store.js` v31 → **v32**.
+
+## `empathyLastPrompt` — **NEW, `store.js` v32, 12 Aug 2026**
+
+```
+empathyLastPrompt: { stage: number, index: number, runLength: number }
+```
+
+| Key | Meaning |
+|---|---|
+| `stage` | Stage the last-fired prompt belonged to. `0` = none yet |
+| `index` | Position within that stage's pool. `-1` = none yet, distinct from a real index of `0` |
+| `runLength` | How many times consecutively that same prompt has fired |
+
+**Why it exists.** Empathy prompts were selected by `pool[atStage % pool.length]` — pure rotation — so nothing needed to remember *which* prompt fired, only how many had. Condition-aware selection can legitimately land on the same prompt several sessions running, because the pools hold four or five prompts and somebody can genuinely struggle repeatedly. `runLength` caps that at two consecutive firings before the next-best fitting prompt is taken instead.
+
+**Written by:** `js/views/reflect.js` on fire. **Read by:** `js/data/empathy-transfer.js` during selection.
+
+**Validated as a whole object**, not field by field. A partial object is worse than none here: `runLength` would be counting a prompt that `stage`/`index` no longer identifies.
+
+**v1.26 (12 Aug 2026)** — DOC-2. The line below previously read *"No `store.js` change in this pass — `store.js` remains v21."* That was left over from the v1.20 text and was wrong from v1.21 onward: the header two lines above already said v30, so this document contradicted itself on its own front page. Corrected, and the supersedes line now points at the version it actually supersedes rather than at v1.20.
+
+No `store.js` change in this pass either — it remains **v30**, and DIC-1 (12 Aug) deliberately introduced no new fields, writing the existing `sessionVariety` instead.
+
+---
+
+## `exerciseHistory` — **NEW, `store.js` v22, 11 Aug 2026**
+
+`{ [exerciseId]: { n, first, last, best } }`, default `{}`.
+
+| Key | Type | Meaning |
+|---|---|---|
+| `n` | `number` | Times completed, all time |
+| `first` | ISO string | First completion |
+| `last` | ISO string | Most recent completion |
+| `best` | `{ weight, reps, unit, at }` \| absent | Optional performance note |
+
+**Why it exists.** Until this field, the product recorded that a session happened and how many exercises it contained — `activityLog` entries carry `exercisesCount: 3` — and never which exercises they were. Nothing persisted what a person had actually done.
+
+That single absence is why selection had to be `Math.random()` over 497 exercises, and therefore why there was no progressive overload (you cannot get stronger at an exercise you meet once), no skill acquisition (you cannot correct a fault you never repeat, which made the entire `watchOut` library decorative), and no familiarity (the nervous beginner needs to recognise the session).
+
+**Written by** `store.recordExercises()`, called automatically by `logActivity()` when a completion supplies `exerciseIds`. Single write path, so no call site can log a session without logging its contents. **Partial exits are excluded deliberately** — an abandoned session did not teach anything and must not make an exercise look familiar.
+
+**Read by** `session-builder.js` v11 for continuity-aware selection, via `store.exerciseStats()`.
+
+**Shape choice:** a map rather than an append-only log, because selection needs "how often, how recently" for every candidate on every build, and scanning a growing array on a phone would not hold. The full narrative already lives in `activityLog`.
+
+**P4 applies.** This is per-exercise behavioural data. `best` is a flat reference the person left themselves — nothing narrates it, nothing compares it, and it is never used to comment on consistency or decline.
+
+**Call sites supplying `exerciseIds` so far:** `gym-programme.js` v9, `workout.js` v10. `core-session.js`, `yoga-session.js` and `prescribed-session.js` do not yet — they still log a count only, so their exercises never become familiar. Outstanding.
+
+---
+
+## `capability` — **NEW, `store.js` v25/v29, 11–12 Aug 2026**
+
+Object, all keys default `null`.
+
+| Key | Values | Question asked |
+|---|---|---|
+| `chairRise` | `'yes'` \| `'not-easily'` \| `'no'` | Can you get up from a chair without pushing off with your hands? |
+| `floorAccess` | `'yes'` \| `'not-comfortably'` \| `'rather-not'` \| `'no'` | Can you get down to the floor and back up on your own? |
+| `bothFeet` | `'yes'` \| `'no'` | Do you currently do anything where both feet leave the ground? |
+| `balanceWorry` | `'no'` \| `'sometimes'` \| `'yes'` | Do you ever worry about losing your balance? |
+| `legPower` | `'full'` \| `'limited'` \| `'none'` | Only asked when `chairRise` is `'no'` or `'not-easily'` |
+| `askedAt` | ISO string | |
+
+**Why it exists.** Answering *"if we are not age restricting, how do we ensure the appropriate level for that user?"* The instrument was wrong, not the policy: `lifestyle.activityLevel` measures **frequency**, not **capacity**. Somebody can garden daily, answer "moderate" honestly, and still not get off the floor unaided — which under the raised difficulty ceilings meant jump squats.
+
+**Three-state, not boolean.** A yes/no pair forces a wheelchair user into a lie that also erases them. `'not easily'` and `'no'` are different answers: one is difficulty, the other is a different body.
+
+**`legPower` is a separate axis from standing (v29).** "Can you rise from a chair" and "do your legs work" are different questions — somebody recovering from a hip replacement cannot stand safely and has full leg function. Conflating them is how a well-meaning adaptation still hands a person the thing they cannot do.
+
+**Read by** `store.capabilityProfile()`, which returns `{ impactSafe, floorSafe, balanceSafe, needsSeated, legsUsable, legsLoadable, ceilingCap, asked }`. Consumed by `session-builder.js` v21. **Unasked is always treated as the cautious answer.** The screen can only ever *lower* a difficulty ceiling, never raise one.
+
+**Collected by** `js/views/onboarding/lifestyle.js` v3.
+
+---
+
+## `trainingIntent` — **NEW, `store.js` v26, 11 Aug 2026**
+
+`'improve' | 'maintain' | 'recover'`, default `'improve'`.
+
+**We do not ask about trajectory, and we never announce it.** `exerciseHistory` and repeat capability screens make direction observable, but saying "you seem to be declining" is a verdict, breaches P4, and is exactly what would make somebody delete the app. **Trajectory may change what is offered. It never changes what is said.**
+
+`'maintain'` is **not** a diluted `'improve'`. What is lost first is specific and known — power before strength, balance early, grip strength (which predicts independence better than almost anything), and floor transfer (which decides whether somebody keeps living in their own home). Maintenance *prioritises* those rather than doing less of everything.
+
+**Read by** `session-builder.js` (main-section tilt) and `session-rationale.js` (arc). **Not yet collected — no screen asks the question.** Wording proposed, awaiting confirmation. See CAP-6.
+
+---
+
+## `sessionPreset` — **NEW, `store.js` v40, 13 Aug 2026**
+
+`"balanced" | "strength" | "mobility"`, default `"balanced"`.
+
+The allocation preset chosen on the duration screen, deciding how a session's time splits between warm-up, working set and cool-down. Personal-tier control (`session-builder-ui.js` gates the picker on `isPremium()`).
+
+It was module state, reset to `"balanced"` on every mount. Persona 2.15 trains four times a week and wants *Mostly strength* every time; she was re-picking it from scratch at every session. Remembering it is not a new feature — it is the absence of an irritation.
+
+**Deliberately separate from `sessionVariety`.** That field is about REPETITION — do you want what you did last time, or something different — and is asked fresh at check-in. This one is about the SHAPE of the session and is a standing preference until changed. Two concepts, two fields: collapsing them would be the one-field-two-meanings fault this build has already paid for more than once.
+
+**Read by** `session-builder-ui.js` at mount, and written when the person picks a preset.
+
+---
+
+## `sessionVariety` — **NEW, `store.js` v23, 11 Aug 2026**
+
+`"familiar" | "balanced" | "varied"`, default `"balanced"`.
+
+Persona 2.13 (ADHD, novelty-driven, abandons routine after ~2 weeks) and persona 2.14 (autistic, predictability-seeking) are opposite motivational shapes. The persona matrix has carried *"novelty vs predictability has no explicit preference capture"* as an open gap since 05 Jul 2026.
+
+CONT-1 made that gap urgent rather than theoretical — continuity became a real force in selection, so a single default actively serves one persona at the other's expense. Traced live, both received 51–57% session-to-session overlap: one treatment serving neither well.
+
+**Read by** `session-builder.js` v13, scaling the novelty rate (0.10 / 0.25 / 0.55).
+
+**Never inferred from behaviour.** Guessing that somebody wants variety because they skipped a session would be exactly the silent judgement this product refuses. It is asked, or it stays at the honest default.
+
+**Not yet collected in onboarding or Settings** — the field and the engine are live; the question is not. Outstanding.
+
+---
+
+## Cross-reference — exercise content fields
+
+Static exercise entries in `js/data/exercises/*.js` are **not** store fields and are not documented here. Their canonical definition is `Documents/Live State/exercise_entry_standard.md` (13 Aug 2026 v3, which now also documents the three selection-eligibility fields `generalPurpose`, `adaptive` and `discipline`).
+
+Two fields were added to that standard on 11 Aug 2026:
+
+- `watchOut` — `string[]`, the failure modes and their correction. Previously absent from all 461 entries and all four private pools; had never existed.
+- `load` — `string`, effort-relative weight guidance. **Never an absolute weight**, per Locked Principle P4: an absolute target is an interpretation of load, and a benchmark with a verdict attached.
+
+One field was added on 11 Sep 2026 (ADAPT-1):
+
+- `adaptations` — `{ easeOff?: string[], further?: string[] }`, optional. The other ways to do the exercise, shown on the card's DO page under "Other ways to do this". Options the person chooses; the app never selects one for them. `further` is withheld when the exercise works an area the person has said is sore today and in Gentle Care, and the whole block is withheld on prescribed exercises. Canonical definition in the Exercise Entry Standard v4; the exact set of entries carrying it is held by `tools/verify-adapt1.mjs`.
+
+Baseline at time of writing, from `Documents/Admin/Templates/validate-exercise-entries.mjs`: 461 entries, 0 carrying `watchOut`, 49 loaded exercises missing `load`/`sets`/`reps`. CON-9 backfills, equipment-requiring exercises first.
+
+**⚠️ CORRECTED 12 Aug 2026 — this finding was WRONG when acted on.** It previously read: *"`contentType` is written on 368 of 461 exercise entries and read nowhere in the codebase… Retire or wire up."*
+
+`contentType` **is** read, in two live places:
+- `session-builder.js:973` — `if (ex.contentType === "practice") return false;` excludes **140 standalone practices** from component selection
+- `session-categories.js:96` — drives the `activation` category
+
+Retiring it would make 20-minute rows and 30-minute yin sequences selectable as one of five warm-up items. The finding was true when written and invalidated by **CON-6**, which moved practices into the shared database — after which `session-builder.js` had to start reading `contentType` to keep them out. Nobody updated it. **Closed as will-not-do.**
+
+---
+
+**Previous supersession note:** `schema.md` v1.17 (09 Aug 2026). Adds the new nested `consent{}` object (`store.js` v19) — see Section 1. This closes a gap found by the Persona Tracing Wave 1 store audit: live onboarding had captured **no legal consent record at all** since the OB-THREAD rebuild retired `welcome.js`. Consent is now an affirmative tick with a recorded policy version, not implied consent. The age gate is built but inert pending A1.11.
+
+**Previous version note (v1.17):** superseded `schema.md` v1.16 (04 Aug 2026). Two catch-ups in one pass: (1) `exercisePreferences` (`store.js` v17, 04 Aug) was never documented here — added below. (2) New `inStepProgress` (`store.js` v18, 09 Aug) for the "In Step" Noticing Hub feature (Personal tier) — four-movement scenario practice extending the empathy transfer arc. Full feature spec developed in PM chat, 09 Aug 2026.
+
+**Carried forward from v1.15:** `prescribedExercises` entries: `conditionId` (singular) replaced with `conditionIds` (array) — real exercise reuse across conditions, not duplication. One entry can now genuinely serve more than one condition. Backward compatible — old singular-shaped entries still read correctly via the new `getEntryConditionIds()` helper, no migration step required. `js/data/conditionProgrammes.js` v2→v3 (not a schema file, but the reason this changed).
+
+**✅ RESOLVED 12 Aug 2026 (BIAS-1) — see v1.30 at the top of this document.** `workoutGenerator.js` now reads it via `resolveIntensity()`. The finding as originally written, retained for the trail: `proposalBias` is written in `coach-reflection.js` (12 sites) but read nowhere else in the codebase, including by `coach-reflection.js` itself. The reflection logic computes a `"lighter"`/`"rest"`/`null` bias per reflection type (severe pain, burnout risk, consecutive days, returning after absence) clearly intending to influence the next generated proposal — but nothing downstream ever consumes it. Same "specified but never wired up" pattern already on record for `exerciseFeedback` and Empathy Transfer's early stages. Still open, not fixed here — out of this session's scope.
+
+**Resolved since v1.10:** `userTier` (previously flagged here as read-but-never-written, locking paying users out of session-builder options) was fixed 03 Aug — `session-builder-ui.js` v2 now reads `tier`, the genuine live field. No longer an open item.
+
+All data lives in a single JSON object under this key. `store.js` provides typed get/set access — never manipulate `localStorage` directly. On initialisation, `mergeWithDefaults()` fills any missing keys so existing users receive new fields without data loss.
+
+*(v1.9's own history — it superseded and retired `schema.md` v1.3, `schema_v1_7_15jun2026.md`, `schema_md.docx`, and the v1.5/v1.8 delta notes — is preserved below in Schema Version History.)*
+
+---
+
+## Schema Version History
+
+| Version | Date | Summary |
+|---------|------|---------|
+| 1.0 | Feb 2026 | Initial schema. Profile, check-in, workout, exercise feedback, credits, stats. |
+| 1.1 | 3 Mar 2026 | Strategic layer: `strategicGoal`, `activeProgramme`, `progressLog`. |
+| 1.2 | 5 Mar 2026 | Condition system: `conditionPainScores`, `prescribedExercises`. |
+| 1.3 | 7 Mar 2026 | Workout cache: `workoutsPainFingerprint`. Conditions: `zone`, `getZoneStatus()`, `getActiveConditionIds()`, `getExerciseSafetyTier()`. |
+| 1.4 | 12 Jun 2026 | Consolidated schema pass — all pending fields added in one go. |
+| 1.5 | 12 Jun 2026 | `lastCheckin.timestamp` added (2-hour return-visit trigger). |
+| 1.6 | 13 Jun 2026 | Weekly Plan shape finalised. |
+| 1.7 | 15 Jun 2026 | Noticing Hub schema pass. |
+| 1.8 | 16 Jul 2026 | Empathy Transfer schema pass: 5 new top-level fields (delta note only, never folded into a full file until now). |
+| 1.9 | 30 Jul 2026 | Full ground-truth reconciliation (BUILD-4). Rewritten directly against live `store.js` v10. Documents all fields actually returned by `getDefaults()`, corrects two errors inherited from v1.7 (see below), resolves the `hardBeforeSelections` naming question, resolves `stats` and `exerciseFeedback` dormancy questions, and separates out an appendix of fields used via `store.get`/`store.set` but absent from `getDefaults()`. |
+| 1.10 | 03 Aug 2026 | BUILD-4 Appendix A follow-up. All 18 previously-unclassified fields individually checked (reader + writer each) and folded into their proper sections. 11 confirmed live, 5 dormant (write-only), 2 dead. Two live bugs surfaced: `userTier` has no writer and its one reader always evaluates false, locking Personal-tier session-builder options for paying users; `proposalBias` is written but never read anywhere. Appendix A closed. |
+| **1.11** | **04 Aug 2026** | **Home Nav & Conditions Redesign, Phase A.** Two new fields: `conditionReflections` (deliberately separate namespace from `journalEntries`, not subject to Journal Privacy Rule), `conditionFoldInLevel` (fold-in dial setting, `'partial'\|'mostly'\|'all'\|null`). `js/store.js` v11→v12. Also: `userTier` bug (flagged 1.10) confirmed fixed since 03 Aug, no longer open. |
+| **1.12** | **04 Aug 2026** | **Pain Input Redesign, same day.** `conditionPainScores` clarified as genuine 0-10 continuous (was 4 discrete values from a button UI) — no field shape change. New canonical `js/data/conditions.js` function `getPainBand(score)` — the one source of truth for pain-severity display bands app-wide, replacing dead code `getPainContext()` (removed, never called anywhere, itself a fourth private duplicate carrying the pre-fix threshold). |
+| **1.13** | **04 Aug 2026** | **Severe pain Rest/Adapt choice, same day.** New field `severePainChoices` — active choice record, one per date + exact severe-condition-id set. `js/store.js` v12→v13 (new `recordSeverePainChoice()`). `coach-proposal.js` v17: Severe pain now gates the whole proposal screen behind an explicit Rest/Adapt choice rather than silently deciding; `_checkSeverePain()`/`severePainOverride` (dead weight, computed but never used) removed entirely, genuinely superseded now rather than theoretically unused. |
+| **1.14** | **04 Aug 2026** | **Phase D-1 (schema), Conditions Update.** Two new fields: `conditionGoals` (felt-sense condition-specific goal, `'healed'\|'cope'\|'improve'` + optional note, new `store.setConditionGoal()`) and `prescribedExercisesOrigin` (`'professional'\|'self'\|null`, lets `prescribed.js` branch its coach voice correctly). Also documented in the field-reference table: `pendingDoorRoute`, added earlier today (Phase C follow-up) but missed in Schema.md at the time. `js/store.js` v14→v15. |
+| **1.15** | **04 Aug 2026** | **Condition programmes, real routes built.** `prescribedExercises` entries can now carry an optional `conditionId` — additive, nullable, existing entries unaffected. New `prescribedExercisesActiveCondition` — single-use context flag, cleared the instant it's read. `js/store.js` v15→v16. New module `js/data/conditionProgrammes.js` (not a schema file, but the reason these fields exist) — real, tested exercise-selection logic for "Coach builds it"/"Coach recommends, you select," built on `affectsAreas`/`rehabPhase`/`contraindications` data that already existed. |
+| **1.16** | **04 Aug 2026** | **Cross-condition exercise reuse, not duplication.** `prescribedExercises` entries: `conditionId` (singular) replaced with `conditionIds` (array) — one entry can now genuinely serve more than one condition, so doing the same physical exercise once correctly counts once everywhere, rather than the same exercise appearing as two separate entries with independent completion state and double credits. Backward compatible — old singular-shaped entries read correctly via new `getEntryConditionIds()`, migrate naturally on rebuild, no explicit migration step. `js/data/conditionProgrammes.js` v2→v3. Smoke-tested against real overlapping conditions before shipping. |
+| **1.41** | **22 Aug 2026** | **TARGET-DEAD.** `store.js` v57 → v58. Top-level `targetWeight` removed — no reader, no writer, both having died with `goal-setup.js` and the `workoutGenerator` branch on 22 Aug. Not revived: `strategicGoal.targetValue`/`targetUnit` is the single home. No migration needed; it was never written. |
+| **1.40** | **22 Aug 2026** | **WEIGHT-1b.** `store.js` v56 → v57. `weightRateRaisedAt` — the coach speaks once about a sustained rate, written *after* the note renders. Writers arrive for `weightTracking`, `weightUnit`, `weight`, `weightLog`, `strategicGoal.targetValue`/`targetUnit`/`weightTargetBand`. Top-level `targetWeight` left dead and booked for removal. |
+| **1.39** | **22 Aug 2026** | **WEIGHT-1a.** `store.js` v55 → v56. `weightTracking` (opt-in, default false), `strategicGoal.weightTargetBand`, and `weight`/`targetWeight`/`weightLog` documented as **canonical kilograms** with `weightUnit` demoted to a display preference. Additive, no migration. Declared dark: no writers until WEIGHT-1b, tracked by `verify-weight1.mjs`. |
+| **1.38** | **21 Aug 2026** | **R1-a.** `store.js` v54 → v55. `strategicGoal.targetSetAt` (the maturity guard's honest clock — `setAt` records when the *frequency* was agreed, not the date) and `strategicGoal.review` (`lastOfferedAt` throttle, `outcomes` log). Both additive, no migration. Declared dark: nothing reads `review` until R1-b and nothing writes `targetSetAt` until R2-a, tracked by `verify-hard1.mjs`. |
+| **1.35** | **17 Aug 2026** | **TARGET-4.** `store.js` v52 → v53. One-way migration of `targetDate`/`targetDescription` from top level into `strategicGoal`, on load, into empty fields only. Closes a divergence where two editable fields held one idea — and a third, `goal.*`, was read but had never existed, silently replacing a chosen primary goal with `goals[0]`. |
+| **1.34** | **16 Aug 2026** | **Eleven versions of drift, caught by fixing the gate meant to catch it.** `store.js` v41 → v52. Nine undocumented top-level fields folded in: `assessment` (ASSESS-1 — the field that lets the difficulty ceiling move), `programme` + `weekFocus` (CHAP-1 step 1, declared and written by nothing), `exerciseClearance` (CARDIAC-1), `pacing` + `sessionPace` (PACE-1/QUICK-1), `sessionMode`, `personalBests` + `showPersonalBests` (PB-1). `tools/schema-check.mjs` v1 → **v2**: its field diff had been slicing an empty string since the day it was written, so it could not fire at any amount of drift. Now anchored on the definition and self-asserting. |
+| **1.17** | **09 Aug 2026** | **"In Step" (Noticing Hub, Personal tier) + drift catch-up.** New field `inStepProgress` (`unlockedAt`, `scenarioIndex`, `completedCount`, `choiceLog`) — four-movement scenario practice extending the empathy transfer arc, `js/store.js` v17→v18, new `js/data/in-step-scenarios.js` + `js/views/in-step.js`, new route `in-step`. Also documented `exercisePreferences` (`store.js` v17, 04 Aug), missed in Schema.md at the time — same drift pattern as `pendingDoorRoute` in 1.14, caught here rather than left open. |
+
+### Corrections made in this pass
+
+- **`todaysWorkouts` / `activeWorkout` — confirmed dead**, as v1.8's delta note flagged. No live references anywhere (only in code comments describing past bugs). The real workout-caching mechanism is `generatedSession`.
+- **`workoutsGeneratedAt` — dead write remains, found this session.** `workoutGenerator.js`'s only reader of this field was removed in this same BUILD-4 session (an orphaned `needsRegeneration()`/`getTodaysWorkouts()` pair, never called from anywhere). However, `checkin-mini.js` (line 373) still writes `store.set("workoutsGeneratedAt", null)` on check-in. Nothing reads it any more. **Not fixed this session** — `checkin-mini.js` wasn't in this session's scheduled file list (touch-once). Logging for a future small cleanup.
+- **`todayIntensity` — corrected. This field is NOT dead**, contrary to the 28 Jul reconciliation note. It's genuinely live: written by `checkin.js` and `coach-proposal.js`, read by `workoutGenerator.js`. It's simply undocumented in `getDefaults()` (a "first write defines it" field — see Appendix A). Documented properly below under Check-In.
+- **`exerciseFeedback` — corrected. This field is dormant, not live**, contrary to this session's own blueprint (which had called it "confirmed live, not dormant" based on the read side only). `applyFeedbackWeighting()` in `exercises.js` does read it — but nothing anywhere in the app ever writes it. No UI collects exercise-level like/dislike feedback. The read always falls back to `[]`, so the weighting logic runs but has zero effect. This is the same "specified but never built" pattern already confirmed for Empathy Transfer and (below) `stats` — the write side was likely planned (see `alongside_exercise_skip_dislike_spec_16may2026_v1.docx`) but never implemented.
+- **`activeProgramme.startDate`** — confirmed correct as-is; v1.7 had this right.
+- **`unwellMode.startedAt`** — confirmed a genuinely different field on a different object from `activeProgramme.startDate`, not a naming clash. Documented in full below.
+- **`hardBeforeSelections` / `hardBeforeShownAt`** — confirmed to be `onboarding.hardBeforeSelections` / `onboarding.hardBeforeShownAt`, already live and documented under Onboarding below. Not a new, separate pair — the naming-mismatch concern raised in the BUILD-4 blueprint is resolved.
+- **`stats` — confirmed not a store field, live or dormant.** It doesn't exist anywhere in `store.js`. Every `stats` reference in the app (`progress.js`, `programmeEngine.js`) is a local variable computed on the fly by `getProgressStats()`, built from `activityLog` / `checkinHistory` / `activeProgramme` at render time. There is nothing to document as a schema field — the v1.7/v1.8 "specified but never built" flag on this one turned out to be a false alarm, not a real gap.
+- **`activeProgramme.measurementsOptIn` — anomaly found, not fixed.** `mergeWithDefaults()` writes a `measurementsOptIn` key onto `activeProgramme` sourced from `saved.strategicGoal?.measurementsOptIn` (line ~176) — this looks like a copy-paste artefact from the adjacent `strategicGoal` merge block. `activeProgramme`'s own `getDefaults()` shape does not include `measurementsOptIn` at all (only `strategicGoal` does). Net effect: a stray, likely-unused `measurementsOptIn` key can appear on `activeProgramme` at runtime, duplicating data that's meant to live only on `strategicGoal`. Not investigated further or fixed — outside this session's file scope (`store.js` was read-only this session except for the pre-approved dead-write removal). Flagging for a future small fix.
+
+---
+
+## 1. Onboarding
+
+| Field | Type | Default | Notes |
+|-------|------|---------|-------|
+| `onboardingComplete` | `boolean` | `false` | Gates app entry |
+| `onboardingStep` | `number` | `1` | Resume position if onboarding is interrupted |
+
+
+### `capability.legPower` — **DECLARED, `store.js` v30, 12 Aug 2026**
+
+| Field | Type | Default | Notes |
+|-------|------|---------|-------|
+| `capability.legPower` | `'full'\|'limited'\|'none'\|null` | `null` | **Not yet asked.** The conditional question (fires when `chairRise !== 'yes'`) is built pending sign-off on its wording |
+
+**C1, third-pass trace.** Read by `capabilityProfile()` and consumed by two filters in `session-builder.js`, but never declared, never written and never asked — so it always fell back to `'full'` and a wheelchair user was served Seated Leg Extension, the exact exercise the v29 note exists to prevent.
+
+**The unknown-value default is now conditional:** `'limited'` when `needsSeated` is true (the person cannot rise from a chair or reach the floor), `'full'` otherwise. Fails safe for the one group at risk and assumes nothing about anyone else. **Do not simplify this back to a flat `'full'`.**
+
+### `exerciseFeedback` — **DECLARED, `store.js` v21, 11 Aug 2026**
+
+| Field | Type | Default | Notes |
+|-------|------|---------|-------|
+| `exerciseFeedback` | `array` | `[]` | `{ exerciseId, feedback: 'too-hard'\|'too-easy', at }[]`. Capped 200 |
+
+**SOLE WRITER: `js/exercise-feedback.js` (FEED-1)** — the explicit two-button control on the exercise card, present in all four session runners. `store.logExerciseFeedback()` is called from there and nowhere else. Binary, not a rating, matching `applyFeedbackWeighting()`'s contract.
+
+**What this entry said before, and why it was wrong.** It named `gym-programme.js`'s "Skip this one" as the writer, on the PT-12 reasoning of 11 Aug that nothing else wrote the field. That was true for one day. FEED-1 shipped on 12 Aug and this entry was never updated, so the schema recorded the incidental writer and omitted the real one.
+
+Two faults followed from it. A skip is offered on the DECIDE page, **before the exercise is attempted**, so the app recorded a difficulty judgement the person had not made and could not have made. And two skips for any reason at all — short on time, wrong room, changed their mind — dropped that exercise's `programmeScore` to 0.5, identically to two deliberate presses of "That was too hard". Removing the skip write does not starve the reader: it leaves the one writer where the person actually chose to say something.
+
+A skip is still recorded as a skip. `activityLog.exerciseIds` carries the exercises that were done, so a skipped one is absent from it — a fact about what happened, carrying no claim about why.
+
+### `absence.returnCapturedAt` — **DECLARED, `store.js` v21, 11 Aug 2026**
+
+Written by `programmeEngine.js:268`, read at `:242`/`:263`, and absent from `getDefaults()` — surviving only via the `...saved` spread. Exactly the migration loss risk PT-10 flagged.
+
+### `liftLog` / `liftLogEnabled` — **NEW, `store.js` v20, 11 Aug 2026**
+
+PT-4. A **memory aid, not analytics** — Graeme's framing: knowing what you set the machine to last week, not tracking progress.
+
+| Field | Type | Default | Notes |
+|-------|------|---------|-------|
+| `liftLogEnabled` | `boolean` | **`true`** | **Changed to default-on in `store.js` v28** — "a recording feature that is off by default is one nobody uses". Supersedes the v20 default of `false`. Toggled in Settings > Equipment; `logLift()` no-ops while false. Note P4 is not breached by default-on: the protection lives in how the number is *presented* (no delta, no interpretation), not in whether it is recorded |
+| `liftLog` | `object` | `{}` | `{ [exerciseId]: [{ at, weight, unit, reps }] }`. Newest last, capped at 20 per exercise |
+
+**Helpers:** `store.logLift(exerciseId, { weight, unit, reps })` and `store.lastLift(exerciseId)`.
+
+**Governed by locked principle P4** — the app may display load, the coach never interprets it. `lastLift()` returns the entry only and deliberately computes no delta, so there is nothing for a caller to narrate. No arrows, no colour-coding, no "new best". *The asymmetry is the reason: silence on a drop is only credible if there is also silence on a rise.* Do not add comparison logic here without revisiting P4.
+
+**Tier:** recall in session is **free** (that is the coach remembering, and P1 says the coach never withholds what it can see). Analysis, trends and export are **Personal** — not yet built.
+
+### `consent` (nested object) — **NEW, `store.js` v19, 11 Aug 2026**
+
+Legal consent record. Restored after the PT-W1 store audit found it absent: `welcome.js:85-86` was the only writer of the old flat `consentGiven`/`consentAt`, and that route was retired from `router.js` VIEW_NAMES in v7. **Live onboarding captured no consent record at all between the OB-THREAD rebuild and 11 Aug 2026.**
+
+| Field | Type | Default | Notes |
+|-------|------|---------|-------|
+| `consent.given` | `boolean` | `false` | Affirmative tick only — **not** implied consent. Written by `thread.js`'s consent gate |
+| `consent.at` | `string \| null` | `null` | ISO timestamp of the tick |
+| `consent.policyVersion` | `string \| null` | `null` | Which documents were agreed to (`POLICY_VERSION` in `thread.js`). Without this, any policy revision silently invalidates every existing record |
+| `consent.ageConfirmed` | `boolean \| null` | `null` | **Reserved and inert.** Age gate is built but switched off via `AGE_GATE_ENABLED` pending the ToS 13+/16+ contradiction (Stream A, A1.11) and Natalie's written advice |
+
+**Deprecated, do not write:** flat `consentGiven` / `consentAt`. Superseded by the nested object above. Nesting was chosen deliberately for the coming Supabase migration, where PT-10 flagged undeclared flat fields as a real loss risk.
+
+### `onboarding` (nested object)
+
+| Field | Type | Default | Notes |
+|-------|------|---------|-------|
+| `threadStartedAt` | `string\|null` (ISO) | `null` | Written when `thread.js` Step 1 renders. Analytics only. |
+| `threadCompletedAt` | `string\|null` (ISO) | `null` | Written when `thread.js` Step 14 completes. Analytics only. |
+| `hardBeforeSelections` | `string[]` | `[]` | Territory IDs selected in Step 3a. Written/read by `thread.js`, `hard-before.js`, `reflection.js`, `beat3-scripts.js`. |
+| `hardBeforeShownAt` | `string\|null` (ISO) | `null` | Step 3a timing. |
+| `primaryTerritory` | `string\|null` | `null` | Single dominant territory confirmed in Step 3b. Read by `beat3-scripts.js` `getDominantTerritory()`. Replaced the old pattern of inferring dominant territory from `hardBeforeSelections[0]`. |
+| `reflectionShownAt` | `string\|null` (ISO) | `null` | Step 4 timing. |
+| `castleShownAt` | `string\|null` (ISO) | `null` | Beat 1 ("The Castle"). `arrival.js` retired but field preserved for analytics continuity. |
+| `consentGiven` | `boolean` | — *(undocumented, resolved 03 Aug)* | Written once, in `welcome.js`, at onboarding. **No reader anywhere** — recorded but never checked/enforced by any gate. Likely intended as an audit-trail record rather than a live gate, but worth confirming that's the actual intent given ToS/consent has legal weight — flagged for Graeme's awareness, not fixed here. |
+| `consentAt` | `string\|null` (ISO) | — *(undocumented, resolved 03 Aug)* | Timestamp paired with `consentGiven`, same file, same status — write-only, no reader. |
+
+---
+
+## 2. Profile
+
+| Field | Type | Default | Notes |
+|-------|------|---------|-------|
+| `name` | `string` | `''` | Required. Used in all coach messages. |
+| `ageBand` | `string\|null` | `null` | |
+| `age` | `number\|null` | `null` | **Deprecated** — kept for migration only, do not write new values. |
+| `gender` | `string\|null` | `null` | |
+| ~~`hormonalTracking`~~ | — | — | **Retired v1.90 (PT-3, 01 Oct 2026).** Nothing read it after W3-8 removed its switch; deleted on load. |
+| `coachStyle` | `string` | `'nurturing'` | `nurturing\|steady\|energetic\|minimal`. Beta: Nurturing voice delivers for all style settings silently — this is permanent product policy, not a beta-only restriction (Free tier: locked to Nurturing; Personal+: all values selectable in UI but all render as Nurturing). |
+| `tier` | `string` | `'free'` | `free\|personal`. **ATHLETE-RETIRE, 18 Aug 2026:** `athlete` removed. It granted nothing beyond `personal` anywhere in the app, had no entry route, no content and no price. `mergeWithDefaults()` migrates any saved `athlete` up to `personal` on load, one way — without it, holders would have silently dropped to free. **This is the one genuine tier field** — see `userTier` bug note at the top of this document. Never write or read `userTier`; it does not exist in `getDefaults()` and has no writer anywhere. |
+| `fitnessLevel` | `string\|null` | `null` | Read by `workoutGenerator.js`'s `getUserProfile()`. Written by Settings. |
+| `weight` | `number\|null` | `null` | |
+| `weightUnit` | `'kg'\|'lbs'` | `'kg'` | |
+| `targetWeight` | `number\|null` | `null` | |
+| `targetDate` | `string\|null` | `null` | ISO date |
+| `targetDescription` | `string` | `''` | Plain text goal note |
+| `goals` | `string[]` | `[]` | Goal IDs from `goals.js`. Drives exercise filter engine and `workoutGenerator.js`'s goal-aware bias. |
+| `conditions` | `string[]` | `[]` | Condition IDs from `conditions.js`. Base IDs only — phase variants derived at runtime. **29 Aug 2026 (CHECKIN-2a):** now also written mid-programme by `store.addSoreArea(id)`, not just at onboarding. **Holds ACTIVE ids only** — a retired area leaves this array and its record stays in `conditionMeta`. **Deliberately NOT reshaped into records.** 25 readers across 15 files treat this as an array of string ids, and a reader missed is a condition that silently stops reaching a caution check. Lifecycle lives in `conditionMeta`. |
+| `conditionMeta` | `object` | `{}` | **New 29 Aug 2026 (CHECKIN-2a).** Keyed by condition ID: `{ addedAt, source, status, dormantAt, lastSoreAt, reportDays, quietRun, asks }`. `addedAt` is `null` for anything that predates this field and **must stay null** — unknown history must never make a condition eligible for the CHECKIN-2b resolution ask, and inventing today's date would make every long-standing condition look brand new. `source` is `onboarding` or `checkin`. `status` is `active` or `dormant`; dormant records are kept, never deleted, so retirement loses no history and reactivation needs no re-declaration. `quietRun` counts **positively reported** low days only — a missed check-in resets it to 0, never pauses it. Migrated and normalised on every load by `store._migrateConditionMeta()`, which is idempotent. |
+| `conditionPainScoresOn` | `string \| null` | `null` | **New v1.76 (P13).** The local day (`YYYY-MM-DD`) `conditionPainScores` was written. Scores from another day are cleared on load. |
+| `conditionPainScores` | `object` | `{}` | Keyed by condition ID. Written at check-in submission. **v1.76: dated by `conditionPainScoresOn` and cleared on load when not today.** **04 Aug 2026:** values are now a genuine 0-10 continuous slider input (Pain Input Redesign) — previously only ever 4 representative discrete values (1/4/6/9) from a button UI. No shape change to the field itself; every consumer already used `>=`/`<` range comparisons, not exact-equality, so this needed no other schema or consumer changes. Band/label classification for display is now centralised in `conditions.js`'s `getPainBand()` — see that file. |
+| ~~`conditionReflections`~~ | — | — | **Removed v1.74 (P0).** Was: **New, 04 Aug 2026 (Home Nav Phase A).** `{ conditionId, text, loggedAt }`. Deliberately a separate namespace from `journalEntries` below — **not** subject to the Journal Privacy Rule, coach-readable by design. Decided explicitly to avoid it silently inheriting journal privacy behaviour by accident (see `alongside_blueprint_home-navigation-conditions_04aug2026_v1.md` §3). |
+| ~~`conditionFoldInLevel`~~ | — | — | **Removed v1.74 (P0).** Was: **New, 04 Aug 2026 (Home Nav Phase A).** `'partial'\|'mostly'\|'all'\|null`. Fold-in dial setting for the condition programme — whether/how much its exercises are woven into Cardio/Core/Strength sessions vs staying static-only in Mobility & Conditioning. `null` = static-only. |
+| ~~`conditionGoals`~~ | — | — | **Removed v1.74 (P0).** Was: **New, 04 Aug 2026 (Phase D-1).** Keyed by condition ID: `{ goalType: 'healed'\|'cope'\|'improve', note, setAt }`. Felt-sense, not numeric — deliberately not reusing `strategicGoal` (single-value, general-purpose, already used for the overall fitness goal). Written by `store.setConditionGoal()`. Offered alongside `activeProgramme.milestones`, not replacing it — see `alongside_blueprint_phaseD_04aug2026_v2.md` §2, decision D-1. |
+| `severePainChoices` | `array` | `[]` | **New, 04 Aug 2026.** `{ date, conditionIds (sorted), choice: 'rest'\|'adapt', chosenAt }`. Written by `store.recordSeverePainChoice()`, read by `coach-proposal.js` to gate whether the Severe-pain Rest/Adapt prompt shows again today. One record per date + exact severe-condition-id set — an active choice log, not a single latest-preference value. |
+| `equipment` | `string[]` | `[]` | Equipment IDs from `equipment.js`. **Derived, not primary input** — see below. |
+| `homeEquipment` | `string[]` | `[]` *(undocumented in `getDefaults()`)* | Live. Scope-specific onboarding input, written/read entirely within `equipment.js`. |
+| `gymEquipment` | `string[]` | `[]` *(undocumented in `getDefaults()`)* | Live. Scope-specific onboarding input, written/read entirely within `equipment.js`. |
+| `scopeNoticeDue` | `boolean` | `false` | **New v1.74 (P0).** True once after a retired condition is dropped on load; Home shows the scope statement and "Understood" clears it. |
+| `prescribedExercises` | `array` | `[]` | **v1.74 (P0): the person's own list, "My exercises". Never app-built; no `prescribedBy` or `conditionIds`; not injected into built sessions.** History: entries could carry `conditionIds` (**array, updated 04 Aug 2026** — replaces the earlier singular `conditionId`) — scopes a coach-built/coach-recommended/self-built exercise to every condition it genuinely belongs to, not just one. One entry can now serve more than one condition (real exercise reuse, not duplication — see `js/data/conditionProgrammes.js` v3) when the same exercise is relevant to both. Additive, nullable; entries added before this existed, or added without a condition context, stay untagged and keep appearing unfiltered in `prescribed.js`. Old singular-`conditionId` entries still read correctly via `getEntryConditionIds()` — no migration step, rebuilding a programme naturally migrates them. Written by `commitProgramme()` for the two coach routes, or by `prescribed.js` itself (reading `prescribedExercisesActiveCondition`, below) for the manual "Build my own" route. |
+| `prescribedExercisesOrigin` | `string\|null` | `null` | **New, 04 Aug 2026 (Phase D-2).** `'professional'\|'self'\|null`. Set once when `prescribedExercises` first goes empty → non-empty. Lets `prescribed.js`'s `buildCoachLine()` branch its two origin-referencing lines correctly when reached via Conditions Update's self-build route rather than a genuine physio/GP prescription — see `alongside_blueprint_phaseD_04aug2026_v2.md` §2, decision D-2. |
+| `prescribedExercisesActiveCondition` | `string\|null` | `null` | **New, 04 Aug 2026.** Single-use context flag, not sticky — set by `conditions-update.js`'s "Build my own" right before navigating to `prescribed.js`, read and cleared immediately by that file so a later, unrelated visit can never be silently tagged with a stale condition. |
+| `pendingDoorRoute` | `string\|null` | `null` | **New, 04 Aug 2026 (Phase C follow-up).** Route name to continue to once check-in/check-in-mini completes. Set by `today.js` when a session-generating Home door (Cardio/Core/Strength, Unsure? Coach decides) is tapped; read and cleared by `checkin.js`/`checkin-mini.js` on completion. |
+
+**Resolved 03 Aug (was flagged as a possible naming overlap):** `homeEquipment` and `gymEquipment` are not duplicates of `equipment` — they're the two scope-specific inputs `equipment.js` collects during onboarding, which are then merged (`Array.from(new Set([...gym, ...home]))`) into the single combined `equipment` array that the rest of the app (`session-builder-ui.js` etc.) actually reads. All three are genuinely live; `equipment` is simply derived, not primary.
+
+### `lifestyle` (nested object)
+
+| Field | Type | Values |
+|-------|------|--------|
+| `activityLevel` | `string\|null` | `sedentary\|light\|moderate\|active\|very-active` |
+| `stressLevel` | `string\|null` | `low\|moderate\|high\|very-high` |
+| `sleepQuality` | `string\|null` | `poor\|okay\|good` |
+| `exerciseHistory` | `string\|null` | `never\|lapsed\|returning\|active` |
+| `returningAfter` | `string\|null` | `injury\|illness\|life\|burnout\|null` |
+
+---
+
+## 3. Strategic Layer
+
+### `strategicGoal` (nested object)
+
+| Field | Type | Default |
+|-------|------|---------|
+| `primaryGoal` | `string\|null` | `null` |
+| `targetDescription` | `string` | `''` |
+| `targetDate` | `string\|null` | `null` |
+| `targetValue` | `number\|null` | `null` |
+| `targetUnit` | `string\|null` | `null` |
+| `weeklySessionTarget` | `number` | `3` |
+| `setAt` | `string\|null` (ISO) | `null` | 
+| `targetSetAt` | `string\|null` (ISO) | `null` |
+| `planPresentedAt` | `string\|null` (ISO) | `null` |
+| `measurementsOptIn` | `string[]` | `[]` |
+| `review` | `object` | `{ lastOfferedAt: null, outcomes: [] }` |
+
+⚠️ **`weeklySessionTarget` defaults to `3` with `setAt: null`.** The pair records that **nobody agreed to it.** `setAt` is the honest test of whether it was ever a choice, and `today.js` (HOME-1) and `my-programme.js` both refuse to display the target without it. Any new reader must inherit that rule: **a default of 3 is never a denominator.**
+
+⚠️ **`targetSetAt` vs `setAt`** — different facts. `setAt` is when the weekly frequency was agreed; `targetSetAt` is when the dated target was named. See v1.38 above.
+
+### `activeProgramme` (nested object)
+
+| Field | Type | Default |
+|-------|------|---------|
+| `programmeId` | `string\|null` | `null` |
+| `programmeName` | `string` | `''` |
+| `startDate` | `string\|null` | `null` |
+| `currentWeek` | `number` | `1` |
+| `currentPhase` | `string\|null` | `null` |
+| `sessionsThisWeek` | `number` | `0` |
+| `totalSessions` | `number` | `0` |
+| `milestones` | `array` | `[]` |
+| `completed` | `boolean` | `false` |
+| `completedAt` | `string\|null` | `null` |
+| `phase` | `number` | `1` |
+| `weekPlan` | `object\|null` | `null` |
+| `sessionSequence` | `array` | `[]` |
+| `missedSessions` | `array` | `[]` |
+| `midProgrammeGlanceShown` | `boolean` | `false` |
+| `programmeReflectionShown` | `boolean` | `false` |
+
+⚠️ See the `measurementsOptIn` anomaly note above — a stray copy of `strategicGoal.measurementsOptIn` can appear here at runtime due to a merge-logic artefact. Not part of the intended schema for this object.
+
+`progressLog` (top-level, not nested): `array`, default `[]`. Session history, capped at 90 entries via `logSession()`.
+
+---
+
+## 4. Gym Programme
+
+| Field | Type | Default | Notes |
+|-------|------|---------|-------|
+| `gymProgrammeSession` | `string` | `'A'` | |
+| `gymProgrammeWeek` | `number` | `1` | **Dormant, resolved 03 Aug.** Read once, in `reflect.js`, only as a rotation seed for picking a wellbeing-invitation line — not a real week number. **No writer anywhere**, so it always falls back to the default `1`. The genuine, actively-tracked programme week is `activeProgramme.currentWeek` (Section 3), maintained by `programmeEngine.js`. Not a naming clash — two real, distinct fields — but `gymProgrammeWeek` is dead weight, cosmetic-only, and never varies. Cleanup candidate, not fixed here. |
+| `lastMilestone` | `string\|null` | `null` *(undocumented in `getDefaults()`)* | **Resolved 03 Aug.** Live — a single-value flag set by `workout.js` on milestone achievement, read and cleared by `workout-complete.js` to show the completion-screen milestone card. Confirmed genuinely distinct from `activeProgramme.milestones` (array of programme-phase milestones reached, Section 3) and `checkin.lastMilestoneNoticed` (Section 6, tracks which streak/week milestone the coach has already surfaced in an opening line) — three separate mechanisms, no overlap. |
+
+---
+
+## 5. Activity & Session Tracking
+
+| Field | Type | Default | Notes |
+|-------|------|---------|-------|
+| `activityLog` | `array` | `[]` | Each entry: `{ id, date, type, durationMins, moodAfter, isEvent, eventName, completedAt, gentle, rescued, ... }` (`gentle` v1.84, W3-12; `rescued` v1.85, W3-13). Single write path since v10: `store.logActivity()`, with dedupe guard against same-type double-writes within 2 minutes. |
+| `currentActivityEntry` | `null` | `null` | **Under active investigation** — separate blueprint (`alongside_blueprint_coresession-integrity_30jul2026_v1.md`) is checking whether Core Session ever populates this field upstream. Out of scope for BUILD-4; do not resolve here. |
+| `generatedSession` (nested) | `object` | `{ session: null, builtAt: null, inputs: {} }` | The real "today's workout" mechanism — this is what replaced the old `todaysWorkouts`/`workoutsGeneratedAt` pattern (see corrections above). **v1.52:** each entry in `session.exercises` carries `role` — `"warmup"`, `"main"` or `"cooldown"` — stamped at assembly by `buildSession()` / `buildSessionFromSelection()`. Read by `workout.js` for the badge above the exercise name. Older sessions cached before 08 Sep 2026 have no `role`; the view suppresses the badge rather than printing anything when it is absent. |
+| `totalCredits` | `number` | `0` *(undocumented)* | **Resolved 03 Aug — live, 21 refs.** Running lifetime total, incremented at completion by every session-type view (walk/run/yoga/swim/core/cycle/gym/quiet/breathing/prescribed). Read by `workout-complete.js` for the completion screen. Confirmed genuinely distinct from `community.credits` (Section 18) — that's the separate Impact Credits mechanism (1–2 awarded per session depending on tier, via `awardCommunityCredit()`). Incidental finding: `community.credits` is written but has **no reader anywhere** — nothing displays it. Logged, not fixed. |
+| `lastWorkoutName` | `string\|null` | `null` *(undocumented)* | **Resolved 03 Aug — live, 12 refs.** Paired with `lastWorkoutCredits`; written by every session-completion view, read by `workout-complete.js`, cleared on exit. |
+| `lastWorkoutCredits` | `number` | `0` *(undocumented)* | **Resolved 03 Aug — live, 12 refs.** See `lastWorkoutName` above; written/read/cleared together at the same call sites. |
+| `workoutProgress` | `array` | `[]` *(undocumented)* | **Resolved 03 Aug — live.** `workout.js`'s own in-progress per-exercise completion tracker, entirely self-contained (get/set/clear all within that file). Confirmed genuinely distinct from `prescribedSessionProgress` below, not a duplicate. |
+| `prescribedSessionProgress` | `array` | `[]` *(undocumented)* | **Resolved 03 Aug — live.** Same pattern as `workoutProgress`, scoped entirely within `prescribed-session.js`. |
+| `workoutHistory` | `array` | `[]` *(undocumented)* | **Resolved 03 Aug — live but write-only.** Appended by `completeWorkout()` in `workout.js` on every gym-type workout completion (`{ workoutId, name, focus, completedAt, exercisesCompleted, totalExercises, creditsEarned }`) — a genuine fourth history mechanism, distinct from `activityLog`, `progressLog`, and `activeProgramme.milestones`. **No reader anywhere confirmed** — nothing in Settings, Progress, or any history view displays it. Data is being collected with no consumer. Logged, not fixed. |
+| `usingGeneratedSession` | `boolean` | — *(undocumented)* | **Resolved 03 Aug — write-only, 1 ref.** Set `true` in `session-builder-ui.js`; no reader anywhere. |
+
+---
+
+## 6. Check-In Engine
+
+### `checkin` (nested object — engine state)
+
+| Field | Type | Default |
+|-------|------|---------|
+| `lastOpeningMode` | `string\|null` | `null` |
+| `openingModeHistory` | `array` | `[]` |
+| ~~`feelingWordDepth`~~ | removed v1.73 (store.js v80) | — |
+| `lastMilestoneNoticed` | `string\|null` | `null` |
+
+### `lastCheckin` (nested object)
+
+| Field | Type | Default |
+|-------|------|---------|
+| ~~`feelingWord`~~ | removed v1.73 (store.js v80) | — |
+| ~~`feelingQuadrant`~~ | removed v1.73 (store.js v80) | — |
+| `unwell` | `boolean` | `false` |
+| `timestamp` | `string\|null` (ISO) | `null` |
+
+`checkinHistory`: `object`, default `{}`. Plain object keyed by `"YYYY-MM-DD"` — **not an array.** A v5 bug once reset this to `[]` on every load via an incorrect `Array.isArray()` check, destroying check-in history; fixed in v5, mentioned here as a cautionary note against reintroducing the same check.
+
+`todayIntensity`: `string|null`, undocumented in `getDefaults()` (see Appendix A). **Corrected this session — genuinely live**, not dead. Written by `checkin.js` and `coach-proposal.js`; read by `workoutGenerator.js` (falls back to `"moderate"` if unset).
+
+`availableTime`: `string|null`, undocumented in `getDefaults()` (see Appendix A). Live. `micro|quick|short|standard|long|open`. Written by `checkin.js` and `coach-proposal.js`; drives `workoutGenerator.js`'s exercise-count and duration-cap logic (BUILD-5, 24 Jul).
+
+`returnVisit`: `boolean|'dismissed'`, undocumented in `getDefaults()`. **Resolved 03 Aug — live, 11 refs.** Three-state flag (`false`/`true`/`"dismissed"`) written by `intention.js` and `checkin-mini.js`, gating whether the return-visit check-in prompt shows again today.
+
+`quietMode`: `string|null`, undocumented in `getDefaults()`. **Resolved 03 Aug — live, 10 refs.** Routing flag, not a check-in field per se — written by `library.js`/`noticing.js` before navigating into `quiet-session.js`, which reads it to select one of three quiet-session sub-modes (including the mindful/journal-mode path from S4-9/10). Cleared on exit/completion.
+
+`todayEnergy`: `number|null`, undocumented in `getDefaults()`. **Resolved 03 Aug — dead.** Read once in `intention.js` as a fallback (`checkin.energy || store.get("todayEnergy") || 5`) but **has no writer anywhere in the codebase** — the read is unreachable in practice, always falling through to the hardcoded `5`. Confirmed superseded by `lastCheckin.energy` (below), which is the field genuinely written by `checkin-mini.js` and read by `gym-programme.js`/`coach-proposal.js`. Naming remnant, safe cleanup candidate, not fixed here.
+
+---
+
+## 7. Mindful Prompts & Empathy Transfer
+
+| Field | Type | Default | Notes |
+|-------|------|---------|-------|
+| `mindfulPromptDepth` | `number` | `1` | |
+| `mindfulPromptFrequency` | `string` | `'automatic'` | |
+| `empathyTransferStage` | `number` | `1` | 1–5, current stage of the 5-stage prompt library. |
+| `empathyPromptsFired` | `number` | `0` | Total, all-time. |
+| `empathyPromptsAtStage` | `number` | `0` | Resets to 0 on stage advance. |
+| `lastEmpathyPromptSession` | `number` | `0` | Session count at last fire — enforces the session gap. |
+| `lastEmpathyPromptAt` | `string \| null` | `null` | **EMP-4, 13 Aug 2026.** ISO timestamp of the last empathy prompt. The cadence is time-aware as well as session-aware: a session-only gate rations the coaching voice in proportion to how *few* sessions somebody does, which is backwards for the people this product exists for. Persona 2.12 met the empathy arc once in three weeks; persona 2.15, at sixteen sessions, met it four times. Written beside `lastEmpathyPromptSession`, never separately. |
+| `empathyPromptSkips` | `number` | `0` | **Consecutive** skip streak, not lifetime total — resets to 0 on any non-skip response. |
+| ~~`proposalBias`~~ | removed v1.72 (store.js v79) | — | — |
+
+---
+
+## 8. Absence & Return
+
+`absence` (nested object): `context` (`string|null`, default `null`), `capturedAt` (`string|null`, default `null`), `returnCapturedAt` (`string|null`, default `null`).
+
+**`context` permitted values — REVISED 20 Aug 2026 (REENTRY-2):**
+
+| Value | Written when | Effect |
+|---|---|---|
+| `'illness'` | "Was unwell" | Intensity one level gentler; programme **holds** the week |
+| `'injury'` | **NEW.** "Was injured" | Intensity one level gentler; programme **holds**; **the coach asks what is still sore** rather than assuming recovery |
+| `'life'` | "Life got full" | **CHANGED.** Was full phase intensity. Now **offers** a gentler start, which the person may decline |
+| `'harder'` | "Finding it harder" | **CHANGED.** As `life` — offered, not imposed |
+| `null` | Skipped, or never asked | No adaptation |
+
+**Why `life` and `harder` changed.** Graeme, 20 Aug: *"If I've been away for 3 weeks for work I'm not fit enough to start where I left off. But I should be offered."* Detraining does not care why you were away. The previous behaviour returned somebody at full phase intensity after any non-illness absence, which is how people come back, find it too hard, and stop.
+
+**Why it is OFFERED and not imposed.** Somebody who was away by choice and feels fine should not be told they have lost ground. `illness` and `injury` still step down without asking, because those carry a clinical reason.
+
+**`injury` is not a clinical record.** It sets intensity and prompts a question. It does not write to `conditions`, does not alter `prescribedExercises`, and never implies the app knows what is wrong.
+
+---
+
+## 9. Exercise Feedback *(dormant — see correction above)*
+
+`exerciseFeedback`: `array`, undocumented in `getDefaults()`. **Read-only, effectively dormant.** `applyFeedbackWeighting()` reads it in `exercises.js`, but nothing anywhere writes it — no UI collects per-exercise like/dislike. Always falls back to `[]`, so the weighting logic runs with zero real effect. Likely a "spec exists, write side never built" gap — see `alongside_exercise_skip_dislike_spec_16may2026_v1.docx`.
+
+---
+
+## 10. Stats *(not a store field)*
+
+There is no `stats` field, live or dormant, anywhere in `store.js`. Every `stats` reference in the app is a local variable computed on demand by `getProgressStats()` (`programmeEngine.js`), built from `activityLog`, `checkinHistory`, and `activeProgramme` at render time — not persisted. The "specified but never built" flag raised against this in the 16 Jul v1.8 delta note is resolved: there was never a gap to fill.
+
+---
+
+## 11. Preferences & Misc Top-Level
+
+| Field | Type | Default | Notes |
+|-------|------|---------|-------|
+| `speechRate` | `number` | `0.9` | Text-to-speech. |
+| `activityPreferences` | `object` | `{}` | |
+| `movementIdentity` | `string[]` | `[]` | Migrated from `string\|null` in v8 (05 Jul) — existing single values are wrapped, not dropped, on merge. e.g. `['gym','running','walking']`, or `['mixed']` (mutually exclusive with named identities). |
+| `sessionLocation` | `string\|null` | `null` | **LOCATION-1, 08 Sep 2026.** `"home"`, `"gym"`, `"outside"` or `null`. Where the person is for THIS session. **The one constraint the coach cannot infer** (CLUB spec v2 §6.2), so it is asked rather than guessed, and remembered so it is asked once. Selects which equipment list a session is built against: `homeEquipment`, `gymEquipment`, or — for `"outside"` — none, because your home kit is not in the park. `null` is treated as `"home"` at the point of building: never propose a barbell to somebody who might be in a kitchen. **Written by** `checkin-mini.js` (Step 4), `capture.js` (during a session) and `coach-proposal.js` **when a session starts** (W3-21: changing *Where* on the plan changes that plan, not the default). **Read by** `coach-proposal.js` via `equipmentForLocation()`. |
+| `requestedLocation` | `string\|null` | `null` | **W3-21, 30 Sep 2026.** `"home"`, `"gym"`, `"outside"` or `null`. Where *I know what I want* asked for today's plan. **Written by** `know-what.js`. **Read once and cleared by** `coach-proposal.js` on mount, so it never outlives the plan it was asked for. |
+| `lastProposalType` | `string\|null` | `null` | |
+| `lastProposalDate` | `string\|null` | `null` | |
+| `createdAt` | `string\|null` | `null` | Set once, at `completeOnboarding()`. |
+| `updatedAt` | `string\|null` | `null` | Set on every `store.set()` and every dedicated helper method. |
+
+---
+
+## 12. Notifications
+
+`checkInNotification` (nested object): `enabled` (`boolean`, `false`), `time` (`string|null`, `null`), `permissionGranted` (`boolean`, `false`).
+
+---
+
+## 13. Noticing Hub
+
+| Field | Type | Default | Notes |
+|-------|------|---------|-------|
+| `journalEntries` | `array` | `[]` | Each entry gets `hasProgressSignal` (boolean) added at save time by `signal-words.js`. **Journal Privacy Rule applies:** journal free-text content itself is never subject to signal detection — only the feeling-word selector and mood history are, no exceptions. |
+| `noticingWeekInCycle` | `number` | `1` | |
+| `noticingLastTriggered` | `string\|null` | `null` | |
+
+`journalSettings` (nested object): `autoTagging` (`boolean`, `true`), `categoryPrefs` (`string[]`, `['life','movement','environment','nature','health']`).
+
+`noticingPreferences` (nested object): `schedule` (`string`, `'automatic'`), `time` (`string|null`, `null`).
+
+`noticingProgress` (nested object): `territoriesVisited` (`string[]`, `[]`), `seriesProgress` (`object`, `{}`), `seriesUnlockedAt` (`object`, `{}`), `lastTerritoryId` (`string|null`, `null`).
+
+`exercisePreferences` (`object`, `{}`) — `{ [exerciseId]: { preference: 'avoid'|'less', setAt, source } }`. Binary signal, not a rating (no stars/scores). Added `store.js` v17 (04 Aug), undocumented here until now — catching up the drift. First consumer: `js/data/conditionProgrammes.js` candidate selection.
+
+`inStepProgress` (nested object) — Personal tier "In Step" feature (Noticing Hub), added `store.js` v18 (09 Aug): `unlockedAt` (`object`, `{}` — `{ [movementId]: ISO }`, gates a 3-day anti-binge cooldown between scenarios in the same movement), `scenarioIndex` (`object`, `{}` — `{ [movementId]: int }`, cycles `js/data/in-step-scenarios.js`'s four-scenario pools per movement), `completedCount` (`object`, `{}` — display only), `choiceLog` (`array`, `[]` — `{ movementId, scenarioId, optionId, tag, at }[]`, aggregate research signal only, never read by coach logic or surfaced per-entry to the user). Deliberately not named "territory" — that word is already used, unrelated, by onboarding's `primaryTerritory`/`hardBeforeSelections`.
+
+---
+
+## 14. Weekly Plan
+
+`weeklyPlan.days` is keyed by lowercase weekday name (`monday`…`sunday`); each day has the identical shape below. `weeklyPlan.updatedAt` sits alongside `days`, not per-day.
+
+| Field (per day) | Type | Default |
+|------|------|---------|
+| `type` | `string` | `'open'` |
+| `sessionType` | `string\|null` | `null` |
+| `durationMins` | `number\|null` | `null` |
+| `location` | `string\|null` | `null` |
+| `classFocus` | `array` | `[]` |
+| `activityName` | `string\|null` | `null` |
+| `label` | `string\|null` | `null` |
+| `enabled` | `boolean` | `false` |
+
+`weeklyPlan.updatedAt`: `string|null`, default `null`.
+
+---
+
+## 15. Safeguarding & Weekly Review
+
+`safeguarding` (nested object): `lastSignpostedAt` (`string|null`, `null`).
+
+`weeklyReview` (nested object): `periodStart` (`string|null`, `null`), `periodEnd` (`string|null`, `null`), `generatedAt` (`string|null`, `null`), `narrative` (`string|null`, `null`), `readAt` (`string|null`, `null`), `dataUnlocked` (`boolean`, `false`).
+
+---
+
+## 16. Weight & Water
+
+| Field | Type | Default | Notes |
+|-------|------|---------|-------|
+| `weightLog` | `array` | `[]` | |
+| `waterLog` | `array` | `[]` | |
+| `waterReminderEnabled` | `boolean` | `false` | |
+| `lastWaterReminder` | `string\|null` | `null` | |
+
+`waterSettings` (nested object): `dailyTargetMl` (`number`, `2000`), `remindersEnabled` (`boolean`, `false`), `reminderCount` (`number`, `2`), `windowStart` (`number`, `9`), `windowEnd` (`number`, `21`).
+
+---
+
+## 17. Coach Offers, Unwell Mode, Food Prompts
+
+`coachOffers` (nested object): `shown` (`object`, `{}`), `declined` (`object`, `{}`).
+
+### `unwellMode` (nested object) — *entirely undocumented until this pass*
+
+Illness/recovery tracking. Genuinely separate from `activeProgramme.startDate` — not a naming clash (v1.7 was correct about `activeProgramme.startDate`; this object was simply missing from the docs entirely).
+
+| Field | Type | Default |
+|-------|------|---------|
+| `active` | `boolean` | `false` |
+| `kind` | `string\|null` | `null` |
+| `startedAt` | `string\|null` | `null` |
+| `recoveryStartedAt` | `string\|null` | `null` |
+| `daysHeld` | `number` | `0` |
+| `kindAtRecovery` | `string\|null` | `null` |
+
+`foodPrompts` (nested object): `lastBalanceAt` (`array`, `[]`), `lastEducationAt` (`string|null`, `null`).
+
+---
+
+## 18. Community & Impact
+
+### `community` (nested object)
+
+| Field | Type | Default | Notes |
+|-------|------|---------|-------|
+| `credits` | `number` | `0` | Awarded via `awardCommunityCredit()`, called by `logActivity()` for every completed movement session (v1.87) — 2 on the Plan, 1 on Free. No same-day guard; the log's double-write guard stops duplicates. |
+| `lastCreditAt` | `string\|null` | `null` | |
+| `quarterlyAllocation` | `null` | `null` | |
+| `lastAllocationAt` | `string\|null` | `null` | |
+| `totalAllocated` | `number` | `0` | |
+
+`annualReflection` (nested object): `lastGeneratedAt` (`string|null`, `null`), `lastReadAt` (`string|null`, `null`), `chaptersUnlocked` (`number`, `0`).
+
+---
+
+## 19. Practice History
+
+`practiceHistory` (nested object): `lastPlayed` (`object`, `{}`), `favourites` (`array`, `[]`).
+
+---
+
+## Appendix A — Closed, 03 Aug 2026
+
+All 18 fields flagged in the 30 Jul v1.9 follow-up list have been individually checked (reader and writer both, per field) and documented in their proper sections above. Summary:
+
+| Field | Resolution | Documented in |
+|-------|-----------|----------------|
+| `totalCredits` | Live | §5 Activity & Session Tracking |
+| `lastWorkoutName` | Live | §5 |
+| `lastWorkoutCredits` | Live | §5 |
+| `quietMode` | Live | §6 Check-In Engine |
+| `lastMilestone` | Live | §4 Gym Programme |
+| `prescribedSessionProgress` | Live | §5 |
+| `returnVisit` | Live | §6 |
+| `homeEquipment` | Live | §2 Profile |
+| `workoutProgress` | Live | §5 |
+| `gymEquipment` | Live | §2 |
+| `morningProgrammeWeek` | Live | Self-contained in `morning-session.js`; confirmed no overlap with `gymProgrammeWeek` |
+| ~~`proposalBias`~~ | **Removed v1.72** (store.js v79) | §7 Mindful Prompts & Empathy Transfer |
+| `cycleLength` | Dead — always default | §2 (existing v1.9 entry) |
+| `workoutHistory` | **Dormant — write-only** | §5 |
+| `consentAt` | Dormant — write-only | §1 Onboarding |
+| `consentGiven` | Dormant — write-only | §1 |
+| `todayEnergy` | **Dead — no writer** | §6 |
+| `userTier` | **Dead — no writer, live bug in one reader** | §2, see top-of-document note |
+| `usingGeneratedSession` | Dormant — write-only | §5 |
+
+**Net finding:** of 18 fields, 11 are genuinely live, 5 are dormant (written, never read), 2 are dead (`cycleLength` already known; `todayEnergy` newly confirmed), and one of the dead ones (`userTier`) has a live, user-facing consequence via its sole reader. No fields turned out to be pure naming duplicates once checked — every flagged "possible overlap" resolved to genuinely distinct mechanisms.
+
+---
+
+*Build New Habits · Alongside: Move · Data Schema Reference · 17 Aug 2026 v1.35*

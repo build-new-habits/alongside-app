@@ -1,6 +1,10 @@
 /**
  * tools/verify-clinical-response.mjs
- * 29 Sep 2026 v2
+ * 01 Oct 2026 v3
+ *
+ * v3 - DOCS-MOVE. Documents/ left this public repository for the private
+ *   BNH-Files repository; the files this check reads are now in docs/ (or,
+ *   for the master schedule, read through tools/bnh-files.mjs).
  *
  * v2 - P0, SCOPE-MINOR (Graeme, 29 Sep). The app no longer asks about
  *   medical conditions, so CR-1's ME/CFS and long covid exclusion, CR-2's
@@ -63,7 +67,7 @@ const check = (name, source, fn) => {
 };
 const ok = (c, m) => { if (!c) throw new Error(m); };
 
-const BP = "Documents/Admin/alongside_blueprint_CLINICAL-RESPONSE_06sep2026_v1.md";
+const BP = "docs/specs/alongside_blueprint_CLINICAL-RESPONSE_06sep2026_v1.md";
 
 console.log("\nCR-1 \u2014 the condition split");
 

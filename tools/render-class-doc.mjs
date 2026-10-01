@@ -1,6 +1,10 @@
 /**
  * tools/render-class-doc.mjs
- * 28 Sep 2026 v1
+ * 01 Oct 2026 v2
+ *
+ * v2 - DOCS-MOVE. Documents/ left this public repository for the private
+ *   BNH-Files repository; the files this check reads are now in docs/ (or,
+ *   for the master schedule, read through tools/bnh-files.mjs).
  *
  * F8, CLASS-8. Renders a guided class's data file as a readable script,
  * for review (clinical sign-off, Graeme's voice pass) and for the voice
@@ -26,7 +30,7 @@ export const RENDERED = {
   "class-getting-going-009": "alongside_class_009_getting_going_28sep2026_v1_DRAFT.md",
   "class-from-the-feet-010": "alongside_class_010_from_the_feet_28sep2026_v1_DRAFT.md",
 };
-export const docPathFor = id => RENDERED[id] && new URL("Documents/Admin/" + RENDERED[id], ROOT);
+export const docPathFor = id => RENDERED[id] && new URL("docs/classes/" + RENDERED[id], ROOT);
 
 const mmss = s => `${Math.floor(s / 60)} min ${String(Math.round(s % 60)).padStart(2, "0")}`;
 

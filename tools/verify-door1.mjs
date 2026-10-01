@@ -1,6 +1,10 @@
 /**
  * tools/verify-door1.mjs
- * 12 Aug 2026 v1
+ * 01 Oct 2026 v2
+ *
+ * v2 - DOCS-MOVE. Documents/ left this public repository for the private
+ *   BNH-Files repository; the files this check reads are now in docs/ (or,
+ *   for the master schedule, read through tools/bnh-files.mjs).
  *
  * Gate for DOOR-1 and the In Step tier correction.
  *
@@ -36,7 +40,7 @@ const ok = (c, m) => { if (!c) throw new Error(m); };
 
 const noticing = read("js/views/noticing.js");
 const inStep   = read("js/views/in-step.js");
-const spec     = fs.readFileSync(_gatePath("Documents/Business/alongside_destination_architecture_12aug2026_v1.md"), "utf8");
+const spec     = fs.readFileSync(_gatePath("docs/specs/alongside_destination_architecture_12aug2026_v1.md"), "utf8");
 const mainC    = read("css/main.css");
 const sw       = read("sw.js");
 

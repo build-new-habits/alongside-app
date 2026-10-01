@@ -1,6 +1,10 @@
 /**
  * tools/verify-decisions.mjs
- * 29 Sep 2026 v5
+ * 01 Oct 2026 v6
+ *
+ * v6 - DOCS-MOVE. Documents/ left this public repository for the private
+ *   BNH-Files repository; the files this check reads are now in docs/ (or,
+ *   for the master schedule, read through tools/bnh-files.mjs).
  *
  * v5 - P15. C1-SAFETY's pin follows store.js v84: the legPower fail-safe
  *   covers everyone who ANSWERED that rising from a chair is hard. It
@@ -91,8 +95,7 @@ const check = (decision, source, fn) => {
 };
 const ok = (c, m) => { if (!c) throw new Error(m); };
 
-const DEST = "Documents/Business/alongside_destination_architecture_12aug2026_v1.md";
-const SCHED = "Documents/Admin/master_schedule.md";
+const DEST = "docs/specs/alongside_destination_architecture_12aug2026_v1.md";
 
 console.log("\nTIER BOUNDARY \u2014 free must actually be free");
 

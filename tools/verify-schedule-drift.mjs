@@ -1,6 +1,10 @@
 /**
  * tools/verify-schedule-drift.mjs
- * 18 Aug 2026 v2
+ * 01 Oct 2026 v3
+ *
+ * v3 - DOCS-MOVE. Documents/ left this public repository for the private
+ *   BNH-Files repository; the files this check reads are now in docs/ (or,
+ *   for the master schedule, read through tools/bnh-files.mjs).
  *
  * v2 - Header/footer version agreement on master_schedule.md. v141
  *   recorded the drift and wrote a rule against it; the rule was then
@@ -29,6 +33,7 @@
  * asserts are dead, and reports any that are demonstrably alive.
  */
 import fs from "node:fs";
+import { readSchedule, SCHEDULE_REL } from "./bnh-files.mjs";
 
 // GATE-PATH, 08 Sep 2026. Resolved from import.meta.url, not the cwd.
 const _GATE_ROOT = new URL("../", import.meta.url);
@@ -49,8 +54,7 @@ const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
 // have run on days something else was already wrong -- a check that
 // cannot fire is worse than no check, because it looks like coverage.
 {
-  const ms = fs.readFileSync(
-    new URL('../Documents/Admin/master_schedule.md', import.meta.url), 'utf8');
+  const ms = readSchedule();
   const headerV = ms.match(/^##\s+\d{1,2} \w{3} \d{4} (v\d+)/m);
   const lines   = ms.trimEnd().split('\n');
   const footerV = lines[lines.length - 1].match(/(v\d+)\*?\s*$/);
@@ -68,8 +72,8 @@ const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
 
 import path from "node:path";
 
-const SCHEDULE = "Documents/Admin/master_schedule.md";
-const md = fs.readFileSync(_gatePath(SCHEDULE), "utf8");
+const SCHEDULE = "BNH-Files/" + SCHEDULE_REL;
+const md = readSchedule();
 
 // Live code, comments stripped: a symbol named only in a comment that
 // DISCUSSES it being dead is not a live use.

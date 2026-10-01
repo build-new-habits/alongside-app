@@ -1,6 +1,10 @@
 /**
  * tools/verify-chap1.mjs
- * 21 Aug 2026 v2
+ * 01 Oct 2026 v3
+ *
+ * v3 - DOCS-MOVE. Documents/ left this public repository for the private
+ *   BNH-Files repository; the files this check reads are now in docs/ (or,
+ *   for the master schedule, read through tools/bnh-files.mjs).
  * GATE-PATH. Path resolution only -- no assertion changed.
  *
  * 15 Aug 2026 v1
@@ -83,7 +87,7 @@ check('and it is still unwritten, so nothing has started counting yet',
 
 // Blueprint promises that must survive into the build.
 const bp = fs.readFileSync(
-  new URL('../Documents/Admin/alongside_blueprint_chapters_15aug2026_v1.md', import.meta.url), 'utf8');
+  new URL('../docs/specs/alongside_blueprint_chapters_15aug2026_v1.md', import.meta.url), 'utf8');
 check('the blueprint is in the repo for the next session', bp.length > 2000);
 check('and it records the one-engine rule',
   /two presentations of ONE engine|One flag, two vocabularies/i.test(bp));

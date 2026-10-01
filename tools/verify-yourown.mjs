@@ -1,6 +1,10 @@
 /**
  * tools/verify-yourown.mjs
- * 28 Sep 2026 v3
+ * 01 Oct 2026 v4
+ *
+ * v4 - DOCS-MOVE. Documents/ left this public repository for the private
+ *   BNH-Files repository; the files this check reads are now in docs/ (or,
+ *   for the master schedule, read through tools/bnh-files.mjs).
  *
  * v3 - SMOOTH-P3a/b. The Your own ROOM left Plan Home (spec 4.1). What
  *   it held now lives in two places: "I know what I want" (the way to
@@ -286,7 +290,7 @@ ok("5a. chooseSessionType does not read savedSessions",
 // ── 6. SCHEMA BEFORE CODE ───────────────────────────────────────────────
 console.log("\nTEST 6 - declared, defaulted, and defended on rehydrate");
 
-const schema = fs.readFileSync(_gatePath("Documents/Live State/Schema.md"), "utf8");
+const schema = fs.readFileSync(_gatePath("docs/Schema.md"), "utf8");
 ok("6a. savedSessions is in Schema.md", /### `savedSessions`/.test(schema));
 
 const storeSrc = fs.readFileSync(_gatePath("js/store.js"), "utf8");

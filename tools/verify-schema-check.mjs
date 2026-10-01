@@ -1,6 +1,10 @@
 /**
  * tools/verify-schema-check.mjs
- * 16 Aug 2026 v2
+ * 01 Oct 2026 v3
+ *
+ * v3 - DOCS-MOVE. Documents/ left this public repository for the private
+ *   BNH-Files repository; the files this check reads are now in docs/ (or,
+ *   for the master schedule, read through tools/bnh-files.mjs).
  *
  * v2 - The field diff had never run. See the note at the extraction
  *   below. Nine store fields were undocumented while this reported the
@@ -8,7 +12,7 @@
  *
  * 12 Aug 2026 v1
  *
- * A3/A1. Diffs js/store.js getDefaults() against Documents/Live State/Schema.md
+ * A3/A1. Diffs js/store.js getDefaults() against docs/Schema.md
  * in BOTH directions, and checks the "confirmed live version" line matches the
  * store.js header.
  *
@@ -35,7 +39,7 @@ const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
 
 
 const storeSrc  = fs.readFileSync(_gatePath('js/store.js'), 'utf8');
-const schemaSrc = fs.readFileSync(_gatePath('Documents/Live State/Schema.md'), 'utf8');
+const schemaSrc = fs.readFileSync(_gatePath('docs/Schema.md'), 'utf8');
 
 // 1. Version agreement
 const storeVer  = (storeSrc.match(/^ \* \d{1,2} \w{3} \d{4} (v\d+)/m) || [])[1];

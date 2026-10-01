@@ -1,6 +1,10 @@
 /**
  * tools/verify-blueprint.mjs
- * 08 Sep 2026 v2
+ * 01 Oct 2026 v3
+ *
+ * v3 - DOCS-MOVE. Documents/ left this public repository for the private
+ *   BNH-Files repository; the files this check reads are now in docs/ (or,
+ *   for the master schedule, read through tools/bnh-files.mjs).
  *
  * v2 - Also checks the MASTER SCHEDULE's "> **Live:" line against the
  *   repo. That line is the first thing a new session reads -- before the
@@ -60,6 +64,7 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 const REPO = path.resolve(HERE, "..");
 
 const read = p => fs.readFileSync(path.join(REPO, p), "utf8");
+import { readSchedule, SCHEDULE_REL } from "./bnh-files.mjs";
 
 let failures = 0, checks = 0;
 const ok = (label, cond, detail = "") => {
@@ -68,7 +73,7 @@ const ok = (label, cond, detail = "") => {
   else { failures++; console.log(`  FAIL  ${label}${detail ? "\n        " + detail : ""}`); }
 };
 
-const BLUEPRINT = "Documents/Admin/alongside_cold_start_blueprint_20aug2026_v1.md";
+const BLUEPRINT = "docs/alongside_cold_start_blueprint_20aug2026_v1.md";
 const bp = read(BLUEPRINT);
 
 console.log("\nThe blueprint's live-state table vs the files themselves\n");
@@ -83,7 +88,7 @@ console.log("\nThe blueprint's live-state table vs the files themselves\n");
 
 // ── Schema.md ───────────────────────────────────────────────────────
 {
-  const actual = read("Documents/Live State/Schema.md").match(/^## \d{1,2} \w{3} \d{4} (v[\d.]+)$/m)?.[1];
+  const actual = read("docs/Schema.md").match(/^## \d{1,2} \w{3} \d{4} (v[\d.]+)$/m)?.[1];
   const claimed = bp.match(/\|\s*`Schema\.md`\s*\|\s*\*{0,2}(v[\d.]+)\*{0,2}\s*\|/)?.[1];
   ok(`Schema.md — blueprint says ${claimed}, file says ${actual}`, claimed === actual,
      claimed !== actual ? `Update the Schema.md row in ${BLUEPRINT}` : "");
@@ -149,8 +154,9 @@ console.log("\nThe blueprint's live-state table vs the files themselves\n");
 //
 // Twice in a day is not a lapse of attention, it is a missing gate.
 {
-  const SCHEDULE = "Documents/Admin/master_schedule.md";
-  const ms = read(SCHEDULE);
+  // 01 Oct 2026: the schedule lives in the private BNH-Files repository.
+  const SCHEDULE = "BNH-Files/" + SCHEDULE_REL;
+  const ms = readSchedule();
   const line = (ms.match(/^> \*\*Live:.*$/m) || [null])[0];
 
   ok("the master schedule states what is live", !!line,
@@ -158,7 +164,7 @@ console.log("\nThe blueprint's live-state table vs the files themselves\n");
 
   if (line) {
     const swReal     = (read("sw.js").match(/const CACHE_NAME = "([^"]+)"/) || [])[1];
-    const schemaReal = (read("Documents/Live State/Schema.md")
+    const schemaReal = (read("docs/Schema.md")
                           .match(/^## \d{1,2} \w{3} \d{4} (v[\d.]+)/m) || [])[1];
     const storeReal  = (read("js/store.js").match(/\d{1,2} \w{3} \d{4} (v\d+)/) || [])[1];
     const bpReal     = (bp.match(/^## \d{1,2} \w{3} \d{4} (v\d+)/m) || [])[1];
