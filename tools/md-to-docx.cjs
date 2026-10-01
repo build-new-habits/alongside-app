@@ -1,5 +1,13 @@
 /**
  * tools/md-to-docx.cjs
+ * 01 Oct 2026 v2
+ *
+ * v2 - Quoted blocks (proposed wording in the Foot Anstey addendum) may hold
+ *   tables and headings. A table inside a quote is now a real, indented table
+ *   (header row repeats); a heading inside a quote is bold quoted text, not a
+ *   heading, so the document's own outline stays the document's. Before, both
+ *   came out as raw markdown.
+ *
  * 01 Oct 2026 v1
  *
  * Turns the 12g legal drafts (plain markdown) into accessible Word files:
@@ -63,7 +71,8 @@ function para(text, opts = {}) {
   return new Paragraph({ children: runs(text, opts.run || {}), spacing: { after: 120, line: 300 }, ...opts.p });
 }
 
-function table(rows) {
+function table(rows, { indent = 0 } = {}) {
+  const W = TEXT_W - indent;
   const parse = l => l.replace(/^\|/, "").replace(/\|$/, "").split("|").map(c => c.trim());
   const head = parse(rows[0]);
   const body = rows.slice(2).map(parse);
@@ -72,7 +81,7 @@ function table(rows) {
   const lens = head.map((h, i) => Math.max(h.length, ...body.map(r => (r[i] || "").length)));
   const weights = lens.map(l => Math.max(Math.sqrt(l), 3));
   const total = weights.reduce((a, b) => a + b, 0);
-  const widths = weights.map(w => Math.floor(TEXT_W * w / total));
+  const widths = weights.map(w => Math.floor(W * w / total));
   // No word broken across lines: each column at least its longest word.
   const strip = t => t.replace(/\*\*|`|\*/g, "");
   const mins = head.map((h, i) => 220 + 112 * Math.max(...[h, ...body.map(r => r[i] || "")]
@@ -84,10 +93,12 @@ function table(rows) {
       widths[j] -= need; widths[k] += need;
     }
   }
-  widths[n - 1] += TEXT_W - widths.reduce((a, b) => a + b, 0);
+  widths[n - 1] += W - widths.reduce((a, b) => a + b, 0);
   const border = { style: BorderStyle.SINGLE, size: 4, color: RULE };
   const borders = { top: border, bottom: border, left: border, right: border };
-  const emptyHead = head.every(h => !h);
+  // A lone row (a proposed row to add to a table elsewhere) is a body row.
+  const emptyHead = head.every(h => !h) || rows.length < 2;
+  if (rows.length < 2) body.push(head);
   const cell = (t, i, isHead) => new TableCell({
     width: { size: widths[i], type: WidthType.DXA },
     borders,
@@ -98,7 +109,8 @@ function table(rows) {
   const trs = [];
   if (!emptyHead) trs.push(new TableRow({ tableHeader: true, cantSplit: true, children: head.map((h, i) => cell(h, i, true)) }));
   body.forEach(r => trs.push(new TableRow({ cantSplit: true, children: head.map((_, i) => cell(r[i] || "", i, emptyHead && i === 0)) })));
-  return new Table({ width: { size: TEXT_W, type: WidthType.DXA }, columnWidths: widths, rows: trs });
+  return new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: widths, rows: trs,
+    ...(indent ? { indent: { size: indent, type: WidthType.DXA } } : {}) });
 }
 
 let i = 0;
@@ -123,6 +135,24 @@ while (i < lines.length) {
   } else if (l.startsWith(">")) {
     while (i < lines.length && lines[i].startsWith(">")) {
       const q = lines[i].replace(/^>\s?/, "");
+      if (q.startsWith("|")) {
+        const rows = [];
+        while (i < lines.length && /^>\s?\|/.test(lines[i])) rows.push(lines[i++].replace(/^>\s?/, ""));
+        children.push(table(rows, { indent: 567 }));
+        children.push(new Paragraph({ spacing: { after: 60 } }));
+        continue;
+      }
+      if (/^#{1,4} /.test(q)) {
+        children.push(new Paragraph({
+          children: runs(q.replace(/^#{1,4} /, ""), { color: INK, bold: true, size: 24 }),
+          indent: { left: 567 },
+          border: { left: { style: BorderStyle.SINGLE, size: 18, color: RULE, space: 8 } },
+          shading: { type: ShadingType.CLEAR, fill: QUOTE, color: "auto" },
+          spacing: { before: 120, after: 80, line: 300 },
+          keepNext: true,
+        }));
+        i++; continue;
+      }
       if (q.trim()) {
         const bullet = /^- /.test(q);
         children.push(new Paragraph({
