@@ -1,6 +1,10 @@
 /**
  * tools/verify-health-consent.mjs
- * 01 Oct 2026 v1
+ * 01 Oct 2026 v2
+ *
+ * v2 - Onboarding is mounted in its own element: its timers outlive test 1
+ *   and crashed the run once in a parallel suite when main was repainted.
+ *   Stress-run 10 at once, all green. No assertion changed.
  *
  * PT-2 HEALTH-CONSENT. Health answers have their own, explicit consent,
  * and a way to take it back.
@@ -85,20 +89,24 @@ console.log("\nTEST 1 - onboarding asks for health consent on its own");
 localStorage.clear(); store.init();
 const tv = await import(B + "views/onboarding/thread.js");
 const View = tv.OnboardingThreadView || tv.ThreadView || Object.values(tv).find(v => typeof v === "function");
-main.innerHTML = ""; const thread = View({ navigate() {}, back() {} }); thread.mount(main); await wait(2600);
-const t1 = main.querySelector("#ob-consent-check"), t2 = main.querySelector("#ob-consent-health");
+// Its own element, as verify-consent2 does: the thread keeps its own
+// timers running after this test, and must not lose its container when
+// later tests repaint main (seen once under a parallel run).
+const obEl = document.createElement("div"); document.body.appendChild(obEl);
+const thread = View({ navigate() {}, back() {} }); thread.mount(obEl); await wait(2600);
+const t1 = obEl.querySelector("#ob-consent-check"), t2 = obEl.querySelector("#ob-consent-health");
 ok("1pc. positive control: the consent screen is up", !!t1);
 ok("1a. a second tick, for health answers, with its own label",
-   !!t2 && /health answers/i.test(txt(main.querySelector('label[for="ob-consent-health"]'))) &&
-   /sore/i.test(txt(main.querySelector('label[for="ob-consent-health"]'))) && /journal/i.test(txt(main.querySelector('label[for="ob-consent-health"]'))),
-   txt(main.querySelector('label[for="ob-consent-health"]')));
+   !!t2 && /health answers/i.test(txt(obEl.querySelector('label[for="ob-consent-health"]'))) &&
+   /sore/i.test(txt(obEl.querySelector('label[for="ob-consent-health"]'))) && /journal/i.test(txt(obEl.querySelector('label[for="ob-consent-health"]'))),
+   txt(obEl.querySelector('label[for="ob-consent-health"]')));
 if (t1) { t1.checked = true; t1.dispatchEvent(new dom.window.Event("change", { bubbles: true })); }
-click(main.querySelector("#ob-consent-continue")); await wait(10);
+click(obEl.querySelector("#ob-consent-continue")); await wait(10);
 ok("1b. one tick is not enough: nothing recorded, and it says so",
-   store.get("consent.given") !== true && /both/i.test(txt(main.querySelector("#ob-consent-error"))) && !main.querySelector("#ob-consent-error")?.hidden,
-   txt(main.querySelector("#ob-consent-error")));
+   store.get("consent.given") !== true && /both/i.test(txt(obEl.querySelector("#ob-consent-error"))) && !obEl.querySelector("#ob-consent-error")?.hidden,
+   txt(obEl.querySelector("#ob-consent-error")));
 if (t2) { t2.checked = true; t2.dispatchEvent(new dom.window.Event("change", { bubbles: true })); }
-click(main.querySelector("#ob-consent-continue")); await wait(10);
+click(obEl.querySelector("#ob-consent-continue")); await wait(10);
 const h = store.get("consent")?.health || {};
 ok("1c. both ticks record consent, and the health consent has its own time and version",
    store.get("consent.given") === true && h.given === true && !!h.at && !!h.version, JSON.stringify(store.get("consent")));
