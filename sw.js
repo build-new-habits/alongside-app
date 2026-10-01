@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 01 Oct 2026 v618
+ * 01 Oct 2026 v619
  *
+ * v619 - LEGAL-TRUE: deleting health answers covers the body answers, reset clears every key, on-device voice only.
  * v618 - CONSENT-VERSION: a changed policy is agreed to again before carrying on.
  *
  * v617 - SIGNPOST-STATIC: free support lines on Wellbeing and the journal.
@@ -4165,7 +4166,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v618";
+const CACHE_NAME = "alongside-v619";
 
 const SHELL_URLS = [
 
