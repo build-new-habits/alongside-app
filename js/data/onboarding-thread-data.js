@@ -1,6 +1,13 @@
 /**
  * js/data/onboarding-thread-data.js
- * 29 Sep 2026 v18
+ * 01 Oct 2026 v19
+ *
+ * v19 - BUNDLE-TRUE. The sore-area question and its thank-you said movements
+ *   that load an area would be left out, "you won't have to remind me". The
+ *   plan leaves them out on a day the person rates the area "Bad" at the
+ *   check-in (and three movements at "A little" or "Quite sore"). The words
+ *   now say so. Found by checking the Foot Anstey bundle against the code.
+ *
  *
  * v18 - End review, P15 (Graeme, 29 Sep: "I'm good with all those plans").
  *   Since P15 the chair question reaches everyone who answers balance,
@@ -534,9 +541,9 @@ export const STEPS = {
     summaryType: 'conditions',
     skipLabel: 'Skip for now',
     openLabel: "Yes, let's do this",
-    coach: "Before I start suggesting things for you to actually do — is anything sore, or an injury you're being careful around? A tight hamstring, a back that grumbles, a knee you don't quite trust.\n\nTell me where, and I'll leave out the movements that are likely to make it worse.\n\n" + SCOPE_TITLE + " " + SCOPE_BODY + " " + SCOPE_ADVICE,
+    coach: "Before I start suggesting things for you to actually do — is anything sore, or an injury you're being careful around? A tight hamstring, a back that grumbles, a knee you don't quite trust.\n\nTell me where. When you check in, you can tell me how it is that day, and on a day it's bad I'll leave out the movements that are likely to make it worse.\n\n" + SCOPE_TITLE + " " + SCOPE_BODY + " " + SCOPE_ADVICE,
     coachAfter: {
-      answered: "Thank you for telling me. I'll leave out movements that are likely to load those — you won't have to remind me.",
+      answered: "Thank you for telling me. When you check in, you can tell me how they are, and on a day one is bad I'll leave out movements that are likely to load it.",
       // Note: coachAfter.answered is a template here — thread.js should replace
       // "both of those" with the actual count if more or fewer than two.
       // Simpler approach: thread.js uses a single dynamic string built from conditions[].
@@ -1138,12 +1145,12 @@ export function generateConditionsAck(conditions) {
     if (EVERYDAY_STATES.has(conditions[0])) {
       return withCaveats(`Thank you for telling me about ${name.toLowerCase()}. I'll keep it in mind day to day \u2014 you won't have to remind me.`);
     }
-    return withCaveats(`Thank you for telling me. I'll leave out movements that are likely to load your ${name.toLowerCase()} \u2014 you won't have to remind me.`);
+    return withCaveats(`Thank you for telling me. When you check in, you can tell me how your ${name.toLowerCase()} is, and on a day it\u2019s bad I'll leave out movements that are likely to load it.`);
   }
   if (conditions.length === 2) {
-    return withCaveats(`Thank you for telling me. I'll leave out movements that are likely to load either of those \u2014 you won't have to remind me.`);
+    return withCaveats(`Thank you for telling me. When you check in, you can tell me how either of those is, and on a day one is bad I'll leave out movements that are likely to load it.`);
   }
-  return withCaveats(`Thank you for telling me. I'll leave out movements that are likely to load any of those \u2014 you won't have to remind me.`);
+  return withCaveats(`Thank you for telling me. When you check in, you can tell me how any of those is, and on a day one is bad I'll leave out movements that are likely to load it.`);
 }
 
 /**

@@ -23,6 +23,8 @@
  *   6. The retired feeling-word list no longer ships.
  *   7. Sentry sends no client reports.
  *   8. The under-18 screen says the one thing it keeps.
+ *   9. Getting started says movements are left out on a day an area is bad,
+ *      not unconditionally.
  */
 import { createRequire as __cr } from "node:module";
 import { readFileSync } from "node:fs";
@@ -226,6 +228,24 @@ console.log("\nTEST 8 - the under-18 screen says the one thing it keeps");
 const { Under18View } = await import(B + "views/under-18.js");
 main.innerHTML = ""; Under18View(router).mount(main); await wait(5);
 ok("8a. it says it keeps only that the person is under 18", /only remembers that you are under 18/i.test(txt(main)), txt(main).slice(0, 200));
+
+// ── 9. ONBOARDING SAYS WHEN MOVEMENTS ARE LEFT OUT ───────────────────────
+// A sore area leaves out movements that load it on a day the person rates
+// it "Bad" (three movements are left out at "A little" or "Quite sore", for
+// a lower back or a hamstring). Getting started promised it unconditionally.
+console.log("\nTEST 9 - getting started says when movements are left out");
+const OT = await import(B + "data/onboarding-thread-data.js");
+for (const ids of [["knee"], ["knee", "shoulder"], ["knee", "shoulder", "hip"]]) {
+  const ack = OT.generateConditionsAck(ids);
+  ok(`9a. ${ids.length} area(s): the thank-you ties leaving movements out to a bad day`,
+     /on a day (it\S*|one is) bad/i.test(ack) && !/won.t have to remind me/i.test(ack), ack.split("\n")[0]);
+}
+const step = Object.values(OT.STEPS).find(s => s && typeof s.coach === "string" && /is anything sore/i.test(s.coach));
+ok("9pc. positive control: the sore-area question was found", !!step);
+ok("9b. the question ties it to a bad day too", /on a day it.s bad/i.test(step?.coach || ""), (step?.coach || "").slice(0, 200));
+ok("9c. its answered line too", /on a day one is bad/i.test(step?.coachAfter?.answered || ""), step?.coachAfter?.answered);
+const condSrc = readFileSync(new URL("js/views/onboarding/conditions.js", ROOT), "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
+ok("9d. the older sore-areas screen says the same", /on a day it.s bad/i.test(condSrc) && !/Tell me where, and I.ll leave out/.test(condSrc));
 
 console.log(`\n${passes} passed, ${fails} failed`);
 process.exit(fails ? 1 : 0);

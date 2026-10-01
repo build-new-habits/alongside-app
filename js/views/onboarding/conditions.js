@@ -1,6 +1,10 @@
 /**
  * conditions.js - Onboarding Step 5: Select conditions
  *
+ * 01 Oct 2026 v1.4
+ *   BUNDLE-TRUE. "Tell me where, and I'll leave out movements..." is tied to
+ *   a bad day, as the plan works (see onboarding-thread-data.js v19).
+ *
  * 01 Oct 2026 v1.3
  *   PT-3. No Hormonal group: Perimenopause and Menopause are not sore areas.
  *
@@ -64,7 +68,7 @@ export function render() {
 
         <div class="onboarding-coach-line">
           <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
-          <p class="onboarding-coach-text">Tell me where, and I'll leave out movements that are likely to make it worse. You'll still move — just not in the way that aggravates it.</p>
+          <p class="onboarding-coach-text">Tell me where. When you check in, you can tell me how it is that day, and on a day it's bad I'll leave out movements that are likely to make it worse. You'll still move — just not in the way that aggravates it.</p>
         </div>
 
         ${AREA_GROUPS.map(group => {
