@@ -1,6 +1,13 @@
 /**
  * prescribed.js - My exercises
  *
+ * 01 Oct 2026 v1.6
+ *
+ * v1.6 - BUNDLE-TRUE. Names, notes and who-prescribed are escaped wherever
+ *   they are written into the page. A name typed with a quotation mark broke
+ *   the card's label, and one from a crafted file could add an event handler
+ *   (independent check of the Foot Anstey bundle).
+ *
  * 29 Sep 2026 v1.5
  *
  * v1.5 - P0, SCOPE-MINOR (Graeme, 29 Sep). "Prescribed Exercises" is now
@@ -243,25 +250,30 @@ function renderExerciseList(active, done, creditsAvail) {
  * @param {number}  index    - position in list (for aria labels)
  * @param {boolean} isDone   - whether completed today
  */
+/** BUNDLE-TRUE. Text the person typed (or a file brought) is text, never markup. */
+function _esc(s) {
+  return String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
 function renderExerciseCard(ex, index, isDone) {
   const weeklyCount = getWeeklyCompletionCount(ex.id);
   const prescriptionStr = formatPrescription(ex);
 
   return `
     <li class="prescribed-exercise-card ${isDone ? "prescribed-exercise-card--done" : ""}"
-        aria-label="${ex.name}${isDone ? ", completed" : ""}">
+        aria-label="${_esc(ex.name)}${isDone ? ", completed" : ""}">
 
       <div class="prescribed-exercise-top">
         <div class="prescribed-exercise-name-wrap">
           ${isDone
             ? `<span class="prescribed-done-tick" aria-hidden="true">&#10003;</span>`
             : ""}
-          <span class="prescribed-exercise-name">${ex.name}</span>
+          <span class="prescribed-exercise-name">${_esc(ex.name)}</span>
         </div>
         ${!isDone ? `
           <button class="btn btn-ghost btn-xs prescribed-remove-btn"
-                  data-exercise-id="${ex.id}"
-                  aria-label="Remove ${ex.name} from my exercises">
+                  data-exercise-id="${_esc(ex.id)}"
+                  aria-label="Remove ${_esc(ex.name)} from my exercises">
             Remove
           </button>
         ` : ""}
@@ -269,14 +281,14 @@ function renderExerciseCard(ex, index, isDone) {
 
       ${prescriptionStr ? `
         <p class="prescribed-exercise-prescription text-sm text-muted">
-          ${prescriptionStr}
+          ${_esc(prescriptionStr)}
         </p>
       ` : ""}
 
       ${ex.notes ? `
         <div class="prescribed-exercise-notes">
           <span class="prescribed-notes-label text-sm">Notes:</span>
-          <p class="text-sm">${ex.notes}</p>
+          <p class="text-sm">${_esc(ex.notes)}</p>
         </div>
       ` : ""}
 

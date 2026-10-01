@@ -1,6 +1,12 @@
 /**
  * prescribed-session.js - My exercises, played
  *
+ * 01 Oct 2026 v13
+ *
+ * v13 - BUNDLE-TRUE. The person's own names, doses and notes are escaped where
+ *   they are written into the page (independent check of the Foot Anstey
+ *   bundle: text from My exercises was written in raw).
+ *
  * 30 Sep 2026 v12
  *
  * v12 - W3-3 CLASS-FINISH (Wave 3, persona 2.14). A finished My exercises
@@ -153,6 +159,11 @@ import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
 import { getActiveConditionIds, getConditionName } from "../data/conditions.js";
 import { EXERCISES } from "../data/exercises/index.js";
 
+/** BUNDLE-TRUE. Text the person typed (or a file brought) is text, never markup. */
+function _esc(s) {
+  return String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
 export const centered = false;
 
 // -- Credit constants ----------------------------------------------------------
@@ -263,7 +274,7 @@ export function render() {
       <!-- Exercise display -->
       <div class="exercise-display">
 
-        <h1 class="exercise-name">${ex.name}</h1>
+        <h1 class="exercise-name">${_esc(ex.name)}</h1>
 
         ${contraFlag ? `
           <div class="ps-contra-flag" role="status" aria-live="polite">
@@ -273,8 +284,8 @@ export function render() {
         ` : ""}
 
         <div class="exercise-meta">
-          ${ex.sets ? `<span class="meta-tag">${ex.sets} sets</span>` : ""}
-          ${ex.reps ? `<span class="meta-tag">${ex.reps}</span>` : ""}
+          ${ex.sets ? `<span class="meta-tag">${_esc(ex.sets)} sets</span>` : ""}
+          ${ex.reps ? `<span class="meta-tag">${_esc(ex.reps)}</span>` : ""}
           <span class="meta-tag">+${creditsForIndex(currentIndex, active.length)} \u2B50</span>
         </div>
 
@@ -299,7 +310,7 @@ export function render() {
                  target="_blank"
                  rel="noopener noreferrer"
                  class="youtube-link"
-                 aria-label="Watch how to do ${ex.name} on YouTube (opens in new tab)">
+                 aria-label="Watch how to do ${_esc(ex.name)} on YouTube (opens in new tab)">
                 <span class="youtube-icon" aria-hidden="true">\u25B6\uFE0F</span>
                 Watch how to do this
               </a>`,
@@ -330,7 +341,7 @@ export function render() {
             <div class="exercise-target">
               <div class="reps-display">
                 <div class="reps-info">
-                  <span class="reps-value">${ex.sets || 3} \u00D7 ${ex.reps}</span>
+                  <span class="reps-value">${_esc(ex.sets || 3)} \u00D7 ${_esc(ex.reps)}</span>
                   <span class="reps-label">sets \u00D7 reps</span>
                 </div>
               </div>
@@ -340,7 +351,7 @@ export function render() {
           ${ex.notes ? `
             <div class="exercise-instructions card">
               <h3>Your notes</h3>
-              <p>${ex.notes}</p>
+              <p>${_esc(ex.notes)}</p>
             </div>
           ` : ""}
         ` : ""}

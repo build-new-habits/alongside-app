@@ -1,6 +1,12 @@
 /**
  * quiet-session.js - Something Quieter View
  *
+ * 01 Oct 2026 v9 - BUNDLE-TRUE. This route has no journal of its own any more.
+ *   Arriving in journal mode (an old link) goes to the real journal
+ *   (journal-entry), which asks for the health consent and shows the support
+ *   lines; the old prompts, textareas and their save are deleted, so nothing
+ *   in this file writes journalEntries.
+ *
  * 01 Oct 2026 v8 - PT-4 QUIET-JOURNAL. The Journaling card opens the real
  *   journal (journal-entry). Its own save replaced the journalEntries array
  *   with an object keyed by date, and the next load then emptied every
@@ -205,32 +211,6 @@ const BREATHING_EXERCISES = [
   }
 ];
 
-// ── Journaling prompts ────────────────────────────────────────────────────────
-
-const JOURNAL_PROMPTS = {
-  low: [
-    "What does your body need most right now? Not what you think you should need. What does it actually need?",
-    "What are you carrying today that isn't yours to carry?",
-    "If rest were something you deserved rather than something you had to earn, what would today look like?",
-    "What is one small thing that felt okay this week, even if everything else was hard?",
-    "What would you say to a friend who was feeling exactly how you feel right now?"
-  ],
-  moderate: [
-    "What has been on your mind that you have not yet put into words?",
-    "Where in your body do you feel today? What does that sensation want you to know?",
-    "What is one thing you want to acknowledge about this week, positive or otherwise?",
-    "What would make tomorrow feel slightly better than today?",
-    "What are you grateful for that you have not recently said out loud?"
-  ],
-  high: [
-    "What do you want to build on from this week? What is working that you want more of?",
-    "What felt good recently that you have not properly acknowledged?",
-    "What is one thing you have learned about yourself in the last week?",
-    "Where is your energy pointing right now? What does it want to move toward?",
-    "What would you do if you knew you had enough energy and time?"
-  ]
-};
-
 // ── Mindfulness sessions ──────────────────────────────────────────────────────
 //
 // RULE: each option's exercise durations must sum exactly to (mins * 60).
@@ -296,9 +276,6 @@ let mindfulElapsed     = 0;            // total seconds elapsed across all exerc
 let mindfulStepElapsed = 0;            // seconds elapsed in current exercise
 let mindfulComplete    = false;
 
-let journalText       = "";
-let journalPrompts    = [];
-let journalSaved      = false;
 
 // ── Render ────────────────────────────────────────────────────────────────────
 
@@ -401,8 +378,8 @@ function renderModeSelector() {
 
 function renderMode() {
   if (!mode || mode === "selector") return renderModeSelector();
+  if (mode === "journal")    return "";   // BUNDLE-TRUE: onMount sends it to journal-entry
   if (mode === "breathing")  return renderBreathingMode();
-  if (mode === "journal")    return renderJournalMode();
   // SAFETY-GATE, GATE-ALL 16 Sep 2026. Mindful mode only, and that is a
   // decision rather than an oversight. The other modes in this route are
   // journalling and short breathing prompts -- reading and typing, with
@@ -537,101 +514,6 @@ function renderBreathingComplete(ex) {
       </div>
     </div>
   `;
-}
-
-// ── Journal mode ──────────────────────────────────────────────────────────────
-
-function renderJournalMode() {
-  if (journalPrompts.length === 0) journalPrompts = selectJournalPrompts();
-  if (journalSaved) return renderJournalSaved();
-
-  return `
-    <div class="card card-coach quiet-coach-card">
-      <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
-      <div>
-        <p>Writing things down externalises what is inside. You do not need to write
-           well, or write much. Just write honestly. Whatever you put here stays private
-           and is only ever used to remember what you wrote.</p>
-      </div>
-    </div>
-
-    ${journalPrompts.map((prompt, i) => `
-      <div class="card quiet-journal-card" style="margin-top:var(--space-4);">
-        <p class="quiet-journal-prompt">${prompt}</p>
-        <textarea
-          class="quiet-journal-textarea"
-          id="journal-textarea-${i}"
-          rows="5"
-          placeholder="Write freely. There is no wrong answer."
-          aria-label="Journal response to: ${prompt}"
-        >${journalText}</textarea>
-      </div>
-    `).join("")}
-
-    <button class="btn btn-primary btn-full" id="quiet-journal-save-btn"
-            style="margin-top:var(--space-4);">
-      Save and finish
-    </button>
-    <button class="btn btn-ghost btn-full" id="quiet-journal-skip-btn"
-            style="margin-top:var(--space-3);">
-      I'd rather not write today
-    </button>
-  `;
-}
-
-function renderJournalSaved() {
-  return `
-    ${renderSessionMoments({})}
-    <div class="card card-coach quiet-coach-card">
-      <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
-      <div>
-        <h3>Saved.</h3>
-        <p>That is yours. It will be here if you want to come back to it. Well done
-           for taking the time.</p>
-      </div>
-    </div>
-    <button class="btn btn-primary btn-full quiet-back-btn"
-            style="margin-top:var(--space-5);">
-      Back to choices
-    </button>
-  `;
-}
-
-function selectJournalPrompts() {
-  const checkin = store.get("checkinHistory") || {};
-  const todayKey = new Date().toISOString().split("T")[0];
-  const today = checkin[todayKey] || {};
-  const energy = today.energy || 5;
-
-  let pool;
-  if (energy <= 3)      pool = JOURNAL_PROMPTS.low;
-  else if (energy <= 6) pool = JOURNAL_PROMPTS.moderate;
-  else                  pool = JOURNAL_PROMPTS.high;
-
-  const start = new Date(new Date().getFullYear(), 0, 0);
-  const dayOfYear = Math.floor((new Date() - start) / 86400000);
-  const idx1 = dayOfYear % pool.length;
-  const idx2 = (dayOfYear + 2) % pool.length;
-  return [pool[idx1], pool[idx2 === idx1 ? (idx2 + 1) % pool.length : idx2]];
-}
-
-function saveJournalEntry() {
-  const entries = {};
-  journalPrompts.forEach((prompt, i) => {
-    const el = document.getElementById("journal-textarea-" + i);
-    if (el?.value?.trim()) entries["prompt_" + i] = { prompt, response: el.value.trim() };
-  });
-
-  // PT-4. Added to the array, never replacing it with an object.
-  const text = Object.values(entries).map(e => `${e.prompt}\n${e.response}`).join("\n\n");
-  if (text) {
-    const list = Array.isArray(store.get("journalEntries")) ? store.get("journalEntries") : [];
-    list.push({ id: `j-${Date.now()}`, date: new Date().toISOString(), text: text.slice(0, 5000), tags: ["quiet"], noWords: false });
-    store.set("journalEntries", list.slice(-200));
-  }
-
-  journalSaved = true;
-  rerender();
 }
 
 // ── Mindful mode ──────────────────────────────────────────────────────────────
@@ -1069,6 +951,16 @@ function logPartialMindfulSession() {
 export function onMount() {
   mode = store.get("quietMode") || "selector";
 
+  // BUNDLE-TRUE, 01 Oct 2026. The journal lives in journal-entry, behind the
+  // health consent and beside the support lines. An old journal-mode link
+  // lands there instead.
+  if (mode === "journal") {
+    store.set("quietMode", null);
+    store.set("journalEntryType", null);
+    router.navigate("journal-entry");
+    return;
+  }
+
   // 23 Jul 2026 v5 (BUILD-3 Section 4): back-gesture protection for the
   // mindful mode's active timer, added where none existed before. Scoped
   // narrowly to mode === "mindful" mid-timer - the short breathing/
@@ -1170,17 +1062,6 @@ export function onMount() {
     });
   });
 
-  document.getElementById("quiet-journal-save-btn")?.addEventListener("click", saveJournalEntry);
-
-  document.getElementById("quiet-journal-skip-btn")?.addEventListener("click", () => {
-    const returnRoute = store.get("quietReturnRoute") || "today";
-    cleanup();
-    store.set("quietMode", null);
-    store.set("quietReturnRoute", null);
-    store.set("quietLaunchedDirect", false);
-    router.navigate(returnRoute);
-  });
-
   document.querySelectorAll(".quiet-duration-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       mindfulDuration = parseInt(btn.dataset.duration);
@@ -1211,8 +1092,6 @@ function cleanup() {
   mindfulStep        = 0;
   mindfulElapsed     = 0;
   mindfulStepElapsed = 0;
-  journalSaved       = false;
-  journalPrompts     = [];
 }
 
 /**

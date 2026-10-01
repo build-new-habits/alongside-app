@@ -1,6 +1,12 @@
 /**
  * settings.js
- * 01 Oct 2026 v53
+ * 01 Oct 2026 v54
+ *
+ * v54 - BUNDLE-TRUE. With the health consent withdrawn, Your profile offers
+ *   no weight entry and a weight is not saved (the Your weight row was
+ *   already hidden; the profile panel's copy was not). Found by the
+ *   independent check of the Foot Anstey bundle.
+ *
  *
  * v53 - RESTORE. Restore from a file brings a person's history to a new
  *   device from the file Download your data saved (js/data/restore.js).
@@ -998,7 +1004,8 @@ export function SettingsView(router) {
    * their name, is pressure dressed as information.
    */
   function _weightSection(on, unit, kg) {
-    if (!isPremium()) return '';
+    // BUNDLE-TRUE: weight is a health answer; no entry without the consent.
+    if (!isPremium() || !healthAllowed()) return '';
 
     const units = [
       { id: 'kg', label: 'kg' },
@@ -2412,7 +2419,7 @@ export function SettingsView(router) {
 
   /** WEIGHT-1b: convert on the way in, always; a cleared field clears it. */
   function _saveWeight(container) {
-        if (isPremium() && store.get('weightTracking') === true) {
+        if (isPremium() && store.get('weightTracking') === true && healthAllowed()) {
           const unit = store.get('weightUnit') || 'kg';
           const main = container.querySelector('#settings-weight-now');
           if (main) {

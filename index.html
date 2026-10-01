@@ -1,4 +1,10 @@
-<!-- index.html | 01 Oct 2026 v6 -->
+<!-- index.html | 01 Oct 2026 v7 -->
+<!--
+  v7 — BUNDLE-TRUE, 01 Oct 2026. sendClientReports false: the SDK's own
+  reports about dropped events are not sent either, so a message goes to
+  Sentry only when something breaks. Found by the independent check of the
+  Foot Anstey bundle.
+-->
 <!--
   v6 — SENTRY-SESSIONS, 01 Oct 2026. Release-health sessions off
   (autoSessionTracking false; the BrowserSession integration removed), so
@@ -74,6 +80,7 @@
       Sentry.init({
         sendDefaultPii: false,
         autoSessionTracking: false,
+        sendClientReports: false,
         integrations: function (defaults) { return defaults.filter(function (i) { return i.name !== 'BrowserSession'; }); },
         tracesSampleRate: 0,
         replaysSessionSampleRate: 0,

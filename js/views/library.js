@@ -1,6 +1,13 @@
 /**
  * library.js - Library Page
  *
+ * 01 Oct 2026 v11
+ *
+ * v11 - BUNDLE-TRUE. Mindful practice › Journal opens the real journal
+ *   (journal-entry), which asks for the health consent and shows the
+ *   support lines. It opened the quiet route's old journaling mode, which
+ *   did neither (found by the independent check of the Foot Anstey bundle).
+ *
  * 30 Sep 2026 v10
  *
  * v10 - LIBRARY-TILES and CORE-DOOR. At home: Core says what the core
@@ -307,7 +314,7 @@ const GUIDED_CATEGORIES = [
     description: "Breathing, journaling, mindful movement",
     sessions: [
       { label: "Breathing",       icon: "\uD83C\uDF2C\uFE0F", target: "quiet-session", quiet: "breathing",  note: "" },
-      { label: "Journal",         icon: "\uD83D\uDCDD",        target: "quiet-session", quiet: "journal",    note: "" },
+      { label: "Journal",         icon: "\uD83D\uDCDD",        target: "journal-entry",                      note: "" },
       { label: "Mindful movement",icon: "\uD83C\uDF3F",        target: "quiet-session", quiet: "mindful",   note: "" },
       { label: "Rest day",        icon: "\uD83D\uDECC",        target: "reflect",                            note: "Log a deliberate rest" },
     ]
@@ -615,6 +622,8 @@ function navigateToSession(target, quiet, preselectType) {
   }
 
   if (quiet) store.set("quietMode", quiet);
+  // BUNDLE-TRUE. The journal's own prompt, not one left from elsewhere.
+  if (target === "journal-entry") store.set("journalEntryType", null);
   if (preselectType) store.set("sessionBuilderPreselect", { type: preselectType });
   screen = "landing";  // reset for next time
   router.navigate(target);

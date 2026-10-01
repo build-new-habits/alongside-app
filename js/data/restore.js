@@ -1,5 +1,16 @@
 /**
  * js/data/restore.js
+ * 01 Oct 2026 v2
+ *
+ * v2 - BUNDLE-TRUE. Rule 3 closed properly. Refusing tag-like text was not
+ *   enough: every view writes stored text into double-quoted attributes, so
+ *   a name holding a straight quotation mark could close one and add an
+ *   event handler (shown working through My exercises by the independent
+ *   check of the Foot Anstey bundle). Now (3b) every straight double
+ *   quotation mark in a file's text and keys becomes a curly one, which
+ *   reads the same and cannot end an attribute; and (3c) text containing a
+ *   javascript: address is refused.
+ *
  * 01 Oct 2026 v1
  *
  * RESTORE. Bring a person's history to a new device from the file
@@ -16,8 +27,10 @@
  *      getDefaults() or KNOWN_OUTSIDE_DEFAULTS are dropped. Display keys are kept only if they start
  *      'alongside' (not the store's own key) and are short strings.
  *   3. NO MARKUP. A file whose text contains anything that looks like an
- *      HTML tag is refused, so a crafted file cannot put working code into
- *      the app's screens.
+ *      HTML tag, or a javascript: address, is refused (3, 3c); and every
+ *      straight double quotation mark in its text and keys becomes a curly
+ *      one (3b), so no text from a file can close an attribute.
+ *      Together: a crafted file cannot put working code into the screens.
  *   4. THIS DEVICE'S AGREEMENTS STAY. The age answer, the policy and terms
  *      agreement and the health consent are this device's, given here. The
  *      file's are ignored, so a file can never carry a "yes" across.
@@ -33,7 +46,7 @@ import { store } from "../store.js";
 
 export const MAX_BYTES = 10 * 1024 * 1024;
 const ABOUT_PREFIX = "Everything Alongside: Move keeps about you";
-const MARKUP = /<\s*[a-zA-Z!\/?]/;
+const MARKUP = /<\s*[a-zA-Z!\/?]|javascript\s*:/i;
 const MAX_DISPLAY_VALUE = 2000;
 
 /**
@@ -87,10 +100,31 @@ export function readRestoreFile(text) {
   };
 }
 
+/**
+ * Rule 3b. Straight double quotation marks, in text and keys, become curly
+ * ones: the words read the same, and nothing can end an attribute (every
+ * view writes text into double-quoted attributes; none into single-quoted
+ * ones). Apostrophes are left alone: exercise names such as "Child's Pose"
+ * are lookup keys. Numbers, true/false and null pass unchanged.
+ */
+export function curlQuotes(v) {
+  if (typeof v === "string") {
+    return v
+      .replace(/(^|[\s(\[{\u2014-])"/g, "$1\u201C").replace(/"/g, "\u201D");
+  }
+  if (Array.isArray(v)) return v.map(curlQuotes);
+  if (v && typeof v === "object") {
+    const out = {};
+    for (const k of Object.keys(v)) out[curlQuotes(k)] = curlQuotes(v[k]);
+    return out;
+  }
+  return v;
+}
+
 /** Replace everything Alongside has stored on this device with the file's. */
 export function applyRestore(data) {
   const known = new Set([...Object.keys(store.getDefaults()), ...KNOWN_OUTSIDE_DEFAULTS]);
-  const incoming = data.store || {};
+  const incoming = curlQuotes(data.store || {});
   const picked = {};
   for (const k of Object.keys(incoming)) if (known.has(k)) picked[k] = incoming[k];
   // Rule 4: this device's agreements, never the file's.
@@ -104,7 +138,7 @@ export function applyRestore(data) {
       if (k && k.startsWith("alongside") && k !== store.STORAGE_KEY) old.push(k);
     }
     old.forEach(k => localStorage.removeItem(k));
-    const display = data.display && typeof data.display === "object" ? data.display : {};
+    const display = data.display && typeof data.display === "object" ? curlQuotes(data.display) : {};
     for (const [k, v] of Object.entries(display)) {
       if (k.startsWith("alongside") && k !== store.STORAGE_KEY && typeof v === "string" && v.length <= MAX_DISPLAY_VALUE) {
         localStorage.setItem(k, v);

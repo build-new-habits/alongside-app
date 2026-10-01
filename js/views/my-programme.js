@@ -1,6 +1,12 @@
 /**
  * my-programme.js - My Programme
  *
+ * 01 Oct 2026 v10
+ *
+ * v10 - BUNDLE-TRUE. No target weight without the health consent: the field
+ *   is not shown and a save is ignored (independent check of the Foot
+ *   Anstey bundle found it could be entered after Delete my health answers).
+ *
  * 28 Sep 2026 v9
  *
  * v9 - F7 LANDMARK. role="main" (and its label) removed from the view's
@@ -183,6 +189,7 @@ import { getGoalLabel }         from '../data/goals.js';
 import { advanceWeekIfNeeded }  from '../data/programmeEngine.js';
 import { evaluateGoalReview }   from '../data/goal-review.js';
 import { toKg, fromKg, validateWeightTarget } from '../data/weight-targets.js';
+import { healthAllowed }        from '../data/health-consent.js';
 import { detectBurnout, getTodaysCheckin } from '../data/checkin.js';
 import { getZoneStatus }        from '../data/conditions.js';
 import { currentWeekFocus, setWeekFocus, focusLine, FOCUS_OPTIONS }
@@ -653,7 +660,7 @@ export function MyProgrammeView(router) {
    * does not exist.
    */
   function _weightTarget(sg) {
-    if (store.get('weightTracking') !== true) return '';
+    if (store.get('weightTracking') !== true || !healthAllowed()) return '';
 
     const unit  = store.get('weightUnit') || 'kg';
     const kg    = sg.targetUnit === 'kg' ? sg.targetValue : null;

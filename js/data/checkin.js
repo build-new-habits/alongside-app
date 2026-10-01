@@ -1,5 +1,13 @@
 /**
  * checkin.js
+ * 01 Oct 2026 v12
+ *
+ * v12 - BUNDLE-TRUE. The retired feeling-word list (FEELING_WORDS) and its
+ *   helpers (getWordsForQuadrant, getWordObject, getQuadrantForWord) are
+ *   deleted, with the two orphan exports beside them (getCoachPostureForQuadrant,
+ *   getOpeningModes). FEELINGS-RETIRE removed the screens on 28 Sep; the list
+ *   still shipped. Nothing in the app read it.
+ *
  * 30 Sep 2026 v11
  *
  * v11 - W3-10 LIGHTER-COUNT (Schema v1.83), agreed by Graeme 30 Sep.
@@ -375,90 +383,6 @@ export function getQuadrant(energy, mood) {
   return 'low-energy-unpleasant';
 }
 
-// ─── Feeling word bank ────────────────────────────────────────────────────────
-
-export const FEELING_WORDS = [
-  { word: 'ready',        quadrant: 'high-energy-pleasant',   depth: 1, coreWord: true  },
-  { word: 'good',         quadrant: 'high-energy-pleasant',   depth: 1, coreWord: true  },
-  { word: 'motivated',    quadrant: 'high-energy-pleasant',   depth: 1, coreWord: true  },
-  { word: 'excited',      quadrant: 'high-energy-pleasant',   depth: 1, coreWord: true  },
-  { word: 'happy',        quadrant: 'high-energy-pleasant',   depth: 1, coreWord: true  },
-  { word: 'energised',    quadrant: 'high-energy-pleasant',   depth: 1, coreWord: false },
-  { word: 'confident',    quadrant: 'high-energy-pleasant',   depth: 2, coreWord: false },
-  { word: 'strong',       quadrant: 'high-energy-pleasant',   depth: 2, coreWord: false },
-  { word: 'focused',      quadrant: 'high-energy-pleasant',   depth: 2, coreWord: false },
-  { word: 'capable',      quadrant: 'high-energy-pleasant',   depth: 2, coreWord: false },
-  { word: 'inspired',     quadrant: 'high-energy-pleasant',   depth: 3, coreWord: false },
-  { word: 'purposeful',   quadrant: 'high-energy-pleasant',   depth: 4, coreWord: false },
-  { word: 'joyful',       quadrant: 'high-energy-pleasant',   depth: 5, coreWord: false },
-
-  { word: 'anxious',      quadrant: 'high-energy-unpleasant', depth: 1, coreWord: true  },
-  { word: 'stressed',     quadrant: 'high-energy-unpleasant', depth: 1, coreWord: true  },
-  { word: 'tense',        quadrant: 'high-energy-unpleasant', depth: 1, coreWord: true  },
-  { word: 'frustrated',   quadrant: 'high-energy-unpleasant', depth: 1, coreWord: true  },
-  { word: 'wired',        quadrant: 'high-energy-unpleasant', depth: 1, coreWord: true  },
-  { word: 'restless',     quadrant: 'high-energy-unpleasant', depth: 2, coreWord: false },
-  { word: 'irritable',    quadrant: 'high-energy-unpleasant', depth: 2, coreWord: false },
-  { word: 'overwhelmed',  quadrant: 'high-energy-unpleasant', depth: 2, coreWord: false },
-  { word: 'scattered',    quadrant: 'high-energy-unpleasant', depth: 3, coreWord: false },
-
-  { word: 'calm',         quadrant: 'low-energy-pleasant',    depth: 1, coreWord: true  },
-  { word: 'okay',         quadrant: 'low-energy-pleasant',    depth: 1, coreWord: true  },
-  { word: 'peaceful',     quadrant: 'low-energy-pleasant',    depth: 1, coreWord: true  },
-  { word: 'content',      quadrant: 'low-energy-pleasant',    depth: 1, coreWord: true  },
-  { word: 'settled',      quadrant: 'low-energy-pleasant',    depth: 1, coreWord: true  },
-  { word: 'relaxed',      quadrant: 'low-energy-pleasant',    depth: 2, coreWord: false },
-  { word: 'grateful',     quadrant: 'low-energy-pleasant',    depth: 2, coreWord: false },
-  { word: 'grounded',     quadrant: 'low-energy-pleasant',    depth: 4, coreWord: false },
-
-  { word: 'tired',        quadrant: 'low-energy-unpleasant',  depth: 1, coreWord: true  },
-  { word: 'flat',         quadrant: 'low-energy-unpleasant',  depth: 1, coreWord: true  },
-  { word: 'heavy',        quadrant: 'low-energy-unpleasant',  depth: 1, coreWord: true  },
-  { word: 'drained',      quadrant: 'low-energy-unpleasant',  depth: 1, coreWord: true  },
-  { word: 'sad',          quadrant: 'low-energy-unpleasant',  depth: 1, coreWord: true  },
-  { word: 'foggy',        quadrant: 'low-energy-unpleasant',  depth: 2, coreWord: false },
-  { word: 'low',          quadrant: 'low-energy-unpleasant',  depth: 2, coreWord: false },
-  { word: 'exhausted',    quadrant: 'low-energy-unpleasant',  depth: 2, coreWord: false },
-  { word: 'empty',        quadrant: 'low-energy-unpleasant',  depth: 2, coreWord: false },
-  { word: 'numb',         quadrant: 'low-energy-unpleasant',  depth: 3, coreWord: false },
-  { word: 'depleted',     quadrant: 'low-energy-unpleasant',  depth: 3, coreWord: false },
-  { word: 'hopeless',     quadrant: 'low-energy-unpleasant',  depth: 4, coreWord: false },
-];
-
-export function getWordsForQuadrant(quadrant, depthLevel) {
-  depthLevel = depthLevel || 1;
-  const available = FEELING_WORDS.filter(
-    w => w.quadrant === quadrant && w.depth <= depthLevel
-  );
-  return {
-    core:     available.filter(w => w.coreWord),
-    expanded: available.filter(w => !w.coreWord),
-  };
-}
-
-export function getWordObject(word) {
-  if (!word) return null;
-  return FEELING_WORDS.find(w => w.word.toLowerCase() === word.toLowerCase()) || null;
-}
-
-export function getQuadrantForWord(word) {
-  return getWordObject(word)?.quadrant || null;
-}
-
-export function getCoachPostureForQuadrant(quadrant) {
-  const postures = {
-    'high-energy-pleasant':   { intensity: 'full',    focus: ['strength', 'cardio'],       coachPosture: 'Full programme appropriate.' },
-    'high-energy-unpleasant': { intensity: 'moderate', focus: ['cardio', 'breathwork'],    coachPosture: 'Stress-relief movement.' },
-    'low-energy-pleasant':    { intensity: 'light',   focus: ['mobility', 'yoga'],          coachPosture: 'Light, enjoyable activity.' },
-    'low-energy-unpleasant':  { intensity: 'gentle',  focus: ['breathing', 'mobility'],    coachPosture: 'Breathing, light mobility only.' },
-  };
-  return postures[quadrant] || postures['low-energy-unpleasant'];
-}
-
-export function getOpeningModes() {
-  return ['standard', 'reflection', 'milestone', 'return', 'progress', 'care'];
-}
-
 // ─── Burnout detection ────────────────────────────────────────────────────────
 
 /**
@@ -550,7 +474,5 @@ export const checkinData = {
   getMoodEmoji,
   getMoodLabel,
   getQuadrant,
-  getQuadrantForWord,
-  getWordsForQuadrant,
   detectBurnout,
 };

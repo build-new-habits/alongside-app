@@ -3,6 +3,22 @@ import { RETIRED_CONDITIONS } from "./data/scope-statement.js";
 
 /**
  * store.js - Data persistence layer
+ * 01 Oct 2026 v100
+ *
+ * v100 - BUNDLE-TRUE (Schema v1.95). No new fields. Found by the independent
+ *   check of the Foot Anstey bundle against the code.
+ *   Delete my health answers also clears: the built plan and sessions that
+ *   carry its text (generatedSession, lastFinishedSession,
+ *   activeSessionCheckpoint, rescuedSession; the plan names the sore area);
+ *   the note, mood, pain and energy answers on currentActivityEntry;
+ *   todayPurposeArea (a body area); checkin.lastOpeningMode and
+ *   openingModeHistory ("care" comes from low check-ins or an injury);
+ *   weightRateRaisedAt; and the notes on My exercises (the exercises stay).
+ *   journalSettings.categoryPrefs defaults to [] (journal topics start
+ *   unticked; "health" was ticked for everybody). Nothing in the app lets the
+ *   person change the list, so a stored copy of the old default is that
+ *   default, and is migrated to [] on load; any other list is kept.
+ *
  * 01 Oct 2026 v99
  *
  * v99 - LEGAL-TRUE 3 (Schema v1.94). Delete my health answers also clears
@@ -1412,8 +1428,11 @@ export const store = {
         ? {
             ...defaults.journalSettings,
             ...saved.journalSettings,
+            // v100 BUNDLE-TRUE: the old default, unchangeable in the app, is
+            // migrated to none ticked; any other list is the person's.
             categoryPrefs: Array.isArray(saved.journalSettings.categoryPrefs)
-              ? saved.journalSettings.categoryPrefs
+              ? (saved.journalSettings.categoryPrefs.join(',') === 'life,movement,environment,nature,health'
+                  ? [] : saved.journalSettings.categoryPrefs)
               : defaults.journalSettings.categoryPrefs
           }
         : defaults.journalSettings,
@@ -2529,7 +2548,7 @@ export const store = {
       // ── JOURNAL SETTINGS ──────────────────────────────────────
       journalSettings: {
         autoTagging:   true,
-        categoryPrefs: ['life', 'movement', 'environment', 'nature', 'health']
+        categoryPrefs: []   // v100: topics start unticked
       },
 
       // ── NOTICING PREFERENCES ──────────────────────────────────
@@ -2799,6 +2818,25 @@ export const store = {
     // target weight, are health answers too.
     this.data.progressLog = (this.data.progressLog || []).map(e => {
       const { energyAtCheckin, conditionScores, ...rest } = e || {};
+      return rest;
+    });
+    // v100 BUNDLE-TRUE. The built plan names a sore area; a session in
+    // progress carries the finish screen's answers; today's area is a body
+    // area; "care" opening mode comes from check-ins; the rate marker comes
+    // from weight; notes on My exercises are often about an injury.
+    this.data.generatedSession        = JSON.parse(JSON.stringify(d.generatedSession));
+    this.data.lastFinishedSession     = null;
+    this.data.activeSessionCheckpoint = null;
+    this.data.rescuedSession          = null;
+    if (this.data.currentActivityEntry && typeof this.data.currentActivityEntry === 'object') {
+      const { note, moodAfter, painChange, energyBefore, ...rest } = this.data.currentActivityEntry;
+      this.data.currentActivityEntry = rest;
+    }
+    this.data.todayPurposeArea = null;
+    this.data.checkin = { ...(this.data.checkin || {}), lastOpeningMode: null, openingModeHistory: [] };
+    this.data.weightRateRaisedAt = null;
+    this.data.prescribedExercises = (this.data.prescribedExercises || []).map(e => {
+      const { notes, ...rest } = e || {};
       return rest;
     });
     const sg = this.data.strategicGoal;

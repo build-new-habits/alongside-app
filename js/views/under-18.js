@@ -1,6 +1,11 @@
 /**
  * js/views/under-18.js
- * 01 Oct 2026 v1
+ * 01 Oct 2026 v2
+ *
+ * v2 - BUNDLE-TRUE. It says the one thing kept: that the person is under 18,
+ *   so the app does not ask again. "Nothing you told the app has been kept"
+ *   alone was not quite exact (independent check of the Foot Anstey bundle).
+ *
  *
  * AGE-CHECK. What somebody who says they are under 18 sees, from then on,
  * on this phone. Reached only through the guard in router.navigate(); see
@@ -26,7 +31,7 @@ export function Under18View(router) {
         <p class="u18-text">So I can’t be your coach. That isn’t about you. What Alongside
           suggests is written for adult bodies, and young people’s information
           deserves more care than this app was built to give.</p>
-        <p class="u18-text">Nothing you told the app has been kept.</p>
+        <p class="u18-text">Nothing you told the app has been kept. It only remembers that you are under 18, so it won’t ask you again.</p>
         <p class="u18-text">If you’d like to move more, a PE teacher, your GP or a local club
           can help you find something that suits you.</p>
 
