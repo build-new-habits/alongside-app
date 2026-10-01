@@ -1,5 +1,11 @@
 /**
  * tools/verify-clinical-response.mjs
+ * 01 Oct 2026 v4
+ *
+ * v4 - BUNDLE-TRUE 2. The sore-area thank-you now says "tell me how your
+ *   <area> is"; the ACK-NAME check reads the name from there. Not loosened:
+ *   putting the store id back fails both ACK-NAME checks (reversal run).
+ *
  * 01 Oct 2026 v3
  *
  * v3 - DOCS-MOVE. Documents/ left this public repository for the private
@@ -328,7 +334,8 @@ check("It holds for every defined condition, not just the sampled one", "ACK-NAM
   // in running prose, so the name is compared without case.
   const clause = ack => {
     const line = ack.split("\n")[0];
-    return (line.match(/load your (.+?) \u2014/) || line.match(/telling me about (.+?)\. /) || [])[1] || "";
+    // v4 (BUNDLE-TRUE 2): the area now sits in "tell me how your <area> is".
+    return (line.match(/tell me how your (.+?) is, and/) || line.match(/telling me about (.+?)\. /) || [])[1] || "";
   };
   const bad = [];
   for (const c of C_ALL) {
