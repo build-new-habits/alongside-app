@@ -3,7 +3,11 @@ import { RETIRED_CONDITIONS } from "./data/scope-statement.js";
 
 /**
  * store.js - Data persistence layer
- * 01 Oct 2026 v98
+ * 01 Oct 2026 v99
+ *
+ * v99 - LEGAL-TRUE 3 (Schema v1.94). Delete my health answers also clears
+ *   todayIntensity and lighterDayDeclinedOn, both derived from the day's
+ *   check-in energy.
  *
  * v98 - LEGAL-TRUE 2 (Schema v1.93). Delete my health answers also deletes a
  *   target weight (strategicGoal.targetValue/targetUnit when kg, and
@@ -2788,6 +2792,9 @@ export const store = {
       const { note, painChange, moodAfter, energyBefore, ...rest } = e || {};
       return rest;
     });
+    // LEGAL-TRUE 3. Derived from today's check-in energy.
+    delete this.data.todayIntensity;
+    this.data.lighterDayDeclinedOn = null;
     // LEGAL-TRUE 2. Copies of check-in answers kept with sessions, and a
     // target weight, are health answers too.
     this.data.progressLog = (this.data.progressLog || []).map(e => {

@@ -1,6 +1,9 @@
 /**
  * tools/verify-health-consent.mjs
- * 01 Oct 2026 v5
+ * 01 Oct 2026 v6
+ *
+ * v6 - LEGAL-TRUE 3. 3l: the day's intensity and lighter-day choice, both
+ *   from check-in energy, go too.
  *
  * v5 - LEGAL-TRUE 2. 3j: a target weight, and check-in energy and soreness
  *   copied into session records, are deleted too; a non-weight target stays.
@@ -175,6 +178,7 @@ store.set("assessment", { ...(store.get("assessment") || {}), completedAt: "x" }
 store.set("lifestyle", { ...(store.get("lifestyle") || {}), returningAfter: "injury", stressLevel: "high" });
 store.set("onboarding", { ...(store.get("onboarding") || {}), hardBeforeSelections: ["body-relationship"], primaryTerritory: "body" });
 store.set("strategicGoal", { ...(store.get("strategicGoal") || {}), targetValue: 70, targetUnit: "kg", weightTargetBand: "gentle", weeklySessionTarget: 4 });
+store.set("todayIntensity", "low"); store.set("lighterDayDeclinedOn", "2026-10-01");
 store.set("progressLog", [{ date: "x", week: 1, focus: "legs", energyAtCheckin: 6, conditionScores: { "lower-back": 6 }, durationMinutes: 30 }]);
 store.set("activityLog", [...(store.get("activityLog") || []).map(e => ({ ...e, energyBefore: 6 }))]);
 const { SettingsView } = await import(B + "views/settings.js");
@@ -214,6 +218,7 @@ ok("3j. a target weight, and check-in energy and soreness kept with sessions, go
    pl.energyAtCheckin == null && pl.conditionScores == null && pl.durationMinutes === 30 &&
    store.get("activityLog")?.[0]?.energyBefore == null,
    JSON.stringify({ sg: { v: sg.targetValue, u: sg.targetUnit, b: sg.weightTargetBand }, pl, eb: store.get("activityLog")?.[0]?.energyBefore }));
+ok("3l. the day's intensity and lighter-day choice (from check-in energy) go too", store.get("todayIntensity") == null && store.get("lighterDayDeclinedOn") == null);
 store.set("strategicGoal", { ...(store.get("strategicGoal") || {}), targetValue: 30, targetUnit: "min" });
 store.deleteHealthAnswers();
 ok("3k. REVERSAL: a target that is not a weight stays", store.get("strategicGoal")?.targetValue === 30);

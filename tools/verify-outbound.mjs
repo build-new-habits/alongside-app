@@ -1,6 +1,9 @@
 /**
  * tools/verify-outbound.mjs
- * 30 Sep 2026 v1
+ * 01 Oct 2026 v2
+ *
+ * v2 - SENTRY-SESSIONS. 3s: no release-health sessions, so nothing is sent
+ *   when the app opens without an error.
  *
  * PT-1 OUTBOUND. Nothing leaves the phone that the privacy policy does
  * not name.
@@ -94,6 +97,10 @@ if (inline) {
 ok("3b. no personal data, no replay, no tracing",
    !!opts && opts.sendDefaultPii === false && opts.tracesSampleRate === 0 && opts.replaysSessionSampleRate === 0 && opts.replaysOnErrorSampleRate === 0,
    JSON.stringify(opts && { pii: opts.sendDefaultPii, t: opts.tracesSampleRate, r: opts.replaysSessionSampleRate, re: opts.replaysOnErrorSampleRate }));
+ok("3s. no release-health sessions: nothing sent on an open without an error",
+   opts?.autoSessionTracking === false && typeof opts?.integrations === "function" &&
+   opts.integrations([{ name: "BrowserSession" }, { name: "GlobalHandlers" }]).map(i => i.name).join() === "GlobalHandlers",
+   JSON.stringify(opts && { ast: opts.autoSessionTracking }));
 ok("3c. no breadcrumbs: every one is dropped", typeof opts?.beforeBreadcrumb === "function" &&
    opts.beforeBreadcrumb({ category: "console", message: "Duplicate activity entry {note: 'Back flared again'}" }) === null);
 const event = {

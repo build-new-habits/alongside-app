@@ -1,4 +1,10 @@
-<!-- index.html | 30 Sep 2026 v5 -->
+<!-- index.html | 01 Oct 2026 v6 -->
+<!--
+  v6 — SENTRY-SESSIONS, 01 Oct 2026. Release-health sessions off
+  (autoSessionTracking false; the BrowserSession integration removed), so
+  the error-reporting code sends nothing when the app opens without an
+  error. Found making the 12g privacy wording precise.
+-->
 <!--
   v5 — PT-1 OUTBOUND, 30 Sep 2026. Google Fonts removed: Inter is served
   from the app (css/base/fonts.css). Sentry is initialised before its
@@ -67,6 +73,8 @@
     window.sentryOnLoad = function () {
       Sentry.init({
         sendDefaultPii: false,
+        autoSessionTracking: false,
+        integrations: function (defaults) { return defaults.filter(function (i) { return i.name !== 'BrowserSession'; }); },
         tracesSampleRate: 0,
         replaysSessionSampleRate: 0,
         replaysOnErrorSampleRate: 0,
