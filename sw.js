@@ -1,7 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 01 Oct 2026 v616
+ * 01 Oct 2026 v617
+ *
+ * v617 - SIGNPOST-STATIC: free support lines on Wellbeing and the journal.
  *
  * v616 - AGE-CHECK: a neutral age question first; under 18 sees only support for young people.
  *
@@ -4161,7 +4163,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v616";
+const CACHE_NAME = "alongside-v617";
 
 const SHELL_URLS = [
 
@@ -4319,6 +4321,7 @@ const SHELL_URLS = [
   "/alongside-app/js/data/red-flag.js",
   "/alongside-app/js/data/health-consent.js",
   "/alongside-app/js/data/age-check.js",
+  "/alongside-app/js/data/support-lines.js",
   "/alongside-app/js/views/my-programme.js",
   "/alongside-app/js/session-builder.js",
   "/alongside-app/js/data/session-choice.js",
