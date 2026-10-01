@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 01 Oct 2026 v621
+ * 01 Oct 2026 v622
  *
+ * v622 - RESTORE: Settings › Restore from a file; js/data/restore.js precached.
  * v621 - PRECISE-WORDS: no Sentry message without an error; deleting health answers clears the day's intensity.
  * v620 - LEGAL-TRUE 2: deleting health answers also covers a target weight and check-in answers kept with sessions.
  * v619 - LEGAL-TRUE: deleting health answers covers the body answers, reset clears every key, on-device voice only.
@@ -4168,7 +4169,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v621";
+const CACHE_NAME = "alongside-v622";
 
 const SHELL_URLS = [
 
@@ -4327,6 +4328,7 @@ const SHELL_URLS = [
   "/alongside-app/js/data/red-flag.js",
   "/alongside-app/js/data/health-consent.js",
   "/alongside-app/js/data/age-check.js",
+  "/alongside-app/js/data/restore.js",
   "/alongside-app/js/data/support-lines.js",
   "/alongside-app/js/data/consent-version.js",
   "/alongside-app/js/views/my-programme.js",
