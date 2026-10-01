@@ -1,7 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 01 Oct 2026 v617
+ * 01 Oct 2026 v618
+ *
+ * v618 - CONSENT-VERSION: a changed policy is agreed to again before carrying on.
  *
  * v617 - SIGNPOST-STATIC: free support lines on Wellbeing and the journal.
  *
@@ -4163,7 +4165,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v617";
+const CACHE_NAME = "alongside-v618";
 
 const SHELL_URLS = [
 
@@ -4315,6 +4317,7 @@ const SHELL_URLS = [
   "/alongside-app/js/views/health-consent.js",
   "/alongside-app/js/views/age-check.js",
   "/alongside-app/js/views/under-18.js",
+  "/alongside-app/js/views/consent-update.js",
   "/alongside-app/js/data/arc-readback.js",
   "/alongside-app/js/data/tier-table.js",
   "/alongside-app/js/views/know-what.js",
@@ -4322,6 +4325,7 @@ const SHELL_URLS = [
   "/alongside-app/js/data/health-consent.js",
   "/alongside-app/js/data/age-check.js",
   "/alongside-app/js/data/support-lines.js",
+  "/alongside-app/js/data/consent-version.js",
   "/alongside-app/js/views/my-programme.js",
   "/alongside-app/js/session-builder.js",
   "/alongside-app/js/data/session-choice.js",
