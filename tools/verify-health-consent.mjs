@@ -1,6 +1,9 @@
 /**
  * tools/verify-health-consent.mjs
- * 01 Oct 2026 v4
+ * 01 Oct 2026 v5
+ *
+ * v5 - LEGAL-TRUE 2. 3j: a target weight, and check-in energy and soreness
+ *   copied into session records, are deleted too; a non-weight target stays.
  *
  * v4 - LEGAL-TRUE. What the person said about their body and how they have
  *   been is a health answer: Delete my health answers now deletes it (3g
@@ -171,6 +174,9 @@ store.set("liftLog", { "barbell-back-squat": [{ at: "x", weight: 60, reps: 5, no
 store.set("assessment", { ...(store.get("assessment") || {}), completedAt: "x" });
 store.set("lifestyle", { ...(store.get("lifestyle") || {}), returningAfter: "injury", stressLevel: "high" });
 store.set("onboarding", { ...(store.get("onboarding") || {}), hardBeforeSelections: ["body-relationship"], primaryTerritory: "body" });
+store.set("strategicGoal", { ...(store.get("strategicGoal") || {}), targetValue: 70, targetUnit: "kg", weightTargetBand: "gentle", weeklySessionTarget: 4 });
+store.set("progressLog", [{ date: "x", week: 1, focus: "legs", energyAtCheckin: 6, conditionScores: { "lower-back": 6 }, durationMinutes: 30 }]);
+store.set("activityLog", [...(store.get("activityLog") || []).map(e => ({ ...e, energyBefore: 6 }))]);
 const { SettingsView } = await import(B + "views/settings.js");
 main.innerHTML = ""; SettingsView({ navigate(v) { landed.push(v); }, back() {} }).mount(main); await wait(20);
 const del = main.querySelector('[data-action="delete-health"]');
@@ -202,6 +208,15 @@ ok("3g. what they said about their body and how they have been goes; lifts stay 
    (store.get("onboarding")?.hardBeforeSelections || []).length === 0 && store.get("onboarding")?.primaryTerritory == null &&
    lift.weight === 60 && lift.note == null,
    JSON.stringify({ cap: store.get("capability"), lift, ob: store.get("onboarding")?.hardBeforeSelections }));
+const pl = store.get("progressLog")?.[0] || {}, sg = store.get("strategicGoal") || {};
+ok("3j. a target weight, and check-in energy and soreness kept with sessions, go too",
+   sg.targetValue == null && sg.targetUnit == null && sg.weightTargetBand == null && sg.weeklySessionTarget === 4 &&
+   pl.energyAtCheckin == null && pl.conditionScores == null && pl.durationMinutes === 30 &&
+   store.get("activityLog")?.[0]?.energyBefore == null,
+   JSON.stringify({ sg: { v: sg.targetValue, u: sg.targetUnit, b: sg.weightTargetBand }, pl, eb: store.get("activityLog")?.[0]?.energyBefore }));
+store.set("strategicGoal", { ...(store.get("strategicGoal") || {}), targetValue: 30, targetUnit: "min" });
+store.deleteHealthAnswers();
+ok("3k. REVERSAL: a target that is not a weight stays", store.get("strategicGoal")?.targetValue === 30);
 const hc = store.get("consent")?.health || {};
 ok("3h. the health consent is marked withdrawn", hc.given === false && !!hc.withdrawnAt, JSON.stringify(hc));
 router.currentView = "settings";

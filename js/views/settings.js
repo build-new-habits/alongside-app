@@ -1,6 +1,9 @@
 /**
  * settings.js
- * 01 Oct 2026 v51
+ * 01 Oct 2026 v52
+ *
+ * v52 - LEGAL-TRUE 2. Delete my health answers' confirmation names a target
+ *   weight, which it now deletes.
  *
  * v51 - LEGAL-TRUE. Reset all data clears every key the app keeps on this
  *   phone. Delete my health answers' confirmation names everything it
@@ -2517,7 +2520,7 @@ export function SettingsView(router) {
       case 'delete-health':
         _confirmDestructive(
           'Delete my health answers',
-          'This deletes your check-ins, your sore areas and how sore they were, what you told me about your body and how you have been, your weight, your journal, and the notes and mood from your sessions and lifts. Your sessions, lifts and settings stay. Until you tell me again, I will plan as cautiously as I can. It cannot be undone. I will ask before keeping anything like this again.',
+          'This deletes your check-ins, your sore areas and how sore they were, what you told me about your body and how you have been, your weight and any target weight, your journal, and the notes and mood from your sessions and lifts. Your sessions, lifts and settings stay. Until you tell me again, I will plan as cautiously as I can. It cannot be undone. I will ask before keeping anything like this again.',
           () => {
             store.deleteHealthAnswers();
             render(container);

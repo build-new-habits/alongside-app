@@ -3,7 +3,14 @@ import { RETIRED_CONDITIONS } from "./data/scope-statement.js";
 
 /**
  * store.js - Data persistence layer
- * 01 Oct 2026 v97
+ * 01 Oct 2026 v98
+ *
+ * v98 - LEGAL-TRUE 2 (Schema v1.93). Delete my health answers also deletes a
+ *   target weight (strategicGoal.targetValue/targetUnit when kg, and
+ *   weightTargetBand), and the check-in energy and soreness scores copied
+ *   into session records (progressLog energyAtCheckin and conditionScores,
+ *   activityLog energyBefore). Found by the independent check of the 12g
+ *   drafts, 01 Oct 2026.
  *
  * v97 - LEGAL-TRUE (Schema v1.92). Delete my health answers also deletes what
  *   the person said about their body and how they have been: capability
@@ -2778,9 +2785,19 @@ export const store = {
     this.data.absence             = { ...(this.data.absence || {}), context: null, capturedAt: null };
     if (this.data.redFlag && typeof this.data.redFlag === 'object') this.data.redFlag = { ...this.data.redFlag, areas: [] };
     this.data.activityLog = (this.data.activityLog || []).map(e => {
-      const { note, painChange, moodAfter, ...rest } = e || {};
+      const { note, painChange, moodAfter, energyBefore, ...rest } = e || {};
       return rest;
     });
+    // LEGAL-TRUE 2. Copies of check-in answers kept with sessions, and a
+    // target weight, are health answers too.
+    this.data.progressLog = (this.data.progressLog || []).map(e => {
+      const { energyAtCheckin, conditionScores, ...rest } = e || {};
+      return rest;
+    });
+    const sg = this.data.strategicGoal;
+    if (sg && typeof sg === 'object' && (sg.targetUnit === 'kg' || sg.weightTargetBand != null)) {
+      this.data.strategicGoal = { ...sg, targetValue: null, targetUnit: null, weightTargetBand: null };
+    }
     this.data.consent = { ...(this.data.consent || {}),
       health: { given: false, at: null, version: null, withdrawnAt: new Date().toISOString() } };
     this.save();
