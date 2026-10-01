@@ -1,5 +1,18 @@
 # Alongside — Data Schema Reference
-## 01 Oct 2026 v1.94
+## 01 Oct 2026 v1.95
+
+> **v1.95, 01 Oct 2026 — BUNDLE-TRUE** (`store.js` v100). No new fields.
+> **`deleteHealthAnswers()`** also resets **`generatedSession`** to its
+> default and sets **`lastFinishedSession`**, **`activeSessionCheckpoint`**,
+> **`rescuedSession`**, **`todayPurposeArea`** and **`weightRateRaisedAt`** to
+> `null`; strips **`note`**, **`moodAfter`**, **`painChange`** and
+> **`energyBefore`** from **`currentActivityEntry`**; clears
+> **`checkin.lastOpeningMode`** and **`checkin.openingModeHistory`**; and strips
+> **`notes`** from each **`prescribedExercises`** entry (the entries stay).
+> **`journalSettings.categoryPrefs`** defaults to **`[]`**; a stored copy of the
+> old default (`life, movement, environment, nature, health`, which nothing
+> in the app could change) is migrated to `[]` on load.
+
 
 > **v1.94, 01 Oct 2026 — LEGAL-TRUE 3** (`store.js` v99). No new fields.
 > **`deleteHealthAnswers()`** also removes **`todayIntensity`** and sets
@@ -845,7 +858,7 @@
 
 ## 06 Sep 2026 v1.51
 
-**File:** `js/store.js` (confirmed live version: **v99, 01 Oct 2026**)
+**File:** `js/store.js` (confirmed live version: **v100, 01 Oct 2026**)
 
 > **v1.47, 06 Sep 2026 — CR-1.** `conditions[]` gains three ids and loses one. `chronic-fatigue` is **retired**; `persistent-fatigue`, `me-cfs` and `long-covid` replace it. No field shape changed — `conditions` is still `string[]` and `conditionMeta` is still keyed by condition id.
 >
@@ -1769,7 +1782,7 @@ There is no `stats` field, live or dormant, anywhere in `store.js`. Every `stats
 | `noticingWeekInCycle` | `number` | `1` | |
 | `noticingLastTriggered` | `string\|null` | `null` | |
 
-`journalSettings` (nested object): `autoTagging` (`boolean`, `true`), `categoryPrefs` (`string[]`, `['life','movement','environment','nature','health']`).
+`journalSettings` (nested object): `autoTagging` (`boolean`, `true`), `categoryPrefs` (`string[]`, `[]` since v1.95; the old default is migrated to `[]`).
 
 `noticingPreferences` (nested object): `schedule` (`string`, `'automatic'`), `time` (`string|null`, `null`).
 

@@ -1,5 +1,5 @@
 # Alongside: Move — Cold Start Blueprint
-## 01 Oct 2026 v228
+## 01 Oct 2026 v229
 
 Build New Habits | Everything a chat with no memory needs to pick this up and build confidently.
 
@@ -51,7 +51,7 @@ git clone --depth 1 https://x-access-token:$TOKEN@github.com/build-new-habits/al
 | BNH-Files: `Apps/Alongside Move/` `Legal/`, `Clinical/`, `Business/`, `Product/`, `Research/`, `Testing/`, `Admin/`, `Archive/` | Every other paper, including the governing documents below |
 | `docs/Schema.md` | Store fields. **Must match `store.js`** |
 | `docs/` | Only what the code and checks need: `Changelog.md`, `exercise_entry_standard.md`, this blueprint, `specs/` (three specs the checks read), `classes/` (guided class scripts), `archive-code/` (retired code) |
-| `tools/verify-*.mjs` | 253 gates |
+| `tools/verify-*.mjs` | 254 gates |
 | `js/` | Vanilla ES modules, no framework, no bundler |
 
 **Governing documents, in read order** (BNH-Files, `Apps/Alongside Move/Business/`):
@@ -70,12 +70,12 @@ git clone --depth 1 https://x-access-token:$TOKEN@github.com/build-new-habits/al
 
 | | Version |
 |---|---|
-| `store.js` | v99 |
-| `Schema.md` | v1.94 |
+| `store.js` | v100 |
+| `Schema.md` | v1.95 |
 | `sw.js` | **v622**, cache `alongside-v622` |
 | `router.js` | v36 · `my-programme.js` v8 · `today.js` v49 · `settings.js` v46 · `progress.js` v22 · `onboarding/thread.js` v16 |
 | `exercise-card.js` | **v7** — CARD-4, four pages. `workout.css` v16 |
-| Gates | **253, all green** — from the repo root. See the cwd row in §9 |
+| Gates | **254, all green** — from the repo root. See the cwd row in §9 |
 
 🟢 **This table is now GATED.** `tools/verify-blueprint.mjs` compares every version above against the file that carries it and goes red on any drift, naming the row to change.
 
@@ -215,7 +215,7 @@ Truth lives in `js/data/pricing.js`. `verify-price.mjs` enforces it.
 | Dead CSS: `.progress-export--locked` | Renderer removed 20 Aug |
 | `verify-price.mjs` banner excuse | A document that *discusses* the banner exempts itself, silently |
 | Orphan fields | `goalHasTarget`, `targetType`, `chaptersDone.measuredLevelAtEnd`, `exerciseFeedback` — written or declared, read by nobody |
-| `checkin.js` orphan exports | `getWordObject`, `getCoachPostureForQuadrant`, `getOpeningModes` — no callers |
+| ~~`checkin.js` orphan exports~~ | **Closed 01 Oct (BUNDLE-TRUE).** Deleted with the retired feeling-word list |
 | Changelog stale since March | Resume or retire — decision needed |
 | ✅ ~~**11 screens have no heading element at all**~~ | **CLOSED 08 Sep, A11Y-HEADER.** All 42 sites across 11 views are real headings; `verify-headings` mounts each one and asserts the OUTLINE, not merely that a heading exists |
 | 🟡 **Quick build never passes through the zones step** | A quick build whose coach-chosen type is `stretch` leaves `selectedZones` empty, because the scaffold does not ask and the location step's zones branch is bypassed by the return leg. **Newly reachable on 08 Sep** — the scaffold had never rendered before then, so nothing regressed |
