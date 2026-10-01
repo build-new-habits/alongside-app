@@ -1,6 +1,10 @@
 /**
  * router.js
- * 01 Oct 2026 v38
+ * 01 Oct 2026 v39
+ *
+ * v39 - CONSENT-VERSION. 'consent-update': somebody who agreed to an older
+ *   Privacy Policy and Terms is asked to agree to the current one before
+ *   carrying on (Settings and the privacy summary stay open).
  *
  * v38 - AGE-CHECK. 'age-check' and 'under-18', reached only through a guard
  *   that runs first: somebody who said they are under 18 sees only the
@@ -407,6 +411,8 @@ const VIEW_NAMES = {
   // AGE-CHECK, 01 Oct 2026. Reached only through the guard in navigate().
   'age-check':          { path: './views/age-check.js',        fn: 'AgeCheckView'          },
   'under-18':           { path: './views/under-18.js',         fn: 'Under18View'           },
+  // CONSENT-VERSION, 01 Oct 2026. Reached only through the guard.
+  'consent-update':     { path: './views/consent-update.js',   fn: 'ConsentUpdateView'     },
 };
 
 const hideNavViews = new Set([
@@ -430,14 +436,14 @@ const hideNavViews = new Set([
   // PT-2. The same: a consent is read, not glanced at.
   'health-consent',
   // AGE-CHECK. Nothing else to go to from either.
-  'age-check', 'under-18',
+  'age-check', 'under-18', 'consent-update',
   // SMOOTH-P3c. A session in progress, with its own Exit and Finish.
   'capture',
 ]);
 
 const NAV_MAP = {
   'today': 'today', 'checkin': 'today', 'checkin-mini': 'today',
-  'coach-proposal': 'today', 'red-flag': 'today', 'health-consent': 'today', 'age-check': 'today', 'under-18': 'today',
+  'coach-proposal': 'today', 'red-flag': 'today', 'health-consent': 'today', 'age-check': 'today', 'under-18': 'today', 'consent-update': 'today',
   'home-threshold': 'today', 'reflect': 'today',
   'workout': 'today', 'gym-programme': 'today', 'morning-session': 'today',
   'core-session': 'today', 'yoga-session': 'today', 'walk-session': 'today',
@@ -508,6 +514,15 @@ export const router = {
       if (to) viewName = to;
     } catch (err) {
       console.error('Router: age-check guard failed', err);
+    }
+
+    // CONSENT-VERSION, 01 Oct 2026. Agreed to an older version: asked again.
+    try {
+      if (!this._cv) this._cv = await import('./data/consent-version.js');
+      const to = this._cv.guardRoute(viewName);
+      if (to) viewName = to;
+    } catch (err) {
+      console.error('Router: consent-version guard failed', err);
     }
 
     // PT-2, 01 Oct 2026. Before a health question, health consent if it

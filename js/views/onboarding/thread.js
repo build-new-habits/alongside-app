@@ -1,5 +1,9 @@
 /**
  * js/views/onboarding/thread.js
+ * 01 Oct 2026 v19
+ *
+ * v19 - CONSENT-VERSION. POLICY_VERSION comes from data/consent-version.js.
+ *
  * 01 Oct 2026 v18
  *
  * v18 - AGE-CHECK. The age gate is live: before consent, a neutral question
@@ -256,6 +260,7 @@ import {
 import { openSheet }          from './sheet-manager.js';
 import { HEALTH_TICK, HEALTH_NOTE, giveHealthConsent } from '../../data/health-consent.js';
 import { ageQuestionHTML, readAge, recordAge } from '../../data/age-check.js';
+import { POLICY_VERSION as CURRENT_POLICY_VERSION } from '../../data/consent-version.js';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MOTION PREFERENCE
@@ -369,7 +374,9 @@ export function ThreadView(router) {
   // POLICY_VERSION is recorded with the tick. Without it, any later
   // revision silently invalidates every existing record and there is no
   // way to tell who needs re-consent.
-  const POLICY_VERSION = '2026-10-01';
+  // CONSENT-VERSION, 01 Oct 2026: the version lives in data/consent-version.js,
+  // where the guard that asks again when it changes reads it.
+  const POLICY_VERSION = CURRENT_POLICY_VERSION;
 
   // AGE-CHECK, 01 Oct 2026. The gate is live; the rule is in
   // js/data/age-check.js. Asked before consent, so somebody under 18 is

@@ -1,6 +1,10 @@
 /**
  * tools/verify-age-check.mjs
- * 01 Oct 2026 v1
+ * 01 Oct 2026 v2
+ *
+ * v2 - CONSENT-VERSION. The existing-install fixture agreed to the current
+ *   policy version, so test 5 measures the age check alone. No assertion
+ *   changed.
  *
  * AGE-CHECK. Alongside is 18+, and the app now does what its terms say
  * (Children's code standard 6). The check is neutral, keeps only the
@@ -132,7 +136,7 @@ console.log("\nTEST 5 - an install from before the check is asked once");
 function existing() {
   localStorage.clear(); store.init();
   store.set("onboardingComplete", true); store.set("name", "Sam"); store.set("tier", "personal");
-  store.set("consent.given", true); store.set("consent.at", now.toISOString());
+  store.set("consent.given", true); store.set("consent.at", now.toISOString()); store.set("consent.policyVersion", "2026-10-01");
   store.set("journalEntries", [{ id: "j1", date: now.toISOString(), text: "Mine", tags: [] }]);
   router.currentView = "settings"; router.history = [];
 }

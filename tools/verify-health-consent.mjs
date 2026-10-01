@@ -82,7 +82,7 @@ const go = async r => { landed = []; await router.navigate(r); await wait(10); r
 function fixture({ consent = true, health } = {}) {
   localStorage.clear(); store.init();
   store.set("onboardingComplete", true); store.set("name", "Sam"); store.set("tier", "personal");
-  if (consent) { store.set("consent.given", true); store.set("consent.at", new Date().toISOString()); store.set("consent.ageConfirmed", true); }
+  if (consent) { store.set("consent.given", true); store.set("consent.at", new Date().toISOString()); store.set("consent.ageConfirmed", true); store.set("consent.policyVersion", "2026-10-01"); }
   if (health !== undefined) store.set("consent.health", health);
   HC?.takePendingRoute?.();
   router.currentView = "today"; router.history = [];

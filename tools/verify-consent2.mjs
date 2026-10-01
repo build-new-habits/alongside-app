@@ -3,7 +3,8 @@
  * 01 Oct 2026 v3
  *
  * v3 - AGE-CHECK. Onboarding asks when you were born before consent; the
- *   fixture answers as an adult (January 1990). No assertion changed.
+ *   fixture answers as an adult (January 1990). The policy version is read
+ *   from data/consent-version.js (CONSENT-VERSION), where it now lives.
  *
  * v2 - PT-2 HEALTH-CONSENT. Onboarding's consent has a second tick, for
  *   health answers; the fixture ticks both. No assertion changed.
@@ -175,7 +176,8 @@ section("3. Ticking and continuing records consent");
   ok("consent.policyVersion is recorded and non-empty",
      typeof v === "string" && v.length > 0, String(v));
 
-  const m = src.match(/POLICY_VERSION\s*=\s*['"]([^'"]+)['"]/);
+  // CONSENT-VERSION, 01 Oct: the constant lives in data/consent-version.js.
+  const m = fs.readFileSync(path.join(REPO, "js/data/consent-version.js"), "utf8").match(/POLICY_VERSION\s*=\s*['"]([^'"]+)['"]/);
   ok("it matches the POLICY_VERSION constant actually shipping",
      m && v === m[1], `store ${v} vs source ${m && m[1]}`);
 
