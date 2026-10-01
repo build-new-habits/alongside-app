@@ -1,6 +1,10 @@
 /**
  * tools/verify-restore-lock.mjs
- * 01 Oct 2026 v1
+ * 01 Oct 2026 v2
+ *
+ * v2 - Waits for each lock and unlock to finish instead of a fixed 1.5 s,
+ *   so a busy machine cannot fail it. No assertion changed.
+ *
  *
  * B2 RESTORE-LOCK. An optional password on the Download your data file.
  *
@@ -51,6 +55,8 @@ const main = document.getElementById("main-content");
 const txt = el => (el?.textContent || "").replace(/\s+/g, " ").trim();
 const wait = ms => new Promise(r => setTimeout(r, ms));
 const click = el => el?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }));
+// Locking takes 600,000 rounds on purpose; wait for the outcome, not a fixed time.
+const until = async (cond, ms = 10000) => { const end = Date.now() + ms; while (!cond() && Date.now() < end) await wait(25); };
 const type = (el, v) => { if (el) { el.value = v; el.dispatchEvent(new dom.window.Event("input", { bubbles: true })); } };
 const blobText = async b => b ? (typeof b.text === "function" ? b.text() : new Response(b).text()) : "";
 const SECRET = "correct horse 42";
@@ -120,7 +126,7 @@ ok("2f. a short password: nothing saved, the reason said where the person is",
    document.getElementById("download-pw-error")?.getAttribute("role") === "alert");
 type(pw(), SECRET); type(pw2(), SECRET + "x"); click(document.getElementById("download-save")); await wait(60);
 ok("2g. mismatched: nothing saved", lastBlob === null && /match/.test(txt(document.getElementById("download-pw-error"))));
-type(pw2(), SECRET); click(document.getElementById("download-save")); await wait(1500);
+type(pw2(), SECRET); click(document.getElementById("download-save")); await until(() => /locked/i.test(saved()));
 const lockedFile = await blobText(lastBlob);
 ok("2h. a good password: a locked file, the journal unreadable in it",
    !!L && L.isLocked(lockedFile) && !lockedFile.includes(JOURNAL) && !lockedFile.includes(SECRET), lockedFile.slice(0, 80));
@@ -150,10 +156,10 @@ await pick(lockedFile || "{}");
 ok("3a. a locked file asks for its password first, changing nothing", !!askDlg() && !document.getElementById("settings-confirm-dialog") && !store.get("name"));
 const upw = () => document.getElementById("unlock-pw");
 ok("3b. a labelled password field", upw()?.type === "password" && !!document.querySelector('label[for="unlock-pw"]'));
-type(upw(), "wrong password"); click(document.getElementById("unlock-open")); await wait(1500);
+type(upw(), "wrong password"); click(document.getElementById("unlock-open")); await until(() => !!txt(document.getElementById("unlock-error")));
 ok("3c. a wrong password: refused, said, nothing changed",
    !!askDlg() && /doesn.t open this file/.test(txt(document.getElementById("unlock-error"))) && !store.get("name"));
-type(upw(), SECRET); click(document.getElementById("unlock-open")); await wait(1500);
+type(upw(), SECRET); click(document.getElementById("unlock-open")); await until(() => !!document.getElementById("settings-confirm-dialog"));
 const conf = document.getElementById("settings-confirm-dialog");
 ok("3d. the right one: then the usual confirmation of what the file holds", !askDlg() && !!conf && /1 session and 1 journal entry/.test(txt(conf)), txt(conf));
 click(document.getElementById("confirm-ok")); await wait(30);

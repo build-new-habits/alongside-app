@@ -1,6 +1,10 @@
 /**
  * tools/verify-evidence.mjs
- * 01 Oct 2026 v1
+ * 01 Oct 2026 v2
+ *
+ * v2 - Waits for each send's outcome instead of a fixed 60 ms (one failure
+ *   under a parallel suite). No assertion changed.
+ *
  *
  * B5 EVIDENCE. The survey and Share my figures.
  *
@@ -46,6 +50,9 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
 const main = document.getElementById("main-content");
 const txt = el => (el?.textContent || "").replace(/\s+/g, " ").trim();
 const click = el => el?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }));
+// Sends are asynchronous; wait for the outcome, not a fixed time (a fixed
+// 60 ms failed once under a parallel suite).
+const until = async (cond, ms = 3000) => { const end = Date.now() + ms; while (!cond() && Date.now() < end) await wait(20); };
 
 let E = null, M = null;
 try { E = await import(B + "data/evidence.js"); M = await import(B + "data/messages.js"); } catch (e) { console.log(e.message); }
@@ -111,7 +118,7 @@ click(surveyBox().querySelector('[data-ev-send="survey"]')); await wait(60);
 ok("3b. Send without both answers: nothing sent, and why", calls.length === 0 && /answer both/.test(txt(main.querySelector("#ev-survey-error"))));
 main.querySelector('input[name="ev-move"][value="much-more"]').checked = true;
 main.querySelector('input[name="ev-used"][value="3-6m"]').checked = true;
-click(surveyBox().querySelector('[data-ev-send="survey"]')); await wait(60);
+click(surveyBox().querySelector('[data-ev-send="survey"]')); await until(() => /Thank you/.test(txt(main.querySelector("#settings-saved"))));
 const c = calls[0];
 ok("3c. one request, POST to the receiver's table", calls.length === 1 && c.url === "https://abcdefgh.supabase.co/rest/v1/evidence" && c.opts.method === "POST", JSON.stringify(c?.url));
 ok("3d. no cookies, no row back", c.opts.credentials === "omit" && c.opts.headers.Prefer === "return=minimal");
@@ -131,11 +138,11 @@ const shown = figBox() ? txt(figBox()) : "";
 const live = E.figuresPayload();
 ok("4a. the screen shows each figure that will be sent", shown.includes(String(live.first_weeks)) && shown.includes(String(live.latest_weeks)) && shown.includes(live.month) && /Not known yet/.test(shown), shown.slice(0, 300));
 globalThis.fetch = async (u, o) => { if (/supabase/.test(String(u))) calls.push({ u, o }); return { ok: false, text: async () => "" }; };
-click(figBox().querySelector('[data-ev-send="share-figures"]')); await wait(60);
+click(figBox().querySelector('[data-ev-send="share-figures"]')); await until(() => !!txt(main.querySelector("#ev-share-figures-error")));
 ok("4b. a failed send: said plainly, nothing kept, still offered",
    new RegExp(E.NOT_SENT.replace(/[.’]/g, ".")).test(txt(main.querySelector("#ev-share-figures-error"))) && store.get("evidence.figuresDone") === false && !!figBox());
 globalThis.fetch = fetchOk; calls = [];
-click(figBox().querySelector('[data-ev-send="share-figures"]')); await wait(60);
+click(figBox().querySelector('[data-ev-send="share-figures"]')); await until(() => store.get("evidence.figuresDone") === true && !figBox());
 const fb = JSON.parse(calls[0]?.opts?.body || "{}");
 ok("4c. Send: exactly the figures shown, plus the release", calls.length === 1 && fb.first_weeks === live.first_weeks && fb.latest_weeks === live.latest_weeks && JSON.stringify(fb.kinds) === JSON.stringify(live.kinds) && Object.keys(fb).length === 8, calls[0]?.opts?.body);
 ok("4d. answered once", store.get("evidence.figuresDone") === true && !figBox());
