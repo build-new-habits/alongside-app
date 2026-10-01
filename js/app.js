@@ -2,6 +2,8 @@
  * app.js - Application entry point
  * 01 Oct 2026 v9
  *
+ * v9 - B3 DOMAIN. The service worker is registered relative ("./sw.js",
+ *   scope "./"), so the app runs unchanged at either address.
  * v9 - B4 MESSAGES. After the first screen is up, the dot on the Settings
  *   tab is set from the messages already kept, then messages.json is
  *   fetched (relative, nothing about the person sent) and the dot set again.
@@ -63,8 +65,10 @@ let _swRegistration = null;
 async function registerServiceWorker() {
   if (!("serviceWorker" in navigator)) return;
   try {
-    const reg = await navigator.serviceWorker.register("/alongside-app/sw.js", {
-      scope: "/alongside-app/"
+    // B3 DOMAIN. Relative, so the same code works at
+    // build-new-habits.github.io/alongside-app/ and at app.buildnewhabits.co.uk.
+    const reg = await navigator.serviceWorker.register("./sw.js", {
+      scope: "./"
     });
     _swRegistration = reg;
     console.log("SW registered, scope:", reg.scope);
