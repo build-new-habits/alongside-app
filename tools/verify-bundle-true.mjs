@@ -25,6 +25,8 @@
  *   8. The under-18 screen says the one thing it keeps.
  *   9. Getting started says movements are left out on a day an area is bad,
  *      not unconditionally.
+ *  10. Settings › Your plan on Free: no "no contract", free in the beta,
+ *      and what stays said exactly (B6 checklist check, 01 Oct).
  */
 import { createRequire as __cr } from "node:module";
 import { readFileSync } from "node:fs";
@@ -246,6 +248,22 @@ ok("9b. the question ties it to a bad day too", /on a day it.s bad/i.test(step?.
 ok("9c. its answered line too", /on a day one is bad/i.test(step?.coachAfter?.answered || ""), step?.coachAfter?.answered);
 const condSrc = readFileSync(new URL("js/views/onboarding/conditions.js", ROOT), "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
 ok("9d. the older sore-areas screen says the same", /on a day it.s bad/i.test(condSrc) && !/Tell me where, and I.ll leave out/.test(condSrc));
+
+// ── 10. YOUR PLAN, ON FREE, SAYS WHAT THE UPGRADE PAGE SAYS ───────────────
+// The Terms are a contract, so "no contract either way" is untrue (removed
+// from the upgrade page by LEGAL-TRUE, 01 Oct); and nobody pays in the beta.
+console.log("\nTEST 10 - Settings › Your plan, on Free");
+fixture({ tier: "free" });
+{
+  const { SettingsView: SV } = await import(B + "views/settings.js");
+  const s10 = SV(router); main.innerHTML = ""; s10.mount(main); await wait(10);
+  click(main.querySelector('[data-open="about-plan"]')); await wait(10);
+  const plan = txt(main);
+  ok("10pc. positive control: the Your plan screen shows the price", /£7\.99 a month/.test(plan), plan.slice(0, 200));
+  ok("10a. no \"no contract either way\"", !/contract either way/i.test(plan));
+  ok("10b. no minimum term, and free while in beta", /no minimum term/i.test(plan) && /free while Alongside is in beta/i.test(plan));
+  ok("10c. what stays is said exactly", /Everything you have done stays on this phone, whatever you decide/.test(plan));
+}
 
 console.log(`\n${passes} passed, ${fails} failed`);
 process.exit(fails ? 1 : 0);

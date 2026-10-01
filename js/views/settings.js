@@ -2,6 +2,10 @@
  * settings.js
  * 01 Oct 2026 v55
  *
+ * v55 - Your plan, on Free: "no contract either way" removed (the Terms are a
+ *   contract; the upgrade page lost it on 01 Oct); says the Plan is free in the
+ *   beta and what stays, in the upgrade page's words (verify-bundle-true 10).
+ *
  * v55 - B5 EVIDENCE. A research message holds its question in place: the
  *   survey's two questions, or Share my figures' exact figures, the line
  *   that it cannot be found again once sent, and Send. Nothing is sent
@@ -2126,11 +2130,11 @@ export function SettingsView(router) {
           </div>
         ` : `
           <div class="settings-plan-block">
-            <p class="settings-plan-price">${PRICE_MONTHLY} a month, or ${PRICE_ANNUAL} for the year.</p>
+            <p class="settings-plan-price">${PRICE_MONTHLY} a month, or ${PRICE_ANNUAL} for the year, when payment starts.</p>
             <p class="text-sm text-muted">
-              Thirty days before you pay anything, and no contract either way.
-              Nothing is lost if you change your mind — your data stays yours
-              whatever you decide.
+              The Plan is free while Alongside is in beta.
+              Thirty days before you pay anything, and no minimum term.
+              Everything you have done stays on this phone, whatever you decide.
             </p>
           </div>
 
