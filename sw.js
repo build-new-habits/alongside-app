@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 01 Oct 2026 v622
+ * 01 Oct 2026 v623
  *
+ * v623 - BUNDLE-TRUE: Library journal opens the real journal; restore and My exercises cannot carry code; no weight entry without health consent; more cleared by Delete my health answers.
  * v622 - RESTORE: Settings › Restore from a file; js/data/restore.js precached.
  * v621 - PRECISE-WORDS: no Sentry message without an error; deleting health answers clears the day's intensity.
  * v620 - LEGAL-TRUE 2: deleting health answers also covers a target weight and check-in answers kept with sessions.
@@ -4169,7 +4170,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v622";
+const CACHE_NAME = "alongside-v623";
 
 const SHELL_URLS = [
 

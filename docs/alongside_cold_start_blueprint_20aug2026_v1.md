@@ -72,7 +72,7 @@ git clone --depth 1 https://x-access-token:$TOKEN@github.com/build-new-habits/al
 |---|---|
 | `store.js` | v100 |
 | `Schema.md` | v1.95 |
-| `sw.js` | **v622**, cache `alongside-v622` |
+| `sw.js` | **v623**, cache `alongside-v623` |
 | `router.js` | v36 · `my-programme.js` v8 · `today.js` v49 · `settings.js` v46 · `progress.js` v22 · `onboarding/thread.js` v16 |
 | `exercise-card.js` | **v7** — CARD-4, four pages. `workout.css` v16 |
 | Gates | **254, all green** — from the repo root. See the cwd row in §9 |
