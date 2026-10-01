@@ -1,7 +1,11 @@
 /**
  * reflect.js - Reflect Screen
  *
- * 30 Sep 2026 v12
+ * 01 Oct 2026 v13
+ *
+ * v13 - PT-2 HEALTH-CONSENT. While health consent is not given (withdrawn
+ *   by Delete my health answers), Add a note -- the mood and the note -- is
+ *   not offered. How did it feel stays: it is about the session.
  *
  * v12 - W3-20. "That is N sessions this week" counted part-sessions, and its week
  *   began at the current time of day on Sunday. Completed sessions, from
@@ -178,6 +182,7 @@
  *   Ends with a coach summary and route back to Today.
  */
 
+import { healthAllowed } from "../data/health-consent.js";
 import { store }          from "../store.js";
 import { SAFETY_LINE }    from "../data/purpose.js";
 // SAVE-ALL, 16 Sep 2026. Eleven views route here when a session ends,
@@ -744,7 +749,7 @@ export function render() {
         <p class="coach-message-text" id="finish-coach" aria-live="polite">${(feelAnswer || painAnswer) ? buildSummary(entry, feelAnswer, painAnswer, moodAfter) : ""}</p>
       </div>
 
-      <details class="finish-more reflect-section">
+      ${healthAllowed() ? `<details class="finish-more reflect-section">
         <summary class="finish-more__summary">Add a note</summary>
         <p class="reflect-section-label" id="finish-mood-label">How's your mood right now?</p>
         <div class="reflect-mood-slider-block">
@@ -765,7 +770,7 @@ export function render() {
                   class="reflect-textarea"
                   rows="3"
                   aria-labelledby="finish-note-label">${openText}</textarea>
-      </details>
+      </details>` : ""}
 
       ${renderSaveBlock()}
 

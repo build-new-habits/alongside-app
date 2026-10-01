@@ -1,6 +1,11 @@
 /**
  * router.js
- * 29 Sep 2026 v36
+ * 01 Oct 2026 v37
+ *
+ * v37 - PT-2, HEALTH-CONSENT. 'health-consent', reached only through a
+ *   guard in navigate(): before the check-in, I know what I want or the
+ *   journal, when health consent was never given or was withdrawn.
+ *   See js/data/health-consent.js.
  *
  * v36 - P3, FREE-BUILDER-UPGRADE. navigate(view, { replace: true }): the
  *   new view takes the place of the current one instead of stacking on
@@ -392,6 +397,8 @@ const VIEW_NAMES = {
   'practices':          { path: './views/practices.js',        fn: 'PracticesView'         },
   // RED-FLAG, 28 Sep 2026. Reached only through the guard in navigate().
   'red-flag':           { path: './views/red-flag.js',         fn: 'RedFlagView'           },
+  // PT-2, 01 Oct 2026. Reached only through the guard in navigate().
+  'health-consent':     { path: './views/health-consent.js',   fn: 'HealthConsentView'     },
 };
 
 const hideNavViews = new Set([
@@ -412,13 +419,15 @@ const hideNavViews = new Set([
   'practices',
   // RED-FLAG. Nothing else on the screen while this is read.
   'red-flag',
+  // PT-2. The same: a consent is read, not glanced at.
+  'health-consent',
   // SMOOTH-P3c. A session in progress, with its own Exit and Finish.
   'capture',
 ]);
 
 const NAV_MAP = {
   'today': 'today', 'checkin': 'today', 'checkin-mini': 'today',
-  'coach-proposal': 'today', 'red-flag': 'today',
+  'coach-proposal': 'today', 'red-flag': 'today', 'health-consent': 'today',
   'home-threshold': 'today', 'reflect': 'today',
   'workout': 'today', 'gym-programme': 'today', 'morning-session': 'today',
   'core-session': 'today', 'yoga-session': 'today', 'walk-session': 'today',
@@ -479,6 +488,16 @@ export const router = {
     if (!VIEW_NAMES[viewName]) {
       console.warn(`Router: unknown view "${viewName}" — falling back to today`);
       viewName = 'today';
+    }
+
+    // PT-2, 01 Oct 2026. Before a health question, health consent if it
+    // was never given or was withdrawn.
+    try {
+      if (!this._hc) this._hc = await import('./data/health-consent.js');
+      const to = this._hc.guardRoute(viewName);
+      if (to) viewName = to;
+    } catch (err) {
+      console.error('Router: health-consent guard failed', err);
     }
 
     // RED-FLAG, 28 Sep 2026. Before exercise, the screen if it is due,

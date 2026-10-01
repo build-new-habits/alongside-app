@@ -1,5 +1,9 @@
 /**
  * tools/verify-weight1b.mjs
+ * 01 Oct 2026 v6
+ * PT-2 HEALTH-CONSENT. The fixtures' consent includes health consent:
+ *   weight is a health answer, not offered without it. No assertion changed.
+ *
  * 30 Sep 2026 v5
  * W3-8 CYCLE-CLAIM. The positive control looked for the cycle-aware
  *   switch as the weight section's neighbour; that switch is retired
@@ -107,7 +111,7 @@ async function mount(state) {
 
 const base = (over = {}) => ({
   tier: "personal", name: "Test",
-  consent: { given: true, at: new Date().toISOString() },
+  consent: { given: true, at: new Date().toISOString(), health: { given: true, at: new Date().toISOString(), version: "2026-10-01", withdrawnAt: null } },
   onboarding: { complete: true },
   ...over
 });
@@ -258,7 +262,7 @@ async function mountProgramme(over = {}) {
   localStorage.clear();
   localStorage.setItem("alongside_user", JSON.stringify({
     tier: "personal", name: "Test",
-    consent: { given: true, at: new Date().toISOString() },
+    consent: { given: true, at: new Date().toISOString(), health: { given: true, at: new Date().toISOString(), version: "2026-10-01", withdrawnAt: null } },
     onboarding: { complete: true },
     weightTracking: true, weightUnit: "kg", weight: 100,
     strategicGoal: {
@@ -403,7 +407,7 @@ async function mountProgress(over = {}) {
   localStorage.clear();
   localStorage.setItem("alongside_user", JSON.stringify({
     tier: "personal", name: "Test",
-    consent: { given: true, at: new Date().toISOString() },
+    consent: { given: true, at: new Date().toISOString(), health: { given: true, at: new Date().toISOString(), version: "2026-10-01", withdrawnAt: null } },
     onboarding: { complete: true },
     weightTracking: true, weightUnit: "kg",
     ...over

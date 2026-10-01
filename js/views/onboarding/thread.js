@@ -1,6 +1,12 @@
 /**
  * js/views/onboarding/thread.js
- * 29 Sep 2026 v16
+ * 01 Oct 2026 v17
+ *
+ * v17 - PT-2 HEALTH-CONSENT / PT-1. A second tick, for health answers
+ *   (explicit consent, recorded as consent.health with its own time and
+ *   version); Continue needs both. The bullets are true: answers are kept
+ *   on this phone, and an error report goes to Sentry without them.
+ *   POLICY_VERSION 2026-10-01.
  *
  * v16 - P0, SCOPE-MINOR. Step 8a (exercise clearance) is gone; its acknowledgement wiring removed.
  *
@@ -241,6 +247,7 @@ import {
   LEG_POWER_CHIPS,
 }                             from '../../data/onboarding-thread-data.js';
 import { openSheet }          from './sheet-manager.js';
+import { HEALTH_TICK, HEALTH_NOTE, giveHealthConsent } from '../../data/health-consent.js';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MOTION PREFERENCE
@@ -353,7 +360,7 @@ export function ThreadView(router) {
   // POLICY_VERSION is recorded with the tick. Without it, any later
   // revision silently invalidates every existing record and there is no
   // way to tell who needs re-consent.
-  const POLICY_VERSION = '2026-08-11';
+  const POLICY_VERSION = '2026-10-01';
 
   // AGE GATE — BUILT BUT INERT. Do not switch on until the ToS 13+ vs
   // business-doc 16+ contradiction (Stream A, A1.11) is resolved AND
@@ -374,10 +381,10 @@ export function ThreadView(router) {
         <div class="ob-consent__summary">
           <h2 class="ob-consent__subheading">What you are agreeing to</h2>
           <ul class="ob-consent__list">
-            <li>Your answers stay on your device. We do not sell them, and we do not share them with advertisers.</li>
+            <li>Your answers are kept on this phone. There is no account and no copy on a server. We do not sell them, and we do not share them with advertisers.</li>
+            <li>If something in the app breaks, a short error report goes to Sentry, the service we use to fix faults. It says what broke, never what you told me.</li>
             <li>We use what you tell us to shape your sessions — that is the whole point of asking.</li>
-            <li>You can change or delete anything, any time, in Settings.</li>
-            <li>You can stop using Alongside whenever you like and take your data with you.</li>
+            <li>You can change or delete anything, any time, in Settings, and download a copy of it all.</li>
           </ul>
           <p class="ob-consent__links">
             The full detail is in our
@@ -398,8 +405,14 @@ export function ThreadView(router) {
           </label>
         </div>
 
+        <div class="ob-consent__tick">
+          <input type="checkbox" id="ob-consent-health" class="ob-consent__checkbox" aria-describedby="ob-consent-health-note">
+          <label for="ob-consent-health" class="ob-consent__label">${HEALTH_TICK}</label>
+        </div>
+        <p class="ob-consent__note" id="ob-consent-health-note">${HEALTH_NOTE}</p>
+
         <p class="ob-consent__error" id="ob-consent-error" role="status" hidden>
-          Please tick the box above to agree before continuing.
+          Please tick both boxes to agree before continuing.
         </p>
 
         <button class="btn btn-primary btn-large btn-full"
@@ -428,6 +441,7 @@ export function ThreadView(router) {
     // threw and ONBOARDING DIED ON THE CONSENT SCREEN. `error.hidden`
     // was unguarded in two more places.
     const check       = _thread.querySelector('#ob-consent-check');
+    const health      = _thread.querySelector('#ob-consent-health');
     const continueBtn = _thread.querySelector('#ob-consent-continue');
     const error       = _thread.querySelector('#ob-consent-error');
 
@@ -441,12 +455,14 @@ export function ThreadView(router) {
       });
     }
 
-    check?.addEventListener('change', () => {
-      const ok = check.checked;
+    const onTick = () => {
+      const ok = !!(check?.checked && health?.checked);
       continueBtn?.setAttribute('aria-disabled', ok ? 'false' : 'true');
       continueBtn?.classList.toggle('is-inactive', !ok);
       if (ok && error) error.hidden = true;
-    });
+    };
+    check?.addEventListener('change', onTick);
+    health?.addEventListener('change', onTick);
     continueBtn?.classList.add('is-inactive');
 
     _thread.querySelector('#ob-consent-inapp')?.addEventListener('click', () => {
@@ -454,15 +470,16 @@ export function ThreadView(router) {
     });
 
     continueBtn?.addEventListener('click', () => {
-      if (!check?.checked) {
+      if (!check?.checked || !health?.checked) {
         // Not a dead button: say what is needed and put focus where it is.
         if (error) error.hidden = false;
-        check?.focus();
+        (check?.checked ? health : check)?.focus();
         return;
       }
       store.set('consent.given',         true);
       store.set('consent.at',            new Date().toISOString());
       store.set('consent.policyVersion', POLICY_VERSION);
+      giveHealthConsent();
       if (AGE_GATE_ENABLED) {
         // Reserved. Nothing writes ageConfirmed while the gate is inert.
       }

@@ -1,6 +1,9 @@
 /**
  * progress.js
- * 30 Sep 2026 v23
+ * 01 Oct 2026 v24
+ *
+ * v24 - PT-2 HEALTH-CONSENT. No weight card or entry while health consent
+ *   is not given.
  *
  * v23 - W3-20. The shared summary says "1 session", not "1 sessions", and under
  *   90 minutes says minutes, not "about 0 hours".
@@ -298,6 +301,7 @@
  *   Touch targets: minimum 44px for all interactive elements.
  */
 
+import { healthAllowed } from '../data/health-consent.js';
 import { store }            from '../store.js';
 // PROGRESS, 06 Sep 2026. The eight session-type labels come from the
 // builder, not a private map here -- a second copy would drift the first
@@ -426,7 +430,7 @@ export function ProgressView(router) {
    * arithmetic on the body this product refuses.
    */
   function _weightLog(premium) {
-    if (!premium || store.get('weightTracking') !== true) return '';
+    if (!premium || store.get('weightTracking') !== true || !healthAllowed()) return '';
 
     const unit    = store.get('weightUnit') || 'kg';
     const entries = (store.get('weightLog') || [])
@@ -485,7 +489,7 @@ export function ProgressView(router) {
    * and the coach putting a number on it turns a concern into a verdict.
    */
   function _rateNote(premium) {
-    if (!premium || store.get('weightTracking') !== true) return '';
+    if (!premium || store.get('weightTracking') !== true || !healthAllowed()) return '';
     if (store.get('weightRateRaisedAt')) return '';
 
     const weekly = _weeklyRates(store.get('weightLog') || []);

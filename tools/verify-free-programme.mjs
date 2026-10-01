@@ -1,6 +1,9 @@
 /**
  * tools/verify-free-programme.mjs
- * 29 Sep 2026 v1
+ * 01 Oct 2026 v2
+ *
+ * v2 - PT-2 HEALTH-CONSENT. Onboarding's consent has a second tick, for
+ *   health answers; the fixture ticks both. No assertion changed.
  *
  * P12, FREE PROGRAMME (persona finding W2-9, seen by all eight). Graeme
  * accepted the recommendation (28 Sep): on Free, no programme is offered
@@ -60,6 +63,7 @@ async function walkOnboarding(tier) {
   await wait(2500);
   const c = el.querySelector("#ob-consent-check");
   c.checked = true; c.dispatchEvent(new dom.window.Event("change"));
+  { const h = el.querySelector("#ob-consent-health"); if (h) { h.checked = true; h.dispatchEvent(new dom.window.Event("change")); } }
   el.querySelector("#ob-consent-continue").dispatchEvent(new dom.window.Event("click"));
   await wait(300);
   const used = new WeakSet(); const sheets = []; let idle = 0;

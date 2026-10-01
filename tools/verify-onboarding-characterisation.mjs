@@ -1,6 +1,9 @@
 /**
  * tools/verify-onboarding-characterisation.mjs
- * 22 Aug 2026 v1
+ * 01 Oct 2026 v2
+ *
+ * v2 - PT-2 HEALTH-CONSENT. Onboarding's consent has a second tick, for
+ *   health answers; the fixture ticks both. No assertion changed.
  *
  * THREAD-1b-char — what onboarding does TODAY, before anything moves it.
  *
@@ -80,6 +83,7 @@ async function passConsent(el) {
   if (!check) return false;
   check.checked = true;
   check.dispatchEvent(new dom.window.Event("change"));
+  { const h = el.querySelector("#ob-consent-health"); if (h) { h.checked = true; h.dispatchEvent(new dom.window.Event("change")); } }
   el.querySelector("#ob-consent-continue").dispatchEvent(new dom.window.Event("click"));
   await wait(200);
   return true;

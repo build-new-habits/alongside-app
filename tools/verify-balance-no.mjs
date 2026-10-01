@@ -1,6 +1,9 @@
 /**
  * tools/verify-balance-no.mjs
- * 29 Sep 2026 v2
+ * 01 Oct 2026 v3
+ *
+ * v3 - PT-2 HEALTH-CONSENT. Onboarding's consent has a second tick, for
+ *   health answers; the fixture ticks both. No assertion changed.
  *
  * v2 - End review (Graeme, 29 Sep). 1d: the chair question, now asked of
  *   everybody who answers balance, says it is asked of everybody.
@@ -73,6 +76,7 @@ async function walkOnboarding() {
   await wait(2500);
   const c = el.querySelector("#ob-consent-check");
   c.checked = true; c.dispatchEvent(new dom.window.Event("change"));
+  { const h = el.querySelector("#ob-consent-health"); if (h) { h.checked = true; h.dispatchEvent(new dom.window.Event("change")); } }
   el.querySelector("#ob-consent-continue").dispatchEvent(new dom.window.Event("click"));
   await wait(300);
   const used = new WeakSet(); const asked = []; let idle = 0;

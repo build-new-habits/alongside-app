@@ -1,6 +1,9 @@
 /**
  * css/components/onboarding-thread.css
- * 05 Sep 2026 v6
+ * 01 Oct 2026 v7
+ *
+ * v7 - PT-2 HEALTH-CONSENT. .ob-consent__note under the second tick, and
+ *      the health-consent screen (.hc-*), which reuses the drawn checkbox.
  *
  * v6 - Six text uses and one hardcoded #E8F4F4 repointed to --color-text.
  *      SURFACE-TOKEN, 05 Sep 2026. `color: var(--color-surface, #E8F4F4)`
@@ -917,3 +920,26 @@
 @media (prefers-reduced-motion: reduce) {
   .ob-consent .btn.is-inactive { transition: none; }
 }
+
+/* PT-2 HEALTH-CONSENT, 01 Oct 2026. The line under the health tick, and
+   the screen that asks before the next health question. The checkbox is
+   the same hand-drawn .ob-consent__checkbox (CONSENT-1: never colour
+   alone). */
+.ob-consent__note {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  margin: calc(-1 * var(--space-2)) 0 var(--space-3) calc(24px + var(--space-3));
+}
+
+.hc-view {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-5) var(--space-4);
+  max-width: 36rem;
+  margin: 0 auto;
+}
+
+.hc-title { font-size: var(--text-2xl); margin: 0; }
+.hc-text  { color: var(--color-text); line-height: 1.6; margin: 0; }
+.hc-error { color: var(--color-danger); font-size: var(--text-sm); font-weight: var(--font-medium); min-height: 1.2em; margin: 0; }

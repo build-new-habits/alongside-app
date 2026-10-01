@@ -3,7 +3,10 @@ import { RETIRED_CONDITIONS } from "./data/scope-statement.js";
 
 /**
  * store.js - Data persistence layer
- * 30 Sep 2026 v93
+ * 01 Oct 2026 v94
+ *
+ * v94 - PT-2 HEALTH-CONSENT (Schema v1.89). consent.health: explicit consent
+ *   for health answers. deleteHealthAnswers() and deleteJournalEntry(id).
  *
  * v93 - W3-21 NAV-SMALL (Schema v1.88). requestedLocation: where "I know
  *   what I want" asked for today's plan, read once by the plan.
@@ -1154,7 +1157,9 @@ export const store = {
       // Never overwrite a real consent record with defaults — an existing
       // user's timestamp and policyVersion are a legal audit trail.
       consent: (saved.consent && typeof saved.consent === 'object')
-        ? { ...defaults.consent, ...saved.consent }
+        ? { ...defaults.consent, ...saved.consent,
+            health: { ...defaults.consent.health,
+                      ...((saved.consent.health && typeof saved.consent.health === 'object') ? saved.consent.health : {}) } }
         : defaults.consent,
 
       // ── PROFILE ───────────────────────────────────────────────
@@ -1825,7 +1830,11 @@ export const store = {
         // Reserved. The age gate is built but INERT — see AGE_GATE_ENABLED
         // in thread.js. Stays null until the ToS 13+/16+ contradiction
         // (Stream A, A1.11) is resolved and Natalie's written advice lands.
-        ageConfirmed:  null    // bool|null
+        ageConfirmed:  null,   // bool|null
+        // PT-2, 01 Oct 2026. Explicit consent for health answers, apart
+        // from the Privacy-and-Terms tick. given: true | false (withdrawn)
+        // | null (never asked: an install from before this existed).
+        health: { given: null, at: null, version: null, withdrawnAt: null }
       },
 
       // ── ONBOARDING THREAD AND BEATS (nested object — v6 + v7) ─
@@ -2705,6 +2714,42 @@ export const store = {
     this.data = this.getDefaults();
     this.save();
     console.log('📦 Store reset');
+  },
+
+  /**
+   * PT-2, 01 Oct 2026. Settings › Delete my health answers. Withdrawing
+   * consent for health answers deletes them. Sessions, lifts and what the
+   * person said their body can do (capability, which keeps sessions safe)
+   * stay; a red-flag stop stays in force, without the areas. The consent
+   * is marked withdrawn, so the next health question asks again.
+   */
+  deleteHealthAnswers() {
+    const d = this.getDefaults();
+    this.data.checkinHistory      = {};
+    this.data.lastCheckin         = { ...d.lastCheckin };
+    this.data.conditions          = [];
+    this.data.conditionMeta       = {};
+    this.data.conditionsResolved  = [];
+    this.data.conditionPainScores = {};
+    this.data.severePainChoices   = [];
+    this.data.weight              = null;
+    this.data.weightLog           = [];
+    this.data.journalEntries      = [];
+    this.data.absence             = { ...(this.data.absence || {}), context: null, capturedAt: null };
+    if (this.data.redFlag && typeof this.data.redFlag === 'object') this.data.redFlag = { ...this.data.redFlag, areas: [] };
+    this.data.activityLog = (this.data.activityLog || []).map(e => {
+      const { note, painChange, moodAfter, ...rest } = e || {};
+      return rest;
+    });
+    this.data.consent = { ...(this.data.consent || {}),
+      health: { given: false, at: null, version: null, withdrawnAt: new Date().toISOString() } };
+    this.save();
+  },
+
+  /** PT-2. One journal entry, by id. */
+  deleteJournalEntry(id) {
+    this.data.journalEntries = (this.data.journalEntries || []).filter(e => e && e.id !== id);
+    this.save();
   },
 
   isOnboardingComplete() {

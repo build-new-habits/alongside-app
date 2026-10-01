@@ -1,0 +1,71 @@
+/**
+ * js/data/health-consent.js
+ * 01 Oct 2026 v1
+ *
+ * PT-2 HEALTH-CONSENT. Explicit consent for health answers, apart from
+ * the Privacy-and-Terms tick, and the guard that asks for it before the
+ * next health question.
+ *
+ * Health answers are what's sore and how much, check-ins, weight, the
+ * journal and session notes. UK GDPR treats them as special category
+ * data, which needs explicit consent; they were covered only by the one
+ * combined tick, and the only way to withdraw was Reset all data.
+ * Graeme, 30 Sep: a separate tick, and a delete control.
+ *
+ * WHO IS ASKED. consent.health.given:
+ *   true  -> nothing to ask
+ *   false -> withdrawn (Delete my health answers): ask before the next
+ *            health question
+ *   null  -> never asked. Asked only if the Privacy-and-Terms consent was
+ *            given, i.e. an install from before this existed. A fresh
+ *            install is asked in onboarding, with both ticks together.
+ *
+ * WHERE. Only routes whose purpose is a health question: the check-in,
+ * I know what I want (it asks what's sore) and the journal. Everything
+ * else -- classes, a run, Wellbeing's breathing -- is reached as before.
+ * Screens that ask a health question in passing (the finish screen's note
+ * and mood, Progress's weight entry) leave it out while consent is not
+ * given; they read healthAllowed().
+ */
+import { store } from "../store.js";
+
+export const HEALTH_CONSENT_VERSION = "2026-10-01";
+
+/** The tick's own words, the same at onboarding and here. */
+export const HEALTH_TICK =
+  "I agree that Alongside keeps my health answers on this phone — what’s sore and how much, " +
+  "my check-ins, my weight if I add it, and my journal — and uses them to shape my sessions.";
+
+export const HEALTH_NOTE =
+  "Sessions are built from these answers, so the coach needs them. " +
+  "You can delete them any time in Settings › Delete my health answers.";
+
+export const HEALTH_ROUTES = new Set(["checkin", "checkin-mini", "know-what", "journal-entry"]);
+
+export function healthConsentNeeded() {
+  const c = store.get("consent") || {};
+  const given = c.health ? c.health.given : null;
+  if (given === true)  return false;
+  if (given === false) return true;
+  return c.given === true;
+}
+
+export const healthAllowed = () => !healthConsentNeeded();
+
+export function giveHealthConsent() {
+  store.set("consent.health", {
+    given: true, at: new Date().toISOString(), version: HEALTH_CONSENT_VERSION, withdrawnAt: null
+  });
+}
+
+let _pendingRoute = null;
+export function setPendingRoute(r) { _pendingRoute = r; }
+export function takePendingRoute() { const r = _pendingRoute; _pendingRoute = null; return r; }
+
+/** Router guard: 'health-consent' in place of a health route, or null. */
+export function guardRoute(route) {
+  if (!HEALTH_ROUTES.has(route)) return null;
+  if (!healthConsentNeeded()) return null;
+  _pendingRoute = route;
+  return "health-consent";
+}

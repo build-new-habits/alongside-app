@@ -1,6 +1,12 @@
 /**
  * settings.js
- * 30 Sep 2026 v48
+ * 01 Oct 2026 v49
+ *
+ * v49 - PT-2 HEALTH-CONSENT. Your plan and your data gains Delete my health
+ *   answers (store.deleteHealthAnswers(): check-ins, sore areas and scores,
+ *   weight, journal, session notes; consent withdrawn, asked again before
+ *   the next health question). While health consent is not given, Add or
+ *   change areas asks for it first, and the weight rows are not offered.
  *
  * v48 - W3-17 MAINTAIN-INTENT (persona Wave 3, 2.4). "What are we aiming
  *   at?" was asked once, at sign-up, and nothing changed it. "What you're
@@ -572,6 +578,7 @@ import { EXERCISES } from '../data/exercises/index.js';
 import { CONDITIONS } from '../data/conditions.js';
 import { scopeStatementHTML } from '../data/scope-statement.js';
 import { aimById } from '../data/aims.js';
+import { healthAllowed, healthConsentNeeded, setPendingRoute } from '../data/health-consent.js';
 import { conditionReadback, shortDate } from '../data/arc-readback.js';
 
 import {
@@ -799,7 +806,7 @@ export function SettingsView(router) {
 
       ${_group('Optional tracking', [
         premium ? _rowSwitch({ id: 'settings-weight-tracking', label: 'Weight tracking', sub: 'Off unless you turn it on. Only you see it, and I will never ask you to weigh yourself.', field: 'weightTracking' }) : '',
-        premium && store.get('weightTracking') === true ? _row({ label: 'Your weight and units', open: 'weight' }) : '',
+        premium && store.get('weightTracking') === true && healthAllowed() ? _row({ label: 'Your weight and units', open: 'weight' }) : '',
       ])}
 
       ${_group('Display', [
@@ -818,6 +825,7 @@ export function SettingsView(router) {
         _row({ label: 'Your impact', sub: 'Where the 5% goes.', action: 'nav-impact' }),
         _row({ label: 'Activity log', action: 'nav-activity-log' }),
         _row({ label: 'Download your data', sub: 'A file of everything the app keeps about you, your journal included. Saved on this device.', action: 'download-data' }),
+        _row({ label: 'Delete my health answers', sub: 'Check-ins, sore areas, weight, journal and session notes. Your sessions and lifts stay.', action: 'delete-health' }),
         _row({ label: 'How your data is kept', open: 'about-data' }),
         _row({ label: 'Privacy policy', action: 'nav-privacy' }),
         _row({ label: 'Reset all data', action: 'reset-data' }),
@@ -2553,7 +2561,22 @@ export function SettingsView(router) {
         );
         break;
 
+      case 'delete-health':
+        _confirmDestructive(
+          'Delete my health answers',
+          'This deletes your check-ins, your sore areas and how sore they were, your weight, your journal, and the notes and mood from your sessions. Your sessions, lifts and settings stay, and so do your answers about balance and getting up and down, which keep sessions safe. It cannot be undone. I will ask before keeping anything like this again.',
+          () => {
+            store.deleteHealthAnswers();
+            render(container);
+            _saved(container, 'Your health answers are deleted.');
+          },
+          container
+        );
+        break;
+
       case 'edit-conditions':
+        // PT-2. Sore areas are health answers: ask first if not given.
+        if (healthConsentNeeded()) { setPendingRoute('settings'); router.navigate('health-consent'); break; }
         // P0 (29 Sep 2026). The conditions-update screen is retired (it
         // tracked severity, set healing goals and built programmes for a
         // condition). The sore-areas sheet is the one place to change

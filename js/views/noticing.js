@@ -1,6 +1,10 @@
 /**
  * js/views/noticing.js - Wellbeing Hub Landing View
  *
+ * 01 Oct 2026 v8 - PT-2 HEALTH-CONSENT. Each of Your reflections can be
+ *   deleted: Delete, then Delete it / Keep it, and "Entry deleted." is said.
+ *   Only that entry goes (store.deleteJournalEntry). Entry text is escaped.
+ *
  * 28 Sep 2026 v7 - SMOOTH-P4b. Spec 4.9.
  *   The heading says Wellbeing. One coach line, read from TODAY'S CHECK-IN
  *   ONLY, and a "Suggested now" card: one breathing practice, a length,
@@ -93,6 +97,11 @@ import { startBreathing, BREATHING_TYPES } from "./breathing-session.js";
 // than left as unused imports.
 
 export const centered = false;
+
+// PT-2. Which entry is asking "Delete this entry?", and what was just said.
+let pendingJournalDelete = null;
+let journalStatus = "";
+const _escText = t => String(t ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 
 // ── Weekly noticing prompt data ───────────────────────────────────────────────
 
@@ -392,6 +401,8 @@ export function render() {
               : ""}
           </div>
 
+          <p class="sr-only" id="journal-status" role="status" aria-live="polite">${_escText(journalStatus)}</p>
+          ${journalStatus ? `<p class="text-sm text-muted" aria-hidden="true">${_escText(journalStatus)}</p>` : ""}
           <div style="display: flex; flex-direction: column; gap: var(--space-2);">
             ${recentEntries.map(entry => `
               <div class="card" role="article">
@@ -407,17 +418,25 @@ export function render() {
                     : ""}
                 </div>
                 <p class="text-secondary" style="font-size: var(--text-sm); line-height: 1.6;">${
-                  entry.text.length > 120
-                    ? entry.text.slice(0, 120) + "…"
-                    : entry.text
+                  _escText(String(entry.text || "").length > 120
+                    ? String(entry.text).slice(0, 120) + "…"
+                    : entry.text)
                 }</p>
+                ${pendingJournalDelete === entry.id ? `
+                  <div class="journal-delete" role="group" aria-labelledby="jd-q-${_escText(entry.id)}">
+                    <p class="text-sm" id="jd-q-${_escText(entry.id)}">Delete this entry? It can’t be undone.</p>
+                    <button class="btn btn-danger btn-small" data-journal-delete-yes="${_escText(entry.id)}">Delete it</button>
+                    <button class="btn btn-ghost btn-small" data-journal-delete-no="${_escText(entry.id)}">Keep it</button>
+                  </div>` : `
+                  <button class="btn btn-ghost btn-small" data-journal-delete="${_escText(entry.id)}"
+                          aria-label="Delete the entry from ${_escText(formatDate(entry.date))}">Delete</button>`}
               </div>
             `).join("")}
           </div>
         </section>
       ` : `
-        <p class="text-secondary text-sm" style="margin-top: var(--space-5);">
-          Your reflections will appear here after your first journal entry.
+        <p class="text-secondary text-sm" style="margin-top: var(--space-5);" ${journalStatus ? 'role="status"' : ''}>
+          ${journalStatus ? _escText(journalStatus) + " " : ""}Your reflections will appear here after your first journal entry.
         </p>
       `}
 
@@ -428,6 +447,27 @@ export function render() {
 // ── Mount ─────────────────────────────────────────────────────────────────────
 
 export function onMount() {
+  // PT-2. Deleting a journal entry: ask, then delete only that one.
+  const _repaint = focusSel => {
+    const main = document.getElementById("main-content");
+    if (!main) return;
+    main.innerHTML = render(); onMount();
+    if (focusSel) main.querySelector(focusSel)?.focus();
+  };
+  document.querySelectorAll("[data-journal-delete]").forEach(b => b.addEventListener("click", () => {
+    pendingJournalDelete = b.dataset.journalDelete; journalStatus = "";
+    _repaint(`[data-journal-delete-no="${pendingJournalDelete}"]`);
+  }));
+  document.querySelectorAll("[data-journal-delete-no]").forEach(b => b.addEventListener("click", () => {
+    const id = b.dataset.journalDeleteNo; pendingJournalDelete = null;
+    _repaint(`[data-journal-delete="${id}"]`);
+  }));
+  document.querySelectorAll("[data-journal-delete-yes]").forEach(b => b.addEventListener("click", () => {
+    store.deleteJournalEntry(b.dataset.journalDeleteYes);
+    pendingJournalDelete = null; journalStatus = "Entry deleted.";
+    _repaint("#reflections-heading");
+  }));
+
   // SMOOTH-P4b. Straight into the suggested practice.
   document.getElementById("wb-start")?.addEventListener("click", () => {
     const sug = suggestNow(getTodaysCheckin());

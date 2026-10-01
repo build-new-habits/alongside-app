@@ -1,6 +1,9 @@
 /**
  * tools/verify-onboarding-echoes.mjs
- * 29 Sep 2026 v1
+ * 01 Oct 2026 v2
+ *
+ * v2 - PT-2 HEALTH-CONSENT. Onboarding's consent has a second tick, for
+ *   health answers; the fixture ticks both. No assertion changed.
  *
  * P11, ONBOARDING ECHOES (persona finding W2-10).
  *   - The thread said the person's answers back as ids: "feel-better,
@@ -54,6 +57,7 @@ ThreadView(rtr).mount(el);
 await wait(2500);
 const check = el.querySelector("#ob-consent-check");
 check.checked = true; check.dispatchEvent(new dom.window.Event("change"));
+{ const h = el.querySelector("#ob-consent-health"); if (h) { h.checked = true; h.dispatchEvent(new dom.window.Event("change")); } }
 el.querySelector("#ob-consent-continue").dispatchEvent(new dom.window.Event("click"));
 await wait(300);
 
