@@ -5,7 +5,8 @@
  * v9 - B4 MESSAGES. After the first screen is up, the dot on the Settings
  *   tab is set from the messages already kept, then messages.json is
  *   fetched (relative, nothing about the person sent) and the dot set again.
- *   It never blocks or delays the first screen.
+ *   It never blocks or delays the first screen. B5: evidence.js is loaded so
+ *   its two research messages count towards the dot (only while sending is on).
  *
  * 03 Aug 2026 v8
  *
@@ -41,6 +42,7 @@ import { router }             from './router.js';
 import { requestExit }        from './session-guard.js';
 import { initPaywallListener } from './auth.js';
 import { refreshMessages, updateNavDot } from './data/messages.js';
+import './data/evidence.js';   // B5: registers the two research messages (only while sending is on)
 
 // ── Globals — set immediately, before anything else runs ──────────────────────
 window.router = router;

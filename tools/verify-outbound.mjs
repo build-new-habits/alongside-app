@@ -1,6 +1,13 @@
 /**
  * tools/verify-outbound.mjs
- * 01 Oct 2026 v2
+ * 01 Oct 2026 v3
+ *
+ * v3 - B5 EVIDENCE. The app now has exactly one way to send something it
+ *   made: js/data/evidence.js, to the survey receiver, only once the person
+ *   presses Send, and only while the receiver is set. 4b-4d hold it to that:
+ *   one POST in the whole of js/, in that file, inside sendEvidence, behind
+ *   enabled(); and the receiver starts empty. Driven in verify-evidence.
+ *
  *
  * v2 - SENTRY-SESSIONS. 3s: no release-health sessions, so nothing is sent
  *   when the app opens without an error.
@@ -126,6 +133,12 @@ for (const p of js) {
   if (/fetch\(\s*[`'"]https?:/.test(src) || /XMLHttpRequest|sendBeacon|new WebSocket/.test(src)) calls.push(p);
 }
 ok("4a. no fetch, XMLHttpRequest, sendBeacon or WebSocket to a web address", calls.length === 0, calls.join(", "));
+const posts = js.filter(p => /method:\s*["']POST["']/.test(read(p).replace(/\/\*[\s\S]*?\*\//g, "")));
+ok("4b. one file in the app can send anything it made: evidence.js", posts.length === 1 && /data\/evidence\.js$/.test(posts[0]), posts.join(", "));
+const ev = read(posts[0] || "js/data/evidence.js");
+const fnBody = ev.slice(ev.indexOf("export async function sendEvidence"), ev.indexOf("export function researchMessages"));
+ok("4c. only inside sendEvidence, and only while the receiver is set", /if \(!enabled\(\)/.test(fnBody) && /method: "POST"/.test(fnBody));
+ok("4d. the receiver starts empty: nothing is sent until it is set", /export const RECEIVER = \{ url: "", key: ""/.test(ev));
 
 console.log(`\n${passes} passed, ${fails} failed`);
 process.exit(fails ? 1 : 0);

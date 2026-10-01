@@ -3,6 +3,11 @@ import { RETIRED_CONDITIONS } from "./data/scope-statement.js";
 
 /**
  * store.js - Data persistence layer
+ * 01 Oct 2026 v102
+ *
+ * v102 - B5 EVIDENCE (Schema v1.97). evidence: { surveyDone, figuresDone },
+ *   set only when the receiver took the answer.
+ *
  * 01 Oct 2026 v101
  *
  * v101 - B4 MESSAGES (Schema v1.96). messages: { list, fetchedAt, read,
@@ -1439,6 +1444,11 @@ export const store = {
             newsOn:    saved.messages.newsOn === true,
           }
         : { list: [], fetchedAt: null, read: [], dismissed: [], newsOn: false },
+      // v102 B5.
+      evidence: {
+        surveyDone:  saved.evidence?.surveyDone === true,
+        figuresDone: saved.evidence?.figuresDone === true,
+      },
 
       // ── JOURNAL SETTINGS ──────────────────────────────────────
       journalSettings: (saved.journalSettings && typeof saved.journalSettings === 'object')
@@ -2564,6 +2574,8 @@ export const store = {
 
       // ── MESSAGES (v101, B4) ───────────────────────────────────
       messages: { list: [], fetchedAt: null, read: [], dismissed: [], newsOn: false },
+      // ── EVIDENCE (v102, B5) ───────────────────────────────────
+      evidence: { surveyDone: false, figuresDone: false },
 
       // ── JOURNAL SETTINGS ──────────────────────────────────────
       journalSettings: {

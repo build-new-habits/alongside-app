@@ -2,7 +2,7 @@
  * css/components/settings.css
  * 01 Oct 2026 v14
  *   B2 RESTORE-LOCK. .settings-dialog__error: a form error in words, with a rule.
- *   B4 MESSAGES. .settings-message*, .nav-dot.
+ *   B4 MESSAGES. .settings-message*, .nav-dot. B5 EVIDENCE: .settings-research__*.
  * 01 Oct 2026 v13
  *   PT-3. .settings-data-about: How your data is kept, in words.
  * 28 Sep 2026 v12
@@ -756,6 +756,12 @@
 .settings-message__body { font-size: var(--text-sm); color: var(--color-text); line-height: var(--leading-relaxed); margin: 0 0 var(--space-2); white-space: pre-line; }
 .settings-message__link { color: var(--color-primary); text-decoration: underline; }
 .settings-message__research { margin: var(--space-3) 0; }
+.settings-research__q { border: 0; padding: 0; margin: 0 0 var(--space-3); }
+.settings-research__opt { display: flex; align-items: center; gap: var(--space-2); min-height: 44px; font-size: var(--text-sm); color: var(--color-text); }
+.settings-research__figures { margin: 0 0 var(--space-3); }
+.settings-research__figures div { display: flex; justify-content: space-between; gap: var(--space-3); padding: var(--space-1) 0; border-bottom: 1px solid var(--color-border); font-size: var(--text-sm); }
+.settings-research__figures dt { color: var(--color-text-secondary); }
+.settings-research__figures dd { margin: 0; color: var(--color-text); font-weight: var(--font-bold); text-align: right; }
 .settings-message__none { color: var(--color-text-secondary); margin: 0 0 var(--space-5); }
 .nav-dot {
   position: absolute; top: 6px; right: 18px;

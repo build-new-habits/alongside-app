@@ -1,5 +1,12 @@
 # Alongside — Data Schema Reference
-## 01 Oct 2026 v1.96
+## 01 Oct 2026 v1.97
+
+> **v1.97, 01 Oct 2026 — B5 EVIDENCE** (`store.js` v102). One new field,
+> **`evidence`** (nested object): `surveyDone` (`boolean`, `false`),
+> `figuresDone` (`boolean`, `false`). Set true only when the receiver took
+> the answer. Nothing else about the survey or the figures is kept on the
+> device, and nothing that identifies the device is sent.
+
 
 > **v1.96, 01 Oct 2026 — B4 MESSAGES** (`store.js` v101). One new field,
 > **`messages`** (nested object): `list` (`object[]`, `[]`: the last list
@@ -869,7 +876,7 @@
 
 ## 06 Sep 2026 v1.51
 
-**File:** `js/store.js` (confirmed live version: **v101, 01 Oct 2026**)
+**File:** `js/store.js` (confirmed live version: **v102, 01 Oct 2026**)
 
 > **v1.47, 06 Sep 2026 — CR-1.** `conditions[]` gains three ids and loses one. `chronic-fatigue` is **retired**; `persistent-fatigue`, `me-cfs` and `long-covid` replace it. No field shape changed — `conditions` is still `string[]` and `conditionMeta` is still keyed by condition id.
 >
@@ -1794,6 +1801,8 @@ There is no `stats` field, live or dormant, anywhere in `store.js`. Every `stats
 | `noticingLastTriggered` | `string\|null` | `null` | |
 
 `journalSettings` (nested object): `autoTagging` (`boolean`, `true`), `categoryPrefs` (`string[]`, `[]` since v1.95; the old default is migrated to `[]`).
+
+`evidence` (nested object, v1.97): `surveyDone` (`boolean`, `false`), `figuresDone` (`boolean`, `false`). See B5 EVIDENCE above.
 
 `messages` (nested object, v1.96): `list` (`object[]`, `[]`), `fetchedAt` (`string|null`, `null`), `read` (`string[]`, `[]`), `dismissed` (`string[]`, `[]`), `newsOn` (`boolean`, `false`). See B4 MESSAGES above.
 

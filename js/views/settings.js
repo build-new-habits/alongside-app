@@ -2,6 +2,11 @@
  * settings.js
  * 01 Oct 2026 v55
  *
+ * v55 - B5 EVIDENCE. A research message holds its question in place: the
+ *   survey's two questions, or Share my figures' exact figures, the line
+ *   that it cannot be found again once sent, and Send. Nothing is sent
+ *   before Send; a failed send keeps nothing and says so (evidence.js).
+ *
  * v55 - B4 MESSAGES. Settings › Messages: the page's first row ("New" in words
  *   when there is one not yet seen), a screen listing them, newest first,
  *   each with Dismiss, and the News from Build New Habits switch (off).
@@ -623,6 +628,7 @@ import { healthAllowed, healthConsentNeeded, setPendingRoute } from '../data/hea
 import { readRestoreFile, applyRestore, describeDate } from '../data/restore.js';
 import { lockText, unlockText, isLocked, passwordProblem, lockAvailable } from '../data/file-lock.js';
 import { visibleMessages, hasUnread, markAllRead, dismissMessage, updateNavDot } from '../data/messages.js';
+import { SURVEY, CANT_FIND, NOT_SENT, figuresPayload, surveyPayload, sendEvidence } from '../data/evidence.js';
 import { conditionReadback, shortDate } from '../data/arc-readback.js';
 
 import {
@@ -913,6 +919,36 @@ export function SettingsView(router) {
     return { name, text };
   }
 
+  /** B5. The research question, in the message, with exactly what Send sends. */
+  function _researchForm(m) {
+    const err = `<p class="settings-dialog__error" id="ev-${m.action}-error" role="alert"></p>`;
+    const send = `<button class="btn btn-primary btn-small" data-ev-send="${m.action}" data-msg="${_esc(m.id)}">Send</button>`;
+    if (m.action === 'survey') {
+      const q = (name, s) => `
+        <fieldset class="settings-research__q">
+          <legend class="settings-label">${_esc(s.legend)}</legend>
+          ${s.options.map(([v, l]) => `<label class="settings-research__opt"><input type="radio" name="ev-${name}" value="${v}"> ${_esc(l)}</label>`).join('')}
+        </fieldset>`;
+      return `${q('move', SURVEY.move)}${q('used', SURVEY.usedFor)}
+        <p class="settings-message__body">What is sent: your two answers, whether you are on the free tier or the Plan, this month, and the app’s version. Nothing that says who you are.</p>
+        <p class="settings-message__body">${_esc(CANT_FIND)}</p>${err}${send}`;
+    }
+    const f = figuresPayload();
+    const band = f.plan_band === 'none' ? 'None (free tier)' : 'Not known yet';
+    const rows = [
+      ['Free tier or the Plan', f.tier === 'plan' ? 'The Plan' : 'Free tier'],
+      ['Time on the Plan', band],
+      ['Sessions a week, your first four weeks', String(f.first_weeks)],
+      ['Sessions a week, your latest four weeks', String(f.latest_weeks)],
+      ['Kinds of session, your latest four weeks', f.kinds.length ? f.kinds.join(', ') : 'None'],
+      ['This month', f.month],
+      ['The app’s version', 'Added when you press Send'],
+    ];
+    return `<p class="settings-message__body">Exactly what would be sent:</p>
+      <dl class="settings-research__figures">${rows.map(([k, v]) => `<div><dt>${_esc(k)}</dt><dd>${_esc(v)}</dd></div>`).join('')}</dl>
+      <p class="settings-message__body">${_esc(CANT_FIND)}</p>${err}${send}`;
+  }
+
   /** B4. Settings › Messages: what is published, newest first, and the News switch. */
   function renderMessagesScreen() {
     const list = visibleMessages();
@@ -922,7 +958,7 @@ export function SettingsView(router) {
           <p class="settings-message__date">${_esc(describeDate(m.publishedAt + 'T12:00:00Z') || '')}</p>
           <p class="settings-message__body">${_esc(m.body)}</p>
           ${m.link ? `<p><a class="settings-message__link" href="${_esc(m.link.href)}" target="_blank" rel="noopener noreferrer">${_esc(m.link.text)}<span class="sr-only"> (opens in a new tab)</span></a></p>` : ''}
-          ${m.kind === 'research' ? `<div class="settings-message__research" data-research="${_esc(m.action)}" data-msg="${_esc(m.id)}"></div>` : ''}
+          ${m.kind === 'research' ? `<div class="settings-message__research" data-research="${_esc(m.action)}" data-msg="${_esc(m.id)}">${_researchForm(m)}</div>` : ''}
           <button class="btn btn-ghost btn-small" data-dismiss-msg="${_esc(m.id)}" aria-label="Dismiss: ${_esc(m.title)}">Dismiss</button>
         </li>`).join('');
     return `
@@ -2314,6 +2350,31 @@ export function SettingsView(router) {
         render(container);
         // B4. Seen once the screen is open: the dot goes.
         if (activeScreen === 'messages') markAllRead();
+      });
+    });
+    // B5. Send: only now is anything sent, and only what the screen showed.
+    container.querySelectorAll('[data-ev-send]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const kind = btn.dataset.evSend;
+        const err = container.querySelector(`#ev-${kind}-error`);
+        const say = s => { if (err) { err.textContent = ''; setTimeout(() => { err.textContent = s; }, 20); } };
+        let payload;
+        if (kind === 'survey') {
+          const move = container.querySelector('input[name="ev-move"]:checked')?.value;
+          const used = container.querySelector('input[name="ev-used"]:checked')?.value;
+          payload = surveyPayload(move, used);
+          if (!payload) { say('Please answer both questions, or Dismiss this message.'); return; }
+        } else {
+          payload = figuresPayload();
+        }
+        btn.disabled = true;
+        const sent = await sendEvidence(payload);
+        btn.disabled = false;
+        if (!sent) { say(NOT_SENT); return; }
+        dismissMessage(btn.dataset.msg);
+        focusAfter = '.settings-title';
+        render(container);
+        _saved(container, 'Sent. Thank you.');
       });
     });
     container.querySelectorAll('[data-dismiss-msg]').forEach(btn => {
