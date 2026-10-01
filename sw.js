@@ -1,7 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 01 Oct 2026 v615
+ * 01 Oct 2026 v616
+ *
+ * v616 - AGE-CHECK: a neutral age question first; under 18 sees only support for young people.
  *
  * v615 - PT-3/PT-4: every privacy line true; reminders gone; quiet journaling opens the real journal.
  *
@@ -4159,7 +4161,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v615";
+const CACHE_NAME = "alongside-v616";
 
 const SHELL_URLS = [
 
@@ -4309,11 +4311,14 @@ const SHELL_URLS = [
   "/alongside-app/js/views/practices.js",
   "/alongside-app/js/views/red-flag.js",
   "/alongside-app/js/views/health-consent.js",
+  "/alongside-app/js/views/age-check.js",
+  "/alongside-app/js/views/under-18.js",
   "/alongside-app/js/data/arc-readback.js",
   "/alongside-app/js/data/tier-table.js",
   "/alongside-app/js/views/know-what.js",
   "/alongside-app/js/data/red-flag.js",
   "/alongside-app/js/data/health-consent.js",
+  "/alongside-app/js/data/age-check.js",
   "/alongside-app/js/views/my-programme.js",
   "/alongside-app/js/session-builder.js",
   "/alongside-app/js/data/session-choice.js",
