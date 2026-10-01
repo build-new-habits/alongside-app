@@ -1,6 +1,11 @@
 /**
  * upgrade.js - Upgrade / Membership view
- * 01 Oct 2026 v15
+ * 01 Oct 2026 v16
+ *
+ * v16 - LEGAL-TRUE. True for the beta: the Plan is free and nobody is
+ *   charged; the price and the thirty days are what will apply when
+ *   payment starts, with the terms shown and agreed first. "No contract
+ *   either way" was not true (the Terms are a contract): "No minimum term."
  *
  * v15 - PT-3. "All your data stays with your account": there are no
  *   accounts. Now: it stays on this phone, whatever you decide.
@@ -345,13 +350,14 @@ export function render() {
            and the note for Natalie. -->
       <section class="upgrade-block" aria-label="Commitment">
         <p class="upgrade-body upgrade-body--emphasis">
-          Thirty days before you pay anything.
+          The Plan is free while Alongside is in beta. You won&rsquo;t be charged.
         </p>
         <p class="upgrade-body">
-          Not a penny until day 30. Cancel before then and you are not charged
-          at all &mdash; you go back to free and keep everything you have done.
+          When payment starts, there will be thirty days before you pay anything,
+          and you can cancel before then without being charged. I&rsquo;ll show you
+          the payment terms and ask you to agree to them first.
         </p>
-        <p class="upgrade-body">No contract either way. Cancel whenever you like.</p>
+        <p class="upgrade-body">No minimum term. Cancel whenever you like.</p>
       </section>
 
       <!-- What free keeps. Stated plainly and last, because the page
@@ -373,7 +379,7 @@ export function render() {
            one highlighted. -->
       <section class="upgrade-price-block" aria-label="Price">
         <p class="upgrade-price">${PRICE_MONTHLY} a month. ${PRICE_ANNUAL} for the year.</p>
-        <p class="upgrade-price-note">That&rsquo;s it.</p>
+        <p class="upgrade-price-note">When payment starts. Free during the beta.</p>
       </section>
 
       <section class="upgrade-block" aria-label="Where the money goes">

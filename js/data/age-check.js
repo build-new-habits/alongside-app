@@ -1,6 +1,9 @@
 /**
  * js/data/age-check.js
- * 01 Oct 2026 v1
+ * 01 Oct 2026 v2
+ *
+ * v2 - LEGAL-TRUE. Under 18 clears every key the app keeps on the phone
+ *   (store.resetEverything), not only the store.
  *
  * AGE-CHECK. Alongside is for adults (decision A1.11, 15 Aug 2026). This
  * is the check that makes that true, and the guard that keeps it true.
@@ -65,7 +68,7 @@ export function recordAge(adult) {
     store.set("consent.ageVersion", AGE_CHECK_VERSION);
     return;
   }
-  store.reset();
+  store.resetEverything();
   store.set("consent.ageConfirmed", false);
   store.set("consent.ageCheckedAt", at);
   store.set("consent.ageVersion", AGE_CHECK_VERSION);

@@ -1,6 +1,12 @@
 /**
  * tools/verify-health-consent.mjs
- * 01 Oct 2026 v3
+ * 01 Oct 2026 v4
+ *
+ * v4 - LEGAL-TRUE. What the person said about their body and how they have
+ *   been is a health answer: Delete my health answers now deletes it (3g
+ *   reversed: capability, assessment, onboarding and lifestyle answers, lift
+ *   notes), the tick names it (1a), and Settings › What your body can do
+ *   asks for the health consent first (TEST 6).
  *
  * v3 - AGE-CHECK. Onboarding asks when you were born before consent; the
  *   fixture answers as an adult (January 1990), and fixtures with consent
@@ -103,7 +109,8 @@ const t1 = obEl.querySelector("#ob-consent-check"), t2 = obEl.querySelector("#ob
 ok("1pc. positive control: the consent screen is up", !!t1);
 ok("1a. a second tick, for health answers, with its own label",
    !!t2 && /health answers/i.test(txt(obEl.querySelector('label[for="ob-consent-health"]'))) &&
-   /sore/i.test(txt(obEl.querySelector('label[for="ob-consent-health"]'))) && /journal/i.test(txt(obEl.querySelector('label[for="ob-consent-health"]'))),
+   /sore/i.test(txt(obEl.querySelector('label[for="ob-consent-health"]'))) && /journal/i.test(txt(obEl.querySelector('label[for="ob-consent-health"]'))) &&
+   /your body|my body/i.test(txt(obEl.querySelector('label[for="ob-consent-health"]'))),
    txt(obEl.querySelector('label[for="ob-consent-health"]')));
 if (t1) { t1.checked = true; t1.dispatchEvent(new dom.window.Event("change", { bubbles: true })); }
 click(obEl.querySelector("#ob-consent-continue")); await wait(10);
@@ -160,7 +167,10 @@ store.set("activityLog", [{ id: "a1", date: new Date().toISOString(), type: "wor
 store.set("absence", { context: "injury", capturedAt: "x" });
 store.set("redFlag", { screenedAt: "x", areas: ["lower-back"], textVersion: "v", level: "advice", flaggedAt: "x", clearedAt: null });
 store.set("capability", { ...(store.get("capability") || {}), balanceWorry: "yes", askedAt: "x" });
-store.logLift?.("barbell-back-squat", { weight: 60, reps: 5 });
+store.set("liftLog", { "barbell-back-squat": [{ at: "x", weight: 60, reps: 5, note: "Back flared again" }] });
+store.set("assessment", { ...(store.get("assessment") || {}), completedAt: "x" });
+store.set("lifestyle", { ...(store.get("lifestyle") || {}), returningAfter: "injury", stressLevel: "high" });
+store.set("onboarding", { ...(store.get("onboarding") || {}), hardBeforeSelections: ["body-relationship"], primaryTerritory: "body" });
 const { SettingsView } = await import(B + "views/settings.js");
 main.innerHTML = ""; SettingsView({ navigate(v) { landed.push(v); }, back() {} }).mount(main); await wait(20);
 const del = main.querySelector('[data-action="delete-health"]');
@@ -184,8 +194,14 @@ ok("3d. sessions stay, without their notes, pain or mood answers",
 ok("3e. nothing a person wrote is left anywhere in the store", !/Back flared/.test(JSON.stringify(store.data || {})));
 ok("3f. a red-flag stop stays in force (only the areas go)",
    store.get("redFlag")?.level === "advice" && !store.get("redFlag")?.clearedAt && (store.get("redFlag")?.areas || []).length === 0);
-ok("3g. what your body can do stays (it keeps sessions safe), and lifts stay",
-   store.get("capability")?.balanceWorry === "yes" && JSON.stringify(store.get("liftLog") || {}).includes("60"));
+const lift = (store.get("liftLog") || {})["barbell-back-squat"]?.[0] || {};
+ok("3g. what they said about their body and how they have been goes; lifts stay without notes",
+   store.get("capability")?.balanceWorry !== "yes" && !store.get("capability")?.askedAt &&
+   !store.get("assessment")?.completedAt &&
+   store.get("lifestyle")?.returningAfter == null && store.get("lifestyle")?.stressLevel == null &&
+   (store.get("onboarding")?.hardBeforeSelections || []).length === 0 && store.get("onboarding")?.primaryTerritory == null &&
+   lift.weight === 60 && lift.note == null,
+   JSON.stringify({ cap: store.get("capability"), lift, ob: store.get("onboarding")?.hardBeforeSelections }));
 const hc = store.get("consent")?.health || {};
 ok("3h. the health consent is marked withdrawn", hc.given === false && !!hc.withdrawnAt, JSON.stringify(hc));
 router.currentView = "settings";
@@ -229,6 +245,21 @@ click(main.querySelector('[data-journal-delete-yes="j2"]')); await wait(10);
 const left = (store.get("journalEntries") || []).map(e => e.id);
 ok("5c. only that entry goes", JSON.stringify(left) === '["j1"]', JSON.stringify(left));
 ok("5d. and it says so", /deleted/i.test(txt(main)));
+
+// ── 6. WHAT YOUR BODY CAN DO ASKS FIRST ─────────────────────────────────
+console.log("\nTEST 6 - Settings › What your body can do asks for the health consent first");
+fixture({ consent: true, health: { given: false, at: null, version: null, withdrawnAt: "x" } });
+landed = [];
+main.innerHTML = ""; SettingsView({ navigate(v) { landed.push(v); }, back() {} }).mount(main); await wait(20);
+const capRow = [...main.querySelectorAll(".settings-row")].find(b => /What your body can do/.test(txt(b)));
+ok("6pc. positive control: the row is there", !!capRow);
+ok("6a. withdrawn: it does not open the answers", !capRow?.hasAttribute("data-open"));
+click(capRow); await wait(20);
+ok("6b. it asks for the health consent", landed.includes("health-consent"), JSON.stringify(landed));
+fixture({ consent: true, health: { given: true, at: "x", version: "x", withdrawnAt: null } });
+main.innerHTML = ""; SettingsView({ navigate(v) { landed.push(v); }, back() {} }).mount(main); await wait(20);
+const capRow2 = [...main.querySelectorAll(".settings-row")].find(b => /What your body can do/.test(txt(b)));
+ok("6c. REVERSAL: with consent, it opens the answers", capRow2?.getAttribute("data-open") === "capability");
 
 console.log(`\n${passes} passed, ${fails} failed`);
 process.exit(fails ? 1 : 0);

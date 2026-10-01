@@ -1,6 +1,10 @@
 /**
  * js/data/health-consent.js
- * 01 Oct 2026 v1
+ * 01 Oct 2026 v2
+ *
+ * v2 - LEGAL-TRUE. The tick names what the app keeps about the person's body
+ *   and how they have been (balance, standing, what they are coming back
+ *   from), which Delete my health answers now deletes too.
  *
  * PT-2 HEALTH-CONSENT. Explicit consent for health answers, apart from
  * the Privacy-and-Terms tick, and the guard that asks for it before the
@@ -34,7 +38,8 @@ export const HEALTH_CONSENT_VERSION = "2026-10-01";
 /** The tick's own words, the same at onboarding and here. */
 export const HEALTH_TICK =
   "I agree that Alongside keeps my health answers on this phone — what’s sore and how much, " +
-  "my check-ins, my weight if I add it, and my journal — and uses them to shape my sessions.";
+  "what I tell it about my body and how I’ve been, my check-ins, my weight if I add it, and my journal — " +
+  "and uses them to shape my sessions.";
 
 export const HEALTH_NOTE =
   "Sessions are built from these answers, so the coach needs them. " +

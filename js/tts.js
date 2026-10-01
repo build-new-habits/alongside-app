@@ -1,5 +1,10 @@
 /**
  * tts.js - Text-to-Speech module
+ * 01 Oct 2026 v2
+ *
+ * v2 - LEGAL-TRUE. Only an on-device voice (localService) is used, so the
+ *   words read aloud never leave the phone. With none, reading aloud is not
+ *   offered on that device.
  *
  * Provides read-aloud for coach cards using the Web Speech API
  * (window.speechSynthesis). Built into every modern mobile browser.
@@ -78,7 +83,20 @@ export const tts = {
 
     const rate = store.get("speechRate") || 0.9;
 
+    // LEGAL-TRUE, 01 Oct 2026. Only a voice that runs on this device.
+    // Some browsers' default voice is an online one, which would send the
+    // words read aloud (a name, what is sore) off the phone. With no
+    // on-device voice, reading aloud is not offered rather than leaking.
+    const voices = (window.speechSynthesis.getVoices?.() || []).filter(v => v.localService);
+    if (!voices.length) {
+      this._announce("Reading aloud isn't available on this device");
+      this._resetButton(button);
+      return;
+    }
+    const voice = voices.find(v => /^en-GB/i.test(v.lang)) || voices.find(v => /^en/i.test(v.lang)) || voices[0];
+
     _utterance        = new SpeechSynthesisUtterance(clean);
+    _utterance.voice  = voice;
     _utterance.rate   = rate;
     _utterance.pitch  = 1;
     _utterance.volume = 1;

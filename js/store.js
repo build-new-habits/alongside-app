@@ -3,7 +3,15 @@ import { RETIRED_CONDITIONS } from "./data/scope-statement.js";
 
 /**
  * store.js - Data persistence layer
- * 01 Oct 2026 v96
+ * 01 Oct 2026 v97
+ *
+ * v97 - LEGAL-TRUE (Schema v1.92). Delete my health answers also deletes what
+ *   the person said about their body and how they have been: capability
+ *   (balance, chair, legs, floor -- null is the cautious answer), the
+ *   onboarding answers about what made it hard and what they are coming
+ *   back from, their energy answer, fitness-check results, and notes on
+ *   lifts. resetEverything() clears every 'alongside' key on this phone,
+ *   not only the store.
  *
  * v96 - AGE-CHECK (Schema v1.91). consent.ageConfirmed is live: true 18 or
  *   over, false under 18 (and nothing else kept), null never asked. With
@@ -2737,9 +2745,10 @@ export const store = {
 
   /**
    * PT-2, 01 Oct 2026. Settings › Delete my health answers. Withdrawing
-   * consent for health answers deletes them. Sessions, lifts and what the
-   * person said their body can do (capability, which keeps sessions safe)
-   * stay; a red-flag stop stays in force, without the areas. The consent
+   * consent for health answers deletes them. Sessions and lifts stay
+   * (without their notes); what the person said their body can do is reset
+   * (LEGAL-TRUE), so sessions fall back to the careful defaults; a red-flag
+   * stop stays in force, without the areas. The consent
    * is marked withdrawn, so the next health question asks again.
    */
   deleteHealthAnswers() {
@@ -2754,6 +2763,18 @@ export const store = {
     this.data.weight              = null;
     this.data.weightLog           = [];
     this.data.journalEntries      = [];
+    // LEGAL-TRUE. What they said about their body and how they have been
+    // is health information too (Foot Anstey review prep, 01 Oct 2026).
+    this.data.capability          = { ...d.capability };
+    this.data.assessment          = { ...d.assessment };
+    this.data.lifestyle           = { ...(this.data.lifestyle || {}), returningAfter: null, stressLevel: null };
+    this.data.onboarding          = { ...(this.data.onboarding || {}), hardBeforeSelections: [], primaryTerritory: null };
+    if (this.data.liftLog && typeof this.data.liftLog === 'object') {
+      for (const id of Object.keys(this.data.liftLog)) {
+        const list = this.data.liftLog[id];
+        if (Array.isArray(list)) this.data.liftLog[id] = list.map(e => { const { note, ...rest } = e || {}; return rest; });
+      }
+    }
     this.data.absence             = { ...(this.data.absence || {}), context: null, capturedAt: null };
     if (this.data.redFlag && typeof this.data.redFlag === 'object') this.data.redFlag = { ...this.data.redFlag, areas: [] };
     this.data.activityLog = (this.data.activityLog || []).map(e => {
@@ -2763,6 +2784,23 @@ export const store = {
     this.data.consent = { ...(this.data.consent || {}),
       health: { given: false, at: null, version: null, withdrawnAt: new Date().toISOString() } };
     this.save();
+  },
+
+  /**
+   * LEGAL-TRUE, 01 Oct 2026. Reset all data, and an under-18 answer, leave
+   * nothing of the person's on this phone: the store, and every other key
+   * the app keeps (display settings, the last screen).
+   */
+  resetEverything() {
+    try {
+      const keys = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && k.startsWith('alongside')) keys.push(k);
+      }
+      keys.forEach(k => localStorage.removeItem(k));
+    } catch { /* storage unavailable: the reset below still runs */ }
+    this.reset();
   },
 
   /** PT-2. One journal entry, by id. */

@@ -1,6 +1,11 @@
 /**
  * settings.js
- * 01 Oct 2026 v50
+ * 01 Oct 2026 v51
+ *
+ * v51 - LEGAL-TRUE. Reset all data clears every key the app keeps on this
+ *   phone. Delete my health answers' confirmation names everything it
+ *   deletes, now including what you told the app about your body. What
+ *   your body can do asks for the health consent first, while it is needed.
  *
  * v50 - PT-3 TRUE-PRIVACY-WORDS. The Reminders group and panel are gone:
  *   nothing ever sent a reminder. How your data is kept says how (this
@@ -778,7 +783,11 @@ export function SettingsView(router) {
         _row({ label: 'How you move', value: moves.length ? moves.map(m => _label(MOVEMENT_IDENTITIES, m, m === 'mixed' ? 'A mix' : m)).join(', ') : 'Not set', open: 'movement' }),
         _row({ label: 'Sore or injured areas', value: conds.length ? `${conds.length} listed` : 'None', open: 'conditions' }),
         _row({ label: 'Equipment', value: `Gym ${gym} · Home ${home}`, open: 'equipment' }),
-        _row({ label: 'What your body can do', value: cap.askedAt ? 'Answered' : 'Not answered', open: 'capability' }),
+        // LEGAL-TRUE. What your body can do is a health answer: without the
+        // health consent the row asks for it first, like Sore or injured areas.
+        healthAllowed()
+          ? _row({ label: 'What your body can do', value: cap.askedAt ? 'Answered' : 'Not answered', open: 'capability' })
+          : _row({ label: 'What your body can do', value: 'Not answered', action: 'health-capability' }),
       ])}
 
       ${_group('Goals and your week', [
@@ -822,7 +831,7 @@ export function SettingsView(router) {
         _row({ label: 'Your impact', sub: 'Where the 5% goes.', action: 'nav-impact' }),
         _row({ label: 'Activity log', action: 'nav-activity-log' }),
         _row({ label: 'Download your data', sub: 'A file of everything the app keeps about you, your journal included. Saved on this device.', action: 'download-data' }),
-        _row({ label: 'Delete my health answers', sub: 'Check-ins, sore areas, weight, journal and session notes. Your sessions and lifts stay.', action: 'delete-health' }),
+        _row({ label: 'Delete my health answers', sub: 'Check-ins, sore areas, what you told me about your body, weight, journal and notes. Your sessions and lifts stay.', action: 'delete-health' }),
         _row({ label: 'How your data is kept', open: 'about-data' }),
         _row({ label: 'Privacy policy', action: 'nav-privacy' }),
         _row({ label: 'Reset all data', action: 'reset-data' }),
@@ -2014,7 +2023,7 @@ export function SettingsView(router) {
         <div class="settings-data-about">
           <p>Everything you tell Alongside is kept on this phone, in the app\u2019s own storage. There is no account and no copy on a server.</p>
           <p>If something in the app breaks, a short error report goes to Sentry, the service we use to fix faults, in Frankfurt. It says what broke and on which screen, never what you told me.</p>
-          <p><strong>Download your data</strong> makes a file of all of it, your journal included, on this phone. <strong>Delete my health answers</strong> removes check-ins, sore areas, weight, journal and session notes. <strong>Reset all data</strong> removes everything.</p>
+          <p><strong>Download your data</strong> makes a file of all of it, your journal included, on this phone. <strong>Delete my health answers</strong> removes check-ins, sore areas, what you told me about your body and how you\u2019ve been, weight, journal and session notes. <strong>Reset all data</strong> removes everything.</p>
         </div>
         <div class="settings-about-links">
           <button class="btn btn-ghost"
@@ -2508,7 +2517,7 @@ export function SettingsView(router) {
       case 'delete-health':
         _confirmDestructive(
           'Delete my health answers',
-          'This deletes your check-ins, your sore areas and how sore they were, your weight, your journal, and the notes and mood from your sessions. Your sessions, lifts and settings stay, and so do your answers about balance and getting up and down, which keep sessions safe. It cannot be undone. I will ask before keeping anything like this again.',
+          'This deletes your check-ins, your sore areas and how sore they were, what you told me about your body and how you have been, your weight, your journal, and the notes and mood from your sessions and lifts. Your sessions, lifts and settings stay. Until you tell me again, I will plan as cautiously as I can. It cannot be undone. I will ask before keeping anything like this again.',
           () => {
             store.deleteHealthAnswers();
             render(container);
@@ -2516,6 +2525,11 @@ export function SettingsView(router) {
           },
           container
         );
+        break;
+
+      case 'health-capability':
+        // LEGAL-TRUE. Only rendered while the health consent is needed.
+        setPendingRoute('settings'); router.navigate('health-consent');
         break;
 
       case 'edit-conditions':
@@ -2569,7 +2583,7 @@ export function SettingsView(router) {
           'Reset all data',
           'This will delete everything — your profile, history, and programme. It cannot be undone.',
           () => {
-            store.reset();
+            store.resetEverything();   // LEGAL-TRUE: every key, not only the store
             router.navigate('onboarding/thread');
           },
           container

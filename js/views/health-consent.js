@@ -1,6 +1,9 @@
 /**
  * js/views/health-consent.js
- * 01 Oct 2026 v1
+ * 01 Oct 2026 v2
+ *
+ * v2 - LEGAL-TRUE. The explanation names what is kept about the person's
+ *   body and how they have been, matching the tick.
  *
  * PT-2 HEALTH-CONSENT. Asked before the next health question when the
  * health consent was never given (an install from before onboarding asked
@@ -24,7 +27,8 @@ export function HealthConsentView(router) {
       <div class="view hc-view">
         <h1 class="hc-title" id="hc-title" tabindex="-1">Before I keep how you are</h1>
         <p class="hc-text">To shape your sessions I keep your health answers on this phone:
-          what’s sore and how much, your check-ins, your weight if you add it, and your journal.
+          what’s sore and how much, what you tell me about your body and how you’ve been,
+          your check-ins, your weight if you add it, and your journal.
           They stay on this phone; nothing in them is sent anywhere.</p>
         <p class="hc-text">${HEALTH_NOTE}</p>
         <div class="ob-consent__tick">
