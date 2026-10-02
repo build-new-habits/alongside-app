@@ -1,6 +1,10 @@
 /**
  * tools/verify-onunmount1.mjs
- * 21 Aug 2026 v2
+ * 02 Oct 2026 v3
+ *
+ * v3 - W4-1 GATE-OPEN. The fixture person has agreed (tools/agreed.mjs): the
+ *   app now sends anybody who has not back to onboarding. No assertion
+ *   changed.
  * GATE-PATH. Path resolution only -- no assertion changed.
  *
  * 18 Aug 2026 v1
@@ -26,6 +30,7 @@
 
 // GATE-PATH, 21 Aug 2026. jsdom resolved through Node rather than by
 // absolute path into one machine's node_modules.
+import { agreed } from "./agreed.mjs";
 import { createRequire as __cr } from "node:module";
 const __require = __cr(import.meta.url);
 import fs from 'node:fs';
@@ -66,7 +71,7 @@ const check = (n, ok, d = '') => {
 };
 
 localStorage.clear();
-store.init();
+store.init(); agreed(store);
 
 // ── It runs ──────────────────────────────────────────────────────────
 //

@@ -1,6 +1,10 @@
 /**
  * tools/verify-sleep1.mjs
- * 28 Sep 2026 v4
+ * 02 Oct 2026 v5
+ *
+ * v5 - W4-1 GATE-OPEN. The fixture person has agreed (tools/agreed.mjs): the
+ *   app now sends anybody who has not back to onboarding. No assertion
+ *   changed.
  *
  * v4 - Work list 2e. Checks 1-2 read workoutGenerator.js, which nothing
  *   had called since 6 Sep. SLEEP-1's rule -- the coach may mention sleep
@@ -46,6 +50,7 @@
 
 // GATE-PATH, 21 Aug 2026. jsdom resolved through Node rather than by
 // absolute path into one machine's node_modules.
+import { agreed } from "./agreed.mjs";
 import { createRequire as __cr } from "node:module";
 const __require = __cr(import.meta.url);
 import fs from 'node:fs';
@@ -120,7 +125,7 @@ const SettingsMod = await import(BASE + 'views/settings.js');
 
 const el = document.getElementById('main-content');
 localStorage.clear();
-store.init();
+store.init(); agreed(store);
 
 // The reflection section renders nothing without a primaryTerritory,
 // which is correct -- there is no reflection to show somebody who never

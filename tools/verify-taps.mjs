@@ -1,6 +1,10 @@
 /**
  * tools/verify-taps.mjs
- * 28 Sep 2026 v1
+ * 02 Oct 2026 v2
+ *
+ * v2 - W4-1 GATE-OPEN. The fixture person has agreed (tools/agreed.mjs): the
+ *   app now sends anybody who has not back to onboarding. No assertion
+ *   changed.
  *
  * SMOOTH-P3c. The Smooth Path's headline number (spec §0): taps from
  * Home to the first exercise on the coach route.
@@ -21,6 +25,7 @@
  * somebody who has told the app something is sore: four more taps (three
  * answers and Continue), once, and asserted as such.
  */
+import { agreed } from "./agreed.mjs";
 import { createRequire as __cr } from "node:module";
 const __require = __cr(import.meta.url);
 const { JSDOM } = __require("jsdom");
@@ -95,7 +100,7 @@ async function tapSel(sel) {
 }
 
 function fixture({ acks = 5, conditions = [] } = {}) {
-  localStorage.clear(); store.init();
+  localStorage.clear(); store.init(); agreed(store);
   gate.endGateSession();
   store.set("onboardingComplete", true); store.set("name", "Test"); store.set("tier", "personal");
   store.set("gymEquipment", ["dumbbells-medium", "bench-flat", "gym-membership"]); store.set("homeEquipment", []);

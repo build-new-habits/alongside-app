@@ -1,6 +1,11 @@
 /**
  * tools/verify-health-consent.mjs
- * 01 Oct 2026 v6
+ * 02 Oct 2026 v7
+ *
+ * v7 - W4-1 GATE-OPEN. 2h asserted the bypass itself: a fresh install that
+ *   had agreed to nothing reached the check-in. It now lands on onboarding,
+ *   which asks the age and both consents; never on this screen and never on
+ *   the check-in. Stricter, not loosened.
  *
  * v6 - LEGAL-TRUE 3. 3l: the day's intensity and lighter-day choice, both
  *   from check-in energy, go too.
@@ -156,7 +161,7 @@ click(main.querySelector("#hc-continue")); await wait(20);
 ok("2f. ticked: recorded, and on to the check-in", store.get("consent")?.health?.given === true && landed.includes("checkin"), JSON.stringify(landed));
 ok("2g. and not asked again", (await go("checkin")) === "checkin");
 fixture({ consent: false });
-ok("2h. REVERSAL: a fresh install before onboarding is not stopped here (onboarding asks)", (await go("checkin")) === "checkin");
+ok("2h. a fresh install that has agreed to nothing goes to onboarding (which asks), never the check-in", (await go("checkin")) === "onboarding/thread");
 
 // ── 3. DELETE MY HEALTH ANSWERS ─────────────────────────────────────────
 console.log("\nTEST 3 - Settings › Delete my health answers");

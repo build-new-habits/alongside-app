@@ -1,6 +1,10 @@
 /**
  * tools/verify-free-builder.mjs
- * 29 Sep 2026 v2
+ * 02 Oct 2026 v3
+ *
+ * v3 - W4-1 GATE-OPEN. The fixture person has agreed (tools/agreed.mjs): the
+ *   app now sends anybody who has not back to onboarding. No assertion
+ *   changed.
  *
  * v2 - P21. Let's go now opens the coach's player (workout), not the
  *   session screen (gym-programme): one player (W2-17). 1a and 4a name the
@@ -26,6 +30,7 @@
  *      play: the upgrade page, and Back leaves it -- no loop.
  *   4. The Plan is unchanged (control).
  */
+import { agreed } from "./agreed.mjs";
 import { createRequire as __cr } from "node:module";
 const __require = __cr(import.meta.url);
 const { JSDOM } = __require("jsdom");
@@ -66,7 +71,7 @@ const txt = el => (el?.textContent || "").replace(/\s+/g, " ").trim();
 const click = el => el?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true, cancelable: true }));
 
 function fixture(tier) {
-  localStorage.clear(); store.init();
+  localStorage.clear(); store.init(); agreed(store);
   gate.endGateSession();
   store.set("onboardingComplete", true); store.set("name", "Test"); store.set("tier", tier);
   store.set("equipment", ["dumbbells", "bench"]); store.set("homeEquipment", ["dumbbells", "bench"]);

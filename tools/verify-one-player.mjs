@@ -1,6 +1,10 @@
 /**
  * tools/verify-one-player.mjs
- * 29 Sep 2026 v1
+ * 02 Oct 2026 v2
+ *
+ * v2 - W4-1 GATE-OPEN. The fixture person has agreed (tools/agreed.mjs): the
+ *   app now sends anybody who has not back to onboarding. No assertion
+ *   changed.
  *
  * P21, PLAYERS (persona finding W2-17). Three players: the coach's (one
  * card per move) and an older one, four pages per move and 40+ taps a
@@ -22,6 +26,7 @@
  *   3. The machine swap came across: a busy treadmill can be swapped for
  *      another machine the person has, and the session keeps the change.
  */
+import { agreed } from "./agreed.mjs";
 import { createRequire as __cr } from "node:module";
 const __require = __cr(import.meta.url);
 const { JSDOM } = __require("jsdom");
@@ -62,7 +67,7 @@ const txt = el => (el?.textContent || "").replace(/\s+/g, " ").trim();
 const click = el => el?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true, cancelable: true }));
 
 function fixture(tier) {
-  localStorage.clear(); store.init();
+  localStorage.clear(); store.init(); agreed(store);
   gate.endGateSession();
   store.set("onboardingComplete", true); store.set("name", "Test"); store.set("tier", tier);
   store.set("equipment", ["dumbbells", "bench"]); store.set("homeEquipment", ["dumbbells", "bench"]);

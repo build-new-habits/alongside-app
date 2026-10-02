@@ -1,6 +1,11 @@
 /**
  * js/data/consent-version.js
- * 01 Oct 2026 v1
+ * 02 Oct 2026 v2
+ *
+ * v2 - W4-1 GATE-OPEN. Adult, but the Privacy Policy and Terms not yet
+ *   agreed: every route but the privacy summary goes back to onboarding,
+ *   which shows the consent screen. Settings is not open in this case (a
+ *   name typed there used to make start-up skip onboarding for good).
  *
  * CONSENT-VERSION. Which version of the Privacy Policy and Terms somebody
  * agreed to, and asking again when it changes.
@@ -38,7 +43,15 @@ export function consentUpdateNeeded() {
 let _pending = null;
 export function takePendingRoute() { const r = _pending; _pending = null; return r; }
 
+/** Adult, but nothing agreed yet. */
+export const consentNeeded = () => {
+  const c = store.get("consent") || {};
+  return c.ageConfirmed === true && c.given !== true;
+};
+const BEFORE_CONSENT_OPEN = new Set(["onboarding/thread", "privacy"]);
+
 export function guardRoute(route) {
+  if (consentNeeded()) return BEFORE_CONSENT_OPEN.has(route) ? null : "onboarding/thread";
   if (OPEN.has(route) || !consentUpdateNeeded()) return null;
   _pending = route;
   return "consent-update";

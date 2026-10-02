@@ -1,6 +1,10 @@
 /**
  * tools/verify-wellbeing-suggest.mjs
- * 28 Sep 2026 v1
+ * 02 Oct 2026 v2
+ *
+ * v2 - W4-1 GATE-OPEN. The fixture person has agreed (tools/agreed.mjs): the
+ *   app now sends anybody who has not back to onboarding. No assertion
+ *   changed.
  *
  * SMOOTH-P4b. Wellbeing. Spec 4.9.
  *
@@ -15,6 +19,7 @@
  * gate fills the journal with words a monitoring system would react to
  * and requires the suggestion to be byte-identical.
  */
+import { agreed } from "./agreed.mjs";
 import { createRequire as __cr } from "node:module";
 const __require = __cr(import.meta.url);
 const { JSDOM } = __require("jsdom");
@@ -60,7 +65,7 @@ router._mountView = async name => {
 
 function fixture({ checkin = null, journal = [] } = {}) {
   BS.onUnmount?.();
-  localStorage.clear(); store.init();
+  localStorage.clear(); store.init(); agreed(store);
   store.set("onboardingComplete", true); store.set("tier", "personal"); store.set("name", "Test");
   store.set("safetyAckLog", Array.from({ length: 5 }, () => ({ at: new Date().toISOString(), textVersion: HURT_AND_ACHE_VERSION, surface: "fixture" })));
   if (checkin) store.set("checkinHistory", { [new Date().toISOString().split("T")[0]]: checkin });

@@ -1,6 +1,10 @@
 /**
  * tools/verify-s1-seated.mjs
- * 30 Sep 2026 v2
+ * 02 Oct 2026 v3
+ *
+ * v3 - W4-1 GATE-OPEN. The fixture person has agreed (tools/agreed.mjs): the
+ *   app now sends anybody who has not back to onboarding. No assertion
+ *   changed.
  *
  * v2 - W3-0 (Wave 3, persona 2.11). v1 counted a step's seatedAlternativeId
  *   as its seated version -- but nothing in js/views reads that field, so
@@ -31,6 +35,7 @@
  *   2. The real class list, through the router, says "can be done
  *      seated" exactly there, on the line and in the Start button's name.
  */
+import { agreed } from "./agreed.mjs";
 import { createRequire as __cr } from "node:module";
 const __require = __cr(import.meta.url);
 const { JSDOM } = __require("jsdom");
@@ -71,7 +76,7 @@ const txt = el => (el?.textContent || "").replace(/\s+/g, " ").trim();
 const click = el => el?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true, cancelable: true }));
 
 function fixture(tier) {
-  localStorage.clear(); store.init();
+  localStorage.clear(); store.init(); agreed(store);
   gate.endGateSession();
   store.set("onboardingComplete", true); store.set("name", "Test"); store.set("tier", tier);
   store.set("equipment", ["dumbbells", "bench"]); store.set("homeEquipment", ["dumbbells", "bench"]);

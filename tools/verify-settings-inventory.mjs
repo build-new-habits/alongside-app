@@ -1,6 +1,10 @@
 /**
  * tools/verify-settings-inventory.mjs
- * 01 Oct 2026 v6
+ * 02 Oct 2026 v7
+ *
+ * v7 - W4-1 GATE-OPEN. The fixture person has agreed (tools/agreed.mjs): the
+ *   app now sends anybody who has not back to onboarding. No assertion
+ *   changed.
  *
  * v6 - B2 RESTORE-LOCK. Download your data opens a dialog first (an optional
  *   password); 5b presses Save the file with none. Assertions unchanged.
@@ -44,6 +48,7 @@
  *
  * Driven through the real SettingsView and the real store.
  */
+import { agreed } from "./agreed.mjs";
 import { createRequire as __cr } from "node:module";
 const __require = __cr(import.meta.url);
 const { JSDOM } = __require("jsdom");
@@ -79,7 +84,7 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
 let navs = [];
 
 function fixture({ tier = "personal" } = {}) {
-  localStorage.clear(); store.init();
+  localStorage.clear(); store.init(); agreed(store);
   store.set("onboardingComplete", true); store.set("tier", tier); store.set("name", "T");
   store.set("weightTracking", true); store.set("checkInNotification.enabled", true);
   store.setExercisePreference("barbell-bench-press", "less");

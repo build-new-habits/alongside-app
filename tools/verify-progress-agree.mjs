@@ -1,6 +1,10 @@
 /**
  * tools/verify-progress-agree.mjs
- * 30 Sep 2026 v3
+ * 02 Oct 2026 v4
+ *
+ * v4 - W4-1 GATE-OPEN. The fixture person has agreed (tools/agreed.mjs): the
+ *   app now sends anybody who has not back to onboarding. No assertion
+ *   changed.
  *
  * v3 - W3-20 TRUE-WORDS. 1d protects that the coach line agrees with the count.
  *   It also required ", mostly", which is now said only when one kind is
@@ -29,6 +33,7 @@
  * the scan catches it); no weight card unless weight tracking is on; a
  * strand is never shown with a count.
  */
+import { agreed } from "./agreed.mjs";
 import { createRequire as __cr } from "node:module";
 const __require = __cr(import.meta.url);
 const { JSDOM } = __require("jsdom");
@@ -77,7 +82,7 @@ const LOG = [
 ];
 
 function fixture({ tier = "personal", weightTracking = false, arc = null, history = {}, conditions = [], meta = {}, liftLog = {} } = {}) {
-  localStorage.clear(); store.init();
+  localStorage.clear(); store.init(); agreed(store);
   store.set("onboardingComplete", true); store.set("tier", tier); store.set("name", "Test");
   store.set("activityLog", LOG);
   store.set("weightTracking", weightTracking);

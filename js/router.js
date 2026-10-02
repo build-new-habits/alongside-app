@@ -1,6 +1,13 @@
 /**
  * router.js
- * 01 Oct 2026 v39
+ * 02 Oct 2026 v40
+ *
+ * v40 - W4-1 GATE-OPEN. No house button ("Back to Today") on onboarding,
+ *   the age question, the under-18 screen or the policy screen. On a fresh
+ *   install it opened the whole app with nothing asked; on the other two it
+ *   went nowhere. Leaving those screens is by answering them. The guards in
+ *   data/age-check.js and data/consent-version.js now also cover a person
+ *   who has agreed to nothing.
  *
  * v39 - CONSENT-VERSION. 'consent-update': somebody who agreed to an older
  *   Privacy Policy and Terms is asked to agree to the current one before
@@ -441,6 +448,9 @@ const hideNavViews = new Set([
   'capture',
 ]);
 
+// W4-1 GATE-OPEN. Screens left only by answering them: no house button.
+const NO_EXIT_VIEWS = new Set(['onboarding/thread', 'age-check', 'under-18', 'consent-update']);
+
 const NAV_MAP = {
   'today': 'today', 'checkin': 'today', 'checkin-mini': 'today',
   'coach-proposal': 'today', 'red-flag': 'today', 'health-consent': 'today', 'age-check': 'today', 'under-18': 'today', 'consent-update': 'today',
@@ -637,7 +647,7 @@ export const router = {
     // pure visibility toggling, click handling lives in app.js.
     const escapeBtn = document.getElementById('hidden-nav-home-btn');
     if (escapeBtn) {
-      if (hideNavViews.has(viewName)) {
+      if (hideNavViews.has(viewName) && !NO_EXIT_VIEWS.has(viewName)) {
         escapeBtn.classList.remove('hidden');
       } else {
         escapeBtn.classList.add('hidden');

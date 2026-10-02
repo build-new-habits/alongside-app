@@ -1,6 +1,10 @@
 /**
  * js/data/health-consent.js
- * 01 Oct 2026 v2
+ * 02 Oct 2026 v3
+ *
+ * v3 - W4-1 GATE-OPEN. Never asked now means needed, whether or not the
+ *   Privacy-and-Terms consent was given. Before, a person who had agreed to
+ *   nothing (the house-button bypass) had health answers allowed.
  *
  * v2 - LEGAL-TRUE. The tick names what the app keeps about the person's body
  *   and how they have been (balance, standing, what they are coming back
@@ -50,9 +54,7 @@ export const HEALTH_ROUTES = new Set(["checkin", "checkin-mini", "know-what", "j
 export function healthConsentNeeded() {
   const c = store.get("consent") || {};
   const given = c.health ? c.health.given : null;
-  if (given === true)  return false;
-  if (given === false) return true;
-  return c.given === true;
+  return given !== true;
 }
 
 export const healthAllowed = () => !healthConsentNeeded();

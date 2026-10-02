@@ -1,6 +1,10 @@
 /**
  * tools/verify-finish.mjs
- * 30 Sep 2026 v2
+ * 02 Oct 2026 v3
+ *
+ * v3 - W4-1 GATE-OPEN. The fixture person has agreed (tools/agreed.mjs): the
+ *   app now sends anybody who has not back to onboarding. No assertion
+ *   changed.
  *
  * v2 - W3-4 SORE-SCOPE (Schema v1.82). The pain question is asked only
  *   when something is sore today, so test 3's fixture scores its listed
@@ -22,6 +26,7 @@
  *
  * Driven through the real workout view into the real reflect view.
  */
+import { agreed } from "./agreed.mjs";
 import { createRequire as __cr } from "node:module";
 const __require = __cr(import.meta.url);
 const { JSDOM } = __require("jsdom");
@@ -68,7 +73,7 @@ const EX = (id, name) => ({ id, name, section: "main", role: "main", category: "
 
 function session({ conditions = [], finish = true, soreToday = false } = {}) {
   if (document.querySelector("#exit-workout-btn")) { tap("#exit-workout-btn"); document.querySelector("#exit-confirm-discard")?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true })); }
-  localStorage.clear(); store.init();
+  localStorage.clear(); store.init(); agreed(store);
   store.set("safetyAckLog", Array.from({ length: 5 }, () => ({ at: new Date().toISOString(), textVersion: HURT_AND_ACHE_VERSION, surface: "fixture" })));
   store.set("tier", "personal"); store.set("onboardingComplete", true); store.set("conditions", conditions);
   store.set("lastCheckin", { mood: 6, energy: 6, timestamp: new Date().toISOString() });

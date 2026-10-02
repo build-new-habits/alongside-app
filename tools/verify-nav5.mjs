@@ -1,6 +1,10 @@
 /**
  * tools/verify-nav5.mjs
- * 01 Oct 2026 v3
+ * 02 Oct 2026 v4
+ *
+ * v4 - W4-1 GATE-OPEN. The fixture person has agreed (tools/agreed.mjs): the
+ *   app now sends anybody who has not back to onboarding. No assertion
+ *   changed.
  *
  * v3 - PT-3. The reminder switch is retired; staying on the page after a
  *   switch is proved with Show your best instead (it does not repaint,
@@ -32,6 +36,7 @@
  * His grouping, agreed in conversation: "we divide into app controls,
  * about, and settings."
  */
+import { agreed } from "./agreed.mjs";
 import fs from "node:fs";
 
 // GATE-PATH, 08 Sep 2026. Paths resolved from import.meta.url, not the
@@ -67,7 +72,7 @@ const { SettingsView } = await import(new URL("../js/views/settings.js", import.
 const main = document.getElementById("main-content");
 const txt = el => (el?.textContent || "").replace(/\s+/g, " ").trim();
 const click = el => el?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }));
-localStorage.clear(); store.init(); store.set("tier", "personal"); store.set("onboardingComplete", true);
+localStorage.clear(); store.init(); agreed(store); store.set("tier", "personal"); store.set("onboardingComplete", true);
 const page = () => { main.innerHTML = ""; SettingsView({ navigate() {}, back() {} }).mount(main); };
 
 console.log("\nTEST 1 - what Graeme could not find is named on the page");

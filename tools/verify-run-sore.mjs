@@ -1,6 +1,10 @@
 /**
  * tools/verify-run-sore.mjs
- * 30 Sep 2026 v1
+ * 02 Oct 2026 v2
+ *
+ * v2 - W4-1 GATE-OPEN. The fixture person has agreed (tools/agreed.mjs): the
+ *   app now sends anybody who has not back to onboarding. No assertion
+ *   changed.
  *
  * W3-2 RUN-SORE (Wave 3, persona 2.1). The Run door is the one door a
  * runner uses, and it did not know today:
@@ -22,6 +26,7 @@
  *   3. No push-through line and no named condition in the Run door.
  *   4. Control: nothing sore, three run types, no question.
  */
+import { agreed } from "./agreed.mjs";
 import { createRequire as __cr } from "node:module";
 const __require = __cr(import.meta.url);
 const { JSDOM } = __require("jsdom");
@@ -63,7 +68,7 @@ const txt = el => (el?.textContent || "").replace(/\s+/g, " ").trim();
 const click = el => el?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true, cancelable: true }));
 
 function fixture(tier, conditions = [], scores = {}) {
-  localStorage.clear(); store.init();
+  localStorage.clear(); store.init(); agreed(store);
   gate.endGateSession();
   store.set("onboardingComplete", true); store.set("name", "Test"); store.set("tier", tier);
   store.set("equipment", ["dumbbells", "bench"]); store.set("homeEquipment", ["dumbbells", "bench"]);

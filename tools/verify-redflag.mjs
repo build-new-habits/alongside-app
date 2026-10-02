@@ -1,6 +1,10 @@
 /**
  * tools/verify-redflag.mjs
- * 29 Sep 2026 v3
+ * 02 Oct 2026 v4
+ *
+ * v4 - W4-1 GATE-OPEN. The fixture person has agreed (tools/agreed.mjs): the
+ *   app now sends anybody who has not back to onboarding. No assertion
+ *   changed.
  *
  * v3 - P0. 1d: fibromyalgia is retired; a scored id that is not a body area is never asked the spinal questions.
  *
@@ -23,6 +27,7 @@
  * question 1 = yes and only that, the unconditional emergency line in
  * both messages.
  */
+import { agreed } from "./agreed.mjs";
 import { createRequire as __cr } from "node:module";
 const __require = __cr(import.meta.url);
 const { JSDOM } = __require("jsdom");
@@ -61,7 +66,7 @@ router._mountView = async name => {
 const go = async r => { landed = []; await router.navigate(r); return landed.at(-1); };
 
 function fixture({ conditions = [], scores = {} } = {}) {
-  localStorage.clear(); store.init();
+  localStorage.clear(); store.init(); agreed(store);
   store.set("onboardingComplete", true); store.set("tier", "personal");
   store.set("conditions", conditions); store.set("conditionPainScores", scores);
   RF.takePendingRoute();

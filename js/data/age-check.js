@@ -1,6 +1,11 @@
 /**
  * js/data/age-check.js
- * 01 Oct 2026 v2
+ * 02 Oct 2026 v3
+ *
+ * v3 - W4-1 GATE-OPEN. A fresh install that has answered nothing goes to
+ *   onboarding from every route but the privacy summary. Before this the
+ *   guard acted only once consent was given, so the house button on the age
+ *   question opened the whole app with nothing asked (Wave 4 trace, 01 Oct).
  *
  * v2 - LEGAL-TRUE. Under 18 clears every key the app keeps on the phone
  *   (store.resetEverything), not only the store.
@@ -79,9 +84,18 @@ export function takePendingRoute() { const r = _pending; _pending = null; return
 
 const ALWAYS_OPEN = new Set(["under-18", "privacy"]);
 
+/** Nothing answered yet: a fresh install, before the age question. */
+export const nothingAnswered = () =>
+  _c().given !== true && _c().ageConfirmed !== true && _c().ageConfirmed !== false;
+
+// W4-1. Before the age question, only onboarding (which asks it first) and
+// the privacy summary it links to.
+const FIRST_OPEN = new Set(["onboarding/thread", "privacy"]);
+
 /** Router guard: 'under-18' or 'age-check' in place of the route, or null. */
 export function guardRoute(route) {
   if (declaredUnder18()) return ALWAYS_OPEN.has(route) ? null : "under-18";
+  if (nothingAnswered()) return FIRST_OPEN.has(route) ? null : "onboarding/thread";
   if (ageNeeded() && !ALWAYS_OPEN.has(route) && route !== "age-check") {
     _pending = route;
     return "age-check";

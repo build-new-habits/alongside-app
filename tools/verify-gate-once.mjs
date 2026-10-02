@@ -1,6 +1,10 @@
 /**
  * tools/verify-gate-once.mjs
- * 28 Sep 2026 v1
+ * 02 Oct 2026 v2
+ *
+ * v2 - W4-1 GATE-OPEN. The fixture person has agreed (tools/agreed.mjs): the
+ *   app now sends anybody who has not back to onboarding. No assertion
+ *   changed.
  *
  * SMOOTH-P0 F1, GATE-LOOP. The safety note is read once per session.
  *
@@ -24,6 +28,7 @@
  * This gate drives attachSafetyGate() -- the code every view uses -- and
  * the real router, never a copy of either.
  */
+import { agreed } from "./agreed.mjs";
 import { createRequire as __cr } from "node:module";
 const __require = __cr(import.meta.url);
 const { JSDOM } = __require("jsdom");
@@ -72,7 +77,7 @@ function acknowledgeLikeAView(surface) {
 }
 
 function fresh() {
-  localStorage.clear(); store.init();
+  localStorage.clear(); store.init(); agreed(store);
   if (typeof gate.endGateSession === "function") gate.endGateSession();
 }
 

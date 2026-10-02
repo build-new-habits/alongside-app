@@ -1,6 +1,10 @@
 /**
  * tools/verify-free-classes.mjs
- * 30 Sep 2026 v3
+ * 02 Oct 2026 v4
+ *
+ * v4 - W4-1 GATE-OPEN. The fixture person has agreed (tools/agreed.mjs): the
+ *   app now sends anybody who has not back to onboarding. No assertion
+ *   changed.
  *
  * v3 - W3-0. 2b's "both" example is Putting the Day Down (mixed): Getting
  *   Going no longer says seated (verify-s1-seated v2), so three classes do.
@@ -33,6 +37,7 @@
  *      field that does not exist, so a severe score (a knee at 8) never
  *      held a class back. It reads conditionPainScores now.
  */
+import { agreed } from "./agreed.mjs";
 import { createRequire as __cr } from "node:module";
 const __require = __cr(import.meta.url);
 const { JSDOM } = __require("jsdom");
@@ -73,7 +78,7 @@ const txt = el => (el?.textContent || "").replace(/\s+/g, " ").trim();
 const click = el => el?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true, cancelable: true }));
 
 function fixture(tier) {
-  localStorage.clear(); store.init();
+  localStorage.clear(); store.init(); agreed(store);
   gate.endGateSession();
   store.set("onboardingComplete", true); store.set("name", "Test"); store.set("tier", tier);
   store.set("equipment", ["dumbbells", "bench"]); store.set("homeEquipment", ["dumbbells", "bench"]);

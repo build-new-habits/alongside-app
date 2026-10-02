@@ -1,6 +1,13 @@
 /**
  * app.js - Application entry point
- * 01 Oct 2026 v9
+ * 02 Oct 2026 v10
+ *
+ * v10 - W4-1 GATE-OPEN. The first screen is Home only once onboarding is
+ *   finished. A stored name no longer counts: typing a name at the first
+ *   coach question (or in Settings after the house-button bypass) and
+ *   closing the app used to skip the rest of onboarding, the age question
+ *   and the consents for good. The schema migration the name check covered
+ *   (Aug 2026) no longer resets onboardingComplete.
  *
  * v9 - B3 DOMAIN. The service worker is registered relative ("./sw.js",
  *   scope "./"), so the app runs unchanged at either address.
@@ -176,17 +183,11 @@ const App = {
 
     console.log("Alongside ready");
 
-    // Routing logic:
-    //   Existing user (onboardingComplete OR has a name stored): → today
-    //   New install: → onboarding/thread
-    //
-    // The hasName check handles the edge case where a user completed the old
-    // multi-screen onboarding but onboardingComplete was reset by a schema
-    // migration. They should not see the thread again.
+    // Routing logic (W4-1, 02 Oct 2026): Home once onboarding is finished,
+    // otherwise onboarding. The guards in the router send anybody who has not
+    // answered the age question or agreed to the policies back to it.
     const isOnboarded    = store.get('onboardingComplete') === true;
-    const hasName        = !!(store.get('name'));
-    const isExistingUser = isOnboarded || hasName;
-    const firstView      = isExistingUser ? 'today' : 'onboarding/thread';
+    const firstView      = isOnboarded ? 'today' : 'onboarding/thread';
 
     await router.navigate(firstView);
 
