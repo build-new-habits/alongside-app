@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 02 Oct 2026 v630
+ * 02 Oct 2026 v631
  *
+ * v631 - W4-10/W4-11/W4-12: tiredness and stress are said apart from the sore areas, and no promise the app cannot keep; "this week" means the last seven days; research figures true (weeks passed, stopped sessions out, kinds from the session), the survey waits for some use, and the privacy screens name it.
  * v630 - W4-7/W4-8/W4-9: one meaning of A little, Quite sore and Bad at every door, one true sentence about a sore area; Bad-day words and minutes true, Something gentle after all; no pain numbers, no pain record kept with sessions.
  * v629 - W4-4/W4-5/W4-14: leg swings and the step-down count as balance work; pinch-zoom allowed; a new version waits for Update and never reloads mid-session (no skipWaiting on install).
  * v628 - W4-3/W4-6: Restore keeps this phone's Plan, News and display settings, makes text harmless instead of refusing a file, shows its result on the page, and is offered on a new phone after the two consents. NEW FILE precached: js/views/restore-flow.js.
@@ -4177,7 +4178,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v630";
+const CACHE_NAME = "alongside-v631";
 
 const SHELL_URLS = [
 
