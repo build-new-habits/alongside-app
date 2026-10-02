@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 02 Oct 2026 v628
+ * 02 Oct 2026 v629
  *
+ * v629 - W4-4/W4-5/W4-14: leg swings and the step-down count as balance work; pinch-zoom allowed; a new version waits for Update and never reloads mid-session (no skipWaiting on install).
  * v628 - W4-3/W4-6: Restore keeps this phone's Plan, News and display settings, makes text harmless instead of refusing a file, shows its result on the page, and is offered on a new phone after the two consents. NEW FILE precached: js/views/restore-flow.js.
  * v627 - W4-2/W4-15: after Delete my health answers, sessions are planned carefully and the body questions are asked again; no notes kept without health consent.
  * v626 - W4-0/W4-1: no way into the app before the age question and both consents; no house button on those screens; checks pinned to jsdom 28.1.0.
@@ -4175,7 +4176,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v628";
+const CACHE_NAME = "alongside-v629";
 
 const SHELL_URLS = [
 
@@ -4505,9 +4506,11 @@ self.addEventListener("install", event => {
             })
         )
       );
-    }).then(() => {
-      return self.skipWaiting();
     })
+    // W4-14, 02 Oct 2026. No skipWaiting() here. A new version waits until
+    // the person presses Update (the page posts SKIP_WAITING, handled
+    // above) or closes the app. Taking over on install reloaded the app in
+    // the middle of whatever somebody was doing. verify-update-hold.
   );
 });
 
