@@ -1,6 +1,12 @@
 /**
  * settings.js
- * 01 Oct 2026 v55
+ * 02 Oct 2026 v56
+ *
+ * v56 - W4-2 / W4-15. Delete my health answers says what careful means
+ *   (seated, nothing on the floor, no balance work, nothing with impact),
+ *   names the reflection, and says goals stay. After the health consent is
+ *   given again, the next built session opens What your body can do first,
+ *   with one line saying why and Carry on (data/health-consent.js).
  *
  * v55 - Your plan, on Free: "no contract either way" removed (the Terms are a
  *   contract; the upgrade page lost it on 01 Oct); says the Plan is free in the
@@ -628,7 +634,7 @@ import { EXERCISES } from '../data/exercises/index.js';
 import { CONDITIONS } from '../data/conditions.js';
 import { scopeStatementHTML } from '../data/scope-statement.js';
 import { aimById } from '../data/aims.js';
-import { healthAllowed, healthConsentNeeded, setPendingRoute } from '../data/health-consent.js';
+import { healthAllowed, healthConsentNeeded, setPendingRoute, takeOpenCapability, takePendingRoute } from '../data/health-consent.js';
 import { readRestoreFile, applyRestore, describeDate } from '../data/restore.js';
 import { lockText, unlockText, isLocked, passwordProblem, lockAvailable } from '../data/file-lock.js';
 import { visibleMessages, hasUnread, markAllRead, dismissMessage, updateNavDot } from '../data/messages.js';
@@ -677,6 +683,7 @@ export function SettingsView(router) {
   // SMOOTH-P4c. null = the one page; otherwise the row screen open.
   let activeScreen = null;
   let focusAfter   = null;    // selector to focus after the next render
+  let askingAgain  = false;   // W4-2: opened by the router to ask the body questions again
 
   // v11 — My Movement rebuild. Matches store.js's movementIdentity
   // string[] values. "mixed" is handled separately, below, since it's
@@ -693,6 +700,8 @@ export function SettingsView(router) {
   // ── Mount ──────────────────────────────────────────────────────────────────
 
   function mount(container) {
+    // W4-2. Sent here before a built session, after Delete and re-consent.
+    if (takeOpenCapability()) { activeScreen = 'capability'; askingAgain = true; focusAfter = '.settings-title'; }
     render(container);
   }
 
@@ -741,7 +750,7 @@ export function SettingsView(router) {
     movement:     { title: 'How you move',            render: () => `<div class="settings-section">${renderMovementSection()}</div>` },
     conditions:   { title: 'Sore or injured areas', render: () => renderConditionsPanel() },
     equipment:    { title: 'Equipment',               render: () => renderEquipmentPanel() },
-    capability:   { title: 'What your body can do',   render: () => `<div class="settings-section">${renderCapabilitySection()}</div>` },
+    capability:   { title: 'What your body can do',   render: () => `${askingAgain ? _askAgainNote() : ''}<div class="settings-section">${renderCapabilitySection()}</div>` },
     preferences:  { title: 'How sessions are built',  render: () => `<div class="settings-section">${renderPreferencesSection()}</div>` },
     reflection:   { title: 'Your reflection',         render: () => `<div class="settings-section">${renderReflectionSection()}</div>` },
     programme:    { title: 'Goals and your week',     render: () => renderProgrammePanel() },
@@ -753,6 +762,16 @@ export function SettingsView(router) {
     'about-app':  { title: 'The app',                 render: () => renderPanel('about-app') },
     'about-data': { title: 'How your data is kept',   render: () => renderPanel('about-data') },
   };
+
+  // W4-2. Why this screen opened by itself, and the way on.
+  function _askAgainNote() {
+    return `
+      <div class="settings-section settings-capability__again">
+        <p class="settings-section__sub">Before I plan your next session: you deleted these answers, so I have been planning carefully. Tell me what your body can do, then carry on.</p>
+        <button class="btn btn-primary btn-full" id="settings-cap-carry-on">Carry on</button>
+        <p class="settings-section__sub" id="settings-cap-carry-on-msg" role="status" aria-live="polite"></p>
+      </div>`;
+  }
 
   const _label = (list, id, fallback) => (list.find(x => x.id === id) || {}).label || fallback;
 
@@ -2392,7 +2411,18 @@ export function SettingsView(router) {
     container.querySelectorAll('[data-go]').forEach(btn => {
       btn.addEventListener('click', () => router.navigate(btn.dataset.go));
     });
+    // W4-2. Carry on to the session they were going to, once answered.
+    document.getElementById('settings-cap-carry-on')?.addEventListener('click', () => {
+      if (!store.get('capability.askedAt')) {
+        const msg = document.getElementById('settings-cap-carry-on-msg');
+        if (msg) msg.textContent = 'Answer at least one question first, or use Settings to come back to this later.';
+        return;
+      }
+      askingAgain = false;
+      router.navigate(takePendingRoute() || 'today');
+    });
     document.getElementById('settings-back-btn')?.addEventListener('click', () => {
+      askingAgain = false;
       const from = activeScreen;
       activeScreen = null;
       focusAfter = `[data-open="${from}"]`;
@@ -2776,7 +2806,7 @@ export function SettingsView(router) {
       case 'delete-health':
         _confirmDestructive(
           'Delete my health answers',
-          'This deletes your check-ins, your sore areas and how sore they were, what you told me about your body and how you have been, your weight and any target weight, your journal, and the notes and mood from your sessions and lifts. Your sessions, lifts and settings stay. Until you tell me again, I will plan as cautiously as I can. It cannot be undone. I will ask before keeping anything like this again.',
+          'This deletes your check-ins, your sore areas and how sore they were, what you told me about your body and how you have been, your reflection on what made exercise hard before, your weight and any target weight, your journal, and the notes and mood from your sessions and lifts. Your sessions, lifts, goals and settings stay. Until you tell me what your body can do again, I will plan carefully: seated, nothing on the floor, no balance work and nothing with impact. I will ask before keeping anything like this again, and then ask about your body before your next session. It cannot be undone.',
           () => {
             store.deleteHealthAnswers();
             render(container);

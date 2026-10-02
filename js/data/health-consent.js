@@ -1,6 +1,11 @@
 /**
  * js/data/health-consent.js
- * 02 Oct 2026 v3
+ * 02 Oct 2026 v4
+ *
+ * v4 - W4-2 DELETE-LOOSENS. After Delete my health answers and the health
+ *   consent given again, the next door that builds a session opens
+ *   Settings › What your body can do first (capabilityToAsk). Until then
+ *   sessions are planned carefully (store.capabilityProfile()).
  *
  * v3 - W4-1 GATE-OPEN. Never asked now means needed, whether or not the
  *   Privacy-and-Terms consent was given. Before, a person who had agreed to
@@ -69,8 +74,28 @@ let _pendingRoute = null;
 export function setPendingRoute(r) { _pendingRoute = r; }
 export function takePendingRoute() { const r = _pendingRoute; _pendingRoute = null; return r; }
 
+// W4-2. Doors that build a session from what the person can do.
+export const BUILD_ROUTES = new Set([
+  "coach-proposal", "session-builder", "know-what", "core-session", "gym-programme", "yoga-session",
+]);
+
+/** Answers deleted, consent given again, not answered yet. */
+export function capabilityToAsk() {
+  const cap = store.get("capability") || {};
+  return !!cap.clearedAt && !cap.askedAt && healthAllowed();
+}
+
+let _openCapability = false;
+/** Settings reads this once: open What your body can do, and say why. */
+export function takeOpenCapability() { const v = _openCapability; _openCapability = false; return v; }
+
 /** Router guard: 'health-consent' in place of a health route, or null. */
 export function guardRoute(route) {
+  if (BUILD_ROUTES.has(route) && capabilityToAsk()) {
+    _pendingRoute = route;
+    _openCapability = true;
+    return "settings";
+  }
   if (!HEALTH_ROUTES.has(route)) return null;
   if (!healthConsentNeeded()) return null;
   _pendingRoute = route;

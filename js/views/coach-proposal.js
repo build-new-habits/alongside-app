@@ -1,6 +1,10 @@
 /**
  * coach-proposal.js
- * 30 Sep 2026 v44
+ * 02 Oct 2026 v45
+ *
+ * v45 - W4-15 DELETE-TRUE. "Let me tell you" (after time away injured)
+ *   opens the sore-areas sheet only with the health consent; without it,
+ *   the health consent screen first, then back to this plan.
  *
  * v44 - W3-21 NAV-SMALL (Wave 3, personas 2.4, 2.13, 2.15, 2.16).
  *   Length and Where open a list and one tap picks (Length cycled
@@ -698,6 +702,7 @@
  */
 
 import { store }             from '../store.js';
+import { healthConsentNeeded, setPendingRoute } from '../data/health-consent.js';
 // ARC-VISIBLE, 16 Sep 2026. Same source today.js reads for "What it's
 // made of", so the proposal names the arc in the words the person
 // already sees on Home rather than a second vocabulary.
@@ -2050,6 +2055,8 @@ export function CoachProposalView(router) {
     container.querySelectorAll('[data-hurts]').forEach(btn => {
       btn.addEventListener('click', () => {
         if (btn.dataset.hurts === 'tell') {
+          // W4-15. Sore areas are health answers: ask first if not given.
+          if (healthConsentNeeded()) { setPendingRoute('coach-proposal'); router.navigate('health-consent'); return; }
           // P0 (29 Sep): the sore-areas sheet, not the retired
           // conditions-update screen. The plan is rebuilt with what they said.
           openSheet('onboarding/conditions', () => {

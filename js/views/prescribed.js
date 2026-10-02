@@ -1,7 +1,11 @@
 /**
  * prescribed.js - My exercises
  *
- * 01 Oct 2026 v1.6
+ * 02 Oct 2026 v1.7
+ *
+ * v1.7 - W4-15 DELETE-TRUE. No Notes box, and no notes kept, while the
+ *   health consent is not given: notes on an exercise are often about an
+ *   injury, and Delete my health answers removes them.
  *
  * v1.6 - BUNDLE-TRUE. Names, notes and who-prescribed are escaped wherever
  *   they are written into the page. A name typed with a quotation mark broke
@@ -78,6 +82,7 @@
  */
 
 import { store } from "../store.js";
+import { healthAllowed } from "../data/health-consent.js";
 
 export const centered = false;
 
@@ -415,6 +420,7 @@ function renderAddForm() {
         </div>
       </div>
 
+      ${healthAllowed() ? `
       <div class="form-field">
         <label class="form-label" for="px-notes">Notes</label>
         <textarea
@@ -423,7 +429,7 @@ function renderAddForm() {
           rows="2"
           placeholder="Instructions, what to watch for, how it should feel..."
         ></textarea>
-      </div>
+      </div>` : ""}
 
 
       <p class="form-required-note text-sm text-muted">
@@ -512,7 +518,7 @@ function saveExercise() {
 
   const sets        = setsEl?.value        ? parseInt(setsEl.value)         : null;
   const reps        = repsEl?.value?.trim()         || null;
-  const notes       = notesEl?.value?.trim()        || null;
+  const notes       = healthAllowed() ? (notesEl?.value?.trim() || null) : null;
 
   const exercise = {
     id:             "px-" + Date.now(),

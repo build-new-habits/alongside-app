@@ -1,6 +1,10 @@
 /**
  * js/session-log.js
- * 30 Sep 2026 v9
+ * 02 Oct 2026 v10
+ *
+ * v10 - W4-15 DELETE-TRUE. No Note box while the health consent is not
+ *   given: a note is often about how a body part felt, and store.logLift()
+ *   no longer keeps one then. The numbers are offered and kept as before.
  *
  * v9 - W3-15 CAPTURE-REPS (persona Wave 3, 2.4). performanceFields()
  *   read "has a duration" as "is a hold", and almost every move carries a
@@ -106,6 +110,7 @@
  */
 
 import { store } from "./store.js";
+import { healthAllowed } from "./data/health-consent.js";
 // R4, 20 Aug 2026. The isPremium import is REMOVED. bestLine() gated on
 // tier; a personal best is a fact about the person's own log, and free
 // already includes lift notes and recall. Decision 7.1, revenue
@@ -323,7 +328,8 @@ export function renderLogBlock(exercise, idPrefix = "slog", mode) {
   if (store.get("liftLogEnabled") !== true) return "";
   if (!exercise?.id) return "";
 
-  const fields = performanceFields(exercise, mode);
+  // W4-15. No note box without the health consent (store.logLift drops it).
+  const fields = performanceFields(exercise, mode).filter(f => f.key !== "note" || healthAllowed());
   // SMOOTH-P2c. Where they left off. Numbers only -- see the header.
   const last = store.lastLift(exercise.id) || {};
   const prefill = f => (f.type === "number" && typeof last[f.key] === "number") ? ` value="${last[f.key]}"` : "";
