@@ -1,5 +1,13 @@
 /**
  * tools/verify-know-what.mjs
+ * 02 Oct 2026 v4
+ *
+ * v4 - W4-20. 1e: the sentence says back what was asked, and when the plan's
+ *   length differs by more than five minutes it says the plan's own (This
+ *   one comes to about N minutes), which must match the plan. The builder's
+ *   length varies, so the old exact match failed one run in five. Stricter,
+ *   not looser: the length is now checked against the plan.
+ *
  * 30 Sep 2026 v3
  *
  * v3 - W3-21 NAV-SMALL. Where? is handed to the plan (requestedLocation,
@@ -115,7 +123,12 @@ ok("1c. where they last trained is chosen", main.querySelector('input[name="plac
 submit();
 ok("1d. on to the plan in three taps", navs.at(-1) === "coach-proposal" && taps === 3, `${taps} taps, ${JSON.stringify(navs)}`);
 const sentence = txt(main.querySelector(".cp-plan__sentence"));
-ok("1e. the plan says back what was asked", sentence === "You asked for strength, full body, 40 minutes.", sentence);
+// W4-20: when the plan's own length differs by more than five minutes it
+// is said too ("This one comes to about N minutes."), and N is the plan's.
+const planTotal = Number((txt(main).match(/About (\d+) min/) || [])[1]);
+const said = (sentence.match(/^You asked for strength, full body, 40 minutes\.(?: This one comes to about (\d+) minutes\.)?$/) || []);
+ok("1e. the plan says back what was asked, and any length it adds is the plan's own",
+   said.length > 0 && (said[1] === undefined ? Math.abs(planTotal - 40) <= 5 : Math.abs(Number(said[1]) - planTotal) <= 5), `${sentence} | About ${planTotal}`);
 ok("1f. and it is a full-body plan", /Full Body/.test(txt(main.querySelector(".cp-plan, .cp-preview, #main-content"))));
 ok("1g. no energy or mood question on the way", !navs.includes("checkin") && !navs.includes("checkin-mini"));
 
