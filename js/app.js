@@ -1,6 +1,14 @@
 /**
  * app.js - Application entry point
- * 02 Oct 2026 v10
+ * 02 Oct 2026 v11
+ *
+ * v11 - W4-14 UPDATE-RELOAD (Wave 4 trace, 2.14). The page reloads for a
+ *   new version only when the person pressed Update. It used to reload on
+ *   every change of service worker, and the worker took over on install,
+ *   so a new version reloaded the app mid-session and Later could not
+ *   hold. The banner also waits while a session, check-in, journal entry or
+ *   getting started is on screen, and shows once they are back.
+ *   verify-update-hold.
  *
  * v10 - W4-1 GATE-OPEN. The first screen is Home only once onboarding is
  *   finished. A stored name no longer counts: typing a name at the first
@@ -48,7 +56,7 @@
 
 import { store }              from './store.js';
 import { router }             from './router.js';
-import { requestExit }        from './session-guard.js';
+import { requestExit, isGuardActive } from './session-guard.js';
 import { initPaywallListener } from './auth.js';
 import { refreshMessages, updateNavDot } from './data/messages.js';
 import './data/evidence.js';   // B5: registers the two research messages (only while sending is on)
@@ -68,6 +76,18 @@ const NAV_VIEWS = new Set([
 ]);
 
 let _swRegistration = null;
+// W4-14. Set only when this person pressed Update.
+let _updateRequested = false;
+let _bannerRetry = null;
+// Screens where a reload would lose somebody's place or words.
+const BUSY_VIEWS = new Set([
+  'workout', 'gym-programme', 'morning-session', 'core-session', 'yoga-session',
+  'walk-session', 'running-session', 'cycle-session', 'swim-session',
+  'quiet-session', 'breathing-session', 'prescribed-session', 'class-player',
+  'capture', 'in-step', 'practices', 'checkin', 'checkin-mini', 'journal-entry',
+  'reflect', 'onboarding/thread', 'age-check', 'consent-update', 'health-consent',
+]);
+const BANNER_RETRY_MS = 30000;
 
 async function registerServiceWorker() {
   if (!("serviceWorker" in navigator)) return;
@@ -89,7 +109,8 @@ async function registerServiceWorker() {
       });
     });
     navigator.serviceWorker.addEventListener("controllerchange", () => {
-      window.location.reload();
+      // W4-14. Only the update this person asked for reloads the page.
+      if (_updateRequested) App.reload();
     });
   } catch (err) {
     console.error("SW registration failed:", err);
@@ -116,16 +137,23 @@ async function checkForUpdate() {
 }
 
 function applyUpdate() {
+  _updateRequested = true;
   const reg = _swRegistration;
   if (reg?.waiting) {
     reg.waiting.postMessage({ type: "SKIP_WAITING" });
   } else {
-    window.location.reload();
+    App.reload();
   }
 }
 
 function showUpdateBanner() {
   if (document.getElementById("update-banner")) return;
+  // W4-14. Not in the middle of something: try again a little later.
+  if (isGuardActive() || BUSY_VIEWS.has(router.currentView)) {
+    clearTimeout(_bannerRetry);
+    _bannerRetry = setTimeout(showUpdateBanner, BANNER_RETRY_MS);
+    return;
+  }
   const banner = document.createElement("div");
   banner.id        = "update-banner";
   banner.className = "update-banner";
@@ -209,7 +237,8 @@ const App = {
   checkForUpdate,
   showUpdateCheckResult,
   applyUpdate,
-  showUpdateBanner
+  showUpdateBanner,
+  reload: () => window.location.reload(),
 };
 
 window.App = App;
