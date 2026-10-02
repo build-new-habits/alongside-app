@@ -1,5 +1,12 @@
 /**
  * js/data/consent-version.js
+ * 02 Oct 2026 v3
+ *
+ * v3 - W4-13 CONSENT-VERSIONS. POLICY_HISTORY, per version; changesSince()
+ *   lists only the versions after the one agreed, without a change the
+ *   person already has (policyChangesFor). consentWaiting() for the router:
+ *   no house button while the policy or first consent waits.
+ *
  * 02 Oct 2026 v2
  *
  * v2 - W4-1 GATE-OPEN. Adult, but the Privacy Policy and Terms not yet
@@ -25,13 +32,41 @@ import { store } from "../store.js";
 
 export const POLICY_VERSION = "2026-10-01";
 
-/** What changed, in plain words, shown with the request to agree again. */
-export const POLICY_CHANGES = Object.freeze([
-  "Your health answers now have their own consent, and Settings › Delete my health answers removes them.",
-  "Alongside is for adults: it asks when you were born, and keeps only whether you are 18 or over.",
-  "Error reports to Sentry carry what broke, never what you told the app.",
-  "The privacy summary in the app says exactly what is kept on this phone and how to delete it.",
+/**
+ * W4-13 (Wave 4, 2.4). What changed, per version, oldest first. The policy
+ * screen lists only the versions after the one the person agreed to (one
+ * fixed list told somebody who agreed on day one that their health answers
+ * "now" had a consent they had already given). A change the person
+ * already has is left out (`unless`). Add a version here when POLICY_VERSION
+ * changes; the last entry must be POLICY_VERSION (verify-consent-versions).
+ */
+export const POLICY_HISTORY = Object.freeze([
+  { version: "2026-10-01", changes: [
+    { text: "Your health answers now have their own consent, and Settings › Delete my health answers removes them.",
+      unless: c => c?.health?.given === true || c?.health?.withdrawnAt != null || c?.health?.declinedAt != null },
+    { text: "Alongside is for adults: it asks when you were born, and keeps only whether you are 18 or over." },
+    { text: "Error reports to Sentry carry what broke, never what you told the app." },
+    { text: "The privacy summary in the app says exactly what is kept on this phone and how to delete it." },
+  ] },
 ]);
+
+/** The changes since `agreed` (a version, or null for never recorded). */
+export function changesSince(agreed, history = POLICY_HISTORY, consent = null) {
+  const at = history.findIndex(h => h.version === agreed);
+  return history.slice(at + 1)
+    .flatMap(h => h.changes)
+    .map(c => (typeof c === "string" ? { text: c } : c))
+    .filter(c => !(consent && typeof c.unless === "function" && c.unless(consent)));
+}
+
+/** What this person is shown: the changes since what they agreed to. */
+export function policyChangesFor() {
+  const c = store.get("consent") || {};
+  return changesSince(c.policyVersion ?? null, POLICY_HISTORY, c).map(x => x.text);
+}
+
+/** Somebody adult who is waiting on the policy or the first consent. */
+export const consentWaiting = () => consentUpdateNeeded() || consentNeeded();
 
 const OPEN = new Set(["consent-update", "privacy", "settings", "under-18", "age-check", "onboarding/thread"]);
 

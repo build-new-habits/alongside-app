@@ -1,5 +1,13 @@
 /**
  * js/data/onboarding-thread-data.js
+ * 02 Oct 2026 v21
+ *
+ * v21 - W4-19 ONBOARDING-FIRST. The health steps (HEALTH_STEP_IDS) show only
+ *   with the health consent given, so declining it in getting started asks
+ *   nothing health-related. No count the questions do not keep: "A few more,
+ *   and then I'll stop asking" (seven followed) and "Last one" (three
+ *   followed) are gone.
+ *
  * 02 Oct 2026 v20
  *
  * v20 - W4-10 TIREDNESS-PROMISE. generateConditionsAck no longer promises to
@@ -634,7 +642,7 @@ export const STEPS = {
     chips: BALANCE_CHIPS,
     storeField: 'capability.balanceWorry',
     summaryType: 'balanceWorry',
-    coach: "A few more, and then I'll stop asking questions.\n\nDo you ever worry about losing your balance?\n\nThere's no wrong answer here. Plenty of people say yes and are perfectly capable — it just changes which things I'd put in front of you early on.",
+    coach: "A few questions about how you move.\n\nDo you ever worry about losing your balance?\n\nThere's no wrong answer here. Plenty of people say yes and are perfectly capable — it just changes which things I'd put in front of you early on.",
     coachAfter: {
       answered: null, // dynamic — see generateBalanceAck()
     },
@@ -736,7 +744,7 @@ export const STEPS = {
     chips: INTENT_CHIPS,
     storeField: 'trainingIntent',
     summaryType: 'trainingIntent',
-    coach: "Last one, and it's the one that shapes most of what I suggest.\n\nWhat are we actually aiming at?\n\nThere's no better answer here. Holding on to what you've got is real work, and it's a different session to building something new.",
+    coach: "This one shapes most of what I suggest.\n\nWhat are we actually aiming at?\n\nThere's no better answer here. Holding on to what you've got is real work, and it's a different session to building something new.",
     coachAfter: {
       answered: null, // dynamic — see generateIntentAck()
     },
@@ -883,6 +891,21 @@ export const STEPS = {
 // 3b is conditional — skipped if only one territory selected in 3a.
 // 4 is skipped if user chose "I'd rather not say" in 3a (goes to 5 directly).
 // ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * W4-19 ONBOARDING-FIRST. The health consent can be declined in getting
+ * started (the app works without it). Then nothing health-related is asked
+ * here: what's been hard, the sore areas, balance and what the body can do,
+ * what they are coming back from, and energy. Each of these steps shows
+ * only with the health consent given, on top of its own condition.
+ */
+export const HEALTH_STEP_IDS = Object.freeze(['3a', '3b', 4, 8, '9a', '9b', '9c', '9d', '9e', 10]);
+export const healthAnswersAllowed = d => (((d || {}).consent || {}).health || {}).given === true;
+for (const id of HEALTH_STEP_IDS) {
+  const step = STEPS[id];
+  const own = step.showIf;
+  step.showIf = d => healthAnswersAllowed(d) && (typeof own !== 'function' || own(d));
+}
 
 export const STEP_ORDER = [0, 1, 2, '2b', '3a', '3b', 4, 5, 6, 7, 8,
                            9,

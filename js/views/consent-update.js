@@ -1,5 +1,10 @@
 /**
  * js/views/consent-update.js
+ * 02 Oct 2026 v2
+ *
+ * v2 - W4-13. Lists only the changes since the version the person agreed to
+ *   (policyChangesFor).
+ *
  * 01 Oct 2026 v1
  *
  * CONSENT-VERSION. "Our privacy policy and terms have changed": what
@@ -12,7 +17,7 @@
  * A11Y. A native checkbox with its label; Continue is never disabled --
  * unticked, it says what is needed and moves focus to the box (3.3.1).
  */
-import { POLICY_CHANGES, agreeToCurrent, takePendingRoute } from "../data/consent-version.js";
+import { policyChangesFor, agreeToCurrent, takePendingRoute } from "../data/consent-version.js";
 
 export function ConsentUpdateView(router) {
   function mount(container) {
@@ -20,7 +25,7 @@ export function ConsentUpdateView(router) {
       <div class="view hc-view">
         <h1 class="hc-title" id="cu-title" tabindex="-1">Our privacy policy and terms have changed</h1>
         <p class="hc-text">Here is what is different:</p>
-        <ul class="u18-list">${POLICY_CHANGES.map(c => `<li>${c}</li>`).join("")}</ul>
+        <ul class="u18-list">${policyChangesFor().map(c => `<li>${c}</li>`).join("")}</ul>
         <p class="hc-text">The full versions are our
           <a class="u18-link" href="https://buildnewhabits.co.uk/privacy/" target="_blank" rel="noopener noreferrer">Privacy Policy</a> and
           <a class="u18-link" href="https://buildnewhabits.co.uk/terms/" target="_blank" rel="noopener noreferrer">Terms of Service</a>

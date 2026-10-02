@@ -1,5 +1,10 @@
 /**
  * js/data/messages.js
+ * 02 Oct 2026 v3
+ *
+ * v3 - W4-17. Nothing is fetched, and the Settings tab is not renamed, for
+ *   somebody who said they are under 18.
+ *
  * 02 Oct 2026 v2
  *
  * v2 - W4-12. A message's minSessions counts completed sessions only
@@ -96,6 +101,8 @@ export function checkMessage(m) {
 /** Fetch the list, check it, keep it. Never throws; offline keeps the last list. */
 export async function refreshMessages(fetchImpl = globalThis.fetch) {
   if (typeof fetchImpl !== "function") return false;
+  // W4-17: nothing is fetched for somebody who said they are under 18.
+  if ((store.get("consent") || {}).ageConfirmed === false) return false;
   try {
     const res = await fetchImpl(MESSAGES_URL, { cache: "no-store", credentials: "omit" });
     if (!res || !res.ok) return false;
@@ -163,6 +170,7 @@ export function setNews(on) {
 export function updateNavDot(doc = globalThis.document) {
   const btn = doc?.querySelector?.('[data-nav="settings"]');
   if (!btn) return;
+  if ((store.get("consent") || {}).ageConfirmed === false) return;   // W4-17
   const on = hasUnread();
   let dot = btn.querySelector(".nav-dot");
   if (on && !dot) {

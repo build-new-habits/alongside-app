@@ -1,5 +1,11 @@
 /**
  * js/views/under-18.js
+ * 02 Oct 2026 v3
+ *
+ * v3 - W4-17 U18-TRUE. No "it won't ask you again": it says how to start
+ *   again at 18 (clear the app's data in the browser settings), which is
+ *   what makes the app ask from the beginning.
+ *
  * 01 Oct 2026 v2
  *
  * v2 - BUNDLE-TRUE. It says the one thing kept: that the person is under 18,
@@ -31,7 +37,8 @@ export function Under18View(router) {
         <p class="u18-text">So I can’t be your coach. That isn’t about you. What Alongside
           suggests is written for adult bodies, and young people’s information
           deserves more care than this app was built to give.</p>
-        <p class="u18-text">Nothing you told the app has been kept. It only remembers that you are under 18, so it won’t ask you again.</p>
+        <p class="u18-text">Nothing you told the app is kept on this phone. It remembers only that you said you are under 18, so it shows you this page.</p>
+        <p class="u18-text">When you are 18, you can start again: clear this app\u2019s data in your phone\u2019s browser settings (the site is app.buildnewhabits.co.uk), and it will ask you from the beginning.</p>
         <p class="u18-text">If you’d like to move more, a PE teacher, your GP or a local club
           can help you find something that suits you.</p>
 

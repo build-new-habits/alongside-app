@@ -1,5 +1,12 @@
 /**
  * js/views/onboarding/sheet-manager.js
+ * 02 Oct 2026 v5
+ *
+ * v5 - W4-19. Back inside a sheet closes it as cancelled (nothing answered),
+ *   and a view's cancel() puts back what was tapped when it closes without
+ *   Continue (Back, overlay, Escape). The sore-areas sheet is announced Sore
+ *   or injured areas (was Health conditions and injuries).
+ *
  * 29 Sep 2026 v4
  *
  * v4 — P1, REDUCED-MOTION-SHEET (persona finding W2-2). A sheet only
@@ -116,6 +123,10 @@ let _openSeq      = 0;     // bumped on every open; a late close checks it
 // real navigate is restored whether the view called it or the sheet was
 // dismissed another way (overlay tap, Escape).
 let _oldPatternRestoreNavigate = null;
+// W4-19. An old-pattern view's cancel(): called when the sheet closes
+// without the view's own Continue (Back, overlay, Escape), so a tap is kept
+// only by Continue.
+let _cancelHook = null;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // BUILD DOM
@@ -273,8 +284,12 @@ export async function openSheet(viewKey, onDone, triggerEl = null) {
         // Restore the real navigate immediately — the view called this
         // because the user confirmed/skipped, so the sheet is done.
         if (realNavigate) window.router.navigate = realNavigate;
+        // W4-19: "back" is Back inside the sheet: nothing answered.
+        if (_destination === 'back') { _close({ cancelled: true, viewKey }); return; }
+        _cancelHook = null;
         _close({ skipped: false, viewKey });
       };
+      _cancelHook = typeof module.cancel === 'function' ? module.cancel : null;
     }
 
     // Old-pattern views sometimes export onMount() to wire up anything
@@ -336,6 +351,8 @@ export async function openSheet(viewKey, onDone, triggerEl = null) {
 function _close(result) {
   if (!_isOpen) return;
   _isOpen = false;
+  if (result && (result.cancelled || result.skipped) && _cancelHook) { try { _cancelHook(); } catch { /* the view's own */ } }
+  _cancelHook = null;
 
   // Always restore window.router.navigate if an old-pattern view swapped
   // it — covers every dismissal path, not just the view's own confirm tap.
@@ -480,7 +497,7 @@ function _resolveFactory(module) {
 function _getLabelForView(viewKey) {
   const labels = {
     'onboarding/goals':       'Your goals',
-    'onboarding/conditions':  'Health conditions and injuries',
+    'onboarding/conditions':  'Sore or injured areas',
     'onboarding/equipment':   'Equipment and location',
     'onboarding/plan-select': 'Choose your programme',
   };

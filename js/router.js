@@ -1,5 +1,11 @@
 /**
  * router.js
+ * 02 Oct 2026 v41
+ *
+ * v41 - W4-13. No house button on any screen while the age question, the
+ *   first consent or a changed policy is waiting, or for somebody under 18:
+ *   from the privacy summary it led straight back (a loop).
+ *
  * 02 Oct 2026 v40
  *
  * v40 - W4-1 GATE-OPEN. No house button ("Back to Today") on onboarding,
@@ -646,8 +652,18 @@ export const router = {
     // bottom nav is hidden. No import of session-guard.js here: this is
     // pure visibility toggling, click handling lives in app.js.
     const escapeBtn = document.getElementById('hidden-nav-home-btn');
+    // W4-13. While the age question, the first consent or a changed policy
+    // is waiting (or somebody said they are under 18), the house would only
+    // lead straight back to that screen: from the privacy summary it
+    // opens, it looped. No house then.
+    let waiting = false;
+    try {
+      if (!this._ac) this._ac = await import('./data/age-check.js');
+      if (!this._cv) this._cv = await import('./data/consent-version.js');
+      waiting = this._ac.nothingAnswered() || this._ac.ageNeeded() || this._ac.declaredUnder18() || this._cv.consentWaiting();
+    } catch { waiting = false; }
     if (escapeBtn) {
-      if (hideNavViews.has(viewName) && !NO_EXIT_VIEWS.has(viewName)) {
+      if (hideNavViews.has(viewName) && !NO_EXIT_VIEWS.has(viewName) && !waiting) {
         escapeBtn.classList.remove('hidden');
       } else {
         escapeBtn.classList.add('hidden');

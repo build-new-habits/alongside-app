@@ -1,5 +1,11 @@
 /**
  * privacy.js - Privacy and Terms (in-app summary)
+ * 02 Oct 2026 v7
+ *
+ * v7 - W4-17. Somebody under 18 gets their own summary: only that they said
+ *   they are under 18 is kept, and how to remove it. Not the adult list, not
+ *   Settings.
+ *
  * 02 Oct 2026 v6
  *
  * v6 - W4-12. Where your answers are kept names the survey and Share my
@@ -49,10 +55,40 @@
 
 import { scopeStatementHTML } from "../data/scope-statement.js";
 import { researchPrivacyLine } from "../data/evidence.js";
+import { declaredUnder18 } from "../data/age-check.js";
 
 export const centered = false;
 
+/**
+ * W4-17. For somebody who said they are under 18, the summary says what is
+ * true for them: one thing is kept. The adult summary listed check-ins and
+ * a journal they never gave, and sent them to Settings, which shows only
+ * the under-18 page.
+ */
+function under18() {
+  return `
+    <div class="view privacy-view">
+      <div class="view-header privacy-header">
+        <button class="btn btn-ghost privacy-back-btn" onclick="history.back()"
+                aria-label="Go back">Back</button>
+        <h1>Privacy &amp; Terms</h1>
+      </div>
+      <div class="privacy-section card">
+        <h2 class="privacy-heading">What this phone keeps about you</h2>
+        <p class="text-secondary">Only one thing: that you said you are under 18, and when.
+          Nothing else you told the app is kept, and nothing is sent anywhere because of you.</p>
+        <p class="text-secondary" style="margin-top: var(--space-3);">If something in the app
+          breaks, a short error report goes to Sentry, the service we use to fix faults. It says
+          what broke, never anything about you.</p>
+        <p class="text-secondary" style="margin-top: var(--space-3);">To remove that one thing,
+          clear this app\u2019s data in your phone\u2019s browser settings
+          (app.buildnewhabits.co.uk).</p>
+      </div>
+    </div>`;
+}
+
 export function render() {
+  if (declaredUnder18()) return under18();
   return `
     <div class="view privacy-view">
 

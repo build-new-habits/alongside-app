@@ -1,6 +1,13 @@
 /**
  * conditions.js - Onboarding Step 5: Select conditions
  *
+ * 02 Oct 2026 v1.5
+ *
+ * v1.5 - W4-19. Back answers nothing: what was tapped is put back and the
+ *   sheet closes as cancelled (it recorded Nothing to flag). No Step 5 of 7
+ *   inside the sheet (the count was not true). Chips, Continue and Back
+ *   wired in onMount, not inline onclick.
+ *
  * 01 Oct 2026 v1.4
  *   BUNDLE-TRUE. "Tell me where, and I'll leave out movements..." is tied to
  *   a bad day, as the plan works (see onboarding-thread-data.js v19).
@@ -44,23 +51,19 @@ function _esc(s) {
     .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 }
 
+// W4-19. What was listed when the sheet opened: Back (or closing the sheet
+// without Continue) puts it back, so a tap is kept only by Continue.
+let _before = null;
+
 export function render() {
   const selected   = store.get("conditions") || [];
+  _before = [...selected];
 
   return `
     <div class="onboarding-view">
       <div class="onboarding-header">
-        <button class="btn btn-ghost" onclick="router.navigate('onboarding/goals')"
-                aria-label="Back">Back</button>
-        <div class="progress-dots" aria-label="Step 5 of 7">
-          <span class="dot completed" aria-hidden="true"></span>
-          <span class="dot completed" aria-hidden="true"></span>
-          <span class="dot completed" aria-hidden="true"></span>
-          <span class="dot completed" aria-hidden="true"></span>
-          <span class="dot active"    aria-hidden="true"></span>
-          <span class="dot"           aria-hidden="true"></span>
-          <span class="dot"           aria-hidden="true"></span>
-        </div>
+        <button class="btn btn-ghost" type="button" data-cond-back
+                aria-label="Back, without changing anything">Back</button>
       </div>
 
       <div class="onboarding-content">
@@ -85,7 +88,6 @@ export function render() {
                   <button
                     class="condition-chip ${selected.includes(c.id) ? "selected" : ""}"
                     data-condition="${c.id}"
-                    onclick="toggleCondition('${c.id}')"
                     aria-pressed="${selected.includes(c.id)}"
                   >
                     <span aria-hidden="true">${c.icon}</span>
@@ -106,7 +108,7 @@ export function render() {
 
       <div class="onboarding-actions">
         <button class="btn btn-primary btn-large btn-full"
-                onclick="saveConditions()"
+                data-cond-save
                 id="conditions-continue-btn">
           ${selected.length > 0 ? "Continue" : "Skip for now"}
         </button>
@@ -141,3 +143,19 @@ window.toggleCondition = function(conditionId) {
 window.saveConditions = function() {
   router.navigate("onboarding/lifestyle");
 };
+
+/** W4-19. Back or closed without Continue: nothing tapped is kept. */
+export function cancel() {
+  if (Array.isArray(_before)) store.set("conditions", _before);
+  _before = null;
+}
+
+/** Wired here, not with inline onclick attributes. */
+export function onMount() {
+  const root = document.querySelector(".sheet-content") || document;
+  root.querySelectorAll("[data-condition]").forEach(b =>
+    b.addEventListener("click", () => window.toggleCondition(b.dataset.condition)));
+  root.querySelector("[data-cond-save]")?.addEventListener("click", () => { _before = null; window.saveConditions(); });
+  // The sheet calls cancel() when it closes as cancelled.
+  root.querySelector("[data-cond-back]")?.addEventListener("click", () => window.router?.navigate("back"));
+}

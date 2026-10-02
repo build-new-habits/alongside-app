@@ -1,6 +1,11 @@
 /**
  * css/components/onboarding-thread.css
- * 02 Oct 2026 v9
+ * 02 Oct 2026 v10
+ *
+ * v10 - W4-19. Consent text at body size and colour: the list, the ticks'
+ *      labels, the notes and the links were 15px, and the list and notes
+ *      the secondary grey, on the screen people agree on. The typed year
+ *      (.age-q__year).
  *
  * v9 - W4-6. .ob-consent__restore: Restore from a file on the consent
  *      screen. The file input is visually hidden but focusable; its label is
@@ -801,15 +806,15 @@
 }
 
 .ob-consent__list li {
-  font-size: var(--text-sm);
-  color: var(--color-text-secondary);
+  font-size: var(--text-base);
+  color: var(--color-text);
   margin-bottom: var(--space-2);
   line-height: 1.5;
 }
 
 .ob-consent__links {
-  font-size: var(--text-sm);
-  color: var(--color-text-secondary);
+  font-size: var(--text-base);
+  color: var(--color-text);
   line-height: 1.6;
   margin: 0;
 }
@@ -905,7 +910,7 @@
 }
 
 .ob-consent__label {
-  font-size: var(--text-sm);
+  font-size: var(--text-base);
   color: var(--color-text);
   line-height: 1.5;
   cursor: pointer;
@@ -935,8 +940,8 @@
    the same hand-drawn .ob-consent__checkbox (CONSENT-1: never colour
    alone). */
 .ob-consent__note {
-  font-size: var(--text-sm);
-  color: var(--color-text-secondary);
+  font-size: var(--text-base);
+  color: var(--color-text);
   margin: calc(-1 * var(--space-2)) 0 var(--space-3) calc(24px + var(--space-3));
 }
 
@@ -1011,6 +1016,8 @@
   border-radius: var(--radius-sm);
   font-size: var(--text-base);
 }
+.age-q__year { font-variant-numeric: tabular-nums; }
+.age-q__select::placeholder { color: var(--color-text-secondary); opacity: 1; }
 .age-q__error { color: var(--color-danger); font-size: var(--text-sm); font-weight: var(--font-medium); min-height: 1.2em; margin: 0; }
 .u18-subtitle { font-size: var(--text-lg); margin: var(--space-2) 0 0; }
 .u18-text { margin: 0; line-height: 1.6; color: var(--color-text); }

@@ -1,5 +1,10 @@
 /**
  * js/views/health-consent.js
+ * 02 Oct 2026 v3
+ *
+ * v3 - W4-13. When the consent was given to older wording, it says the
+ *   wording has changed and asks again.
+ *
  * 01 Oct 2026 v2
  *
  * v2 - LEGAL-TRUE. The explanation names what is kept about the person's
@@ -15,7 +20,7 @@
  * (3.3.1). The heading takes focus on arrival.
  */
 import {
-  HEALTH_TICK, HEALTH_NOTE, giveHealthConsent, takePendingRoute
+  HEALTH_TICK, HEALTH_NOTE, giveHealthConsent, takePendingRoute, healthWordingChanged
 } from "../data/health-consent.js";
 
 export function HealthConsentView(router) {
@@ -26,6 +31,7 @@ export function HealthConsentView(router) {
     root.innerHTML = `
       <div class="view hc-view">
         <h1 class="hc-title" id="hc-title" tabindex="-1">Before I keep how you are</h1>
+        ${healthWordingChanged() ? `<p class="hc-text">The wording of this consent has changed since you agreed, so I need you to read it and say yes again before I keep anything new.</p>` : ""}
         <p class="hc-text">To shape your sessions I keep your health answers on this phone:
           what’s sore and how much, what you tell me about your body and how you’ve been,
           your check-ins, your weight if you add it, and your journal.

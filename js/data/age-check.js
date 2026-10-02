@@ -1,5 +1,13 @@
 /**
  * js/data/age-check.js
+ * 02 Oct 2026 v4
+ *
+ * v4 - W4-17 and W4-19. The year is typed (inputmode numeric), not a list of
+ *   101 starting at this year. ageAnswer() says why an answer cannot be
+ *   read: a date not reached yet is "That date hasn't happened yet"
+ *   (AGE_ERRORS), not "Choose a month and a year". heldOnPhone() for the
+ *   warning before deleting an earlier install.
+ *
  * 02 Oct 2026 v3
  *
  * v3 - W4-1 GATE-OPEN. A fresh install that has answered nothing goes to
@@ -49,11 +57,44 @@ export function isAdult(month, year, now = new Date()) {
   return months >= ADULT_MONTHS;
 }
 
-/** The years offered, newest first: this year back 100 years. */
-export function yearsOffered(now = new Date()) {
-  const ys = [];
-  for (let y = now.getFullYear(); y >= now.getFullYear() - 100; y--) ys.push(y);
-  return ys;
+/**
+ * W4-19. The year is typed, not chosen from a list: 1950 was 77th of 101 in
+ * a list that started at this year. A typed year hands nobody the answer
+ * that lets them in (a list starting 18 years ago would), and anybody can
+ * type their real one.
+ */
+export const OLDEST_YEARS = 120;
+
+/**
+ * What the answer is: "adult", "under", or a reason it can't be read:
+ * "empty", "short" (not four digits), "future" (W4-17: a date not reached
+ * yet said "Choose a month and a year"), "old" (more than 120 years ago).
+ */
+export function ageAnswer(month, year, now = new Date()) {
+  const m = String(month ?? "").trim(), y = String(year ?? "").trim();
+  if (!m || !y) return "empty";
+  if (!/^\d{4}$/.test(y)) return "short";
+  if (Number(y) < now.getFullYear() - OLDEST_YEARS) return "old";
+  const adult = isAdult(m, y, now);
+  if (adult === null) return "future";
+  return adult ? "adult" : "under";
+}
+
+/** The plain words for an answer that can't be read. */
+export const AGE_ERRORS = Object.freeze({
+  empty: "Choose a month and type the year.",
+  short: "Type all four digits of the year, for example 1975.",
+  future: "That date hasn\u2019t happened yet. Check the month and the year.",
+  old: "Check the year: it is more than 120 years ago.",
+});
+
+/** Anything on this phone from before the age question (W4-17). */
+export function heldOnPhone() {
+  const d = store.data || {};
+  const sessions = store.completedSessions(d.activityLog || []).length;
+  const journal = (d.journalEntries || []).length;
+  const checkins = Object.keys(d.checkinHistory || {}).length;
+  return { sessions, journal, checkins, any: sessions + journal + checkins > 0 };
 }
 
 const _c = () => store.get("consent") || {};
@@ -119,10 +160,9 @@ export function ageQuestionHTML(idPrefix = "age") {
         </div>
         <div class="age-q__field">
           <label class="age-q__label" for="${idPrefix}-year">Year</label>
-          <select class="age-q__select" id="${idPrefix}-year" aria-describedby="${idPrefix}-hint">
-            <option value="">Choose</option>
-            ${yearsOffered().map(y => `<option value="${y}">${y}</option>`).join("")}
-          </select>
+          <input class="age-q__select age-q__year" id="${idPrefix}-year" type="text" inputmode="numeric"
+                 pattern="[0-9]*" maxlength="4" autocomplete="off" placeholder="For example 1975"
+                 aria-describedby="${idPrefix}-hint">
         </div>
       </div>
       <p class="age-q__error" id="${idPrefix}-error" role="alert"></p>
@@ -131,8 +171,19 @@ export function ageQuestionHTML(idPrefix = "age") {
 
 /** Read the answer: true adult, false under 18, null not answered. */
 export function readAge(root, idPrefix = "age") {
-  const m = root.querySelector(`#${idPrefix}-month`)?.value;
-  const y = root.querySelector(`#${idPrefix}-year`)?.value;
-  if (!m || !y) return null;
-  return isAdult(m, y);
+  const a = readAnswer(root, idPrefix);
+  return a === "adult" ? true : a === "under" ? false : null;
+}
+
+/** The answer as ageAnswer() gives it, read from the question's fields. */
+export function readAnswer(root, idPrefix = "age") {
+  return ageAnswer(root.querySelector(`#${idPrefix}-month`)?.value, root.querySelector(`#${idPrefix}-year`)?.value);
+}
+
+/** Show why the answer can't be read and put focus where to fix it. */
+export function showAgeError(root, idPrefix, answer) {
+  const err = root.querySelector(`#${idPrefix}-error`);
+  if (err) err.textContent = AGE_ERRORS[answer] || AGE_ERRORS.empty;
+  const month = root.querySelector(`#${idPrefix}-month`), year = root.querySelector(`#${idPrefix}-year`);
+  (answer === "empty" && !month?.value ? month : year)?.focus();
 }

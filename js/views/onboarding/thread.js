@@ -1,5 +1,16 @@
 /**
  * js/views/onboarding/thread.js
+ * 02 Oct 2026 v22
+ *
+ * v22 - W4-19 ONBOARDING-FIRST. The health consent can be declined: only the
+ *   Privacy-and-Terms tick is needed to go on, and without the second
+ *   nothing health-related is asked (declineHealthConsent). The tick is
+ *   short, with what health answers are beside it, under its own heading.
+ *   The age question is headed One question first (both were Before we
+ *   start); the year is typed; a date not reached says so. No splash on a
+ *   return or under Reduce motion. Back inside a sheet offers it again and
+ *   records nothing.
+ *
  * 02 Oct 2026 v21
  *
  * v21 - W4-12. The consent list names the survey and Share my figures while
@@ -272,8 +283,8 @@ import {
   LEG_POWER_CHIPS,
 }                             from '../../data/onboarding-thread-data.js';
 import { openSheet }          from './sheet-manager.js';
-import { HEALTH_TICK, HEALTH_NOTE, giveHealthConsent } from '../../data/health-consent.js';
-import { ageQuestionHTML, readAge, recordAge } from '../../data/age-check.js';
+import { HEALTH_TICK, HEALTH_NOTE, HEALTH_WHAT, giveHealthConsent, declineHealthConsent } from '../../data/health-consent.js';
+import { ageQuestionHTML, readAnswer, showAgeError, recordAge } from '../../data/age-check.js';
 import { POLICY_VERSION as CURRENT_POLICY_VERSION } from '../../data/consent-version.js';
 import { restoreFromFile } from '../restore-flow.js';
 import { researchPrivacyLine } from '../../data/evidence.js';
@@ -339,6 +350,14 @@ export function ThreadView(router) {
   // ── Step 0 — Splash ────────────────────────────────────────────────────────
 
   function _runSplash() {
+    // W4-19. The splash is a first-open moment: not on a return (the age
+    // question already answered) and not under Reduce motion. It replayed
+    // on every reopen and faded in and out regardless.
+    const a = store.get('consent.ageConfirmed');
+    if (a === true || a === false || store.get('consent.given') === true || prefersReducedMotion()) {
+      _afterSplash();
+      return;
+    }
     const splash = document.createElement('div');
     splash.className = 'ob-splash';
     splash.setAttribute('aria-hidden', 'true');
@@ -351,15 +370,19 @@ export function ThreadView(router) {
         splash.classList.remove('is-visible');
         setTimeout(() => {
           splash.remove();
-          // 11 Aug 2026 (WOW-0): consent is a gate, not a step. It runs
-          // before Step 1 and is skipped entirely once already given, so
-          // returning mid-onboarding never re-asks.
-          if (_needsAge())          _renderAgeGate();
-          else if (_needsConsent()) _renderConsentGate();
-          else                      _beginThread();
+          _afterSplash();
         }, 400);
       }, STEPS[0].durationMs);
     });
+  }
+
+  // 11 Aug 2026 (WOW-0): consent is a gate, not a step. It runs before
+  // Step 1 and is skipped entirely once already given, so returning
+  // mid-onboarding never re-asks.
+  function _afterSplash() {
+    if (_needsAge())          _renderAgeGate();
+    else if (_needsConsent()) _renderConsentGate();
+    else                      _beginThread();
   }
 
   // ── Consent gate (11 Aug 2026, WOW-0) ──────────────────────────────────────
@@ -405,18 +428,14 @@ export function ThreadView(router) {
   function _renderAgeGate() {
     _thread.innerHTML = `
       <section class="ob-age" aria-labelledby="ob-age-heading">
-        <h1 class="ob-consent__heading" id="ob-age-heading">Before we start</h1>
+        <h1 class="ob-consent__heading" id="ob-age-heading">One question first</h1>
         ${ageQuestionHTML('ob-age')}
         <button class="btn btn-primary btn-large btn-full" id="ob-age-continue">Continue</button>
       </section>`;
     _thread.querySelector('#ob-age-continue')?.addEventListener('click', () => {
-      const adult = readAge(_thread, 'ob-age');
-      if (adult === null) {
-        const err = _thread.querySelector('#ob-age-error');
-        if (err) err.textContent = 'Choose a month and a year.';
-        [..._thread.querySelectorAll('.age-q__select')].find(x => !x.value)?.focus();
-        return;
-      }
+      const answer = readAnswer(_thread, 'ob-age');
+      if (answer !== 'adult' && answer !== 'under') { showAgeError(_thread, 'ob-age', answer); return; }
+      const adult = answer === 'adult';
       recordAge(adult);
       if (!adult) { router.navigate('under-18'); return; }
       if (_needsConsent()) _renderConsentGate();
@@ -462,14 +481,17 @@ export function ThreadView(router) {
           </label>
         </div>
 
+        <h2 class="ob-consent__subheading">Your health answers</h2>
         <div class="ob-consent__tick">
-          <input type="checkbox" id="ob-consent-health" class="ob-consent__checkbox" aria-describedby="ob-consent-health-note">
+          <input type="checkbox" id="ob-consent-health" class="ob-consent__checkbox" aria-describedby="ob-consent-health-what ob-consent-health-note">
           <label for="ob-consent-health" class="ob-consent__label">${HEALTH_TICK}</label>
         </div>
-        <p class="ob-consent__note" id="ob-consent-health-note">${HEALTH_NOTE}</p>
+        <p class="ob-consent__note" id="ob-consent-health-what">${HEALTH_WHAT}</p>
+        <p class="ob-consent__note" id="ob-consent-health-note">${HEALTH_NOTE}
+          This one is up to you: without it I won\u2019t ask about your body or keep check-ins, and I\u2019ll plan sessions carefully. You can say yes later.</p>
 
         <p class="ob-consent__error" id="ob-consent-error" role="status" hidden>
-          Please tick both boxes to agree before continuing.
+          Tick the first box to agree to the Privacy Policy and Terms of Service before continuing.
         </p>
 
         <button class="btn btn-primary btn-large btn-full"
@@ -480,7 +502,7 @@ export function ThreadView(router) {
         </button>
 
         <div class="ob-consent__restore">
-          <p class="ob-consent__note" id="ob-restore-note">Moving from another phone? Tick both boxes, then choose the file you saved with Download your data.</p>
+          <p class="ob-consent__note" id="ob-restore-note">Moving from another phone? Tick the boxes you agree to, then choose the file you saved with Download your data. Health answers in it come back only with the second tick.</p>
           <input type="file" id="ob-restore-file" class="ob-consent__file" accept=".json,application/json" aria-describedby="ob-restore-note">
           <label for="ob-restore-file" class="btn btn-ghost btn-full ob-consent__file-label">Restore from a file</label>
           <p class="ob-consent__error" id="ob-restore-msg" role="status" tabindex="-1" hidden></p>
@@ -519,8 +541,11 @@ export function ThreadView(router) {
       });
     }
 
+    // W4-19. Only the Privacy-and-Terms tick is needed to go on: the health
+    // consent can be declined here, as it can be later (the app works
+    // without it, planning carefully and asking nothing health-related).
     const onTick = () => {
-      const ok = !!(check?.checked && health?.checked);
+      const ok = !!check?.checked;
       continueBtn?.setAttribute('aria-disabled', ok ? 'false' : 'true');
       continueBtn?.classList.toggle('is-inactive', !ok);
       if (ok && error) error.hidden = true;
@@ -534,13 +559,13 @@ export function ThreadView(router) {
     });
 
     continueBtn?.addEventListener('click', () => {
-      if (!check?.checked || !health?.checked) {
+      if (!check?.checked) {
         // Not a dead button: say what is needed and put focus where it is.
         if (error) error.hidden = false;
-        (check?.checked ? health : check)?.focus();
+        check?.focus();
         return;
       }
-      _agree();
+      _agree(!!health?.checked);
       _beginThread();
     });
 
@@ -554,13 +579,13 @@ export function ThreadView(router) {
     restoreInput?.addEventListener('change', () => {
       const file = restoreInput.files && restoreInput.files[0];
       if (!file) return;
-      if (!check?.checked || !health?.checked) {
+      if (!check?.checked) {
         restoreInput.value = '';
-        sayRestore('Please tick both boxes first, then choose the file again.');
-        (check?.checked ? health : check)?.focus();
+        sayRestore('Please tick the first box first, then choose the file again.');
+        check?.focus();
         return;
       }
-      _agree();
+      _agree(!!health?.checked);
       restoreFromFile(file, {
         opener: restoreInput,
         onMessage: msg => { restoreInput.value = ''; sayRestore(msg + ' You can choose another file, or press Continue to start afresh.'); },
@@ -574,12 +599,14 @@ export function ThreadView(router) {
     _thread.querySelector('#ob-consent-check')?.focus();
   }
 
-  // Both consents, recorded with the current versions.
-  function _agree() {
+  // The consents, recorded with the current versions. W4-19: the health
+  // consent given or declined (Not now), as the second tick says.
+  function _agree(health = true) {
     store.set('consent.given',         true);
     store.set('consent.at',            new Date().toISOString());
     store.set('consent.policyVersion', POLICY_VERSION);
-    giveHealthConsent();
+    if (health) giveHealthConsent();
+    else        declineHealthConsent();
   }
 
   // ── Begin thread — Step 1 ──────────────────────────────────────────────────
@@ -1332,6 +1359,13 @@ export function ThreadView(router) {
     // Genuine user action — the sheet has closed because the user either
     // completed it or explicitly skipped it. Either way, that's the
     // moment to fade what came before.
+    // W4-19. Back inside the sheet answers nothing: offer it again. It
+    // recorded "Nothing to flag" and kept any area tapped.
+    if (result && result.cancelled) {
+      _showSheetBar(step);
+      return;
+    }
+
     _markPreviousStepsPast();
 
     if (result.skipped) {
