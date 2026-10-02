@@ -1,5 +1,12 @@
 /**
  * tools/verify-w3a.mjs
+ * 02 Oct 2026 v5
+ *
+ * v5 - W4-19. The health steps need the health consent (declining it in
+ *   getting started asks none of them). The routes walk a person who gave
+ *   it; the balance question is asked of everyone who did. Same routes
+ *   expected, none loosened.
+ *
  * 29 Sep 2026 v4
  * P15. The chair question (9b) is now also asked whenever balance is
  *   answered "No" (accepted 28 Sep, W2-6): a fit person who said "No" was
@@ -57,8 +64,11 @@ check('9a-9d are in STEP_ORDER',
   ['9a', '9b', '9c', '9d'].every(id => D.STEP_ORDER.includes(id)));
 check('9a sits directly after the activity question',
   D.STEP_ORDER[D.STEP_ORDER.indexOf(9) + 1] === '9a');
-check('balance question has no showIf — it is asked of everyone',
-  typeof D.STEPS['9a'].showIf !== 'function');
+// W4-19: every health step needs the health consent; with it, the balance
+// question is still asked of everyone.
+const HC = { consent: { health: { given: true } } };
+check('balance question is asked of everyone who gave the health consent',
+  typeof D.STEPS['9a'].showIf !== 'function' || D.STEPS['9a'].showIf(HC) === true);
 for (const id of ['9b', '9c', '9d']) {
   check(`${id} is conditional`, typeof D.STEPS[id].showIf === 'function');
 }
@@ -83,6 +93,7 @@ for (const [field, expected] of Object.entries(CONTRACT)) {
 // Mirrors thread.js _nextStep(): walk STEP_ORDER, honouring showIf.
 function walk(fixture, answers = {}) {
   store.init();
+  store.set('consent.health', { given: true });   // W4-19: health steps need it
   for (const [k, v] of Object.entries(fixture)) store.set(k, v);
   const asked = [];
   let idx = D.STEP_ORDER.indexOf(9);
@@ -272,8 +283,8 @@ check('all four are genuinely different openings',
 check('step 9e writes lifestyle.returningAfter',
   D.STEPS['9e']?.storeField === 'lifestyle.returningAfter');
 check('9e is asked only of someone returning',
-  D.STEPS['9e'].showIf({ lifestyle: { activityLevel: 'returning' } }) === true &&
-  D.STEPS['9e'].showIf({ lifestyle: { activityLevel: 'active' } }) === false);
+  D.STEPS['9e'].showIf({ ...HC, lifestyle: { activityLevel: 'returning' } }) === true &&
+  D.STEPS['9e'].showIf({ ...HC, lifestyle: { activityLevel: 'active' } }) === false);
 
 console.log(failures === 0 ? '\nW3-A GATE GREEN' : `\nW3-A GATE RED — ${failures} failure(s)`);
 process.exit(failures === 0 ? 0 : 1);

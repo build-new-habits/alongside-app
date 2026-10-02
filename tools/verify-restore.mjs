@@ -1,5 +1,10 @@
 /**
  * tools/verify-restore.mjs
+ * 02 Oct 2026 v4
+ *
+ * v4 - W4-13. Fixtures give the health consent at the current version: given
+ *   to older wording now asks again. No assertion changed.
+ *
  * 02 Oct 2026 v3
  *
  * v3 - W4-3 / W4-6. Display settings now stay this phone's (1c). Markup in
@@ -26,6 +31,7 @@
  *   6. Download your data says anyone with the file can read it.
  */
 import { createRequire as __cr } from "node:module";
+import { HEALTH_CONSENT_VERSION as HEALTH_V } from "../js/data/health-consent.js";
 const __require = __cr(import.meta.url);
 const { JSDOM } = __require("jsdom");
 
@@ -61,7 +67,7 @@ const keys = () => Array.from({ length: localStorage.length }, (_, i) => localSt
 const adultConsent = (health = true) => ({
   given: true, at: "2026-10-01T09:00:00Z", policyVersion: "2026-10-01",
   ageConfirmed: true, ageCheckedAt: "2026-10-01T09:00:00Z", ageVersion: "2026-10-01",
-  health: health ? { given: true, at: "2026-10-01T09:00:00Z", version: "2026-10-01", withdrawnAt: null }
+  health: health ? { given: true, at: "2026-10-01T09:00:00Z", version: HEALTH_V, withdrawnAt: null }
                  : { given: false, at: null, version: null, withdrawnAt: "x" },
 });
 

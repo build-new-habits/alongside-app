@@ -1,5 +1,13 @@
 /**
  * tools/verify-health-consent.mjs
+ * 02 Oct 2026 v8
+ *
+ * v8 - W4-13 and W4-19. The health tick is short, with what health answers
+ *   are beside it (1a reads both). The Privacy-and-Terms tick is the one
+ *   that cannot be left out; the health one can be declined (1b re-pointed:
+ *   the health tick alone records nothing). Fixtures give the consent at the
+ *   current version (an old one now asks again).
+ *
  * 02 Oct 2026 v7
  *
  * v7 - W4-1 GATE-OPEN. 2h asserted the bypass itself: a fresh install that
@@ -118,17 +126,20 @@ const thread = View({ navigate() {}, back() {} }); thread.mount(obEl); await wai
   { const mo = obEl.querySelector("#ob-age-month"), yr = obEl.querySelector("#ob-age-year"); if (mo && yr) { mo.value = "1"; yr.value = "1990"; obEl.querySelector("#ob-age-continue").dispatchEvent(new dom.window.Event("click")); await wait(20); } }
 const t1 = obEl.querySelector("#ob-consent-check"), t2 = obEl.querySelector("#ob-consent-health");
 ok("1pc. positive control: the consent screen is up", !!t1);
-ok("1a. a second tick, for health answers, with its own label",
+// W4-19: the tick is short; what health answers are is said beside it and
+// read with it (aria-describedby). Same words required, tick or described.
+const said = !t2 ? "" : txt(obEl.querySelector('label[for="ob-consent-health"]')) + " " +
+  (t2.getAttribute("aria-describedby") || "").split(/\s+/).map(id => txt(obEl.querySelector(`#${id}`))).join(" ");
+ok("1a. a second tick, for health answers, with its own label, read with what they are",
    !!t2 && /health answers/i.test(txt(obEl.querySelector('label[for="ob-consent-health"]'))) &&
-   /sore/i.test(txt(obEl.querySelector('label[for="ob-consent-health"]'))) && /journal/i.test(txt(obEl.querySelector('label[for="ob-consent-health"]'))) &&
-   /your body|my body/i.test(txt(obEl.querySelector('label[for="ob-consent-health"]'))),
-   txt(obEl.querySelector('label[for="ob-consent-health"]')));
-if (t1) { t1.checked = true; t1.dispatchEvent(new dom.window.Event("change", { bubbles: true })); }
-click(obEl.querySelector("#ob-consent-continue")); await wait(10);
-ok("1b. one tick is not enough: nothing recorded, and it says so",
-   store.get("consent.given") !== true && /both/i.test(txt(obEl.querySelector("#ob-consent-error"))) && !obEl.querySelector("#ob-consent-error")?.hidden,
-   txt(obEl.querySelector("#ob-consent-error")));
+   /sore/i.test(said) && /journal/i.test(said) && /your body|my body/i.test(said), said);
+// W4-19: the health tick can be declined; the Privacy-and-Terms tick cannot.
 if (t2) { t2.checked = true; t2.dispatchEvent(new dom.window.Event("change", { bubbles: true })); }
+click(obEl.querySelector("#ob-consent-continue")); await wait(10);
+ok("1b. the health tick alone is not enough: nothing recorded, and it says what is needed",
+   store.get("consent.given") !== true && /first box/i.test(txt(obEl.querySelector("#ob-consent-error"))) && !obEl.querySelector("#ob-consent-error")?.hidden,
+   txt(obEl.querySelector("#ob-consent-error")));
+if (t1) { t1.checked = true; t1.dispatchEvent(new dom.window.Event("change", { bubbles: true })); }
 click(obEl.querySelector("#ob-consent-continue")); await wait(10);
 const h = store.get("consent")?.health || {};
 ok("1c. both ticks record consent, and the health consent has its own time and version",
@@ -165,7 +176,7 @@ ok("2h. a fresh install that has agreed to nothing goes to onboarding (which ask
 
 // ── 3. DELETE MY HEALTH ANSWERS ─────────────────────────────────────────
 console.log("\nTEST 3 - Settings › Delete my health answers");
-fixture({ consent: true, health: { given: true, at: new Date().toISOString(), version: "x", withdrawnAt: null } });
+fixture({ consent: true, health: { given: true, at: new Date().toISOString(), version: HC.HEALTH_CONSENT_VERSION, withdrawnAt: null } });
 const day = new Date().toISOString().slice(0, 10);
 store.set("checkinHistory", { [day]: { energy: 6, mood: 3, conditionLevels: { "lower-back": 6 } } });
 store.set("lastCheckin", { energy: 6, mood: 3, timestamp: new Date().toISOString() });
@@ -240,7 +251,7 @@ store.set("currentActivityEntry", "a2");
 main.innerHTML = reflect.render(); try { reflect.onMount(); } catch {}
 ok("4pc. positive control: the finish screen is up", /today done|Saved what you did/.test(txt(main)));
 ok("4a. no note and no mood question", !main.querySelector("#reflect-open-text") && !main.querySelector("#reflect-mood-slider"));
-store.set("consent.health", { given: true, at: "x", version: "x", withdrawnAt: null });
+store.set("consent.health", { given: true, at: "x", version: HC.HEALTH_CONSENT_VERSION, withdrawnAt: null });
 const reflect2 = await import(B + "views/reflect.js?w=2");
 main.innerHTML = reflect2.render(); try { reflect2.onMount(); } catch {}
 ok("4b. REVERSAL: with consent, the note and mood are there", !!main.querySelector("#reflect-open-text") && !!main.querySelector("#reflect-mood-slider"));
@@ -254,7 +265,7 @@ ok("4c. Progress offers no weight entry", !main.querySelector("#weight-log-input
 
 // ── 5. A JOURNAL ENTRY CAN BE DELETED ───────────────────────────────────
 console.log("\nTEST 5 - a journal entry can be deleted from Wellbeing");
-fixture({ consent: true, health: { given: true, at: "x", version: "x", withdrawnAt: null } });
+fixture({ consent: true, health: { given: true, at: "x", version: HC.HEALTH_CONSENT_VERSION, withdrawnAt: null } });
 store.set("journalEntries", [
   { id: "j1", date: "2026-09-29T10:00:00Z", text: "First", tags: [] },
   { id: "j2", date: "2026-09-30T10:00:00Z", text: "Second", tags: [] },
@@ -281,7 +292,7 @@ ok("6pc. positive control: the row is there", !!capRow);
 ok("6a. withdrawn: it does not open the answers", !capRow?.hasAttribute("data-open"));
 click(capRow); await wait(20);
 ok("6b. it asks for the health consent", landed.includes("health-consent"), JSON.stringify(landed));
-fixture({ consent: true, health: { given: true, at: "x", version: "x", withdrawnAt: null } });
+fixture({ consent: true, health: { given: true, at: "x", version: HC.HEALTH_CONSENT_VERSION, withdrawnAt: null } });
 main.innerHTML = ""; SettingsView({ navigate(v) { landed.push(v); }, back() {} }).mount(main); await wait(20);
 const capRow2 = [...main.querySelectorAll(".settings-row")].find(b => /What your body can do/.test(txt(b)));
 ok("6c. REVERSAL: with consent, it opens the answers", capRow2?.getAttribute("data-open") === "capability");

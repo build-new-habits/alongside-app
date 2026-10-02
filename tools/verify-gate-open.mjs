@@ -1,5 +1,12 @@
 /**
  * tools/verify-gate-open.mjs
+ * 02 Oct 2026 v2
+ *
+ * v2 - W4-13. 6pc's positive control is a person with nothing waiting (the
+ *   summary keeps its house); new 6e: before anything is answered the
+ *   summary has no house, since it led back to the first question. Stricter,
+ *   none loosened.
+ *
  * 02 Oct 2026 v1
  *
  * W4-1 GATE-OPEN (Wave 4 persona trace, 01 Oct 2026; found by 2.12, 2.13,
@@ -153,9 +160,9 @@ console.log("\nTEST 6 - no house button on the gate screens");
 router._mountView = realMount;
 const house = () => !document.getElementById("hidden-nav-home-btn").classList.contains("hidden");
 const shown = {};
-for (const [r, setup] of [["onboarding/thread", fresh], ["age-check", fresh], ["under-18", fresh], ["consent-update", agreed], ["privacy", fresh]]) {
+for (const [r, setup] of [["onboarding/thread", fresh], ["age-check", fresh], ["under-18", fresh], ["consent-update", agreed], ["privacy", agreed], ["privacy-fresh", fresh]]) {
   setup();
-  try { await router._mountView(r); } catch (e) { /* the view's own mount; visibility is set first */ }
+  try { await router._mountView(r === "privacy-fresh" ? "privacy" : r); } catch (e) { /* the view's own mount; visibility is set first */ }
   await wait(5);
   shown[r] = house();
 }
@@ -164,6 +171,9 @@ ok("6b. the age question: no house", shown["age-check"] === false);
 ok("6c. the under-18 screen: no house", shown["under-18"] === false);
 ok("6d. the policy screen: no house", shown["consent-update"] === false);
 ok("6pc. positive control: the privacy summary still has it", shown["privacy"] === true, JSON.stringify(shown));
+// W4-13: before anything is answered the house would only lead back to the
+// first question, so the summary opened from it has none either.
+ok("6e. the privacy summary before anything is answered: no house", shown["privacy-fresh"] === false, JSON.stringify(shown));
 await wait(3000); // let onboarding's splash timers finish before the next mount
 document.getElementById("main-content").innerHTML = "";
 

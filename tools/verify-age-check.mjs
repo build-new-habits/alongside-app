@@ -1,5 +1,12 @@
 /**
  * tools/verify-age-check.mjs
+ * 02 Oct 2026 v4
+ *
+ * v4 - W4-17 and W4-19. Not answered now says Choose a month and type the
+ *   year (the year is typed). 5e: with a journal on the phone, the under-18
+ *   answer first says what will be deleted and offers a copy (5e0), then
+ *   Delete it and carry on deletes it. Same intent.
+ *
  * 02 Oct 2026 v3
  *
  * v3 - W4-0 SUITE-TRUE. Mounts through tools/one-screen.mjs, so one screen
@@ -102,7 +109,7 @@ ok("1b. labelled: Month, Year, in a fieldset that asks when you were born",
 ok("1c. it says only the result is kept", /only keep whether you are 18 or over, not the date/i.test(txt(el)));
 click(el.querySelector("#ob-age-continue")); await wait(10);
 ok("1d. not answered: it says so, and nothing is recorded",
-   /Choose a month and a year/.test(txt(el.querySelector("#ob-age-error"))) && store.get("consent.ageConfirmed") == null);
+   /Choose a month and type the year/.test(txt(el.querySelector("#ob-age-error"))) && store.get("consent.ageConfirmed") == null);
 pick(el, "#ob-age-month", ADULT.m); pick(el, "#ob-age-year", ADULT.y);
 click(el.querySelector("#ob-age-continue")); await wait(10);
 ok("1e. adult: on to the consent screen", !!el.querySelector("#ob-consent-check"));
@@ -148,7 +155,7 @@ function existing() {
 existing();
 ok("5a. asked before Home", (await go("today")) === "age-check" && !!main.querySelector("#age-month"));
 click(main.querySelector("#age-continue")); await wait(10);
-ok("5b. not answered: says so", /Choose a month and a year/.test(txt(main.querySelector("#age-error"))));
+ok("5b. not answered: says so", /Choose a month and type the year/.test(txt(main.querySelector("#age-error"))));
 pick(main, "#age-month", ADULT.m); pick(main, "#age-year", ADULT.y);
 landed = []; click(main.querySelector("#age-continue")); await wait(20);
 ok("5c. adult: on to where they were going, data untouched",
@@ -158,6 +165,10 @@ existing();
 await go("checkin");
 pick(main, "#age-month", CHILD.m); pick(main, "#age-year", CHILD.y);
 landed = []; click(main.querySelector("#age-continue")); await wait(20);
+// W4-17: a journal on the phone, so it says what goes and offers a copy first.
+ok("5e0. under 18 with a journal here: told first, nothing deleted yet",
+   /delete/i.test(txt(main)) && (store.get("journalEntries") || []).length === 1, txt(main).slice(0, 200));
+click([...main.querySelectorAll("button")].find(b => /Delete it and carry on/.test(txt(b)))); await wait(20);
 ok("5e. under 18: the under-18 screen, and what was on the phone is deleted",
    landed.includes("under-18") && store.get("consent.ageConfirmed") === false && !store.get("name") &&
    (store.get("journalEntries") || []).length === 0, JSON.stringify(landed));
@@ -176,7 +187,7 @@ localStorage.clear(); store.init(); AC?.recordAge?.(false);
 await go("today");
 const u = txt(main);
 ok("7pc. positive control: it rendered", /Alongside is for adults/.test(u));
-ok("7a. says nothing was kept", /Nothing you told the app has been kept/.test(u));
+ok("7a. says nothing was kept", /Nothing you told the app is kept on this phone/.test(u));   // W4-17 wording
 ok("7b. Childline, any time, 0800 1111, as a working link", !!main.querySelector('a[href="tel:08001111"]') && /Childline/.test(u) && /0800 1111/.test(u));
 ok("7c. Shout 85258", !!main.querySelector('a[href^="sms:85258"]') && /85258/.test(u));
 ok("7d. NHS 111 and 999", !!main.querySelector('a[href="tel:111"]') && !!main.querySelector('a[href="tel:999"]'));

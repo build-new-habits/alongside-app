@@ -1,5 +1,10 @@
 /**
  * tools/verify-restore-lock.mjs
+ * 02 Oct 2026 v4
+ *
+ * v4 - W4-13. Fixtures give the health consent at the current version: given
+ *   to older wording now asks again. No assertion changed.
+ *
  * 02 Oct 2026 v3
  *
  * v3 - W4-6. The download's outcome is read where the person sees it (#settings-result,
@@ -27,6 +32,7 @@
  *   4. The password is not kept: nothing in Alongside's storage holds it.
  */
 import { createRequire as __cr } from "node:module";
+import { HEALTH_CONSENT_VERSION as HEALTH_V } from "../js/data/health-consent.js";
 const __require = __cr(import.meta.url);
 const { JSDOM } = __require("jsdom");
 
@@ -96,7 +102,7 @@ function phone() {
   store.set("onboardingComplete", true); store.set("tier", "free"); store.set("name", "Sam");
   store.set("consent", { given: true, at: "2026-10-01T09:00:00Z", policyVersion: "2026-10-01", ageConfirmed: true,
     ageCheckedAt: "2026-10-01T09:00:00Z", ageVersion: "2026-10-01",
-    health: { given: true, at: "2026-10-01T09:00:00Z", version: "2026-10-01", withdrawnAt: null } });
+    health: { given: true, at: "2026-10-01T09:00:00Z", version: HEALTH_V, withdrawnAt: null } });
   store.set("journalEntries", [{ id: "j1", date: "2026-09-21T10:00:00Z", text: JOURNAL, tags: [] }]);
   store.set("activityLog", [{ id: "a1", date: "2026-09-20T10:00:00Z", type: "workout", status: "completed", durationMins: 30 }]);
 }
@@ -143,7 +149,7 @@ function newPhone() {
   store.set("onboardingComplete", true);
   store.set("consent", { given: true, at: "2026-10-01T09:00:00Z", policyVersion: "2026-10-01", ageConfirmed: true,
     ageCheckedAt: "2026-10-01T09:00:00Z", ageVersion: "2026-10-01",
-    health: { given: true, at: "2026-10-01T09:00:00Z", version: "2026-10-01", withdrawnAt: null } });
+    health: { given: true, at: "2026-10-01T09:00:00Z", version: HEALTH_V, withdrawnAt: null } });
 }
 let picked = null;
 const origClick = dom.window.HTMLInputElement.prototype.click;

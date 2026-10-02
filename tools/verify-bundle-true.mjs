@@ -1,5 +1,11 @@
 /**
  * tools/verify-bundle-true.mjs
+ * 02 Oct 2026 v3
+ *
+ * v3 - W4-13: the health consent fixture uses the current version (an older
+ *   one now asks again). W4-17: the under-18 line is worded "remembers only
+ *   that you said you are under 18". Same intent.
+ *
  * 02 Oct 2026 v2
  *
  * v2 - W4-6. 2f: a javascript: address is made harmless, not refused, and the
@@ -33,6 +39,7 @@
  */
 import { createRequire as __cr } from "node:module";
 import { readFileSync } from "node:fs";
+import { HEALTH_CONSENT_VERSION as HEALTH_V } from "../js/data/health-consent.js";
 const __require = __cr(import.meta.url);
 const { JSDOM } = __require("jsdom");
 
@@ -72,7 +79,7 @@ function fixture({ health = true, tier = "personal" } = {}) {
   store.set("onboardingComplete", true); store.set("name", "Sam"); store.set("tier", tier);
   store.set("consent.given", true); store.set("consent.at", new Date().toISOString());
   store.set("consent.ageConfirmed", true); store.set("consent.policyVersion", "2026-10-01");
-  store.set("consent.health", { given: health, at: health ? new Date().toISOString() : null, version: health ? "2026-10-01" : null });
+  store.set("consent.health", { given: health, at: health ? new Date().toISOString() : null, version: health ? HEALTH_V : null });
   navigated = [];
 }
 
@@ -234,7 +241,7 @@ ok("7a. sendClientReports is false", /sendClientReports:\s*false/.test(init));
 console.log("\nTEST 8 - the under-18 screen says the one thing it keeps");
 const { Under18View } = await import(B + "views/under-18.js");
 main.innerHTML = ""; Under18View(router).mount(main); await wait(5);
-ok("8a. it says it keeps only that the person is under 18", /only remembers that you are under 18/i.test(txt(main)), txt(main).slice(0, 200));
+ok("8a. it says it keeps only that the person is under 18", /remembers only that you said you are under 18/i.test(txt(main)), txt(main).slice(0, 200));
 
 // ── 9. ONBOARDING SAYS WHEN MOVEMENTS ARE LEFT OUT ───────────────────────
 // A sore area leaves out movements that load it on a day the person rates

@@ -1,5 +1,10 @@
 /**
  * tools/verify-weight1b.mjs
+ * 02 Oct 2026 v8
+ *
+ * v8 - W4-13. Fixtures give the health consent at the current version: given
+ *   to older wording now asks again. No assertion changed.
+ *
  * 02 Oct 2026 v7
  *
  * v7 - W4-0 SUITE-TRUE. Mounts through tools/one-screen.mjs, so one screen
@@ -58,6 +63,7 @@
  */
 
 import { oneScreen } from "./one-screen.mjs";
+import { HEALTH_CONSENT_VERSION as HEALTH_V } from "../js/data/health-consent.js";
 import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
@@ -117,7 +123,7 @@ async function mount(state) {
 
 const base = (over = {}) => ({
   tier: "personal", name: "Test",
-  consent: { given: true, at: new Date().toISOString(), health: { given: true, at: new Date().toISOString(), version: "2026-10-01", withdrawnAt: null } },
+  consent: { given: true, at: new Date().toISOString(), health: { given: true, at: new Date().toISOString(), version: HEALTH_V, withdrawnAt: null } },
   onboarding: { complete: true },
   ...over
 });
@@ -268,7 +274,7 @@ async function mountProgramme(over = {}) {
   localStorage.clear();
   localStorage.setItem("alongside_user", JSON.stringify({
     tier: "personal", name: "Test",
-    consent: { given: true, at: new Date().toISOString(), health: { given: true, at: new Date().toISOString(), version: "2026-10-01", withdrawnAt: null } },
+    consent: { given: true, at: new Date().toISOString(), health: { given: true, at: new Date().toISOString(), version: HEALTH_V, withdrawnAt: null } },
     onboarding: { complete: true },
     weightTracking: true, weightUnit: "kg", weight: 100,
     strategicGoal: {
@@ -413,7 +419,7 @@ async function mountProgress(over = {}) {
   localStorage.clear();
   localStorage.setItem("alongside_user", JSON.stringify({
     tier: "personal", name: "Test",
-    consent: { given: true, at: new Date().toISOString(), health: { given: true, at: new Date().toISOString(), version: "2026-10-01", withdrawnAt: null } },
+    consent: { given: true, at: new Date().toISOString(), health: { given: true, at: new Date().toISOString(), version: HEALTH_V, withdrawnAt: null } },
     onboarding: { complete: true },
     weightTracking: true, weightUnit: "kg",
     ...over
