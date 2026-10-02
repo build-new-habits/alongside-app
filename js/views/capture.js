@@ -1,5 +1,10 @@
 /**
  * js/views/capture.js
+ * 02 Oct 2026 v6
+ *
+ * v6 - W4-22. The clock leaves out time away, as the saved session already
+ *   did.
+ *
  * 30 Sep 2026 v5
  *
  * v5 - W3-16 ARC-AND-SAVED (persona Wave 3, 2.15; Schema v1.86). A session
@@ -393,7 +398,9 @@ function _logSet(root) {
 
 function _elapsed() {
   if (!startedAt) return "0:00";
-  const s = Math.max(0, Math.floor((Date.now() - startedAt) / 1000));
+  // W4-22. Time away (gaps over 30 minutes) is left out, as the saved
+  // session already did: the clock counted it.
+  const s = Math.max(0, Math.floor((Date.now() - startedAt - _awayMs(true)) / 1000));
   const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
   return h ? `${h}:${String(m).padStart(2, "0")}:${String(sec).padStart(2, "0")}` : `${m}:${String(sec).padStart(2, "0")}`;
 }

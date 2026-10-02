@@ -1,5 +1,10 @@
 /**
  * js/data/arc-readback.js
+ * 02 Oct 2026 v4
+ *
+ * v4 - W4-20. sessionsByWeek(…, { since }) leaves out weeks that ended
+ *   before the person started.
+ *
  * 30 Sep 2026 v3
  *
  * v3 - W3-20. sessionsInWindow() names a topKind only when it is more than
@@ -221,8 +226,11 @@ export function arcWeek(arc = {}, now = new Date()) {
  * Completed sessions per week for the last `weeks` weeks, and the kinds.
  * `completed` must already be store.completedSessions() -- COUNT-1.
  */
-export function sessionsByWeek(completed = [], { weeks = 6, now = new Date(), kindOf = e => e.sessionType || e.type } = {}) {
-  const W = lastWeeks(weeks, now).map(w => ({ start: w.start, end: w.end, total: 0 }));
+export function sessionsByWeek(completed = [], { weeks = 6, now = new Date(), kindOf = e => e.sessionType || e.type, since = null } = {}) {
+  // W4-20. Weeks that ended before `since` (when the person started) are
+  // not shown: they could only ever be empty.
+  const from = since ? new Date(since).getTime() : -Infinity;
+  const W = lastWeeks(weeks, now).filter(w => w.end.getTime() > from).map(w => ({ start: w.start, end: w.end, total: 0 }));
   for (const e of completed) {
     const t = new Date(e.completedAt || e.loggedAt || e.date).getTime();
     const w = W.find(x => t >= x.start.getTime() && t < x.end.getTime());

@@ -1,4 +1,8 @@
-<!-- index.html | 02 Oct 2026 v8 -->
+<!-- index.html | 02 Oct 2026 v9 -->
+<!--
+  v9 — W4-22, 02 Oct 2026. The inline display copy gains vibration
+  (alongside-vibration, on), matching display-prefs.js (verify-disp1).
+-->
 <!--
   v8 — W4-5 ZOOM, 02 Oct 2026. The viewport line no longer switches pinch-zoom
   off (maximum-scale=1.0, user-scalable=no removed). WCAG 2.2 SC 1.4.4: a
@@ -205,7 +209,8 @@
           underline:     "alongside-underline-links",
           focus:         "alongside-enhanced-focus",
           fullInstructions: "alongside-full-instructions",
-          reduceMotion:  "alongside-reduce-motion"
+          reduceMotion:  "alongside-reduce-motion",
+          vibration:     "alongside-vibration"
         };
         var D = {
           scheme:        "dark",
@@ -215,7 +220,8 @@
           underline:     "off",
           focus:         "off",
           fullInstructions: "off",
-          reduceMotion:  "off"
+          reduceMotion:  "off",
+          vibration:     "on"
         };
         var g = function (k, d) { var v = localStorage.getItem(k); return v === null ? d : v; };
         var r = document.documentElement;

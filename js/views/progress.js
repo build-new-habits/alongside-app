@@ -1,5 +1,10 @@
 /**
  * progress.js
+ * 02 Oct 2026 v25
+ *
+ * v25 - W4-20. Plurals in the shared summary (1 week in, 1 session). The
+ *   weekly chart starts the week the person did, not six weeks back.
+ *
  * 01 Oct 2026 v24
  *
  * v24 - PT-2 HEALTH-CONSENT. No weight card or entry while health consent
@@ -925,14 +930,19 @@ export function ProgressView(router) {
   /** Six weeks of completed sessions, both tiers. COUNT-1. */
   function renderSessionsChart() {
     const completed = store.completedSessions(store.get('activityLog'));
-    const weeks = sessionsByWeek(completed, { weeks: 6 });
+    // W4-20. Weeks start when the person did: it showed six weeks, empty
+    // ones before they installed, to somebody nine days in.
+    const firstDone = completed.map(e => Date.parse(e.completedAt || e.loggedAt || e.date)).filter(Number.isFinite);
+    const startMs = Math.min(Date.parse(store.get('createdAt') || '') || Infinity, ...firstDone);
+    const weeks = sessionsByWeek(completed, { weeks: 6, since: Number.isFinite(startMs) ? new Date(startMs) : null });
     const total = weeks.reduce((n, w) => n + w.total, 0);
+    const over = weeks.length < 6 ? 'since you started' : 'over the last six weeks';
     return _chart({
       id: 'pr-sessions',
       title: 'Sessions, week by week',
       summary: total
-        ? `${total} session${total === 1 ? '' : 's'} over the last six weeks, week by week.`
-        : 'No sessions in the last six weeks yet.',
+        ? `${total} session${total === 1 ? '' : 's'} ${over}, week by week.`
+        : (weeks.length < 6 ? 'No sessions since you started yet.' : 'No sessions in the last six weeks yet.'),
       bars: weeks.map(w => ({ start: w.start, value: w.total,
         label: `Week of ${shortDate(w.start)}: ${w.total} session${w.total === 1 ? '' : 's'}` }))
     });
@@ -1325,7 +1335,7 @@ export function ProgressView(router) {
         ``,
         `${count} session${count === 1 ? "" : "s"} in the last ${windowDays} days. ${mins} minutes of movement.`,
         stats.hasActiveProgramme
-          ? `Programme: ${stats.programmeName} — ${stats.weeksIn} weeks in, ${stats.totalSessions} sessions.`
+          ? `Programme: ${stats.programmeName} — ${stats.weeksIn} week${stats.weeksIn === 1 ? '' : 's'} in, ${stats.totalSessions} session${stats.totalSessions === 1 ? '' : 's'}.`
           : '',
         goalLabels ? `Working towards: ${goalLabels}.` : '',
         ``,

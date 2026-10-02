@@ -1,5 +1,11 @@
 /**
  * js/data/checkin-openings.js
+ * 02 Oct 2026 v10
+ *
+ * v10 - W4-22. With Mostly the same (sessionVariety familiar) the check-in
+ *   opens the same way each time: one mode, the first line; it was random
+ *   whatever the setting.
+ *
  * 30 Sep 2026 v9
  *
  * v9 - W3-20 TRUE-WORDS. Day one ("before your very first session") only when
@@ -403,6 +409,8 @@ export function resolveOpening() {
   let   roll  = Math.random() * total;
   let   chosen = pool[pool.length - 1].mode;
   for (const e of pool) { roll -= e.weight; if (roll <= 0) { chosen = e.mode; break; } }
+  // W4-22. Mostly the same means the same way in: one mode, one line.
+  if (_familiar()) chosen = 'real-world';
 
   _writeMode(chosen);
 
@@ -689,9 +697,13 @@ function _lastWeekMoods(historyKeys, checkinHistory) {
     .filter(v => typeof v === 'number');
 }
 
+const _familiar = () => store.get('sessionVariety') === 'familiar';
+
 function _pick(arr, mode, careMode) {
   _writeMode(mode);
-  const v = arr[Math.floor(Math.random() * arr.length)];
+  // W4-22. With Mostly the same, the first line of the set every time; it
+  // was random whatever the setting.
+  const v = _familiar() ? arr[0] : arr[Math.floor(Math.random() * arr.length)];
   return { b1: v.b1, b2: v.b2, mode, careMode };
 }
 

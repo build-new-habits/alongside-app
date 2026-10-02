@@ -1,6 +1,11 @@
 /**
  * library.js - Library Page
  *
+ * 02 Oct 2026 v13
+ *
+ * v13 - W4-20. Mindful movement is Mindful awareness: it opens sitting and
+ *   breathing practices (body scan, breath awareness), not movement.
+ *
  * 02 Oct 2026 v12
  *
  * v12 - W4-18. The category heading's icon is hidden from screen readers:
@@ -316,11 +321,11 @@ const GUIDED_CATEGORIES = [
     id:          "mindful",
     label:       "Mindful practice",
     icon:        "\uD83C\uDF3F",
-    description: "Breathing, journaling, mindful movement",
+    description: "Breathing, journaling, mindful awareness",
     sessions: [
       { label: "Breathing",       icon: "\uD83C\uDF2C\uFE0F", target: "quiet-session", quiet: "breathing",  note: "" },
       { label: "Journal",         icon: "\uD83D\uDCDD",        target: "journal-entry",                      note: "" },
-      { label: "Mindful movement",icon: "\uD83C\uDF3F",        target: "quiet-session", quiet: "mindful",   note: "" },
+      { label: "Mindful awareness",icon: "\uD83C\uDF3F",        target: "quiet-session", quiet: "mindful",   note: "" },
       { label: "Rest day",        icon: "\uD83D\uDECC",        target: "reflect",                            note: "Log a deliberate rest" },
     ]
   },

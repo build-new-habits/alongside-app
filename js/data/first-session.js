@@ -1,5 +1,10 @@
 /**
  * first-session.js - Recognising a first session as a first
+ * 02 Oct 2026 v2
+ *
+ * v2 - W4-20. Said back in the words chosen (It moved too fast, too soon),
+ *   not a phrase they never used.
+ *
  * 15 Aug 2026 v1
  *
  * DELIGHT-1, found by the first-ninety-seconds audit rather than by a
@@ -64,7 +69,7 @@ const TERRITORY_LINES = {
   },
   'escalation-trap': {
     heading: "That was your first one.",
-    body: "You told me it always ramps up until it breaks. So I'll say the useful thing: nothing about today obliges you to do more tomorrow. This counted on its own."
+    body: "You told me it moved too fast, too soon. So I'll say the useful thing: nothing about today obliges you to do more tomorrow. This counted on its own."
   },
   'life-interruption': {
     heading: "That was your first one.",

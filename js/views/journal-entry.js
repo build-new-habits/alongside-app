@@ -1,5 +1,13 @@
 /**
  * journal-entry.js
+ * 02 Oct 2026 v9
+ *
+ * v9 - W4-21 JOURNAL-SMALL. Write about this shows the week's question as
+ *   the box's label. Back goes back where the person came from, and with
+ *   something written asks Keep writing or Discard it first (only whether
+ *   the box is empty is looked at). Saving says Saved to your journal on
+ *   Wellbeing.
+ *
  * 02 Oct 2026 v8
  *
  * v8 - W4-18. The box is named by its visible label (the prompt); an
@@ -86,6 +94,7 @@
  *   All touch targets minimum 44px.
  */
 
+import { currentWeekQuestion, noteJournalSaved } from "./noticing.js";
 import { supportLinesHTML } from '../data/support-lines.js';
 import { store } from '../store.js';
 
@@ -146,7 +155,12 @@ export function JournalEntryView(router) {
     const autoTagging = store.get('journalSettings.autoTagging') !== false;
 
     const entryType = store.get('journalEntryType');
-    const prompt    = ENTRY_PROMPTS[entryType] || {
+    // W4-21. Write about this keeps the week's question: it is the box's
+    // label, so it is what the person is answering.
+    const base      = ENTRY_PROMPTS[entryType];
+    const prompt    = (entryType === 'weekly-noticing' && base)
+      ? { ...base, label: currentWeekQuestion().prompt }
+      : base || {
       title:       'What are you noticing?',
       label:       'Write anything. This is for you.',
       placeholder: 'Something caught your attention. What was it?'
@@ -160,13 +174,18 @@ export function JournalEntryView(router) {
         <header class="je-header">
           <button class="je-back-btn btn btn-ghost"
                   data-action="back"
-                  aria-label="Back to Wellbeing">
+                  aria-label="Back">
             ← Back
           </button>
           <h1 class="je-title">${_esc(prompt.title)}</h1>
         </header>
 
         <p class="je-privacy" id="je-privacy">Only you can read your journal. The coach never reads it.</p>
+        <div class="je-leave" id="je-leave" role="group" aria-labelledby="je-leave-q" hidden>
+          <p id="je-leave-q" tabindex="-1">You\u2019ve started writing. Keep it, or discard it?</p>
+          <button class="btn btn-primary btn-small" data-action="keep-writing">Keep writing</button>
+          <button class="btn btn-ghost btn-small" data-action="discard">Discard it</button>
+        </div>
 
         <!-- Text input -->
         <div class="je-input-block">
@@ -282,9 +301,23 @@ export function JournalEntryView(router) {
       saveEntry('', container, { noWords: true });
     });
 
-    // Back
+    // Back. W4-21: back where they came from (it always went to Wellbeing),
+    // and with something in the box it asks first (a half-written entry was
+    // thrown away without a word). Only whether the box is empty is looked
+    // at; nothing reads what it says.
+    const leave = () => (router.history && router.history.length ? router.back() : router.navigate('noticing'));
+    const ask   = container.querySelector('#je-leave');
     container.querySelector('[data-action="back"]')?.addEventListener('click', () => {
-      router.navigate('noticing');
+      if (!(textarea?.value || '').trim()) { leave(); return; }
+      if (ask) { ask.hidden = false; ask.querySelector('#je-leave-q')?.focus(); }
+    });
+    container.querySelector('[data-action="keep-writing"]')?.addEventListener('click', () => {
+      if (ask) ask.hidden = true;
+      textarea?.focus();
+    });
+    container.querySelector('[data-action="discard"]')?.addEventListener('click', () => {
+      if (textarea) textarea.value = '';
+      leave();
     });
   }
 
@@ -324,7 +357,8 @@ export function JournalEntryView(router) {
 
     savedEntryId = id;
 
-    // ── Navigate back to noticing hub ────────────────────────────────────────
+    // ── Navigate back to noticing hub, which says it was saved (W4-21) ───────
+    noteJournalSaved();
     router.navigate('noticing');
   }
 

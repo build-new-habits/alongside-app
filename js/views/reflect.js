@@ -1,6 +1,12 @@
 /**
  * reflect.js - Reflect Screen
  *
+ * 02 Oct 2026 v15
+ *
+ * v15 - W4-20. A run's finish line follows the feel answer: Steady (or no
+ *   answer) no longer gets Runs that feel tough. buildSummary exported for
+ *   its check.
+ *
  * 02 Oct 2026 v14
  *
  * v14 - W4-8 PAIN-NUMBERS. Better / About the same / Worse still shapes what
@@ -561,7 +567,7 @@ function _hardLine(entry) {
     : "Hard sessions count just as much as easy ones. You finished it. That is what matters.";
 }
 
-function buildSummary(entry, feel, pain, moodAfterValue) {
+export function buildSummary(entry, feel, pain, moodAfterValue) {
   const log       = store.get("activityLog") || [];
   // W3-20. Completed sessions, from the start of Sunday.
   const thisWeek  = store.completedSessions(log).filter(e => {
@@ -617,9 +623,12 @@ function buildSummary(entry, feel, pain, moodAfterValue) {
       : "That walk counts. Movement is movement.";
   }
   if (type === "run") {
-    return feel === "good"
-      ? (durRef ? durRef + " running. Good session." : "Good run. I have noted it.")
-      : "Runs that feel tough still build the same fitness. Done is done.";
+    // W4-20. The line follows the answer: "Runs that feel tough" was said
+    // after Steady (and after no answer at all).
+    if (feel === "good") return durRef ? durRef + " running. Good session." : "Good run. I have noted it.";
+    if (feel === "tough") return "Runs that feel tough still build the same fitness. Done is done.";
+    if (feel === "steady") return "A steady run. That kind adds up.";
+    return durRef ? durRef + " running. I have noted it." : "Run done. I have noted it.";
   }
   if (type === "class" && name) {
     return name + " is in the books. I will count that alongside everything else -- it all matters.";

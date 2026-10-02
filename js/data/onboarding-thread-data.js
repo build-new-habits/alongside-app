@@ -1,5 +1,11 @@
 /**
  * js/data/onboarding-thread-data.js
+ * 02 Oct 2026 v22
+ *
+ * v22 - W4-20. generateIntentAck(value, profile): no carrying, gripping,
+ *   getting up and down promised to somebody whose legs are not ready for
+ *   load.
+ *
  * 02 Oct 2026 v21
  *
  * v21 - W4-19 ONBOARDING-FIRST. The health steps (HEALTH_STEP_IDS) show only
@@ -942,7 +948,11 @@ export const STEP_ORDER = [0, 1, 2, '2b', '3a', '3b', 4, 5, 6, 7, 8,
  * demanding than what 'improve' selects for a deconditioned person, not
  * less.
  */
-export function generateIntentAck(value) {
+export function generateIntentAck(value, profile = null) {
+  // W4-20. Carrying and getting up and down are not given to somebody whose
+  // legs are not ready for load, so they are not promised either.
+  if (value === 'maintain' && profile && profile.legsLoadable === false)
+    return "Good. That means I'll keep putting everyday things in front of you, in ways that suit what your legs are ready for, rather than quietly making everything easier.";
   if (value === 'maintain')
     return "Good. That means I'll keep putting the things that matter in front of you — carrying, gripping, getting up and down — rather than quietly making everything easier.";
   if (value === 'recover')

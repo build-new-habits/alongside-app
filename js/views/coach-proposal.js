@@ -1,5 +1,13 @@
 /**
  * coach-proposal.js
+ * 02 Oct 2026 v47
+ *
+ * v47 - W4-20 TRUE-WORDS-4. The plan sentence says the plan's own length
+ *   when it differs from the asked one by more than five minutes. The
+ *   good-day offer does not say the plan stays as it is over a plan made
+ *   lighter (gentleReason). No "Fitness slips in that time whatever the
+ *   reason".
+ *
  * 02 Oct 2026 v46
  *
  * v46 - W4-7 / W4-9 (Wave 4 trace). One voice about a sore area: the
@@ -741,7 +749,7 @@ import { getConditionName, isAcute, areaWords }  from '../data/conditions.js';
 import { AVAILABLE_TIME_WINDOW_MINUTES } from '../data/time-windows.js';
 import { buildSession, buildCandidatePools, equipmentForLocation,
          swapAlternatives, swapExerciseInSession, soreLevelFor,
-         soreScoresToday, SESSION_TYPES, exerciseSeconds } from '../session-builder.js';
+         soreScoresToday, SESSION_TYPES, exerciseSeconds, gentleReason } from '../session-builder.js';
 import { activityPhrase, joinList, daysAgo } from '../data/activity-labels.js';
 // SMOOTH-P2a. The plan carries the safety note when it is due.
 import { isGateDue, isGuidanceDue, recordAcknowledgement,
@@ -1329,6 +1337,16 @@ export function CoachProposalView(router) {
       </div>`;
   }
 
+  /** The minutes the plan's groups add up to: the plan's "About N min". */
+  function _planTotal(option) {
+    const list = _planExercises(option);
+    if (!list.length) return 0;
+    const groups = ['warmup', 'main', 'cooldown']
+      .map(sec => list.filter(ex => (ex.section || 'main') === sec))
+      .filter(g => g.length);
+    return _sectionMinutes(groups).total;
+  }
+
   function _renderPlan(option, premium) {
     const list = _planExercises(option);
     const rowsBySection = ['warmup', 'main', 'cooldown']
@@ -1407,7 +1425,13 @@ export function CoachProposalView(router) {
     const req = store.get('requestedSessionType');
     const t   = req ? SESSION_TYPES.find(x => x.id === req) : null;
     if (t && _deliveredType(option) === req) {
-      return `You asked for ${ASKED_WORDS[req] || t.label.toLowerCase()}, ${_getAvailableTimeMinutes()} minutes.` +
+      // W4-20. The length said is the plan's own: "40 minutes" sat over
+      // "About 25 min". The asked length is said back, and the plan's
+      // when they differ by more than five minutes.
+      const asked = _getAvailableTimeMinutes();
+      const total = _planTotal(option);
+      const length = total && Math.abs(total - asked) > 5 ? ` This one comes to about ${total} minutes.` : '';
+      return `You asked for ${ASKED_WORDS[req] || t.label.toLowerCase()}, ${asked} minutes.${length}` +
         (option.conditionNote ? ` ${option.conditionNote}` : '');
     }
     return option.rationale || '';
@@ -1475,9 +1499,15 @@ export function CoachProposalView(router) {
     if (adjust !== 0) return '';
     const c = getTodaysCheckin() || {};
     if (!(Number(c.energy) >= 7)) return '';
+    // W4-20. Not "the plan stays as it is" over a plan made lighter for
+    // another reason (sleep, a busy run of days): it said both at once.
+    const why = gentleReason();
+    const lead = why
+      ? 'You said your energy\u2019s good today. I\u2019ve still kept this one a little lighter today \u2014 if you\u2019d like a bit more:'
+      : 'You said your energy\u2019s good today. The plan stays as it is \u2014 if you\u2019d like a bit more:';
     return `
       <div class="cp-offer" role="note">
-        <p class="cp-offer__text">You said your energy\u2019s good today. The plan stays as it is \u2014 if you\u2019d like a bit more:</p>
+        <p class="cp-offer__text">${lead}</p>
         <button class="btn btn-secondary" id="cp-offer-more">One more set on each</button>
       </div>`;
   }
@@ -1943,9 +1973,8 @@ export function CoachProposalView(router) {
     return `
       <div class="cp-return-door" role="region" aria-label="Starting back">
         <p class="cp-return-door__message">
-          You have been away ${span}. Fitness slips in that time whatever the
-          reason &mdash; it is not a comment on you, it is just what bodies do.
-          I can start you a notch gentler today and build back from there.
+          You have been away ${span}. Whatever the reason, I can start you a
+          notch gentler today and build back from there.
         </p>
         <div class="cp-return-door__chips" role="group"
              aria-label="How would you like to start back?">

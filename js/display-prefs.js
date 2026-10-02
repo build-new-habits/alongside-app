@@ -1,5 +1,11 @@
 /**
  * js/display-prefs.js
+ * 02 Oct 2026 v5
+ *
+ * v5 - W4-22. New key vibration (alongside-vibration, default on). Off stops
+ *   every vibration in the app: navigator.vibrate is wrapped, so every view
+ *   that calls it is covered.
+ *
  * 28 Sep 2026 v4
  * v4 - F6, REDUCE-MOTION-ROW (Graeme, 28 Sep: add it). New key
  *   `reduceMotion`: "off" follows the device (as the app always has),
@@ -67,6 +73,7 @@ export const DISPLAY_KEYS = {
   focus:         "alongside-enhanced-focus",
   fullInstructions: "alongside-full-instructions",
   reduceMotion:  "alongside-reduce-motion",
+  vibration:     "alongside-vibration",
 };
 
 export const DISPLAY_DEFAULTS = {
@@ -87,6 +94,9 @@ export const DISPLAY_DEFAULTS = {
   // F6. "off" means follow the device's own setting, which the app has
   // always honoured. "on" reduces motion here whatever the device says.
   reduceMotion:  "off",
+  // W4-22. "on" vibrates as sessions always have; "off" stops every
+  // vibration in the app (navigator.vibrate is wrapped, so every caller).
+  vibration:     "on",
 };
 
 // Ranges are deliberately conservative at the bottom end: nothing here
@@ -170,6 +180,24 @@ export function applyDisplayPrefs() {
   root.classList.toggle("underline-links", getDisplayPref("underline") === "on");
   root.classList.toggle("enhanced-focus",  getDisplayPref("focus")     === "on");
   _applyReduceMotion(getDisplayPref("reduceMotion") === "on");
+  _applyVibration(getDisplayPref("vibration") !== "off");
+}
+
+// W4-22. One switch for every vibration: the views call navigator.vibrate
+// directly (ten of them), so the setting wraps it rather than asking each.
+let _realVibrate = null;
+function _applyVibration(on) {
+  const nav = globalThis.navigator;
+  if (!nav || typeof nav.vibrate !== "function") return;
+  if (!_realVibrate) _realVibrate = nav.vibrate;
+  const wrapped = function (pattern) {
+    return getDisplayPref("vibration") === "off" ? false : _realVibrate.call(nav, pattern);
+  };
+  if (nav.vibrate !== wrapped) {
+    try { Object.defineProperty(nav, "vibrate", { value: wrapped, configurable: true, writable: true }); }
+    catch { /* the browser will not let it be wrapped: vibration stays as the device has it */ }
+  }
+  void on;
 }
 
 /**

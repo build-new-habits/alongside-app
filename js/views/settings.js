@@ -1,5 +1,11 @@
 /**
  * settings.js
+ * 02 Oct 2026 v61
+ *
+ * v61 - W4-20 and W4-22. Five percent is said for when payment starts (in
+ *   the beta nobody pays). A Vibration switch in Display (off stops every
+ *   vibration).
+ *
  * 02 Oct 2026 v60
  *
  * v60 - W4-16 RESET-TRUE: the Reset dialog names what goes (journal,
@@ -925,6 +931,7 @@ export function SettingsView(router) {
         _rowSwitch({ id: 'disp-full-instructions', label: 'Always show full instructions', disp: 'fullInstructions' }),
         // F6. Off follows the device, which the app always has.
         _rowSwitch({ id: 'disp-reduce-motion', label: 'Reduce motion', disp: 'reduceMotion' }),
+        _rowSwitch({ id: 'disp-vibration', label: 'Vibration', sub: 'Buzzes during sessions to mark a change. Off stops them all.', disp: 'vibration' }),
       ])}
 
       ${_group('Your plan and your data', [
@@ -2178,8 +2185,8 @@ export function SettingsView(router) {
 
         ${isPaid ? `
           <div class="settings-plan-block">
-            <p>Five percent of what you pay goes to causes this community
-               chooses.</p>
+            <p>When payment starts, five percent of what you pay will go to
+               causes this community chooses. In the beta you pay nothing.</p>
           </div>
 
           <div class="settings-plan-block">

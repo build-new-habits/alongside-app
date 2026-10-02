@@ -1,5 +1,10 @@
 /**
  * router.js
+ * 02 Oct 2026 v43
+ *
+ * v43 - W4-22. capture (Make it up as I go) is the Plan's: on Free the route
+ *   opens the upgrade page.
+ *
  * 02 Oct 2026 v42
  *
  * v42 - W4-18. After mounting, the container takes focus only when the view
@@ -545,6 +550,15 @@ export const router = {
       if (to) viewName = to;
     } catch (err) {
       console.error('Router: consent-version guard failed', err);
+    }
+
+    // W4-22. Make it up as I go is the Plan's (tier table: Free "Not
+    // included"); the route opened on Free. Free goes to what the Plan is.
+    if (viewName === 'capture') {
+      try {
+        if (!this._au) this._au = await import('./auth.js');
+        if (!this._au.isPremium()) viewName = 'upgrade';
+      } catch (err) { console.error('Router: tier check failed', err); }
     }
 
     // PT-2, 01 Oct 2026. Before a health question, health consent if it

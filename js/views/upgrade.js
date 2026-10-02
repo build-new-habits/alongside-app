@@ -1,5 +1,15 @@
 /**
  * upgrade.js - Upgrade / Membership view
+ * 02 Oct 2026 v19
+ *
+ * v19 - W4-22. After I'm ready, the Settings tab's dot is updated at once (a
+ *   message for the Plan showed only on reopen).
+ *
+ * 02 Oct 2026 v18
+ *
+ * v18 - W4-20. Five percent is said for when payment starts; in the beta
+ *   nobody pays.
+ *
  * 02 Oct 2026 v17
  *
  * v17 - W4-18. The button's name begins with its visible words (I'm ready:
@@ -200,6 +210,7 @@
  * 22 May 2026 v1 --- Stub to prevent 404.
  */
 
+import { updateNavDot } from "../data/messages.js";
 import { store }  from "../store.js";
 import { router } from "../router.js";
 import { PRICE_MONTHLY, PRICE_ANNUAL } from "../data/pricing.js";
@@ -293,7 +304,8 @@ export function render() {
           <h1 class="upgrade-heading">You have a Plan.</h1>
           <p class="upgrade-lede">Everything is open to you. Nothing here needs deciding.</p>
           <p class="upgrade-body">
-            Five percent of what you pay goes to causes this community chooses.
+            When payment starts, five percent of what you pay will go to causes this
+            community chooses. In the beta you pay nothing.
           </p>
         </div>
 
@@ -436,6 +448,7 @@ export function onMount() {
     // been charged -- leaving that ambiguous after a button labelled
     // "I'm ready" would be the worst thing this page could do.
     store.set("tier", "personal");
+    updateNavDot();   // W4-22: a message for the Plan shows its dot now, not on reopen
 
     const confirm = document.getElementById("upgrade-confirm");
     if (confirm) {

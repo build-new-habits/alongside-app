@@ -1,6 +1,12 @@
 /**
  * js/views/noticing.js - Wellbeing Hub Landing View
  *
+ * 02 Oct 2026 v10 - W4-20 and W4-21. This week's question changes with the week
+ *   (counted from createdAt; noticingWeekInCycle was never advanced).
+ *   Saving a journal entry says Saved to your journal, once. An entry saved
+ *   with Can't find the words says so beside its date. Mindful movement is
+ *   Mindful awareness (sitting and breathing practices).
+ *
  * 01 Oct 2026 v9 - SIGNPOST-STATIC. "If you need to talk to someone" at the foot of
  *   Wellbeing, always, the same for everybody (data/support-lines.js).
  *
@@ -105,6 +111,9 @@ export const centered = false;
 // PT-2. Which entry is asking "Delete this entry?", and what was just said.
 let pendingJournalDelete = null;
 let journalStatus = "";
+// W4-21. Said once, on the next Wellbeing screen, after a save.
+let _savedOnce = false;
+export function noteJournalSaved() { journalStatus = "Saved to your journal."; _savedOnce = true; }
 const _escText = t => String(t ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 
 // ── Weekly noticing prompt data ───────────────────────────────────────────────
@@ -178,8 +187,24 @@ function getCoachStyle() {
   return store.get("coachStyle") || "steady";
 }
 
-function getCurrentWeekPrompt() {
-  const week  = ((store.get("noticingWeekInCycle") || 1) - 1) % 6;
+/**
+ * W4-21 (Wave 4, 2.11). This week's question changes with the week: it
+ * read noticingWeekInCycle, which nothing ever advanced, so it was the
+ * same question for ever. Now weeks are counted from when the person
+ * started (createdAt), Monday to Sunday, round the six.
+ */
+const WEEK_MS = 7 * 86400000;
+function _mondayOf(d) {
+  const m = new Date(d); m.setHours(0, 0, 0, 0);
+  m.setDate(m.getDate() - ((m.getDay() + 6) % 7));
+  return m.getTime();
+}
+export function currentWeekQuestion(now = new Date()) { return getCurrentWeekPrompt(now); }
+
+function getCurrentWeekPrompt(now = new Date()) {
+  const start = Date.parse(store.get("createdAt") || "") || now.getTime();
+  const n     = Math.max(0, Math.round((_mondayOf(now) - _mondayOf(new Date(start))) / WEEK_MS));
+  const week  = n % WEEKLY_PROMPTS.length;
   const entry = WEEKLY_PROMPTS[week];
   const style = getCoachStyle();
   return {
@@ -238,6 +263,8 @@ export function suggestNow(checkin) {
 // ── Render ────────────────────────────────────────────────────────────────────
 
 export function render() {
+  const shownStatus = journalStatus;
+  if (_savedOnce) { journalStatus = ""; _savedOnce = false; }
   const name          = store.get("name") || "";
   const weekData      = getCurrentWeekPrompt();
   const recentEntries = getRecentEntries(3);
@@ -320,12 +347,12 @@ export function render() {
                   style="display: flex; align-items: center; gap: var(--space-4);
                          text-align: left; width: 100%; cursor: pointer;
                          background: var(--color-surface);"
-                  aria-label="Mindful movement — five, ten, fifteen, or twenty minute guided sessions">
+                  aria-label="Mindful awareness — five, ten, fifteen, or twenty minute guided sessions">
             <span style="font-size: 2rem; flex-shrink: 0; line-height: 1;"
                   aria-hidden="true">🌿</span>
             <div style="flex: 1; min-width: 0;">
               <p style="font-size: var(--text-lg); font-weight: var(--font-semibold);
-                        margin-bottom: var(--space-1);">Mindful movement</p>
+                        margin-bottom: var(--space-1);">Mindful awareness</p>
               <p class="text-secondary" style="font-size: var(--text-sm);">
                 5, 10, 15, or 20 minutes. Guided, with a timer.
               </p>
@@ -405,14 +432,14 @@ export function render() {
               : ""}
           </div>
 
-          <p class="sr-only" id="journal-status" role="status" aria-live="polite">${_escText(journalStatus)}</p>
-          ${journalStatus ? `<p class="text-sm text-muted" aria-hidden="true">${_escText(journalStatus)}</p>` : ""}
+          <p class="sr-only" id="journal-status" role="status" aria-live="polite">${_escText(shownStatus)}</p>
+          ${shownStatus ? `<p class="text-sm text-muted" aria-hidden="true">${_escText(shownStatus)}</p>` : ""}
           <div style="display: flex; flex-direction: column; gap: var(--space-2);">
             ${recentEntries.map(entry => `
               <div class="card" role="article">
                 <div style="display: flex; align-items: center; gap: var(--space-2);
                             margin-bottom: var(--space-2);">
-                  <span class="text-xs text-muted">${formatDate(entry.date)}</span>
+                  <span class="text-xs text-muted">${formatDate(entry.date)}${entry.noWords ? " · Saved without words" : ""}</span>
                   ${entry.tags && entry.tags.length > 0
                     ? `<span class="text-xs text-muted"
                              style="background: var(--color-surface-raised, rgba(255,255,255,0.06));
@@ -439,8 +466,8 @@ export function render() {
           </div>
         </section>
       ` : `
-        <p class="text-secondary text-sm" style="margin-top: var(--space-5);" ${journalStatus ? 'role="status"' : ''}>
-          ${journalStatus ? _escText(journalStatus) + " " : ""}Your reflections will appear here after your first journal entry.
+        <p class="text-secondary text-sm" style="margin-top: var(--space-5);" ${shownStatus ? 'role="status"' : ''}>
+          ${shownStatus ? _escText(shownStatus) + " " : ""}Your reflections will appear here after your first journal entry.
         </p>
       `}
 

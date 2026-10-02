@@ -1,6 +1,11 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
+ * 02 Oct 2026 v79
+ *
+ * v79 - W4-20. gentleReason() exported: the coach asks why a plan is lighter
+ *   before saying the plan stays as it is.
+ *
  * 02 Oct 2026 v78
  *
  * v78 - W4-7 / W4-9 (Wave 4 trace). Sore areas through the one classifier
@@ -1284,6 +1289,10 @@ function _burnoutActive() {
  * coachBias(), coldStartBias(), detectBurnout() -- so the thresholds
  * stay where they were decided, not copied here.
  */
+/** W4-20. Why today's plan is lighter, or null: what the coach says
+ *  before "the plan stays as it is" (it said that over a lighter plan). */
+export function gentleReason() { return _gentleReason(); }
+
 function _gentleReason() {
   if (_todayIntensity() === "low") return { id: "today" };
   try {

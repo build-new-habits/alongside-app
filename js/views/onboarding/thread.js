@@ -1,5 +1,10 @@
 /**
  * js/views/onboarding/thread.js
+ * 02 Oct 2026 v23
+ *
+ * v23 - W4-20. The training-intent answer is acknowledged with what the
+ *   person's legs are ready for (capabilityProfile).
+ *
  * 02 Oct 2026 v22
  *
  * v22 - W4-19 ONBOARDING-FIRST. The health consent can be declined: only the
@@ -1561,7 +1566,7 @@ export function ThreadView(router) {
 
     // Step 9f — training intent: dynamic ack (W3-B)
     if (step.id === '9f') {
-      return generateIntentAck(value);
+      return generateIntentAck(value, store.capabilityProfile());
     }
 
 

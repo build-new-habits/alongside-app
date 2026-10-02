@@ -1,5 +1,12 @@
 /**
  * js/views/checkin.js
+ * 02 Oct 2026 v28
+ *
+ * v28 - W4-20. lengthLine(): on a day the plan will be shorter (a low day,
+ *   poor sleep, a lighter form or another lighter reason from the builder)
+ *   it says the usual and that today will be shorter, not the usual
+ *   promised.
+ *
  * 02 Oct 2026 v27
  *
  * v27 - W4-9. The three sore words and their scores come from
@@ -368,8 +375,25 @@ import { prefersReducedMotion } from "../display-prefs.js";
 // reset and the clinical safety line are still used here.
 import { intensityForForm, clearPurpose, SAFETY_LINE } from "../data/purpose.js";
 import { checkinData }     from "../data/checkin.js";
+import { gentleReason }    from "../session-builder.js";
 import { resolveOpening }  from "../data/checkin-openings.js";
 import { CONDITIONS, soreAreaOptions, SORE_LEVELS } from "../data/conditions.js";
+
+const USUAL = { micro: "10 minutes", quick: "20 minutes", short: "30 minutes",
+                standard: "40 minutes", long: "50 minutes", open: "an hour or more" };
+
+/**
+ * W4-20. The check-in's last words on length. "I'll plan for your usual
+ * 30 minutes" came before plans made shorter (a low day, poor sleep, a
+ * lighter reason the builder has): on those days it says so.
+ */
+export function lengthLine(selectedTime, { shorter = false } = {}) {
+  if (!selectedTime) return " I'll have something ready for you.";
+  const usual = USUAL[selectedTime] || selectedTime;
+  return shorter
+    ? ` Your usual is ${usual}; today I'll keep it shorter.`
+    : ` I'll plan for your usual ${usual}.`;
+}
 
 export function CheckinView(router) {
 
@@ -881,7 +905,12 @@ export function CheckinView(router) {
     else                   line += ".";
 
     // W3-20. Their usual length, said as that -- not a claim about today.
-    line += _selectedTime ? ` I'll plan for your usual ${tl[_selectedTime] || _selectedTime}.` : " I'll have something ready for you.";
+    void tl;
+    let reason = null;
+    try { reason = gentleReason(); } catch { reason = null; }
+    const shorter = (Number(e) <= 3) || q === "poor" || intensityForForm(store.get("todayForm")) === "low" ||
+      (reason && reason.id !== "today");
+    line += lengthLine(_selectedTime, { shorter: !!shorter });
     return line;
   }
 

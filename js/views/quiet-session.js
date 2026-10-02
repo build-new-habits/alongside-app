@@ -20,6 +20,11 @@
  *   "the braking system of the nervous system", HRV as "a marker of
  *   nervous system health". Rewritten as what to do. Patterns unchanged.
  *
+ * 02 Oct 2026 v8
+ *
+ * v8 - W4-20. Mindful awareness, not movement: the practices are sitting and
+ *   breathing.
+ *
  * 29 Sep 2026 v7
  *
  * v7 - P23. The safety note before mindful practice is worded for a
@@ -337,7 +342,7 @@ function renderModeSelector() {
       </button>
 
       <button class="quiet-mode-card" data-mode="mindful" role="listitem"
-              aria-label="Mindful movement">
+              aria-label="Mindful awareness">
         <div class="quiet-mode-card-left">
           <span class="quiet-mode-icon" aria-hidden="true">\uD83C\uDF3F</span>
           <div>

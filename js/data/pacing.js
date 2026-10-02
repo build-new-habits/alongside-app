@@ -1,5 +1,11 @@
 /**
  * pacing.js - Proactive pacing
+ * 02 Oct 2026 v5
+ *
+ * v5 - W4-20. The plan-jump line says the count (fewer than one session a
+ *   week), not a judgement, and that breathing and mindful practice are not
+ *   counted when there were some.
+ *
  * 29 Sep 2026 v4
  *
  * v4 - P25 (persona finding W2-20). Make it up as I go ("freestyle") and
@@ -234,14 +240,23 @@ export function noticePlanJump() {
   pacing.planNudgeAt = new Date().toISOString();
   store.set('pacing', pacing);
 
-  const rounded = avg < 1 ? 'not much' : `about ${Math.round(avg)} a week`;
+  // W4-20. "lately it's been not much" to somebody with a month of
+  // breathing and mindful practice: those are not counted here, so it says
+  // so, and says the count rather than judging it.
+  const rounded = avg < 1 ? 'fewer than one session a week' : `about ${Math.round(avg)} a week`;
+  const cutoff = Date.now() - 3 * 7 * 86400000;
+  const quiet = store.completedSessions(store.get('activityLog') || []).some(e => {
+    const ts = e.completedAt || e.loggedAt || e.date;
+    return ts && new Date(ts).getTime() >= cutoff && !_isMovement(e);
+  });
+  const notCounted = quiet ? ' (breathing and mindful practice aren\u2019t counted here)' : '';
   return {
     heading: "Can I say something about the plan?",
     // Names the gap using her own two numbers and nothing else. Offers
     // the smaller version as a suggestion she can ignore, and says
     // plainly that the ambitious version is allowed — otherwise this
     // reads as the app deciding she cannot manage it.
-    body: `You've set ${target} a week, and lately it's been ${rounded}. That's a real jump. You can absolutely go for it — but if you'd rather build up to it, starting nearer where you are tends to be the version people are still doing in a month.`
+    body: `You've set ${target} a week, and lately it's been ${rounded}${notCounted}. That's a real jump. You can absolutely go for it — but if you'd rather build up to it, starting nearer where you are tends to be the version people are still doing in a month.`
   };
 }
 

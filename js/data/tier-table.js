@@ -1,5 +1,9 @@
 /**
  * js/data/tier-table.js
+ * 02 Oct 2026 v5
+ *
+ * v5 - W4-20. Mindful awareness, not movement.
+ *
  * 30 Sep 2026 v4
  *
  * v4 - W3-13. Coming back, Free: a session the phone closed can still
@@ -120,7 +124,7 @@ export const TIER_TABLE = [
     id: "wellbeing",
     area: "Wellbeing",
     same: true,
-    free: "Everything: breathing, mindful movement, the journal, In Step",
+    free: "Everything: breathing, mindful awareness, the journal, In Step",
     plan: "Everything, the same",
     proof: "verify-plan-claims 3.wellbeing",
   },
