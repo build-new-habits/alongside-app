@@ -1,5 +1,14 @@
 # Alongside — Data Schema Reference
-## 02 Oct 2026 v1.101
+## 02 Oct 2026 v1.102
+
+> **v1.102, 02 Oct 2026 — W4-21 and W4-22** (`store.js` v105, unchanged).
+> No store field changes. One display key **outside the store**:
+> **`alongside-vibration`** (`"on"` default, `"off"`), in
+> `display-prefs.js` beside the other display settings (this phone's, kept
+> on Restore, removed by Reset). Off stops every vibration in the app.
+> **`noticingWeekInCycle`** is no longer read: this week's question is
+> counted from `createdAt`, Monday to Sunday (nothing ever advanced the
+> field). It stays in the store, unwritten.
 
 > **v1.101, 02 Oct 2026 — W4-13 and W4-19** (`store.js` v105). New
 > **`consent.health.declinedAt`** (ISO|null, default `null`): set when the
