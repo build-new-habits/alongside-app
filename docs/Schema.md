@@ -1,5 +1,15 @@
 # Alongside — Data Schema Reference
-## 02 Oct 2026 v1.99
+## 02 Oct 2026 v1.100
+
+> **v1.100, 02 Oct 2026 — W4-12 EVIDENCE-TRUE** (`store.js` v104, unchanged).
+> No store field changes. One localStorage key **outside the store**:
+> **`bnh-research-answered`**, a JSON array of the research questions
+> answered on this phone (`"survey"`, `"figures"`), written by
+> `data/evidence.js` only after a send is accepted. It holds no answer.
+> It deliberately does not start `alongside`, so **Reset all data does not
+> remove it**: nobody is asked the same question twice or counted twice.
+> The Reset dialog must say so (W4-16). Delete the app's site data to
+> remove it.
 
 > **v1.99, 02 Oct 2026 — W4-8 PAIN-NUMBERS** (`store.js` v104). Field
 > retired: **`activityLog[].painChange`** (`'better'|'same'|'worse'|'none'`).
