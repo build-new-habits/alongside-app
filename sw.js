@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 02 Oct 2026 v632
+ * 02 Oct 2026 v633
  *
+ * v633 - W4-16/W4-18, and Graeme's health-consent decision: the health consent is asked again only when what it covers changes, not for the shorter tick; Reset says what goes and what stays, then says it happened and puts display settings back; switches keep their names, Saved survives a redraw, the upgrade button is named by its words, headings keep focus, the journal box keeps its label, no emoji in a heading's name, the breath circle still under Reduce motion.
  * v632 - W4-13/W4-17/W4-19: the policy screen lists only what changed since you agreed, a new health-consent wording asks again, no house where it loops; under 18: how to start again at 18, a copy offered before an earlier install is deleted, "That date hasn't happened yet", their own privacy summary, no messages fetched; getting started: the health consent can be declined, readable consent text, a typed year, sheet Back records nothing, no splash on return or under Reduce motion, honest counts. NEW FILE precached: js/data/export-file.js.
  * v631 - W4-10/W4-11/W4-12: tiredness and stress are said apart from the sore areas, and no promise the app cannot keep; "this week" means the last seven days; research figures true (weeks passed, stopped sessions out, kinds from the session), the survey waits for some use, and the privacy screens name it.
  * v630 - W4-7/W4-8/W4-9: one meaning of A little, Quite sore and Bad at every door, one true sentence about a sore area; Bad-day words and minutes true, Something gentle after all; no pain numbers, no pain record kept with sessions.
@@ -4179,7 +4180,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v632";
+const CACHE_NAME = "alongside-v633";
 
 const SHELL_URLS = [
 
