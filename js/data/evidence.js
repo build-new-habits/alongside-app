@@ -1,5 +1,15 @@
 /**
  * js/data/evidence.js
+ * 02 Oct 2026 v2
+ *
+ * v2 - W4-12 EVIDENCE-TRUE. Rates divide by the weeks that have passed (at
+ *   most four). A stopped session (partial) is not counted. Kinds come from
+ *   what the session was (kindOf; every activity type decided in KIND_OF).
+ *   The survey waits for three sessions over a week, Share my figures for
+ *   four weeks since the first. Answered stays answered across Reset all
+ *   data (bnh-research-answered). researchPrivacyLine() for the privacy
+ *   screens.
+ *
  * 01 Oct 2026 v1
  *
  * B5 EVIDENCE. Two voluntary questions in Settings › Messages: a short
@@ -37,13 +47,35 @@ export const RECEIVER = { url: "", key: "", table: "evidence" };
 export const enabled = () => !!(RECEIVER.url && RECEIVER.key && /^https:\/\/[a-z0-9-]+\.supabase\.co$/.test(RECEIVER.url));
 
 export const KIND_LIST = ["walk", "run", "strength", "mobility", "breathing", "class"];
-const KIND_OF = {
-  walk: "walk", run: "run",
-  workout: "strength", gym: "strength", "core-session": "strength", "prescribed-session": "strength", "morning-session": "strength", freestyle: "strength",
-  yoga: "mobility", stretch: "mobility", mobility: "mobility",
-  breathing: "breathing", mindful: "breathing", mindfulness: "breathing", "quiet-session": "breathing",
-  class: "class",
+// W4-12 (Wave 4, 2.18). Every activity type the app writes has a decided
+// kind, or null where none of the six is true (a swim, a made-up session,
+// your own exercises, a sport). "workout" and "coach-session" are SESSION
+// shapes, not kinds: what they were is read from sessionType (kindOf).
+// Before, every workout was sent as strength, a mobility or cardio one too.
+export const KIND_OF = {
+  walk: "walk", "walk-session": "walk", hike: "walk",
+  run: "run", "running-session": "run",
+  workout: "strength", "coach-session": "strength",
+  gym: "strength", "gym-programme": "strength", "core-session": "strength",
+  "morning-session": "mobility",
+  yoga: "mobility", "yoga-session": "mobility", stretch: "mobility", mobility: "mobility",
+  breathing: "breathing", "breathing-session": "breathing", mindful: "breathing", mindfulness: "breathing", "quiet-session": "breathing",
+  class: "class", "body-balance": "class",
+  freestyle: null, capture: null, "prescribed-session": null, practice: null, outdoor: null,
+  swim: null, "swim-session": null, cycle: null, "cycle-session": null, "outdoor-cycle": null,
+  row: null, spin: null, boxing: null, hiit: null, tennis: null, football: null, golf: null, sport: null,
 };
+const SHAPED = new Set(["workout", "coach-session"]);
+/** The kind one session was, from the fixed list, or null. */
+export function kindOf(e) {
+  if (!e) return null;
+  if (SHAPED.has(e.type) && e.sessionType) {
+    if (e.sessionType === "mobility") return "mobility";
+    if (e.sessionType === "cardio") return null;
+    return "strength";
+  }
+  return KIND_OF[e.type] ?? null;
+}
 
 export const SURVEY = {
   move: {
@@ -63,18 +95,36 @@ const _month = (d = new Date()) => d.toISOString().slice(0, 7);
 const _tier = () => ((store.get("tier") || "free") !== "free" ? "plan" : "free");
 const _half = n => Math.round(n * 2) / 2;
 function _when(e) { const t = Date.parse(e?.completedAt || e?.date || ""); return isNaN(t) ? null : t; }
-function _done() { return (store.get("activityLog") || []).filter(e => e && e.status !== "abandoned" && _when(e) != null); }
+// W4-12: a stopped session is written as status "partial"; the old filter
+// looked for "abandoned", which nothing writes. One definition: the store's.
+function _done() { return store.completedSessions(store.get("activityLog") || []).filter(e => _when(e) != null); }
+const DAY = 86400000;
+// Weeks that have passed since a start, at least one, at most four: six
+// sessions in two weeks is three a week, not one and a half.
+const _weeks = (from, now) => Math.min(4, Math.max(1, Math.ceil((now - from) / (7 * DAY))));
+
+// W4-12: once answered, a question stays answered on this phone even after
+// Reset all data (which clears every "alongside" key), so nobody is asked
+// twice and nobody is counted twice. It holds no answer, only which
+// question. The Reset dialog says so (W4-16).
+const ANSWERED_KEY = "bnh-research-answered";
+function _answered() { try { return JSON.parse(globalThis.localStorage?.getItem(ANSWERED_KEY) || "[]"); } catch { return []; } }
+export function rememberAnswered(kind) {
+  try { const a = new Set(_answered()); a.add(kind); globalThis.localStorage?.setItem(ANSWERED_KEY, JSON.stringify([...a])); } catch { /* storage off */ }
+}
+export const wasAnswered = kind => _answered().includes(kind);
 
 /** What Share my figures would send, worked out on the device. */
 export function figuresPayload(now = Date.now()) {
   const log = _done();
-  const DAY = 86400000, FOUR = 28 * DAY;
+  const FOUR = 28 * DAY;
   const first = log.length ? Math.min(...log.map(_when)) : null;
   const inRange = (a, b) => log.filter(e => _when(e) >= a && _when(e) < b);
-  const firstWeeks  = first == null ? 0 : _half(inRange(first, first + FOUR).length / 4);
+  const weeks       = first == null ? 1 : _weeks(first, now);
+  const firstWeeks  = first == null ? 0 : _half(inRange(first, first + FOUR).length / weeks);
   const latest      = inRange(now - FOUR, now + 1);
-  const latestWeeks = _half(latest.length / 4);
-  const kinds = KIND_LIST.filter(k => latest.some(e => KIND_OF[e.type] === k));
+  const latestWeeks = _half(latest.length / weeks);
+  const kinds = KIND_LIST.filter(k => latest.some(e => kindOf(e) === k));
   return {
     kind: "figures",
     tier: _tier(),
@@ -121,6 +171,7 @@ export async function sendEvidence(payload, fetchImpl = globalThis.fetch) {
     if (!res || !res.ok) return false;
     if (payload.kind === "survey") store.set("evidence.surveyDone", true);
     else store.set("evidence.figuresDone", true);
+    rememberAnswered(payload.kind);
     return true;
   } catch { return false; }
 }
@@ -130,17 +181,35 @@ export function researchMessages() {
   if (!enabled()) return [];
   const ev = store.get("evidence") || {};
   const out = [];
-  if (!ev.surveyDone) out.push({
+  // W4-12 (Wave 4, 2.18). "How does your movement now compare with before?"
+  // was offered on day one, to somebody who had done nothing yet, and Share
+  // my figures after four sessions in five days, whose "first four weeks"
+  // and "latest four weeks" were the same few days. The survey waits for
+  // three sessions over a week; the figures for four weeks since the first.
+  const log = _done();
+  const first = log.length ? Math.min(...log.map(_when)) : null;
+  const since = first == null ? 0 : (Date.now() - first) / DAY;
+  if (!ev.surveyDone && !wasAnswered("survey") && log.length >= 3 && since >= 7) out.push({
     id: "survey-2026", kind: "research", action: "survey", publishedAt: "2026-10-01", audience: { tier: "any" },
     title: "A quick question, if you have a moment",
     body: "Two questions about how you move now. It’s up to you, and nothing is sent unless you press Send.",
   });
-  if (!ev.figuresDone) out.push({
+  if (!ev.figuresDone && !wasAnswered("figures") && since >= 28) out.push({
     id: "share-figures-2026", kind: "research", action: "share-figures", publishedAt: "2026-10-01", audience: { tier: "any", minSessions: 4 },
     title: "Share a few figures?",
     body: "A few counts of your sessions, worked out on this phone, to help us say truthfully what Alongside does. You see exactly what would be sent first.",
   });
   return out;
+}
+
+/**
+ * W4-12. The one sentence every privacy screen adds while sending is on:
+ * the survey and Share my figures are the only things that leave the phone
+ * for research. Empty while the receiver is not set.
+ */
+export function researchPrivacyLine() {
+  if (!enabled()) return "";
+  return "If you answer the survey or use Share my figures in Messages, those answers go to a research table we keep in Frankfurt. They don\u2019t say who you are, so they can\u2019t be traced back to you, or taken back once sent.";
 }
 
 addBuiltIn(researchMessages);

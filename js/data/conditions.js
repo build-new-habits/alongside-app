@@ -1,6 +1,13 @@
 /**
  * conditions.js — Condition definitions for onboarding and check-in
  *
+ * 02 Oct 2026 v1.10
+ *
+ * v1.10 - W4-10 TIREDNESS-PROMISE. EVERYDAY_STATES moved here from
+ *   onboarding-thread-data.js, with isEveryday, bodyAreasOf and everydayOf,
+ *   so getting started, Settings and the Plan's arcs tell a sore area from
+ *   an everyday state the same way.
+ *
  * 02 Oct 2026 v1.9
  *   W4-9 SORE-WORDS (Wave 4 trace). ONE place for how sore is sore. The
  *   check-in's three words and their scores (SORE_LEVELS), which word a
@@ -227,6 +234,15 @@ export const CONDITIONS = [
 // all; the scope statement (data/scope-statement.js) tells everybody to
 // speak to a professional instead. These stay as no-ops so a stored id
 // from an older install can never reach a session builder as a rule.
+// W4-10, 02 Oct 2026. Everyday states: listed in getting started, but not
+// sore areas. Nothing a session builder reads plans around them; the
+// check-in's energy is what makes a day gentler. They are said apart from
+// the sore areas everywhere (getting started, Settings, the Plan's arcs).
+export const EVERYDAY_STATES = new Set(['persistent-fatigue', 'anxiety', 'perimenopause', 'menopause']);
+export const isEveryday = id => EVERYDAY_STATES.has(id);
+export const bodyAreasOf = (ids = []) => (ids || []).filter(id => !EVERYDAY_STATES.has(id));
+export const everydayOf  = (ids = []) => (ids || []).filter(id => EVERYDAY_STATES.has(id));
+
 export const EXCLUDED_CONDITIONS = new Set();
 export function hasExcludedCondition() { return false; }
 export function getExcludedConditions() { return []; }

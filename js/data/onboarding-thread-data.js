@@ -1,5 +1,13 @@
 /**
  * js/data/onboarding-thread-data.js
+ * 02 Oct 2026 v20
+ *
+ * v20 - W4-10 TIREDNESS-PROMISE. generateConditionsAck no longer promises to
+ *   keep tiredness or stress in mind (nothing did): sore areas get the
+ *   sore-area sentence, counted over areas only and named; everyday states
+ *   get the check-in's energy line. EVERYDAY_STATES now lives in
+ *   conditions.js.
+ *
  * 01 Oct 2026 v19
  *
  * v19 - BUNDLE-TRUE. The sore-area question and its thank-you said movements
@@ -134,7 +142,7 @@
  *   FALLBACK_REFLECTION     — Beat 3 fallback for "I'd rather not say"
  */
 
-import { getConditionName } from "./conditions.js";
+import { getConditionName, bodyAreasOf, everydayOf } from "./conditions.js";
 import { getGoalLabel } from "./goals.js";
 import { SCOPE_TITLE, SCOPE_BODY, SCOPE_ADVICE } from "./scope-statement.js";
 
@@ -1119,8 +1127,6 @@ export function generateConditionCaveats(conditions) {
     .join("\n\n");
 }
 
-const EVERYDAY_STATES = new Set(['persistent-fatigue', 'anxiety', 'perimenopause', 'menopause']);
-
 export function generateConditionsAck(conditions) {
   const caveats = generateConditionCaveats(conditions);
   const withCaveats = base => (caveats ? `${base}\n\n${caveats}` : base);
@@ -1128,29 +1134,30 @@ export function generateConditionsAck(conditions) {
   if (!conditions || conditions.length === 0) {
     return "Okay \u2014 no problem at all. If anything comes to mind later, you can add it in your settings and I'll adjust from there. I just wanted to ask.";
   }
-  if (conditions.length === 1) {
-    // ACK-NAME, 06 Sep 2026. Was `${conditions[0]}`, which put the raw
-    // store id into the coach's mouth: "I'll work around wrist-elbow".
-    // Every user declaring exactly one condition saw it, at the precise
-    // moment the coach is claiming to have listened.
-    //
-    // getConditionName() rather than a second lookup here -- it already
-    // handles the -acute/-subacute phase suffixes, and it already falls
-    // back to the id for anything unrecognised, so a condition added
-    // without a definition degrades to the old behaviour instead of
-    // rendering "undefined".
-    // P0. A body area is something movements load; an everyday state
-    // (tiredness, stress, peri/menopause) is not, so it gets its own line.
-    const name = getConditionName(conditions[0]);
-    if (EVERYDAY_STATES.has(conditions[0])) {
-      return withCaveats(`Thank you for telling me about ${name.toLowerCase()}. I'll keep it in mind day to day \u2014 you won't have to remind me.`);
-    }
-    return withCaveats(`Thank you for telling me. When you check in, you can tell me how your ${name.toLowerCase()} is, and on a day it\u2019s bad I'll leave out movements that are likely to load it.`);
+  // ACK-NAME, 06 Sep 2026: getConditionName(), never the raw store id.
+  // W4-10, 02 Oct 2026 (Wave 4, 2.4). A body area is something movements
+  // load; an everyday state (tiredness, stress) is not, and nothing that
+  // builds a session reads it. It said "I'll keep it in mind day to day --
+  // you won't have to remind me", which nothing kept. Now each gets what is
+  // true: areas the sore-area sentence (counted over areas only), everyday
+  // states the check-in's energy, which is what makes a day gentler.
+  const areas    = bodyAreasOf(conditions);
+  const everyday = everydayOf(conditions);
+  const parts = [];
+  if (areas.length === 1) {
+    parts.push(`When you check in, you can tell me how your ${getConditionName(areas[0]).toLowerCase()} is, and on a day it\u2019s bad I'll leave out movements that are likely to load it.`);
+  } else if (areas.length === 2) {
+    parts.push(`When you check in, you can tell me how your ${getConditionName(areas[0]).toLowerCase()} and ${getConditionName(areas[1]).toLowerCase()} are, and on a day one is bad I'll leave out movements that are likely to load it.`);
+  } else if (areas.length > 2) {
+    parts.push(`When you check in, you can tell me how each of those areas is, and on a day one is bad I'll leave out movements that are likely to load it.`);
   }
-  if (conditions.length === 2) {
-    return withCaveats(`Thank you for telling me. When you check in, you can tell me how either of those is, and on a day one is bad I'll leave out movements that are likely to load it.`);
+  const energy = "when you check in, tell me how your energy is that day. A low-energy day is what makes a session gentler.";
+  if (everyday.length) {
+    const names = everyday.map(id => getConditionName(id).toLowerCase()).join(" and ");
+    if (!areas.length) return withCaveats(`Thank you for telling me about ${names}. ${energy[0].toUpperCase()}${energy.slice(1)}`);
+    parts.push(`About ${names}: ${energy}`);
   }
-  return withCaveats(`Thank you for telling me. When you check in, you can tell me how any of those is, and on a day one is bad I'll leave out movements that are likely to load it.`);
+  return withCaveats(`Thank you for telling me. ${parts.join(" ")}`);
 }
 
 /**

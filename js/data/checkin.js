@@ -1,5 +1,11 @@
 /**
  * checkin.js
+ * 02 Oct 2026 v13
+ *
+ * v13 - W4-11 BURNOUT-WEEK. detectBurnout counts only check-ins from the
+ *   last seven days, so "Your check-ins this week have mostly been low" is
+ *   about this week.
+ *
  * 01 Oct 2026 v12
  *
  * v12 - BUNDLE-TRUE. The retired feeling-word list (FEELING_WORDS) and its
@@ -415,13 +421,17 @@ export function getQuadrant(energy, mood) {
  *
  * @returns {{ level: 'none'|'moderate'|'high', avgEnergy: number|null }}
  */
-export function detectBurnout(checkinHistory) {
+export function detectBurnout(checkinHistory, now = new Date()) {
   const history = (checkinHistory && typeof checkinHistory === 'object')
     ? checkinHistory
     : (store.get('checkinHistory') || {});
 
   const none = { level: 'none', avgEnergy: null };
-  const dates = Object.keys(history).sort().slice(-7);
+  // W4-11 (Wave 4, 2.6). "Your check-ins this week" read the last seven
+  // check-ins, however old: four low days a fortnight ago still said "this
+  // week" after a good day today. Only the last seven days count now.
+  const since = store._localDay(new Date(now.getTime() - 6 * 86400000));
+  const dates = Object.keys(history).filter(d => d >= since).sort().slice(-7);
   if (dates.length < 3) return none;
 
   const energyValues = dates.slice(-5)

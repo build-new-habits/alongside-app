@@ -1,5 +1,10 @@
 /**
  * js/data/activity-labels.js
+ * 02 Oct 2026 v4
+ *
+ * v4 - W4-12. ACTIVITY_TYPES exported, so the research figures can be
+ *   checked to decide a kind for every type the app writes.
+ *
  * 30 Sep 2026 v3
  *
  * v3 - W3-20. "an upper body session", not "a upper body session".
@@ -67,6 +72,9 @@ const LABELS = {
   "golf":               ["golf",                      "golf"],
   "sport":              ["some sport",                "sport"],
 };
+
+/** Every activity type this file names (W4-12: evidence.js decides a kind for each). */
+export const ACTIVITY_TYPES = Object.freeze(Object.keys(LABELS));
 
 const FALLBACK = ["some activity", "other activity"];
 

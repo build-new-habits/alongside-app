@@ -1,5 +1,10 @@
 /**
  * js/views/onboarding/thread.js
+ * 02 Oct 2026 v21
+ *
+ * v21 - W4-12. The consent list names the survey and Share my figures while
+ *   sending is on (researchPrivacyLine).
+ *
  * 02 Oct 2026 v20
  *
  * v20 - W4-6 RESTORE-MOVE. The consent screen offers "Moving from another
@@ -271,6 +276,7 @@ import { HEALTH_TICK, HEALTH_NOTE, giveHealthConsent } from '../../data/health-c
 import { ageQuestionHTML, readAge, recordAge } from '../../data/age-check.js';
 import { POLICY_VERSION as CURRENT_POLICY_VERSION } from '../../data/consent-version.js';
 import { restoreFromFile } from '../restore-flow.js';
+import { researchPrivacyLine } from '../../data/evidence.js';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MOTION PREFERENCE
@@ -433,6 +439,7 @@ export function ThreadView(router) {
           <ul class="ob-consent__list">
             <li>Your answers are kept on this phone. There is no account and no copy on a server. We do not sell them, and we do not share them with advertisers.</li>
             <li>If something in the app breaks, a short error report goes to Sentry, the service we use to fix faults. It says what broke, never what you told me.</li>
+            ${researchPrivacyLine() ? `<li>${researchPrivacyLine()}</li>` : ''}
             <li>We use what you tell us to shape your sessions — that is the whole point of asking.</li>
             <li>You can change or delete anything, any time, in Settings, and download a copy of it all.</li>
           </ul>

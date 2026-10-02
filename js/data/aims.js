@@ -1,5 +1,11 @@
 /**
  * js/data/aims.js
+ * 02 Oct 2026 v4
+ *
+ * v4 - W4-10 TIREDNESS-PROMISE. situationsFor marks managing (and sport) for
+ *   sore areas only: tiredness or stress listed in getting started no longer
+ *   leads the Plan's arcs with injury aims.
+ *
  * 29 Sep 2026 v3
  *
  * v3 - P0, SCOPE-MINOR. "Build back gently after being ill" is "Get going again after being unwell".
@@ -90,6 +96,8 @@
  * all filter before any of this is consulted, so a wrong row produces a
  * less useful session, never an unsafe one.
  */
+
+import { bodyAreasOf } from "./conditions.js";
 
 /**
  * STRANDS. Each names what it actually does to a session.
@@ -435,7 +443,8 @@ export function situationsFor(store) {
   const out      = new Set(["everyday"]);
   const level    = store.get("fitnessLevel") || store.get("lifestyle.activityLevel") || null;
   const band     = store.get("ageBand");
-  const conds    = store.get("conditions") || [];
+  // W4-10: an everyday state (tiredness, stress) is not an injury to manage.
+  const conds    = bodyAreasOf(store.get("conditions") || []);
   const returning = store.get("lifestyle.returningAfter");
 
   if (returning)                                   out.add("returning");

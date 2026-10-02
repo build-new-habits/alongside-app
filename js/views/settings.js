@@ -1,5 +1,12 @@
 /**
  * settings.js
+ * 02 Oct 2026 v59
+ *
+ * v59 - W4-10 TIREDNESS-PROMISE. The Sore or injured areas row counts sore
+ *   areas only. Tiredness or stress is no longer listed with the sore areas
+ *   or given Not mentioned at a check-in yet: it sits under Also mentioned,
+ *   with the check-in's energy line and Take it off.
+ *
  * 02 Oct 2026 v58
  *
  * v58 - W4-9. Sore or injured areas says what getting started says: on a
@@ -643,7 +650,7 @@ import { openSheet }                     from './onboarding/sheet-manager.js';
 // ("bodyweight-nordic-curl-progression") would be useless and slightly
 // insulting; the list has to say what they actually skipped.
 import { EXERCISES } from '../data/exercises/index.js';
-import { CONDITIONS } from '../data/conditions.js';
+import { CONDITIONS, bodyAreasOf, everydayOf, isEveryday } from '../data/conditions.js';
 import { scopeStatementHTML } from '../data/scope-statement.js';
 import { aimById } from '../data/aims.js';
 import { healthAllowed, healthConsentNeeded, setPendingRoute, takeOpenCapability, takePendingRoute } from '../data/health-consent.js';
@@ -651,7 +658,7 @@ import { describeDate } from '../data/restore.js';
 import { lockText, passwordProblem, lockAvailable } from '../data/file-lock.js';
 import { restoreFromFile } from './restore-flow.js';
 import { visibleMessages, hasUnread, markAllRead, dismissMessage, updateNavDot } from '../data/messages.js';
-import { SURVEY, CANT_FIND, NOT_SENT, figuresPayload, surveyPayload, sendEvidence } from '../data/evidence.js';
+import { SURVEY, CANT_FIND, NOT_SENT, figuresPayload, surveyPayload, sendEvidence, researchPrivacyLine } from '../data/evidence.js';
 import { conditionReadback, shortDate } from '../data/arc-readback.js';
 
 import {
@@ -838,7 +845,8 @@ export function SettingsView(router) {
     const premium  = isPremium();
     const gym      = (store.get('gymEquipment')  || []).length;
     const home     = (store.get('homeEquipment') || []).length;
-    const conds    = store.get('conditions') || [];
+    // W4-10: the row counts sore areas; tiredness or stress is said apart.
+    const conds    = bodyAreasOf(store.get('conditions') || []);
     const moves    = store.get('movementIdentity') || [];
     const cap      = store.get('capability') || {};
     const arc      = store.get('arc') || {};
@@ -1735,7 +1743,13 @@ export function SettingsView(router) {
   // ── Conditions panel ───────────────────────────────────────────────────────
 
   function renderConditionsPanel() {
-    const conditions = store.get('conditions') || [];
+    // W4-10 (Wave 4, 2.4). Tiredness or stress was listed with the sore
+    // areas, under "On a day one is bad, I'll leave out movements", with
+    // "Not mentioned at a check-in yet", which it never can be. Said apart
+    // now, with what is true: the check-in's energy makes a day gentler.
+    const all        = store.get('conditions') || [];
+    const conditions = bodyAreasOf(all);
+    const everyday   = everydayOf(all);
     const resolved   = store.get('conditionsResolved') || [];
     const meta       = store.get('conditionMeta') || {};
     const history    = store.get('checkinHistory') || {};
@@ -1766,6 +1780,23 @@ export function SettingsView(router) {
               </li>`).join('')}
           </ul>
         ` : `<p class="settings-empty">Nothing listed.</p>`}
+        ${everyday.length ? `
+          <h2 class="settings-section__heading">Also mentioned</h2>
+          <p class="settings-section__sub">
+            These aren't sore areas, and I don't leave movements out for them.
+            When you check in, tell me how your energy is that day: a low-energy
+            day is what makes a session gentler.
+          </p>
+          <ul class="settings-conds" aria-label="Also mentioned">
+            ${everyday.map(id => `
+              <li class="settings-cond">
+                <span class="settings-cond__text">
+                  <span class="settings-cond__name">${_esc(nameOf(id))}</span>
+                </span>
+                <button class="btn btn-secondary settings-cond__btn" data-resolve="${_esc(id)}"
+                        aria-label="${_esc(nameOf(id))}: take it off">Take it off</button>
+              </li>`).join('')}
+          </ul>` : ''}
         ${resolved.length ? `
           <h2 class="settings-section__heading">Better now</h2>
           <ul class="settings-conds" aria-label="Areas you've said are better">
@@ -2252,6 +2283,7 @@ export function SettingsView(router) {
         <div class="settings-data-about">
           <p>Everything you tell Alongside is kept on this phone, in the app\u2019s own storage. There is no account and no copy on a server.</p>
           <p>If something in the app breaks, a short error report goes to Sentry, the service we use to fix faults, in Frankfurt. It says what broke and on which screen, never what you told me.</p>
+          ${researchPrivacyLine() ? `<p>${_esc(researchPrivacyLine())}</p>` : ''}
           <p><strong>Download your data</strong> makes a file of all of it, your journal included, on this phone; you can lock it with a password that only you know. <strong>Delete my health answers</strong> removes check-ins, sore areas, what you told me about your body and how you\u2019ve been, weight, journal and session notes. <strong>Reset all data</strong> removes everything. <strong>Restore from a file</strong> brings your history to a new device from a file you downloaded; nothing goes through us.</p>
         </div>
         <div class="settings-about-links">
@@ -2348,7 +2380,9 @@ export function SettingsView(router) {
       store.resolveCondition(btn.dataset.resolve);
       focusAfter = `[data-reopen="${btn.dataset.resolve}"]`;
       render(container);
-      _saved(container, `${name} moved to Better now. I'll stop planning around it.`);
+      _saved(container, isEveryday(btn.dataset.resolve)
+        ? `${name} moved to Better now.`
+        : `${name} moved to Better now. I'll stop planning around it.`);
     }));
     container.querySelectorAll('[data-reopen]').forEach(btn => btn.addEventListener('click', () => {
       const name = (CONDITIONS.find(c => c.id === btn.dataset.reopen) || {}).name || btn.dataset.reopen;

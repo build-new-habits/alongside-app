@@ -1,5 +1,10 @@
 /**
  * privacy.js - Privacy and Terms (in-app summary)
+ * 02 Oct 2026 v6
+ *
+ * v6 - W4-12. Where your answers are kept names the survey and Share my
+ *   figures while sending is on (researchPrivacyLine from evidence.js).
+ *
  * 01 Oct 2026 v5
  *
  * v5 - PT-3 TRUE-PRIVACY-WORDS. Every line checked against what the app
@@ -43,6 +48,7 @@
  */
 
 import { scopeStatementHTML } from "../data/scope-statement.js";
+import { researchPrivacyLine } from "../data/evidence.js";
 
 export const centered = false;
 
@@ -91,6 +97,7 @@ export function render() {
           Pages, like any website. Links you tap, such as &ldquo;Watch how to do
           this&rdquo;, open another site.
         </p>
+        ${researchPrivacyLine() ? `<p class="text-secondary" style="margin-top: var(--space-3);">${researchPrivacyLine()}</p>` : ""}
       </div>
 
       <div class="privacy-section card">

@@ -1,5 +1,11 @@
 /**
  * js/data/messages.js
+ * 02 Oct 2026 v2
+ *
+ * v2 - W4-12. A message's minSessions counts completed sessions only
+ *   (store.completedSessions); a stopped session is partial, which the old
+ *   abandoned filter let through.
+ *
  * 01 Oct 2026 v1
  *
  * B4 MESSAGES. Short messages from Build New Habits, in Settings › Messages,
@@ -104,7 +110,8 @@ export async function refreshMessages(fetchImpl = globalThis.fetch) {
 }
 
 function _sessionCount() {
-  return (store.get("activityLog") || []).filter(e => e && e.status !== "abandoned").length;
+  // W4-12: a stopped session is "partial" (nothing writes "abandoned").
+  return store.completedSessions(store.get("activityLog") || []).length;
 }
 
 /** Built-in messages (B5 adds its own) are joined to the published ones. */
