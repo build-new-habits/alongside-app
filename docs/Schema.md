@@ -1,5 +1,13 @@
 # Alongside — Data Schema Reference
-## 02 Oct 2026 v1.98
+## 02 Oct 2026 v1.99
+
+> **v1.99, 02 Oct 2026 — W4-8 PAIN-NUMBERS** (`store.js` v104). Field
+> retired: **`activityLog[].painChange`** (`'better'|'same'|'worse'|'none'`).
+> No longer written by the finish screen, and dropped from older entries
+> when they load. The answer still shapes what the finish screen says that
+> day; keeping it with each session built a session-by-session record of a
+> sore area (tracking an injury over time, against the 29 Sep scope), and it
+> went into the downloaded file.
 
 > **v1.98, 02 Oct 2026 — W4-2 DELETE-LOOSENS** (`store.js` v103). One new
 > field, **`capability.clearedAt`** (`string|null`, ISO, default `null`).
@@ -891,7 +899,7 @@
 
 ## 06 Sep 2026 v1.51
 
-**File:** `js/store.js` (confirmed live version: **v103, 02 Oct 2026**)
+**File:** `js/store.js` (confirmed live version: **v104, 02 Oct 2026**)
 
 > **v1.47, 06 Sep 2026 — CR-1.** `conditions[]` gains three ids and loses one. `chronic-fatigue` is **retired**; `persistent-fatigue`, `me-cfs` and `long-covid` replace it. No field shape changed — `conditions` is still `string[]` and `conditionMeta` is still keyed by condition id.
 >

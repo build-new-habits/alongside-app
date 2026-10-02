@@ -3,7 +3,13 @@ import { RETIRED_CONDITIONS } from "./data/scope-statement.js";
 
 /**
  * store.js - Data persistence layer
- * 02 Oct 2026 v103
+ * 02 Oct 2026 v104
+ *
+ * v104 - W4-8 PAIN-NUMBERS (Schema v1.99). The painChange field of activityLog is no
+ *   longer written (the finish screen's Better / About the same / Worse
+ *   shapes what it says today and is not kept), and is dropped from
+ *   entries saved before, on load: it was a session-by-session record of a
+ *   sore area, which tracks an injury over time.
  *
  * v103 - W4-2 DELETE-LOOSENS (Schema v1.98). capability.clearedAt: set by
  *   deleteHealthAnswers(); until the person answers again,
@@ -1311,7 +1317,11 @@ export const store = {
       exerciseFeedback:    Array.isArray(saved.exerciseFeedback)    ? saved.exerciseFeedback    : [],
       progressLog:         Array.isArray(saved.progressLog)         ? saved.progressLog         : [],
       prescribedExercises: Array.isArray(saved.prescribedExercises) ? saved.prescribedExercises : [],
-      activityLog:         Array.isArray(saved.activityLog)         ? saved.activityLog         : [],
+      // W4-8. No sore-area answer is kept with a session (it made a
+      // session-by-session record of a sore area). Dropped from old entries.
+      activityLog:         Array.isArray(saved.activityLog)
+                             ? saved.activityLog.map(e => { if (!e || typeof e !== 'object' || !('painChange' in e)) return e; const { painChange, ...rest } = e; return rest; })
+                             : [],
       journalEntries:      Array.isArray(saved.journalEntries)       ? saved.journalEntries       : [],
 
       // ── CHECK-IN ENGINE ───────────────────────────────────────
