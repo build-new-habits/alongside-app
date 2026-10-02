@@ -1,6 +1,10 @@
 /**
  * tools/verify-clubshell.mjs
- * 28 Sep 2026 v2
+ * 02 Oct 2026 v3
+ *
+ * v3 - W4-0 SUITE-TRUE. Mounts through tools/one-screen.mjs, so one screen
+ *   is in the page at a time (two copies of one id failed on jsdom 27+). No
+ *   assertion changed.
  *
  * v2 - SMOOTH-P3a. THE ROOMS HAVE GONE FROM PLAN HOME, BY DECISION.
  *
@@ -43,6 +47,7 @@
  * have to be picked up implicitly.
  */
 
+import { oneScreen } from "./one-screen.mjs";
 import { createRequire as __cr } from "node:module";
 import fs from "node:fs";
 const __require = __cr(import.meta.url);
@@ -98,7 +103,7 @@ function home(tier) {
   store.init();
   store.set("tier", tier);
   const c = document.createElement("div");
-  document.body.appendChild(c);
+  oneScreen(c);
   const navs = [];
   TodayView({ navigate: v => navs.push(v) }).mount(c);
   return { c, navs, text: c.textContent.replace(/\s+/g, " ") };
@@ -131,17 +136,17 @@ console.log("\nTEST 2 - everything the rooms and tiles reached is still within t
   const c = home("personal").c;
   // One tap: the doors' own routes and every data-route on Home.
   c.querySelectorAll("[data-route]").forEach(b => reached.add(b.dataset.route));
-  const hop = sel => { const navs = []; const h = document.createElement("div"); document.body.appendChild(h);
+  const hop = sel => { const navs = []; const h = document.createElement("div"); oneScreen(h);
     TodayView({ navigate: v => navs.push(v) }).mount(h); h.querySelector(sel)?.dispatchEvent(new window.MouseEvent("click", { bubbles: true })); return navs; };
   for (const a of ["start-today", "know-what", "as-i-go"]) hop(`[data-action="${a}"]`).forEach(r => reached.add(r));
   // Two taps: behind "I know what I want".
-  const kw = document.createElement("div"); document.body.appendChild(kw);
+  const kw = document.createElement("div"); oneScreen(kw);
   const kwNavs = [];
   KnowWhatView({ navigate: v => kwNavs.push(v) }).mount(kw);
   kw.querySelectorAll("[data-kw-route]").forEach(b => reached.add(b.dataset.kwRoute));
   if (kw.querySelector('input[name="kind"][value="yoga"]')) reached.add("yoga-session");   // the yoga tile's route (driven in verify-know-what 6b)
   store.set("savedSessions", [{ id: "s1", name: "Mine", exerciseIds: ["x"], createdAt: new Date().toISOString() }]);
-  const kw2 = document.createElement("div"); document.body.appendChild(kw2);
+  const kw2 = document.createElement("div"); oneScreen(kw2);
   KnowWhatView({ navigate() {} }).mount(kw2);
   kw2.querySelectorAll("[data-kw-route]").forEach(b => reached.add(b.dataset.kwRoute));
   const MUST = ["classes", "checkin", "session-builder", "saved-sessions", "capture", "goal-setup",
@@ -310,7 +315,7 @@ console.log("\nTEST 12 - GUIDANCE-1: the general-guidance line returns");
   // fixture that was resetting the very field under test.
   function homeKeepingState() {
     const c = document.createElement("div");
-    document.body.appendChild(c);
+    oneScreen(c);
     TodayView({ navigate: () => {} }).mount(c);
     return c;
   }

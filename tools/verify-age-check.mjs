@@ -1,6 +1,10 @@
 /**
  * tools/verify-age-check.mjs
- * 01 Oct 2026 v2
+ * 02 Oct 2026 v3
+ *
+ * v3 - W4-0 SUITE-TRUE. Mounts through tools/one-screen.mjs, so one screen
+ *   is in the page at a time (two copies of one id failed on jsdom 27+). No
+ *   assertion changed.
  *
  * v2 - CONSENT-VERSION. The existing-install fixture agreed to the current
  *   policy version, so test 5 measures the age check alone. No assertion
@@ -26,6 +30,7 @@
  *      Shout 85258, NHS 111 and 999, as links that work; says nothing was
  *      kept.
  */
+import { oneScreen } from "./one-screen.mjs";
 import { createRequire as __cr } from "node:module";
 const __require = __cr(import.meta.url);
 const { JSDOM } = __require("jsdom");
@@ -79,7 +84,7 @@ const ADULT = ym(30 * 12), CHILD = ym(15 * 12);
 const { ThreadView } = await import(B + "views/onboarding/thread.js");
 async function onboard() {
   localStorage.clear(); store.init();
-  const el = document.createElement("div"); document.body.appendChild(el);
+  const el = document.createElement("div"); oneScreen(el);
   const navs = [];
   ThreadView({ navigate: v => navs.push(v), back() {} }).mount(el); await wait(2600);
   return { el, navs };

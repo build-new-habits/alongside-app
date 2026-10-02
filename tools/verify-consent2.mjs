@@ -1,6 +1,10 @@
 /**
  * tools/verify-consent2.mjs
- * 01 Oct 2026 v3
+ * 02 Oct 2026 v4
+ *
+ * v4 - W4-0 SUITE-TRUE. Mounts through tools/one-screen.mjs, so one screen
+ *   is in the page at a time (two copies of one id failed on jsdom 27+). No
+ *   assertion changed.
  *
  * v3 - AGE-CHECK. Onboarding asks when you were born before consent; the
  *   fixture answers as an adult (January 1990). The policy version is read
@@ -50,6 +54,7 @@
  * Run: node tools/verify-consent2.mjs
  */
 
+import { oneScreen } from "./one-screen.mjs";
 import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 import fs from "node:fs";
@@ -94,7 +99,7 @@ async function openGate({ attached = true } = {}) {
   localStorage.clear();
   store.init();
   const el = document.createElement("div");
-  if (attached) document.body.appendChild(el);
+  if (attached) oneScreen(el);
   ThreadView({ navigate() {} }).mount(el);
   await wait(2500);
   { const mo = el.querySelector("#ob-age-month"), yr = el.querySelector("#ob-age-year"); if (mo && yr) { mo.value = "1"; yr.value = "1990"; el.querySelector("#ob-age-continue").dispatchEvent(new dom.window.Event("click")); await wait(20); } }
@@ -192,7 +197,7 @@ section("4. Consent is not asked for twice");
   store.set("consent.given", true);
   store.set("consent.at", new Date().toISOString());
   const el = document.createElement("div");
-  document.body.appendChild(el);
+  oneScreen(el);
   ThreadView({ navigate() {} }).mount(el);
   await wait(2500);
   { const mo = el.querySelector("#ob-age-month"), yr = el.querySelector("#ob-age-year"); if (mo && yr) { mo.value = "1"; yr.value = "1990"; el.querySelector("#ob-age-continue").dispatchEvent(new dom.window.Event("click")); await wait(20); } }

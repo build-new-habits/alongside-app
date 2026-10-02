@@ -1,6 +1,11 @@
 /**
  * tools/verify-weight1b.mjs
- * 01 Oct 2026 v6
+ * 02 Oct 2026 v7
+ *
+ * v7 - W4-0 SUITE-TRUE. Mounts through tools/one-screen.mjs, so one screen
+ *   is in the page at a time (two copies of one id failed on jsdom 27+). No
+ *   assertion changed.
+ *
  * PT-2 HEALTH-CONSENT. The fixtures' consent includes health consent:
  *   weight is a health answer, not offered without it. No assertion changed.
  *
@@ -52,6 +57,7 @@
  * Run: node tools/verify-weight1b.mjs
  */
 
+import { oneScreen } from "./one-screen.mjs";
 import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
@@ -92,7 +98,7 @@ async function mount(state) {
   localStorage.setItem("alongside_user", JSON.stringify(state));
   store.init();
   const el = document.createElement("div");
-  document.body.appendChild(el);
+  oneScreen(el);
   const v = SettingsView({ navigate() {} });
   (v.mount || v.render).call(v, el);
   await wait(80);
@@ -274,7 +280,7 @@ async function mountProgramme(over = {}) {
   }));
   store.init();
   const el = document.createElement("div");
-  document.body.appendChild(el);
+  oneScreen(el);
   const v = MyProgrammeView({ navigate() {} });
   (v.mount || v.render).call(v, el);
   await wait(80);
@@ -414,7 +420,7 @@ async function mountProgress(over = {}) {
   }));
   store.init();
   const el = document.createElement("div");
-  document.body.appendChild(el);
+  oneScreen(el);
   const v = ProgressView({ navigate() {} });
   (v.mount || v.render).call(v, el);
   await wait(80);

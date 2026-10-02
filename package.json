@@ -1,0 +1,8 @@
+{
+  "name": "alongside-app",
+  "private": true,
+  "description": "02 Oct 2026 v1. Alongside: Move. No build step; this file only pins what the checks in tools/ need (W4-0 SUITE-TRUE). Install with npm ci, then run each tools/verify-*.mjs from the repository root.",
+  "devDependencies": {
+    "jsdom": "28.1.0"
+  }
+}

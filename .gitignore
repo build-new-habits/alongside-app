@@ -2,5 +2,7 @@
 # suite) was swept into a commit by `git add -A`. The gates need jsdom;
 # the repo does not need its 1,800 files.
 node_modules/
-package.json
-package-lock.json
+# 02 Oct 2026 (W4-0 SUITE-TRUE): package.json and package-lock.json are now
+# committed. They pin jsdom 28.1.0, the one version every check passes on;
+# nothing in the repository pinned it before, and the suite was red on
+# both older and newer versions.
