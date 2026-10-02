@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 02 Oct 2026 v627
+ * 02 Oct 2026 v628
  *
+ * v628 - W4-3/W4-6: Restore keeps this phone's Plan, News and display settings, makes text harmless instead of refusing a file, shows its result on the page, and is offered on a new phone after the two consents. NEW FILE precached: js/views/restore-flow.js.
  * v627 - W4-2/W4-15: after Delete my health answers, sessions are planned carefully and the body questions are asked again; no notes kept without health consent.
  * v626 - W4-0/W4-1: no way into the app before the age question and both consents; no house button on those screens; checks pinned to jsdom 28.1.0.
  * v625 - Your plan on Free: no "no contract either way"; free in the beta.
@@ -4174,7 +4175,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v627";
+const CACHE_NAME = "alongside-v628";
 
 const SHELL_URLS = [
 
@@ -4273,6 +4274,7 @@ const SHELL_URLS = [
   "./js/views/workout.js",
   "./js/views/progress.js",
   "./js/views/settings.js",
+  "./js/views/restore-flow.js",
   "./js/views/weekly-plan.js",
   "./js/views/reflect.js",
 
