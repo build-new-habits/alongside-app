@@ -1,5 +1,11 @@
 /**
  * tools/verify-consent-versions.mjs
+ * 02 Oct 2026 v2
+ *
+ * v2 - Graeme, 02 Oct: a consent is asked again only when what it covers
+ *   changes, not for a change of wording (3e); the wording seen is still
+ *   recorded (3f).
+ *
  * 02 Oct 2026 v1
  *
  * W4-13 CONSENT-VERSIONS (Wave 4 persona trace, 2.4).
@@ -89,7 +95,15 @@ store.set("consent.health.version", "2026-09-01");
 ok("3a. an older version: asked again", HC.healthConsentNeeded() === true);
 ok("3b. before the next health question", HC.guardRoute("checkin") === "health-consent");
 const hc = oneScreen(document.createElement("div")); HealthConsentView(router).mount(hc);
-ok("3c. and it says the wording has changed", /changed/i.test(txt(hc)), txt(hc).slice(0, 200));
+ok("3c. and it says what it covers has changed", /changed/i.test(txt(hc)), txt(hc).slice(0, 200));
+// Graeme, 02 Oct: ask again only when what the consent covers changes. The
+// shorter tick (W4-19) covers the same answers for the same use, so a
+// consent given to the wording before it stands; the wording each person saw
+// is still recorded.
+store.set("consent.health.version", "2026-10-01");
+ok("3e. a consent to the longer tick (same answers, same use) is not asked again", HC.healthConsentNeeded() === false && HC.guardRoute("checkin") === null);
+HC.giveHealthConsent();
+ok("3f. a new consent records the wording shown now", store.get("consent.health.version") === HC.HEALTH_CONSENT_VERSION && HC.HEALTH_CONSENT_VERSION === "2026-10-02");
 store.set("consent.health", { given: null, at: null, version: null, withdrawnAt: null });
 const hc2 = oneScreen(document.createElement("div")); HealthConsentView(router).mount(hc2);
 ok("3d. control: never asked, it does not say anything changed", !/has changed|have changed/i.test(txt(hc2)), txt(hc2).slice(0, 200));
