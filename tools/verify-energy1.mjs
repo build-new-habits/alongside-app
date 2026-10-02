@@ -1,5 +1,10 @@
 /**
  * tools/verify-energy1.mjs
+ * 02 Oct 2026 v2
+ *
+ * v2 - W4-11 ENERGY-WINDOW. TEST 7: the low-week read counts only check-ins
+ *   from the last seven days (it took the last seven, however old).
+ *
  * 13 Sep 2026 v1
  *
  * ENERGY-1 and the FEED-1 reader. Two signals the app was collecting and
@@ -257,6 +262,25 @@ console.log("\nTEST 6 — the card opens the ways to ease off, unasked");
     ok("6e. a different exercise is unaffected",
        !/<details[^>]*\sopen/.test(renderExerciseCard(other, { idPrefix: "t", page: "do" })));
   }
+}
+
+// ── 7. W4-11 ENERGY-WINDOW ───────────────────────────────────────────────
+// The low-week read took the last seven check-ins, however old: one bad
+// Sunday said "a flatter few days" for three weeks (persona 2.12), and
+// "your check-ins this week have mostly been low" when the week's only
+// one was Okay. Only the last seven days count now.
+console.log("\nTEST 7 — only check-ins from the last seven days count");
+{
+  const CK = await import("../js/data/checkin.js");
+  const day = n => store._localDay(new Date(Date.now() - n * 864e5));
+  const hist = entries => Object.fromEntries(entries.map(([n, energy]) => [day(n), { energy, mood: 5 }]));
+  const old = hist([[10, 2], [11, 2], [12, 2], [13, 2]]);
+  ok("7pc. CONTROL: four low check-ins in a row read as a low week when recent",
+     CK.detectBurnout(hist([[0, 2], [1, 2], [2, 2], [3, 2]])).level !== "none");
+  ok("7a. the same four, ten days ago and more, read as nothing now", CK.detectBurnout(old).level === "none",
+     JSON.stringify(CK.detectBurnout(old)));
+  ok("7b. old lows plus one Okay this week: not a low week", CK.detectBurnout({ ...old, ...hist([[1, 6]]) }).level === "none");
+  ok("7c. three low check-ins this week still count", CK.detectBurnout({ ...old, ...hist([[0, 2], [2, 3], [4, 2]]) }).level !== "none");
 }
 
 console.log(`\n  ${fails === 0 ? "ALL PASS" : fails + " RED"}\n`);

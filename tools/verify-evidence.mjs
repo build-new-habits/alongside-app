@@ -1,5 +1,13 @@
 /**
  * tools/verify-evidence.mjs
+ * 02 Oct 2026 v3
+ *
+ * v3 - W4-12 EVIDENCE-TRUE. TEST 6: rates over the weeks that have passed;
+ *   Share my figures offered after four weeks of use; kinds from what each
+ *   session was (every activity type decided); stopped sessions not counted;
+ *   the survey waits for some use and stays answered across Reset all data;
+ *   every privacy screen names the survey and figures while sending is on.
+ *
  * 01 Oct 2026 v2
  *
  * v2 - Waits for each send's outcome instead of a fixed 60 ms (one failure
@@ -70,7 +78,7 @@ function person({ tier = "personal" } = {}) {
   const log = [];
   for (let i = 0; i < 5; i++) log.push({ id: "f" + i, type: i % 2 ? "walk" : "workout", status: "completed", completedAt: day(90 - i * 3), note: "knee hurt" });
   for (let i = 0; i < 7; i++) log.push({ id: "l" + i, type: ["walk", "yoga", "breathing", "swim", "run", "class", "workout"][i], status: "completed", completedAt: day(2 + i * 3) });
-  log.push({ id: "x", type: "workout", status: "abandoned", completedAt: day(1) });
+  log.push({ id: "x", type: "workout", status: "partial", completedAt: day(1) });
   store.set("activityLog", log);
 }
 
@@ -155,6 +163,58 @@ ok("5a. dismissed: not offered again", !M.visibleMessages().some(m => m.id === "
 person(); store.set("activityLog", [{ id: "a", type: "walk", status: "completed", completedAt: day(1) }]);
 ok("5b. fewer than four sessions: no figures yet", !M.visibleMessages().some(m => m.action === "share-figures"));
 ok("5c. every built-in message passes the published-message checks", E.researchMessages().every(m => !!M.checkMessage(m)));
+// ── 6. W4-12 EVIDENCE-TRUE, before switching on ─────────────────────────
+console.log("\nTEST 6 - true figures, a survey that waits for use, and the privacy words");
+const ago = n => new Date(Date.now() - n * 86400000).toISOString();
+function log(entries) { person(); store.set("activityLog", entries.map((e, i) => ({ id: "w" + i, status: "completed", ...e }))); }
+// 6a. Four sessions in five days: not offered (it needs four weeks of use).
+log([0, 1, 3, 5].map(d => ({ type: "walk", completedAt: ago(d) })));
+ok("6a. four sessions in five days: Share my figures not offered yet", !M.visibleMessages().some(m => m.action === "share-figures"));
+// 6b. Eight weeks of three a week: 3 and 3.
+log(Array.from({ length: 24 }, (_, i) => ({ type: "walk", completedAt: ago(1 + Math.floor(i * 56 / 24)) })));
+const eight = E.figuresPayload();
+ok("6b. eight weeks of three a week: 3 a week, first and latest", eight.first_weeks === 3 && eight.latest_weeks === 3, JSON.stringify(eight));
+// 6c. Rates over the weeks that have passed: six sessions in two weeks is 3 a week, not 1.5.
+log(Array.from({ length: 6 }, (_, i) => ({ type: "walk", completedAt: ago(1 + i * 2) })));
+const two = E.figuresPayload();
+ok("6c. two weeks in: divided by the two weeks that passed", two.first_weeks === 3 && two.latest_weeks === 3, JSON.stringify(two));
+// 6d. Kinds: what the session was.
+log([{ type: "workout", sessionType: "mobility", completedAt: ago(1) }, { type: "workout", sessionType: "cardio", completedAt: ago(2) },
+     { type: "workout", sessionType: "full", completedAt: ago(3) }, { type: "yoga", completedAt: ago(4) }]);
+ok("6d. mobility is mobility, full body is strength, cardio is not called strength", JSON.stringify(E.figuresPayload().kinds) === '["strength","mobility"]', JSON.stringify(E.figuresPayload().kinds));
+log([{ type: "workout", sessionType: "cardio", completedAt: ago(1) }]);
+ok("6d2. a cardio session alone is not sent as strength", !E.figuresPayload().kinds.includes("strength"), JSON.stringify(E.figuresPayload().kinds));
+log([{ type: "workout", sessionType: "mobility", completedAt: ago(1) }]);
+ok("6d3. a mobility session alone is sent as mobility, not strength", JSON.stringify(E.figuresPayload().kinds) === '["mobility"]', JSON.stringify(E.figuresPayload().kinds));
+const AL = await import(B + "data/activity-labels.js");
+const unmapped = (AL.ACTIVITY_TYPES || []).filter(ty => !(ty in E.KIND_OF));
+ok("6e. every activity type the app writes has a decided kind (or none)", (AL.ACTIVITY_TYPES || []).length > 20 && unmapped.length === 0, unmapped.join(", "));
+// 6f. A stopped session is not counted.
+log([{ type: "walk", completedAt: ago(1) }, { type: "walk", status: "partial", completedAt: ago(2) }]);
+ok("6f. a stopped session is not counted", E.figuresPayload().latest_weeks === 0.5 || E.figuresPayload().latest_weeks === 1, JSON.stringify(E.figuresPayload()));
+// 6g. The survey waits for some use.
+log([]);
+ok("6g. day one, nothing done: no survey", !M.visibleMessages().some(m => m.action === "survey"));
+log([0, 3, 8].map(d => ({ type: "walk", completedAt: ago(d) })));
+ok("6g2. three sessions over a week: the survey is offered", M.visibleMessages().some(m => m.action === "survey"));
+// 6h. Answered, then Reset all data: not offered again.
+store.set("evidence.surveyDone", true); E.rememberAnswered?.("survey");
+store.resetEverything(); store.init();
+store.set("activityLog", [0, 3, 8].map((d, i) => ({ id: "r" + i, type: "walk", status: "completed", completedAt: ago(d) })));
+ok("6h. answered once, then Reset all data: never offered again", !M.visibleMessages().some(m => m.action === "survey"));
+// 6i. The privacy words name the survey whenever sending is on.
+const PV = await import(B + "views/privacy.js");
+const privHtml = typeof PV.render === "function" ? PV.render() : (() => { const d = document.createElement("div"); PV.PrivacyView?.({ navigate() {}, back() {} }).mount(d); return d.innerHTML; })();
+const thread = readFileSync(new URL("../js/views/onboarding/thread.js", import.meta.url), "utf8");
+person(); main.innerHTML = ""; SettingsView({ navigate() {}, back() {} }).mount(main); await wait(10);
+click(main.querySelector('[data-open="about-data"]')); await wait(10);
+const aboutData = txt(main);
+ok("6i. Settings › How your data is kept names the survey and figures", /survey/i.test(aboutData) && /Share my figures/.test(aboutData), aboutData.slice(0, 300));
+ok("6j. the privacy summary names them", /survey/i.test(privHtml) && /Share my figures/.test(privHtml));
+ok("6k. the consent screen names them while sending is on", /researchPrivacyLine\(\)/.test(thread));
+ok("6l. the line itself", /survey/i.test(E.researchPrivacyLine()) && /Share my figures/.test(E.researchPrivacyLine()) && /Frankfurt/.test(E.researchPrivacyLine()));
+E.RECEIVER.url = ""; E.RECEIVER.key = "";
+ok("6m. with sending off, the line is empty", E.researchPrivacyLine() === "");
 globalThis.fetch = realFetch;
 
 console.log(`\n${passes} passed, ${fails} failed`);
