@@ -1,6 +1,14 @@
 /**
  * checkin-mini.js - Abbreviated Return-Visit Check-In
  *
+ * 02 Oct 2026 v8
+ *
+ * v8 - W4-8 PAIN-NUMBERS. The sore-area step asks in the check-in's own
+ *   three words (A little, Quite sore, Bad) and Not sore today; the 0 to 10
+ *   slider, the number and the band word beside each area are gone, and so
+ *   is "No conditions recorded" (No sore areas listed). Scores stored are
+ *   the check-in's own (4, 6, 8, or 0).
+ *
  * 31 Aug 2026 v7
  *   CHECKIN-EXIT. Both exits fell back to "intention" when no
  *   pendingDoorRoute was set -- that is, whenever somebody updated their
@@ -100,7 +108,7 @@
  */
 
 import { store }      from "../store.js";
-import { CONDITIONS, getPainBand } from "../data/conditions.js";
+import { CONDITIONS, SORE_LEVELS, soreWord, areaWords } from "../data/conditions.js";
 
 export const centered = false;
 
@@ -285,36 +293,34 @@ function renderPain() {
         </div>
 
         ${conditions.length > 0 ? `
-          <div class="mini-pain-list" role="group" aria-label="Rate any pain">
+          <div class="mini-pain-list">
             ${conditions.map(id => {
               const cond    = CONDITIONS.find(c => c.id === id);
               const current = currentPain[id] || 0;
-              const pendingScore = miniPainScores[id] !== undefined ? miniPainScores[id] : current;
-              const band    = getPainBand(pendingScore);
+              const pending = miniPainScores[id] !== undefined ? miniPainScores[id] : current;
+              const chosen  = soreWord(pending);
+              const name    = cond?.name || id;
+              // W4-8. The check-in's own three words, and "Not sore today".
+              // No number is shown or asked for.
+              const opts = [{ label: "Not sore today", value: 0 }, ...SORE_LEVELS];
               return `
-                <div class="mini-pain-row" data-condition="${id}">
-                  <span class="mini-pain-label">
-                    ${cond?.icon || ""} ${cond?.name || id}
-                  </span>
-                  <div class="ci-slider-wrap ci-slider-wrap--condition">
-                    <div class="ci-value-row" aria-live="polite" aria-atomic="true">
-                      <span class="ci-value-num"   id="mini-pain-num-${id}">${pendingScore}</span>
-                      <span class="ci-value-label ci-value-label--${band.id}" id="mini-pain-label-${id}">${band.label}</span>
-                    </div>
-                    <input type="range" class="ci-slider mini-pain-slider"
-                           data-condition="${id}"
-                           min="0" max="10" value="${pendingScore}"
-                           aria-label="Pain level for ${cond?.name || id}, 0 none to 10 severe"
-                           aria-valuetext="${band.label}">
+                <fieldset class="mini-pain-row" data-condition="${id}">
+                  <legend class="mini-pain-label">${cond?.icon ? `<span aria-hidden="true">${cond.icon}</span> ` : ""}How is your ${areaWords(id)} today?</legend>
+                  <div class="ci-chips__row" role="group" aria-label="How is your ${areaWords(id)} today">
+                    ${opts.map(o => {
+                      const on = o.value === 0 ? !chosen : o.label === chosen;
+                      return `<button type="button" class="ci-chip mini-pain-chip${on ? " selected" : ""}"
+                                data-condition="${id}" data-value="${o.value}" aria-pressed="${on}">${o.label}</button>`;
+                    }).join("")}
                   </div>
-                </div>
+                </fieldset>
               `;
             }).join("")}
           </div>
         ` : `
           <p class="text-secondary text-sm"
              style="margin-top: var(--space-4);">
-            No conditions recorded. Tap Next to continue.
+            No sore areas listed. Tap Next to continue.
           </p>
         `}
       </div>
@@ -495,22 +501,17 @@ export function onMount() {
     });
   }
 
-  // Pain sliders
-  document.querySelectorAll(".mini-pain-slider").forEach(slider => {
-    slider.addEventListener("input", () => {
-      const condId = slider.dataset.condition;
+  // W4-8. Sore-area chips: the check-in's words, no number.
+  document.querySelectorAll(".mini-pain-chip").forEach(chip => {
+    chip.addEventListener("click", () => {
+      const condId = chip.dataset.condition;
       if (!condId) return;
-      const n    = parseInt(slider.value);
-      const band = getPainBand(n);
-      miniPainScores[condId] = n;
-      const numEl   = document.getElementById(`mini-pain-num-${condId}`);
-      const labelEl = document.getElementById(`mini-pain-label-${condId}`);
-      if (numEl)   numEl.textContent   = n;
-      if (labelEl) {
-        labelEl.textContent = band.label;
-        labelEl.className   = `ci-value-label ci-value-label--${band.id}`;
-      }
-      slider.setAttribute("aria-valuetext", band.label);
+      miniPainScores[condId] = Number(chip.dataset.value) || 0;
+      document.querySelectorAll(`.mini-pain-chip[data-condition="${condId}"]`).forEach(c => {
+        const on = c === chip;
+        c.classList.toggle("selected", on);
+        c.setAttribute("aria-pressed", String(on));
+      });
     });
   });
 

@@ -1,6 +1,12 @@
 /**
  * reflect.js - Reflect Screen
  *
+ * 02 Oct 2026 v14
+ *
+ * v14 - W4-8 PAIN-NUMBERS. Better / About the same / Worse still shapes what
+ *   the finish screen says today (Worse points to someone who can look at
+ *   it), and is no longer kept with the session.
+ *
  * 01 Oct 2026 v13
  *
  * v13 - PT-2 HEALTH-CONSENT. While health consent is not given (withdrawn
@@ -924,7 +930,6 @@ function saveAndSummarise() {
     const idx = log.findIndex(e => e.id === entry.id);
     const reflectFields = {
       feel:        feelAnswer,
-      painChange:  painAnswer,
       note:        openText || null,
       moodAfter:   moodAfter,
       completedAt: new Date().toISOString(),

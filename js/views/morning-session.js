@@ -1,6 +1,11 @@
 /**
  * morning-session.js - Morning Session View
  *
+ * 02 Oct 2026 v5
+ *
+ * v5 - W4-8. No painChange written with a morning session (the field is
+ *   retired, Schema v1.99).
+ *
  * 29 Sep 2026 v4
  *
  * v4 - P0, SCOPE-MINOR. "adjusted to protect those areas" is "left out the options that load it".
@@ -219,7 +224,6 @@ function _saveMorningSession(session, durationMins) {
     durationMins: durationMins,
     energyBefore: store.get("lastCheckin.energy") || null,
     feel:         postFeel || "right",
-    painChange:   "none",
     source:       "coach-recommended",
     sessionId:    session.id,
     completedAt:  nowIso,
@@ -255,7 +259,6 @@ function savePartialSession(session) {
     status:       "partial",
     energyBefore: store.get("lastCheckin.energy") || null,
     feel:         null,
-    painChange:   "none",
     source:       "coach-recommended",
     sessionId:    session.id,
     completedAt:  new Date().toISOString(),
