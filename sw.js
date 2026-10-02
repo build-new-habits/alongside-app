@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 02 Oct 2026 v631
+ * 02 Oct 2026 v632
  *
+ * v632 - W4-13/W4-17/W4-19: the policy screen lists only what changed since you agreed, a new health-consent wording asks again, no house where it loops; under 18: how to start again at 18, a copy offered before an earlier install is deleted, "That date hasn't happened yet", their own privacy summary, no messages fetched; getting started: the health consent can be declined, readable consent text, a typed year, sheet Back records nothing, no splash on return or under Reduce motion, honest counts. NEW FILE precached: js/data/export-file.js.
  * v631 - W4-10/W4-11/W4-12: tiredness and stress are said apart from the sore areas, and no promise the app cannot keep; "this week" means the last seven days; research figures true (weeks passed, stopped sessions out, kinds from the session), the survey waits for some use, and the privacy screens name it.
  * v630 - W4-7/W4-8/W4-9: one meaning of A little, Quite sore and Bad at every door, one true sentence about a sore area; Bad-day words and minutes true, Something gentle after all; no pain numbers, no pain record kept with sessions.
  * v629 - W4-4/W4-5/W4-14: leg swings and the step-down count as balance work; pinch-zoom allowed; a new version waits for Update and never reloads mid-session (no skipWaiting on install).
@@ -4178,7 +4179,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v631";
+const CACHE_NAME = "alongside-v632";
 
 const SHELL_URLS = [
 
@@ -4339,6 +4340,7 @@ const SHELL_URLS = [
   "./js/data/health-consent.js",
   "./js/data/age-check.js",
   "./js/data/restore.js",
+  "./js/data/export-file.js",
   "./js/data/file-lock.js",
   "./js/data/messages.js",
   "./js/data/evidence.js",
