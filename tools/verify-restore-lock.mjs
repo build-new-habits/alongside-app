@@ -1,6 +1,9 @@
 /**
  * tools/verify-restore-lock.mjs
- * 01 Oct 2026 v2
+ * 02 Oct 2026 v3
+ *
+ * v3 - W4-6. The download's outcome is read where the person sees it (#settings-result,
+ *   on the page), not from the screen-reader-only line. No assertion loosened.
  *
  * v2 - Waits for each lock and unlock to finish instead of a fixed 1.5 s,
  *   so a busy machine cannot fail it. No assertion changed.
@@ -100,7 +103,7 @@ function phone() {
 const { SettingsView } = await import(B + "views/settings.js");
 const mount = () => { main.innerHTML = ""; SettingsView({ navigate() {}, back() {} }).mount(main); };
 const dlg = () => document.getElementById("settings-download-dialog");
-const saved = () => txt(main.querySelector("#settings-saved"));
+const saved = () => txt(main.querySelector("#settings-result"));
 
 phone(); mount(); await wait(20);
 lastBlob = null;

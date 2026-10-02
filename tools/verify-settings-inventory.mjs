@@ -1,6 +1,9 @@
 /**
  * tools/verify-settings-inventory.mjs
- * 02 Oct 2026 v7
+ * 02 Oct 2026 v8
+ *
+ * v8 - W4-6. 5d reads the download's outcome where the person sees it
+ *   (#settings-result, on the page). Stricter: it must be visible.
  *
  * v7 - W4-1 GATE-OPEN. The fixture person has agreed (tools/agreed.mjs): the
  *   app now sends anybody who has not back to onboarding. No assertion
@@ -241,7 +244,7 @@ lastBlob = null; click(row); await wait(20); click(document.getElementById("down
 const file = lastBlob ? JSON.parse(await lastBlob.text()) : null;
 ok("5b. a file is made on the device", !!file && !!file.exportedAt);
 ok("5c. with everything the app keeps, the journal included", file?.store?.name === "T" && file?.store?.journalEntries?.[0]?.text === "a private line");
-ok("5d. and it says so, politely", /downloading to this device\..*anyone who has the file can read it/.test(txt(main.querySelector("#settings-saved"))));
+ok("5d. and it says so, on the page", /downloading to this device\..*anyone who has the file can read it/.test(txt(main.querySelector("#settings-result"))));
 
 {
   const priv = await import(B + "views/privacy.js");

@@ -1,5 +1,14 @@
 /**
  * js/views/onboarding/thread.js
+ * 02 Oct 2026 v20
+ *
+ * v20 - W4-6 RESTORE-MOVE. The consent screen offers "Moving from another
+ *   phone? Restore from a file", so a new phone restores straight after the
+ *   two consents (it took the whole of getting started before, and Restore
+ *   then replaced every answer). The file input is the control itself,
+ *   with a visible label, so the picker opens from the tap on every phone.
+ *   A restored phone lands on Home with this phone's agreements.
+ *
  * 01 Oct 2026 v19
  *
  * v19 - CONSENT-VERSION. POLICY_VERSION comes from data/consent-version.js.
@@ -261,6 +270,7 @@ import { openSheet }          from './sheet-manager.js';
 import { HEALTH_TICK, HEALTH_NOTE, giveHealthConsent } from '../../data/health-consent.js';
 import { ageQuestionHTML, readAge, recordAge } from '../../data/age-check.js';
 import { POLICY_VERSION as CURRENT_POLICY_VERSION } from '../../data/consent-version.js';
+import { restoreFromFile } from '../restore-flow.js';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MOTION PREFERENCE
@@ -461,6 +471,13 @@ export function ThreadView(router) {
                 aria-describedby="ob-consent-error">
           Continue
         </button>
+
+        <div class="ob-consent__restore">
+          <p class="ob-consent__note" id="ob-restore-note">Moving from another phone? Tick both boxes, then choose the file you saved with Download your data.</p>
+          <input type="file" id="ob-restore-file" class="ob-consent__file" accept=".json,application/json" aria-describedby="ob-restore-note">
+          <label for="ob-restore-file" class="btn btn-ghost btn-full ob-consent__file-label">Restore from a file</label>
+          <p class="ob-consent__error" id="ob-restore-msg" role="status" tabindex="-1" hidden></p>
+        </div>
       </section>
     `;
 
@@ -516,14 +533,46 @@ export function ThreadView(router) {
         (check?.checked ? health : check)?.focus();
         return;
       }
-      store.set('consent.given',         true);
-      store.set('consent.at',            new Date().toISOString());
-      store.set('consent.policyVersion', POLICY_VERSION);
-      giveHealthConsent();
+      _agree();
       _beginThread();
     });
 
+    // W4-6. A new phone: both ticks, then the file.
+    const restoreInput = _thread.querySelector('#ob-restore-file');
+    const restoreMsg   = _thread.querySelector('#ob-restore-msg');
+    const sayRestore = msg => {
+      if (!restoreMsg) return;
+      restoreMsg.textContent = msg; restoreMsg.hidden = false; restoreMsg.focus();
+    };
+    restoreInput?.addEventListener('change', () => {
+      const file = restoreInput.files && restoreInput.files[0];
+      if (!file) return;
+      if (!check?.checked || !health?.checked) {
+        restoreInput.value = '';
+        sayRestore('Please tick both boxes first, then choose the file again.');
+        (check?.checked ? health : check)?.focus();
+        return;
+      }
+      _agree();
+      restoreFromFile(file, {
+        opener: restoreInput,
+        onMessage: msg => { restoreInput.value = ''; sayRestore(msg + ' You can choose another file, or press Continue to start afresh.'); },
+        onRestored: () => {
+          store.set('onboardingComplete', true);
+          router.navigate('today');
+        },
+      });
+    });
+
     _thread.querySelector('#ob-consent-check')?.focus();
+  }
+
+  // Both consents, recorded with the current versions.
+  function _agree() {
+    store.set('consent.given',         true);
+    store.set('consent.at',            new Date().toISOString());
+    store.set('consent.policyVersion', POLICY_VERSION);
+    giveHealthConsent();
   }
 
   // ── Begin thread — Step 1 ──────────────────────────────────────────────────

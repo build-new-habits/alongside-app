@@ -1,6 +1,14 @@
 /**
  * settings.js
- * 02 Oct 2026 v56
+ * 02 Oct 2026 v57
+ *
+ * v57 - W4-6 RESTORE-MOVE / W4-3 RESTORE-TAKES. Restore runs through
+ *   views/restore-flow.js (shared with onboarding); its confirmation says
+ *   what comes back and what stays (the Plan, Messages and News, display
+ *   settings, agreements). Download, Restore and Delete my health answers
+ *   now show their result on the page, under the title, and move focus to
+ *   it; they were only spoken to screen readers, so a sighted person saw
+ *   nothing happen.
  *
  * v56 - W4-2 / W4-15. Delete my health answers says what careful means
  *   (seated, nothing on the floor, no balance work, nothing with impact),
@@ -635,8 +643,9 @@ import { CONDITIONS } from '../data/conditions.js';
 import { scopeStatementHTML } from '../data/scope-statement.js';
 import { aimById } from '../data/aims.js';
 import { healthAllowed, healthConsentNeeded, setPendingRoute, takeOpenCapability, takePendingRoute } from '../data/health-consent.js';
-import { readRestoreFile, applyRestore, describeDate } from '../data/restore.js';
-import { lockText, unlockText, isLocked, passwordProblem, lockAvailable } from '../data/file-lock.js';
+import { describeDate } from '../data/restore.js';
+import { lockText, passwordProblem, lockAvailable } from '../data/file-lock.js';
+import { restoreFromFile } from './restore-flow.js';
 import { visibleMessages, hasUnread, markAllRead, dismissMessage, updateNavDot } from '../data/messages.js';
 import { SURVEY, CANT_FIND, NOT_SENT, figuresPayload, surveyPayload, sendEvidence } from '../data/evidence.js';
 import { conditionReadback, shortDate } from '../data/arc-readback.js';
@@ -684,6 +693,7 @@ export function SettingsView(router) {
   let activeScreen = null;
   let focusAfter   = null;    // selector to focus after the next render
   let askingAgain  = false;   // W4-2: opened by the router to ask the body questions again
+  let result       = null;    // W4-6: the last Download / Restore / Delete outcome, shown on the page
 
   // v11 — My Movement rebuild. Matches store.js's movementIdentity
   // string[] values. "mixed" is handled separately, below, since it's
@@ -720,6 +730,7 @@ export function SettingsView(router) {
         ` : `
           <h1 class="settings-title" tabindex="-1">Settings</h1>
           <p class="settings-lede">Changes save as you make them.</p>
+          <p class="settings-result" id="settings-result" tabindex="-1" role="status"${result ? '' : ' hidden'}>${_esc(result || '')}</p>
           ${renderPage()}
         `}
         <p class="sr-only" id="settings-saved" role="status" aria-live="polite"></p>
@@ -909,6 +920,14 @@ export function SettingsView(router) {
       ])}`;
   }
 
+  /** W4-6. An outcome the person must see: on the page, with focus. */
+  function _result(container, msg) {
+    result = msg;
+    activeScreen = null;
+    focusAfter = '#settings-result';
+    render(container);
+  }
+
   /** Announce a save. Polite, once. */
   function _saved(container, msg = 'Saved') {
     const el = container.querySelector('#settings-saved');
@@ -935,9 +954,9 @@ export function SettingsView(router) {
       a.href = url; a.download = name; a.hidden = true;
       document.body.appendChild(a); a.click(); a.remove();
       setTimeout(() => URL.revokeObjectURL(url), 1000);
-      _saved(container, `Your file, ${name}, is downloading to this device. It holds your health answers and journal, and anyone who has the file can read it, so keep it somewhere private.`);
+      _result(container, `Your file, ${name}, is downloading to this device. It holds your health answers and journal, and anyone who has the file can read it, so keep it somewhere private.`);
     } catch (err) {
-      _saved(container, 'The file could not be made on this device.');
+      _result(container, 'The file could not be made on this device.');
     }
     return { name, text };
   }
@@ -1005,10 +1024,10 @@ export function SettingsView(router) {
       a.href = url; a.download = name; a.hidden = true;
       document.body.appendChild(a); a.click(); a.remove();
       setTimeout(() => URL.revokeObjectURL(url), 1000);
-      _saved(container, `Your file, ${name}, is downloading to this device. It is locked, and only your password opens it.`);
+      _result(container, `Your file, ${name}, is downloading to this device. It is locked, and only your password opens it.`);
       return { name, text: locked };
     } catch (err) {
-      _saved(container, 'The file could not be made on this device.');
+      _result(container, 'The file could not be made on this device.');
       return null;
     }
   }
@@ -1076,37 +1095,6 @@ export function SettingsView(router) {
       }
       close();
       downloadData(container, pw);
-    });
-  }
-
-  /** B2. A locked file: its password first; then the usual confirmation. */
-  function _askUnlock(text, container) {
-    const { dialog, close } = _formDialog('settings-unlock-dialog', 'unlock-dialog-title', `
-      <h2 class="settings-dialog__title" id="unlock-dialog-title">This file is locked</h2>
-      <p class="settings-dialog__message">It was saved with a password. Nothing changes on this device until it is opened and you have said yes.</p>
-      <div class="settings-field">
-        <label class="settings-label" for="unlock-pw">Password for this file</label>
-        <input class="settings-input" id="unlock-pw" type="password" autocomplete="current-password">
-      </div>
-      <p class="settings-dialog__error" id="unlock-error" role="alert"></p>
-      <div class="settings-dialog__actions">
-        <button class="btn btn-ghost" id="unlock-cancel">Cancel</button>
-        <button class="btn btn-primary" id="unlock-open">Open the file</button>
-      </div>`);
-    dialog.querySelector('#unlock-cancel').addEventListener('click', close);
-    const open = dialog.querySelector('#unlock-open');
-    open.addEventListener('click', async () => {
-      open.disabled = true;
-      const res = await unlockText(text, dialog.querySelector('#unlock-pw')?.value || '');
-      open.disabled = false;
-      if (!res.ok) {
-        const err = dialog.querySelector('#unlock-error');
-        err.textContent = '';
-        setTimeout(() => { err.textContent = res.reason; }, 20);
-        return;
-      }
-      dialog.remove();
-      _offerRestore(res.text, container);
     });
   }
 
@@ -2369,6 +2357,7 @@ export function SettingsView(router) {
     container.querySelectorAll('[data-open]').forEach(btn => {
       btn.addEventListener('click', () => {
         activeScreen = btn.dataset.open;
+        result = null;
         focusAfter = btn.dataset.focus || '.settings-title';
         render(container);
         // B4. Seen once the screen is open: the dot goes.
@@ -2810,7 +2799,7 @@ export function SettingsView(router) {
           () => {
             store.deleteHealthAnswers();
             render(container);
-            _saved(container, 'Your health answers are deleted.');
+            _result(container, 'Your health answers are deleted.');
           },
           container
         );
@@ -2956,45 +2945,28 @@ export function SettingsView(router) {
 
   // ── Restore from a file ────────────────────────────────────────────────────
 
-  /** Opens the file picker; reads, checks, confirms, then replaces. */
+  /** Opens the file picker; the rest is views/restore-flow.js (W4-6). */
   function _pickRestoreFile(container) {
+    document.getElementById('settings-restore-input')?.remove();
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.json,application/json';
     input.hidden = true;
     input.id = 'settings-restore-input';
     document.body.appendChild(input);
+    const opener = container.querySelector('[data-action="restore-data"]');
     input.addEventListener('change', () => {
       const file = input.files && input.files[0];
       input.remove();
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = () => _offerRestore(String(reader.result || ''), container);
-      reader.onerror = () => _saved(container, 'That file could not be read, so nothing has been changed.');
-      reader.readAsText(file);
+      restoreFromFile(file, {
+        opener,
+        onMessage: msg => _result(container, msg),
+        onRestored: r => _result(container, r && r.healthCameAcross === false
+          ? 'Restored. Your history from the file is on this device now, without the health answers.'
+          : 'Restored. Your history from the file is on this device now.'),
+      });
     });
     input.click();
-  }
-
-  function _offerRestore(text, container) {
-    if (isLocked(text)) { _askUnlock(text, container); return; }
-    const read = readRestoreFile(text);
-    if (!read.ok) { _saved(container, read.reason); return; }
-    const { exportedAt, sessions, journal } = read.summary;
-    const when = describeDate(exportedAt);
-    const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
-    _confirmDestructive(
-      'Restore from this file',
-      `${when ? `This file was saved on ${when}. ` : ''}It holds ${plural(sessions, 'session', 'sessions')} and ${plural(journal, 'journal entry', 'journal entries')}. ` +
-      'Restoring replaces everything Alongside has stored on this device with what is in the file. ' +
-      'Your answer to the age question and your agreements on this device stay as they are. It cannot be undone.',
-      () => {
-        applyRestore(read.data);
-        render(container);
-        _saved(container, 'Restored. Your history from the file is on this device now.');
-      },
-      container
-    );
   }
 
   // ── Toast ──────────────────────────────────────────────────────────────────

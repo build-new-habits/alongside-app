@@ -1,6 +1,9 @@
 /**
  * tools/verify-bundle-true.mjs
- * 01 Oct 2026 v1
+ * 02 Oct 2026 v2
+ *
+ * v2 - W4-6. 2f: a javascript: address is made harmless, not refused, and the
+ *   check asserts no address survives restore.
  *
  * BUNDLE-TRUE. The independent check of the Foot Anstey bundle against the
  * code (B1, 01 Oct 2026) found places where the app, not the wording, was
@@ -139,8 +142,10 @@ ok("2gpc. positive control: the player shows the exercise", !!h1, main.innerHTML
 ok("2g. the player shows typed text as text, in heading and dose (no markup made from it)",
    /Band "pull" <b>apart<\/b>/.test(txt(h1)) && /10 <i>each<\/i> side/.test(txt(main)) &&
    !main.querySelector(".exercise-name b") && !main.querySelector(".meta-tag i"), txt(h1));
-ok("2f. a file containing a javascript: address is refused",
-   R.readRestoreFile(JSON.stringify({ ...crafted, store: { ...crafted.store, name: "javascript:alert(1)" } })).ok === false);
+// W4-6: made harmless, not refused (a person's own words never refuse their file).
+const js2 = R.readRestoreFile(JSON.stringify({ ...crafted, store: { ...crafted.store, name: "javascript:alert(1)" } }));
+ok("2f. a javascript: address in a file can never be an address",
+   js2.ok && !/javascript\s*:/i.test(JSON.stringify(R.harmless(R.curlQuotes(js2.data.store)))));
 
 // ── 3. NO WEIGHT ENTRY WITHOUT HEALTH CONSENT ──────────────────────────
 console.log("\nTEST 3 - with the health consent withdrawn, no weight entry");

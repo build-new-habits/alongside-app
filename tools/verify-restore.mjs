@@ -1,6 +1,11 @@
 /**
  * tools/verify-restore.mjs
- * 01 Oct 2026 v2
+ * 02 Oct 2026 v3
+ *
+ * v3 - W4-3 / W4-6. Display settings now stay this phone's (1c). Markup in
+ *   a file is made harmless and the file restores, instead of being
+ *   refused (3m): a person's own words must never refuse their file.
+ *   Stricter, not looser: 3m asserts no tag survives anywhere.
  *
  * v2 - B2 RESTORE-LOCK. Download your data opens a dialog first (an optional
  *   password); 6b presses Save the file with none. Assertion unchanged.
@@ -69,14 +74,14 @@ function oldPhone() {
   store.set("journalEntries", [{ id: "j1", date: "2026-09-21T10:00:00Z", text: "Felt good <3", tags: [] }]);
   store.set("conditions", ["knee"]);
   store.set("gymEquipment", ["dumbbells"]); store.set("totalCredits", 40);
-  localStorage.setItem("alongside-display-scheme", "light");
+  localStorage.setItem("alongside-scheme", "light");
 }
 function exportText() {
   const data = {
     exportedAt: "2026-09-30T12:00:00Z",
     about: "Everything Alongside: Move keeps about you on this device, including your journal. Nothing here was sent anywhere to make this file.",
     store: JSON.parse(localStorage.getItem("alongside_user")),
-    display: { "alongside-display-scheme": localStorage.getItem("alongside-display-scheme") },
+    display: { "alongside-scheme": localStorage.getItem("alongside-scheme") },
   };
   return JSON.stringify(data);
 }
@@ -84,7 +89,7 @@ function newPhone(health = true) {
   localStorage.clear(); store.init();
   store.set("onboardingComplete", true); store.set("tier", "free");
   store.set("consent", adultConsent(health));
-  localStorage.setItem("alongside-display-scheme", "dark");
+  localStorage.setItem("alongside-scheme", "dark");
   localStorage.setItem("alongside-leftover", "x");
   localStorage.setItem("another-site", "keep");
 }
@@ -101,7 +106,7 @@ ok("1b. the history comes back", store.get("name") === "Sam" && (store.get("acti
    store.get("journalEntries")?.[0]?.text === "Felt good <3" && JSON.stringify(store.get("conditions")) === '["knee"]');
 ok("1d. live fields kept outside the defaults come back too (equipment, credits)",
    JSON.stringify(store.get("gymEquipment")) === '["dumbbells"]' && store.get("totalCredits") === 40);
-ok("1c. display settings come back", localStorage.getItem("alongside-display-scheme") === "light");
+ok("1c. display settings stay this phone's (W4-3)", localStorage.getItem("alongside-scheme") === "dark");
 
 // ── 2. THIS DEVICE'S AGREEMENTS STAY ────────────────────────────────────
 console.log("\nTEST 2 - this device's age answer and agreements stay");
@@ -120,8 +125,6 @@ const bad = [
   ["empty", ""],
   ["JSON, but not Alongside's", JSON.stringify({ store: { name: "x" } })],
   ["no store", JSON.stringify({ about: "Everything Alongside: Move keeps about you on this device" })],
-  ["markup in the journal", file.replace("Felt good <3", "<img src=x onerror=alert(1)>")],
-  ["markup in a display value", JSON.stringify({ ...JSON.parse(file), display: { "alongside-x": "<script>" } })],
   ["too large", "x".repeat(R.MAX_BYTES + 1)],
 ];
 for (const [label, t] of bad) {
@@ -132,6 +135,17 @@ for (const [label, t] of bad) {
   ok(`3. ${label}: nothing on the device changed`, localStorage.getItem("alongside_user") === before);
 }
 ok("3pc. REVERSAL: \"<3\" in a journal is not markup", R.readRestoreFile(file).ok);
+// W4-6. Markup is made harmless, and the file restores.
+for (const [label, t] of [
+  ["markup in the journal", file.replace("Felt good <3", "<img src=x onerror=alert(1)>")],
+  ["markup in a display value", JSON.stringify({ ...JSON.parse(file), display: { "alongside-x": "<script>" } })],
+]) {
+  newPhone();
+  const r = R.readRestoreFile(t);
+  if (r.ok) R.applyRestore(r.data);
+  const all = JSON.stringify(store.data) + keys().map(k => localStorage.getItem(k)).join(" ");
+  ok(`3m. ${label}: restored, and no tag survives`, r.ok && !/<\s*(img|script)/i.test(all) && (store.get("activityLog") || []).length === 2, r.reason);
+}
 
 // ── 4. ONLY WHAT ALONGSIDE KNOWS; REPLACE ───────────────────────────────
 console.log("\nTEST 4 - only known fields; replace, not merge");
@@ -167,16 +181,16 @@ Object.defineProperty(picked, "files", { value: [new File([file], "alongside-dat
 picked.dispatchEvent(new dom.window.Event("change")); await wait(80);
 const dlg = document.getElementById("settings-confirm-dialog");
 ok("5c. it says what the file holds and that it replaces, before anything changes",
-   !!dlg && /2 sessions and 1 journal entry/.test(txt(dlg)) && /30 September 2026/.test(txt(dlg)) && /replaces everything/.test(txt(dlg)) && store.get("name") !== "Sam",
+   !!dlg && /2 sessions and 1 journal entry/.test(txt(dlg)) && /30 September 2026/.test(txt(dlg)) && /replaces your history/.test(txt(dlg)) && store.get("name") !== "Sam",
    txt(dlg));
 click(document.getElementById("confirm-ok")); await wait(30);
-ok("5d. confirmed: restored, and it says so", store.get("name") === "Sam" && /Restored/.test(txt(main.querySelector("#settings-saved"))), txt(main.querySelector("#settings-saved")));
+ok("5d. confirmed: restored, and it says so", store.get("name") === "Sam" && /Restored/.test(txt(main.querySelector("#settings-result"))), txt(main.querySelector("#settings-result")));
 newPhone(true); mount(); await wait(20);
 picked = null; click(row()); await wait(20);
 Object.defineProperty(picked, "files", { value: [new File(["not a file of ours"], "x.json")] });
 picked.dispatchEvent(new dom.window.Event("change")); await wait(80);
 ok("5e. a wrong file: no dialog, a plain reason, nothing changed",
-   !document.getElementById("settings-confirm-dialog") && /nothing has been changed/.test(txt(main.querySelector("#settings-saved"))) && !store.get("name"));
+   !document.getElementById("settings-confirm-dialog") && /nothing has been changed/.test(txt(main.querySelector("#settings-result"))) && !store.get("name"));
 dom.window.HTMLInputElement.prototype.click = origClick;
 
 // ── 6. THE DOWNLOAD WARNS ───────────────────────────────────────────────
@@ -185,7 +199,7 @@ oldPhone(); mount(); await wait(20);
 const dl = main.querySelector('[data-action="download-data"]');
 ok("6a. the row says anyone with the file can read it", /Anyone who has the file can read it/.test(txt(dl)));
 click(dl); await wait(20); click(document.getElementById("download-save")); await wait(60);
-ok("6b. so does the message after downloading", /anyone who has the file can read it/.test(txt(main.querySelector("#settings-saved"))), txt(main.querySelector("#settings-saved")));
+ok("6b. so does the message after downloading", /anyone who has the file can read it/.test(txt(main.querySelector("#settings-result"))), txt(main.querySelector("#settings-result")));
 
 console.log(`\n${passes} passed, ${fails} failed`);
 process.exit(fails ? 1 : 0);

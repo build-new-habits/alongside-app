@@ -1,6 +1,10 @@
 /**
  * css/components/onboarding-thread.css
- * 01 Oct 2026 v8
+ * 02 Oct 2026 v9
+ *
+ * v9 - W4-6. .ob-consent__restore: Restore from a file on the consent
+ *      screen. The file input is visually hidden but focusable; its label is
+ *      the button, and shows the focus ring when the input has focus.
  *
  * v8 - AGE-CHECK. The age question (.age-q*, shared by onboarding and the
  *      age-check screen) and the under-18 screen (.u18-*).
@@ -935,6 +939,29 @@
   color: var(--color-text-secondary);
   margin: calc(-1 * var(--space-2)) 0 var(--space-3) calc(24px + var(--space-3));
 }
+
+.ob-consent__restore {
+  display: grid;
+  gap: var(--space-2);
+  margin-top: var(--space-5);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
+}
+.ob-consent__restore .ob-consent__note { margin: 0; }
+.ob-consent__file {
+  position: absolute;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+.ob-consent__file:focus-visible + .ob-consent__file-label {
+  outline: 3px solid var(--color-text);
+  outline-offset: 2px;
+}
+.ob-consent__file-label { cursor: pointer; min-height: 44px; }
 
 .hc-view {
   display: flex;
