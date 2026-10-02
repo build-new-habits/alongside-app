@@ -1,5 +1,10 @@
 /**
  * tools/verify-reduce-motion.mjs
+ * 02 Oct 2026 v2
+ *
+ * v2 - W4-23. 5a finds the switch in the Display section of the Settings
+ *   index (the groups became sections). Same intent.
+ *
  * 28 Sep 2026 v1
  *
  * F6, REDUCE-MOTION-ROW. Graeme, 28 Sep: add it.
@@ -89,7 +94,7 @@ const main = document.getElementById("main-content");
 main.innerHTML = ""; SettingsView({ navigate() {}, back() {} }).mount(main);
 const row = main.querySelector("#disp-reduce-motion");
 ok("5a. a switch on the Settings page, in Display", !!row && row.getAttribute("role") === "switch" && row.getAttribute("aria-checked") === "false" &&
-   /Display/.test(row.closest(".settings-group")?.querySelector(".settings-group__title")?.textContent || ""));
+   /Display/.test(row.closest("[data-section]")?.querySelector(".settings-sec__title")?.textContent || ""));
 row?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }));
 ok("5b. one tap turns it on, and motion is reduced", DP.getDisplayPref("reduceMotion") === "on" && DP.prefersReducedMotion() === true);
 main.innerHTML = ""; SettingsView({ navigate() {}, back() {} }).mount(main);

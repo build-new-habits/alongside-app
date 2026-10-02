@@ -1,5 +1,17 @@
 /**
  * tools/verify-delete-careful.mjs
+ * 02 Oct 2026 v3
+ *
+ * v3 - W4-26, TEST 8: health consent given before what it covers changed
+ *   keeps no lift note, as everywhere else; a consent that still covers it
+ *   does.
+ *
+ * 02 Oct 2026 v2
+ *
+ * v2 - W4-24 ABSENCE-CONSENT, TEST 7: without health consent, Was injured
+ *   and Was unwell are neither offered on return nor kept; Life got full is;
+ *   with consent, as now.
+ *
  * 02 Oct 2026 v1
  *
  * W4-2 DELETE-LOOSENS and W4-15 DELETE-TRUE (Wave 4 persona trace,
@@ -204,6 +216,39 @@ const sheetsBefore = document.querySelectorAll(".sheet, [role='dialog']").length
 click(tell); await wait(20);
 ok("6a. withdrawn: it goes to the health consent, and no sheet opens",
    navs.includes("health-consent") && document.querySelectorAll(".sheet, [role='dialog']").length === sheetsBefore, JSON.stringify(navs));
+
+// ── 7. W4-24 ABSENCE-CONSENT ────────────────────────────────────────────
+console.log("\nTEST 7 - coming back: nothing health-related kept, or asked, without consent");
+const PE = await import(B + "data/programmeEngine.js");
+const fresh = () => { localStorage.clear(); store.init(); agreed(store); store.set("onboardingComplete", true); };
+fresh(); store.deleteHealthAnswers();
+PE.captureReturnContext("injury");
+ok("7a. withdrawn: Was injured is not kept", !["injury", "illness"].includes(store.get("absence.context")), String(store.get("absence.context")));
+fresh(); store.deleteHealthAnswers();
+PE.captureReturnContext("illness");
+ok("7b. withdrawn: Was unwell is not kept", !["injury", "illness"].includes(store.get("absence.context")), String(store.get("absence.context")));
+fresh(); store.deleteHealthAnswers();
+PE.captureReturnContext("life");
+ok("7c. withdrawn: Life got full is kept (not a health answer)", store.get("absence.context") === "life");
+const asked = (PE.returnChoices?.() || []).map(c => c.id);
+ok("7d. withdrawn: the return question offers no health answer", asked.length > 0 && !asked.includes("injury") && !asked.includes("illness"), JSON.stringify(asked));
+fresh();
+PE.captureReturnContext("injury");
+ok("7e. control: with consent, Was injured is kept, as now", store.get("absence.context") === "injury");
+ok("7f. control: and offered", (PE.returnChoices?.() || []).some(c => c.id === "injury"));
+const cpSrc = (await import("node:fs")).readFileSync(new URL("../js/views/coach-proposal.js", import.meta.url), "utf8");
+ok("7g. the coach's return door draws its choices from returnChoices()", /returnChoices\(\)/.test(cpSrc));
+
+// ── 8. W4-26 CONSENT-VERSION-READERS ────────────────────────────────────
+console.log("\nTEST 8 - a consent given before what it covers changed keeps no note");
+person(CAREFUL); store.set("liftLogEnabled", true);
+store.set("consent.health", { given: true, at: new Date().toISOString(), version: "2026-09-01", withdrawnAt: null });
+ok("8pc. the app treats it as not given", HC.healthAllowed() === false);
+store.logLift("goblet-squat", { weight: 14, reps: 8, note: "older consent" });
+ok("8a. the weight is kept, the note is not", store.lastLift("goblet-squat")?.weight === 14 && store.lastLift("goblet-squat")?.note === undefined, JSON.stringify(store.lastLift("goblet-squat")));
+store.set("consent.health", { given: true, at: new Date().toISOString(), version: "2026-10-01", withdrawnAt: null });
+store.logLift("goblet-squat", { weight: 16, reps: 8, note: "covered" });
+ok("8b. control: a consent that still covers it keeps the note (the shorter tick asked nobody again)", store.lastLift("goblet-squat")?.note === "covered");
 
 console.log(`\nDELETE-CAREFUL: ${passes} passed, ${fails} failed`);
 process.exit(fails ? 1 : 0);

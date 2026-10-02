@@ -1,5 +1,11 @@
 /**
  * tools/verify-reentry2.mjs
+ * 02 Oct 2026 v3
+ *
+ * v3 - W4-24. The return door's choices live in programmeEngine.js
+ *   (returnChoices, health consent permitting); the injury option is checked
+ *   there. Same intent.
+ *
  * 21 Aug 2026 v2
  * GATE-PATH. Path resolution only -- no assertion changed.
  *
@@ -135,7 +141,7 @@ for (const ctx of ["life", "harder"]) {
 const cp = read("js/views/coach-proposal.js");
 
 check("the return door offers an injury option",
-  /data-return-context="injury"/.test(cp),
+  /id: 'injury',\s*label: 'Was injured'/.test(read("js/data/programmeEngine.js")) && /returnChoices\(\)/.test(cp),
   "there was none, so a returning injured person had no true answer");
 
 check("getReEntryIntensity is passed the REAL context, not a literal",

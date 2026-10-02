@@ -1,5 +1,12 @@
 /**
  * tools/verify-mostly-same.mjs
+ * 02 Oct 2026 v3
+ *
+ * v3 - W4-25 MOSTLY-SAME-FLAKE. The builder's random choices come from a
+ *   seed printed at the start (a new one each run); SEED=<n> replays a
+ *   failing run exactly. No assertion changed. 50 runs green on v634 before
+ *   this, 100 after.
+ *
  * 29 Sep 2026 v2
  *
  * v2 - P26. Sessions a day apart were, with the lighter-day rule working
@@ -35,6 +42,14 @@ import { createRequire as __cr } from "node:module";
 const __require = __cr(import.meta.url);
 const { JSDOM } = __require("jsdom");
 
+// W4-25. The builder chooses at random, and 2a, 2d, 2e, 4a and 4b are
+// averages over those choices: one run in about 16 failed once and the
+// output was lost. Each run now uses a seed (a new one each time, so the
+// spread of choices is still tested) and prints it; SEED=<n> replays a run
+// exactly.
+const SEED = Number(process.env.SEED) || (Date.now() % 2147483647);
+console.log(`seed ${SEED} (replay: SEED=${SEED} node tools/verify-mostly-same.mjs)`);
+Math.random = (() => { let a = SEED >>> 0; return () => { a = (a + 0x6D2B79F5) >>> 0; let x = Math.imul(a ^ (a >>> 15), 1 | a); x = (x + Math.imul(x ^ (x >>> 7), 61 | x)) ^ x; return ((x ^ (x >>> 14)) >>> 0) / 4294967296; }; })();
 const dom = new JSDOM('<!doctype html><div id="app"><div id="main-content"></div></div>', { url: "https://x/" });
 globalThis.window = dom.window;
 globalThis.document = dom.window.document;

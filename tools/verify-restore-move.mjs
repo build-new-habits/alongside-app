@@ -1,5 +1,10 @@
 /**
  * tools/verify-restore-move.mjs
+ * 02 Oct 2026 v2
+ *
+ * v2 - W4-26. 2d: a health consent given before what it covers changed
+ *   brings no health answers in from a file, as everywhere else.
+ *
  * 02 Oct 2026 v1
  *
  * W4-3 RESTORE-TAKES and W4-6 RESTORE-MOVE (Wave 4 persona trace,
@@ -134,6 +139,12 @@ ok("2b. without it: sessions still come across, and planning is careful", (store
 phone({ health: true });
 R.applyRestore(R.readRestoreFile(fileFrom()).data);
 ok("2c. with it: they come across", (store.get("conditions") || []).includes("knee") && !!store.get("capability")?.askedAt);
+// W4-26: consent given before what it covers changed is not consent here.
+phone({ health: true });
+store.set("consent.health", { given: true, at: iso(30), version: "2026-09-01", withdrawnAt: null });
+R.applyRestore(R.readRestoreFile(fileFrom()).data);
+ok("2d. consent from before what it covers changed: no health answers come in", (store.get("conditions") || []).length === 0 && (store.get("journalEntries") || []).length === 0,
+   JSON.stringify({ c: store.get("conditions"), j: (store.get("journalEntries") || []).length }));
 
 // ── 3. THE COUNT ────────────────────────────────────────────────────────
 console.log("\nTEST 3 - the count is Progress's");

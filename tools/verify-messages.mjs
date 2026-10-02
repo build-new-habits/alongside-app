@@ -1,5 +1,10 @@
 /**
  * tools/verify-messages.mjs
+ * 02 Oct 2026 v2
+ *
+ * v2 - W4-23. Settings is an index of sections; Messages is its own section,
+ *   one tap from the index (5pc). Same intent: Messages is reached at once.
+ *
  * 01 Oct 2026 v1
  *
  * B4 MESSAGES. Settings › Messages, and the dot on the Settings tab.
@@ -132,7 +137,7 @@ store.set("onboardingComplete", true); store.set("name", "Sam");
 setList([msg({ link: { text: "Read the change", href: "https://buildnewhabits.co.uk/news/" } }), msg({ id: "n2", kind: "news", title: "A cause update" })]);
 main.innerHTML = ""; SettingsView({ navigate() {}, back() {} }).mount(main); await wait(20);
 const row = main.querySelector('[data-open="messages"]');
-ok("5pc. positive control: the Messages row is the page's first row", !!row && main.querySelector(".settings-rows [data-open]") === row);
+ok("5pc. positive control: Messages is one tap from the Settings index (W4-23: its own section)", !!row && row.dataset.section === "messages");
 ok("5a. it says New, in words", /New/.test(txt(row)) && !/\d/.test(txt(row)), txt(row));
 click(row); await wait(20);
 const items = main.querySelectorAll(".settings-message");

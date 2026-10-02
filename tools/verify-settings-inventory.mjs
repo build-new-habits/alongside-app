@@ -1,5 +1,11 @@
 /**
  * tools/verify-settings-inventory.mjs
+ * 02 Oct 2026 v9
+ *
+ * v9 - W4-23. 0b reads the eight approved sections (Settings is an index
+ *   now, verify-settings-rescope); every other assertion unchanged, and
+ *   still passes: each control is reached in one or two taps.
+ *
  * 02 Oct 2026 v8
  *
  * v8 - W4-6. 5d reads the download's outcome where the person sees it
@@ -112,8 +118,9 @@ function controlsHere() {
 console.log("\nTEST 0 - one page, grouped, saying that changes save");
 fixture(); page();
 ok("0a. \"Changes save as you make them.\"", /^Changes save as you make them\.$/.test(txt(main.querySelector(".settings-lede"))));
-const groups = [...main.querySelectorAll(".settings-group__title")].map(txt);
-ok("0b. the seven groups, in the spec's order (Reminders retired, PT-3)", JSON.stringify(groups) === JSON.stringify(["You", "Goals and your week", "How the coach works", "Optional tracking", "Display", "Your plan and your data", "About"]), JSON.stringify(groups));
+// W4-23: the one page became an index of the eight sections Graeme approved.
+const groups = [...main.querySelectorAll("[data-section]")].map(s => txt(s.querySelector(".settings-sec__title")));
+ok("0b. the approved sections, in order (W4-23)", JSON.stringify(groups) === JSON.stringify(["You", "Your body", "Sessions", "Display", "Your data", "Messages", "Your plan", "About"]), JSON.stringify(groups));
 ok("0c. no tabs anywhere on it", !main.querySelector('[role="tablist"], [role="tab"]'));
 const val = label => txt([...main.querySelectorAll(".settings-row")].find(r => txt(r.querySelector(".settings-row__label")) === label)?.querySelector(".settings-row__value"));
 ok("0d. rows show their current value (Equipment: Gym 2 · Home 1; Sore or injured areas: 2 listed; Name: T)",

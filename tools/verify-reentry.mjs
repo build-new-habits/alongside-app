@@ -1,5 +1,11 @@
 /**
  * tools/verify-reentry.mjs
+ * 02 Oct 2026 v2
+ *
+ * v2 - W4-24. The fixture gives the health consent (agreed): without it the
+ *   return question rightly offers no Was unwell or Was injured. No
+ *   assertion changed.
+ *
  * 29 Sep 2026 v1
  *
  * P20, RE-ENTRY (persona finding W2-15). Onboarding promises: "When you
@@ -21,6 +27,7 @@
  *   4. Control: the Plan with a programme is still asked.
  */
 import { createRequire as __cr } from "node:module";
+import { agreed } from "./agreed.mjs";
 const __require = __cr(import.meta.url);
 const { JSDOM } = __require("jsdom");
 const fs = __require("node:fs");
@@ -65,7 +72,7 @@ const at = (daysAgo, hour) => { const d = new Date(); d.setDate(d.getDate() - da
 const nowHour = new Date().getHours();
 const todayEarlier = at(0, Math.max(0, nowHour - 1));
 function fixture(tier, log) {
-  localStorage.clear(); store.init();
+  localStorage.clear(); store.init(); agreed(store);   // W4-24: Was unwell and Was injured need the health consent
   gate.endGateSession();
   store.set("onboardingComplete", true); store.set("name", "Sam"); store.set("tier", tier);
   store.set("equipment", ["dumbbells-light"]); store.set("homeEquipment", ["dumbbells-light"]);
