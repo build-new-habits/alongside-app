@@ -1,5 +1,10 @@
 /**
  * upgrade.js - Upgrade / Membership view
+ * 02 Oct 2026 v17
+ *
+ * v17 - W4-18. The button's name begins with its visible words (I'm ready:
+ *   start the Plan); it was named Start the Plan only (WCAG 2.5.3).
+ *
  * 01 Oct 2026 v16
  *
  * v16 - LEGAL-TRUE. True for the beta: the Plan is free and nobody is
@@ -395,7 +400,7 @@ export function render() {
       <div class="upgrade-actions">
         <button class="btn btn-primary btn-full btn-large"
                 id="upgrade-cta"
-                aria-label="Start the Plan">
+                aria-label="I’m ready: start the Plan">
           I&rsquo;m ready
         </button>
 

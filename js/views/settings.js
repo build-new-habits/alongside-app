@@ -1,5 +1,18 @@
 /**
  * settings.js
+ * 02 Oct 2026 v60
+ *
+ * v60 - W4-16 RESET-TRUE: the Reset dialog names what goes (journal,
+ *   check-ins, sore areas, sessions, the Plan on this phone, display
+ *   settings), suggests Download first, and, when a research answer was
+ *   sent, says it cannot be taken back and that this phone remembers it was
+ *   answered; afterwards the page says it happened (focus on it, Start
+ *   again) and display settings are back to the defaults on the live page.
+ *   W4-18 A11Y-W4: every switch is named by its visible label and the name
+ *   never changes (it was rewritten with replace on/off: Sessioff,
+ *   Stroffger); the state is aria-checked. Saved is said after a redraw
+ *   (News).
+ *
  * 02 Oct 2026 v59
  *
  * v59 - W4-10 TIREDNESS-PROMISE. The Sore or injured areas row counts sore
@@ -640,7 +653,7 @@ import { getProgressStats }              from '../data/programmeEngine.js';
 import { getBeat3Script }                from '../data/beat3-scripts.js';
 import {
   DISPLAY_RANGES, SCHEMES, getDisplayPref, setDisplayPref,
-  resetDisplayPrefs, formatDisplayValue
+  resetDisplayPrefs, formatDisplayValue, applyDisplayPrefs
 } from '../display-prefs.js';
 import { openSheet }                     from './onboarding/sheet-manager.js';
 // W3-A2. Imported, never redefined. A second copy of these option lists
@@ -658,7 +671,7 @@ import { describeDate } from '../data/restore.js';
 import { lockText, passwordProblem, lockAvailable } from '../data/file-lock.js';
 import { restoreFromFile } from './restore-flow.js';
 import { visibleMessages, hasUnread, markAllRead, dismissMessage, updateNavDot } from '../data/messages.js';
-import { SURVEY, CANT_FIND, NOT_SENT, figuresPayload, surveyPayload, sendEvidence, researchPrivacyLine } from '../data/evidence.js';
+import { SURVEY, CANT_FIND, NOT_SENT, figuresPayload, surveyPayload, sendEvidence, researchPrivacyLine, wasAnswered } from '../data/evidence.js';
 import { conditionReadback, shortDate } from '../data/arc-readback.js';
 
 import {
@@ -826,7 +839,7 @@ export function SettingsView(router) {
         <button class="settings-toggle ${on ? 'settings-toggle--on' : ''}" id="${id}" role="switch"
                 aria-checked="${on ? 'true' : 'false'}"
                 ${disp ? `data-disp-toggle="${disp}"` : `data-toggle="${field}"`}
-                aria-label="${_esc(label)} ${on ? 'on' : 'off'}">
+                aria-label="${_esc(label)}">
           <span class="settings-toggle__track" aria-hidden="true"></span>
         </button>
       </li>`;
@@ -943,9 +956,13 @@ export function SettingsView(router) {
   /** Announce a save. Polite, once. */
   function _saved(container, msg = 'Saved') {
     const el = container.querySelector('#settings-saved');
-    if (!el) return;
-    el.textContent = '';
-    setTimeout(() => { el.textContent = msg; }, 20);
+    if (el) el.textContent = '';
+    // W4-18: looked up again when it is said, so a redraw in between (News
+    // redraws the page) does not leave the words in a region now gone.
+    setTimeout(() => {
+      const now = container.querySelector('#settings-saved');
+      if (now) now.textContent = msg;
+    }, 20);
   }
 
   /** Everything the app keeps, as a file, built and saved on this device. */
@@ -1242,7 +1259,7 @@ export function SettingsView(router) {
           role="switch"
           aria-checked="${on ? 'true' : 'false'}"
           data-toggle="weightTracking"
-          aria-label="Weight tracking ${on ? 'on' : 'off'}">
+          aria-label="Weight tracking">
           <span class="settings-toggle__track" aria-hidden="true"></span>
         </button>
       </div>
@@ -1881,7 +1898,7 @@ export function SettingsView(router) {
             data-toggle="showPersonalBests"
             role="switch"
             aria-checked="${pbOn ? 'true' : 'false'}"
-            aria-label="Show your best ${pbOn ? 'on' : 'off'}">
+            aria-label="Show your best">
             <span class="settings-toggle__track" aria-hidden="true"></span>
           </button>
         </div>
@@ -1897,7 +1914,7 @@ export function SettingsView(router) {
             role="switch"
             aria-checked="${on ? 'true' : 'false'}"
             data-toggle="liftLogEnabled"
-            aria-label="Session notes ${on ? 'on' : 'off'}">
+            aria-label="Keep session notes">
             <span class="settings-toggle__track" aria-hidden="true"></span>
           </button>
         </div>
@@ -1953,7 +1970,7 @@ export function SettingsView(router) {
           role="switch"
           aria-checked="${on ? "true" : "false"}"
           data-disp-toggle="${name}"
-          aria-label="${label} ${on ? "on" : "off"}">
+          aria-label="${label}">
           <span class="settings-toggle__track" aria-hidden="true"></span>
         </button>
       </div>
@@ -2527,9 +2544,9 @@ export function SettingsView(router) {
         setDisplayPref(name, next ? 'on' : 'off');
         btn.setAttribute('aria-checked', next ? 'true' : 'false');
         btn.classList.toggle('settings-toggle--on', next);
-        const label = btn.getAttribute('aria-label') || '';
-        btn.setAttribute('aria-label', label.replace(next ? 'off' : 'on', next ? 'on' : 'off'));
-        _dispAnnounce(label.replace(/\s(on|off)$/, '') + (next ? ' on' : ' off'));
+        // W4-18: the name is the label and never changes; aria-checked says
+        // on or off. replace('on','off') made "Stroffger focus outlines".
+        _dispAnnounce(`${btn.getAttribute('aria-label') || ''} ${next ? 'on' : 'off'}`);
       });
     });
 
@@ -2549,9 +2566,8 @@ export function SettingsView(router) {
         store.set(field, next);
         btn.setAttribute('aria-checked', next ? 'true' : 'false');
         btn.classList.toggle('settings-toggle--on', next);
-        const label = btn.getAttribute('aria-label') || '';
-        btn.setAttribute('aria-label', label.replace(next ? 'off' : 'on', next ? 'on' : 'off'));
-        _saved(container, `${(btn.getAttribute('aria-label') || '').replace(/\s(on|off)$/, '')} ${next ? 'on' : 'off'}. Saved.`);
+        // W4-18: the name is the label; aria-checked carries the state.
+        _saved(container, `${btn.getAttribute('aria-label') || ''} ${next ? 'on' : 'off'}. Saved.`);
         // SMOOTH-P4c. These two reveal a row beneath them (the reminder
         // time; your weight and units), so the screen is drawn again and
         // focus goes back to the switch that was pressed.
@@ -2902,17 +2918,33 @@ export function SettingsView(router) {
         router.navigate('activity-log');
         break;
 
-      case 'reset-data':
+      case 'reset-data': {
+        // W4-16 (Wave 4 trace). Say what goes, and the one thing that
+        // stays; then say it happened, on the page, and put display
+        // settings back on the live page too.
+        const answered = wasAnswered('survey') || wasAnswered('figures');
         _confirmDestructive(
           'Reset all data',
-          'This will delete everything — your profile, history, and programme. It cannot be undone.',
+          [
+            'This deletes everything Alongside keeps on this phone: your profile, sessions and history, check-ins, sore areas, your journal, your programme, the Plan on this phone and your display settings. It cannot be undone.',
+            'If you might want any of it back, use Download your data first.',
+            ...(answered ? ['Answers you already sent to the survey or with Share my figures can\u2019t be taken back: they don\u2019t say who you are, so they can\u2019t be found. This phone will still remember that you answered, so you aren\u2019t asked again.'] : []),
+          ],
           () => {
             store.resetEverything();   // LEGAL-TRUE: every key, not only the store
-            router.navigate('onboarding/thread');
+            applyDisplayPrefs();       // W4-16: the live page back to the defaults
+            container.innerHTML = `
+              <div class="view settings-view">
+                <p class="settings-result" data-reset-done tabindex="-1" role="status">Everything Alongside kept on this phone has been deleted.</p>
+                <button class="btn btn-primary btn-large btn-full" id="settings-start-again">Start again</button>
+              </div>`;
+            container.querySelector('#settings-start-again').addEventListener('click', () => router.navigate('onboarding/thread'));
+            container.querySelector('[data-reset-done]').focus();
           },
           container
         );
         break;
+      }
     }
   }
 
@@ -2947,7 +2979,7 @@ export function SettingsView(router) {
       <div class="settings-dialog__backdrop"></div>
       <div class="settings-dialog__content">
         <h2 class="settings-dialog__title" id="confirm-dialog-title">${_esc(title)}</h2>
-        <p class="settings-dialog__message">${_esc(message)}</p>
+        ${(Array.isArray(message) ? message : [message]).map(m => `<p class="settings-dialog__message">${_esc(m)}</p>`).join('')}
         <div class="settings-dialog__actions">
           <button class="btn btn-ghost" id="confirm-cancel">Cancel</button>
           <button class="btn btn-danger" id="confirm-ok">${_esc(title)}</button>

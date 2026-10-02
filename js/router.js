@@ -1,5 +1,11 @@
 /**
  * router.js
+ * 02 Oct 2026 v42
+ *
+ * v42 - W4-18. After mounting, the container takes focus only when the view
+ *   has not already put it inside itself (a heading): it overrode the age
+ *   question, policy, health consent and under-18 headings.
+ *
  * 02 Oct 2026 v41
  *
  * v41 - W4-13. No house button on any screen while the age question, the
@@ -764,9 +770,16 @@ export const router = {
           new Error(`View "${viewName}" rendered nothing`));
       }, 800);
 
-      container.setAttribute('tabindex', '-1');
-      container.focus({ preventScroll: true });
-      setTimeout(() => container.removeAttribute('tabindex'), 100);
+      // W4-18. A view that put focus on its own heading keeps it: the age
+      // question, the policy screen, the health consent and the under-18
+      // screen each say what they ask first. Only otherwise does the
+      // container take focus.
+      const active = document.activeElement;
+      if (!active || active === document.body || !container.contains(active)) {
+        container.setAttribute('tabindex', '-1');
+        container.focus({ preventScroll: true });
+        setTimeout(() => container.removeAttribute('tabindex'), 100);
+      }
 
     } catch (err) {
       this._recover(container, viewName, err);

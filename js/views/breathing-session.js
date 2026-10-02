@@ -1,6 +1,11 @@
 /**
  * js/views/breathing-session.js - Guided Breathing Session
  *
+ * 02 Oct 2026 v9
+ *
+ * v9 - W4-18. The breath circle stays still under Reduce motion (it grew and
+ *   shrank regardless).
+ *
  * 30 Sep 2026 v8
  *
  * v8 - W3-20. The "+N credits" line is gone: a count nothing uses, beside a
@@ -73,6 +78,7 @@
  */
 
 import { store }  from "../store.js";
+import { prefersReducedMotion } from "../display-prefs.js";
 import { isGateDue, renderSafetyGate, attachSafetyGate } from "../safety-gate.js";
 // SHARED-1. This view does not route to reflect.js, so it renders the
 // moments itself. No exerciseIds: a breathing session has nothing to ask
@@ -271,9 +277,16 @@ function startPhase(type) {
   tick();
 }
 
-function updateBreathCircle(phaseLabel, duration) {
+export function updateBreathCircle(phaseLabel, duration) {
   const circle = document.getElementById("bs-breath-circle");
   if (!circle) return;
+  // W4-18. Under Reduce motion (the phone's or Display's) the circle stays
+  // still; the phase words and the timer carry the breath.
+  if (prefersReducedMotion()) {
+    circle.style.transition = "none";
+    circle.style.transform = "scale(1)";
+    return;
+  }
   const label = phaseLabel.toLowerCase();
   if (label.includes("in") || label.includes("inhale") || label.includes("top")) {
     circle.style.transform = "scale(1.35)";

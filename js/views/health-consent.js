@@ -31,7 +31,7 @@ export function HealthConsentView(router) {
     root.innerHTML = `
       <div class="view hc-view">
         <h1 class="hc-title" id="hc-title" tabindex="-1">Before I keep how you are</h1>
-        ${healthWordingChanged() ? `<p class="hc-text">The wording of this consent has changed since you agreed, so I need you to read it and say yes again before I keep anything new.</p>` : ""}
+        ${healthWordingChanged() ? `<p class="hc-text">What this consent covers has changed since you agreed, so I need you to read it and say yes again before I keep anything new.</p>` : ""}
         <p class="hc-text">To shape your sessions I keep your health answers on this phone:
           what’s sore and how much, what you tell me about your body and how you’ve been,
           your check-ins, your weight if you add it, and your journal.

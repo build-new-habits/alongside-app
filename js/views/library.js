@@ -1,6 +1,11 @@
 /**
  * library.js - Library Page
  *
+ * 02 Oct 2026 v12
+ *
+ * v12 - W4-18. The category heading's icon is hidden from screen readers:
+ *   Mindful practice was read with its emoji first.
+ *
  * 01 Oct 2026 v11
  *
  * v11 - BUNDLE-TRUE. Mindful practice › Journal opens the real journal
@@ -519,7 +524,7 @@ function renderGuidedSubScreen(categoryId) {
         <button class="btn btn-ghost" id="lib-back-btn" aria-label="Back">
           \u2190 Back
         </button>
-        <h1>${cat.icon} ${cat.label}</h1>
+        <h1><span aria-hidden="true">${cat.icon}</span> ${cat.label}</h1>
       </div>
 
       <p class="text-sm text-secondary" style="margin-bottom: var(--space-4);">

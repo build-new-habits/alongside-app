@@ -1,5 +1,10 @@
 /**
  * journal-entry.js
+ * 02 Oct 2026 v8
+ *
+ * v8 - W4-18. The box is named by its visible label (the prompt); an
+ *   aria-label replaced it.
+ *
  * 01 Oct 2026 v7
  *
  * v7 - SIGNPOST-STATIC. The support lines under Save, the same for
@@ -174,7 +179,6 @@ export function JournalEntryView(router) {
             name="journal-text"
             rows="8"
             aria-required="false"
-            aria-label="Journal entry — write anything"
             aria-describedby="je-privacy"
             placeholder="${_esc(prompt.placeholder)}"
             maxlength="5000"

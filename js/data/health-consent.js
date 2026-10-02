@@ -1,5 +1,12 @@
 /**
  * js/data/health-consent.js
+ * 02 Oct 2026 v6
+ *
+ * v6 - Graeme, 02 Oct: asked again only when what the consent covers changes
+ *   (HEALTH_CONSENT_COVERS_FROM, 2026-10-01), not for the shorter tick,
+ *   which is wording only. Each new consent still records the wording shown
+ *   (2026-10-02).
+ *
  * 02 Oct 2026 v5
  *
  * v5 - W4-13 and W4-19. healthConsentNeeded() reads the version: given to
@@ -54,6 +61,20 @@ import { store } from "../store.js";
 // 2026-10-02 (W4-19): the shorter tick. A new version asks again (W4-13).
 export const HEALTH_CONSENT_VERSION = "2026-10-02";
 
+/**
+ * Graeme, 02 Oct 2026: ask again only when what the consent COVERS changes
+ * (which answers are kept, what they are used for, where they go), never
+ * for a change of wording alone. Asking again for nothing new teaches
+ * people to tick without reading. A consent given to any version from this
+ * date on stands. Move it to the new version's date only when the
+ * substance changes; every new consent still records the exact wording
+ * shown (HEALTH_CONSENT_VERSION).
+ *   2026-10-01  separate health consent (PT-2, LEGAL-TRUE)
+ *   2026-10-02  shorter tick, same answers, same use: wording only
+ */
+export const HEALTH_CONSENT_COVERS_FROM = "2026-10-01";
+const _covers = v => typeof v === "string" && /^\d{4}-\d{2}-\d{2}$/.test(v) && v >= HEALTH_CONSENT_COVERS_FROM;
+
 /** The tick's own words, the same at onboarding and here. Under 25 words
  *  (W4-19: it was 47); what the answers are is said beside it, in
  *  HEALTH_WHAT, which the tick points to (aria-describedby). */
@@ -73,14 +94,14 @@ export const HEALTH_ROUTES = new Set(["checkin", "checkin-mini", "know-what", "j
 export function healthConsentNeeded() {
   const c = store.get("consent") || {};
   const given = c.health ? c.health.given : null;
-  // W4-13: given to older wording is not given to this one.
-  return given !== true || c.health.version !== HEALTH_CONSENT_VERSION;
+  // W4-13: given before what it covers changed is not given to this.
+  return given !== true || !_covers(c.health.version);
 }
 
-/** Given before, to wording that has since changed (W4-13). */
+/** Given, but before what the consent covers changed (W4-13). */
 export function healthWordingChanged() {
   const h = (store.get("consent") || {}).health || {};
-  return h.given === true && h.version !== HEALTH_CONSENT_VERSION;
+  return h.given === true && !_covers(h.version);
 }
 
 export const healthAllowed = () => !healthConsentNeeded();
