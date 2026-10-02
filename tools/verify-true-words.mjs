@@ -1,211 +1,180 @@
 /**
  * tools/verify-true-words.mjs
- * 30 Sep 2026 v1
+ * 02 Oct 2026 v1
  *
- * W3-20 TRUE-WORDS (persona Wave 3, all eight). Lines the app said about
- * the person that were not true, each checked where it is said:
+ * W4-20 TRUE-WORDS-4 (Wave 4 persona trace, findings §4). Each line the
+ * trace found untrue, in the state it was untrue in:
  *
- *    1. "That was your first one." -- whenever one session had been
- *       completed, not only on the finish of that one session.
- *    2. "...going into your first session" -- to somebody who had
- *       trained, because the opener counted check-ins.
- *    3. "More settled... the last couple of weeks" -- from the last 14
- *       check-ins, however few days they covered.
- *    4. "You have 20 minutes today" -- nobody had said so; it is their
- *       usual length.
- *    5. "mostly X" -- on a tie.
- *    6. "That is N sessions this week" -- counting part-sessions, and a
- *       week that began at the current time of day on Sunday.
- *    7. "You moved today" -- after a breathing session.
- *    8. "You picked this one yourself" -- when the coach picked it.
- *    9. Credits: finish screens said "+50 credits earned" in a currency
- *       nothing uses, while the Community page promises one credit per
- *       completed session (two on the Plan) and gave at most one a day,
- *       and only for the coach's workouts.
- *   10. Free's class list: "they know what you're working towards" --
- *       Free has no arc.
- *   11. Intervals: 45 and 60 minutes used the 30-minute script, so "Last
- *       one" came at 21 minutes; and "Everything you have left".
- *   12. Onboarding: "your conditions", "your own programme" -- neither is
- *       what the app does since 29 Sep (scope).
- *   13. "a upper body session"; "1 sessions".
- *   14. The core session's "I've kept hip extension loading light" (and
- *       its other below-acute claims): nothing is moved out below acute.
+ *   1. The coach's plan sentence: the length it states is the plan's own
+ *      (it said "40 minutes" over "About 25 min").
+ *   2. The check-in: "I'll plan for your usual 30 minutes" before a plan
+ *      made shorter (a low day, poor sleep, a lighter reason).
+ *   3. Getting started: "carrying, gripping, getting up and down" promised
+ *      to somebody whose legs are not ready for load.
+ *   4. "Mindful movement" opens sitting and breathing practices only.
+ *   5. "lately it's been not much" to somebody with a month of breathing
+ *      and mindful practice that the count leaves out.
+ *   6. "Runs that feel tough…" after a steady run.
+ *   7. "You told me it always ramps up until it breaks": they chose "It
+ *      moved too fast, too soon".
+ *   8. "Fitness slips in that time whatever the reason".
+ *   9. "Five percent of what you pay" to a beta member who pays nothing.
+ *  10. "The plan stays as it is" over a plan the coach made lighter.
+ *  11. "1 weeks in, 1 sessions".
+ *  12. Progress's weeks start before the person did.
  */
 import { createRequire as __cr } from "node:module";
+import { readFileSync } from "node:fs";
+import { agreed } from "./agreed.mjs";
+import { oneScreen } from "./one-screen.mjs";
 const __require = __cr(import.meta.url);
 const { JSDOM } = __require("jsdom");
-const fs = __require("node:fs");
 
-const dom = new JSDOM('<!doctype html><div id="app"><div id="main-content"></div></div>', { url: "https://x/" });
+const dom = new JSDOM('<!doctype html><body><div id="app"><main id="main-content"></main></div></body>', { url: "https://x/" });
 globalThis.window = dom.window;
 globalThis.document = dom.window.document;
 for (const k of ["navigator", "localStorage", "HTMLElement", "Node", "CustomEvent", "Event", "MouseEvent", "KeyboardEvent"])
   Object.defineProperty(globalThis, k, { value: dom.window[k], configurable: true, writable: true });
 dom.window.matchMedia = q => ({ matches: false, media: q, addEventListener() {}, removeEventListener() {}, addListener() {}, removeListener() {} });
-dom.window.scrollTo = () => {};
+dom.window.scrollTo = () => {}; globalThis.scrollTo = () => {};
 dom.window.HTMLElement.prototype.scrollIntoView = () => {};
+globalThis.requestAnimationFrame = cb => setTimeout(() => cb(0), 0);
 globalThis.history = dom.window.history;
 globalThis.location = dom.window.location;
+globalThis.fetch = dom.window.fetch = async () => ({ ok: false, text: async () => "", json: async () => ({}) });
 
-const R = new URL("../", import.meta.url);
-const B = new URL("../js/", import.meta.url).href;
-const src = f => fs.readFileSync(new URL(f, R), "utf8").replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+const ROOT = new URL("../", import.meta.url);
+const B = new URL("js/", ROOT).href;
+const src = p => readFileSync(new URL(p, ROOT), "utf8");
+// What the app can show: the file without its comment lines (history notes
+// quote the old words).
+const code = p => src(p).split("\n").filter(l => !/^\s*(\*|\/\/|\/\*\*)/.test(l)).join("\n");
 const { store } = await import(B + "store.js");
-const rtr = { navigate() {}, back() {}, history: [] };
-globalThis.router = rtr; dom.window.router = rtr;
+const gate = await import(B + "safety-gate.js");
 
 let fails = 0, passes = 0;
 const ok = (name, cond, detail = "") => {
   console.log(`  ${cond ? "PASS" : "FAIL"}  ${name}`);
   if (cond) passes++; else { fails++; if (detail) console.log(`        ${detail}`); }
 };
-const main = document.getElementById("main-content");
-const txt = el => (el?.textContent || "").replace(/\s+/g, " ").trim();
 const wait = ms => new Promise(r => setTimeout(r, ms));
-const iso = (daysAgo, h = 10) => { const d = new Date(); d.setDate(d.getDate() - daysAgo); d.setHours(h, 0, 0, 0); return d.toISOString(); };
-const localDay = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-function fresh(tier = "free") {
-  localStorage.clear(); store.init();
-  store.set("onboardingComplete", true); store.set("tier", tier); store.set("name", "Sam");
+const txt = el => (el?.textContent || "").replace(/\s+/g, " ").trim();
+const ago = d => new Date(Date.now() - d * 86400000).toISOString();
+function person(extra = {}) {
+  localStorage.clear(); store.init(); agreed(store); gate.endGateSession();
+  store.set("onboardingComplete", true); store.set("name", "Pat"); store.set("tier", "personal");
+  store.set("equipment", []); store.set("homeEquipment", []);
+  for (let i = 0; i < 5; i++) gate.recordAcknowledgement("fixture");
+  gate.endGateSession();
+  for (const [k, v] of Object.entries(extra)) store.set(k, v);
 }
 
-// 1
-console.log("\n1 - That was your first one");
-const SM = await import(B + "data/session-moments.js");
-fresh();
-store.set("activityLog", [{ id: "a", type: "workout", status: "completed", completedAt: iso(1) }]);
-store.set("currentActivityEntry", { id: "b", type: "walk" });   // this finish is about something else
-ok("1a. not said on the finish of a session that is not the first", !/your first one/i.test(SM.renderSessionMoments({})));
-store.set("currentActivityEntry", store.get("activityLog")[0]);
-ok("1b. control: said on the first one's own finish", /your first one/i.test(SM.renderSessionMoments({})));
+// ── 1. THE PLAN SENTENCE ────────────────────────────────────────────────
+console.log("\nTEST 1 - the plan sentence states the plan's own length");
+const { CoachProposalView } = await import(B + "views/coach-proposal.js");
+const off = [];
+let tried = 0;
+for (const type of ["full", "upper", "lower", "glute", "core", "cardio", "mobility", "stretch"]) for (const time of ["standard", "long"]) {
+  person({ availableTime: time, requestedSessionType: type }); tried++;
+  const el = oneScreen(document.createElement("div"));
+  CoachProposalView({ history: ["x"], navigate() {}, back() {} }).mount(el); await wait(30);
+  const all = txt(el);
+  const total = Number((all.match(/About (\d+) min/) || [])[1]);
+  const sent = (all.match(/You asked for [^.]*\.(?: This one comes to about \d+ minutes\.)?/) || [""])[0];
+  const stated = Number((sent.match(/comes to about (\d+)/) || sent.match(/(\d+) minutes/) || [])[1]);
+  if (!sent) off.push(`${time}: no sentence`);
+  else if (!(Math.abs(stated - total) <= 5)) off.push(`${type} ${time}: "${sent.slice(0, 70)}" over About ${total} min`);
+}
+ok(`1a. the length said is within five minutes of the plan's total (${tried} plans: eight kinds, 40 and 50 minutes)`, off.length === 0, off.join(" | "));
 
-// 2 and 3
-console.log("\n2, 3 - check-in openers");
-const CO = await import(B + "data/checkin-openings.js");
-fresh();
-store.set("onboarding.primaryTerritory", "wrong-fit");   // its day-one line says "before your first session"
-store.set("activityLog", [1, 2].map(n => ({ id: "w" + n, type: "workout", status: "completed", completedAt: iso(n) })));
-const o2 = Array.from({ length: 12 }, () => CO.resolveOpening()).map(o => `${o.b1} ${o.b2}`);
-ok("2a. somebody who has trained is never told it is their first session", !o2.some(s => /first session|very first/i.test(s)), o2.find(s => /first session/i.test(s)) || "");
-fresh();
-store.set("onboarding.primaryTerritory", "wrong-fit");
-const o2c = Array.from({ length: 6 }, () => CO.resolveOpening()).map(o => `${o.b1} ${o.b2}`);
-ok("2b. control: a true day one is still told it is their first", o2c.some(s => /first session/i.test(s)), o2c[0]);
-fresh();
-const hist = {};
-for (let i = 9; i >= 0; i--) { const d = new Date(); d.setDate(d.getDate() - i - 1); hist[localDay(d)] = { energy: i >= 5 ? 3 : 7, mood: 6 }; }
-store.set("checkinHistory", hist);
-const o3 = Array.from({ length: 40 }, () => CO.resolveOpening()).map(o => o.b1);
-ok("3a. ten check-ins over ten days: never 'the last couple of weeks... more settled'", !o3.some(s => /couple of weeks/.test(s)), o3.find(s => /couple of weeks/.test(s)) || "");
-fresh();
-const hist2 = {};
-for (let i = 27; i >= 1; i--) { const d = new Date(); d.setDate(d.getDate() - i); hist2[localDay(d)] = { energy: i >= 14 ? 4 : 6, mood: 6 }; }
-store.set("checkinHistory", hist2);
-const o3b = Array.from({ length: 80 }, () => { store.set("checkin.lastOpeningMode", null); return CO.resolveOpening(); }).map(o => o.b1);
-ok("3b. control: four weeks, the last two steadier, can still be said", o3b.some(s => /couple of weeks/.test(s)), [...new Set(o3b)].slice(0, 3).join(" | "));
+// ── 2. THE CHECK-IN'S LENGTH LINE ───────────────────────────────────────
+console.log("\nTEST 2 - the check-in does not promise the usual length on a shorter day");
+const CKV = await import(B + "views/checkin.js");
+const L = CKV.lengthLine;
+ok("2pc. the line is one function", typeof L === "function");
+ok("2a. a low day: not \"I'll plan for your usual\"", !!L && !/plan for your usual/.test(L("short", { shorter: true })) && /shorter/.test(L("short", { shorter: true })), L && L("short", { shorter: true }));
+ok("2b. control: an ordinary day keeps it", !!L && /plan for your usual 30 minutes/.test(L("short", { shorter: false })));
 
-// 4 and 6
-console.log("\n4, 6 - the check-in summary and the finish's week");
-const ck = src("js/views/checkin.js");
-ok("4a. the check-in no longer tells somebody what time they have today", !/You have \$\{tl\[/.test(ck) && /your usual/.test(ck));
-const rf = src("js/views/reflect.js");
-const bs = rf.slice(rf.indexOf("function buildSummary"), rf.indexOf("function buildSummary") + 700);
-ok("6a. the finish's week counts completed sessions, from the start of the day", /completedSessions\(/.test(bs) && /setHours\(0, ?0, ?0, ?0\)/.test(bs), bs.slice(0, 300));
+// ── 3. GETTING STARTED'S PROMISE ────────────────────────────────────────
+console.log("\nTEST 3 - no carrying and getting up and down promised to legs not ready for load");
+const OTD = await import(B + "data/onboarding-thread-data.js");
+const notReady = OTD.generateIntentAck("maintain", { legsLoadable: false });
+ok("3a. legs not ready: no carrying, gripping, getting up and down", !/carrying|getting up and down/i.test(notReady), notReady);
+ok("3b. control: legs ready, it still names them", /carrying/.test(OTD.generateIntentAck("maintain", { legsLoadable: true })));
 
-// 5
-console.log("\n5 - mostly");
-const AR = await import(B + "data/arc-readback.js");
-const two = [{ type: "walk", completedAt: iso(1) }, { type: "run", completedAt: iso(2) }];
-ok("5a. a tie is not 'mostly' anything", AR.sessionsInWindow(two, { kindOf: e => e.type }).topKind === null);
-const three = [...two, { type: "walk", completedAt: iso(3) }];
-ok("5b. control: two walks and a run is mostly walks", AR.sessionsInWindow(three, { kindOf: e => e.type }).topKind === "walk");
+// ── 4. MINDFUL ──────────────────────────────────────────────────────────
+console.log("\nTEST 4 - the sitting practices are not called movement");
+const where = ["js/views/library.js", "js/views/noticing.js", "js/views/quiet-session.js", "js/data/tier-table.js"].filter(f => /Mindful movement|mindful movement/.test(code(f)));
+ok("4a. no \"Mindful movement\" for them", where.length === 0, where.join(", "));
 
-// 7
-console.log("\n7 - You moved today");
-const { TodayView } = await import(B + "views/today.js");
-fresh();
-store.set("activityLog", [{ id: "br", type: "mindfulness", status: "completed", completedAt: new Date().toISOString(), durationMins: 3 }]);
-main.innerHTML = ""; TodayView(rtr).mount(main); await wait(10);
-ok("7a. after breathing only, Home does not say 'You moved today'", !/You moved today/.test(txt(main)), txt(main).slice(0, 160));
-fresh();
-store.set("activityLog", [{ id: "wk", type: "walk", status: "completed", completedAt: new Date().toISOString(), durationMins: 20 }]);
-main.innerHTML = ""; TodayView(rtr).mount(main); await wait(10);
-ok("7b. control: after a walk, it does", /You moved today/.test(txt(main)));
+// ── 5. "NOT MUCH" ───────────────────────────────────────────────────────
+console.log("\nTEST 5 - the plan-jump line with a month of breathing and mindful practice");
+const P = await import(B + "data/pacing.js");
+person({ createdAt: ago(40), "strategicGoal.setAt": ago(30), "strategicGoal.weeklySessionTarget": 4,
+  activityLog: Array.from({ length: 12 }, (_, i) => ({ id: "m" + i, type: i % 2 ? "mindfulness" : "breathing", status: "completed", completedAt: ago(1 + i * 2) })) });
+const jump = P.noticePlanJump();
+ok("5pc. the line is offered", !!jump, JSON.stringify(jump));
+ok("5a. no \"not much\"; it says breathing and mindful practice aren't counted", !!jump && !/not much/.test(jump.body) && /breathing/i.test(jump.body), jump?.body);
 
-// 8
-console.log("\n8 - You picked this one yourself");
+// ── 6. A STEADY RUN ─────────────────────────────────────────────────────
+console.log("\nTEST 6 - the finish line follows the feel answer");
+const R = await import(B + "views/reflect.js");
+person();
+const steady = R.buildSummary?.({ type: "run" }, "steady", null, null) || "";
+ok("6a. a steady run: not \"Runs that feel tough\"; it says steady", !!steady && !/feel tough/.test(steady) && /steady/i.test(steady), steady);
+ok("6b. control: a tough run still gets it", /feel tough/.test(R.buildSummary?.({ type: "run" }, "tough", null, null) || ""));
+
+// ── 7. THEIR OWN WORDS ──────────────────────────────────────────────────
+console.log("\nTEST 7 - said back in the words they chose");
+ok("7a. no \"always ramps up until it breaks\"; their \"too fast\"", !/ramps up until it breaks/.test(code("js/data/first-session.js")) && /too fast/.test(code("js/data/first-session.js")));
+
+// ── 8. FITNESS SLIPS ────────────────────────────────────────────────────
+console.log("\nTEST 8 - no \"Fitness slips\"");
+ok("8a. the coming-back offer makes no claim about their fitness", !/Fitness slips/.test(code("js/views/coach-proposal.js")));
+
+// ── 9. WHAT YOU PAY ─────────────────────────────────────────────────────
+console.log("\nTEST 9 - nobody paying is told what they pay");
+const U = await import(B + "views/upgrade.js");
+person();
+const up = document.createElement("div"); up.innerHTML = U.render();
+ok("9a. upgrade: no \"Five percent of what you pay goes\"", !/Five percent of what you pay goes/.test(txt(up)) && /percent/.test(txt(up)), txt(up).slice(0, 300));
+ok("9b. settings: the same", !/Five percent of what you pay goes/.test(code("js/views/settings.js")));
+
+// ── 10. THE PLAN STAYS AS IT IS ─────────────────────────────────────────
+console.log("\nTEST 10 - not \"stays as it is\" over a plan made lighter");
 const SB = await import(B + "session-builder.js");
-fresh();
-const pools = SB.buildCandidatePools({ sessionType: "full", durationMins: 30, equipmentOverride: ["dumbbells-light"] });
-const ids = ["warmup", "main", "cooldown"].flatMap(s => pools[s].filter(e => e.recommended).map(e => e.id));
-const rec = SB.buildSessionFromSelection({ sessionType: "full", durationMins: 30, selectedIds: ids, equipmentOverride: ["dumbbells-light"], recommended: true });
-ok("8a. the coach's recommendation does not say they picked it", !/picked this one yourself/i.test(rec.coachLine), rec.coachLine);
-const own = SB.buildSessionFromSelection({ sessionType: "full", durationMins: 30, selectedIds: ids.slice(0, 5), equipmentOverride: ["dumbbells-light"] });
-ok("8b. control: their own choice still says so", /picked this one yourself/i.test(own.coachLine), own.coachLine);
-const ui = src("js/views/session-builder-ui.js");
-ok("8c. Coach recommends asks for the coach's words", /recommended:\s*true/.test(ui.slice(ui.indexOf("function triggerRecommendedBuild"), ui.indexOf("function triggerRecommendedBuild") + 1500)));
+ok("10pc. the builder says why a plan is lighter", typeof SB.gentleReason === "function");
+const cp = src("js/views/coach-proposal.js");
+void cp;
+const todayKey = new Date().toISOString().split("T")[0];
+async function goodDay(sleep) {
+  person({ checkinHistory: { [todayKey]: { energy: 8, mood: 7, sleepQuality: sleep } }, lastCheckin: { energy: 8, mood: 7, timestamp: new Date().toISOString() }, todayIntensity: "high" });
+  const el = oneScreen(document.createElement("div"));
+  CoachProposalView({ history: ["x"], navigate() {}, back() {} }).mount(el); await wait(30);
+  return txt(el.querySelector(".cp-offer"));
+}
+const slept = await goodDay("poor");
+ok("10a. good energy after a poor night (a lighter plan): not \"stays as it is\"", !!SB.gentleReason?.() && !/stays as it is/.test(slept) && /lighter/.test(slept), slept);
+const fine = await goodDay("good");
+ok("10b. control: good energy and a good night, it stays as it is", /stays as it is/.test(fine), fine);
 
-// 9
-console.log("\n9 - credits");
-const views = fs.readdirSync(new URL("js/views/", R)).filter(f => f.endsWith(".js"));
-const legacy = views.filter(f => /\+\$\{creditsEarned\}\s*credits/.test(src("js/views/" + f)));
-ok("9a. no finish screen shows '+N credits' in a currency nothing uses", legacy.length === 0, legacy.join(", "));
-fresh("free");
-const credit = () => store.get("community")?.credits || 0;
-const log = e => store.logActivity({ completedAt: new Date().toISOString(), date: new Date().toISOString(), ...e }, 0);
-log({ type: "walk", status: "completed", durationMins: 20 });
-log({ type: "class", status: "complete", durationMins: 15, completedAt: new Date(Date.now() + 60000).toISOString() });
-ok("9b. Free: a walk and a class the same day earn one credit each", credit() === 2, String(credit()));
-log({ type: "mindfulness", status: "completed", durationMins: 3, completedAt: new Date(Date.now() + 120000).toISOString() });
-log({ type: "workout", status: "partial", durationMins: 4, completedAt: new Date(Date.now() + 180000).toISOString() });
-ok("9c. breathing and a session stopped part-way earn none", credit() === 2, String(credit()));
-fresh("personal");
-log({ type: "run", status: "completed", durationMins: 30 });
-ok("9d. the Plan: two", credit() === 2, String(credit()));
-const W = src("js/views/workout.js") + src("js/views/gym-programme.js") + src("js/data/programmeEngine.js");
-ok("9e. awarded in one place (the log), not also by the players", !/awardCommunityCredit\(\)/.test(W));
+// ── 11. PLURALS ─────────────────────────────────────────────────────────
+console.log("\nTEST 11 - plurals");
+ok("11a. no \"${n} weeks in, ${n} sessions\" without a plural", !/\$\{stats\.weeksIn\} weeks in, \$\{stats\.totalSessions\} sessions/.test(src("js/views/progress.js")));
 
-// 10
-console.log("\n10 - the class list on Free");
-const CL = await import(B + "views/class-list.js");
-fresh("free");
-main.innerHTML = CL.render(); try { CL.onMount(); } catch {}
-ok("10a. Free is not told the classes know what they are working towards", !/know what you.re working towards/.test(txt(main)), txt(main).slice(0, 200));
+// ── 12. PROGRESS FROM THE START ─────────────────────────────────────────
+console.log("\nTEST 12 - Progress's weeks start when the person did");
+const AR = await import(B + "data/arc-readback.js");
+const weeks = AR.sessionsByWeek([{ completedAt: ago(1) }], { weeks: 6, since: new Date(ago(9)) });
+ok("12a. installed nine days ago: two weeks shown, not six", weeks.length <= 2 && weeks.length >= 1, String(weeks.length));
+ok("12b. control: no start given, six", AR.sessionsByWeek([], { weeks: 6 }).length === 6);
+person({ createdAt: ago(9), activityLog: [{ id: "w1", type: "walk", status: "completed", completedAt: ago(1) }] });
+const { ProgressView } = await import(B + "views/progress.js");
+const pel = oneScreen(document.createElement("div")); ProgressView({ navigate() {}, back() {} }).mount(pel); await wait(20);
+const chart = pel.querySelector('[aria-label="Sessions, week by week"]');
+ok("12c. Progress, nine days in: no more than two weeks drawn, said as since you started",
+   !!chart && chart.querySelectorAll("li").length <= 2 && /since you started/.test(txt(pel.querySelector("#pr-sessions-cap"))),
+   `${chart?.querySelectorAll("li").length} weeks; ${txt(pel.querySelector("#pr-sessions-cap"))}`);
 
-// 11
-console.log("\n11 - intervals");
-const RS = await import(B + "views/running-session.js");
-const scripts = RS.intervalScript ? [20, 30, 45, 60].map(m => ({ m, s: RS.intervalScript(m) })) : [];
-ok("11pc. the interval script is built from the length", scripts.length === 4);
-const lastOk = scripts.every(({ m, s }) => {
-  const work = s.filter(p => p.type === "work");
-  const li = s.findIndex(p => /\blast\b/i.test(p.text));
-  return work.length >= 3 && li === s.indexOf(work[work.length - 1]) && work[work.length - 1].at <= m * 60 - 300 && s.every(p => p.at < m * 60);
-});
-ok("11a. at every length, 'last' is the last effort, and it leaves an easy finish", lastOk, scripts.map(({ m, s }) => `${m}: ${s.filter(p => p.type === "work").map(p => p.at).join(",")}`).join(" | "));
-ok("11b. no 'everything you have left' or 'give it what you have'", !scripts.some(({ s }) => s.some(p => /everything you have left|give it what you have/i.test(p.text))) && !/Everything you have left|Give it what you have/.test(src("js/views/running-session.js")));
-
-// 12
-console.log("\n12 - onboarding");
-const b3 = src("js/data/beat3-scripts.js");
-ok("12a. no 'your conditions' or 'your own programme'", !/your conditions|your own programme/i.test(b3));
-
-// 13
-console.log("\n13 - grammar");
-const AL = await import(B + "data/activity-labels.js");
-const ph = AL.activityPhrase({ type: "workout", sessionType: "upper", status: "completed" });
-ok("13a. 'an upper body session', not 'a upper body session'", !/\ba upper\b/i.test(ph), ph);
-const pr = src("js/views/progress.js");
-ok("13b. the progress summary says '1 session', not '1 sessions'", !/\$\{count\} sessions/.test(pr));
-
-// 14
-console.log("\n14 - the core session's sore lines");
-const cs = src("js/views/core-session.js");
-const note = cs.slice(cs.indexOf("function buildConditionNote"), cs.indexOf("function buildConditionNote") + 3000);
-ok("14a. no 'I've kept hip extension loading light'", !/kept hip extension loading light/.test(note));
-
-console.log("");
-if (fails) { console.log(`TRUE-WORDS: ${fails} FAILED, ${passes} passed`); process.exit(1); }
-console.log(`TRUE-WORDS: all ${passes} assertions pass\n`);
-process.exit(0);
+console.log(`\nTRUE-WORDS: ${passes} passed, ${fails} failed`);
+process.exit(fails ? 1 : 0);
