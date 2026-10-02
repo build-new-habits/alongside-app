@@ -8,10 +8,12 @@
 > getting started, and `capabilityProfile()` returns the careful profile
 > while `capability.askedAt` is null. Kept when the consent is given later,
 > so What your body can do is asked before the next session
-> (`capabilityToAsk`). **`consent.health.version`** is now read:
-> `healthConsentNeeded()` is true when it differs from
-> `HEALTH_CONSENT_VERSION` (now `2026-10-02`, the shorter tick), so a
-> change of wording asks again. **`consent.policyVersion`** decides which
+> (`capabilityToAsk`). **`consent.health.version`** is now read: it
+> records the wording shown (`HEALTH_CONSENT_VERSION`, now `2026-10-02`,
+> the shorter tick), and `healthConsentNeeded()` is true when it is older
+> than `HEALTH_CONSENT_COVERS_FROM` (`2026-10-01`), the last change in what
+> the consent covers. A change of wording alone does not ask again
+> (Graeme, 02 Oct). **`consent.policyVersion`** decides which
 > changes the policy screen lists (`POLICY_HISTORY` in
 > `data/consent-version.js`).
 
