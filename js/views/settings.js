@@ -1,6 +1,10 @@
 /**
  * settings.js
- * 02 Oct 2026 v57
+ * 02 Oct 2026 v58
+ *
+ * v58 - W4-9. Sore or injured areas says what getting started says: on a
+ *   day one is bad, movements likely to make it worse are left out. It
+ *   said listing an area left movements out, which it does not.
  *
  * v57 - W4-6 RESTORE-MOVE / W4-3 RESTORE-TAKES. Restore runs through
  *   views/restore-flow.js (shared with onboarding); its confirmation says
@@ -1743,7 +1747,8 @@ export function SettingsView(router) {
     return `
       <div class="settings-section">
         <p class="settings-section__sub">
-          The coach leaves out movements likely to load what's listed here.
+          When you check in, tell me how these are that day. On a day one is
+          bad, I'll leave out movements likely to make it worse.
           When something is better, say so and I'll stop planning around it.
           If it comes back, add it again.
         </p>

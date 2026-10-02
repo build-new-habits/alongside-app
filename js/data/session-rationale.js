@@ -1,5 +1,10 @@
 /**
  * data/session-rationale.js
+ * 02 Oct 2026 v7
+ *
+ * v7 - W4-9 SORE-WORDS. Both sore-area readers ask the classifier (isSore,
+ *   data/conditions.js), so the row marks agree with the plan's sentence.
+ *
  * 30 Sep 2026 v6
  *
  * v6 - W3-17 MAINTAIN-INTENT (persona Wave 3, 2.4). "Hold on to what I
@@ -84,6 +89,7 @@
  */
 
 import { store } from "../store.js";
+import { isSore } from "./conditions.js";
 import { buildReads } from "./personal-reads.js";
 
 // ── Goal language ────────────────────────────────────────────────────────
@@ -545,7 +551,7 @@ export const AREA_ALIASES = {
 export function soreAreaLoaded(exercise) {
   const conditions = store.get("conditions") || [];
   const scores     = store.get("conditionPainScores") || {};
-  const sore       = conditions.filter(id => (scores[id] || 0) >= 4);
+  const sore       = conditions.filter(id => isSore(scores[id]));
   const areas      = exercise?.affectsAreas || [];
   return sore.find(id => (AREA_ALIASES[id] || [id]).some(a => areas.includes(a))) || null;
 }
@@ -738,7 +744,7 @@ export function progressionInvitation(exercise) {
   //                       -> conditional, or says nothing
   const conditions = store.get("conditions") || [];
   const scores     = store.get("conditionPainScores") || {};
-  const sore       = conditions.filter(id => (scores[id] || 0) >= 4);
+  const sore       = conditions.filter(id => isSore(scores[id]));
   // `areas` removed with CORE-1 -- soreAreaLoaded() reads affectsAreas
   // itself now, and a leftover unused local is how the next person
   // concludes there are two matching rules here.

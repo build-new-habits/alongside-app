@@ -1,7 +1,12 @@
 /**
  * js/views/session-builder-ui.js - Session Builder UI
  *
- * 30 Sep 2026 v30
+ * 02 Oct 2026 v31
+ *
+ * v31 - W4-7 SEVERE-DAY-TRUE. The Bad-day banner says the person's area and
+ *   word ("You said your lower back is bad today"); it said "You logged
+ *   pain in your spine at 8 or above", a number nobody gave and an internal
+ *   zone name.
  *
  * v30 - W3-21 NAV-SMALL. onUnmount resets the builder, so it never reopens
  *   on an old preview (persona 2.16: a two-day-old plan whose Let's go
@@ -1486,8 +1491,8 @@ function renderPreview() {
         <div class="sb-severe-banner" role="note">
           <p class="sb-severe-banner__head">Your session has been changed</p>
           <p class="sb-severe-banner__body">
-            You logged pain in your ${builtSession.severeZone || "body"} at 8 or above today.
-            At that level I do not build a training session. This is not the session you
+            ${builtSession.severeAreas ? `You said your ${builtSession.severeAreas} ${/ and /.test(builtSession.severeAreas) ? "are" : "is"} bad today.` : "You said something is bad today."}
+            On a bad day I don't build a training session, so this is not the session you
             asked for, and that is deliberate.
           </p>
         </div>

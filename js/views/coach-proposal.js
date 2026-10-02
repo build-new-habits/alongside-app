@@ -1,6 +1,17 @@
 /**
  * coach-proposal.js
- * 02 Oct 2026 v45
+ * 02 Oct 2026 v46
+ *
+ * v46 - W4-7 / W4-9 (Wave 4 trace). One voice about a sore area: the
+ *   builder's sentence (session-builder.js buildConditionNote, through
+ *   data/conditions.js soreLine), shown with the plan, also when the
+ *   request is said back. _buildConditionNarrative() is gone: it said
+ *   "I've noted Lower Back as Mild — I haven't changed anything there"
+ *   beside a plan that had left moves out, and on a Bad day "flagged as
+ *   Severe — I've kept things well clear" above the gentle plan. The choice
+ *   line says "your lower back" in lower case. After Rest today, "Something
+ *   gentle after all" changes the choice; the latest choice of the day
+ *   counts. The Bad-day test is the classifier's (isAcute), not a number.
  *
  * v45 - W4-15 DELETE-TRUE. "Let me tell you" (after time away injured)
  *   opens the sore-areas sheet only with the health consent; without it,
@@ -721,7 +732,7 @@ import { getPhaseBias, getReEntryContext, getMissedSessionOffer,
 import { getProgramme }      from '../data/programmes.js';
 import { detectBurnout, getTodaysCheckin } from '../data/checkin.js';
 import { chosenPrimaryEngineGoal } from '../data/goals.js';
-import { getConditionName }  from '../data/conditions.js';
+import { getConditionName, isAcute, areaWords }  from '../data/conditions.js';
 // TWO-ENGINE, 06 Sep 2026. workoutGenerator.js is no longer imported
 // here. AVAILABLE_TIME_WINDOW_MINUTES is a CONSTANT, not engine
 // behaviour, and stays -- it is the window the check-in's time answer is
@@ -817,7 +828,7 @@ export function CoachProposalView(router) {
     // building options entirely (nothing to generate yet).
     const conditions = store.get('conditions') || [];
     const painScores  = store.get('conditionPainScores') || {};
-    const severeIds   = conditions.filter(id => (painScores[id] || 0) >= 7);
+    const severeIds   = conditions.filter(id => isAcute(painScores[id]));
 
     if (severeIds.length > 0) {
       const existing = _getTodaySevereChoice(severeIds);
@@ -874,7 +885,8 @@ export function CoachProposalView(router) {
     const today   = new Date().toISOString().slice(0, 10);
     const sorted  = [...severeIds].sort();
     const history = store.get('severePainChoices') || [];
-    const match = history.find(entry =>
+    // W4-7. The latest choice today counts (Something gentle after all).
+    const match = [...history].reverse().find(entry =>
       entry.date === today &&
       Array.isArray(entry.conditionIds) &&
       entry.conditionIds.length === sorted.length &&
@@ -917,7 +929,7 @@ export function CoachProposalView(router) {
    * offers rather than instructs and one exception reads as alarm.
    */
   function _buildSevereChoiceLine(pending) {
-    const names  = pending.conditionIds.map(getConditionName);
+    const names  = pending.conditionIds.map(areaWords);
     const plural = names.length > 1;
     const them   = plural ? 'them' : 'it';
 
@@ -942,7 +954,7 @@ export function CoachProposalView(router) {
     // It also had half of CL-4 -- a pointer to someone who can look at it
     // -- and never said to stop if it got worse. On the most serious
     // screen in the app that was the half that mattered most.
-    return `I can see ${_joinNames(names)} ${plural ? 'are' : 'is'} really difficult today. ` +
+    return `I can see your ${_joinNames(names)} ${plural ? 'are' : 'is'} really difficult today. ` +
            `I can't give you medical support \u2014 that isn't something I can do. ` +
            `What I can do is keep today gentle, or we can call it a rest day. ` +
            safetyLineFor(them);
@@ -979,6 +991,10 @@ export function CoachProposalView(router) {
                   aria-label="Visit Wellbeing for something gentle">
             Visit Wellbeing
             <span class="cp-missed-offer__sub">Breathing, journalling, a moment of quiet</span>
+          </button>
+          <button class="cp-missed-offer__btn" data-rest-action="gentle">
+            Something gentle after all
+            <span class="cp-missed-offer__sub">Breathing, a few quiet minutes and a short walk</span>
           </button>
           <button class="cp-missed-offer__btn" data-rest-action="home"
                   aria-label="That's it for today, return home">
@@ -1109,6 +1125,14 @@ export function CoachProposalView(router) {
     container.querySelectorAll('[data-rest-action]').forEach(btn => {
       btn.addEventListener('click', () => {
         const action = btn.dataset.restAction;
+        // W4-7. Changing their mind: the gentle plan, today, as Adapt gives.
+        if (action === 'gentle') {
+          const scores = store.get('conditionPainScores') || {};
+          const ids = (store.get('conditions') || []).filter(id => isAcute(scores[id]));
+          severeChoicePending = { conditionIds: ids, painScores: scores };
+          handleSevereChoice('adapt', container);
+          return;
+        }
         if (action === 'noticing') router.navigate('noticing');
         else router.navigate('today');
       });
@@ -1383,7 +1407,8 @@ export function CoachProposalView(router) {
     const req = store.get('requestedSessionType');
     const t   = req ? SESSION_TYPES.find(x => x.id === req) : null;
     if (t && _deliveredType(option) === req) {
-      return `You asked for ${ASKED_WORDS[req] || t.label.toLowerCase()}, ${_getAvailableTimeMinutes()} minutes.`;
+      return `You asked for ${ASKED_WORDS[req] || t.label.toLowerCase()}, ${_getAvailableTimeMinutes()} minutes.` +
+        (option.conditionNote ? ` ${option.conditionNote}` : '');
     }
     return option.rationale || '';
   }
@@ -2169,8 +2194,8 @@ export function CoachProposalView(router) {
     // still one of their goals.
     const primaryGoal  = chosenPrimaryEngineGoal(goals, store.get('strategicGoal'));
 
-    // Pain override check
-    const conditionNarrative = _buildConditionNarrative(conditions, painScores);
+    // W4-9. No separate narrative: the builder's sentence is the one voice.
+    const conditionNarrative = null;
 
     // Re-entry intensity adjustment.
     //
@@ -2391,63 +2416,7 @@ export function CoachProposalView(router) {
    * genuine rest-day override is a real, separate product decision,
    * flagged to Graeme, not built here.
    */
-  function _buildConditionNarrative(conditions, painScores) {
-    const severeIds   = conditions.filter(id => (painScores[id] || 0) >= 7);
-    const moderateIds = conditions.filter(id => {
-      const p = painScores[id] || 0;
-      return p >= 6 && p < 7;
-    });
-    const mildIds = conditions.filter(id => {
-      const p = painScores[id] || 0;
-      return p >= 3 && p < 6;
-    });
-
-    const sentences = [];
-
-    if (severeIds.length > 0) {
-      // W3-4. No score out of ten: nobody gave one (the chips are words).
-      const parts  = severeIds.map(id => getConditionName(id));
-      const plural = severeIds.length > 1;
-      sentences.push(`Your check-in flagged ${_joinNames(parts)} as Severe today \u2014 I\'ve kept things well clear of ${plural ? 'those areas' : 'that area'}.`);
-    }
-
-    if (moderateIds.length > 0) {
-      const parts  = moderateIds.map(id => getConditionName(id));
-      const plural = moderateIds.length > 1;
-      // CONSTRAINT-CLAIM, 06 Sep 2026. WAS: "I've worked around that."
-      //
-      // Driven at lower-back 6: getActiveConditionIds() adds
-      // `lower-back-subacute`, and getExerciseSafetyTier(cat-cow, ...)
-      // returns SAFE. Nothing was worked around. `caution` only appears
-      // at 7. So the coach claimed an adaptation it had not made, and
-      // then session-rationale.js:521 correctly told the person on the
-      // very next screen that the exercise WORKS that area. Two screens,
-      // two answers, and the truthful one looked like the mistake.
-      //
-      // The subacute tier applies CARE, not exclusion, and whether it
-      // changes the pool at all depends on the exercise. So the sentence
-      // now claims the thing that is always true -- the condition was
-      // taken into account -- and hands the judgement back rather than
-      // asserting an outcome the coach cannot see from here.
-      //
-      // NOT narrowed to 7+ instead. Saying nothing at 6 would be worse:
-      // the person told the coach about it, and silence reads as not
-      // having been heard.
-      //
-      // FAULTLESS: every input the coach implies it used, it demonstrably
-      // used. "Taken into account" is demonstrable -- the id is in the
-      // active list. "Worked around" was not.
-      sentences.push(`Your check-in flagged ${_joinNames(parts)} today. I\'ve built this with ${plural ? 'those' : 'that'} in mind \u2014 go by how it feels, and ease off anything that pulls on ${plural ? 'them' : 'it'}.`);
-    }
-
-    if (mildIds.length > 0) {
-      const names  = mildIds.map(getConditionName);
-      const plural = names.length > 1;
-      sentences.push(`I\'ve noted ${_joinNames(names)} as Mild \u2014 I haven\'t changed anything there, but keep an eye on ${plural ? 'them' : 'it'}: if ${plural ? 'they start' : 'it starts'} feeling worse, please adapt what you\'re doing, or stop.`);
-    }
-
-    return sentences.length > 0 ? sentences.join(' ') : null;
-  }
+  // W4-9. _buildConditionNarrative() removed (see v46).
 
   // ── Option generation ──────────────────────────────────────────────────────
 
@@ -2573,6 +2542,7 @@ export function CoachProposalView(router) {
       exerciseCount: (built.exercises || []).length,
       exercises:     built.exercises || [],
       rationale:     built.coachLine || built.rationale || '',
+      conditionNote: built.conditionNote || null,
       sessionType:   delivered,
       // STRETCH-VIA-COACH. Carried onto the option so the card can say
       // which target was applied. Absent on everything that is not a

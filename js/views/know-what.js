@@ -1,5 +1,9 @@
 /**
  * js/views/know-what.js
+ * 02 Oct 2026 v4
+ *
+ * v4 - W4-9. HOW_SORE is data/conditions.js SORE_LEVELS (unchanged values).
+ *
  * 30 Sep 2026 v3
  *
  * v3 - W3-21 NAV-SMALL. Where? is handed to the plan as requestedLocation
@@ -53,7 +57,7 @@
  */
 
 import { store } from "../store.js";
-import { CONDITIONS, soreAreaOptions } from "../data/conditions.js";
+import { CONDITIONS, soreAreaOptions, SORE_LEVELS } from "../data/conditions.js";
 import { savedSessions } from "../data/saved-sessions.js";
 import { AVAILABLE_TIME_WINDOW_MINUTES } from "../data/time-windows.js";
 
@@ -88,11 +92,7 @@ export const PLACES = [
 ];
 
 /** The check-in's own answers and scores (checkin.js PAIN_CHIPS). */
-export const HOW_SORE = [
-  { label: "A little",   value: 4 },
-  { label: "Quite sore", value: 6 },
-  { label: "Bad",        value: 8 },
-];
+export const HOW_SORE = SORE_LEVELS;   // W4-9: the one place (data/conditions.js)
 
 const COMMON_AREAS = ["lower-back", "knee", "shoulder", "hip", "upper-back"];
 

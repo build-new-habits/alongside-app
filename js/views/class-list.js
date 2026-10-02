@@ -1,6 +1,11 @@
 /**
  * js/views/class-list.js
  *
+ * 02 Oct 2026 v5
+ *
+ * v5 - W4-9. A held class says the app is leaving the move out ("which I'm
+ *   leaving out for you at the moment"), not that the person asked for it.
+ *
  * 30 Sep 2026 v4
  *
  * v4 - W3-20. "They know what you're working towards" only when there is
@@ -192,8 +197,8 @@ export function render() {
               <li class="class-list__row class-list__row--held">
                 <h3 class="class-list__name">${_esc(r.cls.title)}</h3>
                 <p class="class-list__why">
-                  Has ${_esc(r.safety.blockedBy.join(', '))} in it, and you've
-                  told me to steer clear of that at the moment.
+                  Has ${_esc(r.safety.blockedBy.join(', '))} in it, which I'm
+                  leaving out for you at the moment.
                 </p>
               </li>`).join('')}
           </ul>

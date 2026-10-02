@@ -1,7 +1,17 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
- * 30 Sep 2026 v77
+ * 02 Oct 2026 v78
+ *
+ * v78 - W4-7 / W4-9 (Wave 4 trace). Sore areas through the one classifier
+ *   in data/conditions.js: the tags (activeConditionTags), the acute and
+ *   flagged tests, and the one sentence about a sore area (soreLine), which
+ *   names exactly the moves left out today, read from the library, in the
+ *   person's own word ("a little sore", "quite sore"). No number is compared
+ *   here any more. The gentle plan on a Bad day names the area and the word
+ *   ("Your lower back is bad today"), never "the pain is high, so I'm not
+ *   going to build you a session" (they may just have chosen it), and fits
+ *   the minutes chosen: 10 chosen gave About 30 min.
  *
  * v77 - W3-20. buildSessionFromSelection({ recommended: true }) -- "Coach
  *   recommends" -- no longer says "You picked this one yourself".
@@ -1160,7 +1170,7 @@ import { resolveEquipment, exerciseIsAvailable } from "./data/equipment-map.js";
 import { EXERCISES, isSessionLength, isCardioMachine } from "./data/exercises/index.js";
 import { matchCategory } from "./data/session-categories.js";
 import { buildRationale, tooHardRecently } from "./data/session-rationale.js";
-import { getZoneStatus, getPainBand, getCondition } from "./data/conditions.js";
+import { getZoneStatus, getPainBand, getCondition, getActiveConditionIds, isSore, isAcute, isBad, soreLine, areaWords } from "./data/conditions.js";
 import { focusOrderedCategories } from "./data/week-focus.js";
 // BURNOUT-LIVE, 16 Sep 2026. checkin.js imports only the store, so this
 // closes no cycle.
@@ -2134,19 +2144,11 @@ function generateCoachLine(sessionType, durationMins, exercises, conditionNote) 
 // ── Condition filtering ────────────────────────────────────────────────────────
 
 function buildActiveConditionSet() {
-  const conditions  = store.get("conditions")          || [];
-  const painScores  = store.get("conditionPainScores") || {};
-  const active      = new Set();
-
-  conditions.forEach(id => {
-    active.add(id);
-    const pain = painScores[id] || 0;
-    if (pain >= 7)      active.add(`${id}-acute`);
-    else if (pain >= 4) active.add(`${id}-subacute`);
-  });
-
-  return active;
+  // W4-9. The one classifier's tags (data/conditions.js).
+  return new Set(getActiveConditionIds(store.get("conditions") || [], store.get("conditionPainScores") || {}));
 }
+/** W4-9. Today's condition tags, as every door filters on them. */
+export const activeConditionTags = () => buildActiveConditionSet();
 
 /**
  * PULSE-RAISER RULE (11 Aug 2026, PT-19)
@@ -2216,7 +2218,7 @@ export function pulseRaiserDecision(sessionType) {
 
   const conditions = store.get("conditions")          || [];
   const painScores = store.get("conditionPainScores") || {};
-  const acute = conditions.filter(id => (painScores[id] || 0) >= 7);
+  const acute = conditions.filter(id => isAcute(painScores[id]));
   if (acute.length > 0) {
     return {
       include: false,
@@ -2227,54 +2229,25 @@ export function pulseRaiserDecision(sessionType) {
   return { include: true, reason: null };
 }
 
-// P9. Each note's claim, as a test on the finished plan.
-const _touches = (e, area) => (e.affectsAreas || []).includes(area);
-const NOTE_TRUE = {
-  "lower-back-acute": all => !all.some(e => (e.contraindications || []).includes("lower-back-acute")),
-  "lower-back":       all => !all.some(e => e.difficultyLevel >= 3 && _touches(e, "lower-back")),
-  "knee":             all => !all.some(e => _isSingle(e) && _touches(e, "knee")),
-  "shoulder":         all => !all.some(e => _touches(e, "shoulder") && (_isPush(e) || /press|overhead|get-?up|snatch|jerk/i.test(e.name || ""))),
-  "hamstring":        all => !all.some(e => _isHinge(e) && e.difficultyLevel >= 3),
-};
-const AREA_WORDS = { "lower-back": "lower back", knee: "knee", shoulder: "shoulder", hamstring: "hamstring" };
-
+// W4-9. One sentence per sore area (below Bad), true of this plan: the
+// person's own word, and the moves left out for it today, named from the
+// library (what the area's tag rules out and the plan does not hold).
+// Replaces P9's per-area claims ("nothing in this plan loads it heavily"),
+// which sat beside the coach's own sentence and the row marks: three
+// statements about one area on one screen.
 function buildConditionNote(sessionType, exercises = []) {
   const conditions = store.get("conditions")          || [];
   const painScores = store.get("conditionPainScores") || {};
-
-  const relevant = conditions.filter(id => {
-    const pain = painScores[id] || 0;
-    return pain >= 4;
-  });
-
-  if (relevant.length === 0) return null;
-
-  const note = relevant
-    .map(id => {
-      const pain = painScores[id] || 0;
-      const area = ["lower-back", "knee", "shoulder", "hamstring"].find(a => id.includes(a));
-      if (!area) return null;
-      const key  = area === "lower-back" && pain >= 7 ? "lower-back-acute" : area;
-      // P9. Said only when the plan bears it out.
-      // W3-9. Free has no Swap on the plan; everybody has "Skip this one".
-      // Said the same on both tiers: the builder does not read the tier
-      // (TIER-D, verify-tier), and skip is true for everybody.
-      if (!NOTE_TRUE[key](exercises)) {
-        return `Your ${AREA_WORDS[area]} is sore today — go by how it feels, and skip anything that loads it.`;
-      }
-      if (key === "lower-back-acute") return "Your lower back is significant today — I've removed everything that loads the spine under flexion.";
-      // W3-9. Below the acute band the builder takes care, not moves out
-      // (measured: about as much heavy work on the area as with nothing
-      // sore). So the line says what the plan holds, never "I've".
-      if (area === "lower-back") return "Your lower back is sore today — nothing in this plan loads it heavily. Go by how it feels.";
-      if (area === "knee")       return "Your knee is sore today — there's no deep single-leg work in this plan. Go by how it feels.";
-      if (area === "shoulder")   return "Your shoulder is sore today — there's no overhead or heavy pressing in this plan. Go by how it feels.";
-      return "Your hamstring is sore today — there's no heavy hinging in this plan. Go by how it feels.";
-    })
-    .filter(Boolean)
-    .join(" ");
-
-  return note || null;
+  const sore = conditions.filter(id => isSore(painScores[id]) && !isBad(painScores[id]));
+  if (sore.length === 0) return null;
+  const inPlan = new Set((exercises || []).map(e => e && e.id));
+  return sore.map(id => {
+    const tag = isAcute(painScores[id]) ? `${id}-acute` : `${id}-subacute`;
+    const names = [...new Set(EXERCISES
+      .filter(e => (e.contraindications || []).includes(tag) && !inPlan.has(e.id))
+      .map(e => e.name))];
+    return soreLine(id, painScores[id], names);
+  }).join(" ") || null;
 }
 
 // ── Candidate filtering (05 Aug 2026) ─────────────────────────────────────────
@@ -3774,7 +3747,7 @@ function gentleCareSession(zone, durationMins) {
     EXERCISES.find(e => e.category === category) ||
     null;
 
-  const items = [
+  let items = [
     pick("box-breathing", "recovery"),
     pick("body-scan-short", "mindfulness"),
     pick("mindful-walk", "recovery")
@@ -3784,17 +3757,34 @@ function gentleCareSession(zone, durationMins) {
     _gentleCare: true
   }));
 
+  // W4-7. Fits the minutes chosen (10 chosen gave About 30 min): each part
+  // shortened in proportion, never below a minute.
+  const minutes = durationMins || 20;
+  const total = items.reduce((n, e) => n + exerciseSeconds(e), 0);
+  if (total > minutes * 60) {
+    const f = (minutes * 60) / total;
+    items = items.map(e => ({ ...e, sets: 1, duration: Math.max(60, Math.floor(exerciseSeconds(e) * f / 30) * 30) }));
+  }
+
+  // W4-7. The person's area and word; nothing about not building a session
+  // (on the coach's screen they have just chosen this).
+  const ids    = store.get("conditions") || [];
+  const scores = store.get("conditionPainScores") || {};
+  const bad    = ids.filter(id => isBad(scores[id]));
+  const names  = bad.map(areaWords);
+  const areas  = names.length < 2 ? (names[0] || "") : `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}`;
+
   return {
     id: "gentle-care",
     title: "Something gentler today",
     subtitle: "",
-    duration: durationMins || 20,
+    duration: minutes,
     gentleCare: true,
     severeZone: zone,
+    severeAreas: areas,
     coachLine:
-      "You've told me the pain is high today, so I'm not going to build you a session. " +
-      "Here's something gentler instead — breathing, a few quiet minutes, and a walk " +
-      "if you feel like moving at all. None of it is required.",
+      (areas ? `Your ${areas} ${bad.length > 1 ? "are" : "is"} bad today, so this is something gentler: ` : "This is something gentler: ") +
+      "breathing, a few quiet minutes, and a walk if you feel like moving at all. None of it is required.",
     exercises: items,
     rationale: []
   };
@@ -4763,6 +4753,9 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
     subtitle: `Built for you today — ${durationMins} mins`,
     duration: durationStr,
     coachLine: coachLineWithWarmupNote,
+    // W4-9. The sore-area sentence on its own, for a screen that says the
+    // request back instead of the coach line.
+    conditionNote: conditionNote || null,
     exercises: allExercises,
     // W3-10. Which gentle reason, if any, shaped this plan.
     gentleReason: gentle ? gentle.id : null
@@ -4795,7 +4788,7 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
   // someone else should only follow a moment the person actually
   // witnessed, or it praises them for something invisible.
   const _adjPain = store.get("conditionPainScores") || {};
-  const _adjFlagged = (store.get("conditions") || []).some(id => (_adjPain[id] || 0) >= 4);
+  const _adjFlagged = (store.get("conditions") || []).some(id => isSore(_adjPain[id]));
   session.rationale.adjusted = Boolean(pulseRaiser.reason) || _adjFlagged;
 
   // Store in store.js

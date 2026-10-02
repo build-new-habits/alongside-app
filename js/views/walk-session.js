@@ -1,6 +1,11 @@
 /**
  * walk-session.js - Coached Walk Session
  *
+ * 02 Oct 2026 v7
+ *
+ * v7 - W4-9 SORE-WORDS. A sore leg area is the classifier's isSore()
+ *   (data/conditions.js).
+ *
  * 30 Sep 2026 v6
  *
  * v6 - W3-20. The "+N credits" line is gone: a count nothing uses, beside a
@@ -65,6 +70,7 @@
  */
 
 import { store } from "../store.js";
+import { isSore } from "../data/conditions.js";
 import { isGateDue, renderSafetyGate, attachSafetyGate } from "../safety-gate.js";
 import { renderLogBlock, attachLogEvents } from "../session-log.js";
 import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
@@ -201,7 +207,7 @@ function buildConditionNote() {
   const legPain = ["knee", "ankle-foot", "hamstring", "shin-splints",
                    "achilles", "hip", "plantar-fasciitis", "calves"];
   const affected = conditions.filter(id =>
-    legPain.some(c => id.startsWith(c)) && (painScores[id] || 0) >= 3
+    legPain.some(c => id.startsWith(c)) && isSore(painScores[id])
   );
 
   if (affected.length === 0) return null;

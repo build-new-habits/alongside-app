@@ -1,6 +1,12 @@
 /**
  * core-session.js - Guided Core Session
  *
+ * 02 Oct 2026 v18
+ *
+ * v18 - W4-9 SORE-WORDS. Sore-area tests from data/conditions.js (isSore,
+ *   isAcute); below the acute line the note is soreLine(): the person's own
+ *   word and the moves left out, named.
+ *
  * 30 Sep 2026 v17
  *
  * v17 - W3-20 (and W3-9's note). Below the acute level the sore-area lines
@@ -246,7 +252,7 @@ import { renderLogBlock, attachLogEvents, scrollToTop, lastLine } from "../sessi
 import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
 import { EXERCISES, filterByConditions } from "../data/exercises/index.js";
 import { personFilter } from "../session-builder.js";
-import { getActiveConditionIds, getConditionName } from "../data/conditions.js";
+import { getActiveConditionIds, getConditionName, isSore, isAcute, soreLine } from "../data/conditions.js";
 
 export const centered = false;
 
@@ -422,8 +428,7 @@ function buildConditionNote() {
   const painScores = store.get("conditionPainScores") || {};
 
   const relevant = conditions.filter(id => {
-    const pain = painScores[id] || 0;
-    return pain >= 3 && (
+    return isSore(painScores[id]) && (
       id.includes("lower-back") || id.includes("hip") ||
       id.includes("abdominal")  || id.includes("sciatica") ||
       id.includes("hamstring")  || id.includes("wrist")
@@ -438,8 +443,11 @@ function buildConditionNote() {
   // At 7 and above the acute filter does leave moves out, and says so.
   const notes = relevant.map(id => {
     const pain = painScores[id] || 0;
-    const name = getConditionName(id).toLowerCase();
-    if (pain < 7) return `Your ${name} is sore today. Go by how it feels, and skip anything that pulls on it.`;
+    // W4-9. The one sentence, in the person's word, naming what is left out.
+    if (!isAcute(pain)) {
+      const names = [...new Set(EXERCISES.filter(e => (e.contraindications || []).includes(`${id}-subacute`)).map(e => e.name))];
+      return soreLine(id, pain, names);
+    }
     if (id.includes("lower-back")) {
       return "Your lower back is flagging high pain today. I've removed all loaded and rotational exercises. Everything here is gentle.";
     }

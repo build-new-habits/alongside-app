@@ -1,6 +1,18 @@
 /**
  * conditions.js — Condition definitions for onboarding and check-in
  *
+ * 02 Oct 2026 v1.9
+ *   W4-9 SORE-WORDS (Wave 4 trace). ONE place for how sore is sore. The
+ *   check-in's three words and their scores (SORE_LEVELS), which word a
+ *   score is (soreWord), and the lines every door filters on, as named
+ *   numbers: sore from 3, quite sore from 6, acute from 7, bad from 8.
+ *   getActiveConditionIds() now tags every sore area below the acute line
+ *   "-subacute" (it did so only from 6, and only for some areas, while the
+ *   builder did from 4 and Yoga not at all), so "A little" leaves out the
+ *   same moves at every door. No other file compares a sore score with a
+ *   number (verify-sore-words). areaWords() and soreLine() give the one
+ *   sentence a door says about a sore area, in the person's own word.
+ *
  * 01 Oct 2026 v1.8
  *   PT-3. Perimenopause and Menopause are no longer sore areas: everyday
  *   states (W3-4), and nothing planned around them.
@@ -225,31 +237,18 @@ export function getExcludedConditions() { return []; }
 // Conditions that have phase-aware exercise contraindications
 // get expanded based on the user's reported pain score today.
 //
-// pain 1–5  → safe-ish. Only base ID active.
-// pain 6    → subacute. Base + subacute variant active. (raised from the
-//             old 4–6 band to match checkin.js's Moderate boundary,
-//             level > 5 — see conditions.js v1.3 changelog, 04 Aug 2026)
-// pain 7–10 → acute.    Base + acute variant active.
+// W4-9 (02 Oct 2026): from the one classifier below.
+// below 3   → no answer. Only the base ID.
+// 3 to 6    → subacute: "A little" (4) and "Quite sore" (6). Base + subacute.
+// 7 to 10   → acute: "Bad" (8). Base + acute.
 //
 // Exercises list these variants in their contraindications[] array.
 // e.g. Nordic curl: contraindications: ['hamstring-acute', 'hamstring-subacute']
 //      Running: contraindications: ['hamstring-acute']
 // ─────────────────────────────────────────────────────────────
 
-const PHASE_AWARE_CONDITIONS = new Set([
-  'hamstring',
-  'glutes',
-  'knee',
-  'hip',
-  'ankle-foot',
-  'achilles',
-  'shin-splints',
-  'sciatica',
-  'lower-back',
-  'upper-back',
-  'shoulder',
-  'wrist-elbow'
-]);
+// W4-9. PHASE_AWARE_CONDITIONS removed: every sore area is tagged now, so
+// "A little" means the same at every door (getActiveConditionIds below).
 
 /**
  * Convert user conditions + today's pain scores into the full set
@@ -283,6 +282,56 @@ const PHASE_AWARE_CONDITIONS = new Set([
  * @param {Object}   painScores    — { conditionId: 0-10 }
  * @returns {Object} zoneStatus
  */
+// ── W4-9. How sore is sore: the one classifier. ──────────────────────────
+/** The check-in's three answers. checkin.js and know-what.js offer these. */
+export const SORE_LEVELS = Object.freeze([
+  Object.freeze({ id: 'a-little',   label: 'A little',   value: 4 }),
+  Object.freeze({ id: 'quite-sore', label: 'Quite sore', value: 6 }),
+  Object.freeze({ id: 'bad',        label: 'Bad',        value: 8 }),
+]);
+/** The lines, as numbers, here and nowhere else. */
+export const SORE_FROM  = 3;   // below this a score is no answer (getPainBand's "None")
+export const QUITE_FROM = 6;   // "Quite sore"
+export const ACUTE_FROM = 7;   // acute-safe variants (protective; 04 Aug decision)
+export const BAD_FROM   = 8;   // "Bad": no training session, the gentle choice (17 Aug decision)
+
+export const isSore = score => (score ?? 0) >= SORE_FROM;
+export const isAcute = score => (score ?? 0) >= ACUTE_FROM;
+export const isBad = score => (score ?? 0) >= BAD_FROM;
+/** 'a-little' | 'quite-sore' | 'bad' | null */
+export function soreLevel(score) {
+  if (!isSore(score)) return null;
+  if (isBad(score)) return 'bad';
+  return (score >= QUITE_FROM) ? 'quite-sore' : 'a-little';
+}
+/** "A little" | "Quite sore" | "Bad" | null — the person's own word. */
+export const soreWord = score => (SORE_LEVELS.find(l => l.id === soreLevel(score)) || {}).label || null;
+
+/** "lower back", "knee", "IT band": a condition's name for mid-sentence. */
+export function areaWords(id) {
+  const name = (getCondition(String(id).replace(/-(acute|subacute)$/, '')) || {}).name || String(id).replace(/-/g, ' ');
+  return name.split(' ').map(w => (w.length > 1 && w === w.toUpperCase()) ? w : w.toLowerCase()).join(' ');
+}
+
+/**
+ * The one sentence a door says about an area sore today (below Bad):
+ * the person's own word, and what that changed, named.
+ * leftOutNames: the moves left out for it today (from the library), or [].
+ */
+export function soreLine(id, score, leftOutNames = []) {
+  const word = (soreWord(score) || 'A little').toLowerCase();
+  const sore = word === 'a little' ? 'a little sore' : word;
+  const area = areaWords(id);
+  const n = leftOutNames.length;
+  const left = n > 3
+    ? `${n} movements that could make it worse are left out today; skip anything else that hurts it.`
+    : n
+      ? `${_joinList(leftOutNames)} ${n === 1 ? 'is' : 'are'} left out today; skip anything else that hurts it.`
+      : `Nothing is left out for it today, so skip anything that hurts it.`;
+  return `You said your ${area} is ${sore} today. ${left}`;
+}
+function _joinList(a) { return a.length < 2 ? (a[0] || '') : `${a.slice(0, -1).join(', ')} and ${a[a.length - 1]}`; }
+
 export function getZoneStatus(conditionIds = [], painScores = {}) {
   const zoneMax = {};
 
@@ -293,7 +342,7 @@ export function getZoneStatus(conditionIds = [], painScores = {}) {
     const pain = painScores[id] ?? 0;
     if (pain === 0) continue;
 
-    const severity = pain >= 7 ? 'severe' : pain >= 6 ? 'moderate' : 'mild';
+    const severity = isAcute(pain) ? 'severe' : pain >= QUITE_FROM ? 'moderate' : 'mild';
     const order = { severe: 3, moderate: 2, mild: 1 };
 
     if (!zoneMax[zone] || order[severity] > order[zoneMax[zone]]) {
@@ -309,21 +358,14 @@ export function getZoneStatus(conditionIds = [], painScores = {}) {
 }
 
 export function getActiveConditionIds(conditionIds = [], painScores = {}) {
+  // W4-9. Every door's tags, from the one classifier: an area sore today
+  // below the acute line is "-subacute"; from the acute line, "-acute".
   const active = new Set(conditionIds);
-
   for (const id of conditionIds) {
-    if (!PHASE_AWARE_CONDITIONS.has(id)) continue;
-
     const pain = painScores[id] ?? 0;
-
-    if (pain >= 7) {
-      active.add(`${id}-acute`);
-    } else if (pain >= 6) {
-      active.add(`${id}-subacute`);
-    }
-    // pain 1–3: only the base ID stays — no phase variant added
+    if (isAcute(pain))     active.add(`${id}-acute`);
+    else if (isSore(pain)) active.add(`${id}-subacute`);
   }
-
   return [...active];
 }
 

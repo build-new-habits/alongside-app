@@ -1,5 +1,11 @@
 /**
  * js/views/checkin.js
+ * 02 Oct 2026 v27
+ *
+ * v27 - W4-9. The three sore words and their scores come from
+ *   data/conditions.js SORE_LEVELS (unchanged: A little 4, Quite sore 6, Bad
+ *   8).
+ *
  * 30 Sep 2026 v26
  *
  * v26 - W3-20. "You have 20 minutes today" -- nobody had said so; it is their
@@ -363,7 +369,7 @@ import { prefersReducedMotion } from "../display-prefs.js";
 import { intensityForForm, clearPurpose, SAFETY_LINE } from "../data/purpose.js";
 import { checkinData }     from "../data/checkin.js";
 import { resolveOpening }  from "../data/checkin-openings.js";
-import { CONDITIONS, soreAreaOptions } from "../data/conditions.js";
+import { CONDITIONS, soreAreaOptions, SORE_LEVELS } from "../data/conditions.js";
 
 export function CheckinView(router) {
 
@@ -466,11 +472,8 @@ export function CheckinView(router) {
   // "How bad?" -> a pain score inside each of getPainBand()'s bands above
   // none, so the severe-pain rules (zone severe at >=7, band severe at
   // >=8) respond exactly as they did to the slider.
-  const PAIN_CHIPS = [
-    { label: "A little",   value: 4 },   // mild 3-5
-    { label: "Quite sore", value: 6 },   // moderate 6-7, below the severe zone
-    { label: "Bad",        value: 8 },   // severe
-  ];
+  // W4-9. The three words and their scores, from the one place.
+  const PAIN_CHIPS = SORE_LEVELS;
   // Offered after the person's own conditions. Everything else is one tap
   // further, under "Somewhere else".
   const COMMON_AREAS = ["lower-back", "knee", "shoulder", "hip", "upper-back"];

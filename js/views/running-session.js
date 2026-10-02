@@ -1,6 +1,11 @@
 /**
  * running-session.js - Guided Running Session
  *
+ * 02 Oct 2026 v10
+ *
+ * v10 - W4-9 SORE-WORDS. Sore-area tests from data/conditions.js (isSore,
+ *   isAcute); no number compared here.
+ *
  * 30 Sep 2026 v9
  *
  * v9 - W3-21 NAV-SMALL. onUnmount: leaving the Run door before a run has
@@ -101,7 +106,7 @@ import { isGateDue, renderSafetyGate, attachSafetyGate } from "../safety-gate.js
 import { renderLogBlock, attachLogEvents } from "../session-log.js";
 import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
 import { checkpointSession, getResumableSession, clearCheckpoint, computeElapsedSeconds } from "../session-resume.js";
-import { getConditionName } from "../data/conditions.js";
+import { getConditionName, isSore, isAcute } from "../data/conditions.js";
 import { safetyLineFor } from "../data/purpose.js";
 
 export const centered = false;
@@ -253,14 +258,14 @@ export function intervalScript(mins) {
 function severeToday() {
   const conditions = store.get("conditions")          || [];
   const painScores = store.get("conditionPainScores") || {};
-  return conditions.filter(id => (painScores[id] || 0) >= 7).sort();
+  return conditions.filter(id => isAcute(painScores[id])).sort();
 }
 
 /** W3-2. A note that rules out intervals takes Intervals off the list. */
 function intervalsOffReason() {
   const conditions = store.get("conditions")          || [];
   const painScores = store.get("conditionPainScores") || {};
-  const id = conditions.find(c => c.includes("hamstring") && (painScores[c] || 0) >= 3);
+  const id = conditions.find(c => c.includes("hamstring") && isSore(painScores[c]));
   return id ? `Intervals are off today: your ${getConditionName(id).toLowerCase()} is sore, so easy or long, at a pace you could talk at.` : null;
 }
 
@@ -299,9 +304,9 @@ function buildConditionNote() {
   const notes = [];
   conditions.forEach(id => {
     const pain = painScores[id] || 0;
-    if (pain < 3) return;
+    if (!isSore(pain)) return;
     if (id.includes("knee")) {
-      notes.push(pain >= 7
+      notes.push(isAcute(pain)
         ? "Your knee is flagging high pain. Today we avoid any interval efforts and keep pace fully conversational."
         : "Your knee has some discomfort. Avoid downhill sections and keep pace easy throughout.");
     }

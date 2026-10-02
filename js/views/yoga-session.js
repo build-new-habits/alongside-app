@@ -1,5 +1,12 @@
 /**
  * yoga-session.js
+ * 02 Oct 2026 v15
+ *
+ * v15 - W4-9 SORE-WORDS. Tags from data/conditions.js
+ *   getActiveConditionIds(): a sore area at A little or Quite sore now
+ *   leaves out here what it leaves out at every other door (Yoga tagged only
+ *   from 7).
+ *
  * 30 Sep 2026 v14
  *
  * v14 - W3-20. The "+N credits" line is gone: a count nothing uses, beside a
@@ -221,6 +228,7 @@
  */
 
 import { store } from "../store.js";
+import { getActiveConditionIds } from "../data/conditions.js";
 // STRETCH-WHY, 16 Sep 2026. Both imported rather than reimplemented:
 // soreAreaLoaded() owns the >= 4 threshold and the area aliases, and
 // STRANDS is the same source today.js reads for "What it's made of".
@@ -580,12 +588,9 @@ function buildSession(focusId, durationMins, targetId) {
   const painScores  = store.get("conditionPainScores") || {};
   const targetCount = EXERCISE_COUNT[durationMins]     || 5;
 
-  const activeConditions = new Set();
-  conditions.forEach(id => {
-    activeConditions.add(id);
-    const pain = painScores[id] || 0;
-    if (pain >= 7) activeConditions.add(`${id}-acute`);
-  });
+  // W4-9. The one classifier's tags: "A little" leaves out here what it
+  // leaves out at every other door (Yoga tagged only from 7 before).
+  const activeConditions = new Set(getActiveConditionIds(conditions, painScores));
 
   // P5 / YOGA-1. Resolve against the database BEFORE filtering, or the
   // filter runs on this file's stale copy of the contraindications --
