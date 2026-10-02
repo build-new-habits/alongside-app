@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 02 Oct 2026 v635
+ * 02 Oct 2026 v636
  *
+ * v636 - W5-1/W5-2/W5-4: on a Bad day the gentle plan is what plays (the builder stored nothing, so Let's go played yesterday's plan or nothing); Yoga and Classes ask Rest today / Something gentler first; stress is not asked as a sore area. NEW FILE precached: js/views/bad-day-door.js.
  * v635 - W4-23/W4-24/W4-25/W4-26: Settings is an index of eight sections, each opening where it is; nothing health-related asked or kept on return without the health consent; the one consent test shared by every reader. NEW FILE precached: js/data/health-consent-covers.js.
  * v634 - W4-20/W4-21/W4-22: the coach's lines made true (plan length, a shorter day, legs not ready, Mindful awareness, steady runs, their own words, nothing about fitness slipping or what a beta member pays, lighter plans, plurals, Progress from the start); the week's question changes, Write about this keeps it, Back goes back and asks first, saving says so; the opener holds with Mostly the same, the as-you-go clock leaves out time away, Free does not open it, the dot shows after upgrading, and vibration can be turned off.
  * v633 - W4-16/W4-18, and Graeme's health-consent decision: the health consent is asked again only when what it covers changes, not for the shorter tick; Reset says what goes and what stays, then says it happened and puts display settings back; switches keep their names, Saved survives a redraw, the upgrade button is named by its words, headings keep focus, the journal box keeps its label, no emoji in a heading's name, the breath circle still under Reduce motion.
@@ -4182,7 +4183,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v635";
+const CACHE_NAME = "alongside-v636";
 
 const SHELL_URLS = [
 
@@ -4345,6 +4346,7 @@ const SHELL_URLS = [
   "./js/data/restore.js",
   "./js/data/export-file.js",
   "./js/data/health-consent-covers.js",
+  "./js/views/bad-day-door.js",
   "./js/data/file-lock.js",
   "./js/data/messages.js",
   "./js/data/evidence.js",
