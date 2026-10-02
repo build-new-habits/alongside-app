@@ -1,5 +1,13 @@
 # Alongside — Data Schema Reference
-## 02 Oct 2026 v1.102
+## 02 Oct 2026 v1.103
+
+> **v1.103, 02 Oct 2026 — W4-24 and W4-26** (`store.js` v106). No field
+> changes. **`absence.context`** is written as `illness` or `injury` only
+> with the health consent (`captureReturnContext`; the return question
+> offers neither without it). Whether a **`consent.health`** record still
+> covers what is kept is one test, `consentCovers()` in
+> `data/health-consent-covers.js`, read by `data/health-consent.js`,
+> `store.logLift()` and `data/restore.js` alike.
 
 > **v1.102, 02 Oct 2026 — W4-21 and W4-22** (`store.js` v105, unchanged).
 > No store field changes. One display key **outside the store**:
@@ -934,7 +942,7 @@
 
 ## 06 Sep 2026 v1.51
 
-**File:** `js/store.js` (confirmed live version: **v105, 02 Oct 2026**)
+**File:** `js/store.js` (confirmed live version: **v106, 02 Oct 2026**)
 
 > **v1.47, 06 Sep 2026 — CR-1.** `conditions[]` gains three ids and loses one. `chronic-fatigue` is **retired**; `persistent-fatigue`, `me-cfs` and `long-covid` replace it. No field shape changed — `conditions` is still `string[]` and `conditionMeta` is still keyed by condition id.
 >

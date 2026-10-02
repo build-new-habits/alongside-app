@@ -1,9 +1,14 @@
 import { zonesForAreas } from "./data/aims.js";
+import { consentCovers } from "./data/health-consent-covers.js";
 import { RETIRED_CONDITIONS } from "./data/scope-statement.js";
 
 /**
  * store.js - Data persistence layer
- * 02 Oct 2026 v105
+ * 02 Oct 2026 v106
+ *
+ * v106 - W4-26 (no field change). logLift() keeps a note only when the health
+ *   consent still covers it (consentCovers, data/health-consent-covers.js),
+ *   the same test as the rest of the app; it read given === true alone.
  *
  * v105 - W4-19 ONBOARDING-FIRST (Schema v1.101). consent.health.declinedAt:
  *   when the health consent was declined in getting started (Not now on the
@@ -3120,7 +3125,7 @@ export const store = {
     if (this.data.liftLogEnabled !== true) return null;
     // W4-15. A note is often about how a body part felt: a health answer.
     // Not kept without the health consent; the numbers are.
-    const healthOk = this.data.consent?.health?.given === true;
+    const healthOk = consentCovers(this.data.consent?.health);   // W4-26: the same test as everywhere
 
     // Generalised 11 Aug 2026 from weight-and-reps to whatever the
     // exercise actually produces. Graeme: "the weight, time, tension,
