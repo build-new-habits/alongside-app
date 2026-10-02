@@ -1,5 +1,5 @@
 # Alongside: Move — Cold Start Blueprint
-## 01 Oct 2026 v231
+## 02 Oct 2026 v232
 
 Build New Habits | Everything a chat with no memory needs to pick this up and build confidently.
 
@@ -36,7 +36,7 @@ git clone --depth 1 https://x-access-token:$TOKEN@github.com/build-new-habits/al
 
 **Always a fresh clone.** `raw.githubusercontent.com` has CDN caching lag and will show you stale files. **Verify every push with a second fresh clone**, never by reading your own working tree.
 
-**Gates need jsdom:** `npm install jsdom` in `/home/claude` before running the suite, or 30+ gates fail on a missing dependency and look like regressions.
+**Gates need jsdom 28.1.0:** run `npm ci` in the repository root before the suite (W4-0, 02 Oct 2026). The version is pinned in `package.json`; `verify-suite-pin` goes red if the checks load any other copy. On 01 Oct no single version ran every check: 28 and 29 failed five onboarding checks (a harness fault, now `tools/one-screen.mjs`), 24–26 failed two download checks. A check that describes somebody using the app sets them up with `tools/agreed.mjs`: since W4-1 the app sends anybody who has not answered the age question and agreed to the policies back to onboarding.
 
 **Commit messages go in a file** — `git commit -F /tmp/msg.txt`. Never inline with backticks; a force-push incident is on record.
 
@@ -51,7 +51,7 @@ git clone --depth 1 https://x-access-token:$TOKEN@github.com/build-new-habits/al
 | BNH-Files: `Apps/Alongside Move/` `Legal/`, `Clinical/`, `Business/`, `Product/`, `Research/`, `Testing/`, `Admin/`, `Archive/` | Every other paper, including the governing documents below |
 | `docs/Schema.md` | Store fields. **Must match `store.js`** |
 | `docs/` | Only what the code and checks need: `Changelog.md`, `exercise_entry_standard.md`, this blueprint, `specs/` (three specs the checks read), `classes/` (guided class scripts), `archive-code/` (retired code) |
-| `tools/verify-*.mjs` | 258 gates |
+| `tools/verify-*.mjs` | 260 gates |
 | `js/` | Vanilla ES modules, no framework, no bundler |
 
 **Governing documents, in read order** (BNH-Files, `Apps/Alongside Move/Business/`):
@@ -72,10 +72,10 @@ git clone --depth 1 https://x-access-token:$TOKEN@github.com/build-new-habits/al
 |---|---|
 | `store.js` | v102 |
 | `Schema.md` | v1.97 |
-| `sw.js` | **v625**, cache `alongside-v625` |
+| `sw.js` | **v626**, cache `alongside-v626` |
 | `router.js` | v36 · `my-programme.js` v8 · `today.js` v49 · `settings.js` v46 · `progress.js` v22 · `onboarding/thread.js` v16 |
 | `exercise-card.js` | **v7** — CARD-4, four pages. `workout.css` v16 |
-| Gates | **258, all green** — from the repo root. See the cwd row in §9 |
+| Gates | **260, all green** on jsdom 28.1.0 (`npm ci`) — from the repo root. See the cwd row in §9 |
 
 🟢 **This table is now GATED.** `tools/verify-blueprint.mjs` compares every version above against the file that carries it and goes red on any drift, naming the row to change.
 
