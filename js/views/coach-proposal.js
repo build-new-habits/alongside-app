@@ -1,5 +1,10 @@
 /**
  * coach-proposal.js
+ * 02 Oct 2026 v48
+ *
+ * v48 - W4-24. The return question's choices come from returnChoices(): no
+ *   Was unwell or Was injured without the health consent.
+ *
  * 02 Oct 2026 v47
  *
  * v47 - W4-20 TRUE-WORDS-4. The plan sentence says the plan's own length
@@ -734,7 +739,7 @@ import { impliedTarget, sortByTarget, targetById, isStretchLike } from "../stret
 import { purposeLine, safetyLineFor } from "../data/purpose.js";
 import { getActiveVoice, getTimingRules } from '../data/coach-voice.js';
 import { getPhaseBias, getReEntryContext, getMissedSessionOffer,
-         captureReturnContext, clearReturnContext,
+         captureReturnContext, clearReturnContext, returnChoices,
          recordSession, advanceWeekIfNeeded,
          getReEntryIntensity, applyMissedSessionAdaptation }  from '../data/programmeEngine.js';
 import { getProgramme }      from '../data/programmes.js';
@@ -2026,19 +2031,11 @@ export function CoachProposalView(router) {
         <div class="cp-return-door__chips"
              role="group"
              aria-label="What was the last little while like?">
-          <button class="cp-chip" data-return-context="life"
-                  aria-pressed="false">Life got full</button>
-          <button class="cp-chip" data-return-context="illness"
-                  aria-pressed="false">Was unwell</button>
-          <!-- REENTRY-2, 20 Aug 2026. There was no injury option at all.
-               Graeme, 20 Aug. Somebody returning from an injury was
-               choosing between "life got full" and "finding it harder",
-               neither of which is true and neither of which stepped the
-               intensity down. -->
-          <button class="cp-chip" data-return-context="injury"
-                  aria-pressed="false">Was injured</button>
-          <button class="cp-chip" data-return-context="harder"
-                  aria-pressed="false">Finding it harder</button>
+          <!-- REENTRY-2, 20 Aug 2026: Was injured added (Graeme). W4-24: the
+               choices come from returnChoices(), which leaves out Was unwell
+               and Was injured without the health consent. -->
+          ${returnChoices().map(c => `<button class="cp-chip" data-return-context="${c.id}"
+                  aria-pressed="false">${c.label}</button>`).join('')}
           <button class="cp-chip cp-chip--skip" data-return-context="skip"
                   aria-pressed="false">Rather not say — let's just begin</button>
         </div>

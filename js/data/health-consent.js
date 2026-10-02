@@ -1,5 +1,10 @@
 /**
  * js/data/health-consent.js
+ * 02 Oct 2026 v7
+ *
+ * v7 - W4-26. The covers test lives in data/health-consent-covers.js, shared
+ *   with store.js and restore.js.
+ *
  * 02 Oct 2026 v6
  *
  * v6 - Graeme, 02 Oct: asked again only when what the consent covers changes
@@ -57,6 +62,7 @@
  * given; they read healthAllowed().
  */
 import { store } from "../store.js";
+import { consentCovers } from "./health-consent-covers.js";
 
 // 2026-10-02 (W4-19): the shorter tick. A new version asks again (W4-13).
 export const HEALTH_CONSENT_VERSION = "2026-10-02";
@@ -72,8 +78,8 @@ export const HEALTH_CONSENT_VERSION = "2026-10-02";
  *   2026-10-01  separate health consent (PT-2, LEGAL-TRUE)
  *   2026-10-02  shorter tick, same answers, same use: wording only
  */
-export const HEALTH_CONSENT_COVERS_FROM = "2026-10-01";
-const _covers = v => typeof v === "string" && /^\d{4}-\d{2}-\d{2}$/.test(v) && v >= HEALTH_CONSENT_COVERS_FROM;
+export { HEALTH_CONSENT_COVERS_FROM } from "./health-consent-covers.js";
+const _covers = v => consentCovers({ given: true, version: v });   // W4-26: one test, in health-consent-covers.js
 
 /** The tick's own words, the same at onboarding and here. Under 25 words
  *  (W4-19: it was 47); what the answers are is said beside it, in

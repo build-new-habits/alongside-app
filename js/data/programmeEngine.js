@@ -1,5 +1,11 @@
 /**
  * programmeEngine.js
+ * 02 Oct 2026 v11
+ *
+ * v11 - W4-24 ABSENCE-CONSENT. returnChoices(): without the health consent
+ *   the return question offers no Was unwell or Was injured, and
+ *   captureReturnContext() keeps neither.
+ *
  * 30 Sep 2026 v10
  *
  * v10 - W3-20. recordSession() no longer awards the community credit;
@@ -108,6 +114,7 @@
  * re-entry messages must meet WCAG 2.2 AA in the views that render them.
  */
 
+import { healthAllowed } from "./health-consent.js";
 import { store }          from '../store.js';
 import { daysAgo }        from './activity-labels.js';
 // PLAN-PICKER-TIER, 06 Sep 2026. See plannedFocusToday() and
@@ -392,9 +399,25 @@ export function getReEntryContext() {
  *
  * @param {string} context — 'illness' | 'life' | 'harder'
  */
+// W4-24 ABSENCE-CONSENT. Was unwell and Was injured are health answers:
+// without the health consent they are neither offered nor kept (they were
+// stored while it was withdrawn).
+const HEALTH_CONTEXTS = new Set(['illness', 'injury']);
+const RETURN_CHOICES = [
+  { id: 'life',    label: 'Life got full' },
+  { id: 'illness', label: 'Was unwell' },
+  { id: 'injury',  label: 'Was injured' },
+  { id: 'harder',  label: 'Finding it harder' },
+];
+/** The answers the return question offers, for this person now. */
+export function returnChoices() {
+  return healthAllowed() ? RETURN_CHOICES : RETURN_CHOICES.filter(c => !HEALTH_CONTEXTS.has(c.id));
+}
+
 export function captureReturnContext(context) {
   const returnCaptured = store.get('absence.returnCapturedAt');
   if (returnCaptured) return; // never re-ask
+  if (HEALTH_CONTEXTS.has(context) && !healthAllowed()) return;   // W4-24
 
   store.set('absence.context',          context);
   store.set('absence.capturedAt',       new Date().toISOString());

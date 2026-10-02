@@ -1,5 +1,10 @@
 /**
  * js/data/restore.js
+ * 02 Oct 2026 v4
+ *
+ * v4 - W4-26. Health answers in a file come in only when this phone's health
+ *   consent still covers them (consentCovers); it read given === true alone.
+ *
  * 02 Oct 2026 v3
  *
  * v3 - W4-3 RESTORE-TAKES and W4-6 RESTORE-MOVE (Wave 4 trace, 01 Oct).
@@ -58,6 +63,7 @@
  * The Plan's payment status will not come from this file once payments
  * exist: that is Stripe's record. During the beta the Plan is free.
  */
+import { consentCovers } from "./health-consent-covers.js";
 import { store } from "../store.js";
 import { DISPLAY_KEYS } from "../display-prefs.js";
 
@@ -162,7 +168,7 @@ export function applyRestore(data) {
   // about what this phone shows.
   picked.tier = here.tier || "free";
   picked.messages = JSON.parse(JSON.stringify(here.messages || store.getDefaults().messages || {}));
-  const healthHere = picked.consent?.health?.given === true;
+  const healthHere = consentCovers(picked.consent?.health);   // W4-26: the same test as everywhere
 
   // Rule 5: replace. Every other 'alongside' key goes first.
   try {

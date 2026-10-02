@@ -1,5 +1,9 @@
 /*
  * css/components/settings.css
+ * 02 Oct 2026 v17
+ *   W4-23 SETTINGS-RESCOPE. .settings-sec*: the index of eight sections, each
+ *   a native details that opens where it is (Messages a direct row).
+ *   .settings-group retired with the one long page.
  * 02 Oct 2026 v16
  *   W4-6. .settings-result: Download, Restore and Delete outcomes on the page.
  * 02 Oct 2026 v15
@@ -1072,13 +1076,44 @@
   color: var(--color-text);
 }
 .settings-result:focus { outline: 3px solid var(--color-text); outline-offset: 2px; }
-.settings-group { margin: 0 0 var(--space-5); }
-.settings-group__title {
-  margin: 0 0 var(--space-2);
-  font-size: var(--text-sm);
-  font-weight: 700;
-  letter-spacing: 0.02em;
+.settings-sec { margin: 0; border-bottom: 1px solid var(--color-border); }
+.settings-sec:first-of-type { border-top: 1px solid var(--color-border); }
+.settings-sec__summary {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  min-height: 64px;
+  padding: var(--space-3) var(--space-8) var(--space-3) var(--space-1);
+  position: relative;
+  list-style: none;
+  cursor: pointer;
+  color: var(--color-text);
+}
+.settings-sec__summary::-webkit-details-marker { display: none; }
+.settings-sec__summary::after {
+  content: "\203A";
+  position: absolute;
+  right: var(--space-2);
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: var(--text-lg);
   color: var(--color-text-secondary);
+}
+details.settings-sec[open] > .settings-sec__summary::after { transform: translateY(-50%) rotate(90deg); }
+@media (prefers-reduced-motion: no-preference) {
+  .settings-sec__summary::after { transition: transform 150ms ease; }
+}
+.settings-sec__summary:hover { background: var(--color-bg-hover); }
+.settings-sec__summary:focus-visible { outline: 3px solid var(--color-border-focus); outline-offset: -3px; }
+.settings-sec__title { margin: 0; font-size: var(--text-lg); font-weight: 600; color: var(--color-text); }
+.settings-sec__sub { font-size: var(--text-sm); color: var(--color-text-secondary); line-height: 1.4; }
+details.settings-sec > .settings-rows { margin: 0 0 var(--space-3); }
+.settings-sec--direct > button.settings-sec__summary {
+  flex-direction: column;
+  align-items: flex-start;
+  padding: var(--space-3) var(--space-8) var(--space-3) var(--space-1);
+  min-height: 64px;
 }
 .settings-rows { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--color-border); }
 .settings-rows > li { border-bottom: 1px solid var(--color-border); }
