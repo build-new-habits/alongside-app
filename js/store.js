@@ -3,6 +3,14 @@ import { RETIRED_CONDITIONS } from "./data/scope-statement.js";
 
 /**
  * store.js - Data persistence layer
+ * 02 Oct 2026 v103
+ *
+ * v103 - W4-2 DELETE-LOOSENS (Schema v1.98). capability.clearedAt: set by
+ *   deleteHealthAnswers(); until the person answers again,
+ *   capabilityProfile() is the careful profile, not the unasked one (which
+ *   restricted nothing: a person who cannot reach the floor was given floor
+ *   work). W4-15: logLift() keeps no note without health consent.
+ *
  * 01 Oct 2026 v102
  *
  * v102 - B5 EVIDENCE (Schema v1.97). evidence: { surveyDone, figuresDone },
@@ -2146,7 +2154,10 @@ export const store = {
         // asked. See the fail-safe note there. Stays null until the
         // conditional question is built and its wording signed off.
         legPower:     null,
-        askedAt:      null
+        askedAt:      null,
+        // W4-2. When Delete my health answers cleared these. Until answered
+        // again, capabilityProfile() plans carefully. See Schema v1.98.
+        clearedAt:    null
       },
 
       // CARDIAC-1, 14 Aug 2026. 'cleared'|'not-yet'|'not-sure'|null.
@@ -2827,7 +2838,8 @@ export const store = {
     this.data.journalEntries      = [];
     // LEGAL-TRUE. What they said about their body and how they have been
     // is health information too (Foot Anstey review prep, 01 Oct 2026).
-    this.data.capability          = { ...d.capability };
+    // W4-2. Careful until asked again, not unrestricted.
+    this.data.capability          = { ...d.capability, clearedAt: new Date().toISOString() };
     this.data.assessment          = { ...d.assessment };
     this.data.lifestyle           = { ...(this.data.lifestyle || {}), returningAfter: null, stressLevel: null };
     this.data.onboarding          = { ...(this.data.onboarding || {}), hardBeforeSelections: [], primaryTerritory: null };
@@ -3090,6 +3102,9 @@ export const store = {
   logLift(exerciseId, entry) {
     if (!exerciseId || !entry) return null;
     if (this.data.liftLogEnabled !== true) return null;
+    // W4-15. A note is often about how a body part felt: a health answer.
+    // Not kept without the health consent; the numbers are.
+    const healthOk = this.data.consent?.health?.given === true;
 
     // Generalised 11 Aug 2026 from weight-and-reps to whatever the
     // exercise actually produces. Graeme: "the weight, time, tension,
@@ -3116,6 +3131,7 @@ export const store = {
       }
     }
     for (const k of TEXT) {
+      if (k === 'note' && !healthOk) continue;
       if (typeof entry[k] === 'string' && entry[k].trim()) {
         record[k] = entry[k].trim().slice(0, 60); hasValue = true;
       }
@@ -3820,6 +3836,16 @@ export const store = {
   capabilityProfile() {
     const c = this.data.capability || {};
     const asked = c.askedAt !== null && c.askedAt !== undefined;
+
+    // W4-2 DELETE-LOOSENS. Answers deleted and not given again: plan as if
+    // every answer were the careful one. The unasked profile below restricts
+    // nothing (each filter needs `asked`), which is right for nobody who
+    // was asked and then deleted the answers.
+    if (!asked && c.clearedAt) {
+      return { impactSafe: false, floorSafe: false, balanceSafe: false, ceilingCap: 2,
+               needsSeated: true, legsUsable: true, legsLoadable: false,
+               asked: true, careful: true };
+    }
 
     // Impact needs an affirmative yes. Someone who does not currently do
     // anything with both feet off the ground should not be handed

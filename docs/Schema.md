@@ -1,5 +1,20 @@
 # Alongside — Data Schema Reference
-## 01 Oct 2026 v1.97
+## 02 Oct 2026 v1.98
+
+> **v1.98, 02 Oct 2026 — W4-2 DELETE-LOOSENS** (`store.js` v103). One new
+> field, **`capability.clearedAt`** (`string|null`, ISO, default `null`).
+> Set by `deleteHealthAnswers()` when it clears what the person said their
+> body can do. While it is set and `capability.askedAt` is not,
+> `capabilityProfile()` returns the careful profile (seated only, no floor,
+> no balance, no impact, legs not loaded, difficulty capped at 2) with
+> `careful: true`, instead of the unasked profile, which applied no
+> restriction. Answering again (`askedAt` set) ends it. With health consent
+> given again, the router asks the questions before the next built session
+> (`data/health-consent.js`). Not a health answer itself: it records only
+> that answers were deleted, and when. Reset all data clears it.
+>
+> Also W4-15: `logLift()` keeps no `note` while health consent is not
+> given (weights, reps and the rest are kept).
 
 > **v1.97, 01 Oct 2026 — B5 EVIDENCE** (`store.js` v102). One new field,
 > **`evidence`** (nested object): `surveyDone` (`boolean`, `false`),
@@ -876,7 +891,7 @@
 
 ## 06 Sep 2026 v1.51
 
-**File:** `js/store.js` (confirmed live version: **v102, 01 Oct 2026**)
+**File:** `js/store.js` (confirmed live version: **v103, 02 Oct 2026**)
 
 > **v1.47, 06 Sep 2026 — CR-1.** `conditions[]` gains three ids and loses one. `chronic-fatigue` is **retired**; `persistent-fatigue`, `me-cfs` and `long-covid` replace it. No field shape changed — `conditions` is still `string[]` and `conditionMeta` is still keyed by condition id.
 >
