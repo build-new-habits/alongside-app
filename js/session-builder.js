@@ -1,6 +1,11 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
+ * 02 Oct 2026 v80
+ *
+ * v80 - W5-1 BAD-DAY-BUILDER. The gentle plan is stored when built (both
+ *   entry points), so Let's go plays it.
+ *
  * 02 Oct 2026 v79
  *
  * v79 - W4-20. gentleReason() exported: the coach asks why a plan is lighter
@@ -1175,7 +1180,7 @@ import { resolveEquipment, exerciseIsAvailable } from "./data/equipment-map.js";
 import { EXERCISES, isSessionLength, isCardioMachine } from "./data/exercises/index.js";
 import { matchCategory } from "./data/session-categories.js";
 import { buildRationale, tooHardRecently } from "./data/session-rationale.js";
-import { getZoneStatus, getPainBand, getCondition, getActiveConditionIds, isSore, isAcute, isBad, soreLine, areaWords } from "./data/conditions.js";
+import { getZoneStatus, getPainBand, getCondition, getActiveConditionIds, isSore, isAcute, isBad, soreLine, areaWords, bodyAreasOf } from "./data/conditions.js";
 import { focusOrderedCategories } from "./data/week-focus.js";
 // BURNOUT-LIVE, 16 Sep 2026. checkin.js imports only the store, so this
 // closes no cycle.
@@ -3528,7 +3533,7 @@ export function buildSessionFromSelection({ sessionType, durationMins, selectedI
   // reachability fault found this week.
   if (SEVERE_BYPASS_ENABLED && !ignoreSevere) {
     const zone = severeZoneToday();
-    if (zone) return gentleCareSession(zone, durationMins);
+    if (zone) return _storeGentle(gentleCareSession(zone, durationMins), sessionType, durationMins);
   }
 
   const type = SESSION_TYPES.find(t => t.id === sessionType);
@@ -3695,7 +3700,8 @@ const SEVERE_BYPASS_ENABLED = true;
  * how a safety rule ends up living in one view of thirteen.
  */
 export function severeZoneToday() {
-  const ids    = store.get("conditions") || [];
+  // W5-4. Body areas only: a score kept for stress is never a Bad day.
+  const ids    = bodyAreasOf(store.get("conditions") || []);
   const scores = store.get("conditionPainScores") || {};
 
   // THRESHOLD: 8+, via getPainBand. Graeme, 17 Aug: "7 is the top of
@@ -3750,6 +3756,18 @@ export function severeZoneToday() {
  * tell anybody to see somebody. That last part is the red-flag screen's
  * job and it is not built yet.
  */
+// W5-1 BAD-DAY-BUILDER. The gentle plan is stored as every built plan is:
+// "Let's go" plays what is stored, and on a Bad day that was yesterday's
+// half-done plan (Pistol Squat on a Bad knee) or nothing at all.
+function _storeGentle(session, sessionType, durationMins) {
+  store.set("generatedSession", {
+    session,
+    builtAt: new Date().toISOString(),
+    inputs:  { sessionType, durationMins, gentleCare: true }
+  });
+  return session;
+}
+
 function gentleCareSession(zone, durationMins) {
   const pick = (id, category) =>
     EXERCISES.find(e => e.id === id) ||
@@ -3841,7 +3859,7 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
   // SEVERE-1. Before anything else, and before any pool is built.
   if (SEVERE_BYPASS_ENABLED && !ignoreSevere) {
     const zone = severeZoneToday();
-    if (zone) return gentleCareSession(zone, durationMins);
+    if (zone) return _storeGentle(gentleCareSession(zone, durationMins), sessionType, durationMins);
   }
 
   const type = SESSION_TYPES.find(t => t.id === sessionType);

@@ -1,5 +1,10 @@
 /**
  * yoga-session.js
+ * 02 Oct 2026 v16
+ *
+ * v16 - W5-2 BAD-DAY-DOORS. On a Bad day Yoga asks Rest today / Something
+ *   gentler first (views/bad-day-door.js), as Run and the coach do.
+ *
  * 02 Oct 2026 v15
  *
  * v15 - W4-9 SORE-WORDS. Tags from data/conditions.js
@@ -243,6 +248,7 @@ import { isGateDue, renderSafetyGate, attachSafetyGate } from "../safety-gate.js
 import { isPremium } from "../auth.js";
 import { EXERCISES } from "../data/exercises/index.js";
 import { personFilter } from "../session-builder.js";
+import { badDayIds, renderBadDayDoor, wireBadDayDoor } from "./bad-day-door.js";
 import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
 import { renderLogBlock, attachLogEvents, scrollToTop } from "../session-log.js";
 import { selectMoment, recordMomentShown, dismissMoment } from "../data/grounding-moments.js";
@@ -618,6 +624,8 @@ function buildSession(focusId, durationMins, targetId) {
 // ── Render ────────────────────────────────────────────────────────────────────
 
 export function render() {
+  // W5-2. A Bad day asks first, as Run and the coach do.
+  if (phase === "focus" && badDayIds().length) return renderBadDayDoor("Before yoga");
   if (phase === "focus")    return renderFocusSelector();
   if (phase === "duration") return renderDurationSelector();
   if (phase === "overview") return renderSessionOverview();
@@ -1449,6 +1457,10 @@ function rerender() {
 // ── Mount ─────────────────────────────────────────────────────────────────────
 
 export function onMount() {
+  if (phase === "focus" && badDayIds().length) {
+    wireBadDayDoor(document.getElementById("main-content") || document, resetSession);
+    return;
+  }
   mountSessionGuard({
     isActive: () => phase === "session" || phase === "rest",
     label:    "yoga session",

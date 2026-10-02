@@ -1,5 +1,10 @@
 /**
  * js/views/checkin.js
+ * 02 Oct 2026 v29
+ *
+ * v29 - W5-4. A listed area not named today is saved as quiet for body areas
+ *   only; no score is saved for stress, tiredness or the menopause.
+ *
  * 02 Oct 2026 v28
  *
  * v28 - W4-20. lengthLine(): on a day the plan will be shorter (a low day,
@@ -377,7 +382,7 @@ import { intensityForForm, clearPurpose, SAFETY_LINE } from "../data/purpose.js"
 import { checkinData }     from "../data/checkin.js";
 import { gentleReason }    from "../session-builder.js";
 import { resolveOpening }  from "../data/checkin-openings.js";
-import { CONDITIONS, soreAreaOptions, SORE_LEVELS } from "../data/conditions.js";
+import { CONDITIONS, soreAreaOptions, SORE_LEVELS, bodyAreasOf } from "../data/conditions.js";
 
 const USUAL = { micro: "10 minutes", quick: "20 minutes", short: "30 minutes",
                 standard: "40 minutes", long: "50 minutes", open: "an hour or more" };
@@ -562,7 +567,8 @@ export function CheckinView(router) {
 
   async function _askSore() {
     // A listed condition not named today is quiet today.
-    _conditions.forEach(id => { _checkin.conditionLevels[id] = 0; });
+    // W5-4. Body areas only: no score, even 0, for an everyday state.
+    bodyAreasOf(_conditions).forEach(id => { _checkin.conditionLevels[id] = 0; });
 
     // W3-4. Body areas only: perimenopause, tiredness and stress are
     // everyday states (conditions.js), not somewhere that is sore.

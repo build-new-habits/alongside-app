@@ -1,6 +1,11 @@
 /**
  * js/views/class-list.js
  *
+ * 02 Oct 2026 v6
+ *
+ * v6 - W5-2 BAD-DAY-DOORS. On a Bad day Classes asks Rest today / Something
+ *   gentler first (views/bad-day-door.js).
+ *
  * 02 Oct 2026 v5
  *
  * v5 - W4-9. A held class says the app is leaving the move out ("which I'm
@@ -80,6 +85,7 @@ import { CLASSES, classSafety, seatedThroughout } from '../data/classes/index.js
 import { durationLabel, sectionsFor } from '../data/class-contract.js';
 import { STRANDS } from '../data/aims.js';
 import { startClass } from './class-player.js';
+import { badDayIds, renderBadDayDoor, wireBadDayDoor } from './bad-day-door.js';
 
 export const centered = false;
 
@@ -112,6 +118,8 @@ function _conditions() {
 }
 
 export function render() {
+  // W5-2. A Bad day asks first, as Run and the coach do.
+  if (badDayIds().length) return renderBadDayDoor('Before a class');
   const mine = _arcStrands();
   const opts = _conditions();
 
@@ -211,6 +219,7 @@ export function render() {
 export function onMount() {
   const root = document.getElementById('main-content');
   if (!root) return;
+  if (badDayIds().length) { wireBadDayDoor(root); return; }
 
   root.querySelectorAll('[data-start]').forEach(btn => {
     btn.addEventListener('click', () => {

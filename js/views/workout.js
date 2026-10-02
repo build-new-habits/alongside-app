@@ -1,5 +1,10 @@
 /**
  * workout.js - Workout Execution View
+ * 02 Oct 2026 v31
+ *
+ * v31 - W5-1. On a Bad day only the gentle plan plays; any other stored plan
+ *   asks the Bad-day choice (views/bad-day-door.js).
+ *
  * 30 Sep 2026 v30
  *
  * v30 - W3-13 INTERRUPTIONS (Schema v1.85). The checkpoint carries the
@@ -431,6 +436,7 @@ import { recordSession } from "../data/programmeEngine.js";
 import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
 import { checkpointSession, getResumableSession, clearCheckpoint } from "../session-resume.js";
 import { isPremium }     from "../auth.js";
+import { badDayIds, renderBadDayDoor, wireBadDayDoor } from "./bad-day-door.js";
 
 export const centered = false;
 
@@ -510,6 +516,12 @@ let _awayMs = 0;
 function elapsedMins() {
   if (!sessionStartTime) return null;
   return Math.max(1, Math.round((Date.now() - sessionStartTime - _awayMs) / 60000));
+}
+
+// W5-1. The gentle plan, however it was stored (the coach keeps its id,
+// "gentle-care", as the session's id and type rather than the flag).
+function _isGentle(w) {
+  return !!w && (w.gentleCare === true || w.id === "gentle-care" || w.sessionType === "gentle-care");
 }
 
 // v3 — single helper so every read point stays in sync.
@@ -593,6 +605,13 @@ export function render() {
 
   if (!workout) {
     return renderNoWorkout();
+  }
+
+  // W5-1. On a Bad day the player plays only the gentle plan: any other
+  // plan stored (yesterday's half-done Full Body, one built before the
+  // area turned Bad) asks the Bad-day choice instead.
+  if (!_isGentle(workout) && badDayIds().length) {
+    return renderBadDayDoor("Before you start");
   }
 
   // EMPTY-1, 22 Aug 2026. The guard above checked that a workout EXISTS
@@ -970,6 +989,12 @@ const SECTION_LABELS = { warmup: "Warm up", main: "Main", cooldown: "Cool down",
                          accessory: "Main", finisher: "Main" };
 
 export function onMount() {
+  // W5-1. The Bad-day choice in place of a plan: nothing else to wire.
+  const _w = _getWorkout();
+  if (_w && !_isGentle(_w) && badDayIds().length) {
+    wireBadDayDoor(document.getElementById("main-content") || document);
+    return;
+  }
   const workout = _getWorkout();
 
   // EMPTY-1, 22 Aug 2026. The render guard was not enough on its own.

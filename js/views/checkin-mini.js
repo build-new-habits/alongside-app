@@ -1,6 +1,12 @@
 /**
  * checkin-mini.js - Abbreviated Return-Visit Check-In
  *
+ * 02 Oct 2026 v9
+ *
+ * v9 - W5-4 STRESS-SORE. The sore question lists body areas only
+ *   (bodyAreasOf): "How is your stress today?" with A little / Quite sore /
+ *   Bad is gone, and no score is saved for an everyday state.
+ *
  * 02 Oct 2026 v8
  *
  * v8 - W4-8 PAIN-NUMBERS. The sore-area step asks in the check-in's own
@@ -108,7 +114,7 @@
  */
 
 import { store }      from "../store.js";
-import { CONDITIONS, SORE_LEVELS, soreWord, areaWords } from "../data/conditions.js";
+import { CONDITIONS, SORE_LEVELS, soreWord, areaWords, bodyAreasOf } from "../data/conditions.js";
 
 export const centered = false;
 
@@ -270,7 +276,9 @@ function renderMood() {
 // -- Step 3: Pain --------------------------------------------------------------
 
 function renderPain() {
-  const conditions = store.get("conditions") || [];
+  // W5-4. Body areas only: stress, tiredness and the menopause are not
+  // somewhere that is sore (the full check-in has asked this way since W3-4).
+  const conditions = bodyAreasOf(store.get("conditions") || []);
   const currentPain = store.get("conditionPainScores") || {};
 
   return `
