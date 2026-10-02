@@ -1,6 +1,12 @@
 /**
  * tools/verify-tiredness-true.mjs
- * 02 Oct 2026 v1
+ * 02 Oct 2026 v2
+ *
+ * v2 - W5-4 STRESS-SORE (Wave 5 trace: 2.4, 2.16). TEST 6: the update
+ *   check-in asked "How is your stress today?" with A little / Quite sore /
+ *   Bad, and saved the answer as a sore score. Both check-ins now ask about
+ *   body areas only, save no score for an everyday state, and no Bad-day
+ *   screen names one.
  *
  * W4-10 TIREDNESS-PROMISE (Wave 4 persona trace, 2.4).
  *
@@ -92,6 +98,58 @@ ok("4b. the arcs offered are the same", JSON.stringify(plain) === JSON.stringify
 console.log("\nTEST 5 - controls");
 fixture(["knee"]);
 ok("5a. a knee still marks managing", new Set(A.situationsFor(store)).has("managing"));
+
+// ── 6. THE CHECK-INS ASK ABOUT BODY AREAS ONLY (W5-4) ──────────────────
+console.log("\nTEST 6 - stress is not asked as a sore area");
+const navs = [];
+const rtr = { navigate: v => navs.push(v), back() {}, history: [] };
+globalThis.window.router = rtr;
+Object.defineProperty(globalThis, "router", { value: rtr, configurable: true, writable: true });
+const click = el => el?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true, cancelable: true }));
+for (const [k, v] of [["requestAnimationFrame", cb => setTimeout(() => cb(Date.now()), 0)], ["cancelAnimationFrame", id => clearTimeout(id)]]) {
+  dom.window[k] = v; Object.defineProperty(globalThis, k, { value: v, configurable: true, writable: true });
+}
+const Mini = await import(B + "views/checkin-mini.js");
+fixture(["anxiety", "knee"]);
+main.innerHTML = Mini.render(); Mini.onMount?.(); await wait(10);
+for (let i = 0; i < 4 && !/Anything hurting/i.test(txt(main)); i++) { click(main.querySelector("#mini-next-btn")); await wait(10); }
+ok("6pc. the update check-in asks about the knee", !!main.querySelector('fieldset[data-condition="knee"]'), txt(main).slice(0, 200));
+ok("6a. and not about stress", !main.querySelector('fieldset[data-condition="anxiety"]') && !/stress/i.test(txt(main)), txt(main).slice(0, 300));
+// Every row offered gets "A little", as a person going down the list would.
+[...main.querySelectorAll(".mini-pain-chip")].filter(c => txt(c) === "A little").forEach(c => click(c)); await wait(10);
+for (let i = 0; i < 4 && !main.querySelector("#mini-done-btn"); i++) { click(main.querySelector("#mini-next-btn")); await wait(10); }
+click(main.querySelector("#mini-done-btn")); await wait(10);
+ok("6b. no score saved for stress (the knee's is)", !("anxiety" in (store.get("conditionPainScores") || {})) && store.get("conditionPainScores")?.knee === 4, JSON.stringify(store.get("conditionPainScores")));
+
+const { CheckinView } = await import(B + "views/checkin.js");
+document.getElementById("main-content").innerHTML = "";
+dom.window.matchMedia = q => ({ matches: /prefers-reduced-motion/.test(q), media: q, addEventListener() {}, removeEventListener() {}, addListener() {}, removeListener() {} });
+fixture(["anxiety", "knee"]);
+store.set("pendingDoorRoute", "coach-proposal");
+const app = document.getElementById("app");
+const holder = document.createElement("div"); app.appendChild(holder);
+const cnavs = [];
+CheckinView({ navigate: v => cnavs.push(v), back() {} }).mount(holder);
+const tapNow = async re => {
+  for (let t = 0; t < 400; t++) {
+    const b = [...document.querySelectorAll("#app button, .ci-panel button")].find(x => !x.disabled && re.test(txt(x)));
+    if (b) { b.click(); await wait(30); return true; }
+    await wait(15);
+  }
+  return false;
+};
+const reached = (await tapNow(/^Okay$/)) && (await tapNow(/^Pretty good$/)) && (await tapNow(/^Nothing today$/));
+for (let t = 0; t < 200 && !cnavs.length; t++) await wait(15);
+ok("6pc2. the full check-in reaches the plan", reached && cnavs.length > 0, JSON.stringify(cnavs) + " " + reached + " | " + [...document.querySelectorAll("#app button, .ci-panel button")].map(txt).join(" / ") + " | " + txt(app).slice(-300));
+ok("6c. the full check-in saves no score for stress", !("anxiety" in (store.get("conditionPainScores") || {})), JSON.stringify(store.get("conditionPainScores")));
+holder.remove(); document.querySelectorAll(".ci-panel, .ci-overlay").forEach(n => n.remove());
+
+const Door = await import(B + "views/bad-day-door.js");
+fixture(["anxiety", "knee"]);
+store.set("conditionPainScores", { anxiety: 8, knee: 8 });   // a score kept from before
+ok("6d. a Bad-day screen names the knee, never stress", /knee/i.test(Door.renderBadDayDoor()) && !/stress/i.test(Door.renderBadDayDoor()), Door.renderBadDayDoor().replace(/\s+/g, " ").slice(0, 300));
+store.set("conditionPainScores", { anxiety: 8 });
+ok("6e. stress alone never makes a Bad day", Door.badDayIds().length === 0, JSON.stringify(Door.badDayIds()));
 
 console.log(`\nTIREDNESS-TRUE: ${passes} passed, ${fails} failed`);
 process.exit(fails ? 1 : 0);

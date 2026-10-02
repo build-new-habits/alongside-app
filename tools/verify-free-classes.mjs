@@ -1,6 +1,11 @@
 /**
  * tools/verify-free-classes.mjs
- * 02 Oct 2026 v4
+ * 02 Oct 2026 v5
+ *
+ * v5 - W5-2 BAD-DAY-DOORS. At Bad (8) Classes now asks Rest today /
+ *   Something gentler instead of listing classes; 4a holds the list's own
+ *   filter at 7 (still a held list there) and 4b asks that 8 gives the
+ *   choice and no class. Not loosened: at 8 nothing can be started at all.
  *
  * v4 - W4-1 GATE-OPEN. The fixture person has agreed (tools/agreed.mjs): the
  *   app now sends anybody who has not back to onboarding. No assertion
@@ -140,12 +145,15 @@ console.log("\nTEST 4 - a knee scored 8 today holds back the classes that load i
   const offered = () => $$(".class-list__row:not(.class-list__row--held)").filter(li => li.querySelector("[data-start]")).map(li => txt(li.querySelector(".class-list__name")));
   const held = () => $$(".class-list__row--held .class-list__name").map(txt);
   const quiet = offered();
-  store.set("conditionPainScores", { knee: 8 });
+  store.set("conditionPainScores", { knee: 7 });
   await go("today"); await go("classes");
   const sore = offered();
   ok("4pc. with the knee quiet, Standing Up and Unsticking are offered", quiet.includes("Standing Up") && quiet.includes("Unsticking"), quiet.join(", "));
-  ok("4a. with the knee at 8, neither is offered, and both are named under \"Not today\"", !sore.includes("Standing Up") && !sore.includes("Unsticking") &&
+  ok("4a. with the knee at 7, neither is offered, and both are named under \"Not today\"", !sore.includes("Standing Up") && !sore.includes("Unsticking") &&
      held().includes("Standing Up") && held().includes("Unsticking"), `offered: ${sore.join(", ")} | held: ${held().join(", ")}`);
+  store.set("conditionPainScores", { knee: 8 });
+  await go("today"); await go("classes");
+  ok("4b. with the knee Bad (8), the Bad-day choice and no class to start", !!$('[data-bad-day="adapt"]') && !$("[data-start]"), txt(main).slice(0, 160));
 }
 
 console.log("");

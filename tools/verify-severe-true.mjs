@@ -1,6 +1,11 @@
 /**
  * tools/verify-severe-true.mjs
- * 02 Oct 2026 v1
+ * 02 Oct 2026 v2
+ *
+ * v2 - W5-2 BAD-DAY-DOORS (Wave 5 trace: 2.12, 2.14). TEST 6: Yoga and
+ *   Classes ask the Bad-day choice first (Rest today / Something gentler),
+ *   as Run and the coach do; no pose list, no class, no Start. At Quite
+ *   sore, as before.
  *
  * W4-7 SEVERE-DAY-TRUE (Wave 4 persona trace: 2.1, 2.16).
  *
@@ -131,6 +136,29 @@ fixture([], {});
 ok("5a. nothing sore: an ordinary session", !SB.buildSession({ sessionType: "full", durationMins: 30 })?.gentleCare);
 fixture(["lower-back"], { "lower-back": 6 });
 ok("5b. Quite sore is not a Bad day", !SB.buildSession({ sessionType: "full", durationMins: 30 })?.gentleCare);
+
+// ── 6. YOGA AND CLASSES ─────────────────────────────────────────────────
+console.log("\nTEST 6 - Yoga and Classes on a Bad day");
+const YS = await import(B + "views/yoga-session.js");
+const CL = await import(B + "views/class-list.js");
+const noStart = () => ![...main.querySelectorAll("button")].some(b => /^Start\b/.test(txt(b)));
+fixture(["lower-back"], { "lower-back": 8 });
+main.innerHTML = YS.render(); YS.onMount();
+ok("6a. Yoga: the Bad-day choice first", !!main.querySelector('[data-bad-day="rest"]') && !!main.querySelector('[data-bad-day="adapt"]'), txt(main).slice(0, 200));
+ok("6b. Yoga: no pose list, no style choice, no Start", !main.querySelector("[data-target], [data-focus], [data-mins]") && noStart(), txt(main).slice(0, 200));
+ok("6c. Yoga: in the person's words, nothing untrue", /lower back is bad today/i.test(txt(main)) && !UNTRUE.test(txt(main)), txt(main).slice(0, 200));
+click(main.querySelector('[data-bad-day="rest"]')); await wait(60);
+ok("6d. Yoga: Rest today is recorded as the coach records it", (store.get("severePainChoices") || []).at(-1)?.choice === "rest", JSON.stringify((store.get("severePainChoices") || []).at(-1)));
+fixture(["lower-back"], { "lower-back": 8 });
+main.innerHTML = CL.render(); CL.onMount();
+ok("6e. Classes: the Bad-day choice first, no class to start", !!main.querySelector('[data-bad-day="adapt"]') && !main.querySelector("[data-start]") && noStart(), txt(main).slice(0, 200));
+click(main.querySelector('[data-bad-day="adapt"]')); await wait(60);
+ok("6f. Classes: Something gentler is recorded", (store.get("severePainChoices") || []).at(-1)?.choice === "adapt", JSON.stringify((store.get("severePainChoices") || []).at(-1)));
+fixture(["lower-back"], { "lower-back": 6 });
+main.innerHTML = YS.render();
+ok("6g. Quite sore: Yoga opens as before", !main.querySelector("[data-bad-day]") && !!main.querySelector("[data-target]"), txt(main).slice(0, 160));
+main.innerHTML = CL.render();
+ok("6h. Quite sore: Classes as before", !main.querySelector("[data-bad-day]") && !!main.querySelector("[data-start]"), txt(main).slice(0, 160));
 
 console.log(`\nSEVERE-TRUE: ${passes} passed, ${fails} failed`);
 process.exit(fails ? 1 : 0);

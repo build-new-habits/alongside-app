@@ -1,6 +1,11 @@
 /**
  * tools/verify-timetable.mjs
- * 02 Oct 2026 v4
+ * 02 Oct 2026 v5
+ *
+ * v5 - W5-2 BAD-DAY-DOORS. At Bad (8 and over) Classes now asks Rest today /
+ *   Something gentler instead of listing classes, so TEST 4's held list is
+ *   seeded at 7, where the list's own filter still decides; 4e asks that 9
+ *   gives the choice and no class.
  *
  * v4 - W4-9. 4c follows the held class's new reason ("which I'm leaving out
  *   for you at the moment"; it said "you've told me to steer clear"). Same
@@ -134,7 +139,7 @@ function seed({ programme = false, injured = false } = {}) {
   });
   if (injured) {
     store.set("conditions", ["lower-back"]);
-    store.set("conditionPainScores", { "lower-back": 9 });
+    store.set("conditionPainScores", { "lower-back": typeof injured === "number" ? injured : 7 });
   }
   navs.length = 0;
 }
@@ -255,6 +260,12 @@ ok("4d. and names each movement once",
      return new Set(names).size === names.length;
    }),
    "a movement named twice in one reason");
+
+seed({ injured: 9 });
+main.innerHTML = L.render();
+ok("4e. a Bad lower back (9): the Bad-day choice, no class to start",
+   !!main.querySelector('[data-bad-day="adapt"]') && !main.querySelector("[data-start]"),
+   main.textContent.replace(/\s+/g, " ").slice(0, 160));
 
 // ── 5. THE WHOLE ROUTE, END TO END ──────────────────────────────────────
 console.log("\nTEST 5 - tapping a class actually starts it");
