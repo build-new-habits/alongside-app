@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 01 Oct 2026 v625
+ * 02 Oct 2026 v626
  *
+ * v626 - W4-0/W4-1: no way into the app before the age question and both consents; no house button on those screens; checks pinned to jsdom 28.1.0.
  * v625 - Your plan on Free: no "no contract either way"; free in the beta.
  * v624 - B2 password on the downloaded file; B4 Messages (messages.json is left to the network); B5 survey and Share my figures (off until the receiver is set); B3 every path relative, for app.buildnewhabits.co.uk.
  * v623 - BUNDLE-TRUE: Library journal opens the real journal; restore and My exercises cannot carry code; no weight entry without health consent; more cleared by Delete my health answers.
@@ -4172,7 +4173,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v625";
+const CACHE_NAME = "alongside-v626";
 
 const SHELL_URLS = [
 
