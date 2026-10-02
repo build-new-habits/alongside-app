@@ -1,5 +1,10 @@
 /**
  * tools/verify-sore-scope.mjs
+ * 02 Oct 2026 v2
+ *
+ * v2 - W4-9. 4pc: areas are named mid-sentence in lower case now ("your
+ *   lower back"); the positive control ignores case.
+ *
  * 30 Sep 2026 v1
  *
  * W3-4 SORE-SCOPE (Wave 3: personas 2.4, 2.11, 2.12, 2.13, 2.15). What the
@@ -146,7 +151,7 @@ const app4 = document.getElementById("app"); app4.innerHTML = "";
 CoachProposalView({ navigate() {}, back() {}, history: [] }).mount(app4);
 await wait(50);
 app4.querySelector('[data-severe-choice="adapt"]')?.click(); await wait(50);
-ok("4pc. the plan's lines name the areas", /Knee|Lower Back/.test(app4.textContent), app4.textContent.slice(0, 200));
+ok("4pc. the plan's lines name the areas", /knee|lower back/i.test(app4.textContent), app4.textContent.slice(0, 200));
 ok("4a. no /10 anywhere", !/\/10/.test(app4.textContent), (app4.textContent.match(/.{30}\/10.{10}/) || [""])[0]);
 
 console.log("\nTEST 5 - the finish asks about pain only on a sore day");

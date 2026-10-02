@@ -1,5 +1,11 @@
 /**
  * tools/verify-finish.mjs
+ * 02 Oct 2026 v4
+ *
+ * v4 - W4-8 PAIN-NUMBERS. 3c: the finish's Better / About the same / Worse
+ *   is no longer kept with the session; feel and mood still are. Stricter:
+ *   it asserts the answer is absent.
+ *
  * 02 Oct 2026 v3
  *
  * v3 - W4-1 GATE-OPEN. The fixture person has agreed (tools/agreed.mjs): the
@@ -129,7 +135,7 @@ const slider = main.querySelector("#reflect-mood-slider");
 slider.value = "3"; slider.dispatchEvent(new dom.window.Event("input", { bubbles: true }));
 tap("#reflect-done-btn"); await wait(20);
 const e2 = lastEntry();
-ok("3c. feel, pain and a moved mood are all stored", e2.feel === "strong" && e2.painChange === "worse" && e2.moodAfter === 3, JSON.stringify({ f: e2.feel, p: e2.painChange, m: e2.moodAfter }));
+ok("3c. feel and a moved mood are stored; the sore answer is not (W4-8)", e2.feel === "strong" && e2.painChange === undefined && e2.moodAfter === 3, JSON.stringify({ f: e2.feel, p: e2.painChange, m: e2.moodAfter }));
 
 // ── 4. A SAVED PART-SESSION ─────────────────────────────────────────────
 console.log("\nTEST 4 - ending early says what was saved");

@@ -1,5 +1,14 @@
 /**
  * tools/verify-scope-minor.mjs
+ * 02 Oct 2026 v3
+ *   W4-8 PAIN-NUMBERS. TEST 8 added. The update check-in asked for pain
+ *   0 to 10 on a slider ("Lower Back 6 Moderate", "0 none to 10 severe"),
+ *   said "No conditions recorded", and stored the raw score. And every
+ *   finish on a sore day kept Better / About the same / Worse with the
+ *   session: a session-by-session record of a sore area, which tracks an
+ *   injury over time and went into the downloaded file. Now: the same
+ *   three words as the check-in, no number, no "conditions"; and nothing
+ *   about the area is kept with a session, including entries saved before.
  * 29 Sep 2026 v2
  *   P0h. TEST 7 added: the exercise library's own words. About 120 entries
  *   described what a movement treats rather than what it does ("used in
@@ -270,6 +279,42 @@ const withWhy = EXERCISES.filter(e => e.why && practiceTexts.some(t => t.include
 ok("7c-pc. the practices screen was walked and shows `why`", groupCount > 2 && practiceTexts.length > 20 && withWhy > 20, `${groupCount} groups, ${practiceTexts.length} practices, ${withWhy} whys on screen`);
 const pracHits = practiceTexts.map(libBanned).filter(Boolean);
 ok("7c. nor on any practice screen", pracHits.length === 0, [...new Set(pracHits)].join(", "));
+
+// ── 8. NO PAIN NUMBERS, NO PAIN RECORD (W4-8) ────────────────────────────
+console.log("\nTEST 8 - no pain numbers, and no pain record kept with sessions");
+fixture({ conditions: ["lower-back"], conditionPainScores: { "lower-back": 6 } });
+store.set("consent", { given: true, ageConfirmed: true, policyVersion: "2026-10-01", health: { given: true } });
+const Mini = await import(B + "views/checkin-mini.js");
+async function miniAtPain() {
+  main.innerHTML = Mini.render(); Mini.onMount?.(); await wait(10);
+  for (let i = 0; i < 4 && !/Anything hurting/i.test(txt(main)); i++) { click(main.querySelector("#mini-next-btn")); await wait(10); }
+}
+await miniAtPain();
+const mini = visible(main);
+ok("8pc. the update check-in asks about the sore area", /lower back/i.test(mini), mini.slice(0, 200));
+ok("8a. no 0 to 10 control", !main.querySelector('input[type="range"].mini-pain-slider, input[type="range"][aria-label*="Pain"]') && !/0 none to 10/i.test(mini), mini.slice(0, 300));
+const chips = [...main.querySelectorAll("button")].map(b => txt(b));
+ok("8b. the three words of the check-in, and Not sore today", ["Not sore today", "A little", "Quite sore", "Bad"].every(w => chips.includes(w)), chips.join(" | "));
+ok("8c. no number beside the area", !/lower back\s*\d|\b\d+\s*(Moderate|Mild|Severe)\b/i.test(mini), mini.slice(0, 300));
+fixture({ conditions: [] });
+await miniAtPain();
+ok("8d. with nothing listed, no \"conditions\"", !/conditions/i.test(visible(main)), visible(main).slice(0, 200));
+fixture({ conditions: ["lower-back"], conditionPainScores: { "lower-back": 6 } });
+await miniAtPain();
+const bad = [...main.querySelectorAll("button, [role=radio], input[type=radio]")].find(b => /^\s*Bad\s*$/.test(b.textContent || b.value || b.getAttribute("aria-label") || ""));
+click(bad); await wait(5);
+// The answer is saved when the check-in is: on to the last step, then Done.
+for (let i = 0; i < 4 && !main.querySelector("#mini-done-btn"); i++) { click(main.querySelector("#mini-next-btn")); await wait(10); }
+click(main.querySelector("#mini-done-btn")); await wait(10);
+ok("8e. choosing Bad keeps the check-in's own score for Bad", store.get("conditionPainScores")?.["lower-back"] === 8, JSON.stringify(store.get("conditionPainScores")));
+// Entries saved before carry no pain answer once loaded.
+localStorage.clear(); store.init();
+const raw = JSON.parse(localStorage.getItem(store.STORAGE_KEY) || "{}");
+raw.activityLog = [{ id: "old1", type: "workout", completedAt: new Date().toISOString(), durationMins: 20, painChange: "worse", feel: "steady" }];
+localStorage.setItem(store.STORAGE_KEY, JSON.stringify(raw));
+store.init();
+const old = (store.get("activityLog") || [])[0] || {};
+ok("8f. a session saved before keeps its feel and loses its pain answer", old.feel === "steady" && old.painChange === undefined, JSON.stringify(old));
 
 console.log("");
 if (fails) { console.log(`SCOPE-MINOR: ${fails} FAILED, ${passes} passed`); process.exit(1); }

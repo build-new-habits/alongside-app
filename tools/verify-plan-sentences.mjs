@@ -1,5 +1,13 @@
 /**
  * tools/verify-plan-sentences.mjs
+ * 02 Oct 2026 v3
+ *
+ * v3 - W4-9 SORE-WORDS. The claim table follows the one sore-area sentence
+ *   (soreLine): every move it names as left out exists and is absent from
+ *   the plan; "Nothing is left out for it today" is true of the library for
+ *   that area. The old per-area claims are gone with the lines that made
+ *   them.
+ *
  * 30 Sep 2026 v2
  *
  * v2 - W3-9 SORE-LINES. The four sore-area notes below the acute band no
@@ -39,6 +47,7 @@ globalThis.location = dom.window.location;
 const B = new URL("../js/", import.meta.url).href;
 const { store } = await import(B + "store.js");
 const SB = await import(B + "session-builder.js");
+const { EXERCISES } = await import(B + "data/exercises/index.js");
 const gate = await import(B + "safety-gate.js");
 
 let fails = 0, passes = 0;
@@ -77,15 +86,22 @@ const CLAIMS = [
   [/Pull first/,                                  m => has(m, isPull)],
   [/Bracing, anti-rotation, anti-extension/,      m => has(m, e => P(e) === "anti-rotation") && has(m, e => P(e) === "anti-extension")],
   [/Mostly holding still/,                        m => m.filter(isBrace).length * 2 > m.length],
-  [/no overhead or heavy pressing in this plan/,         (m, all) => !all.some(e => touches(e, "shoulder") && (isPush(e) || /press|overhead|get-?up|snatch|jerk/i.test(e.name)))],
-  [/no deep single-leg work in this plan/,             (m, all) => !all.some(e => isSingle(e) && touches(e, "knee"))],
-  [/loads the spine under flexion/,               (m, all) => !all.some(e => (e.contraindications || []).includes("lower-back-acute"))],
-  [/nothing in this plan loads it heavily/,                   (m, all) => !all.some(e => e.difficultyLevel >= 3 && touches(e, "lower-back"))],
-  [/no heavy hinging in this plan/        ,       (m, all) => !all.some(e => isHinge(e) && e.difficultyLevel >= 3)],
+  // W4-9. The one sore-area sentence (data/conditions.js soreLine). Each
+  // move it names as left out must be absent from the plan; "nothing is
+  // left out" must be true of the library for that area.
+  [/[A-Z][^.;]*? (?:is|are) left out today/,      (m, all, line) => {
+    const named = (line.match(/([A-Z][^.;]*?) (?:is|are) left out today/) || [])[1] || "";
+    const names = named.split(/, | and /).map(s => s.trim()).filter(Boolean);
+    return names.length > 0 && names.every(n => EXERCISES.some(e => e.name === n) && !all.some(e => e.name === n));
+  }],
+  [/Nothing is left out for it today/,            (m, all, line) => {
+    const area = (line.match(/your ([a-z ]+?) is (?:a little sore|quite sore) today\. Nothing is left out/) || [])[1];
+    return !!area && !EXERCISES.some(e => (e.contraindications || []).includes(`${area.replace(/ /g, "-")}-subacute`));
+  }],
 ];
 function untrue(line, exercises) {
   const main = exercises.filter(e => (e.section || "main") === "main");
-  return CLAIMS.filter(([rx, f]) => rx.test(line) && !f(main, exercises)).map(([rx]) => String(rx));
+  return CLAIMS.filter(([rx, f]) => rx.test(line) && !f(main, exercises, line)).map(([rx]) => String(rx));
 }
 
 const KIT = ["dumbbells-light", "dumbbells-medium", "band-light", "kettlebell-medium", "bench-flat", "barbell", "pull-up-bar"];
@@ -129,7 +145,7 @@ console.log("\nTEST 2 - what the coach says it left out, it left out");
       const u = untrue(s.coachLine, s.exercises);
       if (u.length) bad.push(`${Object.keys(cond)[0]} ${Object.values(cond)[0]} ${t}: ${u[0]} — ${s.exercises.filter(e => touches(e, "shoulder") || touches(e, "knee")).map(e => e.name).slice(0, 3).join(", ")}`);
     }
-  ok("2pc. the sore-area notes were reached", n >= 60 && seen.size >= 3, `${n} plans, ${seen.size} notes seen`);
+  ok("2pc. the sore-area notes were reached (both kinds of sentence)", n >= 60 && seen.size >= 2, `${n} plans, ${seen.size} notes seen`);
   ok("2a. no note claims a change the plan does not bear out", bad.length === 0, `${bad.length}: ` + bad.slice(0, 4).join("; "));
 }
 

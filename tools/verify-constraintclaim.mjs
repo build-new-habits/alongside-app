@@ -1,6 +1,18 @@
 /**
  * tools/verify-constraintclaim.mjs
- * 30 Sep 2026 v2
+ * 02 Oct 2026 v3
+ *
+ * v3 - W4-9 SORE-WORDS. The coach's own narrative (_buildConditionNarrative)
+ *   is gone: one sentence about a sore area now comes from the builder
+ *   (data/conditions.js soreLine), on every door. Tests 1 and 2 follow it
+ *   there, through real builds, and keep their bar: it names the area with
+ *   no score, hands the judgement back, never says "worked around", and
+ *   claims only what was done (the moves it names as left out carry the
+ *   area's tag and are not in the plan). 2b asserted "I haven't changed
+ *   anything" at the mild band; that was the untrue line (moves are left
+ *   out from "A little", known decision 1), so 2b now asserts it is gone.
+ *   On a Bad day there is no session at all, and the gentle plan says so in
+ *   the person's word.
  *
  * v2 - W3-4 SORE-SCOPE. 1b required the score beside the name: "(6/10)"
  *   is a number nobody gave (the check-in chips are words) and brings back
@@ -60,6 +72,15 @@ const _GATE_ROOT = new URL("../", import.meta.url);
 const _gatePath = (p) => new URL(String(p).replace(/^\.\//, ""), _GATE_ROOT);
 
 const C             = await import(B + "data/conditions.js");
+const { store }     = await import(B + "store.js");
+const SB            = await import(B + "session-builder.js");
+function lineAt(score) {
+  localStorage.clear(); store.init();
+  store.set("conditions", ["lower-back"]); store.set("conditionPainScores", { "lower-back": score });
+  store.set("equipment", []); store.set("homeEquipment", []);
+  const s = SB.buildSession({ sessionType: "full", durationMins: 30 });
+  return { s, line: s?.coachLine || "", note: s?.conditionNote || "" };
+}
 
 const cp = fs.readFileSync(_gatePath("js/views/coach-proposal.js"), "utf8");
 const code = cp.split("\n").filter(l => !/^\s*(\*|\/\/|\/\*)/.test(l)).join("\n");
@@ -101,39 +122,34 @@ ok("0e. while at 7 it is not", tier7 !== "safe",
 // ── 1. THE CLAIM MATCHES THE ACTION ─────────────────────────────────────
 console.log("\nTEST 1 - the moderate band no longer claims an adaptation");
 
-const narrative = code.slice(code.indexOf("function _buildConditionNarrative"));
-const moderateBlock = narrative.slice(narrative.indexOf("if (moderateIds.length > 0)"),
-                                      narrative.indexOf("if (mildIds.length > 0)"));
+const at6b = lineAt(6), at4b = lineAt(4);
+const left6 = EXERCISES.filter(e => (e.contraindications || []).includes("lower-back-subacute"));
+const planIds = new Set((at6b.s?.exercises || []).map(e => e.id));
 
-ok("1a. the moderate sentence does not say 'worked around'",
-   !/worked around/i.test(moderateBlock),
-   "at 6 nothing is worked around - subacute applies care, not exclusion, and " +
-   "the exercise card says so on the very next screen");
+ok("1a. the sentence does not say 'worked around'", !/worked around/i.test(at6b.line), at6b.line);
 
-ok("1b. it still names the condition, with no score out of ten",
-   /_joinNames\(parts\)/.test(moderateBlock) && /getConditionName/.test(moderateBlock) && !/\/10/.test(moderateBlock),
+ok("1b. it still names the area, with no score out of ten",
+   /lower back/i.test(at6b.note) && /quite sore/i.test(at6b.note) && !/\d+\s*\/\s*10|\bout of ten\b/i.test(at6b.line),
    "going silent at 6 is worse than overclaiming: the person told the coach " +
-   "about it, and silence reads as not having been heard");
+   "about it, and silence reads as not having been heard. " + at6b.note);
 
 ok("1c. and it hands the judgement back rather than asserting an outcome",
-   /how it feels|ease off/i.test(moderateBlock),
-   moderateBlock.replace(/\s+/g, " ").slice(0, 160));
+   /skip anything/i.test(at6b.note), at6b.note);
 
-// ── 2. THE OTHER TWO BANDS ARE UNCHANGED ────────────────────────────────
-// A fix that quietly softened the severe sentence too would be a
-// clinical loosening, and is not a wording decision.
-console.log("\nTEST 2 - severe and mild were not touched");
+ok("1d. what it says it left out carries the area's tag and is not in the plan",
+   left6.length > 0 && left6.every(e => !planIds.has(e.id)) && left6.every(e => at6b.note.includes(e.name)),
+   `${left6.map(e => e.name).join(", ")} | ${at6b.note}`);
 
-const severeBlock = narrative.slice(narrative.indexOf("if (severeIds.length > 0)"),
-                                    narrative.indexOf("if (moderateIds.length > 0)"));
-ok("2a. severe still says it kept clear", /kept things well clear/.test(severeBlock),
-   "the severe wording changed. At 7+ the acute tier genuinely excludes, so " +
-   "that claim is earned - softening it would be a clinical loosening");
+// ── 2. THE OTHER BANDS ──────────────────────────────────────────────────
+console.log("\nTEST 2 - A little says the same true thing; Bad builds no session");
+ok("2a. Bad: no session, the gentle plan, in the person's word (earned: nothing is trained)",
+   (() => { const b = lineAt(8); return b.s?.gentleCare === true && /lower back is bad today/i.test(b.line); })());
+ok("2b. A little: never \"I haven't changed anything\" while moves are left out",
+   !/haven.t changed anything/i.test(at4b.line) && /a little sore/i.test(at4b.note) && left6.every(e => at4b.note.includes(e.name)),
+   at4b.note);
+ok("2c. coach-proposal.js keeps no sentence of its own about a sore area", !/function _buildConditionNarrative/.test(code));
 
-const mildBlock = narrative.slice(narrative.indexOf("if (mildIds.length > 0)"));
-ok("2b. mild still says nothing was changed",
-   /haven\\?'t changed anything/.test(mildBlock),
-   "mild's honesty was the model for this fix; it must not drift");
+const moderateBlock = at6b.line;
 
 // ── 3. THE TWO SCREENS AGREE ────────────────────────────────────────────
 console.log("\nTEST 3 - the proposal and the exercise card no longer contradict");

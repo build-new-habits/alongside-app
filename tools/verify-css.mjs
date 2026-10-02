@@ -1,5 +1,10 @@
 /**
  * tools/verify-css.mjs
+ * 02 Oct 2026 v6
+ *
+ * v6 - W4-8. mini-pain-slider left with the update check-in's 0 to 10 slider
+ *   (now the check-in's three words).
+ *
  * 29 Sep 2026 v5
  *
  * v5 - P0. Two hooks left with the screens that rendered them
@@ -89,7 +94,7 @@ const HOOKS = { "in-step-view": SCOPE,
   "programme-select-view": SCOPE, "saved-sessions-view": SCOPE, "sb-view": SCOPE,
   "rf-view--stop": SCOPE, "reflect-view": SCOPE,
   "bs-duration-btn": HOOK, "bs-type-card": HOOK,
-  "is-movement-card": HOOK, "is-option-btn": HOOK, "mini-pain-slider": HOOK,
+  "is-movement-card": HOOK, "is-option-btn": HOOK,
   "ms-timer-btn": HOOK, "quiet-back-btn": HOOK, "sb-buildmode-btn": HOOK,
   "sb-duration-btn": HOOK, "sb-type-tile": HOOK,
   "today-header": WRAP, "progress-body": WRAP, "activity-log-form": WRAP,

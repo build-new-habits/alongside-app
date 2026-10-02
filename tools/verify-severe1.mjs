@@ -1,5 +1,14 @@
 /**
  * tools/verify-severe1.mjs
+ * 02 Oct 2026 v3
+ *
+ * v3 - W4-7 SEVERE-DAY-TRUE. The gentle card says why in the person's own
+ *   words ("Your knee is bad today"), as the W4-7 row decided; it no longer
+ *   says "the pain is high today, so I'm not going to build you a session"
+ *   (they may just have chosen it). The ban on naming the area (16 Aug,
+ *   recorded with no reason, alongside diagnosis words) is replaced by bans
+ *   on an injury claim and on arguing with the choice.
+ *
  * 21 Aug 2026 v2
  * GATE-PATH. Path resolution only -- no assertion changed.
  *
@@ -114,11 +123,15 @@ check('and the zone function agrees',
 seed(['knee'], { knee: 9 });
 const card = SB.buildSession({ sessionType:'full', durationMins:30 });
 const line = card.coachLine;
-check('the coach explains why', /pain is high today/.test(line));
+// W4-7. Why, in the person's own words: the area and "bad".
+check('the coach explains why, in the person\'s words', /knee is bad today/.test(line));
 check('and says nothing is required', /None of it is required/.test(line));
 for (const [re, what] of [
   [/\byou (have|might have)\b/i,   'a diagnosis'],
-  [/\bknee\b|\binjur/i,            'the condition name'],
+  // W4-7: the area is the person's own word and is said (as the coach's
+  // choice line on the same screen already said it); an injury is not.
+  [/\binjur/i,                    'an injury claim'],
+  [/pain is high|not going to build/i, 'a line that argues with the choice they just made'],
   [/\bshould\b|\bmust\b/i,         'an instruction'],
   [/\brest day\b/i,                'a verdict on their day'],
   [/see (a|your) (doctor|physio|gp)/i, 'a referral the red-flag screen has not been built to make'],

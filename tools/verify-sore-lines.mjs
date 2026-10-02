@@ -1,5 +1,13 @@
 /**
  * tools/verify-sore-lines.mjs
+ * 02 Oct 2026 v2
+ *
+ * v2 - W4-9 SORE-WORDS. Follows the one sore-area sentence: 3c finds the
+ *   skip in the sentence after the area's ("…today. Nothing is left out for
+ *   it today, so skip anything that hurts it."); 4 asserts the acute line
+ *   says what it left out and, new (4b), that no acute-ruled-out move is in
+ *   any of those plans.
+ *
  * 30 Sep 2026 v1
  *
  * W3-9 SORE-LINES (persona Wave 3: 2.1, 2.11, 2.13, 2.15, 2.16).
@@ -38,6 +46,7 @@ dom.window.matchMedia = q => ({ matches: false, media: q, addEventListener() {},
 const B = new URL("../js/", import.meta.url).href;
 const { store } = await import(B + "store.js");
 const SB = await import(B + "session-builder.js");
+const { EXERCISES: SB_EX } = await import(B + "data/exercises/index.js");
 
 let fails = 0, passes = 0;
 const ok = (name, cond, detail = "") => {
@@ -78,13 +87,19 @@ ok("1. below the acute band, no plan line claims an action", claimed.length === 
 ok("2. the sore area is named on every build", silent.length === 0, silent.slice(0, 3).join(" | "));
 ok("3a. Free is never told to swap", freeSwap.length === 0, [...new Set(freeSwap)].slice(0, 3).join(" | "));
 ok("3b. the Plan's line says skip too (one line, both tiers)", planNoSwap.length === 0, [...new Set(planNoSwap)].slice(0, 3).join(" | "));
-const freeSkip = builds("free", "shoulder", 4).some(l => sentenceAbout(l, "shoulder").some(x => /\bskip\b/i.test(x)));
+// W4-9: the area is named in one sentence and the skip is in the next.
+const freeSkip = builds("free", "shoulder", 4).some(l => /your shoulder is [^.]*today\.[^.]*\bskip\b/i.test(l));
 ok("3c. Free's line, when the plan does load the area, says skip", freeSkip);
 
 console.log("\nTEST 4 - control: the acute band still says what it removed");
 const acute = builds("free", "lower-back", 7);
-ok("4. at 7 the lower back line says it removed spinal flexion loading",
-   acute.some(l => /removed everything that loads the spine/.test(l)), acute[0]?.slice(0, 120));
+const acutePlans = (() => { localStorage.clear(); store.init(); store.set("conditions", ["lower-back"]); store.set("conditionPainScores", { "lower-back": 7 });
+  const out = []; for (const t of SB.SESSION_TYPES) for (let i = 0; i < 4; i++) { try { out.push(SB.buildSession({ sessionType: t.id, durationMins: 30 })); } catch {} } return out; })();
+// W4-9: said as the one sentence: what is left out, and the acute moves
+// really are out of every plan.
+const acuteIds = SB_EX.filter(e => (e.contraindications || []).includes("lower-back-acute")).map(e => e.id);
+ok("4. at 7 the lower back line says what it left out", acute.length > 0 && acute.every(l => /lower back[^.]*today\.[^.]*left out today/i.test(l)), acute[0]?.slice(0, 200));
+ok("4b. and no acute-ruled-out move is in any of those plans", acutePlans.every(s => !(s.exercises || []).some(e => acuteIds.includes(e.id))));
 
 console.log("");
 if (fails) { console.log(`SORE-LINES: ${fails} FAILED, ${passes} passed`); process.exit(1); }

@@ -1,5 +1,11 @@
 /**
  * tools/verify-timetable.mjs
+ * 02 Oct 2026 v4
+ *
+ * v4 - W4-9. 4c follows the held class's new reason ("which I'm leaving out
+ *   for you at the moment"; it said "you've told me to steer clear"). Same
+ *   bar: each says what is in it, and why.
+ *
  * 29 Sep 2026 v3
  *
  * v3 - P22. Test 4's fixture wrote store "painScores", a field that does
@@ -236,7 +242,7 @@ ok("4b. the withheld ones are NAMED, not hidden",
 
 ok("4c. and each says what is in it",
    [...main.querySelectorAll(".class-list__why")]
-     .every(p => /in it, and you/i.test(p.textContent)),
+     .every(p => /in it, which I.m\s+leaving out/i.test(p.textContent)),
    "withheld without a reason is the app deciding silently");
 
 // 🔴 No duplicate movement names. Steady Round uses a glute bridge in
