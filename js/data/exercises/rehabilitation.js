@@ -1,6 +1,9 @@
 /**
  * data/exercises/rehabilitation.js
- * 30 Sep 2026 v12
+ * 02 Oct 2026 v13
+ *
+ * v13 - W4-4. Step-Down — Eccentric stands on one leg on a step:
+ *   balanceDemand true. verify-s1-legs v2.
  *
  * v12 - S1-LEGS (found building the S1 clinical pack). Six entries that stand on one leg (Terminal Knee Extension, Knee Stability, Hip Flexor Strengthening and others): balanceDemand true.
  *   verify-s1-legs.
@@ -1952,7 +1955,7 @@ export const REHABILITATION = [
     id: 'step-down-eccentric',
     position: 'standing',
     impact: false,
-    balanceDemand: false,
+    balanceDemand: true,
     name: 'Step-Down — Eccentric',
     youtube: 'step-down - eccentric exercise technique',
     category: 'rehabilitation',

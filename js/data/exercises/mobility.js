@@ -1,6 +1,11 @@
 /**
  * data/exercises/mobility.js
- * 30 Sep 2026 v8
+ * 02 Oct 2026 v9
+ *
+ * v9 - W4-4 LEG-SWING (Wave 4 trace, 2.11). Leg Swing — Forward and Back
+ *   and Leg Swing — Lateral stand on one foot to swing the other, with one
+ *   hand on a wall: balanceDemand true (the S1-LEGS rule, as Hip CARs).
+ *   verify-s1-legs v2.
  *
  * v8 - W3-6 HELD-STANCES. heldStance: true on held bent-knee or wide
  *   stances; the builder counts them as loading the legs. verify-held-stances.
@@ -238,7 +243,7 @@ export const MOBILITY = [
     id: 'leg-swing-forward',
     position: 'standing',
     impact: false,
-    balanceDemand: false,
+    balanceDemand: true,
     name: 'Leg Swing — Forward and Back',
     youtube: 'leg swing - forward and back stretch technique',
     category: 'mobility',
@@ -274,7 +279,7 @@ export const MOBILITY = [
     id: 'leg-swing-lateral',
     position: 'standing',
     impact: false,
-    balanceDemand: false,
+    balanceDemand: true,
     name: 'Leg Swing — Lateral',
     youtube: 'leg swing - lateral stretch technique',
     category: 'mobility',

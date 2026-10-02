@@ -1,6 +1,16 @@
 /**
  * tools/verify-s1-legs.mjs
- * 30 Sep 2026 v1
+ * 02 Oct 2026 v2
+ *
+ * v2 - W4-4 LEG-SWING (Wave 4 trace, 2.11). The one-leg wording net missed
+ *   "Shift weight onto your right foot" (both leg swings: 25 times in 40
+ *   builds for somebody who worries about balance) and "Stand on a step
+ *   ... on your right leg" (Eccentric Step-Down). It now also catches
+ *   weight onto one foot and standing on one named leg. One hand on a wall
+ *   is still a one-leg stance (as Hip CARs); both hands on a chair is
+ *   support (the 30 Sep exemption, kept). New exemption: Lateral Quad
+ *   Stretch, whose feet are crossed and both stay down. The three moves
+ *   join the named list the careful person must never get.
  *
  * S1-LEGS (found building the S1 clinical pack, 29 Sep). 400 real builds
  * as somebody who answers "Not easily" to the chair question (balance
@@ -59,11 +69,12 @@ const byId = Object.fromEntries(EXERCISES.map(e => [e.id, e]));
 
 // ── 1. WORDS AND TAGS ───────────────────────────────────────────────────
 console.log("\nTEST 1 - one leg -> balance; running -> impact; knee on the floor -> floor");
-const ONE_LEG = /\b(stand|standing|balance) on (one|your (left|right)|a single) (leg|foot)\b|\bsingle[- ]leg\b/i;
+const ONE_LEG = /\b(stand|standing|balance) on (one|your (left|right)|a single) (leg|foot)\b|\bsingle[- ]leg\b|\bweight onto (one|your (left|right)) foot\b|\bstand on [^.\/]{0,30}\bon your (left|right) leg\b/i;
 const ONE_LEG_OK = {
   "pilates-sequence-beginner": "Single Leg Stretch -- a Pilates move lying on the back",
   "pilates-sequence-core": "Single Leg Stretch -- a Pilates move lying on the back",
   "chair-supported-hip-abduction": "both hands resting on the back of a sturdy chair: support is the point (pack section 4)",
+  "lateral-quad-stretch": "feet crossed, both stay on the floor: weight shifts, no one-leg stance (W4-4)",
 };
 const RUNNING = /\b(run|runs|running|jog|jogging)\b/i;
 const RUNNING_OK = {
@@ -116,7 +127,9 @@ function sweep(runs) {
 // somebody who cannot get to the floor. For somebody who can, whether a
 // kneeling lunge suits limited legs is the physio's question (pack s.4).
 const NAMED = ["isometric-wall-sit", "drill-figure-8-run", "hip-cars",
-               "hip-circles-standing", "standing-quad-stretch", "standing-hip-abduction"];
+               "hip-circles-standing", "standing-quad-stretch", "standing-hip-abduction",
+               // W4-4
+               "leg-swing-forward", "leg-swing-lateral", "step-down-eccentric"];
 const WALL_SQUAT = EXERCISES.find(e => e.name === "Wall Squat Hold — Isometric")?.id;
 ok("3pc. every named move exists", NAMED.every(id => byId[id]) && !!WALL_SQUAT, NAMED.filter(id => !byId[id]).join(", "));
 const named = [...NAMED, WALL_SQUAT];
