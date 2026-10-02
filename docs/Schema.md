@@ -1,5 +1,19 @@
 # Alongside — Data Schema Reference
-## 02 Oct 2026 v1.100
+## 02 Oct 2026 v1.101
+
+> **v1.101, 02 Oct 2026 — W4-13 and W4-19** (`store.js` v105). New
+> **`consent.health.declinedAt`** (ISO|null, default `null`): set when the
+> health consent is declined in getting started (only the Privacy-and-Terms
+> tick). With it, `given` is `false`, nothing health-related is asked in
+> getting started, and `capabilityProfile()` returns the careful profile
+> while `capability.askedAt` is null. Kept when the consent is given later,
+> so What your body can do is asked before the next session
+> (`capabilityToAsk`). **`consent.health.version`** is now read:
+> `healthConsentNeeded()` is true when it differs from
+> `HEALTH_CONSENT_VERSION` (now `2026-10-02`, the shorter tick), so a
+> change of wording asks again. **`consent.policyVersion`** decides which
+> changes the policy screen lists (`POLICY_HISTORY` in
+> `data/consent-version.js`).
 
 > **v1.100, 02 Oct 2026 — W4-12 EVIDENCE-TRUE** (`store.js` v104, unchanged).
 > No store field changes. One localStorage key **outside the store**:
@@ -909,7 +923,7 @@
 
 ## 06 Sep 2026 v1.51
 
-**File:** `js/store.js` (confirmed live version: **v104, 02 Oct 2026**)
+**File:** `js/store.js` (confirmed live version: **v105, 02 Oct 2026**)
 
 > **v1.47, 06 Sep 2026 — CR-1.** `conditions[]` gains three ids and loses one. `chronic-fatigue` is **retired**; `persistent-fatigue`, `me-cfs` and `long-covid` replace it. No field shape changed — `conditions` is still `string[]` and `conditionMeta` is still keyed by condition id.
 >

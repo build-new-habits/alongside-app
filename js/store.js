@@ -3,7 +3,13 @@ import { RETIRED_CONDITIONS } from "./data/scope-statement.js";
 
 /**
  * store.js - Data persistence layer
- * 02 Oct 2026 v104
+ * 02 Oct 2026 v105
+ *
+ * v105 - W4-19 ONBOARDING-FIRST (Schema v1.101). consent.health.declinedAt:
+ *   when the health consent was declined in getting started (Not now on the
+ *   second tick). capabilityProfile() plans carefully while the body
+ *   questions are unanswered after a decline, as after Delete my health
+ *   answers (clearedAt).
  *
  * v104 - W4-8 PAIN-NUMBERS (Schema v1.99). The painChange field of activityLog is no
  *   longer written (the finish screen's Better / About the same / Worse
@@ -1937,7 +1943,7 @@ export const store = {
         // PT-2, 01 Oct 2026. Explicit consent for health answers, apart
         // from the Privacy-and-Terms tick. given: true | false (withdrawn)
         // | null (never asked: an install from before this existed).
-        health: { given: null, at: null, version: null, withdrawnAt: null }
+        health: { given: null, at: null, version: null, withdrawnAt: null, declinedAt: null }
       },
 
       // ── ONBOARDING THREAD AND BEATS (nested object — v6 + v7) ─
@@ -3851,7 +3857,9 @@ export const store = {
     // every answer were the careful one. The unasked profile below restricts
     // nothing (each filter needs `asked`), which is right for nobody who
     // was asked and then deleted the answers.
-    if (!asked && c.clearedAt) {
+    // W4-19: the health consent declined in getting started -- the body
+    // questions were never asked, so plan carefully in the same way.
+    if (!asked && (c.clearedAt || this.data.consent?.health?.declinedAt)) {
       return { impactSafe: false, floorSafe: false, balanceSafe: false, ceilingCap: 2,
                needsSeated: true, legsUsable: true, legsLoadable: false,
                asked: true, careful: true };
