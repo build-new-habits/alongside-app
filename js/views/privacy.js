@@ -1,5 +1,10 @@
 /**
  * privacy.js - Privacy and Terms (in-app summary)
+ * 02 Oct 2026 v8
+ *
+ * v8 - W5-13. Where answers are kept says noServerCopy(): with sending on it
+ *   says research answers you choose to send go to a server.
+ *
  * 02 Oct 2026 v7
  *
  * v7 - W4-17. Somebody under 18 gets their own summary: only that they said
@@ -54,7 +59,7 @@
  */
 
 import { scopeStatementHTML } from "../data/scope-statement.js";
-import { researchPrivacyLine } from "../data/evidence.js";
+import { researchPrivacyLine, noServerCopy } from "../data/evidence.js";
 import { declaredUnder18 } from "../data/age-check.js";
 
 export const centered = false;
@@ -123,8 +128,7 @@ export function render() {
       <div class="privacy-section card">
         <h2 class="privacy-heading">Where your answers are kept</h2>
         <p class="text-secondary">
-          On this phone, in the app&rsquo;s own storage. There is no account and no
-          copy on a server. If you delete the app or clear its data, it is gone.
+          On this phone, in the app&rsquo;s own storage. ${noServerCopy()} If you delete the app or clear its data, it is gone.
         </p>
         <p class="text-secondary" style="margin-top: var(--space-3);">
           If something in the app breaks, a short error report goes to Sentry, the

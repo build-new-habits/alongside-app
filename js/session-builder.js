@@ -1,6 +1,12 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
+ * 02 Oct 2026 v83
+ *
+ * v83 - W5-14. soreLevelFor() marks a move for every area it works
+ *   (worksArea), not only its first two; the sore-area line tells left-out
+ *   moves apart from the plan's.
+ *
  * 02 Oct 2026 v82
  *
  * v82 - W5-12 LENGTH-TRUE-2. The coach line and the subtitle state the
@@ -1191,7 +1197,7 @@ import { store } from "./store.js";
 import { resolveEquipment, exerciseIsAvailable } from "./data/equipment-map.js";
 import { EXERCISES, isSessionLength, isCardioMachine } from "./data/exercises/index.js";
 import { matchCategory } from "./data/session-categories.js";
-import { buildRationale, tooHardRecently } from "./data/session-rationale.js";
+import { buildRationale, tooHardRecently, worksArea } from "./data/session-rationale.js";
 import { isSquatOrLunge } from "./data/chair-legs.js";
 import { getZoneStatus, getPainBand, getCondition, getActiveConditionIds, isSore, isAcute, isBad, soreLine, areaWords, bodyAreasOf } from "./data/conditions.js";
 import { focusOrderedCategories } from "./data/week-focus.js";
@@ -1682,7 +1688,9 @@ export function soreScoresToday() {
  * sheet red and teach people to ignore the ring.
  */
 export function soreLevelFor(ex, scores = {}) {
-  const areas = (ex?.affectsAreas || []).slice(0, PRIMARY_DEPTH).filter(a => scores[a] !== undefined);
+  // W5-14. Every area the move works (worksArea), not its first two: Bench
+  // Press lists the shoulder third and was not marked for a sore shoulder.
+  const areas = Object.keys(scores || {}).filter(id => worksArea(ex, id));
   if (!areas.length) return { level: "none", areas: [] };
   const worst = Math.max(...areas.map(a => Number(scores[a])));
   return { level: worst >= SORE_BLOCK_FLOOR ? "blocked" : "marked", areas };
@@ -2273,7 +2281,7 @@ function buildConditionNote(sessionType, exercises = []) {
     const names = [...new Set(EXERCISES
       .filter(e => (e.contraindications || []).includes(tag) && !inPlan.has(e.id))
       .map(e => e.name))];
-    return soreLine(id, painScores[id], names);
+    return soreLine(id, painScores[id], names, { planNames: (exercises || []).map(e => e && e.name).filter(Boolean) });
   }).join(" ") || null;
 }
 

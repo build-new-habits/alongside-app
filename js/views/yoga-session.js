@@ -1,5 +1,12 @@
 /**
  * yoga-session.js
+ * 02 Oct 2026 v18
+ *
+ * v18 - W5-14. A pose that works a sore area says so in the person's word
+ *   ("You said your hamstring is a little sore today"), not "You flagged
+ *   hamstring today"; nothing is pre-picked from a sore area
+ *   (stretch-target.js).
+ *
  * 02 Oct 2026 v17
  *
  * v17 - W5-12. Length cards say only what they build (About N min, N poses):
@@ -239,7 +246,7 @@
  */
 
 import { store } from "../store.js";
-import { getActiveConditionIds } from "../data/conditions.js";
+import { getActiveConditionIds, soreWord } from "../data/conditions.js";
 // STRETCH-WHY, 16 Sep 2026. Both imported rather than reimplemented:
 // soreAreaLoaded() owns the >= 4 threshold and the area aliases, and
 // STRANDS is the same source today.js reads for "What it's made of".
@@ -916,7 +923,9 @@ export function _poseWhy(pose) {
   try {
     const hit = soreAreaLoaded(pose);
     if (hit) {
-      return `You flagged ${_areaWords(hit)} today. This one works it — go by how it feels.`;
+      // W5-14. The person's own word, as every door says it.
+      const _w = (soreWord((store.get("conditionPainScores") || {})[hit]) || "A little").toLowerCase();
+      return `You said your ${_areaWords(hit)} is ${_w === "a little" ? "a little sore" : _w} today. This one works it, so go by how it feels.`;
     }
   } catch { /* no check-in today */ }
 

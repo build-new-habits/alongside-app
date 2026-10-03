@@ -1,5 +1,12 @@
 /**
  * js/data/evidence.js
+ * 02 Oct 2026 v3
+ *
+ * v3 - W5-13 RESEARCH-TRUE-2. noServerCopy(): the server words every screen
+ *   uses, qualified while sending is on; Share my figures waits for eight
+ *   weeks; gentle-care is breathing, stretch is mobility, the general
+ *   routine none; research messages are never dated before install.
+ *
  * 02 Oct 2026 v2
  *
  * v2 - W4-12 EVIDENCE-TRUE. Rates divide by the weeks that have passed (at
@@ -70,7 +77,12 @@ const SHAPED = new Set(["workout", "coach-session"]);
 export function kindOf(e) {
   if (!e) return null;
   if (SHAPED.has(e.type) && e.sessionType) {
-    if (e.sessionType === "mobility") return "mobility";
+    // W5-13. The Bad day's gentle plan is breathing, a few quiet minutes and
+    // a walk; a stretch session is mobility; the one gentle routine after a
+    // second no to the health consent has no one kind. None is strength.
+    if (e.sessionType === "gentle-care") return "breathing";
+    if (e.sessionType === "general-routine") return null;
+    if (e.sessionType === "mobility" || e.sessionType === "stretch") return "mobility";
     if (e.sessionType === "cardio") return null;
     return "strength";
   }
@@ -189,17 +201,32 @@ export function researchMessages() {
   const log = _done();
   const first = log.length ? Math.min(...log.map(_when)) : null;
   const since = first == null ? 0 : (Date.now() - first) / DAY;
+  // W5-13. Never dated before this phone had the app.
+  const installed = String(store.get("createdAt") || "").slice(0, 10);
+  const pub = installed > "2026-10-01" ? installed : "2026-10-01";
   if (!ev.surveyDone && !wasAnswered("survey") && log.length >= 3 && since >= 7) out.push({
-    id: "survey-2026", kind: "research", action: "survey", publishedAt: "2026-10-01", audience: { tier: "any" },
+    id: "survey-2026", kind: "research", action: "survey", publishedAt: pub, audience: { tier: "any" },
     title: "A quick question, if you have a moment",
     body: "Two questions about how you move now. It’s up to you, and nothing is sent unless you press Send.",
   });
-  if (!ev.figuresDone && !wasAnswered("figures") && since >= 28) out.push({
-    id: "share-figures-2026", kind: "research", action: "share-figures", publishedAt: "2026-10-01", audience: { tier: "any", minSessions: 4 },
+  // W5-13. Eight weeks, so the first four weeks and the latest four are
+  // never the same days (at 28 days they were: "3" then "2.5").
+  if (!ev.figuresDone && !wasAnswered("figures") && since >= 56) out.push({
+    id: "share-figures-2026", kind: "research", action: "share-figures", publishedAt: pub, audience: { tier: "any", minSessions: 4 },
     title: "Share a few figures?",
     body: "A few counts of your sessions, worked out on this phone, to help us say truthfully what Alongside does. You see exactly what would be sent first.",
   });
   return out;
+}
+
+/**
+ * W5-13. Where answers are kept, said the same on every screen: with
+ * sending on, "no copy on a server" sat beside the Frankfurt line.
+ */
+export function noServerCopy() {
+  return enabled()
+    ? "There is no account, and nothing you tell the app is copied to a server, apart from research answers you choose to send (below)."
+    : "There is no account and no copy on a server.";
 }
 
 /**

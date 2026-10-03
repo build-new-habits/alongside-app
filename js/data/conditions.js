@@ -1,6 +1,12 @@
 /**
  * conditions.js — Condition definitions for onboarding and check-in
  *
+ * 02 Oct 2026 v1.11
+ *
+ * v1.11 - W5-14. soreLine() takes the plan's names: a move left out that
+ *   shares a word with one in the plan is told apart ("Supine Spinal Twist
+ *   is a different move, in your plan").
+ *
  * 02 Oct 2026 v1.10
  *
  * v1.10 - W4-10 TIREDNESS-PROMISE. EVERYDAY_STATES moved here from
@@ -334,7 +340,7 @@ export function areaWords(id) {
  * the person's own word, and what that changed, named.
  * leftOutNames: the moves left out for it today (from the library), or [].
  */
-export function soreLine(id, score, leftOutNames = []) {
+export function soreLine(id, score, leftOutNames = [], { planNames = [] } = {}) {
   const word = (soreWord(score) || 'A little').toLowerCase();
   const sore = word === 'a little' ? 'a little sore' : word;
   const area = areaWords(id);
@@ -344,7 +350,12 @@ export function soreLine(id, score, leftOutNames = []) {
     : n
       ? `${_joinList(leftOutNames)} ${n === 1 ? 'is' : 'are'} left out today; skip anything else that hurts it.`
       : `Nothing is left out for it today, so skip anything that hurts it.`;
-  return `You said your ${area} is ${sore} today. ${left}`;
+  // W5-14. A move left out that could be taken for one in the plan
+  // ("Spine Twist is left out" above "Supine Spinal Twist") is told apart.
+  const _words = n => String(n).toLowerCase().split(/[^a-z]+/).filter(w => w.length >= 4);
+  const alike = n <= 3 ? planNames.filter(p => leftOutNames.some(l => _words(l).some(w => _words(p).includes(w)))) : [];
+  const apart = alike.length ? ` ${_joinList(alike)} ${alike.length === 1 ? 'is a different move' : 'are different moves'}, in your plan.` : '';
+  return `You said your ${area} is ${sore} today. ${left}${apart}`;
 }
 function _joinList(a) { return a.length < 2 ? (a[0] || '') : `${a.slice(0, -1).join(', ')} and ${a[a.length - 1]}`; }
 

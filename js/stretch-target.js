@@ -1,5 +1,10 @@
 /**
  * js/stretch-target.js
+ * 02 Oct 2026 v2
+ *
+ * v2 - W5-14 SORE-DOORS-2. impliedTarget() gives no target from a sore area
+ *   (it read as treatment); the person picks the target.
+ *
  * 16 Sep 2026 v1
  *
  * STRETCH-VIA-COACH. What a stretch session is FOR, in one place.
@@ -82,16 +87,10 @@ export const TARGET_AREAS = [
  * between visits and a stale preselection is worse than none.
  */
 export function impliedTarget() {
-  const conditions = store.get("conditions") || [];
-  const scores     = store.get("conditionPainScores") || {};
-  const sore       = conditions.filter(id => (scores[id] || 0) >= 4);
-  if (!sore.length) return null;
-
-  for (const id of sore) {
-    const areas = AREA_ALIASES[id] || [id];
-    const hit = TARGET_AREAS.find(t => t.areas.some(a => areas.includes(a)));
-    if (hit) return hit.id;
-  }
+  // W5-14 SORE-DOORS-2. No target from a sore area: "Ordered around back
+  // and hips, from your check-in" and Yoga pre-picking Back and hips read
+  // as treating the area, which Alongside does not do. The person picks;
+  // with nothing they chose today, nothing is preselected.
   return null;
 }
 

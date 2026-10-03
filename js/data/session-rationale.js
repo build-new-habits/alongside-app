@@ -1,5 +1,12 @@
 /**
  * data/session-rationale.js
+ * 02 Oct 2026 v8
+ *
+ * v8 - W5-14. worksArea(): a move works a listed area if any of its areas
+ *   match (through the aliases) or the library rules it out for that area;
+ *   soreAreaLoaded() uses it, so Pistol Squat no longer "does not work" a
+ *   sore knee.
+ *
  * 02 Oct 2026 v7
  *
  * v7 - W4-9 SORE-WORDS. Both sore-area readers ask the classifier (isSore,
@@ -89,7 +96,7 @@
  */
 
 import { store } from "../store.js";
-import { isSore } from "./conditions.js";
+import { isSore, getCondition } from "./conditions.js";
 import { buildReads } from "./personal-reads.js";
 
 // ── Goal language ────────────────────────────────────────────────────────
@@ -552,8 +559,29 @@ export function soreAreaLoaded(exercise) {
   const conditions = store.get("conditions") || [];
   const scores     = store.get("conditionPainScores") || {};
   const sore       = conditions.filter(id => isSore(scores[id]));
-  const areas      = exercise?.affectsAreas || [];
-  return sore.find(id => (AREA_ALIASES[id] || [id]).some(a => areas.includes(a))) || null;
+  return sore.find(id => worksArea(exercise, id)) || null;
+}
+
+/**
+ * W5-14. Does this move work this listed area? Its own areas (every one,
+ * through the aliases), or the library ruling it out for that area when
+ * sore (a contraindication): 133 of 142 moves ruled out for a sore knee do
+ * not list the knee, so Pistol Squat said "This one does not work that
+ * area".
+ */
+export function worksArea(exercise, id) {
+  if (!exercise || !id) return false;
+  const areas = exercise.affectsAreas || [];
+  const contra = exercise.contraindications || [];
+  if ((AREA_ALIASES[id] || [id]).some(a => areas.includes(a))) return true;
+  // A joint of the arms or legs (knee, ankle, shoulder, wrist...) is loaded
+  // by moves whose areas list only the muscles: the library's own rule for
+  // it stands in. Not the spine: Dead Bug is kept out of an acute back's
+  // plans but works the trunk, and saying it works the back would claim
+  // more than is known (Graeme's case, CORE-1).
+  const zone = (getCondition(String(id).replace(/-(acute|subacute)$/, "")) || {}).zone;
+  if (zone !== "lower-limb" && zone !== "upper-limb") return false;
+  return contra.includes(`${id}-acute`) || contra.includes(`${id}-subacute`);
 }
 
 /**
@@ -677,7 +705,7 @@ function _soreLine(label, exercise) {
     `Your ${label} felt sore today, and this one works it. ` +
     `Go by how it feels rather than by how it went last time — easing off here is the useful thing to do, not a compromise.`,
 
-    `This one works your ${label}, which you flagged this morning. ` +
+    `This one works your ${label}, which you named as sore today. ` +
     `Let how it feels today set the level — backing off is the useful thing to do here, not a compromise.`,
 
     `Another one that loads your ${label}. ` +

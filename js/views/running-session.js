@@ -1,6 +1,13 @@
 /**
  * running-session.js - Guided Running Session
  *
+ * 02 Oct 2026 v12
+ *
+ * v12 - W5-14 SORE-DOORS-2. Sore areas said in the person's word (soreLine),
+ *   on the overview and during the run, with no instructions about the area;
+ *   a Bad day asks the one Bad-day choice (views/bad-day-door.js) before any
+ *   run.
+ *
  * 02 Oct 2026 v11
  *
  * v11 - W5-12. The overview says how many prompts the run will give and
@@ -112,7 +119,8 @@ import { isGateDue, renderSafetyGate, attachSafetyGate } from "../safety-gate.js
 import { renderLogBlock, attachLogEvents } from "../session-log.js";
 import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
 import { checkpointSession, getResumableSession, clearCheckpoint, computeElapsedSeconds } from "../session-resume.js";
-import { getConditionName, isSore, isAcute } from "../data/conditions.js";
+import { getConditionName, isSore, isAcute, isBad, soreLine, bodyAreasOf } from "../data/conditions.js";
+import { badDayIds, renderBadDayDoor, wireBadDayDoor } from "./bad-day-door.js";
 import { safetyLineFor } from "../data/purpose.js";
 
 export const centered = false;
@@ -303,40 +311,26 @@ function renderSevereToday(ids) {
     </div>`;
 }
 
+// W5-14 SORE-DOORS-2. One sentence per sore area, below Bad, in the
+// person's own word (soreLine), as every other door says it. It said
+// "Your hamstring needs attention", "Your lower back is flagging. Engage
+// your core lightly..." -- instructions about an area the app cannot see.
 function buildConditionNote() {
-  const conditions = store.get("conditions")          || [];
+  const conditions = bodyAreasOf(store.get("conditions") || []);
   const painScores = store.get("conditionPainScores") || {};
-
-  const notes = [];
-  conditions.forEach(id => {
-    const pain = painScores[id] || 0;
-    if (!isSore(pain)) return;
-    if (id.includes("knee")) {
-      notes.push(isAcute(pain)
-        ? "Your knee is flagging high pain. Today we avoid any interval efforts and keep pace fully conversational."
-        : "Your knee has some discomfort. Avoid downhill sections and keep pace easy throughout.");
-    }
-    if (id.includes("achilles") || id.includes("shin")) {
-      notes.push("With your lower leg, land with a midfoot strike rather than heel-striking. Shorten your stride slightly.");
-    }
-    if (id.includes("hamstring")) {
-      notes.push("Your hamstring needs attention. No interval efforts today. Keep the pace easy and stop if you feel any pull.");
-    }
-    if (id.includes("plantar")) {
-      notes.push("With your foot sore, take an extra two minutes of walking before you run.");
-    }
-    if (id.includes("lower-back")) {
-      notes.push("Your lower back is flagging. Engage your core lightly throughout and avoid leaning forward.");
-    }
-  });
-
-  return notes.length > 0 ? notes.join(" ") : null;
+  const lines = conditions
+    .filter(id => isSore(painScores[id]) && !isBad(painScores[id]))
+    .map(id => soreLine(id, painScores[id], []).replace(/ Nothing is left out for it today, so skip anything that hurts it\.$/, " Ease off or walk if it hurts."));
+  return lines.length ? lines.join(" ") : null;
 }
 
 // ── Render ────────────────────────────────────────────────────────────────────
 
 export function render() {
-  if (phase === "type" && severeToday().length) return renderSevereToday(severeToday());
+
+  // W5-14. The Bad-day choice in the one wording (views/bad-day-door.js),
+  // before anything that leads to a run.
+  if (["type", "duration", "overview"].includes(phase) && badDayIds().length) return renderBadDayDoor("Before you run");
   if (phase === "type")     return renderTypeSelector();
   if (phase === "resume")   return renderResumePrompt();
   if (phase === "duration") return renderDurationSelector();
@@ -454,7 +448,7 @@ function renderRunOverview() {
         <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
         <p class="coach-message-text">${rt?.coachOpening || "Your run is ready."}</p>
         <p class="text-sm text-muted" style="margin-top: var(--space-2);">
-          2-minute warm-up walk to start. ${prompts.length ? `I will prompt you ${prompts.length === 1 ? "once" : `${prompts.length} times`} during the run.` : "No prompts on a run this short: just the walk in and out."}
+          ${buildConditionNote() ? `${buildConditionNote()} ` : ""}2-minute warm-up walk to start. ${prompts.length ? `I will prompt you ${prompts.length === 1 ? "once" : `${prompts.length} times`} during the run.` : "No prompts on a run this short: just the walk in and out."}
           Cooldown walk in the final 3 minutes.
         </p>
       </div>
@@ -1063,6 +1057,11 @@ function rerender() {
 // ── Mount ─────────────────────────────────────────────────────────────────────
 
 export function onMount() {
+  // W5-14. The Bad-day choice (views/bad-day-door.js).
+  if (["type", "duration", "overview"].includes(phase) && badDayIds().length) {
+    wireBadDayDoor(document.getElementById("main-content") || document, resetSession);
+    return;
+  }
   // SAFETY-GATE. Bound before the session controls; with the gate up
   // there is no overview, timer or log block for them to find.
   if (phase === "overview" && isGateDue()) {

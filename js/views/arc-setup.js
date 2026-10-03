@@ -1,5 +1,11 @@
 /**
  * js/views/arc-setup.js
+ * 02 Oct 2026 v3
+ *
+ * v3 - W5-15. Aims are offered with the listed areas (aims about the back
+ *   lead only with a back listed); the strand step says only body strands
+ *   lean sessions, the others light from practice.
+ *
  * 28 Sep 2026 v2
  *
  * v2 - F7 LANDMARK. role="main" (and its label) removed from the view's
@@ -47,6 +53,7 @@
 
 import { store } from "../store.js";
 import { AIMS, STRANDS, aimById, strandsForAim, situationsFor, aimsFor } from "../data/aims.js";
+import { bodyAreasOf } from "../data/conditions.js";
 
 const esc = s => String(s == null ? "" : s)
   .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
@@ -95,7 +102,7 @@ export function ArcSetupView(router) {
     // opens the whole vocabulary, and it is present on every render.
     // Deciding what somebody is allowed to want is the judgement this
     // audience already gets everywhere else.
-    const shown = showAll ? AIMS.list : aimsFor(situationsFor(store), 8);
+    const shown = showAll ? AIMS.list : aimsFor(situationsFor(store), 8, bodyAreasOf(store.get("conditions") || []));
 
     return `
       <h1 class="as-question" tabindex="-1">What do you want to be able to do?</h1>
@@ -130,7 +137,7 @@ export function ArcSetupView(router) {
     return `
       <h1 class="as-question" tabindex="-1">What feeds it?</h1>
       <p class="as-help">
-        Pick up to ${AIMS.maxStrands}. These are what I'll lean your sessions towards.
+        Pick up to ${AIMS.maxStrands}. The body ones are what I'll lean your sessions towards; the others light up on Progress when you do a breathing or mindful practice.
       </p>
       <div class="as-options" role="group" aria-label="Choose up to ${AIMS.maxStrands}">
         ${cands.map(s => {

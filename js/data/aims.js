@@ -1,5 +1,11 @@
 /**
  * js/data/aims.js
+ * 02 Oct 2026 v5
+ *
+ * v5 - W5-15 ARC-TRUE. Aims about the back (needsArea) lead only when a back
+ *   area is listed; aimsFor() takes the listed areas and puts the others
+ *   last, never removing them.
+ *
  * 02 Oct 2026 v4
  *
  * v4 - W4-10 TIREDNESS-PROMISE. situationsFor marks managing (and sport) for
@@ -200,6 +206,8 @@ export const AIMS = {
       // offered this because she has a condition. It is for people who
       // play something, or want to again.
       situations: ["returning", "sport", "training"],
+      // W5-15. About a body part: leads only when that area is listed.
+      needsArea: ["lower-back", "upper-back", "sciatica"],
       strands: ["back-resilience", "trusting-body", "trunk-strength", "leg-strength", "sport-specific"],
     },
     {
@@ -264,6 +272,7 @@ export const AIMS = {
       id: "carry-shopping",
       label: "Carry the shopping without my back going",
       situations: ["managing", "everyday", "later-life"],
+      needsArea: ["lower-back", "upper-back", "sciatica"],   // W5-15
       strands: ["hip-hinge", "trunk-strength", "back-resilience", "not-overdoing", "leg-strength"],
     },
     {
@@ -473,8 +482,13 @@ export function situationsFor(store) {
  * full list is one tap away and verify-aims asserts every aim stays
  * reachable.
  */
-export function aimsFor(situations, limit = 8) {
+export function aimsFor(situations, limit = 8, areas = null) {
   const set = new Set(situations && situations.length ? situations : ["everyday"]);
+  // W5-15. An aim about a body part (needsArea) goes to the back of the
+  // list unless that area is listed: somebody with stress and no back
+  // problem was offered "Get back to my sport without my back flaring up"
+  // first. Never removed: the full list keeps it.
+  const unlisted = a => Array.isArray(areas) && Array.isArray(a.needsArea) && !a.needsArea.some(x => areas.includes(x));
 
   // "everyday" DOES NOT SCORE. Counting it as a match made it worth the
   // same as "training", so a gym-four-times-a-week 25-year-old was
@@ -493,7 +507,8 @@ export function aimsFor(situations, limit = 8) {
   // rather than three options and a gap.
   const filler = scored.filter(x => x.n === 0 && (x.a.situations || []).includes("everyday"));
 
-  return [...specific, ...filler].slice(0, limit).map(x => x.a);
+  const fits = [...specific, ...filler];
+  return [...fits.filter(x => !unlisted(x.a)), ...fits.filter(x => unlisted(x.a))].slice(0, limit).map(x => x.a);
 }
 
 /** The aim record, or null. */

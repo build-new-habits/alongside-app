@@ -1,5 +1,10 @@
 /**
  * settings.js
+ * 02 Oct 2026 v64
+ *
+ * v64 - W5-13. How your data is kept says noServerCopy(), qualified while
+ *   sending is on.
+ *
  * 02 Oct 2026 v63
  *
  * v63 - W5-8. Asked what their body can do after giving the health consent
@@ -694,7 +699,7 @@ import { describeDate } from '../data/restore.js';
 import { lockText, passwordProblem, lockAvailable } from '../data/file-lock.js';
 import { restoreFromFile } from './restore-flow.js';
 import { visibleMessages, hasUnread, markAllRead, dismissMessage, updateNavDot } from '../data/messages.js';
-import { SURVEY, CANT_FIND, NOT_SENT, figuresPayload, surveyPayload, sendEvidence, researchPrivacyLine, wasAnswered } from '../data/evidence.js';
+import { SURVEY, CANT_FIND, NOT_SENT, figuresPayload, surveyPayload, sendEvidence, researchPrivacyLine, wasAnswered, noServerCopy } from '../data/evidence.js';
 import { conditionReadback, shortDate } from '../data/arc-readback.js';
 
 import {
@@ -2343,7 +2348,7 @@ export function SettingsView(router) {
 
         ${part !== "data" ? "" : `
         <div class="settings-data-about">
-          <p>Everything you tell Alongside is kept on this phone, in the app\u2019s own storage. There is no account and no copy on a server.</p>
+          <p>Everything you tell Alongside is kept on this phone, in the app\u2019s own storage. ${_esc(noServerCopy())}</p>
           <p>If something in the app breaks, a short error report goes to Sentry, the service we use to fix faults, in Frankfurt. It says what broke and on which screen, never what you told me.</p>
           ${researchPrivacyLine() ? `<p>${_esc(researchPrivacyLine())}</p>` : ''}
           <p><strong>Download your data</strong> makes a file of all of it, your journal included, on this phone; you can lock it with a password that only you know. <strong>Delete my health answers</strong> removes check-ins, sore areas, what you told me about your body and how you\u2019ve been, weight, journal and session notes. <strong>Reset all data</strong> removes everything. <strong>Restore from a file</strong> brings your history to a new device from a file you downloaded; nothing goes through us.</p>

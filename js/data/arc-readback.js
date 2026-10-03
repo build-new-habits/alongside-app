@@ -1,5 +1,11 @@
 /**
  * js/data/arc-readback.js
+ * 02 Oct 2026 v5
+ *
+ * v5 - W5-15 ARC-TRUE. Mind strands light from a breathing, mindful or quiet
+ *   practice (arc.typesWorked.practice); nothing lit them, so a mind-only
+ *   arc read "Not yet" for ever.
+ *
  * 02 Oct 2026 v4
  *
  * v4 - W4-20. sessionsByWeek(…, { since }) leaves out weeks that ended
@@ -209,6 +215,8 @@ export function strandReadback(arc = {}, now = new Date()) {
     const dates = [
       ...(s.zones || []).map(z => zones[z]),
       ...(s.sessionTypes || []).map(t => types[t]),
+      // W5-15. A mind strand lights from a breathing or mindful practice.
+      ...(s.kind === "mind" ? [types.practice] : []),
     ].filter(d => d && String(d).slice(0, 10) >= from).map(d => String(d).slice(0, 10)).sort();
     const last = dates.length ? dates[dates.length - 1] : null;
     return { id, label: s.label, last, text: last ? `Worked ${agoText(last, now)}` : "Not yet" };

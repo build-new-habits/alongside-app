@@ -1,5 +1,16 @@
 /**
  * coach-proposal.js
+ * 02 Oct 2026 v51
+ *
+ * v51 - W5-15. "Based on your arc" only when the arc has a strand that
+ *   shapes the plan; a mind-only arc does not claim it.
+ *
+ * 02 Oct 2026 v50
+ *
+ * v50 - W5-14. The Bad-day screen says "Your lower back is bad today", the
+ *   person's own word, as every other door does (it said "really
+ *   difficult").
+ *
  * 02 Oct 2026 v49
  *
  * v49 - W5-11 USUAL-LENGTH. Length and Something shorter set today's length
@@ -974,7 +985,8 @@ export function CoachProposalView(router) {
     // It also had half of CL-4 -- a pointer to someone who can look at it
     // -- and never said to stop if it got worse. On the most serious
     // screen in the app that was the half that mattered most.
-    return `I can see your ${_joinNames(names)} ${plural ? 'are' : 'is'} really difficult today. ` +
+    // W5-14. Their word for it is Bad; said as the other doors say it.
+    return `Your ${_joinNames(names)} ${plural ? 'are' : 'is'} bad today. ` +
            `I can't give you medical support \u2014 that isn't something I can do. ` +
            `What I can do is keep today gentle, or we can call it a rest day. ` +
            safetyLineFor(them);
@@ -2716,6 +2728,9 @@ export function CoachProposalView(router) {
         .map(id => (STRANDS[id] || {}).label)
         .filter(Boolean);
       if (!strandLabels.length) return '';
+      // W5-15. Only an arc that shapes the plan says so: mind strands lean
+      // nothing in a session (they light from practice on Progress).
+      if (!ids.some(id => ((STRANDS[id] || {}).zones || []).length || ((STRANDS[id] || {}).sessionTypes || []).length)) return '';
 
       // 🔴 NAMES THE ARC, NOT A STRAND. The first draft said "leaning on
       // <strandLabels[0]>", which is a claim this screen cannot check:

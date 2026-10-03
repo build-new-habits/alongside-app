@@ -1,5 +1,10 @@
 /**
  * js/views/onboarding/thread.js
+ * 02 Oct 2026 v24
+ *
+ * v24 - W5-13. The consent summary says noServerCopy(), qualified while
+ *   sending is on.
+ *
  * 02 Oct 2026 v23
  *
  * v23 - W4-20. The training-intent answer is acknowledged with what the
@@ -292,7 +297,7 @@ import { HEALTH_TICK, HEALTH_NOTE, HEALTH_WHAT, giveHealthConsent, declineHealth
 import { ageQuestionHTML, readAnswer, showAgeError, recordAge } from '../../data/age-check.js';
 import { POLICY_VERSION as CURRENT_POLICY_VERSION } from '../../data/consent-version.js';
 import { restoreFromFile } from '../restore-flow.js';
-import { researchPrivacyLine } from '../../data/evidence.js';
+import { researchPrivacyLine, noServerCopy } from '../../data/evidence.js';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MOTION PREFERENCE
@@ -461,7 +466,7 @@ export function ThreadView(router) {
         <div class="ob-consent__summary">
           <h2 class="ob-consent__subheading">What you are agreeing to</h2>
           <ul class="ob-consent__list">
-            <li>Your answers are kept on this phone. There is no account and no copy on a server. We do not sell them, and we do not share them with advertisers.</li>
+            <li>Your answers are kept on this phone. ${noServerCopy()} We do not sell them, and we do not share them with advertisers.</li>
             <li>If something in the app breaks, a short error report goes to Sentry, the service we use to fix faults. It says what broke, never what you told me.</li>
             ${researchPrivacyLine() ? `<li>${researchPrivacyLine()}</li>` : ''}
             <li>We use what you tell us to shape your sessions — that is the whole point of asking.</li>
