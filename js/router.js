@@ -1,5 +1,12 @@
 /**
  * router.js
+ * 02 Oct 2026 v44
+ *
+ * v44 - W5-16. The phone's Back leaves the app from the under-18 screen, the
+ *   age question, getting started and the policy screen when there is
+ *   nothing behind them (it pushed a new entry each time, so Back never
+ *   left).
+ *
  * 02 Oct 2026 v43
  *
  * v43 - W4-22. capture (Make it up as I go) is the Plan's: on Free the route
@@ -514,6 +521,9 @@ const NAV_MAP = {
 };
 
 // GATE-ONCE. The screens that mean a session is over.
+// W5-16. Screens where the phone's Back, with nothing behind, leaves the app.
+const BACK_LEAVES = new Set(['under-18', 'age-check', 'onboarding/thread', 'consent-update']);
+
 const GATE_SESSION_ENDS = new Set(['today', 'progress', 'noticing', 'settings', 'library']);
 
 export const router = {
@@ -878,6 +888,10 @@ export const router = {
       // adding browser entries while our own stack was oscillating, so
       // which press exited depended on how the two had drifted apart.
       if (!this.canGoBack() && this.currentView === 'today') return;
+      // W5-16. Nor on a screen with nowhere behind it that the app holds
+      // somebody on: under 18, the age question, getting started's first
+      // screen, the policy screen. Back there leaves, as on Home.
+      if (!this.canGoBack() && BACK_LEAVES.has(this.currentView)) return;
 
       const view = e.state?.view || 'today';
       history.pushState({ view }, '', `#${view}`);

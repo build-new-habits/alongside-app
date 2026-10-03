@@ -1,5 +1,12 @@
 /**
  * app.js - Application entry point
+ * 02 Oct 2026 v12
+ *
+ * v12 - W5-16. At start-up the bottom nav follows the screen the router
+ *   opened, so it stays hidden over the age question and the policy screen.
+ *   W5-5: under 18 answered and the app closed before choosing, what the
+ *   phone held is deleted at the next start-up.
+ *
  * 02 Oct 2026 v11
  *
  * v11 - W4-14 UPDATE-RELOAD (Wave 4 trace, 2.14). The page reloads for a
@@ -59,6 +66,7 @@ import { router }             from './router.js';
 import { requestExit, isGuardActive } from './session-guard.js';
 import { initPaywallListener } from './auth.js';
 import { refreshMessages, updateNavDot } from './data/messages.js';
+import { declaredUnder18, heldOnPhone, deleteForUnder18 } from './data/age-check.js';
 import './data/evidence.js';   // B5: registers the two research messages (only while sending is on)
 
 // ── Globals — set immediately, before anything else runs ──────────────────────
@@ -214,6 +222,13 @@ const App = {
     // Routing logic (W4-1, 02 Oct 2026): Home once onboarding is finished,
     // otherwise onboarding. The guards in the router send anybody who has not
     // answered the age question or agreed to the policies back to it.
+    // W5-5 (safeguarding reviewers to read). Somebody who answered under 18
+    // is offered a copy of what the phone held, on the under-18 screen, in
+    // the visit they answered. If the app is closed before they chose, it
+    // is deleted here, the next time it opens: nothing of theirs outlasts
+    // that visit.
+    if (declaredUnder18() && heldOnPhone().any) deleteForUnder18();
+
     const isOnboarded    = store.get('onboardingComplete') === true;
     const firstView      = isOnboarded ? 'today' : 'onboarding/thread';
 
@@ -223,9 +238,12 @@ const App = {
     const loading = document.getElementById('loading');
     if (loading) loading.style.display = 'none';
 
-    // Show nav bar for nav views
+    // Show nav bar for nav views. W5-16: by the screen the router opened
+    // (the age question or the policy screen in place of Home), not the one
+    // asked for: the nav showed over the age question and its tabs only
+    // redrew it.
     const nav = document.getElementById('bottom-nav');
-    if (nav && NAV_VIEWS.has(firstView)) {
+    if (nav && NAV_VIEWS.has(router.currentView)) {
       nav.classList.remove('hidden');
     }
 

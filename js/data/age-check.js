@@ -1,5 +1,13 @@
 /**
  * js/data/age-check.js
+ * 02 Oct 2026 v5
+ *
+ * v5 - W5-5 and W5-6 (safeguarding reviewers to read). recordAge(false)
+ *   records under 18 at once and no longer deletes first when the phone
+ *   holds something: the under-18 screen warns, offers a copy and deletes
+ *   (deleteForUnder18). heldOnPhone() counts anything entered (a name, a
+ *   sore area, My exercises, a saved session, a weight, lifts).
+ *
  * 02 Oct 2026 v4
  *
  * v4 - W4-17 and W4-19. The year is typed (inputmode numeric), not a list of
@@ -88,13 +96,24 @@ export const AGE_ERRORS = Object.freeze({
   old: "Check the year: it is more than 120 years ago.",
 });
 
-/** Anything on this phone from before the age question (W4-17). */
+/**
+ * Anything on this phone from before the age question (W4-17). W5-6:
+ * anything entered counts, not only sessions, check-ins and the journal (a
+ * phone holding only a name, a sore area, My exercises, a saved session or a
+ * weight was cleared with no warning).
+ */
 export function heldOnPhone() {
   const d = store.data || {};
   const sessions = store.completedSessions(d.activityLog || []).length;
   const journal = (d.journalEntries || []).length;
   const checkins = Object.keys(d.checkinHistory || {}).length;
-  return { sessions, journal, checkins, any: sessions + journal + checkins > 0 };
+  const other = !!String(d.name || "").trim() ||
+    (d.conditions || []).length > 0 ||
+    (d.prescribedExercises || []).length > 0 ||
+    (d.savedSessions || []).length > 0 ||
+    (d.weightLog || []).length > 0 || d.weight != null ||
+    Object.keys(d.liftLog || {}).length > 0;
+  return { sessions, journal, checkins, other, any: sessions + journal + checkins > 0 || other };
 }
 
 const _c = () => store.get("consent") || {};
@@ -105,7 +124,12 @@ export const declaredUnder18 = () => _c().ageConfirmed === false;
 /** An install from before the check existed: consent given, age never asked. */
 export const ageNeeded = () => _c().given === true && _c().ageConfirmed !== true && _c().ageConfirmed !== false;
 
-/** Record the result. Under 18: delete everything else on the phone first. */
+/**
+ * Record the result. W5-5: under 18 is recorded at once, on both doors,
+ * and stands: every route then shows the under-18 screen. What the phone
+ * already holds is deleted there, after a warning and the offer of a copy
+ * (deleteForUnder18); with nothing held it is cleared now.
+ */
 export function recordAge(adult) {
   const at = new Date().toISOString();
   if (adult) {
@@ -114,10 +138,19 @@ export function recordAge(adult) {
     store.set("consent.ageVersion", AGE_CHECK_VERSION);
     return;
   }
-  store.resetEverything();
+  if (!heldOnPhone().any) store.resetEverything();
   store.set("consent.ageConfirmed", false);
   store.set("consent.ageCheckedAt", at);
   store.set("consent.ageVersion", AGE_CHECK_VERSION);
+}
+
+/** W5-5. Under 18: delete everything else the phone holds, keep the answer. */
+export function deleteForUnder18() {
+  const c = store.get("consent") || {};
+  store.resetEverything();
+  store.set("consent.ageConfirmed", false);
+  store.set("consent.ageCheckedAt", c.ageCheckedAt || new Date().toISOString());
+  store.set("consent.ageVersion", c.ageVersion || AGE_CHECK_VERSION);
 }
 
 let _pending = null;
