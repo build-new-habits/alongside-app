@@ -1,5 +1,11 @@
 /**
  * tools/verify-bundle-true.mjs
+ * 03 Oct 2026 v4
+ *
+ * v4 - W5-5. 8a reads the under-18 page once nothing is held: while the
+ *   phone still holds something it shows the warning instead (true words),
+ *   so the fixture's data is deleted first, as the page offers.
+ *
  * 02 Oct 2026 v3
  *
  * v3 - W4-13: the health consent fixture uses the current version (an older
@@ -241,6 +247,7 @@ ok("7a. sendClientReports is false", /sendClientReports:\s*false/.test(init));
 console.log("\nTEST 8 - the under-18 screen says the one thing it keeps");
 const { Under18View } = await import(B + "views/under-18.js");
 main.innerHTML = ""; Under18View(router).mount(main); await wait(5);
+main.querySelector("#u18-delete")?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true })); await wait(5);
 ok("8a. it says it keeps only that the person is under 18", /remembers only that you said you are under 18/i.test(txt(main)), txt(main).slice(0, 200));
 
 // ── 9. ONBOARDING SAYS WHEN MOVEMENTS ARE LEFT OUT ───────────────────────

@@ -1,5 +1,12 @@
 /**
  * tools/verify-age-check.mjs
+ * 03 Oct 2026 v5
+ *
+ * v5 - W5-5 (safeguarding reviewers to read). Under 18 is recorded at
+ *   Continue and the warning lives on the under-18 screen: 5e0 asks it is
+ *   recorded there with nothing deleted yet; its button is now "Delete it
+ *   now" (was "Delete it and carry on").
+ *
  * 02 Oct 2026 v4
  *
  * v4 - W4-17 and W4-19. Not answered now says Choose a month and type the
@@ -166,9 +173,9 @@ await go("checkin");
 pick(main, "#age-month", CHILD.m); pick(main, "#age-year", CHILD.y);
 landed = []; click(main.querySelector("#age-continue")); await wait(20);
 // W4-17: a journal on the phone, so it says what goes and offers a copy first.
-ok("5e0. under 18 with a journal here: told first, nothing deleted yet",
-   /delete/i.test(txt(main)) && (store.get("journalEntries") || []).length === 1, txt(main).slice(0, 200));
-click([...main.querySelectorAll("button")].find(b => /Delete it and carry on/.test(txt(b)))); await wait(20);
+ok("5e0. under 18 with a journal here: recorded, told first, nothing deleted yet",
+   landed.includes("under-18") && store.get("consent.ageConfirmed") === false && /delete/i.test(txt(main)) && (store.get("journalEntries") || []).length === 1, txt(main).slice(0, 200));
+click([...main.querySelectorAll("button")].find(b => /Delete it now/.test(txt(b)))); await wait(20);
 ok("5e. under 18: the under-18 screen, and what was on the phone is deleted",
    landed.includes("under-18") && store.get("consent.ageConfirmed") === false && !store.get("name") &&
    (store.get("journalEntries") || []).length === 0, JSON.stringify(landed));

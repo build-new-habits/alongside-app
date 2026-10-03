@@ -1,5 +1,13 @@
 /**
  * tools/verify-gate-open.mjs
+ * 03 Oct 2026 v3
+ *
+ * v3 - W5-16 (Wave 5 trace, U18 and 2.14). 8d (W5-5): under 18 answered
+ *   and the app closed on the warning, the next start-up deletes what the
+ *   phone held. TEST 8: when start-up opens the
+ *   age question (an install from before it) or the policy screen, the
+ *   bottom nav stays hidden: it was shown by the screen asked for (Home),
+ *   not the one opened, and its tabs only redrew the question.
  * 02 Oct 2026 v2
  *
  * v2 - W4-13. 6pc's positive control is a person with nothing waiting (the
@@ -186,6 +194,31 @@ agreed();
 ok("7b. Settings", (await go("settings")) === "settings");
 agreed();
 ok("7c. the check-in (or the screen it is due before)", ["checkin", "red-flag"].includes(await go("checkin")));
+
+// ── 8. THE NAV AT START-UP (W5-16) ──────────────────────────────────────
+console.log("\nTEST 8 - start-up on the age question or the policy screen: no nav");
+const nav8 = document.getElementById("bottom-nav");
+agreed();
+store.set("consent.ageConfirmed", null);
+nav8.classList.add("hidden");
+const to8 = await startUp();
+ok("8a. the age question, with the bottom nav hidden", to8 === "age-check" && nav8.classList.contains("hidden"), `${to8} | ${nav8.className}`);
+agreed();
+store.set("consent.policyVersion", "2000-01-01");
+nav8.classList.add("hidden");
+const to8b = await startUp();
+ok("8b. the policy screen, with the bottom nav hidden", to8b !== "today" && nav8.classList.contains("hidden"), `${to8b} | ${nav8.className}`);
+// W5-5. Under 18 answered, the app closed on the warning: the next start-up
+// deletes what was held and opens the under-18 screen.
+agreed();
+store.set("journalEntries", [{ id: "j1", text: "a line", tags: [] }]);
+store.set("consent.ageConfirmed", false);
+const to8d = await startUp();
+ok("8d. under 18 answered and the app reopened: what was held is gone, the answer kept", to8d === "under-18" &&
+   (store.get("journalEntries") || []).length === 0 && !store.get("name") && store.get("consent.ageConfirmed") === false, `${to8d} ${store.get("name")}`);
+agreed();
+nav8.classList.add("hidden");
+ok("8c. control: Home shows the nav", (await startUp()) === "today" && !nav8.classList.contains("hidden"), nav8.className);
 
 console.log(`\nGATE-OPEN: ${passes} passed, ${fails} failed`);
 process.exit(fails ? 1 : 0);

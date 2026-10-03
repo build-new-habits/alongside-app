@@ -1,5 +1,12 @@
 /**
  * tools/verify-legal-true.mjs
+ * 03 Oct 2026 v2
+ *
+ * v2 - W5-5 (safeguarding reviewers to read). An under-18 answer is
+ *   recorded at once; what the phone holds is deleted on the under-18
+ *   screen after the warning (deleteForUnder18). 1d0 asks nothing goes
+ *   before that; 1d asks it all goes then, keeping only the answer.
+ *
  * 01 Oct 2026 v1
  *
  * LEGAL-TRUE. Things the 12g documents say, made true in the app before the
@@ -78,7 +85,9 @@ ok("1c. another site's key is untouched", localStorage.getItem("another-site") =
 fixture();
 const { recordAge } = await import(B + "data/age-check.js");
 recordAge(false);
-ok("1d. an under-18 answer clears them too, keeping only that answer",
+ok("1d0. recorded at once, and nothing deleted before the warning", store.get("consent")?.ageConfirmed === false && !!store.get("name"));
+(await import(B + "data/age-check.js")).deleteForUnder18();
+ok("1d. Delete on the under-18 screen clears them too, keeping only that answer",
    keys().filter(k => k.startsWith("alongside") && k !== "alongside_user").length === 0 &&
    !store.get("name") && store.get("consent")?.ageConfirmed === false, keys().join(","));
 
