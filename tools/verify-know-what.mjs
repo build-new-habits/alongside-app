@@ -1,5 +1,10 @@
 /**
  * tools/verify-know-what.mjs
+ * 03 Oct 2026 v5
+ *
+ * v5 - W5-11 USUAL-LENGTH. 2b: the length chosen is today's
+ *   (availableTimeToday), not the usual (availableTime is left as it was).
+ *
  * 02 Oct 2026 v4
  *
  * v4 - W4-20. 1e: the sentence says back what was asked, and when the plan's
@@ -140,7 +145,7 @@ choose(main.querySelector('input[name="part"][value="upper"]'));
 choose(main.querySelector('input[name="length"][value="20"]'));
 choose(main.querySelector('input[name="place"][value="home"]'));
 submit();
-ok("2b. upper body, 20 minutes, at home", store.get("requestedSessionType") === "upper" && store.get("availableTime") === "quick" &&
+ok("2b. upper body, 20 minutes, at home", store.get("requestedSessionType") === "upper" && store.get("availableTimeToday")?.cat === "quick" && store.get("availableTime") !== "quick" &&
    /home/i.test(txt(main.querySelector("#cp-loc"))) && store.get("requestedLocation") == null && txt(main.querySelector(".cp-plan__sentence")) === "You asked for strength, upper body, 20 minutes.",
    txt(main.querySelector(".cp-plan__sentence")));
 fixture({ time: null }); fromHome();

@@ -1,6 +1,13 @@
 /**
  * tools/verify-true-words.mjs
- * 02 Oct 2026 v1
+ * 03 Oct 2026 v2
+ *
+ * v2 - W5-12 LENGTH-TRUE-2 (Wave 5 trace: 2.1, 2.4, 2.11, 2.13, 2.15,
+ *   2.16). TESTs 13-17: on low and lighter days the plan's own lines state
+ *   the minutes built; Yoga's lengths are what it builds, with no "Full
+ *   practice" or "30 minutes ago"; Core's finish says the minutes done; a
+ *   run says how many prompts it will give and lists those; the check-in's
+ *   length line follows today's answers.
  *
  * W4-20 TRUE-WORDS-4 (Wave 4 persona trace, findings §4). Each line the
  * trace found untrue, in the state it was untrue in:
@@ -175,6 +182,97 @@ const chart = pel.querySelector('[aria-label="Sessions, week by week"]');
 ok("12c. Progress, nine days in: no more than two weeks drawn, said as since you started",
    !!chart && chart.querySelectorAll("li").length <= 2 && /since you started/.test(txt(pel.querySelector("#pr-sessions-cap"))),
    `${chart?.querySelectorAll("li").length} weeks; ${txt(pel.querySelector("#pr-sessions-cap"))}`);
+
+// ── 13. LOW AND LIGHTER DAYS (W5-12) ────────────────────────────────────
+console.log("\nTEST 13 - on a low day every stated length is the plan's own");
+const SB13 = await import(B + "session-builder.js");
+const off13 = [];
+let built13 = 0;
+for (const type of ["full", "upper", "lower", "glute", "core", "cardio", "mobility", "stretch"]) for (const mins of [30, 40]) {
+  person({ todayIntensity: "low" });
+  const s = SB13.buildSession({ sessionType: type, durationMins: mins });
+  if (!s || s.gentleCare) continue;
+  built13++;
+  const total = Math.round(s.exercises.reduce((n, e) => n + SB13.exerciseSeconds(e), 0) / 60);
+  const said = [s.coachLine, s.subtitle].join(" ");
+  const nums = [...said.matchAll(/(\d+)[- ]min(?:ute)?s?\b/g)].map(m => Number(m[1]));
+  for (const n of nums) if (Math.abs(n - total) > 5) off13.push(`${type} ${mins}: "${n} minutes" over ${total}`);
+}
+ok(`13a. every length the plan states is within five of what it built (${built13} low-day plans)`, built13 >= 12 && off13.length === 0, off13.slice(0, 6).join(" | "));
+
+// ── 14. YOGA (W5-12) ────────────────────────────────────────────────────
+console.log("\nTEST 14 - Yoga's lengths are what it builds");
+const YS14 = await import(B + "views/yoga-session.js");
+person();
+const ym = document.createElement("div"); document.body.appendChild(ym);
+const paintY = () => { document.getElementById("main-content").innerHTML = YS14.render(); try { YS14.onMount(); } catch {} };
+paintY();
+const mainY = document.getElementById("main-content");
+mainY.querySelector('[data-focus="flexibility"]')?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true })); await wait(10); paintY();
+if (!mainY.querySelector("[data-mins]") && mainY.querySelector("[data-target]")) { mainY.querySelector("[data-target]").dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true })); await wait(10); paintY(); }
+const cards14 = [...mainY.querySelectorAll("[data-mins]")].map(txt);
+ok("14pc. length cards offered", cards14.length >= 1, cards14.join(" | "));
+ok("14a. no card names a practice it is not (Short session, Full practice, Deep session)", !cards14.some(c => /Full practice|Short session|Deep session/.test(c)), cards14.join(" | "));
+ok("14b. each card says about how long it is, and how many poses", cards14.every(c => /About \d+ min/.test(c) && /\d+ poses?/.test(c)), cards14.join(" | "));
+ok("14c. the finish never says \"30 minutes ago\"", !/minutes ago/.test(code("js/views/yoga-session.js")));
+
+// ── 15. CORE'S FINISH (W5-12) ───────────────────────────────────────────
+console.log("\nTEST 15 - Core's finish says the minutes done");
+const CS15 = await import(B + "views/core-session.js");
+person();
+const paintC = () => { document.getElementById("main-content").innerHTML = CS15.render(); try { CS15.onMount(); } catch {} };
+const m15 = document.getElementById("main-content");
+const q15 = sel => m15.querySelector(sel);
+paintC();
+q15("[data-focus]")?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true })); await wait(10); paintC();
+q15('[data-mins="20"]')?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true })); await wait(10); paintC();
+q15("#cs-start-btn")?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true })); await wait(10); paintC();
+for (let i = 0; i < 60 && !/core session done/i.test(txt(m15)); i++) {
+  const b = q15("#cs-skip-btn") || q15("#cs-next-btn") || q15("#cs-done-btn") || q15("#cs-begin-btn") || q15("#cs-rest-skip-btn");
+  if (!b) break; b.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true })); await wait(5); paintC();
+}
+const done15 = txt(m15);
+ok("15pc. reached the finish", /core session done/i.test(done15), done15.slice(0, 160));
+ok("15a. it does not claim the 20 minutes chosen when a minute was done", !/20 minutes/.test(done15) && /\b1 minute\b/.test(done15), done15.slice(0, 200));
+
+// ── 16. A RUN'S PROMPTS (W5-12) ─────────────────────────────────────────
+console.log("\nTEST 16 - a run says how many prompts it gives, and lists those");
+const RS16 = await import(B + "views/running-session.js");
+person();
+const m16 = document.getElementById("main-content");
+const paintR = () => { m16.innerHTML = RS16.render(); try { RS16.onMount(); } catch {} };
+paintR();
+m16.querySelector('.ws-type-card[data-type="easy"]')?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true })); await wait(10); paintR();
+m16.querySelector('.ws-duration-card[data-mins="20"]')?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true })); await wait(10); paintR();
+const over16 = txt(m16);
+const said16 = Number((over16.match(/prompt you (\d+) times?/) || over16.match(/(\d+) prompts?/) || [])[1]);
+// An easy run prompts every 7 minutes, never in the 3-minute cooldown: 20 minutes gives 7 and 14.
+ok("16pc. the overview", /Easy|easy/.test(over16) && /20 min/.test(over16), over16.slice(0, 120));
+ok("16a. says 2, the number it will give", said16 === 2, over16.slice(0, 300));
+ok("16b. and lists no prompt it will not give", !/more prompts during your run/.test(over16) && !/Halfway|miles to go/i.test(over16), over16.slice(0, 500));
+
+// ── 17. THE CHECK-IN, AFTER TODAY'S ANSWERS (W5-12) ─────────────────────
+console.log("\nTEST 17 - the check-in's length line follows today's answers");
+dom.window.matchMedia = q => ({ matches: /prefers-reduced-motion/.test(q), media: q, addEventListener() {}, removeEventListener() {}, addListener() {}, removeListener() {} });
+const day = n => store._localDay(new Date(Date.now() - n * 86400000));
+person({ availableTime: "short", checkinHistory: { [day(2)]: { energy: 2, mood: 4 }, [day(1)]: { energy: 2, mood: 4 } }, pendingDoorRoute: "coach-proposal" });
+const host17 = document.createElement("div"); document.getElementById("app").appendChild(host17);
+const navs17 = [];
+CKV.CheckinView({ navigate: v => navs17.push(v), back() {} }).mount(host17);
+const tap17 = async re => {
+  for (let t = 0; t < 400; t++) {
+    const b = [...document.querySelectorAll("#app button, .ci-panel button")].find(x => !x.disabled && re.test(txt(x)));
+    if (b) { b.click(); await wait(30); return true; }
+    await wait(15);
+  }
+  return false;
+};
+await tap17(/^Okay$/); await tap17(/^Pretty good$/); await tap17(/^Nothing today$/);
+for (let t = 0; t < 200 && !navs17.length; t++) await wait(15);
+const thread17 = txt(host17);
+ok("17pc. the check-in finished", navs17.length > 0, JSON.stringify(navs17));
+ok("17a. a low week with today: not \"I'll plan for your usual\"", !/plan for your usual/.test(thread17) && /shorter/.test(thread17), thread17.slice(-260));
+host17.remove(); document.querySelectorAll(".ci-panel, .ci-overlay").forEach(n => n.remove());
 
 console.log(`\nTRUE-WORDS: ${passes} passed, ${fails} failed`);
 process.exit(fails ? 1 : 0);

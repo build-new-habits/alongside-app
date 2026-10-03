@@ -1,5 +1,10 @@
 /**
  * tools/verify-plan-list.mjs
+ * 03 Oct 2026 v4
+ *
+ * v4 - W5-11 USUAL-LENGTH. 7f: Shorter is today's 20 (availableTimeToday);
+ *   the usual is left as it was.
+ *
  * 30 Sep 2026 v3
  *
  * v3 - W3-21 NAV-SMALL. Swap opens a list instead of cycling. Test 5
@@ -246,7 +251,7 @@ ok("7d. a different kind rebuilds and shows the new plan, without starting",
    `${nameBefore} -> ${txt(main.querySelector(".cp-plan__title"))}, requested ${store.get("requestedSessionType")}`);
 ok("7e. and the coach says it was asked for", /you asked for/i.test(txt(main.querySelector(".cp-plan__sentence"))));
 main.querySelector('[data-different="shorter"]')?.click(); await wait(20);
-ok("7f. Shorter makes it a 20-minute plan", store.get("availableTime") === "quick" && /20 min/.test(txt(main.querySelector("#cp-time"))));
+ok("7f. Shorter makes it a 20-minute plan, for today", store.get("availableTimeToday")?.cat === "quick" && store.get("availableTime") !== "quick" && /20 min/.test(txt(main.querySelector("#cp-time"))));
 main.querySelector('[data-different="class"]')?.click(); await wait(20);
 ok("7g. A class instead goes to classes", navs.includes("classes"), JSON.stringify(navs));
 

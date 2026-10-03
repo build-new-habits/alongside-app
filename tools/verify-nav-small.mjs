@@ -1,5 +1,10 @@
 /**
  * tools/verify-nav-small.mjs
+ * 03 Oct 2026 v2
+ *
+ * v2 - W5-11 USUAL-LENGTH. 1d: 60 is today's length (availableTimeToday),
+ *   and the usual is left as it was.
+ *
  * 30 Sep 2026 v1
  *
  * W3-21 NAV-SMALL. The small routes the Wave 3 tracers tripped on
@@ -116,7 +121,7 @@ ok("1c. the current one is marked, and the control says it is open",
    main.querySelector("#cp-time")?.getAttribute("aria-expanded") === "true");
 click(main.querySelector('[data-pick-time="60"]')); await wait(10);
 ok("1d. one tap reaches 60, and the plan is rebuilt for it",
-   /60 min/.test(txt(main.querySelector("#cp-time"))) && store.get("availableTime") === "open" && !main.querySelector("[data-pick-time]"),
+   /60 min/.test(txt(main.querySelector("#cp-time"))) && store.get("availableTimeToday")?.cat === "open" && store.get("availableTime") !== "open" && !main.querySelector("[data-pick-time]"),
    txt(main.querySelector("#cp-time")));
 ok("1e. the change is said, and focus is back on Length",
    /60 minutes/.test(txt(main.querySelector("#cp-plan-status"))) && document.activeElement?.id === "cp-time");
