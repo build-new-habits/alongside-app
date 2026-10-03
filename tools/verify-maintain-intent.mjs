@@ -1,5 +1,14 @@
 /**
  * tools/verify-maintain-intent.mjs
+ * 03 Oct 2026 v2
+ *
+ * v2 - W5-23 SUITE-FLAKE (found verifying v637 from a fresh clone; also
+ *   fails about 1 run in 12 on v636). 2d compares counts from 40 random
+ *   builds, so it failed now and then on chance alone. Math.random is
+ *   seeded: a fixed seed by default, so the suite gives the same answer
+ *   every time; SEED=<n> tries another (as verify-mostly-same, W4-25). No
+ *   assertion changed.
+ *
  * 30 Sep 2026 v1
  *
  * W3-17 MAINTAIN-INTENT (persona Wave 3, 2.4: ex national-standard
@@ -45,6 +54,11 @@ globalThis.CSS = { escape: s => String(s) };
 for (const [k, v] of [["requestAnimationFrame", cb => setTimeout(() => cb(Date.now()), 0)], ["cancelAnimationFrame", id => clearTimeout(id)]]) {
   dom.window[k] = v; Object.defineProperty(globalThis, k, { value: v, configurable: true, writable: true });
 }
+
+// W5-23. Seeded before anything that builds a session is loaded.
+const SEED = Number(process.env.SEED) || 20261003;
+console.log(`seed ${SEED} (another: SEED=<n> node tools/verify-maintain-intent.mjs)`);
+Math.random = (() => { let a = SEED >>> 0; return () => { a = (a + 0x6D2B79F5) >>> 0; let x = Math.imul(a ^ (a >>> 15), 1 | a); x = (x + Math.imul(x ^ (x >>> 7), 61 | x)) ^ x; return ((x ^ (x >>> 14)) >>> 0) / 4294967296; }; })();
 
 const B = new URL("../js/", import.meta.url).href;
 const { store } = await import(B + "store.js");
