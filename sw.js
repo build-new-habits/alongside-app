@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 03 Oct 2026 v640
+ * 03 Oct 2026 v641
  *
+ * v641 - W5-13/W5-14/W5-15: research wording qualified while sending is on, figures after eight weeks, true kinds and dates; sore areas in the person's word at every door, no target taken from a sore area, marks for every area a move works; mind strands light from practice, a mind-only arc does not claim the plan, back aims need a listed back.
  * v640 - W5-11/W5-12: a length picked on the plan or in I know what I want is for today only, the usual changes in Settings; the coach line, Yoga's cards, Core's finish, a run's prompt count and the check-in's length line say the minutes built or done. NEW FILE precached: js/data/session-length.js.
  * v639 - W5-9/W5-10/W5-18: Exit without saving saves nothing and the next session starts at 1; a different session after Carry on later no longer fails; Stay in session carries a mindful practice on, with a cue at each change and the end; finish screen, mood slider, sore answers, the gap and the trend line read by the day and the session.
  * v638 - W5-5/W5-6/W5-16: under 18 is recorded at Continue and stands; what the phone holds is named, offered as a copy and deleted on the under-18 screen (or at the next start-up), from either door; no way to change the answer; Back can leave; the site named is the one the app runs on.
@@ -4187,7 +4188,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v640";
+const CACHE_NAME = "alongside-v641";
 
 const SHELL_URLS = [
 
