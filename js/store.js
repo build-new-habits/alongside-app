@@ -4,7 +4,15 @@ import { RETIRED_CONDITIONS } from "./data/scope-statement.js";
 
 /**
  * store.js - Data persistence layer
- * 03 Oct 2026 v108
+ * 03 Oct 2026 v109
+ *
+ * v109 - W5-11 USUAL-LENGTH (Schema v1.106). New availableTimeToday
+ *   ({ cat, on } or absent): a length picked for today on the coach's plan,
+ *   in I know what I want or by Something shorter, with the day it was
+ *   picked. availableTime is the usual only (Settings); a pick no longer
+ *   overwrites it. Read through data/session-length.js. Like
+ *   availableTime it is not in getDefaults() (absent means no pick);
+ *   Restore does not carry it (data/restore.js carries availableTime).
  *
  * v108 - W5-18 STALE-SCREENS (Schema v1.105, no field change). Sore answers
  *   are read by their date: get('conditionPainScores') gives nothing once

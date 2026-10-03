@@ -1,5 +1,15 @@
 # Alongside — Data Schema Reference
-## 03 Oct 2026 v1.105
+## 03 Oct 2026 v1.106
+
+> **v1.106, 03 Oct 2026 — W5-11** (`store.js` v109). New
+> **`availableTimeToday`** (`{ cat, on }` or absent; not in `getDefaults()`,
+> like `availableTime`): a length picked for today on the coach's plan, in
+> *I know what I want* or by *Something shorter*, with the local day it was
+> picked (`on`). Read only through `data/session-length.js`:
+> `lengthCatForToday()` is today's pick when `on` is today, else
+> **`availableTime`**, which is now the usual only, written by Settings ›
+> How long you usually have (a pick used to overwrite it, so one rushed
+> day became "your usual" for weeks). Not carried by Restore.
 
 > **v1.105, 03 Oct 2026 — W5-18** (`store.js` v108). No field changes.
 > **`conditionPainScores`** is read by its date: `store.get()` gives `{}`
@@ -967,7 +977,7 @@
 
 ## 06 Sep 2026 v1.51
 
-**File:** `js/store.js` (confirmed live version: **v108, 03 Oct 2026**)
+**File:** `js/store.js` (confirmed live version: **v109, 03 Oct 2026**)
 
 > **v1.47, 06 Sep 2026 — CR-1.** `conditions[]` gains three ids and loses one. `chronic-fatigue` is **retired**; `persistent-fatigue`, `me-cfs` and `long-covid` replace it. No field shape changed — `conditions` is still `string[]` and `conditionMeta` is still keyed by condition id.
 >
@@ -1801,7 +1811,9 @@ Legal consent record. Restored after the PT-W1 store audit found it absent: `wel
 
 `todayIntensity`: `string|null`, undocumented in `getDefaults()` (see Appendix A). **Corrected this session — genuinely live**, not dead. Written by `checkin.js` and `coach-proposal.js`; read by `workoutGenerator.js` (falls back to `"moderate"` if unset).
 
-`availableTime`: `string|null`, undocumented in `getDefaults()` (see Appendix A). Live. `micro|quick|short|standard|long|open`. Written by `checkin.js` and `coach-proposal.js`; drives `workoutGenerator.js`'s exercise-count and duration-cap logic (BUILD-5, 24 Jul).
+`availableTime`: `string|null`, undocumented in `getDefaults()` (see Appendix A). Live. `micro|quick|short|standard|long|open`. **The usual length (W5-11, v1.106): written by Settings only.** Today's length is `availableTimeToday` when picked today, else this (`data/session-length.js`).
+
+`availableTimeToday`: `{ cat, on }`, absent by default (W5-11, v1.106). A length picked for today; `on` is the local day. Ignored once `on` is not today.
 
 `returnVisit`: `boolean|'dismissed'`, undocumented in `getDefaults()`. **Resolved 03 Aug — live, 11 refs.** Three-state flag (`false`/`true`/`"dismissed"`) written by `intention.js` and `checkin-mini.js`, gating whether the return-visit check-in prompt shows again today.
 
