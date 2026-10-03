@@ -1,5 +1,11 @@
 /**
  * tools/verify-age-check.mjs
+ * 03 Oct 2026 v6
+ *
+ * v6 - W5-24 (Graeme, 03 Oct: drop the copy). Under 18 deletes at once:
+ *   5e0 asks it is recorded and on to the under-18 screen; 5e that
+ *   everything else is already gone (no warning, no Delete it now).
+ *
  * 03 Oct 2026 v5
  *
  * v5 - W5-5 (safeguarding reviewers to read). Under 18 is recorded at
@@ -173,9 +179,8 @@ await go("checkin");
 pick(main, "#age-month", CHILD.m); pick(main, "#age-year", CHILD.y);
 landed = []; click(main.querySelector("#age-continue")); await wait(20);
 // W4-17: a journal on the phone, so it says what goes and offers a copy first.
-ok("5e0. under 18 with a journal here: recorded, told first, nothing deleted yet",
-   landed.includes("under-18") && store.get("consent.ageConfirmed") === false && /delete/i.test(txt(main)) && (store.get("journalEntries") || []).length === 1, txt(main).slice(0, 200));
-click([...main.querySelectorAll("button")].find(b => /Delete it now/.test(txt(b)))); await wait(20);
+ok("5e0. under 18 with a journal here: recorded, and on to the under-18 screen with nothing to choose",
+   landed.includes("under-18") && store.get("consent.ageConfirmed") === false && ![...main.querySelectorAll("button")].some(b => /Delete it now|Download/.test(txt(b))), txt(main).slice(0, 200));
 ok("5e. under 18: the under-18 screen, and what was on the phone is deleted",
    landed.includes("under-18") && store.get("consent.ageConfirmed") === false && !store.get("name") &&
    (store.get("journalEntries") || []).length === 0, JSON.stringify(landed));

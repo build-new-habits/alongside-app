@@ -1,6 +1,13 @@
 /**
  * tools/verify-u18-true.mjs
- * 03 Oct 2026 v2
+ * 03 Oct 2026 v3
+ *
+ * v3 - W5-24 (Graeme, 03 Oct: "drop the copy"). Under 18 deletes what the
+ *   phone holds at once, with no warning and no Download, as the policies
+ *   say. TESTs 2, 6, 7 and 8b follow: recorded at Continue, everything else
+ *   gone straight away, the page says nothing is kept, no button to change
+ *   the answer or to keep a copy.
+ *
  *
  * v2 - W5-5, W5-6, W5-16 (Wave 5 trace, U18; safeguarding reviewers to
  *   read). Under 18 is recorded at Continue on both doors, and the warning
@@ -102,16 +109,12 @@ earlier(); downloads = 0; went = null;
 const a = oneScreen(document.createElement("div")); AgeCheckView(router).mount(a);
 a.querySelector("#age-month").value = "1"; a.querySelector("#age-year").value = String(Y - 16);
 click(a.querySelector("#age-continue")); await wait(10);
-ok("2a. recorded as under 18 at Continue, on to the under-18 screen, nothing deleted yet", store.get("consent.ageConfirmed") === false && went === "under-18" && (store.get("journalEntries") || []).length === 1, `${went} ${JSON.stringify(store.get("consent.ageConfirmed"))}`);
+ok("2a. recorded as under 18 at Continue, on to the under-18 screen", store.get("consent.ageConfirmed") === false && went === "under-18", `${went} ${JSON.stringify(store.get("consent.ageConfirmed"))}`);
+ok("2b. the journal and sessions are deleted at once (W5-24: no copy)", (store.get("journalEntries") || []).length === 0 && (store.get("activityLog") || []).length === 0 && !store.get("name"));
 const w = oneScreen(document.createElement("div")); Under18View(router).mount(w);
-ok("2b. the under-18 screen says the journal and sessions will be deleted", /journal/i.test(txt(w)) && /session/i.test(txt(w)) && /delete/i.test(txt(w)), txt(w).slice(0, 400));
-const dl = [...w.querySelectorAll("button")].find(b => /download/i.test(txt(b)));
-ok("2c. Download is offered", !!dl);
-click(dl); await wait(10);
-ok("2d. Download makes the file, and still nothing is deleted", downloads === 1 && (store.get("journalEntries") || []).length === 1, `downloads ${downloads}`);
-const go = [...w.querySelectorAll("button")].find(b => /delete/i.test(txt(b)) && !/download/i.test(txt(b)));
-click(go); await wait(10);
-ok("2e. then deleted, still recorded as under 18, and the page says nothing is kept", (store.get("journalEntries") || []).length === 0 && store.get("consent.ageConfirmed") === false && /Nothing you told the app is kept/i.test(txt(w)), txt(w).slice(0, 200));
+ok("2c. no Download and no delete button: nothing is left to keep", ![...w.querySelectorAll("button")].some(b => /download|delete/i.test(txt(b))), txt(w).slice(0, 200));
+ok("2d. no file made", downloads === 0);
+ok("2e. the page says nothing is kept", /Nothing you told the app is kept/i.test(txt(w)), txt(w).slice(0, 200));
 // control: nothing on the phone, no extra step
 localStorage.clear(); store.init(); store.set("consent.given", true); went = null;
 const a2 = oneScreen(document.createElement("div")); AgeCheckView(router).mount(a2);
@@ -159,7 +162,7 @@ ok("6b. no \"I typed the date wrong\" anywhere", !/typed the date wrong/i.test(t
 // The app closed on the warning and opened again.
 ok("6c. a reopen lands on the under-18 screen", AC.guardRoute("today") === "under-18" && AC.guardRoute("age-check") === "under-18");
 const r6 = oneScreen(document.createElement("div")); Under18View(router).mount(r6);
-ok("6d. and the warning is still there, with Download, until Delete", /delete/i.test(txt(r6)) && !!r6.querySelector("#u18-download") && (store.get("journalEntries") || []).length === 1 && !/typed the date wrong/i.test(txt(r6)), txt(r6).slice(0, 200));
+ok("6d. and nothing of theirs is still held", !AC.heldOnPhone().any && !/typed the date wrong/i.test(txt(r6)), JSON.stringify(AC.heldOnPhone()));
 
 // ── 7. GETTING STARTED WARNS TOO (W5-6) ─────────────────────────────────
 console.log("\nTEST 7 - getting started, on an earlier install that never agreed");
@@ -170,9 +173,9 @@ const o7 = oneScreen(document.createElement("div")); const navs7 = [];
 ThreadView({ navigate: v => navs7.push(v), back() {} }).mount(o7); await wait(2600);
 o7.querySelector("#ob-age-month").value = "1"; o7.querySelector("#ob-age-year").value = String(Y - 16);
 click(o7.querySelector("#ob-age-continue")); await wait(10);
-ok("7a. recorded, on to the under-18 screen, the journal not deleted yet", navs7.includes("under-18") && store.get("consent.ageConfirmed") === false && (store.get("journalEntries") || []).length === 1, JSON.stringify(navs7));
+ok("7a. recorded, on to the under-18 screen, the journal deleted at once", navs7.includes("under-18") && store.get("consent.ageConfirmed") === false && (store.get("journalEntries") || []).length === 0 && !store.get("name"), JSON.stringify(navs7));
 const u7 = oneScreen(document.createElement("div")); Under18View(router).mount(u7);
-ok("7b. the same warning, with Download", /journal/i.test(txt(u7)) && !!u7.querySelector("#u18-download"), txt(u7).slice(0, 200));
+ok("7b. the same page: nothing kept, no Download", /Nothing you told the app is kept/i.test(txt(u7)) && !u7.querySelector("#u18-download"), txt(u7).slice(0, 200));
 const alone = {
   "a name": () => store.set("name", "Kai"),
   "a sore area": () => store.set("conditions", ["knee"]),
@@ -185,8 +188,7 @@ for (const [label, put] of Object.entries(alone)) {
   ok(`7c. ${label} alone counts`, AC.heldOnPhone().any === true, JSON.stringify(AC.heldOnPhone()));
 }
 localStorage.clear(); store.init(); store.set("name", "Kai"); AC.recordAge(false);
-const u7b = oneScreen(document.createElement("div")); Under18View(router).mount(u7b);
-ok("7d. the warning says everything else goes too", /everything else you told the app/i.test(txt(u7b)), txt(u7b).slice(0, 300));
+ok("7d. a name alone goes at once too", !store.get("name") && !AC.heldOnPhone().any);
 localStorage.clear(); store.init();
 ok("7e. control: a fresh install holds nothing", AC.heldOnPhone().any === false);
 
@@ -197,7 +199,7 @@ const u8 = oneScreen(document.createElement("div")); Under18View(router).mount(u
 ok("8a. names the site the app is running on, and the home-screen way", txt(u8).includes(location.host) && !/app\.buildnewhabits\.co\.uk/.test(txt(u8)) && /home screen/i.test(txt(u8)), txt(u8).slice(0, 600));
 earlier(); AC.recordAge(false);
 const u8b = oneScreen(document.createElement("div")); Under18View(router).mount(u8b);
-ok("8b. the delete button does not say \"carry on\"", !/carry on/i.test(txt(u8b)) && !!u8b.querySelector("#u18-delete"), txt(u8b).slice(0, 300));
+ok("8b. nothing says \"carry on\"", !/carry on/i.test(txt(u8b)), txt(u8b).slice(0, 300));
 under18();
 realRouter.currentView = "under-18"; realRouter.history = [];
 realRouter._setupPopstate();

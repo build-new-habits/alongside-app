@@ -1,5 +1,10 @@
 /**
  * tools/verify-onboarding-characterisation.mjs
+ * 03 Oct 2026 v5
+ *
+ * v5 - W5-17 A11Y-W5. Re-pointed to the decision: the consent screen is not
+ *   inside a live region; the thread is a polite live region once it begins.
+ *
  * 02 Oct 2026 v4
  *
  * v4 - W4-0 SUITE-TRUE. Mounts through tools/one-screen.mjs, so one screen
@@ -156,8 +161,10 @@ section("1. The flow opens as it does today");
   ok("the consent gate follows the splash", el.querySelector(".ob-consent") !== null);
   ok("nothing is written before consent",
      store.get("consent.given") !== true && !store.get("onboarding.threadStartedAt"));
-  ok("the thread scroll area is a polite live region",
-     el.querySelector('.ob-thread__scroll[aria-live="polite"]') !== null);
+  // W5-17: the consent screen is a page, not conversation, so it is not
+  // read out whole; the thread becomes a polite live region when it begins.
+  ok("the consent screen is not inside a live region",
+     el.querySelector('.ob-thread__scroll[aria-live]') === null);
 }
 
 // ── 2. Consent — the part that must not change ──────────────────────
@@ -194,6 +201,8 @@ section("3. A full pass, answering everything offered");
   const path = await walk(el);
 
   ok("the thread accepted a sequence of answers", path.length > 3, path.join(" > "));
+  ok("the thread scroll area is a polite live region once it begins",
+     el.querySelector('.ob-thread__scroll[aria-live="polite"]') !== null);
   ok("it renders coach bubbles", el.querySelectorAll(".ob-bubble--coach").length > 2,
      String(el.querySelectorAll(".ob-bubble--coach").length));
   ok("it renders the person's replies back",
