@@ -1,5 +1,12 @@
 /**
  * tools/verify-nav-small.mjs
+ * 03 Oct 2026 v3
+ *
+ * v3 - W5-14. Sore marks read every area a move works (it was the first
+ *   two), so with the shoulder and upper back both at 8 every upper-body
+ *   alternative at the gym is held back. TEST 7 seeds the shoulder at 7
+ *   alone; 7b still asks that nothing on the list is held back.
+ *
  * 03 Oct 2026 v2
  *
  * v2 - W5-11 USUAL-LENGTH. 1d: 60 is today's length (availableTimeToday),
@@ -241,7 +248,7 @@ ok("6b. it says where to find it", /I know what I want/.test(live));
 
 // ── 7. SWAP IS A LIST ───────────────────────────────────────────────────
 console.log("\nTEST 7 - Swap shows the alternatives as a list");
-fixture({ location: "gym", scores: { shoulder: 8, "upper-back": 8 } });
+fixture({ location: "gym", scores: { shoulder: 7 } });
 await proposalSettled();
 const idx = rows().findIndex(r => r.dataset.section === "main");
 const swapBtn = () => main.querySelector(`[data-swap="${idx}"]`);

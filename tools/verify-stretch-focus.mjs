@@ -1,5 +1,11 @@
 /**
  * tools/verify-stretch-focus.mjs
+ * 03 Oct 2026 v2
+ *
+ * v2 - W5-14 SORE-DOORS-2. No target from a sore area (it read as
+ *   treatment): 2.1 asks impliedTarget() reads no sore-area signal; 2.3 that
+ *   it preselects nothing. Still never from the arc (2.2).
+ *
  * 16 Sep 2026 v1
  *
  * STRETCH-FOCUS and SAVE-IN-MOMENT.
@@ -100,10 +106,11 @@ ok("1.4 REVERSAL: choosing a target does NOT advance the phase", (() => {
 // ════════════════════════════════════════════════════════════════════
 console.log("\nTEST 2 — preselected from the check-in, and never from the arc");
 
-ok("2.1 the implied target reads the sore-area signal",
-   /export function impliedTarget/.test(target) &&
-   target.includes('store.get("conditionPainScores")') &&
-   />= 4/.test(target));
+ok("2.1 the implied target reads no sore-area signal (W5-14)", (() => {
+  const i = target.indexOf("export function impliedTarget");
+  const body = target.slice(i, target.indexOf("export function targetById", i));
+  return /export function impliedTarget/.test(target) && !body.includes('conditionPainScores');
+})());
 
 ok("2.2 🔴 REVERSAL: it does NOT fall back to the arc", (() => {
   const i = target.indexOf("export function impliedTarget");
@@ -115,7 +122,7 @@ ok("2.2 🔴 REVERSAL: it does NOT fall back to the arc", (() => {
 ok("2.3 nothing sore means nothing preselected, not a default", (() => {
   const i = target.indexOf("export function impliedTarget");
   const body = target.slice(i, target.indexOf("export function targetById", i));
-  return /if \(!sore\.length\) return null/.test(body);
+  return /return null;/.test(body);
 })());
 
 ok("2.4 an unanswered target is treated as all-over, not as a blocker",

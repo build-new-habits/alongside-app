@@ -1,6 +1,15 @@
 /**
  * tools/verify-sore-words.mjs
- * 02 Oct 2026 v1
+ * 03 Oct 2026 v2
+ *
+ * v2 - W5-14 SORE-DOORS-2 (Wave 5 trace: 2.1, 2.14, 2.15). TEST 7: Run
+ *   and Yoga say the sore area in the person's word (Run said "Your
+ *   hamstring needs attention", "Your lower back is flagging. Engage your
+ *   core lightly"; Yoga "You flagged hamstring today"); a Bad day is "bad
+ *   today", not "really difficult"; no stretch target is taken from a sore
+ *   area (it read as treatment); a move left out cannot be mistaken for one
+ *   in the plan; every move the library rules out for a sore knee is named
+ *   as working the knee; Bench Press is marked for a sore shoulder.
  *
  * W4-9 SORE-WORDS (Wave 4 persona trace: 2.1, 2.11, 2.15, 2.16).
  *
@@ -166,6 +175,45 @@ ok("5b. it says it is on a bad day", /bad/i.test(st) && /leave out/i.test(st), s
 console.log("\nTEST 6 - a held class says the app chose");
 const cl = readFileSync(new URL("../js/views/class-list.js", import.meta.url), "utf8");
 ok("6a. no \"you've told me to steer clear\"", !/told me to steer clear/.test(cl));
+
+// ── 7. EVERY DOOR, EVERY AREA (W5-14) ───────────────────────────────────
+console.log("\nTEST 7 - Run, Yoga, the Bad day, the stretch target, the marks");
+const RS7 = await import(B + "views/running-session.js");
+const paintR7 = () => { main.innerHTML = RS7.render(); try { RS7.onMount(); } catch {} };
+const runTo = async () => {
+  paintR7();
+  main.querySelector('.ws-type-card[data-type="easy"]')?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true })); await wait(10); paintR7();
+  main.querySelector('.ws-duration-card[data-mins="30"]')?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true })); await wait(10); paintR7();
+  return txt(main);
+};
+fixture(["hamstring", "lower-back"], { hamstring: 4, "lower-back": 6 });
+const run7 = await runTo();
+ok("7a. Run: the person's words for each area", /hamstring is a little sore today/i.test(run7) && /lower back is quite sore today/i.test(run7), run7.slice(0, 600));
+ok("7b. Run: no \"needs attention\", \"flagging\" or instructions for the area", !/needs attention|flagging|Engage your core|land with a midfoot/i.test(run7), run7.slice(0, 600));
+fixture(["lower-back"], { "lower-back": 8 });
+paintR7(); const runBad = txt(main);
+ok("7c. Run on a Bad day: \"bad today\", not \"really difficult\"", /lower back is bad today/i.test(runBad) && !/really difficult/i.test(runBad) && !!main.querySelector("[data-bad-day]"), runBad.slice(0, 300));
+main.innerHTML = ""; CoachProposalView(router).mount(main); await wait(30);
+ok("7d. the coach on a Bad day: the same words", /lower back is bad today/i.test(txt(main)) && !/really difficult/i.test(txt(main)), txt(main).slice(0, 300));
+const yogaCode = readFileSync(new URL("../js/views/yoga-session.js", import.meta.url), "utf8").split("\n").filter(l => !/^\s*(\*|\/\/)/.test(l)).join("\n");
+ok("7e. Yoga: no \"You flagged\"", !/You flagged/.test(yogaCode));
+const ST = await import(B + "stretch-target.js");
+fixture(["lower-back"], { "lower-back": 6 });
+ok("7f. no stretch target is taken from a sore area", ST.impliedTarget() === null, String(ST.impliedTarget()));
+const YS7 = await import(B + "views/yoga-session.js");
+main.innerHTML = YS7.render();
+ok("7g. Yoga does not pre-pick Back and hips for a sore back", !/Picked from your check-in/.test(txt(main)) && !main.querySelector('[data-target][aria-pressed="true"]'), txt(main).slice(0, 300));
+const line7 = C.soreLine("lower-back", 4, ["Spine Twist"], { planNames: ["Supine Spinal Twist", "Cat-Cow"] });
+ok("7h. a move left out cannot be mistaken for one in the plan", /Supine Spinal Twist[^.]*different/i.test(line7), line7);
+const RAT = await import(B + "data/session-rationale.js");
+fixture(["knee"], { knee: 6 });
+const kneeMoves = EXERCISES.filter(e => (e.contraindications || []).includes("knee-acute"));
+const unnamed = kneeMoves.filter(e => RAT.soreAreaLoaded(e) !== "knee").map(e => e.name);
+ok(`7i. every move ruled out for a sore knee is named as working it (${kneeMoves.length})`, kneeMoves.length > 50 && unnamed.length === 0, `${unnamed.length}: ${unnamed.slice(0, 6).join(", ")}`);
+const pistol = EXERCISES.find(e => /Pistol Squat/.test(e.name));
+ok("7j. Pistol Squat's card does not say it does not work the knee", !/does not work that area/.test(RAT.bodyCaution(pistol) || ""), RAT.bodyCaution(pistol));
+const bench = EXERCISES.find(e => e.id === "barbell-bench-press") || EXERCISES.find(e => /Bench Press/.test(e.name));
+ok("7k. Bench Press is marked for a sore shoulder (its third area)", SB.soreLevelFor(bench, { shoulder: 4 }).level === "marked", JSON.stringify(SB.soreLevelFor(bench, { shoulder: 4 })));
 
 console.log(`\nSORE-WORDS: ${passes} passed, ${fails} failed`);
 process.exit(fails ? 1 : 0);

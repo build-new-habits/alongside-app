@@ -1,6 +1,13 @@
 /**
  * tools/verify-evidence.mjs
- * 02 Oct 2026 v3
+ * 03 Oct 2026 v4
+ *
+ * v4 - W5-13 RESEARCH-TRUE-2 (Wave 5 trace: 2.1, 2.4, 2.12-2.16; before
+ *   switch-on). TEST 7: with sending on, no screen says "no copy on a
+ *   server" without saying what is sent; Share my figures waits for eight
+ *   weeks, so its first and latest four weeks are never the same days; the
+ *   Bad day's gentle plan and a stretch session are not sent as strength;
+ *   no research message is dated before the app was installed.
  *
  * v3 - W4-12 EVIDENCE-TRUE. TEST 6: rates over the weeks that have passed;
  *   Share my figures offered after four weeks of use; kinds from what each
@@ -213,7 +220,26 @@ ok("6i. Settings › How your data is kept names the survey and figures", /surve
 ok("6j. the privacy summary names them", /survey/i.test(privHtml) && /Share my figures/.test(privHtml));
 ok("6k. the consent screen names them while sending is on", /researchPrivacyLine\(\)/.test(thread));
 ok("6l. the line itself", /survey/i.test(E.researchPrivacyLine()) && /Share my figures/.test(E.researchPrivacyLine()) && /Frankfurt/.test(E.researchPrivacyLine()));
+// ── 7. W5-13 RESEARCH-TRUE-2 ────────────────────────────────────────────
+console.log("\nTEST 7 - the server words, the eight weeks, the kinds, the dates");
+const plainPriv = () => { const d = document.createElement("div"); d.innerHTML = PV.render(); return txt(d); };
+ok("7a. the privacy summary: no unqualified \"no copy on a server\" while sending is on", !/no copy on a server/i.test(plainPriv()) && /choose to send/i.test(plainPriv()), plainPriv().slice(0, 400));
+person(); main.innerHTML = ""; SettingsView({ navigate() {}, back() {} }).mount(main); await wait(10);
+click(main.querySelector('[data-open="about-data"]')); await wait(10);
+ok("7b. Settings \u203a How your data is kept: the same", !/no copy on a server/i.test(txt(main)) && /choose to send/i.test(txt(main)), txt(main).slice(0, 300));
+ok("7c. the consent screen takes its words from the one sentence", /noServerCopy\(\)/.test(thread) && !/no copy on a server/.test(thread.split("\n").filter(l => !/^\s*(\*|\/\/)/.test(l)).join("\n")));
+log(Array.from({ length: 10 }, (_, i) => ({ type: "walk", completedAt: ago(1 + i * 3) })));
+ok("7d. thirty days in: Share my figures not offered (its two four-week windows would be the same days)", !M.visibleMessages().some(m => m.action === "share-figures"));
+log(Array.from({ length: 20 }, (_, i) => ({ type: "walk", completedAt: ago(1 + i * 3) })));
+ok("7e. eight weeks in: offered", M.visibleMessages().some(m => m.action === "share-figures"));
+ok("7f. the Bad day's gentle plan is not sent as strength", E.kindOf({ type: "workout", sessionType: "gentle-care" }) !== "strength");
+ok("7g. a stretch session is mobility", E.kindOf({ type: "workout", sessionType: "stretch" }) === "mobility");
+log(Array.from({ length: 20 }, (_, i) => ({ type: "walk", completedAt: ago(1 + i * 3) })));
+store.set("createdAt", "2026-10-05T09:00:00.000Z");
+const dates = E.researchMessages().map(m => m.publishedAt);
+ok("7h. no research message dated before the app was installed", dates.length > 0 && dates.every(d => d >= "2026-10-05"), dates.join(", "));
 E.RECEIVER.url = ""; E.RECEIVER.key = "";
+ok("7i. with sending off, the summary says there is no copy on a server", /no copy on a server/i.test(plainPriv()));
 ok("6m. with sending off, the line is empty", E.researchPrivacyLine() === "");
 globalThis.fetch = realFetch;
 

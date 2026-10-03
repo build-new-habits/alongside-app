@@ -1,5 +1,10 @@
 /**
  * tools/verify-stretch-why.mjs
+ * 03 Oct 2026 v2
+ *
+ * v2 - W5-14. A pose that works a sore area says so in the person's word
+ *   ("You said your lower back is ..."), not "You flagged": 3.1 follows.
+ *
  * 16 Sep 2026 v1
  *
  * STRETCH-WHY. Why THIS pose, in THIS session, today.
@@ -111,7 +116,7 @@ ok("3.1 a sore area outranks the arc", (() => {
   store.set("conditions", ["lower-back"]);
   store.set("conditionPainScores", { "lower-back": 5 });
   store.set("arc", { strands: ["hip-range"] });
-  return /flagged/.test(_poseWhy(BACK));
+  return /You said your lower back is/.test(_poseWhy(BACK));
 })(), "what they said this morning outranks what the plan says");
 
 ok("3.2 nothing is said when there is nothing to add", (() => {

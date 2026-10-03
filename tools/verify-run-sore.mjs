@@ -1,5 +1,11 @@
 /**
  * tools/verify-run-sore.mjs
+ * 03 Oct 2026 v3
+ *
+ * v3 - W5-14 SORE-DOORS-2. The Bad-day words are the person's own and the
+ *   same at every door: "Your lower back is bad today" (was "really
+ *   difficult"). 1b follows; nothing else changed.
+ *
  * 02 Oct 2026 v2
  *
  * v2 - W4-1 GATE-OPEN. The fixture person has agreed (tools/agreed.mjs): the
@@ -88,8 +94,8 @@ fixture("free", ["lower-back"], { "lower-back": 8 });
 await go("running-session");
 ok("1pc. reached the Run door, not the red-flag screen", router.currentView === "running-session", router.currentView);
 ok("1a. no run types while it is severe", types().length === 0, types().join(","));
-ok("1b. the coach's words: really difficult, medical support, gentle or rest, stop if it gets worse",
-   /really difficult today/.test(txt(main)) && /can't give you medical support/.test(txt(main)) && /keep today gentle, or we can call it a rest day/.test(txt(main)) && /Stop if it gets worse/.test(txt(main)), txt(main).slice(0, 300));
+ok("1b. the coach's words: bad today, medical support, gentle or rest, stop if it gets worse",
+   /lower back is bad today/.test(txt(main)) && !/really difficult/.test(txt(main)) && /can't give you medical support/.test(txt(main)) && /keep today gentle, or we can call it a rest day/.test(txt(main)) && /Stop if it gets worse/.test(txt(main)), txt(main).slice(0, 300));
 ok("1c. Rest today and Something gentler, both buttons", !!btn(/^Rest today/) && !!btn(/^Something gentler/));
 click(btn(/^Something gentler/)); await wait(150);
 const choices = store.get("severePainChoices") || [];

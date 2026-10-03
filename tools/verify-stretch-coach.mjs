@@ -1,5 +1,11 @@
 /**
  * tools/verify-stretch-coach.mjs
+ * 03 Oct 2026 v3
+ *
+ * v3 - W5-14 SORE-DOORS-2. No target is taken from a sore area (it read as
+ *   treating the area): 0.1 and 2b.4 now ask for none; 0.2 sorts with a
+ *   target the person picked. The sort itself is unchanged.
+ *
  * 28 Sep 2026 v2
  *
  * v2 - SMOOTH-P2a. There are no alternate cards any more: one plan, and
@@ -61,14 +67,13 @@ store.set("conditions", ["lower-back"]);
 store.set("conditionPainScores", { "lower-back": 5 });
 const implied = impliedTarget();
 console.log("       implied from a sore lower back: " + JSON.stringify(implied));
-ok("0.1 a sore area implies a target", implied === "back-hips",
-   "every assertion below reads this returning something");
+ok("0.1 a sore area implies no target (W5-14: the person picks)", implied === null, String(implied));
 ok("0.2 and the sort moves matching poses forward", (() => {
   const list = [
     { id: "calf", affectsAreas: ["calves"] },
     { id: "cat-cow", affectsAreas: ["spine", "lower-back"] }
   ];
-  return sortByTarget(list, implied)[0].id === "cat-cow";
+  return sortByTarget(list, "back-hips")[0].id === "cat-cow";
 })());
 
 console.log("\nTEST 1 — ONE implementation, not two");
@@ -173,7 +178,7 @@ console.log("\nTEST 2b — ALIAS-ONE: there is one alias table, not two");
     return copies.length === 0;
   })());
 
-  ok("2b.4 the merged table still resolves every alias to a target", (() => {
+  ok("2b.4 no sore area, however it is aliased, sets a target (W5-14)", (() => {
     const before = {
       "lower-back": "back-hips", "sciatica": "back-hips", "achilles": "legs",
       "shin-splints": "legs", "wrist-elbow": "shoulders", "it-band": "back-hips"
@@ -181,7 +186,8 @@ console.log("\nTEST 2b — ALIAS-ONE: there is one alias table, not two");
     for (const [cond, expected] of Object.entries(before)) {
       store.set("conditions", [cond]);
       store.set("conditionPainScores", { [cond]: 5 });
-      if (impliedTarget() !== expected) return false;
+      void expected;
+      if (impliedTarget() !== null) return false;
     }
     return true;
   })(), "the merge was checked as behaviour-identical before it was made; this " +
