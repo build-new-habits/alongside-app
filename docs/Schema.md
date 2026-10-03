@@ -1,5 +1,14 @@
 # Alongside — Data Schema Reference
-## 02 Oct 2026 v1.104
+## 03 Oct 2026 v1.105
+
+> **v1.105, 03 Oct 2026 — W5-18** (`store.js` v108). No field changes.
+> **`conditionPainScores`** is read by its date: `store.get()` gives `{}`
+> once **`conditionPainScoresOn`** is not today, without a reload (it was
+> cleared only at load, so an app left open overnight kept yesterday's
+> answers). Every write through `store.set('conditionPainScores', …)` now
+> stamps `conditionPainScoresOn` with today, as
+> `updateConditionPainScores()` always did; the update check-in wrote with
+> `set()` and no date, so its answers were lost at the next load.
 
 > **v1.104, 02 Oct 2026 — W5-7 and W5-8** (`store.js` v107). New
 > **`consent.health.confirmedNoAt`** (ISO|null, default `null`): set when
@@ -958,7 +967,7 @@
 
 ## 06 Sep 2026 v1.51
 
-**File:** `js/store.js` (confirmed live version: **v107, 02 Oct 2026**)
+**File:** `js/store.js` (confirmed live version: **v108, 03 Oct 2026**)
 
 > **v1.47, 06 Sep 2026 — CR-1.** `conditions[]` gains three ids and loses one. `chronic-fatigue` is **retired**; `persistent-fatigue`, `me-cfs` and `long-covid` replace it. No field shape changed — `conditions` is still `string[]` and `conditionMeta` is still keyed by condition id.
 >

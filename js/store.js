@@ -4,7 +4,15 @@ import { RETIRED_CONDITIONS } from "./data/scope-statement.js";
 
 /**
  * store.js - Data persistence layer
- * 02 Oct 2026 v107
+ * 03 Oct 2026 v108
+ *
+ * v108 - W5-18 STALE-SCREENS (Schema v1.105, no field change). Sore answers
+ *   are read by their date: get('conditionPainScores') gives nothing once
+ *   conditionPainScoresOn is not today, with no reload needed (an app left
+ *   open overnight kept yesterday's "Quite sore"). set('conditionPainScores')
+ *   stamps today, as updateConditionPainScores() always has: the update
+ *   check-in wrote them with set() and no date, so the next load threw them
+ *   away.
  *
  * v107 - W5-7 and W5-8 (Schema v1.104). capabilityProfile() also returns
  *   chairHard: getting up from a chair answered "not easily" or "no" (true in
@@ -2802,6 +2810,10 @@ export const store = {
   get(path) {
     if (!this.data) this.init();
     if (!path) return this.data;
+    // W5-18. Read by date, not only at load.
+    if (path === 'conditionPainScores' || path.startsWith('conditionPainScores.')) {
+      if (this.data.conditionPainScoresOn !== this._localDay()) this._expireOldScores(this.data);
+    }
     const keys = path.split('.');
     let value = this.data;
     for (const key of keys) {
@@ -2828,6 +2840,8 @@ export const store = {
       obj = obj[key];
     }
     obj[keys[keys.length - 1]] = value;
+    // W5-18. Sore answers carry the day they were given, however written.
+    if (keys[0] === 'conditionPainScores') this.data.conditionPainScoresOn = this._localDay();
     this.data.updatedAt = new Date().toISOString();
     this.save();
   },
