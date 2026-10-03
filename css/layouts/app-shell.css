@@ -1,4 +1,9 @@
-/* app-shell.css - Main app container with Midnight Teal theme */
+/* app-shell.css - Main app container with Midnight Teal theme
+ * 03 Oct 2026 v2
+ *
+ * v2 - W5-17 A11Y-W5. The loading screen's floating logo and spinner stand
+ *   still under Reduce motion (the phone's setting, or the app's).
+ */
 
 /* ============================================
    APP CONTAINER
@@ -106,6 +111,12 @@
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
+
+/* W5-17: still under Reduce motion */
+@media (prefers-reduced-motion: reduce) {
+  .loading-logo, .loading-spinner { animation: none; }
+}
+.reduce-motion .loading-logo, .reduce-motion .loading-spinner { animation: none; }
 
 /* Animations */
 @keyframes float {

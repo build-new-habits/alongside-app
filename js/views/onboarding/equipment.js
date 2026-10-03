@@ -1,5 +1,11 @@
 /**
  * js/views/onboarding/equipment.js
+ * 03 Oct 2026 v5
+ *
+ * v5 - W5-17 A11Y-W5. Inside the getting-started sheet the header has no
+ *   "Step 8 of 8" dots and Back is named Back and closes the sheet (it was
+ *   "Back to lifestyle" and did nothing).
+ *
  * 29 Jun 2026 v4
  *
  * v4 (29 Jun 2026) — OB-THREAD sheet compatibility fix.
@@ -205,19 +211,13 @@ function renderFacilities() {
     <div class="onboarding-view">
 
       <div class="onboarding-header">
-        <button class="btn btn-ghost" id="equip-onboard-back"
-                aria-label="Back to lifestyle">
-          &larr; Back
+        <button class="btn btn-ghost" id="equip-onboard-back">
+          <span aria-hidden="true">&larr;</span> Back
         </button>
-        <div class="progress-dots" aria-label="Step 8 of 8">
-          <span class="dot completed" aria-hidden="true"></span>
-          <span class="dot completed" aria-hidden="true"></span>
-          <span class="dot completed" aria-hidden="true"></span>
-          <span class="dot completed" aria-hidden="true"></span>
-          <span class="dot completed" aria-hidden="true"></span>
-          <span class="dot completed" aria-hidden="true"></span>
+        ${_sheetDoneCallback ? '' : `<div class="progress-dots" aria-label="Step 8 of 8">
+          ${'<span class="dot completed" aria-hidden="true"></span>'.repeat(6)}
           <span class="dot active"    aria-hidden="true"></span>
-        </div>
+        </div>`}
       </div>
 
       <div class="onboarding-content" style="padding-bottom:var(--space-2);">
@@ -428,7 +428,8 @@ function wireFacilities() {
     // part of OB-THREAD), so this is left as the original behaviour.
     // If this ever needs sheet-specific handling, it should skip-out via
     // _sheetDoneCallback the same way the Finish button does below.
-    if (_sheetDoneCallback) return; // no-op inside a sheet for now
+    // W5-17: inside a sheet, Back closes it (it did nothing).
+    if (_sheetDoneCallback) { router.navigate("back"); return; }
     router.navigate("onboarding/lifestyle");
   });
 

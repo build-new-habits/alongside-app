@@ -1,5 +1,13 @@
 /**
  * js/data/age-check.js
+ * 03 Oct 2026 v6
+ *
+ * v6 - W5-24 (Graeme, 03 Oct: drop the copy). Under 18 deletes everything
+ *   else at once again, with no warning and no copy, as the Privacy Policy,
+ *   Safeguarding Policy, Children's Access Assessment and Terms say. Also
+ *   W5-17 A11Y-W5: showAgeError marks the field in error aria-invalid and
+ *   adds the message to its description.
+ *
  * 02 Oct 2026 v5
  *
  * v5 - W5-5 and W5-6 (safeguarding reviewers to read). recordAge(false)
@@ -126,9 +134,10 @@ export const ageNeeded = () => _c().given === true && _c().ageConfirmed !== true
 
 /**
  * Record the result. W5-5: under 18 is recorded at once, on both doors,
- * and stands: every route then shows the under-18 screen. What the phone
- * already holds is deleted there, after a warning and the offer of a copy
- * (deleteForUnder18); with nothing held it is cleared now.
+ * and stands: every route then shows the under-18 screen. W5-24 (Graeme,
+ * 03 Oct: "drop the copy"): everything else the phone holds is deleted
+ * now, with no warning and no copy, as the policies say ("deleted at
+ * once"). Nothing about their health is ever kept.
  */
 export function recordAge(adult) {
   const at = new Date().toISOString();
@@ -138,7 +147,7 @@ export function recordAge(adult) {
     store.set("consent.ageVersion", AGE_CHECK_VERSION);
     return;
   }
-  if (!heldOnPhone().any) store.resetEverything();
+  store.resetEverything();
   store.set("consent.ageConfirmed", false);
   store.set("consent.ageCheckedAt", at);
   store.set("consent.ageVersion", AGE_CHECK_VERSION);
@@ -218,5 +227,15 @@ export function showAgeError(root, idPrefix, answer) {
   const err = root.querySelector(`#${idPrefix}-error`);
   if (err) err.textContent = AGE_ERRORS[answer] || AGE_ERRORS.empty;
   const month = root.querySelector(`#${idPrefix}-month`), year = root.querySelector(`#${idPrefix}-year`);
-  (answer === "empty" && !month?.value ? month : year)?.focus();
+  const bad = answer === "empty" && !month?.value ? month : year;
+  // W5-17. The field in error says so, and names the message.
+  for (const f of [month, year]) {
+    if (!f) continue;
+    if (f === bad) {
+      f.setAttribute("aria-invalid", "true");
+      const ids = (f.getAttribute("aria-describedby") || "").split(/\s+/).filter(Boolean);
+      if (err && !ids.includes(err.id)) f.setAttribute("aria-describedby", [...ids, err.id].join(" "));
+    } else f.removeAttribute("aria-invalid");
+  }
+  bad?.focus();
 }

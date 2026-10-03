@@ -1,5 +1,10 @@
 /**
  * upgrade.js - Upgrade / Membership view
+ * 03 Oct 2026 v20
+ *
+ * v20 - W5-17 A11Y-W5. After the tap the button is named You're in, as it
+ *   reads (it kept the name I'm ready).
+ *
  * 02 Oct 2026 v19
  *
  * v19 - W4-22. After I'm ready, the Settings tab's dot is updated at once (a
@@ -465,6 +470,7 @@ export function onMount() {
 
     cta.disabled = true;
     cta.textContent = "You\u2019re in";
+    cta.removeAttribute("aria-label");   // W5-17: named by its words, not "I'm ready
 
     // Deliberately not navigating away. The doc's success state is a
     // confirmation announced via aria-live, and a screen reader that is

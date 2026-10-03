@@ -1,5 +1,12 @@
 /**
  * js/data/onboarding-thread-data.js
+ * 03 Oct 2026 v23
+ *
+ * v23 - W5-19 GS-RESUME. Step 6 offers one way to skip (no Prefer not to say
+ *   chip) and says they told us they are 18 or over. Step 5 coachNoHistory
+ *   and step 14 coachNoHealth: after a skip or without health answers, they
+ *   do not claim to know where somebody has been.
+ *
  * 02 Oct 2026 v22
  *
  * v22 - W4-20. generateIntentAck(value, profile): no carrying, gripping,
@@ -515,6 +522,8 @@ export const STEPS = {
     id: 5,
     type: 'coach-only',
     coach: "Right.\n\nNow I know a bit about where you've been. Let me ask what I need to know so I can build something that actually fits where you're going.",
+    // W5-19. After skipping what made it hard, or without health answers.
+    coachNoHistory: "Right.\n\nLet me ask a few practical things, so what I suggest fits your week.",
   },
 
   // ── Step 6 — Age ─────────────────────────────────────────────────────────
@@ -523,11 +532,13 @@ export const STEPS = {
   6: {
     id: 6,
     type: 'inline-chips-single',
-    chips: AGE_CHIPS,
+    // W5-19. One way to skip: the skip button, not also a "Prefer not to
+    // say" chip. Settings keeps the full list.
+    chips: AGE_CHIPS.filter(c => c.id !== 'prefer-not'),
     skipLabel: "I'd rather not say",
     storeField: 'ageBand',
     summaryType: 'ageBand',
-    coach: "Can I ask roughly how old you are?\n\nYou don't have to be exact — I'm not going to use it to put you in a box. It just helps me think about what your body has probably been through, and what kinds of movement are going to suit it best. Feel free to skip if you'd rather not say.",
+    coach: "You've told me you're 18 or over. Can I ask roughly how old you are?\n\nYou don't have to be exact — I'm not going to use it to put you in a box. It just helps me think about what your body has probably been through, and what kinds of movement are going to suit it best. Feel free to skip if you'd rather not say.",
     coachAfter: {
       answered: "Got it — thank you.",
       skipped:  "No problem at all.",
@@ -888,6 +899,8 @@ export const STEPS = {
     // rejection.
     coach: "Right. I think that's everything I need.\n\nI know that was a lot of questions. But I wanted to do it properly — because what you've told me is actually going to change what I put in front of you. Not just today. Every time.\n\nOne last thing, and I'd rather say it plainly. What I suggest is general. It's built from what you've told me, but I can't see you move and I don't know your history the way a person could. Before starting anything new it's worth a word with your GP or someone qualified — particularly if you're managing something, or it's been a while. I'd rather say that now than have you assume I know more about you than I do.\n\nAnd there are things I'm not the right tool for. If you're being treated for something, or living with a condition where the wrong movement on the wrong day sets you back for weeks, what you need is a plan built for you by a person. Not this. I'd rather tell you that than quietly get it wrong.\n\nI'm glad you're here, [name]. Let's see what we can do.",
     // [name] replaced by thread.js using store.get('name').
+    // W5-19. Without health answers nothing here shapes a session to them.
+    coachNoHealth: "Right. That's everything I need for now.\n\nWithout your health answers I won't shape sessions to your body, so what I suggest is general rather than shaped to you. You can change that in Settings whenever you like.\n\nOne last thing, and I'd rather say it plainly. I can't see you move and I don't know your history the way a person could. Before starting anything new it's worth a word with your GP or someone qualified — particularly if you're managing something, or it's been a while.\n\nAnd there are things I'm not the right tool for. If you're being treated for something, or living with a condition where the wrong movement on the wrong day sets you back for weeks, what you need is a plan built for you by a person. Not this. I'd rather tell you that than quietly get it wrong.\n\nI'm glad you're here, [name]. Let's see what we can do.",
   },
 };
 

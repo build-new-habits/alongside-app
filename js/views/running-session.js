@@ -1,6 +1,11 @@
 /**
  * running-session.js - Guided Running Session
  *
+ * 03 Oct 2026 v13
+ *
+ * v13 - W5-17 A11Y-W5. The run timer is no longer a live region, so a screen
+ *   reader is not read the time every second; the prompts still are.
+ *
  * 02 Oct 2026 v12
  *
  * v12 - W5-14 SORE-DOORS-2. Sore areas said in the person's word (soreLine),
@@ -529,8 +534,7 @@ function renderRunning() {
         <div class="workout-progress-fill" style="width: ${pct}%"></div>
       </div>
 
-      <div class="ws-timer-block" aria-live="polite" aria-atomic="true"
-           aria-label="${formatMMSS(remaining)} remaining">
+      <div class="ws-timer-block" role="timer">
         <div class="ws-timer-value" id="rs-timer-display">
           ${formatMMSS(remaining)}
         </div>

@@ -1,5 +1,10 @@
 /**
  * app.js - Application entry point
+ * 03 Oct 2026 v13
+ *
+ * v13 - W5-17 A11Y-W5. The update banner is role=status (it was an alert)
+ *   and Later is named Later (it was Dismiss).
+ *
  * 02 Oct 2026 v12
  *
  * v12 - W5-16. At start-up the bottom nav follows the screen the router
@@ -165,8 +170,7 @@ function showUpdateBanner() {
   const banner = document.createElement("div");
   banner.id        = "update-banner";
   banner.className = "update-banner";
-  banner.setAttribute("role", "alert");
-  banner.setAttribute("aria-live", "polite");
+  banner.setAttribute("role", "status");   // W5-17: news, not an alarm
   banner.innerHTML = `
     <div class="update-banner-content">
       <span class="update-banner-icon" aria-hidden="true">&#10024;</span>
@@ -174,7 +178,7 @@ function showUpdateBanner() {
     </div>
     <div class="update-banner-actions">
       <button class="btn btn-primary btn-small" id="update-apply-btn">Update now</button>
-      <button class="btn btn-ghost btn-small" id="update-dismiss-btn" aria-label="Dismiss">Later</button>
+      <button class="btn btn-ghost btn-small" id="update-dismiss-btn">Later</button>
     </div>
   `;
   const app  = document.getElementById("app");

@@ -1,6 +1,11 @@
 /**
  * js/views/breathing-session.js - Guided Breathing Session
  *
+ * 03 Oct 2026 v10
+ *
+ * v10 - W5-17 A11Y-W5. Time remaining is no longer a live region (it was
+ *   read every second); each phase change still is.
+ *
  * 02 Oct 2026 v9
  *
  * v9 - W4-18. The breath circle stays still under Reduce motion (it grew and
@@ -481,7 +486,7 @@ function renderSession() {
         <button class="btn btn-ghost btn-small" id="bs-exit-btn" aria-label="Exit breathing session">
           Exit
         </button>
-        <span class="text-sm text-muted" id="bs-time-remaining" aria-live="polite">
+        <span class="text-sm text-muted" id="bs-time-remaining" role="timer">
           ${formatTime(selectedMins * 60)}
         </span>
       </div>

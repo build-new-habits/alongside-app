@@ -1,5 +1,15 @@
 /**
  * js/views/onboarding/thread.js
+ * 03 Oct 2026 v25
+ *
+ * v25 - W5-19 GS-RESUME. Records the step on screen (onboarding.reachedStep)
+ *   and, opened again part-way, carries on there. A skip clears an earlier
+ *   answer (single-choice steps; what made it hard). The bridge and the
+ *   closing do not claim to know their history after a skip or without
+ *   health answers. Also W5-17 A11Y-W5: the age and consent screens are out
+ *   of the live region and focus their headings; a group of answers is named
+ *   by its question.
+ *
  * 02 Oct 2026 v24
  *
  * v24 - W5-13. The consent summary says noServerCopy(), qualified while
@@ -291,6 +301,7 @@ import {
   CHAIR_RISE_CHIPS,
   FLOOR_ACCESS_CHIPS,
   LEG_POWER_CHIPS,
+  healthAnswersAllowed,
 }                             from '../../data/onboarding-thread-data.js';
 import { openSheet }          from './sheet-manager.js';
 import { HEALTH_TICK, HEALTH_NOTE, HEALTH_WHAT, giveHealthConsent, declineHealthConsent } from '../../data/health-consent.js';
@@ -435,10 +446,15 @@ export function ThreadView(router) {
     return a !== true && a !== false;
   }
 
+  // W5-17. The first screens are pages, not conversation: out of the live
+  // region (it read them out whole), which comes back when the thread begins.
+  function _quiet() { _thread.removeAttribute('aria-live'); }
+
   function _renderAgeGate() {
+    _quiet();
     _thread.innerHTML = `
       <section class="ob-age" aria-labelledby="ob-age-heading">
-        <h1 class="ob-consent__heading" id="ob-age-heading">One question first</h1>
+        <h1 class="ob-consent__heading" id="ob-age-heading" tabindex="-1">One question first</h1>
         ${ageQuestionHTML('ob-age')}
         <button class="btn btn-primary btn-large btn-full" id="ob-age-continue">Continue</button>
       </section>`;
@@ -459,9 +475,10 @@ export function ThreadView(router) {
   }
 
   function _renderConsentGate() {
+    _quiet();
     _thread.innerHTML = `
       <section class="ob-consent" role="group" aria-labelledby="ob-consent-heading">
-        <h1 class="ob-consent__heading" id="ob-consent-heading">Before we start</h1>
+        <h1 class="ob-consent__heading" id="ob-consent-heading" tabindex="-1">Before we start</h1>
 
         <div class="ob-consent__summary">
           <h2 class="ob-consent__subheading">What you are agreeing to</h2>
@@ -606,7 +623,8 @@ export function ThreadView(router) {
       });
     });
 
-    _thread.querySelector('#ob-consent-check')?.focus();
+    // W5-17. Focus on the heading, so the summary is read before the tick.
+    _thread.querySelector('#ob-consent-heading')?.focus();
   }
 
   // The consents, recorded with the current versions. W4-19: the health
@@ -622,7 +640,16 @@ export function ThreadView(router) {
   // ── Begin thread — Step 1 ──────────────────────────────────────────────────
 
   function _beginThread() {
-    // Write threadStartedAt
+    _thread.setAttribute('aria-live', 'polite');   // W5-17
+    // W5-19. Closed part-way and opened again: carry on at the step reached
+    // (it started again at the name and asked everything twice).
+    const reached = store.get('onboarding.reachedStep');
+    if (store.get('onboarding.threadStartedAt') && reached != null &&
+        reached !== 1 && reached !== 2 && STEP_ORDER.includes(reached) && STEPS[reached]) {
+      _skippedHardBefore = !(store.get('onboarding.hardBeforeSelections') || []).length;
+      _showCoachBubble("Welcome back. Let's pick up where we left off.").then(() => _runStep(reached));
+      return;
+    }
     store.set('onboarding.threadStartedAt', new Date().toISOString());
     _runStep(1);
   }
@@ -636,11 +663,16 @@ export function ThreadView(router) {
       console.error(`ThreadView: no step config for id "${stepId}"`);
       return;
     }
+    store.set('onboarding.reachedStep', stepId);   // W5-19
 
     switch (step.type) {
 
       case 'coach-only':
-        await _showCoachBubble(step.coach);
+        // W5-19. After skipping what made it hard, or with no health
+        // answers, the bridge does not claim to know where they have been.
+        await _showCoachBubble(
+          step.coachNoHistory && (_skippedHardBefore || !healthAnswersAllowed(store.data))
+            ? step.coachNoHistory : step.coach);
         // Steps 1 and 5 have no user input — advance automatically.
         // Step 1: coach opens with name question; Step 2 shows the text input.
         // Step 5: bridge into practical questions; Step 6 follows immediately.
@@ -679,7 +711,8 @@ export function ThreadView(router) {
 
       case 'closing':
         await _showCoachBubble(
-          step.coach.replace('[name]', store.get('name') || '')
+          ((!healthAnswersAllowed(store.data) && step.coachNoHealth) || step.coach)
+            .replace('[name]', store.get('name') || '')
         );
         // v7: reading pause before the Begin button appears — same shape
         // as the checkin.js summary/action-buttons fix. Without this,
@@ -978,6 +1011,9 @@ export function ThreadView(router) {
       _markPreviousStepsPast();
       _lockChips(wrap);
       _skippedHardBefore = true;
+      // W5-19. A skip clears an answer given on an earlier pass.
+      store.set('onboarding.hardBeforeSelections', []);
+      store.set('onboarding.primaryTerritory', null);
       _showUserBubble("I'd rather not say.");
       // Jump to Step 5 (bridge), skipping 3b and 4
       await _showCoachBubble("That's completely fine. Let's move on.");
@@ -1241,11 +1277,18 @@ export function ThreadView(router) {
   // INLINE CHIPS — single select (Steps 6, 9, 10, 12)
   // ─────────────────────────────────────────────────────────────────────────
 
+  /** W5-17. A group is named by the question it answers. */
+  function _questionOf(step) {
+    const c = typeof step.coach === 'string' ? step.coach : '';
+    const q = (c.replace(/\n+/g, ' ').match(/[^.?!]*\?/) || [''])[0].trim();
+    return q || 'Choose one';
+  }
+
   function _showChipsSingle(step) {
     const wrap = document.createElement('div');
     wrap.className = 'ob-chips';
     wrap.setAttribute('role', 'radiogroup');
-    wrap.setAttribute('aria-label', `Options for step ${step.id}`);
+    wrap.setAttribute('aria-label', _questionOf(step));   // W5-17: not "Options for step 9a"
 
     const hasSkip = !!step.skipLabel;
 
@@ -1312,6 +1355,11 @@ export function ThreadView(router) {
       wrap.querySelector('[data-skip]')?.addEventListener('click', async () => {
         _markPreviousStepsPast();
         _lockChips(wrap);
+        // W5-19. A skip clears an answer given on an earlier pass, so the
+        // check-in never quotes something they then chose not to say.
+        if (step.storeField && step.storeField !== 'strategicGoal.weeklySessionTarget') {
+          store.set(step.storeField, null);
+        }
         _showUserBubble(step.skipLabel);
         if (step.coachAfter?.skipped) {
           await _showCoachBubble(step.coachAfter.skipped);

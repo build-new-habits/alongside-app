@@ -1,5 +1,11 @@
 /**
  * settings.js
+ * 03 Oct 2026 v65
+ *
+ * v65 - W5-19 GS-RESUME. Gender reads Not set when never given (it said
+ *   Prefer not to say to people never asked). Also W5-17 A11Y-W5: Messages
+ *   is a heading like the other sections, so it is found by heading.
+ *
  * 02 Oct 2026 v64
  *
  * v64 - W5-13. How your data is kept says noServerCopy(), qualified while
@@ -921,7 +927,7 @@ export function SettingsView(router) {
       ${_section('you', 'Name, age, how you move', [
         nameRow,
         _row({ label: 'Age range', value: ageLbl, open: 'profile', focus: '#settings-agebandsel' }),
-        _row({ label: 'Gender', value: _label(GENDERS, store.get('gender'), 'Prefer not to say'), open: 'profile', focus: '#settings-gender' }),
+        _row({ label: 'Gender', value: _label(GENDERS, store.get('gender'), 'Not set'), open: 'profile', focus: '#settings-gender' }),
         _row({ label: 'How you move', value: moves.length ? moves.map(m => _label(MOVEMENT_IDENTITIES, m, m === 'mixed' ? 'A mix' : m)).join(', ') : 'Not set', open: 'movement' }),
       ])}
 
@@ -971,10 +977,12 @@ export function SettingsView(router) {
       ])}
 
       <div class="settings-sec settings-sec--direct">
-        <button class="settings-sec__summary settings-row" data-section="messages" data-open="messages">
-          <span class="settings-sec__title">Messages</span>
-          <span class="settings-sec__sub">${hasUnread() ? 'New' : 'Nothing new'}</span>
-        </button>
+        <h2 style="margin:0; font:inherit;">
+          <button class="settings-sec__summary settings-row" data-section="messages" data-open="messages">
+            <span class="settings-sec__title">Messages</span>
+            <span class="settings-sec__sub">${hasUnread() ? 'New' : 'Nothing new'}</span>
+          </button>
+        </h2>
       </div>
 
       ${_section('plan', 'Goals, your week, the Plan', [
