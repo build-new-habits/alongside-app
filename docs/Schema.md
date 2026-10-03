@@ -1,5 +1,11 @@
 # Alongside — Data Schema Reference
-## 03 Oct 2026 v1.107
+## 03 Oct 2026 v1.108
+
+> **v1.108, 03 Oct 2026 — W5-19** (`store.js` v111). New
+> **`onboarding.reachedStep`** (`string|null`, default `null`): the Getting
+> started step on screen, written by `thread.js` `_runStep`. On a reload
+> with `threadStartedAt` set, the thread resumes at it rather than at the
+> name. Cleared with the rest of `onboarding` by Start again.
 
 > **v1.107, 03 Oct 2026 — W5-15** (`store.js` v110). No new field.
 > **`arc.typesWorked`** gains the key **`practice`** (a date, as every
@@ -984,7 +990,7 @@
 
 ## 06 Sep 2026 v1.51
 
-**File:** `js/store.js` (confirmed live version: **v110, 03 Oct 2026**)
+**File:** `js/store.js` (confirmed live version: **v111, 03 Oct 2026**)
 
 > **v1.47, 06 Sep 2026 — CR-1.** `conditions[]` gains three ids and loses one. `chronic-fatigue` is **retired**; `persistent-fatigue`, `me-cfs` and `long-covid` replace it. No field shape changed — `conditions` is still `string[]` and `conditionMeta` is still keyed by condition id.
 >
@@ -1658,6 +1664,7 @@ Legal consent record. Restored after the PT-W1 store audit found it absent: `wel
 | Field | Type | Default | Notes |
 |-------|------|---------|-------|
 | `threadStartedAt` | `string\|null` (ISO) | `null` | Written when `thread.js` Step 1 renders. Analytics only. |
+| `reachedStep` | `string\|null` | `null` | W5-19. The step on screen (`_runStep`); a reload resumes there. |
 | `threadCompletedAt` | `string\|null` (ISO) | `null` | Written when `thread.js` Step 14 completes. Analytics only. |
 | `hardBeforeSelections` | `string[]` | `[]` | Territory IDs selected in Step 3a. Written/read by `thread.js`, `hard-before.js`, `reflection.js`, `beat3-scripts.js`. |
 | `hardBeforeShownAt` | `string\|null` (ISO) | `null` | Step 3a timing. |

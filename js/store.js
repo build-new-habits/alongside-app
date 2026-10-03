@@ -4,6 +4,12 @@ import { RETIRED_CONDITIONS } from "./data/scope-statement.js";
 
 /**
  * store.js - Data persistence layer
+ * 03 Oct 2026 v111
+ *
+ * v111 - W5-19 GS-RESUME (Schema v1.108). New onboarding.reachedStep: the
+ *   Getting started step on screen, written as each step runs, so closing
+ *   the app part-way resumes there instead of at the name.
+ *
  * 03 Oct 2026 v110
  *
  * v110 - W5-15 ARC-TRUE (Schema v1.107). arc.typesWorked gains the key
@@ -1990,6 +1996,7 @@ export const store = {
         // ── Thread timing (v7) ───────────────────────────────
         threadStartedAt:     null,  // ISO string|null — written when thread.js Step 1 renders
         threadCompletedAt:   null,  // ISO string|null — written when thread.js Step 14 completes
+        reachedStep:         null,  // string|null — W5-19: the step on screen, so a reload resumes there
 
         // ── Hard Before territory (v6 + v7) ──────────────────
         hardBeforeSelections: [],   // string[]        — territory IDs selected in Step 3a
