@@ -1,4 +1,11 @@
 /**
+ * data/exercises/seated.js
+ * 02 Oct 2026 v2
+ *
+ * v2 - W5-7 CHAIR-LEGS. Sit to Stand: the hands help, on the arms of the
+ *   chair or the thighs, as much as needed (Graeme, 02 Oct: keep a
+ *   chair-supported Sit to Stand, hands allowed); folded arms are for later.
+ *
  * 13 Aug 2026 - SEATED-GAP. Six entries added, filling every category a
  * seated user could reach but had nothing in.
  *
@@ -1057,7 +1064,7 @@ SEATED.push(
     tempo: '3-1-3',
     instructions: [
       'Sit towards the front of a sturdy chair with both feet flat and slightly behind your knees',
-      'Fold your arms across your chest if you can, or rest your hands lightly on your thighs',
+      'Put your hands on the arms of the chair, or on your thighs, and push with them as much as you need. Standing up with your arms folded is for later, when this feels easy',
       'Lean your chest forward over your knees, then push down through your heels to stand',
       'Stand fully upright and pause',
       'Lower yourself back down over three counts rather than dropping into the seat'

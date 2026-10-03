@@ -1,5 +1,14 @@
 /**
  * js/data/health-consent.js
+ * 02 Oct 2026 v8
+ *
+ * v8 - W5-8 DECLINE-DOORS (Graeme, 02 Oct: "Second chance, then one
+ *   routine"). confirmNoHealth() and healthConfirmedNo()
+ *   (consent.health.confirmedNoAt, Schema v1.104). ROUTINE_ROUTES: without
+ *   the consent every door that builds a session asks for it; after a second
+ *   no each gives the one gentle routine (data/general-routine.js) and asks
+ *   nothing. The journal still asks.
+ *
  * 02 Oct 2026 v7
  *
  * v7 - W4-26. The covers test lives in data/health-consent-covers.js, shared
@@ -63,6 +72,7 @@
  */
 import { store } from "../store.js";
 import { consentCovers } from "./health-consent-covers.js";
+import { startGeneralRoutine } from "./general-routine.js";
 
 // 2026-10-02 (W4-19): the shorter tick. A new version asks again (W4-13).
 export const HEALTH_CONSENT_VERSION = "2026-10-02";
@@ -119,6 +129,7 @@ export function giveHealthConsent() {
   store.set("consent.health", {
     given: true, at: new Date().toISOString(), version: HEALTH_CONSENT_VERSION, withdrawnAt: null,
     declinedAt: was.declinedAt || null,
+    confirmedNoAt: was.confirmedNoAt || null,
   });
 }
 
@@ -128,6 +139,25 @@ export function declineHealthConsent() {
     given: false, at: null, version: null, withdrawnAt: null, declinedAt: new Date().toISOString(),
   });
 }
+
+/**
+ * W5-8. No a second time, on the screen that says the answers stay on this
+ * phone (Graeme, 02 Oct: "Second chance, then one routine").
+ */
+export function confirmNoHealth() {
+  const was = (store.get("consent") || {}).health || {};
+  const now = new Date().toISOString();
+  store.set("consent.health", {
+    given: false, at: null, version: null, withdrawnAt: was.withdrawnAt || null,
+    declinedAt: was.declinedAt || now, confirmedNoAt: now,
+  });
+}
+
+/** Said no twice and not given since: the one gentle routine. */
+export const healthConfirmedNo = () => {
+  const h = (store.get("consent") || {}).health || {};
+  return !!h.confirmedNoAt && h.given !== true;
+};
 
 /** Declined in getting started and not given since. */
 export const healthDeclined = () => {
@@ -155,12 +185,22 @@ let _openCapability = false;
 /** Settings reads this once: open What your body can do, and say why. */
 export function takeOpenCapability() { const v = _openCapability; _openCapability = false; return v; }
 
+// W5-8. Doors that build a session, the check-in's included. Without the
+// health consent the first asks for it, with a second chance; after a
+// second no, each gives the one gentle routine and asks nothing.
+export const ROUTINE_ROUTES = new Set([...BUILD_ROUTES, "checkin", "checkin-mini"]);
+
 /** Router guard: 'health-consent' in place of a health route, or null. */
 export function guardRoute(route) {
   if (BUILD_ROUTES.has(route) && capabilityToAsk()) {
     _pendingRoute = route;
     _openCapability = true;
     return "settings";
+  }
+  if (ROUTINE_ROUTES.has(route) && healthConsentNeeded()) {
+    if (healthConfirmedNo()) { startGeneralRoutine(); return "workout"; }
+    _pendingRoute = route;
+    return "health-consent";
   }
   if (!HEALTH_ROUTES.has(route)) return null;
   if (!healthConsentNeeded()) return null;

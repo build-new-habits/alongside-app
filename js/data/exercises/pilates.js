@@ -1,5 +1,11 @@
 /**
  * data/exercises/pilates.js
+ * 02 Oct 2026 v5
+ *
+ * v5 - W5-3 FLOOR-SITTING. Spine Stretch Forward and Spine Twist ("Sit tall
+ *   with legs extended") are floor moves, not seated: somebody who cannot
+ *   get down to the floor is no longer given them.
+ *
  * 29 Sep 2026 v4
  *
  * v4 - P0h. Descriptions say what a movement does, not what it treats:
@@ -378,7 +384,7 @@ export const PILATES = [
 
   {
     id: 'pilates-spine-stretch',
-    position: 'seated',
+    position: 'floor',   // W5-3: sat on the floor, legs out long
     impact: false,
     balanceDemand: false,
     name: 'Spine Stretch Forward',
@@ -776,7 +782,7 @@ export const PILATES = [
 
   {
     id: 'pilates-spine-twist',
-    position: 'seated',
+    position: 'floor',   // W5-3: sat on the floor, legs out long
     impact: false,
     balanceDemand: false,
     name: 'Spine Twist',

@@ -1,6 +1,12 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
+ * 02 Oct 2026 v81
+ *
+ * v81 - W5-7 CHAIR-LEGS. Getting up from a chair "not easily" or "no": no
+ *   squat or lunge passes personFilter (data/chair-legs.js), whatever the
+ *   legs answer; the chair-supported Sit to Stand stays (Graeme, 02 Oct).
+ *
  * 02 Oct 2026 v80
  *
  * v80 - W5-1 BAD-DAY-BUILDER. The gentle plan is stored when built (both
@@ -1180,6 +1186,7 @@ import { resolveEquipment, exerciseIsAvailable } from "./data/equipment-map.js";
 import { EXERCISES, isSessionLength, isCardioMachine } from "./data/exercises/index.js";
 import { matchCategory } from "./data/session-categories.js";
 import { buildRationale, tooHardRecently } from "./data/session-rationale.js";
+import { isSquatOrLunge } from "./data/chair-legs.js";
 import { getZoneStatus, getPainBand, getCondition, getActiveConditionIds, isSore, isAcute, isBad, soreLine, areaWords, bodyAreasOf } from "./data/conditions.js";
 import { focusOrderedCategories } from "./data/week-focus.js";
 // BURNOUT-LIVE, 16 Sep 2026. checkin.js imports only the store, so this
@@ -3265,6 +3272,10 @@ export function personFilter({ equipment = null } = {}) {
     // on all 518 entries.
     if (cap.asked && !cap.legsUsable && _needsLegs(ex)) return false;
     if (cap.asked && !cap.legsLoadable && _loadsLegs(ex)) return false;
+    // W5-7 CHAIR-LEGS. Graeme, 02 Oct: getting up from a chair is hard, so
+    // no squat or lunge of any kind, whatever the legs answer or the
+    // difficulty (Deep Squat Hold is difficulty 1). Sit to Stand stays.
+    if (cap.asked && cap.chairHard && isSquatOrLunge(ex)) return false;
     if (equipSet && !exerciseIsAvailable(ex, equipSet)) return false;
     return true;
   };

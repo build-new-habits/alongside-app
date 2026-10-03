@@ -1,6 +1,12 @@
 /**
  * data/classes/index.js
  *
+ * 02 Oct 2026 v6
+ *
+ * v6 - W5-7 CHAIR-LEGS. The class filter holds a class with a squat or a lunge
+ *   (Standing Up: a step-up and a wall sit) for somebody who gets up from a
+ *   chair "not easily" or "no", named under Not today as any held class is.
+ *
  * 30 Sep 2026 v5
  *
  * v5 - W3-0 (Wave 3, persona 2.11). A seated ALTERNATIVE no longer counts:
@@ -64,6 +70,8 @@
  */
 
 import { getActiveConditionIds, getExerciseSafetyTier } from '../conditions.js';
+import { store } from '../../store.js';
+import { isSquatOrLunge } from '../chair-legs.js';
 import { EXERCISES } from '../exercises/index.js';
 import { validateClass } from '../class-contract.js';
 import { STRANDS } from '../aims.js';
@@ -144,10 +152,16 @@ export function seatedThroughout(cls) {
  * have no safe route. Named rather than counted, because the caller that
  * eventually explains this to somebody needs the words.
  */
-export function classSafety(cls, { conditionIds = [], painScores = {} } = {}) {
+export function classSafety(cls, { conditionIds = [], painScores = {}, chairHard } = {}) {
   const active = getActiveConditionIds(conditionIds, painScores);
+  // W5-7. Graeme, 02 Oct: no squats or lunges when getting up from a chair
+  // is hard; read from the person's answers unless the caller says.
+  if (chairHard === undefined) {
+    try { chairHard = !!store.capabilityProfile().chairHard; } catch { chairHard = false; }
+  }
   const tier = (id) => {
     const ex = byId.get(id);
+    if (ex && chairHard && isSquatOrLunge(ex)) return 'avoid';
     return ex ? getExerciseSafetyTier(ex, active) : null;
   };
 

@@ -1,5 +1,12 @@
 /**
  * js/views/health-consent.js
+ * 02 Oct 2026 v4
+ *
+ * v4 - W5-8 DECLINE-DOORS. Not now opens a second screen: the answers stay
+ *   on this phone, never sent; Back to the tick, or No thanks: the gentle
+ *   routine (the same for anyone, sitting in a chair, changing day to day).
+ *   Graeme, 02 Oct.
+ *
  * 02 Oct 2026 v3
  *
  * v3 - W4-13. When the consent was given to older wording, it says the
@@ -20,11 +27,37 @@
  * (3.3.1). The heading takes focus on arrival.
  */
 import {
-  HEALTH_TICK, HEALTH_NOTE, giveHealthConsent, takePendingRoute, healthWordingChanged
+  HEALTH_TICK, HEALTH_NOTE, giveHealthConsent, takePendingRoute, healthWordingChanged, confirmNoHealth
 } from "../data/health-consent.js";
+import { startGeneralRoutine } from "../data/general-routine.js";
 
 export function HealthConsentView(router) {
   let root = null;
+
+  // W5-8. Graeme, 02 Oct: "Second chance, then one routine". Not now says
+  // once more, plainly, where the answers are kept; a second no gives the
+  // one gentle routine, the same for anyone, and asks nothing about health.
+  function secondChance() {
+    root.innerHTML = `
+      <div class="view hc-view">
+        <h1 class="hc-title" id="hc-title" tabindex="-1">Your answers stay on this phone</h1>
+        <p class="hc-text">Before you decide: what you tell me about your body and how you are is kept
+          on this phone and nowhere else. It is never sent to Build New Habits or to anyone, and you can
+          delete it whenever you like in Settings.</p>
+        <p class="hc-text">Without it I can't shape a session to you. What I can do is give you one gentle
+          routine, the same for anyone, all of it sitting in a chair. It changes from day to day.</p>
+        <button class="btn btn-primary btn-large btn-full" id="hc-back-to-tick">Back to the tick</button>
+        <button class="btn btn-secondary btn-full" id="hc-routine">No thanks: the gentle routine</button>
+      </div>`;
+    root.querySelector("#hc-back-to-tick").addEventListener("click", () => mount(root));
+    root.querySelector("#hc-routine").addEventListener("click", () => {
+      confirmNoHealth();
+      takePendingRoute();
+      startGeneralRoutine();
+      router.navigate("workout");
+    });
+    root.querySelector("#hc-title")?.focus();
+  }
 
   function mount(container) {
     root = container;
@@ -58,10 +91,7 @@ export function HealthConsentView(router) {
       giveHealthConsent();
       router.navigate(takePendingRoute() || "today");
     });
-    root.querySelector("#hc-not-now").addEventListener("click", () => {
-      takePendingRoute();
-      router.navigate("today");
-    });
+    root.querySelector("#hc-not-now").addEventListener("click", () => secondChance());
     root.querySelector("#hc-title")?.focus();
   }
 

@@ -1,5 +1,11 @@
 /**
  * settings.js
+ * 02 Oct 2026 v63
+ *
+ * v63 - W5-8. Asked what their body can do after giving the health consent
+ *   they had declined: "you haven't told me this yet", not "you deleted
+ *   these answers".
+ *
  * 02 Oct 2026 v62
  *
  * v62 - W4-23 SETTINGS-RESCOPE (Graeme, 02 Oct: "It's confusing having
@@ -822,7 +828,7 @@ export function SettingsView(router) {
   function _askAgainNote() {
     return `
       <div class="settings-section settings-capability__again">
-        <p class="settings-section__sub">Before I plan your next session: you deleted these answers, so I have been planning carefully. Tell me what your body can do, then carry on.</p>
+        <p class="settings-section__sub">Before I plan your next session: ${(store.get('capability') || {}).clearedAt ? 'you deleted these answers, so I have been planning carefully' : 'you haven\u2019t told me this yet'}. Tell me what your body can do, then carry on.</p>
         <button class="btn btn-primary btn-full" id="settings-cap-carry-on">Carry on</button>
         <p class="settings-section__sub" id="settings-cap-carry-on-msg" role="status" aria-live="polite"></p>
       </div>`;

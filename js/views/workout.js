@@ -1,5 +1,10 @@
 /**
  * workout.js - Workout Execution View
+ * 02 Oct 2026 v32
+ *
+ * v32 - W5-8. The gentle routine (after a second no to the health consent)
+ *   says on its first card why it is the same for anyone.
+ *
  * 02 Oct 2026 v31
  *
  * v31 - W5-1. On a Bad day only the gentle plan plays; any other stored plan
@@ -689,6 +694,11 @@ export function render() {
       </div>
 
       ${_renderSkipOffer()}
+
+      ${workout.general && currentExerciseIndex === 0 ? `
+        <div class="card card-coach" style="margin-bottom: var(--space-4);">
+          <p class="coach-message-text">${workout.coachLine}</p>
+        </div>` : ""}
 
       <div class="exercise-display">
         ${sectionLabel ? `<p class="wo-flow__section">${sectionLabel}</p>` : ""}
