@@ -1,5 +1,11 @@
 /**
  * tools/verify-severe-true.mjs
+ * 03 Oct 2026 v3
+ *
+ * v3 - W5-21. TEST 3 chooses the minutes as the app does, for today
+ *   (setTodaysLength); the gentle plan takes today's length whichever door
+ *   builds it. Assertion unchanged.
+ *
  * 02 Oct 2026 v2
  *
  * v2 - W5-2 BAD-DAY-DOORS (Wave 5 trace: 2.12, 2.14). TEST 6: Yoga and
@@ -104,8 +110,13 @@ ok("2b. the gentle plan, with a Start button", !!startBtn() && /breath/i.test(af
 
 // ── 3. THE MINUTES CHOSEN ───────────────────────────────────────────────
 console.log("\nTEST 3 - the gentle plan fits the minutes chosen");
+// W5-21: the minutes chosen are chosen for today (coach-proposal and know-what
+// record them with setTodaysLength); the gentle plan takes today's length,
+// whichever door builds it.
+const { setTodaysLength } = await import(B + "data/session-length.js");
 for (const mins of [10, 20, 30]) {
   fixture(["lower-back"], { "lower-back": 8 });
+  setTodaysLength({ 10: "micro", 20: "quick", 30: "short" }[mins]);
   const s = SB.buildSession({ sessionType: "full", durationMins: mins });
   const secs = (s?.exercises || []).reduce((n, e) => n + SB.exerciseSeconds(e), 0);
   ok(`3a. ${mins} minutes: the gentle plan totals ${mins} or less`, s?.gentleCare === true && secs <= mins * 60 && secs > 0, `${Math.round(secs / 60)} min`);

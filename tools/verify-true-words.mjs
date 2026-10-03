@@ -1,5 +1,13 @@
 /**
  * tools/verify-true-words.mjs
+ * 03 Oct 2026 v3
+ *
+ * v3 - W5-20 TRUE-WORDS-5 (Wave 5 trace). 3b re-pointed: no carrying,
+ *   gripping, getting up and down promised to anybody. TESTs 18-28, one per
+ *   line: balance Sometimes, Stress taken off, the Mostly the same line, the
+ *   red-flag introduction, leave cards, the tier table, Make it up as I go
+ *   on Free, screen names, heart and lungs, nowhere to answer, restore.
+ *
  * 03 Oct 2026 v2
  *
  * v2 - W5-12 LENGTH-TRUE-2 (Wave 5 trace: 2.1, 2.4, 2.11, 2.13, 2.15,
@@ -107,7 +115,8 @@ console.log("\nTEST 3 - no carrying and getting up and down promised to legs not
 const OTD = await import(B + "data/onboarding-thread-data.js");
 const notReady = OTD.generateIntentAck("maintain", { legsLoadable: false });
 ok("3a. legs not ready: no carrying, gripping, getting up and down", !/carrying|getting up and down/i.test(notReady), notReady);
-ok("3b. control: legs ready, it still names them", /carrying/.test(OTD.generateIntentAck("maintain", { legsLoadable: true })));
+// W5-20: nor to anybody (360 builds of a ready profile gave none of the three).
+ok("3b. legs ready: no carrying, gripping, getting up and down promised either", !/carrying|gripping|getting up and down/i.test(OTD.generateIntentAck("maintain", { legsLoadable: true })));
 
 // ── 4. MINDFUL ──────────────────────────────────────────────────────────
 console.log("\nTEST 4 - the sitting practices are not called movement");
@@ -273,6 +282,87 @@ const thread17 = txt(host17);
 ok("17pc. the check-in finished", navs17.length > 0, JSON.stringify(navs17));
 ok("17a. a low week with today: not \"I'll plan for your usual\"", !/plan for your usual/.test(thread17) && /shorter/.test(thread17), thread17.slice(-260));
 host17.remove(); document.querySelectorAll(".ci-panel, .ci-overlay").forEach(n => n.remove());
+
+// ════ W5-20 TRUE-WORDS-5 ═══════════════════════════════════════════════
+const click = el => el?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true, cancelable: true }));
+
+// ── 18. BALANCE ─────────────────────────────────────────────────────────
+console.log("\nTEST 18 - after balance Sometimes");
+const bal = OTD.generateBalanceAck("sometimes");
+ok("18a. not \"it doesn't rule anything out\" (balance work is left out)", !/rule anything out/i.test(bal) && /leave out/i.test(bal), bal);
+
+// ── 19. STRESS, TAKEN OFF ───────────────────────────────────────────────
+console.log("\nTEST 19 - Take it off on Stress");
+const { SettingsView } = await import(B + "views/settings.js");
+person({ conditions: ["knee", "anxiety"] });
+const s19 = document.getElementById("main-content"); s19.innerHTML = "";
+SettingsView({ navigate() {}, back() {} }).mount(s19); await wait(10);
+click(s19.querySelector('[data-open="conditions"]')); await wait(10);
+click(s19.querySelector('[data-resolve="anxiety"]')); await wait(10);
+ok("19a. not \"moved to Better now\", not under Better now", !/Stress moved to Better now/.test(txt(s19)) && !(store.get("conditionsResolved") || []).some(r => r.id === "anxiety") && !(store.get("conditions") || []).includes("anxiety"), txt(s19).slice(0, 200));
+
+// ── 20. THE MOSTLY THE SAME HINT ────────────────────────────────────────
+console.log("\nTEST 20 - the line under How much should sessions change");
+person();
+s19.innerHTML = ""; SettingsView({ navigate() {}, back() {} }).mount(s19); await wait(10);
+click(s19.querySelector('[data-open="preferences"]')); await wait(10);
+const sel = s19.querySelector("#settings-pref-variety");
+if (sel) { sel.value = "familiar"; sel.dispatchEvent(new dom.window.Event("change", { bubbles: true })); }
+await wait(10);
+ok("20a. follows the answer at once", !!sel && /starts the same way/.test(txt(s19.querySelector("#pref-variety-now"))) && !/This is the default/.test(txt(s19.querySelector("#pref-variety-now"))), txt(s19.querySelector("#pref-variety-now")));
+
+// ── 21. THE RED-FLAG INTRODUCTION ───────────────────────────────────────
+console.log("\nTEST 21 - the red-flag introduction after Nothing today");
+const RF = await import(B + "data/red-flag.js");
+ok("21a. not \"You've told me something is sore\"", !/told me something is sore/.test(RF.RED_FLAG_INTRO) && /listed a sore/.test(RF.RED_FLAG_INTRO), RF.RED_FLAG_INTRO);
+
+// ── 22. LEAVE CARDS ─────────────────────────────────────────────────────
+console.log("\nTEST 22 - leave cards above Exit and save progress");
+ok("22a. the session card: not \"won't be saved\"", !/won.t be saved|won&rsquo;t be saved/.test(code("js/session-guard.js")));
+ok("22b. the run card: not \"won't be saved\"", !/won.t be saved/.test(code("js/views/running-session.js")));
+
+// ── 23. THE TIER TABLE ──────────────────────────────────────────────────
+console.log("\nTEST 23 - the tier table on I know what I want");
+const TT = await import(B + "data/tier-table.js");
+const kw = TT.TIER_TABLE.find(r => r.id === "know-what");
+ok("23a. Free: Not included (the door is the Plan's)", !!kw && /^Not included/.test(kw.free), kw?.free);
+
+// ── 24. MAKE IT UP AS I GO ON FREE ──────────────────────────────────────
+console.log("\nTEST 24 - Make it up as I go on Free says why");
+person({ tier: "free" });
+const { router } = await import(B + "router.js");
+window.router = router;
+router.redirectReason = "capture";
+const U24 = U;
+const up24 = U24.render();
+ok("24a. the page says why it is here", /Make it up as I go is part of the Plan/.test(up24) && /Log what I did/.test(up24));
+router.redirectReason = null;
+ok("24b. and not when reached otherwise", !/Make it up as I go is part of the Plan/.test(U24.render()));
+
+// ── 25. SCREEN NAMES ────────────────────────────────────────────────────
+console.log("\nTEST 25 - Mindful awareness, Back to Wellbeing");
+ok("25a. no \"Mindful Movement\" on screen", !/Mindful Movement/.test(code("js/views/quiet-session.js")));
+ok("25b. no \"Back to Noticing\"", !/Back to Noticing/.test(code("js/views/breathing-session.js")));
+
+// ── 26. HEART AND LUNGS ─────────────────────────────────────────────────
+console.log("\nTEST 26 - heart and lungs");
+const SR = await import(B + "data/session-rationale.js");
+const { EXERCISES } = await import(B + "data/exercises/index.js");
+const pickEx = id => ({ ...EXERCISES.find(e => e.id === id), section: "main" });
+person();
+const r26 = SR.buildRationale({ exercises: ["seated-shoulder-rolls-warmup", "seated-scapular-retraction", "seated-side-bend"].map(pickEx) });
+ok("26a. not from Seated Shoulder Rolls", !/heart and lungs/.test(r26.opening), r26.opening);
+
+// ── 27. "TELL ME WHY YOU'VE BEEN AWAY" ─────────────────────────────────
+console.log("\nTEST 27 - nowhere to answer");
+ok("27a. no opener asks to be told why they were away", !/tell me why you.ve been away/i.test(code("js/data/checkin-openings.js")));
+
+// ── 28. RESTORE ─────────────────────────────────────────────────────────
+console.log("\nTEST 28 - restore says what came across");
+const RS = await import(B + "data/restore.js");
+ok("28a. the confirmation: the Plan does not come with a file", /does not come with the file/.test(RS.confirmMessage({}, true)) && !/stay as they are on this phone: your plan/.test(RS.confirmMessage({}, true)));
+ok("28b. a Plan file onto Free: said", /on this phone you are on Free/.test(RS.restoredMessage({ healthCameAcross: true, planLeft: true })));
+ok("28c. getting started's restore says the result before Home", /onRestored: r =>[\s\S]{0,400}restoredMessage\(r\)/.test(code("js/views/onboarding/thread.js")));
 
 console.log(`\nTRUE-WORDS: ${passes} passed, ${fails} failed`);
 process.exit(fails ? 1 : 0);

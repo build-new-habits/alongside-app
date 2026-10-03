@@ -1,5 +1,11 @@
 /**
  * tools/verify-dead-generator.mjs
+ * 03 Oct 2026 v4
+ *
+ * v4 - W5-21. 2b names a fourth reader, session-builder.js (the gentle plan
+ *   takes today's length); the rule is unchanged: every reader imports from
+ *   data/time-windows.js.
+ *
  * 01 Oct 2026 v3
  *
  * v3 - DOCS-MOVE. Documents/ left this public repository for the private
@@ -93,8 +99,8 @@ ok("2a. js/data/time-windows.js exports the same six windows",
    JSON.stringify(TW.AVAILABLE_TIME_WINDOW_MINUTES));
 const readers = JS.filter(f => /\bAVAILABLE_TIME_WINDOW_MINUTES\b/.test(strip(read(f))) && f !== "js/data/time-windows.js");
 ok("2b. every live reader imports it from there",
-   readers.sort().join(",") === "js/views/coach-proposal.js,js/views/know-what.js,js/views/settings.js" &&
-   readers.every(f => /import\s*\{[^}]*AVAILABLE_TIME_WINDOW_MINUTES[^}]*\}\s*from\s*['"]\.\.\/data\/time-windows\.js['"]/.test(read(f))),
+   readers.sort().join(",") === "js/session-builder.js,js/views/coach-proposal.js,js/views/know-what.js,js/views/settings.js" &&
+   readers.every(f => /import\s*\{[^}]*AVAILABLE_TIME_WINDOW_MINUTES[^}]*\}\s*from\s*['"]\.\.?\/data\/time-windows\.js['"]/.test(read(f))),
    readers.join(", "));
 
 // ── 3. WHAT ONLY THE ENGINE CALLED GOES WITH IT ────────────────────────

@@ -1,5 +1,11 @@
 /**
  * tools/verify-restore-move.mjs
+ * 03 Oct 2026 v3
+ *
+ * v3 - W5-20/W5-21. 4b re-pointed: "</3" comes back as written, and no "<"
+ *   that could open a tag is left. 7c re-pointed: getting started says
+ *   Restored and what came across, then Go to Home.
+ *
  * 02 Oct 2026 v2
  *
  * v2 - W4-26. 2d: a health consent given before what it covers changed
@@ -159,7 +165,8 @@ ok("4a. the file is not refused", read.ok, read.reason);
 phone();
 if (read.ok) R.applyRestore(read.data);
 const back = store.get("journalEntries")?.[0]?.text || "";
-ok("4b. the words read the same, with no '<' left", /sigh/.test(back) && /brain fog/.test(back) && !back.includes("<"), back);
+// W5-21: "</3" comes back as written; no "<" is left that could open a tag.
+ok("4b. the words read the same, \"</3\" kept, no tag can open", /<\/3/.test(back) && /sigh/.test(back) && /brain fog/.test(back) && !/<\s*[a-zA-Z!?]|<\s*\/\s*[a-zA-Z]/.test(back), back);
 read = R.readRestoreFile(fileFrom({ journal: "learning javascript: week 2" }));
 ok("4c. a javascript: in someone's words does not refuse the file", read.ok, read.reason);
 phone();
@@ -250,7 +257,10 @@ if (offer) {
   await until(() => document.querySelector("#confirm-ok"), 3000);
   ok("7b. the same confirmation", /Restore from this file/.test(dlgText()), dlgText());
   click(document.querySelector("#confirm-ok")); await wait(40);
-  ok("7c. lands on Home", navs.includes("today"), JSON.stringify(navs));
+  // W5-20: it says what came across first, then Go to Home.
+  const said = txt(el);
+  click(el.querySelector("#ob-restored-go")); await wait(20);
+  ok("7c. says it restored, then lands on Home", /Restored\. Your history from the file is on this device now/.test(said) && navs.includes("today"), `${said.slice(0, 160)} | ${JSON.stringify(navs)}`);
   ok("7d. onboarding done, the history there, this phone's agreements recorded",
      store.get("onboardingComplete") === true && (store.get("activityLog") || []).length === 3 &&
      store.get("consent")?.given === true && store.get("consent")?.health?.given === true && store.get("consent")?.ageConfirmed === true);
