@@ -1,6 +1,13 @@
 /**
  * js/session-guard.js - Session Back Gesture Guard
  *
+ * 02 Oct 2026 v3
+ *
+ * v3 - W5-9 and W5-10. Exit without saving takes away a checkpoint this
+ *   session wrote (it was saved three hours later anyway) and calls the
+ *   view's onDiscard, so its place is cleared. showExitCard takes onStay:
+ *   Stay, the backdrop and Escape carry the session on.
+ *
  * 21 Jul 2026 v2
  *
  * CHANGELOG
@@ -51,6 +58,7 @@
 
 import { store }  from "./store.js";
 import { router } from "./router.js";
+import { clearCheckpoint } from "./session-resume.js";
 
 // ── Internal state ─────────────────────────────────────────────────────────────
 
@@ -60,6 +68,8 @@ let _label         = "";    // human-readable session label for ARIA
 let _popHandler    = null;  // reference to the popstate listener for cleanup
 let _keyHandler    = null;  // reference to the keydown listener for cleanup
 let _guardActive   = false; // prevents double-mounting
+let _onDiscard     = null;  // W5-9: () => void, the view clears its own place on "Exit without saving"
+let _cpAtMount     = null;  // W5-9: the checkpoint that was there before this session
 
 // ── Public API ─────────────────────────────────────────────────────────────────
 
@@ -71,13 +81,17 @@ let _guardActive   = false; // prevents double-mounting
  * @param {function} opts.onExit   - Called when user chooses "Exit and save progress"
  * @param {string}  [opts.label]  - Human label for ARIA e.g. "gym session"
  */
-export function mountSessionGuard({ isActive, onExit, label = "session" }) {
+export function mountSessionGuard({ isActive, onExit, onDiscard = null, label = "session" }) {
   if (_guardActive) dismountSessionGuard();
 
   _isActive    = isActive;
   _onExit      = onExit;
+  _onDiscard   = onDiscard;
   _label       = label;
   _guardActive = true;
+  // W5-9. Which checkpoint was there before this session, so Exit without
+  // saving can take away only one this session wrote.
+  _cpAtMount   = store.get("activeSessionCheckpoint")?.checkpointedAt || null;
 
   // Push a history entry so we have something to intercept.
   // The router already pushed one when navigating here.
@@ -246,6 +260,14 @@ function _handleExitDiscard() {
 
   store.set("currentActivityEntry", null);
 
+  // W5-9 SESSION-STATE. Without saving means without saving: a checkpoint
+  // this session wrote was saved three hours later anyway ("rescued"), and
+  // the view kept its place, so the next session began at "4 of 10".
+  const cp = store.get("activeSessionCheckpoint");
+  if (cp && cp.checkpointedAt !== _cpAtMount) clearCheckpoint();
+  const after = _onDiscard; _onDiscard = null;
+  if (after) { try { after(); } catch (err) { console.warn("Session guard: onDiscard failed", err); } }
+
   // Navigate back to today without triggering reflect
   router.navigate("today");
 }
@@ -270,7 +292,7 @@ function _handleExitDiscard() {
 // @param {function} opts.onDiscard - Called on "Exit without saving"
 // @param {string} [opts.label]     - Optional label override for ARIA
 
-export function showExitCard({ onSave, onDiscard, label = "session" }) {
+export function showExitCard({ onSave, onDiscard, onStay = null, label = "session" }) {
   // If the gesture guard's card is already visible, don't double-show
   if (document.getElementById("session-guard-card")) return;
 
@@ -315,15 +337,19 @@ export function showExitCard({ onSave, onDiscard, label = "session" }) {
   function dismiss() {
     backdrop.remove();
     card.remove();
+    document.removeEventListener("keydown", onKey);
   }
+  // W5-10. Staying carries on: a paused timer starts again (Stay, the
+  // backdrop and Escape all mean stay).
+  function stay() { dismiss(); if (onStay) onStay(); }
 
-  backdrop.addEventListener("click", dismiss);
+  backdrop.addEventListener("click", stay);
 
   document.getElementById && (() => {})(); // flush before appending
   document.body.appendChild(backdrop);
   document.body.appendChild(card);
 
-  card.querySelector("#sg-stay-btn").addEventListener("click", dismiss);
+  card.querySelector("#sg-stay-btn").addEventListener("click", stay);
 
   card.querySelector("#sg-exit-save-btn").addEventListener("click", () => {
     dismiss();
@@ -345,7 +371,7 @@ export function showExitCard({ onSave, onDiscard, label = "session" }) {
 
   // Escape key dismisses
   function onKey(e) {
-    if (e.key === "Escape") { dismiss(); document.removeEventListener("keydown", onKey); }
+    if (e.key === "Escape") stay();
   }
   document.addEventListener("keydown", onKey);
 

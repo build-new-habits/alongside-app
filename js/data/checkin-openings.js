@@ -1,5 +1,12 @@
 /**
  * js/data/checkin-openings.js
+ * 02 Oct 2026 v11
+ *
+ * v11 - W5-18. The gap is days since the last check-in or finished session,
+ *   said "since you were last here"; "dropping" or "climbing a little each
+ *   check-in" only when each step goes that way (energyTrend exported for
+ *   the check).
+ *
  * 02 Oct 2026 v10
  *
  * v10 - W4-22. With Mostly the same (sessionVariety familiar) the check-in
@@ -277,9 +284,9 @@ const ARRIVAL_LOW = [
 
 // P8. Three to six days since the last check-in: said, never weighed.
 const GAP_SHORT = [
-  { b1: "It's been {n} days since we last checked in. Nothing to make up — let's just start with today.", b2: null },
+  { b1: "It's been {n} days since you were last here. Nothing to make up — let's just start with today.", b2: null },
   { b1: "Good to see you. It's been {n} days, and that's fine. We'll start from where you are now.", b2: null },
-  { b1: "{n} days since your last check-in. Whatever they held, today is its own day.", b2: null },
+  { b1: "{n} days since you were last here. Whatever they held, today is its own day.", b2: null },
 ];
 
 const ARRIVAL_RETURN = [
@@ -623,12 +630,18 @@ function _detectMilestone(totalCheckins, historyKeys) {
 
 // ─── Utilities ────────────────────────────────────────────────────────────────
 
+// W5-18. Days since the person was last here: the latest check-in or
+// finished session (a class or a run needs no check-in), not check-ins only.
 function _gapDays(historyKeys) {
   if (!historyKeys.length) return 999;
-  const last  = new Date(historyKeys[historyKeys.length - 1]);
+  let last = new Date(historyKeys[historyKeys.length - 1]);
+  for (const e of store.completedSessions(store.get('activityLog') || [])) {
+    const d = new Date(e.completedAt || e.date || 0);
+    if (!isNaN(d) && d > last) last = d;
+  }
   const today = new Date();
-  last.setHours(0,0,0,0); today.setHours(0,0,0,0);
-  return Math.floor((today - last) / 864e5);
+  last = new Date(last); last.setHours(0,0,0,0); today.setHours(0,0,0,0);
+  return Math.max(0, Math.floor((today - last) / 864e5));
 }
 
 function _recentField(checkinHistory, historyKeys, field) {
@@ -637,13 +650,16 @@ function _recentField(checkinHistory, historyKeys, field) {
   return v !== undefined ? v : null;
 }
 
+// W5-18. "A little each check-in" only when each step goes that way
+// (6, 2, 3 was said to be dropping each check-in).
 function _energyTrend(last3) {
   const e = last3.map(x => x?.energy).filter(v => typeof v === 'number');
   if (e.length < 3) return null;
-  if (e[2] > e[0] + 1) return 'improving';
-  if (e[2] < e[0] - 1) return 'declining';
+  if (e[0] < e[1] && e[1] < e[2] && e[2] > e[0] + 1) return 'improving';
+  if (e[0] > e[1] && e[1] > e[2] && e[2] < e[0] - 1) return 'declining';
   return 'flat';
 }
+export const energyTrend = _energyTrend;
 
 function _moodDecliningEnergyStable(last3) {
   const m = last3.map(x => x?.mood).filter(v => typeof v === 'number');

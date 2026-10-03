@@ -1,6 +1,12 @@
 /**
  * reflect.js - Reflect Screen
  *
+ * 02 Oct 2026 v16
+ *
+ * v16 - W5-18. Another session in the same app run starts with an empty
+ *   finish screen (it showed the last answer and line); the mood slider
+ *   starts at today's check-in only, else the middle.
+ *
  * 02 Oct 2026 v15
  *
  * v15 - W4-20. A run's finish line follows the feel answer: Steady (or no
@@ -668,8 +674,18 @@ export function buildSummary(entry, feel, pain, moodAfterValue) {
   return "Done. I have noted how today went.";
 }
 
+// W5-18. Which session this screen's answers belong to. Another session in
+// the same app run starts empty: it showed the last one's answer and line.
+let _entryKey = null;
+function _keyOf(e) { return e.id || e.startedAt || `${e.type || ""}|${e.name || ""}|${e.date || ""}`; }
+
 export function render() {
   const entry      = store.get("currentActivityEntry") || {};
+  if (_keyOf(entry) !== _entryKey) {
+    _entryKey = _keyOf(entry);
+    stage = "reflect"; feelAnswer = null; painAnswer = null; openText = "";
+    moodAfter = null; empathyPrompt = null; _momentsMounted = false;
+  }
   const type       = entry.type  || "other";
   const name       = entry.name;
   const conditions = store.get("conditions") || [];
@@ -801,7 +817,10 @@ export function render() {
 /** Where the mood slider starts: today's check-in, else the middle. Shown, never stored. */
 function _startMood() {
   const c = store.get("lastCheckin") || {};
-  return typeof c.mood === "number" ? c.mood : 5;
+  // W5-18. Today's only: a mood from days ago is not where they start.
+  const at = new Date(c.updatedAt || c.timestamp || 0);
+  const today = !isNaN(at) && at.toDateString() === new Date().toDateString();
+  return today && typeof c.mood === "number" ? c.mood : 5;
 }
 
 /**

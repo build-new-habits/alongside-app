@@ -20,6 +20,13 @@
  *   "the braking system of the nervous system", HRV as "a marker of
  *   nervous system health". Rewritten as what to do. Patterns unchanged.
  *
+ * 02 Oct 2026 v9
+ *
+ * v9 - W5-10 MINDFUL-TIMER. Stay in session carries the practice on (it
+ *   froze it); a cue at each change and at the end, said in a status line
+ *   and with a short vibration (per the Vibration switch); the countdown is
+ *   no longer a live region read every second.
+ *
  * 02 Oct 2026 v8
  *
  * v8 - W4-20. Mindful awareness, not movement: the practices are sitting and
@@ -280,6 +287,7 @@ let mindfulTotalSeconds = 0;           // total session duration in seconds
 let mindfulElapsed     = 0;            // total seconds elapsed across all exercises
 let mindfulStepElapsed = 0;            // seconds elapsed in current exercise
 let mindfulComplete    = false;
+let mindfulSession     = null;         // W5-10: the steps, so Stay can carry on
 
 
 // ── Render ────────────────────────────────────────────────────────────────────
@@ -583,11 +591,13 @@ function renderMindfulSession(step) {
     </div>
 
     <div class="quiet-mindful-timer">
-      <div class="quiet-mindful-clock" aria-live="polite"
-           aria-label="${timeDisplay} remaining">
+      <!-- W5-10. Not a live region: it was read out every second. Changes
+           and the end are said once, in the status line below. -->
+      <div class="quiet-mindful-clock">
         <span id="quiet-mindful-time">${timeDisplay}</span>
       </div>
       <p class="text-sm text-muted" style="margin-top:var(--space-2);">remaining</p>
+      <p class="text-sm" id="quiet-mindful-cue" role="status"></p>
     </div>
 
     <div class="quiet-progress-bar" style="margin: var(--space-4) var(--space-4) 0;"
@@ -752,8 +762,18 @@ function startMindfulSession() {
   runMindfulTimer(session);
 }
 
+// W5-10. A practice done with the eyes closed needs telling when it moves
+// on and when it ends: said in the status line, and a short vibration
+// (navigator.vibrate obeys the Vibration switch, display-prefs.js).
+function _cue(text, pattern) {
+  if (typeof navigator !== "undefined" && "vibrate" in navigator) navigator.vibrate(pattern);
+  const el = document.getElementById("quiet-mindful-cue");
+  if (el) el.textContent = text;
+}
+
 function runMindfulTimer(session) {
   if (mindfulTimer) clearInterval(mindfulTimer);
+  mindfulSession = session;
 
   mindfulTimer = setInterval(() => {
     mindfulElapsed++;
@@ -784,6 +804,7 @@ function runMindfulTimer(session) {
         clearInterval(mindfulTimer);
         mindfulTimer    = null;
         mindfulComplete = true;
+        _cue("That\u2019s the end of the practice.", [200, 100, 200]);
         dismountSessionGuard();
         logSession("mindful", mindfulDuration + " min mindful session", 20, session?.[0]?.id);
         rerender();
@@ -796,6 +817,8 @@ function runMindfulTimer(session) {
         content.innerHTML = renderMindfulSession(session[mindfulStep]);
         document.getElementById("quiet-mindful-stop-btn")?.addEventListener("click", stopMindful);
       }
+      const mins = Math.round(session[mindfulStep].duration / 60);
+      _cue(`Now: ${session[mindfulStep].name}, about ${mins} minute${mins === 1 ? "" : "s"}.`, 200);
     }
   }, 1000);
 }
@@ -817,6 +840,8 @@ function stopMindful() {
 
   showExitCard({
     label: "mindful session",
+    // W5-10. Stay carries on (it froze the practice for good).
+    onStay: () => { if (mindfulSession && mindfulStarted && !mindfulComplete) runMindfulTimer(mindfulSession); },
     onSave: () => {
       if (mindfulElapsed >= 10) logPartialMindfulSession();
       resetMindfulState();

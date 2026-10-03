@@ -1,5 +1,12 @@
 /**
  * workout.js - Workout Execution View
+ * 02 Oct 2026 v33
+ *
+ * v33 - W5-9 SESSION-STATE. Exit without saving on the back-gesture card
+ *   clears the player's place (onDiscard), so the next session starts at 1;
+ *   a different session than the one the place belongs to starts from its
+ *   own start (it crashed after Carry on later).
+ *
  * 02 Oct 2026 v32
  *
  * v32 - W5-8. The gentle routine (after a second no to the health consent)
@@ -538,9 +545,16 @@ function _getWorkout() {
 // checkpoint puts the person back where they left off.
 let _resumeChecked = false;
 
+// W5-9. Which session the player's place belongs to. A different one (Carry
+// on later, then another session from Or instead) starts from its own start:
+// the old place ran past the end of a shorter plan and the page failed.
+let _stateKey = null;
+
 function _restoreFromCheckpoint(workout) {
+  if (workout && _resumeChecked && _stateKey !== _sessionKey(workout)) _resetPlayer();
   if (_resumeChecked || !workout || !Array.isArray(workout.exercises)) return;
   _resumeChecked = true;
+  _stateKey = _sessionKey(workout);
   const cp = getResumableSession("workout");
   // P4. Not the checkpointed session, so a new one: whatever progress an
   // unfinished session left behind is not this session's.
@@ -1098,6 +1112,7 @@ export function onMount() {
   mountSessionGuard({
     isActive: () => !!_getWorkout(),
     onExit:   () => { savePartialSession(); cleanupWorkout(); router.navigate("reflect"); },
+    onDiscard: () => cleanupWorkout(),   // W5-9: the place goes too
     label:    "gym session"
   });
 
@@ -1535,7 +1550,17 @@ function completeWorkout() {
 function cleanupWorkout() {
   dismountSessionGuard();
   clearCheckpoint();        // SMOOTH-P3a. Finished, ended or left: nothing to carry on.
+  _resetPlayer();
+  // v3 — clears generatedSession back to its store.js default shape,
+  // rather than setting the never-written activeWorkout to null.
+  store.set("generatedSession", { session: null, builtAt: null, inputs: {} });
+  store.set("workoutProgress", null);
+}
+
+/** The player's own place and clocks, back to a session's start (W5-9). */
+function _resetPlayer() {
   _resumeChecked = false;
+  _stateKey = null;
   pauseTimer();
   sessionStartTime = null;
   _awayMs = 0;
@@ -1552,8 +1577,5 @@ function cleanupWorkout() {
   // Every other piece of ephemeral state on this view is cleared here;
   // adding one and not adding it to this list is how the next one breaks.
   finishedByTimer = false;
-  // v3 — clears generatedSession back to its store.js default shape,
-  // rather than setting the never-written activeWorkout to null.
-  store.set("generatedSession", { session: null, builtAt: null, inputs: {} });
-  store.set("workoutProgress", null);
+  currentSet = 1;
 }
