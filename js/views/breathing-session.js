@@ -1,6 +1,13 @@
 /**
  * js/views/breathing-session.js - Guided Breathing Session
  *
+ * 03 Oct 2026 v11
+ *
+ * v11 - W5-21 SMALL-5 and W5-20 TRUE-WORDS-5. On the practice screen, with
+ *   Vibration on, it says the phone buzzes at each change and where to turn
+ *   it off (the first one buzzed with no word). Back to Wellbeing, as the
+ *   tab is named (was Noticing).
+ *
  * 03 Oct 2026 v10
  *
  * v10 - W5-17 A11Y-W5. Time remaining is no longer a live region (it was
@@ -83,7 +90,7 @@
  */
 
 import { store }  from "../store.js";
-import { prefersReducedMotion } from "../display-prefs.js";
+import { prefersReducedMotion, getDisplayPref } from "../display-prefs.js";
 import { isGateDue, renderSafetyGate, attachSafetyGate } from "../safety-gate.js";
 // SHARED-1. This view does not route to reflect.js, so it renders the
 // moments itself. No exerciseIds: a breathing session has nothing to ask
@@ -396,7 +403,7 @@ function renderPicker() {
     <div class="view breathing-view">
 
       <div class="workout-header">
-        <button class="btn btn-ghost" id="bs-back-btn" aria-label="Back to Noticing">
+        <button class="btn btn-ghost" id="bs-back-btn" aria-label="Back to Wellbeing">
           ← Back
         </button>
         <h1 class="workout-header-title">Breathing</h1>
@@ -490,6 +497,10 @@ function renderSession() {
           ${formatTime(selectedMins * 60)}
         </span>
       </div>
+      ${getDisplayPref("vibration") !== "off" ? `
+      <p class="text-muted text-sm" style="text-align: center; margin: var(--space-2) 0 0;">
+        Your phone buzzes gently at each change of breath. You can turn that off in Settings, Display, Vibration.
+      </p>` : ""}
 
       <!-- Breath circle -->
       <div class="bs-circle-container" aria-hidden="true">
@@ -538,7 +549,7 @@ function renderDone() {
           Another session
         </button>
         <button class="btn btn-ghost btn-full" id="bs-home-btn">
-          Back to Noticing
+          Back to Wellbeing
         </button>
       </div>
 

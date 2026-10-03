@@ -1,6 +1,12 @@
 /**
  * running-session.js - Guided Running Session
  *
+ * 03 Oct 2026 v14
+ *
+ * v14 - W5-20 TRUE-WORDS-5. Leaving a run: no "this run won't be saved"
+ *   above Exit and save progress; it says you can save what you've done or
+ *   leave without saving it.
+ *
  * 03 Oct 2026 v13
  *
  * v13 - W5-17 A11Y-W5. The run timer is no longer a live region, so a screen
@@ -957,7 +963,7 @@ function showExitConfirm() {
       <div class="session-exit-coach-row">
         <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
         <p class="session-exit-coach-text">
-          Hold on — if you leave now this run won’t be saved. Are you sure?
+          Hold on — leave this run? You can save what you’ve done so far, or leave without saving it.
         </p>
       </div>
       <div class="session-exit-actions">

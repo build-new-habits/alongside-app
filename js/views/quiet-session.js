@@ -20,6 +20,13 @@
  *   "the braking system of the nervous system", HRV as "a marker of
  *   nervous system health". Rewritten as what to do. Patterns unchanged.
  *
+ * 03 Oct 2026 v10
+ *
+ * v10 - W5-21 SMALL-5 and W5-20 TRUE-WORDS-5. A finished breathing or
+ *   mindful practice records its minutes, so Progress counts it (it counted
+ *   0). The screen and its card say Mindful awareness, as the Wellbeing card
+ *   that opens it (they said Mindful Movement).
+ *
  * 02 Oct 2026 v9
  *
  * v9 - W5-10 MINDFUL-TIMER. Stay in session carries the practice on (it
@@ -317,7 +324,7 @@ function getModeTitle() {
     selector:  "Something Quieter",
     breathing: "Breathing Practice",
     journal:   "Journal",
-    mindful:   "Mindful Movement",
+    mindful:   "Mindful awareness",   // W5-20: as the card that opens it
     rest:      "Rest"
   };
   return titles[mode] || "Something Quieter";
@@ -354,7 +361,7 @@ function renderModeSelector() {
         <div class="quiet-mode-card-left">
           <span class="quiet-mode-icon" aria-hidden="true">\uD83C\uDF3F</span>
           <div>
-            <h3>Mindful Movement</h3>
+            <h3>Mindful awareness</h3>
             <p class="text-sm text-muted">5, 10, 15, or 20 minutes. Guided practice with timer.</p>
           </div>
         </div>
@@ -708,7 +715,8 @@ function startBreathing(exerciseId) {
         clearInterval(breathingInterval);
         breathingInterval = null;
         breathingComplete = true;
-        logSession("breathing", ex.name, ex.credits, ex.id);
+        logSession("breathing", ex.name, ex.credits, ex.id,
+          Math.max(1, Math.round(ex.rounds * ex.phases.reduce((s, p) => s + (p.seconds || 0), 0) / 60)));
         rerender();
         return;
       }
@@ -806,7 +814,7 @@ function runMindfulTimer(session) {
         mindfulComplete = true;
         _cue("That\u2019s the end of the practice.", [200, 100, 200]);
         dismountSessionGuard();
-        logSession("mindful", mindfulDuration + " min mindful session", 20, session?.[0]?.id);
+        logSession("mindful", mindfulDuration + " min mindful session", 20, session?.[0]?.id, mindfulDuration);
         rerender();
         return;
       }
@@ -902,7 +910,7 @@ const DB_ID = {
   "noting-practice":     "noting-practice",
 };
 
-function logSession(type, name, credits, localId) {
+function logSession(type, name, credits, localId, mins = null) {
   // PT-6, 12 Aug 2026. Wrote straight to activityLog, bypassing
   // store.logActivity() and its dedupe, empty-partial and
   // exerciseHistory handling.
@@ -925,7 +933,8 @@ function logSession(type, name, credits, localId) {
     source:       "quiet-session",
     status:       "completed",
     creditsEarned: credits,
-    durationMins: null,
+    // W5-21. The minutes it took, so Progress counts it (it counted 0).
+    durationMins: mins,
     // QUIET-1. Database id, so exerciseHistory and continuity can see it.
     // Omitted entirely when unmapped rather than logging a local id that
     // matches nothing -- a phantom entry is worse than none.

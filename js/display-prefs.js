@@ -1,5 +1,10 @@
 /**
  * js/display-prefs.js
+ * 03 Oct 2026 v6
+ *
+ * v6 - W5-21 SMALL-5. Reset display to defaults keeps Vibration as it was
+ *   (it turned it back on, from a screen with no Vibration switch).
+ *
  * 02 Oct 2026 v5
  *
  * v5 - W4-22. New key vibration (alongside-vibration, default on). Off stops
@@ -154,7 +159,10 @@ export function setDisplayPref(name, value) {
 }
 
 export function resetDisplayPrefs() {
-  Object.values(DISPLAY_KEYS).forEach(_remove);
+  // W5-21. Vibration is kept: it is set in Settings › Display beside the
+  // others, not on the screen with this reset, and turning buzzing back on
+  // unasked is the one change here that can be felt.
+  Object.entries(DISPLAY_KEYS).forEach(([name, key]) => { if (name !== "vibration") _remove(key); });
   applyDisplayPrefs();
 }
 

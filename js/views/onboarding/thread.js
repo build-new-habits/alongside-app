@@ -1,5 +1,11 @@
 /**
  * js/views/onboarding/thread.js
+ * 03 Oct 2026 v26
+ *
+ * v26 - W5-20 TRUE-WORDS-5. Restore from a file on the consent screen says
+ *   Restored and what came across (health answers, the Plan), then Go to
+ *   Home; it went to Home with no word.
+ *
  * 03 Oct 2026 v25
  *
  * v25 - W5-19 GS-RESUME. Records the step on screen (onboarding.reachedStep)
@@ -308,6 +314,7 @@ import { HEALTH_TICK, HEALTH_NOTE, HEALTH_WHAT, giveHealthConsent, declineHealth
 import { ageQuestionHTML, readAnswer, showAgeError, recordAge } from '../../data/age-check.js';
 import { POLICY_VERSION as CURRENT_POLICY_VERSION } from '../../data/consent-version.js';
 import { restoreFromFile } from '../restore-flow.js';
+import { restoredMessage } from '../../data/restore.js';
 import { researchPrivacyLine, noServerCopy } from '../../data/evidence.js';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -616,9 +623,17 @@ export function ThreadView(router) {
       restoreFromFile(file, {
         opener: restoreInput,
         onMessage: msg => { restoreInput.value = ''; sayRestore(msg + ' You can choose another file, or press Continue to start afresh.'); },
-        onRestored: () => {
+        onRestored: r => {
           store.set('onboardingComplete', true);
-          router.navigate('today');
+          // W5-20. Say what came across before Home (it said nothing).
+          _thread.innerHTML = `
+            <section class="ob-consent" aria-labelledby="ob-restored-heading">
+              <h1 class="ob-consent__heading" id="ob-restored-heading" tabindex="-1">Restored</h1>
+              <p>${restoredMessage(r)}</p>
+              <button class="btn btn-primary btn-large btn-full" id="ob-restored-go">Go to Home</button>
+            </section>`;
+          _thread.querySelector('#ob-restored-go')?.addEventListener('click', () => router.navigate('today'));
+          _thread.querySelector('#ob-restored-heading')?.focus();
         },
       });
     });

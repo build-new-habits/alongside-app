@@ -1,6 +1,11 @@
 /**
  * js/data/red-flag.js
- * 30 Sep 2026 v4
+ * 03 Oct 2026 v5
+ *
+ * v5 - W5-20 TRUE-WORDS-5. The introduction says "You've listed a sore or
+ *   injured area" (it said "You've told me something is sore" two minutes
+ *   after "Nothing today"). RED_FLAG_VERSION bumped, as the rule says, so
+ *   the questions are asked once more with the words now shown.
  *
  * v4 - W3-4 SORE-SCOPE. A check-in-sourced area counts only on a sore day.
  *
@@ -60,7 +65,7 @@ import { store } from "../store.js";
 import { CONDITIONS } from "./conditions.js";
 
 /** Bumped whenever any string below changes. Stored as redFlag.textVersion. */
-export const RED_FLAG_VERSION = "2026-09-28.1";
+export const RED_FLAG_VERSION = "2026-10-03.1";   // W5-20: the introduction
 
 export const RED_FLAG_QUESTIONS = [
   { id: "q1", text: "Have you noticed any change in your bladder or bowel control, or numbness around your groin, buttocks or inner thighs?" },
@@ -75,7 +80,7 @@ export const RED_FLAG_ANSWERS = [
 ];
 
 export const RED_FLAG_INTRO =
-  "You've told me something is sore, so before you exercise there are three quick questions. " +
+  "You've listed a sore or injured area, so before you exercise there are three quick questions. " +
   "They're about rare signs that need a health professional before exercise. " +
   "This is a safety check, not an assessment.";
 

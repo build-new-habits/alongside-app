@@ -1,5 +1,11 @@
 /**
  * data/exercises/strength.js
+ * 03 Oct 2026 v12
+ *
+ * v12 - W5-22 LOWER-BODY-GYM. Turkish Get-Up is a carry (whole-body,
+ *   loaded), not a hinge: as a hinge rated hardest it filled the hinge slot
+ *   of every gym Lower Body.
+ *
  * 30 Sep 2026 v11
  *
  * v11 - S1-LEGS (found building the S1 clinical pack). One-leg entries: balanceDemand true. Wall Sit holds while steady, not "as long as possible ... then extend further".
@@ -1132,7 +1138,9 @@ export const STRENGTH = [
     name: 'Turkish Get-Up',
     youtube: 'turkish get-up exercise technique',
     category: 'strength',
-    movementPattern: 'hinge',
+    // W5-22: a whole-body loaded carry, not a hinge. As a hinge, rated
+    // hardest, it filled the hinge slot of every gym Lower Body.
+    movementPattern: 'carry',
     equipment: ['kettlebell'],
     equipmentOptional: [],
     affectsAreas: ['full-body', 'shoulder', 'abdominals', 'hip'],

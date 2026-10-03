@@ -1,5 +1,11 @@
 /**
  * upgrade.js - Upgrade / Membership view
+ * 03 Oct 2026 v21
+ *
+ * v21 - W5-20 TRUE-WORDS-5. Reached from Make it up as I go on Free, the
+ *   page says why it is here and that Log what I did, in the Library,
+ *   records anything you did (it gave no reason).
+ *
  * 03 Oct 2026 v20
  *
  * v20 - W5-17 A11Y-W5. After the tap the button is named You're in, as it
@@ -338,6 +344,11 @@ export function render() {
            with what she ALREADY has, before it asks her for anything:
            "She is not buying something new. She is going deeper with
            something she already loves." -->
+      ${(typeof window !== "undefined" && window.router?.redirectReason === "capture") ? `
+      <p class="upgrade-body" role="status">
+        Make it up as I go is part of the Plan, so it brought you here. On Free,
+        Log what I did, in the Library, records anything you did.
+      </p>` : ""}
       <header class="upgrade-block">
         <h1 class="upgrade-heading">A coach who knows where you&rsquo;re going.</h1>
         <p class="upgrade-lede">

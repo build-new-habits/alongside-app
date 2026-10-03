@@ -1,6 +1,12 @@
 /**
  * js/session-guard.js - Session Back Gesture Guard
  *
+ * 03 Oct 2026 v4
+ *
+ * v4 - W5-20 TRUE-WORDS-5. The leave card no longer says the session won't
+ *   be saved above Exit and save progress: it says you can save what you've
+ *   done or leave without saving it.
+ *
  * 02 Oct 2026 v3
  *
  * v3 - W5-9 and W5-10. Exit without saving takes away a checkpoint this
@@ -193,7 +199,7 @@ function _showCard() {
         height="36"
       >
       <p id="sg-coach-text" class="sg-coach-text">
-        Hold on &mdash; if you leave now this session won&rsquo;t be saved. Are you sure?
+        Hold on &mdash; leave this session? You can save what you&rsquo;ve done so far, or leave without saving it.
       </p>
     </div>
     <button id="sg-stay-btn" class="btn btn-primary btn-large btn-full sg-btn">
@@ -320,7 +326,7 @@ export function showExitCard({ onSave, onDiscard, onStay = null, label = "sessio
         height="36"
       >
       <p id="sg-coach-text" class="sg-coach-text">
-        Hold on &mdash; if you leave now this session won&rsquo;t be saved. Are you sure?
+        Hold on &mdash; leave this session? You can save what you&rsquo;ve done so far, or leave without saving it.
       </p>
     </div>
     <button id="sg-stay-btn" class="btn btn-primary btn-large btn-full sg-btn">

@@ -1,5 +1,12 @@
 /**
  * js/data/onboarding-thread-data.js
+ * 03 Oct 2026 v24
+ *
+ * v24 - W5-20 TRUE-WORDS-5. After balance Yes or Sometimes: moves that ask
+ *   you to balance are left out, as they are (it said nothing was ruled
+ *   out). Hold on to what I've got no longer promises carrying, gripping,
+ *   getting up and down.
+ *
  * 03 Oct 2026 v23
  *
  * v23 - W5-19 GS-RESUME. Step 6 offers one way to skip (no Prefer not to say
@@ -966,8 +973,10 @@ export function generateIntentAck(value, profile = null) {
   // legs are not ready for load, so they are not promised either.
   if (value === 'maintain' && profile && profile.legsLoadable === false)
     return "Good. That means I'll keep putting everyday things in front of you, in ways that suit what your legs are ready for, rather than quietly making everything easier.";
+  // W5-20. Nor to anybody: what comes depends on their kit and answers, and
+  // a profile promised all three got none of them in 360 builds.
   if (value === 'maintain')
-    return "Good. That means I'll keep putting the things that matter in front of you — carrying, gripping, getting up and down — rather than quietly making everything easier.";
+    return "Good. That means I'll keep putting everyday strength in front of you, with what you have to hand, rather than quietly making everything easier.";
   if (value === 'recover')
     return "Understood. We'll build back steadily rather than push.";
   return "Right then. We'll build.";
@@ -975,7 +984,9 @@ export function generateIntentAck(value, profile = null) {
 
 export function generateBalanceAck(value) {
   return (value === 'yes' || value === 'sometimes')
-    ? "Thank you for saying. I'll keep that in mind — it doesn't rule anything out, it just changes the order I'd suggest things in."
+    // W5-20: balance work is left out after Yes or Sometimes; it said
+    // "it doesn't rule anything out".
+    ? "Thank you for saying. I'll leave out moves that ask you to balance, and you can change that answer in Settings whenever you like."
     : "Good to know. I'll still build sensibly, but that opens a few more options.";
 }
 

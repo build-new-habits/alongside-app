@@ -1,5 +1,14 @@
 /**
  * js/data/restore.js
+ * 03 Oct 2026 v5
+ *
+ * v5 - W5-21 SMALL-5 and W5-20 TRUE-WORDS-5. "</3" comes back as written
+ *   (it became "‹/3"): "</" counts as opening a tag only before a letter,
+ *   so no tag can still survive a file. The confirmation says
+ *   the Plan does not come with a file; applyRestore says when the file had
+ *   the Plan and this phone does not (planLeft), and restoredMessage() words
+ *   the result for Settings and getting started.
+ *
  * 02 Oct 2026 v4
  *
  * v4 - W4-26. Health answers in a file come in only when this phone's health
@@ -90,12 +99,14 @@ export const KNOWN_OUTSIDE_DEFAULTS = [
 
 /**
  * Rule 3 (v3). Text that could be markup or an address is made harmless,
- * never refused: a "<" that could open a tag (before a letter, "/", "!" or
- * "?") becomes "‹" (single angle quotation mark; "<3" stays) and the
+ * never refused: a "<" that could open a tag (before a letter, "!", "?",
+ * or "/" and a letter; W5-21) becomes "‹" (single angle quotation mark; "<3" stays) and the
  * colon of "javascript:" becomes "꞉" (modifier letter colon). Keys too.
  */
 export function harmless(v) {
-  if (typeof v === "string") return v.replace(/<(?=\s*[a-zA-Z!\/?])/g, "\u2039").replace(/(javascript\s*):/gi, "$1\uA789");
+  // W5-21: "</" opens a tag only before a letter, so "</3" comes back as
+  // written (it became "‹/3"); "</b" and "<sigh>" are still made harmless.
+  if (typeof v === "string") return v.replace(/<(?=\s*[a-zA-Z!?]|\s*\/\s*[a-zA-Z])/g, "\u2039").replace(/(javascript\s*):/gi, "$1\uA789");
   if (Array.isArray(v)) return v.map(harmless);
   if (v && typeof v === "object") {
     const out = {};
@@ -167,6 +178,8 @@ export function applyRestore(data) {
   // Payment will be Stripe's record, never a file's; News is a choice
   // about what this phone shows.
   picked.tier = here.tier || "free";
+  // W5-20. The file had the Plan and this phone does not: said, not implied.
+  const planLeft = !!incoming.tier && incoming.tier !== "free" && picked.tier === "free";
   picked.messages = JSON.parse(JSON.stringify(here.messages || store.getDefaults().messages || {}));
   const healthHere = consentCovers(picked.consent?.health);   // W4-26: the same test as everywhere
 
@@ -197,7 +210,7 @@ export function applyRestore(data) {
     store.data.consent = consent;
   }
   store.save();
-  return { healthCameAcross: healthHere };
+  return { healthCameAcross: healthHere, planLeft };
 }
 
 /**
@@ -212,7 +225,15 @@ export function confirmMessage(summary, healthHere) {
     (healthHere
       ? "Restoring replaces your history, goals and settings on this device with the file's, including your health answers: check-ins, sore areas, what you told me about your body, and your journal. "
       : "Restoring replaces your history, goals and settings on this device with the file's. Your health answers and journal in the file are not brought across, because Alongside does not have your agreement to keep health answers on this phone. ") +
-    "These stay as they are on this phone: your plan, Messages and the News switch, display settings, your answer to the age question and your agreements. It cannot be undone.";
+    "These stay as they are on this phone, whatever the file says: whether you have the Plan (it does not come with the file), Messages and the News switch, display settings, your answer to the age question and your agreements. It cannot be undone.";
+}
+
+/** W5-20. After a restore: what came across, in words (Settings and getting started). */
+export function restoredMessage(r) {
+  return (r && r.healthCameAcross === false
+    ? "Restored. Your history from the file is on this device now, without the health answers."
+    : "Restored. Your history from the file is on this device now.") +
+    (r && r.planLeft ? " The Plan does not come with a file: on this phone you are on Free. You can take the Plan again in Settings, Your plan." : "");
 }
 
 /** "1 October 2026", or null. */

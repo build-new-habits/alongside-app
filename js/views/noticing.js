@@ -1,6 +1,10 @@
 /**
  * js/views/noticing.js - Wellbeing Hub Landing View
  *
+ * 03 Oct 2026 v11 - W5-21 SMALL-5. Every journal entry can be read: the newest
+ *   three show, and Show all N entries shows the rest; each in full (it was
+ *   cut at 120 characters with no way to read on).
+ *
  * 02 Oct 2026 v10 - W4-20 and W4-21. This week's question changes with the week
  *   (counted from createdAt; noticingWeekInCycle was never advanced).
  *   Saving a journal entry says Saved to your journal, once. An entry saved
@@ -111,6 +115,7 @@ export const centered = false;
 // PT-2. Which entry is asking "Delete this entry?", and what was just said.
 let pendingJournalDelete = null;
 let journalStatus = "";
+let _allJournal = false;   // W5-21: Show all entries
 // W4-21. Said once, on the next Wellbeing screen, after a save.
 let _savedOnce = false;
 export function noteJournalSaved() { journalStatus = "Saved to your journal."; _savedOnce = true; }
@@ -267,7 +272,7 @@ export function render() {
   if (_savedOnce) { journalStatus = ""; _savedOnce = false; }
   const name          = store.get("name") || "";
   const weekData      = getCurrentWeekPrompt();
-  const recentEntries = getRecentEntries(3);
+  const recentEntries = getRecentEntries(_allJournal ? Infinity : 3);
   const totalEntries  = (store.get("journalEntries") || []).length;
   // The check-in, and nothing else. See suggestNow().
   const sug     = suggestNow(getTodaysCheckin());
@@ -448,11 +453,7 @@ export function render() {
                        </span>`
                     : ""}
                 </div>
-                <p class="text-secondary" style="font-size: var(--text-sm); line-height: 1.6;">${
-                  _escText(String(entry.text || "").length > 120
-                    ? String(entry.text).slice(0, 120) + "…"
-                    : entry.text)
-                }</p>
+                <p class="text-secondary" style="font-size: var(--text-sm); line-height: 1.6; white-space: pre-line;">${_escText(entry.text || "")}</p>
                 ${pendingJournalDelete === entry.id ? `
                   <div class="journal-delete" role="group" aria-labelledby="jd-q-${_escText(entry.id)}">
                     <p class="text-sm" id="jd-q-${_escText(entry.id)}">Delete this entry? It can’t be undone.</p>
@@ -464,6 +465,9 @@ export function render() {
               </div>
             `).join("")}
           </div>
+          ${totalEntries > 3 ? `
+            <button class="btn btn-ghost btn-small" id="journal-show-all" aria-expanded="${_allJournal}"
+                    style="margin-top: var(--space-2);">${_allJournal ? "Show the newest three" : `Show all ${totalEntries} entries`}</button>` : ""}
         </section>
       ` : `
         <p class="text-secondary text-sm" style="margin-top: var(--space-5);" ${shownStatus ? 'role="status"' : ''}>
@@ -487,6 +491,9 @@ export function onMount() {
     main.innerHTML = render(); onMount();
     if (focusSel) main.querySelector(focusSel)?.focus();
   };
+  document.getElementById("journal-show-all")?.addEventListener("click", () => {
+    _allJournal = !_allJournal; _repaint("#journal-show-all");
+  });
   document.querySelectorAll("[data-journal-delete]").forEach(b => b.addEventListener("click", () => {
     pendingJournalDelete = b.dataset.journalDelete; journalStatus = "";
     _repaint(`[data-journal-delete-no="${pendingJournalDelete}"]`);

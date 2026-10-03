@@ -1,5 +1,11 @@
 /**
  * router.js
+ * 03 Oct 2026 v45
+ *
+ * v45 - W5-20 TRUE-WORDS-5. Make it up as I go on Free still goes to the
+ *   upgrade page, now with router.redirectReason 'capture' so the page says
+ *   why.
+ *
  * 02 Oct 2026 v44
  *
  * v44 - W5-16. The phone's Back leaves the app from the under-18 screen, the
@@ -564,10 +570,12 @@ export const router = {
 
     // W4-22. Make it up as I go is the Plan's (tier table: Free "Not
     // included"); the route opened on Free. Free goes to what the Plan is.
+    // W5-20: and the upgrade page is told why, so it can say (it said nothing).
+    this.redirectReason = null;
     if (viewName === 'capture') {
       try {
         if (!this._au) this._au = await import('./auth.js');
-        if (!this._au.isPremium()) viewName = 'upgrade';
+        if (!this._au.isPremium()) { viewName = 'upgrade'; this.redirectReason = 'capture'; }
       } catch (err) { console.error('Router: tier check failed', err); }
     }
 

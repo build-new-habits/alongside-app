@@ -1,6 +1,12 @@
 /**
  * checkin-mini.js - Abbreviated Return-Visit Check-In
  *
+ * 03 Oct 2026 v10
+ *
+ * v10 - W5-21 SMALL-5. The energy and mood sliders start from today's
+ *   check-in answers (both started at 5 and Next saved the 5), and each
+ *   visit starts at the first question.
+ *
  * 02 Oct 2026 v9
  *
  * v9 - W5-4 STRESS-SORE. The sore question lists body areas only
@@ -114,6 +120,7 @@
  */
 
 import { store }      from "../store.js";
+import { getTodaysCheckin } from "../data/checkin.js";
 import { CONDITIONS, SORE_LEVELS, soreWord, areaWords, bodyAreasOf } from "../data/conditions.js";
 
 export const centered = false;
@@ -123,6 +130,19 @@ let miniStep     = 0;  // 0 = energy, 1 = mood, 2 = pain, 3 = location, 4 = done
 let miniEnergy   = 5;
 let miniMood     = 5;
 let miniPainScores = {};
+let _seeded = false;   // W5-21: today's answers read once per visit
+
+// W5-21. Start from what they said this morning (both started at 5, and
+// Next saved the 5); and start at the first question each visit.
+function _seed() {
+  const t = getTodaysCheckin() || {};
+  const n = v => (Number.isFinite(Number(v)) && Number(v) >= 1 && Number(v) <= 10) ? Math.round(Number(v)) : 5;
+  miniEnergy = n(t.energy);
+  miniMood   = n(t.mood);
+  miniStep   = 0;
+  _seeded    = true;
+}
+function _leave() { _seeded = false; miniStep = 0; }
 let miniLocation = null;
 
 const TOTAL_STEPS = 4;
@@ -154,6 +174,7 @@ const LOCATION_OPTIONS = [
 // -- Render --------------------------------------------------------------------
 
 export function render() {
+  if (!_seeded) _seed();
   if (miniStep === 0) return renderEnergy();
   if (miniStep === 1) return renderMood();
   if (miniStep === 2) return renderPain();
@@ -453,6 +474,7 @@ export function onMount() {
 
   // Skip - abandon mini check-in, go to intention
   document.getElementById("mini-skip-btn")?.addEventListener("click", () => {
+    _leave();
     store.set("returnVisit", false);
     // Fix, 04 Aug 2026 — Graeme: "we should fix this so it's optional
     // not fixed." Previously cleared pendingDoorRoute and always
@@ -550,6 +572,7 @@ export function onMount() {
 
   // Continue from done screen
   document.getElementById("mini-continue-btn")?.addEventListener("click", () => {
+    _leave();
     // Fix, 04 Aug 2026: honour a pending Home-door destination if one
     // was set (session-generating doors route through check-in-mini
     // when already checked in today, then continue to where the

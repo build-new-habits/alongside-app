@@ -1,5 +1,11 @@
 /**
  * js/data/tier-table.js
+ * 03 Oct 2026 v6
+ *
+ * v6 - W5-20 TRUE-WORDS-5. I know what I want is the Plan's: Free says Not
+ *   included (it said Free had it). Make it up as I go's Free line names Log
+ *   what I did, in the Library.
+ *
  * 02 Oct 2026 v5
  *
  * v5 - W4-20. Mindful awareness, not movement.
@@ -67,15 +73,16 @@ export const TIER_TABLE = [
   {
     id: "know-what",
     area: "I know what I want",
-    free: "Any kind of session, chosen yourself",
-    plan: "The same, plus sessions you have saved",
+    // W5-20: the door is the Plan's (Home on Free has no such door).
+    free: "Not included. Home on Free lets you choose any kind of session",
+    plan: "Pick the kind of session and how long yourself, and save sessions to start again",
     says: "Sessions you put together can be saved and started again.",
     proof: "verify-plan-claims 3.saved, verify-saved1",
   },
   {
     id: "as-you-go",
     area: "Make it up as I go",
-    free: "Not included. The activity log is there for anything you did",
+    free: "Not included. Log what I did, in the Library, records anything you did",
     plan: "Log each move and set as you go, and it counts as a full session",
     says: "Make it up as you go: log each move and set as you do it, and it counts as a full session.",
     proof: "verify-plan-claims 3.freestyle, verify-freestyle",

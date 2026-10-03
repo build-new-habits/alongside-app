@@ -1,5 +1,13 @@
 /**
  * js/data/checkin-openings.js
+ * 03 Oct 2026 v12
+ *
+ * v12 - W5-21 SMALL-5. With Mostly the same the check-in opens with one
+ *   fixed line (the first humanistic one); the real-world lines it used
+ *   follow the weekday and hour, so the opening changed every time. Also
+ *   W5-20 TRUE-WORDS-5: a returning opener no longer asks to be told why
+ *   they were away (there was nowhere to answer).
+ *
  * 02 Oct 2026 v11
  *
  * v11 - W5-18. The gap is days since the last check-in or finished session,
@@ -290,7 +298,8 @@ const GAP_SHORT = [
 ];
 
 const ARRIVAL_RETURN = [
-  { b1: "Hey. Nice to see you. There's no expectation — but if you want to tell me why you've been away, I'm ready to listen.", b2: null },
+  // W5-20: it asked to be told why, on a check-in with nowhere to answer.
+  { b1: "Hey. Nice to see you. There's no expectation, and nothing you need to explain.", b2: null },
   { b1: "You came back. Whatever brought you here, it was enough.",         b2: null },
   { b1: "No need to explain anything. I'm just glad you're here.",         b2: null },
   { b1: "Hey. It's good to see you. Whenever you're ready, let's just start from where you are today.", b2: null },
@@ -417,7 +426,9 @@ export function resolveOpening() {
   let   chosen = pool[pool.length - 1].mode;
   for (const e of pool) { roll -= e.weight; if (roll <= 0) { chosen = e.mode; break; } }
   // W4-22. Mostly the same means the same way in: one mode, one line.
-  if (_familiar()) chosen = 'real-world';
+  // W5-21: not the real-world lines, which follow the weekday and the hour
+  // ("The evenings are pulling in again" at 07:30). One fixed line.
+  if (_familiar()) chosen = 'humanistic';
 
   _writeMode(chosen);
 
@@ -588,7 +599,7 @@ function _rw(key) {
 function _resolveHumanistic() {
   const history = store.get('checkin.openingModeHistory') || [];
   const count   = history.filter(m => m === 'humanistic').length;
-  const v       = HUMANISTIC[count % HUMANISTIC.length];
+  const v       = HUMANISTIC[_familiar() ? 0 : count % HUMANISTIC.length];
   return { b1: v.b1, b2: v.b2, mode: 'humanistic', careMode: false };
 }
 

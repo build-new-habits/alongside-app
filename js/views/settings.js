@@ -1,5 +1,13 @@
 /**
  * settings.js
+ * 03 Oct 2026 v66
+ *
+ * v66 - W5-20 TRUE-WORDS-5. Take it off on an everyday state (Stress) takes
+ *   it off; it no longer says "moved to Better now" or files it under Better
+ *   now. The line under How much should sessions change follows the answer
+ *   at once. A restore says what came across through restoredMessage() (with
+ *   the Plan left on the old phone named).
+ *
  * 03 Oct 2026 v65
  *
  * v65 - W5-19 GS-RESUME. Gender reads Not set when never given (it said
@@ -701,7 +709,7 @@ import { CONDITIONS, bodyAreasOf, everydayOf, isEveryday } from '../data/conditi
 import { scopeStatementHTML } from '../data/scope-statement.js';
 import { aimById } from '../data/aims.js';
 import { healthAllowed, healthConsentNeeded, setPendingRoute, takeOpenCapability, takePendingRoute } from '../data/health-consent.js';
-import { describeDate } from '../data/restore.js';
+import { describeDate, restoredMessage } from '../data/restore.js';
 import { lockText, passwordProblem, lockAvailable } from '../data/file-lock.js';
 import { restoreFromFile } from './restore-flow.js';
 import { visibleMessages, hasUnread, markAllRead, dismissMessage, updateNavDot } from '../data/messages.js';
@@ -1465,10 +1473,10 @@ export function SettingsView(router) {
                   data-field="sessionVariety"
                   aria-describedby="pref-variety-hint">
             ${VARIETY_OPTIONS.map(o => `
-              <option value="${o.id}"${variety === o.id ? ' selected' : ''}>${_esc(o.label)}</option>
+              <option value="${o.id}" data-hint="${_esc(o.hint)}"${variety === o.id ? ' selected' : ''}>${_esc(o.label)}</option>
             `).join('')}
           </select>
-          <p class="settings-section__sub">
+          <p class="settings-section__sub" id="pref-variety-now">
             ${_esc(VARIETY_OPTIONS.find(o => o.id === variety)?.hint || '')}
           </p>
         </fieldset>
@@ -1825,7 +1833,8 @@ export function SettingsView(router) {
     const all        = store.get('conditions') || [];
     const conditions = bodyAreasOf(all);
     const everyday   = everydayOf(all);
-    const resolved   = store.get('conditionsResolved') || [];
+    // W5-20: an everyday state taken off is not "better now".
+    const resolved   = (store.get('conditionsResolved') || []).filter(r => !isEveryday(r.id));
     const meta       = store.get('conditionMeta') || {};
     const history    = store.get('checkinHistory') || {};
     const nameOf = id => (CONDITIONS.find(c => c.id === id) || {}).name || id;
@@ -2452,11 +2461,15 @@ export function SettingsView(router) {
     // SMOOTH-P4c. It's better now / It's back. The person's call.
     container.querySelectorAll('[data-resolve]').forEach(btn => btn.addEventListener('click', () => {
       const name = (CONDITIONS.find(c => c.id === btn.dataset.resolve) || {}).name || btn.dataset.resolve;
+      const everydayOne = isEveryday(btn.dataset.resolve);
       store.resolveCondition(btn.dataset.resolve);
-      focusAfter = `[data-reopen="${btn.dataset.resolve}"]`;
+      // W5-20. Take it off: an everyday state is taken off, not filed as
+      // better ("Stress moved to Better now").
+      if (everydayOne) store.set('conditionsResolved', (store.get('conditionsResolved') || []).filter(r => r.id !== btn.dataset.resolve));
+      focusAfter = everydayOne ? '[data-action="edit-conditions"]' : `[data-reopen="${btn.dataset.resolve}"]`;
       render(container);
-      _saved(container, isEveryday(btn.dataset.resolve)
-        ? `${name} moved to Better now.`
+      _saved(container, everydayOne
+        ? `${name} taken off.`
         : `${name} moved to Better now. I'll stop planning around it.`);
     }));
     container.querySelectorAll('[data-reopen]').forEach(btn => btn.addEventListener('click', () => {
@@ -2551,6 +2564,12 @@ export function SettingsView(router) {
         store.set(field, el.type === 'number' ? Number(value) : value);
         // P11. One answer: onboarding's field changes with it.
         if (field === 'fitnessLevel') store.set('lifestyle.activityLevel', value);
+        // W5-20. The line under How much should sessions change follows the
+        // answer (it described the old one until the screen was reopened).
+        if (field === 'sessionVariety') {
+          const now = container.querySelector('#pref-variety-now');
+          if (now) now.textContent = el.selectedOptions?.[0]?.dataset.hint || '';
+        }
         _saved(container);
       };
       el.addEventListener('change', save);
@@ -3099,9 +3118,7 @@ export function SettingsView(router) {
       restoreFromFile(file, {
         opener,
         onMessage: msg => _result(container, msg),
-        onRestored: r => _result(container, r && r.healthCameAcross === false
-          ? 'Restored. Your history from the file is on this device now, without the health answers.'
-          : 'Restored. Your history from the file is on this device now.'),
+        onRestored: r => _result(container, restoredMessage(r)),   // W5-20
       });
     });
     input.click();

@@ -1,6 +1,16 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
+ * 03 Oct 2026 v84
+ *
+ * v84 - W5-22 LOWER-BODY-GYM. A first main pick for a strength goal takes
+ *   the heaviest for a main lift, but the two heaviest tiers for an
+ *   accessory, so carries, throws and balance work vary. With the Turkish
+ *   Get-Up now a carry, the gym Lower Body hinge is a deadlift or RDL. Also
+ *   W5-21 SMALL-5: the gentle plan takes today's length (a pick for today,
+ *   else the usual) whichever door builds it, so Cardio, Core & Strength and
+ *   the coach give the same one.
+ *
  * 02 Oct 2026 v83
  *
  * v83 - W5-14. soreLevelFor() marks a move for every area it works
@@ -1199,6 +1209,8 @@ import { EXERCISES, isSessionLength, isCardioMachine } from "./data/exercises/in
 import { matchCategory } from "./data/session-categories.js";
 import { buildRationale, tooHardRecently, worksArea } from "./data/session-rationale.js";
 import { isSquatOrLunge } from "./data/chair-legs.js";
+import { lengthCatForToday } from "./data/session-length.js";
+import { AVAILABLE_TIME_WINDOW_MINUTES } from "./data/time-windows.js";
 import { getZoneStatus, getPainBand, getCondition, getActiveConditionIds, isSore, isAcute, isBad, soreLine, areaWords, bodyAreasOf } from "./data/conditions.js";
 import { focusOrderedCategories } from "./data/week-focus.js";
 // BURNOUT-LIVE, 16 Sep 2026. checkin.js imports only the store, so this
@@ -3811,7 +3823,10 @@ function gentleCareSession(zone, durationMins) {
 
   // W4-7. Fits the minutes chosen (10 chosen gave About 30 min): each part
   // shortened in proportion, never below a minute.
-  const minutes = durationMins || 20;
+  // W5-21. One gentle plan a day, whichever door: today's length (a pick
+  // for today, else the usual), not each door's own default (the builder
+  // gave 20 minutes and the coach 30, the same morning).
+  const minutes = AVAILABLE_TIME_WINDOW_MINUTES[lengthCatForToday()] || durationMins || 20;
   const total = items.reduce((n, e) => n + exerciseSeconds(e), 0);
   if (total > minutes * 60) {
     const f = (minutes * 60) / total;
@@ -4534,7 +4549,13 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
             // squat, by difficulty as the available proxy for load.
             const top = Math.max(...loadable.map(e => e.difficultyLevel || 1));
             const heaviest = loadable.filter(e => (e.difficultyLevel || 1) === top);
-            from = heaviest;
+            // W5-22. For a main lift (squat, hinge, push, pull, lunge) the
+            // heaviest. For an accessory (a carry, a throw, balance work)
+            // the two heaviest tiers, so the same one does not come every
+            // session (2.15: the same four accessories in 40 of 40).
+            const lift = heaviest.every(e => _HEAVY_PATTERNS.has(e.movementPattern));
+            from = lift ? heaviest
+              : loadable.filter(e => (e.difficultyLevel || 1) >= top - 1);
           }
         }
       }

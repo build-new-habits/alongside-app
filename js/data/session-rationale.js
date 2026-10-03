@@ -1,5 +1,10 @@
 /**
  * data/session-rationale.js
+ * 03 Oct 2026 v9
+ *
+ * v9 - W5-20 TRUE-WORDS-5. Today covers heart and lungs only from moves that
+ *   ask for it (energy 3 or more); Seated Shoulder Rolls gave it.
+ *
  * 02 Oct 2026 v8
  *
  * v8 - W5-14. worksArea(): a move works a listed area if any of its areas
@@ -431,6 +436,9 @@ function _distinctPatterns(exercises) {
   const counts = {};
   for (const e of exercises) {
     if (!e.movementPattern) continue;
+    // W5-20. "Heart and lungs" only from moves that ask for it: Seated
+    // Shoulder Rolls (locomotion, energy 2) are not that.
+    if (e.movementPattern === "locomotion" && (Number(e.energyRequired) || 0) < 3) continue;
     counts[e.movementPattern] = (counts[e.movementPattern] || 0) + 1;
   }
   return Object.entries(counts)
