@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 03 Oct 2026 v637
+ * 03 Oct 2026 v638
  *
+ * v638 - W5-5/W5-6/W5-16: under 18 is recorded at Continue and stands; what the phone holds is named, offered as a copy and deleted on the under-18 screen (or at the next start-up), from either door; no way to change the answer; Back can leave; the site named is the one the app runs on.
  * v637 - W5-3/W5-7/W5-8: nothing that sits you on the floor for somebody who cannot get down to it; no squats or lunges when getting up from a chair is hard (Sit to Stand stays, hands allowed); saying no to the health consent gets a second explanation, then one gentle seated routine that changes daily. NEW FILES precached: js/data/chair-legs.js, js/data/general-routine.js.
  * v636 - W5-1/W5-2/W5-4: on a Bad day the gentle plan is what plays (the builder stored nothing, so Let's go played yesterday's plan or nothing); Yoga and Classes ask Rest today / Something gentler first; stress is not asked as a sore area. NEW FILE precached: js/views/bad-day-door.js.
  * v635 - W4-23/W4-24/W4-25/W4-26: Settings is an index of eight sections, each opening where it is; nothing health-related asked or kept on return without the health consent; the one consent test shared by every reader. NEW FILE precached: js/data/health-consent-covers.js.
@@ -4184,7 +4185,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v637";
+const CACHE_NAME = "alongside-v638";
 
 const SHELL_URLS = [
 
