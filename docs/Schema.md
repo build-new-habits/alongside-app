@@ -1,5 +1,12 @@
 # Alongside — Data Schema Reference
-## 03 Oct 2026 v1.106
+## 03 Oct 2026 v1.107
+
+> **v1.107, 03 Oct 2026 — W5-15** (`store.js` v110). No new field.
+> **`arc.typesWorked`** gains the key **`practice`** (a date, as every
+> key): a completed breathing, mindful or quiet practice credits it
+> (`markSessionWorked`, from `logActivity`). Mind strands
+> (`STRANDS[id].kind === "mind"`) light from it in
+> `data/arc-readback.js`; before, nothing lit them.
 
 > **v1.106, 03 Oct 2026 — W5-11** (`store.js` v109). New
 > **`availableTimeToday`** (`{ cat, on }` or absent; not in `getDefaults()`,
@@ -977,7 +984,7 @@
 
 ## 06 Sep 2026 v1.51
 
-**File:** `js/store.js` (confirmed live version: **v109, 03 Oct 2026**)
+**File:** `js/store.js` (confirmed live version: **v110, 03 Oct 2026**)
 
 > **v1.47, 06 Sep 2026 — CR-1.** `conditions[]` gains three ids and loses one. `chronic-fatigue` is **retired**; `persistent-fatigue`, `me-cfs` and `long-covid` replace it. No field shape changed — `conditions` is still `string[]` and `conditionMeta` is still keyed by condition id.
 >

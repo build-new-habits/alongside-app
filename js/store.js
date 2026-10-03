@@ -4,7 +4,12 @@ import { RETIRED_CONDITIONS } from "./data/scope-statement.js";
 
 /**
  * store.js - Data persistence layer
- * 03 Oct 2026 v109
+ * 03 Oct 2026 v110
+ *
+ * v110 - W5-15 ARC-TRUE (Schema v1.107). arc.typesWorked gains the key
+ *   "practice": a breathing, mindful or quiet practice credits it, and
+ *   arc-readback.js lights mind strands from it (nothing lit them, so a
+ *   mind-only arc read "Not yet" for ever).
  *
  * v109 - W5-11 USUAL-LENGTH (Schema v1.106). New availableTimeToday
  *   ({ cat, on } or absent): a length picked for today on the coach's plan,
@@ -3538,7 +3543,8 @@ export const store = {
 
     // Capability strands: the type of session it was -- or, for a session
     // put together as it went, the kind its moves fit (W3-16, creditTypes).
-    const credit = [session.sessionType, ...(Array.isArray(session.creditTypes) ? session.creditTypes : [])]
+    const credit = [session.sessionType, ...(Array.isArray(session.creditTypes) ? session.creditTypes : []),
+                    ...(session.practice ? ['practice'] : [])]   // W5-15: lights mind strands
       .filter(t => typeof t === 'string' && t);
     if (credit.length) {
       const types = { ...(arc.typesWorked || {}) };
@@ -3693,6 +3699,7 @@ export const store = {
     // commentary on it.
     try {
       this.markSessionWorked({
+        practice:    ['breathing', 'mindful', 'mindfulness', 'practice', 'quiet', 'quiet-session'].includes(entry.type),   // W5-15
         sessionType: _inferredType,
         exercises:   (_thisSession && _thisSession.exercises) || entry.exercises || [],
         creditTypes: (_thisSession && _thisSession.creditTypes) || []   // W3-16
