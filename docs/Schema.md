@@ -1,5 +1,21 @@
 # Alongside — Data Schema Reference
-## 02 Oct 2026 v1.103
+## 02 Oct 2026 v1.104
+
+> **v1.104, 02 Oct 2026 — W5-7 and W5-8** (`store.js` v107). New
+> **`consent.health.confirmedNoAt`** (ISO|null, default `null`): set when
+> the person says no to the health consent a second time, on the screen
+> that says their answers stay on this phone (Graeme, 02 Oct: "Second
+> chance, then one routine"). `declinedAt` is set with it. While the
+> consent is not given and this is set, the doors that build a session
+> (`BUILD_ROUTES`, the check-in and the update check-in) give the one
+> gentle full-body routine (`data/general-routine.js`, stored in
+> `generatedSession` with `session.general: true`) and ask nothing about
+> health; the journal still asks for the consent. Giving the consent ends
+> it. **`capabilityProfile()`** also returns **`chairHard`** (not a stored
+> field): getting up from a chair answered `not-easily` or `no`, true in
+> the careful profile; no squat or lunge passes the builder or a class
+> while it is true (`data/chair-legs.js`; Graeme, 02 Oct). A gentle plan
+> stored on a Bad day carries `inputs.gentleCare: true` (W5-1).
 
 > **v1.103, 02 Oct 2026 — W4-24 and W4-26** (`store.js` v106). No field
 > changes. **`absence.context`** is written as `illness` or `injury` only
@@ -942,7 +958,7 @@
 
 ## 06 Sep 2026 v1.51
 
-**File:** `js/store.js` (confirmed live version: **v106, 02 Oct 2026**)
+**File:** `js/store.js` (confirmed live version: **v107, 02 Oct 2026**)
 
 > **v1.47, 06 Sep 2026 — CR-1.** `conditions[]` gains three ids and loses one. `chronic-fatigue` is **retired**; `persistent-fatigue`, `me-cfs` and `long-covid` replace it. No field shape changed — `conditions` is still `string[]` and `conditionMeta` is still keyed by condition id.
 >

@@ -4,7 +4,16 @@ import { RETIRED_CONDITIONS } from "./data/scope-statement.js";
 
 /**
  * store.js - Data persistence layer
- * 02 Oct 2026 v106
+ * 02 Oct 2026 v107
+ *
+ * v107 - W5-7 and W5-8 (Schema v1.104). capabilityProfile() also returns
+ *   chairHard: getting up from a chair answered "not easily" or "no" (true in
+ *   the careful profile), which takes out every squat and lunge
+ *   (data/chair-legs.js; Graeme's decision, 02 Oct). New
+ *   consent.health.confirmedNoAt: set when the person says no a second time,
+ *   on the screen that says their answers stay on this phone; from then the
+ *   doors that build a session give the one gentle routine
+ *   (data/general-routine.js) and ask nothing about health.
  *
  * v106 - W4-26 (no field change). logLift() keeps a note only when the health
  *   consent still covers it (consentCovers, data/health-consent-covers.js),
@@ -1948,7 +1957,7 @@ export const store = {
         // PT-2, 01 Oct 2026. Explicit consent for health answers, apart
         // from the Privacy-and-Terms tick. given: true | false (withdrawn)
         // | null (never asked: an install from before this existed).
-        health: { given: null, at: null, version: null, withdrawnAt: null, declinedAt: null }
+        health: { given: null, at: null, version: null, withdrawnAt: null, declinedAt: null, confirmedNoAt: null }
       },
 
       // ── ONBOARDING THREAD AND BEATS (nested object — v6 + v7) ─
@@ -3867,7 +3876,7 @@ export const store = {
     if (!asked && (c.clearedAt || this.data.consent?.health?.declinedAt)) {
       return { impactSafe: false, floorSafe: false, balanceSafe: false, ceilingCap: 2,
                needsSeated: true, legsUsable: true, legsLoadable: false,
-               asked: true, careful: true };
+               chairHard: true, asked: true, careful: true };
     }
 
     // Impact needs an affirmative yes. Someone who does not currently do
@@ -3989,8 +3998,10 @@ export const store = {
     const legsUsable   = legPower !== 'none';
     const legsLoadable = legPower === 'full';
 
+    // W5-7. Graeme, 02 Oct: no squats or lunges when getting up from a
+    // chair is hard, whatever the legs answer (data/chair-legs.js).
     return { impactSafe, floorSafe, balanceSafe, ceilingCap, needsSeated,
-             legsUsable, legsLoadable, asked };
+             legsUsable, legsLoadable, chairHard: asked && chairHard, asked };
   },
 
   /**
