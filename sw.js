@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 02 Oct 2026 v636
+ * 03 Oct 2026 v637
  *
+ * v637 - W5-3/W5-7/W5-8: nothing that sits you on the floor for somebody who cannot get down to it; no squats or lunges when getting up from a chair is hard (Sit to Stand stays, hands allowed); saying no to the health consent gets a second explanation, then one gentle seated routine that changes daily. NEW FILES precached: js/data/chair-legs.js, js/data/general-routine.js.
  * v636 - W5-1/W5-2/W5-4: on a Bad day the gentle plan is what plays (the builder stored nothing, so Let's go played yesterday's plan or nothing); Yoga and Classes ask Rest today / Something gentler first; stress is not asked as a sore area. NEW FILE precached: js/views/bad-day-door.js.
  * v635 - W4-23/W4-24/W4-25/W4-26: Settings is an index of eight sections, each opening where it is; nothing health-related asked or kept on return without the health consent; the one consent test shared by every reader. NEW FILE precached: js/data/health-consent-covers.js.
  * v634 - W4-20/W4-21/W4-22: the coach's lines made true (plan length, a shorter day, legs not ready, Mindful awareness, steady runs, their own words, nothing about fitness slipping or what a beta member pays, lighter plans, plurals, Progress from the start); the week's question changes, Write about this keeps it, Back goes back and asks first, saving says so; the opener holds with Mostly the same, the as-you-go clock leaves out time away, Free does not open it, the dot shows after upgrading, and vibration can be turned off.
@@ -4183,7 +4184,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v636";
+const CACHE_NAME = "alongside-v637";
 
 const SHELL_URLS = [
 
@@ -4347,6 +4348,8 @@ const SHELL_URLS = [
   "./js/data/export-file.js",
   "./js/data/health-consent-covers.js",
   "./js/views/bad-day-door.js",
+  "./js/data/chair-legs.js",
+  "./js/data/general-routine.js",
   "./js/data/file-lock.js",
   "./js/data/messages.js",
   "./js/data/evidence.js",
