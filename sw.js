@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 03 Oct 2026 v642
+ * 03 Oct 2026 v643
  *
+ * v643 - W5-22/W5-21/W5-20: gym Lower Body hinges with a deadlift or RDL (the Get-Up is a carry) and varies carries, throws and balance work; every journal entry readable; mindful and breathing minutes counted; Reset display keeps Vibration; Restore keeps </3; breathing says it buzzes; Mostly the same opens with one line; one gentle plan a day; the update check-in starts from today's answers; true words on balance, Hold on to what I've got, Stress, the variety line, the red-flag introduction (asked once more), leave cards, the tier table, Make it up as I go on Free, Mindful awareness, Back to Wellbeing, heart and lungs, the away opener and restore.
  * v642 - W5-24/W5-19/W5-17: under 18 deletes everything at once, no copy; getting started carries on where it stopped, a skip clears the earlier answer, the age has one way to skip, no claim to know their history after a skip; first screens out of the live region with focus on their headings, no per-second timers read out, groups named by their questions, equipment sheet Back works, Messages a heading, upgrade and update banner named as they read, loading screen still under Reduce motion, age errors marked.
  * v641 - W5-13/W5-14/W5-15: research wording qualified while sending is on, figures after eight weeks, true kinds and dates; sore areas in the person's word at every door, no target taken from a sore area, marks for every area a move works; mind strands light from practice, a mind-only arc does not claim the plan, back aims need a listed back.
  * v640 - W5-11/W5-12: a length picked on the plan or in I know what I want is for today only, the usual changes in Settings; the coach line, Yoga's cards, Core's finish, a run's prompt count and the check-in's length line say the minutes built or done. NEW FILE precached: js/data/session-length.js.
@@ -4189,7 +4190,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v642";
+const CACHE_NAME = "alongside-v643";
 
 const SHELL_URLS = [
 
