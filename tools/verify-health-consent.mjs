@@ -1,6 +1,11 @@
 /**
  * tools/verify-health-consent.mjs
- * 02 Oct 2026 v8
+ * 02 Oct 2026 v9
+ *
+ * v9 - W5-8 DECLINE-DOORS (Graeme, 02 Oct: "Second chance, then one
+ *   routine"). 2d: Not now opens the second screen (the answers stay on
+ *   this phone) and records nothing; it no longer goes Home.
+ *   verify-decline-doors owns the rest.
  *
  * v8 - W4-13 and W4-19. The health tick is short, with what health answers
  *   are beside it (1a reads both). The Privacy-and-Terms tick is the one
@@ -160,7 +165,8 @@ ok("2c. a class is not a health question", (await go("classes")) === "classes");
 fixture({ consent: true });
 await go("checkin");
 click(main.querySelector("#hc-not-now")); await wait(20);
-ok("2d. Not now goes Home and records nothing", landed.includes("today") && store.get("consent")?.health?.given !== true, JSON.stringify(landed));
+ok("2d. Not now opens the second screen and records nothing", /stay on this phone/i.test(main.textContent) && !landed.includes("today") &&
+   store.get("consent")?.health?.given !== true && !store.get("consent")?.health?.confirmedNoAt, JSON.stringify(landed));
 fixture({ consent: true });
 await go("checkin");
 click(main.querySelector("#hc-continue")); await wait(10);

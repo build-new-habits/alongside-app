@@ -1,5 +1,14 @@
 /**
  * tools/verify-mobility-door.mjs
+ * 02 Oct 2026 v4
+ *
+ * v4 - W5-3 FLOOR-SITTING. The one yoga move this seated, off-the-floor
+ *   person was given was Spine Stretch Forward, which sits you on the floor
+ *   with the legs out long (now tagged floor). So every yoga style is now
+ *   closed for them, each saying why: 3pc allows no open style for the yoga
+ *   session as long as every closed one says so, and 3e asks that Pilates is
+ *   closed. The core session still needs one open focus.
+ *
  * 30 Sep 2026 v3
  *
  * v3 - W3-19 YOGA-EMPTY. A yoga style with nothing that fits now says so
@@ -189,8 +198,9 @@ console.log("\nTEST 1 - \"Start a Mobility Session\" opens a mobility session");
 for (const [label, path, T] of [["core session", "views/core-session.js", "2"], ["yoga session", "views/yoga-session.js", "3"]]) {
   console.log(`\nTEST ${T} - the ${label}, for somebody seated, off the floor, with no kit`);
   const r = await sweep(path, true);
-  ok(`${T}pc. every focus and length that can be chosen was walked`, r.focuses.length + r.closed.length >= 4 && r.focuses.length >= 1 && r.lists >= r.focuses.length && r.closedSaid === r.closed.length,
+  ok(`${T}pc. every focus and length that can be chosen was walked`, r.focuses.length + r.closed.length >= 4 && (r.focuses.length >= 1 || T === "3") && r.lists >= r.focuses.length && r.closedSaid === r.closed.length,
      `${r.focuses.join(",")} (closed: ${r.closed.join(",") || "none"}); ${r.lists} lists, ${r.names} moves`);
+  if (T === "3") ok("3e. Pilates is closed for somebody off the floor (W5-3)", r.closed.includes("pilates"), r.closed.join(","));
   ok(`${T}pc2. every listed move is a library entry`, r.unknown.length === 0, r.unknown.join(", "));
   ok(`${T}a. nothing listed that the shared filters would keep from them`, r.bad.length === 0, `${r.bad.length}: ${r.bad.slice(0, 8).join("; ")}`);
   ok(`${T}a2. where nothing fits, it says so and offers another choice`, r.honest === r.empties.length, `${r.honest} of ${r.empties.length} empty lists: ${r.empties.join(",")}`);

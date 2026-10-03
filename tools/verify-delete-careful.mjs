@@ -1,6 +1,12 @@
 /**
  * tools/verify-delete-careful.mjs
- * 02 Oct 2026 v3
+ * 02 Oct 2026 v4
+ *
+ * v4 - W5-8 DECLINE-DOORS (Graeme, 02 Oct). 4a: without the health
+ *   consent a door that builds a session now asks for it (with the second
+ *   chance, then the one gentle routine) instead of building carefully from
+ *   nothing; verify-decline-doors owns that. Planning stays careful for
+ *   anyone who reaches a build without answers (TEST 2).
  *
  * v3 - W4-26, TEST 8: health consent given before what it covers changed
  *   keeps no lift note, as everywhere else; a consent that still covers it
@@ -157,8 +163,8 @@ router._mountView = async name => {
 const go = async r => { landed = []; await router.navigate(r); await wait(15); return landed.at(-1); };
 
 person(CAREFUL); store.deleteHealthAnswers();
-ok("4a. without health consent the coach's plan is not held up (planning stays careful)",
-   ["coach-proposal", "red-flag"].includes(await go("coach-proposal")), JSON.stringify(landed));
+ok("4a. without health consent the coach's door asks for it first (W5-8)",
+   (await go("coach-proposal")) === "health-consent", JSON.stringify(landed));
 HC.giveHealthConsent();
 const to = await go("coach-proposal");
 ok("4b. consent given again: the next plan opens What your body can do first", to === "settings" && /What your body can do/.test(txt(main.querySelector("h1"))),
