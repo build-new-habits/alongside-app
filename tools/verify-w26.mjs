@@ -1,5 +1,13 @@
 /**
  * tools/verify-w26.mjs
+ * 03 Oct 2026 v4
+ *
+ * v4 - W5-25 SUITE-FLAKE-2 (found 03 Oct verifying v643 from a fresh clone:
+ *   1 run in about 38 failed, on chance, with no app change touching its
+ *   fixture). Math.random is seeded, fixed by default, SEED=<n> for another,
+ *   as verify-maintain-intent (W5-23) and verify-mostly-same (W4-25). No
+ *   assertion changed.
+ *
  * 21 Aug 2026 v3
  * GATE-PATH. Path resolution only -- no assertion changed.
  *
@@ -23,6 +31,10 @@ const dom = new JSDOM('<!doctype html>', { url: 'https://build-new-habits.github
 globalThis.window = dom.window; globalThis.document = dom.window.document;
 Object.defineProperty(globalThis, 'navigator', { value: dom.window.navigator, configurable: true, writable: true });
 Object.defineProperty(globalThis, 'localStorage', { value: dom.window.localStorage, configurable: true, writable: true });
+
+const SEED = Number(process.env.SEED) || 20261003;
+console.log(`seed ${SEED} (another: SEED=<n> node tools/verify-w26.mjs)`);
+Math.random = (() => { let a = SEED >>> 0; return () => { a = (a + 0x6D2B79F5) >>> 0; let x = Math.imul(a ^ (a >>> 15), 1 | a); x = (x + Math.imul(x ^ (x >>> 7), 61 | x)) ^ x; return ((x ^ (x >>> 14)) >>> 0) / 4294967296; }; })();
 
 const BASE = new URL('../js/', import.meta.url).href;
 const { store } = await import(BASE + 'store.js');
