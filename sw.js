@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 03 Oct 2026 v641
+ * 03 Oct 2026 v642
  *
+ * v642 - W5-24/W5-19/W5-17: under 18 deletes everything at once, no copy; getting started carries on where it stopped, a skip clears the earlier answer, the age has one way to skip, no claim to know their history after a skip; first screens out of the live region with focus on their headings, no per-second timers read out, groups named by their questions, equipment sheet Back works, Messages a heading, upgrade and update banner named as they read, loading screen still under Reduce motion, age errors marked.
  * v641 - W5-13/W5-14/W5-15: research wording qualified while sending is on, figures after eight weeks, true kinds and dates; sore areas in the person's word at every door, no target taken from a sore area, marks for every area a move works; mind strands light from practice, a mind-only arc does not claim the plan, back aims need a listed back.
  * v640 - W5-11/W5-12: a length picked on the plan or in I know what I want is for today only, the usual changes in Settings; the coach line, Yoga's cards, Core's finish, a run's prompt count and the check-in's length line say the minutes built or done. NEW FILE precached: js/data/session-length.js.
  * v639 - W5-9/W5-10/W5-18: Exit without saving saves nothing and the next session starts at 1; a different session after Carry on later no longer fails; Stay in session carries a mindful practice on, with a cue at each change and the end; finish screen, mood slider, sore answers, the gap and the trend line read by the day and the session.
@@ -4188,7 +4189,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v641";
+const CACHE_NAME = "alongside-v642";
 
 const SHELL_URLS = [
 
