@@ -1,5 +1,11 @@
 /**
  * yoga-session.js
+ * 02 Oct 2026 v17
+ *
+ * v17 - W5-12. Length cards say only what they build (About N min, N poses):
+ *   no "Short session", "Full practice" or "Deep session" over a 5- or
+ *   7-minute practice; the finish no longer says "30 minutes ago".
+ *
  * 02 Oct 2026 v16
  *
  * v16 - W5-2 BAD-DAY-DOORS. On a Bad day Yoga asks Rest today / Something
@@ -842,9 +848,8 @@ function renderDurationSelector() {
       <div class="cs-duration-grid" role="group" aria-label="Choose session duration">
         ${cards.map(({ d, poses }) => `
           <button class="cs-duration-card" data-mins="${d.mins}"
-                  aria-label="${_aboutMins(poses)}, ${poses.length} poses: ${d.description}">
+                  aria-label="${_aboutMins(poses)}, ${poses.length} pose${poses.length === 1 ? "" : "s"}">
             <span class="cs-duration-label">${_aboutMins(poses)}</span>
-            <span class="cs-duration-desc">${d.description}</span>
             <span class="cs-duration-count text-xs text-muted">
               ${poses.length} pose${poses.length === 1 ? "" : "s"}
             </span>
@@ -1120,7 +1125,7 @@ function renderDone() {
   const name    = store.get("name") || "";
   const focus   = FOCUS_TYPES.find(f => f.id === selectedFocus);
   const doneMsg = {
-    flexibility: "Your body has more range than it did 30 minutes ago. Consistent practice is how that compounds.",
+    flexibility: "Your body has more range than it did when you started. Consistent practice is how that compounds.",
     strength:    "Yoga strength is quiet strength. You have built something real today.",
     balance:     "Balance is a skill and skills improve with practice. You just practised.",
     recovery:    "The body repairs itself. You gave it space to do that today.",

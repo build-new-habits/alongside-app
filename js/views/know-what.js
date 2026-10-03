@@ -1,5 +1,10 @@
 /**
  * js/views/know-what.js
+ * 02 Oct 2026 v5
+ *
+ * v5 - W5-11 USUAL-LENGTH. The length picked here is today's
+ *   (data/session-length.js); the usual changes only in Settings.
+ *
  * 02 Oct 2026 v4
  *
  * v4 - W4-9. HOW_SORE is data/conditions.js SORE_LEVELS (unchanged values).
@@ -60,6 +65,7 @@ import { store } from "../store.js";
 import { CONDITIONS, soreAreaOptions, SORE_LEVELS } from "../data/conditions.js";
 import { savedSessions } from "../data/saved-sessions.js";
 import { AVAILABLE_TIME_WINDOW_MINUTES } from "../data/time-windows.js";
+import { lengthCatForToday, setTodaysLength } from "../data/session-length.js";
 
 export const KINDS = [
   { id: "strength", label: "Strength" },
@@ -101,7 +107,7 @@ const _esc  = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<"
 
 /** The length to preselect, and whether it came from them. */
 export function preselectedLength() {
-  const cat = store.get("availableTime");
+  const cat = lengthCatForToday();   // W5-11: today's pick, else the usual
   const exact = LENGTHS.find(l => l.cat === cat);
   if (exact) return { mins: exact.mins, fromThem: true };
   const m = AVAILABLE_TIME_WINDOW_MINUTES[cat];
@@ -318,7 +324,7 @@ export function KnowWhatView(router) {
 
     const type = kind === "strength" ? part : kind;
     store.set("requestedSessionType", type);
-    store.set("availableTime", LENGTHS.find(l => l.mins === mins)?.cat || "short");
+    setTodaysLength(LENGTHS.find(l => l.mins === mins)?.cat || "short");   // W5-11: today's, not the usual
     store.set("requestedLocation", place);
     if (Array.isArray(sore)) {
       // Exactly the check-in's writes: a new area joins their list, and

@@ -1,6 +1,12 @@
 /**
  * running-session.js - Guided Running Session
  *
+ * 02 Oct 2026 v11
+ *
+ * v11 - W5-12. The overview says how many prompts the run will give and
+ *   lists those (promptsGiven): it said "9 times" and listed lines such as
+ *   "Halfway" that a short run never plays.
+ *
  * 02 Oct 2026 v10
  *
  * v10 - W4-9 SORE-WORDS. Sore-area tests from data/conditions.js (isSore,
@@ -412,6 +418,21 @@ function renderTypeSelector() {
   `;
 }
 
+/**
+ * W5-12. The prompts an easy or long run will actually give: one every
+ * promptFreq minutes, none in the cooldown, in the order the run plays
+ * them. The overview said "I will prompt you 9 times" (the whole list) and
+ * a 20-minute run gave 2.
+ */
+export function promptsGiven(type, mins) {
+  const rt = RUN_TYPES.find(t => t.id === type);
+  const freq = (rt?.promptFreq || 7) * 60;
+  const pool = PROMPTS[type] || PROMPTS.easy;
+  const out = [];
+  for (let at = freq, i = 0; at < mins * 60 - COOLDOWN_SECS; at += freq, i++) out.push(pool[i % pool.length]);
+  return out;
+}
+
 // ── Run overview ──────────────────────────────────────────────────────────────
 
 function renderRunOverview() {
@@ -420,7 +441,7 @@ function renderRunOverview() {
   // length (the prompt list is not played on an interval run).
   const prompts = selectedType === "intervals"
     ? intervalScript(selectedMins).map(p => ({ text: p.text, action: p.type === "work" ? "Working" : "Recovering" }))
-    : (PROMPTS[selectedType] || PROMPTS.easy);
+    : promptsGiven(selectedType, selectedMins);
 
   return `
     <div class="view walk-session-view">
@@ -433,7 +454,7 @@ function renderRunOverview() {
         <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
         <p class="coach-message-text">${rt?.coachOpening || "Your run is ready."}</p>
         <p class="text-sm text-muted" style="margin-top: var(--space-2);">
-          2-minute warm-up walk to start. I will prompt you ${prompts.length} times during the run.
+          2-minute warm-up walk to start. ${prompts.length ? `I will prompt you ${prompts.length === 1 ? "once" : `${prompts.length} times`} during the run.` : "No prompts on a run this short: just the walk in and out."}
           Cooldown walk in the final 3 minutes.
         </p>
       </div>

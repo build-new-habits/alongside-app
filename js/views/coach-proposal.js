@@ -1,5 +1,11 @@
 /**
  * coach-proposal.js
+ * 02 Oct 2026 v49
+ *
+ * v49 - W5-11 USUAL-LENGTH. Length and Something shorter set today's length
+ *   (data/session-length.js), not the usual; the plan reads today's length;
+ *   nothing writes availableTime here any more.
+ *
  * 02 Oct 2026 v48
  *
  * v48 - W4-24. The return question's choices come from returnChoices(): no
@@ -752,6 +758,7 @@ import { getConditionName, isAcute, areaWords }  from '../data/conditions.js';
 // interpreted through and has nothing to do with which builder runs.
 // 2e, 28 Sep: it has its own module now, and the old engine is gone.
 import { AVAILABLE_TIME_WINDOW_MINUTES } from '../data/time-windows.js';
+import { lengthCatForToday, setTodaysLength } from '../data/session-length.js';
 import { buildSession, buildCandidatePools, equipmentForLocation,
          swapAlternatives, swapExerciseInSession, soreLevelFor,
          soreScoresToday, SESSION_TYPES, exerciseSeconds, gentleReason } from '../session-builder.js';
@@ -1728,7 +1735,7 @@ export function CoachProposalView(router) {
     panel.querySelectorAll('[data-pick-time]').forEach(btn => btn.addEventListener('click', () => {
       const mins = Number(btn.dataset.pickTime);
       const cat  = Object.keys(AVAILABLE_TIME_WINDOW_MINUTES).find(k => AVAILABLE_TIME_WINDOW_MINUTES[k] === mins);
-      if (cat) store.set('availableTime', cat);
+      if (cat) setTodaysLength(cat);   // W5-11: today's, not the usual
       _rebuildAndRerender(container, `Now ${_getAvailableTimeMinutes()} minutes.`);
       container.querySelector('#cp-time')?.focus();
     }));
@@ -1769,7 +1776,7 @@ export function CoachProposalView(router) {
         // W3-21. Log it as they go: Make it up as I go.
         if (what === 'log')   { closePreviewPanel(container, { navigateHome: false }); router.navigate('capture'); return; }
         if (what === 'shorter') {
-          store.set('availableTime', 'quick');
+          setTodaysLength('quick');   // W5-11: today's only
           _rebuildAndRerender(container, 'Here’s a 20-minute plan.', true);
           return;
         }
@@ -2464,9 +2471,10 @@ export function CoachProposalView(router) {
       if (intensity) {
         store.set('todayIntensity', intensity);
       }
-      if (availTime) {
-        store.set('availableTime', availTime);
-      }
+      // W5-11. Not written back: availTime is read from today's length
+      // (data/session-length.js), and writing it to availableTime made a
+      // pick for today the usual.
+      void availTime;
       return _buildCoachSuggestion();
     } catch (e) {
       console.warn('coach-proposal: session build failed, using fallbacks', e);
@@ -2785,7 +2793,7 @@ export function CoachProposalView(router) {
     // when nothing has been selected yet — workoutGenerator.js already
     // treats null as "no time constraint", which is the correct behaviour
     // for that case.
-    return store.get('availableTime') || null;
+    return lengthCatForToday() || null;   // W5-11: today's pick, else the usual
   }
 
   // v12 (24 Jul 2026) — NEW. _getAvailableTime() is also used by
@@ -2794,7 +2802,7 @@ export function CoachProposalView(router) {
   // fallback in the first place. Kept as a separate function with its own
   // contract rather than overloading _getAvailableTime()'s return type.
   function _getAvailableTimeMinutes() {
-    const category = store.get('availableTime');
+    const category = lengthCatForToday();   // W5-11
     return category ? (AVAILABLE_TIME_WINDOW_MINUTES[category] ?? 30) : 30;
   }
 

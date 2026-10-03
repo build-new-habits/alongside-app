@@ -1,6 +1,12 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
+ * 02 Oct 2026 v82
+ *
+ * v82 - W5-12 LENGTH-TRUE-2. The coach line and the subtitle state the
+ *   minutes built, not the minutes asked (a low day's plan said "30 minutes"
+ *   over About 21).
+ *
  * 02 Oct 2026 v81
  *
  * v81 - W5-7 CHAIR-LEGS. Getting up from a chair "not easily" or "no": no
@@ -3656,7 +3662,7 @@ export function buildSessionFromSelection({ sessionType, durationMins, selectedI
     sessionType: type.id,
     title:    type.label,
     // W3-20. The coach's picks are not "yours".
-    subtitle: recommended ? `Suggested for you today — ${durationMins} mins` : `Built by you today — ${durationMins} mins`,
+    subtitle: recommended ? `Suggested for you today — about ${estMins} mins` : `Built by you today — about ${estMins} mins`,
     duration: durationStr,
     coachLine: recommended ? "These are the ones I'd suggest. Change any you like." : "You picked this one yourself — here's what you chose.",
     exercises: allExercises
@@ -4774,9 +4780,12 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
   // carry no reason and add nothing here, correctly.
   // P9. Chosen from the finished list, so it can only name what is in it.
   const conditionNote = buildConditionNote(sessionType, allExercises);
+  // W5-12. The lines say the minutes built (a low day trims to three
+  // quarters, and some plans come out shorter): "30 minutes across the
+  // whole body" sat over About 21.
   const coachLine = generateCoachLine(
     sessionType,
-    durationMins,
+    estMins,
     allExercises,
     [conditionNote, gentleNote, equipNote, prescribedNote].filter(Boolean).join(" ") || null
   );
@@ -4788,7 +4797,7 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
     id:       `${sessionType}-${Date.now()}`,
     sessionType: type.id,
     title:    `${type.label}`,
-    subtitle: `Built for you today — ${durationMins} mins`,
+    subtitle: `Built for you today — about ${estMins} mins`,
     duration: durationStr,
     coachLine: coachLineWithWarmupNote,
     // W4-9. The sore-area sentence on its own, for a screen that says the

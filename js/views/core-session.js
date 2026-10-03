@@ -1,6 +1,11 @@
 /**
  * core-session.js - Guided Core Session
  *
+ * 02 Oct 2026 v19
+ *
+ * v19 - W5-12. The finish says the minutes done (from the session clock),
+ *   not the minutes chosen ("20 minutes" after one).
+ *
  * 02 Oct 2026 v18
  *
  * v18 - W4-9 SORE-WORDS. Sore-area tests from data/conditions.js (isSore,
@@ -927,7 +932,7 @@ function renderDone() {
             That's your core session done.
           </h2>
           <p class="coach-message-text">
-            ${name ? name + " — " : ""}${exercisesDone} exercises, ${selectedMins} minutes of ${focus?.label?.toLowerCase() || "core"} work.
+            ${name ? name + " — " : ""}${exercisesDone} exercise${exercisesDone === 1 ? "" : "s"}, ${(() => { const m = elapsedMins() || 1; return `${m} minute${m === 1 ? "" : "s"}`; })()} of ${focus?.label?.toLowerCase() || "core"} work.
             ${selectedFocus === "rehab"
               ? "Consistent gentle work adds up. This matters."
               : selectedFocus === "stability"

@@ -1,5 +1,11 @@
 /**
  * js/views/checkin.js
+ * 02 Oct 2026 v30
+ *
+ * v30 - W5-11 and W5-12. The length line says a length picked for today as
+ *   today's, and is decided after today's answers are saved, from the same
+ *   gentle reasons the builder reads (checkinLengthLine).
+ *
  * 02 Oct 2026 v29
  *
  * v29 - W5-4. A listed area not named today is saved as quiet for body areas
@@ -382,17 +388,36 @@ import { intensityForForm, clearPurpose, SAFETY_LINE } from "../data/purpose.js"
 import { checkinData }     from "../data/checkin.js";
 import { gentleReason }    from "../session-builder.js";
 import { resolveOpening }  from "../data/checkin-openings.js";
+import { usualLengthCat, todaysLengthCat } from "../data/session-length.js";
 import { CONDITIONS, soreAreaOptions, SORE_LEVELS, bodyAreasOf } from "../data/conditions.js";
 
 const USUAL = { micro: "10 minutes", quick: "20 minutes", short: "30 minutes",
                 standard: "40 minutes", long: "50 minutes", open: "an hour or more" };
 
 /**
+ * W5-11 / W5-12. The line as the check-in says it, from today's answers
+ * (saved first) and today's length. shorter: decided by the caller, or by
+ * the same gentle reasons the builder reads.
+ */
+export function checkinLengthLine({ shorter = null } = {}) {
+  let s = shorter;
+  try { s = !!s || !!gentleReason(); } catch { s = !!s; }
+  return lengthLine(usualLengthCat(), { shorter: s, today: todaysLengthCat() });
+}
+
+/**
  * W4-20. The check-in's last words on length. "I'll plan for your usual
  * 30 minutes" came before plans made shorter (a low day, poor sleep, a
  * lighter reason the builder has): on those days it says so.
  */
-export function lengthLine(selectedTime, { shorter = false } = {}) {
+export function lengthLine(selectedTime, { shorter = false, today = null } = {}) {
+  // W5-11. A length picked for today is said as today's, not the usual.
+  if (today) {
+    const t = USUAL[today] || today;
+    return shorter
+      ? ` You picked ${t} for today; I'll keep it shorter than that.`
+      : ` I'll plan for the ${t} you picked for today.`;
+  }
   if (!selectedTime) return " I'll have something ready for you.";
   const usual = USUAL[selectedTime] || selectedTime;
   return shorter
@@ -657,6 +682,9 @@ export function CheckinView(router) {
   // ─────────────────────────────────────────────────────────────────────────
 
   async function _finishConversation() {
+    // W5-12. Today's answers first: the length line was decided before they
+    // were saved, so it promised "your usual" and the plan came out gentler.
+    _saveAll();
     await _showCoachBubble(_buildSummary());
     await new Promise(r => setTimeout(r, T.PANEL_DELAY));
     if (!_alive) return;
@@ -916,7 +944,9 @@ export function CheckinView(router) {
     try { reason = gentleReason(); } catch { reason = null; }
     const shorter = (Number(e) <= 3) || q === "poor" || intensityForForm(store.get("todayForm")) === "low" ||
       (reason && reason.id !== "today");
-    line += lengthLine(_selectedTime, { shorter: !!shorter });
+    // W5-12. After today's answers are saved (_finishConversation), so the
+    // builder's reasons (a low week, poor sleep) are today's too.
+    line += checkinLengthLine({ shorter: !!shorter });
     return line;
   }
 
