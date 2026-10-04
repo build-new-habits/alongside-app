@@ -1,6 +1,22 @@
 /**
  * library.js - Library Page
  *
+ * 04 Oct 2026 v15
+ *
+ * v15 - D-5 LIBRARY-ONCE. The category page (At home, At the gym, Mindful
+ *   practice) takes the LOOK cards: each session a row with its kind-colour
+ *   tile and line icon (no emoji), its line under it, and a chevron.
+ *   And (Graeme, device test, 04 Oct: "I'm asked home or
+ *   gym twice" and "the look of the coach plan ... isn't the same"). At
+ *   home and At the gym already say where, so their body sessions (Full
+ *   Body, Upper, Lower, Glute Focus, Core at the gym, Mobility) open
+ *   Today's plan, the coach's plan screen, with that kind and that place
+ *   (requestedSessionType and requestedLocation, read once there, as "I
+ *   know what I want" does). They opened the step-by-step builder, which
+ *   asked At home or At the gym again and ended on its own, older plan
+ *   screen. Nothing is asked twice; the plan is the one with Where and
+ *   Length to change, Swap, and each exercise to tap.
+ *
  * 04 Oct 2026 v14
  *
  * v14 - LOOK-4 (Graeme approved the mock-up, 04 Oct). The Library's first
@@ -513,9 +529,20 @@ function categoryGrid(labelledBy) {
 
 // ── Guided sub-screen (home / gym / mindful) ──────────────────────────────────
 
+// D-5. Each session in a category gets the LOOK tile its kind has
+// everywhere else (strength amber, mobility violet, cardio blue, the mind
+// green, your own teal), with a line icon in place of the emoji.
+const SESSION_LOOK = {
+  "Full Body": ["strength", "amber"], "Core": ["instep", "amber"], "Upper body": ["strength", "amber"],
+  "Lower body": ["walk", "amber"], "Glute Focus": ["run", "amber"], "Mobility": ["mobility", "violet"],
+  "Cardio": ["run", "blue"], "My programme": ["list", "teal"], "Breathing": ["breath", "green"],
+  "Journal": ["pencil", "green"], "Mindful awareness": ["mind", "green"], "Rest day": ["rest", "slate"],
+};
+
 function renderGuidedSubScreen(categoryId) {
   const cat = GUIDED_CATEGORIES.find(c => c.id === categoryId);
   if (!cat) return renderLanding();
+  const [catIcon, catKind] = CATEGORY_LOOK[cat.id] || ["star", "slate"];
 
   return `
     <div class="view library-view">
@@ -523,7 +550,7 @@ function renderGuidedSubScreen(categoryId) {
         <button class="btn btn-ghost" id="lib-back-btn" aria-label="Back to Library">
           \u2190 Library
         </button>
-        <h1><span aria-hidden="true">${cat.icon}</span> ${cat.label}</h1>
+        <h1 class="library-sub-title"><span class="kind-tile k-${catKind}">${lineIcon(catIcon)}</span> ${cat.label}</h1>
       </div>
 
       <p class="text-sm text-secondary" style="margin-bottom: var(--space-4);">
@@ -532,12 +559,14 @@ function renderGuidedSubScreen(categoryId) {
 
       <div class="library-session-grid">
         ${cat.sessions.map(s => {
+          const [icon, kind] = SESSION_LOOK[s.label] || [catIcon, catKind];
           const inner = `
-            <span class="library-session-icon" aria-hidden="true">${s.icon}</span>
+            <span class="kind-tile k-${kind} library-session-icon">${lineIcon(icon)}</span>
             <span class="library-session-text">
               <span class="library-session-label">${s.label}</span>
               ${s.note ? `<span class="library-session-note">${s.note}</span>` : ""}
             </span>
+            <span class="library-session-chev" aria-hidden="true">${lineIcon("chevron", 20)}</span>
           `;
 
           if (s.tier && !isPremium()) {
@@ -633,6 +662,26 @@ function navigateToSession(target, quiet, preselectType) {
   router.navigate(target);
 }
 
+/**
+ * D-5 LIBRARY-ONCE. Today's plan for this kind of session, at this place.
+ * The same hand-over "I know what I want" makes: the kind as
+ * requestedSessionType (cleared at the next check-in), the place as
+ * requestedLocation (read once by the plan). The plan screen carries the
+ * Bad-day choice, Where and Length to change, Swap and the exercise sheet.
+ */
+function planFor(type, place) {
+  if (!isPremium() && _isPaidTarget("session-builder", type)) {
+    screen = "landing";
+    router.navigate("upgrade");
+    return;
+  }
+  store.set("requestedSessionType", type);
+  store.set("requestedLocation", place);
+  store.set("sessionBuilderPreselect", null);
+  screen = "landing";
+  router.navigate("coach-proposal");
+}
+
 // Derived from the definitions above rather than hardcoded, so a card and
 // its guard cannot drift apart. That drift is the whole bug class this
 // change closes.
@@ -704,6 +753,13 @@ export function onMount() {
       const quiet          = btn.dataset.quiet || null;
       const preselectType  = btn.dataset.preselectType || null;
       if (!target) return;
+      // D-5. The place is already answered by the category: the plan,
+      // not the builder, and nothing asked again.
+      const place = screen === "guided-gym" ? "gym" : screen === "guided-home" ? "home" : null;
+      if (target === "session-builder" && preselectType && place) {
+        planFor(preselectType, place);
+        return;
+      }
       navigateToSession(target, quiet, preselectType);
     });
   });
