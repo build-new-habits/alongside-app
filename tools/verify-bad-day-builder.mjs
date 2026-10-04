@@ -1,5 +1,11 @@
 /**
  * tools/verify-bad-day-builder.mjs
+ * 04 Oct 2026 v2
+ *
+ * v2 - W6-1. Re-pointed: the builder asks the Bad-day choice first, and
+ *   Something gentler then the coach Start plays the gentle plan (it
+ *   previewed the plan itself). The assertions on what plays are unchanged.
+ *
  * 02 Oct 2026 v1
  *
  * W5-1 BAD-DAY-BUILDER (Wave 5 persona trace: 2.14, 2.16; unsafe).
@@ -88,11 +94,15 @@ function storeOrdinary(daysAgo) {
 }
 const GENTLE = () => SB.buildSession({ sessionType: "full", durationMins: 20 });
 
+// W6-1: the builder asks first now; Something gentler hands to the coach's
+// gentle plan, whose Start plays it (one gentle plan whichever door).
 async function builderGo() {
   await go("today");
   await go("session-builder");
   const preview = txt(main);
-  click($("#sb-go-btn")); await wait(200);
+  click($('[data-bad-day="adapt"]')); await wait(80);
+  const startBtn = [...main.querySelectorAll("button")].find(b => /^Start\b/.test(txt(b)) && !b.disabled);
+  click(startBtn); await wait(1200);
   return preview;
 }
 const firstCard = () => txt(main).slice(0, 400);
@@ -106,7 +116,7 @@ const kept = JSON.parse(JSON.stringify(store.get("generatedSession")));
 const gentleFirst = GENTLE().exercises[0].name;
 store.set("generatedSession", kept);   // building it here must not stand in for the builder storing it
 const preview1 = await builderGo();
-ok("1pc. the builder shows the gentle plan", /gentle/i.test(preview1) && stale.length >= 5, preview1.slice(0, 160));
+ok("1pc. the builder asks first (Rest today / Something gentler)", /Something gentler/.test(preview1) && /Rest today/.test(preview1) && stale.length >= 5, preview1.slice(0, 160));
 ok("1a. Let's go opens the player on the gentle plan's first move", onView() === "workout" && firstCard().includes(gentleFirst), `${onView()} | ${firstCard().slice(0, 160)}`);
 const leaked = stale.filter(n => n !== gentleFirst && txt(main).includes(n));
 ok("1b. no card is the old plan's", leaked.length === 0, leaked.join(", "));

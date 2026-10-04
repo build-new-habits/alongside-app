@@ -1,5 +1,10 @@
 /**
  * tools/verify-purpose-ask.mjs
+ * 04 Oct 2026 v2
+ *
+ * v2 - W6-1. 5c.3 reads the phrase without regard to case: it now opens its
+ *   own line (Asks less of the sore area).
+ *
  * 16 Sep 2026 v1
  *
  * PURPOSE-ASK. The coach asks why, then recommends what.
@@ -346,7 +351,7 @@ console.log("\nTEST 5c — the SEVERE-pain screen, under the same principle");
      "to determine what should or should not be loaded'");
 
   ok("5c.3 it offers something gentler, in her words",
-     /asks less of the sore area/.test(btn),
+     /asks less of the sore area/i.test(btn),   // W6-1: now its own line, capitalised
      "her own phrase: 'a lower-intensity, general, or user-selected session " +
      "that reduces demand on the area concerned'");
 

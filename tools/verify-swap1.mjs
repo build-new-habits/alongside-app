@@ -1,6 +1,12 @@
 /**
 
  * tools/verify-swap1.mjs
+ * 04 Oct 2026 v3
+ *
+ * v3 - W6-1. Section 12 re-pointed: at Bad the builder shows the shared
+ *   Bad-day choice in place of the preview (it showed the Gentle Care
+ *   banner); nothing is swappable.
+ *
  * 05 Sep 2026 v2
  *
  * SWAP-1 gate. The session, then the swap.
@@ -660,7 +666,9 @@ console.log("\n12. At 8 the picker is never reached, and nothing is swappable");
 store.set("conditions", ["glutes"]);
 store.set("conditionPainScores", { glutes: 9 });
 paint();
-ok("the Gentle Care banner is shown", !!$(".sb-severe-banner"));
+// W6-1: at Bad the builder now asks first (the shared Bad-day choice), even
+// over an ordinary preview, and builds no gentle preview of its own.
+ok("the Bad-day choice is shown in place of the preview", !!$('[data-bad-day="adapt"]') && !$("#sb-go-btn"));
 ok("no swap affordance appears anywhere", $$("[data-swap-index]").length === 0);
 ok("no swap sheet can be opened", $$("[data-swap-to]").length === 0);
 

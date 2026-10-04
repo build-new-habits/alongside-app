@@ -1,5 +1,10 @@
 /**
  * tools/verify-bypassdoor.mjs
+ * 04 Oct 2026 v2
+ *
+ * v2 - W6-1. 1b accepts the shared Bad-day choice (badDayIds) as the door;
+ *   it must still run before the phase router.
+ *
  * 31 Aug 2026 v1
  *
  * BYPASS-DOOR, BYPASS-RED, SPLIT-ORDER.
@@ -60,9 +65,11 @@ check("1b. the check runs BEFORE the phase router", () => {
   const at    = ui.indexOf("export function render()");
   ok(at > -1, "no render()");
   const body  = ui.slice(at, at + 2200);
-  const door  = body.indexOf("severeZoneToday()");
+  // W6-1: the door is now the shared Bad-day choice (badDayIds(), the
+  // same body areas as severeZoneToday()); it must still come first.
+  const door  = Math.max(body.indexOf("severeZoneToday()"), body.indexOf("badDayIds()"));
   const first = body.indexOf('phase === "type"');
-  ok(door > -1, "render() never calls severeZoneToday()");
+  ok(door > -1, "render() never checks for a Bad day");
   ok(first > -1, "render() has no phase router");
   ok(door < first,
      "the door runs after the phase router, so the type picker renders first and " +

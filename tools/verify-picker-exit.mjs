@@ -1,5 +1,11 @@
 /**
  * tools/verify-picker-exit.mjs
+ * 04 Oct 2026 v2
+ *
+ * v2 - W6-1. At Bad the builder asks first and builds no gentle preview;
+ *   re-pointed: the choice with Back is shown, and Back still leaves the
+ *   builder for Home.
+ *
  * 06 Sep 2026 v1
  *
  * PICKER-EXIT. "Build a different one" returns where the build started.
@@ -90,17 +96,13 @@ reverses("'shoulders' is a zone name, not a condition id (the fixture that misse
           const z = SB.severeZoneToday();
           store.set("conditions", ["lower-back"]); store.set("conditionPainScores", { "lower-back": 8 });
           return z !== null; });
-await toPreview();
-const gbtn = $("#sb-rebuild-btn");
-ok("the Gentle Care preview was reached", !!gbtn);
-ok("the label CHANGES to say where it actually goes",
-  /back to today/i.test(gbtn.textContent));
-reverses("it does not still offer to build a different one from a closed door",
-  () => /different one/i.test(gbtn.textContent));
-
-// The label is set by a SEPARATE ternary (line ~1189) from the navigation
-// (line ~1857). Asserting the label alone would stay green with the exit
-// itself removed -- so spy on the router and assert where it actually goes.
+// W6-1: at Bad the builder asks first (Rest today / Something gentler,
+// and Back); it builds no gentle preview of its own. The honest exit is
+// still out of the builder: Back goes to Home.
+paint();
+const gbtn = $('[data-bad-day="exit"]');
+ok("the Bad-day choice is shown, with Back", !!gbtn && !!$('[data-bad-day="adapt"]'));
+ok("no gentle preview is built in the builder", !$("#sb-rebuild-btn") && !$("#sb-go-btn"));
 const { router } = await import("../js/router.js");
 const navCalls = [];
 const realNavigate = router.navigate;
