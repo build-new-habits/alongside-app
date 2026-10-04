@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 04 Oct 2026 v648
+ * 04 Oct 2026 v649
  *
+ * v649 - D-4 (Graeme, 04 Oct): a stick figure for every exercise, on the How step, in the plan's exercise sheet and on the DO page. NEW FILES precached: js/figures.js, js/data/figures/index.js and its thirteen batch files.
  * v648 - D-3 (device test, 04 Oct): Your arc on Home opens the arc, which says what it is and offers Change what feeds it, Change how you'd know and Start a fresh arc (from week 1), with Stop the arc.
  * v647 - D-1/D-2 (device test, 04 Oct): each exercise is four steps again, Why, Watch out, How, Capture, with "I know this one: go to capture", today's caution on every step and If it hurts on Capture; tap an exercise on the plan to see why, what to watch out for and how before you start, with Swap it on the Plan.
  * v646 - LOOK-4 (Graeme, 04 Oct): Home on both tiers, the finish screen, Wellbeing and the Library take the Settings and Progress look: cards, a kind-colour tile with a line icon beside every choice, numbers as tiles; the Library shows every kind of session on its first page (one tap fewer). NEW FILE precached: js/data/line-icons.js.
@@ -4195,7 +4196,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v648";
+const CACHE_NAME = "alongside-v649";
 
 const SHELL_URLS = [
 
@@ -4360,6 +4361,21 @@ const SHELL_URLS = [
   "./js/data/health-consent-covers.js",
   "./js/data/kind-colours.js",
   "./js/data/line-icons.js",
+  "./js/figures.js",
+  "./js/data/figures/index.js",
+  "./js/data/figures/batch-01.js",
+  "./js/data/figures/batch-02.js",
+  "./js/data/figures/batch-03.js",
+  "./js/data/figures/batch-04.js",
+  "./js/data/figures/batch-05.js",
+  "./js/data/figures/batch-06.js",
+  "./js/data/figures/batch-07.js",
+  "./js/data/figures/batch-08.js",
+  "./js/data/figures/batch-09.js",
+  "./js/data/figures/batch-10.js",
+  "./js/data/figures/batch-11.js",
+  "./js/data/figures/batch-12.js",
+  "./js/data/figures/batch-13.js",
   "./js/views/bad-day-door.js",
   "./js/data/chair-legs.js",
   "./js/data/general-routine.js",
