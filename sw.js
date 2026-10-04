@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 03 Oct 2026 v643
+ * 04 Oct 2026 v644
  *
+ * v644 - W6-1/W6-2/W6-5: on a Bad day every door that starts a session asks Rest today or Something gentler first (the builder and the Library's walk, core, ride and swim too), with one gentle plan from the coach; the coach's choice in the same words; Stay in session carries a run, walk, ride or swim on; an untapped run prompt clears after a minute; the run's progress bar follows it.
  * v643 - W5-22/W5-21/W5-20: gym Lower Body hinges with a deadlift or RDL (the Get-Up is a carry) and varies carries, throws and balance work; every journal entry readable; mindful and breathing minutes counted; Reset display keeps Vibration; Restore keeps </3; breathing says it buzzes; Mostly the same opens with one line; one gentle plan a day; the update check-in starts from today's answers; true words on balance, Hold on to what I've got, Stress, the variety line, the red-flag introduction (asked once more), leave cards, the tier table, Make it up as I go on Free, Mindful awareness, Back to Wellbeing, heart and lungs, the away opener and restore.
  * v642 - W5-24/W5-19/W5-17: under 18 deletes everything at once, no copy; getting started carries on where it stopped, a skip clears the earlier answer, the age has one way to skip, no claim to know their history after a skip; first screens out of the live region with focus on their headings, no per-second timers read out, groups named by their questions, equipment sheet Back works, Messages a heading, upgrade and update banner named as they read, loading screen still under Reduce motion, age errors marked.
  * v641 - W5-13/W5-14/W5-15: research wording qualified while sending is on, figures after eight weeks, true kinds and dates; sore areas in the person's word at every door, no target taken from a sore area, marks for every area a move works; mind strands light from practice, a mind-only arc does not claim the plan, back aims need a listed back.
@@ -4190,7 +4191,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v643";
+const CACHE_NAME = "alongside-v644";
 
 const SHELL_URLS = [
 
