@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 04 Oct 2026 v649
+ * 04 Oct 2026 v650
  *
+ * v650 - D-5 (Graeme, 04 Oct): the Library's At home and At the gym sessions open Today's plan for that place, asked once; the category page in the LOOK cards.
  * v649 - D-4 (Graeme, 04 Oct): a stick figure for every exercise, on the How step, in the plan's exercise sheet and on the DO page. NEW FILES precached: js/figures.js, js/data/figures/index.js and its thirteen batch files.
  * v648 - D-3 (device test, 04 Oct): Your arc on Home opens the arc, which says what it is and offers Change what feeds it, Change how you'd know and Start a fresh arc (from week 1), with Stop the arc.
  * v647 - D-1/D-2 (device test, 04 Oct): each exercise is four steps again, Why, Watch out, How, Capture, with "I know this one: go to capture", today's caution on every step and If it hurts on Capture; tap an exercise on the plan to see why, what to watch out for and how before you start, with Swap it on the Plan.
@@ -4196,7 +4197,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v649";
+const CACHE_NAME = "alongside-v650";
 
 const SHELL_URLS = [
 
