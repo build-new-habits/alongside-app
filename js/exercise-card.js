@@ -1,5 +1,25 @@
 /**
  * js/exercise-card.js
+ * 04 Oct 2026 v14
+ *
+ * v14 - D-1 EXERCISE-FOUR (Graeme, 04 Oct, on the phone: "Why; What to
+ *   watch out for; How; Reflect and capture data. This is what we had
+ *   before." Option B, four steps: "Option b, absolutely."). layout:
+ *   "steps" renders one of the first three steps, chosen by opts.step:
+ *     why   - the exercise's own `why` (written for all 568 entries and
+ *             shown on no exercise screen until now), the lead cue, last
+ *             time, how heavy;
+ *     watch - the person's caution first, then what to watch out for,
+ *             then If it hurts and the pointer to other ways;
+ *     how   - the instructions, the hold, the video link (doSlot), and
+ *             other ways to do it.
+ *   The fourth step, Reflect and capture, is the player's (workout.js).
+ *   STEPS is the one list of names and titles. Safety order kept: the
+ *   watch step comes before the how step, and Next walks them in order.
+ *   Today's caution is pinned on every step, as it was on every page, so
+ *   "I know this one: go to capture" can skip Watch out but never the
+ *   caution; the player repeats it, and If it hurts, on Capture.
+ *
  * 29 Sep 2026 v13
  *
  * v13 - P23. HURT_AND_ACHE_PRACTICE: the same advice phrased for a
@@ -437,6 +457,14 @@ function section(label, body, mod) {
  *                                   prescribed-session.js, which resolves
  *                                   the plain library entry by id
  */
+/** D-1. The four steps of an exercise, in their safety order. */
+export const STEPS = Object.freeze([
+  { key: "why",     label: "Why",       title: "Why" },
+  { key: "watch",   label: "Watch out", title: "What to watch out for" },
+  { key: "how",     label: "How",       title: "How" },
+  { key: "capture", label: "Capture",   title: "Reflect and capture" },
+]);
+
 export function renderExerciseCard(exercise, opts = {}) {
   if (!exercise) return "";
   const p    = opts.idPrefix || "xcard";
@@ -645,6 +673,47 @@ export function renderExerciseCard(exercise, opts = {}) {
   // watch for, then how to do it -- the same safety order as the pages,
   // without the page turns. "How to do it" is open; the options and the
   // universal hurt-and-ache text are one tap away.
+  // D-1. One step at a time: why, watch or how. Capture is the player's.
+  if (opts.layout === "steps") {
+    const step = ["why", "watch", "how"].includes(opts.step) ? opts.step : "why";
+    const title = STEPS.find(s => s.key === step).title;
+    const how = [
+      (exercise.instructions && exercise.instructions.length) ? list("exercise-section-list", exercise.instructions) : "",
+      restCues.length ? list("exercise-section-list xcard-more-form", restCues) : "",
+      hold,
+    ].join("");
+    const watch = (exercise.watchOut && exercise.watchOut.length)
+      ? `<div class="xcard-block xcard-block--hazard">${list("exercise-watchout-list", exercise.watchOut)}</div>` : "";
+    const pointer = (caution && easeOff.length)
+      ? `<p class="xcard-adapt-pointer">There are other ways to do this one in How. Have a look and see if any of them make sense today.</p>`
+      : "";
+    // The caution is safety and stays pinned on every step (CUE-UNPIN's
+    // rule): "I know this one" can skip Watch out, never today's caution.
+    const pinned = caution ? `<p class="exercise-caution" role="note">${caution}</p>` : "";
+    const body = step === "why" ? `
+      ${pinned}
+      ${exercise.why ? `<p class="xstep-why">${esc(exercise.why)}</p>` : ""}
+      ${cueBlock}
+      ${lastBlock}${loadBlock}
+      ${opts.adjustSlot || ""}`
+      : step === "watch" ? `
+      ${pinned}
+      ${watch}
+      ${hurtBlock(false)}
+      ${pointer}`
+      : `
+      ${pinned}
+      ${how ? `<div class="xcard-block xcard-how">${how}</div>` : ""}
+      ${opts.doSlot || ""}
+      ${adaptBlock}`;
+    return `
+  <section class="exercise-card exercise-card--steps xstep xstep--${step}" data-xcard="${p}" data-xstep="${step}"
+           aria-labelledby="${p}-step-h">
+    <h2 class="xstep-title" id="${p}-step-h" tabindex="-1">${title}</h2>
+    ${body}
+  </section>`;
+  }
+
   if (opts.layout === "flow") {
     const how = [
       (exercise.instructions && exercise.instructions.length) ? list("exercise-section-list", exercise.instructions) : "",

@@ -1,6 +1,11 @@
 /*
  * css/components/coach-proposal.css
- * 30 Sep 2026 v12
+ * 04 Oct 2026 v13
+ *
+ * v13 - D-2 PLAN-PREVIEW. .cp-plan__open (the row's name area is a button
+ *   with a chevron, at least 44px) and .cp-xprev (the exercise sheet over
+ *   the plan: Why, What to watch out for in the same rose box as the
+ *   player, How, and Swap it / Keep it). Reduced motion: no slide.
  *
  * v12 - W3-21 NAV-SMALL. .cp-assumptions__choices (Length and Where as
  *   a row of one-tap choices) and .cp-swap (Swap as a list under its
@@ -622,6 +627,179 @@
   flex-direction: column;
   gap: 2px;
   min-width: 0;
+}
+
+/* D-2. The name area opens the exercise. A button, so it reads as one
+   control and takes the keyboard; it keeps the row's look. */
+.cp-plan__open {
+  position: relative;
+  flex: 1 1 12rem;
+  min-height: 44px;
+  margin: 0;
+  padding: 0 calc(18px + var(--space-2)) 0 0;
+  background: transparent;
+  border: 0;
+  font: inherit;
+  text-align: left;
+  color: inherit;
+  cursor: pointer;
+  justify-content: center;
+}
+
+.cp-plan__open:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 4px;
+  border-radius: var(--radius-sm, 4px);
+}
+
+.cp-plan__chev {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-text-secondary);
+}
+
+/* D-2. The exercise sheet, over the plan. */
+.cp-xprev__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  background: rgba(2, 6, 23, 0.6);
+}
+
+.cp-xprev {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 72px;
+  z-index: 2;
+  max-width: 560px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  background: var(--color-bg-card);
+  color: var(--color-text);
+  border-top: 1px solid var(--color-border);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  animation: cp-xprev-up 200ms ease-out;
+}
+
+@keyframes cp-xprev-up {
+  from { transform: translateY(24px); opacity: 0; }
+  to   { transform: none; opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cp-xprev { animation: none; }
+}
+
+.cp-xprev__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.cp-xprev__name {
+  margin: 0;
+  font-size: var(--text-2xl, 1.5rem);
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.cp-xprev__name:focus { outline: none; }
+.cp-xprev__name:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.cp-xprev__dose {
+  margin: var(--space-1) 0 0;
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+.cp-xprev__close {
+  flex-shrink: 0;
+  min-width: 44px;
+  min-height: 44px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-text);
+  font-size: var(--text-lg);
+  cursor: pointer;
+}
+
+.cp-xprev__close:focus-visible,
+.cp-xprev__video:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.cp-xprev__body {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.cp-xprev__part p,
+.cp-xprev__part ul,
+.cp-xprev__part ol {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.cp-xprev__part ul,
+.cp-xprev__part ol {
+  padding-left: 1.25rem;
+}
+
+.cp-xprev__part li + li { margin-top: var(--space-1); }
+
+.cp-xprev__h {
+  margin: 0 0 var(--space-2);
+  font-size: var(--text-base, 1rem);
+  font-weight: 600;
+}
+
+/* The same rose box as the player's What to watch out for. */
+.cp-xprev__part--hazard {
+  padding: var(--space-3);
+  border-left: 4px solid var(--color-danger);
+  border-radius: var(--radius-md, 8px);
+  background: var(--color-danger-light);
+}
+
+.cp-xprev__caution { font-weight: 600; margin-bottom: var(--space-2) !important; }
+
+.cp-xprev__video {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.cp-xprev__actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+.cp-xprev__actions--one { grid-template-columns: 1fr; }
+
+.cp-xprev__actions .btn { min-height: 48px; }
+
+@media (forced-colors: active) {
+  .cp-xprev { border: 1px solid CanvasText; }
+  .cp-xprev__part--hazard { border-left-width: 6px; }
 }
 
 .cp-plan__name {

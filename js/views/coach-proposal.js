@@ -1,5 +1,14 @@
 /**
  * coach-proposal.js
+ * 04 Oct 2026 v53
+ *
+ * v53 - D-2 PLAN-PREVIEW (device test, 04 Oct). Each exercise on the plan
+ *   opens a sheet before anything starts: Why, What to watch out for, How,
+ *   and the video link, on both tiers. Swap it (Plan, where the row can
+ *   swap) closes the sheet and opens that row's swap list; Keep it, Close
+ *   and Escape close it and focus goes back to the row. Nothing starts and
+ *   nothing is logged. The plan behind it is inert while it is open.
+ *
  * 04 Oct 2026 v52
  *
  * v52 - W6-1 BAD-DAY-BUILDER-2. The Bad-day choice uses the words every
@@ -787,6 +796,7 @@ import { activityPhrase, joinList, daysAgo } from '../data/activity-labels.js';
 import { isGateDue, isGuidanceDue, recordAcknowledgement,
          GUIDANCE_TEXT } from '../safety-gate.js';
 import { HURT_AND_ACHE }     from '../exercise-card.js';
+import { bodyCaution }       from '../data/session-rationale.js';
 import { resolveTiming }     from '../exercise-timing.js';
 import { isPremium }         from '../auth.js';
 import { openSheet }         from './onboarding/sheet-manager.js';
@@ -835,6 +845,8 @@ export function CoachProposalView(router) {
   let swapState  = {};
   // W3-21. Which row's swap list is open, and which chip list, or null.
   let swapOpen   = null;
+  // D-2. Which plan row's preview sheet is open, or null.
+  let previewRow = null;
   let chipOpen   = null;       // 'time' | 'loc' | null
   // W3-21. Where THIS plan is for, when it differs from the default.
   let planLoc    = null;
@@ -1191,7 +1203,7 @@ export function CoachProposalView(router) {
            aria-labelledby="cp-preview-title"
            ${previewOpen ? '' : 'hidden'}>
         <div class="cp-preview-panel__backdrop"></div>
-        <div class="cp-preview-panel__content">
+        <div class="cp-preview-panel__content"${previewRow !== null ? ' inert aria-hidden="true"' : ''}>
           <button class="cp-preview-panel__close" id="cp-preview-close" aria-label="Close">✕</button>
 
           ${proposal ? `
@@ -1242,8 +1254,88 @@ export function CoachProposalView(router) {
 
           ${_renderDock(premium)}
         </div>
+        ${option && previewRow !== null ? _renderExercisePreview(option, premium) : ''}
       </div>
     `;
+  }
+
+  // ── D-2. The exercise, before you start ───────────────────────────────────
+
+  const _ESC_P = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+  function _escP(s) {
+    return String(s ?? '').replace(/[&<>"']/g, c => _ESC_P[c]);
+  }
+
+  /**
+   * D-2, 04 Oct 2026. Graeme's wife, on the device test: she wanted to see
+   * what an exercise was and how to do it before starting, and tapped the
+   * row where Swap is. The row did nothing. Now it opens this sheet.
+   *
+   * The same three parts the player shows (D-1), in the same safety order:
+   * Why, then What to watch out for (today's caution first), then How.
+   * Reading it is not doing it: nothing starts and nothing is logged.
+   */
+  function _renderExercisePreview(option, premium) {
+    const list = _planExercises(option);
+    const ex   = list[previewRow];
+    if (!ex) return '';
+    const dose    = _dose(ex);
+    const last    = premium ? _lastText(ex) : '';
+    const caution = bodyCaution(ex);
+    const watch   = Array.isArray(ex.watchOut) ? ex.watchOut : [];
+    const how     = Array.isArray(ex.instructions) ? ex.instructions : [];
+    const canSwap = premium && !ex.isPrescribed;
+    const video   = `https://www.youtube.com/results?search_query=${encodeURIComponent(ex.youtube || (ex.name + ' exercise form'))}`;
+    return `
+      <div class="cp-xprev__backdrop" data-xprev-close aria-hidden="true"></div>
+      <section class="cp-xprev" id="cp-xprev" role="dialog" aria-modal="true"
+               aria-labelledby="cp-xprev-h" data-xprev-row="${previewRow}">
+        <div class="cp-xprev__head">
+          <div>
+            <h2 class="cp-xprev__name" id="cp-xprev-h" tabindex="-1">${_escP(ex.name)}</h2>
+            <p class="cp-xprev__dose"><span aria-hidden="true">${dose.text}</span><span class="sr-only">${dose.spoken}</span>${last ? ` · ${last}` : ''}</p>
+          </div>
+          <button type="button" class="cp-xprev__close" id="cp-xprev-close" data-xprev-close aria-label="Close">
+            <span aria-hidden="true">✕</span>
+          </button>
+        </div>
+        <div class="cp-xprev__body">
+          ${ex.why ? `
+          <div class="cp-xprev__part" data-xprev-part="why">
+            <h3 class="cp-xprev__h">Why</h3>
+            <p>${_escP(ex.why)}</p>
+          </div>` : ''}
+          ${(caution || watch.length) ? `
+          <div class="cp-xprev__part cp-xprev__part--hazard" data-xprev-part="watch">
+            <h3 class="cp-xprev__h">What to watch out for</h3>
+            ${caution ? `<p class="cp-xprev__caution">${_escP(caution)}</p>` : ''}
+            ${watch.length ? `<ul>${watch.map(w => `<li>${_escP(w)}</li>`).join('')}</ul>` : ''}
+          </div>` : ''}
+          <div class="cp-xprev__part" data-xprev-part="how">
+            <h3 class="cp-xprev__h">How</h3>
+            ${how.length ? `<ol>${how.map(w => `<li>${_escP(w)}</li>`).join('')}</ol>` : ''}
+            <a class="cp-xprev__video" href="${video}" target="_blank" rel="noopener noreferrer">Watch how to do this<span class="sr-only"> (opens in a new tab)</span></a>
+          </div>
+        </div>
+        <div class="cp-xprev__actions${canSwap ? '' : ' cp-xprev__actions--one'}">
+          ${canSwap ? `<button type="button" class="btn btn-secondary" id="cp-xprev-swap">Swap it</button>` : ''}
+          <button type="button" class="btn btn-primary" id="cp-xprev-keep" data-xprev-close>Keep it</button>
+        </div>
+      </section>`;
+  }
+
+  function _openExercisePreview(container, index) {
+    previewRow = index;
+    swapOpen   = null;
+    _rerenderPanel(container);
+    container.querySelector('#cp-xprev-h')?.focus();
+  }
+
+  function _closeExercisePreview(container) {
+    const index = previewRow;
+    previewRow = null;
+    _rerenderPanel(container);
+    container.querySelector(`[data-preview="${index}"]`)?.focus();
   }
 
   // ── SMOOTH-P2a. The plan list ─────────────────────────────────────────────
@@ -1408,12 +1500,15 @@ export function CoachProposalView(router) {
                 <li class="cp-plan__row" data-plan-index="${i}" data-exercise-id="${ex.id}"
                     data-section="${ex.section || 'main'}" data-sets="${Number(ex.sets) || 1}"
                     data-areas="${(ex.affectsAreas || []).join(',')}">
-                  <div class="cp-plan__text">
+                  <button type="button" class="cp-plan__text cp-plan__open" data-preview="${i}"
+                          aria-haspopup="dialog">
                     <span class="cp-plan__name">${ex.name}</span>
                     <span class="cp-plan__dose"><span aria-hidden="true">${dose.text}</span><span class="sr-only">${dose.spoken}</span></span>
                     ${last ? `<span class="cp-plan__last">${last}</span>` : ''}
                     ${sore ? `<span class="cp-plan__why">${sore}</span>` : ''}
-                  </div>
+                    <span class="sr-only">. What it is and how to do it</span>
+                    <svg class="cp-plan__chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M9 6l6 6-6 6"/></svg>
+                  </button>
                   ${canSwap ? `<button class="btn btn-ghost cp-plan__swap" data-swap="${i}"
                           aria-label="Swap ${ex.name}" aria-expanded="${swapOpen === i}"
                           ${swapOpen === i ? `aria-controls="cp-swap-${i}"` : ''}>Swap</button>` : ''}
@@ -1677,6 +1772,7 @@ export function CoachProposalView(router) {
     // target no longer exists.
     previewOpen      = false;
     selectedOptionId = null;
+    previewRow       = null;
     document.removeEventListener('keydown', _previewKeydown);
     if (navigateHome) router.navigate('today');
   }
@@ -1705,6 +1801,7 @@ export function CoachProposalView(router) {
     swapState             = {};
     swapOpen              = null;
     chipOpen              = null;
+    previewRow            = null;
     statusMsg             = message;
     _rerenderPanel(container, showPlan);
   }
@@ -1712,7 +1809,10 @@ export function CoachProposalView(router) {
   function _previewKeydown(e) {
     if (e.key !== 'Escape') return;
     const container = document.getElementById('main-content');
-    if (container) closePreviewPanel(container);
+    if (!container) return;
+    // D-2. Escape closes the top sheet only: the exercise, not the plan.
+    if (previewRow !== null) { _closeExercisePreview(container); return; }
+    closePreviewPanel(container);
   }
 
   function _focusFirstInPanel(container) {
@@ -1779,6 +1879,20 @@ export function CoachProposalView(router) {
       adjust = 1;
       statusMsg = 'One more set on each main exercise.';
       _rerenderPanel(container, true);
+    });
+
+    // D-2. The exercise, before you start.
+    panel.querySelectorAll('[data-preview]').forEach(btn => {
+      btn.addEventListener('click', () => _openExercisePreview(container, Number(btn.dataset.preview)));
+    });
+    panel.querySelectorAll('[data-xprev-close]').forEach(el => {
+      el.addEventListener('click', () => _closeExercisePreview(container));
+    });
+    panel.querySelector('#cp-xprev-swap')?.addEventListener('click', () => {
+      const index = previewRow;
+      previewRow = null;
+      swapOpen   = null;
+      _swapRow(container, index);
     });
 
     panel.querySelectorAll('[data-swap]').forEach(btn => {
@@ -1975,11 +2089,14 @@ export function CoachProposalView(router) {
 
   function _trapFocus(e) {
     if (e.key !== 'Tab') return;
-    const panel = document.getElementById('cp-preview-panel');
-    if (!panel) return;
+    const outer = document.getElementById('cp-preview-panel');
+    if (!outer) return;
+    // D-2. While the exercise sheet is open, Tab stays inside it.
+    const panel = outer.querySelector('#cp-xprev') || outer;
     const focusable = [...panel.querySelectorAll(
-      'button:not([disabled]), [tabindex]:not([tabindex="-1"])'
-    )];
+      'button:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])'
+    )].filter(el => !el.closest('[inert]'));
+    if (!focusable.length) return;
     const first = focusable[0];
     const last  = focusable[focusable.length - 1];
     if (e.shiftKey && document.activeElement === first) {

@@ -1,5 +1,21 @@
 /**
  * workout.js - Workout Execution View
+ * 04 Oct 2026 v34
+ *
+ * v34 - D-1 EXERCISE-FOUR (Graeme, 04 Oct, on the phone; Option B,
+ *   "absolutely"). Each exercise is four steps again: Why · Watch out ·
+ *   How · Capture, shown as a strip under the name (each one a button,
+ *   the current one marked aria-current="step"). Why, Watch out and How
+ *   come from exercise-card.js (layout "steps"); Reflect and capture is
+ *   here: the rest count, the weight and reps, the set buttons, too hard
+ *   or too easy, the grounding moment. Next walks the steps in their
+ *   safety order; "I know this one: go to capture" goes straight to
+ *   Capture (the September worry, too many pages, met). A new exercise
+ *   starts at Why; once a set is logged, or after a resume part-way, it
+ *   stays on Capture. Skip this one is on every step. Capture keeps
+ *   today's caution and If it hurts (closed), the safety the old one
+ *   screen carried, since "I know this one" can skip Watch out.
+ *
  * 02 Oct 2026 v33
  *
  * v33 - W5-9 SESSION-STATE. Exit without saving on the back-gesture card
@@ -438,7 +454,8 @@
 import { store }         from "../store.js";
 import { isCardioMachine, getSwapCandidates } from "../data/exercises/index.js";
 import { renderFeedbackControl, attachFeedbackEvents } from "../exercise-feedback.js";
-import { renderExerciseCard, attachCardEvents } from "../exercise-card.js";
+import { STEPS, hurtBlock, renderExerciseCard, attachCardEvents } from "../exercise-card.js";
+import { bodyCaution } from "../data/session-rationale.js";
 import { isGateDue, renderSafetyGate, attachSafetyGate } from "../safety-gate.js";
 import { resolveTiming, formatTime } from "../exercise-timing.js";
 import { renderLogBlock, attachLogEvents, scrollToTop } from "../session-log.js";
@@ -468,6 +485,9 @@ let timerStarted = false; // Timer doesn't start until user taps Start
 // finished, which decides what the actions offer. Ephemeral, reset on
 // every exercise change, never stored -- same reasons as before.
 let exerciseDone = false;
+// D-1. Which of the four steps is showing, and whether to focus its title.
+let step = "why";
+let focusStep = false;
 
 // SMOOTH-P2e, REST-1. When the suggested rest ends (ms since epoch), or
 // null when no rest is running. Never stored.
@@ -566,6 +586,8 @@ function _restoreFromCheckpoint(workout) {
   if (Number.isInteger(i) && i >= 0 && i < workout.exercises.length) {
     currentExerciseIndex = i;
     currentSet = Math.max(1, Number(cp.set) || 1);
+    // D-1. Part-way through its sets: back where the sets are, not at Why.
+    if (currentSet > 1) step = "capture";
   }
   // W3-13. A reopened app: the session's own clock, less the time closed.
   if (sessionStartTime === null) {
@@ -728,19 +750,12 @@ export function render() {
           <p class="xcard-timer-done" role="status">That is the time up on ${exercise.name}.</p>
         ` : ""}
 
-        ${restUntil && !exerciseDone ? `
-          <div class="wo-rest" role="group" aria-labelledby="wo-rest-label">
-            <p class="wo-rest__label" id="wo-rest-label">Rest about ${Number(exercise.rest) || 60}s</p>
-            <p class="wo-rest__count" id="wo-rest-count" aria-hidden="true"${_restLeft() === 0 ? " hidden" : ""}>${formatTime(_restLeft())}</p>
-            <p class="wo-rest__ready" id="wo-rest-ready" role="status" aria-live="polite">${_restLeft() === 0 ? "Ready when you are." : ""}</p>
-          </div>
-        ` : ""}
+        ${_renderStepNav()}
 
-        ${renderLogBlock(exercise, `wo-log-${currentExerciseIndex}`)}
-
-        ${renderExerciseCard(exercise, {
+        ${step !== "capture" ? renderExerciseCard(exercise, {
           idPrefix: `wo-${currentExerciseIndex}`,
-          layout:   "flow",
+          layout:   "steps",
+          step,
           lastTime: "",
           doSlot: `
             <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(exercise.youtube || (exercise.name + " exercise form"))}"
@@ -751,24 +766,47 @@ export function render() {
               <span class="youtube-icon" aria-hidden="true">\u25B6\uFE0F</span>
               Watch how to do this
             </a>`
-        })}
+        }) : `
+        <section class="xstep xstep--capture" aria-labelledby="wo-cap-h">
+          <h2 class="xstep-title" id="wo-cap-h" tabindex="-1">Reflect and capture</h2>
+          ${(() => { const c = bodyCaution(exercise); return c ? `<p class="exercise-caution" role="note">${c}</p>` : ""; })()}
 
-        ${exerciseDone ? `
-          <div class="wo-flow__done" role="group" aria-label="${exercise.name} done">
-            ${renderFeedbackControl(exercise)}
-            ${groundingMoment ? `
-              <aside class="gmoment" aria-label="Something to notice">
-                <p class="gmoment__text">${groundingMoment.text}</p>
-                <button class="gmoment__dismiss" id="gmoment-dismiss"
-                        aria-label="Do not show this one again">Not for me</button>
-              </aside>
-            ` : ""}
-          </div>
-        ` : ""}
+          ${restUntil && !exerciseDone ? `
+            <div class="wo-rest" role="group" aria-labelledby="wo-rest-label">
+              <p class="wo-rest__label" id="wo-rest-label">Rest about ${Number(exercise.rest) || 60}s</p>
+              <p class="wo-rest__count" id="wo-rest-count" aria-hidden="true"${_restLeft() === 0 ? " hidden" : ""}>${formatTime(_restLeft())}</p>
+              <p class="wo-rest__ready" id="wo-rest-ready" role="status" aria-live="polite">${_restLeft() === 0 ? "Ready when you are." : ""}</p>
+            </div>
+          ` : ""}
+
+          ${renderLogBlock(exercise, `wo-log-${currentExerciseIndex}`)}
+
+          ${exerciseDone ? `
+            <div class="wo-flow__done" role="group" aria-label="${exercise.name} done">
+              ${renderFeedbackControl(exercise)}
+              ${groundingMoment ? `
+                <aside class="gmoment" aria-label="Something to notice">
+                  <p class="gmoment__text">${groundingMoment.text}</p>
+                  <button class="gmoment__dismiss" id="gmoment-dismiss"
+                          aria-label="Do not show this one again">Not for me</button>
+                </aside>
+              ` : ""}
+            </div>
+          ` : `<p class="xstep-hint">When the last set is done, you can say whether this was the right level.</p>`}
+
+          ${hurtBlock(false)}
+        </section>`}
       </div>
 
-      <!-- SMOOTH-P2c. What the thumb needs, and nothing else. -->
+      <!-- SMOOTH-P2c / D-1. What the thumb needs, and nothing else. -->
       <div class="workout-actions">
+        ${step !== "capture" ? `
+          <button class="btn btn-primary btn-large btn-full" id="wo-step-next" data-step-go="${_nextStep().key}">
+            Next: ${_nextStep().title}
+          </button>
+          ${step !== "how" ? `<button class="btn btn-ghost btn-full" id="wo-step-capture" data-step-go="capture">I know this one: go to capture</button>` : ""}
+          <button class="btn btn-ghost btn-small" id="skip-exercise-btn">Skip this one</button>
+        ` : `
         ${exerciseDone ? `
           <button class="btn btn-primary btn-large btn-full" id="complete-exercise-btn">
             ${isLastExercise ? "Finish the session" : `Next: ${next.name} \u2192`}
@@ -792,9 +830,35 @@ export function render() {
           </button>
           <button class="btn btn-ghost btn-small" id="skip-exercise-btn">Skip this one</button>
         `}
+        `}
       </div>
     </div>
   `;
+}
+
+/** D-1. The four steps as a strip: each a button, the current one marked. */
+function _renderStepNav() {
+  const at = STEPS.findIndex(s => s.key === step);
+  return `
+        <nav class="wo-steps" aria-label="Steps for this exercise">
+          <ol class="wo-steps__list">
+            ${STEPS.map((s, i) => `
+              <li class="wo-steps__item">
+                <button type="button" class="wo-steps__btn${s.key === step ? " wo-steps__btn--on" : ""}${i < at ? " wo-steps__btn--done" : ""}"
+                        data-step-go="${s.key}"${s.key === step ? ' aria-current="step"' : ""}
+                        aria-label="${s.title}">
+                  <span class="wo-steps__label">${s.label}</span>
+                  <span class="wo-steps__bar" aria-hidden="true"></span>
+                </button>
+              </li>`).join("")}
+          </ol>
+        </nav>`;
+}
+
+/** D-1. The step after this one (Why, Watch out, How, then Capture). */
+function _nextStep() {
+  const i = STEPS.findIndex(s => s.key === step);
+  return STEPS[Math.min(i + 1, STEPS.length - 1)];
 }
 
 /**
@@ -1168,6 +1232,18 @@ export function onMount() {
     });
   });
 
+  // D-1. Any step, from the strip, Next, or "I know this one".
+  document.querySelectorAll("[data-step-go]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const to = btn.dataset.stepGo;
+      if (!STEPS.some(s => s.key === to)) return;
+      step = to;
+      focusStep = true;
+      scrollToTop();
+      router.navigate("workout");
+    });
+  });
+
   // TIMER-2. Each tap is one set. The last set ends the exercise.
   document.getElementById("wo-set-done-btn")?.addEventListener("click", () => {
     const sets = exercise.sets || 1;
@@ -1212,6 +1288,10 @@ export function onMount() {
   if (focusName) {
     focusName = false;
     document.getElementById("wo-exercise-name")?.focus({ preventScroll: true });
+  } else if (focusStep) {
+    // D-1. A new step starts at its title.
+    focusStep = false;
+    document.querySelector(".xstep-title")?.focus({ preventScroll: true });
   }
 }
 
@@ -1395,6 +1475,8 @@ function resetTimer() {
   // (complete and skip) come through here.
   exerciseDone = false;
   focusName    = true;
+  step         = "why";   // D-1. A new exercise starts at Why.
+  focusStep    = false;
   _clearRest();   // REST-1. A new exercise starts without a rest.
 }
 
@@ -1578,4 +1660,5 @@ function _resetPlayer() {
   // adding one and not adding it to this list is how the next one breaks.
   finishedByTimer = false;
   currentSet = 1;
+  step = "why"; focusStep = false;   // D-1
 }
