@@ -1,5 +1,11 @@
 /**
  * today.js
+ * 04 Oct 2026 v54
+ *
+ * v54 - D-3 ARC-HOME (device test, 04 Oct). The Your arc card opens the
+ *   arc (stretch-arc), where it can be changed or started afresh; it
+ *   opened Progress. Nothing else changed.
+ *
  * 04 Oct 2026 v53
  *
  * v53 - LOOK-4 (Graeme approved the mock-up, 04 Oct). Plan Home: the arc
@@ -2098,7 +2104,11 @@ function _markGuidanceShown(root) {
       </div>`;
   }
 
-  /** The arc, in one line. Opens the arc; sets one up if there is none. */
+  /**
+   * The arc, in one line. Opens the arc; sets one up if there is none.
+   * D-3 (device test, 04 Oct): it opens the arc itself, where it can be
+   * changed or started afresh, not Progress (SMOOTH-P4a sent it there).
+   */
   function _arcChip() {
     const arc = store.get('arc') || {};
     // An active arc always opens the arc, whether or not its aim still
@@ -2109,7 +2119,7 @@ function _markGuidanceShown(root) {
     // where the arc is, never a count of anything done (ARC-1).
     const week = arc.active ? arcWeek(arc, new Date()) : null;
     return label
-      ? `<button class="home-arc" data-route="progress" data-requires-checkin="false"
+      ? `<button class="home-arc" data-route="stretch-arc" data-requires-checkin="false"
                  aria-label="Your arc${week ? `, week ${week}` : ''}: working towards ${_esc(label)}">
            <span class="kind-tile k-teal">${lineIcon('arc')}</span>
            <span class="home-arc__text">

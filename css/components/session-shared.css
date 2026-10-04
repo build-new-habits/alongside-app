@@ -1,7 +1,12 @@
 /* ============================================================
    session-shared.css
    css/components/session-shared.css
-   16 Sep 2026 v12
+   04 Oct 2026 v13
+
+   v13 - D-3 ARC-HOME. The arc screen in the LOOK cards: .sa-title,
+   .sa-meta, .sa-card (head, label), .sa-know, and the Change your arc
+   rows (.sa-change: tile, title and line, chevron; 56px tall, focus
+   ring, a divider between rows).
 
    v12 - STRETCH-WHY. .ys-pose-why, one line under a pose name saying
    why it is in today's session. Notes at the foot of this file.
@@ -1224,3 +1229,38 @@
   padding-left: var(--space-3);
   text-align: left;
 }
+
+/* D-3 ARC-HOME, 04 Oct 2026 -- the arc screen in the LOOK cards. */
+.sa-title { margin: var(--space-2) 0 0; font-size: var(--text-2xl); font-weight: 700; color: var(--color-text); }
+.sa-title:focus { outline: none; }
+.sa-title:focus-visible { outline: 3px solid var(--color-border-focus); outline-offset: 2px; }
+.sa-meta { margin: var(--space-1) 0 var(--space-4); font-size: var(--text-sm); color: var(--color-text-secondary); }
+.sa-card { padding: var(--space-4); margin-bottom: var(--space-3); }
+.sa-card__head { display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-2); }
+.sa-card__label { margin: 0 0 var(--space-2); font-size: var(--text-xs); font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-text-secondary); }
+.sa-card__head .sa-card__label { margin: 0; }
+.sa-card .sa-goal { margin: 0; font-size: var(--text-lg); font-weight: 600; }
+.sa-know { margin: var(--space-3) 0 0; line-height: 1.5; color: var(--color-text); }
+.sa-know__label { font-weight: 600; }
+.sa-changes { margin-top: var(--space-4); }
+.sa-change-list { list-style: none; margin: 0 0 var(--space-3); padding: 0; overflow: hidden; }
+.sa-change-list li + li { border-top: 1px solid var(--color-border-light); }
+.sa-change {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: 56px;
+  padding: var(--space-3) var(--space-4);
+  background: none;
+  border: 0;
+  font: inherit;
+  text-align: left;
+  color: var(--color-text);
+  cursor: pointer;
+}
+.sa-change:focus-visible { outline: 3px solid var(--color-border-focus); outline-offset: -3px; }
+.sa-change__text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.sa-change__title { font-weight: 600; }
+.sa-change__line { font-size: var(--text-sm); color: var(--color-text-secondary); }
+.sa-change__chev { color: var(--color-text-secondary); display: inline-flex; }

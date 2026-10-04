@@ -1,5 +1,24 @@
 /**
  * js/views/arc-setup.js
+ * 04 Oct 2026 v4
+ *
+ * v4 - D-3 ARC-HOME (device test, 04 Oct). The arc screen can change the
+ *   arc it shows, so this view takes a mode from it (arcSetupMode(), read
+ *   once at mount):
+ *     strands - What feeds it, with the arc's own strands already chosen;
+ *               Save keeps the arc (same aim, same week);
+ *     marker  - How would you know it was happening, with their words in
+ *               the box; Save keeps the arc;
+ *     fresh   - all four questions, the current aim already chosen (keep
+ *               it or pick another); "Yes, that's mine" starts it again
+ *               from week 1 (startedAt is today), which is what a renewed
+ *               or new arc is.
+ *   In strands and marker, Back returns to the arc without saving. With
+ *   no mode (setting one up from nothing) nothing has changed. The current
+ *   aim is always in the list, even when today's situations would not
+ *   offer it, and so are the arc's own strands (shown, so they can be
+ *   taken off, never kept unseen).
+ *
  * 02 Oct 2026 v3
  *
  * v3 - W5-15. Aims are offered with the listed areas (aims about the back
@@ -59,6 +78,14 @@ const esc = s => String(s == null ? "" : s)
   .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
   .replace(/"/g, "&quot;");
 
+// D-3. How the next mount starts: null (setting one up), "strands",
+// "marker" or "fresh". Set by the arc screen just before it navigates
+// here, read once at mount, never stored.
+let _nextMode = null;
+export function arcSetupMode(mode) {
+  _nextMode = ["strands", "marker", "fresh"].includes(mode) ? mode : null;
+}
+
 export function ArcSetupView(router) {
 
   let step    = 1;
@@ -66,6 +93,22 @@ export function ArcSetupView(router) {
   let chosen  = [];
   let marker  = "";
   let showAll = false;   // "none of these" -- the whole vocabulary, always one tap away
+  let mode    = null;    // D-3
+
+  // D-3. Start from the arc that is there, in the mode the arc screen asked for.
+  {
+    mode = _nextMode; _nextMode = null;
+    const arc = store.get("arc") || {};
+    if (mode && arc.aimId) {
+      aimId  = arc.aimId;
+      chosen = mode === "fresh" ? [] : (arc.strands || []).slice();
+      marker = mode === "fresh" ? "" : (arc.marker || "");
+      step   = mode === "strands" ? 2 : mode === "marker" ? 3 : 1;
+    } else {
+      mode = null;
+    }
+  }
+  const editing = () => mode === "strands" || mode === "marker";
 
   function mount(container) { render(container); }
 
@@ -74,7 +117,7 @@ export function ArcSetupView(router) {
       <div class="mc-view">
         <div class="mc-header">
           <button class="btn btn-ghost" id="as-back-btn" aria-label="Back">&larr; Back</button>
-          <span class="mc-header-title">Your arc</span>
+          <span class="mc-header-title">${mode === "fresh" ? "A fresh arc" : "Your arc"}</span>
         </div>
         ${step === 1 ? stepAim()
         : step === 2 ? stepStrands()
@@ -102,7 +145,9 @@ export function ArcSetupView(router) {
     // opens the whole vocabulary, and it is present on every render.
     // Deciding what somebody is allowed to want is the judgement this
     // audience already gets everywhere else.
-    const shown = showAll ? AIMS.list : aimsFor(situationsFor(store), 8, bodyAreasOf(store.get("conditions") || []));
+    let shown = showAll ? AIMS.list : aimsFor(situationsFor(store), 8, bodyAreasOf(store.get("conditions") || []));
+    // D-3. The aim already chosen is always there to keep.
+    if (aimId && !shown.some(a => a.id === aimId) && aimById(aimId)) shown = [aimById(aimId), ...shown];
 
     return `
       <h1 class="as-question" tabindex="-1">What do you want to be able to do?</h1>
@@ -132,7 +177,12 @@ export function ArcSetupView(router) {
 
   // ── 2. What feeds it ─────────────────────────────────────────────
   function stepStrands() {
-    const cands = strandsForAim(aimId);
+    let cands = strandsForAim(aimId);
+    // D-3. A strand already in the arc is shown even when this aim would
+    // not offer it now, so it can be seen and taken off, never kept unseen.
+    const extra = chosen.filter(id => !cands.some(c => c.id === id) && STRANDS[id])
+      .map(id => ({ ...STRANDS[id], id }));
+    cands = [...extra, ...cands];
     const full  = chosen.length >= AIMS.maxStrands;
     return `
       <h1 class="as-question" tabindex="-1">What feeds it?</h1>
@@ -153,9 +203,13 @@ export function ArcSetupView(router) {
         }).join("")}
       </div>
       <p class="as-count" aria-live="polite">${chosen.length} of ${AIMS.maxStrands} chosen</p>
+      ${editing() ? `
+      <button class="btn btn-primary btn-large btn-full" id="as-save-btn" ${chosen.length ? "" : "disabled"}>
+        Save
+      </button>` : `
       <button class="btn btn-primary btn-large btn-full" id="as-next-btn" ${chosen.length ? "" : "disabled"}>
         Continue
-      </button>`;
+      </button>`}`;
   }
 
   // ── 3. How they would know ───────────────────────────────────────
@@ -169,8 +223,10 @@ export function ArcSetupView(router) {
       <label class="as-label" for="as-marker">What you'd notice</label>
       <textarea class="as-input" id="as-marker" rows="4"
                 placeholder="Getting up off the floor without thinking about it first">${esc(marker)}</textarea>
+      ${editing() ? `
+      <button class="btn btn-primary btn-large btn-full" id="as-save-btn">Save</button>` : `
       <button class="btn btn-primary btn-large btn-full" id="as-next-btn">Continue</button>
-      <button class="btn btn-ghost btn-full" id="as-skip-btn">Skip for now</button>`;
+      <button class="btn btn-ghost btn-full" id="as-skip-btn">Skip for now</button>`}`;
   }
 
   // ── 4. Is this yours ─────────────────────────────────────────────
@@ -201,6 +257,8 @@ export function ArcSetupView(router) {
 
   function wire(container) {
     container.querySelector("#as-back-btn")?.addEventListener("click", () => {
+      // D-3. Changing one part: Back is back to the arc, nothing saved.
+      if (editing()) { router.navigate("stretch-arc", { fromBack: true }); return; }
       if (step > 1) { step -= 1; render(container); }
       else router.navigate("stretch-arc", { fromBack: true });
     });
@@ -250,6 +308,14 @@ export function ArcSetupView(router) {
       render(container);
     });
 
+    // D-3. Save one changed part: the same arc, the same aim, the same week.
+    container.querySelector("#as-save-btn")?.addEventListener("click", () => {
+      if (step === 3 && ta) marker = ta.value;
+      const arc = store.get("arc") || {};
+      store.set("arc", { ...arc, strands: chosen.slice(), marker: marker.trim() });
+      router.navigate("stretch-arc");
+    });
+
     container.querySelector("#as-start-btn")?.addEventListener("click", () => {
       const today = new Date().toISOString().split("T")[0];
       const arc   = store.get("arc") || {};
@@ -262,7 +328,8 @@ export function ArcSetupView(router) {
         provenance: "self",
         acceptedAt: today,
         // Kept if one exists: restarting is a continuation, not a reset.
-        startedAt:   arc.startedAt || today,
+        // D-3. Except a fresh arc, asked for by name: it starts at week 1.
+        startedAt:   mode === "fresh" ? today : (arc.startedAt || today),
         zonesWorked: arc.zonesWorked || {},
       });
       router.navigate("stretch-arc");

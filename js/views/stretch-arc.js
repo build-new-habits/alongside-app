@@ -1,5 +1,19 @@
 /**
  * js/views/stretch-arc.js
+ * 04 Oct 2026 v5
+ *
+ * v5 - D-3 ARC-HOME (Graeme's wife, device test, 04 Oct: tapping "Your
+ *   arc" on Home she expected the arc, and how to change, renew, update or
+ *   develop it; it opened Progress). Home's arc card now opens this
+ *   screen, and an arc with an aim reads, in the LOOK cards: Your arc
+ *   (h1), Week n and since when; What you're working towards (the aim,
+ *   and How you'd know in their words); What feeds it (each strand, when
+ *   it last came up); Start today's session; then Change your arc, three
+ *   rows, each saying what it does: Change what feeds it, Change how
+ *   you'd know (both keep the arc and its week), Start a fresh arc (the
+ *   four questions again, this aim already chosen, from week 1); and Stop
+ *   the arc, unchanged. Focus lands on the h1.
+ *
  * 29 Sep 2026 v4
  *
  * v4 - P26, THE ARC SCREEN SAYS WHAT THE ARC IS (persona finding W2-20).
@@ -57,7 +71,9 @@ import { STRETCH_ZONES, zonesWithCoverage } from "../session-builder.js";
 import { zonesForGoal, STRETCH_GOAL_ZONES } from "../data/stretch-goal-zones.js";
 import { getGoalLabel } from "../data/goals.js";
 import { aimById, STRANDS } from "../data/aims.js";
-import { strandReadback } from "../data/arc-readback.js";
+import { strandReadback, arcWeek } from "../data/arc-readback.js";
+import { arcSetupMode } from "./arc-setup.js";
+import { lineIcon } from "../data/line-icons.js";
 
 const aimLabel    = id => (aimById(id) || {}).label || "";
 const strandLabel = id => (STRANDS[id] || {}).label || "";
@@ -94,11 +110,13 @@ export function StretchArcView(router) {
       <div class="mc-view">
         <div class="mc-header">
           <button class="btn btn-ghost" id="sa-back-btn" aria-label="Back">&larr; Back</button>
-          <span class="mc-header-title">${arc.active && arc.aimId ? "Your arc" : "Stretch arc"}</span>
+          ${arc.active && arc.aimId ? "" : `<span class="mc-header-title">Stretch arc</span>`}
         </div>
 
         ${arc.active ? (arc.aimId ? renderAimed() : renderRunning()) : renderOff()}
       </div>`;
+    // D-3. A screen of its own: focus starts on its heading.
+    container.querySelector("#sa-title")?.focus?.({ preventScroll: true });
 
     function renderOff() {
       return `
@@ -150,26 +168,59 @@ export function StretchArcView(router) {
         </button>`;
     }
 
-    // P26. An arc with an aim: the aim, its strands, and today's session.
+    // P26 / D-3. An arc with an aim: what it is, today's session, and how
+    // to change it.
     function renderAimed() {
       const strands = strandReadback(arc);
+      const week    = arcWeek(arc, new Date());
+      const since   = whenText(String(arc.startedAt || "").slice(0, 10));
+      const row = (go, icon, colour, title, line) => `
+          <li>
+            <button type="button" class="sa-change" data-arc-change="${go}">
+              <span class="kind-tile kind-tile--sm k-${colour}">${lineIcon(icon, 20)}</span>
+              <span class="sa-change__text">
+                <span class="sa-change__title">${title}</span>
+                <span class="sa-change__line">${line}</span>
+              </span>
+              <span class="sa-change__chev" aria-hidden="true">${lineIcon("chevron", 20)}</span>
+            </button>
+          </li>`;
       return `
-        <p class="sb-coach-line">Working towards ${esc(aimLabel(arc.aimId))}.</p>
+        <h1 class="sa-title" id="sa-title" tabindex="-1">Your arc</h1>
+        ${week ? `<p class="sa-meta">Week ${week}${since ? ` \u00B7 since ${esc(since)}` : ""}</p>` : ""}
+
+        <section class="look-card sa-card" aria-labelledby="sa-aim-h">
+          <div class="sa-card__head">
+            <span class="kind-tile k-teal">${lineIcon("arc")}</span>
+            <h2 class="sa-card__label" id="sa-aim-h">What you\u2019re working towards</h2>
+          </div>
+          <p class="sa-goal">${esc(aimLabel(arc.aimId))}</p>
+          ${arc.marker ? `
+            <p class="sa-know"><span class="sa-know__label">How you\u2019d know:</span> \u201C${esc(arc.marker)}\u201D</p>` : ""}
+        </section>
 
         ${strands.length ? `
-          <div class="sa-panel">
-            <span class="exercise-section-label">What it works on</span>
-            <ul class="sa-list">
-              ${strands.map(r => `<li><span>${esc(r.label)}</span><span class="sa-when">${esc(r.text)}</span></li>`).join("")}
-            </ul>
-            <p class="sa-note">Nothing owed here \u2014 it's when each last came up, not a target.</p>
-          </div>
+        <section class="look-card sa-card" aria-labelledby="sa-feeds-h">
+          <h2 class="sa-card__label" id="sa-feeds-h">What feeds it</h2>
+          <ul class="sa-list">
+            ${strands.map(r => `<li><span>${esc(r.label)}</span><span class="sa-when">${esc(r.text)}</span></li>`).join("")}
+          </ul>
+          <p class="sa-note">Nothing owed here \u2014 it's when each last came up, not a target.</p>
+        </section>
         ` : ""}
-        ${arc.marker ? `<p class="sa-note">\u201C${esc(arc.marker)}\u201D</p>` : ""}
 
         <button class="btn btn-primary btn-large btn-full" id="sa-today-btn">
           Start today's session
         </button>
+
+        <section class="sa-changes" aria-labelledby="sa-change-h">
+          <h2 class="look-label" id="sa-change-h">Change your arc</h2>
+          <ul class="look-card sa-change-list">
+            ${row("strands", "list", "amber", "Change what feeds it", "Keep this aim; choose different parts. Same arc, same week.")}
+            ${row("marker", "pencil", "violet", "Change how you\u2019d know", arc.marker ? "Put it in different words. Same arc, same week." : "Say it in your own words. Same arc, same week.")}
+            ${row("fresh", "arc", "teal", "Start a fresh arc", "Keep this aim or choose another, from week 1.")}
+          </ul>
+        </section>
 
         <button class="btn btn-ghost btn-full" id="sa-stop-btn">
           Stop the arc
@@ -215,6 +266,15 @@ export function StretchArcView(router) {
           Stop the arc
         </button>`;
     }
+
+    // D-3. Change one part, or start a fresh arc: the four questions,
+    // in the mode the row names.
+    container.querySelectorAll("[data-arc-change]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        arcSetupMode(btn.dataset.arcChange);
+        router.navigate("arc-setup");
+      });
+    });
 
     container.querySelector("#sa-back-btn")?.addEventListener("click", () => {
       // ARC-BACK, 05 Sep 2026. This went to Mobility & Conditioning,
