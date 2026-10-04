@@ -1,5 +1,17 @@
 /**
  * settings.js
+ * 04 Oct 2026 v67
+ *
+ * v67 - LOOK-1 SETTINGS-PAGES (Graeme, 04 Oct: "the settings page should
+ *   open a separate page instead of collapsing or expanding the content").
+ *   The index is eight rows, each with its kind colour (LOOK-3) and a line
+ *   saying what is set now. A row opens its section as its own page: one
+ *   h1, Back to Settings, its rows in small named groups. W4-23's shape is
+ *   kept (eight sections, one tap, one level, nothing nested); only how a
+ *   section opens changed. A row's screen goes back to its section page,
+ *   focus on the row; a section page goes back to the index, focus on its
+ *   row. Messages is one tap, as before.
+ *
  * 03 Oct 2026 v66
  *
  * v66 - W5-20 TRUE-WORDS-5. Take it off on an everyday state (Stress) takes
@@ -760,7 +772,7 @@ export function SettingsView(router) {
   let focusAfter   = null;    // selector to focus after the next render
   let askingAgain  = false;   // W4-2: opened by the router to ask the body questions again
   let result       = null;    // W4-6: the last Download / Restore / Delete outcome, shown on the page
-  const openSections = new Set();   // W4-23: the sections open on the index
+  let activeSection = null;  // LOOK-1: null = the index; otherwise the section page open
   let screenFrom   = null;    // W4-23: the section a row screen was opened from
 
   // v11 — My Movement rebuild. Matches store.js's movementIdentity
@@ -779,7 +791,7 @@ export function SettingsView(router) {
 
   function mount(container) {
     // W4-2. Sent here before a built session, after Delete and re-consent.
-    if (takeOpenCapability()) { activeScreen = 'capability'; screenFrom = 'body'; askingAgain = true; focusAfter = '.settings-title'; }
+    if (takeOpenCapability()) { activeScreen = 'capability'; screenFrom = 'body'; activeSection = 'body'; askingAgain = true; focusAfter = '.settings-title'; }
     render(container);
   }
 
@@ -796,11 +808,10 @@ export function SettingsView(router) {
           </div>
           <h1 class="settings-title" tabindex="-1">${_esc(screen.title)}</h1>
           <div class="settings-screen">${_withoutRepeatedTitle(screen.render(), screen.title)}</div>
-        ` : `
+        ` : activeSection && SECTION_TITLES[activeSection] ? renderSectionPage(activeSection) : `
           <h1 class="settings-title" tabindex="-1">Settings</h1>
           <p class="settings-lede">Changes save as you make them.</p>
-          <p class="settings-result" id="settings-result" tabindex="-1" role="status"${result ? '' : ' hidden'}>${_esc(result || '')}</p>
-          ${renderPage()}
+          ${renderIndex()}
         `}
         <p class="sr-only" id="settings-saved" role="status" aria-live="polite"></p>
       </div>
@@ -891,130 +902,228 @@ export function SettingsView(router) {
   }
 
   // W4-23 SETTINGS-RESCOPE (Graeme, 02 Oct: "It's confusing having
-  // everything in one long page"). The page is an index of eight sections,
-  // all closed; one tap opens a section where it is (a native details), and
-  // its rows open their screens as before. One level, nothing nested.
+  // everything in one long page"): eight sections, one level, nothing
+  // nested. LOOK-1 (04 Oct): each opens as its own page.
   const SECTION_TITLES = {
     you: 'You', body: 'Your body', sessions: 'Sessions', display: 'Display',
     data: 'Your data', messages: 'Messages', plan: 'Your plan', about: 'About',
   };
-  function _section(id, sub, rows) {
-    return `
-      <details class="settings-sec" data-section="${id}"${openSections.has(id) ? ' open' : ''}>
-        <summary class="settings-sec__summary">
-          <h2 class="settings-sec__title">${_esc(SECTION_TITLES[id])}</h2>
-          <span class="settings-sec__sub">${_esc(sub)}</span>
-        </summary>
-        <ul class="settings-rows">${rows.filter(Boolean).join('')}</ul>
-      </details>`;
+  const SECTION_ORDER = ['you', 'body', 'sessions', 'display', 'data', 'messages', 'plan', 'about'];
+  // LOOK-3. One kind colour per section, the same hues as the Progress mix.
+  const SECTION_KIND = {
+    you: 'teal', body: 'rose', sessions: 'amber', display: 'blue',
+    data: 'violet', messages: 'green', plan: 'teal', about: 'slate',
+  };
+  // Stroke icons, drawn in the section's colour. Decorative: the title says it.
+  const SECTION_ICON = {
+    you:      '<circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/>',
+    body:     '<path d="M12 21s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 5.5-7 10-7 10z"/>',
+    sessions: '<path d="M6 7v10M18 7v10M3 10v4M21 10v4M6 12h12"/>',
+    display:  '<path d="M4 20h4l10-10-4-4L4 16z"/><path d="M13 7l4 4"/>',
+    data:     '<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
+    messages: '<path d="M4 5h16v11H8l-4 4z"/>',
+    plan:     '<path d="M3 17l5-5 4 4 8-8"/><path d="M15 8h5v5"/>',
+    about:    '<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/>',
+  };
+  function _tile(id, cls = 'settings-tile') {
+    return `<span class="${cls}" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false">${SECTION_ICON[id]}</svg></span>`;
   }
 
-  function renderPage() {
+  /** What every section needs to know, read once per render. */
+  function _ctx() {
     const premium  = isPremium();
-    const gym      = (store.get('gymEquipment')  || []).length;
-    const home     = (store.get('homeEquipment') || []).length;
-    // W4-10: the row counts sore areas; tiredness or stress is said apart.
-    const conds    = bodyAreasOf(store.get('conditions') || []);
-    const moves    = store.get('movementIdentity') || [];
     const cap      = store.get('capability') || {};
     const arc      = store.get('arc') || {};
-    const aim      = arc.active && arc.aimId ? aimById(arc.aimId) : null;
-    const goals    = store.get('goals') || [];
-    const target   = store.get('strategicGoal.setAt') ? store.get('strategicGoal.weeklySessionTarget') : null;
     const prog     = store.get('activeProgramme') || {};
-    const progMeta = prog.programmeId ? getProgramme(prog.programmeId) : null;
-    const prefs    = Object.keys(store.get('exercisePreferences') || {}).length;
-    const VARIETY  = [{ id: 'familiar', label: 'Mostly the same' }, { id: 'balanced', label: 'A bit of both' }, { id: 'varied', label: 'Something different' }];
-    const scheme   = getDisplayPref('scheme') || 'dark';
-    const ageLbl   = _label(AGE_CHIPS, store.get('ageBand'), 'Not set');
-    const GENDERS  = [{ id: 'female', label: 'Female' }, { id: 'male', label: 'Male' }, { id: 'non-binary', label: 'Non-binary' }, { id: 'other', label: 'Other' }];
-    const level    = _activityLevel();
+    const target   = store.get('strategicGoal.setAt') ? store.get('strategicGoal.weeklySessionTarget') : null;
+    return {
+      premium, cap, target,
+      gym:      (store.get('gymEquipment')  || []).length,
+      home:     (store.get('homeEquipment') || []).length,
+      // W4-10: the row counts sore areas; tiredness or stress is said apart.
+      conds:    bodyAreasOf(store.get('conditions') || []),
+      moves:    store.get('movementIdentity') || [],
+      aim:      arc.active && arc.aimId ? aimById(arc.aimId) : null,
+      goals:    store.get('goals') || [],
+      progMeta: prog.programmeId ? getProgramme(prog.programmeId) : null,
+      prefs:    Object.keys(store.get('exercisePreferences') || {}).length,
+      scheme:   getDisplayPref('scheme') || 'dark',
+      ageLbl:   _label(AGE_CHIPS, store.get('ageBand'), 'Not set'),
+      level:    _activityLevel(),
+      mins:     AVAILABLE_TIME_WINDOW_MINUTES[store.get('availableTime')] ?? 30,
+    };
+  }
+  const VARIETY  = [{ id: 'familiar', label: 'Mostly the same' }, { id: 'balanced', label: 'A bit of both' }, { id: 'varied', label: 'Something different' }];
+  const GENDERS  = [{ id: 'female', label: 'Female' }, { id: 'male', label: 'Male' }, { id: 'non-binary', label: 'Non-binary' }, { id: 'other', label: 'Other' }];
+  const _schemeLabel = s => (s.charAt(0).toUpperCase() + s.slice(1)).replace(/-/g, ' ');
 
-    const nameRow = _row({ label: 'Name', value: store.get('name') || 'Not set', open: 'profile', focus: '#settings-name' });
-    return `
-      ${_section('you', 'Name, age, how you move', [
-        nameRow,
-        _row({ label: 'Age range', value: ageLbl, open: 'profile', focus: '#settings-agebandsel' }),
+  /** LOOK-1. The line under each index row: what is set now, not what is inside. */
+  function _sectionSummary(id, c) {
+    switch (id) {
+      case 'you': {
+        const name = store.get('name');
+        return name ? `${name}${c.ageLbl !== 'Not set' ? ` \u00b7 ${c.ageLbl}` : ''}` : 'Name, age, how you move';
+      }
+      case 'body':
+        return c.conds.length ? `${c.conds.length} sore ${c.conds.length === 1 ? 'area' : 'areas'} listed` : 'No sore areas listed';
+      case 'sessions': {
+        const where = c.gym && c.home ? 'gym and home' : c.gym ? 'gym' : c.home ? 'home' : 'no equipment saved';
+        return `${c.mins} minutes \u00b7 ${where}`;
+      }
+      case 'display':
+        return `${_schemeLabel(c.scheme)} \u00b7 text ${formatDisplayValue('textScale', getDisplayPref('textScale'))}`;
+      case 'data':     return 'Download, restore, delete';
+      case 'messages': return hasUnread() ? 'New' : 'Nothing new';
+      case 'plan':
+        return `${c.premium ? 'The Plan' : 'Free'}${c.goals.length ? ` \u00b7 ${c.goals.length} ${c.goals.length === 1 ? 'goal' : 'goals'}` : ''}`;
+      case 'about':    return 'Why Alongside exists, app version';
+    }
+    return '';
+  }
+
+  /** LOOK-1. Each section's rows, in small named groups. Every row as before. */
+  function _sectionGroups(id, c) {
+    switch (id) {
+      case 'you': return [{ rows: [
+        _row({ label: 'Name', value: store.get('name') || 'Not set', open: 'profile', focus: '#settings-name' }),
+        _row({ label: 'Age range', value: c.ageLbl, open: 'profile', focus: '#settings-agebandsel' }),
         _row({ label: 'Gender', value: _label(GENDERS, store.get('gender'), 'Not set'), open: 'profile', focus: '#settings-gender' }),
-        _row({ label: 'How you move', value: moves.length ? moves.map(m => _label(MOVEMENT_IDENTITIES, m, m === 'mixed' ? 'A mix' : m)).join(', ') : 'Not set', open: 'movement' }),
-      ])}
-
-      ${_section('body', 'Sore areas, what your body can do, weight', [
-        _row({ label: 'Sore or injured areas', value: conds.length ? `${conds.length} listed` : 'None', open: 'conditions' }),
-        // LEGAL-TRUE. What your body can do is a health answer: without the
-        // health consent the row asks for it first, like Sore or injured areas.
-        healthAllowed()
-          ? _row({ label: 'What your body can do', value: cap.askedAt ? 'Answered' : 'Not answered', open: 'capability' })
-          : _row({ label: 'What your body can do', value: 'Not answered', action: 'health-capability' }),
-        premium ? _rowSwitch({ id: 'settings-weight-tracking', label: 'Weight tracking', sub: 'Off unless you turn it on. Only you see it, and I will never ask you to weigh yourself.', field: 'weightTracking' }) : '',
-        premium && store.get('weightTracking') === true && healthAllowed() ? _row({ label: 'Your weight and units', open: 'weight' }) : '',
-      ])}
-
-      ${_section('sessions', 'Equipment, length, how sessions are built, notes', [
-        _row({ label: 'Equipment', value: `Gym ${gym} · Home ${home}`, open: 'equipment' }),
-        _row({ label: 'How long you usually have', value: `${AVAILABLE_TIME_WINDOW_MINUTES[store.get('availableTime')] ?? 30} minutes`, open: 'preferences', focus: '#settings-usual-length' }),
-        _row({ label: 'What you\u2019re aiming at', value: (INTENT_CHIPS.find(c => c.id === (store.get('trainingIntent') || 'improve')) || INTENT_CHIPS[0]).label, open: 'preferences', focus: '#settings-intent' }),
-        _row({ label: 'How much sessions change', value: _label(VARIETY, store.get('sessionVariety') || 'balanced', 'A bit of both'), open: 'preferences', focus: '#settings-pref-variety' }),
-        _row({ label: 'Exercises you asked to change', value: prefs ? String(prefs) : 'None', open: 'preferences' }),
-        _rowSwitch({ id: 'settings-lift-log', label: 'Session notes', sub: 'Note what you did on each exercise.', field: 'liftLogEnabled' }),
-        _rowSwitch({ id: 'settings-pb', label: 'Show your best', sub: 'Beside your last note. Off unless you want it.', field: 'showPersonalBests' }),
-        _row({ label: 'About session notes', open: 'notes' }),
-        renderReflectionSection() ? _row({ label: 'Your reflection', open: 'reflection' }) : '',
-      ])}
-
-      ${_section('display', 'Colours, text size, motion, vibration', [
-        _row({ label: 'Colour scheme', value: (s => s.charAt(0).toUpperCase() + s.slice(1))(scheme.replace(/-/g, ' ')), open: 'display' }),
-        _row({ label: 'Text size', value: formatDisplayValue('textScale', getDisplayPref('textScale')), open: 'display', focus: '#disp-text-scale' }),
-        _row({ label: 'Line and letter spacing', open: 'display', focus: '#disp-leading-scale' }),
-        _rowSwitch({ id: 'disp-underline', label: 'Underline links', disp: 'underline' }),
-        _rowSwitch({ id: 'disp-focus', label: 'Stronger focus outlines', disp: 'focus' }),
-        _rowSwitch({ id: 'disp-full-instructions', label: 'Always show full instructions', disp: 'fullInstructions' }),
-        // F6. Off follows the device, which the app always has.
-        _rowSwitch({ id: 'disp-reduce-motion', label: 'Reduce motion', disp: 'reduceMotion' }),
-        _rowSwitch({ id: 'disp-vibration', label: 'Vibration', sub: 'Buzzes during sessions to mark a change. Off stops them all.', disp: 'vibration' }),
-      ])}
-
-      ${_section('data', 'Download, restore, delete, privacy', [
-        _row({ label: 'Activity log', action: 'nav-activity-log' }),
-        _row({ label: 'Download your data', sub: 'A file of everything the app keeps about you, your journal included. Saved on this device. Anyone who has the file can read it, unless you add a password.', action: 'download-data' }),
-        _row({ label: 'Restore from a file', sub: 'Bring your history across from a file saved with Download your data. It replaces what is on this device.', action: 'restore-data' }),
-        _row({ label: 'Delete my health answers', sub: 'Check-ins, sore areas, what you told me about your body, weight, journal and notes. Your sessions and lifts stay.', action: 'delete-health' }),
-        _row({ label: 'How your data is kept', open: 'about-data' }),
-        _row({ label: 'Privacy policy', action: 'nav-privacy' }),
-        _row({ label: 'Reset all data', action: 'reset-data' }),
-      ])}
-
-      <div class="settings-sec settings-sec--direct">
-        <h2 style="margin:0; font:inherit;">
-          <button class="settings-sec__summary settings-row" data-section="messages" data-open="messages">
-            <span class="settings-sec__title">Messages</span>
-            <span class="settings-sec__sub">${hasUnread() ? 'New' : 'Nothing new'}</span>
-          </button>
-        </h2>
-      </div>
-
-      ${_section('plan', 'Goals, your week, the Plan', [
-        premium ? _row({ label: 'Your arc', value: aim ? aim.label : 'Not set', go: aim ? 'stretch-arc' : 'arc-setup' }) : '',
-        _row({ label: 'Goals', value: goals.length ? `${goals.length} chosen` : 'None', open: 'programme', focus: '.settings-goal-chip' }),
-        _row({ label: 'Sessions per week', value: target ? String(target) : 'Not set', open: 'programme', focus: '#settings-weekly-target' }),
-        _row({ label: 'Your week', action: 'open-weekly-plan' }),
-        _row({ label: 'Activity level', value: level ? _label(ACTIVITY_LEVELS, level, level) : 'Not set', open: 'programme', focus: '#settings-fitness-level' }),
-        _row({ label: 'Programme', value: progMeta ? progMeta.name : 'None', open: 'programme' }),
-        _row({ label: 'Your plan', value: premium ? 'The Plan' : 'Free', open: 'about-plan' }),
-        _row({ label: 'Your impact', sub: 'Where the 5% goes.', action: 'nav-impact' }),
-      ])}
-
-      ${_section('about', 'Why Alongside exists, app version', [
+        _row({ label: 'How you move', value: c.moves.length ? c.moves.map(m => _label(MOVEMENT_IDENTITIES, m, m === 'mixed' ? 'A mix' : m)).join(', ') : 'Not set', open: 'movement' }),
+      ] }];
+      case 'body': return [
+        { rows: [
+          _row({ label: 'Sore or injured areas', value: c.conds.length ? `${c.conds.length} listed` : 'None', open: 'conditions' }),
+          // LEGAL-TRUE. What your body can do is a health answer: without the
+          // health consent the row asks for it first, like Sore or injured areas.
+          healthAllowed()
+            ? _row({ label: 'What your body can do', value: c.cap.askedAt ? 'Answered' : 'Not answered', open: 'capability' })
+            : _row({ label: 'What your body can do', value: 'Not answered', action: 'health-capability' }),
+        ] },
+        c.premium ? { title: 'Weight', rows: [
+          _rowSwitch({ id: 'settings-weight-tracking', label: 'Weight tracking', sub: 'Off unless you turn it on. Only you see it, and I will never ask you to weigh yourself.', field: 'weightTracking' }),
+          store.get('weightTracking') === true && healthAllowed() ? _row({ label: 'Your weight and units', open: 'weight' }) : '',
+        ] } : null,
+      ];
+      case 'sessions': return [
+        { title: 'What you have', rows: [
+          _row({ label: 'Equipment', value: `Gym ${c.gym} \u00b7 Home ${c.home}`, open: 'equipment' }),
+          _row({ label: 'How long you usually have', value: `${c.mins} minutes`, open: 'preferences', focus: '#settings-usual-length' }),
+        ] },
+        { title: 'How they are built', rows: [
+          _row({ label: 'What you\u2019re aiming at', value: (INTENT_CHIPS.find(x => x.id === (store.get('trainingIntent') || 'improve')) || INTENT_CHIPS[0]).label, open: 'preferences', focus: '#settings-intent' }),
+          _row({ label: 'How much sessions change', value: _label(VARIETY, store.get('sessionVariety') || 'balanced', 'A bit of both'), open: 'preferences', focus: '#settings-pref-variety' }),
+          _row({ label: 'Exercises you asked to change', value: c.prefs ? String(c.prefs) : 'None', open: 'preferences' }),
+        ] },
+        { title: 'Notes', rows: [
+          _rowSwitch({ id: 'settings-lift-log', label: 'Session notes', sub: 'Note what you did on each exercise.', field: 'liftLogEnabled' }),
+          _rowSwitch({ id: 'settings-pb', label: 'Show your best', sub: 'Beside your last note. Off unless you want it.', field: 'showPersonalBests' }),
+          _row({ label: 'About session notes', open: 'notes' }),
+          renderReflectionSection() ? _row({ label: 'Your reflection', open: 'reflection' }) : '',
+        ] },
+      ];
+      case 'display': return [
+        { title: 'Colours and text', rows: [
+          _row({ label: 'Colour scheme', value: _schemeLabel(c.scheme), open: 'display' }),
+          _row({ label: 'Text size', value: formatDisplayValue('textScale', getDisplayPref('textScale')), open: 'display', focus: '#disp-text-scale' }),
+          _row({ label: 'Line and letter spacing', open: 'display', focus: '#disp-leading-scale' }),
+        ] },
+        { title: 'Reading', rows: [
+          _rowSwitch({ id: 'disp-underline', label: 'Underline links', disp: 'underline' }),
+          _rowSwitch({ id: 'disp-focus', label: 'Stronger focus outlines', disp: 'focus' }),
+          _rowSwitch({ id: 'disp-full-instructions', label: 'Always show full instructions', disp: 'fullInstructions' }),
+        ] },
+        { title: 'Motion and vibration', rows: [
+          // F6. Off follows the device, which the app always has.
+          _rowSwitch({ id: 'disp-reduce-motion', label: 'Reduce motion', disp: 'reduceMotion' }),
+          _rowSwitch({ id: 'disp-vibration', label: 'Vibration', sub: 'Buzzes during sessions to mark a change. Off stops them all.', disp: 'vibration' }),
+        ] },
+      ];
+      case 'data': return [
+        { title: 'Your copy', rows: [
+          _row({ label: 'Activity log', action: 'nav-activity-log' }),
+          _row({ label: 'Download your data', sub: 'A file of everything the app keeps about you, your journal included. Saved on this device. Anyone who has the file can read it, unless you add a password.', action: 'download-data' }),
+          _row({ label: 'Restore from a file', sub: 'Bring your history across from a file saved with Download your data. It replaces what is on this device.', action: 'restore-data' }),
+        ] },
+        { title: 'Privacy', rows: [
+          _row({ label: 'How your data is kept', open: 'about-data' }),
+          _row({ label: 'Privacy policy', action: 'nav-privacy' }),
+        ] },
+        { title: 'Delete', rows: [
+          _row({ label: 'Delete my health answers', sub: 'Check-ins, sore areas, what you told me about your body, weight, journal and notes. Your sessions and lifts stay.', action: 'delete-health' }),
+          _row({ label: 'Reset all data', action: 'reset-data' }),
+        ] },
+      ];
+      case 'plan': return [
+        { title: 'Goals and your week', rows: [
+          c.premium ? _row({ label: 'Your arc', value: c.aim ? c.aim.label : 'Not set', go: c.aim ? 'stretch-arc' : 'arc-setup' }) : '',
+          _row({ label: 'Goals', value: c.goals.length ? `${c.goals.length} chosen` : 'None', open: 'programme', focus: '.settings-goal-chip' }),
+          _row({ label: 'Sessions per week', value: c.target ? String(c.target) : 'Not set', open: 'programme', focus: '#settings-weekly-target' }),
+          _row({ label: 'Your week', action: 'open-weekly-plan' }),
+          _row({ label: 'Activity level', value: c.level ? _label(ACTIVITY_LEVELS, c.level, c.level) : 'Not set', open: 'programme', focus: '#settings-fitness-level' }),
+          _row({ label: 'Programme', value: c.progMeta ? c.progMeta.name : 'None', open: 'programme' }),
+        ] },
+        { title: 'The Plan', rows: [
+          _row({ label: 'Your plan', value: c.premium ? 'The Plan' : 'Free', open: 'about-plan' }),
+          _row({ label: 'Your impact', sub: 'Where the 5% goes.', action: 'nav-impact' }),
+        ] },
+      ];
+      case 'about': return [{ rows: [
         _row({ label: 'Why Alongside exists', open: 'about-story' }),
         _row({ label: 'App version', value: swVersion ? 'v' + swVersion : 'Checking\u2026', open: 'about-app' }),
-      ])}`;
+      ] }];
+    }
+    return [];
+  }
+
+  /** LOOK-1. The index: eight rows, one tap each. Each title is a heading. */
+  function renderIndex() {
+    const c = _ctx();
+    return `
+      <ul class="settings-index">
+        ${SECTION_ORDER.map(id => `
+          <li class="settings-index__item">
+            <h2 class="settings-index__h">
+              <button class="settings-idx settings-idx--${SECTION_KIND[id]}" data-section="${id}"
+                      ${id === 'messages' ? 'data-open="messages"' : `data-section-open="${id}"`}>
+                ${_tile(id)}
+                <span class="settings-idx__text">
+                  <span class="settings-sec__title">${_esc(SECTION_TITLES[id])}</span>
+                  <span class="settings-sec__sub">${_esc(_sectionSummary(id, c))}</span>
+                </span>
+                <span class="settings-row__chevron" aria-hidden="true">&rsaquo;</span>
+              </button>
+            </h2>
+          </li>`).join('')}
+      </ul>`;
+  }
+
+  /** LOOK-1. A section on its own page: Back to Settings, one h1, its groups. */
+  function renderSectionPage(id) {
+    const c = _ctx();
+    const groups = _sectionGroups(id, c).filter(g => g && g.rows.filter(Boolean).length);
+    return `
+      <div class="settings-secpage settings-secpage--${SECTION_KIND[id]}" data-section="${id}">
+        <div class="settings-section-header">
+          <button class="btn btn-ghost settings-back" id="settings-back-btn" aria-label="Back to Settings">&larr; Settings</button>
+        </div>
+        <div class="settings-secpage__head">
+          ${_tile(id, 'settings-tile settings-tile--lg')}
+          <h1 class="settings-title" tabindex="-1">${_esc(SECTION_TITLES[id])}</h1>
+        </div>
+        ${id === 'data' ? `<p class="settings-result" id="settings-result" tabindex="-1" role="status"${result ? '' : ' hidden'}>${_esc(result || '')}</p>` : ''}
+        ${groups.map((g, i) => `
+          <section class="settings-group"${g.title ? ` aria-labelledby="sg-${id}-${i}"` : ` aria-label="${_esc(SECTION_TITLES[id])}"`}>
+            ${g.title ? `<h2 class="settings-group__title" id="sg-${id}-${i}">${_esc(g.title)}</h2>` : ''}
+            <ul class="settings-rows">${g.rows.filter(Boolean).join('')}</ul>
+          </section>`).join('')}
+      </div>`;
   }
 
   /** W4-6. An outcome the person must see: on the page, with focus. */
   function _result(container, msg) {
     result = msg;
     activeScreen = null;
-    openSections.add('data');   // W4-23: the result is about Your data
+    activeSection = 'data';   // W4-23 / LOOK-1: the result is about Your data
     focusAfter = '#settings-result';
     render(container);
   }
@@ -2441,7 +2550,7 @@ export function SettingsView(router) {
     // place. Deliberately not blocking the render: the About panel should
     // appear immediately and fill this in a moment later, rather than
     // holding the whole screen for a cache lookup.
-    if (swVersion === null && (activeScreen === null || activeScreen === 'about-app')) {
+    if (swVersion === null && ((activeScreen === null && activeSection === 'about') || activeScreen === 'about-app')) {
       _readSwVersion().then(v => {
         // VER-1b. The cache name is "alongside-v294", so stripping the
         // prefix leaves "v294" -- already carrying its own v. The
@@ -2480,10 +2589,14 @@ export function SettingsView(router) {
       _saved(container, `${name} is back on your list.`);
     }));
 
-    // W4-23. Which sections are open survives a redraw (a switch, a save).
-    container.querySelectorAll('details[data-section]').forEach(d => {
-      d.addEventListener('toggle', () => {
-        if (d.open) openSections.add(d.dataset.section); else openSections.delete(d.dataset.section);
+    // LOOK-1. Index -> a section's own page.
+    container.querySelectorAll('[data-section-open]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        activeSection = btn.dataset.sectionOpen;
+        activeScreen = null;
+        result = null;
+        focusAfter = '.settings-title';
+        render(container);
       });
     });
     // SMOOTH-P4c. Page -> row screen, and back. Two levels, no more.
@@ -2544,13 +2657,27 @@ export function SettingsView(router) {
       askingAgain = false;
       router.navigate(takePendingRoute() || 'today');
     });
-    document.getElementById('settings-back-btn')?.addEventListener('click', () => {
+    // LOOK-1. Back one level: a row's screen to its section page (focus on
+    // the row), a section page to the index (focus on its row).
+    container.querySelector('#settings-back-btn')?.addEventListener('click', () => {
       askingAgain = false;
-      const from = activeScreen;
-      activeScreen = null;
-      if (screenFrom && screenFrom !== 'messages') openSections.add(screenFrom);
-      focusAfter = screenFrom === 'messages' ? '[data-section="messages"]' : `[data-section="${screenFrom || ''}"] [data-open="${from}"], [data-open="${from}"]`;
-      screenFrom = null;
+      if (activeScreen) {
+        const from = activeScreen;
+        activeScreen = null;
+        if (screenFrom && screenFrom !== 'messages' && SECTION_TITLES[screenFrom]) {
+          activeSection = screenFrom;
+          focusAfter = `[data-open="${from}"]`;
+        } else {
+          activeSection = null;
+          focusAfter = '[data-section="messages"]';
+        }
+        screenFrom = null;
+      } else {
+        const from = activeSection;
+        activeSection = null;
+        result = null;
+        focusAfter = `[data-section-open="${from}"]`;
+      }
       render(container);
     });
 

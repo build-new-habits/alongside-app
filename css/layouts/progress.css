@@ -1,5 +1,15 @@
 /*
  * css/layouts/progress.css
+ * 04 Oct 2026 v9
+ *   LOOK-2 / LOOK-3. The overview is cards on the page ground (.pr-card):
+ *   two number tiles, the coach's line, the weekly bars (taller, every bar
+ *   labelled), the kinds of session as one bar in parts (.pr-kinds, each
+ *   part a --kind-* colour) above a list naming and counting each, the
+ *   arc's strands with a filled or open mark, and the rows one tap away
+ *   (.pr-row, a tile in its kind colour). Detail pages (.pr-page) have Back
+ *   and a tile beside the h1. Kind colours are text only on the page and
+ *   card ground; elsewhere they are shapes (tokens measured in
+ *   verify-contrast-check v3). The window tabs are a segmented control.
  * 29 Sep 2026 v8
  *   P25. .pr-lifts-more: every lift past the first eight, one tap away.
  *   The summary is a real control: full width, 44px tall, focus visible.
@@ -614,3 +624,170 @@
   outline-offset: 2px;
 }
 .pr-lifts-more[open] > summary { margin-bottom: var(--space-2, 8px); }
+
+
+/* ============================================================
+   LOOK-2 / LOOK-3 — Progress overview and detail pages, 04 Oct 2026
+   ============================================================ */
+.pr-k--teal   { --k: var(--kind-teal); }
+.pr-k--amber  { --k: var(--kind-amber); }
+.pr-k--violet { --k: var(--kind-violet); }
+.pr-k--blue   { --k: var(--kind-blue); }
+.pr-k--rose   { --k: var(--kind-rose); }
+.pr-k--green  { --k: var(--kind-green); }
+.pr-k--slate  { --k: var(--kind-slate); }
+.pr-row--teal,   .pr-page--teal,   .pr-lift-group--teal   { --k: var(--kind-teal); }
+.pr-row--amber,  .pr-page--amber,  .pr-lift-group--amber  { --k: var(--kind-amber); }
+.pr-row--violet, .pr-page--violet, .pr-lift-group--violet { --k: var(--kind-violet); }
+.pr-row--blue,   .pr-page--blue,   .pr-lift-group--blue   { --k: var(--kind-blue); }
+.pr-row--green,  .pr-page--green,  .pr-lift-group--green  { --k: var(--kind-green); }
+
+/* Header: title and the 30 / 90 switch on one line. */
+.progress-header { flex-direction: row; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+.progress-tabs--seg {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--color-border-light);
+  border-bottom: 1px solid var(--color-border-light);
+  border-radius: 12px;
+  background: var(--color-bg);
+}
+.progress-tabs--seg .progress-tab {
+  border: 0;
+  border-radius: 9px;
+  padding: var(--space-2) var(--space-3);
+  min-height: 44px;
+  color: var(--color-text);
+}
+.progress-tabs--seg .progress-tab--active { background: var(--color-primary); color: var(--color-text-inverse); }
+
+/* The cards. */
+.pr-card, .progress-body > .progress-narrative {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border-light);
+  border-radius: 20px;
+  padding: var(--space-4) var(--space-5);
+}
+.progress-body { display: flex; flex-direction: column; gap: var(--space-4); }
+.progress-body > .pr-block { margin: 0; }
+.pr-card__title { margin: 0; font-size: var(--text-lg); font-weight: 600; color: var(--color-text); }
+.pr-card__cap { margin: var(--space-1) 0 0; font-size: var(--text-sm); color: var(--color-text-secondary); }
+.pr-card__headrow { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-2); }
+.pr-card__meta { font-size: var(--text-sm); color: var(--color-text-secondary); }
+
+/* Two numbers. */
+.progress-body > .progress-summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+  padding: 0;
+  border-top: 0;
+}
+.progress-summary__stat {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border-light);
+  border-radius: 20px;
+  padding: var(--space-4);
+}
+.progress-summary__stat--teal .progress-summary__number { color: var(--kind-teal); }
+.progress-summary__stat--blue .progress-summary__number { color: var(--kind-blue); }
+.progress-summary__stat .progress-summary__label { text-transform: none; letter-spacing: 0; font-size: var(--text-sm); color: var(--color-text-secondary); margin-top: var(--space-1); }
+
+/* The weekly bars: taller, a count and a week under every bar. */
+.pr-card .pr-chart { margin-top: var(--space-2); }
+.pr-card .pr-bars { border-bottom: 1px solid var(--color-border); padding-bottom: 0; }
+.pr-card .pr-bar__track { height: 120px; max-width: 40px; }
+.pr-card .pr-bar__value { font-size: var(--text-sm); font-weight: 600; color: var(--color-text); }
+.pr-card .pr-bar__track::before { border-radius: 8px 8px 0 0; }
+.pr-card .pr-bar__fill { border-radius: 8px 8px 0 0; }
+
+/* Kinds of session: the whole, in parts, named and counted below. */
+.pr-kinds { display: flex; gap: 3px; height: 20px; margin: var(--space-4) 0 0; border-radius: 10px; overflow: hidden; }
+.pr-kinds__part { flex-basis: 0; min-width: 6px; background: var(--k); }
+.progress-shapes .progress-shapes__list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2) var(--space-3);
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  list-style: none;
+}
+.progress-shapes .progress-shapes__row { display: flex; align-items: center; gap: var(--space-2); padding: 0; border: 0; font-size: var(--text-sm); color: var(--color-text); }
+.progress-shapes .progress-shapes__name { min-width: 0; }
+.progress-shapes .progress-shapes__count { color: var(--color-text-secondary); font-variant-numeric: tabular-nums; }
+.progress-shapes .progress-shapes__count::before { content: "\00b7\00a0"; }
+.pr-dot { flex: none; width: 12px; height: 12px; border-radius: 3px; background: var(--k); }
+
+/* The arc's strands: a mark, the name, a date or Not yet. */
+.pr-card .pr-aim { margin: var(--space-2) 0 var(--space-2); font-weight: 500; }
+.pr-strand { align-items: center; }
+.pr-strand__mark { flex: none; width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--kind-slate); box-sizing: border-box; }
+.pr-strand__mark--on { background: var(--kind-teal); border-color: var(--kind-teal); }
+.pr-strand__name { flex: 1; }
+.pr-card .pr-change { margin-top: var(--space-2); padding-left: 0; min-height: 44px; }
+
+/* Rows one tap away. */
+.pr-more { padding: var(--space-1) 0; }
+.pr-more__list { margin: 0; padding: 0; list-style: none; }
+.pr-more__list > li + li { border-top: 1px solid var(--color-border-light); }
+.pr-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: 60px;
+  padding: var(--space-3) var(--space-4);
+  background: none;
+  border: 0;
+  color: var(--color-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.pr-row:hover { background: var(--color-bg-hover); }
+.pr-row:focus-visible { outline: 3px solid var(--color-border-focus); outline-offset: -3px; }
+.pr-row__text { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.pr-row__title { font-weight: 500; }
+.pr-row__sub { font-size: var(--text-sm); color: var(--color-text-secondary); }
+.pr-row__chevron { flex: none; color: var(--color-text-secondary); font-size: var(--text-lg); }
+.pr-tile {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--k, var(--color-primary));
+  background: var(--color-bg-card);
+  background: color-mix(in srgb, var(--k, var(--color-primary)) 16%, var(--color-bg));
+}
+.pr-tile--lg { width: 48px; height: 48px; border-radius: 14px; background: color-mix(in srgb, var(--k, var(--color-primary)) 16%, var(--color-bg-deep)); }
+
+/* Detail pages. */
+.pr-page { display: flex; flex-direction: column; gap: var(--space-4); }
+.pr-back { align-self: flex-start; min-height: 44px; }
+.pr-page__head { display: flex; align-items: center; gap: var(--space-3); }
+.pr-group-title {
+  margin: var(--space-2) 0 var(--space-2) var(--space-1);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--k, var(--color-text-secondary));
+}
+.pr-lift-group .pr-lifts { display: flex; flex-direction: column; gap: var(--space-2); }
+.pr-lift-group .pr-lift {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border-light);
+  border-radius: 16px;
+}
+.pr-lift__body { flex: 1; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.pr-lift-group .pr-lift__name { font-weight: 600; }
+.pr-lift-group .pr-lift__text { text-align: left; }
+.pr-spark { flex: none; color: var(--k, var(--color-primary)); }

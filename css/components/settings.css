@@ -1,5 +1,14 @@
 /*
  * css/components/settings.css
+ * 04 Oct 2026 v18
+ *   LOOK-1 / LOOK-3. The index is eight cards (.settings-idx), each with a
+ *   tile in its kind colour (--sec, from variables.css --kind-*) and a line
+ *   saying what is set now. A section opens as its own page
+ *   (.settings-secpage): a large tile beside the h1, and its rows in named
+ *   groups (.settings-group), each group a rounded card. Colour is never
+ *   the only cue: every tile sits beside its title. The .settings-sec
+ *   details rules above are no longer rendered (touch-once: left one
+ *   release).
  * 02 Oct 2026 v17
  *   W4-23 SETTINGS-RESCOPE. .settings-sec*: the index of eight sections, each
  *   a native details that opens where it is (Messages a direct row).
@@ -1189,3 +1198,74 @@ button.settings-row:focus-visible { outline: 3px solid var(--color-border-focus)
   color: var(--color-text);
 }
 .settings-data-about p { margin: 0; }
+
+
+/* ============================================================
+   LOOK-1 / LOOK-3 — Settings index and section pages, 04 Oct 2026
+   ============================================================ */
+.settings-idx--teal,   .settings-secpage--teal   { --sec: var(--kind-teal); }
+.settings-idx--amber,  .settings-secpage--amber  { --sec: var(--kind-amber); }
+.settings-idx--violet, .settings-secpage--violet { --sec: var(--kind-violet); }
+.settings-idx--blue,   .settings-secpage--blue   { --sec: var(--kind-blue); }
+.settings-idx--rose,   .settings-secpage--rose   { --sec: var(--kind-rose); }
+.settings-idx--green,  .settings-secpage--green  { --sec: var(--kind-green); }
+.settings-idx--slate,  .settings-secpage--slate  { --sec: var(--kind-slate); }
+
+.settings-index { list-style: none; margin: var(--space-2) 0 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-2); }
+.settings-index__item { margin: 0; }
+.settings-index__h { margin: 0; font: inherit; }
+.settings-idx {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: 68px;
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border-light);
+  border-radius: 16px;
+  color: var(--color-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.settings-idx:hover { background: var(--color-bg-hover); }
+.settings-idx:focus-visible { outline: 3px solid var(--color-border-focus); outline-offset: 2px; }
+.settings-idx__text { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+
+.settings-tile {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--sec, var(--color-primary));
+  background: var(--color-bg-card);
+  background: color-mix(in srgb, var(--sec, var(--color-primary)) 16%, var(--color-bg));
+}
+.settings-tile--lg { width: 48px; height: 48px; border-radius: 14px; }
+
+.settings-back { min-height: 44px; }
+.settings-secpage { display: flex; flex-direction: column; }
+.settings-secpage__head { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-2) 0 var(--space-3); }
+.settings-secpage__head .settings-title { padding: 0; }
+.settings-group { margin: var(--space-3) 0 0; }
+.settings-group__title {
+  margin: 0 0 var(--space-2) var(--space-1);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--sec, var(--color-text-secondary));
+}
+.settings-secpage .settings-rows {
+  border: 1px solid var(--color-border-light);
+  border-radius: 16px;
+  background: var(--color-bg);
+  overflow: hidden;
+}
+.settings-secpage .settings-rows > li { border-bottom: 1px solid var(--color-border-light); }
+.settings-secpage .settings-rows > li:last-child { border-bottom: 0; }
+.settings-secpage .settings-row { padding: var(--space-2) var(--space-4); }

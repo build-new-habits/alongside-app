@@ -1,5 +1,20 @@
 /**
  * progress.js
+ * 04 Oct 2026 v26
+ *
+ * v26 - LOOK-2 PROGRESS-SHAPE (Graeme, 04 Oct: "Progress seems wordy and
+ *   lacks graphs ... Too much on one screen"). The overview is two numbers,
+ *   the coach's one line, sessions each week (every bar labelled with its
+ *   count and week), the kinds of session as one coloured bar with each
+ *   name and count beside it (LOOK-3 colours, never colour alone), and the
+ *   arc's strands (a date or Not yet, never a count). Lifts, weight, Build
+ *   Your Base, Share and Your year are rows one tap away; each but Your year
+ *   opens its own page with Back to Progress. The weight note still speaks
+ *   on the overview, once. Build Your Base says how many this week, with no
+ *   target beside it (Graeme approved dropping "0 of 3 this week", 04 Oct).
+ *   Kinds now include classes, yoga, walks and your own sessions, not only
+ *   built ones; a built session with no recorded shape is still skipped.
+ *
  * 02 Oct 2026 v25
  *
  * v25 - W4-20. Plurals in the shared summary (1 week in, 1 session). The
@@ -320,6 +335,7 @@ import { EXERCISES } from '../data/exercises/index.js';
 import { activityNoun } from '../data/activity-labels.js';
 import { liftReadback, strandReadback, arcWeek, sessionsByWeek,
          sessionsInWindow, shortDate } from '../data/arc-readback.js';
+import { kindOf } from '../data/kind-colours.js';
 
 // Set by _rateNote when it renders the sustained-rate note, committed by
 // _commitRateRaise once the markup is on screen. It is a fact about this
@@ -349,6 +365,9 @@ export function ProgressView(router) {
   // selected and aria-selected was false on all of them. Caught by
   // rendering both tiers rather than reading the code.
   let activeWindow = null;
+  // LOOK-2. null = the overview; otherwise one detail page.
+  let activePage   = null;
+  let focusAfter   = null;
 
   // ── Mount ──────────────────────────────────────────────────────────────────
 
@@ -374,56 +393,129 @@ export function ProgressView(router) {
 
     container.innerHTML = `
       <div class="progress-view">
-
+        ${activePage ? renderPage(activePage, premium, stats) : `
         <header class="progress-header">
-          <h1 class="progress-title">Progress</h1>
+          <h1 class="progress-title" tabindex="-1">Progress</h1>
+          ${premium ? renderWindowTabs(tier) : ''}
         </header>
 
         <div class="progress-body">
-          ${premium ? renderArcReadback() : ''}
-
-          <h2 class="pr-title" id="pr-done-h">Everything you\u2019ve done</h2>
-          ${premium ? renderWindowTabs(tier) : ''}
-          ${renderCoachNarrative(stats, tier, name)}
           ${renderActivitySummary(tier)}
+          ${renderCoachNarrative(stats, tier, name)}
           ${renderSessionsChart()}
           ${renderSessionShapes(tier)}
-          ${stats.hasActiveProgramme && premium ? renderProgrammeProgress(stats) : ''}
-          <!-- R4 / decision 7.2, 20 Aug 2026. Was:
-                 tier === 'personal' ? renderExportBlock() : renderExportLocked()
-               UK GDPR gives a right of access and portability regardless
-               of payment, so the lock never withheld the DATA -- only the
-               button, converting a self-serve action into a support email.
-               The tier difference survives in the CONTENTS: this export is
-               scoped by activeWindow (14 free, 30/90 paid) and its
-               programme lines drop out when there is no programme. No
-               conditional needed; the differentiation is emergent. -->
-          ${_weightLog(premium)}
-
-          ${renderExportBlock()}
-
-          <!-- Front door for the annual reflection, added 11 Aug 2026.
-               The view existed and nothing navigated to it. Progress is
-               where somebody looking back would go. It handles having
-               no year of data gracefully, so it is safe to offer from
-               day one rather than hidden until it fills. -->
-          <button class="btn btn-ghost btn-full"
-                  id="progress-year-btn"
-                  style="margin-top: var(--space-4);"
-                  aria-label="Look back across your year">
-            Your year
-          </button>
-
+          ${premium ? renderArcReadback() : ''}
+          ${_rateNote(premium)}
+          ${renderMoreList(premium, stats)}
           ${premium ? '' : renderPlanCard()}
-        </div>
-
+        </div>`}
       </div>
     `;
 
     attachEvents(container, tier);
+    if (focusAfter) {
+      const sel = focusAfter; focusAfter = null;
+      container.querySelector(sel)?.focus();
+    }
 
     // AFTER the markup exists. See _rateNote.
     _commitRateRaise();
+  }
+
+  // ── LOOK-2. The rows one tap away, and their pages ──────────────────────
+
+  const PAGE_ICON = {
+    lifts:     '<path d="M6 7v10M18 7v10M3 10v4M21 10v4M6 12h12"/>',
+    weight:    '<path d="M3 17l5-5 4 4 8-8"/>',
+    programme: '<path d="M4 20V10l8-6 8 6v10"/><path d="M10 20v-6h4v6"/>',
+    year:      '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
+    share:     '<path d="M12 15V3M7 8l5-5 5 5"/><path d="M5 13v6h14v-6"/>',
+  };
+  const PAGE_KIND = { lifts: 'amber', weight: 'blue', programme: 'teal', year: 'violet', share: 'green' };
+
+  function _prRow(key, title, sub, attrs) {
+    return `
+      <li>
+        <button class="pr-row pr-row--${PAGE_KIND[key]}" ${attrs}>
+          <span class="pr-tile" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false">${PAGE_ICON[key]}</svg></span>
+          <span class="pr-row__text">
+            <span class="pr-row__title">${_esc(title)}</span>
+            ${sub ? `<span class="pr-row__sub">${_esc(sub)}</span>` : ''}
+          </span>
+          <span class="pr-row__chevron" aria-hidden="true">&rsaquo;</span>
+        </button>
+      </li>`;
+  }
+
+  function renderMoreList(premium, stats) {
+    const lifts = premium ? liftReadback(store.get('liftLog') || {}, EXERCISES) : [];
+    const weightOn = premium && store.get('weightTracking') === true && healthAllowed();
+    const latest = weightOn ? (store.get('weightLog') || []).filter(e => e && typeof e.kg === 'number')
+      .slice().sort((a, b) => String(b.at).localeCompare(String(a.at)))[0] : null;
+    const rows = [
+      lifts.length ? _prRow('lifts', 'Your lifts', `${lifts.length} logged, first to latest`, 'data-pr-page="lifts"') : '',
+      weightOn ? _prRow('weight', 'Your weight', latest ? `${formatWeight(latest.kg, store.get('weightUnit') || 'kg')} \u00b7 ${_weightDate(latest.at)}` : 'Nothing logged yet', 'data-pr-page="weight"') : '',
+      stats.hasActiveProgramme && premium ? _prRow('programme', stats.programmeName || 'Your programme',
+        `${stats.weeksIn === 0 ? 'Just started' : `Week ${stats.weeksIn}`} \u00b7 ${stats.phaseName}`, 'data-pr-page="programme"') : '',
+      _prRow('year', 'Your year', 'Every session since you started', 'id="progress-year-btn" aria-label="Your year: look back across your year"'),
+      _prRow('share', 'Share your progress', 'For you, a friend or a professional', 'data-pr-page="share"'),
+    ].filter(Boolean);
+    return `
+      <nav class="pr-card pr-more" aria-label="More on your progress">
+        <ul class="pr-more__list">${rows.join('')}</ul>
+      </nav>`;
+  }
+
+  /** A detail page: Back to Progress, one h1, the block. */
+  function renderPage(page, premium, stats) {
+    const titles = { lifts: 'Your lifts', weight: 'Your weight', programme: stats.programmeName || 'Your programme', share: 'Share your progress' };
+    const body = page === 'lifts' ? _liftsPage()
+      : page === 'weight' ? _weightLog(premium, false)
+      : page === 'programme' ? (stats.hasActiveProgramme && premium ? renderProgrammeProgress(stats, false) : '')
+      : page === 'share' ? renderExportBlock(false) : '';
+    return `
+      <div class="pr-page pr-page--${PAGE_KIND[page] || 'teal'}">
+        <button class="btn btn-ghost pr-back" id="pr-back" aria-label="Back to Progress">&larr; Progress</button>
+        <div class="pr-page__head">
+          <span class="pr-tile pr-tile--lg" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false">${PAGE_ICON[page] || ''}</svg></span>
+          <h1 class="progress-title" tabindex="-1"${page === 'lifts' ? ' id="pr-lifts-h"' : ''}>${_esc(titles[page] || 'Progress')}</h1>
+        </div>
+        ${body}
+      </div>`;
+  }
+
+  /** LOOK-2. Every lift, first to latest, each with its line. */
+  function _liftsPage() {
+    const rows = liftReadback(store.get('liftLog') || {}, EXERCISES);
+    if (!rows.length) return '<p class="pr-note">Lifts appear here once you have logged one on two different days.</p>';
+    const KINDS = ['weight', 'reps', 'level', 'durationMins', 'distance'];
+    const kindOfRow = r => KINDS.find(k => typeof r.first[k] === 'number' && typeof r.latest[k] === 'number');
+    const strength = rows.filter(r => ['weight', 'reps', 'level'].includes(kindOfRow(r)));
+    const holds    = rows.filter(r => !strength.includes(r));
+    // The line: first to latest, nothing more. No judgement, same colour up or down.
+    const spark = r => {
+      const k = kindOfRow(r), a = r.first[k], b = r.latest[k];
+      const lo = Math.min(a, b), hi = Math.max(a, b), span = hi - lo || 1;
+      const y = v => (hi === lo ? 16 : 26 - ((v - lo) / span) * 20).toFixed(1);
+      return `<svg class="pr-spark" width="72" height="32" viewBox="0 0 72 32" aria-hidden="true" focusable="false"><line x1="6" y1="${y(a)}" x2="66" y2="${y(b)}" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><circle cx="6" cy="${y(a)}" r="4" fill="currentColor"/><circle cx="66" cy="${y(b)}" r="4" fill="currentColor"/></svg>`;
+    };
+    const li = r => `
+          <li class="pr-lift">
+            <span class="pr-lift__body">
+              <span class="pr-lift__name">${_esc(r.name)}</span>
+              <span class="pr-lift__text">${_esc(r.text)}</span>
+            </span>
+            ${spark(r)}
+          </li>`;
+    const group = (title, cls, list, i) => list.length ? `
+        <section class="pr-lift-group pr-lift-group--${cls}" aria-labelledby="pr-lg-${i}">
+          <h2 class="pr-group-title" id="pr-lg-${i}">${title}</h2>
+          <ul class="pr-lifts">${list.map(li).join('')}</ul>
+        </section>` : '';
+    return `
+      <p class="pr-note">Your best set the first day you logged each one, and on the latest day.</p>
+      ${group('Strength', 'amber', strength, 0)}
+      ${group('Holds and time', 'violet', holds, 1)}`;
   }
 
   /**
@@ -434,7 +526,7 @@ export function ProgressView(router) {
    * losing weight invites reading a slope, and reading a slope is the
    * arithmetic on the body this product refuses.
    */
-  function _weightLog(premium) {
+  function _weightLog(premium, heading = true) {
     if (!premium || store.get('weightTracking') !== true || !healthAllowed()) return '';
 
     const unit    = store.get('weightUnit') || 'kg';
@@ -449,7 +541,7 @@ export function ProgressView(router) {
 
     return `
       <section class="progress-weight" aria-label="Your weight">
-        <h2 class="progress-weight__heading">Your weight</h2>
+        ${heading ? '<h2 class="progress-weight__heading">Your weight</h2>' : ''}
 
         ${note}
 
@@ -570,7 +662,7 @@ export function ProgressView(router) {
     // locked -- the padlocked tabs made the free screen a sales page.
     const windows = [30, 90];
     return `
-      <div class="progress-tabs" role="tablist" aria-label="How far back">
+      <div class="progress-tabs progress-tabs--seg" role="tablist" aria-label="How far back">
         ${windows.map(w => `
           <button
             class="progress-tab ${activeWindow === w ? 'progress-tab--active' : ''}"
@@ -603,7 +695,7 @@ export function ProgressView(router) {
                id="panel-${activeWindow}"
                ${tier === 'free' ? '' : `role="tabpanel" aria-labelledby="tab-${activeWindow}"`}>
         <div class="progress-narrative__text">
-          ${observation.lines.map(line => `<p>${line}</p>`).join('')}
+          ${observation.lines.slice(0, 1).map(line => `<p>${line}</p>`).join('')}
         </div>
       </section>
     `;
@@ -622,11 +714,9 @@ export function ProgressView(router) {
 
     const sessionCount  = recent.length;
     const totalMins     = recent.reduce((acc, e) => acc + (e.durationMins || 0), 0);
-    const activityTypes = _countByType(recent);
-
     return `
       <section class="progress-summary" aria-label="Activity summary for last ${activeWindow} days">
-        <div class="progress-summary__stat">
+        <div class="progress-summary__stat progress-summary__stat--teal">
           <!-- LOG-CLASS-1, 08 Sep 2026. "1 sessions" in the accessible
                name. The VISIBLE word below is a column heading and is
                right to stay plural; this one is read as a sentence.
@@ -636,16 +726,12 @@ export function ProgressView(router) {
                 aria-label="${sessionCount} session${sessionCount === 1 ? '' : 's'}">${sessionCount}</span>
           <span class="progress-summary__label">sessions</span>
         </div>
-        <div class="progress-summary__stat">
+        <div class="progress-summary__stat progress-summary__stat--blue">
           <span class="progress-summary__number" aria-label="${totalMins} minutes total">${totalMins}</span>
-          <span class="progress-summary__label">minutes</span>
+          <span class="progress-summary__label">minutes moving</span>
         </div>
-        ${tier !== 'free' ? `
-        <div class="progress-summary__breakdown" aria-label="Session types">
-          ${Object.entries(activityTypes).slice(0, 3).map(([type, count]) => `
-            <span class="progress-summary__type">${_formatType(type)} × ${count}</span>
-          `).join('')}
-        </div>` : ''}
+        <!-- LOOK-2. The kinds are drawn below, every one named and counted;
+             the chips here repeated three of them. -->
       </section>
     `;
   }
@@ -683,9 +769,15 @@ export function ProgressView(router) {
 
     const completed = store.completedSessions(store.get('activityLog'));
     const cutoff    = _cutoffDate(activeWindow);
+    // LOOK-2. Every kind of session, not only built ones: classes, yoga,
+    // walks and your own sessions are kinds too. A built session (type
+    // workout) with no recorded e.sessionType predates TWO-ENGINE and is
+    // still SKIPPED, never bucketed; so is a type nobody can name.
     const recent    = completed.filter(e => {
       const ts = e.completedAt || e.loggedAt || e.date;
-      return ts && new Date(ts) >= cutoff && e.sessionType;
+      if (!(ts && new Date(ts) >= cutoff)) return false;
+      if (e.type === 'workout' && !e.sessionType) return false;
+      return _kindLabel(e) !== null;
     });
 
     // Silent when there is nothing to show. An empty state here would
@@ -693,33 +785,47 @@ export function ProgressView(router) {
     // back, not to be given something else to do.
     if (recent.length === 0) return '';
 
-    const counts = {};
-    for (const e of recent) counts[e.sessionType] = (counts[e.sessionType] || 0) + 1;
-    const rows = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+    const counts = new Map();
+    for (const e of recent) {
+      const label = _kindLabel(e);
+      const was = counts.get(label) || { count: 0, kind: kindOf(e) };
+      counts.set(label, { count: was.count + 1, kind: was.kind });
+    }
+    const rows = [...counts.entries()].sort((a, b) => b[1].count - a[1].count);
 
     return `
-      <section class="progress-shapes"
-               aria-label="Shapes of session in the last ${activeWindow} days">
-        <!-- PROGRESS-2, 08 Sep 2026. h2, not h3.
-             This section is a sibling of "Your weight", the programme
-             block and "Share your progress", all of which are h2. As an
-             h3 it produced the outline h1 > h3 > h2: somebody navigating
-             by heading met "What you have been doing" as a subsection of
-             nothing, and then "Share your progress" jumping back UP a
-             level. WCAG 2.2 AA 1.3.1 -- the heading level is what
-             carries the structure to anyone not seeing the layout.
-             Styling is on the class, so nothing moves visually. -->
-        <h2 class="progress-shapes__title">What you have been doing</h2>
+      <section class="pr-card progress-shapes" aria-labelledby="pr-kinds-h">
+        <!-- PROGRESS-2: h2, a sibling of the other blocks. -->
+        <h2 class="pr-card__title progress-shapes__title" id="pr-kinds-h">What kinds of session</h2>
+        <!-- Kinds only: the session count is said once, above, and this list
+             leaves out sessions with no recorded shape, so a second count
+             here would disagree with it. -->
+        <p class="pr-card__cap">${rows.length} kind${rows.length === 1 ? '' : 's'} of session.</p>
+        <!-- The whole, in parts. Every part is named and counted in the list
+             below it, so the bar is never the only carrier (1.4.1). -->
+        <div class="pr-kinds" aria-hidden="true">
+          ${rows.map(([, r]) => `<span class="pr-kinds__part pr-k--${r.kind}" style="flex-grow:${r.count}"></span>`).join('')}
+        </div>
         <ul class="progress-shapes__list">
-          ${rows.map(([type, count]) => `
+          ${rows.map(([label, r]) => `
             <li class="progress-shapes__row">
-              <span class="progress-shapes__name">${_esc(_shapeLabel(type))}</span>
-              <span class="progress-shapes__count">${count}</span>
+              <span class="pr-dot pr-k--${r.kind}" aria-hidden="true"></span>
+              <span class="progress-shapes__name">${_esc(label)}</span>
+              <span class="progress-shapes__count">${r.count}</span>
             </li>
           `).join('')}
         </ul>
       </section>
     `;
+  }
+
+  /** A kind's name: the built shape from SESSION_TYPES, else the log's own word. */
+  function _kindLabel(e) {
+    const t = e.sessionType ? SESSION_TYPES.find(x => x.id === e.sessionType) : null;
+    if (t) return t.label;
+    const noun = activityNoun(e);
+    if (!noun || noun === 'other activity') return null;
+    return noun.charAt(0).toUpperCase() + noun.slice(1);
   }
 
   /**
@@ -750,7 +856,7 @@ export function ProgressView(router) {
 
   // ── Programme progress ─────────────────────────────────────────────────────
 
-  function renderProgrammeProgress(stats) {
+  function renderProgrammeProgress(stats, heading = true) {
     const missedSessions = store.get('activeProgramme.missedSessions') || [];
     const recentMissed   = missedSessions.filter(m => {
       const d = new Date(m.date);
@@ -759,7 +865,7 @@ export function ProgressView(router) {
 
     return `
       <section class="progress-programme" aria-label="Programme progress">
-        <h2 class="progress-programme__name">${stats.programmeName || 'Your programme'}</h2>
+        ${heading ? `<h2 class="progress-programme__name">${stats.programmeName || 'Your programme'}</h2>` : ''}
 
         <div class="progress-programme__track">
           <span class="progress-programme__label">
@@ -792,9 +898,11 @@ export function ProgressView(router) {
         -->
         <div class="progress-programme__stats">
           <span>${stats.totalSessions} session${stats.totalSessions === 1 ? '' : 's'} completed</span>
-          ${store.get('strategicGoal.setAt')
-            ? `<span>${stats.sessionsThisWeek} of ${stats.weeklyTarget} this week</span>`
-            : `<span>${stats.sessionsThisWeek} this week</span>`}
+          <!-- LOOK-2 (Graeme approved, 04 Oct): this week's count with no
+               target beside it. "0 of 3 this week" read as a score against
+               a target, on the screen opened to look back. The target is
+               still kept and shown in Settings › Your plan. -->
+          <span>${stats.sessionsThisWeek} this week</span>
         </div>
 
         ${recentMissed.length > 0 ? `
@@ -836,7 +944,8 @@ export function ProgressView(router) {
         <figcaption class="pr-chart__summary" id="${id}-cap">${_esc(summary)}</figcaption>
         <ol class="pr-bars" aria-label="${_esc(title)}">
           ${bars.map((b, i) => {
-            const edge = i === 0 || i === bars.length - 1;
+            // LOOK-2: every bar says its count and its week (at most six).
+            const edge = true;
             return `
             <li class="pr-bar" title="${_esc(b.label)}">
               <span class="sr-only">${_esc(b.label)}</span>
@@ -858,44 +967,39 @@ export function ProgressView(router) {
 
     if (!aim) {
       return `
-        <section class="pr-block" aria-labelledby="pr-arc-h">
-          <h2 class="pr-title" id="pr-arc-h">Your arc</h2>
+        <section class="pr-card pr-block" aria-labelledby="pr-arc-h">
+          <h2 class="pr-card__title pr-title" id="pr-arc-h">Your arc</h2>
           <p class="pr-coach">Tell me what you want to be able to do, and this is where it lives — what you’re working towards and what has come up.</p>
           <button class="btn btn-secondary btn-full" data-route="arc-setup">Set up your arc</button>
-        </section>
-        ${_liftsBlock()}`;
+        </section>`;
     }
 
     const week    = arcWeek(arc, now);
     const strands = strandReadback(arc, now);
-    const latest  = strands.filter(s => s.last).sort((a, b) => b.last.localeCompare(a.last))[0];
-    const coach   = !strands.length ? ''
-      : latest ? `${latest.label} came up most recently, ${latest.text.replace(/^Worked /, '')}.`
-      : 'Nothing has come up yet. All of it is still ahead of you.';
 
+    // LOOK-2. Each strand with a filled mark and when it last came up, or
+    // an open mark and Not yet. A date, never a count; the mark is never
+    // the only carrier, the words beside it are.
     return `
-      <section class="pr-block" aria-labelledby="pr-arc-h">
-        <h2 class="pr-title" id="pr-arc-h">Your arc${week ? ` · week ${week}` : ''}</h2>
-        <p class="pr-aim">Working towards “${_esc(aim.label)}”</p>
-        ${coach ? `<p class="pr-coach">${_esc(coach)}</p>` : ''}
-      </section>
-
-      ${_liftsBlock()}
-
-      ${strands.length ? `
-        <section class="pr-block" aria-labelledby="pr-strands-h">
-          <h2 class="pr-title" id="pr-strands-h">What your arc works on</h2>
-          <ul class="pr-strands">
+      <section class="pr-card pr-block" aria-labelledby="pr-arc-h">
+        <div class="pr-card__headrow">
+          <h2 class="pr-card__title pr-title" id="pr-arc-h">Your arc</h2>
+          ${week ? `<span class="pr-card__meta">Week ${week}</span>` : ''}
+        </div>
+        <p class="pr-aim">“${_esc(aim.label)}”</p>
+        ${strands.length ? `
+          <h3 class="sr-only" id="pr-strands-h">What your arc works on</h3>
+          <ul class="pr-strands" aria-labelledby="pr-strands-h">
             ${strands.map(s => `
               <li class="pr-strand">
+                <span class="pr-strand__mark${s.last ? ' pr-strand__mark--on' : ''}" aria-hidden="true"></span>
                 <span class="pr-strand__name">${_esc(s.label)}</span>
                 <span class="pr-strand__when">${_esc(s.text)}</span>
               </li>`).join('')}
           </ul>
-          <p class="pr-note">Nothing is behind. “Not yet” means it hasn’t come up since your arc began.</p>
-        </section>` : ''}
-
-      <button class="btn btn-secondary btn-full pr-change" data-route="stretch-arc">Change my arc</button>`;
+          <p class="pr-note">Nothing is behind. “Not yet” means it hasn’t come up since your arc began.</p>` : ''}
+        <button class="btn btn-ghost pr-change" data-route="stretch-arc">Change my arc</button>
+      </section>`;
   }
 
   // P0, SCOPE-MINOR (29 Sep 2026). "What you've told me about" -- a chart
@@ -903,29 +1007,7 @@ export function ProgressView(router) {
   // time is monitoring it, which is a medical purpose; Alongside only
   // asks what is sore TODAY and leaves out what loads it.
 
-  function _liftsBlock() {
-    const rows = liftReadback(store.get('liftLog') || {}, EXERCISES);
-    if (!rows.length) return '';
-    // P25. Every lift. Eight at once, the rest one tap away -- it stopped
-    // at eight and the others were simply not there.
-    const SHOWN = 8;
-    const li = r => `
-            <li class="pr-lift">
-              <span class="pr-lift__name">${_esc(r.name)}</span>
-              <span class="pr-lift__text">${_esc(r.text)}</span>
-            </li>`;
-    return `
-      <section class="pr-block" aria-labelledby="pr-lifts-h">
-        <h2 class="pr-title" id="pr-lifts-h">From your logged weights</h2>
-        <p class="pr-note">Your best set the first day you logged it, and on the latest day.</p>
-        <ul class="pr-lifts">${rows.slice(0, SHOWN).map(li).join('')}</ul>
-        ${rows.length > SHOWN ? `
-          <details class="pr-lifts-more">
-            <summary>All ${rows.length} lifts</summary>
-            <ul class="pr-lifts">${rows.slice(SHOWN).map(li).join('')}</ul>
-          </details>` : ''}
-      </section>`;
-  }
+  // LOOK-2. _liftsBlock() is gone: every lift is on its own page (_liftsPage).
 
   /** Six weeks of completed sessions, both tiers. COUNT-1. */
   function renderSessionsChart() {
@@ -937,7 +1019,9 @@ export function ProgressView(router) {
     const weeks = sessionsByWeek(completed, { weeks: 6, since: Number.isFinite(startMs) ? new Date(startMs) : null });
     const total = weeks.reduce((n, w) => n + w.total, 0);
     const over = weeks.length < 6 ? 'since you started' : 'over the last six weeks';
-    return _chart({
+    return `<section class="pr-card" aria-labelledby="pr-weeks-h">
+      <h2 class="pr-card__title" id="pr-weeks-h">Sessions each week</h2>
+      ${_chart({
       id: 'pr-sessions',
       title: 'Sessions, week by week',
       summary: total
@@ -945,23 +1029,24 @@ export function ProgressView(router) {
         : (weeks.length < 6 ? 'No sessions since you started yet.' : 'No sessions in the last six weeks yet.'),
       bars: weeks.map(w => ({ start: w.start, value: w.total,
         label: `Week of ${shortDate(w.start)}: ${w.total} session${w.total === 1 ? '' : 's'}` }))
-    });
+    })}
+    </section>`;
   }
 
   /** Free: last, quiet. Nothing greyed out, nothing locked. */
   function renderPlanCard() {
     return `
-      <section class="pr-block pr-plan-card" aria-labelledby="pr-plan-h">
+      <section class="pr-card pr-block pr-plan-card" aria-labelledby="pr-plan-h">
         <h2 class="pr-title" id="pr-plan-h">On the Plan</h2>
         <p class="pr-coach">Your goal lives here too: what you’re working towards, what has come up, and what your logged weights show.</p>
         <button class="btn btn-ghost btn-full" data-route="upgrade">What the Plan adds</button>
       </section>`;
   }
 
-  function renderExportBlock() {
+  function renderExportBlock(heading = true) {
     return `
       <section class="progress-export" aria-label="Export your progress">
-        <h2 class="progress-export__heading">Share your progress</h2>
+        ${heading ? '<h2 class="progress-export__heading">Share your progress</h2>' : ''}
         <p class="progress-export__intro">Three versions — each written for a different reader.</p>
         <div class="progress-export__buttons">
           <button class="progress-export__btn"
@@ -1051,6 +1136,20 @@ export function ProgressView(router) {
 
     container.querySelector('#progress-year-btn')
       ?.addEventListener('click', () => router.navigate('annual-reflection'));
+
+    // LOOK-2. A row opens its page; Back returns to the overview, on the row.
+    container.querySelectorAll('[data-pr-page]').forEach(btn =>
+      btn.addEventListener('click', () => {
+        activePage = btn.dataset.prPage;
+        focusAfter = '.progress-title';
+        render(container);
+      }));
+    container.querySelector('#pr-back')?.addEventListener('click', () => {
+      const from = activePage;
+      activePage = null;
+      focusAfter = `[data-pr-page="${from}"]`;
+      render(container);
+    });
 
     // SMOOTH-P4a. Change my arc, Set up your arc, What the Plan adds.
     container.querySelectorAll('[data-route]').forEach(btn =>
