@@ -1,5 +1,12 @@
 /**
  * tools/verify-arc-door.mjs
+ * 04 Oct 2026 v4
+ *
+ * v4 - D-3 ARC-HOME. REVERSAL of v3, from the device test (Graeme's wife
+ *   expected the arc, and how to change it, not Progress): the Plan chip
+ *   opens the arc screen (stretch-arc) again. The fixture check follows
+ *   it; nothing else changed.
+ *
  * 28 Sep 2026 v3
  *
  * v3 - SMOOTH-P4a. The Plan chip now opens Progress, where the arc is
@@ -74,7 +81,7 @@ console.log("\nARC-DOOR — free gets the door, never the arc\n");
 store.set("tier","personal"); store.set("arc",ACTIVE_ARC); paint();
 const paidEl=document.querySelector(".home-arc");
 ok("FIXTURE REACHES THE ACTIVE BRANCH: Plan's arc line opens the arc, with the aim",
-  paidEl && paidEl.dataset.route==="progress" && /Build a core that actually holds me up/.test(paidEl.textContent));
+  paidEl && paidEl.dataset.route==="stretch-arc" && /Build a core that actually holds me up/.test(paidEl.textContent));
 reverses("the fixture is not quietly on the offer branch (the fault that hid this)",
   ()=>/home-arc--offer/.test(paidEl.className));
 

@@ -1,5 +1,12 @@
 /**
  * tools/verify-nav-small.mjs
+ * 04 Oct 2026 v4
+ *
+ * v4 - SUITE-FLAKE-3 (found running the D-3 suite under load). TEST 7
+ *   tests Swap on the first main row that has alternatives today; the
+ *   first main row of a random plan sometimes has none, a true state.
+ *   Nothing it proves changed.
+ *
  * 03 Oct 2026 v3
  *
  * v3 - W5-14. Sore marks read every area a move works (it was the first
@@ -250,8 +257,19 @@ ok("6b. it says where to find it", /I know what I want/.test(live));
 console.log("\nTEST 7 - Swap shows the alternatives as a list");
 fixture({ location: "gym", scores: { shoulder: 7 } });
 await proposalSettled();
-const idx = rows().findIndex(r => r.dataset.section === "main");
+// D-3 SUITE-FLAKE-3. The first main row whose Swap has alternatives: on
+// a random plan the first main row sometimes has none today ("Nothing else
+// fits here today", a true state), which failed this about one run in
+// many under load. Which row is tested changes; what is proven does not.
+let idx = -1;
 const swapBtn = () => main.querySelector(`[data-swap="${idx}"]`);
+for (const [i, r] of rows().entries()) {
+  if (r.dataset.section !== "main" || !main.querySelector(`[data-swap="${i}"]`)) continue;
+  idx = i;
+  click(swapBtn()); await wait(10);
+  if (main.querySelectorAll("[data-swap-pick]").length > 1) { click(swapBtn()); await wait(10); break; }
+  click(swapBtn()); await wait(10);
+}
 const orig = names()[idx];
 click(swapBtn()); await wait(10);
 const choices = [...main.querySelectorAll("[data-swap-pick]")];

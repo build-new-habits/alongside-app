@@ -1,5 +1,12 @@
 /**
  * tools/verify-progress-agree.mjs
+ * 04 Oct 2026 v6
+ *
+ * v6 - D-3 ARC-HOME. REVERSAL from the device test (Graeme's wife, 04
+ *   Oct): Home's arc chip opens the arc itself, where it can be changed,
+ *   not Progress. 8a asserts the new route; Progress still reads the arc
+ *   back (test 4, unchanged) and its Change my arc still opens the arc.
+ *
  * 04 Oct 2026 v5
  *
  * v5 - LOOK-2: Progress is an overview plus pages one tap away (progress.js
@@ -229,10 +236,10 @@ ok("7b. in the spec's order", (() => {
 })(), [...main.querySelectorAll("h2")].map(txt).join(" | "));
 
 // ── 8. HOME ─────────────────────────────────────────────────────────────
-console.log("\nTEST 8 - Home's arc chip opens the arc read back");
+console.log("\nTEST 8 - Home's arc chip opens the arc (D-3)");
 fixture({ arc: ARC });
 main.innerHTML = ""; TodayView(router).mount(main);
-ok("8a. the chip routes to Progress", main.querySelector(".home-arc")?.dataset.route === "progress");
+ok("8a. the chip opens the arc, where it can be changed", main.querySelector(".home-arc")?.dataset.route === "stretch-arc");
 
 console.log("");
 if (fails) { console.log(`PROGRESS-AGREE: ${fails} FAILED, ${passes} passed`); process.exit(1); }

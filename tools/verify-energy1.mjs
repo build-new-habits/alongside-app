@@ -1,5 +1,11 @@
 /**
  * tools/verify-energy1.mjs
+ * 04 Oct 2026 v3
+ *
+ * v3 - SUITE-FLAKE-3 (found running the D-3 suite under load). Math.random
+ *   is seeded (SEED=<n> for another), as verify-w26 is. No assertion or
+ *   threshold changed.
+ *
  * 02 Oct 2026 v2
  *
  * v2 - W4-11 ENERGY-WINDOW. TEST 7: the low-week read counts only check-ins
@@ -46,6 +52,12 @@ const ok = (name, cond, detail = "") => {
   console.log(`  ${cond ? "PASS" : "FAIL"}  ${name}`);
   if (!cond) { if (detail) console.log(`        ${detail}`); fails++; }
 };
+
+// SUITE-FLAKE-3. Seeded, as verify-w26 is (SUITE-FLAKE-2): 5c measures a
+// probabilistic suppression on a sample, and unseeded it failed about one
+// run in many. SEED=<n> for another run; the threshold is unchanged.
+const SEED = Number(process.env.SEED) || 20261004;
+Math.random = (() => { let a = SEED >>> 0; return () => { a = (a + 0x6D2B79F5) >>> 0; let x = Math.imul(a ^ (a >>> 15), 1 | a); x = (x + Math.imul(x ^ (x >>> 7), 61 | x)) ^ x; return ((x ^ (x >>> 14)) >>> 0) / 4294967296; }; })();
 
 const { store } = await import("../js/store.js");
 const { buildSession } = await import("../js/session-builder.js");
