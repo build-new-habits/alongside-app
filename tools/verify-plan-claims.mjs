@@ -1,6 +1,10 @@
 /**
  * tools/verify-plan-claims.mjs
- * 30 Sep 2026 v5
+ * 04 Oct 2026 v6
+ *
+ * v6 - LOOK-1: Settings is an index of section pages. openPanel and the
+ *   3.weight switch lookup reach rows through settingsFind (opening the
+ *   section that holds them). No assertion changed.
  *
  * v5 - W3-13. Free Home now shows a session the phone closed, to save
  *   (what was done is the person's on either tier). 3.coming-back reads
@@ -72,6 +76,7 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
 const B = new URL("../js/", import.meta.url).href;
 const { store } = await import(B + "store.js");
 const { SettingsView } = await import(B + "views/settings.js");
+const { settingsFind } = await import("./settings-open.mjs");
 
 // Withdrawn or never-true claims. upgrade.js's WITHDRAWN and SEVEN WERE
 // DRAFTED notes are the source; a claim goes back only when it ships.
@@ -81,7 +86,7 @@ async function openPanel(_unused, screenId) {
   const app = document.getElementById("app"); app.innerHTML = "";
   SettingsView({ navigate() {}, back() {} }).mount(app);
   await wait(50);
-  app.querySelector(`[data-open="${screenId}"]`)?.click();
+  settingsFind(app, `[data-open="${screenId}"]`)?.click();
   await wait(300);
   return app;
 }
@@ -191,7 +196,7 @@ const credits = tier => { tierFixture(tier); box.innerHTML = ""; try { CI.Commun
 ok("3.impact  once on free, twice on the Plan", credits("free") === "1" && credits("personal") === "2", `${credits("free")} / ${credits("personal")}`);
 
 const { offeredGoals } = await import(B + "data/goals.js");
-const weightSwitch = tier => { tierFixture(tier); mountView(SettingsView); return !!box.querySelector("#settings-weight-tracking"); };
+const weightSwitch = tier => { tierFixture(tier); mountView(SettingsView); return !!settingsFind(box, "#settings-weight-tracking"); };
 const offersLose = on => offeredGoals({ weightTracking: on }).some(c => c.goals.some(g => g.id === "lose-weight"));
 ok("3.weight  weight tracking is the Plan's; losing weight is a goal only with it on", weightSwitch("personal") && !weightSwitch("free") && offersLose(true) && !offersLose(false));
 

@@ -1,5 +1,33 @@
 /**
  * tools/verify-progress-shapes.mjs
+ * 04 Oct 2026 v3
+ *
+ * v3 - LOOK-2 (progress.js v26, approved by the product owner from the
+ *   mock-up, 04 Oct). Three deliberate changes, each re-pointed:
+ *
+ *   3e REVERSES THE 06 SEP LIST-ONLY RULE. The kinds card is now a
+ *   proportional bar above the list, by the product owner's approval of
+ *   the mock-up on 04 Oct 2026. The 06 Sep intent -- a proportional bar
+ *   must not make the shortest row read as a failing -- is what 3e now
+ *   protects: the list is still there with every kind named and counted
+ *   (each count matching the log), the bar is aria-hidden and decorative
+ *   with one part per listed kind, nothing is ranked or called
+ *   most/least/top (3b, unchanged), and colour is never the only carrier
+ *   (every coloured part and dot sits beside its name and count in words).
+ *
+ *   6c: the heading is now the card title "What kinds of session" (h2),
+ *   not "What you have been doing". Same check: an h2, like its siblings.
+ *
+ *   7b REVERSES TARGET-3's "with one set, it IS shown". The product owner
+ *   approved dropping "N of T this week" from Progress on 04 Oct (it read
+ *   as a score against a target on the screen opened to look back; the
+ *   target is still kept and shown in Settings). 7b now asserts that with
+ *   a target set, "of 4 this week" is NOT shown on Progress while
+ *   "N this week" is.
+ *
+ *   REACH: test 7 opens the programme row first (the block is now on its
+ *   own page, one tap away).
+ *
  * 08 Sep 2026 v2
  *
  * v2 - PROGRESS-2. Test 6 asserts the heading OUTLINE, not just that
@@ -141,10 +169,26 @@ ok("3c. no gap is named as a fault",
 ok("3d. and no comparison to anybody else",
    !/other people|average|others|than last/i.test(shapes + text));
 
-// A bar chart invites comparison between rows. A list does not.
-ok("3e. it is a list, not a chart",
-   /progress-shapes__list/.test(shapesCode) && !/width:\s*\$\{/.test(shapesCode),
-   "a proportional bar makes the shortest row look like a failing");
+// LOOK-2 (re-pointed, see header). The bar is approved; what it must not do
+// is carry anything alone. The list, every kind named and counted, stays.
+{
+  const bar   = section.querySelector(".pr-kinds");
+  const parts = bar ? [...bar.querySelectorAll(".pr-kinds__part")] : [];
+  const named = rows.map(r => [
+    (r.querySelector(".progress-shapes__name")?.textContent || "").trim(),
+    (r.querySelector(".progress-shapes__count")?.textContent || "").trim()]);
+  const stretchLabel = SESSION_TYPES.find(t => t.id === "stretch").label;
+  ok("3e. the list is still there, every kind named and counted; the bar is decorative only",
+     /progress-shapes__list/.test(shapesCode) && !!section.querySelector(".progress-shapes__list") &&
+     named.length === 2 &&
+     named.some(([n, c]) => n === lowerLabel && c === "2") &&
+     named.some(([n, c]) => n === stretchLabel && c === "1") &&
+     !!bar && bar.getAttribute("aria-hidden") === "true" &&
+     parts.length === rows.length &&
+     rows.every(r => r.querySelector(".pr-dot")?.getAttribute("aria-hidden") === "true"),
+     `rows ${JSON.stringify(named)}, bar ${bar ? `aria-hidden=${bar.getAttribute("aria-hidden")}, ${parts.length} parts` : "missing"}` +
+     " -- a proportional bar on its own makes the shortest row look like a failing");
+}
 
 // ── 4. SILENT WHEN THERE IS NOTHING ─────────────────────────────────────
 console.log("\nTEST 4 - no empty state on a screen for looking back");
@@ -195,7 +239,8 @@ ok("6b. no level is skipped on the way down",
    heads.every((h, i) => i === 0 || h.level <= heads[i - 1].level + 1),
    `outline: ${heads.map(h => `h${h.level} ${h.text.slice(0, 24)}`).join(" > ")}`);
 
-const shapesHead = heads.find(h => /what you have been doing/i.test(h.text));
+// LOOK-2: the section's heading is now its card title.
+const shapesHead = heads.find(h => /what kinds of session/i.test(h.text));
 ok("6c. the shapes section sits at the same level as its siblings",
    !!shapesHead && shapesHead.level === 2,
    shapesHead
@@ -226,6 +271,8 @@ function viewWith(extra) {
   const c = document.createElement("div");
   document.body.appendChild(c);
   ProgressView({ navigate: () => {} }).mount(c);
+  // LOOK-2: the programme block is one tap away, on its own page.
+  c.querySelector('[data-pr-page="programme"]')?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
   return c;
 }
 
@@ -253,7 +300,9 @@ function viewWith(extra) {
      `"${(txt.match(/\d+ of \d+ this week/) || [""])[0]}" — a target nobody ` +
      `chose, presented as theirs`);
 
-  // And the opposite error: somebody who DID set one wants to see it.
+  // LOOK-2 (re-pointed, see header). TARGET-3 said somebody who DID set a
+  // target wants to see it; the product owner reversed that for Progress on
+  // 04 Oct: the count stays, the target is kept in Settings, not shown here.
   const c2 = viewWith({
     activeProgramme: prog,
     strategicGoal: {
@@ -262,9 +311,10 @@ function viewWith(extra) {
       targetSetAt: new Date().toISOString()
     }
   });
-  ok("7b. and with one set, it IS shown",
-     /of 4 this week/.test((c2.textContent || "").replace(/\s+/g, " ")),
-     "taking away a target somebody chose is the opposite error");
+  const txt2 = (c2.textContent || "").replace(/\s+/g, " ");
+  ok("7b. and with one set, it is NOT shown on Progress, but this week's count is",
+     !!c2.querySelector(".progress-programme") && !/of \d+ this week/.test(txt2) && /\b\d+ this week\b/.test(txt2),
+     `"${(txt2.match(/[^.]{0,30}this week/) || [""])[0]}" — LOOK-2: "N of T this week" read as a score against a target`);
 }
 
 console.log(fails === 0

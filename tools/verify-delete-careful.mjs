@@ -1,5 +1,11 @@
 /**
  * tools/verify-delete-careful.mjs
+ * 04 Oct 2026 v5
+ *
+ * v5 - LOOK-1: Delete my health answers is on the Your data section page,
+ *   not the Settings index; TEST 3 reaches it with settingsFind. No
+ *   assertion loosened.
+ *
  * 02 Oct 2026 v4
  *
  * v4 - W5-8 DECLINE-DOORS (Graeme, 02 Oct). 4a: without the health
@@ -50,6 +56,7 @@
  */
 import { createRequire as __cr } from "node:module";
 import { agreed } from "./agreed.mjs";
+import { settingsFind } from "./settings-open.mjs";
 const __require = __cr(import.meta.url);
 const { JSDOM } = __require("jsdom");
 
@@ -143,7 +150,7 @@ console.log("\nTEST 3 - the dialog says what careful means, and what goes and st
 person(CAREFUL);
 const { SettingsView } = await import(B + "views/settings.js");
 main.innerHTML = ""; SettingsView({ navigate() {}, back() {} }).mount(main); await wait(10);
-click(main.querySelector('[data-action="delete-health"]')); await wait(10);
+click(settingsFind(main, '[data-action="delete-health"]')); await wait(10);
 const dlg = txt(document.querySelector(".settings-dialog__message"));
 ok("3a. careful is spelled out: seated, nothing on the floor, no balance work, nothing with impact",
    /seated/i.test(dlg) && /floor/i.test(dlg) && /balance/i.test(dlg) && /impact|jump/i.test(dlg), dlg);

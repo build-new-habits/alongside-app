@@ -1,6 +1,14 @@
 /**
  * tools/verify-tier.mjs
- * 30 Sep 2026 v5
+ * 04 Oct 2026 v6
+ *
+ * v6 - LOOK-2: the export is on the Share page, one tap away (progress.js
+ *   v26), called as renderExportBlock(false) (no heading: the page's h1 is
+ *   the heading). REACH only: "EXPORT is free" finds the call with its
+ *   argument, and now also requires that the Share row that opens it is
+ *   rendered with no tier condition on it -- a tier check on the row would
+ *   hide the export as surely as one on the block. Nothing loosened; the
+ *   runtime check is verify-tiergh 15.
  *
  * v5 - LIBRARY-TILES. At home's HIIT and Strength cards opened the core
  *   session, which is neither; HIIT is removed and Strength became Upper
@@ -274,8 +282,13 @@ check("EXPORT is free — a right of access does not depend on payment", () => {
   ok(!/renderExportLocked/.test(progress),
      "the export lock is back. Gating export does not withhold the data, " +
      "it withholds the BUTTON, and the obligation survives either way");
-  ok(/renderExportBlock\(\)/.test(progress),
+  // LOOK-2: the block is on the Share page, opened from the Share row.
+  ok(/page === 'share' \? renderExportBlock\((false)?\)/.test(progress),
      "the export block is gone entirely");
+  const shareRow = (progress.match(/^.*_prRow\('share'.*$/m) || [""])[0];
+  ok(shareRow && !/premium|tier|isPremium/.test(shareRow),
+     "the Share row is missing or tier-conditional, so a free user cannot " +
+     "reach the export: " + (shareRow.trim() || "(no row)"));
 });
 
 check("the export still differs by tier, in CONTENTS not existence", () => {

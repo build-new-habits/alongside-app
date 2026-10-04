@@ -1,5 +1,13 @@
 /**
  * tools/verify-progress-pacing.mjs
+ * 04 Oct 2026 v2
+ *
+ * v2 - LOOK-2: the lifts are on their own page (progress.js v26). REACH
+ *   only: test 1 opens the Your lifts row before reading the rows, and 1c
+ *   finds the note on that page (#pr-lifts-h now sits in the page head, so
+ *   the note is under .pr-page, not the heading's parent). No expected
+ *   value changed.
+ *
  * 29 Sep 2026 v1
  *
  * P25, PROGRESS AND PACING (persona finding W2-20).
@@ -67,12 +75,14 @@ for (const e of lifts) log[e.id] = [
 store.set("liftLog", log); store.set("liftLogEnabled", true);
 const { ProgressView } = await import(B + "views/progress.js");
 main.innerHTML = ""; ProgressView(rtr).mount(main); await wait(40);
+// LOOK-2: the lifts are one tap away, on their own page.
+main.querySelector('[data-pr-page="lifts"]')?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }));
 const rows = [...main.querySelectorAll(".pr-lift")];
 ok("1pc. ten lifts, two days each, three and two sets", lifts.length === 10 && !!main.querySelector("#pr-lifts-h"), `${lifts.length}`);
 ok("1a. all ten are there (it stopped at 8)", rows.length === 10, `${rows.length} rows`);
 const texts = rows.map(r => txt(r.querySelector(".pr-lift__text")));
 ok("1b. each reads the working set: 70 kg -> 75 kg (not 60 -> 55)", texts.every(t => t === "70 kg → 75 kg"), texts.slice(0, 3).join(" | "));
-ok("1c. the note says what is compared", /heaviest|best/i.test(txt(main.querySelector("#pr-lifts-h")?.parentElement?.querySelector(".pr-note"))), txt(main.querySelector("#pr-lifts-h")?.parentElement?.querySelector(".pr-note")));
+ok("1c. the note says what is compared", /heaviest|best/i.test(txt(main.querySelector("#pr-lifts-h")?.closest(".pr-page")?.querySelector(".pr-note"))), txt(main.querySelector("#pr-lifts-h")?.closest(".pr-page")?.querySelector(".pr-note")));
 
 // ── 2. PACING ───────────────────────────────────────────────────────────
 console.log("\nTEST 2 - pacing counts every kind of movement session");

@@ -1,5 +1,9 @@
 /**
  * tools/verify-scope-minor.mjs
+ * 04 Oct 2026 v4
+ *   LOOK-1: Sore or injured areas is a row on the Your body section page,
+ *   not the Settings index; 2b reaches it with settingsFind. No assertion
+ *   was loosened.
  * 02 Oct 2026 v3
  *   W4-8 PAIN-NUMBERS. TEST 8 added. The update check-in asked for pain
  *   0 to 10 on a slider ("Lower Back 6 Moderate", "0 none to 10 severe"),
@@ -130,9 +134,10 @@ function fixture(extra = {}) {
 }
 fixture({ conditions: ["knee"] });
 const { SettingsView } = await import(B + "views/settings.js");
+const { settingsFind } = await import("./settings-open.mjs");
 const rtr = { navigate() {}, back() {}, history: [] }; globalThis.window.router = rtr;
 main.innerHTML = ""; SettingsView(rtr).mount(main);
-click(main.querySelector('[data-open="conditions"]'));
+click(settingsFind(main, '[data-open="conditions"]'));
 ok("2b. Settings › Sore or injured areas carries it", !!main.querySelector("[data-scope-statement]") && /Sore or injured areas/.test(txt(main)), txt(main).slice(0, 120));
 
 // ── 3. STORED DATA ──────────────────────────────────────────────────────

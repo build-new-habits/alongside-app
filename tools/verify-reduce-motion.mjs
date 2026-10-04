@@ -1,5 +1,15 @@
 /**
  * tools/verify-reduce-motion.mjs
+ * 04 Oct 2026 v3
+ *
+ * v3 - LOOK-1: the switch is on the Display section's own page, reached
+ *   from the index with settingsFind. 5a read the section's title from the
+ *   index's .settings-sec__title, which the section page does not carry
+ *   (deliberate: the page has one h1); it now checks the switch sits on
+ *   the Display section page (data-section="display") whose h1 says
+ *   Display -- same intent, same /Display/ test. 5c reaches the Display
+ *   screen with settingsFind. No assertion was loosened.
+ *
  * 02 Oct 2026 v2
  *
  * v2 - W4-23. 5a finds the switch in the Display section of the Settings
@@ -90,15 +100,17 @@ console.log("\nTEST 5 - Display › Reduce motion, one tap, and it says what it 
 const { store } = await import(B + "store.js");
 localStorage.clear(); store.init(); store.set("onboardingComplete", true); store.set("tier", "personal");
 const { SettingsView } = await import(B + "views/settings.js");
+const { settingsFind } = await import("./settings-open.mjs");
 const main = document.getElementById("main-content");
 main.innerHTML = ""; SettingsView({ navigate() {}, back() {} }).mount(main);
-const row = main.querySelector("#disp-reduce-motion");
+const row = settingsFind(main, "#disp-reduce-motion");
+const rowPage = row?.closest(".settings-secpage");
 ok("5a. a switch on the Settings page, in Display", !!row && row.getAttribute("role") === "switch" && row.getAttribute("aria-checked") === "false" &&
-   /Display/.test(row.closest("[data-section]")?.querySelector(".settings-sec__title")?.textContent || ""));
+   rowPage?.dataset.section === "display" && /Display/.test(rowPage?.querySelector("h1.settings-title")?.textContent || ""));
 row?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }));
 ok("5b. one tap turns it on, and motion is reduced", DP.getDisplayPref("reduceMotion") === "on" && DP.prefersReducedMotion() === true);
 main.innerHTML = ""; SettingsView({ navigate() {}, back() {} }).mount(main);
-main.querySelector('[data-open="display"]')?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }));
+settingsFind(main, '[data-open="display"]')?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }));
 const scr = main.querySelector("#disp-reduce-motion");
 const lab = scr && main.querySelector(`label[for="${scr.id}"]`);
 ok("5c. the Display screen explains it, and that off follows the device", !!lab && /follows your device/i.test(lab.textContent) && scr.getAttribute("aria-checked") === "true");

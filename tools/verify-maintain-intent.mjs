@@ -1,5 +1,13 @@
 /**
  * tools/verify-maintain-intent.mjs
+ * 04 Oct 2026 v3
+ *
+ * v3 - LOOK-1: Settings is an index; "What you're aiming at" is a row on
+ *   the Sessions section page, and index text no longer lists row values
+ *   (a deliberate change). 1a now opens the Sessions page and asserts the
+ *   aim is said there (same regex); 1b's one tap is from that page, as a
+ *   person reaches it. No assertion was loosened.
+ *
  * 03 Oct 2026 v2
  *
  * v2 - W5-23 SUITE-FLAKE (found verifying v637 from a fresh clone; also
@@ -63,6 +71,7 @@ Math.random = (() => { let a = SEED >>> 0; return () => { a = (a + 0x6D2B79F5) >
 const B = new URL("../js/", import.meta.url).href;
 const { store } = await import(B + "store.js");
 const { SettingsView } = await import(B + "views/settings.js");
+const { settingsSection } = await import("./settings-open.mjs");
 const SB = await import(B + "session-builder.js");
 let fails = 0, passes = 0;
 const ok = (name, cond, detail = "") => {
@@ -90,6 +99,7 @@ console.log("\nTEST 1 - Settings shows the aim and changes it");
 for (const tier of ["free", "personal"]) {
   person(tier, "maintain", FREE_BODY, "active");
   main.innerHTML = ""; SettingsView(rtr).mount(main); await wait(20);
+  settingsSection(main, "sessions"); await wait(20);   // LOOK-1: the aim's row lives on Sessions
   ok(`1a-${tier}. the page says what you are aiming at`, /Hold on to what I have/.test(txt(main)), txt(main).slice(0, 200));
   const opener = [...main.querySelectorAll("[data-open]")].find(b => /aiming/i.test(txt(b)));
   click(opener); await wait(20);

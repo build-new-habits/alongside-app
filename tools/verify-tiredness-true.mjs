@@ -1,6 +1,10 @@
 /**
  * tools/verify-tiredness-true.mjs
- * 02 Oct 2026 v2
+ * 04 Oct 2026 v3
+ *
+ * v3 - LOOK-1: TEST 3 opens the Your body section page (settingsFind) to
+ *   read and tap the Sore or injured areas row, which is no longer on the
+ *   index; no assertion loosened.
  *
  * v2 - W5-4 STRESS-SORE (Wave 5 trace: 2.4, 2.16). TEST 6: the update
  *   check-in asked "How is your stress today?" with A little / Quite sore /
@@ -29,6 +33,7 @@
  */
 import { createRequire as __cr } from "node:module";
 import { agreed } from "./agreed.mjs";
+import { settingsFind } from "./settings-open.mjs";
 const __require = __cr(import.meta.url);
 const { JSDOM } = __require("jsdom");
 
@@ -78,6 +83,7 @@ ok("2b. and tiredness gets its own true line", /energy/i.test(both), both);
 console.log("\nTEST 3 - Settings keeps it apart from the sore areas");
 fixture(["knee", TIRED]);
 main.innerHTML = ""; SettingsView({ navigate() {}, back() {} }).mount(main); await wait(10);
+settingsFind(main, '[data-open="conditions"]');
 const row = [...main.querySelectorAll('[data-open="conditions"]')].map(txt).join(" ");
 ok("3a. the Sore or injured areas row counts areas only", /1 listed/.test(row), row);
 main.querySelector('[data-open="conditions"]')?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true })); await wait(10);

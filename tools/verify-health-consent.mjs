@@ -1,5 +1,15 @@
 /**
  * tools/verify-health-consent.mjs
+ * 04 Oct 2026 v10
+ *
+ * v10 - LOOK-1/LOOK-2. Settings rows are on section pages, not the index:
+ *   TEST 3 finds Delete my health answers with settingsFind (Your data);
+ *   TEST 6 opens the Your body section page before looking for the row.
+ *   4c: the weight input is no longer on the Progress overview (LOOK-2), so
+ *   the check also opens the weight page (if its row is offered) before
+ *   asserting there is no weight entry; same protective intent, reached the
+ *   way a person would. No assertion loosened.
+ *
  * 02 Oct 2026 v9
  *
  * v9 - W5-8 DECLINE-DOORS (Graeme, 02 Oct: "Second chance, then one
@@ -65,6 +75,7 @@
  *   5. A journal entry can be deleted from Wellbeing, and only that one.
  */
 import { createRequire as __cr } from "node:module";
+import { settingsFind, settingsSection } from "./settings-open.mjs";
 const __require = __cr(import.meta.url);
 const { JSDOM } = __require("jsdom");
 
@@ -205,7 +216,7 @@ store.set("progressLog", [{ date: "x", week: 1, focus: "legs", energyAtCheckin: 
 store.set("activityLog", [...(store.get("activityLog") || []).map(e => ({ ...e, energyBefore: 6 }))]);
 const { SettingsView } = await import(B + "views/settings.js");
 main.innerHTML = ""; SettingsView({ navigate(v) { landed.push(v); }, back() {} }).mount(main); await wait(20);
-const del = main.querySelector('[data-action="delete-health"]');
+const del = settingsFind(main, '[data-action="delete-health"]');
 ok("3a. a Delete my health answers row that says what it covers",
    !!del && /Delete my health answers/.test(txt(del)) && /journal/i.test(txt(del)), txt(del));
 click(del); await wait(10);
@@ -267,6 +278,7 @@ const prog = await import(B + "views/progress.js");
 const PV = prog.ProgressView || Object.values(prog).find(v => typeof v === "function" && /View/.test(v.name));
 main.innerHTML = ""; try { PV({ navigate() {}, back() {} }).mount(main); } catch (e) { console.log("        progress mount", e.message); }
 await wait(20);
+click(main.querySelector('[data-pr-page="weight"]')); await wait(10);
 ok("4c. Progress offers no weight entry", !main.querySelector("#weight-log-input"));
 
 // ── 5. A JOURNAL ENTRY CAN BE DELETED ───────────────────────────────────
@@ -293,6 +305,7 @@ console.log("\nTEST 6 - Settings › What your body can do asks for the health c
 fixture({ consent: true, health: { given: false, at: null, version: null, withdrawnAt: "x" } });
 landed = [];
 main.innerHTML = ""; SettingsView({ navigate(v) { landed.push(v); }, back() {} }).mount(main); await wait(20);
+settingsSection(main, "body");
 const capRow = [...main.querySelectorAll(".settings-row")].find(b => /What your body can do/.test(txt(b)));
 ok("6pc. positive control: the row is there", !!capRow);
 ok("6a. withdrawn: it does not open the answers", !capRow?.hasAttribute("data-open"));
@@ -300,6 +313,7 @@ click(capRow); await wait(20);
 ok("6b. it asks for the health consent", landed.includes("health-consent"), JSON.stringify(landed));
 fixture({ consent: true, health: { given: true, at: "x", version: HC.HEALTH_CONSENT_VERSION, withdrawnAt: null } });
 main.innerHTML = ""; SettingsView({ navigate(v) { landed.push(v); }, back() {} }).mount(main); await wait(20);
+settingsSection(main, "body");
 const capRow2 = [...main.querySelectorAll(".settings-row")].find(b => /What your body can do/.test(txt(b)));
 ok("6c. REVERSAL: with consent, it opens the answers", capRow2?.getAttribute("data-open") === "capability");
 

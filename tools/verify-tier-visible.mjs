@@ -1,6 +1,11 @@
 /**
  * tools/verify-tier-visible.mjs
- * 28 Sep 2026 v2
+ * 04 Oct 2026 v3
+ *
+ * v3 - LOOK-1. Rows live on section pages now, not the index. The profile
+ *   row, the page's Your plan row and the App version row are reached with
+ *   settingsFind (index -> the section page that holds them). Same
+ *   selectors, same FIXTURE FAULT throw, no assertion loosened.
  *
  * v2 - SMOOTH-P4c. Settings is one page. The plan line still lives on
  *   the profile screen (opened by the Name row), and the page's "Your
@@ -63,6 +68,7 @@
  * sync handler; rendering the line but hiding it.
  */
 import { JSDOM } from "jsdom";
+import { settingsFind } from "./settings-open.mjs";
 const dom = new JSDOM('<!doctype html><html><body><div id="main-content"></div></body></html>', { url: "https://example.org/" });
 globalThis.window = dom.window; globalThis.document = dom.window.document;
 globalThis.localStorage = dom.window.localStorage;
@@ -82,12 +88,12 @@ const click = el => el && el.dispatchEvent(new dom.window.MouseEvent("click",{bu
 // which is how the first draft of this gate "found" no plan line at all.
 const paint = () => {
   SettingsView(router).mount(document.getElementById("main-content"));
-  const row = document.querySelector('[data-open="profile"]');
+  const row = settingsFind(document.getElementById("main-content"), '[data-open="profile"]');
   if (!row) throw new Error("FIXTURE FAULT: the profile row not found");
   row.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }));
 };
 const pageRow = () => { SettingsView(router).mount(document.getElementById("main-content"));
-  return (document.querySelector('[data-open="about-plan"] .settings-row__value')?.textContent || "").trim(); };
+  return (settingsFind(document.getElementById("main-content"), '[data-open="about-plan"] .settings-row__value')?.textContent || "").trim(); };
 
 console.log("\nTIER-VISIBLE — the device never hides which plan it is in\n");
 
@@ -132,7 +138,7 @@ const planLineBefore = $("#settings-plan-line");
 ok("the plan line is on screen before the switch", !!planLineBefore);
 
 SettingsView(router).mount(document.getElementById("main-content"));
-const appRow = document.querySelector('[data-open="about-app"]');
+const appRow = settingsFind(document.getElementById("main-content"), '[data-open="about-app"]');
 ok("FIXTURE REACHES IT: the App version row exists", !!appRow);
 click(appRow);
 const versionEl = $("#settings-version");

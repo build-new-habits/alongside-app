@@ -1,6 +1,10 @@
 /**
  * tools/verify-onboarding-echoes.mjs
- * 01 Oct 2026 v3
+ * 04 Oct 2026 v4
+ *
+ * v4 - LOOK-1: TEST 3 looks for the Activity level row on each Settings
+ *   section page in turn (it lives on Your plan now, not the index); same
+ *   text match, no assertion loosened.
  *
  * v3 - AGE-CHECK. Onboarding asks when you were born before consent; the
  *   fixture answers as an adult (January 1990). No assertion changed.
@@ -21,6 +25,7 @@
  * Walks the real onboarding thread, sheets included, then opens Settings.
  */
 import { createRequire } from "node:module";
+import { settingsSection } from "./settings-open.mjs";
 const require = createRequire(import.meta.url);
 const { JSDOM } = require("jsdom");
 
@@ -138,7 +143,9 @@ console.log("\nTEST 3 - Settings shows the activity level they gave");
   const { SettingsView } = await import(B + "views/settings.js");
   const main = document.getElementById("main-content");
   main.innerHTML = ""; SettingsView(rtr).mount(main); await wait(30);
-  const row = [...main.querySelectorAll(".settings-row")].find(r => /Activity level/.test(txt(r)));
+  const findRow = () => [...main.querySelectorAll(".settings-row")].find(r => /Activity level/.test(txt(r)));
+  let row = findRow();
+  for (const id of ["you", "body", "sessions", "display", "data", "plan", "about"]) { if (row) break; settingsSection(main, id); row = findRow(); }
   const { ACTIVITY_CHIPS } = await import(B + "data/onboarding-thread-data.js");
   const label = (ACTIVITY_CHIPS.find(c => c.id === answered) || {}).label;
   ok("3pc. onboarding recorded an answer", !!answered && !!label, String(answered));

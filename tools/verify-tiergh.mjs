@@ -1,6 +1,10 @@
 /**
  * tools/verify-tiergh.mjs
- * 29 Sep 2026 v4
+ * 04 Oct 2026 v5
+ *
+ * v5 - LOOK-2: the export buttons are on the Share page, one tap away
+ *   (progress.js v26). REACH only: 15/15b click the Share row on the free
+ *   tier first, then look for the three buttons. Same expected values.
  *
  * v4 - P0. Check 14 reads My exercises (prescribed.js, prescribed-session.js) now Conditions Update is retired.
  *
@@ -362,6 +366,8 @@ setTier('free');
 const progressEl = document.createElement('div');
 document.body.appendChild(progressEl);
 ProgressView(router).mount(progressEl);
+// LOOK-2: the export is on the Share page; a free user taps Share to reach it.
+progressEl.querySelector('[data-pr-page="share"]')?.dispatchEvent(new window.MouseEvent('click', { bubbles: true }));
 const exportBtns = [...progressEl.querySelectorAll('[data-export]')];
 
 check('15 R4: a FREE user can reach the export buttons',

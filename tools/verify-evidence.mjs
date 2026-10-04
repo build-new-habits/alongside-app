@@ -1,5 +1,11 @@
 /**
  * tools/verify-evidence.mjs
+ * 04 Oct 2026 v5
+ *
+ * v5 - LOOK-1: How your data is kept is a row on the Your data section
+ *   page, not the Settings index. 6i and 7b now reach it with settingsFind
+ *   (opening that section first). No assertion was loosened.
+ *
  * 03 Oct 2026 v4
  *
  * v4 - W5-13 RESEARCH-TRUE-2 (Wave 5 trace: 2.1, 2.4, 2.12-2.16; before
@@ -123,6 +129,7 @@ calls = [];
 const realFetch = globalThis.fetch;
 globalThis.fetch = fetchOk;
 const { SettingsView } = await import(B + "views/settings.js");
+const { settingsFind } = await import("./settings-open.mjs");
 const mount = async () => { main.innerHTML = ""; SettingsView({ navigate() {}, back() {} }).mount(main); await wait(20); click(main.querySelector('[data-open="messages"]')); await wait(20); };
 await mount();
 const surveyBox = () => main.querySelector('[data-research="survey"]');
@@ -214,7 +221,7 @@ const PV = await import(B + "views/privacy.js");
 const privHtml = typeof PV.render === "function" ? PV.render() : (() => { const d = document.createElement("div"); PV.PrivacyView?.({ navigate() {}, back() {} }).mount(d); return d.innerHTML; })();
 const thread = readFileSync(new URL("../js/views/onboarding/thread.js", import.meta.url), "utf8");
 person(); main.innerHTML = ""; SettingsView({ navigate() {}, back() {} }).mount(main); await wait(10);
-click(main.querySelector('[data-open="about-data"]')); await wait(10);
+click(settingsFind(main, '[data-open="about-data"]')); await wait(10);
 const aboutData = txt(main);
 ok("6i. Settings › How your data is kept names the survey and figures", /survey/i.test(aboutData) && /Share my figures/.test(aboutData), aboutData.slice(0, 300));
 ok("6j. the privacy summary names them", /survey/i.test(privHtml) && /Share my figures/.test(privHtml));
@@ -225,7 +232,7 @@ console.log("\nTEST 7 - the server words, the eight weeks, the kinds, the dates"
 const plainPriv = () => { const d = document.createElement("div"); d.innerHTML = PV.render(); return txt(d); };
 ok("7a. the privacy summary: no unqualified \"no copy on a server\" while sending is on", !/no copy on a server/i.test(plainPriv()) && /choose to send/i.test(plainPriv()), plainPriv().slice(0, 400));
 person(); main.innerHTML = ""; SettingsView({ navigate() {}, back() {} }).mount(main); await wait(10);
-click(main.querySelector('[data-open="about-data"]')); await wait(10);
+click(settingsFind(main, '[data-open="about-data"]')); await wait(10);
 ok("7b. Settings \u203a How your data is kept: the same", !/no copy on a server/i.test(txt(main)) && /choose to send/i.test(txt(main)), txt(main).slice(0, 300));
 ok("7c. the consent screen takes its words from the one sentence", /noServerCopy\(\)/.test(thread) && !/no copy on a server/.test(thread.split("\n").filter(l => !/^\s*(\*|\/\/)/.test(l)).join("\n")));
 log(Array.from({ length: 10 }, (_, i) => ({ type: "walk", completedAt: ago(1 + i * 3) })));

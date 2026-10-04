@@ -1,5 +1,11 @@
 /**
  * tools/verify-bundle-true.mjs
+ * 04 Oct 2026 v5
+ *
+ * v5 - LOOK-1: the Your profile and Your plan rows are no longer on the
+ *   Settings index; TEST 3 and TEST 10 reach them with settingsFind (the
+ *   You and Your plan section pages). No assertion loosened.
+ *
  * 03 Oct 2026 v4
  *
  * v4 - W5-5. 8a reads the under-18 page once nothing is held: while the
@@ -45,6 +51,7 @@
  */
 import { createRequire as __cr } from "node:module";
 import { readFileSync } from "node:fs";
+import { settingsFind } from "./settings-open.mjs";
 import { HEALTH_CONSENT_VERSION as HEALTH_V } from "../js/data/health-consent.js";
 const __require = __cr(import.meta.url);
 const { JSDOM } = __require("jsdom");
@@ -166,12 +173,12 @@ fixture({ health: true });
 store.set("weightTracking", true); store.set("weightUnit", "kg");
 const { SettingsView } = await import(B + "views/settings.js");
 let s = SettingsView(router); main.innerHTML = ""; s.mount(main); await wait(5);
-click(main.querySelector('[data-open="profile"]')); await wait(10);
+click(settingsFind(main, '[data-open="profile"]')); await wait(10);
 ok("3pc. positive control: with consent, Your profile offers weight entry", !!main.querySelector("#settings-weight-now"));
 fixture({ health: false });
 store.set("weightTracking", true); store.set("weightUnit", "kg");
 s = SettingsView(router); main.innerHTML = ""; s.mount(main); await wait(5);
-click(main.querySelector('[data-open="profile"]')); await wait(10);
+click(settingsFind(main, '[data-open="profile"]')); await wait(10);
 ok("3a. without it, Your profile offers no weight entry", !!main.querySelector("#settings-name") && !main.querySelector("#settings-weight-now"));
 const { MyProgrammeView } = await import(B + "views/my-programme.js");
 fixture({ health: true }); store.set("weightTracking", true);
@@ -276,7 +283,7 @@ fixture({ tier: "free" });
 {
   const { SettingsView: SV } = await import(B + "views/settings.js");
   const s10 = SV(router); main.innerHTML = ""; s10.mount(main); await wait(10);
-  click(main.querySelector('[data-open="about-plan"]')); await wait(10);
+  click(settingsFind(main, '[data-open="about-plan"]')); await wait(10);
   const plan = txt(main);
   ok("10pc. positive control: the Your plan screen shows the price", /£7\.99 a month/.test(plan), plan.slice(0, 200));
   ok("10a. no \"no contract either way\"", !/contract either way/i.test(plan));

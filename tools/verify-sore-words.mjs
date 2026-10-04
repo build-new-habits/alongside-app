@@ -1,6 +1,10 @@
 /**
  * tools/verify-sore-words.mjs
- * 03 Oct 2026 v2
+ * 04 Oct 2026 v3
+ *
+ * v3 - LOOK-1: TEST 5 reaches the conditions row through settingsFind (the
+ *   row is on the Your body section page now, not the index); no assertion
+ *   loosened.
  *
  * v2 - W5-14 SORE-DOORS-2 (Wave 5 trace: 2.1, 2.14, 2.15). TEST 7: Run
  *   and Yoga say the sore area in the person's word (Run said "Your
@@ -38,6 +42,7 @@
 import { createRequire as __cr } from "node:module";
 import { readFileSync } from "node:fs";
 import { agreed } from "./agreed.mjs";
+import { settingsFind } from "./settings-open.mjs";
 const __require = __cr(import.meta.url);
 const { JSDOM } = __require("jsdom");
 
@@ -165,7 +170,7 @@ console.log("\nTEST 5 - Settings says what getting started says");
 fixture(["knee"], {});
 const { SettingsView } = await import(B + "views/settings.js");
 main.innerHTML = ""; SettingsView({ navigate() {}, back() {} }).mount(main); await wait(10);
-main.querySelector('[data-open="conditions"]')?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }));
+settingsFind(main, '[data-open="conditions"]')?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }));
 await wait(10);
 const st = txt(main);
 ok("5a. no claim that listing an area leaves movements out", !/leaves out movements likely to load what.s listed here/i.test(st), st.slice(0, 300));

@@ -1,5 +1,20 @@
 /**
  * tools/verify-nav5.mjs
+ * 04 Oct 2026 v5
+ *
+ * v5 - LOOK-1. Settings is now an index of eight sections; each section's
+ *   rows are on its own page (a deliberate, approved change). What this
+ *   gate is FOR is kept and driven on the new pages:
+ *   - TEST 1: the row labels are gathered from the index and every section
+ *     page (the rows are no longer on one page); same names, same count
+ *     regex; the Equipment row is reached with settingsFind.
+ *   - TEST 2: screens opened are gathered from the index and every section
+ *     page; each screen is reached with settingsFind before it is opened.
+ *   - TEST 4: "stays on the page" for the Show your best switch now means
+ *     it stays on the Sessions section page it is on (.settings-lede is
+ *     index-only text now); Display is reached with settingsFind.
+ *   No expected value changed and no assertion was loosened.
+ *
  * 02 Oct 2026 v4
  *
  * v4 - W4-1 GATE-OPEN. The fixture person has agreed (tools/agreed.mjs): the
@@ -69,7 +84,17 @@ dom.window.matchMedia = q => ({ matches: false, media: q, addEventListener() {},
 globalThis.history = dom.window.history; globalThis.location = dom.window.location;
 const { store } = await import(new URL("../js/store.js", import.meta.url).href);
 const { SettingsView } = await import(new URL("../js/views/settings.js", import.meta.url).href);
+const { settingsFind, settingsSection, settingsIndex } = await import("./settings-open.mjs");
 const main = document.getElementById("main-content");
+const SECTIONS = ["you", "body", "sessions", "display", "data", "plan", "about"];
+// LOOK-1: everything matching `sel` on the index and on every section page.
+const allPages = sel => {
+  settingsIndex(main);
+  const out = [...main.querySelectorAll(sel)];
+  for (const sec of SECTIONS) { settingsSection(main, sec); out.push(...main.querySelectorAll(sel)); }
+  settingsIndex(main);
+  return out;
+};
 const txt = el => (el?.textContent || "").replace(/\s+/g, " ").trim();
 const click = el => el?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }));
 localStorage.clear(); store.init(); agreed(store); store.set("tier", "personal"); store.set("onboardingComplete", true);
@@ -77,20 +102,21 @@ const page = () => { main.innerHTML = ""; SettingsView({ navigate() {}, back() {
 
 console.log("\nTEST 1 - what Graeme could not find is named on the page");
 page();
-const labels = [...main.querySelectorAll(".settings-row__label")].map(txt);
+const labels = allPages(".settings-row__label").map(txt);
 check("session notes is a row of its own, by name", () => ok(labels.includes("Session notes"), labels.join(", ")));
 check("equipment is a row of its own, with what is saved", () =>
-  ok(labels.includes("Equipment") && /Gym \d+ · Home \d+/.test(txt(main.querySelector('[data-open="equipment"]'))), "no Equipment row with its count"));
+  ok(labels.includes("Equipment") && /Gym \d+ · Home \d+/.test(txt(settingsFind(main, '[data-open="equipment"]'))), "no Equipment row with its count"));
 check("the capability questions are named", () => ok(labels.includes("What your body can do"), "not named"));
 
 console.log("\nTEST 2 - every screen is reachable, none orphaned");
 const src = fs.readFileSync(_gatePath("js/views/settings.js"), "utf8");
 const screens = [...src.slice(src.indexOf("const SCREENS = {"), src.indexOf("const _label")).matchAll(/^\s{4}'?([\w-]+)'?:\s*\{ title:/gm)].map(m => m[1]);
-const opened = new Set([...main.querySelectorAll("[data-open]")].map(b => b.dataset.open));
+page();
+const opened = new Set(allPages("[data-open]").map(b => b.dataset.open));
 store.set("onboarding.primaryTerritory", "body"); page();
-[...main.querySelectorAll("[data-open]")].forEach(b => opened.add(b.dataset.open));
+allPages("[data-open]").forEach(b => opened.add(b.dataset.open));
 store.set("weightTracking", true); store.set("checkInNotification.enabled", true); page();
-[...main.querySelectorAll("[data-open]")].forEach(b => opened.add(b.dataset.open));
+allPages("[data-open]").forEach(b => opened.add(b.dataset.open));
 check("the page opens only screens that exist", () => {
   const bad = [...opened].filter(k => !screens.includes(k));
   ok(screens.length > 10 && bad.length === 0, `unknown: ${bad.join(", ")}`);
@@ -101,7 +127,7 @@ check("every screen is opened from the page -- none orphaned", () => {
 });
 check("every screen renders something", () => {
   for (const k of opened) {
-    page(); click(main.querySelector(`[data-open="${k}"]`));
+    page(); click(settingsFind(main, `[data-open="${k}"]`));
     ok(txt(main.querySelector(".settings-screen")).length > 20, `${k} is empty`);
   }
 });
@@ -117,15 +143,17 @@ check("rows clear the 44px touch floor", () => {
 
 console.log("\nTEST 4 - in-place actions keep you where you are");
 check("toggling a switch stays on the page", () => {
-  page(); click(main.querySelector("#settings-pb"));
-  ok(!!main.querySelector(".settings-lede") && !!main.querySelector("#settings-pb"), "bounced");
+  page(); const sec = settingsFind(main, "#settings-pb")?.closest(".settings-secpage")?.dataset.section;
+  ok(!!sec, "no Show your best switch on any section page");
+  click(main.querySelector("#settings-pb"));
+  ok(!!main.querySelector(`.settings-secpage[data-section="${sec}"]`) && !!main.querySelector("#settings-pb"), "bounced");
 });
 check("resetting display stays on Display", () => {
-  page(); click(main.querySelector('[data-open="display"]')); click(main.querySelector("#disp-reset"));
+  page(); click(settingsFind(main, '[data-open="display"]')); click(main.querySelector("#disp-reset"));
   ok(/^Display$/.test(txt(main.querySelector(".settings-title"))), "left the Display screen");
 });
 check("reopening Settings shows the page, not the last screen", () => {
-  page(); click(main.querySelector('[data-open="equipment"]')); page();
+  page(); click(settingsFind(main, '[data-open="equipment"]')); page();
   ok(!!main.querySelector(".settings-lede"), "sticky");
 });
 

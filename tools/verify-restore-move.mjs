@@ -1,5 +1,12 @@
 /**
  * tools/verify-restore-move.mjs
+ * 04 Oct 2026 v4
+ *
+ * v4 - LOOK-1: Download your data and Restore from a file are on the Your
+ *   data section page, not the Settings index; the clicks find them with
+ *   settingsFind. #settings-result is read on that page as before. No
+ *   assertion loosened.
+ *
  * 03 Oct 2026 v3
  *
  * v3 - W5-20/W5-21. 4b re-pointed: "</3" comes back as written, and no "<"
@@ -44,6 +51,7 @@
 import { createRequire as __cr } from "node:module";
 import { agreed } from "./agreed.mjs";
 import { oneScreen } from "./one-screen.mjs";
+import { settingsFind } from "./settings-open.mjs";
 const __require = __cr(import.meta.url);
 const { JSDOM } = __require("jsdom");
 
@@ -184,7 +192,7 @@ console.log("\nTEST 5 - results are on screen, and focus goes to them");
 const { SettingsView } = await import(B + "views/settings.js");
 function settings() { main.innerHTML = ""; SettingsView({ navigate() {}, back() {} }).mount(main); }
 async function pickFile(text, name = "alongside.json") {
-  click(main.querySelector('[data-action="restore-data"]')); await wait(10);
+  click(settingsFind(main, '[data-action="restore-data"]')); await wait(10);
   const input = document.getElementById("settings-restore-input");
   if (!input) return false;
   Object.defineProperty(input, "files", { value: [new dom.window.File([text], name, { type: "application/json" })] });
@@ -210,7 +218,7 @@ await pickFile("not a file of ours");
 ok("5f. a refused file: the reason is on screen, with focus", visible(result()) && /nothing has been changed/i.test(txt(result())) && document.activeElement === result(), txt(result()));
 
 phone(); settings();
-click(main.querySelector('[data-action="download-data"]')); await wait(10);
+click(settingsFind(main, '[data-action="download-data"]')); await wait(10);
 click(document.querySelector("#download-go, #download-save, [data-download-go]") || [...document.querySelectorAll('[role="dialog"] button')].find(b => /download|save/i.test(txt(b)) && !/cancel/i.test(txt(b))));
 await until(() => visible(result()), 3000);
 ok("5g. Download: the result is on screen", visible(result()) && /download/i.test(txt(result())), txt(result()));

@@ -1,5 +1,22 @@
 /**
  * tools/verify-progress-agree.mjs
+ * 04 Oct 2026 v5
+ *
+ * v5 - LOOK-2: Progress is an overview plus pages one tap away (progress.js
+ *   v26, approved by the product owner from the mock-up, 04 Oct). REACH:
+ *   3c opens the Your weight row before looking for the weight block; 5a-5c
+ *   open the Your lifts row (5c now scans that page's lift groups and note,
+ *   and requires they exist: nothing carries aria-labelledby="pr-lifts-h"
+ *   any more, so the old selector scanned nothing; the page's Back button,
+ *   "Progress", is navigation, not a word about the lifts). 3a/3b also require no weight row (tightened: the
+ *   block can no longer be on the overview, so absence of the row is what
+ *   keeps it out). RE-POINTED, deliberate changes: 4e the arc heading is
+ *   now the card title "Your arc" with "Week N" beside it and the aim in
+ *   quotes (was "Your arc · week N" / "Working towards"); 4f the "came up
+ *   most recently" coach line was removed, so it now asserts that line is
+ *   gone and the true "Nothing is behind" note is there; 7b the h2 order is
+ *   now the card titles: Sessions each week, What kinds of session, Your arc.
+ *
  * 02 Oct 2026 v4
  *
  * v4 - W4-1 GATE-OPEN. The fixture person has agreed (tools/agreed.mjs): the
@@ -93,6 +110,7 @@ function fixture({ tier = "personal", weightTracking = false, arc = null, histor
   navs = [];
 }
 function progress() { main.innerHTML = ""; const v = ProgressView(router); v.mount(main); return main; }
+const click = el => el?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }));
 const number = () => Number(txt(main.querySelector(".progress-summary__number")));
 
 // ── 0. FIXTURE REACH ────────────────────────────────────────────────────
@@ -143,10 +161,11 @@ ok("2b. and no sentence anywhere on Progress tracks a sore area", !/mentioned on
 // ── 3. WEIGHT ───────────────────────────────────────────────────────────
 console.log("\nTEST 3 - no weight card unless weight tracking is on");
 fixture({ weightTracking: false }); progress();
-ok("3a. Plan, tracking off: not in the DOM", !main.querySelector(".progress-weight"));
+ok("3a. Plan, tracking off: not in the DOM", !main.querySelector(".progress-weight") && !main.querySelector('[data-pr-page="weight"]'));
 fixture({ tier: "free", weightTracking: false }); progress();
-ok("3b. free, tracking off: not in the DOM", !main.querySelector(".progress-weight"));
+ok("3b. free, tracking off: not in the DOM", !main.querySelector(".progress-weight") && !main.querySelector('[data-pr-page="weight"]'));
 fixture({ weightTracking: true }); progress();
+click(main.querySelector('[data-pr-page="weight"]'));   // LOOK-2: its own page
 ok("3c. REVERSAL: Plan, tracking on: there", !!main.querySelector(".progress-weight"));
 
 // ── 4. STRANDS: A DATE, NEVER A COUNT ───────────────────────────────────
@@ -160,8 +179,15 @@ ok("4a. each is a date or Not yet", rows.every(([, w]) => /^(Worked (today|yeste
 ok("4b. no strand carries a count", rows.every(([, w]) => !/\b(times?|sessions?|×|x\d)\b/i.test(w)));
 ok("4c. core worked BEFORE the arc began does not light Trunk strength (ARC-COVERAGE)", rows.find(r => r[0] === "Trunk strength")?.[1] === "Not yet");
 ok("4d. Leg strength from yesterday's lower session", rows.find(r => r[0] === "Leg strength")?.[1] === "Worked yesterday");
-ok("4e. the arc's heading and aim", /^Your arc · week \d+$/.test(txt(main.querySelector("#pr-arc-h"))) && /Working towards “/.test(txt(main.querySelector(".pr-aim"))));
-ok("4f. one coach sentence, and it is true", txt(main.querySelector(".pr-coach")) === "Leg strength came up most recently, yesterday.", txt(main.querySelector(".pr-coach")));
+// LOOK-2 (re-pointed): the heading is the card title, the week beside it, the aim in quotes.
+const arcCard = main.querySelector("#pr-arc-h")?.closest("section");
+ok("4e. the arc's heading and aim", txt(main.querySelector("#pr-arc-h")) === "Your arc" &&
+   /^Week \d+$/.test(txt(arcCard?.querySelector(".pr-card__meta"))) && /^“.+”$/.test(txt(arcCard?.querySelector(".pr-aim"))),
+   `${txt(main.querySelector("#pr-arc-h"))} | ${txt(arcCard?.querySelector(".pr-card__meta"))} | ${txt(arcCard?.querySelector(".pr-aim"))}`);
+// LOOK-2 (re-pointed): the "came up most recently" line is gone; the one note left is true.
+ok("4f. one coach sentence, and it is true", !/came up most recently/.test(txt(arcCard)) && !arcCard?.querySelector(".pr-coach") &&
+   [...arcCard.querySelectorAll(".pr-note")].map(txt).join("|") === "Nothing is behind. “Not yet” means it hasn’t come up since your arc began.",
+   txt(arcCard));
 navs = []; main.querySelector(".pr-change")?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }));
 ok("4g. Change my arc", navs[0] === "stretch-arc");
 
@@ -170,10 +196,12 @@ console.log("\nTEST 5 - from your logged weights: first and latest, facts only")
 const L = { "barbell-bench-press": [{ at: iso(30), weight: 30, unit: "kg", reps: 10 }, { at: iso(10), weight: 35, unit: "kg" }, { at: iso(2), weight: 40, unit: "kg", reps: 8 }],
             "goblet-squat": [{ at: iso(5), weight: 16, unit: "kg" }] };
 fixture({ liftLog: L }); progress();
+click(main.querySelector('[data-pr-page="lifts"]'));   // LOOK-2: its own page
 const lifts = [...main.querySelectorAll(".pr-lift")].map(txt);
 ok("5a. first → latest", lifts.length === 1 && /Barbell Bench Press 30 kg → 40 kg/.test(lifts[0]), JSON.stringify(lifts));
 ok("5b. one entry only is not shown", !lifts.some(l => /Goblet/i.test(l)));
-ok("5c. no judgement words on it", !RB.BANNED_WORDS.test(txt(main.querySelector('[aria-labelledby="pr-lifts-h"]'))) &&
+ok("5c. no judgement words on it", !!main.querySelector("#pr-lifts-h") && main.querySelectorAll(".pr-lift-group").length > 0 &&
+   ![...main.querySelectorAll(".pr-page .pr-note, .pr-lift-group")].some(el => RB.BANNED_WORDS.test(txt(el))) &&
    !/\b(up|down|more|less|stronger|weaker)\b/i.test(lifts.join(" ")));
 
 // ── 6. FREE ─────────────────────────────────────────────────────────────
@@ -192,11 +220,12 @@ console.log("\nTEST 7 - read by heading");
 fixture({ arc: ARC, conditions: ["knee"], history: hist, meta: metaK, liftLog: L }); progress();
 const heads = [...main.querySelectorAll("h1,h2,h3")].map(h => Number(h.tagName[1]));
 ok("7a. one h1, no level skipped", heads.filter(h => h === 1).length === 1 && heads.every((h, i) => i === 0 || h <= heads[i - 1] + 1), heads.join(","));
+// LOOK-2 (re-pointed): the h2s are the card titles, in the mock-up's order.
 ok("7b. in the spec's order", (() => {
   const t = [...main.querySelectorAll("h2")].map(txt);
   const at = s => t.findIndex(x => x.startsWith(s));
-  return at("Your arc") < at("From your logged weights") &&
-         at("From your logged weights") < at("What your arc works on") && at("What your arc works on") < at("Everything you’ve done");
+  return at("Sessions each week") >= 0 && at("Sessions each week") < at("What kinds of session") &&
+         at("What kinds of session") < at("Your arc");
 })(), [...main.querySelectorAll("h2")].map(txt).join(" | "));
 
 // ── 8. HOME ─────────────────────────────────────────────────────────────

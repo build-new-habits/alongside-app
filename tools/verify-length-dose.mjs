@@ -1,6 +1,10 @@
 /**
  * tools/verify-length-dose.mjs
- * 29 Sep 2026 v1
+ * 04 Oct 2026 v2
+ *
+ * v2 - LOOK-1: TEST 3 looks for the "How long you usually have" row on
+ *   each Settings section page in turn (it lives on Sessions now, not the
+ *   index); same text match, no assertion loosened.
  *
  * P24, LENGTH AND DOSE (persona finding W2-20).
  *   - Yoga's length cards said "20 min · 5 poses"; the persona got four
@@ -23,6 +27,7 @@
  *   3. Settings asks how long you usually have; the plan starts from it.
  */
 import { createRequire as __cr } from "node:module";
+import { settingsSection } from "./settings-open.mjs";
 const __require = __cr(import.meta.url);
 const { JSDOM } = __require("jsdom");
 
@@ -150,7 +155,9 @@ console.log("\nTEST 3 - Settings asks how long you usually have; the plan starts
   person();
   const { SettingsView } = await import(B + "views/settings.js");
   main.innerHTML = ""; SettingsView(rtr).mount(main); await wait(20);
-  const row = [...main.querySelectorAll(".settings-row")].find(r => /How long you usually have/.test(txt(r)));
+  const findRow = () => [...main.querySelectorAll(".settings-row")].find(r => /How long you usually have/.test(txt(r)));
+  let row = findRow();
+  for (const id of ["you", "body", "sessions", "display", "data", "plan", "about"]) { if (row) break; settingsSection(main, id); row = findRow(); }
   ok("3a. a row: \"How long you usually have\"", !!row, [...main.querySelectorAll(".settings-row")].map(txt).slice(0, 12).join(" | "));
   click(row); await wait(20);
   const sel = main.querySelector("#settings-usual-length");

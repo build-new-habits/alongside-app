@@ -1,5 +1,12 @@
 /**
  * tools/verify-true-words.mjs
+ * 04 Oct 2026 v4
+ *
+ * v4 - LOOK-1: Settings is an index of section pages. TESTs 19 and 20
+ *   reach the Sore or injured areas and preferences rows through
+ *   settingsFind (opening the section that holds them). No assertion
+ *   changed.
+ *
  * 03 Oct 2026 v3
  *
  * v3 - W5-20 TRUE-WORDS-5 (Wave 5 trace). 3b re-pointed: no carrying,
@@ -42,6 +49,7 @@ import { createRequire as __cr } from "node:module";
 import { readFileSync } from "node:fs";
 import { agreed } from "./agreed.mjs";
 import { oneScreen } from "./one-screen.mjs";
+import { settingsFind } from "./settings-open.mjs";
 const __require = __cr(import.meta.url);
 const { JSDOM } = __require("jsdom");
 
@@ -297,7 +305,7 @@ const { SettingsView } = await import(B + "views/settings.js");
 person({ conditions: ["knee", "anxiety"] });
 const s19 = document.getElementById("main-content"); s19.innerHTML = "";
 SettingsView({ navigate() {}, back() {} }).mount(s19); await wait(10);
-click(s19.querySelector('[data-open="conditions"]')); await wait(10);
+click(settingsFind(s19, '[data-open="conditions"]')); await wait(10);
 click(s19.querySelector('[data-resolve="anxiety"]')); await wait(10);
 ok("19a. not \"moved to Better now\", not under Better now", !/Stress moved to Better now/.test(txt(s19)) && !(store.get("conditionsResolved") || []).some(r => r.id === "anxiety") && !(store.get("conditions") || []).includes("anxiety"), txt(s19).slice(0, 200));
 
@@ -305,7 +313,7 @@ ok("19a. not \"moved to Better now\", not under Better now", !/Stress moved to B
 console.log("\nTEST 20 - the line under How much should sessions change");
 person();
 s19.innerHTML = ""; SettingsView({ navigate() {}, back() {} }).mount(s19); await wait(10);
-click(s19.querySelector('[data-open="preferences"]')); await wait(10);
+click(settingsFind(s19, '[data-open="preferences"]')); await wait(10);
 const sel = s19.querySelector("#settings-pref-variety");
 if (sel) { sel.value = "familiar"; sel.dispatchEvent(new dom.window.Event("change", { bubbles: true })); }
 await wait(10);

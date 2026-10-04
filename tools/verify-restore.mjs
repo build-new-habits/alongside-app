@@ -1,5 +1,12 @@
 /**
  * tools/verify-restore.mjs
+ * 04 Oct 2026 v5
+ *
+ * v5 - LOOK-1: Restore from a file and Download your data are on the Your
+ *   data section page, not the Settings index; row() and the 6a row lookup
+ *   use settingsFind. #settings-result is read on that page as before. No
+ *   assertion loosened.
+ *
  * 02 Oct 2026 v4
  *
  * v4 - W4-13. Fixtures give the health consent at the current version: given
@@ -31,6 +38,7 @@
  *   6. Download your data says anyone with the file can read it.
  */
 import { createRequire as __cr } from "node:module";
+import { settingsFind } from "./settings-open.mjs";
 import { HEALTH_CONSENT_VERSION as HEALTH_V } from "../js/data/health-consent.js";
 const __require = __cr(import.meta.url);
 const { JSDOM } = __require("jsdom");
@@ -172,7 +180,7 @@ let landed = [];
 const mount = () => { main.innerHTML = ""; SettingsView({ navigate(v) { landed.push(v); }, back() {} }).mount(main); };
 newPhone(false);
 mount(); await wait(20);
-const row = () => main.querySelector('[data-action="restore-data"]');
+const row = () => settingsFind(main, '[data-action="restore-data"]');
 ok("5pc. the row is there, and says it replaces", !!row() && /replaces what is on this device/.test(txt(row())), txt(row()));
 click(row()); await wait(20);
 ok("5a. without the health consent, it asks for that first", landed.includes("health-consent") && !document.getElementById("settings-restore-input"), JSON.stringify(landed));
@@ -202,7 +210,7 @@ dom.window.HTMLInputElement.prototype.click = origClick;
 // ── 6. THE DOWNLOAD WARNS ───────────────────────────────────────────────
 console.log("\nTEST 6 - Download your data says who can read the file");
 oldPhone(); mount(); await wait(20);
-const dl = main.querySelector('[data-action="download-data"]');
+const dl = settingsFind(main, '[data-action="download-data"]');
 ok("6a. the row says anyone with the file can read it", /Anyone who has the file can read it/.test(txt(dl)));
 click(dl); await wait(20); click(document.getElementById("download-save")); await wait(60);
 ok("6b. so does the message after downloading", /anyone who has the file can read it/.test(txt(main.querySelector("#settings-result"))), txt(main.querySelector("#settings-result")));

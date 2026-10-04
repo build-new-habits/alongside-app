@@ -1,5 +1,17 @@
 /**
  * tools/verify-settings-rescope.mjs
+ * 04 Oct 2026 v2
+ *
+ * v2 - LOOK-1 SETTINGS-PAGES (Graeme, 04 Oct: "the settings page should
+ *   open a separate page instead of collapsing or expanding the content").
+ *   Re-pointed, not loosened: the sections, their order, the inventory,
+ *   one level and Messages-in-one-tap are asserted as before. What
+ *   changed is how a section opens: its own page, not a details. New: no
+ *   details anywhere; each index row says what is set now and carries its
+ *   kind colour beside its title; a section page has Back to Settings and
+ *   named groups; a row's Back returns to its section page, and the
+ *   section's Back to the index, focus on the row each time.
+ *
  * 02 Oct 2026 v1
  *
  * W4-23 SETTINGS-RESCOPE. Graeme, 02 Oct: "It's confusing having everything
@@ -20,6 +32,7 @@
 import { createRequire as __cr } from "node:module";
 import { agreed } from "./agreed.mjs";
 import { oneScreen } from "./one-screen.mjs";
+import { settingsSection, settingsIndex } from "./settings-open.mjs";
 const __require = __cr(import.meta.url);
 const { JSDOM } = __require("jsdom");
 
@@ -58,47 +71,71 @@ function person() { localStorage.clear(); store.init(); agreed(store); store.set
 const mount = async () => { const el = oneScreen(document.createElement("div")); SettingsView({ navigate() {}, back() {} }).mount(el); await wait(10); return el; };
 
 // ── 1. THE INDEX ────────────────────────────────────────────────────────
-console.log("\nTEST 1 - Settings opens on the sections, closed");
+console.log("\nTEST 1 - Settings opens on the sections, one row each");
 person();
+store.set("ageBand", "45-54"); store.set("availableTime", "medium"); store.set("gymEquipment", ["barbell"]); store.set("homeEquipment", ["band-medium"]);
 let el = await mount();
 ok("1pc. Settings", txt(el.querySelector("h1")) === "Settings");
 const titles = [...el.querySelectorAll("[data-section]")].map(s => txt(s.querySelector(".settings-sec__title")));
 ok("1a. the approved sections, in order", JSON.stringify(titles) === JSON.stringify(SECTIONS), JSON.stringify(titles));
-ok("1b. all closed: nothing else on the page", !el.querySelector("details[data-section][open]") && [...el.querySelectorAll(".settings-row")].every(r => r.closest("details:not([open])") || r.matches("[data-section]")),
-   `${el.querySelectorAll("details[data-section][open]").length} open`);
+ok("1b. nothing expands in place: no details anywhere", !el.querySelector("details"));
+ok("1c. no row or switch on the index, only the eight sections", !el.querySelector(".settings-rows, [role=switch], [data-action], [data-toggle]"),
+   [...el.querySelectorAll(".settings-rows, [role=switch], [data-action], [data-toggle]")].map(n => n.outerHTML.slice(0, 60)).join(" | "));
+const sub = id => txt(el.querySelector(`[data-section="${id}"] .settings-sec__sub`));
+ok("1d. each row says what is set now (You: the name; Sessions: minutes and where; Messages)",
+   /^Jan\b/.test(sub("you")) && /minutes \u00b7 gym and home$/.test(sub("sessions")) && sub("messages") === "Nothing new",
+   `${sub("you")} | ${sub("sessions")} | ${sub("messages")}`);
+ok("1e. each row carries its kind colour, beside its title (never colour alone)",
+   [...el.querySelectorAll("[data-section]")].every(b => /settings-idx--(teal|amber|violet|blue|rose|green|slate)/.test(b.className) && b.querySelector(".settings-tile[aria-hidden=true]") && txt(b.querySelector(".settings-sec__title"))));
+ok("1f. each section title is a heading (found by heading)", [...el.querySelectorAll("[data-section]")].every(b => b.closest("h2")));
 
 // ── 2. ONE TAP ──────────────────────────────────────────────────────────
-console.log("\nTEST 2 - one tap opens a section");
-const body = el.querySelector('[data-section="body"]');
-click(body?.querySelector("summary")); await wait(5);
-ok("2a. Your body opens where it is", !!body && body.open === true);
-ok("2b. and shows its rows", !!body?.querySelector('[data-open="conditions"]') && !!body?.querySelector('[data-open="capability"]'));
+console.log("\nTEST 2 - one tap opens a section on its own page");
+click(el.querySelector('[data-section-open="body"]')); await wait(5);
+ok("2a. Your body is its own page: one h1, Your body", el.querySelectorAll("h1").length === 1 && txt(el.querySelector("h1")) === "Your body");
+ok("2b. and shows its rows", !!el.querySelector('[data-open="conditions"]') && !!el.querySelector('[data-open="capability"]'));
+ok("2c. the index is gone from the page", !el.querySelector("[data-section-open]"));
+ok("2d. Back says Settings", /Settings/.test(el.querySelector("#settings-back-btn")?.getAttribute("aria-label") || ""));
+ok("2e. focus on the page's heading", document.activeElement === el.querySelector("h1"));
 
 // ── 3. EVERYTHING HAS A PLACE ───────────────────────────────────────────
 console.log("\nTEST 3 - everything the one page held is in a section");
 person(); el = await mount();
 const found = new Map();
-for (const s of el.querySelectorAll("[data-section]"))
-  for (const b of [s, ...s.querySelectorAll("*")].filter(n => n.matches("[data-open],[data-action],[data-go],[data-toggle],[data-disp-toggle]"))) found.set(keyOf(b), s.dataset.section);
+for (const id of SECTIONS.map(s => Object.entries({you:"You",body:"Your body",sessions:"Sessions",display:"Display",data:"Your data",messages:"Messages",plan:"Your plan",about:"About"}).find(([, v]) => v === s)[0])) {
+  if (id === "messages") { settingsIndex(el); const m = el.querySelector('[data-section="messages"][data-open="messages"]'); if (m) found.set("open:messages", "messages"); continue; }
+  settingsSection(el, id); await wait(2);
+  const page = el.querySelector(`[data-section="${id}"]`);
+  ok(`3.${id}. ${id} opens on its own page`, !!page && page.classList.contains("settings-secpage"));
+  for (const b of [...(page?.querySelectorAll("[data-open],[data-action],[data-go],[data-toggle],[data-disp-toggle]") || [])]) found.set(keyOf(b), id);
+  ok(`3.${id}b. nothing on the page outside the section`, [...el.querySelectorAll(".settings-row, [role=switch]")].every(r => r.closest(`[data-section="${id}"]`)));
+}
 const gone = INVENTORY.filter(k => !found.has(k) && !(k === "go:arc-setup" && found.has("go:stretch-arc")));
 ok("3a. every control is in a section", gone.length === 0, gone.join(", "));
-ok("3b. nothing left outside the sections", [...el.querySelectorAll(".settings-row, [role=switch]")].every(r => r.closest("[data-section]")), "");
 
 // ── 4. NOTHING NESTED ───────────────────────────────────────────────────
 console.log("\nTEST 4 - one level");
-ok("4a. no section inside a section", ![...el.querySelectorAll("[data-section]")].some(s => s.querySelector("[data-section]")));
+settingsSection(el, "sessions"); await wait(2);
+ok("4a. no section inside a section", !el.querySelector("[data-section-open]") && !el.querySelector("[data-section] [data-section]"));
 ok("4b. no tabs", !el.querySelector('[role="tablist"], [role="tab"]'));
+const groups = [...el.querySelectorAll(".settings-group__title")].map(txt);
+ok("4c. Sessions in named groups: What you have, How they are built, Notes", JSON.stringify(groups) === JSON.stringify(["What you have", "How they are built", "Notes"]), JSON.stringify(groups));
+ok("4d. each group is labelled by its heading", [...el.querySelectorAll(".settings-group")].every(g => g.getAttribute("aria-labelledby") || g.getAttribute("aria-label")));
 
 // ── 5. A ROW'S SCREEN ───────────────────────────────────────────────────
-console.log("\nTEST 5 - a row's screen, and back");
-click(el.querySelector('[data-section="body"] summary')); await wait(5);
+console.log("\nTEST 5 - a row's screen, and back, one level at a time");
+person(); el = await mount();
+settingsSection(el, "body"); await wait(2);
 click(el.querySelector('[data-open="conditions"]')); await wait(10);
 ok("5a. one h1, the row's", el.querySelectorAll("h1").length === 1 && /Sore or injured areas/.test(txt(el.querySelector("h1"))));
 const back = el.querySelector("#settings-back-btn");
 ok("5b. Back names the section", /Your body/.test(txt(back)) || /Your body/.test(back?.getAttribute("aria-label") || ""), txt(back));
 click(back); await wait(10);
-ok("5c. back on the index, that section open", txt(el.querySelector("h1")) === "Settings" && el.querySelector('[data-section="body"]')?.open === true);
+ok("5c. back on the Your body page", txt(el.querySelector("h1")) === "Your body" && !!el.querySelector('[data-section="body"].settings-secpage'));
 ok("5d. focus on the row it came from", document.activeElement?.dataset?.open === "conditions", document.activeElement?.outerHTML?.slice(0, 80));
+click(el.querySelector("#settings-back-btn")); await wait(10);
+ok("5f. the section's Back returns to the index", txt(el.querySelector("h1")) === "Settings" && !!el.querySelector("[data-section-open]"));
+ok("5g. focus on that section's row", document.activeElement?.dataset?.sectionOpen === "body", document.activeElement?.outerHTML?.slice(0, 80));
 
 // A screen the app opened itself (What your body can do, asked again
 // after Delete my health answers) goes back to its section too.
@@ -108,13 +145,16 @@ HC.guardRoute("coach-proposal");
 el = await mount();
 ok("5e0. the app opened What your body can do itself", /What your body can do/.test(txt(el.querySelector("h1"))));
 click(el.querySelector("#settings-back-btn")); await wait(10);
-ok("5e. its Back opens Your body, on that row", el.querySelector('[data-section="body"]')?.open === true && document.activeElement?.dataset?.open === "capability",
+ok("5e. its Back opens Your body, on that row", !!el.querySelector('[data-section="body"].settings-secpage') && document.activeElement?.dataset?.open === "capability",
    document.activeElement?.outerHTML?.slice(0, 80));
 
 // ── 6. MESSAGES, AND THE TAB ────────────────────────────────────────────
 console.log("\nTEST 6 - Messages is one tap; the tab keeps its name");
+person(); el = await mount();
 click(el.querySelector('[data-section="messages"]')); await wait(10);
 ok("6a. one tap to Messages", txt(el.querySelector("h1")) === "Messages");
+click(el.querySelector("#settings-back-btn")); await wait(10);
+ok("6c. Messages' Back returns to the index, focus on Messages", !!el.querySelector("[data-section-open]") && document.activeElement?.dataset?.section === "messages");
 M.updateNavDot();
 ok("6b. the Settings tab is still called Settings", document.querySelector('[data-nav="settings"]').getAttribute("aria-label") === "Settings");
 

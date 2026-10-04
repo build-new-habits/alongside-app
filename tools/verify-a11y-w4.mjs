@@ -1,6 +1,12 @@
 /**
  * tools/verify-a11y-w4.mjs
- * 02 Oct 2026 v1
+ * 04 Oct 2026 v2
+ *
+ * v2 - LOOK-1: Settings is an index of section pages, so the switches are
+ *      no longer all on one page. Test 1 now opens each section page in
+ *      turn (settingsSection) and collects and presses the switches there;
+ *      1pc still needs at least six across Settings and 1a is unchanged.
+ *      The Messages row is still on the index. No assertion was loosened.
  *
  * W4-18 A11Y-W4 (Wave 4 persona trace: 2.4, 2.11, 2.12, 2.13, 2.14, U18).
  *
@@ -25,6 +31,7 @@ import { createRequire as __cr } from "node:module";
 import { readFileSync } from "node:fs";
 import { agreed } from "./agreed.mjs";
 import { oneScreen } from "./one-screen.mjs";
+import { settingsSection } from "./settings-open.mjs";
 const __require = __cr(import.meta.url);
 const { JSDOM } = __require("jsdom");
 
@@ -63,10 +70,18 @@ const settings = async () => { const el = oneScreen(document.createElement("div"
 console.log("\nTEST 1 - Settings switches keep their name");
 person();
 let el = await settings();
-const ids = [...el.querySelectorAll('[role="switch"]')].map(b => b.id).filter(Boolean);
+// LOOK-1: each section page holds its own switches; open each in turn.
+const SECTIONS = ["you", "body", "sessions", "display", "data", "plan", "about"];
+const ids = [];
+const where = {};
+for (const sec of SECTIONS) {
+  settingsSection(el, sec); await wait(5);
+  for (const b of el.querySelectorAll('[role="switch"]')) if (b.id && !ids.includes(b.id)) { ids.push(b.id); where[b.id] = sec; }
+}
 ok("1pc. the switches are there", ids.length >= 6, ids.join(", "));
 const bad = [];
 for (const id of ids) {
+  if (!el.querySelector(`#${id}`)) { settingsSection(el, where[id]); await wait(5); }
   const b0 = el.querySelector(`#${id}`);
   const label = txt(el.querySelector(`label[for="${id}"] .settings-row__label`)) || txt(el.querySelector(`label[for="${id}"]`));
   for (let i = 0; i < 2; i++) {

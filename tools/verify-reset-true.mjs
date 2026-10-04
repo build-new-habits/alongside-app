@@ -1,5 +1,10 @@
 /**
  * tools/verify-reset-true.mjs
+ * 04 Oct 2026 v2
+ *
+ * v2 - LOOK-1: Reset all data now lives on the Your data section page;
+ *   openReset() reaches it with settingsFind. No assertion loosened.
+ *
  * 02 Oct 2026 v1
  *
  * W4-16 RESET-TRUE (Wave 4 persona trace). Reset all data said "your
@@ -20,6 +25,7 @@
 import { createRequire as __cr } from "node:module";
 import { agreed } from "./agreed.mjs";
 import { oneScreen } from "./one-screen.mjs";
+import { settingsFind } from "./settings-open.mjs";
 const __require = __cr(import.meta.url);
 const { JSDOM } = __require("jsdom");
 
@@ -61,7 +67,7 @@ function person({ answered = false } = {}) {
 async function openReset() {
   const el = oneScreen(document.createElement("div"));
   SettingsView({ navigate(r) { went = r; }, back() {} }).mount(el); await wait(10);
-  click(el.querySelector('[data-action="reset-data"]')); await wait(10);
+  click(settingsFind(el, '[data-action="reset-data"]')); await wait(10);
   return { el, dlg: document.getElementById("settings-confirm-dialog") };
 }
 

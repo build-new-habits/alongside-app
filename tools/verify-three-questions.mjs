@@ -1,6 +1,10 @@
 /**
  * tools/verify-three-questions.mjs
- * 29 Sep 2026 v1
+ * 04 Oct 2026 v2
+ *
+ * v2 - LOOK-1: the Settings test looks for the "How much sessions change"
+ *   row on each section page in turn (it lives on Sessions now, not the
+ *   index); same text match, no assertion loosened.
  *
  * P14, FOURTH QUESTION (persona finding W2-16). Free was asked a fourth
  * check-in question every time -- "something like last time, or
@@ -15,6 +19,7 @@
  * it), then Settings.
  */
 import { createRequire as __cr } from "node:module";
+import { settingsSection } from "./settings-open.mjs";
 const __require = __cr(import.meta.url);
 const { JSDOM } = __require("jsdom");
 
@@ -85,7 +90,9 @@ console.log("\nTEST - Settings holds the preference");
   const { SettingsView } = await import(B + "views/settings.js");
   const main = document.createElement("div"); main.id = "settings-under-test"; document.body.appendChild(main);
   SettingsView({ navigate() {}, back() {}, history: [] }).mount(main); await wait(30);
-  const row = [...main.querySelectorAll(".settings-row")].find(r => /How much sessions change/.test(r.textContent));
+  const findRow = () => [...main.querySelectorAll(".settings-row")].find(r => /How much sessions change/.test(r.textContent));
+  let row = findRow();
+  for (const id of ["you", "body", "sessions", "display", "data", "plan", "about"]) { if (row) break; settingsSection(main, id); row = findRow(); }
   ok("s-a. the row is there on Free, showing their choice", !!row && /different/i.test(row.textContent), row?.textContent.replace(/\s+/g, " "));
   row?.dispatchEvent(new window.MouseEvent("click", { bubbles: true })); await wait(30);
   const sel = main.querySelector("#settings-pref-variety");

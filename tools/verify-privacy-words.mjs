@@ -1,5 +1,14 @@
 /**
  * tools/verify-privacy-words.mjs
+ * 04 Oct 2026 v3
+ *
+ * v3 - LOOK-1: Settings is an index of section pages. 3a reaches How your
+ *   data is kept with settingsFind (it is on the Your data page). TEST 5
+ *   read the one page; its rows now live on section pages, so "Settings"
+ *   is the index plus every section page, read in turn: 5pc still needs
+ *   Download your data and 5a still finds no "reminder" anywhere in it.
+ *   Same regexes; no assertion was loosened.
+ *
  * 01 Oct 2026 v2
  *
  * v2 - AGE-CHECK. Onboarding asks when you were born before consent; the
@@ -98,8 +107,9 @@ console.log("\nTEST 3 - Settings › How your data is kept says how");
 localStorage.clear(); store.init();
 store.set("onboardingComplete", true); store.set("tier", "personal");
 const { SettingsView } = await import(B + "views/settings.js");
+const { settingsFind, settingsSection, settingsIndex } = await import("./settings-open.mjs");
 main.innerHTML = ""; SettingsView({ navigate(v) { navs.push(v); }, back() {} }).mount(main); await wait(20);
-click(main.querySelector('[data-open="about-data"]')); await wait(20);
+click(settingsFind(main, '[data-open="about-data"]')); await wait(20);
 const panel = txt(main);
 ok("3a. the panel explains: this phone, Sentry, download, delete",
    /on this phone/i.test(panel) && /Sentry/.test(panel) && /Download your data/.test(panel) && /Delete my health answers/.test(panel),
@@ -124,8 +134,12 @@ ok("4a. no screen says \"your account\"", hits.length === 0, hits.join(", "));
 // ── 5. NO REMINDER SWITCHES ─────────────────────────────────────────────
 console.log("\nTEST 5 - no reminder switches");
 main.innerHTML = ""; SettingsView({ navigate(v) { navs.push(v); }, back() {} }).mount(main); await wait(20);
-ok("5pc. positive control: Settings rendered", /Download your data/.test(txt(main)));
-ok("5a. no Reminders group, no check-in or water reminder", !/reminder/i.test(txt(main)), (txt(main).match(/[^.]*reminder[^.]*/i) || [""])[0]);
+// LOOK-1: the index and every section page, read in turn.
+let all = txt(main);
+for (const sec of ["you", "body", "sessions", "display", "data", "plan", "about"]) { settingsSection(main, sec); await wait(5); all += " " + txt(main); }
+settingsIndex(main);
+ok("5pc. positive control: Settings rendered", /Download your data/.test(all));
+ok("5a. no Reminders group, no check-in or water reminder", !/reminder/i.test(all), (all.match(/[^.]*reminder[^.]*/i) || [""])[0]);
 
 // ── 6. PERIMENOPAUSE AND MENOPAUSE ──────────────────────────────────────
 console.log("\nTEST 6 - Perimenopause and Menopause are not sore areas");

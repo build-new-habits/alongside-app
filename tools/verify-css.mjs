@@ -1,5 +1,10 @@
 /**
  * tools/verify-css.mjs
+ * 04 Oct 2026 v7
+ *
+ * v7 - LOOK-2. progress-body is styled now (the overview's card stack), so
+ *   it leaves the hook list, as the check itself asks.
+ *
  * 02 Oct 2026 v6
  *
  * v6 - W4-8. mini-pain-slider left with the update check-in's 0 to 10 slider
@@ -97,7 +102,7 @@ const HOOKS = { "in-step-view": SCOPE,
   "is-movement-card": HOOK, "is-option-btn": HOOK,
   "ms-timer-btn": HOOK, "quiet-back-btn": HOOK, "sb-buildmode-btn": HOOK,
   "sb-duration-btn": HOOK, "sb-type-tile": HOOK,
-  "today-header": WRAP, "progress-body": WRAP, "activity-log-form": WRAP,
+  "today-header": WRAP, "activity-log-form": WRAP,
   "activity-log-picker": WRAP, "is-intro": WRAP,
   "reflect-coach-card": WRAP, "checkin-coach-card": WRAP,
   "gp-moment--glance": WRAP, "gp-moment--reflection": WRAP,

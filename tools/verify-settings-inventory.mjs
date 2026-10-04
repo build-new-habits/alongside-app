@@ -1,6 +1,23 @@
 /**
  * tools/verify-settings-inventory.mjs
- * 02 Oct 2026 v9
+ * 04 Oct 2026 v10
+ *
+ * v10 - LOOK-1. Settings' index shows eight section buttons; a section
+ *   opens as its own page, and a row's screen opens from there. Graeme
+ *   approved "one tap to a section page, one tap to a row's screen", so the
+ *   reach walk (TEST 1) now goes index -> each section page -> each row
+ *   screen; same v553 inventory, same RENAMED/RETIRED lists, same missing
+ *   and Save assertions. 1c/1d cover every row screen on every section page
+ *   (1d also scans the section pages). openScreen() and the on-page
+ *   switches reach their rows through settingsFind. Re-pointed because they
+ *   tested the old layout directly:
+ *     0d - row values are read on the section pages (rows left the index);
+ *          same three expected values.
+ *     2l - "changes in place, on the page" checked the index's lede; the
+ *          switch is on the Sessions page now, so it checks that page is
+ *          still the one shown.
+ *   6c added: Back from the section page lands on the index, on that
+ *   section's button. No expected value changed, no assertion loosened.
  *
  * v9 - W4-23. 0b reads the eight approved sections (Settings is an index
  *   now, verify-settings-rescope); every other assertion unchanged, and
@@ -58,6 +75,7 @@
  * Driven through the real SettingsView and the real store.
  */
 import { agreed } from "./agreed.mjs";
+import { settingsFind, settingsSection } from "./settings-open.mjs";
 import { createRequire as __cr } from "node:module";
 const __require = __cr(import.meta.url);
 const { JSDOM } = __require("jsdom");
@@ -105,7 +123,19 @@ function fixture({ tier = "personal" } = {}) {
 }
 let view = null;
 function page() { main.innerHTML = ""; view = SettingsView({ navigate: v => navs.push(v), back() {} }); view.mount(main); return main; }
-const openScreen = key => { page(); click(main.querySelector(`[data-open="${key}"]`)); };
+const openScreen = key => { page(); click(settingsFind(main, `[data-open="${key}"]`)); };
+// LOOK-1. The section ids the index offers, and the row screens a section page offers.
+const sectionIds = () => [...main.querySelectorAll("[data-section-open]")].map(b => b.dataset.sectionOpen);
+const screensOn = () => [...main.querySelectorAll("[data-open]")].map(b => b.dataset.open);
+/** Every row screen: the index's own (Messages) and each section page's, with where it was found. */
+function allScreens() {
+  page();
+  const out = screensOn().map(k => [null, k]);
+  for (const id of sectionIds()) { page(); settingsSection(main, id); screensOn().forEach(k => out.push([id, k])); }
+  const seen = new Set();
+  return out.filter(([id, k]) => !seen.has(k) && seen.add(k));
+}
+function openFrom(id, key) { page(); if (id) settingsSection(main, id); click(main.querySelector(`[data-open="${key}"]`)); }
 const ATTRS = ["data-action", "data-field", "data-toggle", "data-disp", "data-disp-toggle", "data-scheme", "data-goal", "data-movement", "data-weight-unit", "data-dev-tier", "data-clear-pref"];
 function controlsHere() {
   const out = new Set();
@@ -122,24 +152,37 @@ ok("0a. \"Changes save as you make them.\"", /^Changes save as you make them\.$/
 const groups = [...main.querySelectorAll("[data-section]")].map(s => txt(s.querySelector(".settings-sec__title")));
 ok("0b. the approved sections, in order (W4-23)", JSON.stringify(groups) === JSON.stringify(["You", "Your body", "Sessions", "Display", "Your data", "Messages", "Your plan", "About"]), JSON.stringify(groups));
 ok("0c. no tabs anywhere on it", !main.querySelector('[role="tablist"], [role="tab"]'));
-const val = label => txt([...main.querySelectorAll(".settings-row")].find(r => txt(r.querySelector(".settings-row__label")) === label)?.querySelector(".settings-row__value"));
+// LOOK-1: row values live on the section pages; read each one there.
+const val = label => {
+  page();
+  for (const id of sectionIds()) {
+    page(); settingsSection(main, id);
+    const r = [...main.querySelectorAll(".settings-row")].find(r => txt(r.querySelector(".settings-row__label")) === label);
+    if (r) return txt(r.querySelector(".settings-row__value"));
+  }
+  return "";
+};
 ok("0d. rows show their current value (Equipment: Gym 2 · Home 1; Sore or injured areas: 2 listed; Name: T)",
    val("Equipment") === "Gym 2 · Home 1" && val("Sore or injured areas") === "2 listed" && val("Name") === "T",
    `${val("Equipment")} | ${val("Sore or injured areas")} | ${val("Name")}`);
 
 // ── 1. THE INVENTORY ────────────────────────────────────────────────────
-console.log("\nTEST 1 - every v553 control is within two taps; the Save buttons are gone");
+console.log("\nTEST 1 - every v553 control is one tap to a section, one to a row's screen; the Save buttons are gone");
 const SAVES = INV.filter(c => /^data-action=save-/.test(c.control));
 ok("1pc. positive control: the fixture holds the v553 inventory, six Save buttons among it", INV.length > 90 && SAVES.length === 6, `${INV.length} controls, ${SAVES.length} saves`);
 const reach = new Map();
 for (const tier of ["personal", "free"]) {
   fixture({ tier }); page();
-  controlsHere().forEach(c => reach.has(c) || reach.set(c, "page"));
-  const screens = [...main.querySelectorAll("[data-open]")].map(b => b.dataset.open);
-  for (const k of new Set(screens)) {
-    openScreen(k);
-    controlsHere().forEach(c => reach.has(c) || reach.set(c, `page › ${k}`));
-    const r = main.querySelector('[data-action="toggle-reflection"]'); if (r) { click(r); controlsHere().forEach(c => reach.has(c) || reach.set(c, `page › ${k}`)); }
+  controlsHere().forEach(c => reach.has(c) || reach.set(c, "index"));
+  for (const id of sectionIds()) {
+    page(); settingsSection(main, id);
+    controlsHere().forEach(c => reach.has(c) || reach.set(c, `index › ${id}`));
+  }
+  for (const [id, k] of allScreens()) {
+    openFrom(id, k);
+    const where = id ? `index › ${id} › ${k}` : `index › ${k}`;
+    controlsHere().forEach(c => reach.has(c) || reach.set(c, where));
+    const r = main.querySelector('[data-action="toggle-reflection"]'); if (r) { click(r); controlsHere().forEach(c => reach.has(c) || reach.set(c, where)); }
   }
 }
 // Controls changed on purpose, each named with its reason, and each
@@ -172,13 +215,16 @@ const missing = INV.filter(c => !/^data-action=save-/.test(c.control))
   .filter(c => !RETIRED[c.control])
   .filter(c => !reach.has(RENAMED[c.control] || c.control))
   .map(c => `${c.control} (was ${c.where})`);
-ok("1a. every control reachable in one or two taps", missing.length === 0, missing.join(", "));
+ok("1a. every control reachable: one tap to a section, one to a row's screen (LOOK-1)", missing.length === 0, missing.join(", "));
 const savesLeft = SAVES.filter(c => reach.has(c.control)).map(c => c.control);
 ok("1b. the six Save buttons are gone", savesLeft.length === 0, savesLeft.join(", "));
 fixture(); page();
 const all = [];
-for (const k of new Set([...main.querySelectorAll("[data-open]")].map(b => b.dataset.open))) {
-  openScreen(k);
+const saveBtns = where => [...main.querySelectorAll("button")].filter(b => /^\s*Save\b/i.test(b.textContent)).map(b => `${where}: ${txt(b)}`);
+all.push(...saveBtns("index"));
+for (const id of sectionIds()) { page(); settingsSection(main, id); all.push(...saveBtns(id)); }
+for (const [id, k] of allScreens()) {
+  openFrom(id, k);
   all.push(...[...main.querySelectorAll("button")].filter(b => /^\s*Save\b/i.test(b.textContent)).map(b => `${k}: ${txt(b)}`));
   ok(`1c. ${k}: no third level (no row screens or tabs inside a row screen)`, !main.querySelector("[data-open], [role=tablist]"));
 }
@@ -209,16 +255,16 @@ ok("2h. what your body can do: answered, dated", store.get("capability.chairRise
 cap.value = ""; fire(cap, "change");
 ok("2i. and \"Not answered\" is stored as null, not \"\" (W3-A2)", store.get("capability.chairRise") === null);
 page();
-click(main.querySelector("#settings-lift-log"));
+click(settingsFind(main, "#settings-lift-log"));
 ok("2j. a switch on the page works in place", store.get("liftLogEnabled") === false && main.querySelector("#settings-lift-log")?.getAttribute("aria-checked") === "false");
 const before = getDisplayPref("underline");
-click(main.querySelector("#disp-underline"));
+click(settingsFind(main, "#disp-underline"));
 ok("2k. a display switch too", getDisplayPref("underline") !== before);
 page();
 const pbBefore = store.get("showPersonalBests") === true;
-click(main.querySelector("#settings-pb"));
+click(settingsFind(main, "#settings-pb"));
 ok("2l. a switch changes in place, on the page", (store.get("showPersonalBests") === true) !== pbBefore &&
-   !!main.querySelector(".settings-lede") && main.querySelector("#settings-pb")?.getAttribute("aria-checked") === String(!pbBefore));
+   !!main.querySelector('.settings-secpage[data-section="sessions"]') && !main.querySelector(".settings-screen") && main.querySelector("#settings-pb")?.getAttribute("aria-checked") === String(!pbBefore));
 
 // ── 3. IT'S BETTER NOW ──────────────────────────────────────────────────
 console.log("\nTEST 3 - It's better now, and It's back: the person's call");
@@ -245,7 +291,7 @@ ok("4d. a goal already chosen stays, selected, so it can be taken off", main.que
 // ── 5. DOWNLOAD YOUR DATA ───────────────────────────────────────────────
 console.log("\nTEST 5 - Download your data");
 fixture(); page();
-const row = main.querySelector('[data-action="download-data"]');
+const row = settingsFind(main, '[data-action="download-data"]');
 ok("5a. on the page, saying what the file holds", !!row && /your journal included/.test(txt(row)) && /Saved on this device/.test(txt(row)));
 lastBlob = null; click(row); await wait(20); click(document.getElementById("download-save")); await wait(50);
 const file = lastBlob ? JSON.parse(await lastBlob.text()) : null;
@@ -264,10 +310,12 @@ ok("5d. and it says so, on the page", /downloading to this device\..*anyone who 
 
 // ── 6. TWO LEVELS, BOTH WAYS ────────────────────────────────────────────
 console.log("\nTEST 6 - back from a screen lands on the row you came from");
-fixture(); page(); click(main.querySelector('[data-open="equipment"]'));
+fixture(); page(); click(settingsFind(main, '[data-open="equipment"]'));
 ok("6a. the screen's heading has focus", document.activeElement?.classList.contains("settings-title"));
 click(main.querySelector("#settings-back-btn"));
 ok("6b. back on the page, on Equipment", document.activeElement?.dataset.open === "equipment");
+click(main.querySelector("#settings-back-btn"));
+ok("6c. back again: the index, on Sessions (LOOK-1)", !!main.querySelector(".settings-lede") && document.activeElement?.dataset.sectionOpen === "sessions");
 
 console.log("");
 if (fails) { console.log(`SETTINGS-INVENTORY: ${fails} FAILED, ${passes} passed`); process.exit(1); }

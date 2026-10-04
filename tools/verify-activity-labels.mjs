@@ -1,6 +1,12 @@
 /**
  * tools/verify-activity-labels.mjs
- * 30 Sep 2026 v2
+ * 04 Oct 2026 v3
+ *
+ * v3 - LOOK-2: the summary chips (.progress-summary__type) are gone from
+ *   Progress (progress.js v26); the kinds card names every kind instead.
+ *   4pc/4a read the kinds card's names (.progress-shapes__name) in place of
+ *   the chips. Same assertion: at least three rows, every one in words, no
+ *   raw id and no "gym".
  *
  * v2 - W3-20 TRUE-WORDS. "Mostly X" is said only when X is more than half
  *   (it was said on a plurality, and on a tie). 4b's fixture had gym two
@@ -140,7 +146,8 @@ console.log("\nTEST 4 - Progress names each type in words");
   const LOG = [{ type: "gym", completedAt: at(4, 12) }, { type: "gym", completedAt: at(3, 12) }, { type: "gym", completedAt: at(2, 12) }, { type: "outdoor-cycle", completedAt: at(1, 12) }, { type: "prescribed-session", completedAt: at(1, 14) }];
   fixture("personal", LOG);
   main.innerHTML = ""; ProgressView(rtr).mount(main); await wait(60);
-  const types = [...main.querySelectorAll(".progress-summary__type")].map(txt);
+  // LOOK-2: the chips are gone; the kinds card names every kind.
+  const types = [...main.querySelectorAll(".progress-shapes__name")].map(txt);
   ok("4pc. the Plan's breakdown lists what was done", types.length >= 3, txt(main).slice(0, 200));
   ok("4a. every row is words, no raw id", types.length >= 3 && types.every(s => !/-|\bgym\b/.test(s.replace(/ × \d+$/, ""))), JSON.stringify(types));
   fixture("free", LOG);

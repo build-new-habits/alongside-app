@@ -1,6 +1,13 @@
 /**
  * tools/verify-cycle-claim.mjs
- * 30 Sep 2026 v1
+ * 04 Oct 2026 v2
+ *
+ * v2 - LOOK-1: Settings is now an index; its rows live on section pages.
+ *      "The page" in 1pc/1a is now the index plus every section page
+ *      (each opened in turn), so 1a still reads every row Settings shows;
+ *      1pc's /Your profile|Name/ is looked for in that text (Name is on
+ *      the You page now, not the index). 1b opens Your profile through
+ *      settingsFind. Same regexes; no assertion was loosened.
  *
  * W3-8 CYCLE-CLAIM (Wave 3, persona 2.4). Settings offered "Cycle-aware
  * coaching -- Adapts sessions to your hormonal cycle", and in Your
@@ -41,6 +48,7 @@ for (const [k, v] of [["requestAnimationFrame", cb => setTimeout(() => cb(Date.n
 const B = new URL("../js/", import.meta.url).href;
 const { store } = await import(B + "store.js");
 const { SettingsView } = await import(B + "views/settings.js");
+const { settingsFind, settingsSection, settingsIndex } = await import("./settings-open.mjs");
 let fails = 0, passes = 0;
 const ok = (name, cond, detail = "") => {
   console.log(`  ${cond ? "PASS" : "FAIL"}  ${name}`);
@@ -61,11 +69,16 @@ for (const tier of ["free", "personal"]) {
   localStorage.clear(); store.init();
   store.set("onboardingComplete", true); store.set("tier", tier); store.set("name", "T");
   main.innerHTML = ""; SettingsView(rtr).mount(main); await wait(20);
-  const page = txt(main);
+  // LOOK-1: the index and every section page, as one reads them in turn.
+  let page = txt(main);
+  for (const sec of ["you", "body", "sessions", "display", "data", "plan", "about"]) {
+    settingsSection(main, sec); await wait(5); page += " " + txt(main);
+  }
+  settingsIndex(main); await wait(5);
   ok(`1pc. ${tier}: Settings is showing`, /Your profile|Name/.test(page), page.slice(0, 120));
   ok(`1a. ${tier}: the page makes no cycle claim`, !CLAIM.test(page), (page.match(/.{20}cycle.{30}/i) || [""])[0]);
   shown = shown || CLAIM.test(page);
-  main.querySelector('[data-open="profile"]')?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true })); await wait(20);
+  settingsFind(main, '[data-open="profile"]')?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true })); await wait(20);
   const prof = txt(main);
   ok(`1b. ${tier}: Your profile opened, and makes no cycle claim`, /Your profile/.test(prof) && !CLAIM.test(prof), (prof.match(/.{20}cycle.{30}/i) || [prof.slice(0, 80)])[0]);
   shown = shown || CLAIM.test(prof);

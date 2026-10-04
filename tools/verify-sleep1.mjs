@@ -1,6 +1,15 @@
 /**
  * tools/verify-sleep1.mjs
- * 02 Oct 2026 v5
+ * 04 Oct 2026 v6
+ *
+ * v6 - LOOK-1. Settings' rows live on section pages, not the index. Check 5
+ *   ("rows on the one page") tested the old layout directly: it now gathers
+ *   the row labels from every section page (index -> each section), so it
+ *   still holds that each dial is a named row one section away. Checks 6-10
+ *   open each row through settingsFind (index -> the section that holds it
+ *   -> the row). Before this, check 9 passed only because the profile row
+ *   was never reached; it now reads the real Profile screen. No expected
+ *   value changed, no assertion loosened.
  *
  * v5 - W4-1 GATE-OPEN. The fixture person has agreed (tools/agreed.mjs): the
  *   app now sends anybody who has not back to onboarding. No assertion
@@ -51,6 +60,7 @@
 // GATE-PATH, 21 Aug 2026. jsdom resolved through Node rather than by
 // absolute path into one machine's node_modules.
 import { agreed } from "./agreed.mjs";
+import { settingsFind, settingsSection } from "./settings-open.mjs";
 import { createRequire as __cr } from "node:module";
 const __require = __cr(import.meta.url);
 import fs from 'node:fs';
@@ -142,11 +152,14 @@ const settings = SettingsMod.SettingsView(router);
 settings.mount(el);
 
 const click = x => x?.dispatchEvent(new dom.window.MouseEvent('click', { bubbles: true }));
-const rowLabels = [...el.querySelectorAll('.settings-row__label')].map(r => r.textContent.trim());
+const rowLabels = ['you', 'body', 'sessions', 'display', 'data', 'plan', 'about'].flatMap(id => {
+  settingsSection(el, id);
+  return [...el.querySelectorAll('.settings-secpage .settings-row__label')].map(r => r.textContent.trim());
+});
 check('5  the three dials are rows on the one page, by name',
   ['What your body can do', 'How much sessions change', 'Your reflection'].every(l => rowLabels.includes(l)), rowLabels.join(', '));
 
-const open = key => { SettingsMod.SettingsView(router).mount(el); click(el.querySelector(`[data-open="${key}"]`)); return el.textContent.replace(/\s+/g, ' ').trim(); };
+const open = key => { SettingsMod.SettingsView(router).mount(el); click(settingsFind(el, `[data-open="${key}"]`)); return el.textContent.replace(/\s+/g, ' ').trim(); };
 check('6  What your body can do opens its own screen', /What your body can do today/.test(open('capability')));
 check('7  and so do the other two',
   /How you like things/.test(open('preferences')) && /Your reflection/.test(open('reflection')),

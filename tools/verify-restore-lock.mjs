@@ -1,5 +1,12 @@
 /**
  * tools/verify-restore-lock.mjs
+ * 04 Oct 2026 v5
+ *
+ * v5 - LOOK-1: Download your data and Restore from a file are on the Your
+ *   data section page, not the Settings index; the clicks find them with
+ *   settingsFind. #settings-result is read on that page as before. No
+ *   assertion loosened.
+ *
  * 02 Oct 2026 v4
  *
  * v4 - W4-13. Fixtures give the health consent at the current version: given
@@ -32,6 +39,7 @@
  *   4. The password is not kept: nothing in Alongside's storage holds it.
  */
 import { createRequire as __cr } from "node:module";
+import { settingsFind } from "./settings-open.mjs";
 import { HEALTH_CONSENT_VERSION as HEALTH_V } from "../js/data/health-consent.js";
 const __require = __cr(import.meta.url);
 const { JSDOM } = __require("jsdom");
@@ -113,7 +121,7 @@ const saved = () => txt(main.querySelector("#settings-result"));
 
 phone(); mount(); await wait(20);
 lastBlob = null;
-click(main.querySelector('[data-action="download-data"]')); await wait(20);
+click(settingsFind(main, '[data-action="download-data"]')); await wait(20);
 ok("2pc. positive control: the Download button is there and opens a dialog", !!dlg());
 ok("2a. nothing is saved until the person chooses", lastBlob === null);
 const pw = () => document.getElementById("download-pw"), pw2 = () => document.getElementById("download-pw2");
@@ -128,7 +136,7 @@ const plainFile = await blobText(lastBlob);
 ok("2d. no password: the plain file, as before", !!plainFile && JSON.parse(plainFile).store?.journalEntries?.[0]?.text === JOURNAL && !dlg());
 ok("2e. and the message says anyone with it can read it", /anyone who has the file can read it/.test(saved()), saved());
 
-lastBlob = null; click(main.querySelector('[data-action="download-data"]')); await wait(20);
+lastBlob = null; click(settingsFind(main, '[data-action="download-data"]')); await wait(20);
 type(pw(), "short"); type(pw2(), "short"); click(document.getElementById("download-save")); await wait(60);
 ok("2f. a short password: nothing saved, the reason said where the person is",
    lastBlob === null && !!dlg() && /at least 8/.test(txt(document.getElementById("download-pw-error"))) &&
@@ -155,7 +163,7 @@ let picked = null;
 const origClick = dom.window.HTMLInputElement.prototype.click;
 dom.window.HTMLInputElement.prototype.click = function () { if (this.type === "file") picked = this; else origClick.call(this); };
 async function pick(text) {
-  picked = null; click(main.querySelector('[data-action="restore-data"]')); await wait(20);
+  picked = null; click(settingsFind(main, '[data-action="restore-data"]')); await wait(20);
   Object.defineProperty(picked, "files", { value: [new File([text], "alongside-data-locked.json", { type: "application/json" })] });
   picked.dispatchEvent(new dom.window.Event("change")); await wait(80);
 }

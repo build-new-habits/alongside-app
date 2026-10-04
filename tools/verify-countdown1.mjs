@@ -1,5 +1,13 @@
 /**
  * tools/verify-countdown1.mjs
+ * 04 Oct 2026 v3
+ *
+ * v3 - LOOK-2: the programme block is on its own page, one tap away
+ *   (progress.js v26). REACH only: each state now reads the overview AND
+ *   the programme page (opened from its row), so every banned pattern is
+ *   checked against both and the kept milestones are read on the page.
+ *   No expected value changed.
+ *
  * 21 Aug 2026 v2
  * GATE-PATH. Path resolution only -- no assertion changed.
  *
@@ -87,8 +95,14 @@ let threw = null;
 try { ProgressView({ navigate: () => {} }).mount(el); } catch (e) { threw = e; }
 check('Progress mounts', !threw, threw ? String(threw) : '');
 
-const html = el.innerHTML;
-const text = el.textContent.replace(/\s+/g, ' ');
+// LOOK-2: the overview, then the programme page opened from its row.
+// Both are checked: a countdown on either is a countdown.
+const openProgramme = (c) => {
+  const overview = c.innerHTML, overviewText = c.textContent;
+  c.querySelector('[data-pr-page="programme"]')?.dispatchEvent(new window.MouseEvent('click', { bubbles: true }));
+  return { html: overview + c.innerHTML, text: (overviewText + ' ' + c.textContent).replace(/\s+/g, ' ') };
+};
+const { html, text } = openProgramme(el);
 
 check('the programme section still renders', /progress-programme/.test(html));
 check('and says how many weeks are BEHIND them', /8 weeks in/.test(text));
@@ -134,12 +148,13 @@ let threw2 = null;
 try { ProgressView({ navigate: () => {} }).mount(el2); } catch (e) { threw2 = e; }
 check('Progress mounts in the late state', !threw2, threw2 ? String(threw2) : '');
 
-const lateHtml = el2.innerHTML;
+const late = openProgramme(el2);
+const lateHtml = late.html;
 for (const [re, what] of BANNED) {
   check(`no ${what}, late in a chapter either`, !re.test(lateHtml));
 }
 check('and the late milestone faces backwards',
-  /11 weeks in/.test(el2.textContent.replace(/\s+/g, ' ')),
+  /11 weeks in/.test(late.text),
   'the milestone is kept — it just stops describing what is left');
 
 // 4. Product-wide. The scoped version of this gate is what let the

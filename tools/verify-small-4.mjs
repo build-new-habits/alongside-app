@@ -1,6 +1,9 @@
 /**
  * tools/verify-small-4.mjs
- * 02 Oct 2026 v1
+ * 04 Oct 2026 v2
+ *
+ * v2 - LOOK-1: 5c reaches the vibration switch through settingsFind (index
+ *      -> the section page that holds it); no assertion loosened.
  *
  * W4-22 SMALL-4 (Wave 4 persona trace). One assertion each:
  *
@@ -16,6 +19,7 @@ import { createRequire as __cr } from "node:module";
 import { readFileSync, readdirSync } from "node:fs";
 import { agreed } from "./agreed.mjs";
 import { oneScreen } from "./one-screen.mjs";
+import { settingsFind } from "./settings-open.mjs";
 const __require = __cr(import.meta.url);
 const { JSDOM } = __require("jsdom");
 
@@ -125,7 +129,7 @@ ok("5b. on: it does", buzzes === 1, `buzzes ${buzzes}`);
 const S = await import(B + "views/settings.js");
 person();
 const sel = oneScreen(document.createElement("div")); S.SettingsView({ navigate() {}, back() {} }).mount(sel); await wait(10);
-ok("5c. Settings has the switch", !!sel.querySelector('[data-disp-toggle="vibration"]'));
+ok("5c. Settings has the switch", !!settingsFind(sel, '[data-disp-toggle="vibration"]'));
 const walk = d => readdirSync(new URL(d, ROOT), { withFileTypes: true }).flatMap(f => f.isDirectory() ? walk(`${d}${f.name}/`) : f.name.endsWith(".js") ? [`${d}${f.name}`] : []);
 const other = walk("js/").filter(f => /vibrate\(/.test(readFileSync(new URL(f, ROOT), "utf8").replace(/navigator\.vibrate\(|function vibrate\(|vibrate\(\d|\bvibrate\(\[/g, "")));
 ok("5d. every vibration goes through navigator.vibrate (so the setting reaches it)", other.length === 0, other.join(", "));

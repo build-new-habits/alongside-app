@@ -1,5 +1,11 @@
 /**
  * tools/verify-legal-true.mjs
+ * 04 Oct 2026 v4
+ *
+ * v4 - LOOK-1: Reset all data is no longer on the Settings index; 2pc now
+ *   opens the Your data section page (settingsSection) before finding the
+ *   row the same way. No assertion loosened.
+ *
  * 03 Oct 2026 v3
  *
  * v3 - W5-24 (Graeme, 03 Oct: drop the copy). 1d: an under-18 answer
@@ -96,7 +102,9 @@ ok("1d. an under-18 answer clears them too, at once, keeping only that answer",
 
 fixture();
 const { SettingsView } = await import(B + "views/settings.js");
+const { settingsSection } = await import("./settings-open.mjs");
 main.innerHTML = ""; SettingsView({ navigate() {}, back() {} }).mount(main); await wait(20);
+settingsSection(main, "data");
 const resetRow = main.querySelector('[data-action="reset"], [data-action="reset-all"]') ||
   [...main.querySelectorAll(".settings-row")].find(b => /Reset all data/.test(txt(b)));
 ok("2pc. positive control: Settings has Reset all data", !!resetRow);

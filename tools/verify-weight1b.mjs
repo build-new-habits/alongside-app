@@ -1,5 +1,20 @@
 /**
  * tools/verify-weight1b.mjs
+ * 04 Oct 2026 v9
+ *
+ * v9 - LOOK-1: Settings is an index of section pages; the Name row
+ *   (open:profile) lives on the You page. mount() reaches it through
+ *   settingsFind. The profile screen still carries the weight section, so
+ *   every check reads the same screen as before.
+ *   LOOK-2: the weight log and #weight-log-input are on Progress's own
+ *   weight page ([data-pr-page="weight"]); the rate note stays on the
+ *   overview. mountProgress opens the weight page by default (as a person
+ *   taps the row); the rate-note checks read the overview, where the note
+ *   is. "no chart or trend line" reads the whole weight page but sets
+ *   aside the page's own decorative header tile (.pr-tile, aria-hidden),
+ *   which LOOK-2 added to every Progress page; anything else drawn there
+ *   still fails it. No expected value changed.
+ *
  * 02 Oct 2026 v8
  *
  * v8 - W4-13. Fixtures give the health consent at the current version: given
@@ -63,6 +78,7 @@
  */
 
 import { oneScreen } from "./one-screen.mjs";
+import { settingsFind } from "./settings-open.mjs";
 import { HEALTH_CONSENT_VERSION as HEALTH_V } from "../js/data/health-consent.js";
 import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
@@ -116,7 +132,7 @@ async function mount(state) {
   // and reported "the toggle exists on the Plan: FAIL" against correct
   // code. Read the navigation, do not guess at it -- fourth fixture
   // fault of the day, same shape every time.
-  el.querySelector('[data-open="profile"]')?.dispatchEvent(new dom.window.Event("click"));
+  settingsFind(el, '[data-open="profile"]')?.dispatchEvent(new dom.window.Event("click"));
   await wait(80);
   return el;
 }
@@ -415,7 +431,7 @@ async function mountProgramme(over = {}) {
 // ── 8. The log, and the sustained-rate note ─────────────────────────
 section("8. The weight log in Progress");
 
-async function mountProgress(over = {}) {
+async function mountProgress(over = {}, page = "weight") {
   localStorage.clear();
   localStorage.setItem("alongside_user", JSON.stringify({
     tier: "personal", name: "Test",
@@ -430,6 +446,8 @@ async function mountProgress(over = {}) {
   const v = ProgressView({ navigate() {} });
   (v.mount || v.render).call(v, el);
   await wait(80);
+  // LOOK-2: the log is one tap away, on its own page.
+  if (page) el.querySelector(`[data-pr-page="${page}"]`)?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }));
   return el;
 }
 
@@ -466,7 +484,7 @@ function fallingLog(weeks, kgPerWeek, startKg = 100) {
   // NO CHART. A slope invites reading, and reading a slope is the
   // arithmetic on the body this product refuses.
   ok("no chart or trend line rendered",
-     on.querySelector("svg, canvas, .progress-weight__chart") === null);
+     [...on.querySelectorAll("svg, canvas, .progress-weight__chart")].filter(n => !n.closest(".pr-tile")).length === 0);
 }
 
 {
@@ -496,11 +514,11 @@ function fallingLog(weeks, kgPerWeek, startKg = 100) {
 
 {
   // THE SUSTAINED-RATE NOTE. RATE_REFUSE is ~1.361 kg/wk.
-  const slow = await mountProgress({ weightLog: fallingLog(4, 0.4) });
+  const slow = await mountProgress({ weightLog: fallingLog(4, 0.4) }, null);
   ok("a gentle rate says nothing",
      slow.querySelector(".progress-weight__note") === null, txt(slow).slice(0, 160));
 
-  const fast = await mountProgress({ weightLog: fallingLog(4, RATE_REFUSE + 0.2) });
+  const fast = await mountProgress({ weightLog: fallingLog(4, RATE_REFUSE + 0.2) }, null);
   const note = fast.querySelector(".progress-weight__note");
   ok("a sustained fast rate IS raised", note !== null, txt(fast).slice(0, 200));
   ok("it points outward", /GP|dietitian/i.test(txt(note)), txt(note));
@@ -522,7 +540,7 @@ function fallingLog(weeks, kgPerWeek, startKg = 100) {
   const again = await mountProgress({
     weightLog: fallingLog(4, RATE_REFUSE + 0.2),
     weightRateRaisedAt: new Date().toISOString()
-  });
+  }, null);
   ok("it never speaks a second time",
      again.querySelector(".progress-weight__note") === null, txt(again).slice(0, 160));
 }
@@ -564,10 +582,10 @@ function fallingLog(weeks, kgPerWeek, startKg = 100) {
 {
   // Gaining or holding steady must not trigger it. The rule is about
   // sustained LOSS.
-  const gaining = await mountProgress({ weightLog: fallingLog(4, -0.5) });
+  const gaining = await mountProgress({ weightLog: fallingLog(4, -0.5) }, null);
   ok("gaining weight is never raised",
      gaining.querySelector(".progress-weight__note") === null);
-  const flat = await mountProgress({ weightLog: fallingLog(4, 0) });
+  const flat = await mountProgress({ weightLog: fallingLog(4, 0) }, null);
   ok("a steady weight is never raised",
      flat.querySelector(".progress-weight__note") === null);
 }

@@ -1,5 +1,13 @@
 /**
  * tools/verify-verify-contrast-check.mjs
+ * 04 Oct 2026 v3
+ *
+ * v3 - LOOK-3 COLOUR (Graeme, 04 Oct: "Both lack colour"). Seven kind
+ *   colours (--kind-teal, amber, violet, blue, rose, green, slate), one per
+ *   kind of session, defined in every scheme. As text they sit only on the
+ *   page and the card ground (deep, bg): 4.5:1 there. On the raised
+ *   surfaces they are shapes only (tiles, bars, dots): 3:1 there.
+ *
  * 12 Aug 2026 v2
  *
  * v2 - SCHEME-1. Runs the full matrix against all three schemes (dark,
@@ -108,6 +116,20 @@ for (const [name, selector] of Object.entries(SCHEMES)) {
     const ok = v >= AA_UI;
     if (!ok) fails++;
     console.log(`  ${label.padEnd(30)} ${v.toFixed(2).padStart(6)}  ${ok ? "PASS" : "FAIL"}`);
+  }
+
+  // LOOK-3. Kind colours: text on the page and card ground, shapes on
+  // the raised surfaces. A scheme that forgot one falls back to :root,
+  // which is how a pale dark-scheme colour would land on white -- caught.
+  console.log("\nLOOK-3 - kind colours (text 4.5:1 on deep/bg, shapes 3:1 on card/elevated)");
+  for (const k of ["teal","amber","violet","blue","rose","green","slate"]) {
+    const t = tok(`kind-${k}`);
+    const text  = Math.min(cr(t, tok("color-bg-deep")), cr(t, tok("color-bg")));
+    const shape = Math.min(cr(t, tok("color-bg-card")), cr(t, tok("color-bg-elevated")));
+    const okT = text >= AA_TEXT, okS = shape >= AA_UI;
+    if (!okT) fails++;
+    if (!okS) fails++;
+    console.log(`  kind-${k.padEnd(7)} text ${text.toFixed(2).padStart(6)} ${okT ? "PASS" : "FAIL"}   shape ${shape.toFixed(2).padStart(6)} ${okS ? "PASS" : "FAIL"}`);
   }
 
   console.log("\nRegression guard - the exact pair A11Y-1 was raised for");

@@ -1,6 +1,10 @@
 /**
  * tools/verify-sheet-close.mjs
- * 30 Sep 2026 v2
+ * 04 Oct 2026 v3
+ *
+ * v3 - LOOK-1: TEST 5 reaches the Equipment row through settingsFind
+ *   (index -> the Sessions section page -> the row's screen), since the
+ *   row is no longer on the index. No assertion loosened.
  *
  * v2 - Timing only. 5a/5b waited a fixed 60 ms for the equipment sheet,
  *   which loads its content on demand; under the full parallel suite on a
@@ -29,6 +33,7 @@
  * tools/chromium-sheets.mjs (needs Chromium; not part of the suite).
  */
 import { createRequire as __cr } from "node:module";
+import { settingsFind } from "./settings-open.mjs";
 const __require = __cr(import.meta.url);
 const { JSDOM } = __require("jsdom");
 
@@ -157,7 +162,7 @@ PANEL_TRANSITION = "0s";
   fixture();
   const { SettingsView } = await import(B + "views/settings.js");
   main.innerHTML = ""; SettingsView(rtr).mount(main); await wait(20);
-  click(main.querySelector('[data-open="equipment"]')); await wait(20);
+  click(settingsFind(main, '[data-open="equipment"]')); await wait(20);
   const row = main.querySelector('[data-action="edit-equipment"]');
   ok("5pc. Settings shows the equipment row", !!row);
   click(row);

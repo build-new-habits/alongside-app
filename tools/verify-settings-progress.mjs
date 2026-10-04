@@ -1,5 +1,17 @@
 /**
  * tools/verify-settings-progress.mjs
+ * 04 Oct 2026 v6
+ *
+ * v6 - LOOK-1/LOOK-2: re-pointed at the new shapes. Settings is an index
+ *   of section buttons, each opening its own page whose rows open screens;
+ *   test 0 now presses everything on the index, on every section page, and
+ *   on every row screen (from its section page; Messages from the index).
+ *   Progress is an overview plus pages one tap away ([data-pr-page]); test
+ *   0 presses everything on the overview and on every page it opens.
+ *   Test 3 opens Share your progress (where the export buttons now are)
+ *   before copying. Every assertion and threshold is unchanged, including
+ *   "every destination registered" and "nothing retired named".
+ *
  * 29 Sep 2026 v5
  *
  * v5 - The 3c flake, found rather than waited out. Reproduced under load
@@ -149,18 +161,37 @@ console.log("\nTEST 0 - fixture reach: both screens mount and have things to pre
 const allNavs = []; const allTexts = []; let pressed = 0; const screensOpened = new Set(); const screenKeys = new Set();
 for (const tier of ["personal", "free"]) {
   fixture(tier);
-  const mountPage = () => { fixture(tier); main.innerHTML = ""; SettingsView(rtr).mount(main); };
-  mountPage();
-  const keys = [...new Set([...main.querySelectorAll("[data-open]")].map(b => b.dataset.open))];
-  keys.forEach(k => screenKeys.add(k));
-  let r = pressAll(mountPage, `settings (${tier})`); allNavs.push(...r.seen); allTexts.push(...r.texts); pressed += r.n;
-  for (const k of keys) {
-    const mountScreen = () => { mountPage(); click(main.querySelector(`[data-open="${k}"]`)); };
-    mountScreen(); if (main.querySelector("#settings-back-btn")) screensOpened.add(k);
-    r = pressAll(mountScreen, `settings › ${k} (${tier})`); allNavs.push(...r.seen); allTexts.push(...r.texts); pressed += r.n;
+  // LOOK-1. The index, each section's page, and each row's screen.
+  const mountIndex = () => { fixture(tier); main.innerHTML = ""; SettingsView(rtr).mount(main); };
+  mountIndex();
+  const sections = [...main.querySelectorAll("[data-section-open]")].map(b => b.dataset.sectionOpen);
+  const indexKeys = [...new Set([...main.querySelectorAll("[data-open]")].map(b => b.dataset.open))];
+  let r = pressAll(mountIndex, `settings (${tier})`); allNavs.push(...r.seen); allTexts.push(...r.texts); pressed += r.n;
+  const openScreens = (mountFrom, keys, where) => {
+    keys.forEach(k => screenKeys.add(k));
+    for (const k of keys) {
+      const mountScreen = () => { mountFrom(); click(main.querySelector(`[data-open="${k}"]`)); };
+      mountScreen(); if (main.querySelector("#settings-back-btn")) screensOpened.add(k);
+      r = pressAll(mountScreen, `settings › ${where}${k} (${tier})`); allNavs.push(...r.seen); allTexts.push(...r.texts); pressed += r.n;
+    }
+  };
+  openScreens(mountIndex, indexKeys, "");
+  for (const sec of sections) {
+    const mountSection = () => { mountIndex(); click(main.querySelector(`[data-section-open="${sec}"]`)); };
+    mountSection();
+    const keys = [...new Set([...main.querySelectorAll("[data-open]")].map(b => b.dataset.open))];
+    r = pressAll(mountSection, `settings › ${sec} (${tier})`); allNavs.push(...r.seen); allTexts.push(...r.texts); pressed += r.n;
+    openScreens(mountSection, keys, `${sec} › `);
   }
+  // LOOK-2. The overview, and every page one tap away.
   const mountProgress = () => { fixture(tier); main.innerHTML = ""; ProgressView(rtr).mount(main); };
+  mountProgress();
+  const pages = [...main.querySelectorAll("[data-pr-page]")].map(b => b.dataset.prPage);
   r = pressAll(mountProgress, `progress (${tier})`); allNavs.push(...r.seen); allTexts.push(...r.texts); pressed += r.n;
+  for (const pg of pages) {
+    const mountPg = () => { mountProgress(); click(main.querySelector(`[data-pr-page="${pg}"]`)); };
+    r = pressAll(mountPg, `progress › ${pg} (${tier})`); allNavs.push(...r.seen); allTexts.push(...r.texts); pressed += r.n;
+  }
 }
 ok("0a. every Settings screen a row opens was opened (and there are many)", screenKeys.size >= 12 && [...screenKeys].every(k => screensOpened.has(k)),
    [...screenKeys].filter(k => !screensOpened.has(k)).join(", ") || [...screensOpened].join(", "));
@@ -196,6 +227,7 @@ for (let i = 0; i < 5 && document.querySelector(".sheet-panel.is-open"); i++) {
 }
 await wait(300);
 fixture("personal"); main.innerHTML = ""; ProgressView(rtr).mount(main);
+click(main.querySelector('[data-pr-page="share"]'));   // LOOK-2: the export buttons are on their own page
 let copied = null;
 Object.defineProperty(globalThis.navigator, "clipboard", { value: { writeText: t => { copied = t; return Promise.resolve(); } }, configurable: true });
 const until = async (fn, ms = 8000) => { const end = Date.now() + ms; while (!fn() && Date.now() < end) await wait(10); };
