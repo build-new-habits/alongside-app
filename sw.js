@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 04 Oct 2026 v646
+ * 04 Oct 2026 v647
  *
+ * v647 - D-1/D-2 (device test, 04 Oct): each exercise is four steps again, Why, Watch out, How, Capture, with "I know this one: go to capture", today's caution on every step and If it hurts on Capture; tap an exercise on the plan to see why, what to watch out for and how before you start, with Swap it on the Plan.
  * v646 - LOOK-4 (Graeme, 04 Oct): Home on both tiers, the finish screen, Wellbeing and the Library take the Settings and Progress look: cards, a kind-colour tile with a line icon beside every choice, numbers as tiles; the Library shows every kind of session on its first page (one tap fewer). NEW FILE precached: js/data/line-icons.js.
  * v645 - LOOK-1/LOOK-2/LOOK-3 (Graeme, 04 Oct): each Settings section opens as its own page, from an index of coloured rows saying what is set now; Progress is two numbers, one coach line, labelled weekly bars, the kinds of session in colour (every kind named and counted) and the arc, with lifts, weight, Build Your Base and Share one tap away on their own pages; seven kind colours in every scheme. NEW FILE precached: js/data/kind-colours.js.
  * v644 - W6-1/W6-2/W6-5: on a Bad day every door that starts a session asks Rest today or Something gentler first (the builder and the Library's walk, core, ride and swim too), with one gentle plan from the coach; the coach's choice in the same words; Stay in session carries a run, walk, ride or swim on; an untapped run prompt clears after a minute; the run's progress bar follows it.
@@ -4193,7 +4194,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v646";
+const CACHE_NAME = "alongside-v647";
 
 const SHELL_URLS = [
 
