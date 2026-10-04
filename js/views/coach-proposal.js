@@ -1,5 +1,14 @@
 /**
  * coach-proposal.js
+ * 04 Oct 2026 v52
+ *
+ * v52 - W6-1 BAD-DAY-BUILDER-2. The Bad-day choice uses the words every
+ *   other door uses (Rest today, Something gentler), each named by its
+ *   visible words; the region is named A bad day: rest or something gentler
+ *   (it was Severe pain and Adapt and continue). The stored plan carries
+ *   gentleCare and gentleReason, so the player and the log know a gentle or
+ *   lighter plan.
+ *
  * 02 Oct 2026 v51
  *
  * v51 - W5-15. "Based on your arc" only when the arc has a strand that
@@ -994,17 +1003,15 @@ export function CoachProposalView(router) {
 
   function renderSevereChoice() {
     return `
-      <div class="cp-missed-offer" role="region" aria-label="Severe pain — choose how to proceed today">
-        <div class="cp-missed-offer__choices" role="group" aria-label="Rest or adapt">
-          <button class="cp-missed-offer__btn" data-severe-choice="rest"
-                  aria-label="Rest today — no session">
+      <div class="cp-missed-offer" role="region" aria-label="A bad day: rest or something gentler">
+        <div class="cp-missed-offer__choices" role="group" aria-label="Rest or something gentler">
+          <button class="cp-missed-offer__btn" data-severe-choice="rest">
             Rest today
             <span class="cp-missed-offer__sub">Nothing pushed today \u2014 the right call some days</span>
           </button>
-          <button class="cp-missed-offer__btn" data-severe-choice="adapt"
-                  aria-label="Adapt and continue with something gentler">
-            Adapt and continue
-            <span class="cp-missed-offer__sub">Something gentler, that asks less of the sore area</span>
+          <button class="cp-missed-offer__btn" data-severe-choice="adapt">
+            Something gentler
+            <span class="cp-missed-offer__sub">Asks less of the sore area</span>
           </button>
         </div>
       </div>
@@ -2596,6 +2603,10 @@ export function CoachProposalView(router) {
       stretchTarget: built.stretchTarget || null,
       // W3-10. A lighter day the person can turn down.
       lighter:       built.gentleReason === 'streak',
+      // W6-1 / W6-7. Carried onto the stored plan, so the player and the
+      // log know a gentle or lighter plan for what it is.
+      gentleCare:    !!built.gentleCare,
+      gentleReason:  built.gentleReason || null,
       inputs:        { ...inputs, chosenType: sessionType, reason },
       _pools:        buildCandidatePools(args)
     }];

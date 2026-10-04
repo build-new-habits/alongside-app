@@ -1,6 +1,11 @@
 /**
  * bad-day-door.js - the Bad-day choice, for every door that starts a session
  *
+ * 04 Oct 2026 v2
+ *
+ * v2 - W6-1. The line under Something gentler says what it does (Asks less
+ *   of the sore area); a screen reader heard Something gentler twice.
+ *
  * 02 Oct 2026 v1
  *
  * v1 - W5-1, W5-2 (Wave 5 persona trace: 2.12, 2.14, 2.16). On a Bad day
@@ -49,7 +54,7 @@ export function renderBadDayDoor(title = "Before you start") {
         </button>
         <button class="ws-type-card" data-bad-day="adapt">
           <span class="ws-type-label">Something gentler</span>
-          <span class="ws-type-desc">Something gentler, that asks less of the sore area</span>
+          <span class="ws-type-desc">Asks less of the sore area</span>
         </button>
       </div>
     </div>`;

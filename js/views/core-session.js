@@ -1,6 +1,12 @@
 /**
  * core-session.js - Guided Core Session
  *
+ * 04 Oct 2026 v20
+ *
+ * v20 - W6-2. Before a core session starts a Bad day asks first (Library
+ *   Core went straight in). The exit card offers to save or not, with no
+ *   won't be saved line.
+ *
  * 02 Oct 2026 v19
  *
  * v19 - W5-12. The finish says the minutes done (from the session clock),
@@ -258,6 +264,7 @@ import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
 import { EXERCISES, filterByConditions } from "../data/exercises/index.js";
 import { personFilter } from "../session-builder.js";
 import { getActiveConditionIds, getConditionName, isSore, isAcute, soreLine } from "../data/conditions.js";
+import { badDayIds, renderBadDayDoor, wireBadDayDoor } from "./bad-day-door.js";
 
 export const centered = false;
 
@@ -464,7 +471,12 @@ function buildConditionNote() {
 
 // ── Render ────────────────────────────────────────────────────────────────────
 
+// W6-2. Before a core session starts, a Bad day asks first, as every other
+// door does (Library › Core went straight to the session).
+const _beforeStart = () => ["focus", "duration", "overview", "intro"].includes(phase);
+
 export function render() {
+  if (_beforeStart() && badDayIds().length) return renderBadDayDoor("Before you start");
   if (phase === "focus")    return renderFocusSelector();
   if (phase === "duration") return renderDurationSelector();
   // P17. The shared filters can leave a focus with nothing for somebody.
@@ -1133,7 +1145,7 @@ function showExitConfirm() {
       <div class="session-exit-coach-row">
         <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
         <p class="session-exit-coach-text">
-          Hold on — if you leave now this session won’t be saved. Are you sure?
+          Hold on — leave this session? You can save what you’ve done so far, or leave without saving it.
         </p>
       </div>
       <div class="session-exit-actions">
@@ -1246,6 +1258,10 @@ function rerender() {
 // ── Mount ─────────────────────────────────────────────────────────────────────
 
 export function onMount() {
+  if (_beforeStart() && badDayIds().length) {
+    wireBadDayDoor(document.getElementById("main-content") || document, resetSession);
+    return;
+  }
   // SAFETY-GATE. Returns early: with the gate up there is no card, timer
   // or log block on screen, so everything below would bind to nothing.
   if (phase === "session" && currentIndex === 0 && isGateDue()) {

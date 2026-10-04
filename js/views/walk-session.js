@@ -1,6 +1,12 @@
 /**
  * walk-session.js - Coached Walk Session
  *
+ * 04 Oct 2026 v8
+ *
+ * v8 - W6-2 and W6-5. Before a walk starts a Bad day asks first. Exit pauses
+ *   and Stay in session carries on (Exit stopped the timer for good). The
+ *   exit card offers to save or not, with no won't be saved line.
+ *
  * 02 Oct 2026 v7
  *
  * v7 - W4-9 SORE-WORDS. A sore leg area is the classifier's isSore()
@@ -74,6 +80,7 @@ import { isSore } from "../data/conditions.js";
 import { isGateDue, renderSafetyGate, attachSafetyGate } from "../safety-gate.js";
 import { renderLogBlock, attachLogEvents } from "../session-log.js";
 import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
+import { badDayIds, renderBadDayDoor, wireBadDayDoor } from "./bad-day-door.js";
 
 export const centered = false;
 
@@ -230,7 +237,12 @@ function buildConditionNote() {
 
 // ── Render ────────────────────────────────────────────────────────────────────
 
+// W6-2 LIBRARY-BAD-DAY. Before a walk starts, a Bad day asks first, as
+// every other door does (it started at once, saying "some discomfort").
+const _beforeStart = () => ["type", "duration", "overview"].includes(phase) || (phase === "walking" && !sessionStarted);
+
 export function render() {
+  if (_beforeStart() && badDayIds().length) return renderBadDayDoor("Before you walk");
   if (phase === "type")     return renderTypeSelector();
   if (phase === "duration") return renderDurationSelector();
   // SAFETY-GATE, GATE-ALL 16 Sep 2026. On the OVERVIEW phase, not the
@@ -641,6 +653,10 @@ function formatMMSS(seconds) {
 // ── Mount ─────────────────────────────────────────────────────────────────────
 
 export function onMount() {
+  if (_beforeStart() && badDayIds().length) {
+    wireBadDayDoor(document.getElementById("main-content") || document, resetSession);
+    return;
+  }
   // SAFETY-GATE. Bound before the session controls; with the gate up
   // there is no overview, timer or log block for them to find.
   if (phase === "overview" && isGateDue()) {
@@ -729,8 +745,11 @@ export function onMount() {
 // Replaces browser confirm() with a coach-voiced in-app card.
 
 function showExitConfirm() {
-  // Pause any running timer
-  if (sessionTimer) { clearInterval(sessionTimer); sessionTimer = null; }
+  // W6-5. Paused, not stopped: Stay in session carries on where it was.
+  // (It cleared the timer, and Stay only removed the card, so the session
+  // froze: no prompts, no end, and a part saved for the whole.)
+  const wasPaused = paused;
+  paused = true;
 
   const overlay = document.createElement("div");
   overlay.className = "session-exit-overlay";
@@ -743,7 +762,7 @@ function showExitConfirm() {
       <div class="session-exit-coach-row">
         <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
         <p class="session-exit-coach-text">
-          Hold on — if you leave now this walk won’t be saved. Are you sure?
+          Hold on — leave this walk? You can save what you’ve done so far, or leave without saving it.
         </p>
       </div>
       <div class="session-exit-actions">
@@ -783,6 +802,7 @@ function showExitConfirm() {
   // Stay — remove overlay and resume
   document.getElementById("exit-confirm-stay").addEventListener("click", () => {
     overlay.remove();
+    paused = wasPaused;   // W6-5
   });
 
   // Leave — save partial entry and navigate to reflect

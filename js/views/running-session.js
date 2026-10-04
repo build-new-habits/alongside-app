@@ -1,6 +1,13 @@
 /**
  * running-session.js - Guided Running Session
  *
+ * 04 Oct 2026 v15
+ *
+ * v15 - W6-5 RUN-STAY. Exit pauses and Stay in session carries on, the
+ *   card's minutes not counted (the run froze). An untapped prompt clears
+ *   after a minute so the next comes. The progress bar's value and name
+ *   follow the run; no frozen You have N left sentence.
+ *
  * 03 Oct 2026 v14
  *
  * v14 - W5-20 TRUE-WORDS-5. Leaving a run: no "this run won't be saved"
@@ -146,6 +153,7 @@ let paused         = false;
 let sessionStarted = false;
 let promptIndex    = 0;
 let activePrompt   = null;
+let promptShownAt  = 0;      // W6-5: the elapsed second a prompt was shown
 let creditsEarned  = 0;
 let inWarmup       = true;   // first 2 min = warmup walk
 let inCooldown     = false;  // last 3 min = cooldown walk
@@ -588,7 +596,7 @@ function renderRunning() {
                 Running now
               </p>
               <p class="text-secondary text-sm" style="margin-top: var(--space-2);">
-                You have ${formatMMSS(Math.max(0, selectedMins * 60 - elapsed))} left. Settle into your pace. I will check in with you as you go.
+                Settle into your pace. I will check in with you as you go.
                 ${selectedType === "easy" ? " Conversational pace — if talking is hard, slow down." : ""}
                 ${selectedType === "long" ? " Almost embarrassingly slow is exactly right." : ""}
               </p>
@@ -733,6 +741,17 @@ function runTimer() {
     if (bar) {
       const pct = Math.min(100, Math.round((elapsed / totalSecs) * 100));
       bar.style.width = `${pct}%`;
+      // W6-5: the bar's value and name follow it (they were fixed at render).
+      const pb = bar.closest(".workout-progress-bar");
+      if (pb) { pb.setAttribute("aria-valuenow", pct); pb.setAttribute("aria-label", `Run progress ${pct}%`); }
+    }
+
+    // W6-5. A prompt left untapped clears itself after a minute, so the
+    // next one can come (each waited for the last to be tapped, so a runner
+    // who never looked got none). The cooldown stays until it is tapped.
+    if (activePrompt && !activePrompt.isCooldown && elapsed - promptShownAt >= 60) {
+      activePrompt = null;
+      rerender();
     }
 
     // Warmup ends at WARMUP_SECS — show transition prompt
@@ -791,6 +810,7 @@ function runTimer() {
 // than replaying from the start.
 function firePrompt(prompt) {
   activePrompt = prompt;
+  promptShownAt = elapsed;   // W6-5
   if ("vibrate" in navigator) navigator.vibrate([100, 50, 100]);
   checkpointSession("run", {
     selectedType,
@@ -949,8 +969,11 @@ function formatMMSS(seconds) {
 // Replaces browser confirm() with a coach-voiced in-app card.
 
 function showExitConfirm() {
-  // Pause any running timer
-  if (sessionTimer) { clearInterval(sessionTimer); sessionTimer = null; }
+  // W6-5. Paused, not stopped: Stay in session carries on where it was,
+  // and the minutes on the card are not counted. (It cleared the timer and
+  // Stay only removed the card: no prompts, no cooldown, no end.)
+  const pausedByExit = !paused;
+  if (pausedByExit) { paused = true; pausedAt = Date.now(); }
 
   const overlay = document.createElement("div");
   overlay.className = "session-exit-overlay";
@@ -1003,6 +1026,10 @@ function showExitConfirm() {
   // Stay — remove overlay and resume
   document.getElementById("exit-confirm-stay").addEventListener("click", () => {
     overlay.remove();
+    if (pausedByExit) {   // W6-5
+      if (pausedAt) { totalPausedMs += Date.now() - pausedAt; pausedAt = null; }
+      paused = false;
+    }
   });
 
   // Leave — save partial entry and navigate to reflect

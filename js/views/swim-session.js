@@ -1,6 +1,11 @@
 /**
  * swim-session.js - Guided Swim Session
  *
+ * 04 Oct 2026 v7
+ *
+ * v7 - W6-2 and W6-5. Before a swim starts a Bad day asks first. Exit pauses
+ *   and Stay in session carries on. The exit card offers to save or not.
+ *
  * 30 Sep 2026 v6
  *
  * v6 - W3-20. The "+N credits" line is gone: a count nothing uses, beside a
@@ -48,6 +53,7 @@ import { store } from "../store.js";
 import { isGateDue, renderSafetyGate, attachSafetyGate } from "../safety-gate.js";
 import { renderLogBlock, attachLogEvents } from "../session-log.js";
 import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
+import { badDayIds, renderBadDayDoor, wireBadDayDoor } from "./bad-day-door.js";
 
 export const centered = false;
 
@@ -124,7 +130,11 @@ function buildConditionNote() {
   return notes.length > 0 ? notes.join(" ") : null;
 }
 
+// W6-2. Before a swim starts, a Bad day asks first, as every other door does.
+const _beforeStart = () => ["stroke", "type", "duration", "overview"].includes(phase) || (phase === "swimming" && !sessionStarted);
+
 export function render() {
+  if (_beforeStart() && badDayIds().length) return renderBadDayDoor("Before you swim");
   if (phase === "stroke")   return renderStrokeSelector();
   if (phase === "type")     return renderTypeSelector();
   if (phase === "duration") return renderDurationSelector();
@@ -393,8 +403,11 @@ function resetSession() {
 // Replaces browser confirm() with a coach-voiced in-app card.
 
 function showExitConfirm() {
-  // Pause any running timer
-  if (sessionTimer) { clearInterval(sessionTimer); sessionTimer = null; }
+  // W6-5. Paused, not stopped: Stay in session carries on where it was.
+  // (It cleared the timer, and Stay only removed the card, so the session
+  // froze: no prompts, no end, and a part saved for the whole.)
+  const wasPaused = paused;
+  paused = true;
 
   const overlay = document.createElement("div");
   overlay.className = "session-exit-overlay";
@@ -407,7 +420,7 @@ function showExitConfirm() {
       <div class="session-exit-coach-row">
         <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
         <p class="session-exit-coach-text">
-          Hold on — if you leave now this swim won’t be saved. Are you sure?
+          Hold on — leave this swim? You can save what you’ve done so far, or leave without saving it.
         </p>
       </div>
       <div class="session-exit-actions">
@@ -447,6 +460,7 @@ function showExitConfirm() {
   // Stay — remove overlay and resume
   document.getElementById("exit-confirm-stay").addEventListener("click", () => {
     overlay.remove();
+    paused = wasPaused;   // W6-5
   });
 
   // Leave — save partial entry and navigate to reflect
@@ -504,6 +518,10 @@ function rerender() {
 }
 
 export function onMount() {
+  if (_beforeStart() && badDayIds().length) {
+    wireBadDayDoor(document.getElementById("main-content") || document, resetSession);
+    return;
+  }
   // SAFETY-GATE. Bound before the session controls; with the gate up
   // there is no overview, timer or log block for them to find.
   if (phase === "overview" && isGateDue()) {

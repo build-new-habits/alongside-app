@@ -1,6 +1,14 @@
 /**
  * js/views/session-builder-ui.js - Session Builder UI
  *
+ * 04 Oct 2026 v32
+ *
+ * v32 - W6-1 BAD-DAY-BUILDER-2. On a Bad day the builder asks Rest today or
+ *   Something gentler first, as every other door does, and builds nothing
+ *   itself (it previewed the gentle plan at once at its own length); leaving
+ *   clears a door preselect. A gentle preview says About N min, and no
+ *   longer says it is not the session you asked for.
+ *
  * 02 Oct 2026 v31
  *
  * v31 - W4-7 SEVERE-DAY-TRUE. The Bad-day banner says the person's area and
@@ -498,6 +506,7 @@ import { saveSession, updateSavedSession, savedSessions, resolveSavedSession, sa
 import { isPremium } from '../auth.js';
 // QUICK-BUILD. The SAME chain One to one uses, not a second simpler one.
 import { router }                         from "../router.js";
+import { badDayIds, renderBadDayDoor, wireBadDayDoor } from "./bad-day-door.js";
 import { SESSION_TYPES, ALLOCATION_PRESETS, buildSession, buildCandidatePools, buildSessionFromSelection, buildSessionFromSaved, severeZoneToday, zonesWithCoverage } from "../session-builder.js";
 // SWAP-1. The grouping, the soreness levels and the replacement all live
 // in the engine, so this file holds the words and none of the rules.
@@ -666,17 +675,13 @@ export function render() {
   // so the alternative offered is leaving the builder, not building
   // anyway. Adding a "build it regardless" escape would be a clinical
   // loosening and is not mine to make.
-  if (phase !== "preview" || !builtSession?.gentleCare) {
-    const severeZone = severeZoneToday();
-    if (severeZone) {
-      builtSession = buildSession({
-        sessionType:  selectedType || "full",
-        durationMins: selectedDuration || 20
-      });
-      phase = "preview";
-      return renderPreview();
-    }
-  }
+  // W6-1 BAD-DAY-BUILDER-2. A Bad day asks first, in the same words as
+  // every other door (Rest today / Something gentler). It used to build
+  // and preview the gentle plan at once, with no choice and its own length
+  // (20 minutes beside the coach's 30). The choice is recorded as the coach
+  // records it, and the coach's screen shows the rest day or the one gentle
+  // plan, so there is one gentle plan whichever door was used.
+  if (badDayIds().length && !builtSession?.gentleCare) return renderBadDayDoor("Before you start");
 
   if (phase === "type")       return renderTypePicker();
   if (phase === "location")   return renderLocationStep();
@@ -1492,8 +1497,7 @@ function renderPreview() {
           <p class="sb-severe-banner__head">Your session has been changed</p>
           <p class="sb-severe-banner__body">
             ${builtSession.severeAreas ? `You said your ${builtSession.severeAreas} ${/ and /.test(builtSession.severeAreas) ? "are" : "is"} bad today.` : "You said something is bad today."}
-            On a bad day I don't build a training session, so this is not the session you
-            asked for, and that is deliberate.
+            On a bad day I don't build a training session, so this one is gentler, on purpose.
           </p>
         </div>
       ` : ""}
@@ -1506,7 +1510,7 @@ function renderPreview() {
             <p class="sb-rationale">${builtSession.rationale.opening}</p>
           ` : ""}
           <p class="text-sm text-muted" style="margin-top: var(--space-2);">
-            ${builtSession.duration} &nbsp;&middot;&nbsp; ${builtSession.exercises.length} exercises
+            ${typeof builtSession.duration === "number" ? `About ${builtSession.duration} min` : builtSession.duration} &nbsp;&middot;&nbsp; ${builtSession.exercises.length} exercises
           </p>
           ${builtSession.rationale?.arc ? `
             <details class="sb-rationale-arc">
@@ -2006,6 +2010,16 @@ export function onUnmount() {
 // ── Mount ─────────────────────────────────────────────────────────────────────
 
 export function onMount() {
+
+  // W6-1. The Bad-day choice: leaving clears the builder and any door's
+  // preselect, so it cannot open on a stale type days later.
+  if (badDayIds().length && !builtSession?.gentleCare) {
+    wireBadDayDoor(document.getElementById("main-content") || document, () => {
+      store.set("sessionBuilderPreselect", null);
+      resetState();
+    });
+    return;
+  }
 
   // 05 Aug 2026 -- pre-selected type from Library's gym cards, read once.
   // Set by library.js as store.set("sessionBuilderPreselect", { type }) just
