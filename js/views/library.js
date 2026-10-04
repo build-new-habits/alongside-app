@@ -1,6 +1,17 @@
 /**
  * library.js - Library Page
  *
+ * 04 Oct 2026 v14
+ *
+ * v14 - LOOK-4 (Graeme approved the mock-up, 04 Oct). The Library's first
+ *   page shows every kind of session as a tile in its kind colour (home
+ *   and gym amber; run, walk, swim and cycle blue; yoga violet; mindful
+ *   and practices green; your own teal), with line icons for the emoji,
+ *   then "Already done something?" and Log what I did. The separate
+ *   "Start a session" page is folded in: one tap fewer to any session.
+ *   Back from a category returns to the Library. Locked cards, routes and
+ *   labels unchanged.
+ *
  * 02 Oct 2026 v13
  *
  * v13 - W4-20. Mindful movement is Mindful awareness: it opens sitting and
@@ -169,6 +180,7 @@ import { store } from "../store.js";
 // mechanism even though the app was fine. Nine other views import it.
 import { router } from "../router.js";
 import { isPremium, lockedFeature } from "../auth.js";
+import { lineIcon } from "../data/line-icons.js";
 
 export const centered = false;
 
@@ -421,7 +433,8 @@ const LOG_CATEGORIES = [
 
 export function render() {
   if (screen === "landing")       return renderLanding();
-  if (screen === "guided")        return renderGuidedLanding();
+  // LOOK-4: the Start a session page is folded into the Library page.
+  if (screen === "guided")        return renderLanding();
   if (screen === "log")           return renderLogLanding();
   if (screen.startsWith("guided-")) return renderGuidedSubScreen(screen.replace("guided-", ""));
   return renderLanding();
@@ -430,63 +443,45 @@ export function render() {
 // ── Landing ───────────────────────────────────────────────────────────────────
 
 function renderLanding() {
-  const name = store.get("name") || "";
   return `
     <div class="view library-view">
       <div class="view-header">
         <h1>Library</h1>
       </div>
 
-      <div class="card card-coach" style="margin-bottom: var(--space-5);">
-        <img src="assets/images/logo-icon-192.png" alt=""
-             class="coach-icon-small" aria-hidden="true">
-        <p class="coach-message-text">
-          ${name ? name + ". " : ""}What would you like to do?
-        </p>
-      </div>
+      <h2 class="look-label" id="lib-start-h">Start a session</h2>
+      ${categoryGrid("lib-start-h")}
 
-      <div class="library-landing-grid">
-
-        <button class="library-landing-card" id="lib-start-session-btn"
-                aria-label="Start a guided session">
-          <span class="library-landing-icon" aria-hidden="true">\u25B6\uFE0F</span>
-          <span class="library-landing-label">Start a session</span>
-          <span class="library-landing-sub">Guided sessions for any activity</span>
-        </button>
-
-        <button class="library-landing-card" id="lib-log-activity-btn"
-                aria-label="Log an activity you have done">
-          <span class="library-landing-icon" aria-hidden="true">\u2795</span>
+      <h2 class="look-label" id="lib-log-h">Already done something?</h2>
+      <button class="library-landing-card library-landing-card--row k-teal" id="lib-log-activity-btn"
+              aria-label="Log what I did: capture something you have already done">
+        <span class="kind-tile">${lineIcon("plus")}</span>
+        <span class="library-landing-text">
           <span class="library-landing-label">Log what I did</span>
           <span class="library-landing-sub">Capture something you have already done</span>
-        </button>
-
-      </div>
-
+        </span>
+        <span class="library-landing-chev" aria-hidden="true">${lineIcon("chevron", 20)}</span>
+      </button>
     </div>
   `;
 }
 
-// ── Guided sessions landing ───────────────────────────────────────────────────
+// LOOK-4. Each category's line icon and kind colour.
+const CATEGORY_LOOK = {
+  home: ["home", "amber"], gym: ["strength", "amber"],
+  run: ["run", "blue"], walk: ["walk", "blue"], swim: ["swim", "blue"], cycle: ["cycle", "blue"],
+  yoga: ["yoga", "violet"], mindful: ["mind", "green"], practices: ["breath", "green"],
+  prescribed: ["list", "teal"], coach: ["star", "teal"],
+};
 
-function renderGuidedLanding() {
+/** The category tiles, shared by the Library page and the old landing. */
+function categoryGrid(labelledBy) {
   return `
-    <div class="view library-view">
-      <div class="library-sub-header">
-        <button class="btn btn-ghost" id="lib-back-btn" aria-label="Back to Library">
-          \u2190 Back
-        </button>
-        <h1>Start a session</h1>
-      </div>
-
-      <p class="text-sm text-secondary" style="margin-bottom: var(--space-4);">
-        Choose your activity. No check-in needed from here.
-      </p>
-
-      <div class="library-category-grid">
+      <div class="library-category-grid" role="group" aria-labelledby="${labelledBy}">
         ${GUIDED_CATEGORIES.map(cat => {
+          const [icon, kind] = CATEGORY_LOOK[cat.id] || ["star", "slate"];
           const inner = `
-            <span class="library-category-icon" aria-hidden="true">${cat.icon}</span>
+            <span class="kind-tile k-${kind} library-category-icon">${lineIcon(icon)}</span>
             <span class="library-category-label">${cat.label}</span>
             <span class="library-category-sub">${cat.description}</span>
           `;
@@ -494,8 +489,7 @@ function renderGuidedLanding() {
           // A <div> inside, never a <button>: lockedFeature() returns
           // role="button" and nesting one interactive control inside
           // another is invalid. Same reasoning, same treatment, as the
-          // type picker in session-builder-ui.js -- consistency across
-          // the two screens is the point, not merely gating.
+          // type picker in session-builder-ui.js.
           if (cat.tier && !isPremium()) {
             return lockedFeature(
               `<div class="library-category-card">${inner}</div>`,
@@ -512,22 +506,22 @@ function renderGuidedLanding() {
           </button>
         `;
         }).join("")}
-      </div>
-    </div>
-  `;
+      </div>`;
 }
+
+// LOOK-4. renderGuidedLanding() is gone: its categories are on the Library page.
 
 // ── Guided sub-screen (home / gym / mindful) ──────────────────────────────────
 
 function renderGuidedSubScreen(categoryId) {
   const cat = GUIDED_CATEGORIES.find(c => c.id === categoryId);
-  if (!cat) return renderGuidedLanding();
+  if (!cat) return renderLanding();
 
   return `
     <div class="view library-view">
       <div class="library-sub-header">
-        <button class="btn btn-ghost" id="lib-back-btn" aria-label="Back">
-          \u2190 Back
+        <button class="btn btn-ghost" id="lib-back-btn" aria-label="Back to Library">
+          \u2190 Library
         </button>
         <h1><span aria-hidden="true">${cat.icon}</span> ${cat.label}</h1>
       </div>
@@ -666,12 +660,7 @@ function rerender() {
 
 export function onMount() {
 
-  // Landing
-  document.getElementById("lib-start-session-btn")?.addEventListener("click", () => {
-    screen = "guided";
-    rerender();
-  });
-
+  // Landing (LOOK-4: the categories are on it; no Start a session step)
   document.getElementById("lib-log-activity-btn")?.addEventListener("click", () => {
     screen = "log";
     rerender();
@@ -682,7 +671,7 @@ export function onMount() {
     if (screen === "guided" || screen === "log") {
       screen = "landing";
     } else if (screen.startsWith("guided-")) {
-      screen = "guided";
+      screen = "landing";   // LOOK-4: the categories are on the Library page
     } else {
       screen = "landing";
     }

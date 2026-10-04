@@ -1,3 +1,9 @@
+/*
+ * css/base/global.css
+ * 04 Oct 2026 v1
+ *   First dated header (the file had none). LOOK-4: shared kind tiles
+ *   (.kind-tile, .k-*), .look-card and .look-label, at the foot.
+ */
 /* ============================================
    GYM PROGRAMME — RAG CONDITION BOXES
    ============================================ */
@@ -1914,4 +1920,49 @@
   line-height: 1;
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum";
+}
+
+
+/* ============================================================
+   LOOK-4 — shared pieces, 04 Oct 2026
+   One kind colour per kind of session (variables.css --kind-*, LOOK-3),
+   drawn as a tile behind a line icon (data/line-icons.js). The tile is
+   always beside words that say the same thing, so colour is never the
+   only cue (1.4.1). Kind colours as text only on the page and card
+   ground; on the tile they are a shape (3:1, verify-contrast-check v3).
+   ============================================================ */
+.k-teal   { --k: var(--kind-teal); }
+.k-amber  { --k: var(--kind-amber); }
+.k-violet { --k: var(--kind-violet); }
+.k-blue   { --k: var(--kind-blue); }
+.k-rose   { --k: var(--kind-rose); }
+.k-green  { --k: var(--kind-green); }
+.k-slate  { --k: var(--kind-slate); }
+.kind-tile {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--k, var(--color-primary));
+  background: var(--color-bg-card);
+  background: color-mix(in srgb, var(--k, var(--color-primary)) 16%, var(--color-bg));
+}
+.kind-tile--sm { width: 36px; height: 36px; border-radius: 10px; }
+.kind-tile--lg { width: 56px; height: 56px; border-radius: 18px; }
+.line-icon { display: block; flex: none; }
+.look-card {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border-light);
+  border-radius: 20px;
+}
+.look-label {
+  margin: var(--space-3) 0 var(--space-2) var(--space-1);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
 }

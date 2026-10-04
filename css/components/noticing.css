@@ -2,6 +2,13 @@
  * css/components/noticing.css
  * Alongside: Move — Noticing Hub view styles
  *
+ * 04 Oct 2026 v5
+ *
+ * v5 - LOOK-4. Suggested now as a green card with its tile; the four
+ *   practices as a 2x2 grid of tiles (.wb-practice); this week's question,
+ *   your reflections and the support lines as cards. Green is the mind's
+ *   kind colour everywhere (variables.css --kind-green).
+ *
  * 01 Oct 2026 v4
  *
  * v4 - SIGNPOST-STATIC. .support-lines, on Wellbeing and the journal.
@@ -167,3 +174,50 @@
 .support-lines__lede  { margin: 0 0 var(--space-3); color: var(--color-text-secondary); }
 .support-lines__list  { margin: 0; padding-left: var(--space-5); display: flex; flex-direction: column; gap: var(--space-2); line-height: 1.6; }
 .support-lines__link  { color: var(--color-primary); text-decoration: underline; }
+
+
+/* LOOK-4 — Wellbeing, 04 Oct 2026 */
+.noticing-view .wb-suggest {
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: 20px;
+  background: var(--color-bg);
+  background: color-mix(in srgb, var(--kind-green) 12%, var(--color-bg));
+  border: 1px solid color-mix(in srgb, var(--kind-green) 35%, var(--color-border-light));
+}
+.wb-suggest__head { display: flex; align-items: center; gap: var(--space-3); }
+.noticing-view .wb-suggest__kicker { color: var(--color-text); text-transform: uppercase; letter-spacing: 0.06em; font-size: var(--text-xs); }
+.noticing-view .wb-suggest__desc { color: var(--color-text); }
+.noticing-view .wb-suggest .btn-primary { background: var(--kind-green); border-color: var(--kind-green); color: var(--color-text-inverse); }
+.noticing-view .wb-question,
+.noticing-view .wb-reflections .card {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border-light);
+  border-radius: 20px;
+}
+.wb-practices { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3); }
+.wb-practice {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+  min-height: 132px;
+  padding: var(--space-4);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border-light);
+  border-radius: 20px;
+  color: var(--color-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.wb-practice:hover { background: var(--color-bg-hover); }
+.wb-practice:focus-visible { outline: 3px solid var(--color-border-focus); outline-offset: 2px; }
+.wb-practice__name { font-size: var(--text-base); font-weight: 600; }
+.wb-practice__sub { font-size: var(--text-sm); line-height: 1.35; color: var(--color-text-secondary); }
+.noticing-view .support-lines {
+  margin-top: var(--space-5);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border-light);
+  border-radius: 20px;
+}

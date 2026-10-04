@@ -1,5 +1,17 @@
 /**
  * today.js
+ * 04 Oct 2026 v53
+ *
+ * v53 - LOOK-4 (Graeme approved the mock-up, 04 Oct). Plan Home: the arc
+ *   as a card ("Your arc · Week n" and the aim), the three doors as cards
+ *   with a tile and a chevron (Tell me what to do filled), and the four
+ *   links as a two-by-two grid of tiles in their kind colours (classes
+ *   rose, run blue, the mind green, Library slate) under "Or go straight
+ *   to". Free Home: the session tiles in their kind colours with line
+ *   icons in place of emoji, Wellbeing on its own row, My exercises and
+ *   Library in one card. Every button, label, route and data attribute is
+ *   as before; colour is never the only cue (each tile has its words).
+ *
  * 30 Sep 2026 v52
  *
  * v52 - W3-21 NAV-SMALL. Plan Home gains "Go for a run" beside Join a
@@ -776,6 +788,8 @@ import { carryOnSummary } from './capture.js';   // F1: a freestyle session to c
 // the real ESM load instead.
 import { GUIDANCE_TEXT, GUIDANCE_DAYS } from '../safety-gate.js';
 import { aimById, STRANDS }    from '../data/aims.js';
+import { lineIcon }            from '../data/line-icons.js';
+import { arcWeek }             from '../data/arc-readback.js';
 import { noticePlanJump, offerBriefPath } from '../data/pacing.js';
 import { isPremium, lockedFeature } from '../auth.js';
 import { scopeStatementHTML } from '../data/scope-statement.js';
@@ -1241,7 +1255,7 @@ export function TodayView(router) {
              is consented to rather than sprung. -->
         ${isPremium() ? _planDoors() : _freeCarryCard() + chooser() + arcPanel()}
 
-        ${isPremium() ? '' : `<div class="today-reference" role="group" aria-label="Reference and settings">
+        ${isPremium() ? '' : `<div class="today-reference look-card" role="group" aria-label="Reference and settings">
           <!-- On free, Wellbeing is promoted into "Settle your mind"
                above, so repeating it here would be the duplication this
                screen exists to remove. On Plan it stays a reference row,
@@ -1252,7 +1266,7 @@ export function TodayView(router) {
                     data-door-id="${d.id}"
                     data-requires-checkin="${d.requiresCheckin}"
                     aria-label="${_esc(d.label)}">
-              <span class="today-ref-row__icon" aria-hidden="true">${d.icon}</span>
+              <span class="kind-tile kind-tile--sm k-${(DOOR_LOOK[d.id] || ['', 'slate'])[1]} today-ref-row__icon">${lineIcon((DOOR_LOOK[d.id] || ['star'])[0], 20)}</span>
               <span class="today-ref-row__label">${_esc(d.label)}</span>
               <span class="today-ref-row__chevron" aria-hidden="true">\u203A</span>
             </button>
@@ -2046,31 +2060,42 @@ function _markGuidanceShown(root) {
   function _planDoors() {
     const carry = _carryOn();
     const checkedIn = _checkedInToday();
-    const door = (action, title, sub, primary) => `
+    // LOOK-4. A tile, the words, a chevron. The words decide, not the colour.
+    const door = (action, title, sub, primary, icon) => `
       <button class="home-door ${primary ? 'home-door--primary' : ''}" data-action="${action}">
-        <span class="home-door__title">${title}</span>
-        <span class="home-door__sub">${sub}</span>
+        <span class="kind-tile k-teal">${lineIcon(icon)}</span>
+        <span class="home-door__text">
+          <span class="home-door__title">${title}</span>
+          <span class="home-door__sub">${sub}</span>
+        </span>
+        <span class="home-door__chev" aria-hidden="true">${lineIcon('chevron', 20)}</span>
       </button>`;
+    const link = (route, label, icon, kind) => `
+        <button class="home-link home-link--tile" data-route="${route}" data-requires-checkin="false">
+          <span class="kind-tile k-${kind}">${lineIcon(icon)}</span>
+          <span class="home-link__label">${label}</span>
+        </button>`;
     // GUIDANCE-1 goes with the doors: it was in the rooms, and the rooms
     // were the only Plan place it was said. Found by verify-clubshell 12a.
     return `
       ${_scopeNotice()}
       ${_guidanceLine()}
       ${carry ? _carryOnCard(carry) : ''}
-      ${carry ? '<p class="home-doors__or" id="home-doors-label">Or instead</p>' : '<h2 class="sr-only" id="home-doors-label">What would you like to do?</h2>'}
+      ${carry ? '<p class="home-doors__or" id="home-doors-label">Or instead</p>' : '<h2 class="look-label" id="home-doors-label">What would you like to do?</h2>'}
       <div class="home-doors" role="group" aria-labelledby="home-doors-label">
         ${door('start-today', 'Tell me what to do',
                checkedIn ? 'You\u2019ve checked in \u2014 straight to your plan' : 'Three quick questions, then your plan',
-               !carry)}
-        ${door('know-what', 'I know what I want', 'Pick the kind of session and how long', false)}
-        ${door('as-i-go', 'Make it up as I go', 'Log each move as you do it', false)}
+               !carry, 'star')}
+        ${door('know-what', 'I know what I want', 'Pick the kind of session and how long', false, 'choose')}
+        ${door('as-i-go', 'Make it up as I go', 'Log each move as you do it', false, 'pencil')}
       </div>
-      <p class="home-links">
-        <button class="home-link" data-route="classes" data-requires-checkin="false">Join a class</button>
-        <button class="home-link" data-route="running-session" data-requires-checkin="false">Go for a run</button>
-        <button class="home-link" data-route="noticing" data-requires-checkin="false">Something for the mind</button>
-        <button class="home-link" data-route="library" data-requires-checkin="false">Library</button>
-      </p>`;
+      <h2 class="look-label" id="home-links-label">Or go straight to</h2>
+      <div class="home-links home-links--grid" role="group" aria-labelledby="home-links-label">
+        ${link('classes', 'Join a class', 'classes', 'rose')}
+        ${link('running-session', 'Go for a run', 'run', 'blue')}
+        ${link('noticing', 'Something for the mind', 'mind', 'green')}
+        ${link('library', 'Library', 'library', 'slate')}
+      </div>`;
   }
 
   /** The arc, in one line. Opens the arc; sets one up if there is none. */
@@ -2080,40 +2105,70 @@ function _markGuidanceShown(root) {
     // resolves; offering setup to somebody who has one would start them
     // again. The aim's own words, else the arc's stored label.
     const label = arc.active ? ((arc.aimId && aimById(arc.aimId)?.label) || arc.label || 'your arc') : null;
+    // LOOK-4. A card: the tile, "Your arc · Week n", the aim. Week n is
+    // where the arc is, never a count of anything done (ARC-1).
+    const week = arc.active ? arcWeek(arc, new Date()) : null;
     return label
       ? `<button class="home-arc" data-route="progress" data-requires-checkin="false"
-                 aria-label="Your arc: working towards ${_esc(label)}">
-           <span class="home-arc__label">Working towards</span>
-           <span class="home-arc__aim">${_esc(label)}</span>
+                 aria-label="Your arc${week ? `, week ${week}` : ''}: working towards ${_esc(label)}">
+           <span class="kind-tile k-teal">${lineIcon('arc')}</span>
+           <span class="home-arc__text">
+             <span class="home-arc__label">Your arc${week ? ` \u00b7 Week ${week}` : ''}</span>
+             <span class="home-arc__aim">${_esc(label)}</span>
+           </span>
+           <span class="home-door__chev" aria-hidden="true">${lineIcon('chevron', 20)}</span>
          </button>`
       : `<button class="home-arc home-arc--offer" data-route="arc-setup" data-requires-checkin="false">
-           <span class="home-arc__label">Your arc</span>
-           <span class="home-arc__aim">Tell me what you want to be able to do</span>
+           <span class="kind-tile k-teal">${lineIcon('arc')}</span>
+           <span class="home-arc__text">
+             <span class="home-arc__label">Your arc</span>
+             <span class="home-arc__aim">Tell me what you want to be able to do</span>
+           </span>
+           <span class="home-door__chev" aria-hidden="true">${lineIcon('chevron', 20)}</span>
          </button>`;
   }
+
+  // LOOK-4. Each door's line icon and kind colour (data/kind-colours.js's
+  // meaning: strength amber, mobility and yoga violet, run blue, classes
+  // rose, the mind green, your own teal, reference slate).
+  const DOOR_LOOK = {
+    'cardio-core-strength':  ['strength', 'amber'],
+    'mobility-conditioning': ['mobility', 'violet'],
+    'yoga':                  ['yoga', 'violet'],
+    'run':                   ['run', 'blue'],
+    'classes':               ['classes', 'rose'],
+    'wellbeing':             ['mind', 'green'],
+    'my-exercises':          ['list', 'teal'],
+    'library':               ['library', 'slate'],
+    'unsure':                ['star', 'teal'],
+  };
 
   function tileGrid() {
     const move = HOME_DOORS.filter(d => d.kind === 'session' && d.id !== 'unsure');
     const mind = HOME_DOORS.filter(d => d.id === 'wellbeing');
 
-    const tile = d => `
-      <button class="today-door today-door--pick"
+    // LOOK-4. Each tile in its kind colour, a line icon for the emoji.
+    const tile = d => {
+      const [icon, kind] = DOOR_LOOK[d.id] || ['star', 'teal'];
+      return `
+      <button class="today-door today-door--pick${d.id === 'wellbeing' ? ' today-door--wide' : ''}"
               data-route="${d.route}"
               data-door-id="${d.id}"
               data-requires-checkin="${d.requiresCheckin}"
               aria-label="${_esc(d.label)}">
-        <span class="today-door__icon" aria-hidden="true">${d.icon}</span>
+        <span class="kind-tile k-${kind} today-door__icon">${lineIcon(icon)}</span>
         <span class="today-door__label">${_esc(d.label)}</span>
       </button>`;
+    };
 
     return `
-      <p class="today-group-label" id="today-group-body">Move your body</p>
+      <p class="today-group-label look-label" id="today-group-body">Move your body</p>
       <div class="today-doors" role="group" aria-labelledby="today-group-body">
         ${move.map(tile).join('')}
       </div>
 
       ${mind.length ? `
-        <p class="today-group-label" id="today-group-mind">Settle your mind</p>
+        <p class="today-group-label look-label" id="today-group-mind">Settle your mind</p>
         <div class="today-doors" role="group" aria-labelledby="today-group-mind">
           ${mind.map(tile).join('')}
         </div>

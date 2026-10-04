@@ -1,5 +1,11 @@
 /*
  * css/layouts/library.css
+ * 04 Oct 2026 v3
+ *
+ * v3 - LOOK-4. The Library page shows the categories as a 2x2 grid of
+ *   tiles (a kind-colour tile, the name, a line under it); Log what I did
+ *   is a row card. Shared .kind-tile and .look-label are in base/global.css.
+ *
  * 04 Aug 2026 v2
  *
  * v2 — Same bug as v1, wider than first found. Checked every class
@@ -217,3 +223,37 @@
   font-size: var(--text-xs);
   color: var(--color-text-muted);
 }
+
+
+/* LOOK-4 — Library, 04 Oct 2026 */
+.library-view .library-category-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+  margin-top: 0;
+}
+.library-view .library-category-grid > :last-child:nth-child(odd) { grid-column: 1 / -1; }
+.library-view .library-category-card {
+  gap: var(--space-2);
+  min-height: 132px;
+  height: 100%;
+  padding: var(--space-4);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border-light);
+  border-radius: 20px;
+}
+.library-view .library-category-card:hover { background: var(--color-bg-hover); border-color: var(--color-border-light); }
+.library-view .library-category-icon { font-size: inherit; margin-bottom: var(--space-1); }
+.library-view .library-category-sub { line-height: 1.35; }
+.library-landing-card--row {
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 72px;
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-bg);
+  border-color: var(--color-border-light);
+  border-radius: 20px;
+}
+.library-landing-text { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.library-landing-chev { flex: none; color: var(--color-text-secondary); }

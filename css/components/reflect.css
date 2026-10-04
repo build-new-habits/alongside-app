@@ -2,6 +2,13 @@
    REFLECT VIEW STYLES
    css/components/reflect.css
 
+   04 Oct 2026 v3
+
+   v3 - LOOK-4. The finish screen: a tick tile above the heading; the
+   stats as number tiles (.finish-stat, colour from .k-*, the words
+   beside every number); How did it feel? as three equal buttons; the
+   coach's answer and Add a note as cards.
+
    28 Sep 2026 v2
 
    v2 - SMOOTH-P2d. The finish screen: .finish-stats (what was done, in
@@ -105,3 +112,43 @@
 .finish-coach-card[hidden] { display: none; }
 .finish-coach-card .coach-icon-small { width: 36px; height: 36px; flex-shrink: 0; }
 .finish-coach-card .coach-message-text { margin: 0; }
+
+
+/* LOOK-4 — the finish screen, 04 Oct 2026 */
+.finish-head { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-3); }
+.finish-head h1 { margin: 0; }
+.finish-view .finish-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3);
+  width: 100%;
+  margin: var(--space-2) 0 0;
+}
+.finish-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: var(--space-3);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border-light);
+  border-radius: 20px;
+}
+.finish-stat__n { font-size: var(--text-3xl); font-weight: 700; line-height: 1; color: var(--k, var(--color-primary)); }
+.finish-stat__l { font-size: var(--text-sm); color: var(--color-text-secondary); }
+.finish-stat__sep { display: none; }
+.finish-view .reflect-chips { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-2); }
+.finish-view .reflect-chips .chip {
+  min-height: 56px;
+  justify-content: center;
+  border-radius: 16px;
+  font-size: var(--text-base);
+  text-align: center;
+}
+.finish-view .reflect-chips:has(.chip--sm) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.finish-view .finish-coach-card,
+.finish-view .finish-more {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border-light);
+  border-radius: 20px;
+}
+.finish-view .finish-more { padding: var(--space-2) var(--space-4); }

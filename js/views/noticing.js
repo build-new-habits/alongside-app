@@ -1,6 +1,12 @@
 /**
  * js/views/noticing.js - Wellbeing Hub Landing View
  *
+ * 04 Oct 2026 v12 - LOOK-4 (Graeme approved the mock-up, 04 Oct). Suggested
+ *   now is a green card with its tile and a green Start; This week's
+ *   question is a card; the four practices are a two-by-two grid of tiles
+ *   (line icons for the emoji); your reflections and the support lines
+ *   are cards. Ids, labels, words and behaviour unchanged.
+ *
  * 03 Oct 2026 v11 - W5-21 SMALL-5. Every journal entry can be read: the newest
  *   three show, and Show all N entries shows the rest; each in full (it was
  *   cut at 120 characters with no way to read on).
@@ -101,6 +107,7 @@
  */
 
 import { supportLinesHTML } from "../data/support-lines.js";
+import { lineIcon } from "../data/line-icons.js";
 import { store }  from "../store.js";
 import { router } from "../router.js";
 import { getTodaysCheckin } from "../data/checkin.js";
@@ -294,9 +301,14 @@ export function render() {
       </div>
 
       <!-- SMOOTH-P4b. One practice, one tap. -->
-      <section class="card wb-suggest" aria-labelledby="wb-suggest-h">
-        <h2 class="wb-suggest__kicker" id="wb-suggest-h">Suggested now</h2>
-        <p class="wb-suggest__name">${sugType.label} \u00b7 ${sug.mins} min</p>
+      <section class="card wb-suggest k-green" aria-labelledby="wb-suggest-h">
+        <div class="wb-suggest__head">
+          <span class="kind-tile kind-tile--lg">${lineIcon("breath", 26)}</span>
+          <div>
+            <h2 class="wb-suggest__kicker" id="wb-suggest-h">Suggested now</h2>
+            <p class="wb-suggest__name">${sugType.label} \u00b7 ${sug.mins} min</p>
+          </div>
+        </div>
         <p class="wb-suggest__desc">${sugType.description}</p>
         <button class="btn btn-primary btn-full" id="wb-start"
                 aria-label="Start ${sugType.label}, ${sug.mins} minutes">Start</button>
@@ -310,7 +322,7 @@ export function render() {
           This week
         </h2>
 
-        <div class="card" style="margin-bottom: var(--space-2);">
+        <div class="card wb-question" style="margin-bottom: var(--space-2);">
           <p class="text-xs text-muted" style="margin-bottom: var(--space-2);">This week's question</p>
           <p style="font-size: var(--text-base); line-height: 1.6;
                     margin-bottom: var(--space-4);">${weekData.prompt}</p>
@@ -330,100 +342,43 @@ export function render() {
           Anytime
         </h2>
 
-        <div style="display: flex; flex-direction: column; gap: var(--space-3);">
-
-          <button class="card" id="noticing-breathe-btn"
-                  style="display: flex; align-items: center; gap: var(--space-4);
-                         text-align: left; width: 100%; cursor: pointer;
-                         background: var(--color-surface);"
+        <!-- LOOK-4. Four practices as tiles. IN STEP IS FREE (Destination
+             Architecture, 12 Aug 2026, sections 9 and 18): everything in
+             Wellbeing is free; the paid thing is the long version, never this. -->
+        <div class="wb-practices">
+          <button class="wb-practice k-green" id="noticing-breathe-btn"
                   aria-label="Breathing exercises — five types, any duration">
-            <span style="font-size: 2rem; flex-shrink: 0; line-height: 1;"
-                  aria-hidden="true">🌬️</span>
-            <div style="flex: 1; min-width: 0;">
-              <p style="font-size: var(--text-lg); font-weight: var(--font-semibold);
-                        margin-bottom: var(--space-1);">Breathing</p>
-              <p class="text-secondary" style="font-size: var(--text-sm);">Five types. Any duration.</p>
-            </div>
-            <span style="color: var(--color-primary); font-size: 1.25rem;"
-                  aria-hidden="true">›</span>
+            <span class="kind-tile">${lineIcon("breath")}</span>
+            <span class="wb-practice__name">Breathing</span>
+            <span class="wb-practice__sub">Five types. Any duration.</span>
           </button>
 
-          <button class="card" id="noticing-mindful-btn"
-                  style="display: flex; align-items: center; gap: var(--space-4);
-                         text-align: left; width: 100%; cursor: pointer;
-                         background: var(--color-surface);"
+          <button class="wb-practice k-green" id="noticing-mindful-btn"
                   aria-label="Mindful awareness — five, ten, fifteen, or twenty minute guided sessions">
-            <span style="font-size: 2rem; flex-shrink: 0; line-height: 1;"
-                  aria-hidden="true">🌿</span>
-            <div style="flex: 1; min-width: 0;">
-              <p style="font-size: var(--text-lg); font-weight: var(--font-semibold);
-                        margin-bottom: var(--space-1);">Mindful awareness</p>
-              <p class="text-secondary" style="font-size: var(--text-sm);">
-                5, 10, 15, or 20 minutes. Guided, with a timer.
-              </p>
-            </div>
-            <span style="color: var(--color-primary); font-size: 1.25rem;"
-                  aria-hidden="true">›</span>
+            <span class="kind-tile">${lineIcon("mind")}</span>
+            <span class="wb-practice__name">Mindful awareness</span>
+            <span class="wb-practice__sub">5, 10, 15, or 20 minutes. Guided, with a timer.</span>
           </button>
 
-          <button class="card" id="noticing-journal-btn"
-                  style="display: flex; align-items: center; gap: var(--space-4);
-                         text-align: left; width: 100%; cursor: pointer;
-                         background: var(--color-surface);"
+          <button class="wb-practice k-green" id="noticing-journal-btn"
                   aria-label="Journal — write anything. Only you can read it.">
-            <span style="font-size: 2rem; flex-shrink: 0; line-height: 1;"
-                  aria-hidden="true">📝</span>
-            <div style="flex: 1; min-width: 0;">
-              <p style="font-size: var(--text-lg); font-weight: var(--font-semibold);
-                        margin-bottom: var(--space-1);">Journal</p>
-              <p class="text-secondary" style="font-size: var(--text-sm);">
-                Write anything. Only you can read it.
-              </p>
-            </div>
-            <span style="color: var(--color-primary); font-size: 1.25rem;"
-                  aria-hidden="true">›</span>
+            <span class="kind-tile">${lineIcon("pencil")}</span>
+            <span class="wb-practice__name">Journal</span>
+            <span class="wb-practice__sub">Write anything. Only you can read it.</span>
           </button>
 
-          <!-- IN STEP IS FREE. Destination Architecture 12 Aug 2026 sections
-               9 and 18: "Free users have full access to everything in
-               Wellbeing -- In Step, the empathy arc, grounding moments,
-               journalling -- but no personal journey through it", and
-               "In Step is free, and is the best door in the product."
-
-               This was gated behind isPremium() from the 9 Aug build, when
-               In Step WAS Personal tier. The 12 Aug tier decision moved it
-               and the code did not follow, so the single best demonstration
-               of what the product is for was invisible to exactly the people
-               it was meant to reach.
-
-               The paid thing is not this. It is the long version described
-               in the door below: a destination you name, built out over
-               months. Same rule as everywhere else -- free is the session,
-               Personal is the plan. -->
-          <button class="card" id="noticing-in-step-btn"
-                  style="display: flex; align-items: center; gap: var(--space-4);
-                         text-align: left; width: 100%; cursor: pointer;
-                         background: var(--color-surface);"
+          <button class="wb-practice k-green" id="noticing-in-step-btn"
                   aria-label="In Step \u2014 short scenarios, three ways to respond, no right step">
-            <span style="font-size: 2rem; flex-shrink: 0; line-height: 1;"
-                  aria-hidden="true">\uD83C\uDFB6</span>
-            <div style="flex: 1; min-width: 0;">
-              <p style="font-size: var(--text-lg); font-weight: var(--font-semibold);
-                        margin-bottom: var(--space-1);">In Step</p>
-              <p class="text-secondary" style="font-size: var(--text-sm);">
-                Short scenarios. Three ways to respond. No right step.
-              </p>
-            </div>
-            <span style="color: var(--color-primary); font-size: 1.25rem;"
-                  aria-hidden="true">\u203A</span>
+            <span class="kind-tile">${lineIcon("instep")}</span>
+            <span class="wb-practice__name">In Step</span>
+            <span class="wb-practice__sub">Short scenarios. Three ways to respond. No right step.</span>
           </button>
-
         </div>
       </section>
 
       <!-- ── Your Reflections ─────────────────────────────────── -->
       ${totalEntries > 0 ? `
-        <section class="noticing-section" aria-labelledby="reflections-heading"
+        <section class="noticing-section wb-reflections" aria-labelledby="reflections-heading"
                  style="margin-top: var(--space-5);">
           <div style="display: flex; align-items: center; justify-content: space-between;
                       margin-bottom: var(--space-3);">

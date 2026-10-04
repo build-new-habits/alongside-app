@@ -1,6 +1,15 @@
 /**
  * reflect.js - Reflect Screen
  *
+ * 04 Oct 2026 v17
+ *
+ * v17 - LOOK-4 (Graeme approved the mock-up, 04 Oct). The finish screen:
+ *   a tick tile above "That's today done.", what was done as number tiles
+ *   (moves and sets in the session's kind colour, minutes in blue, as on
+ *   Progress), How did it feel? as three large buttons in a row, the
+ *   coach's answer and Add a note as cards. Words, order and behaviour
+ *   unchanged; the stats still read "2 moves · 6 sets · 32 min".
+ *
  * 02 Oct 2026 v16
  *
  * v16 - W5-18. Another session in the same app run starts with an empty
@@ -201,6 +210,8 @@
  */
 
 import { healthAllowed } from "../data/health-consent.js";
+import { kindOf }        from "../data/kind-colours.js";
+import { lineIcon }      from "../data/line-icons.js";
 import { store }          from "../store.js";
 import { SAFETY_LINE }    from "../data/purpose.js";
 // SAVE-ALL, 16 Sep 2026. Eleven views route here when a session ends,
@@ -730,19 +741,25 @@ export function render() {
   const moves     = Number(entry.exercisesCount) || 0;
   const sets      = Number(entry.setsDone) || 0;
   const mins      = Number(entry.durationMins) || 0;
+  // LOOK-4. Number tiles. The separators stay in the text (hidden on
+  // screen), so it still reads "2 moves · 6 sets · 32 min" as one line.
+  const kind      = kindOf(entry);
   const statBits  = [
-    moves ? `${moves} ${moves === 1 ? "move" : "moves"}` : "",
-    sets  ? `${sets} ${sets === 1 ? "set" : "sets"}`     : "",
-    mins  ? `${mins} min`                                : ""
+    moves ? { n: moves, l: moves === 1 ? "move" : "moves", k: kind }   : null,
+    sets  ? { n: sets,  l: sets === 1 ? "set" : "sets",    k: kind }   : null,
+    mins  ? { n: mins,  l: "min",                          k: "blue" } : null
   ].filter(Boolean);
   const moodShown = typeof moodAfter === "number" ? moodAfter : _startMood();
 
   return `
     <div class="view reflect-view finish-view">
 
-      <div class="view-header">
+      <div class="view-header finish-head">
+        <span class="kind-tile kind-tile--lg k-teal">${lineIcon(partial ? "pencil" : "tick", 28)}</span>
         <h1>${partial ? "Saved what you did." : "That\u2019s today done."}</h1>
-        ${statBits.length ? `<p class="finish-stats">${statBits.join(" \u00B7 ")}</p>` : ""}
+        ${statBits.length ? `<p class="finish-stats">${statBits.map(b =>
+          `<span class="finish-stat k-${b.k}"><span class="finish-stat__n">${b.n}</span> <span class="finish-stat__l">${b.l}</span></span>`
+        ).join('<span class="finish-stat__sep" aria-hidden="true"> \u00B7 </span>')}</p>` : ""}
       </div>
 
       ${renderSessionMoments({ exerciseIds: _sessionExerciseIds(entry) })}
