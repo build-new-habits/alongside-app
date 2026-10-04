@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 04 Oct 2026 v645
+ * 04 Oct 2026 v646
  *
+ * v646 - LOOK-4 (Graeme, 04 Oct): Home on both tiers, the finish screen, Wellbeing and the Library take the Settings and Progress look: cards, a kind-colour tile with a line icon beside every choice, numbers as tiles; the Library shows every kind of session on its first page (one tap fewer). NEW FILE precached: js/data/line-icons.js.
  * v645 - LOOK-1/LOOK-2/LOOK-3 (Graeme, 04 Oct): each Settings section opens as its own page, from an index of coloured rows saying what is set now; Progress is two numbers, one coach line, labelled weekly bars, the kinds of session in colour (every kind named and counted) and the arc, with lifts, weight, Build Your Base and Share one tap away on their own pages; seven kind colours in every scheme. NEW FILE precached: js/data/kind-colours.js.
  * v644 - W6-1/W6-2/W6-5: on a Bad day every door that starts a session asks Rest today or Something gentler first (the builder and the Library's walk, core, ride and swim too), with one gentle plan from the coach; the coach's choice in the same words; Stay in session carries a run, walk, ride or swim on; an untapped run prompt clears after a minute; the run's progress bar follows it.
  * v643 - W5-22/W5-21/W5-20: gym Lower Body hinges with a deadlift or RDL (the Get-Up is a carry) and varies carries, throws and balance work; every journal entry readable; mindful and breathing minutes counted; Reset display keeps Vibration; Restore keeps </3; breathing says it buzzes; Mostly the same opens with one line; one gentle plan a day; the update check-in starts from today's answers; true words on balance, Hold on to what I've got, Stress, the variety line, the red-flag introduction (asked once more), leave cards, the tier table, Make it up as I go on Free, Mindful awareness, Back to Wellbeing, heart and lungs, the away opener and restore.
@@ -4192,7 +4193,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v645";
+const CACHE_NAME = "alongside-v646";
 
 const SHELL_URLS = [
 
@@ -4356,6 +4357,7 @@ const SHELL_URLS = [
   "./js/data/export-file.js",
   "./js/data/health-consent-covers.js",
   "./js/data/kind-colours.js",
+  "./js/data/line-icons.js",
   "./js/views/bad-day-door.js",
   "./js/data/chair-legs.js",
   "./js/data/general-routine.js",
