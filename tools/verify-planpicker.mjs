@@ -1,5 +1,11 @@
 /**
  * tools/verify-planpicker.mjs
+ * 04 Oct 2026 v3
+ *
+ * v3 - LOOK-4. Home's links are built by one link() template (a tile, the
+ *   words); 3a-2 reads the Join a class call and that the template still
+ *   renders a home-link with its data-route. Same intent, not loosened.
+ *
  * 28 Sep 2026 v2
  *
  * v2 - SMOOTH-P3a/b. The Guided class room left Plan Home. The picker's
@@ -153,7 +159,7 @@ ok("3a. the twelve-week shape routes to the chooser",
    "the picker has no home");
 
 ok("3a-2. and the classes are reachable from Home",
-   /class="home-link" data-route="classes"/.test(todaySrc),
+   /link\('classes', 'Join a class'/.test(todaySrc) && /class="home-link[^"]*" data-route="\$\{route\}"/.test(todaySrc),
    "the room named for classes does not reach them — the fault " +
    "TIMETABLE-1 exists to fix");
 

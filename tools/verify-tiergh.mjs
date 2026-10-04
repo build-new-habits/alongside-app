@@ -1,6 +1,13 @@
 /**
  * tools/verify-tiergh.mjs
- * 04 Oct 2026 v5
+ * 04 Oct 2026 v6
+ *
+ * v6 - LOOK-4: the Library's first page now shows the categories itself
+ *   (the Start a session step is folded in, Graeme approved 04 Oct). Check
+ *   1 asserts the categories are real buttons on the first page; checks 2
+ *   onward read the same cards as before, one tap sooner.
+ *
+ * 04 Oct 2026 v5 (LOOK-2)
  *
  * v5 - LOOK-2: the export buttons are on the Share page, one tap away
  *   (progress.js v26). REACH only: 15/15b click the Share row on the free
@@ -97,17 +104,14 @@ function setTier(tier) {
 function mountGuidedLanding() {
   el.innerHTML = LibraryMod.render();
   LibraryMod.onMount();
-  // Walk from the Library landing into "Start a session" by clicking,
-  // never by reaching into module state.
-  const start = document.getElementById('lib-start-session-btn');
-  if (start) { start.click(); }
-  return start;
+  // LOOK-4: the categories are on the Library's first page; no step.
+  return el.querySelector('button[data-guided]');
 }
 
 setTier('free');
 const startBtn = mountGuidedLanding();
-check('1  Library landing offers "Start a session" as a real button',
-  !!startBtn);
+check('1  Library landing offers the categories as real buttons (LOOK-4: no Start a session step)',
+  !!startBtn && !document.getElementById('lib-start-session-btn'));
 
 const homeCard = [...el.querySelectorAll('[data-guided], .locked-feature-wrap')]
   .find(n => /at home/i.test(n.textContent));
