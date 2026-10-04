@@ -1,5 +1,10 @@
 /**
  * coach-proposal.js
+ * 04 Oct 2026 v54
+ *
+ * v54 - D-4 FIGURES. The exercise sheet's How starts with the exercise's
+ *   stick figure (js/figures.js), as the player's How step does.
+ *
  * 04 Oct 2026 v53
  *
  * v53 - D-2 PLAN-PREVIEW (device test, 04 Oct). Each exercise on the plan
@@ -797,6 +802,7 @@ import { isGateDue, isGuidanceDue, recordAcknowledgement,
          GUIDANCE_TEXT } from '../safety-gate.js';
 import { HURT_AND_ACHE }     from '../exercise-card.js';
 import { bodyCaution }       from '../data/session-rationale.js';
+import { renderFigure }      from '../figures.js';
 import { resolveTiming }     from '../exercise-timing.js';
 import { isPremium }         from '../auth.js';
 import { openSheet }         from './onboarding/sheet-manager.js';
@@ -1313,6 +1319,7 @@ export function CoachProposalView(router) {
           </div>` : ''}
           <div class="cp-xprev__part" data-xprev-part="how">
             <h3 class="cp-xprev__h">How</h3>
+            ${renderFigure(ex)}
             ${how.length ? `<ol>${how.map(w => `<li>${_escP(w)}</li>`).join('')}</ol>` : ''}
             <a class="cp-xprev__video" href="${video}" target="_blank" rel="noopener noreferrer">Watch how to do this<span class="sr-only"> (opens in a new tab)</span></a>
           </div>

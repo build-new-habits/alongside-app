@@ -1,5 +1,12 @@
 /**
  * js/exercise-card.js
+ * 04 Oct 2026 v15
+ *
+ * v15 - D-4 FIGURES. The exercise's stick figure (js/figures.js) is the
+ *   first thing on the How step, above the steps in words; on the paged
+ *   cards' DO page it takes the place of "Photographs are being added",
+ *   which stays only for an exercise with no figure. Nothing else moved.
+ *
  * 04 Oct 2026 v14
  *
  * v14 - D-1 EXERCISE-FOUR (Graeme, 04 Oct, on the phone: "Why; What to
@@ -348,6 +355,7 @@ export function hurtBlock(open) {
 
 
 import { bodyCaution, soreAreaLoaded, tooHardRecently } from "./data/session-rationale.js";
+import { renderFigure } from "./figures.js";
 import { getDisplayPref } from "./display-prefs.js";
 
 function esc(s) {
@@ -602,7 +610,10 @@ export function renderExerciseCard(exercise, opts = {}) {
   // field. Without that, "right for beta, not for public launch"
   // becomes permanent by default, and the tripwire is the only thing
   // making it safe to ship a promise on the screen.
-  const imageSlot = `
+  // D-4. The figure, when there is one, in the slot the placeholder kept.
+  const figure = renderFigure(exercise);
+  const imageSlot = figure ? `
+    <div class="xcard-block xcard-figure">${figure}</div>` : `
     <div class="xcard-block xcard-image">
       <p class="xcard-image-note">Photographs are being added. For now, the video shows the movement.</p>
     </div>`;
@@ -703,6 +714,7 @@ export function renderExerciseCard(exercise, opts = {}) {
       ${pointer}`
       : `
       ${pinned}
+      ${renderFigure(exercise)}
       ${how ? `<div class="xcard-block xcard-how">${how}</div>` : ""}
       ${opts.doSlot || ""}
       ${adaptBlock}`;

@@ -1,0 +1,337 @@
+/**
+ * js/data/figures/batch-12.js
+ * 04 Oct 2026 v1
+ *
+ * D-4 FIGURES, batch 12: the running, swimming and cycling sessions and drills.
+ * The format is described in js/figures.js.
+ */
+export const FIGURES_12 = {
+  "c25k-week1": { w: 160, f: [
+    { l: "Run 60 seconds", a: "Jogging gently at a comfortable pace: body tall, the front foot landing under the body, the back heel lifting, elbows bent and arms swinging.",
+      p: { hip: [80, 114], t: 175, h: 178, nl: [27.9, -16.5, 95], fl: [-25, -62, -25], na: [-40, 40], fa: [32, 140] } },
+    { l: "Walk 90 seconds", a: "Walking briskly, body upright, one foot stepping forward, arms swinging.",
+      p: { hip: [82, 116], t: 180, nl: [26.5, 1.6, 90], fl: [-1.6, -26.5, 90], na: [-20, -8], fa: [20, 30] } },
+  ] },
+  "c25k-week2": { w: 160, f: [
+    { l: "Run 90 seconds", a: "Jogging gently at a comfortable pace: body tall, the front foot landing under the body, the back heel lifting, elbows bent and arms swinging.",
+      p: { hip: [80, 114], t: 175, h: 178, nl: [27.9, -16.5, 95], fl: [-25, -62, -25], na: [-40, 40], fa: [32, 140] } },
+    { l: "Walk 2 minutes", a: "Walking briskly, body upright, one foot stepping forward, arms swinging.",
+      p: { hip: [82, 116], t: 180, nl: [26.5, 1.6, 90], fl: [-1.6, -26.5, 90], na: [-20, -8], fa: [20, 30] } },
+  ] },
+  "c25k-week3": { w: 160, f: [
+    { l: "Run 90 seconds, then 3 minutes", a: "Jogging gently at a comfortable pace: body tall, the front foot landing under the body, the back heel lifting, elbows bent and arms swinging.",
+      p: { hip: [80, 114], t: 175, h: 178, nl: [27.9, -16.5, 95], fl: [-25, -62, -25], na: [-40, 40], fa: [32, 140] } },
+    { l: "Walk for the same time", a: "Walking briskly, body upright, one foot stepping forward, arms swinging.",
+      p: { hip: [82, 116], t: 180, nl: [26.5, 1.6, 90], fl: [-1.6, -26.5, 90], na: [-20, -8], fa: [20, 30] } },
+  ] },
+  "c25k-week4": { w: 160, f: [
+    { l: "Run 3, then 5 minutes", a: "Jogging gently at a comfortable pace: body tall, the front foot landing under the body, the back heel lifting, elbows bent and arms swinging.",
+      p: { hip: [80, 114], t: 175, h: 178, nl: [27.9, -16.5, 95], fl: [-25, -62, -25], na: [-40, 40], fa: [32, 140] } },
+    { l: "Walk 90 seconds, then 2.5 minutes", a: "Walking briskly, body upright, one foot stepping forward, arms swinging.",
+      p: { hip: [82, 116], t: 180, nl: [26.5, 1.6, 90], fl: [-1.6, -26.5, 90], na: [-20, -8], fa: [20, 30] } },
+  ] },
+  "c25k-week5-day1": { w: 160, f: [
+    { l: "Run 5 minutes", a: "Jogging gently at a comfortable pace: body tall, the front foot landing under the body, the back heel lifting, elbows bent and arms swinging.",
+      p: { hip: [80, 114], t: 175, h: 178, nl: [27.9, -16.5, 95], fl: [-25, -62, -25], na: [-40, 40], fa: [32, 140] } },
+    { l: "Walk 3 minutes", a: "Walking briskly, body upright, one foot stepping forward, arms swinging.",
+      p: { hip: [82, 116], t: 180, nl: [26.5, 1.6, 90], fl: [-1.6, -26.5, 90], na: [-20, -8], fa: [20, 30] } },
+  ] },
+  "c25k-week5-day3": { w: 160, f: [
+    { l: "Warm up: walk 5 minutes", a: "Walking briskly, body upright, one foot stepping forward, arms swinging.",
+      p: { hip: [82, 116], t: 180, nl: [26.5, 1.6, 90], fl: [-1.6, -26.5, 90], na: [-20, -8], fa: [20, 30] } },
+    { l: "Run 20 minutes, no walking", a: "Running continuously at an easy, steady pace: body tall, the front foot landing under the body, the back heel lifting, elbows bent and arms swinging.",
+      p: { hip: [80, 114], t: 175, h: 178, nl: [27.9, -16.5, 95], fl: [-25, -62, -25], na: [-40, 40], fa: [32, 140] } },
+  ] },
+  "c25k-week6": { w: 160, f: [
+    { l: "Run 10 minutes", a: "Jogging gently at a comfortable pace: body tall, the front foot landing under the body, the back heel lifting, elbows bent and arms swinging.",
+      p: { hip: [80, 114], t: 175, h: 178, nl: [27.9, -16.5, 95], fl: [-25, -62, -25], na: [-40, 40], fa: [32, 140] } },
+    { l: "Walk 3 minutes", a: "Walking briskly, body upright, one foot stepping forward, arms swinging.",
+      p: { hip: [82, 116], t: 180, nl: [26.5, 1.6, 90], fl: [-1.6, -26.5, 90], na: [-20, -8], fa: [20, 30] } },
+  ] },
+  "c25k-week7": { w: 160, f: [
+    { l: "Warm up: walk 5 minutes", a: "Walking briskly, body upright, one foot stepping forward, arms swinging.",
+      p: { hip: [82, 116], t: 180, nl: [26.5, 1.6, 90], fl: [-1.6, -26.5, 90], na: [-20, -8], fa: [20, 30] } },
+    { l: "Run 25 minutes", a: "Running continuously at an easy, steady pace: body tall, the front foot landing under the body, the back heel lifting, elbows bent and arms swinging.",
+      p: { hip: [80, 114], t: 175, h: 178, nl: [27.9, -16.5, 95], fl: [-25, -62, -25], na: [-40, 40], fa: [32, 140] } },
+  ] },
+  "c25k-week8": { w: 160, f: [
+    { l: "Warm up: walk 5 minutes", a: "Walking briskly, body upright, one foot stepping forward, arms swinging.",
+      p: { hip: [82, 116], t: 180, nl: [26.5, 1.6, 90], fl: [-1.6, -26.5, 90], na: [-20, -8], fa: [20, 30] } },
+    { l: "Run 28 minutes", a: "Running continuously at an easy, steady pace: body tall, the front foot landing under the body, the back heel lifting, elbows bent and arms swinging.",
+      p: { hip: [80, 114], t: 175, h: 178, nl: [27.9, -16.5, 95], fl: [-25, -62, -25], na: [-40, 40], fa: [32, 140] } },
+  ] },
+  "c25k-week9": { w: 160, f: [
+    { l: "Warm up: walk 5 minutes", a: "Walking briskly, body upright, one foot stepping forward, arms swinging.",
+      p: { hip: [82, 116], t: 180, nl: [26.5, 1.6, 90], fl: [-1.6, -26.5, 90], na: [-20, -8], fa: [20, 30] } },
+    { l: "Run 30 minutes", a: "Running continuously at an easy, steady pace: body tall, the front foot landing under the body, the back heel lifting, elbows bent and arms swinging.",
+      p: { hip: [80, 114], t: 175, h: 178, nl: [27.9, -16.5, 95], fl: [-25, -62, -25], na: [-40, 40], fa: [32, 140] } },
+  ] },
+  "run-easy-20": { w: 160, f: [
+    { l: "Easy, conversational pace", a: "Running at an easy, conversational pace: body upright, a soft landing with the foot under the body, the back heel lifting, elbows bent and arms swinging relaxed.",
+      p: { hip: [80, 114], t: 175, h: 178, nl: [27.9, -16.5, 95], fl: [-25, -62, -25], na: [-40, 40], fa: [32, 140] } },
+  ] },
+  "run-tempo-20": { w: 160, f: [
+    { l: "Comfortably hard", a: "Running at a comfortably hard tempo pace: a slight lean forward, the front knee driving forward, the back leg pushing off, arms swinging strongly.",
+      p: { hip: [84, 108], t: 168, h: 172, nl: [45, -15, 95], fl: [-24.9, -23, 55], na: [-50, 55], fa: [42, 150] } },
+  ] },
+  "run-intervals-400m": { w: 160, f: [
+    { l: "Run 400 metres hard", a: "Running at a hard effort: a slight lean forward, the front knee driving forward, the back leg pushing off the floor, arms driving.",
+      p: { hip: [84, 108], t: 168, h: 172, nl: [45, -15, 95], fl: [-24.9, -23, 55], na: [-50, 55], fa: [42, 150] } },
+    { l: "Walk or jog 90 seconds", a: "Walking briskly, body upright, one foot stepping forward, arms swinging.",
+      p: { hip: [82, 116], t: 180, nl: [26.5, 1.6, 90], fl: [-1.6, -26.5, 90], na: [-20, -8], fa: [20, 30] } },
+  ] },
+  "run-intervals-800m": { w: 160, f: [
+    { l: "Run 800 metres hard", a: "Running at a hard effort: a slight lean forward, the front knee driving forward, the back leg pushing off the floor, arms driving.",
+      p: { hip: [84, 108], t: 168, h: 172, nl: [45, -15, 95], fl: [-24.9, -23, 55], na: [-50, 55], fa: [42, 150] } },
+    { l: "Jog slowly 2 minutes", a: "Jogging gently at a comfortable pace: body tall, the front foot landing under the body, the back heel lifting, elbows bent and arms swinging.",
+      p: { hip: [80, 114], t: 175, h: 178, nl: [27.9, -16.5, 95], fl: [-25, -62, -25], na: [-40, 40], fa: [32, 140] } },
+  ] },
+  "run-fartlek-25": { w: 160, f: [
+    { l: "Surge to a lamppost", a: "Surging faster: a slight lean forward, the front knee driving forward, the back leg pushing off, arms driving.",
+      p: { hip: [84, 108], t: 168, h: 172, nl: [45, -15, 95], fl: [-24.9, -23, 55], na: [-50, 55], fa: [42, 150] } },
+    { l: "Then float and recover", a: "Easing back to a gentle jog to recover: body tall, the foot landing under the body, arms swinging relaxed.",
+      p: { hip: [80, 114], t: 175, h: 178, nl: [27.9, -16.5, 95], fl: [-25, -62, -25], na: [-40, 40], fa: [32, 140] } },
+  ] },
+  "run-progression": { w: 160, f: [
+    { l: "First 10 minutes: easy", a: "Running at an easy, conversational pace: body tall, the foot landing under the body, arms swinging relaxed.",
+      p: { hip: [80, 114], t: 175, h: 178, nl: [27.9, -16.5, 95], fl: [-25, -62, -25], na: [-40, 40], fa: [32, 140] } },
+    { l: "Last 10 minutes: near tempo", a: "Running harder near the end: a slight lean forward, the front knee driving forward, the back leg pushing off, arms swinging strongly.",
+      p: { hip: [84, 108], t: 168, h: 172, nl: [45, -15, 95], fl: [-24.9, -23, 55], na: [-50, 55], fa: [42, 150] } },
+  ] },
+  "run-hills": { w: 160, f: [
+    { l: "Drive the arms, short stride", g: "none", a: "Running hard up a hill: a shorter stride, the front knee driving up the slope, the back foot pushing off the hill, arms driving, the lean coming from the ankles, not the waist.",
+      p: { hip: [86, 99], t: 168, h: 170, nl: [72, -2, 105], fl: [-23.4, -16.6, 75], na: [-55, 55], fa: [45, 160] },
+      x: [{ far: [[8, 186, 152, 148]] }] },
+    { l: "Walk or jog back down", g: "none", a: "Turned round, walking easily back down the hill, body upright, short steps.",
+      p: { hip: [86, 94], t: 180, h: -178, nl: [-19.8, -4.8, -75], fl: [-17.4, 37.9, -75], na: [18, 8], fa: [-20, -30] },
+      x: [{ far: [[8, 186, 152, 148]] }, { mv: [58, 124, 30, 131] }] },
+  ] },
+  "run-strides": { w: 160, f: [
+    { l: "Build up, hold, ease off", a: "Running quickly and smoothly at about 85 to 90% effort: body tall, the front knee driving forward, the back leg pushing off, shoulders relaxed, arms swinging.",
+      p: { hip: [84, 107], t: 174, h: 178, nl: [62, -8, 95], fl: [-23.3, -21.4, 55], na: [-48, 55], fa: [40, 148] } },
+  ] },
+  "run-parkrun": { w: 160, f: [
+    { l: "Hard but steady for 5K", a: "Running at a hard race effort for 5 kilometres: a slight lean forward, the front knee driving forward, the back leg pushing off, arms swinging strongly.",
+      p: { hip: [84, 108], t: 168, h: 172, nl: [45, -15, 95], fl: [-24.9, -23, 55], na: [-50, 55], fa: [42, 150] } },
+  ] },
+  "run-5k-time-trial": { w: 160, f: [
+    { l: "Run 5K as fast as you can", a: "Running at a hard race effort: a slight lean forward, the front knee driving forward, the back leg pushing off, arms swinging strongly.",
+      p: { hip: [84, 108], t: 168, h: 172, nl: [45, -15, 95], fl: [-24.9, -23, 55], na: [-50, 55], fa: [42, 150] } },
+  ] },
+  "run-drill-butt-kicks": { w: 160, f: [
+    { l: "Flick the heel up", a: "Running slowly and upright: one heel flicked up towards the bottom, that thigh staying vertical and the knee pointing down; the other foot on the floor; arms pumping.",
+      p: { hip: [82, 112], t: 178, h: 180, nl: [-4, -150, -100], fl: [4, -4, 70], na: [-40, 55], fa: [35, 145] } },
+    { l: "Then the other heel", a: "The same with the other leg: the other heel flicked up towards the bottom, thigh vertical, knee pointing down, the first foot now on the floor.",
+      p: { hip: [82, 112], t: 178, h: 180, fl: [-4, -150, -100], nl: [4, -4, 70], fa: [-40, 55], na: [35, 145] },
+      x: [{ mvq: [48, 168, 38, 140, 58, 120] }] },
+  ] },
+  "run-drill-a-skip": { w: 160, f: [
+    { l: "Knee up to hip height", a: "Standing tall on the ball of one foot, the other knee driven up to hip height with the foot under the knee, the opposite arm forward.",
+      p: { hip: [82, 108], t: 180, h: 180, nl: [90, 0, 90], fl: [11.5, -14.6, 60], na: [-40, 60], fa: [40, 150] } },
+    { l: "Skip, then the other knee", a: "After a single small skip, the other knee is driven up to hip height while landing on the ball of the first foot; the arms swap.",
+      p: { hip: [82, 108], t: 180, h: 180, fl: [90, 0, 90], nl: [11.5, -14.6, 60], fa: [-40, 60], na: [40, 150] },
+      x: [{ mv: [136, 146, 136, 124] }] },
+  ] },
+  "run-drill-b-skip": { w: 160, f: [
+    { l: "Knee up", a: "Standing tall on the ball of one foot, the other knee driven up to hip height, the opposite arm forward.",
+      p: { hip: [82, 108], t: 180, h: 180, nl: [90, 0, 90], fl: [11.5, -14.6, 60], na: [-40, 60], fa: [40, 150] } },
+    { l: "Kick the lower leg out", a: "At the top of the knee drive, the lower leg kicks out forward until the leg is nearly straight.",
+      p: { hip: [70, 108], t: 180, h: 180, nl: [80, 70, 100], fl: [11.5, -14.6, 60], na: [-40, 60], fa: [40, 150] },
+      x: [{ mvq: [118, 160, 134, 160, 144, 146] }] },
+    { l: "Paw down and back", a: "The foot driven down and back onto the floor under the body, pawing the ground, body still tall.",
+      p: { hip: [76, 110], t: 180, h: 180, nl: [28.5, -15.5, 70], fl: [-10, -40, -20], na: [-30, 70], fa: [30, 140] },
+      x: [{ mv: [132, 182, 110, 182] }] },
+  ] },
+  "run-drill-bounding": { w: 180, f: [
+    { l: "Drive off hard", a: "Pushing off hard from the back foot, that leg nearly straight, the front knee driven high, arms pumping in opposition.",
+      p: { hip: [84, 106], t: 166, h: 170, nl: [85, 0, 95], fl: [-27.5, -25.6, 50], na: [-60, 50], fa: [55, 165] } },
+    { l: "Float, then land softly", a: "In the air between bounds: front knee high, back leg trailing, arms pumping; the landing will be soft on the ball of the foot, knee bent.",
+      p: { hip: [86, 96], t: 168, h: 172, nl: [80, 10, 95], fl: [-42, -55, -40], na: [-55, 50], fa: [55, 165] },
+      x: [{ mvq: [120, 82, 146, 64, 168, 92] }] },
+  ] },
+  "run-drill-cadence": { w: 160, f: [
+    { l: "Short, quick steps", a: "Running easily with a short stride: the foot landing right under the hips, not out in front, body upright, arms relaxed.",
+      p: { hip: [80, 113], t: 175, h: 178, nl: [23.2, -18.3, 95], fl: [-15, -50, -20], na: [-35, 60], fa: [30, 140] } },
+  ] },
+  "run-drill-stride-outs": { w: 160, f: [
+    { l: "Run tall and smooth", a: "Running fast and smoothly at about 90% effort: body tall, the front knee driving forward, the back leg pushing off, face and shoulders relaxed.",
+      p: { hip: [84, 107], t: 174, h: 178, nl: [62, -8, 95], fl: [-23.3, -21.4, 55], na: [-48, 55], fa: [40, 148] } },
+  ] },
+  "run-easy-30": { w: 160, f: [
+    { l: "Easy, conversational pace", a: "Running at an easy, conversational pace: body upright and relaxed, the foot landing under the body, the back heel lifting, arms swinging.",
+      p: { hip: [80, 114], t: 175, h: 178, nl: [27.9, -16.5, 95], fl: [-25, -62, -25], na: [-40, 40], fa: [32, 140] } },
+  ] },
+  "run-tempo-30": { w: 160, f: [
+    { l: "Comfortably hard", a: "Running at a comfortably hard, sustained pace: a slight lean forward, the front knee driving forward, the back leg pushing off, arms swinging strongly.",
+      p: { hip: [84, 108], t: 168, h: 172, nl: [45, -15, 95], fl: [-24.9, -23, 55], na: [-50, 55], fa: [42, 150] } },
+  ] },
+  "run-intervals-1k": { w: 160, f: [
+    { l: "Run 1K, hard but controlled", a: "Running at a hard effort: a slight lean forward, the front knee driving forward, the back leg pushing off the floor, arms driving.",
+      p: { hip: [84, 108], t: 168, h: 172, nl: [45, -15, 95], fl: [-24.9, -23, 55], na: [-50, 55], fa: [42, 150] } },
+    { l: "Jog slowly 2 minutes", a: "Jogging gently at a comfortable pace: body tall, the front foot landing under the body, the back heel lifting, elbows bent and arms swinging.",
+      p: { hip: [80, 114], t: 175, h: 178, nl: [27.9, -16.5, 95], fl: [-25, -62, -25], na: [-40, 40], fa: [32, 140] } },
+  ] },
+  "run-cruise-intervals": { w: 160, f: [
+    { l: "Tempo for 5 minutes", a: "Running at tempo pace: a slight lean forward, the front knee driving forward, the back leg pushing off, arms swinging strongly.",
+      p: { hip: [84, 108], t: 168, h: 172, nl: [45, -15, 95], fl: [-24.9, -23, 55], na: [-50, 55], fa: [42, 150] } },
+    { l: "Easy jog for 1 minute", a: "Jogging gently at a comfortable pace: body tall, the front foot landing under the body, the back heel lifting, elbows bent and arms swinging.",
+      p: { hip: [80, 114], t: 175, h: 178, nl: [27.9, -16.5, 95], fl: [-25, -62, -25], na: [-40, 40], fa: [32, 140] } },
+  ] },
+  "run-marathon-pace": { w: 160, f: [
+    { l: "Sustainable, not easy", a: "Running at a steady, sustainable pace: body tall with a slight lean forward, the foot landing under the body, arms swinging.",
+      p: { hip: [82, 111], t: 172, h: 175, nl: [24.9, -9.1, 95], fl: [-32, -78, -40], na: [-45, 55], fa: [38, 145] } },
+  ] },
+  "run-long-60": { w: 160, f: [
+    { l: "Easy enough to keep going", a: "Running at an easy, conversational pace: body upright and relaxed, the foot landing under the body, the back heel lifting, arms swinging.",
+      p: { hip: [80, 114], t: 175, h: 178, nl: [27.9, -16.5, 95], fl: [-25, -62, -25], na: [-40, 40], fa: [32, 140] } },
+  ] },
+  "run-long-slow-90": { w: 160, f: [
+    { l: "Slow, easy running", a: "Running at a slow, easy pace: body upright and relaxed, the foot landing under the body, arms swinging.",
+      p: { hip: [80, 114], t: 175, h: 178, nl: [27.9, -16.5, 95], fl: [-25, -62, -25], na: [-40, 40], fa: [32, 140] } },
+    { l: "Walk 1 to 2 minutes when needed", a: "A walking break: walking upright, one foot stepping forward, arms swinging.",
+      p: { hip: [82, 116], t: 180, nl: [26.5, 1.6, 90], fl: [-1.6, -26.5, 90], na: [-20, -8], fa: [20, 30] } },
+  ] },
+  "run-back-to-back": { w: 160, f: [
+    { l: "Easy pace, both days", a: "Running at an easy pace: body upright and relaxed, the foot landing under the body, the back heel lifting, arms swinging.",
+      p: { hip: [80, 114], t: 175, h: 178, nl: [27.9, -16.5, 95], fl: [-25, -62, -25], na: [-40, 40], fa: [32, 140] } },
+  ] },
+  "swim-catch-drill": { w: 200, f: [
+    { l: "Fingertips in, reach forward", g: "none", a: "Swimming freestyle, face down: one hand has gone into the water fingertips first and reaches forward just under the surface; the other arm is back by the hip.",
+      p: { hip: [94, 140], t: 91, h: 92, nl: [-84, -96, -100], fl: [-95, -85, -82], na: [87, 86], fa: [-85, -88] },
+      x: [{ far: [[8, 131, 192, 131]] }] },
+    { l: "Press back on the forearm", g: "none", a: "The reaching arm bends at the elbow so the forearm points down, the elbow staying high, and presses the water back towards the feet, not down.",
+      p: { hip: [94, 140], t: 91, h: 92, nl: [-84, -96, -100], fl: [-95, -85, -82], na: [68, 0], fa: [-85, -88] },
+      x: [{ far: [[8, 131, 192, 131]] }, { mv: [168, 178, 142, 178] }] },
+  ] },
+  "swim-bilateral-breathing": { w: 200, f: [
+    { l: "Breathe every third stroke", g: "none", a: "Swimming freestyle, face down and body long: one arm reaching forward, the other recovering over the water. Every third stroke the head turns to the side to breathe, alternating sides.",
+      p: { hip: [94, 140], t: 91, h: 92, nl: [-84, -96, -100], fl: [-95, -85, -82], na: [-155, -10], fa: [80, 84] },
+      x: [{ far: [[8, 131, 192, 131]] }] },
+  ] },
+  "swim-kick-drill": { w: 200, f: [
+    { l: "Small, fast kicks from the hips", g: "none", a: "Lying face down in the water, arms straight out in front holding a kickboard; the legs nearly straight, kicking small and fast from the hips, ankles loose.",
+      p: { hip: [94, 140], t: 92, h: 95, nl: [-84, -96, -100], fl: [-95, -85, -82], na: [87, 86], fa: [85, 84] },
+      x: [{ far: [[8, 131, 192, 131]] }, { pad: [170, 128, 26, 10] }] },
+  ] },
+  "swim-pull-buoy": { w: 200, f: [
+    { l: "Arms only, hips high", g: "none", a: "Swimming freestyle with a pull buoy held between the thighs, legs together and still; body long, one arm pulling back under the body, the other reaching forward.",
+      p: { hip: [94, 139], t: 91, h: 92, nl: [-88, -90, -92], fl: [-90, -88, -90], na: [55, -5], fa: [80, 84] },
+      x: [{ far: [[8, 131, 192, 131]] }, { pad: [68, 135, 18, 9] }] },
+  ] },
+  "swim-catch-up-drill": { w: 200, f: [
+    { l: "Both hands meet in front", g: "none", a: "Swimming freestyle, face down: both arms stretched out in front, the second hand catching up to the first before anything else happens.",
+      p: { hip: [94, 140], t: 91, h: 92, nl: [-84, -96, -100], fl: [-95, -85, -82], na: [86, 85], fa: [82, 81] },
+      x: [{ far: [[8, 131, 192, 131]] }] },
+    { l: "Then one arm pulls", g: "none", a: "Only then does one arm pull back under the body while the other stays stretched out in front.",
+      p: { hip: [94, 140], t: 91, h: 92, nl: [-84, -96, -100], fl: [-95, -85, -82], na: [40, -15], fa: [82, 81] },
+      x: [{ far: [[8, 131, 192, 131]] }, { mv: [146, 188, 122, 188] }] },
+  ] },
+  "swim-fingertip-drag": { w: 200, f: [
+    { l: "Elbow high, fingertips skim", g: "none", a: "Swimming freestyle: one arm recovering forward over the water with the elbow lifted high, the forearm hanging and the fingertips trailing lightly along the surface; the other arm reaching forward under the water.",
+      p: { hip: [94, 139], t: 91, h: 92, nl: [-84, -96, -100], fl: [-95, -85, -82], na: [-165, -40], fa: [80, 84] },
+      x: [{ far: [[8, 131, 192, 131]] }] },
+  ] },
+  "swim-descending-intervals": { w: 200, f: [
+    { l: "Each 100 m faster", g: "none", a: "Swimming freestyle, face down and body long just under the surface: one arm reaching forward under the water, the other lifting out of the water behind, elbow high, legs kicking.",
+      p: { hip: [94, 140], t: 91, h: 92, nl: [-84, -96, -100], fl: [-95, -85, -82], na: [-155, -10], fa: [80, 84] },
+      x: [{ far: [[8, 131, 192, 131]] }] },
+  ] },
+  "swim-easy-400": { w: 200, f: [
+    { l: "Long, relaxed strokes", g: "none", a: "Swimming freestyle, face down and body long just under the surface: one arm reaching forward under the water, the other lifting out of the water behind, elbow high, legs kicking.",
+      p: { hip: [94, 140], t: 91, h: 92, nl: [-84, -96, -100], fl: [-95, -85, -82], na: [-155, -10], fa: [80, 84] },
+      x: [{ far: [[8, 131, 192, 131]] }] },
+  ] },
+  "swim-hard-200": { w: 200, f: [
+    { l: "Hard but sustained", g: "none", a: "Swimming freestyle, face down and body long just under the surface: one arm reaching forward under the water, the other lifting out of the water behind, elbow high, legs kicking.",
+      p: { hip: [94, 140], t: 91, h: 92, nl: [-84, -96, -100], fl: [-95, -85, -82], na: [-155, -10], fa: [80, 84] },
+      x: [{ far: [[8, 131, 192, 131]] }] },
+  ] },
+  "swim-sprint-50": { w: 200, f: [
+    { l: "Sprint 50 m, rest 60 s", g: "none", a: "Swimming freestyle, face down and body long just under the surface: one arm reaching forward under the water, the other lifting out of the water behind, elbow high, legs kicking.",
+      p: { hip: [94, 140], t: 91, h: 92, nl: [-84, -96, -100], fl: [-95, -85, -82], na: [-155, -10], fa: [80, 84] },
+      x: [{ far: [[8, 131, 192, 131]] }] },
+  ] },
+  "swim-medley": { w: 200, f: [
+    { l: "Swim 200 m", g: "none", a: "Swimming freestyle, face down and body long just under the surface: one arm reaching forward under the water, the other lifting out of the water behind, elbow high, legs kicking.",
+      p: { hip: [94, 140], t: 91, h: 92, nl: [-84, -96, -100], fl: [-95, -85, -82], na: [-155, -10], fa: [80, 84] },
+      x: [{ far: [[8, 131, 192, 131]] }] },
+    { l: "Pull 200 m with a buoy", g: "none", a: "Arms only: a pull buoy held between the thighs, legs still, one arm pulling under the body, the other reaching forward.",
+      p: { hip: [94, 139], t: 91, h: 92, nl: [-88, -90, -92], fl: [-90, -88, -90], na: [55, -5], fa: [80, 84] },
+      x: [{ far: [[8, 131, 192, 131]] }, { pad: [68, 135, 18, 9] }] },
+    { l: "Kick 200 m with a board", g: "none", a: "Legs only: arms straight out in front holding a kickboard, legs kicking small and fast from the hips.",
+      p: { hip: [94, 140], t: 92, h: 95, nl: [-84, -96, -100], fl: [-95, -85, -82], na: [87, 86], fa: [85, 84] },
+      x: [{ far: [[8, 131, 192, 131]] }, { pad: [170, 128, 26, 10] }] },
+  ] },
+  "swim-backstroke": { w: 180, f: [
+    { l: "One arm up, one pulls", g: "none", a: "Lying on the back in the water, head back with the ears in, hips high near the surface: one arm recovering straight up over the body, the other pulling down by the hip, legs kicking.",
+      p: { hip: [84, 138], t: -90, h: -92, nl: [86, 96, 110], fl: [94, 84, 120], na: [180, 178], fa: [88, 86] },
+      x: [{ far: [[8, 131, 172, 131]] }] },
+  ] },
+  "swim-open-water-prep": { w: 200, f: [
+    { l: "Swim steady", g: "none", a: "Swimming freestyle, face down and body long just under the surface: one arm reaching forward under the water, the other lifting out of the water behind, elbow high, legs kicking.",
+      p: { hip: [94, 140], t: 91, h: 92, nl: [-84, -96, -100], fl: [-95, -85, -82], na: [-155, -10], fa: [80, 84] },
+      x: [{ far: [[8, 131, 192, 131]] }] },
+    { l: "Every 10 strokes, look ahead", g: "none", a: "Sighting: the head lifted briefly so the eyes look forward over the water, one arm reaching forward, then the face goes back down.",
+      p: { hip: [94, 141], t: 95, h: 128, nl: [-84, -96, -100], fl: [-95, -85, -82], na: [84, 86], fa: [-85, -88] },
+      x: [{ far: [[8, 131, 192, 131]] }] },
+  ] },
+  "swim-pool-endurance": { w: 200, f: [
+    { l: "Steady, even strokes", g: "none", a: "Swimming freestyle, face down and body long just under the surface: one arm reaching forward under the water, the other lifting out of the water behind, elbow high, legs kicking.",
+      p: { hip: [94, 140], t: 91, h: 92, nl: [-84, -96, -100], fl: [-95, -85, -82], na: [-155, -10], fa: [80, 84] },
+      x: [{ far: [[8, 131, 192, 131]] }] },
+  ] },
+  "swim-breaststroke": { w: 200, f: [
+    { l: "Pull in, heels up", g: "none", a: "Breaststroke: the hands pulled in under the chest, elbows bent, while the knees bend and the heels are drawn up towards the bottom.",
+      p: { hip: [96, 140], t: 91, h: 100, nl: [-68, -150, -60], fl: [-72, -146, -64], na: [30, 135], fa: [34, 138] },
+      x: [{ far: [[8, 131, 192, 131]] }] },
+    { l: "Kick round, then glide", g: "none", a: "The legs kick out and round until straight and together, the arms push forward, and the body holds a long, flat glide for 1 to 2 seconds.",
+      p: { hip: [96, 140], t: 91, h: 92, nl: [-88, -90, -92], fl: [-90, -88, -90], na: [88, 88], fa: [90, 90] },
+      x: [{ far: [[8, 131, 192, 131]] }, { mv: [36, 150, 14, 150] }, { mv: [160, 112, 184, 112] }] },
+  ] },
+  "cycle-easy-spin": { w: 180, f: [
+    { l: "Light gear, spin easily", a: "Sitting on a bicycle saddle, leaning forward with relaxed arms to the handlebars; one leg nearly straight with the pedal near the bottom, the other knee bent with the pedal near the top.",
+      p: { hip: [72, 106], t: 130, h: 115, nl: [67.3, -29.4, 100], fl: [23.2, -11.2, 100], na: [27.8, 99.8], fa: [22.9, 99.7] },
+      x: [{ ball: [36, 166, 23] }, { ball: [148, 166, 23] }, { far: [[36, 166, 88, 170, 72, 112, 36, 166], [72, 112, 136, 106, 88, 170], [136, 106, 148, 166], [136, 106, 138, 94, 148, 94], [62, 109, 80, 109], [92.4, 157.8, 88, 170, 83.6, 182.2]] }] },
+  ] },
+  "cycle-tempo-45": { w: 180, f: [
+    { l: "Comfortably hard, steady", a: "Sitting on a bicycle and pedalling at a comfortably hard, steady effort, leaning forward with relaxed arms to the handlebars.",
+      p: { hip: [72, 106], t: 130, h: 115, nl: [67.3, -29.4, 100], fl: [23.2, -11.2, 100], na: [27.8, 99.8], fa: [22.9, 99.7] },
+      x: [{ ball: [36, 166, 23] }, { ball: [148, 166, 23] }, { far: [[36, 166, 88, 170, 72, 112, 36, 166], [72, 112, 136, 106, 88, 170], [136, 106, 148, 166], [136, 106, 138, 94, 148, 94], [62, 109, 80, 109], [92.4, 157.8, 88, 170, 83.6, 182.2]] }] },
+  ] },
+  "cycle-hill-simulation": { w: 180, f: [
+    { l: "Seated for 30 seconds", a: "Sitting on the saddle of a bicycle, leaning forward, pushing the pedals round against heavy resistance.",
+      p: { hip: [72, 106], t: 130, h: 115, nl: [67.3, -29.4, 100], fl: [23.2, -11.2, 100], na: [27.8, 99.8], fa: [22.9, 99.7] },
+      x: [{ ball: [36, 166, 23] }, { ball: [148, 166, 23] }, { far: [[36, 166, 88, 170, 72, 112, 36, 166], [72, 112, 136, 106, 88, 170], [136, 106, 148, 166], [136, 106, 138, 94, 148, 94], [62, 109, 80, 109], [92.4, 157.8, 88, 170, 83.6, 182.2]] }] },
+    { l: "Stand for 30 seconds", a: "Standing up off the saddle on the pedals, body forward over the handlebars, hands on the bars, the bike kept steady.",
+      p: { hip: [92, 94], t: 140, h: 125, nl: [35.4, -33.2, 100], fl: [-11, -12.9, 100], na: [-1, 66.8], fa: [-4.4, 64.2] },
+      x: [{ ball: [36, 166, 23] }, { ball: [148, 166, 23] }, { far: [[36, 166, 88, 170, 72, 112, 36, 166], [72, 112, 136, 106, 88, 170], [136, 106, 148, 166], [136, 106, 138, 94, 148, 94], [62, 109, 80, 109], [97.2, 160.8, 88, 170, 78.8, 179.2]] }, { mv: [60, 96, 60, 74] }] },
+  ] },
+  "cycle-intervals": { w: 180, f: [
+    { l: "30 s hard, 90 s easy", a: "Sitting on a bicycle and pedalling, leaning forward with the hands on the handlebars.",
+      p: { hip: [72, 106], t: 130, h: 115, nl: [67.3, -29.4, 100], fl: [23.2, -11.2, 100], na: [27.8, 99.8], fa: [22.9, 99.7] },
+      x: [{ ball: [36, 166, 23] }, { ball: [148, 166, 23] }, { far: [[36, 166, 88, 170, 72, 112, 36, 166], [72, 112, 136, 106, 88, 170], [136, 106, 148, 166], [136, 106, 138, 94, 148, 94], [62, 109, 80, 109], [92.4, 157.8, 88, 170, 83.6, 182.2]] }] },
+  ] },
+  "cycle-cadence-drill": { w: 180, f: [
+    { l: "Light gear", a: "Sitting on a bicycle saddle, leaning forward with relaxed arms to the handlebars; one leg nearly straight with the pedal near the bottom, the other knee bent with the pedal near the top.",
+      p: { hip: [72, 106], t: 130, h: 115, nl: [67.3, -29.4, 100], fl: [23.2, -11.2, 100], na: [27.8, 99.8], fa: [22.9, 99.7] },
+      x: [{ ball: [36, 166, 23] }, { ball: [148, 166, 23] }, { far: [[36, 166, 88, 170, 72, 112, 36, 166], [72, 112, 136, 106, 88, 170], [136, 106, 148, 166], [136, 106, 138, 94, 148, 94], [62, 109, 80, 109], [92.4, 157.8, 88, 170, 83.6, 182.2]] }] },
+    { l: "Spin fast and smooth", a: "The same position, the pedals turning fast in smooth circles, the body staying still in the saddle.",
+      p: { hip: [72, 106], t: 130, h: 115, nl: [67.3, -29.4, 100], fl: [23.2, -11.2, 100], na: [27.8, 99.8], fa: [22.9, 99.7] },
+      x: [{ ball: [36, 166, 23] }, { ball: [148, 166, 23] }, { far: [[36, 166, 88, 170, 72, 112, 36, 166], [72, 112, 136, 106, 88, 170], [136, 106, 148, 166], [136, 106, 138, 94, 148, 94], [62, 109, 80, 109], [75.8, 165.6, 88, 170, 100.2, 174.4]] }, { mvq: [108, 150, 122, 172, 100, 188] }] },
+  ] },
+  "cycle-sprint-intervals": { w: 180, f: [
+    { l: "10 seconds, all out", a: "Sitting on a bicycle, leaning lower over the handlebars, pedalling as hard as possible.",
+      p: { hip: [72, 106], t: 120, h: 105, nl: [41.3, -2.7, 100], fl: [46, -44.5, 100], na: [22.8, 117.4], fa: [17.8, 116.9] },
+      x: [{ ball: [36, 166, 23] }, { ball: [148, 166, 23] }, { far: [[36, 166, 88, 170, 72, 112, 36, 166], [72, 112, 136, 106, 88, 170], [136, 106, 148, 166], [136, 106, 138, 94, 148, 94], [62, 109, 80, 109], [99.3, 176.5, 88, 170, 76.7, 163.5]] }] },
+  ] },
+  "cycle-endurance-90": { w: 180, f: [
+    { l: "Steady, conversational", a: "Sitting on a bicycle saddle, leaning forward with relaxed arms to the handlebars; one leg nearly straight with the pedal near the bottom, the other knee bent with the pedal near the top.",
+      p: { hip: [72, 106], t: 130, h: 115, nl: [67.3, -29.4, 100], fl: [23.2, -11.2, 100], na: [27.8, 99.8], fa: [22.9, 99.7] },
+      x: [{ ball: [36, 166, 23] }, { ball: [148, 166, 23] }, { far: [[36, 166, 88, 170, 72, 112, 36, 166], [72, 112, 136, 106, 88, 170], [136, 106, 148, 166], [136, 106, 138, 94, 148, 94], [62, 109, 80, 109], [92.4, 157.8, 88, 170, 83.6, 182.2]] }] },
+  ] },
+  "cycle-recovery-spin": { w: 180, f: [
+    { l: "Easiest gear, no effort", a: "Sitting fairly upright on a bicycle, hands resting lightly on the handlebars, turning the pedals in the easiest gear.",
+      p: { hip: [72, 106], t: 145, h: 140, nl: [67.3, -29.4, 100], fl: [23.2, -11.2, 100], na: [59.1, 61.3], fa: [57.1, 59.3] },
+      x: [{ ball: [36, 166, 23] }, { ball: [148, 166, 23] }, { far: [[36, 166, 88, 170, 72, 112, 36, 166], [72, 112, 136, 106, 88, 170], [136, 106, 148, 166], [136, 106, 138, 94, 148, 94], [62, 109, 80, 109], [92.4, 157.8, 88, 170, 83.6, 182.2]] }] },
+  ] },
+};
