@@ -1,5 +1,9 @@
 /**
  * tools/verify-interruptions.mjs
+ * 04 Oct 2026 v2
+ *
+ * v2 - D-1 EXERCISE-FOUR. Reaches Capture (the fourth step) before the set buttons; nothing it proves has changed.
+ *
  * 30 Sep 2026 v1
  *
  * W3-13 INTERRUPTIONS (persona Wave 3: 2.4, 2.15, 2.16 -- the parent
@@ -97,7 +101,7 @@ function start(built) {
 function doOne(mins = 0) {
   const name = main.querySelector(".exercise-name")?.textContent;
   for (let i = 0; i < 12 && main.querySelector(".exercise-name")?.textContent === name && !navs.includes("reflect"); i++) {
-    if (!tap("#wo-set-done-btn") && !tap("#complete-exercise-btn") && !tap("#wo-done-btn")) break;
+    if (!tap("#wo-set-done-btn") && !tap("#complete-exercise-btn") && !tap("#wo-done-btn") && !tap('[data-step-go="capture"]:not([aria-current])')) break;
   }
   if (mins) later(mins);
 }

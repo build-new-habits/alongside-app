@@ -1,5 +1,10 @@
 /**
  * tools/verify-arc-and-saved.mjs
+ * 04 Oct 2026 v2
+ *
+ * v2 - D-1 EXERCISE-FOUR. Reaches Capture (the fourth step) before the set
+ *   buttons; nothing it proves has changed.
+ *
  * 30 Sep 2026 v1
  *
  * W3-16 ARC-AND-SAVED (persona Wave 3, 2.15: gym four times a week, on
@@ -176,7 +181,7 @@ appRouter.navigate = v => { navs.push(v); if (v === "workout") paint(); };
 function paint() { main.innerHTML = W.render(); try { W.onMount(); } catch {} }
 paint();
 const tap = sel => { const el = main.querySelector(sel); if (el) el.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true })); return !!el; };
-for (let i = 0; i < 200 && !navs.includes("reflect"); i++) { if (!tap("#wo-set-done-btn") && !tap("#complete-exercise-btn") && !tap("#wo-done-btn")) paint(); }
+for (let i = 0; i < 200 && !navs.includes("reflect"); i++) { if (!tap("#wo-set-done-btn") && !tap("#complete-exercise-btn") && !tap("#wo-done-btn") && !tap('[data-step-go="capture"]:not([aria-current])')) paint(); }
 const done = (store.get("activityLog") || []).at(-1) || {};
 ok("4b. finished, it is logged as Upper Body", navs.includes("reflect") && done.sessionType === "upper", `${done.sessionType} ${JSON.stringify(navs.slice(-2))}`);
 ok("4c. and the arc is credited for it", (store.get("arc").typesWorked || {}).upper === today() && !(store.get("arc").typesWorked || {}).glute, JSON.stringify(store.get("arc").typesWorked));

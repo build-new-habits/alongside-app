@@ -1,5 +1,12 @@
 /**
  * tools/verify-card3.mjs
+ * 04 Oct 2026 v3
+ *
+ * v3 - D-1 EXERCISE-FOUR. REVERSAL, Graeme's request on the device test
+ *   (Option B, approved in the mock-up): 10b said `why` was off the card
+ *   entirely; the exercise's own why is now the first of the four steps,
+ *   so 10b asserts it renders there and nowhere else on the card.
+ *
  * 28 Sep 2026 v2
  *
  * v2 - SMOOTH-P2c. workout.js left the page model for one screen per
@@ -405,8 +412,14 @@ check("10a. DECIDE carries no instructions, no hazards, no why", () => {
   }
 });
 
-check("10b. `why` is off the card entirely", () => {
-  ok(!card.includes("exercise.why"), "the card still reads `why`; it belongs in the library");
+// D-1 REVERSAL (Graeme, 04 Oct, Option B): the exercise's own why is the
+// first of the four steps. It renders there and nowhere else on the card.
+check("10b. `why` renders only on the Why step of the four-step layout", () => {
+  const i = card.indexOf('if (opts.layout === "steps")');
+  const j = card.indexOf('if (opts.layout === "flow")');
+  ok(i > -1 && j > i, "no steps branch before the flow branch");
+  const uses = [...card.matchAll(/exercise\.why/g)].map(m => m.index);
+  ok(uses.length > 0 && uses.every(k => k > i && k < j), "`why` is read outside the steps layout");
 });
 
 check("10c. `load` renders only when there is no last time", () => {

@@ -1,5 +1,9 @@
 /**
  * tools/verify-not-again.mjs
+ * 04 Oct 2026 v2
+ *
+ * v2 - D-1 EXERCISE-FOUR. Reaches Capture (the fourth step) before the set buttons; nothing it proves has changed.
+ *
  * 29 Sep 2026 v1
  *
  * P18, "NOT AGAIN" (persona finding W2-13). Settings says: "When you skip
@@ -112,6 +116,7 @@ ok("2b. \"Leave it\" records nothing, and the question goes", !(store.get("exerc
 // ── 3. THE LAST MOVE ────────────────────────────────────────────────────
 person(); play(session);
 tap("#skip-exercise-btn"); await wait(10);
+if (!main.querySelector("#wo-set-done-btn, #wo-done-btn, #complete-exercise-btn")) { tap('[data-step-go="capture"]:not([aria-current])'); await wait(10); }
 for (let i = 0; i < 6 && main.querySelector("#wo-set-done-btn"); i++) tap("#wo-set-done-btn");
 tap("#wo-done-btn"); tap("#complete-exercise-btn"); await wait(10);
 ok("2c. not answered and carried on: the question goes, nothing recorded", !main.querySelector("[data-skip-pref]") && !(store.get("exercisePreferences") || {})[topId] && nameNow() === session[2].name, `${nameNow()} | offer ${!!main.querySelector("[data-skip-pref]")}`);

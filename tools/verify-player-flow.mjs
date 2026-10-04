@@ -1,5 +1,17 @@
 /**
  * tools/verify-player-flow.mjs
+ * 04 Oct 2026 v5
+ *
+ * v5 - D-1 EXERCISE-FOUR. REVERSAL, Graeme's request on the device test
+ *   (Option B, approved in the mock-up): an exercise is four steps again,
+ *   Why, Watch out, How, Capture, with "I know this one: go to capture".
+ *   1a: no Start-this-one and no old page stepper still holds; it now
+ *   arrives at Why, with the set controls one tap away (was Done on the
+ *   first screen). 1f: Watch out comes before How in the steps and in
+ *   Next (was in the one screen's markup), hazards outside any
+ *   disclosure. 1d, 1e and test 2 reach Capture first and assert the
+ *   same things there; 1e's dose still leads, above the steps.
+ *
  * 28 Sep 2026 v4
  *
  * v4 - Work list 7, SAVE-HANDOFF. 4h: ending part-way records what was
@@ -66,6 +78,8 @@ globalThis.window.router = _router;
 Object.defineProperty(globalThis, "router", { value: _router, configurable: true, writable: true });
 const tap = sel => { const el = (main.querySelector(sel) || document.querySelector(sel)); if (el) el.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true })); return !!el; };
 const T = () => (main.textContent || "").replace(/\s+/g, " ").trim();
+// D-1. Capture is the fourth step; the set controls live there.
+const toCapture = () => { if (!main.querySelector("#wo-set-done-btn, #wo-done-btn, #complete-exercise-btn")) tap('[data-step-go="capture"]:not([aria-current])'); };
 
 const GYM = ["dumbbells-medium", "barbell", "bench-flat", "kettlebell-medium", "band-light"];
 const ROW = { id: "fixture-row", name: "Dumbbell Row", section: "main", role: "main", category: "horizontal-pull",
@@ -93,21 +107,28 @@ ok("0a. the first exercise is on screen", main.querySelector(".exercise-name")?.
 
 // ── 1. ONE SCREEN ───────────────────────────────────────────────────────
 console.log("\nTEST 1 - one screen per exercise: what to do, then how");
-ok("1a. no step before the exercise: Done is on the first screen, no Start-this-one, no page stepper",
-   !!main.querySelector("#wo-done-btn") && !main.querySelector("#wo-begin-btn") && !main.querySelector(".xcard-stepper"));
+ok("1a. no Start-this-one and no old page stepper: it arrives at Why, the set controls one tap away",
+   main.querySelector('.wo-steps [aria-current="step"]')?.dataset.stepGo === "why" && !!main.querySelector("#wo-step-capture") &&
+   !main.querySelector("#wo-begin-btn") && !main.querySelector(".xcard-stepper"));
 ok("1b. no raw category id and no points badge", !main.querySelector(".meta-tag") && !/⭐/.test(main.innerHTML));
 ok("1c. the section is a plain label", /^(Warm up|Main|Cool down)$/.test(main.querySelector(".wo-flow__section")?.textContent.trim() || ""));
+toCapture();
 ok("1d. \"If it hurts\" is on the screen, one tap away (closed)",
    !!main.querySelector("details.xcard-hurt") && !main.querySelector("details.xcard-hurt[open]"));
 
 fresh([ROW, { ...ROW, id: "fixture-2", name: "Goblet Squat" }]);
+const order = [...main.querySelectorAll(".wo-steps [data-step-go]")].map(b => b.dataset.stepGo);
+tap("#wo-step-next");
+const onWatch = main.querySelector('.wo-steps [aria-current="step"]')?.dataset.stepGo === "watch" &&
+  !!main.querySelector(".xstep--watch .xcard-block--hazard") && !main.querySelector("details .xcard-block--hazard:not(.xcard-hurt)") &&
+  /Next: How/.test(main.querySelector("#wo-step-next")?.textContent || "");
+ok("1f. what to watch out for comes before how to do it, outside any disclosure",
+   order.indexOf("watch") > -1 && order.indexOf("watch") < order.indexOf("how") && onWatch, JSON.stringify(order));
+toCapture();
 const html = main.innerHTML;
 ok("1e. the dose leads: 3 × 10 and Set 1 of 3, above the guidance",
    /3 × 10/.test(main.querySelector(".reps-value")?.textContent || "") && /Set 1 of 3/.test(T()) &&
-   html.indexOf("reps-value") < html.indexOf("How to do it"));
-ok("1f. what to watch for comes before how to do it, outside any disclosure",
-   html.indexOf("What to watch for") > -1 && html.indexOf("What to watch for") < html.indexOf("How to do it") &&
-   !main.querySelector("details .xcard-block--hazard:not(.xcard-hurt)"));
+   html.indexOf("reps-value") > -1 && html.indexOf("reps-value") < html.indexOf("wo-steps"));
 
 // ── 2. SETS, THEN NEXT ──────────────────────────────────────────────────
 console.log("\nTEST 2 - a tap a set, then Next on the same screen");
@@ -119,13 +140,13 @@ ok("2c. and asks how it was, without a page turn", !!main.querySelector(".wo-flo
 ok("2d. skip is gone once it is done", !main.querySelector("#skip-exercise-btn"));
 tap("#complete-exercise-btn");
 ok("2e. Next moves on and starts unfinished", main.querySelector(".exercise-name")?.textContent === "Goblet Squat" && !!main.querySelector("#skip-exercise-btn"));
-ok("2f. the last exercise says Finish", (() => { tap("#wo-done-btn"); return /Finish the session/.test(main.querySelector("#complete-exercise-btn")?.textContent || ""); })());
+ok("2f. the last exercise says Finish", (() => { toCapture(); tap("#wo-done-btn"); return /Finish the session/.test(main.querySelector("#complete-exercise-btn")?.textContent || ""); })());
 
 // ── 3. LAST TIME, ALREADY IN THE LOG ────────────────────────────────────
 console.log("\nTEST 3 - the log starts where they left off");
 fresh([ROW]);
 store.logLift("fixture-row", { weight: 16, reps: 10 });
-paint();
+paint(); toCapture();
 const w = main.querySelector('[data-perf-key="weight"]');
 ok("3a. the weight is pre-filled from last time", w && w.value === "16", `value "${w?.value}"`);
 ok("3b. and so are the reps", main.querySelector('[data-perf-key="reps"]')?.value === "10");
@@ -133,7 +154,7 @@ const plus = main.querySelector('[data-step-for$="-weight"][data-step="2.5"]');
 plus?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }));
 ok("3c. + adds a plate step (2.5 kg)", w?.value === "18.5", `value "${w?.value}"`);
 ok("3d. the − and + are named for what they do", /2\.5 kg more/.test(plus?.getAttribute("aria-label") || ""));
-fresh([ROW]);
+fresh([ROW]); toCapture();
 ok("3e. REVERSAL: nothing logged, nothing pre-filled", (main.querySelector('[data-perf-key="weight"]')?.value || "") === "");
 
 // ── 4. THE EXIT ─────────────────────────────────────────────────────────
@@ -155,7 +176,7 @@ const before = (store.get("activityLog") || []).length;
 tap("#exit-workout-btn"); document.querySelector("#exit-confirm-discard")?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }));
 ok("4f. Leave without saving goes Home and writes nothing", navs.at(-1) === "today" && (store.get("activityLog") || []).length === before, JSON.stringify(navs));
 
-fresh([ROW, { ...ROW, id: "fixture-2", name: "Goblet Squat" }]);
+fresh([ROW, { ...ROW, id: "fixture-2", name: "Goblet Squat" }]); toCapture();
 tap("#wo-set-done-btn"); tap("#wo-set-done-btn"); tap("#wo-set-done-btn"); tap("#complete-exercise-btn");
 const b2 = (store.get("activityLog") || []).length;
 tap("#exit-workout-btn"); document.querySelector("#exit-confirm-leave")?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }));
@@ -170,6 +191,7 @@ ok("4h. and records what was done, so the finish screen offers to keep this sess
 // ── 5. REST-1: A SUGGESTED REST ─────────────────────────────────────────
 console.log("\nTEST 5 - after a set, a suggested rest that never pushes");
 fresh([{ ...ROW, rest: 2 }, { ...ROW, id: "fixture-2", name: "Goblet Squat", rest: 2 }]);
+toCapture();
 ok("5pc. REVERSAL: no rest before the first set", !main.querySelector(".wo-rest"));
 tap("#wo-set-done-btn");
 const rest = main.querySelector(".wo-rest");
@@ -193,7 +215,7 @@ ok("5g. the next exercise starts without a rest", main.querySelector(".exercise-
 // 4i sits last: finishing the session ends the player, and test 5 needs
 // it running.
 console.log("\nTEST 4i - finishing offers to keep it");
-fresh([ROW]);
+fresh([ROW]); toCapture();
 tap("#wo-set-done-btn"); tap("#wo-set-done-btn"); tap("#wo-set-done-btn"); tap("#complete-exercise-btn");
 ok("4i. finishing the whole plan: the finish screen offers to keep it (it never could: the plan was cleared first)",
    navs.at(-1) === "reflect" && savableSession()?.exercises?.[0]?.id === "fixture-row",

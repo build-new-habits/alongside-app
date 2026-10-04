@@ -1,6 +1,11 @@
 /**
  * tools/verify-one-player.mjs
- * 02 Oct 2026 v2
+ * 04 Oct 2026 v3
+ *
+ * v3 - D-1 EXERCISE-FOUR. Reaches Capture (the fourth step) before the set
+ *   buttons. REVERSAL, approved in the four-step mock-up (Option B): 1b was
+ *   at most two taps a move (Done, Next); the four steps add one, "I know
+ *   this one: go to capture", so it is at most three. Nothing else changed.
  *
  * v2 - W4-1 GATE-OPEN. The fixture person has agreed (tools/agreed.mjs): the
  *   app now sends anybody who has not back to onboarding. No assertion
@@ -19,7 +24,7 @@
  *
  * Through the real router:
  *   1. Builder -> Let's go -> the coach's player, Free and the Plan; the
- *      whole session in at most two taps a move.
+ *      whole session in at most three taps a move (D-1: two before).
  *   2. Saved -> Start -> the coach's player; done, the list says "Last
  *      done today"; saved from the finish screen straight after doing it,
  *      the same; started and abandoned, still "Not done yet".
@@ -97,7 +102,7 @@ async function buildAndGo() {
 async function playThrough(max = 200) {
   let taps = 0;
   for (let i = 0; i < max && onView() !== "reflect"; i++) {
-    const b = $("#complete-exercise-btn") || $("#wo-done-btn") || $("#gp-next-btn") || $("#gp-done-btn") || $("[data-card-next]") || $("#gp-complete-btn");
+    const b = $("#complete-exercise-btn") || $("#wo-done-btn") || $("#wo-step-capture") || $("#gp-next-btn") || $("#gp-done-btn") || $("[data-card-next]") || $("#gp-complete-btn");
     if (!b) break;
     click(b); taps++; await wait(15);
   }
@@ -112,7 +117,7 @@ for (const tier of ["free", "personal"]) {
   ok(`1pc-${tier}. the builder made a session`, !!s && s.exercises.length >= 5, `${s?.exercises?.length}`);
   ok(`1a-${tier}. Let's go opens the coach's player on its first move`, onView() === "workout" && txt(main).includes(s.exercises[0].name), `${onView()} | ${txt(main).slice(0, 100)}`);
   const taps = await playThrough();
-  ok(`1b-${tier}. the whole session in at most two taps a move`, onView() === "reflect" && taps <= 2 * s.exercises.length, `${taps} taps for ${s.exercises.length} moves; ended on ${onView()}`);
+  ok(`1b-${tier}. the whole session in at most three taps a move (go to capture, Done, Next)`, onView() === "reflect" && taps <= 3 * s.exercises.length, `${taps} taps for ${s.exercises.length} moves; ended on ${onView()}`);
 }
 
 // ── 2. SAVED SESSIONS ───────────────────────────────────────────────────

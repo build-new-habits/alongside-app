@@ -1,5 +1,9 @@
 /**
  * tools/verify-home-plan.mjs
+ * 04 Oct 2026 v2
+ *
+ * v2 - D-1 EXERCISE-FOUR. Reaches Capture (the fourth step) before the set buttons; nothing it proves has changed.
+ *
  * 28 Sep 2026 v1
  *
  * SMOOTH-P3a. Plan Home is three doors, and coming back is one tap.
@@ -50,6 +54,9 @@ globalThis.window.router = fakeRouter;
 Object.defineProperty(globalThis, "router", { value: fakeRouter, configurable: true, writable: true });
 realRouter.navigate = fakeRouter.navigate;
 const tap = sel => { const el = main.querySelector(sel) || document.querySelector(sel); el?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true })); return !!el; };
+// D-1: the set buttons live on the Capture step; reach it first when they are not on screen.
+const toCapture = () => { if (!main.querySelector("#wo-set-done-btn, #wo-done-btn, #complete-exercise-btn, #timer-toggle-btn")) tap('[data-step-go="capture"]:not([aria-current])'); };
+const tapSet = sel => { toCapture(); return tap(sel); };
 
 function fixture({ tier = "personal", checkedIn = false } = {}) {
   if (document.querySelector("#exit-workout-btn")) { tap("#exit-workout-btn"); document.querySelector("#exit-confirm-discard")?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true })); }
@@ -109,8 +116,8 @@ for (const [label, route] of [["Join a class", "classes"], ["Something for the m
 // ── 3. CARRY ON LATER ───────────────────────────────────────────────────
 console.log("\nTEST 3 - Carry on later, then carry on where they were");
 fixture(); startSession();
-tap("#wo-set-done-btn"); tap("#wo-set-done-btn"); tap("#wo-set-done-btn"); tap("#complete-exercise-btn");  // Row done
-tap("#wo-set-done-btn");                                                                                    // Press, set 1
+tapSet("#wo-set-done-btn"); tapSet("#wo-set-done-btn"); tapSet("#wo-set-done-btn"); tapSet("#complete-exercise-btn");  // Row done
+tapSet("#wo-set-done-btn");                                                                                    // Press, set 1
 tap("#exit-workout-btn");
 const later = document.querySelector("#exit-confirm-later");
 ok("3a. the exit sheet offers Carry on later", !!later && /Carry on later/.test(txt(later)));
@@ -129,7 +136,7 @@ ok("3e. Carry on resumes at the same exercise and set", navs[0] === "workout" &&
 // ── 4. A COLD REOPEN ────────────────────────────────────────────────────
 console.log("\nTEST 4 - the app closed mid-session and reopened comes back to the card, not the proposal");
 fixture(); startSession();
-tap("#wo-set-done-btn");
+tapSet("#wo-set-done-btn");
 store.set("lastProposalDate", new Date().toISOString());   // accepted a moment ago: the state that bounced
 store.set("lastProposalType", "door-1");
 navs = [];
@@ -143,7 +150,7 @@ ok("4b. REVERSAL: with nothing to carry on, the cold-open bounce still works (EX
 // ── 5. FINISH HERE ──────────────────────────────────────────────────────
 console.log("\nTEST 5 - Finish here saves what was done and goes to the finish");
 fixture(); startSession();
-tap("#wo-set-done-btn"); tap("#wo-set-done-btn"); tap("#wo-set-done-btn"); tap("#complete-exercise-btn");
+tapSet("#wo-set-done-btn"); tapSet("#wo-set-done-btn"); tapSet("#wo-set-done-btn"); tapSet("#complete-exercise-btn");
 tap("#exit-workout-btn"); document.querySelector("#exit-confirm-later")?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }));
 home(["workout"]);
 navs = [];

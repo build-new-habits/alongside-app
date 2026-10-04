@@ -1,5 +1,9 @@
 /**
  * tools/verify-learned-session.mjs
+ * 04 Oct 2026 v2
+ *
+ * v2 - D-1 EXERCISE-FOUR. Reaches Capture (the fourth step) before the set buttons; nothing it proves has changed.
+ *
  * 30 Sep 2026 v1
  *
  * W3-12 MOSTLY-SAME (persona Wave 3: 2.14, autistic, predictability-
@@ -180,6 +184,7 @@ async function play(low) {
     if (tap("#wo-set-done-btn")) continue;
     if (tap("#wo-done-btn")) continue;
     if (tap("#complete-exercise-btn")) continue;
+    if (tap('[data-step-go="capture"]:not([aria-current])')) continue;
     break;
   }
   store.set("todayIntensity", null);

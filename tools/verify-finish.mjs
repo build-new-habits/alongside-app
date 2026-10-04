@@ -1,5 +1,10 @@
 /**
  * tools/verify-finish.mjs
+ * 04 Oct 2026 v5
+ *
+ * v5 - D-1 EXERCISE-FOUR. Reaches Capture (the fourth step) before the set
+ *   buttons; nothing it proves has changed.
+ *
  * 02 Oct 2026 v4
  *
  * v4 - W4-8 PAIN-NUMBERS. 3c: the finish's Better / About the same / Worse
@@ -77,6 +82,8 @@ const EX = (id, name) => ({ id, name, section: "main", role: "main", category: "
   equipment: ["dumbbell"], affectsAreas: ["upper-back"], sets: 3, reps: "10", rest: 60, duration: 220,
   instructions: ["Pull"], watchOut: ["Twisting"] });
 
+// D-1: the set buttons are on Capture, the fourth step.
+function toCapture() { if (!main.querySelector("#wo-set-done-btn, #wo-done-btn, #complete-exercise-btn")) tap('[data-step-go="capture"]:not([aria-current])'); }
 function session({ conditions = [], finish = true, soreToday = false } = {}) {
   if (document.querySelector("#exit-workout-btn")) { tap("#exit-workout-btn"); document.querySelector("#exit-confirm-discard")?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true })); }
   localStorage.clear(); store.init(); agreed(store);
@@ -88,8 +95,8 @@ function session({ conditions = [], finish = true, soreToday = false } = {}) {
   navs = [];
   paintWorkout();
   // Row: three sets, next. Press: three sets.
-  tap("#wo-set-done-btn"); tap("#wo-set-done-btn"); tap("#wo-set-done-btn"); tap("#complete-exercise-btn");
-  tap("#wo-set-done-btn"); tap("#wo-set-done-btn"); tap("#wo-set-done-btn");
+  toCapture(); tap("#wo-set-done-btn"); tap("#wo-set-done-btn"); tap("#wo-set-done-btn"); tap("#complete-exercise-btn");
+  toCapture(); tap("#wo-set-done-btn"); tap("#wo-set-done-btn"); tap("#wo-set-done-btn");
   if (finish) tap("#complete-exercise-btn");
   else { tap("#exit-workout-btn"); document.querySelector("#exit-confirm-leave")?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true })); }
 }

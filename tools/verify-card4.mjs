@@ -1,5 +1,12 @@
 /**
  * tools/verify-card4.mjs
+ * 04 Oct 2026 v4
+ *
+ * v4 - D-1 EXERCISE-FOUR. REVERSAL (Option B, approved in the mock-up):
+ *   8.9 asserted workout.js used the one-screen "flow" layout; it now uses
+ *   the four-step "steps" layout, and 8.9 asserts that, with no flow and no
+ *   card-page state (a half-migrated view is still the fault to catch).
+ *
  * 28 Sep 2026 v3
  *
  * v3 - SMOOTH-P3c. capture.js joins PARTIAL (borrows hurtBlock only).
@@ -351,8 +358,10 @@ console.log("\nTEST 8 — moving forward passes the warnings; Back goes one page
     VIEWS.map(v => [v, strip(fs.readFileSync(`js/views/${v}.js`, "utf8"))]));
   const wo = strip(fs.readFileSync("js/views/workout.js", "utf8"));
 
-  ok("8.9 workout.js uses the one-screen layout and keeps no page state",
-     /layout:\s*"flow"/.test(wo) && !/currentCardPage/.test(wo));
+  // D-1. The four steps replaced the one screen (Option B, 04 Oct); the
+  // fault to catch is still a half-migrated view holding both models.
+  ok("8.9 workout.js uses the four-step layout and keeps no card-page state",
+     /layout:\s*"steps"/.test(wo) && !/layout:\s*"flow"/.test(wo) && !/currentCardPage/.test(wo));
 
   ok("8.5 CONTROL: three paged view sources read and each holds page state",
      VIEWS.every(v => src[v].length > 2000 && /currentCardPage/.test(src[v])));

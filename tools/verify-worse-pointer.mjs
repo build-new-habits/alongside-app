@@ -1,6 +1,9 @@
 /**
  * tools/verify-worse-pointer.mjs
- * 30 Sep 2026 v1
+ * 04 Oct 2026 v2
+ *
+ * v2 - D-1 EXERCISE-FOUR. Reaches Capture (the fourth step) before the set buttons;
+ *   nothing it proves has changed.
  *
  * W3-5 WORSE-POINTER (Wave 3, persona 2.1). Answering "Worse than usual"
  * at the finish got "Things were harder today and you showed up anyway.
@@ -69,8 +72,10 @@ function session({ conditions = [], finish = true, soreToday = false } = {}) {
   store.set("generatedSession", { session: { id: "s", name: "Upper Body", exercises: [EX("a", "Row"), EX("b", "Press")] }, builtAt: new Date().toISOString(), inputs: {} });
   navs = [];
   paintWorkout();
-  // Row: three sets, next. Press: three sets.
+  // Row: to capture, three sets, next. Press: to capture, three sets.
+  tap("#wo-step-capture");
   tap("#wo-set-done-btn"); tap("#wo-set-done-btn"); tap("#wo-set-done-btn"); tap("#complete-exercise-btn");
+  tap("#wo-step-capture");
   tap("#wo-set-done-btn"); tap("#wo-set-done-btn"); tap("#wo-set-done-btn");
   if (finish) tap("#complete-exercise-btn");
   else { tap("#exit-workout-btn"); document.querySelector("#exit-confirm-leave")?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true })); }

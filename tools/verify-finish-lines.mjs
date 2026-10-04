@@ -1,5 +1,10 @@
 /**
  * tools/verify-finish-lines.mjs
+ * 04 Oct 2026 v2
+ *
+ * v2 - D-1 EXERCISE-FOUR. Reaches Capture (the fourth step) before the set
+ *   buttons; nothing it proves has changed.
+ *
  * 29 Sep 2026 v1
  *
  * P10, FINISH LINES (persona finding W2-10). What the coach says at the
@@ -79,7 +84,9 @@ function fixture({ sore = null, energies = [7, 7, 7, 7, 7], rotate = 0, checkedI
   navs = [];
   paintWorkout();
 }
-function doMoves(n) { for (let i = 0; i < n; i++) { tap("#wo-set-done-btn"); tap("#wo-set-done-btn"); tap("#wo-set-done-btn"); tap("#complete-exercise-btn"); } }
+// D-1: the set buttons are on Capture, the fourth step.
+function toCapture() { if (!main.querySelector("#wo-set-done-btn, #wo-done-btn, #complete-exercise-btn")) tap('[data-step-go="capture"]:not([aria-current])'); }
+function doMoves(n) { for (let i = 0; i < n; i++) { toCapture(); tap("#wo-set-done-btn"); tap("#wo-set-done-btn"); tap("#wo-set-done-btn"); tap("#complete-exercise-btn"); } }
 function endEarly() { tap("#exit-workout-btn"); document.querySelector("#exit-confirm-leave")?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true })); }
 async function empathyText() {
   tap("#reflect-done-btn"); await wait(20);

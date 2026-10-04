@@ -1,5 +1,10 @@
 /**
  * tools/verify-free-carry-on.mjs
+ * 04 Oct 2026 v2
+ *
+ * v2 - D-1 EXERCISE-FOUR. Reaches Capture (the fourth step) before the set
+ *   buttons; nothing it proves has changed.
+ *
  * 29 Sep 2026 v1
  *
  * P4, FREE-CARRY-ON (persona finding W2-4, seen by six of eight).
@@ -71,7 +76,7 @@ function fixture(tier) {
 function doOne() {
   const name = main.querySelector(".exercise-name")?.textContent;
   for (let i = 0; i < 12 && main.querySelector(".exercise-name")?.textContent === name && !navs.includes("reflect"); i++) {
-    if (!tap("#wo-set-done-btn") && !tap("#complete-exercise-btn") && !tap("#wo-done-btn")) break;
+    if (!tap("#wo-set-done-btn") && !tap("#complete-exercise-btn") && !tap("#wo-done-btn") && !tap('[data-step-go="capture"]:not([aria-current])')) break;
   }
 }
 const A = SB.buildSession({ sessionType: "upper", durationMins: 30, equipmentOverride: GYM });

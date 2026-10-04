@@ -1,6 +1,9 @@
 /**
  * tools/verify-session-type-live.mjs
- * 29 Sep 2026 v1
+ * 04 Oct 2026 v2
+ *
+ * v2 - D-1 EXERCISE-FOUR. Reaches Capture (the fourth step) before the set buttons;
+ *   nothing it proves has changed.
  *
  * P2, SESSION-TYPE-ID (persona finding W2-1, seen by all eight).
  * "The coach picks Glute Focus every time."
@@ -97,8 +100,9 @@ async function oneSession() {
   if (!navs.includes("workout")) return { error: "did not start", navs };
   if (process.env.DBG) console.log("PLAYER:", txt(main).slice(0, 300), [...main.querySelectorAll("button")].map(b => b.id || b.className).join(","));
   for (let i = 0; i < 400 && !navs.includes("reflect"); i++) {
-    // A set-based exercise has a button a set; a timed one, "Done".
-    if (!tap("#wo-set-done-btn") && !tap("#complete-exercise-btn") && !tap("#wo-done-btn")) break;
+    // A set-based exercise has a button a set; a timed one, "Done". Each
+    // move opens at Why: "go to capture" reaches the set buttons.
+    if (!tap("#wo-set-done-btn") && !tap("#complete-exercise-btn") && !tap("#wo-done-btn") && !tap("#wo-step-capture")) break;
     await wait(0);
   }
   // Four sessions a person does on four occasions, not inside the store's

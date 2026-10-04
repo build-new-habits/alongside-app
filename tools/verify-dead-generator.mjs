@@ -1,5 +1,10 @@
 /**
  * tools/verify-dead-generator.mjs
+ * 04 Oct 2026 v5
+ *
+ * v5 - D-1 EXERCISE-FOUR. Reaches Capture (the fourth step) before the set
+ *   buttons; nothing it proves has changed.
+ *
  * 03 Oct 2026 v4
  *
  * v4 - W5-21. 2b names a fourth reader, session-builder.js (the gentle plan
@@ -152,6 +157,7 @@ function player({ feedback = [], sore = false, energy = "moderate", lifted = tru
   if (sore) { store.set("conditions", ["upper-back"]); store.set("conditionPainScores", { "upper-back": 6 }); }
   store.set("generatedSession", { session: { id: "s", name: "Upper Body", exercises: [ROW] }, builtAt: new Date().toISOString(), inputs: {} });
   paint();
+  main.querySelector('[data-step-go="capture"]:not([aria-current])')?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }));   // D-1: the log block is on Capture
   return (main.querySelector(".slog__invite")?.textContent || "").trim();
 }
 const up = /too easy last time/i;

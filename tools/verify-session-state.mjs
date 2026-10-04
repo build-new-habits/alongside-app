@@ -1,6 +1,9 @@
 /**
  * tools/verify-session-state.mjs
- * 03 Oct 2026 v1
+ * 04 Oct 2026 v2
+ *
+ * v2 - D-1 EXERCISE-FOUR. Reaches Capture (the fourth step) before the set buttons;
+ *   nothing it proves has changed.
  *
  * W5-9 SESSION-STATE (Wave 5 persona trace: 2.1, 2.15).
  *
@@ -85,7 +88,7 @@ async function advance(n) {
   for (let k = 0; k < n; k++) {
     const start = pos()[0];
     for (let i = 0; i < 12 && pos()[0] === start && onView() === "workout"; i++) {
-      const b = main.querySelector("#complete-exercise-btn, #wo-done-btn, #wo-set-done-btn, [data-card-next]");
+      const b = main.querySelector("#complete-exercise-btn, #wo-done-btn, #wo-set-done-btn, #wo-step-capture, [data-card-next]");
       if (!b) break;
       click(b); await wait(15);
     }

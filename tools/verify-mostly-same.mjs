@@ -1,5 +1,9 @@
 /**
  * tools/verify-mostly-same.mjs
+ * 04 Oct 2026 v4
+ *
+ * v4 - D-1 EXERCISE-FOUR. Reaches Capture (the fourth step) before the set buttons; nothing it proves has changed.
+ *
  * 02 Oct 2026 v3
  *
  * v3 - W4-25 MOSTLY-SAME-FLAKE. The builder's random choices come from a
@@ -117,6 +121,7 @@ console.log("\nTEST 1 - the coach's player records which section each move was d
     if (tap("#wo-set-done-btn")) continue;
     if (tap("#wo-done-btn")) continue;
     if (tap("#complete-exercise-btn")) continue;
+    if (tap('[data-step-go="capture"]:not([aria-current])')) continue;
     break;
   }
   const h = store.get("exerciseHistory") || {};

@@ -1,5 +1,13 @@
 /**
  * tools/verify-timer1.mjs
+ * 04 Oct 2026 v3
+ *
+ * v3 - D-1 EXERCISE-FOUR. Reaches Capture (the fourth step) before the timer
+ *   and set controls.
+ *   REVERSAL, approved in the four-step mock-up: the SMOOTH-P2c tally
+ *   (one screen, Done on it) becomes the D-1 tally (four steps in the
+ *   safety order, arriving at Why). Every timer assertion is unchanged.
+ *
  * 28 Sep 2026 v2
  *
  * v2 - SMOOTH-P2c. The coach's player is one screen per exercise, so
@@ -116,12 +124,18 @@ const tap = (sel) => {
 let _watchPassed = 0, _toDoCalls = 0;
 const toDo = () => {
   _toDoCalls++;
-  // SMOOTH-P2c. One screen: nothing to tap before the exercise, and
-  // the hazards still come before the instructions on it.
+  // D-1 (replaces SMOOTH-P2c's one-screen tally, Graeme's Option B, 04
+  // Oct). Each exercise arrives as four steps in the safety order, Why,
+  // Watch out, How, Capture, at Why, with no Start-this-one step before
+  // it: what to watch out for still comes before how to do it.
+  const strip = [...main.querySelectorAll(".wo-steps [data-step-go]")].map(b => b.dataset.stepGo);
   const oneScreen = !main.querySelector("#wo-begin-btn") && !main.querySelector("#wo-watch-btn") &&
-    !!main.querySelector("#wo-done-btn");
-  const html = main.innerHTML, w = html.indexOf("What to watch for"), h = html.indexOf("How to do it");
-  if (oneScreen && (w === -1 || w < h)) _watchPassed++;
+    JSON.stringify(strip) === JSON.stringify(["why", "watch", "how", "capture"]) &&
+    main.querySelector('.wo-steps [aria-current="step"]')?.dataset.stepGo === "why";
+  if (oneScreen) _watchPassed++;
+  // D-1. The tally above is read on ARRIVAL, unchanged. Then reach
+  // Capture, where the timer and set controls now live.
+  tap('[data-step-go="capture"]');
   return oneScreen;
 };
 
@@ -178,11 +192,11 @@ function freshSession() {
 console.log("\nTEST 1 - the countdown running out is announced");
 
 const built = freshSession();
+toDo();   // D-1: reach Capture first; Done lives there now
 ok("1pc. positive control: the session mounted on an exercise",
    /1 of/.test(T()) && !!main.querySelector("#wo-done-btn"),
    `screen reads: ${T().slice(0, 120)}`);
 
-toDo();
 ok("1a. and reaches the DO page with a timer",
    !!main.querySelector("#timer-toggle-btn"),
    "no timer on this exercise - the fixture must use one that has a duration");
@@ -263,10 +277,10 @@ ok("4a. the next exercise starts clean",
 
 
 // CARD-4. Asserted once, covering every toDo() above.
-ok("SMOOTH-P2c. every exercise was one screen, hazards before how-to (" +
+ok("D-1. every exercise arrived as its four steps, Watch out before How, at Why (" +
    _watchPassed + " of " + _toDoCalls + ")",
    _toDoCalls > 0 && _watchPassed === _toDoCalls,
-   "a Start-this-one step came back, or instructions render above what to watch for");
+   "a Start-this-one step came back, or the steps are out of their safety order");
 
 console.log(fails === 0
   ? "\nTIMER-1: all assertions pass\n"
