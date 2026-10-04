@@ -1,6 +1,11 @@
 /**
  * tools/verify-a11y-w4.mjs
- * 04 Oct 2026 v2
+ * 04 Oct 2026 v3
+ *
+ * v3 - D-5. The Library category heading's emoji became a kind tile with a
+ *      line icon; 6a now finds that tile (its icon aria-hidden) instead of
+ *      the emoji span. What it proves, no icon in the heading's spoken
+ *      name, is unchanged.
  *
  * v2 - LOOK-1: Settings is an index of section pages, so the switches are
  *      no longer all on one page. Test 1 now opens each section page in
@@ -138,7 +143,11 @@ ok("5a. no aria-label replacing the visible label", !!ta && !ta.hasAttribute("ar
 // ── 6. MINDFUL PRACTICE HEADING ─────────────────────────────────────────
 console.log("\nTEST 6 - no emoji in a heading's spoken name");
 const lib = readFileSync(new URL("js/views/library.js", ROOT), "utf8");
-ok("6a. the category heading keeps its icon out of the name", !/<h1>\$\{cat\.icon\}/.test(lib) && /<h1><span aria-hidden="true">\$\{cat\.icon\}<\/span>/.test(lib));
+// D-5: the heading's emoji became a kind tile whose line icon is aria-hidden
+// (data/line-icons.js); the property, no icon in the spoken name, is the same.
+ok("6a. the category heading keeps its icon out of the name", !/<h1[^>]*>\$\{cat\.icon\}/.test(lib) && !/<h1[^>]*>[^<]*\$\{cat\.icon\}/.test(lib) &&
+   /<h1 class="library-sub-title"><span class="kind-tile k-\$\{catKind\}">\$\{lineIcon\(catIcon\)\}<\/span> \$\{cat\.label\}<\/h1>/.test(lib) &&
+   /aria-hidden="true"/.test(readFileSync(new URL("js/data/line-icons.js", ROOT), "utf8")));
 
 // ── 7. BREATHING UNDER REDUCE MOTION ────────────────────────────────────
 console.log("\nTEST 7 - the breathing circle under Reduce motion");

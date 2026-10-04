@@ -1,5 +1,15 @@
 /**
  * tools/verify-library-tiles.mjs
+ * 04 Oct 2026 v3
+ *
+ * v3 - D-5 LIBRARY-ONCE. REVERSAL, from Graeme's device test (asked home
+ *   or gym twice; the builder's plan was not the coach's): Full Body,
+ *   Upper body, Lower body and Mobility at home now open Today's plan
+ *   (coach-proposal) with their kind as requestedSessionType, not the
+ *   builder with a preselect. 1b reads the kind from there; everything it
+ *   protects (each tile lands where its label says, only Core opens the
+ *   core session) is unchanged.
+ *
  * 02 Oct 2026 v2
  *
  * v2 - W4-1 GATE-OPEN. The fixture person has agreed (tools/agreed.mjs): the
@@ -104,11 +114,12 @@ for (const f of found) {
   click(main.querySelector('[data-guided="home"]')); await wait(40);
   const b = tiles().find(x => txt(x.querySelector(".library-session-label")) === f.label);
   lastPre = "";
+  store.set("requestedSessionType", null);
   click(b); await wait(80);
-  landed.push({ ...f, view: router.currentView, preStored: lastPre });
+  landed.push({ ...f, view: router.currentView, preStored: lastPre || store.get("requestedSessionType") || "" });
 }
-const EXPECT = { "Full Body": ["session-builder", "full"], "Core": ["core-session", ""], "Upper body": ["session-builder", "upper"],
-                 "Lower body": ["session-builder", "lower"], "Mobility": ["session-builder", "mobility"] };
+const EXPECT = { "Full Body": ["coach-proposal", "full"], "Core": ["core-session", ""], "Upper body": ["coach-proposal", "upper"],
+                 "Lower body": ["coach-proposal", "lower"], "Mobility": ["coach-proposal", "mobility"] };
 const wrong = [];
 for (const [label, [view, pre]] of Object.entries(EXPECT)) {
   const l = landed.find(x => x.label === label);
