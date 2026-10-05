@@ -1,5 +1,21 @@
 # Alongside — Data Schema Reference
-## 03 Oct 2026 v1.108
+## 05 Oct 2026 v1.109
+
+> **v1.109, 05 Oct 2026 — D-6 WEEK-SHAPE** (`store.js` v112). New
+> **`weekShape`** (`object|null`, default `null`): the shape of the
+> person's week. `{ templates: { [id]: { id, name, mix: [{ focus, level }],
+> intensity, mins, place, extras, favourites } }, days: { mon..sun: id |
+> "rest" | null }, setAt, dismissed }`. Vocabulary and limits in
+> `data/week-shape-model.js` (`FOCUSES`, `LEVELS` 0 a little / 1 some /
+> 2 mostly, `INTENSITIES` gentle / steady / moderate, `LENGTHS`, `PLACES`,
+> `EXTRAS`); `sanitizeWeekShape()` runs on every load, so a malformed week
+> is dropped rather than coerced. **Written by** `views/your-week.js`.
+> **Read by** `data/week-shape.js` (Home's today card, the week page, the
+> balance line). New **`weekDayRequest`** (`object|null`, default `null`):
+> `{ day, templateId, on, short }`, written by Home's *Show me today's
+> plan* / *Only 10 minutes*, **read once and cleared by**
+> `coach-proposal.js`, which builds the day's plan from that day plan.
+> Neither is health data. Both are carried by Restore as part of the store.
 
 > **v1.108, 03 Oct 2026 — W5-19** (`store.js` v111). New
 > **`onboarding.reachedStep`** (`string|null`, default `null`): the Getting
@@ -990,7 +1006,7 @@
 
 ## 06 Sep 2026 v1.51
 
-**File:** `js/store.js` (confirmed live version: **v111, 03 Oct 2026**)
+**File:** `js/store.js` (confirmed live version: **v112, 05 Oct 2026**)
 
 > **v1.47, 06 Sep 2026 — CR-1.** `conditions[]` gains three ids and loses one. `chronic-fatigue` is **retired**; `persistent-fatigue`, `me-cfs` and `long-covid` replace it. No field shape changed — `conditions` is still `string[]` and `conditionMeta` is still keyed by condition id.
 >
@@ -1896,6 +1912,8 @@ There is no `stats` field, live or dormant, anywhere in `store.js`. Every `stats
 | `movementIdentity` | `string[]` | `[]` | Migrated from `string\|null` in v8 (05 Jul) — existing single values are wrapped, not dropped, on merge. e.g. `['gym','running','walking']`, or `['mixed']` (mutually exclusive with named identities). |
 | `sessionLocation` | `string\|null` | `null` | **LOCATION-1, 08 Sep 2026.** `"home"`, `"gym"`, `"outside"` or `null`. Where the person is for THIS session. **The one constraint the coach cannot infer** (CLUB spec v2 §6.2), so it is asked rather than guessed, and remembered so it is asked once. Selects which equipment list a session is built against: `homeEquipment`, `gymEquipment`, or — for `"outside"` — none, because your home kit is not in the park. `null` is treated as `"home"` at the point of building: never propose a barbell to somebody who might be in a kitchen. **Written by** `checkin-mini.js` (Step 4), `capture.js` (during a session) and `coach-proposal.js` **when a session starts** (W3-21: changing *Where* on the plan changes that plan, not the default). **Read by** `coach-proposal.js` via `equipmentForLocation()`. |
 | `requestedLocation` | `string\|null` | `null` | **W3-21, 30 Sep 2026.** `"home"`, `"gym"`, `"outside"` or `null`. Where *I know what I want* asked for today's plan. **Written by** `know-what.js`. **Read once and cleared by** `coach-proposal.js` on mount, so it never outlives the plan it was asked for. |
+| `weekShape` | `object\|null` | `null` | **D-6, 05 Oct 2026.** The shape of the person's week: day plans (`templates`) and what each day is for (`days`: a plan id, `"rest"` or `null`). Vocabulary in `data/week-shape-model.js`; made safe on load by `sanitizeWeekShape()`. **Written by** `views/your-week.js`. **Read by** `data/week-shape.js`. |
+| `weekDayRequest` | `object\|null` | `null` | **D-6, 05 Oct 2026.** `{ day, templateId, on, short }`: Home asked for today's plan from the week (`short`: *Only 10 minutes*). **Written by** `today.js`. **Read once and cleared by** `coach-proposal.js` on mount. |
 | `lastProposalType` | `string\|null` | `null` | |
 | `lastProposalDate` | `string\|null` | `null` | |
 | `createdAt` | `string\|null` | `null` | Set once, at `completeOnboarding()`. |

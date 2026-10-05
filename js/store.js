@@ -1,9 +1,18 @@
 import { zonesForAreas } from "./data/aims.js";
 import { consentCovers } from "./data/health-consent-covers.js";
 import { RETIRED_CONDITIONS } from "./data/scope-statement.js";
+import { sanitizeWeekShape, sanitizeWeekDayRequest } from "./data/week-shape-model.js";
 
 /**
  * store.js - Data persistence layer
+ * 05 Oct 2026 v112
+ *
+ * v112 - D-6 WEEK-SHAPE (Schema v1.109). New weekShape: the shape of the
+ *   person's week (day plans, what each day is for), validated by
+ *   data/week-shape-model.js sanitizeWeekShape(). New weekDayRequest: Home's
+ *   "Show me today's plan" / "Only 10 minutes" from the week, read once and
+ *   cleared by coach-proposal.js.
+ *
  * 03 Oct 2026 v111
  *
  * v111 - W5-19 GS-RESUME (Schema v1.108). New onboarding.reachedStep: the
@@ -1563,6 +1572,12 @@ export const store = {
       // and cleared by the plan, so looking does not change the default.
       requestedLocation: null,
 
+      // D-6 WEEK-SHAPE. The shape of the person's week (data/week-shape-model.js),
+      // or null. And Home's request for today's plan from it, read once and
+      // cleared by the plan.
+      weekShape: null,
+      weekDayRequest: null,
+
       // EXIT-LOOP, 16 Sep 2026. ISO timestamp of the last "exit without
       // saving", or null. Compared against lastProposalDate, so a NEWER
       // proposal clears it without needing to be reset anywhere.
@@ -1581,6 +1596,10 @@ export const store = {
       // ASK-KIND. The kind of session the person asked for, for today.
       requestedSessionType: saved.requestedSessionType || null,
       requestedLocation: ["home", "gym", "outside"].includes(saved.requestedLocation) ? saved.requestedLocation : null,
+
+      // D-6. Made safe on every load: a malformed week is dropped, never coerced.
+      weekShape: sanitizeWeekShape(saved.weekShape),
+      weekDayRequest: sanitizeWeekDayRequest(saved.weekDayRequest),
 
       // EXIT-LOOP. When a proposal was last declined, so Home can tell
       // "interrupted, take me back" from "no, not this one".
