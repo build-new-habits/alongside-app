@@ -1,6 +1,9 @@
 /**
  * tools/verify-outbound.mjs
- * 01 Oct 2026 v3
+ * 05 Oct 2026 v4
+ *
+ * v4 - SW-INCREMENTAL. 3a2: the Sentry loader is async, so it never holds up
+ *   opening the app.
  *
  * v3 - B3 DOMAIN: 2e reads the offline list's relative paths (sw.js v624).
  * v3 - B5 EVIDENCE. The app now has exactly one way to send something it
@@ -95,6 +98,10 @@ console.log("\nTEST 3 - Sentry sends errors only, with nothing personal");
 const loaderAt = live.indexOf("js-de.sentry-cdn.com");
 const inline = [...live.matchAll(/<script>([\s\S]*?)<\/script>/g)].find(m => /sentryOnLoad/.test(m[1]));
 ok("3a. Sentry is configured before its loader", !!inline && inline.index < loaderAt);
+// SW-INCREMENTAL, 05 Oct. A plain script tag held up every open until Sentry's
+// server answered; it is outside the app's own cache.
+const loaderTag = (live.match(/<script[^>]*js-de\.sentry-cdn\.com[^>]*>/) || [""])[0];
+ok("3a2. the Sentry loader does not hold up the page (async)", /\basync\b/.test(loaderTag), loaderTag);
 let opts = null;
 if (inline) {
   const dom = new JSDOM("<!doctype html>", { runScripts: "outside-only" });
