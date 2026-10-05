@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 05 Oct 2026 v652
+ * 05 Oct 2026 v653
  *
+ * v653 - D-7 (Graeme, 05 Oct): Add a plan you already have. Paste a plan; the app finds its exercises with fixed rules (movement only, read on the phone and not kept, nothing added unseen), adds the ticked ones to My exercises by day, and a day of the week can be one of them. NEW FILES precached: js/data/plan-reader.js, js/views/plan-import.js.
  * v652 - D-8 (device test, 05 Oct): at large text sizes the week card's buttons stack and wrap, and the timer's words sit under its circle, which grows with the text.
  * v651 - D-6 (Graeme, 05 Oct): Your week. Say what each day is for (a mix of focuses, how hard, how long, where, favourites) and the coach builds each day inside it; Home leads with Today, from your week; it counts for the arc and Progress. NEW FILES precached: js/data/week-shape-model.js, js/data/week-shape.js, js/views/your-week.js, css/components/your-week.css.
  * v650 - D-5 (Graeme, 04 Oct): the Library's At home and At the gym sessions open Today's plan for that place, asked once; the category page in the LOOK cards.
@@ -4199,7 +4200,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v652";
+const CACHE_NAME = "alongside-v653";
 
 const SHELL_URLS = [
 
@@ -4367,6 +4368,8 @@ const SHELL_URLS = [
   "./js/data/week-shape-model.js",
   "./js/data/week-shape.js",
   "./js/views/your-week.js",
+  "./js/data/plan-reader.js",
+  "./js/views/plan-import.js",
   "./css/components/your-week.css",
   "./js/figures.js",
   "./js/data/figures/index.js",
