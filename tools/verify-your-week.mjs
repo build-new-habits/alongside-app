@@ -1,6 +1,10 @@
 /**
  * tools/verify-your-week.mjs
- * 05 Oct 2026 v1
+ * 05 Oct 2026 v2
+ *
+ * v2 - Start waits for the plan to reach the player (up to five seconds)
+ *   instead of a fixed 900ms: under the parallel suite 5l read the plan
+ *   before the steady one was handed over (fresh-clone run, 05 Oct).
  *
  * D-6 WEEK-SHAPE. Graeme, 05 Oct: plan what each day of the week is for
  * ("Monday is upper body and maybe some gentle trunk stuff, but mostly
@@ -111,6 +115,14 @@ function setWeek(todayTemplate, rest = false) {
   store.set("weekShape", WM.sanitizeWeekShape({ templates, days, setAt: "2026-10-05" }));
 }
 const plan = () => store.get("generatedSession")?.session || null;
+/** Start the plan on screen and wait until the player has it. */
+async function start() {
+  store.set("generatedSession", null);
+  await click($("#cp-preview-start") || $("[data-action='start']"), 50);
+  for (let i = 0; i < 100 && !plan(); i++) await wait(50);
+  // The plan hands over after a short pause; let it land before the next test.
+  for (let i = 0; i < 100 && view() === "coach-proposal"; i++) await wait(50);
+}
 
 // ── 1. Free ────────────────────────────────────────────────────────────
 console.log("TEST 1 - Free sees it is part of the Plan");
@@ -237,7 +249,7 @@ const balanceIn = ids.some(id => WM.BALANCE_IDS.includes(id));
 ok("5f. some balance is in the main part", balanceIn, ids.join(", "));
 ok("5g. some core and trunk is in", ids.some(id => /core|plank|dead-bug|bird-dog|pallof|crunch|ab-|hollow|side-plank|trunk/.test(id)), ids.join(", "));
 // Start, and look at what the player got.
-await click($("#cp-preview-start") || $("[data-action='start']"), 900);
+await start();
 const gs = plan();
 ok("5i. Start hands the player the day (weekDay, creditTypes)", !!gs && gs.weekDay?.templateId === "upper-day" && Array.isArray(gs.creditTypes) && gs.creditTypes.includes("core"), JSON.stringify(gs && { wd: gs.weekDay, ct: gs.creditTypes }));
 const main5 = (gs?.exercises || []).filter(e => e.section === "main");
@@ -248,7 +260,7 @@ ok("5k. mostly upper body: more upper body than any other focus in the main part
 // Gentle against steady: one set fewer.
 const setsOf = s => (s.exercises || []).filter(e => e.section === "main" && !e.weekFocus).map(e => Number(e.sets) || 0);
 await openDay("week-today", upperDay({ intensity: "steady" }));
-await click($("#cp-preview-start") || $("[data-action='start']"), 900);
+await start();
 const steadySets = setsOf(plan());
 ok("5l. gentle is one set fewer than steady on the main exercises", setsOf(gs).length && steadySets.length &&
    setsOf(gs).reduce((a, b) => a + b, 0) < steadySets.reduce((a, b) => a + b, 0), `${setsOf(gs)} vs ${steadySets}`);
@@ -279,7 +291,7 @@ ok("6c. fewer exercises than the full day", $$(".cp-plan__row").length < long, `
 // ── 7. It counts ───────────────────────────────────────────────────────
 console.log("\nTEST 7 - it counts for the arc and Progress");
 await openDay();
-await click($("#cp-preview-start") || $("[data-action='start']"), 900);
+await start();
 const before = store.completedSessions(store.get("activityLog") || []).length;
 store.logActivity({ type: "workout", status: "completed", date: new Date().toISOString(), completedAt: new Date().toISOString(), duration: 40, exercisesCompleted: 6 });
 const arc = store.get("arc");
