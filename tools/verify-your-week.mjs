@@ -1,6 +1,10 @@
 /**
  * tools/verify-your-week.mjs
- * 05 Oct 2026 v2
+ * 05 Oct 2026 v3
+ *
+ * v3 - 5l checks gentle against steady on one fixed plan: two separately
+ *   built plans could differ for the coach's own reasons (seen once in the
+ *   suite, 3,3,0 against 2,2,2).
  *
  * v2 - Start waits for the plan to reach the player (up to five seconds)
  *   instead of a fixed 900ms: under the parallel suite 5l read the plan
@@ -257,13 +261,16 @@ const coolStretch = (gs?.exercises || []).filter(e => e.section === "cooldown" &
 ok("5j. a little stretching goes to the cool-down", coolStretch.length >= 1, JSON.stringify((gs?.exercises || []).map(e => `${e.section}:${e.id}:${e.weekFocus || ""}`)));
 const count5 = main5.reduce((m, e) => (m[e.weekFocus || "upper"] = (m[e.weekFocus || "upper"] || 0) + 1, m), {});
 ok("5k. mostly upper body: more upper body than any other focus in the main part", Object.entries(count5).every(([k, n]) => k === "upper" || k === "favourite" || n < count5.upper), JSON.stringify(count5));
-// Gentle against steady: one set fewer.
-const setsOf = s => (s.exercises || []).filter(e => e.section === "main" && !e.weekFocus).map(e => Number(e.sets) || 0);
-await openDay("week-today", upperDay({ intensity: "steady" }));
-await start();
-const steadySets = setsOf(plan());
-ok("5l. gentle is one set fewer than steady on the main exercises", setsOf(gs).length && steadySets.length &&
-   setsOf(gs).reduce((a, b) => a + b, 0) < steadySets.reduce((a, b) => a + b, 0), `${setsOf(gs)} vs ${steadySets}`);
+// Gentle against steady: one set fewer. On one fixed plan, so the coach's
+// own choices (which vary) cannot make the two differ for another reason.
+const fixed = () => ({ exercises: [
+  { id: "a", section: "warmup", sets: 1 }, { id: "b", section: "main", sets: 3 }, { id: "c", section: "main", sets: 2 },
+  { id: "d", section: "main", sets: 1 }, { id: "e", section: "cooldown", sets: 1 } ] });
+const reqOf = intensity => ({ template: { ...upperDay({ intensity, favourites: [] }), mix: [{ focus: "upper", level: 2 }] }, short: false });
+const mainSets = b => b.exercises.filter(e => e.section === "main").map(e => e.sets).join();
+const gentleB = WS.applyWeekDay(fixed(), reqOf("gentle"), {}, () => null);
+const steadyB = WS.applyWeekDay(fixed(), reqOf("steady"), {}, () => null);
+ok("5l. gentle is one set fewer than steady on each main exercise (never below one)", mainSets(gentleB) === "2,1,1" && mainSets(steadyB) === "3,2,1", `${mainSets(gentleB)} vs ${mainSets(steadyB)}`);
 // At home, no cable machine: the favourite is left out and said.
 await openDay("week-today", upperDay({ place: "home" }));
 const homeSentence = txt($(".cp-plan__sentence"));
