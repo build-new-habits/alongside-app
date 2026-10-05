@@ -1,5 +1,21 @@
 # Alongside — Data Schema Reference
-## 05 Oct 2026 v1.109
+## 05 Oct 2026 v1.110
+
+> **v1.110, 05 Oct 2026 — D-7 PLAN-IMPORT** (`store.js` v113).
+> `prescribedExercises` entries may carry **`group`** (`string`, up to 40
+> characters): the day or session of a plan they were added with
+> (*Session A*, *Monday*), written by `views/plan-import.js` and shown as a
+> heading in My exercises. Entries added there also carry **`exerciseId`**
+> (a library id) when the person confirmed a match, and never carry the
+> pasted text: the plan is read on the device and not kept. New top-level
+> **`myExercisesGroup`** (`string|null`, default `null`): which group the
+> My exercises player plays, `null` for all; **written by** every Start in
+> `prescribed.js` and by Home's *Start your list*, **read by**
+> `prescribed-session.js`. **`weekShape`** day plans may carry **`own`**
+> (`string|null`): a group of My exercises, or `"all"`; that day is the
+> person's own list, played as written (`data/week-shape-model.js`
+> `sanitizeTemplate`). None of these is health data; `notes` on an entry
+> stay health data as before (kept only with the health consent).
 
 > **v1.109, 05 Oct 2026 — D-6 WEEK-SHAPE** (`store.js` v112). New
 > **`weekShape`** (`object|null`, default `null`): the shape of the
@@ -1006,7 +1022,7 @@
 
 ## 06 Sep 2026 v1.51
 
-**File:** `js/store.js` (confirmed live version: **v112, 05 Oct 2026**)
+**File:** `js/store.js` (confirmed live version: **v113, 05 Oct 2026**)
 
 > **v1.47, 06 Sep 2026 — CR-1.** `conditions[]` gains three ids and loses one. `chronic-fatigue` is **retired**; `persistent-fatigue`, `me-cfs` and `long-covid` replace it. No field shape changed — `conditions` is still `string[]` and `conditionMeta` is still keyed by condition id.
 >
@@ -1722,7 +1738,7 @@ Legal consent record. Restored after the PT-W1 store audit found it absent: `wel
 | `homeEquipment` | `string[]` | `[]` *(undocumented in `getDefaults()`)* | Live. Scope-specific onboarding input, written/read entirely within `equipment.js`. |
 | `gymEquipment` | `string[]` | `[]` *(undocumented in `getDefaults()`)* | Live. Scope-specific onboarding input, written/read entirely within `equipment.js`. |
 | `scopeNoticeDue` | `boolean` | `false` | **New v1.74 (P0).** True once after a retired condition is dropped on load; Home shows the scope statement and "Understood" clears it. |
-| `prescribedExercises` | `array` | `[]` | **v1.74 (P0): the person's own list, "My exercises". Never app-built; no `prescribedBy` or `conditionIds`; not injected into built sessions.** History: entries could carry `conditionIds` (**array, updated 04 Aug 2026** — replaces the earlier singular `conditionId`) — scopes a coach-built/coach-recommended/self-built exercise to every condition it genuinely belongs to, not just one. One entry can now serve more than one condition (real exercise reuse, not duplication — see `js/data/conditionProgrammes.js` v3) when the same exercise is relevant to both. Additive, nullable; entries added before this existed, or added without a condition context, stay untagged and keep appearing unfiltered in `prescribed.js`. Old singular-`conditionId` entries still read correctly via `getEntryConditionIds()` — no migration step, rebuilding a programme naturally migrates them. Written by `commitProgramme()` for the two coach routes, or by `prescribed.js` itself (reading `prescribedExercisesActiveCondition`, below) for the manual "Build my own" route. |
+| `prescribedExercises` | `array` | `[]` | **v1.74 (P0): the person's own list, "My exercises". Never app-built; no `prescribedBy` or `conditionIds`; not injected into built sessions.** **v1.110 (D-7):** an entry may carry `group` (the plan day it came with) and `exerciseId` (a library id the person confirmed); written by `prescribed.js` and `plan-import.js`. History: entries could carry `conditionIds` (**array, updated 04 Aug 2026** — replaces the earlier singular `conditionId`) — scopes a coach-built/coach-recommended/self-built exercise to every condition it genuinely belongs to, not just one. One entry can now serve more than one condition (real exercise reuse, not duplication — see `js/data/conditionProgrammes.js` v3) when the same exercise is relevant to both. Additive, nullable; entries added before this existed, or added without a condition context, stay untagged and keep appearing unfiltered in `prescribed.js`. Old singular-`conditionId` entries still read correctly via `getEntryConditionIds()` — no migration step, rebuilding a programme naturally migrates them. Written by `commitProgramme()` for the two coach routes, or by `prescribed.js` itself (reading `prescribedExercisesActiveCondition`, below) for the manual "Build my own" route. |
 | `prescribedExercisesOrigin` | `string\|null` | `null` | **New, 04 Aug 2026 (Phase D-2).** `'professional'\|'self'\|null`. Set once when `prescribedExercises` first goes empty → non-empty. Lets `prescribed.js`'s `buildCoachLine()` branch its two origin-referencing lines correctly when reached via Conditions Update's self-build route rather than a genuine physio/GP prescription — see `alongside_blueprint_phaseD_04aug2026_v2.md` §2, decision D-2. |
 | `prescribedExercisesActiveCondition` | `string\|null` | `null` | **New, 04 Aug 2026.** Single-use context flag, not sticky — set by `conditions-update.js`'s "Build my own" right before navigating to `prescribed.js`, read and cleared immediately by that file so a later, unrelated visit can never be silently tagged with a stale condition. |
 | `pendingDoorRoute` | `string\|null` | `null` | **New, 04 Aug 2026 (Phase C follow-up).** Route name to continue to once check-in/check-in-mini completes. Set by `today.js` when a session-generating Home door (Cardio/Core/Strength, Unsure? Coach decides) is tapped; read and cleared by `checkin.js`/`checkin-mini.js` on completion. |
@@ -1913,6 +1929,7 @@ There is no `stats` field, live or dormant, anywhere in `store.js`. Every `stats
 | `sessionLocation` | `string\|null` | `null` | **LOCATION-1, 08 Sep 2026.** `"home"`, `"gym"`, `"outside"` or `null`. Where the person is for THIS session. **The one constraint the coach cannot infer** (CLUB spec v2 §6.2), so it is asked rather than guessed, and remembered so it is asked once. Selects which equipment list a session is built against: `homeEquipment`, `gymEquipment`, or — for `"outside"` — none, because your home kit is not in the park. `null` is treated as `"home"` at the point of building: never propose a barbell to somebody who might be in a kitchen. **Written by** `checkin-mini.js` (Step 4), `capture.js` (during a session) and `coach-proposal.js` **when a session starts** (W3-21: changing *Where* on the plan changes that plan, not the default). **Read by** `coach-proposal.js` via `equipmentForLocation()`. |
 | `requestedLocation` | `string\|null` | `null` | **W3-21, 30 Sep 2026.** `"home"`, `"gym"`, `"outside"` or `null`. Where *I know what I want* asked for today's plan. **Written by** `know-what.js`. **Read once and cleared by** `coach-proposal.js` on mount, so it never outlives the plan it was asked for. |
 | `weekShape` | `object\|null` | `null` | **D-6, 05 Oct 2026.** The shape of the person's week: day plans (`templates`) and what each day is for (`days`: a plan id, `"rest"` or `null`). Vocabulary in `data/week-shape-model.js`; made safe on load by `sanitizeWeekShape()`. **Written by** `views/your-week.js`. **Read by** `data/week-shape.js`. |
+| `myExercisesGroup` | `string\|null` | `null` | **D-7, 05 Oct 2026.** Which group of My exercises the player plays; `null` for all. **Written by** `prescribed.js` (each Start) and `today.js` (*Start your list*). **Read by** `prescribed-session.js`. |
 | `weekDayRequest` | `object\|null` | `null` | **D-6, 05 Oct 2026.** `{ day, templateId, on, short }`: Home asked for today's plan from the week (`short`: *Only 10 minutes*). **Written by** `today.js`. **Read once and cleared by** `coach-proposal.js` on mount. |
 | `lastProposalType` | `string\|null` | `null` | |
 | `lastProposalDate` | `string\|null` | `null` | |

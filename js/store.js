@@ -5,6 +5,15 @@ import { sanitizeWeekShape, sanitizeWeekDayRequest } from "./data/week-shape-mod
 
 /**
  * store.js - Data persistence layer
+ * 05 Oct 2026 v113
+ *
+ * v113 - D-7 PLAN-IMPORT (Schema v1.110). prescribedExercises entries may
+ *   carry group: the day or session of a plan they came in with ("Session
+ *   A", "Monday"), shown as a heading in My exercises. New myExercisesGroup:
+ *   which group the My exercises player plays (null: all of them), set by
+ *   the Start buttons. weekShape day plans may carry own (a group name, or
+ *   "all"): that day is the person's own list, played as written.
+ *
  * 05 Oct 2026 v112
  *
  * v112 - D-6 WEEK-SHAPE (Schema v1.109). New weekShape: the shape of the
@@ -1578,6 +1587,10 @@ export const store = {
       weekShape: null,
       weekDayRequest: null,
 
+      // D-7 PLAN-IMPORT. Which group of My exercises the player plays
+      // (a group name), or null for all of them. Set by every Start.
+      myExercisesGroup: null,
+
       // EXIT-LOOP, 16 Sep 2026. ISO timestamp of the last "exit without
       // saving", or null. Compared against lastProposalDate, so a NEWER
       // proposal clears it without needing to be reset anywhere.
@@ -1600,6 +1613,8 @@ export const store = {
       // D-6. Made safe on every load: a malformed week is dropped, never coerced.
       weekShape: sanitizeWeekShape(saved.weekShape),
       weekDayRequest: sanitizeWeekDayRequest(saved.weekDayRequest),
+      myExercisesGroup: typeof saved.myExercisesGroup === "string" && saved.myExercisesGroup.trim()
+        ? saved.myExercisesGroup.replace(/[<>]/g, "").slice(0, 40) : null,
 
       // EXIT-LOOP. When a proposal was last declined, so Home can tell
       // "interrupted, take me back" from "no, not this one".

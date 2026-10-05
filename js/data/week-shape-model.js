@@ -1,6 +1,10 @@
 /**
  * js/data/week-shape-model.js
- * 05 Oct 2026 v1
+ * 05 Oct 2026 v2
+ *
+ * v2 - D-7 PLAN-IMPORT. A day plan may be the person's own list: own is a
+ *   group of My exercises (a plan day, "Session A") or "all". That day is
+ *   played as written; its mix is not used.
  *
  * D-6 WEEK-SHAPE. The shape of a person's week, as data: what each day is
  * for. No store, no DOM: store.js validates with sanitizeWeekShape() and
@@ -24,6 +28,8 @@
  *       place: "home"|"gym"|"outside",
  *       extras: ["sauna", "hydro-pool", ...],   after the session, if wanted
  *       favourites: [exerciseId, ...]     in, when they fit
+ *       own: groupName | "all" | null      D-7: the day is My exercises,
+ *                                          played as written
  *     } },
  *     days: { mon..sun: templateId | "rest" | null },
  *     setAt: ISO date the week was first set,
@@ -117,6 +123,7 @@ export function sanitizeTemplate(t, id) {
     place: PLACES.some(p => p.id === t.place) ? t.place : "gym",
     extras: (Array.isArray(t.extras) ? t.extras : []).filter((e, i, a) => EXTRAS.some(x => x.id === e) && a.indexOf(e) === i),
     favourites: (Array.isArray(t.favourites) ? t.favourites : []).filter((f, i, a) => _id(f) && a.indexOf(f) === i).slice(0, MAX_FAVOURITES),
+    own: _str(t.own, NAME_MAX) || null,
   };
 }
 
@@ -210,6 +217,7 @@ export function newTemplate(existingIds = [], name = "My day") {
 /** "Mostly upper body · some core and trunk · a little stretching" */
 export function mixLine(t) {
   if (!t) return "";
+  if (t.own) return t.own === "all" ? "Your own list: all of My exercises" : `Your own list: ${t.own}`;
   const parts = [...t.mix].sort((a, b) => b.level - a.level)
     .map(m => `${LEVELS[m.level].toLowerCase()} ${focusById(m.focus).label.toLowerCase()}`);
   const s = parts.join(" · ");
@@ -219,5 +227,6 @@ export function mixLine(t) {
 /** "Moderate · 30 min · gym" */
 export function detailLine(t) {
   if (!t) return "";
+  if (t.own) return "As you wrote it";
   return `${intensityById(t.intensity).label} · ${t.mins} min · ${PLACES.find(p => p.id === t.place)?.label.toLowerCase() || ""}`;
 }
