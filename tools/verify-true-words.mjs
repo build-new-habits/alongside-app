@@ -1,6 +1,13 @@
 /**
  * tools/verify-true-words.mjs
- * 04 Oct 2026 v4
+ * 05 Oct 2026 v5
+ *
+ * v5 - SUITE-DATE. TEST 12 counted two weeks for nine days, which holds
+ *   only on some weekdays: nine days back from a Monday or a Tuesday
+ *   starts in the week before last, so three calendar weeks are right.
+ *   The check now counts the calendar weeks from the start to today, and
+ *   still fails six (the fault it was written for). Found running the
+ *   suite on Monday 5 Oct.
  *
  * v4 - LOOK-1: Settings is an index of section pages. TESTs 19 and 20
  *   reach the Sore or injured areas and preferences rows through
@@ -190,14 +197,17 @@ ok("11a. no \"${n} weeks in, ${n} sessions\" without a plural", !/\$\{stats\.wee
 console.log("\nTEST 12 - Progress's weeks start when the person did");
 const AR = await import(B + "data/arc-readback.js");
 const weeks = AR.sessionsByWeek([{ completedAt: ago(1) }], { weeks: 6, since: new Date(ago(9)) });
-ok("12a. installed nine days ago: two weeks shown, not six", weeks.length <= 2 && weeks.length >= 1, String(weeks.length));
+// Calendar weeks (Monday first) from nine days ago to today: two or three.
+const monOf = d => { const m = new Date(d.getFullYear(), d.getMonth(), d.getDate()); m.setDate(m.getDate() - ((m.getDay() + 6) % 7)); return m; };
+const SPAN12 = Math.round((monOf(new Date()) - monOf(new Date(ago(9)))) / (7 * 864e5)) + 1;
+ok(`12a. installed nine days ago: the ${SPAN12} calendar weeks since, not six`, weeks.length <= SPAN12 && weeks.length >= 1, String(weeks.length));
 ok("12b. control: no start given, six", AR.sessionsByWeek([], { weeks: 6 }).length === 6);
 person({ createdAt: ago(9), activityLog: [{ id: "w1", type: "walk", status: "completed", completedAt: ago(1) }] });
 const { ProgressView } = await import(B + "views/progress.js");
 const pel = oneScreen(document.createElement("div")); ProgressView({ navigate() {}, back() {} }).mount(pel); await wait(20);
 const chart = pel.querySelector('[aria-label="Sessions, week by week"]');
-ok("12c. Progress, nine days in: no more than two weeks drawn, said as since you started",
-   !!chart && chart.querySelectorAll("li").length <= 2 && /since you started/.test(txt(pel.querySelector("#pr-sessions-cap"))),
+ok(`12c. Progress, nine days in: no more than ${SPAN12} weeks drawn, said as since you started`,
+   !!chart && chart.querySelectorAll("li").length <= SPAN12 && /since you started/.test(txt(pel.querySelector("#pr-sessions-cap"))),
    `${chart?.querySelectorAll("li").length} weeks; ${txt(pel.querySelector("#pr-sessions-cap"))}`);
 
 // ── 13. LOW AND LIGHTER DAYS (W5-12) ────────────────────────────────────

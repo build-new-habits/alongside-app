@@ -1,6 +1,9 @@
 /**
  * tools/verify-look-rest.mjs
- * 04 Oct 2026 v1
+ * 05 Oct 2026 v2
+ *
+ * v2 - D-6 WEEK-SHAPE, a recorded reversal: Plan Home has a fifth link,
+ *   Plan your week (teal), full width under the four. 1f and 1h expect it.
  *
  * LOOK-4 (Graeme approved the mock-up, 04 Oct: "Yes yes yes. Love it").
  * Home on the Plan and on Free, the finish screen, Wellbeing and the
@@ -97,10 +100,10 @@ ok("1d. Tell me what to do is the filled one", doors[0]?.classList.contains("hom
 ok("1e. \"What would you like to do?\" is a visible heading that names the doors", txt($("#home-doors-label")) === "What would you like to do?" && !$("#home-doors-label").classList.contains("sr-only") && $(".home-doors")?.getAttribute("aria-labelledby") === "home-doors-label");
 const links = $$(".home-link--tile");
 const linkLook = links.map(l => `${txt(l)}:${(l.querySelector(".kind-tile")?.className.match(KIND) || [])[1]}`);
-ok("1f. four links as tiles, each in its kind colour (class rose, run blue, mind green, Library slate)",
-   JSON.stringify(linkLook) === JSON.stringify(["Join a class:rose", "Go for a run:blue", "Something for the mind:green", "Library:slate"]), JSON.stringify(linkLook));
+ok("1f. five links as tiles, each in its kind colour (class rose, run blue, mind green, Library slate, Plan your week teal)",
+   JSON.stringify(linkLook) === JSON.stringify(["Join a class:rose", "Go for a run:blue", "Something for the mind:green", "Library:slate", "Plan your week:teal"]), JSON.stringify(linkLook));
 ok("1g. under \"Or go straight to\", which names the group", txt($("#home-links-label")) === "Or go straight to" && $(".home-links")?.getAttribute("aria-labelledby") === "home-links-label");
-ok("1h. the links go where they went", JSON.stringify(links.map(l => l.dataset.route)) === JSON.stringify(["classes", "running-session", "noticing", "library"]));
+ok("1h. the links go where they went", JSON.stringify(links.map(l => l.dataset.route)) === JSON.stringify(["classes", "running-session", "noticing", "library", "your-week"]));
 ok("1i. no count or weekly target on Home", !/\b\d+ of \d+\b|this week/i.test(txt(main)));
 ok("1j. icons decorative; no emoji on Plan Home", iconsDecorative() && !EMOJI.test(txt(main)), (txt(main).match(EMOJI) || [""])[0]);
 click(links[3]); await wait(60);
