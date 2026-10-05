@@ -1,4 +1,10 @@
-<!-- index.html | 02 Oct 2026 v9 -->
+<!-- index.html | 05 Oct 2026 v10 -->
+<!--
+  v10 — SW-INCREMENTAL, 05 Oct 2026. The Sentry loader is async: it was a
+  plain script tag in the head, so every open waited for Sentry's server
+  (outside the app's own cache) before drawing anything. sentryOnLoad is
+  still set before it, so the settings are the same.
+-->
 <!--
   v9 — W4-22, 02 Oct 2026. The inline display copy gains vibration
   (alongside-vibration, on), matching display-prefs.js (verify-disp1).
@@ -110,6 +116,7 @@
   <script
     src="https://js-de.sentry-cdn.com/87fc9709fbce818590bbe5dcaec01586.min.js"
     crossorigin="anonymous"
+    async
   ></script>
 
   <!-- Nav escape-hatch icon styling — self-contained, see v2 changelog above -->
