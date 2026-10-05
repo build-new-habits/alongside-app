@@ -1,7 +1,13 @@
 /**
  * prescribed.js - My exercises
  *
- * 02 Oct 2026 v1.7
+ * 05 Oct 2026 v1.8
+ *
+ * v1.8 - D-7 PLAN-IMPORT. Exercises added from a plan carry their day
+ *   (group: "Session A"); the list shows each day under its own heading
+ *   with its own Start, which plays that day only (myExercisesGroup). The
+ *   overall Start plays all of them. "Add a plan you already have" opens
+ *   the import (plan-import.js).
  *
  * v1.7 - W4-15 DELETE-TRUE. No Notes box, and no notes kept, while the
  *   health consent is not given: notes on an exercise are often about an
@@ -177,6 +183,7 @@ export function render() {
         <div id="px-add-form-wrap" class="${showAddForm ? "" : "hidden"}" aria-live="polite">
           ${renderAddForm()}
         </div>
+        <button class="btn btn-ghost btn-full" id="px-import-btn">Add a plan you already have</button>
       </div>
 
       <!-- ── Bottom back button ───────────────────────────────────────────── -->
@@ -219,14 +226,11 @@ function renderExerciseList(active, done, creditsAvail) {
             : ""}
         </div>
 
-        <ul class="prescribed-exercise-list" aria-label="Your exercises to do today">
-          ${active.map((ex, i) => renderExerciseCard(ex, i, false)).join("")}
-        </ul>
+        ${renderGroups(active)}
 
-        <button class="btn btn-primary btn-large btn-full" id="px-start-session-btn"
-                style="margin-top: var(--space-4);"
-                aria-label="Start my exercises">
-          Start Session
+        <button class="btn ${groupsOf(active).some(g => g.name) ? "btn-secondary" : "btn-primary"} btn-large btn-full" id="px-start-session-btn"
+                style="margin-top: var(--space-4);">
+          ${groupsOf(active).some(g => g.name) ? "Start all of them" : "Start Session"}
         </button>
       ` : `
         <div class="card" role="note" style="margin-bottom: var(--space-4);">
@@ -244,6 +248,35 @@ function renderExerciseList(active, done, creditsAvail) {
 
     </div>
   `;
+}
+
+/** D-7. Today's exercises by plan day: [{ name|null, items }], ungrouped first. */
+function groupsOf(list) {
+  const out = [];
+  for (const ex of list) {
+    const name = ex.group || null;
+    let g = out.find(x => x.name === name);
+    if (!g) { g = { name, items: [] }; out.push(g); }
+    g.items.push(ex);
+  }
+  return out.sort((a, b) => (a.name === null ? -1 : b.name === null ? 1 : 0));
+}
+
+function renderGroups(active) {
+  const groups = groupsOf(active);
+  if (!groups.some(g => g.name)) {
+    return `<ul class="prescribed-exercise-list" aria-label="Your exercises to do today">
+      ${active.map((ex, i) => renderExerciseCard(ex, i, false)).join("")}
+    </ul>`;
+  }
+  return groups.map((g, gi) => `
+    <section class="prescribed-group" aria-labelledby="px-group-${gi}">
+      <h3 class="prescribed-group__name" id="px-group-${gi}">${_esc(g.name || "Your own")}</h3>
+      <ul class="prescribed-exercise-list" aria-labelledby="px-group-${gi}">
+        ${g.items.map((ex, i) => renderExerciseCard(ex, i, false)).join("")}
+      </ul>
+      ${g.name ? `<button class="btn btn-primary btn-full prescribed-group__start" data-px-group="${_esc(g.name)}">Start ${_esc(g.name)}</button>` : ""}
+    </section>`).join("");
 }
 
 /**
@@ -475,8 +508,15 @@ export function onMount() {
 
   // ── Start session ─────────────────────────────────────────────────────────
   document.getElementById("px-start-session-btn")?.addEventListener("click", () => {
+    store.set("myExercisesGroup", null);   // D-7: all of them
     router.navigate("prescribed-session");
   });
+  // D-7. One plan day.
+  document.querySelectorAll("[data-px-group]").forEach(btn => btn.addEventListener("click", () => {
+    store.set("myExercisesGroup", btn.dataset.pxGroup);
+    router.navigate("prescribed-session");
+  }));
+  document.getElementById("px-import-btn")?.addEventListener("click", () => router.navigate("plan-import"));
 
   // ── Toggle add form ───────────────────────────────────────────────────────
   document.getElementById("px-toggle-form-btn")?.addEventListener("click", () => {

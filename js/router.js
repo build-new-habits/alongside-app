@@ -1,6 +1,9 @@
 /**
  * router.js
- * 05 Oct 2026 v46
+ * 05 Oct 2026 v47
+ *
+ * v47 - D-7 PLAN-IMPORT. 'plan-import' (Add a plan you already have),
+ *   reached from Your week and My exercises; the Home tab stays lit.
  *
  * v46 - D-6 WEEK-SHAPE. 'your-week' (Your week, the Plan), reached from
  *   Home, so the Home tab stays lit.
@@ -383,6 +386,7 @@ const VIEW_NAMES = {
   'activity-log':      { path: './views/activity-log.js',     fn: 'ActivityLogView'     },
   'library':           { path: './views/library.js',          fn: 'LibraryView'         },
   'your-week':         { path: './views/your-week.js',        fn: 'YourWeekView'        },
+  'plan-import':       { path: './views/plan-import.js',      fn: 'PlanImportView'      },
   // SAVED-1, 08 Sep 2026. The Your own room counted saved sessions and
   // hid all but the newest behind a button that opened the BUILDER --
   // a screen for making a new one, reached by tapping a control that
@@ -526,6 +530,7 @@ const NAV_MAP = {
   'my-programme': 'today',
   // D-6. Reached from Home.
   'your-week': 'today',
+  'plan-import': 'today',
   'goal-review': 'my-programme',
   'settings': 'settings', 'privacy': 'settings',
   'upgrade': 'settings', 'goal-setup': 'settings',

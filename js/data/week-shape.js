@@ -1,6 +1,11 @@
 /**
  * js/data/week-shape.js
- * 05 Oct 2026 v1
+ * 05 Oct 2026 v2
+ *
+ * v2 - D-7 PLAN-IMPORT. A day that is the person's own list (own) is played
+ *   as written: Home starts My exercises for it (startOwnList), the coach's
+ *   plan is not asked for, and the balance line leaves it out (what is in
+ *   it is theirs, not a mix).
  *
  * D-6 WEEK-SHAPE. Reading the person's week, and building a day inside it.
  * The shape itself, its vocabulary and its validation are in
@@ -109,7 +114,7 @@ export function balanceGap(d = new Date()) {
   const used = DAY_KEYS.map(k => w.days[k]).filter(v => v && v !== "rest");
   if (used.length < 3) return null;
   const groups = new Set();
-  for (const id of used) for (const m of (w.templates[id]?.mix || [])) groups.add(focusById(m.focus)?.group);
+  for (const id of used) if (!w.templates[id]?.own) for (const m of (w.templates[id]?.mix || [])) groups.add(focusById(m.focus)?.group);
   const start = localDay(weekStartOf(d));
   for (const g of GAP_GROUPS) {
     if (g.from.some(x => groups.has(x))) continue;
@@ -118,7 +123,7 @@ export function balanceGap(d = new Date()) {
     // that is not only cardio; else any with room.
     const order = [...DAY_KEYS.slice(DAY_KEYS.indexOf(dayKeyOf(d))), ...DAY_KEYS.slice(0, DAY_KEYS.indexOf(dayKeyOf(d)))];
     const ids = [...new Set(order.map(k => w.days[k]).filter(v => v && v !== "rest"))];
-    const room = ids.map(id => w.templates[id]).filter(t => t && t.mix.length < 4);
+    const room = ids.map(id => w.templates[id]).filter(t => t && !t.own && t.mix.length < 4);
     const target = room.find(t => !t.mix.every(m => m.focus === "cardio")) || room[0];
     if (!target) continue;
     return { key: g.key, label: g.label, focus: g.focus, template: target,
@@ -164,11 +169,31 @@ export function primaryType(t) {
  */
 export function askForToday({ short = false } = {}, d = new Date()) {
   const today = todayInWeek(d);
-  if (!today || !today.template) return false;
+  if (!today || !today.template || today.template.own) return false;
   store.set("weekDayRequest", { day: today.day, templateId: today.template.id, on: localDay(d), short: !!short });
   store.set("requestedSessionType", primaryType(today.template));
   store.set("requestedLocation", today.template.place);
   return true;
+}
+
+/**
+ * D-7. Home: start today's own list (a group of My exercises, or all of
+ * them). Returns false when there is nothing in it to do today.
+ */
+export function startOwnList(d = new Date()) {
+  const today = todayInWeek(d);
+  const own = today?.template?.own;
+  if (!own) return false;
+  const group = own === "all" ? null : own;
+  const left = (store.get("prescribedExercises") || []).filter(e => !e.completedToday && (!group || e.group === group));
+  if (!left.length) return false;
+  store.set("myExercisesGroup", group);
+  return true;
+}
+
+/** The groups in My exercises, in the order they were added. */
+export function ownGroups() {
+  return [...new Set((store.get("prescribedExercises") || []).map(e => e.group).filter(Boolean))];
 }
 
 /** The request, if it is today's and its day plan still exists; then cleared. */

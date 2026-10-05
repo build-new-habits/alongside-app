@@ -1,5 +1,9 @@
 /* css/components/your-week.css
- * 05 Oct 2026 v2
+ * 05 Oct 2026 v3
+ *
+ * v3 - D-7 PLAN-IMPORT. The import screens (js/views/plan-import.js) share
+ *   this page's look: .pi-* below. And My exercises' plan days
+ *   (.prescribed-group), each with its heading and its own Start.
  *
  * v2 - D-8 TEXT-FIT. Buttons on Your week wrap their words at large text
  *   sizes rather than run out of the button.
@@ -158,3 +162,45 @@ button.yw-way:hover { background: var(--color-bg-hover); }
   .yw-chip.is-on, .yw-seg__btn.is-on, .yw-int.is-on { border-color: Highlight; }
   .yw-done, .yw-tag--today, .yw-day__key.is-today { color: CanvasText; }
 }
+
+/* D-7 PLAN-IMPORT, 05 Oct 2026 */
+.pi-view { padding-bottom: var(--space-8); }
+.pi-rules { border-left: 4px solid var(--color-primary); }
+.pi-amt { flex: 1; min-width: 0; box-sizing: border-box; max-width: 14em; }
+.pi-amt-row { display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; }
+.pi-warn { color: var(--color-warning); font-weight: 600; }
+.pi-rules__list { margin: 0; padding-left: 1em; display: flex; flex-direction: column; gap: var(--space-2);
+  font-size: var(--text-sm, 0.9375rem); line-height: 1.45; color: var(--color-text); }
+.pi-text { width: 100%; box-sizing: border-box; min-height: 12em; resize: vertical; line-height: 1.45; font-family: inherit; }
+.pi-template { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: var(--text-sm, 0.9375rem); }
+.pi-day { display: flex; flex-direction: column; gap: var(--space-2); margin-top: var(--space-3); }
+.pi-day__h { margin: 0; font-size: var(--text-lg, 1.125rem); font-weight: 700; color: var(--color-text); }
+.pi-items { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-2); }
+.pi-item {
+  display: flex; flex-direction: column; gap: var(--space-1);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border-light);
+  border-radius: 16px;
+}
+.pi-item.is-on { border: 2px solid var(--color-primary); }
+.pi-item__take { display: flex; align-items: center; gap: var(--space-3); min-height: 44px; }
+.pi-item__take input, .pi-radio input { width: 24px; height: 24px; flex: none; accent-color: var(--color-primary); margin: 0; }
+.pi-item__take label { flex: 1; min-height: 44px; display: flex; align-items: center; cursor: pointer; }
+.pi-item__name { font-weight: 700; color: var(--color-text); overflow-wrap: break-word; }
+.pi-item__line, .pi-item__what { margin: 0; font-size: var(--text-sm, 0.9375rem); line-height: 1.4; color: var(--color-text-secondary); overflow-wrap: anywhere; }
+.pi-item__what { display: flex; gap: var(--space-2); align-items: flex-start; }
+.pi-item__what .line-icon { color: var(--color-success); margin-top: 2px; }
+.pi-choose { margin: 0; padding: 0; border: 0; display: flex; flex-direction: column; gap: var(--space-1); }
+.pi-choose legend { padding: 0; margin-bottom: var(--space-1); font-weight: 600; color: var(--color-text); font-size: var(--text-sm, 0.9375rem); }
+.pi-radio { display: flex; align-items: center; gap: var(--space-3); min-height: 44px; color: var(--color-text); cursor: pointer; }
+.pi-not summary { min-height: 44px; display: flex; align-items: center; font-weight: 600; cursor: pointer; color: var(--color-text); }
+.pi-not ul { margin: 0; padding-left: 1.2em; color: var(--color-text-secondary); font-size: var(--text-sm, 0.9375rem); line-height: 1.45; overflow-wrap: anywhere; }
+.pi-item__take input:focus-visible, .pi-radio input:focus-visible, .pi-not summary:focus-visible {
+  outline: 3px solid var(--color-primary); outline-offset: 2px;
+}
+
+/* D-7. My exercises: each plan day under its own heading, with its Start. */
+.prescribed-group { display: flex; flex-direction: column; gap: var(--space-2); margin-top: var(--space-4); }
+.prescribed-group__name { margin: 0; font-size: var(--text-lg, 1.125rem); font-weight: 700; color: var(--color-text); }
+.prescribed-group__start { min-height: 48px; height: auto; white-space: normal; }

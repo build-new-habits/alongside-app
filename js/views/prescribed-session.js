@@ -1,6 +1,14 @@
 /**
  * prescribed-session.js - My exercises, played
  *
+ * 05 Oct 2026 v14
+ *
+ * v14 - D-7 PLAN-IMPORT. Plays one group of My exercises when one is
+ *   chosen (myExercisesGroup: "Session A" from an imported plan), else all
+ *   of them, as before. A finished session tells the arc which areas its
+ *   exercises worked, for the ones linked to the library (exerciseId):
+ *   it was logged with My exercises' own ids, so the arc learned nothing.
+ *
  * 01 Oct 2026 v13
  *
  * v13 - BUNDLE-TRUE. The person's own names, doses and notes are escaped where
@@ -222,9 +230,14 @@ function _checkContraindication(ex) {
   return { conditionName: getConditionName(baseConditionId) };
 }
 
+/** D-7. Today's list: not yet done, in the chosen group if there is one. */
+function _todaysList() {
+  const group = store.get("myExercisesGroup") || null;
+  return (store.get("prescribedExercises") || []).filter(e => !e.completedToday && (!group || e.group === group));
+}
+
 export function render() {
-  const exercises = store.get("prescribedExercises") || [];
-  const active    = exercises.filter(e => !e.completedToday);
+  const active    = _todaysList();
 
   if (active.length === 0) {
     return renderAlreadyDone();
@@ -465,8 +478,7 @@ function creditsForIndex(index, total) {
 // -- Mount -----------------------------------------------------------------------
 
 export function onMount() {
-  const exercises = store.get("prescribedExercises") || [];
-  const active    = exercises.filter(e => !e.completedToday);
+  const active    = _todaysList();
 
   // SAFETY-GATE. Early return -- nothing below is on screen behind it.
   if (active.length > 0 && currentIndex === 0 && isGateDue()) {
@@ -720,6 +732,14 @@ function completeSession(active) {
   // -- and only when status is not "partial", which is why abandoning
   // one correctly recorded nothing.
   const nowIso = new Date().toISOString();
+  // D-7. What the arc needs: the library exercises behind the person's own
+  // (exerciseId), with the areas they work. Own ones with no link add none.
+  const own = store.get("prescribedExercises") || [];
+  const worked = progress
+    .map(p => own.find(e => e.id === p.exerciseId))
+    .map(e => e && e.exerciseId ? EXERCISES.find(x => x.id === e.exerciseId) : null)
+    .filter(Boolean)
+    .map(x => ({ id: x.id, affectsAreas: x.affectsAreas || [] }));
   // W3-3. The finish screen's entry is this session, not the last one.
   const created = store.logActivity({
     type:           "prescribed-session",
@@ -730,6 +750,7 @@ function completeSession(active) {
     durationMins:   elapsedMins(),
     exercisesCount: progress.length,
     exerciseIds:    progress.map(e => e.exerciseId).filter(Boolean),
+    exercises:      worked,
     creditsEarned
   });
   store.set("currentActivityEntry", created || null);

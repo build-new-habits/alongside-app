@@ -1,6 +1,10 @@
 /**
  * js/views/your-week.js
- * 05 Oct 2026 v1
+ * 05 Oct 2026 v2
+ *
+ * v2 - D-7 PLAN-IMPORT. "Add a plan you already have" opens the import.
+ *   A day can be "My exercises": a day of an imported plan ("Session A")
+ *   or all of them, played as written, alongside "A session" and "Rest".
  *
  * D-6 WEEK-SHAPE. "Your week" (the Plan). Graeme, 05 Oct: plan what each
  * day is for, and let the coach build each session inside it. Approved on
@@ -34,7 +38,7 @@ import {
   DAY_KEYS, DAY_NAMES, DAY_SHORT, FOCUSES, focusById, LEVELS, INTENSITIES, LENGTHS, PLACES, EXTRAS,
   READY_WEEKS, weekFromReady, newTemplate, sanitizeWeekShape, mixLine, detailLine,
 } from "../data/week-shape-model.js";
-import { weekDates, dayKeyOf, doneThisWeek, balanceGap, addGap, leaveGap, primaryFocus } from "../data/week-shape.js";
+import { weekDates, dayKeyOf, doneThisWeek, balanceGap, addGap, leaveGap, primaryFocus, ownGroups } from "../data/week-shape.js";
 
 const esc = s => String(s == null ? "" : s)
   .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -108,11 +112,11 @@ export function YourWeekView(router) {
               <span class="yw-way__line">${esc(r.line)}</span></span>
           </button>`).join("")}
       </div>
-      <div class="yw-way yw-way--soon">
+      <button class="yw-way" data-go-route="plan-import">
         <span class="kind-tile k-blue">${lineIcon("plus")}</span>
         <span class="yw-way__text"><span class="yw-way__name">Add a plan you already have</span>
-          <span class="yw-way__line">From a trainer, a class or another app. Coming next.</span></span>
-      </div>
+          <span class="yw-way__line">From a trainer, a class or another app: paste it in and I'll find the exercises. Then give its days a place in your week.</span></span>
+      </button>
       <p class="yw-foot">Change any day, any time. Missing a day is fine: the week does not keep score.</p>`;
   }
 
@@ -149,7 +153,7 @@ export function YourWeekView(router) {
         ${DAY_KEYS.map(d => {
           const v = w.days[d];
           const t = v && v !== "rest" ? w.templates[v] : null;
-          const f = t ? primaryFocus(t) : null;
+          const f = t ? (t.own ? { kind: "teal", icon: "list" } : primaryFocus(t)) : null;
           const kind = t ? f.kind : v === "rest" ? "green" : "slate";
           const icon = t ? f.icon : v === "rest" ? "rest" : "plus";
           const name = t ? t.name : v === "rest" ? "Rest" : "Nothing planned";
@@ -195,7 +199,8 @@ export function YourWeekView(router) {
       ${header("Your week", null, "week")}
       <h1 class="yw-title" tabindex="-1">${DAY_NAMES[dayKey]}</h1>
       <div class="yw-chips" role="group" aria-label="This day is">
-        ${btn('data-kind="session"', !!t, "A session")}
+        ${btn('data-kind="session"', !!t && !t.own, "A session")}
+        ${btn('data-kind="own"', !!(t && t.own), "My exercises")}
         ${btn('data-kind="rest"', v === "rest", "Rest")}
       </div>
       ${others.length && t ? `
@@ -203,9 +208,31 @@ export function YourWeekView(router) {
         <div class="yw-chips" role="group" aria-labelledby="yw-use-h">
           ${others.map(o => `<button class="yw-chip" data-use="${o.id}">${esc(o.name)}</button>`).join("")}
         </div>` : ""}
-      ${t ? renderEditor(t, usedOn) : ""}
+      ${t ? (t.own ? renderOwn(t, usedOn) : renderEditor(t, usedOn)) : ""}
       <button class="btn btn-primary btn-large btn-full" id="yw-save">Save ${DAY_NAMES[dayKey]}</button>
       <p class="yw-foot">Back saves nothing.</p>`;
+  }
+
+  /** D-7. A day that is the person's own list: which part, and its name. */
+  function renderOwn(t, usedOn) {
+    const groups = ownGroups();
+    const any = (store.get("prescribedExercises") || []).length > 0;
+    const btn = (attr, on, label) => `<button class="yw-chip${on ? " is-on" : ""}" ${attr} aria-pressed="${on}">${label}</button>`;
+    return `
+      ${usedOn.length > 1 ? `<p class="yw-note">Used on ${usedOn.map(k => DAY_NAMES[k]).join(" and ")}.</p>` : ""}
+      <section class="look-card yw-card" aria-labelledby="yw-own-h">
+        <h2 class="yw-card__h" id="yw-own-h">Which of My exercises</h2>
+        ${any ? `
+          <div class="yw-chips" role="group" aria-labelledby="yw-own-h">
+            ${groups.map(g => btn(`data-own="${esc(g)}"`, t.own === g, esc(g))).join("")}
+            ${btn('data-own="all"', t.own === "all", "All of them")}
+          </div>
+          <p class="yw-hint">Played as you wrote them. On a sore day I say which ones load the sore area, and you choose.</p>`
+        : `<p class="yw-card__p">There is nothing in My exercises yet.</p>
+           <button class="btn btn-secondary" data-go-route="plan-import">Add a plan you already have</button>`}
+      </section>
+      <label class="yw-label" for="yw-name">Name</label>
+      <input class="yw-input" id="yw-name" maxlength="40" value="${esc(t.name)}" autocomplete="off">`;
   }
 
   function renderEditor(t, usedOn) {
@@ -341,12 +368,27 @@ export function YourWeekView(router) {
     const redraw = (focusSel) => { render(); if (focusSel) root.querySelector(focusSel)?.focus(); };
     $$("[data-kind]").forEach(b => b.addEventListener("click", () => {
       keepName();
-      if (b.dataset.kind === "rest") draft.days[dayKey] = "rest";
-      else if (!cur()) {
+      const k = b.dataset.kind, c = cur();
+      if (k === "rest") draft.days[dayKey] = "rest";
+      else if (k === "session" && (!c || c.own)) {
         const t = newTemplate(Object.keys(draft.templates), `${DAY_NAMES[dayKey]} plan`);
         draft.templates[t.id] = t; draft.days[dayKey] = t.id;
+      } else if (k === "own" && !(c && c.own)) {
+        // D-7. A new day plan: a day of an imported plan, else all of them.
+        const g = ownGroups()[0] || null;
+        const t = { ...newTemplate(Object.keys(draft.templates), g || "My exercises"), own: g || "all" };
+        draft.templates[t.id] = t; draft.days[dayKey] = t.id;
       }
-      redraw(`[data-kind="${b.dataset.kind}"]`);
+      redraw(`[data-kind="${k}"]`);
+    }));
+    $$("[data-own]").forEach(b => b.addEventListener("click", () => {
+      const t = cur(); if (!t) return;
+      const was = t.own;
+      t.own = b.dataset.own;
+      // The name follows the choice until the person has named it.
+      if (!t.name || t.name === was || t.name === "My exercises" || t.name === "All of them") t.name = t.own === "all" ? "My exercises" : t.own;
+      redraw(null);
+      [...root.querySelectorAll("[data-own]")].find(x => x.dataset.own === t.own)?.focus();
     }));
     $$("[data-use]").forEach(b => b.addEventListener("click", () => { keepName(); draft.days[dayKey] = b.dataset.use; redraw("#yw-name"); }));
     $("#yw-own")?.addEventListener("click", () => {

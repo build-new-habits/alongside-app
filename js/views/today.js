@@ -1,5 +1,11 @@
 /**
  * today.js
+ * 05 Oct 2026 v56
+ *
+ * v56 - D-7 PLAN-IMPORT. On a day of the week that is the person's own list
+ *   (a day of a plan they added, in My exercises), Today, from your week
+ *   says so and offers Start your list, which plays that day as written.
+ *
  * 05 Oct 2026 v55
  *
  * v55 - D-6 WEEK-SHAPE (Graeme approved the "Your week" mock-up, 05 Oct).
@@ -803,7 +809,7 @@ import { carryOnSummary } from './capture.js';   // F1: a freestyle session to c
 import { GUIDANCE_TEXT, GUIDANCE_DAYS } from '../safety-gate.js';
 import { aimById, STRANDS }    from '../data/aims.js';
 import { lineIcon }            from '../data/line-icons.js';
-import { todayInWeek, askForToday } from '../data/week-shape.js';
+import { todayInWeek, askForToday, startOwnList } from '../data/week-shape.js';
 import { mixLine, detailLine } from '../data/week-shape-model.js';
 import { arcWeek }             from '../data/arc-readback.js';
 import { noticePlanJump, offerBriefPath } from '../data/pacing.js';
@@ -1359,6 +1365,9 @@ export function TodayView(router) {
           router.navigate('checkin');
         }
       }));
+    // D-7. Today's own list, as written.
+    container.querySelector('[data-action="week-own"]')
+      ?.addEventListener('click', () => { if (startOwnList()) router.navigate('prescribed-session'); });
     container.querySelector('[data-action="week-else"]')
       ?.addEventListener('click', () => container.querySelector('#home-doors-label')?.focus());
 
@@ -2147,6 +2156,18 @@ function _markGuidanceShown(root) {
       </section>`;
     }
     const t = week.template;
+    if (t.own) {
+      const group = t.own === 'all' ? null : t.own;
+      const left = (store.get('prescribedExercises') || []).filter(e => !e.completedToday && (!group || e.group === group)).length;
+      return `<section class="home-week look-card" aria-labelledby="home-week-h">
+        <p class="look-label home-week__lbl">Today, from your week</p>
+        <h2 class="home-week__name" id="home-week-h">${_esc(t.name)}</h2>
+        <p class="home-week__line">${_esc(mixLine(t))}.</p>
+        ${left ? `<p class="home-week__line">${left} exercise${left === 1 ? '' : 's'}, as you wrote ${left === 1 ? 'it' : 'them'}.</p>
+        <button class="btn btn-primary btn-large btn-full" data-action="week-own">Start your list</button>`
+        : `<p class="home-week__line">All done today.</p>`}
+      </section>`;
+    }
     return `<section class="home-week look-card" aria-labelledby="home-week-h">
       <p class="look-label home-week__lbl">Today, from your week</p>
       <h2 class="home-week__name" id="home-week-h">${_esc(t.name)}</h2>
