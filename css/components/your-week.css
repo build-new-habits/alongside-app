@@ -1,0 +1,155 @@
+/* css/components/your-week.css
+ * 05 Oct 2026 v1
+ *
+ * D-6 WEEK-SHAPE. "Your week" (js/views/your-week.js) in the LOOK cards:
+ * the page ground, row cards with a kind tile, labels in small capitals.
+ * Every target is at least 44px. A chosen chip is bold with a 2px border
+ * as well as its colour, so colour is never the only cue (1.4.1). Focus
+ * is a 3px ring outside the control (2.4.7, 2.4.11).
+ */
+
+.yw-view {
+  padding: var(--space-4) var(--space-4) var(--space-8);
+  max-width: 480px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.yw-header { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); }
+.yw-back { min-height: 44px; padding-left: 0; color: var(--color-primary-light); font-weight: 600; }
+.yw-change { min-height: 44px; }
+.yw-title { margin: 0; font-size: var(--text-2xl, 1.75rem); font-weight: 700; color: var(--color-text); }
+.yw-title:focus { outline: none; }
+.yw-title:focus-visible { outline: 3px solid var(--color-primary); outline-offset: 4px; border-radius: 6px; }
+.yw-sub, .yw-foot, .yw-note, .yw-hint, .yw-card__p {
+  margin: 0;
+  font-size: var(--text-sm, 0.9375rem);
+  line-height: 1.45;
+  color: var(--color-text-secondary);
+}
+.yw-foot { text-align: center; margin-top: var(--space-2); }
+.yw-note { color: var(--color-text); }
+.yw-error { margin: 0; min-height: 1.2em; font-size: var(--text-sm, 0.9375rem); color: var(--color-danger); font-weight: 600; }
+.yw-error:empty { min-height: 0; }
+
+/* The ways to start */
+.yw-ready { display: flex; flex-direction: column; gap: var(--space-3); }
+.yw-way {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: 72px;
+  padding: var(--space-4);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border-light);
+  border-radius: 20px;
+  color: var(--color-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+button.yw-way:hover { background: var(--color-bg-hover); }
+.yw-way--soon { cursor: default; opacity: 0.85; }
+.yw-way__text { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.yw-way__name { font-size: var(--text-base, 1rem); font-weight: 700; }
+.yw-way__line { font-size: var(--text-sm, 0.9375rem); line-height: 1.45; color: var(--color-text-secondary); }
+
+/* Chips and segments */
+.yw-chips { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.yw-chip, .yw-seg__btn, .yw-int {
+  min-height: 44px;
+  min-width: 44px;
+  padding: var(--space-2) var(--space-4);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--text-sm, 0.9375rem);
+  cursor: pointer;
+}
+.yw-chip:hover, .yw-seg__btn:hover, .yw-int:hover { background: var(--color-bg-hover); }
+.yw-chip.is-on, .yw-seg__btn.is-on, .yw-int.is-on {
+  border: 2px solid var(--color-primary);
+  font-weight: 700;
+  background: var(--color-primary-glow);
+}
+.yw-seg { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-2); }
+.yw-seg__btn { padding: var(--space-2); border-radius: 12px; }
+.yw-stack { display: flex; flex-direction: column; gap: var(--space-2); }
+.yw-int { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; border-radius: 14px; text-align: left; padding: var(--space-3) var(--space-4); }
+.yw-int__name { font-weight: 700; }
+.yw-int__line { color: var(--color-text-secondary); line-height: 1.4; font-weight: 400; }
+
+/* The seven days */
+.yw-days { list-style: none; margin: 0; padding: var(--space-1) 0; }
+.yw-days > li + li { border-top: 1px solid var(--color-border-light); }
+.yw-day {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: 64px;
+  padding: var(--space-3) var(--space-4);
+  background: none;
+  border: 0;
+  border-radius: 16px;
+  color: var(--color-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.yw-day:hover { background: var(--color-bg-hover); }
+.yw-day__key { flex: none; width: 2.5em; font-size: var(--text-sm, 0.9375rem); font-weight: 600; color: var(--color-text-secondary); }
+.yw-day__key.is-today { color: var(--color-primary-light); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+.yw-day__text { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.yw-day__name { font-weight: 700; }
+.yw-day__line { font-size: var(--text-sm, 0.9375rem); line-height: 1.35; color: var(--color-text-secondary); }
+.yw-tag {
+  align-self: flex-start;
+  margin-top: 4px;
+  padding: 1px 8px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-size: var(--text-xs, 0.8125rem);
+  font-weight: 600;
+}
+.yw-tag--today { color: var(--color-primary-light); }
+.yw-done { flex: none; display: inline-flex; align-items: center; gap: 4px; font-size: var(--text-sm, 0.9375rem); font-weight: 600; color: var(--color-success); }
+
+/* Cards on the day screen */
+.yw-card { padding: var(--space-4); display: flex; flex-direction: column; gap: var(--space-3); }
+.yw-card__h { margin: 0; font-size: var(--text-base, 1rem); font-weight: 700; color: var(--color-text); }
+.yw-card .look-label { margin: var(--space-1) 0 0; }
+.yw-row { display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center; }
+.yw-row .yw-input { flex: 1; min-width: 0; }
+.yw-label { font-size: var(--text-sm, 0.9375rem); font-weight: 600; color: var(--color-text); }
+.yw-input {
+  min-height: 44px;
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-bg-deep);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  color: var(--color-text);
+  font: inherit;
+}
+.yw-mix { display: flex; flex-direction: column; gap: var(--space-2); }
+.yw-mix + .yw-mix { padding-top: var(--space-3); border-top: 1px solid var(--color-border-light); }
+.yw-mix__head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); }
+.yw-mix__name { font-weight: 600; }
+.yw-inline { min-height: 44px; padding: 0 var(--space-2); color: var(--color-primary-light); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+.yw-favs { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-1); }
+.yw-favs li { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); }
+
+.yw-way:focus-visible, .yw-chip:focus-visible, .yw-seg__btn:focus-visible, .yw-int:focus-visible,
+.yw-day:focus-visible, .yw-input:focus-visible, .yw-inline:focus-visible, .yw-back:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+@media (forced-colors: active) {
+  .yw-chip.is-on, .yw-seg__btn.is-on, .yw-int.is-on { border-color: Highlight; }
+  .yw-done, .yw-tag--today, .yw-day__key.is-today { color: CanvasText; }
+}

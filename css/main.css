@@ -1,5 +1,7 @@
 /* main.css
- * 30 Sep 2026 v30
+ * 05 Oct 2026 v31
+ *
+ * v31 - D-6 WEEK-SHAPE. components/your-week.css imported.
  *
  * v30 - PT-1 OUTBOUND. base/fonts.css imported first: Inter served from
  *   the app, not Google Fonts.
@@ -160,6 +162,7 @@
 @import 'components/club-rooms.css';   /* CLUB-SHELL, 06 Sep 2026 */
 @import 'components/capture.css';      /* CAPTURE-1,  16 Sep 2026 */
 @import 'components/finish.css';       /* F7 CSS-ZERO, 28 Sep 2026 */
+@import 'components/your-week.css';    /* D-6 WEEK-SHAPE, 05 Oct 2026 */
 /* Content-gated — add when content sessions complete */
 /* D3:  @import 'components/home-threshold.css';       */
 /* D10: @import 'components/community-impact.css';     */

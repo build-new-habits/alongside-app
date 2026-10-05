@@ -1,6 +1,9 @@
 /**
  * router.js
- * 03 Oct 2026 v45
+ * 05 Oct 2026 v46
+ *
+ * v46 - D-6 WEEK-SHAPE. 'your-week' (Your week, the Plan), reached from
+ *   Home, so the Home tab stays lit.
  *
  * v45 - W5-20 TRUE-WORDS-5. Make it up as I go on Free still goes to the
  *   upgrade page, now with router.redirectReason 'capture' so the page says
@@ -379,6 +382,7 @@ const VIEW_NAMES = {
   'journal-entry':     { path: './views/journal-entry.js',    fn: 'JournalEntryView'    },
   'activity-log':      { path: './views/activity-log.js',     fn: 'ActivityLogView'     },
   'library':           { path: './views/library.js',          fn: 'LibraryView'         },
+  'your-week':         { path: './views/your-week.js',        fn: 'YourWeekView'        },
   // SAVED-1, 08 Sep 2026. The Your own room counted saved sessions and
   // hid all but the newest behind a button that opened the BUILDER --
   // a screen for making a new one, reached by tapping a control that
@@ -520,6 +524,8 @@ const NAV_MAP = {
   'practices': 'today',
   // CHAP-1 step 2. Reached only from Home's full-width row.
   'my-programme': 'today',
+  // D-6. Reached from Home.
+  'your-week': 'today',
   'goal-review': 'my-programme',
   'settings': 'settings', 'privacy': 'settings',
   'upgrade': 'settings', 'goal-setup': 'settings',

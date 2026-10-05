@@ -1,6 +1,8 @@
 /**
  * data/line-icons.js
- * 04 Oct 2026 v1
+ * 05 Oct 2026 v2
+ *
+ * v2 - D-6 WEEK-SHAPE. week: a calendar page, for Your week.
  *
  * LOOK-4 (Graeme approved the mock-up, 04 Oct: "Yes yes yes. Love it").
  * One set of line icons for every screen: Home, the finish screen,
@@ -35,6 +37,7 @@ const PATHS = {
   tick:     '<path d="M5 12l5 5 9-10"/>',
   plus:     '<path d="M12 5v14M5 12h14"/>',
   chat:     '<path d="M4 5h16v11H8l-4 4z"/>',
+  week:     '<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4M8 14h2M14 14h2M8 17h2"/>',
   rest:     '<path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/>',
   chevron:  '<path d="M9 6l6 6-6 6"/>',
 };

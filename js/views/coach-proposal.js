@@ -1,5 +1,17 @@
 /**
  * coach-proposal.js
+ * 05 Oct 2026 v55
+ *
+ * v55 - D-6 WEEK-SHAPE. Opened from Home's "Show me today's plan" or "Only
+ *   10 minutes" on a day of the person's week, the plan is that day plan:
+ *   built by the coach as always, then reshaped by data/week-shape.js
+ *   applyWeekDay() to its mix of focuses, its favourites and its
+ *   intensity, at its length (ten minutes for the short version) and its
+ *   place. The request is read once on mount (weekDayRequest) and kept for
+ *   rebuilds on this screen, so changing Where or Length keeps the day's
+ *   shape. The sentence above the plan says which day plan it is. The
+ *   day's other focuses go to the arc with the session (creditTypes).
+ *
  * 04 Oct 2026 v54
  *
  * v54 - D-4 FIGURES. The exercise sheet's How starts with the exercise's
@@ -803,6 +815,7 @@ import { isGateDue, isGuidanceDue, recordAcknowledgement,
 import { HURT_AND_ACHE }     from '../exercise-card.js';
 import { bodyCaution }       from '../data/session-rationale.js';
 import { renderFigure }      from '../figures.js';
+import { takeWeekDayRequest, applyWeekDay, primaryType } from '../data/week-shape.js';
 import { resolveTiming }     from '../exercise-timing.js';
 import { isPremium }         from '../auth.js';
 import { openSheet }         from './onboarding/sheet-manager.js';
@@ -853,6 +866,8 @@ export function CoachProposalView(router) {
   let swapOpen   = null;
   // D-2. Which plan row's preview sheet is open, or null.
   let previewRow = null;
+  // D-6. Today's day plan from the person's week, when Home asked for it.
+  let weekReq = null;
   let chipOpen   = null;       // 'time' | 'loc' | null
   // W3-21. Where THIS plan is for, when it differs from the default.
   let planLoc    = null;
@@ -871,6 +886,19 @@ export function CoachProposalView(router) {
     // W3-21. Where "I know what I want" asked for, read once. Anything
     // else starts from the default, so a plan only looked at leaves no
     // trace on the next one.
+    // D-6. A day of the person's week, asked for from Home: read once,
+    // kept for this screen's rebuilds. Its length (ten minutes for the
+    // short version) is today's.
+    weekReq = takeWeekDayRequest();
+    if (weekReq) {
+      const want = weekReq.short ? 10 : weekReq.template.mins;
+      const cat = Object.keys(AVAILABLE_TIME_WINDOW_MINUTES).find(k => AVAILABLE_TIME_WINDOW_MINUTES[k] === want);
+      if (cat) setTodaysLength(cat);
+      // The check-in, when it came between Home and here, cleared the kind
+      // (clearPurpose); the day plan says it again, and where.
+      store.set('requestedSessionType', primaryType(weekReq.template));
+      if (store.get('requestedLocation') == null) store.set('requestedLocation', weekReq.template.place);
+    }
     const asked = store.get('requestedLocation');
     planLoc  = (asked === 'home' || asked === 'gym' || asked === 'outside') ? asked : null;
     if (asked != null) store.set('requestedLocation', null);
@@ -1555,6 +1583,8 @@ export function CoachProposalView(router) {
     glute: 'strength, glutes', core: 'core', cardio: 'cardio', mobility: 'mobility', stretch: 'stretching',
   };
   function _planSentence(option) {
+    // D-6. A day of the person's week says which day plan it is.
+    if (option.weekDay && option.weekDay.sentence) return option.weekDay.sentence;
     const req = store.get('requestedSessionType');
     const t   = req ? SESSION_TYPES.find(x => x.id === req) : null;
     if (t && _deliveredType(option) === req) {
@@ -2702,6 +2732,9 @@ export function CoachProposalView(router) {
     // STRETCH-VIA-COACH. Same ordering as the alternates get.
     _applyStretchTarget(built);
 
+    // D-6. The day plan's mix, favourites and intensity.
+    if (weekReq) applyWeekDay(built, weekReq, args, buildSession);
+
     // SEVERE-1 / CR-2. buildSession() may return Gentle Care or an
     // out-of-scope session instead of the type it was handed, and when it
     // does the type the chain chose is no longer what the person is being
@@ -2731,6 +2764,10 @@ export function CoachProposalView(router) {
       // log know a gentle or lighter plan for what it is.
       gentleCare:    !!built.gentleCare,
       gentleReason:  built.gentleReason || null,
+      // D-6. The day plan it was built from, and the other focuses the
+      // arc should credit.
+      weekDay:       built.weekDay || null,
+      creditTypes:   Array.isArray(built.creditTypes) ? built.creditTypes : [],
       inputs:        { ...inputs, chosenType: sessionType, reason },
       _pools:        buildCandidatePools(args)
     }];

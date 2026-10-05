@@ -1,6 +1,14 @@
 /**
  * today.js
- * 04 Oct 2026 v54
+ * 05 Oct 2026 v55
+ *
+ * v55 - D-6 WEEK-SHAPE (Graeme approved the "Your week" mock-up, 05 Oct).
+ *   Plan Home: when the person has a week, a card "Today, from your week"
+ *   leads the doors: the day plan's name, its mix and how hard, long and
+ *   where, then "Show me today's plan", "Only 10 minutes" and "Something
+ *   else today" (which moves to the doors). Tell me what to do is then not
+ *   the filled door. A rest day says so ("Rest counts."). A fifth link
+ *   tile, Your week (or Plan your week), full width under the four.
  *
  * v54 - D-3 ARC-HOME (device test, 04 Oct). The Your arc card opens the
  *   arc (stretch-arc), where it can be changed or started afresh; it
@@ -795,6 +803,8 @@ import { carryOnSummary } from './capture.js';   // F1: a freestyle session to c
 import { GUIDANCE_TEXT, GUIDANCE_DAYS } from '../safety-gate.js';
 import { aimById, STRANDS }    from '../data/aims.js';
 import { lineIcon }            from '../data/line-icons.js';
+import { todayInWeek, askForToday } from '../data/week-shape.js';
+import { mixLine, detailLine } from '../data/week-shape-model.js';
 import { arcWeek }             from '../data/arc-readback.js';
 import { noticePlanJump, offerBriefPath } from '../data/pacing.js';
 import { isPremium, lockedFeature } from '../auth.js';
@@ -1337,6 +1347,20 @@ export function TodayView(router) {
         store.set('workoutProgress', null);
         mount(container);
       });
+
+    // D-6. Today's day plan from the week: the plan, or its short version.
+    container.querySelectorAll('[data-action="week-today"], [data-action="week-short"]').forEach(btn =>
+      btn.addEventListener('click', () => {
+        if (!askForToday({ short: btn.dataset.action === 'week-short' })) return;
+        if (_checkedInToday()) {
+          router.navigate('coach-proposal');
+        } else {
+          store.set('pendingDoorRoute', 'coach-proposal');
+          router.navigate('checkin');
+        }
+      }));
+    container.querySelector('[data-action="week-else"]')
+      ?.addEventListener('click', () => container.querySelector('#home-doors-label')?.focus());
 
     container.querySelector('[data-action="start-today"]')
       ?.addEventListener('click', () => {
@@ -2066,6 +2090,9 @@ function _markGuidanceShown(root) {
   function _planDoors() {
     const carry = _carryOn();
     const checkedIn = _checkedInToday();
+    // D-6. The week's day leads when there is one for today.
+    const week = todayInWeek();
+    const weekLeads = !carry && !!(week && week.template);
     // LOOK-4. A tile, the words, a chevron. The words decide, not the colour.
     const door = (action, title, sub, primary, icon) => `
       <button class="home-door ${primary ? 'home-door--primary' : ''}" data-action="${action}">
@@ -2087,11 +2114,12 @@ function _markGuidanceShown(root) {
       ${_scopeNotice()}
       ${_guidanceLine()}
       ${carry ? _carryOnCard(carry) : ''}
-      ${carry ? '<p class="home-doors__or" id="home-doors-label">Or instead</p>' : '<h2 class="look-label" id="home-doors-label">What would you like to do?</h2>'}
+      ${!carry && week ? _weekCard(week) : ''}
+      ${carry || weekLeads ? `<p class="home-doors__or" id="home-doors-label" tabindex="-1">${carry ? 'Or instead' : 'Or something else today'}</p>` : '<h2 class="look-label" id="home-doors-label">What would you like to do?</h2>'}
       <div class="home-doors" role="group" aria-labelledby="home-doors-label">
         ${door('start-today', 'Tell me what to do',
                checkedIn ? 'You\u2019ve checked in \u2014 straight to your plan' : 'Three quick questions, then your plan',
-               !carry, 'star')}
+               !carry && !weekLeads, 'star')}
         ${door('know-what', 'I know what I want', 'Pick the kind of session and how long', false, 'choose')}
         ${door('as-i-go', 'Make it up as I go', 'Log each move as you do it', false, 'pencil')}
       </div>
@@ -2101,7 +2129,35 @@ function _markGuidanceShown(root) {
         ${link('running-session', 'Go for a run', 'run', 'blue')}
         ${link('noticing', 'Something for the mind', 'mind', 'green')}
         ${link('library', 'Library', 'library', 'slate')}
+        ${link('your-week', week ? 'Your week' : 'Plan your week', 'week', 'teal')}
       </div>`;
+  }
+
+  /**
+   * D-6. Today, from the person's week. A day plan: what it is, and three
+   * ways in. A rest day: said, and nothing asked. Nothing set for today:
+   * no card (the doors are the way in, as before).
+   */
+  function _weekCard(week) {
+    if (week.value === 'rest') {
+      return `<section class="home-week look-card" aria-labelledby="home-week-h">
+        <p class="look-label home-week__lbl">Today, from your week</p>
+        <h2 class="home-week__name" id="home-week-h">Rest</h2>
+        <p class="home-week__line">Today is a rest day in your week. Rest counts.</p>
+      </section>`;
+    }
+    const t = week.template;
+    return `<section class="home-week look-card" aria-labelledby="home-week-h">
+      <p class="look-label home-week__lbl">Today, from your week</p>
+      <h2 class="home-week__name" id="home-week-h">${_esc(t.name)}</h2>
+      <p class="home-week__line">${_esc(mixLine(t))}.</p>
+      <p class="home-week__line">${_esc(detailLine(t))}</p>
+      <button class="btn btn-primary btn-large btn-full" data-action="week-today">Show me today\u2019s plan</button>
+      <div class="home-week__row">
+        <button class="btn btn-secondary" data-action="week-short">Only 10 minutes</button>
+        <button class="btn btn-secondary" data-action="week-else">Something else today</button>
+      </div>
+    </section>`;
   }
 
   /**
