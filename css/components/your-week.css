@@ -1,5 +1,8 @@
 /* css/components/your-week.css
- * 05 Oct 2026 v1
+ * 05 Oct 2026 v2
+ *
+ * v2 - D-8 TEXT-FIT. Buttons on Your week wrap their words at large text
+ *   sizes rather than run out of the button.
  *
  * D-6 WEEK-SHAPE. "Your week" (js/views/your-week.js) in the LOOK cards:
  * the page ground, row cards with a kind tile, labels in small capitals.
@@ -19,6 +22,8 @@
 .yw-header { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); }
 .yw-back { min-height: 44px; padding-left: 0; color: var(--color-primary-light); font-weight: 600; }
 .yw-change { min-height: 44px; }
+.yw-view .btn { height: auto; white-space: normal; overflow-wrap: break-word; line-height: 1.3; }
+.yw-header .yw-change { max-width: 55%; }
 .yw-title { margin: 0; font-size: var(--text-2xl, 1.75rem); font-weight: 700; color: var(--color-text); }
 .yw-title:focus { outline: none; }
 .yw-title:focus-visible { outline: 3px solid var(--color-primary); outline-offset: 4px; border-radius: 6px; }
