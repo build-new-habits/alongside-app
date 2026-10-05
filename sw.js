@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 05 Oct 2026 v653
+ * 05 Oct 2026 v654
  *
+ * v654 - SW-INCREMENTAL (Graeme, 05 Oct: "everything is really slow to open and load"): an update copies every file whose content hash is unchanged from the cache the phone already has, and downloads only what changed (it downloaded all 247 files, about 6 MB, every time). SHELL_HASHES written by tools/sw-hashes.mjs. This first update to it still downloads everything once. index.html: the Sentry loader is async.
  * v653 - D-7 (Graeme, 05 Oct): Add a plan you already have. Paste a plan; the app finds its exercises with fixed rules (movement only, read on the phone and not kept, nothing added unseen), adds the ticked ones to My exercises by day, and a day of the week can be one of them. NEW FILES precached: js/data/plan-reader.js, js/views/plan-import.js.
  * v652 - D-8 (device test, 05 Oct): at large text sizes the week card's buttons stack and wrap, and the timer's words sit under its circle, which grows with the text.
  * v651 - D-6 (Graeme, 05 Oct): Your week. Say what each day is for (a mix of focuses, how hard, how long, where, favourites) and the coach builds each day inside it; Home leads with Today, from your week; it counts for the arc and Progress. NEW FILES precached: js/data/week-shape-model.js, js/data/week-shape.js, js/views/your-week.js, css/components/your-week.css.
@@ -4200,7 +4201,264 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v653";
+const CACHE_NAME = "alongside-v654";
+
+// SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
+// tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
+// every file whose hash has not changed from the cache it already has, and
+// downloads only the rest: it fetched all of them (about 6 MB) every time.
+// SHELL_HASHES:BEGIN
+const SHELL_HASHES = {
+  "./": "e9c8de187a65ee0b",
+  "./index.html": "e9c8de187a65ee0b",
+  "./css/main.css": "17c9ba6e5a2de852",
+  "./css/base/fonts.css": "1628ae32d5bf6882",
+  "./css/layouts/onboarding-additions.css": "a204c285b813c6e8",
+  "./css/layouts/today.css": "cb292bbfe41d7e07",
+  "./css/layouts/my-programme.css": "6fc8794818a509aa",
+  "./css/layouts/library.css": "21c782973f58ddca",
+  "./css/layouts/mobility-conditioning.css": "7f16e4c2f0af94c9",
+  "./css/layouts/progress.css": "a9bd2339e7de5d86",
+  "./css/layouts/goal-review.css": "a97c4a240fe903cf",
+  "./css/components/session-guard.css": "e745184856d6bd97",
+  "./css/components/weekly-plan.css": "4e89b83df4a2b43c",
+  "./css/components/breathing-session.css": "a781b7bd351396ff",
+  "./css/components/quiet-session.css": "34a8b26534013674",
+  "./css/components/noticing.css": "f7d98b66333ab59f",
+  "./css/components/coach-proposal.css": "45ff041d162cb14b",
+  "./css/components/settings.css": "842c509c12f3f399",
+  "./css/components/weekly-plan-v2.css": "ea4e141c2a5dba52",
+  "./css/components/gym-programme.css": "79be04064c6bd328",
+  "./css/components/journal-entry.css": "dd51da5425ee545b",
+  "./css/components/reflect.css": "a9f38ee926ac2ec3",
+  "./css/components/red-flag.css": "7297aeac122d7e37",
+  "./css/components/know-what.css": "6f1d7faff6783932",
+  "./css/components/nav-fix.css": "ee5db4b763633630",
+  "./css/components/onboarding-thread.css": "e98173c565e8f212",
+  "./css/components/sheet-manager.css": "ea1daa96e07ff080",
+  "./css/components/settings-reflection.css": "37c435fb6fe23db7",
+  "./css/components/checkin-conversation.css": "ce65a87176d427d5",
+  "./css/components/display-preferences.css": "7d1e4e0b34f5223f",
+  "./css/components/session-log.css": "92f8082dc0ee69a7",
+  "./css/components/grounding-moments.css": "a2641284734e48de",
+  "./css/components/single-activity-session.css": "fef626d39b2d281c",
+  "./css/components/session-shared.css": "a71069801a65054c",
+  "./css/components/upgrade-door.css": "1a2deeaceb45f4f1",
+  "./css/components/upgrade-page.css": "ef2284fa060b21ea",
+  "./css/base/global.css": "0a48f058e0429881",
+  "./css/base/reset.css": "6858c07267a7fee6",
+  "./css/base/typography.css": "7ef937ebd7185b4b",
+  "./css/base/variables.css": "0a5315988156303d",
+  "./css/components/buttons.css": "8a51c00d2a3701e6",
+  "./css/components/cards.css": "c65a1ff9ff422d1d",
+  "./css/components/checkin.css": "86932bcac334309a",
+  "./css/components/coach-fix.css": "b9a5e5cd8320758b",
+  "./css/components/equipment-modal.css": "923c72d2dadb57c3",
+  "./css/components/morning-session.css": "92a4f19a858d43b5",
+  "./css/components/settings-library.css": "6e8065c1fb782ba8",
+  "./css/components/workout.css": "e7442fecf7d61dd3",
+  "./css/layouts/app-shell.css": "a890ee4f9459f0d0",
+  "./css/layouts/goal-setup.css": "32ded4f3cacc0b13",
+  "./css/layouts/onboarding.css": "9dd282cf6249ceae",
+  "./css/components/tier-gating.css": "d739441e1e3f3816",
+  "./css/components/practices.css": "60c1221c337fba7b",
+  "./css/components/club-rooms.css": "f1c069c5b8eaf09e",
+  "./css/components/capture.css": "343b4ae0dc6fe6ea",
+  "./css/components/finish.css": "d048b8066d6e9d22",
+  "./js/app.js": "4498f262196f4c67",
+  "./js/router.js": "6455a082a5460187",
+  "./js/store.js": "12533709d3e6c335",
+  "./js/session-log.js": "d43815c658239179",
+  "./js/exercise-feedback.js": "adba8549f444da2a",
+  "./js/exercise-card.js": "78196b42671c67aa",
+  "./js/safety-gate.js": "7a095f4bf8018087",
+  "./js/save-block.js": "831a7143b32e0f7d",
+  "./js/stretch-target.js": "e8c305bfb957d655",
+  "./js/data/purpose.js": "fe0f0dcf76cd4591",
+  "./js/data/morning-library-map.js": "d4eb79cc3e5df86d",
+  "./js/views/capture.js": "78453e2b0b02d31f",
+  "./js/exercise-timing.js": "38608437fd7b08fb",
+  "./js/display-prefs.js": "64a88a740fcb5cd9",
+  "./js/tts.js": "acb754b56a41d53e",
+  "./js/session-guard.js": "00177a846537868c",
+  "./js/session-resume.js": "6916b88c0757374f",
+  "./js/auth.js": "9b9c7a632dccada6",
+  "./js/views/today.js": "f4115b4d5f268ce7",
+  "./js/views/mobility-conditioning.js": "d77cde7833239666",
+  "./js/views/arc-setup.js": "bc3f0046616fc07b",
+  "./js/views/stretch-arc.js": "e67d2715e6019eb9",
+  "./js/views/checkin.js": "29d45c08868e3e8f",
+  "./js/views/checkin-mini.js": "3f1764e87002d46f",
+  "./js/views/coach-proposal.js": "31eb8b16c69b1673",
+  "./js/views/workout.js": "7c29db66bc121ecc",
+  "./js/views/progress.js": "42d8d14d522b3195",
+  "./js/views/settings.js": "51c3bfeadd66479d",
+  "./js/views/restore-flow.js": "dc81c2e455fa472d",
+  "./js/views/weekly-plan.js": "0ec10ff9a6f7f133",
+  "./js/views/reflect.js": "245bc9bc3cde358a",
+  "./js/data/empathy-transfer.js": "b3513396b3541e3a",
+  "./js/data/equipment-map.js": "b3460207997a4fa5",
+  "./js/data/exercises/gym.js": "34140029424a4dce",
+  "./js/data/exercises/seated.js": "4e7ce1b05818ef39",
+  "./js/data/exercises/sport_conditioning.js": "72c789b2f7284b1b",
+  "./js/data/exercises/swimming_cycling.js": "0f3fefe85ab33dfd",
+  "./js/data/morning-programme.js": "684cee9fdc54a03a",
+  "./js/data/session-categories.js": "39f35cc7aab24fe6",
+  "./js/data/aims.js": "dabbcb4d164f9ed4",
+  "./js/data/stretch-goal-zones.js": "a05bc2d626cade4f",
+  "./js/data/session-rationale.js": "3611ae82d114482a",
+  "./js/data/personal-reads.js": "52141f31fa9d4fd0",
+  "./js/data/field-contract.js": "d7d662025990b1fd",
+  "./js/views/activity-log.js": "462e78533c0a815a",
+  "./js/views/annual-reflection.js": "b342635af8b1d212",
+  "./js/views/community-impact.js": "b620646a69ac8d8a",
+  "./js/views/home-threshold.js": "17bc42808aa5bd5c",
+  "./js/views/onboarding/frequency.js": "47e40b6e6e2f458f",
+  "./js/views/programme-select.js": "8f1e740ed2db223b",
+  "./js/views/upgrade.js": "4b7233092e3561da",
+  "./js/views/privacy.js": "a64dfefd8a24d1ac",
+  "./js/views/library.js": "3e523a600356e714",
+  "./js/views/practices.js": "69ede443c8d69360",
+  "./js/views/red-flag.js": "cfe041e1e4da9ecb",
+  "./js/views/health-consent.js": "eaead26a28761859",
+  "./js/views/age-check.js": "78478b867a8cb243",
+  "./js/views/under-18.js": "7c1d5316b2e0a835",
+  "./js/views/consent-update.js": "51f918f8e2c9b25a",
+  "./js/data/arc-readback.js": "9b06dcba96534da0",
+  "./js/data/tier-table.js": "ba30bfb28d0b8b35",
+  "./js/views/know-what.js": "e196bb8321f5218d",
+  "./js/data/red-flag.js": "5ec90a31f4b9a8cc",
+  "./js/data/health-consent.js": "a6432ebfb709d33c",
+  "./js/data/age-check.js": "ed0c1f5310aa26c9",
+  "./js/data/restore.js": "aeeb13c93705e542",
+  "./js/data/export-file.js": "bbee762322d0e4e2",
+  "./js/data/health-consent-covers.js": "6698a3e50672cbbe",
+  "./js/data/kind-colours.js": "178ca1df919c83e9",
+  "./js/data/line-icons.js": "c66cb43d2b010c32",
+  "./js/data/week-shape-model.js": "8b6720d92bedb6e5",
+  "./js/data/week-shape.js": "11aa21a058a7c640",
+  "./js/views/your-week.js": "ee43f8b6e6746f01",
+  "./js/data/plan-reader.js": "a63239d24ffa51f9",
+  "./js/views/plan-import.js": "630d97175edd2091",
+  "./css/components/your-week.css": "f14109dded35259b",
+  "./js/figures.js": "60f325dd602352db",
+  "./js/data/figures/index.js": "81398e8637cb0692",
+  "./js/data/figures/batch-01.js": "aa63243f5ad443df",
+  "./js/data/figures/batch-02.js": "067171d42db1d439",
+  "./js/data/figures/batch-03.js": "2aa6d354f20f277e",
+  "./js/data/figures/batch-04.js": "aeb04719a942e365",
+  "./js/data/figures/batch-05.js": "570b42c8e26230e2",
+  "./js/data/figures/batch-06.js": "dcf7b603cf6c3ead",
+  "./js/data/figures/batch-07.js": "47b134e0e32a4179",
+  "./js/data/figures/batch-08.js": "138e1ed0d3526628",
+  "./js/data/figures/batch-09.js": "c9b02eff8626cefe",
+  "./js/data/figures/batch-10.js": "d03620cf63099b0f",
+  "./js/data/figures/batch-11.js": "7dc464ecc3e93d58",
+  "./js/data/figures/batch-12.js": "2e82b3c1bc531330",
+  "./js/data/figures/batch-13.js": "b5b77f98f819cff0",
+  "./js/views/bad-day-door.js": "5910813778515c4e",
+  "./js/data/chair-legs.js": "9f7c2e9b87617203",
+  "./js/data/general-routine.js": "d3368d7dbbcddb5c",
+  "./js/data/session-length.js": "d135da33af36c923",
+  "./js/data/file-lock.js": "6428c4d49a58959b",
+  "./js/data/messages.js": "eec79984385fe4a3",
+  "./js/data/evidence.js": "a929cf51be2c9b54",
+  "./js/data/support-lines.js": "0c1286fa510e427e",
+  "./js/data/consent-version.js": "c1a39ed44cc24157",
+  "./js/views/my-programme.js": "60eaac657d25c631",
+  "./js/session-builder.js": "467020b3e118cc25",
+  "./js/data/session-choice.js": "954463b0647f3843",
+  "./js/data/saved-sessions.js": "91dd2dc43f0f908b",
+  "./js/data/class-contract.js": "fe8f3f22b0df50f6",
+  "./js/data/classes/index.js": "1dc5d11095c21e99",
+  "./js/data/classes/class-ground-001.js": "b4df735986c353bd",
+  "./js/data/classes/class-steady-round-002.js": "00e7a174fcae3772",
+  "./js/data/classes/class-stopping-early-003.js": "46ff3fd168d14264",
+  "./js/data/classes/class-bending-004.js": "95e1ad568a8151ca",
+  "./js/data/classes/class-standing-up-005.js": "35877775ab43bf07",
+  "./js/data/classes/class-out-006.js": "c910250914f56868",
+  "./js/data/classes/class-unsticking-007.js": "a1d19f121724437b",
+  "./js/data/classes/class-putting-down-008.js": "f22fa629c9e33dd0",
+  "./js/data/classes/class-getting-going-009.js": "c92381f2c500c0a4",
+  "./js/data/classes/class-from-the-feet-010.js": "cdbfa03ffea71774",
+  "./js/data/scope-statement.js": "02dac4d3fb7a62fb",
+  "./js/data/activity-labels.js": "bf2b471372c51323",
+  "./js/views/class-player.js": "e5669734d642c896",
+  "./js/views/class-list.js": "551081d91143ee4d",
+  "./css/components/class-list.css": "e33b073b352399f3",
+  "./css/components/class-player.css": "401cc57d7d39dbb1",
+  "./js/views/saved-sessions.js": "0a357d6fa5c13830",
+  "./js/views/session-builder-ui.js": "62773fe6abab21e4",
+  "./js/views/noticing.js": "54446d31544d9c5c",
+  "./js/views/in-step.js": "196267c5da62e662",
+  "./js/data/in-step-scenarios.js": "b46f085cda4d24fc",
+  "./js/views/journal-entry.js": "5e315297df9abc14",
+  "./js/views/gym-programme.js": "d33d5c8cfaf6eb2a",
+  "./js/views/prescribed.js": "3e6cfd447b499867",
+  "./js/views/prescribed-session.js": "52ad4fc728657898",
+  "./js/views/quiet-session.js": "73c106032a745253",
+  "./js/views/breathing-session.js": "26387298908f3076",
+  "./js/views/morning-session.js": "e1efd26a71ffd68c",
+  "./js/views/core-session.js": "4db5aac7cec94a93",
+  "./js/views/yoga-session.js": "5c668d74269e4014",
+  "./js/views/walk-session.js": "4db23f8714be90d7",
+  "./js/views/running-session.js": "5d68396baa51b914",
+  "./js/views/swim-session.js": "b7df266e78ddc4e9",
+  "./js/views/cycle-session.js": "1acf062699de50fe",
+  "./js/views/onboarding/thread.js": "37c5261ae3d0c723",
+  "./js/views/onboarding/sheet-manager.js": "20cb675f242157c8",
+  "./js/views/onboarding/goals.js": "ec29181741c4bc1e",
+  "./js/views/onboarding/conditions.js": "f719e4e253244b9e",
+  "./js/views/onboarding/equipment.js": "0c04afca3eeba431",
+  "./js/views/onboarding/plan-select.js": "a5eda498c2aa5d62",
+  "./js/data/beat3-scripts.js": "a74cffeeff3e7b4c",
+  "./js/data/onboarding-thread-data.js": "0ef348674b8fdac0",
+  "./js/data/checkin.js": "bfbf13fb4e37c468",
+  "./js/data/checkin-openings.js": "e319f8bb44cd9bf4",
+  "./js/data/first-session.js": "4803879459a70821",
+  "./js/data/pacing.js": "6d73dd69633dbaf0",
+  "./js/data/week-focus.js": "7ef62ccb4eab0729",
+  "./js/data/assessment.js": "abbb5c432a0d6f3c",
+  "./js/data/session-moments.js": "85608dcfb8a34055",
+  "./js/data/conditions.js": "933cab5f52351476",
+  "./js/data/equipment.js": "1628f3c055f525f1",
+  "./js/data/goals.js": "6cac79f51ca5b5a4",
+  "./js/data/goal-review.js": "a0208fe146fed15d",
+  "./js/data/goal-review-script.js": "8a0677e0607dbdca",
+  "./js/views/thread-runner.js": "28b5566df9a2d9df",
+  "./js/views/goal-review-thread.js": "f7135219a5a95c22",
+  "./js/data/weight-targets.js": "290a14916aa4ed3e",
+  "./js/data/plan-options.js": "86087e77bded2cd0",
+  "./js/data/pricing.js": "2458927c2fec1f11",
+  "./js/data/time-windows.js": "a25841c83a4ce91e",
+  "./js/data/programmeEngine.js": "6be1bf8774f9f204",
+  "./js/data/programmes.js": "e455b0b69bd02a52",
+  "./js/data/grounding-moments.js": "33c5054f7e6540ff",
+  "./js/data/coach-voice.js": "92ea4a0209978619",
+  "./js/data/exercises/index.js": "d9df11d43f5df8ce",
+  "./js/data/exercises/strength.js": "c3ea3c850e5c9231",
+  "./js/data/exercises/cardio.js": "70eb66cdf3b2ca93",
+  "./js/data/exercises/mobility.js": "db5e5496ded8847d",
+  "./js/data/exercises/yoga.js": "a47fac7b38781ec5",
+  "./js/data/exercises/pilates.js": "99e320f6392bca5b",
+  "./js/data/exercises/running.js": "fcb33517ce9f6da5",
+  "./js/data/exercises/rehabilitation.js": "d4c680d6888e9f4c",
+  "./js/data/exercises/recovery.js": "417c343342097d9a",
+  "./js/data/exercises/mindfulness.js": "43e569cf2f0ca91c",
+  "./js/data/practice-library.js": "21f37963f0b2d2c2",
+  "./js/data/muscle-search.js": "3f9ae092f24a6bcf",
+  "./assets/images/logo-icon-small.png": "2c057e014ac09481",
+  "./assets/images/logo-icon-square.png": "82917b9f832f06ce",
+  "./assets/images/logo-icon-128.png": "2c057e014ac09481",
+  "./assets/images/logo-icon-192.png": "3e692bf0327bd82d",
+  "./assets/fonts/inter-latin-400-normal.woff2": "8909904ab6c872eb",
+  "./assets/fonts/inter-latin-500-normal.woff2": "f3779f1efccc4bdc",
+  "./assets/fonts/inter-latin-600-normal.woff2": "f9a06e79cd3a2a20",
+  "./assets/fonts/inter-latin-700-normal.woff2": "6f56409fd3d64bb8",
+  "./assets/images/logo-icon-512.png": "83e03cc4171a36cc"
+};
+// SHELL_HASHES:END
+const HASH_HEADER = "x-alongside-hash";
 
 const SHELL_URLS = [
 
@@ -4523,6 +4781,23 @@ self.addEventListener("message", event => {
   }
 });
 
+/** A copy of url from an older cache, if its content hash is the same. */
+function _fromOld(olds, url, hash) {
+  if (!hash || !olds || !olds.length) return Promise.resolve(null);
+  return olds.reduce((p, c) => p.then(hit => hit || c.match(url).then(r =>
+    r && r.headers && r.headers.get(HASH_HEADER) === hash ? r : null).catch(() => null)), Promise.resolve(null));
+}
+
+/** The response with its content hash on it, so the next update can reuse it. */
+function _stamp(res, hash) {
+  if (!hash) return res;
+  try {
+    const headers = new Headers(res.headers);
+    headers.set(HASH_HEADER, hash);
+    return new Response(res.body, { status: res.status, statusText: res.statusText, headers });
+  } catch { return res; }
+}
+
 // Install — cache the app shell
 self.addEventListener("install", event => {
   event.waitUntil(
@@ -4547,18 +4822,32 @@ self.addEventListener("install", event => {
       //
       // This is also why "clear site data" kept appearing to fix it: that
       // wiped the HTTP cache too, so the next install fetched real files.
-      return Promise.allSettled(
-        SHELL_URLS.map(url =>
-          fetch(new Request(url, { cache: "reload" }))
-            .then(res => {
-              if (!res || res.status !== 200) throw new Error(`bad status ${res && res.status}`);
-              return cache.put(url, res);
-            })
-            .catch(() => {
-              console.warn("SW: could not cache", url);
-            })
-        )
-      );
+      //
+      // SW-INCREMENTAL, 05 Oct 2026. Graeme: "Everything is really really
+      // really slow to open and load", on a day of seven updates. Every
+      // update fetched all ~250 files (about 6 MB) again. A file whose
+      // content hash is unchanged is now copied from the cache this phone
+      // already has (each copy carries its hash in HASH_HEADER); only the
+      // files that changed are fetched, still with cache:"reload" (SW-2).
+      // Anything unexpected falls back to fetching, as before.
+      return caches.keys()
+        .then(keys => Promise.all(keys.filter(k => k !== CACHE_NAME && k.startsWith("alongside-")).map(k => caches.open(k))))
+        .catch(() => [])
+        .then(olds => Promise.allSettled(
+          SHELL_URLS.map(url => {
+            const hash = SHELL_HASHES[url] || null;
+            return _fromOld(olds, url, hash).then(found => found
+              ? cache.put(url, found)
+              : fetch(new Request(url, { cache: "reload" }))
+                  .then(res => {
+                    if (!res || res.status !== 200) throw new Error(`bad status ${res && res.status}`);
+                    return cache.put(url, _stamp(res, hash));
+                  }))
+              .catch(() => {
+                console.warn("SW: could not cache", url);
+              });
+          })
+        ));
     })
     // W4-14, 02 Oct 2026. No skipWaiting() here. A new version waits until
     // the person presses Update (the page posts SKIP_WAITING, handled
