@@ -1,5 +1,5 @@
 # Alongside: Move — Cold Start Blueprint
-## 05 Oct 2026 v259
+## 05 Oct 2026 v260
 
 Build New Habits | Everything a chat with no memory needs to pick this up and build confidently.
 
@@ -51,7 +51,7 @@ git clone --depth 1 https://x-access-token:$TOKEN@github.com/build-new-habits/al
 | BNH-Files: `Apps/Alongside Move/` `Legal/`, `Clinical/`, `Business/`, `Product/`, `Research/`, `Testing/`, `Admin/`, `Archive/` | Every other paper, including the governing documents below |
 | `docs/Schema.md` | Store fields. **Must match `store.js`** |
 | `docs/` | Only what the code and checks need: `Changelog.md`, `exercise_entry_standard.md`, this blueprint, `specs/` (three specs the checks read), `classes/` (guided class scripts), `archive-code/` (retired code) |
-| `tools/verify-*.mjs` | 300 gates |
+| `tools/verify-*.mjs` | 301 gates |
 | `js/` | Vanilla ES modules, no framework, no bundler |
 
 **Governing documents, in read order** (BNH-Files, `Apps/Alongside Move/Business/`):
@@ -72,10 +72,10 @@ git clone --depth 1 https://x-access-token:$TOKEN@github.com/build-new-habits/al
 |---|---|
 | `store.js` | v113 |
 | `Schema.md` | v1.110 |
-| `sw.js` | **v653**, cache `alongside-v653` |
+| `sw.js` | **v654**, cache `alongside-v654` |
 | `router.js` | v36 · `my-programme.js` v8 · `today.js` v49 · `settings.js` v46 · `progress.js` v22 · `onboarding/thread.js` v16 |
 | `exercise-card.js` | **v7** — CARD-4, four pages. `workout.css` v16 |
-| Gates | **300, all green** on jsdom 28.1.0 (`npm ci`) — from the repo root. See the cwd row in §9 |
+| Gates | **301, all green** on jsdom 28.1.0 (`npm ci`) — from the repo root. See the cwd row in §9 |
 
 🟢 **This table is now GATED.** `tools/verify-blueprint.mjs` compares every version above against the file that carries it and goes red on any drift, naming the row to change.
 
@@ -105,7 +105,7 @@ All 49 affected files now resolve from `import.meta.url` — 14 for the repo pat
 
 ### Session close
 1. Full suite green, from a fresh clone.
-2. `sw.js` **last, alone, in its own commit**, with a cache bump.
+2. `sw.js` **last, alone, in its own commit**, with a cache bump. **Then run `node tools/sw-hashes.mjs`** (SW-INCREMENTAL, 05 Oct 2026): it writes each shell file's content hash into `sw.js`, so a phone's update copies unchanged files from its own cache and downloads only what changed. `verify-sw-hashes` fails if a hash is missing or stale; a stale one would keep an old file on phones.
 3. Update the master schedule in BNH-Files, archive the old version to `Past MS/`, and push BNH-Files.
 4. Verify with a second fresh clone.
 
