@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 04 Oct 2026 v650
+ * 05 Oct 2026 v651
  *
+ * v651 - D-6 (Graeme, 05 Oct): Your week. Say what each day is for (a mix of focuses, how hard, how long, where, favourites) and the coach builds each day inside it; Home leads with Today, from your week; it counts for the arc and Progress. NEW FILES precached: js/data/week-shape-model.js, js/data/week-shape.js, js/views/your-week.js, css/components/your-week.css.
  * v650 - D-5 (Graeme, 04 Oct): the Library's At home and At the gym sessions open Today's plan for that place, asked once; the category page in the LOOK cards.
  * v649 - D-4 (Graeme, 04 Oct): a stick figure for every exercise, on the How step, in the plan's exercise sheet and on the DO page. NEW FILES precached: js/figures.js, js/data/figures/index.js and its thirteen batch files.
  * v648 - D-3 (device test, 04 Oct): Your arc on Home opens the arc, which says what it is and offers Change what feeds it, Change how you'd know and Start a fresh arc (from week 1), with Stop the arc.
@@ -4197,7 +4198,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v650";
+const CACHE_NAME = "alongside-v651";
 
 const SHELL_URLS = [
 
@@ -4362,6 +4363,10 @@ const SHELL_URLS = [
   "./js/data/health-consent-covers.js",
   "./js/data/kind-colours.js",
   "./js/data/line-icons.js",
+  "./js/data/week-shape-model.js",
+  "./js/data/week-shape.js",
+  "./js/views/your-week.js",
+  "./css/components/your-week.css",
   "./js/figures.js",
   "./js/data/figures/index.js",
   "./js/data/figures/batch-01.js",
