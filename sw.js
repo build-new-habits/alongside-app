@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 05 Oct 2026 v654
+ * 06 Oct 2026 v655
  *
+ * v655 - D-12 PROGRESS-FIT (device test, 06 Oct: "when I go into progress the screen shifts right ... it's every time"): no screen is wider than the phone at any text size. The text size was applied twice (1.45 drew 2.1x); it is applied once now, and the slider goes up to 2. Progress and Plan your week are the screen's width; at large text Progress is one thing per row with the week chart on its side; full-width buttons, session and Mobility & Conditioning headers, Home's door tiles and the morning week grid reflow; the bottom navigation stops growing at about 1.45x so its labels never collide.
  * v654 - SW-INCREMENTAL (Graeme, 05 Oct: "everything is really slow to open and load"): an update copies every file whose content hash is unchanged from the cache the phone already has, and downloads only what changed (it downloaded all 247 files, about 6 MB, every time). SHELL_HASHES written by tools/sw-hashes.mjs. This first update to it still downloads everything once. index.html: the Sentry loader is async.
  * v653 - D-7 (Graeme, 05 Oct): Add a plan you already have. Paste a plan; the app finds its exercises with fixed rules (movement only, read on the phone and not kept, nothing added unseen), adds the ticked ones to My exercises by day, and a day of the week can be one of them. NEW FILES precached: js/data/plan-reader.js, js/views/plan-import.js.
  * v652 - D-8 (device test, 05 Oct): at large text sizes the week card's buttons stack and wrap, and the timer's words sit under its circle, which grows with the text.
@@ -4201,7 +4202,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v654";
+const CACHE_NAME = "alongside-v655";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4214,11 +4215,11 @@ const SHELL_HASHES = {
   "./css/main.css": "17c9ba6e5a2de852",
   "./css/base/fonts.css": "1628ae32d5bf6882",
   "./css/layouts/onboarding-additions.css": "a204c285b813c6e8",
-  "./css/layouts/today.css": "cb292bbfe41d7e07",
+  "./css/layouts/today.css": "31ae917bee386879",
   "./css/layouts/my-programme.css": "6fc8794818a509aa",
   "./css/layouts/library.css": "21c782973f58ddca",
-  "./css/layouts/mobility-conditioning.css": "7f16e4c2f0af94c9",
-  "./css/layouts/progress.css": "a9bd2339e7de5d86",
+  "./css/layouts/mobility-conditioning.css": "659731db8ac66fa7",
+  "./css/layouts/progress.css": "e037c18549bad175",
   "./css/layouts/goal-review.css": "a97c4a240fe903cf",
   "./css/components/session-guard.css": "e745184856d6bd97",
   "./css/components/weekly-plan.css": "4e89b83df4a2b43c",
@@ -4227,7 +4228,7 @@ const SHELL_HASHES = {
   "./css/components/noticing.css": "f7d98b66333ab59f",
   "./css/components/coach-proposal.css": "45ff041d162cb14b",
   "./css/components/settings.css": "842c509c12f3f399",
-  "./css/components/weekly-plan-v2.css": "ea4e141c2a5dba52",
+  "./css/components/weekly-plan-v2.css": "4f70501241fc4fa0",
   "./css/components/gym-programme.css": "79be04064c6bd328",
   "./css/components/journal-entry.css": "dd51da5425ee545b",
   "./css/components/reflect.css": "a9f38ee926ac2ec3",
@@ -4246,18 +4247,18 @@ const SHELL_HASHES = {
   "./css/components/upgrade-door.css": "1a2deeaceb45f4f1",
   "./css/components/upgrade-page.css": "ef2284fa060b21ea",
   "./css/base/global.css": "0a48f058e0429881",
-  "./css/base/reset.css": "6858c07267a7fee6",
+  "./css/base/reset.css": "717c20ab5ebbd16e",
   "./css/base/typography.css": "7ef937ebd7185b4b",
   "./css/base/variables.css": "0a5315988156303d",
-  "./css/components/buttons.css": "8a51c00d2a3701e6",
+  "./css/components/buttons.css": "185517a586d2914d",
   "./css/components/cards.css": "c65a1ff9ff422d1d",
   "./css/components/checkin.css": "86932bcac334309a",
   "./css/components/coach-fix.css": "b9a5e5cd8320758b",
   "./css/components/equipment-modal.css": "923c72d2dadb57c3",
-  "./css/components/morning-session.css": "92a4f19a858d43b5",
+  "./css/components/morning-session.css": "88a53b15036d446d",
   "./css/components/settings-library.css": "6e8065c1fb782ba8",
-  "./css/components/workout.css": "e7442fecf7d61dd3",
-  "./css/layouts/app-shell.css": "a890ee4f9459f0d0",
+  "./css/components/workout.css": "ab211d4342e47a1f",
+  "./css/layouts/app-shell.css": "0e1573a9c6b0e5e4",
   "./css/layouts/goal-setup.css": "32ded4f3cacc0b13",
   "./css/layouts/onboarding.css": "9dd282cf6249ceae",
   "./css/components/tier-gating.css": "d739441e1e3f3816",
@@ -4278,7 +4279,7 @@ const SHELL_HASHES = {
   "./js/data/morning-library-map.js": "d4eb79cc3e5df86d",
   "./js/views/capture.js": "78453e2b0b02d31f",
   "./js/exercise-timing.js": "38608437fd7b08fb",
-  "./js/display-prefs.js": "64a88a740fcb5cd9",
+  "./js/display-prefs.js": "e8bffb6c4d480d9b",
   "./js/tts.js": "acb754b56a41d53e",
   "./js/session-guard.js": "00177a846537868c",
   "./js/session-resume.js": "6916b88c0757374f",
