@@ -1,5 +1,11 @@
 /**
  * router.js
+ * 06 Oct 2026 v48
+ *
+ * v48 - D-11 PROGRESS-SHARE. 'progress-share' (Share your progress: a
+ *   picture, a certificate, a report or text), reached from Progress; the
+ *   Progress tab stays lit and the nav shows.
+ *
  * 05 Oct 2026 v47
  *
  * v47 - D-7 PLAN-IMPORT. 'plan-import' (Add a plan you already have),
@@ -378,6 +384,8 @@ const VIEW_NAMES = {
 
   // ── Main views ─────────────────────────────────────────────────────────────
   'progress':          { path: './views/progress.js',         fn: 'ProgressView'        },
+  // D-11. Share your progress.
+  'progress-share':    { path: './views/progress-share.js',   fn: 'ProgressShareView'   },
   'settings':          { path: './views/settings.js',         fn: 'SettingsView'        },
   'weekly-plan':       { path: './views/weekly-plan.js',      fn: 'WeeklyPlanView'      },
   'noticing':          { path: './views/noticing.js',         fn: 'NoticingView'        },
@@ -505,7 +513,7 @@ const NAV_MAP = {
   // absent.
   'quiet-session': 'noticing', 'breathing-session': 'noticing',
   'prescribed': 'today', 'prescribed-session': 'today', 'session-builder': 'today',
-  'progress': 'progress', 'weekly-plan': 'progress',
+  'progress': 'progress', 'weekly-plan': 'progress', 'progress-share': 'progress',
   'noticing': 'noticing', 'journal-entry': 'noticing',
   'in-step': 'noticing',
   // NAV-8. 'library' moved from 'noticing' to 'today'. The Library is an

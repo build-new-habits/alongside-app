@@ -1,6 +1,14 @@
 /**
  * js/views/session-builder-ui.js - Session Builder UI
  *
+ * 06 Oct 2026 v33
+ *
+ * v33 - D-11 PROGRESS-SHARE. Let's go records where this session is
+ *   (sessionLocation = the place chosen here), as the coach's Start does,
+ *   so the session is logged with the right place (activityLog[].place,
+ *   Schema v1.111). Without it a builder session took whatever place the
+ *   last coach session had.
+ *
  * 04 Oct 2026 v32
  *
  * v32 - W6-1 BAD-DAY-BUILDER-2. On a Bad day the builder asks Rest today or
@@ -2558,6 +2566,8 @@ export function onMount() {
   // Let's go
   document.getElementById("sb-go-btn")?.addEventListener("click", () => {
     store.set("usingGeneratedSession", true);
+    // D-11. Where this session is: the place chosen here (LOCATION-1).
+    store.set("sessionLocation", selectedLocation === "gym" ? "gym" : "home");
     // P21. One player: the coach's, one card a move (was the four-page
     // session screen, 40+ taps a session).
     router.navigate("workout");

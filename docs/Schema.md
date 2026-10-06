@@ -1,5 +1,19 @@
 # Alongside — Data Schema Reference
-## 05 Oct 2026 v1.110
+## 06 Oct 2026 v1.111
+
+> **v1.111, 06 Oct 2026 — D-11 PROGRESS-SHARE** (`store.js` v114). New
+> **`activityLog[].place`** (`"home"|"gym"|"outside"|null`): where the
+> session happened, when the app was told. **Written by**
+> `store.logActivity()` (`_placeOf`): the entry's own `place` if given;
+> a hand-logged gym visit (`type: "gym"`, `source: "self-logged"`) is
+> `"gym"`; `outdoor-cycle`, `hike` and `outdoor` are `"outside"`; a
+> `workout`, `freestyle` or `capture` session takes `sessionLocation`,
+> which is written when such a session starts (the coach's Start, the
+> builder's *Let's go* from `session-builder-ui.js` v33, *Make it up as I
+> go*); anything else is `null`, never guessed (a walk can be on a
+> treadmill, a run in a gym). Entries from before v1.111 have no `place`
+> and are not back-filled. **Read by** `views/progress.js` (Today) and
+> `data/progress-report.js` (the shared report and text). Not health data.
 
 > **v1.110, 05 Oct 2026 — D-7 PLAN-IMPORT** (`store.js` v113).
 > `prescribedExercises` entries may carry **`group`** (`string`, up to 40
@@ -1022,7 +1036,7 @@
 
 ## 06 Sep 2026 v1.51
 
-**File:** `js/store.js` (confirmed live version: **v113, 05 Oct 2026**)
+**File:** `js/store.js` (confirmed live version: **v114, 06 Oct 2026**)
 
 > **v1.47, 06 Sep 2026 — CR-1.** `conditions[]` gains three ids and loses one. `chronic-fatigue` is **retired**; `persistent-fatigue`, `me-cfs` and `long-covid` replace it. No field shape changed — `conditions` is still `string[]` and `conditionMeta` is still keyed by condition id.
 >
@@ -1820,7 +1834,7 @@ Legal consent record. Restored after the PT-W1 store audit found it absent: `wel
 
 | Field | Type | Default | Notes |
 |-------|------|---------|-------|
-| `activityLog` | `array` | `[]` | Each entry: `{ id, date, type, durationMins, moodAfter, isEvent, eventName, completedAt, gentle, rescued, ... }` (`gentle` v1.84, W3-12; `rescued` v1.85, W3-13). Single write path since v10: `store.logActivity()`, with dedupe guard against same-type double-writes within 2 minutes. |
+| `activityLog` | `array` | `[]` | Each entry: `{ id, date, type, durationMins, moodAfter, isEvent, eventName, completedAt, gentle, rescued, place, ... }` (`place` v1.111, D-11) (`gentle` v1.84, W3-12; `rescued` v1.85, W3-13). Single write path since v10: `store.logActivity()`, with dedupe guard against same-type double-writes within 2 minutes. |
 | `currentActivityEntry` | `null` | `null` | **Under active investigation** — separate blueprint (`alongside_blueprint_coresession-integrity_30jul2026_v1.md`) is checking whether Core Session ever populates this field upstream. Out of scope for BUILD-4; do not resolve here. |
 | `generatedSession` (nested) | `object` | `{ session: null, builtAt: null, inputs: {} }` | The real "today's workout" mechanism — this is what replaced the old `todaysWorkouts`/`workoutsGeneratedAt` pattern (see corrections above). **v1.52:** each entry in `session.exercises` carries `role` — `"warmup"`, `"main"` or `"cooldown"` — stamped at assembly by `buildSession()` / `buildSessionFromSelection()`. Read by `workout.js` for the badge above the exercise name. Older sessions cached before 08 Sep 2026 have no `role`; the view suppresses the badge rather than printing anything when it is absent. |
 | `totalCredits` | `number` | `0` *(undocumented)* | **Resolved 03 Aug — live, 21 refs.** Running lifetime total, incremented at completion by every session-type view (walk/run/yoga/swim/core/cycle/gym/quiet/breathing/prescribed). Read by `workout-complete.js` for the completion screen. Confirmed genuinely distinct from `community.credits` (Section 18) — that's the separate Impact Credits mechanism (1–2 awarded per session depending on tier, via `awardCommunityCredit()`). Incidental finding: `community.credits` is written but has **no reader anywhere** — nothing displays it. Logged, not fixed. |

@@ -1,6 +1,15 @@
 /**
  * tools/verify-look-progress.mjs
- * 04 Oct 2026 v1
+ * 06 Oct 2026 v2
+ *
+ * v2 - D-11 PROGRESS-SHARE. RE-POINTED, not loosened: Share your progress
+ *   is its own screen now (views/progress-share.js: a picture, a
+ *   certificate, a report or text), not a page inside Progress with three
+ *   text versions. TEST 2 opens the two pages that are still pages (lifts,
+ *   weight) with the same four assertions each; 2f asserts the Share row
+ *   opens the share screen (verify-progress-share drives that screen); 6b
+ *   finds the Share row by its new hook. The overview still carries no
+ *   share buttons (1m).
  *
  * LOOK-2 PROGRESS-SHAPE (Graeme, 04 Oct: "Progress seems wordy and lacks
  * graphs ... Too much on one screen"; the mock-up approved the same day).
@@ -109,13 +118,13 @@ ok("1k. the arc's strands each have a mark and words (a date or Not yet)", stran
 const rows = [...el.querySelectorAll(".pr-row")].map(r => txt(r.querySelector(".pr-row__title")));
 ok("1l. the rows one tap away: lifts, weight, Your year, Share", ["Your lifts", "Your weight", "Your year", "Share your progress"].every(r => rows.includes(r)), JSON.stringify(rows));
 ok("1m. nothing else crowds the overview: no lift list, weight field or share buttons",
-   !el.querySelector(".pr-lift, #weight-log-input, [data-export]"));
+   !el.querySelector(".pr-lift, #weight-log-input, [data-export], .sh-cards"));
 ok("1n. the weight row says the latest weight and its day", /12 st 6 lb · \d+ \w+/.test(txt([...el.querySelectorAll(".pr-row")].find(r => /Your weight/.test(txt(r))))),
    txt([...el.querySelectorAll(".pr-row")].find(r => /Your weight/.test(txt(r)))));
 
 // ── 2. EACH ROW OPENS ITS PAGE ──────────────────────────────────────────
 console.log("\nTEST 2 - each row opens its own page, and Back");
-for (const [key, title] of [["lifts", "Your lifts"], ["weight", "Your weight"], ["share", "Share your progress"]]) {
+for (const [key, title] of [["lifts", "Your lifts"], ["weight", "Your weight"]]) {
   mount();
   click(el.querySelector(`[data-pr-page="${key}"]`));
   ok(`2.${key}a. ${title}: one h1, its own`, el.querySelectorAll("h1").length === 1 && txt(el.querySelector("h1")) === title, txt(el.querySelector("h1")));
@@ -126,8 +135,8 @@ for (const [key, title] of [["lifts", "Your lifts"], ["weight", "Your weight"], 
 }
 mount(); click(el.querySelector("[data-pr-page=weight]"));
 ok("2e. the weight page has the field and the list, under its one h1", !!el.querySelector("#weight-log-input") && !el.querySelector("h2.progress-weight__heading"));
-mount(); click(el.querySelector("[data-pr-page=share]"));
-ok("2f. the share page has the three versions", el.querySelectorAll("[data-export]").length === 3);
+mount(); click(el.querySelector("[data-share-open]"));
+ok("2f. Share your progress opens the share screen", navs.at(-1) === "progress-share", String(navs.at(-1)));
 mount(); click(el.querySelector("#progress-year-btn"));
 ok("2g. Your year opens the year", navs.at(-1) === "annual-reflection");
 
@@ -170,7 +179,7 @@ console.log("\nTEST 6 - Free");
 person("free");
 mount();
 ok("6a. no kinds, no arc, no lifts row", !el.querySelector(".progress-shapes, #pr-arc-h, [data-pr-page=lifts]"));
-ok("6b. Your year and Share are there", !!el.querySelector("#progress-year-btn") && !!el.querySelector("[data-pr-page=share]"));
+ok("6b. Your year and Share are there", !!el.querySelector("#progress-year-btn") && !!el.querySelector("[data-share-open]"));
 ok("6c. two numbers and the weekly bars", el.querySelectorAll(".progress-summary__number").length === 2 && el.querySelectorAll(".pr-bar").length >= 1);
 
 // ── 7. DISPLAYS, NEVER INTERPRETS ───────────────────────────────────────

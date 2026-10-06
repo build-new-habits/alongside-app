@@ -1,6 +1,22 @@
 /**
  * progress.js
- * 04 Oct 2026 v26
+ * 06 Oct 2026 v27
+ *
+ * v27 - D-11 PROGRESS-SHARE (Graeme, 06 Oct: "Progress pages to show today,
+ *   7 days, 14 days, 30, and 90"; decided the same day: Today to 30 days on
+ *   both tiers, 90 on the Plan). Every window is calendar days ending today
+ *   (data/progress-report.js windowRange, the one definition, also used by
+ *   everything shared). Free has the tabs now (it had 30 days, no tabs);
+ *   nothing is locked, 90 is simply not offered on Free. Today shows each
+ *   session: time, where (when the app was told), what kind, how long, the
+ *   moves with every set logged, and what they said at the finish; with
+ *   Download today's report and Copy as text. 7 and 14 days show sessions
+ *   each day; 30 and 90 each week (6 and 13 weeks). Share your progress
+ *   opens its own screen (views/progress-share.js: a picture, a
+ *   certificate, a report or text); the three text versions (For me / a
+ *   friend / a professional) are retired with their code: Text replaces
+ *   them, and nothing they said is lost (sessions, minutes, kinds; the
+ *   programme lines were Plan detail no reader asked for).
  *
  * v26 - LOOK-2 PROGRESS-SHAPE (Graeme, 04 Oct: "Progress seems wordy and
  *   lacks graphs ... Too much on one screen"). The overview is two numbers,
@@ -303,11 +319,11 @@
  *   Pattern detection is human-readable text. Never statistics.
  *   Missed sessions are context, not failure. No red indicators.
  *
- * Tier behaviour:
- *   Free:     7-day view only. Coach observation: one line. Export: none.
- *   Personal: 7 / 30 / 90 day views. Coach observations: full narrative.
- *             Export: self / friend / professional.
- *
+ * Tier behaviour (D-11, 06 Oct 2026):
+ *   Free:     Today, 7, 14 and 30 days. Coach observation: one line.
+ *   Personal: the same, and 90 days. Coach observations: full narrative.
+ *   Both:     Share your progress (a picture, a certificate, a report or
+ *             text), from views/progress-share.js. *
  * WCAG 2.2 AA:
  *   Tab strip: role="tablist", each tab role="tab", aria-selected, aria-controls.
  *   Selected tab: aria-selected="true". Non-selected: aria-selected="false".
@@ -328,7 +344,6 @@ import { store }            from '../store.js';
 // time one changed, which is what the retired getWorkoutName() did.
 import { SESSION_TYPES }    from '../session-builder.js';
 import { getProgressStats } from '../data/programmeEngine.js';
-import { getGoalLabel }     from '../data/goals.js';
 import { toKg, formatWeight, observedRateBreach } from '../data/weight-targets.js';
 import { aimById } from '../data/aims.js';
 import { EXERCISES } from '../data/exercises/index.js';
@@ -336,6 +351,9 @@ import { activityNoun } from '../data/activity-labels.js';
 import { liftReadback, strandReadback, arcWeek, sessionsByWeek,
          sessionsInWindow, shortDate } from '../data/arc-readback.js';
 import { kindOf } from '../data/kind-colours.js';
+import { windowRange, windowsFor, sessionsIn, dailyCounts, buildReport,
+         setsText } from '../data/progress-report.js';
+import { setSharePreset } from './progress-share.js';
 
 // Set by _rateNote when it renders the sustained-rate note, committed by
 // _commitRateRaise once the markup is on screen. It is a fact about this
@@ -356,8 +374,9 @@ export function ProgressView(router) {
   // has a shape. The difference that matters is not the window; it is
   // what the coach DOES with it (see _buildObservation).
   // SMOOTH-P4a. Free sees 30 days and nothing locked (spec 4.8).
-  const FREE_WINDOW = 30;
-  const PAID_DEFAULT = 30;
+  // D-11. Today, 7, 14 and 30 days on both tiers, 90 on the Plan; the
+  // default is 30 on both, as it was. Windows are keys of WINDOWS.
+  const DEFAULT_WINDOW = '30';
 
   // Initialised per tier at first render rather than at module load.
   // A single shared default left a Personal user with activeWindow = 14
@@ -381,13 +400,11 @@ export function ProgressView(router) {
     const tier  = store.get('tier') || 'free';
     const premium = tier === 'personal';   // ATHLETE-RETIRE
 
-    if (activeWindow === null) activeWindow = premium ? PAID_DEFAULT : FREE_WINDOW;
-
     // A user who lapses mid-session would otherwise keep a window they
-    // are no longer entitled to. Clamp rather than reset, so somebody
-    // upgrading does not lose the view they were looking at.
-    if (!premium && activeWindow !== FREE_WINDOW) activeWindow = FREE_WINDOW;
-    if (premium && activeWindow === FREE_WINDOW)  activeWindow = PAID_DEFAULT;
+    // are no longer entitled to (90 days). Clamp rather than reset, so
+    // somebody upgrading does not lose the view they were looking at.
+    if (activeWindow === null || !windowsFor(premium).some(w => w.key === activeWindow)) activeWindow = DEFAULT_WINDOW;
+    const range = windowRange(activeWindow);
     const name  = store.get('name') || '';
     const stats = getProgressStats();
 
@@ -395,15 +412,18 @@ export function ProgressView(router) {
       <div class="progress-view">
         ${activePage ? renderPage(activePage, premium, stats) : `
         <header class="progress-header">
-          <h1 class="progress-title" tabindex="-1">Progress</h1>
-          ${premium ? renderWindowTabs(tier) : ''}
+          <div class="progress-header__titles">
+            <h1 class="progress-title" tabindex="-1">Progress</h1>
+            <p class="pr-range">${_esc(range.title)}</p>
+          </div>
+          ${renderWindowTabs(premium)}
         </header>
 
-        <div class="progress-body">
-          ${renderActivitySummary(tier)}
-          ${renderCoachNarrative(stats, tier, name)}
-          ${renderSessionsChart()}
-          ${renderSessionShapes(tier)}
+        <div class="progress-body" id="panel-${activeWindow}" role="tabpanel" aria-labelledby="tab-${activeWindow}">
+          ${renderActivitySummary(range)}
+          ${renderCoachNarrative(stats, tier, name, range)}
+          ${range.days === 1 ? renderToday() : renderSessionsChart(range)}
+          ${renderSessionShapes(tier, range)}
           ${premium ? renderArcReadback() : ''}
           ${_rateNote(premium)}
           ${renderMoreList(premium, stats)}
@@ -458,7 +478,7 @@ export function ProgressView(router) {
       stats.hasActiveProgramme && premium ? _prRow('programme', stats.programmeName || 'Your programme',
         `${stats.weeksIn === 0 ? 'Just started' : `Week ${stats.weeksIn}`} \u00b7 ${stats.phaseName}`, 'data-pr-page="programme"') : '',
       _prRow('year', 'Your year', 'Every session since you started', 'id="progress-year-btn" aria-label="Your year: look back across your year"'),
-      _prRow('share', 'Share your progress', 'For you, a friend or a professional', 'data-pr-page="share"'),
+      _prRow('share', 'Share your progress', 'A picture, a certificate, a report or text', 'data-share-open'),
     ].filter(Boolean);
     return `
       <nav class="pr-card pr-more" aria-label="More on your progress">
@@ -468,11 +488,11 @@ export function ProgressView(router) {
 
   /** A detail page: Back to Progress, one h1, the block. */
   function renderPage(page, premium, stats) {
-    const titles = { lifts: 'Your lifts', weight: 'Your weight', programme: stats.programmeName || 'Your programme', share: 'Share your progress' };
+    const titles = { lifts: 'Your lifts', weight: 'Your weight', programme: stats.programmeName || 'Your programme' };
     const body = page === 'lifts' ? _liftsPage()
       : page === 'weight' ? _weightLog(premium, false)
       : page === 'programme' ? (stats.hasActiveProgramme && premium ? renderProgrammeProgress(stats, false) : '')
-      : page === 'share' ? renderExportBlock(false) : '';
+      : '';
     return `
       <div class="pr-page pr-page--${PAGE_KIND[page] || 'teal'}">
         <button class="btn btn-ghost pr-back" id="pr-back" aria-label="Back to Progress">&larr; Progress</button>
@@ -657,29 +677,34 @@ export function ProgressView(router) {
 
   // ── Window tabs (Personal only) ────────────────────────────────────────────
 
-  function renderWindowTabs(tier) {
-    // SMOOTH-P4a. Plan only, 30 or 90. Free sees 30 days and nothing
-    // locked -- the padlocked tabs made the free screen a sales page.
-    const windows = [30, 90];
+  function renderWindowTabs(premium) {
+    // D-11. Today, 7, 14, 30 on both tiers; 90 on the Plan. Nothing is
+    // locked: Free is not shown a 90 it cannot open (SMOOTH-P4a: padlocked
+    // tabs made the free screen a sales page).
     return `
       <div class="progress-tabs progress-tabs--seg" role="tablist" aria-label="How far back">
-        ${windows.map(w => `
+        ${windowsFor(premium).map(w => {
+          const on = activeWindow === w.key;
+          const words = w.key === 'today'
+            ? '<span class="pr-tab__n">Today</span>'
+            : `<span class="pr-tab__n">${w.days}</span> <span class="pr-tab__u">days</span>`;
+          return `
           <button
-            class="progress-tab ${activeWindow === w ? 'progress-tab--active' : ''}"
+            class="progress-tab ${on ? 'progress-tab--active' : ''}"
             role="tab"
-            id="tab-${w}"
-            aria-selected="${activeWindow === w ? 'true' : 'false'}"
-            aria-controls="panel-${w}"
-            data-window="${w}">
-            ${w} days
-          </button>`).join('')}
+            id="tab-${w.key}"
+            aria-selected="${on ? 'true' : 'false'}"
+            aria-controls="panel-${w.key}"
+            tabindex="${on ? '0' : '-1'}"
+            data-window="${w.key}">${words}</button>`;
+        }).join('')}
       </div>
     `;
   }
 
   // ── Coach narrative ────────────────────────────────────────────────────────
 
-  function renderCoachNarrative(stats, tier, name) {
+  function renderCoachNarrative(stats, tier, name, range) {
     // COUNTDOWN-1. Partials excluded here too -- this feeds _buildObservation(),
     // which writes the "N sessions in the last 30 days" coach line. A coach
     // congratulating somebody on sessions they backed out of is worse than
@@ -687,13 +712,10 @@ export function ProgressView(router) {
     const activityLog  = store.completedSessions(store.get('activityLog'));
     const checkinHistory = store.get('checkinHistory') || {};
     const goals        = store.get('goals') || [];
-    const observation  = _buildObservation(activityLog, checkinHistory, stats, activeWindow, tier, name);
+    const observation  = _buildObservation(activityLog, checkinHistory, stats, range, tier, name);
 
     return `
-      <section class="progress-narrative"
-               aria-label="Coach observations"
-               id="panel-${activeWindow}"
-               ${tier === 'free' ? '' : `role="tabpanel" aria-labelledby="tab-${activeWindow}"`}>
+      <section class="progress-narrative" aria-label="Coach observations">
         <div class="progress-narrative__text">
           ${observation.lines.slice(0, 1).map(line => `<p>${line}</p>`).join('')}
         </div>
@@ -703,19 +725,15 @@ export function ProgressView(router) {
 
   // ── Activity summary ───────────────────────────────────────────────────────
 
-  function renderActivitySummary(tier) {
+  function renderActivitySummary(range) {
     // COUNTDOWN-1. Partials excluded, matching Home and Build Your Base.
-    const activityLog = store.completedSessions(store.get('activityLog'));
-    const cutoff      = _cutoffDate(activeWindow);
-    const recent      = activityLog.filter(e => {
-      const ts = e.completedAt || e.loggedAt || e.date;
-      return ts && new Date(ts) >= cutoff;
-    });
+    // D-11: the window from windowRange, the definition shared output uses.
+    const recent        = sessionsIn(store.completedSessions(store.get('activityLog')), range);
 
     const sessionCount  = recent.length;
     const totalMins     = recent.reduce((acc, e) => acc + (e.durationMins || 0), 0);
     return `
-      <section class="progress-summary" aria-label="Activity summary for last ${activeWindow} days">
+      <section class="progress-summary" aria-label="Activity summary ${_esc(range.sentence)}">
         <div class="progress-summary__stat progress-summary__stat--teal">
           <!-- LOG-CLASS-1, 08 Sep 2026. "1 sessions" in the accessible
                name. The VISIBLE word below is a column heading and is
@@ -764,11 +782,11 @@ export function ProgressView(router) {
    * history the person cannot see the shape of, and would look like a
    * kind of session rather than an absence of a record.
    */
-  function renderSessionShapes(tier) {
+  function renderSessionShapes(tier, range) {
     if (tier === 'free') return '';
 
     const completed = store.completedSessions(store.get('activityLog'));
-    const cutoff    = _cutoffDate(activeWindow);
+    const cutoff    = range.from;
     // LOOK-2. Every kind of session, not only built ones: classes, yoga,
     // walks and your own sessions are kinds too. A built session (type
     // workout) with no recorded e.sessionType predates TWO-ENGINE and is
@@ -939,21 +957,28 @@ export function ProgressView(router) {
    */
   function _chart({ id, summary, bars, title }) {
     const max = Math.max(1, ...bars.map(b => Math.max(b.value, b.of || 0)));
+    const n = bars.length;
     return `
       <figure class="pr-chart" aria-labelledby="${id}-cap">
         <figcaption class="pr-chart__summary" id="${id}-cap">${_esc(summary)}</figcaption>
-        <ol class="pr-bars" aria-label="${_esc(title)}">
+        <ol class="pr-bars${n > 7 ? ' pr-bars--many' : ''}" aria-label="${_esc(title)}" style="--n:${n}">
           ${bars.map((b, i) => {
-            // LOOK-2: every bar says its count and its week (at most six).
-            const edge = true;
+            // LOOK-2: every bar says its count and its week. D-11: with more
+            // than seven bars, the first, middle and last name their day or
+            // week where the bars stand upright (the others would collide);
+            // on its side, at large text, every row names its own.
+            const minor = n > 7 && !(i === 0 || i === n - 1 || i === Math.floor((n - 1) / 2));
+            // With more than seven bars a 0 above every empty day crowds
+            // the numbers together: shown on its side, hidden upright.
+            const zero = n > 7 && b.value === 0;
             return `
             <li class="pr-bar" title="${_esc(b.label)}">
               <span class="sr-only">${_esc(b.label)}</span>
-              <span class="pr-bar__value" aria-hidden="true">${edge ? _esc(String(b.value)) : ''}</span>
+              <span class="pr-bar__value${zero ? ' pr-bar__value--zero' : ''}" aria-hidden="true">${_esc(String(b.value))}</span>
               <span class="pr-bar__track" aria-hidden="true" style="--h:${Math.round(((b.of ?? b.value) / max) * 100)}%">
                 <span class="pr-bar__fill" style="--f:${Math.round((b.value / max) * 100)}%"></span>
               </span>
-              <span class="pr-bar__week" aria-hidden="true">${edge ? _esc(shortDate(b.start)) : ''}</span>
+              <span class="pr-bar__week${minor ? ' pr-bar__week--minor' : ''}" aria-hidden="true">${_esc(b.week || shortDate(b.start))}</span>
             </li>`;
           }).join('')}
         </ol>
@@ -1010,15 +1035,37 @@ export function ProgressView(router) {
   // LOOK-2. _liftsBlock() is gone: every lift is on its own page (_liftsPage).
 
   /** Six weeks of completed sessions, both tiers. COUNT-1. */
-  function renderSessionsChart() {
+  function renderSessionsChart(range) {
     const completed = store.completedSessions(store.get('activityLog'));
+    // D-11. 7 and 14 days: each day. 30 and 90: each week (6 and 13).
+    if (range.days <= 14) {
+      const days = dailyCounts(sessionsIn(completed, range), range);
+      const total = days.reduce((n, d) => n + d.total, 0);
+      const on = days.filter(d => d.total).length;
+      const dayName = d => range.days === 7
+        ? d.toLocaleDateString('en-GB', { weekday: 'short' })
+        : String(d.getDate());
+      return `<section class="pr-card" aria-labelledby="pr-days-h">
+      <h2 class="pr-card__title" id="pr-days-h">Sessions each day</h2>
+      ${_chart({
+        id: 'pr-sessions',
+        title: 'Sessions, day by day',
+        summary: total
+          ? `${total} session${total === 1 ? '' : 's'} on ${on} of the last ${range.days} days.`
+          : `No sessions in the last ${range.days} days yet.`,
+        bars: days.map((d, i) => ({ value: d.total, week: i === days.length - 1 ? 'Today' : dayName(d.day),
+          label: `${d.day.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}: ${d.total} session${d.total === 1 ? '' : 's'}` }))
+      })}
+    </section>`;
+    }
     // W4-20. Weeks start when the person did: it showed six weeks, empty
     // ones before they installed, to somebody nine days in.
+    const nWeeks = range.days >= 90 ? 13 : 6;
     const firstDone = completed.map(e => Date.parse(e.completedAt || e.loggedAt || e.date)).filter(Number.isFinite);
     const startMs = Math.min(Date.parse(store.get('createdAt') || '') || Infinity, ...firstDone);
-    const weeks = sessionsByWeek(completed, { weeks: 6, since: Number.isFinite(startMs) ? new Date(startMs) : null });
+    const weeks = sessionsByWeek(completed, { weeks: nWeeks, since: Number.isFinite(startMs) ? new Date(startMs) : null });
     const total = weeks.reduce((n, w) => n + w.total, 0);
-    const over = weeks.length < 6 ? 'since you started' : 'over the last six weeks';
+    const over = weeks.length < nWeeks ? 'since you started' : `over the last ${nWeeks === 6 ? 'six' : '13'} weeks`;
     return `<section class="pr-card" aria-labelledby="pr-weeks-h">
       <h2 class="pr-card__title" id="pr-weeks-h">Sessions each week</h2>
       ${_chart({
@@ -1026,11 +1073,66 @@ export function ProgressView(router) {
       title: 'Sessions, week by week',
       summary: total
         ? `${total} session${total === 1 ? '' : 's'} ${over}, week by week.`
-        : (weeks.length < 6 ? 'No sessions since you started yet.' : 'No sessions in the last six weeks yet.'),
+        : (weeks.length < nWeeks ? 'No sessions since you started yet.' : `No sessions in the last ${nWeeks === 6 ? 'six' : '13'} weeks yet.`),
       bars: weeks.map(w => ({ start: w.start, value: w.total,
         label: `Week of ${shortDate(w.start)}: ${w.total} session${w.total === 1 ? '' : 's'}` }))
     })}
     </section>`;
+  }
+
+  /**
+   * D-11. Today: each session, in order. Time, where (when the app was
+   * told), the kind, how long; the moves with every set logged; what they
+   * said at the finish. The report and the text say the same, from the
+   * same model (data/progress-report.js buildReport).
+   */
+  function renderToday() {
+    const model = buildReport({
+      rangeKey: 'today',
+      completed: store.completedSessions(store.get('activityLog')),
+      liftLog: store.get('liftLog') || {},
+      include: { sessions: true, kinds: true, place: true, moves: true, name: false, checkins: false },
+      exerciseName: _exerciseName,
+    });
+    if (!model.sessions.length) {
+      return `<section class="pr-card pr-today" aria-labelledby="pr-today-h">
+        <h2 class="pr-card__title" id="pr-today-h">Today</h2>
+        <p class="pr-card__cap">Nothing logged today.</p>
+      </section>`;
+    }
+    return `<section class="pr-today" aria-labelledby="pr-today-h">
+      <h2 class="sr-only" id="pr-today-h">Today, session by session</h2>
+      <ol class="pr-today__list">
+        ${model.sessions.map(s => `
+        <li class="pr-card pr-session">
+          <div class="pr-session__head">
+            <span class="pr-dot pr-k--${s.colour}" aria-hidden="true"></span>
+            <div class="pr-session__titles">
+              <h3 class="pr-session__kind">${_esc(s.kind)}</h3>
+              <p class="pr-session__meta">${_esc([s.time, s.place, s.mins ? `${s.mins} min` : null].filter(Boolean).join(' \u00b7 '))}</p>
+            </div>
+          </div>
+          ${s.moves.length ? `<ul class="pr-moves">
+            ${s.moves.map(m => `<li class="pr-move">
+              <span class="pr-move__name">${_esc(m.name)}</span>
+              <span class="pr-move__sets">${m.sets.length ? _esc(setsText(m.sets)) : 'No sets logged'}</span>
+            </li>`).join('')}
+          </ul>` : ''}
+          ${s.afterwards ? `<p class="pr-session__feel">Afterwards you said: <strong>${_esc(s.afterwards)}</strong></p>` : ''}
+        </li>`).join('')}
+      </ol>
+      <div class="pr-card pr-today__out">
+        <h2 class="pr-card__title">Today's report</h2>
+        <p class="pr-card__cap">What you did, where and how many, laid out to print or send: for a trainer, a dietitian, your notes or an AI chat.</p>
+        <button class="btn btn-primary btn-full" data-share-open="report">Download today's report</button>
+        <button class="btn btn-ghost btn-full" data-share-open="text">Copy as text</button>
+      </div>
+    </section>`;
+  }
+
+  function _exerciseName(id) {
+    const e = EXERCISES.find(x => x.id === id);
+    return e ? e.name : null;
   }
 
   /** Free: last, quiet. Nothing greyed out, nothing locked. */
@@ -1043,36 +1145,10 @@ export function ProgressView(router) {
       </section>`;
   }
 
-  function renderExportBlock(heading = true) {
-    return `
-      <section class="progress-export" aria-label="Export your progress">
-        ${heading ? '<h2 class="progress-export__heading">Share your progress</h2>' : ''}
-        <p class="progress-export__intro">Three versions — each written for a different reader.</p>
-        <div class="progress-export__buttons">
-          <button class="progress-export__btn"
-                  data-export="self"
-                  aria-label="Export for yourself — your full picture, coach voice">
-            For me
-          </button>
-          <button class="progress-export__btn"
-                  data-export="friend"
-                  aria-label="Export for a friend — plain English, no jargon">
-            For a friend
-          </button>
-          <button class="progress-export__btn"
-                  data-export="professional"
-                  aria-label="The version to share with someone who helps you train — plain and structured">
-            For a professional
-          </button>
-        </div>
-        <p class="progress-export__status" role="status" aria-live="polite" data-export-status></p>
-        <div class="progress-export__fallback" data-export-fallback hidden>
-          <label for="progress-export-text" class="progress-export__fallback-label">Copying isn't allowed here, so here is the text. Select it and copy it.</label>
-          <textarea id="progress-export-text" class="form-input progress-export__text" readonly rows="8"></textarea>
-        </div>
-      </section>
-    `;
-  }
+  // D-11. The three text versions (renderExportBlock, _handleExport,
+  // _buildExportText and the copy fallback) are retired: Share your
+  // progress opens views/progress-share.js, whose Text says the same and
+  // more, from the model everything shared is drawn from.
 
   // R4, 20 Aug 2026. renderExportLocked() is REMOVED, not left unused.
   // A dead paywall renderer is a working example somebody reinstates.
@@ -1115,24 +1191,33 @@ export function ProgressView(router) {
         render(container);
       });
 
-    // Window tabs
-    container.querySelectorAll('[data-window]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        activeWindow = parseInt(btn.dataset.window);
-        render(container);
-        // Return focus to active tab after re-render
-        const newTab = container.querySelector(`[data-window="${activeWindow}"]`);
-        if (newTab) newTab.focus();
+    // Window tabs. D-11: keys ('today', '7' ... '90'); arrow keys move
+    // along the tabs, as a tab list should (one tab stop).
+    const tabs = [...container.querySelectorAll('[data-window]')];
+    const choose = key => {
+      activeWindow = key;
+      render(container);
+      container.querySelector(`[data-window="${activeWindow}"]`)?.focus();
+    };
+    tabs.forEach((btn, i) => {
+      btn.addEventListener('click', () => choose(btn.dataset.window));
+      btn.addEventListener('keydown', ev => {
+        const step = ev.key === 'ArrowRight' ? 1 : ev.key === 'ArrowLeft' ? -1 : 0;
+        if (ev.key === 'Home' || ev.key === 'End') { ev.preventDefault(); choose(tabs[ev.key === 'Home' ? 0 : tabs.length - 1].dataset.window); return; }
+        if (!step) return;
+        ev.preventDefault();
+        choose(tabs[(i + step + tabs.length) % tabs.length].dataset.window);
       });
     });
 
-    // Export buttons
-    container.querySelectorAll('[data-export]').forEach(btn => {
+    // D-11. Share your progress, Download today's report, Copy as text:
+    // the share screen, set to this window (and to Today's report or text).
+    container.querySelectorAll('[data-share-open]').forEach(btn =>
       btn.addEventListener('click', () => {
-        const type = btn.dataset.export;
-        _handleExport(type);
-      });
-    });
+        const format = btn.dataset.shareOpen || null;
+        setSharePreset({ window: format ? 'today' : activeWindow, format });
+        router.navigate('progress-share');
+      }));
 
     container.querySelector('#progress-year-btn')
       ?.addEventListener('click', () => router.navigate('annual-reflection'));
@@ -1168,12 +1253,9 @@ export function ProgressView(router) {
    *
    * @returns {{ lines: string[] }}
    */
-  function _buildObservation(activityLog, checkinHistory, stats, windowDays, tier, name) {
-    const cutoff  = _cutoffDate(windowDays);
-    const recent  = activityLog.filter(e => {
-      const ts = e.completedAt || e.loggedAt || e.date;
-      return ts && new Date(ts) >= cutoff;
-    });
+  function _buildObservation(activityLog, checkinHistory, stats, range, tier, name) {
+    const windowDays = range.days;
+    const recent  = sessionsIn(activityLog, range);
 
     const lines = [];
     const count = recent.length;
@@ -1196,10 +1278,8 @@ export function ProgressView(router) {
     // record already appraises, there is nothing left for Personal to
     // add but a bigger number -- which is the failure section 4.1
     // names. Stripping them is what makes room for the difference.
-    const period = windowDays === 14 ? 'this fortnight'
-                 : windowDays === 30 ? 'in the last 30 days'
-                 : windowDays === 90 ? 'over the last 90 days'
-                 : 'in this window';
+    // D-11: today, and the last 7, 14, 30 or 90 days.
+    const period = windowDays === 90 ? 'over the last 90 days' : range.sentence;
 
     // SMOOTH-P4a. The most common kind, said plainly: a fact, not a verdict.
     // P7: counted by what a person would call it (activity-labels.js).
@@ -1207,7 +1287,7 @@ export function ProgressView(router) {
     // Free only: the Plan's read below already names the lean, in its own words.
     const mostly = tier === 'free' && topKind && count > 1 ? `, mostly ${topKind}` : '';
     if (count === 0) {
-      lines.push('Nothing logged in this window. Whenever you\'re ready — the app is here.');
+      lines.push(windowDays === 1 ? 'Nothing logged today yet.' : 'Nothing logged in this window. Whenever you\'re ready — the app is here.');
     } else if (count === 1) {
       lines.push(`You\'ve moved once ${period}.`);
     } else {
@@ -1385,141 +1465,9 @@ export function ProgressView(router) {
 
   // ── Export handler ─────────────────────────────────────────────────────────
 
-  function _handleExport(type) {
-    // E2, 13 Aug 2026. This was the last raw activityLog read in the
-    // file. Every count ON SCREEN routes through completedSessions()
-    // (:156, :178, and today.js :285/:451/:501) and this one did not --
-    // so the document a Personal user copies out, plausibly to show a
-    // physio or a GP, reported a HIGHER session count than the screen it
-    // came from, by the number of partials in the window.
-    //
-    // verify-count1.mjs missed it because it asserted `via >= 2` -- that
-    // AT LEAST TWO reads are compliant, not that all are. progress.js
-    // had three, two compliant, gate green. A threshold gate cannot
-    // detect the case it exists for; the gate is corrected alongside this.
-    const activityLog    = store.completedSessions(store.get('activityLog'));
-    const checkinHistory = store.get('checkinHistory') || {};
-    const goals          = store.get('goals') || [];
-    const name           = store.get('name') || 'User';
-    const stats          = getProgressStats();
-    const cutoff         = _cutoffDate(activeWindow);
-    const recent         = activityLog.filter(e => {
-      const ts = e.completedAt || e.loggedAt || e.date;
-      return ts && new Date(ts) >= cutoff;
-    });
-
-    const goalLabels = goals.map(g => getGoalLabel(g)).join(', ');
-    const text       = _buildExportText(type, name, recent, stats, goalLabels, activeWindow);
-
-    // Write to clipboard — if not allowed, show the text to copy (v17)
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(text).then(() => {
-        _showExportConfirmation(type);
-      }).catch(() => {
-        _fallbackExport(text);
-      });
-    } else {
-      _fallbackExport(text);
-    }
-  }
-
-  function _buildExportText(type, name, recent, stats, goalLabels, windowDays) {
-    const date  = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
-    const count = recent.length;
-    const mins  = recent.reduce((acc, e) => acc + (e.durationMins || 0), 0);
-
-    if (type === 'self') {
-      return [
-        `Progress — ${date}`,
-        ``,
-        `${count} session${count === 1 ? "" : "s"} in the last ${windowDays} days. ${mins} minutes of movement.`,
-        stats.hasActiveProgramme
-          ? `Programme: ${stats.programmeName} — ${stats.weeksIn} week${stats.weeksIn === 1 ? '' : 's'} in, ${stats.totalSessions} session${stats.totalSessions === 1 ? '' : 's'}.`
-          : '',
-        goalLabels ? `Working towards: ${goalLabels}.` : '',
-        ``,
-        `Generated by Alongside.`,
-      ].filter(Boolean).join('\n');
-    }
-
-    if (type === 'friend') {
-      return [
-        `Here's what I've been up to with my movement practice:`,
-        ``,
-        `${count} session${count === 1 ? "" : "s"} over the last ${windowDays} days — ${mins < 90 ? `${mins} minutes` : `about ${Math.round(mins / 60)} hours`} of movement in all.`,
-        stats.hasActiveProgramme
-          ? `I'm on week ${stats.currentWeek} of a 12-week programme called ${stats.programmeName}.`
-          : '',
-        ``,
-        `Tracking it with an app called Alongside.`,
-      ].filter(Boolean).join('\n');
-    }
-
-    if (type === 'professional') {
-      return [
-        `Movement summary for ${name}`,
-        `Generated: ${date}`,
-        `Period: last ${windowDays} days`,
-        ``,
-        `Sessions completed: ${count}`,
-        `Total duration: ${mins} minutes`,
-        stats.hasActiveProgramme
-          ? [
-              `Active programme: ${stats.programmeName}`,
-              `Programme week: ${stats.currentWeek} / 12`,
-              // TARGET-3. Same rule: no target named unless one was set.
-              store.get('strategicGoal.setAt')
-                ? `Sessions this week: ${stats.sessionsThisWeek} (target: ${stats.weeklyTarget})`
-                : `Sessions this week: ${stats.sessionsThisWeek}`,
-              `Total programme sessions: ${stats.totalSessions}`,
-            ].join('\n')
-          : 'No active programme.',
-        goalLabels ? `Stated goals: ${goalLabels}` : '',
-        ``,
-        `Data source: Alongside (buildnewhabits.co.uk)`,
-        `Note: self-reported data via PWA. No medical device.`,
-      ].filter(Boolean).join('\n');
-    }
-
-    return '';
-  }
-
-  function _showExportConfirmation(type) {
-    const labels = { self: 'your version', friend: 'the friend version', professional: 'the professional version' };
-    // v17. Said where the button is, in a status line that is always in
-    // the page (a live region added at the moment of speaking is often
-    // not read). Cleared after a while so the next copy is announced too.
-    const status = document.querySelector('[data-export-status]');
-    const fb = document.querySelector('[data-export-fallback]');
-    if (fb) fb.hidden = true;
-    if (status) {
-      status.textContent = `Copied ${labels[type] || 'your progress'}. Paste it wherever you like.`;
-      clearTimeout(_showExportConfirmation._t);
-      _showExportConfirmation._t = setTimeout(() => { status.textContent = ''; }, 6000);
-    }
-  }
-
-  function _fallbackExport(text) {
-    // v17. Was alert(): not selectable on most phones, so nothing could
-    // be copied. The text itself, in a labelled read-only field, selected
-    // and focused so one Copy finishes the job.
-    const fb = document.querySelector('[data-export-fallback]');
-    const area = fb?.querySelector('textarea');
-    if (!fb || !area) return;
-    area.value = text;
-    fb.hidden = false;
-    const status = document.querySelector('[data-export-status]');
-    if (status) status.textContent = '';
-    area.focus();
-    area.select();
-  }
-
-  // ── Utilities ──────────────────────────────────────────────────────────────
-
+  // D-11. Calendar days ending today, as windowRange counts them.
   function _cutoffDate(windowDays) {
-    const d = new Date();
-    d.setDate(d.getDate() - windowDays);
-    return d;
+    return windowRange(String(windowDays) === '1' ? 'today' : String(windowDays)).from;
   }
 
   function _countByType(entries) {

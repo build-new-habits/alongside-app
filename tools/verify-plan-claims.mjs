@@ -1,6 +1,11 @@
 /**
  * tools/verify-plan-claims.mjs
- * 04 Oct 2026 v6
+ * 06 Oct 2026 v7
+ *
+ * v7 - D-11 PROGRESS-SHARE. 3.progress follows the tier table's new row:
+ *   free has Today, 7, 14 and 30 days (tabs, nothing locked) and sharing;
+ *   the Plan the same and 90 days, with the arc read back. Same property:
+ *   what the table says is what the screen does, on both tiers.
  *
  * v6 - LOOK-1: Settings is an index of section pages. openPanel and the
  *   3.weight switch lookup reach rows through settingsFind (opening the
@@ -171,11 +176,11 @@ ok("3.saved  saving sessions is the Plan's; free builds any session itself", fre
 
 const ARC = { active: true, aimId: "floor-unaided", strands: ["leg-strength"], startedAt: new Date(Date.now() - 7 * 86400000).toISOString(), zonesWorked: {}, typesWorked: {} };
 tierFixture("free"); store.set("arc", ARC); mountView(ProgressView);
-const fProg = { arc: !!box.querySelector("#pr-arc-h"), tabs: box.querySelectorAll(".progress-tab").length, share: /Share your progress/.test(txt(box)), thirty: /last 30 days/.test(txt(box)) || /Nothing logged/.test(txt(box)) };
+const fProg = { arc: !!box.querySelector("#pr-arc-h"), windows: [...box.querySelectorAll("[data-window]")].map(b => b.dataset.window).join(","), locked: !!box.querySelector(".progress-tab--locked"), share: /Share your progress/.test(txt(box)), thirty: /last 30 days/.test(txt(box)) || /Nothing logged/.test(txt(box)) };
 tierFixture("personal"); store.set("arc", ARC); mountView(ProgressView);
 const pProg = { arc: !!box.querySelector("#pr-arc-h"), windows: [...box.querySelectorAll("[data-window]")].map(b => b.dataset.window).join(",") };
-ok("3.progress  free: 30 days and sharing; the Plan: the arc read back, 30 or 90 days",
-   !fProg.arc && fProg.tabs === 0 && fProg.share && fProg.thirty && pProg.arc && pProg.windows === "30,90", JSON.stringify({ fProg, pProg }));
+ok("3.progress  free: today, 7, 14 or 30 days and sharing; the Plan: the same and 90 days, with the arc read back",
+   !fProg.arc && fProg.windows === "today,7,14,30" && !fProg.locked && fProg.share && fProg.thirty && pProg.arc && pProg.windows === "today,7,14,30,90", JSON.stringify({ fProg, pProg }));
 ok("3.arc  only the Plan reads back where you are heading", !fProg.arc && pProg.arc);
 
 const withCheckpoint = tier => {

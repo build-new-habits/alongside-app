@@ -1,6 +1,12 @@
 /**
  * tools/verify-settings-progress.mjs
- * 04 Oct 2026 v6
+ * 06 Oct 2026 v7
+ *
+ * v7 - D-11 PROGRESS-SHARE. TEST 3 RE-POINTED, same three properties: the
+ *   text to share is on the share screen now (views/progress-share.js,
+ *   Text). 3a: no alert() on Progress or the share screen. 3b: Copy says
+ *   so in the screen's status line (role=status). 3c: copying refused, the
+ *   text itself is labelled, focused and selected.
  *
  * v6 - LOOK-1/LOOK-2: re-pointed at the new shapes. Settings is an index
  *   of section buttons, each opening its own page whose rows open screens;
@@ -219,26 +225,30 @@ ok("2b. REVERSAL: the scan can see one", retiredIn("Try Quick build").length ===
 // ── 3. SHARE YOUR PROGRESS ──────────────────────────────────────────────
 console.log("\nTEST 3 - Share your progress: Copied is said where you are; no alert()");
 const progSrc = fs.readFileSync(new URL("js/views/progress.js", R), "utf8").replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
-ok("3a. no alert() anywhere on Progress (not selectable on most phones)", !/\balert\(/.test(progSrc));
+const shareSrc = fs.readFileSync(new URL("js/views/progress-share.js", R), "utf8").replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+ok("3a. no alert() anywhere on Progress or the share screen (not selectable on most phones)", !/\balert\(/.test(progSrc) && !/\balert\(/.test(shareSrc));
 // v5. Test 0 left sheets open with focus timers pending; start clean.
 for (let i = 0; i < 5 && document.querySelector(".sheet-panel.is-open"); i++) {
   document.dispatchEvent(new dom.window.KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
   await wait(400);
 }
 await wait(300);
-fixture("personal"); main.innerHTML = ""; ProgressView(rtr).mount(main);
-click(main.querySelector('[data-pr-page="share"]'));   // LOOK-2: the export buttons are on their own page
+fixture("personal"); main.innerHTML = "";
+// D-11: the text is on the share screen (Text), opened from Progress.
+const SHR = await import(new URL("js/views/progress-share.js", R).href);
+SHR.setSharePreset({ window: "30", format: "text" });
+SHR.ProgressShareView(rtr).mount(main);
 let copied = null;
 Object.defineProperty(globalThis.navigator, "clipboard", { value: { writeText: t => { copied = t; return Promise.resolve(); } }, configurable: true });
 const until = async (fn, ms = 8000) => { const end = Date.now() + ms; while (!fn() && Date.now() < end) await wait(10); };
-click(main.querySelector('[data-export="friend"]'));
-await until(() => /Copied/.test(txt(main.querySelector(".progress-export [data-export-status]"))));
-const status = main.querySelector(".progress-export [data-export-status]");
-ok("3b. copying says so under the buttons, politely", !!copied && /^Copied the friend version\./.test(txt(status)) && status.getAttribute("role") === "status", txt(status));
+click(main.querySelector("#sh-copy"));
+await until(() => /Copied/.test(txt(main.querySelector("#sh-status"))));
+const status = main.querySelector("#sh-status");
+ok("3b. copying says so under the buttons, politely", !!copied && /^Copied\./.test(txt(status)) && status.getAttribute("role") === "status" && copied === main.querySelector("#sh-text").value, txt(status));
 Object.defineProperty(globalThis.navigator, "clipboard", { value: { writeText: () => Promise.reject(new Error("denied")) }, configurable: true });
-click(main.querySelector('[data-export="self"]'));
-await until(() => { const a = main.querySelector("[data-export-fallback] textarea"); return !!a && document.activeElement === a; });
-const area = main.querySelector("[data-export-fallback] textarea");
+click(main.querySelector("#sh-copy"));
+await until(() => { const a = main.querySelector("#sh-text"); return !!a && document.activeElement === a; });
+const area = main.querySelector("#sh-text");
 ok("3c. copying refused: the text itself, labelled, focused and selected", !!area && !area.closest("[hidden]") && area.value.length > 40 &&
    document.activeElement === area && !!main.querySelector(`label[for="${area.id}"]`), area?.value.slice(0, 40));
 

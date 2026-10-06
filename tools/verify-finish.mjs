@@ -1,5 +1,15 @@
 /**
  * tools/verify-finish.mjs
+ * 06 Oct 2026 v6
+ *
+ * v6 - D-11 PROGRESS-SHARE. 5pc RE-POINTED, not loosened: the feel answer
+ *   is now shown back (Progress's Today and the shared report say
+ *   "Afterwards: about right"), by data/progress-report.js only. Showing it
+ *   is not using it: nothing plans from it, so the finish screen still may
+ *   not promise to remember, factor in or use it (5a, unchanged). 5pc now
+ *   names the one display reader allowed and goes red for any other
+ *   reader, the pain answer still for any reader at all.
+ *
  * 04 Oct 2026 v5
  *
  * v5 - D-1 EXERCISE-FOUR. Reaches Capture (the fourth step) before the set
@@ -165,11 +175,13 @@ console.log("\nTEST 5 - the coach's line promises nothing it does not do");
       const t = fs.readFileSync(new URL(`../js/${f}`, import.meta.url), "utf8");
       // A READ of the stored answer: entry.feel, e.painChange -- not a
       // DOM dataset.feel, and not a write of painChange: "none".
+      // D-11: the report shows the feel answer back (display only).
+      if (/data[\\/]progress-report\.js$/.test(f) && !/(?<!dataset)\.painChange\b(?!\s*=[^=])/.test(t)) continue;
       if (/(?<!dataset)\.(feel|painChange)\b(?!\s*=[^=])/.test(t)) out.push(f);
     }
     return out;
   })(new URL("../js/", import.meta.url));
-  ok("5pc. nothing in the app reads the feel or pain answers (so no line may promise to)", readers.length === 0, readers.join(", "));
+  ok("5pc. nothing in the app reads the feel or pain answers to plan with (only the report shows the feel answer back), so no line may promise to", readers.length === 0, readers.join(", "));
   ok("5a. no line promises to remember, factor in, or use it next time",
      body.length > 200 && !/I will remember|factor it in|use it next time|when I plan/i.test(body));
 }

@@ -1,5 +1,12 @@
 /**
  * tools/verify-outbound.mjs
+ * 06 Oct 2026 v5
+ *
+ * v5 - D-11 PROGRESS-SHARE. 2c reads the font faces per family: Inter keeps
+ *   its four weights; Newsreader, the certificate's serif (OFL, served from
+ *   the app like Inter), has 500 and 400 italic (2c2); no other family
+ *   (2c3). 2e already holds every face file to the offline list.
+ *
  * 05 Oct 2026 v4
  *
  * v4 - SW-INCREMENTAL. 3a2: the Sentry loader is async, so it never holds up
@@ -82,8 +89,16 @@ const urls = [...faceSrc.matchAll(/url\(\s*["']?([^"')]+\.woff2)["']?\s*\)/g)].m
 const resolved = urls.map(u => new URL(u, new URL(faceFile, ROOT)));
 ok("2a. an @font-face for Inter on local woff2 files", !!faceFile && urls.length >= 4 && urls.every(u => !/^https?:/.test(u)), `${faceFile} ${JSON.stringify(urls)}`);
 ok("2b. the files are there", resolved.length >= 4 && resolved.every(u => fs.existsSync(u)), resolved.map(u => u.pathname).join(", "));
-const weights = [...faceSrc.matchAll(/font-weight:\s*(\d+)/g)].map(m => m[1]).sort().join(",");
+// v5, D-11: the faces are read per family. Inter keeps its four weights;
+// Newsreader (the certificate's serif, OFL, served from the app like Inter)
+// has two faces: 500 upright and 400 italic.
+const faces = [...faceSrc.matchAll(/@font-face\s*\{([^}]*)\}/g)].map(m => m[1]);
+const faceOf = f => ({ family: (f.match(/font-family:\s*["']?([^"';]+)/) || [])[1], weight: (f.match(/font-weight:\s*(\d+)/) || [])[1], style: (f.match(/font-style:\s*(\w+)/) || [, "normal"])[1] });
+const weightsOf = fam => faces.map(faceOf).filter(f => f.family === fam).map(f => `${f.weight}${f.style === "italic" ? "i" : ""}`).sort().join(",");
+const weights = weightsOf("Inter");
 ok("2c. the four weights the app uses: 400, 500, 600, 700", weights === "400,500,600,700", weights);
+ok("2c2. and the certificate's serif, Newsreader: 500, and 400 italic", weightsOf("Newsreader") === "400i,500", weightsOf("Newsreader"));
+ok("2c3. no other family is served", faces.map(faceOf).every(f => f.family === "Inter" || f.family === "Newsreader"), faces.map(faceOf).map(f => f.family).join(","));
 ok("2d. the styles load it", /@import\s+(?:url\()?["']?(?:\.\/)?base\/fonts\.css/.test(read("css/main.css")) || live.includes("css/base/fonts.css"),
    "fonts.css is not imported by main.css or linked from the page");
 const sw = read("sw.js");

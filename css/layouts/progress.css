@@ -1,5 +1,14 @@
 /*
  * css/layouts/progress.css
+ * 06 Oct 2026 v11
+ *   D-11 PROGRESS-SHARE. The header is the title, the days it covers, then
+ *   the window tabs across the full width (Today, 7, 14, 30, and 90 on the
+ *   Plan; a number above the word days). The chart takes any number of
+ *   bars (--n): seven or fourteen days, six or thirteen weeks; with more
+ *   than seven, the in-between labels are hidden while the bars stand up
+ *   and shown when the chart lies on its side. Today: a card for each
+ *   session (a kind-colour dot, the kind, time, where and minutes, the
+ *   moves and sets, what they said after) and the report card.
  * 06 Oct 2026 v10
  *   D-12 PROGRESS-FIT (Graeme, 06 Oct: "the screen shifts right ... it's
  *   every time"). The view is the screen's width and no wider (it sized
@@ -550,7 +559,7 @@
 .pr-chart__summary { margin: 0 0 var(--space-2); font-size: var(--text-sm); color: var(--color-text-secondary); }
 .pr-bars {
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-columns: repeat(var(--n, 6), minmax(0, 1fr));
   grid-template-rows: auto auto auto;
   column-gap: var(--space-2);
   row-gap: 4px;
@@ -664,10 +673,12 @@
 .pr-row--blue,   .pr-page--blue,   .pr-lift-group--blue   { --k: var(--kind-blue); }
 .pr-row--green,  .pr-page--green,  .pr-lift-group--green  { --k: var(--kind-green); }
 
-/* Header: title and the 30 / 90 switch on one line. */
-.progress-header { flex-direction: row; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+/* Header: the title and its days, then the window tabs across. */
+.progress-header { flex-direction: column; align-items: stretch; gap: var(--space-3); }
+.progress-header__titles { display: flex; flex-direction: column; gap: 2px; }
+.pr-range { margin: 0; font-size: var(--text-sm); color: var(--color-text-secondary); }
 .progress-tabs--seg {
-  display: inline-flex;
+  display: flex;
   gap: 4px;
   padding: 4px;
   border: 1px solid var(--color-border-light);
@@ -676,12 +687,21 @@
   background: var(--color-bg);
 }
 .progress-tabs--seg .progress-tab {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   border: 0;
   border-radius: 9px;
-  padding: var(--space-2) var(--space-3);
-  min-height: 44px;
+  padding: var(--space-1) var(--space-1);
+  min-height: 48px;
   color: var(--color-text);
+  line-height: 1.15;
 }
+.pr-tab__n { display: block; font-weight: 600; }
+.pr-tab__u { display: block; font-size: var(--text-xs); }
 .progress-tabs--seg .progress-tab--active { background: var(--color-primary); color: var(--color-text-inverse); }
 
 /* The cards. */
@@ -814,14 +834,39 @@
 .pr-lift-group .pr-lift__text { text-align: left; }
 .pr-spark { flex: none; color: var(--k, var(--color-primary)); }
 
+/* D-11. More than seven bars: closer together; the in-between day or
+   week labels are hidden while the bars stand up (they would collide)
+   and every bar still names itself to a screen reader. */
+.pr-bars--many { column-gap: 3px; }
+.pr-bar__week--minor, .pr-bar__value--zero { visibility: hidden; }
+
+/* D-11. Today: a card for each session, then the report card. */
+.pr-today { display: flex; flex-direction: column; gap: var(--space-4); }
+.pr-today__list { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: var(--space-3); }
+.pr-session { display: flex; flex-direction: column; }
+.pr-session__head { display: flex; align-items: flex-start; gap: var(--space-3); }
+.pr-session__head .pr-dot { margin-top: 0.45em; }
+.pr-session__titles { min-width: 0; }
+.pr-session__kind { margin: 0; font-size: var(--text-lg); font-weight: 600; color: var(--color-text); }
+.pr-session__meta { margin: 2px 0 0; font-size: var(--text-sm); color: var(--color-text-secondary); }
+.pr-moves { margin: var(--space-3) 0 0; padding: 0; list-style: none; }
+.pr-move { display: flex; flex-direction: column; gap: 2px; padding: var(--space-2) 0; border-top: 1px solid var(--color-border-light); font-size: var(--text-sm); }
+.pr-move__name { font-weight: 500; color: var(--color-text); }
+.pr-move__sets { color: var(--color-text-secondary); font-variant-numeric: tabular-nums; }
+.pr-session__feel { margin: var(--space-3) 0 0; font-size: var(--text-sm); color: var(--color-text-secondary); }
+.pr-session__feel strong { color: var(--color-text); font-weight: 600; }
+.pr-today__out { display: flex; flex-direction: column; gap: var(--space-3); }
+.pr-today__out .pr-card__cap { margin: 0; }
+
 /* ── D-12 PROGRESS-FIT. Large text: one thing per row. ─────────────────
    The view's text box under 19 characters across: 332px at normal text on
    a 412px phone is 20.75, so this starts a little above normal size (and
    on a small phone at any size). */
 @container progress (max-width: 19em) {
   .progress-header { flex-direction: column; align-items: stretch; gap: var(--space-3); }
-  .progress-tabs--seg { display: flex; }
-  .progress-tabs--seg .progress-tab { flex: 1; }
+  .progress-tabs--seg { display: flex; flex-wrap: wrap; }
+  .progress-tabs--seg .progress-tab { flex: 1 1 4.5em; }
+  .pr-bar__week--minor, .pr-bar__value--zero { visibility: visible; }
   .progress-body > .progress-summary,
   .progress-shapes .progress-shapes__list { grid-template-columns: minmax(0, 1fr); }
   .pr-card, .progress-body > .progress-narrative { padding: var(--space-4); }

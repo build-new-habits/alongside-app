@@ -1,6 +1,10 @@
 /**
  * js/data/tier-table.js
- * 03 Oct 2026 v6
+ * 06 Oct 2026 v7
+ *
+ * v7 - D-11 PROGRESS-SHARE. Progress: Free has today and the last 7, 14
+ *   or 30 days, and ways to share them (a picture, a certificate, a report
+ *   or text); the Plan the same and 90 days, with the arc read back.
  *
  * v6 - W5-20 TRUE-WORDS-5. I know what I want is the Plan's: Free says Not
  *   included (it said Free had it). Make it up as I go's Free line names Log
@@ -98,8 +102,8 @@ export const TIER_TABLE = [
   {
     id: "progress",
     area: "Progress",
-    free: "Your sessions over the last 30 days, and a way to share them",
-    plan: "Your arc read back to you: what has come up and your logged weights, over 30 or 90 days",
+    free: "Your sessions today and over the last 7, 14 or 30 days, and ways to share them",
+    plan: "The same, and 90 days, with your arc read back to you: what has come up and your logged weights",
     says: "Progress reads your arc back to you: what has come up, and what your logged weights show.",
     proof: "verify-plan-claims 3.progress, verify-progress-agree",
   },

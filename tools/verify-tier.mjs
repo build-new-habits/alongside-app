@@ -1,6 +1,19 @@
 /**
  * tools/verify-tier.mjs
- * 04 Oct 2026 v6
+ * 06 Oct 2026 v7
+ *
+ * v7 - D-11 PROGRESS-SHARE. RE-POINTED, nothing loosened. The three text
+ *   exports became Share your progress (views/progress-share.js): a
+ *   picture, a certificate, a report or text. "EXPORT is free" now finds
+ *   the Share row (no tier condition) and asserts the share screen offers
+ *   every format with no tier check on the formats. "Differs in CONTENTS"
+ *   now reads the one window list (data/progress-report.js WINDOWS): 90
+ *   days is the Plan's, every other window both tiers', and both Progress
+ *   and the share screen offer windowsFor(premium) -- still emergent, no
+ *   format or button conditional on tier. "Free is 30 days" becomes free
+ *   has Today, 7, 14 and 30 (Graeme, 06 Oct), default 30, and the Plan's
+ *   difference is still the arc read-back. "Initialised per tier": the
+ *   window is clamped to the tier's list on every render.
  *
  * v6 - LOOK-2: the export is on the Share page, one tap away (progress.js
  *   v26), called as renderExportBlock(false) (no heading: the page's h1 is
@@ -282,13 +295,15 @@ check("EXPORT is free — a right of access does not depend on payment", () => {
   ok(!/renderExportLocked/.test(progress),
      "the export lock is back. Gating export does not withhold the data, " +
      "it withholds the BUTTON, and the obligation survives either way");
-  // LOOK-2: the block is on the Share page, opened from the Share row.
-  ok(/page === 'share' \? renderExportBlock\((false)?\)/.test(progress),
-     "the export block is gone entirely");
+  // D-11: the Share row opens the share screen, on both tiers.
   const shareRow = (progress.match(/^.*_prRow\('share'.*$/m) || [""])[0];
-  ok(shareRow && !/premium|tier|isPremium/.test(shareRow),
+  ok(shareRow && /data-share-open/.test(shareRow) && !/premium|tier|isPremium/.test(shareRow),
      "the Share row is missing or tier-conditional, so a free user cannot " +
      "reach the export: " + (shareRow.trim() || "(no row)"));
+  const share = read("js/views/progress-share.js");
+  ok(/FORMATS\.map\(f =>/.test(share) && !/FORMATS\.filter|isPremium|lockedFeature/.test(share),
+     "the share screen filters or locks its formats: every format (the report " +
+     "a physio or GP would read included) must be offered on both tiers");
 });
 
 check("the export still differs by tier, in CONTENTS not existence", () => {
@@ -297,12 +312,15 @@ check("the export still differs by tier, in CONTENTS not existence", () => {
   // lines drop out when there is no programme. No conditional required.
   // Asserted so a later "simplification" to a fixed window does not
   // quietly hand free users the paid horizon.
-  const fn = progress.slice(progress.indexOf("function _handleExport"));
-  const body = fn.slice(0, fn.indexOf("function _buildExportText"));
-  ok(/_cutoffDate\(activeWindow\)/.test(body),
-     "the export no longer scopes to activeWindow. Free exports a " +
-     "fortnight and the Plan exports its horizon -- that difference IS " +
-     "the tier boundary here, and it is the only one");
+  const report = read("js/data/progress-report.js");
+  const list = report.slice(report.indexOf("export const WINDOWS"), report.indexOf("]);", report.indexOf("export const WINDOWS")));
+  ok(/key: "90",[^}]*plan: true/.test(list) && (list.match(/plan: true/g) || []).length === 1,
+     "90 days is no longer the Plan's alone (or another window became the Plan's): " +
+     "the window list is the tier boundary for sharing, and its only one");
+  const share = read("js/views/progress-share.js");
+  ok(/windowsFor\(premium\(\)\)/.test(share) && /windowsFor\(premium\)/.test(progress),
+     "Progress or the share screen no longer offers the tier's window list " +
+     "(windowsFor), so free could share the Plan's horizon or the Plan lose it");
 });
 
 check("PERSONAL BESTS are free, and still off by default", () => {
@@ -322,9 +340,9 @@ check("PERSONAL BESTS are free, and still off by default", () => {
      "product exists to serve");
 });
 
-check("free is 30 days, and the Plan's difference is the arc", () => {
-  ok(/const FREE_WINDOW\s*=\s*30/.test(progress),
-     "the free window is not 30 days (Smooth Path spec 4.8 / 4.11)");
+check("free has today to 30 days, and the Plan's difference is the arc", () => {
+  ok(/const DEFAULT_WINDOW\s*=\s*'30'/.test(progress),
+     "the default window is not 30 days on both tiers (Smooth Path spec 4.8; D-11)");
   ok(/\$\{premium \? renderArcReadback\(\) : ''\}/.test(progress),
      "the Plan's Progress no longer leads with the arc read-back, so the only " +
      "difference left is a bigger number -- which is what this check exists to stop");
@@ -362,7 +380,7 @@ check("the read waits until it has earned its closing line", () => {
 });
 
 check("the window is initialised per tier", () =>
-  ok(/activeWindow === null.*premium|premium \? PAID_DEFAULT : FREE_WINDOW/s.test(progress),
+  ok(/activeWindow === null \|\| !windowsFor\(premium\)\.some/.test(progress),
      "a single shared default leaves a Personal user on the 14-day window while " +
      "their tab strip offers only 30 and 90 — no tab reads as selected"));
 

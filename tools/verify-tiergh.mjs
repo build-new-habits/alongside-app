@@ -1,6 +1,12 @@
 /**
  * tools/verify-tiergh.mjs
- * 04 Oct 2026 v6
+ * 06 Oct 2026 v7
+ *
+ * v7 - D-11 PROGRESS-SHARE. 15/15b RE-POINTED, nothing loosened: the export
+ *   is the share screen now. A free user taps Share your progress on the
+ *   real Progress, lands on progress-share, and the real ProgressShareView
+ *   mounted on the free tier offers all four formats; 15b: the report (the
+ *   page for a trainer, a dietitian or a doctor) among them, and it renders.
  *
  * v6 - LOOK-4: the Library's first page now shows the categories itself
  *   (the Start a session step is folded in, Graeme approved 04 Oct). Check
@@ -370,18 +376,26 @@ setTier('free');
 const progressEl = document.createElement('div');
 document.body.appendChild(progressEl);
 ProgressView(router).mount(progressEl);
-// LOOK-2: the export is on the Share page; a free user taps Share to reach it.
-progressEl.querySelector('[data-pr-page="share"]')?.dispatchEvent(new window.MouseEvent('click', { bubbles: true }));
-const exportBtns = [...progressEl.querySelectorAll('[data-export]')];
+// D-11: a free user taps Share your progress, which opens the share screen.
+navigatedTo = null;
+progressEl.querySelector('[data-share-open]')?.dispatchEvent(new window.MouseEvent('click', { bubbles: true }));
+const reachedShare = navigatedTo === 'progress-share';
+const { ProgressShareView } = await import(BASE + 'views/progress-share.js');
+const shareEl = document.createElement('div');
+document.body.appendChild(shareEl);
+ProgressShareView(router).mount(shareEl);
+const exportBtns = [...shareEl.querySelectorAll('input[name="sh-format"]')];
 
-check('15 R4: a FREE user can reach the export buttons',
-  exportBtns.length === 3,
-  `found ${exportBtns.length}: ${exportBtns.map(b => b.dataset.export).join(', ')} ` +
+check('15 R4: a FREE user can reach the export (Share your progress, every format)',
+  reachedShare && exportBtns.length === 4,
+  `reached: ${reachedShare}; formats ${exportBtns.length}: ${exportBtns.map(b => b.value).join(', ')} ` +
   '— UK GDPR gives a right of access regardless of payment; gating this ' +
   'never withheld the data, only the button');
 
-check('15b R4: including the professional export, for a physio or GP',
-  exportBtns.some(b => b.dataset.export === 'professional'),
+const reportBtn = exportBtns.find(b => b.value === 'report');
+reportBtn?.dispatchEvent(new window.Event('change', { bubbles: true }));
+check('15b R4: including the report, for a physio or GP',
+  !!reportBtn && !!shareEl.querySelector('.sh-report'),
   'the person least able to pay is the person most likely to need to ' +
   'show a clinician what they have been doing');
 

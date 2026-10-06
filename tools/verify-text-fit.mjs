@@ -1,5 +1,11 @@
 /**
  * tools/verify-text-fit.mjs
+ * 06 Oct 2026 v3
+ *
+ * v3 - D-11 PROGRESS-SHARE. 7b reads the chart's column count from --n
+ *   (seven or fourteen days, six or thirteen weeks), default six; the rule
+ *   it holds (columns may narrow below their labels) is unchanged.
+ *
  * 06 Oct 2026 v2
  *
  * v2 - D-12 PROGRESS-FIT. Graeme, 06 Oct, on the phone: "when I go into
@@ -95,7 +101,8 @@ ok("6. the text size slider goes up to 2 (twice the size)", /max:\s*2(\.0)?\s*,/
 const pr = css("layouts/progress.css");
 const view = rule(pr, ".progress-view");
 ok("7a. Progress fills the screen and no wider (width 100%, and a container for its own width)", /width:\s*100%/.test(view) && /container:\s*progress\s*\/\s*inline-size/.test(view), view);
-ok("7b. the week chart's six columns may narrow below their labels", /repeat\(6,\s*minmax\(0,\s*1fr\)\)/.test(rule(pr, ".pr-bars")), rule(pr, ".pr-bars"));
+// v3, D-11: the chart takes any number of bars (--n), default six.
+ok("7b. the chart's columns may narrow below their labels", /repeat\((6|var\(--n,\s*6\)),\s*minmax\(0,\s*1fr\)\)/.test(rule(pr, ".pr-bars")), rule(pr, ".pr-bars"));
 // The normal-size rules only: on its side (large text) the week label is
 // one line on purpose, with a whole row to itself.
 const prNormal = pr.replace(/@container[\s\S]*$/, "");

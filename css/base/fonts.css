@@ -1,6 +1,11 @@
 /*
  * css/base/fonts.css
- * 30 Sep 2026 v1
+ * 06 Oct 2026 v2
+ *
+ * v2 - D-11 PROGRESS-SHARE. Newsreader (500 upright, 400 italic), for the
+ *   name and the sentence on the shared certificate, served from the app
+ *   for the same reason as Inter. @fontsource/newsreader 5.3.0, latin, SIL
+ *   Open Font License (assets/fonts/Newsreader-OFL.txt).
  *
  * PT-1 OUTBOUND. Inter, served from the app. It came from Google Fonts on
  * every open, which sent the phone's address to Google; the consent
@@ -36,4 +41,18 @@
   font-weight: 700;
   font-display: swap;
   src: url('../../assets/fonts/inter-latin-700-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Newsreader';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('../../assets/fonts/newsreader-latin-500-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Newsreader';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../../assets/fonts/newsreader-latin-400-italic.woff2') format('woff2');
 }

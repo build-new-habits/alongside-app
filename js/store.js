@@ -5,7 +5,18 @@ import { sanitizeWeekShape, sanitizeWeekDayRequest } from "./data/week-shape-mod
 
 /**
  * store.js - Data persistence layer
- * 05 Oct 2026 v113
+ * 06 Oct 2026 v114
+ *
+ * v114 - D-11 PROGRESS-SHARE (Schema v1.111). activityLog[].place:
+ *   "home", "gym", "outside" or null, stamped by logActivity() when the
+ *   entry does not say. A built or made-up session (workout, freestyle,
+ *   capture) takes sessionLocation, which is written when such a session
+ *   starts (the coach's Start, the builder's Let's go, Make it up as I go).
+ *   A gym visit logged by hand is "gym"; an outdoor ride, hike or outdoor
+ *   activity is "outside". Anything else is null: a walk, a run, a class
+ *   or a practice is not given a place the person never said. Read by
+ *   Progress (Today) and the shared report. Not health data. Entries from
+ *   before have no place and are not back-filled.
  *
  * v113 - D-7 PLAN-IMPORT (Schema v1.110). prescribedExercises entries may
  *   carry group: the day or session of a plan they came in with ("Session
@@ -3634,6 +3645,25 @@ export const store = {
       .slice(0, limit);
   },
 
+  /**
+   * D-11 (v114). Where a session happened, when the app was told. Never
+   * a guess: null unless the entry says, or the session is one whose
+   * place was asked when it started (sessionLocation), or its type is a
+   * place (a gym visit, an outdoor ride).
+   */
+  _placeOf(entry) {
+    const PLACES = ['home', 'gym', 'outside'];
+    if (PLACES.includes(entry && entry.place)) return entry.place;
+    if (!entry) return null;
+    if (entry.type === 'gym' && entry.source === 'self-logged') return 'gym';
+    if (['outdoor-cycle', 'hike', 'outdoor'].includes(entry.type)) return 'outside';
+    if (['workout', 'freestyle', 'capture'].includes(entry.type)) {
+      const where = this.data.sessionLocation;
+      return PLACES.includes(where) ? where : null;
+    }
+    return null;
+  },
+
   logActivity(entry, dedupeWindowMs = 10 * 1000) {
     if (!entry || !entry.type) {
       console.error('Store: logActivity called without a type', entry);
@@ -3727,7 +3757,8 @@ export const store = {
       ...entry,
       // After the spread, so a reused id cannot win back.
       id: (!_idTaken && entry.id) || (new Date().toISOString() + '_' + Math.random().toString(36).slice(2, 6)),
-      sessionType: _inferredType
+      sessionType: _inferredType,
+      place: this._placeOf(entry)
     };
 
     // ARC-EVERYTHING, 16 Sep 2026. Credit the arc here, at the single

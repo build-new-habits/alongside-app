@@ -1,0 +1,128 @@
+/*
+ * css/components/progress-share.css
+ * 06 Oct 2026 v1
+ *
+ * D-11 PROGRESS-SHARE. Share your progress (views/progress-share.js): the
+ * choices as large tappable cards and chips (44px and over), the switches
+ * of what goes on it, the preview, and the report as a white A4 page.
+ *
+ * The report keeps a white page in every colour scheme: it is a document
+ * to print or send, read on paper or on someone else's screen. Its kind
+ * dots take the light-scheme kind colours (3:1 and over on white, WCAG
+ * 1.4.11), and every dot has the kind's name beside it (1.4.1).
+ *
+ * Printing (Print or save as PDF) prints the report alone, on A4.
+ */
+
+.share-view { display: flex; flex-direction: column; gap: var(--space-5); padding: var(--space-5) var(--space-4) var(--space-8); width: 100%; max-width: 600px; margin: 0 auto; }
+.share-view .pr-back { align-self: flex-start; min-height: 44px; }
+.share-title { margin: 0; font-size: var(--text-2xl); font-weight: 700; color: var(--color-text); }
+.share-title:focus { outline: none; }
+.share-title:focus-visible { outline: 3px solid var(--color-primary); outline-offset: 4px; border-radius: 6px; }
+.share-view .pr-range { margin-top: calc(-1 * var(--space-4)); }
+
+.sh-group { border: 0; margin: 0; padding: 0; min-width: 0; }
+.share-view .sh-legend { padding: 0; margin: 0 0 var(--space-3); font-size: var(--text-lg); font-weight: 600; color: var(--color-text); }
+
+.sh-chips { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.sh-chip { position: relative; display: inline-flex; }
+.sh-chip input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.sh-chip span {
+  display: inline-flex; align-items: center; min-height: 44px; padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--color-border); border-radius: var(--radius-full);
+  background: var(--color-bg); color: var(--color-text); font-size: var(--text-sm); font-weight: 500;
+}
+.sh-chip input:checked + span { background: var(--color-primary); border-color: var(--color-primary); color: var(--color-text-inverse); font-weight: 700; }
+.sh-chip input:focus-visible + span { outline: 3px solid var(--color-primary); outline-offset: 3px; }
+
+.sh-cards { display: flex; flex-direction: column; gap: var(--space-2); }
+.sh-card {
+  display: flex; align-items: center; gap: var(--space-3); min-height: 56px; padding: var(--space-3) var(--space-4);
+  background: var(--color-bg); border: 2px solid var(--color-border-light); border-radius: 16px; cursor: pointer;
+}
+.sh-card:has(input:checked) { border-color: var(--color-primary); }
+.sh-card input, .sh-part input { flex: none; width: 22px; height: 22px; margin: 0; accent-color: var(--color-primary); }
+.sh-card__text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.sh-card__title { font-size: var(--text-base); font-weight: 600; color: var(--color-text); }
+.sh-card__sub { font-size: var(--text-sm); color: var(--color-text-secondary); }
+
+.sh-parts { background: var(--color-bg); border: 1px solid var(--color-border-light); border-radius: 20px; padding: var(--space-2) var(--space-4) var(--space-2); }
+.sh-parts .sh-legend { padding-top: var(--space-3); }
+.sh-part { display: flex; align-items: flex-start; gap: var(--space-3); min-height: 48px; padding: var(--space-3) 0; border-top: 1px solid var(--color-border-light); font-size: var(--text-base); color: var(--color-text); cursor: pointer; }
+.sh-part input { margin-top: 1px; }
+.sh-part__hint { display: block; margin-top: 2px; font-size: var(--text-sm); color: var(--color-text-secondary); }
+
+.sh-private { display: flex; gap: var(--space-3); margin: 0; font-size: var(--text-sm); line-height: 1.5; color: var(--color-text); }
+.sh-private svg { flex: none; color: var(--color-primary); margin-top: 1px; }
+
+.sh-preview { display: flex; flex-direction: column; gap: var(--space-3); }
+.share-view .sh-preview .sh-legend { margin: 0; }
+.sh-note { margin: 0; font-size: var(--text-sm); color: var(--color-text-secondary); }
+.sh-image-wrap { display: flex; flex-direction: column; gap: var(--space-2); }
+.sh-image { display: block; width: 100%; height: auto; border-radius: 12px; border: 1px solid var(--color-border-light); }
+.sh-actions { display: flex; flex-direction: column; gap: var(--space-2); }
+.sh-status { min-height: 1.5em; margin: 0; font-size: var(--text-sm); color: var(--color-text); }
+
+.sh-text {
+  width: 100%; box-sizing: border-box; min-height: 16em; resize: vertical;
+  padding: var(--space-3); border: 1px solid var(--color-border); border-radius: 12px;
+  background: var(--color-bg-deep, #0F172A); color: var(--color-text);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: var(--text-sm); line-height: 1.55;
+  white-space: pre-wrap;
+}
+
+/* ── The report: a white page, in every scheme. ───────────────────────── */
+.sh-report {
+  --kind-teal: #0F766E; --kind-amber: #92400E; --kind-violet: #6D28D9; --kind-blue: #1D4ED8;
+  --kind-rose: #BE123C; --kind-green: #047857; --kind-slate: #475569;
+  background: #FFFFFF; color: #0F172A; border-radius: 12px; padding: var(--space-5);
+  font-size: var(--text-sm); line-height: 1.5;
+  display: flex; flex-direction: column; gap: var(--space-4);
+}
+.shr-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: var(--space-3); padding-bottom: var(--space-3); border-bottom: 3px solid #0F766E; }
+.shr-eyebrow { margin: 0; font-size: var(--text-xs); font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #0F766E; }
+.sh-report .shr-title { margin: 4px 0 0; font-size: var(--text-xl); font-weight: 700; color: #0F172A; }
+.shr-for { margin: 2px 0 0; color: #334155; }
+.shr-brand { display: flex; align-items: center; gap: 8px; }
+.shr-brand img { display: block; height: auto; }
+.shr-brand img[alt=""] { width: 34px; }
+.shr-brand img[alt="Alongside"] { width: 104px; }
+.shr-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 7.5em), 1fr)); gap: 8px; margin: 0; }
+.shr-tile { background: #F1F5F9; border-radius: 8px; padding: 10px 12px; display: flex; flex-direction: column-reverse; }
+.shr-tile dt { color: #475569; font-size: var(--text-xs); }
+.shr-tile dd { margin: 0; font-size: var(--text-lg); font-weight: 700; color: #0F172A; overflow-wrap: break-word; }
+.shr-kinds { margin: 0; display: flex; flex-wrap: wrap; gap: 6px 16px; color: #0F172A; }
+.shr-kind { display: inline-flex; align-items: center; gap: 6px; }
+.shr-day { display: flex; flex-direction: column; gap: 10px; }
+.sh-report .shr-day__h { margin: 0; font-size: var(--text-base); font-weight: 700; color: #0F172A; }
+.shr-sess { border-top: 1px solid #E2E8F0; padding-top: 10px; }
+.shr-sess__head { margin: 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; }
+.shr-sess__head .pr-dot { align-self: center; }
+.shr-sess__meta { color: #475569; }
+.shr-moves { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: var(--text-sm); }
+.shr-moves th, .shr-moves td { text-align: left; vertical-align: top; padding: 6px 8px; border-bottom: 1px solid #E2E8F0; }
+.shr-moves thead th { background: #0F766E; color: #FFFFFF; font-weight: 600; }
+.shr-moves tbody th { font-weight: 500; width: 42%; }
+.shr-feel { margin: 6px 0 0; color: #334155; }
+.shr-none { margin: 0; color: #475569; }
+.shr-checkins ul, .shr-foot ul { margin: 6px 0 0; padding-left: 18px; color: #334155; list-style: disc; }
+.shr-checkins li + li, .shr-foot li + li { margin-top: 4px; }
+.shr-muted { font-weight: 400; color: #475569; }
+.shr-foot { border-top: 1px solid #CBD5E1; padding-top: 12px; color: #334155; }
+.shr-maker { margin: 10px 0 0; display: flex; align-items: center; gap: 8px; font-size: var(--text-xs); color: #475569; }
+.shr-maker img { width: 28px; height: auto; }
+
+@media print {
+  @page { size: A4; margin: 14mm; }
+  body:has(.sh-report) * { visibility: hidden !important; }
+  body:has(.sh-report) .sh-report,
+  body:has(.sh-report) .sh-report * { visibility: visible !important; }
+  body:has(.sh-report) .sh-report {
+    position: absolute; left: 0; top: 0; width: 100%; padding: 0; border-radius: 0;
+    font-size: 10.5pt; color: #000;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+  .sh-report .shr-title { font-size: 18pt; }
+  .shr-tile dd { font-size: 14pt; }
+  .shr-sess, .shr-moves tr { break-inside: avoid; }
+}
