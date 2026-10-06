@@ -1,5 +1,5 @@
 # Alongside: Move — Cold Start Blueprint
-## 05 Oct 2026 v260
+## 06 Oct 2026 v261
 
 Build New Habits | Everything a chat with no memory needs to pick this up and build confidently.
 
@@ -72,7 +72,7 @@ git clone --depth 1 https://x-access-token:$TOKEN@github.com/build-new-habits/al
 |---|---|
 | `store.js` | v113 |
 | `Schema.md` | v1.110 |
-| `sw.js` | **v654**, cache `alongside-v654` |
+| `sw.js` | **v655**, cache `alongside-v655` |
 | `router.js` | v36 · `my-programme.js` v8 · `today.js` v49 · `settings.js` v46 · `progress.js` v22 · `onboarding/thread.js` v16 |
 | `exercise-card.js` | **v7** — CARD-4, four pages. `workout.css` v16 |
 | Gates | **301, all green** on jsdom 28.1.0 (`npm ci`) — from the repo root. See the cwd row in §9 |
@@ -113,6 +113,11 @@ All 49 affected files now resolve from `import.meta.url` — 14 for the repo pat
 - Every file carries `DD Mon YYYY vN`. **Check today's actual date.** Do not copy the date from a prior version or from the conversation — that error was made on 20 Aug and cost a filename.
 - Human-readable JS strings use **double quotes**; no apostrophes inside single-quoted strings.
 - Python `str.replace` with `assert text.count(old) == 1` before every substitution. It has caught real ambiguity.
+
+### Large text (D-12, 06 Oct 2026)
+- The text-size setting is applied **once**, by the `--text-*` tokens; the page root is 100% (`reset.css`). Do not multiply the root by `--user-text-scale` again: that drew 1.45 at 2.1x and pushed screens off the phone.
+- A screen's root that centres itself with `margin: 0 auto; max-width` also needs `width: 100%`, or it sizes to its widest content.
+- **After any layout change, run `node tools/chromium-text-fit.mjs`** (needs Chromium; not in the verify loop): every screen, both tiers, text 1 / 1.45 / 2, nothing wider than the phone and no word split across lines.
 
 ### Verification — read this twice
 - **`node --check` DOES NOT VALIDATE ES MODULES.** It parses `.js` as a script and will pass a file that throws on load. Use `cp file /tmp/x.mjs && node --check /tmp/x.mjs`.
