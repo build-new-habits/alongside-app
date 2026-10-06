@@ -1,4 +1,12 @@
 /* app-shell.css - Main app container with Midnight Teal theme
+ * 06 Oct 2026 v3
+ *
+ * v3 - D-12 PROGRESS-FIT. The bottom navigation's labels and icons grow
+ *   with the text size up to about 1.45x (19px, 36px) and no further: at
+ *   2x four labels cannot fit across a phone ("Wellbeing" alone is wider
+ *   than a quarter of it) and ran into each other. Everything else keeps
+ *   growing; the browser's own zoom still enlarges the bar.
+ *
  * 03 Oct 2026 v2
  *
  * v2 - W5-17 A11Y-W5. The loading screen's floating logo and spinner stand
@@ -269,13 +277,13 @@
 }
 
 .nav-icon {
-  font-size: calc(1.5rem * var(--user-text-scale, 1));
+  font-size: min(calc(1.5rem * var(--user-text-scale, 1)), 2.25rem);
   margin-bottom: var(--space-1);
   transition: transform var(--transition-spring);
 }
 
 .nav-label {
-  font-size: var(--text-xs);
+  font-size: min(var(--text-xs), 1.1875rem);
   font-weight: var(--font-medium);
   letter-spacing: var(--tracking-wide);
 }

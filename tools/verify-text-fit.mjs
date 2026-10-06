@@ -28,6 +28,9 @@
  *  12. The Mobility & Conditioning header (and Stretch arc, Your arc)
  *      lets its title drop under Back.
  *  13. A web or email address too long for a line may break.
+ *  14. The bottom navigation's labels and icons stop growing at about
+ *      1.45x: at 2x the four labels ran into each other. (The sweep cannot
+ *      see this: the bar is fixed to the screen, so it never widens it.)
  * Measured at 2x as well as Graeme's size, because the slider now reaches
  * it: Home, Privacy, Mobility & Conditioning and the morning session were
  * still too wide there after 5-10.
@@ -120,6 +123,10 @@ ok("11b. the morning session's week grid too", /repeat\(auto-fit,\s*minmax\(min\
 const mc = css("layouts/mobility-conditioning.css");
 ok("12. the Mobility & Conditioning header lets its title drop under Back", /flex-wrap:\s*wrap/.test(rule(mc, ".mc-header")), rule(mc, ".mc-header"));
 ok("13. a web or email address too long for a line may break", /overflow-wrap:\s*break-word/.test(rule(reset, "body")) && !/overflow-wrap:\s*anywhere/.test(rule(reset, "body")), rule(reset, "body"));
+
+const shell = css("layouts/app-shell.css");
+ok("14a. the navigation labels grow with the text, to a limit (all four fit at 2x)", /font-size:\s*min\(var\(--text-xs\),\s*[\d.]+rem\)/.test(rule(shell, ".nav-label")), rule(shell, ".nav-label"));
+ok("14b. and the navigation icons", /font-size:\s*min\(calc\([^)]*--user-text-scale[^)]*\)\),\s*[\d.]+rem\)/.test(rule(shell, ".nav-icon")), rule(shell, ".nav-icon"));
 
 console.log(`\nTEXT-FIT: ${passes} passed, ${fails} failed`);
 process.exit(fails ? 1 : 0);
