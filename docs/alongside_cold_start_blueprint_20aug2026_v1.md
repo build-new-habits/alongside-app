@@ -1,5 +1,5 @@
 # Alongside: Move — Cold Start Blueprint
-## 06 Oct 2026 v261
+## 06 Oct 2026 v262
 
 Build New Habits | Everything a chat with no memory needs to pick this up and build confidently.
 
@@ -51,7 +51,7 @@ git clone --depth 1 https://x-access-token:$TOKEN@github.com/build-new-habits/al
 | BNH-Files: `Apps/Alongside Move/` `Legal/`, `Clinical/`, `Business/`, `Product/`, `Research/`, `Testing/`, `Admin/`, `Archive/` | Every other paper, including the governing documents below |
 | `docs/Schema.md` | Store fields. **Must match `store.js`** |
 | `docs/` | Only what the code and checks need: `Changelog.md`, `exercise_entry_standard.md`, this blueprint, `specs/` (three specs the checks read), `classes/` (guided class scripts), `archive-code/` (retired code) |
-| `tools/verify-*.mjs` | 301 gates |
+| `tools/verify-*.mjs` | 302 gates |
 | `js/` | Vanilla ES modules, no framework, no bundler |
 
 **Governing documents, in read order** (BNH-Files, `Apps/Alongside Move/Business/`):
@@ -70,12 +70,12 @@ git clone --depth 1 https://x-access-token:$TOKEN@github.com/build-new-habits/al
 
 | | Version |
 |---|---|
-| `store.js` | v113 |
-| `Schema.md` | v1.110 |
-| `sw.js` | **v655**, cache `alongside-v655` |
-| `router.js` | v36 · `my-programme.js` v8 · `today.js` v49 · `settings.js` v46 · `progress.js` v22 · `onboarding/thread.js` v16 |
+| `store.js` | v114 |
+| `Schema.md` | v1.111 |
+| `sw.js` | **v656**, cache `alongside-v656` |
+| `router.js` | v48 · `my-programme.js` v8 · `today.js` v49 · `settings.js` v46 · `progress.js` v27 · `onboarding/thread.js` v16 |
 | `exercise-card.js` | **v7** — CARD-4, four pages. `workout.css` v16 |
-| Gates | **301, all green** on jsdom 28.1.0 (`npm ci`) — from the repo root. See the cwd row in §9 |
+| Gates | **302, all green** on jsdom 28.1.0 (`npm ci`) — from the repo root. See the cwd row in §9 |
 
 🟢 **This table is now GATED.** `tools/verify-blueprint.mjs` compares every version above against the file that carries it and goes red on any drift, naming the row to change.
 
@@ -118,6 +118,11 @@ All 49 affected files now resolve from `import.meta.url` — 14 for the repo pat
 - The text-size setting is applied **once**, by the `--text-*` tokens; the page root is 100% (`reset.css`). Do not multiply the root by `--user-text-scale` again: that drew 1.45 at 2.1x and pushed screens off the phone.
 - A screen's root that centres itself with `margin: 0 auto; max-width` also needs `width: 100%`, or it sizes to its widest content.
 - **After any layout change, run `node tools/chromium-text-fit.mjs`** (needs Chromium; not in the verify loop): every screen, both tiers, text 1 / 1.45 / 2, nothing wider than the phone and no word split across lines.
+
+### Sharing progress (D-11, 06 Oct 2026)
+- `js/data/progress-report.js` is the one place that turns the log into what a person shares (report, text, CSV, the picture's words). It is the only display reader of `entry.feel` (as `afterwards`), and it never reads a note, `moodAfter`, `painChange`, the journal or weight. Check-in answers only when the person switches them on **and** the health consent covers them. `tools/verify-progress-share.mjs` scans every output for planted secrets.
+- `js/data/share-images.js` draws the picture and the certificate with the real logos in `assets/images/brand/`. Brand rule: words and numbers in front on plain ground; nothing behind or across text; shapes only in their own zones; clear space round every logo.
+- Each finished session records where it was done (`entry.place`: home, gym or outside, or null), set by `store._placeOf()`.
 
 ### Verification — read this twice
 - **`node --check` DOES NOT VALIDATE ES MODULES.** It parses `.js` as a script and will pass a file that throws on load. Use `cp file /tmp/x.mjs && node --check /tmp/x.mjs`.
