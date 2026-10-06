@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 06 Oct 2026 v655
+ * 06 Oct 2026 v656
  *
+ * v656 - D-11 PROGRESS-SHARE (Graeme, 06 Oct): Progress shows today and the last 7, 14 or 30 days on both tiers, and 90 on the Plan; Download today's report says what was done, where and how many; Share your progress makes a picture, a certificate, a report to print or save as a PDF, or text to copy (with a CSV), on both tiers. The picture holds only sessions and kinds unless the person switches more on; the journal, notes and weight are never included; check-in answers only by choice and with the health consent. Each session records where it was done. NEW FILES precached: js/data/progress-report.js, js/data/share-images.js, js/views/progress-share.js, css/components/progress-share.css, two Newsreader font files and six brand logo images.
  * v655 - D-12 PROGRESS-FIT (device test, 06 Oct: "when I go into progress the screen shifts right ... it's every time"): no screen is wider than the phone at any text size. The text size was applied twice (1.45 drew 2.1x); it is applied once now, and the slider goes up to 2. Progress and Plan your week are the screen's width; at large text Progress is one thing per row with the week chart on its side; full-width buttons, session and Mobility & Conditioning headers, Home's door tiles and the morning week grid reflow; the bottom navigation stops growing at about 1.45x so its labels never collide.
  * v654 - SW-INCREMENTAL (Graeme, 05 Oct: "everything is really slow to open and load"): an update copies every file whose content hash is unchanged from the cache the phone already has, and downloads only what changed (it downloaded all 247 files, about 6 MB, every time). SHELL_HASHES written by tools/sw-hashes.mjs. This first update to it still downloads everything once. index.html: the Sentry loader is async.
  * v653 - D-7 (Graeme, 05 Oct): Add a plan you already have. Paste a plan; the app finds its exercises with fixed rules (movement only, read on the phone and not kept, nothing added unseen), adds the ticked ones to My exercises by day, and a day of the week can be one of them. NEW FILES precached: js/data/plan-reader.js, js/views/plan-import.js.
@@ -4202,7 +4203,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v655";
+const CACHE_NAME = "alongside-v656";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4212,14 +4213,14 @@ const CACHE_NAME = "alongside-v655";
 const SHELL_HASHES = {
   "./": "e9c8de187a65ee0b",
   "./index.html": "e9c8de187a65ee0b",
-  "./css/main.css": "17c9ba6e5a2de852",
-  "./css/base/fonts.css": "1628ae32d5bf6882",
+  "./css/main.css": "e306ded0118cbea6",
+  "./css/base/fonts.css": "04893bbdfa4cf013",
   "./css/layouts/onboarding-additions.css": "a204c285b813c6e8",
   "./css/layouts/today.css": "31ae917bee386879",
   "./css/layouts/my-programme.css": "6fc8794818a509aa",
   "./css/layouts/library.css": "21c782973f58ddca",
   "./css/layouts/mobility-conditioning.css": "659731db8ac66fa7",
-  "./css/layouts/progress.css": "e037c18549bad175",
+  "./css/layouts/progress.css": "aafd53d8cb826116",
   "./css/layouts/goal-review.css": "a97c4a240fe903cf",
   "./css/components/session-guard.css": "e745184856d6bd97",
   "./css/components/weekly-plan.css": "4e89b83df4a2b43c",
@@ -4267,8 +4268,8 @@ const SHELL_HASHES = {
   "./css/components/capture.css": "343b4ae0dc6fe6ea",
   "./css/components/finish.css": "d048b8066d6e9d22",
   "./js/app.js": "4498f262196f4c67",
-  "./js/router.js": "6455a082a5460187",
-  "./js/store.js": "12533709d3e6c335",
+  "./js/router.js": "bbbc2ab57c9ac0f4",
+  "./js/store.js": "f48f7bc17c61919a",
   "./js/session-log.js": "d43815c658239179",
   "./js/exercise-feedback.js": "adba8549f444da2a",
   "./js/exercise-card.js": "78196b42671c67aa",
@@ -4292,7 +4293,7 @@ const SHELL_HASHES = {
   "./js/views/checkin-mini.js": "3f1764e87002d46f",
   "./js/views/coach-proposal.js": "31eb8b16c69b1673",
   "./js/views/workout.js": "7c29db66bc121ecc",
-  "./js/views/progress.js": "42d8d14d522b3195",
+  "./js/views/progress.js": "bc4bdbf7b01d7573",
   "./js/views/settings.js": "51c3bfeadd66479d",
   "./js/views/restore-flow.js": "dc81c2e455fa472d",
   "./js/views/weekly-plan.js": "0ec10ff9a6f7f133",
@@ -4326,7 +4327,7 @@ const SHELL_HASHES = {
   "./js/views/under-18.js": "7c1d5316b2e0a835",
   "./js/views/consent-update.js": "51f918f8e2c9b25a",
   "./js/data/arc-readback.js": "9b06dcba96534da0",
-  "./js/data/tier-table.js": "ba30bfb28d0b8b35",
+  "./js/data/tier-table.js": "f72328887db67d30",
   "./js/views/know-what.js": "e196bb8321f5218d",
   "./js/data/red-flag.js": "5ec90a31f4b9a8cc",
   "./js/data/health-consent.js": "a6432ebfb709d33c",
@@ -4389,7 +4390,7 @@ const SHELL_HASHES = {
   "./css/components/class-list.css": "e33b073b352399f3",
   "./css/components/class-player.css": "401cc57d7d39dbb1",
   "./js/views/saved-sessions.js": "0a357d6fa5c13830",
-  "./js/views/session-builder-ui.js": "62773fe6abab21e4",
+  "./js/views/session-builder-ui.js": "000f29af26271192",
   "./js/views/noticing.js": "54446d31544d9c5c",
   "./js/views/in-step.js": "196267c5da62e662",
   "./js/data/in-step-scenarios.js": "b46f085cda4d24fc",
@@ -4456,7 +4457,19 @@ const SHELL_HASHES = {
   "./assets/fonts/inter-latin-500-normal.woff2": "f3779f1efccc4bdc",
   "./assets/fonts/inter-latin-600-normal.woff2": "f9a06e79cd3a2a20",
   "./assets/fonts/inter-latin-700-normal.woff2": "6f56409fd3d64bb8",
-  "./assets/images/logo-icon-512.png": "83e03cc4171a36cc"
+  "./assets/images/logo-icon-512.png": "83e03cc4171a36cc",
+  "./js/data/progress-report.js": "8e29a439d162766c",
+  "./js/data/share-images.js": "0812f14d822387ad",
+  "./js/views/progress-share.js": "20b9d3e812af6999",
+  "./css/components/progress-share.css": "530655f5cd5c62b4",
+  "./assets/fonts/newsreader-latin-500-normal.woff2": "5613e2fc8377392c",
+  "./assets/fonts/newsreader-latin-400-italic.woff2": "fa9b900403949d9a",
+  "./assets/images/brand/alongside-icon-teal.png": "7b5bde05f9e32efe",
+  "./assets/images/brand/alongside-icon-deep.png": "c1b0f3540114649e",
+  "./assets/images/brand/alongside-wordmark-light.png": "256b444af1a7c7f2",
+  "./assets/images/brand/alongside-wordmark-dark.png": "aedc5179fe6f5b74",
+  "./assets/images/brand/bnh-mark-light.png": "6a94ad03d9faecdd",
+  "./assets/images/brand/bnh-mark-deep.png": "fdc8ee909e41e8f5"
 };
 // SHELL_HASHES:END
 const HASH_HEADER = "x-alongside-hash";
@@ -4755,7 +4768,19 @@ const SHELL_URLS = [
   "./assets/fonts/inter-latin-500-normal.woff2",
   "./assets/fonts/inter-latin-600-normal.woff2",
   "./assets/fonts/inter-latin-700-normal.woff2",
-  "./assets/images/logo-icon-512.png"
+  "./assets/images/logo-icon-512.png",
+  "./js/data/progress-report.js",
+  "./js/data/share-images.js",
+  "./js/views/progress-share.js",
+  "./css/components/progress-share.css",
+  "./assets/fonts/newsreader-latin-500-normal.woff2",
+  "./assets/fonts/newsreader-latin-400-italic.woff2",
+  "./assets/images/brand/alongside-icon-teal.png",
+  "./assets/images/brand/alongside-icon-deep.png",
+  "./assets/images/brand/alongside-wordmark-light.png",
+  "./assets/images/brand/alongside-wordmark-dark.png",
+  "./assets/images/brand/bnh-mark-light.png",
+  "./assets/images/brand/bnh-mark-deep.png"
 
 ];
 
