@@ -1,5 +1,17 @@
 /*
  * css/layouts/progress.css
+ * 06 Oct 2026 v10
+ *   D-12 PROGRESS-FIT (Graeme, 06 Oct: "the screen shifts right ... it's
+ *   every time"). The view is the screen's width and no wider (it sized
+ *   itself to its content, and the week chart's six no-wrap labels made
+ *   that 707px on a 412px phone; at normal text it spilled 22px into the
+ *   right-hand margin). The chart's columns may narrow; a week label
+ *   wraps; the count, bar and week sit in rows shared by every bar, so the
+ *   bars stand on one line however a label wraps. The view is a container:
+ *   when its text box is under 19 characters across (large text, or a
+ *   small phone) it is one thing per row: tiles stacked, the week chart on
+ *   its side, each row's tile above its words. The kinds of session sit
+ *   beside their dots (club-rooms.css spread them across the row).
  * 04 Oct 2026 v9
  *   LOOK-2 / LOOK-3. The overview is cards on the page ground (.pr-card):
  *   two number tiles, the coach's line, the weekly bars (taller, every bar
@@ -70,8 +82,10 @@
   gap: var(--space-5);
   padding: var(--space-5) var(--space-4);
   padding-bottom: var(--space-8);
+  width: 100%;
   max-width: 600px;
   margin: 0 auto;
+  container: progress / inline-size;
 }
 
 /* ── Header ───────────────────────────────────────────────────────────── */
@@ -536,19 +550,27 @@
 .pr-chart__summary { margin: 0 0 var(--space-2); font-size: var(--text-sm); color: var(--color-text-secondary); }
 .pr-bars {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: var(--space-2);
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-rows: auto auto auto;
+  column-gap: var(--space-2);
+  row-gap: 4px;
   align-items: end;
   margin: 0;
   padding: 0;
   list-style: none;
 }
-.pr-bar { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+/* Count, bar and week: three rows every bar shares (subgrid), so the bars
+   stand on one line however a week label wraps. */
+.pr-bar { display: grid; grid-row: span 3; grid-template-rows: subgrid; justify-items: center; }
+.pr-bar__value { align-self: end; }
+.pr-bar__track { align-self: end; }
+.pr-bar__week { align-self: start; }
 .pr-bar__value, .pr-bar__week {
   display: block;
-  height: 1.3em;
+  min-height: 1.3em;
   line-height: 1.3;
-  white-space: nowrap;
+  white-space: normal;
+  text-align: center;
   font-size: var(--text-xs, 0.75rem);
   color: var(--color-text-secondary);
   font-variant-numeric: tabular-nums;
@@ -713,7 +735,7 @@
   padding: 0;
   list-style: none;
 }
-.progress-shapes .progress-shapes__row { display: flex; align-items: center; gap: var(--space-2); padding: 0; border: 0; font-size: var(--text-sm); color: var(--color-text); }
+.progress-shapes .progress-shapes__row { display: flex; justify-content: flex-start; align-items: center; gap: var(--space-2); padding: 0; border: 0; font-size: var(--text-sm); color: var(--color-text); }
 .progress-shapes .progress-shapes__name { min-width: 0; }
 .progress-shapes .progress-shapes__count { color: var(--color-text-secondary); font-variant-numeric: tabular-nums; }
 .progress-shapes .progress-shapes__count::before { content: "\00b7\00a0"; }
@@ -791,3 +813,33 @@
 .pr-lift-group .pr-lift__name { font-weight: 600; }
 .pr-lift-group .pr-lift__text { text-align: left; }
 .pr-spark { flex: none; color: var(--k, var(--color-primary)); }
+
+/* ── D-12 PROGRESS-FIT. Large text: one thing per row. ─────────────────
+   The view's text box under 19 characters across: 332px at normal text on
+   a 412px phone is 20.75, so this starts a little above normal size (and
+   on a small phone at any size). */
+@container progress (max-width: 19em) {
+  .progress-header { flex-direction: column; align-items: stretch; gap: var(--space-3); }
+  .progress-tabs--seg { display: flex; }
+  .progress-tabs--seg .progress-tab { flex: 1; }
+  .progress-body > .progress-summary,
+  .progress-shapes .progress-shapes__list { grid-template-columns: minmax(0, 1fr); }
+  .pr-card, .progress-body > .progress-narrative { padding: var(--space-4); }
+  /* A row: its tile above the words, the arrow beside them. */
+  .pr-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: var(--space-2); row-gap: var(--space-2); padding: var(--space-3); }
+  .pr-row > .pr-tile { grid-column: 1; grid-row: 1; }
+  .pr-row > .pr-row__text { grid-column: 1; grid-row: 2; }
+  .pr-row > .pr-row__chevron { grid-column: 2; grid-row: 1 / span 2; align-self: center; }
+  .pr-page__head { flex-wrap: wrap; }
+  .pr-lift-group .pr-lift { flex-wrap: wrap; }
+
+  /* The week chart on its side: the week, a bar across, the count. */
+  .pr-bars { grid-template-columns: auto minmax(0, 1fr) auto; grid-template-rows: none; row-gap: var(--space-2); column-gap: var(--space-3); align-items: center; }
+  .pr-card .pr-bars { border-bottom: 0; }
+  .pr-bar { grid-column: 1 / -1; grid-row: auto; grid-template-columns: subgrid; grid-template-rows: none; align-items: center; justify-items: stretch; }
+  .pr-bar__week { grid-column: 1; grid-row: 1; align-self: center; text-align: left; white-space: nowrap; }
+  .pr-bar__track, .pr-card .pr-bar__track { grid-column: 2; grid-row: 1; align-self: center; width: 100%; max-width: none; height: 1.5em; }
+  .pr-bar__value { grid-column: 3; grid-row: 1; align-self: center; text-align: right; }
+  .pr-bar__track::before, .pr-card .pr-bar__track::before { inset: 0 auto 0 0; height: auto; width: var(--h); border-radius: 0 6px 6px 0; }
+  .pr-bar__fill, .pr-card .pr-bar__fill { left: 0; top: 0; bottom: 0; right: auto; height: auto; width: var(--f); border-radius: 0 6px 6px 0; }
+}

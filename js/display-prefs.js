@@ -1,5 +1,11 @@
 /**
  * js/display-prefs.js
+ * 06 Oct 2026 v7
+ *
+ * v7 - D-12 PROGRESS-FIT. Text size goes up to 2 (was 1.6). The setting
+ *   was applied twice until reset.css v1, so 1.6 drew text at 2.56x; now
+ *   it means what it says, and 2 keeps twice the size within reach.
+ *
  * 03 Oct 2026 v6
  *
  * v6 - W5-21 SMALL-5. Reset display to defaults keeps Vibration as it was
@@ -120,7 +126,7 @@ export const SCHEME_CLASS = {
 };
 
 export const DISPLAY_RANGES = {
-  textScale:     { min: 0.9, max: 1.6,  step: 0.05 },
+  textScale:     { min: 0.9, max: 2,    step: 0.05 },
   leadingScale:  { min: 0.9, max: 1.35, step: 0.05 },
   letterSpacing: { min: 0,   max: 0.12, step: 0.01 },
 };

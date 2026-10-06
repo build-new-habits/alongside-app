@@ -1,3 +1,8 @@
+/* buttons.css - 06 Oct 2026 v2: D-12 PROGRESS-FIT. A full-width button wraps its words
+   (.btn is nowrap, so "None of these, show me everything" and "Not sure?
+   I'll pick something" ran off the phone at large text). Line height 1.25
+   for a wrapped second line; one line stays inside the 48px minimum; two
+   lines are balanced, so one word is not left alone underneath. */
 /* buttons.css - 14 May 2026 v1: replaced ::before hover overlay with brightness filter */
 /* buttons.css - Modern button components for Midnight Teal theme */
 
@@ -154,6 +159,9 @@
 
 .btn-full {
   width: 100%;
+  white-space: normal;
+  line-height: 1.25;
+  text-wrap: balance;
 }
 
 /* ============================================

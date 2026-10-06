@@ -1,5 +1,9 @@
 /*
  * css/layouts/today.css
+ * 06 Oct 2026 v12
+ *   D-12 PROGRESS-FIT. Free Home's door tiles: as many columns as fit
+ *   9 characters each (two at normal text, one at large text). Two fixed
+ *   columns pushed "Mobility & Conditioning" off the phone at 2x.
  * 05 Oct 2026 v11
  *   D-8 TEXT-FIT (device test, 05 Oct). Only 10 minutes and Something else
  *   today ran out of their buttons side by side at a large text size: they
@@ -265,7 +269,7 @@
 
 .today-doors {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 9em), 1fr));
   gap: var(--space-3);
   margin-top: var(--space-2);
 }

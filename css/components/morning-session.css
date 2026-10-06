@@ -1,9 +1,14 @@
 /* ── Morning Session View ──────────────────────────────────────────────────── */
+/* css/components/morning-session.css
+   06 Oct 2026 v1
+   v1 - D-12 PROGRESS-FIT. The week grid: as many columns as fit 6
+   characters each (three at normal text, fewer at large text); three
+   fixed columns ran off the phone at 2x. First dated header. */
 
 /* Week selector grid */
 .ms-week-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 6em), 1fr));
   gap: var(--space-2);
   margin-bottom: var(--space-2);
 }

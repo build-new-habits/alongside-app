@@ -1,4 +1,14 @@
-/* reset.css - Modern CSS reset for Alongside */
+/* reset.css - Modern CSS reset for Alongside
+   06 Oct 2026 v1
+   v1 - D-12 PROGRESS-FIT. The root is the browser's own size (100%). It
+   was calc(16px * var(--user-text-scale)), and every text token in
+   variables.css multiplies by the same setting, so the setting was applied
+   twice: 1.45 drew text at 2.1x, 1.6 at 2.56x, and screens ran off the
+   side of the phone. The tokens alone carry it now (verify-disp1 TEST 3,
+   verify-text-fit 5). Spacing in rem no longer grows with the text, which
+   leaves the words the room. body: overflow-wrap break-word, so a web or
+   email address too long for a line breaks rather than running off the
+   phone (it changes nothing that fits). First dated header. */
 
 *, *::before, *::after {
   box-sizing: border-box;
@@ -7,7 +17,7 @@
 }
 
 html {
-  font-size: calc(16px * var(--user-text-scale, 1));
+  font-size: 100%;
   -webkit-text-size-adjust: 100%;
   -webkit-tap-highlight-color: transparent;
   scroll-behavior: smooth;
@@ -22,6 +32,7 @@ body {
   text-rendering: optimizeLegibility;
   overscroll-behavior: none;
   overflow-x: hidden;
+  overflow-wrap: break-word;
 }
 
 img, picture, video, canvas, svg {

@@ -1,6 +1,15 @@
 /* ============================================
    WORKOUT STYLES
    css/components/workout.css
+   06 Oct 2026 v22
+
+   v22 - D-12 PROGRESS-FIT. .workout-header wraps: at large text the
+   title ("Breathing") was squeezed between Back and the home button and
+   split mid-word; now it drops under Back when it does not fit. The
+   title starts from 6 characters' width (it grows to fill the row), so
+   at normal text it stays beside Back as before; judged at its full
+   one-line width it dropped a line even at normal size.
+
    05 Oct 2026 v21
 
    v21 - D-8 TEXT-FIT (device test, 05 Oct: "2 sets, this long each"
@@ -286,10 +295,13 @@
 
 .workout-header {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
+  row-gap: var(--space-1);
   margin-bottom: var(--space-2);
 }
+.workout-header > .workout-header-title { flex-basis: 6em; }
 
 .workout-progress-info {
   font-size: var(--text-sm);
