@@ -1,6 +1,12 @@
 /**
  * library.js - Library Page
  *
+ * 12 Oct 2026 v17
+ *
+ * v17 - A-2 ONE-PLAN-SCREEN (Stage AWARD). On the Plan, At home › Core
+ *   opens Today's plan for a core session (it opened the core session's own
+ *   screens). Free unchanged.
+ *
  * 12 Oct 2026 v16
  *
  * v16 - A-1 PLAN-HOME-PRUNE (Stage AWARD). Two tiles on the Plan only:
@@ -786,6 +792,13 @@ export function onMount() {
       const place = screen === "guided-gym" ? "gym" : screen === "guided-home" ? "home" : null;
       if (target === "session-builder" && preselectType && place) {
         planFor(preselectType, place);
+        return;
+      }
+      // A-2 ONE-PLAN-SCREEN (v17). On the Plan, Core is Today's plan for a
+      // core session too, on the one plan screen and player. Free keeps the
+      // core session's own screens.
+      if (target === "core-session" && place && isPremium()) {
+        planFor("core", place);
         return;
       }
       navigateToSession(target, quiet, preselectType);

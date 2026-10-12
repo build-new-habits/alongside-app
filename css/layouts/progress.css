@@ -1,5 +1,7 @@
 /*
  * css/layouts/progress.css
+ * 12 Oct 2026 v12
+ *   A-7 EMPTY-AND-FIRST. .pr-empty: Progress before the first session.
  * 06 Oct 2026 v11
  *   D-11 PROGRESS-SHARE. The header is the title, the days it covers, then
  *   the window tabs across the full width (Today, 7, 14, 30, and 90 on the
@@ -888,3 +890,14 @@
   .pr-bar__track::before, .pr-card .pr-bar__track::before { inset: 0 auto 0 0; height: auto; width: var(--h); border-radius: 0 6px 6px 0; }
   .pr-bar__fill, .pr-card .pr-bar__fill { left: 0; top: 0; bottom: 0; right: auto; height: auto; width: var(--f); border-radius: 0 6px 6px 0; }
 }
+
+/* A-7 EMPTY-AND-FIRST, 12 Oct 2026 (both tiers). Before the first session. */
+.pr-empty {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: var(--space-3); text-align: center;
+  min-height: 55vh; padding: var(--space-6, 2rem) var(--space-4);
+}
+.pr-empty__art { color: var(--color-border); }
+.pr-empty__h { margin: 0; font-size: var(--text-xl, 1.25rem); font-weight: 700; color: var(--color-text); }
+.pr-empty__line { margin: 0; max-width: 28ch; color: var(--color-text-secondary); line-height: 1.5; }
+.pr-empty .btn { min-width: 0; max-width: 100%; white-space: normal; }

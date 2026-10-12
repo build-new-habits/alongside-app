@@ -1,5 +1,14 @@
 /**
  * tools/verify-mobility-door.mjs
+ * 12 Oct 2026 v5
+ *
+ * v5 - A-2 ONE-PLAN-SCREEN (Stage AWARD). REVERSAL on the Plan only: Start a
+ *   Mobility Session opens Today's plan for a mobility session (the hand-over
+ *   I know what I want makes), through today's check-in, not the builder's
+ *   own preview. Never the core session (1b), and the session it builds
+ *   passes the shared filters (1d): unchanged. Free still opens the builder
+ *   (1e, Graeme, 12 Oct: Free is left alone).
+ *
  * 02 Oct 2026 v4
  *
  * v4 - W5-3 FLOOR-SITTING. The one yoga move this seated, off-the-floor
@@ -179,15 +188,20 @@ console.log("\nTEST 1 - \"Start a Mobility Session\" opens a mobility session");
   const card = main.querySelector("#mc-start-session");
   ok("1pc. the card is there", !!card && /Mobility/.test(card.textContent));
   click(card); await wait(10);
-  const pre = store.get("sessionBuilderPreselect") || {};
-  ok("1a. not checked in today: through the check-in, to the builder, as Mobility",
-     navs.at(-1) === "checkin" && store.get("pendingDoorRoute") === "session-builder" && pre.type === "mobility",
-     `${JSON.stringify(navs)} pending ${store.get("pendingDoorRoute")} preselect ${JSON.stringify(pre)}`);
+  ok("1a. not checked in today: through the check-in, to Today's plan, as Mobility",
+     navs.at(-1) === "checkin" && store.get("pendingDoorRoute") === "coach-proposal" && store.get("requestedSessionType") === "mobility",
+     `${JSON.stringify(navs)} pending ${store.get("pendingDoorRoute")} requested ${store.get("requestedSessionType")}`);
   ok("1b. never the core session", !navs.includes("core-session"), JSON.stringify(navs));
   store.set("lastCheckin", { energy: 6, mood: 6, timestamp: new Date().toISOString() });
   navs = []; main.innerHTML = ""; MobilityConditioningView(rtr).mount(main); await wait(10);
   click(main.querySelector("#mc-start-session")); await wait(10);
-  ok("1c. checked in: straight to the builder, as Mobility", navs.at(-1) === "session-builder" && (store.get("sessionBuilderPreselect") || {}).type === "mobility", JSON.stringify(navs));
+  ok("1c. checked in: straight to Today's plan, as Mobility", navs.at(-1) === "coach-proposal" && store.get("requestedSessionType") === "mobility", JSON.stringify(navs));
+  // v5. Free is left alone: its door still opens the builder.
+  store.set("tier", "free");
+  navs = []; main.innerHTML = ""; MobilityConditioningView(rtr).mount(main); await wait(10);
+  click(main.querySelector("#mc-start-session")); await wait(10);
+  ok("1e. on Free, the builder, as Mobility, as before", navs.at(-1) === "session-builder" && (store.get("sessionBuilderPreselect") || {}).type === "mobility", JSON.stringify(navs));
+  store.set("tier", "personal");
   const allows = SB.personFilter({ equipment: [] });
   const s = SB.buildSession({ sessionType: "mobility", durationMins: 20, equipmentOverride: [] });
   const off = s.exercises.filter(e => !allows(EXERCISES.find(x => x.id === e.id) || e)).map(e => e.name);

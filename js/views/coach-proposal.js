@@ -1,5 +1,14 @@
 /**
  * coach-proposal.js
+ * 12 Oct 2026 v57
+ *
+ * v57 - A-4 SHARED-POLISH (Stage AWARD; Graeme, 12 Oct: the shared screens
+ *   tidied on both tiers, the difference kept in what the Plan does). Today's
+ *   plan: a plain "‹ Home" top left in place of the outlined ✕; no greeting
+ *   or yesterday's line (Home has just said both); a sore-area or coming-
+ *   back line still leads; Where, Length and Focus as a row of pills (their
+ *   names stay in each button's name). Swap and Focus stay the Plan's.
+ *
  * 12 Oct 2026 v56
  *
  * v56 - A-3 RETIRE-WEEKLY-PLAN (Stage AWARD). With Your week set, the old
@@ -1245,12 +1254,16 @@ export function CoachProposalView(router) {
            ${previewOpen ? '' : 'hidden'}>
         <div class="cp-preview-panel__backdrop"></div>
         <div class="cp-preview-panel__content"${previewRow !== null ? ' inert aria-hidden="true"' : ''}>
-          <button class="cp-preview-panel__close" id="cp-preview-close" aria-label="Close">✕</button>
+          <!-- A-4 (v57, Stage AWARD, both tiers): a plain Back to Home, top
+               left, in place of an outlined ✕; the greeting and yesterday's
+               line went (Home has just said both). What matters today, a
+               sore area or coming back, still leads. -->
+          <button class="cp-preview-panel__close" id="cp-preview-close" aria-label="Back to Home">
+            <span aria-hidden="true">‹</span> Home
+          </button>
 
-          ${proposal ? `
+          ${proposal && (proposal.constraint || proposal.reentryLine) ? `
             <div class="cp-coach-block cp-coach-block--in-panel" aria-live="polite">
-              <div class="cp-greeting">${proposal.greeting}</div>
-              ${proposal.reflection ? `<p class="cp-reflection">${proposal.reflection}</p>` : ''}
               ${proposal.constraint ? `
                 <div class="cp-constraint" role="status" aria-live="polite">
                   <span class="cp-constraint__icon" aria-hidden="true">🌱</span>

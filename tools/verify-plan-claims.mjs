@@ -1,6 +1,11 @@
 /**
  * tools/verify-plan-claims.mjs
- * 12 Oct 2026 v8
+ * 12 Oct 2026 v9
+ *
+ * v9 - A-7 EMPTY-AND-FIRST. 3.progress and 3.arc: the person has one finished
+ *   session. Before the first, Progress is "Nothing here yet" on both tiers
+ *   (no days to choose between), so the tier difference in days is read
+ *   where it exists. The claim and its words are unchanged.
  *
  * v8 - A-1 PLAN-HOME-PRUNE. 3.home: the Plan's three ways in are read from
  *   the controls themselves (start-today, know-what, as-i-go), because with
@@ -181,9 +186,9 @@ tierFixture("personal"); store.set("savedSessions", [{ id: "s", name: "Mine", ex
 ok("3.saved  saving sessions is the Plan's; free builds any session itself", freeSaved === 0 && freeSave === false && SS.savedSessions().length === 1);
 
 const ARC = { active: true, aimId: "floor-unaided", strands: ["leg-strength"], startedAt: new Date(Date.now() - 7 * 86400000).toISOString(), zonesWorked: {}, typesWorked: {} };
-tierFixture("free"); store.set("arc", ARC); mountView(ProgressView);
+tierFixture("free"); store.set("arc", ARC); store.set("activityLog", [{ id: "p1", type: "workout", sessionType: "upper", completedAt: new Date(Date.now() - 2 * 864e5).toISOString(), durationMins: 30 }]); mountView(ProgressView);   // v9
 const fProg = { arc: !!box.querySelector("#pr-arc-h"), windows: [...box.querySelectorAll("[data-window]")].map(b => b.dataset.window).join(","), locked: !!box.querySelector(".progress-tab--locked"), share: /Share your progress/.test(txt(box)), thirty: /last 30 days/.test(txt(box)) || /Nothing logged/.test(txt(box)) };
-tierFixture("personal"); store.set("arc", ARC); mountView(ProgressView);
+tierFixture("personal"); store.set("arc", ARC); store.set("activityLog", [{ id: "p1", type: "workout", sessionType: "upper", completedAt: new Date(Date.now() - 2 * 864e5).toISOString(), durationMins: 30 }]); mountView(ProgressView);   // v9
 const pProg = { arc: !!box.querySelector("#pr-arc-h"), windows: [...box.querySelectorAll("[data-window]")].map(b => b.dataset.window).join(",") };
 ok("3.progress  free: today, 7, 14 or 30 days and sharing; the Plan: the same and 90 days, with the arc read back",
    !fProg.arc && fProg.windows === "today,7,14,30" && !fProg.locked && fProg.share && fProg.thirty && pProg.arc && pProg.windows === "today,7,14,30,90", JSON.stringify({ fProg, pProg }));

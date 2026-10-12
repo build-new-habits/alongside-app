@@ -2,6 +2,12 @@
    REFLECT VIEW STYLES
    css/components/reflect.css
 
+   12 Oct 2026 v4
+
+   v4 - A-5 SIGNATURE-MOMENTS. The tick larger and centred (it scales in
+   once, never under Reduce motion); .finish-arc, the Plan's arc line;
+   .finish-keep, Keep to repeat folded like Add a note.
+
    04 Oct 2026 v3
 
    v3 - LOOK-4. The finish screen: a tick tile above the heading; the
@@ -152,3 +158,27 @@
   border-radius: 20px;
 }
 .finish-view .finish-more { padding: var(--space-2) var(--space-4); }
+
+/* A-5 SIGNATURE-MOMENTS, 12 Oct 2026 (both tiers; .finish-arc the Plan's).
+   The finish as a moment: the tick larger and centred over the heading;
+   the arc line; Keep to repeat folded like Add a note. */
+.finish-head { align-items: center; text-align: center; }
+.finish-head > .kind-tile--lg {
+  width: 88px; height: 88px; border-radius: 50%;
+  border: 3px solid var(--kind-teal, var(--color-primary));
+}
+.finish-head > .kind-tile--lg svg { width: 44px; height: 44px; }
+.finish-arc {
+  display: flex; align-items: center; gap: var(--space-3);
+  margin: var(--space-4) 0 0; padding: var(--space-3) var(--space-4);
+  background: var(--color-bg); border: 1px solid var(--color-border-light); border-radius: 16px;
+  color: var(--color-text-secondary); line-height: 1.45;
+}
+.finish-arc svg { flex: none; color: var(--kind-teal, var(--color-primary)); }
+.finish-arc strong { color: var(--color-text); }
+.finish-view .finish-keep { margin-top: var(--space-3); }
+.finish-keep .save-block { border: 0; padding: 0; background: none; }
+@media (prefers-reduced-motion: no-preference) {
+  :root:not(.reduce-motion) .finish-head > .kind-tile--lg { animation: finish-tick 420ms ease-out both; }
+}
+@keyframes finish-tick { from { transform: scale(0.6); opacity: 0; } to { transform: scale(1); opacity: 1; } }

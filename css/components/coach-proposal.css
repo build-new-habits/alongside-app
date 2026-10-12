@@ -1,6 +1,10 @@
 /*
  * css/components/coach-proposal.css
- * 04 Oct 2026 v13
+ * 12 Oct 2026 v14
+ *
+ * v14 - A-4 SHARED-POLISH (both tiers). "‹ Home" top left in place of
+ *   the ✕; Where, Length and Focus as a row of pills.
+ *
  *
  * v13 - D-2 PLAN-PREVIEW. .cp-plan__open (the row's name area is a button
  *   with a chevron, at least 44px) and .cp-xprev (the exercise sheet over
@@ -982,3 +986,41 @@
   font-size: var(--text-sm);
   flex-shrink: 0;
 }
+
+/* ============================================================
+   A-4 SHARED-POLISH, 12 Oct 2026 (both tiers). Today's plan:
+   "‹ Home" top left in place of the ✕; Where, Length and Focus as
+   a row of pills. Each button's name still says which it is
+   ("Length: 30 min. Change"), so the visible labels can go.
+   ============================================================ */
+.cp-preview-panel__close {
+  align-self: flex-start;
+  margin-right: 0;
+  margin-left: calc(-1 * var(--space-2));
+  padding: 0 var(--space-2);
+  color: var(--color-text);
+  font-size: var(--text-base);
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+.cp-assumptions {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+.cp-assumptions__row { display: contents; }
+.cp-assumptions__label { display: none; }
+.cp-assumptions__change {
+  min-height: 44px;
+  border-radius: 999px;
+  padding: 0 var(--space-4);
+}
+.cp-assumptions__change::after {
+  content: "\25BE";
+  margin-left: var(--space-2);
+  opacity: 0.75;
+}
+.cp-assumptions__change[aria-expanded="true"]::after { content: "\25B4"; }
+.cp-assumptions__choices { flex-basis: 100%; }

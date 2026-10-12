@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 12 Oct 2026 v658
+ * 12 Oct 2026 v659
  *
+ * v659 - Stage AWARD (Graeme, 12 Oct: tidy the shared screens on both tiers, keep the difference in what the Plan does). On the Plan, Mobility & Conditioning, the stretch arc and the Library's Core open Today's plan and the one player (A-2; Free keeps its builder and core session). Today's plan: "‹ Home" in place of the ✕, no repeated greeting, Where, Length and Focus as pills. The finish: a larger tick; on the Plan, the arc's strands worked today; Keep this one? folded into Keep to repeat. Progress before the first session says so, with the arc, the weight note and the rows one tap away kept. The bottom bar has line icons in place of emoji.
  * v658 - A-1 PLAN-HOME-PRUNE (Graeme approved the mock-up, 12 Oct: "I love plan home"): Plan Home leads with one Today card (the day from your week, a rest day, or, with nothing set, your arc and Tell me what to do), your arc a line inside it, then the doors and one Library row: six ways in at most. Join a class, Go for a run, Something for the mind and Your week are in the Library (Classes and Your week as new tiles on the Plan only). The week card's Only 10 minutes went (the plan's Length does it). Free Home and Free's Library are unchanged.
  * v657 - Stage AWARD, first batch (Graeme, 12 Oct: "Great plan. Let's go with it"): on the Plan, Settings › Your week opens Your week and, once it is set, the older weekly plan no longer leads the coach's plan; Free keeps its weekly plan, and Settings no longer says the coach uses it (A-3). Three exercise descriptions made to match their own instructions: the internal-rotation band is anchored on the same side as the working arm; Thoracic Rotation and Side-Lying Thoracic Rotation (was Prone) lie on the side (A-6). After Home, the screens people open next load while the phone is idle, so their first open is quicker; the page's character set is declared where browsers look for it (A-8). Something different today names Make it up as I go by its name (A-9). NEW FILE precached: js/data/warm-views.js.
  * v656 - D-11 PROGRESS-SHARE (Graeme, 06 Oct): Progress shows today and the last 7, 14 or 30 days on both tiers, and 90 on the Plan; Download today's report says what was done, where and how many; Share your progress makes a picture, a certificate, a report to print or save as a PDF, or text to copy (with a CSV), on both tiers. The picture holds only sessions and kinds unless the person switches more on; the journal, notes and weight are never included; check-in answers only by choice and with the health consent. Each session records where it was done. NEW FILES precached: js/data/progress-report.js, js/data/share-images.js, js/views/progress-share.js, css/components/progress-share.css, two Newsreader font files and six brand logo images.
@@ -4205,7 +4206,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v658";
+const CACHE_NAME = "alongside-v659";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4213,8 +4214,8 @@ const CACHE_NAME = "alongside-v658";
 // downloads only the rest: it fetched all of them (about 6 MB) every time.
 // SHELL_HASHES:BEGIN
 const SHELL_HASHES = {
-  "./": "125ce489a4d2308a",
-  "./index.html": "125ce489a4d2308a",
+  "./": "662d5f7fe44e93eb",
+  "./index.html": "662d5f7fe44e93eb",
   "./css/main.css": "e306ded0118cbea6",
   "./css/base/fonts.css": "04893bbdfa4cf013",
   "./css/layouts/onboarding-additions.css": "a204c285b813c6e8",
@@ -4222,19 +4223,19 @@ const SHELL_HASHES = {
   "./css/layouts/my-programme.css": "6fc8794818a509aa",
   "./css/layouts/library.css": "21c782973f58ddca",
   "./css/layouts/mobility-conditioning.css": "659731db8ac66fa7",
-  "./css/layouts/progress.css": "aafd53d8cb826116",
+  "./css/layouts/progress.css": "1433214bd49e127e",
   "./css/layouts/goal-review.css": "a97c4a240fe903cf",
   "./css/components/session-guard.css": "e745184856d6bd97",
   "./css/components/weekly-plan.css": "4e89b83df4a2b43c",
   "./css/components/breathing-session.css": "a781b7bd351396ff",
   "./css/components/quiet-session.css": "34a8b26534013674",
   "./css/components/noticing.css": "f7d98b66333ab59f",
-  "./css/components/coach-proposal.css": "45ff041d162cb14b",
+  "./css/components/coach-proposal.css": "17dd57e038afae41",
   "./css/components/settings.css": "842c509c12f3f399",
   "./css/components/weekly-plan-v2.css": "4f70501241fc4fa0",
   "./css/components/gym-programme.css": "79be04064c6bd328",
   "./css/components/journal-entry.css": "dd51da5425ee545b",
-  "./css/components/reflect.css": "a9f38ee926ac2ec3",
+  "./css/components/reflect.css": "40cdc625f934a9bb",
   "./css/components/red-flag.css": "7297aeac122d7e37",
   "./css/components/know-what.css": "6f1d7faff6783932",
   "./css/components/nav-fix.css": "ee5db4b763633630",
@@ -4261,7 +4262,7 @@ const SHELL_HASHES = {
   "./css/components/morning-session.css": "88a53b15036d446d",
   "./css/components/settings-library.css": "6e8065c1fb782ba8",
   "./css/components/workout.css": "ab211d4342e47a1f",
-  "./css/layouts/app-shell.css": "0e1573a9c6b0e5e4",
+  "./css/layouts/app-shell.css": "a7b24b10fea16cc7",
   "./css/layouts/goal-setup.css": "32ded4f3cacc0b13",
   "./css/layouts/onboarding.css": "9dd282cf6249ceae",
   "./css/components/tier-gating.css": "d739441e1e3f3816",
@@ -4288,18 +4289,18 @@ const SHELL_HASHES = {
   "./js/session-resume.js": "6916b88c0757374f",
   "./js/auth.js": "9b9c7a632dccada6",
   "./js/views/today.js": "29e4cc210e80dd9d",
-  "./js/views/mobility-conditioning.js": "d77cde7833239666",
+  "./js/views/mobility-conditioning.js": "dd64370231617186",
   "./js/views/arc-setup.js": "bc3f0046616fc07b",
-  "./js/views/stretch-arc.js": "e67d2715e6019eb9",
+  "./js/views/stretch-arc.js": "fce3ddbd29c7fb30",
   "./js/views/checkin.js": "29d45c08868e3e8f",
   "./js/views/checkin-mini.js": "3f1764e87002d46f",
-  "./js/views/coach-proposal.js": "45edea5aed331843",
+  "./js/views/coach-proposal.js": "95200d66481ffa8a",
   "./js/views/workout.js": "7c29db66bc121ecc",
-  "./js/views/progress.js": "bc4bdbf7b01d7573",
+  "./js/views/progress.js": "63cf6b5568af45e7",
   "./js/views/settings.js": "74e5899414373a9a",
   "./js/views/restore-flow.js": "dc81c2e455fa472d",
   "./js/views/weekly-plan.js": "dcee06e297b402c0",
-  "./js/views/reflect.js": "245bc9bc3cde358a",
+  "./js/views/reflect.js": "f4e0034752548a00",
   "./js/data/empathy-transfer.js": "b3513396b3541e3a",
   "./js/data/equipment-map.js": "b3460207997a4fa5",
   "./js/data/exercises/gym.js": "34140029424a4dce",
@@ -4321,7 +4322,7 @@ const SHELL_HASHES = {
   "./js/views/programme-select.js": "8f1e740ed2db223b",
   "./js/views/upgrade.js": "4b7233092e3561da",
   "./js/views/privacy.js": "a64dfefd8a24d1ac",
-  "./js/views/library.js": "b338defd49ca0775",
+  "./js/views/library.js": "910e8fae94e5aab2",
   "./js/views/practices.js": "69ede443c8d69360",
   "./js/views/red-flag.js": "cfe041e1e4da9ecb",
   "./js/views/health-consent.js": "eaead26a28761859",

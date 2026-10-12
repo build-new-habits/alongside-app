@@ -1,6 +1,14 @@
 /**
  * reflect.js - Reflect Screen
  *
+ * 12 Oct 2026 v18
+ *
+ * v18 - A-5 SIGNATURE-MOMENTS (Stage AWARD; both tiers, the arc line the
+ *   Plan's only). The finish: a larger tick, centred; on the Plan, "Your
+ *   arc today:" with the strands worked today, from the arc's own dates;
+ *   Keep this one? folded into a "Keep to repeat" disclosure beside Add a
+ *   note. Words, order of questions and behaviour otherwise unchanged.
+ *
  * 04 Oct 2026 v17
  *
  * v17 - LOOK-4 (Graeme approved the mock-up, 04 Oct). The finish screen:
@@ -213,6 +221,8 @@ import { healthAllowed } from "../data/health-consent.js";
 import { kindOf }        from "../data/kind-colours.js";
 import { lineIcon }      from "../data/line-icons.js";
 import { store }          from "../store.js";
+import { isPremium }      from "../auth.js";
+import { strandReadback } from "../data/arc-readback.js";
 import { SAFETY_LINE }    from "../data/purpose.js";
 // SAVE-ALL, 16 Sep 2026. Eleven views route here when a session ends,
 // so the "keep this one?" offer lives here once rather than being
@@ -762,6 +772,8 @@ export function render() {
         ).join('<span class="finish-stat__sep" aria-hidden="true"> \u00B7 </span>')}</p>` : ""}
       </div>
 
+      ${_arcToday()}
+
       ${renderSessionMoments({ exerciseIds: _sessionExerciseIds(entry) })}
 
       <div class="reflect-section">
@@ -820,7 +832,16 @@ export function render() {
                   aria-labelledby="finish-note-label">${openText}</textarea>
       </details>` : ""}
 
-      ${renderSaveBlock()}
+      ${(() => {
+        // A-5 (v18). Keep this one? folded into a "Keep to repeat"
+        // disclosure, like Add a note: the save is one tap away, not a form
+        // on the screen. The Plan's only, as before (renderSaveBlock).
+        const save = renderSaveBlock();
+        return save ? `<details class="finish-more finish-keep reflect-section">
+          <summary class="finish-more__summary">Keep to repeat</summary>
+          ${save}
+        </details>` : "";
+      })()}
 
       <button class="btn btn-primary btn-large btn-full" id="reflect-done-btn"
               style="margin-top: var(--space-4);">
@@ -829,6 +850,27 @@ export function render() {
 
     </div>
   `;
+}
+
+/**
+ * A-5 SIGNATURE-MOMENTS (v18). The Plan's arc, on the finish: which strands
+ * have been worked today. Read from the arc's own dates (strandReadback),
+ * so it says only what is true; "today", not "this one", because another
+ * session today may have worked it too. Never a count. The Plan's only:
+ * Free has no arc.
+ */
+function _arcToday() {
+  if (!isPremium()) return "";
+  const arc = store.get("arc") || {};
+  if (!arc.active || !arc.aimId) return "";
+  const today = new Date().toISOString().slice(0, 10);
+  const lit = strandReadback(arc).filter(s => s.last === today).map(s => s.label);
+  if (!lit.length) return "";
+  return `<p class="finish-arc">${lineIcon("arc", 20)}
+    <span>Your arc today: <strong>${lit.map(_escHtml).join("</strong> and <strong>")}</strong>.</span></p>`;
+}
+function _escHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 }
 
 /** Where the mood slider starts: today's check-in, else the middle. Shown, never stored. */

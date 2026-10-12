@@ -1,4 +1,9 @@
 /* app-shell.css - Main app container with Midnight Teal theme
+ * 12 Oct 2026 v4
+ *
+ * v4 - A-4 SHARED-POLISH. The bottom bar's icons are inline line icons
+ *   (index.html v12), sized by .nav-icon as before.
+ *
  * 06 Oct 2026 v3
  *
  * v3 - D-12 PROGRESS-FIT. The bottom navigation's labels and icons grow
@@ -441,3 +446,8 @@
     height: 120px;
   }
 }
+
+/* A-4 SHARED-POLISH, 12 Oct 2026. The bar's icons are line icons sized by
+   .nav-icon's font-size (1em), coloured by the item (currentColor). */
+.nav-icon { display: inline-flex; line-height: 1; }
+.nav-svg { display: block; }

@@ -1,8 +1,13 @@
-<!-- index.html | 12 Oct 2026 v11 -->
+<!-- index.html | 12 Oct 2026 v12 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+<!--
+  v12 — A-4 SHARED-POLISH (Stage AWARD), 12 Oct 2026. The bottom bar's
+  icons are the app's line icons (inline SVG, currentColor, aria-hidden), in
+  place of emoji, on both tiers. Same buttons, names and order.
+-->
 <!--
   v11 — A-8 SPEED (Stage AWARD), 12 Oct 2026. <meta charset> moved into the
   first 1024 bytes, where a browser looks for it (Lighthouse "charset"): the
@@ -307,11 +312,11 @@
     <!-- Bottom navigation -->
     <nav id="bottom-nav" class="bottom-nav hidden" aria-label="Main navigation">
       <button class="nav-item active" data-nav="today" aria-label="Today" aria-current="page">
-        <span class="nav-icon" aria-hidden="true">🏠</span>
+        <span class="nav-icon" aria-hidden="true"><svg class="nav-svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M4 11l8-7 8 7v9H4z"/><path d="M10 20v-5h4v5"/></svg></span>
         <span class="nav-label">Today</span>
       </button>
       <button class="nav-item" data-nav="progress" aria-label="Progress">
-        <span class="nav-icon" aria-hidden="true">📊</span>
+        <span class="nav-icon" aria-hidden="true"><svg class="nav-svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M5 20V12M12 20V5M19 20v-9"/></svg></span>
         <span class="nav-label">Progress</span>
       </button>
       <!-- TIER-F, 13 Aug 2026. Label changed from "Noticing" to
@@ -321,11 +326,11 @@
            needs the philosophy to decode it, and a nav label is the
            worst place in a product to ask for that. -->
       <button class="nav-item" data-nav="noticing" aria-label="Wellbeing">
-        <span class="nav-icon" aria-hidden="true">🌿</span>
+        <span class="nav-icon" aria-hidden="true"><svg class="nav-svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M5 19c8 0 14-6 14-14C11 5 5 11 5 19zM5 19l7-7"/></svg></span>
         <span class="nav-label">Wellbeing</span>
       </button>
       <button class="nav-item" data-nav="settings" aria-label="Settings">
-        <span class="nav-icon" aria-hidden="true">⚙️</span>
+        <span class="nav-icon" aria-hidden="true"><svg class="nav-svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg></span>
         <span class="nav-label">Settings</span>
       </button>
     </nav>

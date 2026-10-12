@@ -1,5 +1,14 @@
 /**
  * progress.js
+ * 12 Oct 2026 v28
+ *
+ * v28 - A-7 EMPTY-AND-FIRST (Stage AWARD, both tiers). Before the first
+ *   finished session: "Nothing here yet", one line, and Start today's
+ *   session (the coach's, through today's check-in), in place of tabs over
+ *   zeros and empty charts. The arc read back (the Plan's), the weight-rate
+ *   note and the rows one tap away (Your weight, lifts, the programme,
+ *   Share) stay. From the first session, as before.
+ *
  * 06 Oct 2026 v27
  *
  * v27 - D-11 PROGRESS-SHARE (Graeme, 06 Oct: "Progress pages to show today,
@@ -407,6 +416,47 @@ export function ProgressView(router) {
     const range = windowRange(activeWindow);
     const name  = store.get('name') || '';
     const stats = getProgressStats();
+
+    // A-7 EMPTY-AND-FIRST (v28, both tiers). Before the first finished
+    // session there is nothing to chart: a heading, one line and one way
+    // to start, not tabs over zeros and empty bars.
+    if (!activePage && !store.completedSessions(store.get('activityLog')).length) {
+      container.innerHTML = `
+        <div class="progress-view">
+          <header class="progress-header">
+            <div class="progress-header__titles">
+              <h1 class="progress-title" tabindex="-1">Progress</h1>
+            </div>
+          </header>
+          <section class="pr-empty" aria-labelledby="pr-empty-h">
+            <svg class="pr-empty__art" width="120" height="80" viewBox="0 0 120 80" aria-hidden="true" focusable="false">
+              <path d="M10 70h100" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <rect x="22" y="52" width="16" height="18" rx="4" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="4 4"/>
+              <rect x="52" y="38" width="16" height="32" rx="4" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="4 4"/>
+              <rect x="82" y="24" width="16" height="46" rx="4" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="4 4"/>
+            </svg>
+            <h2 class="pr-empty__h" id="pr-empty-h">Nothing here yet</h2>
+            <p class="pr-empty__line">After your first session, this shows what you’ve done and when.</p>
+            <button class="btn btn-primary btn-large" id="pr-empty-start">Start today’s session</button>
+          </section>
+          ${premium ? renderArcReadback() : ''}
+          ${_rateNote(premium)}
+          ${renderMoreList(premium, stats)}
+        </div>`;
+      _commitRateRaise();
+      // The arc read back (the Plan's), the weight-rate note (Safeguarding
+      // §8.4) and the rows one tap away (Your weight, lifts, the programme, Share)
+      // stay: none of them needs a finished session.
+      attachEvents(container, tier);
+      container.querySelector('#pr-empty-start')?.addEventListener('click', () => {
+        // The coach's session, through today's check-in if there has not
+        // been one (the same way in as Home's Tell me what to do).
+        store.set('requestedSessionType', null);
+        if (store.checkedInToday()) router.navigate('coach-proposal');
+        else { store.set('pendingDoorRoute', 'coach-proposal'); router.navigate('checkin'); }
+      });
+      return;
+    }
 
     container.innerHTML = `
       <div class="progress-view">

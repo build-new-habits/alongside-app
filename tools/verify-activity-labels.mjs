@@ -1,6 +1,14 @@
 /**
  * tools/verify-activity-labels.mjs
- * 04 Oct 2026 v3
+ * 12 Oct 2026 v4
+ *
+ * v4 - A-4 SHARED-POLISH (Stage AWARD; Graeme, 12 Oct). Today's plan no
+ *   longer repeats the greeting and yesterday's line: Home has just said
+ *   them. TEST 2 reads the recap where it is now said, Home's line, for the
+ *   same four histories, and asserts the plan does not repeat it. The
+ *   property is the same: the actual day, in words, breathing as breathing,
+ *   no "gym" for a session's kind.
+ *
  *
  * v3 - LOOK-2: the summary chips (.progress-summary__type) are gone from
  *   Progress (progress.js v26); the kinds card names every kind instead.
@@ -109,22 +117,26 @@ if (AL) {
 }
 
 // ── 2. THE PLAN'S RECAP ──────────────────────────────────────────────────
-console.log("\nTEST 2 - the coach's recap names the actual day");
+console.log("\nTEST 2 - the recap names the actual day (Home says it; the plan does not repeat it)");
 const { CoachProposalView } = await import(B + "views/coach-proposal.js");
+const { TodayView: HomeView } = await import(B + "views/today.js");
 async function recap(log) {
   fixture("personal", log);
-  main.innerHTML = ""; CoachProposalView(rtr).mount(main); await wait(40);
-  return txt(main);
+  main.innerHTML = ""; HomeView(rtr).mount(main); await wait(40);
+  return txt(main.querySelector(".today-header") || main);
 }
 {
   const t1 = await recap([{ type: "walk", completedAt: at(1, 12) }]);
-  ok("2a. a walk yesterday: \"Yesterday you did a walk\"", /Yesterday you did a walk\./.test(t1) && !/Since yesterday/.test(t1), t1.slice(0, 200));
+  ok("2a. a walk yesterday: \"You did a walk yesterday\"", /You did a walk yesterday\./.test(t1) && !/Since yesterday/.test(t1), t1.slice(0, 200));
   const t2 = await recap([{ type: "mindfulness", completedAt: at(2, 23) }]);
   ok("2b. two days ago is not yesterday", !/yesterday/i.test(t2), t2.slice(0, 200));
   const t3 = await recap([{ type: "gym", sessionType: "lower", completedAt: todayEarlier }]);
-  ok("2c. a built session at home earlier today: named by its kind, and the day", /Earlier today you did a lower body session\./.test(t3) && !/you did gym/.test(t3), t3.slice(0, 200));
+  ok("2c. a session earlier today: today, and never \"you did gym\"", /today/i.test(t3) && !/you did gym/i.test(t3), t3.slice(0, 200));
   const t4 = await recap([{ type: "mindfulness", completedAt: at(1, 9) }, { type: "walk", completedAt: at(1, 18) }]);
-  ok("2d. breathing is breathing, not \"movement\"", /Yesterday you did a breathing practice and a walk\./.test(t4), t4.slice(0, 200));
+  ok("2d. breathing is breathing, not \"movement\"", /breathing practice/.test(t4) && !/movement yesterday/.test(t4), t4.slice(0, 200));
+  fixture("personal", [{ type: "walk", completedAt: at(1, 12) }]);
+  main.innerHTML = ""; CoachProposalView(rtr).mount(main); await wait(40);
+  ok("2e. the plan does not repeat it (A-4)", !/yesterday/i.test(txt(main.querySelector("#cp-preview-panel"))), txt(main.querySelector("#cp-preview-panel")).slice(0, 160));
 }
 
 // ── 3. HOME ──────────────────────────────────────────────────────────────

@@ -1,6 +1,13 @@
 /**
  * tools/verify-library-tiles.mjs
- * 04 Oct 2026 v3
+ * 12 Oct 2026 v4
+ *
+ * v4 - A-2 ONE-PLAN-SCREEN (Stage AWARD). REVERSAL on the Plan only: Core at
+ *   home opens Today's plan for a core session (one plan screen, one
+ *   player), so on the Plan no tile opens the core session's own screens.
+ *   Free keeps Core opening the core session (Graeme, 12 Oct: Free is left
+ *   alone), now asserted (2e). Each tile still lands where its label says.
+ *
  *
  * v3 - D-5 LIBRARY-ONCE. REVERSAL, from Graeme's device test (asked home
  *   or gym twice; the builder's plan was not the coach's): Full Body,
@@ -118,7 +125,7 @@ for (const f of found) {
   click(b); await wait(80);
   landed.push({ ...f, view: router.currentView, preStored: lastPre || store.get("requestedSessionType") || "" });
 }
-const EXPECT = { "Full Body": ["coach-proposal", "full"], "Core": ["core-session", ""], "Upper body": ["coach-proposal", "upper"],
+const EXPECT = { "Full Body": ["coach-proposal", "full"], "Core": ["coach-proposal", "core"],   // v4: the Plan "Upper body": ["coach-proposal", "upper"],
                  "Lower body": ["coach-proposal", "lower"], "Mobility": ["coach-proposal", "mobility"] };
 const wrong = [];
 for (const [label, [view, pre]] of Object.entries(EXPECT)) {
@@ -133,7 +140,13 @@ const core = found.find(f => f.label === "Core");
 ok("2a. Core says what the core session holds", !!core && /stability/i.test(core.note) && /gentle/i.test(core.note), core?.note);
 ok("2b. no tile promises HIIT", !found.some(f => /HIIT|high intensity/i.test(f.label + " " + f.note)), found.map(f => f.label).join(", "));
 const intoCore = landed.filter(l => l.view === "core-session").map(l => l.label);
-ok("2c. only Core opens the core session", intoCore.length === 1 && intoCore[0] === "Core", intoCore.join(", "));
+ok("2c. on the Plan, no tile opens the core session's own screens", intoCore.length === 0, intoCore.join(", "));
+// v4. Free is left alone: its Core still opens the core session.
+fixture("free"); await go("library");
+click(main.querySelector("#lib-start-session-btn")); await wait(40);
+click(main.querySelector('[data-guided="home"]')); await wait(40);
+click(tiles().find(x => txt(x.querySelector(".library-session-label")) === "Core")); await wait(80);
+ok("2e. on Free, Core opens the core session, as before", router.currentView === "core-session", router.currentView);
 const types = new Set(SB.SESSION_TYPES.map(t => t.id));
 const unknown = found.filter(f => f.pre && !types.has(f.pre)).map(f => `${f.label}:${f.pre}`);
 ok("2d. every preselected type is one the builder has", unknown.length === 0, unknown.join(", "));

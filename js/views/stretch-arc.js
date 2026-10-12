@@ -1,5 +1,10 @@
 /**
  * js/views/stretch-arc.js
+ * 12 Oct 2026 v6
+ *
+ * v6 - A-2 ONE-PLAN-SCREEN (Stage AWARD). Stretch now opens Today's plan
+ *   for a stretch session, not the builder.
+ *
  * 04 Oct 2026 v5
  *
  * v5 - D-3 ARC-HOME (Graeme's wife, device test, 04 Oct: tapping "Your
@@ -325,11 +330,14 @@ export function StretchArcView(router) {
     });
 
     container.querySelector("#sa-stretch-btn")?.addEventListener("click", () => {
-      store.set("sessionBuilderPreselect", { type: "stretch", returnTo: "stretch-arc" });
+      // A-2 ONE-PLAN-SCREEN (v6). The arc is the Plan's: Today's plan, a
+      // stretch session, on the one plan screen (it opened the builder).
+      store.set("requestedSessionType", "stretch");
+      store.set("sessionBuilderPreselect", null);
       if (store.checkedInToday()) {
-        router.navigate("session-builder");
+        router.navigate("coach-proposal");
       } else {
-        store.set("pendingDoorRoute", "session-builder");
+        store.set("pendingDoorRoute", "coach-proposal");
         router.navigate("checkin");
       }
     });

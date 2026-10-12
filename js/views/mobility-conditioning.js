@@ -1,6 +1,12 @@
 /**
  * mobility-conditioning.js - Mobility & Conditioning
  *
+ * 12 Oct 2026 v9
+ *
+ * v9 - A-2 ONE-PLAN-SCREEN (Stage AWARD). On the Plan, Start a mobility
+ *   session and Stretch open Today's plan (requestedSessionType), not the
+ *   builder's own preview. Free unchanged.
+ *
  * 29 Sep 2026 v8
  *
  * v8 - P17, MOBILITY DOOR (persona finding W2-12). "Start a Mobility
@@ -75,6 +81,7 @@
  */
 
 import { store } from "../store.js";
+import { isPremium } from "../auth.js";
 
 export function MobilityConditioningView(router) {
 
@@ -159,11 +166,22 @@ export function MobilityConditioningView(router) {
   // records the door, so Back does not walk into the type picker the card
   // exists to skip; only the day's FIRST check-in is a gate.
   function _toBuilder(type) {
-    store.set("sessionBuilderPreselect", { type, returnTo: "mobility-conditioning" });
-    if (store.checkedInToday()) {
-      router.navigate("session-builder");
+    // A-2 ONE-PLAN-SCREEN (v9). On the Plan, Today's plan for this kind of
+    // session, the hand-over I know what I want and the Library make; the
+    // one plan screen and the one player. Free keeps the builder (Graeme,
+    // 12 Oct: Free is left alone).
+    const plan = isPremium();
+    if (plan) {
+      store.set("requestedSessionType", type);
+      store.set("sessionBuilderPreselect", null);
     } else {
-      store.set("pendingDoorRoute", "session-builder");
+      store.set("sessionBuilderPreselect", { type, returnTo: "mobility-conditioning" });
+    }
+    const dest = plan ? "coach-proposal" : "session-builder";
+    if (store.checkedInToday()) {
+      router.navigate(dest);
+    } else {
+      store.set("pendingDoorRoute", dest);
       router.navigate("checkin");
     }
   }

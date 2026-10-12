@@ -1,6 +1,12 @@
 /**
  * tools/verify-sectionrules.mjs
- * 29 Sep 2026 v3
+ * 12 Oct 2026 v4
+ * A-2 ONE-PLAN-SCREEN. The door helper chooses its destination by tier: the
+ * builder on Free (with the preselect), Today's plan on the Plan (with
+ * requestedSessionType). 6 and 7b read the helper's new shape; the same
+ * properties hold (the card is wired, preselects stretch, and gates on
+ * today's check-in with the pending route to where it goes). Driven in
+ * verify-one-plan-screen and verify-mobility-door.
  * P17. The Stretch card's preselect and check-in gate moved into
  *   _toBuilder(type) in mobility-conditioning.js, shared with "Start a
  *   Mobility Session" (which now opens the builder's Mobility type).
@@ -233,10 +239,11 @@ check("6. the Mobility & Conditioning door offers Stretch", () => {
   ok(at > -1, "the Stretch card is rendered but never wired");
   const handler = mc.slice(at, at + 400);
   // P17: the card calls the shared door helper with its type.
-  const helper = mc.slice(mc.indexOf("function _toBuilder("), mc.indexOf("function _toBuilder(") + 700);
-  ok(handler.includes('_toBuilder("stretch")') && helper.includes("sessionBuilderPreselect", ) && helper.includes("{ type, returnTo"),
+  const helper = mc.slice(mc.indexOf("function _toBuilder("), mc.indexOf("function _toBuilder(") + 1400);
+  ok(handler.includes('_toBuilder("stretch")') && helper.includes("sessionBuilderPreselect", ) && helper.includes("{ type, returnTo") &&
+     helper.includes('store.set("requestedSessionType", type)'),
      "the card preselects the wrong type");
-  ok(helper.includes('router.navigate("session-builder")'), "the card goes nowhere");
+  ok(/const dest = plan \? "coach-proposal" : "session-builder"/.test(helper) && helper.includes("router.navigate(dest)"), "the card goes nowhere");
 });
 
 console.log("\nTEST 7 - the Stretch door gates on check-in and gives back a way out");
@@ -255,12 +262,12 @@ check("7b. the Stretch card enforces the gate", () => {
   const at = mc.indexOf('"#mc-stretch"');
   // P17: the gate lives in the helper the card calls.
   ok(mc.slice(at, at + 1400).includes('_toBuilder("stretch")'), "the Stretch card no longer goes through the gated helper");
-  const h = mc.slice(mc.indexOf("function _toBuilder("), mc.indexOf("function _toBuilder(") + 700);
+  const h = mc.slice(mc.indexOf("function _toBuilder("), mc.indexOf("function _toBuilder(") + 1400);
   ok(h.includes("store.checkedInToday()"),
      "the Stretch card skips the check-in gate. The Cardio, Core & Strength door " +
      "enforces it for the SAME builder -- without it there is no pain data, so no " +
      "bodyCaution fires and the severe bypass has nothing to read.");
-  ok(h.includes('store.set("pendingDoorRoute", "session-builder")'),
+  ok(h.includes('store.set("pendingDoorRoute", dest)'),
      "no pending route set, so the person would not arrive at the builder after " +
      "checking in");
   ok(h.includes('router.navigate("checkin")'), "the gate never sends anyone to check in");
