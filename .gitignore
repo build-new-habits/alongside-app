@@ -6,3 +6,4 @@ node_modules/
 # committed. They pin jsdom 28.1.0, the one version every check passes on;
 # nothing in the repository pinned it before, and the suite was red on
 # both older and newer versions.
+tools/out/

@@ -1,5 +1,12 @@
 /**
  * coach-proposal.js
+ * 12 Oct 2026 v56
+ *
+ * v56 - A-3 RETIRE-WEEKLY-PLAN (Stage AWARD). With Your week set, the old
+ *   weekly plan's day (You planned a walk today) is not read. And A-9
+ *   ONE-NAME: Something different today's logging door is called Make it
+ *   up as I go, its name everywhere else (was "I'll just log what I do").
+ *
  * 05 Oct 2026 v55
  *
  * v55 - D-6 WEEK-SHAPE. Opened from Home's "Show me today's plan" or "Only
@@ -1614,6 +1621,9 @@ export function CoachProposalView(router) {
 
   function _plannedToday() {
     const DAYS = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
+    // A-3 (v56). Once Your week is set it is the Plan's week; the old plan
+    // no longer leads, so "You planned a walk" never sits over "From your week".
+    if (store.get('weekShape')) return null;
     const slot = store.get(`weeklyPlan.days.${DAYS[new Date().getDay()]}`) || {};
     if (!slot || slot.type === 'rest' || !OWN_SESSIONS[slot.sessionType]) return null;
     return { id: slot.sessionType, ...OWN_SESSIONS[slot.sessionType] };
@@ -1704,7 +1714,7 @@ export function CoachProposalView(router) {
           </div>
           <div class="cp-different__row">
             ${btn('data-different="class"', 'A class instead')}
-            ${btn('data-different="log"', 'I\u2019ll just log what I do')}
+            ${btn('data-different="log"', 'Make it up as I go')}
           </div>
         </div>
       </details>`;

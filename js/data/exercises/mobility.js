@@ -1,5 +1,16 @@
 /**
  * data/exercises/mobility.js
+ * 12 Oct 2026 v10
+ *
+ * v10 - A-6 (Stage AWARD). Two descriptions brought into line with their
+ *   own instructions and figures (found drawing them, D-4): Thoracic
+ *   Rotation (side-lying open book; the description said sit with hands
+ *   behind the head), and prone-thoracic-rotation (side-lying, knees
+ *   together; the description said lie face down in a T), now named
+ *   Side-Lying Thoracic Rotation (id kept). Thoracic Rotation's last cue,
+ *   "Each rep, try to go a little further", contradicted its own watch-out
+ *   on forcing range (CL-5): now "Go only as far as is comfortable today".
+ *
  * 02 Oct 2026 v9
  *
  * v9 - W4-4 LEG-SWING (Wave 4 trace, 2.11). Leg Swing — Forward and Back
@@ -225,12 +236,12 @@ export const MOBILITY = [
     reps: "10 each side",
     holdSeconds: 3,
     rest: 30,
-    description: "Sit on the floor or a chair. Place hands behind your head. Rotate your upper back as far as you comfortably can to one side — lead with your elbow. Hold 3 seconds. Return. The lower back should not move.",
+    description: "Lie on your side, knees bent and stacked, arms out in front. Open the top arm across to the other side, following your hand with your eyes. Hold 2 seconds, then return. Your hips and knees stay where they are.",
     cues: [
       "The rotation is in your upper back — thoracic spine",
-      "Lower back stays still throughout",
+      "Hips and knees stay still throughout",
       "Do not force the range — breathe into the rotation",
-      "Each rep, try to go a little further"
+      "Go only as far as is comfortable today"
     ],
   },
 
@@ -1323,7 +1334,7 @@ export const MOBILITY = [
     position: 'floor',
     impact: false,
     balanceDemand: false,
-    name: 'Prone Thoracic Rotation',
+    name: 'Side-Lying Thoracic Rotation',
     youtube: 'prone thoracic rotation technique',
     category: 'mobility',
     contentType: 'exercise',
@@ -1358,7 +1369,7 @@ export const MOBILITY = [
     reps: "8 each side",
     holdSeconds: 3,
     rest: 30,
-    description: "Lie face down, arms out to the sides in a T-shape. Rotate one arm and shoulder up and over to the other side — your torso will follow. The hip of the rotating side will lift slightly. Hold 3 seconds. Return slowly.",
+    description: "Lie on your side, knees together and bent. Reach the top arm open and behind you, following it with your eyes. Your knees stay together, so only your upper body turns. Hold 3 seconds. Return slowly.",
     cues: [
       "Let the movement flow from the upper back — not the neck",
       "The hold at end range is where the mobility work happens",

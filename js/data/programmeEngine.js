@@ -1,5 +1,10 @@
 /**
  * programmeEngine.js
+ * 12 Oct 2026 v12
+ *
+ * v12 - A-3 RETIRE-WEEKLY-PLAN (Stage AWARD). plannedFocusToday() reads
+ *   nothing from the old weekly plan once Your week is set.
+ *
  * 02 Oct 2026 v11
  *
  * v11 - W4-24 ABSENCE-CONSENT. returnChoices(): without the health consent
@@ -800,6 +805,10 @@ export function plannedFocusToday() {
   // free device that already has a programme therefore stops being
   // driven by it immediately, without a migration.
   if (!isPremium()) return null;
+
+  // A-3 RETIRE-WEEKLY-PLAN, 12 Oct 2026. Once Your week (weekShape) is set,
+  // it is the Plan's week: the old weekly plan's sequence is not read.
+  if (store.get('weekShape')) return null;
 
   // Array-checked, not truthy-checked. `|| []` accepts a STRING and
   // then seq.find() throws — and this runs inside the coach's proposal,

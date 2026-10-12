@@ -1,5 +1,10 @@
 /**
  * weekly-plan.js
+ * 12 Oct 2026 v5
+ *
+ * v5 - A-3 RETIRE-WEEKLY-PLAN (Stage AWARD). Free's week. On the Plan the
+ *   week is Your week, so this view sends the Plan there (replace).
+ *
  * 28 Sep 2026 v4
  *
  * v4 - F7 LANDMARK. role="main" (and its label) removed from the view's
@@ -63,6 +68,7 @@
 
 import { store }        from '../store.js';
 import { getWeekShape } from '../data/programmeEngine.js';
+import { isPremium }    from '../auth.js';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -117,6 +123,9 @@ export function WeeklyPlanView(router) {
   // ── Mount ──────────────────────────────────────────────────────────────────
 
   function mount(container) {
+    // A-3 RETIRE-WEEKLY-PLAN (v5). On the Plan the week is Your week; any
+    // way here (an old link, the back stack) lands there instead.
+    if (isPremium()) { router.navigate('your-week', { replace: true }); return; }
     // Sync week shape from programme engine on every mount
     _syncWeekShape();
     render(container);

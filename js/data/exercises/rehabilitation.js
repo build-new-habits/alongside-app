@@ -1,5 +1,12 @@
 /**
  * data/exercises/rehabilitation.js
+ * 12 Oct 2026 v14
+ *
+ * v14 - A-6 (Stage AWARD). Internal Rotation — Band: the band is anchored
+ *   on the same side as the working arm (it said the opposite side, which
+ *   assists an inward rotation instead of resisting it). Found drawing it
+ *   (D-4); the figure already showed the side that resists.
+ *
  * 02 Oct 2026 v13
  *
  * v13 - W4-4. Step-Down — Eccentric stands on one leg on a step:
@@ -2458,7 +2465,7 @@ export const REHABILITATION = [
     duration: 90,
     perSide: true,
     instructions: [
-      'Anchor a resistance band at elbow height on the opposite side to your working arm',
+      'Anchor a resistance band at elbow height on the same side as your working arm, so it pulls your hand away from your body',
       'Hold the band in your right hand, elbow bent at about 90°, upper arm against your side',
       'Rotate your forearm toward your body against the band resistance',
       'Move slowly — 2 seconds in, 2 seconds back',

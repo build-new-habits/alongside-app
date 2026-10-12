@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 06 Oct 2026 v656
+ * 12 Oct 2026 v657
  *
+ * v657 - Stage AWARD, first batch (Graeme, 12 Oct: "Great plan. Let's go with it"): on the Plan, Settings › Your week opens Your week and, once it is set, the older weekly plan no longer leads the coach's plan; Free keeps its weekly plan, and Settings no longer says the coach uses it (A-3). Three exercise descriptions made to match their own instructions: the internal-rotation band is anchored on the same side as the working arm; Thoracic Rotation and Side-Lying Thoracic Rotation (was Prone) lie on the side (A-6). After Home, the screens people open next load while the phone is idle, so their first open is quicker; the page's character set is declared where browsers look for it (A-8). Something different today names Make it up as I go by its name (A-9). NEW FILE precached: js/data/warm-views.js.
  * v656 - D-11 PROGRESS-SHARE (Graeme, 06 Oct): Progress shows today and the last 7, 14 or 30 days on both tiers, and 90 on the Plan; Download today's report says what was done, where and how many; Share your progress makes a picture, a certificate, a report to print or save as a PDF, or text to copy (with a CSV), on both tiers. The picture holds only sessions and kinds unless the person switches more on; the journal, notes and weight are never included; check-in answers only by choice and with the health consent. Each session records where it was done. NEW FILES precached: js/data/progress-report.js, js/data/share-images.js, js/views/progress-share.js, css/components/progress-share.css, two Newsreader font files and six brand logo images.
  * v655 - D-12 PROGRESS-FIT (device test, 06 Oct: "when I go into progress the screen shifts right ... it's every time"): no screen is wider than the phone at any text size. The text size was applied twice (1.45 drew 2.1x); it is applied once now, and the slider goes up to 2. Progress and Plan your week are the screen's width; at large text Progress is one thing per row with the week chart on its side; full-width buttons, session and Mobility & Conditioning headers, Home's door tiles and the morning week grid reflow; the bottom navigation stops growing at about 1.45x so its labels never collide.
  * v654 - SW-INCREMENTAL (Graeme, 05 Oct: "everything is really slow to open and load"): an update copies every file whose content hash is unchanged from the cache the phone already has, and downloads only what changed (it downloaded all 247 files, about 6 MB, every time). SHELL_HASHES written by tools/sw-hashes.mjs. This first update to it still downloads everything once. index.html: the Sentry loader is async.
@@ -4203,7 +4204,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v656";
+const CACHE_NAME = "alongside-v657";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4211,8 +4212,8 @@ const CACHE_NAME = "alongside-v656";
 // downloads only the rest: it fetched all of them (about 6 MB) every time.
 // SHELL_HASHES:BEGIN
 const SHELL_HASHES = {
-  "./": "e9c8de187a65ee0b",
-  "./index.html": "e9c8de187a65ee0b",
+  "./": "125ce489a4d2308a",
+  "./index.html": "125ce489a4d2308a",
   "./css/main.css": "e306ded0118cbea6",
   "./css/base/fonts.css": "04893bbdfa4cf013",
   "./css/layouts/onboarding-additions.css": "a204c285b813c6e8",
@@ -4267,7 +4268,7 @@ const SHELL_HASHES = {
   "./css/components/club-rooms.css": "f1c069c5b8eaf09e",
   "./css/components/capture.css": "343b4ae0dc6fe6ea",
   "./css/components/finish.css": "d048b8066d6e9d22",
-  "./js/app.js": "4498f262196f4c67",
+  "./js/app.js": "24ff2a302aec8762",
   "./js/router.js": "bbbc2ab57c9ac0f4",
   "./js/store.js": "f48f7bc17c61919a",
   "./js/session-log.js": "d43815c658239179",
@@ -4291,12 +4292,12 @@ const SHELL_HASHES = {
   "./js/views/stretch-arc.js": "e67d2715e6019eb9",
   "./js/views/checkin.js": "29d45c08868e3e8f",
   "./js/views/checkin-mini.js": "3f1764e87002d46f",
-  "./js/views/coach-proposal.js": "31eb8b16c69b1673",
+  "./js/views/coach-proposal.js": "45edea5aed331843",
   "./js/views/workout.js": "7c29db66bc121ecc",
   "./js/views/progress.js": "bc4bdbf7b01d7573",
-  "./js/views/settings.js": "51c3bfeadd66479d",
+  "./js/views/settings.js": "74e5899414373a9a",
   "./js/views/restore-flow.js": "dc81c2e455fa472d",
-  "./js/views/weekly-plan.js": "0ec10ff9a6f7f133",
+  "./js/views/weekly-plan.js": "dcee06e297b402c0",
   "./js/views/reflect.js": "245bc9bc3cde358a",
   "./js/data/empathy-transfer.js": "b3513396b3541e3a",
   "./js/data/equipment-map.js": "b3460207997a4fa5",
@@ -4339,6 +4340,7 @@ const SHELL_HASHES = {
   "./js/data/line-icons.js": "c66cb43d2b010c32",
   "./js/data/week-shape-model.js": "8b6720d92bedb6e5",
   "./js/data/week-shape.js": "11aa21a058a7c640",
+  "./js/data/warm-views.js": "73c268f74f004e8e",
   "./js/views/your-week.js": "ee43f8b6e6746f01",
   "./js/data/plan-reader.js": "a63239d24ffa51f9",
   "./js/views/plan-import.js": "630d97175edd2091",
@@ -4433,18 +4435,18 @@ const SHELL_HASHES = {
   "./js/data/plan-options.js": "86087e77bded2cd0",
   "./js/data/pricing.js": "2458927c2fec1f11",
   "./js/data/time-windows.js": "a25841c83a4ce91e",
-  "./js/data/programmeEngine.js": "6be1bf8774f9f204",
+  "./js/data/programmeEngine.js": "74dd56652c4f2c13",
   "./js/data/programmes.js": "e455b0b69bd02a52",
   "./js/data/grounding-moments.js": "33c5054f7e6540ff",
   "./js/data/coach-voice.js": "92ea4a0209978619",
   "./js/data/exercises/index.js": "d9df11d43f5df8ce",
   "./js/data/exercises/strength.js": "c3ea3c850e5c9231",
   "./js/data/exercises/cardio.js": "70eb66cdf3b2ca93",
-  "./js/data/exercises/mobility.js": "db5e5496ded8847d",
+  "./js/data/exercises/mobility.js": "16f5c307b159bd12",
   "./js/data/exercises/yoga.js": "a47fac7b38781ec5",
   "./js/data/exercises/pilates.js": "99e320f6392bca5b",
   "./js/data/exercises/running.js": "fcb33517ce9f6da5",
-  "./js/data/exercises/rehabilitation.js": "d4c680d6888e9f4c",
+  "./js/data/exercises/rehabilitation.js": "66c1ab3b83ee0c37",
   "./js/data/exercises/recovery.js": "417c343342097d9a",
   "./js/data/exercises/mindfulness.js": "43e569cf2f0ca91c",
   "./js/data/practice-library.js": "21f37963f0b2d2c2",
@@ -4639,6 +4641,7 @@ const SHELL_URLS = [
   "./js/data/line-icons.js",
   "./js/data/week-shape-model.js",
   "./js/data/week-shape.js",
+  "./js/data/warm-views.js",
   "./js/views/your-week.js",
   "./js/data/plan-reader.js",
   "./js/views/plan-import.js",

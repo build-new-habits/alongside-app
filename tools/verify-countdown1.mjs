@@ -1,5 +1,13 @@
 /**
  * tools/verify-countdown1.mjs
+ * 12 Oct 2026 v4
+ *
+ * v4 - SUITE-FLAKE-5 (found 12 Oct). On the 12th of any month the week
+ *   chart's own label, "Week of 12 Oct: 0 sessions", matched the banned
+ *   "of 12" and the check failed. The pattern now skips a calendar date
+ *   (a month name after the 12). The week-of-twelve count is still banned,
+ *   and the source scan (section 4, anchored on Week) is unchanged.
+ *
  * 04 Oct 2026 v3
  *
  * v3 - LOOK-2: the programme block is on its own page, one tap away
@@ -113,7 +121,9 @@ const BANNED = [
   [/weeks remaining/i,                                 '"weeks remaining"'],
   [/\d+% complete/i,                                   '"N% complete"'],
   [/\d+% through/i,                                    '"N% through"'],
-  [/\bof 12\b/,                                        '"week N of 12" — the week count is the deadline'],
+  // v4: not a calendar date. "Week of 12 Oct" is the week chart's label on
+  // the 12th of any month; a count of twelve weeks is never followed by one.
+  [/\bof 12\b(?!\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec))/, '"week N of 12" — the week count is the deadline'],
   [/the end is close/i,                                '"the end is close"'],
   [/halfway through/i,                                 '"halfway through"'],
   [/style="width: \d+%/,                               'a percentage-width fill'],

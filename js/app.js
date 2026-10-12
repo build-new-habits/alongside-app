@@ -1,5 +1,12 @@
 /**
  * app.js - Application entry point
+ * 12 Oct 2026 v14
+ *
+ * v14 - A-8 SPEED (Stage AWARD). After the first screen, from Home, the
+ *   code for Today's plan, Progress, the Library and Settings is loaded
+ *   while the phone is idle (data/warm-views.js), so their first open is
+ *   as quick as a second one.
+ *
  * 03 Oct 2026 v13
  *
  * v13 - W5-17 A11Y-W5. The update banner is role=status (it was an alert)
@@ -73,6 +80,7 @@ import { initPaywallListener } from './auth.js';
 import { refreshMessages, updateNavDot } from './data/messages.js';
 import { declaredUnder18, heldOnPhone, deleteForUnder18 } from './data/age-check.js';
 import './data/evidence.js';   // B5: registers the two research messages (only while sending is on)
+import { warmViews } from './data/warm-views.js';
 
 // ── Globals — set immediately, before anything else runs ──────────────────────
 window.router = router;
@@ -254,6 +262,10 @@ const App = {
     // B4 MESSAGES. Last, and not awaited: it must never hold the app up.
     updateNavDot();
     refreshMessages();
+
+    // A-8 SPEED. From Home, once the phone is idle, load the code for the
+    // screens people open next, so their first open is not the slow one.
+    warmViews({ currentView: router.currentView, load: p => import(p) });
   },
 
   checkForUpdate,

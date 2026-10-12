@@ -1,4 +1,14 @@
-<!-- index.html | 05 Oct 2026 v10 -->
+<!-- index.html | 12 Oct 2026 v11 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<!--
+  v11 — A-8 SPEED (Stage AWARD), 12 Oct 2026. <meta charset> moved into the
+  first 1024 bytes, where a browser looks for it (Lighthouse "charset"): the
+  change notes below used to sit above the doctype and pushed it to byte
+  3275. No other change.
+-->
 <!--
   v10 — SW-INCREMENTAL, 05 Oct 2026. The Sentry loader is async: it was a
   plain script tag in the head, so every open waited for Sentry's server
@@ -60,10 +70,6 @@
   v1 — Sentry error monitoring wired in (Session A, item 1, DSN received).
     Loader script added to <head>, EU region confirmed (js-de.sentry-cdn.com).
 -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="theme-color" content="#0F172A">
   <meta name="apple-mobile-web-app-capable" content="yes">

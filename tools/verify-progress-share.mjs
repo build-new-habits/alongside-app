@@ -1,5 +1,14 @@
 /**
  * tools/verify-progress-share.mjs
+ * 12 Oct 2026 v2
+ *
+ * v2 - SUITE-FLAKE-5 (found 12 Oct running the suite at 08:56). Today's
+ *   two sessions and their lifts were dated 07:10 and 09:10-09:47, so any
+ *   run before 09:47 put a session in the future and 1c, 1g, 2a and 2b
+ *   failed (every morning). They are now just after midnight (00:05-00:30):
+ *   still today, still in the same order. 2j's two (08:00, 09:00) too.
+ *   No assertion changed.
+ *
  * 06 Oct 2026 v1
  *
  * D-11 PROGRESS-SHARE (Graeme, 06 Oct: Progress for today, 7, 14, 30 and
@@ -70,8 +79,8 @@ const router = { navigate: v => navs.push(v), history: [], back() {} };
 const at = (daysAgo, h, m) => { const d = new Date(); d.setDate(d.getDate() - daysAgo); d.setHours(h, m, 0, 0); return d.toISOString(); };
 const SECRET = { journal: "JOURNALSECRET", note: "SESSIONNOTESECRET", lift: "LIFTNOTESECRET", weight: 83.4 };
 const LOG = [
-  { id: "t1", type: "breathing-session", completedAt: at(0, 7, 10), durationMins: 4, feel: "calmer" },
-  { id: "t2", type: "workout", sessionType: "upper", place: "gym", completedAt: at(0, 9, 47), durationMins: 42, feel: "right",
+  { id: "t1", type: "breathing-session", completedAt: at(0, 0, 5), durationMins: 4, feel: "calmer" },
+  { id: "t2", type: "workout", sessionType: "upper", place: "gym", completedAt: at(0, 0, 30), durationMins: 42, feel: "right",
     exerciseIds: ["gym-lat-pulldown", "dead-bug"], note: SECRET.note, notes: SECRET.note, moodAfter: "MOODAFTERSECRET", painChange: "PAINCHANGESECRET" },
   { id: "y1", type: "walk-session", completedAt: at(1, 12, 30), durationMins: 35, feel: "good" },
   { id: "p1", type: "workout", status: "partial", completedAt: at(2, 18, 0), durationMins: 6 },
@@ -84,11 +93,11 @@ const LOG = [
 const LIFTS = {
   "gym-lat-pulldown": [
     { at: at(1, 18, 0), weight: 30, reps: 10, unit: "kg" },                           // yesterday: not today's
-    { at: at(0, 9, 10), weight: 40, reps: 10, unit: "kg", note: SECRET.lift },
-    { at: at(0, 9, 13), weight: 40, reps: 10, unit: "kg" },
-    { at: at(0, 9, 16), weight: 42.5, reps: 8, unit: "kg" },
+    { at: at(0, 0, 10), weight: 40, reps: 10, unit: "kg", note: SECRET.lift },
+    { at: at(0, 0, 12), weight: 40, reps: 10, unit: "kg" },
+    { at: at(0, 0, 14), weight: 42.5, reps: 8, unit: "kg" },
   ],
-  "dead-bug": [{ at: at(0, 9, 40), reps: 8 }],
+  "dead-bug": [{ at: at(0, 0, 25), reps: 8 }],
 };
 const todayKey = new Date().toISOString().slice(0, 10);
 function person(tier = "personal", { consent = true } = {}) {
@@ -166,10 +175,10 @@ ok("2g. ... on today's report", main.querySelector('input[name="sh-window"]:chec
 const doc = txt(main.querySelector(".sh-report"));
 const tile = label => [...main.querySelectorAll(".shr-tile")].find(t => txt(t.querySelector("dt")) === label)?.querySelector("dd");
 ok("2h. the report says what, where and how many", /Lat Pulldown/.test(doc) && /At the gym/.test(doc) && txt(tile("sessions")) === "2" && txt(tile("sets logged")) === "4" && /46 minutes/.test(txt(tile("moving"))), doc.slice(0, 300));
-ok("2i. a move the library cannot name reads as words, not an id", R.movesFor({ exerciseIds: ["gone-move-x"], completedAt: at(0, 9, 47), durationMins: 10 }, {}, () => null)[0].name === "Gone move x");
+ok("2i. a move the library cannot name reads as words, not an id", R.movesFor({ exerciseIds: ["gone-move-x"], completedAt: at(0, 0, 30), durationMins: 10 }, {}, () => null)[0].name === "Gone move x");
 
 { // 2j: sessions logged without minutes never read "0 minutes of moving".
-  const noMins = [{ id: "n1", type: "class", completedAt: at(0, 8, 0) }, { id: "n2", type: "walk-session", completedAt: at(0, 9, 0) }];
+  const noMins = [{ id: "n1", type: "class", completedAt: at(0, 0, 2) }, { id: "n2", type: "walk-session", completedAt: at(0, 0, 3) }];
   const m0 = R.buildReport({ rangeKey: "today", completed: noMins, liftLog: {}, include: R.defaultsFor("report"), exerciseName });
   const said = [R.reportText(m0), R.reportCsv(m0), R.describeShare(m0, "picture"), R.describeShare(m0, "certificate")].join("\n");
   ok("2j. sessions with no minutes recorded: no \"0 minutes\" in what is shared", m0.totals.sessions === 2 && !/\b0 min|Time moving/.test(said), said.slice(0, 300));

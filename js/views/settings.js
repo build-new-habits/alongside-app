@@ -1,5 +1,14 @@
 /**
  * settings.js
+ * 12 Oct 2026 v68
+ *
+ * v68 - A-3 RETIRE-WEEKLY-PLAN (Stage AWARD). One week per tier: on the
+ *   Plan, Your week (Settings › Your plan, and the Plan my week button)
+ *   opens Your week, not the old weekly plan; Free keeps the weekly plan.
+ *   The summary line says what is true on each tier: on Free nothing reads
+ *   the old plan, so it no longer says the coach uses it as a starting
+ *   point. Old copy archived in BNH-Files, Archive/Stage AWARD/A-3.
+ *
  * 04 Oct 2026 v67
  *
  * v67 - LOOK-1 SETTINGS-PAGES (Graeme, 04 Oct: "the settings page should
@@ -1922,14 +1931,23 @@ export function SettingsView(router) {
   // the voice used elsewhere on this panel (Conditions/Equipment sections).
 
   function renderWeeklyPlanSummary() {
+    // A-3 (v68). On the Plan this row opens Your week, which Home reads.
+    if (isPremium()) {
+      return store.get('weekShape')
+        ? `Your week is set. Home shows today's day from it.`
+        : `Choose the days you'd like to move and what each is for. Home will show today's.`;
+    }
+    // A-3 (v68). On Free nothing reads this plan (the planned-day lead and
+    // plannedFocusToday() are the Plan's), so it does not claim the coach
+    // uses it. It is the person's own plan to keep.
     const updatedAt = store.get('weeklyPlan.updatedAt');
     if (!updatedAt) {
-      return `You haven't shaped a week yet — the coach will ask each day instead. Set one up and it'll use that as your starting point.`;
+      return `Set out which days you'd like to move. It's your plan to keep; the coach still builds each day from your check-in.`;
     }
     const formatted = new Date(updatedAt).toLocaleDateString('en-GB', {
       day: 'numeric', month: 'short', year: 'numeric'
     });
-    return `Last shaped ${_esc(formatted)}. The coach uses this as its starting point each day — you can still adjust on the day itself.`;
+    return `Last shaped ${_esc(formatted)}. It's your plan to keep; the coach still builds each day from your check-in.`;
   }
 
   // ── Conditions panel ───────────────────────────────────────────────────────
@@ -3036,7 +3054,8 @@ export function SettingsView(router) {
         break;
 
       case 'open-weekly-plan':
-        router.navigate('weekly-plan');
+        // A-3 (v68). One week per tier: the Plan's week is Your week.
+        router.navigate(isPremium() ? 'your-week' : 'weekly-plan');
         break;
 
       case 'reset-programme':

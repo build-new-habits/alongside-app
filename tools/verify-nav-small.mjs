@@ -1,5 +1,12 @@
 /**
  * tools/verify-nav-small.mjs
+ * 12 Oct 2026 v5
+ *
+ * v5 - A-9 ONE-NAME (Stage AWARD). 8a: the logging door under Something
+ *   different today is named Make it up as I go, the name it has on Home and
+ *   on its own screen (it said "I'll just log what I do"). Same door, same
+ *   destination (8b unchanged); only its name.
+ *
  * 04 Oct 2026 v4
  *
  * v4 - SUITE-FLAKE-3 (found running the D-3 suite under load). TEST 7
@@ -306,7 +313,8 @@ console.log("\nTEST 8 - Something different today offers logging as you go");
 fixture({ location: "gym" });
 proposal();
 const logBtn = main.querySelector('[data-different="log"]');
-ok("8a. \"I'll just log what I do\" is there", !!logBtn && /I.ll just log what I do/.test(txt(logBtn)), txt(main.querySelector(".cp-different")));
+// v5, A-9 ONE-NAME: the door is called by the name it has everywhere else.
+ok("8a. \"Make it up as I go\" is there", !!logBtn && txt(logBtn) === "Make it up as I go", txt(main.querySelector(".cp-different")));
 click(logBtn); await wait(10);
 ok("8b. it opens Make it up as I go", navs.includes("capture"), JSON.stringify(navs));
 
