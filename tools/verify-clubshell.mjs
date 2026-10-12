@@ -1,6 +1,16 @@
 /**
  * tools/verify-clubshell.mjs
- * 02 Oct 2026 v3
+ * 12 Oct 2026 v4
+ *
+ * v4 - A-1 PLAN-HOME-PRUNE (Graeme approved the mock-up, 12 Oct). REACH
+ *   only. 2a: Join a class and Something for the mind left Plan Home for the
+ *   Library and the Wellbeing tab, so the two-tap reach now also reads the
+ *   Library's first page (driven, real LibraryView) and the bottom
+ *   navigation (index.html data-nav, always one tap). The MUST list is
+ *   unchanged. 9a: with no week day set, Tell me what to do is the Today
+ *   card's button rather than the first door; the line still names a
+ *   control on the screen, found by its action.
+ *
  *
  * v3 - W4-0 SUITE-TRUE. Mounts through tools/one-screen.mjs, so one screen
  *   is in the page at a time (two copies of one id failed on jsdom 27+). No
@@ -149,6 +159,25 @@ console.log("\nTEST 2 - everything the rooms and tiles reached is still within t
   const kw2 = document.createElement("div"); oneScreen(kw2);
   KnowWhatView({ navigate() {} }).mount(kw2);
   kw2.querySelectorAll("[data-kw-route]").forEach(b => reached.add(b.dataset.kwRoute));
+  // v4. Two taps: Home's Library row, then a Library tile (the real view).
+  const lib = await import(B + "views/library.js");
+  const lh = document.createElement("div"); oneScreen(lh);
+  const libNavs = [];
+  const { router: realRouter } = await import(B + "router.js");
+  const keepNav = realRouter.navigate; realRouter.navigate = v => libNavs.push(v);
+  for (const g of (() => { lh.innerHTML = lib.render(); return [...lh.querySelectorAll("[data-guided]")].map(b => b.dataset.guided); })()) {
+    lh.innerHTML = lib.render(); document.body.appendChild(lh); lib.onMount();
+    lh.querySelector(`[data-guided="${g}"]`)?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+    // A category with its own page (At home, Mindful) stays open in the
+    // module: Back to the Library page before the next tile.
+    lh.innerHTML = lib.render(); lib.onMount();
+    lh.querySelector("#lib-back-btn")?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+    lh.remove();
+  }
+  realRouter.navigate = keepNav;
+  libNavs.forEach(r => reached.add(r));
+  // v4. One tap, always: the bottom navigation (index.html).
+  [...fs.readFileSync(_gatePath("index.html"), "utf8").matchAll(/data-nav="([a-z-]+)"/g)].forEach(m => reached.add(m[1]));
   const MUST = ["classes", "checkin", "session-builder", "saved-sessions", "capture", "goal-setup",
                 "mobility-conditioning", "yoga-session", "noticing", "library", "know-what"];
   const missing = MUST.filter(r => !reached.has(r));
@@ -176,7 +205,7 @@ const orient = code9.slice(code9.indexOf("lets me decide today"));
 // asserted now, from the control actually on each screen.
 ok("9a. the orientation line names the Plan door that is on the screen",
    roomTitles.some(r => new RegExp(`${r}(\\\\u2019|\u2019)? lets me decide today`).test(code9)) &&
-   plan.c.querySelector(".home-door__title")?.textContent === roomTitles[0],
+   [...plan.c.querySelectorAll('[data-action="start-today"]')].some(b => (b.querySelector(".home-door__title") || b).textContent.trim() === roomTitles[0]),   // v4
    "it points at a door that is not on the screen - and it shows ONLY to " +
    "somebody with no goal set, the exact person who needs the pointer to work");
 

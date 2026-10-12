@@ -1,6 +1,18 @@
 /**
  * tools/verify-your-week.mjs
- * 05 Oct 2026 v3
+ * 12 Oct 2026 v4
+ *
+ * v4 - A-1 PLAN-HOME-PRUNE (Graeme approved the mock-up, 12 Oct). REVERSALS,
+ *   by that decision: the week card has one way in, Show me today's plan
+ *   (4b); Something else today went, the doors are directly below it (4e);
+ *   Your week moved off Home to the Library, which says so (4f); on a rest
+ *   day the doors sit under the rest card and none is filled (4h); the
+ *   coach's card on Plan Home shares the week card's look, so 2a2 looks for
+ *   a week card that is not the coach's. TEST 6, Only 10 minutes: the same
+ *   outcome now comes from the plan's own Length (10 min) on the day's plan,
+ *   which keeps the day's shape (D-6): the day kept, ten minutes, fewer
+ *   exercises than the full day.
+ *
  *
  * v3 - 5l checks gentle against steady on one fixed plan: two separately
  *   built plans could differ for the coach's own reasons (seen once in the
@@ -143,7 +155,7 @@ fixture();
 await router.navigate("today"); await wait(60);
 const weekTile = $('[data-route="your-week"]');
 ok("2a. Plan Home links to Plan your week", txt(weekTile) === "Plan your week");
-ok("2a2. no week card before there is a week", !$(".home-week"));
+ok("2a2. no week card before there is a week", !$(".home-week:not(.home-today)"));
 await click(weekTile);
 ok("2b. it opens Plan your week: build it, or three ready-made weeks", view() === "your-week" && txt($("h1")) === "Plan your week" &&
    !!$('[data-start="build"]') && $$("[data-ready]").length === 3, txt(main).slice(0, 200));
@@ -223,16 +235,15 @@ await router.navigate("today"); await wait(60);
 const card = $(".home-week");
 ok("4a. Today, from your week leads, with the day's name, mix and details", !!card && txt(card).includes("Today, from your week") && txt($("#home-week-h")) === "Upper day" &&
    /Mostly upper body/.test(txt(card)) && /Gentle · 40 min · gym/.test(txt(card)), txt(card));
-ok("4b. three ways in: the plan, only 10 minutes, something else", !!$('[data-action="week-today"]') && !!$('[data-action="week-short"]') && !!$('[data-action="week-else"]'));
+ok("4b. one way in on the card: the plan", !!$('[data-action="week-today"]') && !$('[data-action="week-short"]') && !$('[data-action="week-else"]'));
 ok("4c. Tell me what to do is not the filled door now", !$('[data-action="start-today"]').classList.contains("home-door--primary"));
 ok("4d. the doors are 'Or something else today'", txt($("#home-doors-label")) === "Or something else today");
-await click($('[data-action="week-else"]'));
-ok("4e. Something else today moves to the doors", document.activeElement === $("#home-doors-label"));
-ok("4f. the link is Your week", txt($('[data-route="your-week"]')) === "Your week");
+ok("4e. the doors are directly below the card, all three", $$(".home-doors .home-door").map(d => d.dataset.action).join() === "start-today,know-what,as-i-go");
+ok("4f. Your week is in the Library, and the Library row says so", /your week/.test(txt($('[data-route="library"]'))));
 fixture(); setWeek(null, true);
 await router.navigate("today"); await wait(60);
 ok("4g. a rest day says so, and asks nothing", /Today is a rest day in your week. Rest counts./.test(txt($(".home-week"))) && !$('[data-action="week-today"]'));
-ok("4h. and Tell me what to do is the filled door", $('[data-action="start-today"]').classList.contains("home-door--primary"));
+ok("4h. and Tell me what to do is among the doors below it, none filled", !!$('.home-doors [data-action="start-today"]') && !$(".home-door--primary"));
 
 // ── 5. The plan it opens ───────────────────────────────────────────────
 console.log("\nTEST 5 - the day's plan");
@@ -285,14 +296,14 @@ await router.navigate("coach-proposal"); await wait(300);
 ok("5o. after it, the plan is still the day's (its kind, place and sentence)", /^From your week: Upper day/.test(txt($(".cp-plan__sentence"))) && /gym/i.test(txt($("#cp-loc"))) &&
    store.get("requestedSessionType") === "upper", txt($(".cp-plan__sentence")));
 
-// ── 6. Only 10 minutes ─────────────────────────────────────────────────
-console.log("\nTEST 6 - only 10 minutes");
-await openDay("week-short");
-const s6 = txt($(".cp-plan__sentence"));
-ok("6a. the short version, said", /Upper day, the short version/.test(s6), s6);
-ok("6b. today's length is ten minutes", store.getAvailableTimeMinutes?.() === 10 || /10 min/.test(txt(main)), txt(main).slice(0, 300));
+// ── 6. Only 10 minutes, from the plan's Length ─────────────────────────
+console.log("\nTEST 6 - only 10 minutes (the plan's Length)");
 const long = await (async () => { await openDay("week-today"); return $$(".cp-plan__row").length; })();
-await openDay("week-short");
+await click($("#cp-time"), 30);
+await click($('[data-pick-time="10"]'), 300);
+const s6 = txt($(".cp-plan__sentence"));
+ok("6a. the day is kept: still from your week", /^From your week: Upper day\./.test(s6), s6);
+ok("6b. today's length is ten minutes", /10 min/.test(txt($("#cp-time"))), txt($("#cp-time")));
 ok("6c. fewer exercises than the full day", $$(".cp-plan__row").length < long, `${$$(".cp-plan__row").length} vs ${long}`);
 
 // ── 7. It counts ───────────────────────────────────────────────────────

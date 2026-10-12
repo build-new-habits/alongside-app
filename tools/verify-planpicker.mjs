@@ -1,6 +1,11 @@
 /**
  * tools/verify-planpicker.mjs
- * 04 Oct 2026 v3
+ * 12 Oct 2026 v4
+ *
+ * v4 - A-1 PLAN-HOME-PRUNE. 3a-2: on the Plan the classes are reached from
+ *   Home's Library row, then the Library's Classes tile (the Plan's only),
+ *   which goes straight to "classes". Read from both files.
+ *
  *
  * v3 - LOOK-4. Home's links are built by one link() template (a tile, the
  *   words); 3a-2 reads the Join a class call and that the template still
@@ -159,7 +164,8 @@ ok("3a. the twelve-week shape routes to the chooser",
    "the picker has no home");
 
 ok("3a-2. and the classes are reachable from Home",
-   /link\('classes', 'Join a class'/.test(todaySrc) && /class="home-link[^"]*" data-route="\$\{route\}"/.test(todaySrc),
+   /class="home-door home-libraryrow" data-route="library"/.test(todaySrc) &&   // v4: Home > Library > Classes
+   /id:\s*"classes"[\s\S]{0,200}directTarget:\s*"classes"[\s\S]{0,40}planOnly:\s*true/.test(fs.readFileSync(new URL("../js/views/library.js", import.meta.url), "utf8")),
    "the room named for classes does not reach them — the fault " +
    "TIMETABLE-1 exists to fix");
 

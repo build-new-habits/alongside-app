@@ -1,5 +1,10 @@
 /*
  * css/layouts/today.css
+ * 12 Oct 2026 v13
+ *   A-1 PLAN-HOME-PRUNE. The Today card (.home-week, .home-today) in the
+ *   teal of the arc; the arc as a line inside it (.home-arcline); the
+ *   coach's card heading as a button to the arc (.home-today__arc); Plan
+ *   your week as a text link; one Library row. Free Home untouched.
  * 06 Oct 2026 v12
  *   D-12 PROGRESS-FIT. Free Home's door tiles: as many columns as fit
  *   9 characters each (two at normal text, one at large text). Two fixed
@@ -778,3 +783,64 @@
 .today-reference { padding: var(--space-1) 0; overflow: hidden; }
 .today-ref-row { gap: var(--space-3); }
 .today-ref-row__icon { font-size: inherit; }
+
+/* ============================================================
+   A-1 PLAN-HOME-PRUNE — Plan Home, 12 Oct 2026
+   The Today card leads (.home-week, and .home-today for the coach's card),
+   the arc a line inside it, then the doors and one Library row.
+   ============================================================ */
+.home-week, .home-today {
+  background: color-mix(in srgb, var(--kind-teal) 14%, var(--color-bg));
+  border-color: color-mix(in srgb, var(--kind-teal) 55%, var(--color-border-light));
+}
+.home-arcline {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 48px;
+  margin-top: var(--space-2);
+  padding: var(--space-3) 0 0;
+  border: 0;
+  border-top: 1px solid color-mix(in srgb, var(--kind-teal) 35%, transparent);
+  background: none;
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--text-sm);
+  line-height: 1.4;
+  text-align: left;
+  cursor: pointer;
+}
+.home-arcline svg { flex: none; color: var(--kind-teal); }
+.home-arcline__text strong { font-weight: 700; }
+.home-today__arc {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.home-today__link {
+  align-self: center;
+  min-height: 44px;
+  padding: 0 var(--space-3);
+  border: 0;
+  background: none;
+  color: var(--color-text);
+  font: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.home-arcline:focus-visible, .home-today__arc:focus-visible, .home-today__link:focus-visible {
+  outline: 3px solid var(--color-border-focus);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+.home-libraryrow { margin-top: var(--space-3); background: transparent; }
+#home-doors-label:focus { outline: none; }

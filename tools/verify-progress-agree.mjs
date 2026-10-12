@@ -1,6 +1,11 @@
 /**
  * tools/verify-progress-agree.mjs
- * 04 Oct 2026 v6
+ * 12 Oct 2026 v7
+ *
+ * v7 - A-1 PLAN-HOME-PRUNE. 8a: the arc on Home is inside the Today card
+ *   now; found by what it says (the aim) rather than the old card's class.
+ *   Still opens the arc.
+ *
  *
  * v6 - D-3 ARC-HOME. REVERSAL from the device test (Graeme's wife, 04
  *   Oct): Home's arc chip opens the arc itself, where it can be changed,
@@ -239,7 +244,8 @@ ok("7b. in the spec's order", (() => {
 console.log("\nTEST 8 - Home's arc chip opens the arc (D-3)");
 fixture({ arc: ARC });
 main.innerHTML = ""; TodayView(router).mount(main);
-ok("8a. the chip opens the arc, where it can be changed", main.querySelector(".home-arc")?.dataset.route === "stretch-arc");
+const arcEl = [...main.querySelectorAll("[data-route]")].find(b => /Your arc/.test(b.textContent || ""));   // v7
+ok("8a. the arc on Home opens the arc, where it can be changed", arcEl?.dataset.route === "stretch-arc", arcEl?.outerHTML?.slice(0, 120));
 
 console.log("");
 if (fails) { console.log(`PROGRESS-AGREE: ${fails} FAILED, ${passes} passed`); process.exit(1); }

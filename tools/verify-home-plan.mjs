@@ -1,6 +1,17 @@
 /**
  * tools/verify-home-plan.mjs
- * 04 Oct 2026 v2
+ * 12 Oct 2026 v3
+ *
+ * v3 - A-1 PLAN-HOME-PRUNE (Graeme approved the mock-up, 12 Oct). REVERSALS,
+ *   by that decision: with no week day set, Tell me what to do leads as the
+ *   Today card's filled button and the doors below are the other two (1a,
+ *   1b); the doors are named only, and what Tell me what to do does is said
+ *   on the card (1d); the arc is a line in the card (1e); Join a class and
+ *   Something for the mind moved to the Library (2e: the Library row; the
+ *   reach is in verify-plan-home-prune 6 and verify-clubshell 2a). Doors are
+ *   counted inside .home-doors (the Library row shares their look). 3d
+ *   unchanged in meaning: three doors under "Or instead", none filled.
+ *
  *
  * v2 - D-1 EXERCISE-FOUR. Reaches Capture (the fourth step) before the set buttons; nothing it proves has changed.
  *
@@ -91,13 +102,14 @@ ok("0a. the greeting is there", /Test/.test(txt(main.querySelector("h1"))));
 
 // ── 1. THREE DOORS ──────────────────────────────────────────────────────
 console.log("\nTEST 1 - three doors, nothing else in front of the choice");
-const doors = [...main.querySelectorAll(".home-door")];
-ok("1a. exactly three doors, in order", doors.map(d => txt(d.querySelector(".home-door__title"))).join(" | ") ===
-   "Tell me what to do | I know what I want | Make it up as I go", doors.map(txt).join(" | "));
-ok("1b. the first is the filled one", doors[0]?.classList.contains("home-door--primary") && !doors[1]?.classList.contains("home-door--primary"));
+const doors = [...main.querySelectorAll(".home-doors .home-door")];
+const lead = main.querySelector(".home-today [data-action='start-today']");
+ok("1a. Tell me what to do leads in the Today card, the other two doors below, in order", !!lead && txt(lead) === "Tell me what to do" &&
+   doors.map(d => txt(d.querySelector(".home-door__title"))).join(" | ") === "I know what I want | Make it up as I go", doors.map(txt).join(" | "));
+ok("1b. the lead is the filled one, and no door is", lead?.classList.contains("btn-primary") && !doors.some(d => d.classList.contains("home-door--primary")));
 ok("1c. no rooms, no tile grid, no reference rows", !main.querySelector(".club-rooms, .club-row, .today-doors, .today-reference, .today-ref-row"));
-ok("1d. each door says what happens next", doors.every(d => txt(d.querySelector(".home-door__sub")).length > 10));
-ok("1e. the arc is one line", !!main.querySelector(".home-arc") && !main.querySelector(".today-arc"));
+ok("1d. what Tell me what to do does is said on the card", /Three quick questions, then today.s plan/.test(txt(main.querySelector(".home-today"))));
+ok("1e. the arc is one line in the card", !!main.querySelector(".home-today [data-route='arc-setup'], .home-today [data-route='stretch-arc']") && !main.querySelector(".today-arc, .home-arc"));
 
 // ── 2. EACH DOOR, ONE TAP ───────────────────────────────────────────────
 console.log("\nTEST 2 - every door and link reaches its screen in one tap");
@@ -107,11 +119,9 @@ ok("2a. Tell me what to do, not checked in: the check-in", JSON.stringify(oneTap
 ok("2b. Tell me what to do, already checked in: straight to the plan", JSON.stringify(oneTap('[data-action="start-today"]', { checkedIn: true })) === '["coach-proposal"]');
 ok("2c. I know what I want", JSON.stringify(oneTap('[data-action="know-what"]')) === '["know-what"]');
 ok("2d. Make it up as I go", JSON.stringify(oneTap('[data-action="as-i-go"]')) === '["capture"]');
-for (const [label, route] of [["Join a class", "classes"], ["Something for the mind", "noticing"], ["Library", "library"]]) {
-  fixture(); home(); navs = [];
-  [...main.querySelectorAll(".home-link")].find(b => txt(b) === label)?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }));
-  ok(`2e. ${label}`, navs[0] === route, JSON.stringify(navs));
-}
+{ fixture(); home(); navs = [];
+  main.querySelector('[data-route="library"]')?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }));
+  ok("2e. Library", navs[0] === "library", JSON.stringify(navs)); }
 
 // ── 3. CARRY ON LATER ───────────────────────────────────────────────────
 console.log("\nTEST 3 - Carry on later, then carry on where they were");
@@ -126,7 +136,7 @@ ok("3b. it goes Home and saves nothing as done", navs.at(-1) === "today" && (sto
 home(["workout"]);
 const card = main.querySelector(".home-carry");
 ok("3c. Home leads with the Carry-on card: the session and what is next", !!card && /Upper Body/.test(txt(card)) && /Next: Press/.test(txt(card)) && /2 of 3/.test(txt(card)), txt(card));
-ok("3d. the doors are still there, under \"Or instead\"", /Or instead/.test(txt(main)) && main.querySelectorAll(".home-door").length === 3 &&
+ok("3d. the doors are still there, under \"Or instead\"", /Or instead/.test(txt(main)) && main.querySelectorAll(".home-doors .home-door").length === 3 &&
    !main.querySelector(".home-door--primary"));
 navs = [];
 tap('[data-action="carry-on"]');

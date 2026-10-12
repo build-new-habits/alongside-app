@@ -1,6 +1,12 @@
 /**
  * tools/verify-plan-claims.mjs
- * 06 Oct 2026 v7
+ * 12 Oct 2026 v8
+ *
+ * v8 - A-1 PLAN-HOME-PRUNE. 3.home: the Plan's three ways in are read from
+ *   the controls themselves (start-today, know-what, as-i-go), because with
+ *   no week day set Tell me what to do is the Today card's button, not the
+ *   first door. The claim and its words are unchanged.
+ *
  *
  * v7 - D-11 PROGRESS-SHARE. 3.progress follows the tier table's new row:
  *   free has Today, 7, 14 and 30 days (tabs, nothing locked) and sharing;
@@ -155,7 +161,7 @@ ok("3pc. the table has the spec's rows, and Wellbeing and Safety are the same on
 tierFixture("free"); mountView(TodayView);
 const freeHome = { doors: box.querySelectorAll(".home-door").length, tiles: box.querySelectorAll("[data-door-id]").length, pick: !!box.querySelector('[data-action="start-today"]') };
 tierFixture("personal"); mountView(TodayView);
-const planDoors = [...box.querySelectorAll(".home-door__title")].map(txt);
+const planDoors = [...box.querySelectorAll('[data-action="start-today"], [data-action="know-what"], [data-action="as-i-go"]')].map(b => txt(b.querySelector(".home-door__title") || b));   // v8
 ok("3.home  free: any kind of session, or the coach suggests one; the Plan: three ways in",
    freeHome.doors === 0 && freeHome.tiles >= 3 && freeHome.pick &&
    JSON.stringify(planDoors) === JSON.stringify(["Tell me what to do", "I know what I want", "Make it up as I go"]), JSON.stringify({ freeHome, planDoors }));

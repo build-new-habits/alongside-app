@@ -1,5 +1,16 @@
 /**
  * today.js
+ * 12 Oct 2026 v57
+ *
+ * v57 - A-1 PLAN-HOME-PRUNE (Stage AWARD; Graeme approved the mock-up, 12
+ *   Oct). Plan Home: one Today card (the week's day; a rest day; or, with
+ *   no day set, the coach's card leading with the arc and Tell me what to
+ *   do), the arc a line inside the card, the doors (named only), and one
+ *   Library row. Six ways in at most. Join a class, Go for a run, Something
+ *   for the mind and Your week moved to the Library; the week card's Only
+ *   10 minutes (the plan's Length does it) and Something else today (the
+ *   doors are below it) went. Free Home unchanged. Old markup archived.
+ *
  * 05 Oct 2026 v56
  *
  * v56 - D-7 PLAN-IMPORT. On a day of the week that is the person's own list
@@ -1251,7 +1262,9 @@ export function TodayView(router) {
              is why the taxonomy is visible here and hidden on Plan: the
              "coach weaves body and mind" argument only holds where there
              IS a coach doing the weaving. -->
-        ${isPremium() ? _arcChip() : ''}
+        <!-- A-1 (v57). The arc is inside Plan Home's Today card now
+             (_arcLine / _coachCard); its own card here went. -->
+
 
         <!-- MY PROGRAMME ROW REMOVED, LOBBY-1c, 03 Sep 2026.
              It read "Your goals and where you are up to" and sat
@@ -2096,50 +2109,108 @@ function _markGuidanceShown(root) {
    * session to carry on, in which case that card leads and all three sit
    * quietly under "Or instead".
    */
+  /**
+   * A-1 PLAN-HOME-PRUNE (v57; Graeme approved the mock-up, 12 Oct: "I love
+   * plan home"). One Today card, then the doors, then one Library row: six
+   * ways in at most (it was up to twelve).
+   *   - A day of the week: that day leads, the arc a line inside the card,
+   *     all three doors below.
+   *   - A rest day: said, with the arc; all three doors below.
+   *   - No week, or nothing set for today: the coach's card leads with the
+   *     arc and Tell me what to do, which is then not repeated below; the
+   *     week is offered on the card.
+   *   - A session to carry on: that card leads, the arc a line under it.
+   * Join a class, Go for a run, Something for the mind and Your week moved
+   * to the Library (one tap; the mind is also the Wellbeing tab). The old
+   * markup is archived in BNH-Files, Archive/Stage AWARD/A-1.
+   */
   function _planDoors() {
     const carry = _carryOn();
-    const checkedIn = _checkedInToday();
     // D-6. The week's day leads when there is one for today.
     const week = todayInWeek();
-    const weekLeads = !carry && !!(week && week.template);
+    const weekCard = !carry && !!(week && (week.template || week.value === 'rest'));
+    const coachCard = !carry && !weekCard;
     // LOOK-4. A tile, the words, a chevron. The words decide, not the colour.
-    const door = (action, title, sub, primary, icon) => `
-      <button class="home-door ${primary ? 'home-door--primary' : ''}" data-action="${action}">
+    // A-4: the doors' second lines went; their names say it.
+    const door = (action, title, icon) => `
+      <button class="home-door" data-action="${action}">
         <span class="kind-tile k-teal">${lineIcon(icon)}</span>
-        <span class="home-door__text">
-          <span class="home-door__title">${title}</span>
-          <span class="home-door__sub">${sub}</span>
-        </span>
+        <span class="home-door__text"><span class="home-door__title">${title}</span></span>
         <span class="home-door__chev" aria-hidden="true">${lineIcon('chevron', 20)}</span>
       </button>`;
-    const link = (route, label, icon, kind) => `
-        <button class="home-link home-link--tile" data-route="${route}" data-requires-checkin="false">
-          <span class="kind-tile k-${kind}">${lineIcon(icon)}</span>
-          <span class="home-link__label">${label}</span>
-        </button>`;
+    const label = carry ? 'Or instead' : coachCard ? 'Or choose for yourself' : 'Or something else today';
+    // The Library row names what moved there; your week only when no card
+    // on Home already offers it.
+    const libSub = `Classes, runs, the mind, your lists${coachCard ? '' : ', your week'}`;
     // GUIDANCE-1 goes with the doors: it was in the rooms, and the rooms
     // were the only Plan place it was said. Found by verify-clubshell 12a.
     return `
       ${_scopeNotice()}
       ${_guidanceLine()}
-      ${carry ? _carryOnCard(carry) : ''}
-      ${!carry && week ? _weekCard(week) : ''}
-      ${carry || weekLeads ? `<p class="home-doors__or" id="home-doors-label" tabindex="-1">${carry ? 'Or instead' : 'Or something else today'}</p>` : '<h2 class="look-label" id="home-doors-label">What would you like to do?</h2>'}
+      ${carry ? _carryOnCard(carry) + _arcChip() : ''}
+      ${weekCard ? _weekCard(week) : ''}
+      ${coachCard ? _coachCard(week) : ''}
+      <h2 class="look-label" id="home-doors-label" tabindex="-1">${label}</h2>
       <div class="home-doors" role="group" aria-labelledby="home-doors-label">
-        ${door('start-today', 'Tell me what to do',
-               checkedIn ? 'You\u2019ve checked in \u2014 straight to your plan' : 'Three quick questions, then your plan',
-               !carry && !weekLeads, 'star')}
-        ${door('know-what', 'I know what I want', 'Pick the kind of session and how long', false, 'choose')}
-        ${door('as-i-go', 'Make it up as I go', 'Log each move as you do it', false, 'pencil')}
+        ${coachCard ? '' : door('start-today', 'Tell me what to do', 'star')}
+        ${door('know-what', 'I know what I want', 'choose')}
+        ${door('as-i-go', 'Make it up as I go', 'pencil')}
       </div>
-      <h2 class="look-label" id="home-links-label">Or go straight to</h2>
-      <div class="home-links home-links--grid" role="group" aria-labelledby="home-links-label">
-        ${link('classes', 'Join a class', 'classes', 'rose')}
-        ${link('running-session', 'Go for a run', 'run', 'blue')}
-        ${link('noticing', 'Something for the mind', 'mind', 'green')}
-        ${link('library', 'Library', 'library', 'slate')}
-        ${link('your-week', week ? 'Your week' : 'Plan your week', 'week', 'teal')}
-      </div>`;
+      <button class="home-door home-libraryrow" data-route="library" data-requires-checkin="false">
+        <span class="kind-tile k-slate">${lineIcon('library')}</span>
+        <span class="home-door__text">
+          <span class="home-door__title">Library</span>
+          <span class="home-door__sub">${libSub}</span>
+        </span>
+        <span class="home-door__chev" aria-hidden="true">${lineIcon('chevron', 20)}</span>
+      </button>`;
+  }
+
+  /**
+   * A-1. The arc as a line inside a card: opens the arc, or offers to set
+   * one up. Week n is where the arc is, never a count (ARC-1).
+   */
+  function _arcLine() {
+    const arc = store.get('arc') || {};
+    const aim = arc.active ? ((arc.aimId && aimById(arc.aimId)?.label) || arc.label || 'your arc') : null;
+    const wk = arc.active ? arcWeek(arc, new Date()) : null;
+    return aim
+      ? `<button class="home-arcline" data-route="stretch-arc" data-requires-checkin="false"
+                 aria-label="Your arc${wk ? `, week ${wk}` : ''}: working towards ${_esc(aim)}">
+           ${lineIcon('arc', 20)}
+           <span class="home-arcline__text"><strong>Your arc${wk ? ` \u00b7 Week ${wk}` : ''}.</strong> ${_esc(aim)}</span>
+         </button>`
+      : `<button class="home-arcline" data-route="arc-setup" data-requires-checkin="false">
+           ${lineIcon('arc', 20)}
+           <span class="home-arcline__text"><strong>Your arc.</strong> Tell me what you want to be able to do</span>
+         </button>`;
+  }
+
+  /**
+   * A-1. No week, or nothing set for today: the coach chooses. Leads with
+   * the arc when there is one (its aim is the heading, and opens the arc),
+   * then Tell me what to do, then the week.
+   */
+  function _coachCard(week) {
+    const arc = store.get('arc') || {};
+    const aim = arc.active ? ((arc.aimId && aimById(arc.aimId)?.label) || arc.label || null) : null;
+    const wk = aim ? arcWeek(arc, new Date()) : null;
+    const line = _checkedInToday() ? 'You\u2019ve checked in. Straight to today\u2019s plan.' : 'Three quick questions, then today\u2019s plan.';
+    const top = aim
+      ? `<button class="home-today__arc" data-route="stretch-arc" data-requires-checkin="false"
+                 aria-label="Your arc${wk ? `, week ${wk}` : ''}: working towards ${_esc(aim)}">
+           <span class="look-label home-week__lbl">Your arc${wk ? ` \u00b7 Week ${wk}` : ''}</span>
+           <span class="home-week__name" id="home-today-h">${_esc(aim)}</span>
+         </button>`
+      : `<p class="look-label home-week__lbl">Today</p>
+         <h2 class="home-week__name" id="home-today-h">What shall we do today?</h2>`;
+    return `<section class="home-week home-today look-card" aria-labelledby="home-today-h">
+      ${top}
+      <p class="home-week__line">${line}</p>
+      <button class="btn btn-primary btn-large btn-full" data-action="start-today">Tell me what to do</button>
+      ${aim ? '' : _arcLine()}
+      <button class="home-today__link" data-route="your-week" data-requires-checkin="false">${week ? 'Your week' : 'Plan your week'}</button>
+    </section>`;
   }
 
   /**
@@ -2153,6 +2224,7 @@ function _markGuidanceShown(root) {
         <p class="look-label home-week__lbl">Today, from your week</p>
         <h2 class="home-week__name" id="home-week-h">Rest</h2>
         <p class="home-week__line">Today is a rest day in your week. Rest counts.</p>
+        ${_arcLine()}
       </section>`;
     }
     const t = week.template;
@@ -2166,6 +2238,7 @@ function _markGuidanceShown(root) {
         ${left ? `<p class="home-week__line">${left} exercise${left === 1 ? '' : 's'}, as you wrote ${left === 1 ? 'it' : 'them'}.</p>
         <button class="btn btn-primary btn-large btn-full" data-action="week-own">Start your list</button>`
         : `<p class="home-week__line">All done today.</p>`}
+        ${_arcLine()}
       </section>`;
     }
     return `<section class="home-week look-card" aria-labelledby="home-week-h">
@@ -2174,10 +2247,7 @@ function _markGuidanceShown(root) {
       <p class="home-week__line">${_esc(mixLine(t))}.</p>
       <p class="home-week__line">${_esc(detailLine(t))}</p>
       <button class="btn btn-primary btn-large btn-full" data-action="week-today">Show me today\u2019s plan</button>
-      <div class="home-week__row">
-        <button class="btn btn-secondary" data-action="week-short">Only 10 minutes</button>
-        <button class="btn btn-secondary" data-action="week-else">Something else today</button>
-      </div>
+      ${_arcLine()}
     </section>`;
   }
 

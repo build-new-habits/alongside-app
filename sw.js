@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 12 Oct 2026 v657
+ * 12 Oct 2026 v658
  *
+ * v658 - A-1 PLAN-HOME-PRUNE (Graeme approved the mock-up, 12 Oct: "I love plan home"): Plan Home leads with one Today card (the day from your week, a rest day, or, with nothing set, your arc and Tell me what to do), your arc a line inside it, then the doors and one Library row: six ways in at most. Join a class, Go for a run, Something for the mind and Your week are in the Library (Classes and Your week as new tiles on the Plan only). The week card's Only 10 minutes went (the plan's Length does it). Free Home and Free's Library are unchanged.
  * v657 - Stage AWARD, first batch (Graeme, 12 Oct: "Great plan. Let's go with it"): on the Plan, Settings › Your week opens Your week and, once it is set, the older weekly plan no longer leads the coach's plan; Free keeps its weekly plan, and Settings no longer says the coach uses it (A-3). Three exercise descriptions made to match their own instructions: the internal-rotation band is anchored on the same side as the working arm; Thoracic Rotation and Side-Lying Thoracic Rotation (was Prone) lie on the side (A-6). After Home, the screens people open next load while the phone is idle, so their first open is quicker; the page's character set is declared where browsers look for it (A-8). Something different today names Make it up as I go by its name (A-9). NEW FILE precached: js/data/warm-views.js.
  * v656 - D-11 PROGRESS-SHARE (Graeme, 06 Oct): Progress shows today and the last 7, 14 or 30 days on both tiers, and 90 on the Plan; Download today's report says what was done, where and how many; Share your progress makes a picture, a certificate, a report to print or save as a PDF, or text to copy (with a CSV), on both tiers. The picture holds only sessions and kinds unless the person switches more on; the journal, notes and weight are never included; check-in answers only by choice and with the health consent. Each session records where it was done. NEW FILES precached: js/data/progress-report.js, js/data/share-images.js, js/views/progress-share.js, css/components/progress-share.css, two Newsreader font files and six brand logo images.
  * v655 - D-12 PROGRESS-FIT (device test, 06 Oct: "when I go into progress the screen shifts right ... it's every time"): no screen is wider than the phone at any text size. The text size was applied twice (1.45 drew 2.1x); it is applied once now, and the slider goes up to 2. Progress and Plan your week are the screen's width; at large text Progress is one thing per row with the week chart on its side; full-width buttons, session and Mobility & Conditioning headers, Home's door tiles and the morning week grid reflow; the bottom navigation stops growing at about 1.45x so its labels never collide.
@@ -4204,7 +4205,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v657";
+const CACHE_NAME = "alongside-v658";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4217,7 +4218,7 @@ const SHELL_HASHES = {
   "./css/main.css": "e306ded0118cbea6",
   "./css/base/fonts.css": "04893bbdfa4cf013",
   "./css/layouts/onboarding-additions.css": "a204c285b813c6e8",
-  "./css/layouts/today.css": "31ae917bee386879",
+  "./css/layouts/today.css": "6b7dac51c8280fb9",
   "./css/layouts/my-programme.css": "6fc8794818a509aa",
   "./css/layouts/library.css": "21c782973f58ddca",
   "./css/layouts/mobility-conditioning.css": "659731db8ac66fa7",
@@ -4286,7 +4287,7 @@ const SHELL_HASHES = {
   "./js/session-guard.js": "00177a846537868c",
   "./js/session-resume.js": "6916b88c0757374f",
   "./js/auth.js": "9b9c7a632dccada6",
-  "./js/views/today.js": "f4115b4d5f268ce7",
+  "./js/views/today.js": "29e4cc210e80dd9d",
   "./js/views/mobility-conditioning.js": "d77cde7833239666",
   "./js/views/arc-setup.js": "bc3f0046616fc07b",
   "./js/views/stretch-arc.js": "e67d2715e6019eb9",
@@ -4320,7 +4321,7 @@ const SHELL_HASHES = {
   "./js/views/programme-select.js": "8f1e740ed2db223b",
   "./js/views/upgrade.js": "4b7233092e3561da",
   "./js/views/privacy.js": "a64dfefd8a24d1ac",
-  "./js/views/library.js": "3e523a600356e714",
+  "./js/views/library.js": "b338defd49ca0775",
   "./js/views/practices.js": "69ede443c8d69360",
   "./js/views/red-flag.js": "cfe041e1e4da9ecb",
   "./js/views/health-consent.js": "eaead26a28761859",

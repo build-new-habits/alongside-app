@@ -1,6 +1,12 @@
 /**
  * tools/verify-free-classes.mjs
- * 02 Oct 2026 v5
+ * 12 Oct 2026 v6
+ *
+ * v6 - A-1 PLAN-HOME-PRUNE (Graeme approved the mock-up, 12 Oct). 3a: on
+ *   the Plan, classes moved from a Home tile to the Library (Classes, the
+ *   Plan's only). Still reached, now Home > Library > Classes. Free's own
+ *   door (TEST 1) is unchanged.
+ *
  *
  * v5 - W5-2 BAD-DAY-DOORS. At Bad (8) Classes now asks Rest today /
  *   Something gentler instead of listing classes; 4a holds the list's own
@@ -133,7 +139,12 @@ ok("2b. Putting the Day Down (mixed, every step with a seated version) says both
 console.log("\nTEST 3 - control: the Plan's \"Join a class\" is unchanged");
 fixture("personal");
 await go("today");
-ok("3a. \"Join a class\" is on Plan Home", !!$$("button").find(b => /Join a class/.test(txt(b)) && b.dataset.route === "classes"));
+ok("3a. Plan Home's Library row is there", !!$$("button").find(b => b.dataset.route === "library"));
+await go("library");
+const libClasses = $$("button").find(b => b.dataset.guided === "classes");
+ok("3b. and the Library offers Classes", !!libClasses);
+libClasses?.dispatchEvent(new window.MouseEvent("click", { bubbles: true })); await wait(60);
+ok("3c. which opens the classes", router.currentView === "classes", router.currentView);
 
 // ── 4. A SEVERE SCORE HOLDS A CLASS BACK ────────────────────────────────
 console.log("\nTEST 4 - a knee scored 8 today holds back the classes that load it");

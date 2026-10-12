@@ -1,6 +1,14 @@
 /**
  * tools/verify-lobby1.mjs
- * 30 Sep 2026 v4
+ * 12 Oct 2026 v5
+ *
+ * v5 - A-1 PLAN-HOME-PRUNE (Graeme approved the mock-up, 12 Oct). REACH
+ *   only: Plan's arc is no longer a card of its own above the doors
+ *   (isPremium() ? _arcChip()); it is inside Plan Home's Today card, drawn
+ *   by _planDoors() through _arcLine() / _coachCard(). 7a, 10a and 11a read
+ *   that: Plan renders the arc, free renders its offer, and the two are
+ *   still different screens on one tier ternary. Same properties.
+ *
  *
  * v4 - W3-13. Free's side of the Home ternary now begins with the card
  *   for a session the phone closed (_freeCarryCard()); 11d finds the
@@ -175,7 +183,9 @@ check("7a. the arc panel is on Home", () => {
   // arc moved out of it and each tier places it explicitly -- above on
   // Plan, below on free. Both branches asserted separately: one regex
   // over the whole file passed with a tier's arc deleted.
-  ok(/isPremium\(\) \? _arcChip\(\) : ''/.test(today),
+  // v5. Inside the Plan branch's _planDoors(): the Today card's arc.
+  const pd = today.slice(today.indexOf("function _planDoors"), today.indexOf("function _arcLine"));
+  ok(/isPremium\(\) \? _planDoors\(\)/.test(today) && /_coachCard\(week\)/.test(pd) && /function _coachCard[\s\S]*data-route="stretch-arc"/.test(today) && /\$\{_arcLine\(\)\}/.test(today),
      "Plan's Home does not render the arc");
   // CLUB-SHELL, 06 Sep 2026. Free's arc moved into the same ternary that
   // chooses the chooser, because Plan now renders clubRooms() instead.
@@ -273,7 +283,7 @@ check("10a. session tiles have left PLAN's Home", () => {
   //
   // The original property is unchanged where it applies -- Plan's Home
   // is still an arc and an invitation, nothing else.
-  const at = today.indexOf("${isPremium() ? _arcChip()");
+  const at = today.indexOf("${isPremium() ? _planDoors()");   // v5
   ok(at > -1, "Home no longer branches on tier");
   // HOME-DOORS, 06 Sep 2026. THIS ASSERTION IS INVERTED, deliberately.
   // It used to require that Plan's Home had NO tiles. On device the
@@ -358,13 +368,13 @@ check("11a. Home branches on tier at all", () => {
   // Decided 3 Sep and unbuilt until 5 Sep: both tiers rendered an
   // identical Home, which is the one thing the design said it must
   // never be. Free is not Plan with a panel swapped.
-  ok(/isPremium\(\) \? _arcChip\(\)/.test(today),
+  ok(/isPremium\(\) \? _planDoors\(\) : _freeCarryCard\(\) \+ chooser\(\) \+ arcPanel\(\)/.test(today),   // v5
      "the arc panel renders on both tiers, so free is Plan with a panel swapped");
   // HOME-DOORS. The tiers no longer differ in their CALL TO ACTION --
   // both get the doors, which is what Plan lost on 04 Sep. They differ
   // in the arc: Plan leads with it, free is offered it beneath the
   // doors. Asserted as two positions, not one branch.
-  const arcPlan = today.indexOf("isPremium() ? _arcChip() : ''");
+  const arcPlan = today.indexOf("isPremium() ? _planDoors()");   // v5: the Plan's arc is inside its doors
   const arcFree = today.indexOf("chooser() + arcPanel()");
   ok(arcPlan > -1 && arcFree > -1 && arcPlan < arcFree,
      "the arc sits in the same place on both tiers, so free is Plan with a panel swapped");

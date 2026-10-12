@@ -1,6 +1,11 @@
 /**
  * tools/verify-home-fold.mjs
- * 28 Sep 2026 v1
+ * 12 Oct 2026 v2
+ *
+ * v2 - A-1 PLAN-HOME-PRUNE. F3b: a control named in the coach line may be
+ *   the Today card's button (Tell me what to do, with no week day set) as
+ *   well as a door. Still: nothing named that is not on the screen.
+ *
  *
  * F3 GUIDANCE-FOLD and F4 HATCH-GUTTER, from the finish list.
  *
@@ -69,7 +74,7 @@ console.log("\nF3b - a coach line on Plan Home names only doors that are on it")
 for (const goals of [["get-stronger"], ["flexibility"], []]) {
   c = home({ goals, guidanceShownAt: month });
   const head = txt(c.querySelector(".today-header"));
-  const doors = [...c.querySelectorAll(".home-door__title")].map(txt);
+  const doors = [...c.querySelectorAll(".home-door__title, .home-week [data-action], .home-today [data-action]")].map(txt);   // v2
   const named = [...head.matchAll(/(Cardio, Core & Strength|Mobility & Conditioning|‘([^’]+)’)/g)].map(m => m[2] || m[1]);
   ok(`F3b ${JSON.stringify(goals)}: "${head.slice(0, 70)}"`, named.every(n => doors.includes(n)), `names ${named.join(", ")}; doors ${doors.join(", ")}`);
 }

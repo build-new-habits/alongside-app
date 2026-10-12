@@ -1,6 +1,12 @@
 /**
  * tools/verify-arc-door.mjs
- * 04 Oct 2026 v4
+ * 12 Oct 2026 v5
+ *
+ * v5 - A-1 PLAN-HOME-PRUNE (Graeme approved the mock-up, 12 Oct). REACH
+ *   only: Plan Home's arc is a line inside the Today card, no longer its
+ *   own .home-arc card. Found by its route (stretch-arc, or arc-setup with
+ *   no arc), as a person finds it by its words. Every assertion unchanged.
+ *
  *
  * v4 - D-3 ARC-HOME. REVERSAL of v3, from the device test (Graeme's wife
  *   expected the arc, and how to change it, not Progress): the Plan chip
@@ -79,11 +85,12 @@ console.log("\nARC-DOOR — free gets the door, never the arc\n");
 // FIXTURE INTEGRITY FIRST. The previous investigation set aimId without
 // active, landed on the offer branch, and reported no leak.
 store.set("tier","personal"); store.set("arc",ACTIVE_ARC); paint();
-const paidEl=document.querySelector(".home-arc");
+const PLAN_ARC='[data-route="stretch-arc"], [data-route="arc-setup"]';   // v5
+const paidEl=document.querySelector(PLAN_ARC);
 ok("FIXTURE REACHES THE ACTIVE BRANCH: Plan's arc line opens the arc, with the aim",
   paidEl && paidEl.dataset.route==="stretch-arc" && /Build a core that actually holds me up/.test(paidEl.textContent));
 reverses("the fixture is not quietly on the offer branch (the fault that hid this)",
-  ()=>/home-arc--offer/.test(paidEl.className));
+  ()=>paidEl.dataset.route==="arc-setup");
 
 store.set("tier","free"); paint();
 const freeEl=document.querySelector(".today-arc");
@@ -101,7 +108,7 @@ reverses("free cannot walk into arc setup from Home",
 
 // Plan with no arc keeps the real setup entrance.
 store.set("tier","personal"); store.set("arc",{}); paint();
-const setupEl=document.querySelector(".home-arc");
+const setupEl=document.querySelector(PLAN_ARC);
 ok("Plan without an arc still gets the SETUP entrance",
   setupEl && setupEl.dataset.route==="arc-setup");
 

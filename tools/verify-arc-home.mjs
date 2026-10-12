@@ -1,6 +1,12 @@
 /**
  * tools/verify-arc-home.mjs
- * 04 Oct 2026 v1
+ * 12 Oct 2026 v2
+ *
+ * v2 - A-1 PLAN-HOME-PRUNE (Graeme approved the mock-up, 12 Oct). REACH
+ *   only: the arc on Plan Home is inside the Today card (its heading with no
+ *   week, a line with one), found by its route, stretch-arc. 1pc and 1a
+ *   assert the same things: the aim is on Home, and tapping it opens the arc.
+ *
  *
  * D-3 ARC-HOME. Graeme's wife, on the device test: tapping "Your arc" on
  * Home she expected the arc, and how to change, renew, update or develop
@@ -79,7 +85,7 @@ const view = () => router.currentView;
 console.log("\nTEST 1 - Home's Your arc opens the arc");
 fixture();
 await go("today");
-const card = $(".home-arc");
+const card = $('[data-route="stretch-arc"]');   // v2: inside the Today card
 ok("1pc. Home shows the Your arc card with the aim", !!card && txt(card).includes(aimById(ARC.aimId).label), txt(card));
 await click(card);
 ok("1a. tapping it opens the arc, not Progress", view() === "stretch-arc", view());

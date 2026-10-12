@@ -1,6 +1,11 @@
 /**
  * tools/verify-capture.mjs
- * 28 Sep 2026 v3
+ * 12 Oct 2026 v4
+ *
+ * v4 - A-1 PLAN-HOME-PRUNE. 5.3 counts door('...') calls wherever they sit:
+ *   Tell me what to do is now written ${coachCard ? '' : door(...)}, as the
+ *   coach's card leads with it when no week day is set. Still exactly three.
+ *
  *
  * v3 - SMOOTH-P3c. capture.js v2 is "Make it up as I go": sets are logged
  *   on the move card itself, so there is no longer a player to walk a
@@ -207,7 +212,7 @@ console.log("\nTEST 5 — reachable, and not a fifth room");
      /data-action="as-i-go"\]'\)\s*\?\.addEventListener\('click', \(\) => router\.navigate\('capture'\)\)/.test(today));
   const doorsFn = today.slice(today.indexOf("function _planDoors"), today.indexOf("function _arcChip"));
   ok("5.3 REVERSAL: it is not a fourth door on Home",
-     (doorsFn.match(/\$\{door\('/g) || []).length === 3,
+     (doorsFn.match(/\bdoor\('/g) || []).length === 3,
      "three doors is spec 4.1. If a door is legitimately added, change this " +
      "line on purpose rather than loosening the count");
   ok("5.4 and its stylesheet is imported",

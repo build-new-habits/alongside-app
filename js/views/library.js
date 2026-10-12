@@ -1,6 +1,11 @@
 /**
  * library.js - Library Page
  *
+ * 12 Oct 2026 v16
+ *
+ * v16 - A-1 PLAN-HOME-PRUNE (Stage AWARD). Two tiles on the Plan only:
+ *   Classes and Your week, which left Plan Home. Free's Library unchanged.
+ *
  * 04 Oct 2026 v15
  *
  * v15 - D-5 LIBRARY-ONCE. The category page (At home, At the gym, Mindful
@@ -392,6 +397,28 @@ const GUIDED_CATEGORIES = [
     sessions: [],
     directTarget: "coach-proposal"
   },
+  // A-1 PLAN-HOME-PRUNE (v16). Join a class and Your week left Plan Home;
+  // they are here, one tap from it. The Plan's only: Free Home keeps its
+  // own Classes tile and Free's Library is as it was (Graeme, 12 Oct:
+  // Free is left alone).
+  {
+    id:          "classes",
+    label:       "Classes",
+    icon:        "",
+    description: "Guided classes to follow along",
+    sessions: [],
+    directTarget: "classes",
+    planOnly:    true
+  },
+  {
+    id:          "week",
+    label:       "Your week",
+    icon:        "",
+    description: "What each day is for",
+    sessions: [],
+    directTarget: "your-week",
+    planOnly:    true
+  },
 ];
 
 const LOG_CATEGORIES = [
@@ -488,13 +515,14 @@ const CATEGORY_LOOK = {
   run: ["run", "blue"], walk: ["walk", "blue"], swim: ["swim", "blue"], cycle: ["cycle", "blue"],
   yoga: ["yoga", "violet"], mindful: ["mind", "green"], practices: ["breath", "green"],
   prescribed: ["list", "teal"], coach: ["star", "teal"],
+  classes: ["classes", "rose"], week: ["week", "teal"],
 };
 
 /** The category tiles, shared by the Library page and the old landing. */
 function categoryGrid(labelledBy) {
   return `
       <div class="library-category-grid" role="group" aria-labelledby="${labelledBy}">
-        ${GUIDED_CATEGORIES.map(cat => {
+        ${GUIDED_CATEGORIES.filter(cat => !cat.planOnly || isPremium()).map(cat => {
           const [icon, kind] = CATEGORY_LOOK[cat.id] || ["star", "slate"];
           const inner = `
             <span class="kind-tile k-${kind} library-category-icon">${lineIcon(icon)}</span>

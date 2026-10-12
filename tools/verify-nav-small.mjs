@@ -1,6 +1,11 @@
 /**
  * tools/verify-nav-small.mjs
- * 12 Oct 2026 v5
+ * 12 Oct 2026 v6
+ *
+ * v6 - A-1 PLAN-HOME-PRUNE (Graeme approved the mock-up, 12 Oct). TEST 2:
+ *   the Plan still has a way to a run (the W3-21 finding), now Home's
+ *   Library row then the Library's Run tile, two taps (it was a Home tile).
+ *
  *
  * v5 - A-9 ONE-NAME (Stage AWARD). 8a: the logging door under Something
  *   different today is named Make it up as I go, the name it has on Home and
@@ -160,10 +165,14 @@ ok("1h. REVERSAL: tapping Length again closes the list, nothing changed",
 console.log("\nTEST 2 - Plan Home has a way to a run");
 fixture();
 main.innerHTML = ""; TodayView(rtr).mount(main); navs = [];
-const runLink = [...main.querySelectorAll(".home-link")].find(b => /run/i.test(txt(b)));
-ok("2a. a Go for a run link on Plan Home", !!runLink && txt(runLink) === "Go for a run", [...main.querySelectorAll(".home-link")].map(txt).join(" | "));
-click(runLink); await wait(10);
-ok("2b. one tap opens the Run door", navs.includes("running-session"), JSON.stringify(navs));
+const libRow = main.querySelector('[data-route="library"]');
+ok("2a. Plan Home has the Library row", !!libRow && /runs/.test(txt(libRow)), txt(libRow));
+click(libRow); await wait(10);
+const lib = await import(B + "views/library.js");
+main.innerHTML = lib.render(); lib.onMount(); navs = [];
+const runTile = main.querySelector('[data-guided="run"]');
+click(runTile); await wait(10);
+ok("2b. and the Library's Run opens the Run door", !!runTile && navs.includes("running-session"), JSON.stringify(navs));
 
 // ── 3. LOOKING DOES NOT CHANGE THE DEFAULT ──────────────────────────────
 console.log("\nTEST 3 - looking at a plan does not change where the next one is for");

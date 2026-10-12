@@ -1,6 +1,12 @@
 /**
  * tools/verify-timetable.mjs
- * 02 Oct 2026 v5
+ * 12 Oct 2026 v6
+ *
+ * v6 - A-1 PLAN-HOME-PRUNE (Graeme approved the mock-up, 12 Oct). REACH:
+ *   the Plan's way to the classes is Home's Library row, then the Library's
+ *   Classes tile (it was a Home tile). TEST 1 drives both taps; its meaning
+ *   (somebody can reach the classes, with no programme chosen) unchanged.
+ *
  *
  * v5 - W5-2 BAD-DAY-DOORS. At Bad (8 and over) Classes now asks Rest today /
  *   Something gentler instead of listing classes, so TEST 4's held list is
@@ -156,10 +162,14 @@ console.log("\nTEST 1 - the room named for classes leads to them");
 seed();
 homeRoom();
 
-const goBtn = main.querySelector('.home-link[data-route="classes"]');
-ok("1pc. positive control: Home rendered Plan's doors and links",
-   main.querySelectorAll(".home-door").length === 3 && main.querySelectorAll(".home-link").length > 0,
+// v6. Two taps: Home's Library row, then the Library's Classes tile.
+const libRow = main.querySelector('.home-libraryrow[data-route="library"]');
+ok("1pc. positive control: Home rendered Plan's doors and its Library row",
+   main.querySelectorAll(".home-doors .home-door").length >= 2 && !!libRow,
    "not Plan's Home - everything below measures nothing");
+const lib = await import(B + "views/library.js");
+main.innerHTML = lib.render(); lib.onMount();
+const goBtn = main.querySelector('[data-guided="classes"]');
 
 ok("1a. it offers a way to the classes", !!goBtn && /class/i.test(goBtn.textContent),
    "THE FAULT: seven playable classes and the room named for them led " +
