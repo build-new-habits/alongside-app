@@ -1,7 +1,11 @@
 /**
  * prescribed.js - My exercises
  *
- * 05 Oct 2026 v1.8
+ * 13 Oct 2026 v1.9
+ *
+ * v1.9 - A-7 EMPTY-AND-FIRST (Stage AWARD). Empty: a heading, "No exercises
+ *   yet", and one line saying what goes here (it said "Add an exercise with
+ *   the button below"). The Add button is the action, as before.
  *
  * v1.8 - D-7 PLAN-IMPORT. Exercises added from a plan carry their day
  *   (group: "Session A"); the list shows each day under its own heading
@@ -202,11 +206,12 @@ export function render() {
 
 function renderEmptyState() {
   return `
-    <div class="card prescribed-empty-card" role="note">
+    <section class="card prescribed-empty-card" aria-labelledby="prescribed-empty-h">
+      <h2 id="prescribed-empty-h" class="prescribed-empty__h">No exercises yet</h2>
       <p class="text-secondary">
-        Nothing here yet. Add an exercise with the button below.
+        Add exercises you’ve been given, or ones you like to do. They’ll be here, as you wrote them.
       </p>
-    </div>
+    </section>
   `;
 }
 

@@ -1,5 +1,5 @@
 # Alongside: Move — Glossary
-## 12 Oct 2026 v1
+## 13 Oct 2026 v2
 
 A-9 ONE-NAME (Stage AWARD). One name for each thing, across the app, the website and the policies. A screen, a page or a policy that names one of these uses the name in the **Use** column. Names in **Not** are retired or wrong for it; `tools/verify-one-name.mjs` fails if a retired one reaches a string in `js/`.
 
@@ -13,7 +13,7 @@ Taken from the words on every screen (`node tools/chromium-words.mjs`, 95 screen
 | Logging moves while you do them (capture) | **Make it up as I go** | I'll just log what I do, Freestyle | The Plan's. Freestyle remains the swimming stroke |
 | Recording something already done | **Log what I did** | — | Library, both tiers. A different thing from Make it up as I go |
 | The person's own exercise list (from a physio, a PT or anywhere) | **My exercises** | Prescribed, your own list | "Your own list" is its description on the Library tile, not a second name |
-| Sessions the person saved to repeat | **saved sessions** *(proposed)* | — | 🟡 Graeme to decide: the screen is headed *Your own sessions*, the finish says *Keep this one*, the privacy page says *saved sessions* |
+| Sessions the person saved to repeat | **Saved sessions** | Your own sessions, Keep this one (as the name) | Graeme, 13 Oct. The finish's button is **Keep to repeat**; the empty list says *Nothing kept yet*. "Your own sessions" stays only as Progress's name for the *kind* of session someone built themselves |
 | The Plan's week | **Your week** | weekly plan, Plan my week | "Plan your week" is the action that opens it |
 | Free's week | **Your week** | — | The older weekly plan, Free only since A-3 |
 | Where the Plan is heading | **your arc** | programme, goal (for the arc) | *My programme* is the twelve-week programme, a separate thing |
@@ -22,6 +22,6 @@ Taken from the words on every screen (`node tools/chromium-words.mjs`, 95 screen
 | The browsable list of everything | **Library** | — | *At home* / *At the gym* are its two places |
 | Wellbeing tab | **Wellbeing** | Mind, mental health | *Something for the mind* is a door into it |
 
-## Open decisions for Graeme
+## Decided
 
-1. **Saved sessions.** One name for the screen, the finish's offer and the policies. Proposed: *Saved sessions*, with the finish saying *Save to repeat*.
+1. **Saved sessions** (Graeme, 13 Oct): one name for the screen and the policies; *Keep to repeat* on the finish.

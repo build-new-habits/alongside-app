@@ -1,6 +1,13 @@
 /**
  * js/views/saved-sessions.js
- * 29 Sep 2026 v6
+ * 13 Oct 2026 v7
+ *
+ * v7 - A-7 EMPTY-AND-FIRST and A-9 ONE-NAME (Stage AWARD). Headed "Saved
+ *   sessions" (was "Your own sessions", one of three names; glossary
+ *   decision 1). Empty on the Plan: "Nothing kept yet", where saving is
+ *   (Keep to repeat, on the finish; it said "a save on the preview
+ *   screen"), and Start today's session. Free's words unchanged.
+ *
  *
  * v6 - P21, PLAYERS (persona finding W2-17). Start plays in the coach's
  *   player (workout), one card a move, not the four-page session screen.
@@ -327,21 +334,22 @@ export function render() {
              enters the tab order. All three states carry it: a heading that
              is focusable on one screen and not another is a difference with
              no reason behind it. -->
-        <h1 tabindex="-1">Your own sessions</h1>
-            <p class="text-secondary">Sessions you put together yourself.</p>
+        <h1 tabindex="-1">Saved sessions</h1>
           </div>
-          <div class="card">
-            <p>Nothing saved yet. When you build a session you like, there is
-               a save on the preview screen — name it whatever makes sense to
-               you, and it will be here.</p>
-          </div>
+          <!-- A-7 (v7). Heading, one line, one action. It pointed to "a save
+               on the preview screen"; since A-5 the save is the finish's
+               Keep to repeat. -->
+          <section class="card own-empty" aria-labelledby="own-empty-h">
+            <h2 id="own-empty-h" class="own-empty__h">Nothing kept yet</h2>
+            <p>When a session goes well, choose Keep to repeat when you finish, and it will be here.</p>
+            <button class="btn btn-primary" id="saved-empty-start">Start today’s session</button>
+          </section>
         </div>
       `
       : `
         <div class="view saved-sessions-view">
           <div class="view-header">
-            <h1 tabindex="-1">Your own sessions</h1>
-            <p class="text-secondary">Sessions you put together yourself.</p>
+            <h1 tabindex="-1">Saved sessions</h1>
           </div>
           <div class="card">
             <p>You can build your own sessions on any plan. Keeping them is
@@ -361,7 +369,7 @@ export function render() {
   return `
     <div class="view saved-sessions-view">
       <div class="view-header">
-        <h1 tabindex="-1">Your own sessions</h1>
+        <h1 tabindex="-1">Saved sessions</h1>
         <p class="text-secondary">
           ${list.length} saved, newest first.
         </p>
@@ -396,6 +404,14 @@ export function render() {
 export function onMount() {
   const root = document.getElementById('main-content');
   if (!root) return;
+
+  // A-7 (v7). The empty list's one action: the coach's session, through
+  // today's check-in when there has not been one (Home's Tell me what to do).
+  root.querySelector('#saved-empty-start')?.addEventListener('click', () => {
+    store.set('requestedSessionType', null);
+    if (store.checkedInToday()) router.navigate('coach-proposal');
+    else { store.set('pendingDoorRoute', 'coach-proposal'); router.navigate('checkin'); }
+  });
 
   // OWN-LIST. Filter in place: hiding rows, not repainting, so the field
   // keeps its focus and caret while somebody types.

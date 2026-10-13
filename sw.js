@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 13 Oct 2026 v661
+ * 13 Oct 2026 v662
  *
+ * v662 - Stage AWARD (Graeme, 13 Oct: "Yes please"): Saved sessions has one name, and when it is empty it says where saving is (Keep to repeat, when you finish) with Start today's session; My exercises, empty, has a heading and says what goes there; on the Plan, the first day of a new arc week says "Week n starts today".
  * v661 - ARC-CREDIT: the arc's record of what a session worked is saved on the phone when the session is logged (it lived only in memory, and could be lost if the app was closed before anything else saved). store.js v115, Schema v1.112, no field change.
  * v660 - HOME-BANDS (Graeme, 13 Oct: "I have short and long resistance bands … include aerobic exercises for home"): a long band and a short loop band are two different kit items now, so a loop band is no longer offered face pulls or presses and a long band is no longer offered clamshells; the kit list says which is which. Eighteen new exercises: eight long-band (Kneeling Band Pulldown, Band Lateral Raise, Band Reverse Fly, Band Pull-Through, Band Overhead Triceps Extension, Standing Band Woodchop, Banded Press-Up, Band Split Squat), three loop-band (Banded Glute Bridge, Loop Band Squat, Standing Band Kickback) and seven quiet, no-jump home cardio moves (Step Jacks, Skater Steps, Standing Cross-Body Knee Drive, Squat to Overhead Reach, Step-Back Burpee, Band Punches, the Quiet Cardio Circuit), each with its figure. NEW FILE precached: js/data/figures/batch-14.js.
  * v659 - Stage AWARD (Graeme, 12 Oct: tidy the shared screens on both tiers, keep the difference in what the Plan does). On the Plan, Mobility & Conditioning, the stretch arc and the Library's Core open Today's plan and the one player (A-2; Free keeps its builder and core session). Today's plan: "‹ Home" in place of the ✕, no repeated greeting, Where, Length and Focus as pills. The finish: a larger tick; on the Plan, the arc's strands worked today; Keep this one? folded into Keep to repeat. Progress before the first session says so, with the arc, the weight note and the rows one tap away kept. The bottom bar has line icons in place of emoji.
@@ -4208,7 +4209,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v661";
+const CACHE_NAME = "alongside-v662";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4271,7 +4272,7 @@ const SHELL_HASHES = {
   "./css/components/practices.css": "60c1221c337fba7b",
   "./css/components/club-rooms.css": "f1c069c5b8eaf09e",
   "./css/components/capture.css": "343b4ae0dc6fe6ea",
-  "./css/components/finish.css": "d048b8066d6e9d22",
+  "./css/components/finish.css": "27761f962a903976",
   "./js/app.js": "24ff2a302aec8762",
   "./js/router.js": "bbbc2ab57c9ac0f4",
   "./js/store.js": "216e2494f3a4763a",
@@ -4290,7 +4291,7 @@ const SHELL_HASHES = {
   "./js/session-guard.js": "00177a846537868c",
   "./js/session-resume.js": "6916b88c0757374f",
   "./js/auth.js": "9b9c7a632dccada6",
-  "./js/views/today.js": "29e4cc210e80dd9d",
+  "./js/views/today.js": "11a8f1fa25b73702",
   "./js/views/mobility-conditioning.js": "dd64370231617186",
   "./js/views/arc-setup.js": "bc3f0046616fc07b",
   "./js/views/stretch-arc.js": "fce3ddbd29c7fb30",
@@ -4396,14 +4397,14 @@ const SHELL_HASHES = {
   "./js/views/class-list.js": "551081d91143ee4d",
   "./css/components/class-list.css": "e33b073b352399f3",
   "./css/components/class-player.css": "401cc57d7d39dbb1",
-  "./js/views/saved-sessions.js": "0a357d6fa5c13830",
+  "./js/views/saved-sessions.js": "eb44bae692d7e795",
   "./js/views/session-builder-ui.js": "000f29af26271192",
   "./js/views/noticing.js": "54446d31544d9c5c",
   "./js/views/in-step.js": "196267c5da62e662",
   "./js/data/in-step-scenarios.js": "b46f085cda4d24fc",
   "./js/views/journal-entry.js": "5e315297df9abc14",
   "./js/views/gym-programme.js": "d33d5c8cfaf6eb2a",
-  "./js/views/prescribed.js": "3e6cfd447b499867",
+  "./js/views/prescribed.js": "573739eb278fea8f",
   "./js/views/prescribed-session.js": "52ad4fc728657898",
   "./js/views/quiet-session.js": "73c106032a745253",
   "./js/views/breathing-session.js": "26387298908f3076",

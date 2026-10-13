@@ -1,6 +1,11 @@
 /**
  * today.js
- * 12 Oct 2026 v57
+ * 13 Oct 2026 v58
+ *
+ * v58 - A-5 SIGNATURE-MOMENTS (Stage AWARD). On the first day of a new arc
+ *   week (a Monday, after week 1), Plan Home says "Week n starts today": in
+ *   the coach card's line, or on the arc line inside the week card. A day,
+ *   never a count. arcWeekStartsToday() exported for its check.
  *
  * v57 - A-1 PLAN-HOME-PRUNE (Stage AWARD; Graeme approved the mock-up, 12
  *   Oct). Plan Home: one Today card (the week's day; a rest day; or, with
@@ -822,7 +827,7 @@ import { aimById, STRANDS }    from '../data/aims.js';
 import { lineIcon }            from '../data/line-icons.js';
 import { todayInWeek, askForToday, startOwnList } from '../data/week-shape.js';
 import { mixLine, detailLine } from '../data/week-shape-model.js';
-import { arcWeek }             from '../data/arc-readback.js';
+import { arcWeek, weekStart }  from '../data/arc-readback.js';
 import { noticePlanJump, offerBriefPath } from '../data/pacing.js';
 import { isPremium, lockedFeature } from '../auth.js';
 import { scopeStatementHTML } from '../data/scope-statement.js';
@@ -843,6 +848,17 @@ import { savedSessions, resolveSavedSession, markSavedSessionUsed }
 import { detectBurnout }       from '../data/checkin.js';
 import { proposeWeekFocus }    from '../data/week-focus.js';
 import { activityPhrase, daysAgo } from '../data/activity-labels.js';
+
+/**
+ * A-5 SIGNATURE-MOMENTS (v58). The first day of a new arc week: arc weeks
+ * start on a Monday (arcWeek), and week 1 is the arc beginning, not a new
+ * week. A day, never a count of anything done (ARC-1).
+ */
+export function arcWeekStartsToday(arc = {}, now = new Date()) {
+  if (!arc || !arc.active || !arc.startedAt) return false;
+  const wk = arcWeek(arc, now);
+  return !!wk && wk > 1 && weekStart(now).toDateString() === new Date(now).toDateString();
+}
 
 export function TodayView(router) {
 
@@ -2176,9 +2192,9 @@ function _markGuidanceShown(root) {
     const wk = arc.active ? arcWeek(arc, new Date()) : null;
     return aim
       ? `<button class="home-arcline" data-route="stretch-arc" data-requires-checkin="false"
-                 aria-label="Your arc${wk ? `, week ${wk}` : ''}: working towards ${_esc(aim)}">
+                 aria-label="Your arc${wk ? `, week ${wk}` : ''}${arcWeekStartsToday(arc) ? ' starts today' : ''}: working towards ${_esc(aim)}">
            ${lineIcon('arc', 20)}
-           <span class="home-arcline__text"><strong>Your arc${wk ? ` \u00b7 Week ${wk}` : ''}.</strong> ${_esc(aim)}</span>
+           <span class="home-arcline__text"><strong>Your arc${wk ? ` \u00b7 Week ${wk}` : ''}${arcWeekStartsToday(arc) ? ' starts today' : ''}.</strong> ${_esc(aim)}</span>
          </button>`
       : `<button class="home-arcline" data-route="arc-setup" data-requires-checkin="false">
            ${lineIcon('arc', 20)}
@@ -2195,7 +2211,9 @@ function _markGuidanceShown(root) {
     const arc = store.get('arc') || {};
     const aim = arc.active ? ((arc.aimId && aimById(arc.aimId)?.label) || arc.label || null) : null;
     const wk = aim ? arcWeek(arc, new Date()) : null;
-    const line = _checkedInToday() ? 'You\u2019ve checked in. Straight to today\u2019s plan.' : 'Three quick questions, then today\u2019s plan.';
+    // A-5 (v58). On the first day of a new arc week the card says so first.
+    const fresh = aim && arcWeekStartsToday(arc) ? `Week ${wk} starts today. ` : '';
+    const line = fresh + (_checkedInToday() ? 'You\u2019ve checked in. Straight to today\u2019s plan.' : 'Three quick questions, then today\u2019s plan.');
     const top = aim
       ? `<button class="home-today__arc" data-route="stretch-arc" data-requires-checkin="false"
                  aria-label="Your arc${wk ? `, week ${wk}` : ''}: working towards ${_esc(aim)}">

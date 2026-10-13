@@ -1,6 +1,12 @@
 /**
  * tools/verify-saved1.mjs
- * 28 Sep 2026 v2
+ * 13 Oct 2026 v3
+ *
+ * v3 - A-7 (Stage AWARD). The Plan's empty list says "Nothing kept yet"
+ *   (the finish's Keep to repeat); 4a and 4d accept either word, so both
+ *   sides of the rule hold: the Plan is told it has nothing kept, Free is
+ *   never told so.
+ *
  *
  * v2 - SMOOTH-P3a/b. The Your own room left Plan Home (spec 4.1) and the
  *   counted button moved to "I know what I want" as "Or one you saved
@@ -223,7 +229,7 @@ fixture({ tier: "personal", saved: [] });
 main.innerHTML = view.render();
 const planEmpty = text();
 ok("4a. Plan with nothing saved is told it has nothing saved",
-   /Nothing saved yet/i.test(planEmpty), planEmpty.slice(0, 160));
+   /Nothing (saved|kept) yet/i.test(planEmpty), planEmpty.slice(0, 160));
 ok("4b. and is NOT sold an upgrade it already has",
    !/Plan tier|upgrade/i.test(planEmpty),
    "answering a question they did not ask");
@@ -234,7 +240,7 @@ const freeEmpty = text();
 ok("4c. free is told why the list is empty",
    /Plan tier/i.test(freeEmpty), freeEmpty.slice(0, 160));
 ok("4d. and is NOT told it has saved nothing, which would be untrue",
-   !/Nothing saved yet/i.test(freeEmpty),
+   !/Nothing (saved|kept) yet/i.test(freeEmpty),
    "somebody who cannot save is being told they have not saved");
 
 // ── 5. ACCESSIBILITY ────────────────────────────────────────────────────

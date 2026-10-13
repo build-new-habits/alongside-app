@@ -1,4 +1,9 @@
 /* css/components/finish.css
+ * 13 Oct 2026 v4
+ *
+ * v4 - A-7 EMPTY-AND-FIRST. .own-empty (Saved sessions, empty) and the
+ *   heading on My exercises' empty card.
+ *
  * 29 Sep 2026 v3
  *
  * v3 - P0. .scope-statement (onboarding, Settings, the one-time Home
@@ -368,3 +373,11 @@
 .scope-notice .btn { margin-top: var(--space-3); }
 .scope-notice > p { margin: 0; }
 .scope-notice__lead { font-weight: var(--font-semibold); }
+
+/* A-7 EMPTY-AND-FIRST, 13 Oct 2026. Empty lists: a heading, one line, one
+   action, centred (Saved sessions and My exercises). */
+.own-empty { text-align: center; display: flex; flex-direction: column; align-items: center; gap: var(--space-3); }
+.own-empty p { margin: 0; max-width: 32ch; color: var(--color-text-secondary); line-height: 1.5; }
+.own-empty__h, .prescribed-empty__h { margin: 0; font-size: var(--text-lg); font-weight: 700; color: var(--color-text); }
+.prescribed-empty-card { display: flex; flex-direction: column; align-items: center; gap: var(--space-2); }
+.prescribed-empty-card p { margin: 0; max-width: 32ch; }
