@@ -1,5 +1,12 @@
 /**
  * data/exercises/rehabilitation.js
+ * 13 Oct 2026 v15
+ *
+ * v15 - HOME-BANDS. A band worn round both legs is a short loop band, so
+ *   Banded Clamshell, Resistance Band Walk — Lateral and
+ *   Monster Walk now need "loop-band", not "resistance-band" (a long band).
+ *   equipment-map.js v4; verify-home-bands TEST 3.
+ *
  * 12 Oct 2026 v14
  *
  * v14 - A-6 (Stage AWARD). Internal Rotation — Band: the band is anchored
@@ -282,7 +289,7 @@ export const REHABILITATION = [
     rehabPhase: 'maintenance',
     activationTarget: 'glutes',
     movementPattern: 'hip-abduction',
-    equipment: ['resistance-band'],
+    equipment: ['loop-band'],
     equipmentOptional: ['yoga-mat'],
     affectsAreas: ['glutes', 'hip'],
     contraindications: ['hip-acute', 'glutes-acute'],
@@ -550,7 +557,7 @@ export const REHABILITATION = [
     rehabPhase: 'maintenance',
     activationTarget: 'glutes',
     movementPattern: 'hip-abduction',
-    equipment: ['resistance-band'],
+    equipment: ['loop-band'],
     equipmentOptional: [],
     affectsAreas: ['glutes', 'hip', 'quadriceps'],
     contraindications: ['knee-acute', 'glutes-acute'],
@@ -590,7 +597,7 @@ export const REHABILITATION = [
     rehabPhase: 'maintenance',
     activationTarget: 'glutes',
     movementPattern: 'hip-abduction',
-    equipment: ['resistance-band'],
+    equipment: ['loop-band'],
     equipmentOptional: [],
     affectsAreas: ['glutes', 'hip', 'quadriceps'],
     contraindications: ['knee-acute', 'glutes-acute'],

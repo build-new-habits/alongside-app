@@ -1,5 +1,18 @@
 /**
  * data/equipment-map.js
+ * 13 Oct 2026 v4
+ *
+ * v4 - HOME-BANDS (Graeme, 13 Oct: "I have short and long resistance
+ *   bands"). Every band used to give the one tag "resistance-band", so a
+ *   short loop band was offered face pulls and overhead presses that need
+ *   a long band, and a long band was offered clamshells that need a loop
+ *   round the knees. Now: a long band (light, medium, heavy, and the
+ *   pull-up assist band, which is a long loop) gives "resistance-band";
+ *   a short loop band gives "loop-band"; a flat therapy band can be tied
+ *   as either, so it gives both, as do the session screen's plain
+ *   "Resistance bands", a gym and a studio. Stored kit ids are unchanged.
+ *   verify-home-bands.
+ *
  * 28 Sep 2026 v3
  *
  * v3 - Work list 6. UNSATISFIABLE_TAGS emptied: every tag it named is
@@ -91,7 +104,7 @@ export const EQUIPMENT_IMPLIES = {
   // vocabulary starts.
   "dumbbells":        ["dumbbell"],
   "kettlebells":      ["kettlebell"],
-  "resistance-bands": ["resistance-band"],
+  "resistance-bands": ["resistance-band", "loop-band"],
   "bike":             ["exercise-bike"],
   "stationary-bike":  ["exercise-bike"],
   "cross-trainer":    ["elliptical"],
@@ -115,14 +128,19 @@ export const EQUIPMENT_IMPLIES = {
   "slam-ball":            ["medicine-ball"],
 
   // ── Bands ──────────────────────────────────────────────────────────────
-  // Therapy bands are flat rehabilitation bands. They genuinely substitute
-  // for a resistance band in the low-load rehabilitation work that uses
-  // this tag, so they are included deliberately rather than by oversight.
+  // HOME-BANDS, 13 Oct 2026. Two capabilities, because they do different
+  // jobs: "resistance-band" is a LONG band (stood on, held at both ends,
+  // or anchored at a door or post); "loop-band" is a SHORT loop worn round
+  // both legs. Neither does the other's job, so a loop band no longer
+  // satisfies a face pull and a long band no longer satisfies a clamshell.
+  // Therapy bands are flat rehabilitation bands: long enough to hold at
+  // both ends, and commonly tied into a loop for the low-load leg work, so
+  // they give both, deliberately rather than by oversight.
   "band-light":    ["resistance-band"],
   "band-medium":   ["resistance-band"],
   "band-heavy":    ["resistance-band"],
-  "mini-bands":    ["resistance-band"],
-  "therapy-band":  ["resistance-band"],
+  "mini-bands":    ["loop-band"],
+  "therapy-band":  ["resistance-band", "loop-band"],
 
   // ── Cardio ─────────────────────────────────────────────────────────────
   "exercise-bike":  ["exercise-bike", "bicycle"],
@@ -142,7 +160,7 @@ export const EQUIPMENT_IMPLIES = {
   "step-platform":    ["bench", "step-platform"],
   "ab-wheel":         ["ab-wheel"],
   "pull-up-bar":      ["pull-up-bar"],
-  "pull-up-assist":   ["pull-up-bar"],
+  "pull-up-assist":   ["pull-up-bar", "resistance-band"],
   "dip-station":      ["dip-station"],
   "parallettes":      ["dip-station"],
   "gymnastic-rings":  ["gymnastic-rings", "trx"],
@@ -203,6 +221,7 @@ export const EQUIPMENT_IMPLIES = {
     "bench",
     "medicine-ball",
     "resistance-band",
+    "loop-band",
     "rowing-machine",
     "exercise-bike",
     "bicycle",
@@ -225,7 +244,7 @@ export const EQUIPMENT_IMPLIES = {
   "sauna-steam":    ["sauna"],
 
   "outdoor-track":  ["agility-cones"],
-  "fitness-studio": ["yoga-mat", "foam-roller", "resistance-band"]
+  "fitness-studio": ["yoga-mat", "foam-roller", "resistance-band", "loop-band"]
 };
 
 /**

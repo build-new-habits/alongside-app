@@ -1,5 +1,16 @@
 /**
  * data/exercises/strength.js
+ * 13 Oct 2026 v13
+ *
+ * v13 - HOME-BANDS (Graeme, 13 Oct: "I have short and long resistance bands
+ *   … can we ensure we have a full range"). Eight long-band moves the
+ *   library lacked (Kneeling Band Pulldown, Band Lateral Raise, Band
+ *   Reverse Fly, Band Pull-Through, Band Overhead Triceps Extension,
+ *   Standing Band Woodchop, Banded Press-Up, Band Split Squat) and three
+ *   short loop-band moves (Banded Glute Bridge, Loop Band Squat, Standing
+ *   Band Kickback). Band Lateral Walk needs a loop band ("loop-band"), not
+ *   a long one. verify-home-bands.
+ *
  * 03 Oct 2026 v12
  *
  * v12 - W5-22 LOWER-BODY-GYM. Turkish Get-Up is a carry (whole-body,
@@ -2569,7 +2580,7 @@ export const STRENGTH = [
     category: 'strength',
     contentType: 'exercise',
     movementPattern: 'squat',
-    equipment: ['resistance-band'],
+    equipment: ['loop-band'],
     equipmentOptional: [],
     affectsAreas: ['glutes', 'hip', 'adductors'],
     contraindications: ['knee-acute', 'glutes-acute'],
@@ -4028,5 +4039,430 @@ export const STRENGTH = [
     load: 'Bodyweight.',
     credits: 25
   },
+
+  // ── HOME-BANDS, 13 Oct 2026 ────────────────────────────────────────────
+  // Graeme: "I have short and long resistance bands … can we ensure we have
+  // a full range". Long-band moves need "resistance-band" (a long band,
+  // stood on or anchored); loop-band moves need "loop-band" (a short loop
+  // worn round the legs). equipment-map.js v4. Anchors at a door are set in
+  // a closed door, opening away from the person.
+
+  {
+    id: 'band-kneeling-pulldown',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
+    name: "Kneeling Band Pulldown",
+    youtube: "kneeling resistance band lat pulldown technique",
+    category: 'strength',
+    movementPattern: 'pull',
+    equipment: ['resistance-band'],
+    equipmentOptional: [],
+    affectsAreas: ['upper-back', 'shoulder', 'biceps-triceps'],
+    contraindications: ['shoulder-acute'],
+    energyRequired: 4,
+    difficultyLevel: 2,
+    duration: 90,
+    perSide: false,
+    instructions: [
+      "Anchor the middle of a long band high up: a door anchor near the top of a closed door that opens away from you, or round a sturdy bar above head height",
+      "Kneel facing the anchor on a cushion or folded towel, an end of the band in each hand, arms reaching up and slightly forward, the band a little taut",
+      "Draw your shoulder blades down first, then pull your elbows down towards your ribs",
+      "Finish with your hands near the top of your chest, then let your arms rise slowly until they are long again"
+    ],
+    coaching: "Think of pulling your elbows into your back pockets rather than pulling with your hands, and the work moves out of your arms and into your back.",
+    why: "This is the home version of the pulldown machine. Pulling down from above keeps reaching overhead comfortable, and it works the broad muscles down the sides of your back that most home training never reaches.",
+    watchOut: [
+      "Leaning a long way back to finish the pull — stay nearly upright, and kneel a little closer to the anchor if you need to",
+      "Shoulders creeping up towards your ears; set them down before each pull and keep them there",
+      "A pinch at the front of the shoulder as you reach up — reach less high, or kneel so the anchor is slightly in front of you",
+      "Any sharp pain in the shoulder: let the band rise slowly and leave this one for today"
+    ],
+    load: "Heavy enough that the last two reps are hard, light enough that your form does not change. Kneeling further from the anchor adds resistance.",
+    sets: 3,
+    reps: "12",
+    rest: 60,
+    credits: 45
+  },
+
+  {
+    id: 'band-lateral-raise',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
+    name: "Band Lateral Raise",
+    youtube: "resistance band lateral raise technique",
+    category: 'strength',
+    movementPattern: 'push',
+    equipment: ['resistance-band'],
+    equipmentOptional: [],
+    affectsAreas: ['shoulder'],
+    contraindications: ['shoulder-acute'],
+    energyRequired: 3,
+    difficultyLevel: 2,
+    duration: 60,
+    perSide: false,
+    instructions: [
+      "Stand on the middle of a long band with your feet hip-width apart, an end in each hand by your sides",
+      "Soften your elbows slightly and keep them that way",
+      "Raise both arms out to the sides, elbows leading, until your hands reach shoulder height or a little below",
+      "Lower slowly back to your sides"
+    ],
+    coaching: "Lift as if you are pouring two jugs out to the sides, elbows leading, and your shoulders stay down where they belong.",
+    why: "It builds the rounded muscle on the outside of your shoulder, which makes lifting things up and out to the side, such as a case onto a rack or a box onto a shelf, feel steady.",
+    watchOut: [
+      "Shoulders shrugging up as the band tightens — stop the lift a little lower, where they can stay down",
+      "Swinging your body to get the band up, which usually means the band is too strong; stand on it with your feet closer together",
+      "A pinch at the top of the shoulder as you lift: lift to a lower height, and if it becomes a sharp pain, leave this one for today"
+    ],
+    load: "Lighter than you think. These respond to control, not weight. Standing with your feet closer together makes the band lighter.",
+    sets: 3,
+    reps: "12",
+    rest: 45,
+    credits: 40
+  },
+
+  {
+    id: 'band-reverse-fly',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
+    name: "Band Reverse Fly",
+    youtube: "resistance band reverse fly anchored technique",
+    category: 'strength',
+    movementPattern: 'pull',
+    equipment: ['resistance-band'],
+    equipmentOptional: [],
+    affectsAreas: ['upper-back', 'shoulder', 'rotator-cuff'],
+    contraindications: ['shoulder-acute', 'upper-back-acute'],
+    energyRequired: 3,
+    difficultyLevel: 2,
+    duration: 60,
+    perSide: false,
+    instructions: [
+      "Anchor the middle of a long band at chest height in front of you: a door anchor in a closed door that opens away from you, or round a sturdy post",
+      "Hold an end in each hand and step back until the band is just taut, arms straight out in front at chest height",
+      "Keeping a soft bend in your elbows, open both arms wide to the sides until your hands are in line with your shoulders",
+      "Squeeze your shoulder blades together for a moment, then let your arms return slowly to the front"
+    ],
+    coaching: "Move from your shoulder blades, not your hands — your arms are only the levers.",
+    why: "It strengthens the small muscles across the back of your shoulders that hold you upright, which helps after a day spent leaning forward over a desk or a phone.",
+    watchOut: [
+      "Bending your elbows as the band tightens, which turns it into a row — keep the same soft bend all the way",
+      "Shoulders lifting towards your ears; let them settle before you open your arms",
+      "Arching your lower back to get your arms wider — stop where your back stays still",
+      "Any sharp pain in the shoulder: let your arms come back in slowly and leave this one for today"
+    ],
+    load: "Light. You should reach the end of the set tired rather than close to failing.",
+    sets: 3,
+    reps: "15",
+    rest: 45,
+    credits: 40
+  },
+
+  {
+    id: 'band-pull-through',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
+    name: "Band Pull-Through",
+    youtube: "resistance band pull through hip hinge technique",
+    category: 'strength',
+    movementPattern: 'hinge',
+    equipment: ['resistance-band'],
+    equipmentOptional: [],
+    affectsAreas: ['glutes', 'hamstring', 'lower-back'],
+    contraindications: ['lower-back-acute', 'hamstring-acute'],
+    energyRequired: 4,
+    difficultyLevel: 2,
+    duration: 90,
+    perSide: false,
+    instructions: [
+      "Anchor the middle of a long band low behind you, round a heavy table leg or the base of a sturdy post",
+      "Face away from the anchor, holding both ends together between your legs, and step forward until the band is taut, feet a little wider than your hips",
+      "Push your hips back towards the anchor with a soft bend in your knees, letting your hands travel back between your legs, back flat",
+      "Drive your hips forward to stand tall, squeezing your glutes at the top, arms staying long"
+    ],
+    coaching: "Your arms only hold the band — the whole movement comes from your hips travelling back and then forward.",
+    why: "It teaches the hip hinge, the movement for picking things up from the floor, with the band drawing you back into the shape, and it works your glutes and the backs of your thighs with nothing resting on your spine.",
+    watchOut: [
+      "Your back rounding as you reach back — stop where your back is still flat",
+      "Turning it into a squat with the knees travelling forward; keep your shins nearly upright and move your hips instead",
+      "Leaning back at the top to finish; stand tall, squeeze, and stop there",
+      "Any sharp pain in the lower back: step towards the anchor to let the band go slack and leave this one for today"
+    ],
+    load: "Heavy enough that the last two reps are hard, light enough that your form does not change. Stepping further from the anchor adds resistance.",
+    sets: 3,
+    reps: "12",
+    rest: 60,
+    credits: 45
+  },
+
+  {
+    id: 'band-overhead-triceps-extension',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
+    name: "Band Overhead Triceps Extension",
+    youtube: "resistance band overhead tricep extension technique",
+    category: 'strength',
+    movementPattern: 'push',
+    equipment: ['resistance-band'],
+    equipmentOptional: [],
+    affectsAreas: ['triceps-biceps', 'shoulder'],
+    contraindications: ['shoulder-acute', 'wrist-elbow-acute'],
+    energyRequired: 3,
+    difficultyLevel: 2,
+    duration: 60,
+    perSide: false,
+    instructions: [
+      "Stand in a short split stance with one end of a long band under your back foot",
+      "Hold the other end in both hands behind your head, elbows bent and pointing up",
+      "Keeping your upper arms close to your head and still, straighten your arms to press your hands up overhead",
+      "Bend your elbows slowly to bring your hands back down behind your head"
+    ],
+    coaching: "Only your forearms move — if your elbows drift forward, the work leaves the backs of your arms.",
+    why: "It strengthens the backs of your arms in a lengthened position, which is where they help most with pushing yourself up from a chair or the floor.",
+    watchOut: [
+      "Elbows flaring out wide; keep them pointing up, close to your head",
+      "Ribs lifting and your lower back arching as you press — brace your stomach before each rep",
+      "The band slipping from under your foot; stand on it with the whole foot, not the toes",
+      "Any sharp pain in the elbow or shoulder: lower the band slowly and leave this one for today"
+    ],
+    load: "Lighter than you think. These respond to control, not weight.",
+    sets: 3,
+    reps: "12",
+    rest: 45,
+    credits: 40
+  },
+
+  {
+    id: 'band-standing-woodchop',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
+    name: "Standing Band Woodchop",
+    youtube: "resistance band woodchop high to low technique",
+    category: 'strength',
+    movementPattern: 'rotation',
+    equipment: ['resistance-band'],
+    equipmentOptional: [],
+    affectsAreas: ['abdominals', 'core', 'shoulder', 'glutes'],
+    contraindications: ['lower-back-acute', 'shoulder-acute'],
+    energyRequired: 4,
+    difficultyLevel: 2,
+    duration: 90,
+    perSide: true,
+    instructions: [
+      "Anchor a long band high to one side of you, with a door anchor near the top of a closed door that opens away from you",
+      "Stand side-on with your feet wider than your hips, holding the band in both hands up by the shoulder nearest the anchor, arms long",
+      "Pull the band down and across your body towards the opposite hip, turning through your chest and letting your back heel turn",
+      "Return slowly to the start; do all your reps, then turn round for the other side"
+    ],
+    coaching: "Let your hips and chest turn together, so the twist is shared by your whole body rather than wrung out of your lower back.",
+    why: "It trains your trunk to turn under control, the movement in lifting a bag out of the car or swinging a rake, where most core work only trains it to stay still.",
+    watchOut: [
+      "Twisting from the lower back while your hips stay fixed; let your back heel turn so your hips come round too",
+      "Bending your arms and pulling with them; keep them long and let your trunk turn the band down",
+      "Rushing the return as the band pulls you back — take two counts to go back up",
+      "Any sharp pain in the back: stop the turn and leave this one for today"
+    ],
+    load: "Heavy enough that the last two reps are hard, light enough that your form does not change.",
+    sets: 3,
+    reps: "10 each side",
+    rest: 45,
+    credits: 45
+  },
+
+  {
+    id: 'band-push-up',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
+    name: "Banded Press-Up",
+    youtube: "resistance band push up technique",
+    category: 'strength',
+    movementPattern: 'push',
+    equipment: ['resistance-band'],
+    equipmentOptional: [],
+    affectsAreas: ['chest-pecs', 'triceps-biceps', 'shoulder'],
+    contraindications: ['shoulder-acute', 'wrist-elbow-acute'],
+    energyRequired: 6,
+    difficultyLevel: 3,
+    duration: 90,
+    perSide: false,
+    instructions: [
+      "Hold an end of a long band in each hand and pass the band across your upper back, just below your shoulder blades",
+      "Set up in a press-up with your hands under your shoulders, pinning the band ends to the floor under your palms",
+      "Lower your chest towards the floor, elbows angled back rather than out to the sides",
+      "Press back up against the band until your arms are straight"
+    ],
+    coaching: "Keep your body in one line from head to heels — the band makes the top of the press-up the toughest part, so finish every rep fully.",
+    why: "Once a press-up feels steady, the band adds resistance where you are strongest, at the top, so your chest and arms keep getting stronger with no weights at all.",
+    watchOut: [
+      "Hips sagging as you tire — squeeze your glutes and stomach, or do the next reps from your knees",
+      "The band sliding up towards your neck; set it lower on your back before you start",
+      "Elbows flaring straight out, which you feel at the front of the shoulder; tuck them back a little",
+      "Any sharp pain in the wrist or shoulder: lower yourself to the floor and leave this one for today"
+    ],
+    load: "Challenging by the final rep, but you should never be straining or holding your breath.",
+    sets: 3,
+    reps: "8",
+    rest: 60,
+    credits: 55
+  },
+
+  {
+    id: 'band-split-squat',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
+    name: "Band Split Squat",
+    youtube: "resistance band split squat technique",
+    category: 'strength',
+    movementPattern: 'lunge',
+    equipment: ['resistance-band'],
+    equipmentOptional: [],
+    affectsAreas: ['quadriceps', 'glutes', 'hip-flexor'],
+    contraindications: ['knee-acute', 'hip-acute', 'glutes-acute'],
+    energyRequired: 5,
+    difficultyLevel: 2,
+    duration: 90,
+    perSide: true,
+    instructions: [
+      "Stand on the middle of a long band with your front foot, then step your other foot back into a long split stance, back heel lifted",
+      "Hold an end of the band in each hand at your shoulders",
+      "Lower your back knee towards the floor, chest tall, front heel down",
+      "Push through your front foot to rise back up; do all your reps, then swap legs"
+    ],
+    coaching: "Go straight down and up like a lift rather than forward and back — it keeps the front knee comfortable.",
+    why: "It strengthens one leg at a time, which is how you use them on stairs, hills and getting up from the floor, and the band adds resistance as you stand.",
+    watchOut: [
+      "Your front knee drifting inwards — keep it pointing over your middle toes",
+      "Your front heel lifting, which loads the knee; shift your weight back until the whole foot is down",
+      "Wobbling: rest one hand on a wall or chair back and hold both band ends in the other",
+      "Any sharp pain in the knee: stand up and leave this one for today"
+    ],
+    load: "A band that makes the last two reps hard while your front knee still tracks over your toes.",
+    sets: 3,
+    reps: "10 each side",
+    rest: 60,
+    credits: 50
+  },
+
+  {
+    id: 'loop-band-glute-bridge',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
+    name: "Banded Glute Bridge",
+    youtube: "mini band glute bridge technique",
+    category: 'strength',
+    movementPattern: 'hinge',
+    equipment: ['loop-band'],
+    equipmentOptional: ['yoga-mat'],
+    affectsAreas: ['glutes', 'hamstring', 'lower-back'],
+    contraindications: ['hamstring-acute', 'glutes-acute', 'lower-back-acute'],
+    energyRequired: 3,
+    difficultyLevel: 2,
+    duration: 60,
+    perSide: false,
+    instructions: [
+      "Loop a short band around both legs just above your knees",
+      "Lie on your back with your knees bent, feet flat and hip-width apart, arms by your sides",
+      "Press your knees gently out against the band, then push through your heels to lift your hips until your body makes a line from shoulders to knees",
+      "Pause at the top, then lower slowly, keeping your knees pressing out"
+    ],
+    coaching: "Keep your knees pressing out the whole time — the band switches on the sides of your glutes, and it only works if you never let it draw you in.",
+    why: "It works your glutes in two directions at once, lifting and pressing out, which is what steadies your knees and hips when you walk, climb and stand on one leg.",
+    watchOut: [
+      "Knees falling in towards each other as you lift — press out first, then lift",
+      "Arching your lower back at the top to get higher; stop where your ribs stay down",
+      "Feeling it in the backs of your thighs more than your glutes; bring your feet a little closer to you",
+      "Any sharp pain in your back or hips: lower down and leave this one for today"
+    ],
+    load: "A band you can keep pressed out for every rep, with the last two reps hard.",
+    sets: 3,
+    reps: "12",
+    rest: 45,
+    credits: 35
+  },
+
+  {
+    id: 'loop-band-squat',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
+    name: "Loop Band Squat",
+    youtube: "mini band squat technique",
+    category: 'strength',
+    movementPattern: 'squat',
+    equipment: ['loop-band'],
+    equipmentOptional: [],
+    affectsAreas: ['quadriceps', 'glutes', 'adductors'],
+    contraindications: ['knee-acute', 'glutes-acute'],
+    energyRequired: 4,
+    difficultyLevel: 2,
+    duration: 60,
+    perSide: false,
+    instructions: [
+      "Place a short band around both legs just above your knees",
+      "Stand with your feet a little wider than your hips, toes turned slightly out, arms out in front for balance",
+      "Sit back and down into a squat, pressing your knees out against the band",
+      "Push through your whole foot to stand tall, keeping your knees pressing out all the way up"
+    ],
+    coaching: "Keep a little outward pressure on the band throughout — if it ever goes slack, your knees have drifted in.",
+    why: "The band asks your glutes to hold your knees in line while your legs do the squat, which is the job they do every time you sit down and stand up.",
+    watchOut: [
+      "Knees caving in as you stand — slow down and press them out before you rise",
+      "Heels lifting; sit back a little more and keep your weight in the middle of your feet",
+      "Going lower than you can control; stop at the depth where your back stays flat",
+      "Any sharp pain in the knee: stand up and leave this one for today"
+    ],
+    load: "A band you can press against for every rep while your knees still track over your toes.",
+    sets: 3,
+    reps: "12",
+    rest: 45,
+    credits: 35
+  },
+
+  {
+    id: 'loop-band-standing-kickback',
+    position: 'standing',
+    impact: false,
+    balanceDemand: true,
+    name: "Standing Band Kickback",
+    youtube: "mini band standing glute kickback technique",
+    category: 'strength',
+    movementPattern: 'hip-extension',
+    equipment: ['loop-band'],
+    equipmentOptional: [],
+    affectsAreas: ['glutes'],
+    contraindications: ['glutes-acute', 'lower-back-acute'],
+    energyRequired: 3,
+    difficultyLevel: 2,
+    duration: 90,
+    perSide: true,
+    instructions: [
+      "Place a short band around both ankles and stand facing a wall or the back of a chair, hands resting on it",
+      "Shift your weight onto one leg, with a soft bend in that knee",
+      "Keeping the other leg nearly straight, press it back behind you against the band, squeezing your glute",
+      "Return slowly until your feet are nearly together; do all your reps, then swap legs"
+    ],
+    coaching: "The leg only travels a short way back — once your lower back starts to arch, the work has moved from your glute into your spine.",
+    why: "It works the glute of the moving leg while the standing leg holds you steady, so both sides get something from every rep.",
+    watchOut: [
+      "Arching your lower back to kick higher; brace your stomach and make the movement smaller",
+      "Leaning forward onto your hands; stay tall and use them only for balance",
+      "Swinging the leg; press back slowly and return slowly",
+      "Any sharp pain in your back or hip: put the foot down and leave this one for today"
+    ],
+    load: "Lighter than you think. These respond to control, not weight.",
+    sets: 3,
+    reps: "12 each side",
+    rest: 45,
+    credits: 35
+  },
+
 
 ];

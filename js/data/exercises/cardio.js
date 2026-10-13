@@ -1,5 +1,13 @@
 /**
  * data/exercises/cardio.js
+ * 13 Oct 2026 v8
+ *
+ * v8 - HOME-BANDS (Graeme, 13 Oct: "include aerobic exercises for home").
+ *   Seven quiet, no-jump moves for a living room: Step Jacks, Skater Steps,
+ *   Standing Cross-Body Knee Drive, Squat to Overhead Reach, Step-Back
+ *   Burpee, Band Punches (a long band) and the Quiet Cardio Circuit that
+ *   strings four of them together. verify-home-bands.
+ *
  * 30 Sep 2026 v7
  *
  * v7 - S1-LEGS (found building the S1 clinical pack). Treadmill Intervals runs: impact true.
@@ -1075,6 +1083,256 @@ export const CARDIO = [
     ],
     load: 'Light damper setting, easy pace. Technique is the point of these four minutes, not effort.',
     credits: 25
+  },
+
+  // ── HOME-BANDS, 13 Oct 2026 ────────────────────────────────────────────
+  // Graeme: "include aerobic exercises for home". Quiet, no-jump cardio for
+  // a living room: nothing here leaves the floor (impact false).
+
+  {
+    id: 'step-jacks',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
+    name: 'Step Jacks',
+    youtube: 'low impact step jacks exercise',
+    category: 'cardio',
+    movementPattern: 'locomotion',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['full-body'],
+    contraindications: [],
+    energyRequired: 4,
+    difficultyLevel: 1,
+    duration: 60,
+    perSide: false,
+    instructions: [
+      'Stand tall with your feet together and your arms by your sides',
+      'Step one foot out to the side while raising both arms out and up overhead',
+      'Step that foot back in as your arms come down',
+      'Repeat to the other side, and keep alternating at a pace that lifts your breathing'
+    ],
+    coaching: 'Make the arm circle big — the bigger and quicker the arm circle, the more it lifts your heart rate, with no jumping at all.',
+    why: 'It gives you the lift in heart rate of jumping jacks without the landing, so it is kind to knees and quiet enough for a flat with neighbours below.',
+    watchOut: [
+      'Steps shrinking until you are barely moving; keep stepping out a full foot\'s width',
+      'Arms stopping at shoulder height; reach overhead if your shoulders are comfortable, or out to the sides if they are not',
+      'Holding your breath as you speed up — breathe out every few steps',
+      'Any sharp pain: slow to marching on the spot and leave this one for today'
+    ],
+    load: 'Bodyweight only.',
+    credits: 35
+  },
+
+  {
+    id: 'skater-steps',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
+    name: 'Skater Steps',
+    youtube: 'low impact skater steps exercise',
+    category: 'cardio',
+    movementPattern: 'locomotion',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['glutes', 'quadriceps', 'adductors'],
+    contraindications: ['knee-acute', 'glutes-acute'],
+    energyRequired: 5,
+    difficultyLevel: 2,
+    duration: 60,
+    perSide: false,
+    instructions: [
+      'Stand with your feet hip-width apart and a soft bend in your knees',
+      'Take a wide step to the right, bending your right knee, and sweep your left foot behind you to tap the floor',
+      'Swing your arms across your body as you step, as a speed skater does',
+      'Step wide to the left and tap your right foot behind, and keep a steady rhythm side to side'
+    ],
+    coaching: 'Sink into each step rather than bobbing up — staying low is where the effort comes from.',
+    why: 'Side-to-side movement works the outsides of your hips and thighs, which walking and running straight ahead hardly touch, and it gets your heart going without leaving the floor.',
+    watchOut: [
+      'Your front knee falling inwards as you land the step; point it over your middle toes',
+      'Standing up tall between steps; stay low and keep your knees soft',
+      'Stepping too wide to control; shorten the step until each one feels steady',
+      'Any sharp pain in the knee: slow to a step touch and leave this one for today'
+    ],
+    load: 'Bodyweight only.',
+    credits: 40
+  },
+
+  {
+    id: 'cross-body-knee-drive',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
+    name: 'Standing Cross-Body Knee Drive',
+    youtube: 'standing cross body knee to elbow exercise',
+    category: 'cardio',
+    movementPattern: 'locomotion',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['abdominals', 'core', 'hip-flexor'],
+    contraindications: ['lower-back-acute'],
+    energyRequired: 4,
+    difficultyLevel: 1,
+    duration: 60,
+    perSide: false,
+    instructions: [
+      'Stand tall with your feet hip-width apart, hands lightly behind your head or held out in front',
+      'Lift your right knee up and across towards your left elbow, turning your chest a little to meet it',
+      'Lower the foot and repeat with your left knee towards your right elbow',
+      'Keep alternating at a pace that lifts your breathing, standing tall throughout'
+    ],
+    coaching: 'Bring the knee up to the elbow rather than curling down to the knee — staying tall is what makes this work your middle.',
+    why: 'It lifts your heart rate and works your stomach muscles at the same time, all standing up, so there is no getting down on the floor.',
+    watchOut: [
+      'Pulling on your neck with your hands; keep them light, or hold them out in front instead',
+      'Rounding forward to reach the knee; lift it only as high as you can while staying tall',
+      'Speeding up until the movement gets sloppy; slow down and keep each one controlled',
+      'Any sharp pain in your back or hip: march gently on the spot instead and leave this one for today'
+    ],
+    load: 'Bodyweight only.',
+    credits: 35
+  },
+
+  {
+    id: 'squat-to-reach',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
+    name: 'Squat to Overhead Reach',
+    youtube: 'squat to overhead reach low impact cardio',
+    category: 'cardio',
+    movementPattern: 'locomotion',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['quadriceps', 'glutes', 'shoulder'],
+    contraindications: ['knee-acute', 'glutes-acute'],
+    energyRequired: 5,
+    difficultyLevel: 2,
+    duration: 60,
+    perSide: false,
+    instructions: [
+      'Stand with your feet a little wider than your hips, arms by your sides',
+      'Sit back into a squat, reaching your hands down towards your shins',
+      'Stand up briskly and reach both arms up overhead, rising onto your toes if that feels steady',
+      'Flow straight into the next squat and keep a steady rhythm'
+    ],
+    coaching: 'Keep it rhythmic rather than rushed — down, up and reach, in one smooth wave.',
+    why: 'It uses your largest muscles, legs and back together, which is what raises your heart rate quickest without any jumping.',
+    watchOut: [
+      'Squatting deeper than you can control; go only as low as you can with your heels down and your back flat',
+      'Heels lifting at the bottom; sit back a little more',
+      'Arching your back at the top of the reach; keep your ribs down and reach long rather than high',
+      'Any sharp pain in the knee or back: stop and leave this one for today'
+    ],
+    load: 'Bodyweight only.',
+    credits: 40
+  },
+
+  {
+    id: 'step-back-burpee',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
+    name: 'Step-Back Burpee',
+    youtube: 'step back burpee no jump',
+    category: 'cardio',
+    movementPattern: 'locomotion',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['full-body'],
+    contraindications: ['knee-acute', 'shoulder-acute', 'wrist-elbow-acute'],
+    energyRequired: 6,
+    difficultyLevel: 3,
+    duration: 90,
+    perSide: false,
+    instructions: [
+      'Stand with your feet hip-width apart, then squat down and place your hands flat on the floor in front of your feet',
+      'Step one foot back, then the other, into a plank with your hands under your shoulders',
+      'Step your feet back in towards your hands, one at a time',
+      'Stand up tall and reach your arms overhead, then go straight into the next one'
+    ],
+    coaching: 'Stepping rather than jumping keeps every part of the burpee except the landing, so you can keep going for longer.',
+    why: 'It works your whole body, getting down to the floor and back up again, and raises your heart rate without the jump or the landing of a burpee.',
+    watchOut: [
+      'Hips sagging in the plank; squeeze your stomach and glutes so you hold a straight line',
+      'Rounding your back to reach the floor; bend your knees more, or put your hands on a low step or the seat of a sofa',
+      'Rushing until the steps get messy; slow down and place each foot',
+      'Any sharp pain in the wrists, shoulders or knees: stand up and leave this one for today'
+    ],
+    load: 'Bodyweight only.',
+    credits: 60
+  },
+
+  {
+    id: 'band-punches',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
+    name: 'Band Punches',
+    youtube: 'resistance band punches cardio',
+    category: 'cardio',
+    movementPattern: 'locomotion',
+    equipment: ['resistance-band'],
+    equipmentOptional: [],
+    affectsAreas: ['shoulder', 'chest-pecs', 'core'],
+    contraindications: ['shoulder-acute'],
+    energyRequired: 5,
+    difficultyLevel: 2,
+    duration: 60,
+    perSide: false,
+    instructions: [
+      'Pass a long band behind your upper back and hold an end in each hand at chest height, elbows bent',
+      'Stand with your feet hip-width apart, one foot a little ahead, knees soft',
+      'Punch one hand straight forward against the band, then bring it back as the other hand punches',
+      'Keep alternating quickly for the time, turning your shoulders slightly with each punch'
+    ],
+    coaching: 'Punch quickly but bring each hand back under control, so the band never yanks your arms back for you.',
+    why: 'Punching against a band lifts your heart rate and works your shoulders, chest and middle together, without moving your feet or making any noise.',
+    watchOut: [
+      'Snapping your elbows straight at the end of each punch; stop just short of straight',
+      'Shoulders hunching up as you tire; drop them and keep going a little slower',
+      'The band sliding up to your neck; set it across your shoulder blades before you start',
+      'Any sharp pain in the shoulder or elbow: lower your arms and leave this one for today'
+    ],
+    load: 'A light band. Speed is the point here, not resistance.',
+    credits: 40
+  },
+
+  {
+    id: 'quiet-cardio-circuit',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
+    name: 'Quiet Cardio Circuit — No Jumping',
+    youtube: 'low impact no jumping cardio workout apartment',
+    category: 'cardio',
+    contentType: 'practice',
+    movementPattern: 'locomotion',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['full-body'],
+    contraindications: ['knee-acute', 'glutes-acute'],
+    energyRequired: 5,
+    difficultyLevel: 2,
+    duration: 960,
+    perSide: false,
+    instructions: [
+      'Warm up for two minutes, marching on the spot and lifting your knees a little higher as you go',
+      'Then work for 40 seconds and rest for 20 on each move in turn: step jacks, skater steps, squat to overhead reach, cross-body knee drives',
+      'Go round the four moves three times, about twelve minutes',
+      'Finish with two minutes of easy marching, and let your breathing settle'
+    ],
+    coaching: 'Choose a pace you could hold for the whole circuit — breathing harder but still able to say a few words — rather than racing the first round.',
+    why: 'It is a full cardio session for a living room, with no jumping and no kit, so it works in a flat, late in the evening, and on days when your knees would rather stay on the floor.',
+    watchOut: [
+      'Going all out in the first round and fading; aim to finish the third round at the pace you started',
+      'Cutting the rests short; the 20 seconds are part of the session',
+      'Form slipping as you tire; slow down rather than letting your knees cave in or your back round',
+      'Any sharp pain, at any point: slow to marching, then stop for today'
+    ],
+    load: 'Bodyweight only.',
+    credits: 70
   }
 
 ];

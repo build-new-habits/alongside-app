@@ -1,6 +1,16 @@
 /**
  * equipment.js - Equipment options for onboarding
  * Organised by category for modal selection
+ *
+ * 13 Oct 2026 v2
+ *
+ * v2 - HOME-BANDS. The band chips say which band is which, because the
+ *   two do different jobs (equipment-map.js v4): "Long band" for light,
+ *   medium and heavy, "Short loop band" for the mini band, and the pull-up
+ *   assist band named as the long loop it is. Ids unchanged, so nobody's
+ *   saved kit moves. verify-home-bands TEST 6.
+ *
+ * v1 - first dated header; the file carried none before this.
  */
 
 export const EQUIPMENT_CATEGORIES = [
@@ -33,14 +43,14 @@ export const EQUIPMENT_CATEGORIES = [
     id: 'bands',
     name: 'Resistance Bands',
     icon: '🎗️',
-    description: 'Tubes, loops, therapy bands',
+    description: 'Long bands, short loop bands, therapy bands',
     items: [
-      { id: 'band-light', name: 'Light resistance band' },
-      { id: 'band-medium', name: 'Medium resistance band' },
-      { id: 'band-heavy', name: 'Heavy resistance band' },
-      { id: 'mini-bands', name: 'Mini/loop bands (booty bands)' },
+      { id: 'band-light', name: 'Long band, light' },
+      { id: 'band-medium', name: 'Long band, medium' },
+      { id: 'band-heavy', name: 'Long band, heavy' },
+      { id: 'mini-bands', name: 'Short loop band (worn round the legs)' },
       { id: 'therapy-band', name: 'Therapy band (flat)' },
-      { id: 'pull-up-assist', name: 'Pull-up assist band' }
+      { id: 'pull-up-assist', name: 'Pull-up assist band (long loop)' }
     ]
   },
   {

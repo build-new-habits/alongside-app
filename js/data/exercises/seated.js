@@ -1,5 +1,11 @@
 /**
  * data/exercises/seated.js
+ * 13 Oct 2026 v3
+ *
+ * v3 - HOME-BANDS. A band worn round both legs is a short loop band, so
+ *   Seated Hip Abduction now needs "loop-band", not "resistance-band" (a long band).
+ *   equipment-map.js v4; verify-home-bands TEST 3.
+ *
  * 02 Oct 2026 v2
  *
  * v2 - W5-7 CHAIR-LEGS. Sit to Stand: the hands help, on the arms of the
@@ -913,7 +919,7 @@ SEATED.push(
     adaptive: true,   // CAP-6
     impact: false,
     balanceDemand: false,
-    equipment: ['resistance-band'],
+    equipment: ['loop-band'],
     equipmentOptional: [],
     affectsAreas: ['glutes', 'hip'],
     contraindications: ['hip-acute'],
