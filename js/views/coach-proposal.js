@@ -1,5 +1,14 @@
 /**
  * coach-proposal.js
+ * 13 Oct 2026 v58
+ *
+ * v58 - D662-1 WALK-DAY (Graeme's device check, 13 Oct: "Concerning it's
+ *   not a walk when it said it should be"). A Your week day that is only
+ *   cardio, outside (the ready weeks' "A walk" and "A gentle walk") built a
+ *   cardio circuit under "From your week: A walk." The coach cannot build a
+ *   walk, so that day now leads with "You planned a walk today" and Start
+ *   the walk (WEEK-DOORS), the coach's session offered below as before.
+ *
  * 12 Oct 2026 v57
  *
  * v57 - A-4 SHARED-POLISH (Stage AWARD; Graeme, 12 Oct: the shared screens
@@ -831,7 +840,7 @@ import { isGateDue, isGuidanceDue, recordAcknowledgement,
 import { HURT_AND_ACHE }     from '../exercise-card.js';
 import { bodyCaution }       from '../data/session-rationale.js';
 import { renderFigure }      from '../figures.js';
-import { takeWeekDayRequest, applyWeekDay, primaryType } from '../data/week-shape.js';
+import { takeWeekDayRequest, applyWeekDay, primaryType, todayInWeek } from '../data/week-shape.js';
 import { resolveTiming }     from '../exercise-timing.js';
 import { isPremium }         from '../auth.js';
 import { openSheet }         from './onboarding/sheet-manager.js';
@@ -1636,7 +1645,13 @@ export function CoachProposalView(router) {
     const DAYS = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
     // A-3 (v56). Once Your week is set it is the Plan's week; the old plan
     // no longer leads, so "You planned a walk" never sits over "From your week".
-    if (store.get('weekShape')) return null;
+    // D662-1 (v58). Except a walk day: only cardio, outside. The coach
+    // cannot build a walk, so the walk session leads, as it did here.
+    if (store.get('weekShape')) {
+      const t = todayInWeek()?.template;
+      const walk = t && t.place === 'outside' && t.mix?.length && t.mix.every(m => m.focus === 'cardio');
+      return walk ? { id: 'walk', ...OWN_SESSIONS.walk } : null;
+    }
     const slot = store.get(`weeklyPlan.days.${DAYS[new Date().getDay()]}`) || {};
     if (!slot || slot.type === 'rest' || !OWN_SESSIONS[slot.sessionType]) return null;
     return { id: slot.sessionType, ...OWN_SESSIONS[slot.sessionType] };

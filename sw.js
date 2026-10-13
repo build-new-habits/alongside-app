@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 13 Oct 2026 v662
+ * 13 Oct 2026 v663
  *
+ * v663 - DEVICE-662 (Graeme's device check, 13 Oct): on the Plan, a day in Your week that is a walk (only cardio, outside) leads with "You planned a walk today" and Start the walk, not a cardio circuit; and the Library has a Mobility & Conditioning tile, so Stretch, Stretch arc and a mobility session can be found.
  * v662 - Stage AWARD (Graeme, 13 Oct: "Yes please"): Saved sessions has one name, and when it is empty it says where saving is (Keep to repeat, when you finish) with Start today's session; My exercises, empty, has a heading and says what goes there; on the Plan, the first day of a new arc week says "Week n starts today".
  * v661 - ARC-CREDIT: the arc's record of what a session worked is saved on the phone when the session is logged (it lived only in memory, and could be lost if the app was closed before anything else saved). store.js v115, Schema v1.112, no field change.
  * v660 - HOME-BANDS (Graeme, 13 Oct: "I have short and long resistance bands … include aerobic exercises for home"): a long band and a short loop band are two different kit items now, so a loop band is no longer offered face pulls or presses and a long band is no longer offered clamshells; the kit list says which is which. Eighteen new exercises: eight long-band (Kneeling Band Pulldown, Band Lateral Raise, Band Reverse Fly, Band Pull-Through, Band Overhead Triceps Extension, Standing Band Woodchop, Banded Press-Up, Band Split Squat), three loop-band (Banded Glute Bridge, Loop Band Squat, Standing Band Kickback) and seven quiet, no-jump home cardio moves (Step Jacks, Skater Steps, Standing Cross-Body Knee Drive, Squat to Overhead Reach, Step-Back Burpee, Band Punches, the Quiet Cardio Circuit), each with its figure. NEW FILE precached: js/data/figures/batch-14.js.
@@ -4209,7 +4210,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v662";
+const CACHE_NAME = "alongside-v663";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4297,7 +4298,7 @@ const SHELL_HASHES = {
   "./js/views/stretch-arc.js": "fce3ddbd29c7fb30",
   "./js/views/checkin.js": "29d45c08868e3e8f",
   "./js/views/checkin-mini.js": "3f1764e87002d46f",
-  "./js/views/coach-proposal.js": "95200d66481ffa8a",
+  "./js/views/coach-proposal.js": "caaf7bf8e2fee898",
   "./js/views/workout.js": "7c29db66bc121ecc",
   "./js/views/progress.js": "63cf6b5568af45e7",
   "./js/views/settings.js": "74e5899414373a9a",
@@ -4325,7 +4326,7 @@ const SHELL_HASHES = {
   "./js/views/programme-select.js": "8f1e740ed2db223b",
   "./js/views/upgrade.js": "4b7233092e3561da",
   "./js/views/privacy.js": "a64dfefd8a24d1ac",
-  "./js/views/library.js": "910e8fae94e5aab2",
+  "./js/views/library.js": "0fba57582118da84",
   "./js/views/practices.js": "69ede443c8d69360",
   "./js/views/red-flag.js": "cfe041e1e4da9ecb",
   "./js/views/health-consent.js": "eaead26a28761859",

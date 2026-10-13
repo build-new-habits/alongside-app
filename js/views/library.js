@@ -1,6 +1,13 @@
 /**
  * library.js - Library Page
  *
+ * 13 Oct 2026 v18
+ *
+ * v18 - D662-2 MOBILITY-DOOR (Graeme's device check, 13 Oct: "Can't find
+ *   stretch at all"). A Plan-only Mobility & Conditioning tile: on the Plan
+ *   it had no way in from Home or Library. Free's Library unchanged (Free
+ *   Home has its own door).
+ *
  * 12 Oct 2026 v17
  *
  * v17 - A-2 ONE-PLAN-SCREEN (Stage AWARD). On the Plan, At home › Core
@@ -407,6 +414,18 @@ const GUIDED_CATEGORIES = [
   // they are here, one tap from it. The Plan's only: Free Home keeps its
   // own Classes tile and Free's Library is as it was (Graeme, 12 Oct:
   // Free is left alone).
+  // D662-2 (v18). Mobility & Conditioning (a mobility session, Stretch,
+  // Stretch arc, My exercises): Plan Home has no door for it. Plan only;
+  // Free Home has its own.
+  {
+    id:          "mobility",
+    label:       "Mobility & Conditioning",
+    icon:        "",
+    description: "Mobility, stretching and your own exercises",
+    sessions: [],
+    directTarget: "mobility-conditioning",
+    planOnly:    true
+  },
   {
     id:          "classes",
     label:       "Classes",
@@ -521,7 +540,7 @@ const CATEGORY_LOOK = {
   run: ["run", "blue"], walk: ["walk", "blue"], swim: ["swim", "blue"], cycle: ["cycle", "blue"],
   yoga: ["yoga", "violet"], mindful: ["mind", "green"], practices: ["breath", "green"],
   prescribed: ["list", "teal"], coach: ["star", "teal"],
-  classes: ["classes", "rose"], week: ["week", "teal"],
+  mobility: ["mobility", "violet"], classes: ["classes", "rose"], week: ["week", "teal"],
 };
 
 /** The category tiles, shared by the Library page and the old landing. */
