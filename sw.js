@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 12 Oct 2026 v659
+ * 13 Oct 2026 v660
  *
+ * v660 - HOME-BANDS (Graeme, 13 Oct: "I have short and long resistance bands … include aerobic exercises for home"): a long band and a short loop band are two different kit items now, so a loop band is no longer offered face pulls or presses and a long band is no longer offered clamshells; the kit list says which is which. Eighteen new exercises: eight long-band (Kneeling Band Pulldown, Band Lateral Raise, Band Reverse Fly, Band Pull-Through, Band Overhead Triceps Extension, Standing Band Woodchop, Banded Press-Up, Band Split Squat), three loop-band (Banded Glute Bridge, Loop Band Squat, Standing Band Kickback) and seven quiet, no-jump home cardio moves (Step Jacks, Skater Steps, Standing Cross-Body Knee Drive, Squat to Overhead Reach, Step-Back Burpee, Band Punches, the Quiet Cardio Circuit), each with its figure. NEW FILE precached: js/data/figures/batch-14.js.
  * v659 - Stage AWARD (Graeme, 12 Oct: tidy the shared screens on both tiers, keep the difference in what the Plan does). On the Plan, Mobility & Conditioning, the stretch arc and the Library's Core open Today's plan and the one player (A-2; Free keeps its builder and core session). Today's plan: "‹ Home" in place of the ✕, no repeated greeting, Where, Length and Focus as pills. The finish: a larger tick; on the Plan, the arc's strands worked today; Keep this one? folded into Keep to repeat. Progress before the first session says so, with the arc, the weight note and the rows one tap away kept. The bottom bar has line icons in place of emoji.
  * v658 - A-1 PLAN-HOME-PRUNE (Graeme approved the mock-up, 12 Oct: "I love plan home"): Plan Home leads with one Today card (the day from your week, a rest day, or, with nothing set, your arc and Tell me what to do), your arc a line inside it, then the doors and one Library row: six ways in at most. Join a class, Go for a run, Something for the mind and Your week are in the Library (Classes and Your week as new tiles on the Plan only). The week card's Only 10 minutes went (the plan's Length does it). Free Home and Free's Library are unchanged.
  * v657 - Stage AWARD, first batch (Graeme, 12 Oct: "Great plan. Let's go with it"): on the Plan, Settings › Your week opens Your week and, once it is set, the older weekly plan no longer leads the coach's plan; Free keeps its weekly plan, and Settings no longer says the coach uses it (A-3). Three exercise descriptions made to match their own instructions: the internal-rotation band is anchored on the same side as the working arm; Thoracic Rotation and Side-Lying Thoracic Rotation (was Prone) lie on the side (A-6). After Home, the screens people open next load while the phone is idle, so their first open is quicker; the page's character set is declared where browsers look for it (A-8). Something different today names Make it up as I go by its name (A-9). NEW FILE precached: js/data/warm-views.js.
@@ -4206,7 +4207,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v659";
+const CACHE_NAME = "alongside-v660";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4302,9 +4303,9 @@ const SHELL_HASHES = {
   "./js/views/weekly-plan.js": "dcee06e297b402c0",
   "./js/views/reflect.js": "f4e0034752548a00",
   "./js/data/empathy-transfer.js": "b3513396b3541e3a",
-  "./js/data/equipment-map.js": "b3460207997a4fa5",
+  "./js/data/equipment-map.js": "2db6399d16987707",
   "./js/data/exercises/gym.js": "34140029424a4dce",
-  "./js/data/exercises/seated.js": "4e7ce1b05818ef39",
+  "./js/data/exercises/seated.js": "5ee4b5ccfdf8c945",
   "./js/data/exercises/sport_conditioning.js": "72c789b2f7284b1b",
   "./js/data/exercises/swimming_cycling.js": "0f3fefe85ab33dfd",
   "./js/data/morning-programme.js": "684cee9fdc54a03a",
@@ -4348,7 +4349,7 @@ const SHELL_HASHES = {
   "./js/views/plan-import.js": "630d97175edd2091",
   "./css/components/your-week.css": "f14109dded35259b",
   "./js/figures.js": "60f325dd602352db",
-  "./js/data/figures/index.js": "81398e8637cb0692",
+  "./js/data/figures/index.js": "d4cf080b2f72544c",
   "./js/data/figures/batch-01.js": "aa63243f5ad443df",
   "./js/data/figures/batch-02.js": "067171d42db1d439",
   "./js/data/figures/batch-03.js": "2aa6d354f20f277e",
@@ -4362,6 +4363,7 @@ const SHELL_HASHES = {
   "./js/data/figures/batch-11.js": "7dc464ecc3e93d58",
   "./js/data/figures/batch-12.js": "2e82b3c1bc531330",
   "./js/data/figures/batch-13.js": "b5b77f98f819cff0",
+  "./js/data/figures/batch-14.js": "a5d94d7a78cc5c19",
   "./js/views/bad-day-door.js": "5910813778515c4e",
   "./js/data/chair-legs.js": "9f7c2e9b87617203",
   "./js/data/general-routine.js": "d3368d7dbbcddb5c",
@@ -4427,7 +4429,7 @@ const SHELL_HASHES = {
   "./js/data/assessment.js": "abbb5c432a0d6f3c",
   "./js/data/session-moments.js": "85608dcfb8a34055",
   "./js/data/conditions.js": "933cab5f52351476",
-  "./js/data/equipment.js": "1628f3c055f525f1",
+  "./js/data/equipment.js": "b1d233c36eaf6270",
   "./js/data/goals.js": "6cac79f51ca5b5a4",
   "./js/data/goal-review.js": "a0208fe146fed15d",
   "./js/data/goal-review-script.js": "8a0677e0607dbdca",
@@ -4442,13 +4444,13 @@ const SHELL_HASHES = {
   "./js/data/grounding-moments.js": "33c5054f7e6540ff",
   "./js/data/coach-voice.js": "92ea4a0209978619",
   "./js/data/exercises/index.js": "d9df11d43f5df8ce",
-  "./js/data/exercises/strength.js": "c3ea3c850e5c9231",
-  "./js/data/exercises/cardio.js": "70eb66cdf3b2ca93",
+  "./js/data/exercises/strength.js": "1357c6bb46e7a89d",
+  "./js/data/exercises/cardio.js": "e828c599b78284d3",
   "./js/data/exercises/mobility.js": "16f5c307b159bd12",
   "./js/data/exercises/yoga.js": "a47fac7b38781ec5",
   "./js/data/exercises/pilates.js": "99e320f6392bca5b",
   "./js/data/exercises/running.js": "fcb33517ce9f6da5",
-  "./js/data/exercises/rehabilitation.js": "66c1ab3b83ee0c37",
+  "./js/data/exercises/rehabilitation.js": "f7f79c01a05b1d21",
   "./js/data/exercises/recovery.js": "417c343342097d9a",
   "./js/data/exercises/mindfulness.js": "43e569cf2f0ca91c",
   "./js/data/practice-library.js": "21f37963f0b2d2c2",
@@ -4663,6 +4665,7 @@ const SHELL_URLS = [
   "./js/data/figures/batch-11.js",
   "./js/data/figures/batch-12.js",
   "./js/data/figures/batch-13.js",
+  "./js/data/figures/batch-14.js",
   "./js/views/bad-day-door.js",
   "./js/data/chair-legs.js",
   "./js/data/general-routine.js",
