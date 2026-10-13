@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 13 Oct 2026 v660
+ * 13 Oct 2026 v661
  *
+ * v661 - ARC-CREDIT: the arc's record of what a session worked is saved on the phone when the session is logged (it lived only in memory, and could be lost if the app was closed before anything else saved). store.js v115, Schema v1.112, no field change.
  * v660 - HOME-BANDS (Graeme, 13 Oct: "I have short and long resistance bands … include aerobic exercises for home"): a long band and a short loop band are two different kit items now, so a loop band is no longer offered face pulls or presses and a long band is no longer offered clamshells; the kit list says which is which. Eighteen new exercises: eight long-band (Kneeling Band Pulldown, Band Lateral Raise, Band Reverse Fly, Band Pull-Through, Band Overhead Triceps Extension, Standing Band Woodchop, Banded Press-Up, Band Split Squat), three loop-band (Banded Glute Bridge, Loop Band Squat, Standing Band Kickback) and seven quiet, no-jump home cardio moves (Step Jacks, Skater Steps, Standing Cross-Body Knee Drive, Squat to Overhead Reach, Step-Back Burpee, Band Punches, the Quiet Cardio Circuit), each with its figure. NEW FILE precached: js/data/figures/batch-14.js.
  * v659 - Stage AWARD (Graeme, 12 Oct: tidy the shared screens on both tiers, keep the difference in what the Plan does). On the Plan, Mobility & Conditioning, the stretch arc and the Library's Core open Today's plan and the one player (A-2; Free keeps its builder and core session). Today's plan: "‹ Home" in place of the ✕, no repeated greeting, Where, Length and Focus as pills. The finish: a larger tick; on the Plan, the arc's strands worked today; Keep this one? folded into Keep to repeat. Progress before the first session says so, with the arc, the weight note and the rows one tap away kept. The bottom bar has line icons in place of emoji.
  * v658 - A-1 PLAN-HOME-PRUNE (Graeme approved the mock-up, 12 Oct: "I love plan home"): Plan Home leads with one Today card (the day from your week, a rest day, or, with nothing set, your arc and Tell me what to do), your arc a line inside it, then the doors and one Library row: six ways in at most. Join a class, Go for a run, Something for the mind and Your week are in the Library (Classes and Your week as new tiles on the Plan only). The week card's Only 10 minutes went (the plan's Length does it). Free Home and Free's Library are unchanged.
@@ -4207,7 +4208,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v660";
+const CACHE_NAME = "alongside-v661";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4273,7 +4274,7 @@ const SHELL_HASHES = {
   "./css/components/finish.css": "d048b8066d6e9d22",
   "./js/app.js": "24ff2a302aec8762",
   "./js/router.js": "bbbc2ab57c9ac0f4",
-  "./js/store.js": "f48f7bc17c61919a",
+  "./js/store.js": "216e2494f3a4763a",
   "./js/session-log.js": "d43815c658239179",
   "./js/exercise-feedback.js": "adba8549f444da2a",
   "./js/exercise-card.js": "78196b42671c67aa",

@@ -5,6 +5,13 @@ import { sanitizeWeekShape, sanitizeWeekDayRequest } from "./data/week-shape-mod
 
 /**
  * store.js - Data persistence layer
+ * 13 Oct 2026 v115
+ *
+ * v115 - ARC-CREDIT (no schema change). markSessionWorked() tested an
+ *   undefined `type` before saving, so it threw on every call (its caller
+ *   caught it): arc credits lived in memory and reached the phone only if
+ *   another write saved the store later. It now saves what it credits.
+ *
  * 06 Oct 2026 v114
  *
  * v114 - D-11 PROGRESS-SHARE (Schema v1.111). activityLog[].place:
@@ -3618,7 +3625,9 @@ export const store = {
       arc.zonesWorked = worked;
     }
 
-    if (type || zones.length) this.set("arc", arc);
+    // ARC-CREDIT (v115). Was `if (type || ...)`: `type` is not defined here,
+    // so this threw on every call and the credit was never saved.
+    if (credit.length || zones.length) this.set("arc", arc);
   },
 
   markZonesWorked(zoneIds) {

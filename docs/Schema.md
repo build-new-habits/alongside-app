@@ -1,5 +1,11 @@
 # Alongside — Data Schema Reference
-## 06 Oct 2026 v1.111
+## 13 Oct 2026 v1.112
+
+> **v1.112, 13 Oct 2026 — ARC-CREDIT** (`store.js` v115). **No field
+> change.** `store.markSessionWorked()` now saves the arc it credits
+> (`arc.typesWorked`, `arc.zonesWorked`): it tested an undefined `type`
+> before saving and threw on every call, so credits lived in memory and
+> reached the phone only if another write saved the store later.
 
 > **v1.111, 06 Oct 2026 — D-11 PROGRESS-SHARE** (`store.js` v114). New
 > **`activityLog[].place`** (`"home"|"gym"|"outside"|null`): where the
@@ -1036,7 +1042,7 @@
 
 ## 06 Sep 2026 v1.51
 
-**File:** `js/store.js` (confirmed live version: **v114, 06 Oct 2026**)
+**File:** `js/store.js` (confirmed live version: **v115, 13 Oct 2026**)
 
 > **v1.47, 06 Sep 2026 — CR-1.** `conditions[]` gains three ids and loses one. `chronic-fatigue` is **retired**; `persistent-fatigue`, `me-cfs` and `long-covid` replace it. No field shape changed — `conditions` is still `string[]` and `conditionMeta` is still keyed by condition id.
 >

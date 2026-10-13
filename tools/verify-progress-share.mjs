@@ -1,6 +1,11 @@
 /**
  * tools/verify-progress-share.mjs
- * 12 Oct 2026 v2
+ * 13 Oct 2026 v3
+ *
+ * v3 - SUITE-FLAKE-6 (found 13 Oct, 06:20). 4c failed before 07:00: today's
+ *   check-in, journal entry and weight were dated 06:00-07:00, so early in
+ *   the morning they were in the future. Moved to just after midnight, as
+ *   v2 did for the sessions. No assertion changed.
  *
  * v2 - SUITE-FLAKE-5 (found 12 Oct running the suite at 08:56). Today's
  *   two sessions and their lifts were dated 07:10 and 09:10-09:47, so any
@@ -104,9 +109,9 @@ function person(tier = "personal", { consent = true } = {}) {
   localStorage.clear(); store.init(); agreed(store);
   store.set("onboardingComplete", true); store.set("tier", tier); store.set("name", "Graeme");
   store.set("activityLog", LOG); store.set("liftLog", LIFTS);
-  store.set("journalEntries", [{ id: "j", text: SECRET.journal, createdAt: at(0, 6, 0) }]);
-  store.set("weightTracking", true); store.set("weightLog", [{ at: at(0, 6, 0), kg: SECRET.weight }]);
-  store.set("checkinHistory", { [todayKey]: { energy: 6, mood: 7, conditionLevels: { "lower-back": 3 }, notes: "CHECKINNOTESECRET", savedAt: at(0, 7, 0) } });
+  store.set("journalEntries", [{ id: "j", text: SECRET.journal, createdAt: at(0, 0, 3) }]);
+  store.set("weightTracking", true); store.set("weightLog", [{ at: at(0, 0, 3), kg: SECRET.weight }]);
+  store.set("checkinHistory", { [todayKey]: { energy: 6, mood: 7, conditionLevels: { "lower-back": 3 }, notes: "CHECKINNOTESECRET", savedAt: at(0, 0, 2) } });
   if (!consent) store.set("consent.health", { given: false, at: null, version: null, withdrawnAt: new Date().toISOString() });
   navs = [];
 }
