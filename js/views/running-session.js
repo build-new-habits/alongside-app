@@ -1,6 +1,12 @@
 /**
  * running-session.js - Guided Running Session
  *
+ * 17 Oct 2026 v16
+ *
+ * v16 - W6-4 (Wave 6, persona 2.1). After Delete my health answers,
+ *   Settings says "I will plan carefully: ... nothing with impact". Intervals
+ *   are off until the answers are given again, and the run says why.
+ *
  * 04 Oct 2026 v15
  *
  * v15 - W6-5 RUN-STAY. Exit pauses and Stay in session carries on, the
@@ -296,6 +302,10 @@ function severeToday() {
 
 /** W3-2. A note that rules out intervals takes Intervals off the list. */
 function intervalsOffReason() {
+  // W6-4 (v16). Careful planning after the health answers were deleted.
+  try {
+    if (store.capabilityProfile().careful) return "Intervals are off for now: you deleted what you told me about your body, so I\u2019m planning carefully. Easy or long, at a pace you could talk at. Tell me again in Settings and they come back.";
+  } catch { /* no profile: as before */ }
   const conditions = store.get("conditions")          || [];
   const painScores = store.get("conditionPainScores") || {};
   const id = conditions.find(c => c.includes("hamstring") && isSore(painScores[c]));

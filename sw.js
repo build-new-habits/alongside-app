@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 17 Oct 2026 v665
+ * 17 Oct 2026 v666
  *
+ * v666 - W6-3/W6-4 (Graeme, 17 Oct: "Let's start wave 6"): somebody who gets up from a chair "not easily" is given no held lunge or wide stance (Warrior I and II, Triangle, Crescent Lunge, Standing Adductor Stretch), and Warrior I counts as balance work; Classes holds a class with a floor or balance move (and no way round it) for somebody who said floor or balance is hard; after Delete my health answers, Run has no Intervals and says why.
  * v665 - D662-10 (Graeme, 17 Oct: "Remove them"): no "Up to +150 ⭐" on My exercises and no "+35 ⭐" on each move: the older per-move count, which nothing shows or uses; the social action credits (1 or 2 a session, Settings › Community impact) are unchanged. The player says "1 set".
  * v664 - DEVICE-662, the rest (Graeme, 17 Oct: "Can we fix them now?"): "One more set on each" only where the work is sets; My exercises in plan days is headed Your exercises with today's day first, and its way back says Home; one way home per screen (no house beside ‹ Home or Back to Home); 1 set, 1 session, 1 minute; no "No sets logged" under a move; a saved session's button says Start; the finish's tiles share the row; Plan Home fits above the bar on a 412 x 915 phone; the Library's tiles go to one column at the largest text; somebody who can stand always has a standing move in a strength session (CAP-7).
  * v663 - DEVICE-662 (Graeme's device check, 13 Oct): on the Plan, a day in Your week that is a walk (only cardio, outside) leads with "You planned a walk today" and Start the walk, not a cardio circuit; and the Library has a Mobility & Conditioning tile, so Stretch, Stretch arc and a mobility session can be found.
@@ -4212,7 +4213,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v665";
+const CACHE_NAME = "alongside-v666";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4370,7 +4371,7 @@ const SHELL_HASHES = {
   "./js/data/figures/batch-13.js": "b5b77f98f819cff0",
   "./js/data/figures/batch-14.js": "a5d94d7a78cc5c19",
   "./js/views/bad-day-door.js": "5910813778515c4e",
-  "./js/data/chair-legs.js": "9f7c2e9b87617203",
+  "./js/data/chair-legs.js": "2befbb45dab79deb",
   "./js/data/general-routine.js": "d3368d7dbbcddb5c",
   "./js/data/session-length.js": "d135da33af36c923",
   "./js/data/file-lock.js": "6428c4d49a58959b",
@@ -4383,7 +4384,7 @@ const SHELL_HASHES = {
   "./js/data/session-choice.js": "954463b0647f3843",
   "./js/data/saved-sessions.js": "91dd2dc43f0f908b",
   "./js/data/class-contract.js": "fe8f3f22b0df50f6",
-  "./js/data/classes/index.js": "1dc5d11095c21e99",
+  "./js/data/classes/index.js": "0204f29329b03b15",
   "./js/data/classes/class-ground-001.js": "b4df735986c353bd",
   "./js/data/classes/class-steady-round-002.js": "00e7a174fcae3772",
   "./js/data/classes/class-stopping-early-003.js": "46ff3fd168d14264",
@@ -4415,7 +4416,7 @@ const SHELL_HASHES = {
   "./js/views/core-session.js": "4db5aac7cec94a93",
   "./js/views/yoga-session.js": "5c668d74269e4014",
   "./js/views/walk-session.js": "4db23f8714be90d7",
-  "./js/views/running-session.js": "5d68396baa51b914",
+  "./js/views/running-session.js": "515027b91a5509ef",
   "./js/views/swim-session.js": "b7df266e78ddc4e9",
   "./js/views/cycle-session.js": "1acf062699de50fe",
   "./js/views/onboarding/thread.js": "37c5261ae3d0c723",
@@ -4452,7 +4453,7 @@ const SHELL_HASHES = {
   "./js/data/exercises/strength.js": "1357c6bb46e7a89d",
   "./js/data/exercises/cardio.js": "e828c599b78284d3",
   "./js/data/exercises/mobility.js": "16f5c307b159bd12",
-  "./js/data/exercises/yoga.js": "a47fac7b38781ec5",
+  "./js/data/exercises/yoga.js": "e506e6b3452ee86e",
   "./js/data/exercises/pilates.js": "99e320f6392bca5b",
   "./js/data/exercises/running.js": "fcb33517ce9f6da5",
   "./js/data/exercises/rehabilitation.js": "f7f79c01a05b1d21",

@@ -1,6 +1,16 @@
 /**
  * data/classes/index.js
  *
+ * 17 Oct 2026 v7
+ *
+ * v7 - W6-4 CLASS-FLOOR-BALANCE (Wave 6, personas 2.11 and 2.1). The class
+ *   filter reads the same answers the builder does: a floor move for
+ *   somebody who cannot get down to the floor comfortably, and a balance
+ *   move for somebody with balance worries, hold a class unless the beat
+ *   has a safe way round (a seated or easier route). After Delete my health
+ *   answers the careful profile applies here too (nothing on the floor, no
+ *   balance work), as Settings says.
+ *
  * 02 Oct 2026 v6
  *
  * v6 - W5-7 CHAIR-LEGS. The class filter holds a class with a squat or a lunge
@@ -156,12 +166,18 @@ export function classSafety(cls, { conditionIds = [], painScores = {}, chairHard
   const active = getActiveConditionIds(conditionIds, painScores);
   // W5-7. Graeme, 02 Oct: no squats or lunges when getting up from a chair
   // is hard; read from the person's answers unless the caller says.
-  if (chairHard === undefined) {
-    try { chairHard = !!store.capabilityProfile().chairHard; } catch { chairHard = false; }
-  }
+  let cap = {};
+  try { cap = store.capabilityProfile() || {}; } catch { cap = {}; }
+  if (chairHard === undefined) chairHard = !!cap.chairHard;
+  // W6-4 (v7). Floor and balance, read as the builder reads them
+  // (session-builder.js personFilter): only from answers given.
+  const noFloor   = cap.asked && cap.floorSafe === false;
+  const noBalance = cap.asked && cap.balanceSafe === false;
   const tier = (id) => {
     const ex = byId.get(id);
     if (ex && chairHard && isSquatOrLunge(ex)) return 'avoid';
+    if (ex && noFloor && ex.position === 'floor') return 'avoid';
+    if (ex && noBalance && ex.balanceDemand === true) return 'avoid';
     return ex ? getExerciseSafetyTier(ex, active) : null;
   };
 

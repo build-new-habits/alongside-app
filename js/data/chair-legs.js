@@ -1,5 +1,14 @@
 /**
  * js/data/chair-legs.js
+ * 17 Oct 2026 v2
+ *
+ * v2 - W6-3 CHAIR-STANCES (Wave 6, persona 2.11). A held bent-knee or wide
+ *   stance (the library's heldStance: Warrior I and II, Triangle, Crescent
+ *   Lunge, Standing Adductor Stretch) is a lunge or a squat that does not
+ *   move, so it counts. It reached somebody who gets up from a chair "not
+ *   easily" in nearly every Mobility build. For the clinical reviewer to
+ *   confirm (pack section 4); until then, the careful reading.
+ *
  * 02 Oct 2026 v1
  *
  * v1 - W5-7 CHAIR-LEGS (Wave 5 persona trace: 2.11). Decided by Graeme,
@@ -28,6 +37,8 @@ const NAMED = /squat|lunge|split[- ]squat|step[- ]?up|step[- ]?down|wall sit/i;
 export function isSquatOrLunge(ex) {
   if (!ex || KEPT_FOR_CHAIR.has(ex.id)) return false;
   if (ex.position === "seated") return false;
+  // v2 W6-3. A held lunge or wide stance is a lunge or squat held still.
+  if (ex.heldStance === true) return true;
   return ["squat", "lunge"].includes(ex.movementPattern) || NAMED.test(ex.name || "");
 }
 

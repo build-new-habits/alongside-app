@@ -1,5 +1,10 @@
 /**
  * data/exercises/yoga.js
+ * 17 Oct 2026 v10
+ *
+ * v10 - W6-3 CHAIR-STANCES. Warrior I is tagged balanceDemand: its own
+ *   "why" says it requires balance (Wave 6, persona 2.11).
+ *
  * 30 Sep 2026 v9
  *
  * v9 - W3-6 HELD-STANCES. heldStance: true on held bent-knee or wide
@@ -115,7 +120,7 @@ export const YOGA = [
     id: 'yoga-warrior-1',
     position: 'standing',
     impact: false,
-    balanceDemand: false,
+    balanceDemand: true,    // W6-3: its own words, "Requires and develops focus and balance"
     heldStance: true,   // W3-6: held bent-knee or wide stance; counts as loading the legs until S1 pack s.4 is answered
     name: 'Warrior I',
     youtube: 'warrior 1 yoga pose tutorial',
