@@ -1,5 +1,15 @@
 /**
  * js/data/aims.js
+ * 17 Oct 2026 v6
+ *
+ * v6 - W6-13 ARC-STRESS (Wave 6, persona 2.4). A "settling" situation,
+ *   from the goals Reduce stress or Sleep better (or Stress listed): the
+ *   winding-down aims (Wind down properly, Be steadier in myself, Have
+ *   something left by the evening, Stop carrying my day in my shoulders)
+ *   rank first, a stated goal counting double. With Stress and both
+ *   goals, her first eight were all performance. Ranking only: nothing is
+ *   pre-filled (ARC-1), and the full list is one tap away.
+ *
  * 02 Oct 2026 v5
  *
  * v5 - W5-15 ARC-TRUE. Aims about the back (needsArea) lead only when a back
@@ -172,6 +182,7 @@ export const SITUATIONS = [
   "sport",       // plays something, or wants to again
   "later-life",  // 55+, where balance, bone health and staying mobile lead
   "desk",        // sedentary working day
+  "settling",    // W6-13: said they want less stress or better sleep
   "everyday",    // available to anybody
 ];
 
@@ -298,7 +309,7 @@ export const AIMS = {
     {
       id: "neck-shoulders-ease",
       label: "Stop carrying my day in my shoulders",
-      situations: ["desk", "everyday"],
+      situations: ["desk", "everyday", "settling"],
       strands: ["neck-shoulders", "winding-down", "shoulder-health", "upper-back-range"],
     },
 
@@ -390,13 +401,13 @@ export const AIMS = {
     {
       id: "energy-through-day",
       label: "Have something left by the evening",
-      situations: ["desk", "starting", "everyday"],
+      situations: ["desk", "starting", "everyday", "settling"],
       strands: ["gentle-capacity", "winding-down", "pacing", "being-outside"],
     },
     {
       id: "sleep-better",
       label: "Wind down properly at the end of a day",
-      situations: ["everyday", "desk", "managing"],
+      situations: ["everyday", "desk", "managing", "settling"],
       strands: ["winding-down", "neck-shoulders", "being-outside", "self-kindness"],
     },
     {
@@ -422,7 +433,7 @@ export const AIMS = {
     {
       id: "steadier-in-myself",
       label: "Be steadier in myself when things shift",
-      situations: ["everyday", "managing", "returning"],
+      situations: ["everyday", "managing", "returning", "settling"],
       strands: ["steadiness", "self-kindness", "winding-down", "being-outside"],
     },
     {
@@ -461,6 +472,9 @@ export function situationsFor(store) {
   if (["sedentary", "light"].includes(level))      out.add("starting");
   if (["active", "very-active", "moderate"].includes(level)) out.add("training");
   if (["55-64", "65-74", "75+"].includes(band))    out.add("later-life");
+  // W6-13. Less stress or better sleep, as a goal, or Stress listed.
+  const goals = (store.get("goals") || []).map(g => (typeof g === "string" ? g : g && g.id));
+  if (goals.includes("reduce-stress") || goals.includes("sleep-better") || (store.get("conditions") || []).includes("anxiety")) out.add("settling");
 
   // Somebody active with a condition is usually trying to keep doing
   // their thing around it, which is a different situation from either
@@ -496,7 +510,8 @@ export function aimsFor(situations, limit = 8, areas = null) {
   // heavier" and "get faster" never appeared at all -- they matched one
   // situation each, the same as every universal aim, and lost on list
   // order. A fallback that ranks is not a fallback.
-  const score = a => (a.situations || []).filter(x => x !== "everyday" && set.has(x)).length;
+  // W6-13. "settling" comes from a goal the person chose: it counts double.
+  const score = a => (a.situations || []).filter(x => x !== "everyday" && set.has(x)).reduce((n, x) => n + (x === "settling" ? 2 : 1), 0);
 
   const scored = AIMS.list.map((a, i) => ({ a, i, n: score(a) }));
   const specific = scored.filter(x => x.n > 0)

@@ -1,5 +1,12 @@
 /**
  * today.js
+ * 17 Oct 2026 v60
+ *
+ * v60 - W6-19 EMPATHY-GAPS (Wave 6, personas 2.13, 2.4). A Struggling or Low
+ *   mood this morning is answered on Home, in their word, with Wellbeing
+ *   (the line was the same on a good day and the worst). Touch-once
+ *   exception: this file was in session 5 too (W6-9).
+ *
  * 17 Oct 2026 v59
  *
  * v59 - W6-9 SMALL-6. Back at Home, a hand-over to the builder is dropped (a
@@ -851,7 +858,7 @@ import { getProgramme, getPhaseForWeek } from '../data/programmes.js';
 import { CLASSES } from '../data/classes/index.js';
 import { savedSessions, resolveSavedSession, markSavedSessionUsed }
   from '../data/saved-sessions.js';
-import { detectBurnout }       from '../data/checkin.js';
+import { detectBurnout, lowMoodToday } from '../data/checkin.js';
 import { proposeWeekFocus }    from '../data/week-focus.js';
 import { activityPhrase, daysAgo } from '../data/activity-labels.js';
 
@@ -1595,6 +1602,12 @@ export function TodayView(router) {
     if (burnout.level === 'moderate') {
       return "It's been a flatter few days than usual. I'll go a bit easier with what I suggest.";
     }
+
+    // W6-19 EMPATHY-GAPS. A low mood this morning is answered, in their own
+    // word, with the quieter door; the line was the same on a good day and
+    // the worst. No claim about why, and nothing more than the offer.
+    const low = lowMoodToday();
+    if (low) return `You said you're ${low} today. Wellbeing has the quieter things, if that's more like it.`;
 
     // P7. The local calendar day, and the one label map.
     const yesterdaySessions = activityLog.filter(e => {

@@ -1,5 +1,12 @@
 /**
  * tools/verify-know-what.mjs
+ * 17 Oct 2026 v6
+ *
+ * v6 - SUITE-FLAKE-9. 2b allows the true length line ("This one comes to
+ *   about 14 minutes.") that a short random build adds, as long as it
+ *   matches the plan's own minutes; it failed once in a suite run when
+ *   the build came to 14 of the 20 asked. Behaviour unchanged.
+ *
  * 03 Oct 2026 v5
  *
  * v5 - W5-11 USUAL-LENGTH. 2b: the length chosen is today's
@@ -146,7 +153,8 @@ choose(main.querySelector('input[name="length"][value="20"]'));
 choose(main.querySelector('input[name="place"][value="home"]'));
 submit();
 ok("2b. upper body, 20 minutes, at home", store.get("requestedSessionType") === "upper" && store.get("availableTimeToday")?.cat === "quick" && store.get("availableTime") !== "quick" &&
-   /home/i.test(txt(main.querySelector("#cp-loc"))) && store.get("requestedLocation") == null && txt(main.querySelector(".cp-plan__sentence")) === "You asked for strength, upper body, 20 minutes.",
+   /home/i.test(txt(main.querySelector("#cp-loc"))) && store.get("requestedLocation") == null && /^You asked for strength, upper body, 20 minutes\.( This one comes to about (\d+) minutes\.)?$/.test(txt(main.querySelector(".cp-plan__sentence"))) &&
+   (() => { const m = txt(main.querySelector(".cp-plan__sentence")).match(/about (\d+) minutes/); const about = txt(main).match(/About (\d+) min/); return !m || (about && m[1] === about[1]); })(),
    txt(main.querySelector(".cp-plan__sentence")));
 fixture({ time: null }); fromHome();
 ok("2c. REVERSAL: nothing picked before -- 30 chosen, no \"Last time\" line", main.querySelector('input[name="length"]:checked')?.value === "30" &&

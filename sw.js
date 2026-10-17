@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 17 Oct 2026 v670
+ * 17 Oct 2026 v671
  *
+ * v671 - W6-13/W6-19: someone whose goals are less stress or better sleep sees the winding-down aims first when setting an arc; a Struggling or Low mood this morning is answered in their word, on Home with Wellbeing and on Today's plan with Something gentler and Wellbeing.
  * v670 - W6-11/W6-12: a gym session's main part runs heavy lifts first and carries, holds and core last (power cleans and snatches no longer come after carries and throws), and a barbell lift's minutes include its warm-up sets; Yoga & Pilates offers the practice once, twice or three times through, each card saying its real minutes, and the finish records those minutes.
  * v669 - W6-9 SMALL-6: a breathing practice left part-way is saved as what was done; the update check-in changes the plan; the finish screen's first answers work; declining from the journal or Settings goes back, not to a workout; a yes from Settings returns to the same page; Log what I did keeps your choice; a half-written journal entry survives the phone's Back; no stale Stretch preselect; skipping sore areas says which are kept; the quiet practice says when it ends and when nothing was saved; no buzz promised where the phone cannot; research messages dated when due; the News hint follows the switch.
  * v668 - W6-8 TRUE-WORDS-6: every line the Wave 6 tracers found untrue made true or removed: exit cards in Yoga and the gym say you can save or leave without saving; a length picked on the plan is for that day only, and the plan says what it comes to; check-in openers, the getting-started lines, the red-flag introduction ("You've marked an area as sore or injured"; the three questions are asked once more), the seated routine's name, Progress ("N sessions"), Settings and Yoga say only what is true; a gentle day's own instruction says 2 sets when a set comes off.
@@ -4217,7 +4218,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v670";
+const CACHE_NAME = "alongside-v671";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4299,13 +4300,13 @@ const SHELL_HASHES = {
   "./js/session-guard.js": "00177a846537868c",
   "./js/session-resume.js": "6916b88c0757374f",
   "./js/auth.js": "9b9c7a632dccada6",
-  "./js/views/today.js": "d8048e812b1d64c5",
+  "./js/views/today.js": "551e2226f851e075",
   "./js/views/mobility-conditioning.js": "dd64370231617186",
   "./js/views/arc-setup.js": "bc3f0046616fc07b",
   "./js/views/stretch-arc.js": "fce3ddbd29c7fb30",
   "./js/views/checkin.js": "29d45c08868e3e8f",
   "./js/views/checkin-mini.js": "c647f4da71feddde",
-  "./js/views/coach-proposal.js": "dde0db36f2ad1976",
+  "./js/views/coach-proposal.js": "38d4d67ef14fd103",
   "./js/views/workout.js": "7c29db66bc121ecc",
   "./js/views/progress.js": "0e5aa6295cab8ee5",
   "./js/views/settings.js": "cfa6fde135e8ed77",
@@ -4320,7 +4321,7 @@ const SHELL_HASHES = {
   "./js/data/exercises/swimming_cycling.js": "0f3fefe85ab33dfd",
   "./js/data/morning-programme.js": "684cee9fdc54a03a",
   "./js/data/session-categories.js": "39f35cc7aab24fe6",
-  "./js/data/aims.js": "dabbcb4d164f9ed4",
+  "./js/data/aims.js": "35afe1468825731f",
   "./js/data/stretch-goal-zones.js": "a05bc2d626cade4f",
   "./js/data/session-rationale.js": "3611ae82d114482a",
   "./js/data/personal-reads.js": "52141f31fa9d4fd0",
@@ -4431,7 +4432,7 @@ const SHELL_HASHES = {
   "./js/views/onboarding/plan-select.js": "a5eda498c2aa5d62",
   "./js/data/beat3-scripts.js": "a74cffeeff3e7b4c",
   "./js/data/onboarding-thread-data.js": "e8d28a9bb1f239e5",
-  "./js/data/checkin.js": "bfbf13fb4e37c468",
+  "./js/data/checkin.js": "9f2e06ea4bd0e75c",
   "./js/data/checkin-openings.js": "175cbf4063a1fff5",
   "./js/data/first-session.js": "4803879459a70821",
   "./js/data/pacing.js": "6d73dd69633dbaf0",

@@ -1,5 +1,12 @@
 /**
  * coach-proposal.js
+ * 17 Oct 2026 v61
+ *
+ * v61 - W6-19 EMPATHY-GAPS (Wave 6, personas 2.13, 2.4). A Struggling or
+ *   Low mood this morning gets one plain line in their word, with Something
+ *   gentler (one set fewer) and Wellbeing. It was stored and never answered.
+ *   Both tiers.
+ *
  * 17 Oct 2026 v60
  *
  * v60 - W6-8 TRUE-WORDS-6. After picking a length, the plan says what it
@@ -834,7 +841,7 @@ import { getPhaseBias, getReEntryContext, getMissedSessionOffer,
          recordSession, advanceWeekIfNeeded,
          getReEntryIntensity, applyMissedSessionAdaptation }  from '../data/programmeEngine.js';
 import { getProgramme }      from '../data/programmes.js';
-import { detectBurnout, getTodaysCheckin } from '../data/checkin.js';
+import { detectBurnout, getTodaysCheckin, lowMoodToday } from '../data/checkin.js';
 import { chosenPrimaryEngineGoal } from '../data/goals.js';
 import { getConditionName, isAcute, areaWords }  from '../data/conditions.js';
 // TWO-ENGINE, 06 Sep 2026. workoutGenerator.js is no longer imported
@@ -1305,6 +1312,7 @@ export function CoachProposalView(router) {
           ${option ? `<p class="cp-plan__sentence">${_planSentence(option)}</p>` : ''}
           ${option ? _renderLighterOffer(option) : ''}
           ${premium ? _arcLine() : ''}
+          ${option ? _renderLowMood() : ''}
           ${premium && option ? _renderGoodDayOffer(option) : ''}
 
           <!-- LOCATION-1 / SMOOTH-P2a. What the coach assumed, one tap to
@@ -1714,6 +1722,23 @@ export function CoachProposalView(router) {
   }
 
   /**
+   * W6-19 EMPATHY-GAPS (v61). A low mood this morning, in their own word,
+   * with two ways to go: something gentler (one set fewer on each) or
+   * Wellbeing. Both tiers: kindness is not a feature. No claim about why,
+   * nothing about mental health, and never once they have chosen.
+   */
+  function _renderLowMood() {
+    const low = lowMoodToday();
+    if (!low || adjust !== 0) return '';
+    return `
+      <div class="cp-offer" role="note">
+        <p class="cp-offer__text">You said you\u2019re ${low} today. This plan is here if you want it. If you\u2019d rather:</p>
+        <button class="btn btn-secondary" id="cp-low-gentler">Something gentler</button>
+        <button class="btn btn-ghost" id="cp-low-wellbeing">Wellbeing</button>
+      </div>`;
+  }
+
+  /**
    * D662-6 TWO-HOMES (v59). The router draws the house on this screen; the
    * plan has its own "‹ Home", so while it shows, the house is not drawn.
    */
@@ -1988,6 +2013,17 @@ export function CoachProposalView(router) {
     });
 
     panel.querySelector('#cp-lighter-decline')?.addEventListener('click', () => _declineLighter(container));
+
+    // W6-19. A low mood: gentler, or the quieter door.
+    panel.querySelector('#cp-low-gentler')?.addEventListener('click', () => {
+      adjust = -1;
+      statusMsg = 'Something gentler: one set fewer on each main exercise.';
+      _rerenderPanel(container, true);
+    });
+    panel.querySelector('#cp-low-wellbeing')?.addEventListener('click', () => {
+      closePreviewPanel(container, { navigateHome: false });
+      router.navigate('noticing');
+    });
 
     panel.querySelector('#cp-offer-more')?.addEventListener('click', () => {
       adjust = 1;

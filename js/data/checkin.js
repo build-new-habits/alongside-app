@@ -1,5 +1,11 @@
 /**
  * checkin.js
+ * 17 Oct 2026 v14
+ *
+ * v14 - W6-19 EMPATHY-GAPS. lowMoodToday(): the person's own word for a
+ *   low mood today (Struggling, Low), or null. A Struggling mood was
+ *   stored and never answered. No mental-health claim is made from it.
+ *
  * 02 Oct 2026 v13
  *
  * v13 - W4-11 BURNOUT-WEEK. detectBurnout counts only check-ins from the
@@ -309,6 +315,17 @@ export function coldStartBias() {
 }
 
 // ─── Check-in history ─────────────────────────────────────────────────────────
+
+/**
+ * W6-19. Today's mood in the person's own word when it is low ("struggling"
+ * at 2 or under, "low" at 3), or null. Only what they said; nothing read
+ * into it.
+ */
+export function lowMoodToday() {
+  const m = Number(getTodaysCheckin()?.mood);
+  if (!Number.isFinite(m) || m <= 0) return null;
+  return m <= 2 ? "struggling" : m <= 3 ? "low" : null;
+}
 
 export function getTodaysCheckin() {
   const today   = new Date().toDateString();
