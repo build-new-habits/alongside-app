@@ -1,5 +1,13 @@
 /*
  * css/layouts/library.css
+ * 17 Oct 2026 v5
+ *
+ * v5 - D662-2 follow-up. The tiles go to one column when the text is
+ *   large enough that a long name ("Conditioning", on the Plan's Mobility
+ *   & Conditioning tile) would not fit half the width: Library on the
+ *   Plan at text size 2 was 428px wide on a 412px phone
+ *   (chromium-text-fit). Two columns at text 1 and 1.45, as before.
+ *
  * 04 Oct 2026 v4
  *
  * v4 - D-5. The category page in the LOOK cards: the title with its kind
@@ -232,7 +240,9 @@
 /* LOOK-4 — Library, 04 Oct 2026 */
 .library-view .library-category-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  /* v5. Two columns while a tile can be at least 5.5em wide; one when the
+     text is large (5.5em grows with it). */
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, max(5.5em, calc(50% - var(--space-3) / 2))), 1fr));
   gap: var(--space-3);
   margin-top: 0;
 }

@@ -2,6 +2,12 @@
    REFLECT VIEW STYLES
    css/components/reflect.css
 
+   17 Oct 2026 v5
+
+   v5 - D662-7 (Graeme's device check, 13 Oct). The finish's number tiles
+   share the row: one tile fills it, two halve it, three take a third
+   each. A lone "1 min" sat in a third with the rest empty.
+
    12 Oct 2026 v4
 
    v4 - A-5 SIGNATURE-MOMENTS. The tick larger and centred (it scales in
@@ -125,7 +131,8 @@
 .finish-head h1 { margin: 0; }
 .finish-view .finish-stats {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
   gap: var(--space-3);
   width: 100%;
   margin: var(--space-2) 0 0;

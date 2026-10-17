@@ -1,6 +1,18 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
+ * 17 Oct 2026 v85
+ *
+ * v85 - SUITE-FLAKE-7 STANDING-FLOOR (CAP-7). Measured on v663: persona
+ *   2.11 (cannot get down to the floor, rises from a chair "not easily",
+ *   able to stand) had no standing move in the main part of 33 of 300
+ *   full-body sessions; the random picks landed on adapted, seated work.
+ *   CAP-7 says somebody who can stand is not confined to a chair. In a
+ *   strength session for somebody who was asked and does not need to be
+ *   seated, the main part keeps at least one standing move when the pool
+ *   has one: a seated pick is swapped, nothing is added. Somebody who
+ *   needs seated work is untouched (CAP-4). verify-standing-floor.
+ *
  * 03 Oct 2026 v84
  *
  * v84 - W5-22 LOWER-BODY-GYM. A first main pick for a strength goal takes
@@ -2560,6 +2572,30 @@ const _BALANCE_TYPES = new Set(["upper", "full"]);
  *              replaced by the other, in place.
  * Nothing is added or removed: the list keeps its length.
  */
+/**
+ * v85 STANDING-FLOOR (CAP-7). In a strength session, somebody who was asked
+ * and does not need to be seated is given at least one standing move in the
+ * main part when the pool (already filtered for kit, capability and sore
+ * areas) has one. A seated pick is swapped in place; the session is not
+ * made longer. Never for somebody who needs seated work (CAP-4), never for
+ * somebody who was not asked, and never over a move of their own.
+ */
+const _STANDING_FLOOR_TYPES = new Set(["full", "upper", "lower", "glute"]);
+function _standingFloor(list, typeId, pool) {
+  if (!_STANDING_FLOOR_TYPES.has(typeId)) return;
+  const cap = store.capabilityProfile();
+  if (!cap.asked || cap.needsSeated) return;
+  if (list.some(e => e.position === "standing")) return;
+  const standing = pool.filter(e => e.position === "standing");
+  if (!standing.length) return;
+  let i = -1;
+  for (let k = list.length - 1; k >= 0; k--) {
+    if (list[k].position === "seated" && !list[k].isPrescribed) { i = k; break; }
+  }
+  if (i < 0) return;
+  list[i] = withDefaultDose(standing[Math.floor(Math.random() * standing.length)]);
+}
+
 function _shapeMain(list, typeId, pool, { hinge = true, balance = true } = {}) {
   const taken = new Set(list.map(e => e && e.id));
   const fresh = f => pool.find(c => f(c) && !taken.has(c.id));
@@ -4786,6 +4822,8 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
   // W3-18. After the time step: explosive hinges after the strength one,
   // pushing and pulling in balance -- replacing in place, never adding.
   if (!_learned) _shapeMain(mainExercises, type.id, _mainPool().filter(ex => !mainExercises.some(m => m.id === ex.id)), { hinge: true, balance: true });
+  // v85 STANDING-FLOOR (CAP-7). After every other step, so nothing undoes it.
+  if (!_learned) _standingFloor(mainExercises, type.id, _mainPool().filter(ex => !mainExercises.some(m => m.id === ex.id)));
   // ROLE-1. See _withRole above. This is the coach route -- One to one,
   // quick build, the four doors -- and the one the screenshots came from.
   const allExercises = [

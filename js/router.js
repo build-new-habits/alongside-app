@@ -1,5 +1,13 @@
 /**
  * router.js
+ * 17 Oct 2026 v49
+ *
+ * v49 - D662-6 TWO-HOMES (Graeme's device check, 13 Oct). No house button
+ *   on the finish or My exercises: each has its own way home (Back to
+ *   Home, ‹ Home), and two side by side was one too many. Today's plan
+ *   hides it itself while the plan, with its ‹ Home, is showing
+ *   (coach-proposal.js v59).
+ *
  * 06 Oct 2026 v48
  *
  * v48 - D-11 PROGRESS-SHARE. 'progress-share' (Share your progress: a
@@ -496,6 +504,9 @@ const hideNavViews = new Set([
 
 // W4-1 GATE-OPEN. Screens left only by answering them: no house button.
 const NO_EXIT_VIEWS = new Set(['onboarding/thread', 'age-check', 'under-18', 'consent-update']);
+// D662-6 TWO-HOMES. Screens with their own way home: no house beside it.
+// Today's plan hides it itself while its plan (with "‹ Home") is showing.
+const OWN_HOME_VIEWS = new Set(['reflect', 'prescribed']);
 
 const NAV_MAP = {
   'today': 'today', 'checkin': 'today', 'checkin-mini': 'today',
@@ -720,7 +731,7 @@ export const router = {
       waiting = this._ac.nothingAnswered() || this._ac.ageNeeded() || this._ac.declaredUnder18() || this._cv.consentWaiting();
     } catch { waiting = false; }
     if (escapeBtn) {
-      if (hideNavViews.has(viewName) && !NO_EXIT_VIEWS.has(viewName) && !waiting) {
+      if (hideNavViews.has(viewName) && !NO_EXIT_VIEWS.has(viewName) && !OWN_HOME_VIEWS.has(viewName) && !waiting) {
         escapeBtn.classList.remove('hidden');
       } else {
         escapeBtn.classList.add('hidden');

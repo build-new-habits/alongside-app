@@ -1,6 +1,15 @@
 /**
  * prescribed.js - My exercises
  *
+ * 17 Oct 2026 v1.10
+ *
+ * v1.10 - Graeme's device check of v662 (13 Oct; "Can we fix them now?",
+ *   17 Oct). D662-4: a list in plan days is headed "Your exercises", not
+ *   "To do today", and today's day comes first, marked "(today)". D662-5:
+ *   the way back says Home, where it goes (it said "Back to choices").
+ *   D662-7: "1 set", not "1 sets". The house button is not drawn here
+ *   (router.js, D662-6): this screen has its own way home.
+ *
  * 13 Oct 2026 v1.9
  *
  * v1.9 - A-7 EMPTY-AND-FIRST (Stage AWARD). Empty: a heading, "No exercises
@@ -158,8 +167,8 @@ export function render() {
       <div class="view-header prescribed-view-header">
         <button class="btn btn-ghost btn-small prescribed-back-top"
                 id="prescribed-back-top"
-                aria-label="Back to choices">
-          &larr; Back to choices
+                aria-label="Back to Home">
+          &lsaquo; Home
         </button>
         <h1>My exercises</h1>
       </div>
@@ -193,8 +202,8 @@ export function render() {
       <!-- ── Bottom back button ───────────────────────────────────────────── -->
       <div style="margin-top: var(--space-6); margin-bottom: var(--space-4);">
         <button class="btn btn-ghost btn-full" id="prescribed-back-bottom"
-                aria-label="Back to choices">
-          Back to choices
+                aria-label="Back to Home">
+          Back to Home
         </button>
       </div>
 
@@ -223,7 +232,7 @@ function renderExerciseList(active, done, creditsAvail) {
 
       ${active.length > 0 ? `
         <div class="prescribed-list-header">
-          <h2 class="section-heading">To do today</h2>
+          <h2 class="section-heading">${groupsOf(active).some(g => g.name) ? "Your exercises" : "To do today"}</h2>
           ${creditsAvail > 0
             ? `<span class="prescribed-credits-badge" aria-label="Up to ${creditsAvail} credits available">
                 Up to +${creditsAvail} &#11088;
@@ -264,7 +273,18 @@ function groupsOf(list) {
     if (!g) { g = { name, items: [] }; out.push(g); }
     g.items.push(ex);
   }
-  return out.sort((a, b) => (a.name === null ? -1 : b.name === null ? 1 : 0));
+  // D662-4. Ungrouped first, then today's day, then the rest as written.
+  const today = _todayName();
+  const rank = g => (g.name === null ? 0 : _sameDay(g.name, today) ? 1 : 2);
+  return out.sort((a, b) => rank(a) - rank(b));
+}
+
+const _DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+function _todayName() { return _DAY_NAMES[new Date().getDay()]; }
+/** "Tuesday", "tuesday", "Tue" all name Tuesday. */
+function _sameDay(name, day) {
+  const n = String(name || "").toLowerCase().replace(/[^a-z]/g, "");
+  return n.length >= 3 && day.toLowerCase().startsWith(n);
 }
 
 function renderGroups(active) {
@@ -276,7 +296,7 @@ function renderGroups(active) {
   }
   return groups.map((g, gi) => `
     <section class="prescribed-group" aria-labelledby="px-group-${gi}">
-      <h3 class="prescribed-group__name" id="px-group-${gi}">${_esc(g.name || "Your own")}</h3>
+      <h3 class="prescribed-group__name" id="px-group-${gi}">${_esc(g.name || "Your own")}${g.name && _sameDay(g.name, _todayName()) ? " (today)" : ""}</h3>
       <ul class="prescribed-exercise-list" aria-labelledby="px-group-${gi}">
         ${g.items.map((ex, i) => renderExerciseCard(ex, i, false)).join("")}
       </ul>
@@ -351,7 +371,7 @@ function renderExerciseCard(ex, index, isDone) {
  */
 function formatPrescription(ex) {
   const parts = [];
-  if (ex.sets) parts.push(ex.sets + " sets");
+  if (ex.sets) parts.push(ex.sets + (Number(ex.sets) === 1 ? " set" : " sets"));
   if (ex.reps) parts.push(ex.reps);
   return parts.join(" x ");
 }

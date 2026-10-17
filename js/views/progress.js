@@ -1,5 +1,12 @@
 /**
  * progress.js
+ * 17 Oct 2026 v29
+ *
+ * v29 - D662-7 (Graeme's device check, 13 Oct: "1 sessions"). The summary's
+ *   words agree with the number (1 session, 1 minute moving); a move with
+ *   no sets logged shows its name only (a timed move has none to log, and
+ *   "No sets logged" under each read as something missed).
+ *
  * 12 Oct 2026 v28
  *
  * v28 - A-7 EMPTY-AND-FIRST (Stage AWARD, both tiers). Before the first
@@ -792,11 +799,11 @@ export function ProgressView(router) {
                proposal card, OWN-1 on the Home card. -->
           <span class="progress-summary__number"
                 aria-label="${sessionCount} session${sessionCount === 1 ? '' : 's'}">${sessionCount}</span>
-          <span class="progress-summary__label">sessions</span>
+          <span class="progress-summary__label">${sessionCount === 1 ? 'session' : 'sessions'}</span>
         </div>
         <div class="progress-summary__stat progress-summary__stat--blue">
           <span class="progress-summary__number" aria-label="${totalMins} minutes total">${totalMins}</span>
-          <span class="progress-summary__label">minutes moving</span>
+          <span class="progress-summary__label">${totalMins === 1 ? 'minute' : 'minutes'} moving</span>
         </div>
         <!-- LOOK-2. The kinds are drawn below, every one named and counted;
              the chips here repeated three of them. -->
@@ -1165,7 +1172,7 @@ export function ProgressView(router) {
           ${s.moves.length ? `<ul class="pr-moves">
             ${s.moves.map(m => `<li class="pr-move">
               <span class="pr-move__name">${_esc(m.name)}</span>
-              <span class="pr-move__sets">${m.sets.length ? _esc(setsText(m.sets)) : 'No sets logged'}</span>
+              ${m.sets.length ? `<span class="pr-move__sets">${_esc(setsText(m.sets))}</span>` : ''}
             </li>`).join('')}
           </ul>` : ''}
           ${s.afterwards ? `<p class="pr-session__feel">Afterwards you said: <strong>${_esc(s.afterwards)}</strong></p>` : ''}

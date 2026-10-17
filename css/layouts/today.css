@@ -1,5 +1,11 @@
 /*
  * css/layouts/today.css
+ * 17 Oct 2026 v14
+ *   D662-8 HOME-FIT (Graeme's device check, 13 Oct: "a tiny scroll").
+ *   Plan Home's doors and Library row a little shorter (8px top and
+ *   bottom, 8px apart; still 56px or more to tap). Measured in Chromium
+ *   at 412 x 915 with a week day set: the Library row ended at 910px,
+ *   under the bar at 843px; now 834px.
  * 12 Oct 2026 v13
  *   A-1 PLAN-HOME-PRUNE. The Today card (.home-week, .home-today) in the
  *   teal of the arc; the arc as a line inside it (.home-arcline); the
@@ -843,4 +849,9 @@
   border-radius: 8px;
 }
 .home-libraryrow { margin-top: var(--space-3); background: transparent; }
+/* D662-8 HOME-FIT. Plan Home's doors and Library row, a little shorter. */
+.home-doors { gap: var(--space-2); }
+.home-doors .home-door,
+.home-door.home-libraryrow { min-height: 56px; padding-top: var(--space-2); padding-bottom: var(--space-2); }
+.home-door.home-libraryrow { margin-top: var(--space-2); }
 #home-doors-label:focus { outline: none; }

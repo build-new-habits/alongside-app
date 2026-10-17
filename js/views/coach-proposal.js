@@ -1,5 +1,14 @@
 /**
  * coach-proposal.js
+ * 17 Oct 2026 v59
+ *
+ * v59 - D662-3 GOOD-DAY-SETS (Graeme's device check, 13 Oct). "One more
+ *   set on each" is offered only where the work is sets: not on a
+ *   stretch, mobility or cardio plan (it was on a walk and a stretch).
+ *   D662-6 TWO-HOMES: while the plan is showing, with its own "‹ Home",
+ *   the round house button is not drawn beside it. On the Bad-day choice
+ *   and the other states, which have no Home of their own, it stays.
+ *
  * 13 Oct 2026 v58
  *
  * v58 - D662-1 WALK-DAY (Graeme's device check, 13 Oct: "Concerning it's
@@ -1148,6 +1157,7 @@ export function CoachProposalView(router) {
         </div>
       `;
       attachSevereChoiceEvents(container);
+      _oneHome();
       return;
     }
 
@@ -1163,6 +1173,7 @@ export function CoachProposalView(router) {
         </div>
       `;
       attachRestDayEvents(container);
+      _oneHome();
       return;
     }
 
@@ -1221,6 +1232,7 @@ export function CoachProposalView(router) {
     `;
 
     attachEvents(container);
+    _oneHome();
   }
 
   function attachSevereChoiceEvents(container) {
@@ -1288,7 +1300,7 @@ export function CoachProposalView(router) {
           ${option ? `<p class="cp-plan__sentence">${_planSentence(option)}</p>` : ''}
           ${option ? _renderLighterOffer(option) : ''}
           ${premium ? _arcLine() : ''}
-          ${premium && option ? _renderGoodDayOffer() : ''}
+          ${premium && option ? _renderGoodDayOffer(option) : ''}
 
           <!-- LOCATION-1 / SMOOTH-P2a. What the coach assumed, one tap to
                change each. Focus opens "Something different today". -->
@@ -1696,8 +1708,21 @@ export function CoachProposalView(router) {
     _rebuildAndRerender(container, 'Your usual plan, as you chose.', true);
   }
 
-  function _renderGoodDayOffer() {
+  /**
+   * D662-6 TWO-HOMES (v59). The router draws the house on this screen; the
+   * plan has its own "‹ Home", so while it shows, the house is not drawn.
+   */
+  function _oneHome() {
+    document.getElementById('hidden-nav-home-btn')?.classList.toggle('hidden', !!previewOpen);
+  }
+
+  function _renderGoodDayOffer(option) {
     if (adjust !== 0) return '';
+    // D662-3 (v59). Sets are the strength work's; a stretch, a mobility
+    // session or cardio is held or timed, and more sets of it is not "a
+    // bit more".
+    const kind = _deliveredType(option) || option?.inputs?.chosenType;
+    if (['stretch', 'mobility', 'cardio'].includes(kind)) return '';
     const c = getTodaysCheckin() || {};
     if (!(Number(c.energy) >= 7)) return '';
     // W4-20. Not "the plan stays as it is" over a plan made lighter for

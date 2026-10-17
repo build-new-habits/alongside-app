@@ -1,5 +1,11 @@
 /**
  * js/views/saved-sessions.js
+ * 17 Oct 2026 v8
+ *
+ * v8 - D662-7 (Graeme's device check, 13 Oct). Each session's button says
+ *   Start; the name is above it and in the button's name for a screen
+ *   reader. A long name ("Tuesday 30th September 26") wrapped the button.
+ *
  * 13 Oct 2026 v7
  *
  * v7 - A-7 EMPTY-AND-FIRST and A-9 ONE-NAME (Stage AWARD). Headed "Saved
@@ -278,7 +284,7 @@ function _row(rec) {
         <button class="btn btn-primary btn-full club-room__go"
                 data-saved-id="${_esc(rec.id)}"
                 aria-label="${_esc(startLabel)}">
-          Start ${_esc(rec.name)}
+          Start
         </button>
       ` : ''}
 

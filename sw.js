@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 13 Oct 2026 v663
+ * 17 Oct 2026 v664
  *
+ * v664 - DEVICE-662, the rest (Graeme, 17 Oct: "Can we fix them now?"): "One more set on each" only where the work is sets; My exercises in plan days is headed Your exercises with today's day first, and its way back says Home; one way home per screen (no house beside ‹ Home or Back to Home); 1 set, 1 session, 1 minute; no "No sets logged" under a move; a saved session's button says Start; the finish's tiles share the row; Plan Home fits above the bar on a 412 x 915 phone; the Library's tiles go to one column at the largest text; somebody who can stand always has a standing move in a strength session (CAP-7).
  * v663 - DEVICE-662 (Graeme's device check, 13 Oct): on the Plan, a day in Your week that is a walk (only cardio, outside) leads with "You planned a walk today" and Start the walk, not a cardio circuit; and the Library has a Mobility & Conditioning tile, so Stretch, Stretch arc and a mobility session can be found.
  * v662 - Stage AWARD (Graeme, 13 Oct: "Yes please"): Saved sessions has one name, and when it is empty it says where saving is (Keep to repeat, when you finish) with Start today's session; My exercises, empty, has a heading and says what goes there; on the Plan, the first day of a new arc week says "Week n starts today".
  * v661 - ARC-CREDIT: the arc's record of what a session worked is saved on the phone when the session is logged (it lived only in memory, and could be lost if the app was closed before anything else saved). store.js v115, Schema v1.112, no field change.
@@ -4210,7 +4211,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v663";
+const CACHE_NAME = "alongside-v664";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4223,9 +4224,9 @@ const SHELL_HASHES = {
   "./css/main.css": "e306ded0118cbea6",
   "./css/base/fonts.css": "04893bbdfa4cf013",
   "./css/layouts/onboarding-additions.css": "a204c285b813c6e8",
-  "./css/layouts/today.css": "6b7dac51c8280fb9",
+  "./css/layouts/today.css": "c1b636255096d8af",
   "./css/layouts/my-programme.css": "6fc8794818a509aa",
-  "./css/layouts/library.css": "21c782973f58ddca",
+  "./css/layouts/library.css": "823c2990dd6a2f02",
   "./css/layouts/mobility-conditioning.css": "659731db8ac66fa7",
   "./css/layouts/progress.css": "1433214bd49e127e",
   "./css/layouts/goal-review.css": "a97c4a240fe903cf",
@@ -4239,7 +4240,7 @@ const SHELL_HASHES = {
   "./css/components/weekly-plan-v2.css": "4f70501241fc4fa0",
   "./css/components/gym-programme.css": "79be04064c6bd328",
   "./css/components/journal-entry.css": "dd51da5425ee545b",
-  "./css/components/reflect.css": "40cdc625f934a9bb",
+  "./css/components/reflect.css": "5925f1883139ce3f",
   "./css/components/red-flag.css": "7297aeac122d7e37",
   "./css/components/know-what.css": "6f1d7faff6783932",
   "./css/components/nav-fix.css": "ee5db4b763633630",
@@ -4275,7 +4276,7 @@ const SHELL_HASHES = {
   "./css/components/capture.css": "343b4ae0dc6fe6ea",
   "./css/components/finish.css": "27761f962a903976",
   "./js/app.js": "24ff2a302aec8762",
-  "./js/router.js": "bbbc2ab57c9ac0f4",
+  "./js/router.js": "acd841a1fc44593e",
   "./js/store.js": "216e2494f3a4763a",
   "./js/session-log.js": "d43815c658239179",
   "./js/exercise-feedback.js": "adba8549f444da2a",
@@ -4298,9 +4299,9 @@ const SHELL_HASHES = {
   "./js/views/stretch-arc.js": "fce3ddbd29c7fb30",
   "./js/views/checkin.js": "29d45c08868e3e8f",
   "./js/views/checkin-mini.js": "3f1764e87002d46f",
-  "./js/views/coach-proposal.js": "caaf7bf8e2fee898",
+  "./js/views/coach-proposal.js": "c945aefcc6212aff",
   "./js/views/workout.js": "7c29db66bc121ecc",
-  "./js/views/progress.js": "63cf6b5568af45e7",
+  "./js/views/progress.js": "4115c2031707ea16",
   "./js/views/settings.js": "74e5899414373a9a",
   "./js/views/restore-flow.js": "dc81c2e455fa472d",
   "./js/views/weekly-plan.js": "dcee06e297b402c0",
@@ -4377,7 +4378,7 @@ const SHELL_HASHES = {
   "./js/data/support-lines.js": "0c1286fa510e427e",
   "./js/data/consent-version.js": "c1a39ed44cc24157",
   "./js/views/my-programme.js": "60eaac657d25c631",
-  "./js/session-builder.js": "467020b3e118cc25",
+  "./js/session-builder.js": "ccca3a7295da6923",
   "./js/data/session-choice.js": "954463b0647f3843",
   "./js/data/saved-sessions.js": "91dd2dc43f0f908b",
   "./js/data/class-contract.js": "fe8f3f22b0df50f6",
@@ -4398,14 +4399,14 @@ const SHELL_HASHES = {
   "./js/views/class-list.js": "551081d91143ee4d",
   "./css/components/class-list.css": "e33b073b352399f3",
   "./css/components/class-player.css": "401cc57d7d39dbb1",
-  "./js/views/saved-sessions.js": "eb44bae692d7e795",
+  "./js/views/saved-sessions.js": "e4b36f369759e70a",
   "./js/views/session-builder-ui.js": "000f29af26271192",
   "./js/views/noticing.js": "54446d31544d9c5c",
   "./js/views/in-step.js": "196267c5da62e662",
   "./js/data/in-step-scenarios.js": "b46f085cda4d24fc",
   "./js/views/journal-entry.js": "5e315297df9abc14",
   "./js/views/gym-programme.js": "d33d5c8cfaf6eb2a",
-  "./js/views/prescribed.js": "573739eb278fea8f",
+  "./js/views/prescribed.js": "63e69a3ef907af33",
   "./js/views/prescribed-session.js": "52ad4fc728657898",
   "./js/views/quiet-session.js": "73c106032a745253",
   "./js/views/breathing-session.js": "26387298908f3076",

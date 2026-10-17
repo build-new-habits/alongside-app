@@ -1,6 +1,19 @@
 /**
  * tools/verify-device-662.mjs
- * 13 Oct 2026 v1
+ * 17 Oct 2026 v2
+ *
+ * v2 - the rest of the device check's list (Graeme, 17 Oct: "Can we fix
+ *   them now?"):
+ *   D662-3 GOOD-DAY-SETS: "One more set on each" only where the work is
+ *     sets (not a stretch, mobility or cardio plan).
+ *   D662-4 PRESCRIBED-DAY: My exercises in plan days is not headed "To do
+ *     today"; today's day comes first.
+ *   D662-5 BACK-LABEL: My exercises' way back says Home, where it goes.
+ *   D662-7 WORDS: "1 set", "1 session"; no "No sets logged" under a move
+ *     on Progress; a saved session's button says Start; the finish's tiles
+ *     share the row, so one is not left alone.
+ *   D662-9 ARC-SHOWS: what the finish says the arc worked today is what
+ *     Progress's arc card says.
  *
  * DEVICE-662 (Graeme's device check of v662, 13 Oct). Two findings:
  *
@@ -48,6 +61,11 @@ const { CoachProposalView } = await import(B + "views/coach-proposal.js");
 const { agreed } = await import(new URL("./agreed.mjs", import.meta.url).href);
 
 const library = await import(B + "views/library.js");
+const prescribed = await import(B + "views/prescribed.js");
+const saved = await import(B + "views/saved-sessions.js");
+const { ProgressView } = await import(B + "views/progress.js");
+const { strandReadback } = await import(B + "data/arc-readback.js");
+const fs = await import("node:fs");
 const { router: realRouter } = await import(B + "router.js");
 
 let fails = 0, passes = 0;
@@ -113,6 +131,68 @@ ok("2a. Plan: a Mobility & Conditioning tile", !!t && /Mobility & Conditioning/.
 navs.length = 0; click(t);
 ok("2b. it opens Mobility & Conditioning (Stretch is there)", navs.at(-1) === "mobility-conditioning", JSON.stringify(navs));
 ok("2c. CONTROL: Free's Library is unchanged (Free Home has the door)", !tile("free"));
+
+console.log("\nTEST 3 - One more set on each, only where the work is sets");
+function offer(type) {
+  fixture("personal");
+  store.set("requestedSessionType", type);
+  main.innerHTML = ""; CoachProposalView(rtr).mount(main);
+  return !!main.querySelector("#cp-offer-more");
+}
+ok("3pc. CONTROL: an upper-body plan on a good day offers it", offer("upper"));
+for (const t of ["stretch", "mobility", "cardio"]) ok(`3a-${t}. a ${t} plan does not`, !offer(t));
+
+console.log("\nTEST 4/5 - My exercises: plan days, today first; the way back says Home");
+const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+const todayName = DAYS[new Date().getDay()], otherName = DAYS[(new Date().getDay() + 6) % 7];
+fixture("personal");
+store.set("prescribedExercises", [
+  { id: "p1", name: "Cat-Cow Flow", sets: 1, reps: "8", group: otherName },
+  { id: "p2", name: "Dead Bug", sets: 3, reps: "8 each side", group: todayName },
+]);
+main.innerHTML = prescribed.render(); try { prescribed.onMount(); } catch {}
+const heads = [...main.querySelectorAll(".prescribed-group__name")].map(txt);
+ok("4a. not headed To do today over plan days", !/To do today/i.test(txt(main)), txt(main).slice(0, 200));
+ok("4b. today's day first", heads[0] === `${todayName} (today)` || heads[0] === todayName, JSON.stringify(heads));
+ok("4c. today's day says so", heads.some(h => h.includes("today")), JSON.stringify(heads));
+ok("7a. \"1 set\", not \"1 sets\"", /\b1 set\b/.test(txt(main)) && !/\b1 sets\b/.test(txt(main)) && /\b3 sets\b/.test(txt(main)));
+const backs = [...main.querySelectorAll("#prescribed-back-top, #prescribed-back-bottom")];
+ok("5a. the way back says Home", backs.length && backs.every(b => /Home/.test(txt(b) + (b.getAttribute("aria-label") || "")) && !/choices/i.test(txt(b) + (b.getAttribute("aria-label") || ""))), backs.map(txt).join(" | "));
+fixture("personal");
+store.set("prescribedExercises", [{ id: "p3", name: "Bridge", sets: 2, reps: "10" }]);
+main.innerHTML = prescribed.render(); try { prescribed.onMount(); } catch {}
+ok("4pc. CONTROL: an ungrouped list is still today's", /To do today/i.test(txt(main)));
+
+console.log("\nTEST 7 - words");
+fixture("personal");
+const at = new Date(Date.now() - 10 * 60000).toISOString();
+store.set("activityLog", [{ id: "w1", type: "workout", sessionType: "cardio", completedAt: at, durationMins: 1, completed: true, exerciseIds: ["wall-roll-down"] }]);
+main.innerHTML = ""; ProgressView(rtr).mount(main);
+const todayBtn = [...main.querySelectorAll("button")].find(b => txt(b) === "Today");
+if (todayBtn && todayBtn.getAttribute("aria-pressed") !== "true") click(todayBtn);
+ok("7pc. the session is listed", /Cardio/.test(txt(main)), txt(main).slice(0, 200));
+ok("7b. one session says session", /\b1 session\b/.test(txt(main.querySelector(".progress-summary"))) || txt(main.querySelector(".progress-summary__label")) === "session", txt(main.querySelector(".progress-summary")));
+ok("7c. no \"No sets logged\" under a move", !/No sets logged/.test(txt(main)));
+fixture("personal");
+store.set("savedSessions", [{ id: "s1", name: "Tuesday 30th September 26", exerciseIds: ["goblet-squat"], createdAt: new Date().toISOString() }]);
+main.innerHTML = saved.render(); try { saved.onMount(); } catch {}
+const go = main.querySelector("[data-saved-id]");
+ok("7d. the saved session's button says Start; its name stays in the button's name", txt(go) === "Start" && /Tuesday 30th September 26/.test(go?.getAttribute("aria-label") || ""), txt(go));
+const css = fs.readFileSync(new URL("../css/components/reflect.css", import.meta.url), "utf8");
+const rule = css.slice(css.indexOf(".finish-view .finish-stats {"), css.indexOf("}", css.indexOf(".finish-view .finish-stats {")));
+ok("7e. the finish's tiles share the row (one tile is not left at a third)", rule && !/repeat\(3/.test(rule) && /grid-auto-columns:\s*minmax\(0,\s*1fr\)/.test(rule) && /grid-auto-flow:\s*column/.test(rule), rule);
+
+console.log("\nTEST 9 - the arc: the finish and Progress say the same");
+fixture("personal");
+const today = new Date().toISOString();
+store.set("arc", { active: true, aimId: "sport-without-flaring", startedAt: new Date(Date.now() - 40 * 864e5).toISOString(), strands: ["trunk-strength", "back-resilience"],
+  zonesWorked: { "lower-back": today }, typesWorked: { core: new Date(Date.now() - 8 * 864e5).toISOString() } });
+store.set("activityLog", [{ id: "w2", type: "workout", sessionType: "mobility", completedAt: today, durationMins: 10, completed: true }]);
+const lit = strandReadback(store.get("arc")).filter(x => x.last === today.slice(0, 10)).map(x => x.label);
+main.innerHTML = ""; ProgressView(rtr).mount(main);
+const arcText = txt(main);
+ok("9pc. the finish would say: A back that copes", lit.join() === "A back that copes", lit.join());
+ok("9a. Progress says it was worked today", /A back that copes\s*Worked today/.test(arcText), arcText.slice(arcText.indexOf("Your arc"), arcText.indexOf("Your arc") + 200));
 
 console.log(`\nVERIFY-DEVICE-662: ${passes} passed, ${fails} failed`);
 process.exit(fails ? 1 : 0);
