@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 17 Oct 2026 v673
+ * 17 Oct 2026 v674
  *
+ * v674 - SHORT-BARBELL: a session of 15 minutes or less chooses moves without barbell warm-up sets when it can, so a 10-minute plan is about 10 minutes again (since v670 about 1 in 9 came to 13 or more).
  * v673 - W6-14/W6-15/W6-16: when the three safety questions come back, one line says why (a new area, changed wording, or a month); the sore-area list names body areas (Front of the Shin, Outside of the Thigh / Knee, Heel / Arch of the Foot, Pain Running Down the Leg) and no line claims healing; the birth month no longer counts, so nobody is let in at 17; under 18 also forgets which research questions were answered; the privacy summary names the app's own address and the home-screen step, and its heading takes focus; one Back after the age answer; a late messages download keeps nothing after an under-18 answer; links that open a new tab say so; the run's Bad-day line matches every other door.
  * v672 - W6-17/W6-18: a busy few days (three sessions in the three days before today) still makes the plan lighter, and nothing counts days in a row; Weight tracking and Show your best read their description with the switch; the 30 minutes choice says Recommended to a screen reader; the update banner sits above the bottom bar instead of pushing the page down.
  * v671 - W6-13/W6-19: someone whose goals are less stress or better sleep sees the winding-down aims first when setting an arc; a Struggling or Low mood this morning is answered in their word, on Home with Wellbeing and on Today's plan with Something gentler and Wellbeing.
@@ -4220,7 +4221,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v673";
+const CACHE_NAME = "alongside-v674";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4387,7 +4388,7 @@ const SHELL_HASHES = {
   "./js/data/support-lines.js": "0c1286fa510e427e",
   "./js/data/consent-version.js": "c1a39ed44cc24157",
   "./js/views/my-programme.js": "60eaac657d25c631",
-  "./js/session-builder.js": "4b48731d4664b9bd",
+  "./js/session-builder.js": "b3725a26389fe3d2",
   "./js/data/session-choice.js": "954463b0647f3843",
   "./js/data/saved-sessions.js": "91dd2dc43f0f908b",
   "./js/data/class-contract.js": "fe8f3f22b0df50f6",

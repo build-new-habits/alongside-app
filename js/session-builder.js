@@ -1,6 +1,16 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
+ * 17 Oct 2026 v90
+ *
+ * v90 - SHORT-BARBELL (found in the v673 fresh-clone run: verify-short-
+ *   sessions 1b, a 10-minute gym Full Body at 16). Since v88 a heavy
+ *   barbell lift carries three minutes of warm-up sets in the estimate,
+ *   and the shape's swaps come after the trim: 10-minute gym Full Body
+ *   came to 13 or more in about 1 in 9 builds (none over 12 on v669).
+ *   At 15 minutes or less, main picks and the shape prefer moves without
+ *   warm-up sets; a barbell lift comes back only when nothing else fits.
+ *
  * 17 Oct 2026 v89
  *
  * v89 - W6-17 CONSECUTIVE-DAYS. The lighter plan after a busy few days is
@@ -2595,6 +2605,9 @@ const _HEAVY_PATTERNS   = new Set(["squat", "hinge", "push", "pull", "lunge"]);
 // estimate as in the gym.
 const _isHeavyBarbell = e => !!e && (e.equipment || []).includes("barbell") && _HEAVY_PATTERNS.has(e.movementPattern) && !_BALLISTIC.test(e.name || "");
 const WARMUP_SETS_SECONDS = 180;
+// v90. At or under this, a heavy barbell lift (with its warm-up sets) is
+// chosen only when nothing else fits.
+const SHORT_BARBELL_MINS = 15;
 function _warmupSecondsFor(ex) {
   return (_isHeavyBarbell(ex) && (ex.section || ex.role || "main") === "main") ? WARMUP_SETS_SECONDS : 0;
 }
@@ -4545,6 +4558,15 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
       // is actually available rather than to an absolute number, so a
       // section can never be emptied by it. PROPOSAL-3 already shortened
       // the working part; this is about which movements fill what is left.
+      // v90 SHORT-BARBELL. A heavy barbell lift carries its warm-up sets
+      // (v88, three minutes), and in fifteen minutes or less that does not
+      // fit: a 10-minute plan came to 13 to 16. A preference, not a
+      // filter -- the lift comes back when nothing else fits the slot.
+      if (section === "main" && Number(durationMins) <= SHORT_BARBELL_MINS) {
+        const noWarmupSets = candidates.filter(e => !_isHeavyBarbell(e));
+        if (noWarmupSets.length > 0) candidates = noWarmupSets;
+      }
+
       if (_sessionIntensity() === "low") {
         const levels = candidates.map(e => e.energyRequired || 0).sort((a, b) => a - b);
         const median = levels[Math.floor(levels.length / 2)];
@@ -4845,8 +4867,14 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
 
   // W3-18. The pool the shape draws on: this section's candidates, with
   // every filter the selection used (kit, capability, sore areas).
-  const _mainPool = () => _filterCandidates(mainCategories, "main", equipSet, conditionSet, type.sectionRules?.main)
-    .filter(ex => !alreadyChosen.has(ex.id));
+  const _mainPool = () => {
+    const pool = _filterCandidates(mainCategories, "main", equipSet, conditionSet, type.sectionRules?.main)
+      .filter(ex => !alreadyChosen.has(ex.id));
+    // v90 SHORT-BARBELL, for the shape's swaps too.
+    if (Number(durationMins) > SHORT_BARBELL_MINS) return pool;
+    const light = pool.filter(e => !_isHeavyBarbell(e));
+    return light.length ? light : pool;
+  };
   const _picked = selectFromCategories(mainCategories, "main", adjustedCounts.main, alreadyChosen);
   // A replayed learned session carries its shape already; reshaping it
   // would change a second move (verify-learned-session 4a).

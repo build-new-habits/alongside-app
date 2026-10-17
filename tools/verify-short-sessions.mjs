@@ -1,5 +1,13 @@
 /**
  * tools/verify-short-sessions.mjs
+ * 17 Oct 2026 v3
+ *
+ * v3 - SHORT-BARBELL. TEST 1c: 300 ten-minute gym Full Body plans,
+ *   none over 12 minutes. Found by 1b in the v673 fresh-clone run (one at
+ *   16): since v88 a heavy barbell lift carries its warm-up sets, and on
+ *   v672 about 1 in 9 came to 13 or more. 1b's eight builds a setting
+ *   could miss a 1-in-9 fault; this cannot.
+ *
  * 30 Sep 2026 v2
  *
  * v2 - session-builder v75. 3pc required that some warm-up be shortened
@@ -94,6 +102,16 @@ for (const [label, kit] of [["home", HOME], ["gym", GYM]]) for (const t of SB.SE
 ok("1pc. plans built across the grid", n > 600, String(n));
 ok("1a. every type and length averages within 20% of the time asked", off.length === 0, `${off.length}: ${off.slice(0, 8).join("; ")}`);
 ok("1b. no plan is more than 30% over", wild.length === 0, `${wild.length}: ${wild.slice(0, 6).join("; ")}`);
+
+{
+  fresh();
+  let worst = 0, over = 0;
+  for (let i = 0; i < 300; i++) {
+    const s = SB.buildSession({ sessionType: "full", durationMins: 10, equipmentOverride: GYM });
+    const a = about(s); worst = Math.max(worst, a); if (a > 12) over++;
+  }
+  ok("1c. 300 ten-minute gym Full Body plans: none over 12 minutes (a barbell lift's warm-up sets do not fit ten)", over === 0, `${over} over 12; longest ${worst}`);
+}
 
 console.log("\nTEST 2 - the warm-up scales with the time");
 const avgW = d => warm[d].reduce((a, b) => a + b, 0) / warm[d].length;
