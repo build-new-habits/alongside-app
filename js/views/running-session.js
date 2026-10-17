@@ -1,6 +1,12 @@
 /**
  * running-session.js - Guided Running Session
  *
+ * 17 Oct 2026 v17
+ *
+ * v17 - W6-16 ("make everything match"). The Bad-day line before a run is
+ *   the one every other door says: "Your knee is bad today" (it said "I can
+ *   see Knee is really difficult today", in the list's name).
+ *
  * 17 Oct 2026 v16
  *
  * v16 - W6-4 (Wave 6, persona 2.1). After Delete my health answers,
@@ -143,7 +149,7 @@ import { isGateDue, renderSafetyGate, attachSafetyGate } from "../safety-gate.js
 import { renderLogBlock, attachLogEvents } from "../session-log.js";
 import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
 import { checkpointSession, getResumableSession, clearCheckpoint, computeElapsedSeconds } from "../session-resume.js";
-import { getConditionName, isSore, isAcute, isBad, soreLine, bodyAreasOf } from "../data/conditions.js";
+import { getConditionName, isSore, isAcute, isBad, soreLine, bodyAreasOf, areaWords } from "../data/conditions.js";
 import { badDayIds, renderBadDayDoor, wireBadDayDoor } from "./bad-day-door.js";
 import { safetyLineFor } from "../data/purpose.js";
 
@@ -313,7 +319,9 @@ function intervalsOffReason() {
 }
 
 function renderSevereToday(ids) {
-  const names  = ids.map(getConditionName);
+  // W6-16 "make everything match": the person's area words, as every
+  // other Bad-day door says them (bad-day-door.js, coach-proposal.js).
+  const names  = ids.map(areaWords);
   const plural = names.length > 1;
   const joined = names.length === 1 ? names[0]
     : names.length === 2 ? `${names[0]} and ${names[1]}`
@@ -325,7 +333,7 @@ function renderSevereToday(ids) {
         <h1 class="workout-header-title">Before you run</h1>
       </div>
       <div class="card card-coach" style="margin-bottom: var(--space-5);">
-        <p class="coach-message-text">I can see ${joined} ${plural ? "are" : "is"} really difficult today. I can't give you medical support \u2014 that isn't something I can do. What I can do is keep today gentle, or we can call it a rest day. ${safetyLineFor(plural ? "them" : "it")}</p>
+        <p class="coach-message-text">Your ${joined} ${plural ? "are" : "is"} bad today. I can't give you medical support \u2014 that isn't something I can do. What I can do is keep today gentle, or we can call it a rest day. ${safetyLineFor(plural ? "them" : "it")}</p>
       </div>
       <div class="ws-type-grid" role="group" aria-label="Rest or something gentler">
         <button class="ws-type-card" data-severe-run="rest">

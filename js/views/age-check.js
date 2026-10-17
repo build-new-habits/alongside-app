@@ -1,5 +1,10 @@
 /**
  * js/views/age-check.js
+ * 17 Oct 2026 v4
+ *
+ * v4 - W6-16. After the answer the question is replaced in the
+ *   history, so one Back leaves (it took two).
+ *
  * 02 Oct 2026 v3
  *
  * v3 - W5-5 (safeguarding reviewers to read). Under 18 is recorded at
@@ -41,13 +46,15 @@ export function AgeCheckView(router) {
     root.querySelector("#age-continue").addEventListener("click", () => {
       const a = readAnswer(root, "age");
       if (a !== "adult" && a !== "under") { showAgeError(root, "age", a); return; }
-      if (a === "adult") { recordAge(true); router.navigate(takePendingRoute() || "today"); return; }
+      // W6-16. Replaced, not stacked: one Back leaves the screen after the
+      // answer (it took two, the first landing on the answered question).
+      if (a === "adult") { recordAge(true); router.navigate(takePendingRoute() || "today", { replace: true }); return; }
       // W5-5. Recorded now, and it stands: the under-18 screen warns about
       // anything this phone holds, offers a copy, then deletes it. There is
       // no way back to change the answer (the warning here offered one).
       recordAge(false);
       takePendingRoute();
-      router.navigate("under-18");
+      router.navigate("under-18", { replace: true });
     });
     root.querySelector("#age-title")?.focus();
   }

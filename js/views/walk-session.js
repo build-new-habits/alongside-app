@@ -1,6 +1,11 @@
 /**
  * walk-session.js - Coached Walk Session
  *
+ * 17 Oct 2026 v9
+ *
+ * v9 - W6-15 SCOPE-WORDS (Graeme, 17 Oct: "these are fine"). The heel and arch note names
+ *   the area, not a diagnosis, and claims nothing about what aggravates it.
+ *
  * 04 Oct 2026 v8
  *
  * v8 - W6-2 and W6-5. Before a walk starts a Bad day asks first. Exit pauses
@@ -227,7 +232,7 @@ function buildConditionNote() {
     notes.push("With your lower leg, walk on flatter ground today and avoid hard heel strikes.");
   }
   if (affected.some(id => id.startsWith("plantar"))) {
-    notes.push("Plantar fasciitis can be aggravated by cold starts. Take 2-3 minutes to warm up slowly before picking up pace.");
+    notes.push("With your heel or arch, take 2-3 minutes to warm up slowly before picking up pace.");
   }
   if (affected.some(id => id.startsWith("hamstring"))) {
     notes.push("Your hamstring is flagging some discomfort. Keep the pace easy and avoid any uphill that stretches it.");

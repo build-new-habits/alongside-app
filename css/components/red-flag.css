@@ -1,5 +1,10 @@
 /* ============================================================
    css/components/red-flag.css
+   17 Oct 2026 v3
+
+   v3 - W6-14. .rf-why: the line saying why the questions are back, in
+   the secondary colour under the introduction.
+
    28 Sep 2026 v2
 
    v2 - F4, HATCH-GUTTER. The gutter's 64px fallback removed: the
@@ -41,6 +46,8 @@
   line-height: 1.55;
   color: var(--color-text);
 }
+
+.rf-why { color: var(--color-text-secondary); }
 
 .rf-form { display: flex; flex-direction: column; gap: var(--space-4); }
 

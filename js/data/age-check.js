@@ -1,5 +1,12 @@
 /**
  * js/data/age-check.js
+ * 17 Oct 2026 v7
+ *
+ * v7 - W6-16 U18-POLICY-2 (Graeme, 17 Oct: "a"; "make everything
+ *   match"). The birth month no longer counts: 18 from the month after
+ *   it, so nobody is let in while 17. Under 18 also removes the research
+ *   "already answered" key, which resetEverything() did not reach.
+ *
  * 03 Oct 2026 v6
  *
  * v6 - W5-24 (Graeme, 03 Oct: drop the copy). Under 18 deletes everything
@@ -53,8 +60,10 @@
  *     Starting again needs the app's data cleared, a deliberate act.
  *
  * Age is counted in whole months: 18 years is 216 months, and the birth
- * month counts as reached. So somebody born in October 2008 is 18 in
- * October 2026; somebody born in November 2008 is not yet.
+ * month does NOT count as reached (W6-16, Graeme, 17 Oct: option a). With
+ * only a month and a year, somebody born in October 2008 may still be 17
+ * on any day of October 2026, so they are let in from November 2026. An
+ * 18-year-old can wait up to a month; a 17-year-old is never let in.
  */
 import { store } from "../store.js";
 
@@ -70,7 +79,7 @@ export function isAdult(month, year, now = new Date()) {
   if (!Number.isInteger(m) || !Number.isInteger(y) || m < 1 || m > 12) return null;
   const months = (now.getFullYear() - y) * 12 + (now.getMonth() + 1 - m);
   if (months < 0) return null;
-  return months >= ADULT_MONTHS;
+  return months > ADULT_MONTHS;   // W6-16: from the month after
 }
 
 /**
@@ -148,15 +157,26 @@ export function recordAge(adult) {
     return;
   }
   store.resetEverything();
+  _forgetResearch();
   store.set("consent.ageConfirmed", false);
   store.set("consent.ageCheckedAt", at);
   store.set("consent.ageVersion", AGE_CHECK_VERSION);
+}
+
+/**
+ * W6-16. The research "already answered" key is not an alongside key, so
+ * resetEverything() kept it (it holds which question, never an answer).
+ * Under 18 keeps only that they said so: it goes too.
+ */
+function _forgetResearch() {
+  try { globalThis.localStorage?.removeItem("bnh-research-answered"); } catch { /* storage off */ }
 }
 
 /** W5-5. Under 18: delete everything else the phone holds, keep the answer. */
 export function deleteForUnder18() {
   const c = store.get("consent") || {};
   store.resetEverything();
+  _forgetResearch();
   store.set("consent.ageConfirmed", false);
   store.set("consent.ageCheckedAt", c.ageCheckedAt || new Date().toISOString());
   store.set("consent.ageVersion", c.ageVersion || AGE_CHECK_VERSION);

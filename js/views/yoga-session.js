@@ -1,5 +1,10 @@
 /**
  * yoga-session.js
+ * 17 Oct 2026 v21
+ *
+ * v21 - W6-15 SCOPE-WORDS (Graeme, 17 Oct: "these are fine"). The recovery finish line no
+ *   longer says the body repairs itself.
+ *
  * 17 Oct 2026 v20
  *
  * v20 - W6-12 YOGA-LENGTH (Wave 6, personas 2.4, 2.15). The length cards
@@ -1166,7 +1171,7 @@ function renderDone() {
     flexibility: "Your body has more range than it did when you started. Consistent practice is how that compounds.",
     strength:    "Yoga strength is quiet strength. You have built something real today.",
     balance:     "Balance is a skill and skills improve with practice. You just practised.",
-    recovery:    "The body repairs itself. You gave it space to do that today.",
+    recovery:    "You gave yourself some space today.",
     mindful:     "You moved and you noticed. That combination is rare and valuable.",
     pilates:     "Controlled movement. Precise effort. That is what you just did."
   };

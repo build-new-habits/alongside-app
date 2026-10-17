@@ -1,5 +1,12 @@
 /**
  * tools/verify-age-check.mjs
+ * 17 Oct 2026 v7
+ *
+ * v7 - W6-16 (Graeme, 17 Oct: option a). The birth month no longer counts:
+ *   with a month and a year only, someone turning 18 later this month is
+ *   still 17 on most of its days. 3a now: 18 this month is not yet; 3d:
+ *   the month after, 18.
+ *
  * 03 Oct 2026 v6
  *
  * v6 - W5-24 (Graeme, 03 Oct: drop the copy). Under 18 deletes at once:
@@ -142,7 +149,9 @@ ok("2a. no yes/no buttons about being 18", !btns.some(b => /18|over|under|^yes$|
 console.log("\nTEST 3 - the boundary, by month");
 const e18 = ym(18 * 12), short = ym(18 * 12 - 1);
 ok("3pc. the rule exists", typeof AC?.isAdult === "function");
-ok("3a. 18 this month is 18", AC?.isAdult(e18.m, e18.y, now) === true);
+ok("3a. W6-16: turning 18 this month is not yet (could still be 17 today)", AC?.isAdult(e18.m, e18.y, now) === false);
+const e18b = ym(18 * 12 + 1);
+ok("3d. turned 18 last month: 18", AC?.isAdult(e18b.m, e18b.y, now) === true);
 ok("3b. a month short is not", AC?.isAdult(short.m, short.y, now) === false);
 ok("3c. a future date is not an answer", AC?.isAdult(1, now.getFullYear() + 1, now) === null);
 

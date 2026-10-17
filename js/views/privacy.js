@@ -1,5 +1,11 @@
 /**
  * privacy.js - Privacy and Terms (in-app summary)
+ * 17 Oct 2026 v9
+ *
+ * v9 - W6-16. The under-18 summary names the site the app is on
+ *   and the home-screen step (it named one fixed address); the heading
+ *   takes focus; the policy links say they open in a new tab.
+ *
  * 02 Oct 2026 v8
  *
  * v8 - W5-13. Where answers are kept says noServerCopy(): with sending on it
@@ -70,6 +76,9 @@ export const centered = false;
  * a journal they never gave, and sent them to Settings, which shows only
  * the under-18 page.
  */
+// W6-16. The site the app is on, as the under-18 screen says it.
+const _host = () => (typeof location !== "undefined" && location.host) || "this app\u2019s site";
+
 function under18() {
   return `
     <div class="view privacy-view">
@@ -86,8 +95,9 @@ function under18() {
           breaks, a short error report goes to Sentry, the service we use to fix faults. It says
           what broke, never anything about you.</p>
         <p class="text-secondary" style="margin-top: var(--space-3);">To remove that one thing,
-          clear this app\u2019s data in your phone\u2019s browser settings
-          (app.buildnewhabits.co.uk).</p>
+          clear this app\u2019s data in your phone\u2019s browser settings (the site is
+          ${_host()}), and if you added Alongside to your home screen, remove it from there
+          too.</p>
       </div>
     </div>`;
 }
@@ -113,11 +123,11 @@ export function render() {
         <p style="margin-top: var(--space-3);">
           <a href="https://buildnewhabits.co.uk/privacy/"
              style="color: var(--color-primary); text-decoration: underline;"
-             target="_blank" rel="noopener noreferrer">Privacy Policy</a>
+             target="_blank" rel="noopener noreferrer" aria-label="Privacy Policy (opens in a new tab)">Privacy Policy</a>
           &middot;
           <a href="https://buildnewhabits.co.uk/terms/"
              style="color: var(--color-primary); text-decoration: underline;"
-             target="_blank" rel="noopener noreferrer">Terms of Service</a>
+             target="_blank" rel="noopener noreferrer" aria-label="Terms of Service (opens in a new tab)">Terms of Service</a>
         </p>
         <p class="text-secondary text-sm" style="margin-top: var(--space-3);">
           Both open in a new tab. If the two ever disagree, the website version is
@@ -214,5 +224,7 @@ export function render() {
 }
 
 export function onMount() {
-  // nothing interactive
+  // W6-16. The heading takes focus, as every other screen's does.
+  const h = document.querySelector(".privacy-view h1");
+  if (h) { h.setAttribute("tabindex", "-1"); h.focus(); }
 }

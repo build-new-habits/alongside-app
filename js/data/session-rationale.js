@@ -1,5 +1,10 @@
 /**
  * data/session-rationale.js
+ * 17 Oct 2026 v10
+ *
+ * v10 - W6-15 SCOPE-WORDS (Graeme, 17 Oct: "these are fine"). The area words for the old
+ *   IT Band and Sciatica entries are body areas.
+ *
  * 03 Oct 2026 v9
  *
  * v9 - W5-20 TRUE-WORDS-5. Today covers heart and lungs only from moves that
@@ -843,7 +848,7 @@ function _conditionLabel(id) {
     "ankle-foot": "ankle", "wrist-elbow": "wrist or elbow",
     "biceps-triceps": "arm", "chest-pecs": "chest",
     "shin-splints": "shin", "plantar-fasciitis": "foot",
-    "it-band": "IT band", "abdominals": "middle"
+    "it-band": "outside of the thigh", "sciatica": "leg", "abdominals": "middle"
   };
   return LABELS[id] || id.replace(/-/g, " ");
 }

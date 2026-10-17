@@ -1,6 +1,14 @@
 /**
  * conditions.js — Condition definitions for onboarding and check-in
  *
+ * 17 Oct 2026 v1.12
+ *
+ * v1.12 - W6-15 SCOPE-WORDS (Graeme, 17 Oct: "these are fine"). The sore-area list names
+ *   body areas, never a diagnosis: Shin Splints, IT Band, Plantar
+ *   Fasciitis and Sciatica are Front of the Shin, Outside of the Thigh /
+ *   Knee, Heel / Arch of the Foot and Pain Running Down the Leg. Ids
+ *   unchanged.
+ *
  * 02 Oct 2026 v1.11
  *
  * v1.11 - W5-14. soreLine() takes the plan's names: a move left out that
@@ -190,10 +198,10 @@ export const CONDITIONS = [
   { id: 'glutes',           name: 'Glutes / Buttocks',      icon: '🍑', area: 'lower',    hasPhase: true, zone: 'lower-limb' },
   { id: 'calves',           name: 'Calves / Lower Leg',     icon: '🦵', area: 'lower',    hasPhase: false, zone: 'lower-limb' },
   { id: 'achilles',         name: 'Achilles Tendon',        icon: '🦶', area: 'lower',    hasPhase: true, zone: 'lower-limb' },
-  { id: 'shin-splints',     name: 'Shin Splints',           icon: '🦵', area: 'lower',    hasPhase: true, zone: 'lower-limb' },
-  { id: 'it-band',          name: 'IT Band',                icon: '🦵', area: 'lower',    hasPhase: false, zone: 'lower-limb' },
-  { id: 'plantar-fasciitis',name: 'Plantar Fasciitis',      icon: '🦶', area: 'lower',    hasPhase: false, zone: 'lower-limb' },
-  { id: 'sciatica',         name: 'Sciatica',               icon: '⚡', area: 'lower',    hasPhase: true, zone: 'spine' },
+  { id: 'shin-splints',     name: 'Front of the Shin',      icon: '🦵', area: 'lower',    hasPhase: true, zone: 'lower-limb' },
+  { id: 'it-band',          name: 'Outside of the Thigh / Knee', icon: '🦵', area: 'lower',    hasPhase: false, zone: 'lower-limb' },
+  { id: 'plantar-fasciitis',name: 'Heel / Arch of the Foot', icon: '🦶', area: 'lower',    hasPhase: false, zone: 'lower-limb' },
+  { id: 'sciatica',         name: 'Pain Running Down the Leg', icon: '⚡', area: 'lower',    hasPhase: true, zone: 'spine' },
 
   // MUSCULOSKELETAL — BACK
   { id: 'lower-back',       name: 'Lower Back',             icon: '🔙', area: 'back',     hasPhase: true, zone: 'spine' },

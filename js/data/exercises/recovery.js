@@ -1,5 +1,10 @@
 /**
  * data/exercises/recovery.js
+ * 17 Oct 2026 v4
+ *
+ * v4 - W6-15 SCOPE-WORDS (Graeme, 17 Oct: "these are fine"). The walk's coaching no longer
+ *   calls movement medicine, and its why no longer claims repair.
+ *
  * 17 Oct 2026 v3
  *
  * v3 - W6-8 TRUE-WORDS-6. Mindful Walk: the timer is a guide (it said "10
@@ -1000,8 +1005,8 @@ export const RECOVERY = [
       'Pause whenever you want. Look around. Breathe.',
       'Return home before you feel tired — not after'
     ],
-    coaching: 'This is not exercise. It is movement as medicine — gentle circulation, fresh air, and a reminder that your body still works, even on hard days. The goal is simply to have gone.',
-    why: 'Gentle walking maintains circulation and joint mobility without loading the structures that are hurting. The mindfulness element activates the parasympathetic nervous system, which supports the body natural repair processes.',
+    coaching: 'This is not exercise. It is gentle movement and fresh air, and a reminder that your body still works, even on hard days. The goal is simply to have gone.',
+    why: 'Gentle walking maintains circulation and joint mobility without loading the structures that are hurting. The mindfulness element activates the parasympathetic nervous system, which helps the body settle.',
         watchOut: [
       'Bouncing into the stretch rather than holding it still',
       'Pushing to the point of pain; a stretch should feel like a strong pull, never sharp',

@@ -1,5 +1,14 @@
 /**
  * tools/verify-scope-minor.mjs
+ * 17 Oct 2026 v5
+ *   W6-15 SCOPE-WORDS (Graeme, 17 Oct: "these are fine"). Healing-style
+ *   claims added to the ban ("repairs itself", "movement as medicine",
+ *   "it's not a warning", "nothing went wrong"), and TEST 1c: the sore-area
+ *   list names body areas, never a diagnosis (Shin Splints, IT Band,
+ *   Plantar Fasciitis, Sciatica became Front of the Shin, Outside of the
+ *   Thigh / Knee, Heel / Arch of the Foot, Pain Running Down the Leg; ids
+ *   unchanged). The walk's cold-start note no longer names plantar
+ *   fasciitis.
  * 04 Oct 2026 v4
  *   LOOK-1: Sore or injured areas is a row on the Your body section page,
  *   not the Settings index; 2b reaches it with settingsFind. No assertion
@@ -95,13 +104,13 @@ const visible = root => [txt(root), ...[...root.querySelectorAll("[aria-label],[
 // The vocabulary of intended medical purpose. "treat" alone is ordinary
 // English ("I will never treat time away as failure") and is not banned;
 // "treatment" is. The one allowed sentence is the Terms' own disclaimer.
-const BAN = /\bprescri\w*|physio notes|notes from your physio|\brehab\b|rehabilitat\w*|\bheal(ed|ing|s)?\b|reduce (your )?pain|recover(y)? from (an |your )?injur\w*|\btreatment\b|diagnos\w*|safe for back|clinical-friendly|clinically/i;
+const BAN = /repairs itself|movement as medicine|not a warning|nothing went wrong|plantar fasciitis|sciatica|shin splints|\bprescri\w*|physio notes|notes from your physio|\brehab\b|rehabilitat\w*|\bheal(ed|ing|s)?\b|reduce (your )?pain|recover(y)? from (an |your )?injur\w*|\btreatment\b|diagnos\w*|safe for back|clinical-friendly|clinically/i;
 const ALLOWED = [/not a substitute for professional medical advice, diagnosis,? or treatment/gi, /isn[’']t a diagnosis/gi];
 const banned = t => { let s = t; for (const a of ALLOWED) s = s.replace(a, ""); return s.match(BAN)?.[0] || null; };
 
 // ── 0. THE RULE CAN SEE WHAT IT IS FOR ───────────────────────────────────
 console.log("\nTEST 0 - the scan catches the words it exists for, and passes ordinary English");
-ok("0a. REVERSAL: catches each", ["Prescribed by: coach", "Physio notes:", "Rehab", "Feel healed", "Reduce pain",
+ok("0a. REVERSAL: catches each", ["The body repairs itself", "movement as medicine", "it's not a warning", "nothing went wrong", "Plantar Fasciitis", "Prescribed by: coach", "Physio notes:", "Rehab", "Feel healed", "Reduce pain",
   "Recover from an injury", "clinical-friendly format", "It isn't a treatment"].every(t => banned(t)));
 ok("0b. passes ordinary English and the Terms' disclaimer", !banned("I will never treat time away as failure") &&
    !banned("It is not a substitute for professional medical advice, diagnosis, or treatment."));
@@ -110,6 +119,10 @@ ok("0b. passes ordinary English and the Terms' disclaimer", !banned("I will neve
 console.log("\nTEST 1 - no retired condition can be chosen anywhere");
 const retired = new Set(SCOPE.RETIRED_CONDITIONS);
 ok("1a. none in the catalogue", CONDITIONS.every(c => !retired.has(c.id)), CONDITIONS.filter(c => retired.has(c.id)).map(c => c.id).join());
+ok("1c. W6-15: the sore-area list names body areas, never a diagnosis",
+   CONDITIONS.every(c => !/shin splints|^it band$|plantar fasciitis|sciatica/i.test(c.name)) &&
+   ["shin-splints", "it-band", "plantar-fasciitis", "sciatica"].every(id => CONDITIONS.some(c => c.id === id)),
+   CONDITIONS.filter(c => /shin splints|^it band$|plantar fasciitis|sciatica/i.test(c.name)).map(c => c.name).join(", "));
 ok("1b. none offered as a sore area, and only body areas are", soreAreaOptions([]).every(o => !retired.has(o.id)) &&
    soreAreaOptions([]).every(o => CONDITIONS.find(c => c.id === o.id)?.zone !== "systemic"));
 const sheet = await import(B + "views/onboarding/conditions.js");

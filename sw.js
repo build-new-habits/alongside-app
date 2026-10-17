@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 17 Oct 2026 v672
+ * 17 Oct 2026 v673
  *
+ * v673 - W6-14/W6-15/W6-16: when the three safety questions come back, one line says why (a new area, changed wording, or a month); the sore-area list names body areas (Front of the Shin, Outside of the Thigh / Knee, Heel / Arch of the Foot, Pain Running Down the Leg) and no line claims healing; the birth month no longer counts, so nobody is let in at 17; under 18 also forgets which research questions were answered; the privacy summary names the app's own address and the home-screen step, and its heading takes focus; one Back after the age answer; a late messages download keeps nothing after an under-18 answer; links that open a new tab say so; the run's Bad-day line matches every other door.
  * v672 - W6-17/W6-18: a busy few days (three sessions in the three days before today) still makes the plan lighter, and nothing counts days in a row; Weight tracking and Show your best read their description with the switch; the 30 minutes choice says Recommended to a screen reader; the update banner sits above the bottom bar instead of pushing the page down.
  * v671 - W6-13/W6-19: someone whose goals are less stress or better sleep sees the winding-down aims first when setting an arc; a Struggling or Low mood this morning is answered in their word, on Home with Wellbeing and on Today's plan with Something gentler and Wellbeing.
  * v670 - W6-11/W6-12: a gym session's main part runs heavy lifts first and carries, holds and core last (power cleans and snatches no longer come after carries and throws), and a barbell lift's minutes include its warm-up sets; Yoga & Pilates offers the practice once, twice or three times through, each card saying its real minutes, and the finish records those minutes.
@@ -4219,7 +4220,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v672";
+const CACHE_NAME = "alongside-v673";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4249,7 +4250,7 @@ const SHELL_HASHES = {
   "./css/components/gym-programme.css": "79be04064c6bd328",
   "./css/components/journal-entry.css": "dd51da5425ee545b",
   "./css/components/reflect.css": "5925f1883139ce3f",
-  "./css/components/red-flag.css": "7297aeac122d7e37",
+  "./css/components/red-flag.css": "3934b0b0d770419b",
   "./css/components/know-what.css": "6f1d7faff6783932",
   "./css/components/nav-fix.css": "ee5db4b763633630",
   "./css/components/onboarding-thread.css": "e98173c565e8f212",
@@ -4324,7 +4325,7 @@ const SHELL_HASHES = {
   "./js/data/session-categories.js": "39f35cc7aab24fe6",
   "./js/data/aims.js": "35afe1468825731f",
   "./js/data/stretch-goal-zones.js": "a05bc2d626cade4f",
-  "./js/data/session-rationale.js": "3611ae82d114482a",
+  "./js/data/session-rationale.js": "f14d0d565eb7f9dc",
   "./js/data/personal-reads.js": "52141f31fa9d4fd0",
   "./js/data/field-contract.js": "d7d662025990b1fd",
   "./js/views/activity-log.js": "17f79396471ec498",
@@ -4334,20 +4335,20 @@ const SHELL_HASHES = {
   "./js/views/onboarding/frequency.js": "47e40b6e6e2f458f",
   "./js/views/programme-select.js": "8f1e740ed2db223b",
   "./js/views/upgrade.js": "2bce7ee3c22e3e76",
-  "./js/views/privacy.js": "a64dfefd8a24d1ac",
+  "./js/views/privacy.js": "9acd0bf0a418d745",
   "./js/views/library.js": "b82890843b58f923",
   "./js/views/practices.js": "69ede443c8d69360",
-  "./js/views/red-flag.js": "cfe041e1e4da9ecb",
+  "./js/views/red-flag.js": "d2f857d0f8ba905f",
   "./js/views/health-consent.js": "66c6f499c7863c7c",
-  "./js/views/age-check.js": "78478b867a8cb243",
-  "./js/views/under-18.js": "7c1d5316b2e0a835",
+  "./js/views/age-check.js": "b29fd222f8378e0b",
+  "./js/views/under-18.js": "22c82205c5f7626a",
   "./js/views/consent-update.js": "51f918f8e2c9b25a",
   "./js/data/arc-readback.js": "9b06dcba96534da0",
   "./js/data/tier-table.js": "f72328887db67d30",
   "./js/views/know-what.js": "e196bb8321f5218d",
-  "./js/data/red-flag.js": "8ebc8776f3df27d9",
+  "./js/data/red-flag.js": "3cd9eecbc3985eb3",
   "./js/data/health-consent.js": "a23d005af57f179c",
-  "./js/data/age-check.js": "ed0c1f5310aa26c9",
+  "./js/data/age-check.js": "7fa5b0f5a6b34770",
   "./js/data/restore.js": "aeeb13c93705e542",
   "./js/data/export-file.js": "bbee762322d0e4e2",
   "./js/data/health-consent-covers.js": "6698a3e50672cbbe",
@@ -4381,7 +4382,7 @@ const SHELL_HASHES = {
   "./js/data/general-routine.js": "30dd1899fa187d6a",
   "./js/data/session-length.js": "d135da33af36c923",
   "./js/data/file-lock.js": "6428c4d49a58959b",
-  "./js/data/messages.js": "eec79984385fe4a3",
+  "./js/data/messages.js": "252ee15828010efc",
   "./js/data/evidence.js": "e4c368006fefebc6",
   "./js/data/support-lines.js": "0c1286fa510e427e",
   "./js/data/consent-version.js": "c1a39ed44cc24157",
@@ -4394,7 +4395,7 @@ const SHELL_HASHES = {
   "./js/data/classes/class-ground-001.js": "b4df735986c353bd",
   "./js/data/classes/class-steady-round-002.js": "00e7a174fcae3772",
   "./js/data/classes/class-stopping-early-003.js": "46ff3fd168d14264",
-  "./js/data/classes/class-bending-004.js": "95e1ad568a8151ca",
+  "./js/data/classes/class-bending-004.js": "6e065c8ae3c4251c",
   "./js/data/classes/class-standing-up-005.js": "35877775ab43bf07",
   "./js/data/classes/class-out-006.js": "c910250914f56868",
   "./js/data/classes/class-unsticking-007.js": "a1d19f121724437b",
@@ -4420,9 +4421,9 @@ const SHELL_HASHES = {
   "./js/views/breathing-session.js": "323a54e31bcc485f",
   "./js/views/morning-session.js": "e1efd26a71ffd68c",
   "./js/views/core-session.js": "4db5aac7cec94a93",
-  "./js/views/yoga-session.js": "9f8b89e121cfac9b",
-  "./js/views/walk-session.js": "4db23f8714be90d7",
-  "./js/views/running-session.js": "515027b91a5509ef",
+  "./js/views/yoga-session.js": "4ef95f8f3362e78d",
+  "./js/views/walk-session.js": "c845628eb086dc3a",
+  "./js/views/running-session.js": "9e046703e469db90",
   "./js/views/swim-session.js": "b7df266e78ddc4e9",
   "./js/views/cycle-session.js": "1acf062699de50fe",
   "./js/views/onboarding/thread.js": "51088ae8b1ee97d9",
@@ -4440,7 +4441,7 @@ const SHELL_HASHES = {
   "./js/data/week-focus.js": "7ef62ccb4eab0729",
   "./js/data/assessment.js": "abbb5c432a0d6f3c",
   "./js/data/session-moments.js": "85608dcfb8a34055",
-  "./js/data/conditions.js": "933cab5f52351476",
+  "./js/data/conditions.js": "7869a336d4fdfcc8",
   "./js/data/equipment.js": "b1d233c36eaf6270",
   "./js/data/goals.js": "6cac79f51ca5b5a4",
   "./js/data/goal-review.js": "a0208fe146fed15d",
@@ -4463,7 +4464,7 @@ const SHELL_HASHES = {
   "./js/data/exercises/pilates.js": "99e320f6392bca5b",
   "./js/data/exercises/running.js": "fcb33517ce9f6da5",
   "./js/data/exercises/rehabilitation.js": "f7f79c01a05b1d21",
-  "./js/data/exercises/recovery.js": "424dd3707d7e3fdd",
+  "./js/data/exercises/recovery.js": "0497a8c7c5c145eb",
   "./js/data/exercises/mindfulness.js": "43e569cf2f0ca91c",
   "./js/data/practice-library.js": "21f37963f0b2d2c2",
   "./js/data/muscle-search.js": "3f9ae092f24a6bcf",

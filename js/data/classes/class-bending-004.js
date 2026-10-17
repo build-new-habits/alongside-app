@@ -1,6 +1,12 @@
 /**
  * data/classes/class-bending-004.js
  *
+ * 17 Oct 2026 v3
+ *
+ * v3 - W6-15 SCOPE-WORDS (Graeme, 17 Oct: "these are fine"). "It's not a warning" and
+ *   "nothing went wrong" were reassurance about a body the app cannot
+ *   see: "That's your range today" and "…of bending, done."
+ *
  * 08 Sep 2026 v2
  *
  * v2 - PACING-1. Section durations rebalanced so each one holds its own
@@ -214,7 +220,7 @@ export const CLASS_BENDING_004 = {
         },
         {
           kind: 'movement',
-          voice: "The moment your back starts to round, that's your range today. It moves about. That's normal, and it's not a warning.",
+          voice: "The moment your back starts to round, that's your range today. It moves about. That's your range today.",
           speechSeconds: 35
         }
       ]
@@ -263,8 +269,8 @@ export const CLASS_BENDING_004 = {
         },
         {
           kind: 'closing',
-          voice: "That's it. Fifteen minutes of bending, and nothing went wrong.",
-          lighterVoice: "That's it. Ten minutes of bending, and nothing went wrong.",
+          voice: "That's it. Fifteen minutes of bending, done.",
+          lighterVoice: "That's it. Ten minutes of bending, done.",
           speechSeconds: 15
         },
         { kind: 'closing', voice: 'See you next time.' }

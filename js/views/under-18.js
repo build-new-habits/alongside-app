@@ -1,5 +1,11 @@
 /**
  * js/views/under-18.js
+ * 17 Oct 2026 v6
+ *
+ * v6 - W6-16. Starting again is from the month after turning 18
+ *   (the birth month no longer counts); Childline and 111 say they open in
+ *   a new tab.
+ *
  * 03 Oct 2026 v5
  *
  * v5 - W5-24 (Graeme, 03 Oct: drop the copy). No warning or Download:
@@ -58,7 +64,7 @@ export function Under18View(router) {
           suggests is written for adult bodies, and young people\u2019s information
           deserves more care than this app was built to give.</p>
         <p class="u18-text">Nothing you told the app is kept on this phone. It remembers only that you said you are under 18, so it shows you this page.</p>
-        <p class="u18-text">When you are 18, you can start again: clear this app\u2019s data in your phone\u2019s browser settings (the site is ${_host()}), and if you added Alongside to your home screen, remove it from there too. Then it will ask you from the beginning.</p>
+        <p class="u18-text">From the month after you turn 18, you can start again: clear this app\u2019s data in your phone\u2019s browser settings (the site is ${_host()}), and if you added Alongside to your home screen, remove it from there too. Then it will ask you from the beginning.</p>
         <p class="u18-text">If you\u2019d like to move more, a PE teacher, your GP or a local club
           can help you find something that suits you.</p>
 
@@ -67,12 +73,12 @@ export function Under18View(router) {
         <ul class="u18-list">
           <li><strong>Childline</strong>, any time, for anyone under 19:
             <a class="u18-link" href="tel:08001111">call 0800 1111</a>, or chat at
-            <a class="u18-link" href="https://www.childline.org.uk/" target="_blank" rel="noopener noreferrer">childline.org.uk</a></li>
+            <a class="u18-link" href="https://www.childline.org.uk/" target="_blank" rel="noopener noreferrer" aria-label="childline.org.uk (opens in a new tab)">childline.org.uk</a></li>
           <li><strong>Shout</strong>, any time:
             <a class="u18-link" href="sms:85258?&body=SHOUT">text SHOUT to 85258</a></li>
           <li><strong>NHS 111</strong>, for a health worry that is not an emergency:
             <a class="u18-link" href="tel:111">call 111</a> or go to
-            <a class="u18-link" href="https://111.nhs.uk/" target="_blank" rel="noopener noreferrer">111.nhs.uk</a></li>
+            <a class="u18-link" href="https://111.nhs.uk/" target="_blank" rel="noopener noreferrer" aria-label="111.nhs.uk (opens in a new tab)">111.nhs.uk</a></li>
           <li>In an emergency, <a class="u18-link" href="tel:999">call 999</a>.</li>
         </ul>
 

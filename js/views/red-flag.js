@@ -1,5 +1,11 @@
 /**
  * js/views/red-flag.js
+ * 17 Oct 2026 v4
+ *
+ * v4 - W6-14 RED-FLAG-REPEAT. When the questions come back, one line
+ *   under the introduction says why (data/red-flag.js repeatReason()): a
+ *   new area, changed wording, or a month. The first time, none.
+ *
  * 29 Sep 2026 v3
  *
  * v3 - P26, A WAY OUT (persona finding W2-20). The questions had no way
@@ -38,7 +44,7 @@
 import {
   RED_FLAG_QUESTIONS, RED_FLAG_ANSWERS, RED_FLAG_INTRO, RED_FLAG_ALWAYS,
   RED_FLAG_MESSAGES, RED_FLAG_CLEAR_CONFIRM,
-  redFlagStop, recordScreen, clearRedFlag, takePendingRoute,
+  redFlagStop, recordScreen, clearRedFlag, takePendingRoute, repeatReason,
 } from "../data/red-flag.js";
 
 export function RedFlagView(router) {
@@ -58,6 +64,7 @@ export function RedFlagView(router) {
       <div class="view rf-view">
         <h1 class="rf-title" id="rf-title" tabindex="-1">Before you start</h1>
         <p class="rf-intro">${RED_FLAG_INTRO}</p>
+        ${(() => { const why = repeatReason(); return why ? `<p class="rf-intro rf-why">${why}</p>` : ""; })()}
         <form class="rf-form" novalidate>
           ${RED_FLAG_QUESTIONS.map((q, i) => `
             <fieldset class="rf-q" id="rf-${q.id}">

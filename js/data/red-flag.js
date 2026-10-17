@@ -1,5 +1,13 @@
 /**
  * js/data/red-flag.js
+ * 17 Oct 2026 v7
+ *
+ * v7 - W6-14 RED-FLAG-REPEAT. repeatReason(): why the questions are being
+ *   asked again, for one line on the screen (they came back as the same
+ *   screen with no reason). Who is asked and when is unchanged, as decided
+ *   on 28 Sep: anyone who reports pain; again for a new area, after 30
+ *   days, or when the wording changes.
+ *
  * 17 Oct 2026 v6
  *
  * v6 - W6-8 TRUE-WORDS-6. "You've marked an area as sore or injured": true
@@ -178,6 +186,28 @@ export function redFlagDue(now = Date.now()) {
   const t = new Date(r.screenedAt).getTime();
   return !Number.isFinite(t) || now - t > DAYS_30;
 }
+
+/**
+ * W6-14. Why the questions are back, in one line, or null the first time
+ * (and when they are not due). A new area first (it names it), then a
+ * change of wording, then the month. Never a count.
+ */
+export function repeatReason(now = Date.now()) {
+  const r = _record();
+  if (!r.screenedAt || !redFlagDue(now)) return null;
+  const added = reportedPainAreas().filter(a => !(r.areas || []).includes(a));
+  if (added.length) {
+    const names = added.map(_areaName);
+    const list = names.length > 1 ? `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}` : names[0];
+    return `You've added ${list} since you last answered them, so they're asked again.`;
+  }
+  if (r.textVersion !== RED_FLAG_VERSION) return "The questions have changed since you last answered them, so they're asked again.";
+  return "It's been a month since you last answered them, so they're asked again.";
+}
+const _areaName = id => {
+  const n = (CONDITIONS.find(c => c.id === id) || {}).name || String(id).replace(/-/g, " ");
+  return "your " + n.split(" ").map(w => (w.length > 1 && w === w.toUpperCase()) ? w : w.toLowerCase()).join(" ");
+};
 
 /** Answers -> level. The 16 Aug lock: emergency is question 1 = yes, and only that. */
 export function levelFor(answers) {

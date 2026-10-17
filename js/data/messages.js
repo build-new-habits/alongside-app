@@ -1,5 +1,10 @@
 /**
  * js/data/messages.js
+ * 17 Oct 2026 v4
+ *
+ * v4 - W6-16. The under-18 check is made again when the download
+ *   lands, so one that finishes after the answer keeps nothing.
+ *
  * 02 Oct 2026 v3
  *
  * v3 - W4-17. Nothing is fetched, and the Settings tab is not renamed, for
@@ -107,6 +112,8 @@ export async function refreshMessages(fetchImpl = globalThis.fetch) {
     const res = await fetchImpl(MESSAGES_URL, { cache: "no-store", credentials: "omit" });
     if (!res || !res.ok) return false;
     const json = await res.json();
+    // W6-16. A download that lands after an under-18 answer keeps nothing.
+    if ((store.get("consent") || {}).ageConfirmed === false) return false;
     const raw = Array.isArray(json?.messages) ? json.messages : [];
     const list = raw.map(checkMessage).filter(Boolean).slice(0, 50);
     store.set("messages.list", list);
