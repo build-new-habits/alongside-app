@@ -1,5 +1,11 @@
 /**
  * today.js
+ * 17 Oct 2026 v59
+ *
+ * v59 - W6-9 SMALL-6. Back at Home, a hand-over to the builder is dropped (a
+ *   Stretch preselect from an unfinished check-in opened the builder on
+ *   Stretch 18 days later).
+ *
  * 13 Oct 2026 v58
  *
  * v58 - A-5 SIGNATURE-MOMENTS (Stage AWARD). On the first day of a new arc
@@ -995,6 +1001,10 @@ export function TodayView(router) {
 
   function mount(container) {
     rescueStaleSession();   // W3-13: a session nobody came back to is saved, not dropped
+    // W6-9. A hand-over to the builder is for that trip only: back at Home,
+    // it is dropped (a Stretch preselect left by a check-in nobody finished
+    // opened the builder on Stretch 18 days later).
+    if (store.get('sessionBuilderPreselect')) store.set('sessionBuilderPreselect', null);
     advanceWeekIfNeeded();
     // CHAP-1 step 4. Proposed HERE because Home is the one surface
     // everybody reaches. Proposing it lazily on read would mean My

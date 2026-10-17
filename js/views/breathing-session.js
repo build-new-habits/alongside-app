@@ -1,6 +1,12 @@
 /**
  * js/views/breathing-session.js - Guided Breathing Session
  *
+ * 17 Oct 2026 v12
+ *
+ * v12 - W6-9 SMALL-6. Left part-way, a practice is saved as partial with the
+ *   minutes done (40 seconds of a 5-minute practice was saved as 5,
+ *   completed). "Your phone buzzes" only where it can.
+ *
  * 03 Oct 2026 v11
  *
  * v11 - W5-21 SMALL-5 and W5-20 TRUE-WORDS-5. On the practice screen, with
@@ -90,7 +96,7 @@
  */
 
 import { store }  from "../store.js";
-import { prefersReducedMotion, getDisplayPref } from "../display-prefs.js";
+import { prefersReducedMotion, getDisplayPref, canVibrate } from "../display-prefs.js";
 import { isGateDue, renderSafetyGate, attachSafetyGate } from "../safety-gate.js";
 // SHARED-1. This view does not route to reflect.js, so it renders the
 // moments itself. No exerciseIds: a breathing session has nothing to ask
@@ -312,7 +318,9 @@ export function updateBreathCircle(phaseLabel, duration) {
   }
 }
 
-function logSession() {
+// W6-9. Left part-way: saved as what was done (it was saved as the full
+// length, completed, after 40 seconds). Finished: the full length.
+function logSession(partialSeconds = null) {
   // PT-6, 12 Aug 2026. This wrote straight to activityLog with
   // store.set(), bypassing store.logActivity() and therefore all three
   // of its guards:
@@ -334,11 +342,11 @@ function logSession() {
     id:           today + "-breathing-" + Math.random().toString(36).slice(2, 6),
     date:         today,
     type:         "mindfulness",
-    name:         `${TYPES.find(t => t.id === selectedType)?.label || "Breathing"} — ${selectedMins} min`,
-    durationMins: selectedMins,
+    name:         `${TYPES.find(t => t.id === selectedType)?.label || "Breathing"} — ${partialSeconds == null ? selectedMins : Math.max(1, Math.round(partialSeconds / 60))} min`,
+    durationMins: partialSeconds == null ? selectedMins : Math.max(1, Math.round(partialSeconds / 60)),
     creditsEarned,
     source:       "self-directed",
-    status:       "completed",
+    status:       partialSeconds == null ? "completed" : "partial",
     completedAt:  nowIso,
     sessionEnd:   nowIso
   });
@@ -497,7 +505,7 @@ function renderSession() {
           ${formatTime(selectedMins * 60)}
         </span>
       </div>
-      ${getDisplayPref("vibration") !== "off" ? `
+      ${getDisplayPref("vibration") !== "off" && canVibrate() ? `
       <p class="text-muted text-sm" style="text-align: center; margin: var(--space-2) 0 0;">
         Your phone buzzes gently at each change of breath. You can turn that off in Settings, Display, Vibration.
       </p>` : ""}
@@ -593,7 +601,7 @@ export function onMount() {
     isActive: () => phase === "session",
     label:    "breathing session",
     onExit:   () => {
-      if (elapsed >= 30) logSession();
+      if (elapsed >= 30) logSession(elapsed);
       resetSession();
       router.navigate("noticing");
     }
@@ -642,7 +650,7 @@ export function onMount() {
     sessionInterval = null;
     phaseInterval   = null;
     // Log partial if >30 seconds elapsed
-    if (elapsed >= 30) logSession();
+    if (elapsed >= 30) logSession(elapsed);
     resetSession();
     router.navigate("noticing");
   });

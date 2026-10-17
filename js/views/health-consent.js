@@ -1,5 +1,11 @@
 /**
  * js/views/health-consent.js
+ * 17 Oct 2026 v5
+ *
+ * v5 - W6-9 SMALL-6. From the journal, Settings or a restore, No thanks goes
+ *   back where they were and offers no routine (it started the chair
+ *   workout); the routine stays the answer at a session door.
+ *
  * 02 Oct 2026 v4
  *
  * v4 - W5-8 DECLINE-DOORS. Not now opens a second screen: the answers stay
@@ -27,7 +33,8 @@
  * (3.3.1). The heading takes focus on arrival.
  */
 import {
-  HEALTH_TICK, HEALTH_NOTE, giveHealthConsent, takePendingRoute, healthWordingChanged, confirmNoHealth
+  HEALTH_TICK, HEALTH_NOTE, giveHealthConsent, takePendingRoute, healthWordingChanged, confirmNoHealth,
+  peekPendingRoute, ROUTINE_ROUTES
 } from "../data/health-consent.js";
 import { startGeneralRoutine } from "../data/general-routine.js";
 
@@ -38,6 +45,30 @@ export function HealthConsentView(router) {
   // once more, plainly, where the answers are kept; a second no gives the
   // one gentle routine, the same for anyone, and asks nothing about health.
   function secondChance() {
+    // W6-9. The gentle routine is the answer for a session door only. From
+    // the journal, Settings or a restore, no thanks goes back where they
+    // were (it started the chair workout), and asks nothing again.
+    const pending = peekPendingRoute();
+    if (!ROUTINE_ROUTES.has(pending)) {
+      root.innerHTML = `
+      <div class="view hc-view">
+        <h1 class="hc-title" id="hc-title" tabindex="-1">Your answers stay on this phone</h1>
+        <p class="hc-text">Before you decide: what you tell me about your body and how you are is kept
+          on this phone and nowhere else. It is never sent to Build New Habits or to anyone, and you can
+          delete it whenever you like in Settings.</p>
+        <p class="hc-text">Without it I won't keep this. Everything that doesn't need it still works,
+          and you can say yes any time in Settings.</p>
+        <button class="btn btn-primary btn-large btn-full" id="hc-back-to-tick">Back to the tick</button>
+        <button class="btn btn-secondary btn-full" id="hc-no-thanks">No thanks</button>
+      </div>`;
+      root.querySelector("#hc-back-to-tick").addEventListener("click", () => mount(root));
+      root.querySelector("#hc-no-thanks").addEventListener("click", () => {
+        const from = takePendingRoute();
+        router.navigate(from === "journal-entry" ? "noticing" : from === "settings" ? "settings" : "today");
+      });
+      root.querySelector("#hc-title")?.focus();
+      return;
+    }
     root.innerHTML = `
       <div class="view hc-view">
         <h1 class="hc-title" id="hc-title" tabindex="-1">Your answers stay on this phone</h1>

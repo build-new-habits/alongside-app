@@ -1,5 +1,10 @@
 /**
  * tools/verify-small-5.mjs
+ * 17 Oct 2026 v2
+ *
+ * v2 - W6-9. 5a is on a phone that can vibrate (the practice now says it
+ *   buzzes only where the phone can; jsdom has no navigator.vibrate).
+ *
  * 03 Oct 2026 v1
  *
  * W5-21 SMALL-5 (Wave 5 persona trace: 2.4, 2.11, 2.13, 2.14, 2.1). One
@@ -118,6 +123,7 @@ console.log("\nTEST 5 - a breathing practice says it buzzes");
 person();
 const BS = await import(B + "views/breathing-session.js");
 BS.startBreathing("box", 3);
+Object.defineProperty(globalThis.navigator, "vibrate", { value: () => true, configurable: true, writable: true });   // a phone that can
 const bsHtml = BS.render();
 ok("5a. with Vibration on, it says so on the practice screen", /buzzes/.test(bsHtml) && /Vibration/.test(bsHtml));
 DP.setDisplayPref("vibration", "off");

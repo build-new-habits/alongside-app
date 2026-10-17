@@ -1,5 +1,10 @@
 /**
  * js/views/onboarding/thread.js
+ * 17 Oct 2026 v28
+ *
+ * v28 - W6-9 SMALL-6. Skipping the sore areas says which already-tapped
+ *   areas are kept.
+ *
  * 17 Oct 2026 v27
  *
  * v27 - W6-6 CONSENT-STAYS (Wave 6: 2.1, 2.11, 2.16). After Continue the
@@ -325,6 +330,7 @@ import { POLICY_VERSION as CURRENT_POLICY_VERSION } from '../../data/consent-ver
 import { restoreFromFile } from '../restore-flow.js';
 import { restoredMessage } from '../../data/restore.js';
 import { researchPrivacyLine, noServerCopy } from '../../data/evidence.js';
+import { CONDITIONS, bodyAreasOf } from '../../data/conditions.js';   // W6-9
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MOTION PREFERENCE
@@ -1464,7 +1470,14 @@ export function ThreadView(router) {
 
     if (result.skipped) {
       _showUserBubble(step.skipLabel || "I'll decide later.");
-      if (step.coachAfter?.skipped) {
+      // W6-9. Skipping the sore areas keeps any already tapped (Back inside
+      // the sheet keeps them, W4-19): say which, rather than nothing.
+      const kept = step.storeField === 'conditions' ? bodyAreasOf(store.get('conditions') || []) : [];
+      if (kept.length) {
+        const names = kept.map(id => (CONDITIONS.find(c => c.id === id) || {}).name || id).map(n => n.toLowerCase());
+        const list = names.length < 2 ? names[0] : `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}`;
+        await _showCoachBubble(`I've kept what you'd already tapped: ${list}. You can change that any time in Settings.`);
+      } else if (step.coachAfter?.skipped) {
         await _showCoachBubble(step.coachAfter.skipped);
       }
     } else {

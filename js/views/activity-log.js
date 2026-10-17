@@ -1,5 +1,11 @@
 /**
  * activity-log.js - Universal Activity Logging View
+ * 17 Oct 2026 v3
+ *
+ * v3 - W6-9 SMALL-6. The Library's choice arrives chosen (handed over in
+ *   memory; the key it read was never written), and leaving goes back where
+ *   it came from (it ended in Settings).
+ *
  * 29 Sep 2026 v2
  *
  * v2 - P26 (persona finding W2-20). A Strength group with "Gym or
@@ -20,6 +26,18 @@ export const centered = false;
 
 // Pre-set activity type if navigated from Library
 let activityType = null;
+
+// W6-9. The Library's choice, handed over in memory (the Library wrote
+// "pendingLogActivity", a name this screen never read, so the activity
+// was forgotten). Matched by the words on the Library's card.
+let _preset = null;
+const LIBRARY_WORDS = { "spin class": "spin", "hiit": "hiit", "outdoor cycle": "outdoor-cycle" };
+export function presetLogActivity(label) {
+  const l = String(label || "").trim().toLowerCase();
+  const all = ACTIVITY_GROUPS.flatMap(g => g.items);
+  const hit = all.find(i => i.label.toLowerCase() === l) || all.find(i => i.id === LIBRARY_WORDS[l]);
+  _preset = hit ? hit.id : null;
+}
 
 const ACTIVITY_GROUPS = [
   { group: "Cardio", items: [
@@ -60,7 +78,7 @@ let feelRating     = 3;
 let logSaved       = false;
 
 export function render() {
-  activityType = store.get("logActivityType") || null;
+  activityType = _preset;
   if (activityType) selectedType = activityType;
 
   if (logSaved) return renderSaved();
@@ -173,7 +191,7 @@ function renderSaved() {
 }
 
 export function onMount() {
-  store.set("logActivityType", null); // clear the pre-set
+  _preset = null; // W6-9: read once
 
   // Type picker
   document.querySelectorAll(".activity-type-card").forEach(card => {
@@ -247,8 +265,10 @@ export function onMount() {
   // Done / cancel
   function goBack() {
     logSaved = false; selectedType = null;
-    const prev = localStorage.getItem("alongside_previousView") || "settings";
-    router.navigate(prev);
+    // W6-9. Back where they came from (it ended in Settings: the key it
+    // read was never written).
+    if (router.history && router.history.length) router.back();
+    else router.navigate("library");
   }
   document.getElementById("activity-done-btn")?.addEventListener("click", goBack);
   document.getElementById("activity-cancel-btn")?.addEventListener("click", goBack);

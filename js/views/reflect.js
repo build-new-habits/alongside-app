@@ -1,6 +1,12 @@
 /**
  * reflect.js - Reflect Screen
  *
+ * 17 Oct 2026 v19
+ *
+ * v19 - W6-9 SMALL-6. The finish screen's moment controls (the baseline
+ *   chips) are wired on every mount, the first included; they were dead
+ *   until a redraw.
+ *
  * 12 Oct 2026 v18
  *
  * v18 - A-5 SIGNATURE-MOMENTS (Stage AWARD; both tiers, the arc line the
@@ -893,8 +899,7 @@ function _repaintMoments() {
   const main = document.getElementById("main-content");
   if (!main) return;
   main.innerHTML = render();
-  onMount();
-  attachSessionMoments(main, _repaintMoments);
+  onMount();   // W6-9: onMount wires the moments
 }
 
 function _sessionExerciseIds(entry) {
@@ -934,6 +939,10 @@ export function onMount() {
 
   const view = document.querySelector(".reflect-view");
   if (!view) return;
+  // W6-9. The moment controls are wired by every mount, the first included
+  // (the router's): they were wired only after a repaint, so the baseline
+  // chips did nothing until something else redrew the screen.
+  attachSessionMoments(document.getElementById("main-content") || view, _repaintMoments);
 
   const moodSlider = document.getElementById("reflect-mood-slider");
   if (moodSlider) {
@@ -1052,11 +1061,7 @@ function saveAndSummarise() {
   const main = document.getElementById("main-content");
   if (main) {
     main.innerHTML = render();
-    onMount();
-    // SHARED-1. Re-wire the moment controls after every repaint. Both
-    // repaint sites in this file get this; missing one would leave the
-    // baseline chips dead on whichever path took the other.
-    attachSessionMoments(main, _repaintMoments);
+    onMount();   // W6-9: onMount wires the moments, on every path
   }
 }
 

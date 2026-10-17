@@ -1,5 +1,10 @@
 /**
  * js/data/health-consent.js
+ * 17 Oct 2026 v9
+ *
+ * v9 - W6-9 SMALL-6. peekPendingRoute(): the second chance reads where the
+ *   person was going without taking it.
+ *
  * 02 Oct 2026 v8
  *
  * v8 - W5-8 DECLINE-DOORS (Graeme, 02 Oct: "Second chance, then one
@@ -168,6 +173,8 @@ export const healthDeclined = () => {
 let _pendingRoute = null;
 export function setPendingRoute(r) { _pendingRoute = r; }
 export function takePendingRoute() { const r = _pendingRoute; _pendingRoute = null; return r; }
+/** W6-9. Where the person was going, without taking it (the second chance reads it). */
+export function peekPendingRoute() { return _pendingRoute; }
 
 // W4-2. Doors that build a session from what the person can do.
 export const BUILD_ROUTES = new Set([

@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 17 Oct 2026 v668
+ * 17 Oct 2026 v669
  *
+ * v669 - W6-9 SMALL-6: a breathing practice left part-way is saved as what was done; the update check-in changes the plan; the finish screen's first answers work; declining from the journal or Settings goes back, not to a workout; a yes from Settings returns to the same page; Log what I did keeps your choice; a half-written journal entry survives the phone's Back; no stale Stretch preselect; skipping sore areas says which are kept; the quiet practice says when it ends and when nothing was saved; no buzz promised where the phone cannot; research messages dated when due; the News hint follows the switch.
  * v668 - W6-8 TRUE-WORDS-6: every line the Wave 6 tracers found untrue made true or removed: exit cards in Yoga and the gym say you can save or leave without saving; a length picked on the plan is for that day only, and the plan says what it comes to; check-in openers, the getting-started lines, the red-flag introduction ("You've marked an area as sore or injured"; the three questions are asked once more), the seated routine's name, Progress ("N sessions"), Settings and Yoga say only what is true; a gentle day's own instruction says 2 sets when a set comes off.
  * v667 - Stage W6, session 3: after Continue, the consent form becomes one line saying what was agreed and cannot be sent twice; the Bad day's gentle plan and the general routine are logged as what they were (not strength work) and never learned as the usual; with Mostly the same, the plan's first line stays the same.
  * v666 - W6-3/W6-4 (Graeme, 17 Oct: "Let's start wave 6"): somebody who gets up from a chair "not easily" is given no held lunge or wide stance (Warrior I and II, Triangle, Crescent Lunge, Standing Adductor Stretch), and Warrior I counts as balance work; Classes holds a class with a floor or balance move (and no way round it) for somebody who said floor or balance is hard; after Delete my health answers, Run has no Intervals and says why.
@@ -4215,7 +4216,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v668";
+const CACHE_NAME = "alongside-v669";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4292,24 +4293,24 @@ const SHELL_HASHES = {
   "./js/data/morning-library-map.js": "d4eb79cc3e5df86d",
   "./js/views/capture.js": "78453e2b0b02d31f",
   "./js/exercise-timing.js": "38608437fd7b08fb",
-  "./js/display-prefs.js": "e8bffb6c4d480d9b",
+  "./js/display-prefs.js": "4fe3fe77bd5f796c",
   "./js/tts.js": "acb754b56a41d53e",
   "./js/session-guard.js": "00177a846537868c",
   "./js/session-resume.js": "6916b88c0757374f",
   "./js/auth.js": "9b9c7a632dccada6",
-  "./js/views/today.js": "11a8f1fa25b73702",
+  "./js/views/today.js": "d8048e812b1d64c5",
   "./js/views/mobility-conditioning.js": "dd64370231617186",
   "./js/views/arc-setup.js": "bc3f0046616fc07b",
   "./js/views/stretch-arc.js": "fce3ddbd29c7fb30",
   "./js/views/checkin.js": "29d45c08868e3e8f",
-  "./js/views/checkin-mini.js": "3f1764e87002d46f",
+  "./js/views/checkin-mini.js": "c647f4da71feddde",
   "./js/views/coach-proposal.js": "dde0db36f2ad1976",
   "./js/views/workout.js": "7c29db66bc121ecc",
   "./js/views/progress.js": "0e5aa6295cab8ee5",
-  "./js/views/settings.js": "4aa86b366062041d",
+  "./js/views/settings.js": "cfa6fde135e8ed77",
   "./js/views/restore-flow.js": "dc81c2e455fa472d",
   "./js/views/weekly-plan.js": "dcee06e297b402c0",
-  "./js/views/reflect.js": "f4e0034752548a00",
+  "./js/views/reflect.js": "1f905f98c16931ee",
   "./js/data/empathy-transfer.js": "b3513396b3541e3a",
   "./js/data/equipment-map.js": "2db6399d16987707",
   "./js/data/exercises/gym.js": "34140029424a4dce",
@@ -4323,7 +4324,7 @@ const SHELL_HASHES = {
   "./js/data/session-rationale.js": "3611ae82d114482a",
   "./js/data/personal-reads.js": "52141f31fa9d4fd0",
   "./js/data/field-contract.js": "d7d662025990b1fd",
-  "./js/views/activity-log.js": "462e78533c0a815a",
+  "./js/views/activity-log.js": "17f79396471ec498",
   "./js/views/annual-reflection.js": "b342635af8b1d212",
   "./js/views/community-impact.js": "b620646a69ac8d8a",
   "./js/views/home-threshold.js": "17bc42808aa5bd5c",
@@ -4331,10 +4332,10 @@ const SHELL_HASHES = {
   "./js/views/programme-select.js": "8f1e740ed2db223b",
   "./js/views/upgrade.js": "4b7233092e3561da",
   "./js/views/privacy.js": "a64dfefd8a24d1ac",
-  "./js/views/library.js": "0fba57582118da84",
+  "./js/views/library.js": "b82890843b58f923",
   "./js/views/practices.js": "69ede443c8d69360",
   "./js/views/red-flag.js": "cfe041e1e4da9ecb",
-  "./js/views/health-consent.js": "eaead26a28761859",
+  "./js/views/health-consent.js": "66c6f499c7863c7c",
   "./js/views/age-check.js": "78478b867a8cb243",
   "./js/views/under-18.js": "7c1d5316b2e0a835",
   "./js/views/consent-update.js": "51f918f8e2c9b25a",
@@ -4342,7 +4343,7 @@ const SHELL_HASHES = {
   "./js/data/tier-table.js": "f72328887db67d30",
   "./js/views/know-what.js": "e196bb8321f5218d",
   "./js/data/red-flag.js": "8ebc8776f3df27d9",
-  "./js/data/health-consent.js": "a6432ebfb709d33c",
+  "./js/data/health-consent.js": "a23d005af57f179c",
   "./js/data/age-check.js": "ed0c1f5310aa26c9",
   "./js/data/restore.js": "aeeb13c93705e542",
   "./js/data/export-file.js": "bbee762322d0e4e2",
@@ -4378,7 +4379,7 @@ const SHELL_HASHES = {
   "./js/data/session-length.js": "d135da33af36c923",
   "./js/data/file-lock.js": "6428c4d49a58959b",
   "./js/data/messages.js": "eec79984385fe4a3",
-  "./js/data/evidence.js": "a929cf51be2c9b54",
+  "./js/data/evidence.js": "e4c368006fefebc6",
   "./js/data/support-lines.js": "0c1286fa510e427e",
   "./js/data/consent-version.js": "c1a39ed44cc24157",
   "./js/views/my-programme.js": "60eaac657d25c631",
@@ -4408,12 +4409,12 @@ const SHELL_HASHES = {
   "./js/views/noticing.js": "54446d31544d9c5c",
   "./js/views/in-step.js": "196267c5da62e662",
   "./js/data/in-step-scenarios.js": "b46f085cda4d24fc",
-  "./js/views/journal-entry.js": "5e315297df9abc14",
+  "./js/views/journal-entry.js": "e09705b71899ad3c",
   "./js/views/gym-programme.js": "c7c1131806b03654",
   "./js/views/prescribed.js": "0ae8c1283826141d",
   "./js/views/prescribed-session.js": "a4efb7a0bb697409",
-  "./js/views/quiet-session.js": "73c106032a745253",
-  "./js/views/breathing-session.js": "26387298908f3076",
+  "./js/views/quiet-session.js": "2a99696c17f817a1",
+  "./js/views/breathing-session.js": "323a54e31bcc485f",
   "./js/views/morning-session.js": "e1efd26a71ffd68c",
   "./js/views/core-session.js": "4db5aac7cec94a93",
   "./js/views/yoga-session.js": "83da4af5c38c074b",
@@ -4421,7 +4422,7 @@ const SHELL_HASHES = {
   "./js/views/running-session.js": "515027b91a5509ef",
   "./js/views/swim-session.js": "b7df266e78ddc4e9",
   "./js/views/cycle-session.js": "1acf062699de50fe",
-  "./js/views/onboarding/thread.js": "7459be230a4ce5a5",
+  "./js/views/onboarding/thread.js": "51088ae8b1ee97d9",
   "./js/views/onboarding/sheet-manager.js": "20cb675f242157c8",
   "./js/views/onboarding/goals.js": "ec29181741c4bc1e",
   "./js/views/onboarding/conditions.js": "f719e4e253244b9e",

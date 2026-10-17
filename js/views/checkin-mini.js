@@ -1,6 +1,12 @@
 /**
  * checkin-mini.js - Abbreviated Return-Visit Check-In
  *
+ * 17 Oct 2026 v11
+ *
+ * v11 - W6-9 SMALL-6. The update check-in changes today's check-in too,
+ *   which the plan reads first (it changed only lastCheckin, so the plan
+ *   ignored it).
+ *
  * 03 Oct 2026 v10
  *
  * v10 - W5-21 SMALL-5. The energy and mood sliders start from today's
@@ -441,6 +447,17 @@ function submitMiniCheckin() {
     mood:      miniMood,
     updatedAt: new Date().toISOString(),
   });
+
+  // W6-9. Today's check-in too: the plan reads checkinHistory first, so an
+  // update that changed only lastCheckin was ignored.
+  const todayKey = new Date().toISOString().split("T")[0];
+  const hist = store.get("checkinHistory") || {};
+  if (hist[todayKey]) {
+    store.set("checkinHistory", { ...hist, [todayKey]: { ...hist[todayKey],
+      ...(miniEnergy != null ? { energy: miniEnergy } : {}),
+      ...(miniMood != null ? { mood: miniMood } : {}),
+      updatedAt: new Date().toISOString() } });
+  }
 
   // Update pain scores if any were set
   if (Object.keys(miniPainScores).length > 0) {

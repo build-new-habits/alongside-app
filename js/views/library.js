@@ -1,6 +1,11 @@
 /**
  * library.js - Library Page
  *
+ * 17 Oct 2026 v19
+ *
+ * v19 - W6-9 SMALL-6. Log what I did hands its choice to the activity log
+ *   (presetLogActivity), which reads it.
+ *
  * 13 Oct 2026 v18
  *
  * v18 - D662-2 MOBILITY-DOOR (Graeme's device check, 13 Oct: "Can't find
@@ -206,6 +211,7 @@
  * Nav: shown (standard bottom nav)
  */
 
+import { presetLogActivity } from "./activity-log.js";   // W6-9
 import { store } from "../store.js";
 // 18 Aug 2026. This file used `router` as a bare name and relied on
 // app.js setting `window.router`. That works in a browser and fails
@@ -830,7 +836,7 @@ export function onMount() {
       const target = btn.dataset.logTarget;
       const label  = btn.dataset.logLabel;
       // Pre-populate activity log with the selected type
-      store.set("pendingLogActivity", label);
+      presetLogActivity(label);   // W6-9: the activity log reads this
       screen = "landing";
       router.navigate(target);
     });

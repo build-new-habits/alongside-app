@@ -1,5 +1,12 @@
 /**
  * settings.js
+ * 17 Oct 2026 v70
+ *
+ * v70 - W6-9 SMALL-6. A yes to the health consent comes back to the Settings
+ *   page it was asked from, and opens what was asked for (it landed on the
+ *   index). The Vibration hint says when the phone cannot vibrate; the News
+ *   hint follows the switch.
+ *
  * 17 Oct 2026 v69
  *
  * v69 - W6-8 TRUE-WORDS-6. How long you usually have: a length picked on the
@@ -723,7 +730,7 @@ import { getProgressStats }              from '../data/programmeEngine.js';
 import { getBeat3Script }                from '../data/beat3-scripts.js';
 import {
   DISPLAY_RANGES, SCHEMES, getDisplayPref, setDisplayPref,
-  resetDisplayPrefs, formatDisplayValue, applyDisplayPrefs
+  resetDisplayPrefs, formatDisplayValue, applyDisplayPrefs, canVibrate
 } from '../display-prefs.js';
 import { openSheet }                     from './onboarding/sheet-manager.js';
 // W3-A2. Imported, never redefined. A second copy of these option lists
@@ -762,6 +769,11 @@ const ACTIVITY_LEVELS = [...ACTIVITY_CHIPS, { id: 'very-active', label: 'Very ac
 function _activityLevel() {
   return store.get('fitnessLevel') || (store.get('lifestyle') || {}).activityLevel || null;
 }
+
+// W6-9. Where Settings was when it asked for the health consent, and what
+// was asked for, so the answer comes back to the same page (it landed on
+// the index). Module-level: the view is created again on return.
+let _afterConsent = null;
 
 export function SettingsView(router) {
 
@@ -805,10 +817,31 @@ export function SettingsView(router) {
 
   // ── Mount ──────────────────────────────────────────────────────────────────
 
+  /** W6-9. Ask for the health consent, remembering this page and the ask. */
+  function _askConsent(action) {
+    _afterConsent = { action, activeScreen, activeSection, screenFrom };
+    setPendingRoute('settings');
+    router.navigate('health-consent');
+  }
+
   function mount(container) {
     // W4-2. Sent here before a built session, after Delete and re-consent.
     if (takeOpenCapability()) { activeScreen = 'capability'; screenFrom = 'body'; activeSection = 'body'; askingAgain = true; focusAfter = '.settings-title'; }
+    // W6-9. Back from the health consent: the same page, and with a yes,
+    // what was asked for (What your body can do; the sore areas). A file
+    // to restore is chosen again by a tap (a browser needs one).
+    // Only straight back from the consent screen; any other visit starts
+    // at the index as before.
+    const back = _afterConsent; _afterConsent = null;
+    const fromConsent = (router?.history || []).at(-1) === 'health-consent';
+    let openConditions = false;
+    if (back && fromConsent && !activeScreen) {
+      activeScreen = back.activeScreen; activeSection = back.activeSection; screenFrom = back.screenFrom;
+      if (healthAllowed() && back.action === 'health-capability') { activeScreen = 'capability'; screenFrom = 'body'; activeSection = 'body'; focusAfter = '.settings-title'; }
+      if (healthAllowed() && back.action === 'edit-conditions') openConditions = true;
+    }
     render(container);
+    if (openConditions) openSheet('onboarding/conditions', () => render(container));
   }
 
   // ── Render ─────────────────────────────────────────────────────────────────
@@ -1053,7 +1086,7 @@ export function SettingsView(router) {
         { title: 'Motion and vibration', rows: [
           // F6. Off follows the device, which the app always has.
           _rowSwitch({ id: 'disp-reduce-motion', label: 'Reduce motion', disp: 'reduceMotion' }),
-          _rowSwitch({ id: 'disp-vibration', label: 'Vibration', sub: 'Buzzes during sessions to mark a change. Off stops them all.', disp: 'vibration' }),
+          _rowSwitch({ id: 'disp-vibration', label: 'Vibration', sub: canVibrate() ? 'Buzzes during sessions to mark a change. Off stops them all.' : 'This phone does not let web apps vibrate, so nothing buzzes here.', disp: 'vibration' }),
         ] },
       ];
       case 'data': return [
@@ -1230,7 +1263,7 @@ export function SettingsView(router) {
         <p class="settings-data-about">Short messages from Build New Habits: about the app, and now and then a question for you. They never contain safety or medical information, and nothing about you is sent to fetch them.</p>
         ${list.length ? `<ul class="settings-messages">${items}</ul>` : `<p class="settings-message__none">No messages at the moment.</p>`}
         <ul class="settings-rows">
-          ${_rowSwitch({ id: 'settings-news', label: 'News from Build New Habits', sub: 'News about the app and the causes the community supports. Off unless you turn it on.', field: 'messages.newsOn' })}
+          ${_rowSwitch({ id: 'settings-news', label: 'News from Build New Habits', sub: store.get('messages.newsOn') === true ? 'News about the app and the causes the community supports. On; turn it off any time.' : 'News about the app and the causes the community supports. Off unless you turn it on.', field: 'messages.newsOn' })}
         </ul>
       </div>`;
   }
@@ -3103,12 +3136,12 @@ export function SettingsView(router) {
 
       case 'health-capability':
         // LEGAL-TRUE. Only rendered while the health consent is needed.
-        setPendingRoute('settings'); router.navigate('health-consent');
+        _askConsent('health-capability');
         break;
 
       case 'edit-conditions':
         // PT-2. Sore areas are health answers: ask first if not given.
-        if (healthConsentNeeded()) { setPendingRoute('settings'); router.navigate('health-consent'); break; }
+        if (healthConsentNeeded()) { _askConsent('edit-conditions'); break; }
         // P0 (29 Sep 2026). The conditions-update screen is retired (it
         // tracked severity, set healing goals and built programmes for a
         // condition). The sore-areas sheet is the one place to change
@@ -3125,7 +3158,7 @@ export function SettingsView(router) {
       case 'restore-data':
         // RESTORE. A file holds health answers, so this device's health
         // consent comes first.
-        if (healthConsentNeeded()) { setPendingRoute('settings'); router.navigate('health-consent'); break; }
+        if (healthConsentNeeded()) { _askConsent('restore-data'); break; }
         _pickRestoreFile(container);
         break;
 

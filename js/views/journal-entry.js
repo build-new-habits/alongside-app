@@ -1,5 +1,10 @@
 /**
  * journal-entry.js
+ * 17 Oct 2026 v10
+ *
+ * v10 - W6-9 SMALL-6. A half-written entry survives the phone's Back: kept
+ *   in memory only, never stored or read, until saved or thrown away.
+ *
  * 02 Oct 2026 v9
  *
  * v9 - W4-21 JOURNAL-SMALL. Write about this shows the week's question as
@@ -114,6 +119,11 @@ const MAX_DISPLAY_CHARS = 1000; // soft display limit — no hard truncation
 
 // ─── View registration ────────────────────────────────────────────────────────
 
+// W6-9. A half-written entry survives the phone's Back: kept in memory
+// only (never stored, never read), until it is saved or thrown away, or
+// the app is closed.
+let _draft = '';
+
 export function JournalEntryView(router) {
 
   let selectedCategories = [];
@@ -126,6 +136,7 @@ export function JournalEntryView(router) {
     // Pre-select category preferences from settings
     const prefs = store.get('journalSettings.categoryPrefs') || [];
     selectedCategories = [...prefs];
+    currentText = _draft;   // W6-9
 
     render(container);
   }
@@ -268,6 +279,7 @@ export function JournalEntryView(router) {
 
     textarea?.addEventListener('input', () => {
       currentText = textarea.value;
+      _draft = currentText;   // W6-9
       const len   = currentText.length;
       if (charCount) {
         charCount.textContent = len > MAX_DISPLAY_CHARS
@@ -317,6 +329,7 @@ export function JournalEntryView(router) {
     });
     container.querySelector('[data-action="discard"]')?.addEventListener('click', () => {
       if (textarea) textarea.value = '';
+      _draft = '';   // W6-9: thrown away on purpose
       leave();
     });
   }
@@ -335,6 +348,7 @@ export function JournalEntryView(router) {
    */
   function saveEntry(text, container, opts = {}) {
     const trimmedText = text.trim();
+    _draft = '';   // W6-9: saved, so no draft
 
     // ── Build entry ──────────────────────────────────────────────────────────
     const id    = `je-${Date.now()}`;

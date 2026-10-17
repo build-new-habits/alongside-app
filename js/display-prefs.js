@@ -1,5 +1,12 @@
 /**
  * js/display-prefs.js
+ * 17 Oct 2026 v8
+ *
+ * v8 - W6-9 SMALL-6. canVibrate(): whether this phone lets a web app
+ *   vibrate (most iPhones do not), so no screen promises a buzz it cannot
+ *   give. Here, beside the one vibration wrapper, so the check that keeps
+ *   vibration out of Settings and Messages still holds.
+ *
  * 06 Oct 2026 v7
  *
  * v7 - D-12 PROGRESS-FIT. Text size goes up to 2 (was 1.6). The setting
@@ -153,6 +160,11 @@ function _clamp(name, value) {
   const n = parseFloat(value);
   if (!r || !Number.isFinite(n)) return parseFloat(DISPLAY_DEFAULTS[name]);
   return Math.min(r.max, Math.max(r.min, n));
+}
+
+/** W6-9. Can this phone vibrate for a web app at all? */
+export function canVibrate() {
+  try { return typeof navigator !== "undefined" && typeof navigator.vibrate === "function"; } catch { return false; }
 }
 
 export function getDisplayPref(name) {

@@ -1,6 +1,11 @@
 /**
  * tools/verify-shared1.mjs
- * 30 Sep 2026 v3
+ * 17 Oct 2026 v4
+ *
+ * v4 - W6-9. The moment controls are wired in reflect.js's onMount, which
+ *   every repaint and the router's first mount call; the check asks that
+ *   (it counted wirings at repaint sites, and the first mount had none,
+ *   so the baseline chips were dead on arrival).
  *
  * v3 - W3-20 TRUE-WORDS. "That was your first one" is said only on the finish
  *   of that session: the fixture sets currentActivityEntry to the entry it
@@ -63,10 +68,11 @@ check('and wires their controls', /attachSessionMoments\(/.test(reflect));
 check('and resets them on a fresh mount', /resetSessionMoments\(\)/.test(reflect));
 
 // Both repaint sites must re-wire, or the chips die on one path.
-const repaints = (reflect.match(/main\.innerHTML = render\(\)/g) || []).length;
-const wirings  = (reflect.match(/attachSessionMoments\(main/g) || []).length;
-check('every repaint site re-wires the controls', wirings >= repaints - 1,
-  `${repaints} repaints, ${wirings} wirings`);
+// W6-9. The wiring moved into onMount, which every repaint and the
+// router's first mount both call (the first mount had none: dead chips).
+const onMountBody = reflect.slice(reflect.indexOf('export function onMount'), reflect.indexOf('export function onMount') + 4000);
+check('every mount, the first included, wires the controls', /attachSessionMoments\(/.test(onMountBody),
+  'attachSessionMoments in onMount');
 
 // ── Every session view reaches it ────────────────────────────
 const views = fs.readdirSync(_gatePath('js/views')).filter(f => f.endsWith('.js'));

@@ -1,5 +1,11 @@
 /**
  * js/data/evidence.js
+ * 17 Oct 2026 v4
+ *
+ * v4 - W6-9 SMALL-6. Research messages are dated the day they became due (a
+ *   week after the first session, with three done; eight weeks after the
+ *   first), not the install day.
+ *
  * 02 Oct 2026 v3
  *
  * v3 - W5-13 RESEARCH-TRUE-2. noServerCopy(): the server words every screen
@@ -203,16 +209,24 @@ export function researchMessages() {
   const since = first == null ? 0 : (Date.now() - first) / DAY;
   // W5-13. Never dated before this phone had the app.
   const installed = String(store.get("createdAt") || "").slice(0, 10);
-  const pub = installed > "2026-10-01" ? installed : "2026-10-01";
+  const floor = installed > "2026-10-01" ? installed : "2026-10-01";
+  // W6-9. Each dated the day it became due (it read as the install day,
+  // weeks before it was there): a week after the first session, with three
+  // done; eight weeks after the first.
+  const iso = t => new Date(t).toISOString().slice(0, 10);
+  const later = (...d) => d.filter(Boolean).sort().pop();
+  const times = log.map(_when).sort((a, b) => a - b);
+  const surveyPub  = first == null ? floor : later(floor, iso(first + 7 * DAY), times[2] != null ? iso(times[2]) : null);
+  const figuresPub = first == null ? floor : later(floor, iso(first + 56 * DAY));
   if (!ev.surveyDone && !wasAnswered("survey") && log.length >= 3 && since >= 7) out.push({
-    id: "survey-2026", kind: "research", action: "survey", publishedAt: pub, audience: { tier: "any" },
+    id: "survey-2026", kind: "research", action: "survey", publishedAt: surveyPub, audience: { tier: "any" },
     title: "A quick question, if you have a moment",
     body: "Two questions about how you move now. It’s up to you, and nothing is sent unless you press Send.",
   });
   // W5-13. Eight weeks, so the first four weeks and the latest four are
   // never the same days (at 28 days they were: "3" then "2.5").
   if (!ev.figuresDone && !wasAnswered("figures") && since >= 56) out.push({
-    id: "share-figures-2026", kind: "research", action: "share-figures", publishedAt: pub, audience: { tier: "any", minSessions: 4 },
+    id: "share-figures-2026", kind: "research", action: "share-figures", publishedAt: figuresPub, audience: { tier: "any", minSessions: 4 },
     title: "Share a few figures?",
     body: "A few counts of your sessions, worked out on this phone, to help us say truthfully what Alongside does. You see exactly what would be sent first.",
   });

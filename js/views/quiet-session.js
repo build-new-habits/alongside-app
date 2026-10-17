@@ -1,6 +1,12 @@
 /**
  * quiet-session.js - Something Quieter View
  *
+ * 17 Oct 2026 v10
+ *
+ * v10 - W6-9 SMALL-6. The end-of-practice cue is said on the finished screen
+ *   (the redraw wiped it); a save under ten seconds says nothing was saved
+ *   (it was silent).
+ *
  * 01 Oct 2026 v9 - BUNDLE-TRUE. This route has no journal of its own any more.
  *   Arriving in journal mode (an old link) goes to the real journal
  *   (journal-entry), which asks for the health consent and shows the support
@@ -547,8 +553,12 @@ function renderMindfulMode() {
   return renderMindfulSession(step);
 }
 
+let _mindfulNote = "";   // W6-9: said once, on the next screen
+
 function renderMindfulSelector() {
+  const note = _mindfulNote; _mindfulNote = "";
   return `
+    ${note ? `<p class="text-sm" role="status" style="margin: 0 var(--space-4) var(--space-3);">${note}</p>` : ""}
     <div class="card card-coach quiet-coach-card">
       <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
       <div>
@@ -628,6 +638,7 @@ function renderMindfulComplete() {
       <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
       <div>
         <h3>Session complete.</h3>
+        <p id="quiet-mindful-cue" class="sr-only" aria-live="polite" aria-atomic="true"></p>
         <p>You gave yourself ${mindfulDuration} minutes. That is not nothing. Notice what
            is different, even slightly, from when you started.</p>
       </div>
@@ -816,6 +827,9 @@ function runMindfulTimer(session) {
         dismountSessionGuard();
         logSession("mindful", mindfulDuration + " min mindful session", 20, session?.[0]?.id, mindfulDuration);
         rerender();
+        // W6-9. The redraw replaced the cue before a screen reader could
+        // say it: said again on the finished screen, once it is there.
+        setTimeout(() => { const el = document.getElementById("quiet-mindful-cue"); if (el) el.textContent = "That\u2019s the end of the practice."; }, 150);
         return;
       }
 
@@ -851,7 +865,9 @@ function stopMindful() {
     // W5-10. Stay carries on (it froze the practice for good).
     onStay: () => { if (mindfulSession && mindfulStarted && !mindfulComplete) runMindfulTimer(mindfulSession); },
     onSave: () => {
+      // W6-9. Under ten seconds nothing is saved: say so (it was silent).
       if (mindfulElapsed >= 10) logPartialMindfulSession();
+      else _mindfulNote = "Under ten seconds, so there was nothing to save.";
       resetMindfulState();
       rerender();
     },
