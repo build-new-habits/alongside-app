@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 17 Oct 2026 v664
+ * 17 Oct 2026 v665
  *
+ * v665 - D662-10 (Graeme, 17 Oct: "Remove them"): no "Up to +150 ⭐" on My exercises and no "+35 ⭐" on each move: the older per-move count, which nothing shows or uses; the social action credits (1 or 2 a session, Settings › Community impact) are unchanged. The player says "1 set".
  * v664 - DEVICE-662, the rest (Graeme, 17 Oct: "Can we fix them now?"): "One more set on each" only where the work is sets; My exercises in plan days is headed Your exercises with today's day first, and its way back says Home; one way home per screen (no house beside ‹ Home or Back to Home); 1 set, 1 session, 1 minute; no "No sets logged" under a move; a saved session's button says Start; the finish's tiles share the row; Plan Home fits above the bar on a 412 x 915 phone; the Library's tiles go to one column at the largest text; somebody who can stand always has a standing move in a strength session (CAP-7).
  * v663 - DEVICE-662 (Graeme's device check, 13 Oct): on the Plan, a day in Your week that is a walk (only cardio, outside) leads with "You planned a walk today" and Start the walk, not a cardio circuit; and the Library has a Mobility & Conditioning tile, so Stretch, Stretch arc and a mobility session can be found.
  * v662 - Stage AWARD (Graeme, 13 Oct: "Yes please"): Saved sessions has one name, and when it is empty it says where saving is (Keep to repeat, when you finish) with Start today's session; My exercises, empty, has a heading and says what goes there; on the Plan, the first day of a new arc week says "Week n starts today".
@@ -4211,7 +4212,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v664";
+const CACHE_NAME = "alongside-v665";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4406,8 +4407,8 @@ const SHELL_HASHES = {
   "./js/data/in-step-scenarios.js": "b46f085cda4d24fc",
   "./js/views/journal-entry.js": "5e315297df9abc14",
   "./js/views/gym-programme.js": "d33d5c8cfaf6eb2a",
-  "./js/views/prescribed.js": "63e69a3ef907af33",
-  "./js/views/prescribed-session.js": "52ad4fc728657898",
+  "./js/views/prescribed.js": "0ae8c1283826141d",
+  "./js/views/prescribed-session.js": "a4efb7a0bb697409",
   "./js/views/quiet-session.js": "73c106032a745253",
   "./js/views/breathing-session.js": "26387298908f3076",
   "./js/views/morning-session.js": "e1efd26a71ffd68c",

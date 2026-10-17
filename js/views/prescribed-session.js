@@ -1,6 +1,14 @@
 /**
  * prescribed-session.js - My exercises, played
  *
+ * 17 Oct 2026 v15
+ *
+ * v15 - D662-10 OLD-STARS (Graeme, 17 Oct: "Remove them"). No "+35 ⭐" on
+ *   each move: the older per-move count, which nothing shows or uses (the
+ *   social action credits are 1 or 2 a session, Settings › Community
+ *   impact). The count itself is still kept, untouched. "1 set", not
+ *   "1 sets". As it was: BNH-Files, Archive/DEVICE-662/D662-10 old-stars.
+ *
  * 05 Oct 2026 v14
  *
  * v14 - D-7 PLAN-IMPORT. Plays one group of My exercises when one is
@@ -297,9 +305,8 @@ export function render() {
         ` : ""}
 
         <div class="exercise-meta">
-          ${ex.sets ? `<span class="meta-tag">${_esc(ex.sets)} sets</span>` : ""}
+          ${ex.sets ? `<span class="meta-tag">${_esc(ex.sets)} ${Number(ex.sets) === 1 ? "set" : "sets"}</span>` : ""}
           ${ex.reps ? `<span class="meta-tag">${_esc(ex.reps)}</span>` : ""}
-          <span class="meta-tag">+${creditsForIndex(currentIndex, active.length)} \u2B50</span>
         </div>
 
         <!-- CARD-3. One card, three pages, and it renders whether or not

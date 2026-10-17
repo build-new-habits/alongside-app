@@ -1,6 +1,14 @@
 /**
  * prescribed.js - My exercises
  *
+ * 17 Oct 2026 v1.11
+ *
+ * v1.11 - D662-10 OLD-STARS (Graeme, 17 Oct: "is there any value here?
+ *   Remove them"). "Up to +150 ⭐" is gone: it was the older per-move count,
+ *   which nothing shows or uses; the social action credits are 1 or 2 a
+ *   session (Settings › Community impact). As it was: BNH-Files,
+ *   Archive/DEVICE-662/D662-10 old-stars.
+ *
  * 17 Oct 2026 v1.10
  *
  * v1.10 - Graeme's device check of v662 (13 Oct; "Can we fix them now?",
@@ -105,10 +113,6 @@ import { healthAllowed } from "../data/health-consent.js";
 
 export const centered = false;
 
-// ── Credit constants (must match prescribed-session.js) ───────────────────────
-const CREDITS_PER_EXERCISE = 35;
-const CREDITS_MAX          = 150;
-
 // ── View state ────────────────────────────────────────────────────────────────
 let showAddForm = false;
 
@@ -158,7 +162,6 @@ export function render() {
   const checkin    = store.get("lastCheckin") || {};
   const energy     = checkin.energy || null;
   const coachLine  = buildCoachLine(exercises, energy);
-  const creditsAvail = Math.min(active.length * CREDITS_PER_EXERCISE, CREDITS_MAX);
 
   return `
     <div class="view prescribed-view">
@@ -182,7 +185,7 @@ export function render() {
       <!-- ── Exercise list ────────────────────────────────────────────────── -->
       ${exercises.length === 0
         ? renderEmptyState()
-        : renderExerciseList(active, done, creditsAvail)
+        : renderExerciseList(active, done)
       }
 
       <!-- ── Add exercise form ────────────────────────────────────────────── -->
@@ -226,18 +229,13 @@ function renderEmptyState() {
 
 // ── Exercise list ─────────────────────────────────────────────────────────────
 
-function renderExerciseList(active, done, creditsAvail) {
+function renderExerciseList(active, done) {
   return `
     <div class="prescribed-list-section">
 
       ${active.length > 0 ? `
         <div class="prescribed-list-header">
           <h2 class="section-heading">${groupsOf(active).some(g => g.name) ? "Your exercises" : "To do today"}</h2>
-          ${creditsAvail > 0
-            ? `<span class="prescribed-credits-badge" aria-label="Up to ${creditsAvail} credits available">
-                Up to +${creditsAvail} &#11088;
-               </span>`
-            : ""}
         </div>
 
         ${renderGroups(active)}

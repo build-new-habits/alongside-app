@@ -1,6 +1,14 @@
 /**
  * tools/verify-device-662.mjs
- * 17 Oct 2026 v2
+ * 17 Oct 2026 v3
+ *
+ * v3 - D662-10 OLD-STARS (Graeme, 17 Oct: "is there any value here?
+ *   Remove them"). My exercises said "Up to +150 ⭐" and each move in its
+ *   player "+35 ⭐": the older per-move count (totalCredits), which nothing
+ *   has shown or used since August. The social action credits are
+ *   community.credits (1 a session on Free, 2 on the Plan, Settings ›
+ *   Community impact), so the stars promised what the app does not give.
+ *   Gone from both screens; the player says "1 set" too.
  *
  * v2 - the rest of the device check's list (Graeme, 17 Oct: "Can we fix
  *   them now?"):
@@ -66,6 +74,7 @@ const saved = await import(B + "views/saved-sessions.js");
 const { ProgressView } = await import(B + "views/progress.js");
 const { strandReadback } = await import(B + "data/arc-readback.js");
 const fs = await import("node:fs");
+const player = await import(B + "views/prescribed-session.js");
 const { router: realRouter } = await import(B + "router.js");
 
 let fails = 0, passes = 0;
@@ -193,6 +202,19 @@ main.innerHTML = ""; ProgressView(rtr).mount(main);
 const arcText = txt(main);
 ok("9pc. the finish would say: A back that copes", lit.join() === "A back that copes", lit.join());
 ok("9a. Progress says it was worked today", /A back that copes\s*Worked today/.test(arcText), arcText.slice(arcText.indexOf("Your arc"), arcText.indexOf("Your arc") + 200));
+
+console.log("\nTEST 10 - no old credit stars");
+fixture("personal");
+store.set("prescribedExercises", [{ id: "p1", name: "Cat-Cow Flow", sets: 1, reps: "8" }, { id: "p2", name: "Dead Bug", sets: 3, reps: "8" }]);
+main.innerHTML = prescribed.render(); try { prescribed.onMount(); } catch {}
+const listText = txt(main);
+ok("10pc. My exercises is showing its list", /Cat-Cow Flow/.test(listText));
+ok("10a. My exercises: no \"Up to +…\" and no star", !/Up to \+\d/.test(listText) && !/\u2B50/.test(main.innerHTML) && !main.querySelector(".prescribed-credits-badge"));
+main.innerHTML = ""; try { main.innerHTML = player.render(); player.onMount(); } catch {}
+const playText = txt(main);
+ok("10pc2. the player is showing the first move", /Cat-Cow Flow/.test(playText), playText.slice(0, 160));
+ok("10b. the player: no \"+35 ⭐\"", !/\+\d+\s*\u2B50/.test(playText) && !/\u2B50/.test(main.innerHTML));
+ok("10c. the player says 1 set", /\b1 set\b/.test(playText) && !/\b1 sets\b/.test(playText), playText.slice(0, 200));
 
 console.log(`\nVERIFY-DEVICE-662: ${passes} passed, ${fails} failed`);
 process.exit(fails ? 1 : 0);
