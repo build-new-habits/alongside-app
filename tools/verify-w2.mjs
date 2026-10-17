@@ -1,5 +1,10 @@
 /**
  * tools/verify-w2.mjs
+ * 17 Oct 2026 v4
+ *
+ * v4 - W6-17 (Graeme, 04 Oct: "I guess option 1"). W2-2 asserts by behaviour that today
+ *   is left out of sessionsInLastThreeDays().
+ *
  * 28 Sep 2026 v3
  *
  * v3 - Work list 2e. W2-2's "nothing stores a bias" read checkin.js and
@@ -127,14 +132,16 @@ check('W2-2 nothing stores a bias that could survive a day',
 // The rule it guarded -- today is excluded -- was right and is kept.
 // It is now asserted by BEHAVIOUR: log today and yesterday, and the run
 // must be one day, not two.
-check('W2-2 and today is excluded from the run it counts',
-  /d < today/.test(chkSrc) && (await (async () => {
+// W6-17 (v4): the count is sessions in the last three days; today is
+// still left out. Asserted by behaviour only.
+check('W2-2 and today is excluded from what it counts',
+  (await (async () => {
     const { store } = await import(new URL("../js/store.js", import.meta.url).href);
-    const { consecutiveActiveDays } = await import(new URL("../js/data/checkin.js", import.meta.url).href);
+    const { sessionsInLastThreeDays } = await import(new URL("../js/data/checkin.js", import.meta.url).href);
     localStorage.clear(); store.init();
     store.logActivity({ type: "workout", completedAt: new Date(Date.now() - 86400000).toISOString() });
     store.logActivity({ type: "workout", completedAt: new Date().toISOString() });
-    return consecutiveActiveDays() === 1;
+    return sessionsInLastThreeDays() === 1;
   })()),
   'counting today would soften the very session about to be done');
 

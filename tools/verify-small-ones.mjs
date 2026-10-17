@@ -1,5 +1,10 @@
 /**
  * tools/verify-small-ones.mjs
+ * 17 Oct 2026 v3
+ *
+ * v3 - W6-17 (Graeme, 04 Oct: "I guess option 1"). 6a counts sessions in the last three
+ *   days (sessionsInLastThreeDays); the date-as-timestamp fixture is kept.
+ *
  * 02 Oct 2026 v2
  *
  * v2 - W4-1 GATE-OPEN. The fixture person has agreed (tools/agreed.mjs): the
@@ -163,7 +168,8 @@ fixture("free");
   // As the players write them: date as a full timestamp.
   store.set("activityLog", [1, 2, 3].map(n => ({ id: "w" + n, type: "workout", status: "completed", date: d(n), completedAt: d(n) })));
   const CK = await import(B + "data/checkin.js");
-  ok("6a. three days running are counted (the date bug read 0)", CK.consecutiveActiveDays() === 3, String(CK.consecutiveActiveDays()));
+  // W6-17 (v3): sessions in the last three days, not days in a row.
+  ok("6a. three sessions in the last three days are counted (the date bug read 0)", CK.sessionsInLastThreeDays() === 3, String(CK.sessionsInLastThreeDays()));
   const SB = await import(B + "session-builder.js");
   const s = SB.buildSession({ sessionType: "full", durationMins: 30 });
   const line = [s.gentleLine, s.coachLine, s.reasonLine, s.note].filter(Boolean).join(" ") || JSON.stringify(s).match(/moving a lot lately[^"]*/)?.[0] || "";

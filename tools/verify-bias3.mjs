@@ -1,5 +1,10 @@
 /**
  * tools/verify-bias3.mjs
+ * 17 Oct 2026 v4
+ *
+ * v4 - W6-17 (Graeme, 04 Oct: "I guess option 1"). consecutiveActiveDays() is gone; the
+ *   facade carries sessionsInLastThreeDays(), and today is still excluded.
+ *
  * 28 Sep 2026 v3
  *
  * v3 - Work list 2e. TEST 2 executed workoutGenerator.generateDailyOptions()
@@ -80,8 +85,8 @@ fresh();
 check("checkinData.coachBias is callable through the facade",
   typeof checkinData.coachBias === "function",
   "anything reaching this module through the facade finds it");
-check("checkinData.consecutiveActiveDays is callable through the facade",
-  typeof checkinData.consecutiveActiveDays === "function");
+check("checkinData.sessionsInLastThreeDays is callable through the facade",
+  typeof checkinData.sessionsInLastThreeDays === "function");
 
 // ── 2. THE LIVE CALLER ───────────────────────────────────────────────
 //
@@ -91,9 +96,10 @@ check("checkinData.consecutiveActiveDays is callable through the facade",
 {
   const sb = fs.readFileSync(_gatePath("js/session-builder.js"), "utf8");
   const line = (sb.match(/import\s*\{[^}]*\}\s*from\s*"\.\/data\/checkin\.js"/) || [""])[0];
-  check("the live builder imports coachBias and consecutiveActiveDays by name",
-    /\bcoachBias\b/.test(line) && /\bconsecutiveActiveDays\b/.test(line), line);
-  check("and calls them", /coachBias\(\) === "lighter"/.test(sb) && /consecutiveActiveDays\(\)/.test(sb));
+  // W6-17 (v4). The builder reads the count only through coachBias().
+  check("the live builder imports coachBias by name",
+    /\bcoachBias\b/.test(line), line);
+  check("and calls it", /coachBias\(\) === "lighter"/.test(sb));
 }
 
 // ── 3. THE STRUCTURAL GUARD ──────────────────────────────────────────
@@ -164,11 +170,11 @@ check("checkinData.consecutiveActiveDays is callable through the facade",
   fresh();
   const d = n => new Date(Date.now() - n * 864e5).toISOString().split("T")[0];
   store.set("activityLog", [{ date: d(1) }, { date: d(2) }, { date: d(3) }]);
-  check("three consecutive days produces a 'lighter' bias",
+  check("three sessions in the last three days produce a 'lighter' bias",
     checkinData.coachBias() === "lighter",
     `got ${JSON.stringify(checkinData.coachBias())}`);
   fresh();
-  check("one day is not a run — no bias",
+  check("one session is not a busy few days — no bias",
     checkinData.coachBias() === null);
 }
 
@@ -188,9 +194,9 @@ check("checkinData.consecutiveActiveDays is callable through the facade",
   fresh();
   const day = n => new Date(Date.now() - n * 864e5).toISOString().split("T")[0];
   store.set("activityLog", [{ date: day(0) }, { date: day(1) }, { date: day(2) }]);
-  check("today is excluded from the consecutive run",
-    checkinData.consecutiveActiveDays() === 2,
-    `got ${checkinData.consecutiveActiveDays()}, expected 2 (yesterday and the ` +
+  check("today is excluded from the count",
+    checkinData.sessionsInLastThreeDays() === 2,
+    `got ${checkinData.sessionsInLastThreeDays()}, expected 2 (yesterday and the ` +
     "day before, not today) — counting today would soften the very session " +
     "they are about to do");
 

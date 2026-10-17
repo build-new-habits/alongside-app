@@ -382,7 +382,7 @@ export function render() {
                  style="margin-top: var(--space-5);">
           <div style="display: flex; align-items: center; justify-content: space-between;
                       margin-bottom: var(--space-3);">
-            <h2 class="section-label" id="reflections-heading"
+            <h2 class="section-label" id="reflections-heading" tabindex="-1"
                 style="color: var(--color-primary); font-size: var(--text-lg);
                        font-weight: var(--font-semibold);">
               Your reflections

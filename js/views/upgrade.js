@@ -358,7 +358,7 @@ export function render() {
           The Plan gives you a coach who also knows where you want to get to,
           and builds towards it.
         </p>
-      </section>
+      </header>
 
       <!-- WHAT CHANGES. Not a feature list, and deliberately not a
            comparison table -- the doc calls for plain statements with

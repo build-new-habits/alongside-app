@@ -1,6 +1,20 @@
 /**
  * tools/verify-a11y-w5.mjs
- * 03 Oct 2026 v1
+ * 17 Oct 2026 v2
+ *
+ * v2 - W6-18 A11Y-W6 (Wave 6 findings §4). Each item checked against
+ *   v671 first. Already right, so asserted here to hold: Settings has no
+ *   heading inside a <summary>; the journal's Save is named as it reads;
+ *   Begin, a journal delete and Settings leave focus on the page, not the
+ *   body; the Bad-day choice is named in plain words, not "Severe pain";
+ *   equipment cards are buttons inside list items; the upgrade page's
+ *   header closes as a header. Still wrong, and fixed (red first):
+ *   11. Weight tracking and Show your best: their descriptions linked
+ *       (aria-describedby), and Show your best's label points at its
+ *       switch (it named an id nothing had).
+ *   12. The builder's 30 minutes: "Recommended" in its accessible name.
+ *   13. The update banner: after the page in reading order and fixed above
+ *       the bottom bar, so it no longer pushes what is being read down.
  *
  * W5-17 A11Y-W5 (Wave 5 persona trace, all tracers). One assertion each:
  *
@@ -166,6 +180,50 @@ AC.showAgeError(q, "t", "empty");
 const month = q.querySelector("#t-month");
 ok("10a. aria-invalid, and the message in its description", month?.getAttribute("aria-invalid") === "true" && /\bt-error\b/.test(month?.getAttribute("aria-describedby") || ""),
    `${month?.getAttribute("aria-invalid")} | ${month?.getAttribute("aria-describedby")}`);
+
+// ── 11-13. W6-18 ────────────────────────────────────────────────────────
+console.log("\nTEST 11 - every switch's description is read with it");
+const { settingsFind } = await import(new URL("./settings-open.mjs", import.meta.url).href);
+localStorage.clear(); store.init(); agreed(store); store.set("onboardingComplete", true); store.set("name", "Ann"); store.set("tier", "personal");
+const s11 = oneScreen(document.createElement("div")); SettingsView({ navigate() {}, back() {} }).mount(s11); await wait(20);
+// The section pages' switches (_rowSwitch) already link theirs; the two row
+// screens (Your weight and units, About session notes) carry their own.
+store.set("weightTracking", true);
+for (const [open, id, word] of [["weight", "settings-weight-tracking", "never ask you to weigh"], ["notes", "settings-pb-note", "highest you have logged"]]) {
+  SettingsView({ navigate() {}, back() {} }).mount(s11); await wait(10);
+  const row = settingsFind(s11, `[data-open="${open}"]`);
+  click(row); await wait(10);
+  const sw = s11.querySelector("#" + id);
+  const desc = (sw?.getAttribute("aria-describedby") || "").split(/\s+/).map(d => d && s11.querySelector("#" + d)).filter(Boolean).map(txt).join(" ");
+  ok(`11a-${open}. ${id} described by its line`, !!sw && desc.includes(word), `${row ? "row found" : "no row"}, ${sw ? "switch found" : "no switch"}; described: "${desc.slice(0, 80)}"`);
+  ok(`11b-${open}. its label points at it`, !!sw && !!s11.querySelector(`label[for="${id}"]`));
+}
+for (const sw of s11.querySelectorAll('[role="switch"]')) {
+  const d = sw.getAttribute("aria-describedby");
+  if (d) ok(`11c. ${sw.id}: describedby names an element that is there`, d.split(/\s+/).every(x => s11.querySelector("#" + x)));
+}
+const sumH = [...document.querySelectorAll("summary h1, summary h2, summary h3")].length + [...s11.querySelectorAll("summary h2, summary h3")].length;
+ok("11d. HOLDS: no heading inside a summary in Settings", sumH === 0);
+
+console.log("\nTEST 12 - Recommended is in the name");
+{
+  localStorage.clear(); store.init(); agreed(store); store.set("onboardingComplete", true); store.set("name", "Ann");
+  const ui = await import(B + "views/session-builder-ui.js");
+  main.innerHTML = ui.render(); ui.onMount();
+  click([...main.querySelectorAll(".sb-type-tile")].find(b => b.dataset.type === "full"));
+  click(main.querySelector("#sb-location-continue-btn"));
+  const b30 = [...main.querySelectorAll(".sb-duration-btn")].find(b => b.dataset.mins === "30");
+  const name = b30?.getAttribute("aria-label") || txt(b30);
+  ok("12pc. the 30 minute choice is on screen, marked Recommended", !!b30 && /Recommended/.test(txt(b30)), txt(main).slice(0, 120));
+  ok("12a. and its name says so", /recommended/i.test(name), name);
+}
+
+console.log("\nTEST 13 - the update banner does not push the page");
+const { APP_TEST } = await import(B + "app.js").catch(() => ({}));
+const css13 = src("css/components/finish.css");
+const rule13 = css13.slice(css13.indexOf(".update-banner {"), css13.indexOf("}", css13.indexOf(".update-banner {")));
+ok("13a. after the page in reading order (not inserted above it)", !/app\.insertBefore\(banner, main\)/.test(bannerFn) && /insertBefore\(banner, main\.nextSibling\)|after\(banner\)|appendChild\(banner\)/.test(bannerFn), bannerFn.slice(bannerFn.indexOf("const app"), bannerFn.indexOf("const app") + 200));
+ok("13b. fixed above the bottom bar, out of the page's flow", /position:\s*fixed/.test(rule13) && /bottom:\s*calc\([^)]*--nav-height/.test(rule13), rule13);
 
 console.log("");
 if (fails) { console.log(`A11Y-W5: ${fails} FAILED, ${passes} passed`); process.exit(1); }

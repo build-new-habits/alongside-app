@@ -1,5 +1,10 @@
 /**
  * tools/verify-delight.mjs
+ * 17 Oct 2026 v3
+ *
+ * v3 - W6-17 (Graeme, 04 Oct: "I guess option 1"). The lighter-day rule is read as
+ *   sessionsInLastThreeDays() >= 3; days in a row are counted nowhere.
+ *
  * 21 Aug 2026 v2
  * GATE-PATH. Path resolution only -- no assertion changed.
  *
@@ -215,8 +220,10 @@ check('the stored key is a count, not a streak',
 // management, not reward — the opposite of a streak, and correct.
 const chk = fs.readFileSync(
   new URL('../js/data/checkin.js', import.meta.url), 'utf8');
-check('several days in a row still makes the next session LIGHTER',
-  /consecutiveActiveDays\(\) >= 3 \? 'lighter'/.test(chk),
+// W6-17 (v3). A busy few days, counted as SESSIONS in the last three
+// days, never as days in a row (verify-busy-days drives it).
+check('a busy few days still makes the next session LIGHTER',
+  /sessionsInLastThreeDays\(\) >= 3 \? 'lighter'/.test(chk),
   'load management, not reward — the opposite mechanic, and correct');
 check('and it is still never rewarded as a streak',
   !/streak/i.test(chk),

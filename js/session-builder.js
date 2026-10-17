@@ -1,6 +1,14 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
+ * 17 Oct 2026 v89
+ *
+ * v89 - W6-17 CONSECUTIVE-DAYS. The lighter plan after a busy few days is
+ *   reason "busy" (it was "streak"), read from coachBias(), which counts
+ *   sessions in the last three days, never days in a row (checkin.js
+ *   v15). The sentence is unchanged ("You've been moving a lot lately").
+ *   GENTLE_LINES is exported so a check can read what is said.
+ *
  * 17 Oct 2026 v88
  *
  * v88 - W6-11 LIFT-ORDER (Wave 6, persona 2.15). After the top-up, the
@@ -1255,7 +1263,7 @@ import { getZoneStatus, getPainBand, getCondition, getActiveConditionIds, isSore
 import { focusOrderedCategories } from "./data/week-focus.js";
 // BURNOUT-LIVE, 16 Sep 2026. checkin.js imports only the store, so this
 // closes no cycle.
-import { detectBurnout, coachBias, consecutiveActiveDays, coldStartBias } from "./data/checkin.js";
+import { detectBurnout, coachBias, coldStartBias } from "./data/checkin.js";
 
 // ── Allocation presets (05 Aug 2026) ──────────────────────────────────────────
 // Scales EXERCISE_COUNT's warmup/main/cooldown split. Warmup always floors at
@@ -1378,7 +1386,7 @@ function _gentleReason() {
   } catch { /* no check-in today: nothing to read */ }
   if (_burnoutActive()) return { id: "burnout" };
   try {
-    if (coachBias() === "lighter") return { id: "streak" };
+    if (coachBias() === "lighter") return { id: "busy" };   // W6-17
   } catch { /* history unreadable: not a reason */ }
   try {
     if (coldStartBias() === "lighter") return { id: "declared" };
@@ -1398,12 +1406,12 @@ function _sessionIntensity() {
  * The app says what it was told; it does not label anybody.
  * 🟡 Draft wording, all of it, for the end-of-list review.
  */
-const GENTLE_LINES = {
+export const GENTLE_LINES = {
   today:    () => "You said your energy's low today, so this is shorter than usual with more time to settle at the end.",
   sleep:    () => "You said you slept badly, so I've kept this gentler today.",
   burnout:  () => "Your check-ins this week have mostly been low on energy, so I've kept this gentler even though today feels better.",
   // P26. No count: a number of days is a streak, however kindly said.
-  streak:   () => "You've been moving a lot lately, so today's a lighter one to let that settle.",
+  busy:     () => "You've been moving a lot lately, so today's a lighter one to let that settle.",
   declared: () => "You told me things have been running low lately, so I'm starting you gently."
 };
 

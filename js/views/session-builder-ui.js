@@ -1,6 +1,11 @@
 /**
  * js/views/session-builder-ui.js - Session Builder UI
  *
+ * 17 Oct 2026 v34
+ *
+ * v34 - W6-18 A11Y-W6. The 30 minutes choice says "Recommended" in its
+ *   accessible name, as it does on screen (the name left it out).
+ *
  * 06 Oct 2026 v33
  *
  * v33 - D-11 PROGRESS-SHARE. Let's go records where this session is
@@ -1124,7 +1129,7 @@ function renderDurationPicker() {
             <button class="card sb-duration-btn"
                     data-mins="${d.mins}"
                     style="display:flex;align-items:center;justify-content:space-between;text-align:left;width:100%;cursor:pointer;background:var(--color-surface);"
-                    aria-label="${d.label}: ${d.desc}">
+                    aria-label="${d.label}: ${d.desc}${d.mins === 30 ? '. Recommended' : ''}">
               ${inner}
               ${recLabel}
             </button>

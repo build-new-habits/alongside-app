@@ -597,7 +597,7 @@ function renderMindfulSession(step) {
     <div class="card card-coach quiet-coach-card" style="margin-bottom:var(--space-4);">
       <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
       <div>
-        <h3>${step.name}</h3>
+        <h3 id="quiet-step-name" tabindex="-1">${step.name}</h3>
         <p class="text-sm">${step.instruction}</p>
         ${step.coaching ? `
           <p class="text-sm text-muted" style="margin-top:var(--space-3);">
@@ -776,6 +776,9 @@ function startMindfulSession() {
   if (content) {
     content.innerHTML = renderMindfulSession(session[0]);
     document.getElementById("quiet-mindful-stop-btn")?.addEventListener("click", stopMindful);
+    // W6-18. Begin is gone from the page: focus the first practice's name
+    // (it dropped to the page body).
+    document.getElementById("quiet-step-name")?.focus();
   }
 
   runMindfulTimer(session);

@@ -256,8 +256,7 @@ export function JournalEntryView(router) {
         <div class="je-footer">
           <button class="btn btn-primary je-save-btn"
                   data-action="save"
-                  id="je-save-btn"
-                  aria-label="Save this entry">
+                  id="je-save-btn">
             Save entry
           </button>
         </div>

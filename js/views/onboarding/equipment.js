@@ -262,10 +262,9 @@ function renderFacilityCard(f) {
   if (f.id === "no-equipment") {
     const bwActive = bodyweightSelected;
     return `
-      <button class="equip-facility-card ${bwActive ? "equip-facility-card--active" : ""}"
+      <div role="listitem"><button class="equip-facility-card ${bwActive ? "equip-facility-card--active" : ""}"
               data-facility="no-equipment"
               data-bodyweight-toggle="true"
-              role="listitem"
               aria-pressed="${bwActive}"
               aria-label="${f.label}. ${f.description}. ${bwActive ? "Selected." : "Tap to select."}">
         <span class="equip-facility-icon" aria-hidden="true">${f.icon}</span>
@@ -274,14 +273,13 @@ function renderFacilityCard(f) {
           <span class="equip-facility-desc">${f.description}</span>
         </span>
         ${bwActive ? `<span class="equip-facility-check" aria-hidden="true">&#10003;</span>` : `<span class="equip-facility-chevron" aria-hidden="true">&#8250;</span>`}
-      </button>
+      </button></div>
     `;
   }
 
   return `
-    <button class="equip-facility-card ${isActive ? "equip-facility-card--active" : ""}"
+    <div role="listitem"><button class="equip-facility-card ${isActive ? "equip-facility-card--active" : ""}"
             data-facility="${f.id}"
-            role="listitem"
             aria-label="${f.label}. ${f.description}. ${isActive ? "Items selected. " : ""}Tap to open.">
       <span class="equip-facility-icon" aria-hidden="true">${f.icon}</span>
       <span class="equip-facility-body">
@@ -289,7 +287,7 @@ function renderFacilityCard(f) {
         <span class="equip-facility-desc">${f.description}</span>
       </span>
       ${isActive ? `<span class="equip-facility-check" aria-hidden="true">&#10003;</span>` : `<span class="equip-facility-chevron" aria-hidden="true">&#8250;</span>`}
-    </button>
+    </button></div>
   `;
 }
 

@@ -1,5 +1,11 @@
 /**
  * app.js - Application entry point
+ * 17 Oct 2026 v15
+ *
+ * v15 - W6-18 A11Y-W6. The update banner goes after the page in reading
+ *   order and sits fixed above the bottom bar (finish.css v5): put above
+ *   the page, it pushed whatever was being read down the screen.
+ *
  * 12 Oct 2026 v14
  *
  * v14 - A-8 SPEED (Stage AWARD). After the first screen, from Home, the
@@ -191,8 +197,9 @@ function showUpdateBanner() {
   `;
   const app  = document.getElementById("app");
   const main = document.getElementById("main-content");
-  if (app && main) app.insertBefore(banner, main);
-  else document.body.insertBefore(banner, document.body.firstChild);
+  // W6-18. After the page, never above it: nothing being read moves.
+  if (app && main) app.insertBefore(banner, main.nextSibling);
+  else document.body.appendChild(banner);
   document.getElementById("update-apply-btn")?.addEventListener("click", () => { banner.remove(); applyUpdate(); });
   document.getElementById("update-dismiss-btn")?.addEventListener("click", () => banner.remove());
 }

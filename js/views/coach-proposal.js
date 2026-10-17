@@ -1,5 +1,10 @@
 /**
  * coach-proposal.js
+ * 17 Oct 2026 v62
+ *
+ * v62 - W6-17. The lighter plan after a busy few days is reason "busy"
+ *   (session-builder.js v89; it was "streak").
+ *
  * 17 Oct 2026 v61
  *
  * v61 - W6-19 EMPATHY-GAPS (Wave 6, personas 2.13, 2.4). A Struggling or
@@ -2872,7 +2877,7 @@ export function CoachProposalView(router) {
       // stretch session, which is what keeps the note silent.
       stretchTarget: built.stretchTarget || null,
       // W3-10. A lighter day the person can turn down.
-      lighter:       built.gentleReason === 'streak',
+      lighter:       built.gentleReason === 'busy',
       // W6-1 / W6-7. Carried onto the stored plan, so the player and the
       // log know a gentle or lighter plan for what it is.
       gentleCare:    !!built.gentleCare,

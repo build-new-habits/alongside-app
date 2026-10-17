@@ -1,5 +1,15 @@
 /**
  * checkin.js
+ * 17 Oct 2026 v15
+ *
+ * v15 - W6-17 CONSECUTIVE-DAYS (Graeme, 04 Oct: "I guess option 1").
+ *   consecutiveActiveDays() is gone: it counted days in a row (never shown),
+ *   and the product counts nothing in a row. coachBias() now reads
+ *   sessionsInLastThreeDays(): three movement sessions in the three days
+ *   before today still make today's plan lighter, so a busy few days is
+ *   answered as before, but two sessions on one day and one two days later
+ *   count the same as three days running. On the facade too.
+ *
  * 17 Oct 2026 v14
  *
  * v14 - W6-19 EMPATHY-GAPS. lowMoodToday(): the person's own word for a
@@ -237,9 +247,9 @@ export function coachBias() {
     if (Number(getTodaysCheckin()?.energy) >= 9) return null;
   } catch { /* nothing readable: the count decides */ }
   // Three is coach-reflection.js's original threshold, kept rather than
-  // re-chosen. Changing a number while moving code is how a move
-  // becomes a silent behaviour change.
-  return consecutiveActiveDays() >= 3 ? 'lighter' : null;
+  // re-chosen. W6-17: three sessions in the last three days, not three
+  // days in a row.
+  return sessionsInLastThreeDays() >= 3 ? 'lighter' : null;
 }
 
 // W3-10. Decision 4a: breathing and quiet practices are not movement.
@@ -252,35 +262,20 @@ export function countsAsMovement(e) {
 }
 
 /**
- * Days in a row, counting BACK from yesterday.
- *
- * Lifted from coach-reflection.js unchanged, because it was the only
- * definition and it was about to be deleted with the file. Today is
- * deliberately excluded: somebody who has already moved today has not
- * yet made it a longer run, and counting it would soften the very
- * session they are about to do.
+ * W6-17 (v15; Graeme, 04 Oct: "I guess option 1"). Movement sessions in the
+ * three days before today. It replaced consecutiveActiveDays(), which
+ * counted days in a row: the product counts nothing in a row, shown or
+ * not. Today is left out, as it was: somebody who has already moved today
+ * has not yet made it a busier few days, and counting it would soften the
+ * very session they are about to do. Local calendar days (P26); a quiet
+ * practice, or a session stopped under ten minutes, is not movement
+ * (W3-10). The local day of completedAt, else of date; a bare
+ * "YYYY-MM-DD" is taken as it is (GENTLE-SIGNALS, P26).
  */
-export function consecutiveActiveDays() {
+export function sessionsInLastThreeDays() {
   const log = store.get('activityLog') || [];
-  // P26. Local calendar days throughout, as a person counts them.
   const local = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-  const today = local(new Date());
-  // 🔴 GENTLE-SIGNALS, 16 Sep 2026. THIS READ A FIELD NO ENTRY HAS.
-  //
-  // It counted `e.date`. store.logActivity() writes id, type,
-  // completedAt and sessionType -- no `date`. So this returned 0 for
-  // every user, always, and coachBias() ("three days running -> go
-  // lighter") could never fire even had anything called it. Found by
-  // logging an activity and reading back its fields, which is the
-  // eighth time this session that a field assumed to exist did not.
-  //
-  // `date` is still honoured first, for any caller that sets one;
-  // completedAt is the field every entry actually carries.
-  //
-  // P26, 29 Sep 2026. And `date` is written by the players as a full
-  // timestamp, so compared whole it never matched a day. Now: the local
-  // day of completedAt, else of date; a bare "YYYY-MM-DD" is taken as it
-  // is (new Date() would read it as UTC midnight).
+  const days = new Set([1, 2, 3].map(n => { const d = new Date(); d.setDate(d.getDate() - n); return local(d); }));
   const dayOf = e => {
     const v = e && (e.completedAt || e.date);
     if (typeof v !== 'string' || !v) return null;
@@ -288,19 +283,7 @@ export function consecutiveActiveDays() {
     const d = new Date(v);
     return isNaN(d) ? null : local(d);
   };
-  const activeDates = new Set(log.filter(countsAsMovement).map(dayOf).filter(d => d && d < today));
-  let count = 0;
-  const cursor = new Date();
-  cursor.setDate(cursor.getDate() - 1);
-  // Bounded. An unbounded while-loop over a Set that could be seeded
-  // with odd data is a hang, not a bug report.
-  for (let i = 0; i < 400; i++) {
-    const dateStr = local(cursor);
-    if (!activeDates.has(dateStr)) break;
-    count++;
-    cursor.setDate(cursor.getDate() - 1);
-  }
-  return count;
+  return log.filter(countsAsMovement).filter(e => days.has(dayOf(e))).length;
 }
 
 export function coldStartBias() {
@@ -495,7 +478,7 @@ export const checkinData = {
   getSuggestedIntensity,
   coldStartBias,
   coachBias,
-  consecutiveActiveDays,
+  sessionsInLastThreeDays,
   getEnergyEmoji,
   getEnergyLabel,
   getMoodEmoji,

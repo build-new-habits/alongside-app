@@ -1,5 +1,13 @@
 /**
  * settings.js
+ * 17 Oct 2026 v71
+ *
+ * v71 - W6-18 A11Y-W6. The two switches drawn on their own screens (Your
+ *   weight and units; About session notes) read their line with them
+ *   (aria-describedby), as the section pages' switches already did; and
+ *   Show your best's label points at its switch (it named settings-pb,
+ *   the section page's id, which is not on this screen).
+ *
  * 17 Oct 2026 v70
  *
  * v70 - W6-9 SMALL-6. A yes to the health consent comes back to the Settings
@@ -939,10 +947,10 @@ export function SettingsView(router) {
       <li class="settings-row settings-row--switch">
         <label class="settings-row__text" for="${id}">
           <span class="settings-row__label">${_esc(label)}</span>
-          ${sub ? `<span class="settings-row__sub">${_esc(sub)}</span>` : ''}
+          ${sub ? `<span class="settings-row__sub" id="${id}-desc">${_esc(sub)}</span>` : ''}
         </label>
         <button class="settings-toggle ${on ? 'settings-toggle--on' : ''}" id="${id}" role="switch"
-                aria-checked="${on ? 'true' : 'false'}"
+                aria-checked="${on ? 'true' : 'false'}"${sub ? ` aria-describedby="${id}-desc"` : ''}
                 ${disp ? `data-disp-toggle="${disp}"` : `data-toggle="${field}"`}
                 aria-label="${_esc(label)}">
           <span class="settings-toggle__track" aria-hidden="true"></span>
@@ -1477,13 +1485,14 @@ export function SettingsView(router) {
       <div class="settings-field settings-field--toggle">
         <label class="settings-label" for="settings-weight-tracking">
           Weight tracking
-          <span class="settings-label__sub">Off unless you want it. Turn it on to record your weight and set a target, and I'll take it into account. I'll never ask you to weigh yourself.</span>
+          <span class="settings-label__sub" id="settings-weight-tracking-desc">Off unless you want it. Turn it on to record your weight and set a target, and I'll take it into account. I'll never ask you to weigh yourself.</span>
         </label>
         <button
           class="settings-toggle ${on ? 'settings-toggle--on' : ''}"
           id="settings-weight-tracking"
           role="switch"
           aria-checked="${on ? 'true' : 'false'}"
+          aria-describedby="settings-weight-tracking-desc"
           data-toggle="weightTracking"
           aria-label="Weight tracking">
           <span class="settings-toggle__track" aria-hidden="true"></span>
@@ -2124,9 +2133,9 @@ export function SettingsView(router) {
         </p>
 
         <div class="settings-field settings-field--toggle">
-          <label class="settings-label" for="settings-pb">
+          <label class="settings-label" for="settings-pb-note">
             Show your best
-            <span class="settings-label__sub">The highest you have logged for an exercise, alongside your last note. Off unless you want it.</span>
+            <span class="settings-label__sub" id="settings-pb-note-desc">The highest you have logged for an exercise, alongside your last note. Off unless you want it.</span>
           </label>
           <button
             class="settings-toggle ${pbOn ? 'settings-toggle--on' : ''}"
@@ -2134,6 +2143,7 @@ export function SettingsView(router) {
             data-toggle="showPersonalBests"
             role="switch"
             aria-checked="${pbOn ? 'true' : 'false'}"
+            aria-describedby="settings-pb-note-desc"
             aria-label="Show your best">
             <span class="settings-toggle__track" aria-hidden="true"></span>
           </button>

@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 17 Oct 2026 v671
+ * 17 Oct 2026 v672
  *
+ * v672 - W6-17/W6-18: a busy few days (three sessions in the three days before today) still makes the plan lighter, and nothing counts days in a row; Weight tracking and Show your best read their description with the switch; the 30 minutes choice says Recommended to a screen reader; the update banner sits above the bottom bar instead of pushing the page down.
  * v671 - W6-13/W6-19: someone whose goals are less stress or better sleep sees the winding-down aims first when setting an arc; a Struggling or Low mood this morning is answered in their word, on Home with Wellbeing and on Today's plan with Something gentler and Wellbeing.
  * v670 - W6-11/W6-12: a gym session's main part runs heavy lifts first and carries, holds and core last (power cleans and snatches no longer come after carries and throws), and a barbell lift's minutes include its warm-up sets; Yoga & Pilates offers the practice once, twice or three times through, each card saying its real minutes, and the finish records those minutes.
  * v669 - W6-9 SMALL-6: a breathing practice left part-way is saved as what was done; the update check-in changes the plan; the finish screen's first answers work; declining from the journal or Settings goes back, not to a workout; a yes from Settings returns to the same page; Log what I did keeps your choice; a half-written journal entry survives the phone's Back; no stale Stretch preselect; skipping sore areas says which are kept; the quiet practice says when it ends and when nothing was saved; no buzz promised where the phone cannot; research messages dated when due; the News hint follows the switch.
@@ -4218,7 +4219,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v671";
+const CACHE_NAME = "alongside-v672";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4281,8 +4282,8 @@ const SHELL_HASHES = {
   "./css/components/practices.css": "60c1221c337fba7b",
   "./css/components/club-rooms.css": "f1c069c5b8eaf09e",
   "./css/components/capture.css": "343b4ae0dc6fe6ea",
-  "./css/components/finish.css": "27761f962a903976",
-  "./js/app.js": "24ff2a302aec8762",
+  "./css/components/finish.css": "462e37edaddaf693",
+  "./js/app.js": "72054b00e54ad55b",
   "./js/router.js": "acd841a1fc44593e",
   "./js/store.js": "216e2494f3a4763a",
   "./js/session-log.js": "d43815c658239179",
@@ -4306,10 +4307,10 @@ const SHELL_HASHES = {
   "./js/views/stretch-arc.js": "fce3ddbd29c7fb30",
   "./js/views/checkin.js": "29d45c08868e3e8f",
   "./js/views/checkin-mini.js": "c647f4da71feddde",
-  "./js/views/coach-proposal.js": "38d4d67ef14fd103",
+  "./js/views/coach-proposal.js": "73baf3596386f6b0",
   "./js/views/workout.js": "7c29db66bc121ecc",
   "./js/views/progress.js": "0e5aa6295cab8ee5",
-  "./js/views/settings.js": "cfa6fde135e8ed77",
+  "./js/views/settings.js": "565981070cf72823",
   "./js/views/restore-flow.js": "dc81c2e455fa472d",
   "./js/views/weekly-plan.js": "dcee06e297b402c0",
   "./js/views/reflect.js": "1f905f98c16931ee",
@@ -4332,7 +4333,7 @@ const SHELL_HASHES = {
   "./js/views/home-threshold.js": "17bc42808aa5bd5c",
   "./js/views/onboarding/frequency.js": "47e40b6e6e2f458f",
   "./js/views/programme-select.js": "8f1e740ed2db223b",
-  "./js/views/upgrade.js": "4b7233092e3561da",
+  "./js/views/upgrade.js": "2bce7ee3c22e3e76",
   "./js/views/privacy.js": "a64dfefd8a24d1ac",
   "./js/views/library.js": "b82890843b58f923",
   "./js/views/practices.js": "69ede443c8d69360",
@@ -4385,7 +4386,7 @@ const SHELL_HASHES = {
   "./js/data/support-lines.js": "0c1286fa510e427e",
   "./js/data/consent-version.js": "c1a39ed44cc24157",
   "./js/views/my-programme.js": "60eaac657d25c631",
-  "./js/session-builder.js": "3bb98127c48e5d48",
+  "./js/session-builder.js": "4b48731d4664b9bd",
   "./js/data/session-choice.js": "954463b0647f3843",
   "./js/data/saved-sessions.js": "91dd2dc43f0f908b",
   "./js/data/class-contract.js": "fe8f3f22b0df50f6",
@@ -4407,15 +4408,15 @@ const SHELL_HASHES = {
   "./css/components/class-list.css": "e33b073b352399f3",
   "./css/components/class-player.css": "401cc57d7d39dbb1",
   "./js/views/saved-sessions.js": "e4b36f369759e70a",
-  "./js/views/session-builder-ui.js": "000f29af26271192",
-  "./js/views/noticing.js": "54446d31544d9c5c",
+  "./js/views/session-builder-ui.js": "4bff89344b105d5c",
+  "./js/views/noticing.js": "7344ac61b5a10c06",
   "./js/views/in-step.js": "196267c5da62e662",
   "./js/data/in-step-scenarios.js": "b46f085cda4d24fc",
-  "./js/views/journal-entry.js": "e09705b71899ad3c",
+  "./js/views/journal-entry.js": "772a866eba022cc4",
   "./js/views/gym-programme.js": "c7c1131806b03654",
   "./js/views/prescribed.js": "0ae8c1283826141d",
   "./js/views/prescribed-session.js": "a4efb7a0bb697409",
-  "./js/views/quiet-session.js": "2a99696c17f817a1",
+  "./js/views/quiet-session.js": "3867b1ec900581f4",
   "./js/views/breathing-session.js": "323a54e31bcc485f",
   "./js/views/morning-session.js": "e1efd26a71ffd68c",
   "./js/views/core-session.js": "4db5aac7cec94a93",
@@ -4428,11 +4429,11 @@ const SHELL_HASHES = {
   "./js/views/onboarding/sheet-manager.js": "20cb675f242157c8",
   "./js/views/onboarding/goals.js": "ec29181741c4bc1e",
   "./js/views/onboarding/conditions.js": "f719e4e253244b9e",
-  "./js/views/onboarding/equipment.js": "0c04afca3eeba431",
+  "./js/views/onboarding/equipment.js": "435b0d93489e4dbd",
   "./js/views/onboarding/plan-select.js": "a5eda498c2aa5d62",
   "./js/data/beat3-scripts.js": "a74cffeeff3e7b4c",
   "./js/data/onboarding-thread-data.js": "e8d28a9bb1f239e5",
-  "./js/data/checkin.js": "9f2e06ea4bd0e75c",
+  "./js/data/checkin.js": "57ba8f4864069369",
   "./js/data/checkin-openings.js": "175cbf4063a1fff5",
   "./js/data/first-session.js": "4803879459a70821",
   "./js/data/pacing.js": "6d73dd69633dbaf0",
