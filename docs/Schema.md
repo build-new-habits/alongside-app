@@ -1,5 +1,8 @@
 # Alongside — Data Schema Reference
-## 13 Oct 2026 v1.112
+## 17 Oct 2026 v1.113
+
+> **v1.113, 17 Oct 2026 — W6-7 GENTLE-LOGGED** (`store.js` unchanged, v115). **No new field.** `activityLog[].sessionType` now also takes `"gentle-care"` (the Bad day's gentle plan, `session-builder.js` v86) and `"general-routine"` (the routine after a second no to the health consent, `general-routine.js` v2), written by `logActivity()` from the session the player played, as every built type is. Both sessions also carry `gentleReason`, so the entry is `gentle: true` and Mostly the same never learns them as the usual. Read by `activity-labels.js` v5 (their own words) and `evidence.js` (breathing; no kind). `chooseSessionType()` ignores both, as it ignores anything not one of the nine.
+
 
 > **v1.112, 13 Oct 2026 — ARC-CREDIT** (`store.js` v115). **No field
 > change.** `store.markSessionWorked()` now saves the arc it credits

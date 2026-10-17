@@ -1,6 +1,14 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
+ * 17 Oct 2026 v86
+ *
+ * v86 - Stage W6, session 3. W6-10 MOSTLY-SAME-2: with Mostly the same,
+ *   the plan's first line is the first one true of the plan, not the next
+ *   in the rotation. W6-7 GENTLE-LOGGED: the Bad day's gentle plan carries
+ *   sessionType "gentle-care" and a gentleReason, so it is logged as what
+ *   it was (not as strength work) and is not learned as the usual.
+ *
  * 17 Oct 2026 v85
  *
  * v85 - SUITE-FLAKE-7 STANDING-FLOOR (CAP-7). Measured on v663: persona
@@ -2188,8 +2196,10 @@ function generateCoachLine(sessionType, durationMins, exercises, conditionNote) 
   const pool = (COACH_LINES[sessionType] || [])
     .map((fn, i) => ({ fn, needs: LINE_NEEDS[`${sessionType}:${i}`] }))
     .filter(x => !x.needs || x.needs(main));
+  // W6-10 (v86). Mostly the same: the first true line, every time.
+  const familiar = (store.get("sessionVariety") || "balanced") === "familiar";
   const line0 = pool.length
-    ? pool[_rotationIndex() % pool.length].fn(durationMins)
+    ? pool[familiar ? 0 : _rotationIndex() % pool.length].fn(durationMins)
     : `${durationMins}-minute ${type?.label || ""} session, built for you today.`;
   let line = line0;
 
@@ -3879,6 +3889,9 @@ function gentleCareSession(zone, durationMins) {
 
   return {
     id: "gentle-care",
+    // W6-7 (v86). Logged as what it was, and never learned as the usual.
+    sessionType: "gentle-care",
+    gentleReason: "bad-day",
     title: "Something gentler today",
     subtitle: "",
     duration: minutes,

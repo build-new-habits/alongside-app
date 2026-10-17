@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 17 Oct 2026 v666
+ * 17 Oct 2026 v667
  *
+ * v667 - Stage W6, session 3: after Continue, the consent form becomes one line saying what was agreed and cannot be sent twice; the Bad day's gentle plan and the general routine are logged as what they were (not strength work) and never learned as the usual; with Mostly the same, the plan's first line stays the same.
  * v666 - W6-3/W6-4 (Graeme, 17 Oct: "Let's start wave 6"): somebody who gets up from a chair "not easily" is given no held lunge or wide stance (Warrior I and II, Triangle, Crescent Lunge, Standing Adductor Stretch), and Warrior I counts as balance work; Classes holds a class with a floor or balance move (and no way round it) for somebody who said floor or balance is hard; after Delete my health answers, Run has no Intervals and says why.
  * v665 - D662-10 (Graeme, 17 Oct: "Remove them"): no "Up to +150 ⭐" on My exercises and no "+35 ⭐" on each move: the older per-move count, which nothing shows or uses; the social action credits (1 or 2 a session, Settings › Community impact) are unchanged. The player says "1 set".
  * v664 - DEVICE-662, the rest (Graeme, 17 Oct: "Can we fix them now?"): "One more set on each" only where the work is sets; My exercises in plan days is headed Your exercises with today's day first, and its way back says Home; one way home per screen (no house beside ‹ Home or Back to Home); 1 set, 1 session, 1 minute; no "No sets logged" under a move; a saved session's button says Start; the finish's tiles share the row; Plan Home fits above the bar on a 412 x 915 phone; the Library's tiles go to one column at the largest text; somebody who can stand always has a standing move in a strength session (CAP-7).
@@ -4213,7 +4214,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v666";
+const CACHE_NAME = "alongside-v667";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4372,7 +4373,7 @@ const SHELL_HASHES = {
   "./js/data/figures/batch-14.js": "a5d94d7a78cc5c19",
   "./js/views/bad-day-door.js": "5910813778515c4e",
   "./js/data/chair-legs.js": "2befbb45dab79deb",
-  "./js/data/general-routine.js": "d3368d7dbbcddb5c",
+  "./js/data/general-routine.js": "f8f682aa9fd2374f",
   "./js/data/session-length.js": "d135da33af36c923",
   "./js/data/file-lock.js": "6428c4d49a58959b",
   "./js/data/messages.js": "eec79984385fe4a3",
@@ -4380,7 +4381,7 @@ const SHELL_HASHES = {
   "./js/data/support-lines.js": "0c1286fa510e427e",
   "./js/data/consent-version.js": "c1a39ed44cc24157",
   "./js/views/my-programme.js": "60eaac657d25c631",
-  "./js/session-builder.js": "ccca3a7295da6923",
+  "./js/session-builder.js": "bcc9f5c87f1eac21",
   "./js/data/session-choice.js": "954463b0647f3843",
   "./js/data/saved-sessions.js": "91dd2dc43f0f908b",
   "./js/data/class-contract.js": "fe8f3f22b0df50f6",
@@ -4396,7 +4397,7 @@ const SHELL_HASHES = {
   "./js/data/classes/class-getting-going-009.js": "c92381f2c500c0a4",
   "./js/data/classes/class-from-the-feet-010.js": "cdbfa03ffea71774",
   "./js/data/scope-statement.js": "02dac4d3fb7a62fb",
-  "./js/data/activity-labels.js": "bf2b471372c51323",
+  "./js/data/activity-labels.js": "c2a6bc320d1d7fdd",
   "./js/views/class-player.js": "e5669734d642c896",
   "./js/views/class-list.js": "551081d91143ee4d",
   "./css/components/class-list.css": "e33b073b352399f3",
@@ -4419,7 +4420,7 @@ const SHELL_HASHES = {
   "./js/views/running-session.js": "515027b91a5509ef",
   "./js/views/swim-session.js": "b7df266e78ddc4e9",
   "./js/views/cycle-session.js": "1acf062699de50fe",
-  "./js/views/onboarding/thread.js": "37c5261ae3d0c723",
+  "./js/views/onboarding/thread.js": "7459be230a4ce5a5",
   "./js/views/onboarding/sheet-manager.js": "20cb675f242157c8",
   "./js/views/onboarding/goals.js": "ec29181741c4bc1e",
   "./js/views/onboarding/conditions.js": "f719e4e253244b9e",

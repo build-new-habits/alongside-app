@@ -1,5 +1,12 @@
 /**
  * js/data/general-routine.js
+ * 17 Oct 2026 v2
+ *
+ * v2 - W6-7 GENTLE-LOGGED. The routine carries sessionType
+ *   "general-routine" and a gentleReason: it was logged as a workout with
+ *   no type, so Home called it strength work, and it could be learned as
+ *   the usual by Mostly the same.
+ *
  * 02 Oct 2026 v1
  *
  * v1 - W5-8 DECLINE-DOORS (Wave 5 persona trace: 2.14, 2.4). Decided by
@@ -45,6 +52,8 @@ export function generalRoutine(now = new Date()) {
     .map((e, i) => ({ ...e, section: i === 0 ? "warmup" : i === ids.length - 1 ? "cooldown" : "main" }));
   return {
     id: "general-routine",
+    sessionType: "general-routine",   // W6-7
+    gentleReason: "general",          // W6-7: logged gentle, never learned as the usual
     title: "A gentle full-body routine",
     subtitle: "",
     duration: 20,

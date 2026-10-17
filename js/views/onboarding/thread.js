@@ -1,5 +1,14 @@
 /**
  * js/views/onboarding/thread.js
+ * 17 Oct 2026 v27
+ *
+ * v27 - W6-6 CONSENT-STAYS (Wave 6: 2.1, 2.11, 2.16). After Continue the
+ *   consent form stayed live above the conversation: Continue again started
+ *   getting started a second time (a second name box) and rewrote
+ *   consent.at. It is replaced by one line saying what was agreed, health
+ *   answers included or "not now" (with where to change it), before the
+ *   conversation starts.
+ *
  * 03 Oct 2026 v26
  *
  * v26 - W5-20 TRUE-WORDS-5. Restore from a file on the consent screen says
@@ -599,7 +608,19 @@ export function ThreadView(router) {
         check?.focus();
         return;
       }
-      _agree(!!health?.checked);
+      // W6-6. Once only, however fast the taps.
+      if (continueBtn.dataset.agreed) return;
+      continueBtn.dataset.agreed = '1';
+      const healthYes = !!health?.checked;
+      _agree(healthYes);
+      // W6-6 (v27). The form becomes one line, so it cannot be sent twice.
+      const done = document.createElement('p');
+      done.className = 'ob-consent-done';
+      done.setAttribute('role', 'status');
+      done.textContent = healthYes
+        ? 'You agreed to the Privacy Policy and Terms, and to me keeping what you tell me about your health.'
+        : 'You agreed to the Privacy Policy and Terms. Health answers: not now. You can change that in Settings.';
+      _thread.querySelector('.ob-consent')?.replaceWith(done);
       _beginThread();
     });
 

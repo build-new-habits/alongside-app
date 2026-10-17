@@ -1,5 +1,12 @@
 /**
  * js/data/activity-labels.js
+ * 17 Oct 2026 v5
+ *
+ * v5 - W6-7 GENTLE-LOGGED. The Bad day's gentle plan and the general
+ *   routine are workouts with their own session type; they are named as
+ *   what they were ("something gentler", "a gentle routine"), never
+ *   "strength work".
+ *
  * 02 Oct 2026 v4
  *
  * v4 - W4-12. ACTIVITY_TYPES exported, so the research figures can be
@@ -83,6 +90,13 @@ const FALLBACK = ["some activity", "other activity"];
 const SELF_GYM = ["a gym session", "gym sessions"];
 const selfGym = e => e?.type === "gym" && e?.source === "self-logged";
 
+// W6-7 (v5). Gentle sessions the player plays, by their session type.
+const GENTLE_KINDS = {
+  "gentle-care":     ["something gentler",  "something gentler"],
+  "general-routine": ["a gentle routine",   "gentle routines"],
+};
+const gentleKind = e => (e && GENTLE_KINDS[e.sessionType]) || null;
+
 function builtKind(entry) {
   const t = entry && SESSION_TYPES.find(s => s.id === entry.sessionType && s.id !== "gym");
   return t ? t.label.toLowerCase() : null;
@@ -91,6 +105,7 @@ function builtKind(entry) {
 /** "a walk", "a lower body session", "a breathing practice". */
 export function activityPhrase(entry) {
   if (selfGym(entry)) return SELF_GYM[0];
+  if (gentleKind(entry)) return gentleKind(entry)[0];
   const kind = (entry?.type === "workout" || entry?.type === "gym" || entry?.type === "gym-programme") && builtKind(entry);
   if (kind) return `${/^[aeiou]/i.test(kind) ? "an" : "a"} ${kind} session`;   // W3-20: "an upper body"
   return (LABELS[entry?.type] || FALLBACK)[0];
@@ -99,6 +114,7 @@ export function activityPhrase(entry) {
 /** "walking", "lower body", "breathing" -- for counts and "mostly ...". */
 export function activityNoun(entry) {
   if (selfGym(entry)) return SELF_GYM[1];
+  if (gentleKind(entry)) return gentleKind(entry)[1];
   const kind = (entry?.type === "workout" || entry?.type === "gym" || entry?.type === "gym-programme") && builtKind(entry);
   if (kind) return kind;
   return (LABELS[entry?.type] || FALLBACK)[1];
