@@ -1,6 +1,17 @@
 /**
  * tools/verify-burnout-live.mjs
- * 28 Sep 2026 v2
+ * 17 Oct 2026 v3
+ *
+ * v3 - SUITE-FLAKE-8 (Graeme, 17 Oct: "Happy with that"). 1.3 compared
+ *   average effort against a fixed gap of 0.3, set when the gap was ~0.9;
+ *   HOME-BANDS' new core entries moved what "the easier half" holds, and
+ *   the gap now measures 0.27-0.45, so it failed about 1 run in 10 with
+ *   the easing working. It now asserts the rule itself (session-builder
+ *   pickFrom: on a low day each pick comes from the easier half of what
+ *   is available): on a burnt-out week every main move of a core session
+ *   is at or below the median effort of its category's pool. Exact, not
+ *   an average. Positive control: on a steady week some are above it
+ *   (about a quarter, measured 17 Oct), so the check can see a miss.
  *
  * v2 - N 25 -> 80. Failed once in a fresh-clone run after v544 (the
  *   top-up widened session sizes); the thresholds are unchanged. More
@@ -41,7 +52,7 @@ const ok = (m, c, d = "") => { if (c) { pass++; console.log("  ok   " + m); }
 
 const B = new URL("../js/", import.meta.url).href;
 const { store } = await import(B + "store.js");
-const { buildSession, equipmentForLocation } = await import(B + "session-builder.js");
+const { buildSession, equipmentForLocation, buildCandidatePools } = await import(B + "session-builder.js");
 const { detectBurnout } = await import(B + "data/checkin.js");
 
 const N = 80;
@@ -122,8 +133,31 @@ ok("1.2 more time to settle at the end", burnt.cool >= normal.cool + 0.6);
 reset(steadyWeek(8), "moderate");   const normalCore = profile("core");
 reset(burntOutWeek(8), "moderate"); const burntCore  = profile("core");
 console.log(`       core effort: steady ${normalCore.effort.toFixed(2)}, burnt-out ${burntCore.effort.toFixed(2)}`);
-ok("1.3 easier main work, on core where the effect is measurable",
-   burntCore.effort <= normalCore.effort - 0.3);
+// v3. The rule, not an average: each main move from the easier half of
+// its category's pool (the pool every filter has already been applied to).
+function aboveMedian() {
+  const kit = equipmentForLocation("home").list;
+  const pools = buildCandidatePools({ sessionType: "core", durationMins: 30, equipmentOverride: kit, preset: null });
+  const byCat = {};
+  for (const e of pools.main) (byCat[e.category] ||= []).push(e.energyRequired || 0);
+  const median = c => { const l = [...(byCat[c] || [])].sort((a, b) => a - b); return l[Math.floor(l.length / 2)]; };
+  let over = 0, total = 0;
+  for (let i = 0; i < N; i++) {
+    for (const e of buildSession({ sessionType: "core", durationMins: 30, equipmentOverride: kit, preset: null }).exercises) {
+      if (e.section !== "main") continue;
+      total++;
+      if ((e.energyRequired || 0) > median(e.category)) over++;
+    }
+  }
+  return { over, total };
+}
+reset(steadyWeek(8), "moderate");   const steadyPicks = aboveMedian();
+reset(burntOutWeek(8), "moderate"); const burntPicks  = aboveMedian();
+console.log(`       core main moves above their pool's median: steady ${steadyPicks.over} of ${steadyPicks.total}, burnt-out ${burntPicks.over} of ${burntPicks.total}`);
+ok("1.3pc CONTROL: on a steady week some core moves are from the harder half (the check can see one)",
+   steadyPicks.over > 0 && steadyPicks.total > 0);
+ok("1.3 easier main work: on a burnt-out week every core move is from the easier half of what was available",
+   burntPicks.total > 0 && burntPicks.over === 0, `${burntPicks.over} of ${burntPicks.total} above the median`);
 
 console.log("\nTEST 2 — the words stay true");
 ok("2.1 it does NOT say their energy is low today",

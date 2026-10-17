@@ -1,6 +1,13 @@
 /**
  * tools/verify-evidence.mjs
- * 04 Oct 2026 v5
+ * 17 Oct 2026 v6
+ *
+ * v6 - SUITE-FLAKE-8. Test 6 took the clock once per session and again
+ *   for the figures, so the session exactly four weeks after the first
+ *   fell either side of the four-week edge by whether a millisecond
+ *   passed while the fixture was built (6b: 3.5 a week once in a suite
+ *   run, 0 of 10 alone). One moment for the fixture and the figures:
+ *   T6, passed to figuresPayload(T6). No assertion changed.
  *
  * v5 - LOOK-1: How your data is kept is a row on the Your data section
  *   page, not the Settings index. 6i and 7b now reach it with settingsFind
@@ -179,18 +186,19 @@ ok("5b. fewer than four sessions: no figures yet", !M.visibleMessages().some(m =
 ok("5c. every built-in message passes the published-message checks", E.researchMessages().every(m => !!M.checkMessage(m)));
 // ── 6. W4-12 EVIDENCE-TRUE, before switching on ─────────────────────────
 console.log("\nTEST 6 - true figures, a survey that waits for use, and the privacy words");
-const ago = n => new Date(Date.now() - n * 86400000).toISOString();
+const T6 = Date.now();   // v6: one moment for the fixture and the figures
+const ago = n => new Date(T6 - n * 86400000).toISOString();
 function log(entries) { person(); store.set("activityLog", entries.map((e, i) => ({ id: "w" + i, status: "completed", ...e }))); }
 // 6a. Four sessions in five days: not offered (it needs four weeks of use).
 log([0, 1, 3, 5].map(d => ({ type: "walk", completedAt: ago(d) })));
 ok("6a. four sessions in five days: Share my figures not offered yet", !M.visibleMessages().some(m => m.action === "share-figures"));
 // 6b. Eight weeks of three a week: 3 and 3.
 log(Array.from({ length: 24 }, (_, i) => ({ type: "walk", completedAt: ago(1 + Math.floor(i * 56 / 24)) })));
-const eight = E.figuresPayload();
+const eight = E.figuresPayload(T6);
 ok("6b. eight weeks of three a week: 3 a week, first and latest", eight.first_weeks === 3 && eight.latest_weeks === 3, JSON.stringify(eight));
 // 6c. Rates over the weeks that have passed: six sessions in two weeks is 3 a week, not 1.5.
 log(Array.from({ length: 6 }, (_, i) => ({ type: "walk", completedAt: ago(1 + i * 2) })));
-const two = E.figuresPayload();
+const two = E.figuresPayload(T6);
 ok("6c. two weeks in: divided by the two weeks that passed", two.first_weeks === 3 && two.latest_weeks === 3, JSON.stringify(two));
 // 6d. Kinds: what the session was.
 log([{ type: "workout", sessionType: "mobility", completedAt: ago(1) }, { type: "workout", sessionType: "cardio", completedAt: ago(2) },
