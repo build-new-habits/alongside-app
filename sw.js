@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 17 Oct 2026 v669
+ * 17 Oct 2026 v670
  *
+ * v670 - W6-11/W6-12: a gym session's main part runs heavy lifts first and carries, holds and core last (power cleans and snatches no longer come after carries and throws), and a barbell lift's minutes include its warm-up sets; Yoga & Pilates offers the practice once, twice or three times through, each card saying its real minutes, and the finish records those minutes.
  * v669 - W6-9 SMALL-6: a breathing practice left part-way is saved as what was done; the update check-in changes the plan; the finish screen's first answers work; declining from the journal or Settings goes back, not to a workout; a yes from Settings returns to the same page; Log what I did keeps your choice; a half-written journal entry survives the phone's Back; no stale Stretch preselect; skipping sore areas says which are kept; the quiet practice says when it ends and when nothing was saved; no buzz promised where the phone cannot; research messages dated when due; the News hint follows the switch.
  * v668 - W6-8 TRUE-WORDS-6: every line the Wave 6 tracers found untrue made true or removed: exit cards in Yoga and the gym say you can save or leave without saving; a length picked on the plan is for that day only, and the plan says what it comes to; check-in openers, the getting-started lines, the red-flag introduction ("You've marked an area as sore or injured"; the three questions are asked once more), the seated routine's name, Progress ("N sessions"), Settings and Yoga say only what is true; a gentle day's own instruction says 2 sets when a set comes off.
  * v667 - Stage W6, session 3: after Continue, the consent form becomes one line saying what was agreed and cannot be sent twice; the Bad day's gentle plan and the general routine are logged as what they were (not strength work) and never learned as the usual; with Mostly the same, the plan's first line stays the same.
@@ -4216,7 +4217,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v669";
+const CACHE_NAME = "alongside-v670";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4383,7 +4384,7 @@ const SHELL_HASHES = {
   "./js/data/support-lines.js": "0c1286fa510e427e",
   "./js/data/consent-version.js": "c1a39ed44cc24157",
   "./js/views/my-programme.js": "60eaac657d25c631",
-  "./js/session-builder.js": "401a0545d7a7fe0a",
+  "./js/session-builder.js": "3bb98127c48e5d48",
   "./js/data/session-choice.js": "954463b0647f3843",
   "./js/data/saved-sessions.js": "91dd2dc43f0f908b",
   "./js/data/class-contract.js": "fe8f3f22b0df50f6",
@@ -4417,7 +4418,7 @@ const SHELL_HASHES = {
   "./js/views/breathing-session.js": "323a54e31bcc485f",
   "./js/views/morning-session.js": "e1efd26a71ffd68c",
   "./js/views/core-session.js": "4db5aac7cec94a93",
-  "./js/views/yoga-session.js": "83da4af5c38c074b",
+  "./js/views/yoga-session.js": "9f8b89e121cfac9b",
   "./js/views/walk-session.js": "4db23f8714be90d7",
   "./js/views/running-session.js": "515027b91a5509ef",
   "./js/views/swim-session.js": "b7df266e78ddc4e9",

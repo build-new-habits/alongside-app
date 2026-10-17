@@ -1,5 +1,13 @@
 /**
  * yoga-session.js
+ * 17 Oct 2026 v20
+ *
+ * v20 - W6-12 YOGA-LENGTH (Wave 6, personas 2.4, 2.15). The length cards
+ *   are the practice once, twice or three times through, each saying its
+ *   real minutes; the finish stores those minutes (it stored 20 for a
+ *   5-minute practice). The 20/30/45 cards all built 3-7 minutes.
+ *   Touch-once exception: this file was in session 4 too (W6-8).
+ *
  * 17 Oct 2026 v19
  *
  * v19 - W6-8 TRUE-WORDS-6. The exit card says you can save or leave without
@@ -823,13 +831,23 @@ function _styleIsEmpty(focusId) {
   return buildSession(focusId, longest, selectedTarget).length === 0;
 }
 
+// W6-12 YOGA-LENGTH (v20). The poses that fit make a practice of about
+// five to ten minutes, whatever length was asked: the 20, 30 and 45 cards
+// all came to 3-7 minutes, two could read "About 4 min", and the finish
+// stored 20 for a 5-minute practice. Now the practice is offered once,
+// twice or three times through, each card saying the minutes it is.
+const ROUNDS = [[1, "Once through"], [2, "Twice through"], [3, "Three times through"]];
 function _offeredCards() {
+  const longest = Math.max(...DURATIONS.map(d => d.mins));
+  const base = _offered.base || (_offered.base = buildSession(selectedFocus, longest, selectedTarget));
+  if (base.length === 0) return [];   // W3-19: never "0 poses"
   const out = [];
-  for (const d of DURATIONS) {
-    const poses = _offered[d.mins] || (_offered[d.mins] = buildSession(selectedFocus, d.mins, selectedTarget));
-    if (poses.length === 0) continue;   // W3-19: never "0 poses"
-    if (out.length && out[out.length - 1].poses.length >= poses.length) continue;
-    out.push({ d, poses });
+  for (const [rounds, words] of ROUNDS) {
+    const poses = Array.from({ length: rounds }, () => base).flat();
+    const mins = Math.max(1, Math.round(yogaSessionSeconds(poses) / 60));
+    if (out.length && out[out.length - 1].d.mins >= mins) continue;
+    _offered[mins] = poses;
+    out.push({ d: { mins, rounds, words }, poses });
   }
   return out;
 }
@@ -858,19 +876,21 @@ function renderDurationSelector() {
 
       <div class="card card-coach" style="margin-bottom: var(--space-5);">
         <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
-        <p class="coach-message-text">How long have you got?</p>
+        <p class="coach-message-text">How long have you got? The practice is short, so the longer ones go through it again.</p>
       </div>
 
       <div class="cs-duration-grid" role="group" aria-label="Choose session duration">
-        ${cards.map(({ d, poses }) => `
+        ${cards.map(({ d, poses }) => {
+          const n = poses.length / d.rounds;
+          return `
           <button class="cs-duration-card" data-mins="${d.mins}"
-                  aria-label="${_aboutMins(poses)}, ${poses.length} pose${poses.length === 1 ? "" : "s"}">
+                  aria-label="${d.words}, ${_aboutMins(poses).toLowerCase()}, ${n} pose${n === 1 ? "" : "s"}">
             <span class="cs-duration-label">${_aboutMins(poses)}</span>
             <span class="cs-duration-count text-xs text-muted">
-              ${poses.length} pose${poses.length === 1 ? "" : "s"}
+              ${d.words} · ${n} pose${n === 1 ? "" : "s"}
             </span>
-          </button>
-        `).join("")}
+          </button>`;
+        }).join("")}
       </div>
     </div>
   `;
@@ -1587,7 +1607,8 @@ export function onMount() {
   document.querySelectorAll(".cs-duration-card").forEach(btn => {
     btn.addEventListener("click", () => {
       selectedMins = parseInt(btn.dataset.mins);
-      // P24. Exactly the session the card described.
+      // P24. Exactly the session the card described; W6-12: its minutes
+      // are the card's, so the finish stores what was offered.
       sessionQueue = _offered[selectedMins] || buildSession(selectedFocus, selectedMins, selectedTarget);
       currentIndex = 0;
       creditsEarned = 0;

@@ -1,6 +1,19 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
+ * 17 Oct 2026 v88
+ *
+ * v88 - W6-11 LIFT-ORDER (Wave 6, persona 2.15). After the top-up, the
+ *   main section is ordered by demand: a heavy barbell lift first (one was
+ *   sometimes appended last), then the other strength work, then the
+ *   explosive lifts (still after the strength hinge, W3-18), then throws,
+ *   then carries, holds, core and calves. Power Clean, Kettlebell Snatch
+ *   and Clean came 7th of 9, after carries and throws, in 38 of 40 Lower
+ *   60 builds. A barbell squat, deadlift, press or row's estimate includes
+ *   its warm-up sets (three minutes): the plan's minutes left them out.
+ *   Nothing is added or removed; moves of their own and the feature keep
+ *   their places. Touch-once exception: sessions 3, 4 and 5 too.
+ *
  * 17 Oct 2026 v87
  *
  * v87 - W6-8 TRUE-WORDS-6. On a gentle day, when a set comes off an
@@ -2474,9 +2487,12 @@ function _exerciseMins(ex) {
  */
 export function exerciseSeconds(ex) {
   if (!ex) return 0;
-  if (ex.duration && ex.reps != null) return ex.duration;
-  if (ex.duration) return ex.duration * (ex.sets || 1);
-  return (ex.sets || 3) * 90;
+  // W6-11 (v88). A heavy barbell lift's warm-up sets, in the one sum the
+  // plan, the trim and the player all use.
+  const warm = _warmupSecondsFor(ex);
+  if (ex.duration && ex.reps != null) return ex.duration + warm;
+  if (ex.duration) return ex.duration * (ex.sets || 1) + warm;
+  return (ex.sets || 3) * 90 + warm;
 }
 
 /**
@@ -2566,6 +2582,33 @@ const _BALLISTIC = /swing|snatch|\bclean\b|jerk|throw|slam|jump/i;
 const _isStrengthHinge  = e => e && e.movementPattern === "hinge" && !_BALLISTIC.test(e.name || "");
 const _isBallisticHinge = e => e && e.movementPattern === "hinge" && _BALLISTIC.test(e.name || "");
 const _HEAVY_PATTERNS   = new Set(["squat", "hinge", "push", "pull", "lunge"]);
+
+// W6-11 (v88). A heavy barbell lift: warm-up sets come first, in the
+// estimate as in the gym.
+const _isHeavyBarbell = e => !!e && (e.equipment || []).includes("barbell") && _HEAVY_PATTERNS.has(e.movementPattern) && !_BALLISTIC.test(e.name || "");
+const WARMUP_SETS_SECONDS = 180;
+function _warmupSecondsFor(ex) {
+  return (_isHeavyBarbell(ex) && (ex.section || ex.role || "main") === "main") ? WARMUP_SETS_SECONDS : 0;
+}
+
+/** W6-11 (v88). Where a move belongs in the main section, by demand. */
+function _demandRank(e) {
+  const pat = e.movementPattern || "";
+  if (_isHeavyBarbell(e)) return 0;
+  if (/throw|slam|toss/i.test(e.name || "")) return 3;
+  if (_isBallisticHinge(e) || /\b(clean|snatch|jerk)\b/i.test(e.name || "")) return 2;
+  if (pat === "carry" || pat === "isometric" || /^anti-/.test(pat) || pat === "calf-raise" || /carry|walk$/i.test(e.name || "")) return 4;
+  return 1;
+}
+/** W6-11 (v88). Order the main section in place; own moves and the feature stay put. */
+function _orderByDemand(list) {
+  const fixed = i => list[i]._feature || list[i].isPrescribed;
+  const slots = list.map((e, i) => i).filter(i => !fixed(i));
+  const moving = slots.map(i => ({ e: list[i], i }))
+    .sort((a, b) => _demandRank(a.e) - _demandRank(b.e) || a.i - b.i)
+    .map(x => x.e);
+  slots.forEach((slot, k) => { list[slot] = moving[k]; });
+}
 /** W3-18. Rest that suits the lift, when the move does not state its own. */
 function _defaultRest(ex) {
   if (Number(ex.rest) > 0) return Number(ex.rest);
@@ -4849,6 +4892,8 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
   if (!_learned) _shapeMain(mainExercises, type.id, _mainPool().filter(ex => !mainExercises.some(m => m.id === ex.id)), { hinge: true, balance: true });
   // v85 STANDING-FLOOR (CAP-7). After every other step, so nothing undoes it.
   if (!_learned) _standingFloor(mainExercises, type.id, _mainPool().filter(ex => !mainExercises.some(m => m.id === ex.id)));
+  // W6-11 (v88). Ordered by demand, after everything that adds or swaps.
+  if (!_learned) _orderByDemand(mainExercises);
   // ROLE-1. See _withRole above. This is the coach route -- One to one,
   // quick build, the four doors -- and the one the screenshots came from.
   const allExercises = [
