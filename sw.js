@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 17 Oct 2026 v667
+ * 17 Oct 2026 v668
  *
+ * v668 - W6-8 TRUE-WORDS-6: every line the Wave 6 tracers found untrue made true or removed: exit cards in Yoga and the gym say you can save or leave without saving; a length picked on the plan is for that day only, and the plan says what it comes to; check-in openers, the getting-started lines, the red-flag introduction ("You've marked an area as sore or injured"; the three questions are asked once more), the seated routine's name, Progress ("N sessions"), Settings and Yoga say only what is true; a gentle day's own instruction says 2 sets when a set comes off.
  * v667 - Stage W6, session 3: after Continue, the consent form becomes one line saying what was agreed and cannot be sent twice; the Bad day's gentle plan and the general routine are logged as what they were (not strength work) and never learned as the usual; with Mostly the same, the plan's first line stays the same.
  * v666 - W6-3/W6-4 (Graeme, 17 Oct: "Let's start wave 6"): somebody who gets up from a chair "not easily" is given no held lunge or wide stance (Warrior I and II, Triangle, Crescent Lunge, Standing Adductor Stretch), and Warrior I counts as balance work; Classes holds a class with a floor or balance move (and no way round it) for somebody who said floor or balance is hard; after Delete my health answers, Run has no Intervals and says why.
  * v665 - D662-10 (Graeme, 17 Oct: "Remove them"): no "Up to +150 ⭐" on My exercises and no "+35 ⭐" on each move: the older per-move count, which nothing shows or uses; the social action credits (1 or 2 a session, Settings › Community impact) are unchanged. The player says "1 set".
@@ -4214,7 +4215,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v667";
+const CACHE_NAME = "alongside-v668";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4302,10 +4303,10 @@ const SHELL_HASHES = {
   "./js/views/stretch-arc.js": "fce3ddbd29c7fb30",
   "./js/views/checkin.js": "29d45c08868e3e8f",
   "./js/views/checkin-mini.js": "3f1764e87002d46f",
-  "./js/views/coach-proposal.js": "c945aefcc6212aff",
+  "./js/views/coach-proposal.js": "dde0db36f2ad1976",
   "./js/views/workout.js": "7c29db66bc121ecc",
-  "./js/views/progress.js": "4115c2031707ea16",
-  "./js/views/settings.js": "74e5899414373a9a",
+  "./js/views/progress.js": "0e5aa6295cab8ee5",
+  "./js/views/settings.js": "4aa86b366062041d",
   "./js/views/restore-flow.js": "dc81c2e455fa472d",
   "./js/views/weekly-plan.js": "dcee06e297b402c0",
   "./js/views/reflect.js": "f4e0034752548a00",
@@ -4340,7 +4341,7 @@ const SHELL_HASHES = {
   "./js/data/arc-readback.js": "9b06dcba96534da0",
   "./js/data/tier-table.js": "f72328887db67d30",
   "./js/views/know-what.js": "e196bb8321f5218d",
-  "./js/data/red-flag.js": "5ec90a31f4b9a8cc",
+  "./js/data/red-flag.js": "8ebc8776f3df27d9",
   "./js/data/health-consent.js": "a6432ebfb709d33c",
   "./js/data/age-check.js": "ed0c1f5310aa26c9",
   "./js/data/restore.js": "aeeb13c93705e542",
@@ -4373,7 +4374,7 @@ const SHELL_HASHES = {
   "./js/data/figures/batch-14.js": "a5d94d7a78cc5c19",
   "./js/views/bad-day-door.js": "5910813778515c4e",
   "./js/data/chair-legs.js": "2befbb45dab79deb",
-  "./js/data/general-routine.js": "f8f682aa9fd2374f",
+  "./js/data/general-routine.js": "30dd1899fa187d6a",
   "./js/data/session-length.js": "d135da33af36c923",
   "./js/data/file-lock.js": "6428c4d49a58959b",
   "./js/data/messages.js": "eec79984385fe4a3",
@@ -4381,7 +4382,7 @@ const SHELL_HASHES = {
   "./js/data/support-lines.js": "0c1286fa510e427e",
   "./js/data/consent-version.js": "c1a39ed44cc24157",
   "./js/views/my-programme.js": "60eaac657d25c631",
-  "./js/session-builder.js": "bcc9f5c87f1eac21",
+  "./js/session-builder.js": "401a0545d7a7fe0a",
   "./js/data/session-choice.js": "954463b0647f3843",
   "./js/data/saved-sessions.js": "91dd2dc43f0f908b",
   "./js/data/class-contract.js": "fe8f3f22b0df50f6",
@@ -4408,14 +4409,14 @@ const SHELL_HASHES = {
   "./js/views/in-step.js": "196267c5da62e662",
   "./js/data/in-step-scenarios.js": "b46f085cda4d24fc",
   "./js/views/journal-entry.js": "5e315297df9abc14",
-  "./js/views/gym-programme.js": "d33d5c8cfaf6eb2a",
+  "./js/views/gym-programme.js": "c7c1131806b03654",
   "./js/views/prescribed.js": "0ae8c1283826141d",
   "./js/views/prescribed-session.js": "a4efb7a0bb697409",
   "./js/views/quiet-session.js": "73c106032a745253",
   "./js/views/breathing-session.js": "26387298908f3076",
   "./js/views/morning-session.js": "e1efd26a71ffd68c",
   "./js/views/core-session.js": "4db5aac7cec94a93",
-  "./js/views/yoga-session.js": "5c668d74269e4014",
+  "./js/views/yoga-session.js": "83da4af5c38c074b",
   "./js/views/walk-session.js": "4db23f8714be90d7",
   "./js/views/running-session.js": "515027b91a5509ef",
   "./js/views/swim-session.js": "b7df266e78ddc4e9",
@@ -4427,9 +4428,9 @@ const SHELL_HASHES = {
   "./js/views/onboarding/equipment.js": "0c04afca3eeba431",
   "./js/views/onboarding/plan-select.js": "a5eda498c2aa5d62",
   "./js/data/beat3-scripts.js": "a74cffeeff3e7b4c",
-  "./js/data/onboarding-thread-data.js": "0ef348674b8fdac0",
+  "./js/data/onboarding-thread-data.js": "e8d28a9bb1f239e5",
   "./js/data/checkin.js": "bfbf13fb4e37c468",
-  "./js/data/checkin-openings.js": "e319f8bb44cd9bf4",
+  "./js/data/checkin-openings.js": "175cbf4063a1fff5",
   "./js/data/first-session.js": "4803879459a70821",
   "./js/data/pacing.js": "6d73dd69633dbaf0",
   "./js/data/week-focus.js": "7ef62ccb4eab0729",
@@ -4453,12 +4454,12 @@ const SHELL_HASHES = {
   "./js/data/exercises/index.js": "d9df11d43f5df8ce",
   "./js/data/exercises/strength.js": "1357c6bb46e7a89d",
   "./js/data/exercises/cardio.js": "e828c599b78284d3",
-  "./js/data/exercises/mobility.js": "16f5c307b159bd12",
+  "./js/data/exercises/mobility.js": "721c3f53d858e0d2",
   "./js/data/exercises/yoga.js": "e506e6b3452ee86e",
   "./js/data/exercises/pilates.js": "99e320f6392bca5b",
   "./js/data/exercises/running.js": "fcb33517ce9f6da5",
   "./js/data/exercises/rehabilitation.js": "f7f79c01a05b1d21",
-  "./js/data/exercises/recovery.js": "417c343342097d9a",
+  "./js/data/exercises/recovery.js": "424dd3707d7e3fdd",
   "./js/data/exercises/mindfulness.js": "43e569cf2f0ca91c",
   "./js/data/practice-library.js": "21f37963f0b2d2c2",
   "./js/data/muscle-search.js": "3f9ae092f24a6bcf",

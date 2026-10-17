@@ -1,5 +1,10 @@
 /**
  * progress.js
+ * 17 Oct 2026 v30
+ *
+ * v30 - W6-8 TRUE-WORDS-6. "N sessions" in the window, not "You've moved N
+ *   times" (it counted breathing as moving).
+ *
  * 17 Oct 2026 v29
  *
  * v29 - D662-7 (Graeme's device check, 13 Oct: "1 sessions"). The summary's
@@ -1346,9 +1351,9 @@ export function ProgressView(router) {
     if (count === 0) {
       lines.push(windowDays === 1 ? 'Nothing logged today yet.' : 'Nothing logged in this window. Whenever you\'re ready — the app is here.');
     } else if (count === 1) {
-      lines.push(`You\'ve moved once ${period}.`);
+      lines.push(`One session ${period}.`);   // W6-8: breathing is a session, not moving
     } else {
-      lines.push(`You\'ve moved ${count} times ${period}${mostly}.`);
+      lines.push(`${count} sessions ${period}${mostly}.`);
     }
 
     if (tier === 'free' || !lines.length) return { lines: lines.length ? lines : ['Keep going.'] };

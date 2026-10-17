@@ -1,5 +1,10 @@
 /**
  * js/data/general-routine.js
+ * 17 Oct 2026 v3
+ *
+ * v3 - W6-8 TRUE-WORDS-6. "A gentle seated routine": every move is seated;
+ *   it said full-body.
+ *
  * 17 Oct 2026 v2
  *
  * v2 - W6-7 GENTLE-LOGGED. The routine carries sessionType
@@ -54,7 +59,7 @@ export function generalRoutine(now = new Date()) {
     id: "general-routine",
     sessionType: "general-routine",   // W6-7
     gentleReason: "general",          // W6-7: logged gentle, never learned as the usual
-    title: "A gentle full-body routine",
+    title: "A gentle seated routine",
     subtitle: "",
     duration: 20,
     general: true,

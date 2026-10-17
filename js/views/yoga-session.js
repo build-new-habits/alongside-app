@@ -1,5 +1,12 @@
 /**
  * yoga-session.js
+ * 17 Oct 2026 v19
+ *
+ * v19 - W6-8 TRUE-WORDS-6. The exit card says you can save or leave without
+ *   saving (it said the session would not be saved, above Exit and save
+ *   progress); "Picked from your check-in" only until a focus is tapped, and
+ *   the focus is from each visit's check-in.
+ *
  * 02 Oct 2026 v18
  *
  * v18 - W5-14. A pose that works a sore area says so in the person's word
@@ -293,6 +300,7 @@ let selectedFocus = null;
  * not assumed.
  */
 let selectedTarget = null;
+let targetTapped = false;   // W6-8: chosen by a tap, not from the check-in
 let selectedMins  = null;
 // ── P5 / YOGA-1, 12 Aug 2026 ───────────────────────────────────────────────
 //
@@ -669,7 +677,8 @@ function renderFocusSelector() {
   // than latched, because the check-in can change between visits and a
   // stale preselection is worse than none.
   if (selectedTarget === null) selectedTarget = impliedTarget();
-  const implied = selectedTarget !== null;
+  // W6-8. "Picked from your check-in" only while it was.
+  const implied = selectedTarget !== null && !targetTapped;
 
   const targetRow = `
       <p class="cs-focus-question" id="ys-target-q">What's this for today?</p>
@@ -1334,6 +1343,8 @@ function resetSession() {
   phase         = "focus";
   selectedFocus = null;
   selectedMins  = null;
+  selectedTarget = null;   // W6-8: from the next visit's check-in, as STRETCH-FOCUS says
+  targetTapped   = false;
   sessionQueue  = [];
   currentIndex  = 0;
   creditsEarned = 0;
@@ -1360,7 +1371,7 @@ function showExitConfirm() {
       <div class="session-exit-coach-row">
         <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
         <p class="session-exit-coach-text">
-          Hold on — if you leave now this session won’t be saved. Are you sure?
+          Hold on — leave this session? You can save what you’ve done so far, or leave without saving it.
         </p>
       </div>
       <div class="session-exit-actions">
@@ -1531,6 +1542,7 @@ export function onMount() {
   document.querySelectorAll(".cs-target-card").forEach(btn => {
     btn.addEventListener("click", () => {
       selectedTarget = btn.dataset.target;
+      targetTapped = true;
       rerender();
       // Focus returns to the pressed control, or a rerender drops the
       // keyboard user back at the top of the page mid-choice.

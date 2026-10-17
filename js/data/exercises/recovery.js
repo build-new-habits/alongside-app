@@ -1,5 +1,10 @@
 /**
  * data/exercises/recovery.js
+ * 17 Oct 2026 v3
+ *
+ * v3 - W6-8 TRUE-WORDS-6. Mindful Walk: the timer is a guide (it said "10
+ *   minutes is enough" over a 15:00 card).
+ *
  * 29 Sep 2026 v2
  *
  * v2 - P0h. Descriptions say what a movement does, not what it treats:
@@ -988,7 +993,7 @@ export const RECOVERY = [
     instructions: [
       'Put your trainers on — that is the only target right now',
       'Step outside and start walking at whatever pace feels right',
-      'No distance, no time target — 10 minutes is enough',
+      'No distance target. The timer is a guide: stop whenever you like',
       'Let your eyes move: notice three things you can see',
       'Notice the ground beneath your feet with each step',
       'If pain increases, slow down or stop — this is not pushing through',

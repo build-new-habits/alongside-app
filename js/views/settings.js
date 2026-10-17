@@ -1,5 +1,12 @@
 /**
  * settings.js
+ * 17 Oct 2026 v69
+ *
+ * v69 - W6-8 TRUE-WORDS-6. How long you usually have: a length picked on the
+ *   plan is for that day only (it said it changed the usual, untrue since
+ *   W5-11). Sore or injured areas says what else is listed (Stress) instead
+ *   of None alone.
+ *
  * 12 Oct 2026 v68
  *
  * v68 - A-3 RETIRE-WEEKLY-PLAN (Stage AWARD). One week per tier: on the
@@ -951,6 +958,7 @@ export function SettingsView(router) {
       home:     (store.get('homeEquipment') || []).length,
       // W4-10: the row counts sore areas; tiredness or stress is said apart.
       conds:    bodyAreasOf(store.get('conditions') || []),
+      everyday: everydayOf(store.get('conditions') || []).map(id => (CONDITIONS.find(x => x.id === id) || {}).name || id),
       moves:    store.get('movementIdentity') || [],
       aim:      arc.active && arc.aimId ? aimById(arc.aimId) : null,
       goals:    store.get('goals') || [],
@@ -1001,7 +1009,8 @@ export function SettingsView(router) {
       ] }];
       case 'body': return [
         { rows: [
-          _row({ label: 'Sore or injured areas', value: c.conds.length ? `${c.conds.length} listed` : 'None', open: 'conditions' }),
+          // W6-8. "None" sat beside a listed Stress: say what else is there.
+          _row({ label: 'Sore or injured areas', value: c.conds.length ? `${c.conds.length} listed` : (c.everyday.length ? `None sore · ${c.everyday.join(', ')}` : 'None'), open: 'conditions' }),
           // LEGAL-TRUE. What your body can do is a health answer: without the
           // health consent the row asks for it first, like Sore or injured areas.
           healthAllowed()
@@ -1603,7 +1612,7 @@ export function SettingsView(router) {
         <div class="settings-field">
           <label class="settings-label" for="settings-usual-length">How long you usually have</label>
           <p class="settings-section__sub" id="usual-length-hint">
-            The coach's plan starts from this. Changing Length on the plan changes it here too.
+            The coach's plan starts from this. A length you pick on the plan is for that day only.
           </p>
           <select class="settings-select" id="settings-usual-length" data-field="availableTime"
                   aria-describedby="usual-length-hint">

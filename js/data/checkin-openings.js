@@ -1,5 +1,12 @@
 /**
  * js/data/checkin-openings.js
+ * 17 Oct 2026 v13
+ *
+ * v13 - W6-8 TRUE-WORDS-6. "Life kept getting in the way" is said back as
+ *   itself (it was "finding time and energy"); the mood opener compares with
+ *   a few check-ins ago (its rule compares the first and the last, not
+ *   each).
+ *
  * 03 Oct 2026 v12
  *
  * v12 - W5-21 SMALL-5. With Mostly the same the check-in opens with one
@@ -142,7 +149,7 @@ const REFLECTION_VARIANTS = [
     b1: "Recently, I've noticed your energy's been climbing — slowly, but it has been.",
     b2: "I'm curious if that's still holding today." },
   { id: 'mood-improving-flat',  careMode: false,
-    b1: "I've noticed your mood's been a little better each check-in, even when the energy hasn't followed.",
+    b1: "I've noticed your mood's better than it was a few check-ins ago, even when the energy hasn't followed.",
     b2: "I want to check in on that before we figure out today." },
   { id: 'low-in-better-out',    careMode: false,
     b1: "Last time you said you weren't sure you wanted to start — but you did, and you felt better after.",
@@ -324,7 +331,7 @@ const DAY_ONE = [
   { trigger: 'movement-pain',      careMode: true,  b1: "Do you remember telling me during onboarding that movement has sometimes hurt — physically?",  b2: "I was wondering how you feel about that now, before your very first session." },
   { trigger: 'self-consciousness', careMode: false, b1: "Do you remember telling me that being around other people when you exercise has felt hard?",    b2: "You're here now, on your own terms. I was wondering how that feels going into your first one." },
   { trigger: 'motivation',         careMode: false, b1: "Do you remember telling me that getting started — actually starting — has been the hardest part?", b2: "You've just done that. I was wondering what it feels like to be on this side of it." },
-  { trigger: 'time-energy',        careMode: false, b1: "Do you remember saying that finding time and energy has been the thing that keeps getting in the way?", b2: "I was wondering — right now, today, how is that feeling?" },
+  { trigger: 'time-energy',        careMode: false, b1: "Do you remember saying that life kept getting in the way?", b2: "I was wondering — right now, today, how is that feeling?" },
   { trigger: 'not-knowing',        careMode: false, b1: "Do you remember telling me that not knowing what to do has made it hard to start?",             b2: "That's what I'm here for. I was wondering how it feels to have someone take that off your plate." },
   { trigger: 'judged',             careMode: false, b1: "Do you remember telling me that fitness has sometimes felt like a place where you don't quite belong?", b2: "I was wondering how you're feeling now, before your first session — just you and me." },
   { trigger: 'past-failure',       careMode: false, b1: "Do you remember telling me that you've tried to build this before and it hasn't stuck?",        b2: "I want to ask — what feels different this time, if anything?" },

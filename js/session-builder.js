@@ -1,6 +1,13 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
+ * 17 Oct 2026 v87
+ *
+ * v87 - W6-8 TRUE-WORDS-6. On a gentle day, when a set comes off an
+ *   entry's own written dose, its instruction line says the same ("Complete
+ *   2 sets of 10", not 3 over a plan of 2 x 10). Touch-once exception: this
+ *   file was in session 3 too, for W6-7 and W6-10.
+ *
  * 17 Oct 2026 v86
  *
  * v86 - Stage W6, session 3. W6-10 MOSTLY-SAME-2: with Mostly the same,
@@ -2685,7 +2692,12 @@ export function withDefaultDose(ex, intensity) {
     const wside = written.side || (ex.perSide && /^[\d\u2013-]+$/.test(wreps) ? " each side" : "");
     const rest  = _defaultRest(ex);   // W3-18
     const work  = written.holdSeconds ? written.holdSeconds * (wside ? 2 : 1) : 10 * 4 * (wside ? 2 : 1);
-    return { ...ex, sets: wsets, reps: `${wreps}${wside}`, rest,
+    // W6-8 (v87). A gentle day takes a set off: the entry's own line says
+    // so too ("Complete 3 sets of 10" sat over a plan of 2 x 10).
+    const instructions = (written.sets != null && wsets !== written.sets && Array.isArray(ex.instructions))
+      ? ex.instructions.map(l => String(l).replace(new RegExp(`\\b${written.sets}(\\s+sets?)\\b`, "i"), `${wsets}$1`))
+      : ex.instructions;
+    return { ...ex, instructions, sets: wsets, reps: `${wreps}${wside}`, rest,
              duration: _doseSeconds(wsets, work, rest), _doseWork: work,
              _defaultDose: true, _doseFrom: "instructions" };
   }

@@ -1,5 +1,9 @@
 /**
  * tools/verify-progress-share.mjs
+ * 17 Oct 2026 v4
+ *
+ * v4 - W6-8. 1g: "N sessions", not "You've moved N times" (W6-8: it counted breathing as moving).
+ *
  * 13 Oct 2026 v3
  *
  * v3 - SUITE-FLAKE-6 (found 13 Oct, 06:20). 4c failed before 07:00: today's
@@ -158,7 +162,7 @@ click(main.querySelector('[data-window="14"]'));
 ok("1e. 14 days: fourteen bars, each named for a screen reader", main.querySelectorAll(".pr-bar").length === 14 && [...main.querySelectorAll(".pr-bar .sr-only")].every(s => /session/.test(txt(s))));
 person("personal"); progress(); click(main.querySelector('[data-window="90"]'));
 ok("1f. 90 days: sessions each week, thirteen weeks at most", main.querySelectorAll(".pr-bar").length <= 13 && main.querySelectorAll(".pr-bar").length >= 2, main.querySelectorAll(".pr-bar").length);
-ok("1g. the coach line says the window in words", /You've moved 8 times over the last 90 days/.test(txt(main.querySelector(".progress-narrative"))), txt(main.querySelector(".progress-narrative")));
+ok("1g. the coach line says the window in words", /8 sessions over the last 90 days/.test(txt(main.querySelector(".progress-narrative"))), txt(main.querySelector(".progress-narrative")));
 person("free"); share({ window: "90" });
 ok("1h. Free cannot share 90 days (not offered, falls back to 30)", ![...main.querySelectorAll('input[name="sh-window"]')].some(r => r.value === "90") && main.querySelector('input[name="sh-window"]:checked')?.value === "30");
 

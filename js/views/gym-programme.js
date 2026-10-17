@@ -1,5 +1,11 @@
 /**
  * gym-programme.js
+ * 17 Oct 2026 v19
+ *
+ * v19 - W6-8 TRUE-WORDS-6. The exit card says you can save or leave without
+ *   saving (it said the session would not be saved, above Exit and save
+ *   progress).
+ *
  * 30 Sep 2026 v18
  *
  * v18 - W3-12 MOSTLY-SAME (Schema v1.84). exerciseIds in plan order (the
@@ -1328,7 +1334,7 @@ export function GymProgrammeView(router) {
         <div class="session-exit-coach-row">
           <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
           <p class="session-exit-coach-text">
-            Hold on — if you leave now this session won't be saved. Are you sure?
+            Hold on — leave this session? You can save what you’ve done so far, or leave without saving it.
           </p>
         </div>
         <div class="session-exit-actions">

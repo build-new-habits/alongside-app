@@ -1,5 +1,10 @@
 /**
  * coach-proposal.js
+ * 17 Oct 2026 v60
+ *
+ * v60 - W6-8 TRUE-WORDS-6. After picking a length, the plan says what it
+ *   comes to when that differs ("Now 60 minutes." sat over a plan of 42).
+ *
  * 17 Oct 2026 v59
  *
  * v59 - D662-3 GOOD-DAY-SETS (Graeme's device check, 13 Oct). "One more
@@ -1902,7 +1907,8 @@ export function CoachProposalView(router) {
     swapOpen              = null;
     chipOpen              = null;
     previewRow            = null;
-    statusMsg             = message;
+    // W6-8. A message may need the rebuilt plan (what it comes to).
+    statusMsg             = typeof message === 'function' ? message() : message;
     _rerenderPanel(container, showPlan);
   }
 
@@ -1955,7 +1961,15 @@ export function CoachProposalView(router) {
       const mins = Number(btn.dataset.pickTime);
       const cat  = Object.keys(AVAILABLE_TIME_WINDOW_MINUTES).find(k => AVAILABLE_TIME_WINDOW_MINUTES[k] === mins);
       if (cat) setTodaysLength(cat);   // W5-11: today's, not the usual
-      _rebuildAndRerender(container, `Now ${_getAvailableTimeMinutes()} minutes.`);
+      // W6-8. Say what the plan comes to when it is not what was picked
+      // ("Now 60 minutes." sat over a plan of 42).
+      _rebuildAndRerender(container, () => {
+        const asked = _getAvailableTimeMinutes();
+        const total = _planTotal(currentPreviewOptions.find(o => o.id === selectedOptionId) || currentPreviewOptions[0]);
+        return total && Math.abs(total - asked) > 5
+          ? `Planned for ${asked} minutes. This one comes to about ${total} minutes.`
+          : `Now ${asked} minutes.`;
+      });
       container.querySelector('#cp-time')?.focus();
     }));
 

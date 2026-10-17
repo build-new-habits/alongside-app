@@ -1,5 +1,11 @@
 /**
  * data/exercises/mobility.js
+ * 17 Oct 2026 v11
+ *
+ * v11 - W6-8 TRUE-WORDS-6. Seated thoracic rotation leads with the chair;
+ *   ankle circles say "Daily, if it suits you" (not "Complete daily for best
+ *   results").
+ *
  * 12 Oct 2026 v10
  *
  * v10 - A-6 (Stage AWARD). Two descriptions brought into line with their
@@ -883,7 +889,7 @@ export const MOBILITY = [
     duration: 60,
     perSide: true,
     instructions: [
-      'Sit cross-legged or on a chair with feet flat',
+      'Sit on a chair with your feet flat (or cross-legged, if the floor suits you)',
       'Cross your arms over your chest',
       'Rotate slowly to the right as far as comfortable — do not force it',
       'Hold for 2 seconds at the end range',
@@ -975,7 +981,7 @@ export const MOBILITY = [
       'Complete 10 circles clockwise, 10 anticlockwise',
       'Then trace the alphabet with the big toe — A through Z',
       'Switch to the other ankle',
-      'Complete daily for best results'
+      'Daily, if it suits you'
     ],
     coaching: 'The alphabet drill exposes which ankle directions are restricted — letters that feel limited show where to focus. Do it daily, not occasionally.',
     why: 'Stiff ankles are one of the most common mobility limits, and the knees and hips often work around them. Regular ankle work keeps the range you have.',

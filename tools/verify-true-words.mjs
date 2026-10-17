@@ -1,6 +1,11 @@
 /**
  * tools/verify-true-words.mjs
- * 05 Oct 2026 v5
+ * 17 Oct 2026 v6
+ *
+ * v6 - W6-8. 21a: the introduction says "marked", true for an area listed
+ *   in Settings and for one tapped in today's check-in ("listed", which
+ *   this asserted, was untrue for the second). Still never "told me
+ *   something is sore" (the W5-20 fault).
  *
  * v5 - SUITE-DATE. TEST 12 counted two weeks for nine days, which holds
  *   only on some weekdays: nine days back from a Monday or a Tuesday
@@ -332,7 +337,7 @@ ok("20a. follows the answer at once", !!sel && /starts the same way/.test(txt(s1
 // ── 21. THE RED-FLAG INTRODUCTION ───────────────────────────────────────
 console.log("\nTEST 21 - the red-flag introduction after Nothing today");
 const RF = await import(B + "data/red-flag.js");
-ok("21a. not \"You've told me something is sore\"", !/told me something is sore/.test(RF.RED_FLAG_INTRO) && /listed a sore/.test(RF.RED_FLAG_INTRO), RF.RED_FLAG_INTRO);
+ok("21a. not \"You've told me something is sore\", nor \"listed\"", !/told me something is sore/.test(RF.RED_FLAG_INTRO) && !/listed/.test(RF.RED_FLAG_INTRO) && /marked an area/.test(RF.RED_FLAG_INTRO), RF.RED_FLAG_INTRO);
 
 // ── 22. LEAVE CARDS ─────────────────────────────────────────────────────
 console.log("\nTEST 22 - leave cards above Exit and save progress");

@@ -1,5 +1,13 @@
 /**
  * js/data/red-flag.js
+ * 17 Oct 2026 v6
+ *
+ * v6 - W6-8 TRUE-WORDS-6. "You've marked an area as sore or injured": true
+ *   for an area listed in Settings and for one tapped in today's check-in
+ *   ("listed" was untrue for the second; W5-20's "told me something is
+ *   sore" was untrue after "Nothing today"). RED_FLAG_VERSION moved, as
+ *   the rule says, so the questions are asked once more with these words.
+ *
  * 03 Oct 2026 v5
  *
  * v5 - W5-20 TRUE-WORDS-5. The introduction says "You've listed a sore or
@@ -65,7 +73,7 @@ import { store } from "../store.js";
 import { CONDITIONS } from "./conditions.js";
 
 /** Bumped whenever any string below changes. Stored as redFlag.textVersion. */
-export const RED_FLAG_VERSION = "2026-10-03.1";   // W5-20: the introduction
+export const RED_FLAG_VERSION = "2026-10-17.1";   // W6-8: the introduction
 
 export const RED_FLAG_QUESTIONS = [
   { id: "q1", text: "Have you noticed any change in your bladder or bowel control, or numbness around your groin, buttocks or inner thighs?" },
@@ -80,7 +88,7 @@ export const RED_FLAG_ANSWERS = [
 ];
 
 export const RED_FLAG_INTRO =
-  "You've listed a sore or injured area, so before you exercise there are three quick questions. " +
+  "You've marked an area as sore or injured, so before you exercise there are three quick questions. " +
   "They're about rare signs that need a health professional before exercise. " +
   "This is a safety check, not an assessment.";
 

@@ -1,5 +1,11 @@
 /**
  * js/data/onboarding-thread-data.js
+ * 17 Oct 2026 v25
+ *
+ * v25 - W6-8 TRUE-WORDS-6. Mostly the same promises everyday movement, not
+ *   strength; the name step no longer says "Not something I'd give to anyone
+ *   who walked in" (said to people who then declined the health answers).
+ *
  * 03 Oct 2026 v24
  *
  * v24 - W5-20 TRUE-WORDS-5. After balance Yes or Sometimes: moves that ask
@@ -434,7 +440,7 @@ export const STEPS = {
     placeholder: 'Your first name',
     storeField: 'name',
     summaryType: 'name',
-    coach: "[Name]. Right. Good to meet you.\n\nSo — everything I'm going to ask you over the next little while, the reason I need it is so that what I build for you is actually built for you. Not something generic. Not something I'd give to anyone who walked in. Yours.",
+    coach: "[Name]. Right. Good to meet you.\n\nSo — everything I'm going to ask you over the next little while, the reason I need it is so that what I build for you is actually built for you. Not something generic. Yours.",
     // coach line above renders after name is submitted, with [Name] replaced.
   },
 
@@ -976,7 +982,7 @@ export function generateIntentAck(value, profile = null) {
   // W5-20. Nor to anybody: what comes depends on their kit and answers, and
   // a profile promised all three got none of them in 360 builds.
   if (value === 'maintain')
-    return "Good. That means I'll keep putting everyday strength in front of you, with what you have to hand, rather than quietly making everything easier.";
+    return "Good. That means I'll keep everyday movement in your sessions, with what you have to hand, rather than quietly making everything easier.";
   if (value === 'recover')
     return "Understood. We'll build back steadily rather than push.";
   return "Right then. We'll build.";

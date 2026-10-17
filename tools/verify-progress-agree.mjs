@@ -1,5 +1,9 @@
 /**
  * tools/verify-progress-agree.mjs
+ * 17 Oct 2026 v8
+ *
+ * v8 - W6-8. 1d: the coach line says "N sessions", not "You've moved N times" (W6-8: it counted breathing as moving).
+ *
  * 12 Oct 2026 v7
  *
  * v7 - A-1 PLAN-HOME-PRUNE. 8a: the arc on Home is inside the Today card
@@ -141,7 +145,7 @@ main.querySelector('[data-window="90"]')?.dispatchEvent(new dom.window.MouseEven
 ok("1b. Plan, 90 days", number() === truth(90) && number() === 8, String(number()));
 fixture({ tier: "free" }); progress();
 ok("1c. free, 30 days: the same number as the Plan", number() === plan30);
-ok("1d. the coach line agrees with it", new RegExp(`You've moved ${plan30} times in the last 30 days[,.]`).test(txt(main.querySelector(".progress-narrative"))),
+ok("1d. the coach line agrees with it", new RegExp(`${plan30} sessions in the last 30 days[,.]`).test(txt(main.querySelector(".progress-narrative"))),
    txt(main.querySelector(".progress-narrative")));
 const weeks = RB.lastWeeks(6, new Date(NOW));
 const inSix = store.completedSessions(LOG).filter(e => new Date(e.completedAt) >= weeks[0].start).length;
