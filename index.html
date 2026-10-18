@@ -1,8 +1,13 @@
-<!-- index.html | 12 Oct 2026 v12 -->
+<!-- index.html | 18 Oct 2026 v13 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+<!--
+  v13 — A-8b CSS-PARALLEL (Stage AWARD), 18 Oct 2026. Every sheet main.css
+  imports is preloaded, so they are asked for at once rather than after
+  main.css arrives (verify-css-parallel holds the two lists the same).
+-->
 <!--
   v12 — A-4 SHARED-POLISH (Stage AWARD), 12 Oct 2026. The bottom bar's
   icons are the app's line icons (inline SVG, currentColor, aria-hidden), in
@@ -89,6 +94,70 @@
   <link rel="apple-touch-icon" href="assets/images/logo-icon-180.png">
   <meta name="apple-mobile-web-app-title" content="Alongside">
 
+  <!-- A-8b CSS-PARALLEL (18 Oct 2026). main.css pulls in each sheet below
+       with @import, which a browser fetches one after another before it
+       draws (Lighthouse: render-blocking, about 5 s on a slow first visit).
+       Preloading them asks for all of them at once; main.css stays the one
+       list, and its @imports are then served from what is already here.
+       This list is main.css's, in its order: verify-css-parallel holds them
+       the same. -->
+  <link rel="preload" as="style" href="css/base/fonts.css">
+  <link rel="preload" as="style" href="css/base/variables.css">
+  <link rel="preload" as="style" href="css/base/reset.css">
+  <link rel="preload" as="style" href="css/base/typography.css">
+  <link rel="preload" as="style" href="css/base/global.css">
+  <link rel="preload" as="style" href="css/layouts/app-shell.css">
+  <link rel="preload" as="style" href="css/layouts/onboarding.css">
+  <link rel="preload" as="style" href="css/layouts/onboarding-additions.css">
+  <link rel="preload" as="style" href="css/layouts/goal-setup.css">
+  <link rel="preload" as="style" href="css/layouts/progress.css">
+  <link rel="preload" as="style" href="css/layouts/today.css">
+  <link rel="preload" as="style" href="css/layouts/my-programme.css">
+  <link rel="preload" as="style" href="css/layouts/goal-review.css">
+  <link rel="preload" as="style" href="css/layouts/library.css">
+  <link rel="preload" as="style" href="css/layouts/mobility-conditioning.css">
+  <link rel="preload" as="style" href="css/components/buttons.css">
+  <link rel="preload" as="style" href="css/components/cards.css">
+  <link rel="preload" as="style" href="css/components/equipment-modal.css">
+  <link rel="preload" as="style" href="css/components/checkin.css">
+  <link rel="preload" as="style" href="css/components/workout.css">
+  <link rel="preload" as="style" href="css/components/coach-fix.css">
+  <link rel="preload" as="style" href="css/components/coach-proposal.css">
+  <link rel="preload" as="style" href="css/components/morning-session.css">
+  <link rel="preload" as="style" href="css/components/session-guard.css">
+  <link rel="preload" as="style" href="css/components/tier-gating.css">
+  <link rel="preload" as="style" href="css/components/settings-library.css">
+  <link rel="preload" as="style" href="css/components/settings.css">
+  <link rel="preload" as="style" href="css/components/weekly-plan.css">
+  <link rel="preload" as="style" href="css/components/weekly-plan-v2.css">
+  <link rel="preload" as="style" href="css/components/breathing-session.css">
+  <link rel="preload" as="style" href="css/components/quiet-session.css">
+  <link rel="preload" as="style" href="css/components/noticing.css">
+  <link rel="preload" as="style" href="css/components/gym-programme.css">
+  <link rel="preload" as="style" href="css/components/journal-entry.css">
+  <link rel="preload" as="style" href="css/components/reflect.css">
+  <link rel="preload" as="style" href="css/components/nav-fix.css">
+  <link rel="preload" as="style" href="css/components/onboarding-thread.css">
+  <link rel="preload" as="style" href="css/components/sheet-manager.css">
+  <link rel="preload" as="style" href="css/components/settings-reflection.css">
+  <link rel="preload" as="style" href="css/components/checkin-conversation.css">
+  <link rel="preload" as="style" href="css/components/display-preferences.css">
+  <link rel="preload" as="style" href="css/components/session-log.css">
+  <link rel="preload" as="style" href="css/components/grounding-moments.css">
+  <link rel="preload" as="style" href="css/components/single-activity-session.css">
+  <link rel="preload" as="style" href="css/components/session-shared.css">
+  <link rel="preload" as="style" href="css/components/upgrade-door.css">
+  <link rel="preload" as="style" href="css/components/upgrade-page.css">
+  <link rel="preload" as="style" href="css/components/practices.css">
+  <link rel="preload" as="style" href="css/components/red-flag.css">
+  <link rel="preload" as="style" href="css/components/know-what.css">
+  <link rel="preload" as="style" href="css/components/class-list.css">
+  <link rel="preload" as="style" href="css/components/class-player.css">
+  <link rel="preload" as="style" href="css/components/club-rooms.css">
+  <link rel="preload" as="style" href="css/components/capture.css">
+  <link rel="preload" as="style" href="css/components/finish.css">
+  <link rel="preload" as="style" href="css/components/your-week.css">
+  <link rel="preload" as="style" href="css/components/progress-share.css">
   <link rel="stylesheet" href="css/main.css">
 
   <!--

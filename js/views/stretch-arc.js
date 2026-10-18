@@ -1,5 +1,10 @@
 /**
  * js/views/stretch-arc.js
+ * 18 Oct 2026 v7
+ *
+ * v7 - A-4 WORD BUDGET. How it works is folded (every word kept), so
+ *   Start is no longer under 93 words.
+ *
  * 12 Oct 2026 v6
  *
  * v6 - A-2 ONE-PLAN-SCREEN (Stage AWARD). Stretch now opens Today's plan
@@ -127,15 +132,18 @@ export function StretchArcView(router) {
       return `
         <p class="sb-coach-line">A direction for your stretching, held over weeks.</p>
 
-        <p class="sa-body">
-          I'll lean each session towards what you're working on, and keep track of which
-          parts of you have come up so I can tell you what hasn't.
-        </p>
-
-        <p class="sa-body">
-          There's no schedule and nothing to keep up with. Leave it a week and nothing
-          happens \u2014 it's a direction, not a commitment.
-        </p>
+        <!-- A-4 WORD BUDGET (18 Oct). Folded, every word kept. -->
+        <details class="finish-more">
+          <summary class="finish-more__summary">How it works</summary>
+          <p class="sa-body">
+            I'll lean each session towards what you're working on, and keep track of which
+            parts of you have come up so I can tell you what hasn't.
+          </p>
+          <p class="sa-body">
+            There's no schedule and nothing to keep up with. Leave it a week and nothing
+            happens \u2014 it's a direction, not a commitment.
+          </p>
+        </details>
 
         ${arc.aimId ? `
           <div class="sa-panel">

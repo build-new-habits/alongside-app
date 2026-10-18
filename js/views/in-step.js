@@ -1,5 +1,11 @@
 /**
  * js/views/in-step.js
+ * 18 Oct 2026 v4
+ *
+ * v4 - A-4 WORD BUDGET (Stage AWARD; Graeme, 18 Oct: "You do those
+ *   things"). What this is is folded (every word kept), so the four
+ *   movements are no longer under 106 words.
+ *
  * 08 Sep 2026 v3
  *
  * v3 - A11Y-HEADER. The .workout-header-title span is an h1. It was a
@@ -229,10 +235,11 @@ function renderLanding() {
         helper register rather than coach voice: it explains the screen,
         it does not speak to the person about themselves.
       -->
-      <section class="card is-intro" aria-labelledby="is-intro-h"
+      <!-- A-4 WORD BUDGET (18 Oct). Folded, every word kept: the four
+           movements are the first thing to choose. -->
+      <details class="card is-intro finish-more"
                style="margin-bottom: var(--space-5); background: var(--color-bg-card);">
-        <h2 id="is-intro-h" style="font-size: var(--text-base); font-weight: var(--font-semibold);
-                                   margin-bottom: var(--space-2);">What this is</h2>
+        <summary class="finish-more__summary" id="is-intro-h">What this is</summary>
         <p class="text-secondary" style="font-size: var(--text-sm); margin-bottom: var(--space-2);">
           The same care you practise on yourself here, pointed outward. Each one is a moment you would
           recognise, and three ways of standing in it.
@@ -245,7 +252,7 @@ function renderLanding() {
           They open one at a time, widening outward — your own patterns first, then the people nearest
           you, then strangers, then the world that doesn't consult you. A few days between each.
         </p>
-      </section>
+      </details>
 
       <div style="display: flex; flex-direction: column; gap: var(--space-3);">
         ${MOVEMENTS.map(m => {

@@ -1,9 +1,11 @@
 /**
  * js/data/figures/batch-02.js
- * 04 Oct 2026 v1
+ * 18 Oct 2026 v2
  *
  * D-4 FIGURES, batch 02: the gym machines and free weights.
  * The format is described in js/figures.js.
+ * v2 (18 Oct 2026): cross trainer redrawn; the machine is joined up, the
+ * hands hold the handles and the feet stand on the pedals.
  */
 export const FIGURES_02 = {
   "gym-treadmill-intervals": { w: 180, f: [
@@ -21,8 +23,8 @@ export const FIGURES_02 = {
   ] },
   "gym-cross-trainer-intervals": { w: 180, f: [
     { l: "Long strides, arms driving", a: "Standing upright on a cross trainer, one foot forward on its pedal and one back, hands pushing and pulling the moving handles.",
-      p: { hip: [72, 96], t: 178, nl: [46.7, -2.5, 90], fl: [-3, -18.4, 90], na: [4.3, 51.9], fa: [38.9, 58.1] },
-      x: [{ ball: [28, 164, 14] }, { ln: [28, 164, 94, 166] }, { ln: [28, 164, 70, 176] }, { bar: [92, 166, 116, 166] }, { bar: [50, 176, 76, 176] }, { bar: [156, 188, 150, 100] }, { bar: [144, 102, 164, 96] }, { bar: [111.2, 122.4, 90.6, 81.3] }, { far: [[121.5, 116.6, 108.6, 72.5]] }] },
+      p: { hip: [90, 92], t: 172, nl: [38.4, -11.6, 90], fl: [-7, -25.6, 90], na: [14, 76], fa: [-16.1, 61.3] },
+      x: [{ bar: [24, 184, 150, 184] }, { ball: [34, 166, 14] }, { ln: [34, 166, 101, 163] }, { ln: [34, 166, 65, 168] }, { bar: [100, 163, 126, 163] }, { bar: [64, 168, 88, 168] }, { bar: [150, 184, 142, 70] }, { bar: [136, 72, 158, 64] }, { bar: [150, 152, 128, 76] }, { far: [[148, 154, 112, 84]] }, { mv: [118, 66, 134, 70] }, { mv: [108, 92, 94, 88] }] },
   ] },
   "gym-stair-climber-steady": { w: 160, f: [
     { l: "Stand tall, whole steps", a: "Standing tall on a stair climber, one whole foot on the step above and one on the step below, a hand resting lightly on the rail for balance.",

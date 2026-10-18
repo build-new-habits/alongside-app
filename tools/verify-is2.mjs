@@ -1,5 +1,9 @@
 /**
  * tools/verify-is2.mjs
+ * 18 Oct 2026 v3
+ * A-4 WORD BUDGET. 13 accepts the intro folded under its summary
+ * ("What this is"), which names it; no other assertion changed.
+ *
  * 21 Aug 2026 v2
  * GATE-PATH. Path resolution only -- no assertion changed.
  *
@@ -138,8 +142,10 @@ check('11 the landing explains what In Step is for, not just its format',
   /What this is/.test(flat()) && /nothing is fed back to you/i.test(flat()));
 check('12 and it tells the person the movements open one at a time',
   /one at a time/i.test(flat()));
-check('13 the intro is a labelled landmark, not an unattached paragraph',
-  !!el.querySelector('section[aria-labelledby]'));
+// v3 (A-4, 18 Oct): the intro is folded under its own summary, which
+// names it ("What this is"); still never an unattached paragraph.
+check('13 the intro is named, not an unattached paragraph',
+  !!el.querySelector('section[aria-labelledby], details.is-intro > summary'));
 
 // ── The header must not still describe v1 ────────────────────────────
 

@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 18 Oct 2026 v675
+ * 18 Oct 2026 v676
  *
+ * v676 - A-8b/A-4/A-6 (Graeme, 18 Oct: "You do those things and these"; "I remember cross trainer being one"): every stylesheet starts downloading at once, so the first screen draws sooner; In step's "What this is" and the stretch arc's "How it works" are folded behind a tap, so no ordinary screen opens with more than about 60 words before its first button; the cross trainer is redrawn with the hands on the handles, the feet on the pedals and the machine joined up.
  * v675 - GS-EDIT/WEIGHT-RECHECK/OLD-CREDITS-TIDY (Graeme, 18 Oct): Settings › Your body › What you told me at the start changes what made exercise hard before, what you are coming back from and how your energy has been; a target weight is checked again whenever the weight, the date or the target changes, and set aside, with My programme saying why, if it has become faster than 3 lb a week; the older per-session credit count is no longer written.
  * v674 - SHORT-BARBELL: a session of 15 minutes or less chooses moves without barbell warm-up sets when it can, so a 10-minute plan is about 10 minutes again (since v670 about 1 in 9 came to 13 or more).
  * v673 - W6-14/W6-15/W6-16: when the three safety questions come back, one line says why (a new area, changed wording, or a month); the sore-area list names body areas (Front of the Shin, Outside of the Thigh / Knee, Heel / Arch of the Foot, Pain Running Down the Leg) and no line claims healing; the birth month no longer counts, so nobody is let in at 17; under 18 also forgets which research questions were answered; the privacy summary names the app's own address and the home-screen step, and its heading takes focus; one Back after the age answer; a late messages download keeps nothing after an under-18 answer; links that open a new tab say so; the run's Bad-day line matches every other door.
@@ -4222,7 +4223,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v675";
+const CACHE_NAME = "alongside-v676";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4230,8 +4231,8 @@ const CACHE_NAME = "alongside-v675";
 // downloads only the rest: it fetched all of them (about 6 MB) every time.
 // SHELL_HASHES:BEGIN
 const SHELL_HASHES = {
-  "./": "662d5f7fe44e93eb",
-  "./index.html": "662d5f7fe44e93eb",
+  "./": "ad5cc113fa8e5017",
+  "./index.html": "ad5cc113fa8e5017",
   "./css/main.css": "e306ded0118cbea6",
   "./css/base/fonts.css": "04893bbdfa4cf013",
   "./css/layouts/onboarding-additions.css": "a204c285b813c6e8",
@@ -4307,7 +4308,7 @@ const SHELL_HASHES = {
   "./js/views/today.js": "551e2226f851e075",
   "./js/views/mobility-conditioning.js": "dd64370231617186",
   "./js/views/arc-setup.js": "bc3f0046616fc07b",
-  "./js/views/stretch-arc.js": "fce3ddbd29c7fb30",
+  "./js/views/stretch-arc.js": "41d235d11e31fcb7",
   "./js/views/checkin.js": "29d45c08868e3e8f",
   "./js/views/checkin-mini.js": "c647f4da71feddde",
   "./js/views/coach-proposal.js": "73baf3596386f6b0",
@@ -4366,7 +4367,7 @@ const SHELL_HASHES = {
   "./js/figures.js": "60f325dd602352db",
   "./js/data/figures/index.js": "d4cf080b2f72544c",
   "./js/data/figures/batch-01.js": "aa63243f5ad443df",
-  "./js/data/figures/batch-02.js": "067171d42db1d439",
+  "./js/data/figures/batch-02.js": "ef4ef1ca67ed63ea",
   "./js/data/figures/batch-03.js": "2aa6d354f20f277e",
   "./js/data/figures/batch-04.js": "aeb04719a942e365",
   "./js/data/figures/batch-05.js": "570b42c8e26230e2",
@@ -4377,7 +4378,7 @@ const SHELL_HASHES = {
   "./js/data/figures/batch-10.js": "d03620cf63099b0f",
   "./js/data/figures/batch-11.js": "7dc464ecc3e93d58",
   "./js/data/figures/batch-12.js": "2e82b3c1bc531330",
-  "./js/data/figures/batch-13.js": "b5b77f98f819cff0",
+  "./js/data/figures/batch-13.js": "a1d9cccb18ce1cc8",
   "./js/data/figures/batch-14.js": "a5d94d7a78cc5c19",
   "./js/views/bad-day-door.js": "5910813778515c4e",
   "./js/data/chair-legs.js": "2befbb45dab79deb",
@@ -4413,7 +4414,7 @@ const SHELL_HASHES = {
   "./js/views/saved-sessions.js": "e4b36f369759e70a",
   "./js/views/session-builder-ui.js": "4bff89344b105d5c",
   "./js/views/noticing.js": "7344ac61b5a10c06",
-  "./js/views/in-step.js": "196267c5da62e662",
+  "./js/views/in-step.js": "e6b66f1d1e71096e",
   "./js/data/in-step-scenarios.js": "b46f085cda4d24fc",
   "./js/views/journal-entry.js": "772a866eba022cc4",
   "./js/views/gym-programme.js": "c7c1131806b03654",

@@ -1,11 +1,13 @@
 # Alongside: Move — Cold Start Blueprint
-## 18 Oct 2026 v281
+## 18 Oct 2026 v282
 
 Build New Habits | Everything a chat with no memory needs to pick this up and build confidently.
 
 **Read this first, then the master schedule in the private BNH-Files repository (`Apps/Alongside Move/Schedule/master_schedule.md`). Do not start work before both.**
 
 **01 Oct 2026: all business, legal, clinical, research and planning documents moved out of this public repository into `build-new-habits/BNH-Files` (private), and this repository's history was cleaned. Clone BNH-Files beside this repository (`../bnh-files`) or set `BNH_FILES`; the schedule checks read it from there.**
+
+**18 Oct 2026: clone the public website (`build-new-habits/website`) beside this repository too (`../website`) or set `WEBSITE`; `tools/verify-website.mjs` checks the site says only what this app does (tier table, coach lines, no detection claims).**
 
 ---
 
@@ -51,7 +53,7 @@ git clone --depth 1 https://x-access-token:$TOKEN@github.com/build-new-habits/al
 | BNH-Files: `Apps/Alongside Move/` `Legal/`, `Clinical/`, `Business/`, `Product/`, `Research/`, `Testing/`, `Admin/`, `Archive/` | Every other paper, including the governing documents below |
 | `docs/Schema.md` | Store fields. **Must match `store.js`** |
 | `docs/` | Only what the code and checks need: `Changelog.md`, `exercise_entry_standard.md`, `glossary.md` (one name per thing, A-9), this blueprint, `specs/` (three specs the checks read), `classes/` (guided class scripts), `archive-code/` (retired code) |
-| `tools/verify-*.mjs` | 327 gates |
+| `tools/verify-*.mjs` | 329 gates |
 | `js/` | Vanilla ES modules, no framework, no bundler |
 
 **Governing documents, in read order** (BNH-Files, `Apps/Alongside Move/Business/`):
@@ -72,10 +74,10 @@ git clone --depth 1 https://x-access-token:$TOKEN@github.com/build-new-habits/al
 |---|---|
 | `store.js` | v116 |
 | `Schema.md` | v1.114 |
-| `sw.js` | **v675**, cache `alongside-v675` |
+| `sw.js` | **v676**, cache `alongside-v676` |
 | `router.js` | v48 · `my-programme.js` v8 · `today.js` v49 · `settings.js` v46 · `progress.js` v27 · `onboarding/thread.js` v16 |
 | `exercise-card.js` | **v7** — CARD-4, four pages. `workout.css` v16 |
-| Gates | **327, all green** on jsdom 28.1.0 (`npm ci`) — from the repo root. See the cwd row in §9 |
+| Gates | **329, all green** on jsdom 28.1.0 (`npm ci`) — from the repo root. See the cwd row in §9 |
 
 🟢 **This table is now GATED.** `tools/verify-blueprint.mjs` compares every version above against the file that carries it and goes red on any drift, naming the row to change.
 
