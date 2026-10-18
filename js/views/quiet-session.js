@@ -1,6 +1,15 @@
 /**
  * quiet-session.js - Something Quieter View
  *
+ * 18 Oct 2026 v11
+ *
+ * v11 - OLD-CREDITS-TIDY (Graeme, 18 Oct: "You do those things"). The
+ *   older per-session credit count is no longer written (totalCredits,
+ *   lastWorkoutCredits, lastWorkoutName, an entry's creditsEarned): nothing
+ *   read it since August. The social action credits (community.credits,
+ *   store.logActivity) are unchanged. As it was: BNH-Files
+ *   Archive/DEVICE-662/OLD-CREDITS-TIDY.
+ *
  * 17 Oct 2026 v10
  *
  * v10 - W6-9 SMALL-6. The end-of-practice cue is said on the finished screen
@@ -951,7 +960,6 @@ function logSession(type, name, credits, localId, mins = null) {
     name,
     source:       "quiet-session",
     status:       "completed",
-    creditsEarned: credits,
     // W5-21. The minutes it took, so Progress counts it (it counted 0).
     durationMins: mins,
     // QUIET-1. Database id, so exerciseHistory and continuity can see it.
@@ -962,10 +970,6 @@ function logSession(type, name, credits, localId, mins = null) {
     sessionEnd:   nowIso
   });
 
-  const current = store.get("totalCredits") || 0;
-  store.set("totalCredits", current + credits);
-  store.set("lastWorkoutCredits", credits);
-  store.set("lastWorkoutName", name);
 }
 
 /**
@@ -997,7 +1001,6 @@ function logPartialMindfulSession() {
     name:          mindfulDuration + " min mindful session",
     source:        "quiet-session",
     status:        "partial",
-    creditsEarned: 0,
     durationMins:  Math.round(mindfulElapsed / 60),
     completedAt:   nowIso,
     sessionEnd:    nowIso

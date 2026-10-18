@@ -1,5 +1,14 @@
 /**
  * yoga-session.js
+ * 18 Oct 2026 v22
+ *
+ * v22 - OLD-CREDITS-TIDY (Graeme, 18 Oct: "You do those things"). The
+ *   older per-session credit count is no longer written (totalCredits,
+ *   lastWorkoutCredits, lastWorkoutName, an entry's creditsEarned): nothing
+ *   read it since August. The social action credits (community.credits,
+ *   store.logActivity) are unchanged. As it was: BNH-Files
+ *   Archive/DEVICE-662/OLD-CREDITS-TIDY.
+ *
  * 17 Oct 2026 v21
  *
  * v21 - W6-15 SCOPE-WORDS (Graeme, 17 Oct: "these are fine"). The recovery finish line no
@@ -376,7 +385,6 @@ let currentIndex  = 0;
 let timerInterval = null;
 let timeRemaining = 0;
 let timerRunning  = false;
-let creditsEarned = 0;
 let restInterval  = null;
 
 // 11 Aug 2026 — WOW-1 (PT-3). Session-level elapsed time. This view had
@@ -1254,7 +1262,6 @@ function startRestTimer(seconds, onComplete) {
 // ── Session flow ──────────────────────────────────────────────────────────────
 
 function advancePose() {
-  creditsEarned += 20;
   const pose = sessionQueue[currentIndex];
   currentIndex++;
   scrollToTop();   // SCROLL-1: a new card starts at the top
@@ -1298,9 +1305,6 @@ function advancePose() {
  * by id if the user taps "How did that feel?" afterward.
  */
 function finaliseSession() {
-  store.set("totalCredits",       (store.get("totalCredits") || 0) + creditsEarned);
-  store.set("lastWorkoutCredits", creditsEarned);
-  store.set("lastWorkoutName",    "Yoga & Pilates");
 
   // SAVE-HANDOFF, 16 Sep 2026. Hand the finished session to reflect.js
   // instead of carrying a private save block. This view assembles its
@@ -1349,7 +1353,6 @@ function finaliseSession() {
     // CONT-3. Poses never became familiar, for the same reason as
     // core-session: a count was logged, never the ids.
     exerciseIds:  sessionQueue.slice(0, currentIndex).map(p => p.id).filter(Boolean),
-    creditsEarned
   });
 
   if (activityEntry) {
@@ -1372,7 +1375,6 @@ function resetSession() {
   targetTapped   = false;
   sessionQueue  = [];
   currentIndex  = 0;
-  creditsEarned = 0;
   timeRemaining = 0;
   timerRunning  = false;
   restRemaining = 0;
@@ -1490,7 +1492,6 @@ function savePartialSession() {
     // 11 Aug 2026 (WOW-1): a real session clock now exists in this file,
     // so a partial exit reports genuine elapsed time instead of null.
     durationMins: elapsedMins(),
-    creditsEarned: typeof creditsEarned !== "undefined" ? creditsEarned : 0
   });
 
   if (activityEntry) {
@@ -1616,7 +1617,6 @@ export function onMount() {
       // are the card's, so the finish stores what was offered.
       sessionQueue = _offered[selectedMins] || buildSession(selectedFocus, selectedMins, selectedTarget);
       currentIndex = 0;
-      creditsEarned = 0;
       timeRemaining = 0;
       phase = "overview";
       rerender();

@@ -2,9 +2,18 @@ import { zonesForAreas } from "./data/aims.js";
 import { consentCovers } from "./data/health-consent-covers.js";
 import { RETIRED_CONDITIONS } from "./data/scope-statement.js";
 import { sanitizeWeekShape, sanitizeWeekDayRequest } from "./data/week-shape-model.js";
+import { validateWeightTarget } from "./data/weight-targets.js";
 
 /**
  * store.js - Data persistence layer
+ * 18 Oct 2026 v116
+ *
+ * v116 - WEIGHT-RECHECK (Schema v1.114; no new field). set() runs the
+ *   3 lb a week target check again whenever the weight, the target date
+ *   or the target changes (_recheckWeightTarget); a target that has
+ *   become too fast is cleared and strategicGoal.weightTargetBand takes
+ *   the new value "set-aside", so My programme can say why.
+ *
  * 13 Oct 2026 v115
  *
  * v115 - ARC-CREDIT (no schema change). markSessionWorked() tested an
@@ -2914,8 +2923,40 @@ export const store = {
     obj[keys[keys.length - 1]] = value;
     // W5-18. Sore answers carry the day they were given, however written.
     if (keys[0] === 'conditionPainScores') this.data.conditionPainScoresOn = this._localDay();
+    // WEIGHT-RECHECK (v116). The weight, the date or the target changed:
+    // the 3 lb a week check runs again, however it was written.
+    if (!this._rechecking && (path === 'weight' || path === 'targetDate' || path === 'weightTracking' ||
+        keys[0] === 'strategicGoal')) this._recheckWeightTarget();
     this.data.updatedAt = new Date().toISOString();
     this.save();
+  },
+
+  /**
+   * WEIGHT-RECHECK (v116; Graeme, 18 Oct). The target-weight check ran
+   * only when a target was saved with a weight and a date already there
+   * (my-programme.js); a later weight, date or target change was never
+   * checked (Safeguarding Policy v13 §3.9 said so). Now, whenever any of
+   * them changes and all three are known, the same check runs; a target
+   * that has become faster than 3 lb a week is set aside -- cleared, so
+   * nothing works towards it -- and weightTargetBand records "set-aside"
+   * for My programme to say why. Weight tracking off: nothing is touched.
+   * Nothing asks for a weigh-in.
+   */
+  _recheckWeightTarget() {
+    const sg = this.data.strategicGoal;
+    if (!sg || sg.targetUnit !== 'kg' || !(Number(sg.targetValue) > 0)) return;
+    if (this.data.weightTracking !== true) return;
+    const currentKg = Number(this.data.weight);
+    const date = sg.targetDate || this.data.targetDate || null;
+    if (!(currentKg > 0) || !date) return;
+    const weeks = Math.max(1, Math.round((new Date(date) - Date.now()) / (7 * 86400000)));
+    const r = validateWeightTarget({ currentKg, targetKg: Number(sg.targetValue), weeks,
+      now: new Date().toISOString().slice(0, 10), trackingEnabled: true });
+    if (r.band !== 'refuse') return;
+    this._rechecking = true;
+    try {
+      this.data.strategicGoal = { ...sg, targetValue: null, targetUnit: null, weightTargetBand: 'set-aside' };
+    } finally { this._rechecking = false; }
   },
 
   save() {

@@ -1,6 +1,12 @@
 /**
  * my-programme.js - My Programme
  *
+ * 18 Oct 2026 v11
+ *
+ * v11 - WEIGHT-RECHECK. When store.js v116 sets a target aside (a later
+ *   weight or date made it faster than 3 lb a week), the weight section
+ *   says why, in the refusal's own words.
+ *
  * 01 Oct 2026 v10
  *
  * v10 - BUNDLE-TRUE. No target weight without the health consent: the field
@@ -659,6 +665,17 @@ export function MyProgrammeView(router) {
    * on -- the toggle in Settings is the consent, and without it this
    * does not exist.
    */
+  /**
+   * WEIGHT-RECHECK (v11). store.js v116 set a target aside when a later
+   * weight or date made it faster than 3 lb a week. Said in the refusal's
+   * own words; no rate, no number about the body.
+   */
+  function _setAsideLine() {
+    return "I set your target aside: with things as they are now, it's faster than I can plan for safely. " +
+      "That's not a judgement on where you want to get to; it's a conversation for a GP or a registered " +
+      "dietitian. You can set it again further out, or leave it open-ended and we just get moving.";
+  }
+
   function _weightTarget(sg) {
     if (store.get('weightTracking') !== true || !healthAllowed()) return '';
 
@@ -694,7 +711,7 @@ export function MyProgrammeView(router) {
         <div class="my-programme-review__actions">
           <button class="btn btn-secondary btn-small" data-review="save-weight">Save it</button>
         </div>
-        <p class="my-programme-weight__note" id="weight-target-note" role="status"></p>
+        <p class="my-programme-weight__note" id="weight-target-note" role="status">${sg.weightTargetBand === 'set-aside' ? _setAsideLine() : ''}</p>
       </div>
     `;
   }

@@ -1,6 +1,15 @@
 /**
  * js/views/breathing-session.js - Guided Breathing Session
  *
+ * 18 Oct 2026 v13
+ *
+ * v13 - OLD-CREDITS-TIDY (Graeme, 18 Oct: "You do those things"). The
+ *   older per-session credit count is no longer written (totalCredits,
+ *   lastWorkoutCredits, lastWorkoutName, an entry's creditsEarned): nothing
+ *   read it since August. The social action credits (community.credits,
+ *   store.logActivity) are unchanged. As it was: BNH-Files
+ *   Archive/DEVICE-662/OLD-CREDITS-TIDY.
+ *
  * 17 Oct 2026 v12
  *
  * v12 - W6-9 SMALL-6. Left part-way, a practice is saved as partial with the
@@ -121,7 +130,6 @@ let totalSeconds   = 0;
 let currentPhase   = null;        // current breath phase label
 let phaseRemaining = 0;           // seconds left in current breath phase
 let phaseIndex     = 0;           // index within breath cycle
-let creditsEarned  = 0;
 
 // ── Breathing type definitions ────────────────────────────────────────────────
 
@@ -222,7 +230,6 @@ function startSession() {
   elapsed        = 0;
   totalSeconds   = selectedMins * 60;
   phaseIndex     = 0;
-  creditsEarned  = 0;
   phaseRemaining = type.cycle[0].seconds;
   currentPhase   = type.cycle[0];
 
@@ -240,8 +247,6 @@ function startSession() {
     const el = document.getElementById("bs-time-remaining");
     if (el) el.textContent = formatTime(remaining);
 
-    // Credits: 10 per minute
-    creditsEarned = Math.floor(elapsed / 60) * 10;
 
     if (elapsed >= totalSeconds) {
       clearInterval(sessionInterval);
@@ -344,15 +349,12 @@ function logSession(partialSeconds = null) {
     type:         "mindfulness",
     name:         `${TYPES.find(t => t.id === selectedType)?.label || "Breathing"} — ${partialSeconds == null ? selectedMins : Math.max(1, Math.round(partialSeconds / 60))} min`,
     durationMins: partialSeconds == null ? selectedMins : Math.max(1, Math.round(partialSeconds / 60)),
-    creditsEarned,
     source:       "self-directed",
     status:       partialSeconds == null ? "completed" : "partial",
     completedAt:  nowIso,
     sessionEnd:   nowIso
   });
 
-  const total = (store.get("totalCredits") || 0) + creditsEarned;
-  store.set("totalCredits", total);
 }
 
 function resetSession() {

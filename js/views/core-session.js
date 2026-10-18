@@ -1,6 +1,15 @@
 /**
  * core-session.js - Guided Core Session
  *
+ * 18 Oct 2026 v21
+ *
+ * v21 - OLD-CREDITS-TIDY (Graeme, 18 Oct: "You do those things"). The
+ *   older per-session credit count is no longer written (totalCredits,
+ *   lastWorkoutCredits, lastWorkoutName, an entry's creditsEarned): nothing
+ *   read it since August. The social action credits (community.credits,
+ *   store.logActivity) are unchanged. As it was: BNH-Files
+ *   Archive/DEVICE-662/OLD-CREDITS-TIDY.
+ *
  * 04 Oct 2026 v20
  *
  * v20 - W6-2. Before a core session starts a Bad day asks first (Library
@@ -294,7 +303,6 @@ let timerRunning  = false;
 
 // CARD-3. Ephemeral page state, reset on every exercise change.
 let currentCardPage = "decide";
-let creditsEarned = 0;
 let restRemaining = 0;
 
 // 11 Aug 2026 — WOW-1 (PT-3). Session-level elapsed time. This view had
@@ -1020,7 +1028,6 @@ function startRestTimer(seconds, onComplete) {
 }
 
 function awardCredits() {
-  creditsEarned += 20;
 }
 
 function completeExercise() {
@@ -1062,10 +1069,6 @@ function completeExercise() {
 }
 
 function finaliseSession() {
-  const total = (store.get("totalCredits") || 0) + creditsEarned;
-  store.set("totalCredits",       total);
-  store.set("lastWorkoutCredits", creditsEarned);
-  store.set("lastWorkoutName",    "Core Session");
 
   // 30 Jul 2026 v4 (Core Session data-integrity investigation): stopped
   // spreading `pending` (currentActivityEntry) into this write. Confirmed
@@ -1098,7 +1101,6 @@ function finaliseSession() {
     // work, and the drop-in coach question's 21-day window never saw it.
     // Sliced to currentIndex because that is how many were actually done.
     exerciseIds:    sessionQueue.slice(0, currentIndex).map(e => e.id).filter(Boolean),
-    creditsEarned
   });
 
   if (activityEntry) {
@@ -1118,7 +1120,6 @@ function resetSession() {
   sessionQueue  = [];
   currentIndex  = 0;
   pendingSkipOffer = null;   // W2-7: must not leak between sessions
-  creditsEarned = 0;
   timeRemaining = 0;
   timerRunning  = false;
   currentCardPage = "decide";   // CARD-3. Index resets here, so the page must too.
@@ -1238,7 +1239,6 @@ function savePartialSession() {
     // so a partial exit reports genuine elapsed time instead of null.
     durationMins:   elapsedMins(),
     exercisesCount: currentIndex,
-    creditsEarned:  typeof creditsEarned !== "undefined" ? creditsEarned : 0
   });
 
   if (activityEntry) {
@@ -1335,7 +1335,6 @@ export function onMount() {
   document.getElementById("cs-start-btn")?.addEventListener("click", () => {
     currentIndex  = 0;
     pendingSkipOffer = null;   // W2-7: must not leak between sessions
-    creditsEarned = 0;
     timeRemaining = 0;
     timerRunning  = false;
     currentCardPage = "decide";   // CARD-3. Every session opens on DECIDE.

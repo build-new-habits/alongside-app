@@ -1,5 +1,11 @@
 /**
  * tools/verify-restore.mjs
+ * 18 Oct 2026 v6
+ *
+ * v6 - OLD-CREDITS-TIDY. 1d's example of a live field outside the
+ *   defaults was totalCredits, now retired (Restore no longer carries it);
+ *   lastMilestone, still carried, takes its place. No assertion loosened.
+ *
  * 04 Oct 2026 v5
  *
  * v5 - LOOK-1: Restore from a file and Download your data are on the Your
@@ -87,7 +93,7 @@ function oldPhone() {
                             { id: "a2", date: "2026-09-22T10:00:00Z", type: "workout", status: "completed", durationMins: 20 }]);
   store.set("journalEntries", [{ id: "j1", date: "2026-09-21T10:00:00Z", text: "Felt good <3", tags: [] }]);
   store.set("conditions", ["knee"]);
-  store.set("gymEquipment", ["dumbbells"]); store.set("totalCredits", 40);
+  store.set("gymEquipment", ["dumbbells"]); store.set("lastMilestone", "first-week");
   localStorage.setItem("alongside-scheme", "light");
 }
 function exportText() {
@@ -118,8 +124,8 @@ ok("1a. Alongside's own file is accepted, with what it holds", read.ok && read.s
 R.applyRestore(read.data);
 ok("1b. the history comes back", store.get("name") === "Sam" && (store.get("activityLog") || []).length === 2 &&
    store.get("journalEntries")?.[0]?.text === "Felt good <3" && JSON.stringify(store.get("conditions")) === '["knee"]');
-ok("1d. live fields kept outside the defaults come back too (equipment, credits)",
-   JSON.stringify(store.get("gymEquipment")) === '["dumbbells"]' && store.get("totalCredits") === 40);
+ok("1d. live fields kept outside the defaults come back too (equipment, a milestone)",
+   JSON.stringify(store.get("gymEquipment")) === '["dumbbells"]' && store.get("lastMilestone") === "first-week");
 ok("1c. display settings stay this phone's (W4-3)", localStorage.getItem("alongside-scheme") === "dark");
 
 // ── 2. THIS DEVICE'S AGREEMENTS STAY ────────────────────────────────────

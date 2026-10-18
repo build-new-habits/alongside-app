@@ -1,5 +1,9 @@
 /*
  * css/components/settings.css
+ * 18 Oct 2026 v19
+ *   GS-EDIT. What you told me at the start: .settings-background__group
+ *   (as the capability groups), .settings-checks and .settings-check, one
+ *   tick box per answer, each a 44px target.
  * 04 Oct 2026 v18
  *   LOOK-1 / LOOK-3. The index is eight cards (.settings-idx), each with a
  *   tile in its kind colour (--sec, from variables.css --kind-*) and a line
@@ -1269,3 +1273,32 @@ button.settings-row:focus-visible { outline: 3px solid var(--color-border-focus)
 .settings-secpage .settings-rows > li { border-bottom: 1px solid var(--color-border-light); }
 .settings-secpage .settings-rows > li:last-child { border-bottom: 0; }
 .settings-secpage .settings-row { padding: var(--space-2) var(--space-4); }
+
+/* GS-EDIT — What you told me at the start, 18 Oct 2026 */
+.settings-background__group {
+  border: 0;
+  margin: 0 0 var(--space-5);
+  padding: 0;
+}
+.settings-background__group > .settings-label { margin-bottom: var(--space-1); }
+.settings-checks {
+  list-style: none;
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.settings-check {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 44px;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md, 12px);
+  color: var(--color-text);
+  cursor: pointer;
+}
+.settings-check input { width: 22px; height: 22px; flex: none; accent-color: var(--color-primary); }
+.settings-check:focus-within { outline: 3px solid var(--color-border-focus); outline-offset: 2px; }

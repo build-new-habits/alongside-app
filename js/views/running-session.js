@@ -1,6 +1,15 @@
 /**
  * running-session.js - Guided Running Session
  *
+ * 18 Oct 2026 v18
+ *
+ * v18 - OLD-CREDITS-TIDY (Graeme, 18 Oct: "You do those things"). The
+ *   older per-session credit count is no longer written (totalCredits,
+ *   lastWorkoutCredits, lastWorkoutName, an entry's creditsEarned): nothing
+ *   read it since August. The social action credits (community.credits,
+ *   store.logActivity) are unchanged. As it was: BNH-Files
+ *   Archive/DEVICE-662/OLD-CREDITS-TIDY.
+ *
  * 17 Oct 2026 v17
  *
  * v17 - W6-16 ("make everything match"). The Bad-day line before a run is
@@ -166,7 +175,6 @@ let sessionStarted = false;
 let promptIndex    = 0;
 let activePrompt   = null;
 let promptShownAt  = 0;      // W6-5: the elapsed second a prompt was shown
-let creditsEarned  = 0;
 let inWarmup       = true;   // first 2 min = warmup walk
 let inCooldown     = false;  // last 3 min = cooldown walk
 
@@ -691,7 +699,6 @@ function renderDone() {
 function startSession() {
   sessionStarted = true;
   paused         = false;
-  creditsEarned  = 50;
   inWarmup       = true;
   inCooldown     = false;
   elapsed        = 0;
@@ -710,7 +717,6 @@ function startSession() {
     totalPausedMs:          0,
     promptIndex:            0,
     firedStructureIndices:  [],
-    creditsEarned
   });
 
   requestWakeLock();
@@ -837,7 +843,6 @@ function firePrompt(prompt) {
     totalPausedMs,
     promptIndex,
     firedStructureIndices:  Array.from(firedStructureIndices),
-    creditsEarned
   });
   rerender();
 }
@@ -875,7 +880,6 @@ function handleVisibilityChange() {
 
 function dismissPrompt() {
   if (activePrompt && !activePrompt.isCooldown && !activePrompt.isWarmup) {
-    creditsEarned += 10;
   }
   activePrompt = null;
   rerender();
@@ -900,7 +904,6 @@ function pauseSession() {
       totalPausedMs,
       promptIndex,
       firedStructureIndices:  Array.from(firedStructureIndices),
-      creditsEarned
     });
     requestWakeLock();
   }
@@ -925,7 +928,6 @@ function endSession() {
     completedAt:   nowIso,
     status:        "completed",
     durationMins:  Math.floor(elapsed / 60),
-    creditsEarned
   });
 
   if (activityEntry) {
@@ -935,9 +937,6 @@ function endSession() {
   // 03 Aug 2026 v4 - genuine completion, nothing left to resume
   clearCheckpoint();
 
-  store.set("totalCredits",       (store.get("totalCredits") || 0) + creditsEarned);
-  store.set("lastWorkoutCredits", creditsEarned);
-  store.set("lastWorkoutName",    "Run");
   phase = "done";
   rerender();
 }
@@ -958,7 +957,6 @@ function resetSession() {
   sessionStarted = false;
   promptIndex    = 0;
   activePrompt   = null;
-  creditsEarned  = 0;
   inWarmup       = true;
   inCooldown     = false;
   // 03 Aug 2026 v4
@@ -1090,7 +1088,6 @@ function savePartialSession() {
     completedAt:   nowIso,
     status:        "partial",
     durationMins:  Math.floor(elapsed / 60),
-    creditsEarned: typeof creditsEarned !== "undefined" ? creditsEarned : 0
   });
 
   if (activityEntry) {
@@ -1233,7 +1230,6 @@ function resumeSession() {
   pausedAt                = null;
   promptIndex             = cp.promptIndex || 0;
   firedStructureIndices   = new Set(cp.firedStructureIndices || []);
-  creditsEarned           = typeof cp.creditsEarned === "number" ? cp.creditsEarned : 50;
   sessionStarted          = true;
   paused                  = false;
   activePrompt            = null;

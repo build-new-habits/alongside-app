@@ -1,5 +1,14 @@
 /**
  * activity-log.js - Universal Activity Logging View
+ * 18 Oct 2026 v4
+ *
+ * v4 - OLD-CREDITS-TIDY (Graeme, 18 Oct: "You do those things"). The
+ *   older per-session credit count is no longer written (totalCredits,
+ *   lastWorkoutCredits, lastWorkoutName, an entry's creditsEarned): nothing
+ *   read it since August. The social action credits (community.credits,
+ *   store.logActivity) are unchanged. As it was: BNH-Files
+ *   Archive/DEVICE-662/OLD-CREDITS-TIDY.
+ *
  * 17 Oct 2026 v3
  *
  * v3 - W6-9 SMALL-6. The Library's choice arrives chosen (handed over in
@@ -252,11 +261,9 @@ export function onMount() {
       status:        "completed",
       durationMins:  durationMins,
       feel:          FEEL_LABELS[feelRating - 1].toLowerCase().replace(" ", "-"),
-      creditsEarned: 20,
       completedAt:   nowIso,
       sessionEnd:    nowIso
     });
-    store.set("totalCredits", (store.get("totalCredits") || 0) + 20);
 
     logSaved = true;
     rerender();

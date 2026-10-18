@@ -1,6 +1,15 @@
 /**
  * prescribed-session.js - My exercises, played
  *
+ * 18 Oct 2026 v16
+ *
+ * v16 - OLD-CREDITS-TIDY (Graeme, 18 Oct: "You do those things"). The
+ *   older per-session credit count is no longer written (totalCredits,
+ *   lastWorkoutCredits, lastWorkoutName, an entry's creditsEarned): nothing
+ *   read it since August. The social action credits (community.credits,
+ *   store.logActivity) are unchanged. As it was: BNH-Files
+ *   Archive/DEVICE-662/OLD-CREDITS-TIDY.
+ *
  * 17 Oct 2026 v15
  *
  * v15 - D662-10 OLD-STARS (Graeme, 17 Oct: "Remove them"). No "+35 ⭐" on
@@ -183,8 +192,6 @@ function _esc(s) {
 export const centered = false;
 
 // -- Credit constants ----------------------------------------------------------
-const CREDITS_PER_EXERCISE = 35;
-const CREDITS_MAX          = 150;
 
 // -- Session state ---------------------------------------------------------------
 // PT-3 / PRESC-1, 12 Aug 2026. This view had no session clock, so it
@@ -465,18 +472,6 @@ function renderAlreadyDone() {
 // did not, so the same prescription timed in one view and not the other.
 // Both are now js/exercise-timing.js.
 
-/**
- * Credits for completing an exercise at this index.
- * Total for the session: min(count x 35, 150).
- * Split as evenly as possible across exercises.
- */
-function creditsForIndex(index, total) {
-  const sessionTotal = Math.min(total * CREDITS_PER_EXERCISE, CREDITS_MAX);
-  const base         = Math.floor(sessionTotal / total);
-  const remainder    = sessionTotal - (base * total);
-  // Give the remainder to the last exercise
-  return index === total - 1 ? base + remainder : base;
-}
 
 // TIME-1. formatTime is now js/exercise-timing.js -- there were three
 // identical copies, and the shared one also floors null to 0:00 rather
@@ -665,7 +660,6 @@ function resetTimer() {
 
 function completeExercise(active) {
   const ex      = active[currentIndex];
-  const credits = creditsForIndex(currentIndex, active.length);
 
   // Mark this exercise as completed in the store
   const all = store.get("prescribedExercises") || [];
@@ -681,7 +675,7 @@ function completeExercise(active) {
 
   // Accumulate credits in session progress
   const progress = store.get("prescribedSessionProgress") || [];
-  progress.push({ exerciseId: ex.id, credits });
+  progress.push({ exerciseId: ex.id });
   store.set("prescribedSessionProgress", progress);
 
   // P5 (29 Sep). The finished exercise has just LEFT the active list, so
@@ -711,18 +705,8 @@ function advanceSession(active) {
 
 function completeSession(active) {
   const progress     = store.get("prescribedSessionProgress") || [];
-  const creditsEarned = Math.min(
-    progress.reduce((sum, e) => sum + (e.credits || 0), 0),
-    CREDITS_MAX
-  );
-
-  // Award credits
-  const total = (store.get("totalCredits") || 0) + creditsEarned;
-  store.set("totalCredits", total);
 
   // Stash data for the reflection / completion screens
-  store.set("lastWorkoutCredits", creditsEarned);
-  store.set("lastWorkoutName",    "My exercises");
 
   // PRESC-1, 12 Aug 2026. This function did not log the session at all.
   // It awarded credits and navigated away, so a FINISHED prescribed
@@ -758,7 +742,6 @@ function completeSession(active) {
     exercisesCount: progress.length,
     exerciseIds:    progress.map(e => e.exerciseId).filter(Boolean),
     exercises:      worked,
-    creditsEarned
   });
   store.set("currentActivityEntry", created || null);
 
@@ -796,10 +779,6 @@ function savePartialSession() {
   const progress = store.get("prescribedSessionProgress") || [];
   if (progress.length === 0) return; // nothing completed yet - nothing to log
 
-  const creditsEarned = Math.min(
-    progress.reduce((sum, e) => sum + (e.credits || 0), 0),
-    CREDITS_MAX
-  );
   const nowIso = new Date().toISOString();
 
   const activityEntry = store.logActivity({
@@ -814,13 +793,9 @@ function savePartialSession() {
     // make its exercises "familiar". Present so the two call sites do not
     // diverge if that guard is ever revisited.
     exerciseIds:    progress.map(e => e.exerciseId).filter(Boolean),
-    creditsEarned
   });
 
   if (activityEntry) {
-    store.set("totalCredits", (store.get("totalCredits") || 0) + creditsEarned);
-    store.set("lastWorkoutCredits", creditsEarned);
-    store.set("lastWorkoutName",    "My exercises");
     store.set("currentActivityEntry", activityEntry);
   }
 

@@ -1,6 +1,15 @@
 /**
  * views/practices.js - Guided Practices
  *
+ * 18 Oct 2026 v3
+ *
+ * v3 - OLD-CREDITS-TIDY (Graeme, 18 Oct: "You do those things"). The
+ *   older per-session credit count is no longer written (totalCredits,
+ *   lastWorkoutCredits, lastWorkoutName, an entry's creditsEarned): nothing
+ *   read it since August. The social action credits (community.credits,
+ *   store.logActivity) are unchanged. As it was: BNH-Files
+ *   Archive/DEVICE-662/OLD-CREDITS-TIDY.
+ *
  * 28 Sep 2026 v2
  *
  * v2 - F7 LANDMARK. role="main" (and its label) removed from the view's
@@ -375,14 +384,10 @@ function logPractice(p) {
     name:          p.name,
     source:        "practices",
     status:        "completed",
-    creditsEarned: credits,
     durationMins:  Math.max(1, Math.round((p.duration || 0) / 60)),
     exerciseIds:   [p.id],
     completedAt:   nowIso,
     sessionEnd:    nowIso
   });
 
-  store.set("totalCredits", (store.get("totalCredits") || 0) + credits);
-  store.set("lastWorkoutCredits", credits);
-  store.set("lastWorkoutName", p.name);
 }

@@ -1,5 +1,14 @@
 /**
  * workout.js - Workout Execution View
+ * 18 Oct 2026 v35
+ *
+ * v35 - OLD-CREDITS-TIDY (Graeme, 18 Oct: "You do those things"). The
+ *   older per-session credit count is no longer written (totalCredits,
+ *   lastWorkoutCredits, lastWorkoutName, an entry's creditsEarned): nothing
+ *   read it since August. The social action credits (community.credits,
+ *   store.logActivity) are unchanged. As it was: BNH-Files
+ *   Archive/DEVICE-662/OLD-CREDITS-TIDY.
+ *
  * 04 Oct 2026 v34
  *
  * v34 - D-1 EXERCISE-FOUR (Graeme, 04 Oct, on the phone; Option B,
@@ -1514,7 +1523,6 @@ function savePartialSession() {
   if (exerciseDone && current && !progress.some(p => p.exerciseId === current.id)) {
     progress.push({ exerciseId: current.id, credits: current.credits, sets: Number(current.sets) || 1 });
   }
-  const creditsEarned  = progress.reduce((sum, e) => sum + (e.credits || 0), 0);
   const nowIso         = new Date().toISOString();
 
   _handOff(nowIso);   // P2: before the log, so the log describes this session
@@ -1534,7 +1542,6 @@ function savePartialSession() {
     // tell this was today's plan and offer to keep it. A partial entry's
     // ids are not routed into exerciseHistory (store.logActivity).
     exerciseIds:    progress.map(p => p.exerciseId).filter(Boolean),
-    creditsEarned
   });
 
   if (activityEntry) {
@@ -1562,11 +1569,6 @@ function completeWorkout() {
   const progress = store.get("workoutProgress") || [];
   const nowIso   = new Date().toISOString();
 
-  // Credits
-  const creditsEarned = progress.reduce((sum, e) => sum + (e.credits || 0), 0);
-  const totalCredits  = (store.get("totalCredits") || 0) + creditsEarned;
-  store.set("totalCredits", totalCredits);
-
   // Workout history
   const history = store.get("workoutHistory") || [];
   history.push({
@@ -1576,7 +1578,6 @@ function completeWorkout() {
     completedAt:        nowIso,
     exercisesCompleted: progress.length,
     totalExercises:     workout.exercises.length,
-    creditsEarned
   });
   store.set("workoutHistory", history);
 
@@ -1621,8 +1622,6 @@ function completeWorkout() {
   store.set("lastMilestone", milestone);
 
   // Stash data for the completion screen / reflection step
-  store.set("lastWorkoutCredits", creditsEarned);
-  store.set("lastWorkoutName",    workout.name);
 
   cleanupWorkout();
   // Route through reflect.js for post-session reflection.

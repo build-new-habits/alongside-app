@@ -1,5 +1,14 @@
 /**
  * js/data/restore.js
+ * 18 Oct 2026 v6
+ *
+ * v6 - OLD-CREDITS-TIDY (Graeme, 18 Oct: "You do those things"). The
+ *   older per-session credit count is no longer written (totalCredits,
+ *   lastWorkoutCredits, lastWorkoutName, an entry's creditsEarned): nothing
+ *   read it since August. The social action credits (community.credits,
+ *   store.logActivity) are unchanged. As it was: BNH-Files
+ *   Archive/DEVICE-662/OLD-CREDITS-TIDY.
+ *
  * 03 Oct 2026 v5
  *
  * v5 - W5-21 SMALL-5 and W5-20 TRUE-WORDS-5. "</3" comes back as written
@@ -91,9 +100,9 @@ const MAX_DISPLAY_VALUE = 2000;
  * person. Legacy consentGiven is left out: agreements are this device's.
  */
 export const KNOWN_OUTSIDE_DEFAULTS = [
-  "gymEquipment", "homeEquipment", "totalCredits", "availableTime",
+  "gymEquipment", "homeEquipment", "availableTime",
   "workoutHistory", "workoutProgress", "morningProgrammeWeek",
-  "prescribedSessionProgress", "lastWorkoutName", "lastWorkoutCredits",
+  "prescribedSessionProgress",
   "lastMilestone",
 ];
 

@@ -1,6 +1,15 @@
 /**
  * walk-session.js - Coached Walk Session
  *
+ * 18 Oct 2026 v10
+ *
+ * v10 - OLD-CREDITS-TIDY (Graeme, 18 Oct: "You do those things"). The
+ *   older per-session credit count is no longer written (totalCredits,
+ *   lastWorkoutCredits, lastWorkoutName, an entry's creditsEarned): nothing
+ *   read it since August. The social action credits (community.credits,
+ *   store.logActivity) are unchanged. As it was: BNH-Files
+ *   Archive/DEVICE-662/OLD-CREDITS-TIDY.
+ *
  * 17 Oct 2026 v9
  *
  * v9 - W6-15 SCOPE-WORDS (Graeme, 17 Oct: "these are fine"). The heel and arch note names
@@ -99,7 +108,6 @@ let promptInterval = null;
 let nextPromptAt   = 0;          // seconds elapsed when next prompt fires
 let promptIndex    = 0;
 let activePrompt   = null;       // currently displayed prompt object
-let creditsEarned  = 0;
 let sessionStarted = false;
 let paused         = false;
 
@@ -514,7 +522,6 @@ function renderDone() {
 function startSession() {
   sessionStarted = true;
   paused         = false;
-  creditsEarned  = 40;
 
   const totalSecs       = selectedMins * 60;
   const wt              = WALK_TYPES.find(t => t.id === selectedType);
@@ -574,7 +581,6 @@ function firePrompt(prompt) {
 function dismissPrompt() {
   // Award credits for engaging with a prompt
   if (activePrompt && !activePrompt.isCooldown) {
-    creditsEarned += 10;
   }
   activePrompt = null;
   rerenderPromptArea();
@@ -619,16 +625,12 @@ function endSession() {
     completedAt:   nowIso,
     status:        "completed",
     durationMins:  Math.floor(elapsed / 60),
-    creditsEarned
   });
 
   if (activityEntry) {
     store.set("currentActivityEntry", activityEntry);
   }
 
-  store.set("totalCredits",       (store.get("totalCredits") || 0) + creditsEarned);
-  store.set("lastWorkoutCredits", creditsEarned);
-  store.set("lastWorkoutName",    "Walk Session");
 
   phase = "done";
   rerenderPromptArea();
@@ -644,7 +646,6 @@ function resetSession() {
   promptIndex    = 0;
   nextPromptAt   = 0;
   activePrompt   = null;
-  creditsEarned  = 0;
   sessionStarted = false;
   paused         = false;
 }
@@ -850,7 +851,6 @@ function savePartialSession() {
     completedAt:   nowIso,
     status:        "partial",
     durationMins:  Math.floor(elapsed / 60),
-    creditsEarned: typeof creditsEarned !== "undefined" ? creditsEarned : 0
   });
 
   if (activityEntry) {

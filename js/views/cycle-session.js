@@ -1,6 +1,15 @@
 /**
  * cycle-session.js - Guided Cycle Session
  *
+ * 18 Oct 2026 v8
+ *
+ * v8 - OLD-CREDITS-TIDY (Graeme, 18 Oct: "You do those things"). The
+ *   older per-session credit count is no longer written (totalCredits,
+ *   lastWorkoutCredits, lastWorkoutName, an entry's creditsEarned): nothing
+ *   read it since August. The social action credits (community.credits,
+ *   store.logActivity) are unchanged. As it was: BNH-Files
+ *   Archive/DEVICE-662/OLD-CREDITS-TIDY.
+ *
  * 04 Oct 2026 v7
  *
  * v7 - W6-2 and W6-5. Before a ride starts a Bad day asks first. Exit pauses
@@ -70,7 +79,6 @@ let paused         = false;
 let sessionStarted = false;
 let promptIndex    = 0;
 let activePrompt   = null;
-let creditsEarned  = 0;
 
 const RIDE_TYPES = [
   { id: "road",    label: "Road ride",     icon: "\uD83D\uDEB4", description: "Outdoors. Real terrain and conditions." },
@@ -345,7 +353,6 @@ function renderDone() {
 function startSession() {
   sessionStarted = true;
   paused         = false;
-  creditsEarned  = 50;
   const totalSecs = selectedMins * 60;
   const freqSecs  = selectedType === "intervals" ? 5 * 60 : selectedType === "ftp-builder" ? 6 * 60 : 8 * 60;
   let nextPromptAt = freqSecs;
@@ -389,16 +396,12 @@ function endSession() {
     completedAt:   nowIso,
     status:        "completed",
     durationMins:  Math.floor(elapsed / 60),
-    creditsEarned
   });
 
   if (activityEntry) {
     store.set("currentActivityEntry", activityEntry);
   }
 
-  store.set("totalCredits",       (store.get("totalCredits") || 0) + creditsEarned);
-  store.set("lastWorkoutCredits", creditsEarned);
-  store.set("lastWorkoutName",    "Cycle");
   phase = "done";
   rerender();
 }
@@ -408,7 +411,7 @@ function resetSession() {
   if (sessionTimer) { clearInterval(sessionTimer); sessionTimer = null; }
   phase = "ride-type"; selectedRide = null; selectedType = null;
   selectedMins = null; elapsed = 0; paused = false;
-  sessionStarted = false; promptIndex = 0; activePrompt = null; creditsEarned = 0;
+  sessionStarted = false; promptIndex = 0; activePrompt = null;
 }
 
 // ── Exit confirmation overlay ──────────────────────────────────────────────
@@ -511,7 +514,6 @@ function savePartialSession() {
     completedAt:   nowIso,
     status:        "partial",
     durationMins:  Math.floor(elapsed / 60),
-    creditsEarned: typeof creditsEarned !== "undefined" ? creditsEarned : 0
   });
 
   if (activityEntry) {
@@ -569,8 +571,7 @@ export function onMount() {
   document.getElementById("cs-start-btn")?.addEventListener("click", startSession);
   document.getElementById("cs-start-ride-btn")?.addEventListener("click", () => { phase = "cycling"; rerender(); });
   document.getElementById("cs-pause-btn")?.addEventListener("click", () => { paused = !paused; rerender(); });
-  document.getElementById("cs-prompt-dismiss")?.addEventListener("click", () => {
-    creditsEarned += 10; activePrompt = null; rerender();
+  document.getElementById("cs-prompt-dismiss")?.addEventListener("click", () => { activePrompt = null; rerender();
   });
   document.getElementById("cs-reflect-btn")?.addEventListener("click", () => { resetSession(); router.navigate("reflect"); });
   document.getElementById("cs-home-btn")?.addEventListener("click", () => { resetSession(); router.navigate("today"); });

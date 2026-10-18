@@ -1,5 +1,7 @@
 # Alongside — Data Schema Reference
-## 17 Oct 2026 v1.113
+## 18 Oct 2026 v1.114
+
+> **v1.114, 18 Oct 2026 — WEIGHT-RECHECK and GS-EDIT** (`store.js` v116). **No new field.** `strategicGoal.weightTargetBand` takes one new value, **`"set-aside"`**: written by `store.set()` (`_recheckWeightTarget`) when a later change to `weight`, the target date or the target makes the target faster than 3 lb a week; `targetValue` and `targetUnit` are cleared with it. Read by `views/my-programme.js` (one line saying why). Never written with `weightTracking` off. `onboarding.hardBeforeSelections`, `onboarding.primaryTerritory`, `lifestyle.returningAfter` and `lifestyle.stressLevel` gain a second writer, Settings › Your body › What you told me at the start (`settings.js` v72); an empty choice writes `null`. **OLD-CREDITS-TIDY: `totalCredits`, `lastWorkoutCredits` and `lastWorkoutName` are retired** (no writer, no reader; a phone that has them keeps them, unread; Restore no longer carries them), and new `activityLog[]` entries no longer carry `creditsEarned`. The social action credits, `community.credits`, are unchanged.
 
 > **v1.113, 17 Oct 2026 — W6-7 GENTLE-LOGGED** (`store.js` unchanged, v115). **No new field.** `activityLog[].sessionType` now also takes `"gentle-care"` (the Bad day's gentle plan, `session-builder.js` v86) and `"general-routine"` (the routine after a second no to the health consent, `general-routine.js` v2), written by `logActivity()` from the session the player played, as every built type is. Both sessions also carry `gentleReason`, so the entry is `gentle: true` and Mostly the same never learns them as the usual. Read by `activity-labels.js` v5 (their own words) and `evidence.js` (breathing; no kind). `chooseSessionType()` ignores both, as it ignores anything not one of the nine.
 
@@ -1045,7 +1047,7 @@
 
 ## 06 Sep 2026 v1.51
 
-**File:** `js/store.js` (confirmed live version: **v115, 13 Oct 2026**)
+**File:** `js/store.js` (confirmed live version: **v116, 18 Oct 2026**)
 
 > **v1.47, 06 Sep 2026 — CR-1.** `conditions[]` gains three ids and loses one. `chronic-fatigue` is **retired**; `persistent-fatigue`, `me-cfs` and `long-covid` replace it. No field shape changed — `conditions` is still `string[]` and `conditionMeta` is still keyed by condition id.
 >
@@ -1181,7 +1183,7 @@ Weight tracking is **a feature, off by default, Plan-only**. Nothing here is rea
 | `targetWeight` | `number\|null` | `null` | **Canonical kilograms, always** |
 | `weightUnit` | `'kg'\|'lb'\|'st'` | `'kg'` | **Display preference only.** Never affects what is stored |
 | `weightLog` | `array` | `[]` | `{ at, kg }`. Passive entry only |
-| `strategicGoal.weightTargetBand` | `string\|null` | `null` | Which band accepted the target at set-time: `silent` \| `note` \| `capped` |
+| `strategicGoal.weightTargetBand` | `string\|null` | `null` | Which band accepted the target at set-time: `silent` \| `note` \| `capped`; or `set-aside` when a later weight or date made it too fast and it was cleared (v1.114) |
 
 ### 🔴 Canonical kilograms — storage only, never display
 
@@ -1846,9 +1848,9 @@ Legal consent record. Restored after the PT-W1 store audit found it absent: `wel
 | `activityLog` | `array` | `[]` | Each entry: `{ id, date, type, durationMins, moodAfter, isEvent, eventName, completedAt, gentle, rescued, place, ... }` (`place` v1.111, D-11) (`gentle` v1.84, W3-12; `rescued` v1.85, W3-13). Single write path since v10: `store.logActivity()`, with dedupe guard against same-type double-writes within 2 minutes. |
 | `currentActivityEntry` | `null` | `null` | **Under active investigation** — separate blueprint (`alongside_blueprint_coresession-integrity_30jul2026_v1.md`) is checking whether Core Session ever populates this field upstream. Out of scope for BUILD-4; do not resolve here. |
 | `generatedSession` (nested) | `object` | `{ session: null, builtAt: null, inputs: {} }` | The real "today's workout" mechanism — this is what replaced the old `todaysWorkouts`/`workoutsGeneratedAt` pattern (see corrections above). **v1.52:** each entry in `session.exercises` carries `role` — `"warmup"`, `"main"` or `"cooldown"` — stamped at assembly by `buildSession()` / `buildSessionFromSelection()`. Read by `workout.js` for the badge above the exercise name. Older sessions cached before 08 Sep 2026 have no `role`; the view suppresses the badge rather than printing anything when it is absent. |
-| `totalCredits` | `number` | `0` *(undocumented)* | **Resolved 03 Aug — live, 21 refs.** Running lifetime total, incremented at completion by every session-type view (walk/run/yoga/swim/core/cycle/gym/quiet/breathing/prescribed). Read by `workout-complete.js` for the completion screen. Confirmed genuinely distinct from `community.credits` (Section 18) — that's the separate Impact Credits mechanism (1–2 awarded per session depending on tier, via `awardCommunityCredit()`). Incidental finding: `community.credits` is written but has **no reader anywhere** — nothing displays it. Logged, not fixed. |
-| `lastWorkoutName` | `string\|null` | `null` *(undocumented)* | **Resolved 03 Aug — live, 12 refs.** Paired with `lastWorkoutCredits`; written by every session-completion view, read by `workout-complete.js`, cleared on exit. |
-| `lastWorkoutCredits` | `number` | `0` *(undocumented)* | **Resolved 03 Aug — live, 12 refs.** See `lastWorkoutName` above; written/read/cleared together at the same call sites. |
+| `totalCredits` | `number` | `0` *(undocumented)* | **RETIRED 18 Oct 2026 (v1.114, OLD-CREDITS-TIDY): no writer, no reader.** Was: **Resolved 03 Aug — live, 21 refs.** Running lifetime total, incremented at completion by every session-type view (walk/run/yoga/swim/core/cycle/gym/quiet/breathing/prescribed). Read by `workout-complete.js` for the completion screen. Confirmed genuinely distinct from `community.credits` (Section 18) — that's the separate Impact Credits mechanism (1–2 awarded per session depending on tier, via `awardCommunityCredit()`). Incidental finding: `community.credits` is written but has **no reader anywhere** — nothing displays it. Logged, not fixed. |
+| `lastWorkoutName` | `string\|null` | `null` *(undocumented)* | **RETIRED 18 Oct 2026 (v1.114, OLD-CREDITS-TIDY): no writer, no reader.** Was: **Resolved 03 Aug — live, 12 refs.** Paired with `lastWorkoutCredits`; written by every session-completion view, read by `workout-complete.js`, cleared on exit. |
+| `lastWorkoutCredits` | `number` | `0` *(undocumented)* | **RETIRED 18 Oct 2026 (v1.114, OLD-CREDITS-TIDY): no writer, no reader.** Was: **Resolved 03 Aug — live, 12 refs.** See `lastWorkoutName` above; written/read/cleared together at the same call sites. |
 | `workoutProgress` | `array` | `[]` *(undocumented)* | **Resolved 03 Aug — live.** `workout.js`'s own in-progress per-exercise completion tracker, entirely self-contained (get/set/clear all within that file). Confirmed genuinely distinct from `prescribedSessionProgress` below, not a duplicate. |
 | `prescribedSessionProgress` | `array` | `[]` *(undocumented)* | **Resolved 03 Aug — live.** Same pattern as `workoutProgress`, scoped entirely within `prescribed-session.js`. |
 | `workoutHistory` | `array` | `[]` *(undocumented)* | **Resolved 03 Aug — live but write-only.** Appended by `completeWorkout()` in `workout.js` on every gym-type workout completion (`{ workoutId, name, focus, completedAt, exercisesCompleted, totalExercises, creditsEarned }`) — a genuine fourth history mechanism, distinct from `activityLog`, `progressLog`, and `activeProgramme.milestones`. **No reader anywhere confirmed** — nothing in Settings, Progress, or any history view displays it. Data is being collected with no consumer. Logged, not fixed. |
@@ -2080,9 +2082,9 @@ All 18 fields flagged in the 30 Jul v1.9 follow-up list have been individually c
 
 | Field | Resolution | Documented in |
 |-------|-----------|----------------|
-| `totalCredits` | Live | §5 Activity & Session Tracking |
-| `lastWorkoutName` | Live | §5 |
-| `lastWorkoutCredits` | Live | §5 |
+| `totalCredits` | Retired 18 Oct (v1.114) | §5 Activity & Session Tracking |
+| `lastWorkoutName` | Retired 18 Oct (v1.114) | §5 |
+| `lastWorkoutCredits` | Retired 18 Oct (v1.114) | §5 |
 | `quietMode` | Live | §6 Check-In Engine |
 | `lastMilestone` | Live | §4 Gym Programme |
 | `prescribedSessionProgress` | Live | §5 |

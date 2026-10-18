@@ -1,5 +1,14 @@
 /**
  * settings.js
+ * 18 Oct 2026 v72
+ *
+ * v72 - GS-EDIT (Graeme, 18 Oct: "change three of the getting-started
+ *   answers - now"). Your body › What you told me at the start: what made
+ *   exercise hard before (ticks), what you are coming back from and how
+ *   your energy has been, each changeable and saved as it changes (they
+ *   could only be deleted). Health answers: without the consent the row
+ *   asks for it first.
+ *
  * 17 Oct 2026 v71
  *
  * v71 - W6-18 A11Y-W6. The two switches drawn on their own screens (Your
@@ -726,7 +735,7 @@
  */
 
 import { AVAILABLE_TIME_WINDOW_MINUTES } from '../data/time-windows.js';
-import { INTENT_CHIPS }   from '../data/onboarding-thread-data.js';   // W3-17
+import { INTENT_CHIPS, HARD_BEFORE_CHIPS, RETURNING_AFTER_CHIPS, ENERGY_CHIPS } from '../data/onboarding-thread-data.js';   // W3-17; GS-EDIT
 import { store }          from '../store.js';
 import { isPremium }      from '../auth.js';
 import { toKg, fromKg } from '../data/weight-targets.js';
@@ -846,6 +855,7 @@ export function SettingsView(router) {
     if (back && fromConsent && !activeScreen) {
       activeScreen = back.activeScreen; activeSection = back.activeSection; screenFrom = back.screenFrom;
       if (healthAllowed() && back.action === 'health-capability') { activeScreen = 'capability'; screenFrom = 'body'; activeSection = 'body'; focusAfter = '.settings-title'; }
+      if (healthAllowed() && back.action === 'health-background') { activeScreen = 'background'; screenFrom = 'body'; activeSection = 'body'; focusAfter = '.settings-title'; }
       if (healthAllowed() && back.action === 'edit-conditions') openConditions = true;
     }
     render(container);
@@ -899,6 +909,7 @@ export function SettingsView(router) {
     conditions:   { title: 'Sore or injured areas', render: () => renderConditionsPanel() },
     equipment:    { title: 'Equipment',               render: () => renderEquipmentPanel() },
     capability:   { title: 'What your body can do',   render: () => `${askingAgain ? _askAgainNote() : ''}<div class="settings-section">${renderCapabilitySection()}</div>` },
+    background:   { title: 'What you told me at the start', render: () => `<div class="settings-section">${renderBackgroundSection()}</div>` },
     preferences:  { title: 'How sessions are built',  render: () => `<div class="settings-section">${renderPreferencesSection()}</div>` },
     reflection:   { title: 'Your reflection',         render: () => `<div class="settings-section">${renderReflectionSection()}</div>` },
     programme:    { title: 'Goals and your week',     render: () => renderProgrammePanel() },
@@ -1057,6 +1068,11 @@ export function SettingsView(router) {
           healthAllowed()
             ? _row({ label: 'What your body can do', value: c.cap.askedAt ? 'Answered' : 'Not answered', open: 'capability' })
             : _row({ label: 'What your body can do', value: 'Not answered', action: 'health-capability' }),
+          // GS-EDIT. What they told the app at the start: health answers,
+          // so without the consent the row asks for it first.
+          healthAllowed()
+            ? _row({ label: 'What you told me at the start', value: _backgroundAnswered() ? 'Answered' : 'Not answered', open: 'background' })
+            : _row({ label: 'What you told me at the start', value: 'Not answered', action: 'health-background' }),
         ] },
         c.premium ? { title: 'Weight', rows: [
           _rowSwitch({ id: 'settings-weight-tracking', label: 'Weight tracking', sub: 'Off unless you turn it on. Only you see it, and I will never ask you to weigh yourself.', field: 'weightTracking' }),
@@ -1719,6 +1735,49 @@ export function SettingsView(router) {
   //    capabilityProfile() treats null as cautious-but-unrestricted, so
   //    clearing an answer is meaningful and must be possible. A person who
   //    said "no" during a bad flare must be able to take it back.
+
+  /**
+   * GS-EDIT (18 Oct 2026; Graeme: "change three of the getting-started
+   * answers - now"). Getting started's three background answers, each
+   * changeable here as it was given there (the same answers, the same
+   * words), saved as it changes. Delete my health answers still deletes
+   * them all.
+   */
+  function _backgroundAnswered() {
+    return (store.get('onboarding.hardBeforeSelections') || []).length > 0 ||
+      !!store.get('lifestyle.returningAfter') || !!store.get('lifestyle.stressLevel');
+  }
+  function renderBackgroundSection() {
+    const hard = store.get('onboarding.hardBeforeSelections') || [];
+    const ret  = store.get('lifestyle.returningAfter') || '';
+    const en   = store.get('lifestyle.stressLevel') || '';
+    const select = (field, id, chips, value) => `
+        <select class="settings-select" id="${id}" data-field="${field}">
+          <option value=""${!value ? ' selected' : ''}>Not answered</option>
+          ${chips.map(c => `<option value="${c.id}"${value === c.id ? ' selected' : ''}>${_esc(c.label)}</option>`).join('')}
+        </select>`;
+    return `
+      <p class="settings-section__sub">What you said when you started. Change any of it whenever it stops being true; I use it to choose how I talk to you and how hard to start.</p>
+      <fieldset class="settings-field settings-background__group">
+        <legend class="settings-label">What made exercise hard before</legend>
+        <p class="settings-section__sub" id="bg-hard-hint">Tick everything that feels true. None is fine too.</p>
+        <ul class="settings-checks" aria-describedby="bg-hard-hint">
+          ${HARD_BEFORE_CHIPS.map(c => `
+            <li><label class="settings-check">
+              <input type="checkbox" data-hard-before value="${c.id}"${hard.includes(c.id) ? ' checked' : ''}>
+              <span>${_esc(c.label)}</span>
+            </label></li>`).join('')}
+        </ul>
+      </fieldset>
+      <div class="settings-field">
+        <label class="settings-label" for="settings-bg-returning">What you are coming back from</label>
+        ${select('lifestyle.returningAfter', 'settings-bg-returning', RETURNING_AFTER_CHIPS, ret)}
+      </div>
+      <div class="settings-field">
+        <label class="settings-label" for="settings-bg-energy">How your energy has been</label>
+        ${select('lifestyle.stressLevel', 'settings-bg-energy', ENERGY_CHIPS, en)}
+      </div>`;
+  }
 
   function renderCapabilitySection() {
     const cap = store.get('capability') || {};
@@ -2751,6 +2810,15 @@ export function SettingsView(router) {
       render(container);
     });
 
+    // GS-EDIT. What made it hard before: the ticked boxes are the list,
+    // and the main one stays one of them (the first ticked, if it was not).
+    container.querySelectorAll('[data-hard-before]').forEach(el => el.addEventListener('change', () => {
+      const picked = [...container.querySelectorAll('[data-hard-before]')].filter(b => b.checked).map(b => b.value);
+      store.set('onboarding.hardBeforeSelections', picked);
+      if (!picked.includes(store.get('onboarding.primaryTerritory'))) store.set('onboarding.primaryTerritory', picked[0] || null);
+      _saved(container);
+    }));
+
     // SMOOTH-P4c. Every field saves the moment it changes -- no Save.
     // Text saves as it is typed too, so leaving never loses a word.
     container.querySelectorAll('[data-field]').forEach(el => {
@@ -2758,6 +2826,8 @@ export function SettingsView(router) {
         const field = el.dataset.field;
         if (field.startsWith('capability.')) { _saveCapability(container); _saved(container); return; }
         const value = el.type === 'checkbox' ? el.checked : el.value;
+        // GS-EDIT. Not answered is no answer (null), never an empty string.
+        if ((field === 'lifestyle.returningAfter' || field === 'lifestyle.stressLevel') && value === '') { store.set(field, null); _saved(container); return; }
         store.set(field, el.type === 'number' ? Number(value) : value);
         // P11. One answer: onboarding's field changes with it.
         if (field === 'fitnessLevel') store.set('lifestyle.activityLevel', value);
@@ -3147,6 +3217,11 @@ export function SettingsView(router) {
       case 'health-capability':
         // LEGAL-TRUE. Only rendered while the health consent is needed.
         _askConsent('health-capability');
+        break;
+
+      case 'health-background':
+        // GS-EDIT. The same: only while the health consent is needed.
+        _askConsent('health-background');
         break;
 
       case 'edit-conditions':
