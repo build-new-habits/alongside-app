@@ -1,6 +1,7 @@
 /**
  * js/data/figures/batch-13.js
- * 18 Oct 2026 v2
+ * 19 Oct 2026 v3
+ * v3 (19 Oct 2026, A-6, Graeme's marks): stationary bike frame simplified.
  *
  * D-4 FIGURES, batch 13: cardio (bodyweight conditioning, walking, running,
  * skipping, dance, bikes, rowing machines and the cardio warm-ups).
@@ -158,11 +159,7 @@ export const FIGURES_13 = {
     { l: "Rest: 20 seconds", a: "Recovering between rounds: upright, walking gently rather than standing still.",
       p: { hip: [82, 116], t: 180, nl: [26.5, 1.6, 90], fl: [-1.6, -26.5, 90], na: [-20, -8], fa: [20, 30] } },
   ] },
-  "bike-easy-spin-warmup": { w: 180, f: [
-    { l: "Sit upright, easy spin", a: "Sitting upright on an exercise bike, hands resting on the handlebars, one pedal at the bottom with that leg almost straight.",
-      p: { hip: [74, 98], t: 165, h: 175, nl: [18.4, 3, 90], fl: [69.3, -31, 90], na: [43.6, 68.3] },
-      x: [{ box: [26, 184, 128, 6] }, { ball: [128, 160, 16] }, { bar: [62, 184, 72, 104] }, { bar: [62, 103, 84, 103] }, { bar: [128, 160, 130, 82] }, { bar: [118, 82, 140, 80] }, { bar: [60, 184, 96, 160] }, { bar: [96, 160, 96, 174] }, { bar: [96, 160, 96, 146] }] },
-  ] },
+  "bike-easy-spin-warmup": {"w":180,"f":[{"l":"Sit upright, easy spin","a":"Sitting upright on an exercise bike, hands resting on the handlebars, one pedal at the bottom with that leg almost straight.","p":{"hip":[74,98],"t":165,"h":175,"nl":[18.4,3,90],"fl":[69.3,-31,90],"na":[43.6,68.3]},"x":[{"box":[40,184,106,6]},{"bar":[64,184,68,106]},{"bar":[58,104,82,104]},{"bar":[66,160,134,160]},{"bar":[134,184,130,82]},{"bar":[118,82,140,80]},{"ball":[134,160,14]},{"bar":[96,146,96,174]}]}]},
   "treadmill-easy-walk-warmup": { w: 180, f: [
     { l: "Walk tall, hands free", a: "Walking upright at a brisk pace on a flat treadmill, arms swinging naturally, not leaning on the rails, looking ahead.",
       p: { hip: [80, 100], t: 180, nl: [26.5, -1.4, 90], fl: [1.4, -26.5, 90], na: [-18, -8], fa: [18, 30] },

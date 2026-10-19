@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 18 Oct 2026 v676
+ * 19 Oct 2026 v677
  *
+ * v677 - A-6 FIGURE-PASS (Graeme marked 25 drawings on the Figure Review page, 19 Oct): every swim has a light wavy water line instead of a grey line through the body, a high-elbow arm and a tidier kick, and Bilateral Breathing shows the breath; every "feel it" circle says so; the "keep this line" guide is grey and dotted, not green; face pulls, reverse fly and chest fly stay in one view; Achilles drops, Pallof press, Thread the Needle, Side Plank, the bike, knee drive, lateral step-over, towel curl, frog, mermaid, Shoulder Bridge (the peel) and the Quiet Cardio squat redrawn; Compassionate Self-Talk has a speech bubble; no exercise says it burns calories.
  * v676 - A-8b/A-4/A-6 (Graeme, 18 Oct: "You do those things and these"; "I remember cross trainer being one"): every stylesheet starts downloading at once, so the first screen draws sooner; In step's "What this is" and the stretch arc's "How it works" are folded behind a tap, so no ordinary screen opens with more than about 60 words before its first button; the cross trainer is redrawn with the hands on the handles, the feet on the pedals and the machine joined up.
  * v675 - GS-EDIT/WEIGHT-RECHECK/OLD-CREDITS-TIDY (Graeme, 18 Oct): Settings › Your body › What you told me at the start changes what made exercise hard before, what you are coming back from and how your energy has been; a target weight is checked again whenever the weight, the date or the target changes, and set aside, with My programme saying why, if it has become faster than 3 lb a week; the older per-session credit count is no longer written.
  * v674 - SHORT-BARBELL: a session of 15 minutes or less chooses moves without barbell warm-up sets when it can, so a 10-minute plan is about 10 minutes again (since v670 about 1 in 9 came to 13 or more).
@@ -4223,7 +4224,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v676";
+const CACHE_NAME = "alongside-v677";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4267,7 +4268,7 @@ const SHELL_HASHES = {
   "./css/components/session-shared.css": "a71069801a65054c",
   "./css/components/upgrade-door.css": "1a2deeaceb45f4f1",
   "./css/components/upgrade-page.css": "ef2284fa060b21ea",
-  "./css/base/global.css": "0a48f058e0429881",
+  "./css/base/global.css": "4ea80d6410e772ff",
   "./css/base/reset.css": "717c20ab5ebbd16e",
   "./css/base/typography.css": "7ef937ebd7185b4b",
   "./css/base/variables.css": "0a5315988156303d",
@@ -4364,22 +4365,22 @@ const SHELL_HASHES = {
   "./js/data/plan-reader.js": "a63239d24ffa51f9",
   "./js/views/plan-import.js": "630d97175edd2091",
   "./css/components/your-week.css": "f14109dded35259b",
-  "./js/figures.js": "60f325dd602352db",
+  "./js/figures.js": "01542770aecbbc2d",
   "./js/data/figures/index.js": "d4cf080b2f72544c",
-  "./js/data/figures/batch-01.js": "aa63243f5ad443df",
-  "./js/data/figures/batch-02.js": "ef4ef1ca67ed63ea",
+  "./js/data/figures/batch-01.js": "27f86e28fb0c9833",
+  "./js/data/figures/batch-02.js": "45f4f07439ed515e",
   "./js/data/figures/batch-03.js": "2aa6d354f20f277e",
-  "./js/data/figures/batch-04.js": "aeb04719a942e365",
-  "./js/data/figures/batch-05.js": "570b42c8e26230e2",
+  "./js/data/figures/batch-04.js": "9f74c9e82d89444b",
+  "./js/data/figures/batch-05.js": "f2d0d1e87037802b",
   "./js/data/figures/batch-06.js": "dcf7b603cf6c3ead",
   "./js/data/figures/batch-07.js": "47b134e0e32a4179",
-  "./js/data/figures/batch-08.js": "138e1ed0d3526628",
-  "./js/data/figures/batch-09.js": "c9b02eff8626cefe",
-  "./js/data/figures/batch-10.js": "d03620cf63099b0f",
-  "./js/data/figures/batch-11.js": "7dc464ecc3e93d58",
-  "./js/data/figures/batch-12.js": "2e82b3c1bc531330",
-  "./js/data/figures/batch-13.js": "a1d9cccb18ce1cc8",
-  "./js/data/figures/batch-14.js": "a5d94d7a78cc5c19",
+  "./js/data/figures/batch-08.js": "b64d62a0725de3d4",
+  "./js/data/figures/batch-09.js": "c0fab8282e087789",
+  "./js/data/figures/batch-10.js": "068116a7ecbd4a05",
+  "./js/data/figures/batch-11.js": "f430879ecc2de572",
+  "./js/data/figures/batch-12.js": "b73433bc521bb260",
+  "./js/data/figures/batch-13.js": "805fd6bff0fe06e4",
+  "./js/data/figures/batch-14.js": "9c7dda3723b2648b",
   "./js/views/bad-day-door.js": "5910813778515c4e",
   "./js/data/chair-legs.js": "2befbb45dab79deb",
   "./js/data/general-routine.js": "30dd1899fa187d6a",
@@ -4461,7 +4462,7 @@ const SHELL_HASHES = {
   "./js/data/coach-voice.js": "92ea4a0209978619",
   "./js/data/exercises/index.js": "d9df11d43f5df8ce",
   "./js/data/exercises/strength.js": "1357c6bb46e7a89d",
-  "./js/data/exercises/cardio.js": "e828c599b78284d3",
+  "./js/data/exercises/cardio.js": "2ca5030c1a1cf9fa",
   "./js/data/exercises/mobility.js": "721c3f53d858e0d2",
   "./js/data/exercises/yoga.js": "e506e6b3452ee86e",
   "./js/data/exercises/pilates.js": "99e320f6392bca5b",

@@ -1,6 +1,7 @@
 /**
  * js/data/figures/batch-05.js
- * 04 Oct 2026 v1
+ * 19 Oct 2026 v2
+ * v2 (19 Oct 2026, A-6, Graeme's marks): Achilles heel drops: the other foot lifted behind in both pictures, a hand on the wall; towel hamstring curl legs and feet redrawn.
  *
  * D-4 FIGURES, batch 05: rehabilitation, first half (glutes, hamstrings,
  * calves and Achilles, knees and the outer hip).
@@ -196,12 +197,7 @@ export const FIGURES_05 = {
       p: { hip: [82, 172], t: -105, h: -100, fl: [98, 98, 98], nl: [100.6, 100.6, 100.6], na: [0, 90], fa: [65, 80] },
       x: [{ bench: [124, 172, 162] }, { mv: [104, 187, 104, 177] }] },
   ] },
-  "towel-hamstring-curl": { w: 180, f: [
-    { l: "Heels on towel, hips up", g: "mat", a: "Lying on the back, heels on a folded towel, knees bent, hips lifted into a bridge, arms on the floor.",
-      p: { hip: [97, 161], t: -68, h: -95, nl: [112.9, -6, 180], fa: [96, 92] }, x: [{ box: [120, 183, 26, 6] }] },
-    { l: "Slide out, hips up", g: "mat", a: "The heels slid away on the towel until the legs are nearly straight, hips still lifted; then curled back in.",
-      p: { hip: [97, 163], t: -70, h: -95, nl: [100.7, 42.4, 180], fa: [96, 92] }, x: [{ box: [150, 183, 26, 6] }, { mv: [138, 140, 166, 140] }] },
-  ] },
+  "towel-hamstring-curl": {"w":180,"f":[{"l":"Heels on towel, hips up","g":"mat","a":"Lying on the back, heels on a folded towel, knees bent, hips lifted into a bridge, arms on the floor.","p":{"hip":[97,161],"t":-68,"h":-95,"nl":[112.9,-6,160],"fa":[96,92]},"x":[{"box":[120,183,26,6]}]},{"l":"Slide out, hips up","g":"mat","a":"The heels slid away on the towel until the legs are nearly straight, hips still lifted; then curled back in.","p":{"hip":[97,163],"t":-70,"h":-95,"nl":[83,61,160],"fa":[96,92]},"x":[{"box":[154,183,26,6]},{"mv":[128,150,160,150]}]}]},
   "standing-calf-raise-eccentric": { w: 160, f: [
     { l: "Rise on both feet", a: "Standing on a step with the balls of both feet on the edge, risen up onto the toes.",
       p: { hip: [84, 85], t: 180, nl: [0, 0, 50], fl: [0, 0, 50], na: [0, 4] }, x: [{ box: [90, 172, 60, 18] }] },
@@ -214,18 +210,8 @@ export const FIGURES_05 = {
     { l: "Rise, hold 1, lower over 3", a: "Risen onto the ball of the standing foot as high as is comfortable.",
       p: { hip: [84, 103], t: 180, nl: [0, 0, 50], fl: [5, -60, 90], na: [62, 110], fa: [0, 4] }, x: [{ wall: 136 }, { mv: [106, 186, 106, 170] }] },
   ] },
-  "achilles-heel-drop-straight": { w: 160, f: [
-    { l: "Start: up on the ball", a: "Standing on a step with the ball of the foot on the edge, up on the toes, knee straight.",
-      p: { hip: [84, 85], t: 180, nl: [0, 0, 50], fl: [0, 0, 50], na: [0, 4] }, x: [{ box: [90, 172, 60, 18] }] },
-    { l: "Heel down over 4, knee straight", a: "On one foot, knee kept straight, the heel lowered slowly below the level of the step; the other foot is off.",
-      p: { hip: [83.2, 102], t: 180, nl: [0, 0, 125], fl: [10, -60, 90], na: [0, 4] }, x: [{ box: [90, 172, 60, 18] }, { mv: [68, 168, 68, 186] }] },
-  ] },
-  "achilles-heel-drop-bent": { w: 160, f: [
-    { l: "Start: knee bent, up on ball", a: "Standing on a step with the ball of the foot on the edge, up on the toes, knee bent a little.",
-      p: { hip: [77.6, 88.2], t: 180, nl: [20, -10, 50], fl: [20, -10, 50], na: [0, 4] }, x: [{ box: [90, 172, 60, 18] }] },
-    { l: "Heel down over 4, knee bent", a: "On one foot, knee kept bent the same amount, the heel lowered slowly below the level of the step; the other foot is off.",
-      p: { hip: [76.8, 105.2], t: 180, nl: [20, -10, 125], fl: [24, -60, 90], na: [0, 4] }, x: [{ box: [90, 172, 60, 18] }, { mv: [60, 170, 60, 188] }] },
-  ] },
+  "achilles-heel-drop-straight": {"w":160,"f":[{"l":"Up on the ball, knee straight","a":"One foot on the edge of a step, up on the ball of the foot with the knee straight, the other foot lifted behind; one hand on the wall for balance.","p":{"hip":[84,85],"t":180,"nl":[0,0,50],"fl":[10,-80,-100],"na":[72,88]},"x":[{"wall":130},{"box":[90,172,40,18]}]},{"l":"Heel down over 4, knee straight","a":"The heel lowered slowly below the level of the step, the knee kept straight; the other foot stays lifted behind.","p":{"hip":[83.2,102],"t":180,"nl":[0,0,125],"fl":[10,-80,-100],"na":[72,96]},"x":[{"wall":130},{"box":[90,172,40,18]},{"mv":[68,168,68,186]}]}]},
+  "achilles-heel-drop-bent": {"w":160,"f":[{"l":"Up on the ball, knee bent","a":"One foot on the edge of a step, up on the ball of the foot with the knee bent a little, the other foot lifted behind; one hand on the wall for balance.","p":{"hip":[77.6,88.2],"t":180,"nl":[20,-10,50],"fl":[10,-80,-100],"na":[80,92]},"x":[{"wall":130},{"box":[90,172,40,18]}]},{"l":"Heel down over 4, knee bent","a":"The heel lowered slowly below the level of the step, the knee kept bent the same amount; the other foot stays lifted behind.","p":{"hip":[76.8,105.2],"t":180,"nl":[20,-10,125],"fl":[10,-80,-100],"na":[80,100]},"x":[{"wall":130},{"box":[90,172,40,18]},{"mv":[60,170,60,188]}]}]},
   "standing-calf-stretch-wall": { w: 160, f: [
     { l: "Lean in and hold", a: "Facing a wall with both hands on it, one foot stepped well back with the knee straight and the heel pressed down, the front knee bent, leaning gently in; the stretch is felt in the back calf.",
       p: { hip: [73.6, 125.7], t: 145, h: 145, nl: [-35, -35, 90], fl: [50.2, 1.8, 90], na: [50, 130] }, x: [{ wall: 140 }, { ring: [38, 166] }] },

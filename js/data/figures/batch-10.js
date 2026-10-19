@@ -1,6 +1,7 @@
 /**
  * js/data/figures/batch-10.js
- * 04 Oct 2026 v1
+ * 19 Oct 2026 v2
+ * v2 (19 Oct 2026, A-6, Graeme's marks): mermaid ring says feel it; shoulder bridge shows the peel up, bone by bone.
  *
  * D-4 FIGURES, batch 10: recovery and pilates (breathing practices, foam
  * rolling, rest and sleep positions, walks, heat and cold, and the mat
@@ -241,20 +242,8 @@ export const FIGURES_10 = {
       p: { hip: [100, 180], t: -140, h: -150, nl: [140, 90, 100], fl: [136, 88, 100], na: [92, 92], fa: [94, 94] },
       x: [{ mvq: [24, 172, 12, 146, 26, 124] }] },
   ] },
-  "pilates-shoulder-bridge": { w: 160, f: [
-    { l: "Start", g: "mat", a: "Lying on the back, knees bent, feet flat on the floor hip-width apart, arms by the sides.",
-      p: { hip: [100, 178], t: -90, h: -95, nl: [140, 10, 90], fa: [96, 92] } },
-    { l: "Peel up into a bridge", g: "mat", a: "Spine peeled off the mat from the tailbone up until the body is one straight line from shoulders to knees, feet still flat.",
-      p: { hip: [97, 161], t: -68, h: -95, nl: [112, -5, 90], fa: [96, 92] }, x: [{ mv: [97, 188, 97, 173] }] },
-  ] },
-  "pilates-mermaid": { w: 180, f: [
-    { l: "Sit, one arm up", a: "Seen from the front: sitting with both legs folded to one side, the hand on the other side resting on the floor, the free arm reaching up.",
-      p: { v: "front", hip: [100, 182], t: 174, la: [-174, -176], ra: [14, 6] },
-      x: [{ body: [[92, 182, 54, 186, 86, 188]] }, { far: [[108, 182, 66, 184, 98, 186]] }] },
-    { l: "Reach up and over, hold", a: "Seen from the front: bending sideways towards the supporting hand, the free arm reaching up and over the head; the stretch is felt along the side of the body.",
-      p: { v: "front", hip: [100, 182], t: 156, h: 150, la: [168, 128], ra: [34, -6] },
-      x: [{ body: [[92, 182, 54, 186, 86, 188]] }, { far: [[108, 182, 66, 184, 98, 186]] }, { ring: [82, 140] }, { mvq: [60, 70, 80, 40, 116, 44] }] },
-  ] },
+  "pilates-shoulder-bridge": {"w":160,"f":[{"l":"Start","g":"mat","a":"Lying on the back, knees bent, feet flat on the floor hip-width apart, arms by the sides.","p":{"hip":[100,178],"t":-90,"h":-95,"nl":[140,10,90],"fa":[96,92]}},{"l":"Peel up, one bone at a time","g":"mat","a":"The tailbone curls up first, then the spine peels off the mat one bone at a time, the back rounded, not arched.","p":{"hip":[99,170],"t":-80,"h":-95,"bend":[0,5],"nl":[128,3,90],"fa":[96,92]},"x":[{"mv":[99,188,99,180]}]},{"l":"Bridge, then roll down","g":"mat","a":"At the top the body is one straight line from shoulders to knees; then the spine rolls back down one bone at a time, the tailbone last.","p":{"hip":[97,161],"t":-68,"h":-95,"nl":[112,-5,90],"fa":[96,92]}}]},
+  "pilates-mermaid": {"w":180,"f":[{"l":"Sit, one arm up","a":"Seen from the front: sitting with both legs folded to one side, the hand on the other side resting on the floor, the free arm reaching up.","p":{"v":"front","hip":[100,182],"t":174,"la":[-174,-176],"ra":[14,6]},"x":[{"body":[[92,182,54,186,86,188]]},{"far":[[108,182,66,184,98,186]]}]},{"l":"Reach up and over, hold","a":"Seen from the front: bending sideways towards the supporting hand, the free arm reaching up and over the head; the stretch is felt along the side of the body, marked feel it.","p":{"v":"front","hip":[100,182],"t":156,"h":150,"la":[168,128],"ra":[34,-6]},"x":[{"body":[[92,182,54,186,86,188]]},{"far":[[108,182,66,184,98,186]]},{"ring":[80,142,"l"]},{"mvq":[60,70,80,40,116,44]}]}]},
   "pilates-roll-down-wall": { w: 160, f: [
     { l: "Back against the wall", a: "Standing with the back against a wall, feet hip-width apart and a short step away from it, head, upper back and tailbone touching the wall.",
       p: { hip: [50, 113.6], t: -175, h: -178, nl: [12, 12, 90], fl: [10, 10, 90], na: [-4, 2], fa: [-2, 4] },

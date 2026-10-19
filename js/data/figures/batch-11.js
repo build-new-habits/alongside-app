@@ -1,6 +1,7 @@
 /**
  * js/data/figures/batch-11.js
- * 04 Oct 2026 v1
+ * 19 Oct 2026 v2
+ * v2 (19 Oct 2026, A-6, Graeme's marks): compassionate self-talk has a speech bubble.
  *
  * D-4 FIGURES, batch 11: the yoga poses and flows, then the mindfulness,
  * breathing and relaxation practices. A flow or sequence shows its key pose;
@@ -202,9 +203,7 @@ export const FIGURES_11 = {
     { l: "Walk slowly, notice each step", a: "Walking upright at a natural, comfortable pace, one foot stepping forward as the arms swing gently.",
       p: WALK },
   ] },
-  "compassionate-self-talk": sitFrame("Hand on the chest",
-    "Sitting quietly on a chair, feet flat on the floor, one hand resting on the chest and the other on the thigh, eyes soft and low.",
-    { ...SIT_SOFT, na: [5, 150], fa: [34, 34] }),
+  "compassionate-self-talk": {"w":160,"f":[{"l":"Hand on the chest, kind words","a":"Sitting quietly on a chair, feet flat on the floor, one hand resting on the chest and the other on the thigh, eyes soft and low, saying something kind to yourself.","p":{"hip":[70,150],"t":180,"nl":[90,0,90],"fl":[90,0,90],"na":[5,150],"h":170,"fa":[34,34]},"x":[{"chair":[44,152]},{"say":[90,46]}]}]},
   "nature-visualisation": lieFrame("Lie or sit comfortably", LIE_A),
   "morning-intention": sitFrame("Sit quietly", SIT_A),
   "gratitude-reflection": sitFrame("Sit quietly", SIT_A),

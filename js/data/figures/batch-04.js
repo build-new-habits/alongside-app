@@ -1,6 +1,7 @@
 /**
  * js/data/figures/batch-04.js
- * 04 Oct 2026 v1
+ * 19 Oct 2026 v2
+ * v2 (19 Oct 2026, A-6, Graeme's marks): face pull shown from the front throughout; Pallof press start has the hands at the chest, one arrow; Barbell RDL's "feel it" on the left, off the bar.
  *
  * D-4 FIGURES, batch 04: strength, second half: barbell lifts, resistance
  * bands, dumbbell variations, carries, planks and holds.
@@ -17,7 +18,7 @@ export const FIGURES_04 = {
     { l: "Start", a: "Standing tall holding a barbell at hip height with straight arms.",
       p: { hip: [84, 112], t: 180, nl: [0, 0, 90], na: [0, 3], hold: "plate" } },
     { l: "Hips back, back flat", a: "Hinged at the hips: hips pushed back, knees soft, back flat, the bar lowered close to the legs to about mid-shin; the stretch is felt in the back of the thighs.",
-      p: { hip: [63.4, 123.6], t: 115, nl: [45, -9.5, 90], na: [0, 0], hold: "plate" }, x: [{ mv: [52, 104, 30, 104] }, { ring: [70, 143] }] },
+      p: { hip: [63.4, 123.6], t: 115, nl: [45, -9.5, 90], na: [0, 0], hold: "plate" }, x: [{ mv: [52, 104, 30, 104] }, { ring: [70, 143, "l"] }] },
   ] },
   "barbell-hip-thrust": { w: 160, f: [
     { l: "Start", a: "Sitting on the floor with the upper back against the edge of a bench, a padded barbell across the hips held in place by the hands, knees bent, feet flat on the floor.",
@@ -51,12 +52,7 @@ export const FIGURES_04 = {
     { l: "Pull the band apart", a: "Seen from the front, arms drawn straight out to the sides at shoulder height, the band stretched across the chest, shoulder blades squeezed together, shoulders down.",
       p: { v: "front", hip: [80, 112], t: 180, ll: [-8, -2], rl: [8, 2], la: [-90, -90], ra: [90, 90] }, x: [{ band: [13, 66, 147, 66] }, { mv: [44, 90, 20, 90] }, { mv: [116, 90, 140, 90] }] },
   ] },
-  "band-face-pull": { w: 160, f: [
-    { l: "Arms reaching forward", a: "Standing, facing a band anchored at face height, holding it with both hands, arms straight out in front at face height, the band taut.",
-      p: { hip: [64, 112], t: 180, nl: [0, 0, 90], na: [100, 100], fa: [98, 98] }, x: [{ wall: 150 }, { band: [115, 57, 150, 54] }] },
-    { l: "Pull to the face", a: "Seen from the front, the band pulled to the face: elbows out to the sides at shoulder height, hands beside the face, thumbs turned back.",
-      p: { v: "front", hip: [80, 112], t: 180, ll: [-8, -2], rl: [8, 2], la: [-90, 151], ra: [90, -151] } },
-  ] },
+  "band-face-pull": {"w":160,"f":[{"l":"Arms forward, hands together","a":"Seen from the front, facing a band anchored at face height in front, holding it with both hands, arms reaching straight forward so the hands are together in front.","p":{"v":"front","hip":[80,112],"t":180,"ll":[-8,-2],"rl":[8,2],"la":[-40,100],"ra":[40,-100]}},{"l":"Pull to the face, elbows high","a":"Seen from the front, the band pulled to the face: elbows out to the sides at shoulder height, hands beside the ears, shoulder blades squeezed.","p":{"v":"front","hip":[80,112],"t":180,"ll":[-8,-2],"rl":[8,2],"la":[-90,151],"ra":[90,-151]},"x":[{"mv":[56,92,30,92]},{"mv":[104,92,130,92]}]}]},
   "band-squat": { w: 160, f: [
     { l: "Start", a: "Standing tall on the middle of a band, feet shoulder-width apart, holding the band ends at shoulder height.",
       p: { hip: [84, 112], t: 180, nl: [0, 0, 90], na: [28, 172] }, x: [{ band: [94, 188, 100, 64] }] },
@@ -111,12 +107,7 @@ export const FIGURES_04 = {
     { l: "Press up", a: "Seen from the front, both hands pressed straight up until the arms are straight, lower back not arched.",
       p: { v: "front", hip: [80, 112], t: 180, ll: [-8, -2], rl: [8, 2], la: [-167, 176], ra: [167, -176] }, x: [{ band: [62, 188, 60, 16] }, { band: [98, 188, 100, 16] }, { mv: [22, 74, 22, 36] }, { mv: [138, 74, 138, 36] }] },
   ] },
-  "band-pallof-press": { w: 180, f: [
-    { l: "Hands at the chest", a: "Seen from the front, standing side-on to a band anchored at chest height, feet apart, holding the band with both hands at the middle of the chest.",
-      p: { v: "front", hip: [66, 112], t: 180, ll: [-8, -2], rl: [8, 2], la: [101.9, -26.1], ra: [-101.9, 26.1] }, x: [{ wall: 172 }, { band: [68, 84, 172, 80] }] },
-    { l: "Press out, hold 2 seconds", a: "Seen from the side, both hands pressed straight out in front of the chest until the arms are straight, held for 2 seconds; the body stays square, not turning towards the band.",
-      p: { hip: [66, 112], nl: [0, 0, 90], fl: [0, 0, 90], t: 180, na: [79, 101], fa: [77, 103] }, x: [{ mv: [124, 96, 146, 96] }] },
-  ] },
+  "band-pallof-press": {"w":180,"f":[{"l":"Side-on to the anchor, hands at chest","a":"Seen from the front, standing side-on to a band anchored at chest height, feet apart, holding the band with both hands at the middle of the chest.","p":{"v":"front","hip":[66,112],"t":180,"ll":[-8,-2],"rl":[8,2],"la":[-40,100],"ra":[40,-100]},"x":[{"wall":172},{"band":[80,88,172,84]}]},{"l":"Press straight out, don't turn","a":"Seen from the side, both hands pressed straight out in front of the chest until the arms are straight, held for 2 seconds; the band pulls sideways but the body stays square, not turning towards it.","p":{"hip":[66,112],"nl":[0,0,90],"fl":[0,0,90],"t":180,"na":[86,94],"fa":[84,92]},"x":[{"mv":[126,96,150,96]}]}]},
   "dumbbell-step-up": { w: 160, f: [
     { l: "Foot on the step", a: "Standing in front of a step holding a dumbbell in each hand, one foot placed flat on top of the step.",
       p: { hip: [64, 112], t: 180, fl: [0, 0, 90], nl: [79.4, 1, 90], na: [0, 4], fa: [0, 2], hold: "dbs", holdF: "dbs" }, x: [{ box: [92, 160, 60, 30] }] },

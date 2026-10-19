@@ -1,6 +1,7 @@
 /**
  * data/exercises/cardio.js
- * 13 Oct 2026 v8
+ * 19 Oct 2026 v9
+ * v9 - A-6/WEB-CLAIMS: no line says an exercise burns calories (the app never counts them); jumping rope and Nordic walking reworded.
  *
  * v8 - HOME-BANDS (Graeme, 13 Oct: "include aerobic exercises for home").
  *   Seven quiet, no-jump moves for a living room: Step Jacks, Skater Steps,
@@ -264,7 +265,7 @@ export const CARDIO = [
       'Start with 30 seconds on, 30 rest — build to longer sets over time'
     ],
     coaching: 'It takes a few sessions to get the rhythm. If you miss, just restart immediately.',
-    why: 'One of the most efficient cardio exercises — improves coordination and burns calories quickly.',
+    why: 'One of the most efficient cardio exercises — improves coordination and fitness in very little time.',
         watchOut: [
       'Jumping far higher than the rope needs',
       'Landing flat-footed and heavily',
@@ -883,7 +884,7 @@ export const CARDIO = [
       'The poles increase the upper body involvement to 90% of all muscles',
       'Walk for 30 minutes at a brisk pace'
     ],
-    coaching: 'Nordic walking looks unusual but the evidence is excellent — it burns more calories than regular walking at the same pace and develops upper body strength simultaneously.',
+    coaching: 'Nordic walking looks unusual, but the poles bring the arms and upper body into every step, so it works more of you than walking at the same pace.',
     why: 'Nordic walking engages the upper body through active pole planting, increasing caloric expenditure by 20 to 40% compared to regular walking while reducing knee joint load.',
         watchOut: [
       'Planting the poles too far forward, which becomes braking rather than propulsion',

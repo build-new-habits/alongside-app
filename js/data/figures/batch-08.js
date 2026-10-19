@@ -1,6 +1,7 @@
 /**
  * js/data/figures/batch-08.js
- * 04 Oct 2026 v1
+ * 19 Oct 2026 v2
+ * v2 (19 Oct 2026, A-6, Graeme's marks): seated chest fly hands meet at the chest; seated face pull shown from the front throughout; seated lat stretch "feel it" on the left.
  *
  * D-4 FIGURES, batch 08: the seated exercises (chair-based strength, bands,
  * stretches and seated cardio), plus three standing ones holding a chair.
@@ -180,12 +181,7 @@ export const FIGURES_08 = {
     { l: "Pull apart, back over 3", a: "Seen from the front, sitting tall, arms drawn straight out to the sides, the band stretched across the chest, shoulder blades squeezed, shoulders down.",
       p: { ...FRONT, la: [-90, -90], ra: [90, 90] }, x: [...SEAT, { band: [13, 96, 147, 96] }, { mv: [44, 118, 20, 118] }, { mv: [116, 118, 140, 118] }] },
   ] },
-  "seated-band-face-pull": { w: 160, f: [
-    { l: "Arms straight out", a: "Seen from the side, sitting tall on a chair facing a band anchored at face height, holding it with both hands, arms straight out, the band taut.",
-      p: { ...SIT, na: [100, 100], fa: [98, 98] }, x: [CH, { wall: 150 }, { band: [121, 95, 150, 92] }] },
-    { l: "Pull to the face", a: "Seen from the front, the band pulled towards the face: elbows out wide and high at shoulder height, hands either side of the head, shoulder blades squeezed.",
-      p: { ...FRONT, la: [-90, 151], ra: [90, -151] }, x: SEAT },
-  ] },
+  "seated-band-face-pull": {"w":160,"f":[{"l":"Arms forward, hands together","a":"Seen from the front, sitting tall on a chair facing a band anchored at face height in front, holding it with both hands, arms reaching straight forward so the hands are together in front.","p":{"v":"front","hip":[80,142],"t":180,"la":[-40,100],"ra":[40,-100]},"x":[{"box":[56,148,48,8]},{"box":[77,156,6,34]},{"body":[[62,188,66,150,72,142],[98,188,94,150,88,142]]}]},{"l":"Pull to the face, elbows high","a":"Seen from the front, the band pulled towards the face: elbows out wide and high at shoulder height, hands either side of the head, shoulder blades squeezed.","p":{"v":"front","hip":[80,142],"t":180,"la":[-90,151],"ra":[90,-151]},"x":[{"box":[56,148,48,8]},{"box":[77,156,6,34]},{"body":[[62,188,66,150,72,142],[98,188,94,150,88,142]]},{"mv":[56,122,30,122]},{"mv":[104,122,130,122]}]}]},
   "seated-band-lat-pulldown": { w: 160, f: [
     { l: "Arms overhead", a: "Seen from the front, sitting tall on a chair beneath a band anchored above head height, an end in each hand, arms up overhead.",
       p: { ...FRONT, la: [-158, -167], ra: [158, 167] }, x: [...SEAT, { bar: [64, 12, 96, 12] }, { band: [48, 47, 80, 14] }, { band: [112, 47, 80, 14] }] },
@@ -236,7 +232,7 @@ export const FIGURES_08 = {
     { l: "Arm up", a: "Seen from the front, sitting tall on a chair, one arm reaching straight up overhead, the other hand on the thigh.",
       p: { ...FRONT, la: [180, 180], ra: [10, -12] }, x: SEAT },
     { l: "Lean over, hold 30 seconds", a: "Seen from the front, leaning slowly to the side away from the raised arm, which reaches over the head; both hips stay down on the seat; the stretch is felt along the side of the raised arm.",
-      p: { ...FRONT, t: 165, h: 165, la: [175, 130], ra: [20, 10] }, x: [...SEAT, { ring: [70, 120] }, { mvq: [112, 38, 132, 46, 136, 70] }] },
+      p: { ...FRONT, t: 165, h: 165, la: [175, 130], ra: [20, 10] }, x: [...SEAT, { ring: [70, 120, "l"] }, { mvq: [112, 38, 132, 46, 136, 70] }] },
   ] },
   "seated-wrist-forearm-stretch": { w: 160, f: [
     { l: "Palm down, fingers back", a: "Sitting tall on a chair, one arm out in front, elbow soft, palm facing down, the other hand gently drawing the fingers back towards the body.",
@@ -256,12 +252,7 @@ export const FIGURES_08 = {
     { l: "One arm up, then swap", a: "One arm reached slowly up overhead until it is beside the ear, the other hand still on the thigh; ribs down and lower back not arched.",
       p: { ...SIT_FWD, na: [160, 178], fa: [34, 34] }, x: [CH, { mvq: [108, 118, 118, 86, 98, 60] }] },
   ] },
-  "seated-band-chest-fly": { w: 160, f: [
-    { l: "Arms out wide", a: "Seen from the front, sitting tall on a chair, a band passed around the chair back, an end in each hand, arms out wide at chest height with a soft bend at the elbow.",
-      p: { ...FRONT, la: [-75, -95], ra: [75, 95] }, x: [...SEAT, { band: [13, 100, 62, 108] }, { band: [147, 100, 98, 108] }] },
-    { l: "Hands together, squeeze", a: "Seen from the front, both hands brought together in front of the chest in a wide arc, elbows still softly bent.",
-      p: { ...FRONT, la: [-24.7, 107.1], ra: [24.7, -107.1] }, x: [...SEAT, { mvq: [16, 124, 24, 140, 46, 140] }, { mvq: [144, 124, 136, 140, 114, 140] }] },
-  ] },
+  "seated-band-chest-fly": {"w":160,"f":[{"l":"Arms out wide","a":"Seen from the front, sitting tall on a chair, a band passed behind the chair back, an end in each hand, arms out wide at chest height with a soft bend at the elbow.","p":{"v":"front","hip":[80,142],"t":180,"la":[-75,-95],"ra":[75,95]},"x":[{"box":[56,148,48,8]},{"box":[77,156,6,34]},{"body":[[62,188,66,150,72,142],[98,188,94,150,88,142]]},{"band":[13,100,64,98]},{"band":[147,100,96,98]}]},{"l":"Hug forward, hands meet","a":"Seen from the front, both arms swept forward in a wide hugging arc until the hands meet in front of the chest, elbows still softly bent.","p":{"v":"front","hip":[80,142],"t":180,"la":[-40,100],"ra":[40,-100]},"x":[{"box":[56,148,48,8]},{"box":[77,156,6,34]},{"body":[[62,188,66,150,72,142],[98,188,94,150,88,142]]},{"mvq":[22,124,30,140,50,136]},{"mvq":[138,124,130,140,110,136]}]}]},
   "seated-arm-intervals": { w: 160, f: [
     { l: "Fast for 30 seconds", a: "Sitting tall on a chair, the arms moving as fast as is comfortable, here punching: one arm forward at shoulder height, the other fist by the chin.",
       p: { ...SIT_FWD, na: [84, 92], fa: [32, 168] }, x: [CH] },

@@ -1,6 +1,7 @@
 /**
  * js/data/figures/batch-02.js
- * 18 Oct 2026 v2
+ * 19 Oct 2026 v3
+ * v3 (19 Oct 2026, A-6, Graeme's marks): lateral step-over: the stepping foot points out, like the standing one.
  *
  * D-4 FIGURES, batch 02: the gym machines and free weights.
  * The format is described in js/figures.js.
@@ -311,14 +312,7 @@ export const FIGURES_02 = {
       p: { hip: [84, 112], t: 180, nl: [0, 0, 90], na: [129.9, -166.8] },
       x: [{ ball: [100, 16, 9] }, { mv: [118, 116, 118, 64] }] },
   ] },
-  "step-platform-lateral-step": { w: 180, f: [
-    { l: "Side-on to the step", a: "Seen from the front, standing tall beside a low step that is to the right side.",
-      p: { v: "front", hip: [104, 112], t: 180, ll: [-8, -2], rl: [8, 2], la: [-8, -4], ra: [8, 4] },
-      x: [{ box: [12, 170, 58, 20] }] },
-    { l: "Right foot up, left follows", a: "Seen from the front, the right foot stepped up onto the step, the left about to follow; then down the other side and back again.",
-      p: { v: "front", hip: [96, 110], t: 180, ll: [-61.5, 5.1, 90], rl: [3, 3, 90], la: [-14, -6], ra: [10, 4] },
-      x: [{ box: [12, 170, 58, 20] }, { mv: [168, 60, 140, 60] }] },
-  ] },
+  "step-platform-lateral-step": {"w":180,"f":[{"l":"Side-on to the step","a":"Seen from the front, standing tall beside a low step that is to the right side.","p":{"v":"front","hip":[104,112],"t":180,"ll":[-8,-2],"rl":[8,2],"la":[-8,-4],"ra":[8,4]},"x":[{"box":[12,170,58,20]}]},{"l":"Right foot up, left follows","a":"Seen from the front, the right foot stepped up onto the step, the left about to follow; then down the other side and back again. Both feet point forward.","p":{"v":"front","hip":[96,110],"t":180,"ll":[-61.5,5.1,-90],"rl":[3,3,90],"la":[-14,-6],"ra":[10,4]},"x":[{"box":[12,170,58,20]},{"mv":[168,60,140,60]}]}]},
   "pull-up": { w: 160, f: [
     { l: "Hang, shoulders down", g: "none", a: "Seen from the front, hanging from a bar with straight arms, an overhand grip a little wider than the shoulders, shoulders pulled down, knees bent.",
       p: { v: "front", hip: [80, 135], t: 180, la: [-156.7, -165], ra: [156.7, 165] },

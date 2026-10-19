@@ -1,6 +1,7 @@
 /**
  * js/data/figures/batch-09.js
- * 04 Oct 2026 v1
+ * 19 Oct 2026 v2
+ * v2 (19 Oct 2026, A-6, Graeme's marks): thread the needle drawn side-on; frog stretch loses the stray line, ring says feel it; upper trap "feel it" on the left.
  *
  * D-4 FIGURES, batch 09: mobility (hip, spine, shoulder, ankle and wrist
  * mobility drills, leg swings, CARs and the longer held stretches).
@@ -102,13 +103,7 @@ export const FIGURES_09 = {
       p: { hip: [100, 178], t: 110.4, h: 100, nl: [-90, -90, -90], na: [0, 90] }, x: [{ far: [[100, 178, 137, 186, 124, 188]] },
       { mvq: [126, 112, 154, 116, 166, 140] }] },
   ] },
-  "thread-the-needle": { w: 160, f: [
-    { l: "Hands and knees", a: "Seen from the front, on hands and knees: hands under the shoulders, arms straight, knees behind under the hips.",
-      x: [{ far: [[72, 150, 72, 188], [88, 150, 88, 188], [80, 136, 80, 150]] }, { body: [[60, 136, 100, 136], [60, 136, 60, 188], [100, 136, 100, 188]] }, { head: [80, 124] }] },
-    { l: "Thread one arm under, rest", a: "Seen from the front, one arm slid along the floor under the body to the other side, that shoulder and cheek resting on the floor; the other hand stays pressing into the floor.",
-      x: [{ far: [[74, 150, 74, 188], [90, 150, 90, 188]] }, { body: [[56, 178, 100, 150], [100, 150, 104, 188], [56, 178, 136, 186]] }, { head: [44, 174] },
-          { mv: [118, 172, 144, 172] }] },
-  ] },
+  "thread-the-needle": {"w":190,"f":[{"l":"Hands and knees","g":"mat","a":"On hands and knees: hands under the shoulders, knees under the hips, back flat.","p":{"hip":[88,150],"t":108,"h":100,"nl":[0,-90,-90],"na":[0,0]}},{"l":"Slide one arm under, rest the shoulder","g":"mat","a":"One arm slid along the floor under the body to the other side, palm up, until that shoulder and the side of the head rest on the floor; hips stay over the knees, the other hand pressing into the floor.","p":{"hip":[88,150],"t":50,"h":88,"nl":[0,-90,-90],"na":[-90,-90],"fa":[120,60]},"x":[{"mv":[110,156,72,156]}]}]},
   "standing-quad-stretch": { w: 160, f: [
     { l: "Knee down, hold 30 seconds", a: "Standing on one leg with one hand on a wall, the other knee bent so that hand holds the ankle behind, the bent knee pointing straight down, body tall.",
       p: { hip: [84, 112], t: 180, fl: [0, 0, 90], nl: [-10, -165, -140], na: [-20, -20], fa: [80, 95] }, x: [{ wall: 136 }] },
@@ -116,7 +111,7 @@ export const FIGURES_09 = {
   "upper-trap-stretch": { w: 160, f: [
     { l: "Ear down, hand rests", a: "Seen from the front, standing tall, the head tilted so one ear moves towards that shoulder, that hand resting lightly on the head without pulling, the other arm relaxed by the side; the stretch is felt along the other side of the neck and top of the shoulder.",
       p: { v: "front", hip: [80, 112], t: 180, h: 160, ll: [-6, -2], rl: [6, 2], la: [-4, -2], ra: [130, -115] },
-      x: [{ ring: [62, 62] }] },
+      x: [{ ring: [62, 62, "l"] }] },
   ] },
   "chest-opener-arms-back": { w: 160, f: [
     { l: "Clasp, lift, hold 20 seconds", a: "Standing tall, hands clasped behind the back, arms straight and drawn down and back, shoulder blades squeezed together, chest lifted.",
@@ -190,11 +185,7 @@ export const FIGURES_09 = {
       p: { v: "front", hip: [80, 112], t: 165, h: 150, ll: [-6, -2], rl: [6, 2], la: [-14, -8], ra: [14, 8] },
       x: [{ mvq: [44, 70, 56, 30, 92, 24] }] },
   ] },
-  "frog-stretch": { w: 160, f: [
-    { l: "Hips back and down, hold", g: "mat", a: "Seen from the front, on the forearms with the knees spread wide out to the sides behind, hips lowered towards the floor; the stretch is felt in the inner thighs.",
-      x: [{ far: [[80, 162, 80, 168]] }, { body: [[72, 168, 30, 188], [88, 168, 130, 188], [64, 162, 96, 162], [64, 162, 62, 188], [96, 162, 98, 188]] }, { head: [80, 148] },
-          { ring: [114, 172] }] },
-  ] },
+  "frog-stretch": {"w":160,"f":[{"l":"Hips back and down, hold","g":"mat","a":"Seen from the front, on the forearms with the knees spread wide out to the sides behind, hips lowered towards the floor; the stretch is felt in the inner thighs, marked feel it.","x":[{"body":[[72,168,30,188],[88,168,130,188],[64,162,96,162],[64,162,62,188],[96,162,98,188],[72,168,88,168]]},{"head":[80,148]},{"ring":[100,170,"r"]}]}]},
   "shoulder-dislocates": { w: 160, f: [
     { l: "Band in front, arms wide", a: "Seen from the front, standing tall, holding a resistance band in both hands, arms straight and wider than the shoulders, band in front of the hips.",
       p: { v: "front", hip: [80, 112], t: 180, ll: [-6, -2], rl: [6, 2], la: [-25, -25], ra: [25, 25] }, x: [{ band: [42, 113, 118, 113] }] },

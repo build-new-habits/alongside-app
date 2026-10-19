@@ -1,6 +1,7 @@
 /**
  * js/data/figures/batch-01.js
- * 04 Oct 2026 v1
+ * 19 Oct 2026 v2
+ * v2 (19 Oct 2026, A-6, Graeme's marks): side plank captions say lie on your side; plank guide is the grey dotted line.
  *
  * D-4 FIGURES, batch 1: the sixteen Graeme saw on the canvas and approved
  * ("Love it. Absolutely love it."), redrawn as poses for js/figures.js.
@@ -58,16 +59,8 @@ export const FIGURES_01 = {
       p: { hip: [88, 150], t: 108, h: 100, nl: [0, -90, -90], fl: [-95, -95, 0], na: [100, 100], fa: [0, 0] },
       x: [{ mv: [150, 112, 176, 108] }, { mv: [60, 132, 26, 134] }] },
   ] },
-  "plank": { w: 180, f: [
-    { l: "Hold: one straight line, head to heels", a: "Forearms on the floor, elbows under the shoulders, toes on the floor, body one straight line from head to heels.",
-      p: { hip: [100.9, 171], t: 101.3, h: 101, nl: [-78.7, -78.7, -79], na: [0, 90] }, x: [{ guide: [21, 159, 141, 135] }] },
-  ] },
-  "side-plank-full": { w: 180, f: [
-    { l: "Set up", a: "Lying on one side, elbow under the shoulder, forearm on the floor, feet stacked, hips on the floor.",
-      p: { hip: [74, 184], t: -132, h: -120, nl: [88, 88, 88], na: [0, 90], fa: [55, 60] } },
-    { l: "Lift and hold", a: "Hips lifted until the body is one straight line from head to feet, top hand resting on the hip.",
-      p: { hip: [82, 172], t: -114, h: -112, nl: [79, 79, 79], na: [0, 90], fa: [66, 70] }, x: [{ mv: [98, 188, 98, 176] }] },
-  ] },
+  "plank": {"w":180,"f":[{"l":"Hold: one straight line, head to heels","a":"Forearms on the floor, elbows under the shoulders, toes on the floor, body one straight line from head to heels.","p":{"hip":[100.9,171],"t":101.3,"h":101,"nl":[-78.7,-78.7,-79],"na":[0,90]},"x":[{"guide":[21,163,141,139]}]}]},
+  "side-plank-full": {"w":180,"f":[{"l":"Lie on your side, elbow under shoulder","a":"Lying on one side, propped on the forearm with the elbow under the shoulder, legs straight and feet stacked, hips on the floor.","p":{"hip":[74,184],"t":-132,"h":-120,"nl":[88,88,88],"na":[0,90],"fa":[55,60]}},{"l":"Lift the hips, hold a straight line","a":"Hips lifted until the body is one straight line from head to feet, top hand resting on the hip; hold.","p":{"hip":[82,172],"t":-114,"h":-112,"nl":[79,79,79],"na":[0,90],"fa":[66,70]},"x":[{"mv":[98,188,98,176]}]}]},
   "reverse-lunge": { w: 160, f: [
     { l: "Start", a: "Standing tall, feet together, arms by the sides.",
       p: { hip: [84, 112], t: 180, nl: [0, 0, 90], na: [0, 4] } },

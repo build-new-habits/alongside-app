@@ -1,6 +1,16 @@
 /**
  * js/figures.js
- * 04 Oct 2026 v1
+ * 19 Oct 2026 v2
+ *
+ * v2 - A-6 FIGURE-PASS (Graeme's marks on the Figure Review page, 19 Oct).
+ *   water:[x1,y,x2] draws the water surface as a light wavy line behind
+ *   the swimmer (it was a thick grey "far" line through the body: "Messy
+ *   lines for all swimming strokes. Maybe wavy and very light coloured
+ *   lines?"). say:[x,y] a speech bubble ("Maybe a speech bubble?").
+ *   ring:[x,y,"l"] now says "feel it" beside the circle, on the left with
+ *   "l" ("What is the green circle marking?"). The guide line is grey and
+ *   dotted, not green and dashed like a movement or a band ("What's the
+ *   green line about? Usually this means a band?").
  *
  * v1 - D-4 FIGURES (Graeme, 04 Oct: "Love it. Absolutely love it. Please
  *   do these, obviously in batches, for all of the exercises"). Stick-figure
@@ -42,7 +52,11 @@
  *   band:[x1,y1,x2,y2]  db:[x,y,"v"|"s"|"w"]  kb:[x,y]  plate:[x,y]
  *   mv:[x1,y1,x2,y2] / mvq:[x1,y1,cx,cy,x2,y2]  the movement (an arrow)
  *   guide:[x1,y1,x2,y2]  a dashed "keep this line"
- *   ring:[x,y]  where it should be felt   pad:[x,y,w,h]  a pad in front (thigh pad)
+ *   ring:[x,y(,"l"|"r")]  where it should be felt, labelled "feel it": on the right,
+ *                 or the left with "l" or when the right would run off the frame
+ *   pad:[x,y,w,h]  a pad in front (thigh pad)
+ *   water:[x1,y,x2]  the water surface, a light wavy line behind the swimmer
+ *   say:[x,y]  a speech bubble, its top left corner at x,y (36 by 22)
  *   body:[[x,y,…]] / far:[[…]] / head:[x,y]  raw lines, for what no pose fits
  *
  * ── HOW IT LOOKS ──────────────────────────────────────────────────────
@@ -178,11 +192,16 @@ function propsBack(x) {
     if (o.pulley) s.push(`<circle class="fig-eq-ring" cx="${o.pulley[0]}" cy="${o.pulley[1]}" r="5"></circle>`);
     if (o.ball) { const [bx, by, br] = o.ball; s.push(`<circle class="fig-eq-ring" cx="${bx}" cy="${by}" r="${br}"></circle>`); }
     if (o.guide) { const [a, b, c, d] = o.guide; s.push(`<line class="fig-guide" x1="${a}" y1="${b}" x2="${c}" y2="${d}"></line>`); }
+    if (o.water) {
+      const [x1, y, x2] = o.water; let d = `M${x1} ${y}`;
+      for (let x = x1; x + 12 <= x2; x += 12) d += ` q3 -3 6 0 t6 0`;
+      s.push(`<path class="fig-water" d="${d}"></path>`);
+    }
   }
   return s.join("");
 }
 
-function propsFront(x, mid) {
+function propsFront(x, mid, w = 160) {
   const s = [];
   for (const o of x || []) {
     if (o.bar) { const [a, b, c, d] = o.bar; s.push(`<line class="fig-bar" x1="${a}" y1="${b}" x2="${c}" y2="${d}"></line>`); }
@@ -193,7 +212,17 @@ function propsFront(x, mid) {
     if (o.mv) { const [a, b, c, d] = o.mv; s.push(`<line class="fig-move" x1="${a}" y1="${b}" x2="${c}" y2="${d}" marker-end="url(#${mid})"></line>`); }
     if (o.mvq) { const [a, b, c, d, e, f] = o.mvq; s.push(`<path class="fig-move" d="M${a} ${b} Q${c} ${d} ${e} ${f}" marker-end="url(#${mid})"></path>`); }
     if (o.pad) { const [px, py, pw, ph] = o.pad; s.push(`<rect class="fig-eq-fill" x="${px}" y="${py}" width="${pw}" height="${ph}" rx="4"></rect>`); }
-    if (o.ring) s.push(`<circle class="fig-ring" cx="${o.ring[0]}" cy="${o.ring[1]}" r="10"></circle>`);
+    if (o.ring) {
+      // "feel it" is about 44 wide at the smallest text size: it goes on the left when asked, or when the right would run off the frame
+      const [rx, ry, side] = o.ring, left = side === "l" || (side !== "r" && rx + 14 + 44 > w - 2);
+      s.push(`<circle class="fig-ring" cx="${rx}" cy="${ry}" r="10"></circle>` +
+        `<text class="fig-note" x="${left ? rx - 14 : rx + 14}" y="${ry + 4}" text-anchor="${left ? "end" : "start"}">feel it</text>`);
+    }
+    if (o.say) {
+      const [sx, sy] = o.say;
+      s.push(`<path class="fig-say" d="M${sx + 6} ${sy}h24a6 6 0 0 1 6 6v10a6 6 0 0 1 -6 6h-16l-8 7v-7h0a6 6 0 0 1 -6 -6v-10a6 6 0 0 1 6 -6z"></path>` +
+        `<line class="fig-say-line" x1="${sx + 8}" y1="${sy + 8}" x2="${sx + 28}" y2="${sy + 8}"></line><line class="fig-say-line" x1="${sx + 8}" y1="${sy + 14}" x2="${sx + 22}" y2="${sy + 14}"></line>`);
+    }
   }
   return s.join("");
 }
@@ -226,7 +255,7 @@ export function frameSvg(fig, frame) {
   const holds = poses.flatMap(p => p.holds).join("");
   return `<svg class="fig-svg" viewBox="0 0 ${w} 200" role="img" aria-label="${esc(frame.a)}" focusable="false">` +
     `<defs><marker id="${mid}" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path class="fig-arrowhead" d="M0 0L10 5L0 10z"></path></marker></defs>` +
-    ground + propsBack(frame.x) + far + spines + near + heads + holds + propsFront(frame.x, mid) +
+    ground + propsBack(frame.x) + far + spines + near + heads + holds + propsFront(frame.x, mid, w) +
     `</svg>`;
 }
 
