@@ -1,6 +1,8 @@
 /**
  * settings.js
- * 18 Oct 2026 v72
+ * 27 Oct 2026 v73
+ *
+ * v73 - LIFT-UNIT: Settings › Equipment › Weights you lift, in: kg or lb (store liftUnit), on both tiers. The lifting unit no longer follows the body-weight unit, so it is never stone.
  *
  * v72 - GS-EDIT (Graeme, 18 Oct: "change three of the getting-started
  *   answers - now"). Your body › What you told me at the start: what made
@@ -1517,7 +1519,7 @@ export function SettingsView(router) {
 
       ${on ? `
         <div class="settings-field" role="group" aria-label="How weights are shown">
-          <span class="settings-label" id="settings-weight-unit-label">Show weights in</span>
+          <span class="settings-label" id="settings-weight-unit-label">Show your body weight in</span>
           <div class="settings-unit-picker">
             ${units.map(u => `
               <button type="button"
@@ -2370,8 +2372,28 @@ export function SettingsView(router) {
                 aria-label="Edit your equipment">
           Edit equipment
         </button>
+        ${_liftUnitPicker()}
       </div>
     `;
+  }
+
+  // LIFT-UNIT, 27 Oct 2026 (Graeme: "these exercises hold stone as the gym
+  // weight. They need to be kg or pounds"). The unit for weights lifted,
+  // on both tiers: not a health answer, so no consent gate. kg or lb only.
+  function _liftUnitPicker() {
+    const unit = store.liftUnit();
+    return `
+        <div class="settings-field" role="group" aria-labelledby="settings-lift-unit-label" style="margin-top: var(--space-4);">
+          <span class="settings-label" id="settings-lift-unit-label">Weights you lift, in</span>
+          <div class="settings-unit-picker">
+            ${[['kg', 'kg'], ['lb', 'lb']].map(([id, label]) => `
+              <button type="button"
+                      class="settings-unit ${unit === id ? 'settings-unit--on' : ''}"
+                      data-lift-unit="${id}"
+                      aria-pressed="${unit === id ? 'true' : 'false'}">${label}</button>
+            `).join('')}
+          </div>
+        </div>`;
   }
 
   // PT-3, 01 Oct 2026. The Reminders panel is gone: nothing ever sent a
@@ -2941,6 +2963,17 @@ export function SettingsView(router) {
     // WEIGHT-1b. Display unit only -- NEVER touches the stored value,
     // which is canonical kilograms. Changing how you read a number must
     // not change the number.
+    // LIFT-UNIT. The label for weights lifted from now on; numbers already
+    // logged keep the unit they were logged in.
+    container.querySelectorAll('[data-lift-unit]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        store.set('liftUnit', btn.dataset.liftUnit);
+        focusAfter = `[data-lift-unit="${btn.dataset.liftUnit}"]`;
+        render(container);
+        _saved(container);
+      });
+    });
+
     container.querySelectorAll('[data-weight-unit]').forEach(btn => {
       btn.addEventListener('click', () => {
         store.set('weightUnit', btn.dataset.weightUnit);

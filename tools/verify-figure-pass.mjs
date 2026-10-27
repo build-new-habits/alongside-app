@@ -1,6 +1,12 @@
 /**
  * tools/verify-figure-pass.mjs
- * 19 Oct 2026 v1
+ * 27 Oct 2026 v2
+ *
+ * v2 - Graeme's second marks (27 Oct): "Where is the band?", "Explain how
+ *   to set up the band", "Where is the band and how is this set up", and
+ *   the Mermaid ring "hovering in mid air". Test 5: a band exercise opens
+ *   with a set-up picture that shows the band, then the movement in one
+ *   view. Test 6j: the Mermaid ring touches the body.
  *
  * A-6 FIGURE-PASS. Graeme marked 25 drawings on the Figure Review page
  * (19 Oct 2026). What he found, kept fixed:
@@ -91,10 +97,17 @@ for (const [id, fig] of Object.entries(FIGURES)) frames(fig).forEach((fr, i) => 
 });
 ok(bad.length === 0, "4. no foot turned in", bad.join("; "));
 
-console.log("\nTEST 5 - one view, first picture to last");
-for (const id of ["band-face-pull", "seated-band-face-pull", "band-reverse-fly", "seated-band-chest-fly", "thread-the-needle"]) {
-  const views = frames(FIGURES[id]).map(fr => [].concat(fr.p || [])[0]?.v === "front" ? "front" : (fr.p ? "side" : "lines"));
-  ok(new Set(views).size === 1 && views[0] !== "lines", `5. ${id}: ${views.join(", ")}`);
+console.log("\nTEST 5 - a band exercise shows where the band goes, then the movement in one view");
+const viewOf = fr => [].concat(fr.p || [])[0]?.v === "front" ? "front" : (fr.p ? "side" : "lines");
+for (const id of ["band-face-pull", "seated-band-face-pull", "band-reverse-fly", "seated-band-chest-fly"]) {
+  const fr = frames(FIGURES[id]);
+  const setUp = /^Set up/.test(fr[0].l) && props(fr[0]).some(o => o.band);
+  const rest = new Set(fr.slice(1).map(viewOf));
+  ok(setUp && rest.size === 1 && fr.length >= 3, `5a. ${id}: "${fr[0].l}", then ${fr.slice(1).map(viewOf).join(", ")}`);
+}
+{
+  const views = frames(FIGURES["thread-the-needle"]).map(viewOf);
+  ok(new Set(views).size === 1 && views[0] !== "lines", `5b. thread-the-needle: ${views.join(", ")}`);
 }
 
 console.log("\nTEST 6 - the single fixes");
@@ -119,6 +132,19 @@ const diag = props(bike).filter(o => o.bar && Math.max(o.bar[1], o.bar[3]) >= 18
 ok(diag.length === 0, "6h. the bike has no diagonal bar under the rider's legs", JSON.stringify(diag));
 const tw = frames(FIGURES["towel-hamstring-curl"]);
 ok(tw.every(f => f.p.nl[2] !== 180), "6i. Towel Hamstring Curl: the feet are not drawn straight up");
+
+// The ring sits on the side of the body that stretches: within 10 of a drawn point.
+{
+  const fig = FIGURES["pilates-mermaid"], fr = fig.f[1];
+  const [rx, ry] = props(fr).find(o => o.ring).ring;
+  const near = F.framePoints(fig, fr).points.some(([x, y]) => Math.hypot(x - rx, y - ry) <= 16)
+    || (() => { const p = [].concat(fr.p)[0]; const hip = p.hip, a = p.t * Math.PI / 180;
+        const sh = [hip[0] + Math.sin(a) * 46, hip[1] + Math.cos(a) * 46];
+        for (let k = 0; k <= 10; k++) { const x = hip[0] + (sh[0] - hip[0]) * k / 10, y = hip[1] + (sh[1] - hip[1]) * k / 10; if (Math.hypot(x - rx, y - ry) <= 12) return true; }
+        return false; })();
+  ok(near, `6j. the Mermaid ring is on the body, not in the air (${rx}, ${ry})`);
+}
+ok(props(FIGURES["towel-hamstring-curl"].f[0]).some(o => o.box && o.box[2] >= 30), "6k. the towel under the heels is big enough to see");
 
 console.log("\nTEST 7 - no exercise says it burns calories");
 const cal = EXERCISES.filter(e => /calorie/i.test(JSON.stringify(e))).map(e => e.id);

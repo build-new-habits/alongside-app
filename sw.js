@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 19 Oct 2026 v677
+ * 27 Oct 2026 v678
  *
+ * v678 - LIFT-UNIT and A-6 second marks (Graeme, 27 Oct: "these exercises hold stone as the gym weight. They need to be kg or pounds"): weights lifted are in kg or lb, never stone: Settings › Equipment › Weights you lift, in (both tiers); unchosen, lb for a body weight in lb or a phone set to the United States, else kg; lifts saved as st become kg. store.js v117, Schema v1.115 (liftUnit). Reverse fly, both face pulls and the seated chest fly open with a set-up picture showing where the band goes; the Mermaid "feel it" sits on the body; the towel curl's towel is visible.
  * v677 - A-6 FIGURE-PASS (Graeme marked 25 drawings on the Figure Review page, 19 Oct): every swim has a light wavy water line instead of a grey line through the body, a high-elbow arm and a tidier kick, and Bilateral Breathing shows the breath; every "feel it" circle says so; the "keep this line" guide is grey and dotted, not green; face pulls, reverse fly and chest fly stay in one view; Achilles drops, Pallof press, Thread the Needle, Side Plank, the bike, knee drive, lateral step-over, towel curl, frog, mermaid, Shoulder Bridge (the peel) and the Quiet Cardio squat redrawn; Compassionate Self-Talk has a speech bubble; no exercise says it burns calories.
  * v676 - A-8b/A-4/A-6 (Graeme, 18 Oct: "You do those things and these"; "I remember cross trainer being one"): every stylesheet starts downloading at once, so the first screen draws sooner; In step's "What this is" and the stretch arc's "How it works" are folded behind a tap, so no ordinary screen opens with more than about 60 words before its first button; the cross trainer is redrawn with the hands on the handles, the feet on the pedals and the machine joined up.
  * v675 - GS-EDIT/WEIGHT-RECHECK/OLD-CREDITS-TIDY (Graeme, 18 Oct): Settings › Your body › What you told me at the start changes what made exercise hard before, what you are coming back from and how your energy has been; a target weight is checked again whenever the weight, the date or the target changes, and set aside, with My programme saying why, if it has become faster than 3 lb a week; the older per-session credit count is no longer written.
@@ -4224,7 +4225,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v677";
+const CACHE_NAME = "alongside-v678";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4290,8 +4291,8 @@ const SHELL_HASHES = {
   "./css/components/finish.css": "c33e298d5fcb92ae",
   "./js/app.js": "72054b00e54ad55b",
   "./js/router.js": "acd841a1fc44593e",
-  "./js/store.js": "cf41e33a0f356a1e",
-  "./js/session-log.js": "d43815c658239179",
+  "./js/store.js": "81246f19b4d08c1e",
+  "./js/session-log.js": "6134de4315842e05",
   "./js/exercise-feedback.js": "adba8549f444da2a",
   "./js/exercise-card.js": "78196b42671c67aa",
   "./js/safety-gate.js": "7a095f4bf8018087",
@@ -4299,7 +4300,7 @@ const SHELL_HASHES = {
   "./js/stretch-target.js": "e8c305bfb957d655",
   "./js/data/purpose.js": "fe0f0dcf76cd4591",
   "./js/data/morning-library-map.js": "d4eb79cc3e5df86d",
-  "./js/views/capture.js": "78453e2b0b02d31f",
+  "./js/views/capture.js": "54a48dbbb3395e8a",
   "./js/exercise-timing.js": "38608437fd7b08fb",
   "./js/display-prefs.js": "4fe3fe77bd5f796c",
   "./js/tts.js": "acb754b56a41d53e",
@@ -4315,7 +4316,7 @@ const SHELL_HASHES = {
   "./js/views/coach-proposal.js": "73baf3596386f6b0",
   "./js/views/workout.js": "27f3ec466b83017e",
   "./js/views/progress.js": "0e5aa6295cab8ee5",
-  "./js/views/settings.js": "6e89d69d6da44a40",
+  "./js/views/settings.js": "ec21456c0fda9b36",
   "./js/views/restore-flow.js": "dc81c2e455fa472d",
   "./js/views/weekly-plan.js": "dcee06e297b402c0",
   "./js/views/reflect.js": "1f905f98c16931ee",
@@ -4370,17 +4371,17 @@ const SHELL_HASHES = {
   "./js/data/figures/batch-01.js": "27f86e28fb0c9833",
   "./js/data/figures/batch-02.js": "45f4f07439ed515e",
   "./js/data/figures/batch-03.js": "2aa6d354f20f277e",
-  "./js/data/figures/batch-04.js": "9f74c9e82d89444b",
-  "./js/data/figures/batch-05.js": "f2d0d1e87037802b",
+  "./js/data/figures/batch-04.js": "2743dbb1e300e686",
+  "./js/data/figures/batch-05.js": "2c305c6159f5a08d",
   "./js/data/figures/batch-06.js": "dcf7b603cf6c3ead",
   "./js/data/figures/batch-07.js": "47b134e0e32a4179",
-  "./js/data/figures/batch-08.js": "b64d62a0725de3d4",
+  "./js/data/figures/batch-08.js": "8fc2a441a87cd8e2",
   "./js/data/figures/batch-09.js": "c0fab8282e087789",
-  "./js/data/figures/batch-10.js": "068116a7ecbd4a05",
+  "./js/data/figures/batch-10.js": "515c59674d42706c",
   "./js/data/figures/batch-11.js": "f430879ecc2de572",
   "./js/data/figures/batch-12.js": "b73433bc521bb260",
   "./js/data/figures/batch-13.js": "805fd6bff0fe06e4",
-  "./js/data/figures/batch-14.js": "9c7dda3723b2648b",
+  "./js/data/figures/batch-14.js": "f9a857b8ef04b6b3",
   "./js/views/bad-day-door.js": "5910813778515c4e",
   "./js/data/chair-legs.js": "2befbb45dab79deb",
   "./js/data/general-routine.js": "30dd1899fa187d6a",

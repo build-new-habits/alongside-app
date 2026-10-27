@@ -1,6 +1,7 @@
 /**
  * js/data/figures/batch-04.js
- * 19 Oct 2026 v2
+ * 27 Oct 2026 v3
+ * v3 (27 Oct 2026, A-6, Graeme's second marks): face pull opens with a set-up picture: the band at face height in front.
  * v2 (19 Oct 2026, A-6, Graeme's marks): face pull shown from the front throughout; Pallof press start has the hands at the chest, one arrow; Barbell RDL's "feel it" on the left, off the bar.
  *
  * D-4 FIGURES, batch 04: strength, second half: barbell lifts, resistance
@@ -52,7 +53,7 @@ export const FIGURES_04 = {
     { l: "Pull the band apart", a: "Seen from the front, arms drawn straight out to the sides at shoulder height, the band stretched across the chest, shoulder blades squeezed together, shoulders down.",
       p: { v: "front", hip: [80, 112], t: 180, ll: [-8, -2], rl: [8, 2], la: [-90, -90], ra: [90, 90] }, x: [{ band: [13, 66, 147, 66] }, { mv: [44, 90, 20, 90] }, { mv: [116, 90, 140, 90] }] },
   ] },
-  "band-face-pull": {"w":160,"f":[{"l":"Arms forward, hands together","a":"Seen from the front, facing a band anchored at face height in front, holding it with both hands, arms reaching straight forward so the hands are together in front.","p":{"v":"front","hip":[80,112],"t":180,"ll":[-8,-2],"rl":[8,2],"la":[-40,100],"ra":[40,-100]}},{"l":"Pull to the face, elbows high","a":"Seen from the front, the band pulled to the face: elbows out to the sides at shoulder height, hands beside the ears, shoulder blades squeezed.","p":{"v":"front","hip":[80,112],"t":180,"ll":[-8,-2],"rl":[8,2],"la":[-90,151],"ra":[90,-151]},"x":[{"mv":[56,92,30,92]},{"mv":[104,92,130,92]}]}]},
+  "band-face-pull": {"w":160,"f":[{"l":"Set up: band at face height","a":"Seen from the side: a band anchored at face height in front; standing facing it, holding it with both hands, arms straight out, the band taut.","p":{"hip":[64,112],"t":180,"nl":[0,0,90],"na":[100,100],"fa":[98,98]},"x":[{"wall":150},{"band":[115,57,150,54]}]},{"l":"Hands together in front","a":"Seen from the front, facing the anchor: arms straight out in front so the hands are together, holding the band.","p":{"v":"front","hip":[80,112],"t":180,"ll":[-8,-2],"rl":[8,2],"la":[-40,100],"ra":[40,-100]}},{"l":"Pull to the face, elbows high","a":"Seen from the front: the band pulled to the face, elbows out to the sides at shoulder height, hands beside the ears.","p":{"v":"front","hip":[80,112],"t":180,"ll":[-8,-2],"rl":[8,2],"la":[-90,151],"ra":[90,-151]},"x":[{"mv":[56,92,30,92]},{"mv":[104,92,130,92]}]}]},
   "band-squat": { w: 160, f: [
     { l: "Start", a: "Standing tall on the middle of a band, feet shoulder-width apart, holding the band ends at shoulder height.",
       p: { hip: [84, 112], t: 180, nl: [0, 0, 90], na: [28, 172] }, x: [{ band: [94, 188, 100, 64] }] },

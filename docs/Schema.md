@@ -1,5 +1,7 @@
 # Alongside — Data Schema Reference
-## 18 Oct 2026 v1.114
+## 27 Oct 2026 v1.115
+
+> **v1.115, 27 Oct 2026 — LIFT-UNIT** (`store.js` v117). **New field `liftUnit`**: `'kg' | 'lb' | null`, default `null`, the unit for weights lifted. Writer: Settings › Equipment › Weights in (`settings.js`). Read through `store.liftUnit()`: the choice, else `'lb'` when `weightUnit` is `'lb'` or the phone's language ends `-US`/`-LR`/`-MM`, else `'kg'`; never stone. Readers: `session-log.js` (the field label and the ± step), `capture.js`, and `store.logLift()` / the exercise-history best, which stamp each lift's `unit`. `weightUnit` is no longer read for lifting. **Migration on load**: a `liftLog` entry, `personalBests[id].weight` or `exerciseHistory[id].best` with `unit: 'st'` is relabelled `'kg'` (a gym weight typed under the body-weight label). Anything else in `liftUnit` loads as `null`.
 
 > **v1.114, 18 Oct 2026 — WEIGHT-RECHECK and GS-EDIT** (`store.js` v116). **No new field.** `strategicGoal.weightTargetBand` takes one new value, **`"set-aside"`**: written by `store.set()` (`_recheckWeightTarget`) when a later change to `weight`, the target date or the target makes the target faster than 3 lb a week; `targetValue` and `targetUnit` are cleared with it. Read by `views/my-programme.js` (one line saying why). Never written with `weightTracking` off. `onboarding.hardBeforeSelections`, `onboarding.primaryTerritory`, `lifestyle.returningAfter` and `lifestyle.stressLevel` gain a second writer, Settings › Your body › What you told me at the start (`settings.js` v72); an empty choice writes `null`. **OLD-CREDITS-TIDY: `totalCredits`, `lastWorkoutCredits` and `lastWorkoutName` are retired** (no writer, no reader; a phone that has them keeps them, unread; Restore no longer carries them), and new `activityLog[]` entries no longer carry `creditsEarned`. The social action credits, `community.credits`, are unchanged.
 
@@ -1047,7 +1049,7 @@
 
 ## 06 Sep 2026 v1.51
 
-**File:** `js/store.js` (confirmed live version: **v116, 18 Oct 2026**)
+**File:** `js/store.js` (confirmed live version: **v117, 27 Oct 2026**)
 
 > **v1.47, 06 Sep 2026 — CR-1.** `conditions[]` gains three ids and loses one. `chronic-fatigue` is **retired**; `persistent-fatigue`, `me-cfs` and `long-covid` replace it. No field shape changed — `conditions` is still `string[]` and `conditionMeta` is still keyed by condition id.
 >
@@ -1181,7 +1183,8 @@ Weight tracking is **a feature, off by default, Plan-only**. Nothing here is rea
 | `weightTracking` | `boolean` | `false` | The opt-in. **Off by default.** Plan-only at the surface |
 | `weight` | `number\|null` | `null` | **Canonical kilograms, always** |
 | `targetWeight` | `number\|null` | `null` | **Canonical kilograms, always** |
-| `weightUnit` | `'kg'\|'lb'\|'st'` | `'kg'` | **Display preference only.** Never affects what is stored |
+| `weightUnit` | `'kg'\|'lb'\|'st'` | `'kg'` | **Display preference only.** Never affects what is stored. Body weight only: not read for lifting since v1.115 |
+| `liftUnit` | `'kg'\|'lb'\|null` | `null` | Weights lifted (v1.115). Read via `store.liftUnit()`; never stone |
 | `weightLog` | `array` | `[]` | `{ at, kg }`. Passive entry only |
 | `strategicGoal.weightTargetBand` | `string\|null` | `null` | Which band accepted the target at set-time: `silent` \| `note` \| `capped`; or `set-aside` when a later weight or date made it too fast and it was cleared (v1.114) |
 

@@ -1,6 +1,7 @@
 /**
  * tools/verify-plan-list.mjs
- * 03 Oct 2026 v4
+ * 27 Oct 2026 v5
+ * v5 - LIFT-UNIT: the test phone is en-GB, so lifts are in kg; a US phone would now lift in lb.
  *
  * v4 - W5-11 USUAL-LENGTH. 7f: Shorter is today's 20 (availableTimeToday);
  *   the usual is left as it was.
@@ -40,6 +41,8 @@ const __require = __cr(import.meta.url);
 const { JSDOM } = __require("jsdom");
 
 const dom = new JSDOM('<!doctype html><div id="main-content"></div>', { url: "https://x/" });
+// LIFT-UNIT, 27 Oct 2026: a UK phone, so weights lifted are in kg (jsdom says en-US, which now means lb).
+Object.defineProperty(dom.window.navigator, "language", { value: "en-GB", configurable: true });
 globalThis.window = dom.window;
 globalThis.document = dom.window.document;
 for (const k of ["navigator", "localStorage", "HTMLElement", "Node", "CustomEvent", "Event", "MouseEvent"])

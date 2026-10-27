@@ -1,6 +1,7 @@
 /**
  * tools/verify-player-flow.mjs
- * 04 Oct 2026 v5
+ * 27 Oct 2026 v6
+ * v6 - LIFT-UNIT: the test phone is en-GB, so lifts are in kg; a US phone would now lift in lb.
  *
  * v5 - D-1 EXERCISE-FOUR. REVERSAL, Graeme's request on the device test
  *   (Option B, approved in the mock-up): an exercise is four steps again,
@@ -45,6 +46,8 @@ const __require = __cr(import.meta.url);
 const { JSDOM } = __require("jsdom");
 
 const dom = new JSDOM('<!doctype html><div id="app"><div id="main-content"></div></div>', { url: "https://x/" });
+// LIFT-UNIT, 27 Oct 2026: a UK phone, so weights lifted are in kg (jsdom says en-US, which now means lb).
+Object.defineProperty(dom.window.navigator, "language", { value: "en-GB", configurable: true });
 globalThis.window = dom.window;
 globalThis.document = dom.window.document;
 for (const k of ["navigator", "localStorage", "HTMLElement", "Node", "CustomEvent", "Event", "MouseEvent", "KeyboardEvent"])

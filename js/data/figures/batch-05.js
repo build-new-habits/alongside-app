@@ -1,6 +1,7 @@
 /**
  * js/data/figures/batch-05.js
- * 19 Oct 2026 v2
+ * 27 Oct 2026 v3
+ * v3 (27 Oct 2026, A-6, Graeme's second marks): towel hamstring curl: a bigger towel under the heels; out and back in.
  * v2 (19 Oct 2026, A-6, Graeme's marks): Achilles heel drops: the other foot lifted behind in both pictures, a hand on the wall; towel hamstring curl legs and feet redrawn.
  *
  * D-4 FIGURES, batch 05: rehabilitation, first half (glutes, hamstrings,
@@ -197,7 +198,7 @@ export const FIGURES_05 = {
       p: { hip: [82, 172], t: -105, h: -100, fl: [98, 98, 98], nl: [100.6, 100.6, 100.6], na: [0, 90], fa: [65, 80] },
       x: [{ bench: [124, 172, 162] }, { mv: [104, 187, 104, 177] }] },
   ] },
-  "towel-hamstring-curl": {"w":180,"f":[{"l":"Heels on towel, hips up","g":"mat","a":"Lying on the back, heels on a folded towel, knees bent, hips lifted into a bridge, arms on the floor.","p":{"hip":[97,161],"t":-68,"h":-95,"nl":[112.9,-6,160],"fa":[96,92]},"x":[{"box":[120,183,26,6]}]},{"l":"Slide out, hips up","g":"mat","a":"The heels slid away on the towel until the legs are nearly straight, hips still lifted; then curled back in.","p":{"hip":[97,163],"t":-70,"h":-95,"nl":[83,61,160],"fa":[96,92]},"x":[{"box":[154,183,26,6]},{"mv":[128,150,160,150]}]}]},
+  "towel-hamstring-curl": {"w":180,"f":[{"l":"Heels on a towel, hips up","g":"mat","a":"Lying on the back on a smooth floor, both heels on a folded towel, knees bent, hips lifted into a bridge, arms on the floor.","p":{"hip":[97,161],"t":-68,"h":-95,"nl":[112.9,-6,170],"fa":[96,92]},"x":[{"box":[112,182,34,6]}]},{"l":"Slide the heels out, then pull back in","g":"mat","a":"Hips still lifted, the heels slid away on the towel until the legs are nearly straight, then pulled back in towards the bottom.","p":{"hip":[97,163],"t":-70,"h":-95,"nl":[83,61,170],"fa":[96,92]},"x":[{"box":[150,182,34,6]},{"mv":[130,150,162,150]},{"mv":[162,160,130,160]}]}]},
   "standing-calf-raise-eccentric": { w: 160, f: [
     { l: "Rise on both feet", a: "Standing on a step with the balls of both feet on the edge, risen up onto the toes.",
       p: { hip: [84, 85], t: 180, nl: [0, 0, 50], fl: [0, 0, 50], na: [0, 4] }, x: [{ box: [90, 172, 60, 18] }] },

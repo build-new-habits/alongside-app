@@ -1,6 +1,8 @@
 /**
  * js/session-log.js
- * 02 Oct 2026 v10
+ * 27 Oct 2026 v11
+ *
+ * v11 - LIFT-UNIT (Graeme, 27 Oct: "these exercises hold stone as the gym weight"): the weight field is in the lifting unit, kg or lb (store.liftUnit()), never the body-weight unit, so never stone; the ± steps 2.5 kg or 5 lb.
  *
  * v10 - W4-15 DELETE-TRUE. No Note box while the health consent is not
  *   given: a note is often about how a body part felt, and store.logLift()
@@ -215,7 +217,7 @@ export function performanceFields(exercise, mode) {
           "chest-press-machine", "gym-membership",
           // W3-15. Loads the list did not know.
           "sandbag", "landmine", "weighted-vest", "ankle-weights", "sled")) {
-    const unit = store.get("weightUnit") || "kg";
+    const unit = store.liftUnit();
     return [
       { key: "weight", label: `Weight (${unit})`, type: "number", step: "0.5" },
       { key: "reps",   label: "Reps",             type: "number", step: "1"   }
@@ -333,7 +335,7 @@ export function renderLogBlock(exercise, idPrefix = "slog", mode) {
   // SMOOTH-P2c. Where they left off. Numbers only -- see the header.
   const last = store.lastLift(exercise.id) || {};
   const prefill = f => (f.type === "number" && typeof last[f.key] === "number") ? ` value="${last[f.key]}"` : "";
-  const unit = store.get("weightUnit") || "kg";
+  const unit = store.liftUnit();
   const plate = unit === "lb" ? 5 : 2.5;
 
   // The invitation sits with the note, because this is the moment the

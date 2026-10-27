@@ -1,6 +1,7 @@
 /**
  * tools/verify-freestyle.mjs
- * 28 Sep 2026 v1
+ * 27 Oct 2026 v2
+ * v2 - LIFT-UNIT: the test phone is en-GB, so lifts are in kg; a US phone would now lift in lb.
  *
  * SMOOTH-P3c. "Make it up as I go". Spec 4.7.
  *
@@ -22,6 +23,8 @@ const __require = __cr(import.meta.url);
 const { JSDOM } = __require("jsdom");
 
 const dom = new JSDOM('<!doctype html><div id="app"><div id="main-content"></div></div>', { url: "https://x/" });
+// LIFT-UNIT, 27 Oct 2026: a UK phone, so weights lifted are in kg (jsdom says en-US, which now means lb).
+Object.defineProperty(dom.window.navigator, "language", { value: "en-GB", configurable: true });
 globalThis.window = dom.window;
 globalThis.document = dom.window.document;
 for (const k of ["navigator", "localStorage", "HTMLElement", "Node", "CustomEvent", "Event", "MouseEvent", "KeyboardEvent"])

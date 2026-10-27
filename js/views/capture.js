@@ -1,6 +1,8 @@
 /**
  * js/views/capture.js
- * 02 Oct 2026 v6
+ * 27 Oct 2026 v7
+ *
+ * v7 - LIFT-UNIT (Graeme, 27 Oct: "these exercises hold stone as the gym weight"): a set is logged and shown in the lifting unit, kg or lb (store.liftUnit()), never stone.
  *
  * v6 - W4-22. The clock leaves out time away, as the saved session already
  *   did.
@@ -344,7 +346,7 @@ export function suggestions(location = currentLocation()) {
 export function setText(e, withUnit = true) {
   if (!e) return "";
   if (typeof e.weight === "number" && typeof e.reps === "number")
-    return `${e.weight}${withUnit ? ` ${e.unit || store.get("weightUnit") || "kg"}` : ""} × ${e.reps}`;
+    return `${e.weight}${withUnit ? ` ${e.unit || store.liftUnit()}` : ""} × ${e.reps}`;
   const bits = [];
   if (typeof e.weight === "number") bits.push(`${e.weight} ${e.unit || "kg"}`);
   if (typeof e.reps === "number")   bits.push(`${e.reps} reps`);
@@ -386,7 +388,7 @@ function _logSet(root) {
     focusNext = "[data-fs-key]";
     return;
   }
-  if (typeof entry.weight === "number") entry.unit = store.get("weightUnit") || "kg";
+  if (typeof entry.weight === "number") entry.unit = store.liftUnit();
   store.logLift(ex.id, entry);            // no-op if lift notes are off; the session still has it
   current.sets.push({ ...entry, at: new Date().toISOString() });
   status = `Set ${current.sets.length} logged: ${setText(entry)}.`;
@@ -415,7 +417,7 @@ function _field(f, value) {
                maxlength="${f.maxlength || 60}" value="${esc(value ?? "")}">
       </div>`;
   }
-  const unit = store.get("weightUnit") || "kg";
+  const unit = store.liftUnit();
   const step = f.key === "weight" ? (unit === "lb" ? 5 : 2.5) : Number(f.step) || 1;
   const name = f.label.replace(/\s*\(.*\)$/, "");
   return `

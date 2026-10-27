@@ -6,6 +6,18 @@ import { validateWeightTarget } from "./data/weight-targets.js";
 
 /**
  * store.js - Data persistence layer
+ * 27 Oct 2026 v117
+ *
+ * v117 - LIFT-UNIT (Graeme, 27 Oct: "these exercises hold stone as the
+ *   gym weight. They need to be kg or pounds (for the American market)").
+ *   New field liftUnit: 'kg' | 'lb' | null, the unit for weights lifted.
+ *   It was weightUnit, the body-weight display unit, so somebody who
+ *   weighs themselves in stone logged a dumbbell in stone. liftUnit() reads
+ *   it: the person's choice, else lb when their body weight is shown in lb
+ *   or the phone is set to the United States, else kg. Never stone. On load,
+ *   a lift already saved as 'st' is relabelled 'kg' (the number was typed
+ *   as a gym weight under the wrong label). Schema v1.115.
+ *
  * 18 Oct 2026 v116
  *
  * v116 - WEIGHT-RECHECK (Schema v1.114; no new field). set() runs the
@@ -1249,6 +1261,39 @@ export const store = {
     return out;
   },
 
+  /** LIFT-UNIT, v117. A lift saved as 'st' (when the lifting unit was the
+   *  body-weight unit) was a gym weight typed under the wrong label: kg. */
+  _stoneLiftsToKg(log) {
+    const out = {};
+    for (const [id, list] of Object.entries(log)) {
+      out[id] = Array.isArray(list) ? list.map(e => (e && e.unit === 'st') ? { ...e, unit: 'kg' } : e) : list;
+    }
+    return out;
+  },
+
+  _stoneBestsToKg(bests) {
+    if (!bests || typeof bests !== 'object') return bests;
+    const out = {};
+    for (const [id, m] of Object.entries(bests)) {
+      out[id] = (m && m.weight && m.weight.unit === 'st') ? { ...m, weight: { ...m.weight, unit: 'kg' } } : m;
+    }
+    return out;
+  },
+
+  /** LIFT-UNIT, v117. The unit for weights lifted: the person's choice,
+   *  else lb for a body weight shown in lb or a phone set to the United
+   *  States, else kg. Never stone. */
+  liftUnit() {
+    const chosen = this.get('liftUnit');
+    if (chosen === 'kg' || chosen === 'lb') return chosen;
+    if (this.data && this.data.weightUnit === 'lb') return 'lb';
+    try {
+      const lang = (typeof navigator !== 'undefined' && (navigator.language || '')) || '';
+      if (/-(US|LR|MM)$/i.test(lang)) return 'lb';
+    } catch (e) { /* no navigator */ }
+    return 'kg';
+  },
+
   mergeWithDefaults(saved) {
     const defaults = this.getDefaults();
     return this._expireOldScores(this._repairSessionTypes(this._dropRetired({
@@ -1257,6 +1302,9 @@ export const store = {
 
       // AGE-1. Runs before the spread's ageBand would win.
       ageBand: saved.ageBand ? this._migrateAgeBand(saved.ageBand) : defaults.ageBand,
+
+      // LIFT-UNIT, v117. Only 'kg' or 'lb' is a choice.
+      liftUnit: (saved.liftUnit === 'kg' || saved.liftUnit === 'lb') ? saved.liftUnit : null,
 
       // CR-1. Runs before the spread's `conditions` would win. Shape is
       // still not reshaped (CHECKIN-2a) -- only ids are renamed.
@@ -1301,13 +1349,13 @@ export const store = {
       // nothing is ever required to complete a session.
       liftLogEnabled: typeof saved.liftLogEnabled === 'boolean' ? saved.liftLogEnabled : true,
       liftLog: (saved.liftLog && typeof saved.liftLog === 'object' && !Array.isArray(saved.liftLog))
-        ? saved.liftLog
+        ? this._stoneLiftsToKg(saved.liftLog)
         : {},
 
       // PB-1
       personalBests: (saved.personalBests && typeof saved.personalBests === 'object'
                       && !Array.isArray(saved.personalBests))
-        ? saved.personalBests
+        ? this._stoneBestsToKg(saved.personalBests)
         : {},
       showPersonalBests: typeof saved.showPersonalBests === 'boolean'
         ? saved.showPersonalBests
@@ -1696,7 +1744,8 @@ export const store = {
       pendingDoorRoute: typeof saved.pendingDoorRoute === 'string' ? saved.pendingDoorRoute : null,
       scopeNoticeDue: saved.scopeNoticeDue === true,
       exerciseHistory: (saved.exerciseHistory && typeof saved.exerciseHistory === 'object' && !Array.isArray(saved.exerciseHistory))
-        ? saved.exerciseHistory
+        ? Object.fromEntries(Object.entries(saved.exerciseHistory).map(([id, h]) =>
+            [id, (h && h.best && h.best.unit === 'st') ? { ...h, best: { ...h.best, unit: 'kg' } } : h]))
         : {},
 
       sessionPreset: ['balanced', 'strength', 'mobility'].includes(saved.sessionPreset)
@@ -2110,6 +2159,10 @@ export const store = {
       weightRateRaisedAt: null,
       weight: null,
       weightUnit: 'kg',
+      // LIFT-UNIT, v117. Weights lifted: 'kg' | 'lb', or null for not
+      // chosen (liftUnit() then decides). Separate from weightUnit, which
+      // can be stone; no gym weight is in stone.
+      liftUnit: null,
       targetDate: null,
       targetDescription: '',
 
@@ -3295,7 +3348,7 @@ export const store = {
     }
     if (!hasValue) return null;
     if (record.weight !== undefined) {
-      record.unit = entry.unit || this.data.weightUnit || 'kg';
+      record.unit = (entry.unit === 'kg' || entry.unit === 'lb') ? entry.unit : this.liftUnit();
     }
 
     const log = { ...(this.data.liftLog || {}) };
@@ -3981,7 +4034,7 @@ export const store = {
         // score. Nothing narrates it and nothing compares it (P4).
         const prevWeight = prev.best && typeof prev.best.weight === 'number' ? prev.best.weight : 0;
         if (perf.weight >= prevWeight) {
-          entry.best = { weight: perf.weight, reps: perf.reps || null, unit: perf.unit || 'kg', at: now };
+          entry.best = { weight: perf.weight, reps: perf.reps || null, unit: (perf.unit === 'kg' || perf.unit === 'lb') ? perf.unit : this.liftUnit(), at: now };
         }
       }
       history[id] = entry;
