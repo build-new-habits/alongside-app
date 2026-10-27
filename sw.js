@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 27 Oct 2026 v679
+ * 27 Oct 2026 v680
  *
+ * v680 - STAGE PATH P-1 SCHEMA: nothing you can see changes; the app can now remember which movements you loved and whether today's first-open screen has been shown, ready for the Plan's new Home. store.js v118, Schema v1.116, restore.js v7.
  * v679 - A-6, Graeme's third marks (27 Oct): in the band exercises seen from the front, the band is drawn coming towards you, thick dashes near the waist thinning to the hands ("dashes curve out towards hands from central point near waist"); at the end of a face pull the elbows are above the hands; the seated chest fly shows the band in its last picture; the Mermaid says "feel it along your side". figures.js v3 (bandq), global.css v4.
  * v678 - LIFT-UNIT and A-6 second marks (Graeme, 27 Oct: "these exercises hold stone as the gym weight. They need to be kg or pounds"): weights lifted are in kg or lb, never stone: Settings › Equipment › Weights you lift, in (both tiers); unchosen, lb for a body weight in lb or a phone set to the United States, else kg; lifts saved as st become kg. store.js v117, Schema v1.115 (liftUnit). Reverse fly, both face pulls and the seated chest fly open with a set-up picture showing where the band goes; the Mermaid "feel it" sits on the body; the towel curl's towel is visible.
  * v677 - A-6 FIGURE-PASS (Graeme marked 25 drawings on the Figure Review page, 19 Oct): every swim has a light wavy water line instead of a grey line through the body, a high-elbow arm and a tidier kick, and Bilateral Breathing shows the breath; every "feel it" circle says so; the "keep this line" guide is grey and dotted, not green; face pulls, reverse fly and chest fly stay in one view; Achilles drops, Pallof press, Thread the Needle, Side Plank, the bike, knee drive, lateral step-over, towel curl, frog, mermaid, Shoulder Bridge (the peel) and the Quiet Cardio squat redrawn; Compassionate Self-Talk has a speech bubble; no exercise says it burns calories.
@@ -4226,7 +4227,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v679";
+const CACHE_NAME = "alongside-v680";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4292,7 +4293,7 @@ const SHELL_HASHES = {
   "./css/components/finish.css": "c33e298d5fcb92ae",
   "./js/app.js": "72054b00e54ad55b",
   "./js/router.js": "acd841a1fc44593e",
-  "./js/store.js": "81246f19b4d08c1e",
+  "./js/store.js": "cd9732c41d483377",
   "./js/session-log.js": "6134de4315842e05",
   "./js/exercise-feedback.js": "adba8549f444da2a",
   "./js/exercise-card.js": "78196b42671c67aa",
@@ -4355,7 +4356,7 @@ const SHELL_HASHES = {
   "./js/data/red-flag.js": "3cd9eecbc3985eb3",
   "./js/data/health-consent.js": "a23d005af57f179c",
   "./js/data/age-check.js": "7fa5b0f5a6b34770",
-  "./js/data/restore.js": "af7df234eb922a36",
+  "./js/data/restore.js": "fd3860a6ccd4e480",
   "./js/data/export-file.js": "bbee762322d0e4e2",
   "./js/data/health-consent-covers.js": "6698a3e50672cbbe",
   "./js/data/kind-colours.js": "178ca1df919c83e9",
