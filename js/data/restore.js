@@ -1,5 +1,13 @@
 /**
  * js/data/restore.js
+ * 27 Oct 2026 v7
+ *
+ * v7 - STAGE PATH P-1 SCHEMA (store.js v118, Schema v1.116). The Plan's
+ *   likes (likedMovements) come across with everything else, as the
+ *   person's own record. dayOpen does not: whether today's first-open
+ *   screen was shown is this phone's day, so a file saved this morning
+ *   cannot stop the new phone asking.
+ *
  * 18 Oct 2026 v6
  *
  * v6 - OLD-CREDITS-TIDY (Graeme, 18 Oct: "You do those things"). The
@@ -180,6 +188,8 @@ export function applyRestore(data) {
   const incoming = harmless(curlQuotes(data.store || {}));
   const picked = {};
   for (const k of Object.keys(incoming)) if (known.has(k)) picked[k] = incoming[k];
+  // STAGE PATH P-1 (v7). Today's first open is this phone's, not the file's.
+  delete picked.dayOpen;
   // Rule 4: this device's agreements, never the file's.
   const here = store.data || {};
   picked.consent = JSON.parse(JSON.stringify(here.consent || store.get("consent") || {}));

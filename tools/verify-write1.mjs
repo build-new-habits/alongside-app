@@ -1,6 +1,13 @@
 /**
  * tools/verify-write1.mjs
- * 01 Oct 2026 v7
+ * 27 Oct 2026 v8
+ *
+ * v8 - STAGE PATH P-1 SCHEMA. dayOpen and likedMovements join the baseline
+ *   as DATED PROMISES, the WEIGHT-1a pattern: schema first means each is
+ *   declared one session before anything reads it. Stage PATH Session 3
+ *   (likedMovements, data/path-engine.js) and Session 4 (dayOpen,
+ *   views/plan-home.js) connect them, and "the baseline is still accurate"
+ *   below then makes those sessions remove the lines.
  *
  * v7 - PT-3. hormonalTracking left the baseline: the field is retired.
  *
@@ -197,6 +204,13 @@ const BASELINE = new Set([
   'activityPreferences','noticingPreferences','noticingProgress','safeguarding',
   'weeklyReview','waterLog','waterSettings','coachOffers','unwellMode',
   'foodPrompts','practiceHistory',
+
+  // STAGE PATH P-1, 27 Oct 2026 (store.js v118). DATED PROMISES, not
+  // permission: written by store helpers (setDayOpen, likeMovement) with
+  // no reader yet, by design (schema before code). Session 3 connects
+  // likedMovements (path-engine.js), Session 4 connects dayOpen
+  // (plan-home.js); each removes its line, as the check below insists.
+  'dayOpen', 'likedMovements',
 
   // 'conditionMeta' -- removed 28 Sep 2026. SMOOTH-P4a reads it: Progress
   // says "Since 19 Aug" for each condition from conditionMeta[id].addedAt.

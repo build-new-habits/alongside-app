@@ -1,5 +1,5 @@
 # Alongside: Move — Glossary
-## 13 Oct 2026 v2
+## 27 Oct 2026 v3
 
 A-9 ONE-NAME (Stage AWARD). One name for each thing, across the app, the website and the policies. A screen, a page or a policy that names one of these uses the name in the **Use** column. Names in **Not** are retired or wrong for it; `tools/verify-one-name.mjs` fails if a retired one reaches a string in `js/`.
 
@@ -20,8 +20,20 @@ Taken from the words on every screen (`node tools/chromium-words.mjs`, 95 screen
 | What hurts | **sore area** | condition, injury (as a label) | The scope statement and policies may say "medical condition" and "minor injuries" because that is their point |
 | The three morning questions | **check-in** | check in (noun), checkin | "Check in" is the verb |
 | The browsable list of everything | **Library** | — | *At home* / *At the gym* are its two places |
-| Wellbeing tab | **Wellbeing** | Mind, mental health | *Something for the mind* is a door into it |
+| Wellbeing tab | **Wellbeing** | Mind, mental health | *Something for the mind* is a door into it on Free. Stage PATH takes it off Plan Home |
+| The Plan's four ways in by purpose (Stage PATH) | **Get stronger**, **Keep moving**, **Stretch**, **Move to feel better** | Tell me what to do, I know what I want, Make it up as I go (as Plan Home doors), rooms | Graeme, 27 Oct. Collectively *doors* in the code and these papers; on screen, *Or choose for yourself*. Store words: `stronger`, `moving`, `stretch`, `feel` |
+| How someone feels, in Move to feel better | **Grounded**, **Calmer**, **Worn out**, **Wake up**, **Ready for sleep**, **Surprise me** | Energise | *Wake up*'s description says *feel energised*. Store words: `ground`, `calm`, `worn`, `wake`, `sleep` |
+| The Plan's screen the first time the app opens each day | **first open of the day** | morning screen, splash | A name for papers and code; the screen itself is headed by its check-in |
+| The coach's choice when somebody does not check in | **Just pick something for me** | Not sure today | A pill in the check-in, not a door |
+| The suggestion at the top of Plan Home | **Today card** | — | Its list is **What I've adjusted for today** |
+| A movement somebody loved | **Loved it** | Like, thumbs up, favourite | Stored as `likedMovements` |
+| A movement somebody would rather have less of | **Less often** | Not a fan, skip (as a name) | One store record with Skip's: `exercisePreferences` `'less'` |
+| A movement somebody never wants again | open, decision 2 | — | Settings › How you like things says *Not again*; the Stage PATH spec says *Never show me this*. One store record: `exercisePreferences` `'avoid'` |
 
 ## Decided
 
 1. **Saved sessions** (Graeme, 13 Oct): one name for the screen and the policies; *Keep to repeat* on the finish.
+
+## Open (Stage PATH, for Graeme before Session 6)
+
+2. **Two names on the Plan's new finish.** The Stage PATH spec says *Save this session* and *Never show me this*; the app already says *Keep to repeat* (the finish, decision 1) and *Not again* (Settings › How you like things, where it can be undone). Recommended: keep the app's two names, so the button and the list that undoes it say the same thing.

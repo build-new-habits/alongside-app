@@ -1,5 +1,19 @@
 # Alongside — Data Schema Reference
-## 27 Oct 2026 v1.115
+## 27 Oct 2026 v1.116
+
+> **v1.116, 27 Oct 2026 — STAGE PATH P-1 SCHEMA** (`store.js` v118; Stage PATH blueprint Session 1, Part C). Schema first: **no app code reads these yet**; their readers arrive in Sessions 3 to 7. Gated by `tools/verify-path-schema.mjs`.
+>
+> **New `dayOpen`** (`{ date, choice }`, default `{ date: null, choice: null }`): the Plan's first-open-of-the-day screen. `date` is the local day it was shown (`YYYY-MM-DD`); `choice` is `'checked'`, `'pick'`, `'not-now'` or `null` (shown, nothing chosen). **Written by** `store.setDayOpen(choice)` (anything else is refused), to be called by `views/day-open.js` (Session 4). **Read by** `store.dayOpenToday()` (the record when it is today's, else `null`), for `views/plan-home.js` (Session 4). A check-in finished later the same day is read from `store.checkedInToday()`, **not written here** (corrected from the blueprint, which wrote `'checked'` back: the check-in's own record already says it). **Load:** a `date` that is not `YYYY-MM-DD`, or a `dayOpen` that is not an object, loads as the default; an unknown `choice` loads as `null`. **Restore does not carry it** (`restore.js` v7): it is this phone's day.
+>
+> **New `likedMovements`** (`{ [exerciseId]: 'YYYY-MM-DD' }`, default `{}`): movements the person said they loved, with the local day. **Written by** `store.likeMovement(id)` and `store.unlikeMovement(id)`, to be called by the Plan's finish, *Loved it* (`views/plan-finish.js`, Session 6). **Read by** the engine (`data/path-engine.js`, Session 3) and the plan screen's *Loved* mark. **One or the other:** a like and an `exercisePreferences` entry for the same movement replace each other — `likeMovement()` deletes the `'less'`/`'avoid'` entry, and `setExercisePreference()` with a value now deletes the like. **Load:** only a non-empty id with a `YYYY-MM-DD` value is kept; anything that is not an object loads as `{}`. **Restore carries it** (the person's own record). Not health data.
+>
+> **Why not `movementPrefs`** (the blueprint's C2, `'liked' | 'less' | 'never'`): *less often* and *never* already exist as **`exercisePreferences`** (`'less'` / `'avoid'`, `store.js` v17), written by Skip on both tiers, read by `session-builder.js`, listed with an undo in Settings › How you like things, and its contract (`data/field-contract.js`) says its two levels must stay two. So the Plan's *Less of this* writes `'less'` and *Never show me this* writes `'avoid'` there; only liking is new. Improvements extend what exists; they do not relocate it.
+>
+> **Why not `requestedFocus` or `requestedLength`** (the blueprint's C6): a door's stretch zones are **`sessionZoneFocus`** (ZONE-1, read by the builder); a door's area is a session type, **`requestedSessionType`** (`upper` / `lower` / `core` / `full`, blueprint D4); a length chosen for today is **`availableTimeToday`** through `data/session-length.js` (W5-11). Session 5 writes those. (Note for Session 5: `sessionZoneFocus` is not read-once, so a door's *Whole body* must write `[]`.)
+>
+> **`savedSessions[]` may carry `purpose`** (`'stronger' | 'moving' | 'stretch' | 'feel' | null`) **and `place`** (`'home' | 'gym' | null`; never `'outside'`). To be written by `data/saved-sessions.js` (Session 6). **`activityLog[]` may carry `door`** (the same four) **and `feeling`** (`'ground' | 'calm' | 'worn' | 'wake' | 'sleep' | null`): **written by** `store.logActivity()` from the entry it is given, a valid value kept and anything else written as `null`; the Plan's session builder supplies them (Session 6). **Absent stays absent:** an older record, and every Free session, gains no keys; a reader treats absent as `null`. On load, a present value that is not one of these loads as `null`. **`moodAfter` is unchanged** in meaning and scale (1–10); the Plan's finish will write the check-in's own chip values (2/3/6/7/9) so before and after compare directly.
+>
+> **Library tags** (`doors`, `feelings`, `style` on `data/exercises/*.js` and `data/practice-library.js`) are data, not store: Session 2, with `docs/exercise_entry_standard.md`.
 
 > **v1.115, 27 Oct 2026 — LIFT-UNIT** (`store.js` v117). **New field `liftUnit`**: `'kg' | 'lb' | null`, default `null`, the unit for weights lifted. Writer: Settings › Equipment › Weights in (`settings.js`). Read through `store.liftUnit()`: the choice, else `'lb'` when `weightUnit` is `'lb'` or the phone's language ends `-US`/`-LR`/`-MM`, else `'kg'`; never stone. Readers: `session-log.js` (the field label and the ± step), `capture.js`, and `store.logLift()` / the exercise-history best, which stamp each lift's `unit`. `weightUnit` is no longer read for lifting. **Migration on load**: a `liftLog` entry, `personalBests[id].weight` or `exerciseHistory[id].best` with `unit: 'st'` is relabelled `'kg'` (a gym weight typed under the body-weight label). Anything else in `liftUnit` loads as `null`.
 
@@ -1049,7 +1063,7 @@
 
 ## 06 Sep 2026 v1.51
 
-**File:** `js/store.js` (confirmed live version: **v117, 27 Oct 2026**)
+**File:** `js/store.js` (confirmed live version: **v118, 27 Oct 2026**)
 
 > **v1.47, 06 Sep 2026 — CR-1.** `conditions[]` gains three ids and loses one. `chronic-fatigue` is **retired**; `persistent-fatigue`, `me-cfs` and `long-covid` replace it. No field shape changed — `conditions` is still `string[]` and `conditionMeta` is still keyed by condition id.
 >

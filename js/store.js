@@ -6,6 +6,26 @@ import { validateWeightTarget } from "./data/weight-targets.js";
 
 /**
  * store.js - Data persistence layer
+ * 27 Oct 2026 v118
+ *
+ * v118 - STAGE PATH P-1 SCHEMA (blueprint Session 1, Part C; Schema
+ *   v1.116). Schema first: nothing reads these yet.
+ *   New dayOpen { date, choice }: whether the Plan's first-open-of-the-day
+ *   screen has been shown today (local YYYY-MM-DD) and what was chosen
+ *   ('checked' | 'pick' | 'not-now' | null). setDayOpen(), dayOpenToday().
+ *   Restore does not carry it (a day's state, this phone's).
+ *   New likedMovements { [exerciseId]: 'YYYY-MM-DD' }: movements the person
+ *   said they loved. likeMovement(), unlikeMovement(). A like and an
+ *   exercisePreferences entry ('less' / 'avoid') for the same movement
+ *   replace each other, so setExercisePreference() now clears a like.
+ *   savedSessions[] may carry purpose and place; activityLog[] may carry
+ *   door and feeling (logActivity() keeps them only when valid). Absent
+ *   stays absent: older records and Free's sessions gain no keys.
+ *   Corrected against the code: the blueprint's movementPrefs would have
+ *   duplicated exercisePreferences, and its requestedFocus /
+ *   requestedLength would have duplicated sessionZoneFocus and
+ *   availableTimeToday; none is added (improvements extend, not relocate).
+ *
  * 27 Oct 2026 v117
  *
  * v117 - LIFT-UNIT (Graeme, 27 Oct: "these exercises hold stone as the
@@ -1296,7 +1316,7 @@ export const store = {
 
   mergeWithDefaults(saved) {
     const defaults = this.getDefaults();
-    return this._expireOldScores(this._repairSessionTypes(this._dropRetired({
+    return this._cleanPathFields(this._expireOldScores(this._repairSessionTypes(this._dropRetired({
       ...defaults,
       ...saved,
 
@@ -1931,12 +1951,52 @@ export const store = {
       // honest direction; a retirement must never take something away
       // from somebody who did nothing wrong.
       tier:       saved.tier === 'athlete' ? 'personal' : (saved.tier || 'free')
-    })));
+    }))));
   },
 
   /** P13, v83. The local day, "YYYY-MM-DD". */
   _localDay(d = new Date()) {
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  },
+
+  /** STAGE PATH P-1, v118. The words each new field may hold (Schema v1.116). */
+  PATH_VALUES: {
+    dayChoice: ['checked', 'pick', 'not-now'],
+    door:      ['stronger', 'moving', 'stretch', 'feel'],
+    feeling:   ['ground', 'calm', 'worn', 'wake', 'sleep'],
+    place:     ['home', 'gym'],
+  },
+
+  /**
+   * STAGE PATH P-1, v118. Made safe on every load. A malformed dayOpen
+   * loads as the default; a like keeps only an id and a date; a saved
+   * session's purpose and place, and an entry's door and feeling, are
+   * kept when valid and null when not. A record without them is left as
+   * it is: older records and Free's sessions gain no keys.
+   */
+  _cleanPathFields(data) {
+    const V = this.PATH_VALUES;
+    const isDay = s => typeof s === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(s);
+    const day = data.dayOpen;
+    data.dayOpen = (day && typeof day === 'object' && !Array.isArray(day) && isDay(day.date))
+      ? { date: day.date, choice: V.dayChoice.includes(day.choice) ? day.choice : null }
+      : { date: null, choice: null };
+    const liked = data.likedMovements;
+    const kept = {};
+    if (liked && typeof liked === 'object' && !Array.isArray(liked)) {
+      for (const [id, at] of Object.entries(liked)) if (id && isDay(at)) kept[id] = at;
+    }
+    data.likedMovements = kept;
+    const only = (rec, key, allowed) => (key in rec && !allowed.includes(rec[key])) ? { ...rec, [key]: null } : rec;
+    if (Array.isArray(data.savedSessions)) {
+      data.savedSessions = data.savedSessions.map(r => (!r || typeof r !== 'object') ? r
+        : only(only(r, 'purpose', V.door), 'place', V.place));
+    }
+    if (Array.isArray(data.activityLog)) {
+      data.activityLog = data.activityLog.map(e => (!e || typeof e !== 'object') ? e
+        : only(only(e, 'door', V.door), 'feeling', V.feeling));
+    }
+    return data;
   },
 
   /**
@@ -2506,6 +2566,14 @@ export const store = {
       // a fixed rest value would never reach it.
       savedSessions: [],
 
+      // STAGE PATH P-1, v118. The Plan's first open of the day: the local
+      // day it was shown and what was chosen. Restore leaves it out.
+      dayOpen: { date: null, choice: null },
+
+      // STAGE PATH P-1, v118. { [exerciseId]: 'YYYY-MM-DD' }, movements the
+      // person loved. The other side of exercisePreferences: one movement
+      // is liked or not wanted, never both (likeMovement / setExercisePreference).
+      likedMovements: {},
 
       exercisePreferences: {}, // { [exerciseId]: { preference: 'avoid'|'less', setAt, source } } — per alongside_exercise_skip_dislike_spec_16may2026_v1.docx. Binary signal, not a rating (spec §6: "not a rating system... no stars, no thumbs, no scores"). First consumer: js/data/conditionProgrammes.js's candidate selection, 04 Aug 2026 — the full spec's in-session Skip flow (gym-programme.js/prescribed-session.js/core-session.js) remains separate future work.
 
@@ -3297,9 +3365,54 @@ export const store = {
       delete prefs[exerciseId];
     } else {
       prefs[exerciseId] = { preference, setAt: new Date().toISOString(), source };
+      // STAGE PATH P-1, v118. Not wanting a movement takes back a like.
+      const liked = this.data.likedMovements;
+      if (liked && exerciseId in liked) {
+        const next = { ...liked };
+        delete next[exerciseId];
+        this.data.likedMovements = next;
+      }
     }
     this.data.exercisePreferences = prefs;
     this.save();
+  },
+
+  /**
+   * STAGE PATH P-1, v118. "Loved it": liked today. Takes back any
+   * 'less' or 'avoid' for the same movement, so it is one or the other.
+   */
+  likeMovement(exerciseId) {
+    if (typeof exerciseId !== 'string' || !exerciseId) return;
+    const prefs = { ...(this.data.exercisePreferences || {}) };
+    delete prefs[exerciseId];
+    this.data.exercisePreferences = prefs;
+    this.data.likedMovements = { ...(this.data.likedMovements || {}), [exerciseId]: this._localDay() };
+    this.save();
+  },
+
+  /** STAGE PATH P-1, v118. A like taken back. */
+  unlikeMovement(exerciseId) {
+    const next = { ...(this.data.likedMovements || {}) };
+    if (!(exerciseId in next)) return;
+    delete next[exerciseId];
+    this.data.likedMovements = next;
+    this.save();
+  },
+
+  /**
+   * STAGE PATH P-1, v118. The first-open screen was shown today (choice
+   * null), or one of its choices was made. Anything else is refused.
+   */
+  setDayOpen(choice = null) {
+    if (choice !== null && !this.PATH_VALUES.dayChoice.includes(choice)) return;
+    this.data.dayOpen = { date: this._localDay(), choice };
+    this.save();
+  },
+
+  /** STAGE PATH P-1, v118. Today's dayOpen, or null when it is another day's. */
+  dayOpenToday() {
+    const d = this.data.dayOpen;
+    return d && d.date === this._localDay() ? { date: d.date, choice: d.choice ?? null } : null;
   },
 
   /**
@@ -3863,6 +3976,10 @@ export const store = {
       sessionType: _inferredType,
       place: this._placeOf(entry)
     };
+    // STAGE PATH P-1, v118. The door and feeling of a session the Plan
+    // built: kept when valid, null when not, never added when absent.
+    if ('door' in finalEntry && !this.PATH_VALUES.door.includes(finalEntry.door)) finalEntry.door = null;
+    if ('feeling' in finalEntry && !this.PATH_VALUES.feeling.includes(finalEntry.feeling)) finalEntry.feeling = null;
 
     // ARC-EVERYTHING, 16 Sep 2026. Credit the arc here, at the single
     // write path, so every door counts without each view remembering to.
