@@ -1,6 +1,13 @@
 /**
  * js/figures.js
- * 19 Oct 2026 v2
+ * 27 Oct 2026 v3
+ *
+ * v3 - A-6, Graeme's third marks (27 Oct): "I'd do dots from slightly off
+ *   center to the hands, starting big dashes (near …) to small dashes
+ *   (farther away, at the hands)"; "dashes curve out towards hands from
+ *   central point near waist". bandq:[x1,y1,cx,cy,x2,y2] draws a band
+ *   coming towards you in a front view: thick dashes at the near end
+ *   (x1,y1), thinning along a curve to the far end (x2,y2).
  *
  * v2 - A-6 FIGURE-PASS (Graeme's marks on the Figure Review page, 19 Oct).
  *   water:[x1,y,x2] draws the water surface as a light wavy line behind
@@ -57,6 +64,8 @@
  *   pad:[x,y,w,h]  a pad in front (thigh pad)
  *   water:[x1,y,x2]  the water surface, a light wavy line behind the swimmer
  *   say:[x,y]  a speech bubble, its top left corner at x,y (36 by 22)
+ *   bandq:[x1,y1,cx,cy,x2,y2]  a band seen coming towards you: thick dashes
+ *                 near (x1,y1), thinning along the curve to the far end
  *   body:[[x,y,…]] / far:[[…]] / head:[x,y]  raw lines, for what no pose fits
  *
  * ── HOW IT LOOKS ──────────────────────────────────────────────────────
@@ -206,6 +215,14 @@ function propsFront(x, mid, w = 160) {
   for (const o of x || []) {
     if (o.bar) { const [a, b, c, d] = o.bar; s.push(`<line class="fig-bar" x1="${a}" y1="${b}" x2="${c}" y2="${d}"></line>`); }
     if (o.band) { const [a, b, c, d] = o.band; s.push(`<line class="fig-band" x1="${a}" y1="${b}" x2="${c}" y2="${d}"></line>`); }
+    if (o.bandq) {
+      const [x1, y1, cx, cy, x2, y2] = o.bandq, N = 5;
+      const at = t => [(1 - t) * (1 - t) * x1 + 2 * (1 - t) * t * cx + t * t * x2, (1 - t) * (1 - t) * y1 + 2 * (1 - t) * t * cy + t * t * y2];
+      for (let i = 0; i < N; i++) {
+        const t0 = i / N, t1 = t0 + 0.4 / N, [ax, ay] = at(t0), [bx, by] = at(t1);
+        s.push(`<line class="fig-bandq" x1="${r1(ax)}" y1="${r1(ay)}" x2="${r1(bx)}" y2="${r1(by)}" stroke-width="${r1(4.5 - 2.7 * i / (N - 1))}"></line>`);
+      }
+    }
     if (o.db) s.push(holdShape("db" + (o.db[2] || "s"), o.db));
     if (o.kb) s.push(holdShape("kb", o.kb));
     if (o.plate) s.push(holdShape("plate", o.plate));

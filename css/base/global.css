@@ -1,6 +1,7 @@
 /*
  * css/base/global.css
- * 19 Oct 2026 v3
+ * 27 Oct 2026 v4
+ *   v4 - A-6: .fig-bandq, a band coming towards you (amber dashes that thin with distance).
  *   v3 - A-6 FIGURE-PASS. Figures: .fig-water (the water surface, light and
  *   wavy), .fig-say (a speech bubble), .fig-note ("feel it" beside the ring);
  *   .fig-guide grey and dotted so it is not read as a movement or a band.
@@ -1998,6 +1999,7 @@
 .fig-cable { stroke: var(--color-text-secondary); stroke-width: 2; }
 .fig-bar { stroke: var(--color-text-secondary); stroke-width: 5; stroke-linecap: round; }
 .fig-band { stroke: var(--kind-amber); stroke-width: 3; stroke-dasharray: 6 4; stroke-linecap: round; }
+.fig-bandq { stroke: var(--kind-amber); stroke-linecap: round; }
 .fig-wt { fill: var(--kind-amber); }
 .fig-wt-line { fill: none; stroke: var(--kind-amber); stroke-width: 4; }
 .fig-move { fill: none; stroke: var(--color-primary); stroke-width: 4; stroke-linecap: round; }
@@ -2012,7 +2014,7 @@
   .fig-body, .fig-head { stroke: CanvasText; }
   .fig-far, .fig-eq line, .fig-cable, .fig-bar, .fig-eq-ring, .fig-water, .fig-say, .fig-say-line, .fig-guide { stroke: GrayText; }
   .fig-note { fill: GrayText; }
-  .fig-move, .fig-ring, .fig-band { stroke: Highlight; }
+  .fig-move, .fig-ring, .fig-band, .fig-bandq { stroke: Highlight; }
   .fig-arrowhead, .fig-wt, .fig-eq-fill, .fig-mat, .fig-eq-dark { fill: CanvasText; }
   .fig-head { fill: Canvas; }
 }

@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 27 Oct 2026 v678
+ * 27 Oct 2026 v679
  *
+ * v679 - A-6, Graeme's third marks (27 Oct): in the band exercises seen from the front, the band is drawn coming towards you, thick dashes near the waist thinning to the hands ("dashes curve out towards hands from central point near waist"); at the end of a face pull the elbows are above the hands; the seated chest fly shows the band in its last picture; the Mermaid says "feel it along your side". figures.js v3 (bandq), global.css v4.
  * v678 - LIFT-UNIT and A-6 second marks (Graeme, 27 Oct: "these exercises hold stone as the gym weight. They need to be kg or pounds"): weights lifted are in kg or lb, never stone: Settings › Equipment › Weights you lift, in (both tiers); unchosen, lb for a body weight in lb or a phone set to the United States, else kg; lifts saved as st become kg. store.js v117, Schema v1.115 (liftUnit). Reverse fly, both face pulls and the seated chest fly open with a set-up picture showing where the band goes; the Mermaid "feel it" sits on the body; the towel curl's towel is visible.
  * v677 - A-6 FIGURE-PASS (Graeme marked 25 drawings on the Figure Review page, 19 Oct): every swim has a light wavy water line instead of a grey line through the body, a high-elbow arm and a tidier kick, and Bilateral Breathing shows the breath; every "feel it" circle says so; the "keep this line" guide is grey and dotted, not green; face pulls, reverse fly and chest fly stay in one view; Achilles drops, Pallof press, Thread the Needle, Side Plank, the bike, knee drive, lateral step-over, towel curl, frog, mermaid, Shoulder Bridge (the peel) and the Quiet Cardio squat redrawn; Compassionate Self-Talk has a speech bubble; no exercise says it burns calories.
  * v676 - A-8b/A-4/A-6 (Graeme, 18 Oct: "You do those things and these"; "I remember cross trainer being one"): every stylesheet starts downloading at once, so the first screen draws sooner; In step's "What this is" and the stretch arc's "How it works" are folded behind a tap, so no ordinary screen opens with more than about 60 words before its first button; the cross trainer is redrawn with the hands on the handles, the feet on the pedals and the machine joined up.
@@ -4225,7 +4226,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v678";
+const CACHE_NAME = "alongside-v679";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4269,7 +4270,7 @@ const SHELL_HASHES = {
   "./css/components/session-shared.css": "a71069801a65054c",
   "./css/components/upgrade-door.css": "1a2deeaceb45f4f1",
   "./css/components/upgrade-page.css": "ef2284fa060b21ea",
-  "./css/base/global.css": "4ea80d6410e772ff",
+  "./css/base/global.css": "b8e901782637c19f",
   "./css/base/reset.css": "717c20ab5ebbd16e",
   "./css/base/typography.css": "7ef937ebd7185b4b",
   "./css/base/variables.css": "0a5315988156303d",
@@ -4366,22 +4367,22 @@ const SHELL_HASHES = {
   "./js/data/plan-reader.js": "a63239d24ffa51f9",
   "./js/views/plan-import.js": "630d97175edd2091",
   "./css/components/your-week.css": "f14109dded35259b",
-  "./js/figures.js": "01542770aecbbc2d",
+  "./js/figures.js": "621b376c8778dbb4",
   "./js/data/figures/index.js": "d4cf080b2f72544c",
   "./js/data/figures/batch-01.js": "27f86e28fb0c9833",
   "./js/data/figures/batch-02.js": "45f4f07439ed515e",
   "./js/data/figures/batch-03.js": "2aa6d354f20f277e",
-  "./js/data/figures/batch-04.js": "2743dbb1e300e686",
+  "./js/data/figures/batch-04.js": "cac09a845db8934f",
   "./js/data/figures/batch-05.js": "2c305c6159f5a08d",
   "./js/data/figures/batch-06.js": "dcf7b603cf6c3ead",
   "./js/data/figures/batch-07.js": "47b134e0e32a4179",
-  "./js/data/figures/batch-08.js": "8fc2a441a87cd8e2",
+  "./js/data/figures/batch-08.js": "e0a9a8d0b74927f1",
   "./js/data/figures/batch-09.js": "c0fab8282e087789",
-  "./js/data/figures/batch-10.js": "515c59674d42706c",
+  "./js/data/figures/batch-10.js": "545e56807a4086c6",
   "./js/data/figures/batch-11.js": "f430879ecc2de572",
   "./js/data/figures/batch-12.js": "b73433bc521bb260",
   "./js/data/figures/batch-13.js": "805fd6bff0fe06e4",
-  "./js/data/figures/batch-14.js": "f9a857b8ef04b6b3",
+  "./js/data/figures/batch-14.js": "525000f917bc99e3",
   "./js/views/bad-day-door.js": "5910813778515c4e",
   "./js/data/chair-legs.js": "2befbb45dab79deb",
   "./js/data/general-routine.js": "30dd1899fa187d6a",

@@ -1,6 +1,11 @@
 /**
  * tools/verify-figure-pass.mjs
- * 27 Oct 2026 v2
+ * 27 Oct 2026 v3
+ *
+ * v3 - Graeme's third marks (27 Oct): the band drawn coming towards you in
+ *   every front view of a band exercise ("dashes curve out towards hands
+ *   from central point near waist"); face pull elbows above the hands;
+ *   Mermaid says where it is felt. Tests 5c, 5d, 6l.
  *
  * v2 - Graeme's second marks (27 Oct): "Where is the band?", "Explain how
  *   to set up the band", "Where is the band and how is this set up", and
@@ -84,6 +89,13 @@ const guide = (css.match(/\.fig-guide \{([^}]*)\}/) || [])[1] || "";
 ok(guide && !/--color-primary/.test(guide) && /dasharray: 1 /.test(guide), "3. .fig-guide is grey and dotted", guide);
 for (const k of ["fig-water", "fig-say", "fig-note"]) ok(new RegExp(`\\.${k} \\{`).test(css), `3b. .${k} is styled`);
 
+{
+  const fig = FIGURES["band-reverse-fly"], fr = fig.f.find(f => props(f).some(o => o.bandq));
+  const w = fr ? [...F.frameSvg(fig, fr).matchAll(/class="fig-bandq"[^>]*stroke-width="([\d.]+)"/g)].map(m => Number(m[1])) : [];
+  ok(w.length >= 5 && w[0] > w[4], "3c. the band coming towards you is drawn in dashes that thin with distance", w.join(","));
+}
+ok(/\.fig-bandq \{[^}]*--kind-amber/.test(css), "3d. .fig-bandq is the band colour");
+
 console.log("\nTEST 4 - front-view feet never point across the body");
 const bad = [];
 for (const [id, fig] of Object.entries(FIGURES)) frames(fig).forEach((fr, i) => {
@@ -104,6 +116,17 @@ for (const id of ["band-face-pull", "seated-band-face-pull", "band-reverse-fly",
   const setUp = /^Set up/.test(fr[0].l) && props(fr[0]).some(o => o.band);
   const rest = new Set(fr.slice(1).map(viewOf));
   ok(setUp && rest.size === 1 && fr.length >= 3, `5a. ${id}: "${fr[0].l}", then ${fr.slice(1).map(viewOf).join(", ")}`);
+}
+for (const id of ["band-face-pull", "seated-band-face-pull", "band-reverse-fly", "seated-band-chest-fly"]) {
+  const fr = frames(FIGURES[id]).slice(1).filter(f => viewOf(f) === "front");
+  const missing = fr.filter(f => !props(f).some(o => o.bandq || o.band)).map(f => f.l);
+  ok(fr.length > 0 && missing.length === 0, `5c. ${id}: every front picture shows the band`, missing.join("; "));
+}
+for (const id of ["band-face-pull", "seated-band-face-pull"]) {
+  const end = frames(FIGURES[id]).at(-1), p = [].concat(end.p)[0];
+  // left arm: shoulder, elbow, hand follow the torso line and shoulder bar in framePoints order
+  const elbowUp = p.la && p.la[0] < -95 && p.la[0] > -180;
+  ok(elbowUp, `5d. ${id}: at the end the elbows are lifted above the hands`, JSON.stringify(p.la));
 }
 {
   const views = frames(FIGURES["thread-the-needle"]).map(viewOf);
@@ -144,6 +167,7 @@ ok(tw.every(f => f.p.nl[2] !== 180), "6i. Towel Hamstring Curl: the feet are not
         return false; })();
   ok(near, `6j. the Mermaid ring is on the body, not in the air (${rx}, ${ry})`);
 }
+ok(/feel it along your side/i.test(FIGURES["pilates-mermaid"].f[1].l), "6l. Mermaid says where it is felt", FIGURES["pilates-mermaid"].f[1].l);
 ok(props(FIGURES["towel-hamstring-curl"].f[0]).some(o => o.box && o.box[2] >= 30), "6k. the towel under the heels is big enough to see");
 
 console.log("\nTEST 7 - no exercise says it burns calories");
