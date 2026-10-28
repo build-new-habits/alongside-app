@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 28 Oct 2026 v681
+ * 28 Oct 2026 v682
  *
+ * v682 - STAGE PATH content: nothing new on Free; the Plan's Move to feel better now has 21 programmes (four or more for every feeling) and its Stretch door has 16 ready-made routines across four areas, with three new Pilates stretches and their figures, ready for the door screens. NEW FILE precached: js/data/stretch-routines.js.
  * v681 - STAGE PATH Session 2 (P-2, P-9, P-9a, P-9b): nothing new on Free's screens except truer card words; every exercise is tagged by purpose, feeling and style, and the Plan's twenty new tai chi, qigong, yoga and gentle movements and its sixteen Move to feel better programmes are in place, each movement with its figure, ready for the door screens; exercise cards that overstated a benefit, or said something works that has not been shown, now say what is true (223 changes, every one sourced). NEW FILES precached: js/data/feel-programmes.js, js/data/exercises/path_movements.js, js/data/figures/batch-15.js.
  * v680 - STAGE PATH P-1 SCHEMA: nothing you can see changes; the app can now remember which movements you loved and whether today's first-open screen has been shown, ready for the Plan's new Home. store.js v118, Schema v1.116, restore.js v7.
  * v679 - A-6, Graeme's third marks (27 Oct): in the band exercises seen from the front, the band is drawn coming towards you, thick dashes near the waist thinning to the hands ("dashes curve out towards hands from central point near waist"); at the end of a face pull the elbows are above the hands; the seated chest fly shows the band in its last picture; the Mermaid says "feel it along your side". figures.js v3 (bandq), global.css v4.
@@ -4228,7 +4229,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v681";
+const CACHE_NAME = "alongside-v682";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4326,7 +4327,7 @@ const SHELL_HASHES = {
   "./js/data/empathy-transfer.js": "b3513396b3541e3a",
   "./js/data/equipment-map.js": "2db6399d16987707",
   "./js/data/exercises/gym.js": "835e777941d00fe4",
-  "./js/data/exercises/seated.js": "49e18d00ebffbe5e",
+  "./js/data/exercises/seated.js": "96d05952ab9fb6cb",
   "./js/data/exercises/sport_conditioning.js": "8362edef4c0336b2",
   "./js/data/exercises/swimming_cycling.js": "06c7dd87c9fe64e1",
   "./js/data/morning-programme.js": "684cee9fdc54a03a",
@@ -4385,7 +4386,7 @@ const SHELL_HASHES = {
   "./js/data/figures/batch-12.js": "b73433bc521bb260",
   "./js/data/figures/batch-13.js": "805fd6bff0fe06e4",
   "./js/data/figures/batch-14.js": "525000f917bc99e3",
-  "./js/data/figures/batch-15.js": "9351e0265512da40",
+  "./js/data/figures/batch-15.js": "7dea3eafc847aea9",
   "./js/views/bad-day-door.js": "5910813778515c4e",
   "./js/data/chair-legs.js": "2befbb45dab79deb",
   "./js/data/general-routine.js": "30dd1899fa187d6a",
@@ -4470,13 +4471,14 @@ const SHELL_HASHES = {
   "./js/data/exercises/cardio.js": "4c5980555053cc89",
   "./js/data/exercises/mobility.js": "fc7d0f9631672a44",
   "./js/data/exercises/yoga.js": "675ab856b6de12d3",
-  "./js/data/exercises/path_movements.js": "8f0a1c0434a9959e",
-  "./js/data/feel-programmes.js": "736a1766c248a881",
+  "./js/data/exercises/path_movements.js": "7a627e4bc94e2d97",
+  "./js/data/feel-programmes.js": "ade4752f88834a40",
+  "./js/data/stretch-routines.js": "e3e430a29af1455d",
   "./js/data/exercises/pilates.js": "5741c325f65e935c",
   "./js/data/exercises/running.js": "c1fc520e1eb7ee8c",
   "./js/data/exercises/rehabilitation.js": "c2b00a8513421566",
   "./js/data/exercises/recovery.js": "779e8bf25bfbb6fb",
-  "./js/data/exercises/mindfulness.js": "0a15ed40cea20758",
+  "./js/data/exercises/mindfulness.js": "b3e87308a6cf9578",
   "./js/data/practice-library.js": "21f37963f0b2d2c2",
   "./js/data/muscle-search.js": "3f9ae092f24a6bcf",
   "./assets/images/logo-icon-small.png": "2c057e014ac09481",
@@ -4786,6 +4788,7 @@ const SHELL_URLS = [
   "./js/data/exercises/yoga.js",
   "./js/data/exercises/path_movements.js",
   "./js/data/feel-programmes.js",
+  "./js/data/stretch-routines.js",
   "./js/data/exercises/pilates.js",
   "./js/data/exercises/running.js",
   "./js/data/exercises/rehabilitation.js",
