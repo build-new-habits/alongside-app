@@ -1,6 +1,8 @@
 # Exercise Entry Standard
 
-**28 Oct 2026 v5**
+**28 Oct 2026 v6**
+
+**v6 (Stage PATH content session, 28 Oct 2026):** an entry a ready-made Stretch routine uses is behind the `stretch` door, as an entry a Move to feel better programme uses carries `feel` and the programme's feeling.
 
 **v5 (Stage PATH P-2 and P-9b, 28 Oct 2026):** three new required fields, `doors`, `feelings` and `style` (below), held on every entry by `tools/verify-path-tags.mjs`; and an accuracy rule for `why` and `coaching`.
 
@@ -66,7 +68,7 @@ need to hear it.
 | `contraindications` | `string[]` | Conditions that exclude this exercise. |
 | `energyRequired` | `number` | 1–10. Daily gate. |
 | `difficultyLevel` | `number` | 1–10. Structural ceiling. |
-| `doors` | `string[]` | **NEW, Stage PATH.** Which of the Plan's purpose doors offer it: `stronger`, `moving`, `stretch`, `feel`. Empty only for condition-only rehabilitation (reached through sore areas and My exercises) or a still practice (breath, body scan, visualising, grounding), which lives in Wellbeing. A strength entry is always behind `stronger`, a cardio entry behind `moving`. |
+| `doors` | `string[]` | **NEW, Stage PATH.** Which of the Plan's purpose doors offer it: `stronger`, `moving`, `stretch`, `feel`. Empty only for condition-only rehabilitation (reached through sore areas and My exercises) or a still practice (breath, body scan, visualising, grounding), which lives in Wellbeing. A strength entry is always behind `stronger`, a cardio entry behind `moving`, and an entry a ready-made Stretch routine uses (`data/stretch-routines.js`) behind `stretch`. |
 | `feelings` | `string[]` | **NEW, Stage PATH.** For Move to feel better only: `ground`, `calm`, `worn`, `wake`, `sleep`. Set where a programme in `data/feel-programmes.js` uses the entry; otherwise `[]`. A feeling needs `feel` in `doors`. |
 | `style` | `string` | **NEW, Stage PATH.** `exercise`, `stretch`, `yoga`, `pilates`, `taichi`, `qigong` or `gentle`. A yoga pose or flow is `yoga`; a Pilates move or sequence is `pilates`. |
 

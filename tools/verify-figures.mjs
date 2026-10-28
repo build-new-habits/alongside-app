@@ -66,7 +66,7 @@ const stray = Object.keys(FIGURES).filter(id => !ids.has(id) && !pathIds.has(id)
 ok(`1a. all ${ids.size} exercises are drawn`, ids.size > 500 && missing.length === 0, missing.slice(0, 20).join(", "));
 ok("1b. every figure is a real exercise", stray.length === 0, stray.join(", "));
 const pathMissing = [...pathIds].filter(id => !FG.hasFigure(id));
-ok(`1c. all ${pathIds.size} Move to feel better movements are drawn`, pathIds.size === 20 && pathMissing.length === 0, pathMissing.join(", "));
+ok(`1c. all ${pathIds.size} Move to feel better movements are drawn`, pathIds.size === 23 && pathMissing.length === 0, pathMissing.join(", "));
 
 // ── 2. EACH FRAME ───────────────────────────────────────────────────────
 console.log("\nTEST 2 - every frame is captioned, described and inside its frame");

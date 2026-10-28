@@ -1,7 +1,17 @@
 /**
  * tools/verify-path-tags.mjs
- * 28 Oct 2026 v1
+ * 28 Oct 2026 v2
  *
+ * v2 - STAGE PATH content session (P-9, P-9d). Move to feel better content
+ *   v3: 21 programmes, at least four ready-made per feeling (blueprint v3
+ *   floor; 4a no longer counts the classes offered alongside). The Stretch
+ *   routines (stretch draft v2, approved 28 Oct): TEST 9, fifteen routines,
+ *   every movement real and behind the Stretch door, minutes adding up,
+ *   every area with all three styles, one of ten minutes or less and one
+ *   without the floor, and four or more per area. L4's three new Pilates
+ *   movements join the new movements (23).
+ *
+ * v1 -
  * STAGE PATH Session 2 (P-2 TAG-LIBRARY, P-9 / P-9a CONTENT). Blueprint
  * Part C5 and Part F row 2; content as approved by Graeme, 28 Oct
  * (Product/alongside_content_feel-better-programmes_28oct2026_v2.md:
@@ -47,9 +57,10 @@ const { EXERCISES } = await import(B + "data/exercises/index.js");
 const { exerciseIsAvailable } = await import(B + "data/equipment-map.js");
 const { FIGURES } = await import(B + "data/figures/index.js");
 const CARD = await import(B + "exercise-card.js");
-let PATH_MOVEMENTS = [], FP = {};
+let PATH_MOVEMENTS = [], FP = {}, SR = {};
 try { ({ PATH_MOVEMENTS } = await import(B + "data/exercises/path_movements.js")); } catch (e) { console.log("  (path_movements.js did not load: " + e.message + ")"); }
 try { FP = await import(B + "data/feel-programmes.js"); } catch (e) { console.log("  (feel-programmes.js did not load: " + e.message + ")"); }
+try { SR = await import(B + "data/stretch-routines.js"); } catch (e) { console.log("  (stretch-routines.js did not load: " + e.message + ")"); }
 const { CLASSES = [] } = await import(B + "data/classes/index.js").catch(() => ({}));
 
 let fails = 0, passes = 0;
@@ -64,12 +75,13 @@ const ALL = [...EXERCISES, ...(PATH_MOVEMENTS || [])];
 const byId = new Map(ALL.map(e => [e.id, e]));
 const NEW_IDS = ["tc-opening-stance", "tc-weight-shift", "tc-wave-hands-clouds", "tc-brush-knee", "tc-push-forward", "tc-closing",
   "qg-tapping", "qg-hold-up-sky", "qg-draw-bow", "qg-separate-heaven-earth", "qg-look-back", "qg-heel-drops", "qg-pressing-earth",
-  "qg-gathering-in", "qg-closing-breath", "yoga-mountain-pose", "gm-gentle-sway", "gm-reach-and-rise", "gm-knees-hug", "yoga-reclined-butterfly"];
+  "qg-gathering-in", "qg-closing-breath", "yoga-mountain-pose", "gm-gentle-sway", "gm-reach-and-rise", "gm-knees-hug", "yoga-reclined-butterfly",
+  "pilates-saw", "pilates-side-lying-quad", "pilates-thigh-stretch"];
 
 console.log("\nTEST 0 - positive control: the libraries loaded");
 ok("0a. the library is the size it is", EXERCISES.length >= 580, EXERCISES.length);
-ok("0b. the twenty new movements loaded", (PATH_MOVEMENTS || []).length === 20, (PATH_MOVEMENTS || []).length);
-ok("0c. the programmes loaded", Array.isArray(FP.PROGRAMMES) && FP.PROGRAMMES.length === 16, FP.PROGRAMMES && FP.PROGRAMMES.length);
+ok("0b. the twenty-three new movements loaded", (PATH_MOVEMENTS || []).length === 23, (PATH_MOVEMENTS || []).length);
+ok("0c. the programmes loaded", Array.isArray(FP.PROGRAMMES) && FP.PROGRAMMES.length === 21, FP.PROGRAMMES && FP.PROGRAMMES.length);
 
 console.log("\nTEST 1 - every entry carries doors, feelings and style");
 const untagged = ALL.filter(e => !Array.isArray(e.doors) || !Array.isArray(e.feelings) || typeof e.style !== "string");
@@ -121,7 +133,7 @@ const progs = FP.PROGRAMMES || [];
 for (const f of FEELINGS) {
   const mine = progs.filter(p => p.feeling === f);
   const also = (FP.ALSO_OFFERED || {})[f] || [];
-  ok(`4a. ${f}: ${mine.length} programmes and ${also.length} also offered make three or more`, mine.length + also.length >= 3);
+  ok(`4a. ${f}: ${mine.length} ready-made programmes, four or more (P-9d floor)`, mine.length >= 4);
   ok(`4b. ${f}: at least two styles`, new Set(mine.map(p => p.style)).size >= 2, [...new Set(mine.map(p => p.style))].join(", "));
   ok(`4c. ${f}: one of ten minutes or less`, mine.some(p => p.minutes <= 10), mine.map(p => p.minutes).join(", "));
 }
@@ -135,8 +147,8 @@ const classIds = new Set(CLASSES.map(c => c.id));
 const HOLDS = ["energising-breath", "alternate-nostril-breathing", "box-breathing", "box-breathing-extended", "four-seven-eight-breathing", "cold-shower-protocol", "contrast-therapy", "sauna-protocol", "napping-protocol"];
 const RANKING = /\b(easy|easier|hard|harder|beginner|advanced|intermediate|modified|regression|progression|basic|proper)\b/i;
 const TREAT = /\b(treat|treats|treatment|cure|cures|heal|heals|therapy|anxiety|depression|insomnia|disorder|symptom)/i;
-const expected = { g1: 10, g2: 12, g3: 15, c1: 10, c2: 15, c3: 20, w1: 6, w2: 8, k1: 8, k2: 10, k3: 12, k4: 10, k5: 20, s1: 10, s2: 12, s3: 10 };
-ok("5a. the sixteen programmes, by id", Object.keys(expected).every(id => progs.some(p => p.id === id)), progs.map(p => p.id).join(","));
+const expected = { g1: 10, g2: 12, g3: 15, g4: 6, c1: 10, c2: 15, c3: 20, c4: 10, w1: 6, w2: 8, w3: 5, w4: 6, k1: 8, k2: 10, k3: 12, k4: 10, k5: 20, s1: 10, s2: 12, s3: 10, s4: 6 };
+ok("5a. the twenty-one programmes, by id", Object.keys(expected).every(id => progs.some(p => p.id === id)), progs.map(p => p.id).join(","));
 for (const p of progs) {
   const steps = p.steps || [];
   const missing = steps.filter(s => !byId.has(s.id)).map(s => s.id);
@@ -162,7 +174,7 @@ ok("5l. Worn out programmes can all be done seated or lying", progs.filter(p => 
 ok("5m. Worn out offers no going further (it is meant to stay easy)", progs.filter(p => p.feeling === "worn").every(p => !(p.further || []).length));
 
 console.log("\nTEST 6 - the twenty new movements, to the entry standard, kept out of Free");
-ok("6a. the twenty, by id", NEW_IDS.every(id => (PATH_MOVEMENTS || []).some(e => e.id === id)), NEW_IDS.filter(id => !(PATH_MOVEMENTS || []).some(e => e.id === id)).join(", "));
+ok("6a. the twenty-three, by id", NEW_IDS.every(id => (PATH_MOVEMENTS || []).some(e => e.id === id)), NEW_IDS.filter(id => !(PATH_MOVEMENTS || []).some(e => e.id === id)).join(", "));
 const SAFE = "Move slowly and only as far as is comfortable. If something hurts, ease off or sit down.";
 for (const e of PATH_MOVEMENTS || []) {
   const probs = [];
@@ -229,6 +241,33 @@ ok("8d. no card speaks to the library's authors (stretch draft v2 §4)", notes.l
 const STRETCH_OK = { "seated-spinal-decompression": "A gentle lengthening through the back, done sitting. A calm way to finish.",
   "pigeon-pose": "A deep stretch for the back of the hip, including the piriformis, an area many people who sit a lot feel as tight." };
 for (const [id, w] of Object.entries(STRETCH_OK)) ok(`8e. ${id} why reads as approved with the Stretch routines`, card(id).why === w, card(id).why);
+
+console.log("\nTEST 9 - the Stretch routines (stretch draft v2, approved 28 Oct)");
+const routines = SR.ROUTINES || [];
+const AREAS = ["whole", "neck-shoulders", "back-hips", "legs"];
+const rExpected = { wb1: 10, wb2: 20, wb3: 15, wb4: 30, ns1: 10, ns2: 12, ns3: 12, ns4: 8, bh1: 10, bh2: 15, bh3: 12, bh4: 8, l1: 12, l2: 15, l3: 8, l4: 12 };
+ok("9a. the sixteen routines, by id (NS4 waiting for Graeme)", Object.keys(rExpected).every(id => routines.some(r => r.id === id)), routines.map(r => r.id).join(","));
+for (const r of routines) {
+  const steps = r.steps || [];
+  const missing = steps.filter(s => !byId.has(s.id)).map(s => s.id);
+  const notStretch = steps.filter(s => byId.has(s.id) && !(byId.get(s.id).doors || []).includes("stretch")).map(s => s.id);
+  const sum = Math.round(steps.reduce((a, s) => a + s.mins, 0) * 10) / 10;
+  ok(`9b. ${r.id} ${r.name}: every movement is real and behind the Stretch door`, !missing.length && !notStretch.length, [...missing, ...notStretch].join(", "));
+  ok(`9c. ${r.id}: minutes add up to ${r.minutes}`, sum === r.minutes && r.minutes === rExpected[r.id], `${sum} vs ${r.minutes}`);
+  ok(`9d. ${r.id}: an area, a style and the floor said`, AREAS.includes(r.area) && ["stretch", "yoga", "pilates"].includes(r.style) && typeof r.floor === "boolean" && r.door === "stretch");
+  ok(`9e. ${r.id}: options read as options`, (r.easeOff || []).every(x => /^If\b/.test(x)) && (r.further || []).every(x => /^When\b/.test(x)) && !RANKING.test([...(r.easeOff || []), ...(r.further || [])].join(" ")), JSON.stringify([r.easeOff, r.further]));
+  const swapBad = Object.entries(r.withoutFloor || {}).filter(([, v]) => !(v || []).every(s => byId.has(s.id) && ["standing", "seated", "any"].includes(byId.get(s.id).position)));
+  ok(`9f. ${r.id}: a without-the-floor swap uses only standing or seated movements`, swapBad.length === 0);
+  ok(`9g. ${r.id}: no sore area sets it (W5-14)`, !("soreArea" in r) && !("forSore" in r));
+}
+for (const a of AREAS) {
+  const mine = routines.filter(r => r.area === a);
+  const styles = new Set(mine.map(r => r.style));
+  ok(`9h. ${a}: all three styles`, styles.size === 3, [...styles].join(", "));
+  ok(`9i. ${a}: one of ten minutes or less`, mine.some(r => r.minutes <= 10), mine.map(r => r.minutes).join(", "));
+  ok(`9j. ${a}: one without getting down to the floor`, mine.some(r => r.floor === false || r.withoutFloor), mine.map(r => r.id).join(", "));
+  ok(`9k. ${a}: four or more ready-made (P-9d floor)`, mine.length >= 4, `${mine.length}`);
+}
 
 console.log(`\n${passes} passed, ${fails} failed`);
 process.exit(fails ? 1 : 0);

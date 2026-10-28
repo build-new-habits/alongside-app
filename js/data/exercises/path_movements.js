@@ -1,7 +1,15 @@
 /**
  * js/data/exercises/path_movements.js
- * 28 Oct 2026 v1
+ * 28 Oct 2026 v2
  *
+ * v2 - STAGE PATH content session. Three Pilates stretches for the Stretch
+ *   door's L4 Pilates for legs (stretch draft v2 Part 2b, approved 28 Oct:
+ *   "if this is a gap in content, surely we should plug that?"): The Saw,
+ *   Side-lying quad stretch, Thigh stretch. Classic Pilates mat exercises,
+ *   written new; contraindications are proposals for the clinical reviewer.
+ *   Feelings brought in line with content v3's five added programmes.
+ *
+ * v1 -
  * STAGE PATH P-9 / P-9a (blueprint Session 2). The twenty movements the
  * Move to feel better programmes need that the library did not have: six
  * tai chi, nine qigong, two yoga and three gentle movements. Written to
@@ -105,7 +113,7 @@ export const PATH_MOVEMENTS = [
   }),
   base({
     id: "tc-wave-hands-clouds", name: "Wave hands like clouds", style: "taichi", movementPattern: "taichi-form",
-    feelings: ["ground", "calm", "sleep"], position: "standing", balanceDemand: true,
+    feelings: ["ground", "calm", "worn", "sleep"], position: "standing", balanceDemand: true,
     youtube: "tai chi wave hands like clouds beginners",
     affectsAreas: ["shoulder", "spine", "hip"], contraindications: [],
     difficultyLevel: 2, energyRequired: 2, duration: 240,
@@ -228,7 +236,7 @@ export const PATH_MOVEMENTS = [
   }),
   base({
     id: "qg-hold-up-sky", name: "Holding up the sky", style: "qigong", movementPattern: "qigong-form",
-    feelings: ["wake", "sleep"], position: "standing", balanceDemand: false,
+    feelings: ["calm", "worn", "wake", "sleep"], position: "standing", balanceDemand: false,
     youtube: "baduanjin holding up the sky beginners",
     affectsAreas: ["shoulder", "spine"], contraindications: ["shoulder-acute"],
     difficultyLevel: 1, energyRequired: 2, duration: 90,
@@ -372,7 +380,7 @@ export const PATH_MOVEMENTS = [
   }),
   base({
     id: "qg-gathering-in", name: "Gathering in", style: "qigong", movementPattern: "qigong-form",
-    feelings: ["sleep"], position: "standing", balanceDemand: false,
+    feelings: ["calm", "worn", "sleep"], position: "standing", balanceDemand: false,
     youtube: "qigong gathering energy closing beginners",
     affectsAreas: ["shoulder", "full-body"], contraindications: [],
     difficultyLevel: 1, energyRequired: 1, duration: 120,
@@ -396,7 +404,7 @@ export const PATH_MOVEMENTS = [
   }),
   base({
     id: "qg-closing-breath", name: "Closing breath", style: "qigong", movementPattern: "qigong-form",
-    feelings: ["wake", "sleep"], position: "any", balanceDemand: false,
+    feelings: ["calm", "worn", "wake", "sleep"], position: "any", balanceDemand: false,
     youtube: "qigong closing breath hands on belly",
     affectsAreas: ["nervous-system"], contraindications: [],
     difficultyLevel: 1, energyRequired: 1, duration: 90,
@@ -519,7 +527,7 @@ export const PATH_MOVEMENTS = [
   }),
   base({
     id: "gm-knees-hug", name: "Knees hug", style: "gentle", movementPattern: "gentle-flow",
-    feelings: ["worn"], position: "floor", balanceDemand: false,
+    feelings: ["worn", "sleep"], position: "floor", balanceDemand: false,
     youtube: "knees to chest gentle rock lying down",
     affectsAreas: ["lower-back", "hip"], contraindications: ["knee-acute"],
     difficultyLevel: 1, energyRequired: 1, duration: 60,
@@ -537,6 +545,81 @@ export const PATH_MOVEMENTS = [
     ],
     adaptations: {
       easeOff: ["If hugging both knees is a lot, hug one knee at a time with the other foot on the floor."],
+    },
+  }),
+
+  // ── Pilates stretches for the Stretch door (L4) ────────────────────────
+  base({
+    id: "pilates-saw", name: "The Saw", style: "pilates", movementPattern: "pilates-stretch", category: "stretch-door",
+    doors: ["stretch", "feel"], feelings: [], position: "floor", balanceDemand: false,
+    youtube: "pilates saw exercise beginner",
+    affectsAreas: ["hamstring", "upper-back", "spine"], contraindications: ["lower-back-acute", "hamstring-acute"],
+    difficultyLevel: 2, energyRequired: 2, duration: 120,
+    instructions: [
+      "Sit tall on the floor with your legs straight and wider than your hips, toes pointing up",
+      "Reach your arms out to the sides at shoulder height",
+      "Turn your upper body towards one leg, keeping both sides of your bottom on the floor",
+      "Reach the opposite hand towards the outside of that foot, letting the back arm reach behind you",
+      "Sit tall again, turn back to the middle and repeat to the other side",
+    ],
+    why: "A stretch for the backs of the legs with a turn through the upper back, from the classic Pilates mat sequence.",
+    coaching: "Grow tall before you turn; the reach comes after the twist, not instead of it.",
+    watchOut: [
+      "Rounding into a heavy slump to reach the foot: reach only as far as you can while the back stays long",
+      "Lifting one side of your bottom off the floor as you turn: keep both sit bones down and turn a little less",
+      "A sharp pull behind the knee: bend the knees and leave the reach shorter today",
+    ],
+    adaptations: {
+      easeOff: ["If the backs of your legs pull, bend your knees, or sit on a folded blanket."],
+      further: ["When the turn feels comfortable, take a slow breath out as you reach and let the reach go a little further, never past comfortable."],
+    },
+  }),
+  base({
+    id: "pilates-side-lying-quad", name: "Side-lying quad stretch", style: "pilates", movementPattern: "pilates-stretch", category: "stretch-door",
+    doors: ["stretch", "feel"], feelings: [], position: "floor", balanceDemand: false, perSide: true,
+    youtube: "side lying quad stretch",
+    affectsAreas: ["quadriceps", "hip-flexor"], contraindications: ["knee-acute"],
+    difficultyLevel: 1, energyRequired: 1, duration: 120,
+    instructions: [
+      "Lie on one side with your head resting on your lower arm and your knees together",
+      "Bend your top knee and hold the top ankle with your top hand",
+      "Draw the knee gently back until you feel a stretch down the front of the thigh",
+      "Keep your knees close together and your hips stacked, and hold",
+      "Let go slowly, then turn over and do the other side",
+    ],
+    why: "Stretches the front of the thigh lying down, so there is no balancing to think about.",
+    coaching: "Tuck your tailbone under a little and the stretch arrives without pulling harder.",
+    watchOut: [
+      "Arching your lower back to get more stretch: tuck the tailbone and keep the back long",
+      "Pain in the knee rather than a stretch in the thigh: ease off and hold a sock or towel round the ankle instead",
+      "Pulling the heel hard into your bottom: a gentle hold is enough",
+    ],
+    adaptations: {
+      easeOff: ["If you cannot reach your ankle comfortably, loop a towel or sock round it and hold that."],
+    },
+  }),
+  base({
+    id: "pilates-thigh-stretch", name: "Thigh stretch", style: "pilates", movementPattern: "pilates-stretch", category: "stretch-door",
+    doors: ["stretch", "feel"], feelings: [], position: "floor", balanceDemand: false,
+    youtube: "pilates thigh stretch beginner",
+    affectsAreas: ["quadriceps", "abdominals"], contraindications: ["knee-acute", "lower-back-acute"],
+    difficultyLevel: 2, energyRequired: 2, duration: 120,
+    instructions: [
+      "Kneel upright on a mat, knees hip-width apart, with a cushion under the knees if you like",
+      "Reach both arms forward at shoulder height",
+      "Lean back slowly in one straight line from your knees to the top of your head, only as far as is comfortable",
+      "Come back up to kneeling, keeping the same straight line",
+      "Repeat slowly",
+    ],
+    why: "A classic Pilates stretch for the fronts of the thighs, which also asks your middle to hold you in one line.",
+    coaching: "Think of tipping back like a door on its hinges at the knees, not bending at the hips.",
+    watchOut: [
+      "Bending at the hips or arching the back as you lean: lean back less and keep the line from knees to head",
+      "Feeling it in the knees rather than the thighs: put a cushion under the knees and lean back only a little",
+      "Any sharp pain in the knees or lower back: stop and use the side-lying quad stretch instead",
+    ],
+    adaptations: {
+      easeOff: ["If kneeling is uncomfortable, put a folded blanket under your knees and lean back only a little."],
     },
   }),
 ];

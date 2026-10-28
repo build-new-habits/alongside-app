@@ -1,7 +1,14 @@
 /**
  * js/data/feel-programmes.js
- * 28 Oct 2026 v1
+ * 28 Oct 2026 v2
  *
+ * v2 - P-9d (Graeme, 28 Oct: "Both"): five more programmes from content
+ *   v3 (G4 Seated settle, C4 Qigong for calm, W3 Seated reset, W4 Gentle
+ *   seated qigong, S4 In-bed wind-down), so every feeling has four or more.
+ *   All use movements already in the library or the new movements. A fresh
+ *   one for me (blueprint v3 E5) is the engine's, Session 3.
+ *
+ * v1 -
  * STAGE PATH P-9 / P-9a (blueprint Session 2). The Plan's Move to feel
  * better programmes, as Graeme approved them on 28 Oct ("Great. These
  * look great"): BNH-Files Product/alongside_content_feel-better-
@@ -78,6 +85,15 @@ export const PROGRAMMES = Object.freeze([
       ],
       easeOff: ["If your knees ask for less, keep them barely bent.", "If standing is too much today, sit and do the arms only."],
       further: ["When it all feels steady, bend the knees a little more and shift your weight more slowly, never past comfortable."] }),
+  P({ id: "g4", feeling: "ground", style: "gentle", name: "Seated settle", minutes: 6, position: "seated", seatedRoute: true,
+      steps: [
+        { id: "feet-on-floor-grounding", mins: 2 },
+        { id: "seated-shoulder-rolls-warmup", mins: 1 },
+        { id: "seated-spinal-decompression", mins: 1 },
+        { id: "five-four-three-two-one-grounding", mins: 2 },
+      ],
+      easeOff: ["If even sitting up is a lot right now, lean back in the chair for the breathing and the noticing."],
+      further: [] }),
 
   // ── Calmer ─────────────────────────────────────────────────────────────
   P({ id: "c1", feeling: "calm", style: "gentle", name: "Breathe and sway", minutes: 10, position: "standing", seatedRoute: true, support: WALL,
@@ -114,6 +130,16 @@ export const PROGRAMMES = Object.freeze([
       ],
       easeOff: ["If this is new to you, stop after Wave hands like clouds the first time and add a movement next time.", "If standing is too much today, sit and do the arms only."],
       further: [] }),
+  P({ id: "c4", feeling: "calm", style: "qigong", name: "Qigong for calm", minutes: 10, position: "standing", seatedRoute: true, support: WALL, slowLine: true,
+      steps: [
+        { id: "tc-opening-stance", mins: 1.5 },
+        { id: "qg-hold-up-sky", mins: 2, note: "Slowly" },
+        { id: "tc-wave-hands-clouds", mins: 2.5 },
+        { id: "qg-gathering-in", mins: 2 },
+        { id: "qg-closing-breath", mins: 2 },
+      ],
+      easeOff: ["If standing is too much today, sit and do the arms only."],
+      further: [] }),
 
   // ── Worn out ───────────────────────────────────────────────────────────
   P({ id: "w1", feeling: "worn", style: "gentle", name: "Rest and reset", minutes: 6, position: "seated", seatedRoute: true,
@@ -133,6 +159,24 @@ export const PROGRAMMES = Object.freeze([
         { id: "yoga-corpse-pose", mins: 3 },
       ],
       easeOff: ["If hugging both knees is a lot, hug one knee at a time.", "If the twist pulls, rest your knees on a pillow."],
+      further: [] }),
+  P({ id: "w3", feeling: "worn", style: "gentle", name: "Seated reset", minutes: 5, position: "seated", seatedRoute: true,
+      steps: [
+        { id: "belly-breathing", mins: 2 },
+        { id: "seated-shoulder-rolls-warmup", mins: 1 },
+        { id: "seated-neck-side-stretch", mins: 1 },
+        { id: "feet-on-floor-grounding", mins: 1 },
+      ],
+      easeOff: ["If turning or tilting your neck does not suit you today, leave that one out and stay with the breathing."],
+      further: [] }),
+  P({ id: "w4", feeling: "worn", style: "qigong", name: "Gentle seated qigong", minutes: 6, position: "seated", seatedRoute: true, slowLine: true,
+      steps: [
+        { id: "qg-closing-breath", mins: 1.5, note: "To begin" },
+        { id: "qg-hold-up-sky", mins: 1.5, note: "Arms only" },
+        { id: "tc-wave-hands-clouds", mins: 1.5, note: "Arms only" },
+        { id: "qg-gathering-in", mins: 1.5 },
+      ],
+      easeOff: ["If lifting your arms is a lot today, keep them low and let the movements be small."],
       further: [] }),
 
   // ── Wake up ────────────────────────────────────────────────────────────
@@ -226,6 +270,15 @@ export const PROGRAMMES = Object.freeze([
         { id: "qg-closing-breath", mins: 2.5 },
       ],
       easeOff: ["If standing is too much tonight, sit and do the arms only."],
+      further: [] }),
+  P({ id: "s4", feeling: "sleep", style: "yoga", name: "In-bed wind-down", minutes: 6, position: "floor", seatedRoute: true,
+      steps: [
+        { id: "gm-knees-hug", mins: 1 },
+        { id: "yoga-supine-twist", mins: 2 },
+        { id: "yoga-reclined-butterfly", mins: 1 },
+        { id: "diaphragmatic-breathing", mins: 2 },
+      ],
+      easeOff: ["If the butterfly pulls at your hips, put pillows under your knees."],
       further: [] }),
 ]);
 

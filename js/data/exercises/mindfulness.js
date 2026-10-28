@@ -1,5 +1,9 @@
 /**
  * data/exercises/mindfulness.js
+ * 28 Oct 2026 v4
+ * v4 - STAGE PATH content session: feelings brought in line with Move to
+ *   feel better content v3 (G4, W3 and the other programmes added for P-9d).
+ *
  * 28 Oct 2026 v3
  * v3 - STAGE PATH P-2 and P-9b (Session 2). Every entry carries doors,
  *   feelings and style (blueprint C5; tools/verify-path-tags.mjs). Why and
@@ -348,7 +352,7 @@ export const MINDFULNESS = [
     name: 'Feet on Floor Grounding',
     youtube: 'feet on floor grounding guided practice',
     category: 'mindfulness',
-    doors: ['feel'], feelings: ['ground'], style: 'gentle',   // Stage PATH P-2
+    doors: ['feel'], feelings: ['ground', 'worn'], style: 'gentle',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'grounding',
     equipment: [],

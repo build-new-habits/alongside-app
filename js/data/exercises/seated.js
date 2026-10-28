@@ -1,5 +1,11 @@
 /**
  * data/exercises/seated.js
+ * 28 Oct 2026 v5
+ * v5 - STAGE PATH content session: feelings brought in line with Move to
+ *   feel better content v3 (G4, W3 and the other programmes added for P-9d).
+ *   Seated Shoulder Rolls is also behind the Stretch door: the approved
+ *   Stretch routine Desk unwind uses it.
+ *
  * 28 Oct 2026 v4
  * v4 - STAGE PATH P-2 and P-9b (Session 2). Every entry carries doors,
  *   feelings and style (blueprint C5; tools/verify-path-tags.mjs). Why and
@@ -349,7 +355,7 @@ export const SEATED = [
     name: 'Seated Spinal Lengthening',
     youtube: 'seated spinal decompression chair',
     category: 'mobility',
-    doors: ['stretch'], feelings: [], style: 'stretch',   // Stage PATH P-2
+    doors: ['stretch', 'feel'], feelings: ['ground'], style: 'stretch',   // Stage PATH P-2
     movementPattern: 'spinal-decompression',
     position: 'seated',
     adaptive: true,
@@ -1519,7 +1525,7 @@ SEATED.push(
   { id: 'seated-neck-side-stretch', name: 'Seated Neck Side Stretch',
     youtube: 'seated neck side stretch technique',
     category: 'recovery', movementPattern: 'stretch',
-    doors: ['stretch', 'feel'], feelings: ['sleep'], style: 'stretch',   // Stage PATH P-2
+    doors: ['stretch', 'feel'], feelings: ['worn', 'sleep'], style: 'stretch',   // Stage PATH P-2
     position: 'seated',
     adaptive: true,   // CAP-6
     impact: false, balanceDemand: false,
@@ -1736,7 +1742,7 @@ SEATED.push(
   { id: 'seated-shoulder-rolls-warmup', name: 'Seated Shoulder Rolls',
     youtube: 'seated shoulder rolls warm up',
     category: 'cardio', movementPattern: 'locomotion',
-    doors: ['moving', 'feel'], feelings: ['calm', 'worn'], style: 'exercise',   // Stage PATH P-2
+    doors: ['moving', 'stretch', 'feel'], feelings: ['ground', 'calm', 'worn'], style: 'exercise',   // Stage PATH P-2
     position: 'seated',
     adaptive: true,   // CAP-6
     impact: false, balanceDemand: false,

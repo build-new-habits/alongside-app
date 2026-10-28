@@ -1,6 +1,9 @@
 /**
  * js/data/figures/batch-15.js
- * 28 Oct 2026 v1
+ * 28 Oct 2026 v2
+ *
+ * v2 - The three Pilates stretches for the Stretch door's L4 (The Saw,
+ *   Side-lying quad stretch, Thigh stretch), drawn new.
  *
  * STAGE PATH P-9 / P-9a. Figures for the twenty new Move to feel better
  * movements (data/exercises/path_movements.js). The seven qigong figures
@@ -32,4 +35,7 @@ export const FIGURES_15 = {
   "gm-reach-and-rise": {"w":160,"f":[{"l":"Stand tall","a":"Seen from the side, standing tall with the feet hip-width apart, arms by the sides.","p":{"hip":[80,112],"t":180,"nl":[0,0,90],"fl":[1,1,90],"na":[2,4],"fa":[1,3]}},{"l":"Reach up, heels lift","a":"Seen from the side, both arms reaching up overhead as the heels lift a little off the floor.","p":{"hip":[80,104],"t":180,"nl":[0,0,44],"fl":[1,1,44],"na":[172,176],"fa":[170,174]},"x":[{"mv":[60,172,60,186]}]}]},
   "gm-knees-hug": {"w":200,"f":[{"l":"Hug the knees, rock gently","g":"mat","a":"Seen from the side, lying on the back with both knees drawn in towards the chest and the hands resting on the shins; an arrow shows a gentle rock from side to side.","p":{"hip":[116,176],"t":-90,"h":-95,"nl":[-150,100,170],"fl":[-148,102,170],"na":[130,110],"fa":[128,108]},"x":[{"mvq":[100,118,116,108,132,118]}]}]},
   "yoga-reclined-butterfly": {"w":200,"f":[{"l":"Soles together, knees open","g":"none","a":"Seen from above, lying on the back with the soles of the feet together and the knees fallen open to the sides, hands resting on the belly.","p":{"v":"front","hip":[100,100],"t":-90,"h":-90,"ll":[130,35,90],"rl":[50,145,90],"la":[60,100],"ra":[120,80]}}]},
+  "pilates-saw": {"w":180,"f":[{"l":"Sit tall, arms out wide","g":"mat","a":"Seen from the side, sitting tall on the floor with the legs straight out in front and apart, one arm reaching forward and the other reaching back at shoulder height.","p":{"hip":[56,182],"t":180,"nl":[90,90,180],"fl":[92,90,180],"na":[90,92],"fa":[-90,-92]}},{"l":"Turn and reach to the foot","g":"mat","a":"Seen from the side, the upper body turned and leaning forward, the front hand reaching towards the outside of the foot and the back arm reaching up behind, both sides of the bottom staying on the floor.","p":{"hip":[56,182],"t":132,"h":124,"nl":[90,90,180],"fl":[92,90,180],"na":[118,112],"fa":[-120,-130]},"x":[{"mvq":[100,104,122,108,140,136]}]}]},
+  "pilates-side-lying-quad": {"w":200,"f":[{"l":"Hold the ankle, knee back","g":"mat","a":"Seen from the side, lying on one side with the head on the lower arm, the bottom leg straight, the top knee bent and the top hand holding the ankle behind, drawing the knee gently back to stretch the front of the thigh.","p":{"hip":[112,176],"t":-90,"h":-96,"fl":[90,90,180],"nl":[120,-100,-100],"fa":[-160,-140],"na":[122,122]},"x":[{"mvq":[150,140,140,130,124,134]}]}]},
+  "pilates-thigh-stretch": {"w":180,"f":[{"l":"Kneel tall, arms forward","g":"mat","a":"Seen from the side, kneeling upright on a mat, knees under the hips, arms reaching forward at shoulder height.","p":{"hip":[80,150],"t":180,"nl":[0,-90,-90],"fl":[1,-90,-90],"na":[90,90],"fa":[88,88]}},{"l":"Lean back in one line","g":"mat","a":"Seen from the side, leaning back from the knees in one straight line from the knees to the top of the head, arms still forward, only as far as is comfortable; then coming back up.","p":{"hip":[64,152],"t":-155,"h":-155,"nl":[25,-90,-90],"fl":[26,-90,-90],"na":[115,115],"fa":[113,113]},"x":[{"mvq":[40,40,30,60,36,84]}]}]},
 };
