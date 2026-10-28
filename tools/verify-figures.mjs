@@ -1,6 +1,8 @@
 /**
  * tools/verify-figures.mjs
- * 28 Oct 2026 v2
+ * 28 Oct 2026 v3
+ *
+ * v3 - 1c counts the twenty-three new movements (L4's three Pilates stretches).
  *
  * v2 - STAGE PATH P-9. Re-pointed, not loosened: "a real exercise" now
  *   includes the twenty Move to feel better movements, which live in
