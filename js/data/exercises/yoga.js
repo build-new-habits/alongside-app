@@ -345,7 +345,7 @@ export const YOGA = [
       'Hold for 5 breaths, then lower slowly'
     ],
     coaching: 'The height of the lift depends on your back flexibility — even a few centimetres is the full pose. Never force range here.',
-    why: 'A gentle backbend that opens the chest and counteracts the rounded posture of sitting.',
+    why: 'A gentle backbend that opens the chest, a change of shape after a lot of sitting.',
         watchOut: [
       'Moving faster than you can control, which turns mobility work into momentum',
       'Forcing range rather than working to the edge of what is comfortable',
@@ -384,7 +384,7 @@ export const YOGA = [
       'Return to upright slowly'
     ],
     coaching: 'A rounded back stretches the lower back, not the hamstrings. Sit on a folded blanket to tilt the pelvis forward if your lower back rounds immediately.',
-    why: 'A deep hamstring and lower back stretch. Regular practice improves posterior chain flexibility useful in many physical activities.',
+    why: 'A deep stretch for the hamstrings and lower back. Regular practice can improve flexibility in the back of the legs.',
         watchOut: [
       'Moving faster than you can control, which turns mobility work into momentum',
       'Forcing range rather than working to the edge of what is comfortable',
@@ -419,7 +419,7 @@ export const YOGA = [
       'Hold for 5 breaths, then switch sides'
     ],
     coaching: 'The back knee on the floor makes this more accessible than Warrior I. Lower the back knee any time Warrior I becomes too intense.',
-    why: 'A deep hip flexor and quad stretch in a stable position. A good one after long periods of sitting.',
+    why: 'A deep stretch for the front of the hip and thigh in a steady, kneeling position.',
     difficultyLevel: 2,
     energyRequired: 3,
         watchOut: [
@@ -651,7 +651,7 @@ export const YOGA = [
       'Breathe deeply into any tension'
     ],
     coaching: 'Place a folded blanket under the right hip if it does not reach the floor. Forcing the hip down strains the knee.',
-    why: 'A deep hip opener that works the glutes and the muscles that turn the hip outward.',
+    why: 'The deepest hip opener in yoga, working the glutes and the muscles that turn the hip outward.',
         watchOut: [
       'Moving faster than you can control, which turns mobility work into momentum',
       'Forcing range rather than working to the edge of what is comfortable',

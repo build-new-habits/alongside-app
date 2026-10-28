@@ -255,7 +255,7 @@ export const SEATED = [
       'Return to upright by squeezing your glutes'
     ],
     coaching: 'The hinge is the movement your back most wants you to be good at, and it can be trained perfectly well sitting down. Flat back is the whole exercise.',
-    why: 'Hinging is how you reach for anything below waist height. Every hinge exercise in the library needs standing — this one does not.',
+    why: 'Hinging is how you reach for anything below waist height. This one is done sitting, with no need to stand.',
     watchOut: [
       'If your back rounds as you go forward, that is your stopping point. It will move further over weeks',
       'If you feel it mostly in your lower back rather than your hips, come less far forward and lead with your chest',
@@ -335,7 +335,7 @@ export const SEATED = [
       'Hold for thirty seconds, breathing normally, then swap sides'
     ],
     coaching: 'The tuck is what creates the stretch, not how far the leg goes back. Most people get this the wrong way round and reach with the leg instead.',
-    why: 'Sitting shortens the front of the hips more than anything else, and every existing stretch for it needs kneeling on the floor.',
+    why: 'Sitting a lot can leave the front of the hips feeling tight. This stretches them without kneeling on the floor.',
     watchOut: [
       'If you feel it in your lower back rather than the front of the hip, tuck your hips under more and take the leg less far back',
       'If you are gripping the chair to stay steady, move further in from the edge',
@@ -375,7 +375,7 @@ export const SEATED = [
       'Repeat for five slow breaths'
     ],
     coaching: 'Almost nothing moves here and that is deliberate. It is the end of a session, and the point is to leave taller than you arrived.',
-    why: 'Every spinal decompression exercise in the library involves hanging or lying down. This closes a session for somebody who does neither.',
+    why: 'A gentle lengthening through the back, done sitting. A calm way to finish.',
     watchOut: [
       'If your chin lifts as you grow taller, tuck it very slightly — the length comes from the back of the neck',
       'If your shoulders rise with the breath, let them settle and lengthen more slowly',
@@ -1562,7 +1562,7 @@ SEATED.push(
       'Release slowly'
     ],
     coaching: 'Lead with the chest lifting rather than the arms going back. It reaches the same place and asks far less of the shoulder joint.',
-    why: 'Everything most people do happens in front of them, and the chest shortens to match. This stretch works the other way.',
+    why: 'Everything we do happens in front of us, and the chest can feel tight to match. This opens it back up.',
     watchOut: [
       'Arching the lower back instead of opening the chest',
       'Forcing the arms further back than is comfortable',

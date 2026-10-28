@@ -223,6 +223,12 @@ const RETIRED = [/increases oxygen/i, /oxygen efficiency/i, /greatest calming ef
 const bad = [];
 for (const e of ALL) for (const f of ["why", "coaching"]) for (const re of RETIRED) if (re.test(String(e[f] || ""))) bad.push(`${e.id}.${f} ~ ${re}`);
 ok(`8c. none of the ${RETIRED.length} corrected claims is left in any why or coaching`, bad.length === 0, bad.join("; "));
+const notes = [];
+for (const e of ALL) for (const f of ["why", "coaching"]) if (/\b(in the library|every existing|this file)\b/i.test(String(e[f] || ""))) notes.push(`${e.id}.${f}`);
+ok("8d. no card speaks to the library's authors (stretch draft v2 §4)", notes.length === 0, notes.join(", "));
+const STRETCH_OK = { "seated-spinal-decompression": "A gentle lengthening through the back, done sitting. A calm way to finish.",
+  "pigeon-pose": "A deep stretch for the back of the hip, including the piriformis, an area many people who sit a lot feel as tight." };
+for (const [id, w] of Object.entries(STRETCH_OK)) ok(`8e. ${id} why reads as approved with the Stretch routines`, card(id).why === w, card(id).why);
 
 console.log(`\n${passes} passed, ${fails} failed`);
 process.exit(fails ? 1 : 0);

@@ -1797,7 +1797,7 @@ export const REHABILITATION = [
       'Hold for 30 seconds, then switch',
       'Repeat 3 times each side'
     ],
-    coaching: 'This feels different to the standard calf stretch — lower and tighter. That is the soleus. Doing both stretches reaches both calf muscles.',
+    coaching: 'This feels lower and tighter than the usual calf stretch. That is the soleus, and it is worth doing both.',
     why: 'Stretches the soleus, which is commonly neglected. Tight soleus increases Achilles load during walking and running.',
         watchOut: [
       "If you feel it high in the calf rather than low near the ankle, bend the back knee more and step in closer",
@@ -2169,7 +2169,7 @@ export const REHABILITATION = [
       'Repeat 3 times each side'
     ],
     coaching: 'The further you lean the hips to the side, the deeper the stretch. Start gentle and increase over time.',
-    why: 'A stretch for the outside of the hip, which many people find eases the feeling of tightness there. Complements foam rolling well.',
+    why: 'Stretches the outside of the hip and thigh, an area many runners and cyclists feel as tight.',
         watchOut: [
       "If you feel it in your lower back rather than the outer thigh, shift your hips further sideways and lean less",
       "If you are twisting as you lean, keep your shoulders square and move only sideways",
@@ -2750,7 +2750,7 @@ export const REHABILITATION = [
       'Repeat 3 times'
     ],
     coaching: 'Lean forward slowly — do not throw yourself into the stretch. A gentle sustained pull works better than a hard fast one.',
-    why: 'Stretches the chest, including the small pec minor, which can draw the shoulder blade forward.',
+    why: 'Stretches the front of the chest and shoulder. Many people feel this area tighten with a lot of sitting and screen work.',
         watchOut: [
       "If you feel it in the front of your shoulder joint rather than across the chest, lower your arms and try again — high positions pinch some shoulders",
       "If your lower back arches as you lean, tuck your ribs down and lean less",

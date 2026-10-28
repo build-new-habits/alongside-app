@@ -427,7 +427,7 @@ export const PILATES = [
       'Complete 8 reps'
     ],
     coaching: 'This is a spinal articulation, not a hamstring stretch. The priority is the C-curve of the spine — not how far forward you reach.',
-    why: 'Develops the ability to round the spine forward with control, one section at a time.',
+    why: 'Moves the spine through a long forward curve, building control of how each part of the back bends.',
         watchOut: [
       'Bouncing into the stretch rather than holding it still',
       'Pushing to the point of pain; a stretch should feel like a strong pull, never sharp',

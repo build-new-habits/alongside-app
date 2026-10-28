@@ -192,7 +192,7 @@ export const MOBILITY = [
       'Hold 45 seconds each side'
     ],
     coaching: 'If this is too intense, sit on a cushion to elevate your hips.',
-    why: 'Works inward and outward hip rotation in the same position.',
+    why: 'Works both ways the hip turns, inward and outward, in one position.',
         watchOut: [
       'Bouncing into the stretch rather than holding it still',
       'Pushing to the point of pain; a stretch should feel like a strong pull, never sharp',
@@ -240,7 +240,7 @@ export const MOBILITY = [
       'Hold 2 seconds, return, repeat 10 times each side'
     ],
     coaching: 'Keep your knees stacked and hips from rolling back - the movement is just in your upper back.',
-    why: 'Gets the upper back turning, which many people find eases stiffness through the neck and shoulders.',
+    why: 'Keeps your upper back turning freely. Many people find this eases stiffness through the neck and shoulders.',
         watchOut: [
       'Moving faster than you can control, which turns mobility work into momentum',
       'Forcing range rather than working to the edge of what is comfortable',
@@ -606,7 +606,7 @@ export const MOBILITY = [
       'Hold for 60 to 90 seconds each side'
     ],
     coaching: 'If the hip on the bent leg does not touch the floor, place a folded blanket or cushion under it for support.',
-    why: 'A deep stretch for the back of the hip and the muscles that turn the leg outward, including the piriformis, which can feel tight in people who sit a lot.',
+    why: 'A deep stretch for the back of the hip, including the piriformis, an area many people who sit a lot feel as tight.',
         watchOut: [
       'Moving faster than you can control, which turns mobility work into momentum',
       'Forcing range rather than working to the edge of what is comfortable',
@@ -717,8 +717,8 @@ export const MOBILITY = [
       'Hold for 30 seconds, then switch sides',
       'Repeat 3 times each side'
     ],
-    coaching: 'The hand on the head is there for weight only, not traction. Pulling makes it easy to overdo — just let gravity and the weight of the hand do the work.',
-    why: 'The muscle across the top of the shoulders and up the side of the neck often feels tight after long spells at a desk or behind the wheel.',
+    coaching: 'The hand on the head is there for its weight, not to pull. Pulling can strain the neck; let gravity do the work.',
+    why: 'Stretches the muscle across the top of the shoulder and the side of the neck, which many people feel tighten after desk work or driving.',
         watchOut: [
       'Bouncing into the stretch rather than holding it still',
       'Pushing to the point of pain; a stretch should feel like a strong pull, never sharp',
@@ -755,7 +755,7 @@ export const MOBILITY = [
       'Release and repeat 3 times'
     ],
     coaching: 'Think tall through the crown of the head as you open. Slumping forward defeats the purpose.',
-    why: 'Counteracts the forward shoulder posture from screens, driving, and prolonged sitting. Simple and can be done anywhere throughout the day.',
+    why: 'Opens the front of the chest and shoulders, which often feel closed after screens, driving or long sitting. Can be done anywhere.',
         watchOut: [
       'Bouncing into the stretch rather than holding it still',
       'Pushing to the point of pain; a stretch should feel like a strong pull, never sharp',
@@ -836,7 +836,7 @@ export const MOBILITY = [
       'Complete 5 full waves'
     ],
     coaching: 'This is exploration, not performance. Move within a range that feels comfortable. Any section that does not move is telling you something.',
-    why: 'Moves every segment of the spine through flexion and extension sequentially — a gentle way to keep the whole spine moving.',
+    why: 'Moves each part of the spine forward and back in turn, which helps keep it moving when you sit a lot.',
         watchOut: [
       'Moving faster than you can control, which turns mobility work into momentum',
       'Forcing range rather than working to the edge of what is comfortable',
@@ -1053,7 +1053,7 @@ export const MOBILITY = [
       'Complete 15 reps each side, holding the end range for 1 second'
     ],
     coaching: 'This is a test and a drill. Measure the foot distance from the wall over weeks — improvement here will be noticeable in squat depth and running comfort.',
-    why: 'Directly develops ankle dorsiflexion range — an ankle range that squatting, running and most standing movement rely on.',
+    why: 'Works the ankle\'s forward bend, which affects how deep you can squat and how freely you run.',
         watchOut: [
       'Moving faster than you can control, which turns mobility work into momentum',
       'Forcing range rather than working to the edge of what is comfortable',
