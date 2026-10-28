@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 27 Oct 2026 v680
+ * 28 Oct 2026 v681
  *
+ * v681 - STAGE PATH Session 2 (P-2, P-9, P-9a, P-9b): nothing new on Free's screens except truer card words; every exercise is tagged by purpose, feeling and style, and the Plan's twenty new tai chi, qigong, yoga and gentle movements and its sixteen Move to feel better programmes are in place, each movement with its figure, ready for the door screens; exercise cards that overstated a benefit, or said something works that has not been shown, now say what is true (223 changes, every one sourced). NEW FILES precached: js/data/feel-programmes.js, js/data/exercises/path_movements.js, js/data/figures/batch-15.js.
  * v680 - STAGE PATH P-1 SCHEMA: nothing you can see changes; the app can now remember which movements you loved and whether today's first-open screen has been shown, ready for the Plan's new Home. store.js v118, Schema v1.116, restore.js v7.
  * v679 - A-6, Graeme's third marks (27 Oct): in the band exercises seen from the front, the band is drawn coming towards you, thick dashes near the waist thinning to the hands ("dashes curve out towards hands from central point near waist"); at the end of a face pull the elbows are above the hands; the seated chest fly shows the band in its last picture; the Mermaid says "feel it along your side". figures.js v3 (bandq), global.css v4.
  * v678 - LIFT-UNIT and A-6 second marks (Graeme, 27 Oct: "these exercises hold stone as the gym weight. They need to be kg or pounds"): weights lifted are in kg or lb, never stone: Settings › Equipment › Weights you lift, in (both tiers); unchosen, lb for a body weight in lb or a phone set to the United States, else kg; lifts saved as st become kg. store.js v117, Schema v1.115 (liftUnit). Reverse fly, both face pulls and the seated chest fly open with a set-up picture showing where the band goes; the Mermaid "feel it" sits on the body; the towel curl's towel is visible.
@@ -4227,7 +4228,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v680";
+const CACHE_NAME = "alongside-v681";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4324,10 +4325,10 @@ const SHELL_HASHES = {
   "./js/views/reflect.js": "1f905f98c16931ee",
   "./js/data/empathy-transfer.js": "b3513396b3541e3a",
   "./js/data/equipment-map.js": "2db6399d16987707",
-  "./js/data/exercises/gym.js": "34140029424a4dce",
-  "./js/data/exercises/seated.js": "5ee4b5ccfdf8c945",
-  "./js/data/exercises/sport_conditioning.js": "72c789b2f7284b1b",
-  "./js/data/exercises/swimming_cycling.js": "0f3fefe85ab33dfd",
+  "./js/data/exercises/gym.js": "835e777941d00fe4",
+  "./js/data/exercises/seated.js": "49e18d00ebffbe5e",
+  "./js/data/exercises/sport_conditioning.js": "8362edef4c0336b2",
+  "./js/data/exercises/swimming_cycling.js": "06c7dd87c9fe64e1",
   "./js/data/morning-programme.js": "684cee9fdc54a03a",
   "./js/data/session-categories.js": "39f35cc7aab24fe6",
   "./js/data/aims.js": "35afe1468825731f",
@@ -4369,7 +4370,7 @@ const SHELL_HASHES = {
   "./js/views/plan-import.js": "630d97175edd2091",
   "./css/components/your-week.css": "f14109dded35259b",
   "./js/figures.js": "621b376c8778dbb4",
-  "./js/data/figures/index.js": "d4cf080b2f72544c",
+  "./js/data/figures/index.js": "7532ceb1837831ca",
   "./js/data/figures/batch-01.js": "27f86e28fb0c9833",
   "./js/data/figures/batch-02.js": "45f4f07439ed515e",
   "./js/data/figures/batch-03.js": "2aa6d354f20f277e",
@@ -4384,6 +4385,7 @@ const SHELL_HASHES = {
   "./js/data/figures/batch-12.js": "b73433bc521bb260",
   "./js/data/figures/batch-13.js": "805fd6bff0fe06e4",
   "./js/data/figures/batch-14.js": "525000f917bc99e3",
+  "./js/data/figures/batch-15.js": "9351e0265512da40",
   "./js/views/bad-day-door.js": "5910813778515c4e",
   "./js/data/chair-legs.js": "2befbb45dab79deb",
   "./js/data/general-routine.js": "30dd1899fa187d6a",
@@ -4464,15 +4466,17 @@ const SHELL_HASHES = {
   "./js/data/grounding-moments.js": "33c5054f7e6540ff",
   "./js/data/coach-voice.js": "92ea4a0209978619",
   "./js/data/exercises/index.js": "d9df11d43f5df8ce",
-  "./js/data/exercises/strength.js": "1357c6bb46e7a89d",
-  "./js/data/exercises/cardio.js": "2ca5030c1a1cf9fa",
-  "./js/data/exercises/mobility.js": "721c3f53d858e0d2",
-  "./js/data/exercises/yoga.js": "e506e6b3452ee86e",
-  "./js/data/exercises/pilates.js": "99e320f6392bca5b",
-  "./js/data/exercises/running.js": "fcb33517ce9f6da5",
-  "./js/data/exercises/rehabilitation.js": "f7f79c01a05b1d21",
-  "./js/data/exercises/recovery.js": "0497a8c7c5c145eb",
-  "./js/data/exercises/mindfulness.js": "43e569cf2f0ca91c",
+  "./js/data/exercises/strength.js": "56a487cd793dfe1c",
+  "./js/data/exercises/cardio.js": "4c5980555053cc89",
+  "./js/data/exercises/mobility.js": "fc7d0f9631672a44",
+  "./js/data/exercises/yoga.js": "675ab856b6de12d3",
+  "./js/data/exercises/path_movements.js": "8f0a1c0434a9959e",
+  "./js/data/feel-programmes.js": "736a1766c248a881",
+  "./js/data/exercises/pilates.js": "5741c325f65e935c",
+  "./js/data/exercises/running.js": "c1fc520e1eb7ee8c",
+  "./js/data/exercises/rehabilitation.js": "c2b00a8513421566",
+  "./js/data/exercises/recovery.js": "779e8bf25bfbb6fb",
+  "./js/data/exercises/mindfulness.js": "0a15ed40cea20758",
   "./js/data/practice-library.js": "21f37963f0b2d2c2",
   "./js/data/muscle-search.js": "3f9ae092f24a6bcf",
   "./assets/images/logo-icon-small.png": "2c057e014ac09481",
@@ -4686,6 +4690,7 @@ const SHELL_URLS = [
   "./js/data/figures/batch-12.js",
   "./js/data/figures/batch-13.js",
   "./js/data/figures/batch-14.js",
+  "./js/data/figures/batch-15.js",
   "./js/views/bad-day-door.js",
   "./js/data/chair-legs.js",
   "./js/data/general-routine.js",
@@ -4779,6 +4784,8 @@ const SHELL_URLS = [
   "./js/data/exercises/cardio.js",
   "./js/data/exercises/mobility.js",
   "./js/data/exercises/yoga.js",
+  "./js/data/exercises/path_movements.js",
+  "./js/data/feel-programmes.js",
   "./js/data/exercises/pilates.js",
   "./js/data/exercises/running.js",
   "./js/data/exercises/rehabilitation.js",
