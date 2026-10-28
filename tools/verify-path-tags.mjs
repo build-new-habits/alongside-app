@@ -1,6 +1,8 @@
 /**
  * tools/verify-path-tags.mjs
- * 28 Oct 2026 v2
+ * 28 Oct 2026 v3
+ *
+ * v3 - NS4 approved; 9a's label says so.
  *
  * v2 - STAGE PATH content session (P-9, P-9d). Move to feel better content
  *   v3: 21 programmes, at least four ready-made per feeling (blueprint v3
@@ -246,7 +248,7 @@ console.log("\nTEST 9 - the Stretch routines (stretch draft v2, approved 28 Oct)
 const routines = SR.ROUTINES || [];
 const AREAS = ["whole", "neck-shoulders", "back-hips", "legs"];
 const rExpected = { wb1: 10, wb2: 20, wb3: 15, wb4: 30, ns1: 10, ns2: 12, ns3: 12, ns4: 8, bh1: 10, bh2: 15, bh3: 12, bh4: 8, l1: 12, l2: 15, l3: 8, l4: 12 };
-ok("9a. the sixteen routines, by id (NS4 waiting for Graeme)", Object.keys(rExpected).every(id => routines.some(r => r.id === id)), routines.map(r => r.id).join(","));
+ok("9a. the sixteen routines, by id (NS4 approved 28 Oct)", Object.keys(rExpected).every(id => routines.some(r => r.id === id)), routines.map(r => r.id).join(","));
 for (const r of routines) {
   const steps = r.steps || [];
   const missing = steps.filter(s => !byId.has(s.id)).map(s => s.id);

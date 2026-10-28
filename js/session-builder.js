@@ -1,6 +1,17 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
+ * 28 Oct 2026 v91
+ *
+ * v91 - STAGE PATH P-3 ENGINE (blueprint E3). pickFrom() puts the person's
+ *   liked movements first when they fit the slot, at most two a session,
+ *   not when done in either of the last two sessions (data/path-engine.js
+ *   applyPrefs). After every safety and suitability rule, before
+ *   continuity. No tier check (TIER-D): only the Plan's finish writes
+ *   likes, so without likes every session is built exactly as before.
+ *   Correction to the blueprint: it named buildCandidatePools(), which
+ *   builds the swap lists; picks are made in pickFrom().
+ *
  * 17 Oct 2026 v90
  *
  * v90 - SHORT-BARBELL (found in the v673 fresh-clone run: verify-short-
@@ -1262,6 +1273,7 @@
  */
 
 import { store } from "./store.js";
+import { applyPrefs, recentIds } from "./data/path-engine.js";
 import { resolveEquipment, exerciseIsAvailable } from "./data/equipment-map.js";
 import { EXERCISES, isSessionLength, isCardioMachine } from "./data/exercises/index.js";
 import { matchCategory } from "./data/session-categories.js";
@@ -4123,6 +4135,17 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
     return [{ ...picked, _feature: true }];
   }
 
+  // PATH-LIKES BEGIN. STAGE PATH P-3 (v91). The person's liked movements,
+  // and what was in the last two sessions. No tier check (TIER-D, 13 Aug:
+  // payment never decides selection): only the Plan's finish writes likes,
+  // so on Free there are none, nothing below runs, and no random number is
+  // drawn: every session without likes is built exactly as before
+  // (verify-path-engine 3h compares against this file with these lines out).
+  const _liked = store.get("likedMovements") || {};
+  const _hasLikes = Object.keys(_liked).length > 0;
+  const _recent = _hasLikes ? recentIds(store.get("activityLog") || []) : new Set();
+  // PATH-LIKES END
+
   // W3-12. The session learned, and the one move that changes today.
   const _learned = _learnedSession(sessionType);
   const _releaseToday = _learnedRelease(_learned);
@@ -4623,6 +4646,19 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
         const priority = candidates.filter(intentPriority);
         if (priority.length >= 2) candidates = priority;
       }
+
+      // PATH-LIKES BEGIN. STAGE PATH P-3 (blueprint E3). Liked movements first when they
+      // fit this slot (type, place and sore rules have already filtered
+      // the pool), at most two a session, not when done in either of the
+      // last two sessions. Placed after every safety and suitability rule
+      // above and before continuity, so a like outranks familiarity and
+      // nothing else.
+      if (_hasLikes) {
+        const likedSoFar = [...chosen, ...selected.map(e => e.id)].filter(id => _liked[id]).length;
+        const loved = applyPrefs(candidates, { liked: _liked, recent: _recent, likedSoFar });
+        if (loved !== candidates) return loved[Math.floor(Math.random() * loved.length)];
+      }
+      // PATH-LIKES END
 
       if (Math.random() >= noveltyRate) {
         const anchors = candidates.filter(isAnchor);

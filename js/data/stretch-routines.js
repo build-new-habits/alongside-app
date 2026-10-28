@@ -1,6 +1,8 @@
 /**
  * js/data/stretch-routines.js
- * 28 Oct 2026 v1
+ * 28 Oct 2026 v2
+ *
+ * v2 - NS4 approved (Graeme, 28 Oct: "seems good"); its waiting mark removed.
  *
  * STAGE PATH P-9 (content session). The Plan's ready-made Stretch
  * routines, as Graeme approved them on 28 Oct ("That all looks good"),
@@ -19,10 +21,9 @@
  * Areas match the Stretch door (blueprint D4): whole, neck-shoulders,
  * back-hips, legs. floor: false means the whole routine is done standing
  * or seated; withoutFloor gives the swap for a routine that has one.
- * NS4 is the one routine not in the approved draft: P-9d's floor of four
- * per area (Graeme, 28 Oct: "Both") left Neck and shoulders one short. It
- * uses only movements already in the library, standing or seated, and is
- * waiting for Graeme's look (schedule P-9e); change or remove it here.
+ * NS4 was added to meet P-9d's floor of four per area (Neck and shoulders
+ * was one short), from movements already in the library, and approved by
+ * Graeme on 28 Oct ("seems good"; schedule P-9e).
  *
  * A sore area never sets which routine is suggested (W5-14); the builder's
  * own sore rules are unchanged. Options are the person's to choose.
@@ -120,7 +121,7 @@ export const ROUTINES = Object.freeze([
         { id: "thread-the-needle", mins: 2, note: "Each side" },
         { id: "childs-pose", mins: 2 },
       ] }),
-  R({ id: "ns4", area: "neck-shoulders", style: "stretch", name: "Shoulders, standing", minutes: 8, floor: false, support: "A doorway and a chair nearby.", awaitingApproval: true,
+  R({ id: "ns4", area: "neck-shoulders", style: "stretch", name: "Shoulders, standing", minutes: 8, floor: false, support: "A doorway and a chair nearby.",
       steps: [
         { id: "shoulder-cars-standing", mins: 2, note: "Each side" },
         { id: "chest-opener-arms-back", mins: 1 },

@@ -1,6 +1,10 @@
 /**
  * tools/verify-write1.mjs
- * 27 Oct 2026 v8
+ * 28 Oct 2026 v9
+ *
+ * v9 - STAGE PATH Session 3. likedMovements leaves the baseline, as its
+ *   dated promise said: session-builder.js reads it (PATH-LIKES) and the
+ *   store writes it. dayOpen stays until Session 4.
  *
  * v8 - STAGE PATH P-1 SCHEMA. dayOpen and likedMovements join the baseline
  *   as DATED PROMISES, the WEIGHT-1a pattern: schema first means each is
@@ -210,7 +214,7 @@ const BASELINE = new Set([
   // no reader yet, by design (schema before code). Session 3 connects
   // likedMovements (path-engine.js), Session 4 connects dayOpen
   // (plan-home.js); each removes its line, as the check below insists.
-  'dayOpen', 'likedMovements',
+  'dayOpen',
 
   // 'conditionMeta' -- removed 28 Sep 2026. SMOOTH-P4a reads it: Progress
   // says "Since 19 Aug" for each condition from conditionMeta[id].addedAt.

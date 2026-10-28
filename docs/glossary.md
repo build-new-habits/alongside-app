@@ -1,5 +1,5 @@
 # Alongside: Move — Glossary
-## 27 Oct 2026 v3
+## 28 Oct 2026 v4
 
 A-9 ONE-NAME (Stage AWARD). One name for each thing, across the app, the website and the policies. A screen, a page or a policy that names one of these uses the name in the **Use** column. Names in **Not** are retired or wrong for it; `tools/verify-one-name.mjs` fails if a retired one reaches a string in `js/`.
 
@@ -28,12 +28,10 @@ Taken from the words on every screen (`node tools/chromium-words.mjs`, 95 screen
 | The suggestion at the top of Plan Home | **Today card** | — | Its list is **What I've adjusted for today** |
 | A movement somebody loved | **Loved it** | Like, thumbs up, favourite | Stored as `likedMovements` |
 | A movement somebody would rather have less of | **Less often** | Not a fan, skip (as a name) | One store record with Skip's: `exercisePreferences` `'less'` |
-| A movement somebody never wants again | open, decision 2 | — | Settings › How you like things says *Not again*; the Stage PATH spec says *Never show me this*. One store record: `exercisePreferences` `'avoid'` |
+| A movement somebody never wants again | **Not again** | Never show me this | Decision 2, settled. Settings › How you like things says it and undoes it. One store record: `exercisePreferences` `'avoid'` |
 
 ## Decided
 
 1. **Saved sessions** (Graeme, 13 Oct): one name for the screen and the policies; *Keep to repeat* on the finish.
 
-## Open (Stage PATH, for Graeme before Session 6)
-
-2. **Two names on the Plan's new finish.** The Stage PATH spec says *Save this session* and *Never show me this*; the app already says *Keep to repeat* (the finish, decision 1) and *Not again* (Settings › How you like things, where it can be undone). Recommended: keep the app's two names, so the button and the list that undoes it say the same thing.
+2. **Keep to repeat** and **Not again** on the Plan's new finish (Graeme, 28 Oct: agreed): the button and the list that undoes it say the same thing. The Stage PATH spec's *Save this session* and *Never show me this* are not used.
