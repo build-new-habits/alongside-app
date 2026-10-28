@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 28 Oct 2026 v682
+ * 28 Oct 2026 v683
  *
+ * v683 - STAGE PATH Session 3: nothing new on screen yet; the Plan's coach can now suggest today's session from the check-in, say what it adjusted, put movements you loved first (at most two a session, not if done in the last two sessions), and put together a fresh Move to feel better sequence inside each feeling's gentle rules. NEW FILE precached: js/data/path-engine.js.
  * v682 - STAGE PATH content: nothing new on Free; the Plan's Move to feel better now has 21 programmes (four or more for every feeling) and its Stretch door has 16 ready-made routines across four areas, with three new Pilates stretches and their figures, ready for the door screens. NEW FILE precached: js/data/stretch-routines.js.
  * v681 - STAGE PATH Session 2 (P-2, P-9, P-9a, P-9b): nothing new on Free's screens except truer card words; every exercise is tagged by purpose, feeling and style, and the Plan's twenty new tai chi, qigong, yoga and gentle movements and its sixteen Move to feel better programmes are in place, each movement with its figure, ready for the door screens; exercise cards that overstated a benefit, or said something works that has not been shown, now say what is true (223 changes, every one sourced). NEW FILES precached: js/data/feel-programmes.js, js/data/exercises/path_movements.js, js/data/figures/batch-15.js.
  * v680 - STAGE PATH P-1 SCHEMA: nothing you can see changes; the app can now remember which movements you loved and whether today's first-open screen has been shown, ready for the Plan's new Home. store.js v118, Schema v1.116, restore.js v7.
@@ -4229,7 +4230,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v682";
+const CACHE_NAME = "alongside-v683";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4397,7 +4398,7 @@ const SHELL_HASHES = {
   "./js/data/support-lines.js": "0c1286fa510e427e",
   "./js/data/consent-version.js": "c1a39ed44cc24157",
   "./js/views/my-programme.js": "a13d0ab884680b43",
-  "./js/session-builder.js": "b3725a26389fe3d2",
+  "./js/session-builder.js": "70992dba2147aa1f",
   "./js/data/session-choice.js": "954463b0647f3843",
   "./js/data/saved-sessions.js": "91dd2dc43f0f908b",
   "./js/data/class-contract.js": "fe8f3f22b0df50f6",
@@ -4473,7 +4474,8 @@ const SHELL_HASHES = {
   "./js/data/exercises/yoga.js": "675ab856b6de12d3",
   "./js/data/exercises/path_movements.js": "7a627e4bc94e2d97",
   "./js/data/feel-programmes.js": "ade4752f88834a40",
-  "./js/data/stretch-routines.js": "e3e430a29af1455d",
+  "./js/data/stretch-routines.js": "5a5fa2e7598037fb",
+  "./js/data/path-engine.js": "aa987b65895789ed",
   "./js/data/exercises/pilates.js": "5741c325f65e935c",
   "./js/data/exercises/running.js": "c1fc520e1eb7ee8c",
   "./js/data/exercises/rehabilitation.js": "c2b00a8513421566",
@@ -4789,6 +4791,7 @@ const SHELL_URLS = [
   "./js/data/exercises/path_movements.js",
   "./js/data/feel-programmes.js",
   "./js/data/stretch-routines.js",
+  "./js/data/path-engine.js",
   "./js/data/exercises/pilates.js",
   "./js/data/exercises/running.js",
   "./js/data/exercises/rehabilitation.js",
