@@ -1,5 +1,12 @@
 /**
  * data/exercises/recovery.js
+ * 28 Oct 2026 v5
+ * v5 - STAGE PATH P-2 and P-9b (Session 2). Every entry carries doors,
+ *   feelings and style (blueprint C5; tools/verify-path-tags.mjs). Why and
+ *   coaching lines that were not accurate are corrected, keeping what is
+ *   true (Graeme, 28 Oct: "If they are not, then change them"); each change
+ *   and its source: BNH-Files Product/alongside_library_accuracy_28oct2026_v1.md.
+ *
  * 17 Oct 2026 v4
  *
  * v4 - W6-15 SCOPE-WORDS (Graeme, 17 Oct: "these are fine"). The walk's coaching no longer
@@ -44,6 +51,7 @@ export const RECOVERY = [
     name: 'Child\'s Pose',
     youtube: 'childs pose technique',
     category: 'recovery',
+    doors: ['stretch', 'feel'], feelings: ['calm', 'sleep'], style: 'stretch',   // Stage PATH P-2
     movementPattern: 'stretch',
     equipment: [],
     equipmentOptional: ['yoga-mat'],
@@ -81,6 +89,7 @@ export const RECOVERY = [
     name: 'Supine Spinal Twist',
     youtube: 'supine spinal twist technique',
     category: 'recovery',
+    doors: ['stretch'], feelings: [], style: 'stretch',   // Stage PATH P-2
     movementPattern: 'spinal-rotation',
     equipment: [],
     equipmentOptional: ['yoga-mat'],
@@ -118,6 +127,7 @@ export const RECOVERY = [
     name: 'Foam Roll — Upper Back',
     youtube: 'foam roll - upper back technique',
     category: 'recovery',
+    doors: ['stretch'], feelings: [], style: 'stretch',   // Stage PATH P-2
     movementPattern: 'self-massage',
     equipment: ['foam-roller'],
     equipmentOptional: [],
@@ -154,6 +164,7 @@ export const RECOVERY = [
     name: 'Foam Roll — Quads',
     youtube: 'foam roll - quads technique',
     category: 'recovery',
+    doors: ['stretch'], feelings: [], style: 'stretch',   // Stage PATH P-2
     movementPattern: 'self-massage',
     equipment: ['foam-roller'],
     equipmentOptional: [],
@@ -190,6 +201,7 @@ export const RECOVERY = [
     name: 'Diaphragmatic Breathing',
     youtube: 'diaphragmatic breathing technique',
     category: 'recovery',
+    doors: ['feel'], feelings: ['worn', 'sleep'], style: 'gentle',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'breath',
     equipment: [],
@@ -209,7 +221,7 @@ export const RECOVERY = [
       'Continue for 5 minutes'
     ],
     coaching: 'This is harder than it sounds at first — most of us breathe too shallow. Stick with it.',
-    why: 'Activates the body\'s natural relaxation response and improves oxygen efficiency.',
+    why: 'Slow breathing from the belly can help you feel calmer.',
         watchOut: [
       'Forcing the breath rather than letting it lengthen naturally',
       'Lifting the shoulders on the in-breath instead of expanding the ribs',
@@ -227,6 +239,7 @@ export const RECOVERY = [
     name: 'Legs Up the Wall',
     youtube: 'legs up the wall technique',
     category: 'recovery',
+    doors: ['stretch'], feelings: [], style: 'stretch',   // Stage PATH P-2
     movementPattern: 'stretch',
     equipment: [],
     equipmentOptional: ['yoga-mat'],
@@ -244,7 +257,7 @@ export const RECOVERY = [
       'Arms relaxed at sides, breathe deeply'
     ],
     coaching: 'Great for after long days on your feet or after exercise.',
-    why: 'Gentle inversion that helps fluid return from legs and calms the nervous system.',
+    why: 'Gentle inversion that helps fluid return from the legs, and many people find it calming.',
         watchOut: [
       'Bouncing into the stretch rather than holding it still',
       'Pushing to the point of pain; a stretch should feel like a strong pull, never sharp',
@@ -269,6 +282,7 @@ export const RECOVERY = [
     name: 'Box Breathing',
     youtube: 'box breathing technique',
     category: 'recovery',
+    doors: [], feelings: [], style: 'gentle',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'breath-awareness',
     equipment: [],
@@ -289,7 +303,7 @@ export const RECOVERY = [
       'Repeat for 5 minutes or until you feel calmer'
     ],
     coaching: 'If 4 counts feels too long, try 3. There is no wrong way to do this.',
-    why: 'Box breathing slows your heart rate and tells your nervous system it is safe to relax.',
+    why: 'Box breathing slows your breathing down, which many people find helps them settle.',
         watchOut: [
       'Forcing the breath rather than letting it lengthen naturally',
       'Lifting the shoulders on the in-breath instead of expanding the ribs',
@@ -307,6 +321,7 @@ export const RECOVERY = [
     name: '4-7-8 Breathing',
     youtube: '4-7-8 breathing technique',
     category: 'recovery',
+    doors: [], feelings: [], style: 'gentle',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'breath-awareness',
     equipment: [],
@@ -345,6 +360,7 @@ export const RECOVERY = [
     name: 'Physiological Sigh',
     youtube: 'physiological sigh technique',
     category: 'recovery',
+    doors: ['feel'], feelings: ['calm'], style: 'gentle',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'breath-awareness',
     equipment: [],
@@ -363,8 +379,8 @@ export const RECOVERY = [
       'Repeat 3 to 5 times',
       'Return to normal breathing'
     ],
-    coaching: 'This is the fastest known way to reduce stress. One or two sighs can shift your state in under a minute.',
-    why: 'The double inhale fully inflates the lungs. The long exhale dumps carbon dioxide and quickly calms the body.',
+    coaching: 'In a study of healthy adults, five minutes a day of this breathing improved mood more than a breath-watching meditation. One or two sighs can help you feel calmer.',
+    why: 'Two breaths in through the nose, then a long breath out. Many people find it slows things down quickly.',
         watchOut: [
       'Forcing the breath rather than letting it lengthen naturally',
       'Lifting the shoulders on the in-breath instead of expanding the ribs',
@@ -382,6 +398,7 @@ export const RECOVERY = [
     name: 'Belly Breathing',
     youtube: 'belly breathing technique',
     category: 'recovery',
+    doors: ['feel'], feelings: ['worn'], style: 'gentle',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'breath-awareness',
     equipment: [],
@@ -401,7 +418,7 @@ export const RECOVERY = [
       'Continue for 5 minutes, keeping each breath slow and full'
     ],
     coaching: 'Most of us breathe too shallow without realising. This practice resets that habit.',
-    why: 'Diaphragmatic breathing reduces stress hormones and increases oxygen flow around the body.',
+    why: 'Slow breathing from the belly can help you feel calmer. In a small study, eight weeks of regular practice lowered levels of the stress hormone cortisol.',
         watchOut: [
       'Forcing the breath rather than letting it lengthen naturally',
       'Lifting the shoulders on the in-breath instead of expanding the ribs',
@@ -419,6 +436,7 @@ export const RECOVERY = [
     name: 'Extended Exhale Breathing',
     youtube: 'extended exhale breathing technique',
     category: 'recovery',
+    doors: ['feel'], feelings: ['calm', 'sleep'], style: 'gentle',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'breath-awareness',
     equipment: [],
@@ -437,7 +455,7 @@ export const RECOVERY = [
       'Continue for 5 minutes',
       'If 4 and 8 feel too long, try 3 and 6'
     ],
-    coaching: 'The ratio matters more than the exact count. Any exhale that is longer than the inhale will calm you down.',
+    coaching: 'The ratio matters more than the exact count. An out-breath longer than the in-breath helps many people feel calmer.',
     why: 'Longer exhales activate the parasympathetic nervous system — the body\'s built-in calming mechanism.',
         watchOut: [
       'Forcing the breath rather than letting it lengthen naturally',
@@ -456,6 +474,7 @@ export const RECOVERY = [
     name: 'Alternate Nostril Breathing',
     youtube: 'alternate nostril breathing technique',
     category: 'recovery',
+    doors: [], feelings: [], style: 'gentle',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'breath-awareness',
     equipment: [],
@@ -477,7 +496,7 @@ export const RECOVERY = [
       'Continue for 5 minutes'
     ],
     coaching: 'This can feel awkward at first — that is completely normal. Focus on the breathing, not the hand position.',
-    why: 'Balances the nervous system and improves focus. Used in yoga for thousands of years as a calming practice.',
+    why: 'A slow, rhythmic breathing practice from yoga, used for centuries; many people find it calming and steadying.',
         watchOut: [
       'Forcing the breath rather than letting it lengthen naturally',
       'Lifting the shoulders on the in-breath instead of expanding the ribs',
@@ -495,6 +514,7 @@ export const RECOVERY = [
     name: 'Pursed Lip Breathing',
     youtube: 'pursed lip breathing technique',
     category: 'recovery',
+    doors: [], feelings: [], style: 'gentle',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'breath-awareness',
     equipment: [],
@@ -532,6 +552,7 @@ export const RECOVERY = [
     name: 'Coherent Breathing',
     youtube: 'coherent breathing technique',
     category: 'recovery',
+    doors: ['feel'], feelings: ['calm'], style: 'gentle',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'breath-awareness',
     equipment: [],
@@ -550,8 +571,8 @@ export const RECOVERY = [
       'This works out to about 6 breaths per minute',
       'Continue for 10 minutes — a timer can help you stay relaxed'
     ],
-    coaching: 'This breathing rate has been shown to produce the greatest calming effect. It takes a few minutes to settle into.',
-    why: 'Six breaths per minute synchronises your heart rate, blood pressure, and nervous system — a state called heart rate variability coherence.',
+    coaching: 'It takes a few minutes to settle into. If counting feels like effort, let the out-breath be a little longer than the in-breath.',
+    why: 'At about six breaths a minute, your heart rate rises and falls in step with your breath and its natural variation is at its largest. Many people find this pace calming.',
         watchOut: [
       'Forcing the breath rather than letting it lengthen naturally',
       'Lifting the shoulders on the in-breath instead of expanding the ribs',
@@ -569,6 +590,7 @@ export const RECOVERY = [
     name: 'Humming Bee Breath',
     youtube: 'humming bee breath technique',
     category: 'recovery',
+    doors: [], feelings: [], style: 'gentle',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'breath-awareness',
     equipment: [],
@@ -589,7 +611,7 @@ export const RECOVERY = [
       'Continue for 5 minutes'
     ],
     coaching: 'There is no need to hum loudly. Even a very quiet hum works. It can feel a little silly at first.',
-    why: 'Vibration from humming activates the vagus nerve — a direct pathway to the calming part of your nervous system.',
+    why: 'Humming slows and lengthens the out-breath, and many people find the gentle vibration calming.',
         watchOut: [
       'Forcing the breath rather than letting it lengthen naturally',
       'Lifting the shoulders on the in-breath instead of expanding the ribs',
@@ -607,6 +629,7 @@ export const RECOVERY = [
     name: 'Energising Breath',
     youtube: 'energising breath technique',
     category: 'recovery',
+    doors: [], feelings: [], style: 'gentle',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'breath-awareness',
     equipment: [],
@@ -628,7 +651,7 @@ export const RECOVERY = [
       'Do 2 to 3 rounds'
     ],
     coaching: 'Stop straight away if you feel dizzy. If you are pregnant, or have anything affecting your heart or breathing, speak to a GP or physio before trying this one.',
-    why: 'The rapid breathing increases oxygen and wakes up the body — good for low-energy moments when you need a gentle boost.',
+    why: 'Quick, rhythmic breathing can feel invigorating — good for low-energy moments when you need a gentle boost.',
         watchOut: [
       'Forcing the breath rather than letting it lengthen naturally',
       'Lifting the shoulders on the in-breath instead of expanding the ribs',
@@ -646,6 +669,7 @@ export const RECOVERY = [
     name: 'Three-Part Breath',
     youtube: 'three-part breath technique',
     category: 'recovery',
+    doors: [], feelings: [], style: 'gentle',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'breath-awareness',
     equipment: [],
@@ -665,7 +689,7 @@ export const RECOVERY = [
       'Continue for 5 minutes'
     ],
     coaching: 'This takes practice. Do not worry if it feels mechanical at first — that feeling goes away.',
-    why: 'Full three-part breathing maximises your lung capacity and produces a strong calming effect.',
+    why: 'Three-part breathing fills the lungs from the belly up to the chest, and many people find it calming.',
         watchOut: [
       'Forcing the breath rather than letting it lengthen naturally',
       'Lifting the shoulders on the in-breath instead of expanding the ribs',
@@ -683,6 +707,7 @@ export const RECOVERY = [
     name: 'Breath Counting',
     youtube: 'breath counting technique',
     category: 'recovery',
+    doors: [], feelings: [], style: 'gentle',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'breath-awareness',
     equipment: [],
@@ -727,6 +752,7 @@ export const RECOVERY = [
     name: 'Cold Shower — Recovery Protocol',
     youtube: 'cold shower - recovery protocol technique',
     category: 'recovery',
+    doors: [], feelings: [], style: 'gentle',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'grounding',
     equipment: [],
@@ -745,8 +771,8 @@ export const RECOVERY = [
       'Focus on slow, controlled breathing throughout — do not gasp and tense',
       'Finish cold — do not turn the warm back on'
     ],
-    coaching: 'The breathing is the practice. The cold is just the trigger. Controlling the breath under cold stress trains the nervous system to regulate under other forms of stress too.',
-    why: 'Cold water immersion activates the sympathetic system and then the parasympathetic rebound. Regular practice builds cold tolerance, reduces muscle soreness, and improves mood via norepinephrine release.',
+    coaching: 'The breathing is the practice. The cold is just the trigger. Keep the breath slow and steady while the cold does its work.',
+    why: 'Cold water immersion activates the sympathetic system and then the parasympathetic rebound. With regular practice it feels less of a shock, and cold water after hard exercise can ease muscle soreness a little.',
         watchOut: [
       'Forcing the breath rather than letting it lengthen naturally',
       'Lifting the shoulders on the in-breath instead of expanding the ribs',
@@ -764,6 +790,7 @@ export const RECOVERY = [
     name: 'Hot and Cold Contrast',
     youtube: 'hot and cold contrast recovery technique',
     category: 'recovery',
+    doors: [], feelings: [], style: 'gentle',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'grounding',
     equipment: [],
@@ -782,7 +809,7 @@ export const RECOVERY = [
       'Always finish with cold',
       'Use after heavy training sessions or competition'
     ],
-    coaching: 'The alternating temperatures create a pumping effect on circulation — hot dilates blood vessels, cold constricts them. This mechanical action clears metabolic waste from muscle tissue.',
+    coaching: 'Warm opens the blood vessels and cold narrows them, so the blood flow changes as you switch.',
     why: 'Alternating hot and cold changes blood flow through the muscles. Many sports teams use it after matches, and plenty of people find their legs feel fresher afterwards.',
         watchOut: [
       'Forcing the breath rather than letting it lengthen naturally',
@@ -801,6 +828,7 @@ export const RECOVERY = [
     name: 'Recovery Nap Protocol',
     youtube: 'recovery nap protocol technique',
     category: 'recovery',
+    doors: [], feelings: [], style: 'gentle',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'grounding',
     equipment: [],
@@ -818,8 +846,8 @@ export const RECOVERY = [
       'If sleep does not come, rest with eyes closed — the rest still has benefit',
       'On waking, allow 5 minutes before demanding cognitive work'
     ],
-    coaching: 'A 20-minute nap does not cause sleep inertia. A 30-minute nap often does. Keep it short — the science on this is clear.',
-    why: 'A 20-minute nap improves alertness, reaction time, and mood for 2 to 3 hours. Used deliberately by elite athletes and military. NASA studies show 26 minutes as optimal.',
+    coaching: 'Naps of 20 minutes or less usually leave little grogginess; longer naps more often do. Keep it short.',
+    why: 'A short nap of about 20 minutes can improve alertness and mood for a few hours afterwards. In a NASA study of long-haul pilots, a planned nap of about 26 minutes improved alertness.',
         watchOut: [
       'Forcing the breath rather than letting it lengthen naturally',
       'Lifting the shoulders on the in-breath instead of expanding the ribs',
@@ -837,6 +865,7 @@ export const RECOVERY = [
     name: 'Hydration Protocol',
     youtube: 'hydration protocol technique',
     category: 'recovery',
+    doors: [], feelings: [], style: 'gentle',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'grounding',
     equipment: [],
@@ -855,8 +884,8 @@ export const RECOVERY = [
       'Drink 500ml in the 2 hours before exercise',
       'Do not wait until you are thirsty during exercise — drink on a schedule'
     ],
-    coaching: 'Even mild dehydration of 2% body weight reduces performance by up to 20%. Most people train and compete dehydrated without knowing it.',
-    why: 'Adequate hydration is one of the highest-return recovery and performance interventions available. The evidence base is unambiguous and the application is straightforward.',
+    coaching: 'Losing about 2% of your body weight in sweat can start to affect endurance performance. Drinking regularly through the day keeps you well clear of that.',
+    why: 'Drinking enough supports how you feel and how you perform, and the habit is simple.',
         watchOut: [
       'Forcing the breath rather than letting it lengthen naturally',
       'Lifting the shoulders on the in-breath instead of expanding the ribs',
@@ -874,6 +903,7 @@ export const RECOVERY = [
     name: 'Post-Exercise Nutrition Window',
     youtube: 'post-exercise nutrition window technique',
     category: 'recovery',
+    doors: [], feelings: [], style: 'gentle',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'grounding',
     equipment: [],
@@ -911,6 +941,7 @@ export const RECOVERY = [
     name: 'Trigger Point Release — Ball',
     youtube: 'trigger point release - ball technique',
     category: 'recovery',
+    doors: [], feelings: [], style: 'gentle',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'body-scan',
     equipment: ['massage-ball'],
@@ -929,7 +960,7 @@ export const RECOVERY = [
       'When the tenderness reduces, move to the next spot',
       'Work: glutes, upper back, calves, and plantar fascia (foot)'
     ],
-    coaching: 'The pressure should produce a "good pain" — uncomfortable but clearly beneficial. Avoid directly on bones or joints.',
+    coaching: 'The pressure can feel uncomfortable but should never be sharp. Avoid directly on bones or joints.',
     why: 'Pressing into tight spots with a ball lets you work on knots that restrict movement. A ball gives deeper pressure and more precision than a foam roller.',
         watchOut: [
       'Forcing the breath rather than letting it lengthen naturally',
@@ -948,6 +979,7 @@ export const RECOVERY = [
     name: 'Leg Elevation Recovery',
     youtube: 'leg elevation recovery technique',
     category: 'recovery',
+    doors: [], feelings: [], style: 'gentle',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'grounding',
     equipment: [],
@@ -964,8 +996,8 @@ export const RECOVERY = [
       'Remain in this position for 10 minutes',
       'Optional: add ankle circles while elevated'
     ],
-    coaching: 'Legs up the wall is one of the simplest and most effective recovery positions. It works purely through gravity and requires nothing.',
-    why: 'Elevating the legs above the heart reverses the pooling of blood and lymphatic fluid that accumulates from standing and training. Reduces swelling and accelerates clearance of metabolic waste.',
+    coaching: 'Legs up the wall is one of the simplest recovery positions there is. It works purely through gravity and requires nothing.',
+    why: 'Raising the legs above the heart helps fluid drain back from them, which can ease swelling and heaviness after a long time on your feet.',
         watchOut: [
       'Forcing the breath rather than letting it lengthen naturally',
       'Lifting the shoulders on the in-breath instead of expanding the ribs',
@@ -984,6 +1016,7 @@ export const RECOVERY = [
     name: 'Mindful Walk',
     youtube: 'mindful walk technique',
     category: 'recovery',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     equipment: [],
@@ -1006,7 +1039,7 @@ export const RECOVERY = [
       'Return home before you feel tired — not after'
     ],
     coaching: 'This is not exercise. It is gentle movement and fresh air, and a reminder that your body still works, even on hard days. The goal is simply to have gone.',
-    why: 'Gentle walking maintains circulation and joint mobility without loading the structures that are hurting. The mindfulness element activates the parasympathetic nervous system, which helps the body settle.',
+    why: 'Gentle walking maintains circulation and joint mobility without loading the structures that are hurting. Paying attention as you walk helps many people feel more settled.',
         watchOut: [
       'Bouncing into the stretch rather than holding it still',
       'Pushing to the point of pain; a stretch should feel like a strong pull, never sharp',
@@ -1026,6 +1059,7 @@ export const RECOVERY = [
     name: 'Active Recovery Walk',
     youtube: 'active recovery walk technique',
     category: 'recovery',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     equipment: [],
@@ -1043,8 +1077,8 @@ export const RECOVERY = [
       'Ideally outdoors in a natural environment',
       'Leave your phone in your pocket or at home if possible'
     ],
-    coaching: 'An active recovery walk the day after hard training reduces soreness more effectively than complete rest — the gentle movement promotes circulation without adding stress.',
-    why: 'Active recovery increases blood flow to muscle tissue, accelerating the removal of metabolic by-products. The gentle locomotion also maintains movement patterns without adding training load.',
+    coaching: 'Many people find an easy walk the day after hard training leaves them less stiff than complete rest.',
+    why: 'Gentle walking keeps blood moving and the legs ticking over without adding training load.',
         watchOut: [
       'Bouncing into the stretch rather than holding it still',
       'Pushing to the point of pain; a stretch should feel like a strong pull, never sharp',
@@ -1063,6 +1097,7 @@ export const RECOVERY = [
     name: 'Sleep Position Optimisation',
     youtube: 'sleep position optimisation technique',
     category: 'recovery',
+    doors: [], feelings: [], style: 'gentle',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'grounding',
     equipment: [],
@@ -1080,8 +1115,8 @@ export const RECOVERY = [
       'Neck: the pillow should keep the spine neutral — not pushed up or dropping down',
       'Assess your sleeping position after waking — morning pain indicates alignment issues'
     ],
-    coaching: 'Many chronic back and neck problems are significantly influenced by sleeping position. This is a free intervention with potentially major impact.',
-    why: 'Spinal alignment during 7 to 9 hours of sleep significantly influences musculoskeletal health. Poor sleep position creates cumulative joint stress that compounds over years.',
+    coaching: 'A pillow under or between the knees, or a different pillow height, costs nothing to try.',
+    why: 'Many people find that how they lie in bed makes a difference to how their back and neck feel in the morning.',
         watchOut: [
       'Forcing the breath rather than letting it lengthen naturally',
       'Lifting the shoulders on the in-breath instead of expanding the ribs',
@@ -1099,6 +1134,7 @@ export const RECOVERY = [
     name: 'Sleep Onset Meditation',
     youtube: 'sleep onset meditation technique',
     category: 'recovery',
+    doors: [], feelings: [], style: 'gentle',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'body-scan',
     equipment: [],
@@ -1119,7 +1155,7 @@ export const RECOVERY = [
       'If still awake, begin again from the feet'
     ],
     coaching: 'If you are still awake after 20 minutes, get up and do a quiet activity until you feel sleepy — the research on this is clear. Lying awake anxiously trains the brain that bed is a place for wakefulness.',
-    why: 'The progressive relaxation approach to sleep onset reduces sleep latency (time to fall asleep) by activating the parasympathetic system and reducing physical tension that prevents sleep.',
+    why: 'Relaxing each part of the body in turn eases physical tension, and many people find it helps them drift off.',
         watchOut: [
       'Forcing the breath rather than letting it lengthen naturally',
       'Lifting the shoulders on the in-breath instead of expanding the ribs',
@@ -1137,6 +1173,7 @@ export const RECOVERY = [
     name: 'Sauna Recovery Protocol',
     youtube: 'sauna recovery protocol technique',
     category: 'recovery',
+    doors: [], feelings: [], style: 'gentle',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'grounding',
     equipment: ['sauna'],

@@ -1,6 +1,8 @@
 # Exercise Entry Standard
 
-**11 Sep 2026 v4**
+**28 Oct 2026 v5**
+
+**v5 (Stage PATH P-2 and P-9b, 28 Oct 2026):** three new required fields, `doors`, `feelings` and `style` (below), held on every entry by `tools/verify-path-tags.mjs`; and an accuracy rule for `why` and `coaching`.
 
 Build New Habits · Alongside: Move · Live State
 
@@ -64,6 +66,9 @@ need to hear it.
 | `contraindications` | `string[]` | Conditions that exclude this exercise. |
 | `energyRequired` | `number` | 1–10. Daily gate. |
 | `difficultyLevel` | `number` | 1–10. Structural ceiling. |
+| `doors` | `string[]` | **NEW, Stage PATH.** Which of the Plan's purpose doors offer it: `stronger`, `moving`, `stretch`, `feel`. Empty only for condition-only rehabilitation (reached through sore areas and My exercises) or a still practice (breath, body scan, visualising, grounding), which lives in Wellbeing. A strength entry is always behind `stronger`, a cardio entry behind `moving`. |
+| `feelings` | `string[]` | **NEW, Stage PATH.** For Move to feel better only: `ground`, `calm`, `worn`, `wake`, `sleep`. Set where a programme in `data/feel-programmes.js` uses the entry; otherwise `[]`. A feeling needs `feel` in `doors`. |
+| `style` | `string` | **NEW, Stage PATH.** `exercise`, `stretch`, `yoga`, `pilates`, `taichi`, `qigong` or `gentle`. A yoga pose or flow is `yoga`; a Pilates move or sequence is `pilates`. |
 
 ### Selection-eligibility fields — added 13 Aug 2026
 
@@ -175,6 +180,7 @@ anatomical terms alone.
 - Lead with the effect they will notice, not the muscle recruited.
 - Anatomy is allowed once it has been earned by a plain-language reason.
 - No superlatives. Nothing is "the best" or "essential".
+- **Accurate, or not said** (P-9b, Graeme, 28 Oct 2026: *"why should this change if the claims are true? If they are not, then change them."*). A benefit stays when it is true; a claim nobody has shown (a comparison with every other exercise, a mechanism such as "flushes waste", a protection from injury, a treatment) is not written. Say what you can stand behind: *many people find*, *can help*, *in a small study*. Every correction made in the pass is in BNH-Files `Product/alongside_library_accuracy_28oct2026_v1.md`, with its source.
 
 **Good:** "Pressing from a cable keeps tension on the chest through the whole
 range, and the standing position means your core is working the entire time

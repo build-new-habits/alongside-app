@@ -1,5 +1,12 @@
 /*
  * js/data/exercises/sport_conditioning.js
+ * 28 Oct 2026 v2
+ * v2 - STAGE PATH P-2 and P-9b (Session 2). Every entry carries doors,
+ *   feelings and style (blueprint C5; tools/verify-path-tags.mjs). Why and
+ *   coaching lines that were not accurate are corrected, keeping what is
+ *   true (Graeme, 28 Oct: "If they are not, then change them"); each change
+ *   and its source: BNH-Files Product/alongside_library_accuracy_28oct2026_v1.md.
+ *
  * 30 Sep 2026 v1
  *
  * v1 - First dated header (the file had none). S1-LEGS (found building the
@@ -86,6 +93,7 @@ export const SPORT_CONDITIONING = [
     name: 'Lateral Shuffle',
     youtube: 'lateral shuffle drill technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'locomotion',
     discipline: 'sport',
@@ -126,6 +134,7 @@ export const SPORT_CONDITIONING = [
     name: 'T-Drill',
     youtube: 't-drill technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'locomotion',
     discipline: 'sport',
@@ -168,6 +177,7 @@ export const SPORT_CONDITIONING = [
     name: '5-10-5 Shuttle',
     youtube: '5-10-5 shuttle drill technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'locomotion',
     discipline: 'sport',
@@ -190,7 +200,7 @@ export const SPORT_CONDITIONING = [
       'Complete 4 to 6 reps'
     ],
     coaching: 'The change-of-direction technique matters: plant the outside foot, stay low through the turn, and drive with the opposite leg.',
-    why: 'The 5-10-5 is used by every major sport league as a standard combine test. It measures short-area quickness and change-of-direction ability.',
+    why: 'The 5-10-5 is a standard test in American football and other sports. It measures short-area quickness and change-of-direction ability.',
         watchOut: [
       'Planting on a straight leg when changing direction, which is where knees get hurt',
       'Going full speed before the movement pattern is comfortable at half speed',
@@ -209,6 +219,7 @@ export const SPORT_CONDITIONING = [
     name: 'Figure-8 Run',
     youtube: 'figure-8 run drill technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'locomotion',
     discipline: 'sport',
@@ -248,6 +259,7 @@ export const SPORT_CONDITIONING = [
     name: 'Defensive Slide',
     youtube: 'defensive slide drill technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'locomotion',
     discipline: 'sport',
@@ -288,6 +300,7 @@ export const SPORT_CONDITIONING = [
     name: 'Ladder In-Out',
     youtube: 'ladder in-out drill technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'locomotion',
     discipline: 'sport',
@@ -309,7 +322,7 @@ export const SPORT_CONDITIONING = [
       'Complete 4 lengths with 30 seconds rest'
     ],
     coaching: 'Accuracy before speed. The ladder drills bad footwork out of existence — rushing too early means no benefit. Slow down until the pattern is grooved.',
-    why: 'Develops foot speed, coordination, and rapid ground contact time — the mechanical basis of agility in all sports.',
+    why: 'Develops foot speed, coordination, and rapid ground contact time.',
         watchOut: [
       'Planting on a straight leg when changing direction, which is where knees get hurt',
       'Going full speed before the movement pattern is comfortable at half speed',
@@ -328,6 +341,7 @@ export const SPORT_CONDITIONING = [
     name: 'Ladder Ickey Shuffle',
     youtube: 'ladder ickey shuffle drill technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'locomotion',
     discipline: 'sport',
@@ -368,6 +382,7 @@ export const SPORT_CONDITIONING = [
     name: 'Pro Agility Drill',
     youtube: 'pro agility drill technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'locomotion',
     discipline: 'sport',
@@ -390,7 +405,7 @@ export const SPORT_CONDITIONING = [
       'Complete 4 to 6 reps'
     ],
     coaching: 'Low centre of gravity through the turns is everything. High hips lose time. The turns should be tight and explosive — not wide arcs.',
-    why: 'The pro agility drill is the gold standard change-of-direction test in professional sport. It measures what scouts actually care about: how fast you can move laterally and stop.',
+    why: 'The pro agility drill is a standard change-of-direction test in professional sport. It measures what scouts actually care about: how fast you can move laterally and stop.',
         watchOut: [
       'Planting on a straight leg when changing direction, which is where knees get hurt',
       'Going full speed before the movement pattern is comfortable at half speed',
@@ -413,6 +428,7 @@ export const SPORT_CONDITIONING = [
     name: 'Acceleration Run — 10m',
     youtube: 'acceleration run - 10m drill technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'locomotion',
     discipline: 'sport',
@@ -453,6 +469,7 @@ export const SPORT_CONDITIONING = [
     name: 'Wall Drive — Sprint Mechanics',
     youtube: 'wall drive - sprint mechanics drill technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'locomotion',
     discipline: 'sport',
@@ -472,8 +489,8 @@ export const SPORT_CONDITIONING = [
       'Once the pattern is established, alternate rapidly — simulating sprint drive phase',
       'Complete 3 sets of 20 total drives'
     ],
-    coaching: 'The wall removes balance demands and lets you focus entirely on the knee drive mechanics. This is the most transferable sprint drill there is.',
-    why: 'Develops the drive phase of sprinting — the most mechanically demanding part of acceleration. Used by track athletes before every session.',
+    coaching: 'The wall removes balance demands and lets you focus entirely on the knee drive mechanics.',
+    why: 'Develops the drive phase of sprinting — the most mechanically demanding part of acceleration. Common in track athletes\' warm-ups.',
         watchOut: [
       'Hips sagging away from the wall',
       'Driving the knee up without the opposite arm following',
@@ -491,6 +508,7 @@ export const SPORT_CONDITIONING = [
     name: 'Falling Start',
     youtube: 'falling start drill technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'locomotion',
     discipline: 'sport',
@@ -531,6 +549,7 @@ export const SPORT_CONDITIONING = [
     name: 'Resisted Sprint — Partner or Sled',
     youtube: 'resisted sprint - partner or sled drill technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'locomotion',
     discipline: 'sport',
@@ -570,6 +589,7 @@ export const SPORT_CONDITIONING = [
     name: 'Cone Weave',
     youtube: 'cone weave drill technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'locomotion',
     discipline: 'sport',
@@ -610,6 +630,7 @@ export const SPORT_CONDITIONING = [
     name: 'Box Drill',
     youtube: 'box drill technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'locomotion',
     discipline: 'sport',
@@ -649,6 +670,7 @@ export const SPORT_CONDITIONING = [
     name: 'Reaction Ball Drill',
     youtube: 'reaction ball drill technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'locomotion',
     discipline: 'sport',
@@ -689,6 +711,7 @@ export const SPORT_CONDITIONING = [
     name: 'Mirror Drill',
     youtube: 'mirror drill technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'locomotion',
     discipline: 'sport',
@@ -733,6 +756,7 @@ export const SPORT_CONDITIONING = [
     name: 'General Pre-Sport Warm-Up',
     youtube: 'general pre-sport warm-up drill technique',
     category: 'mobility',
+    doors: ['stretch'], feelings: [], style: 'stretch',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     discipline: 'sport',
@@ -777,6 +801,7 @@ export const SPORT_CONDITIONING = [
     name: 'Lower Body Activation Warm-Up',
     youtube: 'lower body activation warm-up drill technique',
     category: 'mobility',
+    doors: ['stretch'], feelings: [], style: 'stretch',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     discipline: 'sport',
@@ -819,6 +844,7 @@ export const SPORT_CONDITIONING = [
     name: 'Upper Body Activation Warm-Up',
     youtube: 'upper body activation warm-up drill technique',
     category: 'mobility',
+    doors: ['stretch'], feelings: [], style: 'stretch',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     discipline: 'sport',
@@ -861,6 +887,7 @@ export const SPORT_CONDITIONING = [
     name: 'General Post-Sport Cool-Down',
     youtube: 'general post-sport cool-down drill technique',
     category: 'recovery',
+    doors: ['stretch'], feelings: [], style: 'stretch',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'stretch',
     discipline: 'sport',
@@ -884,8 +911,8 @@ export const SPORT_CONDITIONING = [
       'Supine twist: 30 seconds each side',
       'Lie flat for 2 minutes — allow heart rate to fully return to resting'
     ],
-    coaching: 'The cool-down is not optional and it is not about flexibility. It is about returning the body to homeostasis safely and reducing next-day stiffness.',
-    why: 'A structured cool-down reduces post-exercise blood pooling, removes metabolic waste from muscles, and begins the recovery process that enables the next session.',
+    coaching: 'Use it to come down gradually. Many people like the stretch at the end, though it does little for next-day soreness.',
+    why: 'A gradual cool-down brings your heart rate and breathing down steadily after hard effort.',
         watchOut: [
       'Bouncing into the stretch rather than holding it still',
       'Pushing to the point of pain; a stretch should feel like a strong pull, never sharp',
@@ -904,6 +931,7 @@ export const SPORT_CONDITIONING = [
     name: 'Post-Run Cool-Down Routine',
     youtube: 'post-run cool-down routine drill technique',
     category: 'recovery',
+    doors: ['stretch'], feelings: [], style: 'stretch',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'stretch',
     discipline: 'sport',
@@ -927,7 +955,7 @@ export const SPORT_CONDITIONING = [
       'Supine knees to chest: 30 seconds'
     ],
     coaching: 'The legs most need attention after running — these target the exact muscles most stressed. Do not skip the calf and Achilles stretch.',
-    why: 'Running creates cumulative tightness in the posterior chain and hip flexors. A targeted post-run stretch routine reduces the risk of overuse injury across training weeks.',
+    why: 'Running creates cumulative tightness in the posterior chain and hip flexors. A short stretch routine for the muscles running works hardest, which many runners find leaves them less stiff.',
         watchOut: [
       'Bouncing into the stretch rather than holding it still',
       'Pushing to the point of pain; a stretch should feel like a strong pull, never sharp',
@@ -947,6 +975,7 @@ export const SPORT_CONDITIONING = [
     name: 'Football Conditioning Session',
     youtube: 'football conditioning session drill technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     discipline: 'sport',
@@ -992,6 +1021,7 @@ export const SPORT_CONDITIONING = [
     name: 'Sprint Build-Up — Sport Prep',
     youtube: 'sprint build-up - sport prep drill technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'locomotion',
     discipline: 'sport',
@@ -1012,7 +1042,7 @@ export const SPORT_CONDITIONING = [
       'Walk back to the start — full recovery, at least 90 seconds',
       'Complete 4 to 6 reps'
     ],
-    coaching: 'This is the ideal pre-sport sprint preparation — the body reaches near-maximum velocity by the end without the injury risk of a standing-start sprint.',
+    coaching: 'A good way to prepare for sprinting before sport, building to near top speed gradually.',
     why: 'Prepares the neuromuscular system for maximum velocity running without the explosive start demands that risk hamstring strain when cold.',
         watchOut: [
       'Sprinting without a thorough warm-up, which is how hamstrings get pulled',
@@ -1031,6 +1061,7 @@ export const SPORT_CONDITIONING = [
     name: 'Cutting Drill',
     youtube: 'cutting drill technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'locomotion',
     discipline: 'sport',
@@ -1071,6 +1102,7 @@ export const SPORT_CONDITIONING = [
     name: 'Zig-Zag Run',
     youtube: 'zig-zag run drill technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'locomotion',
     discipline: 'sport',
@@ -1110,6 +1142,7 @@ export const SPORT_CONDITIONING = [
     name: 'Backpedal and Turn Drill',
     youtube: 'backpedal and turn drill technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'locomotion',
     discipline: 'sport',
@@ -1149,6 +1182,7 @@ export const SPORT_CONDITIONING = [
     name: 'Dot Drill',
     youtube: 'dot drill technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'locomotion',
     discipline: 'sport',
@@ -1189,6 +1223,7 @@ export const SPORT_CONDITIONING = [
     name: 'Partner Chase Drill',
     youtube: 'partner chase drill technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'locomotion',
     discipline: 'sport',
@@ -1208,8 +1243,8 @@ export const SPORT_CONDITIONING = [
       'Switch roles and repeat',
       'Complete 4 reps each role'
     ],
-    coaching: 'Being chased produces maximum effort that no solo sprint drill can replicate. Competitive sprinting is what actually develops speed.',
-    why: 'Competitive chase drills produce maximal sprint effort through the psychological drive of competition — unmatched by any solo drill for developing actual speed.',
+    coaching: 'Being chased tends to bring out more effort than sprinting alone.',
+    why: 'Competitive chase drills produce maximal sprint effort through the psychological drive of competition.',
         watchOut: [
       'Sprinting without a thorough warm-up, which is how hamstrings get pulled',
       'Straining the face, jaw and shoulders; stay relaxed above the waist',
@@ -1227,6 +1262,7 @@ export const SPORT_CONDITIONING = [
     name: 'Change of Pace Run',
     youtube: 'change of pace run drill technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'locomotion',
     discipline: 'sport',
@@ -1267,6 +1303,7 @@ export const SPORT_CONDITIONING = [
     name: 'Defensive Footwork Circuit',
     youtube: 'defensive footwork circuit drill technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     discipline: 'sport',
@@ -1286,7 +1323,7 @@ export const SPORT_CONDITIONING = [
       'Lateral mirror drill with partner: 4 × 20 seconds',
       'Rest 60 seconds between each exercise'
     ],
-    coaching: 'Defensive footwork is the most undertrained athletic skill in recreational sport. Most players practise attacking — defenders win games.',
+    coaching: 'Most players practise attacking more than defending, so this is often where there is most to gain.',
     why: 'A complete defensive footwork session developing the sliding, closing out, and reactive movement that characterises quality individual defence in court sports.',
         watchOut: [
       'Planting on a straight leg when changing direction, which is where knees get hurt',
@@ -1314,6 +1351,7 @@ export const SPORT_CONDITIONING = [
     name: 'AMRAP Bodyweight Circuit',
     youtube: 'amrap bodyweight circuit drill technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     discipline: 'sport',
@@ -1355,6 +1393,7 @@ export const SPORT_CONDITIONING = [
     name: 'EMOM Strength Circuit',
     youtube: 'emom strength circuit drill technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     discipline: 'sport',
@@ -1395,6 +1434,7 @@ export const SPORT_CONDITIONING = [
     name: 'Tabata — Sport Conditioning',
     youtube: 'tabata - sport conditioning drill technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     discipline: 'sport',
@@ -1435,6 +1475,7 @@ export const SPORT_CONDITIONING = [
     name: 'Power Endurance Circuit',
     youtube: 'power endurance circuit drill technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     discipline: 'sport',
@@ -1475,6 +1516,7 @@ export const SPORT_CONDITIONING = [
     name: 'Repeated Sprint Ability (RSA)',
     youtube: 'repeated sprint ability rsa drill technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     discipline: 'sport',
@@ -1514,6 +1556,7 @@ export const SPORT_CONDITIONING = [
     name: 'Beep Test Simulation',
     youtube: 'beep test simulation drill technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     discipline: 'sport',
@@ -1553,6 +1596,7 @@ export const SPORT_CONDITIONING = [
     name: 'Yo-Yo Intermittent Recovery',
     youtube: 'yo-yo intermittent recovery drill technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     discipline: 'sport',
@@ -1573,7 +1617,7 @@ export const SPORT_CONDITIONING = [
       'Continue until unable to complete the recovery walk before the next bleep',
       'Record your score'
     ],
-    coaching: 'The Yo-Yo IR1 is the most sport-specific aerobic test because the recovery period mirrors the demands of team sport better than a continuous beep test.',
+    coaching: 'The Yo-Yo IR1 is more sport-specific than the beep test because the recovery period mirrors the demands of team sport better than a continuous beep test.',
     why: 'Developed by Dr Jens Bangsbo, the Yo-Yo intermittent test specifically assesses the ability to perform repeated high-intensity work with active recovery — directly reflecting team sport physiology.',
         watchOut: [
       'Form degrading in the later rounds to keep pace',
@@ -1592,6 +1636,7 @@ export const SPORT_CONDITIONING = [
     name: 'Speed Ladder — Advanced Patterns',
     youtube: 'speed ladder - advanced patterns drill technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     discipline: 'sport',
@@ -1632,6 +1677,7 @@ export const SPORT_CONDITIONING = [
     name: 'Small-Sided Game Conditioning',
     youtube: 'small-sided game conditioning drill technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     discipline: 'sport',
@@ -1652,7 +1698,7 @@ export const SPORT_CONDITIONING = [
       'Can be adapted for any team sport — adjust pitch size to player number'
     ],
     coaching: 'Small-sided games produce higher intensity than most formal training drills because competitive instinct drives effort that instruction cannot replicate.',
-    why: 'Small-sided games are the most sport-specific conditioning tool available — developing fitness, decision-making, and technical skills simultaneously in realistic conditions.',
+    why: 'Small-sided games are a very sport-specific way to condition — developing fitness, decision-making, and technical skills simultaneously in realistic conditions.',
         watchOut: [
       'Playing competitively enough that the conditioning intent disappears',
       'Uncontrolled changes of direction as fatigue builds',
@@ -1670,6 +1716,7 @@ export const SPORT_CONDITIONING = [
     name: 'Max Aerobic Speed Intervals',
     youtube: 'max aerobic speed intervals drill technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     discipline: 'sport',
@@ -1691,7 +1738,7 @@ export const SPORT_CONDITIONING = [
       'Cool down: 10 minutes easy'
     ],
     coaching: 'MAS training is more sophisticated than simple interval training because it trains at the specific intensity that maximises aerobic adaptation.',
-    why: 'MAS interval training is the most research-supported method for rapidly improving VO2 max and running economy in team sport athletes.',
+    why: 'MAS interval training is a well-researched way to improve aerobic fitness in team sport athletes.',
         watchOut: [
       'Form degrading in the later rounds to keep pace',
       'Rest periods creeping longer than the session asks',
@@ -1709,6 +1756,7 @@ export const SPORT_CONDITIONING = [
     name: 'Dynamic Warm-Up — Full Session',
     youtube: 'dynamic warm-up - full session drill technique',
     category: 'mobility',
+    doors: ['stretch'], feelings: [], style: 'stretch',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     discipline: 'sport',
@@ -1754,6 +1802,7 @@ export const SPORT_CONDITIONING = [
     name: 'Carioca',
     youtube: 'carioca drill technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'locomotion',
     discipline: 'sport',
@@ -1795,6 +1844,7 @@ export const SPORT_CONDITIONING = [
     name: 'Backpedal',
     youtube: 'backpedal drill technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'locomotion',
     discipline: 'sport',
@@ -1835,6 +1885,7 @@ export const SPORT_CONDITIONING = [
     name: 'Medicine Ball Power Circuit',
     youtube: 'medicine ball power circuit drill technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     discipline: 'sport',
@@ -1856,7 +1907,7 @@ export const SPORT_CONDITIONING = [
       'Squat and press × 10',
       'Move through each exercise with minimal rest between'
     ],
-    coaching: 'Medicine ball work develops rotational and multi-planar power that barbells cannot access. The unpredictable ball rebound also trains reactive catching.',
+    coaching: 'Medicine ball work develops rotational and multi-directional power that barbell lifts work less. The unpredictable ball rebound also trains reactive catching.',
     why: 'Medicine ball circuits develop total body power across multiple planes — essential for throwing, striking, and contact sports where force is rarely applied in a single direction.',
         watchOut: [
       'Landing or catching with locked joints',
@@ -1875,6 +1926,7 @@ export const SPORT_CONDITIONING = [
     name: '10-20-30 Running Protocol',
     youtube: '10-20-30 running protocol drill technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     discipline: 'sport',
@@ -1916,6 +1968,7 @@ export const SPORT_CONDITIONING = [
     name: 'Strength-Endurance Circuit',
     youtube: 'strength-endurance circuit drill technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     discipline: 'sport',
@@ -1957,6 +2010,7 @@ export const SPORT_CONDITIONING = [
     name: 'Sport-Specific Ladder Warm-Up',
     youtube: 'sport-specific ladder warm-up drill technique',
     category: 'mobility',
+    doors: ['stretch'], feelings: [], style: 'stretch',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     discipline: 'sport',
@@ -1998,6 +2052,7 @@ export const SPORT_CONDITIONING = [
     name: 'VO2 Max Intervals',
     youtube: 'vo2 max intervals drill technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     discipline: 'sport',
@@ -2018,7 +2073,7 @@ export const SPORT_CONDITIONING = [
       'Cool down: 10 minutes easy'
     ],
     coaching: 'Genuine VO2 max intervals require sustained discomfort. The final minute of each work interval should feel very hard. If it does not, you are working below the required intensity.',
-    why: 'Long intervals at VO2 max intensity produce the greatest aerobic adaptations available. Used by serious athletes across all endurance sports.',
+    why: 'Long intervals at VO2 max intensity are a strong stimulus for aerobic fitness. Used by serious athletes across all endurance sports.',
         watchOut: [
       'Form degrading in the later rounds to keep pace',
       'Rest periods creeping longer than the session asks',
@@ -2036,6 +2091,7 @@ export const SPORT_CONDITIONING = [
     name: 'Drop Step',
     youtube: 'drop step drill technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'locomotion',
     discipline: 'sport',
@@ -2076,6 +2132,7 @@ export const SPORT_CONDITIONING = [
     name: 'High-Low Conditioning',
     youtube: 'high-low conditioning drill technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     discipline: 'sport',

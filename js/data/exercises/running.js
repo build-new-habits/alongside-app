@@ -1,5 +1,12 @@
 /**
  * data/exercises/running.js
+ * 28 Oct 2026 v5
+ * v5 - STAGE PATH P-2 and P-9b (Session 2). Every entry carries doors,
+ *   feelings and style (blueprint C5; tools/verify-path-tags.mjs). Why and
+ *   coaching lines that were not accurate are corrected, keeping what is
+ *   true (Graeme, 28 Oct: "If they are not, then change them"); each change
+ *   and its source: BNH-Files Product/alongside_library_accuracy_28oct2026_v1.md.
+ *
  * 30 Sep 2026 v4
  *
  * v4 - S1-LEGS (found building the S1 clinical pack). Every run and jog: impact true. P16 checked jumps and sprints, never running itself.
@@ -46,6 +53,7 @@ export const RUNNING = [
     name: 'C25K — Week 1 Session',
     youtube: 'couch to 5k week 1 running plan',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     equipment: [],
@@ -84,6 +92,7 @@ export const RUNNING = [
     name: 'C25K — Week 2 Session',
     youtube: 'couch to 5k week 2 running plan',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     equipment: [],
@@ -122,6 +131,7 @@ export const RUNNING = [
     name: 'C25K — Week 3 Session',
     youtube: 'couch to 5k week 3 running plan',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     equipment: [],
@@ -159,6 +169,7 @@ export const RUNNING = [
     name: 'C25K — Week 4 Session',
     youtube: 'couch to 5k week 4 running plan',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     equipment: [],
@@ -197,6 +208,7 @@ export const RUNNING = [
     name: 'C25K — Week 5, Session 1',
     youtube: 'couch to 5k week 5 running plan',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     equipment: [],
@@ -234,6 +246,7 @@ export const RUNNING = [
     name: 'C25K — Week 5, Session 3 (20-Minute Run)',
     youtube: 'couch to 5k week 5 day 3 20 minute run',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     equipment: [],
@@ -270,6 +283,7 @@ export const RUNNING = [
     name: 'C25K — Week 6 Session',
     youtube: 'couch to 5k week 6 running plan',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     equipment: [],
@@ -306,6 +320,7 @@ export const RUNNING = [
     name: 'C25K — Week 7 Session (25-Minute Run)',
     youtube: 'couch to 5k week 7 running plan',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     equipment: [],
@@ -341,6 +356,7 @@ export const RUNNING = [
     name: 'C25K — Week 8 Session (28-Minute Run)',
     youtube: 'couch to 5k week 8 running plan',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     equipment: [],
@@ -376,6 +392,7 @@ export const RUNNING = [
     name: 'C25K — Week 9, Graduation Run (30 Minutes)',
     youtube: 'couch to 5k graduation run week 9',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     equipment: [],
@@ -417,6 +434,7 @@ export const RUNNING = [
     name: 'Easy Run — 20 Minutes',
     youtube: 'easy run pace guide',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     equipment: [],
@@ -453,6 +471,7 @@ export const RUNNING = [
     name: 'Tempo Run — 20 Minutes',
     youtube: 'tempo run pacing guide',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     equipment: [],
@@ -489,6 +508,7 @@ export const RUNNING = [
     name: '400m Intervals × 6',
     youtube: '400m interval training technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     equipment: [],
@@ -525,6 +545,7 @@ export const RUNNING = [
     name: '800m Intervals × 4',
     youtube: '800m interval training technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     equipment: [],
@@ -561,6 +582,7 @@ export const RUNNING = [
     name: 'Fartlek Run — 25 Minutes',
     youtube: 'fartlek training explained',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     equipment: [],
@@ -598,6 +620,7 @@ export const RUNNING = [
     name: 'Progression Run — 30 Minutes',
     youtube: 'progression run pacing guide',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     equipment: [],
@@ -634,6 +657,7 @@ export const RUNNING = [
     name: 'Hill Repeat Session',
     youtube: 'hill repeats running technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     equipment: [],
@@ -653,7 +677,7 @@ export const RUNNING = [
       'Cool down: 10 minutes easy running'
     ],
     coaching: 'Hills are speed work in disguise — they force good form and build strength without the impact of flat sprinting. Your legs will know tomorrow.',
-    why: 'Hill running builds leg strength, power, and cardiovascular capacity simultaneously. One of the most efficient training sessions available.',
+    why: 'Hill running builds leg strength, power, and cardiovascular capacity simultaneously.',
         watchOut: [
       'Sprinting the first repeat and struggling from the second',
       'Running hard down the hill, which is where the impact and the injuries are',
@@ -671,6 +695,7 @@ export const RUNNING = [
     name: 'Strides',
     youtube: 'running strides technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'locomotion',
     equipment: [],
@@ -708,6 +733,7 @@ export const RUNNING = [
     name: 'Parkrun Effort — 5K Race Simulation',
     youtube: 'parkrun race pacing guide',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     equipment: [],
@@ -745,6 +771,7 @@ export const RUNNING = [
     name: '5K Time Trial',
     youtube: '5k time trial pacing guide',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     equipment: [],
@@ -786,6 +813,7 @@ export const RUNNING = [
     name: 'Butt Kicks',
     youtube: 'butt kicks running drill technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'locomotion',
     equipment: [],
@@ -822,6 +850,7 @@ export const RUNNING = [
     name: 'A-Skip',
     youtube: 'a-skip running drill tutorial',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'locomotion',
     equipment: [],
@@ -859,6 +888,7 @@ export const RUNNING = [
     name: 'B-Skip',
     youtube: 'b-skip running drill tutorial',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'locomotion',
     equipment: [],
@@ -896,6 +926,7 @@ export const RUNNING = [
     name: 'Bounding',
     youtube: 'bounding running drill technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'locomotion',
     equipment: [],
@@ -915,7 +946,7 @@ export const RUNNING = [
       'Complete 3 × 20-metre lengths with full recovery between'
     ],
     coaching: 'Bounding is plyometric — it is hard on tendons and joints. Only add it when easy running is fully pain-free.',
-    why: 'Develops explosive power and elasticity in the running stride. Transfers directly to speed and running economy. Used by all serious runners.',
+    why: 'Develops explosive power and elasticity in the running stride. Transfers directly to speed and running economy.',
         watchOut: [
       'Bounding for distance before you can land under control',
       'Landing on a straight leg',
@@ -933,6 +964,7 @@ export const RUNNING = [
     name: 'Cadence Drill',
     youtube: 'running cadence drill technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'locomotion',
     equipment: [],
@@ -952,7 +984,7 @@ export const RUNNING = [
       'Check cadence again at the end'
     ],
     coaching: 'Higher cadence does not mean running faster — it means running more efficiently. Think quick, light feet rather than bigger steps.',
-    why: 'Low cadence (slow turnover) is a primary cause of overstriding and running injury. Cadence work is one of the most impactful technique changes available.',
+    why: 'A slow turnover often goes with overstriding. Raising your cadence a little reduces the load on the knees and hips with each step.',
         watchOut: [
       'Shortening the stride so much you stop moving forward',
       'Tensing the upper body to hit the rhythm',
@@ -970,6 +1002,7 @@ export const RUNNING = [
     name: 'Stride-Outs',
     youtube: 'stride outs running technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'locomotion',
     equipment: [],
@@ -1011,6 +1044,7 @@ export const RUNNING = [
     name: 'Easy Run — 30 Minutes',
     youtube: 'easy run pace guide',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     equipment: [],
@@ -1028,7 +1062,7 @@ export const RUNNING = [
       'No targets, no splits — just 30 minutes of easy movement'
     ],
     coaching: 'The 30-minute easy run is the backbone of any running programme. Most training benefits come from easy running — not from pushing every session.',
-    why: 'Builds aerobic base, promotes recovery, and develops running economy. The most important session in any runner\'s week.',
+    why: 'Builds aerobic base, promotes recovery, and develops running economy. The backbone of most runners\' weeks.',
         watchOut: [
       'Drifting up to moderate pace without noticing',
       'Running this the day after a hard session without checking how the legs feel',
@@ -1046,6 +1080,7 @@ export const RUNNING = [
     name: 'Tempo Run — 30 Minutes',
     youtube: 'tempo run pacing guide',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     equipment: [],
@@ -1062,7 +1097,7 @@ export const RUNNING = [
       'Cool down: 10 minutes easy running'
     ],
     coaching: 'A 20-minute tempo block is demanding. If the pace slips in the last 5 minutes, you started too fast. Aim for even splits or a slight negative split.',
-    why: 'A longer tempo block raises the lactate threshold more significantly than shorter efforts — the primary session for improving 10K performance.',
+    why: 'A longer tempo block raises the lactate threshold more significantly than shorter efforts — a key session for 10K performance.',
         watchOut: [
       'Running the tempo section too fast and fading',
       'Treating this as a race rather than a controlled effort',
@@ -1080,6 +1115,7 @@ export const RUNNING = [
     name: '1K Intervals × 5',
     youtube: '1k interval training guide',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     equipment: [],
@@ -1116,6 +1152,7 @@ export const RUNNING = [
     name: 'Cruise Intervals',
     youtube: 'cruise intervals running guide',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     equipment: [],
@@ -1152,6 +1189,7 @@ export const RUNNING = [
     name: 'Marathon Pace Run — 40 Minutes',
     youtube: 'marathon pace training guide',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     equipment: [],
@@ -1187,6 +1225,7 @@ export const RUNNING = [
     name: 'Long Run — 60 Minutes',
     youtube: 'long run pacing guide',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     equipment: [],
@@ -1223,6 +1262,7 @@ export const RUNNING = [
     name: 'Long Slow Run — 90 Minutes',
     youtube: 'long slow run pacing guide',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     equipment: [],
@@ -1241,7 +1281,7 @@ export const RUNNING = [
       'Allow a full rest day the day after'
     ],
     coaching: 'Very few recreational runners do a 90-minute run. If you do it once every 2 to 3 weeks, you will be better prepared for race day than most people at the start line.',
-    why: 'The 90-minute long run is the primary training stimulus for half marathon and marathon endurance. Depletes glycogen stores and forces fat adaptation.',
+    why: 'The 90-minute long run is the primary training stimulus for half marathon and marathon endurance. Long runs train the body to keep going on its fuel stores for a long effort.',
         watchOut: [
       'Running faster than easy, which turns a long run into a hard session',
       'Going without fuel or fluid',
@@ -1259,6 +1299,7 @@ export const RUNNING = [
     name: 'Back-to-Back Run Days',
     youtube: 'back to back running days training guide',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     equipment: [],

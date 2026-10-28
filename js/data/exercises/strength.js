@@ -1,5 +1,12 @@
 /**
  * data/exercises/strength.js
+ * 28 Oct 2026 v14
+ * v14 - STAGE PATH P-2 and P-9b (Session 2). Every entry carries doors,
+ *   feelings and style (blueprint C5; tools/verify-path-tags.mjs). Why and
+ *   coaching lines that were not accurate are corrected, keeping what is
+ *   true (Graeme, 28 Oct: "If they are not, then change them"); each change
+ *   and its source: BNH-Files Product/alongside_library_accuracy_28oct2026_v1.md.
+ *
  * 13 Oct 2026 v13
  *
  * v13 - HOME-BANDS (Graeme, 13 Oct: "I have short and long resistance bands
@@ -109,6 +116,7 @@ export const STRENGTH = [
     name: 'Glute Bridge',
     youtube: 'glute bridge exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'hinge',
     equipment: [],
     equipmentOptional: ['yoga-mat'],
@@ -150,6 +158,7 @@ export const STRENGTH = [
     name: 'Bird Dog',
     youtube: 'bird dog exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'anti-extension',
     equipment: [],
     equipmentOptional: ['yoga-mat'],
@@ -197,6 +206,7 @@ export const STRENGTH = [
     name: 'Dead Bug',
     youtube: 'dead bug exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'anti-extension',
     equipment: [],
     equipmentOptional: ['yoga-mat'],
@@ -215,7 +225,7 @@ export const STRENGTH = [
       'Complete 8 reps each side'
     ],
     coaching: 'Keep the lower back flat. A smaller movement is better than losing that contact.',
-    why: 'Trains deep core stability - the foundation for all other movements.',
+    why: 'Trains deep core stability, a base for a lot of other training.',
         watchOut: [
       'Lower back lifting off the floor as the limbs extend — reduce the range until it stays down',
       'Holding your breath; breathe out as you extend',
@@ -250,6 +260,7 @@ export const STRENGTH = [
     name: 'Goblet Squat',
     youtube: 'goblet squat exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'squat',
     equipment: ['dumbbell'],
     equipmentOptional: ['kettlebell'],
@@ -287,6 +298,7 @@ export const STRENGTH = [
     name: 'Press-Up',
     youtube: 'press-up exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'push',
     equipment: [],
     equipmentOptional: [],
@@ -324,6 +336,7 @@ export const STRENGTH = [
     name: 'Dumbbell Row',
     youtube: 'dumbbell row exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'pull',
     equipment: ['dumbbell'],
     equipmentOptional: [],
@@ -361,6 +374,7 @@ export const STRENGTH = [
     name: 'Plank',
     youtube: 'plank exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'anti-extension',
     equipment: [],
     equipmentOptional: ['yoga-mat'],
@@ -379,7 +393,7 @@ export const STRENGTH = [
       'Lower with control'
     ],
     coaching: 'Don\'t let your hips sag or pike up - a straight line is the goal.',
-    why: 'The foundation of core stability - protects the spine in all other movements.',
+    why: 'Builds the ability to hold your trunk steady, which helps in lifting, carrying and many other movements.',
         watchOut: [
       'Hips creeping upwards, which makes it easier without you noticing',
       'Lower back sagging, which is the point to stop the set',
@@ -408,6 +422,7 @@ export const STRENGTH = [
     name: 'Clamshell',
     youtube: 'clamshell exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'hip-abduction',
     equipment: [],
     equipmentOptional: ['resistance-band', 'yoga-mat'],
@@ -426,7 +441,7 @@ export const STRENGTH = [
       'Complete 15 reps each side'
     ],
     coaching: 'The movement is small - quality matters more than range. If you feel it in your hip, you\'re doing it right.',
-    why: 'Activates the gluteus medius - essential for knee and hip stability.',
+    why: 'Activates the gluteus medius, which helps steady the hip and knee.',
         watchOut: [
       'The pelvis rolling backwards as the knee opens; keep it steady',
       'Opening further than your hip allows, which just rotates the trunk',
@@ -444,6 +459,7 @@ export const STRENGTH = [
     name: 'Reverse Lunge',
     youtube: 'reverse lunge exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'lunge',
     equipment: [],
     equipmentOptional: ['dumbbell'],
@@ -485,6 +501,7 @@ export const STRENGTH = [
     name: 'Incline Press-Up',
     youtube: 'incline press-up exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'push',
     equipment: [],
     equipmentOptional: [],
@@ -520,6 +537,7 @@ export const STRENGTH = [
     name: 'Decline Press-Up',
     youtube: 'decline press-up exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'push',
     equipment: [],
     equipmentOptional: [],
@@ -555,6 +573,7 @@ export const STRENGTH = [
     name: 'Bulgarian Split Squat',
     youtube: 'bulgarian split squat exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'lunge',
     equipment: [],
     equipmentOptional: ['dumbbell'],
@@ -597,6 +616,7 @@ export const STRENGTH = [
     name: 'Dumbbell Sumo Squat',
     youtube: 'dumbbell sumo squat exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'squat',
     equipment: ['dumbbell'],
     equipmentOptional: ['kettlebell'],
@@ -632,6 +652,7 @@ export const STRENGTH = [
     name: 'Dumbbell Lateral Raise',
     youtube: 'dumbbell lateral raise exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'pull',
     equipment: ['dumbbell'],
     equipmentOptional: [],
@@ -648,7 +669,7 @@ export const STRENGTH = [
       'Lower slowly — take 3 counts',
       'Complete 3 sets of 12 reps'
     ],
-    coaching: 'Lead with your elbows, not your hands. The slow lowering builds more strength than the raising.',
+    coaching: 'Lead with your elbows, not your hands. Lower slowly — the lowering half builds strength too, and it is the half people rush.',
     why: 'Strengthens the medial deltoid — the middle of the three shoulder muscles — which gives the shoulder its rounded shape and lateral stability.',
         watchOut: [
       'Swinging the weights up with a bounce from the legs',
@@ -667,6 +688,7 @@ export const STRENGTH = [
     name: 'Dumbbell Overhead Press',
     youtube: 'dumbbell overhead press exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'push',
     equipment: ['dumbbell'],
     equipmentOptional: [],
@@ -684,7 +706,7 @@ export const STRENGTH = [
       'Complete 3 sets of 10 reps'
     ],
     coaching: 'Seated removes lower back strain — use seated if you have any lower back sensitivity.',
-    why: 'The primary overhead pushing movement. Builds shoulder and tricep strength essential for pushing, reaching, and upper body balance.',
+    why: 'The primary overhead pushing movement. Builds shoulder and tricep strength useful for pushing, reaching, and upper body balance.',
         watchOut: [
       'Arching the lower back to get the weight up — brace your stomach before every rep',
       'Pressing the weights in front of your face rather than beside your ears',
@@ -702,6 +724,7 @@ export const STRENGTH = [
     name: 'Dumbbell Bicep Curl',
     youtube: 'dumbbell bicep curl exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'pull',
     equipment: ['dumbbell'],
     equipmentOptional: [],
@@ -737,6 +760,7 @@ export const STRENGTH = [
     name: 'Dumbbell Overhead Tricep Extension',
     youtube: 'dumbbell overhead tricep extension exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'push',
     equipment: ['dumbbell'],
     equipmentOptional: [],
@@ -754,7 +778,7 @@ export const STRENGTH = [
       'Complete 3 sets of 12 reps'
     ],
     coaching: 'Upper arms stay still and pointed up — only the forearms move. If your elbows flare wide, the weight is too heavy.',
-    why: 'The only exercise that works the long head of the tricep in a stretched position — important for elbow extension strength and upper arm balance.',
+    why: 'Overhead, the long head of the tricep works in a lengthened position, which helps build elbow extension strength and upper arm balance.',
         watchOut: [
       'Elbows flaring wide, which takes the work off the triceps',
       'Arching the back as the weight goes behind your head',
@@ -772,6 +796,7 @@ export const STRENGTH = [
     name: 'Dumbbell Floor Press',
     youtube: 'dumbbell floor press exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'push',
     equipment: ['dumbbell'],
     equipmentOptional: ['yoga-mat'],
@@ -788,7 +813,7 @@ export const STRENGTH = [
       'Pause for 1 second, then press again',
       'Complete 3 sets of 10 reps'
     ],
-    coaching: 'The floor limits range of motion and removes shoulder instability — safer than a bench for anyone with shoulder concerns.',
+    coaching: 'The floor stops your elbows going below your body, which many people with sensitive shoulders find more comfortable than a bench.',
     why: 'A bench press alternative requiring no equipment. The floor stop prevents the shoulder from going into a vulnerable position at the bottom.',
         watchOut: [
       'Elbows flaring straight out to the sides rather than at forty-five degrees',
@@ -807,6 +832,7 @@ export const STRENGTH = [
     name: 'Inverted Row — Table',
     youtube: 'inverted row - table exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'pull',
     equipment: [],
     equipmentOptional: [],
@@ -843,6 +869,7 @@ export const STRENGTH = [
     name: 'Pallof Press',
     youtube: 'pallof press exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'anti-rotation',
     equipment: ['resistance-band'],
     equipmentOptional: [],
@@ -891,6 +918,7 @@ export const STRENGTH = [
     name: 'Farmer\'s Carry',
     youtube: 'farmers carry exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'carry',
     equipment: ['dumbbell'],
     equipmentOptional: ['kettlebell'],
@@ -908,7 +936,7 @@ export const STRENGTH = [
       'Rest for 60 seconds and repeat 3 times'
     ],
     coaching: 'Do not let the weight pull your shoulders down or your torso lean. Staying tall is the whole exercise.',
-    why: 'One of the most functional strength exercises there is — heavy things need carrying. Builds grip, core, and total body strength simultaneously.',
+    why: 'A very practical strength exercise — heavy things need carrying. Builds grip, core, and total body strength simultaneously.',
         watchOut: [
       'Shoulders rounding forward as your grip tires — that is the point to stop the set',
       'Holding your breath; breathe steadily throughout',
@@ -926,6 +954,7 @@ export const STRENGTH = [
     name: 'Suitcase Carry — Single Arm',
     youtube: 'suitcase carry - single arm exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'carry',
     equipment: ['dumbbell'],
     equipmentOptional: ['kettlebell'],
@@ -961,6 +990,7 @@ export const STRENGTH = [
     name: 'Hip Hinge Drill — Bodyweight',
     youtube: 'hip hinge drill - bodyweight exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'hinge',
     equipment: [],
     equipmentOptional: [],
@@ -978,8 +1008,8 @@ export const STRENGTH = [
       'Drive hips forward to return',
       'Complete 10 slow reps — this is a drill, not a loaded exercise'
     ],
-    coaching: 'The stick is your teacher — any gap shows you where control breaks down. Most people have never felt a true hip hinge before this drill.',
-    why: 'Teaches the hip hinge pattern needed for deadlifts, Romanian deadlifts and good mornings. Doing these loaded without the pattern first causes back injury.',
+    coaching: 'The stick is your teacher — any gap shows you where control breaks down.',
+    why: 'Teaches the hip hinge pattern needed for deadlifts, Romanian deadlifts and good mornings. Learning the pattern first makes those lifts easier to do well.',
         watchOut: [
       'Squatting rather than pushing the hips back',
       'Rounding the back at the bottom — stop where it is still flat',
@@ -1004,6 +1034,7 @@ export const STRENGTH = [
     name: 'Kettlebell Swing',
     youtube: 'kettlebell swing exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'hinge',
     equipment: ['kettlebell'],
     equipmentOptional: [],
@@ -1022,7 +1053,7 @@ export const STRENGTH = [
       'Complete 3 sets of 15 reps'
     ],
     coaching: 'This is a hip hinge, not a squat. The power comes from the hips snapping forward — not from lifting with the arms or rounding the back.',
-    why: 'The kettlebell swing builds explosive hip power, posterior chain strength, and cardiovascular capacity simultaneously. One of the most effective single exercises available.',
+    why: 'The kettlebell swing builds explosive hip power, posterior chain strength, and cardiovascular capacity simultaneously.',
         watchOut: [
       'Squatting instead of hinging — the hips go back, not down',
       'Lifting the bell with the arms; it should float up from the hip drive alone',
@@ -1041,6 +1072,7 @@ export const STRENGTH = [
     name: 'Kettlebell Goblet Squat',
     youtube: 'kettlebell goblet squat exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'squat',
     equipment: ['kettlebell'],
     equipmentOptional: ['dumbbell'],
@@ -1058,7 +1090,7 @@ export const STRENGTH = [
       'Drive through the heels to stand',
       'Complete 3 sets of 12 reps'
     ],
-    coaching: 'The goblet hold keeps the torso upright — the counterbalance of the weight in front naturally prevents forward lean. The best teaching squat there is.',
+    coaching: 'The goblet hold keeps the torso upright — the counterbalance of the weight in front naturally prevents forward lean.',
     why: 'The front-loaded position forces an upright torso and deep hip crease. Improves squat mechanics and builds full lower body strength.',
         watchOut: [
       'Knees falling inward as you stand up',
@@ -1077,6 +1109,7 @@ export const STRENGTH = [
     name: 'Kettlebell Clean',
     youtube: 'kettlebell clean exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'hinge',
     equipment: ['kettlebell'],
     equipmentOptional: [],
@@ -1114,6 +1147,7 @@ export const STRENGTH = [
     name: 'Kettlebell Press',
     youtube: 'kettlebell press exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'push',
     equipment: ['kettlebell'],
     equipmentOptional: [],
@@ -1149,6 +1183,7 @@ export const STRENGTH = [
     name: 'Turkish Get-Up',
     youtube: 'turkish get-up exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     // W5-22: a whole-body loaded carry, not a hinge. As a hinge, rated
     // hardest, it filled the hinge slot of every gym Lower Body.
     movementPattern: 'carry',
@@ -1189,6 +1224,7 @@ export const STRENGTH = [
     name: 'Kettlebell Deadlift',
     youtube: 'kettlebell deadlift exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'hinge',
     equipment: ['kettlebell'],
     equipmentOptional: ['dumbbell'],
@@ -1207,7 +1243,7 @@ export const STRENGTH = [
       'Complete 4 sets of 8 reps'
     ],
     coaching: 'The kettlebell deadlift teaches the hip hinge pattern with the load held centrally — ideal for learning the movement before progressing to barbell.',
-    why: 'The deadlift is the most fundamental strength movement — picking things up from the floor. The kettlebell version is accessible for beginners.',
+    why: 'The deadlift is a fundamental strength movement — picking things up from the floor. The kettlebell version is accessible for beginners.',
         watchOut: [
       'Rounding the back to reach the bell — bring the bell closer or raise it on a block',
       'Squatting down to it rather than hinging back',
@@ -1225,6 +1261,7 @@ export const STRENGTH = [
     name: 'Kettlebell Single-Arm Row',
     youtube: 'kettlebell single-arm row exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'pull',
     equipment: ['kettlebell'],
     equipmentOptional: ['dumbbell'],
@@ -1242,7 +1279,7 @@ export const STRENGTH = [
       'Complete 10 reps each side, 3 sets'
     ],
     coaching: 'The elbow should travel back like a saw, not out like a wing. Keep the shoulder blade moving — not just the arm.',
-    why: 'The single-arm row builds back thickness and corrects the imbalances from pressing. Essential counterpart to any horizontal pressing movement.',
+    why: 'The single-arm row builds back thickness and balances out pressing work — a useful partner to any horizontal pressing movement.',
         watchOut: [
       'Twisting the torso to help the bell up',
       'Shrugging rather than driving the elbow back',
@@ -1260,6 +1297,7 @@ export const STRENGTH = [
     name: 'Kettlebell Snatch',
     youtube: 'kettlebell snatch exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'hinge',
     equipment: ['kettlebell'],
     equipmentOptional: [],
@@ -1296,6 +1334,7 @@ export const STRENGTH = [
     name: 'Kettlebell Halo',
     youtube: 'kettlebell halo exercise technique',
     category: 'mobility',
+    doors: ['stretch'], feelings: [], style: 'stretch',   // Stage PATH P-2
     movementPattern: 'shoulder-rotation',
     equipment: ['kettlebell'],
     equipmentOptional: ['dumbbell'],
@@ -1330,6 +1369,7 @@ export const STRENGTH = [
     name: 'Kettlebell Windmill',
     youtube: 'kettlebell windmill exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'hinge',
     equipment: ['kettlebell'],
     equipmentOptional: [],
@@ -1348,7 +1388,7 @@ export const STRENGTH = [
       'Complete 5 reps each side, 3 sets'
     ],
     coaching: 'Keep your eye on the bell throughout. The eyes tracking the bell keeps the shoulder packed and safe. The moment you look down, the arm tends to drift.',
-    why: 'Develops shoulder stability under load in an unusual position, hip mobility, and lateral core strength — a uniquely effective combination.',
+    why: 'Develops shoulder stability under load in an unusual position, hip mobility, and lateral core strength — an unusual combination.',
         watchOut: [
       'Bending sideways through the waist rather than hinging at the hip',
       'Eyes leaving the overhead bell',
@@ -1366,6 +1406,7 @@ export const STRENGTH = [
     name: 'Kettlebell Figure-8',
     youtube: 'kettlebell figure-8 exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'hinge',
     equipment: ['kettlebell'],
     equipmentOptional: [],
@@ -1401,6 +1442,7 @@ export const STRENGTH = [
     name: 'Around the Body Pass',
     youtube: 'around the body pass exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'anti-rotation',
     equipment: ['kettlebell'],
     equipmentOptional: [],
@@ -1441,6 +1483,7 @@ export const STRENGTH = [
     name: 'Jump Squat',
     youtube: 'jump squat exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'squat',
     equipment: [],
     equipmentOptional: ['yoga-mat'],
@@ -1477,6 +1520,7 @@ export const STRENGTH = [
     name: 'Box Jump',
     youtube: 'box jump exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'squat',
     equipment: [],
     equipmentOptional: ['plyo-box'],
@@ -1514,6 +1558,7 @@ export const STRENGTH = [
     name: 'Broad Jump',
     youtube: 'broad jump exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'jump',
     equipment: [],
     equipmentOptional: [],
@@ -1550,6 +1595,7 @@ export const STRENGTH = [
     name: 'Explosive Press-Up',
     youtube: 'explosive press-up exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'push',
     equipment: [],
     equipmentOptional: ['yoga-mat'],
@@ -1585,6 +1631,7 @@ export const STRENGTH = [
     name: 'Depth Jump',
     youtube: 'depth jump exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'squat',
     equipment: [],
     equipmentOptional: ['plyo-box'],
@@ -1603,7 +1650,7 @@ export const STRENGTH = [
       'Complete 3 sets of 5 reps'
     ],
     coaching: 'The depth jump develops the stretch-shortening cycle — the spring-like quality of tendons. Only attempt once standard jump squats are comfortable.',
-    why: 'One of the most effective plyometric exercises for reactive strength — the ability to absorb and immediately re-use elastic energy in the tendons.',
+    why: 'A demanding plyometric exercise for reactive strength — the ability to absorb and immediately re-use elastic energy in the tendons.',
         watchOut: [
       'Stepping off from a box that is too high',
       'Spending too long on the ground between landing and jumping',
@@ -1621,6 +1668,7 @@ export const STRENGTH = [
     name: 'Lateral Hops',
     youtube: 'lateral hops exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'squat',
     equipment: [],
     equipmentOptional: [],
@@ -1657,6 +1705,7 @@ export const STRENGTH = [
     name: 'Skater Jumps',
     youtube: 'skater jumps exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'squat',
     equipment: [],
     equipmentOptional: [],
@@ -1674,7 +1723,7 @@ export const STRENGTH = [
       'Complete 3 sets of 12 total jumps'
     ],
     coaching: 'The trailing leg sweep helps with balance and adds hip adductor work. The bigger the lateral distance, the more demanding the single-leg landing.',
-    why: 'Develops lateral explosive power and single-leg landing mechanics. One of the best exercises for lateral sport performance.',
+    why: 'Develops lateral explosive power and single-leg landing mechanics.',
         watchOut: [
       'Landing on a straight leg',
       'Trunk collapsing towards the landing side',
@@ -1692,6 +1741,7 @@ export const STRENGTH = [
     name: 'Tuck Jump',
     youtube: 'tuck jump exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'squat',
     equipment: [],
     equipmentOptional: [],
@@ -1728,6 +1778,7 @@ export const STRENGTH = [
     name: 'Sprint Build-Up',
     youtube: 'sprint build-up exercise technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'locomotion',
     equipment: [],
     equipmentOptional: [],
@@ -1746,7 +1797,7 @@ export const STRENGTH = [
       'Complete 4 to 6 build-ups'
     ],
     coaching: 'Build-ups are how sprinters warm up and how recreational runners safely explore top speed. The gradual build gives the hamstrings time to get ready.',
-    why: 'Safely introduces maximum velocity running. Progressive acceleration allows the body to reach top speed safely — sudden standing starts are where hamstring injuries happen.',
+    why: 'Safely introduces maximum velocity running. Progressive acceleration lets the body reach top speed gradually rather than all at once.',
         watchOut: [
       'Going to full speed from the first stride rather than building into it',
       'Sprinting without a proper warm-up, which is how hamstrings get pulled',
@@ -1764,6 +1815,7 @@ export const STRENGTH = [
     name: 'Medicine Ball Slam',
     youtube: 'medicine ball slam exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'hinge',
     equipment: ['medicine-ball'],
     equipmentOptional: [],
@@ -1799,6 +1851,7 @@ export const STRENGTH = [
     name: 'Medicine Ball Chest Pass',
     youtube: 'medicine ball chest pass exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'push',
     equipment: ['medicine-ball'],
     equipmentOptional: [],
@@ -1833,6 +1886,7 @@ export const STRENGTH = [
     name: 'Single-Leg Hop for Distance',
     youtube: 'single-leg hop for distance exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'squat',
     equipment: [],
     equipmentOptional: [],
@@ -1851,7 +1905,7 @@ export const STRENGTH = [
       'Complete 3 sets each side'
     ],
     coaching: 'Hopping on one leg asks the hip, knee and ankle to work together. It is excellent training for landing and balance.',
-    why: 'The gold-standard test of single-leg power and landing control. The ability to hop for distance and stick the landing indicates robust lower limb function.',
+    why: 'A widely used test of single-leg power and landing control. The ability to hop for distance and stick the landing indicates robust lower limb function.',
         watchOut: [
       'Landing on a straight leg',
       'Hopping for distance before you can land and hold it still',
@@ -1870,6 +1924,7 @@ export const STRENGTH = [
     name: 'Reactive Change of Direction',
     youtube: 'reactive change of direction exercise technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'locomotion',
     equipment: [],
     equipmentOptional: [],
@@ -1906,6 +1961,7 @@ export const STRENGTH = [
     name: 'Deceleration Run',
     youtube: 'deceleration run exercise technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'locomotion',
     equipment: [],
     equipmentOptional: [],
@@ -1949,6 +2005,7 @@ export const STRENGTH = [
     name: 'Barbell Deadlift',
     youtube: 'barbell deadlift exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'hinge',
     equipment: ['barbell'],
@@ -1976,7 +2033,7 @@ export const STRENGTH = [
       'Complete 3 sets of 5 reps'
     ],
     coaching: 'The bar should travel in a straight vertical line — if it swings away from your legs at any point, the weight is too heavy or the setup is off.',
-    why: 'The deadlift is the most fundamental human strength movement — picking a heavy load from the floor. No exercise builds posterior chain strength as comprehensively.',
+    why: 'The deadlift is picking a heavy load up from the floor, a movement used every day. It builds strength right along the back of the body.',
         watchOut: [
       'Back rounding as you set up or as you lift — reset rather than pushing through it',
       'Hips shooting up first, leaving the back to do the work',
@@ -1995,6 +2052,7 @@ export const STRENGTH = [
     name: 'Barbell Back Squat',
     youtube: 'barbell back squat exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'squat',
     equipment: ['barbell', 'squat-rack'],
@@ -2035,6 +2093,7 @@ export const STRENGTH = [
     name: 'Barbell Bench Press',
     youtube: 'barbell bench press exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'push',
     equipment: ['barbell', 'bench'],
@@ -2087,6 +2146,7 @@ export const STRENGTH = [
     name: 'Barbell Overhead Press',
     youtube: 'barbell overhead press exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'push',
     equipment: ['barbell'],
@@ -2107,7 +2167,7 @@ export const STRENGTH = [
       'Complete 3 sets of 5 reps'
     ],
     coaching: 'The strict press allows no leg drive — if you need to use your legs, the weight is too heavy for a strict press. Move to push press instead.',
-    why: 'The overhead press builds shoulder and upper body strength in a standing, loaded position — the most functional upper body strength exercise available.',
+    why: 'The overhead press builds shoulder and upper body strength in a standing, loaded position.',
         watchOut: [
       'Arching the lower back to get the bar up — brace the stomach and squeeze the backside first',
       'Pressing the bar around your face rather than moving your head back and letting it travel straight',
@@ -2125,6 +2185,7 @@ export const STRENGTH = [
     name: 'Barbell Bent-Over Row',
     youtube: 'barbell bent-over row exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'pull',
     equipment: ['barbell'],
@@ -2144,7 +2205,7 @@ export const STRENGTH = [
       'Complete 3 sets of 8 reps'
     ],
     coaching: 'If your lower back starts to round, reduce the weight or lean forward a little less.',
-    why: 'The barbell row builds upper back thickness and strength — the essential counterpart to any pressing programme and a primary postural strength exercise.',
+    why: 'The barbell row builds upper back thickness and strength — a natural counterpart to any pressing programme.',
         watchOut: [
       'Standing up as you pull, so the torso angle changes rep to rep',
       'Rounding the lower back — set the back flat before the first rep and hold it',
@@ -2163,6 +2224,7 @@ export const STRENGTH = [
     name: 'Barbell Romanian Deadlift',
     youtube: 'romanian deadlift exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'hinge',
     equipment: ['barbell'],
@@ -2202,6 +2264,7 @@ export const STRENGTH = [
     name: 'Barbell Hip Thrust',
     youtube: 'barbell hip thrust exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'hinge',
     equipment: ['barbell', 'bench'],
@@ -2222,7 +2285,7 @@ export const STRENGTH = [
       'Complete 3 sets of 10 reps'
     ],
     coaching: 'Keep the chin tucked at the top — looking up causes the lower back to extend instead of the glutes to contract.',
-    why: 'Research by Dr Bret Contreras consistently shows the barbell hip thrust produces greater glute activation than any other exercise. The most direct glute builder available.',
+    why: 'Studies measuring muscle activity show the hip thrust works the glutes hard, though a training trial comparing it with the back squat found similar glute growth.',
         watchOut: [
       'Over-arching at the top and finishing with the lower back rather than the backside',
       'Feet too close, so the front of the thighs take over',
@@ -2241,6 +2304,7 @@ export const STRENGTH = [
     name: 'Barbell Front Squat',
     youtube: 'barbell front squat exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'squat',
     equipment: ['barbell', 'squat-rack'],
@@ -2280,6 +2344,7 @@ export const STRENGTH = [
     name: 'Good Morning',
     youtube: 'good morning exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'hinge',
     equipment: ['barbell'],
@@ -2318,6 +2383,7 @@ export const STRENGTH = [
     name: 'Power Clean',
     youtube: 'power clean exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'hinge',
     equipment: ['barbell'],
@@ -2360,6 +2426,7 @@ export const STRENGTH = [
     name: 'Band Pull-Apart',
     youtube: 'band pull-apart exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'pull',
     equipment: ['resistance-band'],
@@ -2378,7 +2445,7 @@ export const STRENGTH = [
       'Complete 3 sets of 20 reps'
     ],
     coaching: 'Keep the arms straight throughout — bending the elbows turns it into an arm exercise. The movement comes from the shoulder blades.',
-    why: 'One of the most effective exercises for rear deltoid and mid-trap strength — the muscles that pull against a forward, rounded posture.',
+    why: 'A simple exercise for rear deltoid and mid-trap strength — the muscles that pull against a forward, rounded posture.',
         watchOut: [
       'Shrugging the shoulders up as you pull',
       'Bending the elbows, which turns it into a row',
@@ -2396,6 +2463,7 @@ export const STRENGTH = [
     name: 'Band Face Pull',
     youtube: 'band face pull exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'pull',
     equipment: ['resistance-band'],
@@ -2415,7 +2483,7 @@ export const STRENGTH = [
       'Complete 3 sets of 20 reps'
     ],
     coaching: 'The external rotation at the end is the key part — it is what makes this a rotator cuff and rear delt exercise rather than just a row.',
-    why: 'The face pull is widely considered one of the most important shoulder health exercises — directly targets the posterior rotator cuff and combats the internal rotation dominance of most training.',
+    why: 'A popular shoulder exercise that works the back of the shoulder and the rotator cuff muscles that turn the arm outward, balancing out a lot of pressing work.',
         watchOut: [
       'Pulling towards the chest rather than the face',
       'Shrugging as you pull',
@@ -2433,6 +2501,7 @@ export const STRENGTH = [
     name: 'Band Squat',
     youtube: 'band squat exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'squat',
     equipment: ['resistance-band'],
@@ -2469,6 +2538,7 @@ export const STRENGTH = [
     name: 'Band Hip Hinge — Deadlift Pattern',
     youtube: 'band hip hinge - deadlift pattern exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'hinge',
     equipment: ['resistance-band'],
@@ -2505,6 +2575,7 @@ export const STRENGTH = [
     name: 'Band Chest Press',
     youtube: 'band chest press exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'push',
     equipment: ['resistance-band'],
@@ -2541,6 +2612,7 @@ export const STRENGTH = [
     name: 'Seated Band Row',
     youtube: 'seated band row exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'pull',
     equipment: ['resistance-band'],
@@ -2578,6 +2650,7 @@ export const STRENGTH = [
     name: 'Band Lateral Walk',
     youtube: 'band lateral walk exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'squat',
     equipment: ['loop-band'],
@@ -2615,6 +2688,7 @@ export const STRENGTH = [
     name: 'Band Standing Single-Arm Row',
     youtube: 'band standing single-arm row exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'pull',
     equipment: ['resistance-band'],
@@ -2633,7 +2707,7 @@ export const STRENGTH = [
       'The opposite hand is free — your middle works to stop you twisting',
       'Complete 12 reps each side, 3 sets'
     ],
-    coaching: 'The anti-rotation demand makes this more effective for core development than a cable or dumbbell row from a supported position.',
+    coaching: 'The anti-rotation demand adds core work that a supported row does not ask for.',
     why: 'A single-arm pull against a lateral anchor requires core anti-rotation — combining back strength and core stability in a functional standing pattern.',
         watchOut: [
       'Twisting the torso towards the anchor as you pull',
@@ -2652,6 +2726,7 @@ export const STRENGTH = [
     name: 'Band Bicep Curl',
     youtube: 'band bicep curl exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'pull',
     equipment: ['resistance-band'],
@@ -2688,6 +2763,7 @@ export const STRENGTH = [
     name: 'Band Tricep Pushdown',
     youtube: 'band tricep pushdown exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'push',
     equipment: ['resistance-band'],
@@ -2724,6 +2800,7 @@ export const STRENGTH = [
     name: 'Band Overhead Press',
     youtube: 'band overhead press exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'push',
     equipment: ['resistance-band'],
@@ -2741,7 +2818,7 @@ export const STRENGTH = [
       'Keep the core braced — do not let the lower back arch',
       'Complete 3 sets of 12 reps'
     ],
-    coaching: 'Accommodating resistance means the band is hardest overhead where you are typically weakest in a barbell press. Develops strength at the top of the pressing range.',
+    coaching: 'The band is hardest near the top of the press, so it builds strength at the end of the movement.',
     why: 'A fully accessible overhead pressing movement requiring only a band. Builds shoulder strength and overhead stability without a barbell or machine.',
         watchOut: [
       'Arching the lower back to get the hands overhead',
@@ -2760,6 +2837,7 @@ export const STRENGTH = [
     name: 'Band Pallof Press',
     youtube: 'band pallof press exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'anti-rotation',
     equipment: ['resistance-band'],
@@ -2779,7 +2857,7 @@ export const STRENGTH = [
       'Complete 10 reps each side, 3 sets'
     ],
     coaching: 'The anti-rotation demand is highest when the arms are extended. Everything in the body is working to stay square.',
-    why: 'The Pallof press is the gold standard anti-rotation core exercise — trains the core in its primary function of resisting unwanted movement rather than creating it.',
+    why: 'The Pallof press is the classic anti-rotation core exercise — trains the core in its primary function of resisting unwanted movement rather than creating it.',
     watchOut: [
       'Rotating towards the anchor at the point the arms straighten, which is where it is hardest and where form usually goes',
       'Shoulders creeping up towards the ears as you press',
@@ -2817,6 +2895,7 @@ export const STRENGTH = [
     name: 'Dumbbell Romanian Deadlift',
     youtube: 'dumbbell romanian deadlift exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'hinge',
     equipment: ['dumbbell'],
@@ -2855,6 +2934,7 @@ export const STRENGTH = [
     name: 'Dumbbell Step-Up',
     youtube: 'dumbbell step-up exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'squat',
     equipment: ['dumbbell'],
@@ -2892,6 +2972,7 @@ export const STRENGTH = [
     name: 'Dumbbell Reverse Lunge',
     youtube: 'dumbbell reverse lunge exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'lunge',
     equipment: ['dumbbell'],
@@ -2929,6 +3010,7 @@ export const STRENGTH = [
     name: 'Dumbbell Y-Raise',
     youtube: 'dumbbell y-raise exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'pull',
     equipment: ['dumbbell'],
@@ -2966,6 +3048,7 @@ export const STRENGTH = [
     name: 'Single-Leg Dumbbell Deadlift',
     youtube: 'single-leg dumbbell deadlift exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'hinge',
     equipment: ['dumbbell'],
@@ -3002,6 +3085,7 @@ export const STRENGTH = [
     name: 'Dumbbell Incline Row',
     youtube: 'dumbbell incline row exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'pull',
     equipment: ['dumbbell', 'bench'],
@@ -3021,7 +3105,7 @@ export const STRENGTH = [
       '3 sets of 12 reps'
     ],
     coaching: 'The prone position prevents any cheating through body momentum — the upper back does all the work.',
-    why: 'A bilateral row that removes all postural cheating — the chest-supported position isolates the upper back muscles completely.',
+    why: 'A two-arm row with the chest supported, which removes most of the chance to swing, so the upper back does the work.',
         watchOut: [
       'Lifting the chest off the bench to help the weights up',
       'Shrugging rather than driving the elbows back',
@@ -3039,6 +3123,7 @@ export const STRENGTH = [
     name: 'Paused Goblet Squat',
     youtube: 'paused goblet squat exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'squat',
     equipment: ['dumbbell'],
@@ -3075,6 +3160,7 @@ export const STRENGTH = [
     name: 'Dumbbell Floor Fly',
     youtube: 'dumbbell floor fly exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'push',
     equipment: ['dumbbell'],
@@ -3111,6 +3197,7 @@ export const STRENGTH = [
     name: 'Overhead Carry',
     youtube: 'overhead carry exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'carry',
     equipment: ['dumbbell'],
@@ -3129,7 +3216,7 @@ export const STRENGTH = [
       '3 sets each side'
     ],
     coaching: 'The overhead carry exposes shoulder weakness and core instability immediately. If the arm wavers, the weight is too heavy.',
-    why: 'Develops shoulder stability and core anti-lateral-flexion under dynamic load — a uniquely functional combination that transfers to every overhead sport and activity.',
+    why: 'Develops shoulder stability and core anti-lateral-flexion under dynamic load — a combination that carries over to overhead sport and everyday reaching.',
         watchOut: [
       'Ribs flaring and the back arching under the overhead load',
       'The arm drifting forward instead of staying beside the ear',
@@ -3147,6 +3234,7 @@ export const STRENGTH = [
     name: 'Bear Hug Carry',
     youtube: 'bear hug carry exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'carry',
     // PATTERN-TAGS, 06 Sep 2026. This was equipment: [] with the kit named
@@ -3197,6 +3285,7 @@ export const STRENGTH = [
     name: 'Zottman Curl',
     youtube: 'zottman curl exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'pull',
     equipment: ['dumbbell'],
@@ -3215,8 +3304,8 @@ export const STRENGTH = [
       'At the bottom, rotate palms up again for the next rep',
       '3 sets of 10 reps'
     ],
-    coaching: 'The lowering phase with pronated grip develops forearm and brachioradialis strength that standard curls miss entirely.',
-    why: 'The Zottman curl trains both the bicep on the way up and the forearm and brachioradialis on the way down — more efficient than any single curl variation.',
+    coaching: 'The lowering phase with pronated grip develops forearm and brachioradialis strength that a standard curl works less.',
+    why: 'The Zottman curl trains both the bicep on the way up and the forearm and brachioradialis on the way down.',
         watchOut: [
       'Rushing the rotation at the top',
       'Elbows swinging forward',
@@ -3234,6 +3323,7 @@ export const STRENGTH = [
     name: 'Dumbbell Pullover',
     youtube: 'dumbbell pullover exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'pull',
     equipment: ['dumbbell', 'bench'],
@@ -3270,6 +3360,7 @@ export const STRENGTH = [
     name: 'Pistol Squat Progression',
     youtube: 'pistol squat progression exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'squat',
     equipment: [],
@@ -3307,6 +3398,7 @@ export const STRENGTH = [
     name: 'Nordic Curl — Assisted Progression',
     youtube: 'nordic curl - assisted progression exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'hinge',
     equipment: [],
@@ -3344,6 +3436,7 @@ export const STRENGTH = [
     name: 'Wall Sit',
     youtube: 'wall sit exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'isometric',
     equipment: [],
@@ -3382,6 +3475,7 @@ export const STRENGTH = [
     name: 'Hollow Body Hold',
     youtube: 'hollow body hold exercise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'isometric',
     equipment: [],
@@ -3401,7 +3495,7 @@ export const STRENGTH = [
       'Build toward 30 to 60 seconds, 3 sets'
     ],
     coaching: 'The moment the lower back arches off the floor, the position is lost. Lift the legs higher or bend the knees to reduce difficulty and maintain position.',
-    why: 'The hollow body hold is the foundation of gymnastics strength training — trains the deep abdominals to maintain spinal position against load, essential for all pressing and pulling movements.',
+    why: 'The hollow body hold is the foundation of gymnastics strength training — trains the deep abdominals to maintain spinal position against load, useful in pressing and pulling.',
         watchOut: [
       'Lower back lifting off the floor, which is the point to reduce the range',
       'Holding your breath',
@@ -3450,6 +3544,7 @@ export const STRENGTH = [
     name: "Band Bent-Over Row",
     youtube: "resistance band bent over row technique",
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'pull',
     equipment: ['resistance-band'],
     equipmentOptional: [],
@@ -3489,6 +3584,7 @@ export const STRENGTH = [
     name: "Single-Arm Dumbbell Row",
     youtube: "single arm dumbbell row bench technique",
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'pull',
     equipment: ['dumbbell', 'bench'],
     equipmentOptional: [],
@@ -3528,6 +3624,7 @@ export const STRENGTH = [
     name: "Front Rack Carry",
     youtube: "dumbbell front rack carry technique",
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'carry',
     equipment: ['dumbbell'],
     equipmentOptional: [],
@@ -3567,6 +3664,7 @@ export const STRENGTH = [
     name: "Waiter Walk",
     youtube: "dumbbell overhead carry waiter walk technique",
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'carry',
     equipment: ['dumbbell'],
     equipmentOptional: [],
@@ -3606,6 +3704,7 @@ export const STRENGTH = [
     name: "Plank Shoulder Tap",
     youtube: "plank shoulder tap exercise technique",
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'anti-extension',
     equipment: [],
     equipmentOptional: [],
@@ -3645,6 +3744,7 @@ export const STRENGTH = [
     name: "Split-Stance Pallof Press",
     youtube: "split stance pallof press band technique",
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'anti-rotation',
     equipment: ['resistance-band'],
     equipmentOptional: [],
@@ -3684,6 +3784,7 @@ export const STRENGTH = [
     name: "Plank Single-Arm Reach",
     youtube: "plank single arm reach exercise technique",
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'anti-rotation',
     equipment: [],
     equipmentOptional: [],
@@ -3723,6 +3824,7 @@ export const STRENGTH = [
     name: "Side Plank",
     youtube: "side plank exercise technique",
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'anti-lateral-flexion',
     equipment: [],
     equipmentOptional: [],
@@ -3775,6 +3877,7 @@ export const STRENGTH = [
     name: "Suitcase Hold",
     youtube: "suitcase hold dumbbell anti lateral flexion",
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'anti-lateral-flexion',
     equipment: ['dumbbell'],
     equipmentOptional: [],
@@ -3833,6 +3936,7 @@ export const STRENGTH = [
     name: 'Hammer Curl',
     youtube: 'dumbbell hammer curl technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'pull',
     equipment: ['dumbbell'],
@@ -3876,6 +3980,7 @@ export const STRENGTH = [
     name: 'Front Raise',
     youtube: 'dumbbell front raise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'push',
     equipment: ['dumbbell'],
@@ -3919,6 +4024,7 @@ export const STRENGTH = [
     name: 'Lateral Raise',
     youtube: 'dumbbell lateral raise technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'push',
     equipment: ['dumbbell'],
@@ -3963,6 +4069,7 @@ export const STRENGTH = [
     name: 'Plank to Push-Up',
     youtube: 'plank to push up technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'anti-rotation',
     equipment: [],
@@ -4006,6 +4113,7 @@ export const STRENGTH = [
     name: 'Bear Hold',
     youtube: 'bear hold core exercise',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'isometric',
     equipment: [],
@@ -4055,6 +4163,7 @@ export const STRENGTH = [
     name: "Kneeling Band Pulldown",
     youtube: "kneeling resistance band lat pulldown technique",
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'pull',
     equipment: ['resistance-band'],
     equipmentOptional: [],
@@ -4093,6 +4202,7 @@ export const STRENGTH = [
     name: "Band Lateral Raise",
     youtube: "resistance band lateral raise technique",
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'push',
     equipment: ['resistance-band'],
     equipmentOptional: [],
@@ -4130,6 +4240,7 @@ export const STRENGTH = [
     name: "Band Reverse Fly",
     youtube: "resistance band reverse fly anchored technique",
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'pull',
     equipment: ['resistance-band'],
     equipmentOptional: [],
@@ -4168,6 +4279,7 @@ export const STRENGTH = [
     name: "Band Pull-Through",
     youtube: "resistance band pull through hip hinge technique",
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'hinge',
     equipment: ['resistance-band'],
     equipmentOptional: [],
@@ -4206,6 +4318,7 @@ export const STRENGTH = [
     name: "Band Overhead Triceps Extension",
     youtube: "resistance band overhead tricep extension technique",
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'push',
     equipment: ['resistance-band'],
     equipmentOptional: [],
@@ -4244,6 +4357,7 @@ export const STRENGTH = [
     name: "Standing Band Woodchop",
     youtube: "resistance band woodchop high to low technique",
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'rotation',
     equipment: ['resistance-band'],
     equipmentOptional: [],
@@ -4282,6 +4396,7 @@ export const STRENGTH = [
     name: "Banded Press-Up",
     youtube: "resistance band push up technique",
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'push',
     equipment: ['resistance-band'],
     equipmentOptional: [],
@@ -4320,6 +4435,7 @@ export const STRENGTH = [
     name: "Band Split Squat",
     youtube: "resistance band split squat technique",
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'lunge',
     equipment: ['resistance-band'],
     equipmentOptional: [],
@@ -4358,6 +4474,7 @@ export const STRENGTH = [
     name: "Banded Glute Bridge",
     youtube: "mini band glute bridge technique",
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'hinge',
     equipment: ['loop-band'],
     equipmentOptional: ['yoga-mat'],
@@ -4396,6 +4513,7 @@ export const STRENGTH = [
     name: "Loop Band Squat",
     youtube: "mini band squat technique",
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'squat',
     equipment: ['loop-band'],
     equipmentOptional: [],
@@ -4434,6 +4552,7 @@ export const STRENGTH = [
     name: "Standing Band Kickback",
     youtube: "mini band standing glute kickback technique",
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'hip-extension',
     equipment: ['loop-band'],
     equipmentOptional: [],

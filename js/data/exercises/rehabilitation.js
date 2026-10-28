@@ -1,5 +1,12 @@
 /**
  * data/exercises/rehabilitation.js
+ * 28 Oct 2026 v16
+ * v16 - STAGE PATH P-2 and P-9b (Session 2). Every entry carries doors,
+ *   feelings and style (blueprint C5; tools/verify-path-tags.mjs). Why and
+ *   coaching lines that were not accurate are corrected, keeping what is
+ *   true (Graeme, 28 Oct: "If they are not, then change them"); each change
+ *   and its source: BNH-Files Product/alongside_library_accuracy_28oct2026_v1.md.
+ *
  * 13 Oct 2026 v15
  *
  * v15 - HOME-BANDS. A band worn round both legs is a short loop band, so
@@ -233,6 +240,7 @@ export const REHABILITATION = [
     generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'clamshell - glute activation exercise technique',
     category: 'rehabilitation',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'activation',
     rehabPhase: 'maintenance',
     activationTarget: 'glutes',
@@ -255,7 +263,7 @@ export const REHABILITATION = [
       'Complete 15 reps, then turn over and repeat on the other side'
     ],
     coaching: 'Small and controlled beats big and sloppy every time. If you feel it burning in the side of your hip, it is working.',
-    why: 'Activates gluteus medius — the hip stabiliser that protects your knees and lower back in every movement.',
+    why: 'Activates gluteus medius — a hip muscle that helps steady the hip and knee.',
         watchOut: [
       "If your top hip rolls backwards as the knee opens, you have gone past your range. Stop where the hips stay stacked — it will be a smaller movement than you expect",
       "If you feel it mostly in the front of your hip, you are lifting rather than rotating. Think about turning the thigh bone in the socket instead",
@@ -285,6 +293,7 @@ export const REHABILITATION = [
     generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'banded clamshell exercise technique',
     category: 'rehabilitation',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'activation',
     rehabPhase: 'maintenance',
     activationTarget: 'glutes',
@@ -325,6 +334,7 @@ export const REHABILITATION = [
     generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'glute bridge - activation exercise technique',
     category: 'rehabilitation',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'activation',
     rehabPhase: 'maintenance',
     activationTarget: 'glutes',
@@ -347,7 +357,7 @@ export const REHABILITATION = [
       'Lower slowly and repeat for 15 reps'
     ],
     coaching: 'The squeeze at the top is the whole point. If you rush past it, you are losing half the benefit.',
-    why: 'Glute bridge directly activates the glutes and teaches the brain to use them — essential before any lower body workout.',
+    why: 'The glute bridge gets the glutes working, a useful warm-up before lower body work.',
         watchOut: [
       "If you feel this mostly in your hamstrings, walk your feet slightly closer to your bottom and squeeze the glutes before you lift",
       "If your lower back arches at the top, you have lifted too far. Stop where your body makes a straight line from knee to shoulder, not higher",
@@ -377,6 +387,7 @@ export const REHABILITATION = [
     generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'single-leg glute bridge exercise technique',
     category: 'rehabilitation',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'subacute',
     activationTarget: 'glutes',
@@ -433,6 +444,7 @@ export const REHABILITATION = [
     generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'donkey kick exercise technique',
     category: 'rehabilitation',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'activation',
     rehabPhase: 'maintenance',
     activationTarget: 'glutes',
@@ -473,6 +485,7 @@ export const REHABILITATION = [
     generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'fire hydrant exercise technique',
     category: 'rehabilitation',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'activation',
     rehabPhase: 'maintenance',
     activationTarget: 'glutes',
@@ -494,7 +507,7 @@ export const REHABILITATION = [
       'Complete 15 reps each side'
     ],
     coaching: 'Keep your weight even through both hands. It wants to shift — resist it.',
-    why: 'Works the gluteus medius from a different angle than clamshells — together they give full hip stabiliser coverage.',
+    why: 'Works the gluteus medius from a different angle than clamshells — a useful partner to clamshells.',
         watchOut: [
       "If you are leaning away to lift higher, keep your weight even and accept a lower leg",
       "If the knee straightens as it rises, keep it bent. A straight leg makes it a different exercise",
@@ -513,6 +526,7 @@ export const REHABILITATION = [
     generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'side-lying hip abduction exercise technique',
     category: 'rehabilitation',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'subacute',
     activationTarget: 'glutes',
@@ -534,7 +548,7 @@ export const REHABILITATION = [
       'Complete 15 reps, then switch sides'
     ],
     coaching: 'Toes pointing slightly down works the glutes harder. Toes up shifts more load to the hip flexors.',
-    why: 'Directly targets the gluteus medius and minimus — essential for hip stability and IT band health.',
+    why: 'Directly targets the gluteus medius and minimus — which steady the hip when you walk and stand on one leg.',
         watchOut: [
       "If you go above about 45 degrees, your back starts doing the work. Lower is better here",
       "If your toes are pointing at the ceiling, the leg has rolled. Turn it so the toes point forward, or slightly down",
@@ -553,6 +567,7 @@ export const REHABILITATION = [
     generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'resistance band walk - lateral exercise technique',
     category: 'rehabilitation',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'activation',
     rehabPhase: 'maintenance',
     activationTarget: 'glutes',
@@ -574,7 +589,7 @@ export const REHABILITATION = [
       'Complete 3 sets'
     ],
     coaching: 'Stay low throughout. Standing up straight makes it too easy and loses the glute engagement.',
-    why: 'One of the most effective glute med exercises. A good warm-up before running and jumping, and a steady builder of hip strength.',
+    why: 'A simple glute med exercise. A good warm-up before running and jumping, and a steady builder of hip strength.',
         watchOut: [
       "If your knees fall inward, the band has won. Lighter band, and push the knees out against it as you step",
       "If you have stood up out of the squat, sink back down. Standing tall takes the glutes out of it entirely",
@@ -593,6 +608,7 @@ export const REHABILITATION = [
     generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'monster walk exercise technique',
     category: 'rehabilitation',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'activation',
     rehabPhase: 'maintenance',
     activationTarget: 'glutes',
@@ -633,6 +649,7 @@ export const REHABILITATION = [
     generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'hip thrust - bodyweight exercise technique',
     category: 'rehabilitation',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'subacute',
     activationTarget: 'glutes',
@@ -654,7 +671,7 @@ export const REHABILITATION = [
       'Lower slowly and repeat for 12 reps, 3 sets'
     ],
     coaching: 'The range of motion is bigger than a glute bridge because your shoulders are elevated. You will feel the difference.',
-    why: 'The hip thrust works the glutes harder than almost any other exercise — a staple for glute strength.',
+    why: 'The hip thrust works the glutes hard — a staple for glute strength.',
         watchOut: [
       "If your ribs flare and your back arches at the top, tuck your chin and think about lifting with the hips only",
       "If it is mostly hamstrings, walk your feet in a little and squeeze at the top for a second",
@@ -673,6 +690,7 @@ export const REHABILITATION = [
     generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'glute bridge march exercise technique',
     category: 'rehabilitation',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'subacute',
     activationTarget: 'glutes',
@@ -713,6 +731,7 @@ export const REHABILITATION = [
     generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'step-up - glute focus exercise technique',
     category: 'rehabilitation',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'maintenance',
     activationTarget: 'glutes',
@@ -753,6 +772,7 @@ export const REHABILITATION = [
     generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'reverse lunge - glute focus exercise technique',
     category: 'rehabilitation',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'maintenance',
     activationTarget: 'glutes',
@@ -793,6 +813,7 @@ export const REHABILITATION = [
     generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'standing hip abduction exercise technique',
     category: 'rehabilitation',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'activation',
     rehabPhase: 'maintenance',
     activationTarget: 'glutes',
@@ -834,6 +855,7 @@ export const REHABILITATION = [
     generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'glute squeeze - isometric exercise technique',
     category: 'rehabilitation',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'activation',
     rehabPhase: 'acute',
     activationTarget: 'glutes',
@@ -874,6 +896,7 @@ export const REHABILITATION = [
     generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'prone hip extension exercise technique',
     category: 'rehabilitation',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'activation',
     rehabPhase: 'acute',
     activationTarget: 'glutes',
@@ -919,6 +942,7 @@ export const REHABILITATION = [
     name: 'Hamstring Isometric Hold',
     youtube: 'hamstring isometric hold exercise technique',
     category: 'rehabilitation',
+    doors: [], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'acute',
     activationTarget: 'hamstring',
@@ -960,6 +984,7 @@ export const REHABILITATION = [
     generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'supine hamstring stretch exercise technique',
     category: 'rehabilitation',
+    doors: ['stretch'], feelings: [], style: 'stretch',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'subacute',
     activationTarget: 'hamstring',
@@ -1001,6 +1026,7 @@ export const REHABILITATION = [
     generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'active straight leg raise exercise technique',
     category: 'rehabilitation',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'subacute',
     activationTarget: 'hamstring',
@@ -1040,6 +1066,7 @@ export const REHABILITATION = [
     name: 'Prone Hamstring Curl',
     youtube: 'prone hamstring curl exercise technique',
     category: 'rehabilitation',
+    doors: [], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'subacute',
     activationTarget: 'hamstring',
@@ -1060,7 +1087,7 @@ export const REHABILITATION = [
       'Lower slowly — take 3 counts to come down',
       'Complete 12 reps each side, 3 sets'
     ],
-    coaching: 'The slow lowering (the eccentric phase) is where most of the benefit comes from. Take your time with it.',
+    coaching: 'The slow lowering (the eccentric phase) matters as much as the lift. Take your time with it.',
     why: 'Rebuilds hamstring strength through active range of motion — the next step after isometric work.',
         watchOut: [
       "If your hips lift off the floor, you have run out of range and started borrowing. Stop where the hips stay down",
@@ -1079,6 +1106,7 @@ export const REHABILITATION = [
     name: 'Romanian Deadlift — Light Load',
     youtube: 'romanian deadlift light load exercise technique',
     category: 'rehabilitation',
+    doors: [], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'subacute',
     activationTarget: 'hamstring',
@@ -1120,6 +1148,7 @@ export const REHABILITATION = [
     generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'nordic curl - assisted exercise technique',
     category: 'rehabilitation',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'maintenance',
     activationTarget: 'hamstring',
@@ -1159,6 +1188,7 @@ export const REHABILITATION = [
     name: 'Hamstring Bridge Curl',
     youtube: 'hamstring bridge curl exercise technique',
     category: 'rehabilitation',
+    doors: [], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'subacute',
     activationTarget: 'hamstring',
@@ -1198,6 +1228,7 @@ export const REHABILITATION = [
     name: 'Standing Hamstring Curl — Band',
     youtube: 'standing hamstring curl - band exercise technique',
     category: 'rehabilitation',
+    doors: [], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'subacute',
     activationTarget: 'hamstring',
@@ -1218,7 +1249,7 @@ export const REHABILITATION = [
       'Lower slowly — take 3 counts',
       'Complete 12 reps each side, 3 sets'
     ],
-    coaching: 'The slow lowering is doing most of the work. A 3-second lowering builds more strength than a fast one.',
+    coaching: 'Take about three seconds to lower — the lowering half builds strength too, and it is the half people rush.',
     why: 'Builds hamstring strength through functional range in a standing position — closer to how the hamstring works in sport and daily movement.',
         watchOut: [
       "If your standing hip drifts out sideways, put a hand on a wall and reset. Balance should not be the hard part here",
@@ -1238,6 +1269,7 @@ export const REHABILITATION = [
     generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'single-leg deadlift exercise technique',
     category: 'rehabilitation',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'maintenance',
     activationTarget: 'hamstring',
@@ -1265,7 +1297,7 @@ export const REHABILITATION = [
       'Complete 10 reps each side, 3 sets'
     ],
     coaching: 'Balance is hard at first — holding a wall lightly is fine. Build up to freestanding over time.',
-    why: 'Trains single-leg hamstring strength and balance together — essential for returning to running and any sport involving one-leg landing.',
+    why: 'Trains single-leg hamstring strength and balance together — useful when returning to running and any sport involving one-leg landing.',
         watchOut: [
       "If the raised hip rolls open toward the ceiling, you have gained range you have not earned. Keep both hips pointing at the floor",
       "If your back rounds to reach lower, stop higher. Depth is not the point",
@@ -1284,6 +1316,7 @@ export const REHABILITATION = [
     generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'hamstring 90-90 stretch exercise technique',
     category: 'rehabilitation',
+    doors: ['stretch'], feelings: [], style: 'stretch',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'subacute',
     activationTarget: 'hamstring',
@@ -1306,7 +1339,7 @@ export const REHABILITATION = [
       'Repeat 3 times each side'
     ],
     coaching: 'Round back means you are stretching your lower back, not your hamstring. Sit on a cushion if your back rounds immediately.',
-    why: 'Restores hamstring length with the hip in a position that closely mimics running — more functional than a lying hamstring stretch.',
+    why: 'Restores hamstring length with the hip in a position that closely mimics running.',
         watchOut: [
       "If your lower back is rounding, sit on a cushion and hinge from the hip instead. Reaching further with a rounded back is not more stretch",
       "If you are reaching with your hands, move your chest toward the leg instead. The hands are along for the ride",
@@ -1324,6 +1357,7 @@ export const REHABILITATION = [
     name: 'Hamstring Neural Flossing',
     youtube: 'hamstring neural flossing exercise technique',
     category: 'rehabilitation',
+    doors: [], feelings: [], style: 'stretch',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'subacute',
     activationTarget: 'hamstring',
@@ -1344,7 +1378,7 @@ export const REHABILITATION = [
       'Bend the knee back down and drop your chin',
       'Repeat this alternating movement rhythmically for 10 to 12 slow reps, then switch sides'
     ],
-    coaching: 'This is a neural mobilisation, not a muscle stretch. The rhythmic movement flushes the sciatic nerve — it should feel releasing, not painful.',
+    coaching: 'This is a nerve glide, not a muscle stretch: the nerve slides gently as you move. It should feel easy, not painful.',
     why: 'Hamstring tightness is often partly neural, not just muscular. Neural flossing addresses both and is particularly useful when the hamstring feels tight but not torn.',
         watchOut: [
       "If you are holding the end position, do not. One second and back — this is a pumping movement, not a stretch",
@@ -1365,6 +1399,7 @@ export const REHABILITATION = [
     generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'walking lunge - short stride exercise technique',
     category: 'rehabilitation',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'maintenance',
     activationTarget: 'hamstring',
@@ -1405,6 +1440,7 @@ export const REHABILITATION = [
     generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'copenhagen adductor exercise technique',
     category: 'rehabilitation',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'maintenance',
     activationTarget: 'hamstring',
@@ -1443,6 +1479,7 @@ export const REHABILITATION = [
     name: 'Towel Hamstring Curl',
     youtube: 'towel hamstring curl exercise technique',
     category: 'rehabilitation',
+    doors: [], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'subacute',
     activationTarget: 'hamstring',
@@ -1490,6 +1527,7 @@ export const REHABILITATION = [
     generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'seated calf raise exercise technique',
     category: 'rehabilitation',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'acute',
     activationTarget: 'calves',
@@ -1509,7 +1547,7 @@ export const REHABILITATION = [
       'Lower slowly — take 3 counts to come down',
       'Complete 3 sets of 15 reps'
     ],
-    coaching: 'The slow lowering is where most of the work happens. Let the heels come down slowly.',
+    coaching: 'Lower the heels slowly — that half counts too. Let the heels come down slowly.',
     why: 'A gentle starting point for calf work — sitting takes your body weight off while still working the muscle.',
         watchOut: [
       "If your heels come off the chair rather than your toes staying down, you are pushing your feet forward. Keep the balls of the feet planted",
@@ -1528,6 +1566,7 @@ export const REHABILITATION = [
     name: 'Eccentric Heel Drop',
     youtube: 'eccentric heel drop exercise technique',
     category: 'rehabilitation',
+    doors: [], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'subacute',
     activationTarget: 'calves',
@@ -1570,6 +1609,7 @@ export const REHABILITATION = [
     generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'single-leg calf raise exercise technique',
     category: 'rehabilitation',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'maintenance',
     activationTarget: 'calves',
@@ -1610,6 +1650,7 @@ export const REHABILITATION = [
     name: 'Achilles Heel Drop — Straight Knee',
     youtube: 'achilles heel drop - straight knee exercise technique',
     category: 'rehabilitation',
+    doors: [], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'subacute',
     activationTarget: 'calves',
@@ -1651,6 +1692,7 @@ export const REHABILITATION = [
     name: 'Achilles Heel Drop — Bent Knee',
     youtube: 'achilles heel drop - bent knee exercise technique',
     category: 'rehabilitation',
+    doors: [], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'subacute',
     activationTarget: 'calves',
@@ -1693,6 +1735,7 @@ export const REHABILITATION = [
     generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'standing calf stretch - wall exercise technique',
     category: 'rehabilitation',
+    doors: ['stretch'], feelings: [], style: 'stretch',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'subacute',
     activationTarget: 'calves',
@@ -1733,6 +1776,7 @@ export const REHABILITATION = [
     generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'soleus stretch - bent knee exercise technique',
     category: 'rehabilitation',
+    doors: ['stretch'], feelings: [], style: 'stretch',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'subacute',
     activationTarget: 'calves',
@@ -1753,7 +1797,7 @@ export const REHABILITATION = [
       'Hold for 30 seconds, then switch',
       'Repeat 3 times each side'
     ],
-    coaching: 'This feels different to the standard calf stretch — lower and tighter. That is the soleus. Both stretches are needed for full Achilles health.',
+    coaching: 'This feels different to the standard calf stretch — lower and tighter. That is the soleus. Doing both stretches reaches both calf muscles.',
     why: 'Stretches the soleus, which is commonly neglected. Tight soleus increases Achilles load during walking and running.',
         watchOut: [
       "If you feel it high in the calf rather than low near the ankle, bend the back knee more and step in closer",
@@ -1773,6 +1817,7 @@ export const REHABILITATION = [
     generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'ankle alphabet exercise technique',
     category: 'rehabilitation',
+    doors: ['stretch'], feelings: [], style: 'stretch',   // Stage PATH P-2
     contentType: 'activation',
     rehabPhase: 'acute',
     activationTarget: 'calves',
@@ -1791,7 +1836,7 @@ export const REHABILITATION = [
       'Move through the full range each letter allows',
       'Complete the full alphabet on the right, then switch to the left'
     ],
-    coaching: 'This looks simple but covers every direction your ankle moves. It is one of the best all-round ankle mobility exercises there is.',
+    coaching: 'This looks simple but covers every direction your ankle moves.',
     why: 'Moves the ankle round in every direction and trains your sense of where the joint is. No load goes through the ankle, so it is a gentle place to start.',
         watchOut: [
       "If your whole leg is swinging, rest the leg on something so only the foot can move",
@@ -1810,6 +1855,7 @@ export const REHABILITATION = [
     name: 'Banded Ankle Dorsiflexion',
     youtube: 'banded ankle dorsiflexion exercise technique',
     category: 'rehabilitation',
+    doors: [], feelings: [], style: 'stretch',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'subacute',
     activationTarget: 'calves',
@@ -1850,6 +1896,7 @@ export const REHABILITATION = [
     generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'calf foam roll exercise technique',
     category: 'rehabilitation',
+    doors: ['stretch'], feelings: [], style: 'stretch',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'subacute',
     activationTarget: 'calves',
@@ -1895,6 +1942,7 @@ export const REHABILITATION = [
     name: 'Terminal Knee Extension',
     youtube: 'terminal knee extension exercise technique',
     category: 'rehabilitation',
+    doors: [], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'subacute',
     activationTarget: 'knee',
@@ -1915,8 +1963,8 @@ export const REHABILITATION = [
       'Hold for 2 seconds, then slowly bend back to the start',
       'Complete 15 reps each side, 3 sets'
     ],
-    coaching: 'The squeeze at full extension activates the VMO — the teardrop-shaped muscle on the inner quad that stabilises the kneecap.',
-    why: 'Works the VMO — the inner part of the quad that controls the last part of straightening the knee.',
+    coaching: 'Squeeze the front of the thigh at full extension — that squeeze is the exercise.',
+    why: 'Works the quadriceps through the last part of straightening the knee.',
         watchOut: [
       "If your whole leg moves back, keep your foot planted and straighten only the knee",
       "If you are locking the knee hard at the end, squeeze the thigh instead. The last few degrees are the point, not the lock",
@@ -1934,6 +1982,7 @@ export const REHABILITATION = [
     name: 'VMO Squat',
     youtube: 'vmo squat exercise technique',
     category: 'rehabilitation',
+    doors: [], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'subacute',
     activationTarget: 'knee',
@@ -1954,8 +2003,8 @@ export const REHABILITATION = [
       'Drive through your heels to stand, squeezing the quads hard at the top',
       'Complete 3 sets of 12 reps'
     ],
-    coaching: 'The wide toe angle and outward knee push shifts load onto the VMO. This is not about depth — it is about the quad squeeze at the top.',
-    why: 'The turned-out foot position preferentially loads the VMO over the outer quad, helping to rebalance the forces acting on the kneecap.',
+    coaching: 'Push the knees out in line with the toes and squeeze the front of the thighs at the top. This is not about depth — it is about the quad squeeze at the top.',
+    why: 'A squat with the toes turned out and a squeeze of the thighs at the top, working the whole front of the thigh.',
         watchOut: [
       "If your knees fall inward, push them out over your little toes. That direction is the whole reason for this version",
       "If your heels lift, you have gone deeper than your ankles allow. Come up higher, or put a small book under your heels",
@@ -1973,6 +2022,7 @@ export const REHABILITATION = [
     name: 'Step-Down — Eccentric',
     youtube: 'step-down - eccentric exercise technique',
     category: 'rehabilitation',
+    doors: [], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'subacute',
     activationTarget: 'knee',
@@ -2014,6 +2064,7 @@ export const REHABILITATION = [
     generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'wall squat hold - isometric exercise technique',
     category: 'rehabilitation',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'acute',
     activationTarget: 'knee',
@@ -2055,6 +2106,7 @@ export const REHABILITATION = [
     generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'it band foam roll exercise technique',
     category: 'rehabilitation',
+    doors: ['stretch'], feelings: [], style: 'stretch',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'subacute',
     activationTarget: 'it-band',
@@ -2095,6 +2147,7 @@ export const REHABILITATION = [
     generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'lateral quad and it band stretch exercise technique',
     category: 'rehabilitation',
+    doors: ['stretch'], feelings: [], style: 'stretch',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'subacute',
     activationTarget: 'it-band',
@@ -2116,7 +2169,7 @@ export const REHABILITATION = [
       'Repeat 3 times each side'
     ],
     coaching: 'The further you lean the hips to the side, the deeper the stretch. Start gentle and increase over time.',
-    why: 'One of the few effective stretches for the lateral hip and IT band region. Complements foam rolling well.',
+    why: 'A stretch for the outside of the hip, which many people find eases the feeling of tightness there. Complements foam rolling well.',
         watchOut: [
       "If you feel it in your lower back rather than the outer thigh, shift your hips further sideways and lean less",
       "If you are twisting as you lean, keep your shoulders square and move only sideways",
@@ -2135,6 +2188,7 @@ export const REHABILITATION = [
     generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'tfl and hip flexor release exercise technique',
     category: 'rehabilitation',
+    doors: ['stretch'], feelings: [], style: 'stretch',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'subacute',
     activationTarget: 'it-band',
@@ -2156,7 +2210,7 @@ export const REHABILITATION = [
       'Repeat 3 times each side'
     ],
     coaching: 'The rotation is what makes this target the TFL. Without it, it is just a hip flexor stretch.',
-    why: 'Releases the TFL — the muscle at the top of the IT band that is often the true source of IT band tension.',
+    why: 'Releases the TFL — the muscle at the top of the IT band, which can add to the feeling of tightness down the outside of the thigh.',
         watchOut: [
       "If you feel it in your lower back, tuck your hips under before shifting forward. The tuck comes first",
       "If your front knee travels past your toes, step it further forward",
@@ -2174,6 +2228,7 @@ export const REHABILITATION = [
     name: 'Tibialis Anterior Raise',
     youtube: 'tibialis anterior raise exercise technique',
     category: 'rehabilitation',
+    doors: [], feelings: [], style: 'stretch',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'acute',
     activationTarget: 'shin-splints',
@@ -2195,7 +2250,7 @@ export const REHABILITATION = [
       'Progress to standing with back against wall once seated is easy'
     ],
     coaching: 'You will feel this in the muscle running along the outer shin. That is the muscle doing the work.',
-    why: 'Strengthens the tibialis anterior — the muscle most involved in shin splints. Directly addresses the source of the pain.',
+    why: 'Strengthens the tibialis anterior, the muscle at the front of the shin that lifts your toes and works hard when you walk and run.',
         watchOut: [
       "If your heels lift as your toes come up, press them down. Heels stay planted throughout",
       "If your shins burn quickly, that is the muscle working — but stop the set if it turns sharp",
@@ -2213,6 +2268,7 @@ export const REHABILITATION = [
     name: 'Shin Splint Calf Raise Progression',
     youtube: 'shin splint calf raise progression exercise technique',
     category: 'rehabilitation',
+    doors: [], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'subacute',
     activationTarget: 'shin-splints',
@@ -2234,7 +2290,7 @@ export const REHABILITATION = [
       'Rest at least 48 hours between sessions while your shins feel sore'
     ],
     coaching: 'This is a progression — only start it once the tibialis raise is pain-free. Do not push through sharp shin pain.',
-    why: 'Balances strength between the calf and tibialis anterior — the imbalance between these two muscles is a primary cause of shin splints.',
+    why: 'Builds strength in the calf and the front of the shin together.',
         watchOut: [
       "If you are rushing the two halves together, separate them: two counts up onto the toes, then a deliberate shift and pull the toes up",
       "If your shins ache during rather than working, shorten the range at the toe-raise end",
@@ -2254,6 +2310,7 @@ export const REHABILITATION = [
     generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'single-leg balance hold exercise technique',
     category: 'rehabilitation',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'activation',
     rehabPhase: 'subacute',
     activationTarget: 'knee',
@@ -2293,6 +2350,7 @@ export const REHABILITATION = [
     name: 'Patella Mobilisation',
     youtube: 'patella mobilisation exercise technique',
     category: 'rehabilitation',
+    doors: [], feelings: [], style: 'stretch',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'acute',
     activationTarget: 'knee',
@@ -2333,6 +2391,7 @@ export const REHABILITATION = [
     generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'y-balance reach exercise technique',
     category: 'rehabilitation',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'maintenance',
     activationTarget: 'knee',
@@ -2378,6 +2437,7 @@ export const REHABILITATION = [
     name: 'Pendulum Swing',
     youtube: 'pendulum swing exercise technique',
     category: 'rehabilitation',
+    doors: [], feelings: [], style: 'stretch',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'acute',
     activationTarget: 'shoulder',
@@ -2419,6 +2479,7 @@ export const REHABILITATION = [
     generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'external rotation - band exercise technique',
     category: 'rehabilitation',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'subacute',
     activationTarget: 'shoulder',
@@ -2459,6 +2520,7 @@ export const REHABILITATION = [
     generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'internal rotation - band exercise technique',
     category: 'rehabilitation',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'subacute',
     activationTarget: 'shoulder',
@@ -2479,7 +2541,7 @@ export const REHABILITATION = [
       'Complete 3 sets of 15 reps each side'
     ],
     coaching: 'Same rule as external rotation — elbow stays against your side. Doing both together works the rotator cuff evenly.',
-    why: 'Strengthens the subscapularis — the rotator cuff muscle on the front of the shoulder. Balance between internal and external rotation is critical for shoulder health.',
+    why: 'Strengthens the subscapularis — the rotator cuff muscle on the front of the shoulder. Working both rotations trains the rotator cuff evenly.',
         watchOut: [
       "If your elbow leaves your side, tuck a rolled towel there and keep hold of it",
       "If you are leaning away from the anchor to gain range, stand square and use a lighter band",
@@ -2498,6 +2560,7 @@ export const REHABILITATION = [
     generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'wall slide exercise technique',
     category: 'rehabilitation',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'subacute',
     activationTarget: 'shoulder',
@@ -2539,6 +2602,7 @@ export const REHABILITATION = [
     generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'shoulder cars exercise technique',
     category: 'rehabilitation',
+    doors: ['stretch'], feelings: [], style: 'stretch',   // Stage PATH P-2
     contentType: 'activation',
     rehabPhase: 'maintenance',
     activationTarget: 'shoulder',
@@ -2580,6 +2644,7 @@ export const REHABILITATION = [
     generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'prone y-t-w exercise technique',
     category: 'rehabilitation',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'subacute',
     activationTarget: 'shoulder',
@@ -2621,6 +2686,7 @@ export const REHABILITATION = [
     generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'scapular press-up exercise technique',
     category: 'rehabilitation',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'activation',
     rehabPhase: 'subacute',
     activationTarget: 'shoulder',
@@ -2662,6 +2728,7 @@ export const REHABILITATION = [
     generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'doorway chest stretch exercise technique',
     category: 'rehabilitation',
+    doors: ['stretch'], feelings: [], style: 'stretch',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'subacute',
     activationTarget: 'shoulder',
@@ -2683,7 +2750,7 @@ export const REHABILITATION = [
       'Repeat 3 times'
     ],
     coaching: 'Lean forward slowly — do not throw yourself into the stretch. A gentle sustained pull works better than a hard fast one.',
-    why: 'Releases pec minor tightness that pulls the shoulder blade forward — one of the most common postural problems from sitting and screen use.',
+    why: 'Stretches the chest, including the small pec minor, which can draw the shoulder blade forward.',
         watchOut: [
       "If you feel it in the front of your shoulder joint rather than across the chest, lower your arms and try again — high positions pinch some shoulders",
       "If your lower back arches as you lean, tuck your ribs down and lean less",
@@ -2702,6 +2769,7 @@ export const REHABILITATION = [
     generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'wrist cars exercise technique',
     category: 'rehabilitation',
+    doors: ['stretch'], feelings: [], style: 'stretch',   // Stage PATH P-2
     contentType: 'activation',
     rehabPhase: 'acute',
     activationTarget: 'wrist-elbow',
@@ -2722,7 +2790,7 @@ export const REHABILITATION = [
       'Complete 5 circles clockwise and 5 anticlockwise each side'
     ],
     coaching: 'This is a daily maintenance exercise — two minutes a day keeps the wrists moving well.',
-    why: 'Maintains wrist joint health and range of motion. Particularly useful for anyone who types, uses a mouse, or does press-ups regularly.',
+    why: 'Keeps the wrists moving through the range they have. Particularly useful for anyone who types, uses a mouse, or does press-ups regularly.',
         watchOut: [
       "If your forearm is rotating, hold it still with your other hand so only the wrist moves",
       "If the circle has flat sections, that is where the range runs out. Go slowly through those rather than skipping them",
@@ -2741,6 +2809,7 @@ export const REHABILITATION = [
     generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'wrist extension stretch exercise technique',
     category: 'rehabilitation',
+    doors: ['stretch'], feelings: [], style: 'stretch',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'subacute',
     activationTarget: 'wrist-elbow',
@@ -2781,6 +2850,7 @@ export const REHABILITATION = [
     generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'forearm pronation and supination exercise technique',
     category: 'rehabilitation',
+    doors: ['stretch'], feelings: [], style: 'stretch',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'subacute',
     activationTarget: 'wrist-elbow',
@@ -2821,6 +2891,7 @@ export const REHABILITATION = [
     generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'grip strengthening - towel squeeze exercise technique',
     category: 'rehabilitation',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'subacute',
     activationTarget: 'wrist-elbow',
@@ -2868,6 +2939,7 @@ export const REHABILITATION = [
     generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'pelvic tilt exercise technique',
     category: 'rehabilitation',
+    doors: ['stretch'], feelings: [], style: 'stretch',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'acute',
     activationTarget: 'lower-back',
@@ -2920,6 +2992,7 @@ export const REHABILITATION = [
     generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'diaphragmatic breathing - core activation exercise technique',
     category: 'rehabilitation',
+    doors: [], feelings: [], style: 'gentle',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'acute',
     activationTarget: 'abdominals',
@@ -2972,6 +3045,7 @@ export const REHABILITATION = [
     generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'dead bug - progression 1 exercise technique',
     category: 'rehabilitation',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'subacute',
     activationTarget: 'abdominals',
@@ -2993,7 +3067,7 @@ export const REHABILITATION = [
       'Complete 8 reps each side, 3 sets'
     ],
     coaching: 'Arms only to start. The lower back staying flat is everything — reduce the range if it lifts.',
-    why: 'Trains the anti-extension function of the core — the most important job the abs do in protecting the spine.',
+    why: 'Trains the anti-extension function of the core — one of the main jobs of the abdominal muscles: stopping the lower back arching.',
         watchOut: [
       "If your lower back lifts away from the floor, you have gone too far. Stop the arm higher and keep the back down",
       "If you cannot tell whether your back is lifting, slide a hand underneath it. You should feel steady pressure the whole time",
@@ -3023,6 +3097,7 @@ export const REHABILITATION = [
     generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'dead bug - progression 2 exercise technique',
     category: 'rehabilitation',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'subacute',
     activationTarget: 'abdominals',
@@ -3063,6 +3138,7 @@ export const REHABILITATION = [
     generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'dead bug - progression 3 exercise technique',
     category: 'rehabilitation',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'maintenance',
     activationTarget: 'abdominals',
@@ -3120,6 +3196,7 @@ export const REHABILITATION = [
     
     youtube: 'bird dog core exercise technique',
     category: 'rehabilitation',
+    doors: [], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'subacute',
     activationTarget: 'lower-back',
@@ -3172,6 +3249,7 @@ export const REHABILITATION = [
     name: 'McKenzie Press-Up',
     youtube: 'mckenzie press-up exercise technique',
     category: 'rehabilitation',
+    doors: [], feelings: [], style: 'stretch',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'subacute',
     activationTarget: 'lower-back',
@@ -3213,6 +3291,7 @@ export const REHABILITATION = [
     name: 'Sciatic Neural Flossing',
     youtube: 'sciatic neural flossing exercise technique',
     category: 'rehabilitation',
+    doors: [], feelings: [], style: 'stretch',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'subacute',
     activationTarget: 'sciatica',
@@ -3235,7 +3314,7 @@ export const REHABILITATION = [
       'Complete 10 to 12 slow reps each side'
     ],
     coaching: 'Neural flossing should never cause sharp pain down the leg. A gentle pulling sensation is expected. If it causes sharp pain, stop.',
-    why: 'Mobilises the sciatic nerve by creating a pumping action that reduces inflammation and adhesions along the nerve path.',
+    why: 'A gentle nerve glide: the sciatic nerve slides back and forth as you move the knee and head together.',
         watchOut: [
       "If you are pulling into a sustained hamstring stretch, ease off. This is a slow, smooth glide and never a stretch",
       "As your knee straightens, look up at the ceiling at the same time; as it bends, drop your chin. Keep the range small and completely pain-free",
@@ -3255,6 +3334,7 @@ export const REHABILITATION = [
     generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'seated lumbar rotation exercise technique',
     category: 'rehabilitation',
+    doors: ['stretch'], feelings: [], style: 'stretch',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'acute',
     activationTarget: 'lower-back',
@@ -3296,6 +3376,7 @@ export const REHABILITATION = [
     generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'ql stretch - side bend exercise technique',
     category: 'rehabilitation',
+    doors: ['stretch'], feelings: [], style: 'stretch',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'subacute',
     activationTarget: 'lower-back',
@@ -3318,7 +3399,7 @@ export const REHABILITATION = [
       'Repeat 3 times each side'
     ],
     coaching: 'Keep your hips level — they want to shift as you lean. Resist that to get the stretch in the right place.',
-    why: 'Stretches the quadratus lumborum — the deep lower back muscle that is one of the most common sources of lower back tightness and pain.',
+    why: 'Stretches the quadratus lumborum — a deep lower back muscle that can feel tight after long periods standing or sitting.',
         watchOut: [
       "If you are leaning forward or twisting as you bend, work with your back against a wall so you can feel yourself staying in one plane",
       "If your hips slide out to the side, keep them square and bend less",
@@ -3342,6 +3423,7 @@ export const REHABILITATION = [
     generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'mcgill curl-up exercise technique',
     category: 'rehabilitation',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'subacute',
     activationTarget: 'abdominals',
@@ -3362,7 +3444,7 @@ export const REHABILITATION = [
       'Hold for 10 seconds, then lower',
       'Complete 3 sets of 5 reps'
     ],
-    coaching: 'The hands under the back are not for comfort — they hold the natural spinal curve that protects the discs. Without them, this becomes a harmful crunch.',
+    coaching: 'The hands under the back are not for comfort — they keep the natural curve in your lower back, which is how this exercise is meant to be done.',
     why: 'Developed by spine researcher Stuart McGill — works the front of the abdominals while the spine stays in a neutral position. A gentler option than sit-ups or crunches for many people.',
         watchOut: [
       "If your lower back flattens into the floor, you have lost the point of it. Keep your hands underneath and keep the natural arch there",
@@ -3393,6 +3475,7 @@ export const REHABILITATION = [
     generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'side plank - modified exercise technique',
     category: 'rehabilitation',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'subacute',
     activationTarget: 'abdominals',
@@ -3459,6 +3542,7 @@ export const REHABILITATION = [
     name: 'Pelvic Floor Contraction — Basic',
     youtube: 'pelvic floor contraction - basic exercise technique',
     category: 'rehabilitation',
+    doors: [], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'acute',
     activationTarget: 'pelvic-floor',
@@ -3499,6 +3583,7 @@ export const REHABILITATION = [
     name: 'Pelvic Floor Quick Flicks',
     youtube: 'pelvic floor quick flicks exercise technique',
     category: 'rehabilitation',
+    doors: [], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'subacute',
     activationTarget: 'pelvic-floor',
@@ -3539,6 +3624,7 @@ export const REHABILITATION = [
     name: 'Glute Bridge with Pelvic Floor',
     youtube: 'glute bridge with pelvic floor exercise technique',
     category: 'rehabilitation',
+    doors: [], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'subacute',
     activationTarget: 'pelvic-floor',
@@ -3579,6 +3665,7 @@ export const REHABILITATION = [
     name: 'Squat with Pelvic Floor Awareness',
     youtube: 'squat with pelvic floor awareness exercise technique',
     category: 'rehabilitation',
+    doors: [], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'maintenance',
     activationTarget: 'pelvic-floor',
@@ -3626,6 +3713,7 @@ export const REHABILITATION = [
     name: 'Joint Position Awareness',
     youtube: 'joint position awareness exercise technique',
     category: 'rehabilitation',
+    doors: [], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'acute',
     activationTarget: 'hypermobility',
@@ -3665,6 +3753,7 @@ export const REHABILITATION = [
     name: 'Knee Stability — Soft Knee Hold',
     youtube: 'knee stability - soft knee hold exercise technique',
     category: 'rehabilitation',
+    doors: [], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'acute',
     activationTarget: 'hypermobility',
@@ -3686,7 +3775,7 @@ export const REHABILITATION = [
       'Repeat 5 times each side'
     ],
     coaching: 'This tiny bend is doing a lot. Locking the knee out is easy — holding it slightly bent with muscle takes real work, especially if your joints bend further than most.',
-    why: 'Trains the quads to actively stabilise the knee rather than relying on the ligaments. Reduces knee hyperextension, pain, and instability.',
+    why: 'Trains the thigh muscles to hold the knee in a slight bend instead of resting back into the joint.',
         watchOut: [
       "If the knee keeps snapping back to locked, you are relaxing the thigh. Keep a light squeeze the whole time",
       "If you cannot tell whether it is locked, put a hand on the front of the thigh — it should feel firm, not soft",
@@ -3705,6 +3794,7 @@ export const REHABILITATION = [
     generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'shoulder packing exercise technique',
     category: 'rehabilitation',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'activation',
     rehabPhase: 'acute',
     activationTarget: 'hypermobility',
@@ -3745,6 +3835,7 @@ export const REHABILITATION = [
     generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'hip stability in standing exercise technique',
     category: 'rehabilitation',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'rehabilitation',
     rehabPhase: 'subacute',
     activationTarget: 'hypermobility',
@@ -3789,6 +3880,7 @@ export const REHABILITATION = [
     name: 'Knee Terminal Extension',
     youtube: 'knee terminal extension exercise technique',
     category: 'rehabilitation',
+    doors: [], feelings: [], style: 'stretch',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'extension',
     rehabPhase: 'subacute',
@@ -3808,7 +3900,7 @@ export const REHABILITATION = [
       'Return to slight bend slowly',
       'Complete 3 sets of 15 reps each side'
     ],
-    coaching: 'Terminal extension targets the VMO — the inner quad muscle that controls the last part of straightening the knee and keeps it steady.',
+    coaching: 'Terminal extension works the quadriceps through the last part of straightening the knee.',
     why: 'Builds strength in the final part of straightening the knee, without loading the joint in a deep bend.',
         watchOut: [
       "If your whole leg moves back, keep your foot planted and straighten only the knee",
@@ -3828,6 +3920,7 @@ export const REHABILITATION = [
     generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'y-t-w exercise technique',
     category: 'rehabilitation',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'pull',
     rehabPhase: 'subacute',
@@ -3848,7 +3941,7 @@ export const REHABILITATION = [
       'Use a very light weight or no weight to start',
       'Complete 3 sets of each'
     ],
-    coaching: 'The Y-T-W directly targets the lower and middle trapezius — muscles almost universally undertrained and responsible for shoulder stability.',
+    coaching: 'The Y-T-W directly targets the lower and middle trapezius — muscles that help steady the shoulder blade and often get little work.',
     why: 'Raising the arms in a Y, T and W shape trains the muscles that control the shoulder blades. Good for posture and shoulder steadiness.',
         watchOut: [
       "If your head lifts and your neck strains, rest your forehead down and leave it there",
@@ -3868,6 +3961,7 @@ export const REHABILITATION = [
     name: 'Ankle Proprioception Progression',
     youtube: 'ankle proprioception progression exercise technique',
     category: 'rehabilitation',
+    doors: [], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'balance',
     rehabPhase: 'subacute',
@@ -3907,6 +4001,7 @@ export const REHABILITATION = [
     name: 'Wrist Flexion-Extension Strengthening',
     youtube: 'wrist flexion-extension strengthening exercise technique',
     category: 'rehabilitation',
+    doors: [], feelings: [], style: 'stretch',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'joint-rotation',
     rehabPhase: 'subacute',
@@ -3946,6 +4041,7 @@ export const REHABILITATION = [
     name: 'Deep Cervical Flexor Activation',
     youtube: 'deep cervical flexor activation exercise technique',
     category: 'rehabilitation',
+    doors: [], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'isometric',
     rehabPhase: 'acute',
@@ -3987,6 +4083,7 @@ export const REHABILITATION = [
     generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'hip flexor strengthening exercise technique',
     category: 'rehabilitation',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'hip-rotation',
     rehabPhase: 'subacute',
@@ -4007,7 +4104,7 @@ export const REHABILITATION = [
       'Complete 3 sets of 15 reps each side'
     ],
     coaching: 'Hip flexor strength is often overlooked. These muscles matter for walking, climbing stairs and running.',
-    why: 'Hip flexor strength — not just flexibility — is essential for healthy hip mechanics. Weakness leads to compensatory patterns that drive knee, hip, and lower back pain.',
+    why: 'Hip flexor strength, not just flexibility, matters for walking, climbing stairs and running.',
         watchOut: [
       "If your back arches as the knee comes up, tuck your ribs down and lift the knee lower",
       "If you are leaning back to lift higher, stand tall and take less height",
@@ -4026,6 +4123,7 @@ export const REHABILITATION = [
     generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'lateral hip strengthening progression exercise technique',
     category: 'rehabilitation',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'hip-rotation',
     rehabPhase: 'subacute',
@@ -4047,7 +4145,7 @@ export const REHABILITATION = [
       'Progress through phases as each becomes easy',
       'Add a resistance band around the knees for additional load'
     ],
-    coaching: 'Lateral hip strength is the foundation of lower limb health — it affects knee alignment, IT band tension, and lower back stability all at once.',
+    coaching: 'Lateral hip strength helps keep the knee in line when you stand on one leg.',
     why: 'Strengthens the side of the hip, which steadies the pelvis and knee with every step. A single series that works the whole lateral hip.',
         watchOut: [
       "If your form falls apart partway through, stop there rather than finishing the numbers. The last exercise is the hardest and comes when the others are tired on purpose",
@@ -4067,6 +4165,7 @@ export const REHABILITATION = [
     generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'thoracic mobility exercise technique',
     category: 'rehabilitation',
+    doors: ['stretch'], feelings: [], style: 'stretch',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'extension',
     rehabPhase: 'subacute',
@@ -4107,6 +4206,7 @@ export const REHABILITATION = [
     name: 'Breathing Retraining',
     youtube: 'diaphragmatic breathing retraining technique',
     category: 'rehabilitation',
+    doors: [], feelings: [], style: 'gentle',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'breath-awareness',
     rehabPhase: 'acute',
@@ -4148,6 +4248,7 @@ export const REHABILITATION = [
     name: 'Neural Flossing — Sciatic Nerve',
     youtube: 'neural flossing - sciatic nerve exercise technique',
     category: 'rehabilitation',
+    doors: [], feelings: [], style: 'stretch',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'extension',
     rehabPhase: 'subacute',

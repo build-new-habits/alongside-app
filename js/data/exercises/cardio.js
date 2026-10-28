@@ -1,5 +1,12 @@
 /**
  * data/exercises/cardio.js
+ * 28 Oct 2026 v10
+ * v10 - STAGE PATH P-2 and P-9b (Session 2). Every entry carries doors,
+ *   feelings and style (blueprint C5; tools/verify-path-tags.mjs). Why and
+ *   coaching lines that were not accurate are corrected, keeping what is
+ *   true (Graeme, 28 Oct: "If they are not, then change them"); each change
+ *   and its source: BNH-Files Product/alongside_library_accuracy_28oct2026_v1.md.
+ *
  * 19 Oct 2026 v9
  * v9 - A-6/WEB-CLAIMS: no line says an exercise burns calories (the app never counts them); jumping rope and Nordic walking reworded.
  *
@@ -70,6 +77,7 @@ export const CARDIO = [
     name: 'Jumping Jacks',
     youtube: 'jumping jacks exercise technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'locomotion',
     equipment: [],
     equipmentOptional: [],
@@ -105,6 +113,7 @@ export const CARDIO = [
     name: 'High Knees',
     youtube: 'high knees exercise technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'locomotion',
     equipment: [],
     equipmentOptional: [],
@@ -121,7 +130,7 @@ export const CARDIO = [
       'Keep your core tight and chest up',
       'Aim for 30 seconds at a pace that challenges you'
     ],
-    coaching: 'Slow it down if needed - marching high knees is just as effective as running them.',
+    coaching: 'Slow it down if needed - marching high knees still counts, at a gentler pace.',
     why: 'Builds cardiovascular fitness and hip flexor strength simultaneously.',
         watchOut: [
       'Leaning back to get the knees higher, which loads the lower back',
@@ -140,6 +149,7 @@ export const CARDIO = [
     name: 'Mountain Climbers',
     youtube: 'mountain climbers exercise technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'anti-extension',
     equipment: [],
     equipmentOptional: ['yoga-mat'],
@@ -175,6 +185,7 @@ export const CARDIO = [
     name: 'Burpee',
     youtube: 'burpee exercise technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'locomotion',
     equipment: [],
     equipmentOptional: [],
@@ -213,6 +224,7 @@ export const CARDIO = [
     name: 'Squat Jumps',
     youtube: 'squat jumps exercise technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'jump',
     equipment: [],
     equipmentOptional: [],
@@ -248,6 +260,7 @@ export const CARDIO = [
     name: 'Skipping',
     youtube: 'skipping exercise technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'locomotion',
     equipment: ['skipping-rope'],
     equipmentOptional: [],
@@ -265,7 +278,7 @@ export const CARDIO = [
       'Start with 30 seconds on, 30 rest — build to longer sets over time'
     ],
     coaching: 'It takes a few sessions to get the rhythm. If you miss, just restart immediately.',
-    why: 'One of the most efficient cardio exercises — improves coordination and fitness in very little time.',
+    why: 'An efficient cardio exercise — improves coordination and fitness in very little time.',
         watchOut: [
       'Jumping far higher than the rope needs',
       'Landing flat-footed and heavily',
@@ -288,6 +301,7 @@ export const CARDIO = [
     name: 'Marching on the Spot',
     youtube: 'marching on the spot exercise technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'locomotion',
     equipment: [],
     equipmentOptional: [],
@@ -323,6 +337,7 @@ export const CARDIO = [
     name: 'Step Touch',
     youtube: 'step touch exercise technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'locomotion',
     equipment: [],
     equipmentOptional: [],
@@ -358,6 +373,7 @@ export const CARDIO = [
     name: 'Stair Climbing',
     youtube: 'stair climbing exercise technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'locomotion',
     equipment: [],
     equipmentOptional: [],
@@ -393,6 +409,7 @@ export const CARDIO = [
     name: 'Shadow Boxing',
     youtube: 'shadow boxing exercise technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'locomotion',
     equipment: [],
     equipmentOptional: [],
@@ -428,6 +445,7 @@ export const CARDIO = [
     name: 'Steady Cycling',
     youtube: 'steady cycling exercise technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'locomotion',
     equipment: ['bicycle'],
     equipmentOptional: ['exercise-bike'],
@@ -463,6 +481,7 @@ export const CARDIO = [
     name: 'Brisk Walk',
     youtube: 'brisk walk exercise technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'locomotion',
     equipment: [],
     equipmentOptional: [],
@@ -499,6 +518,7 @@ export const CARDIO = [
     name: 'Freestyle Dance',
     youtube: 'freestyle dance exercise technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'locomotion',
     equipment: [],
     equipmentOptional: [],
@@ -534,6 +554,7 @@ export const CARDIO = [
     name: 'HIIT — 30:30 Intervals',
     youtube: 'hiit - 3030 intervals exercise technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'locomotion',
     equipment: [],
     equipmentOptional: [],
@@ -570,6 +591,7 @@ export const CARDIO = [
     name: 'Rowing Machine — Steady State',
     youtube: 'rowing machine - steady state exercise technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'locomotion',
     equipment: ['rowing-machine'],
     equipmentOptional: [],
@@ -586,8 +608,8 @@ export const CARDIO = [
       'Row at a pace of 22 to 26 strokes per minute',
       'Continue for 20 minutes'
     ],
-    coaching: 'The legs do 60% of the work, the back 30%, the arms 10%. Most beginners reverse this and wonder why their back hurts.',
-    why: 'The rowing machine is one of the most complete cardiovascular exercises — the only machine that works both the upper and lower body through a full range.',
+    coaching: 'The legs drive first, then the body swings back and the arms finish. Most beginners pull with the arms too early, which can leave the back aching.',
+    why: 'The rowing machine is one of the few machines that works the upper and lower body together through a long range.',
         watchOut: [
       'Pulling with the arms before the legs have finished driving',
       'Rounding the back as you reach forward',
@@ -605,6 +627,7 @@ export const CARDIO = [
     name: 'Walk-Run Intervals',
     youtube: 'walk-run intervals exercise technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'locomotion',
     equipment: [],
     equipmentOptional: [],
@@ -622,7 +645,7 @@ export const CARDIO = [
       'Cool down with 5 minutes of walking'
     ],
     coaching: 'The walking intervals are not failure — they are the whole point. This method builds running fitness while managing load on the joints.',
-    why: 'The walk-run method is the safest and most evidence-backed approach for building running fitness from scratch or returning after a break.',
+    why: 'The walk-run method is a widely used, gradual way to build running fitness from scratch or after a break.',
         watchOut: [
       'Running the first intervals too fast to complete the last ones',
       'Stopping dead during the walk portions',
@@ -645,6 +668,7 @@ export const CARDIO = [
     name: 'Easy Row — 20 Minutes',
     youtube: 'easy row - 20 minutes exercise technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     equipment: ['rowing-machine'],
@@ -664,7 +688,7 @@ export const CARDIO = [
       'Aim for 24 to 26 strokes per minute'
     ],
     coaching: 'Most beginners use too much arm and back and not enough leg. Think of the drive sequence as a leg press — the arms and back finish the stroke.',
-    why: 'Rowing is a full-body aerobic exercise that builds both cardiovascular fitness and upper body endurance. Non-impact — excellent for people managing lower body injuries.',
+    why: 'Rowing is a full-body aerobic exercise that builds both cardiovascular fitness and upper body endurance. Non-impact, which many people find comfortable on days running does not suit their legs.',
         watchOut: [
       'Arms pulling before the legs drive',
       'Rounding the back at the front of the stroke',
@@ -682,6 +706,7 @@ export const CARDIO = [
     name: 'Rowing Intervals — 500m',
     youtube: 'rowing intervals - 500m exercise technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     equipment: ['rowing-machine'],
@@ -719,6 +744,7 @@ export const CARDIO = [
     name: 'Assault Bike — Interval Session',
     youtube: 'assault bike - interval session exercise technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     equipment: ['exercise-bike'],
@@ -756,6 +782,7 @@ export const CARDIO = [
     name: 'Jump Rope — Conditioning',
     youtube: 'jump rope - conditioning exercise technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     equipment: ['jump-rope'],
@@ -774,7 +801,7 @@ export const CARDIO = [
       'Progress to double-unders or crossovers as skill develops'
     ],
     coaching: 'Jump rope requires patience in the learning phase — missing is inevitable at first. A consistent rhythm at slow speed builds the skill that allows faster skipping.',
-    why: 'Jump rope develops coordination, calf strength, ankle stability, and cardiovascular fitness simultaneously. Used by boxing coaches as one of the most complete single conditioning tools available.',
+    why: 'Jump rope develops coordination, calf strength, ankle stability, and cardiovascular fitness simultaneously. A staple of boxing training.',
         watchOut: [
       'Jumping higher than the rope requires',
       'Landing heavily and flat-footed',
@@ -792,6 +819,7 @@ export const CARDIO = [
     name: 'Dance Fitness — Freestyle',
     youtube: 'dance fitness - freestyle exercise technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     equipment: [],
@@ -809,8 +837,8 @@ export const CARDIO = [
       'Let the music set the intensity — fast songs, higher intensity',
       'Allow yourself to look ridiculous'
     ],
-    coaching: 'Dance fitness has one significant advantage over all other cardio: people actually enjoy it. Enjoyment drives consistency. Consistency drives outcomes.',
-    why: 'Dance provides equivalent cardiovascular benefit to moderate-intensity exercise while producing significantly higher rates of mood improvement and long-term adherence than conventional cardio.',
+    coaching: 'Dance has one big thing going for it: many people enjoy it. Enjoyment drives consistency. Consistency drives outcomes.',
+    why: 'Dance gives a similar heart and lung workout to other moderate exercise, and many people find it lifts their mood and is easier to keep doing because they enjoy it.',
         watchOut: [
       'Pushing through a twinge rather than changing the movement',
       'Repeated jumping on a hard floor',
@@ -828,6 +856,7 @@ export const CARDIO = [
     name: 'Cardio Circuit — No Equipment',
     youtube: 'cardio circuit - no equipment exercise technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     equipment: [],
@@ -867,6 +896,7 @@ export const CARDIO = [
     name: 'Nordic Walking',
     youtube: 'nordic walking exercise technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     equipment: ['nordic-walking-poles'],
@@ -885,7 +915,7 @@ export const CARDIO = [
       'Walk for 30 minutes at a brisk pace'
     ],
     coaching: 'Nordic walking looks unusual, but the poles bring the arms and upper body into every step, so it works more of you than walking at the same pace.',
-    why: 'Nordic walking engages the upper body through active pole planting, increasing caloric expenditure by 20 to 40% compared to regular walking while reducing knee joint load.',
+    why: 'Nordic walking brings the upper body in through the poles, which raises the energy used compared with walking at the same pace.',
         watchOut: [
       'Planting the poles too far forward, which becomes braking rather than propulsion',
       'Gripping the poles tightly rather than letting the straps take the work',
@@ -903,6 +933,7 @@ export const CARDIO = [
     name: 'HIIT — 20 Minute Session',
     youtube: 'hiit - 20 minute session exercise technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     equipment: [],
@@ -921,7 +952,7 @@ export const CARDIO = [
       'Cool down: 2 minutes easy walking',
       'Use a different exercise each round if possible'
     ],
-    coaching: 'HIIT only works if the work intervals are genuinely hard. Going at 70% effort during HIIT produces 70% of the benefit — and you might as well do steady-state cardio instead.',
+    coaching: 'HIIT works when the work intervals are genuinely hard. If they are not, steady cardio may suit you better that day.',
     why: 'HIIT produces cardiovascular adaptations equivalent to much longer steady-state sessions in a fraction of the time. Among the most time-efficient training formats available.',
         watchOut: [
       'Treating every interval as maximal, which means the last ones are not',
@@ -945,6 +976,7 @@ export const CARDIO = [
     name: 'Stationary Bike — Easy Spin',
     youtube: 'stationary bike warm up before weights',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'locomotion',
     equipment: ['exercise-bike'],
     equipmentOptional: [],
@@ -982,6 +1014,7 @@ export const CARDIO = [
     name: 'Treadmill — Easy Walk',
     youtube: 'treadmill walk warm up before gym',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'locomotion',
     equipment: ['treadmill'],
     equipmentOptional: [],
@@ -1019,6 +1052,7 @@ export const CARDIO = [
     name: 'Cross Trainer — Easy Pace',
     youtube: 'cross trainer elliptical warm up',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'locomotion',
     equipment: ['elliptical'],
     equipmentOptional: [],
@@ -1056,6 +1090,7 @@ export const CARDIO = [
     name: 'Rowing Machine — Easy Technique',
     youtube: 'rowing machine technique warm up',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'locomotion',
     equipment: ['rowing-machine'],
     equipmentOptional: [],
@@ -1076,7 +1111,7 @@ export const CARDIO = [
       'Row at an easy pace for four minutes, thinking about the sequence rather than the speed'
     ],
     coaching: 'Legs first, arms last. Almost everyone pulls with the arms too early, and the order is what makes rowing feel powerful instead of awkward.',
-    why: 'Warms the whole back of the body at once — calves, hamstrings, glutes, back and shoulders — which is more than any other machine gives you in four minutes.',
+    why: 'Warms the whole back of the body at once — calves, hamstrings, glutes, back and shoulders.',
     watchOut: [
       'Pulling with the arms before the legs have finished driving, which is the most common rowing habit and the least efficient',
       'Rounding the back as you reach forward — hinge from the hips and keep the chest open',
@@ -1098,6 +1133,7 @@ export const CARDIO = [
     name: 'Step Jacks',
     youtube: 'low impact step jacks exercise',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'locomotion',
     equipment: [],
     equipmentOptional: [],
@@ -1133,6 +1169,7 @@ export const CARDIO = [
     name: 'Skater Steps',
     youtube: 'low impact skater steps exercise',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'locomotion',
     equipment: [],
     equipmentOptional: [],
@@ -1168,6 +1205,7 @@ export const CARDIO = [
     name: 'Standing Cross-Body Knee Drive',
     youtube: 'standing cross body knee to elbow exercise',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'locomotion',
     equipment: [],
     equipmentOptional: [],
@@ -1203,6 +1241,7 @@ export const CARDIO = [
     name: 'Squat to Overhead Reach',
     youtube: 'squat to overhead reach low impact cardio',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'locomotion',
     equipment: [],
     equipmentOptional: [],
@@ -1238,6 +1277,7 @@ export const CARDIO = [
     name: 'Step-Back Burpee',
     youtube: 'step back burpee no jump',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'locomotion',
     equipment: [],
     equipmentOptional: [],
@@ -1273,6 +1313,7 @@ export const CARDIO = [
     name: 'Band Punches',
     youtube: 'resistance band punches cardio',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'locomotion',
     equipment: ['resistance-band'],
     equipmentOptional: [],
@@ -1308,6 +1349,7 @@ export const CARDIO = [
     name: 'Quiet Cardio Circuit — No Jumping',
     youtube: 'low impact no jumping cardio workout apartment',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     equipment: [],

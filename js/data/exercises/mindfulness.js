@@ -1,5 +1,12 @@
 /**
  * data/exercises/mindfulness.js
+ * 28 Oct 2026 v3
+ * v3 - STAGE PATH P-2 and P-9b (Session 2). Every entry carries doors,
+ *   feelings and style (blueprint C5; tools/verify-path-tags.mjs). Why and
+ *   coaching lines that were not accurate are corrected, keeping what is
+ *   true (Graeme, 28 Oct: "If they are not, then change them"); each change
+ *   and its source: BNH-Files Product/alongside_library_accuracy_28oct2026_v1.md.
+ *
  * 29 Sep 2026 v2
  *
  * v2 - P0h. Descriptions say what a movement does, not what it treats:
@@ -37,6 +44,7 @@ export const MINDFULNESS = [
     name: 'Breath Awareness Meditation',
     youtube: 'breath awareness meditation guided meditation',
     category: 'mindfulness',
+    doors: ['feel'], feelings: ['ground', 'calm'], style: 'gentle',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'breath-awareness',
     equipment: [],
@@ -74,6 +82,7 @@ export const MINDFULNESS = [
     name: 'Body Scan — Short',
     youtube: 'body scan - short guided practice',
     category: 'mindfulness',
+    doors: [], feelings: [], style: 'gentle',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'body-scan',
     equipment: [],
@@ -112,6 +121,7 @@ export const MINDFULNESS = [
     name: 'Loving-Kindness — Short',
     youtube: 'loving-kindness - short guided practice',
     category: 'mindfulness',
+    doors: [], feelings: [], style: 'gentle',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'visualisation',
     equipment: [],
@@ -149,6 +159,7 @@ export const MINDFULNESS = [
     name: '5-4-3-2-1 Grounding',
     youtube: '5-4-3-2-1 grounding guided practice',
     category: 'mindfulness',
+    doors: ['feel'], feelings: ['ground'], style: 'gentle',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'grounding',
     equipment: [],
@@ -186,6 +197,7 @@ export const MINDFULNESS = [
     name: 'Progressive Muscle Relaxation',
     youtube: 'progressive muscle relaxation guided practice',
     category: 'mindfulness',
+    doors: [], feelings: [], style: 'gentle',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'body-scan',
     equipment: [],
@@ -223,6 +235,7 @@ export const MINDFULNESS = [
     name: 'Open Awareness Meditation',
     youtube: 'open awareness meditation guided meditation',
     category: 'mindfulness',
+    doors: [], feelings: [], style: 'gentle',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'breath-awareness',
     equipment: [],
@@ -241,7 +254,7 @@ export const MINDFULNESS = [
       'Continue for 10 minutes'
     ],
     coaching: 'This is harder than breath focus for most beginners. If the mind is very active, return to breath awareness first.',
-    why: 'Open monitoring meditation builds metacognitive awareness — the ability to observe thoughts without being swept up in them. Reduces rumination.',
+    why: 'Open monitoring meditation builds metacognitive awareness — the ability to observe thoughts without being swept up in them. Many people find it helps them step back from going over the same thoughts.',
         watchOut: [
       'Forcing the breath rather than letting it lengthen naturally',
       'Lifting the shoulders on the in-breath instead of expanding the ribs',
@@ -259,6 +272,7 @@ export const MINDFULNESS = [
     name: 'Safe Place Visualisation',
     youtube: 'safe place visualisation guided practice',
     category: 'mindfulness',
+    doors: [], feelings: [], style: 'gentle',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'visualisation',
     equipment: [],
@@ -278,7 +292,7 @@ export const MINDFULNESS = [
       'When you return, carry the feeling with you for a moment before opening your eyes'
     ],
     coaching: 'The place can be completely imaginary. It just needs to feel safe to you. There is no wrong answer.',
-    why: 'Builds a calm place in your imagination that you can return to — a reliable way to steady yourself when things feel like too much.',
+    why: 'Builds a calm place in your imagination that you can return to — a way many people use to steady themselves when things feel like too much.',
         watchOut: [
       'Forcing the breath rather than letting it lengthen naturally',
       'Lifting the shoulders on the in-breath instead of expanding the ribs',
@@ -296,6 +310,7 @@ export const MINDFULNESS = [
     name: 'Noting Practice',
     youtube: 'noting practice guided practice',
     category: 'mindfulness',
+    doors: [], feelings: [], style: 'gentle',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'breath-awareness',
     equipment: [],
@@ -333,6 +348,7 @@ export const MINDFULNESS = [
     name: 'Feet on Floor Grounding',
     youtube: 'feet on floor grounding guided practice',
     category: 'mindfulness',
+    doors: ['feel'], feelings: ['ground'], style: 'gentle',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'grounding',
     equipment: [],
@@ -370,6 +386,7 @@ export const MINDFULNESS = [
     name: 'Mindful Object Observation',
     youtube: 'mindful object observation guided practice',
     category: 'mindfulness',
+    doors: [], feelings: [], style: 'gentle',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'grounding',
     equipment: [],
@@ -414,6 +431,7 @@ export const MINDFULNESS = [
     name: 'Sleep Body Scan',
     youtube: 'sleep body scan guided practice',
     category: 'mindfulness',
+    doors: [], feelings: [], style: 'gentle',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'body-scan',
     equipment: [],
@@ -435,7 +453,7 @@ export const MINDFULNESS = [
       'If you reach the top without falling asleep, start again from the feet'
     ],
     coaching: 'If you fall asleep before finishing, that is success. Most people do not reach the top more than once.',
-    why: 'The body scan switches on the rest-and-digest system and releases physical tension, which can make it easier to drift off.',
+    why: 'The body scan helps release physical tension, which can make it easier to drift off.',
         watchOut: [
       'Forcing the breath rather than letting it lengthen naturally',
       'Lifting the shoulders on the in-breath instead of expanding the ribs',
@@ -453,6 +471,7 @@ export const MINDFULNESS = [
     name: 'Progressive Relaxation for Sleep',
     youtube: 'progressive relaxation for sleep guided practice',
     category: 'mindfulness',
+    doors: [], feelings: [], style: 'gentle',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'body-scan',
     equipment: [],
@@ -472,8 +491,8 @@ export const MINDFULNESS = [
       'Now hold your mind still for 10 seconds — if thoughts come, picture a calm scene',
       'Repeat until sleep comes'
     ],
-    coaching: 'This takes practice. Most people who master it report being able to sleep within 2 minutes after a few weeks of daily practice.',
-    why: 'A systematic relaxation technique that removes physical and mental tension in sequence. Effective for both falling asleep and returning to sleep after waking.',
+    coaching: 'This takes practice. Give it a few weeks before deciding whether it suits you.',
+    why: 'A step-by-step relaxation technique that eases physical and mental tension in turn. Many people use it to help them drift off.',
         watchOut: [
       'Forcing the breath rather than letting it lengthen naturally',
       'Lifting the shoulders on the in-breath instead of expanding the ribs',
@@ -491,6 +510,7 @@ export const MINDFULNESS = [
     name: 'Worry Time Practice',
     youtube: 'worry time practice guided practice',
     category: 'mindfulness',
+    doors: [], feelings: [], style: 'gentle',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'grounding',
     equipment: [],
@@ -528,6 +548,7 @@ export const MINDFULNESS = [
     name: 'Mindful Walking',
     youtube: 'mindful walking guided practice',
     category: 'mindfulness',
+    doors: [], feelings: [], style: 'gentle',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'grounding',
     equipment: [],
@@ -565,6 +586,7 @@ export const MINDFULNESS = [
     name: 'Compassionate Self-Talk',
     youtube: 'compassionate self-talk guided practice',
     category: 'mindfulness',
+    doors: [], feelings: [], style: 'gentle',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'visualisation',
     equipment: [],
@@ -583,7 +605,7 @@ export const MINDFULNESS = [
       'Place one hand on your chest and notice what shifts',
       'Stay with this for 5 minutes'
     ],
-    coaching: 'Self-compassion is not self-indulgence or giving up. Research consistently shows it produces better outcomes than self-criticism — more motivation, more resilience, less burnout.',
+    coaching: 'Self-compassion is not self-indulgence or giving up. Studies link self-compassion with more motivation after setbacks than self-criticism brings.',
     why: 'Self-compassion practice means speaking to yourself the way you would to a friend. It builds motivation without shame. Based on the work of Dr Kristin Neff, and particularly relevant for neurodivergent adults.',
         watchOut: [
       'Forcing the breath rather than letting it lengthen naturally',
@@ -602,6 +624,7 @@ export const MINDFULNESS = [
     name: 'Nature Visualisation',
     youtube: 'nature visualisation guided practice',
     category: 'mindfulness',
+    doors: [], feelings: [], style: 'gentle',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'visualisation',
     equipment: [],
@@ -621,8 +644,8 @@ export const MINDFULNESS = [
       'Spend 10 minutes exploring',
       'Return gradually, bringing the calm feeling back with you'
     ],
-    coaching: 'Nature visualisation works even without real access to nature. The physiological effects — reduced cortisol, lowered heart rate — are measurable even from imagination alone.',
-    why: 'Exposure to natural environments reduces stress hormones and improves mood. When real nature is inaccessible, visualisation produces similar measurable effects.',
+    coaching: 'Picture it in as much detail as you can: sounds, light, temperature. Many people find it calming even without being outdoors.',
+    why: 'Time in natural places is linked with feeling calmer. Picturing a natural place in detail is a way to bring some of that indoors.',
         watchOut: [
       'Forcing the breath rather than letting it lengthen naturally',
       'Lifting the shoulders on the in-breath instead of expanding the ribs',
@@ -640,6 +663,7 @@ export const MINDFULNESS = [
     name: 'Morning Intention Setting',
     youtube: 'morning intention setting guided practice',
     category: 'mindfulness',
+    doors: [], feelings: [], style: 'gentle',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'grounding',
     equipment: [],
@@ -659,7 +683,7 @@ export const MINDFULNESS = [
       'Begin the day from this place'
     ],
     coaching: 'An intention is different to a to-do list. It is about how you want to show up, not what you want to achieve. It takes less than 5 minutes.',
-    why: 'Morning intention setting activates the prefrontal cortex before reactive systems take over. Reduces autopilot behaviour and increases sense of agency throughout the day.',
+    why: 'Setting an intention in the morning gives the day a direction of your choosing, and many people find it helps them feel less on autopilot.',
         watchOut: [
       'Forcing the breath rather than letting it lengthen naturally',
       'Lifting the shoulders on the in-breath instead of expanding the ribs',
@@ -677,6 +701,7 @@ export const MINDFULNESS = [
     name: 'Gratitude Reflection',
     youtube: 'gratitude reflection guided practice',
     category: 'mindfulness',
+    doors: [], feelings: [], style: 'gentle',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'grounding',
     equipment: [],
@@ -713,6 +738,7 @@ export const MINDFULNESS = [
     name: 'Box Breathing — Extended Practice',
     youtube: 'box breathing - extended practice guided practice',
     category: 'mindfulness',
+    doors: [], feelings: [], style: 'gentle',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'breath-awareness',
     equipment: [],
@@ -732,7 +758,7 @@ export const MINDFULNESS = [
       'Continue for 10 minutes total'
     ],
     coaching: 'The extended version deepens the calming effect. Used by emergency services and the military to steady themselves under stress. The hold phases are where the body settles.',
-    why: 'Extended box breathing reduces cortisol, lowers blood pressure, and improves heart rate variability — all measurable markers of stress reduction. More effective than a shorter session.',
+    why: 'Slow, steady breathing like this can lower your heart rate, and with regular practice many people find it helps them feel calmer.',
         watchOut: [
       'Forcing the breath rather than letting it lengthen naturally',
       'Lifting the shoulders on the in-breath instead of expanding the ribs',
@@ -750,6 +776,7 @@ export const MINDFULNESS = [
     name: 'Screen-to-Calm Transition',
     youtube: 'screen-to-calm transition guided practice',
     category: 'mindfulness',
+    doors: [], feelings: [], style: 'gentle',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'grounding',
     equipment: [],
@@ -768,8 +795,8 @@ export const MINDFULNESS = [
       'Notice any urges to check your phone — acknowledge them without acting',
       'After 3 minutes, notice the difference in your body'
     ],
-    coaching: 'This feels difficult at first precisely because of how over-stimulated the nervous system has become. That difficulty is the signal that it is needed.',
-    why: 'Screen time activates the sympathetic nervous system. This transition practice allows the nervous system to downregulate before the next activity — improving focus, mood, and sleep if done before bed.',
+    coaching: 'If it feels difficult at first, that is common.',
+    why: 'Stepping away from a screen for a few minutes gives you a pause before the next thing, which many people find helps them settle, especially before bed.',
         watchOut: [
       'Forcing the breath rather than letting it lengthen naturally',
       'Lifting the shoulders on the in-breath instead of expanding the ribs',

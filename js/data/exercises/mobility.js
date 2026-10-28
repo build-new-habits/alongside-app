@@ -1,5 +1,12 @@
 /**
  * data/exercises/mobility.js
+ * 28 Oct 2026 v12
+ * v12 - STAGE PATH P-2 and P-9b (Session 2). Every entry carries doors,
+ *   feelings and style (blueprint C5; tools/verify-path-tags.mjs). Why and
+ *   coaching lines that were not accurate are corrected, keeping what is
+ *   true (Graeme, 28 Oct: "If they are not, then change them"); each change
+ *   and its source: BNH-Files Product/alongside_library_accuracy_28oct2026_v1.md.
+ *
  * 17 Oct 2026 v11
  *
  * v11 - W6-8 TRUE-WORDS-6. Seated thoracic rotation leads with the chair;
@@ -78,6 +85,7 @@ export const MOBILITY = [
     name: 'Hip Flexor Stretch',
     youtube: 'hip flexor stretch technique',
     category: 'mobility',
+    doors: ['stretch'], feelings: [], style: 'stretch',   // Stage PATH P-2
     movementPattern: 'stretch',
     equipment: [],
     equipmentOptional: ['yoga-mat'],
@@ -129,6 +137,7 @@ export const MOBILITY = [
     name: 'Cat-Cow Stretch',
     youtube: 'cat-cow stretch technique',
     category: 'mobility',
+    doors: ['stretch'], feelings: [], style: 'stretch',   // Stage PATH P-2
     movementPattern: 'spinal-flexion-extension',
     equipment: [],
     equipmentOptional: ['yoga-mat'],
@@ -165,6 +174,7 @@ export const MOBILITY = [
     name: '90-90 Hip Stretch',
     youtube: '90-90 hip stretch technique',
     category: 'mobility',
+    doors: ['stretch'], feelings: [], style: 'stretch',   // Stage PATH P-2
     movementPattern: 'hip-rotation',
     equipment: [],
     equipmentOptional: ['yoga-mat'],
@@ -182,7 +192,7 @@ export const MOBILITY = [
       'Hold 45 seconds each side'
     ],
     coaching: 'If this is too intense, sit on a cushion to elevate your hips.',
-    why: 'Opens internal and external hip rotation - essential for healthy hips.',
+    why: 'Works inward and outward hip rotation in the same position.',
         watchOut: [
       'Bouncing into the stretch rather than holding it still',
       'Pushing to the point of pain; a stretch should feel like a strong pull, never sharp',
@@ -212,6 +222,7 @@ export const MOBILITY = [
     name: 'Thoracic Rotation',
     youtube: 'thoracic rotation technique',
     category: 'mobility',
+    doors: ['stretch'], feelings: [], style: 'stretch',   // Stage PATH P-2
     movementPattern: 'spinal-rotation',
     equipment: [],
     equipmentOptional: ['yoga-mat'],
@@ -229,7 +240,7 @@ export const MOBILITY = [
       'Hold 2 seconds, return, repeat 10 times each side'
     ],
     coaching: 'Keep your knees stacked and hips from rolling back - the movement is just in your upper back.',
-    why: 'Thoracic mobility reduces neck and shoulder tension and improves posture.',
+    why: 'Gets the upper back turning, which many people find eases stiffness through the neck and shoulders.',
         watchOut: [
       'Moving faster than you can control, which turns mobility work into momentum',
       'Forcing range rather than working to the edge of what is comfortable',
@@ -264,6 +275,7 @@ export const MOBILITY = [
     name: 'Leg Swing — Forward and Back',
     youtube: 'leg swing - forward and back stretch technique',
     category: 'mobility',
+    doors: ['stretch'], feelings: [], style: 'stretch',   // Stage PATH P-2
     movementPattern: 'hip-flexion',
     equipment: [],
     equipmentOptional: [],
@@ -300,6 +312,7 @@ export const MOBILITY = [
     name: 'Leg Swing — Lateral',
     youtube: 'leg swing - lateral stretch technique',
     category: 'mobility',
+    doors: ['stretch'], feelings: [], style: 'stretch',   // Stage PATH P-2
     movementPattern: 'hip-abduction',
     equipment: [],
     equipmentOptional: [],
@@ -336,6 +349,7 @@ export const MOBILITY = [
     name: 'Inchworm',
     youtube: 'inchworm stretch technique',
     category: 'mobility',
+    doors: ['stretch'], feelings: [], style: 'stretch',   // Stage PATH P-2
     movementPattern: 'stretch',
     equipment: [],
     equipmentOptional: ['yoga-mat'],
@@ -374,6 +388,7 @@ export const MOBILITY = [
     name: 'Lateral Lunge with Reach',
     youtube: 'lateral lunge with reach stretch technique',
     category: 'mobility',
+    doors: ['stretch'], feelings: [], style: 'stretch',   // Stage PATH P-2
     movementPattern: 'lunge',
     equipment: [],
     equipmentOptional: [],
@@ -411,6 +426,7 @@ export const MOBILITY = [
     name: 'Hip CARs',
     youtube: 'hip cars stretch technique',
     category: 'mobility',
+    doors: ['stretch'], feelings: [], style: 'stretch',   // Stage PATH P-2
     movementPattern: 'hip-rotation',
     equipment: [],
     equipmentOptional: ['yoga-mat'],
@@ -430,7 +446,7 @@ export const MOBILITY = [
       'Complete 5 circles each direction each side'
     ],
     coaching: 'The slower the better. You are exploring the edge of your hip\'s available range while keeping the muscles engaged throughout.',
-    why: 'Controlled articular rotations maintain joint cartilage health and build active range of motion — more valuable than passive stretching for long-term hip health.',
+    why: 'Slow, controlled circles take the hip through its full active range, which helps keep that range available to you.',
         watchOut: [
       'Moving faster than you can control, which turns mobility work into momentum',
       'Forcing range rather than working to the edge of what is comfortable',
@@ -460,6 +476,7 @@ export const MOBILITY = [
     name: 'Ankle Circles',
     youtube: 'ankle circles technique',
     category: 'mobility',
+    doors: ['stretch', 'feel'], feelings: ['ground', 'wake'], style: 'stretch',   // Stage PATH P-2
     movementPattern: 'ankle-mobility',
     equipment: [],
     equipmentOptional: [],
@@ -495,6 +512,7 @@ export const MOBILITY = [
     name: 'Deep Squat Hold',
     youtube: 'deep squat hold stretch technique',
     category: 'mobility',
+    doors: ['stretch'], feelings: [], style: 'stretch',   // Stage PATH P-2
     movementPattern: 'squat',
     equipment: [],
     equipmentOptional: [],
@@ -512,7 +530,7 @@ export const MOBILITY = [
       'Stand slowly'
     ],
     coaching: 'If your heels lift, place a rolled-up towel or small plates under them. The goal is heels flat over time, not immediately.',
-    why: 'The deep squat is the most fundamental human resting position and a reliable indicator of lower body mobility. Building it reduces hip, knee, and ankle restriction.',
+    why: 'Resting in a deep squat is an everyday position in many parts of the world, and it shows how your hips, knees and ankles bend together. Practising it helps you keep that range.',
         watchOut: [
       'Moving faster than you can control, which turns mobility work into momentum',
       'Forcing range rather than working to the edge of what is comfortable',
@@ -531,6 +549,7 @@ export const MOBILITY = [
     name: 'Couch Stretch',
     youtube: 'couch stretch technique',
     category: 'mobility',
+    doors: ['stretch'], feelings: [], style: 'stretch',   // Stage PATH P-2
     movementPattern: 'stretch',
     equipment: [],
     equipmentOptional: ['yoga-mat'],
@@ -548,7 +567,7 @@ export const MOBILITY = [
       'Hold for 60 to 90 seconds, then switch sides'
     ],
     coaching: 'This is intense for most people. Start with just a few seconds if needed and build from there.',
-    why: 'One of the most effective hip flexor and quad stretches available. Addresses the tightness caused by prolonged sitting better than most alternatives.',
+    why: 'A strong stretch for the front of the hip and thigh, which can feel tight after long periods of sitting.',
         watchOut: [
       'Bouncing into the stretch rather than holding it still',
       'Pushing to the point of pain; a stretch should feel like a strong pull, never sharp',
@@ -567,6 +586,7 @@ export const MOBILITY = [
     name: 'Pigeon Pose',
     youtube: 'pigeon pose stretch technique',
     category: 'mobility',
+    doors: ['stretch'], feelings: [], style: 'stretch',   // Stage PATH P-2
     movementPattern: 'hip-rotation',
     equipment: [],
     equipmentOptional: ['yoga-mat'],
@@ -586,7 +606,7 @@ export const MOBILITY = [
       'Hold for 60 to 90 seconds each side'
     ],
     coaching: 'If the hip on the bent leg does not touch the floor, place a folded blanket or cushion under it for support.',
-    why: 'The most effective stretch for the piriformis and deep hip rotators — tight in almost everyone who sits. Also directly addresses sciatic nerve tension.',
+    why: 'A deep stretch for the back of the hip and the muscles that turn the leg outward, including the piriformis, which can feel tight in people who sit a lot.',
         watchOut: [
       'Moving faster than you can control, which turns mobility work into momentum',
       'Forcing range rather than working to the edge of what is comfortable',
@@ -605,6 +625,7 @@ export const MOBILITY = [
     name: 'Thread the Needle',
     youtube: 'thread the needle stretch technique',
     category: 'mobility',
+    doors: ['stretch', 'feel'], feelings: ['calm'], style: 'stretch',   // Stage PATH P-2
     movementPattern: 'spinal-rotation',
     equipment: [],
     equipmentOptional: ['yoga-mat'],
@@ -621,7 +642,7 @@ export const MOBILITY = [
       'Your left arm can stay extended or press into the floor for a deeper stretch',
       'Hold for 30 seconds, then repeat on the other side'
     ],
-    coaching: 'Breathe into the stretch. Each exhale can take you a little further into rotation.',
+    coaching: 'Go only as far as is comfortable today. Let the floor take the weight.',
     why: 'Opens thoracic rotation in a supported position — excellent for upper back tightness, neck tension, and shoulder mobility.',
         watchOut: [
       'Moving faster than you can control, which turns mobility work into momentum',
@@ -641,6 +662,7 @@ export const MOBILITY = [
     name: 'Standing Quad Stretch',
     youtube: 'standing quad stretch technique',
     category: 'mobility',
+    doors: ['stretch'], feelings: [], style: 'stretch',   // Stage PATH P-2
     movementPattern: 'stretch',
     equipment: [],
     equipmentOptional: [],
@@ -677,6 +699,7 @@ export const MOBILITY = [
     name: 'Upper Trapezius Stretch',
     youtube: 'upper trapezius stretch technique',
     category: 'mobility',
+    doors: ['stretch', 'feel'], feelings: ['calm'], style: 'stretch',   // Stage PATH P-2
     movementPattern: 'stretch',
     equipment: [],
     equipmentOptional: [],
@@ -694,8 +717,8 @@ export const MOBILITY = [
       'Hold for 30 seconds, then switch sides',
       'Repeat 3 times each side'
     ],
-    coaching: 'The hand on the head is there for weight only, not traction. Pulling causes injury — just let gravity and the weight of the hand do the work.',
-    why: 'The upper trapezius is the most tension-holding muscle in the body for most people — stretched by almost every desk worker and driver daily.',
+    coaching: 'The hand on the head is there for weight only, not traction. Pulling makes it easy to overdo — just let gravity and the weight of the hand do the work.',
+    why: 'The muscle across the top of the shoulders and up the side of the neck often feels tight after long spells at a desk or behind the wheel.',
         watchOut: [
       'Bouncing into the stretch rather than holding it still',
       'Pushing to the point of pain; a stretch should feel like a strong pull, never sharp',
@@ -714,6 +737,7 @@ export const MOBILITY = [
     name: 'Chest Opener — Arms Behind',
     youtube: 'chest opener - arms behind stretch technique',
     category: 'mobility',
+    doors: ['stretch'], feelings: [], style: 'stretch',   // Stage PATH P-2
     movementPattern: 'stretch',
     equipment: [],
     equipmentOptional: [],
@@ -751,6 +775,7 @@ export const MOBILITY = [
     name: 'Standing Adductor Stretch',
     youtube: 'standing adductor stretch technique',
     category: 'mobility',
+    doors: ['stretch'], feelings: [], style: 'stretch',   // Stage PATH P-2
     movementPattern: 'stretch',
     equipment: [],
     equipmentOptional: [],
@@ -792,6 +817,7 @@ export const MOBILITY = [
     name: 'Standing Spinal Wave',
     youtube: 'standing spinal wave stretch technique',
     category: 'mobility',
+    doors: ['stretch', 'feel'], feelings: ['ground', 'wake'], style: 'stretch',   // Stage PATH P-2
     movementPattern: 'spinal-flexion-extension',
     equipment: [],
     equipmentOptional: [],
@@ -810,7 +836,7 @@ export const MOBILITY = [
       'Complete 5 full waves'
     ],
     coaching: 'This is exploration, not performance. Move within a range that feels comfortable. Any section that does not move is telling you something.',
-    why: 'Moves every segment of the spine through flexion and extension sequentially — maintaining segmental mobility that is rapidly lost with inactivity.',
+    why: 'Moves every segment of the spine through flexion and extension sequentially — a gentle way to keep the whole spine moving.',
         watchOut: [
       'Moving faster than you can control, which turns mobility work into momentum',
       'Forcing range rather than working to the edge of what is comfortable',
@@ -837,6 +863,7 @@ export const MOBILITY = [
     name: "World's Greatest Stretch",
     youtube: 'worlds greatest stretch yoga pose tutorial',
     category: 'mobility',
+    doors: ['stretch'], feelings: [], style: 'stretch',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'stretch',
     equipment: [],
@@ -857,7 +884,7 @@ export const MOBILITY = [
       'Return to standing and switch sides',
       'Complete 5 full cycles each side'
     ],
-    coaching: "This is called the world's greatest stretch because it genuinely hits more tight areas in one movement than almost anything else. Slow down through each transition.",
+    coaching: "The name is a nickname; it earns it by reaching several areas in one movement. Slow down through each transition.",
     why: 'Combines hip flexor stretch, thoracic rotation, groin opening, and hamstring lengthening in one flowing sequence. Used as a warm-up by elite athletes worldwide.',
         watchOut: [
       'Bouncing into the stretch rather than holding it still',
@@ -877,6 +904,7 @@ export const MOBILITY = [
     name: 'Seated Thoracic Rotation',
     youtube: 'seated thoracic rotation technique',
     category: 'mobility',
+    doors: ['stretch'], feelings: [], style: 'stretch',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'rotation',
     equipment: [],
@@ -897,7 +925,7 @@ export const MOBILITY = [
       'Complete 10 rotations each way'
     ],
     coaching: 'The rotation comes from the mid-back, not the lower back or hips. Keep the hips square and feel the movement in the chest area.',
-    why: 'Restores thoracic rotation range of motion — essential for driving, reaching overhead, throwing, and all rotational sport movements.',
+    why: 'Restores thoracic rotation range of motion — useful for driving, reaching overhead, throwing, and all rotational sport movements.',
         watchOut: [
       'Moving faster than you can control, which turns mobility work into momentum',
       'Forcing range rather than working to the edge of what is comfortable',
@@ -916,6 +944,7 @@ export const MOBILITY = [
     name: 'Thoracic Extension Over Foam Roller',
     youtube: 'thoracic extension over foam roller stretch technique',
     category: 'mobility',
+    doors: ['stretch'], feelings: [], style: 'stretch',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'extension',
     equipment: ['foam-roller'],
@@ -935,7 +964,7 @@ export const MOBILITY = [
       'Work from the mid-back to between the shoulder blades'
     ],
     coaching: 'Only work the thoracic spine — not the lower back. If the roller dips below the ribcage, stop.',
-    why: 'Directly restores thoracic extension mobility — the movement most lost from sitting. Essential for shoulder health, overhead movement, and upright posture.',
+    why: 'Lets the upper back arch gently over the roller, a movement long spells of sitting give it little of. Many people find overhead reaching feels easier afterwards.',
         watchOut: [
       'Rolling directly over a joint or bone rather than the muscle',
       'Pressing so hard you tense up, which stops the muscle releasing',
@@ -965,6 +994,7 @@ export const MOBILITY = [
     name: 'Ankle Circles and CARs',
     youtube: 'ankle circles and cars technique',
     category: 'mobility',
+    doors: ['stretch', 'feel'], feelings: ['worn'], style: 'stretch',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'joint-rotation',
     equipment: [],
@@ -1003,6 +1033,7 @@ export const MOBILITY = [
     name: 'Ankle Dorsiflexion Drill — Wall',
     youtube: 'ankle dorsiflexion drill - wall stretch technique',
     category: 'mobility',
+    doors: ['stretch'], feelings: [], style: 'stretch',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'joint-rotation',
     equipment: [],
@@ -1022,7 +1053,7 @@ export const MOBILITY = [
       'Complete 15 reps each side, holding the end range for 1 second'
     ],
     coaching: 'This is a test and a drill. Measure the foot distance from the wall over weeks — improvement here will be noticeable in squat depth and running comfort.',
-    why: 'Directly develops ankle dorsiflexion range — the single most impactful mobility improvement for squatting, running, and any standing athletic movement.',
+    why: 'Directly develops ankle dorsiflexion range — an ankle range that squatting, running and most standing movement rely on.',
         watchOut: [
       'Moving faster than you can control, which turns mobility work into momentum',
       'Forcing range rather than working to the edge of what is comfortable',
@@ -1041,6 +1072,7 @@ export const MOBILITY = [
     name: 'Wrist Extension on Floor',
     youtube: 'wrist extension on floor stretch technique',
     category: 'mobility',
+    doors: ['stretch'], feelings: [], style: 'stretch',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'joint-rotation',
     equipment: [],
@@ -1058,8 +1090,8 @@ export const MOBILITY = [
       'Pulse gently in and out of the end range',
       'Complete 2 minutes of gentle movement'
     ],
-    coaching: 'Wrist extension is the range most reduced by keyboard use. This simple drill is more effective than any wrist stretch done from a chair.',
-    why: 'Restores wrist extension range critical for press-ups, planks, yoga, and all pushing movements. Directly counteracts the wrist flexion position of keyboard and phone use.',
+    coaching: 'Ease into it a little at a time — wrists respond better to patience than to pressure.',
+    why: 'Restores wrist extension range critical for press-ups, planks, yoga, and all pushing movements. Useful for anyone who types or uses a phone a lot.',
         watchOut: [
       'Moving faster than you can control, which turns mobility work into momentum',
       'Forcing range rather than working to the edge of what is comfortable',
@@ -1078,6 +1110,7 @@ export const MOBILITY = [
     name: 'Hip 90-90 Stretch',
     youtube: 'hip 90-90 stretch technique',
     category: 'mobility',
+    doors: ['stretch'], feelings: [], style: 'stretch',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'hip-rotation',
     equipment: [],
@@ -1116,6 +1149,7 @@ export const MOBILITY = [
     name: 'Shoulder CARs — Standing',
     youtube: 'shoulder cars - standing stretch technique',
     category: 'mobility',
+    doors: ['stretch', 'feel'], feelings: ['wake'], style: 'stretch',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'joint-rotation',
     equipment: [],
@@ -1135,7 +1169,7 @@ export const MOBILITY = [
       'Complete 3 circles forward, 3 backward each shoulder'
     ],
     coaching: 'CARs (Controlled Articular Rotations) are done slowly because speed hides range. The slower you go, the more honest the movement.',
-    why: 'Shoulder CARs assess and develop full joint range of motion in all directions — the most comprehensive single shoulder mobility drill available.',
+    why: 'Shoulder CARs assess and develop full joint range of motion in all directions — a thorough way to take the shoulder through its whole range.',
         watchOut: [
       'Moving faster than you can control, which turns mobility work into momentum',
       'Forcing range rather than working to the edge of what is comfortable',
@@ -1154,6 +1188,7 @@ export const MOBILITY = [
     name: 'Spinal CARs',
     youtube: 'spinal cars stretch technique',
     category: 'mobility',
+    doors: ['stretch'], feelings: [], style: 'stretch',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'rotation',
     equipment: [],
@@ -1172,7 +1207,7 @@ export const MOBILITY = [
       'Complete 5 circles each direction, very slowly'
     ],
     coaching: 'Spinal CARs are meditative as well as functional. Done first thing in the morning, they reveal overnight stiffness and work through it.',
-    why: 'Develops segmental spinal mobility — each vertebra moving independently. Maintains the distributed movement capacity that keeps the spine healthy long-term.',
+    why: 'Develops segmental spinal mobility — each vertebra moving independently. Moving each part in turn helps keep the whole back moving, not just the parts that bend easily.',
         watchOut: [
       'Moving faster than you can control, which turns mobility work into momentum',
       'Forcing range rather than working to the edge of what is comfortable',
@@ -1191,6 +1226,7 @@ export const MOBILITY = [
     name: 'Frog Stretch',
     youtube: 'frog stretch technique',
     category: 'mobility',
+    doors: ['stretch'], feelings: [], style: 'stretch',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'hip-rotation',
     equipment: [],
@@ -1209,7 +1245,7 @@ export const MOBILITY = [
       'Gently rock forward and back to deepen'
     ],
     coaching: 'The frog stretch is demanding. Place folded blankets under the knees if there is knee discomfort. Breathe through the hip tension.',
-    why: 'One of the deepest hip adductor and hip flexor stretches available. Develops the inner thigh mobility essential for deep squatting and lateral movement.',
+    why: 'A deep stretch for the inner thighs and the front of the hips, useful for deep squatting and side-to-side movement.',
         watchOut: [
       'Bouncing into the stretch rather than holding it still',
       'Pushing to the point of pain; a stretch should feel like a strong pull, never sharp',
@@ -1228,6 +1264,7 @@ export const MOBILITY = [
     name: 'Shoulder Dislocates — Band',
     youtube: 'shoulder dislocates - band stretch technique',
     category: 'mobility',
+    doors: ['stretch'], feelings: [], style: 'stretch',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'joint-rotation',
     equipment: ['resistance-band'],
@@ -1266,6 +1303,7 @@ export const MOBILITY = [
     name: 'Neck Mobility Routine',
     youtube: 'neck mobility routine stretch technique',
     category: 'mobility',
+    doors: ['stretch', 'feel'], feelings: ['wake'], style: 'stretch',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'joint-rotation',
     equipment: [],
@@ -1306,6 +1344,7 @@ export const MOBILITY = [
     name: 'Standing Hip Circles',
     youtube: 'standing hip circles technique',
     category: 'mobility',
+    doors: ['stretch', 'feel'], feelings: ['wake'], style: 'stretch',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'joint-rotation',
     equipment: [],
@@ -1343,6 +1382,7 @@ export const MOBILITY = [
     name: 'Side-Lying Thoracic Rotation',
     youtube: 'prone thoracic rotation technique',
     category: 'mobility',
+    doors: ['stretch'], feelings: [], style: 'stretch',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'rotation',
     equipment: [],
@@ -1392,6 +1432,7 @@ export const MOBILITY = [
     name: 'Seated Figure-4 Stretch',
     youtube: 'seated figure-4 stretch technique',
     category: 'mobility',
+    doors: ['stretch'], feelings: [], style: 'stretch',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'hip-rotation',
     equipment: [],
@@ -1411,7 +1452,7 @@ export const MOBILITY = [
       'Hold for 45 to 60 seconds each side'
     ],
     coaching: 'This can be done on a chair at a desk — completely discreet. Do it at the end of any long sitting period.',
-    why: 'The most accessible deep hip rotator stretch — it reaches the piriformis and gluteus medius, deep in the back of the hip.',
+    why: 'An easy-to-reach stretch for the deep hip rotators — it reaches the piriformis and gluteus medius, deep in the back of the hip.',
         watchOut: [
       'Bouncing into the stretch rather than holding it still',
       'Pushing to the point of pain; a stretch should feel like a strong pull, never sharp',
@@ -1430,6 +1471,7 @@ export const MOBILITY = [
     name: 'Five-Minute Morning Mobility Flow',
     youtube: 'five-minute morning mobility flow stretch technique',
     category: 'mobility',
+    doors: ['stretch', 'feel'], feelings: ['wake'], style: 'yoga',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'yoga-flow',
     equipment: [],
@@ -1450,8 +1492,8 @@ export const MOBILITY = [
       'Standing forward fold: 5 breaths',
       'Slow roll up to standing'
     ],
-    coaching: 'This five-minute flow requires no warm-up and no equipment. It is the minimum effective dose of morning movement. Do it before checking your phone.',
-    why: 'A complete morning mobility sequence that addresses spinal stiffness, hip flexor tightness, and thoracic rotation in the minimal time needed to produce real benefit.',
+    coaching: 'This five-minute flow requires no warm-up and no equipment. It fits in before you check your phone.',
+    why: 'A complete morning mobility sequence that addresses spinal stiffness, hip flexor tightness, and thoracic rotation in five minutes.',
         watchOut: [
       'Moving faster than you can control, which turns mobility work into momentum',
       'Forcing range rather than working to the edge of what is comfortable',
@@ -1470,6 +1512,7 @@ export const MOBILITY = [
     name: 'Hip Flexor Progressive Series',
     youtube: 'hip flexor progressive series stretch technique',
     category: 'mobility',
+    doors: ['stretch'], feelings: [], style: 'stretch',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'hip-rotation',
     equipment: [],
@@ -1490,7 +1533,7 @@ export const MOBILITY = [
       'Switch sides and repeat the full sequence'
     ],
     coaching: 'Progress through each phase only when you feel the previous one has fully released. Rushing the sequence means not getting the benefit of any individual position.',
-    why: 'A systematic hip flexor sequence that progressively addresses all components — length, rotation, and overhead reach. More effective than any single static stretch.',
+    why: 'A systematic hip flexor sequence that progressively addresses all components — length, rotation, and overhead reach.',
         watchOut: [
       'Moving faster than you can control, which turns mobility work into momentum',
       'Forcing range rather than working to the edge of what is comfortable',

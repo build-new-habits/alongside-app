@@ -1,5 +1,12 @@
 /**
  * data/exercises/swimming_cycling.js
+ * 28 Oct 2026 v5
+ * v5 - STAGE PATH P-2 and P-9b (Session 2). Every entry carries doors,
+ *   feelings and style (blueprint C5; tools/verify-path-tags.mjs). Why and
+ *   coaching lines that were not accurate are corrected, keeping what is
+ *   true (Graeme, 28 Oct: "If they are not, then change them"); each change
+ *   and its source: BNH-Files Product/alongside_library_accuracy_28oct2026_v1.md.
+ *
  * 29 Sep 2026 v4
  *
  * v4 - P0h. Descriptions say what a movement does, not what it treats:
@@ -50,6 +57,7 @@ export const SWIMMING_CYCLING = [
     name: 'Freestyle Catch Drill',
     youtube: 'freestyle catch drill technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'swim',
     equipment: ['swimming-pool'],
@@ -68,8 +76,8 @@ export const SWIMMING_CYCLING = [
       'Avoid slipping the hand straight down — press back, not down',
       'Complete 4 × 50 metres with 20 seconds rest between'
     ],
-    coaching: 'The catch is where most freestyle power is lost. A good catch sets up a powerful pull — a missed catch wastes effort regardless of arm speed.',
-    why: 'The catch is the most technically important phase of the freestyle stroke. Improving it is the single highest-return technique investment for most swimmers.',
+    coaching: 'The catch is where a lot of freestyle power is lost. A good catch sets up a powerful pull — a missed catch wastes effort regardless of arm speed.',
+    why: 'The catch is a key phase of the freestyle stroke, and improving it pays off for most swimmers.',
         watchOut: [
       'Rushing the drill so it becomes ordinary swimming again',
       'Holding the breath through the length rather than exhaling steadily into the water',
@@ -87,6 +95,7 @@ export const SWIMMING_CYCLING = [
     name: 'Bilateral Breathing Drill',
     youtube: 'bilateral breathing drill technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'swim',
     equipment: ['swimming-pool'],
@@ -105,7 +114,7 @@ export const SWIMMING_CYCLING = [
       'Complete 4 × 50 metres focusing on symmetry'
     ],
     coaching: 'Bilateral breathing feels awkward on the weak side for most people. That awkwardness is exactly why it is worth practising — it corrects stroke imbalance.',
-    why: 'Bilateral breathing develops a balanced stroke, improves body rotation on both sides, and is essential for open water swimming where waves come from either side.',
+    why: 'Bilateral breathing develops a balanced stroke, improves body rotation on both sides, and is useful in open water where waves come from either side.',
         watchOut: [
       'Rushing the drill so it becomes ordinary swimming again',
       'Holding the breath through the length rather than exhaling steadily into the water',
@@ -123,6 +132,7 @@ export const SWIMMING_CYCLING = [
     name: 'Kick Set — Board',
     youtube: 'kick set - board technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'swim',
     equipment: ['swimming-pool', 'kickboard'],
@@ -159,6 +169,7 @@ export const SWIMMING_CYCLING = [
     name: 'Pull Buoy Set',
     youtube: 'pull buoy set technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'swim',
     equipment: ['swimming-pool', 'pull-buoy'],
@@ -176,7 +187,7 @@ export const SWIMMING_CYCLING = [
       'Keep the hips high and body long throughout',
       'Complete 6 × 50 metres with 15 seconds rest'
     ],
-    coaching: 'Many swimmers go faster with a pull buoy than without. If this is you, your kick is adding drag — the buoy is telling you where to improve.',
+    coaching: 'Many swimmers go faster with a pull buoy than without. If this is you, the buoy is lifting your legs, which can mean your body position or kick has room to improve.',
     why: 'Isolates the arm stroke by removing the kick, allowing focused development of pull mechanics and upper body swimming strength.',
         watchOut: [
       'Letting the hips sink because the legs have stopped working',
@@ -195,6 +206,7 @@ export const SWIMMING_CYCLING = [
     name: 'Catch-Up Drill',
     youtube: 'catch-up drill technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'swim',
     equipment: ['swimming-pool'],
@@ -231,6 +243,7 @@ export const SWIMMING_CYCLING = [
     name: 'Fingertip Drag Drill',
     youtube: 'fingertip drag drill technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'swim',
     equipment: ['swimming-pool'],
@@ -267,6 +280,7 @@ export const SWIMMING_CYCLING = [
     name: 'Descending Intervals',
     youtube: 'descending intervals technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'swim',
     equipment: ['swimming-pool'],
@@ -303,6 +317,7 @@ export const SWIMMING_CYCLING = [
     name: 'Easy 400 Metres',
     youtube: 'easy 400 metres technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'swim',
     equipment: ['swimming-pool'],
@@ -338,6 +353,7 @@ export const SWIMMING_CYCLING = [
     name: 'Hard 200 Metres',
     youtube: 'hard 200 metres technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'swim',
     equipment: ['swimming-pool'],
@@ -373,6 +389,7 @@ export const SWIMMING_CYCLING = [
     name: 'Sprint 50 Metres × 6',
     youtube: 'sprint 50 metres 6 technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'swim',
     equipment: ['swimming-pool'],
@@ -409,6 +426,7 @@ export const SWIMMING_CYCLING = [
     name: 'Swim, Pull, Kick Medley',
     youtube: 'swim pull kick medley technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'swim',
     equipment: ['swimming-pool', 'kickboard', 'pull-buoy'],
@@ -445,6 +463,7 @@ export const SWIMMING_CYCLING = [
     name: 'Backstroke Technique',
     youtube: 'backstroke swimming technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'swim',
     equipment: ['swimming-pool'],
@@ -464,7 +483,7 @@ export const SWIMMING_CYCLING = [
       'Complete 4 × 50 metres'
     ],
     coaching: 'Backstroke is kinder on the shoulders than freestyle for many people. Worth adding as a regular component if you have shoulder sensitivity.',
-    why: 'Backstroke develops posterior shoulder strength and spinal extension — often the opposite movement to what the body does all day. Great for posture.',
+    why: 'Backstroke develops posterior shoulder strength and spinal extension — often the opposite movement to what the body does all day.',
         watchOut: [
       'Rushing the drill so it becomes ordinary swimming again',
       'Holding the breath through the length rather than exhaling steadily into the water',
@@ -482,6 +501,7 @@ export const SWIMMING_CYCLING = [
     name: 'Open Water Preparation',
     youtube: 'open water preparation technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'swim',
     equipment: ['swimming-pool'],
@@ -518,6 +538,7 @@ export const SWIMMING_CYCLING = [
     name: 'Pool Endurance — 1500 Metres',
     youtube: 'pool endurance - 1500 metres technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'swim',
     equipment: ['swimming-pool'],
@@ -554,6 +575,7 @@ export const SWIMMING_CYCLING = [
     name: 'Breaststroke Technique',
     youtube: 'breaststroke swimming technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'swim',
     equipment: ['swimming-pool'],
@@ -595,6 +617,7 @@ export const SWIMMING_CYCLING = [
     name: 'Easy Spin — 30 Minutes',
     youtube: 'easy spin - 30 minutes technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     equipment: ['bicycle'],
@@ -631,6 +654,7 @@ export const SWIMMING_CYCLING = [
     name: 'Tempo Ride — 45 Minutes',
     youtube: 'tempo ride - 45 minutes technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     equipment: ['bicycle'],
@@ -649,7 +673,7 @@ export const SWIMMING_CYCLING = [
       'Cool down: 10 minutes easy spinning'
     ],
     coaching: 'Tempo cycling is harder to judge than running because hills and wind vary effort without changing pace. Focus on sustained effort, not speed.',
-    why: 'Builds cycling-specific lactate threshold — the primary physiological adaptation for cycling performance improvement.',
+    why: 'Builds cycling-specific lactate threshold — a key adaptation for cycling performance.',
         watchOut: [
       'Starting at interval intensity and fading',
       'Grinding a heavy gear at low cadence, which loads the knees',
@@ -667,6 +691,7 @@ export const SWIMMING_CYCLING = [
     name: 'Hill Climb Simulation',
     youtube: 'hill climb simulation technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     equipment: ['bicycle'],
@@ -704,6 +729,7 @@ export const SWIMMING_CYCLING = [
     name: 'Cycling Interval Session',
     youtube: 'cycling interval session technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     equipment: ['bicycle'],
@@ -740,6 +766,7 @@ export const SWIMMING_CYCLING = [
     name: 'Cadence Drill — Cycling',
     youtube: 'cadence drill - cycling technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'locomotion',
     equipment: ['bicycle'],
@@ -776,6 +803,7 @@ export const SWIMMING_CYCLING = [
     name: 'Sprint Intervals — Cycling',
     youtube: 'sprint intervals - cycling technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     equipment: ['bicycle'],
@@ -812,6 +840,7 @@ export const SWIMMING_CYCLING = [
     name: 'Endurance Ride — 90 Minutes',
     youtube: 'endurance ride - 90 minutes technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     equipment: ['bicycle'],
@@ -848,6 +877,7 @@ export const SWIMMING_CYCLING = [
     name: 'Recovery Spin — 20 Minutes',
     youtube: 'recovery spin - 20 minutes technique',
     category: 'recovery',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'locomotion',
     equipment: ['bicycle'],
@@ -865,7 +895,7 @@ export const SWIMMING_CYCLING = [
       'Continue for 20 minutes'
     ],
     coaching: 'Recovery cycling is a skill. Most people go too hard. If you feel any fatigue during the session, you are doing it wrong.',
-    why: 'Gentle cycling flushes metabolic waste from the legs and promotes recovery between hard sessions — significantly better than complete rest for trained athletes.',
+    why: 'Gentle cycling keeps the legs moving between hard sessions, and many cyclists find it leaves them fresher than complete rest.',
         watchOut: [
       'Bouncing into the stretch rather than holding it still',
       'Pushing to the point of pain; a stretch should feel like a strong pull, never sharp',

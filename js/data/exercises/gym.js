@@ -1,5 +1,12 @@
 /**
  * data/exercises/gym.js
+ * 28 Oct 2026 v6
+ * v6 - STAGE PATH P-2 and P-9b (Session 2). Every entry carries doors,
+ *   feelings and style (blueprint C5; tools/verify-path-tags.mjs). Why and
+ *   coaching lines that were not accurate are corrected, keeping what is
+ *   true (Graeme, 28 Oct: "If they are not, then change them"); each change
+ *   and its source: BNH-Files Product/alongside_library_accuracy_28oct2026_v1.md.
+ *
  * 30 Sep 2026 v5
  *
  * v5 - S1-LEGS (found building the S1 clinical pack). Treadmill Intervals runs: impact true.
@@ -74,6 +81,7 @@ export const GYM = [
     name: 'Treadmill Intervals',
     youtube: 'treadmill interval workout beginners',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'locomotion',
     equipment: ['treadmill'],
     equipmentOptional: [],
@@ -112,6 +120,7 @@ export const GYM = [
     name: 'Treadmill Incline Walk',
     youtube: 'incline treadmill walking workout',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'locomotion',
     equipment: ['treadmill'],
     equipmentOptional: [],
@@ -131,8 +140,8 @@ export const GYM = [
       'Drop the incline back to flat for the last two minutes',
       'You should be breathing hard enough that talking is possible but not comfortable'
     ],
-    coaching: 'Let go of the handrails. Holding on can cut the work by a third and puts your spine into a position it was not designed to walk in.',
-    why: 'One of the most joint-friendly ways to work hard. The incline recruits your glutes and hamstrings far more than flat walking, and there is almost no impact through the knees.',
+    coaching: 'Let go of the handrails. Holding on takes a good share of the work away and changes how you walk.',
+    why: 'A joint-friendly way to work hard. The incline recruits your glutes and hamstrings far more than flat walking, and there is almost no impact through the knees.',
     watchOut: [
       'Gripping the rails and leaning back, which is the single most common thing that makes this session ineffective',
       'Incline so steep you end up on your toes — your whole foot should land each step',
@@ -150,6 +159,7 @@ export const GYM = [
     name: 'Cross Trainer Intervals',
     youtube: 'elliptical interval training workout',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'locomotion',
     equipment: ['elliptical'],
     equipmentOptional: [],
@@ -188,6 +198,7 @@ export const GYM = [
     name: 'Stair Climber — Steady',
     youtube: 'stair climber workout proper form',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'locomotion',
     equipment: ['stair-climber'],
     equipmentOptional: [],
@@ -208,7 +219,7 @@ export const GYM = [
       'Take whole steps rather than short ones — the full step is where the glute work is'
     ],
     coaching: 'Push down through the heel of the standing leg. That one adjustment moves the work from the front of your thigh into your backside, which is where you want it.',
-    why: 'Works the glutes harder than almost any cardio machine while keeping impact low. Good for anyone who wants to feel stronger through the hips as well as fitter.',
+    why: 'Works the glutes hard for a cardio machine while keeping impact low. Good for anyone who wants to feel stronger through the hips as well as fitter.',
     watchOut: [
       'Leaning your bodyweight onto the handrails, which takes most of the work out of it',
       'Short, fast, toe-only steps rather than full ones — speed is not the point here',
@@ -226,6 +237,7 @@ export const GYM = [
     name: 'Stair Climber Intervals',
     youtube: 'stair climber interval workout',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'locomotion',
     equipment: ['stair-climber'],
     equipmentOptional: [],
@@ -264,6 +276,7 @@ export const GYM = [
     name: 'Ski Erg Intervals',
     youtube: 'ski erg technique workout',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'pull',
     equipment: ['ski-erg'],
     equipmentOptional: [],
@@ -306,6 +319,7 @@ export const GYM = [
     name: 'Sled Push',
     youtube: 'sled push prowler technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'locomotion',
     equipment: ['sled'],
     equipmentOptional: [],
@@ -344,6 +358,7 @@ export const GYM = [
     name: 'Battle Rope Waves',
     youtube: 'battle rope alternating waves technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'isometric',
     equipment: ['battle-ropes'],
     equipmentOptional: [],
@@ -382,6 +397,7 @@ export const GYM = [
     name: 'Kettlebell Suitcase Carry',
     youtube: 'suitcase carry kettlebell technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'carry',
     equipment: ['kettlebell'],
     equipmentOptional: [],
@@ -420,6 +436,7 @@ export const GYM = [
     name: "Farmer's Carry — Heavy",
     youtube: 'farmers carry technique heavy',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'carry',
     equipment: ['kettlebell'],
     equipmentOptional: ['dumbbell'],
@@ -465,6 +482,7 @@ export const GYM = [
     name: 'EZ Bar Curl',
     youtube: 'ez bar curl technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'pull',
     // No "ez-bar" in the equipment list; an EZ bar is a barbell, and a
@@ -508,6 +526,7 @@ export const GYM = [
     name: 'Cable Curl',
     youtube: 'cable bicep curl technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'pull',
     equipment: ['cable-machine'],
@@ -549,6 +568,7 @@ export const GYM = [
     name: 'Dumbbell Bench Press',
     youtube: 'dumbbell bench press technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'push',
     equipment: ['dumbbell', 'bench'],
@@ -604,6 +624,7 @@ GYM.push(
     name: 'Cable Chest Press',
     youtube: 'cable chest press standing technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'push',
     equipment: ['cable-machine'],
     equipmentOptional: [],
@@ -644,6 +665,7 @@ GYM.push(
     name: 'Seated Cable Row',
     youtube: 'seated cable row proper form',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'pull',
     equipment: ['cable-machine'],
     equipmentOptional: [],
@@ -683,6 +705,7 @@ GYM.push(
     name: 'Lat Pulldown',
     youtube: 'lat pulldown proper form technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'pull',
     equipment: ['cable-machine'],
     equipmentOptional: [],
@@ -723,6 +746,7 @@ GYM.push(
     name: 'Cable Pull-Through',
     youtube: 'cable pull through hip hinge technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'hinge',
     equipment: ['cable-machine'],
     equipmentOptional: [],
@@ -744,7 +768,7 @@ GYM.push(
       'Drive your hips forward and squeeze your backside hard to stand up tall'
     ],
     coaching: 'This is a hip movement, not an arm movement. Your arms are just hooks — the rope should feel like it is being pushed forward by your hips, not pulled by your hands.',
-    why: 'The easiest way to learn a hip hinge safely, because the cable pulls you into the right position rather than loading your spine. It is the pattern behind deadlifting and picking anything heavy off the floor.',
+    why: 'An easy way to learn a hip hinge, because the cable pulls you into the right position rather than loading your spine. It is the pattern behind deadlifting and picking anything heavy off the floor.',
     watchOut: [
       'Squatting down rather than pushing the hips back — the knees should stay softly bent and fairly still',
       'Rounding the lower back at the bottom; stop where your back is still flat',
@@ -763,6 +787,7 @@ GYM.push(
     name: 'Tricep Rope Pushdown',
     youtube: 'tricep rope pushdown cable technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'push',
     equipment: ['cable-machine'],
     equipmentOptional: [],
@@ -784,7 +809,7 @@ GYM.push(
       'Let your hands rise slowly until your forearms are about parallel to the floor'
     ],
     coaching: 'Your elbows should not move at all. If they drift forward or flare out, the weight is too heavy and your shoulders have started helping.',
-    why: 'Strengthens the back of the upper arm, which is what actually gives the arm shape and what does most of the work in any pressing movement.',
+    why: 'Strengthens the back of the upper arm, the larger part of the arm\'s muscle and a big help in any pressing movement.',
     watchOut: [
       'Elbows travelling forward as you push, turning it into a shoulder exercise',
       'Leaning your bodyweight over the rope to force it down',
@@ -802,6 +827,7 @@ GYM.push(
     name: 'Cable Woodchop',
     youtube: 'cable woodchop rotation technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'anti-rotation',
     equipment: ['cable-machine'],
     equipmentOptional: [],
@@ -841,6 +867,7 @@ GYM.push(
     name: 'Leg Press',
     youtube: 'leg press machine proper form',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'squat',
     equipment: ['leg-press-machine'],
     equipmentOptional: [],
@@ -881,6 +908,7 @@ GYM.push(
     name: 'Chest Press Machine',
     youtube: 'chest press machine proper form',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'push',
     equipment: ['chest-press-machine'],
     equipmentOptional: [],
@@ -920,6 +948,7 @@ GYM.push(
     name: 'Leg Curl',
     youtube: 'hamstring leg curl machine form',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'hinge',
     equipment: ['leg-curl-machine'],
     equipmentOptional: [],
@@ -941,7 +970,7 @@ GYM.push(
       'Lower slowly over three counts until your legs are almost straight'
     ],
     coaching: 'Point your toes towards your shins as you curl. It takes the calves out of it and puts the work squarely in the hamstring.',
-    why: 'Hamstrings are the most commonly under-trained muscle in the leg, and strengthening them directly protects the knee and improves almost everything you do standing up.',
+    why: 'Hamstrings often get less direct work than the front of the thigh, and strengthening them helps steady the knee.',
     watchOut: [
       'Lifting the hips off the pad to help the weight up',
       'Pad sitting too high on the calf, which is uncomfortable and reduces the range',
@@ -968,6 +997,7 @@ GYM.push(
     name: 'Incline Dumbbell Press',
     youtube: 'incline dumbbell press technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'push',
     equipment: ['dumbbell', 'bench'],
     equipmentOptional: [],
@@ -1008,6 +1038,7 @@ GYM.push(
     name: 'Dumbbell Arnold Press',
     youtube: 'arnold press dumbbell technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'push',
     equipment: ['dumbbell'],
     equipmentOptional: ['bench'],
@@ -1047,6 +1078,7 @@ GYM.push(
     name: 'Dumbbell Renegade Row',
     youtube: 'renegade row technique form',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'anti-rotation',
     equipment: ['dumbbell'],
     equipmentOptional: [],
@@ -1094,6 +1126,7 @@ GYM.push(
     name: 'Cable Crunch',
     youtube: 'cable crunch kneeling technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'anti-extension',
     equipment: ['cable-machine'],
     equipmentOptional: [],
@@ -1115,7 +1148,7 @@ GYM.push(
       'Return slowly until you feel your stomach lengthen, without letting the weight pull you upright fast'
     ],
     coaching: 'Move your ribs, not your hips. If your backside is travelling towards your heels, your hips are doing the work and your stomach is along for the ride.',
-    why: 'Lets you add weight to core work, which is the only way to keep making progress once planks and sit-ups have stopped being difficult.',
+    why: 'Lets you add weight to core work, which is a way to keep making progress once planks and sit-ups have stopped being difficult.',
     watchOut: [
       'Hips sitting back towards the heels, turning it into a hip movement',
       'Pulling with the arms rather than curling the trunk',
@@ -1133,6 +1166,7 @@ GYM.push(
     name: 'Weighted Decline Sit-Up',
     youtube: 'decline sit up weighted technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'anti-extension',
     equipment: ['bench', 'medicine-ball'],
     equipmentOptional: ['dumbbell'],
@@ -1173,6 +1207,7 @@ GYM.push(
     name: 'Ab Wheel Rollout',
     youtube: 'ab wheel rollout beginner technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'anti-extension',
     equipment: ['ab-wheel'],
     equipmentOptional: [],
@@ -1194,7 +1229,7 @@ GYM.push(
       'Pull yourself back by drawing your hips and ribs towards each other'
     ],
     coaching: 'Your range is decided by your back, not your arms. Go only as far as you can keep the lower back flat, even if that is a few inches at first — that is a successful rep.',
-    why: 'One of the hardest and most effective core exercises there is, because it trains your midsection to stop your back arching under load, which is exactly what it needs to do when you lift anything.',
+    why: 'One of the hardest core exercises there is, because it trains your midsection to stop your back arching under load, which is exactly what it needs to do when you lift anything.',
     watchOut: [
       'Lower back sagging as you roll out, which is the moment the exercise stops working and starts risking something',
       'Going too far too soon — this is one to build over weeks, not sessions',
@@ -1222,6 +1257,7 @@ GYM.push(
     name: 'Medicine Ball Rotational Throw',
     youtube: 'medicine ball rotational throw wall',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'rotation',
     equipment: ['medicine-ball'],
     equipmentOptional: [],
@@ -1261,6 +1297,7 @@ GYM.push(
     name: 'BOSU Ball Squat',
     youtube: 'bosu ball squat balance technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'squat',
     equipment: ['bosu-ball'],
     equipmentOptional: [],
@@ -1307,6 +1344,7 @@ GYM.push(
     name: 'Balance Board Hold',
     youtube: 'balance board hold technique beginners',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'proprioception',
     equipment: ['balance-board'],
     equipmentOptional: ['wobble-cushion'],
@@ -1345,6 +1383,7 @@ GYM.push(
     name: 'Lateral Box Hop',
     youtube: 'lateral box hop plyometric technique',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'jump',
     equipment: ['plyo-box'],
     equipmentOptional: [],
@@ -1366,7 +1405,7 @@ GYM.push(
       'Rest a full minute between sets — this is a power exercise, not a conditioning one'
     ],
     coaching: 'Land quietly. Noise is impact that your joints absorbed instead of your muscles, and quiet landings are the whole skill here.',
-    why: 'Trains sideways power and the ability to absorb landing forces, which is what protects knees and ankles during anything unpredictable.',
+    why: 'Trains sideways power and the ability to absorb landing forces, which helps knees and ankles cope with sudden movements.',
     watchOut: [
       'Heavy, loud landings, which is the sign to lower the box or stop the set',
       'Knees collapsing inward on landing',
@@ -1385,6 +1424,7 @@ GYM.push(
     name: 'TRX Row',
     youtube: 'trx inverted row suspension technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'pull',
     equipment: ['trx'],
     equipmentOptional: [],
@@ -1433,6 +1473,7 @@ GYM.push(
     name: 'Cable Pallof Press',
     youtube: 'cable pallof press anti rotation technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'anti-rotation',
     equipment: ['cable-machine'],
     equipmentOptional: [],
@@ -1482,6 +1523,7 @@ GYM.push(
   { id: 'balance-board-single-leg', name: 'Balance Board Single-Leg Hold',
     youtube: 'balance board single leg hold progression',
     category: 'strength', movementPattern: 'proprioception',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     position: 'standing', impact: false, balanceDemand: true,
     equipment: ['balance-board'], equipmentOptional: ['bosu-ball'],
     affectsAreas: ['ankle-foot', 'knee', 'hip', 'core'],
@@ -1496,7 +1538,7 @@ GYM.push(
       'Step down between sides rather than hopping across'
     ],
     coaching: 'Look ahead, not down. Balance is a conversation between your eyes, your inner ear and your feet, and staring at your feet removes one of the three.',
-    why: 'Single-leg balance on an unstable surface is the hardest thing you can ask of the ankle, and it is what turns a stumble into a recovery rather than a fall.',
+    why: 'Single-leg balance on an unstable surface asks a lot of the ankle, and it is what turns a stumble into a recovery rather than a fall.',
     watchOut: [
       'Gripping with the toes until the foot cramps — spread the weight instead',
       'Attempting this without something within reach to steady yourself on',
@@ -1507,6 +1549,7 @@ GYM.push(
   { id: 'balance-board-squat', name: 'Balance Board Squat',
     youtube: 'balance board squat technique',
     category: 'strength', movementPattern: 'squat',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     position: 'standing', impact: false, balanceDemand: true,
     equipment: ['balance-board'], equipmentOptional: ['bosu-ball'],
     affectsAreas: ['quadriceps', 'glutes', 'ankle-foot', 'core'],
@@ -1532,6 +1575,7 @@ GYM.push(
   { id: 'balance-board-rocking', name: 'Balance Board Controlled Rocking',
     youtube: 'balance board rocking ankle control',
     category: 'strength', movementPattern: 'proprioception',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     position: 'standing', impact: false, balanceDemand: true,
     equipment: ['balance-board'], equipmentOptional: [],
     affectsAreas: ['ankle-foot', 'calves', 'knee'],
@@ -1557,6 +1601,7 @@ GYM.push(
   { id: 'box-step-up-weighted', name: 'Weighted Box Step-Up',
     youtube: 'weighted box step up technique',
     category: 'strength', movementPattern: 'lunge',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     position: 'standing', impact: false, balanceDemand: false,
     equipment: ['plyo-box', 'dumbbell'], equipmentOptional: [],
     affectsAreas: ['quadriceps', 'glutes', 'hamstring'],
@@ -1582,6 +1627,7 @@ GYM.push(
   { id: 'box-jump-step-down', name: 'Box Jump with Step-Down',
     youtube: 'box jump step down safe technique',
     category: 'cardio', movementPattern: 'jump',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     position: 'standing', impact: true, balanceDemand: false,
     equipment: ['plyo-box'], equipmentOptional: [],
     affectsAreas: ['quadriceps', 'glutes', 'calves', 'ankle-foot'],
@@ -1595,7 +1641,7 @@ GYM.push(
       'Stand up fully on the box',
       'STEP down one foot at a time — never jump down'
     ],
-    coaching: 'Step down, always. Jumping down is where nearly every box jump injury happens, and it adds nothing at all to the exercise.',
+    coaching: 'Step down, always. Jumping down adds impact and nothing to the exercise.',
     why: 'Trains power, which fades earlier than strength does and is what lets you react quickly. Landing on a box rather than the floor means far less impact than a jump squat.',
     watchOut: [
       'Jumping down instead of stepping down',
@@ -1608,6 +1654,7 @@ GYM.push(
   { id: 'skipping-intervals', name: 'Skipping Intervals',
     youtube: 'skipping rope interval workout technique',
     category: 'cardio', movementPattern: 'jump',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     position: 'standing', impact: true, balanceDemand: false,
     equipment: ['skipping-rope'], equipmentOptional: [],
     affectsAreas: ['calves', 'ankle-foot', 'quadriceps', 'shoulder'],
@@ -1622,7 +1669,7 @@ GYM.push(
       'Repeat six times'
     ],
     coaching: 'Turn the rope with your wrists, not your arms. Big arm circles are tiring, and they are why most people last thirty seconds.',
-    why: 'One of the most efficient pieces of cardio there is, and it trains the calves and ankles to absorb landing forces, which protects them everywhere else.',
+    why: 'An efficient piece of cardio, and it trains the calves and ankles to absorb landing forces.',
     watchOut: [
       'Jumping far higher than the rope needs',
       'Landing flat-footed and heavily — stay on the balls of the feet',
@@ -1634,6 +1681,7 @@ GYM.push(
   { id: 'medicine-ball-overhead-throw', name: 'Medicine Ball Overhead Throw',
     youtube: 'medicine ball overhead throw wall power',
     category: 'strength', movementPattern: 'jump',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     position: 'standing', impact: false, balanceDemand: false,
     equipment: ['medicine-ball'], equipmentOptional: [],
     affectsAreas: ['full-body', 'shoulder', 'abdominals', 'upper-back'],
@@ -1648,7 +1696,7 @@ GYM.push(
       'Six throws, then rest a full minute'
     ],
     coaching: 'Reset fully between throws. This is a power exercise, and six good throws beat twenty tired ones by a wide margin.',
-    why: 'Trains the whole body to produce force quickly, which is the quality that fades first with age and the one almost nobody trains directly.',
+    why: 'Trains the whole body to produce force quickly, which fades sooner with age than strength does, and gets little direct training.',
     watchOut: [
       'Arching the lower back to get the ball further behind you',
       'Standing so close there is no time to collect the rebound safely',
@@ -1659,6 +1707,7 @@ GYM.push(
   { id: 'medicine-ball-squat-press', name: 'Medicine Ball Squat to Press',
     youtube: 'medicine ball squat press technique',
     category: 'strength', movementPattern: 'squat',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     position: 'standing', impact: false, balanceDemand: false,
     equipment: ['medicine-ball'], equipmentOptional: [],
     affectsAreas: ['quadriceps', 'glutes', 'shoulder', 'abdominals'],
@@ -1684,6 +1733,7 @@ GYM.push(
   { id: 'step-platform-lateral-step', name: 'Lateral Step-Over',
     youtube: 'lateral step over platform technique',
     category: 'cardio', movementPattern: 'lunge',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     position: 'standing', impact: false, balanceDemand: true,
     equipment: ['step-platform'], equipmentOptional: ['plyo-box'],
     affectsAreas: ['glutes', 'quadriceps', 'hip', 'ankle-foot'],
@@ -1724,6 +1774,7 @@ GYM.push(
   { id: 'pull-up', name: 'Pull-Up',
     youtube: 'pull up technique progression beginners',
     category: 'strength', movementPattern: 'pull',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     position: 'standing', impact: false, balanceDemand: false,
     equipment: ['pull-up-bar'], equipmentOptional: ['resistance-band'],
     affectsAreas: ['upper-back', 'shoulder', 'triceps-biceps', 'abdominals'],
@@ -1738,7 +1789,7 @@ GYM.push(
       'Lower all the way to straight arms over three counts'
     ],
     coaching: 'Start by pulling your shoulder blades down before your arms bend at all. Almost everybody who struggles with pull-ups is skipping that first inch.',
-    why: 'The clearest measure of upper-body strength relative to your own weight, and the one that transfers to almost everything you do with your arms.',
+    why: 'A clear measure of upper-body strength relative to your own weight, and the one that transfers to almost everything you do with your arms.',
     watchOut: [
       'Swinging or kicking to generate momentum',
       'Stopping short of straight arms at the bottom, which quietly removes the hardest part',
@@ -1750,6 +1801,7 @@ GYM.push(
   { id: 'hanging-knee-raise', name: 'Hanging Knee Raise',
     youtube: 'hanging knee raise core technique',
     category: 'strength', movementPattern: 'anti-extension',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     position: 'standing', impact: false, balanceDemand: false,
     equipment: ['pull-up-bar'], equipmentOptional: [],
     affectsAreas: ['abdominals', 'core', 'hip-flexor', 'shoulder'],
@@ -1775,6 +1827,7 @@ GYM.push(
   { id: 'dips-parallel-bars', name: 'Parallel Bar Dip',
     youtube: 'parallel bar dip technique progression',
     category: 'strength', movementPattern: 'push',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     position: 'standing', impact: false, balanceDemand: false,
     equipment: ['dip-station'], equipmentOptional: ['resistance-band'],
     affectsAreas: ['chest-pecs', 'triceps-biceps', 'shoulder'],
@@ -1801,6 +1854,7 @@ GYM.push(
   { id: 'stability-ball-hamstring-curl', name: 'Stability Ball Hamstring Curl',
     youtube: 'stability ball hamstring curl technique',
     category: 'strength', movementPattern: 'hinge',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     position: 'floor', impact: false, balanceDemand: false,
     equipment: ['stability-ball'], equipmentOptional: [],
     affectsAreas: ['hamstring', 'glutes', 'core'],
@@ -1826,6 +1880,7 @@ GYM.push(
   { id: 'stability-ball-deadbug', name: 'Stability Ball Dead Bug',
     youtube: 'stability ball dead bug core technique',
     category: 'strength', movementPattern: 'anti-extension',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     position: 'floor', impact: false, balanceDemand: false,
     equipment: ['stability-ball'], equipmentOptional: [],
     affectsAreas: ['abdominals', 'core'],
@@ -1851,6 +1906,7 @@ GYM.push(
   { id: 'heavy-bag-rounds', name: 'Heavy Bag Rounds',
     youtube: 'heavy bag boxing rounds technique beginner',
     category: 'cardio', movementPattern: 'push',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     position: 'standing', impact: false, balanceDemand: false,
     equipment: ['punching-bag'], equipmentOptional: [],
     affectsAreas: ['full-body', 'shoulder', 'abdominals', 'calves'],
@@ -1865,7 +1921,7 @@ GYM.push(
       'Four rounds, and keep the hands up even when you are tired'
     ],
     coaching: 'Turn your hips into each punch. Power comes from the ground up, and punching with the arm alone is both weaker and much harder on the shoulder.',
-    why: 'Hard cardio that does not feel like cardio, and it works the whole body at once. It is also genuinely good for a bad mood, which is a legitimate reason to do it.',
+    why: 'Hard cardio that does not feel like cardio, and it works the whole body at once. Many people find it lifts a bad mood, which is a legitimate reason to do it.',
     watchOut: [
       'Hitting the bag without wraps or gloves — wrists get hurt this way, easily',
       'Locking the elbow at full extension',
@@ -1877,6 +1933,7 @@ GYM.push(
   { id: 'sandbag-clean-press', name: 'Sandbag Clean and Press',
     youtube: 'sandbag clean and press technique',
     category: 'strength', movementPattern: 'hinge',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     position: 'standing', impact: false, balanceDemand: false,
     equipment: ['sandbag'], equipmentOptional: [],
     affectsAreas: ['full-body', 'glutes', 'hamstring', 'shoulder', 'upper-back'],
@@ -1903,6 +1960,7 @@ GYM.push(
   { id: 'landmine-press', name: 'Landmine Press',
     youtube: 'landmine press single arm technique',
     category: 'strength', movementPattern: 'push',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     position: 'standing', impact: false, balanceDemand: false,
     equipment: ['landmine'], equipmentOptional: [],
     affectsAreas: ['shoulder', 'chest-pecs', 'abdominals', 'triceps-biceps'],
@@ -1928,6 +1986,7 @@ GYM.push(
   { id: 'strap-hamstring-stretch', name: 'Strap Hamstring Stretch',
     youtube: 'strap hamstring stretch supine technique',
     category: 'recovery', movementPattern: 'stretch',
+    doors: ['stretch'], feelings: [], style: 'stretch',   // Stage PATH P-2
     position: 'floor', impact: false, balanceDemand: false,
     equipment: ['stretching-strap'], equipmentOptional: [],
     affectsAreas: ['hamstring', 'calves'],
@@ -1953,6 +2012,7 @@ GYM.push(
   { id: 'blocks-supported-forward-fold', name: 'Supported Forward Fold',
     youtube: 'yoga block supported forward fold',
     category: 'recovery', movementPattern: 'stretch',
+    doors: ['stretch'], feelings: [], style: 'stretch',   // Stage PATH P-2
     position: 'standing', impact: false, balanceDemand: false,
     equipment: ['yoga-blocks'], equipmentOptional: [],
     affectsAreas: ['hamstring', 'lower-back', 'calves'],
@@ -1978,6 +2038,7 @@ GYM.push(
   { id: 'ankle-weight-leg-raises', name: 'Weighted Side-Lying Leg Raise',
     youtube: 'side lying leg raise ankle weight',
     category: 'strength', movementPattern: 'hip-abduction',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     position: 'floor', impact: false, balanceDemand: false,
     equipment: ['ankle-weights'], equipmentOptional: [],
     affectsAreas: ['glutes', 'hip'],
@@ -2003,6 +2064,7 @@ GYM.push(
   { id: 'weighted-vest-walk', name: 'Weighted Vest Walk',
     youtube: 'weighted vest walking rucking technique',
     category: 'cardio', movementPattern: 'locomotion',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     position: 'standing', impact: false, balanceDemand: false,
     equipment: ['weighted-vest'], equipmentOptional: [],
     affectsAreas: ['glutes', 'quadriceps', 'calves', 'upper-back', 'abdominals'],

@@ -1,6 +1,12 @@
 /**
  * tools/verify-figures.mjs
- * 04 Oct 2026 v1
+ * 28 Oct 2026 v2
+ *
+ * v2 - STAGE PATH P-9. Re-pointed, not loosened: "a real exercise" now
+ *   includes the twenty Move to feel better movements, which live in
+ *   data/exercises/path_movements.js and are kept out of EXERCISES so Free
+ *   is unchanged. 1a still requires every library exercise drawn; 1c new:
+ *   every new movement drawn too.
  *
  * D-4 FIGURES. Graeme, 04 Oct: "Love it. Absolutely love it. Please do
  * these, obviously in batches, for all of the exercises."
@@ -37,6 +43,7 @@ dom.window.HTMLElement.prototype.scrollIntoView = () => {};
 const B = new URL("../js/", import.meta.url).href;
 const { store } = await import(B + "store.js");
 const { EXERCISES } = await import(B + "data/exercises/index.js");
+const { PATH_MOVEMENTS } = await import(B + "data/exercises/path_movements.js");
 const { FIGURES } = await import(B + "data/figures/index.js");
 const FG = await import(B + "figures.js");
 const CARD = await import(B + "exercise-card.js");
@@ -54,9 +61,12 @@ const frag = html => { const d = document.createElement("div"); d.innerHTML = ht
 console.log("\nTEST 1 - every exercise has a figure");
 const ids = new Set(EXERCISES.map(e => e.id));
 const missing = [...ids].filter(id => !FG.hasFigure(id));
-const stray = Object.keys(FIGURES).filter(id => !ids.has(id));
+const pathIds = new Set(PATH_MOVEMENTS.map(e => e.id));
+const stray = Object.keys(FIGURES).filter(id => !ids.has(id) && !pathIds.has(id));
 ok(`1a. all ${ids.size} exercises are drawn`, ids.size > 500 && missing.length === 0, missing.slice(0, 20).join(", "));
 ok("1b. every figure is a real exercise", stray.length === 0, stray.join(", "));
+const pathMissing = [...pathIds].filter(id => !FG.hasFigure(id));
+ok(`1c. all ${pathIds.size} Move to feel better movements are drawn`, pathIds.size === 20 && pathMissing.length === 0, pathMissing.join(", "));
 
 // ── 2. EACH FRAME ───────────────────────────────────────────────────────
 console.log("\nTEST 2 - every frame is captioned, described and inside its frame");

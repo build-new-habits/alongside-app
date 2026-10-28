@@ -1,5 +1,12 @@
 /**
  * data/exercises/pilates.js
+ * 28 Oct 2026 v6
+ * v6 - STAGE PATH P-2 and P-9b (Session 2). Every entry carries doors,
+ *   feelings and style (blueprint C5; tools/verify-path-tags.mjs). Why and
+ *   coaching lines that were not accurate are corrected, keeping what is
+ *   true (Graeme, 28 Oct: "If they are not, then change them"); each change
+ *   and its source: BNH-Files Product/alongside_library_accuracy_28oct2026_v1.md.
+ *
  * 02 Oct 2026 v5
  *
  * v5 - W5-3 FLOOR-SITTING. Spine Stretch Forward and Spine Twist ("Sit tall
@@ -57,6 +64,7 @@ export const PILATES = [
     name: 'The Hundred',
     youtube: 'the hundred pilates technique',
     category: 'strength',
+    doors: ['stronger', 'feel'], feelings: [], style: 'pilates',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'pilates-move',
     equipment: [],
@@ -94,6 +102,7 @@ export const PILATES = [
     name: 'Roll-Up',
     youtube: 'roll-up pilates technique',
     category: 'strength',
+    doors: ['stronger', 'feel'], feelings: [], style: 'pilates',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'pilates-move',
     equipment: [],
@@ -132,6 +141,7 @@ export const PILATES = [
     name: 'Single Leg Stretch',
     youtube: 'single leg stretch pilates technique',
     category: 'strength',
+    doors: ['stronger', 'feel'], feelings: ['wake'], style: 'pilates',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'pilates-move',
     equipment: [],
@@ -169,6 +179,7 @@ export const PILATES = [
     name: 'Double Leg Stretch',
     youtube: 'double leg stretch pilates technique',
     category: 'strength',
+    doors: ['stronger', 'feel'], feelings: [], style: 'pilates',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'pilates-move',
     equipment: [],
@@ -205,6 +216,7 @@ export const PILATES = [
     name: 'Scissors',
     youtube: 'scissors pilates technique',
     category: 'strength',
+    doors: ['stronger', 'feel'], feelings: [], style: 'pilates',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'pilates-move',
     equipment: [],
@@ -242,6 +254,7 @@ export const PILATES = [
     name: 'Criss-Cross',
     youtube: 'criss-cross pilates technique',
     category: 'strength',
+    doors: ['stronger', 'feel'], feelings: [], style: 'pilates',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'pilates-move',
     equipment: [],
@@ -261,7 +274,7 @@ export const PILATES = [
       'Complete 10 sets'
     ],
     coaching: 'The rotation comes from the waist, not just the elbow. Think of bringing your ribs toward the opposite knee, not your head.',
-    why: 'The primary oblique exercise in Pilates. Builds rotational core strength that protects the spine and is essential for all twisting movements.',
+    why: 'The primary oblique exercise in Pilates. Builds rotational core strength used in twisting movements.',
         watchOut: [
       'Pulling the head round with the hands, which strains the neck',
       'Rotating from the shoulders rather than the ribs',
@@ -279,6 +292,7 @@ export const PILATES = [
     name: 'Swan',
     youtube: 'swan pilates technique',
     category: 'mobility',
+    doors: ['stretch', 'feel'], feelings: [], style: 'pilates',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'pilates-move',
     equipment: [],
@@ -317,6 +331,7 @@ export const PILATES = [
     name: 'Swimming',
     youtube: 'swimming pilates technique',
     category: 'strength',
+    doors: ['stronger', 'feel'], feelings: ['wake'], style: 'pilates',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'pilates-move',
     equipment: [],
@@ -354,6 +369,7 @@ export const PILATES = [
     name: 'Side-Lying Kick Series',
     youtube: 'side-lying kick series pilates technique',
     category: 'strength',
+    doors: ['stronger', 'feel'], feelings: [], style: 'pilates',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'pilates-move',
     equipment: [],
@@ -390,6 +406,7 @@ export const PILATES = [
     name: 'Spine Stretch Forward',
     youtube: 'spine stretch forward pilates technique',
     category: 'mobility',
+    doors: ['stretch', 'feel'], feelings: ['wake'], style: 'pilates',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'pilates-move',
     equipment: [],
@@ -410,7 +427,7 @@ export const PILATES = [
       'Complete 8 reps'
     ],
     coaching: 'This is a spinal articulation, not a hamstring stretch. The priority is the C-curve of the spine — not how far forward you reach.',
-    why: 'Develops spinal flexion mobility and the ability to decompresses the vertebrae — important for back health and posture.',
+    why: 'Develops the ability to round the spine forward with control, one section at a time.',
         watchOut: [
       'Bouncing into the stretch rather than holding it still',
       'Pushing to the point of pain; a stretch should feel like a strong pull, never sharp',
@@ -429,6 +446,7 @@ export const PILATES = [
     name: 'Leg Circles',
     youtube: 'leg circles pilates technique',
     category: 'mobility',
+    doors: ['stretch', 'feel'], feelings: [], style: 'pilates',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'pilates-move',
     equipment: [],
@@ -467,6 +485,7 @@ export const PILATES = [
     name: 'Teaser Preparation',
     youtube: 'teaser preparation pilates technique',
     category: 'strength',
+    doors: ['stronger', 'feel'], feelings: [], style: 'pilates',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'pilates-move',
     equipment: [],
@@ -506,6 +525,7 @@ export const PILATES = [
     name: 'Shoulder Bridge',
     youtube: 'shoulder bridge pilates technique',
     category: 'strength',
+    doors: ['stronger', 'feel'], feelings: ['wake'], style: 'pilates',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'pilates-move',
     equipment: [],
@@ -525,7 +545,7 @@ export const PILATES = [
       'Complete 8 reps'
     ],
     coaching: 'The articulation of the spine on the way up and down is the whole exercise — not just the bridge position. Move like a wave, not a plank.',
-    why: 'Develops sequential spinal articulation and posterior chain strength. Superior to a standard glute bridge for spinal mobility.',
+    why: 'Develops sequential spinal articulation and posterior chain strength. Adds rolling the spine up and down to a glute bridge.',
         watchOut: [
       'Over-arching at the top rather than finishing level',
       'Pushing through the toes instead of the heels',
@@ -543,6 +563,7 @@ export const PILATES = [
     name: 'Mermaid Stretch',
     youtube: 'mermaid stretch pilates technique',
     category: 'mobility',
+    doors: ['stretch', 'feel'], feelings: ['wake'], style: 'pilates',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'pilates-move',
     equipment: [],
@@ -581,6 +602,7 @@ export const PILATES = [
     name: 'Wall Roll-Down',
     youtube: 'wall roll-down pilates technique',
     category: 'mobility',
+    doors: ['stretch', 'feel'], feelings: ['wake'], style: 'pilates',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'pilates-move',
     equipment: [],
@@ -623,6 +645,7 @@ export const PILATES = [
     name: 'Pilates Beginner Sequence',
     youtube: 'pilates beginner sequence pilates technique',
     category: 'strength',
+    doors: ['stronger', 'feel'], feelings: ['wake'], style: 'pilates',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'pilates-sequence',
     equipment: [],
@@ -665,6 +688,7 @@ export const PILATES = [
     name: 'Pilates Core Focus Sequence',
     youtube: 'pilates core focus sequence pilates technique',
     category: 'strength',
+    doors: ['stronger', 'feel'], feelings: [], style: 'pilates',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'pilates-sequence',
     equipment: [],
@@ -712,6 +736,7 @@ export const PILATES = [
     name: 'Standing Roll-Down',
     youtube: 'standing roll-down pilates technique',
     category: 'mobility',
+    doors: ['stretch', 'feel'], feelings: ['ground', 'wake'], style: 'pilates',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'pilates-move',
     equipment: [],
@@ -750,6 +775,7 @@ export const PILATES = [
     name: 'Corkscrew',
     youtube: 'corkscrew pilates technique',
     category: 'strength',
+    doors: ['stronger', 'feel'], feelings: [], style: 'pilates',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'pilates-move',
     equipment: [],
@@ -770,7 +796,7 @@ export const PILATES = [
       'Complete 3 circles each direction'
     ],
     coaching: 'The lower back stays on the mat throughout — as soon as it lifts, the range is too large. Control is more important than size of the circle.',
-    why: 'Develops rotational core strength and hip flexor control while maintaining spinal stability — one of the most effective lateral abdominal exercises in Pilates.',
+    why: 'Develops rotational core strength and hip flexor control while maintaining spinal stability.',
         watchOut: [
       'Lower back lifting as the legs circle',
       'Circling wider than you can control',
@@ -788,6 +814,7 @@ export const PILATES = [
     name: 'Spine Twist',
     youtube: 'spine twist pilates technique',
     category: 'mobility',
+    doors: ['stretch', 'feel'], feelings: [], style: 'pilates',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'pilates-move',
     equipment: [],
@@ -826,6 +853,7 @@ export const PILATES = [
     name: 'Long Stretch — Plank Variation',
     youtube: 'long stretch - plank variation pilates technique',
     category: 'strength',
+    doors: ['stronger', 'feel'], feelings: [], style: 'pilates',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'pilates-move',
     equipment: [],
@@ -864,6 +892,7 @@ export const PILATES = [
     name: 'Kneeling Side Kick Series',
     youtube: 'kneeling side kick series pilates technique',
     category: 'strength',
+    doors: ['stronger', 'feel'], feelings: [], style: 'pilates',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'pilates-move',
     equipment: [],
@@ -901,6 +930,7 @@ export const PILATES = [
     name: 'Advanced Pilates Sequence — 30 Minutes',
     youtube: 'advanced pilates sequence - 30 minutes pilates technique',
     category: 'strength',
+    doors: ['stronger', 'feel'], feelings: [], style: 'pilates',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'pilates-sequence',
     equipment: [],
@@ -944,6 +974,7 @@ export const PILATES = [
     name: 'Reformer-Style Pilates — Mat Adaptation',
     youtube: 'reformer-style pilates - mat adaptation pilates technique',
     category: 'strength',
+    doors: ['stronger', 'feel'], feelings: [], style: 'pilates',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'pilates-sequence',
     equipment: ['resistance-band'],

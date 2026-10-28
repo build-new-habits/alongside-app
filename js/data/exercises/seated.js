@@ -1,5 +1,12 @@
 /**
  * data/exercises/seated.js
+ * 28 Oct 2026 v4
+ * v4 - STAGE PATH P-2 and P-9b (Session 2). Every entry carries doors,
+ *   feelings and style (blueprint C5; tools/verify-path-tags.mjs). Why and
+ *   coaching lines that were not accurate are corrected, keeping what is
+ *   true (Graeme, 28 Oct: "If they are not, then change them"); each change
+ *   and its source: BNH-Files Product/alongside_library_accuracy_28oct2026_v1.md.
+ *
  * 13 Oct 2026 v3
  *
  * v3 - HOME-BANDS. A band worn round both legs is a short loop band, so
@@ -141,6 +148,7 @@ export const SEATED = [
     name: 'Seated Self-Resisted Row',
     youtube: 'seated self resisted row no equipment',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'pull',
     position: 'seated',
     adaptive: true,
@@ -181,6 +189,7 @@ export const SEATED = [
     name: 'Seated Shoulder Blade Squeeze',
     youtube: 'seated scapular retraction exercise',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'pull',
     position: 'seated',
     adaptive: true,
@@ -220,6 +229,7 @@ export const SEATED = [
     name: 'Seated Hip Hinge',
     youtube: 'seated hip hinge chair exercise',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'hinge',
     position: 'seated',
     adaptive: true,
@@ -259,6 +269,7 @@ export const SEATED = [
     name: 'Seated Chair Press',
     youtube: 'seated chair press up triceps',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'push',
     position: 'seated',
     adaptive: true,
@@ -298,6 +309,7 @@ export const SEATED = [
     name: 'Seated Hip Flexor Stretch',
     youtube: 'seated hip flexor stretch chair edge',
     category: 'mobility',
+    doors: ['stretch'], feelings: [], style: 'stretch',   // Stage PATH P-2
     movementPattern: 'stretch',
     position: 'seated',
     adaptive: true,
@@ -337,6 +349,7 @@ export const SEATED = [
     name: 'Seated Spinal Lengthening',
     youtube: 'seated spinal decompression chair',
     category: 'mobility',
+    doors: ['stretch'], feelings: [], style: 'stretch',   // Stage PATH P-2
     movementPattern: 'spinal-decompression',
     position: 'seated',
     adaptive: true,
@@ -380,6 +393,7 @@ export const SEATED = [
     name: 'Seated Arm Cycling',
     youtube: 'seated arm cycling cardio workout',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'locomotion',
     position: 'seated',
     adaptive: true,   // CAP-6
@@ -419,6 +433,7 @@ export const SEATED = [
     name: 'Seated Punches',
     youtube: 'seated boxing punches chair cardio',
     category: 'cardio',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'push',
     position: 'seated',
     adaptive: true,   // CAP-6
@@ -458,6 +473,7 @@ export const SEATED = [
     name: 'Seated Marching',
     youtube: 'seated marching chair exercise cardio',
     category: 'cardio',
+    doors: ['moving', 'feel'], feelings: ['wake'], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'locomotion',
     position: 'seated',
     adaptive: true,   // CAP-6
@@ -501,6 +517,7 @@ export const SEATED = [
     name: 'Seated Shoulder Press',
     youtube: 'seated dumbbell shoulder press form',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'push',
     position: 'seated',
     adaptive: true,   // CAP-6
@@ -541,6 +558,7 @@ export const SEATED = [
     name: 'Seated Band Chest Press',
     youtube: 'seated resistance band chest press',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'push',
     position: 'seated',
     adaptive: true,   // CAP-6
@@ -581,6 +599,7 @@ export const SEATED = [
     name: 'Seated Lateral Raise',
     youtube: 'seated dumbbell lateral raise form',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'push',
     position: 'seated',
     adaptive: true,   // CAP-6
@@ -621,6 +640,7 @@ export const SEATED = [
     name: 'Seated Bicep Curl',
     youtube: 'seated dumbbell bicep curl technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'pull',
     position: 'seated',
     adaptive: true,   // CAP-6
@@ -661,6 +681,7 @@ export const SEATED = [
     name: 'Seated Overhead Tricep Extension',
     youtube: 'seated overhead tricep extension form',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'push',
     position: 'seated',
     adaptive: true,   // CAP-6
@@ -686,7 +707,7 @@ export const SEATED = [
       'Press back up until your arms are straight, without locking the elbows hard'
     ],
     coaching: 'Elbows stay pointing forwards and close together. Once they flare out to the sides the triceps stop doing most of the work.',
-    why: 'The back of the upper arm does most of the work in any pushing movement, including pushing yourself up out of a chair. It is also what gives the arm its shape.',
+    why: 'The back of the upper arm does a lot of the work in any pushing movement, including pushing yourself up out of a chair. It is also what gives the arm its shape.',
     watchOut: [
       'Elbows flaring wide as you lower',
       'Arching the lower back as the weight goes behind your head — brace your stomach first',
@@ -705,6 +726,7 @@ export const SEATED = [
     name: 'Seated Pallof Press',
     youtube: 'seated pallof press band anti rotation',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'anti-rotation',
     position: 'seated',
     adaptive: true,   // CAP-6
@@ -730,7 +752,7 @@ export const SEATED = [
       'Hold for two seconds while the band tries to turn you, then bring your hands back in'
     ],
     coaching: 'Nothing moves except your arms. The band is trying to rotate you the whole time, and the whole exercise is your middle quietly refusing to let it.',
-    why: 'Trains your trunk to resist being turned, which is what it does every time you reach sideways for something, push a door, or steady yourself. It is the seated version of the most useful core exercise there is.',
+    why: 'Trains your trunk to resist being turned, which is what it does every time you reach sideways for something, push a door, or steady yourself. It is the seated version of a very useful core exercise.',
     watchOut: [
       'Your body turning towards the anchor as you press out, which means the band is too strong',
       'Shoulders rotating while the hips stay square, or the other way about',
@@ -745,6 +767,7 @@ export const SEATED = [
     name: 'Seated Torso Rotation',
     youtube: 'seated torso rotation core exercise',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'rotation',
     position: 'seated',
     adaptive: true,   // CAP-6
@@ -785,6 +808,7 @@ export const SEATED = [
     name: 'Seated Knee Lift',
     youtube: 'seated knee lift core chair exercise',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'anti-extension',
     position: 'seated',
     adaptive: true,   // CAP-6
@@ -825,6 +849,7 @@ export const SEATED = [
     name: 'Seated Side Bend',
     youtube: 'seated side bend oblique exercise',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'anti-lateral-flexion',
     position: 'seated',
     adaptive: true,   // CAP-6
@@ -874,6 +899,7 @@ SEATED.push(
     name: 'Seated Leg Extension',
     youtube: 'seated leg extension chair exercise',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'squat',
     position: 'seated',
     adaptive: true,   // CAP-6
@@ -899,7 +925,7 @@ SEATED.push(
       'Complete all reps on one leg before changing'
     ],
     coaching: 'The two-second hold at the top is where this works. Swinging the leg up and letting it drop is a different exercise, and a much easier one.',
-    why: 'The muscle at the front of the thigh is what straightens your knee and what holds you steady in standing. It is the first thing lost when someone stops walking much, and among the quickest to come back.',
+    why: 'The muscle at the front of the thigh is what straightens your knee and what holds you steady in standing. It weakens quickly when someone stops walking much, and it comes back with use.',
     watchOut: [
       'Leaning back as the leg comes up, which usually means reaching for height you do not have yet',
       'Letting the leg drop rather than lowering it',
@@ -914,6 +940,7 @@ SEATED.push(
     name: 'Seated Hip Abduction',
     youtube: 'seated banded hip abduction chair',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'hip-abduction',
     position: 'seated',
     adaptive: true,   // CAP-6
@@ -939,7 +966,7 @@ SEATED.push(
       'Return slowly, keeping tension on the band throughout'
     ],
     coaching: 'Keep both feet flat as the knees travel out. If the feet roll onto their outside edges, the ankles have started doing the hips\' work.',
-    why: 'The muscles on the outside of the hip are what stabilise you sideways and what stop the knee falling inwards. They are among the most useful and least trained muscles in the body.',
+    why: 'The muscles on the outside of the hip are what stabilise you sideways and what stop the knee falling inwards. They are useful muscles that get little training.',
     watchOut: [
       'Feet rolling outwards as the knees open',
       'Leaning back into the chair as you press',
@@ -961,6 +988,7 @@ SEATED.push(
     name: 'Seated Heel and Toe Raise',
     youtube: 'seated heel toe raise circulation exercise',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'calf-raise',
     position: 'seated',
     adaptive: true,   // CAP-6
@@ -1001,6 +1029,7 @@ SEATED.push(
     name: 'Seated Hamstring Curl',
     youtube: 'seated banded hamstring curl chair',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'hinge',
     position: 'seated',
     adaptive: true,   // CAP-6
@@ -1026,7 +1055,7 @@ SEATED.push(
       'Let the band draw your leg forward slowly over three counts'
     ],
     coaching: 'Point your toes up towards your shin as you pull. It takes the calf out of the movement and puts the work squarely in the back of the thigh.',
-    why: 'Hamstrings are the most commonly under-trained muscle in the leg, and they protect the knee. Working them seated means the back is fully supported while you do it.',
+    why: 'Hamstrings often get less direct work than the front of the thigh, and they help steady the knee. Working them seated means the back is fully supported while you do it.',
     watchOut: [
       'The whole leg lifting rather than the knee bending',
       'Letting the band snap the leg straight at the end of each rep',
@@ -1051,6 +1080,7 @@ SEATED.push(
     name: 'Sit to Stand',
     youtube: 'sit to stand exercise technique chair',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'squat',
     position: 'standing',
     adaptive: true,   // CAP-6
@@ -1076,7 +1106,7 @@ SEATED.push(
       'Lower yourself back down over three counts rather than dropping into the seat'
     ],
     coaching: 'Nose over toes before you stand. Almost everyone tries to stand while still leaning back, which is what makes it feel impossible, and the lean forward is what makes it work.',
-    why: 'This is the single movement that decides most about staying independent. Every time you get out of a chair, a car, or a bath you are doing it, and it is trainable at any age. Keeping hold of it keeps a great deal else available to you in years to come.',
+    why: 'This movement matters a great deal for staying independent. Every time you get out of a chair, a car, or a bath you are doing it, and it is trainable at any age. Keeping hold of it keeps a great deal else available to you in years to come.',
     watchOut: [
       'Trying to stand while still leaning back into the chair',
       'Dropping down into the seat rather than lowering under control -- the lowering is the half that builds the strength',
@@ -1092,6 +1122,7 @@ SEATED.push(
     name: 'Supported Calf Raise',
     youtube: 'supported calf raise chair technique',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'calf-raise',
     position: 'standing',
     adaptive: true,   // CAP-6
@@ -1132,6 +1163,7 @@ SEATED.push(
     name: 'Supported Standing Hip Abduction',
     youtube: 'standing hip abduction chair support',
     category: 'strength',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'hip-abduction',
     position: 'standing',
     adaptive: true,   // CAP-6
@@ -1172,6 +1204,7 @@ SEATED.push(
     name: 'Supported Standing March',
     youtube: 'supported standing march chair exercise',
     category: 'cardio',
+    doors: ['moving', 'feel'], feelings: ['wake'], style: 'exercise',   // Stage PATH P-2
     movementPattern: 'locomotion',
     position: 'standing',
     adaptive: true,   // CAP-6
@@ -1225,6 +1258,7 @@ SEATED.push(
     name: 'Seated Band Pull-Apart',
     youtube: 'seated band pull apart posture',
     category: 'strength', movementPattern: 'pull',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     position: 'seated',
     adaptive: true,   // CAP-6
     impact: false, balanceDemand: false,
@@ -1241,7 +1275,7 @@ SEATED.push(
       'Return slowly over three counts, resisting the band the whole way'
     ],
     coaching: 'Keep your arms straight throughout. The moment your elbows bend it becomes a row, which is a fine exercise but not this one.',
-    why: 'Works the small muscles between the shoulder blades that hold your shoulders back. If you spend a lot of the day with your arms in front of you, this is the direct antidote.',
+    why: 'Works the small muscles between the shoulder blades that hold your shoulders back. If you spend a lot of the day with your arms in front of you, this is a useful balance to it.',
     watchOut: [
       'Elbows bending as the band gets harder near the end of the range',
       'Shrugging the shoulders up towards the ears',
@@ -1255,6 +1289,7 @@ SEATED.push(
     name: 'Seated Band Face Pull',
     youtube: 'seated band face pull technique',
     category: 'strength', movementPattern: 'pull',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     position: 'seated',
     adaptive: true,   // CAP-6
     impact: false, balanceDemand: false,
@@ -1271,7 +1306,7 @@ SEATED.push(
       'Return slowly over three counts'
     ],
     coaching: 'Elbows high and wide, not tucked in. That angle is what reaches the muscles at the back of the shoulder rather than the ones down your sides.',
-    why: 'One of the best things you can do for shoulder health, particularly if you push a chair or use your arms heavily. It balances out all the forward work.',
+    why: 'A good exercise for the back of the shoulder, particularly if you push a chair or use your arms heavily. It balances out all the forward work.',
     watchOut: [
       'Elbows dropping low, which turns it into a row',
       'Leaning back to generate the pull',
@@ -1285,6 +1320,7 @@ SEATED.push(
     name: 'Seated Band Pulldown',
     youtube: 'seated band lat pulldown overhead anchor',
     category: 'strength', movementPattern: 'pull',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     position: 'seated',
     adaptive: true,   // CAP-6
     impact: false, balanceDemand: false,
@@ -1322,6 +1358,7 @@ SEATED.push(
     name: 'Seated Shoulder External Rotation',
     youtube: 'seated band external rotation shoulder',
     category: 'strength', movementPattern: 'shoulder-rotation',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     position: 'seated',
     adaptive: true,   // CAP-6
     impact: false, balanceDemand: false,
@@ -1352,6 +1389,7 @@ SEATED.push(
     name: 'Seated Band Overhead Press',
     youtube: 'seated band overhead press technique',
     category: 'strength', movementPattern: 'push',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     position: 'seated',
     adaptive: true,   // CAP-6
     impact: false, balanceDemand: false,
@@ -1382,6 +1420,7 @@ SEATED.push(
     name: 'Seated Band Woodchop',
     youtube: 'seated band woodchop rotation core',
     category: 'strength', movementPattern: 'rotation',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     position: 'seated',
     adaptive: true,   // CAP-6
     impact: false, balanceDemand: false,
@@ -1412,6 +1451,7 @@ SEATED.push(
     name: 'Seated Shrug',
     youtube: 'seated dumbbell shrug technique',
     category: 'strength', movementPattern: 'pull',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     position: 'seated',
     adaptive: true,   // CAP-6
     impact: false, balanceDemand: false,
@@ -1427,7 +1467,7 @@ SEATED.push(
       'Hold for a second at the top',
       'Lower slowly over three counts until the shoulders are fully down again'
     ],
-    coaching: 'Straight up and straight down. Rolling the shoulders backwards at the top adds nothing and grinds the joint.',
+    coaching: 'Straight up and straight down. Rolling the shoulders at the top adds nothing to the exercise.',
     why: 'Strengthens the muscles that carry the weight of your arms all day. For anyone who pushes, lifts or carries a lot, these take a steady beating and rarely get trained.',
     watchOut: [
       'Rolling the shoulders rather than lifting them',
@@ -1442,6 +1482,7 @@ SEATED.push(
     name: 'Seated Isometric Chest Press',
     youtube: 'isometric chest press palms together',
     category: 'strength', movementPattern: 'isometric',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     position: 'seated',
     adaptive: true,   // CAP-6
     impact: false, balanceDemand: false,
@@ -1478,6 +1519,7 @@ SEATED.push(
   { id: 'seated-neck-side-stretch', name: 'Seated Neck Side Stretch',
     youtube: 'seated neck side stretch technique',
     category: 'recovery', movementPattern: 'stretch',
+    doors: ['stretch', 'feel'], feelings: ['sleep'], style: 'stretch',   // Stage PATH P-2
     position: 'seated',
     adaptive: true,   // CAP-6
     impact: false, balanceDemand: false,
@@ -1504,6 +1546,7 @@ SEATED.push(
   { id: 'seated-chest-doorway-stretch', name: 'Seated Chest Stretch',
     youtube: 'seated chest stretch hands behind',
     category: 'recovery', movementPattern: 'stretch',
+    doors: ['stretch'], feelings: [], style: 'stretch',   // Stage PATH P-2
     position: 'seated',
     adaptive: true,   // CAP-6
     impact: false, balanceDemand: false,
@@ -1519,7 +1562,7 @@ SEATED.push(
       'Release slowly'
     ],
     coaching: 'Lead with the chest lifting rather than the arms going back. It reaches the same place and asks far less of the shoulder joint.',
-    why: 'Everything most people do happens in front of them, and the chest shortens to match. This is the direct undoing of that.',
+    why: 'Everything most people do happens in front of them, and the chest shortens to match. This stretch works the other way.',
     watchOut: [
       'Arching the lower back instead of opening the chest',
       'Forcing the arms further back than is comfortable',
@@ -1530,6 +1573,7 @@ SEATED.push(
   { id: 'seated-lat-side-stretch', name: 'Seated Side Reach',
     youtube: 'seated side stretch overhead reach',
     category: 'recovery', movementPattern: 'stretch',
+    doors: ['stretch'], feelings: [], style: 'stretch',   // Stage PATH P-2
     position: 'seated',
     adaptive: true,   // CAP-6
     impact: false, balanceDemand: false,
@@ -1556,6 +1600,7 @@ SEATED.push(
   { id: 'seated-wrist-forearm-stretch', name: 'Seated Wrist and Forearm Stretch',
     youtube: 'seated wrist forearm stretch technique',
     category: 'recovery', movementPattern: 'stretch',
+    doors: ['stretch'], feelings: [], style: 'stretch',   // Stage PATH P-2
     position: 'seated',
     adaptive: true,   // CAP-6
     impact: false, balanceDemand: false,
@@ -1571,7 +1616,7 @@ SEATED.push(
       'Keep the working elbow soft rather than locked'
     ],
     coaching: 'Gently is the whole instruction. Wrists respond badly to being forced and there is nothing to gain by pushing.',
-    why: 'Anybody who grips, pushes or carries a lot works their forearms constantly and stretches them almost never. This is where wrist and elbow trouble starts.',
+    why: 'Anybody who grips, pushes or carries a lot works their forearms constantly and stretches them almost never.',
     watchOut: [
       'Locking the elbow of the arm being stretched',
       'Pulling hard enough to feel it in the joint rather than the muscle',
@@ -1582,6 +1627,7 @@ SEATED.push(
   { id: 'seated-band-anti-rotation-hold', name: 'Seated Anti-Rotation Hold',
     youtube: 'seated band anti rotation hold core',
     category: 'strength', movementPattern: 'anti-rotation',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     position: 'seated',
     adaptive: true,   // CAP-6
     impact: false, balanceDemand: false,
@@ -1608,6 +1654,7 @@ SEATED.push(
   { id: 'seated-dead-bug-arms', name: 'Seated Arm Reach with Brace',
     youtube: 'seated core brace arm reach',
     category: 'strength', movementPattern: 'anti-extension',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     position: 'seated',
     adaptive: true,   // CAP-6
     impact: false, balanceDemand: false,
@@ -1634,6 +1681,7 @@ SEATED.push(
   { id: 'seated-band-chest-fly', name: 'Seated Band Chest Fly',
     youtube: 'seated band chest fly technique',
     category: 'strength', movementPattern: 'push',
+    doors: ['stronger'], feelings: [], style: 'exercise',   // Stage PATH P-2
     position: 'seated',
     adaptive: true,   // CAP-6
     impact: false, balanceDemand: false,
@@ -1649,7 +1697,7 @@ SEATED.push(
       'Let your arms open slowly over three counts, staying in control at the widest point'
     ],
     coaching: 'Keep the same soft elbow bend the whole way. Straightening as you come together turns it into a press and takes the chest out of it.',
-    why: 'Works the chest through a wider arc than pressing does, which reaches the part of it that pressing largely misses.',
+    why: 'Works the chest through a wider arc than pressing does.',
     watchOut: [
       'Elbows straightening as the hands meet',
       'Opening wider than feels comfortable in the shoulder',
@@ -1660,6 +1708,7 @@ SEATED.push(
   { id: 'seated-arm-intervals', name: 'Seated Arm Intervals',
     youtube: 'seated arm cardio interval workout',
     category: 'cardio', movementPattern: 'locomotion',
+    doors: ['moving'], feelings: [], style: 'exercise',   // Stage PATH P-2
     position: 'seated',
     adaptive: true,   // CAP-6
     impact: false, balanceDemand: false,
@@ -1676,7 +1725,7 @@ SEATED.push(
       'Change the movement each round if you like — variety keeps the effort up'
     ],
     coaching: 'Pick a pace you can repeat five times, not one you can manage once. The last round should look like the first.',
-    why: 'Genuinely hard cardio using the upper body alone. Five rounds of this raises your fitness in the same way running does for somebody who runs.',
+    why: 'Genuinely hard cardio using the upper body alone.',
     watchOut: [
       'Going flat out in the first round and fading badly',
       'Shoulders creeping up and staying there',
@@ -1687,6 +1736,7 @@ SEATED.push(
   { id: 'seated-shoulder-rolls-warmup', name: 'Seated Shoulder Rolls',
     youtube: 'seated shoulder rolls warm up',
     category: 'cardio', movementPattern: 'locomotion',
+    doors: ['moving', 'feel'], feelings: ['calm', 'worn'], style: 'exercise',   // Stage PATH P-2
     position: 'seated',
     adaptive: true,   // CAP-6
     impact: false, balanceDemand: false,

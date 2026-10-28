@@ -1,5 +1,12 @@
 /**
  * data/exercises/yoga.js
+ * 28 Oct 2026 v11
+ * v11 - STAGE PATH P-2 and P-9b (Session 2). Every entry carries doors,
+ *   feelings and style (blueprint C5; tools/verify-path-tags.mjs). Why and
+ *   coaching lines that were not accurate are corrected, keeping what is
+ *   true (Graeme, 28 Oct: "If they are not, then change them"); each change
+ *   and its source: BNH-Files Product/alongside_library_accuracy_28oct2026_v1.md.
+ *
  * 17 Oct 2026 v10
  *
  * v10 - W6-3 CHAIR-STANCES. Warrior I is tagged balanceDemand: its own
@@ -87,6 +94,7 @@ export const YOGA = [
     name: 'Downward Facing Dog',
     youtube: 'downward facing dog yoga pose tutorial',
     category: 'mobility',
+    doors: ['stretch', 'feel'], feelings: ['wake'], style: 'yoga',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'yoga-pose',
     equipment: [],
@@ -125,6 +133,7 @@ export const YOGA = [
     name: 'Warrior I',
     youtube: 'warrior 1 yoga pose tutorial',
     category: 'mobility',
+    doors: ['stretch', 'feel'], feelings: ['wake'], style: 'yoga',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'yoga-pose',
     equipment: [],
@@ -164,6 +173,7 @@ export const YOGA = [
     name: 'Warrior II',
     youtube: 'warrior 2 yoga pose tutorial',
     category: 'mobility',
+    doors: ['stretch', 'feel'], feelings: ['ground', 'wake'], style: 'yoga',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'yoga-pose',
     equipment: [],
@@ -203,6 +213,7 @@ export const YOGA = [
     name: 'Triangle Pose',
     youtube: 'triangle pose yoga tutorial',
     category: 'mobility',
+    doors: ['stretch', 'feel'], feelings: [], style: 'yoga',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'yoga-pose',
     equipment: [],
@@ -241,6 +252,7 @@ export const YOGA = [
     name: 'Chair Pose',
     youtube: 'chair pose yoga tutorial',
     category: 'strength',
+    doors: ['stronger', 'feel'], feelings: ['wake'], style: 'yoga',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'yoga-pose',
     equipment: [],
@@ -277,6 +289,7 @@ export const YOGA = [
     name: 'Tree Pose',
     youtube: 'tree pose yoga tutorial',
     category: 'mobility',
+    doors: ['stretch', 'feel'], feelings: ['ground', 'wake'], style: 'yoga',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'yoga-pose',
     equipment: [],
@@ -313,6 +326,7 @@ export const YOGA = [
     name: 'Cobra Pose',
     youtube: 'cobra pose yoga tutorial',
     category: 'mobility',
+    doors: ['stretch', 'feel'], feelings: [], style: 'yoga',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'yoga-pose',
     equipment: [],
@@ -350,6 +364,7 @@ export const YOGA = [
     name: 'Seated Forward Fold',
     youtube: 'seated forward fold yoga pose tutorial',
     category: 'mobility',
+    doors: ['stretch', 'feel'], feelings: [], style: 'yoga',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'yoga-pose',
     equipment: [],
@@ -369,7 +384,7 @@ export const YOGA = [
       'Return to upright slowly'
     ],
     coaching: 'A rounded back stretches the lower back, not the hamstrings. Sit on a folded blanket to tilt the pelvis forward if your lower back rounds immediately.',
-    why: 'A deep hamstring and lower back stretch. Regular practice improves posterior chain flexibility essential for most physical activities.',
+    why: 'A deep hamstring and lower back stretch. Regular practice improves posterior chain flexibility useful in many physical activities.',
         watchOut: [
       'Moving faster than you can control, which turns mobility work into momentum',
       'Forcing range rather than working to the edge of what is comfortable',
@@ -389,6 +404,7 @@ export const YOGA = [
     name: 'Crescent Lunge',
     youtube: 'crescent lunge yoga pose tutorial',
     category: 'mobility',
+    doors: ['stretch', 'feel'], feelings: ['wake'], style: 'yoga',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'yoga-pose',
     equipment: [],
@@ -403,7 +419,7 @@ export const YOGA = [
       'Hold for 5 breaths, then switch sides'
     ],
     coaching: 'The back knee on the floor makes this more accessible than Warrior I. Lower the back knee any time Warrior I becomes too intense.',
-    why: 'A deep hip flexor and quad stretch in a stable position. One of the most effective poses for counteracting the effects of prolonged sitting.',
+    why: 'A deep hip flexor and quad stretch in a stable position. A good one after long periods of sitting.',
     difficultyLevel: 2,
     energyRequired: 3,
         watchOut: [
@@ -424,6 +440,7 @@ export const YOGA = [
     name: 'Half Moon Pose',
     youtube: 'half moon pose yoga tutorial',
     category: 'mobility',
+    doors: ['stretch', 'feel'], feelings: [], style: 'yoga',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'yoga-pose',
     equipment: [],
@@ -462,6 +479,7 @@ export const YOGA = [
     name: 'Corpse Pose (Savasana)',
     youtube: 'corpse pose savasana yoga tutorial',
     category: 'recovery',
+    doors: ['stretch', 'feel'], feelings: ['worn', 'wake'], style: 'yoga',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'yoga-pose',
     equipment: [],
@@ -481,7 +499,7 @@ export const YOGA = [
       'Stay for at least 5 minutes'
     ],
     coaching: 'This is the hardest pose for many people precisely because it asks you to do nothing. Resist the urge to move or plan. Just be here.',
-    why: 'Savasana integrates the physical work of practice and allows the nervous system to fully downregulate. Skipping it is the most common yoga mistake.',
+    why: 'A few minutes of stillness at the end gives your breathing and heart rate time to settle after moving. Many people find it the most restful part.',
         watchOut: [
       'Bouncing into the stretch rather than holding it still',
       'Pushing to the point of pain; a stretch should feel like a strong pull, never sharp',
@@ -500,6 +518,7 @@ export const YOGA = [
     name: 'Warrior III',
     youtube: 'warrior 3 yoga pose tutorial',
     category: 'strength',
+    doors: ['stronger', 'feel'], feelings: [], style: 'yoga',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'yoga-pose',
     equipment: [],
@@ -536,6 +555,7 @@ export const YOGA = [
     name: 'Boat Pose',
     youtube: 'boat pose yoga tutorial',
     category: 'strength',
+    doors: ['stronger', 'feel'], feelings: [], style: 'yoga',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'yoga-pose',
     equipment: [],
@@ -554,7 +574,7 @@ export const YOGA = [
       'Hold for 5 breaths, then lower with control'
     ],
     coaching: 'Bent knees are completely fine. The spine staying long is the priority — a round back shifts load from the core to the lower back.',
-    why: 'One of yoga\'s primary abdominal strengthening poses. Builds the deep core required for spinal stability.',
+    why: 'One of yoga\'s primary abdominal strengthening poses. Builds the deep core that helps steady the spine.',
         watchOut: [
       'Rounding the lower back, which is the point to bend the knees more',
       'Neck straining forwards',
@@ -572,6 +592,7 @@ export const YOGA = [
     name: 'Bridge Pose',
     youtube: 'bridge pose yoga tutorial',
     category: 'strength',
+    doors: ['stronger', 'feel'], feelings: [], style: 'yoga',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'yoga-pose',
     equipment: [],
@@ -591,7 +612,7 @@ export const YOGA = [
       'Lower slowly, one vertebra at a time'
     ],
     coaching: 'Lowering one vertebra at a time on the way down is a spinal mobility exercise in itself — do not drop.',
-    why: 'A backbend, a hip opener, and a glute strengthener in one. One of the most complete single poses in yoga.',
+    why: 'A backbend, a hip opener, and a glute strengthener in one.',
         watchOut: [
       'Pushing the hips higher by arching the back rather than squeezing the glutes',
       'Knees splaying outwards',
@@ -609,6 +630,7 @@ export const YOGA = [
     name: 'Pigeon Pose — Yoga',
     youtube: 'pigeon pose yoga tutorial',
     category: 'mobility',
+    doors: ['stretch', 'feel'], feelings: [], style: 'yoga',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'yoga-pose',
     equipment: [],
@@ -629,7 +651,7 @@ export const YOGA = [
       'Breathe deeply into any tension'
     ],
     coaching: 'Place a folded blanket under the right hip if it does not reach the floor. Forcing the hip down strains the knee.',
-    why: 'The deepest hip opener in yoga — targets the glutes and external hip rotators directly. Most effective pose for releasing sciatic tension.',
+    why: 'A deep hip opener that works the glutes and the muscles that turn the hip outward.',
         watchOut: [
       'Moving faster than you can control, which turns mobility work into momentum',
       'Forcing range rather than working to the edge of what is comfortable',
@@ -648,6 +670,7 @@ export const YOGA = [
     name: 'Supine Spinal Twist — Yoga',
     youtube: 'supine spinal twist yoga pose tutorial',
     category: 'recovery',
+    doors: ['stretch', 'feel'], feelings: ['calm', 'worn', 'sleep'], style: 'yoga',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'yoga-pose',
     equipment: [],
@@ -686,6 +709,7 @@ export const YOGA = [
     name: 'Legs Up the Wall — Yoga',
     youtube: 'legs up the wall yoga pose tutorial',
     category: 'recovery',
+    doors: ['stretch', 'feel'], feelings: ['calm', 'sleep'], style: 'yoga',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'yoga-pose',
     equipment: [],
@@ -706,7 +730,7 @@ export const YOGA = [
       'Stay for 5 to 15 minutes'
     ],
     coaching: 'Slide a folded blanket under your lower back if the position feels uncomfortable. This is meant to be completely effortless.',
-    why: 'A passive inversion that reverses the effects of gravity on the legs, calms the nervous system, and is among the most restorative poses in yoga.',
+    why: 'Raising the legs helps fluid drain back from them, and many people find it one of the most restful positions there is.',
         watchOut: [
       'Bouncing into the stretch rather than holding it still',
       'Pushing to the point of pain; a stretch should feel like a strong pull, never sharp',
@@ -725,6 +749,7 @@ export const YOGA = [
     name: 'Cat-Cow Flow',
     youtube: 'cat-cow flow yoga pose tutorial',
     category: 'mobility',
+    doors: ['stretch', 'feel'], feelings: ['calm', 'wake', 'sleep'], style: 'yoga',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'yoga-pose',
     equipment: [],
@@ -744,7 +769,7 @@ export const YOGA = [
       'Continue for 10 to 20 cycles',
       'End in neutral'
     ],
-    coaching: 'This is the most fundamental spinal warm-up in yoga. The synchronisation of breath and movement is what makes it more than just stretching.',
+    coaching: 'This is a classic spinal warm-up in yoga. The synchronisation of breath and movement is what makes it more than just stretching.',
     why: 'Mobilises the entire spine, warms up the core, and synchronises breath with movement — the foundational skill of yoga practice.',
         watchOut: [
       'Moving faster than you can control, which turns mobility work into momentum',
@@ -768,6 +793,7 @@ export const YOGA = [
     name: 'Morning Wake-Up Flow',
     youtube: 'morning wake-up flow yoga pose tutorial',
     category: 'mobility',
+    doors: ['stretch', 'feel'], feelings: ['wake'], style: 'yoga',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'yoga-flow',
     equipment: [],
@@ -811,6 +837,7 @@ export const YOGA = [
     name: 'Evening Wind-Down Flow',
     youtube: 'evening wind-down flow yoga pose tutorial',
     category: 'recovery',
+    doors: ['stretch', 'feel'], feelings: ['sleep'], style: 'yoga',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'yoga-flow',
     equipment: [],
@@ -860,6 +887,7 @@ export const YOGA = [
     name: 'Sun Salutation B',
     youtube: 'sun salutation b yoga pose tutorial',
     category: 'mobility',
+    doors: ['stretch', 'feel'], feelings: ['wake'], style: 'yoga',   // Stage PATH P-2
     contentType: 'exercise',
     movementPattern: 'yoga-flow',
     equipment: [],
@@ -902,6 +930,7 @@ export const YOGA = [
     name: 'Yin Yoga — Hip Opening Sequence',
     youtube: 'yin yoga - hip opening sequence yoga pose tutorial',
     category: 'recovery',
+    doors: ['stretch', 'feel'], feelings: [], style: 'yoga',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'yoga-flow',
     equipment: [],
@@ -923,8 +952,8 @@ export const YOGA = [
       'Supine twist left — 2 minutes',
       'Savasana — 5 minutes'
     ],
-    coaching: 'Yin yoga targets connective tissue — fascia and ligaments — not muscles. The long holds are essential. Do not try to relax into the poses too quickly.',
-    why: 'Yin yoga works on connective tissue hydration and flexibility through long static holds — a different physiological mechanism to the dynamic stretching of most exercise.',
+    coaching: 'The long holds are the practice. Do not try to relax into the poses too quickly.',
+    why: 'Yin yoga uses long, still holds, a different approach from the moving stretches in most exercise.',
         watchOut: [
       'Bouncing into the stretch rather than holding it still',
       'Pushing to the point of pain; a stretch should feel like a strong pull, never sharp',
@@ -943,6 +972,7 @@ export const YOGA = [
     name: 'Restorative Yoga Sequence',
     youtube: 'restorative yoga sequence yoga pose tutorial',
     category: 'recovery',
+    doors: ['stretch', 'feel'], feelings: [], style: 'yoga',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'yoga-flow',
     equipment: [],
@@ -980,6 +1010,7 @@ export const YOGA = [
     name: 'Balance Challenge Series',
     youtube: 'balance challenge series yoga pose tutorial',
     category: 'strength',
+    doors: ['stronger', 'feel'], feelings: [], style: 'yoga',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'yoga-pose',
     equipment: [],
@@ -1020,6 +1051,7 @@ export const YOGA = [
     name: 'Forward Fold Series',
     youtube: 'forward fold series yoga pose tutorial',
     category: 'mobility',
+    doors: ['stretch', 'feel'], feelings: [], style: 'yoga',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'yoga-pose',
     equipment: [],
@@ -1040,7 +1072,7 @@ export const YOGA = [
       'Janu sirsasana left — 90 seconds'
     ],
     coaching: 'In every forward fold, the priority is a flat back over reaching the toes. A rounded spine to reach further defeats the purpose.',
-    why: 'A dedicated posterior chain flexibility sequence addressing the hamstring, lumbar, and calf tightness that drives lower back pain in most adults.',
+    why: 'A sequence for the backs of the legs and the lower back, where many people feel stiff.',
         watchOut: [
       'Moving faster than you can control, which turns mobility work into momentum',
       'Forcing range rather than working to the edge of what is comfortable',
@@ -1059,6 +1091,7 @@ export const YOGA = [
     name: 'Backbend Opening Series',
     youtube: 'backbend opening series yoga pose tutorial',
     category: 'mobility',
+    doors: ['stretch', 'feel'], feelings: [], style: 'yoga',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'yoga-pose',
     equipment: [],
@@ -1079,8 +1112,8 @@ export const YOGA = [
       'Camel — 30 seconds, 2 rounds',
       'Child pose to counterpose — 2 minutes'
     ],
-    coaching: 'The backbend series should always finish with a counterpose. Child pose or supine twist neutralises the lumbar extension and prevents post-session back tightness.',
-    why: 'Backbends develop thoracic extension and hip flexor length — the two most commonly restricted movements in people who sit for long periods.',
+    coaching: 'The backbend series should always finish with a counterpose. Child pose or supine twist lets the lower back settle afterwards.',
+    why: 'Backbends develop thoracic extension and hip flexor length — two movements long periods of sitting give the body little of.',
         watchOut: [
       'Moving faster than you can control, which turns mobility work into momentum',
       'Forcing range rather than working to the edge of what is comfortable',
@@ -1099,6 +1132,7 @@ export const YOGA = [
     name: 'Power Yoga Flow — 30 Minutes',
     youtube: 'power yoga flow - 30 minutes yoga pose tutorial',
     category: 'strength',
+    doors: ['stronger', 'feel'], feelings: [], style: 'yoga',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'yoga-flow',
     equipment: [],
@@ -1137,6 +1171,7 @@ export const YOGA = [
     name: 'Pranayama Breathing Practice',
     youtube: 'pranayama breathing practice yoga pose tutorial',
     category: 'mindfulness',
+    doors: ['feel'], feelings: [], style: 'yoga',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'breath-awareness',
     equipment: [],
@@ -1173,6 +1208,7 @@ export const YOGA = [
     name: 'Chair Yoga — Seated Sequence',
     youtube: 'chair yoga - seated sequence yoga pose tutorial',
     category: 'mobility',
+    doors: ['stretch', 'feel'], feelings: [], style: 'yoga',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'yoga-pose',
     equipment: [],
@@ -1213,6 +1249,7 @@ export const YOGA = [
     name: 'Hip Strength and Stability — Yoga',
     youtube: 'hip strength and stability yoga pose tutorial',
     category: 'strength',
+    doors: ['stronger', 'feel'], feelings: [], style: 'yoga',   // Stage PATH P-2
     contentType: 'practice',
     movementPattern: 'yoga-pose',
     equipment: [],
