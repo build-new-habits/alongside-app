@@ -1,6 +1,13 @@
 /**
  * mobility-conditioning.js - Mobility & Conditioning
  *
+ * 29 Oct 2026 v10
+ *
+ * v10 - P-12 FIX-NOW (consistency trace, Graeme 29 Oct: "As proposed"). Both tiers: a fault, not a look.
+ *   The screen's name is its heading (h1; it had none, WCAG 1.3.1, 2.4.6).
+ *   Log an event ("Capture something you've already done") opens Log an
+ *   activity; it opened the Library, wherever the Library was last left.
+ *
  * 12 Oct 2026 v9
  *
  * v9 - A-2 ONE-PLAN-SCREEN (Stage AWARD). On the Plan, Start a mobility
@@ -97,7 +104,7 @@ export function MobilityConditioningView(router) {
       <div class="mc-view">
         <div class="mc-header">
           <button class="btn btn-ghost" id="mc-back-btn" aria-label="Back to Home">&larr; Back</button>
-          <span class="mc-header-title">Mobility &amp; Conditioning</span>
+          <h1 class="mc-header-title" style="margin:0">Mobility &amp; Conditioning</h1>
         </div>
 
         <p class="mc-coach-line">What would you like to do?</p>
@@ -220,7 +227,7 @@ export function MobilityConditioningView(router) {
     });
 
     container.querySelector("#mc-log-event")?.addEventListener("click", () => {
-      router.navigate("library");
+      router.navigate("activity-log");   // P-12: where it says (it opened the Library)
     });
 
     container.querySelector("#mc-my-exercises")?.addEventListener("click", () => {

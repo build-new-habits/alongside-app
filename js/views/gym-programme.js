@@ -1,5 +1,11 @@
 /**
  * gym-programme.js
+ * 29 Oct 2026 v20
+ *
+ * v20 - P-12 FIX-NOW (consistency trace, Graeme 29 Oct: "As proposed"). Both tiers: a fault, not a look.
+ *   With no session built, the screen has a heading, My programme (h1; it
+ *   had none).
+ *
  * 17 Oct 2026 v19
  *
  * v19 - W6-8 TRUE-WORDS-6. The exit card says you can save or leave without
@@ -1227,6 +1233,7 @@ export function GymProgrammeView(router) {
   function renderNoSession(container, stats) {
     container.innerHTML = `
       <div class="gp-no-session">
+        <h1 style="font-size: var(--text-xl); margin: 0 0 var(--space-2)">My programme</h1>
         <p class="gp-no-session__message">
           No session generated yet. Go back and complete your check-in.
         </p>

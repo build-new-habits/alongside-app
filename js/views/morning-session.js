@@ -1,6 +1,11 @@
 /**
  * morning-session.js - Morning Session View
  *
+ * 29 Oct 2026 v6
+ *
+ * v6 - P-12 FIX-NOW (consistency trace, Graeme 29 Oct: "As proposed"). Both tiers: a fault, not a look.
+ *   Morning Programme is the screen's heading (h1; it had none).
+ *
  * 02 Oct 2026 v5
  *
  * v5 - W4-8. No painChange written with a morning session (the field is
@@ -299,7 +304,7 @@ function renderSelect() {
         <button class="btn btn-ghost" id="ms-back-btn" aria-label="Back to today">
           \u2190 Today
         </button>
-        <span class="workout-progress-info">Morning Programme</span>
+        <h1 class="workout-progress-info" style="margin:0">Morning Programme</h1>
       </div>
 
       <div style="padding: var(--space-5) var(--space-4) var(--space-4);">
