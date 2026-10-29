@@ -1776,7 +1776,7 @@ export function CoachProposalView(router) {
    * and the way to change what the plan was fitted to.
    */
   function _renderAdjusted() {
-    const adj = shownAdjustments();
+    const adj = shownAdjustments({ nameArea: false });   // the plan's own sentence names the area (once)
     return `
       <div class="cp-adjusted">
         ${adj.length ? `<p class="cp-adjusted__lbl">What I’ve adjusted</p>

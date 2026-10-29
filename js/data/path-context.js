@@ -11,23 +11,24 @@
  * Reads the store; writes nothing. The journal is never read (A5.21).
  *
  * shownAdjustments(): the engine's E4 sentences that are TRUE in the app
- * today. Four are not yet (found in Session 5, before any was on screen):
+ * today. Four were not (found in Session 5, before any was on screen).
+ * Graeme, 29 Oct: make the first two true in Session 6, and reword the
+ * other two to what the app does (path-engine.js v3), so two stay off
+ * until Session 6:
  *   - "No countdown timers, go at your own pace": the player still offers
  *     its clock on a low-mood day (workout.js, Session 6 can make it so);
  *   - "A quick check halfway: still okay?": the player has no halfway check
  *     (Session 6);
- *   - "Fewer rounds and longer rests": a low-energy day is built shorter,
- *     with more time to settle at the end (session-builder.js), which its own
- *     line already says on the plan;
- *   - "Built from your last three sessions, so it won't repeat": the builder
- *     rotates, but does not promise no repeat.
- * They are left off the screen, never reworded here: the engine's words stay
- * one gate's (verify-path-engine), and what to say instead is Graeme's
- * (schedule P-5). A list with nothing true in it is not drawn.
+ *   (reworded in v3: "Fewer rounds and longer rests" is now "Shorter than
+ *   usual, with more time to settle at the end"; "Built from your last three
+ *   sessions, so it won't repeat" is now "Mixed up from your last few
+ *   sessions".)
+ * Left off the screen, never reworded here: the engine's words stay one
+ * gate's (verify-path-engine). A list with nothing true in it is not drawn.
  */
 import { store } from "../store.js";
 import { getTodaysCheckin } from "./checkin.js";
-import { movementName, adjustmentsFor } from "./path-engine.js";
+import { movementName, adjustmentsFor, freshSequence, recentIds } from "./path-engine.js";
 
 /** Today's check-in as the engine reads it ({ energy, mood }), or null. */
 export function checkinToday() {
@@ -73,10 +74,34 @@ export function lowMood() {
   return m != null && m <= 3;
 }
 
-const NOT_YET = [/^No countdown timers/, /^A quick check halfway/, /^Fewer rounds and longer rests$/, /^Built from your last three sessions/];
+const NOT_YET = [/^No countdown timers/, /^A quick check halfway/];   // Session 6 makes these true
 
-/** The engine's adjustments for today that the app really does now. */
-export function shownAdjustments() {
+/**
+ * The engine's adjustments for today that the app really does now.
+ * nameArea false leaves out the lines that name a sore area, for a screen
+ * that already says it in its own sentence (Today's plan: the area is said
+ * once, verify-sore-words 4c).
+ */
+export function shownAdjustments({ nameArea = true } = {}) {
+  const areas = soreToday().map(s => s.id);
   return adjustmentsFor({ checkin: checkinToday(), sore: soreToday(), ...prefNames() })
-    .filter(line => !NOT_YET.some(re => re.test(line)));
+    .filter(line => !NOT_YET.some(re => re.test(line)))
+    .filter(line => nameArea || !/ your [a-z ]+$/.test(line) || !areas.length);
+}
+
+/**
+ * A fresh one for me (blueprint E5), from what the person told the app:
+ * likes, less and never, the last two sessions, today's sore areas.
+ * { practice, fresh: true } shaped as a programme; or, when the pool cannot
+ * fill one inside the feeling's limits, { practice: nearest programme, note }.
+ */
+export function freshPracticeFor({ feeling, minutes = 10 } = {}) {
+  const ids = prefIds();
+  const r = freshSequence({ feeling, minutes, never: ids.never, liked: ids.liked, less: ids.less,
+    recent: recentIds(store.get("activityLog") || []), avoidFor: soreToday().map(s => s.id) });
+  if (!r) return null;
+  if (r.fallback) return r.programme ? { practice: r.programme, note: r.message } : null;
+  const WORD = { arrive: "To arrive", settle: "To settle" };
+  return { practice: { id: "fresh", name: "A fresh one for me", minutes: r.minutes, style: null, position: null,
+    steps: r.steps.map(s => ({ id: s.id, mins: s.mins, note: WORD[s.role] || "" })) }, fresh: true };
 }

@@ -52,8 +52,8 @@ import { FEELINGS, PROGRAMMES, SLOW_LINE } from "../data/feel-programmes.js";
 import { AREAS, ROUTINES } from "../data/stretch-routines.js";
 import { EXERCISES } from "../data/exercises/index.js";
 import { PATH_MOVEMENTS } from "../data/exercises/path_movements.js";
-import { suggestFeeling, pickProgramme, pickSurprise, freshSequence, recentIds, routinesFor, STRETCH_AREA_ZONES } from "../data/path-engine.js";
-import { checkinToday, soreToday, lastPlace, prefIds, lowMood, shownAdjustments } from "../data/path-context.js";
+import { suggestFeeling, pickProgramme, pickSurprise, routinesFor, STRETCH_AREA_ZONES } from "../data/path-engine.js";
+import { checkinToday, lastPlace, lowMood, shownAdjustments, freshPracticeFor } from "../data/path-context.js";
 import { savedSessions } from "../data/saved-sessions.js";
 import { setTodaysLength, lengthCatForToday } from "../data/session-length.js";
 
@@ -134,8 +134,11 @@ export function startPractice(router, practice, { door, feeling = null } = {}) {
 let lastDoor = null;   // Back to this view without a hand-off starts at this door's first step
 
 export function PathView(router) {
-  let root = null, live = null;
-  let step = null, st = {}, trail = [];
+  let root = null;
+  let live = null;
+  let step = null;
+  let st = {};
+  let trail = [];
   let opener = null;   // the control that opened the next step (Safari does not focus a pressed button)
 
   function first(door) {
@@ -329,16 +332,7 @@ export function PathView(router) {
     return savedSessions().filter(s => (s.purpose == null || s.purpose === door) && (!place || s.place == null || s.place === place));
   }
 
-  function freshPractice() {
-    const ids = prefIds();
-    const r = freshSequence({ feeling: st.feeling, minutes: Number(st.flen) || 10, never: ids.never, liked: ids.liked, less: ids.less,
-      recent: recentIds(store.get("activityLog") || []), avoidFor: soreToday().map(s => s.id) });
-    if (!r) return null;
-    if (r.fallback) return r.programme ? { practice: r.programme, note: r.message } : null;
-    const WORD = { arrive: "To arrive", settle: "To settle" };
-    return { practice: { id: "fresh", name: "A fresh one for me", minutes: r.minutes, style: null, position: null,
-      steps: r.steps.map(s => ({ id: s.id, mins: s.mins, note: WORD[s.role] || "" })) }, fresh: true };
-  }
+  const freshPractice = () => freshPracticeFor({ feeling: st.feeling, minutes: Number(st.flen) || 10 });
 
   // ── Presses ────────────────────────────────────────────────────────────
   function onRow(v) {

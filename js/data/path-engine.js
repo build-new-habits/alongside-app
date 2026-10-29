@@ -1,5 +1,15 @@
 /**
  * js/data/path-engine.js
+ * 29 Oct 2026 v3
+ *
+ * v3 - STAGE PATH Session 5 (words only; a touch-once exception, recorded).
+ *   Two E4 sentences said more than the app does (found before any was on
+ *   screen). Graeme, 29 Oct, chose the true words: a low-energy day is
+ *   "Shorter than usual, with more time to settle at the end" (what the
+ *   builder does; was "Fewer rounds and longer rests"), and the line for
+ *   nothing else to say is "Mixed up from your last few sessions" (the
+ *   builder rotates; it does not promise no repeat). No rule changed.
+ *
  * 28 Oct 2026 v2
  *
  * v2 - STAGE PATH Session 4 (words only; a touch-once exception, recorded in
@@ -99,7 +109,7 @@ export function suggestToday({ checkin = null, week = null, arcDoor: door = null
 export function adjustmentsFor({ checkin = null, sore = [], likedNames = [], lessNames = [], neverNames = [] } = {}) {
   const out = [];
   const energy = checkin?.energy ?? null, mood = checkin?.mood ?? null;
-  if (energy != null && energy <= 3) out.push("Fewer rounds and longer rests");
+  if (energy != null && energy <= 3) out.push("Shorter than usual, with more time to settle at the end");
   if (mood != null && mood <= 3) out.push("No countdown timers, go at your own pace");
   for (const s of sore || []) {
     const lvl = soreLevel(s.score);
@@ -117,7 +127,7 @@ export function adjustmentsFor({ checkin = null, sore = [], likedNames = [], les
   if ((lessNames || [])[0]) out.push(`Less of ${lessNames[0]}`);
   const seen = new Set();
   const list = out.filter(x => !seen.has(x) && seen.add(x));
-  return list.length ? list : ["Built from your last three sessions, so it won't repeat"];
+  return list.length ? list : ["Mixed up from your last few sessions"];
 }
 
 // ── E3. Likes, recency ───────────────────────────────────────────────────

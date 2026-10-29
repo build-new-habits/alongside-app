@@ -1,5 +1,13 @@
 /**
  * tools/verify-path-engine.mjs
+ * 29 Oct 2026 v2
+ *
+ * v2 - Two E4 sentences reworded to what the app does (Graeme, 29 Oct,
+ *   chose the words; path-engine.js v3): low energy is "Shorter than
+ *   usual, with more time to settle at the end"; nothing else to say is
+ *   "Mixed up from your last few sessions". Same rules, same strictness:
+ *   exact words only.
+ *
  * 28 Oct 2026 v1
  *
  * STAGE PATH Session 3 (P-3 ENGINE; blueprint v3 Part E; P-9c part 2).
@@ -94,14 +102,14 @@ for (const c of [ci(2, 6), ci(6, 2), ci(3, 6), ci(6, 6), null]) { const r = st({
 ok("1l. every suggestion has one plain reason", reasonsOk);
 
 console.log("\nTEST 2 - adjustments (E4): never empty, exact words");
-const EXACT = [/^Fewer rounds and longer rests$/, /^No countdown timers, go at your own pace$/, /^Left out moves that load your [a-z ]+$/, /^Easier options pointed out on cards that use your [a-z ]+$/,
+const EXACT = [/^Shorter than usual, with more time to settle at the end$/, /^No countdown timers, go at your own pace$/, /^Left out moves that load your [a-z ]+$/, /^Easier options pointed out on cards that use your [a-z ]+$/,
   /^A quick check halfway: still okay\?$/, /^Easier options pointed out where something might niggle$/, /^More of [^,]+ and [^,]+, which you loved$/, /^More of [^,]+, which you loved$/,
-  /^Left out [^,]+, as you asked$/, /^Less of [^,]+$/, /^Built from your last three sessions, so it won.t repeat$/];
+  /^Left out [^,]+, as you asked$/, /^Less of [^,]+$/, /^Mixed up from your last few sessions$/];
 const adj = o => safe(fn("adjustmentsFor"), o) || [];
 const all = [];
 const cases = [
-  [{ checkin: ci(6, 6) }, a => a.length === 1 && /Built from your last three sessions/.test(a[0]), "nothing to say -> the recency line"],
-  [{ checkin: ci(3, 6) }, a => a.includes("Fewer rounds and longer rests"), "low energy"],
+  [{ checkin: ci(6, 6) }, a => a.length === 1 && /^Mixed up from your last few sessions$/.test(a[0]), "nothing to say -> the recency line"],
+  [{ checkin: ci(3, 6) }, a => a.includes("Shorter than usual, with more time to settle at the end"), "low energy"],
   [{ checkin: ci(6, 3) }, a => a.includes("No countdown timers, go at your own pace"), "low mood"],
   [{ checkin: ci(6, 6), sore: [{ id: "knee", score: 6 }] }, a => a.includes("Left out moves that load your knee") && a.includes("Easier options pointed out on cards that use your knee") && a.includes("A quick check halfway: still okay?"), "quite sore"],
   [{ checkin: ci(6, 6), sore: [{ id: "lower-back", score: 4 }] }, a => a.includes("Easier options pointed out where something might niggle"), "a little sore"],

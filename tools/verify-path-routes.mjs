@@ -285,7 +285,7 @@ const sent = txt(main.querySelector(".cp-plan__sentence"));
 ok("9a. the coach's reason starts the plan's own sentence, read once", sent.startsWith("It's the next step on what you're working towards. ") && fakeRouter.planReason === null, sent.slice(0, 120));
 const adjList = [...main.querySelectorAll(".cp-adjusted__list li")].map(txt);
 ok("9b. What I've adjusted: lines the app does now; never one it does not (no countdown timers, a halfway check)",
-   adjList.includes("Easier options pointed out where something might niggle") && !adjList.some(l => /countdown|halfway|Fewer rounds|won.t repeat/.test(l)), JSON.stringify(adjList));
+   adjList.includes("Easier options pointed out where something might niggle") && !adjList.some(l => /countdown|halfway/.test(l)), JSON.stringify(adjList));
 navs = []; click(main.querySelector("#cp-redo-checkin"));
 ok("9c. Change my check-in: the check-in, back to this plan, with its kind and place kept", navs.at(-1) === "checkin" && store.get("pendingDoorRoute") === "coach-proposal" && fakeRouter.planKeep?.type === "full", JSON.stringify(fakeRouter.planKeep));
 store.set("requestedSessionType", null);
