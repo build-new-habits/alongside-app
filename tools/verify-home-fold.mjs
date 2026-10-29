@@ -57,7 +57,7 @@ const txt = el => (el?.textContent || "").replace(/\s+/g, " ").trim();
 
 function home({ tier = "personal", goals = [], guidanceShownAt = null } = {}) {
   localStorage.clear(); store.init();
-  store.set("onboardingComplete", true); store.set("tier", tier); store.set("name", "T"); store.setDayOpen("checked");   // P-4: the day's question answered
+  store.set("onboardingComplete", true); store.set("tier", tier); store.set("name", "T");
   store.set("goals", goals); store.set("guidanceShownAt", guidanceShownAt);
   const c = document.createElement("div"); document.body.innerHTML = ""; document.body.appendChild(c);
   TodayView({ navigate() {}, back() {}, history: ["x"] }).mount(c);

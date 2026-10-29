@@ -109,7 +109,7 @@ const ok = (name, cond, detail = "") => {
 function home(tier) {
   localStorage.clear();
   store.init();
-  store.set("tier", tier); store.setDayOpen("checked");   // v4: the day's question answered
+  store.set("tier", tier);
   const c = document.getElementById("c");
   c.innerHTML = "";
   const navs = [];
@@ -167,7 +167,6 @@ const { CoachProposalView } = await import(B + "views/coach-proposal.js");
     if (v === "know-what") KnowWhatView(r).mount(c);
     if (v === "coach-proposal") CoachProposalView(r).mount(c);
   } };
-  store.setDayOpen("checked");
   TodayView(r).mount(c);
   // v4: Home's Stretch door opens the door's steps (path, Session 5: Area, then How, where Build my own is
   // I know what I want). Here: the door names itself, then the engine's stretch route is driven from know-what.

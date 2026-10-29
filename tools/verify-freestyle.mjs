@@ -68,7 +68,7 @@ function fixture({ scores = {}, liftLog = {}, gen = null } = {}) {
   // Leave any session from the last test without saving.
   if (document.querySelector("[data-freestyle]")) { click(main.querySelector("#fs-exit")); click(document.querySelector("#exit-confirm-discard")); }
   localStorage.clear(); store.init();
-  store.set("onboardingComplete", true); store.set("tier", "personal"); store.setDayOpen("checked");   // P-4: the day's question answered
+  store.set("onboardingComplete", true); store.set("tier", "personal");
   store.set("gymEquipment", GYM); store.set("homeEquipment", HOME); store.set("equipment", [...GYM, ...HOME]);
   store.set("sessionLocation", "gym");
   store.set("liftLogEnabled", true);

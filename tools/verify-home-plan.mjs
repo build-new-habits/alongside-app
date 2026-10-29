@@ -1,15 +1,17 @@
 /**
  * tools/verify-home-plan.mjs
- * 28 Oct 2026 v4
+ * 29 Oct 2026 v4
  *
- * v4 - STAGE PATH P-4 re-point (none loosened; Graeme approved mock-up v9,
- *   28 Oct). TEST 1 and 2 are the purpose-first Home: one Today card with
- *   one action (filled), four doors below none filled, the arc said as a
- *   line; each way in reaches its screen in one tap (a door opens its own
- *   steps, path). Carry on later, the cold reopen and Free are unchanged
+ * v4 - STAGE PATH P-4 re-point (none loosened; mock-up v10, Graeme 29 Oct).
+ *   TEST 1 and 2 are the purpose-first Home: one row, Let me choose for you
+ *   (tinted, one action), four doors below none set apart, the arc said as
+ *   a line; each way in reaches its screen in one tap, through the
+ *   check-in the first time each day (it lives inside each way in). Carry on later, the cold reopen and Free are unchanged
  *   in meaning, read from the Plan's Today card. TEST 5 finishes early from
  *   inside the session (End it here and save), because the card has one
- *   action now; still one part-session saved and on to the finish.
+ *   action now; still one part-session saved and on to the finish. The
+ *   fixture clears the router's hand-off (pathStart), so one test's way in
+ *   never carries into the next.
  *
  * 12 Oct 2026 v3
  *
@@ -82,8 +84,8 @@ const tapSet = sel => { toCapture(); return tap(sel); };
 
 function fixture({ tier = "personal", checkedIn = false } = {}) {
   if (document.querySelector("#exit-workout-btn")) { tap("#exit-workout-btn"); document.querySelector("#exit-confirm-discard")?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true })); }
-  localStorage.clear(); store.init();
-  store.set("onboardingComplete", true); store.set("name", "Test"); store.set("tier", tier); store.setDayOpen("checked");   // v4: the day's question answered
+  localStorage.clear(); store.init(); fakeRouter.pathStart = null;
+  store.set("onboardingComplete", true); store.set("name", "Test"); store.set("tier", tier);
   store.set("safetyAckLog", Array.from({ length: 5 }, () => ({ at: new Date().toISOString(), textVersion: HURT_AND_ACHE_VERSION, surface: "fixture" })));
   if (checkedIn) {
     const key = new Date().toISOString().split("T")[0];
@@ -112,24 +114,26 @@ fixture(); home();
 ok("0a. the greeting is there", /Test/.test(txt(main.querySelector("h1"))));
 
 // ── 1. FOUR DOORS (v4: Stage PATH, mock-up v9) ──────────────────────────
-console.log("\nTEST 1 - one Today card, four doors, the Library: nothing else in front of the choice");
+console.log("\nTEST 1 - one row, four doors, the Library: nothing else in front of the choice");
 const doors = [...main.querySelectorAll(".path-doors .path-door[data-door]")];
-const lead = main.querySelector(".path-today .path-today__go");
-ok("1a. the Today card leads with one action; four doors below, in order", !!lead && main.querySelectorAll(".path-today button").length === 1 &&
+const lead = main.querySelector('.path-coach[data-action="path-coach"]');
+ok("1a. Let me choose for you leads, one action; four doors below, in order", !!lead && !main.querySelector(".path-today") &&
    doors.map(d => txt(d.querySelector(".path-door__t"))).join(" | ") === "Get stronger | Keep moving | Stretch | Move to feel better", doors.map(txt).join(" | "));
-ok("1b. the card's action is the filled one, and no door is", lead?.classList.contains("btn-primary") && !doors.some(d => d.classList.contains("btn-primary")));
+ok("1b. the row is set apart (tinted), and no door is", lead?.classList.contains("k-teal") && !doors.some(d => d.classList.contains("btn-primary") || d.classList.contains("path-coach")));
 ok("1c. no rooms, no tile grid, no reference rows, no old doors", !main.querySelector(".club-rooms, .club-row, .today-doors, .today-reference, .today-ref-row, .home-doors"));
-ok("1d. what the card's action does is said on the card", /Three quick taps/.test(txt(main.querySelector(".path-today"))) && txt(lead) === "Check in");
+ok("1d. what the row does is said on it", /Let me choose for you/.test(txt(lead)) && /Three quick questions, then today.s plan/.test(txt(lead)));
 fixture(); store.set("arc", { active: true, aimId: "sport-without-flaring", startedAt: new Date(Date.now() - 15 * 864e5).toISOString(), strands: [] }); home();
 ok("1e. the arc is one line, said", !!main.querySelector(".path-arcline") && !main.querySelector(".today-arc, .home-arc, [data-route='stretch-arc']"));
 
 // ── 2. EACH WAY IN, ONE TAP ─────────────────────────────────────────────
 console.log("\nTEST 2 - every way in reaches its screen in one tap");
 const oneTap = (sel, fixtureOpts = {}) => { fixture(fixtureOpts); home(); navs = []; tap(sel); return navs.slice(); };
-ok("2a. not checked in: Check in opens the check-in", JSON.stringify(oneTap('.path-today [data-action="checkin"]')) === '["checkin"]');
-ok("2b. checked in: Show me today's plan goes straight to the plan", JSON.stringify(oneTap('.path-today [data-action="path-go"]', { checkedIn: true })) === '["coach-proposal"]');
-for (const d of ["stronger", "moving", "stretch", "feel"])
-  ok(`2c. the ${d} door opens its steps`, JSON.stringify(oneTap(`.path-door[data-door="${d}"]`)) === '["path"]' && fakeRouter.pathStart?.door === d);
+ok("2a. not checked in: Let me choose for you asks the check-in first", JSON.stringify(oneTap('[data-action="path-coach"]')) === '["checkin"]');
+{ const n2b = oneTap('[data-action="path-coach"]', { checkedIn: true }); ok("2b. checked in: Let me choose for you goes straight to the plan", JSON.stringify(n2b) === '["coach-proposal"]', JSON.stringify(n2b)); }
+for (const d of ["stronger", "moving", "stretch", "feel"]) {
+  ok(`2c. the ${d} door, first of the day: the check-in, on the way to its steps`, JSON.stringify(oneTap(`.path-door[data-door="${d}"]`)) === '["checkin"]' && fakeRouter.pathStart?.door === d && store.get("pendingDoorRoute") === "path");
+  ok(`2d. the ${d} door, checked in: its steps`, JSON.stringify(oneTap(`.path-door[data-door="${d}"]`, { checkedIn: true })) === '["path"]');
+}
 { fixture(); home(); navs = [];
   main.querySelector('[data-route="library"]')?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }));
   ok("2e. Library", navs[0] === "library", JSON.stringify(navs)); }

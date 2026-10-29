@@ -1,8 +1,8 @@
 /**
  * tools/verify-plan-claims.mjs
- * 28 Oct 2026 v10
+ * 29 Oct 2026 v10
  *
- * v10 - STAGE PATH P-4 re-point (none loosened). 3.home: the Plan's Home is four doors by what you came for and one suggestion for today (tier-table.js v8, mock-up v9); read from the doors themselves. 3.as-you-go: Make it up as I go is no longer a Home door, so the claim is proved where it is opened: the router gives it to the Plan and sends Free to the upgrade page. Same property: the table says what the screen does.
+ * v10 - STAGE PATH P-4 re-point (none loosened). 3.home: the Plan's Home is four doors by what you came for and one suggestion for today (tier-table.js v8, mock-up v10); read from the doors themselves and Home's one row (Let me choose for you, or the day's card once there is one). 3.as-you-go: Make it up as I go is no longer a Home door, so the claim is proved where it is opened: the router gives it to the Plan and sends Free to the upgrade page. Same property: the table says what the screen does.
  *
  * 12 Oct 2026 v9
  *
@@ -156,7 +156,7 @@ const box = document.getElementById("app");
 const txt = el => (el?.textContent || "").replace(/\s+/g, " ").trim();
 function tierFixture(tier) {
   localStorage.clear(); store.init();
-  store.set("onboardingComplete", true); store.set("name", "Test"); store.set("tier", tier); store.setDayOpen("checked");   // P-4: the day's question answered
+  store.set("onboardingComplete", true); store.set("name", "Test"); store.set("tier", tier);
   store.set("safetyAckLog", Array.from({ length: 5 }, () => ({ at: new Date().toISOString(), textVersion: HURT_AND_ACHE_VERSION, surface: "fixture" })));
   store.set("gymEquipment", ["barbell", "bench-flat", "dumbbells-medium"]); store.set("sessionLocation", "gym");
   store.set("liftLog", { "barbell-bench-press": [{ at: new Date(Date.now() - 86400000).toISOString(), weight: 40, unit: "kg", reps: 10 }] });
@@ -171,7 +171,7 @@ tierFixture("free"); mountView(TodayView);
 const freeHome = { doors: box.querySelectorAll(".home-door").length, tiles: box.querySelectorAll("[data-door-id]").length, pick: !!box.querySelector('[data-action="start-today"]') };
 tierFixture("personal"); mountView(TodayView);
 const planDoors = [...box.querySelectorAll(".path-door[data-door] .path-door__t")].map(txt);   // v10: purpose first
-const planCard = box.querySelector(".path-today");
+const planCard = box.querySelector(".path-coach, .path-today");
 ok("3.home  free: any kind of session, or the coach suggests one; the Plan: four doors by what you came for, and one suggestion for today",
    freeHome.doors === 0 && freeHome.tiles >= 3 && freeHome.pick &&
    JSON.stringify(planDoors) === JSON.stringify(["Get stronger", "Keep moving", "Stretch", "Move to feel better"]) && !!planCard, JSON.stringify({ freeHome, planDoors }));

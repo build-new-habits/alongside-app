@@ -2,12 +2,13 @@
  * today.js
  * 28 Oct 2026 v61
  *
- * v61 - STAGE PATH P-4 (blueprint Session 4; mock-up v9, approved 28 Oct:
- *   "I think this is good. A nice consistency to help users use it."). The
- *   Plan's Home is views/plan-home.js: the arc as a line, one Today card,
- *   four purpose doors, the Library. The first time the Plan opens each
- *   day, Home hands over to day-open (views/day-open.js) unless today's
- *   check-in is already done. _planDoors(), and the three doors behind it,
+ * v61 - STAGE PATH P-4 (blueprint Session 4; mock-up v9, approved 28 Oct,
+ *   then v10, 29 Oct: "I like v10"). The Plan's Home is views/plan-home.js:
+ *   the arc as a line, Lately, one row (Let me choose for you, or Carry on,
+ *   Done today, your week's day), four purpose doors, the Library. The
+ *   check-in is asked inside each way in, before the day's first session;
+ *   back from it after Let me choose for you, Home goes straight on to the
+ *   coach's choice. _planDoors(), and the three doors behind it,
  *   are archived in BNH-Files (Archive/Stage PATH/P-4 plan-home) and no
  *   longer drawn; their code stays below for the archive's sake until the
  *   stage closes. On the Plan, the coach's line on Home is said only when
@@ -858,7 +859,7 @@ import { mixLine, detailLine } from '../data/week-shape-model.js';
 import { arcWeek, weekStart }  from '../data/arc-readback.js';
 import { noticePlanJump, offerBriefPath } from '../data/pacing.js';
 import { isPremium, lockedFeature } from '../auth.js';
-import { renderPlanHome, wirePlanHome } from './plan-home.js';   // STAGE PATH P-4
+import { renderPlanHome, wirePlanHome, goToSuggestion } from './plan-home.js';   // STAGE PATH P-4
 import { scopeStatementHTML } from '../data/scope-statement.js';
 // GUIDED-COPY, 06 Sep 2026. plannedFocusToday dropped from this import.
 // CLUB-SHELL added it so Guided class could say what the class was for
@@ -1041,14 +1042,12 @@ export function TodayView(router) {
       return;
     }
 
-    // STAGE PATH P-4. The Plan's first open of the day asks how you are,
-    // once (dayOpen, C1). Somebody who has already checked in is not asked,
-    // and nor is somebody who got to Home from inside the app (EXIT-HOME:
-    // you came here, so you stay here); Home's card asks them instead.
-    const coldOpen = !(Array.isArray(router?.history) && router.history.length > 0);
-    if (isPremium() && !store.dayOpenToday() && coldOpen) {
-      if (_checkedInToday()) store.setDayOpen('checked');
-      else { router.navigate('day-open', { replace: true }); return; }
+    // STAGE PATH P-4 (mock-up v10). Back from the check-in that "Let me
+    // choose for you" asked: straight on to the coach's choice, not Home.
+    if (isPremium() && router?.pathStart?.coach) {
+      router.pathStart = null;
+      goToSuggestion(router, { replace: true });
+      return;
     }
 
     renderHome(container);
@@ -1431,9 +1430,11 @@ export function TodayView(router) {
     container.querySelectorAll('[data-action="week-today"], [data-action="week-short"]').forEach(btn =>
       btn.addEventListener('click', () => {
         if (!askForToday({ short: btn.dataset.action === 'week-short' })) return;
-        if (_checkedInToday()) {
+        // STAGE PATH P-4 (v10): asked once a day; Not today counts as asked.
+        if (_checkedInToday() || store.dayOpenToday()?.choice === 'pick') {
           router.navigate('coach-proposal');
         } else {
+          router.pathStart = { week: true };   // the check-in says "Before today's plan" and offers Not today
           store.set('pendingDoorRoute', 'coach-proposal');
           router.navigate('checkin');
         }

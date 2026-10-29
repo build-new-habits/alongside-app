@@ -2,7 +2,7 @@
  * tools/verify-empty-and-moments.mjs
  * 28 Oct 2026 v2
  *
- * v2 - STAGE PATH P-4 re-point (none loosened). The Plan answers the day's first question (day-open) before Home on a cold open, so the fixture has answered it. The new arc week is said on Plan Home's arc line (plan-home.js), still a day and never a count.
+ * v2 - STAGE PATH P-4 re-point (none loosened). The new arc week is said on Plan Home's arc line (plan-home.js), still a day and never a count.
  *
  * 13 Oct 2026 v1
  *
@@ -64,7 +64,6 @@ const click = el => el?.dispatchEvent(new dom.window.MouseEvent("click", { bubbl
 function fixture(tier) {
   localStorage.clear(); store.init(); agreed(store);
   store.set("onboardingComplete", true); store.set("name", "T"); store.set("tier", tier);
-  store.setDayOpen("checked");   // STAGE PATH P-4: the day's question answered, so Home is drawn
   store.set("activityLog", Array.from({ length: 6 }, (_, i) => ({ id: "a" + i, type: "workout", sessionType: "upper",
     completedAt: new Date(Date.now() - (i + 1) * 864e5).toISOString(), durationMins: 30 })));
   store.set("guidanceLastShownAt", new Date().toISOString());

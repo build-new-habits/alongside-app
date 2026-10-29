@@ -1,12 +1,13 @@
 /**
  * tools/verify-plan-home-prune.mjs
- * 28 Oct 2026 v2
+ * 29 Oct 2026 v2
  *
  * v2 - STAGE PATH P-4 re-point (none loosened). A-1's Home was replaced by
- *   the purpose-first Home (mock-up v9, Graeme approved 28 Oct; the old
+ *   the purpose-first Home (mock-up v10, Graeme approved 29 Oct; the old
  *   markup archived, Archive/Stage PATH/P-4). Its states are held by
  *   verify-plan-home-path. Here, in A-1's same five situations, what A-1
- *   decided still holds: six ways in at most, one Today card, one Library
+ *   decided still holds: six ways in at most, one lead (Home's one row,
+ *   or the day's card), one Library
  *   row naming your week, nothing that moved to the Library back on Home.
  *   Tests 6 and 7 (the Library's tiles, Free left alone) unchanged.
  *
@@ -110,10 +111,10 @@ const SITS = { "1 - a day of your week": { week: "day" }, "2 - no week set": {},
   "4 - a week, but nothing set for today": { week: "none-today" }, "5 - a rest day in your week": { week: "rest" } };
 for (const [label, f] of Object.entries(SITS)) {
   console.log(`\nTEST ${label}`);
-  fixture(f); store.setDayOpen("checked"); home();
+  fixture(f);home();
   const n = label[0];
   ok(`${n}a. at most six ways in`, waysIn().length <= 6, waysIn().map(b => txt(b).slice(0, 24) || b.dataset.action).join(" | "));
-  ok(`${n}b. one Today card`, main.querySelectorAll(".path-today").length === 1);
+  ok(`${n}b. one lead: Home's one row or the day's card, never both`, main.querySelectorAll(".path-coach, .path-today").length === 1);
   ok(`${n}c. one Library row, naming your week`, main.querySelectorAll("[data-route='library']").length === 1 && /your week/i.test(txt(main.querySelector("[data-route='library']"))));
   ok(`${n}d. no class, run, mind or week tiles on Home`, !["classes", "running-session", "noticing", "your-week"].some(r => homeRoutes().includes(r)), homeRoutes().join());
   ok(`${n}e. no Only 10 minutes or Something else today`, !main.querySelector("[data-action='week-short'], [data-action='week-else']"));

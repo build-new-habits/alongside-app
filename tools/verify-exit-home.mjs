@@ -1,9 +1,5 @@
 /**
  * tools/verify-exit-home.mjs
- * 28 Oct 2026 v2
- *
- * v2 - STAGE PATH P-4 re-point (none loosened). The fixture's person accepted a plan a moment ago, so on the Plan they have answered the day's first question (day-open) today; without that, a cold open would show that question (correctly) before Home and 4b would be measuring it.
- *
  * 26 Sep 2026 v1
  *
  * EXIT-HOME. Every way out of a coach session lands on Home.
@@ -63,7 +59,6 @@ function acceptedJustNow() {
   store.set("name", "Test");
   store.set("lastProposalDate", nowIso());
   store.set("lastProposalType", "workout");
-  store.setDayOpen("checked");   // P-4: somebody who accepted a plan today has answered the day's question
 }
 
 // Mount the REAL Home with a router whose history is what the real

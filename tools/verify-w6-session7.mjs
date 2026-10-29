@@ -1,8 +1,8 @@
 /**
  * tools/verify-w6-session7.mjs
- * 28 Oct 2026 v2
+ * 29 Oct 2026 v2
  *
- * v2 - STAGE PATH P-4 re-point (none loosened). W6-19 on the Plan's Home: the Today card answers a low mood in the person's word and offers the quieter thing itself (Move to feel better, Calmer; path-engine E2), so 2a and 2b read the card. Free's Home line and Today's plan's offer (2c to 2f) are unchanged. The fixture checks in today, as the person did.
+ * v2 - STAGE PATH P-4 re-point (none loosened). W6-19 on the Plan's Home (mock-up v10, Graeme approved 29 Oct): Home's one row offers the quieter thing itself (Move to feel better; path-engine E2), and the coach's reason, in the person's word, rides with it to the plan screen where reasons now live (router.pathStart.reason; Session 5's gate proves it is said there). So 2a and 2b tap the row and read what it carries. Free's Home line and Today's plan's offer (2c to 2f) are unchanged. The fixture checks in today, as the person did.
  *
  * 17 Oct 2026 v1
  *
@@ -63,7 +63,7 @@ globalThis.window.router = rtr;
 realRouter.navigate = rtr.navigate;
 function person({ mood = 6, goals = [], conditions = [], level = "active" } = {}) {
   localStorage.clear(); store.init(); gate.endGateSession(); agreed(store);
-  store.set("onboardingComplete", true); store.set("name", "T"); store.set("tier", "personal"); store.setDayOpen("checked");   // P-4: the day's question answered
+  store.set("onboardingComplete", true); store.set("name", "T"); store.set("tier", "personal");
   store.set("homeEquipment", []); store.set("sessionLocation", "home");
   for (let i = 0; i < 5; i++) gate.recordAcknowledgement("fixture");
   gate.endGateSession();
@@ -88,13 +88,14 @@ ok("1c. nothing is pre-filled: the arc is not set by ranking", !store.get("arc")
 console.log("\nTEST 2 - W6-19: a low mood is answered, in their word");
 person({ mood: 2 });
 main.innerHTML = ""; TodayView(rtr).mount(main);
-// Stage PATH (mock-up v9): the Plan's Home answers it on the Today card, in their word, with the quieter
-// thing itself (Move to feel better, Calmer); Wellbeing is the tab, and Today's plan still offers it (2c, 2f).
-const card2 = () => txt(main.querySelector(".path-today"));
-ok("2a. Home: \"You said you're struggling\", and something slow and steady to move to feel better", /You said you.re struggling, so this is slow and steady\./.test(card2()) && main.querySelector(".path-today")?.dataset.door === "feel", card2().slice(0, 200));
+// Stage PATH (mock-up v10): Home's one row offers the quieter thing itself (Move to feel better); the reason,
+// in their word, rides with it to the plan screen (router.pathStart.reason). Today's plan still offers Wellbeing (2c, 2f).
+const takeRow = () => { rtr.pathStart = null; click(main.querySelector('.path-coach[data-action="path-coach"]')); return rtr.pathStart || {}; };
+const row2 = txt(main.querySelector(".path-coach")); const went2 = takeRow();
+ok("2a. Home: something slow and steady to move to feel better, and \"You said you're struggling\" goes with it", /^Let me choose for you ?Today: .+ \u00b7 About \d+ minutes$/.test(row2) && went2.door === "feel" && /You said you.re struggling, so this is slow and steady\./.test(went2.reason || "") && navs.at(-1) === "path", `${row2} | ${JSON.stringify(went2)}`);
 person({ mood: 3 });
 main.innerHTML = ""; TodayView(rtr).mount(main);
-ok("2b. Low is said as low", /You said you.re feeling low/.test(card2()), card2().slice(0, 120));
+ok("2b. Low is said as low", /You said you.re feeling low/.test(takeRow().reason || ""), JSON.stringify(rtr.pathStart));
 person({ mood: 2 });
 main.innerHTML = ""; CoachProposalView(rtr).mount(main);
 ok("2c. Today's plan: the line, with Something gentler and Wellbeing", /You said you\u2019re struggling today/.test(txt(main)) && !!main.querySelector("#cp-low-gentler") && !!main.querySelector("#cp-low-wellbeing"), txt(main).slice(0, 200));

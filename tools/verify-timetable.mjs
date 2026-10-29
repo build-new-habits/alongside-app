@@ -2,7 +2,7 @@
  * tools/verify-timetable.mjs
  * 28 Oct 2026 v7
  *
- * v7 - STAGE PATH P-4 re-point (none loosened). 1pc reads the Plan's purpose-first Home (four doors and its Library row, plan-home.js); the fixture has answered the day's first question. Classes are still two taps: the Library row, then Classes.
+ * v7 - STAGE PATH P-4 re-point (none loosened). 1pc reads the Plan's purpose-first Home (four doors and its Library row, plan-home.js). Classes are still two taps: the Library row, then Classes.
  *
  * 12 Oct 2026 v6
  *
@@ -140,7 +140,7 @@ function seed({ programme = false, injured = false } = {}) {
       textVersion: ACK_VERSION,
       surface: "fixture"
     })));
-  store.set("tier", "personal"); store.setDayOpen("checked");   // P-4: the day's question answered
+  store.set("tier", "personal");
   store.set("name", "Graeme");
   store.set("arc", {
     aimId: "stronger-core",

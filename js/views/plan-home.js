@@ -1,5 +1,18 @@
 /**
  * views/plan-home.js
+ * 29 Oct 2026 v2
+ *
+ * v2 - MOCK-UP v10 (Graeme, 29 Oct: "I like v10"). The check-in lives
+ *   inside each way in, asked once a day just before the first session
+ *   (needsCheckin(); "Not today" on the check-in counts as asked), so there
+ *   is no first-open screen and no suggestion card on Home: one row, "Let
+ *   me choose for you", names today's pick once the questions are answered
+ *   and the plan screen gives its reason and every adjustment. Lately (mood
+ *   before and after, and what seems to help; never a weekly count on Home,
+ *   LOBBY-1b, Graeme 29 Oct) sits above the doors, from three sessions with
+ *   both moods. Carry on, Done today, your week's day and a rest day lead
+ *   in the row's place. Six ways in at most, still.
+ *
  * 28 Oct 2026 v1
  *
  * STAGE PATH P-4 (blueprint Session 4, D2). The Plan's Home, purpose first,
@@ -114,18 +127,9 @@ export function todaysSuggestion() {
 
 // ── Pieces ─────────────────────────────────────────────────────────────────
 
-/** The arc, said as a line (not a button): also the first-open screen's. */
-export function arcLineHTML() { return arcLine(arcInfo()); }
-
 function arcLine(arc) {
   if (!arc.aim) return "";
   return `<p class="path-arcline">${lineIcon("arc", 20)}<span><strong>Your arc${arc.week ? ` · Week ${arc.week}${arc.fresh ? " starts today" : ""}` : ""}.</strong> ${esc(arc.aim)}</span></p>`;
-}
-
-/** Two on Home; the plan lists them all. */
-function adjustments(list) {
-  const shown = list.slice(0, 2), more = list.length - shown.length;
-  return `<div class="path-adj"><p class="path-adj__lbl">What I’ve adjusted</p><ul>${shown.map(x => `<li>${esc(x)}</li>`).join("")}${more ? `<li>And ${more} more on the plan</li>` : ""}</ul></div>`;
 }
 
 const fig = id => { const f = id ? renderFigure(id) : ""; return f ? `<div class="path-today__fig" aria-hidden="true">${f}</div>` : ""; };
@@ -157,7 +161,7 @@ function ownLeft(t) {
   return (store.get("prescribedExercises") || []).filter(e => !e.completedToday && (!group || e.group === group)).length;
 }
 
-/** One of: carry, done, week, rest, bad, suggest, prompt. */
+/** One of: carry, week, done, rest, coach. */
 export function todayState(carry) {
   if (carry) return "carry";
   const w = todayInWeek();
@@ -166,14 +170,21 @@ export function todayState(carry) {
   if (doneToday()) return "done";
   if (w && w.value === "rest") return "rest";
   if (w && w.template) return "week";
-  const d = store.dayOpenToday();
-  if (checkinToday() || d?.choice === "pick") return todaysSuggestion().route === "bad-day" ? "bad" : "suggest";
-  return "prompt";
+  return "coach";
+}
+
+/**
+ * v2 (mock-up v10). The check-in is asked once a day, just before the first
+ * session, inside whichever way in was chosen; "Not today" (dayOpen 'pick')
+ * means not asked again today.
+ */
+export function needsCheckin() {
+  return !store.checkedInToday() && store.dayOpenToday()?.choice !== "pick";
 }
 
 function todayCard(state, carry) {
   if (state === "carry") {
-    const what = carry.freestyle ? carry.done : `Next: ${carry.next} · ${carry.index + 1} of ${carry.total}`;
+    const what = carry.freestyle ? carry.done : `Next: ${carry.next} \u00b7 ${carry.index + 1} of ${carry.total}`;
     return card("carry", "teal", null, `${head("teal", "play", "Carry on", carry.name, carry.nextId)}
       <p class="path-today__meta">${esc(what)}</p>
       ${carry.freestyle ? "" : `<div class="path-today__bar" role="img" aria-label="Movement ${carry.index + 1} of ${carry.total}"><i style="width:${Math.round((carry.index / carry.total) * 100)}%"></i></div>`}
@@ -185,11 +196,11 @@ function todayCard(state, carry) {
     const kind = door ? DOOR[door].kind : kindOf(e);
     const before = Number(getTodaysCheckin()?.mood), after = Number(e.moodAfter);
     const hasBefore = store.checkedInToday() && Number.isFinite(before), hasAfter = Number.isFinite(after) && after > 0;
-    const line = !hasAfter ? "That’s today done." : !hasBefore ? `You finished feeling ${FIVE[fiveOf(after)]}.`
+    const line = !hasAfter ? "That\u2019s today done." : !hasBefore ? `You finished feeling ${FIVE[fiveOf(after)]}.`
       : fiveOf(after) > fiveOf(before) ? `You went from ${FIVE[fiveOf(before)]} to ${FIVE[fiveOf(after)]}.`
       : fiveOf(after) === fiveOf(before) ? "You held steady. That counts." : "Thanks for being honest. Some days are like that, and it still counts.";
     const lovedToday = Object.entries(store.get("likedMovements") || {}).filter(([, d]) => d === store._localDay()).map(([id]) => movementName(id)).filter(Boolean);
-    const remember = lovedToday.length ? `<div class="path-adj"><p class="path-adj__lbl">I’ll remember</p><ul><li>More of ${esc(lovedToday.join(", "))}</li></ul></div>` : "";
+    const remember = lovedToday.length ? `<div class="path-adj"><p class="path-adj__lbl">I\u2019ll remember</p><ul><li>More of ${esc(lovedToday.join(", "))}</li></ul></div>` : "";
     const title = e.name || e.title || (activityPhrase(e) || "Your session").replace(/^(a|an) /, "").replace(/^./, c => c.toUpperCase());
     return card("done", kind, door, `${head(kind, "tick", "Done today", title)}
       ${hasAfter ? moodPath(hasBefore ? before : null, after) : ""}
@@ -210,42 +221,73 @@ function todayCard(state, carry) {
         ${left ? `<p class="path-today__coach">${left} exercise${left === 1 ? "" : "s"}, as you wrote ${left === 1 ? "it" : "them"}.</p>${go("Start your list", 'data-action="week-own"')}`
           : `<p class="path-today__coach">All done today.</p>`}`);
     }
-    const s = suggestToday({ checkin: checkinToday(), week: { name: t.name, mins: t.mins, place: t.place, door }, sore: soreToday(), ...prefNames() });
-    return card("week", kind, door, `${head(kind, DOOR[door].icon, `Today, from your week · ${DOOR[door].label}`, t.name)}
-      <p class="path-today__meta">${esc(mixLine(t))} · ${esc(detailLine(t))}</p>
-      <p class="path-today__coach">${esc(s.reason)}</p>
-      ${adjustments(s.adjustments)}
-      ${go("Show me today’s plan", 'data-action="week-today"')}`);
+    return row("week", kind, DOOR[door].icon, `Today, from your week: ${t.name}`, `${mixLine(t)} \u00b7 ${detailLine(t)}`, 'data-action="week-today"', door);
   }
-  if (state === "bad") {
+  // The coach's row: asks the three questions if today has none, then chooses.
+  let sub = "Three quick questions, then today\u2019s plan";
+  if (!needsCheckin()) {
     const s = todaysSuggestion();
-    return card("bad", "teal", null, `${head("teal", "rest", "Today", "A gentle day")}
-      <p class="path-today__coach">${esc(s.reason)}</p>
-      ${go("See gentle choices", 'data-action="path-go"')}`);
-  }
-  if (state === "suggest") {
-    const s = todaysSuggestion();
-    const d = DOOR[s.door] || DOOR.moving;
-    let title, meta, figId = null;
-    if (s.door === "feel") {
-      const p = pickProgramme({ feeling: s.feeling, minutes: s.minutes })?.programme;
-      title = p ? p.name : "Move to feel better";
-      meta = `Anywhere · About ${p ? p.minutes : s.minutes} minutes${p ? ` · ${STYLE[p.style] || ""}` : ""}`;
-      figId = p?.steps?.[0]?.id || null;
-    } else {
-      title = s.door === "stronger" ? "Whole body strength" : s.door === "stretch" ? "Whole body stretch" : s.intensity === "light" ? "Short and light" : "Whole body, moving";
-      meta = `${s.place ? PLACE[s.place] + " · " : ""}About ${s.minutes} minutes`;
+    if (s.route === "bad-day") sub = s.reason;
+    else {
+      const p = s.door === "feel" ? pickProgramme({ feeling: s.feeling, minutes: s.minutes })?.programme : null;
+      sub = `Today: ${p ? p.name : coachTitle(s)} \u00b7 About ${p ? p.minutes : s.minutes} minutes`;
     }
-    return card("suggest", d.kind, s.door, `${head(d.kind, d.icon, `Today · ${d.label}`, title, figId)}
-      <p class="path-today__meta">${esc(meta)}</p>
-      <p class="path-today__coach">${esc(s.reason)}</p>
-      ${adjustments(s.adjustments)}
-      ${go("Show me today’s plan", 'data-action="path-go"')}`);
   }
-  const after = store.dayOpenToday()?.choice === "not-now";
-  return card("prompt", "teal", null, `${head("teal", "chat", "Today", after ? "Want to check in now?" : "How are you doing?")}
-    <p class="path-today__coach">${after ? "No pressure. " : ""}Three quick taps and I’ll fit today to your energy, your mood and anything sore.</p>
-    ${go("Check in", 'data-action="checkin"')}`);
+  return row("coach", "teal", "chat", "Let me choose for you", sub, 'data-action="path-coach"');
+}
+
+function coachTitle(s) {
+  return s.door === "stronger" ? "Whole body strength" : s.door === "stretch" ? "Whole body stretch" : s.intensity === "light" ? "Short and light" : "Whole body, moving";
+}
+
+/** One row with one action: the coach, or your week's day. */
+function row(state, kind, icon, title, sub, attrs, door = null) {
+  return `<button type="button" class="path-coach k-${kind}" data-state="${state}"${door ? ` data-door="${door}"` : ""} ${attrs}>
+    <span class="kind-tile k-${kind}">${lineIcon(icon)}</span>
+    <span class="path-coach__text"><span class="path-coach__t">${esc(title)}</span><span class="path-coach__d">${esc(sub)}</span></span>
+    <span class="path-door__chev" aria-hidden="true">${lineIcon("chevron", 20)}</span>
+  </button>`;
+}
+
+// ── Lately (a first cut; Session 7 draws it from progress-report.js) ───────
+
+/**
+ * Before and after, on the person's own five words, for the last six
+ * finished sessions that have both (the check-in's mood that day, and the
+ * mood after). Shown from three. Never a count of days, never a target.
+ */
+export function latelyPairs(n = 6) {
+  const hist = store.get("checkinHistory") || {};
+  const pairs = [];
+  for (const e of store.completedSessions(store.get("activityLog") || [])) {
+    const ts = e.completedAt || e.loggedAt || e.date; if (!ts) continue;
+    const before = Number(hist[new Date(ts).toISOString().split("T")[0]]?.mood), after = Number(e.moodAfter);
+    if (Number.isFinite(before) && before > 0 && Number.isFinite(after) && after > 0) pairs.push({ e, before, after, better: fiveOf(after) > fiveOf(before) });
+  }
+  return pairs.slice(-n);
+}
+
+function lately() {
+  const pairs = latelyPairs();
+  if (pairs.length < 3) return "";
+  const better = pairs.filter(p => p.better).length;
+  const H = 40, bw = 12, gw = bw * 2 + 10, h = v => ((fiveOf(v) + 1) / 5) * H;
+  const bars = pairs.map((p, i) => `<rect x="${i * gw}" y="${H - h(p.before)}" width="${bw}" height="${h(p.before)}" rx="3" class="path-lately__before"></rect>` +
+    `<rect x="${i * gw + bw + 2}" y="${H - h(p.after)}" width="${bw}" height="${h(p.after)}" rx="3" class="path-lately__after"></rect>`).join("");
+  const same = pairs.length - better;
+  const label = `Mood before and after your last ${pairs.length} sessions: better after ${better}, the same or lower after ${same}.`;
+  // What seems to help: the session most often followed by a better mood (twice or more).
+  const byName = {};
+  for (const p of pairs) if (p.better) { const k = p.e.name || p.e.title || activityPhrase(p.e); byName[k] = (byName[k] || 0) + 1; }
+  const top = Object.entries(byName).sort((a, b) => b[1] - a[1])[0];
+  const helps = top && top[1] >= 2 ? top[0].replace(/^(a|an) /, "").replace(/^./, c => c.toUpperCase()) : null;
+  return `<h2 class="look-label" id="path-lately-h">Lately</h2>
+    <div class="path-lately" role="group" aria-labelledby="path-lately-h">
+      <div class="path-lately__tile"><p class="path-lately__lbl">After moving</p>
+        <svg class="path-lately__spark" viewBox="0 0 ${gw * pairs.length - 10} ${H}" role="img" aria-label="${label}">${bars}</svg>
+        <p class="path-lately__line">Better after ${better} of your last ${pairs.length}.</p></div>
+      ${helps ? `<div class="path-lately__tile"><p class="path-lately__lbl">What seems to help</p><p class="path-lately__line">${esc(helps)} seems to help you most.</p></div>` : ""}
+    </div>`;
 }
 
 // ── Home ───────────────────────────────────────────────────────────────────
@@ -255,8 +297,6 @@ function todayCard(state, carry) {
  *        coachNote (a flat week or the week's pace, or ''), carry }
  */
 export function renderPlanHome(ctx = {}) {
-  // A check-in finished later the same day counts as the day's answer (C1).
-  if (store.checkedInToday() && store.dayOpenToday()?.choice !== "checked") store.setDayOpen("checked");
   const arc = arcInfo();
   const state = todayState(ctx.carry);
   const label = state === "carry" ? "Or instead" : (state === "week" || state === "rest") ? "Or something else today" : "Or choose for yourself";
@@ -268,6 +308,7 @@ export function renderPlanHome(ctx = {}) {
       <h1 class="path-greeting" tabindex="-1">${esc(ctx.greeting || "")}</h1>
       ${ctx.coachNote ? `<p class="path-note" role="status">${esc(ctx.coachNote)}</p>` : ""}
       ${arcLine(arc)}
+      ${lately()}
       ${todayCard(state, ctx.carry)}
       <h2 class="look-label" id="path-doors-h">${label}</h2>
       <ul class="path-doors" aria-labelledby="path-doors-h">
@@ -284,23 +325,40 @@ export function renderPlanHome(ctx = {}) {
     </div>`;
 }
 
-/** The presses only this Home has. today.js's attachEvents() wires the rest. */
+/**
+ * The coach's choice, made now: a gentle day goes to Today's plan, where
+ * the bad-day door is; Move to feel better to its feeling (path, Session
+ * 5); anything else to Today's plan for its kind and place.
+ */
+export function goToSuggestion(router, opts = {}) {
+  const s = todaysSuggestion();
+  if (s.route === "bad-day") { router.navigate("coach-proposal", opts); return; }
+  if (s.door === "feel") {
+    const p = pickProgramme({ feeling: s.feeling, minutes: s.minutes })?.programme;
+    router.pathStart = { door: "feel", feeling: s.feeling, minutes: s.minutes, programmeId: p?.id || null, reason: s.reason };
+    router.navigate("path", opts);
+    return;
+  }
+  store.set("requestedSessionType", s.sessionType || "full");
+  store.set("requestedLocation", s.place || null);
+  router.navigate("coach-proposal", opts);
+}
+
+/**
+ * The presses only this Home has. today.js's attachEvents() wires the rest.
+ * The first way in of the day goes through the check-in, which comes back
+ * to where the person was going (pendingDoorRoute): a door to its steps
+ * (path), the coach to Home, which goes straight on to its choice
+ * (router.pathStart.coach, read by today.js).
+ */
 export function wirePlanHome(container, router) {
   container.querySelectorAll(".path-door[data-door]").forEach(btn => btn.addEventListener("click", () => {
     router.pathStart = { door: btn.dataset.door };
+    if (needsCheckin()) { store.set("pendingDoorRoute", "path"); router.navigate("checkin"); return; }
     router.navigate("path");
   }));
-  container.querySelector('[data-action="path-go"]')?.addEventListener("click", () => {
-    const s = todaysSuggestion();
-    if (s.route === "bad-day") { router.navigate("coach-proposal"); return; }   // its bad-day door
-    if (s.door === "feel") {
-      const p = pickProgramme({ feeling: s.feeling, minutes: s.minutes })?.programme;
-      router.pathStart = { door: "feel", feeling: s.feeling, minutes: s.minutes, programmeId: p?.id || null };
-      router.navigate("path");
-      return;
-    }
-    store.set("requestedSessionType", s.sessionType || "full");
-    store.set("requestedLocation", s.place || null);
-    router.navigate("coach-proposal");
+  container.querySelector('[data-action="path-coach"]')?.addEventListener("click", () => {
+    if (needsCheckin()) { router.pathStart = { coach: true }; store.set("pendingDoorRoute", "today"); router.navigate("checkin"); return; }
+    goToSuggestion(router);
   });
 }

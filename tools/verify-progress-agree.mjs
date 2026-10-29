@@ -120,7 +120,7 @@ const LOG = [
 
 function fixture({ tier = "personal", weightTracking = false, arc = null, history = {}, conditions = [], meta = {}, liftLog = {} } = {}) {
   localStorage.clear(); store.init(); agreed(store);
-  store.set("onboardingComplete", true); store.set("tier", tier); store.set("name", "Test"); store.setDayOpen("checked");   // P-4: the day's question answered
+  store.set("onboardingComplete", true); store.set("tier", tier); store.set("name", "Test");
   store.set("activityLog", LOG);
   store.set("weightTracking", weightTracking);
   if (weightTracking) store.set("weightLog", [{ at: iso(3), kg: 80 }]);

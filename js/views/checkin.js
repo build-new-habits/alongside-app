@@ -1,6 +1,17 @@
 /**
  * js/views/checkin.js
- * 02 Oct 2026 v30
+ * 29 Oct 2026 v31
+ *
+ * v31 - STAGE PATH P-4 (mock-up v10, Graeme 29 Oct: "I like v10"). On the
+ *   Plan the check-in is asked inside the way in somebody chose, just
+ *   before the day's first session. Then the first question says where
+ *   they are going ("Before you stretch, how's your energy today?"; the
+ *   opening lines are unchanged) and offers "Not today" with it: the day is
+ *   marked as answered without a check-in (dayOpen 'pick') and they go on
+ *   to where they were going. Free's check-in is unchanged: neither shows
+ *   unless the Plan sent somebody here on the way somewhere
+ *   (pendingDoorRoute) and said where (router.pathStart): the check-in
+ *   asks no tier (verify-decisions, P14).
  *
  * v30 - W5-11 and W5-12. The length line says a length picked for today as
  *   today's, and is decided after today's answers are saved, from the same
@@ -532,15 +543,36 @@ export function CheckinView(router) {
   // further, under "Somewhere else".
   const COMMON_AREAS = ["lower-back", "knee", "shoulder", "hip", "upper-back"];
 
+  // v31. Where the Plan is taking somebody, said before the questions.
+  const ON_THE_WAY = { stronger: "Before you get stronger", moving: "Before you move", stretch: "Before you stretch",
+                       feel: "Before you move to feel better", coach: "Before I choose for you" };
+  // Only the Plan's Home says where somebody is going (router.pathStart), so
+  // the check-in itself never asks which tier it is on (P14: the same three
+  // questions for everyone).
+  function _onTheWay() {
+    const s = router?.pathStart;
+    if (!s || !store.get("pendingDoorRoute")) return null;
+    return ON_THE_WAY[s.coach ? "coach" : s.door] || "Before today\u2019s plan";
+  }
+  /** v31. "Not today": the day counts as answered, and on to where they were going. */
+  function _notToday() {
+    store.setDayOpen("pick");
+    const pending = store.get("pendingDoorRoute");
+    store.set("pendingDoorRoute", null);
+    router.navigate(pending || "today");
+  }
+
   async function _runOpening() {
+    const onTheWay = _onTheWay();
     const opening = resolveOpening();
     await _showCoachBubble(opening.b1);
     if (opening.b2) await _showCoachBubble(opening.b2);
     if (!_alive) return;
 
-    await _showCoachBubble("How's your energy today?");
-    const energy = await _askChips("Your energy today", ENERGY_CHIPS);
+    await _showCoachBubble(onTheWay ? `${onTheWay}, how\u2019s your energy today?` : "How's your energy today?");
+    const energy = await _askChips("Your energy today", ENERGY_CHIPS, onTheWay ? { extra: "Not today" } : {});
     if (!energy) return;
+    if (energy.extra) { _notToday(); return; }
     _checkin.energy = energy.value;
 
     await _showCoachBubble("And your mood alongside that?");

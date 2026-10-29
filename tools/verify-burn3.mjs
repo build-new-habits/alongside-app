@@ -4,8 +4,7 @@
  *
  * v3 - STAGE PATH P-4 re-point (none loosened). On the Plan's purpose-first
  *   Home the coach's line is .path-note, said when it adds to the Today
- *   card, as a flat week does; the fixture has answered the day's first
- *   question (day-open), so Home is drawn. Every sentence checked as before.
+ *   card, as a flat week does. Every sentence checked as before.
  *
  * 21 Aug 2026 v2
  * GATE-PATH. Path resolution only -- no assertion changed.
@@ -44,7 +43,7 @@ const day = n => new Date(Date.now() - n*864e5).toISOString().split('T')[0];
 
 function homeWith(energyByDay) {
   localStorage.clear(); store.init();
-  store.set('tier','personal'); store.setDayOpen('checked');   // P-4: the day's question answered
+  store.set('tier','personal');
   const hist = {};
   energyByDay.forEach((e, i) => { hist[day(i + 1)] = { energy: e, mood: e }; });
   store.set('checkinHistory', hist);
@@ -102,7 +101,7 @@ check('and the moderate one does too, proportionately',
 
 // ── 4. It outranks the yesterday line ────────────────────────────────
 localStorage.clear(); store.init();
-store.set('tier','personal'); store.setDayOpen('checked');   // P-4: the day's question answered
+store.set('tier','personal');
 const hist = {}; [1,2,2,1,2].forEach((e,i)=>{ hist[day(i+1)] = { energy: e, mood: e }; });
 store.set('checkinHistory', hist);
 store.set('activityLog', [{ type:'workout', completed:true,

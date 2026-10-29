@@ -70,7 +70,7 @@ const SITUATIONS = {
   "moved today": s => s.set("activityLog", [{ id: "t", type: "walk", completedAt: new Date().toISOString(), durationMins: 20, completed: true }]),
   "a scope notice": s => s.set("scopeNoticeDue", true),
   "a flat week": s => s.set("checkinHistory", Object.fromEntries([1, 2, 3, 4].map(n => [new Date(Date.now() - n * 864e5).toISOString().split("T")[0], { energy: 2, mood: 6 }]))),
-  "never asked the day's question": s => s.set("dayOpen", { date: null, choice: null }),
+  "a check-in put off (Not today)": s => s.setDayOpen("pick"),
 };
 function fixture(fn) {
   localStorage.clear(); store.init(); agreed(store);
@@ -87,7 +87,7 @@ for (const [label, fn] of Object.entries(SITUATIONS)) {
   const before = draw(OLD); const after = draw(NOW);
   let at = 0; while (at < before.length && before[at] === after[at]) at++;
   ok(`1. ${label}: the same`, before === after && before.length > 500, `differs at ${at}: "${before.slice(at - 40, at + 60)}" vs "${after.slice(at - 40, at + 60)}"`);
-  ok(`1. ${label}: no Plan Home in it, and not sent to the day's question`, !/path-home|path-today/.test(after) && !navs.includes("day-open"), JSON.stringify(navs));
+  ok(`1. ${label}: no Plan Home in it`, !/path-home|path-today|path-coach/.test(after), JSON.stringify(navs));
 }
 
 console.log("\nTEST 2 - every control on Free Home goes where it went");

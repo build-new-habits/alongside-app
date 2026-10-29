@@ -2,16 +2,15 @@
  * tools/verify-clubshell.mjs
  * 28 Oct 2026 v5
  *
- * v5 - STAGE PATH P-4 re-point (none loosened; mock-up v9). The Plan's Home
- *   is one Today card, four purpose doors and the Library row; 1pc counts
- *   the four doors. 2a's MUST list is unchanged and still met within two
- *   taps: Check in is the Today card's action (the fixture has put off the
- *   day's first question), I know what I want and Make it up as I go are
- *   Library tiles now (library.js v20), one tap on from Home's Library row.
- *   9a: the Plan's Home does not say the orientation line; its Today card's
- *   words point at the card's own action, which is on the screen. 11b: the
- *   doors are a list named by its heading. 12: the fixture answers the
- *   day's first question.
+ * v5 - STAGE PATH P-4 re-point (none loosened; mock-up v10, Graeme 29 Oct).
+ *   The Plan's Home is Lately, one row (Let me choose for you), four
+ *   purpose doors and the Library row; 1pc counts the four doors. 2a's MUST
+ *   list is unchanged and still met within two taps: the check-in is one
+ *   tap away through Let me choose for you or any door (it is asked inside
+ *   each way in), I know what I want and Make it up as I go are Library
+ *   tiles now (library.js v20), one tap on from Home's Library row. 9a: the
+ *   Plan's Home does not say the orientation line; its row's words point at
+ *   the row itself. 11b: the doors are a list named by its heading.
  *
  * v4 - A-1 PLAN-HOME-PRUNE (Graeme approved the mock-up, 12 Oct). REACH
  *   only. 2a: Join a class and Something for the mind left Plan Home for the
@@ -122,7 +121,7 @@ const ok = (name, cond, detail = "") => {
 function home(tier) {
   localStorage.clear();
   store.init();
-  store.set("tier", tier); store.setDayOpen("not-now");   // v5: the day's question put off, so Home (and its Check in) is drawn
+  store.set("tier", tier);
   const c = document.createElement("div");
   oneScreen(c);
   const navs = [];
@@ -159,7 +158,8 @@ console.log("\nTEST 2 - everything the rooms and tiles reached is still within t
   c.querySelectorAll("[data-route]").forEach(b => reached.add(b.dataset.route));
   const hop = sel => { const navs = []; const h = document.createElement("div"); oneScreen(h);
     TodayView({ navigate: v => navs.push(v) }).mount(h); h.querySelector(sel)?.dispatchEvent(new window.MouseEvent("click", { bubbles: true })); return navs; };
-  for (const a of ["checkin", "path-go"]) hop(`[data-action="${a}"]`).forEach(r => reached.add(r));   // v5: the Today card's one action
+  hop('[data-action="path-coach"]').forEach(r => reached.add(r));   // v5: Let me choose for you (the check-in first, today)
+  hop('.path-door[data-door="stretch"]').forEach(r => reached.add(r));   // v5: and any door
   // Two taps: behind "I know what I want".
   const kw = document.createElement("div"); oneScreen(kw);
   const kwNavs = [];
@@ -216,9 +216,9 @@ const orient = code9.slice(code9.indexOf("lets me decide today"));
 // asserted now, from the control actually on each screen.
 // v5: the Plan's Home no longer says the orientation line (its Today card speaks); what the card says
 // points at the card's own action, which is on the screen.
-const planCardLine = (plan.c.querySelector(".path-today__coach")?.textContent || "");
+const planRow = plan.c.querySelector('.path-coach[data-action="path-coach"]');
 ok("9a. the Plan's Home points only at a control that is on the screen",
-   /Three quick taps/.test(planCardLine) && (plan.c.querySelector(".path-today [data-action]")?.textContent || "").trim() === "Check in" &&
+   !!planRow && /Let me choose for you/.test(planRow.textContent) && /Three quick questions/.test(planRow.textContent) &&
    !/lets me decide today/.test(plan.c.textContent || ""),
    "it points at a door that is not on the screen - and it shows ONLY to " +
    "somebody with no goal set, the exact person who needs the pointer to work");
@@ -363,7 +363,7 @@ console.log("\nTEST 12 - GUIDANCE-1: the general-guidance line returns");
     return c;
   }
 
-  localStorage.clear(); store.init(); store.set("tier", "personal"); store.setDayOpen("checked");   // v5
+  localStorage.clear(); store.init(); store.set("tier", "personal");
   const first = homeKeepingState();
   ok("12pc. positive control: Home rendered", first.querySelectorAll(".path-door[data-door]").length === 4);
 

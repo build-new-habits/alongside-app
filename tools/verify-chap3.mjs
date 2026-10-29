@@ -2,8 +2,7 @@
  * tools/verify-chap3.mjs
  * 28 Oct 2026 v4
  * STAGE PATH P-4 re-point (none loosened). The Plan's way through is its
- * four purpose doors (.path-door); the fixture has answered the day's
- * first question (day-open), so Home is drawn under the hinge. The
+ * four purpose doors (.path-door), drawn under the hinge. The
  * property is unchanged: a hinge card never blocks the way through.
  *
  * 28 Sep 2026 v3
@@ -67,7 +66,7 @@ const ago = d => new Date(Date.now() - d * 864e5).toISOString();
 
 function seed(daysElapsed, week = 12) {
   localStorage.clear(); store.init();
-  store.set('tier', 'personal'); store.setDayOpen('checked');   // P-4: the day's question answered
+  store.set('tier', 'personal');
   store.set('activeProgramme.programmeId', 'beginner-fitness');
   store.set('activeProgramme.programmeName', 'Build Your Base');
   store.set('activeProgramme.startDate', ago(daysElapsed));

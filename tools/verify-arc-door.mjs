@@ -90,7 +90,7 @@ console.log("\nARC-DOOR — free gets the door, never the arc\n");
 // FIXTURE INTEGRITY FIRST. The previous investigation set aimId without
 // active, landed on the offer branch, and reported no leak.
 // v6 (Stage PATH, mock-up v9): the Plan's Home says the arc as a line; it opens from Progress.
-store.set("tier","personal"); store.setDayOpen("checked"); store.set("arc",ACTIVE_ARC); paint();
+store.set("tier","personal");store.set("arc",ACTIVE_ARC); paint();
 const paidEl=document.querySelector(".path-arcline");
 ok("FIXTURE REACHES THE ACTIVE BRANCH: Plan's arc line says the arc, with the aim",
   paidEl && /Build a core that actually holds me up/.test(paidEl.textContent));
@@ -112,7 +112,7 @@ reverses("free cannot walk into arc setup from Home",
   ()=>freeEl.dataset.route==="arc-setup");
 
 // Plan with no arc keeps the real setup entrance.
-store.set("tier","personal"); store.setDayOpen("checked"); store.set("arc",{}); paint();
+store.set("tier","personal");store.set("arc",{}); paint();
 ok("Plan without an arc: Home says no arc (nothing to say yet)", !document.querySelector(".path-arcline"));
 const {ProgressView}=await import("../js/views/progress.js");
 const pm=document.getElementById("main-content"); pm.innerHTML=""; ProgressView({navigate(){},back(){},history:["x"]}).mount(pm);

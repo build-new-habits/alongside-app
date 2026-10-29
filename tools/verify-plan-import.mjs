@@ -187,7 +187,7 @@ const GYM = ["dumbbells-medium", "barbell", "bench-flat", "kettlebell-medium", "
 function fixture(tier = "personal") {
   localStorage.clear(); store.init(); agreed(store);
   gate.endGateSession();
-  store.set("onboardingComplete", true); store.set("name", "Test"); store.set("tier", tier); store.setDayOpen("checked");   // P-4: the day's question answered
+  store.set("onboardingComplete", true); store.set("name", "Test"); store.set("tier", tier);
   store.set("homeEquipment", ["band-light"]); store.set("gymEquipment", GYM); store.set("equipment", GYM);
   store.set("conditions", []); store.set("conditionPainScores", {});
   store.set("arc", { active: true, aimId: "floor-unaided", strands: ["leg-strength", "trunk-strength"], marker: "Up off the floor",

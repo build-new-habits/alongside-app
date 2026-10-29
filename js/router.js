@@ -1,15 +1,6 @@
 /**
  * router.js
- * 28 Oct 2026 v50
- *
- * v50 - STAGE PATH P-4 (blueprint Session 4). 'day-open', the Plan's first
- *   open of the day, under the Today tab. 'path' (Session 5) and
- *   'plan-finish' (Session 6) are registered by the sessions that write
- *   their views: a route to a file that does not exist yet would fall to
- *   the recovery screen (verify-mount-all). A door tells 'path' which door
- *   it is by router.pathStart, read once by path.js (the router passes no
- *   parameters; as redirectReason). Sessions 4 and 5 reach phones
- *   together, so no door is pressed before path.js exists.
+ * 17 Oct 2026 v49
  *
  * v49 - D662-6 TWO-HOMES (Graeme's device check, 13 Oct). No house button
  *   on the finish or My exercises: each has its own way home (Back to
@@ -397,8 +388,6 @@ const VIEW_NAMES = {
   'classes':           { path: './views/class-list.js',        fn: 'ClassListView'       },
   'class-player':      { path: './views/class-player.js',      fn: 'ClassPlayerView'     },
   'home-threshold':    { path: './views/home-threshold.js',   fn: 'HomeThresholdView'   },
-  // STAGE PATH (v50). The Plan's first open of the day. ('path', Session 5; 'plan-finish', Session 6.)
-  'day-open':          { path: './views/day-open.js',         fn: 'DayOpenView'         },
   'reflect':           { path: './views/reflect.js',          fn: 'ReflectView'         },
 
   // ── Main views ─────────────────────────────────────────────────────────────
@@ -523,8 +512,6 @@ const NAV_MAP = {
   'today': 'today', 'checkin': 'today', 'checkin-mini': 'today',
   'coach-proposal': 'today', 'red-flag': 'today', 'health-consent': 'today', 'age-check': 'today', 'under-18': 'today', 'consent-update': 'today',
   'home-threshold': 'today', 'reflect': 'today',
-  // STAGE PATH (v50).
-  'day-open': 'today',
   'workout': 'today', 'gym-programme': 'today', 'morning-session': 'today',
   'core-session': 'today', 'yoga-session': 'today', 'walk-session': 'today',
   'running-session': 'today', 'cycle-session': 'today', 'swim-session': 'today',

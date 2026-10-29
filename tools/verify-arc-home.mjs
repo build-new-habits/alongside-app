@@ -87,7 +87,7 @@ const view = () => router.currentView;
 
 // ── 1. HOME → THE ARC ──────────────────────────────────────────────────
 console.log("\nTEST 1 - Home says the arc; Progress's Change my arc opens it (Stage PATH, mock-up v9)");
-fixture(); store.setDayOpen("checked");
+fixture();
 await go("today");
 const line = $(".path-arcline");
 ok("1pc. Home says the arc, with the aim", !!line && txt(line).includes(aimById(ARC.aimId).label) && !$('#main-content [data-route="stretch-arc"]'), txt(line));

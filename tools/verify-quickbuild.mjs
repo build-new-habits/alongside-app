@@ -2,7 +2,7 @@
  * tools/verify-quickbuild.mjs
  * 28 Oct 2026 v5
  *
- * v5 - STAGE PATH P-4 re-point (none loosened). The fixture has answered the day's first question (day-open), so Home is drawn. 0b's control reads the Plan's Home as it is now (four doors, plan-home.js), still with no quick chips.
+ * v5 - STAGE PATH P-4 re-point (none loosened). 0b's control reads the Plan's Home as it is now (four doors, plan-home.js), still with no quick chips.
  *
  * 28 Sep 2026 v4
  *
@@ -95,7 +95,7 @@ const ok = (name, cond, detail = "") => {
 function home() {
   localStorage.clear();
   store.init();
-  store.set("tier", "personal"); store.setDayOpen("checked");   // P-4: the day's question answered
+  store.set("tier", "personal");
   store.set("equipment", ["none"]);
   const c = document.createElement("div");
   document.body.appendChild(c);

@@ -69,7 +69,7 @@ const [M1, M2] = EXERCISES.filter(e => avail.has(e.id) && (e.equipment || []).so
 async function fixture() {
   document.getElementById("session-exit-overlay")?.remove();
   localStorage.clear(); store.init();
-  store.set("onboardingComplete", true); store.set("tier", "personal"); store.set("name", "T"); store.setDayOpen("checked");   // P-4: the day's question answered
+  store.set("onboardingComplete", true); store.set("tier", "personal"); store.set("name", "T");
   store.set("gymEquipment", GYM); store.set("equipment", GYM); store.set("sessionLocation", "gym");
   store.set("liftLogEnabled", true);
   store.set("safetyAckLog", Array.from({ length: 5 }, () => ({ at: new Date().toISOString(), textVersion: HURT_AND_ACHE_VERSION, surface: "fixture" })));

@@ -78,7 +78,7 @@ const submit = () => { taps++; main.querySelector(".kw-form")?.dispatchEvent(new
 function fixture({ time = "standard", conditions = [], scores = {}, saved = 0, location } = {}) {
   localStorage.clear(); store.init();
   gate.endGateSession();
-  store.set("onboardingComplete", true); store.set("name", "Test"); store.set("tier", "personal"); store.setDayOpen("checked");   // P-4: the day's question answered
+  store.set("onboardingComplete", true); store.set("name", "Test"); store.set("tier", "personal");
   store.set("gymEquipment", FULL_GYM); store.set("homeEquipment", []);
   store.set("equipment", FULL_GYM);
   store.set("availableTime", time);

@@ -1,9 +1,5 @@
 /**
  * tools/verify-scope-minor.mjs
- * 28 Oct 2026 v6
- *
- * v6 - STAGE PATH P-4 re-point (none loosened). The fixture has answered the Plan's first question of the day (day-open), so a cold open draws Home as before. No assertion changed.
- *
  * 17 Oct 2026 v5
  *   W6-15 SCOPE-WORDS (Graeme, 17 Oct: "these are fine"). Healing-style
  *   claims added to the ban ("repairs itself", "movement as medicine",
@@ -145,7 +141,7 @@ const step8 = OTD.THREAD_STEPS?.[8] || OTD.STEPS?.[8] || Object.values(OTD).find
 ok("2a. onboarding asks about sore areas and says it", !!step8 && step8.coach.includes(SCOPE.SCOPE_ADVICE) && !/health conditions/i.test(step8.coach), step8?.coach?.slice(0, 120));
 function fixture(extra = {}) {
   localStorage.clear(); store.init();
-  store.set("onboardingComplete", true); store.set("name", "T"); store.set("tier", "personal"); store.setDayOpen("checked");   // P-4: the day's question answered
+  store.set("onboardingComplete", true); store.set("name", "T"); store.set("tier", "personal");
   store.set("safetyAckLog", Array.from({ length: 5 }, () => ({ at: new Date().toISOString(), textVersion: HURT_AND_ACHE_VERSION, surface: "fixture" })));
   for (const [k, v] of Object.entries(extra)) store.set(k, v);
 }

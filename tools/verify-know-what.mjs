@@ -1,8 +1,8 @@
 /**
  * tools/verify-know-what.mjs
- * 28 Oct 2026 v7
+ * 29 Oct 2026 v7
  *
- * v7 - STAGE PATH P-4 re-point (none loosened). TEST 8: the coach decides from the Today card now (Show me today's plan), which asks for the suggestion's own kind, so a kind asked for here still does not ride along. I know what I want is no longer a Home door on the Plan (Stage PATH, mock-up v9; Session 5 offers it from a door's How as Build my own). fromHome() opens it as the router does, still counting the one tap that opens it, and fails if the old door is still on Home. Every assertion after is unchanged.
+ * v7 - STAGE PATH P-4 re-point (none loosened). TEST 8: the coach decides from Home's one row now (Let me choose for you, checked in), which asks for the suggestion's own kind, so a kind asked for here still does not ride along. I know what I want is no longer a Home door on the Plan (Stage PATH, mock-up v10; it is a Library tile). fromHome() opens it as the router does, still counting the one tap that opens it, and fails if the old door is still on Home. Every assertion after is unchanged.
  *
  * 17 Oct 2026 v6
  *
@@ -102,7 +102,7 @@ const submit = () => { taps++; main.querySelector(".kw-form")?.dispatchEvent(new
 function fixture({ time = "standard", conditions = [], scores = {}, saved = 0, location } = {}) {
   localStorage.clear(); store.init();
   gate.endGateSession();
-  store.set("onboardingComplete", true); store.set("name", "Test"); store.set("tier", "personal"); store.setDayOpen("checked");   // P-4: the day's question answered
+  store.set("onboardingComplete", true); store.set("name", "Test"); store.set("tier", "personal");
   store.set("gymEquipment", FULL_GYM); store.set("homeEquipment", []);
   store.set("equipment", FULL_GYM);
   store.set("availableTime", time);
@@ -258,8 +258,8 @@ const key = new Date().toISOString().split("T")[0];
 store.set("checkinHistory", { [key]: { energy: 6, mood: 6, date: new Date().toDateString() } });
 store.set("lastCheckin", { energy: 6, mood: 6, date: new Date().toDateString(), timestamp: new Date().toISOString() });
 main.innerHTML = ""; TodayView(router).mount(main); navs = [];
-// Stage PATH: the coach's choice is the Today card's one action now (Show me today's plan).
-click(main.querySelector('.path-today [data-action="path-go"]'));
+// Stage PATH: the coach's choice is Home's one row now (Let me choose for you); checked in, it goes straight to the plan.
+click(main.querySelector('.path-coach[data-action="path-coach"]'));
 ok("8a. the coach's suggestion asks for its own kind, not the one asked for here", navs[0] === "coach-proposal" && store.get("requestedSessionType") === "full",
    `${JSON.stringify(navs)} ${store.get("requestedSessionType")}`);
 

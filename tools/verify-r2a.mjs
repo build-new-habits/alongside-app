@@ -1,9 +1,5 @@
 /**
  * tools/verify-r2a.mjs
- * 28 Oct 2026 v2
- *
- * v2 - STAGE PATH P-4 re-point (none loosened). The fixture has answered the day's first question (day-open, the Plan's cold open), so Home is drawn and the chapter's hinge with it.
- *
  * 22 Aug 2026 v1
  *
  * R2-a — a dated target can only be recorded on the Plan.
@@ -90,7 +86,7 @@ function hingeState(tier) {
 async function mount(state) {
   localStorage.clear();
   localStorage.setItem("alongside_user", JSON.stringify(state));
-  store.init(); store.setDayOpen("checked");   // P-4: the day's question answered, so Home is drawn
+  store.init();
   const el = document.createElement("div");
   document.body.appendChild(el);
   const v = TodayView({ navigate() {} });
