@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 28 Oct 2026 v683
+ * 29 Oct 2026 v684
  *
+ * v684 - STAGE PATH Sessions 4 and 5, together (mock-up v10, Graeme 29 Oct: "Yep. I like v10"). Free is unchanged. On the Plan, Home is purpose first: your arc as a line, Lately (mood before and after your sessions, and what seems to help), one row (Let me choose for you, or your week's day, Carry on, Done today), then four doors: Get stronger, Keep moving, Stretch, Move to feel better, and the Library. The check-in is asked inside whichever way in you choose, once a day, with Not today. Behind each door, its own steps: where you are, which part, then built for you, built by you or one you saved; outside, what you're doing and Log it; Stretch by area, with ready-made routines and the floor question; Move to feel better by feeling, with programmes, a fresh one, Surprise me and Help me choose, each played in the usual player. Today's plan says why the coach chose it, what it adjusted and Change my check-in. I know what I want and Make it up as I go are in the Library. NEW FILES precached: js/views/plan-home.js, js/views/path.js, js/data/path-context.js, css/components/path.css.
  * v683 - STAGE PATH Session 3: nothing new on screen yet; the Plan's coach can now suggest today's session from the check-in, say what it adjusted, put movements you loved first (at most two a session, not if done in the last two sessions), and put together a fresh Move to feel better sequence inside each feeling's gentle rules. NEW FILE precached: js/data/path-engine.js.
  * v682 - STAGE PATH content: nothing new on Free; the Plan's Move to feel better now has 21 programmes (four or more for every feeling) and its Stretch door has 16 ready-made routines across four areas, with three new Pilates stretches and their figures, ready for the door screens. NEW FILE precached: js/data/stretch-routines.js.
  * v681 - STAGE PATH Session 2 (P-2, P-9, P-9a, P-9b): nothing new on Free's screens except truer card words; every exercise is tagged by purpose, feeling and style, and the Plan's twenty new tai chi, qigong, yoga and gentle movements and its sixteen Move to feel better programmes are in place, each movement with its figure, ready for the door screens; exercise cards that overstated a benefit, or said something works that has not been shown, now say what is true (223 changes, every one sourced). NEW FILES precached: js/data/feel-programmes.js, js/data/exercises/path_movements.js, js/data/figures/batch-15.js.
@@ -4230,7 +4231,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v683";
+const CACHE_NAME = "alongside-v684";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4238,9 +4239,9 @@ const CACHE_NAME = "alongside-v683";
 // downloads only the rest: it fetched all of them (about 6 MB) every time.
 // SHELL_HASHES:BEGIN
 const SHELL_HASHES = {
-  "./": "ad5cc113fa8e5017",
-  "./index.html": "ad5cc113fa8e5017",
-  "./css/main.css": "e306ded0118cbea6",
+  "./": "0a6b137fb70c49b5",
+  "./index.html": "0a6b137fb70c49b5",
+  "./css/main.css": "3e25300b00cf449e",
   "./css/base/fonts.css": "04893bbdfa4cf013",
   "./css/layouts/onboarding-additions.css": "a204c285b813c6e8",
   "./css/layouts/today.css": "c1b636255096d8af",
@@ -4295,7 +4296,7 @@ const SHELL_HASHES = {
   "./css/components/capture.css": "343b4ae0dc6fe6ea",
   "./css/components/finish.css": "c33e298d5fcb92ae",
   "./js/app.js": "72054b00e54ad55b",
-  "./js/router.js": "acd841a1fc44593e",
+  "./js/router.js": "4e007ac00ace7fcd",
   "./js/store.js": "cd9732c41d483377",
   "./js/session-log.js": "6134de4315842e05",
   "./js/exercise-feedback.js": "adba8549f444da2a",
@@ -4312,13 +4313,13 @@ const SHELL_HASHES = {
   "./js/session-guard.js": "00177a846537868c",
   "./js/session-resume.js": "6916b88c0757374f",
   "./js/auth.js": "9b9c7a632dccada6",
-  "./js/views/today.js": "551e2226f851e075",
+  "./js/views/today.js": "c111c12d501a63e6",
   "./js/views/mobility-conditioning.js": "dd64370231617186",
   "./js/views/arc-setup.js": "bc3f0046616fc07b",
   "./js/views/stretch-arc.js": "41d235d11e31fcb7",
-  "./js/views/checkin.js": "29d45c08868e3e8f",
+  "./js/views/checkin.js": "fea9b03bd24ea34f",
   "./js/views/checkin-mini.js": "c647f4da71feddde",
-  "./js/views/coach-proposal.js": "73baf3596386f6b0",
+  "./js/views/coach-proposal.js": "058eefda64c4dd1e",
   "./js/views/workout.js": "27f3ec466b83017e",
   "./js/views/progress.js": "0e5aa6295cab8ee5",
   "./js/views/settings.js": "ec21456c0fda9b36",
@@ -4346,7 +4347,7 @@ const SHELL_HASHES = {
   "./js/views/programme-select.js": "8f1e740ed2db223b",
   "./js/views/upgrade.js": "2bce7ee3c22e3e76",
   "./js/views/privacy.js": "9acd0bf0a418d745",
-  "./js/views/library.js": "b82890843b58f923",
+  "./js/views/library.js": "0c2b7f775a4eee80",
   "./js/views/practices.js": "b1bf1229e097e410",
   "./js/views/red-flag.js": "d2f857d0f8ba905f",
   "./js/views/health-consent.js": "66c6f499c7863c7c",
@@ -4354,8 +4355,12 @@ const SHELL_HASHES = {
   "./js/views/under-18.js": "22c82205c5f7626a",
   "./js/views/consent-update.js": "51f918f8e2c9b25a",
   "./js/data/arc-readback.js": "9b06dcba96534da0",
-  "./js/data/tier-table.js": "f72328887db67d30",
-  "./js/views/know-what.js": "e196bb8321f5218d",
+  "./js/data/tier-table.js": "7821c3304bd0815c",
+  "./js/views/know-what.js": "0b3d8db4a33b6c9b",
+  "./js/views/plan-home.js": "e92bc5094b16da66",
+  "./js/views/path.js": "7f9ed1459cbf019a",
+  "./js/data/path-context.js": "caa277b03a30df21",
+  "./css/components/path.css": "0cab2283275f3104",
   "./js/data/red-flag.js": "3cd9eecbc3985eb3",
   "./js/data/health-consent.js": "a23d005af57f179c",
   "./js/data/age-check.js": "7fa5b0f5a6b34770",
@@ -4363,7 +4368,7 @@ const SHELL_HASHES = {
   "./js/data/export-file.js": "bbee762322d0e4e2",
   "./js/data/health-consent-covers.js": "6698a3e50672cbbe",
   "./js/data/kind-colours.js": "178ca1df919c83e9",
-  "./js/data/line-icons.js": "c66cb43d2b010c32",
+  "./js/data/line-icons.js": "b746ddec419dc568",
   "./js/data/week-shape-model.js": "8b6720d92bedb6e5",
   "./js/data/week-shape.js": "11aa21a058a7c640",
   "./js/data/warm-views.js": "73c268f74f004e8e",
@@ -4419,7 +4424,7 @@ const SHELL_HASHES = {
   "./js/views/class-list.js": "551081d91143ee4d",
   "./css/components/class-list.css": "e33b073b352399f3",
   "./css/components/class-player.css": "401cc57d7d39dbb1",
-  "./js/views/saved-sessions.js": "e4b36f369759e70a",
+  "./js/views/saved-sessions.js": "675fccfefce142c8",
   "./js/views/session-builder-ui.js": "4bff89344b105d5c",
   "./js/views/noticing.js": "7344ac61b5a10c06",
   "./js/views/in-step.js": "e6b66f1d1e71096e",
@@ -4475,7 +4480,7 @@ const SHELL_HASHES = {
   "./js/data/exercises/path_movements.js": "7a627e4bc94e2d97",
   "./js/data/feel-programmes.js": "ade4752f88834a40",
   "./js/data/stretch-routines.js": "5a5fa2e7598037fb",
-  "./js/data/path-engine.js": "aa987b65895789ed",
+  "./js/data/path-engine.js": "4072deb17d2f4edb",
   "./js/data/exercises/pilates.js": "5741c325f65e935c",
   "./js/data/exercises/running.js": "c1fc520e1eb7ee8c",
   "./js/data/exercises/rehabilitation.js": "c2b00a8513421566",
@@ -4663,6 +4668,10 @@ const SHELL_URLS = [
   "./js/data/arc-readback.js",
   "./js/data/tier-table.js",
   "./js/views/know-what.js",
+  "./js/views/plan-home.js",
+  "./js/views/path.js",
+  "./js/data/path-context.js",
+  "./css/components/path.css",
   "./js/data/red-flag.js",
   "./js/data/health-consent.js",
   "./js/data/age-check.js",
