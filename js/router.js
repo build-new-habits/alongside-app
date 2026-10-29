@@ -1,5 +1,12 @@
 /**
  * router.js
+ * 29 Oct 2026 v50
+ *
+ * v50 - STAGE PATH Session 5 (P-5 DOOR-ROUTES). 'path' registered
+ *   (views/path.js: every step behind the four doors on the Plan's Home),
+ *   mapped to Today, with the nav shown, as I know what I want is. A door
+ *   says which door through router.pathStart, read once by the view.
+ *
  * 17 Oct 2026 v49
  *
  * v49 - D662-6 TWO-HOMES (Graeme's device check, 13 Oct). No house button
@@ -416,6 +423,7 @@ const VIEW_NAMES = {
   'capture':           { path: './views/capture.js',         fn: 'CaptureView'         },
   // SMOOTH-P3b. "I know what I want", Plan Home's second door.
   'know-what':         { path: './views/know-what.js',       fn: 'KnowWhatView'        },
+  'path':              { path: './views/path.js',            fn: 'PathView'            },
   'my-programme':      { path: './views/my-programme.js',     fn: 'MyProgrammeView'     },
   // THREAD-1a. The hard conversation is ENTERED from My Programme's
   // invitation, never opened over the top of it.
@@ -540,6 +548,8 @@ const NAV_MAP = {
   'saved-sessions': 'today',
   // SMOOTH-P3b. A Home door, so the Home tab stays lit.
   'know-what': 'today',
+  // STAGE PATH P-5. Behind a Home door.
+  'path': 'today',
   'capture': 'today',
   // PRAC-1. Reached from the Library, which maps to Today. Mapping it
   // to Wellbeing would repeat the NAV-8 fault from the other side --

@@ -1,5 +1,14 @@
 /**
  * js/views/saved-sessions.js
+ * 29 Oct 2026 v9
+ *
+ * v9 - STAGE PATH Session 5 (P-5). Reached from a door on the Plan's Home
+ *   (views/path.js sets router.savedStart = { purpose, place }, read once),
+ *   the list shows the sessions kept for that door and place, and the ones
+ *   kept before doors existed (no purpose: every door's, blueprint C3).
+ *   When any are left out, one button shows them all. If none fit, all are
+ *   shown. Opened any other way, it is exactly as it was.
+ *
  * 17 Oct 2026 v8
  *
  * v8 - D662-7 (Graeme's device check, 13 Oct). Each session's button says
@@ -324,8 +333,16 @@ function _row(rec) {
   `;
 }
 
+// P-5. The door this list was opened from, if any (router.savedStart, read once; cleared on leaving).
+let doorFilter = null;
+const _fits = (r, f) => (r.purpose == null || r.purpose === f.purpose) && (!f.place || r.place == null || r.place === f.place);
+
 export function render() {
-  const list = savedSessions();
+  if (router.savedStart) { doorFilter = router.savedStart; router.savedStart = null; }
+  const all = savedSessions();
+  const fit = doorFilter ? all.filter(r => _fits(r, doorFilter)) : all;
+  const list = fit.length ? fit : all;
+  const hidden = all.length - list.length;
 
   // Two different empty states. See the TIER note in the file header.
   if (!list.length) {
@@ -377,8 +394,9 @@ export function render() {
       <div class="view-header">
         <h1 tabindex="-1">Saved sessions</h1>
         <p class="text-secondary">
-          ${list.length} saved, newest first.
+          ${hidden ? `${list.length} kept for this, newest first.` : `${list.length} saved, newest first.`}
         </p>
+        ${hidden ? `<button type="button" class="btn btn-secondary" data-own-all>Show all ${all.length}</button>` : ''}
       </div>
 
       ${searchable ? `
@@ -488,6 +506,13 @@ export function onMount() {
     onMount();
   };
 
+  // P-5. Show all: the door's filter goes, the whole list shows.
+  root.querySelector('[data-own-all]')?.addEventListener('click', () => {
+    doorFilter = null;
+    refresh();
+    root.querySelector('h1')?.focus();
+  });
+
   // EDIT. Hands off to the builder's preview, where the swap control
   // already lets any movement be changed. Nothing is edited here.
   root.querySelectorAll('[data-edit-id]').forEach(btn => {
@@ -539,6 +564,7 @@ export function onMount() {
 /** OWN-LIST. Leaving clears the search, so coming back shows everything. */
 export function onUnmount() {
   query = '';
+  doorFilter = null;
   confirmingDeleteId = null;
   clearTimeout(announceTimer);
 }

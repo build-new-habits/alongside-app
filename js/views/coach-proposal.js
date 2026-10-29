@@ -1,5 +1,17 @@
 /**
  * coach-proposal.js
+ * 29 Oct 2026 v63
+ *
+ * v63 - STAGE PATH Session 5 (P-5; mock-up v10, Graeme 29 Oct: "Yep. I like
+ *   v10"). On the Plan only, Today's plan now carries what Home no longer
+ *   says: the coach's reason, when the coach chose (router.planReason, read
+ *   once, said at the start of the plan's own sentence, so still one line);
+ *   What I've adjusted, every line that is true in the app today
+ *   (data/path-context.js shownAdjustments); and Change my check-in (Check
+ *   in now, before one), which comes back to this plan with its kind and
+ *   place (router.planKeep, read once: the check-in clears the kind).
+ *   Free's screen is unchanged.
+ *
  * 17 Oct 2026 v62
  *
  * v62 - W6-17. The lighter plan after a busy few days is reason "busy"
@@ -869,6 +881,7 @@ import { renderFigure }      from '../figures.js';
 import { takeWeekDayRequest, applyWeekDay, primaryType, todayInWeek } from '../data/week-shape.js';
 import { resolveTiming }     from '../exercise-timing.js';
 import { isPremium }         from '../auth.js';
+import { shownAdjustments }  from '../data/path-context.js';
 import { openSheet }         from './onboarding/sheet-manager.js';
 import { chooseSessionType, lineIsSupported } from '../data/session-choice.js';
 
@@ -883,6 +896,8 @@ import { chooseSessionType, lineIsSupported } from '../data/session-choice.js';
 // retired now, not just hidden.
 
 // ─── View registration ────────────────────────────────────────────────────────
+
+const _escWhy = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
 export function CoachProposalView(router) {
 
@@ -927,12 +942,24 @@ export function CoachProposalView(router) {
   let statusMsg  = '';
   let ackTicked  = false;
   let ackError   = '';
+  // P-5. Why the coach chose this, when it did (router.planReason, read once).
+  let planWhy    = null;
 
   // ── Mount ──────────────────────────────────────────────────────────────────
 
   function mount(container) {
     // Advance week if Monday
     advanceWeekIfNeeded();
+
+    // P-5 (the Plan). The coach's reason, and a plan coming back from Change my check-in.
+    planWhy = isPremium() && router?.planReason ? String(router.planReason) : null;
+    if (router) router.planReason = null;
+    const keep = isPremium() && router?.planKeep ? router.planKeep : null;
+    if (router) router.planKeep = null;
+    if (keep) {
+      if (keep.type) store.set('requestedSessionType', keep.type);
+      if (keep.loc && store.get('requestedLocation') == null) store.set('requestedLocation', keep.loc);
+    }
 
     // W3-21. Where "I know what I want" asked for, read once. Anything
     // else starts from the default, so a plan only looked at leaves no
@@ -1314,11 +1341,12 @@ export function CoachProposalView(router) {
           <!-- LOCATION-1. h1: this screen's top level. WCAG 2.2 AA 1.3.1. -->
           <h1 id="cp-preview-title" class="cp-preview-panel__title">Today’s plan</h1>
           ${premium ? _renderPlanned() : ''}
-          ${option ? `<p class="cp-plan__sentence">${_planSentence(option)}</p>` : ''}
+          ${option ? `<p class="cp-plan__sentence">${planWhy ? `${_escWhy(planWhy)} ` : ''}${_planSentence(option)}</p>` : ''}
           ${option ? _renderLighterOffer(option) : ''}
           ${premium ? _arcLine() : ''}
           ${option ? _renderLowMood() : ''}
           ${premium && option ? _renderGoodDayOffer(option) : ''}
+          ${premium && option ? _renderAdjusted() : ''}
 
           <!-- LOCATION-1 / SMOOTH-P2a. What the coach assumed, one tap to
                change each. Focus opens "Something different today". -->
@@ -1744,6 +1772,20 @@ export function CoachProposalView(router) {
   }
 
   /**
+   * P-5 (v63, the Plan). Every adjustment that is true in the app today,
+   * and the way to change what the plan was fitted to.
+   */
+  function _renderAdjusted() {
+    const adj = shownAdjustments();
+    return `
+      <div class="cp-adjusted">
+        ${adj.length ? `<p class="cp-adjusted__lbl">What I’ve adjusted</p>
+        <ul class="cp-adjusted__list">${adj.map(x => `<li>${_escWhy(x)}</li>`).join('')}</ul>` : ''}
+        <button type="button" class="cp-adjusted__redo" id="cp-redo-checkin">${store.checkedInToday() ? 'Change my check-in' : 'Check in now'}</button>
+      </div>`;
+  }
+
+  /**
    * D662-6 TWO-HOMES (v59). The router draws the house on this screen; the
    * plan has its own "‹ Home", so while it shows, the house is not drawn.
    */
@@ -2024,6 +2066,13 @@ export function CoachProposalView(router) {
       adjust = -1;
       statusMsg = 'Something gentler: one set fewer on each main exercise.';
       _rerenderPanel(container, true);
+    });
+    // P-5. Change my check-in: the check-in, then this plan again, for the same kind and place.
+    panel.querySelector('#cp-redo-checkin')?.addEventListener('click', () => {
+      router.planKeep = { type: store.get('requestedSessionType') || null, loc: _currentLocation() };
+      store.set('pendingDoorRoute', 'coach-proposal');
+      closePreviewPanel(container, { navigateHome: false });
+      router.navigate('checkin');
     });
     panel.querySelector('#cp-low-wellbeing')?.addEventListener('click', () => {
       closePreviewPanel(container, { navigateHome: false });

@@ -1,6 +1,12 @@
 /**
  * views/plan-home.js
- * 29 Oct 2026 v2
+ * 29 Oct 2026 v3
+ *
+ * v3 - STAGE PATH Session 5 (a touch-once exception, recorded: Sessions 4
+ *   and 5 release together). What the person told the app today is read
+ *   from data/path-context.js, shared with the door routes and Today's
+ *   plan. The coach's reason goes with its choice to Today's plan
+ *   (router.planReason), where reasons now live. Nothing on Home changes.
  *
  * v2 - MOCK-UP v10 (Graeme, 29 Oct: "I like v10"). The check-in lives
  *   inside each way in, asked once a day just before the first session
@@ -54,6 +60,7 @@ import { aimById } from "../data/aims.js";
 import { arcWeek } from "../data/arc-readback.js";
 import { arcWeekStartsToday } from "./today.js";   // A-5: "Week n starts today" (a function; the cycle is safe)
 import { getTodaysCheckin } from "../data/checkin.js";
+import { checkinToday, soreToday, lastPlace, prefNames } from "../data/path-context.js";
 import { mixLine, detailLine } from "../data/week-shape-model.js";
 import { todayInWeek, primaryFocus } from "../data/week-shape.js";
 import { kindOf } from "../data/kind-colours.js";
@@ -84,27 +91,6 @@ const todayKey = () => new Date().toISOString().split("T")[0];
 
 // ── What the person told the app ──────────────────────────────────────────
 
-function checkinToday() {
-  if (!store.checkedInToday()) return null;
-  const c = getTodaysCheckin();
-  const energy = Number(c?.energy), mood = Number(c?.mood);
-  return Number.isFinite(energy) || Number.isFinite(mood) ? { energy: Number.isFinite(energy) ? energy : null, mood: Number.isFinite(mood) ? mood : null } : null;
-}
-function soreToday() {
-  const s = store.get("conditionPainScores") || {};
-  return Object.entries(s).filter(([, v]) => Number(v) > 0).map(([id, score]) => ({ id, score: Number(score) }));
-}
-function lastPlace() {
-  const log = store.completedSessions(store.get("activityLog") || []);
-  for (let i = log.length - 1; i >= 0; i--) if (log[i].place === "home" || log[i].place === "gym") return log[i].place;
-  return "home";
-}
-function prefNames() {
-  const liked = Object.keys(store.get("likedMovements") || {}).map(movementName).filter(Boolean);
-  const prefs = store.get("exercisePreferences") || {};
-  const by = want => Object.entries(prefs).filter(([, p]) => (p?.preference || p) === want).map(([id]) => movementName(id)).filter(Boolean);
-  return { likedNames: liked, lessNames: by("less"), neverNames: by("avoid") };
-}
 function arcInfo() {
   const arc = store.get("arc") || {};
   if (!arc.active) return { aim: null, week: null, door: null };
@@ -341,6 +327,7 @@ export function goToSuggestion(router, opts = {}) {
   }
   store.set("requestedSessionType", s.sessionType || "full");
   store.set("requestedLocation", s.place || null);
+  router.planReason = s.reason;   // Today's plan says why, once (coach-proposal.js, Session 5)
   router.navigate("coach-proposal", opts);
 }
 

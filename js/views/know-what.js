@@ -1,5 +1,13 @@
 /**
  * js/views/know-what.js
+ * 29 Oct 2026 v6
+ *
+ * v6 - STAGE PATH Session 5 (P-5). Build my own, behind a door on the
+ *   Plan's Home, opens this screen with the door's kind, part and place
+ *   already chosen (router.knowWhatStart, read once and cleared; views/
+ *   path.js). Everything can still be changed. Opened any other way, it
+ *   is exactly as it was.
+ *
  * 02 Oct 2026 v5
  *
  * v5 - W5-11 USUAL-LENGTH. The length picked here is today's
@@ -155,6 +163,14 @@ export function KnowWhatView(router) {
     kind   = null; part = "full"; sore = null; levels = {}; extra = []; error = "";
     mins   = preselectedLength().mins;
     place  = preselectedPlace();
+    // Build my own, from a door (Stage PATH P-5): its kind, part and place, chosen already.
+    const from = router?.knowWhatStart || null;
+    if (router) router.knowWhatStart = null;
+    if (from) {
+      if (KINDS.some(k => k.id === from.kind)) kind = from.kind;
+      if (PARTS.some(p => p.id === from.part)) part = from.part;
+      if (PLACES.some(p => p.id === from.place)) place = from.place;
+    }
     paint();
     container.querySelector("h1")?.focus();
   }

@@ -1,6 +1,10 @@
 /* ============================================================
    components/path.css
-   29 Oct 2026 v2
+   29 Oct 2026 v3
+
+   v3 - STAGE PATH Session 5 (P-5): the door routes (views/path.js) and,
+   on Today's plan, What I've adjusted with Change my check-in
+   (.cp-adjusted, the Plan only). Same tokens, sizes from --text-*.
 
    STAGE PATH P-4 (blueprint Session 4). The Plan's Home
    (views/plan-home.js), as mock-up v10 (Graeme, 29 Oct: "I like v10").
@@ -213,3 +217,67 @@
 .path-lately__before { fill: var(--color-text-secondary); }
 .path-lately__after { fill: var(--kind-green); }
 .path-lately__line { margin: 0; font-size: var(--text-sm); line-height: 1.4; color: var(--color-text); }
+
+/* ── The door routes (views/path.js, Session 5) ───────────────────── */
+.path-view { display: flex; flex-direction: column; gap: var(--space-3); width: 100%; max-width: 480px; margin: 0 auto; box-sizing: border-box; }
+.path-back {
+  align-self: flex-start; display: inline-flex; align-items: center; gap: 4px;
+  min-height: 44px; min-width: 44px; padding: 0 var(--space-2) 0 0;
+  background: none; border: 0; color: var(--color-text); font: inherit; font-size: var(--text-base); cursor: pointer;
+}
+.path-back:focus-visible, .path-link:focus-visible, .path-mv__yt:focus-visible { outline: 3px solid var(--color-border-focus); outline-offset: 2px; }
+.path-stepbar { display: flex; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.path-stepbar li { flex: 1; height: 6px; border-radius: 3px; background: var(--color-border); }
+.path-stepbar li.is-on { background: var(--k, var(--color-primary)); }
+.path-head { display: flex; gap: var(--space-3); align-items: center; }
+.path-head > .kind-tile { flex: none; }
+.path-h1 { margin: 0; font-size: var(--text-2xl); font-weight: var(--font-bold); line-height: 1.2; color: var(--color-text); text-wrap: balance; }
+.path-h1:focus { outline: none; }
+.path-list { display: flex; flex-direction: column; gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
+.path-list li { display: flex; }
+.path-row.is-tint { border-color: var(--k, var(--color-primary)); background: color-mix(in srgb, var(--k, var(--color-primary)) 12%, var(--color-bg)); }
+.path-row.is-dashed { border-style: dashed; background: transparent; }
+.path-badge {
+  display: inline-block; margin-left: 4px; padding: 0 6px; vertical-align: 2px;
+  border: 1.5px solid var(--k, var(--color-primary)); border-radius: 999px;
+  font-size: var(--text-xs); font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--color-text);
+}
+.path-why { display: block; color: var(--color-text); }
+.path-coachline { margin: 0; font-size: var(--text-base); line-height: 1.45; color: var(--color-text); }
+.path-small { margin: 0; font-size: var(--text-sm); line-height: 1.45; color: var(--color-text-secondary); }
+.path-note {
+  margin: 0; padding: var(--space-2) var(--space-3); border: 1.5px solid var(--kind-amber); border-radius: 12px;
+  background: color-mix(in srgb, var(--kind-amber) 12%, var(--color-bg)); color: var(--color-text); font-size: var(--text-sm); line-height: 1.45;
+}
+.path-link {
+  align-self: flex-start; min-height: 44px; padding: 0; background: none; border: 0;
+  color: var(--color-text); font: inherit; font-size: var(--text-base); text-decoration: underline; cursor: pointer; text-align: left;
+}
+.path-seg { border: 0; margin: 0; padding: 0; min-width: 0; }
+.path-seg legend { padding: 0; margin-bottom: 6px; font-size: var(--text-xs); font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--color-text-secondary); }
+.path-seg__opts { display: flex; flex-wrap: wrap; gap: 6px; }
+.path-seg label {
+  position: relative; display: flex; align-items: center; justify-content: center; max-width: 100%;
+  min-height: 44px; min-width: 56px; padding: 0 14px; border-radius: 999px; cursor: pointer;
+  border: 1.5px solid var(--color-border); background: var(--color-bg); color: var(--color-text); font-size: var(--text-sm);
+}
+.path-seg input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+.path-seg label:has(input:checked) { background: var(--color-text); border-color: var(--color-text); color: var(--color-bg); font-weight: 700; }
+.path-seg label:has(input:focus-visible) { outline: 3px solid var(--color-border-focus); outline-offset: 2px; }
+.path-mvs { display: flex; flex-direction: column; gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
+.path-mv { display: flex; flex-direction: column; gap: 4px; padding: var(--space-3); border: 1px solid var(--color-border); border-radius: var(--radius-lg, 16px); background: var(--color-surface); }
+.path-mv .xfig { max-width: 160px; }
+.path-mv .xfig__cap { display: none; }
+.path-mv__nm { margin: 0; font-size: var(--text-base); font-weight: 700; color: var(--color-text); }
+.path-mv__yt { align-self: flex-start; display: inline-flex; align-items: center; min-height: 44px; color: var(--color-text); font-size: var(--text-sm); text-decoration: underline; }
+.path-view .path-adj { display: flex; flex-direction: column; gap: 2px; }
+
+/* Today's plan, the Plan only: every adjustment, and Change my check-in. */
+.cp-adjusted { display: flex; flex-direction: column; gap: 4px; margin: var(--space-2) 0; }
+.cp-adjusted__lbl { margin: 0; font-size: var(--text-xs); font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--color-text-secondary); }
+.cp-adjusted__list { margin: 0; padding-left: 1.2em; font-size: var(--text-sm); line-height: 1.45; color: var(--color-text); }
+.cp-adjusted__redo {
+  align-self: flex-start; min-height: 44px; padding: 0; background: none; border: 0;
+  color: var(--color-text); font: inherit; font-size: var(--text-base); text-decoration: underline; cursor: pointer;
+}
+.cp-adjusted__redo:focus-visible { outline: 3px solid var(--color-border-focus); outline-offset: 2px; }
