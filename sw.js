@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 29 Oct 2026 v684
+ * 29 Oct 2026 v685
  *
+ * v685 - P-12 fix-now, from the consistency trace (both tiers): Mobility & Conditioning, Morning Programme and My programme (before a session is built) now say their name as the page heading, so a screen reader announces where you are; on Mobility & Conditioning, Log an event opens Log an activity, as it says (it opened the Library).
  * v684 - STAGE PATH Sessions 4 and 5, together (mock-up v10, Graeme 29 Oct: "Yep. I like v10"). Free is unchanged. On the Plan, Home is purpose first: your arc as a line, Lately (mood before and after your sessions, and what seems to help), one row (Let me choose for you, or your week's day, Carry on, Done today), then four doors: Get stronger, Keep moving, Stretch, Move to feel better, and the Library. The check-in is asked inside whichever way in you choose, once a day, with Not today. Behind each door, its own steps: where you are, which part, then built for you, built by you or one you saved; outside, what you're doing and Log it; Stretch by area, with ready-made routines and the floor question; Move to feel better by feeling, with programmes, a fresh one, Surprise me and Help me choose, each played in the usual player. Today's plan says why the coach chose it, what it adjusted and Change my check-in. I know what I want and Make it up as I go are in the Library. NEW FILES precached: js/views/plan-home.js, js/views/path.js, js/data/path-context.js, css/components/path.css.
  * v683 - STAGE PATH Session 3: nothing new on screen yet; the Plan's coach can now suggest today's session from the check-in, say what it adjusted, put movements you loved first (at most two a session, not if done in the last two sessions), and put together a fresh Move to feel better sequence inside each feeling's gentle rules. NEW FILE precached: js/data/path-engine.js.
  * v682 - STAGE PATH content: nothing new on Free; the Plan's Move to feel better now has 21 programmes (four or more for every feeling) and its Stretch door has 16 ready-made routines across four areas, with three new Pilates stretches and their figures, ready for the door screens. NEW FILE precached: js/data/stretch-routines.js.
@@ -4231,7 +4232,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v684";
+const CACHE_NAME = "alongside-v685";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4314,7 +4315,7 @@ const SHELL_HASHES = {
   "./js/session-resume.js": "6916b88c0757374f",
   "./js/auth.js": "9b9c7a632dccada6",
   "./js/views/today.js": "c111c12d501a63e6",
-  "./js/views/mobility-conditioning.js": "dd64370231617186",
+  "./js/views/mobility-conditioning.js": "8b30ad4fa0887d62",
   "./js/views/arc-setup.js": "bc3f0046616fc07b",
   "./js/views/stretch-arc.js": "41d235d11e31fcb7",
   "./js/views/checkin.js": "fea9b03bd24ea34f",
@@ -4430,12 +4431,12 @@ const SHELL_HASHES = {
   "./js/views/in-step.js": "e6b66f1d1e71096e",
   "./js/data/in-step-scenarios.js": "b46f085cda4d24fc",
   "./js/views/journal-entry.js": "772a866eba022cc4",
-  "./js/views/gym-programme.js": "c7c1131806b03654",
+  "./js/views/gym-programme.js": "900d1ae24e672fe8",
   "./js/views/prescribed.js": "0ae8c1283826141d",
   "./js/views/prescribed-session.js": "1b1ad238284e3f4c",
   "./js/views/quiet-session.js": "c69d992fe69f568c",
   "./js/views/breathing-session.js": "b38371ead09543e6",
-  "./js/views/morning-session.js": "e1efd26a71ffd68c",
+  "./js/views/morning-session.js": "c261f642db4bb8de",
   "./js/views/core-session.js": "30d5977595020ba7",
   "./js/views/yoga-session.js": "bde8e016cc17c761",
   "./js/views/walk-session.js": "8c76b05ea66a817d",
