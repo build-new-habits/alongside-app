@@ -1,13 +1,14 @@
 /**
  * tools/verify-homedoors.mjs
- * 28 Oct 2026 v4
+ * 29 Oct 2026 v4
  *
- * v4 - STAGE PATH P-4 re-point (none loosened; mock-up v9). The Plan's Home
- *   is four purpose doors: 1b counts four. 2a: the Stretch door opens its
- *   own steps (path; Session 5 drives Area, How and Build my own end to
- *   end in verify-path-routes), so 2a checks the door, then drives the
- *   stretch plan from I know what I want as before. 3a: the coach's way is
- *   the Today card (Check in, or Show me today's plan).
+ * v4 - STAGE PATH P-4 re-point (none loosened; mock-up v10, Graeme approved
+ *   29 Oct). The Plan's Home is four purpose doors: 1b counts four. 2a:
+ *   the person has checked in today (the check-in now lives inside each
+ *   way in), so the Stretch door opens its own steps (path; Session 5
+ *   drives them in verify-path-routes); 2a checks the door, then drives the
+ *   stretch plan from I know what I want (a Library tile now) as before.
+ *   3a: the coach's way is Home's one row, Let me choose for you.
  *
  * 28 Sep 2026 v3
  *
@@ -159,6 +160,9 @@ const { KnowWhatView } = await import(B + "views/know-what.js");
 const { CoachProposalView } = await import(B + "views/coach-proposal.js");
 {
   localStorage.clear(); store.init(); store.set("tier", "personal"); store.set("onboardingComplete", true);
+  { const k = new Date().toISOString().split("T")[0];   // v4: checked in today, so the door goes straight to its steps
+    store.set("checkinHistory", { [k]: { energy: 6, mood: 6, date: new Date().toDateString() } });
+    store.set("lastCheckin", { energy: 6, mood: 6, date: new Date().toDateString(), timestamp: new Date().toISOString() }); }
   // Its own container: tests 3 and 4 read the Plan render still in #c.
   const c = document.createElement("div"); document.body.appendChild(c);
   const navs = [];
@@ -205,8 +209,8 @@ console.log("\nTEST 3 - the invitation survived, and nothing doubled");
 // What must NOT change is that a coach-picks route exists on Home at
 // all -- restoring the doors and then removing the soft option would be
 // the same mistake in the other direction.
-ok("3a. the coach-picks fallback is still offered on Plan (v4: the Today card, which asks or suggests)",
-   !!plan.c.querySelector('.path-today [data-action="checkin"], .path-today [data-action="path-go"]'),
+ok("3a. the coach-picks fallback is still offered on Plan (v4: Home's one row, Let me choose for you)",
+   !!plan.c.querySelector('.path-coach[data-action="path-coach"]'),
    "restoring the doors removed the invitation. It is meant to become one " +
    "option among them, not to be replaced in turn -- that would be the same " +
    "mistake in the other direction.");
