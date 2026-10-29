@@ -1,0 +1,193 @@
+/* ============================================================
+   components/path.css
+   28 Oct 2026 v1
+
+   STAGE PATH P-4 (blueprint Session 4). The Plan's Home and the first
+   open of the day (views/plan-home.js, views/day-open.js), as mock-up v9
+   (approved 28 Oct). Later Stage PATH screens add their rules here.
+
+   One kind, one colour (LOOK-3, --kind-*): Get stronger amber, Keep moving
+   blue, Stretch violet, Move to feel better green; teal for the app's own
+   (check in, carry on). A colour is never said alone: every tile sits
+   beside its words (WCAG 1.4.1). Sizes are the --text-* tokens, so the
+   text size setting reaches every word (D-12). Nothing below the fold at
+   text 1 on a 390 x 844 phone: the doors sit two by two until the words
+   need a column of their own.
+   ============================================================ */
+
+.path-home {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  /* .main-content already gives the side gutter and the room above the nav. */
+  padding: 0;
+  box-sizing: border-box;
+}
+.path-greeting {
+  margin: 0;
+  font-size: var(--text-2xl);
+  font-weight: var(--font-bold);
+  line-height: 1.2;
+  color: var(--color-text);
+  text-wrap: balance;
+}
+.path-greeting:focus { outline: none; }
+.path-note {
+  margin: 0;
+  font-size: var(--text-base);
+  line-height: 1.45;
+  color: var(--color-text);
+}
+
+/* The arc, said (it opens from Progress, Change my arc). */
+.path-arcline {
+  display: flex;
+  gap: var(--space-2);
+  align-items: flex-start;
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: 1.45;
+  color: var(--color-text-secondary);
+}
+.path-arcline .line-icon { color: var(--kind-teal); margin-top: 2px; }
+.path-arcline strong { color: var(--color-text); font-weight: 600; }
+
+/* ── The Today card: tinted with its door's colour ───────────────── */
+.path-today {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4) var(--space-4);
+  border: 1.5px solid var(--k, var(--color-primary));
+  border-radius: var(--radius-xl);
+  background: var(--color-bg-card);
+  background: color-mix(in srgb, var(--k, var(--color-primary)) 12%, var(--color-bg));
+  color: var(--color-text);
+}
+.path-today__head { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: flex-start; }
+.path-today__head > .kind-tile { width: 40px; height: 40px; }
+.path-today__titles { flex: 1 1 calc(9.5rem * var(--user-text-scale, 1)); min-width: 0; }
+.path-today__eyebrow {
+  margin: 0;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+.path-today__title { margin: 0; font-size: var(--text-xl); font-weight: var(--font-bold); line-height: 1.2; }
+.path-today__meta  { margin: 0; font-size: var(--text-sm); color: var(--color-text-secondary); }
+.path-today__coach { margin: 0; font-size: var(--text-base); line-height: 1.45; }
+.path-today__go { margin-top: var(--space-1); }
+/* On the card's tint the app's teal-on-clear secondary falls below 4.5:1 in the light scheme: words in text colour, the edge in the border colour. */
+.path-today .btn-secondary { color: var(--color-text); border-color: var(--color-border); }
+.path-today__link {
+  align-self: flex-start;
+  min-height: 44px;
+  padding: 0;
+  background: none;
+  border: 0;
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--text-base);
+  text-decoration: underline;
+  cursor: pointer;
+}
+.path-today__link:focus-visible { outline: 3px solid var(--color-border-focus); outline-offset: 2px; }
+.path-today__bar { height: 8px; border-radius: 4px; background: var(--color-border-light); overflow: hidden; }
+.path-today__bar i { display: block; height: 100%; background: var(--k, var(--color-primary)); }
+
+/* What I've adjusted / I'll remember: two on Home, all on the plan. */
+.path-adj__lbl {
+  margin: 0 0 2px;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+.path-adj ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 2px; font-size: var(--text-sm); line-height: 1.45; }
+.path-adj li { display: flex; gap: var(--space-2); align-items: flex-start; }
+.path-adj li::before { content: ""; flex: none; width: 7px; height: 7px; margin-top: 0.5em; border-radius: 2px; background: var(--k, var(--color-primary)); }
+
+/* The first movement, drawn: its frames take turns, still under Reduce motion. */
+.path-today__fig { flex: none; width: calc(84px * min(var(--user-text-scale, 1), 1.2)); }
+.path-today__fig .xfig { display: grid; grid-template-columns: 1fr; gap: 0; margin: 0; }
+.path-today__fig .xfig__frame {
+  grid-area: 1 / 1;
+  max-width: none; width: 100%;
+  padding: 2px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--k, var(--color-primary)) 8%, var(--color-bg-deep));
+}
+.path-today__fig .xfig__cap { display: none; }
+.path-today__fig .xfig__frame:not(:first-child) { opacity: 0; }
+@media (prefers-reduced-motion: no-preference) {
+  :root:not(.reduce-motion) .path-today__fig .xfig--2 .xfig__frame { animation: path-fig2 5s ease-in-out infinite; }
+  :root:not(.reduce-motion) .path-today__fig .xfig--2 .xfig__frame:nth-child(2) { animation-delay: -2.5s; }
+  :root:not(.reduce-motion) .path-today__fig .xfig--3 .xfig__frame { animation: path-fig3 7.5s ease-in-out infinite; }
+  :root:not(.reduce-motion) .path-today__fig .xfig--3 .xfig__frame:nth-child(2) { animation-delay: -5s; }
+  :root:not(.reduce-motion) .path-today__fig .xfig--3 .xfig__frame:nth-child(3) { animation-delay: -2.5s; }
+}
+@keyframes path-fig2 { 0%, 40% { opacity: 1; } 50%, 90% { opacity: 0; } 100% { opacity: 1; } }
+@keyframes path-fig3 { 0%, 27% { opacity: 1; } 33%, 94% { opacity: 0; } 100% { opacity: 1; } }
+
+/* Done today: before and after on the person's own five words (never a score). */
+.path-moodpath { display: block; width: 100%; height: auto; max-height: 48px; }
+.path-moodpath__line { stroke: var(--color-border); stroke-width: 2; stroke-linecap: round; }
+.path-moodpath__tick { fill: var(--color-border); }
+.path-moodpath__before { fill: var(--color-bg); stroke: var(--color-text-secondary); stroke-width: 3; }
+.path-moodpath__after { fill: var(--k, var(--color-primary)); stroke: var(--k, var(--color-primary)); stroke-width: 3; }
+.path-moodpath__move { stroke: var(--k, var(--color-primary)); stroke-width: 4; stroke-linecap: round; fill: none; }
+.path-moodpath__ends { display: flex; justify-content: space-between; margin: -6px 0 0; font-size: var(--text-xs); color: var(--color-text-secondary); }
+@media (prefers-reduced-motion: no-preference) {
+  :root:not(.reduce-motion) .path-moodpath__move { stroke-dasharray: var(--len); stroke-dashoffset: var(--len); animation: path-move 0.9s 0.2s ease-out forwards; }
+  :root:not(.reduce-motion) .path-moodpath__after { transform-box: fill-box; transform-origin: center; animation: path-pop 0.45s 1s ease-out both; }
+}
+@keyframes path-move { to { stroke-dashoffset: 0; } }
+@keyframes path-pop { from { transform: scale(0); } 60% { transform: scale(1.25); } to { transform: scale(1); } }
+
+/* ── The doors ───────────────────────────────────────────────────── */
+.path-doors {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, calc(9.5rem * var(--user-text-scale, 1))), 1fr));
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.path-doors li { display: flex; }
+.path-doors__wide { grid-column: 1 / -1; }
+.path-door {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 56px;
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg, 16px);
+  color: var(--color-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.12s, transform 0.12s;
+}
+.path-door:hover { border-color: var(--k, var(--color-primary)); }
+.path-door:active { transform: scale(0.99); }
+.path-door:focus-visible { outline: 3px solid var(--color-border-focus); outline-offset: 2px; }
+.path-door__text { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.path-door__t { font-size: var(--text-base); font-weight: 700; line-height: 1.25; }
+.path-door__d { font-size: var(--text-xs); color: var(--color-text-secondary); line-height: 1.4; }
+.path-door__chev { flex: none; color: var(--color-text-secondary); }
+.path-door--wide { min-height: 60px; }
+@media (prefers-reduced-motion: reduce) { .path-door { transition: none; } .path-door:active { transform: none; } }
+:root.reduce-motion .path-door { transition: none; }
+:root.reduce-motion .path-door:active { transform: none; }
+
+/* The first open of the day */
+.path-dayopen .path-today { gap: var(--space-3); }

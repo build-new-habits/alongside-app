@@ -1,5 +1,9 @@
 /**
  * tools/verify-quickbuild.mjs
+ * 28 Oct 2026 v5
+ *
+ * v5 - STAGE PATH P-4 re-point (none loosened). The fixture has answered the day's first question (day-open), so Home is drawn. 0b's control reads the Plan's Home as it is now (four doors, plan-home.js), still with no quick chips.
+ *
  * 28 Sep 2026 v4
  *
  * v4 - F2, QUICK-SCAFFOLD-ORPHAN. The scaffold v3 said was unreachable is
@@ -91,7 +95,7 @@ const ok = (name, cond, detail = "") => {
 function home() {
   localStorage.clear();
   store.init();
-  store.set("tier", "personal");
+  store.set("tier", "personal"); store.setDayOpen("checked");   // P-4: the day's question answered
   store.set("equipment", ["none"]);
   const c = document.createElement("div");
   document.body.appendChild(c);
@@ -106,7 +110,7 @@ const { c, navs } = home();
 const chips = [...c.querySelectorAll("[data-quick-mins]")];
 ok("0a. the Plan fixture is on Plan", isPremium() === true);
 ok("0b. Plan Home no longer carries Quick build's chips (retired by spec 4.1)", chips.length === 0 &&
-   c.querySelectorAll(".home-door").length === 3, `${chips.length} chips`);
+   c.querySelectorAll(".path-door[data-door]").length === 4, `${chips.length} chips`);   // the Plan's Home is drawn (its four doors)
 {
   const { LENGTHS } = await import("../js/views/know-what.js");
   ok("0c. the length question lives on I know what I want", Array.isArray(LENGTHS) && LENGTHS.length >= 3);

@@ -1,5 +1,9 @@
 /**
  * tools/verify-plan-claims.mjs
+ * 28 Oct 2026 v10
+ *
+ * v10 - STAGE PATH P-4 re-point (none loosened). 3.home: the Plan's Home is four doors by what you came for and one suggestion for today (tier-table.js v8, mock-up v9); read from the doors themselves. 3.as-you-go: Make it up as I go is no longer a Home door, so the claim is proved where it is opened: the router gives it to the Plan and sends Free to the upgrade page. Same property: the table says what the screen does.
+ *
  * 12 Oct 2026 v9
  *
  * v9 - A-7 EMPTY-AND-FIRST. 3.progress and 3.arc: the person has one finished
@@ -152,7 +156,7 @@ const box = document.getElementById("app");
 const txt = el => (el?.textContent || "").replace(/\s+/g, " ").trim();
 function tierFixture(tier) {
   localStorage.clear(); store.init();
-  store.set("onboardingComplete", true); store.set("name", "Test"); store.set("tier", tier);
+  store.set("onboardingComplete", true); store.set("name", "Test"); store.set("tier", tier); store.setDayOpen("checked");   // P-4: the day's question answered
   store.set("safetyAckLog", Array.from({ length: 5 }, () => ({ at: new Date().toISOString(), textVersion: HURT_AND_ACHE_VERSION, surface: "fixture" })));
   store.set("gymEquipment", ["barbell", "bench-flat", "dumbbells-medium"]); store.set("sessionLocation", "gym");
   store.set("liftLog", { "barbell-bench-press": [{ at: new Date(Date.now() - 86400000).toISOString(), weight: 40, unit: "kg", reps: 10 }] });
@@ -166,11 +170,18 @@ ok("3pc. the table has the spec's rows, and Wellbeing and Safety are the same on
 tierFixture("free"); mountView(TodayView);
 const freeHome = { doors: box.querySelectorAll(".home-door").length, tiles: box.querySelectorAll("[data-door-id]").length, pick: !!box.querySelector('[data-action="start-today"]') };
 tierFixture("personal"); mountView(TodayView);
-const planDoors = [...box.querySelectorAll('[data-action="start-today"], [data-action="know-what"], [data-action="as-i-go"]')].map(b => txt(b.querySelector(".home-door__title") || b));   // v8
-ok("3.home  free: any kind of session, or the coach suggests one; the Plan: three ways in",
+const planDoors = [...box.querySelectorAll(".path-door[data-door] .path-door__t")].map(txt);   // v10: purpose first
+const planCard = box.querySelector(".path-today");
+ok("3.home  free: any kind of session, or the coach suggests one; the Plan: four doors by what you came for, and one suggestion for today",
    freeHome.doors === 0 && freeHome.tiles >= 3 && freeHome.pick &&
-   JSON.stringify(planDoors) === JSON.stringify(["Tell me what to do", "I know what I want", "Make it up as I go"]), JSON.stringify({ freeHome, planDoors }));
-ok("3.as-you-go  only the Plan has Make it up as I go", freeHome.doors === 0 && planDoors.includes("Make it up as I go"));
+   JSON.stringify(planDoors) === JSON.stringify(["Get stronger", "Keep moving", "Stretch", "Move to feel better"]) && !!planCard, JSON.stringify({ freeHome, planDoors }));
+// v10. Make it up as I go is no longer a Home door: it is the Plan's wherever it is opened.
+const { router: claimsRouter } = await import(B + "router.js");
+const { agreed: claimsAgreed } = await import(new URL("./agreed.mjs", import.meta.url).href);
+const asYouGo = async tier => { tierFixture(tier); claimsAgreed(store); let landed = null; const real = claimsRouter._mountView; claimsRouter._mountView = async v => { landed = v; };
+  claimsRouter.history = []; await claimsRouter.navigate("capture"); claimsRouter._mountView = real; return landed; };
+const freeLands = await asYouGo("free"), planLands = await asYouGo("personal");
+ok("3.as-you-go  only the Plan has Make it up as I go", freeHome.doors === 0 && freeLands === "upgrade" && planLands === "capture", `free: ${freeLands}, plan: ${planLands}`);
 
 const planScreen = tier => { tierFixture(tier); store.set("availableTime", "standard"); mountView(CoachProposalView); return box; };
 planScreen("free");

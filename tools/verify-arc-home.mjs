@@ -1,5 +1,9 @@
 /**
  * tools/verify-arc-home.mjs
+ * 28 Oct 2026 v3
+ *
+ * v3 - STAGE PATH P-4 re-point (none loosened). TEST 1: Graeme approved mock-up v9 (28 Oct), where Home says the arc as a line (six ways in with four doors); the arc opens from the Progress tab's Change my arc. D-3's want (the arc, and how to change it, not a read-back) still holds: 1a lands on the arc screen, and TESTS 2-6 are unchanged.
+ *
  * 12 Oct 2026 v2
  *
  * v2 - A-1 PLAN-HOME-PRUNE (Graeme approved the mock-up, 12 Oct). REACH
@@ -82,13 +86,15 @@ async function go(view) { await router.navigate(view); await wait(60); }
 const view = () => router.currentView;
 
 // ── 1. HOME → THE ARC ──────────────────────────────────────────────────
-console.log("\nTEST 1 - Home's Your arc opens the arc");
-fixture();
+console.log("\nTEST 1 - Home says the arc; Progress's Change my arc opens it (Stage PATH, mock-up v9)");
+fixture(); store.setDayOpen("checked");
 await go("today");
-const card = $('[data-route="stretch-arc"]');   // v2: inside the Today card
-ok("1pc. Home shows the Your arc card with the aim", !!card && txt(card).includes(aimById(ARC.aimId).label), txt(card));
+const line = $(".path-arcline");
+ok("1pc. Home says the arc, with the aim", !!line && txt(line).includes(aimById(ARC.aimId).label) && !$('#main-content [data-route="stretch-arc"]'), txt(line));
+await go("progress");
+const card = [...document.querySelectorAll('[data-route="stretch-arc"]')].find(b => /Change my arc/.test(txt(b)));
 await click(card);
-ok("1a. tapping it opens the arc, not Progress", view() === "stretch-arc", view());
+ok("1a. Change my arc, on Progress, opens the arc", view() === "stretch-arc", view());
 
 // ── 2. THE ARC SCREEN ──────────────────────────────────────────────────
 console.log("\nTEST 2 - the arc: what it is, and how to change it");

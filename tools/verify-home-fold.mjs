@@ -1,5 +1,9 @@
 /**
  * tools/verify-home-fold.mjs
+ * 28 Oct 2026 v3
+ *
+ * v3 - STAGE PATH P-4 re-point (none loosened). F3.2's reversal is read on Free: the Plan's Home (plan-home.js) no longer says the first-days orientation line, its Today card gives the coach's reason. F3.0 and F3.1 still hold the guidance day on the Plan. F3b reads the Plan's controls as they are now.
+ *
  * 12 Oct 2026 v2
  *
  * v2 - A-1 PLAN-HOME-PRUNE. F3b: a control named in the coach line may be
@@ -53,7 +57,7 @@ const txt = el => (el?.textContent || "").replace(/\s+/g, " ").trim();
 
 function home({ tier = "personal", goals = [], guidanceShownAt = null } = {}) {
   localStorage.clear(); store.init();
-  store.set("onboardingComplete", true); store.set("tier", tier); store.set("name", "T");
+  store.set("onboardingComplete", true); store.set("tier", tier); store.set("name", "T"); store.setDayOpen("checked");   // P-4: the day's question answered
   store.set("goals", goals); store.set("guidanceShownAt", guidanceShownAt);
   const c = document.createElement("div"); document.body.innerHTML = ""; document.body.appendChild(c);
   TodayView({ navigate() {}, back() {}, history: ["x"] }).mount(c);
@@ -67,14 +71,15 @@ let c = home({ goals: ["get-stronger"] });
 ok("F3.0 fixture reach: the guidance line is on Plan Home", txt(c.querySelector(".today-guidance")) === GUIDANCE_TEXT.replace(/\s+/g, " ").trim());
 ok("F3.1 and no orientation line beside it", !ORIENT.test(txt(c)), txt(c.querySelector(".today-header")));
 const month = new Date(Date.now() - 2 * 864e5).toISOString();
-c = home({ goals: ["get-stronger"], guidanceShownAt: month });
-ok("F3.2 REVERSAL: any other day, the orientation line is back", ORIENT.test(txt(c)) && !c.querySelector(".today-guidance"), txt(c.querySelector(".today-header")));
+// v3: the Plan's Home no longer says the first-days line (its Today card gives the coach's reason), so the reversal is read on Free, which still says both.
+c = home({ tier: "free", goals: ["get-stronger"], guidanceShownAt: month });
+ok("F3.2 REVERSAL: any other day, the orientation line is back (Free)", ORIENT.test(txt(c)) && !c.querySelector(".today-guidance"), txt(c.querySelector(".today-header")));
 
 console.log("\nF3b - a coach line on Plan Home names only doors that are on it");
 for (const goals of [["get-stronger"], ["flexibility"], []]) {
   c = home({ goals, guidanceShownAt: month });
-  const head = txt(c.querySelector(".today-header"));
-  const doors = [...c.querySelectorAll(".home-door__title, .home-week [data-action], .home-today [data-action]")].map(txt);   // v2
+  const head = txt(c.querySelector(".path-note")) || txt(c.querySelector(".path-today__coach"));   // v3: the Plan's coach words
+  const doors = [...c.querySelectorAll(".path-door__t, .path-today [data-action]")].map(txt);   // v3
   const named = [...head.matchAll(/(Cardio, Core & Strength|Mobility & Conditioning|‘([^’]+)’)/g)].map(m => m[2] || m[1]);
   ok(`F3b ${JSON.stringify(goals)}: "${head.slice(0, 70)}"`, named.every(n => doors.includes(n)), `names ${named.join(", ")}; doors ${doors.join(", ")}`);
 }

@@ -1,6 +1,11 @@
 /**
  * tools/verify-arc-door.mjs
- * 12 Oct 2026 v5
+ * 28 Oct 2026 v6
+ *
+ * v6 - STAGE PATH P-4 re-point (none loosened; mock-up v9, Graeme approved
+ *   28 Oct). The Plan's Home says the arc as a line, not a button; with no
+ *   arc it says nothing, and the setup entrance is Progress's Set up your
+ *   arc (driven). Every Free assertion unchanged.
  *
  * v5 - A-1 PLAN-HOME-PRUNE (Graeme approved the mock-up, 12 Oct). REACH
  *   only: Plan Home's arc is a line inside the Today card, no longer its
@@ -84,13 +89,13 @@ console.log("\nARC-DOOR — free gets the door, never the arc\n");
 
 // FIXTURE INTEGRITY FIRST. The previous investigation set aimId without
 // active, landed on the offer branch, and reported no leak.
-store.set("tier","personal"); store.set("arc",ACTIVE_ARC); paint();
-const PLAN_ARC='[data-route="stretch-arc"], [data-route="arc-setup"]';   // v5
-const paidEl=document.querySelector(PLAN_ARC);
-ok("FIXTURE REACHES THE ACTIVE BRANCH: Plan's arc line opens the arc, with the aim",
-  paidEl && paidEl.dataset.route==="stretch-arc" && /Build a core that actually holds me up/.test(paidEl.textContent));
+// v6 (Stage PATH, mock-up v9): the Plan's Home says the arc as a line; it opens from Progress.
+store.set("tier","personal"); store.setDayOpen("checked"); store.set("arc",ACTIVE_ARC); paint();
+const paidEl=document.querySelector(".path-arcline");
+ok("FIXTURE REACHES THE ACTIVE BRANCH: Plan's arc line says the arc, with the aim",
+  paidEl && /Build a core that actually holds me up/.test(paidEl.textContent));
 reverses("the fixture is not quietly on the offer branch (the fault that hid this)",
-  ()=>paidEl.dataset.route==="arc-setup");
+  ()=>!!document.querySelector('#main-content [data-route="arc-setup"]'));
 
 store.set("tier","free"); paint();
 const freeEl=document.querySelector(".today-arc");
@@ -107,9 +112,12 @@ reverses("free cannot walk into arc setup from Home",
   ()=>freeEl.dataset.route==="arc-setup");
 
 // Plan with no arc keeps the real setup entrance.
-store.set("tier","personal"); store.set("arc",{}); paint();
-const setupEl=document.querySelector(PLAN_ARC);
-ok("Plan without an arc still gets the SETUP entrance",
+store.set("tier","personal"); store.setDayOpen("checked"); store.set("arc",{}); paint();
+ok("Plan without an arc: Home says no arc (nothing to say yet)", !document.querySelector(".path-arcline"));
+const {ProgressView}=await import("../js/views/progress.js");
+const pm=document.getElementById("main-content"); pm.innerHTML=""; ProgressView({navigate(){},back(){},history:["x"]}).mount(pm);
+const setupEl=pm.querySelector('[data-route="arc-setup"]');
+ok("Plan without an arc still gets the SETUP entrance (Progress, Set up your arc)",
   setupEl && setupEl.dataset.route==="arc-setup");
 
 // The rule must live in arcPanel(), not at a call site.

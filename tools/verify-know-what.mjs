@@ -1,5 +1,9 @@
 /**
  * tools/verify-know-what.mjs
+ * 28 Oct 2026 v7
+ *
+ * v7 - STAGE PATH P-4 re-point (none loosened). TEST 8: the coach decides from the Today card now (Show me today's plan), which asks for the suggestion's own kind, so a kind asked for here still does not ride along. I know what I want is no longer a Home door on the Plan (Stage PATH, mock-up v9; Session 5 offers it from a door's How as Build my own). fromHome() opens it as the router does, still counting the one tap that opens it, and fails if the old door is still on Home. Every assertion after is unchanged.
+ *
  * 17 Oct 2026 v6
  *
  * v6 - SUITE-FLAKE-9. 2b allows the true length line ("This one comes to
@@ -98,7 +102,7 @@ const submit = () => { taps++; main.querySelector(".kw-form")?.dispatchEvent(new
 function fixture({ time = "standard", conditions = [], scores = {}, saved = 0, location } = {}) {
   localStorage.clear(); store.init();
   gate.endGateSession();
-  store.set("onboardingComplete", true); store.set("name", "Test"); store.set("tier", "personal");
+  store.set("onboardingComplete", true); store.set("name", "Test"); store.set("tier", "personal"); store.setDayOpen("checked");   // P-4: the day's question answered
   store.set("gymEquipment", FULL_GYM); store.set("homeEquipment", []);
   store.set("equipment", FULL_GYM);
   store.set("availableTime", time);
@@ -107,18 +111,22 @@ function fixture({ time = "standard", conditions = [], scores = {}, saved = 0, l
   store.set("savedSessions", Array.from({ length: saved }, (_, i) => ({ id: `s${i}`, name: `Mine ${i}`, exerciseIds: [EXERCISES[i].id], createdAt: new Date().toISOString() })));
   navs = []; taps = 0;
 }
+// Stage PATH P-4: I know what I want is no longer a Home door on the Plan (Stage PATH:
+// a door's How offers it as Build my own, Session 5, verify-path-routes). It
+// opens as the router opens it; the one tap that opened it is still counted.
 function fromHome() {
   main.innerHTML = "";
   TodayView(router).mount(main);
   navs = []; taps = 0;
-  tap(main.querySelector('[data-action="know-what"]'));
+  if (main.querySelector('[data-action="know-what"]')) throw new Error("the Plan's Home still has the I know what I want door");
+  taps++; router.navigate("know-what");
 }
 const kindInput = id => main.querySelector(`input[name="kind"][value="${id}"]`);
 
 // ── 0. FIXTURE REACH ────────────────────────────────────────────────────
-console.log("\nTEST 0 - Home's second door opens this screen");
+console.log("\nTEST 0 - I know what I want opens this screen");
 fixture(); fromHome();
-ok("0a. one tap from Home", navs[0] === "know-what" && !!main.querySelector(".kw-view"), JSON.stringify(navs));
+ok("0a. one tap opens it", navs[0] === "know-what" && !!main.querySelector(".kw-view"), JSON.stringify(navs));
 ok("0b. six kinds, in the spec's order", [...main.querySelectorAll('input[name="kind"]')].map(i => txt(i.parentElement)).join(" | ") ===
    "Strength | Cardio | Core | Mobility | Stretch | Yoga & Pilates");
 ok("0c. no kind chosen for them", !main.querySelector('input[name="kind"]:checked'));
@@ -250,8 +258,10 @@ const key = new Date().toISOString().split("T")[0];
 store.set("checkinHistory", { [key]: { energy: 6, mood: 6, date: new Date().toDateString() } });
 store.set("lastCheckin", { energy: 6, mood: 6, date: new Date().toDateString(), timestamp: new Date().toISOString() });
 main.innerHTML = ""; TodayView(router).mount(main); navs = [];
-click(main.querySelector('[data-action="start-today"]'));
-ok("8a. Tell me what to do clears it", navs[0] === "coach-proposal" && store.get("requestedSessionType") === null);
+// Stage PATH: the coach's choice is the Today card's one action now (Show me today's plan).
+click(main.querySelector('.path-today [data-action="path-go"]'));
+ok("8a. the coach's suggestion asks for its own kind, not the one asked for here", navs[0] === "coach-proposal" && store.get("requestedSessionType") === "full",
+   `${JSON.stringify(navs)} ${store.get("requestedSessionType")}`);
 
 console.log("");
 if (fails) { console.log(`KNOW-WHAT: ${fails} FAILED, ${passes} passed`); process.exit(1); }

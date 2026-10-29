@@ -1,5 +1,9 @@
 /**
  * tools/verify-severe-adapt.mjs
+ * 28 Oct 2026 v2
+ *
+ * v2 - STAGE PATH P-4 re-point (none loosened). I know what I want is no longer a Home door on the Plan (Stage PATH, mock-up v9): fromHome() opens it as the router does and fails if the old door is still on Home. The severe day is driven exactly as before.
+ *
  * 30 Sep 2026 v1
  *
  * W3-1 SEVERE-ADAPT (Wave 3, persona 2.1). On a severe day the coach asks
@@ -74,7 +78,7 @@ const submit = () => { taps++; main.querySelector(".kw-form")?.dispatchEvent(new
 function fixture({ time = "standard", conditions = [], scores = {}, saved = 0, location } = {}) {
   localStorage.clear(); store.init();
   gate.endGateSession();
-  store.set("onboardingComplete", true); store.set("name", "Test"); store.set("tier", "personal");
+  store.set("onboardingComplete", true); store.set("name", "Test"); store.set("tier", "personal"); store.setDayOpen("checked");   // P-4: the day's question answered
   store.set("gymEquipment", FULL_GYM); store.set("homeEquipment", []);
   store.set("equipment", FULL_GYM);
   store.set("availableTime", time);
@@ -83,11 +87,14 @@ function fixture({ time = "standard", conditions = [], scores = {}, saved = 0, l
   store.set("savedSessions", Array.from({ length: saved }, (_, i) => ({ id: `s${i}`, name: `Mine ${i}`, exerciseIds: [EXERCISES[i].id], createdAt: new Date().toISOString() })));
   navs = []; taps = 0;
 }
+// v2: I know what I want is no longer a Home door on the Plan (Stage PATH; a
+// door's How offers it, Session 5). It opens as the router opens it.
 function fromHome() {
   main.innerHTML = "";
   TodayView(router).mount(main);
   navs = []; taps = 0;
-  tap(main.querySelector('[data-action="know-what"]'));
+  if (main.querySelector('[data-action="know-what"]')) throw new Error("the Plan's Home still has the I know what I want door");
+  taps++; router.navigate("know-what");
 }
 const kindInput = id => main.querySelector(`input[name="kind"][value="${id}"]`);
 const visible = el => !!el && !el.closest("[hidden]") && !el.disabled;

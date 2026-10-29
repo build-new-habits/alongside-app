@@ -1,5 +1,20 @@
 /**
  * today.js
+ * 28 Oct 2026 v61
+ *
+ * v61 - STAGE PATH P-4 (blueprint Session 4; mock-up v9, approved 28 Oct:
+ *   "I think this is good. A nice consistency to help users use it."). The
+ *   Plan's Home is views/plan-home.js: the arc as a line, one Today card,
+ *   four purpose doors, the Library. The first time the Plan opens each
+ *   day, Home hands over to day-open (views/day-open.js) unless today's
+ *   check-in is already done. _planDoors(), and the three doors behind it,
+ *   are archived in BNH-Files (Archive/Stage PATH/P-4 plan-home) and no
+ *   longer drawn; their code stays below for the archive's sake until the
+ *   stage closes. On the Plan, the coach's line on Home is said only when
+ *   it carries something the Today card does not (a flat week, the week's
+ *   pace, a shorter way in): _planCoachNote(). Free Home is byte for byte
+ *   what it was (verify-path-free-unchanged).
+ *
  * 17 Oct 2026 v60
  *
  * v60 - W6-19 EMPATHY-GAPS (Wave 6, personas 2.13, 2.4). A Struggling or Low
@@ -843,6 +858,7 @@ import { mixLine, detailLine } from '../data/week-shape-model.js';
 import { arcWeek, weekStart }  from '../data/arc-readback.js';
 import { noticePlanJump, offerBriefPath } from '../data/pacing.js';
 import { isPremium, lockedFeature } from '../auth.js';
+import { renderPlanHome, wirePlanHome } from './plan-home.js';   // STAGE PATH P-4
 import { scopeStatementHTML } from '../data/scope-statement.js';
 // GUIDED-COPY, 06 Sep 2026. plannedFocusToday dropped from this import.
 // CLUB-SHELL added it so Guided class could say what the class was for
@@ -1025,6 +1041,16 @@ export function TodayView(router) {
       return;
     }
 
+    // STAGE PATH P-4. The Plan's first open of the day asks how you are,
+    // once (dayOpen, C1). Somebody who has already checked in is not asked,
+    // and nor is somebody who got to Home from inside the app (EXIT-HOME:
+    // you came here, so you stay here); Home's card asks them instead.
+    const coldOpen = !(Array.isArray(router?.history) && router.history.length > 0);
+    if (isPremium() && !store.dayOpenToday() && coldOpen) {
+      if (_checkedInToday()) store.setDayOpen('checked');
+      else { router.navigate('day-open', { replace: true }); return; }
+    }
+
     renderHome(container);
     // GUIDANCE-1. Stamped only if the line actually reached the screen,
     // so a render that suppressed it does not reset the thirty days.
@@ -1168,6 +1194,7 @@ export function TodayView(router) {
   function renderHome(container) {
     const name          = store.get('name') || '';
     const greeting      = _buildGreeting(name);
+    if (isPremium()) { _renderPlanHome(container, greeting); return; }
     const sessionDone   = _sessionCompletedToday();
     // HOME-1, 13 Aug 2026. The denominator only appears if the person
     // actually set one.
@@ -1562,6 +1589,40 @@ export function TodayView(router) {
   ]);
   const ORIENTATION_SESSIONS = 4;
 
+  /** BURN-3's graded line, or null. Shared by Free's coach line and the Plan's Home. */
+  function _burnoutLine(checkinHistory = store.get('checkinHistory') || {}) {
+    const burnout = detectBurnout(checkinHistory);
+    if (burnout.level === 'high') {
+      return "Your energy has been low for a while now, not just today. I'll keep things gentle until it lifts.";
+    }
+    if (burnout.level === 'moderate') {
+      return "It's been a flatter few days than usual. I'll go a bit easier with what I suggest.";
+    }
+    return null;
+  }
+
+  /**
+   * STAGE PATH P-4. The Plan's Home (views/plan-home.js). Things due go
+   * first, as before: the scope notice, the monthly guidance line, a
+   * chapter's end, a session saved for them. The coach's line is said only
+   * when it adds to the Today card: a flat week (BURN-3), the week's pace
+   * (PACE-2), a shorter way in (QUICK-2). Yesterday's session and the
+   * low-mood line are the card's job now: its reason says what they said.
+   */
+  function _renderPlanHome(container, greeting) {
+    const planJump = noticePlanJump();
+    const brief = planJump ? null : offerBriefPath();
+    const coachNote = planJump ? planJump.body : brief ? brief.body : (_burnoutLine() || '');
+    container.innerHTML = renderPlanHome({
+      greeting,
+      coachNote,
+      carry: _carryOn(),
+      top: _scopeNotice() + _guidanceLine() + _hingeCard() + _rescuedNote(),
+    });
+    attachEvents(container);
+    wirePlanHome(container, router);
+  }
+
   function _buildCoachLine() {
     // COUNT-1. Same rule -- the coach must not refer back to a session
     // yesterday that was opened and abandoned.
@@ -1595,13 +1656,8 @@ export function TodayView(router) {
     // instruction, no "you are burnt out" -- that is a clinical claim
     // this product is not qualified to make, and the word is deliberately
     // absent from what a person sees.
-    const burnout = detectBurnout(checkinHistory);
-    if (burnout.level === 'high') {
-      return "Your energy has been low for a while now, not just today. I'll keep things gentle until it lifts.";
-    }
-    if (burnout.level === 'moderate') {
-      return "It's been a flatter few days than usual. I'll go a bit easier with what I suggest.";
-    }
+    const flat = _burnoutLine(checkinHistory);
+    if (flat) return flat;
 
     // W6-19 EMPATHY-GAPS. A low mood this morning is answered, in their own
     // word, with the quieter door; the line was the same on a good day and
@@ -2087,6 +2143,7 @@ function _markGuidanceShown(root) {
     return {
       name:  ses.title || cp.name || 'Your session',
       next:  ses.exercises[index]?.name || '',
+      nextId: ses.exercises[index]?.id || null,   // STAGE PATH P-4: its drawing on the Plan's card
       index, total,
     };
   }

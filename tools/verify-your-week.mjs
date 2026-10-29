@@ -1,5 +1,9 @@
 /**
  * tools/verify-your-week.mjs
+ * 28 Oct 2026 v5
+ *
+ * v5 - STAGE PATH P-4 re-point (none loosened). TEST 4 reads the Plan's Today card and its four doors (plan-home.js): the same words, one way in on the card, no door filled, Or something else today, a rest day asks nothing. 2a: the Plan's Home (mock-up v9) has no Plan your week button (six ways in with four doors); its Library row names your week and the Library's Your week opens it, two taps, as A-1 required of everything that left Home. 2b onwards unchanged.
+ *
  * 12 Oct 2026 v4
  *
  * v4 - A-1 PLAN-HOME-PRUNE (Graeme approved the mock-up, 12 Oct). REVERSALS,
@@ -103,7 +107,7 @@ const ARC = { active: true, aimId: "floor-unaided", strands: ["leg-strength", "t
 function fixture(tier = "personal", { checkedIn = true } = {}) {
   localStorage.clear(); store.init(); agreed(store);
   gate.endGateSession();
-  store.set("onboardingComplete", true); store.set("name", "Test"); store.set("tier", tier);
+  store.set("onboardingComplete", true); store.set("name", "Test"); store.set("tier", tier); store.setDayOpen("checked");   // P-4: the day's question answered
   store.set("homeEquipment", HOME); store.set("gymEquipment", GYM); store.set("equipment", [...HOME, ...GYM]);
   store.set("sessionLocation", "home");
   store.set("conditions", []); store.set("conditionPainScores", {});
@@ -153,9 +157,13 @@ ok("1c. Free Home has no week card", !$(".home-week"));
 console.log("\nTEST 2 - setting a week");
 fixture();
 await router.navigate("today"); await wait(60);
-const weekTile = $('[data-route="your-week"]');
-ok("2a. Plan Home links to Plan your week", txt(weekTile) === "Plan your week");
-ok("2a2. no week card before there is a week", !$(".home-week:not(.home-today)"));
+// Stage PATH, mock-up v9: Home's Library row names your week; the Library's Your week opens it (two taps, A-1's rule).
+const libRow = $('.path-doors [data-route="library"]');
+ok("2a. Plan Home's Library row names your week", /your week/i.test(txt(libRow)), txt(libRow));
+ok("2a2. no week card before there is a week", !$('.path-today[data-state="week"]'));
+await click(libRow);
+const weekTile = $('[data-guided="week"]');
+ok("2a3. and the Library's Your week is one tap on", view() === "library" && /Your week/.test(txt(weekTile)), txt(weekTile));
 await click(weekTile);
 ok("2b. it opens Plan your week: build it, or three ready-made weeks", view() === "your-week" && txt($("h1")) === "Plan your week" &&
    !!$('[data-start="build"]') && $$("[data-ready]").length === 3, txt(main).slice(0, 200));
@@ -232,18 +240,18 @@ console.log("\nTEST 4 - Home");
 fixture();
 setWeek(upperDay());
 await router.navigate("today"); await wait(60);
-const card = $(".home-week");
-ok("4a. Today, from your week leads, with the day's name, mix and details", !!card && txt(card).includes("Today, from your week") && txt($("#home-week-h")) === "Upper day" &&
+const card = $('.path-today[data-state="week"]');   // v5: the Plan's Today card
+ok("4a. Today, from your week leads, with the day's name, mix and details", !!card && txt(card).includes("Today, from your week") && txt($("#path-today-h")) === "Upper day" &&
    /Mostly upper body/.test(txt(card)) && /Gentle · 40 min · gym/.test(txt(card)), txt(card));
-ok("4b. one way in on the card: the plan", !!$('[data-action="week-today"]') && !$('[data-action="week-short"]') && !$('[data-action="week-else"]'));
-ok("4c. Tell me what to do is not the filled door now", !$('[data-action="start-today"]').classList.contains("home-door--primary"));
-ok("4d. the doors are 'Or something else today'", txt($("#home-doors-label")) === "Or something else today");
-ok("4e. the doors are directly below the card, all three", $$(".home-doors .home-door").map(d => d.dataset.action).join() === "start-today,know-what,as-i-go");
+ok("4b. one way in on the card: the plan", !!$('[data-action="week-today"]') && card.querySelectorAll("button").length === 1 && !$('[data-action="week-short"]') && !$('[data-action="week-else"]'));
+ok("4c. no door is filled: the card's button is the one primary", !$(".path-door.btn-primary, .home-door--primary"));
+ok("4d. the doors are 'Or something else today'", txt($("#path-doors-h")) === "Or something else today");
+ok("4e. the doors are directly below the card, all four", $$(".path-doors .path-door[data-door]").map(d => d.dataset.door).join() === "stronger,moving,stretch,feel");
 ok("4f. Your week is in the Library, and the Library row says so", /your week/.test(txt($('[data-route="library"]'))));
 fixture(); setWeek(null, true);
 await router.navigate("today"); await wait(60);
-ok("4g. a rest day says so, and asks nothing", /Today is a rest day in your week. Rest counts./.test(txt($(".home-week"))) && !$('[data-action="week-today"]'));
-ok("4h. and Tell me what to do is among the doors below it, none filled", !!$('.home-doors [data-action="start-today"]') && !$(".home-door--primary"));
+ok("4g. a rest day says so, and asks nothing", /Today is a rest day in your week. Rest counts./.test(txt($('.path-today[data-state="rest"]'))) && !$('[data-action="week-today"]') && !$(".path-today button"));
+ok("4h. and the four doors are below it, none filled", $$(".path-doors .path-door[data-door]").length === 4 && !$(".path-door.btn-primary"));
 
 // ── 5. The plan it opens ───────────────────────────────────────────────
 console.log("\nTEST 5 - the day's plan");

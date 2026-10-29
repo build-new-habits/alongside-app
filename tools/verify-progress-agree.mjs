@@ -1,5 +1,9 @@
 /**
  * tools/verify-progress-agree.mjs
+ * 28 Oct 2026 v9
+ *
+ * v9 - STAGE PATH P-4 re-point (none loosened). 8a: Graeme approved mock-up v9 (28 Oct), where Home says the arc as a line and is no longer the arc's button (six ways in with four doors); the arc opens from Progress, Change my arc. 8a asserts that; D-3's chip is retired with the old Home (archived, Archive/Stage PATH/P-4).
+ *
  * 17 Oct 2026 v8
  *
  * v8 - W6-8. 1d: the coach line says "N sessions", not "You've moved N times" (W6-8: it counted breathing as moving).
@@ -116,7 +120,7 @@ const LOG = [
 
 function fixture({ tier = "personal", weightTracking = false, arc = null, history = {}, conditions = [], meta = {}, liftLog = {} } = {}) {
   localStorage.clear(); store.init(); agreed(store);
-  store.set("onboardingComplete", true); store.set("tier", tier); store.set("name", "Test");
+  store.set("onboardingComplete", true); store.set("tier", tier); store.set("name", "Test"); store.setDayOpen("checked");   // P-4: the day's question answered
   store.set("activityLog", LOG);
   store.set("weightTracking", weightTracking);
   if (weightTracking) store.set("weightLog", [{ at: iso(3), kg: 80 }]);
@@ -245,11 +249,12 @@ ok("7b. in the spec's order", (() => {
 })(), [...main.querySelectorAll("h2")].map(txt).join(" | "));
 
 // ── 8. HOME ─────────────────────────────────────────────────────────────
-console.log("\nTEST 8 - Home's arc chip opens the arc (D-3)");
+console.log("\nTEST 8 - Home says the arc; Progress opens it (Stage PATH, mock-up v9)");
 fixture({ arc: ARC });
 main.innerHTML = ""; TodayView(router).mount(main);
-const arcEl = [...main.querySelectorAll("[data-route]")].find(b => /Your arc/.test(b.textContent || ""));   // v7
-ok("8a. the arc on Home opens the arc, where it can be changed", arcEl?.dataset.route === "stretch-arc", arcEl?.outerHTML?.slice(0, 120));
+const arcEl = main.querySelector(".path-arcline");
+ok("8a. Home says the arc (its week and aim), as a line and not a seventh way in", /Your arc · Week \d+/.test(arcEl?.textContent || "") && !arcEl.querySelector("button, a") && !main.querySelector('[data-route="stretch-arc"]'),
+   arcEl?.outerHTML?.slice(0, 160));
 
 console.log("");
 if (fails) { console.log(`PROGRESS-AGREE: ${fails} FAILED, ${passes} passed`); process.exit(1); }

@@ -1,5 +1,13 @@
 /**
  * js/data/path-engine.js
+ * 28 Oct 2026 v2
+ *
+ * v2 - STAGE PATH Session 4 (words only; a touch-once exception, recorded in
+ *   the blueprint). Home said "You said you're feeling struggling": a mood
+ *   is now said as a person says it (said()): "you're struggling", "you're
+ *   feeling low". Help me choose asks only about energy, so its reason says
+ *   the energy, not "feeling okay" (the P-4a finding). No rule changed.
+ *
  * 28 Oct 2026 v1
  *
  * STAGE PATH Session 3 (P-3 ENGINE; blueprint v3 Part E; P-9c part 2).
@@ -35,6 +43,8 @@ const BY_ID = new Map(LIBRARY.map(e => [e.id, e]));
 /** The check-in's own words for its values (views/checkin.js). */
 const ENERGY_WORDS = { 2: "running on empty", 3: "low", 6: "okay", 7: "good", 9: "full of it" };
 const MOOD_WORDS = { 2: "struggling", 3: "low", 6: "okay", 7: "pretty good", 9: "great" };
+/** A mood as a person says it: "you're struggling", "you're feeling low". */
+const said = mood => (mood === 2 ? "you're struggling" : `you're feeling ${MOOD_WORDS[mood] || "okay"}`);
 
 // ── E2. Today ────────────────────────────────────────────────────────────
 
@@ -73,7 +83,7 @@ export function suggestToday({ checkin = null, week = null, arcDoor: door = null
              reason: `It's ${week.name || "today's session"} in your week.`, adjustments };
   }
   if (energy === 2) return { door: "feel", feeling: "worn", place: null, minutes: 6, reason: "You said you're running on empty, so this is very gentle and short.", adjustments };
-  if (mood === 2 || mood === 3) return { door: "feel", feeling: "calm", place: null, minutes: 15, reason: `You said you're feeling ${MOOD_WORDS[mood]}, so this is slow and steady.`, adjustments };
+  if (mood === 2 || mood === 3) return { door: "feel", feeling: "calm", place: null, minutes: 15, reason: `You said ${said(mood)}, so this is slow and steady.`, adjustments };
   if (energy === 3) return { door: "moving", place, sessionType: "full", intensity: "light", minutes: 10, reason: "You said your energy is low, so this is short and light.", adjustments };
   const d = door || "moving";
   const minutes = (energy != null && energy >= 7) ? 35 : 25;
@@ -165,12 +175,14 @@ export function suggestFeeling({ checkin = null, now = new Date() } = {}) {
   const evening = now.getHours() >= 18;
   const { energy, mood } = checkin;
   if (energy === 2) return { feeling: "worn", reason: "You said you're running on empty." };
-  if (mood === 2 || mood === 3) return { feeling: "calm", reason: `You said you're feeling ${MOOD_WORDS[mood]}.` };
+  if (mood === 2 || mood === 3) return { feeling: "calm", reason: `You said ${said(mood)}.` };
   if (energy === 3) return evening
     ? { feeling: "sleep", reason: "You said your energy is low, and it's evening." }
     : { feeling: "wake", reason: "You said your energy is low." };
-  if (evening && now.getHours() >= 20) return { feeling: "sleep", reason: `You said you're feeling ${MOOD_WORDS[mood] || "okay"}, and it's getting late.` };
-  return { feeling: "ground", reason: `You said you're feeling ${MOOD_WORDS[mood] || "okay"}.` };
+  // Help me choose asks only about energy: then the reason says the energy.
+  const what = mood == null ? `You said your energy is ${ENERGY_WORDS[energy] || "okay"}` : `You said ${said(mood)}`;
+  if (evening && now.getHours() >= 20) return { feeling: "sleep", reason: `${what}, and it's getting late.` };
+  return { feeling: "ground", reason: `${what}.` };
 }
 
 /** How long have you got? The longest programme that fits, not one done recently when there is a choice. */

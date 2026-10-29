@@ -1,5 +1,9 @@
 /**
  * tools/verify-activity-labels.mjs
+ * 28 Oct 2026 v5
+ *
+ * v5 - STAGE PATH P-4 re-point (none loosened). TEST 2 reads the recap on Free's Home: the Plan's purpose-first Home (mock-up v9) no longer says yesterday's session, its Today card gives today's reason instead (recorded for Graeme). The words are held exactly as before: the actual day, breathing as breathing, never gym for a kind; the plan still does not repeat it.
+ *
  * 12 Oct 2026 v4
  *
  * v4 - A-4 SHARED-POLISH (Stage AWARD; Graeme, 12 Oct). Today's plan no
@@ -120,8 +124,10 @@ if (AL) {
 console.log("\nTEST 2 - the recap names the actual day (Home says it; the plan does not repeat it)");
 const { CoachProposalView } = await import(B + "views/coach-proposal.js");
 const { TodayView: HomeView } = await import(B + "views/today.js");
+// Stage PATH P-4: the Plan's Home says the coach's reason for today on its Today card and no longer
+// recaps yesterday; Free's Home still does, so the recap's words are read there.
 async function recap(log) {
-  fixture("personal", log);
+  fixture("free", log);
   main.innerHTML = ""; HomeView(rtr).mount(main); await wait(40);
   return txt(main.querySelector(".today-header") || main);
 }

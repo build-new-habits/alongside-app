@@ -1,5 +1,15 @@
 /**
  * tools/verify-look-rest.mjs
+ * 28 Oct 2026 v4
+ *
+ * v4 - STAGE PATH P-4 re-point (none loosened; mock-up v9, Graeme approved
+ *   28 Oct). TEST 1 reads the purpose-first Home with the same LOOK-4
+ *   properties: the arc said first ("Your arc · Week n", the aim), as words
+ *   rather than a control (it opens from Progress); each door its kind
+ *   colour tile, icon and name; the Today card's one action filled, no door
+ *   filled; a visible heading naming the doors; one slate Library row
+ *   saying what is in it; no count, no emoji, icons decorative.
+ *
  * 12 Oct 2026 v3
  *
  * v3 - A-1 PLAN-HOME-PRUNE (Graeme approved the mock-up, 12 Oct: "I love
@@ -99,19 +109,21 @@ console.log("\nTEST 1 - Plan Home");
 fixture("personal");
 const aim = AIMS.list[0];
 store.set("arc", { active: true, aimId: aim.id, startedAt: iso(22), strands: aim.strands.slice(0, 2), zonesWorked: {}, typesWorked: {} });
+store.setDayOpen("checked");   // v4: the day's question answered, so Home is drawn
 await go("today");
-const arcBtn = $(".home-today__arc");
-const doors = $$(".home-doors .home-door");
-const libRow = $('.home-libraryrow[data-route="library"]');
-ok("1pc. Plan Home rendered (the Today card, two doors, the Library row)", !!$(".home-today") && doors.length === 2 && !!libRow, txt(main).slice(0, 120));
-ok("1a. the arc leads the card: \"Your arc · Week n\", the aim", /^Your arc · Week \d+$/.test(txt(arcBtn?.querySelector(".home-week__lbl"))) && txt(arcBtn?.querySelector(".home-week__name")) === aim.label && arcBtn?.dataset.route === "stretch-arc",
-   txt(arcBtn));
-ok("1b. and its name says the week and the aim", /^Your arc, week \d+: working towards /.test(arcBtn?.getAttribute("aria-label") || ""), arcBtn?.getAttribute("aria-label"));
-ok("1c. each door: a tile, its title and a chevron", doors.every(d => d.querySelector(".kind-tile svg") && txt(d.querySelector(".home-door__title")) && d.querySelector(".home-door__chev svg")));
-const lead = $(".home-today [data-action='start-today']");
-ok("1d. Tell me what to do is the filled one", lead?.classList.contains("btn-primary") && txt(lead) === "Tell me what to do" && !doors.some(d => d.classList.contains("home-door--primary")));
-ok("1e. \"Or choose for yourself\" is a visible heading that names the doors", txt($("#home-doors-label")) === "Or choose for yourself" && !$("#home-doors-label").classList.contains("sr-only") && $(".home-doors")?.getAttribute("aria-labelledby") === "home-doors-label");
-ok("1f. one Library row, in slate, saying what is in it", /k-slate/.test(libRow?.querySelector(".kind-tile")?.className || "") && txt(libRow?.querySelector(".home-door__title")) === "Library" && /Classes, runs, the mind, your lists/.test(txt(libRow?.querySelector(".home-door__sub"))));
+// v4 (Stage PATH, mock-up v9): the LOOK-4 properties on the purpose-first Home.
+const arcLine = $(".path-arcline");
+const doors = $$(".path-doors .path-door[data-door]");
+const libRow = $('.path-doors [data-route="library"]');
+const DOOR_KIND = { stronger: "k-amber", moving: "k-blue", stretch: "k-violet", feel: "k-green" };
+ok("1pc. Plan Home rendered (the Today card, four doors, the Library row)", !!$(".path-today") && doors.length === 4 && !!libRow, txt(main).slice(0, 120));
+ok("1a. the arc is said first: \"Your arc · Week n\", the aim", /^Your arc · Week \d+( starts today)?\. /.test(txt(arcLine)) && txt(arcLine).endsWith(aim.label), txt(arcLine));
+ok("1b. and it is words, not a control (it opens from Progress, Change my arc)", !!arcLine && !arcLine.closest("button, a") && !arcLine.querySelector("button, a"));
+ok("1c. each door: its kind colour tile with an icon, and its name", doors.every(d => d.querySelector(`.kind-tile.${DOOR_KIND[d.dataset.door]} svg`) && txt(d.querySelector(".path-door__t"))));
+const lead = $(".path-today .path-today__go");
+ok("1d. the Today card's one action is the filled one, and no door is", lead?.classList.contains("btn-primary") && $$(".path-today button").length === 1 && !doors.some(d => d.classList.contains("btn-primary")));
+ok("1e. \"Or choose for yourself\" is a visible heading that names the doors", txt($("#path-doors-h")) === "Or choose for yourself" && !$("#path-doors-h").classList.contains("sr-only") && $(".path-doors")?.getAttribute("aria-labelledby") === "path-doors-h");
+ok("1f. one Library row, in slate, saying what is in it", /k-slate/.test(libRow?.querySelector(".kind-tile")?.className || "") && txt(libRow?.querySelector(".path-door__t")) === "Library" && /Classes, runs, the mind, your lists/.test(txt(libRow?.querySelector(".path-door__d"))));
 ok("1g. no \"Or go straight to\" tiles", !$("#home-links-label") && !$$(".home-link--tile").length);
 ok("1h. the Library row goes to the Library", libRow?.dataset.route === "library");
 ok("1i. no count or weekly target on Home", !/\b\d+ of \d+\b|this week/i.test(txt(main)));

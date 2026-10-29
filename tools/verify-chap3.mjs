@@ -1,5 +1,11 @@
 /**
  * tools/verify-chap3.mjs
+ * 28 Oct 2026 v4
+ * STAGE PATH P-4 re-point (none loosened). The Plan's way through is its
+ * four purpose doors (.path-door); the fixture has answered the day's
+ * first question (day-open), so Home is drawn under the hinge. The
+ * property is unchanged: a hinge card never blocks the way through.
+ *
  * 28 Sep 2026 v3
  * SMOOTH-P3a. Plan Home's way through to moving is the three doors
  * (.home-door), not the room buttons or tiles. The property -- a hinge
@@ -61,7 +67,7 @@ const ago = d => new Date(Date.now() - d * 864e5).toISOString();
 
 function seed(daysElapsed, week = 12) {
   localStorage.clear(); store.init();
-  store.set('tier', 'personal');
+  store.set('tier', 'personal'); store.setDayOpen('checked');   // P-4: the day's question answered
   store.set('activeProgramme.programmeId', 'beginner-fitness');
   store.set('activeProgramme.programmeName', 'Build Your Base');
   store.set('activeProgramme.startDate', ago(daysElapsed));
@@ -222,13 +228,13 @@ check('with all three ways out offered',
 // three routes to moving satisfies it, so this passes on either tier
 // without asserting which one the fixture happens to be on.
 const doorsGrid = atHingeHome.c.querySelector(
-  '.home-door, [data-action="start-today"], .club-room__go, [data-door-id]');
+  '.path-door, .home-door, [data-action="start-today"], .club-room__go, [data-door-id]');
 const doorsHidden = !doorsGrid
   || doorsGrid.hasAttribute('hidden')
   || doorsGrid.disabled
   || /display:\s*none|visibility:\s*hidden/.test(doorsGrid.getAttribute('style') || '');
 check('the way through still works underneath it',
-  atHingeHome.c.querySelectorAll('.home-door, [data-door-id]').length > 0 && !doorsHidden,
+  atHingeHome.c.querySelectorAll('.path-door, .home-door, [data-door-id]').length > 0 && !doorsHidden,
   'gym-programme blocked the session until an option was chosen');
 
 // No countdown and no verdict, at the moment most likely to produce one.

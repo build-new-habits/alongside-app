@@ -1,5 +1,9 @@
 /**
  * tools/verify-freestyle.mjs
+ * 28 Oct 2026 v3
+ *
+ * v3 - STAGE PATH P-4 re-point (none loosened). Make it up as I go is no longer a Home door on the Plan (Stage PATH, mock-up v9): TEST 0 opens it as the router does, and checks the door has gone from Home. Everything after is unchanged.
+ *
  * 27 Oct 2026 v2
  * v2 - LIFT-UNIT: the test phone is en-GB, so lifts are in kg; a US phone would now lift in lb.
  *
@@ -64,7 +68,7 @@ function fixture({ scores = {}, liftLog = {}, gen = null } = {}) {
   // Leave any session from the last test without saving.
   if (document.querySelector("[data-freestyle]")) { click(main.querySelector("#fs-exit")); click(document.querySelector("#exit-confirm-discard")); }
   localStorage.clear(); store.init();
-  store.set("onboardingComplete", true); store.set("tier", "personal");
+  store.set("onboardingComplete", true); store.set("tier", "personal"); store.setDayOpen("checked");   // P-4: the day's question answered
   store.set("gymEquipment", GYM); store.set("homeEquipment", HOME); store.set("equipment", [...GYM, ...HOME]);
   store.set("sessionLocation", "gym");
   store.set("liftLogEnabled", true);
@@ -104,11 +108,13 @@ const loaded = EXERCISES.filter(e => avail.has(e.id) && (e.equipment || []).some
 const [M1, M2, M3] = loaded.slice(0, 3);
 
 // ── 0. FIXTURE REACH ────────────────────────────────────────────────────
-console.log("\nTEST 0 - Home's third door opens the freestyle session");
+console.log("\nTEST 0 - Make it up as I go opens the freestyle session");
 fixture();
 main.innerHTML = ""; TodayView(router).mount(main); navs = [];
-click(main.querySelector('[data-action="as-i-go"]'));
-ok("0a. one tap from Home", navs[0] === "capture" && !!main.querySelector("[data-freestyle]"), JSON.stringify(navs));
+// v3: no longer a Home door (Stage PATH: a door's How offers it, Session 5); opened as the router opens it.
+ok("0pc. the Plan's Home no longer has the door", !main.querySelector('[data-action="as-i-go"]'));
+router.navigate("capture");
+ok("0a. it opens the freestyle session", navs[0] === "capture" && !!main.querySelector("[data-freestyle]"), JSON.stringify(navs));
 ok("0b. Exit, a running clock and Finish", !!main.querySelector("#fs-exit") && /^\d+:\d\d$/.test(txt(main.querySelector("#fs-clock"))) &&
    !!main.querySelector("#fs-finish"));
 ok("0c. three moves with loaded kit exist for the fixture", !!(M1 && M2 && M3), `${loaded.length} loaded moves at the fixture gym`);

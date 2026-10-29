@@ -1,6 +1,17 @@
 /**
  * tools/verify-clubshell.mjs
- * 12 Oct 2026 v4
+ * 28 Oct 2026 v5
+ *
+ * v5 - STAGE PATH P-4 re-point (none loosened; mock-up v9). The Plan's Home
+ *   is one Today card, four purpose doors and the Library row; 1pc counts
+ *   the four doors. 2a's MUST list is unchanged and still met within two
+ *   taps: Check in is the Today card's action (the fixture has put off the
+ *   day's first question), I know what I want and Make it up as I go are
+ *   Library tiles now (library.js v20), one tap on from Home's Library row.
+ *   9a: the Plan's Home does not say the orientation line; its Today card's
+ *   words point at the card's own action, which is on the screen. 11b: the
+ *   doors are a list named by its heading. 12: the fixture answers the
+ *   day's first question.
  *
  * v4 - A-1 PLAN-HOME-PRUNE (Graeme approved the mock-up, 12 Oct). REACH
  *   only. 2a: Join a class and Something for the mind left Plan Home for the
@@ -111,7 +122,7 @@ const ok = (name, cond, detail = "") => {
 function home(tier) {
   localStorage.clear();
   store.init();
-  store.set("tier", tier);
+  store.set("tier", tier); store.setDayOpen("not-now");   // v5: the day's question put off, so Home (and its Check in) is drawn
   const c = document.createElement("div");
   oneScreen(c);
   const navs = [];
@@ -130,10 +141,10 @@ ok("0b. the free fixture is on free", isPremium() === false);
 console.log("\nTEST 1 - the rooms have gone from Plan Home; free keeps its screen");
 
 const plan = home("personal");
-ok("1pc. positive control: Plan Home rendered its doors", plan.c.querySelectorAll(".home-door").length === 3);
+ok("1pc. positive control: Plan Home rendered its doors", plan.c.querySelectorAll(".path-door[data-door]").length === 4);
 ok("1a. no rooms on Plan Home", plan.c.querySelectorAll("[data-room-id], .club-row").length === 0);
 const free = home("free");
-ok("1b-2. mounting free did not wipe the Plan render", plan.c.querySelectorAll(".home-door").length === 3);
+ok("1b-2. mounting free did not wipe the Plan render", plan.c.querySelectorAll(".path-door[data-door]").length === 4);
 ok("1c. and free does NOT get them", free.c.querySelectorAll("[data-room-id]").length === 0,
    "free was given the rooms. Free keeps the screen it has -- structure IS the " +
    "free product, and Graeme confirmed he likes it");
@@ -148,7 +159,7 @@ console.log("\nTEST 2 - everything the rooms and tiles reached is still within t
   c.querySelectorAll("[data-route]").forEach(b => reached.add(b.dataset.route));
   const hop = sel => { const navs = []; const h = document.createElement("div"); oneScreen(h);
     TodayView({ navigate: v => navs.push(v) }).mount(h); h.querySelector(sel)?.dispatchEvent(new window.MouseEvent("click", { bubbles: true })); return navs; };
-  for (const a of ["start-today", "know-what", "as-i-go"]) hop(`[data-action="${a}"]`).forEach(r => reached.add(r));
+  for (const a of ["checkin", "path-go"]) hop(`[data-action="${a}"]`).forEach(r => reached.add(r));   // v5: the Today card's one action
   // Two taps: behind "I know what I want".
   const kw = document.createElement("div"); oneScreen(kw);
   const kwNavs = [];
@@ -203,9 +214,12 @@ const orient = code9.slice(code9.indexOf("lets me decide today"));
 // passed -- but One to one is a PLAN room, and free's coach route is the
 // "Not sure?" button. The fix moved the fault one tier over. Both tiers
 // asserted now, from the control actually on each screen.
-ok("9a. the orientation line names the Plan door that is on the screen",
-   roomTitles.some(r => new RegExp(`${r}(\\\\u2019|\u2019)? lets me decide today`).test(code9)) &&
-   [...plan.c.querySelectorAll('[data-action="start-today"]')].some(b => (b.querySelector(".home-door__title") || b).textContent.trim() === roomTitles[0]),   // v4
+// v5: the Plan's Home no longer says the orientation line (its Today card speaks); what the card says
+// points at the card's own action, which is on the screen.
+const planCardLine = (plan.c.querySelector(".path-today__coach")?.textContent || "");
+ok("9a. the Plan's Home points only at a control that is on the screen",
+   /Three quick taps/.test(planCardLine) && (plan.c.querySelector(".path-today [data-action]")?.textContent || "").trim() === "Check in" &&
+   !/lets me decide today/.test(plan.c.textContent || ""),
    "it points at a door that is not on the screen - and it shows ONLY to " +
    "somebody with no goal set, the exact person who needs the pointer to work");
 
@@ -307,7 +321,7 @@ console.log("\nTEST 11 - A11Y-HOME: Home can be read by heading");
      heads.filter(h => h.level === 1).length === 1,
      `${heads.filter(h => h.level === 1).length} found`);
 
-  const group = c.querySelector(".home-doors[role=group]");
+  const group = c.querySelector(".path-doors[aria-labelledby]");   // v5: the purpose doors, a list named by its heading
   const label = group && c.querySelector("#" + group.getAttribute("aria-labelledby"));
   ok("11b. the doors are a group named by a heading",
      !!label && /^H[1-6]$/.test(label.tagName) && label.textContent.trim().length > 0);
@@ -349,9 +363,9 @@ console.log("\nTEST 12 - GUIDANCE-1: the general-guidance line returns");
     return c;
   }
 
-  localStorage.clear(); store.init(); store.set("tier", "personal");
+  localStorage.clear(); store.init(); store.set("tier", "personal"); store.setDayOpen("checked");   // v5
   const first = homeKeepingState();
-  ok("12pc. positive control: Home rendered", first.querySelectorAll(".home-door").length === 3);
+  ok("12pc. positive control: Home rendered", first.querySelectorAll(".path-door[data-door]").length === 4);
 
   ok("12a. somebody who has never seen it, sees it", said(first),
      "the line that carries the red-flag screen's weight never appears");

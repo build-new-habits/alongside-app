@@ -1,5 +1,9 @@
 /**
  * tools/verify-interruptions.mjs
+ * 28 Oct 2026 v3
+ *
+ * v3 - STAGE PATH P-4 re-point (none loosened). The fixture has answered the Plan's first question of the day (day-open), so a cold open draws Home as before. No assertion changed.
+ *
  * 04 Oct 2026 v2
  *
  * v2 - D-1 EXERCISE-FOUR. Reaches Capture (the fourth step) before the set buttons; nothing it proves has changed.
@@ -90,7 +94,7 @@ function fixture(tier) {
   localStorage.clear(); store.init();
   store.set("onboardingComplete", true); store.set("name", "Sam");
   store.set("safetyAckLog", Array.from({ length: 5 }, () => ({ at: new Date().toISOString(), textVersion: HURT_AND_ACHE_VERSION, surface: "fixture" })));
-  store.set("tier", tier); store.set("liftLogEnabled", true);
+  store.set("tier", tier); store.set("liftLogEnabled", true); store.setDayOpen("checked");   // P-4: the day's question answered
   store.set("gymEquipment", GYM); store.set("equipment", GYM); store.set("sessionLocation", "gym");
   store.set("lastCheckin", { date: new Date().toDateString(), completed: true, energy: 6 });
 }

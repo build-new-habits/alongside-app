@@ -1,5 +1,9 @@
 /**
  * tools/verify-taps.mjs
+ * 28 Oct 2026 v3
+ *
+ * v3 - STAGE PATH P-4 re-point (none loosened). The coach route now starts on the Plan's Today card (mock-up v9, Graeme approved 28 Oct): Check in, three answers, back to Home where today's suggestion is read with its reason, Show me today's plan, Start. Six taps, one more than the Smooth Path's five: the suggestion is read on Home before the plan (v9's design, recorded for Graeme). Every extra (the tick, the red-flag answers) is still exactly what it was, and the reversals still bite.
+ *
  * 02 Oct 2026 v2
  *
  * v2 - W4-1 GATE-OPEN. The fixture person has agreed (tools/agreed.mjs): the
@@ -102,7 +106,7 @@ async function tapSel(sel) {
 function fixture({ acks = 5, conditions = [] } = {}) {
   localStorage.clear(); store.init(); agreed(store);
   gate.endGateSession();
-  store.set("onboardingComplete", true); store.set("name", "Test"); store.set("tier", "personal");
+  store.set("onboardingComplete", true); store.set("name", "Test"); store.set("tier", "personal"); store.setDayOpen("checked");   // P-4: the day's question answered
   store.set("gymEquipment", ["dumbbells-medium", "bench-flat", "gym-membership"]); store.set("homeEquipment", []);
   store.set("conditions", conditions);
   store.set("safetyAckLog", Array.from({ length: acks }, () => ({ at: new Date().toISOString(), textVersion: HURT_AND_ACHE_VERSION, surface: "fixture" })));
@@ -114,13 +118,14 @@ const firstExerciseShown = () => path.at(-1) === "workout" && (document.querySel
 async function coachRoute({ tick = false, redFlag = false } = {}) {
   await router.navigate("today");
   taps = 0;
-  await tapSel('[data-action="start-today"]');                 // 1  Tell me what to do
+  await tapSel('.path-today [data-action="checkin"]');         // 1  Check in (the Today card)
   await tapText(/^Okay$/);                                      // 2  energy
   await tapText(/^Pretty good$/);                               // 3  mood
   await tapText(/^Nothing today$/);                             // 4  anything sore
+  await tapSel('.path-today [data-action="path-go"]');          // 5  Show me today's plan (the suggestion, read on Home)
   await waitFor(() => document.querySelector("#cp-preview-start"));
   if (tick) await tapSel("#cp-ack-box");                        //    the taper's tick-box
-  await tapSel("#cp-preview-start");                            // 5  Start
+  await tapSel("#cp-preview-start");                            // 6  Start
   if (redFlag) {
     await waitFor(() => path.at(-1) === "red-flag");
     for (const q of ["q1", "q2", "q3"]) await tapSel(`input[name="${q}"][value="no"]`);
@@ -133,20 +138,21 @@ async function coachRoute({ tick = false, redFlag = false } = {}) {
 console.log("\nTEST 1 - a returning Plan user, past the safety taper");
 fixture();
 await coachRoute();
-ok("1pc. positive control: the route really passed Home, check-in and plan", ["today", "checkin", "coach-proposal", "workout"].every(v => path.includes(v)),
+ok("1pc. positive control: the route really passed Home, check-in, Home again and the plan", ["today", "checkin", "coach-proposal", "workout"].every(v => path.includes(v)) && path.filter(v => v === "today").length >= 2,
    JSON.stringify(path));
 ok("1a. the first exercise is on screen", firstExerciseShown(), JSON.stringify(path));
-ok("1b. in FIVE taps (v540: 15)", taps === 5, `${taps} taps: ${JSON.stringify(path)}`);
+ok("1b. in SIX taps (v540: 15; Smooth Path 5; Stage PATH 6, the suggestion read on Home)", taps === 6, `${taps} taps: ${JSON.stringify(path)}`);
 
 // ── 2. NEW ──────────────────────────────────────────────────────────────
 console.log("\nTEST 2 - a new user in the safety taper");
 fixture({ acks: 0 });
 await coachRoute({ tick: true });
 ok("2a. the first exercise is on screen", firstExerciseShown(), JSON.stringify(path));
-ok("2b. in six taps: five, plus the one tick that records the safety note was read (v540: 23)", taps === 6, `${taps} taps`);
+ok("2b. in seven taps: six, plus the one tick that records the safety note was read (v540: 23)", taps === 7, `${taps} taps`);
 fixture({ acks: 0 });
 await router.navigate("today"); taps = 0;
-await tapSel('[data-action="start-today"]'); await tapText(/^Okay$/); await tapText(/^Pretty good$/); await tapText(/^Nothing today$/);
+await tapSel('.path-today [data-action="checkin"]'); await tapText(/^Okay$/); await tapText(/^Pretty good$/); await tapText(/^Nothing today$/);
+await tapSel('.path-today [data-action="path-go"]'); await waitFor(() => document.querySelector("#cp-preview-start"));
 await tapSel("#cp-preview-start");
 await wait(100);
 ok("2c. REVERSAL: without the tick, Start does not go in -- the tick is real, not ceremony", path.at(-1) === "coach-proposal",
@@ -158,12 +164,12 @@ fixture({ conditions: ["lower-back"] });
 await coachRoute({ redFlag: true });
 ok("3a. the red-flag screen was asked, once, on the way", path.filter(v => v === "red-flag").length === 1, JSON.stringify(path));
 ok("3b. and the first exercise is on screen", firstExerciseShown(), JSON.stringify(path));
-ok("3c. in nine taps: five, plus three answers and Continue, once", taps === 9, `${taps} taps`);
+ok("3c. in ten taps: six, plus three answers and Continue, once", taps === 10, `${taps} taps`);
 fixture({ conditions: ["lower-back"] });
 store.set("redFlag", { screenedAt: new Date().toISOString(), areas: ["lower-back"], textVersion: (await import(B + "data/red-flag.js")).RED_FLAG_VERSION,
   level: null, flaggedAt: null, clearedAt: null });
 await coachRoute();
-ok("3d. REVERSAL: already asked -- five taps again", taps === 5 && firstExerciseShown() && !path.includes("red-flag"), `${taps} taps ${JSON.stringify(path)}`);
+ok("3d. REVERSAL: already asked -- six taps again", taps === 6 && firstExerciseShown() && !path.includes("red-flag"), `${taps} taps ${JSON.stringify(path)}`);
 
 console.log("");
 if (fails) { console.log(`TAPS: ${fails} FAILED, ${passes} passed`); process.exit(1); }

@@ -1,5 +1,9 @@
 /**
  * tools/verify-free-classes.mjs
+ * 28 Oct 2026 v7
+ *
+ * v7 - STAGE PATH P-4 re-point (none loosened). The fixture has answered the Plan's first question of the day (day-open), so a cold open draws Home as before. No assertion changed.
+ *
  * 12 Oct 2026 v6
  *
  * v6 - A-1 PLAN-HOME-PRUNE (Graeme approved the mock-up, 12 Oct). 3a: on
@@ -91,7 +95,7 @@ const click = el => el?.dispatchEvent(new dom.window.MouseEvent("click", { bubbl
 function fixture(tier) {
   localStorage.clear(); store.init(); agreed(store);
   gate.endGateSession();
-  store.set("onboardingComplete", true); store.set("name", "Test"); store.set("tier", tier);
+  store.set("onboardingComplete", true); store.set("name", "Test"); store.set("tier", tier); store.setDayOpen("checked");   // P-4: the day's question answered
   store.set("equipment", ["dumbbells", "bench"]); store.set("homeEquipment", ["dumbbells", "bench"]);
   store.set("conditions", []); store.set("conditionPainScores", {});
   for (let i = 0; i < 5; i++) gate.recordAcknowledgement("fixture");

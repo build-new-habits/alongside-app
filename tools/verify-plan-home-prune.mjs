@@ -1,5 +1,15 @@
 /**
  * tools/verify-plan-home-prune.mjs
+ * 28 Oct 2026 v2
+ *
+ * v2 - STAGE PATH P-4 re-point (none loosened). A-1's Home was replaced by
+ *   the purpose-first Home (mock-up v9, Graeme approved 28 Oct; the old
+ *   markup archived, Archive/Stage PATH/P-4). Its states are held by
+ *   verify-plan-home-path. Here, in A-1's same five situations, what A-1
+ *   decided still holds: six ways in at most, one Today card, one Library
+ *   row naming your week, nothing that moved to the Library back on Home.
+ *   Tests 6 and 7 (the Library's tiles, Free left alone) unchanged.
+ *
  * 12 Oct 2026 v1
  *
  * A-1 PLAN-HOME-PRUNE (Stage AWARD). Graeme approved the mock-up, 12 Oct:
@@ -91,44 +101,23 @@ const card = () => main.querySelector(".home-week, .home-today");
 const doorActions = () => [...main.querySelectorAll(".home-doors .home-door")].map(d => d.dataset.action);
 const homeRoutes = () => [...main.querySelectorAll("[data-route]")].map(b => b.dataset.route);
 
-console.log("\nTEST 1 - a day of your week");
-fixture({ week: "day" }); home();
-ok("1pc. the week card is there", !!main.querySelector(".home-week [data-action='week-today']"));
-ok("1a. at most six ways in", waysIn().length <= 6, waysIn().map(b => txt(b).slice(0, 24) || b.dataset.action).join(" | "));
-ok("1b. the arc is a line inside the card, opening the arc", !!card()?.querySelector("[data-route='stretch-arc']") && main.querySelectorAll("[data-route='stretch-arc']").length === 1);
-ok("1c. no Only 10 minutes or Something else today on Home (Length on the plan does it)", !main.querySelector("[data-action='week-short'], [data-action='week-else']"));
-ok("1d. all three doors below, in order", doorActions().join() === "start-today,know-what,as-i-go", doorActions().join());
-ok("1e. one Library row, naming your week", homeRoutes().includes("library") && /your week/i.test(txt(main.querySelector("[data-route='library']"))));
-ok("1f. no class, run, mind or week tiles on Home", !["classes", "running-session", "noticing", "your-week"].some(r => homeRoutes().includes(r)), homeRoutes().join());
-navs = []; click(main.querySelector("[data-action='week-today']"));
-ok("1g. Show me today's plan opens the plan", navs.length > 0, JSON.stringify(navs));
-
-console.log("\nTEST 2 - no week set");
-fixture(); home();
-const c2 = card();
-ok("2pc. a Today card leads", !!c2);
-ok("2a. it leads with your arc and Tell me what to do", /Week \d/.test(txt(c2)) && !!c2?.querySelector("[data-action='start-today']") && !!c2?.querySelector("[data-route='stretch-arc']"), txt(c2));
-ok("2b. Tell me what to do is on screen once", main.querySelectorAll("[data-action='start-today']").length === 1);
-ok("2c. the other two doors below", doorActions().join() === "know-what,as-i-go", doorActions().join());
-ok("2d. Plan your week is on the card", txt(c2?.querySelector("[data-route='your-week']")) === "Plan your week");
-ok("2e. at most six ways in", waysIn().length <= 6, waysIn().map(b => txt(b).slice(0, 24)).join(" | "));
-ok("2f. the Library row does not repeat your week", !/your week/i.test(txt(main.querySelector("[data-route='library']"))));
-
-console.log("\nTEST 3 - no week and no arc yet");
-fixture({ arc: false }); home();
-ok("3a. the card offers to set the arc", !!card()?.querySelector("[data-route='arc-setup']"));
-ok("3b. and Tell me what to do", !!card()?.querySelector("[data-action='start-today']"));
-ok("3c. at most six ways in", waysIn().length <= 6, waysIn().map(b => txt(b).slice(0, 24)).join(" | "));
-
-console.log("\nTEST 4 - a week, but nothing set for today");
-fixture({ week: "none-today" }); home();
-ok("4a. the coach's card leads, with Your week (not Plan your week)", txt(card()?.querySelector("[data-route='your-week']")) === "Your week");
-
-console.log("\nTEST 5 - a rest day in your week");
-fixture({ week: "rest" }); home();
-ok("5a. the card says rest, with your arc", /Rest/.test(txt(card())) && !!card()?.querySelector("[data-route='stretch-arc']"));
-ok("5b. all three doors below", doorActions().join() === "start-today,know-what,as-i-go", doorActions().join());
-ok("5c. at most six ways in", waysIn().length <= 6);
+// v2: tests 1-5 held A-1's Home (the week card or the coach's card, three doors). Stage PATH replaced
+// that Home (mock-up v9, approved 28 Oct; archived in BNH-Files, Archive/Stage PATH/P-4); its own
+// states are held by verify-plan-home-path. What A-1 decided still holds and is checked here, in the
+// same five situations: six ways in at most, the Library row, and nothing that moved to the Library
+// back on Home.
+const SITS = { "1 - a day of your week": { week: "day" }, "2 - no week set": {}, "3 - no week and no arc yet": { arc: false },
+  "4 - a week, but nothing set for today": { week: "none-today" }, "5 - a rest day in your week": { week: "rest" } };
+for (const [label, f] of Object.entries(SITS)) {
+  console.log(`\nTEST ${label}`);
+  fixture(f); store.setDayOpen("checked"); home();
+  const n = label[0];
+  ok(`${n}a. at most six ways in`, waysIn().length <= 6, waysIn().map(b => txt(b).slice(0, 24) || b.dataset.action).join(" | "));
+  ok(`${n}b. one Today card`, main.querySelectorAll(".path-today").length === 1);
+  ok(`${n}c. one Library row, naming your week`, main.querySelectorAll("[data-route='library']").length === 1 && /your week/i.test(txt(main.querySelector("[data-route='library']"))));
+  ok(`${n}d. no class, run, mind or week tiles on Home`, !["classes", "running-session", "noticing", "your-week"].some(r => homeRoutes().includes(r)), homeRoutes().join());
+  ok(`${n}e. no Only 10 minutes or Something else today`, !main.querySelector("[data-action='week-short'], [data-action='week-else']"));
+}
 
 console.log("\nTEST 6 - what left Home is one tap from the Library, on the Plan");
 fixture();
@@ -143,7 +132,7 @@ ok("6c. Your week opens your week", navs.includes("your-week"), JSON.stringify(n
 
 console.log("\nTEST 7 - FREE IS LEFT ALONE");
 fixture({ tier: "free" }); home();
-ok("7a. Free Home has no Plan doors or Today card", !main.querySelector(".home-door, .home-today, .home-week"));
+ok("7a. Free Home has no Plan doors or Today card", !main.querySelector(".home-door, .home-today, .home-week, .path-home, .path-door"));
 ok("7b. Free Home keeps its own tiles and Not sure? I'll pick something", /Cardio, Core/.test(txt(main)) && /Not sure\? I.ll pick something/.test(txt(main)));
 main.innerHTML = library.render(); library.onMount();
 const freeGuided = [...main.querySelectorAll("[data-guided]")].map(b => b.dataset.guided);

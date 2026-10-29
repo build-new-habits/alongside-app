@@ -1,6 +1,12 @@
 /**
  * js/data/tier-table.js
- * 06 Oct 2026 v7
+ * 28 Oct 2026 v8
+ *
+ * v8 - STAGE PATH P-4. Home on the Plan is purpose first (mock-up v9,
+ *   approved 28 Oct): four doors by what you came for and one suggestion
+ *   for today. The three ways in are no longer Home's; I know what I want
+ *   and Make it up as I go stay the Plan's, reached from a door's How
+ *   (Session 5). The website says the same (verify-website 4b).
  *
  * v7 - D-11 PROGRESS-SHARE. Progress: Free has today and the last 7, 14
  *   or 30 days, and ways to share them (a picture, a certificate, a report
@@ -54,9 +60,9 @@ export const TIER_TABLE = [
     id: "home",
     area: "Home",
     free: "Choose any kind of session, or let the coach suggest one from your check-in",
-    plan: "Three ways in: tell me what to do, I know what I want, or make it up as I go",
-    says: "Home gives you three ways in: let the coach decide, say what you want, or make it up as you go.",
-    proof: "verify-plan-claims 3.home, verify-home-plan",
+    plan: "Four doors, by what you came for: get stronger, keep moving, stretch or move to feel better, and one suggestion for today from your check-in",
+    says: "Home asks what you came for: get stronger, keep moving, stretch or move to feel better, with one suggestion for today from your check-in.",
+    proof: "verify-plan-claims 3.home, verify-plan-home-path",
   },
   {
     id: "checkin",

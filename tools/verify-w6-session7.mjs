@@ -1,5 +1,9 @@
 /**
  * tools/verify-w6-session7.mjs
+ * 28 Oct 2026 v2
+ *
+ * v2 - STAGE PATH P-4 re-point (none loosened). W6-19 on the Plan's Home: the Today card answers a low mood in the person's word and offers the quieter thing itself (Move to feel better, Calmer; path-engine E2), so 2a and 2b read the card. Free's Home line and Today's plan's offer (2c to 2f) are unchanged. The fixture checks in today, as the person did.
+ *
  * 17 Oct 2026 v1
  *
  * Stage W6, session 7.
@@ -59,12 +63,13 @@ globalThis.window.router = rtr;
 realRouter.navigate = rtr.navigate;
 function person({ mood = 6, goals = [], conditions = [], level = "active" } = {}) {
   localStorage.clear(); store.init(); gate.endGateSession(); agreed(store);
-  store.set("onboardingComplete", true); store.set("name", "T"); store.set("tier", "personal");
+  store.set("onboardingComplete", true); store.set("name", "T"); store.set("tier", "personal"); store.setDayOpen("checked");   // P-4: the day's question answered
   store.set("homeEquipment", []); store.set("sessionLocation", "home");
   for (let i = 0; i < 5; i++) gate.recordAcknowledgement("fixture");
   gate.endGateSession();
   store.set("goals", goals); store.set("conditions", conditions); store.set("fitnessLevel", level);
   store.set("checkinHistory", { [new Date().toISOString().split("T")[0]]: { energy: 6, mood, date: new Date().toDateString() } });
+  store.set("lastCheckin", { ...store.get("lastCheckin"), energy: 6, mood, timestamp: new Date().toISOString() });   // Stage PATH P-4: checked in today
   store.set("guidanceShownAt", new Date().toISOString());
   navs.length = 0;
 }
@@ -83,10 +88,13 @@ ok("1c. nothing is pre-filled: the arc is not set by ranking", !store.get("arc")
 console.log("\nTEST 2 - W6-19: a low mood is answered, in their word");
 person({ mood: 2 });
 main.innerHTML = ""; TodayView(rtr).mount(main);
-ok("2a. Home: \"You said you're struggling today\" with Wellbeing", /You said you're struggling today\. Wellbeing/.test(txt(main)), txt(main).slice(0, 200));
+// Stage PATH (mock-up v9): the Plan's Home answers it on the Today card, in their word, with the quieter
+// thing itself (Move to feel better, Calmer); Wellbeing is the tab, and Today's plan still offers it (2c, 2f).
+const card2 = () => txt(main.querySelector(".path-today"));
+ok("2a. Home: \"You said you're struggling\", and something slow and steady to move to feel better", /You said you.re struggling, so this is slow and steady\./.test(card2()) && main.querySelector(".path-today")?.dataset.door === "feel", card2().slice(0, 200));
 person({ mood: 3 });
 main.innerHTML = ""; TodayView(rtr).mount(main);
-ok("2b. Low is said as low", /You said you're low today/.test(txt(main)));
+ok("2b. Low is said as low", /You said you.re feeling low/.test(card2()), card2().slice(0, 120));
 person({ mood: 2 });
 main.innerHTML = ""; CoachProposalView(rtr).mount(main);
 ok("2c. Today's plan: the line, with Something gentler and Wellbeing", /You said you\u2019re struggling today/.test(txt(main)) && !!main.querySelector("#cp-low-gentler") && !!main.querySelector("#cp-low-wellbeing"), txt(main).slice(0, 200));

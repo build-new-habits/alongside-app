@@ -1,5 +1,9 @@
 /**
  * tools/verify-plan-import.mjs
+ * 28 Oct 2026 v2
+ *
+ * v2 - STAGE PATH P-4 re-point (none loosened). 6f reads the Plan's Today card (plan-home.js, mock-up v9): today from your week, Session A, how many, Start your list; same words, same button.
+ *
  * 05 Oct 2026 v1
  *
  * D-7 PLAN-IMPORT. Graeme, 05 Oct: "Add a plan you already have? We need
@@ -183,7 +187,7 @@ const GYM = ["dumbbells-medium", "barbell", "bench-flat", "kettlebell-medium", "
 function fixture(tier = "personal") {
   localStorage.clear(); store.init(); agreed(store);
   gate.endGateSession();
-  store.set("onboardingComplete", true); store.set("name", "Test"); store.set("tier", tier);
+  store.set("onboardingComplete", true); store.set("name", "Test"); store.set("tier", tier); store.setDayOpen("checked");   // P-4: the day's question answered
   store.set("homeEquipment", ["band-light"]); store.set("gymEquipment", GYM); store.set("equipment", GYM);
   store.set("conditions", []); store.set("conditionPainScores", {});
   store.set("arc", { active: true, aimId: "floor-unaided", strands: ["leg-strength", "trunk-strength"], marker: "Up off the floor",
@@ -301,9 +305,9 @@ ok("6c. saved: the day is Session A, as written", tOwn?.own === "Session A" && t
 ok("6d. the week says so", /Your own list: Session A/.test(txt($(`[data-day="${TODAY}"]`))) && /As you wrote it/.test(txt($(`[data-day="${TODAY}"]`))));
 ok("6e. the balance line leaves it out (no crash, nothing offered into it)", (() => { const g = WS.balanceGap(); return !g || !g.template.own; })());
 await router.navigate("today"); await wait(80);
-const card = $(".home-week");
+const card = $('.path-today[data-state="week"]');   // Stage PATH P-4: the Plan's Today card
 const nA = store.get("prescribedExercises").filter(e => e.group === "Session A").length;
-ok("6f. Home: Today, from your week, Session A, how many, Start your list", !!card && txt($("#home-week-h")) === "Session A" && new RegExp(`${nA} exercises, as you wrote them`).test(txt(card)) && !!$('[data-action="week-own"]'), txt(card));
+ok("6f. Home: Today, from your week, Session A, how many, Start your list", !!card && txt($("#path-today-h")) === "Session A" && new RegExp(`${nA} exercises, as you wrote them`).test(txt(card)) && !!$('[data-action="week-own"]'), txt(card));
 ok("6g. the coach's plan is not offered for it", !$('[data-action="week-today"]') && WS.askForToday() === false);
 await click($('[data-action="week-own"]'), 200);
 ok("6h. Start your list plays Session A only", view() === "prescribed-session" && store.get("myExercisesGroup") === "Session A" && new RegExp(`1 of ${nA}\\b`).test(txt(main)), txt(main).slice(0, 100));

@@ -1,5 +1,9 @@
 /**
  * tools/verify-freestyle-reload.mjs
+ * 28 Oct 2026 v3
+ *
+ * v3 - STAGE PATH P-4 re-point (none loosened). The Plan's Carry-on card is the Today card (plan-home.js, mock-up v9) with one action, Carry on; finishing early is in the session (Finish), so 2c finishes from there and still checks the two sets are saved and the finish opens. 2c0 checks the card has no second button.
+ *
  * 27 Oct 2026 v2
  * v2 - LIFT-UNIT: the test phone is en-GB, so lifts are in kg; a US phone would now lift in lb.
  *
@@ -65,7 +69,7 @@ const [M1, M2] = EXERCISES.filter(e => avail.has(e.id) && (e.equipment || []).so
 async function fixture() {
   document.getElementById("session-exit-overlay")?.remove();
   localStorage.clear(); store.init();
-  store.set("onboardingComplete", true); store.set("tier", "personal"); store.set("name", "T");
+  store.set("onboardingComplete", true); store.set("tier", "personal"); store.set("name", "T"); store.setDayOpen("checked");   // P-4: the day's question answered
   store.set("gymEquipment", GYM); store.set("equipment", GYM); store.set("sessionLocation", "gym");
   store.set("liftLogEnabled", true);
   store.set("safetyAckLog", Array.from({ length: 5 }, () => ({ at: new Date().toISOString(), textVersion: HURT_AND_ACHE_VERSION, surface: "fixture" })));
@@ -113,16 +117,19 @@ console.log("\nTEST 2 - after a close, Home leads with it");
 await fixture();
 await pick(M1.id); logSet({ weight: 20, reps: 10 }); logSet({ weight: 20, reps: 10 });
 await openApp(); navs = []; home();
-const card = main.querySelector(".home-carry");
+const card = main.querySelector('.path-today[data-state="carry"]');   // Stage PATH P-4: the Plan's Today card
 ok("2a. the Carry-on card names it and what is done", !!card && /Make it up as I go/.test(txt(card)) && /1 move · 2 sets so far/.test(txt(card)), txt(card));
 click(main.querySelector('[data-action="carry-on"]'));
 ok("2b. Carry on goes back into it, sets intact", navs.at(-1) === "capture" && /Set 1 20 kg × 10 ?Set 2 20 kg × 10/.test(txt(main)) && /Log set 3/.test(txt(main)), JSON.stringify(navs) + " " + txt(main).slice(0, 300));
 await openApp(); navs = []; home();
-click(main.querySelector('[data-action="carry-finish"]')); await wait(50);
+// Stage PATH (mock-up v9): the card has one action; finishing early is in the session itself.
+ok("2c0. the card has no second button", main.querySelectorAll('.path-today button').length === 1 && !main.querySelector('[data-action="carry-finish"]'));
+click(main.querySelector('[data-action="carry-on"]')); await wait(20);
+click(main.querySelector("#fs-finish")); await wait(50);
 const log2 = store.get("activityLog") || [];
-ok("2c. Finish here and save saves it and goes to the finish", navs.at(-1) === "reflect" && log2.length === 1 && log2[0].setsDone === 2, `${JSON.stringify(navs)} ${JSON.stringify(log2[0] || {})}`);
+ok("2c. Carry on, then Finish, saves it and goes to the finish", navs.at(-1) === "reflect" && log2.length === 1 && log2[0].setsDone === 2, `${JSON.stringify(navs)} ${JSON.stringify(log2[0] || {})}`);
 home();
-ok("2d. and the card has gone", !main.querySelector(".home-carry"));
+ok("2d. and the card has gone", !main.querySelector('.path-today[data-state="carry"]'));
 
 // ── 3. LEAVING WITHOUT SAVING ───────────────────────────────────────────
 console.log("\nTEST 3 - leaving without saving leaves nothing to come back to");

@@ -1,5 +1,14 @@
 /**
  * tools/verify-homedoors.mjs
+ * 28 Oct 2026 v4
+ *
+ * v4 - STAGE PATH P-4 re-point (none loosened; mock-up v9). The Plan's Home
+ *   is four purpose doors: 1b counts four. 2a: the Stretch door opens its
+ *   own steps (path; Session 5 drives Area, How and Build my own end to
+ *   end in verify-path-routes), so 2a checks the door, then drives the
+ *   stretch plan from I know what I want as before. 3a: the coach's way is
+ *   the Today card (Check in, or Show me today's plan).
+ *
  * 28 Sep 2026 v3
  *
  * v3 - Work list 2e. 2d ("the coach-proposal engine still has no stretch
@@ -100,7 +109,7 @@ const ok = (name, cond, detail = "") => {
 function home(tier) {
   localStorage.clear();
   store.init();
-  store.set("tier", tier);
+  store.set("tier", tier); store.setDayOpen("checked");   // v4: the day's question answered
   const c = document.getElementById("c");
   c.innerHTML = "";
   const navs = [];
@@ -126,11 +135,11 @@ ok("0b. the free fixture is actually on free", isPremium() === false,
 console.log("\nTEST 1 - Plan's Home has the session doors");
 
 const plan = home("personal");
-const planDoors = [...plan.c.querySelectorAll(".home-door")];
+const planDoors = [...plan.c.querySelectorAll(".path-door[data-door]")];   // v4: the four purpose doors
 
 ok("1a. Plan's Home renders its doors", planDoors.length > 0,
    "Plan's Home has no doors. This is the LOBBY-1c state: nothing but one way in.");
-ok("1b. and it is the full set, not a remnant", planDoors.length === 3,
+ok("1b. and it is the full set, not a remnant", planDoors.length === 4,
    `${planDoors.length} door(s) on Plan's Home`);
 
 // VISIBLE AND CLICKABLE, not merely present. jsdom computes no CSS, so a
@@ -158,14 +167,19 @@ const { CoachProposalView } = await import(B + "views/coach-proposal.js");
     if (v === "know-what") KnowWhatView(r).mount(c);
     if (v === "coach-proposal") CoachProposalView(r).mount(c);
   } };
+  store.setDayOpen("checked");
   TodayView(r).mount(c);
-  c.querySelector('[data-action="know-what"]')?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }));
+  // v4: Home's Stretch door opens the door's steps (path, Session 5: Area, then How, where Build my own is
+  // I know what I want). Here: the door names itself, then the engine's stretch route is driven from know-what.
+  c.querySelector('.path-door[data-door="stretch"]')?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }));
+  const doorOk = navs[0] === "path" && r.pathStart?.door === "stretch";
+  navs.length = 0; r.navigate("know-what");
   const stretch = c.querySelector('input[name="kind"][value="stretch"]');
   if (stretch) { stretch.checked = true; stretch.dispatchEvent(new dom.window.Event("change", { bubbles: true })); }
   c.querySelector(".kw-form")?.dispatchEvent(new dom.window.Event("submit", { bubbles: true, cancelable: true }));
   const sentence = (c.querySelector(".cp-plan__sentence")?.textContent || "").trim();
   ok("2a. Home -> I know what I want -> Stretch reaches a stretch plan",
-     navs.join(">") === "know-what>coach-proposal" && /^You asked for stretching,/.test(sentence) &&
+     doorOk && navs.join(">") === "know-what>coach-proposal" && /^You asked for stretching,/.test(sentence) &&
      c.querySelectorAll(".cp-plan__row").length > 0,
      `${navs.join(">")} | ${sentence}. The only route to a Stretch session must not quietly go.`);
 
@@ -192,8 +206,8 @@ console.log("\nTEST 3 - the invitation survived, and nothing doubled");
 // What must NOT change is that a coach-picks route exists on Home at
 // all -- restoring the doors and then removing the soft option would be
 // the same mistake in the other direction.
-ok("3a. the coach-picks fallback is still offered on Plan",
-   !!plan.c.querySelector('[data-action="start-today"], [data-route="coach-proposal"]'),
+ok("3a. the coach-picks fallback is still offered on Plan (v4: the Today card, which asks or suggests)",
+   !!plan.c.querySelector('.path-today [data-action="checkin"], .path-today [data-action="path-go"]'),
    "restoring the doors removed the invitation. It is meant to become one " +
    "option among them, not to be replaced in turn -- that would be the same " +
    "mistake in the other direction.");

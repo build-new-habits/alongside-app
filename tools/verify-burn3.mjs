@@ -1,5 +1,12 @@
 /**
  * tools/verify-burn3.mjs
+ * 28 Oct 2026 v3
+ *
+ * v3 - STAGE PATH P-4 re-point (none loosened). On the Plan's purpose-first
+ *   Home the coach's line is .path-note, said when it adds to the Today
+ *   card, as a flat week does; the fixture has answered the day's first
+ *   question (day-open), so Home is drawn. Every sentence checked as before.
+ *
  * 21 Aug 2026 v2
  * GATE-PATH. Path resolution only -- no assertion changed.
  *
@@ -37,7 +44,7 @@ const day = n => new Date(Date.now() - n*864e5).toISOString().split('T')[0];
 
 function homeWith(energyByDay) {
   localStorage.clear(); store.init();
-  store.set('tier','personal');
+  store.set('tier','personal'); store.setDayOpen('checked');   // P-4: the day's question answered
   const hist = {};
   energyByDay.forEach((e, i) => { hist[day(i + 1)] = { energy: e, mood: e }; });
   store.set('checkinHistory', hist);
@@ -46,7 +53,7 @@ function homeWith(energyByDay) {
   // The COACH LINE only, not the whole page. Scanning all of Home made
   // the P4 checks fail on door labels and the greeting — a banned-word
   // test is only meaningful against the text it is meant to police.
-  return (el.querySelector('.today-coach-line')?.textContent || '').replace(/\s+/g, ' ');
+  return (el.querySelector('.today-coach-line, .path-note')?.textContent || '').replace(/\s+/g, ' ');
 }
 
 // ── 1. It is REACHED, on the surface everybody uses ──────────────────
@@ -95,14 +102,14 @@ check('and the moderate one does too, proportionately',
 
 // ── 4. It outranks the yesterday line ────────────────────────────────
 localStorage.clear(); store.init();
-store.set('tier','personal');
+store.set('tier','personal'); store.setDayOpen('checked');   // P-4: the day's question answered
 const hist = {}; [1,2,2,1,2].forEach((e,i)=>{ hist[day(i+1)] = { energy: e, mood: e }; });
 store.set('checkinHistory', hist);
 store.set('activityLog', [{ type:'workout', completed:true,
   date: day(1), completedAt: new Date(Date.now()-864e5).toISOString() }]);
 const el = document.getElementById('c');
 TodayView({ navigate: () => {} }).mount(el);
-const both = (el.querySelector('.today-coach-line')?.textContent || '').replace(/\s+/g,' ');
+const both = (el.querySelector('.today-coach-line, .path-note')?.textContent || '').replace(/\s+/g,' ');
 check('a flat week outranks "you did strength work yesterday"',
   /low for a while now/.test(both) && !/You did strength work yesterday/.test(both),
   'if somebody has been flat for a week, yesterday is not the useful thing to say');

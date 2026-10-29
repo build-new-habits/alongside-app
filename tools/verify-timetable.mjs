@@ -1,5 +1,9 @@
 /**
  * tools/verify-timetable.mjs
+ * 28 Oct 2026 v7
+ *
+ * v7 - STAGE PATH P-4 re-point (none loosened). 1pc reads the Plan's purpose-first Home (four doors and its Library row, plan-home.js); the fixture has answered the day's first question. Classes are still two taps: the Library row, then Classes.
+ *
  * 12 Oct 2026 v6
  *
  * v6 - A-1 PLAN-HOME-PRUNE (Graeme approved the mock-up, 12 Oct). REACH:
@@ -136,7 +140,7 @@ function seed({ programme = false, injured = false } = {}) {
       textVersion: ACK_VERSION,
       surface: "fixture"
     })));
-  store.set("tier", "personal");
+  store.set("tier", "personal"); store.setDayOpen("checked");   // P-4: the day's question answered
   store.set("name", "Graeme");
   store.set("arc", {
     aimId: "stronger-core",
@@ -163,9 +167,9 @@ seed();
 homeRoom();
 
 // v6. Two taps: Home's Library row, then the Library's Classes tile.
-const libRow = main.querySelector('.home-libraryrow[data-route="library"]');
+const libRow = main.querySelector('.path-doors [data-route="library"]');   // the Plan's purpose-first Home
 ok("1pc. positive control: Home rendered Plan's doors and its Library row",
-   main.querySelectorAll(".home-doors .home-door").length >= 2 && !!libRow,
+   main.querySelectorAll(".path-doors .path-door[data-door]").length === 4 && !!libRow,
    "not Plan's Home - everything below measures nothing");
 const lib = await import(B + "views/library.js");
 main.innerHTML = lib.render(); lib.onMount();

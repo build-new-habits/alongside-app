@@ -1,6 +1,16 @@
 /**
  * data/line-icons.js
- * 05 Oct 2026 v2
+ * 28 Oct 2026 v3
+ *
+ * v3 - STAGE PATH P-4 (blueprint Session 4, touch-once for this file: every
+ *   icon Sessions 4 to 8 draw). The doors: heart (Move to feel better; Get
+ *   stronger, Keep moving and Stretch reuse strength, walk and mobility).
+ *   The feelings, by the names data/feel-programmes.js gives them:
+ *   mountain (Grounded), wave (Calmer), battery (Worn out), sun (Wake up),
+ *   moon (Ready for sleep); sparkle (Surprise me), fresh (A fresh one for
+ *   me), unsure (Help me choose). Places: gym, outside (home exists).
+ *   The finish and the card: play (Carry on), less (Less often), keep
+ *   (Keep to repeat), link (Find a video on YouTube).
  *
  * v2 - D-6 WEEK-SHAPE. week: a calendar page, for Your week.
  *
@@ -40,6 +50,22 @@ const PATHS = {
   week:     '<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4M8 14h2M14 14h2M8 17h2"/>',
   rest:     '<path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/>',
   chevron:  '<path d="M9 6l6 6-6 6"/>',
+  // STAGE PATH P-4 (v3)
+  heart:    '<path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"/>',
+  mountain: '<path d="M3 19l6-10 4 6 3-4 5 8z"/>',
+  wave:     '<path d="M3 9c2-2 4-2 6 0s4 2 6 0 4-2 6 0M3 15c2-2 4-2 6 0s4 2 6 0 4-2 6 0"/>',
+  battery:  '<rect x="2" y="8" width="17" height="8" rx="2"/><path d="M22 11v2M5.5 11v2"/>',
+  sun:      '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+  moon:     '<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>',
+  sparkle:  '<path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5L18 18M6 18l2.5-2.5M15.5 8.5L18 6"/>',
+  fresh:    '<path d="M4 12a8 8 0 0 1 14-5.3M20 12a8 8 0 0 1-14 5.3M18 3v4h-4M6 21v-4h4"/>',
+  unsure:   '<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-.9.8-.9 1.5V14M12 17h.01"/>',
+  gym:      '<path d="M6 7v10M18 7v10M3 10v4M21 10v4M6 12h12"/>',
+  outside:  '<path d="M12 3l5 8h-3l4 6H6l4-6H7zM12 17v4"/>',
+  play:     '<path d="M8 5v14l11-7z"/>',
+  less:     '<circle cx="12" cy="12" r="9"/><path d="M8 12h8"/>',
+  keep:     '<path d="M6 3h12v18l-6-4-6 4z"/>',
+  link:     '<path d="M14 4h6v6M20 4l-9 9M18 14v6H4V6h6"/>',
 };
 
 /** An icon as inline SVG, decorative. Unknown names draw nothing. */

@@ -1,5 +1,16 @@
 /**
  * tools/verify-home-plan.mjs
+ * 28 Oct 2026 v4
+ *
+ * v4 - STAGE PATH P-4 re-point (none loosened; Graeme approved mock-up v9,
+ *   28 Oct). TEST 1 and 2 are the purpose-first Home: one Today card with
+ *   one action (filled), four doors below none filled, the arc said as a
+ *   line; each way in reaches its screen in one tap (a door opens its own
+ *   steps, path). Carry on later, the cold reopen and Free are unchanged
+ *   in meaning, read from the Plan's Today card. TEST 5 finishes early from
+ *   inside the session (End it here and save), because the card has one
+ *   action now; still one part-session saved and on to the finish.
+ *
  * 12 Oct 2026 v3
  *
  * v3 - A-1 PLAN-HOME-PRUNE (Graeme approved the mock-up, 12 Oct). REVERSALS,
@@ -72,7 +83,7 @@ const tapSet = sel => { toCapture(); return tap(sel); };
 function fixture({ tier = "personal", checkedIn = false } = {}) {
   if (document.querySelector("#exit-workout-btn")) { tap("#exit-workout-btn"); document.querySelector("#exit-confirm-discard")?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true })); }
   localStorage.clear(); store.init();
-  store.set("onboardingComplete", true); store.set("name", "Test"); store.set("tier", tier);
+  store.set("onboardingComplete", true); store.set("name", "Test"); store.set("tier", tier); store.setDayOpen("checked");   // v4: the day's question answered
   store.set("safetyAckLog", Array.from({ length: 5 }, () => ({ at: new Date().toISOString(), textVersion: HURT_AND_ACHE_VERSION, surface: "fixture" })));
   if (checkedIn) {
     const key = new Date().toISOString().split("T")[0];
@@ -100,25 +111,25 @@ console.log("\nTEST 0 - Plan Home renders");
 fixture(); home();
 ok("0a. the greeting is there", /Test/.test(txt(main.querySelector("h1"))));
 
-// ── 1. THREE DOORS ──────────────────────────────────────────────────────
-console.log("\nTEST 1 - three doors, nothing else in front of the choice");
-const doors = [...main.querySelectorAll(".home-doors .home-door")];
-const lead = main.querySelector(".home-today [data-action='start-today']");
-ok("1a. Tell me what to do leads in the Today card, the other two doors below, in order", !!lead && txt(lead) === "Tell me what to do" &&
-   doors.map(d => txt(d.querySelector(".home-door__title"))).join(" | ") === "I know what I want | Make it up as I go", doors.map(txt).join(" | "));
-ok("1b. the lead is the filled one, and no door is", lead?.classList.contains("btn-primary") && !doors.some(d => d.classList.contains("home-door--primary")));
-ok("1c. no rooms, no tile grid, no reference rows", !main.querySelector(".club-rooms, .club-row, .today-doors, .today-reference, .today-ref-row"));
-ok("1d. what Tell me what to do does is said on the card", /Three quick questions, then today.s plan/.test(txt(main.querySelector(".home-today"))));
-ok("1e. the arc is one line in the card", !!main.querySelector(".home-today [data-route='arc-setup'], .home-today [data-route='stretch-arc']") && !main.querySelector(".today-arc, .home-arc"));
+// ── 1. FOUR DOORS (v4: Stage PATH, mock-up v9) ──────────────────────────
+console.log("\nTEST 1 - one Today card, four doors, the Library: nothing else in front of the choice");
+const doors = [...main.querySelectorAll(".path-doors .path-door[data-door]")];
+const lead = main.querySelector(".path-today .path-today__go");
+ok("1a. the Today card leads with one action; four doors below, in order", !!lead && main.querySelectorAll(".path-today button").length === 1 &&
+   doors.map(d => txt(d.querySelector(".path-door__t"))).join(" | ") === "Get stronger | Keep moving | Stretch | Move to feel better", doors.map(txt).join(" | "));
+ok("1b. the card's action is the filled one, and no door is", lead?.classList.contains("btn-primary") && !doors.some(d => d.classList.contains("btn-primary")));
+ok("1c. no rooms, no tile grid, no reference rows, no old doors", !main.querySelector(".club-rooms, .club-row, .today-doors, .today-reference, .today-ref-row, .home-doors"));
+ok("1d. what the card's action does is said on the card", /Three quick taps/.test(txt(main.querySelector(".path-today"))) && txt(lead) === "Check in");
+fixture(); store.set("arc", { active: true, aimId: "sport-without-flaring", startedAt: new Date(Date.now() - 15 * 864e5).toISOString(), strands: [] }); home();
+ok("1e. the arc is one line, said", !!main.querySelector(".path-arcline") && !main.querySelector(".today-arc, .home-arc, [data-route='stretch-arc']"));
 
-// ── 2. EACH DOOR, ONE TAP ───────────────────────────────────────────────
-console.log("\nTEST 2 - every door and link reaches its screen in one tap");
+// ── 2. EACH WAY IN, ONE TAP ─────────────────────────────────────────────
+console.log("\nTEST 2 - every way in reaches its screen in one tap");
 const oneTap = (sel, fixtureOpts = {}) => { fixture(fixtureOpts); home(); navs = []; tap(sel); return navs.slice(); };
-ok("2a. Tell me what to do, not checked in: the check-in", JSON.stringify(oneTap('[data-action="start-today"]')) === '["checkin"]' &&
-   store.get("pendingDoorRoute") === "coach-proposal");
-ok("2b. Tell me what to do, already checked in: straight to the plan", JSON.stringify(oneTap('[data-action="start-today"]', { checkedIn: true })) === '["coach-proposal"]');
-ok("2c. I know what I want", JSON.stringify(oneTap('[data-action="know-what"]')) === '["know-what"]');
-ok("2d. Make it up as I go", JSON.stringify(oneTap('[data-action="as-i-go"]')) === '["capture"]');
+ok("2a. not checked in: Check in opens the check-in", JSON.stringify(oneTap('.path-today [data-action="checkin"]')) === '["checkin"]');
+ok("2b. checked in: Show me today's plan goes straight to the plan", JSON.stringify(oneTap('.path-today [data-action="path-go"]', { checkedIn: true })) === '["coach-proposal"]');
+for (const d of ["stronger", "moving", "stretch", "feel"])
+  ok(`2c. the ${d} door opens its steps`, JSON.stringify(oneTap(`.path-door[data-door="${d}"]`)) === '["path"]' && fakeRouter.pathStart?.door === d);
 { fixture(); home(); navs = [];
   main.querySelector('[data-route="library"]')?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }));
   ok("2e. Library", navs[0] === "library", JSON.stringify(navs)); }
@@ -134,10 +145,10 @@ ok("3a. the exit sheet offers Carry on later", !!later && /Carry on later/.test(
 later?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }));
 ok("3b. it goes Home and saves nothing as done", navs.at(-1) === "today" && (store.get("activityLog") || []).length === 0);
 home(["workout"]);
-const card = main.querySelector(".home-carry");
+const card = main.querySelector('.path-today[data-state="carry"]');   // v4
 ok("3c. Home leads with the Carry-on card: the session and what is next", !!card && /Upper Body/.test(txt(card)) && /Next: Press/.test(txt(card)) && /2 of 3/.test(txt(card)), txt(card));
-ok("3d. the doors are still there, under \"Or instead\"", /Or instead/.test(txt(main)) && main.querySelectorAll(".home-doors .home-door").length === 3 &&
-   !main.querySelector(".home-door--primary"));
+ok("3d. the doors are still there, under \"Or instead\"", /Or instead/.test(txt(main)) && main.querySelectorAll(".path-doors .path-door[data-door]").length === 4 &&
+   !main.querySelector(".path-door.btn-primary"));
 navs = [];
 tap('[data-action="carry-on"]');
 ok("3e. Carry on resumes at the same exercise and set", navs[0] === "workout" && main.querySelector(".exercise-name")?.textContent === "Press" && /Set 2 of 3/.test(txt(main)),
@@ -151,31 +162,33 @@ store.set("lastProposalDate", new Date().toISOString());   // accepted a moment 
 store.set("lastProposalType", "door-1");
 navs = [];
 home([]);                                                    // a cold open: nothing behind it
-ok("4a. Home renders with the Carry-on card", !!main.querySelector(".home-carry") && !navs.includes("home-threshold"), JSON.stringify(navs));
+ok("4a. Home renders with the Carry-on card", !!main.querySelector('.path-today[data-state="carry"]') && !navs.includes("home-threshold"), JSON.stringify(navs));
 fixture();
 store.set("lastProposalDate", new Date().toISOString()); store.set("lastProposalType", "door-1");
 navs = []; home([]);
 ok("4b. REVERSAL: with nothing to carry on, the cold-open bounce still works (EXIT-HOME)", navs.includes("home-threshold"), JSON.stringify(navs));
 
 // ── 5. FINISH HERE ──────────────────────────────────────────────────────
-console.log("\nTEST 5 - Finish here saves what was done and goes to the finish");
+console.log("\nTEST 5 - finishing early saves what was done and goes to the finish (v4: from inside the session; the card has one action)");
 fixture(); startSession();
 tapSet("#wo-set-done-btn"); tapSet("#wo-set-done-btn"); tapSet("#wo-set-done-btn"); tapSet("#complete-exercise-btn");
 tap("#exit-workout-btn"); document.querySelector("#exit-confirm-later")?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }));
 home(["workout"]);
+ok("5pc. the card has no Finish here and save of its own", !main.querySelector('[data-action="carry-finish"]'));
 navs = [];
-tap('[data-action="carry-finish"]');
+tap('[data-action="carry-on"]');
+tap("#exit-workout-btn"); document.querySelector("#exit-confirm-leave")?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }));
 await wait(50);
 const log = store.get("activityLog") || [];
 ok("5a. one part-session saved with what was done, and on to the finish", navs.includes("reflect") && log.length === 1 && log[0].status === "partial" && log[0].exercisesCount === 1,
    `${JSON.stringify(navs)} ${JSON.stringify(log[0] || {})}`);
 home(["reflect"]);
-ok("5b. and nothing is left to carry on", !main.querySelector(".home-carry"));
+ok("5b. and nothing is left to carry on", !main.querySelector('.path-today[data-state="carry"]'));
 
 // ── 6. FREE ─────────────────────────────────────────────────────────────
 console.log("\nTEST 6 - free Home is unchanged (P5 cross-checks it)");
 fixture({ tier: "free" }); home();
-ok("6a. free keeps its chooser, not the three doors", !main.querySelector(".home-door") && !!main.querySelector(".today-doors"));
+ok("6a. free keeps its chooser, not the Plan's doors", !main.querySelector(".home-door, .path-door") && !!main.querySelector(".today-doors"));
 
 console.log("");
 if (fails) { console.log(`HOME-PLAN: ${fails} FAILED, ${passes} passed`); process.exit(1); }

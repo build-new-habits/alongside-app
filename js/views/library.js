@@ -1,7 +1,13 @@
 /**
  * library.js - Library Page
  *
- * 17 Oct 2026 v19
+ * 28 Oct 2026 v20
+ *
+ * v20 - STAGE PATH P-4. I know what I want and Make it up as I go left the
+ *   Plan's Home with the three mode doors (mock-up v9); here they are, one
+ *   tap on from Home's Library row, as A-1 required of everything that
+ *   leaves Home (two taps, verify-clubshell 2a). The Plan's only, like
+ *   Classes and Your week; Free's Library is as it was.
  *
  * v19 - W6-9 SMALL-6. Log what I did hands its choice to the activity log
  *   (presetLogActivity), which reads it.
@@ -441,6 +447,25 @@ const GUIDED_CATEGORIES = [
     directTarget: "classes",
     planOnly:    true
   },
+  // STAGE PATH P-4 (v20). The two mode doors that left the Plan's Home.
+  {
+    id:          "know-what",
+    label:       "I know what I want",
+    icon:        "",
+    description: "Choose the kind of session and how long",
+    sessions: [],
+    directTarget: "know-what",
+    planOnly:    true
+  },
+  {
+    id:          "as-i-go",
+    label:       "Make it up as I go",
+    icon:        "",
+    description: "Log each move and set as you do it",
+    sessions: [],
+    directTarget: "capture",
+    planOnly:    true
+  },
   {
     id:          "week",
     label:       "Your week",
@@ -547,6 +572,7 @@ const CATEGORY_LOOK = {
   yoga: ["yoga", "violet"], mindful: ["mind", "green"], practices: ["breath", "green"],
   prescribed: ["list", "teal"], coach: ["star", "teal"],
   mobility: ["mobility", "violet"], classes: ["classes", "rose"], week: ["week", "teal"],
+  "know-what": ["choose", "teal"], "as-i-go": ["pencil", "teal"],   // v20: sessions you make yourself
 };
 
 /** The category tiles, shared by the Library page and the old landing. */
