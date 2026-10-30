@@ -1,6 +1,9 @@
 /**
  * views/plan-home.js
- * 29 Oct 2026 v3
+ * 29 Oct 2026 v4
+ *
+ * v4 - STAGE PATH Session 6 (one line): the coach's choice tells Today's
+ *   plan its door (router.planDoor), so the finish and Lately know it.
  *
  * v3 - STAGE PATH Session 5 (a touch-once exception, recorded: Sessions 4
  *   and 5 release together). What the person told the app today is read
@@ -328,6 +331,7 @@ export function goToSuggestion(router, opts = {}) {
   store.set("requestedSessionType", s.sessionType || "full");
   store.set("requestedLocation", s.place || null);
   router.planReason = s.reason;   // Today's plan says why, once (coach-proposal.js, Session 5)
+  router.planDoor = s.door || null;   // and which door it is, for the finish (Session 6)
   router.navigate("coach-proposal", opts);
 }
 

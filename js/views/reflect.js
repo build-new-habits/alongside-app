@@ -1,6 +1,18 @@
 /**
  * reflect.js - Reflect Screen
  *
+ * 29 Oct 2026 v20
+ *
+ * v20 - STAGE PATH Session 6 (a touch-once exception: exports only, no
+ *   behaviour changed; Free's finish is gated unchanged). The Plan's finish
+ *   (views/plan-finish.js) keeps four things from this one at Graeme's
+ *   choice (29 Oct): the pain check when something is sore, the occasional
+ *   reflection prompt, Your arc today, Add a note. It uses this file's own
+ *   pieces rather than copies: PAIN_OPTIONS, buildSummary, arcTodayLine,
+ *   the empathy cadence (getSessionCount, getEmpathyPromptForSession,
+ *   fireEmpathyPrompt, skipEmpathyPrompt) and useAnswersForEmpathy(), which
+ *   hands it that screen's answers, so a prompt is chosen the same way.
+ *
  * 17 Oct 2026 v19
  *
  * v19 - W6-9 SMALL-6. The finish screen's moment controls (the baseline
@@ -286,7 +298,7 @@ const FEEL_OPTIONS = {
   "morning-session":[{ v: "strong", l: "Felt strong" }, { v: "right", l: "About right" }, { v: "hard", l: "Struggled" }],
 };
 
-const PAIN_OPTIONS = [
+export const PAIN_OPTIONS = [
   { v: "none",    l: "No pain"           },
   { v: "better",  l: "Better than usual" },
   { v: "same",    l: "About the same"    },
@@ -331,7 +343,7 @@ const EMPATHY_MIN_SESSIONS = 2; // EMP-4: was 3. See getEmpathyPromptForSession(
 const EMPATHY_TIME_GAP_DAYS     = 10;
 const EMPATHY_TIME_MIN_SESSIONS = 2;
 
-function getSessionCount() {
+export function getSessionCount() {
   // "Session count" per the spec is unit of experience, not calendar
   // time, and the spec's own language ("after any completed session")
   // treats every activityLog entry as a countable session — consistent
@@ -452,7 +464,7 @@ function _firstSessionAt() {
   } catch { return null; }
 }
 
-function getEmpathyPromptForSession(sessionCount) {
+export function getEmpathyPromptForSession(sessionCount) {
   // ── EMP-4, 13 Aug 2026: the cadence is now time-aware as well as
   // session-aware. ──────────────────────────────────────────────────
   //
@@ -524,7 +536,7 @@ function getEmpathyPromptForSession(sessionCount) {
   };
 }
 
-function fireEmpathyPrompt(sessionCount) {
+export function fireEmpathyPrompt(sessionCount) {
   const stageNum = store.get("empathyTransferStage") || 1;
   const atStage  = (store.get("empathyPromptsAtStage") || 0) + 1;
   const fired    = (store.get("empathyPromptsFired") || 0) + 1;
@@ -566,7 +578,7 @@ function fireEmpathyPrompt(sessionCount) {
   }
 }
 
-function skipEmpathyPrompt(sessionCount) {
+export function skipEmpathyPrompt(sessionCount) {
   const skips = (store.get("empathyPromptSkips") || 0) + 1;
   store.set("empathyPromptSkips", skips);
 
@@ -865,6 +877,9 @@ export function render() {
  * session today may have worked it too. Never a count. The Plan's only:
  * Free has no arc.
  */
+export { _arcToday as arcTodayLine };
+/** v20. Another finish's answers, for the empathy cadence (plan-finish.js). */
+export function useAnswersForEmpathy(feel, mood) { feelAnswer = feel ?? null; moodAfter = typeof mood === "number" ? mood : null; }
 function _arcToday() {
   if (!isPremium()) return "";
   const arc = store.get("arc") || {};

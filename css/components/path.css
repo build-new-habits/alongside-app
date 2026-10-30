@@ -1,6 +1,10 @@
 /* ============================================================
    components/path.css
-   29 Oct 2026 v3
+   29 Oct 2026 v4
+
+   v4 - STAGE PATH Session 6 (P-6, P-12): one proposal shape (Swap beside
+   each movement's video link; each figure on Today's plan's rows), the
+   Plan's finish (.plan-finish, .pf-*), the player's halfway check.
 
    v3 - STAGE PATH Session 5 (P-5): the door routes (views/path.js) and,
    on Today's plan, What I've adjusted with Change my check-in
@@ -281,3 +285,30 @@
   color: var(--color-text); font: inherit; font-size: var(--text-base); text-decoration: underline; cursor: pointer;
 }
 .cp-adjusted__redo:focus-visible { outline: 3px solid var(--color-border-focus); outline-offset: 2px; }
+
+/* ── One proposal shape (Session 6) ──────────────────────────────── */
+.path-mv__acts { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2); }
+.path-mv__swap { min-height: 44px; min-width: 64px; }
+.cp-plan__fig { flex: none; width: calc(56px * min(var(--user-text-scale, 1), 1.2)); }
+.cp-plan__fig .xfig { display: grid; grid-template-columns: 1fr; margin: 0; }
+.cp-plan__fig .xfig__frame { grid-area: 1 / 1; max-width: none; width: 100%; padding: 2px; border-radius: 10px; background: var(--color-bg-deep); }
+.cp-plan__fig .xfig__frame:not(:first-child), .cp-plan__fig .xfig__cap { display: none; }
+
+/* ── The Plan's finish (views/plan-finish.js) ─────────────────────── */
+.plan-finish { display: flex; flex-direction: column; gap: var(--space-4); max-width: 480px; margin: 0 auto; }
+.plan-finish h1 { margin: 0; }
+.plan-finish h1:focus { outline: none; }
+.pf-fb { display: flex; flex-direction: column; gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
+.pf-fb__row { display: flex; flex-direction: column; gap: var(--space-2); padding: var(--space-3); border: 1px solid var(--color-border); border-radius: var(--radius-lg, 16px); background: var(--color-surface); }
+.pf-fb__nm { font-size: var(--text-base); font-weight: 700; color: var(--color-text); }
+.pf-fb__btns { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.pf-tog {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 14px; border-radius: 999px; cursor: pointer;
+  border: 1.5px solid var(--color-border); background: var(--color-bg); color: var(--color-text); font: inherit; font-size: var(--text-sm);
+}
+.pf-tog[aria-pressed="true"] { background: var(--color-text); border-color: var(--color-text); color: var(--color-bg); font-weight: 700; }
+.pf-tog:focus-visible { outline: 3px solid var(--color-border-focus); outline-offset: 2px; }
+.pf-tog .line-icon { flex: none; }
+
+/* The player's halfway check (workout.js v36, the Plan). */
+.wo-halfway .coach-message-text { margin: var(--space-3) 0 var(--space-4); }

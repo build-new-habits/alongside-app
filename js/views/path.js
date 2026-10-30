@@ -1,6 +1,19 @@
 /**
  * views/path.js
- * 29 Oct 2026 v1
+ * 29 Oct 2026 v2
+ *
+ * v2 - STAGE PATH Session 6 (P-6; P-12, Graeme 29 Oct: "I like the new
+ *   design with the stickmen as part of the proposal with the easy swap.
+ *   There needs to be this consistency applied to all"). One proposal
+ *   shape: a programme, a routine, a fresh one and a kept session all show
+ *   each movement with its stick figure and a Swap (path-context
+ *   swapOptionsFor: same kind, same purpose, never a Not again, never one
+ *   today's sore areas rule out), then Start. Make it mine keeps a
+ *   programme or routine, with any swaps, in Saved sessions, for its door
+ *   (spec §5 "Make it mine", edit a copy). A kept session opens here from
+ *   Saved sessions (router.pathStart.saved) and starts with its own doses.
+ *   Build my session tells Today's plan which door it came from
+ *   (router.planDoor), so the finish and Lately know.
  *
  * STAGE PATH Session 5 (P-5 DOOR-ROUTES; blueprint v6 D3, spec §5), as
  * mock-up v10 (Graeme, 29 Oct: "Yep. I like v10"). Every step behind the
@@ -53,8 +66,8 @@ import { AREAS, ROUTINES } from "../data/stretch-routines.js";
 import { EXERCISES } from "../data/exercises/index.js";
 import { PATH_MOVEMENTS } from "../data/exercises/path_movements.js";
 import { suggestFeeling, pickProgramme, pickSurprise, routinesFor, STRETCH_AREA_ZONES } from "../data/path-engine.js";
-import { checkinToday, lastPlace, lowMood, shownAdjustments, freshPracticeFor } from "../data/path-context.js";
-import { savedSessions } from "../data/saved-sessions.js";
+import { checkinToday, lastPlace, lowMood, shownAdjustments, freshPracticeFor, swapOptionsFor } from "../data/path-context.js";
+import { savedSessions, saveSession, resolveSavedSession } from "../data/saved-sessions.js";
 import { setTodaysLength, lengthCatForToday } from "../data/session-length.js";
 
 const BY_ID = new Map([...EXERCISES, ...PATH_MOVEMENTS].map(e => [e.id, e]));
@@ -116,19 +129,38 @@ export function stepsFor(r, floor) {
 }
 /** The one player, as Saved sessions starts it: the movements, in order, each for its minutes. */
 export function startPractice(router, practice, { door, feeling = null } = {}) {
-  const exercises = practice.steps.map(s => {
-    const e = BY_ID.get(s.id);
-    return e ? { ...e, reps: null, sets: 1, duration: Math.round(s.mins * 60), pathNote: s.note || null } : null;
-  }).filter(Boolean);
+  // A kept session keeps its own doses (sets, reps, time); a programme or routine plays each for its minutes.
+  const exercises = practice.saved
+    ? practice.steps.map(s => s.entry).filter(Boolean)
+    : practice.steps.map(s => {
+      const e = BY_ID.get(s.id);
+      return e ? { ...e, reps: null, sets: 1, duration: Math.round(s.mins * 60), pathNote: s.note || null } : null;
+    }).filter(Boolean);
   if (!exercises.length) return;
+  const session = { id: practice.id, title: practice.name, duration: practice.minutes ? `${practice.minutes} mins` : null, exercises,
+                    sessionType: practice.sessionType || (door === "stretch" ? "stretch" : null), door, feeling };
+  if (practice.place) session.place = practice.place;
+  if (!practice.saved) session.programmeId = practice.id;
   store.set("generatedSession", {
-    session: { id: practice.id, title: practice.name, duration: `${practice.minutes} mins`, exercises,
-               sessionType: door === "stretch" ? "stretch" : null, door, feeling, programmeId: practice.id },
+    session,
     builtAt: new Date().toISOString(),
-    inputs: { door, feeling, programmeId: practice.id },
+    inputs: practice.saved ? { savedSessionId: practice.id, door } : { door, feeling, programmeId: practice.id },
   });
   store.set("usingGeneratedSession", true);
   router.navigate("workout");
+}
+
+/** A kept session as a proposal: its movements, each with its own dose. */
+export function practiceFromSaved(rec) {
+  const { exercises } = resolveSavedSession(rec);
+  const dose = e => { const sets = Number(e.sets) || 1; return e.reps ? `${sets} \u00d7 ${e.reps}` : e.duration ? `About ${Math.max(1, Math.round(e.duration / 60))} min` : ""; };
+  return { id: rec.id, name: rec.name, minutes: rec.durationMins || null, sessionType: rec.sessionType || null, place: rec.place || null, saved: true,
+           steps: exercises.map(e => ({ id: e.id, entry: e, dose: dose(e) })) };
+}
+/** The door a kept session belongs to: its own, or its kind's. */
+export function doorOfSaved(rec) {
+  if (DOOR[rec?.purpose]) return rec.purpose;
+  return ["stretch", "mobility"].includes(rec?.sessionType) ? "stretch" : rec?.sessionType === "cardio" ? "moving" : "stronger";
 }
 
 let lastDoor = null;   // Back to this view without a hand-off starts at this door's first step
@@ -157,6 +189,10 @@ export function PathView(router) {
     lastDoor = door;
     trail = [];
     st = { door };
+    if (start?.saved) {
+      const rec = savedSessions().find(x => x.id === start.saved);
+      if (rec) { step = "prog"; st = { door, practice: practiceFromSaved(rec), fromSaved: true }; paint(); return; }
+    }
     if (door === "feel" && start?.feeling && FEELINGS[start.feeling]) {
       // The coach's choice: its feeling's programmes behind, its programme open.
       st.feeling = start.feeling; st.markId = start.programmeId || null;
@@ -298,11 +334,12 @@ export function PathView(router) {
 
     // A programme or a routine, before Start
     prog() {
-      const p = st.practice, kind = st.door === "stretch" ? "violet" : "green";
-      const icon = st.door === "stretch" ? "mobility" : (FEELINGS[st.feeling]?.icon || "heart");
+      const p = st.practice, kind = DOOR[st.door].kind;
+      const icon = st.door === "feel" ? (FEELINGS[st.feeling]?.icon || "heart") : DOOR[st.door].icon;
       const line = st.note || st.reason || (st.surprise ? "A surprise that fits today." : "");
       const adj = st.fresh || st.fromCoach ? shownAdjustments() : [];
-      const meta = [`About ${p.minutes} minutes`, !st.fresh && STYLE[p.style], !st.fresh && POSITION[p.position]].filter(Boolean).join(" · ");
+      const meta = [p.minutes ? `About ${p.minutes} minutes` : "", !st.fresh && STYLE[p.style], !st.fresh && POSITION[p.position]].filter(Boolean).join(" · ");
+      const ids = p.steps.map(s => s.id);
       return `${heading(p.name, icon, kind)}
         ${line ? `<p class="${st.note ? "path-note" : "path-coachline"}">${esc(line)}</p>` : ""}
         <p class="path-small">${esc(meta)}</p>
@@ -312,14 +349,18 @@ export function PathView(router) {
         <button type="button" class="btn btn-primary btn-full" id="path-start">Start</button>
         ${st.fromCoach ? `<button type="button" class="path-link" id="path-redo">Change my check-in</button>` : ""}
         ${st.door === "feel" && lowMood() ? `<button type="button" class="path-link" id="path-wellbeing">Or something from Wellbeing</button>` : ""}
+        ${!p.saved ? `<button type="button" class="path-link" id="path-mine"${st.kept ? " disabled" : ""}>${st.kept ? "Kept in Saved sessions" : "Make it mine"}</button>` : ""}
         <h2 class="path-adj__lbl" id="path-mvs-h">What\u2019s in it</h2>
         <ol class="path-mvs" aria-labelledby="path-mvs-h">${p.steps.map((s, i) => {
           const e = BY_ID.get(s.id) || {};
           const q = encodeURIComponent(e.youtube || `${e.name || s.id} how to`);
           return `<li class="path-mv">${renderFigure(s.id) || ""}
-            <p class="path-mv__nm">${i + 1}. ${esc(nameOf(s.id))}</p>
-            <p class="path-small">${s.mins} min${s.note ? ` · ${esc(s.note)}` : ""}</p>
-            <a class="path-mv__yt" href="https://www.youtube.com/results?search_query=${q}" target="_blank" rel="noopener">Find a video on YouTube<span class="sr-only"> for ${esc(nameOf(s.id))} (opens YouTube, a search)</span></a>
+            <p class="path-mv__nm" id="path-mv-${i}">${i + 1}. ${esc(nameOf(s.id))}</p>
+            <p class="path-small">${s.dose ? esc(s.dose) : `${s.mins} min`}${s.note ? ` · ${esc(s.note)}` : ""}</p>
+            <span class="path-mv__acts">
+              <a class="path-mv__yt" href="https://www.youtube.com/results?search_query=${q}" target="_blank" rel="noopener">Find a video on YouTube<span class="sr-only"> for ${esc(nameOf(s.id))} (opens YouTube, a search)</span></a>
+              ${swapOptionsFor(s.id, { door: st.door, feeling: st.feeling, exclude: ids }).length ? `<button type="button" class="btn btn-secondary path-mv__swap" id="path-swap-${i}" data-swap="${i}" aria-describedby="path-mv-${i}">Swap</button>` : ""}
+            </span>
           </li>`; }).join("")}</ol>
         ${(p.easeOff || []).length ? `<div class="path-adj"><p class="path-adj__lbl">If you need it easier</p><ul>${p.easeOff.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>` : ""}
 `;
@@ -333,6 +374,37 @@ export function PathView(router) {
   }
 
   const freshPractice = () => freshPracticeFor({ feeling: st.feeling, minutes: Number(st.flen) || 10 });
+
+  /** Swap one movement for the next of its kind; said, and focus kept on the row's Swap. */
+  function swapAt(i) {
+    const p = st.practice, from = p.steps[i];
+    const opts = swapOptionsFor(from.id, { door: st.door, feeling: st.feeling, exclude: p.steps.map(s => s.id) });
+    if (!opts.length) return;
+    const to = opts[0];
+    const steps = p.steps.map((s, j) => {
+      if (j !== i) return s;
+      if (p.saved) {
+        const entry = { ...to, section: s.entry?.section, sets: s.entry?.sets ?? to.sets, reps: s.entry?.reps ?? to.reps, duration: s.entry?.duration ?? to.duration };
+        return { id: to.id, entry, dose: s.dose };
+      }
+      return { id: to.id, mins: s.mins };
+    });
+    st = { ...st, practice: { ...p, steps }, kept: false };
+    paint(false);
+    root.querySelector(`#path-swap-${i}`)?.focus();
+    say(`Swapped ${nameOf(from.id)} for ${nameOf(to.id)}.`);
+  }
+
+  /** Make it mine: this version, swaps and all, kept in Saved sessions for this door. */
+  function keepMine() {
+    const p = st.practice;
+    const exercises = p.steps.map(s => BY_ID.get(s.id)).filter(Boolean)
+      .map((e, j) => ({ ...e, sets: 1, reps: null, duration: Math.round((p.steps[j].mins || 1) * 60) }));
+    const res = saveSession(`${p.name}, my version`, { title: p.name, exercises, door: st.door, durationMins: p.minutes,
+      sessionType: st.door === "stretch" ? "stretch" : null });
+    if (res?.ok) { st = { ...st, kept: true }; paint(false); root.querySelector("#path-mine")?.focus(); say(`Kept in Saved sessions as ${p.name}, my version.`); }
+    else say(res?.reason === "dupe" ? "You already have one kept under that name." : "That could not be kept.");
+  }
 
   // ── Presses ────────────────────────────────────────────────────────────
   function onRow(v) {
@@ -352,6 +424,7 @@ export function PathView(router) {
           store.set("requestedSessionType", "stretch");
           store.set("sessionZoneFocus", [...(STRETCH_AREA_ZONES[st.area] || [])]);
           setTodaysLength("quick");
+          router.planDoor = "stretch";
           router.navigate("coach-proposal"); return;
         }
         if (v === "saved") { router.savedStart = { purpose: "stretch", place: null }; router.navigate("saved-sessions"); return; }
@@ -402,9 +475,12 @@ export function PathView(router) {
       store.set("requestedSessionType", sessionTypeFor(st.door, st.part));
       store.set("requestedLocation", st.place);
       setTodaysLength(st.blen || "short");
+      router.planDoor = st.door;   // P-6: the door goes with the session it starts
       router.navigate("coach-proposal");
     });
     root.querySelector("#path-start")?.addEventListener("click", () => startPractice(router, st.practice, { door: st.door, feeling: st.door === "feel" ? st.feeling : null }));
+    root.querySelectorAll("[data-swap]").forEach(b => b.addEventListener("click", () => swapAt(Number(b.dataset.swap))));
+    root.querySelector("#path-mine")?.addEventListener("click", keepMine);
     root.querySelector("#path-wellbeing")?.addEventListener("click", () => router.navigate("noticing"));
     root.querySelector("#path-redo")?.addEventListener("click", () => {
       // As Home's row: the check-in, then straight on to the coach's choice (today.js reads pathStart.coach).

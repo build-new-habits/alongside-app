@@ -1,5 +1,14 @@
 /**
  * saved-sessions.js
+ * 29 Oct 2026 v5
+ *
+ * v5 - STAGE PATH Session 6 (P-6; blueprint C3). A session kept on the Plan
+ *   keeps the door it came through and where it was done (purpose, place:
+ *   from the session itself, built.door and built.place), so Saved sessions
+ *   can show a door its own (path.js, saved-sessions view v9). A kept
+ *   programme or routine resolves its movements from the Plan's own as well
+ *   (exercises/path_movements.js): they were dropped as missing.
+ *
  * 30 Sep 2026 v4
  *
  * v4 - W3-16 ARC-AND-SAVED (persona Wave 3, 2.15; Schema v1.86). The kind was
@@ -86,6 +95,10 @@
 import { store }      from "../store.js";
 import { isPremium }  from "../auth.js";
 import { EXERCISES }  from "./exercises/index.js";
+import { PATH_MOVEMENTS } from "./exercises/path_movements.js";
+
+const _PURPOSES = ["stronger", "moving", "stretch", "feel"];
+const _PLACES = ["home", "gym"];
 
 /** The most a name may be. Long enough for a real sentence, short
  *  enough that the card does not become the list. */
@@ -161,6 +174,9 @@ export function saveSession(name, built) {
     createdAt:    new Date().toISOString(),
     lastUsedAt:   null
   };
+  // P-6 (C3). The door and place it came from, when the session says; absent otherwise.
+  if (_PURPOSES.includes(built.door)) record.purpose = built.door;
+  if (_PLACES.includes(built.place)) record.place = built.place;
 
   store.set("savedSessions", [...list(), record]);
   return { ok: true, saved: record };
@@ -286,7 +302,7 @@ export function resolveSavedSession(saved) {
   // over it: library words and corrections, the person's doses.
   const doses = saved.doses && typeof saved.doses === "object" ? saved.doses : {};
   const found = saved.exerciseIds
-    .map(id => { const e = EXERCISES.find(x => x.id === id); return e ? (doses[id] ? { ...e, ...doses[id] } : e) : null; })
+    .map(id => { const e = EXERCISES.find(x => x.id === id) || PATH_MOVEMENTS.find(x => x.id === id); return e ? (doses[id] ? { ...e, ...doses[id] } : e) : null; })
     .filter(Boolean);
   return { exercises: found, missing: saved.exerciseIds.length - found.length };
 }

@@ -1,6 +1,11 @@
 /**
  * js/views/saved-sessions.js
- * 29 Oct 2026 v9
+ * 29 Oct 2026 v10
+ *
+ * v10 - STAGE PATH Session 6 (P-12: one proposal shape on the Plan). Start
+ *   on the Plan opens the session as a proposal first (views/path.js: each
+ *   movement with its figure and Swap, then Start), as every other way to a
+ *   session now does; it starts with its own doses. Free: no saved sessions.
  *
  * v9 - STAGE PATH Session 5 (P-5). Reached from a door on the Plan's Home
  *   (views/path.js sets router.savedStart = { purpose, place }, read once),
@@ -151,6 +156,7 @@ import { store } from '../store.js';
 // fails anywhere else, which is how verify-prac1 reported the Library's
 // navigation broken and was right about the mechanism.
 import { router } from '../router.js';
+import { doorOfSaved } from './path.js';
 import { isPremium } from '../auth.js';
 import {
   savedSessions,
@@ -480,6 +486,8 @@ export function onMount() {
     btn.addEventListener('click', () => {
       const rec = savedSessions().find(s => s.id === btn.dataset.savedId);
       if (!rec) return;
+      // P-6 / P-12. The Plan: the proposal first (figures and Swap), then the player.
+      if (isPremium()) { router.pathStart = { door: doorOfSaved(rec), saved: rec.id }; router.navigate('path'); return; }
       const { exercises } = resolveSavedSession(rec);
       if (!exercises.length) return;
       // P21: starting is not doing; "last done" comes from the log.

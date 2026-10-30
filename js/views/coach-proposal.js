@@ -1,6 +1,13 @@
 /**
  * coach-proposal.js
- * 29 Oct 2026 v63
+ * 29 Oct 2026 v64
+ *
+ * v64 - STAGE PATH Session 6 (P-6, P-12: one proposal shape on the Plan;
+ *   a touch-once exception, recorded). On the Plan only: each movement's
+ *   stick figure on its row, beside Swap, as the door routes' programmes
+ *   show them; and the door the plan came through, and where it is for,
+ *   go with the session it starts (router.planDoor, read once), so the
+ *   finish, Saved sessions and Lately know it. Free unchanged.
  *
  * v63 - STAGE PATH Session 5 (P-5; mock-up v10, Graeme 29 Oct: "Yep. I like
  *   v10"). On the Plan only, Today's plan now carries what Home no longer
@@ -944,6 +951,8 @@ export function CoachProposalView(router) {
   let ackError   = '';
   // P-5. Why the coach chose this, when it did (router.planReason, read once).
   let planWhy    = null;
+  // P-6. The door this plan came through (router.planDoor, read once).
+  let planDoor   = null;
 
   // ── Mount ──────────────────────────────────────────────────────────────────
 
@@ -954,6 +963,8 @@ export function CoachProposalView(router) {
     // P-5 (the Plan). The coach's reason, and a plan coming back from Change my check-in.
     planWhy = isPremium() && router?.planReason ? String(router.planReason) : null;
     if (router) router.planReason = null;
+    planDoor = isPremium() && ['stronger', 'moving', 'stretch', 'feel'].includes(router?.planDoor) ? router.planDoor : planDoor;
+    if (router) router.planDoor = null;
     const keep = isPremium() && router?.planKeep ? router.planKeep : null;
     if (router) router.planKeep = null;
     if (keep) {
@@ -1622,6 +1633,7 @@ export function CoachProposalView(router) {
                 <li class="cp-plan__row" data-plan-index="${i}" data-exercise-id="${ex.id}"
                     data-section="${ex.section || 'main'}" data-sets="${Number(ex.sets) || 1}"
                     data-areas="${(ex.affectsAreas || []).join(',')}">
+                  ${premium ? _rowFigure(ex) : ''}
                   <button type="button" class="cp-plan__text cp-plan__open" data-preview="${i}"
                           aria-haspopup="dialog">
                     <span class="cp-plan__name">${ex.name}</span>
@@ -1639,6 +1651,12 @@ export function CoachProposalView(router) {
             }).join('')}
           </ol>`).join('')}
       </section>`;
+  }
+
+  /** P-6 (the Plan). The movement's stick figure, first picture only; decorative (its name is beside it). */
+  function _rowFigure(ex) {
+    const f = renderFigure(ex.id);
+    return f ? `<span class="cp-plan__fig" aria-hidden="true">${f}</span>` : '';
   }
 
   /**
@@ -2274,6 +2292,12 @@ export function CoachProposalView(router) {
     // the list was drawn from.
     session.exercises     = _planExercises(option);
     session.exerciseCount = session.exercises.length;
+    // P-6. The Plan's door and place go with what it starts.
+    if (isPremium()) {
+      if (planDoor) session.door = planDoor;
+      const at = _currentLocation();
+      if (at === 'home' || at === 'gym') session.place = at;
+    }
     // Where they trained becomes the next plan's default (spec 4.3).
     store.set('sessionLocation', _currentLocation());
 

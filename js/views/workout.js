@@ -1,5 +1,22 @@
 /**
  * workout.js - Workout Execution View
+ * 29 Oct 2026 v36
+ *
+ * v36 - STAGE PATH Session 6 (P-6; Graeme, 29 Oct). On the Plan only (Free
+ *   is gated unchanged):
+ *   - the finish is the Plan's own (plan-finish), for every way of
+ *     finishing (all done, End it here and save, Finish here from Home);
+ *   - the session's door and feeling, and its name, go on its log entry
+ *     (Lately and Progress read them);
+ *   - Swap this one counts as less often for the one swapped out
+ *     (path-engine noteSwap: never over a like or a Not again);
+ *   - a low mood this morning: no countdown. A timed movement says how
+ *     long, to go at your own pace, and has Done; a rest says to take as
+ *     long as you need ("No countdown timers, go at your own pace" is now
+ *     true, so Today's plan says it);
+ *   - something quite sore this morning: at the halfway point, "A quick
+ *     check: still okay?" (carry on, or stop here and save what was done).
+ *
  * 18 Oct 2026 v35
  *
  * v35 - OLD-CREDITS-TIDY (Graeme, 18 Oct: "You do those things"). The
@@ -475,6 +492,32 @@ import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
 import { checkpointSession, getResumableSession, clearCheckpoint } from "../session-resume.js";
 import { isPremium }     from "../auth.js";
 import { badDayIds, renderBadDayDoor, wireBadDayDoor } from "./bad-day-door.js";
+import { noteSwap }      from "../data/path-engine.js";
+import { lowMood, soreToday } from "../data/path-context.js";
+import { soreLevel, areaWords } from "../data/conditions.js";
+
+// STAGE PATH P-6. The Plan's player.
+const _plan = () => isPremium();
+/** Where a finished session goes: the Plan's finish, or Free's. */
+const _finishRoute = () => (_plan() ? "plan-finish" : "reflect");
+/** A low mood this morning, on the Plan: no countdown anywhere. */
+const _noClock = () => _plan() && lowMood();
+/** The session's door and feeling, and its name, for its log entry (the Plan's sessions only). */
+function _pathFields(w) {
+  if (!_plan() || !w) return {};
+  const out = {};
+  if (w.door) out.door = w.door;
+  if (w.feeling) out.feeling = w.feeling;
+  if (w.title || w.name) out.name = w.title || w.name;
+  return out;
+}
+/** Quite sore this morning, on the Plan: the area. */
+function _quiteSore() {
+  if (!_plan()) return null;
+  const s = soreToday().find(x => soreLevel(x.score) === "quite-sore");
+  return s ? s.id : null;
+}
+let _halfwayDone = null;   // the session key the halfway check was answered for
 
 export const centered = false;
 
@@ -709,6 +752,24 @@ export function render() {
     </div>`;
   }
 
+  // P-6. Quite sore this morning: a quick check at the halfway point, once.
+  const _sore = _quiteSore();
+  if (_sore && workout.exercises.length >= 4 && currentExerciseIndex === Math.floor(workout.exercises.length / 2)
+      && _halfwayDone !== _sessionKey(workout) && !exerciseDone) {
+    return `
+    <div class="view workout-view wo-flow wo-halfway">
+      <div class="workout-header">
+        <button class="btn btn-ghost" id="exit-workout-btn" aria-label="Exit workout">\u2715 Exit</button>
+      </div>
+      <h1 class="exercise-name" id="wo-exercise-name" tabindex="-1">A quick check: still okay?</h1>
+      <p class="coach-message-text">You said your ${areaWords(_sore)} was quite sore this morning. Halfway now: how is it?</p>
+      <div class="workout-actions">
+        <button class="btn btn-primary btn-large btn-full" id="wo-half-ok">Still okay, carry on</button>
+        <button class="btn btn-secondary btn-full" id="wo-half-stop">Not so good: stop here and save</button>
+      </div>
+    </div>`;
+  }
+
   const exercise = workout.exercises[currentExerciseIndex];
 
   // GM-1. Chosen once per render, so the card does not shuffle moments
@@ -723,7 +784,7 @@ export function render() {
 
   const next = workout.exercises[currentExerciseIndex + 1] || null;
   const sectionLabel = SECTION_LABELS[exercise.section || exercise.role] || "";
-  const timed = !!resolveTiming(exercise).seconds;
+  const timed = !!resolveTiming(exercise).seconds && !_noClock();
 
   return `
     <div class="view workout-view wo-flow">
@@ -780,7 +841,11 @@ export function render() {
           <h2 class="xstep-title" id="wo-cap-h" tabindex="-1">Reflect and capture</h2>
           ${(() => { const c = bodyCaution(exercise); return c ? `<p class="exercise-caution" role="note">${c}</p>` : ""; })()}
 
-          ${restUntil && !exerciseDone ? `
+          ${restUntil && !exerciseDone && _noClock() ? `
+            <div class="wo-rest" role="group" aria-labelledby="wo-rest-label">
+              <p class="wo-rest__label" id="wo-rest-label">Rest as long as you need.</p>
+            </div>
+          ` : restUntil && !exerciseDone ? `
             <div class="wo-rest" role="group" aria-labelledby="wo-rest-label">
               <p class="wo-rest__label" id="wo-rest-label">Rest about ${Number(exercise.rest) || 60}s</p>
               <p class="wo-rest__count" id="wo-rest-count" aria-hidden="true"${_restLeft() === 0 ? " hidden" : ""}>${formatTime(_restLeft())}</p>
@@ -921,6 +986,7 @@ function _applySwap(toId) {
   const current = list[currentExerciseIndex];
   const chosen = getSwapCandidates(current, store.get("equipment") || []).find(o => o.id === toId);
   if (!chosen) return;
+  if (_plan() && current?.id) noteSwap(store, current.id);   // P-6: less often, never over a like or a Not again
   list[currentExerciseIndex] = { ...chosen, section: current.section, reps: current.reps ?? chosen.reps };
   store.set("generatedSession", generated);
   swapPanelOpen = false;
@@ -1020,6 +1086,18 @@ function _setsRemaining(exercise) {
 function renderExerciseTarget(exercise) {
   const timing = resolveTiming(exercise);
 
+  // P-6. A low mood this morning, on the Plan: how long, and no clock.
+  if (timing.seconds && _noClock()) {
+    const s = timing.seconds;
+    const howLong = s < 60 ? `About ${s} seconds` : `About ${Math.max(1, Math.round(s / 60))} min`;
+    return `
+      <div class="reps-display wo-target">
+        <p class="reps-value">${howLong}</p>
+        <p class="reps-label">No countdown today. Go at your own pace.</p>
+      </div>
+    `;
+  }
+
   if (timing.seconds) {
     const sets = exercise.sets || 1;
     return `
@@ -1110,6 +1188,21 @@ export function onMount() {
 
   if (empty) return;
 
+  // P-6. The halfway check: carry on, or stop here and save what was done.
+  document.getElementById("wo-half-ok")?.addEventListener("click", () => {
+    _halfwayDone = _sessionKey(workout);
+    router.navigate("workout");
+  });
+  document.getElementById("wo-half-stop")?.addEventListener("click", () => {
+    _halfwayDone = _sessionKey(workout);
+    dismountSessionGuard();
+    savePartialSession();
+    cleanupWorkout();
+    router.navigate(_finishRoute());
+  });
+  document.getElementById("exit-workout-btn")?.addEventListener("click", () => { if (document.querySelector(".wo-halfway")) showExitConfirm(); });
+  if (document.querySelector(".wo-halfway")) return;
+
   // SAFETY-GATE. Bound before the session controls, and returns early:
   // when the gate is up there is no card, no timer and no log block to
   // wire, and everything below would be binding to elements that are not
@@ -1184,7 +1277,7 @@ export function onMount() {
   // "save partial progress" choice for the first time.
   mountSessionGuard({
     isActive: () => !!_getWorkout(),
-    onExit:   () => { savePartialSession(); cleanupWorkout(); router.navigate("reflect"); },
+    onExit:   () => { savePartialSession(); cleanupWorkout(); router.navigate(_finishRoute()); },
     onDiscard: () => cleanupWorkout(),   // W5-9: the place goes too
     label:    "gym session"
   });
@@ -1378,7 +1471,7 @@ function showExitConfirm() {
     overlay.remove();
     savePartialSession();
     cleanupWorkout();
-    router.navigate("reflect");
+    router.navigate(_finishRoute());
   });
 
   // EXIT-1. Discard: leave WITHOUT writing a partial entry. Home records
@@ -1509,7 +1602,7 @@ export function finishFromHome() {
   _restoreFromCheckpoint(workout);
   savePartialSession();
   cleanupWorkout();
-  router.navigate("reflect");
+  router.navigate(_finishRoute());
 }
 
 function savePartialSession() {
@@ -1527,6 +1620,7 @@ function savePartialSession() {
 
   _handOff(nowIso);   // P2: before the log, so the log describes this session
   const activityEntry = store.logActivity({
+    ..._pathFields(workout),   // P-6: the Plan's door, feeling and name
     type:           "workout",
     date:           nowIso,
     sessionEnd:     nowIso,
@@ -1589,6 +1683,7 @@ function completeWorkout() {
   // fixed here. See v5 changelog above for full detail.
   _handOff(nowIso);   // SAVE-HANDOFF, and P2: before the log (see v24)
   const activityEntry = store.logActivity({
+    ..._pathFields(workout),   // P-6: the Plan's door, feeling and name
     date:         nowIso,
     completedAt:  nowIso,
     type:         "workout",
@@ -1625,7 +1720,7 @@ function completeWorkout() {
 
   cleanupWorkout();
   // Route through reflect.js for post-session reflection.
-  router.navigate("reflect");
+  router.navigate(_finishRoute());
 }
 
 function cleanupWorkout() {

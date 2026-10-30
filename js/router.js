@@ -1,5 +1,11 @@
 /**
  * router.js
+ * 29 Oct 2026 v51
+ *
+ * v51 - STAGE PATH Session 6 (P-6). 'plan-finish' registered (views/
+ *   plan-finish.js: the Plan's finish; Free keeps reflect), without the nav
+ *   and with its own way home (Done), as reflect; Home tab lit.
+ *
  * 29 Oct 2026 v50
  *
  * v50 - STAGE PATH Session 5 (P-5 DOOR-ROUTES). 'path' registered
@@ -396,6 +402,7 @@ const VIEW_NAMES = {
   'class-player':      { path: './views/class-player.js',      fn: 'ClassPlayerView'     },
   'home-threshold':    { path: './views/home-threshold.js',   fn: 'HomeThresholdView'   },
   'reflect':           { path: './views/reflect.js',          fn: 'ReflectView'         },
+  'plan-finish':       { path: './views/plan-finish.js',      fn: 'PlanFinishView'      },
 
   // ── Main views ─────────────────────────────────────────────────────────────
   'progress':          { path: './views/progress.js',         fn: 'ProgressView'        },
@@ -496,7 +503,7 @@ const hideNavViews = new Set([
   'yoga-session', 'walk-session', 'running-session', 'cycle-session',
   'swim-session', 'quiet-session', 'breathing-session',
   'prescribed', 'prescribed-session', 'session-builder',
-  'reflect', 'journal-entry', 'privacy', 'upgrade', 'in-step',
+  'reflect', 'plan-finish', 'journal-entry', 'privacy', 'upgrade', 'in-step',
   // PRAC-1. A practice is read start to finish; the nav bar is one
   // more thing on the screen while somebody is trying to settle.
   'practices',
@@ -514,12 +521,12 @@ const hideNavViews = new Set([
 const NO_EXIT_VIEWS = new Set(['onboarding/thread', 'age-check', 'under-18', 'consent-update']);
 // D662-6 TWO-HOMES. Screens with their own way home: no house beside it.
 // Today's plan hides it itself while its plan (with "‹ Home") is showing.
-const OWN_HOME_VIEWS = new Set(['reflect', 'prescribed']);
+const OWN_HOME_VIEWS = new Set(['reflect', 'plan-finish', 'prescribed']);
 
 const NAV_MAP = {
   'today': 'today', 'checkin': 'today', 'checkin-mini': 'today',
   'coach-proposal': 'today', 'red-flag': 'today', 'health-consent': 'today', 'age-check': 'today', 'under-18': 'today', 'consent-update': 'today',
-  'home-threshold': 'today', 'reflect': 'today',
+  'home-threshold': 'today', 'reflect': 'today', 'plan-finish': 'today',
   'workout': 'today', 'gym-programme': 'today', 'morning-session': 'today',
   'core-session': 'today', 'yoga-session': 'today', 'walk-session': 'today',
   'running-session': 'today', 'cycle-session': 'today', 'swim-session': 'today',

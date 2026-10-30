@@ -1,7 +1,12 @@
 import { createRequire as __cr } from "node:module";
 /**
  * tools/verify-path-routes.mjs
- * 29 Oct 2026 v1
+ * 29 Oct 2026 v2
+ *
+ * v2 - STAGE PATH Session 6 re-point (none loosened). 9b: the player now
+ *   does what "No countdown timers, go at your own pace" says (workout.js
+ *   v36, held by verify-path-finish), so on a low-mood day Today's plan
+ *   says it; still never a line the app does not do.
  *
  * STAGE PATH Session 5 (P-5 DOOR-ROUTES; blueprint v6 D3, D4, Part G), as
  * mock-up v10 (Graeme, 29 Oct: "Yep. I like v10"). Drives the real views:
@@ -284,8 +289,8 @@ main.innerHTML = ""; CoachProposalView(fakeRouter).mount(main); await wait(50);
 const sent = txt(main.querySelector(".cp-plan__sentence"));
 ok("9a. the coach's reason starts the plan's own sentence, read once", sent.startsWith("It's the next step on what you're working towards. ") && fakeRouter.planReason === null, sent.slice(0, 120));
 const adjList = [...main.querySelectorAll(".cp-adjusted__list li")].map(txt);
-ok("9b. What I've adjusted: lines the app does now; never one it does not (no countdown timers, a halfway check)",
-   adjList.includes("Easier options pointed out where something might niggle") && !adjList.some(l => /countdown|halfway/.test(l)), JSON.stringify(adjList));
+ok("9b. What I've adjusted: every line, now that the app does each (a low mood: no countdown timers)",
+   adjList.includes("Easier options pointed out where something might niggle") && adjList.includes("No countdown timers, go at your own pace"), JSON.stringify(adjList));
 navs = []; click(main.querySelector("#cp-redo-checkin"));
 ok("9c. Change my check-in: the check-in, back to this plan, with its kind and place kept", navs.at(-1) === "checkin" && store.get("pendingDoorRoute") === "coach-proposal" && fakeRouter.planKeep?.type === "full", JSON.stringify(fakeRouter.planKeep));
 store.set("requestedSessionType", null);

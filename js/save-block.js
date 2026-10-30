@@ -1,5 +1,11 @@
 /**
  * js/save-block.js
+ * 29 Oct 2026 v5
+ *
+ * v5 - STAGE PATH Session 6 (true words). Says where a kept session is
+ *   now: in the Library, under Saved sessions (I know what I want left Plan
+ *   Home in Stage PATH and no longer lists them). The Plan's only, as before.
+ *
  * 30 Sep 2026 v4
  *
  * v4 - W3-21 NAV-SMALL. Says where a saved session is found: under
@@ -198,7 +204,7 @@ export function renderSaveBlock() {
     <div class="save-block" id="save-block" data-save-block>
       <p class="save-block-title">Keep this one?</p>
       <p class="text-sm text-muted save-block-sub">
-        You’ll find it under I know what I want, ready to repeat.
+        You’ll find it in the Library, under Saved sessions, ready to repeat.
       </p>
       <label class="sr-only" for="save-block-name">Name for this session</label>
       <input type="text" id="save-block-name" class="save-block-name"
@@ -242,7 +248,7 @@ export function attachSaveBlock(root) {
     const res = saveSession(input ? input.value : "", built);
 
     if (res && res.ok) {
-      if (status) status.textContent = "Saved. You’ll find it under I know what I want.";
+      if (status) status.textContent = "Saved. You’ll find it in the Library, under Saved sessions.";
       btn.textContent = "Saved";
       btn.disabled = true;
       if (input) input.disabled = true;

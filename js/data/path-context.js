@@ -1,6 +1,12 @@
 /**
  * js/data/path-context.js
- * 29 Oct 2026 v1
+ * 29 Oct 2026 v2
+ *
+ * v2 - STAGE PATH Session 6. The player now does what the last two lines
+ *   say (workout.js v36: no countdown on a low-mood day; the halfway check
+ *   when something is quite sore), so every E4 line is shown. The lines
+ *   left out where a plan already names the area are matched on the area's
+ *   own words (the pattern matched "your own pace" too).
  *
  * STAGE PATH Session 5 (P-5). What the person has told the app today, read
  * the one way for every Plan screen that asks the engine (data/path-engine.js):
@@ -28,7 +34,13 @@
  */
 import { store } from "../store.js";
 import { getTodaysCheckin } from "./checkin.js";
+import { areaWords } from "./conditions.js";
+import { EXERCISES, filterByConditions } from "./exercises/index.js";
+import { PATH_MOVEMENTS } from "./exercises/path_movements.js";
 import { movementName, adjustmentsFor, freshSequence, recentIds } from "./path-engine.js";
+
+const LIBRARY = [...EXERCISES, ...PATH_MOVEMENTS];
+const LIBRARY_BY_ID = new Map(LIBRARY.map(e => [e.id, e]));
 
 /** Today's check-in as the engine reads it ({ energy, mood }), or null. */
 export function checkinToday() {
@@ -74,7 +86,7 @@ export function lowMood() {
   return m != null && m <= 3;
 }
 
-const NOT_YET = [/^No countdown timers/, /^A quick check halfway/];   // Session 6 makes these true
+const NOT_YET = [];   // v2: Session 6 made the last two true (workout.js v36)
 
 /**
  * The engine's adjustments for today that the app really does now.
@@ -83,10 +95,10 @@ const NOT_YET = [/^No countdown timers/, /^A quick check halfway/];   // Session
  * once, verify-sore-words 4c).
  */
 export function shownAdjustments({ nameArea = true } = {}) {
-  const areas = soreToday().map(s => s.id);
+  const named = soreToday().map(s => ` your ${areaWords(s.id)}`);
   return adjustmentsFor({ checkin: checkinToday(), sore: soreToday(), ...prefNames() })
     .filter(line => !NOT_YET.some(re => re.test(line)))
-    .filter(line => nameArea || !/ your [a-z ]+$/.test(line) || !areas.length);
+    .filter(line => nameArea || !named.some(w => line.endsWith(w)));
 }
 
 /**
@@ -104,4 +116,31 @@ export function freshPracticeFor({ feeling, minutes = 10 } = {}) {
   const WORD = { arrive: "To arrive", settle: "To settle" };
   return { practice: { id: "fresh", name: "A fresh one for me", minutes: r.minutes, style: null, position: null,
     steps: r.steps.map(s => ({ id: s.id, mins: s.mins, note: WORD[s.role] || "" })) }, fresh: true };
+}
+
+/**
+ * v2, Session 6 (one proposal shape). What Swap offers for one movement of
+ * a programme, a routine or a kept session, before it starts: movements of
+ * the same kind for the same purpose, never one the person said Not again
+ * to, never one already in it, never a held or forced breath, and never
+ * one today's sore areas rule out (the builder's own rule, filterByConditions).
+ *   feel:    tagged for Move to feel better and this feeling, same position;
+ *   stretch: tagged for Stretch, working any of the same areas, same position
+ *            (so a routine without the floor stays without it);
+ *   else:    the same movement pattern and category (a kept session).
+ */
+const HELD_BREATH = new Set(["box-breathing", "box-breathing-extended", "four-seven-eight-breathing", "energising-breath", "alternate-nostril-breathing"]);
+export function swapOptionsFor(id, { door = null, feeling = null, exclude = [] } = {}) {
+  const me = LIBRARY_BY_ID.get(id);
+  if (!me) return [];
+  const never = prefIds().never;
+  const out = new Set(exclude);
+  let pool = LIBRARY.filter(e => e.id !== id && !out.has(e.id) && !never.has(e.id) && !HELD_BREATH.has(e.id));
+  if (door === "feel") pool = pool.filter(e => (e.doors || []).includes("feel") && (!feeling || (e.feelings || []).includes(feeling)) && e.position === me.position);
+  else if (door === "stretch") pool = pool.filter(e => (e.doors || []).includes("stretch") && e.position === me.position
+    && (e.affectsAreas || []).some(a => (me.affectsAreas || []).includes(a)));
+  else pool = pool.filter(e => e.movementPattern && e.movementPattern === me.movementPattern && e.category === me.category);
+  const sore = soreToday().map(s => s.id);
+  if (sore.length) pool = filterByConditions(pool, sore).safe;
+  return pool.sort((a, b) => String(a.name).localeCompare(String(b.name)));
 }
