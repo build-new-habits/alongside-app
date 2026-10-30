@@ -1,5 +1,12 @@
 /**
  * tools/verify-pt6.mjs
+ * 29 Oct 2026 v2
+ *
+ * v2 - STAGE PATH Session 6 re-point (none loosened). The Plan's finish
+ *   (plan-finish.js) updates the entry just logged in place, as reflect.js
+ *   does for Free; it is held to the same rule: it only ever updates, never
+ *   appends.
+ *
  * 12 Aug 2026 v1
  *
  * PT-6 / PT-3 gate: one write path into activityLog, one set of field
@@ -51,16 +58,16 @@ check("no view writes activityLog directly", () => {
     const s = strip(fs.readFileSync(_gatePath(`js/views/${f}`), "utf8"));
     // reflect.js UPDATES an existing entry in place, which is not a
     // creation and legitimately does not go through logActivity().
-    if (f === "reflect.js") continue;
+    if (f === "reflect.js" || f === "plan-finish.js") continue;   // v2: the two finishes
     if (/store\.set\(["']activityLog["']/.test(s)) offenders.push(f);
   }
   ok(offenders.length === 0,
      `bypass store.logActivity() and lose its dedupe, empty-partial and ` +
      `exerciseHistory handling: ${offenders.join(", ")}`);
 });
-check("reflect.js only ever updates, never appends", () => {
-  const s = strip(fs.readFileSync(_gatePath("js/views/reflect.js"), "utf8"));
-  ok(!/log\.push\(/.test(s), "appending directly would bypass every guard");
+for (const f of ["reflect.js", "plan-finish.js"]) check(`${f} only ever updates, never appends`, () => {
+  const s = strip(fs.readFileSync(_gatePath(`js/views/${f}`), "utf8"));
+  ok(!/log\.push\(/.test(s) && !/\[\s*\.\.\.log\s*,/.test(s), "appending directly would bypass every guard");
 });
 
 console.log("\nTEST 2 - no local function shadows store.logActivity()");

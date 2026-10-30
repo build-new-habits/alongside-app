@@ -188,6 +188,14 @@ export function savableSession() {
   return built;
 }
 
+/**
+ * v5, Stage PATH Session 6. Make it mine, on the door routes' proposal:
+ * the same save, here, so no view keeps its own (verify-save-all 5.2).
+ */
+export function keepVersion(name, built) {
+  return saveSession(name, built);
+}
+
 /** A name somebody can accept without typing. Theirs to change. */
 export function suggestedName(built) {
   const base = built.title || built.name || "Session";

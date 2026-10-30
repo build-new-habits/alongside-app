@@ -67,7 +67,8 @@ import { EXERCISES } from "../data/exercises/index.js";
 import { PATH_MOVEMENTS } from "../data/exercises/path_movements.js";
 import { suggestFeeling, pickProgramme, pickSurprise, routinesFor, STRETCH_AREA_ZONES } from "../data/path-engine.js";
 import { checkinToday, lastPlace, lowMood, shownAdjustments, freshPracticeFor, swapOptionsFor } from "../data/path-context.js";
-import { savedSessions, saveSession, resolveSavedSession } from "../data/saved-sessions.js";
+import { savedSessions, resolveSavedSession } from "../data/saved-sessions.js";
+import { keepVersion } from "../save-block.js";
 import { setTodaysLength, lengthCatForToday } from "../data/session-length.js";
 
 const BY_ID = new Map([...EXERCISES, ...PATH_MOVEMENTS].map(e => [e.id, e]));
@@ -400,7 +401,7 @@ export function PathView(router) {
     const p = st.practice;
     const exercises = p.steps.map(s => BY_ID.get(s.id)).filter(Boolean)
       .map((e, j) => ({ ...e, sets: 1, reps: null, duration: Math.round((p.steps[j].mins || 1) * 60) }));
-    const res = saveSession(`${p.name}, my version`, { title: p.name, exercises, door: st.door, durationMins: p.minutes,
+    const res = keepVersion(`${p.name}, my version`, { title: p.name, exercises, door: st.door, durationMins: p.minutes,
       sessionType: st.door === "stretch" ? "stretch" : null });
     if (res?.ok) { st = { ...st, kept: true }; paint(false); root.querySelector("#path-mine")?.focus(); say(`Kept in Saved sessions as ${p.name}, my version.`); }
     else say(res?.reason === "dupe" ? "You already have one kept under that name." : "That could not be kept.");

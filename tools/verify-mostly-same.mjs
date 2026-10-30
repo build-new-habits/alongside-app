@@ -1,5 +1,13 @@
 /**
  * tools/verify-mostly-same.mjs
+ * 29 Oct 2026 v5
+ *
+ * v5 - STAGE PATH Session 6 re-point (none loosened). On the Plan a session
+ *   ends on the Plan's own finish (plan-finish), and a saved session opens as
+ *   a proposal first (path.js: figures and Swap, P-12) whose Start plays it.
+ *   This gate reads the tier's own finish, and presses that Start; every
+ *   assertion is otherwise unchanged.
+ *
  * 04 Oct 2026 v4
  *
  * v4 - D-1 EXERCISE-FOUR. Reaches Capture (the fourth step) before the set buttons; nothing it proves has changed.
@@ -117,7 +125,7 @@ console.log("\nTEST 1 - the coach's player records which section each move was d
   store.set("generatedSession", { session: { ...s, sessionType: "full" }, builtAt: new Date().toISOString(), inputs: {} });
   store.set("usingGeneratedSession", true);
   navs = []; paint();
-  for (let i = 0; i < s.exercises.length * 12 && !navs.includes("reflect"); i++) {
+  for (let i = 0; i < s.exercises.length * 12 && !navs.includes("plan-finish"); i++) {
     if (tap("#wo-set-done-btn")) continue;
     if (tap("#wo-done-btn")) continue;
     if (tap("#complete-exercise-btn")) continue;
@@ -126,7 +134,7 @@ console.log("\nTEST 1 - the coach's player records which section each move was d
   }
   const h = store.get("exerciseHistory") || {};
   const wrong = s.exercises.filter(e => (h[e.id] || {}).section !== sec(e)).map(e => `${e.id}: ${sec(e)} vs ${(h[e.id] || {}).section}`);
-  ok("1pc. a real builder session, finished in the real player", navs.includes("reflect") && s.exercises.every(e => h[e.id]), JSON.stringify(navs));
+  ok("1pc. a real builder session, finished in the real player", navs.includes("plan-finish") && s.exercises.every(e => h[e.id]), JSON.stringify(navs));
   ok("1a. each move's history says the section it was done in", wrong.length === 0, wrong.join("; "));
   const log = store.get("activityLog") || [];
   ok("1b. and the log entry itself carries no new field", !("exerciseSections" in (log.at(-1) || {})), Object.keys(log.at(-1) || {}).join(","));

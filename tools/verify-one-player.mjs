@@ -1,5 +1,13 @@
 /**
  * tools/verify-one-player.mjs
+ * 29 Oct 2026 v4
+ *
+ * v4 - STAGE PATH Session 6 re-point (none loosened). On the Plan a session
+ *   ends on the Plan's own finish (plan-finish), and a saved session opens as
+ *   a proposal first (path.js: figures and Swap, P-12) whose Start plays it.
+ *   This gate reads the tier's own finish, and presses that Start; every
+ *   assertion is otherwise unchanged.
+ *
  * 04 Oct 2026 v3
  *
  * v3 - D-1 EXERCISE-FOUR. Reaches Capture (the fourth step) before the set
@@ -101,7 +109,8 @@ async function buildAndGo() {
 // Play to the finish by the fewest taps the player offers; count them.
 async function playThrough(max = 200) {
   let taps = 0;
-  for (let i = 0; i < max && onView() !== "reflect"; i++) {
+  const FIN = store.get("tier") === "free" ? "reflect" : "plan-finish";
+  for (let i = 0; i < max && onView() !== FIN; i++) {
     const b = $("#complete-exercise-btn") || $("#wo-done-btn") || $("#wo-step-capture") || $("#gp-next-btn") || $("#gp-done-btn") || $("[data-card-next]") || $("#gp-complete-btn");
     if (!b) break;
     click(b); taps++; await wait(15);
@@ -117,7 +126,7 @@ for (const tier of ["free", "personal"]) {
   ok(`1pc-${tier}. the builder made a session`, !!s && s.exercises.length >= 5, `${s?.exercises?.length}`);
   ok(`1a-${tier}. Let's go opens the coach's player on its first move`, onView() === "workout" && txt(main).includes(s.exercises[0].name), `${onView()} | ${txt(main).slice(0, 100)}`);
   const taps = await playThrough();
-  ok(`1b-${tier}. the whole session in at most three taps a move (go to capture, Done, Next)`, onView() === "reflect" && taps <= 3 * s.exercises.length, `${taps} taps for ${s.exercises.length} moves; ended on ${onView()}`);
+  ok(`1b-${tier}. the whole session in at most three taps a move (go to capture, Done, Next)`, onView() === (tier === "free" ? "reflect" : "plan-finish") && taps <= 3 * s.exercises.length, `${taps} taps for ${s.exercises.length} moves; ended on ${onView()}`);
 }
 
 // ── 2. SAVED SESSIONS ───────────────────────────────────────────────────
@@ -132,12 +141,14 @@ const label = () => txt($("[data-saved-id]")?.closest("li, .saved-session, artic
   await go("saved-sessions");
   ok("2pc2. listed, never done", /Not done yet/.test(label()), label().slice(0, 140));
   click($("[data-saved-id]")); await wait(300);
+  if (onView() === "path") { click($("#path-start")); await wait(300); }
   ok("2a. Start opens the coach's player", onView() === "workout" && txt(main).includes(SS.resolveSavedSession(r.saved).exercises[0].name), onView());
   // Started, and left without finishing.
   await go("today");
   await go("saved-sessions");
   ok("2b. started and left, not finished: still \"Not done yet\"", /Not done yet/.test(label()), label().slice(0, 140));
   click($("[data-saved-id]")); await wait(300);
+  if (onView() === "path") { click($("#path-start")); await wait(300); }
   await playThrough();
   await go("saved-sessions");
   ok("2c. finished: \"Last done today\"", /Last done today/.test(label()) && !/Not done yet/.test(label()), label().slice(0, 140));

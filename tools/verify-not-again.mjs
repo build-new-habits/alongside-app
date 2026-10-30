@@ -1,5 +1,13 @@
 /**
  * tools/verify-not-again.mjs
+ * 29 Oct 2026 v3
+ *
+ * v3 - STAGE PATH Session 6 re-point (none loosened). On the Plan a session
+ *   ends on the Plan's own finish (plan-finish), and a saved session opens as
+ *   a proposal first (path.js: figures and Swap, P-12) whose Start plays it.
+ *   This gate reads the tier's own finish, and presses that Start; every
+ *   assertion is otherwise unchanged.
+ *
  * 04 Oct 2026 v2
  *
  * v2 - D-1 EXERCISE-FOUR. Reaches Capture (the fourth step) before the set buttons; nothing it proves has changed.
@@ -127,9 +135,9 @@ tap("#skip-exercise-btn"); await wait(10);   // skip move 1
 tap('[data-skip-pref="dismiss"]'); await wait(10);
 ok("3pc. on the last move", nameNow() === session[1].name, nameNow());
 tap("#skip-exercise-btn"); await wait(10);
-ok("3a. it asks about the last move before the session ends", !!main.querySelector("[data-skip-pref]") && T().includes(session[1].name) && !navs.includes("reflect"), `${navs.join(",")} | ${T().slice(0, 120)}`);
+ok("3a. it asks about the last move before the session ends", !!main.querySelector("[data-skip-pref]") && T().includes(session[1].name) && !navs.includes("plan-finish"), `${navs.join(",")} | ${T().slice(0, 120)}`);
 tap('[data-skip-pref="avoid"]'); await wait(10);
-ok("3b. answered, it records and finishes", ((store.get("exercisePreferences") || {})[session[1].id] || {}).preference === "avoid" && navs.at(-1) === "reflect", JSON.stringify(navs));
+ok("3b. answered, it records and finishes", ((store.get("exercisePreferences") || {})[session[1].id] || {}).preference === "avoid" && navs.at(-1) === "plan-finish", JSON.stringify(navs));
 
 // ── 4. NOTHING CARRIES OVER ─────────────────────────────────────────────
 console.log("\nTEST 4 - the question never carries into the next session");

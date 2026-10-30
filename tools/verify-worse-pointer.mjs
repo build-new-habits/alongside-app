@@ -1,6 +1,14 @@
 /**
  * tools/verify-worse-pointer.mjs
- * 04 Oct 2026 v2
+ * 29 Oct 2026 v3
+ *
+ * v3 - STAGE PATH Session 6 re-point (none loosened; stricter). Tests 1 to 3
+ *   are Free's finish (reflect.js), as before. On the Plan a session ends on
+ *   the Plan's own finish (plan-finish.js), which keeps the pain check
+ *   (Graeme, 29 Oct); TEST 4 holds it to the same three rules there: Worse
+ *   gets the pointer and no praise, no "moved through something difficult"
+ *   after Worse (control: a struggling mood after on a low-energy day still
+ *   gets it), Better makes no claim about the body.
  *
  * v2 - D-1 EXERCISE-FOUR. Reaches Capture (the fourth step) before the set buttons;
  *   nothing it proves has changed.
@@ -39,6 +47,7 @@ const { HURT_AND_ACHE_VERSION } = await import(B + "exercise-card.js");
 const { router: realRouter } = await import(B + "router.js");
 const workout = await import(B + "views/workout.js");
 const reflect = await import(B + "views/reflect.js");
+const { PlanFinishView } = await import(B + "views/plan-finish.js");
 
 let fails = 0, passes = 0;
 const ok = (name, cond, detail = "") => {
@@ -50,7 +59,9 @@ const main = document.getElementById("main-content");
 let navs = [];
 function paintWorkout() { main.innerHTML = workout.render(); try { workout.onMount(); } catch {} }
 function paintReflect() { main.innerHTML = reflect.render(); try { reflect.onMount(); } catch (e) { console.log("reflect onMount threw", e.message); } }
-const nav = v => { navs.push(v); if (v === "workout") paintWorkout(); if (v === "reflect") paintReflect(); };
+const nav = v => { navs.push(v); if (v === "workout") paintWorkout(); if (v === "reflect") paintReflect();
+  if (v === "plan-finish") { main.innerHTML = ""; PlanFinishView({ navigate: nav, back() {} }).mount(main); } };
+let TIER = "free";   // v3
 const _router = { navigate: nav, back() {} };
 globalThis.window.router = _router;
 Object.defineProperty(globalThis, "router", { value: _router, configurable: true, writable: true });
@@ -66,7 +77,7 @@ function session({ conditions = [], finish = true, soreToday = false } = {}) {
   if (document.querySelector("#exit-workout-btn")) { tap("#exit-workout-btn"); document.querySelector("#exit-confirm-discard")?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true })); }
   localStorage.clear(); store.init();
   store.set("safetyAckLog", Array.from({ length: 5 }, () => ({ at: new Date().toISOString(), textVersion: HURT_AND_ACHE_VERSION, surface: "fixture" })));
-  store.set("tier", "personal"); store.set("onboardingComplete", true); store.set("conditions", conditions);
+  store.set("tier", TIER); store.set("onboardingComplete", true); store.set("conditions", conditions);
   store.set("lastCheckin", { mood: 6, energy: 6, timestamp: new Date().toISOString() });
   if (soreToday) { store.set("conditionPainScores", Object.fromEntries(conditions.map(c => [c, 4]))); store.set("conditionPainScoresOn", store._localDay()); }
   store.set("generatedSession", { session: { id: "s", name: "Upper Body", exercises: [EX("a", "Row"), EX("b", "Press")] }, builtAt: new Date().toISOString(), inputs: {} });
@@ -121,6 +132,33 @@ session({ conditions: ["lower-back"], soreToday: true });
 tap('[data-pain="better"]');
 const b = main.querySelector("#finish-coach")?.textContent.trim() || "";
 ok("3a. glad, with no claim about the body responding", /better/i.test(b) && !/body is responding/.test(b), b);
+
+console.log("\nTEST 4 - the Plan's finish: the same three rules");
+TIER = "personal";
+const pick = sel => { const el = main.querySelector(sel); if (el) { el.checked = true; el.dispatchEvent(new dom.window.Event("change", { bubbles: true })); } return !!el; };
+session({ conditions: ["lower-back"], soreToday: true });
+ok("4pc. the Plan's finish is showing the pain question", navs.at(-1) === "plan-finish" && main.querySelectorAll('input[name="pf-pain"]').length === 4, JSON.stringify(navs));
+pick('input[name="pf-pain"][value="worse"]');
+const pl = main.querySelector("#pf-line")?.textContent.trim() || "";
+ok("4a. Worse: get it looked at, stop if it gets worse, no praise", /worth getting someone to look at it/.test(pl) && /Stop if it gets worse/.test(pl) && !/showed up anyway|pushed|well done/i.test(pl), pl);
+session({ conditions: ["lower-back"], soreToday: true });
+earlier();
+pick('input[name="pf-pain"][value="worse"]');
+tap("#pf-done"); await wait(30);
+const pp = document.querySelector("#pf-empathy")?.textContent || "";
+ok("4b. a reflection prompt is given at this point, and not the difficult-day one", pp.length > 20 && !/moved through something difficult/.test(pp), pp || document.body.textContent.slice(0, 160));
+session({ conditions: ["lower-back"], soreToday: true });
+earlier();
+store.set("lastCheckin", { mood: 6, energy: 2, timestamp: new Date().toISOString() });
+{ const { agreed } = await import(new URL("./agreed.mjs", import.meta.url).href); agreed(store); }   // a mood answer needs health consent
+main.innerHTML = ""; PlanFinishView({ navigate: nav, back() {} }).mount(main);
+pick('input[name="pf-mood"][value="2"]');
+tap("#pf-done"); await wait(30);
+ok("4c. control: a struggling mood after, on a low-energy day, still gets it", /moved through something difficult/.test(document.querySelector("#pf-empathy")?.textContent || ""), document.querySelector("#pf-empathy")?.textContent);
+session({ conditions: ["lower-back"], soreToday: true });
+pick('input[name="pf-pain"][value="better"]');
+const pb = main.querySelector("#pf-line")?.textContent.trim() || "";
+ok("4d. Better: glad, with no claim about the body responding", /better/i.test(pb) && !/body is responding/.test(pb), pb);
 
 console.log("");
 if (fails) { console.log(`WORSE-POINTER: ${fails} FAILED, ${passes} passed`); process.exit(1); }

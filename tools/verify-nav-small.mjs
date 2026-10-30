@@ -1,5 +1,12 @@
 /**
  * tools/verify-nav-small.mjs
+ * 29 Oct 2026 v7
+ *
+ * v7 - STAGE PATH Session 6 re-point (none loosened). 6b: the save block
+ *   now says where a kept session really is, in the Library under Saved
+ *   sessions (save-block v5); the property is the same: it names a place
+ *   that exists.
+ *
  * 12 Oct 2026 v6
  *
  * v6 - A-1 PLAN-HOME-PRUNE (Graeme approved the mock-up, 12 Oct). TEST 2:
@@ -267,7 +274,7 @@ console.log("\nTEST 6 - the save block names a place on Plan Home");
 const saveSrc = (await import("node:fs")).readFileSync(new URL("../js/save-block.js", import.meta.url), "utf8");
 const live = saveSrc.split("\n").filter(l => !/^\s*(\*|\/\/)/.test(l)).join("\n");
 ok("6a. no \"Your own\" in what it says", !/in Your own/.test(live));
-ok("6b. it says where to find it", /I know what I want/.test(live));
+ok("6b. it says where to find it (v7: the Library, under Saved sessions)", /in the Library, under Saved sessions/.test(live));
 
 // ── 7. SWAP IS A LIST ───────────────────────────────────────────────────
 console.log("\nTEST 7 - Swap shows the alternatives as a list");

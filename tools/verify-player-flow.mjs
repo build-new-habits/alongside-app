@@ -1,5 +1,13 @@
 /**
  * tools/verify-player-flow.mjs
+ * 29 Oct 2026 v7
+ *
+ * v7 - STAGE PATH Session 6 re-point (none loosened). On the Plan a session
+ *   ends on the Plan's own finish (plan-finish), and a saved session opens as
+ *   a proposal first (path.js: figures and Swap, P-12) whose Start plays it.
+ *   This gate reads the tier's own finish, and presses that Start; every
+ *   assertion is otherwise unchanged.
+ *
  * 27 Oct 2026 v6
  * v6 - LIFT-UNIT: the test phone is en-GB, so lifts are in kg; a US phone would now lift in lb.
  *
@@ -185,7 +193,7 @@ const b2 = (store.get("activityLog") || []).length;
 tap("#exit-workout-btn"); document.querySelector("#exit-confirm-leave")?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }));
 const log = store.get("activityLog") || [];
 ok("4g. End it here and save goes to the finish, saving what was done",
-   navs.at(-1) === "reflect" && log.length === b2 + 1 && log.at(-1).status === "partial" && log.at(-1).exercisesCount === 1,
+   navs.at(-1) === "plan-finish" && log.length === b2 + 1 && log.at(-1).status === "partial" && log.at(-1).exercisesCount === 1,
    `${JSON.stringify(navs)} ${JSON.stringify(log.at(-1))}`);
 ok("4h. and records what was done, so the finish screen offers to keep this session",
    JSON.stringify(log.at(-1)?.exerciseIds) === JSON.stringify(["fixture-row"]) && !!savableSession(),
@@ -221,7 +229,7 @@ console.log("\nTEST 4i - finishing offers to keep it");
 fresh([ROW]); toCapture();
 tap("#wo-set-done-btn"); tap("#wo-set-done-btn"); tap("#wo-set-done-btn"); tap("#complete-exercise-btn");
 ok("4i. finishing the whole plan: the finish screen offers to keep it (it never could: the plan was cleared first)",
-   navs.at(-1) === "reflect" && savableSession()?.exercises?.[0]?.id === "fixture-row",
+   navs.at(-1) === "plan-finish" && savableSession()?.exercises?.[0]?.id === "fixture-row",
    `${JSON.stringify(navs)}; offered: ${!!savableSession()}`);
 
 console.log("");

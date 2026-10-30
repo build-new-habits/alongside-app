@@ -1,5 +1,13 @@
 /**
  * tools/verify-session-type-live.mjs
+ * 29 Oct 2026 v3
+ *
+ * v3 - STAGE PATH Session 6 re-point (none loosened). On the Plan a session
+ *   ends on the Plan's own finish (plan-finish), and a saved session opens as
+ *   a proposal first (path.js: figures and Swap, P-12) whose Start plays it.
+ *   This gate reads the tier's own finish, and presses that Start; every
+ *   assertion is otherwise unchanged.
+ *
  * 04 Oct 2026 v2
  *
  * v2 - D-1 EXERCISE-FOUR. Reaches Capture (the fourth step) before the set buttons;
@@ -99,7 +107,7 @@ async function oneSession() {
   const gs = store.get("generatedSession")?.session;
   if (!navs.includes("workout")) return { error: "did not start", navs };
   if (process.env.DBG) console.log("PLAYER:", txt(main).slice(0, 300), [...main.querySelectorAll("button")].map(b => b.id || b.className).join(","));
-  for (let i = 0; i < 400 && !navs.includes("reflect"); i++) {
+  for (let i = 0; i < 400 && !navs.includes(store.get("tier") === "free" ? "reflect" : "plan-finish"); i++) {
     // A set-based exercise has a button a set; a timed one, "Done". Each
     // move opens at Why: "go to capture" reaches the set buttons.
     if (!tap("#wo-set-done-btn") && !tap("#complete-exercise-btn") && !tap("#wo-done-btn") && !tap("#wo-step-capture")) break;
@@ -110,7 +118,7 @@ async function oneSession() {
   const log = store.get("activityLog") || [];
   const at = new Date(Date.now() - (10 - (store.get("activityLog") || []).length) * 3600e3).toISOString();
   if (log.length) { log[log.length - 1] = { ...log.at(-1), completedAt: at, date: at }; store.set("activityLog", log); }
-  return { finished: navs.includes("reflect"), proposedTitle, planType: gs?.sessionType, planId: gs?.id, entry: log.at(-1) };
+  return { finished: navs.includes(store.get("tier") === "free" ? "reflect" : "plan-finish"), proposedTitle, planType: gs?.sessionType, planId: gs?.id, entry: log.at(-1) };
 }
 
 // ── 1. FREE AND THE PLAN: FOUR SESSIONS IN A ROW ────────────────────────

@@ -1,5 +1,12 @@
 /**
  * tools/verify-shared1.mjs
+ * 29 Oct 2026 v5
+ *
+ * v5 - STAGE PATH Session 6 re-point (none loosened). The Plan's player
+ *   ends on the Plan's own finish (plan-finish.js); a view that routes there
+ *   counts only if plan-finish.js itself renders, wires and resets the
+ *   moments, which is checked here as reflect.js is.
+ *
  * 17 Oct 2026 v4
  *
  * v4 - W6-9. The moment controls are wired in reflect.js's onMount, which
@@ -74,6 +81,11 @@ const onMountBody = reflect.slice(reflect.indexOf('export function onMount'), re
 check('every mount, the first included, wires the controls', /attachSessionMoments\(/.test(onMountBody),
   'attachSessionMoments in onMount');
 
+// v5. The Plan's finish holds the moments the same way.
+const planFinish = fs.readFileSync(_gatePath('js/views/plan-finish.js'), 'utf8');
+const PLAN_FINISH_OK = /\$\{renderSessionMoments/.test(planFinish) && /attachSessionMoments\(/.test(planFinish) && /resetSessionMoments\(\)/.test(planFinish);
+check("the Plan's finish renders, wires and resets the moments", PLAN_FINISH_OK);
+
 // ── Every session view reaches it ────────────────────────────
 const views = fs.readdirSync(_gatePath('js/views')).filter(f => f.endsWith('.js'));
 const SESSION_VIEWS = views.filter(f => {
@@ -86,7 +98,7 @@ check('there are session views to check', SESSION_VIEWS.length >= 8,
 const orphans = [];
 for (const f of SESSION_VIEWS) {
   const s = fs.readFileSync(_gatePath(path.join('js/views', f)), 'utf8');
-  const routesToReflect = /navigate\(["']reflect["']\)/.test(s);
+  const routesToReflect = /navigate\(["']reflect["']\)/.test(s) || (/["']plan-finish["']/.test(s) && PLAN_FINISH_OK);
   const rendersItself   = /renderSessionMoments\(/.test(s);
   if (!routesToReflect && !rendersItself) orphans.push(f);
 }
