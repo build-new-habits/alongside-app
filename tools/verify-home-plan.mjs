@@ -1,6 +1,10 @@
 /**
  * tools/verify-home-plan.mjs
- * 29 Oct 2026 v4
+ * 29 Oct 2026 v5
+ *
+ * v5 - STAGE PATH Session 6 re-point (none loosened). On the Plan a session
+ *   now ends on the Plan's own finish (plan-finish); Free's is still reflect.
+ *   Where this gate reads which finish was reached, it reads the tier's own.
  *
  * v4 - STAGE PATH P-4 re-point (none loosened; mock-up v10, Graeme 29 Oct).
  *   TEST 1 and 2 are the purpose-first Home: one row, Let me choose for you
@@ -184,9 +188,9 @@ tap('[data-action="carry-on"]');
 tap("#exit-workout-btn"); document.querySelector("#exit-confirm-leave")?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }));
 await wait(50);
 const log = store.get("activityLog") || [];
-ok("5a. one part-session saved with what was done, and on to the finish", navs.includes("reflect") && log.length === 1 && log[0].status === "partial" && log[0].exercisesCount === 1,
+ok("5a. one part-session saved with what was done, and on to the finish", navs.includes("plan-finish") && log.length === 1 && log[0].status === "partial" && log[0].exercisesCount === 1,
    `${JSON.stringify(navs)} ${JSON.stringify(log[0] || {})}`);
-home(["reflect"]);
+home(["plan-finish"]);
 ok("5b. and nothing is left to carry on", !main.querySelector('.path-today[data-state="carry"]'));
 
 // ── 6. FREE ─────────────────────────────────────────────────────────────

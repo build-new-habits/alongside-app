@@ -312,3 +312,5 @@
 
 /* The player's halfway check (workout.js v36, the Plan). */
 .wo-halfway .coach-message-text { margin: var(--space-3) 0 var(--space-4); }
+/* The session moments' answers on the Plan's finish: 44 px targets (they are 36 on Free's, unchanged). */
+.plan-finish .card-coach button { min-height: 44px; }

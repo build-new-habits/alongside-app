@@ -1,5 +1,11 @@
 /**
  * tools/verify-interruptions.mjs
+ * 29 Oct 2026 v3
+ *
+ * v3 - STAGE PATH Session 6 re-point (none loosened). On the Plan a session
+ *   now ends on the Plan's own finish (plan-finish); Free's is still reflect.
+ *   Where this gate reads which finish was reached, it reads the tier's own.
+ *
  * 04 Oct 2026 v2
  *
  * v2 - D-1 EXERCISE-FOUR. Reaches Capture (the fourth step) before the set buttons; nothing it proves has changed.
@@ -164,7 +170,7 @@ paint();
 doOne(5);
 for (let i = 0; i < 40 && !navs.includes("reflect"); i++) doOne();
 const done = log().at(-1) || {};
-ok("4pc. finished", navs.includes("reflect") && done.type === "workout", JSON.stringify(navs.slice(-3)));
+ok("4pc. finished", navs.includes("plan-finish") && done.type === "workout", JSON.stringify(navs.slice(-3)));
 ok("4a. about twenty minutes of training, not ninety", done.durationMins >= 18 && done.durationMins <= 24, `${done.durationMins} min`);
 
 // ── 5. MAKE IT UP AS I GO ───────────────────────────────────────────────

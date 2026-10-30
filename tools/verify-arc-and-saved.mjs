@@ -1,6 +1,12 @@
 /**
  * tools/verify-arc-and-saved.mjs
- * 04 Oct 2026 v2
+ * 29 Oct 2026 v3
+ *
+ * v3 - STAGE PATH Session 6 re-point (none loosened). On the Plan, Start on
+ *   a saved session opens it as a proposal first (views/path.js: figures and
+ *   Swap, P-12), and its Start plays it; the session it starts, its kind,
+ *   its sections, its log and the arc's credit are asserted exactly as
+ *   before. It ends on the Plan's own finish (plan-finish).
  *
  * v2 - D-1 EXERCISE-FOUR. Reaches Capture (the fourth step) before the set
  *   buttons; nothing it proves has changed.
@@ -170,7 +176,15 @@ globalThis.router = r4; dom.window.router = r4;
 main.innerHTML = "";
 const view = SV.SavedSessionsView ? SV.SavedSessionsView(r4) : null;
 if (view?.mount) view.mount(main); else if (SV.render) { main.innerHTML = SV.render(); SV.onMount?.(main); }
+const { router: appRouter0 } = await import(B + "router.js");
+appRouter0.navigate = v => navs.push(v);
 main.querySelector(`[data-saved-id="${r2.saved.id}"]`)?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }));
+// v3: the proposal first, then its Start.
+if (navs.at(-1) === "path") {
+  const { PathView } = await import(B + "views/path.js");
+  main.innerHTML = ""; PathView(appRouter0).mount(main);
+  main.querySelector("#path-start")?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }));
+}
 const gen = store.get("generatedSession")?.session || {};
 ok("4pc. the saved list started it", store.get("usingGeneratedSession") === true && gen.exercises?.length > 0 && store.get("generatedSession")?.inputs?.savedSessionId === r2.saved.id);
 ok("4a. it starts as its kind, with its sections", gen.sessionType === "upper" && gen.exercises.every(e => e.section), `${gen.sessionType}; ${gen.exercises?.map(e => e.section).join(",")}`);
@@ -181,9 +195,9 @@ appRouter.navigate = v => { navs.push(v); if (v === "workout") paint(); };
 function paint() { main.innerHTML = W.render(); try { W.onMount(); } catch {} }
 paint();
 const tap = sel => { const el = main.querySelector(sel); if (el) el.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true })); return !!el; };
-for (let i = 0; i < 200 && !navs.includes("reflect"); i++) { if (!tap("#wo-set-done-btn") && !tap("#complete-exercise-btn") && !tap("#wo-done-btn") && !tap('[data-step-go="capture"]:not([aria-current])')) paint(); }
+for (let i = 0; i < 200 && !navs.includes("plan-finish"); i++) { if (!tap("#wo-set-done-btn") && !tap("#complete-exercise-btn") && !tap("#wo-done-btn") && !tap('[data-step-go="capture"]:not([aria-current])')) paint(); }
 const done = (store.get("activityLog") || []).at(-1) || {};
-ok("4b. finished, it is logged as Upper Body", navs.includes("reflect") && done.sessionType === "upper", `${done.sessionType} ${JSON.stringify(navs.slice(-2))}`);
+ok("4b. finished, it is logged as Upper Body", navs.includes("plan-finish") && done.sessionType === "upper", `${done.sessionType} ${JSON.stringify(navs.slice(-2))}`);
 ok("4c. and the arc is credited for it", (store.get("arc").typesWorked || {}).upper === today() && !(store.get("arc").typesWorked || {}).glute, JSON.stringify(store.get("arc").typesWorked));
 
 console.log("");

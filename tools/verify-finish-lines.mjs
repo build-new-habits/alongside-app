@@ -1,6 +1,13 @@
 /**
  * tools/verify-finish-lines.mjs
- * 04 Oct 2026 v2
+ * 29 Oct 2026 v3
+ *
+ * v3 - STAGE PATH Session 6 re-point (none loosened; stricter). On the Plan
+ *   a session now ends on the Plan's own finish (views/plan-finish.js), which
+ *   has no How did it feel? line, so TEST 1 (the coach's line after a hard
+ *   session) is Free's finish. The reflection prompts (TESTS 2 and 3) are
+ *   chosen by the same cadence on both finishes, so they now run on both
+ *   tiers: Free through reflect.js, the Plan through plan-finish.js.
  *
  * v2 - D-1 EXERCISE-FOUR. Reaches Capture (the fourth step) before the set
  *   buttons; nothing it proves has changed.
@@ -41,6 +48,7 @@ const { HURT_AND_ACHE_VERSION } = await import(B + "exercise-card.js");
 const { router: realRouter } = await import(B + "router.js");
 const workout = await import(B + "views/workout.js");
 const reflect = await import(B + "views/reflect.js");
+const { PlanFinishView } = await import(B + "views/plan-finish.js");
 const { EMPATHY_PROMPTS } = await import(B + "data/empathy-transfer.js");
 
 let fails = 0, passes = 0;
@@ -53,7 +61,8 @@ const main = document.getElementById("main-content");
 let navs = [];
 function paintWorkout() { main.innerHTML = workout.render(); try { workout.onMount(); } catch {} }
 function paintReflect() { main.innerHTML = reflect.render(); try { reflect.onMount(); } catch {} }
-const nav = v => { navs.push(v); if (v === "workout") paintWorkout(); if (v === "reflect") paintReflect(); };
+let TIER = "free";   // v3: Free's finish (reflect) or the Plan's (plan-finish)
+const nav = v => { navs.push(v); if (v === "workout") paintWorkout(); if (v === "reflect") paintReflect(); if (v === "plan-finish") { main.innerHTML = ""; PlanFinishView({ navigate: nav, back() {} }).mount(main); } };
 const _router = { navigate: nav, back() {} };
 globalThis.window.router = _router;
 Object.defineProperty(globalThis, "router", { value: _router, configurable: true, writable: true });
@@ -72,7 +81,7 @@ function fixture({ sore = null, energies = [7, 7, 7, 7, 7], rotate = 0, checkedI
   if (document.querySelector("#exit-workout-btn")) { tap("#exit-workout-btn"); document.querySelector("#exit-confirm-discard")?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true })); }
   localStorage.clear(); store.init();
   store.set("safetyAckLog", Array.from({ length: 5 }, () => ({ at: new Date().toISOString(), textVersion: HURT_AND_ACHE_VERSION, surface: "fixture" })));
-  store.set("tier", "personal"); store.set("onboardingComplete", true);
+  store.set("tier", TIER); store.set("onboardingComplete", true);
   store.set("activityLog", Array.from({ length: 8 }, (_, i) => ({ id: "p" + i, type: "workout", status: "completed", completedAt: dayAgo(i + 2).toISOString(), date: dayAgo(i + 2).toISOString() })));
   const hist = {}; energies.forEach((e, i) => { hist[key(dayAgo(i + 1))] = { energy: e, mood: 6 }; });
   if (checkedIn) hist[key(new Date())] = { energy: 7, mood: 6 };
@@ -89,8 +98,8 @@ function toCapture() { if (!main.querySelector("#wo-set-done-btn, #wo-done-btn, 
 function doMoves(n) { for (let i = 0; i < n; i++) { toCapture(); tap("#wo-set-done-btn"); tap("#wo-set-done-btn"); tap("#wo-set-done-btn"); tap("#complete-exercise-btn"); } }
 function endEarly() { tap("#exit-workout-btn"); document.querySelector("#exit-confirm-leave")?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true })); }
 async function empathyText() {
-  tap("#reflect-done-btn"); await wait(20);
-  return T(main.querySelector("#empathy-prompt-text"));
+  tap(TIER === "free" ? "#reflect-done-btn" : "#pf-done"); await wait(20);
+  return T(main.querySelector(TIER === "free" ? "#empathy-prompt-text" : "#pf-empathy"));
 }
 
 // ── 1. "YOU FINISHED IT" ─────────────────────────────────────────────────
@@ -104,6 +113,8 @@ fixture(); doMoves(10); await wait(10);
 tap('[data-feel="hard"]'); await wait(10);
 ok("1b. control: a hard session done to the end still hears it", /You finished it/.test(T(main.querySelector("#finish-coach"))), T(main.querySelector("#finish-coach")));
 
+for (const tier of ["free", "personal"]) {
+TIER = tier;
 // ── 2. THE GOOD-DAY REFLECTIONS ─────────────────────────────────────────
 console.log("\nTEST 2 - a \"good day\" reflection needs a good day");
 const GOOD = Object.values(EMPATHY_PROMPTS).flat().filter(p => (p.requires || []).includes("goodEnergy")).map(p => p.text.slice(0, 40));
@@ -116,10 +127,10 @@ const saidGood = s => GOOD.some(g => s.startsWith(g));
     fixture({ rotate: r }); doMoves(2); endEarly(); await wait(10); seen.early.push(await empathyText());
     fixture({ rotate: r, checkedIn: false }); doMoves(10); await wait(10); seen.none.push(await empathyText());
   }
-  ok("2pc. control: on a plain good day the good-day reflections are reached", seen.plain.some(saidGood), seen.plain.map(s => s.slice(0, 30)).join(" | "));
-  ok("2a. not after saying something is sore today", !seen.sore.some(saidGood), seen.sore.filter(saidGood).map(s => s.slice(0, 50)).join(" | "));
-  ok("2b. not after ending early", !seen.early.some(saidGood), seen.early.filter(saidGood).map(s => s.slice(0, 50)).join(" | "));
-  ok("2c. not when they have not said how their energy is today", !seen.none.some(saidGood), seen.none.filter(saidGood).map(s => s.slice(0, 50)).join(" | "));
+  ok(`${tier}: 2pc. control: on a plain good day the good-day reflections are reached`, seen.plain.some(saidGood), seen.plain.map(s => s.slice(0, 30)).join(" | "));
+  ok(`${tier}: 2a. not after saying something is sore today`, !seen.sore.some(saidGood), seen.sore.filter(saidGood).map(s => s.slice(0, 50)).join(" | "));
+  ok(`${tier}: 2b. not after ending early`, !seen.early.some(saidGood), seen.early.filter(saidGood).map(s => s.slice(0, 50)).join(" | "));
+  ok(`${tier}: 2c. not when they have not said how their energy is today`, !seen.none.some(saidGood), seen.none.filter(saidGood).map(s => s.slice(0, 50)).join(" | "));
 }
 
 // ── 3. THE CHARACTER LINE ────────────────────────────────────────────────
@@ -131,9 +142,12 @@ console.log("\nTEST 3 - \"You adjust and continue\" needs the adjusting it descr
     fixture({ rotate: r, energies: [5, 5, 5, 5, 5], checkedIn: false }); doMoves(10); await wait(10); flat.push(await empathyText());
     fixture({ rotate: r, energies: [2, 8, 3, 7, 2], checkedIn: false }); doMoves(10); await wait(10); varied.push(await empathyText());
   }
-  ok("3a. never said to somebody whose energy has been the same every day", !flat.some(s => CHAR.test(s)), flat.filter(s => CHAR.test(s)).length + " times");
-  ok("3b. control: it can be said when their energy has varied and they kept coming", varied.some(s => CHAR.test(s)), varied.map(s => s.slice(0, 30)).join(" | "));
+  ok(`${tier}: 3a. never said to somebody whose energy has been the same every day`, !flat.some(s => CHAR.test(s)), flat.filter(s => CHAR.test(s)).length + " times");
+  ok(`${tier}: 3b. control: it can be said when their energy has varied and they kept coming`, varied.some(s => CHAR.test(s)), varied.map(s => s.slice(0, 30)).join(" | "));
 }
+
+}
+TIER = "free";
 
 // ── 4. THE BUILDER NAMES WHAT THEY SAID ──────────────────────────────────
 console.log("\nTEST 4 - the builder says the area the person named");

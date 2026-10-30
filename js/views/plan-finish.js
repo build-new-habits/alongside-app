@@ -43,7 +43,9 @@ const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "
 export function PlanFinishView(router) {
   let root = null;
   let entry = null;
-  let mood = null, pain = null, note = "";
+  let mood = null;
+  let pain = null;
+  let note = "";
   let fb = {};          // id -> { like, less, never }
   let empathy = null;   // { text } when the prompt is due
 

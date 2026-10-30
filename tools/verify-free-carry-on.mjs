@@ -1,5 +1,11 @@
 /**
  * tools/verify-free-carry-on.mjs
+ * 29 Oct 2026 v3
+ *
+ * v3 - STAGE PATH Session 6 re-point (none loosened). On the Plan a session
+ *   now ends on the Plan's own finish (plan-finish); Free's is still reflect.
+ *   Where this gate reads which finish was reached, it reads the tier's own.
+ *
  * 04 Oct 2026 v2
  *
  * v2 - D-1 EXERCISE-FOUR. Reaches Capture (the fourth step) before the set
@@ -109,9 +115,10 @@ for (const tier of ["free", "personal"]) {
   await reopen();
   start(tier, Bs);
   ok(`2a-${tier}. the new session starts at its own first move`, main.querySelector(".exercise-name")?.textContent === Bs.exercises[0].name, main.querySelector(".exercise-name")?.textContent);
-  for (let i = 0; i < 40 && !navs.includes("reflect"); i++) doOne();
+  const FIN = tier === "free" ? "reflect" : "plan-finish";   // v3: the tier's own finish
+  for (let i = 0; i < 40 && !navs.includes(FIN); i++) doOne();
   const entry = (store.get("activityLog") || []).at(-1);
-  ok(`2b-${tier}. finished, it counts only its own moves`, navs.includes("reflect") && entry?.exercisesCount === Bs.exercises.length && entry?.exercisesCount <= Bs.exercises.length,
+  ok(`2b-${tier}. finished, it counts only its own moves`, navs.includes(FIN) && entry?.exercisesCount === Bs.exercises.length && entry?.exercisesCount <= Bs.exercises.length,
      `logged ${entry?.exercisesCount}, session has ${Bs.exercises.length}`);
 }
 

@@ -1,6 +1,11 @@
 /**
  * tools/verify-finish.mjs
- * 06 Oct 2026 v6
+ * 29 Oct 2026 v7
+ *
+ * v7 - STAGE PATH Session 6 re-point (none loosened). On the Plan a session
+ *   now ends on the Plan's own finish (views/plan-finish.js, held by
+ *   verify-path-finish); this screen (reflect.js) is Free's. The fixture
+ *   person is on Free, and every assertion is unchanged.
  *
  * v6 - D-11 PROGRESS-SHARE. 5pc RE-POINTED, not loosened: the feel answer
  *   is now shown back (Progress's Today and the shared report say
@@ -98,7 +103,7 @@ function session({ conditions = [], finish = true, soreToday = false } = {}) {
   if (document.querySelector("#exit-workout-btn")) { tap("#exit-workout-btn"); document.querySelector("#exit-confirm-discard")?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true })); }
   localStorage.clear(); store.init(); agreed(store);
   store.set("safetyAckLog", Array.from({ length: 5 }, () => ({ at: new Date().toISOString(), textVersion: HURT_AND_ACHE_VERSION, surface: "fixture" })));
-  store.set("tier", "personal"); store.set("onboardingComplete", true); store.set("conditions", conditions);
+  store.set("tier", "free"); store.set("onboardingComplete", true); store.set("conditions", conditions);   // v7: Free's finish
   store.set("lastCheckin", { mood: 6, energy: 6, timestamp: new Date().toISOString() });
   if (soreToday) { store.set("conditionPainScores", Object.fromEntries(conditions.map(c => [c, 4]))); store.set("conditionPainScoresOn", store._localDay()); }
   store.set("generatedSession", { session: { id: "s", name: "Upper Body", exercises: [EX("a", "Row"), EX("b", "Press")] }, builtAt: new Date().toISOString(), inputs: {} });
