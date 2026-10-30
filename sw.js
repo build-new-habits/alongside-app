@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 29 Oct 2026 v685
+ * 30 Oct 2026 v686
  *
+ * v686 - STAGE PATH Session 6 (Free unchanged). On the Plan: a new finish after every session (how you feel now beside how you felt this morning, Loved it / Less often / Not again for each movement, Keep to repeat, and, as before, the pain check when something is sore, the occasional reflection, Your arc today and Add a note); on a low-mood day the player shows no countdown; when something is quite sore it checks halfway, still okay?; swapping a movement out means less of it. Every way to a session now shows the same proposal first: each movement's stick figure and Swap, then Start; Make it mine keeps your version; a saved session opens that way too. NEW FILE precached: js/views/plan-finish.js.
  * v685 - P-12 fix-now, from the consistency trace (both tiers): Mobility & Conditioning, Morning Programme and My programme (before a session is built) now say their name as the page heading, so a screen reader announces where you are; on Mobility & Conditioning, Log an event opens Log an activity, as it says (it opened the Library).
  * v684 - STAGE PATH Sessions 4 and 5, together (mock-up v10, Graeme 29 Oct: "Yep. I like v10"). Free is unchanged. On the Plan, Home is purpose first: your arc as a line, Lately (mood before and after your sessions, and what seems to help), one row (Let me choose for you, or your week's day, Carry on, Done today), then four doors: Get stronger, Keep moving, Stretch, Move to feel better, and the Library. The check-in is asked inside whichever way in you choose, once a day, with Not today. Behind each door, its own steps: where you are, which part, then built for you, built by you or one you saved; outside, what you're doing and Log it; Stretch by area, with ready-made routines and the floor question; Move to feel better by feeling, with programmes, a fresh one, Surprise me and Help me choose, each played in the usual player. Today's plan says why the coach chose it, what it adjusted and Change my check-in. I know what I want and Make it up as I go are in the Library. NEW FILES precached: js/views/plan-home.js, js/views/path.js, js/data/path-context.js, css/components/path.css.
  * v683 - STAGE PATH Session 3: nothing new on screen yet; the Plan's coach can now suggest today's session from the check-in, say what it adjusted, put movements you loved first (at most two a session, not if done in the last two sessions), and put together a fresh Move to feel better sequence inside each feeling's gentle rules. NEW FILE precached: js/data/path-engine.js.
@@ -4232,7 +4233,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v685";
+const CACHE_NAME = "alongside-v686";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4297,13 +4298,13 @@ const SHELL_HASHES = {
   "./css/components/capture.css": "343b4ae0dc6fe6ea",
   "./css/components/finish.css": "c33e298d5fcb92ae",
   "./js/app.js": "72054b00e54ad55b",
-  "./js/router.js": "4e007ac00ace7fcd",
+  "./js/router.js": "394b564ae6adb351",
   "./js/store.js": "cd9732c41d483377",
   "./js/session-log.js": "6134de4315842e05",
   "./js/exercise-feedback.js": "adba8549f444da2a",
   "./js/exercise-card.js": "78196b42671c67aa",
   "./js/safety-gate.js": "7a095f4bf8018087",
-  "./js/save-block.js": "831a7143b32e0f7d",
+  "./js/save-block.js": "efe2b2583f4c14f7",
   "./js/stretch-target.js": "e8c305bfb957d655",
   "./js/data/purpose.js": "fe0f0dcf76cd4591",
   "./js/data/morning-library-map.js": "d4eb79cc3e5df86d",
@@ -4320,13 +4321,13 @@ const SHELL_HASHES = {
   "./js/views/stretch-arc.js": "41d235d11e31fcb7",
   "./js/views/checkin.js": "fea9b03bd24ea34f",
   "./js/views/checkin-mini.js": "c647f4da71feddde",
-  "./js/views/coach-proposal.js": "058eefda64c4dd1e",
-  "./js/views/workout.js": "27f3ec466b83017e",
+  "./js/views/coach-proposal.js": "a6b85909527f72c2",
+  "./js/views/workout.js": "4f0d68a7b2ebe702",
   "./js/views/progress.js": "0e5aa6295cab8ee5",
   "./js/views/settings.js": "ec21456c0fda9b36",
   "./js/views/restore-flow.js": "dc81c2e455fa472d",
   "./js/views/weekly-plan.js": "dcee06e297b402c0",
-  "./js/views/reflect.js": "1f905f98c16931ee",
+  "./js/views/reflect.js": "4e61ab900c9b51b4",
   "./js/data/empathy-transfer.js": "b3513396b3541e3a",
   "./js/data/equipment-map.js": "2db6399d16987707",
   "./js/data/exercises/gym.js": "835e777941d00fe4",
@@ -4358,10 +4359,11 @@ const SHELL_HASHES = {
   "./js/data/arc-readback.js": "9b06dcba96534da0",
   "./js/data/tier-table.js": "7821c3304bd0815c",
   "./js/views/know-what.js": "0b3d8db4a33b6c9b",
-  "./js/views/plan-home.js": "e92bc5094b16da66",
-  "./js/views/path.js": "7f9ed1459cbf019a",
-  "./js/data/path-context.js": "caa277b03a30df21",
-  "./css/components/path.css": "0cab2283275f3104",
+  "./js/views/plan-home.js": "aec84d576d4d745b",
+  "./js/views/path.js": "500ed3f0536357a6",
+  "./js/views/plan-finish.js": "7a03f4176a4cb840",
+  "./js/data/path-context.js": "fc5643585fe6066e",
+  "./css/components/path.css": "689b87da53e9f588",
   "./js/data/red-flag.js": "3cd9eecbc3985eb3",
   "./js/data/health-consent.js": "a23d005af57f179c",
   "./js/data/age-check.js": "7fa5b0f5a6b34770",
@@ -4406,7 +4408,7 @@ const SHELL_HASHES = {
   "./js/views/my-programme.js": "a13d0ab884680b43",
   "./js/session-builder.js": "70992dba2147aa1f",
   "./js/data/session-choice.js": "954463b0647f3843",
-  "./js/data/saved-sessions.js": "91dd2dc43f0f908b",
+  "./js/data/saved-sessions.js": "93acb1c187b291ab",
   "./js/data/class-contract.js": "fe8f3f22b0df50f6",
   "./js/data/classes/index.js": "0204f29329b03b15",
   "./js/data/classes/class-ground-001.js": "b4df735986c353bd",
@@ -4425,7 +4427,7 @@ const SHELL_HASHES = {
   "./js/views/class-list.js": "551081d91143ee4d",
   "./css/components/class-list.css": "e33b073b352399f3",
   "./css/components/class-player.css": "401cc57d7d39dbb1",
-  "./js/views/saved-sessions.js": "675fccfefce142c8",
+  "./js/views/saved-sessions.js": "d20746ec43b1756c",
   "./js/views/session-builder-ui.js": "4bff89344b105d5c",
   "./js/views/noticing.js": "7344ac61b5a10c06",
   "./js/views/in-step.js": "e6b66f1d1e71096e",
@@ -4671,6 +4673,7 @@ const SHELL_URLS = [
   "./js/views/know-what.js",
   "./js/views/plan-home.js",
   "./js/views/path.js",
+  "./js/views/plan-finish.js",
   "./js/data/path-context.js",
   "./css/components/path.css",
   "./js/data/red-flag.js",
