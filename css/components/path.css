@@ -345,3 +345,5 @@
 .is-plan .view-header h1 { font-size: var(--text-2xl); text-align: left; }
 .is-plan .ws-type-icon, .is-plan .activity-type-card > span[aria-hidden="true"] { display: inline-flex; color: var(--kind-blue); }
 .is-plan .ws-type-icon .line-icon, .is-plan .activity-type-card .line-icon { width: 22px; height: 22px; }
+/* Log what I did's choices wrap as the text grows (both tiers: at text 2 three columns ran off the page, a fault, not a look). */
+.activity-type-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, calc(6.5rem * var(--user-text-scale, 1))), 1fr)); }
