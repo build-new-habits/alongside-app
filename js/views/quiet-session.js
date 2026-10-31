@@ -1,7 +1,16 @@
 /**
  * quiet-session.js - Something Quieter View
  *
- * 18 Oct 2026 v11
+ * 31 Oct 2026 v12
+ *
+ * v12 - P-13 rooms, the mind rooms first (Graeme, 31 Oct). On the Plan only,
+ *   the one look (Session 9): the heading 24 px at the left; "‹ Back", or
+ *   Exit while a practice runs, with no house beside it; line icons for the
+ *   four ways in and the breathing patterns (they were emoji); Try another
+ *   drawn as a button; the last button on a finished practice or a rest day
+ *   says Done (it said "Back to choices"; it still goes there). Free
+ *   unchanged. The look only: planLook, never the tier, in a Wellbeing room;
+ *   verify-one-look TEST 6 proves the same controls on both tiers.
  *
  * v11 - OLD-CREDITS-TIDY (Graeme, 18 Oct: "You do those things"). The
  *   older per-session credit count is no longer written (totalCredits,
@@ -161,6 +170,8 @@
  */
 
 import { store }  from "../store.js";
+import { planLook } from "../plan-look.js";
+import { lineIcon } from "../data/line-icons.js";
 import { isGateDue, renderSafetyGate, attachSafetyGate } from "../safety-gate.js";
 // SHARED-1. See breathing-session.js. Both completion screens in this
 // view get the moments; missing one would mean a first journal entry is
@@ -317,13 +328,18 @@ let mindfulSession     = null;         // W5-10: the steps, so Stay can carry on
 export function render() {
   mode = store.get("quietMode") || "selector";
 
+  // v12. The Plan's look: "‹ Back", or Exit while a practice runs; no house beside it.
+  const plan = planLook();
+  const running = (mode === "breathing" && selectedBreathing && !breathingComplete) || (mode === "mindful" && mindfulStarted && !mindfulComplete);
   return `
-    <div class="view quiet-session-view">
+    <div class="view quiet-session-view${plan ? " is-plan" : ""}">
       <div class="quiet-session-header">
-        <button class="btn btn-ghost btn-small quiet-back-btn" id="quiet-back-btn"
+        ${plan ? (running ? `<button class="btn btn-ghost btn-small quiet-back-btn plan-exit" id="quiet-back-btn"
+                aria-label="Exit, back to choices">Exit</button>` : `<button class="btn btn-ghost btn-small quiet-back-btn plan-back" id="quiet-back-btn"
+                aria-label="Back to choices">‹ Back</button>`) : `<button class="btn btn-ghost btn-small quiet-back-btn" id="quiet-back-btn"
                 aria-label="Back to choices">
           &larr; Back
-        </button>
+        </button>`}
         <h1 class="quiet-session-title">${getModeTitle()}</h1>
       </div>
 
@@ -362,7 +378,7 @@ function renderModeSelector() {
       <button class="quiet-mode-card" data-mode="breathing" role="listitem"
               aria-label="Breathing practice">
         <div class="quiet-mode-card-left">
-          <span class="quiet-mode-icon" aria-hidden="true">\uD83C\uDF2C</span>
+          <span class="quiet-mode-icon" aria-hidden="true">${planLook() ? lineIcon("breath") : "\uD83C\uDF2C"}</span>
           <div>
             <h3>Breathing</h3>
             <p class="text-sm text-muted">Five breathing patterns, with a guided timer.</p>
@@ -374,7 +390,7 @@ function renderModeSelector() {
       <button class="quiet-mode-card" data-mode="mindful" role="listitem"
               aria-label="Mindful awareness">
         <div class="quiet-mode-card-left">
-          <span class="quiet-mode-icon" aria-hidden="true">\uD83C\uDF3F</span>
+          <span class="quiet-mode-icon" aria-hidden="true">${planLook() ? lineIcon("mind") : "\uD83C\uDF3F"}</span>
           <div>
             <h3>Mindful awareness</h3>
             <p class="text-sm text-muted">5, 10, 15, or 20 minutes. Guided practice with timer.</p>
@@ -386,7 +402,7 @@ function renderModeSelector() {
       <button class="quiet-mode-card" data-mode="journal" role="listitem"
               aria-label="Journaling">
         <div class="quiet-mode-card-left">
-          <span class="quiet-mode-icon" aria-hidden="true">\uD83D\uDCDD</span>
+          <span class="quiet-mode-icon" aria-hidden="true">${planLook() ? lineIcon("pencil") : "\uD83D\uDCDD"}</span>
           <div>
             <h3>Journaling</h3>
             <p class="text-sm text-muted">Write anything. Only you can read it.</p>
@@ -398,7 +414,7 @@ function renderModeSelector() {
       <button class="quiet-mode-card" data-mode="rest" role="listitem"
               aria-label="Rest day">
         <div class="quiet-mode-card-left">
-          <span class="quiet-mode-icon" aria-hidden="true">\uD83D\uDECC</span>
+          <span class="quiet-mode-icon" aria-hidden="true">${planLook() ? lineIcon("rest") : "\uD83D\uDECC"}</span>
           <div>
             <h3>Rest</h3>
             <p class="text-sm text-muted">A coach acknowledgement. Nothing more required.</p>
@@ -451,7 +467,7 @@ function renderBreathingSelector() {
         <button class="card quiet-breathing-card" data-breathing-id="${ex.id}"
                 role="listitem" aria-label="Start ${ex.name}">
           <div class="quiet-breathing-card-header">
-            <span class="quiet-breathing-icon" aria-hidden="true">${ex.icon}</span>
+            <span class="quiet-breathing-icon" aria-hidden="true">${planLook() ? lineIcon("breath") : ex.icon}</span>
             <div>
               <h3>${ex.name}</h3>
               <p class="text-sm text-muted">${ex.rounds} rounds
@@ -528,7 +544,7 @@ function renderBreathingComplete(ex) {
     </div>
 
     <div class="quiet-complete-actions">
-      <button class="btn btn-ghost btn-full" id="quiet-try-another-btn">
+      <button class="btn ${planLook() ? "btn-secondary" : "btn-ghost"} btn-full" id="quiet-try-another-btn">
         Try another exercise
       </button>
       <button class="btn btn-primary btn-full" id="quiet-breathing-done-btn"
@@ -655,7 +671,7 @@ function renderMindfulComplete() {
 
     <button class="btn btn-primary btn-full quiet-back-btn"
             style="margin-top:var(--space-5); margin-left:var(--space-4); margin-right:var(--space-4);">
-      Back to choices
+      ${planLook() ? "Done" : "Back to choices"}
     </button>
   `;
 }
@@ -693,9 +709,9 @@ function renderRestMode() {
       </p>
     </div>
 
-    <button class="btn btn-ghost btn-full quiet-back-btn"
+    <button class="btn ${planLook() ? "btn-secondary" : "btn-ghost"} btn-full quiet-back-btn"
             style="margin-top:var(--space-5); margin-left:var(--space-4); margin-right:var(--space-4);">
-      Back to choices
+      ${planLook() ? "Done" : "Back to choices"}
     </button>
   `;
 }

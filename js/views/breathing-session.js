@@ -1,6 +1,18 @@
 /**
  * js/views/breathing-session.js - Guided Breathing Session
  *
+ * 31 Oct 2026 v14
+ *
+ * v14 - P-13 rooms, the mind rooms first (Graeme, 31 Oct). On the Plan only,
+ *   the one look (Session 9): the heading 24 px at the left; "‹ Back" before
+ *   the practice and Exit during it, with no house beside either; line icons
+ *   for the five practices (they were symbols); the practice's name as the
+ *   heading while it runs, and "Breathing done." as the heading when it
+ *   ends (both had none); the last button says Done. Free unchanged. The
+ *   look only: planLook (js/plan-look.js), never the tier, in a Wellbeing
+ *   room (verify-plan-claims); verify-one-look TEST 6 proves the controls
+ *   are the same on both tiers.
+ *
  * 18 Oct 2026 v13
  *
  * v13 - OLD-CREDITS-TIDY (Graeme, 18 Oct: "You do those things"). The
@@ -105,6 +117,8 @@
  */
 
 import { store }  from "../store.js";
+import { planLook } from "../plan-look.js";
+import { lineIcon } from "../data/line-icons.js";
 import { prefersReducedMotion, getDisplayPref, canVibrate } from "../display-prefs.js";
 import { isGateDue, renderSafetyGate, attachSafetyGate } from "../safety-gate.js";
 // SHARED-1. This view does not route to reflect.js, so it renders the
@@ -408,14 +422,18 @@ export function render() {
   return renderPicker();
 }
 
+// v14. The Plan's look: one place for the way back and the root's class.
+const _look = () => (planLook() ? " is-plan" : "");
+const _back = (label, free) => (planLook() ? `<button class="btn btn-ghost plan-back" id="bs-back-btn" aria-label="${label}">‹ Back</button>` : free);
+
 function renderPicker() {
   return `
-    <div class="view breathing-view">
+    <div class="view breathing-view${_look()}">
 
       <div class="workout-header">
-        <button class="btn btn-ghost" id="bs-back-btn" aria-label="Back to Wellbeing">
+        ${_back("Back to Wellbeing", `<button class="btn btn-ghost" id="bs-back-btn" aria-label="Back to Wellbeing">
           ← Back
-        </button>
+        </button>`)}
         <h1 class="workout-header-title">Breathing</h1>
       </div>
 
@@ -431,7 +449,7 @@ function renderPicker() {
           <button class="card bs-type-card" data-type="${t.id}"
                   style="display: flex; align-items: flex-start; gap: var(--space-4); text-align: left; width: 100%; cursor: pointer; background: var(--color-surface);"
                   aria-label="${t.label}: ${t.tagline}">
-            <span style="font-size: 1.75rem; flex-shrink: 0; line-height: 1.2; margin-top: 2px;" aria-hidden="true">${t.icon}</span>
+            ${planLook() ? `<span class="kind-tile k-green" aria-hidden="true">${lineIcon("breath")}</span>` : `<span style="font-size: 1.75rem; flex-shrink: 0; line-height: 1.2; margin-top: 2px;" aria-hidden="true">${t.icon}</span>`}
             <div style="flex: 1; min-width: 0;">
               <p style="font-size: var(--text-base); font-weight: var(--font-semibold); margin-bottom: var(--space-1);">${t.label}</p>
               <p class="text-secondary" style="font-size: var(--text-sm); margin-bottom: var(--space-1);">${t.tagline}</p>
@@ -449,12 +467,12 @@ function renderPicker() {
 function renderDuration() {
   const type = TYPES.find(t => t.id === selectedType);
   return `
-    <div class="view breathing-view">
+    <div class="view breathing-view${_look()}">
 
       <div class="workout-header">
-        <button class="btn btn-ghost" id="bs-back-btn" aria-label="Back to type picker">
+        ${_back("Back to type picker", `<button class="btn btn-ghost" id="bs-back-btn" aria-label="Back to type picker">
           ← Back
-        </button>
+        </button>`)}
         <h1 class="workout-header-title">${type?.label || "Breathing"}</h1>
       </div>
 
@@ -490,7 +508,7 @@ function renderSession() {
   const type = TYPES.find(t => t.id === selectedType);
   const firstPhase = type?.cycle[0];
   return `
-    <div class="view breathing-view breathing-view--session">
+    <div class="view breathing-view breathing-view--session${_look()}">
 
       <!-- Progress bar across top -->
       <div class="bs-top-progress" role="progressbar"
@@ -500,13 +518,14 @@ function renderSession() {
       </div>
 
       <div class="bs-session-header">
-        <button class="btn btn-ghost btn-small" id="bs-exit-btn" aria-label="Exit breathing session">
+        ${planLook() ? `<button class="btn btn-ghost btn-small plan-exit" id="bs-exit-btn" aria-label="Exit breathing session">Exit</button>` : `<button class="btn btn-ghost btn-small" id="bs-exit-btn" aria-label="Exit breathing session">
           Exit
-        </button>
+        </button>`}
         <span class="text-sm text-muted" id="bs-time-remaining" role="timer">
           ${formatTime(selectedMins * 60)}
         </span>
       </div>
+      ${planLook() ? `<h1>${type?.label || "Breathing"}</h1>` : ""}
       ${getDisplayPref("vibration") !== "off" && canVibrate() ? `
       <p class="text-muted text-sm" style="text-align: center; margin: var(--space-2) 0 0;">
         Your phone buzzes gently at each change of breath. You can turn that off in Settings, Display, Vibration.
@@ -540,7 +559,8 @@ function renderDone() {
   const type = TYPES.find(t => t.id === selectedType);
   const name = store.get("name") || "";
   return `
-    <div class="view breathing-view" style="text-align: center;">
+    <div class="view breathing-view${_look()}"${planLook() ? "" : ` style="text-align: center;"`}>
+      ${planLook() ? `<h1 tabindex="-1">Breathing done.</h1>` : ""}
 
       ${renderSessionMoments({})}
 
@@ -558,9 +578,9 @@ function renderDone() {
         <button class="btn btn-primary btn-full" id="bs-again-btn">
           Another session
         </button>
-        <button class="btn btn-ghost btn-full" id="bs-home-btn">
+        ${planLook() ? `<button class="btn btn-secondary btn-full" id="bs-home-btn" aria-label="Done, back to Wellbeing">Done</button>` : `<button class="btn btn-ghost btn-full" id="bs-home-btn">
           Back to Wellbeing
-        </button>
+        </button>`}
       </div>
 
     </div>

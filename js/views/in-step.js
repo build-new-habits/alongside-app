@@ -1,6 +1,14 @@
 /**
  * js/views/in-step.js
- * 18 Oct 2026 v4
+ * 31 Oct 2026 v5
+ *
+ * v5 - P-13 rooms, the mind rooms first (Graeme, 31 Oct). On the Plan only,
+ *   the one look (Session 9): the heading 24 px at the left; "‹ Back" (it
+ *   said "← Back") with no house beside it; the four movements' line icon
+ *   in place of their emoji, and no padlock emoji on one not open yet (its
+ *   line already says when it opens); Learn why and Write about it drawn as
+ *   buttons. Free unchanged; In Step stays free (verify-door1,
+ *   verify-plan-claims).
  *
  * v4 - A-4 WORD BUDGET (Stage AWARD; Graeme, 18 Oct: "You do those
  *   things"). What this is is folded (every word kept), so the four
@@ -101,6 +109,7 @@ import { store }               from "../store.js";
 import { router }              from "../router.js";
 import { MOVEMENTS, getScenario } from "../data/in-step-scenarios.js";
 import { isPremium }           from "../auth.js";
+import { lineIcon }            from "../data/line-icons.js";
 
 export const centered = false;
 
@@ -211,12 +220,12 @@ function renderLanding() {
   const progress = getProgress();
 
   return `
-    <div class="view in-step-view">
+    <div class="view in-step-view${isPremium() ? " is-plan" : ""}">
 
       <div class="workout-header">
-        <button class="btn btn-ghost" id="is-back-btn" aria-label="Back to Noticing">
+        ${isPremium() ? `<button class="btn btn-ghost plan-back" id="is-back-btn" aria-label="Back to Noticing">‹ Back</button>` : `<button class="btn btn-ghost" id="is-back-btn" aria-label="Back to Noticing">
           ← Back
-        </button>
+        </button>`}
         <h1 class="workout-header-title">In Step</h1>
       </div>
 
@@ -287,14 +296,14 @@ function renderLanding() {
                            background: var(--color-surface);
                            border: 1px ${available ? "solid transparent" : "dashed var(--color-primary)"};"
                     aria-label="${m.name}: ${available ? m.tagline : sub}">
-              <span style="font-size: 2rem; flex-shrink: 0; line-height: 1;" aria-hidden="true">${m.icon}</span>
+              ${isPremium() ? `<span class="kind-tile k-green" aria-hidden="true">${lineIcon("instep")}</span>` : `<span style="font-size: 2rem; flex-shrink: 0; line-height: 1;" aria-hidden="true">${m.icon}</span>`}
               <div style="flex: 1; min-width: 0;">
                 <p style="font-size: var(--text-lg); font-weight: var(--font-semibold);
                           margin-bottom: var(--space-1);">${m.name}</p>
                 <p class="text-secondary" style="font-size: var(--text-sm);">${sub}</p>
               </div>
               <span style="color: var(--color-primary); font-size: 1.25rem; flex-shrink: 0;"
-                    aria-hidden="true">${available ? "›" : "🔒"}</span>
+                    aria-hidden="true">${available ? "›" : (isPremium() ? "" : "🔒")}</span>
             </button>
           `;
         }).join("")}
@@ -309,12 +318,12 @@ function renderScenario() {
   const options = shuffled(activeScenario.options);
 
   return `
-    <div class="view in-step-view">
+    <div class="view in-step-view${isPremium() ? " is-plan" : ""}">
 
       <div class="workout-header">
-        <button class="btn btn-ghost" id="is-back-btn" aria-label="Back to In Step">
+        ${isPremium() ? `<button class="btn btn-ghost plan-back" id="is-back-btn" aria-label="Back to In Step">‹ Back</button>` : `<button class="btn btn-ghost" id="is-back-btn" aria-label="Back to In Step">
           ← Back
-        </button>
+        </button>`}
         <h1 class="workout-header-title">${movement.name}</h1>
       </div>
 
@@ -341,7 +350,7 @@ function renderResult() {
   const movement = MOVEMENTS.find(m => m.id === activeMovementId);
 
   return `
-    <div class="view in-step-view">
+    <div class="view in-step-view${isPremium() ? " is-plan" : ""}">
 
       <div class="workout-header">
         <h1 class="workout-header-title">${movement.name}</h1>
@@ -352,7 +361,7 @@ function renderResult() {
         <p class="coach-message-text">${movement.acknowledgement}</p>
       </div>
 
-      <button class="btn btn-ghost btn-small" id="is-learn-why-toggle"
+      <button class="btn ${isPremium() ? "btn-secondary" : "btn-ghost"} btn-small" id="is-learn-why-toggle"
               aria-expanded="${learnWhyOpen}" aria-controls="is-learn-why-panel"
               style="margin-bottom: var(--space-3);">
         ${learnWhyOpen ? "Hide" : "Learn why"}
@@ -405,7 +414,7 @@ function renderResult() {
       ` : ""}
 
       <div style="display: flex; flex-direction: column; gap: var(--space-3); margin-top: var(--space-5);">
-        <button class="btn btn-ghost" id="is-journal-btn">
+        <button class="btn ${isPremium() ? "btn-secondary" : "btn-ghost"}" id="is-journal-btn">
           Want to say more? Write about it.
         </button>
         <button class="btn btn-primary" id="is-done-btn">

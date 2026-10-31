@@ -1,7 +1,13 @@
 import { createRequire as __cr } from "node:module";
 /**
  * tools/verify-one-look.mjs
- * 31 Oct 2026 v2
+ * 31 Oct 2026 v3
+ *
+ * v3 - P-13 rooms (the mind rooms first, Graeme 31 Oct): In Step, Something
+ *   quieter and Breathing leave P-13's list, so TEST 2 now holds them; 5a
+ *   says six rooms remain. Breathing and Something quieter are Wellbeing
+ *   rooms, so they ask planLook for the look, and TEST 6 proves their
+ *   controls are the same on both tiers.
  *
  * v2 - P-13 (Graeme, 31 Oct): Mobility & Conditioning is no longer opened on
  *   the Plan (split into the Stretch door), so it moved from P-13's rooms to
@@ -187,6 +193,12 @@ await inside("3f. Plan import: what I read", "plan-import", []);
 await inside("3g. Your arc: what feeds it", "stretch-arc", ["[data-arc-change]"]);
 await inside("3h. the player, in a session", "workout", [], true);
 await inside("3i. Make it up as I go, in a session", "capture", [], true);
+// v3: the mind rooms, before and during a practice.
+await inside("3j. Breathing: how long, before it starts", "breathing-session", [".bs-type-card"]);
+// The room keeps its place between visits (3j left it on How long), so the next tap is the length.
+await inside("3k. Breathing, while it runs", "breathing-session", [() => main.querySelector(".bs-type-card") ? (click(main.querySelector(".bs-type-card")), main.querySelector(".bs-duration-btn")) : main.querySelector(".bs-duration-btn")], true);
+await inside("3l. Something quieter: a breathing pattern, while it runs", "quiet-session", ['[data-mode="breathing"]', ".quiet-breathing-card"], true);
+await inside("3m. In Step: a scenario", "in-step", [".is-movement-card:not([disabled])"]);
 
 // ── 4 ───────────────────────────────────────────────────────────────────
 console.log("\nTEST 4 - Free, as it was on alongside-v688");
@@ -233,7 +245,7 @@ ok("4pc2. compared every touched room the router opens", compared >= 20, compare
 // ── 5 ───────────────────────────────────────────────────────────────────
 console.log("\nTEST 5 - the scope");
 // v2 (P-13): Mobility & Conditioning left the Plan (split into the Stretch door); verify-library-shelf proves nothing on the Plan opens it.
-ok("5a. P-13 keeps its rooms but My exercises and the twelve-week shape (taken in by Session 9) and Mobility & Conditioning (no longer on the Plan)", P13_ROOMS.length === 9 && !P13_ROOMS.includes("prescribed") && !P13_ROOMS.includes("goal-setup") && !P13_ROOMS.includes("mobility-conditioning") && NOT_ON_THE_PLAN.includes("mobility-conditioning") && P13_ROOMS.includes("classes"), P13_ROOMS.join(", "));
+ok("5a. P-13 keeps its rooms but My exercises and the twelve-week shape (taken in by Session 9) and Mobility & Conditioning (no longer on the Plan)", P13_ROOMS.length === 6 && !["in-step", "quiet-session", "breathing-session"].some(r => P13_ROOMS.includes(r)) && !P13_ROOMS.includes("prescribed") && !P13_ROOMS.includes("goal-setup") && !P13_ROOMS.includes("mobility-conditioning") && NOT_ON_THE_PLAN.includes("mobility-conditioning") && P13_ROOMS.includes("classes"), P13_ROOMS.join(", "));
 const callers = execSync(`git -C "${ROOT}" grep -n "navigate('checkin-mini')\\|data-action=\\"checkin-mini\\"" -- js`, { encoding: "utf8" }).trim().split("\n");
 ok("5b. Update check-in is opened only from Free's Home (today.js)", callers.every(l => l.startsWith("js/views/today.js")), callers.join(" | "));
 person(); await open("today");
@@ -241,11 +253,11 @@ ok("5c. the Plan's Home does not offer it", !main.querySelector('[data-action="c
 
 // ── 6 ───────────────────────────────────────────────────────────────────
 console.log("\nTEST 6 - the look only, where the tier is never checked");
-const LOOK_ONLY = { "js/views/noticing.js": "noticing", "js/views/journal-entry.js": "journal-entry", "js/views/checkin.js": "checkin",
+const LOOK_ONLY = { "js/views/breathing-session.js": "breathing-session", "js/views/quiet-session.js": "quiet-session", "js/views/noticing.js": "noticing", "js/views/journal-entry.js": "journal-entry", "js/views/checkin.js": "checkin",
   "js/views/prescribed.js": "prescribed", "js/views/prescribed-session.js": "prescribed-session", "js/views/progress-share.js": "progress-share" };
 const users = execSync(`git -C "${ROOT}" grep -l "planLook" -- js`, { encoding: "utf8" }).trim().split("\n").filter(f => f !== "js/plan-look.js").sort();
 ok("6a. planLook is used only in the rooms this test proves", JSON.stringify(users) === JSON.stringify(Object.keys(LOOK_ONLY).sort()), users.join(", "));
-const BACK_IDS = /^(prescribed-back-top|prescribed-back-bottom|sh-back|ci-back)$/;
+const BACK_IDS = /^(prescribed-back-top|prescribed-back-bottom|sh-back|ci-back|bs-back-btn|quiet-back-btn)$/;
 // The share screen's 90 days is the Plan's by the tier table (windowsFor; verify-tier holds it): contents, not the look.
 const TABLED = /^sh-w-90$/;
 const controls = () => [...document.querySelectorAll("#app button, #app a[href], #app input, #app select, #app textarea, .ci-panel button, .ci-panel input")]
