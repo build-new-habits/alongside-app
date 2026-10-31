@@ -220,7 +220,7 @@ function renderLanding() {
   const progress = getProgress();
 
   return `
-    <div class="view in-step-view${isPremium() ? " is-plan" : ""}">
+    ${isPremium() ? `<div class="view in-step-view is-plan">` : `<div class="view in-step-view">`}
 
       <div class="workout-header">
         ${isPremium() ? `<button class="btn btn-ghost plan-back" id="is-back-btn" aria-label="Back to Noticing">‹ Back</button>` : `<button class="btn btn-ghost" id="is-back-btn" aria-label="Back to Noticing">
@@ -318,7 +318,7 @@ function renderScenario() {
   const options = shuffled(activeScenario.options);
 
   return `
-    <div class="view in-step-view${isPremium() ? " is-plan" : ""}">
+    ${isPremium() ? `<div class="view in-step-view is-plan">` : `<div class="view in-step-view">`}
 
       <div class="workout-header">
         ${isPremium() ? `<button class="btn btn-ghost plan-back" id="is-back-btn" aria-label="Back to In Step">‹ Back</button>` : `<button class="btn btn-ghost" id="is-back-btn" aria-label="Back to In Step">
@@ -350,7 +350,7 @@ function renderResult() {
   const movement = MOVEMENTS.find(m => m.id === activeMovementId);
 
   return `
-    <div class="view in-step-view${isPremium() ? " is-plan" : ""}">
+    ${isPremium() ? `<div class="view in-step-view is-plan">` : `<div class="view in-step-view">`}
 
       <div class="workout-header">
         <h1 class="workout-header-title">${movement.name}</h1>
