@@ -1,6 +1,10 @@
 /* ============================================================
    components/path.css
-   31 Oct 2026 v5
+   31 Oct 2026 v6
+
+   v6 - STAGE PATH Session 8 (P-8, P-12): the Plan's look reaches Outside's
+   rooms, Log what I did, Walk, Run, Cycle and Swim (line icons in the
+   door's colour, the page heading at its size).
 
    v5 - STAGE PATH Session 7 (P-7, P-12): Progress's Before and after, and
    the Plan's look for a shared room (.is-plan: Your year, Your impact):
@@ -336,3 +340,8 @@
 .is-plan .card-coach .coach-icon-small { display: none; }
 .is-plan .card-coach .coach-message-text { font-size: var(--text-base); line-height: 1.45; color: var(--color-text); }
 .is-plan .card:not(.card-coach) { border-radius: var(--radius-lg, 16px); }
+
+/* Outside's rooms on the Plan (Session 8). */
+.is-plan .view-header h1 { font-size: var(--text-2xl); text-align: left; }
+.is-plan .ws-type-icon, .is-plan .activity-type-card > span[aria-hidden="true"] { display: inline-flex; color: var(--kind-blue); }
+.is-plan .ws-type-icon .line-icon, .is-plan .activity-type-card .line-icon { width: 22px; height: 22px; }

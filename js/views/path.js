@@ -1,6 +1,13 @@
 /**
  * views/path.js
- * 29 Oct 2026 v2
+ * 31 Oct 2026 v3
+ *
+ * v3 - STAGE PATH Session 8 (P-8). Outside, after "What are you doing?": a
+ *   warm-up before and a cool-down after, each from the library or an
+ *   approved routine (data/outside.js), shown as a proposal like any other,
+ *   and Log it opens Log what I did with the activity already chosen. Log
+ *   it said "anything sore", which Log what I did does not ask: now it says
+ *   what it does.
  *
  * v2 - STAGE PATH Session 6 (P-6; P-12, Graeme 29 Oct: "I like the new
  *   design with the stickmen as part of the proposal with the easy swap.
@@ -69,6 +76,8 @@ import { suggestFeeling, pickProgramme, pickSurprise, routinesFor, STRETCH_AREA_
 import { checkinToday, lastPlace, lowMood, shownAdjustments, freshPracticeFor, swapOptionsFor } from "../data/path-context.js";
 import { savedSessions, resolveSavedSession } from "../data/saved-sessions.js";
 import { keepVersion } from "../save-block.js";
+import { OUTSIDE_PLANS } from "../data/outside.js";
+import { presetLogActivity } from "./activity-log.js";
 import { setTodaysLength, lengthCatForToday } from "../data/session-length.js";
 
 const BY_ID = new Map([...EXERCISES, ...PATH_MOVEMENTS].map(e => [e.id, e]));
@@ -277,8 +286,12 @@ export function PathView(router) {
     },
     outplan() {
       return `${bar(3, 3)}${heading(ENJOY[st.activity] || "Enjoy it")}
-        <p class="path-coachline">You can log it here when you’re back.</p>
-        <ul class="path-list">${row({ v: "log", t: "Log it", d: "How long, how it felt, anything sore", icon: "pencil", kind: DOOR[st.door].kind })}</ul>`;
+        <p class="path-coachline">I can get you ready for it, and you can log it here when you\u2019re back.</p>
+        <ul class="path-list">
+          ${outsidePractice("warm") ? row({ v: "warm", t: "Warm-up before", d: `${esc(outsidePractice("warm").name)} \u00b7 about ${outsidePractice("warm").minutes} min`, icon: "sun", kind: DOOR[st.door].kind }) : ""}
+          ${outsidePractice("cool") ? row({ v: "cool", t: "Cool-down after", d: `${esc(outsidePractice("cool").name)} \u00b7 about ${outsidePractice("cool").minutes} min`, icon: "moon", kind: DOOR[st.door].kind }) : ""}
+          ${row({ v: "log", t: "Log it", d: "How long it was, and how it felt", icon: "pencil", kind: DOOR[st.door].kind })}
+        </ul>`;
     },
 
     // Stretch
@@ -407,6 +420,16 @@ export function PathView(router) {
     else say(res?.reason === "dupe" ? "You already have one kept under that name." : "That could not be kept.");
   }
 
+  /** P-8. Outside's warm-up or cool-down for the activity chosen, as a proposal (a library practice, or an approved routine). */
+  function outsidePractice(kind) {
+    const plan = OUTSIDE_PLANS[st.activity]; if (!plan) return null;
+    const ref = kind === "warm" ? { practice: plan.warm } : plan.cool;
+    if (ref.routine) { const r = ROUTINES.find(x => x.id === ref.routine); return r ? { ...r, steps: stepsFor(r, null) } : null; }
+    const e = BY_ID.get(ref.practice); if (!e) return null;
+    const mins = Math.max(1, Math.round((e.duration || 300) / 60));
+    return { id: e.id, name: e.name, minutes: mins, style: null, position: null, steps: [{ id: e.id, mins }] };
+  }
+
   // ── Presses ────────────────────────────────────────────────────────────
   function onRow(v) {
     switch (step) {
@@ -418,7 +441,14 @@ export function PathView(router) {
         if (v === "saved") { router.savedStart = { purpose: st.door, place: st.place }; router.navigate("saved-sessions"); return; }
         return;
       case "activity": return go("outplan", { activity: v });
-      case "outplan": router.navigate("activity-log"); return;
+      case "outplan": {
+        if (v === "warm" || v === "cool") {
+          const p = outsidePractice(v); if (!p) return;
+          return go("prog", { practice: p, fresh: false, reason: null, note: null, surprise: false, fromCoach: false });
+        }
+        presetLogActivity(OUTSIDE_PLANS[st.activity]?.log || "Other outdoor");   // Log what I did, with the activity chosen
+        router.navigate("activity-log"); return;
+      }
       case "sarea": return go("routines", { area: v, floor: "yes" });
       case "routines": {
         if (v === "fresh") {

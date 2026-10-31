@@ -1,5 +1,16 @@
 /**
  * activity-log.js - Universal Activity Logging View
+ * 31 Oct 2026 v5
+ *
+ * v5 - STAGE PATH Session 8 (P-8; P-12, Graeme 29 Oct: the new look is the
+ *   Plan's only, "It's the same thing, but it doesn't look like it"). On the
+ *   Plan this room takes the new look: the heading at the left at the page
+ *   size, the coach's words without the avatar card, and line icons in place
+ *   of the emoji (is-plan, path.css). One tier check (_plan); Free's render
+ *   is unchanged, byte for byte.
+ *   Arriving from a door's Outside (path.js, Log it), the activity is
+ *   already chosen (presetLogActivity, as from the Library).
+ *
  * 18 Oct 2026 v4
  *
  * v4 - OLD-CREDITS-TIDY (Graeme, 18 Oct: "You do those things"). The
@@ -30,6 +41,16 @@
  */
 
 import { store } from "../store.js";
+import { isPremium } from "../auth.js";
+import { lineIcon } from "../data/line-icons.js";
+
+// STAGE PATH P-8 / P-12. The Plan's look: one tier check, a class and line icons.
+const _plan = () => isPremium();
+const _planCls = () => (_plan() ? " is-plan" : "");
+const PLAN_ICON = { run: "run", walk: "walk", cycle: "cycle", swim: "swim", row: "wave", gym: "gym", "body-balance": "yoga", spin: "cycle",
+  boxing: "strength", hiit: "strength", class: "classes", tennis: "outside", football: "outside", golf: "outside", sport: "outside",
+  hike: "mountain", "outdoor-cycle": "cycle", outdoor: "outside" };
+const _icon = item => (_plan() ? lineIcon(PLAN_ICON[item.id] || "outside", 22) : item.icon);
 
 export const centered = false;
 
@@ -93,7 +114,7 @@ export function render() {
   if (logSaved) return renderSaved();
 
   return `
-    <div class="view activity-log-view">
+    <div class="view activity-log-view${_planCls()}">
       <div class="view-header">
         <h1>Log an Activity</h1>
         <p class="text-secondary">You did the work. Let's capture it.</p>
@@ -118,7 +139,7 @@ function renderTypePicker() {
           ${group.items.map(item => `
             <button class="activity-type-card" data-type="${item.id}"
                     aria-label="${item.label}">
-              <span aria-hidden="true">${item.icon}</span>
+              <span aria-hidden="true">${_icon(item)}</span>
               <span>${item.label}</span>
             </button>
           `).join("")}
@@ -183,7 +204,7 @@ function renderLogForm() {
 
 function renderSaved() {
   return `
-    <div class="view activity-log-view">
+    <div class="view activity-log-view${_planCls()}">
       <div class="card card-coach" style="margin-top:var(--space-8);">
         <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
         <div>

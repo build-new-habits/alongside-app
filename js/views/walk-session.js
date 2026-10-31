@@ -1,6 +1,15 @@
 /**
  * walk-session.js - Coached Walk Session
  *
+ * 31 Oct 2026 v11
+ *
+ * v11 - STAGE PATH Session 8 (P-8; P-12, Graeme 29 Oct: the new look is the
+ *   Plan's only, "It's the same thing, but it doesn't look like it"). On the
+ *   Plan this room takes the new look: the heading at the left at the page
+ *   size, the coach's words without the avatar card, and line icons in place
+ *   of the emoji (is-plan, path.css). One tier check (_plan); Free's render
+ *   is unchanged, byte for byte.
+ *
  * 18 Oct 2026 v10
  *
  * v10 - OLD-CREDITS-TIDY (Graeme, 18 Oct: "You do those things"). The
@@ -90,6 +99,13 @@
  */
 
 import { store } from "../store.js";
+import { isPremium } from "../auth.js";
+import { lineIcon } from "../data/line-icons.js";
+
+// STAGE PATH P-8 / P-12. The Plan's look: one tier check, a class and line icons.
+const _plan = () => isPremium();
+const _planCls = () => (_plan() ? " is-plan" : "");
+const _icon = t => (_plan() ? lineIcon("walk", 22) : t.icon);
 import { isSore } from "../data/conditions.js";
 import { isGateDue, renderSafetyGate, attachSafetyGate } from "../safety-gate.js";
 import { renderLogBlock, attachLogEvents } from "../session-log.js";
@@ -276,7 +292,7 @@ export function render() {
 function renderTypeSelector() {
   const name = store.get("name") || "";
   return `
-    <div class="view walk-session-view">
+    <div class="view walk-session-view${_planCls()}">
 
       <div class="workout-header">
         <button class="btn btn-ghost" id="ws-back-btn" aria-label="Exit">
@@ -297,7 +313,7 @@ function renderTypeSelector() {
         ${WALK_TYPES.map(t => `
           <button class="ws-type-card" data-type="${t.id}"
                   aria-label="${t.label}: ${t.description}">
-            <span class="ws-type-icon" aria-hidden="true">${t.icon}</span>
+            <span class="ws-type-icon" aria-hidden="true">${_icon(t)}</span>
             <span class="ws-type-label">${t.label}</span>
             <span class="ws-type-desc">${t.description}</span>
           </button>
@@ -317,7 +333,7 @@ function renderWalkOverview() {
   const prompts = PROMPTS[selectedType] || PROMPTS.gentle;
 
   return `
-    <div class="view walk-session-view">
+    <div class="view walk-session-view${_planCls()}">
       <div class="workout-header">
         <button class="btn btn-ghost" id="ws-back-btn" aria-label="Back">\u2190 Back</button>
         <h1 class="workout-header-title">${wt?.label || "Walk"} \u2014 ${selectedMins} min</h1>
@@ -359,7 +375,7 @@ function renderWalkOverview() {
 function renderDurationSelector() {
   const wt = WALK_TYPES.find(t => t.id === selectedType);
   return `
-    <div class="view walk-session-view">
+    <div class="view walk-session-view${_planCls()}">
 
       <div class="workout-header">
         <button class="btn btn-ghost" id="ws-back-btn" aria-label="Back">
@@ -398,7 +414,7 @@ function renderWalking() {
   const condNote    = buildConditionNote();
 
   return `
-    <div class="view walk-session-view">
+    <div class="view walk-session-view${_planCls()}">
 
       <div class="workout-header">
         <button class="btn btn-ghost" id="ws-exit-btn" aria-label="Exit session">
@@ -486,7 +502,7 @@ function renderDone() {
   };
 
   return `
-    <div class="view walk-session-view" style="text-align: center;">
+    <div class="view walk-session-view${_planCls()}" style="text-align: center;">
 
       <div class="card card-coach" style="margin-top: var(--space-8);">
         <img src="assets/images/logo-icon-192.png" alt=""

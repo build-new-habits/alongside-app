@@ -1,6 +1,15 @@
 /**
  * swim-session.js - Guided Swim Session
  *
+ * 31 Oct 2026 v9
+ *
+ * v9 - STAGE PATH Session 8 (P-8; P-12, Graeme 29 Oct: the new look is the
+ *   Plan's only, "It's the same thing, but it doesn't look like it"). On the
+ *   Plan this room takes the new look: the heading at the left at the page
+ *   size, the coach's words without the avatar card, and line icons in place
+ *   of the emoji (is-plan, path.css). One tier check (_plan); Free's render
+ *   is unchanged, byte for byte.
+ *
  * 18 Oct 2026 v8
  *
  * v8 - OLD-CREDITS-TIDY (Graeme, 18 Oct: "You do those things"). The
@@ -59,6 +68,13 @@
  */
 
 import { store } from "../store.js";
+import { isPremium } from "../auth.js";
+import { lineIcon } from "../data/line-icons.js";
+
+// STAGE PATH P-8 / P-12. The Plan's look: one tier check, a class and line icons.
+const _plan = () => isPremium();
+const _planCls = () => (_plan() ? " is-plan" : "");
+const _icon = t => (_plan() ? lineIcon("swim", 22) : t.icon);
 import { isGateDue, renderSafetyGate, attachSafetyGate } from "../safety-gate.js";
 import { renderLogBlock, attachLogEvents } from "../session-log.js";
 import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
@@ -162,7 +178,7 @@ export function render() {
 function renderStrokeSelector() {
   const name = store.get("name") || "";
   return `
-    <div class="view walk-session-view">
+    <div class="view walk-session-view${_planCls()}">
       <div class="workout-header">
         <button class="btn btn-ghost" id="ss-back-btn" aria-label="Exit">Exit</button>
         <h1 class="workout-header-title">Swim</h1>
@@ -174,7 +190,7 @@ function renderStrokeSelector() {
       <div class="ws-type-grid" role="group" aria-label="Choose stroke">
         ${STROKES.map(s => `
           <button class="ws-type-card" data-stroke="${s.id}" aria-label="${s.label}: ${s.description}">
-            <span class="ws-type-icon" aria-hidden="true">${s.icon}</span>
+            <span class="ws-type-icon" aria-hidden="true">${_icon(s)}</span>
             <span class="ws-type-label">${s.label}</span>
             <span class="ws-type-desc">${s.description}</span>
           </button>
@@ -185,7 +201,7 @@ function renderStrokeSelector() {
 
 function renderTypeSelector() {
   return `
-    <div class="view walk-session-view">
+    <div class="view walk-session-view${_planCls()}">
       <div class="workout-header">
         <button class="btn btn-ghost" id="ss-back-btn" aria-label="Back">Back</button>
         <h1 class="workout-header-title">Swim</h1>
@@ -197,7 +213,7 @@ function renderTypeSelector() {
       <div class="ws-type-grid" role="group" aria-label="Choose session type">
         ${SESSION_TYPES.map(t => `
           <button class="ws-type-card" data-session-type="${t.id}" aria-label="${t.label}: ${t.description}">
-            <span class="ws-type-icon" aria-hidden="true">${t.icon}</span>
+            <span class="ws-type-icon" aria-hidden="true">${_icon(t)}</span>
             <span class="ws-type-label">${t.label}</span>
             <span class="ws-type-desc">${t.description}</span>
           </button>
@@ -208,7 +224,7 @@ function renderTypeSelector() {
 
 function renderDurationSelector() {
   return `
-    <div class="view walk-session-view">
+    <div class="view walk-session-view${_planCls()}">
       <div class="workout-header">
         <button class="btn btn-ghost" id="ss-back-btn" aria-label="Back">Back</button>
         <h1 class="workout-header-title">Swim</h1>
@@ -232,7 +248,7 @@ function renderSwimOverview() {
   const stype  = SESSION_TYPES.find(t => t.id === selectedType);
   const prompts = PROMPTS[selectedType] || PROMPTS.steady;
   return `
-    <div class="view walk-session-view">
+    <div class="view walk-session-view${_planCls()}">
       <div class="workout-header">
         <button class="btn btn-ghost" id="ss-back-btn" aria-label="Back">\u2190 Back</button>
         <h1 class="workout-header-title">${stroke?.label || "Swim"} \u2014 ${selectedMins} min</h1>
@@ -267,7 +283,7 @@ function renderSwimming() {
   const condNote  = buildConditionNote();
 
   return `
-    <div class="view walk-session-view">
+    <div class="view walk-session-view${_planCls()}">
       <div class="workout-header">
         <button class="btn btn-ghost" id="ss-exit-btn" aria-label="End session">Exit</button>
         <h1 class="workout-header-title">${stroke?.label || "Swim"}</h1>
@@ -318,7 +334,7 @@ function renderDone() {
   const name = store.get("name") || "";
   const mins = Math.floor(elapsed / 60);
   return `
-    <div class="view walk-session-view" style="text-align: center;">
+    <div class="view walk-session-view${_planCls()}" style="text-align: center;">
       <div class="card card-coach" style="margin-top: var(--space-8);">
         <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
         <div>

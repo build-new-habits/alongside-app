@@ -1,6 +1,13 @@
 import { createRequire as __cr } from "node:module";
 /**
  * tools/verify-path-routes.mjs
+ * 31 Oct 2026 v3
+ *
+ * v3 - STAGE PATH Session 8 re-point (none loosened). 3c: after "What are
+ *   you doing?", Outside offers a warm-up before and a cool-down after as
+ *   well as Log it (P-8; held by verify-path-outside); Log it is still
+ *   there and still opens Log what I did (3d).
+ *
  * 29 Oct 2026 v2
  *
  * v2 - STAGE PATH Session 6 re-point (none loosened). 9b: the player now
@@ -163,7 +170,7 @@ fixture(); fakeRouter.pathStart = { door: "stronger" }; path(); tapRow("outside"
 ok("3a. What are you doing? Step 2 of 3, six activities", step() === "activity" && rows().length === 6 && !!main.querySelector('.path-stepbar[aria-label="Step 2 of 3"]'), rowText().join("|"));
 ok("3b. never the gym, never yoga", !/gym|yoga/i.test(txt(main.querySelector(".path-list"))), txt(main.querySelector(".path-list")));
 tapRow("run");
-ok("3c. Enjoy your run, and one way on: Log it", h1() === "Enjoy your run" && rowText().join() === "Log it");
+ok("3c. Enjoy your run: a warm-up before, a cool-down after, and Log it", h1() === "Enjoy your run" && rowText().join() === "Warm-up before,Cool-down after,Log it", rowText().join());
 navs = []; tapRow("log");
 ok("3d. Log it opens Log what I did", navs.join() === "activity-log");
 fixture(); fakeRouter.pathStart = { door: "moving" }; path(); tapRow("outside");
