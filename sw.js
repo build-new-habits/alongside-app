@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 31 Oct 2026 v692
+ * 31 Oct 2026 v693
  *
+ * v693 - P-13, Core and Yoga & Pilates (Free unchanged). On the Plan both take the one look: the heading at the left, ‹ Back before a session and Exit during it, no house button beside either, line icons in place of emoji, and Done to finish.
  * v692 - P-13, the mind rooms (Free unchanged). On the Plan, Breathing, Something quieter and In Step take the one look: the heading at the left, ‹ Back before a practice and Exit while it runs, no house button beside it, line icons in place of emoji, and Done to finish.
  * v691 - P-13, the Library (Free unchanged). On the Plan the Library now holds only what no door does: Classes, Practices, Mindful practice, My exercises, Saved sessions, Your week and Log what I did, each saying what it is for. Everything else is behind Home's doors: a guided run, ride, walk or swim under Keep moving › Outside; Yoga & Pilates and a mobility session under Stretch; My programme under Get stronger › Gym.
  * v690 - P-15 (both tiers' arc). Five new things your arc can be about: Find something I actually enjoy; Stay well as I get older; Ride or swim further, comfortably; Get ready for something I've signed up for; Have something to do with other people. A goal you chose when you started (enjoying exercise, a 10K, cycling or swimming) puts its aim near the top.
@@ -4239,7 +4240,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v692";
+const CACHE_NAME = "alongside-v693";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4447,8 +4448,8 @@ const SHELL_HASHES = {
   "./js/views/quiet-session.js": "eb439e800dc71d74",
   "./js/views/breathing-session.js": "3d049d83a8e783b9",
   "./js/views/morning-session.js": "c261f642db4bb8de",
-  "./js/views/core-session.js": "30d5977595020ba7",
-  "./js/views/yoga-session.js": "bde8e016cc17c761",
+  "./js/views/core-session.js": "dd82e73cd721e233",
+  "./js/views/yoga-session.js": "86d3266d0ac27e7b",
   "./js/views/walk-session.js": "67b2bcd2f265307f",
   "./js/views/running-session.js": "3fcc750fa8c6214d",
   "./js/views/swim-session.js": "796864e209d35cb8",
