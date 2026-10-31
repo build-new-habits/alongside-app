@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 31 Oct 2026 v687
+ * 31 Oct 2026 v688
  *
+ * v688 - STAGE PATH Session 8. On the Plan, Outside (behind Get stronger or Keep moving) offers a warm-up before and a cool-down after for each activity, from the library or an approved routine, then Log it, which opens Log what I did with the activity chosen; Log what I did, Walk, Run, Cycle and Swim take the Plan's look. Both tiers: Log what I did's choices wrap at the largest text instead of running off the page. NEW FILE precached: js/data/outside.js.
  * v687 - STAGE PATH Session 7 (Free unchanged). On the Plan, Progress shows Before and after: how you felt before and after each session you rated, for the time you are looking at, how many were followed by a better mood, and what seems to help you most (from three sessions; never a streak or a score); Home's Lately reads the same. Your year and Your impact take the Plan's look.
  * v686 - STAGE PATH Session 6 (Free unchanged). On the Plan: a new finish after every session (how you feel now beside how you felt this morning, Loved it / Less often / Not again for each movement, Keep to repeat, and, as before, the pain check when something is sore, the occasional reflection, Your arc today and Add a note); on a low-mood day the player shows no countdown; when something is quite sore it checks halfway, still okay?; swapping a movement out means less of it. Every way to a session now shows the same proposal first: each movement's stick figure and Swap, then Start; Make it mine keeps your version; a saved session opens that way too. NEW FILE precached: js/views/plan-finish.js.
  * v685 - P-12 fix-now, from the consistency trace (both tiers): Mobility & Conditioning, Morning Programme and My programme (before a session is built) now say their name as the page heading, so a screen reader announces where you are; on Mobility & Conditioning, Log an event opens Log an activity, as it says (it opened the Library).
@@ -4234,7 +4235,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v687";
+const CACHE_NAME = "alongside-v688";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4342,7 +4343,7 @@ const SHELL_HASHES = {
   "./js/data/session-rationale.js": "f14d0d565eb7f9dc",
   "./js/data/personal-reads.js": "52141f31fa9d4fd0",
   "./js/data/field-contract.js": "d7d662025990b1fd",
-  "./js/views/activity-log.js": "f0e37e1cb471f357",
+  "./js/views/activity-log.js": "40aa4a523bbc4c30",
   "./js/views/annual-reflection.js": "0169de318bd82070",
   "./js/views/community-impact.js": "34582ebffba78371",
   "./js/views/home-threshold.js": "17bc42808aa5bd5c",
@@ -4361,10 +4362,11 @@ const SHELL_HASHES = {
   "./js/data/tier-table.js": "7821c3304bd0815c",
   "./js/views/know-what.js": "0b3d8db4a33b6c9b",
   "./js/views/plan-home.js": "73ceb682dd817d5f",
-  "./js/views/path.js": "500ed3f0536357a6",
+  "./js/views/path.js": "f28b63dd3f2d980f",
   "./js/views/plan-finish.js": "7a03f4176a4cb840",
+  "./js/data/outside.js": "3af4ea46bd898084",
   "./js/data/path-context.js": "fc5643585fe6066e",
-  "./css/components/path.css": "d7d880d5c8e0ffbd",
+  "./css/components/path.css": "ad584aa348e3c086",
   "./js/data/red-flag.js": "3cd9eecbc3985eb3",
   "./js/data/health-consent.js": "a23d005af57f179c",
   "./js/data/age-check.js": "7fa5b0f5a6b34770",
@@ -4442,10 +4444,10 @@ const SHELL_HASHES = {
   "./js/views/morning-session.js": "c261f642db4bb8de",
   "./js/views/core-session.js": "30d5977595020ba7",
   "./js/views/yoga-session.js": "bde8e016cc17c761",
-  "./js/views/walk-session.js": "8c76b05ea66a817d",
-  "./js/views/running-session.js": "229381f557829d5c",
-  "./js/views/swim-session.js": "d873eca02ebc3fdb",
-  "./js/views/cycle-session.js": "71160fae4a740efc",
+  "./js/views/walk-session.js": "6667fa2866b57145",
+  "./js/views/running-session.js": "fa53c88e6136674b",
+  "./js/views/swim-session.js": "3cb0e39c5da3b32f",
+  "./js/views/cycle-session.js": "21b4fa639a67ac86",
   "./js/views/onboarding/thread.js": "51088ae8b1ee97d9",
   "./js/views/onboarding/sheet-manager.js": "20cb675f242157c8",
   "./js/views/onboarding/goals.js": "ec29181741c4bc1e",
@@ -4675,6 +4677,7 @@ const SHELL_URLS = [
   "./js/views/plan-home.js",
   "./js/views/path.js",
   "./js/views/plan-finish.js",
+  "./js/data/outside.js",
   "./js/data/path-context.js",
   "./css/components/path.css",
   "./js/data/red-flag.js",
