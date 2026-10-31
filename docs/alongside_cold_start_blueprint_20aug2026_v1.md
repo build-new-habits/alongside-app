@@ -1,5 +1,5 @@
 # Alongside: Move — Cold Start Blueprint
-## 31 Oct 2026 v294
+## 31 Oct 2026 v295
 
 Build New Habits | Everything a chat with no memory needs to pick this up and build confidently.
 
@@ -53,7 +53,7 @@ git clone --depth 1 https://x-access-token:$TOKEN@github.com/build-new-habits/al
 | BNH-Files: `Apps/Alongside Move/` `Legal/`, `Clinical/`, `Business/`, `Product/`, `Research/`, `Testing/`, `Admin/`, `Archive/` | Every other paper, including the governing documents below |
 | `docs/Schema.md` | Store fields. **Must match `store.js`** |
 | `docs/` | Only what the code and checks need: `Changelog.md`, `exercise_entry_standard.md`, `glossary.md` (one name per thing, A-9), this blueprint, `specs/` (three specs the checks read), `classes/` (guided class scripts), `archive-code/` (retired code) |
-| `tools/verify-*.mjs` | 342 gates |
+| `tools/verify-*.mjs` | 343 gates |
 | `js/` | Vanilla ES modules, no framework, no bundler |
 
 **Governing documents, in read order** (BNH-Files, `Apps/Alongside Move/Business/`):
@@ -74,10 +74,10 @@ git clone --depth 1 https://x-access-token:$TOKEN@github.com/build-new-habits/al
 |---|---|
 | `store.js` | v118 |
 | `Schema.md` | v1.116 |
-| `sw.js` | **v688**, cache `alongside-v688` |
+| `sw.js` | **v689**, cache `alongside-v689` |
 | `router.js` | v48 · `my-programme.js` v8 · `today.js` v49 · `settings.js` v46 · `progress.js` v27 · `onboarding/thread.js` v16 |
 | `exercise-card.js` | **v7** — CARD-4, four pages. `workout.css` v16 |
-| Gates | **342, all green** on jsdom 28.1.0 (`npm ci`) — from the repo root. See the cwd row in §9 |
+| Gates | **343, all green** on jsdom 28.1.0 (`npm ci`) — from the repo root. See the cwd row in §9 |
 
 🟢 **This table is now GATED.** `tools/verify-blueprint.mjs` compares every version above against the file that carries it and goes red on any drift, naming the row to change.
 
