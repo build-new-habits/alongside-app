@@ -1,6 +1,15 @@
 /**
  * data/progress-report.js
- * 06 Oct 2026 v1
+ * 31 Oct 2026 v2
+ *
+ * v2 - STAGE PATH Session 7 (P-7 PROGRESS-STORY; blueprint D6). The Plan's
+ *   before and after: moodPairs() reads, for each finished session, the
+ *   check-in's mood that day and the mood after (both on the check-in's own
+ *   scale); moodStory() says how many were followed by a better mood, and
+ *   which session seems to help most (a better mood after it twice or more).
+ *   One reading for Progress and for Home's Lately, so the two never
+ *   disagree. Shown from three pairs. Never a streak, never "down", never a
+ *   score: "the same or lower" is said once, in the chart's spoken label.
  *
  * D-11 PROGRESS-SHARE (Graeme, 06 Oct: "Progress pages to show today, 7
  * days, 14 days, 30, and 90 ... Download today's report - what was done,
@@ -383,4 +392,47 @@ export function describeShare(model, format) {
   const who = model.name ? `${model.name}, ` : "";
   const lead = format === "certificate" ? `A record of moving. ${who}` : "";
   return `${lead}${what} ${when}${kinds}. Alongside: Move, by Build New Habits.`;
+}
+
+
+// ── v2. Before and after (the Plan's, Stage PATH Session 7) ──────────────
+
+/** The person's own five words, on the check-in's 1-10 scale (2, 3, 6, 7, 9). */
+export const fiveOf = v => (v <= 2 ? 0 : v <= 4 ? 1 : v <= 6 ? 2 : v <= 8 ? 3 : 4);
+/** Shown from this many pairs; below it, nothing (a pattern of two is not one). */
+export const MOOD_PAIRS_MIN = 3;
+
+/**
+ * Each finished session with both moods: the day's check-in mood, the mood
+ * after. range limits to a window (windowRange); last keeps the latest n.
+ */
+export function moodPairs(completed = [], checkinHistory = {}, { range = null, last = null } = {}) {
+  const pairs = [];
+  for (const e of completed || []) {
+    const ts = e && (e.completedAt || e.loggedAt || e.date); if (!ts) continue;
+    const t = Date.parse(ts); if (!Number.isFinite(t)) continue;
+    if (range && (t < range.from.getTime() || t > range.to.getTime())) continue;
+    const before = Number(checkinHistory?.[new Date(t).toISOString().split("T")[0]]?.mood);
+    const after = Number(e.moodAfter);
+    if (Number.isFinite(before) && before > 0 && Number.isFinite(after) && after > 0)
+      pairs.push({ entry: e, before, after, better: fiveOf(after) > fiveOf(before) });
+  }
+  return last ? pairs.slice(-last) : pairs;
+}
+
+/**
+ * What the pairs say: { total, better, helps, label } or null under the
+ * minimum. helps: the session most often followed by a better mood, twice
+ * or more (nameOf names an entry). label: the chart's words for a screen
+ * reader.
+ */
+export function moodStory(pairs = [], nameOf = e => e?.name || "") {
+  if (pairs.length < MOOD_PAIRS_MIN) return null;
+  const better = pairs.filter(p => p.better).length;
+  const by = {};
+  for (const p of pairs) if (p.better) { const k = nameOf(p.entry); if (k) by[k] = (by[k] || 0) + 1; }
+  const top = Object.entries(by).sort((a, b) => b[1] - a[1])[0];
+  const helps = top && top[1] >= 2 ? top[0].replace(/^(a|an) /, "").replace(/^./, c => c.toUpperCase()) : null;
+  return { total: pairs.length, better, helps,
+           label: `Mood before and after your last ${pairs.length} sessions: better after ${better}, the same or lower after ${pairs.length - better}.` };
 }

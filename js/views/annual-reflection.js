@@ -1,5 +1,13 @@
 /**
  * views/annual-reflection.js
+ * 31 Oct 2026 v6
+ *
+ * v6 - STAGE PATH Session 7 (P-12, Graeme 29 Oct: the new look is the
+ *   Plan's only, "It's the same thing, but it doesn't look like it"). On the
+ *   Plan this room takes the new look: "‹ Back" and the heading at the left
+ *   at the page size, the coach's words without the avatar card (is-plan,
+ *   path.css). One isPremium() check; Free's render is unchanged.
+ *
  * 29 Sep 2026 v5
  *
  * v5 - P0, SCOPE-MINOR. 'Your own exercises', not 'Prescribed exercises'.
@@ -56,6 +64,7 @@
 
 import { store }  from '../store.js';
 import { router } from '../router.js';
+import { isPremium } from '../auth.js';
 
 const DAY = 86400000;
 
@@ -85,12 +94,13 @@ function _render(container) {
   const daysIn   = firstAt ? Math.floor((Date.now() - firstAt) / DAY) : 0;
   const hasYear  = daysIn >= 365;
 
+  const plan = isPremium();   // the Plan's look (P-12, Session 7)
   container.innerHTML = `
-    <div class="view annual-reflection-view">
+    <div class="view annual-reflection-view${plan ? ' is-plan' : ''}">
 
       <div class="workout-header">
         <button class="btn btn-ghost" id="ar-back-btn" aria-label="Go back">
-          &larr; Back
+          ${plan ? '&lsaquo;' : '&larr;'} Back
         </button>
         <h1 class="workout-header-title">Your year</h1>
       </div>

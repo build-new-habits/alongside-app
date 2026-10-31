@@ -1,5 +1,13 @@
 /**
  * views/community-impact.js
+ * 31 Oct 2026 v7
+ *
+ * v7 - STAGE PATH Session 7 (P-12, Graeme 29 Oct: the new look is the
+ *   Plan's only, "It's the same thing, but it doesn't look like it"). On the
+ *   Plan this room takes the new look: "‹ Back" and the heading at the left
+ *   at the page size, the coach's words without the avatar card (is-plan,
+ *   path.css). One isPremium() check; Free's render is unchanged.
+ *
  * 28 Sep 2026 v6
  *
  * v6 - F7 LANDMARK. role="main" (and its label) removed from the view's
@@ -69,6 +77,7 @@
 
 import { store }  from '../store.js';
 import { router } from '../router.js';
+import { isPremium } from '../auth.js';
 
 const WEBSITE_IMPACT_URL = 'https://buildnewhabits.co.uk/impact/';
 
@@ -124,12 +133,13 @@ function _render(container) {
   const log       = store.get('activityLog') || [];
   const completed = log.filter(e => e.status !== 'partial').length;
 
+  const plan = isPremium();   // the Plan's look (P-12, Session 7)
   container.innerHTML = `
-    <div class="view community-impact-view">
+    <div class="view community-impact-view${plan ? ' is-plan' : ''}">
 
       <div class="workout-header">
         <button class="btn btn-ghost" id="ci-back-btn" aria-label="Go back">
-          &larr; Back
+          ${plan ? '&lsaquo;' : '&larr;'} Back
         </button>
         <h1 class="workout-header-title">Your impact</h1>
       </div>

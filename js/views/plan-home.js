@@ -1,6 +1,11 @@
 /**
  * views/plan-home.js
- * 29 Oct 2026 v4
+ * 31 Oct 2026 v5
+ *
+ * v5 - STAGE PATH Session 7 (blueprint v6 Part F: Lately's numbers from
+ *   data/progress-report.js, a touch-once exception planned there). Lately
+ *   reads the same before-and-after as Progress (moodPairs, moodStory), so
+ *   Home and Progress never disagree. Nothing on screen changes.
  *
  * v4 - STAGE PATH Session 6 (one line): the coach's choice tells Today's
  *   plan its door (router.planDoor), so the finish and Lately know it.
@@ -70,6 +75,7 @@ import { kindOf } from "../data/kind-colours.js";
 import { activityPhrase } from "../data/activity-labels.js";
 import { renderFigure } from "../figures.js";
 import { suggestToday, arcDoor, pickProgramme, movementName } from "../data/path-engine.js";
+import { moodPairs, moodStory, fiveOf } from "../data/progress-report.js";
 
 // ── The doors ──────────────────────────────────────────────────────────────
 
@@ -87,7 +93,6 @@ const NOT_MOVEMENT = ["breathing", "mindful", "mindfulness", "practice"];
 
 // The person's own five words, on the check-in's scale (1-10).
 const FIVE = ["struggling", "low", "okay", "pretty good", "great"];
-const fiveOf = v => (v <= 2 ? 0 : v <= 4 ? 1 : v <= 6 ? 2 : v <= 8 ? 3 : 4);
 
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const todayKey = () => new Date().toISOString().split("T")[0];
@@ -246,36 +251,24 @@ function row(state, kind, icon, title, sub, attrs, door = null) {
  * mood after). Shown from three. Never a count of days, never a target.
  */
 export function latelyPairs(n = 6) {
-  const hist = store.get("checkinHistory") || {};
-  const pairs = [];
-  for (const e of store.completedSessions(store.get("activityLog") || [])) {
-    const ts = e.completedAt || e.loggedAt || e.date; if (!ts) continue;
-    const before = Number(hist[new Date(ts).toISOString().split("T")[0]]?.mood), after = Number(e.moodAfter);
-    if (Number.isFinite(before) && before > 0 && Number.isFinite(after) && after > 0) pairs.push({ e, before, after, better: fiveOf(after) > fiveOf(before) });
-  }
-  return pairs.slice(-n);
+  return moodPairs(store.completedSessions(store.get("activityLog") || []), store.get("checkinHistory") || {}, { last: n })
+    .map(p => ({ e: p.entry, before: p.before, after: p.after, better: p.better }));
 }
 
+/** v5: the same reading as Progress (data/progress-report.js moodStory), so the two never disagree. */
 function lately() {
   const pairs = latelyPairs();
-  if (pairs.length < 3) return "";
-  const better = pairs.filter(p => p.better).length;
+  const story = moodStory(pairs.map(p => ({ entry: p.e, before: p.before, after: p.after, better: p.better })), e => e.name || e.title || activityPhrase(e));
+  if (!story) return "";
   const H = 40, bw = 12, gw = bw * 2 + 10, h = v => ((fiveOf(v) + 1) / 5) * H;
   const bars = pairs.map((p, i) => `<rect x="${i * gw}" y="${H - h(p.before)}" width="${bw}" height="${h(p.before)}" rx="3" class="path-lately__before"></rect>` +
     `<rect x="${i * gw + bw + 2}" y="${H - h(p.after)}" width="${bw}" height="${h(p.after)}" rx="3" class="path-lately__after"></rect>`).join("");
-  const same = pairs.length - better;
-  const label = `Mood before and after your last ${pairs.length} sessions: better after ${better}, the same or lower after ${same}.`;
-  // What seems to help: the session most often followed by a better mood (twice or more).
-  const byName = {};
-  for (const p of pairs) if (p.better) { const k = p.e.name || p.e.title || activityPhrase(p.e); byName[k] = (byName[k] || 0) + 1; }
-  const top = Object.entries(byName).sort((a, b) => b[1] - a[1])[0];
-  const helps = top && top[1] >= 2 ? top[0].replace(/^(a|an) /, "").replace(/^./, c => c.toUpperCase()) : null;
   return `<h2 class="look-label" id="path-lately-h">Lately</h2>
     <div class="path-lately" role="group" aria-labelledby="path-lately-h">
       <div class="path-lately__tile"><p class="path-lately__lbl">After moving</p>
-        <svg class="path-lately__spark" viewBox="0 0 ${gw * pairs.length - 10} ${H}" role="img" aria-label="${label}">${bars}</svg>
-        <p class="path-lately__line">Better after ${better} of your last ${pairs.length}.</p></div>
-      ${helps ? `<div class="path-lately__tile"><p class="path-lately__lbl">What seems to help</p><p class="path-lately__line">${esc(helps)} seems to help you most.</p></div>` : ""}
+        <svg class="path-lately__spark" viewBox="0 0 ${gw * pairs.length - 10} ${H}" role="img" aria-label="${story.label}">${bars}</svg>
+        <p class="path-lately__line">Better after ${story.better} of your last ${story.total}.</p></div>
+      ${story.helps ? `<div class="path-lately__tile"><p class="path-lately__lbl">What seems to help</p><p class="path-lately__line">${esc(story.helps)} seems to help you most.</p></div>` : ""}
     </div>`;
 }
 

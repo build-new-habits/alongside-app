@@ -1,6 +1,14 @@
 /**
  * progress.js
- * 17 Oct 2026 v30
+ * 31 Oct 2026 v31
+ *
+ * v31 - STAGE PATH Session 7 (P-7 PROGRESS-STORY; blueprint D6). On the Plan,
+ *   Before and after: for the window shown, the mood before and after each
+ *   session with both answers (bars, said in words to a screen reader),
+ *   "Better after n of the m sessions with both", and what seems to help
+ *   (a better mood after it twice or more). Shown from three; the same
+ *   reading as Home's Lately (data/progress-report.js moodPairs, moodStory).
+ *   No streak, no "down", no score. Free unchanged.
  *
  * v30 - W6-8 TRUE-WORDS-6. "N sessions" in the window, not "You've moved N
  *   times" (it counted breathing as moving).
@@ -373,7 +381,7 @@ import { liftReadback, strandReadback, arcWeek, sessionsByWeek,
          sessionsInWindow, shortDate } from '../data/arc-readback.js';
 import { kindOf } from '../data/kind-colours.js';
 import { windowRange, windowsFor, sessionsIn, dailyCounts, buildReport,
-         setsText } from '../data/progress-report.js';
+         setsText, moodPairs, moodStory, fiveOf } from '../data/progress-report.js';
 import { setSharePreset } from './progress-share.js';
 
 // Set by _rateNote when it renders the sustained-rate note, committed by
@@ -484,7 +492,7 @@ export function ProgressView(router) {
         <div class="progress-body" id="panel-${activeWindow}" role="tabpanel" aria-labelledby="tab-${activeWindow}">
           ${renderActivitySummary(range)}
           ${renderCoachNarrative(stats, tier, name, range)}
-          ${range.days === 1 ? renderToday() : renderSessionsChart(range)}
+          ${range.days === 1 ? renderToday() : renderSessionsChart(range)}${premium ? renderMoodStory(range) : ''}
           ${renderSessionShapes(tier, range)}
           ${premium ? renderArcReadback() : ''}
           ${_rateNote(premium)}
@@ -786,6 +794,31 @@ export function ProgressView(router) {
   }
 
   // ── Activity summary ───────────────────────────────────────────────────────
+
+  /**
+   * v31 (the Plan). Before and after, in this window. From three sessions
+   * with both moods; otherwise nothing (two is not a pattern).
+   */
+  function renderMoodStory(range) {
+    const pairs = moodPairs(store.completedSessions(store.get('activityLog')), store.get('checkinHistory') || {}, { range });
+    const story = moodStory(pairs, e => e.name || e.title || activityNoun(e));
+    if (!story) return '';
+    const shown = pairs.slice(-12);
+    const H = 48, bw = 12, gw = bw * 2 + 10, h = v => ((fiveOf(v) + 1) / 5) * H;
+    const bars = shown.map((p, i) => `<rect x="${i * gw}" y="${H - h(p.before)}" width="${bw}" height="${h(p.before)}" rx="3" class="path-lately__before"></rect>` +
+      `<rect x="${i * gw + bw + 2}" y="${H - h(p.after)}" width="${bw}" height="${h(p.after)}" rx="3" class="path-lately__after"></rect>`).join('');
+    return `
+      <section class="pr-mood" aria-labelledby="pr-mood-h">
+        <h2 class="look-label" id="pr-mood-h">Before and after</h2>
+        <div class="path-lately">
+          <div class="path-lately__tile"><p class="path-lately__lbl">After moving</p>
+            <svg class="path-lately__spark" viewBox="0 0 ${gw * shown.length - 10} ${H}" role="img" aria-label="${_esc(story.label)}">${bars}</svg>
+            <p class="path-lately__line">Better after ${story.better} of the ${story.total} sessions you rated before and after, ${_esc(range.sentence)}.</p>
+            <p class="path-lately__key"><span class="path-lately__swatch is-before" aria-hidden="true"></span>Before <span class="path-lately__swatch is-after" aria-hidden="true"></span>After</p></div>
+          ${story.helps ? `<div class="path-lately__tile"><p class="path-lately__lbl">What seems to help</p><p class="path-lately__line">${_esc(story.helps)} seems to help you most.</p></div>` : ''}
+        </div>
+      </section>`;
+  }
 
   function renderActivitySummary(range) {
     // COUNTDOWN-1. Partials excluded, matching Home and Build Your Base.

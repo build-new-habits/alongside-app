@@ -1,6 +1,11 @@
 /* ============================================================
    components/path.css
-   29 Oct 2026 v4
+   31 Oct 2026 v5
+
+   v5 - STAGE PATH Session 7 (P-7, P-12): Progress's Before and after, and
+   the Plan's look for a shared room (.is-plan: Your year, Your impact):
+   "‹ Back" and the heading at the left at the page size, the coach's words
+   as a line, without the avatar card. Free's rooms are untouched.
 
    v4 - STAGE PATH Session 6 (P-6, P-12): one proposal shape (Swap beside
    each movement's video link; each figure on Today's plan's rows), the
@@ -314,3 +319,19 @@
 .wo-halfway .coach-message-text { margin: var(--space-3) 0 var(--space-4); }
 /* The session moments' answers on the Plan's finish: 44 px targets (they are 36 on Free's, unchanged). */
 .plan-finish .card-coach button { min-height: 44px; }
+
+/* ── Progress, Before and after (Session 7, the Plan) ─────────────── */
+.pr-mood { display: flex; flex-direction: column; gap: var(--space-2); margin: var(--space-4) 0; }
+.path-lately__key { display: flex; align-items: center; gap: 6px; margin: 0; font-size: var(--text-xs); color: var(--color-text-secondary); }
+.path-lately__swatch { display: inline-block; width: 10px; height: 10px; border-radius: 3px; }
+.path-lately__swatch.is-before { background: var(--color-text-secondary); }
+.path-lately__swatch.is-after { background: var(--kind-green); margin-left: var(--space-2); }
+
+/* ── The Plan's look for a shared room (.is-plan; P-12, Session 7) ─── */
+.is-plan .workout-header { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-2); padding-left: 0; padding-right: 0; position: static; background: none; border: 0; }
+.is-plan .workout-header .btn-ghost { min-height: 44px; padding-left: 0; color: var(--color-text); font-weight: 400; }
+.is-plan .workout-header-title { margin: 0; font-size: var(--text-2xl); font-weight: var(--font-bold); line-height: 1.2; text-align: left; color: var(--color-text); }
+.is-plan .card-coach { background: none; border: 0; box-shadow: none; padding: 0; }
+.is-plan .card-coach .coach-icon-small { display: none; }
+.is-plan .card-coach .coach-message-text { font-size: var(--text-base); line-height: 1.45; color: var(--color-text); }
+.is-plan .card:not(.card-coach) { border-radius: var(--radius-lg, 16px); }
