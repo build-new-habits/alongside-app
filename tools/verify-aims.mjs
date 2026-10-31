@@ -1,5 +1,14 @@
 /**
  * tools/verify-aims.mjs
+ * 31 Oct 2026 v2
+ *
+ * v2 - P-15 ARC-AIMS-BUILD. TEST 7: the aims Graeme approved on 31 Oct
+ *   (P-14) are in the list in his words; three goals from getting started
+ *   lift their aims to the front; the two weight and shape aims are held
+ *   (never offered, found or listed) until the clinical read, and already
+ *   keep every rule here, so releasing one is moving it, nothing else.
+ *   TESTS 1-6 unchanged.
+ *
  * 03 Sep 2026 v1
  *
  * AIM-VOCAB. The arc's content spine.
@@ -28,7 +37,7 @@
  *   makes that drift fail a gate instead.
  */
 import fs from "node:fs";
-import { AIMS, STRANDS, SITUATIONS, aimById, strandsForAim, zonesForStrands, sessionTypesForStrands, aimsFor }
+import { AIMS, STRANDS, SITUATIONS, aimById, strandsForAim, zonesForStrands, sessionTypesForStrands, aimsFor, situationsFor, HELD_AIMS }
   from "../js/data/aims.js";
 import { STRETCH_ZONES, SESSION_TYPES } from "../js/session-builder.js";
 
@@ -250,6 +259,53 @@ check("6f. the personas the vocabulary was rewritten for are served", () => {
     const ids = aimsFor(sits, 8).map(a => a.id);
     ok(ids.includes(wanted),
        `${who} is not offered "${wanted}" in their first 8. Shown: ${ids.join(", ")}`);
+  }
+});
+
+console.log("\nTEST 7 - P-15: the aims Graeme approved on 31 Oct");
+
+check("7a. the five approved for release are there, in his words", () => {
+  const want = { "enjoy-it": "Find something I actually enjoy", "stay-well": "Stay well as I get older",
+    "ride-swim-further": "Ride or swim further, comfortably", "signed-up": "Get ready for something I've signed up for",
+    "with-others": "Have something to do with other people" };
+  for (const [id, label] of Object.entries(want)) {
+    const a = aimById(id);
+    ok(a && a.label === label, `"${id}" is ${a ? `worded "${a.label}"` : "missing"}; approved as "${label}"`);
+  }
+});
+
+const goalStore = goals => ({ get: k => (k === "goals" ? goals : k === "conditions" ? [] : null) });
+check("7b. a goal from getting started lifts its aim to the front", () => {
+  for (const [goal, aim] of [["cycling", "ride-swim-further"], ["swimming", "ride-swim-further"], ["run-10k", "signed-up"], ["enjoy-exercise", "enjoy-it"]]) {
+    const first = aimsFor(situationsFor(goalStore([goal])), 3).map(a => a.id);
+    ok(first.includes(aim), `the goal "${goal}" does not put "${aim}" in the first three: ${first.join(", ")}`);
+  }
+  const none = aimsFor(situationsFor(goalStore([])), 8).map(a => a.id);
+  ok(!none.includes("signed-up"), "with no such goal, Get ready for something I've signed up for is pushed ahead of others");
+});
+
+check("7c. the weight and shape aims are held: never offered, found or listed", () => {
+  ok(Array.isArray(HELD_AIMS) && HELD_AIMS.length === 2, "HELD_AIMS should hold the two weight and shape aims");
+  for (const h of HELD_AIMS) {
+    ok(h.heldFor === "clinical read", `"${h.id}" does not say what it is held for`);
+    ok(!AIMS.list.some(a => a.id === h.id), `"${h.id}" is in the list a person chooses from`);
+    ok(aimById(h.id) === null, `"${h.id}" can be found by id, so a stored arc could use it`);
+  }
+  const shaped = aimsFor(situationsFor(goalStore(["lose-weight", "tone-up", "build-muscle"])), 99).map(a => a.id);
+  ok(!HELD_AIMS.some(h => shaped.includes(h.id)), "a held aim is offered to somebody who chose Lose weight");
+  ok(situationsFor(goalStore(["lose-weight"])).includes("shape"), "Lose weight no longer marks the shape situation");
+});
+
+check("7d. the held aims already keep every rule, and say no numbers and no body talk", () => {
+  const known = new Set(SITUATIONS);
+  for (const h of HELD_AIMS) {
+    const l = h.label.toLowerCase();
+    ok(h.strands.every(s => STRANDS[s]), `"${h.id}" names a strand that does not exist`);
+    ok(h.strands.some(s => STRANDS[s].kind === "mind"), `"${h.id}" has no mind strand`);
+    ok(h.strands.length > AIMS.maxStrands, `"${h.id}" offers no choice of strands`);
+    ok(h.situations.every(x => known.has(x)), `"${h.id}" names an unknown situation`);
+    ok(!/\d/.test(l) && !/\b(lose|losing|weight|burn|tone|toned|flat|fat|slim|lean|kg|lbs|stone|calorie)/.test(l),
+       `"${h.label}" counts or talks about the body in the words Graeme ruled out (no numbers, no body talk)`);
   }
 });
 

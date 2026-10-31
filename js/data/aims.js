@@ -1,5 +1,21 @@
 /**
  * js/data/aims.js
+ * 31 Oct 2026 v7
+ *
+ * v7 - P-15 ARC-AIMS-BUILD (P-11 traced, P-14 approved by Graeme, 31 Oct:
+ *   Product/alongside_arc_aims_31oct2026_v2.md). Five aims join the list:
+ *   Find something I actually enjoy; Stay well as I get older; Ride or swim
+ *   further, comfortably; Get ready for something I've signed up for; Have
+ *   something to do with other people. Existing strands only. Three
+ *   situations come from a goal chosen in getting started and count double,
+ *   as "settling" does: "enjoying" (Enjoy exercise), "endurance" (Run a 10K,
+ *   Improve cycling, Improve swimming) and "shape" (Lose weight, Tone up,
+ *   Build muscle). HELD_AIMS: the two weight and shape aims, Change shape
+ *   slowly, without hating it and Look and feel stronger, built and
+ *   approved but held out of the list until the clinical adviser has read
+ *   them (Safeguarding Policy v14 §3, §8). Nothing offers, finds or stores
+ *   a held aim until it is moved into the list.
+ *
  * 17 Oct 2026 v6
  *
  * v6 - W6-13 ARC-STRESS (Wave 6, persona 2.4). A "settling" situation,
@@ -183,6 +199,9 @@ export const SITUATIONS = [
   "later-life",  // 55+, where balance, bone health and staying mobile lead
   "desk",        // sedentary working day
   "settling",    // W6-13: said they want less stress or better sleep
+  "enjoying",    // v7: said they want to enjoy exercise (a goal)
+  "endurance",   // v7: said they want a 10K, to ride or to swim (a goal)
+  "shape",       // v7: said they want to lose weight, tone up or build muscle (a goal); only held aims use it yet
   "everyday",    // available to anybody
 ];
 
@@ -451,8 +470,75 @@ export const AIMS = {
       situations: ["everyday", "desk", "later-life", "starting"],
       strands: ["hip-range", "hamstring-range", "at-home-in-body", "upper-back-range", "neck-shoulders"],
     },
+
+    // ── P-15, 31 Oct 2026 (P-11's gaps; Graeme approved the words) ──
+    // At the end, so no earlier aim loses its place in a first eight;
+    // the goal-derived situations lift each for the people who said it.
+    {
+      id: "enjoy-it",
+      label: "Find something I actually enjoy",
+      // P-11: no aim was about liking it. "Start something, and actually
+      // keep going" is about keeping at it; this is about wanting to.
+      situations: ["starting", "everyday", "returning", "enjoying"],
+      strands: ["at-home-in-body", "being-outside", "gentle-capacity", "showing-up"],
+    },
+    {
+      id: "stay-well",
+      label: "Stay well as I get older",
+      // P-11: nothing for somebody well who wants to stay that way. Not
+      // medical: strength, staying-power and balance, the ordinary things.
+      situations: ["everyday", "desk", "training", "later-life"],
+      strands: ["leg-strength", "aerobic-base", "balance", "upper-strength", "showing-up"],
+    },
+    {
+      id: "with-others",
+      label: "Have something to do with other people",
+      situations: ["everyday", "starting", "later-life", "returning"],
+      strands: ["meeting-people", "being-outside", "showing-up", "getting-going"],
+    },
+    {
+      id: "ride-swim-further",
+      label: "Ride or swim further, comfortably",
+      // P-11: getting started offers Improve cycling and Improve swimming,
+      // and the arc only had running.
+      situations: ["training", "sport", "everyday", "endurance"],
+      strands: ["aerobic-base", "leg-strength", "shoulder-health", "hip-range", "pacing"],
+    },
+    {
+      id: "signed-up",
+      label: "Get ready for something I've signed up for",
+      // A 10K, a half, a sportive, a swim. No date in the aim: the arc
+      // never counts down (2b).
+      situations: ["training", "sport", "endurance"],
+      strands: ["aerobic-base", "load-tolerance", "pacing", "not-overdoing", "leg-strength"],
+    },
   ],
 };
+
+/**
+ * HELD_AIMS (v7). Approved by Graeme on 31 Oct, held until the clinical
+ * adviser has read them: they answer Lose weight, Tone up and Build muscle
+ * with no numbers and no body talk, and the Safeguarding Policy (v14 §3,
+ * §8) asks the reviewers about exactly that ground. Not in AIMS.list, so
+ * aimsFor, aimById and the full list never see them. To release one, move
+ * it into AIMS.list (verify-aims TEST 7 then holds it like any other).
+ */
+export const HELD_AIMS = [
+  {
+    id: "change-shape",
+    label: "Change shape slowly, without hating it",
+    heldFor: "clinical read",
+    situations: ["everyday", "starting", "training", "shape"],
+    strands: ["leg-strength", "upper-strength", "aerobic-base", "self-kindness", "showing-up"],
+  },
+  {
+    id: "look-feel-stronger",
+    label: "Look and feel stronger",
+    heldFor: "clinical read",
+    situations: ["training", "everyday", "shape"],
+    strands: ["load-tolerance", "upper-strength", "leg-strength", "trunk-strength", "at-home-in-body"],
+  },
+];
 
 /**
  * The situations a person is in, from what is already stored. Nothing
@@ -475,6 +561,10 @@ export function situationsFor(store) {
   // W6-13. Less stress or better sleep, as a goal, or Stress listed.
   const goals = (store.get("goals") || []).map(g => (typeof g === "string" ? g : g && g.id));
   if (goals.includes("reduce-stress") || goals.includes("sleep-better") || (store.get("conditions") || []).includes("anxiety")) out.add("settling");
+  // v7 (P-15). Three more from a goal chosen in getting started.
+  if (goals.includes("enjoy-exercise")) out.add("enjoying");
+  if (goals.some(g => ["run-10k", "cycling", "swimming"].includes(g))) out.add("endurance");
+  if (goals.some(g => ["lose-weight", "tone-up", "build-muscle"].includes(g))) out.add("shape");
 
   // Somebody active with a condition is usually trying to keep doing
   // their thing around it, which is a different situation from either
@@ -511,7 +601,9 @@ export function aimsFor(situations, limit = 8, areas = null) {
   // situation each, the same as every universal aim, and lost on list
   // order. A fallback that ranks is not a fallback.
   // W6-13. "settling" comes from a goal the person chose: it counts double.
-  const score = a => (a.situations || []).filter(x => x !== "everyday" && set.has(x)).reduce((n, x) => n + (x === "settling" ? 2 : 1), 0);
+  // v7: so do "enjoying", "endurance" and "shape", for the same reason.
+  const FROM_A_GOAL = new Set(["settling", "enjoying", "endurance", "shape"]);
+  const score = a => (a.situations || []).filter(x => x !== "everyday" && set.has(x)).reduce((n, x) => n + (FROM_A_GOAL.has(x) ? 2 : 1), 0);
 
   const scored = AIMS.list.map((a, i) => ({ a, i, n: score(a) }));
   const specific = scored.filter(x => x.n > 0)
