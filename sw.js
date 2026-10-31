@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 31 Oct 2026 v691
+ * 31 Oct 2026 v692
  *
+ * v692 - P-13, the mind rooms (Free unchanged). On the Plan, Breathing, Something quieter and In Step take the one look: the heading at the left, ‹ Back before a practice and Exit while it runs, no house button beside it, line icons in place of emoji, and Done to finish.
  * v691 - P-13, the Library (Free unchanged). On the Plan the Library now holds only what no door does: Classes, Practices, Mindful practice, My exercises, Saved sessions, Your week and Log what I did, each saying what it is for. Everything else is behind Home's doors: a guided run, ride, walk or swim under Keep moving › Outside; Yoga & Pilates and a mobility session under Stretch; My programme under Get stronger › Gym.
  * v690 - P-15 (both tiers' arc). Five new things your arc can be about: Find something I actually enjoy; Stay well as I get older; Ride or swim further, comfortably; Get ready for something I've signed up for; Have something to do with other people. A goal you chose when you started (enjoying exercise, a 10K, cycling or swimming) puts its aim near the top.
  * v689 - STAGE PATH Session 9, the close (Free unchanged). On the Plan, every screen outside the rooms still to come (Classes, In Step, Build a session, Mobility & Conditioning, the Morning programme, Core, Yoga & Pilates, Something quieter, Breathing) now has one look: one heading at the left at the same size, ‹ Back to go back (Exit once a session has started) and no house button beside it, no emoji, and every link a pill, a button or a row that says what it is for. Both tiers: Today's plan keeps long names whole at large text, and two pieces of text that were too faint now read clearly. NEW FILE precached: js/plan-look.js.
@@ -4238,7 +4239,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v691";
+const CACHE_NAME = "alongside-v692";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4437,14 +4438,14 @@ const SHELL_HASHES = {
   "./js/views/saved-sessions.js": "bb7b1a61c1e2837f",
   "./js/views/session-builder-ui.js": "4bff89344b105d5c",
   "./js/views/noticing.js": "afb617785e39e18d",
-  "./js/views/in-step.js": "e6b66f1d1e71096e",
+  "./js/views/in-step.js": "54f53470958ac62f",
   "./js/data/in-step-scenarios.js": "b46f085cda4d24fc",
   "./js/views/journal-entry.js": "dd38e795ee54e7d7",
   "./js/views/gym-programme.js": "98de0c5929699fb1",
   "./js/views/prescribed.js": "2c074cff1755456e",
   "./js/views/prescribed-session.js": "105d69a0d22b6318",
-  "./js/views/quiet-session.js": "c69d992fe69f568c",
-  "./js/views/breathing-session.js": "b38371ead09543e6",
+  "./js/views/quiet-session.js": "eb439e800dc71d74",
+  "./js/views/breathing-session.js": "3d049d83a8e783b9",
   "./js/views/morning-session.js": "c261f642db4bb8de",
   "./js/views/core-session.js": "30d5977595020ba7",
   "./js/views/yoga-session.js": "bde8e016cc17c761",
