@@ -123,7 +123,17 @@ mc("#mc-start-session", "free");
 ok("5a. Free's Mobility & Conditioning opens the builder, as before", navs.at(-1) === "session-builder" && store.get("sessionBuilderPreselect")?.type === "mobility", JSON.stringify(navs));
 mc("#mc-stretch", "free");
 ok("5b. and its Stretch too", navs.at(-1) === "session-builder" && store.get("sessionBuilderPreselect")?.type === "stretch", JSON.stringify(navs));
-libCore("free");
+// v2: Free's Library is unchanged, so its At home › Core is driven as before.
+function libCore(tier) {
+  fixture(tier);
+  main.innerHTML = library.render(); library.onMount();
+  click(main.querySelector('[data-guided="home"]'));
+  main.innerHTML = library.render(); library.onMount();
+  const core = [...main.querySelectorAll("[data-target]")].find(b => b.dataset.target === "core-session");
+  navs = []; click(core);
+  return !!core;
+}
+ok("5pc. Free's Core row is there", libCore("free"));
 ok("5c. Free's Library Core opens the core session, as before", navs.at(-1) === "core-session", JSON.stringify(navs));
 
 console.log(`\nVERIFY-ONE-PLAN-SCREEN: ${passes} passed, ${fails} failed`);
