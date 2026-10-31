@@ -1,7 +1,16 @@
 /**
  * library.js - Library Page
  *
- * 31 Oct 2026 v21
+ * 31 Oct 2026 v22
+ *
+ * v22 - P-13 LIBRARY (Graeme, 29 Oct: "Only what doors don't hold"; 31 Oct:
+ *   doors first, then trim). On the Plan the Library holds only what no
+ *   door does: Classes, Practices, Mindful practice, My exercises, Saved
+ *   sessions (new here), Your week and Log what I did, each saying what it
+ *   is for (onPlan). The tiles that repeated a door are gone from the
+ *   Plan's Library, and every room they opened is behind a door
+ *   (path.js v4; verify-library-shelf proves each one). Free's Library is
+ *   unchanged.
  *
  * v21 - STAGE PATH Session 9 (CLOSE; P-12 F4, F5; Graeme, 31 Oct: "24 px,
  *   left", "‹ Back"). On the Plan only: the Library's heading at the page
@@ -385,6 +394,7 @@ const GUIDED_CATEGORIES = [
   },
   {
     id:          "mindful",
+    onPlan:      true,
     label:       "Mindful practice",
     icon:        "\uD83C\uDF3F",
     description: "Breathing, journaling, mindful awareness",
@@ -408,6 +418,7 @@ const GUIDED_CATEGORIES = [
     // coach-chosen full-body session + all wellbeing practices", and
     // nothing behind this card is a plan or a journey.
     id:          "practices",
+    onPlan:      true,
     label:       "Practices",
     icon:        "\uD83E\uDDF4",
     description: "Recovery, grounding, warm-ups and whole circuits",
@@ -416,6 +427,7 @@ const GUIDED_CATEGORIES = [
   },
   {
     id:          "prescribed",
+    onPlan:      true,
     label:       "My exercises",
     icon:        "\uD83D\uDCCB",
     description: "Your own list of exercises",
@@ -448,6 +460,7 @@ const GUIDED_CATEGORIES = [
   },
   {
     id:          "classes",
+    onPlan:      true,
     label:       "Classes",
     icon:        "",
     description: "Guided classes to follow along",
@@ -474,8 +487,20 @@ const GUIDED_CATEGORIES = [
     directTarget: "capture",
     planOnly:    true
   },
+  // P-13 (v22). The Plan's: sessions you kept, which no door lists whole.
+  {
+    id:          "saved",
+    label:       "Saved sessions",
+    icon:        "",
+    description: "Sessions you kept to repeat",
+    sessions: [],
+    directTarget: "saved-sessions",
+    planOnly:    true,
+    onPlan:      true
+  },
   {
     id:          "week",
+    onPlan:      true,
     label:       "Your week",
     icon:        "",
     description: "What each day is for",
@@ -554,9 +579,10 @@ function renderLanding() {
     <div class="view library-view${isPremium() ? " is-plan" : ""}">
       <div class="view-header">
         <h1>Library</h1>
-      </div>
+${isPremium() ? `        <p class="library-purpose">Your own things, classes and practices. Sessions start from Home\u2019s doors.</p>
+` : ""}      </div>
 
-      <h2 class="look-label" id="lib-start-h">Start a session</h2>
+      ${isPremium() ? `<h2 class="look-label" id="lib-start-h">What's here</h2>` : `<h2 class="look-label" id="lib-start-h">Start a session</h2>`}
       ${categoryGrid("lib-start-h")}
 
       <h2 class="look-label" id="lib-log-h">Already done something?</h2>
@@ -578,7 +604,7 @@ const CATEGORY_LOOK = {
   home: ["home", "amber"], gym: ["strength", "amber"],
   run: ["run", "blue"], walk: ["walk", "blue"], swim: ["swim", "blue"], cycle: ["cycle", "blue"],
   yoga: ["yoga", "violet"], mindful: ["mind", "green"], practices: ["breath", "green"],
-  prescribed: ["list", "teal"], coach: ["star", "teal"],
+  prescribed: ["list", "teal"], coach: ["star", "teal"], saved: ["keep", "teal"],
   mobility: ["mobility", "violet"], classes: ["classes", "rose"], week: ["week", "teal"],
   "know-what": ["choose", "teal"], "as-i-go": ["pencil", "teal"],   // v20: sessions you make yourself
 };
@@ -587,7 +613,7 @@ const CATEGORY_LOOK = {
 function categoryGrid(labelledBy) {
   return `
       <div class="library-category-grid" role="group" aria-labelledby="${labelledBy}">
-        ${GUIDED_CATEGORIES.filter(cat => !cat.planOnly || isPremium()).map(cat => {
+        ${GUIDED_CATEGORIES.filter(cat => (isPremium() ? cat.onPlan : !cat.planOnly)).map(cat => {
           const [icon, kind] = CATEGORY_LOOK[cat.id] || ["star", "slate"];
           const inner = `
             <span class="kind-tile k-${kind} library-category-icon">${lineIcon(icon)}</span>

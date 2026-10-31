@@ -22,11 +22,15 @@
  * check-in) is offered only on Free's Home: the Plan's Home returns before
  * that row is drawn, and the Plan changes its check-in from Today's plan
  * (Change my check-in, the full check-in). verify-one-look proves it.
+ * mobility-conditioning (P-13, 31 Oct, Graeme: split into the Stretch
+ * door): the Plan's Library and I know what I want no longer open it, so
+ * it left P13_ROOMS for this list; verify-library-shelf proves nothing on
+ * the Plan opens it.
  */
 export const P13_ROOMS = [
-  "classes", "class-player", "in-step", "session-builder", "mobility-conditioning",
+  "classes", "class-player", "in-step", "session-builder",
   "morning-session", "core-session", "yoga-session", "quiet-session", "breathing-session",
 ];
 export const SESSION_SCREENS = ["workout", "capture", "prescribed-session", "gym-programme"];
 export const NOT_A_ROOM = ["age-check", "under-18", "consent-update", "health-consent", "red-flag"];
-export const NOT_ON_THE_PLAN = ["checkin-mini"];
+export const NOT_ON_THE_PLAN = ["checkin-mini", "mobility-conditioning"];

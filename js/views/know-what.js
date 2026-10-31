@@ -1,6 +1,11 @@
 /**
  * js/views/know-what.js
- * 31 Oct 2026 v7
+ * 31 Oct 2026 v8
+ *
+ * v8 - P-13 (Graeme, 31 Oct: Mobility & Conditioning split into the Stretch
+ *   door). On the Plan the Mobility & Conditioning row goes: its mobility
+ *   session and held stretches are behind Stretch, the arc is on Home. The
+ *   other two rows stay. Free unchanged.
  *
  * v7 - STAGE PATH Session 9 (CLOSE; P-12 F2: "ends in three underlined text
  *   links and nothing to say what is behind them"; Graeme, 29 Oct: "the
@@ -297,7 +302,6 @@ export function KnowWhatView(router) {
     const chev = `<span class="path-door__chev" aria-hidden="true">${lineIcon("chevron", 20)}</span>`;
     const rows = [
       ["session-builder", "pencil", "Build your own, move by move", "Choose each movement yourself, then play it."],
-      ["mobility-conditioning", "mobility", "Mobility &amp; Conditioning", "Hips, spine, ankles and shoulders, your stretch arc, and held stretches."],
       [prog.programmeId ? "my-programme" : "goal-setup", "week", "A twelve-week shape", prog.programmeId ? "The programme you are following, week by week." : "A programme to follow for twelve weeks, chosen with you."],
     ];
     return `<ul class="path-list kw-rows">${rows.map(([route, icon, t, d]) => `<li><button type="button" class="path-door path-row" data-kw-route="${route}">

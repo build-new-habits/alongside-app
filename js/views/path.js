@@ -1,6 +1,16 @@
 /**
  * views/path.js
- * 31 Oct 2026 v3
+ * 31 Oct 2026 v4
+ *
+ * v4 - P-13 LIBRARY, doors first (Graeme, 31 Oct: "Doors first, then trim";
+ *   Mobility & Conditioning split into the Stretch door). Every room the
+ *   Plan's Library no longer lists is behind a door:
+ *   - Outside › Run, Bike ride, Walk or hike, Open-water swim: "A guided
+ *     run / ride / walk / swim" opens that room;
+ *   - Stretch: after the areas, Yoga & Pilates and A mobility session (the
+ *     coach's mobility plan, as Mobility & Conditioning's was);
+ *   - Get stronger › Gym: My programme.
+ *   verify-library-shelf drives each from Home.
  *
  * v3 - STAGE PATH Session 8 (P-8). Outside, after "What are you doing?": a
  *   warm-up before and a cool-down after, each from the library or an
@@ -108,6 +118,9 @@ export const ACTIVITIES = Object.freeze([
   { id: "sport", label: "A sport or match", icon: "outside", line: "Football, tennis, netball and more" },
   { id: "other", label: "Something else",  icon: "outside" },
 ]);
+// v4 (P-13). The guided room for each outside activity, in the words its Library tile used.
+const GUIDED = { run: ["running-session", "A guided run", "Easy, intervals, or long run"], bike: ["cycle-session", "A guided ride", "Road, indoor, or turbo trainer"],
+  walk: ["walk-session", "A guided walk", "Gentle, mindful, brisk, or nature walk"], swim: ["swim-session", "A guided swim", "Steady or interval swim session"] };
 const ENJOY = { run: "Enjoy your run", bike: "Enjoy your ride", walk: "Enjoy your walk", swim: "Enjoy your swim", sport: "Enjoy the game", other: "Enjoy it" };
 const STYLE = { gentle: "Gentle movement", yoga: "Yoga", taichi: "Tai chi", qigong: "Qigong", pilates: "Pilates", stretch: "Stretches" };
 const POSITION = { standing: "Standing", seated: "Seated", floor: "On the floor", lying: "Lying down", mixed: "Mixed" };
@@ -269,6 +282,7 @@ export function PathView(router) {
           ${row({ v: "coach", t: "Build it for me", d: "Shaped by today’s check-in and what you’ve told me", icon: "fresh", kind: DOOR[st.door].kind, tint: true })}
           ${row({ v: "own", t: "Build my own", d: "Choose the exercises yourself" })}
           ${n ? row({ v: "saved", t: "Saved sessions", d: `${n} kept` }) : ""}
+          ${st.place === "gym" ? row({ v: "programme", t: "My programme", d: "Your current gym programme" }) : ""}
         </ul>`;
     },
     buildlen() {
@@ -290,6 +304,7 @@ export function PathView(router) {
         <ul class="path-list">
           ${outsidePractice("warm") ? row({ v: "warm", t: "Warm-up before", d: `${esc(outsidePractice("warm").name)} \u00b7 about ${outsidePractice("warm").minutes} min`, icon: "sun", kind: DOOR[st.door].kind }) : ""}
           ${outsidePractice("cool") ? row({ v: "cool", t: "Cool-down after", d: `${esc(outsidePractice("cool").name)} \u00b7 about ${outsidePractice("cool").minutes} min`, icon: "moon", kind: DOOR[st.door].kind }) : ""}
+          ${GUIDED[st.activity] ? row({ v: "guided", t: GUIDED[st.activity][1], d: GUIDED[st.activity][2], icon: ACTIVITIES.find(a => a.id === st.activity)?.icon || "outside", kind: DOOR[st.door].kind }) : ""}
           ${row({ v: "log", t: "Log it", d: "How long it was, and how it felt", icon: "pencil", kind: DOOR[st.door].kind })}
         </ul>`;
     },
@@ -297,7 +312,12 @@ export function PathView(router) {
     // Stretch
     sarea() {
       return `${bar(1, 2)}${heading("Where do you want to stretch?")}
-        <ul class="path-list">${Object.entries(AREAS).map(([id, a]) => row({ v: id, t: a.label, icon: "mobility", kind: "violet" })).join("")}</ul>`;
+        <ul class="path-list">${Object.entries(AREAS).map(([id, a]) => row({ v: id, t: a.label, icon: "mobility", kind: "violet" })).join("")}</ul>
+        <h2 class="look-label" id="path-more-stretch">Or a whole session</h2>
+        <ul class="path-list" aria-labelledby="path-more-stretch">
+          ${row({ v: "yoga", t: "Yoga & Pilates", d: "Flexibility, strength, balance, recovery", icon: "yoga", kind: "violet" })}
+          ${row({ v: "mobility", t: "A mobility session", d: "Hips, spine, ankles and shoulders, with some yoga and Pilates, adapted to how you\u2019re doing today", icon: "fresh", kind: "violet" })}
+        </ul>`;
     },
     routines() {
       const floor = st.floor !== "no";
@@ -439,6 +459,7 @@ export function PathView(router) {
         if (v === "coach") return go("buildlen", {});
         if (v === "own") { router.knowWhatStart = knowWhatFor(st.door, st.part, st.place); router.navigate("know-what"); return; }
         if (v === "saved") { router.savedStart = { purpose: st.door, place: st.place }; router.navigate("saved-sessions"); return; }
+        if (v === "programme") { router.navigate("gym-programme"); return; }
         return;
       case "activity": return go("outplan", { activity: v });
       case "outplan": {
@@ -446,10 +467,18 @@ export function PathView(router) {
           const p = outsidePractice(v); if (!p) return;
           return go("prog", { practice: p, fresh: false, reason: null, note: null, surprise: false, fromCoach: false });
         }
+        if (v === "guided" && GUIDED[st.activity]) { router.navigate(GUIDED[st.activity][0]); return; }
         presetLogActivity(OUTSIDE_PLANS[st.activity]?.log || "Other outdoor");   // Log what I did, with the activity chosen
         router.navigate("activity-log"); return;
       }
-      case "sarea": return go("routines", { area: v, floor: "yes" });
+      case "sarea":
+        if (v === "yoga") { router.navigate("yoga-session"); return; }
+        if (v === "mobility") {
+          store.set("requestedSessionType", "mobility");
+          router.planDoor = "stretch";
+          router.navigate("coach-proposal"); return;
+        }
+        return go("routines", { area: v, floor: "yes" });
       case "routines": {
         if (v === "fresh") {
           store.set("requestedSessionType", "stretch");

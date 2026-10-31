@@ -1,5 +1,9 @@
 /* ============================================================
    components/path.css
+   31 Oct 2026 v8
+
+   v8 - P-13 LIBRARY: the Plan's Library says what it holds (.library-purpose).
+
    31 Oct 2026 v7
 
    v7 - STAGE PATH Session 9 (CLOSE; P-12 F3, F4, F5; Graeme, 31 Oct: "‹ Back,
@@ -375,3 +379,5 @@ body:has(#main-content .plan-back, #main-content .plan-exit) #hidden-nav-home-bt
 .ci-plan-head h1 { margin: 0; }
 .kw-rows { margin-top: var(--space-3); }
 .privacy-docs { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-3); }
+/* P-13: the Plan's Library says what it holds. */
+.library-purpose { margin: var(--space-1) 0 0; color: var(--color-text-secondary); }

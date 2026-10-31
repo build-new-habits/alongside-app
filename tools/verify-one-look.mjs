@@ -1,7 +1,11 @@
 import { createRequire as __cr } from "node:module";
 /**
  * tools/verify-one-look.mjs
- * 31 Oct 2026 v1
+ * 31 Oct 2026 v2
+ *
+ * v2 - P-13 (Graeme, 31 Oct): Mobility & Conditioning is no longer opened on
+ *   the Plan (split into the Stretch door), so it moved from P-13's rooms to
+ *   the screens not on the Plan; 5a says so. Nothing loosened.
  *
  * STAGE PATH Session 9 (CLOSE; P-12 F2, F3, F4, F5). Graeme, 29 Oct, after
  * trying v684: "the links I discovered don't always have pills … maze of
@@ -228,7 +232,8 @@ ok("4pc2. compared every touched room the router opens", compared >= 20, compare
 
 // ── 5 ───────────────────────────────────────────────────────────────────
 console.log("\nTEST 5 - the scope");
-ok("5a. P-13 keeps its rooms but My exercises and the twelve-week shape (taken in now)", P13_ROOMS.length === 10 && !P13_ROOMS.includes("prescribed") && !P13_ROOMS.includes("goal-setup") && P13_ROOMS.includes("classes"), P13_ROOMS.join(", "));
+// v2 (P-13): Mobility & Conditioning left the Plan (split into the Stretch door); verify-library-shelf proves nothing on the Plan opens it.
+ok("5a. P-13 keeps its rooms but My exercises and the twelve-week shape (taken in by Session 9) and Mobility & Conditioning (no longer on the Plan)", P13_ROOMS.length === 9 && !P13_ROOMS.includes("prescribed") && !P13_ROOMS.includes("goal-setup") && !P13_ROOMS.includes("mobility-conditioning") && NOT_ON_THE_PLAN.includes("mobility-conditioning") && P13_ROOMS.includes("classes"), P13_ROOMS.join(", "));
 const callers = execSync(`git -C "${ROOT}" grep -n "navigate('checkin-mini')\\|data-action=\\"checkin-mini\\"" -- js`, { encoding: "utf8" }).trim().split("\n");
 ok("5b. Update check-in is opened only from Free's Home (today.js)", callers.every(l => l.startsWith("js/views/today.js")), callers.join(" | "));
 person(); await open("today");
