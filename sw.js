@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 30 Oct 2026 v686
+ * 31 Oct 2026 v687
  *
+ * v687 - STAGE PATH Session 7 (Free unchanged). On the Plan, Progress shows Before and after: how you felt before and after each session you rated, for the time you are looking at, how many were followed by a better mood, and what seems to help you most (from three sessions; never a streak or a score); Home's Lately reads the same. Your year and Your impact take the Plan's look.
  * v686 - STAGE PATH Session 6 (Free unchanged). On the Plan: a new finish after every session (how you feel now beside how you felt this morning, Loved it / Less often / Not again for each movement, Keep to repeat, and, as before, the pain check when something is sore, the occasional reflection, Your arc today and Add a note); on a low-mood day the player shows no countdown; when something is quite sore it checks halfway, still okay?; swapping a movement out means less of it. Every way to a session now shows the same proposal first: each movement's stick figure and Swap, then Start; Make it mine keeps your version; a saved session opens that way too. NEW FILE precached: js/views/plan-finish.js.
  * v685 - P-12 fix-now, from the consistency trace (both tiers): Mobility & Conditioning, Morning Programme and My programme (before a session is built) now say their name as the page heading, so a screen reader announces where you are; on Mobility & Conditioning, Log an event opens Log an activity, as it says (it opened the Library).
  * v684 - STAGE PATH Sessions 4 and 5, together (mock-up v10, Graeme 29 Oct: "Yep. I like v10"). Free is unchanged. On the Plan, Home is purpose first: your arc as a line, Lately (mood before and after your sessions, and what seems to help), one row (Let me choose for you, or your week's day, Carry on, Done today), then four doors: Get stronger, Keep moving, Stretch, Move to feel better, and the Library. The check-in is asked inside whichever way in you choose, once a day, with Not today. Behind each door, its own steps: where you are, which part, then built for you, built by you or one you saved; outside, what you're doing and Log it; Stretch by area, with ready-made routines and the floor question; Move to feel better by feeling, with programmes, a fresh one, Surprise me and Help me choose, each played in the usual player. Today's plan says why the coach chose it, what it adjusted and Change my check-in. I know what I want and Make it up as I go are in the Library. NEW FILES precached: js/views/plan-home.js, js/views/path.js, js/data/path-context.js, css/components/path.css.
@@ -4233,7 +4234,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v686";
+const CACHE_NAME = "alongside-v687";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4323,7 +4324,7 @@ const SHELL_HASHES = {
   "./js/views/checkin-mini.js": "c647f4da71feddde",
   "./js/views/coach-proposal.js": "a6b85909527f72c2",
   "./js/views/workout.js": "4f0d68a7b2ebe702",
-  "./js/views/progress.js": "0e5aa6295cab8ee5",
+  "./js/views/progress.js": "5afce3f005df10f3",
   "./js/views/settings.js": "ec21456c0fda9b36",
   "./js/views/restore-flow.js": "dc81c2e455fa472d",
   "./js/views/weekly-plan.js": "dcee06e297b402c0",
@@ -4342,8 +4343,8 @@ const SHELL_HASHES = {
   "./js/data/personal-reads.js": "52141f31fa9d4fd0",
   "./js/data/field-contract.js": "d7d662025990b1fd",
   "./js/views/activity-log.js": "f0e37e1cb471f357",
-  "./js/views/annual-reflection.js": "b342635af8b1d212",
-  "./js/views/community-impact.js": "b620646a69ac8d8a",
+  "./js/views/annual-reflection.js": "0169de318bd82070",
+  "./js/views/community-impact.js": "34582ebffba78371",
   "./js/views/home-threshold.js": "17bc42808aa5bd5c",
   "./js/views/onboarding/frequency.js": "47e40b6e6e2f458f",
   "./js/views/programme-select.js": "8f1e740ed2db223b",
@@ -4359,11 +4360,11 @@ const SHELL_HASHES = {
   "./js/data/arc-readback.js": "9b06dcba96534da0",
   "./js/data/tier-table.js": "7821c3304bd0815c",
   "./js/views/know-what.js": "0b3d8db4a33b6c9b",
-  "./js/views/plan-home.js": "aec84d576d4d745b",
+  "./js/views/plan-home.js": "73ceb682dd817d5f",
   "./js/views/path.js": "500ed3f0536357a6",
   "./js/views/plan-finish.js": "7a03f4176a4cb840",
   "./js/data/path-context.js": "fc5643585fe6066e",
-  "./css/components/path.css": "689b87da53e9f588",
+  "./css/components/path.css": "d7d880d5c8e0ffbd",
   "./js/data/red-flag.js": "3cd9eecbc3985eb3",
   "./js/data/health-consent.js": "a23d005af57f179c",
   "./js/data/age-check.js": "7fa5b0f5a6b34770",
@@ -4500,7 +4501,7 @@ const SHELL_HASHES = {
   "./assets/fonts/inter-latin-600-normal.woff2": "f9a06e79cd3a2a20",
   "./assets/fonts/inter-latin-700-normal.woff2": "6f56409fd3d64bb8",
   "./assets/images/logo-icon-512.png": "83e03cc4171a36cc",
-  "./js/data/progress-report.js": "8e29a439d162766c",
+  "./js/data/progress-report.js": "5bbd5461406855bb",
   "./js/data/share-images.js": "0812f14d822387ad",
   "./js/views/progress-share.js": "20b9d3e812af6999",
   "./css/components/progress-share.css": "530655f5cd5c62b4",
