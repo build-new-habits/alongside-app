@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 31 Oct 2026 v689
+ * 31 Oct 2026 v690
  *
+ * v690 - P-15 (both tiers' arc). Five new things your arc can be about: Find something I actually enjoy; Stay well as I get older; Ride or swim further, comfortably; Get ready for something I've signed up for; Have something to do with other people. A goal you chose when you started (enjoying exercise, a 10K, cycling or swimming) puts its aim near the top.
  * v689 - STAGE PATH Session 9, the close (Free unchanged). On the Plan, every screen outside the rooms still to come (Classes, In Step, Build a session, Mobility & Conditioning, the Morning programme, Core, Yoga & Pilates, Something quieter, Breathing) now has one look: one heading at the left at the same size, ‹ Back to go back (Exit once a session has started) and no house button beside it, no emoji, and every link a pill, a button or a row that says what it is for. Both tiers: Today's plan keeps long names whole at large text, and two pieces of text that were too faint now read clearly. NEW FILE precached: js/plan-look.js.
  * v688 - STAGE PATH Session 8. On the Plan, Outside (behind Get stronger or Keep moving) offers a warm-up before and a cool-down after for each activity, from the library or an approved routine, then Log it, which opens Log what I did with the activity chosen; Log what I did, Walk, Run, Cycle and Swim take the Plan's look. Both tiers: Log what I did's choices wrap at the largest text instead of running off the page. NEW FILE precached: js/data/outside.js.
  * v687 - STAGE PATH Session 7 (Free unchanged). On the Plan, Progress shows Before and after: how you felt before and after each session you rated, for the time you are looking at, how many were followed by a better mood, and what seems to help you most (from three sessions; never a streak or a score); Home's Lately reads the same. Your year and Your impact take the Plan's look.
@@ -4236,7 +4237,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v689";
+const CACHE_NAME = "alongside-v690";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4339,7 +4340,7 @@ const SHELL_HASHES = {
   "./js/data/exercises/swimming_cycling.js": "06c7dd87c9fe64e1",
   "./js/data/morning-programme.js": "684cee9fdc54a03a",
   "./js/data/session-categories.js": "39f35cc7aab24fe6",
-  "./js/data/aims.js": "35afe1468825731f",
+  "./js/data/aims.js": "63294a5f628c7fa8",
   "./js/data/stretch-goal-zones.js": "a05bc2d626cade4f",
   "./js/data/session-rationale.js": "f14d0d565eb7f9dc",
   "./js/data/personal-reads.js": "52141f31fa9d4fd0",
