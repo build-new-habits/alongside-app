@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 31 Oct 2026 v690
+ * 31 Oct 2026 v691
  *
+ * v691 - P-13, the Library (Free unchanged). On the Plan the Library now holds only what no door does: Classes, Practices, Mindful practice, My exercises, Saved sessions, Your week and Log what I did, each saying what it is for. Everything else is behind Home's doors: a guided run, ride, walk or swim under Keep moving › Outside; Yoga & Pilates and a mobility session under Stretch; My programme under Get stronger › Gym.
  * v690 - P-15 (both tiers' arc). Five new things your arc can be about: Find something I actually enjoy; Stay well as I get older; Ride or swim further, comfortably; Get ready for something I've signed up for; Have something to do with other people. A goal you chose when you started (enjoying exercise, a 10K, cycling or swimming) puts its aim near the top.
  * v689 - STAGE PATH Session 9, the close (Free unchanged). On the Plan, every screen outside the rooms still to come (Classes, In Step, Build a session, Mobility & Conditioning, the Morning programme, Core, Yoga & Pilates, Something quieter, Breathing) now has one look: one heading at the left at the same size, ‹ Back to go back (Exit once a session has started) and no house button beside it, no emoji, and every link a pill, a button or a row that says what it is for. Both tiers: Today's plan keeps long names whole at large text, and two pieces of text that were too faint now read clearly. NEW FILE precached: js/plan-look.js.
  * v688 - STAGE PATH Session 8. On the Plan, Outside (behind Get stronger or Keep moving) offers a warm-up before and a cool-down after for each activity, from the library or an approved routine, then Log it, which opens Log what I did with the activity chosen; Log what I did, Walk, Run, Cycle and Swim take the Plan's look. Both tiers: Log what I did's choices wrap at the largest text instead of running off the page. NEW FILE precached: js/data/outside.js.
@@ -4237,7 +4238,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v690";
+const CACHE_NAME = "alongside-v691";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4353,7 +4354,7 @@ const SHELL_HASHES = {
   "./js/views/programme-select.js": "115a22eeb9526be5",
   "./js/views/upgrade.js": "2a3e1f4ce77dbbac",
   "./js/views/privacy.js": "25721026cff47822",
-  "./js/views/library.js": "01cb55a4c0c20265",
+  "./js/views/library.js": "b694b0bfca860c6f",
   "./js/views/practices.js": "9890a7fa300e9d1c",
   "./js/views/red-flag.js": "d2f857d0f8ba905f",
   "./js/views/health-consent.js": "66c6f499c7863c7c",
@@ -4362,14 +4363,14 @@ const SHELL_HASHES = {
   "./js/views/consent-update.js": "51f918f8e2c9b25a",
   "./js/data/arc-readback.js": "9b06dcba96534da0",
   "./js/data/tier-table.js": "7821c3304bd0815c",
-  "./js/views/know-what.js": "d69c27a2ea4ba9b8",
-  "./js/views/plan-home.js": "73ceb682dd817d5f",
-  "./js/views/path.js": "f28b63dd3f2d980f",
+  "./js/views/know-what.js": "4c4e9aa82b226bd6",
+  "./js/views/plan-home.js": "7a6738b3d0e3d23e",
+  "./js/views/path.js": "81e7d2cfb111bf8c",
   "./js/plan-look.js": "7674d8fbf5101aa9",
   "./js/views/plan-finish.js": "7a03f4176a4cb840",
   "./js/data/outside.js": "3af4ea46bd898084",
   "./js/data/path-context.js": "fc5643585fe6066e",
-  "./css/components/path.css": "73f8e19975ab247c",
+  "./css/components/path.css": "7da1c1fa5a28af32",
   "./js/data/red-flag.js": "3cd9eecbc3985eb3",
   "./js/data/health-consent.js": "a23d005af57f179c",
   "./js/data/age-check.js": "7fa5b0f5a6b34770",
