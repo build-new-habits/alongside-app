@@ -1,5 +1,15 @@
 /**
  * coach-proposal.js
+ * 31 Oct 2026 v65
+ *
+ * v65 - STAGE PATH Session 9 (CLOSE; P-12 F3, F4, F5; Graeme, 31 Oct: "‹ Back,
+ *   Exit in a session", "24 px, left"). On the Plan only: Today's plan says
+ *   "‹ Back" (it said "‹ Home"; its spoken name still says where it goes),
+ *   its heading at the page size at the left (.is-plan), Swap and Change my
+ *   check-in drawn as pills and Not today as a button (they were bare
+ *   words), and a line icon for
+ *   what matters today in place of the 🌱. Free unchanged.
+ *
  * 29 Oct 2026 v64
  *
  * v64 - STAGE PATH Session 6 (P-6, P-12: one proposal shape on the Plan;
@@ -885,6 +895,7 @@ import { isGateDue, isGuidanceDue, recordAcknowledgement,
 import { HURT_AND_ACHE }     from '../exercise-card.js';
 import { bodyCaution }       from '../data/session-rationale.js';
 import { renderFigure }      from '../figures.js';
+import { lineIcon }          from '../data/line-icons.js';
 import { takeWeekDayRequest, applyWeekDay, primaryType, todayInWeek } from '../data/week-shape.js';
 import { resolveTiming }     from '../exercise-timing.js';
 import { isPremium }         from '../auth.js';
@@ -1260,7 +1271,7 @@ export function CoachProposalView(router) {
             ${proposal.reflection ? `<p class="cp-reflection">${proposal.reflection}</p>` : ''}
             ${proposal.constraint ? `
               <div class="cp-constraint" role="status" aria-live="polite">
-                <span class="cp-constraint__icon" aria-hidden="true">🌱</span>
+                <span class="cp-constraint__icon" aria-hidden="true">${isPremium() ? lineIcon('heart', 20) : '🌱'}</span>
                 <p>${proposal.constraint}</p>
               </div>` : ''}
             <p class="cp-proposal-intro">${proposal.intro}</p>
@@ -1323,7 +1334,7 @@ export function CoachProposalView(router) {
     const premium = isPremium();
     return `
       <div id="cp-preview-panel"
-           class="cp-preview-panel ${previewOpen ? 'is-open' : ''}"
+           class="cp-preview-panel ${previewOpen ? 'is-open' : ''}${premium ? ' is-plan' : ''}"
            role="dialog"
            aria-modal="true"
            aria-labelledby="cp-preview-title"
@@ -1334,15 +1345,15 @@ export function CoachProposalView(router) {
                left, in place of an outlined ✕; the greeting and yesterday's
                line went (Home has just said both). What matters today, a
                sore area or coming back, still leads. -->
-          <button class="cp-preview-panel__close" id="cp-preview-close" aria-label="Back to Home">
+          ${premium ? `<button class="cp-preview-panel__close plan-back" id="cp-preview-close" aria-label="Back to Home">‹ Back</button>` : `<button class="cp-preview-panel__close" id="cp-preview-close" aria-label="Back to Home">
             <span aria-hidden="true">‹</span> Home
-          </button>
+          </button>`}
 
           ${proposal && (proposal.constraint || proposal.reentryLine) ? `
             <div class="cp-coach-block cp-coach-block--in-panel" aria-live="polite">
               ${proposal.constraint ? `
                 <div class="cp-constraint" role="status" aria-live="polite">
-                  <span class="cp-constraint__icon" aria-hidden="true">🌱</span>
+                  <span class="cp-constraint__icon" aria-hidden="true">${isPremium() ? lineIcon('heart', 20) : '🌱'}</span>
                   <p>${proposal.constraint}</p>
                 </div>` : ''}
               ${proposal.reentryLine ? `<p class="cp-proposal-intro">${proposal.reentryLine}</p>` : ''}
@@ -1643,7 +1654,7 @@ export function CoachProposalView(router) {
                     <span class="sr-only">. What it is and how to do it</span>
                     <svg class="cp-plan__chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M9 6l6 6-6 6"/></svg>
                   </button>
-                  ${canSwap ? `<button class="btn btn-ghost cp-plan__swap" data-swap="${i}"
+                  ${canSwap ? `<button class="btn btn-ghost cp-plan__swap${premium ? ' plan-link' : ''}" data-swap="${i}"
                           aria-label="Swap ${ex.name}" aria-expanded="${swapOpen === i}"
                           ${swapOpen === i ? `aria-controls="cp-swap-${i}"` : ''}>Swap</button>` : ''}
                   ${canSwap && swapOpen === i ? _renderSwapList(i, ex) : ''}
@@ -1799,7 +1810,7 @@ export function CoachProposalView(router) {
       <div class="cp-adjusted">
         ${adj.length ? `<p class="cp-adjusted__lbl">What I’ve adjusted</p>
         <ul class="cp-adjusted__list">${adj.map(x => `<li>${_escWhy(x)}</li>`).join('')}</ul>` : ''}
-        <button type="button" class="cp-adjusted__redo" id="cp-redo-checkin">${store.checkedInToday() ? 'Change my check-in' : 'Check in now'}</button>
+        <button type="button" class="cp-adjusted__redo plan-link" id="cp-redo-checkin">${store.checkedInToday() ? 'Change my check-in' : 'Check in now'}</button>
       </div>`;
   }
 
@@ -1893,7 +1904,7 @@ export function CoachProposalView(router) {
           <p class="cp-dock__line">If something hurts — sharp, or building as you go — stop that one. Aching afterwards is normal.</p>
         `}
         <div class="cp-preview-panel__actions">
-          <button class="btn btn-ghost" id="cp-preview-not-today">
+          <button class="btn ${premium ? 'btn-secondary' : 'btn-ghost'}" id="cp-preview-not-today">
             ${premium ? 'Not today' : 'Pick something else'}
           </button>
           <button class="btn btn-primary" id="cp-preview-start">Start</button>

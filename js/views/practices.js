@@ -1,6 +1,14 @@
 /**
  * views/practices.js - Guided Practices
  *
+ * 31 Oct 2026 v4
+ *
+ * v4 - STAGE PATH Session 9 (CLOSE; P-12 F3, F4, F5; Graeme, 31 Oct: "‹
+ *   Back", "24 px, left"). On the Plan only: "‹ Back" (it said "← Back";
+ *   its spoken name still says where it goes), the heading at the page size
+ *   at the left (.is-plan), and no house beside the room's own way back.
+ *   Free unchanged.
+ *
  * 18 Oct 2026 v3
  *
  * v3 - OLD-CREDITS-TIDY (Graeme, 18 Oct: "You do those things"). The
@@ -100,6 +108,7 @@
  */
 
 import { store } from "../store.js";
+import { isPremium } from "../auth.js";
 // SHARED-1. Caught by verify-shared1.mjs, which classifies this as a
 // session view the moment it calls store.logActivity() — correctly.
 // Somebody's first thing in the product could be a three-minute
@@ -171,6 +180,16 @@ export function PracticesView(router) {
   // ── Markup ────────────────────────────────────────────────────────
 
   function shell(title, backLabel, body) {
+    if (isPremium()) return `
+      <div class="view practices-view is-plan">
+        <div class="practices-header">
+          <button class="btn btn-ghost btn-small practices-back-btn plan-back"
+                  id="practices-back-btn" aria-label="${esc(backLabel)}">‹ Back</button>
+          <h1 class="practices-title">${esc(title)}</h1>
+        </div>
+        ${body}
+      </div>
+    `;
     return `
       <div class="view practices-view">
         <div class="practices-header">

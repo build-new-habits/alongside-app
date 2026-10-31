@@ -1,5 +1,12 @@
 /**
  * tools/verify-checkin-three.mjs
+ * 31 Oct 2026 v4
+ *
+ * v4 - STAGE PATH Session 9. On the Plan the check-in has a heading and its
+ *   own "‹ Back" (the look only; the questions are the same for everyone).
+ *   The answers read here leave out that way back, which is not an answer.
+ *   No assertion changed.
+ *
  * 29 Sep 2026 v3
  *
  * v3 - P0, SCOPE-MINOR. The option is "I'll do my own exercises", not
@@ -67,8 +74,10 @@ async function waitFor(fn, ms = 2500) {
 
 // Every control a person could tap inside the conversation, wherever the
 // view puts it (inline chips or a bottom panel).
+// v4: the answers only. On the Plan the check-in has its own way back
+// (Session 9: "‹ Back" and a heading, the look); that is not an answer.
 const tappables = () => [...document.querySelectorAll("#app button, .ci-panel button")]
-  .filter(b => !b.disabled && !b.closest("[hidden]"));
+  .filter(b => !b.disabled && !b.closest("[hidden]") && !b.classList.contains("plan-back"));
 const labelsNow = () => tappables().map(b => b.textContent.trim().replace(/\s+/g, " "));
 const threadText = () => (document.getElementById("app")?.textContent || "").replace(/\s+/g, " ");
 

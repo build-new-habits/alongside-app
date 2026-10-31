@@ -1,5 +1,13 @@
 /**
  * privacy.js - Privacy and Terms (in-app summary)
+ * 31 Oct 2026 v10
+ *
+ * v10 - STAGE PATH Session 9 (CLOSE; P-12 F5; Graeme, 31 Oct: "‹ Back"). On
+ *   the Plan only: "‹ Back" (it said "Back"), no house beside it, the
+ *   heading in the Plan's look, and the Privacy Policy and Terms of Service
+ *   drawn as pills (they were underlined words). Free unchanged; the
+ *   under-18 summary is never the Plan's.
+ *
  * 17 Oct 2026 v9
  *
  * v9 - W6-16. The under-18 summary names the site the app is on
@@ -67,6 +75,7 @@
 import { scopeStatementHTML } from "../data/scope-statement.js";
 import { researchPrivacyLine, noServerCopy } from "../data/evidence.js";
 import { declaredUnder18 } from "../data/age-check.js";
+import { isPremium } from "../auth.js";
 
 export const centered = false;
 
@@ -104,12 +113,14 @@ function under18() {
 
 export function render() {
   if (declaredUnder18()) return under18();
+  const plan = isPremium();
   return `
-    <div class="view privacy-view">
+    <div class="view privacy-view${plan ? " is-plan" : ""}">
 
       <div class="view-header privacy-header">
-        <button class="btn btn-ghost privacy-back-btn" onclick="history.back()"
-                aria-label="Go back">Back</button>
+        ${plan ? `<button class="btn btn-ghost privacy-back-btn plan-back" onclick="history.back()"
+                aria-label="Go back">‹ Back</button>` : `<button class="btn btn-ghost privacy-back-btn" onclick="history.back()"
+                aria-label="Go back">Back</button>`}
         <h1>Privacy &amp; Terms</h1>
       </div>
 
@@ -120,7 +131,12 @@ export function render() {
           without reading a legal document. The full and canonical Privacy Policy
           and Terms of Service live on our website:
         </p>
-        <p style="margin-top: var(--space-3);">
+        ${plan ? `<p class="privacy-docs">
+          <a class="plan-link" href="https://buildnewhabits.co.uk/privacy/"
+             target="_blank" rel="noopener noreferrer" aria-label="Privacy Policy (opens in a new tab)">Privacy Policy</a>
+          <a class="plan-link" href="https://buildnewhabits.co.uk/terms/"
+             target="_blank" rel="noopener noreferrer" aria-label="Terms of Service (opens in a new tab)">Terms of Service</a>
+        </p>` : `<p style="margin-top: var(--space-3);">
           <a href="https://buildnewhabits.co.uk/privacy/"
              style="color: var(--color-primary); text-decoration: underline;"
              target="_blank" rel="noopener noreferrer" aria-label="Privacy Policy (opens in a new tab)">Privacy Policy</a>
@@ -128,7 +144,7 @@ export function render() {
           <a href="https://buildnewhabits.co.uk/terms/"
              style="color: var(--color-primary); text-decoration: underline;"
              target="_blank" rel="noopener noreferrer" aria-label="Terms of Service (opens in a new tab)">Terms of Service</a>
-        </p>
+        </p>`}
         <p class="text-secondary text-sm" style="margin-top: var(--space-3);">
           Both open in a new tab. If the two ever disagree, the website version is
           the one that counts.

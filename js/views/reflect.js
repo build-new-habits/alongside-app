@@ -1,6 +1,14 @@
 /**
  * reflect.js - Reflect Screen
  *
+ * 31 Oct 2026 v21
+ *
+ * v21 - STAGE PATH Session 9 (CLOSE; P-12 F3, F4, F5). The Plan's other
+ *   players (Walk, Run, Cycle, Swim, a class, Make it up as I go) still
+ *   finish here: on the Plan only, the heading at the page size at the left
+ *   (.is-plan) and the last button says Done, as the Plan's own finish does
+ *   (it said "Back to Home"; it still goes there). Free unchanged.
+ *
  * 29 Oct 2026 v20
  *
  * v20 - STAGE PATH Session 6 (a touch-once exception: exports only, no
@@ -779,8 +787,9 @@ export function render() {
   ].filter(Boolean);
   const moodShown = typeof moodAfter === "number" ? moodAfter : _startMood();
 
+  const plan = isPremium();
   return `
-    <div class="view reflect-view finish-view">
+    <div class="view reflect-view finish-view${plan ? " is-plan" : ""}">
 
       <div class="view-header finish-head">
         <span class="kind-tile kind-tile--lg k-teal">${lineIcon(partial ? "pencil" : "tick", 28)}</span>
@@ -861,10 +870,11 @@ export function render() {
         </details>` : "";
       })()}
 
-      <button class="btn btn-primary btn-large btn-full" id="reflect-done-btn"
+      ${plan ? `<button class="btn btn-primary btn-large btn-full" id="reflect-done-btn"
+              style="margin-top: var(--space-4);">Done</button>` : `<button class="btn btn-primary btn-large btn-full" id="reflect-done-btn"
               style="margin-top: var(--space-4);">
         Back to Home
-      </button>
+      </button>`}
 
     </div>
   `;

@@ -1,6 +1,16 @@
 /**
  * swim-session.js - Guided Swim Session
  *
+ * 31 Oct 2026 v10
+ *
+ * v10 - STAGE PATH Session 9 (CLOSE; P-12 F4, F5; Graeme, 31 Oct: "‹ Back,
+ *   Exit in a session", "24 px, left"). On the Plan only: before the swim
+ *   starts the way back says "‹ Back" (the first screen said Exit); once it
+ *   has started, Exit; the house is not drawn beside either; the done
+ *   screen's heading is the page heading at the left (it was a centred
+ *   line), and its last button says Done (it said "Back to today"; it
+ *   still goes there). Free unchanged.
+ *
  * 31 Oct 2026 v9
  *
  * v9 - STAGE PATH Session 8 (P-8; P-12, Graeme 29 Oct: the new look is the
@@ -180,7 +190,7 @@ function renderStrokeSelector() {
   return `
     <div class="view walk-session-view${_planCls()}">
       <div class="workout-header">
-        <button class="btn btn-ghost" id="ss-back-btn" aria-label="Exit">Exit</button>
+        ${_plan() ? `<button class="btn btn-ghost plan-back" id="ss-back-btn" aria-label="Back">‹ Back</button>` : `<button class="btn btn-ghost" id="ss-back-btn" aria-label="Exit">Exit</button>`}
         <h1 class="workout-header-title">Swim</h1>
       </div>
       <div class="card card-coach" style="margin-bottom: var(--space-5);">
@@ -203,7 +213,7 @@ function renderTypeSelector() {
   return `
     <div class="view walk-session-view${_planCls()}">
       <div class="workout-header">
-        <button class="btn btn-ghost" id="ss-back-btn" aria-label="Back">Back</button>
+        ${_plan() ? `<button class="btn btn-ghost plan-back" id="ss-back-btn" aria-label="Back">‹ Back</button>` : `<button class="btn btn-ghost" id="ss-back-btn" aria-label="Back">Back</button>`}
         <h1 class="workout-header-title">Swim</h1>
       </div>
       <div class="card card-coach" style="margin-bottom: var(--space-5);">
@@ -226,7 +236,7 @@ function renderDurationSelector() {
   return `
     <div class="view walk-session-view${_planCls()}">
       <div class="workout-header">
-        <button class="btn btn-ghost" id="ss-back-btn" aria-label="Back">Back</button>
+        ${_plan() ? `<button class="btn btn-ghost plan-back" id="ss-back-btn" aria-label="Back">‹ Back</button>` : `<button class="btn btn-ghost" id="ss-back-btn" aria-label="Back">Back</button>`}
         <h1 class="workout-header-title">Swim</h1>
       </div>
       <div class="card card-coach" style="margin-bottom: var(--space-5);">
@@ -250,7 +260,7 @@ function renderSwimOverview() {
   return `
     <div class="view walk-session-view${_planCls()}">
       <div class="workout-header">
-        <button class="btn btn-ghost" id="ss-back-btn" aria-label="Back">\u2190 Back</button>
+        ${_plan() ? `<button class="btn btn-ghost plan-back" id="ss-back-btn" aria-label="Back">‹ Back</button>` : `<button class="btn btn-ghost" id="ss-back-btn" aria-label="Back">\u2190 Back</button>`}
         <h1 class="workout-header-title">${stroke?.label || "Swim"} \u2014 ${selectedMins} min</h1>
       </div>
       <div class="card card-coach" style="margin-bottom: var(--space-4);">
@@ -285,7 +295,7 @@ function renderSwimming() {
   return `
     <div class="view walk-session-view${_planCls()}">
       <div class="workout-header">
-        <button class="btn btn-ghost" id="ss-exit-btn" aria-label="End session">Exit</button>
+        ${_plan() ? `<button class="btn btn-ghost plan-exit" id="ss-exit-btn" aria-label="End session">Exit</button>` : `<button class="btn btn-ghost" id="ss-exit-btn" aria-label="End session">Exit</button>`}
         <h1 class="workout-header-title">${stroke?.label || "Swim"}</h1>
       </div>
       <div class="workout-progress-bar" role="progressbar"
@@ -334,11 +344,11 @@ function renderDone() {
   const name = store.get("name") || "";
   const mins = Math.floor(elapsed / 60);
   return `
-    <div class="view walk-session-view${_planCls()}" style="text-align: center;">
+    <div class="view walk-session-view${_planCls()}"${_plan() ? "" : ` style="text-align: center;"`}>
       <div class="card card-coach" style="margin-top: var(--space-8);">
         <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
         <div>
-          <h2 style="color: var(--color-primary); margin-bottom: var(--space-2);">Swim done.</h2>
+          ${_plan() ? `<h1 tabindex="-1">Swim done.</h1>` : `<h2 style="color: var(--color-primary); margin-bottom: var(--space-2);">Swim done.</h2>`}
           <p class="coach-message-text">
             ${name ? name + " \u2014 " : ""}${mins} minutes in the water. Swimming trains the cardiovascular system and the whole body simultaneously. Good session.
           </p>
@@ -348,7 +358,7 @@ function renderDone() {
 
       <div style="display: flex; flex-direction: column; gap: var(--space-3); margin-top: var(--space-6);">
         <button class="btn btn-primary btn-full" id="ss-reflect-btn">How did that feel?</button>
-        <button class="btn btn-ghost btn-full" id="ss-home-btn">Back to today</button>
+        ${_plan() ? `<button class="btn btn-secondary btn-full" id="ss-home-btn">Done</button>` : `<button class="btn btn-ghost btn-full" id="ss-home-btn">Back to today</button>`}
       </div>
     </div>`;
 }

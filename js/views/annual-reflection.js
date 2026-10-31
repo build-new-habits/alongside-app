@@ -1,5 +1,11 @@
 /**
  * views/annual-reflection.js
+ * 31 Oct 2026 v7
+ *
+ * v7 - STAGE PATH Session 9 (CLOSE; P-12 F5). On the Plan only, the way
+ *   back carries plan-back, so the house is not drawn beside it (one way
+ *   back). Free unchanged.
+ *
  * 31 Oct 2026 v6
  *
  * v6 - STAGE PATH Session 7 (P-12, Graeme 29 Oct: the new look is the
@@ -99,7 +105,7 @@ function _render(container) {
     <div class="view annual-reflection-view${plan ? ' is-plan' : ''}">
 
       <div class="workout-header">
-        <button class="btn btn-ghost" id="ar-back-btn" aria-label="Go back">
+        <button class="btn btn-ghost${plan ? ' plan-back' : ''}" id="ar-back-btn" aria-label="Go back">
           ${plan ? '&lsaquo;' : '&larr;'} Back
         </button>
         <h1 class="workout-header-title">Your year</h1>

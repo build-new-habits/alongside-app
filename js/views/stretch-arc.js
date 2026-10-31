@@ -1,5 +1,12 @@
 /**
  * js/views/stretch-arc.js
+ * 31 Oct 2026 v8
+ *
+ * v8 - STAGE PATH Session 9 (CLOSE; P-12 F5; Graeme, 31 Oct: "‹ Back"). On
+ *   the Plan only: "‹ Back" (it said "← Back"), no house beside it, the
+ *   heading in the Plan's look, and Stop the arc drawn as a button (it was
+ *   bare words). Free unchanged.
+ *
  * 18 Oct 2026 v7
  *
  * v7 - A-4 WORD BUDGET. How it works is folded (every word kept), so
@@ -77,6 +84,7 @@
  */
 
 import { store } from "../store.js";
+import { isPremium } from "../auth.js";
 import { STRETCH_ZONES, zonesWithCoverage } from "../session-builder.js";
 import { zonesForGoal, STRETCH_GOAL_ZONES } from "../data/stretch-goal-zones.js";
 import { getGoalLabel } from "../data/goals.js";
@@ -116,10 +124,11 @@ export function StretchArcView(router) {
     const covered  = available.filter(id => worked[id]);
     const notYet   = available.filter(id => !worked[id]);
 
+    const plan = isPremium();
     container.innerHTML = `
-      <div class="mc-view">
+      <div class="mc-view${plan ? " is-plan" : ""}">
         <div class="mc-header">
-          <button class="btn btn-ghost" id="sa-back-btn" aria-label="Back">&larr; Back</button>
+          ${plan ? `<button class="btn btn-ghost plan-back" id="sa-back-btn">‹ Back</button>` : `<button class="btn btn-ghost" id="sa-back-btn" aria-label="Back">&larr; Back</button>`}
           ${arc.active && arc.aimId ? "" : `<span class="mc-header-title">Stretch arc</span>`}
         </div>
 
@@ -235,7 +244,7 @@ export function StretchArcView(router) {
           </ul>
         </section>
 
-        <button class="btn btn-ghost btn-full" id="sa-stop-btn">
+        <button class="btn ${isPremium() ? "btn-secondary" : "btn-ghost"} btn-full" id="sa-stop-btn">
           Stop the arc
         </button>`;
     }
@@ -275,7 +284,7 @@ export function StretchArcView(router) {
           Stretch now
         </button>
 
-        <button class="btn btn-ghost btn-full" id="sa-stop-btn">
+        <button class="btn ${isPremium() ? "btn-secondary" : "btn-ghost"} btn-full" id="sa-stop-btn">
           Stop the arc
         </button>`;
     }

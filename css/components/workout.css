@@ -1,6 +1,12 @@
 /* ============================================
    WORKOUT STYLES
    css/components/workout.css
+   31 Oct 2026 v23
+
+   v23 - STAGE PATH Session 9 (close checks, axe; both tiers: a fault).
+         "If it hurts" on the card's rose box reads in --color-danger-text
+         (it was 3.2:1 at 13px; now over 4.5).
+
    06 Oct 2026 v22
 
    v22 - D-12 PROGRESS-FIT. .workout-header wraps: at large text the
@@ -1679,7 +1685,7 @@
      target, not the marker glyph. */
   min-height: 44px;
   padding: var(--space-2) 0;
-  color: var(--color-danger);
+  color: var(--color-danger-text, var(--color-danger));
   list-style: none;
 }
 

@@ -1,5 +1,13 @@
 /**
  * views/progress-share.js
+ * 31 Oct 2026 v2
+ *
+ * v2 - STAGE PATH Session 9 (CLOSE; P-12 F5; Graeme, 31 Oct: "‹ Back"). On
+ *   the Plan only: the way back says "‹ Back" (it said "← Progress"; its
+ *   spoken name still says Back to Progress), the heading sits in the
+ *   Plan's look (.is-plan), and Share…, Save to phone and Save as a file are
+ *   drawn as buttons (they were bare words). Free unchanged.
+ *
  * 06 Oct 2026 v1
  *
  * D-11 PROGRESS-SHARE. Share your progress (Graeme, 06 Oct: "Reporting or
@@ -25,6 +33,7 @@
  * setSharePreset().
  */
 import { store } from "../store.js";
+import { planLook } from "../plan-look.js";
 import { healthAllowed } from "../data/health-consent.js";
 import { EXERCISES } from "../data/exercises/index.js";
 import { aimById } from "../data/aims.js";
@@ -104,13 +113,17 @@ export function ProgressShareView(router) {
     });
   }
 
+  // The Plan draws a quiet action as a button, not bare words (Session 9).
+  const quiet = () => (planLook() ? "btn-secondary" : "btn-ghost");
+
   function render(focusId) {
     const m = model();
     const range = m.range;
     const arc = arcInfo();
+    const plan = planLook();
     container.innerHTML = `
-      <div class="view share-view">
-        <button class="btn btn-ghost pr-back" id="sh-back" aria-label="Back to Progress">&larr; Progress</button>
+      <div class="view share-view${plan ? " is-plan" : ""}">
+        ${plan ? `<button class="btn btn-ghost pr-back plan-back" id="sh-back" aria-label="Back to Progress">‹ Back</button>` : `<button class="btn btn-ghost pr-back" id="sh-back" aria-label="Back to Progress">&larr; Progress</button>`}
         <h1 class="share-title" tabindex="-1">Share your progress</h1>
         <p class="pr-range">${esc(range.title)}</p>
 
@@ -180,7 +193,7 @@ export function ProgressShareView(router) {
         </div>
         <div class="sh-actions">
           <button class="btn btn-primary btn-full" id="sh-share-file" disabled>Share…</button>
-          <button class="btn btn-ghost btn-full" id="sh-save-file" disabled>Save to phone</button>
+          <button class="btn ${quiet()} btn-full" id="sh-save-file" disabled>Save to phone</button>
         </div>`;
     }
     if (format === "report") {
@@ -201,8 +214,8 @@ export function ProgressShareView(router) {
       <textarea class="sh-text" id="sh-text" readonly rows="14">${esc(text)}</textarea>
       <div class="sh-actions">
         <button class="btn btn-primary btn-full" id="sh-copy">Copy</button>
-        <button class="btn btn-ghost btn-full" id="sh-share-text">Share…</button>
-        <button class="btn btn-ghost btn-full" id="sh-save-text">Save as a file</button>
+        <button class="btn ${quiet()} btn-full" id="sh-share-text">Share…</button>
+        <button class="btn ${quiet()} btn-full" id="sh-save-text">Save as a file</button>
       </div>`;
   }
 

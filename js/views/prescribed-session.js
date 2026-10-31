@@ -1,6 +1,15 @@
 /**
  * prescribed-session.js - My exercises, played
  *
+ * 31 Oct 2026 v17
+ *
+ * v17 - STAGE PATH Session 9 (CLOSE; P-12 F4, F5; Graeme, 31 Oct: "Exit in a
+ *   session", "‹ Back"). On the Plan only: in the session the way out says
+ *   Exit (it said "✕ Exit") with no house beside it, the movement's name
+ *   as the page heading and Skip this one a button (it was bare words); with all of today's done, "All done" is the page
+ *   heading and the way back says "‹ Back" (it said "Back to choices").
+ *   Free unchanged.
+ *
  * 18 Oct 2026 v16
  *
  * v16 - OLD-CREDITS-TIDY (Graeme, 18 Oct: "You do those things"). The
@@ -175,6 +184,7 @@
  */
 
 import { store } from "../store.js";
+import { planLook } from "../plan-look.js";
 import { renderFeedbackControl, attachFeedbackEvents } from "../exercise-feedback.js";
 import { renderExerciseCard, attachCardEvents } from "../exercise-card.js";
 import { isGateDue, renderSafetyGate, attachSafetyGate } from "../safety-gate.js";
@@ -279,14 +289,15 @@ export function render() {
   const hasTimer     = holdSecs !== null;
   const contraFlag   = _checkContraindication(ex);
 
+  const plan = planLook();
   return `
-    <div class="view workout-view">
+    <div class="view workout-view${plan ? " is-plan" : ""}">
 
       <!-- Header -->
       <div class="workout-header">
-        <button class="btn btn-ghost" id="ps-exit-btn" aria-label="Exit my exercises">
+        ${plan ? `<button class="btn btn-ghost plan-exit" id="ps-exit-btn" aria-label="Exit my exercises">Exit</button>` : `<button class="btn btn-ghost" id="ps-exit-btn" aria-label="Exit my exercises">
           \u2715 Exit
-        </button>
+        </button>`}
         <div class="workout-progress-info" aria-label="Exercise ${currentIndex + 1} of ${active.length}">
           <span>${currentIndex + 1} of ${active.length}</span>
         </div>
@@ -398,7 +409,7 @@ export function render() {
             Start this one \u2192
           </button>
 
-          <button class="btn btn-ghost btn-small" id="ps-skip-btn">
+          <button class="btn ${plan ? "btn-secondary" : "btn-ghost"} btn-small" id="ps-skip-btn">
             Skip this one
           </button>
         ` : ""}
@@ -439,6 +450,13 @@ export function render() {
 }
 
 function renderAlreadyDone() {
+  if (planLook()) return `
+    <div class="view is-plan">
+      <button class="btn btn-ghost plan-back" id="ps-back-btn" aria-label="Back to My exercises">‹ Back</button>
+      <h1 tabindex="-1">All done</h1>
+      <p>That's all of your exercises done for today.</p>
+    </div>
+  `;
   return `
     <div class="view">
       <div class="card card-coach" style="margin-top: var(--space-8);">

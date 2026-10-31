@@ -1,5 +1,12 @@
 /**
  * js/views/goal-review-thread.js
+ * 31 Oct 2026 v2
+ *
+ * v2 - STAGE PATH Session 9 (CLOSE; P-12 F5; Graeme, 31 Oct: "‹ Back"). The
+ *   Plan's only screen: the way back is "‹ Back" at the top left (it was
+ *   "Back" at the foot; its spoken name still says Back to My Programme),
+ *   and a heading, Looking at your date (it had none: WCAG 1.3.1, 2.4.6).
+ *
  * 22 Aug 2026 v1
  *
  * THREAD-1a — the hard conversation's own screen.
@@ -50,10 +57,11 @@ export function GoalReviewThreadView(router) {
     };
 
     container.innerHTML = `
-      <div class="goal-review-view" role="region" aria-label="Looking at your date together">
+      <div class="goal-review-view is-plan" role="region" aria-label="Looking at your date together">
+        <button class="btn btn-ghost goal-review-back plan-back"
+                data-action="back" aria-label="Back to My Programme">‹ Back</button>
+        <h1 tabindex="-1">Looking at your date</h1>
         <div id="goal-review-thread"></div>
-        <button class="btn btn-ghost btn-full goal-review-back"
-                data-action="back" aria-label="Back to My Programme">Back</button>
       </div>
     `;
 

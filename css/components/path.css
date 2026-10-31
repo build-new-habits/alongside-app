@@ -1,5 +1,17 @@
 /* ============================================================
    components/path.css
+   31 Oct 2026 v7
+
+   v7 - STAGE PATH Session 9 (CLOSE; P-12 F3, F4, F5; Graeme, 31 Oct: "‹ Back,
+   Exit in a session", "24 px, left", every Plan screen outside P-13's rooms).
+   One look for every Plan room: the page heading 24 px at the left; one
+   way back, ".plan-back" (‹ Back) or ".plan-exit" (Exit, once a session has
+   started), and the house hidden beside it (only the Plan's markup carries
+   these classes, so Free's house is untouched); ".plan-link", a link that
+   was bare text, drawn as a pill; rooms whose heading sat beside the way
+   back or centred, stacked at the left; the check-in's heading, I know
+   what I want's rows and Privacy's two pills.
+
    31 Oct 2026 v6
 
    v6 - STAGE PATH Session 8 (P-8, P-12): the Plan's look reaches Outside's
@@ -347,3 +359,19 @@
 .is-plan .ws-type-icon .line-icon, .is-plan .activity-type-card .line-icon { width: 22px; height: 22px; }
 /* Log what I did's choices wrap as the text grows (both tiers: at text 2 three columns ran off the page, a fault, not a look). */
 .activity-type-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, calc(6.5rem * var(--user-text-scale, 1))), 1fr)); }
+
+/* ── One look for every Plan room (Session 9) ────────────────────────── */
+.is-plan h1:not(.sr-only) { font-size: var(--text-2xl); font-weight: var(--font-bold); line-height: 1.2; text-align: left; }
+.plan-back, .plan-exit { min-height: 44px; padding-left: 0; padding-right: var(--space-3); background: none; border: 0; color: var(--color-text); font-weight: 400; justify-content: flex-start; }
+/* One way back: a room with its own does not draw the house beside it. */
+body:has(#main-content .plan-back, #main-content .plan-exit) #hidden-nav-home-btn { display: none; }
+.plan-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: var(--space-2) var(--space-4); border: 1px solid var(--color-border-strong, var(--color-border)); border-radius: 999px; background: var(--color-surface); color: var(--color-text); text-decoration: none; font-weight: var(--font-medium, 500); }
+/* Rooms whose heading sat beside the way back, or centred, on the Plan. */
+.is-plan .je-header, .is-plan .practices-header, .is-plan .library-sub-header, .is-plan .mc-header, .is-plan .prescribed-view-header, .is-plan .privacy-header { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-2); border-bottom: 0; }
+.is-plan .finish-head { align-items: flex-start; text-align: left; }
+.is-plan.gp-no-session { text-align: left; align-items: flex-start; }
+/* The check-in's heading and way back (the Plan), I know what I want's rows, Privacy's two pills. */
+.ci-plan-head { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-2); padding: var(--space-3) var(--space-4) 0; }
+.ci-plan-head h1 { margin: 0; }
+.kw-rows { margin-top: var(--space-3); }
+.privacy-docs { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-3); }

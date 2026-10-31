@@ -1,5 +1,12 @@
 /**
  * js/views/plan-import.js
+ * 31 Oct 2026 v2
+ *
+ * v2 - STAGE PATH Session 9 (CLOSE; P-12 F5; Graeme, 31 Oct: "‹ Back"). On
+ *   the Plan, every way back says "‹ Back" (it said "← Back", "← My
+ *   exercises" and the step's name), its spoken name saying where it goes.
+ *   Free's page (See the Plan) unchanged.
+ *
  * 05 Oct 2026 v1
  *
  * D-7 PLAN-IMPORT. "Add a plan you already have" (the Plan). Paste a plan
@@ -55,7 +62,7 @@ export function PlanImportView(router) {
   function go(next, msg = "") { screen = next; status = msg; error = ""; render(); }
 
   function header(label, back) {
-    return `<div class="yw-header"><button class="btn btn-ghost yw-back" data-back="${back}">← ${esc(label)}</button></div>`;
+    return `<div class="yw-header"><button class="btn btn-ghost yw-back plan-back" data-back="${back}">‹ Back</button></div>`;
   }
 
   function rulesCard() {
@@ -93,7 +100,7 @@ export function PlanImportView(router) {
   // ── paste ───────────────────────────────────────────────────────────
   function renderPaste() {
     return `
-      <div class="yw-header"><button class="btn btn-ghost yw-back" data-route-to="back">← Back</button></div>
+      <div class="yw-header"><button class="btn btn-ghost yw-back plan-back" data-route-to="back">‹ Back</button></div>
       <h1 class="yw-title" tabindex="-1">Add a plan you already have</h1>
       <p class="yw-sub">From a trainer, a class, another app or an AI. Paste it below and I'll find the exercises in it.</p>
       ${rulesCard()}
@@ -175,7 +182,7 @@ export function PlanImportView(router) {
   // ── done ────────────────────────────────────────────────────────────
   function renderDone() {
     return `
-      <div class="yw-header"><button class="btn btn-ghost yw-back" data-route-to="prescribed">← My exercises</button></div>
+      <div class="yw-header"><button class="btn btn-ghost yw-back plan-back" data-route-to="prescribed" aria-label="Back to My exercises">‹ Back</button></div>
       <h1 class="yw-title" tabindex="-1">Added to My exercises</h1>
       <p class="yw-sub">${added.count} exercise${added.count === 1 ? "" : "s"}, in ${added.days.map(esc).join(", ")}.</p>
       <p class="yw-sub">${esc(HEALTH_LINES.yours)}</p>

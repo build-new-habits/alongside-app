@@ -1,5 +1,12 @@
 /**
  * tools/verify-know-what.mjs
+ * 31 Oct 2026 v8
+ *
+ * v8 - STAGE PATH Session 9 re-point (none loosened). On the Plan, Build your
+ *   own, Mobility & Conditioning and A twelve-week shape are rows with a line
+ *   saying what is behind each (P-12 F2); 7c finds each by its name, the
+ *   row's first line, and still asserts where it goes.
+ *
  * 29 Oct 2026 v7
  *
  * v7 - STAGE PATH P-4 re-point (none loosened). TEST 8: the coach decides from Home's one row now (Let me choose for you, checked in), which asks for the suggestion's own kind, so a kind asked for here still does not ride along. I know what I want is no longer a Home door on the Plan (Stage PATH, mock-up v10; it is a Library tile). fromHome() opens it as the router does, still counting the one tap that opens it, and fails if the old door is still on Home. Every assertion after is unchanged.
@@ -246,7 +253,8 @@ ok("7b. REVERSAL: none saved, no empty promise", !main.querySelector('[data-kw-r
 for (const [label, route] of [["Build your own, move by move", "session-builder"], ["Mobility & Conditioning", "mobility-conditioning"],
                               ["A twelve-week shape", "goal-setup"]]) {
   fixture(); fromHome(); navs = [];
-  click([...main.querySelectorAll("[data-kw-route]")].find(b => txt(b) === label));
+  // v8: on the Plan each is a row, its name on the first line and what is behind it on the second.
+  click([...main.querySelectorAll("[data-kw-route]")].find(b => txt(b.querySelector(".path-door__t") || b) === label));
   ok(`7c. ${label}`, navs[0] === route, JSON.stringify(navs));
 }
 

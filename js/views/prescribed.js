@@ -1,6 +1,16 @@
 /**
  * prescribed.js - My exercises
  *
+ * 31 Oct 2026 v1.12
+ *
+ * v1.12 - STAGE PATH Session 9 (CLOSE; P-12 F2, F5; Graeme, 31 Oct: "‹
+ *   Back", and this room taken in now rather than in P-13). On the Plan
+ *   only: one way back, "‹ Back" at the top (it said "‹ Home", with Back to
+ *   Home again at the foot; its spoken name still says Back to Home), no
+ *   house beside it, the heading in the Plan's look, and + Add an exercise,
+ *   Cancel and Add a plan you already have drawn as buttons (they were bare
+ *   words). Free unchanged.
+ *
  * 17 Oct 2026 v1.11
  *
  * v1.11 - D662-10 OLD-STARS (Graeme, 17 Oct: "is there any value here?
@@ -109,6 +119,7 @@
  */
 
 import { store } from "../store.js";
+import { planLook } from "../plan-look.js";
 import { healthAllowed } from "../data/health-consent.js";
 
 export const centered = false;
@@ -163,16 +174,19 @@ export function render() {
   const energy     = checkin.energy || null;
   const coachLine  = buildCoachLine(exercises, energy);
 
+  const plan = planLook(), quiet = plan ? "btn-secondary" : "btn-ghost";
   return `
-    <div class="view prescribed-view">
+    <div class="view prescribed-view${plan ? " is-plan" : ""}">
 
       <!-- ── Header with back link ────────────────────────────────────────── -->
       <div class="view-header prescribed-view-header">
-        <button class="btn btn-ghost btn-small prescribed-back-top"
+        ${plan ? `<button class="btn btn-ghost btn-small prescribed-back-top plan-back"
+                id="prescribed-back-top"
+                aria-label="Back to Home">‹ Back</button>` : `<button class="btn btn-ghost btn-small prescribed-back-top"
                 id="prescribed-back-top"
                 aria-label="Back to Home">
           &lsaquo; Home
-        </button>
+        </button>`}
         <h1>My exercises</h1>
       </div>
 
@@ -190,7 +204,7 @@ export function render() {
 
       <!-- ── Add exercise form ────────────────────────────────────────────── -->
       <div class="prescribed-add-section" style="margin-top: var(--space-5);">
-        <button class="btn btn-ghost btn-full" id="px-toggle-form-btn"
+        <button class="btn ${quiet} btn-full" id="px-toggle-form-btn"
                 aria-expanded="${showAddForm}"
                 aria-controls="px-add-form-wrap">
           ${showAddForm ? "Cancel" : "+ Add an exercise"}
@@ -199,17 +213,17 @@ export function render() {
         <div id="px-add-form-wrap" class="${showAddForm ? "" : "hidden"}" aria-live="polite">
           ${renderAddForm()}
         </div>
-        <button class="btn btn-ghost btn-full" id="px-import-btn">Add a plan you already have</button>
+        <button class="btn ${quiet} btn-full" id="px-import-btn">Add a plan you already have</button>
       </div>
 
-      <!-- ── Bottom back button ───────────────────────────────────────────── -->
+${plan ? "" : `      <!-- ── Bottom back button ───────────────────────────────────────────── -->
       <div style="margin-top: var(--space-6); margin-bottom: var(--space-4);">
         <button class="btn btn-ghost btn-full" id="prescribed-back-bottom"
                 aria-label="Back to Home">
           Back to Home
         </button>
       </div>
-
+`}
     </div>
   `;
 }

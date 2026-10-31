@@ -1,5 +1,11 @@
 /**
  * upgrade.js - Upgrade / Membership view
+ * 31 Oct 2026 v22
+ *
+ * v22 - STAGE PATH Session 9 (CLOSE; P-12 F5; Graeme, 31 Oct: "‹ Back"). The
+ *   Plan's page, You have a Plan.: "‹ Back" (it said "← Back"), no house
+ *   beside it, the heading in the Plan's look. Free's page unchanged.
+ *
  * 03 Oct 2026 v21
  *
  * v21 - W5-20 TRUE-WORDS-5. Reached from Make it up as I go on Free, the
@@ -304,11 +310,9 @@ export function render() {
   // way back, not a pitch they have already accepted.
   if (isPaid) {
     return `
-      <div class="view upgrade-view">
+      <div class="view upgrade-view is-plan">
         <div class="view-header">
-          <button class="btn btn-ghost" data-action="upgrade-back" aria-label="Go back">
-            &larr; Back
-          </button>
+          <button class="btn btn-ghost plan-back" data-action="upgrade-back" aria-label="Go back">‹ Back</button>
         </div>
 
         <div class="upgrade-block">

@@ -1,5 +1,14 @@
 /**
  * journal-entry.js
+ * 31 Oct 2026 v11
+ *
+ * v11 - STAGE PATH Session 9 (CLOSE; P-12 F3, F4, F5; Graeme, 31 Oct: "‹
+ *   Back", "24 px, left"). On the Plan only: "‹ Back" (it said "← Back"),
+ *   the heading at the page size at the left (.is-plan), the house not
+ *   drawn beside the room's own way back, and Can't find the words right
+ *   now and Discard it drawn as buttons (they were bare words). Free
+ *   unchanged.
+ *
  * 17 Oct 2026 v10
  *
  * v10 - W6-9 SMALL-6. A half-written entry survives the phone's Back: kept
@@ -102,6 +111,7 @@
 import { currentWeekQuestion, noteJournalSaved } from "./noticing.js";
 import { supportLinesHTML } from '../data/support-lines.js';
 import { store } from '../store.js';
+import { planLook } from '../plan-look.js';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -179,15 +189,16 @@ export function JournalEntryView(router) {
     // Single-use, like prescribedExercisesActiveCondition.
     if (entryType) store.set('journalEntryType', null);
 
+    const plan = planLook(), quiet = plan ? 'btn-secondary' : 'btn-ghost';
     container.innerHTML = `
-      <div class="journal-entry-view">
+      <div class="journal-entry-view${plan ? ' is-plan' : ''}">
 
         <header class="je-header">
-          <button class="je-back-btn btn btn-ghost"
+          ${plan ? `<button class="je-back-btn btn btn-ghost plan-back" data-action="back">‹ Back</button>` : `<button class="je-back-btn btn btn-ghost"
                   data-action="back"
                   aria-label="Back">
             ← Back
-          </button>
+          </button>`}
           <h1 class="je-title">${_esc(prompt.title)}</h1>
         </header>
 
@@ -195,7 +206,7 @@ export function JournalEntryView(router) {
         <div class="je-leave" id="je-leave" role="group" aria-labelledby="je-leave-q" hidden>
           <p id="je-leave-q" tabindex="-1">You\u2019ve started writing. Keep it, or discard it?</p>
           <button class="btn btn-primary btn-small" data-action="keep-writing">Keep writing</button>
-          <button class="btn btn-ghost btn-small" data-action="discard">Discard it</button>
+          <button class="btn ${quiet} btn-small" data-action="discard">Discard it</button>
         </div>
 
         <!-- Text input -->
@@ -222,7 +233,7 @@ export function JournalEntryView(router) {
 
         <!-- "Can't find words" option -->
         <div class="je-no-words">
-          <button class="btn btn-ghost je-no-words-btn"
+          <button class="btn ${quiet} je-no-words-btn"
                   data-action="no-words"
                   aria-label="I can't find the words right now — save a blank entry">
             Can't find the words right now

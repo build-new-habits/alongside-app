@@ -1,6 +1,13 @@
 /**
  * my-programme.js - My Programme
  *
+ * 31 Oct 2026 v12
+ *
+ * v12 - STAGE PATH Session 9 (CLOSE; P-12 F5; Graeme, 31 Oct: "‹ Back"). On
+ *   the Plan only: the way back is "‹ Back" at the top left, as on every
+ *   Plan room (it was "Back" at the foot; its spoken name still says Back
+ *   to today), and the heading sits in the Plan's look. Free unchanged.
+ *
  * 18 Oct 2026 v11
  *
  * v11 - WEIGHT-RECHECK. When store.js v116 sets a target aside (a later
@@ -224,9 +231,11 @@ export function MyProgrammeView(router) {
       _whatThePlanAdds()
     ].filter(Boolean);
 
+    const plan = isPremium();
     container.innerHTML = `
-      <div class="my-programme-view">
-
+      <div class="my-programme-view${plan ? ' is-plan' : ''}">
+${plan ? `        <button class="btn btn-ghost my-programme-back plan-back" data-action="back" aria-label="Back to today">‹ Back</button>
+` : ''}
         <header class="my-programme-header">
           <h1 class="my-programme-title">My Programme</h1>
         </header>
@@ -239,12 +248,12 @@ export function MyProgrammeView(router) {
                </p>`}
         </div>
 
-        <button class="btn btn-ghost btn-full my-programme-back"
+${plan ? '' : `        <button class="btn btn-ghost btn-full my-programme-back"
                 data-action="back"
                 aria-label="Back to today">
           Back
         </button>
-
+`}
       </div>
     `;
 

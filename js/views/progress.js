@@ -1,5 +1,13 @@
 /**
  * progress.js
+ * 31 Oct 2026 v32
+ *
+ * v32 - STAGE PATH Session 9 (CLOSE; P-12 F5; Graeme, 31 Oct: "‹ Back").
+ *   On the Plan only: a detail page's way back says "‹ Back" (it said
+ *   "← Progress"; its spoken name still says Back to Progress), and Change
+ *   my arc (the Plan's own) is drawn as a pill, not bare words. Free
+ *   unchanged.
+ *
  * 31 Oct 2026 v31
  *
  * v31 - STAGE PATH Session 7 (P-7 PROGRESS-STORY; blueprint D6). On the Plan,
@@ -565,7 +573,7 @@ export function ProgressView(router) {
       : '';
     return `
       <div class="pr-page pr-page--${PAGE_KIND[page] || 'teal'}">
-        <button class="btn btn-ghost pr-back" id="pr-back" aria-label="Back to Progress">&larr; Progress</button>
+        ${premium ? `<button class="btn btn-ghost pr-back plan-back" id="pr-back" aria-label="Back to Progress">‹ Back</button>` : `<button class="btn btn-ghost pr-back" id="pr-back" aria-label="Back to Progress">&larr; Progress</button>`}
         <div class="pr-page__head">
           <span class="pr-tile pr-tile--lg" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false">${PAGE_ICON[page] || ''}</svg></span>
           <h1 class="progress-title" tabindex="-1"${page === 'lifts' ? ' id="pr-lifts-h"' : ''}>${_esc(titles[page] || 'Progress')}</h1>
@@ -1118,7 +1126,7 @@ export function ProgressView(router) {
               </li>`).join('')}
           </ul>
           <p class="pr-note">Nothing is behind. “Not yet” means it hasn’t come up since your arc began.</p>` : ''}
-        <button class="btn btn-ghost pr-change" data-route="stretch-arc">Change my arc</button>
+        <button class="btn btn-ghost pr-change plan-link" data-route="stretch-arc">Change my arc</button>
       </section>`;
   }
 

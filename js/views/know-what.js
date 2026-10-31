@@ -1,5 +1,14 @@
 /**
  * js/views/know-what.js
+ * 31 Oct 2026 v7
+ *
+ * v7 - STAGE PATH Session 9 (CLOSE; P-12 F2: "ends in three underlined text
+ *   links and nothing to say what is behind them"; Graeme, 29 Oct: "the
+ *   links I discovered don't always have pills ... no description or
+ *   purpose"). On the Plan only: Build your own, Mobility & Conditioning and
+ *   A twelve-week shape are rows, each with a line saying what is behind
+ *   it, as the doors' rows are. Free unchanged.
+ *
  * 29 Oct 2026 v6
  *
  * v6 - STAGE PATH Session 5 (P-5). Build my own, behind a door on the
@@ -70,6 +79,8 @@
  */
 
 import { store } from "../store.js";
+import { isPremium } from "../auth.js";
+import { lineIcon } from "../data/line-icons.js";
 import { CONDITIONS, soreAreaOptions, SORE_LEVELS } from "../data/conditions.js";
 import { savedSessions } from "../data/saved-sessions.js";
 import { AVAILABLE_TIME_WINDOW_MINUTES } from "../data/time-windows.js";
@@ -271,14 +282,27 @@ export function KnowWhatView(router) {
             <button class="btn btn-secondary btn-full" data-kw-route="saved-sessions">
               Or one you saved (${saved})
             </button>` : ""}
-          <p class="kw-links">
+          ${isPremium() ? _planRows(prog) : `<p class="kw-links">
             <button class="home-link" data-kw-route="session-builder">Build your own, move by move</button>
             <button class="home-link" data-kw-route="mobility-conditioning">Mobility &amp; Conditioning</button>
             <button class="home-link" data-kw-route="${prog.programmeId ? "my-programme" : "goal-setup"}">A twelve-week shape</button>
-          </p>
+          </p>`}
         </div>
       </div>`;
     attach();
+  }
+
+  /** The Plan (Session 9): the three ways on, each a row saying what is behind it. */
+  function _planRows(prog) {
+    const chev = `<span class="path-door__chev" aria-hidden="true">${lineIcon("chevron", 20)}</span>`;
+    const rows = [
+      ["session-builder", "pencil", "Build your own, move by move", "Choose each movement yourself, then play it."],
+      ["mobility-conditioning", "mobility", "Mobility &amp; Conditioning", "Hips, spine, ankles and shoulders, your stretch arc, and held stretches."],
+      [prog.programmeId ? "my-programme" : "goal-setup", "week", "A twelve-week shape", prog.programmeId ? "The programme you are following, week by week." : "A programme to follow for twelve weeks, chosen with you."],
+    ];
+    return `<ul class="path-list kw-rows">${rows.map(([route, icon, t, d]) => `<li><button type="button" class="path-door path-row" data-kw-route="${route}">
+      <span class="kind-tile k-teal">${lineIcon(icon)}</span>
+      <span class="path-door__text"><span class="path-door__t">${t}</span><span class="path-door__d">${d}</span></span>${chev}</button></li>`).join("")}</ul>`;
   }
 
   /** Repaint and put focus back on what was just used, so a reveal never loses the person. */

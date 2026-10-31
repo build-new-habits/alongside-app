@@ -1,6 +1,16 @@
 /**
  * walk-session.js - Coached Walk Session
  *
+ * 31 Oct 2026 v12
+ *
+ * v12 - STAGE PATH Session 9 (CLOSE; P-12 F4, F5; Graeme, 31 Oct: "‹ Back,
+ *   Exit in a session", "24 px, left"). On the Plan only: before the walk
+ *   starts the way back says "‹ Back" (the first screen said Exit); once it
+ *   has started, Exit; the house is not drawn beside either; the done
+ *   screen's heading is the page heading at the left (it was a centred
+ *   line), and its last button says Done (it said "Back to today"; it
+ *   still goes there). Free unchanged.
+ *
  * 31 Oct 2026 v11
  *
  * v11 - STAGE PATH Session 8 (P-8; P-12, Graeme 29 Oct: the new look is the
@@ -295,9 +305,9 @@ function renderTypeSelector() {
     <div class="view walk-session-view${_planCls()}">
 
       <div class="workout-header">
-        <button class="btn btn-ghost" id="ws-back-btn" aria-label="Exit">
+        ${_plan() ? `<button class="btn btn-ghost plan-back" id="ws-back-btn" aria-label="Back">‹ Back</button>` : `<button class="btn btn-ghost" id="ws-back-btn" aria-label="Exit">
           Exit
-        </button>
+        </button>`}
         <h1 class="workout-header-title">Walk</h1>
       </div>
 
@@ -335,7 +345,7 @@ function renderWalkOverview() {
   return `
     <div class="view walk-session-view${_planCls()}">
       <div class="workout-header">
-        <button class="btn btn-ghost" id="ws-back-btn" aria-label="Back">\u2190 Back</button>
+        ${_plan() ? `<button class="btn btn-ghost plan-back" id="ws-back-btn" aria-label="Back">‹ Back</button>` : `<button class="btn btn-ghost" id="ws-back-btn" aria-label="Back">\u2190 Back</button>`}
         <h1 class="workout-header-title">${wt?.label || "Walk"} \u2014 ${selectedMins} min</h1>
       </div>
 
@@ -378,9 +388,9 @@ function renderDurationSelector() {
     <div class="view walk-session-view${_planCls()}">
 
       <div class="workout-header">
-        <button class="btn btn-ghost" id="ws-back-btn" aria-label="Back">
+        ${_plan() ? `<button class="btn btn-ghost plan-back" id="ws-back-btn" aria-label="Back">‹ Back</button>` : `<button class="btn btn-ghost" id="ws-back-btn" aria-label="Back">
           Back
-        </button>
+        </button>`}
         <h1 class="workout-header-title">${wt?.label || "Walk"}</h1>
       </div>
 
@@ -417,9 +427,9 @@ function renderWalking() {
     <div class="view walk-session-view${_planCls()}">
 
       <div class="workout-header">
-        <button class="btn btn-ghost" id="ws-exit-btn" aria-label="Exit session">
+        ${_plan() ? `<button class="btn btn-ghost plan-exit" id="ws-exit-btn" aria-label="Exit session">Exit</button>` : `<button class="btn btn-ghost" id="ws-exit-btn" aria-label="Exit session">
           Exit
-        </button>
+        </button>`}
         <h1 class="workout-header-title">${wt?.label || "Walk"}</h1>
       </div>
 
@@ -502,15 +512,15 @@ function renderDone() {
   };
 
   return `
-    <div class="view walk-session-view${_planCls()}" style="text-align: center;">
+    <div class="view walk-session-view${_planCls()}"${_plan() ? "" : ` style="text-align: center;"`}>
 
       <div class="card card-coach" style="margin-top: var(--space-8);">
         <img src="assets/images/logo-icon-192.png" alt=""
              class="coach-icon-small" aria-hidden="true">
         <div>
-          <h2 style="color: var(--color-primary); margin-bottom: var(--space-2);">
+          ${_plan() ? `<h1 tabindex="-1">Walk done.</h1>` : `<h2 style="color: var(--color-primary); margin-bottom: var(--space-2);">
             Walk done.
-          </h2>
+          </h2>`}
           <p class="coach-message-text">
             ${name ? name + " — " : ""}${actualMin} minutes. ${completions[selectedType] || "Well done."}
           </p>
@@ -524,9 +534,9 @@ function renderDone() {
         <button class="btn btn-primary btn-full" id="ws-reflect-btn">
           How did that feel?
         </button>
-        <button class="btn btn-ghost btn-full" id="ws-home-btn">
+        ${_plan() ? `<button class="btn btn-secondary btn-full" id="ws-home-btn">Done</button>` : `<button class="btn btn-ghost btn-full" id="ws-home-btn">
           Back to today
-        </button>
+        </button>`}
       </div>
 
     </div>

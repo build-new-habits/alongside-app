@@ -1,5 +1,13 @@
 /**
  * tools/verify-shared-polish.mjs
+ * 31 Oct 2026 v2
+ *
+ * v2 - STAGE PATH Session 9 re-point (Graeme, 31 Oct: "‹ Back, Exit in a
+ *   session", one word for going back on every Plan screen). 1a: on the
+ *   Plan, Today's plan says "‹ Back", still named Back to Home and still
+ *   going Home (1d); Free unchanged ("‹ Home"). Nothing loosened: the
+ *   Plan's check is now an exact match.
+ *
  * 12 Oct 2026 v1
  *
  * A-4 / A-5 / A-7 SHARED-POLISH (Stage AWARD). Graeme, 12 Oct: tidy the
@@ -77,7 +85,9 @@ for (const tier of ["personal", "free"]) {
   fixture(tier); main.innerHTML = "";
   CoachProposalView(rtr).mount(main);
   const back = main.querySelector("#cp-preview-close");
-  ok(`1a-${tier}. "‹ Home", named Back to Home`, /Home/.test(txt(back)) && back?.getAttribute("aria-label") === "Back to Home" && !/✕/.test(txt(back)), txt(back));
+  // v2: on the Plan the visible word is "‹ Back" (Graeme, 31 Oct, Session 9: one word for going back on every Plan
+  // screen); its spoken name still says where it goes. Free keeps "‹ Home".
+  ok(`1a-${tier}. ${tier === "free" ? '"‹ Home"' : '"‹ Back"'}, named Back to Home`, (tier === "free" ? /Home/.test(txt(back)) : txt(back) === "‹ Back") && back?.getAttribute("aria-label") === "Back to Home" && !/✕/.test(txt(back)), txt(back));
   ok(`1b-${tier}. no greeting or yesterday's line on the plan`, !main.querySelector("#cp-preview-panel .cp-greeting, #cp-preview-panel .cp-reflection") && !/Morning, Test|Afternoon, Test|Evening, Test/.test(txt(main.querySelector("#cp-preview-panel"))));
   const pills = [...main.querySelectorAll(".cp-assumptions__change")];
   ok(`1c-${tier}. each pill is named by its label and value`, pills.length >= 2 && pills.every(p => /^(Where|Length|Focus): .+\. Change$/.test(p.getAttribute("aria-label") || "")), pills.map(p => p.getAttribute("aria-label")).join(" | "));

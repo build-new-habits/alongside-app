@@ -1,5 +1,11 @@
 /**
  * views/community-impact.js
+ * 31 Oct 2026 v8
+ *
+ * v8 - STAGE PATH Session 9 (CLOSE; P-12 F5). On the Plan only, the way
+ *   back carries plan-back, so the house is not drawn beside it (one way
+ *   back). Free unchanged.
+ *
  * 31 Oct 2026 v7
  *
  * v7 - STAGE PATH Session 7 (P-12, Graeme 29 Oct: the new look is the
@@ -138,7 +144,7 @@ function _render(container) {
     <div class="view community-impact-view${plan ? ' is-plan' : ''}">
 
       <div class="workout-header">
-        <button class="btn btn-ghost" id="ci-back-btn" aria-label="Go back">
+        <button class="btn btn-ghost${plan ? ' plan-back' : ''}" id="ci-back-btn" aria-label="Go back">
           ${plan ? '&lsaquo;' : '&larr;'} Back
         </button>
         <h1 class="workout-header-title">Your impact</h1>

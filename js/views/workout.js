@@ -1,5 +1,15 @@
 /**
  * workout.js - Workout Execution View
+ * 31 Oct 2026 v37
+ *
+ * v37 - STAGE PATH Session 9 (CLOSE; P-12 F3, F4, F5; Graeme, 31 Oct: "Exit
+ *   in a session", "24 px, left"). On the Plan only: the way out says Exit
+ *   (it said "✕ Exit") and is the only one (no house beside it), the
+ *   movement's name is the page heading at the page size at the left
+ *   (.is-plan), Skip this one and I know this one drawn as buttons (they
+ *   were bare words), and with nothing to play, a heading and "‹ Back" (it was a
+ *   card with a Back button and no heading). Free unchanged.
+ *
  * 29 Oct 2026 v36
  *
  * v36 - STAGE PATH Session 6 (P-6; Graeme, 29 Oct). On the Plan only (Free
@@ -500,6 +510,11 @@ import { soreLevel, areaWords } from "../data/conditions.js";
 const _plan = () => isPremium();
 /** Where a finished session goes: the Plan's finish, or Free's. */
 const _finishRoute = () => (_plan() ? "plan-finish" : "reflect");
+// Session 9. The Plan's one way out of a session: Exit, and no house beside it.
+const _exitBtn = () => (_plan()
+  ? `<button class="btn btn-ghost plan-exit" id="exit-workout-btn" aria-label="Exit workout">Exit</button>`
+  : `<button class="btn btn-ghost" id="exit-workout-btn" aria-label="Exit workout">\u2715 Exit</button>`);
+const _look = () => (_plan() ? " is-plan" : "");
 /** A low mood this morning, on the Plan: no countdown anywhere. */
 const _noClock = () => _plan() && lowMood();
 /** The session's door and feeling, and its name, for its log entry (the Plan's sessions only). */
@@ -744,9 +759,9 @@ export function render() {
   // P18. The last move was skipped: ask, then the answer finishes.
   if (finishAfterOffer && pendingSkipOffer) {
     return `
-    <div class="view workout-view wo-flow">
+    <div class="view workout-view wo-flow${_look()}">
       <div class="workout-header">
-        <button class="btn btn-ghost" id="exit-workout-btn" aria-label="Exit workout">\u2715 Exit</button>
+        ${_exitBtn()}
       </div>
       ${_renderSkipOffer()}
     </div>`;
@@ -757,9 +772,9 @@ export function render() {
   if (_sore && workout.exercises.length >= 4 && currentExerciseIndex === Math.floor(workout.exercises.length / 2)
       && _halfwayDone !== _sessionKey(workout) && !exerciseDone) {
     return `
-    <div class="view workout-view wo-flow wo-halfway">
+    <div class="view workout-view wo-flow wo-halfway${_look()}">
       <div class="workout-header">
-        <button class="btn btn-ghost" id="exit-workout-btn" aria-label="Exit workout">\u2715 Exit</button>
+        ${_exitBtn()}
       </div>
       <h1 class="exercise-name" id="wo-exercise-name" tabindex="-1">A quick check: still okay?</h1>
       <p class="coach-message-text">You said your ${areaWords(_sore)} was quite sore this morning. Halfway now: how is it?</p>
@@ -787,9 +802,9 @@ export function render() {
   const timed = !!resolveTiming(exercise).seconds && !_noClock();
 
   return `
-    <div class="view workout-view wo-flow">
+    <div class="view workout-view wo-flow${_look()}">
       <div class="workout-header">
-        <button class="btn btn-ghost" id="exit-workout-btn" aria-label="Exit workout">\u2715 Exit</button>
+        ${_exitBtn()}
         <div class="workout-progress-info">
           <span>${currentExerciseIndex + 1} of ${workout.exercises.length}</span>
         </div>
@@ -878,8 +893,8 @@ export function render() {
           <button class="btn btn-primary btn-large btn-full" id="wo-step-next" data-step-go="${_nextStep().key}">
             Next: ${_nextStep().title}
           </button>
-          ${step !== "how" ? `<button class="btn btn-ghost btn-full" id="wo-step-capture" data-step-go="capture">I know this one: go to capture</button>` : ""}
-          <button class="btn btn-ghost btn-small" id="skip-exercise-btn">Skip this one</button>
+          ${step !== "how" ? `<button class="btn ${_plan() ? "btn-secondary" : "btn-ghost"} btn-full" id="wo-step-capture" data-step-go="capture">I know this one: go to capture</button>` : ""}
+          <button class="btn ${_plan() ? "btn-secondary" : "btn-ghost"} btn-small" id="skip-exercise-btn">Skip this one</button>
         ` : `
         ${exerciseDone ? `
           <button class="btn btn-primary btn-large btn-full" id="complete-exercise-btn">
@@ -902,7 +917,7 @@ export function render() {
           <button class="btn ${timed || _setsRemaining(exercise) ? "btn-secondary" : "btn-primary btn-large"} btn-full" id="wo-done-btn">
             ${_setsRemaining(exercise) ? "Finish this one" : "Done"}
           </button>
-          <button class="btn btn-ghost btn-small" id="skip-exercise-btn">Skip this one</button>
+          <button class="btn ${_plan() ? "btn-secondary" : "btn-ghost"} btn-small" id="skip-exercise-btn">Skip this one</button>
         `}
         `}
       </div>
@@ -1020,6 +1035,12 @@ function _renderSkipOffer() {
 // one. It does not apologise at length, does not blame the person, and
 // offers the two things that actually work from here.
 function renderEmptyWorkout() {
+  if (_plan()) return `
+    <div class="view is-plan">
+      <button class="btn btn-ghost plan-back" id="no-workout-back-btn" aria-label="Back, to choose again">‹ Back</button>
+      <h1 tabindex="-1">I could not build that one</h1>
+      <p>Something went wrong putting that session together &mdash; that is on me, not on you. Go back and choose again, and it should come through properly this time.</p>
+    </div>`;
   return `
     <div class="view">
       <div class="card card-coach">
@@ -1038,6 +1059,12 @@ function renderEmptyWorkout() {
 }
 
 function renderNoWorkout() {
+  if (_plan()) return `
+    <div class="view is-plan">
+      <button class="btn btn-ghost plan-back" id="no-workout-back-btn">‹ Back</button>
+      <h1 tabindex="-1">No session chosen</h1>
+      <p>Go back to choose one.</p>
+    </div>`;
   return `
     <div class="view">
       <div class="card card-coach">

@@ -1,5 +1,12 @@
 /**
  * js/views/your-week.js
+ * 31 Oct 2026 v3
+ *
+ * v3 - STAGE PATH Session 9 (CLOSE; P-12 F5; Graeme, 31 Oct: "‹ Back"). On
+ *   the Plan, every way back says "‹ Back" (it said "← Home", "← Your
+ *   week", "← Back"), its spoken name saying where it goes. Free's page
+ *   (See the Plan) unchanged.
+ *
  * 05 Oct 2026 v2
  *
  * v2 - D-7 PLAN-IMPORT. "Add a plan you already have" opens the import.
@@ -85,6 +92,9 @@ export function YourWeekView(router) {
   }
 
   function header(label, route, back) {
+    if (isPremium()) return `<div class="yw-header">
+      <button class="btn btn-ghost yw-back plan-back" ${back ? `data-back="${back}"` : `data-go-route="${route}"`} aria-label="Back to ${esc(label === "Back" ? "the start" : label)}">‹ Back</button>
+    </div>`;
     return `<div class="yw-header">
       <button class="btn btn-ghost yw-back" ${back ? `data-back="${back}"` : `data-go-route="${route}"`}>← ${esc(label)}</button>
     </div>`;
@@ -144,7 +154,7 @@ export function YourWeekView(router) {
     const gap = balanceGap();
     return `
       <div class="yw-header">
-        <button class="btn btn-ghost yw-back" data-go-route="today">← Home</button>
+        <button class="btn btn-ghost yw-back plan-back" data-go-route="today" aria-label="Back to Home">‹ Back</button>
         <button class="btn btn-secondary yw-change" data-back="start">Change the week</button>
       </div>
       <h1 class="yw-title" tabindex="-1">Your week</h1>

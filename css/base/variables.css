@@ -1,5 +1,11 @@
 /* variables.css - Midnight Teal Design Tokens
-   04 Oct 2026 v6
+   31 Oct 2026 v7
+
+   v7 - STAGE PATH Session 9 (close checks, axe; both tiers: a fault).
+        --color-danger-text: rose as small text on its own tinted box. The
+        player's "If it hurts" was #FB7185 on the rose-tinted card, 3.2:1
+        (13px needs 4.5). Dark #FDA4AF; light and high contrast keep their
+        own usable rose.
 
    v6 - LOOK-3 COLOUR (Graeme, 04 Oct: "Both lack colour and seem
         unappealing"). Seven kind colours, one per kind of session, used
@@ -136,6 +142,7 @@
   --color-warning: #FBBF24;       /* Caution - amber */
   --color-warning-light: rgba(251, 191, 36, 0.15);
   --color-danger: #FB7185;        /* Alert - rose */
+  --color-danger-text: #FDA4AF;   /* v7: rose as small text on a rose-tinted box */
   --color-danger-light: rgba(251, 113, 133, 0.15);
   --color-info: #60A5FA;          /* Info - blue */
   --color-info-light: rgba(96, 165, 250, 0.15);
@@ -358,6 +365,7 @@
   --color-success:        #047857;
   --color-warning:        #92400E;   /* amber is unreadable on white; this is its usable form */
   --color-danger:         #9F1239;   /* rose #FB7185 is ~2.6:1 on white; this is its usable form */
+  --color-danger-text:    #9F1239;
   --color-danger-light:   rgba(159, 18, 57, 0.10);
 
   --color-border:         #64748B;   /* 4.76 on card -- above the 3:1 needed for boundaries */

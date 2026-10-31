@@ -1,5 +1,15 @@
 /*
  * css/components/coach-proposal.css
+ * 31 Oct 2026 v15
+ *
+ * v15 - STAGE PATH Session 9 (close checks; both tiers: a fault, not a look).
+ *   At text 2 a long movement name split mid-word ("Diaphragmatic",
+ *   "Strengthening": chromium-text-fit, on v688 too) because the name could
+ *   break anywhere and its column was fixed beside the figure. The name now
+ *   breaks only a word too long for the whole row, and its column's width
+ *   grows with the text, so at large text it takes the line under the
+ *   figure and Swap moves under it, before any word would split.
+ *
  * 12 Oct 2026 v14
  *
  * v14 - A-4 SHARED-POLISH (both tiers). "‹ Home" top left in place of
@@ -637,7 +647,9 @@
    control and takes the keyboard; it keeps the row's look. */
 .cp-plan__open {
   position: relative;
-  flex: 1 1 12rem;
+  /* v15: the basis grows with the text, so at large text the name takes a
+     line of its own under the figure rather than splitting a word. */
+  flex: 1 1 calc(12rem * var(--user-text-scale, 1));
   min-height: 44px;
   margin: 0;
   padding: 0 calc(18px + var(--space-2)) 0 0;
@@ -809,7 +821,7 @@
 .cp-plan__name {
   font-weight: var(--font-semibold, 600);
   color: var(--color-text);
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
 }
 
 .cp-plan__dose,

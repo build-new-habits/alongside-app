@@ -1,6 +1,12 @@
 /**
  * js/views/noticing.js - Wellbeing Hub Landing View
  *
+ * 31 Oct 2026 v13 - STAGE PATH Session 9 (CLOSE; P-12 F2). On the Plan only,
+ *   Write about this is drawn as a button (it was bare words); one look
+ *   check (planLook, js/plan-look.js: the look only; Wellbeing still offers
+ *   the same to everyone, verify-one-look TEST 6). Free unchanged. The crisis lines stay as they are: numbers in a
+ *   sentence, to be read, not rooms to go into.
+ *
  * 04 Oct 2026 v12 - LOOK-4 (Graeme approved the mock-up, 04 Oct). Suggested
  *   now is a green card with its tile and a green Start; This week's
  *   question is a card; the four practices are a two-by-two grid of tiles
@@ -109,6 +115,7 @@
 import { supportLinesHTML } from "../data/support-lines.js";
 import { lineIcon } from "../data/line-icons.js";
 import { store }  from "../store.js";
+import { planLook } from "../plan-look.js";
 import { router } from "../router.js";
 import { getTodaysCheckin } from "../data/checkin.js";
 import { startBreathing, BREATHING_TYPES } from "./breathing-session.js";
@@ -326,7 +333,7 @@ export function render() {
           <p class="text-xs text-muted" style="margin-bottom: var(--space-2);">This week's question</p>
           <p style="font-size: var(--text-base); line-height: 1.6;
                     margin-bottom: var(--space-4);">${weekData.prompt}</p>
-          <button class="btn btn-ghost btn-small" id="noticing-weekly-journal-btn"
+          <button class="btn ${planLook() ? "btn-secondary" : "btn-ghost"} btn-small" id="noticing-weekly-journal-btn"
                   style="align-self: flex-start;"
                   aria-label="Write about this week's prompt">
             Write about this

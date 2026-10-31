@@ -1,5 +1,11 @@
 /*
  * css/layouts/onboarding-additions.css
+ * 31 Oct 2026 v12
+ *
+ * v12 - STAGE PATH Session 9 (close checks, axe; both tiers: a fault). A
+ *   chosen plan card (and a chosen Suggested for you) sat on the raised ground, where its teal line and the
+ *   first-four-weeks hint measured 4.4:1; it sits on the card ground now.
+ *
  * 22 Aug 2026 v11
  * CHOOSER-1. Two spacing classes for the post-onboarding programme
  * chooser. The plan cards themselves are unchanged and shared.
@@ -867,7 +873,7 @@
 
 .plan-card--selected {
   border-color: var(--color-primary);
-  background: color-mix(in srgb, var(--color-primary) 6%, var(--color-bg-elevated));
+  background: color-mix(in srgb, var(--color-primary) 6%, var(--color-surface));
 }
 
 .plan-card--recommended {
@@ -876,7 +882,7 @@
 
 .plan-card--recommended.plan-card--selected {
   border-color: #B8970A;
-  background: color-mix(in srgb, #B8970A 6%, var(--color-bg-elevated));
+  background: color-mix(in srgb, #B8970A 6%, var(--color-surface));
 }
 
 .plan-badge {

@@ -1,5 +1,12 @@
 /**
  * js/views/saved-sessions.js
+ * 31 Oct 2026 v11
+ *
+ * v11 - STAGE PATH Session 9 (CLOSE; P-12 F3, F4; Graeme, 31 Oct: "24 px,
+ *   left"). On the Plan only: the heading at the page size (it was 32 px;
+ *   .is-plan), and Edit, Delete and Delete it drawn as buttons (they were
+ *   bare words). Free unchanged.
+ *
  * 29 Oct 2026 v10
  *
  * v10 - STAGE PATH Session 6 (P-12: one proposal shape on the Plan). Start
@@ -321,7 +328,7 @@ function _row(rec) {
           <button class="btn btn-secondary btn-full"
                   data-delete-cancel="${_esc(rec.id)}"
                   aria-label="Keep ${_esc(rec.name)}">Keep it</button>
-          <button class="btn btn-ghost btn-full saved-row__danger"
+          <button class="btn ${isPremium() ? 'btn-secondary' : 'btn-ghost'} btn-full saved-row__danger"
                   data-delete-confirm="${_esc(rec.id)}"
                   aria-label="Yes, delete ${_esc(rec.name)} permanently">
             Delete it
@@ -329,9 +336,9 @@ function _row(rec) {
         </div>
       ` : `
         <div class="saved-row__actions">
-          <button class="btn btn-ghost" data-edit-id="${_esc(rec.id)}"
+          <button class="btn ${isPremium() ? 'btn-secondary' : 'btn-ghost'}" data-edit-id="${_esc(rec.id)}"
                   aria-label="Edit ${_esc(rec.name)}">Edit</button>
-          <button class="btn btn-ghost" data-delete-id="${_esc(rec.id)}"
+          <button class="btn ${isPremium() ? 'btn-secondary' : 'btn-ghost'}" data-delete-id="${_esc(rec.id)}"
                   aria-label="Delete ${_esc(rec.name)}">Delete</button>
         </div>
       `}
@@ -354,7 +361,7 @@ export function render() {
   if (!list.length) {
     return isPremium()
       ? `
-        <div class="view saved-sessions-view">
+        <div class="view saved-sessions-view is-plan">
           <div class="view-header">
             <!-- SAVED-2. tabindex="-1" so focus can be SENT here after a delete
              removes the row the person was standing in. Without it .focus()
@@ -396,7 +403,7 @@ export function render() {
   const matching = q ? list.filter(r => _haystack(r).includes(q)).length : list.length;
 
   return `
-    <div class="view saved-sessions-view">
+    <div class="view saved-sessions-view${isPremium() ? ' is-plan' : ''}">
       <div class="view-header">
         <h1 tabindex="-1">Saved sessions</h1>
         <p class="text-secondary">

@@ -1,6 +1,14 @@
 /**
  * library.js - Library Page
  *
+ * 31 Oct 2026 v21
+ *
+ * v21 - STAGE PATH Session 9 (CLOSE; P-12 F4, F5; Graeme, 31 Oct: "24 px,
+ *   left", "‹ Back"). On the Plan only: the Library's heading at the page
+ *   size (it was 32 px) and its pages' way back says "‹ Back" (it said
+ *   "← Library", "← Back"; the spoken name still says Back to Library).
+ *   Free unchanged.
+ *
  * 28 Oct 2026 v20
  *
  * v20 - STAGE PATH P-4. I know what I want and Make it up as I go left the
@@ -543,7 +551,7 @@ export function render() {
 
 function renderLanding() {
   return `
-    <div class="view library-view">
+    <div class="view library-view${isPremium() ? " is-plan" : ""}">
       <div class="view-header">
         <h1>Library</h1>
       </div>
@@ -630,11 +638,11 @@ function renderGuidedSubScreen(categoryId) {
   const [catIcon, catKind] = CATEGORY_LOOK[cat.id] || ["star", "slate"];
 
   return `
-    <div class="view library-view">
+    <div class="view library-view${isPremium() ? " is-plan" : ""}">
       <div class="library-sub-header">
-        <button class="btn btn-ghost" id="lib-back-btn" aria-label="Back to Library">
+        ${isPremium() ? `<button class="btn btn-ghost plan-back" id="lib-back-btn" aria-label="Back to Library">‹ Back</button>` : `<button class="btn btn-ghost" id="lib-back-btn" aria-label="Back to Library">
           \u2190 Library
-        </button>
+        </button>`}
         <h1 class="library-sub-title"><span class="kind-tile k-${catKind}">${lineIcon(catIcon)}</span> ${cat.label}</h1>
       </div>
 
@@ -681,11 +689,11 @@ function renderGuidedSubScreen(categoryId) {
 
 function renderLogLanding() {
   return `
-    <div class="view library-view">
+    <div class="view library-view${isPremium() ? " is-plan" : ""}">
       <div class="library-sub-header">
-        <button class="btn btn-ghost" id="lib-back-btn" aria-label="Back to Library">
+        ${isPremium() ? `<button class="btn btn-ghost plan-back" id="lib-back-btn" aria-label="Back to Library">‹ Back</button>` : `<button class="btn btn-ghost" id="lib-back-btn" aria-label="Back to Library">
           \u2190 Back
-        </button>
+        </button>`}
         <h1>Log what I did</h1>
       </div>
 

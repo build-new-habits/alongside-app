@@ -1,5 +1,16 @@
 /**
  * gym-programme.js
+ * 31 Oct 2026 v21
+ *
+ * v21 - STAGE PATH Session 9 (CLOSE; P-12 F3, F4, F5; Graeme, 31 Oct: "Exit
+ *   in a session", "‹ Back", "24 px, left"). On the Plan only: in a session
+ *   the way out says Exit (it said "✕ Exit") with no house beside it, the
+ *   movement's name is the heading at the page size at the left, and the
+ *   programme's line icon replaces the 🏋 on its badge, Skip this one is a
+ *   button (it was bare words); with no session yet,
+ *   "‹ Back" and the heading at the left (it was 20 px, centred). Free
+ *   unchanged.
+ *
  * 29 Oct 2026 v20
  *
  * v20 - P-12 FIX-NOW (consistency trace, Graeme 29 Oct: "As proposed"). Both tiers: a fault, not a look.
@@ -367,6 +378,7 @@
 
 import { store }                    from '../store.js';
 import { isPremium }                from '../auth.js';
+import { lineIcon }                 from '../data/line-icons.js';
 import { renderFeedbackControl, attachFeedbackEvents } from "../exercise-feedback.js";
 import { renderExerciseCard, attachCardEvents } from "../exercise-card.js";
 import { isGateDue, renderSafetyGate, attachSafetyGate } from "../safety-gate.js";
@@ -854,14 +866,15 @@ export function GymProgrammeView(router) {
     const hasTimer    = holdSecs !== null;
     const caution     = exercise._cautionActive;
 
+    const plan = isPremium();
     container.innerHTML = `
-      <div class="view workout-view">
+      <div class="view workout-view${plan ? ' is-plan' : ''}">
 
         <!-- Header -->
         <div class="workout-header">
-          <button class="btn btn-ghost" id="gp-exit-btn" aria-label="Exit gym session">
+          ${plan ? `<button class="btn btn-ghost plan-exit" id="gp-exit-btn" aria-label="Exit gym session">Exit</button>` : `<button class="btn btn-ghost" id="gp-exit-btn" aria-label="Exit gym session">
             \u2715 Exit
-          </button>
+          </button>`}
           <div class="workout-progress-info" aria-label="Exercise ${currentExerciseIndex + 1} of ${session.exercises.length}">
             <span>${currentExerciseIndex + 1} of ${session.exercises.length}</span>
           </div>
@@ -885,7 +898,7 @@ export function GymProgrammeView(router) {
                programme week to name. -->
           ${Number(stats.currentWeek) > 0 && isPremium() ? `
             <div class="exercise-role-badge main" aria-label="${_esc(stats.programmeName || 'Gym programme')}">
-              \uD83C\uDFCB ${_esc(stats.programmeName || 'Your programme')} \u00B7 Week ${stats.currentWeek} \u00B7 Session ${sessionType}
+              <span aria-hidden="true">${lineIcon('gym', 16)}</span> ${_esc(stats.programmeName || 'Your programme')} \u00B7 Week ${stats.currentWeek} \u00B7 Session ${sessionType}
             </div>
           ` : ""}
 
@@ -977,7 +990,7 @@ export function GymProgrammeView(router) {
               Start this one \u2192
             </button>
 
-            <button class="btn btn-ghost btn-small" id="gp-skip-btn">
+            <button class="btn ${plan ? 'btn-secondary' : 'btn-ghost'} btn-small" id="gp-skip-btn">
               Skip this one
             </button>
           ` : ''}
@@ -1231,6 +1244,18 @@ export function GymProgrammeView(router) {
 
 
   function renderNoSession(container, stats) {
+    if (isPremium()) {
+      container.innerHTML = `
+      <div class="gp-no-session is-plan">
+        <button class="btn btn-ghost plan-back" data-action="back" aria-label="Back to today">‹ Back</button>
+        <h1>My programme</h1>
+        <p class="gp-no-session__message">No session generated yet. Go back and complete your check-in.</p>
+        <button class="btn btn-primary" data-action="go-checkin" aria-label="Go to check-in">Check in</button>
+      </div>`;
+      container.querySelector('[data-action="back"]')?.addEventListener('click', () => router.navigate('today'));
+      container.querySelector('[data-action="go-checkin"]')?.addEventListener('click', () => router.navigate('checkin'));
+      return;
+    }
     container.innerHTML = `
       <div class="gp-no-session">
         <h1 style="font-size: var(--text-xl); margin: 0 0 var(--space-2)">My programme</h1>

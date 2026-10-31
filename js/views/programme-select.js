@@ -1,5 +1,15 @@
 /**
  * js/views/programme-select.js
+ * 31 Oct 2026 v3
+ *
+ * v3 - STAGE PATH Session 9 (CLOSE; P-12 F3, F4, F5; Graeme, 31 Oct: "‹
+ *   Back", "24 px, left", and this room, the twelve-week shape, taken in now
+ *   rather than in P-13). On the Plan only: "‹ Back" (it said "← Back"; its
+ *   spoken name still says it changes nothing), the heading at the page size
+ *   at the left (it was 32 px; .is-plan), no house beside the way back, and
+ *   each programme's line icon in place of its emoji. Free unchanged. The
+ *   Suggested for you card's own look stays for P-13.
+ *
  * 28 Sep 2026 v2
  *
  * v2 - F7 LANDMARK. role="main" (and its label) removed from the view's
@@ -65,6 +75,8 @@
  */
 
 import { store }        from "../store.js";
+import { isPremium }    from "../auth.js";
+import { lineIcon }     from "../data/line-icons.js";
 import { startChapter } from "../data/programmeEngine.js";
 import {
   buildPlanOptions,
@@ -88,7 +100,13 @@ export function ProgrammeSelectView(router) {
     if (options.length === 0) {
       // Nothing matched. Say so plainly and let the person leave --
       // never strand them on an empty screen.
-      container.innerHTML = `
+      container.innerHTML = isPremium() ? `
+        <div class="view is-plan">
+          <button class="btn btn-ghost plan-back" data-action="back" aria-label="Back to today">‹ Back</button>
+          <h1 tabindex="-1" id="chooser-heading">Choosing what is next</h1>
+          <p>I could not put together options just now. Your current plan is unchanged.</p>
+        </div>
+      ` : `
         <div class="view">
           <h1 tabindex="-1" id="chooser-heading">Choosing what is next</h1>
           <p>I could not put together options just now. Your current plan is unchanged.</p>
@@ -103,14 +121,16 @@ export function ProgrammeSelectView(router) {
       return;
     }
 
+    const plan = isPremium();
     container.innerHTML = `
-      <div class="view programme-select-view">
+      ${plan ? `<div class="view programme-select-view is-plan">` : `<div class="view programme-select-view">`}
 
         <div class="view-header">
-          <button class="btn btn-ghost" data-action="back"
+          ${plan ? `<button class="btn btn-ghost plan-back" data-action="back"
+                  aria-label="Back to today, without changing your plan">‹ Back</button>` : `<button class="btn btn-ghost" data-action="back"
                   aria-label="Back to today, without changing your plan">
             &larr; Back
-          </button>
+          </button>`}
         </div>
 
         <div class="programme-select-body">
@@ -143,6 +163,8 @@ export function ProgrammeSelectView(router) {
     `;
 
     const cards = [...container.querySelectorAll(".plan-card")];
+    // The Plan: a line icon, never an emoji (the shared card draws the programme's own).
+    if (plan) container.querySelectorAll(".plan-card__icon").forEach(el => { el.innerHTML = lineIcon("week"); });
 
     function select(index, focus = false) {
       selectedIndex = index;

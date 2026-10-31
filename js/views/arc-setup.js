@@ -1,5 +1,12 @@
 /**
  * js/views/arc-setup.js
+ * 31 Oct 2026 v5
+ *
+ * v5 - STAGE PATH Session 9 (CLOSE; P-12 F5; Graeme, 31 Oct: "‹ Back"). On
+ *   the Plan only: "‹ Back" (it said "← Back"), no house beside it, the
+ *   question in the Plan's look, and None of these, Skip for now and Start
+ *   again drawn as buttons (they were bare words). Free unchanged.
+ *
  * 04 Oct 2026 v4
  *
  * v4 - D-3 ARC-HOME (device test, 04 Oct). The arc screen can change the
@@ -71,6 +78,7 @@
  */
 
 import { store } from "../store.js";
+import { isPremium } from "../auth.js";
 import { AIMS, STRANDS, aimById, strandsForAim, situationsFor, aimsFor } from "../data/aims.js";
 import { bodyAreasOf } from "../data/conditions.js";
 
@@ -113,10 +121,11 @@ export function ArcSetupView(router) {
   function mount(container) { render(container); }
 
   function render(container) {
+    const plan = isPremium();
     container.innerHTML = `
-      <div class="mc-view">
+      <div class="mc-view${plan ? " is-plan" : ""}">
         <div class="mc-header">
-          <button class="btn btn-ghost" id="as-back-btn" aria-label="Back">&larr; Back</button>
+          ${plan ? `<button class="btn btn-ghost plan-back" id="as-back-btn">‹ Back</button>` : `<button class="btn btn-ghost" id="as-back-btn" aria-label="Back">&larr; Back</button>`}
           <span class="mc-header-title">${mode === "fresh" ? "A fresh arc" : "Your arc"}</span>
         </div>
         ${step === 1 ? stepAim()
@@ -165,7 +174,7 @@ export function ArcSetupView(router) {
       ${showAll ? `
         <p class="as-count">Everything I can hold for you.</p>
       ` : `
-        <button class="btn btn-ghost btn-full" id="as-all-btn">
+        <button class="btn ${isPremium() ? "btn-secondary" : "btn-ghost"} btn-full" id="as-all-btn">
           None of these \u2014 show me everything
         </button>
       `}
@@ -226,7 +235,7 @@ export function ArcSetupView(router) {
       ${editing() ? `
       <button class="btn btn-primary btn-large btn-full" id="as-save-btn">Save</button>` : `
       <button class="btn btn-primary btn-large btn-full" id="as-next-btn">Continue</button>
-      <button class="btn btn-ghost btn-full" id="as-skip-btn">Skip for now</button>`}`;
+      <button class="btn ${isPremium() ? "btn-secondary" : "btn-ghost"} btn-full" id="as-skip-btn">Skip for now</button>`}`;
   }
 
   // ── 4. Is this yours ─────────────────────────────────────────────
@@ -252,7 +261,7 @@ export function ArcSetupView(router) {
       </p>
 
       <button class="btn btn-primary btn-large btn-full" id="as-start-btn">Yes, that's mine</button>
-      <button class="btn btn-ghost btn-full" id="as-restart-btn">Start again</button>`;
+      <button class="btn ${isPremium() ? "btn-secondary" : "btn-ghost"} btn-full" id="as-restart-btn">Start again</button>`;
   }
 
   function wire(container) {

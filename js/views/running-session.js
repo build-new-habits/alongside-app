@@ -1,6 +1,16 @@
 /**
  * running-session.js - Guided Running Session
  *
+ * 31 Oct 2026 v20
+ *
+ * v20 - STAGE PATH Session 9 (CLOSE; P-12 F4, F5; Graeme, 31 Oct: "‹ Back,
+ *   Exit in a session", "24 px, left"). On the Plan only: before the run
+ *   starts the way back says "‹ Back" (the first screen said Exit); once it
+ *   has started, Exit; the house is not drawn beside either; the done
+ *   screen's heading is the page heading at the left (it was a centred
+ *   line), and its last button says Done (it said "Back to today"; it
+ *   still goes there). Free unchanged.
+ *
  * 31 Oct 2026 v19
  *
  * v19 - STAGE PATH Session 8 (P-8; P-12, Graeme 29 Oct: the new look is the
@@ -353,7 +363,7 @@ function renderSevereToday(ids) {
   return `
     <div class="view walk-session-view${_planCls()}">
       <div class="workout-header">
-        <button class="btn btn-ghost" id="rs-back-btn" aria-label="Exit">Exit</button>
+        ${_plan() ? `<button class="btn btn-ghost plan-back" id="rs-back-btn" aria-label="Back">‹ Back</button>` : `<button class="btn btn-ghost" id="rs-back-btn" aria-label="Exit">Exit</button>`}
         <h1 class="workout-header-title">Before you run</h1>
       </div>
       <div class="card card-coach" style="margin-bottom: var(--space-5);">
@@ -446,7 +456,7 @@ function renderTypeSelector() {
   return `
     <div class="view walk-session-view${_planCls()}">
       <div class="workout-header">
-        <button class="btn btn-ghost" id="rs-back-btn" aria-label="Exit">Exit</button>
+        ${_plan() ? `<button class="btn btn-ghost plan-back" id="rs-back-btn" aria-label="Back">‹ Back</button>` : `<button class="btn btn-ghost" id="rs-back-btn" aria-label="Exit">Exit</button>`}
         <h1 class="workout-header-title">Run</h1>
       </div>
 
@@ -501,7 +511,7 @@ function renderRunOverview() {
   return `
     <div class="view walk-session-view${_planCls()}">
       <div class="workout-header">
-        <button class="btn btn-ghost" id="rs-back-btn" aria-label="Back">\u2190 Back</button>
+        ${_plan() ? `<button class="btn btn-ghost plan-back" id="rs-back-btn" aria-label="Back">‹ Back</button>` : `<button class="btn btn-ghost" id="rs-back-btn" aria-label="Back">\u2190 Back</button>`}
         <h1 class="workout-header-title">${rt?.label || "Run"} \u2014 ${selectedMins} min</h1>
       </div>
 
@@ -543,7 +553,7 @@ function renderDurationSelector() {
   return `
     <div class="view walk-session-view${_planCls()}">
       <div class="workout-header">
-        <button class="btn btn-ghost" id="rs-back-btn" aria-label="Back">Back</button>
+        ${_plan() ? `<button class="btn btn-ghost plan-back" id="rs-back-btn" aria-label="Back">‹ Back</button>` : `<button class="btn btn-ghost" id="rs-back-btn" aria-label="Back">Back</button>`}
         <h1 class="workout-header-title">${rt?.label || "Run"}</h1>
       </div>
 
@@ -580,7 +590,7 @@ function renderRunning() {
   return `
     <div class="view walk-session-view${_planCls()}">
       <div class="workout-header">
-        <button class="btn btn-ghost" id="rs-exit-btn" aria-label="End run">Exit</button>
+        ${_plan() ? `<button class="btn btn-ghost plan-exit" id="rs-exit-btn" aria-label="End run">Exit</button>` : `<button class="btn btn-ghost" id="rs-exit-btn" aria-label="End run">Exit</button>`}
         <h1 class="workout-header-title">${phaseLabel}</h1>
       </div>
 
@@ -682,14 +692,14 @@ function renderDone() {
   };
 
   return `
-    <div class="view walk-session-view${_planCls()}" style="text-align: center;">
+    <div class="view walk-session-view${_planCls()}"${_plan() ? "" : ` style="text-align: center;"`}>
       <div class="card card-coach" style="margin-top: var(--space-8);">
         <img src="assets/images/logo-icon-192.png" alt=""
              class="coach-icon-small" aria-hidden="true">
         <div>
-          <h2 style="color: var(--color-primary); margin-bottom: var(--space-2);">
+          ${_plan() ? `<h1 tabindex="-1">Run done.</h1>` : `<h2 style="color: var(--color-primary); margin-bottom: var(--space-2);">
             Run done.
-          </h2>
+          </h2>`}
           <p class="coach-message-text">
             ${name ? name + " \u2014 " : ""}${mins} minutes. ${completions[selectedType] || "Well done."}
           </p>
@@ -702,9 +712,9 @@ function renderDone() {
         <button class="btn btn-primary btn-full" id="rs-reflect-btn">
           How did that feel?
         </button>
-        <button class="btn btn-ghost btn-full" id="rs-home-btn">
+        ${_plan() ? `<button class="btn btn-secondary btn-full" id="rs-home-btn">Done</button>` : `<button class="btn btn-ghost btn-full" id="rs-home-btn">
           Back to today
-        </button>
+        </button>`}
       </div>
     </div>
   `;

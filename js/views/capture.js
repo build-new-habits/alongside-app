@@ -1,5 +1,13 @@
 /**
  * js/views/capture.js
+ * 31 Oct 2026 v8
+ *
+ * v8 - STAGE PATH Session 9 (CLOSE; P-12 F3, F4, F5; Graeme, 31 Oct: "Exit
+ *   in a session", "24 px, left"). On the Plan only: the heading, Make it up
+ *   as I go, shows at the page size at the left (it was for screen readers
+ *   only), Exit is the one way out (no house beside it), and Change is drawn
+ *   as a pill (it was bare words). Free unchanged.
+ *
  * 27 Oct 2026 v7
  *
  * v7 - LIFT-UNIT (Graeme, 27 Oct: "these exercises hold stone as the gym weight"): a set is logged and shown in the lifting unit, kg or lb (store.liftUnit()), never stone.
@@ -92,6 +100,7 @@
  */
 
 import { store } from "../store.js";
+import { isPremium } from "../auth.js";
 import { EXERCISES } from "../data/exercises/index.js";
 import { CONDITIONS } from "../data/conditions.js";
 import { searchByTerm } from "../data/muscle-search.js";
@@ -489,20 +498,21 @@ export function render() {
   const q    = query.trim();
   const { found, anyKit } = searchHere(q, loc);
 
+  const plan = isPremium();
   return `
-    <div class="view capture-view" data-freestyle>
+    <div class="view capture-view${plan ? " is-plan" : ""}" data-freestyle>
       <header class="fs-bar">
-        <button type="button" class="btn btn-ghost fs-bar__exit" id="fs-exit">Exit</button>
+        <button type="button" class="btn btn-ghost fs-bar__exit${plan ? " plan-exit" : ""}" id="fs-exit">Exit</button>
         <span class="fs-bar__clock" id="fs-clock" aria-hidden="true">${_elapsed()}</span>
         <button type="button" class="btn btn-secondary fs-bar__finish" id="fs-finish">Finish</button>
       </header>
-      <h1 class="sr-only">Make it up as I go</h1>
+      <h1${plan ? "" : ` class="sr-only"`}>Make it up as I go</h1>
       <p class="fs-error" id="fs-error" role="alert"></p>
 
       <p class="fs-sub">If you stop part-way, this keeps for 3 hours after your last set, then I save what you\u2019ve logged.</p>
 
       <p class="fs-where">${esc(PLACE_WORDS[loc])}
-        <button type="button" class="fs-where__change" id="fs-where" aria-label="Change where you are. Now: ${esc(PLACE_WORDS[loc])}">Change</button>
+        <button type="button" class="fs-where__change${plan ? " plan-link" : ""}" id="fs-where" aria-label="Change where you are. Now: ${esc(PLACE_WORDS[loc])}">Change</button>
       </p>
 
       ${moves.length ? `

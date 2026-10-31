@@ -1,5 +1,13 @@
 /**
  * js/views/checkin.js
+ * 31 Oct 2026 v32
+ *
+ * v32 - STAGE PATH Session 9 (CLOSE; P-12 F4, F5; Graeme, 31 Oct: "‹ Back",
+ *   "24 px, left"). On the Plan only, the look, never the questions (P14
+ *   holds: the same three questions for everyone): a page heading, Check
+ *   in (it had none), and one way back, "‹ Back", to the step it was asked
+ *   from, in place of the house. Free unchanged.
+ *
  * 29 Oct 2026 v31
  *
  * v31 - STAGE PATH P-4 (mock-up v10, Graeme 29 Oct: "I like v10"). On the
@@ -389,6 +397,7 @@
  */
 
 import { store }           from "../store.js";
+import { planLook }       from "../plan-look.js";
 import { prefersReducedMotion } from "../display-prefs.js";
 // PURPOSE-ASK, 16 Sep 2026. The coach asks WHY today, then what would
 // help -- and recommends, rather than offering a menu. See
@@ -495,9 +504,14 @@ export function CheckinView(router) {
                  sleepQuality: null, conditionLevels: {} };
     _sleepGiven = false;
 
+    const plan = planLook();
     container.innerHTML = `
-      <div class="ci-view">
-        <div class="ci-thread"
+      <div class="ci-view${plan ? " is-plan" : ""}">
+${plan ? `        <div class="ci-plan-head">
+          <button type="button" class="btn btn-ghost plan-back" id="ci-back">‹ Back</button>
+          <h1 tabindex="-1">Check in</h1>
+        </div>
+` : ""}        <div class="ci-thread"
              id="ci-thread"
              aria-live="polite"
              aria-atomic="false"
@@ -507,6 +521,11 @@ export function CheckinView(router) {
     `;
 
     _thread = container.querySelector("#ci-thread");
+    // Session 9. Back to the step it was asked from, and nowhere waiting after.
+    container.querySelector("#ci-back")?.addEventListener("click", () => {
+      store.set("pendingDoorRoute", null);
+      router.back();
+    });
     _runOpening();
   }
 
