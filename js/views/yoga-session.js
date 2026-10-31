@@ -1,5 +1,15 @@
 /**
  * yoga-session.js
+ * 31 Oct 2026 v23
+ *
+ * v23 - P-13 rooms (Graeme, 31 Oct: Core and Yoga now). On the Plan only,
+ *   the one look (Session 9): the heading 24 px at the left; "‹ Back" before
+ *   a session (the first screen said Exit) and Exit during it, with no house
+ *   beside either; a line icon on each tile in place of its emoji; Skip and
+ *   the exit card's buttons drawn as buttons; the done screen's heading is
+ *   the page heading at the left, and its last button says Done (it said
+ *   "Back to today"; it still goes there). Free unchanged.
+ *
  * 18 Oct 2026 v22
  *
  * v22 - OLD-CREDITS-TIDY (Graeme, 18 Oct: "You do those things"). The
@@ -288,6 +298,10 @@ import { STRANDS } from "../data/aims.js";
 import { TARGET_AREAS, impliedTarget, sortByTarget } from "../stretch-target.js";
 import { isGateDue, renderSafetyGate, attachSafetyGate } from "../safety-gate.js";
 import { isPremium } from "../auth.js";
+import { lineIcon } from "../data/line-icons.js";
+// P-13 (v23). The Plan's look: one tier check, and one line icon for the type and focus tiles.
+const _plan = () => isPremium();
+const _FOCUS_ICON = "yoga";
 import { EXERCISES } from "../data/exercises/index.js";
 import { personFilter } from "../session-builder.js";
 import { badDayIds, renderBadDayDoor, wireBadDayDoor } from "./bad-day-door.js";
@@ -680,7 +694,7 @@ export function render() {
   //
   // The gate belongs to MOVEMENT, not to the card component.
   if (phase === "session" && currentIndex === 0 && isGateDue()) {
-    return `<div class="view core-session-view">${renderSafetyGate()}</div>`;
+    return `${_plan() ? `<div class="view core-session-view is-plan">` : `<div class="view core-session-view">`}${renderSafetyGate()}</div>`;
   }
   if (phase === "session")  return renderPose();
   if (phase === "rest")     return renderRest();
@@ -711,16 +725,16 @@ function renderFocusSelector() {
           <button class="cs-target-card${t.id === selectedTarget ? " is-selected" : ""}"
                   data-target="${t.id}"
                   aria-pressed="${t.id === selectedTarget ? "true" : "false"}">
-            <span class="cs-focus-icon" aria-hidden="true">${t.icon}</span>
+            ${_plan() ? `<span class="cs-focus-icon" aria-hidden="true">${lineIcon(_FOCUS_ICON)}</span>` : `<span class="cs-focus-icon" aria-hidden="true">${t.icon}</span>`}
             <span class="cs-focus-label">${t.label}</span>
           </button>
         `).join("")}
       </div>`;
 
   return `
-    <div class="view core-session-view">
+    ${_plan() ? `<div class="view core-session-view is-plan">` : `<div class="view core-session-view">`}
       <div class="workout-header">
-        <button class="btn btn-ghost" id="ys-back-btn" aria-label="Exit">Exit</button>
+        ${_plan() ? `<button class="btn btn-ghost plan-back" id="ys-back-btn" aria-label="Back">‹ Back</button>` : `<button class="btn btn-ghost" id="ys-back-btn" aria-label="Exit">Exit</button>`}
         <h1 class="workout-header-title">Yoga &amp; Pilates</h1>
       </div>
 
@@ -741,7 +755,7 @@ function renderFocusSelector() {
           return `
           <button class="cs-focus-card" data-focus="${f.id}"${none ? " disabled" : ""}
                   aria-label="${f.label}: ${none ? "nothing here fits what you've told me" : f.description}">
-            <span class="cs-focus-icon" aria-hidden="true">${f.icon}</span>
+            ${_plan() ? `<span class="cs-focus-icon" aria-hidden="true">${lineIcon(_FOCUS_ICON)}</span>` : `<span class="cs-focus-icon" aria-hidden="true">${f.icon}</span>`}
             <span class="cs-focus-label">${f.label}</span>
             <span class="cs-focus-desc">${none ? "Nothing here fits what you\u2019ve told me" : f.description}</span>
           </button>`;
@@ -761,9 +775,9 @@ function renderSessionOverview() {
   // P17. The shared filters can leave a style with nothing for somebody.
   if (sessionQueue.length === 0) {
     return `
-    <div class="view yoga-session-view">
+    ${_plan() ? `<div class="view yoga-session-view is-plan">` : `<div class="view yoga-session-view">`}
       <div class="workout-header">
-        <button class="btn btn-ghost" id="ys-back-btn" aria-label="Back to duration">\u2190 Back</button>
+        ${_plan() ? `<button class="btn btn-ghost plan-back" id="ys-back-btn" aria-label="Back to duration">‹ Back</button>` : `<button class="btn btn-ghost" id="ys-back-btn" aria-label="Back to duration">\u2190 Back</button>`}
         <h1 class="workout-header-title">${focus?.label || "Yoga"}</h1>
       </div>
       <div class="card card-coach" role="status">
@@ -776,11 +790,11 @@ function renderSessionOverview() {
   }
 
   return `
-    <div class="view yoga-session-view">
+    ${_plan() ? `<div class="view yoga-session-view is-plan">` : `<div class="view yoga-session-view">`}
       <div class="workout-header">
-        <button class="btn btn-ghost" id="ys-back-btn" aria-label="Back to duration">
+        ${_plan() ? `<button class="btn btn-ghost plan-back" id="ys-back-btn" aria-label="Back to duration">‹ Back</button>` : `<button class="btn btn-ghost" id="ys-back-btn" aria-label="Back to duration">
           \u2190 Back
-        </button>
+        </button>`}
         <h1 class="workout-header-title">${focus?.label || "Yoga"} \u2014 ${_aboutMins(sessionQueue)}</h1>
       </div>
 
@@ -870,9 +884,9 @@ function renderDurationSelector() {
   const cards = _offeredCards();
   // W3-19. Reached with nothing in it (the target changed, say): said plainly.
   if (cards.length === 0) return `
-    <div class="view core-session-view">
+    ${_plan() ? `<div class="view core-session-view is-plan">` : `<div class="view core-session-view">`}
       <div class="workout-header">
-        <button class="btn btn-ghost" id="ys-back-btn" aria-label="Back">Back</button>
+        ${_plan() ? `<button class="btn btn-ghost plan-back" id="ys-back-btn" aria-label="Back">‹ Back</button>` : `<button class="btn btn-ghost" id="ys-back-btn" aria-label="Back">Back</button>`}
         <h1 class="workout-header-title">${focus?.label || "Yoga"}</h1>
       </div>
       <div class="card card-coach" role="status">
@@ -881,9 +895,9 @@ function renderDurationSelector() {
       <button class="btn btn-primary btn-large btn-full" id="ys-refocus-btn" style="margin-top: var(--space-6);">Choose another style</button>
     </div>`;
   return `
-    <div class="view core-session-view">
+    ${_plan() ? `<div class="view core-session-view is-plan">` : `<div class="view core-session-view">`}
       <div class="workout-header">
-        <button class="btn btn-ghost" id="ys-back-btn" aria-label="Back">Back</button>
+        ${_plan() ? `<button class="btn btn-ghost plan-back" id="ys-back-btn" aria-label="Back">‹ Back</button>` : `<button class="btn btn-ghost" id="ys-back-btn" aria-label="Back">Back</button>`}
         <h1 class="workout-header-title">${focus?.label || "Yoga"}</h1>
       </div>
 
@@ -1038,9 +1052,9 @@ function renderPose() {
   const focus    = FOCUS_TYPES.find(f => f.id === selectedFocus);
 
   return `
-    <div class="view core-session-view">
+    ${_plan() ? `<div class="view core-session-view is-plan">` : `<div class="view core-session-view">`}
       <div class="workout-header">
-        <button class="btn btn-ghost" id="ys-exit-btn" aria-label="Exit session">Exit</button>
+        ${_plan() ? `<button class="btn btn-ghost plan-exit" id="ys-exit-btn" aria-label="Exit session">Exit</button>` : `<button class="btn btn-ghost" id="ys-exit-btn" aria-label="Exit session">Exit</button>`}
         <div class="workout-progress-info" aria-label="Pose ${currentIndex + 1} of ${total}">
           <span>${currentIndex + 1} of ${total}</span>
         </div>
@@ -1133,7 +1147,7 @@ function renderPose() {
                 style="${hasTimer ? "margin-top: var(--space-2);" : ""}">
           ${isLast ? "Finish practice" : "Done — Next pose"}
         </button>
-        <button class="btn btn-ghost btn-small" id="ys-skip-btn">Skip</button>
+        <button class="btn ${_plan() ? "btn-secondary" : "btn-ghost"} btn-small" id="ys-skip-btn">Skip</button>
       </div>
     </div>
   `;
@@ -1144,9 +1158,9 @@ function renderPose() {
 function renderRest() {
   const nextPose = sessionQueue[currentIndex];
   return `
-    <div class="view core-session-view">
+    ${_plan() ? `<div class="view core-session-view is-plan">` : `<div class="view core-session-view">`}
       <div class="workout-header">
-        <button class="btn btn-ghost" id="ys-exit-btn" aria-label="Exit">Exit</button>
+        ${_plan() ? `<button class="btn btn-ghost plan-exit" id="ys-exit-btn" aria-label="Exit">Exit</button>` : `<button class="btn btn-ghost" id="ys-exit-btn" aria-label="Exit">Exit</button>`}
         <h1 class="workout-header-title">Rest</h1>
       </div>
 
@@ -1185,13 +1199,13 @@ function renderDone() {
   };
 
   return `
-    <div class="view core-session-view" style="text-align: center;">
+    <div class="view core-session-view${_plan() ? " is-plan" : ""}"${_plan() ? "" : ` style="text-align: center;"`}>
       <div class="card card-coach" style="margin-top: var(--space-8);">
         <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
         <div>
-          <h2 style="color: var(--color-primary); margin-bottom: var(--space-2);">
+          ${_plan() ? `<h1 tabindex="-1">Practice done.</h1>` : `<h2 style="color: var(--color-primary); margin-bottom: var(--space-2);">
             Practice done.
-          </h2>
+          </h2>`}
           <p class="coach-message-text">
             ${name ? name + " \u2014 " : ""}${doneMsg[selectedFocus] || "Well done."}
           </p>
@@ -1203,8 +1217,8 @@ function renderDone() {
         <button class="btn btn-primary btn-full" id="ys-reflect-btn">
           How did that feel?
         </button>
-        <button class="btn btn-ghost btn-full" id="ys-home-btn">
-          Back to today
+        <button class="btn ${_plan() ? "btn-secondary" : "btn-ghost"} btn-full" id="ys-home-btn">
+          ${_plan() ? "Done" : "Back to today"}
         </button>
       </div>
     </div>
@@ -1406,7 +1420,7 @@ function showExitConfirm() {
                 aria-label="Stay in session">
           Stay in session
         </button>
-        <button class="btn btn-ghost btn-full" id="exit-confirm-leave"
+        <button class="btn ${_plan() ? "btn-secondary" : "btn-ghost"} btn-full" id="exit-confirm-leave"
                 aria-label="Exit and save progress so far">
           Exit and save progress
         </button>
@@ -1425,7 +1439,7 @@ function showExitConfirm() {
              option is available, not encouraged -- matching
              .sg-exit-discard's existing treatment rather than inventing
              one. -->
-        <button class="btn btn-ghost btn-full session-exit-discard" id="exit-confirm-discard"
+        <button class="btn ${_plan() ? "btn-secondary" : "btn-ghost"} btn-full session-exit-discard" id="exit-confirm-discard"
                 aria-label="Exit without saving this session">
           Exit without saving
         </button>

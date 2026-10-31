@@ -13,7 +13,8 @@
  * hold it from then on. Nothing is ever added here to make a gate pass.
  *
  * P-13 rooms, 31 Oct: In Step, Something quieter and Breathing moved to the
- * look and left P13_ROOMS (the mind rooms first, Graeme's order).
+ * look and left P13_ROOMS (the mind rooms first, Graeme's order); then Core
+ * and Yoga & Pilates.
  *
  * SESSION_SCREENS: a session in progress, where the way out says "Exit"
  * (Graeme, 31 Oct: Exit only once a session has started).
@@ -32,8 +33,8 @@
  */
 export const P13_ROOMS = [
   "classes", "class-player", "session-builder",
-  "morning-session", "core-session", "yoga-session",
+  "morning-session",
 ];
-export const SESSION_SCREENS = ["workout", "capture", "prescribed-session", "gym-programme", "breathing-session", "quiet-session"];
+export const SESSION_SCREENS = ["workout", "capture", "prescribed-session", "gym-programme", "breathing-session", "quiet-session", "core-session", "yoga-session"];
 export const NOT_A_ROOM = ["age-check", "under-18", "consent-update", "health-consent", "red-flag"];
 export const NOT_ON_THE_PLAN = ["checkin-mini", "mobility-conditioning"];

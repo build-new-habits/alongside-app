@@ -1,6 +1,16 @@
 /**
  * core-session.js - Guided Core Session
  *
+ * 31 Oct 2026 v22
+ *
+ * v22 - P-13 rooms (Graeme, 31 Oct: Core and Yoga now). On the Plan only,
+ *   the one look (Session 9): the heading 24 px at the left; "‹ Back" before
+ *   a session (the first screen said Exit) and Exit during it, with no house
+ *   beside either; a line icon on each tile in place of its emoji; Skip and
+ *   the exit card's buttons drawn as buttons; the done screen's heading is
+ *   the page heading at the left, and its last button says Done (it said
+ *   "Back to today"; it still goes there). Free unchanged.
+ *
  * 18 Oct 2026 v21
  *
  * v21 - OLD-CREDITS-TIDY (Graeme, 18 Oct: "You do those things"). The
@@ -264,6 +274,11 @@
  */
 
 import { store } from "../store.js";
+import { isPremium } from "../auth.js";
+import { lineIcon } from "../data/line-icons.js";
+// P-13 (v22). The Plan's look: one tier check, and one line icon for the focus tiles.
+const _plan = () => isPremium();
+const _FOCUS_ICON = "instep";
 import { firstSessionRecognition } from "../data/first-session.js";
 import { renderFeedbackControl, attachFeedbackEvents } from "../exercise-feedback.js";
 import { renderExerciseCard, attachCardEvents } from "../exercise-card.js";
@@ -501,9 +516,9 @@ export function render() {
 function renderNothingFits() {
   const focus = FOCUS_TYPES.find(f => f.id === selectedFocus);
   return `
-    <div class="view core-session-view">
+    ${_plan() ? `<div class="view core-session-view is-plan">` : `<div class="view core-session-view">`}
       <div class="workout-header">
-        <button class="btn btn-ghost" id="cs-nofit-back-btn" aria-label="Back to length">&larr; Back</button>
+        ${_plan() ? `<button class="btn btn-ghost plan-back" id="cs-nofit-back-btn" aria-label="Back to length">‹ Back</button>` : `<button class="btn btn-ghost" id="cs-nofit-back-btn" aria-label="Back to length">&larr; Back</button>`}
         <h1 class="workout-header-title">${focus?.label || "Core"}</h1>
       </div>
       <div class="card card-coach" role="status">
@@ -523,12 +538,12 @@ function renderNothingFits() {
 function renderFocusSelector() {
   const name = store.get("name") || "";
   return `
-    <div class="view core-session-view">
+    ${_plan() ? `<div class="view core-session-view is-plan">` : `<div class="view core-session-view">`}
 
       <div class="workout-header">
-        <button class="btn btn-ghost" id="cs-back-btn" aria-label="Back">
+        ${_plan() ? `<button class="btn btn-ghost plan-back" id="cs-back-btn" aria-label="Back">‹ Back</button>` : `<button class="btn btn-ghost" id="cs-back-btn" aria-label="Back">
           Exit
-        </button>
+        </button>`}
         <h1 class="workout-header-title">Core Session</h1>
       </div>
 
@@ -543,7 +558,7 @@ function renderFocusSelector() {
         ${FOCUS_TYPES.map(f => `
           <button class="cs-focus-card" data-focus="${f.id}"
                   aria-label="${f.label}: ${f.description}">
-            <span class="cs-focus-icon" aria-hidden="true">${f.icon}</span>
+            ${_plan() ? `<span class="cs-focus-icon" aria-hidden="true">${lineIcon(_FOCUS_ICON)}</span>` : `<span class="cs-focus-icon" aria-hidden="true">${f.icon}</span>`}
             <span class="cs-focus-label">${f.label}</span>
             <span class="cs-focus-desc">${f.description}</span>
           </button>
@@ -559,12 +574,12 @@ function renderFocusSelector() {
 function renderDurationSelector() {
   const focus = FOCUS_TYPES.find(f => f.id === selectedFocus);
   return `
-    <div class="view core-session-view">
+    ${_plan() ? `<div class="view core-session-view is-plan">` : `<div class="view core-session-view">`}
 
       <div class="workout-header">
-        <button class="btn btn-ghost" id="cs-back-btn" aria-label="Back to focus">
+        ${_plan() ? `<button class="btn btn-ghost plan-back" id="cs-back-btn" aria-label="Back to focus">‹ Back</button>` : `<button class="btn btn-ghost" id="cs-back-btn" aria-label="Back to focus">
           Back
-        </button>
+        </button>`}
         <h1 class="workout-header-title">${focus?.label || "Core"}</h1>
       </div>
 
@@ -597,12 +612,12 @@ function renderSessionOverview() {
   const condNote = buildConditionNote();
 
   return `
-    <div class="view core-session-view">
+    ${_plan() ? `<div class="view core-session-view is-plan">` : `<div class="view core-session-view">`}
 
       <div class="workout-header">
-        <button class="btn btn-ghost" id="cs-back-btn" aria-label="Back to duration">
+        ${_plan() ? `<button class="btn btn-ghost plan-back" id="cs-back-btn" aria-label="Back to duration">‹ Back</button>` : `<button class="btn btn-ghost" id="cs-back-btn" aria-label="Back to duration">
           ← Back
-        </button>
+        </button>`}
         <h1 class="workout-header-title">${focus?.label || "Core"} — ${selectedMins} min</h1>
       </div>
 
@@ -666,12 +681,12 @@ function renderSessionIntro() {
   const exCount     = sessionQueue.length;
 
   return `
-    <div class="view core-session-view">
+    ${_plan() ? `<div class="view core-session-view is-plan">` : `<div class="view core-session-view">`}
 
       <div class="workout-header">
-        <button class="btn btn-ghost" id="cs-back-btn" aria-label="Exit session">
+        ${_plan() ? `<button class="btn btn-ghost plan-back" id="cs-back-btn" aria-label="Back">‹ Back</button>` : `<button class="btn btn-ghost" id="cs-back-btn" aria-label="Exit session">
           Exit
-        </button>
+        </button>`}
         <h1 class="workout-header-title">${focus?.label || "Core"} — ${selectedMins} min</h1>
       </div>
 
@@ -714,7 +729,7 @@ function renderExercise() {
   // acknowledgement is written, so no view-local flag is needed -- a
   // second source of truth is how a gate fires twice or not at all.
   if (currentIndex === 0 && isGateDue()) {
-    return `<div class="view core-session-view">${renderSafetyGate()}</div>`;
+    return `${_plan() ? `<div class="view core-session-view is-plan">` : `<div class="view core-session-view">`}${renderSafetyGate()}</div>`;
   }
 
   const ex       = sessionQueue[currentIndex];
@@ -724,12 +739,12 @@ function renderExercise() {
   const hasTimer = ex.holdSeconds > 0;
 
   return `
-    <div class="view core-session-view">
+    ${_plan() ? `<div class="view core-session-view is-plan">` : `<div class="view core-session-view">`}
 
       <div class="workout-header">
-        <button class="btn btn-ghost" id="cs-exit-btn" aria-label="Exit session">
+        ${_plan() ? `<button class="btn btn-ghost plan-exit" id="cs-exit-btn" aria-label="Exit session">Exit</button>` : `<button class="btn btn-ghost" id="cs-exit-btn" aria-label="Exit session">
           Exit
-        </button>
+        </button>`}
         <div class="workout-progress-info"
              aria-label="Exercise ${currentIndex + 1} of ${total}">
           <span>${currentIndex + 1} of ${total}</span>
@@ -806,7 +821,7 @@ function renderExercise() {
             Start this one \u2192
           </button>
 
-          <button class="btn btn-ghost btn-small" id="cs-skip-btn"
+          <button class="btn ${_plan() ? "btn-secondary" : "btn-ghost"} btn-small" id="cs-skip-btn"
                   aria-label="Skip ${ex.name}">
             Skip
           </button>
@@ -885,11 +900,11 @@ function renderSkipOffer() {
          aria-label="Tell the coach about skipping ${name}">
       <p class="cs-skip-offer__line">Want me to change how often ${name} comes up?</p>
       <div class="cs-skip-offer__actions">
-        <button class="btn btn-ghost btn-small" data-skip-pref="less"
+        <button class="btn ${_plan() ? "btn-secondary" : "btn-ghost"} btn-small" data-skip-pref="less"
                 aria-label="Offer ${name} less often">Less often</button>
-        <button class="btn btn-ghost btn-small" data-skip-pref="avoid"
+        <button class="btn ${_plan() ? "btn-secondary" : "btn-ghost"} btn-small" data-skip-pref="avoid"
                 aria-label="Never offer ${name} again">Not again</button>
-        <button class="btn btn-ghost btn-small" data-skip-pref="dismiss"
+        <button class="btn ${_plan() ? "btn-secondary" : "btn-ghost"} btn-small" data-skip-pref="dismiss"
                 aria-label="Leave it as it is">Leave it</button>
       </div>
     </div>
@@ -899,9 +914,9 @@ function renderSkipOffer() {
 function renderRest() {
   const nextEx = sessionQueue[currentIndex];
   return `
-    <div class="view core-session-view">
+    ${_plan() ? `<div class="view core-session-view is-plan">` : `<div class="view core-session-view">`}
       <div class="workout-header">
-        <button class="btn btn-ghost" id="cs-exit-btn" aria-label="Exit">Exit</button>
+        ${_plan() ? `<button class="btn btn-ghost plan-exit" id="cs-exit-btn" aria-label="Exit">Exit</button>` : `<button class="btn btn-ghost" id="cs-exit-btn" aria-label="Exit">Exit</button>`}
         <h1 class="workout-header-title">Rest</h1>
       </div>
 
@@ -944,13 +959,13 @@ function renderDone() {
   // coach moment is how they drift apart.
 
   return `
-    <div class="view core-session-view" style="text-align: center;">
+    <div class="view core-session-view${_plan() ? " is-plan" : ""}"${_plan() ? "" : ` style="text-align: center;"`}>
       <div class="card card-coach" style="margin-top: var(--space-8);">
         <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
         <div>
-          <h2 style="color: var(--color-primary); margin-bottom: var(--space-2);">
+          ${_plan() ? `<h1 tabindex="-1">That's your core session done.</h1>` : `<h2 style="color: var(--color-primary); margin-bottom: var(--space-2);">
             That's your core session done.
-          </h2>
+          </h2>`}
           <p class="coach-message-text">
             ${name ? name + " — " : ""}${exercisesDone} exercise${exercisesDone === 1 ? "" : "s"}, ${(() => { const m = elapsedMins() || 1; return `${m} minute${m === 1 ? "" : "s"}`; })()} of ${focus?.label?.toLowerCase() || "core"} work.
             ${selectedFocus === "rehab"
@@ -966,8 +981,8 @@ function renderDone() {
         <button class="btn btn-primary btn-full" id="cs-reflect-btn">
           How did that feel?
         </button>
-        <button class="btn btn-ghost btn-full" id="cs-home-btn">
-          Back to today
+        <button class="btn ${_plan() ? "btn-secondary" : "btn-ghost"} btn-full" id="cs-home-btn">
+          ${_plan() ? "Done" : "Back to today"}
         </button>
       </div>
     </div>
@@ -1154,7 +1169,7 @@ function showExitConfirm() {
                 aria-label="Stay in session">
           Stay in session
         </button>
-        <button class="btn btn-ghost btn-full" id="exit-confirm-leave"
+        <button class="btn ${_plan() ? "btn-secondary" : "btn-ghost"} btn-full" id="exit-confirm-leave"
                 aria-label="Exit and save progress so far">
           Exit and save progress
         </button>
@@ -1173,7 +1188,7 @@ function showExitConfirm() {
              option is available, not encouraged -- matching
              .sg-exit-discard's existing treatment rather than inventing
              one. -->
-        <button class="btn btn-ghost btn-full session-exit-discard" id="exit-confirm-discard"
+        <button class="btn ${_plan() ? "btn-secondary" : "btn-ghost"} btn-full session-exit-discard" id="exit-confirm-discard"
                 aria-label="Exit without saving this session">
           Exit without saving
         </button>
