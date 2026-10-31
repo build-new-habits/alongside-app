@@ -1,6 +1,10 @@
 /**
  * tools/verify-look-rest.mjs
- * 29 Oct 2026 v4
+ * 31 Oct 2026 v5
+ *
+ * v5 - P-13 re-point: 1f's Library row words are now "Classes, practices,
+ *   the mind, your lists" (true words: runs are behind Keep moving). Nothing
+ *   loosened.
  *
  * v4 - STAGE PATH P-4 re-point (none loosened; mock-up v10, Graeme approved
  *   29 Oct: "I like v10"). TEST 1 reads the purpose-first Home with the same LOOK-4
@@ -122,7 +126,7 @@ ok("1c. each door: its kind colour tile with an icon, and its name", doors.every
 const lead = $(".path-coach");
 ok("1d. the one row is the one set apart (tinted, one action), and no door is", lead?.tagName === "BUTTON" && /\bk-teal\b/.test(lead.className) && $$(".path-coach").length === 1 && !lead.querySelector("button") && !doors.some(d => d.classList.contains("btn-primary") || d.classList.contains("path-coach")));
 ok("1e. \"Or choose for yourself\" is a visible heading that names the doors", txt($("#path-doors-h")) === "Or choose for yourself" && !$("#path-doors-h").classList.contains("sr-only") && $(".path-doors")?.getAttribute("aria-labelledby") === "path-doors-h");
-ok("1f. one Library row, in slate, saying what is in it", /k-slate/.test(libRow?.querySelector(".kind-tile")?.className || "") && txt(libRow?.querySelector(".path-door__t")) === "Library" && /Classes, runs, the mind, your lists/.test(txt(libRow?.querySelector(".path-door__d"))));
+ok("1f. one Library row, in slate, saying what is in it", /k-slate/.test(libRow?.querySelector(".kind-tile")?.className || "") && txt(libRow?.querySelector(".path-door__t")) === "Library" && /Classes, practices, the mind, your lists/.test(txt(libRow?.querySelector(".path-door__d"))));
 ok("1g. no \"Or go straight to\" tiles", !$("#home-links-label") && !$$(".home-link--tile").length);
 ok("1h. the Library row goes to the Library", libRow?.dataset.route === "library");
 ok("1i. no count or weekly target on Home", !/\b\d+ of \d+\b|this week/i.test(txt(main)));

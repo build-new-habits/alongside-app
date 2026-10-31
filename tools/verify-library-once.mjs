@@ -1,6 +1,14 @@
 /**
  * tools/verify-library-once.mjs
- * 04 Oct 2026 v1
+ * 31 Oct 2026 v2
+ *
+ * v2 - P-13 re-point (Graeme, 29 Oct: the Library keeps "Only what doors
+ *   don't hold"; 31 Oct: doors first, then trim). At home and At the gym are
+ *   Free's Library categories now; on the Plan the same sessions come from
+ *   Get stronger (where, which part, Build it for me: the place asked once,
+ *   P-5) and My programme from Get stronger › Gym (verify-library-shelf 2d,
+ *   2f). Every check here runs on Free, unchanged; 6c finds Free's My
+ *   programme card, which is the Plan's (locked on Free) as before.
  *
  * D-5 LIBRARY-ONCE. Graeme, device test, 04 Oct, going through the Library:
  * "I'm asked home or gym twice" and "the look of the coach plan (where I can
@@ -85,7 +93,7 @@ const CARDS = {
 };
 const WORDS = { full: "strength, full body", upper: "strength, upper body", lower: "strength, lower body", glute: "strength, glutes", core: "core", mobility: "mobility" };
 
-for (const tier of ["free", "personal"]) {
+for (const tier of ["free"]) {   // v2: the Plan's equivalent is the Get stronger door (see header)
   for (const place of ["home", "gym"]) {
     for (const [label, type] of CARDS[place]) {
       fixture(tier);
@@ -112,7 +120,7 @@ for (const tier of ["free", "personal"]) {
 
 // 5. Read once.
 console.log("\nTEST 5 - the place is read once");
-fixture("personal");
+fixture("free");
 await router.navigate("library"); await wait(60);
 await click($('[data-guided="gym"]'));
 await click($$("[data-target]").find(b => txt(b.querySelector(".library-session-label")).startsWith("Upper body")));
@@ -124,18 +132,20 @@ ok("5. the next plan, opened from elsewhere, is back where they usually train (h
 
 // 7. The look.
 console.log("\nTEST 7 - the category page in the LOOK cards");
-fixture("personal");
+fixture("free");
 await router.navigate("library"); await wait(60);
 await click($('[data-guided="gym"]'));
 const rows = $$(".library-session-card");
 ok("7a. every session row has its kind tile with a line icon, and a chevron", rows.length > 4 &&
    rows.every(r => r.querySelector(".kind-tile svg[aria-hidden=true]") && r.querySelector(".library-session-chev svg")));
-ok("7b. no emoji on the page", !/\p{Extended_Pictographic}/u.test(txt(main)), txt(main).slice(0, 200));
+// v2: on Free the Plan's own card carries the paywall's lock badge (auth.js lockedFeature); every session tile is still a line icon.
+const _noLock = (() => { const c = main.cloneNode(true); c.querySelectorAll(".locked-badge-icon").forEach(n => n.remove()); return txt(c); })();
+ok("7b. no emoji on the page (the Plan's lock badge aside)", !/\p{Extended_Pictographic}/u.test(_noLock), _noLock.slice(0, 200));
 ok("7c. the title carries its tile", !!$("h1.library-sub-title .kind-tile svg"));
 
 // 6. The other cards.
 console.log("\nTEST 6 - the other cards go where they went");
-fixture("personal");
+fixture("free");
 await router.navigate("library"); await wait(60);
 if ($("#lib-back-btn")) await click($("#lib-back-btn"));   // the Library page, not the last category
 await click($('[data-guided="home"]'));
@@ -145,7 +155,7 @@ const cardio = $$("[data-target]").find(b => txt(b.querySelector(".library-sessi
 ok("6b. Cardio at home still opens the walk", cardio?.dataset.target === "walk-session");
 await click($("#lib-back-btn"));
 await click($('[data-guided="gym"]'));
-ok("6c. My programme still opens the programme", $$("[data-target]").find(b => txt(b.querySelector(".library-session-label")).startsWith("My programme"))?.dataset.target === "gym-programme");
+ok("6c. My programme is still on the gym page (the Plan's: locked on Free, as before)", /My programme/.test(txt(main)));
 
 console.log(`\n${passes} passed, ${fails} failed`);
 process.exit(fails ? 1 : 0);

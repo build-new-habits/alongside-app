@@ -1,6 +1,13 @@
 /**
  * tools/verify-device-662.mjs
- * 17 Oct 2026 v3
+ * 31 Oct 2026 v4
+ *
+ * v4 - P-13 re-point (Graeme, 31 Oct: Mobility & Conditioning "Split into
+ *   the Stretch door"). D662-2 put the room on the Plan's Library so its
+ *   Stretch could be found; now its mobility session and held stretches are
+ *   the Stretch door's own. TEST 2: the Plan's Library has no tile for the
+ *   room, and the Stretch door offers A mobility session and the areas'
+ *   stretches (the real path view). 2c unchanged.
  *
  * v3 - D662-10 OLD-STARS (Graeme, 17 Oct: "is there any value here?
  *   Remove them"). My exercises said "Up to +150 ⭐" and each move in its
@@ -136,9 +143,11 @@ function tile(tier) {
   return main.querySelector('[data-guided="mobility"]');
 }
 const t = tile("personal");
-ok("2a. Plan: a Mobility & Conditioning tile", !!t && /Mobility & Conditioning/.test(txt(t)), txt(main).slice(0, 300));
-navs.length = 0; click(t);
-ok("2b. it opens Mobility & Conditioning (Stretch is there)", navs.at(-1) === "mobility-conditioning", JSON.stringify(navs));
+ok("2a. Plan: no Mobility & Conditioning tile (the room is split into the Stretch door)", !t, txt(main).slice(0, 300));
+{ const { PathView } = await import(B + "views/path.js"); fixture("personal");
+  const r = { navigate() {}, back() {}, history: [], pathStart: { door: "stretch" } };
+  main.innerHTML = ""; PathView(r).mount(main);
+  ok("2b. the Stretch door holds what it held: A mobility session, and stretches by area", !!main.querySelector('.path-row[data-v="mobility"]') && main.querySelectorAll(".path-row").length >= 4, txt(main).slice(0, 200)); }
 ok("2c. CONTROL: Free's Library is unchanged (Free Home has the door)", !tile("free"));
 
 console.log("\nTEST 3 - One more set on each, only where the work is sets");

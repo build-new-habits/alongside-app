@@ -1,6 +1,11 @@
 /**
  * tools/verify-one-plan-screen.mjs
- * 12 Oct 2026 v1
+ * 31 Oct 2026 v2
+ *
+ * v2 - P-13 re-point (Graeme, 31 Oct: doors first, then trim). TEST 3: a core
+ *   session at home on the Plan comes from Get stronger › At home › Core ›
+ *   Build it for me (the Plan's Library no longer has At home); it still
+ *   lands on Today's plan, a core session, at home. Nothing loosened.
  *
  * A-2 ONE-PLAN-SCREEN (Stage AWARD), the Plan only (Graeme, 12 Oct: Free is
  * left alone). On the Plan, every door that asks for a kind of session
@@ -95,17 +100,17 @@ ok("2pc. the button is there", !!sa);
 click(sa);
 ok("2a. Today's plan, a stretch session, not the builder", toPlan() && store.get("requestedSessionType") === "stretch" && !navs.includes("session-builder"), JSON.stringify(navs));
 
-console.log("\nTEST 3 - Library › At home › Core, on the Plan");
-function libCore(tier) {
-  fixture(tier);
-  main.innerHTML = library.render(); library.onMount();
-  click(main.querySelector('[data-guided="home"]'));
-  main.innerHTML = library.render(); library.onMount();
-  const core = [...main.querySelectorAll("[data-target]")].find(b => b.dataset.target === "core-session");
-  navs = []; click(core);
-  return !!core;
+console.log("\nTEST 3 - Get stronger › At home › Core, on the Plan (v2)");
+async function doorCore() {
+  fixture("personal");
+  const { PathView } = await import(B + "views/path.js");
+  rtr.pathStart = { door: "stronger" }; main.innerHTML = ""; PathView(rtr).mount(main);
+  for (const v of ["home", "core", "coach"]) click(main.querySelector(`.path-row[data-v="${v}"]`));
+  const b = main.querySelector("#path-build");
+  navs = []; click(b);
+  return !!b;
 }
-ok("3pc. the Core row is there", libCore("personal"));
+ok("3pc. the way is there", await doorCore());
 ok("3a. Today's plan, a core session at home", navs.at(-1) === "coach-proposal" && store.get("requestedSessionType") === "core" && store.get("requestedLocation") === "home", JSON.stringify(navs));
 
 console.log("\nTEST 4 - kept by design");

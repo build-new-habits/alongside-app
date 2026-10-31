@@ -1,7 +1,10 @@
 import { createRequire as __cr } from "node:module";
 /**
  * tools/verify-path-outside.mjs
- * 31 Oct 2026 v1
+ * 31 Oct 2026 v2
+ *
+ * v2 - P-13 re-point: 1a also expects the guided room for a run, ride, walk
+ *   or swim (the Library's tiles, now behind this door). Nothing loosened.
  *
  * STAGE PATH Session 8 (P-8 OUTSIDE-LOG; P-12's Plan look for Outside's
  * rooms). Drives the real views: the door route (path.js), Log what I did
@@ -77,7 +80,9 @@ ok("1pc. every warm-up and cool-down is in the library or an approved routine", 
 for (const act of Object.keys(OUTSIDE_PLANS)) {
   fixture(); fakeRouter.pathStart = { door: "moving" }; path(); tapRow("outside"); tapRow(act);
   const rows = [...main.querySelectorAll(".path-row")].map(r => txt(r.querySelector(".path-door__t")));
-  ok(`1a. ${act}: Warm-up before, Cool-down after, Log it, each saying what it is`, rows.join() === "Warm-up before,Cool-down after,Log it" &&
+  // v2 (P-13): a run, ride, walk or swim also offers its guided room (verify-library-shelf 2a).
+  const want = ["run", "bike", "walk", "swim"].includes(act) ? `Warm-up before,Cool-down after,${{ run: "A guided run", bike: "A guided ride", walk: "A guided walk", swim: "A guided swim" }[act]},Log it` : "Warm-up before,Cool-down after,Log it";
+  ok(`1a. ${act}: Warm-up before, Cool-down after, Log it, each saying what it is`, rows.join() === want &&
      [...main.querySelectorAll(".path-row")].every(r => txt(r.querySelector(".path-door__d"))), rows.join());
 }
 fixture(); fakeRouter.pathStart = { door: "moving" }; path(); tapRow("outside"); tapRow("run"); tapRow("warm");

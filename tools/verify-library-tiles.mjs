@@ -1,6 +1,16 @@
 /**
  * tools/verify-library-tiles.mjs
- * 12 Oct 2026 v4
+ * 31 Oct 2026 v5
+ *
+ * v5 - P-13 re-point (Graeme, 29 Oct: "Only what doors don't hold"; 31 Oct:
+ *   doors first, then trim). The Plan's Library no longer has At home; the
+ *   same sessions come from the doors. TEST 1 reads the tiles on Free (where
+ *   they are) and drives the Plan's way to each, through the real router:
+ *   Get stronger › At home › the part › Build it for me for Full Body, Core,
+ *   Upper body and Lower body, and Stretch › A mobility session for
+ *   Mobility; each still lands on Today's plan with its kind, as 1b always
+ *   asked. 2c: no door opens the core session's own screens. 2a, 2b, 2d, 2e
+ *   unchanged.
  *
  * v4 - A-2 ONE-PLAN-SCREEN (Stage AWARD). REVERSAL on the Plan only: Core at
  *   home opens Today's plan for a core session (one plan screen, one
@@ -101,7 +111,7 @@ const _set = store.set.bind(store);
 store.set = (k, v, ...r) => { if (k === "sessionBuilderPreselect" && v) lastPre = v.type || ""; return _set(k, v, ...r); };
 
 console.log("\nTEST 1 - Library > At home, through the real router");
-fixture("personal");
+fixture("free");   // v5: the tiles are Free's now; the Plan's way to each is driven below
 await go("library");
 click(main.querySelector("#lib-start-session-btn")); await wait(60);
 click(main.querySelector('[data-guided="home"]')); await wait(60);
@@ -114,15 +124,18 @@ const dupes = dest.filter((d, i) => dest.indexOf(d) !== i);
 ok("1a. no two tiles open the same thing", dupes.length === 0, dupes.join(", "));
 
 // Each label, clicked, lands where it says.
+// v5: on the Plan, each through its door (where, part, Build it for me; Stretch's mobility session).
+const DOOR_WAY = { "Full Body": ["stronger", "whole"], "Core": ["stronger", "core"], "Upper body": ["stronger", "upper"], "Lower body": ["stronger", "lower"], "Mobility": ["stretch", null] };
 const landed = [];
 for (const f of found) {
-  fixture("personal"); await go("library");
-  click(main.querySelector("#lib-start-session-btn")); await wait(40);
-  click(main.querySelector('[data-guided="home"]')); await wait(40);
-  const b = tiles().find(x => txt(x.querySelector(".library-session-label")) === f.label);
-  lastPre = "";
-  store.set("requestedSessionType", null);
-  click(b); await wait(80);
+  const way = DOOR_WAY[f.label]; if (!way) continue;
+  fixture("personal");
+  store.set("checkinHistory", { [new Date().toISOString().split("T")[0]]: { energy: 6, mood: 6 } });
+  lastPre = ""; store.set("requestedSessionType", null);
+  router.pathStart = { door: way[0] }; await go("path");
+  const row = v => click(main.querySelector(`.path-row[data-v="${v}"]`));
+  if (way[0] === "stretch") { row("mobility"); await wait(80); }
+  else { row("home"); await wait(20); row(way[1]); await wait(20); row("coach"); await wait(20); click(main.querySelector("#path-build")); await wait(80); }
   landed.push({ ...f, view: router.currentView, preStored: lastPre || store.get("requestedSessionType") || "" });
 }
 const EXPECT = { "Full Body": ["coach-proposal", "full"], "Core": ["coach-proposal", "core"],   // v4: the Plan "Upper body": ["coach-proposal", "upper"],
@@ -140,7 +153,7 @@ const core = found.find(f => f.label === "Core");
 ok("2a. Core says what the core session holds", !!core && /stability/i.test(core.note) && /gentle/i.test(core.note), core?.note);
 ok("2b. no tile promises HIIT", !found.some(f => /HIIT|high intensity/i.test(f.label + " " + f.note)), found.map(f => f.label).join(", "));
 const intoCore = landed.filter(l => l.view === "core-session").map(l => l.label);
-ok("2c. on the Plan, no tile opens the core session's own screens", intoCore.length === 0, intoCore.join(", "));
+ok("2c. on the Plan, no door opens the core session's own screens", intoCore.length === 0, intoCore.join(", "));
 // v4. Free is left alone: its Core still opens the core session.
 fixture("free"); await go("library");
 click(main.querySelector("#lib-start-session-btn")); await wait(40);

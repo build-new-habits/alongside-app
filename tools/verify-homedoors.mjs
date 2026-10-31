@@ -1,6 +1,12 @@
 /**
  * tools/verify-homedoors.mjs
- * 29 Oct 2026 v4
+ * 31 Oct 2026 v5
+ *
+ * v5 - P-13 re-point (Graeme, 31 Oct: Mobility & Conditioning split into
+ *   the Stretch door). 2b: the builder is still one tap on from I know what
+ *   I want; Mobility & Conditioning's mobility session is now one tap on
+ *   from the Stretch door itself (A mobility session), so that is where
+ *   2b looks for it. Nothing loosened.
  *
  * v4 - STAGE PATH P-4 re-point (none loosened; mock-up v10, Graeme approved
  *   29 Oct). The Plan's Home is four purpose doors: 1b counts four. 2a:
@@ -188,9 +194,12 @@ const { CoachProposalView } = await import(B + "views/coach-proposal.js");
 
   c.innerHTML = ""; KnowWhatView(r).mount(c);
   const routes = [...c.querySelectorAll("[data-kw-route]")].map(b => b.dataset.kwRoute);
-  ok("2b. and the builder and Mobility & Conditioning are one tap on from there",
-     routes.includes("session-builder") && routes.includes("mobility-conditioning"),
-     `routes: ${routes.join(", ")}`);
+  const { PathView } = await import(B + "views/path.js");
+  r.pathStart = { door: "stretch" }; c.innerHTML = ""; PathView(r).mount(c);
+  const mob = !!c.querySelector('.path-row[data-v="mobility"]');
+  ok("2b. and the builder is one tap on from there, and the mobility session one tap into Stretch",
+     routes.includes("session-builder") && mob,
+     `routes: ${routes.join(", ")}; Stretch's mobility session: ${mob}`);
 }
 
 const { SESSION_TYPES } = await import(B + "session-builder.js");

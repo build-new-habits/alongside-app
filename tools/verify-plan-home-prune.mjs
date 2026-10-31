@@ -1,6 +1,11 @@
 /**
  * tools/verify-plan-home-prune.mjs
- * 29 Oct 2026 v2
+ * 31 Oct 2026 v3
+ *
+ * v3 - P-13 re-point (Graeme, 29 Oct: the Library keeps "Only what doors
+ *   don't hold"). 6a: Run left the Library for Keep moving › Outside › Run ›
+ *   A guided run (verify-library-shelf 2a); Classes, Your week and the mind
+ *   are still here. Nothing else changed.
  *
  * v2 - STAGE PATH P-4 re-point (none loosened). A-1's Home was replaced by
  *   the purpose-first Home (mock-up v10, Graeme approved 29 Oct; the old
@@ -124,7 +129,8 @@ console.log("\nTEST 6 - what left Home is one tap from the Library, on the Plan"
 fixture();
 main.innerHTML = library.render(); library.onMount();
 const guided = [...main.querySelectorAll("[data-guided]")].map(b => b.dataset.guided);
-ok("6a. Classes, Run, Your week and the mind in the Library", ["classes", "run", "week", "mindful"].every(g => guided.includes(g)), guided.join());
+// v3: Run is behind Keep moving now (verify-library-shelf 2a drives it); the rest stay here.
+ok("6a. Classes, Your week and the mind in the Library; Run behind Keep moving", ["classes", "week", "mindful"].every(g => guided.includes(g)) && !guided.includes("run"), guided.join());
 navs = []; click(main.querySelector("[data-guided='classes']"));
 ok("6b. Classes opens the classes", navs.includes("classes"), JSON.stringify(navs));
 main.innerHTML = library.render(); library.onMount();

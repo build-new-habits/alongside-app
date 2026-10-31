@@ -1,7 +1,13 @@
 import { createRequire as __cr } from "node:module";
 /**
  * tools/verify-path-routes.mjs
- * 31 Oct 2026 v3
+ * 31 Oct 2026 v4
+ *
+ * v4 - P-13 re-point (Graeme, 31 Oct: doors first, then trim). 3c: a run
+ *   also offers A guided run (the room the Library's Run tile opened). 4a:
+ *   Stretch's step 1 is still the four areas, with Yoga & Pilates and A
+ *   mobility session listed under them (Or a whole session); the areas are
+ *   read from their own list. Nothing loosened.
  *
  * v3 - STAGE PATH Session 8 re-point (none loosened). 3c: after "What are
  *   you doing?", Outside offers a warm-up before and a cool-down after as
@@ -170,7 +176,7 @@ fixture(); fakeRouter.pathStart = { door: "stronger" }; path(); tapRow("outside"
 ok("3a. What are you doing? Step 2 of 3, six activities", step() === "activity" && rows().length === 6 && !!main.querySelector('.path-stepbar[aria-label="Step 2 of 3"]'), rowText().join("|"));
 ok("3b. never the gym, never yoga", !/gym|yoga/i.test(txt(main.querySelector(".path-list"))), txt(main.querySelector(".path-list")));
 tapRow("run");
-ok("3c. Enjoy your run: a warm-up before, a cool-down after, and Log it", h1() === "Enjoy your run" && rowText().join() === "Warm-up before,Cool-down after,Log it", rowText().join());
+ok("3c. Enjoy your run: a warm-up before, a cool-down after, a guided run, and Log it", h1() === "Enjoy your run" && rowText().join() === "Warm-up before,Cool-down after,A guided run,Log it", rowText().join());
 navs = []; tapRow("log");
 ok("3d. Log it opens Log what I did", navs.join() === "activity-log");
 fixture(); fakeRouter.pathStart = { door: "moving" }; path(); tapRow("outside");
@@ -179,7 +185,8 @@ ok("3e. the same from Keep moving", !/gym|yoga/i.test(txt(main.querySelector(".p
 // ── 4. STRETCH ───────────────────────────────────────────────────────────
 console.log("\nTEST 4 - Stretch never asks Where");
 fixture(); home(); tapDoor("stretch"); path(); steps.length = 0; seen();
-ok("4a. it opens at Where do you want to stretch? Four areas, step 1 of 2", step() === "sarea" && h1() === "Where do you want to stretch?" && rowText().join("|") === "Whole body|Neck and shoulders|Back and hips|Legs" && !!main.querySelector('.path-stepbar[aria-label="Step 1 of 2"]'));
+const areaRows = () => [...main.querySelectorAll(".path-list:first-of-type .path-row")].map(r => txt(r.querySelector(".path-door__t")));
+ok("4a. it opens at Where do you want to stretch? Four areas, step 1 of 2, and a whole session under them", step() === "sarea" && h1() === "Where do you want to stretch?" && areaRows().join("|") === "Whole body|Neck and shoulders|Back and hips|Legs" && rowText().join("|") === "Whole body|Neck and shoulders|Back and hips|Legs|Yoga & Pilates|A mobility session" && !!main.querySelector('.path-stepbar[aria-label="Step 1 of 2"]'), rowText().join("|"));
 tapRow("legs"); seen();
 const legs = ROUTINES.filter(r => r.area === "legs");
 ok("4b. Legs: its routines, A fresh one for me, and Can you get down to the floor today?", step() === "routines" && legs.every(r => rowText().includes(r.name)) && rowText().includes("A fresh one for me") &&

@@ -1,6 +1,11 @@
 /**
  * tools/verify-know-what.mjs
- * 31 Oct 2026 v8
+ * 31 Oct 2026 v9
+ *
+ * v9 - P-13 re-point (Graeme, 31 Oct: Mobility & Conditioning split into the
+ *   Stretch door). On the Plan the Mobility & Conditioning row goes; 7c
+ *   still drives the other two, and 7d asserts that row is gone
+ *   (verify-library-shelf proves where its sessions are now).
  *
  * v8 - STAGE PATH Session 9 re-point (none loosened). On the Plan, Build your
  *   own, Mobility & Conditioning and A twelve-week shape are rows with a line
@@ -250,13 +255,15 @@ const savedBtn = main.querySelector('[data-kw-route="saved-sessions"]');
 ok("7a. saved sessions, counted", /Or one you saved \(3\)/.test(txt(savedBtn)));
 fixture({ saved: 0 }); fromHome();
 ok("7b. REVERSAL: none saved, no empty promise", !main.querySelector('[data-kw-route="saved-sessions"]'));
-for (const [label, route] of [["Build your own, move by move", "session-builder"], ["Mobility & Conditioning", "mobility-conditioning"],
+for (const [label, route] of [["Build your own, move by move", "session-builder"],
                               ["A twelve-week shape", "goal-setup"]]) {
   fixture(); fromHome(); navs = [];
   // v8: on the Plan each is a row, its name on the first line and what is behind it on the second.
   click([...main.querySelectorAll("[data-kw-route]")].find(b => txt(b.querySelector(".path-door__t") || b) === label));
   ok(`7c. ${label}`, navs[0] === route, JSON.stringify(navs));
 }
+fixture(); fromHome();
+ok("7d. no Mobility & Conditioning row on the Plan (split into the Stretch door)", !main.querySelector('[data-kw-route="mobility-conditioning"]'));
 
 // ── 8. TELL ME WHAT TO DO MEANS THE COACH DECIDES ───────────────────────
 console.log("\nTEST 8 - a request made here does not ride into Tell me what to do");

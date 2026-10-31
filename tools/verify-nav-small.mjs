@@ -1,6 +1,11 @@
 /**
  * tools/verify-nav-small.mjs
- * 29 Oct 2026 v7
+ * 31 Oct 2026 v8
+ *
+ * v8 - P-13 re-point (Graeme, 31 Oct: doors first, then trim). TEST 2: the
+ *   way to a run from Plan Home is Keep moving › Outside › Run › A guided
+ *   run (the Library no longer lists Run); 2a: the Library row says what it
+ *   holds, and no longer says runs. Nothing loosened.
  *
  * v7 - STAGE PATH Session 6 re-point (none loosened). 6b: the save block
  *   now says where a kept session really is, in the Library under Saved
@@ -173,13 +178,14 @@ console.log("\nTEST 2 - Plan Home has a way to a run");
 fixture();
 main.innerHTML = ""; TodayView(rtr).mount(main); navs = [];
 const libRow = main.querySelector('[data-route="library"]');
-ok("2a. Plan Home has the Library row", !!libRow && /runs/.test(txt(libRow)), txt(libRow));
-click(libRow); await wait(10);
-const lib = await import(B + "views/library.js");
-main.innerHTML = lib.render(); lib.onMount(); navs = [];
-const runTile = main.querySelector('[data-guided="run"]');
-click(runTile); await wait(10);
-ok("2b. and the Library's Run opens the Run door", !!runTile && navs.includes("running-session"), JSON.stringify(navs));
+// v8 (P-13): runs are behind Keep moving now; the Library row says what it holds.
+ok("2a. Plan Home has the Library row, saying what it holds", !!libRow && /practices/.test(txt(libRow)) && !/runs/.test(txt(libRow)), txt(libRow));
+const { PathView } = await import(B + "views/path.js");
+fixture(); navs = []; rtr.pathStart = { door: "moving" }; main.innerHTML = ""; PathView(rtr).mount(main);
+for (const v of ["outside", "run"]) click(main.querySelector(`.path-row[data-v="${v}"]`));
+const { router: realR } = await import(B + "router.js"); const keepR = realR.navigate; realR.navigate = v => navs.push(v);
+click(main.querySelector('.path-row[data-v="guided"]')); await wait(10); realR.navigate = keepR;
+ok("2b. and Keep moving › Outside › Run › A guided run opens the Run room", navs.includes("running-session"), JSON.stringify(navs));
 
 // ── 3. LOOKING DOES NOT CHANGE THE DEFAULT ──────────────────────────────
 console.log("\nTEST 3 - looking at a plan does not change where the next one is for");

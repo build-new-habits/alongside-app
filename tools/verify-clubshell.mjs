@@ -1,6 +1,17 @@
 /**
  * tools/verify-clubshell.mjs
- * 28 Oct 2026 v5
+ * 31 Oct 2026 v6
+ *
+ * v6 - P-13 re-point (Graeme, 29 Oct: the Library keeps "Only what doors
+ *   don't hold"; 31 Oct: doors first, then trim; Mobility & Conditioning
+ *   split into the Stretch door). 2a's MUST list is unchanged but one: it is
+ *   now also reached through the doors' own steps (the real path view: Get
+ *   stronger › Build my own is I know what I want; Stretch › Yoga & Pilates)
+ *   and Today's plan's Something different today (Make it up as I go), since
+ *   the Plan's Library no longer repeats them. mobility-conditioning leaves
+ *   MUST: on the Plan the room is retired by decision, its two sessions
+ *   behind Stretch; verify-library-shelf TEST 2 and 3 prove both. Nothing
+ *   else loosened.
  *
  * v5 - STAGE PATH P-4 re-point (none loosened; mock-up v10, Graeme 29 Oct).
  *   The Plan's Home is Lately, one row (Let me choose for you), four
@@ -187,10 +198,25 @@ console.log("\nTEST 2 - everything the rooms and tiles reached is still within t
   }
   realRouter.navigate = keepNav;
   libNavs.forEach(r => reached.add(r));
+  // v6. Through the doors' own steps (the real path view), and Today's plan.
+  const { PathView } = await import(B + "views/path.js");
+  const pathNavs = [];
+  const pr = { navigate: v => pathNavs.push(v), back() {}, history: [] };
+  realRouter.navigate = v => pathNavs.push(v);
+  const walk = (door, ...vs) => { const ph = document.createElement("div"); oneScreen(ph); pr.pathStart = { door }; realRouter.pathStart = { door };
+    const v = PathView(pr); v.mount(ph); for (const x of vs) ph.querySelector(`.path-row[data-v="${x}"]`)?.dispatchEvent(new window.MouseEvent("click", { bubbles: true })); try { v.onUnmount?.(); } catch {} };
+  walk("stronger", "home", "whole", "own");
+  walk("stretch", "yoga");
+  const { CoachProposalView } = await import(B + "views/coach-proposal.js");
+  const cph = document.createElement("div"); oneScreen(cph);
+  CoachProposalView(pr).mount(cph);
+  cph.querySelector('[data-different="log"]')?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  realRouter.navigate = keepNav;
+  pathNavs.forEach(r => reached.add(r));
   // v4. One tap, always: the bottom navigation (index.html).
   [...fs.readFileSync(_gatePath("index.html"), "utf8").matchAll(/data-nav="([a-z-]+)"/g)].forEach(m => reached.add(m[1]));
   const MUST = ["classes", "checkin", "session-builder", "saved-sessions", "capture", "goal-setup",
-                "mobility-conditioning", "yoga-session", "noticing", "library", "know-what"];
+                "yoga-session", "noticing", "library", "know-what"];   // v6: mobility-conditioning retired on the Plan (see header)
   const missing = MUST.filter(r => !reached.has(r));
   ok("2a. every route the rooms and tiles led to is still reached", missing.length === 0,
      `unreachable: ${missing.join(", ")}. The v1 lesson: improvements extend what exists; they do not relocate it out of reach`);

@@ -1,6 +1,10 @@
 /**
  * views/plan-home.js
- * 31 Oct 2026 v5
+ * 31 Oct 2026 v6
+ *
+ * v6 - P-13 (true words). The Library row said "Classes, runs, the mind,
+ *   your lists, your week"; runs are behind Keep moving now, so it says
+ *   "Classes, practices, the mind, your lists, your week".
  *
  * v5 - STAGE PATH Session 7 (blueprint v6 Part F: Lately's numbers from
  *   data/progress-report.js, a touch-once exception planned there). Lately
@@ -283,7 +287,7 @@ export function renderPlanHome(ctx = {}) {
   const state = todayState(ctx.carry);
   const label = state === "carry" ? "Or instead" : (state === "week" || state === "rest") ? "Or something else today" : "Or choose for yourself";
   // Your week lives in the Library on the Plan (no card offers to plan it), so the row always names it.
-  const libSub = "Classes, runs, the mind, your lists, your week";
+  const libSub = "Classes, practices, the mind, your lists, your week";
   return `
     <div class="path-home">
       ${ctx.top || ""}
