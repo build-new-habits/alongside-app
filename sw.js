@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 01 Nov 2026 v698
+ * 01 Nov 2026 v699
  *
+ * v699 - P-20, fitness trends, part 4 (the Plan). Follow a fitness trend in Get stronger adds reformer-style Pilates with a band (a reformer class's order, a long band where the springs would be, slow and steady, with or without the floor, up to three days a week), the library's Mat Adaptation, and from week 9 Dynamic Pilates once a week. Log what I did: Body Balance is now Yoga or Pilates class on both tiers (the old name is a trademark), and the Plan's list adds Reformer class. A step under two minutes is said in seconds (it said 0.5 min). The Mat Adaptation card's steps are written out, with a bolster as optional kit.
  * v698 - P-20, fitness trends, parts 2 and 3 (Free unchanged). On the Plan, Follow a fitness trend adds HILIT: hard work, no jumping (five short bursts a round with a rest after each, nothing leaves the floor, standing or seated; two days a week at most, with a day off between) and, in Get stronger, Hybrid training (eight stations in order, each the version your kit allows; an easy walk between them in the first weeks, then a run, walk, ride, row or the cross trainer, your choice; stations that do not fit your time are left for another day and said; from week 11, the full eight at your own pace; no time kept). Two styles that had no rule now have one.
  * v697 - P-20, fitness trends, part 1 (Free unchanged). On the Plan, How would you like it? (behind Get stronger and Keep moving) offers Follow a fitness trend: Zone 2, mostly easy (one activity kept easy, with one harder day a week from week 5, its week said on Progress in words), a 10-minute snack (legs, a pull, your middle, balance or getting out of breath, standing or seated, from the kit you have) and Mix it up (two or three easy swaps for what you do most; you choose). Each says its effort by the talk test, with a safety line on a hard one. After a snack, Count this as a session; otherwise snacks on one day count as one day moved. NEW FILE precached: js/data/trend-recipes.js.
  * v696 - P-19 TRENDS-SCHEMA: Your week offers a fourth level, Hard (you can only say a few words at a time); the app can now remember which fitness trend you follow and when it started, and mark a short snack and whether you counted it as a session, ready for Follow a fitness trend. Nothing else changes on screen. store.js v119, Schema v1.117.
@@ -4245,7 +4246,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v698";
+const CACHE_NAME = "alongside-v699";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4353,7 +4354,7 @@ const SHELL_HASHES = {
   "./js/data/session-rationale.js": "f14d0d565eb7f9dc",
   "./js/data/personal-reads.js": "52141f31fa9d4fd0",
   "./js/data/field-contract.js": "d7d662025990b1fd",
-  "./js/views/activity-log.js": "40aa4a523bbc4c30",
+  "./js/views/activity-log.js": "8dbeb7d58332b07e",
   "./js/views/annual-reflection.js": "c1b1221672a0eb4a",
   "./js/views/community-impact.js": "b8537fe58e1f8f69",
   "./js/views/home-threshold.js": "17bc42808aa5bd5c",
@@ -4361,7 +4362,7 @@ const SHELL_HASHES = {
   "./js/views/programme-select.js": "115a22eeb9526be5",
   "./js/views/upgrade.js": "2a3e1f4ce77dbbac",
   "./js/views/privacy.js": "25721026cff47822",
-  "./js/views/library.js": "b694b0bfca860c6f",
+  "./js/views/library.js": "3e10593fc07a60f2",
   "./js/views/practices.js": "9890a7fa300e9d1c",
   "./js/views/red-flag.js": "d2f857d0f8ba905f",
   "./js/views/health-consent.js": "66c6f499c7863c7c",
@@ -4372,11 +4373,11 @@ const SHELL_HASHES = {
   "./js/data/tier-table.js": "7821c3304bd0815c",
   "./js/views/know-what.js": "4c4e9aa82b226bd6",
   "./js/views/plan-home.js": "7a6738b3d0e3d23e",
-  "./js/views/path.js": "81af5d4b114e0ce7",
+  "./js/views/path.js": "9825148786e0a1e6",
   "./js/plan-look.js": "7674d8fbf5101aa9",
   "./js/views/plan-finish.js": "67772c3957aee32e",
   "./js/data/outside.js": "3af4ea46bd898084",
-  "./js/data/trend-recipes.js": "0bb980223a363acb",
+  "./js/data/trend-recipes.js": "14961e4c12aef77e",
   "./js/data/path-context.js": "fc5643585fe6066e",
   "./css/components/path.css": "8183dd3b0eee6cf1",
   "./js/data/red-flag.js": "3cd9eecbc3985eb3",
@@ -4385,7 +4386,7 @@ const SHELL_HASHES = {
   "./js/data/restore.js": "fd3860a6ccd4e480",
   "./js/data/export-file.js": "bbee762322d0e4e2",
   "./js/data/health-consent-covers.js": "6698a3e50672cbbe",
-  "./js/data/kind-colours.js": "178ca1df919c83e9",
+  "./js/data/kind-colours.js": "1628adad116963b7",
   "./js/data/line-icons.js": "b746ddec419dc568",
   "./js/data/week-shape-model.js": "133f54fc7f23c44c",
   "./js/data/week-shape.js": "11aa21a058a7c640",
@@ -4417,7 +4418,7 @@ const SHELL_HASHES = {
   "./js/data/session-length.js": "d135da33af36c923",
   "./js/data/file-lock.js": "6428c4d49a58959b",
   "./js/data/messages.js": "252ee15828010efc",
-  "./js/data/evidence.js": "e4c368006fefebc6",
+  "./js/data/evidence.js": "9d0c194e256e2809",
   "./js/data/support-lines.js": "0c1286fa510e427e",
   "./js/data/consent-version.js": "c1a39ed44cc24157",
   "./js/views/my-programme.js": "b28f193145da0c1a",
@@ -4437,7 +4438,7 @@ const SHELL_HASHES = {
   "./js/data/classes/class-getting-going-009.js": "c92381f2c500c0a4",
   "./js/data/classes/class-from-the-feet-010.js": "cdbfa03ffea71774",
   "./js/data/scope-statement.js": "02dac4d3fb7a62fb",
-  "./js/data/activity-labels.js": "c2a6bc320d1d7fdd",
+  "./js/data/activity-labels.js": "5be29507e37604f5",
   "./js/views/class-player.js": "42620de997fa1226",
   "./js/views/class-list.js": "c5f80d89802bf845",
   "./css/components/class-list.css": "e33b073b352399f3",
@@ -4499,7 +4500,7 @@ const SHELL_HASHES = {
   "./js/data/feel-programmes.js": "ade4752f88834a40",
   "./js/data/stretch-routines.js": "5a5fa2e7598037fb",
   "./js/data/path-engine.js": "4072deb17d2f4edb",
-  "./js/data/exercises/pilates.js": "5741c325f65e935c",
+  "./js/data/exercises/pilates.js": "2428ed5f9e3f41cf",
   "./js/data/exercises/running.js": "c1fc520e1eb7ee8c",
   "./js/data/exercises/rehabilitation.js": "c2b00a8513421566",
   "./js/data/exercises/recovery.js": "779e8bf25bfbb6fb",
