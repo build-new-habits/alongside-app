@@ -1,6 +1,16 @@
 /**
  * tools/verify-progress-share.mjs
- * 17 Oct 2026 v4
+ * 01 Nov 2026 v5
+ *
+ * v5 - SUITE-FLAKE-6 (found 29 Oct, 00:20). Today's sessions, lifts, journal
+ *   entry, weight and check-in were dated 00:02 to 00:30, so in the first
+ *   half-hour after midnight some were in the future and 1c, 1g, 2a and 2b
+ *   failed. Each is now placed between midnight and now (today(f): a
+ *   fraction of the day so far, in the same order as before), and the sets
+ *   minutes before the session they belong to ended (during(), never before
+ *   midnight), so each is today, in the past and in its session at any
+ *   time of day. Proved with the clock pinned
+ *   to 00:20 (red before, green after) and to noon. No assertion changed.
  *
  * v4 - W6-8. 1g: "N sessions", not "You've moved N times" (W6-8: it counted breathing as moving).
  *
@@ -85,11 +95,17 @@ let navs = [];
 const router = { navigate: v => navs.push(v), history: [], back() {} };
 
 // ── The person: today, this week, older; and things that must stay home ──
+// v5: today, at a fraction f (0 to 1) of the day so far: always today, always past, order kept.
+const today = f => { const mid = new Date(); mid.setHours(0, 0, 0, 0); return new Date(mid.getTime() + Math.max(1000, Date.now() - mid.getTime()) * f).toISOString(); };
+// Sets are logged during the session they belong to: so many minutes before it ended, never before midnight
+// (the n-th one a few seconds after it, to keep their order).
+const during = (mins, n) => { const mid = new Date(); mid.setHours(0, 0, 0, 0); const end = new Date(today(0.90)).getTime();
+  return new Date(Math.max(mid.getTime() + (n + 1) * 1000, end - mins * 60000)).toISOString(); };
 const at = (daysAgo, h, m) => { const d = new Date(); d.setDate(d.getDate() - daysAgo); d.setHours(h, m, 0, 0); return d.toISOString(); };
 const SECRET = { journal: "JOURNALSECRET", note: "SESSIONNOTESECRET", lift: "LIFTNOTESECRET", weight: 83.4 };
 const LOG = [
-  { id: "t1", type: "breathing-session", completedAt: at(0, 0, 5), durationMins: 4, feel: "calmer" },
-  { id: "t2", type: "workout", sessionType: "upper", place: "gym", completedAt: at(0, 0, 30), durationMins: 42, feel: "right",
+  { id: "t1", type: "breathing-session", completedAt: today(0.12), durationMins: 4, feel: "calmer" },
+  { id: "t2", type: "workout", sessionType: "upper", place: "gym", completedAt: today(0.90), durationMins: 42, feel: "right",
     exerciseIds: ["gym-lat-pulldown", "dead-bug"], note: SECRET.note, notes: SECRET.note, moodAfter: "MOODAFTERSECRET", painChange: "PAINCHANGESECRET" },
   { id: "y1", type: "walk-session", completedAt: at(1, 12, 30), durationMins: 35, feel: "good" },
   { id: "p1", type: "workout", status: "partial", completedAt: at(2, 18, 0), durationMins: 6 },
@@ -102,20 +118,20 @@ const LOG = [
 const LIFTS = {
   "gym-lat-pulldown": [
     { at: at(1, 18, 0), weight: 30, reps: 10, unit: "kg" },                           // yesterday: not today's
-    { at: at(0, 0, 10), weight: 40, reps: 10, unit: "kg", note: SECRET.lift },
-    { at: at(0, 0, 12), weight: 40, reps: 10, unit: "kg" },
-    { at: at(0, 0, 14), weight: 42.5, reps: 8, unit: "kg" },
+    { at: during(20, 0), weight: 40, reps: 10, unit: "kg", note: SECRET.lift },
+    { at: during(18, 1), weight: 40, reps: 10, unit: "kg" },
+    { at: during(16, 2), weight: 42.5, reps: 8, unit: "kg" },
   ],
-  "dead-bug": [{ at: at(0, 0, 25), reps: 8 }],
+  "dead-bug": [{ at: during(5, 3), reps: 8 }],
 };
 const todayKey = new Date().toISOString().slice(0, 10);
 function person(tier = "personal", { consent = true } = {}) {
   localStorage.clear(); store.init(); agreed(store);
   store.set("onboardingComplete", true); store.set("tier", tier); store.set("name", "Graeme");
   store.set("activityLog", LOG); store.set("liftLog", LIFTS);
-  store.set("journalEntries", [{ id: "j", text: SECRET.journal, createdAt: at(0, 0, 3) }]);
-  store.set("weightTracking", true); store.set("weightLog", [{ at: at(0, 0, 3), kg: SECRET.weight }]);
-  store.set("checkinHistory", { [todayKey]: { energy: 6, mood: 7, conditionLevels: { "lower-back": 3 }, notes: "CHECKINNOTESECRET", savedAt: at(0, 0, 2) } });
+  store.set("journalEntries", [{ id: "j", text: SECRET.journal, createdAt: today(0.08) }]);
+  store.set("weightTracking", true); store.set("weightLog", [{ at: today(0.08), kg: SECRET.weight }]);
+  store.set("checkinHistory", { [todayKey]: { energy: 6, mood: 7, conditionLevels: { "lower-back": 3 }, notes: "CHECKINNOTESECRET", savedAt: today(0.05) } });
   if (!consent) store.set("consent.health", { given: false, at: null, version: null, withdrawnAt: new Date().toISOString() });
   navs = [];
 }
@@ -184,10 +200,10 @@ ok("2g. ... on today's report", main.querySelector('input[name="sh-window"]:chec
 const doc = txt(main.querySelector(".sh-report"));
 const tile = label => [...main.querySelectorAll(".shr-tile")].find(t => txt(t.querySelector("dt")) === label)?.querySelector("dd");
 ok("2h. the report says what, where and how many", /Lat Pulldown/.test(doc) && /At the gym/.test(doc) && txt(tile("sessions")) === "2" && txt(tile("sets logged")) === "4" && /46 minutes/.test(txt(tile("moving"))), doc.slice(0, 300));
-ok("2i. a move the library cannot name reads as words, not an id", R.movesFor({ exerciseIds: ["gone-move-x"], completedAt: at(0, 0, 30), durationMins: 10 }, {}, () => null)[0].name === "Gone move x");
+ok("2i. a move the library cannot name reads as words, not an id", R.movesFor({ exerciseIds: ["gone-move-x"], completedAt: today(0.90), durationMins: 10 }, {}, () => null)[0].name === "Gone move x");
 
 { // 2j: sessions logged without minutes never read "0 minutes of moving".
-  const noMins = [{ id: "n1", type: "class", completedAt: at(0, 0, 2) }, { id: "n2", type: "walk-session", completedAt: at(0, 0, 3) }];
+  const noMins = [{ id: "n1", type: "class", completedAt: today(0.05) }, { id: "n2", type: "walk-session", completedAt: today(0.08) }];
   const m0 = R.buildReport({ rangeKey: "today", completed: noMins, liftLog: {}, include: R.defaultsFor("report"), exerciseName });
   const said = [R.reportText(m0), R.reportCsv(m0), R.describeShare(m0, "picture"), R.describeShare(m0, "certificate")].join("\n");
   ok("2j. sessions with no minutes recorded: no \"0 minutes\" in what is shared", m0.totals.sessions === 2 && !/\b0 min|Time moving/.test(said), said.slice(0, 300));
