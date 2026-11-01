@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 01 Nov 2026 v695
+ * 01 Nov 2026 v696
  *
+ * v696 - P-19 TRENDS-SCHEMA: Your week offers a fourth level, Hard (you can only say a few words at a time); the app can now remember which fitness trend you follow and when it started, and mark a short snack and whether you counted it as a session, ready for Follow a fitness trend. Nothing else changes on screen. store.js v119, Schema v1.117.
  * v695 - P-13 finished (Free unchanged). On the Plan, Build a session and the Morning programme take the one look too: the heading at the left, ‹ Back before a session and Exit during it, no house button beside either, line icons and no emoji. Every room on the Plan now looks the same.
  * v694 - P-13, Classes (Free unchanged). On the Plan, Classes is one row per class (how long, where you'll be, what it's for); tap one to see it first: full or shorter, what to know before you start, its parts with their stick figures, then Start. In the class, Exit, and each part's figure.
  * v693 - P-13, Core and Yoga & Pilates (Free unchanged). On the Plan both take the one look: the heading at the left, ‹ Back before a session and Exit during it, no house button beside either, line icons in place of emoji, and Done to finish.
@@ -4242,7 +4243,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v695";
+const CACHE_NAME = "alongside-v696";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4308,7 +4309,7 @@ const SHELL_HASHES = {
   "./css/components/finish.css": "c33e298d5fcb92ae",
   "./js/app.js": "72054b00e54ad55b",
   "./js/router.js": "394b564ae6adb351",
-  "./js/store.js": "cd9732c41d483377",
+  "./js/store.js": "72b0b44c2b1e8182",
   "./js/session-log.js": "6134de4315842e05",
   "./js/exercise-feedback.js": "adba8549f444da2a",
   "./js/exercise-card.js": "78196b42671c67aa",
@@ -4383,7 +4384,7 @@ const SHELL_HASHES = {
   "./js/data/health-consent-covers.js": "6698a3e50672cbbe",
   "./js/data/kind-colours.js": "178ca1df919c83e9",
   "./js/data/line-icons.js": "b746ddec419dc568",
-  "./js/data/week-shape-model.js": "8b6720d92bedb6e5",
+  "./js/data/week-shape-model.js": "133f54fc7f23c44c",
   "./js/data/week-shape.js": "11aa21a058a7c640",
   "./js/data/warm-views.js": "73c268f74f004e8e",
   "./js/views/your-week.js": "51c281a7f8b15da0",
