@@ -1,7 +1,16 @@
 import { createRequire as __cr } from "node:module";
 /**
  * tools/verify-path-trends.mjs
- * 01 Nov 2026 v2
+ * 01 Nov 2026 v3
+ *
+ * v3 - P-20 session 3: Hybrid training in Get stronger (1c: cross, HILIT,
+ *   Hybrid training, the snack; Keep moving unchanged), and TEST 9 holds
+ *   it: eight stations in order, each version from the kit, the four held
+ *   movements never offered (their substitutes stand in), the burpee
+ *   always the no-jump version for now, no runs in block 1, everyone
+ *   choosing what goes between, left-out stations said, the full eight
+ *   from week 11, no time anywhere, two days a week at most. Nothing
+ *   loosened.
  *
  * v2 - P-20 session 2: HILIT joins both doors' lists (1a to 1c, the new
  *   order: Zone 2, Mix it up, HILIT, the snack), and TEST 8 holds it:
@@ -122,7 +131,7 @@ ok("1a. How offers Follow a fitness trend, saying what is behind it", vals().inc
 tapRow("trend");
 ok("1b. Keep moving: Zone 2, Mix it up, HILIT, the snack", step() === "trends" && h1() === "Follow a fitness trend" && vals().join() === "zone2,cross,hilit,snack", vals().join());
 fixture(); toHow("stronger"); tapRow("trend");
-ok("1c. Get stronger: Mix it up, HILIT and the snack, never Zone 2", vals().join() === "cross,hilit,snack", vals().join());
+ok("1c. Get stronger: Mix it up, HILIT, Hybrid training and the snack, never Zone 2", vals().join() === "cross,hilit,hybrid,snack", vals().join());
 ok("1d. no trademark anywhere on the step", !/hyrox|deka/i.test(main.textContent));
 
 // ── 2 ────────────────────────────────────────────────────────────────────
@@ -315,6 +324,50 @@ ok("8l. never a trademark", !/hyrox|deka/i.test(main.textContent));
 const marked = new Map([...BYID].map(([id, e]) => [id, id === "sit-to-stand" ? { ...e, impact: true } : id === "reverse-lunge" ? { ...e, movementPattern: "jump" } : e]));
 const guarded = R.hilitSession({ week: 1, minutes: 20, byId: marked });
 ok("8m. a pool movement marked impact or jump is never used (the library can change)", guarded && !guarded.steps.some(s => s.id === "sit-to-stand" || s.id === "reverse-lunge"), J(guarded?.steps.map(s => s.id)));
+
+// ── 9 ────────────────────────────────────────────────────────────────────
+console.log("\nTEST 9 - Hybrid training");
+const STATION_IDS = new Set(R.HYBRID_STATIONS.flatMap(s => s.versions.flat()));
+const hardOf = () => (practice()?.exercises || []).filter(e => /hard, at a pace/.test(e.pathNote || ""));
+fixture({ home: [], gym: ["gym-membership"] }); toHow("stronger", "gym"); tapRow("trend"); tapRow("hybrid");
+ok("9a. week 1: four stations with an easy walk between, no time kept; no between choice yet (no runs in block 1)", step() === "hybrid" && /week 1/.test(h1())
+   && /Four stations/.test(main.textContent) && /No time is kept/.test(main.textContent) && !main.querySelector('input[name="ybetween"]') && !vals().includes("full"), `${h1()} ${vals()}`);
+tapRow("go");
+ok("9b. followed, and a proposal: Hard with the safety line", (store.get("trends") || []).some(t => t.id === "hybrid") && step() === "prog" && !!main.querySelector("#path-hard-safety"));
+navs = []; click(main.querySelector("#path-start"));
+const h9 = hardOf();
+ok("9c. the first four stations, in order, each from its own column", h9.length === 4 && h9.every(e => STATION_IDS.has(e.id))
+   && /1\. Ski/.test(h9[0].pathNote) && /4\. Burpee broad jump/.test(h9[3].pathNote), J(h9.map(e => [e.id, e.pathNote])));
+ok("9d. the burpee is the no-jump version, two long steps forward said", h9[3].id === "step-back-burpee" && /two long steps forward/.test(h9[3].pathNote), J(h9[3]));
+ok("9e. no held movement anywhere", (practice()?.exercises || []).every(e => !R.HELD.includes(e.id)));
+ok("9f. between stations, an easy walk, not a run", (practice()?.exercises || []).filter(e => /Between/.test(e.pathNote || "")).every(e => e.id === "brisk-walk"));
+const b1run = R.hybridSession({ week: 2, between: "run", byId: BYID });
+ok("9f2. block 1 never runs between stations, even when a run was chosen before", b1run.steps.filter(s => /Between/.test(s.note)).every(s => s.id === "brisk-walk"), J(b1run.steps.filter(s => /Between/.test(s.note)).map(s => s.id)));
+ok("9g. nothing anywhere says a time to beat", !/personal best|your time|race pace|leaderboard/i.test(JSON.stringify(practice())));
+store.logActivity({ type: "workout", completedAt: new Date(Date.now() - 3 * 86400000).toISOString(), trend: "hybrid", effort: "hard", durationMins: 22 });
+store.set("activityLog", store.get("activityLog").filter(e => Date.parse(e.completedAt) < Date.now() - 86400000));
+path("stronger"); tapRow("gym"); tapRow("whole"); tapRow("trend"); tapRow("hybrid"); tapRow("go");
+navs = []; click(main.querySelector("#path-start"));
+ok("9h. the next day of block 1 is the second four (Row to Wall ball)", /5\. Row/.test(hardOf()[0]?.pathNote || "") && /8\. Wall ball/.test(hardOf().at(-1)?.pathNote || ""), J(hardOf().map(e => e.pathNote)));
+ok("9i. Wall ball is Medicine Ball Squat to Press at the gym (the wall ball is held)", hardOf().some(e => e.id === "medicine-ball-squat-press") && !hardOf().some(e => e.id === "wall-ball"), J(hardOf().map(e => e.id)));
+fixture({ home: [], gym: ["gym-membership"] });
+store.set("trends", [{ id: "hybrid", startedAt: store._localDay(new Date(Date.now() - 60 * 86400000)), activity: null }]);
+toHow("stronger", "gym"); tapRow("trend"); tapRow("hybrid");
+ok("9j. week 9: all eight, everyone chooses what goes between (a run or not), and from week 11 the full eight", /week 9/.test(h1())
+   && [...main.querySelectorAll('input[name="ybetween"]')].map(i => i.value).join() === "run,walk,ride,row,cross" && !vals().includes("full"), `${h1()} ${vals()}`);
+pick(main.querySelector('input[name="ybetween"][value="row"]')); pick(main.querySelector('input[name="ylen"][value="30"]')); tapRow("go");
+ok("9k. 30 minutes: stations left for another day, and said", /Left for another day, to fit your time:/.test(main.textContent) && /Wall ball/.test(main.textContent), txt(main.querySelector(".path-view")).slice(0, 300));
+navs = []; click(main.querySelector("#path-start"));
+ok("9l. what they chose goes between (a row)", (practice()?.exercises || []).filter(e => /Between/.test(e.pathNote || "")).every(e => /row/.test(e.id)), J((practice()?.exercises || []).filter(e => /Between/.test(e.pathNote || "")).map(e => e.id)));
+store.set("trends", [{ id: "hybrid", startedAt: store._localDay(new Date(Date.now() - 75 * 86400000)), activity: null }]);
+path("stronger"); tapRow("gym"); tapRow("whole"); tapRow("trend"); tapRow("hybrid");
+ok("9m. week 11: the full eight at your own pace is offered", /week 11/.test(h1()) && vals().includes("full"), `${h1()} ${vals()}`);
+pick(main.querySelector('input[name="ylen"][value="75"]')); tapRow("full"); navs = []; click(main.querySelector("#path-start"));
+ok("9n. the full eight: all eight stations, by its own name", hardOf().length === 8 && practice()?.title === "The full eight, at your own pace", J([practice()?.title, hardOf().map(e => e.id)]));
+fixture({ home: [], gym: [] }); toHow("stronger"); tapRow("trend"); tapRow("hybrid"); tapRow("go");
+navs = []; click(main.querySelector("#path-start"));
+ok("9o. at home with no kit: no kit in any station", hardOf().every(e => !(BYID.get(e.id)?.equipment || []).length), J(hardOf().map(e => e.id)));
+ok("9p. two Hybrid days this week: not allowed; two HILIT days do not count against it", !R.hybridDayAllowed(monWed.map(e => ({ ...e, trend: "hybrid" })), fri).ok && R.hybridDayAllowed(monWed, fri).ok);
 
 console.log(`\n${passes} passed, ${fails} failed`);
 process.exit(fails ? 1 : 0);

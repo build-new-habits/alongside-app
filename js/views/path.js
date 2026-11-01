@@ -1,6 +1,12 @@
 /**
  * views/path.js
- * 01 Nov 2026 v6
+ * 01 Nov 2026 v7
+ *
+ * v7 - P-20 session 3: Hybrid training (approved 01 Nov, Graeme; Get
+ *   stronger only). Its step says the week and the stations, asks how long
+ *   and what goes between the stations (everyone chooses, a run or not),
+ *   and from week 11 offers the full eight at your own pace. A station the
+ *   time leaves out is said, for another day. Never a time kept.
  *
  * v6 - P-20 session 2: HILIT (approved 01 Nov, Graeme: "HILIT: hard work,
  *   no jumping"; two days a week at most, never back to back). Follow a
@@ -112,7 +118,7 @@ import { equipmentForLocation } from "../session-builder.js";
 import { resolveEquipment, exerciseIsAvailable } from "../data/equipment-map.js";
 import { TRENDS, EFFORT, HARD_SAFETY, ZONE2_ACTIVITIES, zone2Week, zone2Session, zone2HardDoneThisWeek,
          SNACK_QUALITIES, snackSession, MAIN_ACTIVITIES, mainActivityFrom, crossOptions, recentTrendIds, plainName,
-         hilitWeek, hilitDayAllowed, hilitSession } from "../data/trend-recipes.js";
+         hilitWeek, hilitDayAllowed, hilitSession, HYBRID_BETWEEN, hybridWeek, hybridDayAllowed, hybridSession } from "../data/trend-recipes.js";
 
 const BY_ID = new Map([...EXERCISES, ...PATH_MOVEMENTS].map(e => [e.id, e]));
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -344,7 +350,7 @@ export function PathView(router) {
     trends() {
       return `${heading("Follow a fitness trend", "fresh", DOOR[st.door].kind)}
         <ul class="path-list">${trendsFor(st.door).map(([id, x]) => {
-          const w = id === "zone2" || id === "hilit" ? store.trendWeek(id) : null;
+          const w = ["zone2", "hilit", "hybrid"].includes(id) ? store.trendWeek(id) : null;
           return row({ v: id, t: x.name, d: esc(x.line) + (w ? ` · Week ${w}` : ""), icon: x.icon, kind: DOOR[st.door].kind }); }).join("")}</ul>`;
     },
     z2act() {
@@ -379,6 +385,21 @@ export function PathView(router) {
         <ul class="path-list">${row({ v: "go", t: "Today\u2019s HILIT", d: esc(EFFORT.hard), tint: true })}</ul>` : `<p class="path-note" id="path-hilit-why">${esc(day.why)}</p>`}
         ${followed("hilit") ? `<ul class="path-list">${row({ v: "stop", t: "Stop following HILIT" })}</ul>` : ""}
         <p class="path-small">Two HILIT days a week at most, with a day off between.</p>`;
+    },
+    hybrid() {
+      const wk = hybridWeek(store.trendWeek("hybrid") || 1);
+      const day = hybridDayAllowed(store.get("activityLog") || []);
+      const what = wk.block === 1 ? `Four stations, ${wk.each} minutes each, with an easy walk between.` : `${wk.stations} stations, about ${Math.round(wk.each)} minutes each, with ${wk.between >= 3 ? "3 minutes" : "2 or 3 minutes"} between.`;
+      return `${heading(`Hybrid training, week ${wk.week}`, "strength", DOOR[st.door].kind)}
+        <p class="path-coachline">${esc(what)}${wk.easier ? " This is an easier week." : ""} No time is kept.</p>
+        ${day.ok ? `${radios("ylen", "How long have you got?", [["30", "30 min"], ["45", "45 min"], ["60", "60 min"], ["75", "75 min"]], st.ylen || "45")}
+        ${wk.runs ? radios("ybetween", "Between the stations", HYBRID_BETWEEN.map(b => [b.id, b.label]), st.ybetween || "walk") : ""}
+        <ul class="path-list">
+          ${row({ v: "go", t: "Today\u2019s stations", d: esc(EFFORT.hard), tint: true })}
+          ${wk.fullEight ? row({ v: "full", t: "The full eight, at your own pace", d: "All eight stations, in order. Nothing is timed." }) : ""}
+        </ul>` : `<p class="path-note" id="path-hybrid-why">${esc(day.why)}</p>`}
+        ${followed("hybrid") ? `<ul class="path-list">${row({ v: "stop", t: "Stop following Hybrid training" })}</ul>` : ""}
+        <p class="path-small">Two days a week at most, with a day off between.</p>`;
     },
     squal() {
       const mine = SNACK_QUALITIES.filter(q => q.door === st.door || (st.door === "moving" && q.id === "legs"));
@@ -593,7 +614,18 @@ export function PathView(router) {
         }
         if (v === "snack") return go("squal", {});
         if (v === "hilit") return go("hilit", {});
+        if (v === "hybrid") return go("hybrid", {});
         return;
+      case "hybrid": {
+        if (v === "stop") { store.stopTrend("hybrid"); say("Stopped following Hybrid training."); trail.pop(); step = "trends"; paint(); return; }
+        if (!hybridDayAllowed(store.get("activityLog") || []).ok) return;
+        const done = (store.get("activityLog") || []).filter(e => e && e.trend === "hybrid" && e.status !== "partial").length;
+        const s = hybridSession({ ...recipeIn(), week: store.trendWeek("hybrid") || 1, minutes: Number(st.ylen || 45), half: done % 2,
+                                  between: st.ybetween || "walk", full: v === "full" });
+        if (!s) { say("Nothing fits with the kit you have there."); return; }
+        if (!followed("hybrid")) store.startTrend("hybrid");
+        return trendProg(s.leftOut.length ? { ...s, support: `Left for another day, to fit your time: ${s.leftOut.join(", ")}.` } : s);
+      }
       case "hilit": {
         if (v === "stop") { store.stopTrend("hilit"); say("Stopped following HILIT."); trail.pop(); step = "trends"; paint(); return; }
         if (!hilitDayAllowed(store.get("activityLog") || []).ok) return;
@@ -701,6 +733,8 @@ export function PathView(router) {
     root.querySelectorAll('input[name="sseat"]').forEach(r => r.addEventListener("change", () => { st.sseat = r.value; }));
     root.querySelectorAll('input[name="hlen"]').forEach(r => r.addEventListener("change", () => { st.hlen = r.value; }));
     root.querySelectorAll('input[name="hseat"]').forEach(r => r.addEventListener("change", () => { st.hseat = r.value; }));
+    root.querySelectorAll('input[name="ylen"]').forEach(r => r.addEventListener("change", () => { st.ylen = r.value; }));
+    root.querySelectorAll('input[name="ybetween"]').forEach(r => r.addEventListener("change", () => { st.ybetween = r.value; }));
     root.querySelector("#path-build")?.addEventListener("click", () => {
       store.set("requestedSessionType", sessionTypeFor(st.door, st.part));
       store.set("requestedLocation", st.place);

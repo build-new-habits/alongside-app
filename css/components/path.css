@@ -1,6 +1,9 @@
 /* ============================================================
    components/path.css
-   01 Nov 2026 v10
+   01 Nov 2026 v11
+
+   v11 - P-20: .path-effort and .pr-trend have their own rules (verify-css
+   found them classes with none on v697).
 
    v10 - P-20 TRENDS-BUILD session 1: the Plan finish's Count this as a
    session (a snack), a 44 px target.
@@ -407,3 +410,6 @@ body:has(#main-content .plan-back, #main-content .plan-exit) #hidden-nav-home-bt
 .pf-count { margin: 0.75rem 0; }
 .pf-count__lbl { display: flex; align-items: center; gap: 0.6rem; min-height: 44px; font-size: var(--text-base, 1rem); }
 .pf-count__lbl input { width: 1.4rem; height: 1.4rem; flex: none; }
+/* P-20: a trend session's effort in the talk test's words, and Progress's Zone 2 week. */
+.path-effort { font-weight: 600; }
+.pr-trend { margin: 1rem 0; }

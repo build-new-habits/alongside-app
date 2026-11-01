@@ -1,6 +1,15 @@
 /**
  * js/data/trend-recipes.js
- * 01 Nov 2026 v2
+ * 01 Nov 2026 v3
+ *
+ * v3 - P-20 session 3: Hybrid training (approved 01 Nov, Graeme: BNH-Files
+ *   Product/alongside_content_trends-hybrid_01nov2026_v2.md). Eight stations
+ *   in a fixed order; each station's version chosen from the person's kit
+ *   (the race versions at a gym that has them, a band or dumbbell at home,
+ *   no kit at all), the four new movements held until the clinical read so
+ *   their stated substitutes stand in. Between stations, the person's own
+ *   choice: a run, a brisk walk, a ride, a row or the cross trainer. Runs
+ *   come late and short: block 1 has none. No time is kept.
  *
  * v2 - P-20 session 2: HILIT, hard work with no jumping (approved 01 Nov,
  *   Graeme: BNH-Files Product/alongside_content_trends-hilit_01nov2026_v2.md).
@@ -68,6 +77,7 @@ export const TRENDS = Object.freeze({
   zone2: { name: "Zone 2, mostly easy", short: "Zone 2", line: "Mostly easy, with one harder day.", doors: ["moving"], icon: "run" },
   cross: { name: "Mix it up", short: "cross training", line: "Cross training: swap one day for something that uses your body differently.", doors: ["moving", "stronger"], icon: "fresh" },
   hilit: { name: "HILIT: hard work, no jumping", short: "HILIT", line: "Short bursts, then a rest. Nothing leaves the floor.", doors: ["stronger", "moving"], icon: "strength" },
+  hybrid: { name: "Hybrid training", short: "hybrid training", line: "Eight stations of strength and fitness, at your own pace.", doors: ["stronger"], icon: "strength" },
   snack: { name: "A 10-minute snack", short: "a 10-minute snack", line: "A short burst for one thing. Ten minutes still counts.", doors: ["stronger", "moving"], icon: "sparkle" },
 });
 
@@ -262,17 +272,25 @@ export function hilitWeek(week) {
 }
 
 /**
+ * Two days a week at most (Monday to Sunday), never on the day after
+ * another, for a hard trend. Returns { ok, why }.
+ */
+export function hardTrendDayAllowed(trend, label, log = [], now = new Date()) {
+  const day = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const monday = new Date(day); monday.setDate(day.getDate() - ((day.getDay() + 6) % 7));
+  const yesterday = new Date(day); yesterday.setDate(day.getDate() - 1);
+  const done = log.filter(e => e && e.trend === trend && e.status !== "partial").map(e => Date.parse(e.completedAt || e.date)).filter(Number.isFinite);
+  if (done.some(t => t >= yesterday.getTime())) return { ok: false, why: `You did ${label} yesterday or today. It works best with a day off between.` };
+  if (done.filter(t => t >= monday.getTime()).length >= 2) return { ok: false, why: `That\u2019s two ${label} days this week, which is plenty. The rest of the week is for something easier.` };
+  return { ok: true, why: "" };
+}
+
+/**
  * Can a HILIT day be offered today? Two a week (Monday to Sunday) at most,
  * never on the day after another. Returns { ok, why }.
  */
 export function hilitDayAllowed(log = [], now = new Date()) {
-  const day = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const monday = new Date(day); monday.setDate(day.getDate() - ((day.getDay() + 6) % 7));
-  const yesterday = new Date(day); yesterday.setDate(day.getDate() - 1);
-  const done = log.filter(e => e && e.trend === "hilit" && e.status !== "partial").map(e => Date.parse(e.completedAt || e.date)).filter(Number.isFinite);
-  if (done.some(t => t >= yesterday.getTime())) return { ok: false, why: "You did HILIT yesterday or today. It works best with a day off between." };
-  if (done.filter(t => t >= monday.getTime()).length >= 2) return { ok: false, why: "That\u2019s two HILIT days this week, which is plenty. The rest of the week is for something easier." };
-  return { ok: true, why: "" };
+  return hardTrendDayAllowed("hilit", "HILIT", log, now);
 }
 
 /**
@@ -318,6 +336,95 @@ export function hilitSession({ week = 1, minutes = 30, place = "home", seated = 
   const total = Math.round(steps.reduce((a, s) => a + s.mins, 0));
   return labelled({ id: `trend-hilit-${rounds}`, trend: "hilit", effort: "hard", name: "HILIT: hard work, no jumping", minutes: total, steps,
     line: "Hard comes from moving steadily for the whole burst, not from going faster." }, byId);
+}
+
+// ── Hybrid training (Hybrid draft §2 to §4) ──────────────────────────────
+
+/**
+ * The eight stations, in order. Each lists its versions, the race version
+ * first: the first the person's kit allows (and that is not Not again or
+ * held) is the one shown; the rest of that column are its swaps. A version
+ * may be two movements done in halves (a row without a rower).
+ */
+export const HYBRID_STATIONS = Object.freeze([
+  { id: "ski",    label: "Ski",                        versions: [["gym-ski-erg-intervals"], ["band-kneeling-pulldown"], ["step-jacks"]] },
+  { id: "push",   label: "Sled push",                  versions: [["gym-sled-push"], ["gym-treadmill-incline-walk"], ["stair-climbing"]] },
+  { id: "pull",   label: "Sled pull",                  versions: [["sled-pull"], ["band-bent-over-row"], ["dumbbell-row"], ["inverted-row-table"]] },
+  { id: "burpee", label: "Burpee broad jump",          versions: [["burpee-broad-jump"], ["step-back-burpee"]], noJumpNote: "Then two long steps forward" },
+  { id: "row",    label: "Row",                        versions: [["cardio-rowing-intervals"], ["gym-cross-trainer-intervals"], ["band-bent-over-row", "sit-to-stand"], ["sit-to-stand", "step-jacks"]] },
+  { id: "carry",  label: "Farmer\u2019s carry",        versions: [["gym-farmers-carry-heavy"], ["farmers-carry"], ["suitcase-carry"], ["gym-kettlebell-suitcase-carry"], ["bear-hold"]] },
+  { id: "lunge",  label: "Walking lunge with a load",  versions: [["loaded-walking-lunge"], ["dumbbell-reverse-lunge"], ["reverse-lunge"]] },
+  { id: "ball",   label: "Wall ball",                  versions: [["wall-ball"], ["medicine-ball-squat-press"], ["squat-to-reach"]] },
+]);
+
+/** What goes between stations, the person's choice; the easy session for it. */
+export const HYBRID_BETWEEN = Object.freeze([
+  { id: "run",   label: "A run",              ids: ["walk-run-intervals", "run-easy-20"] },
+  { id: "walk",  label: "A brisk walk",       ids: ["brisk-walk", "treadmill-easy-walk-warmup"] },
+  { id: "ride",  label: "A ride",             ids: ["bike-easy-spin-warmup", "cycle-easy-spin"] },
+  { id: "row",   label: "A row",              ids: ["rower-easy-warmup", "cardio-rowing-easy"] },
+  { id: "cross", label: "The cross trainer",  ids: ["cross-trainer-easy-warmup"] },
+]);
+
+/** The shape of a Hybrid week: stations, minutes each, minutes between, the easier week. */
+export function hybridWeek(week) {
+  const w = Math.min(12, Math.max(1, Math.floor(Number(week) || 1)));
+  const block = Math.ceil(w / 4), easier = ((w - 1) % 4) + 1 === 4;
+  const [stations, each, between] = block === 1 ? [4, 2, 1] : block === 2 ? [6, 2.5, 2.5] : [8, 3, 3];
+  return { week: w, block, easier, stations: easier ? (block === 3 ? 6 : stations - 1) : stations, each, between, runs: block > 1, fullEight: w >= 11 };
+}
+
+export function hybridDayAllowed(log = [], now = new Date()) {
+  return hardTrendDayAllowed("hybrid", "Hybrid training", log, now);
+}
+
+/**
+ * A Hybrid training session. half: which four stations in block 1 (0 the
+ * first four, 1 the second; alternate days). between: the person's choice
+ * (HYBRID_BETWEEN id). minutes caps the length: stations are left for
+ * another day from the end, never the warm-up or cool-down, and the
+ * session says which (leftOut). full: the full eight at your own pace
+ * (from week 11). Never keeps a time.
+ */
+export function hybridSession({ week = 1, minutes = 60, half = 0, between = "walk", full = false, byId, available = () => true, prefs = {}, liked = {} }) {
+  const wk = hybridWeek(week);
+  const usable = id => { const e = byId.get(id); return !!e && !HELD.includes(id) && prefs[id]?.preference !== "avoid" && available(e); };
+  const version = st => {
+    const ok = st.versions.filter(v => v.every(usable));
+    return ok.length ? { ids: ok[0], swaps: [...new Set(ok.slice(1).filter(v => v.length === 1).map(v => v[0]))] } : null;
+  };
+  const mode = HYBRID_BETWEEN.find(b => b.id === between) || HYBRID_BETWEEN[1];
+  const easyOf = b => b.ids.find(usable) || "brisk-walk";
+  const betweenId = wk.runs || full ? easyOf(mode) : "brisk-walk";
+  let order = full ? HYBRID_STATIONS : wk.block === 1 ? HYBRID_STATIONS.slice(half ? 4 : 0, half ? 8 : 4) : HYBRID_STATIONS;
+  const count = full ? 8 : Math.min(order.length, wk.stations);
+  let chosen = order.slice(0, count).map(st => ({ st, v: version(st) })).filter(x => x.v);
+  const each = full ? 3 : wk.each, gap = full ? 4 : wk.between;
+  const fixed = 6 + 5;   // warm-up and cool-down
+  const lengthOf = n => fixed + n * each + Math.max(0, n - 1) * gap;
+  const cap = Number(minutes) > 0 ? Number(minutes) : 999;
+  const leftOut = [];
+  while (chosen.length > 2 && lengthOf(chosen.length) > cap) leftOut.unshift(chosen.pop().st.label);
+  if (!chosen.length) return null;
+  const steps = [
+    { id: betweenId, mins: 3, note: "Warm up, easy" },
+    { id: "squat-to-reach", mins: 1, note: "Warm up, easy" },
+    { id: "step-jacks", mins: 1, note: "Warm up, easy" },
+    { id: chosen[0].v.ids[0], mins: 1, note: `${chosen[0].st.label}, easy, to practise` },
+  ];
+  chosen.forEach(({ st, v }, i) => {
+    const per = each / v.ids.length;
+    v.ids.forEach(id => steps.push({ id, mins: per, note: `${HYBRID_STATIONS.indexOf(st) + 1}. ${st.label}${id === "step-back-burpee" ? ` \u00b7 ${st.noJumpNote}` : ""} \u00b7 hard, at a pace you can keep`, swaps: v.ids.length === 1 ? v.swaps : [] }));
+    if (i < chosen.length - 1) steps.push({ id: betweenId, mins: gap, note: wk.runs || full ? "Between stations, steady" : "Between stations, an easy walk" });
+  });
+  steps.push({ id: easyOf(HYBRID_BETWEEN[1]), mins: 2, note: "Cool down, easy" });
+  if (byId.has("sport-cooldown-general")) steps.push({ id: "sport-cooldown-general", mins: 3, note: "Cool down" });
+  return labelled({
+    id: full ? "trend-hybrid-full" : `trend-hybrid-${wk.block}-${half ? "b" : "a"}`, trend: "hybrid", effort: "hard",
+    name: full ? "The full eight, at your own pace" : "Hybrid training", minutes: Math.round(steps.reduce((a, s) => a + s.mins, 0)), steps,
+    stations: chosen.map(x => x.st.label), leftOut,
+    line: full ? "Nothing is timed. Go at a pace you could keep going at." : "Go at a pace you can keep for the whole station.",
+  }, byId);
 }
 
 // ── Cross training (draft §5) ────────────────────────────────────────────
