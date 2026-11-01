@@ -1,6 +1,10 @@
 /**
  * js/data/figures/index.js
- * 28 Oct 2026 v3
+ * 01 Nov 2026 v4
+ *
+ * v4 - P-20, the held entries: batch 16, the ten new trend movements
+ *   (data/exercises/held_movements.js), held until the clinical read and
+ *   offered nowhere; drawn so they can be reviewed.
  *
  * v3 - STAGE PATH P-9: batch 15, the twenty Move to feel better movements
  *   (data/exercises/path_movements.js, kept out of EXERCISES; Plan only).
@@ -35,11 +39,12 @@ import { FIGURES_12 } from "./batch-12.js";
 import { FIGURES_13 } from "./batch-13.js";
 import { FIGURES_14 } from "./batch-14.js";
 import { FIGURES_15 } from "./batch-15.js";
+import { FIGURES_16 } from "./batch-16.js";
 
 export const FIGURE_BATCHES = Object.freeze([
   FIGURES_01, FIGURES_02, FIGURES_03, FIGURES_04, FIGURES_05, FIGURES_06, FIGURES_07,
   FIGURES_08, FIGURES_09, FIGURES_10, FIGURES_11, FIGURES_12, FIGURES_13,
-  FIGURES_14, FIGURES_15,
+  FIGURES_14, FIGURES_15, FIGURES_16,
 ]);
 
 export const FIGURES = Object.freeze(Object.assign({}, ...FIGURE_BATCHES));

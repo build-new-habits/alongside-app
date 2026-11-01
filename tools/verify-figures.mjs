@@ -1,6 +1,11 @@
 /**
  * tools/verify-figures.mjs
- * 28 Oct 2026 v3
+ * 01 Nov 2026 v4
+ *
+ * v4 - P-20 held entries. Re-pointed, not loosened: "a real exercise" now
+ *   also includes the ten held trend movements (data/exercises/
+ *   held_movements.js, offered nowhere until the clinical read); 1d new:
+ *   every one of them drawn.
  *
  * v3 - 1c counts the twenty-three new movements (L4's three Pilates stretches).
  *
@@ -46,6 +51,7 @@ const B = new URL("../js/", import.meta.url).href;
 const { store } = await import(B + "store.js");
 const { EXERCISES } = await import(B + "data/exercises/index.js");
 const { PATH_MOVEMENTS } = await import(B + "data/exercises/path_movements.js");
+const { HELD_MOVEMENTS } = await import(B + "data/exercises/held_movements.js");
 const { FIGURES } = await import(B + "data/figures/index.js");
 const FG = await import(B + "figures.js");
 const CARD = await import(B + "exercise-card.js");
@@ -64,11 +70,14 @@ console.log("\nTEST 1 - every exercise has a figure");
 const ids = new Set(EXERCISES.map(e => e.id));
 const missing = [...ids].filter(id => !FG.hasFigure(id));
 const pathIds = new Set(PATH_MOVEMENTS.map(e => e.id));
-const stray = Object.keys(FIGURES).filter(id => !ids.has(id) && !pathIds.has(id));
+const heldIds = new Set(HELD_MOVEMENTS.map(e => e.id));
+const stray = Object.keys(FIGURES).filter(id => !ids.has(id) && !pathIds.has(id) && !heldIds.has(id));
 ok(`1a. all ${ids.size} exercises are drawn`, ids.size > 500 && missing.length === 0, missing.slice(0, 20).join(", "));
 ok("1b. every figure is a real exercise", stray.length === 0, stray.join(", "));
 const pathMissing = [...pathIds].filter(id => !FG.hasFigure(id));
 ok(`1c. all ${pathIds.size} Move to feel better movements are drawn`, pathIds.size === 23 && pathMissing.length === 0, pathMissing.join(", "));
+const heldMissing = [...heldIds].filter(id => !FG.hasFigure(id));
+ok(`1d. all ${heldIds.size} held trend movements are drawn`, heldIds.size === 10 && heldMissing.length === 0, heldMissing.join(", "));
 
 // ── 2. EACH FRAME ───────────────────────────────────────────────────────
 console.log("\nTEST 2 - every frame is captioned, described and inside its frame");
