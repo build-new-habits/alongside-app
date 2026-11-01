@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 01 Nov 2026 v694
+ * 01 Nov 2026 v695
  *
+ * v695 - P-13 finished (Free unchanged). On the Plan, Build a session and the Morning programme take the one look too: the heading at the left, ‹ Back before a session and Exit during it, no house button beside either, line icons and no emoji. Every room on the Plan now looks the same.
  * v694 - P-13, Classes (Free unchanged). On the Plan, Classes is one row per class (how long, where you'll be, what it's for); tap one to see it first: full or shorter, what to know before you start, its parts with their stick figures, then Start. In the class, Exit, and each part's figure.
  * v693 - P-13, Core and Yoga & Pilates (Free unchanged). On the Plan both take the one look: the heading at the left, ‹ Back before a session and Exit during it, no house button beside either, line icons in place of emoji, and Done to finish.
  * v692 - P-13, the mind rooms (Free unchanged). On the Plan, Breathing, Something quieter and In Step take the one look: the heading at the left, ‹ Back before a practice and Exit while it runs, no house button beside it, line icons in place of emoji, and Done to finish.
@@ -4241,7 +4242,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v694";
+const CACHE_NAME = "alongside-v695";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4438,7 +4439,7 @@ const SHELL_HASHES = {
   "./css/components/class-list.css": "e33b073b352399f3",
   "./css/components/class-player.css": "401cc57d7d39dbb1",
   "./js/views/saved-sessions.js": "bb7b1a61c1e2837f",
-  "./js/views/session-builder-ui.js": "4bff89344b105d5c",
+  "./js/views/session-builder-ui.js": "30c36be8e7a979d4",
   "./js/views/noticing.js": "afb617785e39e18d",
   "./js/views/in-step.js": "54f53470958ac62f",
   "./js/data/in-step-scenarios.js": "b46f085cda4d24fc",
@@ -4448,7 +4449,7 @@ const SHELL_HASHES = {
   "./js/views/prescribed-session.js": "105d69a0d22b6318",
   "./js/views/quiet-session.js": "eb439e800dc71d74",
   "./js/views/breathing-session.js": "3d049d83a8e783b9",
-  "./js/views/morning-session.js": "c261f642db4bb8de",
+  "./js/views/morning-session.js": "549fd3efaac3eb67",
   "./js/views/core-session.js": "dd82e73cd721e233",
   "./js/views/yoga-session.js": "86d3266d0ac27e7b",
   "./js/views/walk-session.js": "67b2bcd2f265307f",
