@@ -1,7 +1,14 @@
 /**
  * js/views/class-player.js
  *
- * 30 Sep 2026 v5
+ * 01 Nov 2026 v6
+ *
+ * v6 - P-13 Classes (mock-up v1 approved by Graeme, 01 Nov). On the Plan
+ *   only, the one look: the way out says Exit (it said "✕ Leave"; its
+ *   spoken name says Exit and the class) with no house beside it, the
+ *   class's name the heading at the left, and the part's stick figure where
+ *   the part has one. Its timing, Pause and Move on are unchanged. With no
+ *   class open, a heading and "‹ Back". Free unchanged.
  *
  * v5 - W3-3 CLASS-FINISH (Wave 3). The class is the finish screen's entry:
  *   currentActivityEntry is set when the class is logged. It was never
@@ -93,6 +100,15 @@
 import { prefersReducedMotion } from '../display-prefs.js';
 
 import { store } from '../store.js';
+import { isPremium } from '../auth.js';
+import { hasFigure, renderFigure } from '../figures.js';
+// v6. The part's stick figure (the Plan's): the first exercise in it that has one, first frame.
+function _partFig(sec) {
+  const id = (sec?.beats || []).map(b => b.practiceId || b.exerciseId).find(x => x && hasFigure(x));
+  if (!id) return '';
+  const h = renderFigure(id); const i = h.indexOf('<svg'), j = h.indexOf('</svg>');
+  return i < 0 || j < 0 ? '' : `<div class="class-player__fig" aria-hidden="true">${h.slice(i, j + 6)}</div>`;
+}
 import { isGateDue, renderSafetyGate, attachSafetyGate } from '../safety-gate.js';
 import { router } from '../router.js';
 import { CLASSES } from '../data/classes/index.js';
@@ -187,6 +203,12 @@ export function render() {
   _load();
 
   if (!_cls) {
+    if (isPremium()) return `
+      <div class="view class-player is-plan">
+        <button class="btn btn-ghost plan-back" id="cp-home" aria-label="Back to today">‹ Back</button>
+        <h1 tabindex="-1">No class open</h1>
+        <p class="text-secondary">That class is no longer available. Nothing has been lost — pick another whenever you want to.</p>
+      </div>`;
     return `
       <div class="view class-player">
         <h1 tabindex="-1">No class open</h1>
@@ -222,11 +244,13 @@ export function render() {
   const spoken = beat ? voiceFor(beat, { lighter: _lighter }) : '';
   const held = typeof beat?.holdSeconds === 'number';
 
+  const plan = isPremium();
   return `
-    <div class="view class-player">
+    ${plan ? `<div class="view class-player is-plan">` : `<div class="view class-player">`}
       <div class="class-player__head">
-        <button class="btn btn-ghost" id="cp-exit"
-                aria-label="Leave ${_esc(_cls.title)}">✕ Leave</button>
+        ${plan ? `<button class="btn btn-ghost plan-exit" id="cp-exit"
+                aria-label="Exit ${_esc(_cls.title)}">Exit</button>` : `<button class="btn btn-ghost" id="cp-exit"
+                aria-label="Leave ${_esc(_cls.title)}">✕ Leave</button>`}
         <span class="class-player__where">
           ${st.sectionIndex + 1} of ${_sections.length}
         </span>
@@ -234,7 +258,8 @@ export function render() {
 
       <h1 class="class-player__title" tabindex="-1">${_esc(_cls.title)}</h1>
       <h2 class="class-player__section">${_esc(sec.title)}</h2>
-
+${plan ? `      ${_partFig(sec)}
+` : ''}
       <!--
         PLAYER-1. role="status" because the beat changes ON A TIMER, under
         somebody who may be lying on the floor with their eyes shut. Same

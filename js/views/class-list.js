@@ -1,7 +1,17 @@
 /**
  * js/views/class-list.js
  *
- * 02 Oct 2026 v6
+ * 01 Nov 2026 v7
+ *
+ * v7 - P-13 Classes (mock-up v1 approved by Graeme, 01 Nov: "Yes, build
+ *   it"; trace P-12 F2, F6). On the Plan only: one row per class (how
+ *   long, where you'll be, what it is for; Your arc where it feeds it),
+ *   no buttons until one is chosen (there were twenty); then the class's
+ *   own page, the shape of Today's plan: Full or Shorter as one choice,
+ *   Before you start in sentences (the flags were hyphenated words), its
+ *   parts with their minutes and the stick figure where a part has one,
+ *   and Start. Not today still names what is left out and why. Free
+ *   unchanged.
  *
  * v6 - W5-2 BAD-DAY-DOORS. On a Bad day Classes asks Rest today / Something
  *   gentler first (views/bad-day-door.js).
@@ -82,7 +92,10 @@
 import { store } from '../store.js';
 import { router } from '../router.js';
 import { CLASSES, classSafety, seatedThroughout } from '../data/classes/index.js';
-import { durationLabel, sectionsFor } from '../data/class-contract.js';
+import { durationLabel, sectionsFor, lighterMinutes } from '../data/class-contract.js';
+import { isPremium } from '../auth.js';
+import { lineIcon } from '../data/line-icons.js';
+import { hasFigure, renderFigure } from '../figures.js';
 import { STRANDS } from '../data/aims.js';
 import { startClass } from './class-player.js';
 import { badDayIds, renderBadDayDoor, wireBadDayDoor } from './bad-day-door.js';
@@ -117,7 +130,97 @@ function _conditions() {
   };
 }
 
-export function render() {
+// ── v7: the Plan's Classes ─────────────────────────────────────────────
+let _chosen = null;          // the class whose page is open (the Plan's), or null for the list
+let _short  = false;         // Full or Shorter, on that page
+
+const WHERE = { floor: 'on the floor', seated: 'seated', standing: 'standing', walking: 'walking, outdoors', mixed: 'floor optional' };
+// Each flag, said in a sentence (Before you start). An unknown flag is said in its own words.
+const SAY = {
+  'floor-transfer': "You'll get down onto the floor and back up.",
+  'up-and-down-once': "You'll get down to the floor and up again, once.",
+  'repeated-up-and-down': "You'll get down to the floor and back up more than once.",
+  'getting-down-and-up': "You'll get down to the floor and back up.",
+  'floor-position': 'Most of it is on the floor.',
+  'floor-optional': 'The floor is optional.',
+  'no-floor': 'Nothing on the floor.',
+  'bending-forward': 'It bends forward.',
+  'mostly-seated': 'Mostly seated.',
+  'standing-with-support': 'Some standing, holding something steady.',
+  'standing-throughout': 'Standing throughout.',
+  'needs-a-chair': "You'll need a chair.",
+  'one-held-position': 'One position is held for a while.',
+  'holding-positions': 'Some positions are held for a while.',
+  'eyes-closed-offered': 'Closing your eyes is offered, never needed.',
+  'body-focused-attention': 'It asks you to notice your body.',
+  'deliberately-stopping-short': 'It stops before the end of each movement, on purpose.',
+  'outdoors': "It's outside.",
+  'going-alone': 'You do it on your own.',
+  'uneven-ground': 'The ground may be uneven.',
+  'weather-and-light': 'Mind the weather and the light.',
+};
+const _say = f => SAY[f] || (String(f).replace(/-/g, ' ').replace(/^./, c => c.toUpperCase()) + '.');
+const _mins = secs => Math.max(1, Math.round(secs / 60));
+// The part's stick figure: the first exercise in it that has one.
+function _figFor(sec) {
+  const id = (sec.beats || []).map(b => b.practiceId || b.exerciseId).find(x => x && hasFigure(x));
+  if (!id) return '';
+  const h = renderFigure(id); const i = h.indexOf('<svg'), j = h.indexOf('</svg>');
+  return i < 0 || j < 0 ? '' : h.slice(i, j + 6);
+}
+
+function _planList(rows, open, held) {
+  const chev = `<span class="path-door__chev" aria-hidden="true">${lineIcon('chevron', 20)}</span>`;
+  return `
+    <div class="view class-list is-plan">
+      <button class="btn btn-ghost plan-back" id="cl-back" aria-label="Back to Home">‹ Back</button>
+      <h1 class="class-list__title" tabindex="-1">Classes</h1>
+      <p class="class-list__intro">Follow along, start to finish. Pick one to see what\u2019s in it.</p>
+      ${open.length ? `<ul class="path-list">${open.map(r => `<li><button type="button" class="path-door path-row" data-class="${_esc(r.cls.id)}">
+          <span class="kind-tile k-rose">${lineIcon('classes')}</span>
+          <span class="path-door__text"><span class="path-door__t">${_esc(r.cls.title)}${r.inArc ? ' <span class="path-badge">Your arc</span>' : ''}</span>
+            <span class="path-door__d">${Math.round(r.cls.durationMins)} min \u00b7 ${_esc(WHERE[r.cls.position] || r.cls.position)}${r.seatable && r.cls.position !== 'seated' ? ' \u00b7 can be done seated' : ''}</span>
+            <span class="path-door__d">For ${_esc(r.strandLabel.charAt(0).toLowerCase() + r.strandLabel.slice(1))}</span></span>${chev}</button></li>`).join('')}</ul>` : `
+        <p class="class-list__empty">Nothing here today, because of what you've told me to avoid. That isn't permanent.</p>`}
+      ${held.length ? `
+        <section class="class-list__held">
+          <h2 class="look-label">Not today</h2>
+          <ul class="class-list__board">${held.map(r => `
+            <li class="class-list__row class-list__row--held">
+              <h3 class="class-list__name">${_esc(r.cls.title)}</h3>
+              <p class="class-list__why">Has ${_esc(r.safety.blockedBy.join(', '))} in it, which I'm leaving out for you at the moment.</p>
+            </li>`).join('')}</ul>
+        </section>` : ''}
+    </div>`;
+}
+
+function _planClass(r) {
+  const cls = r.cls;
+  const shortOk = !!cls.lighter;
+  const short = shortOk && _short;
+  const secs = sectionsFor(cls, { lighter: short });
+  const say = [...(cls.flags || []).map(_say), ...(r.seatable && cls.position !== 'seated' ? ['It can all be done seated.'] : [])];
+  return `
+    <div class="view class-list class-page is-plan">
+      <button class="btn btn-ghost plan-back" id="cl-list" aria-label="Back to Classes">‹ Back</button>
+      <h1 class="class-list__title" tabindex="-1">${_esc(cls.title)}</h1>
+      <p class="class-list__intro">For ${_esc(r.strandLabel.charAt(0).toLowerCase() + r.strandLabel.slice(1))}.${r.inArc ? ' Part of your arc.' : ''}</p>
+      ${shortOk ? `<fieldset class="path-seg"><legend>How long?</legend><div class="path-seg__opts">
+        <label><input type="radio" name="cl-len" value="full"${short ? '' : ' checked'}><span>Full \u00b7 ${Math.round(cls.durationMins)} min</span></label>
+        <label><input type="radio" name="cl-len" value="short"${short ? ' checked' : ''}><span>Shorter \u00b7 ${Math.round(lighterMinutes(cls))} min</span></label>
+      </div></fieldset>` : ''}
+      ${say.length ? `<section class="class-before" aria-labelledby="cl-before-h"><h2 class="class-before__h" id="cl-before-h">Before you start</h2>${say.map(t => `<p>${_esc(t)}</p>`).join('')}</section>` : ''}
+      <h2 class="look-label" id="cl-parts-h">What\u2019s in it</h2>
+      <ol class="class-parts" aria-labelledby="cl-parts-h">${secs.map(sec => { const fig = _figFor(sec); return `<li class="class-part">
+          <span class="class-part__fig${fig ? '' : ' is-none'}" aria-hidden="true">${fig}</span>
+          <span class="path-door__text"><span class="path-door__t">${_esc(sec.title)}</span><span class="path-door__d">${_mins(sec.durationSeconds || 0)} min</span></span></li>`; }).join('')}</ol>
+      <button class="btn btn-primary btn-large btn-full" data-start="${_esc(cls.id)}"${short ? ' data-lighter="1"' : ''}>Start ${_esc(cls.title)}</button>
+    </div>`;
+}
+
+export function render(stay = false) {
+  // v7. Opened by the router: the list first, never a class left open from an earlier visit.
+  if (!stay) { _chosen = null; _short = false; }
   // W5-2. A Bad day asks first, as Run and the coach do.
   if (badDayIds().length) return renderBadDayDoor('Before a class');
   const mine = _arcStrands();
@@ -143,6 +246,12 @@ export function render() {
 
   const open = rows.filter(r => r.safety.offer);
   const held = rows.filter(r => !r.safety.offer);
+
+  // v7. The Plan: the list, or the chosen class's own page.
+  if (isPremium()) {
+    const pick = _chosen && open.find(r => r.cls.id === _chosen);
+    return pick ? _planClass(pick) : _planList(rows, open, held);
+  }
 
   return `
     <div class="view class-list">
@@ -221,10 +330,16 @@ export function onMount() {
   if (!root) return;
   if (badDayIds().length) { wireBadDayDoor(root); return; }
 
+  // v7. The Plan: a row opens its class's page; Back returns to the list; the length is one choice.
+  const redraw = focus => { root.innerHTML = render(true); onMount(); root.querySelector(focus)?.focus?.(); };
+  root.querySelectorAll('[data-class]').forEach(btn => btn.addEventListener('click', () => { _chosen = btn.dataset.class; _short = false; redraw('h1'); }));
+  root.querySelector('#cl-list')?.addEventListener('click', () => { const was = _chosen; _chosen = null; redraw(`[data-class="${was}"]`); });
+  root.querySelectorAll('input[name="cl-len"]').forEach(i => i.addEventListener('change', () => { _short = i.value === 'short'; redraw(`input[name="cl-len"][value="${i.value}"]`); }));
+
   root.querySelectorAll('[data-start]').forEach(btn => {
     btn.addEventListener('click', () => {
       const ok = startClass(btn.dataset.start, { lighter: btn.dataset.lighter === '1' });
-      if (ok) router.navigate('class-player');
+      if (ok) { _chosen = null; router.navigate('class-player'); }
     });
   });
 
