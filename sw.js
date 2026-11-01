@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 01 Nov 2026 v697
+ * 01 Nov 2026 v698
  *
+ * v698 - P-20, fitness trends, parts 2 and 3 (Free unchanged). On the Plan, Follow a fitness trend adds HILIT: hard work, no jumping (five short bursts a round with a rest after each, nothing leaves the floor, standing or seated; two days a week at most, with a day off between) and, in Get stronger, Hybrid training (eight stations in order, each the version your kit allows; an easy walk between them in the first weeks, then a run, walk, ride, row or the cross trainer, your choice; stations that do not fit your time are left for another day and said; from week 11, the full eight at your own pace; no time kept). Two styles that had no rule now have one.
  * v697 - P-20, fitness trends, part 1 (Free unchanged). On the Plan, How would you like it? (behind Get stronger and Keep moving) offers Follow a fitness trend: Zone 2, mostly easy (one activity kept easy, with one harder day a week from week 5, its week said on Progress in words), a 10-minute snack (legs, a pull, your middle, balance or getting out of breath, standing or seated, from the kit you have) and Mix it up (two or three easy swaps for what you do most; you choose). Each says its effort by the talk test, with a safety line on a hard one. After a snack, Count this as a session; otherwise snacks on one day count as one day moved. NEW FILE precached: js/data/trend-recipes.js.
  * v696 - P-19 TRENDS-SCHEMA: Your week offers a fourth level, Hard (you can only say a few words at a time); the app can now remember which fitness trend you follow and when it started, and mark a short snack and whether you counted it as a session, ready for Follow a fitness trend. Nothing else changes on screen. store.js v119, Schema v1.117.
  * v695 - P-13 finished (Free unchanged). On the Plan, Build a session and the Morning programme take the one look too: the heading at the left, ‹ Back before a session and Exit during it, no house button beside either, line icons and no emoji. Every room on the Plan now looks the same.
@@ -4244,7 +4245,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v697";
+const CACHE_NAME = "alongside-v698";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4371,13 +4372,13 @@ const SHELL_HASHES = {
   "./js/data/tier-table.js": "7821c3304bd0815c",
   "./js/views/know-what.js": "4c4e9aa82b226bd6",
   "./js/views/plan-home.js": "7a6738b3d0e3d23e",
-  "./js/views/path.js": "2835e3fc86783a81",
+  "./js/views/path.js": "81af5d4b114e0ce7",
   "./js/plan-look.js": "7674d8fbf5101aa9",
   "./js/views/plan-finish.js": "67772c3957aee32e",
   "./js/data/outside.js": "3af4ea46bd898084",
-  "./js/data/trend-recipes.js": "ef0dc177716ba33d",
+  "./js/data/trend-recipes.js": "0bb980223a363acb",
   "./js/data/path-context.js": "fc5643585fe6066e",
-  "./css/components/path.css": "ee48cada22322369",
+  "./css/components/path.css": "8183dd3b0eee6cf1",
   "./js/data/red-flag.js": "3cd9eecbc3985eb3",
   "./js/data/health-consent.js": "a23d005af57f179c",
   "./js/data/age-check.js": "7fa5b0f5a6b34770",
