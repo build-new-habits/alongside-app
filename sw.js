@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 01 Nov 2026 v696
+ * 01 Nov 2026 v697
  *
+ * v697 - P-20, fitness trends, part 1 (Free unchanged). On the Plan, How would you like it? (behind Get stronger and Keep moving) offers Follow a fitness trend: Zone 2, mostly easy (one activity kept easy, with one harder day a week from week 5, its week said on Progress in words), a 10-minute snack (legs, a pull, your middle, balance or getting out of breath, standing or seated, from the kit you have) and Mix it up (two or three easy swaps for what you do most; you choose). Each says its effort by the talk test, with a safety line on a hard one. After a snack, Count this as a session; otherwise snacks on one day count as one day moved. NEW FILE precached: js/data/trend-recipes.js.
  * v696 - P-19 TRENDS-SCHEMA: Your week offers a fourth level, Hard (you can only say a few words at a time); the app can now remember which fitness trend you follow and when it started, and mark a short snack and whether you counted it as a session, ready for Follow a fitness trend. Nothing else changes on screen. store.js v119, Schema v1.117.
  * v695 - P-13 finished (Free unchanged). On the Plan, Build a session and the Morning programme take the one look too: the heading at the left, ‹ Back before a session and Exit during it, no house button beside either, line icons and no emoji. Every room on the Plan now looks the same.
  * v694 - P-13, Classes (Free unchanged). On the Plan, Classes is one row per class (how long, where you'll be, what it's for); tap one to see it first: full or shorter, what to know before you start, its parts with their stick figures, then Start. In the class, Exit, and each part's figure.
@@ -4243,7 +4244,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v696";
+const CACHE_NAME = "alongside-v697";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4309,7 +4310,7 @@ const SHELL_HASHES = {
   "./css/components/finish.css": "c33e298d5fcb92ae",
   "./js/app.js": "72054b00e54ad55b",
   "./js/router.js": "394b564ae6adb351",
-  "./js/store.js": "72b0b44c2b1e8182",
+  "./js/store.js": "d2e7fea4f9211013",
   "./js/session-log.js": "6134de4315842e05",
   "./js/exercise-feedback.js": "adba8549f444da2a",
   "./js/exercise-card.js": "78196b42671c67aa",
@@ -4332,8 +4333,8 @@ const SHELL_HASHES = {
   "./js/views/checkin.js": "1d03b5f4d59bee0f",
   "./js/views/checkin-mini.js": "c647f4da71feddde",
   "./js/views/coach-proposal.js": "51a95d9089367b0b",
-  "./js/views/workout.js": "65f98fb6a9c10926",
-  "./js/views/progress.js": "aa45846ff2a1b6b0",
+  "./js/views/workout.js": "7bce456d42bad1a7",
+  "./js/views/progress.js": "5e22359809361986",
   "./js/views/settings.js": "ec21456c0fda9b36",
   "./js/views/restore-flow.js": "dc81c2e455fa472d",
   "./js/views/weekly-plan.js": "dcee06e297b402c0",
@@ -4370,12 +4371,13 @@ const SHELL_HASHES = {
   "./js/data/tier-table.js": "7821c3304bd0815c",
   "./js/views/know-what.js": "4c4e9aa82b226bd6",
   "./js/views/plan-home.js": "7a6738b3d0e3d23e",
-  "./js/views/path.js": "81e7d2cfb111bf8c",
+  "./js/views/path.js": "2835e3fc86783a81",
   "./js/plan-look.js": "7674d8fbf5101aa9",
-  "./js/views/plan-finish.js": "7a03f4176a4cb840",
+  "./js/views/plan-finish.js": "67772c3957aee32e",
   "./js/data/outside.js": "3af4ea46bd898084",
+  "./js/data/trend-recipes.js": "ef0dc177716ba33d",
   "./js/data/path-context.js": "fc5643585fe6066e",
-  "./css/components/path.css": "2ab935b8a0045008",
+  "./css/components/path.css": "ee48cada22322369",
   "./js/data/red-flag.js": "3cd9eecbc3985eb3",
   "./js/data/health-consent.js": "a23d005af57f179c",
   "./js/data/age-check.js": "7fa5b0f5a6b34770",
@@ -4688,6 +4690,7 @@ const SHELL_URLS = [
   "./js/plan-look.js",
   "./js/views/plan-finish.js",
   "./js/data/outside.js",
+  "./js/data/trend-recipes.js",
   "./js/data/path-context.js",
   "./css/components/path.css",
   "./js/data/red-flag.js",
