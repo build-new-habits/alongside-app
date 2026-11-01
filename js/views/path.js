@@ -1,6 +1,12 @@
 /**
  * views/path.js
- * 01 Nov 2026 v8
+ * 01 Nov 2026 v9
+ *
+ * v9 - P-21 TRENDS-WEEK. Home's row for a trend day in Your week arrives
+ *   with router.pathStart.trendDay ({ id, day }) and opens that day: Zone 2
+ *   and a snack straight to their proposal (From your week), the trend's
+ *   list behind Back; HILIT, Hybrid training and reformer-style at their
+ *   step, which asks its quick questions; Mix it up at its choices.
  *
  * v8 - P-20 session 4: reformer-style Pilates with a band (approved 01 Nov,
  *   Graeme; Get stronger). Its step says the week, asks the floor question
@@ -261,6 +267,7 @@ export function PathView(router) {
       const rec = savedSessions().find(x => x.id === start.saved);
       if (rec) { step = "prog"; st = { door, practice: practiceFromSaved(rec), fromSaved: true }; paint(); return; }
     }
+    if (start?.trendDay && openTrendDay(door, start.trendDay, start.mins)) return;
     if (door === "feel" && start?.feeling && FEELINGS[start.feeling]) {
       // The coach's choice: its feeling's programmes behind, its programme open.
       st.feeling = start.feeling; st.markId = start.programmeId || null;
@@ -569,6 +576,35 @@ export function PathView(router) {
     return swapOptionsFor(s.id, { door: st.door, feeling: st.feeling, exclude: ids });
   }
   const trendProg = practice => go("prog", { practice, fresh: false, reason: null, note: null, surprise: false, fromCoach: false });
+
+  /**
+   * P-21. A trend day from Your week, opened from Home. The trend's list sits
+   * behind Back, as if the person had come through the door. Returns false
+   * when the day cannot be opened (Home then stays where it was going).
+   */
+  function openTrendDay(door, td, mins) {
+    const at = (next, patch = {}) => { step = next; st = { ...st, ...patch }; paint(); return true; };
+    trail.push({ step: "trends", st: { door }, focus: null });
+    const fromWeek = practice => at("prog", { practice, fresh: false, reason: "From your week.", note: null, surprise: false, fromCoach: false });
+    if (td.id === "zone2") {
+      const f = followed("zone2");
+      if (!f?.activity) return at("z2act");
+      trail.push({ step: "z2day", st: { door }, focus: null });
+      const s = zone2Session({ ...recipeIn(), activity: f.activity, kind: td.day === "hard" ? "hard" : "easy", week: store.trendWeek("zone2") || 1, minutes: Number(mins) || null });
+      if (s) return fromWeek(s);
+      trail.pop(); return at("z2day");
+    }
+    if (td.id === "snack") {
+      trail.push({ step: "squal", st: { door }, focus: null });
+      const s = snackSession({ ...recipeIn(), quality: td.day, minutes: 10 });
+      if (s) return fromWeek(s);
+      trail.pop(); return at("squal");
+    }
+    if (td.id === "cross") return at(followed("cross")?.activity ? "xopts" : "xmain");
+    if (["hilit", "hybrid", "reformer"].includes(td.id)) return at(td.id);
+    trail = [];
+    return false;
+  }
 
   function savedFor(door, place) {
     return savedSessions().filter(s => (s.purpose == null || s.purpose === door) && (!place || s.place == null || s.place === place));

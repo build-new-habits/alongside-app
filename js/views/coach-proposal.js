@@ -1,6 +1,11 @@
 /**
  * coach-proposal.js
- * 31 Oct 2026 v65
+ * 01 Nov 2026 v66
+ *
+ * v66 - P-21 TRENDS-WEEK. A day in Your week that follows a fitness trend is
+ *   never taken for the old walk day (D662-1): Home's row opens the trend.
+ *   Nothing else changes; Free never has a week.
+ *
  *
  * v65 - STAGE PATH Session 9 (CLOSE; P-12 F3, F4, F5; Graeme, 31 Oct: "‹ Back,
  *   Exit in a session", "24 px, left"). On the Plan only: Today's plan says
@@ -1736,7 +1741,8 @@ export function CoachProposalView(router) {
     // cannot build a walk, so the walk session leads, as it did here.
     if (store.get('weekShape')) {
       const t = todayInWeek()?.template;
-      const walk = t && t.place === 'outside' && t.mix?.length && t.mix.every(m => m.focus === 'cardio');
+      // P-21 (v66). A trend day is the trend's, opened from Home's row: never the walk.
+      const walk = t && !t.trend && t.place === 'outside' && t.mix?.length && t.mix.every(m => m.focus === 'cardio');
       return walk ? { id: 'walk', ...OWN_SESSIONS.walk } : null;
     }
     const slot = store.get(`weeklyPlan.days.${DAYS[new Date().getDay()]}`) || {};

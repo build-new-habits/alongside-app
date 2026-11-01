@@ -1,5 +1,15 @@
 /* css/components/your-week.css
- * 05 Oct 2026 v3
+ * 01 Nov 2026 v4
+ *
+ * v4 - P-21 (found by chromium-trends v5, and on v700 before P-21: a fault,
+ *   not a look). The three level chips (A little, Some, Mostly) sat in
+ *   three fixed columns, so at text 1.45 or larger "Mostly" broke inside
+ *   its chip: they now take as many columns as fit, a whole word each, and
+ *   wrap to a new row. On a narrow phone at the largest text a day's words
+ *   in the week list split beside its day and tile: they drop below them
+ *   when there is no room; and the day's name, the page heading, is held to
+ *   the screen width ("Wednesday" split at 320 px, text 2). Nothing changes
+ *   at text 1 on a 390 phone.
  *
  * v3 - D-7 PLAN-IMPORT. The import screens (js/views/plan-import.js) share
  *   this page's look: .pi-* below. And My exercises' plan days
@@ -29,6 +39,8 @@
 .yw-view .btn { height: auto; white-space: normal; overflow-wrap: break-word; line-height: 1.3; }
 .yw-header .yw-change { max-width: 55%; }
 .yw-title { margin: 0; font-size: var(--text-2xl, 1.75rem); font-weight: 700; color: var(--color-text); }
+/* v4: a day's name is one word; on a narrow phone at the largest text it is held to the screen, never split. */
+.yw-view .yw-title { font-size: min(var(--text-2xl, 1.75rem), 12.5vw); overflow-wrap: normal; word-break: normal; }
 .yw-title:focus { outline: none; }
 .yw-title:focus-visible { outline: 3px solid var(--color-primary); outline-offset: 4px; border-radius: 6px; }
 .yw-sub, .yw-foot, .yw-note, .yw-hint, .yw-card__p {
@@ -85,8 +97,8 @@ button.yw-way:hover { background: var(--color-bg-hover); }
   font-weight: 700;
   background: var(--color-primary-glow);
 }
-.yw-seg { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-2); }
-.yw-seg__btn { padding: var(--space-2); border-radius: 12px; }
+.yw-seg { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 6.5em), 1fr)); gap: var(--space-2); }
+.yw-seg__btn { padding: var(--space-2); border-radius: 12px; overflow-wrap: normal; word-break: normal; }
 .yw-stack { display: flex; flex-direction: column; gap: var(--space-2); }
 .yw-int { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; border-radius: 14px; text-align: left; padding: var(--space-3) var(--space-4); }
 .yw-int__name { font-weight: 700; }
@@ -97,6 +109,7 @@ button.yw-way:hover { background: var(--color-bg-hover); }
 .yw-days > li + li { border-top: 1px solid var(--color-border-light); }
 .yw-day {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--space-3);
   width: 100%;
@@ -113,7 +126,7 @@ button.yw-way:hover { background: var(--color-bg-hover); }
 .yw-day:hover { background: var(--color-bg-hover); }
 .yw-day__key { flex: none; width: 2.5em; font-size: var(--text-sm, 0.9375rem); font-weight: 600; color: var(--color-text-secondary); }
 .yw-day__key.is-today { color: var(--color-primary-light); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
-.yw-day__text { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.yw-day__text { flex: 1 1 9em; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .yw-day__name { font-weight: 700; }
 .yw-day__line { font-size: var(--text-sm, 0.9375rem); line-height: 1.35; color: var(--color-text-secondary); }
 .yw-tag {

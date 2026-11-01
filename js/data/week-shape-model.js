@@ -1,6 +1,18 @@
 /**
  * js/data/week-shape-model.js
- * 01 Nov 2026 v3
+ * 01 Nov 2026 v4
+ *
+ * v4 - P-21 TRENDS-WEEK (mock-up approved 01 Nov, Graeme: "Yes, build it";
+ *   other days "Ordinary sessions"). A day plan may follow a fitness trend:
+ *   trend { id, day? } where id is one of WEEK_TRENDS and day is, for
+ *   zone2, "easy" or "hard", and for snack, a quality (legs, pull, middle,
+ *   balance, breath). Kept only when valid; absent otherwise (Schema
+ *   v1.119). weekFromTrend() fills a week from a trend's own rules: Zone 2
+ *   easy days with one harder day mid-week; HILIT and Hybrid on at most two
+ *   of the days picked, reformer-style on at most three, never on days side
+ *   by side (the week repeats, so Sunday is beside Monday); Mix it up on one
+ *   day; a week of snacks on every day, a different thing each day. The
+ *   other days picked are ordinary sessions, changeable as any day is.
  *
  * v3 - P-19 TRENDS-SCHEMA (Schema v1.117). A fourth level, Hard, in the
  *   talk test's words as approved 01 Nov (Graeme: "Add Hard as a 4th
@@ -36,6 +48,8 @@
  *       favourites: [exerciseId, ...]     in, when they fit
  *       own: groupName | "all" | null      D-7: the day is My exercises,
  *                                          played as written
+ *       trend: { id, day? } | absent      P-21: the day follows a fitness
+ *                                          trend (see WEEK_TRENDS)
  *     } },
  *     days: { mon..sun: templateId | "rest" | null },
  *     setAt: ISO date the week was first set,
@@ -131,7 +145,118 @@ export function sanitizeTemplate(t, id) {
     extras: (Array.isArray(t.extras) ? t.extras : []).filter((e, i, a) => EXTRAS.some(x => x.id === e) && a.indexOf(e) === i),
     favourites: (Array.isArray(t.favourites) ? t.favourites : []).filter((f, i, a) => _id(f) && a.indexOf(f) === i).slice(0, MAX_FAVOURITES),
     own: _str(t.own, NAME_MAX) || null,
+    ...(cleanTrend(t.trend) ? { trend: cleanTrend(t.trend) } : {}),
   };
+}
+
+// ── P-21: a day that follows a fitness trend ───────────────────────────
+
+/** The trends a week can follow, each with its rule for the week (approved 01 Nov). */
+export const WEEK_TRENDS = Object.freeze({
+  zone2:    { name: "Zone 2, mostly easy",                 line: "Mostly easy, with one harder day.", most: 7 },
+  hilit:    { name: "HILIT: hard work, no jumping",        line: "Two days a week at most.", most: 2 },
+  hybrid:   { name: "Hybrid training",                     line: "Two days a week at most.", most: 2 },
+  reformer: { name: "Reformer-style Pilates, with a band", line: "Up to three days a week.", most: 3 },
+  cross:    { name: "Mix it up",                           line: "One day a week, something different from what you do most.", most: 1 },
+  snack:    { name: "A week of snacks",                    line: "Ten minutes a day, a different thing each day.", most: 7 },
+});
+const SNACK_DAYS = ["legs", "pull", "middle", "balance", "breath"];
+const SNACK_NAMES = { legs: "Snack: legs", pull: "Snack: a pull", middle: "Snack: your middle", balance: "Snack: balance", breath: "Snack: out of breath" };
+
+/** A trend on a day plan made safe, or null. */
+export function cleanTrend(tr) {
+  if (!tr || typeof tr !== "object" || !Object.prototype.hasOwnProperty.call(WEEK_TRENDS, tr.id)) return null;
+  if (tr.id === "zone2") return { id: "zone2", day: tr.day === "hard" ? "hard" : "easy" };
+  if (tr.id === "snack") return SNACK_DAYS.includes(tr.day) ? { id: "snack", day: tr.day } : null;
+  return { id: tr.id };
+}
+
+/** The day plan for one trend day. */
+export function trendTemplate(id, tr, { activity = null } = {}) {
+  const outside = ["walk", "run", "cycle", "swim"].includes(activity);
+  const shapes = {
+    zone2:    () => tr.day === "hard"
+      ? ["Zone 2: the harder day", [["cardio", 2]], "hard", 30, outside ? "outside" : "gym"]
+      : ["Zone 2: an easy day", [["cardio", 2]], "gentle", 30, outside ? "outside" : "gym"],
+    hilit:    () => ["HILIT: hard work, no jumping", [["full", 2]], "hard", 30, "home"],
+    hybrid:   () => ["Hybrid training", [["full", 2]], "hard", 40, "gym"],
+    reformer: () => ["Reformer-style Pilates", [["trunk", 2]], "steady", 30, "home"],
+    cross:    () => ["Mix it up", [["cardio", 2]], "gentle", 30, "gym"],
+    snack:    () => [SNACK_NAMES[tr.day], [[{ legs: "legs", pull: "upper", middle: "trunk", balance: "balance", breath: "cardio" }[tr.day], 2]],
+                     tr.day === "breath" ? "hard" : "steady", 10, "home"],
+  };
+  const [name, mix, intensity, mins, place] = shapes[tr.id]();
+  return sanitizeTemplate({ id, name, mix: mix.map(([focus, level]) => ({ focus, level })), intensity, mins, place, trend: tr });
+}
+
+/** An ordinary day for the other days picked: the person's usual for Mix it up, else a whole-body session. */
+function ordinaryTemplate(id, trendId, activity) {
+  if (trendId === "cross") {
+    const usual = {
+      run: ["A run", [["cardio", 2]], "steady", 30, "outside"], walk: ["A walk", [["cardio", 2]], "steady", 30, "outside"],
+      cycle: ["A ride", [["cardio", 2]], "steady", 30, "outside"], swim: ["A swim", [["cardio", 2]], "steady", 30, "outside"],
+      workout: ["Strength", [["full", 2], ["trunk", 1]], "moderate", 30, "gym"], yoga: ["Yoga or Pilates", [["mobility", 2], ["trunk", 1]], "steady", 30, "home"],
+    }[activity];
+    if (usual) { const [name, mix, intensity, mins, place] = usual; return sanitizeTemplate({ id, name, mix: mix.map(([focus, level]) => ({ focus, level })), intensity, mins, place }); }
+  }
+  return sanitizeTemplate({ id, name: "Whole body", mix: [{ focus: "full", level: 2 }], intensity: "steady", mins: 30, place: trendId === "hybrid" ? "gym" : "home" });
+}
+
+/** Days side by side, the week repeating (Sunday is beside Monday). */
+export function besideDays(a, b) {
+  const i = DAY_KEYS.indexOf(a), j = DAY_KEYS.indexOf(b);
+  const d = Math.abs(i - j);
+  return d === 1 || d === 6;
+}
+
+/**
+ * The days a trend takes from those picked: never side by side when it has
+ * a most of three or fewer, at most its most; spread, starting from the first.
+ */
+export function trendDays(trendId, picked) {
+  const rule = WEEK_TRENDS[trendId];
+  const days = DAY_KEYS.filter(d => picked.includes(d));
+  if (!rule) return [];
+  if (rule.most === 1) return days.length ? [days[Math.floor((days.length - 1) / 2)]] : [];
+  if (rule.most >= 7) return days;
+  const out = [];
+  for (const d of days) {
+    if (out.length >= rule.most) break;
+    if (out.some(x => besideDays(x, d))) continue;
+    out.push(d);
+  }
+  return out;
+}
+
+/**
+ * P-21. A week filled from a trend's rules, as a weekShape. activity: Zone 2's
+ * activity, or Mix it up's main activity. null when no day was picked.
+ */
+export function weekFromTrend(trendId, picked, { activity = null } = {}, today = new Date()) {
+  if (!WEEK_TRENDS[trendId] || !Array.isArray(picked) || !picked.length) return null;
+  const days = Object.fromEntries(DAY_KEYS.map(d => [d, "rest"]));
+  const templates = {};
+  const mine = trendDays(trendId, picked);
+  const sorted = DAY_KEYS.filter(d => picked.includes(d));
+  if (trendId === "zone2") {
+    templates["trend-easy"] = trendTemplate("trend-easy", { id: "zone2", day: "easy" }, { activity });
+    const hardDay = sorted.length >= 2 ? sorted[Math.floor((sorted.length - 1) / 2)] : null;
+    if (hardDay) templates["trend-hard"] = trendTemplate("trend-hard", { id: "zone2", day: "hard" }, { activity });
+    for (const d of sorted) days[d] = d === hardDay ? "trend-hard" : "trend-easy";
+  } else if (trendId === "snack") {
+    sorted.forEach((d, i) => {
+      const q = SNACK_DAYS[i % SNACK_DAYS.length];
+      const id = `snack-${q}`;
+      templates[id] = templates[id] || trendTemplate(id, { id: "snack", day: q });
+      days[d] = id;
+    });
+  } else {
+    templates["trend-day"] = trendTemplate("trend-day", { id: trendId }, { activity });
+    const rest = sorted.filter(d => !mine.includes(d));
+    if (rest.length) templates["usual-day"] = ordinaryTemplate("usual-day", trendId, activity);
+    for (const d of sorted) days[d] = mine.includes(d) ? "trend-day" : "usual-day";
+  }
+  return sanitizeWeekShape({ templates, days, setAt: today.toISOString().slice(0, 10) });
 }
 
 /** The whole week made safe, or null when there is no usable week. */
@@ -224,6 +349,7 @@ export function newTemplate(existingIds = [], name = "My day") {
 /** "Mostly upper body · some core and trunk · a little stretching" */
 export function mixLine(t) {
   if (!t) return "";
+  if (t.trend) return `From your trend: ${WEEK_TRENDS[t.trend.id].name}`;
   if (t.own) return t.own === "all" ? "Your own list: all of My exercises" : `Your own list: ${t.own}`;
   const parts = [...t.mix].sort((a, b) => b.level - a.level)
     .map(m => `${LEVELS[m.level].toLowerCase()} ${focusById(m.focus).label.toLowerCase()}`);

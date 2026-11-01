@@ -1,6 +1,14 @@
 /**
  * views/plan-home.js
- * 31 Oct 2026 v6
+ * 01 Nov 2026 v7
+ *
+ * v7 - P-21 TRENDS-WEEK (mock-up v1 approved 01 Nov). When today in Your
+ *   week follows a fitness trend, the one row names it ("Today, from your
+ *   week: Zone 2: an easy day", with the activity, about how long and the
+ *   talk test's word) and one tap opens that trend's session behind its
+ *   door (router.pathStart.trendDay, read by path.js), through the
+ *   check-in when today has none, as every door does. Zone 2's harder day,
+ *   before week 5 or once this week's is done, is said as an easy day.
  *
  * v6 - P-13 (true words). The Library row said "Classes, runs, the mind,
  *   your lists, your week"; runs are behind Keep moving now, so it says
@@ -80,6 +88,7 @@ import { activityPhrase } from "../data/activity-labels.js";
 import { renderFigure } from "../figures.js";
 import { suggestToday, arcDoor, pickProgramme, movementName } from "../data/path-engine.js";
 import { moodPairs, moodStory, fiveOf } from "../data/progress-report.js";
+import { EFFORT, ZONE2_ACTIVITIES, zone2Week, zone2HardDoneThisWeek } from "../data/trend-recipes.js";
 
 // ── The doors ──────────────────────────────────────────────────────────────
 
@@ -219,6 +228,10 @@ function todayCard(state, carry) {
         ${left ? `<p class="path-today__coach">${left} exercise${left === 1 ? "" : "s"}, as you wrote ${left === 1 ? "it" : "them"}.</p>${go("Start your list", 'data-action="week-own"')}`
           : `<p class="path-today__coach">All done today.</p>`}`);
     }
+    if (t.trend) {
+      const d = trendDayToday(t);
+      return row("week", DOOR[d.door].kind, DOOR[d.door].icon, `Today, from your week: ${d.name}`, d.sub, 'data-action="week-trend"', d.door);
+    }
     return row("week", kind, DOOR[door].icon, `Today, from your week: ${t.name}`, `${mixLine(t)} \u00b7 ${detailLine(t)}`, 'data-action="week-today"', door);
   }
   // The coach's row: asks the three questions if today has none, then chooses.
@@ -232,6 +245,25 @@ function todayCard(state, carry) {
     }
   }
   return row("coach", "teal", "chat", "Let me choose for you", sub, 'data-action="path-coach"');
+}
+
+/**
+ * P-21. Today's trend day as Home says it: its door, its name (Zone 2's
+ * harder day said as an easy day before week 5, or once this week's is
+ * done), and a line: the activity, about how long, the talk test's word.
+ */
+export function trendDayToday(t) {
+  const tr = t.trend;
+  const followed = (store.get("trends") || []).find(x => x && x.id === tr.id) || null;
+  const door = (tr.id === "zone2" || tr.id === "cross" || (tr.id === "snack" && tr.day === "breath")) ? "moving" : "stronger";
+  let name = t.name, effort = { gentle: "easy", steady: "steady", moderate: "steady", hard: "hard" }[t.intensity] || "steady", day = tr.day || null;
+  if (tr.id === "zone2" && tr.day === "hard") {
+    const wk = zone2Week(store.trendWeek("zone2") || 1);
+    if (!wk.hardAllowed || zone2HardDoneThisWeek(store.get("activityLog") || [])) { name = "Zone 2: an easy day"; effort = "easy"; day = "easy"; }
+  }
+  const act = tr.id === "zone2" ? ZONE2_ACTIVITIES.find(a => a.id === followed?.activity)?.label : null;
+  const sub = [act, `About ${t.mins} min`, EFFORT[effort]].filter(Boolean).join(" \u00b7 ");
+  return { door, name, sub, trend: { id: tr.id, day }, mins: t.mins };
 }
 
 function coachTitle(s) {
@@ -345,6 +377,14 @@ export function wirePlanHome(container, router) {
     if (needsCheckin()) { store.set("pendingDoorRoute", "path"); router.navigate("checkin"); return; }
     router.navigate("path");
   }));
+  // P-21. Today's trend day from Your week: that trend's session, behind its door.
+  container.querySelector('[data-action="week-trend"]')?.addEventListener("click", () => {
+    const t = todayInWeek()?.template; if (!t?.trend) return;
+    const d = trendDayToday(t);
+    router.pathStart = { door: d.door, trendDay: d.trend, mins: d.mins };
+    if (needsCheckin()) { store.set("pendingDoorRoute", "path"); router.navigate("checkin"); return; }
+    router.navigate("path");
+  });
   container.querySelector('[data-action="path-coach"]')?.addEventListener("click", () => {
     if (needsCheckin()) { router.pathStart = { coach: true }; store.set("pendingDoorRoute", "today"); router.navigate("checkin"); return; }
     goToSuggestion(router);

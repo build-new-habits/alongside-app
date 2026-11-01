@@ -1,6 +1,15 @@
 /**
  * js/views/your-week.js
- * 31 Oct 2026 v3
+ * 01 Nov 2026 v4
+ *
+ * v4 - P-21 TRENDS-WEEK (mock-up v1 approved 01 Nov, Graeme: "Yes, build
+ *   it"; other days "Ordinary sessions"). Plan your week gains Follow a
+ *   fitness trend: which trend, then (Zone 2) the activity to keep easy or
+ *   (Mix it up) what you do most, then which days; the week is filled by
+ *   the trend's own rules (week-shape-model.js weekFromTrend), and the
+ *   trend is started if it is not followed already. A trend day says so on
+ *   its own screen and can be made an ordinary session. Free's page (See
+ *   the Plan) unchanged.
  *
  * v3 - STAGE PATH Session 9 (CLOSE; P-12 F5; Graeme, 31 Oct: "‹ Back"). On
  *   the Plan, every way back says "‹ Back" (it said "← Home", "← Your
@@ -44,7 +53,9 @@ import { EXERCISES } from "../data/exercises/index.js";
 import {
   DAY_KEYS, DAY_NAMES, DAY_SHORT, FOCUSES, focusById, LEVELS, INTENSITIES, LENGTHS, PLACES, EXTRAS,
   READY_WEEKS, weekFromReady, newTemplate, sanitizeWeekShape, mixLine, detailLine,
+  WEEK_TRENDS, weekFromTrend,
 } from "../data/week-shape-model.js";
+import { ZONE2_ACTIVITIES, MAIN_ACTIVITIES, mainActivityFrom } from "../data/trend-recipes.js";
 import { weekDates, dayKeyOf, doneThisWeek, balanceGap, addGap, leaveGap, primaryFocus, ownGroups } from "../data/week-shape.js";
 
 const esc = s => String(s == null ? "" : s)
@@ -60,6 +71,7 @@ export function YourWeekView(router) {
   let draft = null;        // the week being edited on the day screen
   let status = "";
   let picked = [];         // days chosen on the pick screen
+  let trendPick = null;    // P-21: { id, activity } while following a trend into the week
 
   function mount(container) {
     root = container;
@@ -83,6 +95,8 @@ export function YourWeekView(router) {
       return;
     }
     const body = screen === "start" ? renderStart()
+      : screen === "trend" ? renderTrend()
+      : screen === "tact" ? renderTrendActivity()
       : screen === "pick" ? renderPick()
       : screen === "day" ? renderDay()
       : renderWeek();
@@ -113,6 +127,11 @@ export function YourWeekView(router) {
         <span class="yw-way__text"><span class="yw-way__name">Build it with me</span>
           <span class="yw-way__line">Which days you want to move, then what each one is for.</span></span>
       </button>
+      <button class="yw-way" data-trendway="1">
+        <span class="kind-tile k-blue">${lineIcon("fresh")}</span>
+        <span class="yw-way__text"><span class="yw-way__name">Follow a fitness trend</span>
+          <span class="yw-way__line">Zone 2, HILIT, Hybrid training, reformer-style, Mix it up, or a week of snacks. I fill the week by its rules.</span></span>
+      </button>
       <h2 class="look-label" id="yw-ready-h">Or start from a ready-made week</h2>
       <div class="yw-ready" role="group" aria-labelledby="yw-ready-h">
         ${READY_WEEKS.map(r => `
@@ -130,17 +149,50 @@ export function YourWeekView(router) {
       <p class="yw-foot">Change any day, any time. Missing a day is fine: the week does not keep score.</p>`;
   }
 
+  // ── P-21: follow a trend ────────────────────────────────────────────
+  function renderTrend() {
+    return `
+      ${header("Back", null, "start")}
+      <h1 class="yw-title" tabindex="-1">Which trend?</h1>
+      ${Object.entries(WEEK_TRENDS).map(([id, x]) => `
+        <button class="yw-way" data-trend="${id}">
+          <span class="kind-tile k-${["zone2", "cross"].includes(id) ? "blue" : "amber"}">${lineIcon(["zone2", "cross"].includes(id) ? "run" : "strength")}</span>
+          <span class="yw-way__text"><span class="yw-way__name">${esc(x.name)}</span>
+            <span class="yw-way__line">${esc(x.line)}</span></span>
+        </button>`).join("")}`;
+  }
+  function renderTrendActivity() {
+    const z2 = trendPick?.id === "zone2";
+    const list = z2 ? ZONE2_ACTIVITIES : MAIN_ACTIVITIES;
+    return `
+      ${header("Back", null, "trend")}
+      <h1 class="yw-title" tabindex="-1">${z2 ? "Which do you want to keep easy?" : "What do you do most?"}</h1>
+      <p class="yw-sub">${z2 ? "Zone 2 is mostly easy days of one activity, with one harder day from week 5." : "Mix it up swaps one day of it for something that uses your body differently."}</p>
+      <div class="yw-chips" role="group" aria-label="${z2 ? "Activity" : "What you do most"}">
+        ${list.map(a => `<button class="yw-chip${trendPick?.activity === a.id ? " is-on" : ""}" data-tact="${a.id}" aria-pressed="${trendPick?.activity === a.id}">${esc(a.label)}</button>`).join("")}
+      </div>`;
+  }
+
   // ── pick ────────────────────────────────────────────────────────────
   function renderPick() {
     return `
-      ${header("Back", null, "start")}
+      ${header("Back", null, trendPick ? (["zone2", "cross"].includes(trendPick.id) ? "tact" : "trend") : "start")}
       <h1 class="yw-title" tabindex="-1">Which days do you want to move?</h1>
-      <p class="yw-sub">The others are rest. Rest counts.</p>
+      <p class="yw-sub">The others are rest. Rest counts.${trendPick ? ` ${esc(trendNote(trendPick.id))}` : ""}</p>
       <div class="yw-chips" role="group" aria-label="Days to move">
         ${DAY_KEYS.map(d => `<button class="yw-chip${picked.includes(d) ? " is-on" : ""}" data-pick="${d}" aria-pressed="${picked.includes(d)}">${DAY_NAMES[d]}</button>`).join("")}
       </div>
       <p class="yw-error" id="yw-pick-error" role="alert"></p>
       <button class="btn btn-primary btn-large btn-full" id="yw-pick-go">Continue</button>`;
+  }
+
+  function trendNote(id) {
+    return { hilit: "HILIT takes two of them at most, never side by side; the others are ordinary sessions.",
+             hybrid: "Hybrid training takes two of them at most, never side by side; the others are ordinary sessions.",
+             reformer: "Reformer-style takes three of them at most, never side by side; the others are ordinary sessions.",
+             cross: "Mix it up takes one of them; the others are what you usually do.",
+             zone2: "All easy, with one harder day mid-week.",
+             snack: "A ten-minute snack each day, a different thing each day." }[id] || "";
   }
 
   // ── week ────────────────────────────────────────────────────────────
@@ -208,6 +260,8 @@ export function YourWeekView(router) {
     return `
       ${header("Your week", null, "week")}
       <h1 class="yw-title" tabindex="-1">${DAY_NAMES[dayKey]}</h1>
+      ${t && t.trend ? `<p class="yw-note" id="yw-trend-note">This day follows ${esc(WEEK_TRENDS[t.trend.id].name)}: ${esc(t.name)}. On the day, Home opens it.</p>
+        <button class="btn btn-secondary" id="yw-untrend">Make it an ordinary session</button>` : ""}
       <div class="yw-chips" role="group" aria-label="This day is">
         ${btn('data-kind="session"', !!t && !t.own, "A session")}
         ${btn('data-kind="own"', !!(t && t.own), "My exercises")}
@@ -322,7 +376,17 @@ export function YourWeekView(router) {
     $$("[data-back]").forEach(b => b.addEventListener("click", () => { draft = null; go(b.dataset.back); }));
 
     // start
-    $$("[data-start]").forEach(b => b.addEventListener("click", () => { picked = []; go("pick"); }));
+    $$("[data-start]").forEach(b => b.addEventListener("click", () => { picked = []; trendPick = null; go("pick"); }));
+    // P-21. Follow a fitness trend: which, then the activity where it needs one, then the days.
+    $$("[data-trendway]").forEach(b => b.addEventListener("click", () => { trendPick = null; go("trend"); }));
+    $$("[data-trend]").forEach(b => b.addEventListener("click", () => {
+      const id = b.dataset.trend;
+      const had = (store.get("trends") || []).find(x => x && x.id === id);
+      trendPick = { id, activity: had?.activity || (id === "cross" ? mainActivityFrom(store.get("activityLog") || []) : null) };
+      picked = [];
+      go(["zone2", "cross"].includes(id) ? "tact" : "pick");
+    }));
+    $$("[data-tact]").forEach(b => b.addEventListener("click", () => { trendPick = { ...trendPick, activity: b.dataset.tact }; go("pick"); }));
     $$("[data-ready]").forEach(b => b.addEventListener("click", () => {
       store.set("weekShape", weekFromReady(b.dataset.ready));
       go("week", `${READY_WEEKS.find(r => r.id === b.dataset.ready)?.name} is your week. Tap any day to change it.`);
@@ -339,6 +403,21 @@ export function YourWeekView(router) {
       if (!picked.length) {
         const e = $("#yw-pick-error"); if (e) e.textContent = "Choose at least one day.";
         root.querySelector("[data-pick]")?.focus();
+        return;
+      }
+      if (trendPick) {
+        const w = weekFromTrend(trendPick.id, picked, { activity: trendPick.activity });
+        if (!w) return;
+        const storeId = trendPick.id === "snack" ? null : trendPick.id;
+        if (storeId) {
+          const had = (store.get("trends") || []).find(x => x && x.id === storeId);
+          if (!had) store.startTrend(storeId, trendPick.activity || null);
+          else if (trendPick.activity && had.activity !== trendPick.activity) store.changeTrendActivity(storeId, trendPick.activity);
+        }
+        store.set("weekShape", w);
+        const name = WEEK_TRENDS[trendPick.id].name;
+        trendPick = null;
+        go("week", `${name} is your week. Tap any day to change it.`);
         return;
       }
       const templates = {}, days = {};
@@ -370,6 +449,14 @@ export function YourWeekView(router) {
 
     // day
     const cur = () => { const v = draft.days[dayKey]; return v && v !== "rest" ? draft.templates[v] : null; };
+    // P-21. A trend day made ordinary: a copy for this day, without the trend.
+    $("#yw-untrend")?.addEventListener("click", () => {
+      const c = cur(); if (!c) return;
+      const copy = { ...clone(c), id: newTemplate(Object.keys(draft.templates)).id, name: `${DAY_NAMES[dayKey]} plan` };
+      delete copy.trend;
+      draft.templates[copy.id] = copy; draft.days[dayKey] = copy.id;
+      render(); root.querySelector("#yw-name")?.focus();
+    });
     // The name is kept as it is typed, into the plan on screen; reading it
     // at redraw instead wrote it into whichever plan was on screen next
     // (found by verify-your-week 3g: Tuesday's name onto Monday's plan).
