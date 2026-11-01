@@ -1,7 +1,14 @@
 import { createRequire as __cr } from "node:module";
 /**
  * tools/verify-path-outside.mjs
- * 31 Oct 2026 v2
+ * 01 Nov 2026 v3
+ *
+ * v3 - P-20 re-point (Graeme, 01 Nov: rename "Body Balance", a trademark,
+ *   to "Yoga or Pilates class", on both tiers). TEST 4 compares Free's Log
+ *   what I did with v687 after making that one approved change to v687's
+ *   words, and to no other; any other difference is still red. Nothing
+ *   loosened. (Reformer class is the Plan's, so Free's list is otherwise
+ *   as it was.)
  *
  * v2 - P-13 re-point: 1a also expects the guided room for a run, ride, walk
  *   or swim (the Library's tiles, now behind this door). Nothing loosened.
@@ -136,6 +143,10 @@ for (const [file, draw] of Object.entries(rooms)) {
   fixture("free");
   const snap = JSON.stringify(store.data);
   let a = ""; if (OLD) { store.data = JSON.parse(snap); store.save(); await draw(OLD); a = main.innerHTML; }
+  // v3: the one approved rename, made to the old words only (its count is held below).
+  const renames = file.endsWith("activity-log.js") ? (a.match(/Body Balance/g) || []).length : 0;
+  if (renames) a = a.replace(/Body Balance/g, "Yoga or Pilates class");
+  if (file.endsWith("activity-log.js")) ok("4r. v687's Free Log what I did named Body Balance exactly twice (label and words): the rename is that and no more", renames === 2, String(renames));
   store.data = JSON.parse(snap); store.save(); await draw(NOW); const b = main.innerHTML;
   let at = 0; while (at < a.length && a[at] === b[at]) at++;
   ok(`4. Free ${file.split("/").pop()}: the same, byte for byte`, !!OLD && a === b && a.length > 200, `differs at ${at}: ${a.slice(at - 40, at + 40)} | ${b.slice(at - 40, at + 40)}`);

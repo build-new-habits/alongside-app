@@ -1,6 +1,11 @@
 /**
  * library.js - Library Page
  *
+ * 01 Nov 2026 v23
+ *
+ * v23 - P-20 (Graeme, 01 Nov): the Classes tile "Body Balance" (a trademark)
+ *   is "Yoga or Pilates class", both tiers; it opens Log what I did as before.
+ *
  * 31 Oct 2026 v22
  *
  * v22 - P-13 LIBRARY (Graeme, 29 Oct: "Only what doors don't hold"; 31 Oct:
@@ -528,7 +533,7 @@ const LOG_CATEGORIES = [
       { label: "Boxing",       icon: "\uD83E\uDD4A", target: "activity-log" },
       { label: "Spin class",   icon: "\uD83D\uDEB4", target: "activity-log" },
       { label: "HIIT",         icon: "\u26A1",        target: "activity-log" },
-      { label: "Body Balance", icon: "\uD83E\uDDD8",  target: "activity-log" },
+      { label: "Yoga or Pilates class", icon: "\uD83E\uDDD8",  target: "activity-log" },   // v23: "Body Balance" is a trademark
       { label: "Other class",  icon: "\uD83C\uDFE5",  target: "activity-log" },
     ]
   },

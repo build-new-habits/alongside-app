@@ -1,5 +1,13 @@
 /**
  * activity-log.js - Universal Activity Logging View
+ * 01 Nov 2026 v6
+ *
+ * v6 - P-20 session 4 (Graeme, 01 Nov). "Body Balance" is a branded class's
+ *   name (a trademark, as HYROX is): the choice is now "Yoga or Pilates
+ *   class", on both tiers, its id kept so past entries still read right.
+ *   The Plan's list also offers Reformer class (reformer-class), under
+ *   Classes. Free gains nothing.
+ *
  * 31 Oct 2026 v5
  *
  * v5 - STAGE PATH Session 8 (P-8; P-12, Graeme 29 Oct: the new look is the
@@ -47,7 +55,7 @@ import { lineIcon } from "../data/line-icons.js";
 // STAGE PATH P-8 / P-12. The Plan's look: one tier check, a class and line icons.
 const _plan = () => isPremium();
 const _planCls = () => (_plan() ? " is-plan" : "");
-const PLAN_ICON = { run: "run", walk: "walk", cycle: "cycle", swim: "swim", row: "wave", gym: "gym", "body-balance": "yoga", spin: "cycle",
+const PLAN_ICON = { run: "run", walk: "walk", cycle: "cycle", swim: "swim", row: "wave", gym: "gym", "body-balance": "yoga", "reformer-class": "yoga", spin: "cycle",
   boxing: "strength", hiit: "strength", class: "classes", tennis: "outside", football: "outside", golf: "outside", sport: "outside",
   hike: "mountain", "outdoor-cycle": "cycle", outdoor: "outside" };
 const _icon = item => (_plan() ? lineIcon(PLAN_ICON[item.id] || "outside", 22) : item.icon);
@@ -61,7 +69,9 @@ let activityType = null;
 // "pendingLogActivity", a name this screen never read, so the activity
 // was forgotten). Matched by the words on the Library's card.
 let _preset = null;
-const LIBRARY_WORDS = { "spin class": "spin", "hiit": "hiit", "outdoor cycle": "outdoor-cycle" };
+const LIBRARY_WORDS = { "spin class": "spin", "hiit": "hiit", "outdoor cycle": "outdoor-cycle", "body balance": "body-balance" };
+/** v6. The groups this person sees: Reformer class is the Plan's. */
+const _groups = () => ACTIVITY_GROUPS.map(g => ({ ...g, items: g.items.filter(i => !i.planOnly || _plan()) }));
 export function presetLogActivity(label) {
   const l = String(label || "").trim().toLowerCase();
   const all = ACTIVITY_GROUPS.flatMap(g => g.items);
@@ -81,7 +91,8 @@ const ACTIVITY_GROUPS = [
     { id: "gym", label: "Gym or weights", icon: "\uD83C\uDFCB\uFE0F" },
   ]},
   { group: "Classes", items: [
-    { id: "body-balance", label: "Body Balance", icon: "\uD83E\uDDD8" },
+    { id: "body-balance", label: "Yoga or Pilates class", icon: "\uD83E\uDDD8" },
+    { id: "reformer-class", label: "Reformer class", icon: "\uD83E\uDDD8", planOnly: true },
     { id: "spin", label: "Spin / cycle class", icon: "\uD83D\uDEB4" },
     { id: "boxing", label: "Boxing", icon: "\uD83E\uDD4A" },
     { id: "hiit", label: "HIIT / circuits", icon: "\uD83D\uDD25" },
@@ -133,7 +144,7 @@ export function render() {
 function renderTypePicker() {
   return `
     <div class="activity-log-picker">
-      ${ACTIVITY_GROUPS.map(group => `
+      ${_groups().map(group => `
         <h3 class="activity-group-heading">${group.group}</h3>
         <div class="activity-type-grid">
           ${group.items.map(item => `

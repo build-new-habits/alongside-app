@@ -1,5 +1,10 @@
 /**
  * js/data/activity-labels.js
+ * 01 Nov 2026 v6
+ *
+ * v6 - P-20: body-balance reads "a yoga or Pilates class" (the name was a
+ *   trademark); reformer-class added (the Plan's Log what I did).
+ *
  * 17 Oct 2026 v5
  *
  * v5 - W6-7 GENTLE-LOGGED. The Bad day's gentle plan and the general
@@ -70,7 +75,8 @@ const LABELS = {
   "practice":           ["a practice",                "practices"],
   // The manual activity log
   "row":                ["some rowing",               "rowing"],
-  "body-balance":       ["a Body Balance class",      "Body Balance"],
+  "body-balance":       ["a yoga or Pilates class",   "yoga or Pilates classes"],   // v6: "Body Balance" is a trademark
+  "reformer-class":     ["a reformer class",          "reformer classes"],
   "spin":               ["a spin class",              "spin"],
   "boxing":             ["boxing",                    "boxing"],
   "hiit":               ["a HIIT session",            "HIIT"],

@@ -1,6 +1,15 @@
 /**
  * js/data/trend-recipes.js
- * 01 Nov 2026 v3
+ * 01 Nov 2026 v4
+ *
+ * v4 - P-20 session 4: reformer-style Pilates with a band, and Dynamic
+ *   Pilates (approved 01 Nov, Graeme: BNH-Files Product/
+ *   alongside_content_trends-reformer_01nov2026_v2.md). Seven slots in a
+ *   reformer class's order, a long band where the springs would be; the two
+ *   new band movements held, their stated substitutes standing in. Steady,
+ *   not Hard. Up to three days a week, never the day after another. From
+ *   week 9, one day a week may be Dynamic Pilates (a Pilates move, then a
+ *   band strength burst). Always reformer-style: never the machine.
  *
  * v3 - P-20 session 3: Hybrid training (approved 01 Nov, Graeme: BNH-Files
  *   Product/alongside_content_trends-hybrid_01nov2026_v2.md). Eight stations
@@ -78,6 +87,7 @@ export const TRENDS = Object.freeze({
   cross: { name: "Mix it up", short: "cross training", line: "Cross training: swap one day for something that uses your body differently.", doors: ["moving", "stronger"], icon: "fresh" },
   hilit: { name: "HILIT: hard work, no jumping", short: "HILIT", line: "Short bursts, then a rest. Nothing leaves the floor.", doors: ["stronger", "moving"], icon: "strength" },
   hybrid: { name: "Hybrid training", short: "hybrid training", line: "Eight stations of strength and fitness, at your own pace.", doors: ["stronger"], icon: "strength" },
+  reformer: { name: "Reformer-style Pilates, with a band", short: "reformer-style Pilates", line: "A reformer class\u2019s order, with a band where the springs would be.", doors: ["stronger"], icon: "yoga" },
   snack: { name: "A 10-minute snack", short: "a 10-minute snack", line: "A short burst for one thing. Ten minutes still counts.", doors: ["stronger", "moving"], icon: "sparkle" },
 });
 
@@ -275,13 +285,13 @@ export function hilitWeek(week) {
  * Two days a week at most (Monday to Sunday), never on the day after
  * another, for a hard trend. Returns { ok, why }.
  */
-export function hardTrendDayAllowed(trend, label, log = [], now = new Date()) {
+export function hardTrendDayAllowed(trend, label, log = [], now = new Date(), most = 2) {
   const day = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const monday = new Date(day); monday.setDate(day.getDate() - ((day.getDay() + 6) % 7));
   const yesterday = new Date(day); yesterday.setDate(day.getDate() - 1);
   const done = log.filter(e => e && e.trend === trend && e.status !== "partial").map(e => Date.parse(e.completedAt || e.date)).filter(Number.isFinite);
   if (done.some(t => t >= yesterday.getTime())) return { ok: false, why: `You did ${label} yesterday or today. It works best with a day off between.` };
-  if (done.filter(t => t >= monday.getTime()).length >= 2) return { ok: false, why: `That\u2019s two ${label} days this week, which is plenty. The rest of the week is for something easier.` };
+  if (done.filter(t => t >= monday.getTime()).length >= most) return { ok: false, why: `That\u2019s ${most === 3 ? "three" : "two"} ${label} days this week, which is plenty. The rest of the week is for something else.` };
   return { ok: true, why: "" };
 }
 
@@ -425,6 +435,82 @@ export function hybridSession({ week = 1, minutes = 60, half = 0, between = "wal
     stations: chosen.map(x => x.st.label), leftOut,
     line: full ? "Nothing is timed. Go at a pace you could keep going at." : "Go at a pace you can keep for the whole station.",
   }, byId);
+}
+
+// ── Reformer-style (reformer draft §2 to §5) ─────────────────────────────
+
+/** The seven slots, in a reformer class's order; floor and without the floor, easiest first. */
+export const REFORMER_SLOTS = Object.freeze([
+  { id: "footwork", label: "Footwork",       floor: ["band-footwork", "seated-leg-extension"],               noFloor: ["seated-leg-extension"] },
+  { id: "bridge",   label: "Bridging",       floor: ["pilates-shoulder-bridge", "loop-band-glute-bridge", "glute-bridge", "glute-bridge-march", "glute-bridge-single-leg"], noFloor: ["band-pull-through"] },
+  { id: "straps",   label: "Feet in straps", floor: ["band-feet-in-straps", "pilates-leg-circles"],           noFloor: ["standing-hip-abduction", "loop-band-standing-kickback"] },
+  { id: "arms",     label: "Arms",           floor: ["band-row-seated", "band-reverse-fly", "band-chest-press", "band-overhead-triceps-extension"], noFloor: ["seated-band-chest-press", "seated-band-chest-fly", "seated-overhead-band-press"] },
+  { id: "plank",    label: "Plank",          floor: ["bird-dog", "pilates-long-stretch", "plank", "bear-hold"], noFloor: ["seated-dead-bug-arms"] },
+  { id: "side",     label: "Side work",      floor: ["clamshell", "clamshell-banded", "pilates-side-kick", "side-plank-modified", "pilates-kneeling-series"], noFloor: ["seated-side-bend", "band-lateral-walk"] },
+  { id: "close",    label: "Stretch to close", floor: ["pilates-mermaid", "pilates-spine-stretch", "pilates-spine-twist"], noFloor: ["pilates-roll-down-standing", "pilates-roll-down-wall"] },
+]);
+/** Dynamic Pilates's pairs: a Pilates move, then a band strength burst. */
+export const DYNAMIC_POOLS = Object.freeze({
+  pilates: ["pilates-hundred", "pilates-shoulder-bridge", "pilates-swimming", "pilates-side-kick", "pilates-single-leg-stretch", "pilates-double-leg-stretch", "pilates-scissors", "pilates-teaser-prep"],
+  band:    ["band-squat", "band-chest-press", "band-row-seated", "band-lateral-walk", "band-pull-through", "band-overhead-press", "band-bent-over-row"],
+});
+
+export function reformerWeek(week) {
+  const w = Math.min(12, Math.max(1, Math.floor(Number(week) || 1)));
+  const block = Math.ceil(w / 4);
+  return { week: w, block, easier: ((w - 1) % 4) + 1 === 4, harder: block >= 2, dynamic: block === 3 };
+}
+export function reformerDayAllowed(log = [], now = new Date()) {
+  return hardTrendDayAllowed("reformer", "reformer-style", log, now, 3);
+}
+/** Has this week's Dynamic Pilates day been done (Monday to today)? */
+export function dynamicDoneThisWeek(log = [], now = new Date()) {
+  const day = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const monday = new Date(day); monday.setDate(day.getDate() - ((day.getDay() + 6) % 7));
+  return log.some(e => e && e.trend === "reformer" && e.effort === "hard" && Date.parse(e.completedAt || e.date) >= monday.getTime());
+}
+
+/**
+ * Reformer-style: a 2 minute breathing start, then the slots in order.
+ * 20 min: footwork, bridging, arms, plank, the close; 30 and 40: all
+ * seven. floor false: the versions without the floor. The harder versions
+ * come from block 2 (the person still chooses with Swap).
+ */
+export function reformerSession({ week = 1, minutes = 20, floor = true, byId, available = () => true, prefs = {}, liked = {}, recent = [] }) {
+  const wk = reformerWeek(week);
+  const len = Number(minutes) >= 40 ? 40 : Number(minutes) >= 30 ? 30 : 20;
+  let slots = len === 20 ? REFORMER_SLOTS.filter(s => !["straps", "side"].includes(s.id)) : REFORMER_SLOTS;
+  if (wk.easier && slots.length > 5) slots = slots.filter(s => s.id !== "side");
+  const per = len === 20 ? 3.5 : len === 30 ? 4 : 5;
+  const steps = [{ id: "breath-awareness-meditation", mins: 2, note: "Settle your breath, seated" }];
+  for (const s of slots) {
+    const ids = orderPool(floor ? s.floor : s.noFloor, { byId, prefs, liked, recent }).filter(id => available(byId.get(id)));
+    if (!ids.length) continue;
+    const pick = wk.harder && ids.length > 1 && s.id !== "close" ? ids[Math.min(1, ids.length - 1)] : ids[0];
+    steps.push({ id: pick, mins: per, note: `${s.label} \u00b7 slow and controlled`, swaps: ids });
+  }
+  if (steps.length < 4) return null;
+  return labelled({ id: `trend-reformer-${len}${floor ? "" : "-nofloor"}`, trend: "reformer", effort: "steady", name: "Reformer-style Pilates, with a band",
+    minutes: Math.round(steps.reduce((a, s) => a + s.mins, 0)), steps,
+    support: "A long band takes the place of a reformer\u2019s springs. The order and the kind of work follow a reformer class.",
+    line: "Slow, with control." }, byId);
+}
+
+/** Dynamic Pilates: rounds of five pairs (60 s Pilates, 40 s band burst, 20 s rest). 20 min: two rounds; 30: three. */
+export function dynamicSession({ minutes = 20, byId, available = () => true, prefs = {}, liked = {}, recent = [] }) {
+  const rounds = Number(minutes) >= 30 ? 3 : 2;
+  const pil = orderPool(DYNAMIC_POOLS.pilates, { byId, prefs, liked, recent }).filter(id => available(byId.get(id)));
+  const band = orderPool(DYNAMIC_POOLS.band, { byId, prefs, liked, recent }).filter(id => { const e = byId.get(id); return e && e.impact !== true && available(e); });
+  if (pil.length < 5 || band.length < 5) return null;
+  const steps = [{ id: "breath-awareness-meditation", mins: 2, note: "Settle your breath, seated" }];
+  for (let r = 1; r <= rounds; r++) for (let i = 0; i < 5; i++) {
+    steps.push({ id: pil[i], mins: 1, note: `Round ${r} of ${rounds} \u00b7 Pilates, steady`, swaps: pil });
+    steps.push({ id: band[i], mins: 40 / 60, note: `Round ${r} of ${rounds} \u00b7 40 seconds, hard`, swaps: band });
+    steps.push({ id: "breath-awareness-meditation", mins: 20 / 60, note: "Rest, 20 seconds" });
+  }
+  for (const id of ["pilates-mermaid", "pilates-spine-stretch"]) if (byId.has(id)) steps.push({ id, mins: 2, note: "To close" });
+  return labelled({ id: `trend-reformer-dynamic-${rounds}`, trend: "reformer", effort: "hard", name: "Dynamic Pilates", minutes: Math.round(steps.reduce((a, s) => a + s.mins, 0)), steps,
+    line: "Pilates moves steady; the band bursts hard." }, byId);
 }
 
 // ── Cross training (draft §5) ────────────────────────────────────────────

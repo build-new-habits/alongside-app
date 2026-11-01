@@ -1,6 +1,12 @@
 /**
  * views/path.js
- * 01 Nov 2026 v7
+ * 01 Nov 2026 v8
+ *
+ * v8 - P-20 session 4: reformer-style Pilates with a band (approved 01 Nov,
+ *   Graeme; Get stronger). Its step says the week, asks the floor question
+ *   and how long, and offers today's reformer-style session, the library's
+ *   own Mat Adaptation and, from week 9 once a week, Dynamic Pilates. Up to
+ *   three days a week, a day off between. Always reformer-style.
  *
  * v7 - P-20 session 3: Hybrid training (approved 01 Nov, Graeme; Get
  *   stronger only). Its step says the week and the stations, asks how long
@@ -118,7 +124,8 @@ import { equipmentForLocation } from "../session-builder.js";
 import { resolveEquipment, exerciseIsAvailable } from "../data/equipment-map.js";
 import { TRENDS, EFFORT, HARD_SAFETY, ZONE2_ACTIVITIES, zone2Week, zone2Session, zone2HardDoneThisWeek,
          SNACK_QUALITIES, snackSession, MAIN_ACTIVITIES, mainActivityFrom, crossOptions, recentTrendIds, plainName,
-         hilitWeek, hilitDayAllowed, hilitSession, HYBRID_BETWEEN, hybridWeek, hybridDayAllowed, hybridSession } from "../data/trend-recipes.js";
+         hilitWeek, hilitDayAllowed, hilitSession, HYBRID_BETWEEN, hybridWeek, hybridDayAllowed, hybridSession,
+         reformerWeek, reformerDayAllowed, reformerSession, dynamicSession, dynamicDoneThisWeek } from "../data/trend-recipes.js";
 
 const BY_ID = new Map([...EXERCISES, ...PATH_MOVEMENTS].map(e => [e.id, e]));
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -157,6 +164,8 @@ const POSITION = { standing: "Standing", seated: "Seated", floor: "On the floor"
 const ENERGY = [["Running on empty", 2], ["Low", 3], ["Okay", 6], ["Good", 7], ["Full of it", 9]];
 const FEEL_LENGTHS = [5, 10, 15, 20];
 const BUILD_LENGTHS = [["micro", 10], ["quick", 20], ["short", 30], ["standard", 40], ["long", 50]];
+/** P-20. A step's length in words: seconds under two minutes when not whole, else whole minutes ("0.666… min" was shown). */
+export const stepLength = m => { const n = Number(m) || 0; return n < 2 && Math.abs(n - Math.round(n)) > 0.01 ? `${Math.round(n * 60)} seconds` : `${Math.round(n)} min`; };
 /** P-20. Today's length in minutes, only when chosen today (else the recipe's own). */
 const lengthMinsToday = () => BUILD_LENGTHS.find(([c]) => c === todaysLengthCat())?.[1] || null;
 
@@ -350,7 +359,7 @@ export function PathView(router) {
     trends() {
       return `${heading("Follow a fitness trend", "fresh", DOOR[st.door].kind)}
         <ul class="path-list">${trendsFor(st.door).map(([id, x]) => {
-          const w = ["zone2", "hilit", "hybrid"].includes(id) ? store.trendWeek(id) : null;
+          const w = ["zone2", "hilit", "hybrid", "reformer"].includes(id) ? store.trendWeek(id) : null;
           return row({ v: id, t: x.name, d: esc(x.line) + (w ? ` · Week ${w}` : ""), icon: x.icon, kind: DOOR[st.door].kind }); }).join("")}</ul>`;
     },
     z2act() {
@@ -400,6 +409,23 @@ export function PathView(router) {
         </ul>` : `<p class="path-note" id="path-hybrid-why">${esc(day.why)}</p>`}
         ${followed("hybrid") ? `<ul class="path-list">${row({ v: "stop", t: "Stop following Hybrid training" })}</ul>` : ""}
         <p class="path-small">Two days a week at most, with a day off between.</p>`;
+    },
+    reformer() {
+      const wk = reformerWeek(store.trendWeek("reformer") || 1);
+      const day = reformerDayAllowed(store.get("activityLog") || []);
+      const dyn = wk.dynamic && !dynamicDoneThisWeek(store.get("activityLog") || []);
+      const floor = st.rfloor !== "no";
+      return `${heading(`Reformer-style, week ${wk.week}`, "yoga", DOOR[st.door].kind)}
+        <p class="path-coachline">A reformer class\u2019s order, with a long band where the springs would be. Slow, with control.${wk.easier ? " This is an easier week." : ""}</p>
+        ${day.ok ? `${radios("rfloor", "Can you get down to the floor today?", [["yes", "Yes"], ["no", "Not today"]], floor ? "yes" : "no")}
+        ${radios("rlen", "How long have you got?", [["20", "20 min"], ["30", "30 min"], ["40", "40 min"]], st.rlen || "20")}
+        <ul class="path-list">
+          ${row({ v: "go", t: "Today\u2019s reformer-style session", d: esc(EFFORT.steady), tint: true })}
+          ${dyn && floor ? row({ v: "dynamic", t: "Dynamic Pilates", d: "Pilates moves, each followed by a short band burst. Once a week." }) : ""}
+          ${floor && BY_ID.has("pilates-reformer-simulation") ? row({ v: "mat", t: "Reformer-Style Pilates, Mat Adaptation", d: "The library\u2019s own 30 minute sequence" }) : ""}
+        </ul>` : `<p class="path-note" id="path-reformer-why">${esc(day.why)}</p>`}
+        ${followed("reformer") ? `<ul class="path-list">${row({ v: "stop", t: "Stop following reformer-style" })}</ul>` : ""}
+        <p class="path-small">Up to three days a week, with a day off between.</p>`;
     },
     squal() {
       const mine = SNACK_QUALITIES.filter(q => q.door === st.door || (st.door === "moving" && q.id === "legs"));
@@ -512,7 +538,7 @@ export function PathView(router) {
           const q = encodeURIComponent(e.youtube || `${e.name || s.id} how to`);
           return `<li class="path-mv">${renderFigure(s.id) || ""}
             <p class="path-mv__nm" id="path-mv-${i}">${i + 1}. ${esc(s.label || nameOf(s.id))}</p>
-            <p class="path-small">${s.dose ? esc(s.dose) : `${s.mins} min`}${s.note ? ` · ${esc(s.note)}` : ""}</p>
+            <p class="path-small">${s.dose ? esc(s.dose) : stepLength(s.mins)}${s.note ? ` · ${esc(s.note)}` : ""}</p>
             <span class="path-mv__acts">
               <a class="path-mv__yt" href="https://www.youtube.com/results?search_query=${q}" target="_blank" rel="noopener">Find a video on YouTube<span class="sr-only"> for ${esc(s.label || nameOf(s.id))} (opens YouTube, a search)</span></a>
               ${swapsFor(p, s, ids).length ? `<button type="button" class="btn btn-secondary path-mv__swap" id="path-swap-${i}" data-swap="${i}" aria-describedby="path-mv-${i}">Swap</button>` : ""}
@@ -615,7 +641,20 @@ export function PathView(router) {
         if (v === "snack") return go("squal", {});
         if (v === "hilit") return go("hilit", {});
         if (v === "hybrid") return go("hybrid", {});
+        if (v === "reformer") return go("reformer", {});
         return;
+      case "reformer": {
+        if (v === "stop") { store.stopTrend("reformer"); say("Stopped following reformer-style."); trail.pop(); step = "trends"; paint(); return; }
+        if (!reformerDayAllowed(store.get("activityLog") || []).ok) return;
+        const inn = { ...recipeIn(), minutes: Number(st.rlen || 20) };
+        let s = null;
+        if (v === "go") s = reformerSession({ ...inn, week: store.trendWeek("reformer") || 1, floor: st.rfloor !== "no" });
+        else if (v === "dynamic") s = dynamicSession(inn);
+        else if (v === "mat") { const e = BY_ID.get("pilates-reformer-simulation"); s = { id: e.id, trend: "reformer", effort: "steady", name: e.name, minutes: 30, steps: [{ id: e.id, mins: 30 }] }; }
+        if (!s) { say("Nothing fits with the kit you have there. A long band is needed."); return; }
+        if (!followed("reformer")) store.startTrend("reformer");
+        return trendProg(s);
+      }
       case "hybrid": {
         if (v === "stop") { store.stopTrend("hybrid"); say("Stopped following Hybrid training."); trail.pop(); step = "trends"; paint(); return; }
         if (!hybridDayAllowed(store.get("activityLog") || []).ok) return;
@@ -735,6 +774,11 @@ export function PathView(router) {
     root.querySelectorAll('input[name="hseat"]').forEach(r => r.addEventListener("change", () => { st.hseat = r.value; }));
     root.querySelectorAll('input[name="ylen"]').forEach(r => r.addEventListener("change", () => { st.ylen = r.value; }));
     root.querySelectorAll('input[name="ybetween"]').forEach(r => r.addEventListener("change", () => { st.ybetween = r.value; }));
+    root.querySelectorAll('input[name="rlen"]').forEach(r => r.addEventListener("change", () => { st.rlen = r.value; }));
+    root.querySelectorAll('input[name="rfloor"]').forEach(r => r.addEventListener("change", () => {
+      st.rfloor = r.value; paint(false); root.querySelector(`input[name="rfloor"][value="${r.value}"]`)?.focus();
+      say(r.value === "no" ? "Showing the session without the floor." : "Showing all of them.");
+    }));
     root.querySelector("#path-build")?.addEventListener("click", () => {
       store.set("requestedSessionType", sessionTypeFor(st.door, st.part));
       store.set("requestedLocation", st.place);

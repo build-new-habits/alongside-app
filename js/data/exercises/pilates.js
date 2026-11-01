@@ -1,5 +1,13 @@
 /**
  * data/exercises/pilates.js
+ * 01 Nov 2026 v7
+ *
+ * v7 - P-20 (reformer draft §7, approved 01 Nov): Reformer-Style Pilates —
+ *   Mat Adaptation's steps written out as sentences, a bolster as optional
+ *   kit (its Long box step uses one), and its coaching no longer claims it
+ *   captures "most of the benefit" (not shown): a band gives resistance in
+ *   a similar way. Its why is accurate and stays.
+ *
  * 28 Oct 2026 v6
  * v6 - STAGE PATH P-2 and P-9b (Session 2). Every entry carries doors,
  *   feelings and style (blueprint C5; tools/verify-path-tags.mjs). Why and
@@ -978,7 +986,7 @@ export const PILATES = [
     contentType: 'practice',
     movementPattern: 'pilates-sequence',
     equipment: ['resistance-band'],
-    equipmentOptional: [],
+    equipmentOptional: ['bolster'],   // P-20: its Long box step uses one (or a firm cushion)
     affectsAreas: ['full-body'],
     contraindications: [],
     energyRequired: 5,
@@ -986,14 +994,14 @@ export const PILATES = [
     duration: 1800,
     perSide: false,
     instructions: [
-      'Footwork: lie on back, band around feet, legs press out and in × 20',
-      'Long spine: band around feet, extend legs overhead while pulling handles × 8',
-      'Rowing: seated, band around feet, row sequence × 10 each variation',
-      'Long box: lie prone over a bolster, band in hands for lat pulls × 10',
-      'Side-lying leg series: band around ankle for resistance — kicks, circles × 10 each',
-      'Full plank series without band to close'
+      'Footwork: lie on your back with the band round your feet, and press your legs out and back in, 20 times',
+      'Long spine: with the band round your feet, take your legs up overhead as you pull on the band, 8 times',
+      'Rowing: sit tall with the band round your feet, and row, 10 times for each way of rowing',
+      'Long box: lie face down over a bolster or firm cushion, the band in your hands, and pull your arms down to your sides, 10 times',
+      'Side-lying leg series: lie on your side with the band round your ankles, then kick and circle the top leg, 10 times each',
+      'To close, a plank series without the band'
     ],
-    coaching: 'The reformer uses spring resistance — a band approximates this well enough to capture most of the benefit on a mat. Adjust band tension to match your level.',
+    coaching: 'A reformer uses springs for resistance; a band gives you resistance in a similar way on a mat. Adjust the band\u2019s tension to match your level.',
     why: 'Reformer Pilates uses resistance that mat Pilates lacks — this adaptation bridges the gap, allowing mat practitioners to experience resistance-based Pilates without the equipment.',
         watchOut: [
       'Letting the band snap back rather than controlling the return',

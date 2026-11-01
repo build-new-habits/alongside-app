@@ -1,7 +1,8 @@
 /**
  * tools/chromium-trends.mjs
- * 01 Nov 2026 v3
+ * 01 Nov 2026 v4
  *
+ * v4 - P-20 session 4: reformer-style's screens and Dynamic Pilates.
  * v3 - P-20 session 3: Hybrid training's screens (week 1, the session, week 9).
  * v2 - P-20 session 2: HILIT's two screens.
  *
@@ -63,6 +64,9 @@ const SCREENS = [
   ["stronger", ["home", "whole", "trend", "hybrid"], "Hybrid training, week 1"],
   ["stronger", ["home", "whole", "trend", "hybrid", "go"], "Hybrid training, the session"],
   ["stronger", ["@week9h", "gym", "whole", "trend", "hybrid"], "Hybrid training, week 9"],
+  ["stronger", ["home", "whole", "trend", "reformer"], "Reformer-style, week 1"],
+  ["stronger", ["home", "whole", "trend", "reformer", "go"], "Reformer-style, the session"],
+  ["stronger", ["@week9r", "home", "whole", "trend", "reformer", "dynamic"], "Dynamic Pilates"],
   ["finish",   [], "the Plan finish after a snack"],
 ];
 
@@ -75,7 +79,7 @@ for (const scheme of ["light", "dark"]) for (const width of [390, 320]) for (con
   await page.goto(BASE); await page.waitForTimeout(1000);
   for (const [door, presses, name] of SCREENS) {
     const label = `${scheme} ${width}px text ${size}: ${name}`;
-    await page.evaluate(async ({ size, week5, week9h, finish }) => {
+    await page.evaluate(async ({ size, week5, week9h, week9r, finish }) => {
       const s = window.store;
       const { POLICY_VERSION } = await import("./js/data/consent-version.js");
       const { AGE_CHECK_VERSION } = await import("./js/data/age-check.js");
@@ -88,9 +92,10 @@ for (const scheme of ["light", "dark"]) for (const width of [390, 320]) for (con
       s.set("consent.health", { given: true, at, version: HEALTH_CONSENT_VERSION, withdrawnAt: null });
       s.set("onboardingComplete", true); s.set("name", "Graeme"); s.set("tier", "personal");
       s.set("safetyAckLog", Array.from({ length: 5 }, () => ({ at, textVersion: HURT_AND_ACHE_VERSION, surface: "fixture" })));
-      s.set("homeEquipment", ["resistance-band-medium"]);
+      s.set("homeEquipment", ["band-medium"]);
       const k = new Date().toISOString().split("T")[0];
       s.set("checkinHistory", { [k]: { energy: 6, mood: 6, date: new Date().toDateString() } });
+      if (week9r) s.set("trends", [{ id: "reformer", startedAt: s._localDay(new Date(Date.now() - 60 * 86400000)), activity: null }]);
       if (week9h) s.set("trends", [{ id: "hybrid", startedAt: s._localDay(new Date(Date.now() - 60 * 86400000)), activity: null }]);
       if (week5) s.set("trends", [{ id: "zone2", startedAt: s._localDay(new Date(Date.now() - 30 * 86400000)), activity: "run" }]);
       if (finish) {
@@ -98,7 +103,7 @@ for (const scheme of ["light", "dark"]) for (const width of [390, 320]) for (con
         s.set("currentActivityEntry", s.get("activityLog").slice(-1)[0]);
       }
       const DP = await import("./js/display-prefs.js"); DP.setDisplayPref("textScale", size); DP.applyDisplayPrefs();
-    }, { size, week5: presses[0] === "@week5", week9h: presses[0] === "@week9h", finish: door === "finish" });
+    }, { size, week5: presses[0] === "@week5", week9h: presses[0] === "@week9h", week9r: presses[0] === "@week9r", finish: door === "finish" });
     if (door === "finish") { await page.evaluate(() => window.router.navigate("plan-finish")); }
     else {
       await page.evaluate(d => { window.router.pathStart = { door: d }; window.router.navigate("path"); }, door);

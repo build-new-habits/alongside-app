@@ -1,5 +1,9 @@
 /**
  * js/data/evidence.js
+ * 01 Nov 2026 v5
+ *
+ * v5 - P-20: reformer-class counts as a class.
+ *
  * 17 Oct 2026 v4
  *
  * v4 - W6-9 SMALL-6. Research messages are dated the day they became due (a
@@ -73,7 +77,7 @@ export const KIND_OF = {
   "morning-session": "mobility",
   yoga: "mobility", "yoga-session": "mobility", stretch: "mobility", mobility: "mobility",
   breathing: "breathing", "breathing-session": "breathing", mindful: "breathing", mindfulness: "breathing", "quiet-session": "breathing",
-  class: "class", "body-balance": "class",
+  class: "class", "body-balance": "class", "reformer-class": "class",
   freestyle: null, capture: null, "prescribed-session": null, practice: null, outdoor: null,
   swim: null, "swim-session": null, cycle: null, "cycle-session": null, "outdoor-cycle": null,
   row: null, spin: null, boxing: null, hiit: null, tennis: null, football: null, golf: null, sport: null,

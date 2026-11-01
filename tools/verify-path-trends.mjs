@@ -1,7 +1,14 @@
 import { createRequire as __cr } from "node:module";
 /**
  * tools/verify-path-trends.mjs
- * 01 Nov 2026 v3
+ * 01 Nov 2026 v4
+ *
+ * v4 - P-20 session 4: reformer-style in Get stronger (1c), and TEST 10:
+ *   the seven slots in a reformer class's order, the held band movements'
+ *   substitutes, Steady, the floor question, three days a week at most,
+ *   Dynamic Pilates from week 9 once a week, never the machine; Log what I
+ *   did says "Yoga or Pilates class" (never the trademark) on both tiers
+ *   and offers Reformer class on the Plan only.
  *
  * v3 - P-20 session 3: Hybrid training in Get stronger (1c: cross, HILIT,
  *   Hybrid training, the snack; Keep moving unchanged), and TEST 9 holds
@@ -131,7 +138,7 @@ ok("1a. How offers Follow a fitness trend, saying what is behind it", vals().inc
 tapRow("trend");
 ok("1b. Keep moving: Zone 2, Mix it up, HILIT, the snack", step() === "trends" && h1() === "Follow a fitness trend" && vals().join() === "zone2,cross,hilit,snack", vals().join());
 fixture(); toHow("stronger"); tapRow("trend");
-ok("1c. Get stronger: Mix it up, HILIT, Hybrid training and the snack, never Zone 2", vals().join() === "cross,hilit,hybrid,snack", vals().join());
+ok("1c. Get stronger: Mix it up, HILIT, Hybrid training, reformer-style and the snack, never Zone 2", vals().join() === "cross,hilit,hybrid,reformer,snack", vals().join());
 ok("1d. no trademark anywhere on the step", !/hyrox|deka/i.test(main.textContent));
 
 // ── 2 ────────────────────────────────────────────────────────────────────
@@ -170,7 +177,7 @@ ok("2l. Stop following Zone 2 removes it", !(store.get("trends") || []).some(t =
 console.log("\nTEST 3 - Snacks");
 const HELD = new Set(R.HELD);
 for (const q of ["legs", "pull", "middle", "balance"]) {
-  fixture({ home: ["resistance-band-medium"] }); toHow("stronger"); tapRow("trend"); tapRow("snack");
+  fixture({ home: ["band-medium"] }); toHow("stronger"); tapRow("trend"); tapRow("snack");
   if (q === "legs") ok("3pc. the snack step: length and standing or seated, then the qualities", step() === "squal" && vals().join() === "legs,pull,middle,balance"
      && main.querySelectorAll('input[name="slen"]').length === 2 && main.querySelectorAll('input[name="sseat"]').length === 2, `${step()} ${vals()}`);
   tapRow(q);
@@ -368,6 +375,49 @@ fixture({ home: [], gym: [] }); toHow("stronger"); tapRow("trend"); tapRow("hybr
 navs = []; click(main.querySelector("#path-start"));
 ok("9o. at home with no kit: no kit in any station", hardOf().every(e => !(BYID.get(e.id)?.equipment || []).length), J(hardOf().map(e => e.id)));
 ok("9p. two Hybrid days this week: not allowed; two HILIT days do not count against it", !R.hybridDayAllowed(monWed.map(e => ({ ...e, trend: "hybrid" })), fri).ok && R.hybridDayAllowed(monWed, fri).ok);
+
+// ── 10 ───────────────────────────────────────────────────────────────────
+console.log("\nTEST 10 - Reformer-style, and Log what I did");
+const SLOT_IDS = new Set(R.REFORMER_SLOTS.flatMap(s => [...s.floor, ...s.noFloor]));
+fixture({ home: ["band-medium", "mini-bands"], gym: [] }); toHow("stronger"); tapRow("trend"); tapRow("reformer");
+ok("10a. week 1: the floor question, how long, today's session; no Dynamic Pilates yet", step() === "reformer" && /week 1/.test(h1()) && !!main.querySelector('input[name="rfloor"]')
+   && vals().includes("go") && !vals().includes("dynamic") && /springs/.test(main.textContent), `${h1()} ${vals()}`);
+tapRow("go");
+ok("10b. Steady, no Hard safety line; says the band takes the springs' place", txt(main.querySelector("#path-effort")).startsWith(R.EFFORT.steady) && !main.querySelector("#path-hard-safety") && /takes the place of a reformer/.test(main.textContent));
+navs = []; click(main.querySelector("#path-start"));
+const rx = (practice()?.exercises || []).slice(1);
+ok("10c. 20 minutes: footwork, bridging, arms, plank, the close, in that order, from the slots", rx.length === 5 && rx.every(e => SLOT_IDS.has(e.id))
+   && J(rx.map(e => (e.pathNote || "").split(" \u00b7")[0])) === J(["Footwork", "Bridging", "Arms", "Plank", "Stretch to close"]), J(rx.map(e => [e.id, e.pathNote])));
+ok("10d. the held band movements are not used (their substitutes are)", !(practice()?.exercises || []).some(e => R.HELD.includes(e.id)) && rx[0].id === "seated-leg-extension");
+ok("10e. marked reformer, Steady, for the log", practice()?.trend === "reformer" && practice()?.effort === "steady");
+ok("10f. never the machine: no word says it is a reformer", !/on (a|the) reformer machine|use a reformer/i.test(JSON.stringify(practice())));
+path("stronger"); tapRow("home"); tapRow("whole"); tapRow("trend"); tapRow("reformer");
+pick(main.querySelector('input[name="rfloor"][value="no"]'));
+ok("10g. Not today (the floor): no Mat Adaptation, no Dynamic", !vals().includes("mat") && !vals().includes("dynamic"), vals().join());
+tapRow("go"); navs = []; click(main.querySelector("#path-start"));
+ok("10h. without the floor: no floor movement", (practice()?.exercises || []).slice(1).every(e => BYID.get(e.id)?.position !== "floor"), J((practice()?.exercises || []).map(e => [e.id, BYID.get(e.id)?.position])));
+ok("10i. three days a week at most (Mon, Wed, Fri done: not on Sunday); two is fine", R.reformerDayAllowed([26, 28, 30].map(d => ({ trend: "reformer", completedAt: new Date(2026, 9, d, 7).toISOString() })), new Date(2026, 10, 1, 12)).ok === false
+   && R.reformerDayAllowed(monWed.map(e => ({ ...e, trend: "reformer" })), fri).ok);
+fixture({ home: ["band-medium", "mini-bands"], gym: [] });
+store.set("trends", [{ id: "reformer", startedAt: store._localDay(new Date(Date.now() - 60 * 86400000)), activity: null }]);
+toHow("stronger"); tapRow("trend"); tapRow("reformer");
+ok("10j. week 9: Dynamic Pilates offered", /week 9/.test(h1()) && vals().includes("dynamic"), `${h1()} ${vals()}`);
+tapRow("dynamic"); navs = []; click(main.querySelector("#path-start"));
+const dx = practice()?.exercises || [];
+ok("10k. Dynamic Pilates: Pilates moves then band bursts, the bursts Hard and never impact", dx.filter(e => /hard/.test(e.pathNote || "")).length === 10 && dx.filter(e => /hard/.test(e.pathNote || "")).every(e => R.DYNAMIC_POOLS.band.includes(e.id) && BYID.get(e.id).impact === false)
+   && practice()?.effort === "hard", J(dx.map(e => e.id)));
+store.logActivity({ type: "workout", completedAt: new Date().toISOString(), trend: "reformer", effort: "hard" });
+const lens = [...main.querySelectorAll(".path-mv .path-small")].map(e => e.textContent);
+ok("10k2. every step's length reads as whole minutes or seconds (it showed 0.6666666666666666 min)", lens.length > 0 && lens.every(l => /^(\d+ min|\d+ seconds)( ·|$)/.test(l.trim())), lens.slice(0, 6).join(" | "));
+ok("10l0. a Dynamic day done last week does not count", R.dynamicDoneThisWeek([{ trend: "reformer", effort: "hard", completedAt: new Date(2026, 9, 23, 7).toISOString() }], fri) === false);
+ok("10l. once done this week, Dynamic Pilates is not offered again", R.dynamicDoneThisWeek(store.get("activityLog")) === true);
+const AL = await import(B + "views/activity-log.js");
+for (const tier of ["personal", "free"]) {
+  fixture({ tier }); main.innerHTML = AL.render ? AL.render() : ""; try { AL.onMount?.(); } catch {}
+  const labels = [...main.querySelectorAll(".activity-type-card")].map(b => b.getAttribute("aria-label"));
+  ok(`10m. ${tier}: Log what I did says Yoga or Pilates class, never the trademark`, labels.includes("Yoga or Pilates class") && !labels.includes("Body Balance"), labels.join("|"));
+  ok(`10n. ${tier}: Reformer class ${tier === "free" ? "is not offered (the Plan's)" : "is offered"}`, labels.includes("Reformer class") === (tier !== "free"), labels.join("|"));
+}
 
 console.log(`\n${passes} passed, ${fails} failed`);
 process.exit(fails ? 1 : 0);
