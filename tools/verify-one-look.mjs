@@ -1,7 +1,13 @@
 import { createRequire as __cr } from "node:module";
 /**
  * tools/verify-one-look.mjs
- * 01 Nov 2026 v6
+ * 01 Nov 2026 v7
+ *
+ * v7 - P-20 re-point, as verify-path-outside v3 (Graeme, 01 Nov: rename
+ *   "Body Balance", a trademark, to "Yoga or Pilates class", on both
+ *   tiers). TEST 4 makes that one approved change to v688's Free Log what I
+ *   did, and to no other screen; its count is held at exactly two; any
+ *   other difference is still red. Nothing loosened.
  *
  * v6 - P-13 done: Build a session and the Morning programme leave the list,
  *   which is now empty; TEST 2 holds every Plan screen the router opens.
@@ -257,6 +263,12 @@ for (const file of touched) {
   try { a = await draw(OLD, entry.fn); } catch (e) { a = "THREW " + e.message; }
   store.data = JSON.parse(snap); store.save();
   try { b = await draw(NOW, entry.fn); } catch (e) { b = "THREW " + e.message; }
+  // v7: the one approved rename, made to the old words only, on Log what I did only.
+  if (name === "activity-log") {
+    const renames = (a.match(/Body Balance/g) || []).length;
+    ok("4r. v688's Free Log what I did named Body Balance exactly twice (label and words): the rename is that and no more", renames === 2, String(renames));
+    a = a.replace(/Body Balance/g, "Yoga or Pilates class");
+  }
   let at = 0; while (at < a.length && a[at] === b[at]) at++;
   compared++;
   ok(`4. Free ${name}: the same, byte for byte`, a === b && a.length > 40, `differs at ${at}: ${a.slice(at - 50, at + 50)} | ${b.slice(at - 50, at + 50)}`);
