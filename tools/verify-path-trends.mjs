@@ -1,7 +1,14 @@
 import { createRequire as __cr } from "node:module";
 /**
  * tools/verify-path-trends.mjs
- * 01 Nov 2026 v1
+ * 01 Nov 2026 v2
+ *
+ * v2 - P-20 session 2: HILIT joins both doors' lists (1a to 1c, the new
+ *   order: Zone 2, Mix it up, HILIT, the snack), and TEST 8 holds it:
+ *   five stations a round from the approved pools, never impact or a jump,
+ *   the week's work and rest, two days a week at most and never the day
+ *   after another, seated, Hard with the safety line, the held sliders
+ *   never offered. Nothing loosened.
  *
  * P-20 TRENDS-BUILD, session 1: Zone 2, snacks and cross training, as
  * approved 01 Nov (Graeme): BNH-Files Product/
@@ -111,11 +118,11 @@ ok("0b. completedSessions with no snack is as before (partials out, nothing merg
 console.log("\nTEST 1 - Follow a fitness trend, in the two doors");
 fixture(); toHow("moving");
 ok("1pc. the route reaches How would you like it?", step() === "how", step());
-ok("1a. How offers Follow a fitness trend, saying what is behind it", vals().includes("trend") && /Zone 2, cross training, a 10-minute snack/.test(txt(main.querySelector('.path-row[data-v="trend"]'))), txt(main.querySelector('.path-row[data-v="trend"]')));
+ok("1a. How offers Follow a fitness trend, saying what is behind it", vals().includes("trend") && /Zone 2, cross training, HILIT, a 10-minute snack/.test(txt(main.querySelector('.path-row[data-v="trend"]'))), txt(main.querySelector('.path-row[data-v="trend"]')));
 tapRow("trend");
-ok("1b. Keep moving: Zone 2, Mix it up, the snack", step() === "trends" && h1() === "Follow a fitness trend" && vals().join() === "zone2,cross,snack", vals().join());
+ok("1b. Keep moving: Zone 2, Mix it up, HILIT, the snack", step() === "trends" && h1() === "Follow a fitness trend" && vals().join() === "zone2,cross,hilit,snack", vals().join());
 fixture(); toHow("stronger"); tapRow("trend");
-ok("1c. Get stronger: Mix it up and the snack, never Zone 2", vals().join() === "cross,snack", vals().join());
+ok("1c. Get stronger: Mix it up, HILIT and the snack, never Zone 2", vals().join() === "cross,hilit,snack", vals().join());
 ok("1d. no trademark anywhere on the step", !/hyrox|deka/i.test(main.textContent));
 
 // ── 2 ────────────────────────────────────────────────────────────────────
@@ -267,6 +274,47 @@ store.logActivity({ type: "workout", completedAt: new Date().toISOString(), tren
 main.innerHTML = ""; try { ProgressView(fakeRouter).mount(main); } catch {}
 await new Promise(r => setTimeout(r, 30));
 ok("7c. Free: no Zone 2 week", !main.querySelector(".pr-trend"));
+
+// ── 8 ────────────────────────────────────────────────────────────────────
+console.log("\nTEST 8 - HILIT");
+const BYID = new Map(EXERCISES.map(e => [e.id, e]));
+const HPOOL = new Set(Object.values(R.HILIT_POOLS).flatMap(p => [...p.stand, ...(p.gym || []), ...p.seated]));
+const WARM = new Set(["marching-on-spot", "seated-marching-cardio", "squat-to-reach", "step-jacks", "sport-cooldown-general"]);
+fixture({ home: [], gym: [] }); toHow("stronger"); tapRow("trend"); tapRow("hilit");
+ok("8a. week 1: 30 seconds on, 30 off, length and standing or seated, today's session", step() === "hilit" && /week 1/.test(h1()) && /30 seconds, then 30 seconds/.test(main.textContent)
+   && [...main.querySelectorAll('input[name="hlen"]')].map(i => i.value).join() === "20,30,40" && vals().includes("go"), `${h1()} ${vals()}`);
+pick(main.querySelector('input[name="hlen"][value="20"]')); tapRow("go");
+const hp = st => [...main.querySelectorAll(".path-mv__nm")].map(e => e.textContent);
+ok("8b. it is followed from today, and opens as a proposal: Hard, the safety line", (store.get("trends") || []).some(t => t.id === "hilit") && step() === "prog"
+   && txt(main.querySelector("#path-effort")).startsWith(R.EFFORT.hard) && !!main.querySelector("#path-hard-safety"), J(store.get("trends")));
+navs = []; click(main.querySelector("#path-start"));
+const hx = practice()?.exercises || [];
+const work = hx.filter(e => /hard/.test(e.pathNote || ""));
+ok("8c. two rounds of five stations, each 30 seconds", work.length === 10 && work.every(e => e.duration === 30), J(work.map(e => [e.id, e.duration])));
+ok("8d. every station from the approved pools, never impact or a jump, never a held slider", work.every(e => HPOOL.has(e.id) && BYID.get(e.id)?.impact === false && BYID.get(e.id)?.movementPattern !== "jump" && !R.HELD.includes(e.id)), J(work.map(e => e.id)));
+ok("8e. everything else is the warm-up, rests and cool-down", hx.filter(e => !/hard/.test(e.pathNote || "")).every(e => WARM.has(e.id)));
+ok("8f. it is marked HILIT and Hard for the log", practice()?.trend === "hilit" && practice()?.effort === "hard");
+ok("8g. no kit: no band or dumbbell move", work.every(e => !(BYID.get(e.id)?.equipment || []).length), J(work.map(e => e.id)));
+store.logActivity({ type: "workout", completedAt: new Date().toISOString(), trend: "hilit", effort: "hard", durationMins: 20 });
+path("stronger"); tapRow("home"); tapRow("whole"); tapRow("trend"); tapRow("hilit");
+ok("8h. done today: not offered, and why (a day off between)", !vals().includes("go") && /day off between/.test(txt(main.querySelector("#path-hilit-why"))), vals().join());
+// The rule, on fixed days (Friday 30 Oct 2026, after Monday 26 and Wednesday 28): never vacuous on any weekday.
+const fri = new Date(2026, 9, 30, 12);
+const monWed = [26, 28].map(d => ({ trend: "hilit", effort: "hard", completedAt: new Date(2026, 9, d, 7).toISOString() }));
+ok("8i. two this week already: not allowed, and said", !R.hilitDayAllowed(monWed, fri).ok && /two HILIT days this week/.test(R.hilitDayAllowed(monWed, fri).why));
+ok("8i2. one this week, two days ago: allowed", R.hilitDayAllowed(monWed.slice(1), fri).ok);
+ok("8i3. one yesterday: not allowed (a day off between)", !R.hilitDayAllowed([{ trend: "hilit", completedAt: new Date(2026, 9, 29, 18).toISOString() }], fri).ok);
+ok("8i4. last week's do not count", R.hilitDayAllowed([19, 21, 23].map(d => ({ trend: "hilit", completedAt: new Date(2026, 9, d, 7).toISOString() })), fri).ok);
+ok("8j. the week's shape: block 2 is 40 on, 20 off; block 3 four rounds; each fourth week easier", J([R.hilitWeek(5), R.hilitWeek(9).rounds, R.hilitWeek(4).rounds, R.hilitWeek(12).rounds])
+   === J([{ week: 5, block: 2, easier: false, work: 40, rest: 20, rounds: 3 }, 4, 2, 3]));
+fixture({ home: [], gym: [] }); toHow("stronger"); tapRow("trend"); tapRow("hilit");
+pick(main.querySelector('input[name="hseat"][value="seated"]')); tapRow("go");
+const seatedH = hp().join();
+ok("8k. seated: seated stations only", /Seated/.test(seatedH) && !/Plank|Lunge|Press-Up|Sit to Stand/.test(seatedH), seatedH);
+ok("8l. never a trademark", !/hyrox|deka/i.test(main.textContent));
+const marked = new Map([...BYID].map(([id, e]) => [id, id === "sit-to-stand" ? { ...e, impact: true } : id === "reverse-lunge" ? { ...e, movementPattern: "jump" } : e]));
+const guarded = R.hilitSession({ week: 1, minutes: 20, byId: marked });
+ok("8m. a pool movement marked impact or jump is never used (the library can change)", guarded && !guarded.steps.some(s => s.id === "sit-to-stand" || s.id === "reverse-lunge"), J(guarded?.steps.map(s => s.id)));
 
 console.log(`\n${passes} passed, ${fails} failed`);
 process.exit(fails ? 1 : 0);

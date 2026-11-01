@@ -1,6 +1,13 @@
 /**
  * js/data/trend-recipes.js
- * 01 Nov 2026 v1
+ * 01 Nov 2026 v2
+ *
+ * v2 - P-20 session 2: HILIT, hard work with no jumping (approved 01 Nov,
+ *   Graeme: BNH-Files Product/alongside_content_trends-hilit_01nov2026_v2.md).
+ *   Five stations a round (legs, upper body with push and pull taking turns,
+ *   out of breath, your middle, legs or a carry), impact false and no jump
+ *   on every one; twelve weeks in three blocks, the fourth week of each
+ *   easier; two HILIT days a week at most, never on the day after another.
  *
  * P-20 TRENDS-BUILD, session 1 (master schedule v610): Zone 2 / 80-20,
  * snacks and cross training, as recipes the engine fills from the library.
@@ -60,6 +67,7 @@ export const HELD = Object.freeze([
 export const TRENDS = Object.freeze({
   zone2: { name: "Zone 2, mostly easy", short: "Zone 2", line: "Mostly easy, with one harder day.", doors: ["moving"], icon: "run" },
   cross: { name: "Mix it up", short: "cross training", line: "Cross training: swap one day for something that uses your body differently.", doors: ["moving", "stronger"], icon: "fresh" },
+  hilit: { name: "HILIT: hard work, no jumping", short: "HILIT", line: "Short bursts, then a rest. Nothing leaves the floor.", doors: ["stronger", "moving"], icon: "strength" },
   snack: { name: "A 10-minute snack", short: "a 10-minute snack", line: "A short burst for one thing. Ten minutes still counts.", doors: ["stronger", "moving"], icon: "sparkle" },
 });
 
@@ -225,6 +233,91 @@ export function snackSession({ quality, minutes = 10, seated = false, byId, avai
     minutes: Math.round(1 + rounds * chosen.length * per), steps, snack: true,
     line: "The last few reps take effort.",
   }, byId);
+}
+
+// ── HILIT (HILIT draft §2 to §4) ─────────────────────────────────────────
+
+/** Approved pools, easiest first; the three slider entries are held (P-18). */
+export const HILIT_POOLS = Object.freeze({
+  legs:   { stand: ["sit-to-stand", "reverse-lunge", "glute-bridge", "isometric-wall-sit", "hip-hinge-drill", "goblet-squat", "band-squat", "loop-band-squat", "bulgarian-split-squat"],
+            seated: ["seated-leg-extension", "seated-heel-toe-raise"] },
+  push:   { stand: ["press-up-incline", "band-chest-press", "band-overhead-press", "dumbbell-chest-press-floor", "dumbbell-overhead-press", "push-up", "press-up-decline"],
+            seated: ["seated-wall-press", "seated-band-chest-press"] },
+  pull:   { stand: ["inverted-row-table", "band-row-seated", "band-bent-over-row", "band-pull-apart", "dumbbell-row", "seated-self-resisted-row"],
+            seated: ["seated-self-resisted-row", "seated-scapular-retraction"] },
+  breath: { stand: ["step-jacks", "skater-steps", "cross-body-knee-drive", "squat-to-reach", "step-back-burpee", "band-punches", "mountain-climbers"],
+            gym: ["gym-cross-trainer-intervals", "cardio-rowing-intervals", "gym-stair-climber-intervals"],
+            seated: ["seated-punches", "seated-marching-cardio"] },
+  middle: { stand: ["dead-bug", "bird-dog", "plank", "bear-hold", "side-plank-modified", "isometric-hollow-hold"],
+            seated: ["seated-knee-lift", "seated-dead-bug-arms"] },
+  carry:  { stand: ["farmers-carry", "suitcase-carry", "gym-kettlebell-suitcase-carry", "dumbbell-front-rack-carry"], seated: [] },
+});
+
+/** The shape of a HILIT week: work and rest in seconds, the most rounds, and whether it is the easier week. */
+export function hilitWeek(week) {
+  const w = Math.min(12, Math.max(1, Math.floor(Number(week) || 1)));
+  const block = Math.ceil(w / 4), easier = ((w - 1) % 4) + 1 === 4;
+  const [work, rest, most] = block === 1 ? [30, 30, 3] : block === 2 ? [40, 20, 3] : [40, 20, 4];
+  return { week: w, block, easier, work, rest, rounds: easier ? most - 1 : most };
+}
+
+/**
+ * Can a HILIT day be offered today? Two a week (Monday to Sunday) at most,
+ * never on the day after another. Returns { ok, why }.
+ */
+export function hilitDayAllowed(log = [], now = new Date()) {
+  const day = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const monday = new Date(day); monday.setDate(day.getDate() - ((day.getDay() + 6) % 7));
+  const yesterday = new Date(day); yesterday.setDate(day.getDate() - 1);
+  const done = log.filter(e => e && e.trend === "hilit" && e.status !== "partial").map(e => Date.parse(e.completedAt || e.date)).filter(Number.isFinite);
+  if (done.some(t => t >= yesterday.getTime())) return { ok: false, why: "You did HILIT yesterday or today. It works best with a day off between." };
+  if (done.filter(t => t >= monday.getTime()).length >= 2) return { ok: false, why: "That\u2019s two HILIT days this week, which is plenty. The rest of the week is for something easier." };
+  return { ok: true, why: "" };
+}
+
+/**
+ * A HILIT session: 4 min warm-up, rounds of five stations (each worked for
+ * the week's time with its rest after it), one easy minute between rounds,
+ * then a cool-down. minutes (20, 30 or 40, from How long have you got?)
+ * gives 2, 3 or 4 rounds, never more than the week allows.
+ */
+export function hilitSession({ week = 1, minutes = 30, place = "home", seated = false, byId, available = () => true, prefs = {}, liked = {}, recent = [] }) {
+  const wk = hilitWeek(week);
+  const want = Number(minutes) >= 40 ? 4 : Number(minutes) >= 30 ? 3 : 2;
+  const rounds = Math.max(1, Math.min(want, wk.rounds));
+  const used = new Set();
+  const from = key => {
+    const P = HILIT_POOLS[key];
+    const list = seated ? P.seated : [...(place === "gym" && P.gym ? P.gym : []), ...P.stand];
+    const ids = orderPool(list, { byId, prefs, liked, recent }).filter(id => {
+      const e = byId.get(id); return e && e.impact !== true && e.movementPattern !== "jump" && available(e);
+    });
+    const id = ids.find(x => !used.has(x)) || null;
+    if (id) used.add(id);
+    return { id, pool: ids };
+  };
+  const legs = from("legs"), push = from("push"), pull = from("pull"), breath = from("breath"), middle = from("middle");
+  const carry = seated ? { id: null, pool: [] } : from("carry");
+  const fifth = carry.id ? carry : from("legs");
+  if (!legs.id || !(push.id || pull.id) || !breath.id || !middle.id || !fifth.id) return null;
+  const warm = seated ? "seated-marching-cardio" : "marching-on-spot";
+  const w = wk.work / 60, r = wk.rest / 60;
+  const steps = [{ id: warm, mins: 2, note: "Warm up, easy" }];
+  if (!seated) steps.push({ id: "squat-to-reach", mins: 1, note: "Warm up, easy" }, { id: "step-jacks", mins: 1, note: "Warm up, easy" });
+  else steps.push({ id: warm, mins: 2, note: "Warm up, easy" });
+  for (let n = 1; n <= rounds; n++) {
+    const upper = (n % 2 === 0 && pull.id) || !push.id ? pull : push;
+    for (const s of [legs, upper, breath, middle, fifth]) {
+      steps.push({ id: s.id, mins: w, note: `Round ${n} of ${rounds} \u00b7 ${wk.work} seconds, hard`, swaps: s.pool });
+      steps.push({ id: warm, mins: r, note: `Rest, ${wk.rest} seconds` });
+    }
+    if (n < rounds) steps.push({ id: warm, mins: 1, note: "One easy minute" });
+  }
+  steps.push({ id: warm, mins: 1, note: "Cool down, easy" });
+  if (!seated && byId.has("sport-cooldown-general")) steps.push({ id: "sport-cooldown-general", mins: 3, note: "Cool down" });
+  const total = Math.round(steps.reduce((a, s) => a + s.mins, 0));
+  return labelled({ id: `trend-hilit-${rounds}`, trend: "hilit", effort: "hard", name: "HILIT: hard work, no jumping", minutes: total, steps,
+    line: "Hard comes from moving steadily for the whole burst, not from going faster." }, byId);
 }
 
 // ── Cross training (draft §5) ────────────────────────────────────────────

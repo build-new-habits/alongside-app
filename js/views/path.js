@@ -1,6 +1,12 @@
 /**
  * views/path.js
- * 01 Nov 2026 v5
+ * 01 Nov 2026 v6
+ *
+ * v6 - P-20 session 2: HILIT (approved 01 Nov, Graeme: "HILIT: hard work,
+ *   no jumping"; two days a week at most, never back to back). Follow a
+ *   fitness trend lists it in Get stronger and Keep moving. Its step says
+ *   the week, asks how long and standing or seated, and builds today's
+ *   session as a proposal; on a day it is not offered, it says why.
  *
  * v5 - P-20 TRENDS-BUILD, session 1 (content approved 01 Nov, Graeme:
  *   BNH-Files Product/alongside_content_trends-zone2-snacks-cross_01nov2026_v2.md).
@@ -105,7 +111,8 @@ import { setTodaysLength, lengthCatForToday, todaysLengthCat } from "../data/ses
 import { equipmentForLocation } from "../session-builder.js";
 import { resolveEquipment, exerciseIsAvailable } from "../data/equipment-map.js";
 import { TRENDS, EFFORT, HARD_SAFETY, ZONE2_ACTIVITIES, zone2Week, zone2Session, zone2HardDoneThisWeek,
-         SNACK_QUALITIES, snackSession, MAIN_ACTIVITIES, mainActivityFrom, crossOptions, recentTrendIds, plainName } from "../data/trend-recipes.js";
+         SNACK_QUALITIES, snackSession, MAIN_ACTIVITIES, mainActivityFrom, crossOptions, recentTrendIds, plainName,
+         hilitWeek, hilitDayAllowed, hilitSession } from "../data/trend-recipes.js";
 
 const BY_ID = new Map([...EXERCISES, ...PATH_MOVEMENTS].map(e => [e.id, e]));
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -337,7 +344,7 @@ export function PathView(router) {
     trends() {
       return `${heading("Follow a fitness trend", "fresh", DOOR[st.door].kind)}
         <ul class="path-list">${trendsFor(st.door).map(([id, x]) => {
-          const w = id !== "snack" ? store.trendWeek(id === "zone2" ? "zone2" : "cross") : null;
+          const w = id === "zone2" || id === "hilit" ? store.trendWeek(id) : null;
           return row({ v: id, t: x.name, d: esc(x.line) + (w ? ` · Week ${w}` : ""), icon: x.icon, kind: DOOR[st.door].kind }); }).join("")}</ul>`;
     },
     z2act() {
@@ -360,6 +367,18 @@ export function PathView(router) {
           ${row({ v: "stop", t: "Stop following Zone 2" })}
         </ul>
         ${hardNote ? `<p class="path-small">${esc(hardNote)}</p>` : ""}`;
+    },
+    hilit() {
+      const wk = hilitWeek(store.trendWeek("hilit") || 1);
+      const day = hilitDayAllowed(store.get("activityLog") || []);
+      const len = st.hlen || "30";
+      return `${heading(`HILIT, week ${wk.week}`, "strength", DOOR[st.door].kind)}
+        <p class="path-coachline">Short bursts of ${wk.work} seconds, then ${wk.rest} seconds\u2019 rest. Nothing leaves the floor.${wk.easier ? " This is an easier week." : ""}</p>
+        ${day.ok ? `${radios("hlen", "How long have you got?", [["20", "20 min"], ["30", "30 min"], ["40", "40 min"]], len)}
+        ${radios("hseat", "Standing or seated?", [["stand", "Standing"], ["seated", "Seated"]], st.hseat || "stand")}
+        <ul class="path-list">${row({ v: "go", t: "Today\u2019s HILIT", d: esc(EFFORT.hard), tint: true })}</ul>` : `<p class="path-note" id="path-hilit-why">${esc(day.why)}</p>`}
+        ${followed("hilit") ? `<ul class="path-list">${row({ v: "stop", t: "Stop following HILIT" })}</ul>` : ""}
+        <p class="path-small">Two HILIT days a week at most, with a day off between.</p>`;
     },
     squal() {
       const mine = SNACK_QUALITIES.filter(q => q.door === st.door || (st.door === "moving" && q.id === "legs"));
@@ -573,7 +592,16 @@ export function PathView(router) {
           return go("xmain", {});
         }
         if (v === "snack") return go("squal", {});
+        if (v === "hilit") return go("hilit", {});
         return;
+      case "hilit": {
+        if (v === "stop") { store.stopTrend("hilit"); say("Stopped following HILIT."); trail.pop(); step = "trends"; paint(); return; }
+        if (!hilitDayAllowed(store.get("activityLog") || []).ok) return;
+        const s = hilitSession({ ...recipeIn(), week: store.trendWeek("hilit") || 1, minutes: Number(st.hlen || 30), place: st.place || "home", seated: st.hseat === "seated" });
+        if (!s) { say("Nothing fits with the kit you have there."); return; }
+        if (!followed("hilit")) store.startTrend("hilit");
+        return trendProg(s);
+      }
       case "z2act":
         if (followed("zone2")) store.changeTrendActivity("zone2", v); else store.startTrend("zone2", v);
         trail.pop(); return go("z2day", {});
@@ -671,6 +699,8 @@ export function PathView(router) {
     root.querySelectorAll('input[name="blen"]').forEach(r => r.addEventListener("change", () => { st.blen = r.value; }));
     root.querySelectorAll('input[name="slen"]').forEach(r => r.addEventListener("change", () => { st.slen = r.value; }));
     root.querySelectorAll('input[name="sseat"]').forEach(r => r.addEventListener("change", () => { st.sseat = r.value; }));
+    root.querySelectorAll('input[name="hlen"]').forEach(r => r.addEventListener("change", () => { st.hlen = r.value; }));
+    root.querySelectorAll('input[name="hseat"]').forEach(r => r.addEventListener("change", () => { st.hseat = r.value; }));
     root.querySelector("#path-build")?.addEventListener("click", () => {
       store.set("requestedSessionType", sessionTypeFor(st.door, st.part));
       store.set("requestedLocation", st.place);

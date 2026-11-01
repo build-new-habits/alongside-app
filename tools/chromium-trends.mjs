@@ -1,6 +1,8 @@
 /**
  * tools/chromium-trends.mjs
- * 01 Nov 2026 v1
+ * 01 Nov 2026 v2
+ *
+ * v2 - P-20 session 2: HILIT's two screens.
  *
  * P-20 TRENDS-BUILD, session 1. The real-browser half of
  * verify-path-trends: jsdom draws no layout, so this measures what a person
@@ -55,6 +57,8 @@ const SCREENS = [
   ["moving",   ["home", "whole", "trend", "snack", "breath"], "snack, out of breath"],
   ["moving",   ["home", "whole", "trend", "cross"], "cross, what do you do most"],
   ["moving",   ["home", "whole", "trend", "cross", "run"], "cross, the choices"],
+  ["stronger", ["home", "whole", "trend", "hilit"], "HILIT, week 1"],
+  ["stronger", ["home", "whole", "trend", "hilit", "go"], "HILIT, the session"],
   ["finish",   [], "the Plan finish after a snack"],
 ];
 
