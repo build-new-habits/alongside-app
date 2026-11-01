@@ -1,6 +1,12 @@
 /**
  * js/data/week-shape-model.js
- * 05 Oct 2026 v2
+ * 01 Nov 2026 v3
+ *
+ * v3 - P-19 TRENDS-SCHEMA (Schema v1.117). A fourth level, Hard, in the
+ *   talk test's words as approved 01 Nov (Graeme: "Add Hard as a 4th
+ *   level"): "You can only say a few words at a time." The three earlier
+ *   levels are unchanged. The fitness-trend recipes (P-20) mark their hard
+ *   days with it; anyone can choose it for a day in Your week.
  *
  * v2 - D-7 PLAN-IMPORT. A day plan may be the person's own list: own is a
  *   group of My exercises (a plan day, "Session A") or "all". That day is
@@ -23,7 +29,7 @@
  *       id, name,                         "Upper day"
  *       mix: [{ focus, level }],          up to four; level 0 a little,
  *                                         1 some, 2 mostly
- *       intensity: "gentle"|"steady"|"moderate",
+ *       intensity: "gentle"|"steady"|"moderate"|"hard",
  *       mins: 10|20|30|40|50|60,
  *       place: "home"|"gym"|"outside",
  *       extras: ["sauna", "hydro-pool", ...],   after the session, if wanted
@@ -70,6 +76,7 @@ export const INTENSITIES = [
   { id: "gentle",   label: "Gentle",   line: "Easy all the way. You could chat throughout." },
   { id: "steady",   label: "Steady",   line: "Working, but you could still talk in short sentences." },
   { id: "moderate", label: "Moderate", line: "The last reps take effort: two or three left in you." },
+  { id: "hard",     label: "Hard",     line: "You can only say a few words at a time." },
 ];
 export const intensityById = id => INTENSITIES.find(i => i.id === id) || INTENSITIES[1];
 

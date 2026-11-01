@@ -1,5 +1,18 @@
 # Alongside — Data Schema Reference
-## 27 Oct 2026 v1.116
+## 01 Nov 2026 v1.117
+
+> **v1.117, 01 Nov 2026 — P-19 TRENDS-SCHEMA** (`store.js` v119; master schedule v610). Schema first: **no app code reads these yet**; the fitness-trend recipes (P-20) do. Gated by `tools/verify-trends-schema.mjs`. Content approved 01 Nov (Graeme): BNH-Files `Product/alongside_content_trends-*_01nov2026_v2.md`.
+>
+> **New `trends`** (`[{ id, startedAt, activity }]`, default `[]`): the fitness trends the person follows, from *Follow a fitness trend* (the Plan). `id` is one of `store.TREND_RULES`: `'zone2'`, `'cross'`, `'hilit'`, `'hybrid'`, `'reformer'` (never a trademark). `startedAt` is the local day it began (`YYYY-MM-DD`). `activity` is the chosen cardio for `zone2` (`walk`, `run`, `cycle`, `row`, `swim`), the person's main activity for `cross` (`walk`, `run`, `cycle`, `swim`, `workout`, `yoga`), and `null` for the rest. Each trend appears once. **Written by** `store.startTrend(id, activity)` (starts it today, or over again), `changeTrendActivity(id, activity)` (keeps the start day) and `stopTrend(id)`; anything not allowed is refused. **Read by** `store.trendWeek(id)`: the week since it started, 1 on the first day, **derived, never stored**, so it cannot go stale; a start in the future reads as week 1. P-20 reads `trends` for the recipes' weeks and the cross-training swap. **On load:** an unknown id, a start that is not a date, a repeat (the first wins) or a non-object is dropped; an activity the trend does not allow becomes `null`. **Restore carries it** (it is the person's plan, like `weekShape`). Free never writes it.
+>
+> **`activityLog[]` may carry `snack: true`** (a 10 to 15 minute snack, the Plan) **and `counted: true`** (the person chose *Count this as a session* on its finish). Anything else is **removed, not nulled**, and `counted` stands only on a snack, so older entries and every Free session gain no keys. **Written by** `store.logActivity()` from the entry it is given, and `store.setSnackCounted(entryId, yes)` (refuses an entry that is not a snack). **Read by** P-20: snacks on one day are one day moved, minutes added, unless counted (approved 01 Nov).
+>
+> **`activityLog[]` may carry `trend`** (one of `TREND_RULES`) **and `effort`** (`'easy'`, `'steady'` or `'hard'`, the talk test's word for the session, `store.EFFORTS`). Anything else is removed; absent stays absent. **Written by** `store.logActivity()` from the session a trend recipe built (P-20). **Read by** P-20: Progress says a Zone 2 week in words (*mostly easy, with one harder day*; never a score), and the recipe knows this week's harder day is done.
+>
+> **`weekShape.templates[].intensity` gains `'hard'`** (*Hard: You can only say a few words at a time.*), a fourth level after `gentle`, `steady`, `moderate` (Graeme, 01 Nov: *"Add Hard as a 4th level"*). Data in `data/week-shape-model.js` v3 `INTENSITIES`, which `sanitizeWeekShape()` reads, so a stored Hard day loads as Hard and an unknown level is still `steady`. Your week shows it as a choice from this version (the Plan's own screen); the builder treats it as it treats `steady` (only `gentle` changes the sets) and says its line.
+>
+> **Why no new library tags:** the recipes read `movementPattern`, `impact`, `balanceDemand` and `energyRequired`, already on all 586 entries (P-17's tag check). **Why `trends` is top-level, not in `weekShape`:** a trend can be followed without a week being set, and its weeks count from its own start.
+
 
 > **v1.116, 27 Oct 2026 — STAGE PATH P-1 SCHEMA** (`store.js` v118; Stage PATH blueprint Session 1, Part C). Schema first: **no app code reads these yet**; their readers arrive in Sessions 3 to 7. Gated by `tools/verify-path-schema.mjs`.
 >

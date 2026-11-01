@@ -1,6 +1,10 @@
 /**
  * tools/verify-write1.mjs
- * 28 Oct 2026 v9
+ * 01 Nov 2026 v10
+ *
+ * v10 - P-19 TRENDS-SCHEMA. trends joins the baseline as a DATED PROMISE
+ *   (the v8 pattern): written by store helpers (startTrend and the rest),
+ *   read by nothing until P-20's recipes, which remove the line.
  *
  * v9 - STAGE PATH Session 3. likedMovements leaves the baseline, as its
  *   dated promise said: session-builder.js reads it (PATH-LIKES) and the
@@ -215,6 +219,11 @@ const BASELINE = new Set([
   // likedMovements (path-engine.js), Session 4 connects dayOpen
   // (plan-home.js); each removes its line, as the check below insists.
   'dayOpen',
+
+  // P-19, 01 Nov 2026 (store.js v119). DATED PROMISE: written by
+  // startTrend / changeTrendActivity / stopTrend, read by P-20 (the
+  // fitness-trend recipes), which removes this line.
+  'trends',
 
   // 'conditionMeta' -- removed 28 Sep 2026. SMOOTH-P4a reads it: Progress
   // says "Since 19 Aug" for each condition from conditionMeta[id].addedAt.

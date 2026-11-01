@@ -6,6 +6,27 @@ import { validateWeightTarget } from "./data/weight-targets.js";
 
 /**
  * store.js - Data persistence layer
+ * 01 Nov 2026 v119
+ *
+ * v119 - P-19 TRENDS-SCHEMA (master schedule v610; Schema v1.117). Schema
+ *   first: nothing reads these yet; P-20 (the fitness-trend recipes) does.
+ *   New trends [{ id, startedAt, activity }]: the fitness trends the person
+ *   follows (Follow a fitness trend, the Plan). id is one of TREND_RULES;
+ *   startedAt the local day it began; activity the chosen cardio for zone2,
+ *   the person's main activity for cross, null for the rest. Each trend
+ *   once. startTrend(), changeTrendActivity(), stopTrend(), trendWeek()
+ *   (the week since it started, 1 on the first day; derived, never stored,
+ *   so it cannot go stale). Restore carries it (it is the person's plan).
+ *   activityLog[] may carry snack: true and counted: true (counted only on a
+ *   snack; anything else is removed, never nulled, so older entries and Free
+ *   gain no keys). setSnackCounted() is the finish's "Count this as a
+ *   session". activityLog[] may also carry trend (one of TREND_RULES) and
+ *   effort ('easy' | 'steady' | 'hard', the talk test's word for the
+ *   session), so Progress can say a Zone 2 week in words and the recipe
+ *   knows the harder day is done; anything else is removed. Your week's Hard level is data (week-shape-model.js v3).
+ *   Content approved 01 Nov (Graeme): BNH-Files Product/
+ *   alongside_content_trends-*_01nov2026_v2.md.
+ *
  * 27 Oct 2026 v118
  *
  * v118 - STAGE PATH P-1 SCHEMA (blueprint Session 1, Part C; Schema
@@ -1316,7 +1337,7 @@ export const store = {
 
   mergeWithDefaults(saved) {
     const defaults = this.getDefaults();
-    return this._cleanPathFields(this._expireOldScores(this._repairSessionTypes(this._dropRetired({
+    return this._cleanTrendFields(this._cleanPathFields(this._expireOldScores(this._repairSessionTypes(this._dropRetired({
       ...defaults,
       ...saved,
 
@@ -1951,12 +1972,67 @@ export const store = {
       // honest direction; a retirement must never take something away
       // from somebody who did nothing wrong.
       tier:       saved.tier === 'athlete' ? 'personal' : (saved.tier || 'free')
-    }))));
+    })))));
   },
 
   /** P13, v83. The local day, "YYYY-MM-DD". */
   _localDay(d = new Date()) {
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  },
+
+  /**
+   * P-19, v119. The trends Follow a fitness trend offers, and the activity
+   * each may carry (an empty list: always null). Schema v1.117.
+   */
+  TREND_RULES: {
+    zone2:    ['walk', 'run', 'cycle', 'row', 'swim'],
+    cross:    ['walk', 'run', 'cycle', 'swim', 'workout', 'yoga'],
+    hilit:    [],
+    hybrid:   [],
+    reformer: [],
+  },
+
+  /** P-19, v119. One trend made safe, or null when it cannot be kept. */
+  _cleanTrend(t) {
+    if (!t || typeof t !== 'object' || Array.isArray(t)) return null;
+    const allowed = this.TREND_RULES[t.id];
+    if (!Array.isArray(allowed) || !Object.prototype.hasOwnProperty.call(this.TREND_RULES, t.id)) return null;
+    if (typeof t.startedAt !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(t.startedAt)) return null;
+    return { id: t.id, startedAt: t.startedAt, activity: allowed.includes(t.activity) ? t.activity : null };
+  },
+
+  /**
+   * P-19, v119. Made safe on every load: trends keeps known trends, each
+   * once (the first wins); snack and counted on an activity entry are true
+   * or removed, and counted stands only on a snack.
+   */
+  _cleanTrendFields(data) {
+    const seen = new Set();
+    data.trends = (Array.isArray(data.trends) ? data.trends : [])
+      .map(t => this._cleanTrend(t))
+      .filter(t => t && !seen.has(t.id) && seen.add(t.id));
+    if (Array.isArray(data.activityLog)) {
+      data.activityLog = data.activityLog.map(e => (!e || typeof e !== 'object') ? e : this._cleanSnackMarks(e));
+    }
+    return data;
+  },
+
+  /** P-19, v119. The talk test's words a session may carry as its effort. */
+  EFFORTS: ['easy', 'steady', 'hard'],
+
+  /**
+   * P-19, v119. An activity entry's trend marks: snack and counted true or
+   * removed (counted only on a snack); trend one of TREND_RULES and effort
+   * one of EFFORTS, or removed. An entry without them is returned as it is.
+   */
+  _cleanSnackMarks(e) {
+    if (!('snack' in e) && !('counted' in e) && !('trend' in e) && !('effort' in e)) return e;
+    const out = { ...e };
+    if (out.snack !== true) delete out.snack;
+    if (out.counted !== true || out.snack !== true) delete out.counted;
+    if ('trend' in out && !Object.prototype.hasOwnProperty.call(this.TREND_RULES, out.trend)) delete out.trend;
+    if ('effort' in out && !this.EFFORTS.includes(out.effort)) delete out.effort;
+    return out;
   },
 
   /** STAGE PATH P-1, v118. The words each new field may hold (Schema v1.116). */
@@ -2574,6 +2650,10 @@ export const store = {
       // person loved. The other side of exercisePreferences: one movement
       // is liked or not wanted, never both (likeMovement / setExercisePreference).
       likedMovements: {},
+
+      // P-19, v119. The fitness trends the person follows, each once:
+      // [{ id, startedAt: 'YYYY-MM-DD', activity }]. See TREND_RULES.
+      trends: [],
 
       exercisePreferences: {}, // { [exerciseId]: { preference: 'avoid'|'less', setAt, source } } — per alongside_exercise_skip_dislike_spec_16may2026_v1.docx. Binary signal, not a rating (spec §6: "not a rating system... no stars, no thumbs, no scores"). First consumer: js/data/conditionProgrammes.js's candidate selection, 04 Aug 2026 — the full spec's in-session Skip flow (gym-programme.js/prescribed-session.js/core-session.js) remains separate future work.
 
@@ -3416,6 +3496,63 @@ export const store = {
   },
 
   /**
+   * P-19, v119. Start following a trend today (again, if already followed:
+   * it starts over). Refuses an unknown trend or an activity it does not
+   * allow. Returns true when saved.
+   */
+  startTrend(id, activity = null) {
+    const allowed = this.TREND_RULES[id];
+    if (!Object.prototype.hasOwnProperty.call(this.TREND_RULES, id)) return false;
+    if (activity !== null && !allowed.includes(activity)) return false;
+    const rest = (this.data.trends || []).filter(t => t && t.id !== id);
+    this.set('trends', [...rest, { id, startedAt: this._localDay(), activity }]);
+    return true;
+  },
+
+  /** P-19, v119. Change a followed trend's activity, keeping its start day. */
+  changeTrendActivity(id, activity) {
+    const list = this.data.trends || [];
+    const t = list.find(x => x && x.id === id);
+    if (!t || !this.TREND_RULES[id].includes(activity)) return false;
+    this.set('trends', list.map(x => x === t ? { ...t, activity } : x));
+    return true;
+  },
+
+  /** P-19, v119. Stop following a trend. */
+  stopTrend(id) {
+    this.set('trends', (this.data.trends || []).filter(t => t && t.id !== id));
+  },
+
+  /**
+   * P-19, v119. The week of a followed trend: 1 on the day it started,
+   * 2 from the seventh day after, and so on. A start in the future reads
+   * as week 1. null when the trend is not followed. Derived, never stored.
+   */
+  trendWeek(id, now = new Date()) {
+    const t = (this.data.trends || []).find(x => x && x.id === id);
+    if (!t) return null;
+    const [y, m, d] = t.startedAt.split('-').map(Number);
+    const start = new Date(y, m - 1, d);
+    const day = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const days = Math.round((day - start) / 86400000);
+    return days < 0 ? 1 : Math.floor(days / 7) + 1;
+  },
+
+  /**
+   * P-19, v119. The finish's "Count this as a session": mark one snack as
+   * counted, or take it back. Refuses an entry that is not a snack.
+   */
+  setSnackCounted(entryId, yes) {
+    const log = this.data.activityLog || [];
+    const e = log.find(x => x && x.id === entryId);
+    if (!e || e.snack !== true) return false;
+    const next = { ...e };
+    if (yes) next.counted = true; else delete next.counted;
+    this.set('activityLog', log.map(x => x === e ? next : x));
+    return true;
+  },
+
+  /**
    * logLift(exerciseId, { weight, unit, reps }) — PT-4, 11 Aug 2026.
    * Appends one entry. No-ops when liftLogEnabled is false, so callers do
    * not each need to check. Caps at 20 entries per exercise: this is a
@@ -3980,6 +4117,10 @@ export const store = {
     // built: kept when valid, null when not, never added when absent.
     if ('door' in finalEntry && !this.PATH_VALUES.door.includes(finalEntry.door)) finalEntry.door = null;
     if ('feeling' in finalEntry && !this.PATH_VALUES.feeling.includes(finalEntry.feeling)) finalEntry.feeling = null;
+    // P-19, v119. A snack's marks, a trend and an effort: valid or removed
+    // (never added when absent).
+    { const c = this._cleanSnackMarks(finalEntry);
+      if (c !== finalEntry) { for (const k of ['snack', 'counted', 'trend', 'effort']) { if (k in c) finalEntry[k] = c[k]; else delete finalEntry[k]; } } }
 
     // ARC-EVERYTHING, 16 Sep 2026. Credit the arc here, at the single
     // write path, so every door counts without each view remembering to.
