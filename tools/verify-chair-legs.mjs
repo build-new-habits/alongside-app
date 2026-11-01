@@ -1,6 +1,11 @@
 /**
  * tools/verify-chair-legs.mjs
- * 02 Oct 2026 v1
+ * 01 Nov 2026 v2
+ *
+ * v2 - P-13 Classes re-point (mock-up v1, Graeme 01 Nov). On the Plan a class
+ *   is offered as a row (one tap to its page and Start), not a Start button
+ *   on the list; 3a and 4b read what is offered either way (offered()), so
+ *   3a cannot pass by finding no buttons. Nothing loosened.
  *
  * W5-7 CHAIR-LEGS (Wave 5 persona trace: 2.11). Decided by Graeme, 02 Oct:
  * "squats and lunges when getting up and down from a chair is tricky is not
@@ -112,7 +117,11 @@ ok("2b. its steps let the hands help, on the chair or the thighs", /hands/i.test
 console.log("\nTEST 3 - Classes");
 const CL = await import(B + "views/class-list.js");
 main.innerHTML = CL.render();
-const startable = [...main.querySelectorAll("[data-start]")].map(b => b.getAttribute("aria-label") || "");
+// v2: what is offered, as Free shows it (Start buttons) or as the Plan does (one row per class).
+const offered = () => [...main.querySelectorAll("[data-start]")].map(b => b.getAttribute("aria-label") || "")
+  .concat([...main.querySelectorAll("[data-class]")].map(txt));
+const startable = offered();
+ok("3pc. the list offers classes (so 3a measures something)", startable.length > 0, "nothing offered");
 const held = [...main.querySelectorAll(".class-list__row--held")].map(txt);
 ok("3a. Standing Up cannot be started", !startable.some(l => /Standing Up/.test(l)), startable.join(" | "));
 ok("3b. and is named under Not today, with what is in it", held.some(h => /Standing Up/.test(h) && /Step-Up|Wall Sit/i.test(h)), held.join(" | "));
@@ -123,7 +132,7 @@ fixture("yes", null);
 const pass2 = SB.personFilter({ equipment: store.get("equipment") });
 ok("4a. chair yes: Goblet Squat and Reverse Lunge still pass", pass2(EXERCISES.find(e => e.id === "goblet-squat")) && pass2(EXERCISES.find(e => e.id === "reverse-lunge")));
 main.innerHTML = CL.render();
-ok("4b. chair yes: Standing Up is offered", [...main.querySelectorAll("[data-start]")].some(b => /Standing Up/.test(b.getAttribute("aria-label") || "")));
+ok("4b. chair yes: Standing Up is offered", offered().some(l => /Standing Up/.test(l)));
 
 console.log("");
 if (fails) { console.log(`CHAIR-LEGS: ${fails} FAILED, ${passes} passed`); process.exit(1); }

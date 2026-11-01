@@ -1,5 +1,12 @@
 /**
  * tools/verify-timetable.mjs
+ * 01 Nov 2026 v8
+ *
+ * v8 - P-13 Classes re-point (mock-up v1, Graeme 01 Nov: "Yes, build it").
+ *   On the Plan the board became one row per class and a page for each, so
+ *   TESTS 2-7 hold Free's board (unchanged) and verify-path-classes holds
+ *   the Plan's: every assertion kept, none loosened. TEST 1 is the Plan's.
+ *
  * 28 Oct 2026 v7
  *
  * v7 - STAGE PATH P-4 re-point (none loosened). 1pc reads the Plan's purpose-first Home (four doors and its Library row, plan-home.js). Classes are still two taps: the Library row, then Classes.
@@ -123,7 +130,7 @@ const routerStub = { navigate: (r) => navs.push(r) };
 const realRouter = (await import(B + "router.js")).router;
 realRouter.navigate = (r) => navs.push(r);
 
-function seed({ programme = false, injured = false } = {}) {
+function seed({ programme = false, injured = false, tier = "personal" } = {}) {
   localStorage.clear();
   store.init();
   // SAFETY-GATE, GATE-ALL 16 Sep 2026. The gate fires on the class
@@ -140,7 +147,7 @@ function seed({ programme = false, injured = false } = {}) {
       textVersion: ACK_VERSION,
       surface: "fixture"
     })));
-  store.set("tier", "personal");
+  store.set("tier", tier);
   store.set("name", "Graeme");
   store.set("arc", {
     aimId: "stronger-core",
@@ -193,10 +200,14 @@ ok("1c. and it does so WITHOUT a twelve-week shape chosen",
    "a class no more depends on a programme than a yoga class at a gym " +
    "depends on having signed up for a course");
 
-// ── 2. THE TIMETABLE SHOWS THE CLASSES ──────────────────────────────────
+// ── 2. THE TIMETABLE SHOWS THE CLASSES
+// v8 (P-13 Classes, 01 Nov): TESTS 2 to 7 hold the board as Free has it, unchanged. On the Plan the
+// board is one row per class and a page for each (mock-up v1, Graeme 01 Nov); verify-path-classes holds
+// the same properties there: every class listed in the order written, the arc named, Not today with why,
+// the length before you commit, the shorter one a choice, Start opens the player. ──────────────────────────────────
 console.log("\nTEST 2 - every class is on the board");
 
-seed();
+seed({ tier: "free" });
 main.innerHTML = L.render();
 L.onMount();
 
@@ -242,7 +253,7 @@ ok("3c. but a class in the person's arc says so",
 // ── 4. SAFETY WITHHOLDS, AND SAYS WHY ───────────────────────────────────
 console.log("\nTEST 4 - a declared severe zone withholds classes rather than editing them");
 
-seed({ injured: true });
+seed({ injured: true, tier: "free" });
 main.innerHTML = L.render();
 L.onMount();
 
@@ -275,7 +286,7 @@ ok("4d. and names each movement once",
    }),
    "a movement named twice in one reason");
 
-seed({ injured: 9 });
+seed({ injured: 9, tier: "free" });
 main.innerHTML = L.render();
 ok("4e. a Bad lower back (9): the Bad-day choice, no class to start",
    !!main.querySelector('[data-bad-day="adapt"]') && !main.querySelector("[data-start]"),
@@ -284,7 +295,7 @@ ok("4e. a Bad lower back (9): the Bad-day choice, no class to start",
 // ── 5. THE WHOLE ROUTE, END TO END ──────────────────────────────────────
 console.log("\nTEST 5 - tapping a class actually starts it");
 
-seed();
+seed({ tier: "free" });
 main.innerHTML = L.render();
 L.onMount();
 navs.length = 0;
@@ -465,7 +476,7 @@ console.log("\nTEST 5d - leaving immediately records nothing");
 // ── 6. THE SHORTER VERSION IS OFFERED ───────────────────────────────────
 console.log("\nTEST 6 - the lighter variant is a choice on the board");
 
-seed();
+seed({ tier: "free" });
 main.innerHTML = L.render();
 L.onMount();
 
@@ -486,7 +497,7 @@ if (lighterBtn) {
 // ── 7. IT CAN BE READ ───────────────────────────────────────────────────
 console.log("\nTEST 7 - the board can be navigated by heading");
 
-seed();
+seed({ tier: "free" });
 main.innerHTML = L.render();
 const heads = [...main.querySelectorAll("h1,h2,h3,h4")].map(h => Number(h.tagName[1]));
 ok("7a. exactly one h1", heads.filter(l => l === 1).length === 1, `${heads.filter(l => l === 1).length}`);

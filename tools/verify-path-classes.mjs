@@ -76,6 +76,7 @@ ok("1b. nothing to start on the list", !main.querySelector("[data-start]"));
 const g = rows.find(r => r.dataset.class === ground.id);
 ok("1c. each row says how long, where, and what it is for", /15 min · on the floor/.test(txt(g)) && /For trusting your body again/.test(txt(g)), txt(g));
 ok("1d. Your arc where it feeds it, and only there", /Your arc/.test(txt(g)) && rows.filter(r => /Your arc/.test(txt(r))).length === CLASSES.filter(c => c.serves === "trusting-body").length);
+ok("1f. in the order they were written (nothing sorted, nothing recommended)", rows.map(r => r.dataset.class).join() === CLASSES.map(c => c.id).join() && !/suggested|recommended|best for you/i.test(txt(main)));
 ok("1e. no hyphenated flag words on the list", !/[a-z]+-[a-z]+-[a-z]+/.test(txt(main.querySelector(".path-list"))), txt(main).slice(0, 160));
 
 // ── 2 ───────────────────────────────────────────────────────────────────
