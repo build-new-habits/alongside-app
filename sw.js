@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 01 Nov 2026 v699
+ * 01 Nov 2026 v700
  *
+ * v700 - P-20, the held entries: nothing you can see changes. The ten new movements the fitness trends were written for (Uphill Walk; Slider Reverse Lunge, Slider Lateral Lunge, Slider Mountain Climber; Sled Pull, Burpee Broad Jump, Walking Lunge with a Load, Wall Ball; Footwork with a Band, Feet in Straps with a Band) are written and drawn but offered nowhere until the clinical read; each recipe keeps playing its approved substitute. NEW FILES precached: js/data/exercises/held_movements.js, js/data/figures/batch-16.js.
  * v699 - P-20, fitness trends, part 4 (the Plan). Follow a fitness trend in Get stronger adds reformer-style Pilates with a band (a reformer class's order, a long band where the springs would be, slow and steady, with or without the floor, up to three days a week), the library's Mat Adaptation, and from week 9 Dynamic Pilates once a week. Log what I did: Body Balance is now Yoga or Pilates class on both tiers (the old name is a trademark), and the Plan's list adds Reformer class. A step under two minutes is said in seconds (it said 0.5 min). The Mat Adaptation card's steps are written out, with a bolster as optional kit.
  * v698 - P-20, fitness trends, parts 2 and 3 (Free unchanged). On the Plan, Follow a fitness trend adds HILIT: hard work, no jumping (five short bursts a round with a rest after each, nothing leaves the floor, standing or seated; two days a week at most, with a day off between) and, in Get stronger, Hybrid training (eight stations in order, each the version your kit allows; an easy walk between them in the first weeks, then a run, walk, ride, row or the cross trainer, your choice; stations that do not fit your time are left for another day and said; from week 11, the full eight at your own pace; no time kept). Two styles that had no rule now have one.
  * v697 - P-20, fitness trends, part 1 (Free unchanged). On the Plan, How would you like it? (behind Get stronger and Keep moving) offers Follow a fitness trend: Zone 2, mostly easy (one activity kept easy, with one harder day a week from week 5, its week said on Progress in words), a 10-minute snack (legs, a pull, your middle, balance or getting out of breath, standing or seated, from the kit you have) and Mix it up (two or three easy swaps for what you do most; you choose). Each says its effort by the talk test, with a safety line on a hard one. After a snack, Count this as a session; otherwise snacks on one day count as one day moved. NEW FILE precached: js/data/trend-recipes.js.
@@ -4246,7 +4247,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v699";
+const CACHE_NAME = "alongside-v700";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4396,7 +4397,7 @@ const SHELL_HASHES = {
   "./js/views/plan-import.js": "baee11ac3f5ff1da",
   "./css/components/your-week.css": "f14109dded35259b",
   "./js/figures.js": "621b376c8778dbb4",
-  "./js/data/figures/index.js": "7532ceb1837831ca",
+  "./js/data/figures/index.js": "9dd411b0802b6ff2",
   "./js/data/figures/batch-01.js": "27f86e28fb0c9833",
   "./js/data/figures/batch-02.js": "45f4f07439ed515e",
   "./js/data/figures/batch-03.js": "2aa6d354f20f277e",
@@ -4412,6 +4413,7 @@ const SHELL_HASHES = {
   "./js/data/figures/batch-13.js": "805fd6bff0fe06e4",
   "./js/data/figures/batch-14.js": "525000f917bc99e3",
   "./js/data/figures/batch-15.js": "7dea3eafc847aea9",
+  "./js/data/figures/batch-16.js": "be84786b4cf25547",
   "./js/views/bad-day-door.js": "5910813778515c4e",
   "./js/data/chair-legs.js": "2befbb45dab79deb",
   "./js/data/general-routine.js": "30dd1899fa187d6a",
@@ -4497,6 +4499,7 @@ const SHELL_HASHES = {
   "./js/data/exercises/mobility.js": "fc7d0f9631672a44",
   "./js/data/exercises/yoga.js": "675ab856b6de12d3",
   "./js/data/exercises/path_movements.js": "7a627e4bc94e2d97",
+  "./js/data/exercises/held_movements.js": "73a0fd1503850f28",
   "./js/data/feel-programmes.js": "ade4752f88834a40",
   "./js/data/stretch-routines.js": "5a5fa2e7598037fb",
   "./js/data/path-engine.js": "4072deb17d2f4edb",
@@ -4727,6 +4730,7 @@ const SHELL_URLS = [
   "./js/data/figures/batch-13.js",
   "./js/data/figures/batch-14.js",
   "./js/data/figures/batch-15.js",
+  "./js/data/figures/batch-16.js",
   "./js/views/bad-day-door.js",
   "./js/data/chair-legs.js",
   "./js/data/general-routine.js",
@@ -4821,6 +4825,7 @@ const SHELL_URLS = [
   "./js/data/exercises/mobility.js",
   "./js/data/exercises/yoga.js",
   "./js/data/exercises/path_movements.js",
+  "./js/data/exercises/held_movements.js",
   "./js/data/feel-programmes.js",
   "./js/data/stretch-routines.js",
   "./js/data/path-engine.js",
