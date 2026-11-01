@@ -1,7 +1,14 @@
 /**
  * morning-session.js - Morning Session View
  *
- * 29 Oct 2026 v6
+ * 01 Nov 2026 v7
+ *
+ * v7 - P-13, the last rooms (Graeme, 01 Nov: "Build both now"). On the Plan
+ *   only, the one look, in one place (_dressForPlan: the room had emoji in
+ *   fourteen places): the heading at the left (the overview and the done
+ *   screen had none), "‹ Back" before the session and Exit during it with
+ *   no house beside either, line icons for the blocks, no emoji. Free
+ *   unchanged.
  *
  * v6 - P-12 FIX-NOW (consistency trace, Graeme 29 Oct: "As proposed"). Both tiers: a fault, not a look.
  *   Morning Programme is the screen's heading (h1; it had none).
@@ -78,6 +85,8 @@
  */
 
 import { store }         from "../store.js";
+import { isPremium }     from "../auth.js";
+import { lineIcon }      from "../data/line-icons.js";
 import { isGateDue, renderSafetyGate, attachSafetyGate } from "../safety-gate.js";
 // CARD-LOCAL, 16 Sep 2026. The same block the shared exercise card uses,
 // imported rather than copied -- one implementation, one copy of the
@@ -283,11 +292,34 @@ export function render() {
   if (!selectedWeek) selectedWeek = store.get("morningProgrammeWeek") || 1;
   if (!selectedSlot) selectedSlot = getTodaySlot();
 
-  if (viewState === "select")   return renderSelect();
-  if (viewState === "overview") return renderOverview();
-  if (viewState === "session")  return renderSession();
-  if (viewState === "done")     return renderDone();
-  return renderSelect();
+  const html = viewState === "overview" ? renderOverview()
+    : viewState === "session" ? renderSession()
+    : viewState === "done" ? renderDone()
+    : renderSelect();
+  return isPremium() ? _dressForPlan(html) : html;
+}
+
+/**
+ * v7 (P-13, 01 Nov). The Plan's look, applied to this room's markup in one
+ * place (it has emoji in fourteen places across its screens): the root
+ * takes .is-plan; the way back says "‹ Back" (it said "← Today", "← Back")
+ * and carries plan-back, Exit carries plan-exit (it said "✕ Exit"); a
+ * screen whose name was a span gets it as the heading; each block's emoji
+ * becomes its line icon and every other emoji goes, with the space after
+ * it; the done screen gets a heading. Free never passes through here.
+ */
+const _BLOCK_ICON = { "\uD83D\uDD25": "sun", "\uD83C\uDFC3": "run", "\uD83D\uDCAA": "strength", "\uD83C\uDFAF": "star", "\uD83C\uDF0A": "wave" };
+function _dressForPlan(html) {
+  let h = html;
+  h = h.replace(/<span class="ms-block-icon" aria-hidden="true">([^<]*)<\/span>/g, (m, e) => `<span class="ms-block-icon" aria-hidden="true">${lineIcon(_BLOCK_ICON[e] || "star", 20)}</span>`);
+  h = h.replace(/<button class="btn btn-ghost" id="(ms-back-btn|ms-back-to-select)" aria-label="([^"]*)">[\s\S]*?<\/button>/g, (m, id, a) => `<button class="btn btn-ghost plan-back" id="${id}" aria-label="${a}">\u2039 Back</button>`);
+  h = h.replace(/<button class="btn btn-ghost" id="ms-exit-btn" aria-label="([^"]*)">[\s\S]*?<\/button>/g, (m, a) => `<button class="btn btn-ghost plan-exit" id="ms-exit-btn" aria-label="${a}">Exit</button>`);
+  h = h.replace(/<span class="workout-progress-info">([^<]*)<\/span>/, '<h1 class="workout-progress-info">$1</h1>');
+  h = h.replace(/\p{Extended_Pictographic}\uFE0F?\s?/gu, "");
+  // The room's root (the first view div), as plain strings so the CSS check reads real class names.
+  h = h.includes('<div class="view workout-view"') ? h.replace('<div class="view workout-view"', '<div class="view workout-view is-plan"') : h.replace('<div class="view"', '<div class="view is-plan"');
+  if (viewState === "done") h = h.replace(/(<div class="view is-plan"[^>]*>)/, '$1\n      <h1 tabindex="-1">Morning session done.</h1>');
+  return h;
 }
 
 // -- 1. Select: week + slot ----------------------------------------------------

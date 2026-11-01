@@ -1,7 +1,11 @@
 import { createRequire as __cr } from "node:module";
 /**
  * tools/verify-one-look.mjs
- * 01 Nov 2026 v5
+ * 01 Nov 2026 v6
+ *
+ * v6 - P-13 done: Build a session and the Morning programme leave the list,
+ *   which is now empty; TEST 2 holds every Plan screen the router opens.
+ *   3r and 3s hold their inner screens.
  *
  * v5 - P-13 Classes (mock-up v1 approved 01 Nov): Classes and the class
  *   player leave P-13's list; 3p holds a class's own page, 3q the player in
@@ -209,6 +213,9 @@ await inside("3m. In Step: a scenario", "in-step", [".is-movement-card:not([disa
 // v4: Core and Yoga & Pilates, past their first choice.
 await inside("3n. Core: how long, before it starts", "core-session", ["[data-focus]"]);
 await inside("3o. Yoga & Pilates: past the first choice", "yoga-session", ["[data-type], [data-focus]"]);
+// v6: the last two rooms, past their first screen.
+await inside("3r. Build a session: a type chosen", "session-builder", ["[data-type], .sb-type-card"]);
+await inside("3s. the Morning programme: its overview", "morning-session", ["#ms-start-btn, [data-slot], .ms-slot-btn"]);
 // v5: a class's own page, and the player in a class.
 await inside("3p. Classes: a class's own page", "classes", ["[data-class]"]);
 person(); await open("classes"); click(main.querySelector("[data-class]")); await wait(40); click(main.querySelector("[data-start]")); await wait(120);
@@ -259,7 +266,7 @@ ok("4pc2. compared every touched room the router opens", compared >= 20, compare
 // ── 5 ───────────────────────────────────────────────────────────────────
 console.log("\nTEST 5 - the scope");
 // v2 (P-13): Mobility & Conditioning left the Plan (split into the Stretch door); verify-library-shelf proves nothing on the Plan opens it.
-ok("5a. P-13 keeps its rooms but My exercises and the twelve-week shape (taken in by Session 9) and Mobility & Conditioning (no longer on the Plan)", P13_ROOMS.length === 2 && !["in-step", "quiet-session", "breathing-session", "core-session", "yoga-session", "classes", "class-player"].some(r => P13_ROOMS.includes(r)) && !P13_ROOMS.includes("prescribed") && !P13_ROOMS.includes("goal-setup") && !P13_ROOMS.includes("mobility-conditioning") && NOT_ON_THE_PLAN.includes("mobility-conditioning") && P13_ROOMS.includes("session-builder"), P13_ROOMS.join(", "));
+ok("5a. P-13 keeps its rooms but My exercises and the twelve-week shape (taken in by Session 9) and Mobility & Conditioning (no longer on the Plan)", P13_ROOMS.length === 0 && !["in-step", "quiet-session", "breathing-session", "core-session", "yoga-session", "classes", "class-player", "session-builder", "morning-session"].some(r => P13_ROOMS.includes(r)) && !P13_ROOMS.includes("prescribed") && !P13_ROOMS.includes("goal-setup") && !P13_ROOMS.includes("mobility-conditioning") && NOT_ON_THE_PLAN.includes("mobility-conditioning") && NOT_ON_THE_PLAN.includes("checkin-mini"), P13_ROOMS.join(", ") || "(none left)");
 const callers = execSync(`git -C "${ROOT}" grep -n "navigate('checkin-mini')\\|data-action=\\"checkin-mini\\"" -- js`, { encoding: "utf8" }).trim().split("\n");
 ok("5b. Update check-in is opened only from Free's Home (today.js)", callers.every(l => l.startsWith("js/views/today.js")), callers.join(" | "));
 person(); await open("today");

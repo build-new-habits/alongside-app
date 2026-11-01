@@ -31,9 +31,7 @@
  * it left P13_ROOMS for this list; verify-library-shelf proves nothing on
  * the Plan opens it.
  */
-export const P13_ROOMS = [
-  "session-builder", "morning-session",
-];
-export const SESSION_SCREENS = ["workout", "capture", "prescribed-session", "gym-programme", "breathing-session", "quiet-session", "core-session", "yoga-session", "class-player"];
+export const P13_ROOMS = [];   // 01 Nov: P-13's rooms are all in the Plan's look (Build a session and the Morning programme last)
+export const SESSION_SCREENS = ["workout", "capture", "prescribed-session", "gym-programme", "breathing-session", "quiet-session", "core-session", "yoga-session", "class-player", "morning-session"];
 export const NOT_A_ROOM = ["age-check", "under-18", "consent-update", "health-consent", "red-flag"];
 export const NOT_ON_THE_PLAN = ["checkin-mini", "mobility-conditioning"];

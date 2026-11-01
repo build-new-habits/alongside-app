@@ -1,6 +1,8 @@
 /**
  * tools/chromium-one-look.mjs
- * 31 Oct 2026 v1
+ * 01 Nov 2026 v2
+ *
+ * v2 - P-13 done: no rooms are left out, so it says nothing about them.
  *
  * STAGE PATH Session 9 (CLOSE; P-12 F3, F4, F5). The real-browser half of
  * verify-one-look: jsdom draws no layout, so that gate holds the markup and
@@ -168,7 +170,7 @@ for (const size of SIZES) {
 await browser.close();
 server.close();
 
-console.log(`P-13's rooms, not measured here (the Library session): ${P13_ROOMS.join(", ")}`);
+if (P13_ROOMS.length) console.log(`P-13's rooms, not measured here (the Library session): ${P13_ROOMS.join(", ")}`);
 if (unreached.length) console.log(`Not reached with this history (not measured):\n  ${unreached.join("\n  ")}\n`);
 console.log(faults.length ? faults.map(f => "  FAIL  " + f).join("\n") : "  PASS  every Plan screen: one heading at 24 px at the left, no emoji, one way back in the agreed words, every link a pill, a button or a row that says what it is for");
 console.log(`\nCHROMIUM-ONE-LOOK: ${measured} screens measured (the Plan × text ${SIZES.join(" / ")}), ${faults.length} faults`);
