@@ -1,6 +1,11 @@
 /**
  * views/plan-finish.js
- * 29 Oct 2026 v1
+ * 01 Nov 2026 v2
+ *
+ * v2 - P-20 TRENDS-BUILD, session 1 (approved 01 Nov, Graeme: "One day
+ *   moved, minutes added"). After a snack, one unticked box: Count this as a
+ *   session. Snacks on one day are one day moved, with their minutes added,
+ *   unless the person ticks it (store.setSnackCounted). Nothing else changes.
  *
  * STAGE PATH Session 6 (P-6 FINISH; blueprint D5, mock-up v10). The Plan's
  * finish, after any session the Plan's player plays (workout.js routes here
@@ -48,12 +53,13 @@ export function PlanFinishView(router) {
   let note = "";
   let fb = {};          // id -> { like, less, never }
   let empathy = null;   // { text } when the prompt is due
+  let counted = false;  // P-20: a snack the person counts as a session
 
   function mount(container) {
     root = container;
     entry = store.get("currentActivityEntry") || null;
     if (!isPremium() || !entry) { router.navigate(isPremium() ? "today" : "reflect", { replace: true }); return; }
-    mood = null; pain = null; note = ""; empathy = null;
+    mood = null; pain = null; note = ""; empathy = null; counted = entry.counted === true;
     fb = Object.fromEntries(ids().map(id => [id, { like: false, less: false, never: false }]));
     resetSessionMoments();
     paint();
@@ -116,6 +122,8 @@ export function PlanFinishView(router) {
               ${f.less ? radios(`pf-lo-${j}`, `How much less of ${movementName(id) || "it"}?`, [["Less often", "less"], ["Not again", "never"]], f.never ? "never" : "less") : ""}
             </li>`; }).join("")}</ul>
           <p class="path-small">Nothing here is required. Less often and Not again can be undone in Settings, How you like things.</p>` : ""}
+        ${entry.snack === true ? `<div class="pf-count"><label class="pf-count__lbl"><input type="checkbox" id="pf-counted" aria-describedby="pf-count-help"${counted ? " checked" : ""}> Count this as a session</label>
+          <p class="path-small" id="pf-count-help">Snacks on the same day count as one day moved, with their minutes added up.</p></div>` : ""}
         ${keep ? `<details class="finish-more finish-keep"><summary class="finish-more__summary">Keep to repeat</summary>${keep}</details>` : ""}
         ${healthAllowed() ? `<details class="finish-more"${note ? " open" : ""}><summary class="finish-more__summary">Add a note</summary>
           <label class="sr-only" for="pf-note">A note about this session</label>
@@ -150,6 +158,7 @@ export function PlanFinishView(router) {
       li.querySelectorAll(`input[name="pf-lo-${j}"]`).forEach(r => r.addEventListener("change", () => { f.never = r.value === "never"; }));
     });
     root.querySelector("#pf-note")?.addEventListener("input", e => { note = e.target.value; });
+    root.querySelector("#pf-counted")?.addEventListener("change", e => { counted = !!e.target.checked; });
     root.querySelector("#pf-done")?.addEventListener("click", done);
     root.querySelector("#pf-empathy-go")?.addEventListener("click", () => { fireEmpathyPrompt(getSessionCount()); router.navigate("today"); });
     root.querySelector("#pf-empathy-skip")?.addEventListener("click", () => { skipEmpathyPrompt(getSessionCount()); router.navigate("today"); });
@@ -166,6 +175,10 @@ export function PlanFinishView(router) {
       log[i] = { ...log[i], ...fields };
       store.set("activityLog", log);
       store.set("currentActivityEntry", log[i]);
+    }
+    if (entry.snack === true && i !== -1 && counted !== (log[i].counted === true)) {
+      store.setSnackCounted(entry.id, counted);
+      store.set("currentActivityEntry", (store.get("activityLog") || []).find(e => e && e.id === entry.id) || entry);
     }
     for (const [id, f] of Object.entries(fb)) {
       if (f.like) store.likeMovement(id);

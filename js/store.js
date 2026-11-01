@@ -6,6 +6,17 @@ import { validateWeightTarget } from "./data/weight-targets.js";
 
 /**
  * store.js - Data persistence layer
+ * 01 Nov 2026 v120
+ *
+ * v120 - P-20 TRENDS-BUILD, session 1 (approved 01 Nov, Graeme: "One day
+ *   moved, minutes added"). completedSessions(), the one definition of a
+ *   session that happened, now counts snacks on one local day as one day
+ *   moved: the day's first uncounted snack stands for them all, with their
+ *   minutes added (durationMins), their movements joined (exerciseIds) and
+ *   snacksInDay saying how many. A snack the person counted is a session
+ *   like any other. Free never logs a snack, so nothing changes there. No
+ *   field changes (Schema v1.118 records the rule).
+ *
  * 01 Nov 2026 v119
  *
  * v119 - P-19 TRENDS-SCHEMA (master schedule v610; Schema v1.117). Schema
@@ -3819,7 +3830,23 @@ export const store = {
    * session you did, and it must never be counted as one.
    */
   completedSessions(entries) {
-    return (entries || []).filter(e => e && e.status !== 'partial');
+    const done = (entries || []).filter(e => e && e.status !== 'partial');
+    if (!done.some(e => e.snack === true && e.counted !== true)) return done;
+    // v120. Uncounted snacks on one local day are one day moved.
+    const dayOf = e => { const t = Date.parse(e.completedAt || e.date); return Number.isFinite(t) ? this._localDay(new Date(t)) : null; };
+    const firstOfDay = new Map();
+    const out = [];
+    for (const e of done) {
+      const day = e.snack === true && e.counted !== true ? dayOf(e) : null;
+      if (!day) { out.push(e); continue; }
+      const at = firstOfDay.get(day);
+      if (at === undefined) { firstOfDay.set(day, out.length); out.push({ ...e, snacksInDay: 1 }); continue; }
+      const f = out[at];
+      out[at] = { ...f, snacksInDay: f.snacksInDay + 1,
+        durationMins: (Number(f.durationMins) || 0) + (Number(e.durationMins) || 0),
+        exerciseIds: [...new Set([...(f.exerciseIds || []), ...(e.exerciseIds || [])])] };
+    }
+    return out;
   },
 
   /**

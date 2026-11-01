@@ -1,5 +1,8 @@
 # Alongside — Data Schema Reference
-## 01 Nov 2026 v1.117
+## 01 Nov 2026 v1.118
+
+> **v1.118, 01 Nov 2026 — P-20 TRENDS-BUILD session 1** (`store.js` v120). **No field change.** `store.completedSessions()`, the one definition of a session that happened, now counts **uncounted snacks on one local day as one day moved**: the day's first such snack stands for them all, with `durationMins` added, `exerciseIds` joined and **`snacksInDay`** (a count on the returned copy, **never stored**). A snack with `counted: true` is a session like any other. The stored `activityLog` is not changed. Free never logs a snack, so its counts are as before. **First readers of v1.117's fields:** `views/path.js` v5 writes `trends` (Follow a fitness trend) and reads `trendWeek()`; the player (`workout.js` v38) writes `trend`, `effort` and `snack` on the entry; the Plan finish (`plan-finish.js` v2) calls `setSnackCounted()`; Progress (`progress.js` v33) reads `trend` and `effort` for the Zone 2 week in words. Gated by `tools/verify-path-trends.mjs`.
+
 
 > **v1.117, 01 Nov 2026 — P-19 TRENDS-SCHEMA** (`store.js` v119; master schedule v610). Schema first: **no app code reads these yet**; the fitness-trend recipes (P-20) do. Gated by `tools/verify-trends-schema.mjs`. Content approved 01 Nov (Graeme): BNH-Files `Product/alongside_content_trends-*_01nov2026_v2.md`.
 >
@@ -1076,7 +1079,7 @@
 
 ## 06 Sep 2026 v1.51
 
-**File:** `js/store.js` (confirmed live version: **v119, 01 Nov 2026**)
+**File:** `js/store.js` (confirmed live version: **v120, 01 Nov 2026**)
 
 > **v1.47, 06 Sep 2026 — CR-1.** `conditions[]` gains three ids and loses one. `chronic-fatigue` is **retired**; `persistent-fatigue`, `me-cfs` and `long-covid` replace it. No field shape changed — `conditions` is still `string[]` and `conditionMeta` is still keyed by condition id.
 >

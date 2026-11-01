@@ -1,7 +1,12 @@
 import { createRequire as __cr } from "node:module";
 /**
  * tools/verify-path-routes.mjs
- * 31 Oct 2026 v4
+ * 01 Nov 2026 v5
+ *
+ * v5 - P-20 re-point (none loosened). 1d: How would you like it? now also
+ *   offers Follow a fitness trend, after Build my own (approved 01 Nov,
+ *   Graeme: "Follow a fitness Trend"); held by verify-path-trends. Build it
+ *   for me is still first and set apart, and nothing else was added.
  *
  * v4 - P-13 re-point (Graeme, 31 Oct: doors first, then trim). 3c: a run
  *   also offers A guided run (the room the Library's Run tile opened). 4a:
@@ -142,7 +147,7 @@ tapRow("home");
 ok("1c. Which part of you? Whole body, Upper, Lower, Core", step() === "area" && h1() === "Which part of you?" && rowText().join("|") === "Whole body|Upper body|Lower body|Core");
 tapRow("upper");
 ok("1d. How would you like it? Build it for me (set apart) and Build my own; no Saved sessions with none kept; no ready-made routine yet (no content)",
-   step() === "how" && rowText().join("|") === "Build it for me|Build my own" && main.querySelector('.path-row[data-v="coach"]').classList.contains("is-tint"), rowText().join("|"));
+   step() === "how" && rowText().join("|") === "Build it for me|Build my own|Follow a fitness trend" && main.querySelector('.path-row[data-v="coach"]').classList.contains("is-tint"), rowText().join("|"));
 const upperBtn = () => main.querySelector('.path-row[data-v="upper"]');
 click(main.querySelector("#path-back"));
 ok("1e. Back: one step, and focus on what opened it", step() === "area" && document.activeElement === upperBtn(), document.activeElement?.outerHTML?.slice(0, 80));

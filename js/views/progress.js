@@ -1,6 +1,11 @@
 /**
  * progress.js
- * 31 Oct 2026 v32
+ * 01 Nov 2026 v33
+ *
+ * v33 - P-20 TRENDS-BUILD, session 1 (approved 01 Nov, Graeme). On the
+ *   Plan, for someone following Zone 2: Your Zone 2 week, this week's easy
+ *   and hard days in words (trend-recipes.js zone2WeekWords): never a score,
+ *   a percentage or a grade. Free unchanged.
  *
  * v32 - STAGE PATH Session 9 (CLOSE; P-12 F5; Graeme, 31 Oct: "‹ Back").
  *   On the Plan only: a detail page's way back says "‹ Back" (it said
@@ -388,6 +393,7 @@ import { activityNoun } from '../data/activity-labels.js';
 import { liftReadback, strandReadback, arcWeek, sessionsByWeek,
          sessionsInWindow, shortDate } from '../data/arc-readback.js';
 import { kindOf } from '../data/kind-colours.js';
+import { zone2WeekWords } from '../data/trend-recipes.js';
 import { windowRange, windowsFor, sessionsIn, dailyCounts, buildReport,
          setsText, moodPairs, moodStory, fiveOf } from '../data/progress-report.js';
 import { setSharePreset } from './progress-share.js';
@@ -500,7 +506,7 @@ export function ProgressView(router) {
         <div class="progress-body" id="panel-${activeWindow}" role="tabpanel" aria-labelledby="tab-${activeWindow}">
           ${renderActivitySummary(range)}
           ${renderCoachNarrative(stats, tier, name, range)}
-          ${range.days === 1 ? renderToday() : renderSessionsChart(range)}${premium ? renderMoodStory(range) : ''}
+          ${range.days === 1 ? renderToday() : renderSessionsChart(range)}${premium ? renderMoodStory(range) + renderZone2Week() : ''}
           ${renderSessionShapes(tier, range)}
           ${premium ? renderArcReadback() : ''}
           ${_rateNote(premium)}
@@ -825,6 +831,24 @@ export function ProgressView(router) {
             <p class="path-lately__key"><span class="path-lately__swatch is-before" aria-hidden="true"></span>Before <span class="path-lately__swatch is-after" aria-hidden="true"></span>After</p></div>
           ${story.helps ? `<div class="path-lately__tile"><p class="path-lately__lbl">What seems to help</p><p class="path-lately__line">${_esc(story.helps)} seems to help you most.</p></div>` : ''}
         </div>
+      </section>`;
+  }
+
+  /**
+   * v33 (the Plan). This week's Zone 2 days, easy and hard, in words, for
+   * someone following it; nothing when they are not, or have none yet.
+   */
+  function renderZone2Week() {
+    if (!(store.get('trends') || []).some(t => t && t.id === 'zone2')) return '';
+    const now = new Date();
+    const monday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - ((now.getDay() + 6) % 7)).getTime();
+    const week = store.completedSessions(store.get('activityLog')).filter(e => e.trend === 'zone2' && Date.parse(e.completedAt || e.date) >= monday);
+    const words = zone2WeekWords({ easy: week.filter(e => e.effort === 'easy').length, hard: week.filter(e => e.effort === 'hard').length });
+    if (!words) return '';
+    return `
+      <section class="pr-trend" aria-labelledby="pr-trend-h">
+        <h2 class="look-label" id="pr-trend-h">Your Zone 2 week</h2>
+        <p class="path-lately__line" id="pr-trend-words">${_esc(words)}</p>
       </section>`;
   }
 

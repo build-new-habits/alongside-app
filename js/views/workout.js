@@ -1,6 +1,12 @@
 /**
  * workout.js - Workout Execution View
- * 31 Oct 2026 v37
+ * 01 Nov 2026 v38
+ *
+ * v38 - P-20 TRENDS-BUILD, session 1. On the Plan, a fitness-trend session
+ *   (views/path.js v5) logs its trend, its effort (easy, steady or hard) and,
+ *   for a snack, snack: true, through _pathFields, so Progress can say a
+ *   Zone 2 week in words and snacks on one day count as one day moved.
+ *   Free unchanged (_pathFields returns {} off the Plan).
  *
  * v37 - STAGE PATH Session 9 (CLOSE; P-12 F3, F4, F5; Graeme, 31 Oct: "Exit
  *   in a session", "24 px, left"). On the Plan only: the way out says Exit
@@ -524,6 +530,10 @@ function _pathFields(w) {
   if (w.door) out.door = w.door;
   if (w.feeling) out.feeling = w.feeling;
   if (w.title || w.name) out.name = w.title || w.name;
+  // P-20. A fitness-trend session: its trend, its effort, and a snack (Schema v1.117).
+  if (w.trend) out.trend = w.trend;
+  if (w.effort) out.effort = w.effort;
+  if (w.snack === true) out.snack = true;
   return out;
 }
 /** Quite sore this morning, on the Plan: the area. */

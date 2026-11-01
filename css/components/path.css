@@ -1,6 +1,9 @@
 /* ============================================================
    components/path.css
-   01 Nov 2026 v9
+   01 Nov 2026 v10
+
+   v10 - P-20 TRENDS-BUILD session 1: the Plan finish's Count this as a
+   session (a snack), a 44 px target.
 
    v9 - P-13 Classes (mock-up v1 approved 01 Nov): a class's own page on the
    Plan (Before you start, its parts with their figures) and the player's
@@ -399,3 +402,8 @@ body:has(#main-content .plan-back, #main-content .plan-exit) #hidden-nav-home-bt
 .class-part__fig.is-none::before { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--color-border); }
 .class-player__fig { display: grid; place-items: center; background: var(--color-surface); border-radius: var(--radius-lg, 16px); padding: var(--space-3); margin: var(--space-2) 0 var(--space-3); }
 .class-player__fig svg { width: min(100%, 220px); height: auto; }
+
+/* P-20 (path.css v10): the Plan finish's Count this as a session, a 44 px target. */
+.pf-count { margin: 0.75rem 0; }
+.pf-count__lbl { display: flex; align-items: center; gap: 0.6rem; min-height: 44px; font-size: var(--text-base, 1rem); }
+.pf-count__lbl input { width: 1.4rem; height: 1.4rem; flex: none; }

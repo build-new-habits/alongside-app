@@ -1,6 +1,19 @@
 /**
  * views/path.js
- * 31 Oct 2026 v4
+ * 01 Nov 2026 v5
+ *
+ * v5 - P-20 TRENDS-BUILD, session 1 (content approved 01 Nov, Graeme:
+ *   BNH-Files Product/alongside_content_trends-zone2-snacks-cross_01nov2026_v2.md).
+ *   How would you like it? gains Follow a fitness trend (Get stronger and
+ *   Keep moving, Home or Gym): Zone 2, mostly easy (Keep moving), Mix it up
+ *   (cross training) and A 10-minute snack. Each is a recipe filled from the
+ *   library (data/trend-recipes.js) and shown as a proposal like any other:
+ *   figures, Swap (only within the recipe's own pool), Start. The session's
+ *   effort is said in the talk test's words, with the safety line on a Hard
+ *   one. Choosing Zone 2 or Mix it up starts following it (store.trends);
+ *   Zone 2 says its week and offers the harder day only from week 5 and once
+ *   a week; Mix it up offers two or three easy swaps for what they do most,
+ *   and the person picks. The ten new movements stay held (none offered).
  *
  * v4 - P-13 LIBRARY, doors first (Graeme, 31 Oct: "Doors first, then trim";
  *   Mobility & Conditioning split into the Stretch door). Every room the
@@ -88,7 +101,11 @@ import { savedSessions, resolveSavedSession } from "../data/saved-sessions.js";
 import { keepVersion } from "../save-block.js";
 import { OUTSIDE_PLANS } from "../data/outside.js";
 import { presetLogActivity } from "./activity-log.js";
-import { setTodaysLength, lengthCatForToday } from "../data/session-length.js";
+import { setTodaysLength, lengthCatForToday, todaysLengthCat } from "../data/session-length.js";
+import { equipmentForLocation } from "../session-builder.js";
+import { resolveEquipment, exerciseIsAvailable } from "../data/equipment-map.js";
+import { TRENDS, EFFORT, HARD_SAFETY, ZONE2_ACTIVITIES, zone2Week, zone2Session, zone2HardDoneThisWeek,
+         SNACK_QUALITIES, snackSession, MAIN_ACTIVITIES, mainActivityFrom, crossOptions, recentTrendIds, plainName } from "../data/trend-recipes.js";
 
 const BY_ID = new Map([...EXERCISES, ...PATH_MOVEMENTS].map(e => [e.id, e]));
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -127,6 +144,8 @@ const POSITION = { standing: "Standing", seated: "Seated", floor: "On the floor"
 const ENERGY = [["Running on empty", 2], ["Low", 3], ["Okay", 6], ["Good", 7], ["Full of it", 9]];
 const FEEL_LENGTHS = [5, 10, 15, 20];
 const BUILD_LENGTHS = [["micro", 10], ["quick", 20], ["short", 30], ["standard", 40], ["long", 50]];
+/** P-20. Today's length in minutes, only when chosen today (else the recipe's own). */
+const lengthMinsToday = () => BUILD_LENGTHS.find(([c]) => c === todaysLengthCat())?.[1] || null;
 
 /** D4: a door, a part and a place, as the builder's session type. */
 export function sessionTypeFor(door, part) {
@@ -157,13 +176,17 @@ export function startPractice(router, practice, { door, feeling = null } = {}) {
     ? practice.steps.map(s => s.entry).filter(Boolean)
     : practice.steps.map(s => {
       const e = BY_ID.get(s.id);
-      return e ? { ...e, reps: null, sets: 1, duration: Math.round(s.mins * 60), pathNote: s.note || null } : null;
+      return e ? { ...e, ...(s.label ? { name: s.label } : {}), reps: null, sets: 1, duration: Math.round(s.mins * 60), pathNote: s.note || null } : null;
     }).filter(Boolean);
   if (!exercises.length) return;
   const session = { id: practice.id, title: practice.name, duration: practice.minutes ? `${practice.minutes} mins` : null, exercises,
                     sessionType: practice.sessionType || (door === "stretch" ? "stretch" : null), door, feeling };
   if (practice.place) session.place = practice.place;
   if (!practice.saved) session.programmeId = practice.id;
+  // P-20. A trend session says which trend, its effort, and whether it is a snack (Schema v1.117).
+  if (practice.trend && practice.trend !== "snack") session.trend = practice.trend;
+  if (practice.effort) session.effort = practice.effort;
+  if (practice.snack) session.snack = true;
   store.set("generatedSession", {
     session,
     builtAt: new Date().toISOString(),
@@ -281,6 +304,7 @@ export function PathView(router) {
         <ul class="path-list">
           ${row({ v: "coach", t: "Build it for me", d: "Shaped by today’s check-in and what you’ve told me", icon: "fresh", kind: DOOR[st.door].kind, tint: true })}
           ${row({ v: "own", t: "Build my own", d: "Choose the exercises yourself" })}
+          ${row({ v: "trend", t: "Follow a fitness trend", d: trendsFor(st.door).map(([, x]) => x.short).join(", ") })}
           ${n ? row({ v: "saved", t: "Saved sessions", d: `${n} kept` }) : ""}
           ${st.place === "gym" ? row({ v: "programme", t: "My programme", d: "Your current gym programme" }) : ""}
         </ul>`;
@@ -306,6 +330,62 @@ export function PathView(router) {
           ${outsidePractice("cool") ? row({ v: "cool", t: "Cool-down after", d: `${esc(outsidePractice("cool").name)} \u00b7 about ${outsidePractice("cool").minutes} min`, icon: "moon", kind: DOOR[st.door].kind }) : ""}
           ${GUIDED[st.activity] ? row({ v: "guided", t: GUIDED[st.activity][1], d: GUIDED[st.activity][2], icon: ACTIVITIES.find(a => a.id === st.activity)?.icon || "outside", kind: DOOR[st.door].kind }) : ""}
           ${row({ v: "log", t: "Log it", d: "How long it was, and how it felt", icon: "pencil", kind: DOOR[st.door].kind })}
+        </ul>`;
+    },
+
+    // P-20. Follow a fitness trend
+    trends() {
+      return `${heading("Follow a fitness trend", "fresh", DOOR[st.door].kind)}
+        <ul class="path-list">${trendsFor(st.door).map(([id, x]) => {
+          const w = id !== "snack" ? store.trendWeek(id === "zone2" ? "zone2" : "cross") : null;
+          return row({ v: id, t: x.name, d: esc(x.line) + (w ? ` · Week ${w}` : ""), icon: x.icon, kind: DOOR[st.door].kind }); }).join("")}</ul>`;
+    },
+    z2act() {
+      return `${heading("Which do you want to keep easy?", "run", DOOR[st.door].kind)}
+        <p class="path-small">Zone 2 is mostly easy days of one activity, with one harder day from week 5.</p>
+        <ul class="path-list">${ZONE2_ACTIVITIES.map(a => row({ v: a.id, t: a.label })).join("")}</ul>`;
+    },
+    z2day() {
+      const t = followed("zone2"), wk = zone2Week(store.trendWeek("zone2") || 1);
+      const label = ZONE2_ACTIVITIES.find(a => a.id === t?.activity)?.label || "";
+      const hardDone = zone2HardDoneThisWeek(store.get("activityLog") || []);
+      const hardNote = !wk.hardAllowed ? "The harder day starts in week 5. Until then, every day is easy."
+        : hardDone ? "This week\u2019s harder day is done. The rest of the week is easy." : "";
+      return `${heading(`Zone 2: ${label}, week ${wk.week}`, "run", DOOR[st.door].kind)}
+        <p class="path-coachline">Mostly easy, with one harder day.${wk.easier ? " This is an easier week." : ""}</p>
+        <ul class="path-list">
+          ${row({ v: "easy", t: "An easy day", d: `About ${zone2Session({ ...recipeIn(), activity: t.activity, week: wk.week })?.minutes || wk.easyMins} min \u00b7 ${esc(EFFORT.easy)}`, tint: true })}
+          ${wk.hardAllowed && !hardDone ? row({ v: "hard", t: "The harder day", d: `About 25 min \u00b7 ${esc(EFFORT.hard)}` }) : ""}
+          ${row({ v: "change", t: "Change the activity", d: `Now: ${esc(label)}` })}
+          ${row({ v: "stop", t: "Stop following Zone 2" })}
+        </ul>
+        ${hardNote ? `<p class="path-small">${esc(hardNote)}</p>` : ""}`;
+    },
+    squal() {
+      const mine = SNACK_QUALITIES.filter(q => q.door === st.door || (st.door === "moving" && q.id === "legs"));
+      const len = st.slen || "10";
+      return `${heading("A 10-minute snack", "sparkle", DOOR[st.door].kind)}
+        <p class="path-small">A short burst for one thing. Ten minutes still counts.</p>
+        ${radios("slen", "How long have you got?", [["10", "10 min"], ["15", "15 min"]], len)}
+        ${radios("sseat", "Standing or seated?", [["stand", "Standing"], ["seated", "Seated"]], st.sseat || "stand")}
+        <ul class="path-list">${mine.map(q => row({ v: q.id, t: q.label })).join("")}</ul>`;
+    },
+    xmain() {
+      return `${heading("What do you do most?", "fresh", DOOR[st.door].kind)}
+        <p class="path-small">Mix it up swaps one day of it for something that uses your body differently.</p>
+        <ul class="path-list">${MAIN_ACTIVITIES.map(a => row({ v: a.id, t: a.label })).join("")}</ul>`;
+    },
+    xopts() {
+      const t = followed("cross");
+      const label = MAIN_ACTIVITIES.find(a => a.id === t?.activity)?.label?.toLowerCase() || "";
+      const opts = crossOptions({ ...recipeIn(), main: t?.activity });
+      return `${heading("Mix it up", "fresh", DOOR[st.door].kind)}
+        <p class="path-coachline">You usually ${t?.activity === "workout" ? "do strength work" : t?.activity === "yoga" ? "do yoga or Pilates" : esc(label)}. Something different today?</p>
+        <ul class="path-list">${opts.map(o => row({ v: o.id, t: o.name, d: `About ${o.minutes} min \u00b7 ${esc(EFFORT[o.effort])}` })).join("")}</ul>
+        <p class="path-small">You choose. It uses your body differently, and gives the same parts a break from the same work.</p>
+        <ul class="path-list">
+          ${row({ v: "change", t: "That\u2019s not what I do most", d: `Now: ${esc(MAIN_ACTIVITIES.find(a => a.id === t?.activity)?.label || "")}` })}
+          ${row({ v: "stop", t: "Stop mixing it up" })}
         </ul>`;
     },
 
@@ -378,6 +458,8 @@ export function PathView(router) {
         ${line ? `<p class="${st.note ? "path-note" : "path-coachline"}">${esc(line)}</p>` : ""}
         <p class="path-small">${esc(meta)}</p>
         ${p.support ? `<p class="path-small">${esc(p.support)}</p>` : ""}
+        ${p.effort ? `<p class="path-small path-effort" id="path-effort">${esc(EFFORT[p.effort])}${p.line ? ` ${esc(p.line)}` : ""}</p>` : ""}
+        ${p.effort === "hard" ? `<p class="path-note" id="path-hard-safety">${esc(HARD_SAFETY)}</p>` : ""}
         ${p.slowLine || p.style === "taichi" || p.style === "qigong" ? `<p class="path-small">${esc(SLOW_LINE)}</p>` : ""}
         ${adj.length ? `<div class="path-adj"><p class="path-adj__lbl">What I’ve adjusted</p><ul>${adj.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>` : ""}
         <button type="button" class="btn btn-primary btn-full" id="path-start">Start</button>
@@ -389,11 +471,11 @@ export function PathView(router) {
           const e = BY_ID.get(s.id) || {};
           const q = encodeURIComponent(e.youtube || `${e.name || s.id} how to`);
           return `<li class="path-mv">${renderFigure(s.id) || ""}
-            <p class="path-mv__nm" id="path-mv-${i}">${i + 1}. ${esc(nameOf(s.id))}</p>
+            <p class="path-mv__nm" id="path-mv-${i}">${i + 1}. ${esc(s.label || nameOf(s.id))}</p>
             <p class="path-small">${s.dose ? esc(s.dose) : `${s.mins} min`}${s.note ? ` · ${esc(s.note)}` : ""}</p>
             <span class="path-mv__acts">
-              <a class="path-mv__yt" href="https://www.youtube.com/results?search_query=${q}" target="_blank" rel="noopener">Find a video on YouTube<span class="sr-only"> for ${esc(nameOf(s.id))} (opens YouTube, a search)</span></a>
-              ${swapOptionsFor(s.id, { door: st.door, feeling: st.feeling, exclude: ids }).length ? `<button type="button" class="btn btn-secondary path-mv__swap" id="path-swap-${i}" data-swap="${i}" aria-describedby="path-mv-${i}">Swap</button>` : ""}
+              <a class="path-mv__yt" href="https://www.youtube.com/results?search_query=${q}" target="_blank" rel="noopener">Find a video on YouTube<span class="sr-only"> for ${esc(s.label || nameOf(s.id))} (opens YouTube, a search)</span></a>
+              ${swapsFor(p, s, ids).length ? `<button type="button" class="btn btn-secondary path-mv__swap" id="path-swap-${i}" data-swap="${i}" aria-describedby="path-mv-${i}">Swap</button>` : ""}
             </span>
           </li>`; }).join("")}</ol>
         ${(p.easeOff || []).length ? `<div class="path-adj"><p class="path-adj__lbl">If you need it easier</p><ul>${p.easeOff.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>` : ""}
@@ -402,6 +484,25 @@ export function PathView(router) {
   };
 
   function feelingToday() { return suggestFeeling({ checkin: checkinToday() }); }
+
+  // ── P-20, fitness trends ─────────────────────────────────────────────
+  /** The trends a door offers, in order: [id, trend]. */
+  function trendsFor(door) {
+    return Object.entries(TRENDS).filter(([, x]) => x.doors.includes(door)).map(([id, x]) => [id, { ...x, short: x.short || x.name }]);
+  }
+  const followed = id => (store.get("trends") || []).find(t => t && t.id === id) || null;
+  /** What every recipe needs: the library, the kit where they are, likes, Not again, what was done lately. */
+  function recipeIn() {
+    const kit = resolveEquipment(equipmentForLocation(st.place || "home").list);
+    return { byId: BY_ID, available: e => !!e && exerciseIsAvailable(e, kit), prefs: store.get("exercisePreferences") || {},
+             liked: store.get("likedMovements") || {}, recent: recentTrendIds(store.get("activityLog") || []) };
+  }
+  /** A recipe's step swaps only within its own pool; anything else as before. */
+  function swapsFor(p, s, ids) {
+    if (Array.isArray(s.swaps)) return s.swaps.filter(id => id !== s.id && !ids.includes(id)).map(id => BY_ID.get(id)).filter(Boolean);
+    return swapOptionsFor(s.id, { door: st.door, feeling: st.feeling, exclude: ids });
+  }
+  const trendProg = practice => go("prog", { practice, fresh: false, reason: null, note: null, surprise: false, fromCoach: false });
 
   function savedFor(door, place) {
     return savedSessions().filter(s => (s.purpose == null || s.purpose === door) && (!place || s.place == null || s.place === place));
@@ -412,7 +513,7 @@ export function PathView(router) {
   /** Swap one movement for the next of its kind; said, and focus kept on the row's Swap. */
   function swapAt(i) {
     const p = st.practice, from = p.steps[i];
-    const opts = swapOptionsFor(from.id, { door: st.door, feeling: st.feeling, exclude: p.steps.map(s => s.id) });
+    const opts = swapsFor(p, from, p.steps.map(s => s.id));
     if (!opts.length) return;
     const to = opts[0];
     const steps = p.steps.map((s, j) => {
@@ -421,7 +522,7 @@ export function PathView(router) {
         const entry = { ...to, section: s.entry?.section, sets: s.entry?.sets ?? to.sets, reps: s.entry?.reps ?? to.reps, duration: s.entry?.duration ?? to.duration };
         return { id: to.id, entry, dose: s.dose };
       }
-      return { id: to.id, mins: s.mins };
+      return { ...s, id: to.id, ...(s.label ? { label: plainName(to.name) } : {}) };
     });
     st = { ...st, practice: { ...p, steps }, kept: false };
     paint(false);
@@ -460,7 +561,44 @@ export function PathView(router) {
         if (v === "own") { router.knowWhatStart = knowWhatFor(st.door, st.part, st.place); router.navigate("know-what"); return; }
         if (v === "saved") { router.savedStart = { purpose: st.door, place: st.place }; router.navigate("saved-sessions"); return; }
         if (v === "programme") { router.navigate("gym-programme"); return; }
+        if (v === "trend") return go("trends", {});
         return;
+      case "trends":
+        if (v === "zone2") return go(followed("zone2")?.activity ? "z2day" : "z2act", {});
+        if (v === "cross") {
+          const t = followed("cross");
+          if (t?.activity) return go("xopts", {});
+          const main = mainActivityFrom(store.get("activityLog") || []);
+          if (main) { store.startTrend("cross", main); return go("xopts", {}); }
+          return go("xmain", {});
+        }
+        if (v === "snack") return go("squal", {});
+        return;
+      case "z2act":
+        if (followed("zone2")) store.changeTrendActivity("zone2", v); else store.startTrend("zone2", v);
+        trail.pop(); return go("z2day", {});
+      case "z2day": {
+        if (v === "change") return go("z2act", {});
+        if (v === "stop") { store.stopTrend("zone2"); say("Stopped following Zone 2."); trail.pop(); step = "trends"; paint(); return; }
+        const wk = store.trendWeek("zone2") || 1;
+        const s = zone2Session({ ...recipeIn(), activity: followed("zone2")?.activity, kind: v, week: wk, minutes: lengthMinsToday() });
+        if (!s) { say("That one isn\u2019t available today."); return; }
+        return trendProg(s);
+      }
+      case "squal": {
+        const s = snackSession({ ...recipeIn(), quality: v, minutes: Number(st.slen || 10), seated: st.sseat === "seated" });
+        if (!s) { say("Nothing fits with the kit you have there. Try another."); return; }
+        return trendProg(s);
+      }
+      case "xmain":
+        if (followed("cross")) store.changeTrendActivity("cross", v); else store.startTrend("cross", v);
+        trail.pop(); return go("xopts", {});
+      case "xopts": {
+        if (v === "change") return go("xmain", {});
+        if (v === "stop") { store.stopTrend("cross"); say("Stopped mixing it up."); trail.pop(); step = "trends"; paint(); return; }
+        const o = crossOptions({ ...recipeIn(), main: followed("cross")?.activity }).find(x => x.id === v);
+        return o ? trendProg(o) : undefined;
+      }
       case "activity": return go("outplan", { activity: v });
       case "outplan": {
         if (v === "warm" || v === "cool") {
@@ -531,6 +669,8 @@ export function PathView(router) {
       say(r.value === "no" ? "Showing ones without the floor." : "Showing all of them.");
     }));
     root.querySelectorAll('input[name="blen"]').forEach(r => r.addEventListener("change", () => { st.blen = r.value; }));
+    root.querySelectorAll('input[name="slen"]').forEach(r => r.addEventListener("change", () => { st.slen = r.value; }));
+    root.querySelectorAll('input[name="sseat"]').forEach(r => r.addEventListener("change", () => { st.sseat = r.value; }));
     root.querySelector("#path-build")?.addEventListener("click", () => {
       store.set("requestedSessionType", sessionTypeFor(st.door, st.part));
       store.set("requestedLocation", st.place);
