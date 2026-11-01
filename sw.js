@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 31 Oct 2026 v693
+ * 01 Nov 2026 v694
  *
+ * v694 - P-13, Classes (Free unchanged). On the Plan, Classes is one row per class (how long, where you'll be, what it's for); tap one to see it first: full or shorter, what to know before you start, its parts with their stick figures, then Start. In the class, Exit, and each part's figure.
  * v693 - P-13, Core and Yoga & Pilates (Free unchanged). On the Plan both take the one look: the heading at the left, ‹ Back before a session and Exit during it, no house button beside either, line icons in place of emoji, and Done to finish.
  * v692 - P-13, the mind rooms (Free unchanged). On the Plan, Breathing, Something quieter and In Step take the one look: the heading at the left, ‹ Back before a practice and Exit while it runs, no house button beside it, line icons in place of emoji, and Done to finish.
  * v691 - P-13, the Library (Free unchanged). On the Plan the Library now holds only what no door does: Classes, Practices, Mindful practice, My exercises, Saved sessions, Your week and Log what I did, each saying what it is for. Everything else is behind Home's doors: a guided run, ride, walk or swim under Keep moving › Outside; Yoga & Pilates and a mobility session under Stretch; My programme under Get stronger › Gym.
@@ -4240,7 +4241,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v693";
+const CACHE_NAME = "alongside-v694";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4372,7 +4373,7 @@ const SHELL_HASHES = {
   "./js/views/plan-finish.js": "7a03f4176a4cb840",
   "./js/data/outside.js": "3af4ea46bd898084",
   "./js/data/path-context.js": "fc5643585fe6066e",
-  "./css/components/path.css": "7da1c1fa5a28af32",
+  "./css/components/path.css": "2ab935b8a0045008",
   "./js/data/red-flag.js": "3cd9eecbc3985eb3",
   "./js/data/health-consent.js": "a23d005af57f179c",
   "./js/data/age-check.js": "7fa5b0f5a6b34770",
@@ -4432,8 +4433,8 @@ const SHELL_HASHES = {
   "./js/data/classes/class-from-the-feet-010.js": "cdbfa03ffea71774",
   "./js/data/scope-statement.js": "02dac4d3fb7a62fb",
   "./js/data/activity-labels.js": "c2a6bc320d1d7fdd",
-  "./js/views/class-player.js": "e5669734d642c896",
-  "./js/views/class-list.js": "551081d91143ee4d",
+  "./js/views/class-player.js": "42620de997fa1226",
+  "./js/views/class-list.js": "c5f80d89802bf845",
   "./css/components/class-list.css": "e33b073b352399f3",
   "./css/components/class-player.css": "401cc57d7d39dbb1",
   "./js/views/saved-sessions.js": "bb7b1a61c1e2837f",
