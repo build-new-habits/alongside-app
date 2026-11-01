@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 01 Nov 2026 v700
+ * 01 Nov 2026 v701
  *
+ * v701 - P-21 (the Plan; Free unchanged). Your week can follow a fitness trend: Plan your week > Follow a fitness trend > which trend, the activity (Zone 2) or what you do most (Mix it up), then which days; the week is filled by the trend's own rules (HILIT and Hybrid training two days at most, reformer-style three, never side by side; Zone 2 one harder day mid-week; Mix it up one day; a week of snacks), the other days ordinary sessions you can change. Home's row then names today's trend day with the talk test's word, and one tap opens it. Fixed: on Your week's day screen, at larger text, the A little / Some / Mostly choices and the day's name no longer break mid-word.
  * v700 - P-20, the held entries: nothing you can see changes. The ten new movements the fitness trends were written for (Uphill Walk; Slider Reverse Lunge, Slider Lateral Lunge, Slider Mountain Climber; Sled Pull, Burpee Broad Jump, Walking Lunge with a Load, Wall Ball; Footwork with a Band, Feet in Straps with a Band) are written and drawn but offered nowhere until the clinical read; each recipe keeps playing its approved substitute. NEW FILES precached: js/data/exercises/held_movements.js, js/data/figures/batch-16.js.
  * v699 - P-20, fitness trends, part 4 (the Plan). Follow a fitness trend in Get stronger adds reformer-style Pilates with a band (a reformer class's order, a long band where the springs would be, slow and steady, with or without the floor, up to three days a week), the library's Mat Adaptation, and from week 9 Dynamic Pilates once a week. Log what I did: Body Balance is now Yoga or Pilates class on both tiers (the old name is a trademark), and the Plan's list adds Reformer class. A step under two minutes is said in seconds (it said 0.5 min). The Mat Adaptation card's steps are written out, with a bolster as optional kit.
  * v698 - P-20, fitness trends, parts 2 and 3 (Free unchanged). On the Plan, Follow a fitness trend adds HILIT: hard work, no jumping (five short bursts a round with a rest after each, nothing leaves the floor, standing or seated; two days a week at most, with a day off between) and, in Get stronger, Hybrid training (eight stations in order, each the version your kit allows; an easy walk between them in the first weeks, then a run, walk, ride, row or the cross trainer, your choice; stations that do not fit your time are left for another day and said; from week 11, the full eight at your own pace; no time kept). Two styles that had no rule now have one.
@@ -4247,7 +4248,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v700";
+const CACHE_NAME = "alongside-v701";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4335,7 +4336,7 @@ const SHELL_HASHES = {
   "./js/views/stretch-arc.js": "9d4f528a4372d5ea",
   "./js/views/checkin.js": "1d03b5f4d59bee0f",
   "./js/views/checkin-mini.js": "c647f4da71feddde",
-  "./js/views/coach-proposal.js": "51a95d9089367b0b",
+  "./js/views/coach-proposal.js": "54467c72a7f9c012",
   "./js/views/workout.js": "7bce456d42bad1a7",
   "./js/views/progress.js": "5e22359809361986",
   "./js/views/settings.js": "ec21456c0fda9b36",
@@ -4373,8 +4374,8 @@ const SHELL_HASHES = {
   "./js/data/arc-readback.js": "9b06dcba96534da0",
   "./js/data/tier-table.js": "7821c3304bd0815c",
   "./js/views/know-what.js": "4c4e9aa82b226bd6",
-  "./js/views/plan-home.js": "7a6738b3d0e3d23e",
-  "./js/views/path.js": "9825148786e0a1e6",
+  "./js/views/plan-home.js": "e6451225dfb42305",
+  "./js/views/path.js": "c2ff2d9c59a54792",
   "./js/plan-look.js": "7674d8fbf5101aa9",
   "./js/views/plan-finish.js": "67772c3957aee32e",
   "./js/data/outside.js": "3af4ea46bd898084",
@@ -4389,13 +4390,13 @@ const SHELL_HASHES = {
   "./js/data/health-consent-covers.js": "6698a3e50672cbbe",
   "./js/data/kind-colours.js": "1628adad116963b7",
   "./js/data/line-icons.js": "b746ddec419dc568",
-  "./js/data/week-shape-model.js": "133f54fc7f23c44c",
+  "./js/data/week-shape-model.js": "bea5abfccaaeda60",
   "./js/data/week-shape.js": "11aa21a058a7c640",
   "./js/data/warm-views.js": "73c268f74f004e8e",
-  "./js/views/your-week.js": "51c281a7f8b15da0",
+  "./js/views/your-week.js": "f74ab9f7826cd193",
   "./js/data/plan-reader.js": "a63239d24ffa51f9",
   "./js/views/plan-import.js": "baee11ac3f5ff1da",
-  "./css/components/your-week.css": "f14109dded35259b",
+  "./css/components/your-week.css": "900ee35d728e96d1",
   "./js/figures.js": "621b376c8778dbb4",
   "./js/data/figures/index.js": "9dd411b0802b6ff2",
   "./js/data/figures/batch-01.js": "27f86e28fb0c9833",
