@@ -1179,7 +1179,7 @@ function _addNext(entry) {
   const list = generated?.session?.exercises;
   const i = currentExerciseIndex;
   if (!_plan() || !Array.isArray(list) || !entry || list.some(e => e.id === entry.id)) return;
-  list.splice(i + 1, 0, withDefaultDose({ ...entry, section: _sectionOf(list[i]), added: true }));
+  list.splice(i + 1, 0, withDefaultDose({ ...entry, section: _sectionOf(list[i]) }));
   orderSay = `${entry.name} goes next.`;
   leftOpen = false; addOpen = false;
   focusName = true;

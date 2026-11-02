@@ -1,5 +1,17 @@
 /*
  * css/components/coach-proposal.css
+ * 02 Nov 2026 v16
+ *
+ * v16 - P-23 (the Plan; a fault found with it). At 320 px and text 2 the
+ *   swap list under a row was 599 px wide inside the sheet, clipped: each
+ *   choice is a .btn, which never wraps, so the longest name set the
+ *   list's width. The list now keeps to its row and a name wraps between
+ *   words; its size is capped at 6.4vw, so "Strengthening" fits at 320 px.
+ *   The plan's own row name split the same word at text 2 on 320 px (a
+ *   32 px word in a 194 px column; both tiers, already on v701): it is
+ *   capped at 7vw (22 px there, 27 px on a 390 px phone), so only text 2
+ *   is any smaller. The search that P-23 adds below it is workout.css's .swap-find.
+ *
  * 31 Oct 2026 v15
  *
  * v15 - STAGE PATH Session 9 (close checks; both tiers: a fault, not a look).
@@ -822,6 +834,7 @@
   font-weight: var(--font-semibold, 600);
   color: var(--color-text);
   overflow-wrap: break-word;
+  font-size: min(1em, 7vw);   /* v16: "Strengthening" at text 2 on a 320 px phone */
 }
 
 .cp-plan__dose,
@@ -964,6 +977,8 @@
 
 .cp-swap {
   flex-basis: 100%;
+  min-width: 0;
+  max-width: 100%;
   margin-top: var(--space-2);
 }
 
@@ -984,6 +999,8 @@
 
 .cp-swap__pick {
   width: 100%;
+  white-space: normal;
+  flex-wrap: wrap;
   min-height: 44px;
   display: flex;
   justify-content: space-between;
@@ -991,7 +1008,7 @@
   text-align: left;
 }
 
-.cp-swap__name { font-weight: var(--font-semibold, 600); }
+.cp-swap__name { font-weight: var(--font-semibold, 600); flex: 1 1 10em; min-width: 0; font-size: min(1em, 6.4vw); }
 
 .cp-swap__dose {
   color: var(--color-text-secondary);

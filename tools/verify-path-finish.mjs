@@ -1,6 +1,15 @@
 import { createRequire as __cr } from "node:module";
 /**
  * tools/verify-path-finish.mjs
+ * 02 Nov 2026 v2
+ *
+ * v2 - P-23 SWAP-SEARCH re-point (none loosened). On the Plan, Swap opens a
+ *   list (Like this one, then a search) instead of taking the first one on
+ *   the tap: 2a picks from the player's list ([data-plan-swap]); 6b opens
+ *   the proposal's list and picks its first like it. What they assert is
+ *   unchanged: less often (source swap); another movement in its place,
+ *   said, focus on that row's Swap.
+ *
  * 29 Oct 2026 v1
  *
  * STAGE PATH Session 6 (P-6 FINISH; P-12's one proposal shape). Drives the
@@ -118,7 +127,7 @@ const machine = EXERCISES.find(e => getSwapCandidates(e, []).length > 0);
 if (machine) {
   startSession({ exercises: [{ ...machine, section: "main" }, EX("b", "Press"), EX("c", "Curl")] });
   tap('[aria-controls*="swap"], #wo-swap-btn, .exercise-swap__toggle');
-  const choice = main.querySelector("[data-swap-to], [data-swap-id], .exercise-swap__option button, .exercise-swap__option");
+  const choice = main.querySelector("[data-plan-swap], [data-swap-to], [data-swap-id], .exercise-swap__option button, .exercise-swap__option");
   click(choice);
   ok("2a. Plan: swapping a movement out marks it less often (source swap)", (store.get("exercisePreferences") || {})[machine.id]?.preference === "less", JSON.stringify((store.get("exercisePreferences") || {})[machine.id]));
   fixture({ tier: "free" }); startSession({ exercises: [{ ...machine, section: "main" }, EX("b", "Press"), EX("c", "Curl")] });
@@ -204,6 +213,7 @@ ok("6a. every movement: its figure and, where there is another of its kind, a Sw
 const sw = main.querySelector(".path-mv__swap"); const si = Number(sw.dataset.swap);
 const before = txt(main.querySelectorAll(".path-mv__nm")[si]);
 click(sw); await wait(60);
+click(main.querySelector(`#path-swp-${si} [data-swap-to]`)); await wait(60);   // v2: Swap opens the list; its first like it
 const after = txt(main.querySelectorAll(".path-mv__nm")[si]);
 ok("6b. Swap: another movement in its place, said, and focus stays on that Swap", before !== after && /^Swapped /.test(txt(main.querySelector("#path-live"))) && document.activeElement?.id === `path-swap-${si}`, `${before} -> ${after}`);
 click(main.querySelector("#path-mine"));

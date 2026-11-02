@@ -1,5 +1,13 @@
 /**
  * tools/verify-one-player.mjs
+ * 02 Nov 2026 v5
+ *
+ * v5 - P-23 SWAP-SEARCH re-point (none loosened). On the Plan the machine's
+ *   swap is the Plan's Swap: the machines they have come first, under Like
+ *   this one ([data-plan-swap]), with a search below. 3a and 3b press that
+ *   list; what they assert is unchanged (the machines they have, focus on the
+ *   first; the card and the session keep the new machine, in its section).
+ *
  * 29 Oct 2026 v4
  *
  * v4 - STAGE PATH Session 6 re-point (none loosened). On the Plan a session
@@ -176,9 +184,9 @@ console.log("\nTEST 3 - a busy machine can still be swapped in the coach's playe
   await go("workout");
   ok("3pc. on a cardio machine with alternatives", txt(main).includes(machine.name) && !!$("#wo-swap-btn"), txt(main).slice(0, 120));
   click($("#wo-swap-btn")); await wait(20);
-  const opt = $("[data-swap-to]");
-  ok("3a. \"Can't get on this? Swap it\" opens the machines they have", !!opt && document.activeElement === opt, txt($("#wo-swap-panel")).slice(0, 120));
-  const to = opt?.getAttribute("data-swap-to");
+  const opt = $("[data-plan-swap]");   // v5: the Plan's Swap, machines first
+  ok("3a. Swap opens the machines they have first (Like this one), focus on the first", !!opt && document.activeElement === opt && isCardioMachine(EXERCISES.find(e => e.id === opt.getAttribute("data-plan-swap")) || {}), txt($("#wo-swap-panel")).slice(0, 120));
+  const to = opt?.getAttribute("data-plan-swap");
   click(opt); await wait(20);
   const toName = (EXERCISES.find(e => e.id === to) || {}).name;
   ok("3b. the card is the new machine, and the session keeps it", !!toName && txt(main).includes(toName) &&

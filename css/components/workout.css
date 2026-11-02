@@ -7,6 +7,11 @@
          under the exercise's name (.wo-ctl), the Swap panel (.wo-swap),
          What's left (.wo-left), and the search every swap shares
          (.swap-find: the session, a door's proposal, Today's plan).
+         Two faults the new screens' check found in the player, on both
+         tiers and already on v701: Skip this one was 36 px tall (the app's
+         rule is 44), and at 320 px and text 1.45 or 2 the step strip split
+         "Watch out" and "Capture" mid-word. Skip is 44 px; the strip goes
+         to two rows before a word would split.
 
    31 Oct 2026 v23
 
@@ -1907,8 +1912,8 @@
 
 /* D-1 — the four steps, 04 Oct 2026 */
 .wo-steps { margin: var(--space-3) 0; }
-.wo-steps__list { display: flex; gap: 6px; margin: 0; padding: 0; list-style: none; }
-.wo-steps__item { flex: 1; min-width: 0; }
+.wo-steps__list { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.wo-steps__item { flex: 1 1 5em; min-width: 0; }
 .wo-steps__btn {
   display: flex;
   flex-direction: column;
@@ -1930,7 +1935,7 @@
 .wo-steps__btn--on { color: var(--color-text); font-weight: 700; }
 .wo-steps__btn--on .wo-steps__bar { background: var(--color-primary); }
 .wo-steps__btn--done .wo-steps__bar { background: var(--color-primary); opacity: 0.55; }
-.wo-steps__label { display: block; max-width: 100%; overflow-wrap: anywhere; text-align: center; line-height: 1.2; }
+.wo-steps__label { display: block; max-width: 100%; overflow-wrap: break-word; text-align: center; line-height: 1.2; }
 .xstep--capture { border-color: var(--color-primary); }
 .xstep {
   margin-top: var(--space-2);
@@ -1969,7 +1974,7 @@
   font: inherit; cursor: pointer;
 }
 .wo-swap__pick:focus-visible, .swap-find__pick:focus-visible { outline: 3px solid var(--color-border-focus); outline-offset: 2px; }
-.wo-swap__name, .swap-find__name { font-weight: var(--font-bold); flex: 1 1 10em; min-width: 0; overflow-wrap: anywhere; }
+.wo-swap__name, .swap-find__name { font-weight: var(--font-bold); flex: 1 1 10em; min-width: 0; overflow-wrap: break-word; }
 .wo-swap__kit, .swap-find__kit { color: var(--color-text-secondary); font-size: var(--text-sm); }
 .swap-find { margin: var(--space-3) 0; }
 .swap-find__label { display: block; font-weight: var(--font-bold); margin-bottom: var(--space-1); }
@@ -1983,7 +1988,10 @@
 .wo-left__row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-3); padding: var(--space-2) 0; border-top: 1px solid var(--color-border); }
 .wo-left__row:first-child { border-top: 0; }
 .wo-left__n { flex: 0 0 1.6em; font-weight: var(--font-bold); color: var(--color-text-secondary); }
-.wo-left__t { flex: 1 1 9em; min-width: 0; overflow-wrap: anywhere; font-weight: var(--font-bold); }
+.wo-left__t { flex: 1 1 9em; min-width: 0; overflow-wrap: break-word; font-weight: var(--font-bold); }
 .wo-left__dose { display: block; font-weight: normal; color: var(--color-text-secondary); font-size: var(--text-sm); }
 .wo-left__add { margin-top: var(--space-3); padding: var(--space-3); }
 .wo-left .workout-header .btn { white-space: normal; text-align: left; overflow-wrap: anywhere; }
+.workout-actions #skip-exercise-btn { min-height: 44px; }   /* both tiers: a fault (v24) */
+/* P-23. A long word in a name ("Strengthening") fits a 320 px phone at text 2 before it would split. */
+.wo-swap__name, .swap-find__name, .wo-left__t { font-size: min(1em, 6.4vw); }
