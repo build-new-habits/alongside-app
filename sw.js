@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 01 Nov 2026 v701
+ * 02 Nov 2026 v702
  *
+ * v702 - P-22 to P-24 (the Plan; Free unchanged but for two faults). In a session, under each exercise's name: Swap (moves like it, then Search for something else, by name or muscle, only what your kit there allows, never a Not again or one today's sore areas rule out), Do this one later (to the end of its part of the session) and What's left (the rest, each with Do now, and Add an exercise, which goes next and is saved with the session). A proposal's Swap and Today's plan's swap list have the same search. Make it up as I go is behind Get stronger and Keep moving. Faults fixed on both tiers: Skip this one is 44 px tall, and the player's step strip and Today's plan's names no longer split a word at the largest text. NEW FILE precached: js/data/swap-search.js.
  * v701 - P-21 (the Plan; Free unchanged). Your week can follow a fitness trend: Plan your week > Follow a fitness trend > which trend, the activity (Zone 2) or what you do most (Mix it up), then which days; the week is filled by the trend's own rules (HILIT and Hybrid training two days at most, reformer-style three, never side by side; Zone 2 one harder day mid-week; Mix it up one day; a week of snacks), the other days ordinary sessions you can change. Home's row then names today's trend day with the talk test's word, and one tap opens it. Fixed: on Your week's day screen, at larger text, the A little / Some / Mostly choices and the day's name no longer break mid-word.
  * v700 - P-20, the held entries: nothing you can see changes. The ten new movements the fitness trends were written for (Uphill Walk; Slider Reverse Lunge, Slider Lateral Lunge, Slider Mountain Climber; Sled Pull, Burpee Broad Jump, Walking Lunge with a Load, Wall Ball; Footwork with a Band, Feet in Straps with a Band) are written and drawn but offered nowhere until the clinical read; each recipe keeps playing its approved substitute. NEW FILES precached: js/data/exercises/held_movements.js, js/data/figures/batch-16.js.
  * v699 - P-20, fitness trends, part 4 (the Plan). Follow a fitness trend in Get stronger adds reformer-style Pilates with a band (a reformer class's order, a long band where the springs would be, slow and steady, with or without the floor, up to three days a week), the library's Mat Adaptation, and from week 9 Dynamic Pilates once a week. Log what I did: Body Balance is now Yoga or Pilates class on both tiers (the old name is a trademark), and the Plan's list adds Reformer class. A step under two minutes is said in seconds (it said 0.5 min). The Mat Adaptation card's steps are written out, with a bolster as optional kit.
@@ -4248,7 +4249,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v701";
+const CACHE_NAME = "alongside-v702";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4272,7 +4273,7 @@ const SHELL_HASHES = {
   "./css/components/breathing-session.css": "a781b7bd351396ff",
   "./css/components/quiet-session.css": "34a8b26534013674",
   "./css/components/noticing.css": "f7d98b66333ab59f",
-  "./css/components/coach-proposal.css": "37c8206558aaf43d",
+  "./css/components/coach-proposal.css": "37688fdc312b1a0e",
   "./css/components/settings.css": "ebad4d7b9dfe7160",
   "./css/components/weekly-plan-v2.css": "4f70501241fc4fa0",
   "./css/components/gym-programme.css": "79be04064c6bd328",
@@ -4303,7 +4304,7 @@ const SHELL_HASHES = {
   "./css/components/equipment-modal.css": "923c72d2dadb57c3",
   "./css/components/morning-session.css": "88a53b15036d446d",
   "./css/components/settings-library.css": "6e8065c1fb782ba8",
-  "./css/components/workout.css": "3606fb396d9d7c67",
+  "./css/components/workout.css": "a579c812b38fb65f",
   "./css/layouts/app-shell.css": "a7b24b10fea16cc7",
   "./css/layouts/goal-setup.css": "32ded4f3cacc0b13",
   "./css/layouts/onboarding.css": "9dd282cf6249ceae",
@@ -4336,8 +4337,8 @@ const SHELL_HASHES = {
   "./js/views/stretch-arc.js": "9d4f528a4372d5ea",
   "./js/views/checkin.js": "1d03b5f4d59bee0f",
   "./js/views/checkin-mini.js": "c647f4da71feddde",
-  "./js/views/coach-proposal.js": "54467c72a7f9c012",
-  "./js/views/workout.js": "7bce456d42bad1a7",
+  "./js/views/coach-proposal.js": "14ff6954e3576885",
+  "./js/views/workout.js": "025277c8fe86396c",
   "./js/views/progress.js": "5e22359809361986",
   "./js/views/settings.js": "ec21456c0fda9b36",
   "./js/views/restore-flow.js": "dc81c2e455fa472d",
@@ -4375,13 +4376,14 @@ const SHELL_HASHES = {
   "./js/data/tier-table.js": "7821c3304bd0815c",
   "./js/views/know-what.js": "4c4e9aa82b226bd6",
   "./js/views/plan-home.js": "e6451225dfb42305",
-  "./js/views/path.js": "c2ff2d9c59a54792",
+  "./js/views/path.js": "e8ddc0c8402bfe0a",
   "./js/plan-look.js": "7674d8fbf5101aa9",
   "./js/views/plan-finish.js": "67772c3957aee32e",
   "./js/data/outside.js": "3af4ea46bd898084",
   "./js/data/trend-recipes.js": "14961e4c12aef77e",
   "./js/data/path-context.js": "fc5643585fe6066e",
-  "./css/components/path.css": "8183dd3b0eee6cf1",
+  "./js/data/swap-search.js": "db9cd5a6d1ac965a",
+  "./css/components/path.css": "506ed1a6da136ea6",
   "./js/data/red-flag.js": "3cd9eecbc3985eb3",
   "./js/data/health-consent.js": "a23d005af57f179c",
   "./js/data/age-check.js": "7fa5b0f5a6b34770",
@@ -4698,6 +4700,7 @@ const SHELL_URLS = [
   "./js/data/outside.js",
   "./js/data/trend-recipes.js",
   "./js/data/path-context.js",
+  "./js/data/swap-search.js",
   "./css/components/path.css",
   "./js/data/red-flag.js",
   "./js/data/health-consent.js",
