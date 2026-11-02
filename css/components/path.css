@@ -5,7 +5,10 @@
    v13 - P-26 ONE-BUILD-PAGE: Build a session (.bs-*): Lately, the three
    parts (each in its kind's colour, with its icon and name), a move's row
    (figure, name and dose, the heart, Swap), Help me fill this, and When's
-   it for?. A move left out on a sore day says so (.path-mv__out).
+   it for?. A move left out on a sore day says so (.path-mv__out). Found
+   by the new browser check: a heading beside its tile (.path-head) and
+   Home's row (.path-coach) now wrap rather than split a long word or run
+   off a 320 px phone at the largest text (a name like Wednesday).
 
    02 Nov 2026 v12
 
@@ -248,7 +251,7 @@
 
 /* The coach's row, or your week's day: one action, tinted (mock-up v10). */
 .path-coach {
-  display: flex; align-items: center; gap: var(--space-3);
+  display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3);
   width: 100%; min-height: 64px;
   padding: var(--space-2) var(--space-3);
   border: 1.5px solid var(--k, var(--color-primary));
@@ -258,7 +261,7 @@
   color: var(--color-text); font: inherit; text-align: left; cursor: pointer;
 }
 .path-coach:focus-visible { outline: 3px solid var(--color-border-focus); outline-offset: 2px; }
-.path-coach__text { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.path-coach__text { flex: 1 1 0; min-width: min-content; display: flex; flex-direction: column; }   /* v13: a word never splits; the row wraps instead */
 .path-coach__t { font-size: var(--text-base); font-weight: 700; line-height: 1.3; }
 .path-coach__d { font-size: var(--text-sm); color: var(--color-text-secondary); line-height: 1.4; }
 
@@ -282,7 +285,8 @@
 .path-stepbar { display: flex; gap: 6px; margin: 0; padding: 0; list-style: none; }
 .path-stepbar li { flex: 1; height: 6px; border-radius: 3px; background: var(--color-border); }
 .path-stepbar li.is-on { background: var(--k, var(--color-primary)); }
-.path-head { display: flex; gap: var(--space-3); align-items: center; }
+.path-head { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: center; }
+.path-head > .path-h1 { flex: 1 1 0; min-width: min-content; }   /* v13: a long name drops under its tile rather than run off the phone */
 .path-head > .kind-tile { flex: none; }
 .path-h1 { margin: 0; font-size: var(--text-2xl); font-weight: var(--font-bold); line-height: 1.2; color: var(--color-text); text-wrap: balance; }
 .path-h1:focus { outline: none; }
@@ -444,18 +448,22 @@ body:has(#main-content .plan-back, #main-content .plan-exit) #hidden-nav-home-bt
 .bs-pills { display: flex; flex-wrap: wrap; gap: var(--space-2); }
 .bs-quiet { color: var(--color-text-secondary); }
 .bs-part { display: flex; flex-direction: column; gap: var(--space-2); padding: var(--space-3); border: 1px solid var(--color-border); border-radius: var(--radius-lg, 16px); background: var(--color-surface); min-width: 0; }
-.bs-part__head { display: flex; align-items: center; gap: var(--space-3); }
+.bs-part__head { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-3); }
 .bs-part__head > .kind-tile { flex: none; }
 .bs-part__h { margin: 0; font-size: var(--text-lg); font-weight: var(--font-bold); color: var(--color-text); }
 .bs-part__min { margin-left: auto; font-size: var(--text-sm); color: var(--color-text-secondary); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .bs-mvs, .bs-picks { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-2); }
 .bs-mv { display: flex; flex-direction: column; min-width: 0; }
-.bs-mv__row { display: flex; align-items: center; gap: var(--space-2); min-height: 56px; }
-.bs-mv__fig { flex: none; width: 56px; }
-.bs-mv__fig .xfig { width: 56px; max-width: 56px; }
+.bs-mv__row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-3); min-height: 56px; }
+.bs-mv__acts { display: flex; align-items: center; gap: var(--space-2); margin-left: auto; }
+.bs-mv__fig { flex: none; width: 64px; }
+.bs-mv__fig .xfig { display: block; width: 64px; max-width: 64px; margin: 0; }
+.bs-mv__fig .xfig__frame { display: block; width: 64px; margin: 0; }
+.bs-mv__fig .xfig__frame svg { display: block; width: 64px; height: auto; }
 .bs-mv__fig .xfig__frame:not(:first-child), .bs-mv__fig .xfig__cap { display: none; }
-.bs-mv__txt, .bs-pick__txt { display: flex; flex-direction: column; min-width: 0; flex: 1; }
-.bs-mv__nm { font-weight: 600; color: var(--color-text); overflow-wrap: break-word; hyphens: manual; }
+.bs-mv__txt { display: flex; flex-direction: column; flex: 1 1 6em; min-width: min-content; }
+.bs-pick__txt { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+.bs-mv__nm { font-weight: 600; color: var(--color-text); }
 .bs-fav { flex: none; display: grid; place-items: center; width: 44px; height: 44px; border: 0; border-radius: 50%; background: none; color: var(--color-text-secondary); cursor: pointer; }
 .bs-fav[aria-pressed="true"] { color: var(--color-danger-text, var(--color-text)); }
 .bs-fav[aria-pressed="true"] svg { fill: currentColor; }

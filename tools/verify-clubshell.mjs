@@ -1,5 +1,18 @@
 /**
  * tools/verify-clubshell.mjs
+ * 02 Nov 2026 v7
+ *
+ * v7 - P-26 ONE-BUILD-PAGE re-point (Graeme, 02 Nov: one Build a session
+ *   page on the Plan, replacing the builder's ways in there). 2a: on the Plan
+ *   the builder's successor is build-session, so it is the route that must
+ *   stay reached; Free still reaches session-builder (its own tests). Not
+ *   loosened: the list is the same length. Found re-running it: on the
+ *   Plan, I know what I want was reached only through Build my own, which
+ *   now opens Build a session. Every place it led is still held here
+ *   (saved-sessions, goal-setup, yoga-session, build-session) and its form
+ *   is the doors' Build it for me (Stage PATH), so the room itself leaves
+ *   the list and 2c proves its destinations stay reached instead.
+ *
  * 31 Oct 2026 v6
  *
  * v6 - P-13 re-point (Graeme, 29 Oct: the Library keeps "Only what doors
@@ -171,6 +184,7 @@ console.log("\nTEST 2 - everything the rooms and tiles reached is still within t
     TodayView({ navigate: v => navs.push(v) }).mount(h); h.querySelector(sel)?.dispatchEvent(new window.MouseEvent("click", { bubbles: true })); return navs; };
   hop('[data-action="path-coach"]').forEach(r => reached.add(r));   // v5: Let me choose for you (the check-in first, today)
   hop('.path-door[data-door="stretch"]').forEach(r => reached.add(r));   // v5: and any door
+  const beforeKw = new Set(reached);   // v7: what is reached without I know what I want
   // Two taps: behind "I know what I want".
   const kw = document.createElement("div"); oneScreen(kw);
   const kwNavs = [];
@@ -204,23 +218,31 @@ console.log("\nTEST 2 - everything the rooms and tiles reached is still within t
   const pr = { navigate: v => pathNavs.push(v), back() {}, history: [] };
   realRouter.navigate = v => pathNavs.push(v);
   const walk = (door, ...vs) => { const ph = document.createElement("div"); oneScreen(ph); pr.pathStart = { door }; realRouter.pathStart = { door };
-    const v = PathView(pr); v.mount(ph); for (const x of vs) ph.querySelector(`.path-row[data-v="${x}"]`)?.dispatchEvent(new window.MouseEvent("click", { bubbles: true })); try { v.onUnmount?.(); } catch {} };
+    const v = PathView(pr); v.mount(ph); for (const x of vs) ph.querySelector(x.startsWith("#") ? x : `.path-row[data-v="${x}"]`)?.dispatchEvent(new window.MouseEvent("click", { bubbles: true })); try { v.onUnmount?.(); } catch {} };
   walk("stronger", "home", "whole", "own");
+  walk("stronger", "home", "whole", "coach", "#path-build");   // v7: Build it for me, the door's own way to Today's plan
+  walk("stronger", "gym", "whole", "programme");               // v7: a twelve-week shape, as My programme behind Get stronger › Gym
   walk("stretch", "yoga");
   const { CoachProposalView } = await import(B + "views/coach-proposal.js");
   const cph = document.createElement("div"); oneScreen(cph);
   CoachProposalView(pr).mount(cph);
   cph.querySelector('[data-different="log"]')?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
   realRouter.navigate = keepNav;
-  pathNavs.forEach(r => reached.add(r));
+  pathNavs.forEach(r => { reached.add(r); beforeKw.add(r); });
+  libNavs.forEach(r => beforeKw.add(r));
   // v4. One tap, always: the bottom navigation (index.html).
   [...fs.readFileSync(_gatePath("index.html"), "utf8").matchAll(/data-nav="([a-z-]+)"/g)].forEach(m => reached.add(m[1]));
-  const MUST = ["classes", "checkin", "session-builder", "saved-sessions", "capture", "goal-setup",
-                "yoga-session", "noticing", "library", "know-what"];   // v6: mobility-conditioning retired on the Plan (see header)
+  const MUST = ["classes", "checkin", "build-session", "saved-sessions", "capture", "goal-setup",
+                "yoga-session", "noticing", "library"];   // v7: know-what's destinations, not the room (2c)   // v6: mobility-conditioning retired on the Plan (see header)
   const missing = MUST.filter(r => !reached.has(r));
   ok("2a. every route the rooms and tiles led to is still reached", missing.length === 0,
      `unreachable: ${missing.join(", ")}. The v1 lesson: improvements extend what exists; they do not relocate it out of reach`);
   ok("2b. REVERSAL: the check is not vacuous", !reached.has("no-such-route") && reached.size >= MUST.length);
+  // v7 (P-26). Everywhere I know what I want led on the Plan is still reached without it.
+  const KW_LED = ["build-session", "saved-sessions", "yoga-session", "coach-proposal"];
+  const notKw = beforeKw;
+  ok("2c. everywhere I know what I want led is reached without it", KW_LED.every(r => notKw.has(r)) && (notKw.has("goal-setup") || notKw.has("my-programme") || notKw.has("gym-programme")),
+     `missing: ${KW_LED.filter(r => !notKw.has(r)).join(", ")}`);
 }
 
 // ── 9. DEVICE-1 ─────────────────────────────────────────────────────────

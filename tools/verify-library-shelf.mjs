@@ -1,6 +1,12 @@
 import { createRequire as __cr } from "node:module";
 /**
  * tools/verify-library-shelf.mjs
+ * 02 Nov 2026 v2
+ *
+ * v2 - P-26 ONE-BUILD-PAGE re-point (Graeme, 02 Nov: one Build a session
+ *   page on the Plan, replacing the builder's ways in there). 2e: Build my
+ *   own opens Build a session; 3b: I know what I want's row is it.
+ *
  * 31 Oct 2026 v1
  *
  * P-13 LIBRARY, first session. Graeme, 29 Oct: the Library keeps "Only what
@@ -106,7 +112,7 @@ ok("2d. Get stronger › Gym: My programme", navs.join() === "gym-programme", JS
 fixture(); path("stronger"); tapRow("home"); tapRow("whole");
 ok("2d. control: at home there is no gym programme row", !main.querySelector('.path-row[data-v="programme"]'));
 fixture(); path("stronger"); tapRow("home"); tapRow("upper"); navs = []; tapRow("own");
-ok("2e. Build my own opens I know what I want", navs.join() === "know-what", JSON.stringify(navs));
+ok("2e. Build my own opens Build a session", navs.join() === "build-session", JSON.stringify(navs));
 fixture(); path("stronger"); tapRow("gym"); tapRow("lower"); tapRow("coach");
 ok("2f. the session types of At home and At the gym: a part, then Build it for me", !!main.querySelector("#path-build"), txt(main).slice(0, 80));
 const cpSrc = readFileSync(`${ROOT}js/views/coach-proposal.js`, "utf8");
@@ -117,7 +123,7 @@ console.log("\nTEST 3 - Mobility & Conditioning is no longer opened on the Plan"
 fixture(); library();
 ok("3a. not from the Library", !main.querySelector('[data-guided="mobility"]'));
 fixture(); main.innerHTML = ""; KnowWhatView(fakeRouter).mount(main);
-ok("3b. not from I know what I want", !main.querySelector('[data-kw-route="mobility-conditioning"]') && !!main.querySelector('[data-kw-route="session-builder"]'));
+ok("3b. not from I know what I want", !main.querySelector('[data-kw-route="mobility-conditioning"]') && !!main.querySelector('[data-kw-route="build-session"]'));
 const planFiles = ["js/views/path.js", "js/views/plan-home.js", "js/views/plan-finish.js", "js/data/path-context.js"];
 ok("3c. not from Home or a door", planFiles.every(f => !readFileSync(`${ROOT}${f}`, "utf8").includes("mobility-conditioning")));
 ok("3d. control: Free keeps its own way in (Free Home's Mobility & Conditioning)", /route: 'mobility-conditioning'/.test(readFileSync(`${ROOT}js/views/today.js`, "utf8")));

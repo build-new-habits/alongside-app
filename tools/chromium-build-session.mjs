@@ -85,7 +85,7 @@ for (const scheme of ["light", "dark"]) for (const width of [390, 320]) for (con
       s.set("activityLog", [1, 2, 3].map(n => ({ id: "u" + n, type: "workout", sessionType: "upper", place: "gym", completedAt: ago(n), durationMins: 40, completed: true, exerciseIds: ["dumbbell-bench-press"] }))
         .concat([{ id: "l4", type: "workout", sessionType: "lower", place: "gym", completedAt: ago(4), durationMins: 40, completed: true, exerciseIds: ["goblet-squat"] }]));
       const pad = n => String(n).padStart(2, "0"), d = new Date(), today = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-      const rec = { id: "own_2026-11-02T16:30:00.000Z_ab12", name: "Wednesday morning at the gym, strengthening", sessionType: "upper", purpose: "stronger", place: "gym", durationMins: 40,
+      const rec = { id: "own_2026-11-02T16:30:00.000Z_ab12", name: "Wednesday gym", sessionType: "upper", purpose: "stronger", place: "gym", durationMins: 40,
         equipment: GYM, exerciseIds: ["band-pull-apart", "dumbbell-romanian-deadlift", "dumbbell-bench-press", "dead-bug", "doorway-chest-stretch"],
         doses: { "band-pull-apart": { section: "warmup", sets: 2, reps: 15 }, "dumbbell-romanian-deadlift": { section: "main", sets: 3, reps: 8 },
           "dumbbell-bench-press": { section: "main", sets: 3, reps: 10 }, "dead-bug": { section: "main", sets: 3, reps: 8 }, "doorway-chest-stretch": { section: "cooldown", sets: 2, duration: 30 } },

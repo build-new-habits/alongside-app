@@ -1,5 +1,11 @@
 /**
  * tools/verify-homedoors.mjs
+ * 02 Nov 2026 v6
+ *
+ * v6 - P-26 ONE-BUILD-PAGE re-point (Graeme, 02 Nov: one Build a session
+ *   page on the Plan, replacing the builder's ways in there). 2b: I know what
+ *   I want's builder row now opens Build a session on the Plan.
+ *
  * 31 Oct 2026 v5
  *
  * v5 - P-13 re-point (Graeme, 31 Oct: Mobility & Conditioning split into
@@ -198,7 +204,7 @@ const { CoachProposalView } = await import(B + "views/coach-proposal.js");
   r.pathStart = { door: "stretch" }; c.innerHTML = ""; PathView(r).mount(c);
   const mob = !!c.querySelector('.path-row[data-v="mobility"]');
   ok("2b. and the builder is one tap on from there, and the mobility session one tap into Stretch",
-     routes.includes("session-builder") && mob,
+     routes.includes("build-session") && mob,
      `routes: ${routes.join(", ")}; Stretch's mobility session: ${mob}`);
 }
 

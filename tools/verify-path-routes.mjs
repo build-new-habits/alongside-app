@@ -1,6 +1,14 @@
 import { createRequire as __cr } from "node:module";
 /**
  * tools/verify-path-routes.mjs
+ * 02 Nov 2026 v7
+ *
+ * v7 - P-26 ONE-BUILD-PAGE re-point (Graeme, 02 Nov: one Build a session
+ *   page on the Plan, replacing the builder's ways in there). 2b: Build my
+ *   own opens Build a session with the door, part and place handed over
+ *   (router.buildStart), read once; the page is held by
+ *   verify-build-session.
+ *
  * 02 Nov 2026 v6
  *
  * v6 - P-24 re-point (none loosened). 1d: How would you like it? also offers
@@ -172,11 +180,9 @@ tapRow("gym"); tapRow("whole"); tapRow("coach"); navs = []; click(main.querySele
 ok("2a. the whole body at the gym is a cardio session at the gym (D4)", store.get("requestedSessionType") === "cardio" && store.get("requestedLocation") === "gym" && navs.join() === "coach-proposal");
 for (const [door, part, kind, wantPart] of [["moving", "whole", "cardio", "full"], ["stronger", "lower", "strength", "lower"], ["stronger", "core", "core", "full"]]) {
   fixture(); fakeRouter.pathStart = { door }; path(); tapRow("gym"); tapRow(part); navs = []; tapRow("own");
-  const handed = fakeRouter.knowWhatStart;
-  main.innerHTML = ""; KnowWhatView(fakeRouter).mount(main);
-  ok(`2b. ${door}, ${part}: Build my own opens I know what I want, ${kind} at the gym already chosen, read once`,
-     navs.join() === "know-what" && handed?.kind === kind && main.querySelector(`input[name="kind"][value="${kind}"]`)?.checked &&
-     (kind !== "strength" || main.querySelector(`input[name="part"][value="${wantPart}"]`)?.checked) && main.querySelector('input[name="place"][value="gym"]')?.checked && fakeRouter.knowWhatStart === null,
+  const handed = fakeRouter.buildStart;
+  ok(`2b. ${door}, ${part}: Build my own opens Build a session, the door, part and place handed over`,
+     navs.join() === "build-session" && handed?.door === door && handed?.part === part && handed?.place === "gym",
      JSON.stringify(handed));
 }
 fixture(); main.innerHTML = ""; KnowWhatView(fakeRouter).mount(main);

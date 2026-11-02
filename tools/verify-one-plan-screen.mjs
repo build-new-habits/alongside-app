@@ -1,5 +1,12 @@
 /**
  * tools/verify-one-plan-screen.mjs
+ * 02 Nov 2026 v3
+ *
+ * v3 - P-26 ONE-BUILD-PAGE re-point (Graeme, 02 Nov: one Build a session
+ *   page on the Plan, replacing the builder's ways in there). 4a: choosing
+ *   each move is still its own job, now on Build a session (which opens
+ *   as a proposal before the player, so A-2's one plan screen holds).
+ *
  * 31 Oct 2026 v2
  *
  * v2 - P-13 re-point (Graeme, 31 Oct: doors first, then trim). TEST 3: a core
@@ -116,7 +123,7 @@ ok("3a. Today's plan, a core session at home", navs.at(-1) === "coach-proposal" 
 console.log("\nTEST 4 - kept by design");
 fixture(); main.innerHTML = "";
 KnowWhatView(rtr).mount(main);
-ok("4a. Build your own, move by move still opens the builder (choosing each move)", !!main.querySelector('[data-kw-route="session-builder"]'));
+ok("4a. choosing each move is kept: Build a session (P-26)", !!main.querySelector('[data-kw-route="build-session"]'));
 
 console.log("\nTEST 5 - FREE IS LEFT ALONE");
 mc("#mc-start-session", "free");

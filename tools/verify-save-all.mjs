@@ -1,5 +1,13 @@
 /**
  * tools/verify-save-all.mjs
+ * 02 Nov 2026 v3
+ *
+ * v3 - P-26 ONE-BUILD-PAGE re-point (Graeme, 02 Nov: one Build a session
+ *   page on the Plan, replacing the builder's ways in there). 5.2: Build a
+ *   session is where the Plan builds a session in advance, as
+ *   session-builder-ui.js is for Free, so it calls saveSession() itself,
+ *   as that file does. Session views still may not.
+ *
  * 28 Sep 2026 v2
  *
  * v2 - Work list 7, SAVE-HANDOFF. TEST 4c: the fallback to today's
@@ -284,7 +292,7 @@ console.log("\nTEST 5 — one implementation, and the shared screen carries it")
   // js/views/ contains subdirectories (onboarding/), so filter to files.
   const copies = fs.readdirSync(dir).filter(f => {
     if (!f.endsWith(".js")) return false;
-    if (f === "reflect.js" || f === "session-builder-ui.js" || f === "saved-sessions.js") return false;
+    if (f === "reflect.js" || f === "session-builder-ui.js" || f === "saved-sessions.js" || f === "build-session.js") return false;
     const t = fs.readFileSync(new URL(f, dir), "utf8");
     return /saveSession\s*\(/.test(t);
   });

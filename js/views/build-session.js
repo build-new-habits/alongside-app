@@ -267,13 +267,15 @@ export function BuildSessionView(router) {
   function moveRow(e, part, i) {
     const liked = !!(store.get("likedMovements") || {})[e.id];
     const nmId = `bs-mv-${part}-${i}`;
-    const open = st.open && st.open.kind === "swap" && st.open.part === part && st.open.i === i;
+    const open = !!(st.open && st.open.kind === "swap" && st.open.part === part && st.open.i === i);
     return `<li class="bs-mv">
       <div class="bs-mv__row">
         <span class="bs-mv__fig">${renderFigure(e.id) || ""}</span>
         <span class="bs-mv__txt"><span class="bs-mv__nm" id="${nmId}">${esc(e.name)}</span><span class="path-small">${esc(doseWords(e))}</span></span>
+        <span class="bs-mv__acts">
         <button type="button" class="bs-fav" data-fav="${esc(e.id)}" aria-pressed="${liked}" aria-label="Favourite: ${esc(e.name)}">${HEART}</button>
         <button type="button" class="btn btn-secondary bs-swap" id="bs-swap-${part}-${i}" data-swap="${part}:${i}" aria-describedby="${nmId}" aria-expanded="${open}"${open ? ` aria-controls="bs-swp"` : ""}>Swap</button>
+        </span>
       </div>
       ${open ? swapPanel(e, part) : ""}
     </li>`;

@@ -1,6 +1,13 @@
 import { createRequire as __cr } from "node:module";
 /**
  * tools/verify-one-look.mjs
+ * 02 Nov 2026 v8
+ *
+ * v8 - P-26 ONE-BUILD-PAGE re-point (Graeme, 02 Nov: one Build a session
+ *   page on the Plan, replacing the builder's ways in there). TEST 4: a view
+ *   new since v688 (build-session, the Plan's only) has no v688 copy to
+ *   compare; Free must be sent away from it, to its own screen.
+ *
  * 01 Nov 2026 v7
  *
  * v7 - P-20 re-point, as verify-path-outside v3 (Graeme, 01 Nov: rename
@@ -230,6 +237,7 @@ person(); await open("classes"); click(main.querySelector("[data-class]")); awai
 // ── 4 ───────────────────────────────────────────────────────────────────
 console.log("\nTEST 4 - Free, as it was on alongside-v688");
 const V688 = "79799cb";
+const NEW_PLAN_ONLY = ["build-session"];   // v8 (P-26)
 const touched = execSync(`git -C "${ROOT}" diff --name-only ${V688} -- js/views`, { encoding: "utf8" }).split("\n").filter(f => /^js\/views\/[a-z-]+\.js$/.test(f));
 ok("4pc. the files this session touched are found from git", touched.length >= 20, touched.join(", "));
 const fnOf = Object.fromEntries([...table.matchAll(/'([a-z0-9/-]+)'\s*:\s*\{\s*path:\s*'\.\/views\/([a-z-]+)\.js',\s*fn:\s*'(\w+)'/g)].map(m => [m[2], { route: m[1], fn: m[3] }]));
@@ -252,6 +260,11 @@ for (const file of touched) {
   if (!entry) continue;                     // a view the router does not open by itself
   let old = "";
   try { old = execSync(`git -C "${ROOT}" show ${V688}:${file}`, { encoding: "utf8", maxBuffer: 1 << 26 }); } catch {}
+  if (!old && NEW_PLAN_ONLY.includes(name)) {
+    person("free"); await router.navigate(entry.route); await wait(80);
+    ok(`4. Free ${name}: new since v688, the Plan's only: Free is sent to its own screen`, router.currentView !== entry.route, router.currentView);
+    continue;
+  }
   if (!old) { ok(`4. Free ${name}: there on v688`, false); continue; }
   // Both drawn from fresh copies, so neither carries a state from TEST 2 or 3.
   const fresh = async (code, tag) => { const t = new URL(`../${file.replace(/\.js$/, "")}__${tag}_look.js`, import.meta.url); writeFileSync(t, code); try { return await import(t.href); } finally { unlinkSync(t); } };

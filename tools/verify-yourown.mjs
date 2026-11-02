@@ -1,5 +1,11 @@
 /**
  * tools/verify-yourown.mjs
+ * 02 Nov 2026 v5
+ *
+ * v5 - P-26 ONE-BUILD-PAGE re-point (Graeme, 02 Nov: one Build a session
+ *   page on the Plan, replacing the builder's ways in there). 4a, 4c-1, 4c-2:
+ *   the Plan's way to build another is Build a session (build-session).
+ *
  * 01 Oct 2026 v4
  *
  * v4 - DOCS-MOVE. Documents/ left this public repository for the private
@@ -194,9 +200,9 @@ function list() {
 
 seed();
 const empty = knowWhat();
-const buildBtn = [...empty.c.querySelectorAll("[data-kw-route]")].find(b => b.dataset.kwRoute === "session-builder");
+const buildBtn = [...empty.c.querySelectorAll("[data-kw-route]")].find(b => b.dataset.kwRoute === "build-session");
 ok("4a. with nothing saved, it invites you to build one",
-   !!buildBtn && /Build your own/.test(buildBtn.textContent));
+   !!buildBtn && /Build a session/.test(buildBtn.textContent));
 ok("4b. and no longer says saving is not built", !/comes soon/i.test(empty.c.textContent));
 
 seed();
@@ -213,9 +219,9 @@ ok("4c. the newest is first on the list",
 // YOUR-OWN-CREATE, 16 Sep 2026: "Build your first" existed only in the
 // empty branch, so a way to build vanished with the first save. The same
 // check on the populated state, where it now lives.
-const buildAgain = [...full.c.querySelectorAll("[data-kw-route]")].find(b => b.dataset.kwRoute === "session-builder");
+const buildAgain = [...full.c.querySelectorAll("[data-kw-route]")].find(b => b.dataset.kwRoute === "build-session");
 ok("4c-1. with sessions saved, there is still a way to build another", !!buildAgain);
-ok("4c-2. and it points at the builder, not the list", buildAgain?.dataset.kwRoute === "session-builder");
+ok("4c-2. and it points at the builder, not the list", buildAgain?.dataset.kwRoute === "build-session");
 ok("4c-3. REVERSAL: it does not displace the primary action",
    /Show me the plan/.test(full.c.querySelector(".btn-primary")?.textContent || "") &&
    !buildAgain?.classList.contains("btn-primary"));

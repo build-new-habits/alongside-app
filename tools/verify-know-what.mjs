@@ -1,5 +1,11 @@
 /**
  * tools/verify-know-what.mjs
+ * 02 Nov 2026 v10
+ *
+ * v10 - P-26 ONE-BUILD-PAGE re-point (Graeme, 02 Nov: one Build a session
+ *   page on the Plan, replacing the builder's ways in there). 7c: the Plan's
+ *   row is Build a session, and opens build-session.
+ *
  * 31 Oct 2026 v9
  *
  * v9 - P-13 re-point (Graeme, 31 Oct: Mobility & Conditioning split into the
@@ -255,7 +261,7 @@ const savedBtn = main.querySelector('[data-kw-route="saved-sessions"]');
 ok("7a. saved sessions, counted", /Or one you saved \(3\)/.test(txt(savedBtn)));
 fixture({ saved: 0 }); fromHome();
 ok("7b. REVERSAL: none saved, no empty promise", !main.querySelector('[data-kw-route="saved-sessions"]'));
-for (const [label, route] of [["Build your own, move by move", "session-builder"],
+for (const [label, route] of [["Build a session", "build-session"],
                               ["A twelve-week shape", "goal-setup"]]) {
   fixture(); fromHome(); navs = [];
   // v8: on the Plan each is a row, its name on the first line and what is behind it on the second.
