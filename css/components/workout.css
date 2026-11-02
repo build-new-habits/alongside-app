@@ -1,6 +1,13 @@
 /* ============================================
    WORKOUT STYLES
    css/components/workout.css
+   02 Nov 2026 v24
+
+   v24 - P-22 to P-24 (the Plan). Swap, Do this one later and What's left
+         under the exercise's name (.wo-ctl), the Swap panel (.wo-swap),
+         What's left (.wo-left), and the search every swap shares
+         (.swap-find: the session, a door's proposal, Today's plan).
+
    31 Oct 2026 v23
 
    v23 - STAGE PATH Session 9 (close checks, axe; both tiers: a fault).
@@ -1938,3 +1945,45 @@
 .xstep-why { margin: 0 0 var(--space-3); font-size: var(--text-lg); line-height: 1.55; color: var(--color-text); }
 .xstep-hint { margin: var(--space-3) 0 0; font-size: var(--text-sm); color: var(--color-text-secondary); }
 .workout-actions #wo-step-capture { margin-top: var(--space-1); }
+
+
+/* ── P-22 to P-24 (the Plan): order, swap with search, add ───────────── */
+.wo-ctl { display: flex; flex-wrap: wrap; gap: var(--space-2); margin: var(--space-2) 0 var(--space-3); }
+.wo-ctl__pill {
+  min-height: 44px; padding: var(--space-2) var(--space-4); border-radius: 999px;
+  border: 1px solid var(--color-primary); background: var(--color-surface); color: var(--color-text);
+  font: inherit; font-weight: var(--font-bold); cursor: pointer; max-width: 100%; overflow-wrap: anywhere;
+}
+.wo-ctl__pill:focus-visible { outline: 3px solid var(--color-border-focus); outline-offset: 2px; }
+.wo-ctl__said { margin: 0 0 var(--space-2); color: var(--color-text-secondary); font-size: var(--text-sm); }
+.wo-ctl__said:empty { margin: 0; }
+.wo-swap { margin: var(--space-2) 0 var(--space-3); padding: var(--space-3); border: 2px solid var(--color-primary); }
+.wo-swap__h { font-size: var(--text-base); margin: 0 0 var(--space-2); overflow-wrap: anywhere; }
+.wo-swap__sub { font-size: var(--text-sm); margin: var(--space-2) 0; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: .04em; }
+.wo-swap__none { margin: var(--space-2) 0; color: var(--color-text-secondary); font-size: var(--text-sm); }
+.wo-swap__list, .swap-find__list, .wo-left__list { list-style: none; margin: 0; padding: 0; }
+.wo-swap__pick, .swap-find__pick {
+  display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 2px var(--space-2);
+  width: 100%; min-height: 48px; margin: var(--space-1) 0; padding: var(--space-2) var(--space-3); text-align: left;
+  background: var(--color-surface); color: var(--color-text); border: 1px solid var(--color-border); border-radius: var(--radius-lg);
+  font: inherit; cursor: pointer;
+}
+.wo-swap__pick:focus-visible, .swap-find__pick:focus-visible { outline: 3px solid var(--color-border-focus); outline-offset: 2px; }
+.wo-swap__name, .swap-find__name { font-weight: var(--font-bold); flex: 1 1 10em; min-width: 0; overflow-wrap: anywhere; }
+.wo-swap__kit, .swap-find__kit { color: var(--color-text-secondary); font-size: var(--text-sm); }
+.swap-find { margin: var(--space-3) 0; }
+.swap-find__label { display: block; font-weight: var(--font-bold); margin-bottom: var(--space-1); }
+.swap-find__hint { margin: 0 0 var(--space-2); color: var(--color-text-secondary); font-size: var(--text-sm); }
+.swap-find__input {
+  width: 100%; min-height: 44px; padding: var(--space-2) var(--space-3); font: inherit; color: var(--color-text);
+  background: var(--color-bg); border: 1px solid var(--color-border-strong, var(--color-border)); border-radius: var(--radius-lg);
+}
+.swap-find__input:focus-visible { outline: 3px solid var(--color-border-focus); outline-offset: 2px; }
+.swap-find__none { padding: var(--space-2) 0; color: var(--color-text-secondary); }
+.wo-left__row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-3); padding: var(--space-2) 0; border-top: 1px solid var(--color-border); }
+.wo-left__row:first-child { border-top: 0; }
+.wo-left__n { flex: 0 0 1.6em; font-weight: var(--font-bold); color: var(--color-text-secondary); }
+.wo-left__t { flex: 1 1 9em; min-width: 0; overflow-wrap: anywhere; font-weight: var(--font-bold); }
+.wo-left__dose { display: block; font-weight: normal; color: var(--color-text-secondary); font-size: var(--text-sm); }
+.wo-left__add { margin-top: var(--space-3); padding: var(--space-3); }
+.wo-left .workout-header .btn { white-space: normal; text-align: left; overflow-wrap: anywhere; }

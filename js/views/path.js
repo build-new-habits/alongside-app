@@ -1,5 +1,12 @@
 /**
  * views/path.js
+ * 02 Nov 2026 v10
+ *
+ * v10 - P-23, P-24. How would you like it? gains Make it up as I go (the
+ *   capture room, at the place chosen). A proposal's Swap opens a panel under
+ *   its row: like this one, then a search (data/swap-search.js). A trend's
+ *   step stays inside the trend's own moves, so it has no search.
+ *
  * 01 Nov 2026 v9
  *
  * v9 - P-21 TRENDS-WEEK. Home's row for a trend day in Your week arrives
@@ -121,6 +128,7 @@ import { EXERCISES } from "../data/exercises/index.js";
 import { PATH_MOVEMENTS } from "../data/exercises/path_movements.js";
 import { suggestFeeling, pickProgramme, pickSurprise, routinesFor, STRETCH_AREA_ZONES } from "../data/path-engine.js";
 import { checkinToday, lastPlace, lowMood, shownAdjustments, freshPracticeFor, swapOptionsFor } from "../data/path-context.js";
+import { renderSwapSearch, wireSwapSearch, kitWords } from "../data/swap-search.js";
 import { savedSessions, resolveSavedSession } from "../data/saved-sessions.js";
 import { keepVersion } from "../save-block.js";
 import { OUTSIDE_PLANS } from "../data/outside.js";
@@ -333,6 +341,7 @@ export function PathView(router) {
         <ul class="path-list">
           ${row({ v: "coach", t: "Build it for me", d: "Shaped by today’s check-in and what you’ve told me", icon: "fresh", kind: DOOR[st.door].kind, tint: true })}
           ${row({ v: "own", t: "Build my own", d: "Choose the exercises yourself" })}
+          ${row({ v: "asgo", t: "Make it up as I go", d: "Go to an exercise, log your sets, then choose the next" })}
           ${row({ v: "trend", t: "Follow a fitness trend", d: trendsFor(st.door).map(([, x]) => x.short).join(", ") })}
           ${n ? row({ v: "saved", t: "Saved sessions", d: `${n} kept` }) : ""}
           ${st.place === "gym" ? row({ v: "programme", t: "My programme", d: "Your current gym programme" }) : ""}
@@ -548,8 +557,9 @@ export function PathView(router) {
             <p class="path-small">${s.dose ? esc(s.dose) : stepLength(s.mins)}${s.note ? ` · ${esc(s.note)}` : ""}</p>
             <span class="path-mv__acts">
               <a class="path-mv__yt" href="https://www.youtube.com/results?search_query=${q}" target="_blank" rel="noopener">Find a video on YouTube<span class="sr-only"> for ${esc(s.label || nameOf(s.id))} (opens YouTube, a search)</span></a>
-              ${swapsFor(p, s, ids).length ? `<button type="button" class="btn btn-secondary path-mv__swap" id="path-swap-${i}" data-swap="${i}" aria-describedby="path-mv-${i}">Swap</button>` : ""}
+              ${canSwap(p, s, ids) ? `<button type="button" class="btn btn-secondary path-mv__swap" id="path-swap-${i}" data-swap="${i}" aria-describedby="path-mv-${i}" aria-expanded="${st.swapOpen === i}"${st.swapOpen === i ? ` aria-controls="path-swp-${i}"` : ""}>Swap</button>` : ""}
             </span>
+            ${st.swapOpen === i ? swapPanel(p, s, i, ids) : ""}
           </li>`; }).join("")}</ol>
         ${(p.easeOff || []).length ? `<div class="path-adj"><p class="path-adj__lbl">If you need it easier</p><ul>${p.easeOff.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>` : ""}
 `;
@@ -574,6 +584,22 @@ export function PathView(router) {
   function swapsFor(p, s, ids) {
     if (Array.isArray(s.swaps)) return s.swaps.filter(id => id !== s.id && !ids.includes(id)).map(id => BY_ID.get(id)).filter(Boolean);
     return swapOptionsFor(s.id, { door: st.door, feeling: st.feeling, exclude: ids });
+  }
+  /**
+   * P-23. A recipe's step stays inside its own pool (the trend's rules); any
+   * other step can also be searched for, so it always has a Swap.
+   */
+  const canSwap = (p, s, ids) => !Array.isArray(s.swaps) || swapsFor(p, s, ids).length > 0;
+  function swapPanel(p, s, i, ids) {
+    const like = swapsFor(p, s, ids).slice(0, 6);
+    const nm = esc(s.label || nameOf(s.id));
+    return `<div class="path-swp" id="path-swp-${i}" role="group" aria-labelledby="path-swp-h-${i}">
+              <h3 class="path-swp__h" id="path-swp-h-${i}">Instead of ${nm}</h3>
+              ${like.length ? `<p class="path-swp__sub" id="path-swp-like-${i}">Like this one</p>
+              <ul class="path-swp__list" aria-labelledby="path-swp-like-${i}">${like.map(e => `<li><button type="button" class="path-swp__pick" data-swap-to="${esc(e.id)}"><span class="path-swp__name">${esc(e.name)}</span><span class="path-swp__kit">${esc(kitWords(e))}</span></button></li>`).join("")}</ul>` : ""}
+              ${Array.isArray(s.swaps) ? `<p class="path-small">This one stays within the trend\u2019s own moves.</p>` : renderSwapSearch(`path-swp-${i}`)}
+              <button type="button" class="btn btn-secondary btn-full" id="path-swp-keep">Keep ${nm}</button>
+            </div>`;
   }
   const trendProg = practice => go("prog", { practice, fresh: false, reason: null, note: null, surprise: false, fromCoach: false });
 
@@ -612,12 +638,18 @@ export function PathView(router) {
 
   const freshPractice = () => freshPracticeFor({ feeling: st.feeling, minutes: Number(st.flen) || 10 });
 
-  /** Swap one movement for the next of its kind; said, and focus kept on the row's Swap. */
+  /** P-23. Swap opens that row's choices and search; again closes them. */
   function swapAt(i) {
+    st = { ...st, swapOpen: st.swapOpen === i ? null : i };
+    paint(false);
+    if (st.swapOpen === i) root.querySelector(`#path-swp-${i} [data-swap-to], #path-swp-${i}-q`)?.focus();
+    else root.querySelector(`#path-swap-${i}`)?.focus();
+  }
+
+  /** One movement for another, from the list or the search; said, and focus back on the row's Swap. */
+  function swapTo(i, to) {
     const p = st.practice, from = p.steps[i];
-    const opts = swapsFor(p, from, p.steps.map(s => s.id));
-    if (!opts.length) return;
-    const to = opts[0];
+    if (!to || !from || to.id === from.id || p.steps.some(s => s.id === to.id)) return;
     const steps = p.steps.map((s, j) => {
       if (j !== i) return s;
       if (p.saved) {
@@ -626,7 +658,7 @@ export function PathView(router) {
       }
       return { ...s, id: to.id, ...(s.label ? { label: plainName(to.name) } : {}) };
     });
-    st = { ...st, practice: { ...p, steps }, kept: false };
+    st = { ...st, practice: { ...p, steps }, kept: false, swapOpen: null };
     paint(false);
     root.querySelector(`#path-swap-${i}`)?.focus();
     say(`Swapped ${nameOf(from.id)} for ${nameOf(to.id)}.`);
@@ -661,6 +693,8 @@ export function PathView(router) {
       case "how":
         if (v === "coach") return go("buildlen", {});
         if (v === "own") { router.knowWhatStart = knowWhatFor(st.door, st.part, st.place); router.navigate("know-what"); return; }
+        // P-24. The room that already exists: suggestions, a search, sets logged as they go.
+        if (v === "asgo") { if (st.place) store.set("sessionLocation", st.place); router.navigate("capture"); return; }
         if (v === "saved") { router.savedStart = { purpose: st.door, place: st.place }; router.navigate("saved-sessions"); return; }
         if (v === "programme") { router.navigate("gym-programme"); return; }
         if (v === "trend") return go("trends", {});
@@ -824,6 +858,12 @@ export function PathView(router) {
     });
     root.querySelector("#path-start")?.addEventListener("click", () => startPractice(router, st.practice, { door: st.door, feeling: st.door === "feel" ? st.feeling : null }));
     root.querySelectorAll("[data-swap]").forEach(b => b.addEventListener("click", () => swapAt(Number(b.dataset.swap))));
+    if (step === "prog" && Number.isInteger(st.swapOpen)) {
+      const i = st.swapOpen, p = st.practice, ids = p.steps.map(s => s.id);
+      root.querySelectorAll(`#path-swp-${i} [data-swap-to]`).forEach(b => b.addEventListener("click", () => swapTo(i, BY_ID.get(b.dataset.swapTo))));
+      wireSwapSearch(root, `path-swp-${i}`, e => swapTo(i, BY_ID.get(e.id) || e), { place: st.place || p.place || null, exclude: ids });
+      root.querySelector("#path-swp-keep")?.addEventListener("click", () => swapAt(i));
+    }
     root.querySelector("#path-mine")?.addEventListener("click", keepMine);
     root.querySelector("#path-wellbeing")?.addEventListener("click", () => router.navigate("noticing"));
     root.querySelector("#path-redo")?.addEventListener("click", () => {

@@ -1,5 +1,10 @@
 /* ============================================================
    components/path.css
+   02 Nov 2026 v12
+
+   v12 - P-23: a proposal's Swap opens a panel under its row (.path-swp):
+   like this one, then the shared search (workout.css, .swap-find).
+
    01 Nov 2026 v11
 
    v11 - P-20: .path-effort and .pr-trend have their own rules (verify-css
@@ -413,3 +418,14 @@ body:has(#main-content .plan-back, #main-content .plan-exit) #hidden-nav-home-bt
 /* P-20: a trend session's effort in the talk test's words, and Progress's Zone 2 week. */
 .path-effort { font-weight: 600; }
 .pr-trend { margin: 1rem 0; }
+
+/* ── P-23: a proposal's Swap, opened under its row ─────────────────── */
+.path-swp { flex-basis: 100%; width: 100%; margin-top: var(--space-2); padding: var(--space-3); border: 2px solid var(--color-primary); border-radius: var(--radius-lg); background: var(--color-surface); }
+.path-swp__h { font-size: var(--text-base); margin: 0 0 var(--space-2); overflow-wrap: anywhere; }
+.path-swp__sub { margin: var(--space-2) 0; font-size: var(--text-sm); color: var(--color-text-secondary); }
+.path-swp__list { list-style: none; margin: 0; padding: 0; }
+.path-swp__pick { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2px var(--space-2); width: 100%; min-height: 48px; margin: var(--space-1) 0;
+  padding: var(--space-2) var(--space-3); text-align: left; font: inherit; color: var(--color-text); background: var(--color-bg); border: 1px solid var(--color-border); border-radius: var(--radius-lg); cursor: pointer; }
+.path-swp__pick:focus-visible { outline: 3px solid var(--color-border-focus); outline-offset: 2px; }
+.path-swp__name { font-weight: var(--font-bold); flex: 1 1 10em; min-width: 0; overflow-wrap: anywhere; }
+.path-swp__kit { color: var(--color-text-secondary); font-size: var(--text-sm); }

@@ -1,5 +1,11 @@
 /**
  * coach-proposal.js
+ * 02 Nov 2026 v67
+ *
+ * v67 - P-23 SWAP-SEARCH. A row's swap list ends with Search for something
+ *   else (data/swap-search.js), so Swap is never a dead end: "Nothing else
+ *   fits here today" is gone with the search there.
+ *
  * 01 Nov 2026 v66
  *
  * v66 - P-21 TRENDS-WEEK. A day in Your week that follows a fitness trend is
@@ -905,6 +911,7 @@ import { takeWeekDayRequest, applyWeekDay, primaryType, todayInWeek } from '../d
 import { resolveTiming }     from '../exercise-timing.js';
 import { isPremium }         from '../auth.js';
 import { shownAdjustments }  from '../data/path-context.js';
+import { renderSwapSearch, wireSwapSearch } from '../data/swap-search.js';
 import { openSheet }         from './onboarding/sheet-manager.js';
 import { chooseSessionType, lineIsSupported } from '../data/session-choice.js';
 
@@ -1606,6 +1613,7 @@ export function CoachProposalView(router) {
             </button></li>`;
           }).join('')}
         </ul>
+        ${renderSwapSearch(`cp-swp-${i}`)}
       </div>`;
   }
 
@@ -2140,6 +2148,13 @@ export function CoachProposalView(router) {
     panel.querySelectorAll('[data-swap-pick]').forEach(btn => {
       btn.addEventListener('click', () => _swapPick(container, swapOpen, btn.dataset.swapPick));
     });
+    // P-23. Search for something else: the same rule as the session player's.
+    if (swapOpen !== null) {
+      const ids = (currentPreviewOptions?.[0]?.exercises || []).map(e => e.id);
+      const at = swapOpen;
+      wireSwapSearch(panel, `cp-swp-${at}`, entry => _swapPickEntry(container, at, entry),
+        { place: _currentLocation(), exclude: ids });
+    }
 
     panel.querySelectorAll('[data-different]').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -2245,17 +2260,11 @@ export function CoachProposalView(router) {
       swapState[index] = { original: current, alts };
     }
 
-    const st = swapState[index];
-    if (!st.alts.length && st.original.id === current.id) {
-      statusMsg = `Nothing else fits here today, so ${current.name} stays.`;
-      _rerenderPanel(container);
-      container.querySelector(`[data-swap="${index}"]`)?.focus();
-      return;
-    }
+    // P-23. Never a dead end: with nothing alike, the search is still there.
     swapOpen  = index;
     statusMsg = '';
     _rerenderPanel(container);
-    container.querySelector(`#cp-swap-${index} [data-swap-pick]`)?.focus();
+    container.querySelector(`#cp-swap-${index} [data-swap-pick], #cp-swp-${index}-q`)?.focus();
   }
 
   /** W3-21. One tap on the list puts that move on the plan and closes it. */
@@ -2269,6 +2278,18 @@ export function CoachProposalView(router) {
     option.exercises = swapped.exercises;
     swapOpen  = null;
     statusMsg = id === '__original' ? `Back to ${next.name}.` : `Swapped to ${next.name}.`;
+    _rerenderPanel(container);
+    container.querySelector(`[data-swap="${index}"]`)?.focus();
+  }
+
+  /** P-23. A pick from the search: on the plan, with its usual dose. */
+  function _swapPickEntry(container, index, entry) {
+    const option = currentPreviewOptions[0];
+    if (!option || !entry || !swapState[index]) return;
+    if (option.exercises.some(e => e.id === entry.id)) return;
+    option.exercises = swapExerciseInSession(option, index, entry).exercises;
+    swapOpen  = null;
+    statusMsg = `Swapped to ${entry.name}.`;
     _rerenderPanel(container);
     container.querySelector(`[data-swap="${index}"]`)?.focus();
   }

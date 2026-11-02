@@ -1,5 +1,15 @@
 /**
  * workout.js - Workout Execution View
+ * 02 Nov 2026 v39
+ *
+ * v39 - P-22 SESSION-ORDER, P-23 SWAP-SEARCH, P-24 AS-YOU-GO (the Plan;
+ *   Graeme, 02 Nov). Under each exercise's name: Swap (like this one, then a
+ *   search by name or muscle, data/swap-search.js), Do this one later (to the
+ *   end of its own part of the session) and What's left (the rest, each with
+ *   Do now, and Add an exercise, which goes next and is saved with the
+ *   session). The order is the session's own, so the checkpoint and Carry on
+ *   later follow it. Free is unchanged: the machine swap only.
+ *
  * 01 Nov 2026 v38
  *
  * v38 - P-20 TRENDS-BUILD, session 1. On the Plan, a fitness-trend session
@@ -509,7 +519,9 @@ import { checkpointSession, getResumableSession, clearCheckpoint } from "../sess
 import { isPremium }     from "../auth.js";
 import { badDayIds, renderBadDayDoor, wireBadDayDoor } from "./bad-day-door.js";
 import { noteSwap }      from "../data/path-engine.js";
-import { lowMood, soreToday } from "../data/path-context.js";
+import { lowMood, soreToday, swapOptionsFor } from "../data/path-context.js";
+import { swapAllowed, swapPlace, renderSwapSearch, wireSwapSearch, kitWords } from "../data/swap-search.js";
+import { withDefaultDose } from "../session-builder.js";
 import { soreLevel, areaWords } from "../data/conditions.js";
 
 // STAGE PATH P-6. The Plan's player.
@@ -553,6 +565,12 @@ let pendingSkipOffer = null;
 let finishAfterOffer = false;
 // P21 / SWAP-0. The machine-swap panel on the current card.
 let swapPanelOpen = false;
+// P-22 / P-24 (the Plan). What's left showing, its Add an exercise search
+// open, and the one line said after the order changed. Never stored: the
+// order itself is, in generatedSession.
+let leftOpen = false;
+let addOpen  = false;
+let orderSay = "";
 let timerInterval = null;
 let timeRemaining = 0;
 let timerStarted = false; // Timer doesn't start until user taps Start
@@ -797,6 +815,9 @@ export function render() {
 
   const exercise = workout.exercises[currentExerciseIndex];
 
+  // P-22. What's left: the rest of the session, any one of them now.
+  if (_plan() && leftOpen) return _renderLeft(workout, exercise);
+
   // GM-1. Chosen once per render, so the card does not shuffle moments
   // on a timer tick. Returns null far more often than not: wrong family,
   // too soon, severe pain, already dismissed, or simply not this
@@ -839,7 +860,7 @@ export function render() {
           ${renderExerciseTarget(exercise)}
         </div>
 
-        ${_renderSwapControl(exercise)}
+        ${_plan() ? _renderPlanControls(workout, exercise) : _renderSwapControl(exercise)}
 
         ${finishedByTimer ? `
           <p class="xcard-timer-done" role="status">That is the time up on ${exercise.name}.</p>
@@ -1017,6 +1038,169 @@ function _applySwap(toId) {
   swapPanelOpen = false;
   resetTimer();
   router.navigate("workout");
+}
+
+// ── P-22 SESSION-ORDER, P-23 SWAP-SEARCH, P-24 AS-YOU-GO (the Plan) ──────
+//
+// Graeme, 02 Nov: mid-session he could not change the order, could swap only
+// between two machines, and could not add a move as he went. On the Plan,
+// every exercise gets three controls under its name: Swap (like this one,
+// then a search), Do this one later (to the end of its own part of the
+// session, so a main move never lands after the cool-down), and What's left
+// (the rest, any one of them now, and Add an exercise, which goes next).
+// Skip is unchanged. Free is unchanged: it keeps the machine swap only.
+//
+// The order lives in generatedSession.session.exercises, so the checkpoint
+// (index and set) and Carry on later follow it; workoutProgress is only
+// what was done, so nothing done is lost or counted twice.
+
+const _sectionOf = e => e?.section || e?.role || "main";
+
+/** Where Do this one later would put the current one: the last of its part, or -1. */
+function _laterAt(list, i) {
+  const sec = _sectionOf(list[i]);
+  let j = -1;
+  for (let k = i + 1; k < list.length; k++) if (_sectionOf(list[k]) === sec) j = k;
+  return j;
+}
+
+/** Like this one: the machine's own swaps, else the same kind, here, today. Six at most. */
+function _likeThis(workout, exercise) {
+  const ids = workout.exercises.map(e => e.id);
+  if (isCardioMachine(exercise)) return getSwapCandidates(exercise, store.get("equipment") || []).slice(0, 6);
+  const ok = swapAllowed(swapPlace(workout.place), ids);
+  return swapOptionsFor(exercise.id, { door: workout.door || null, feeling: workout.feeling || null, exclude: ids })
+    .filter(ok).slice(0, 6);
+}
+
+function _renderPlanControls(workout, exercise) {
+  const i = currentExerciseIndex, list = workout.exercises;
+  const left = list.length - i - 1;
+  const later = _laterAt(list, i) > i;
+  const name = _escSwap(exercise.name);
+  const pills = `
+        <div class="wo-ctl" role="group" aria-label="Change ${name}">
+          <button type="button" class="wo-ctl__pill" id="wo-swap-btn" aria-expanded="${swapPanelOpen}" aria-controls="wo-swap-panel">Swap</button>
+          ${later ? `<button type="button" class="wo-ctl__pill" id="wo-later-btn">Do this one later</button>` : ""}
+          <button type="button" class="wo-ctl__pill" id="wo-left-btn">${left ? `What’s left (${left})` : "Add an exercise"}</button>
+        </div>
+        <p class="wo-ctl__said" id="wo-said" role="status" aria-live="polite"></p>`;
+  if (!swapPanelOpen) return pills;
+  const like = _likeThis(workout, exercise);
+  return `${pills}
+        <div class="wo-swap card" id="wo-swap-panel" role="group" aria-labelledby="wo-swap-h">
+          <h2 class="wo-swap__h" id="wo-swap-h">Instead of ${name}</h2>
+          ${like.length ? `
+          <h3 class="wo-swap__sub" id="wo-swap-like">Like this one</h3>
+          <ul class="wo-swap__list" aria-labelledby="wo-swap-like">
+            ${like.map(o => `<li><button type="button" class="wo-swap__pick" data-plan-swap="${_escSwap(o.id)}">
+              <span class="wo-swap__name">${_escSwap(o.name)}</span><span class="wo-swap__kit">${_escSwap(kitWords(o))}</span></button></li>`).join("")}
+          </ul>` : `<p class="wo-swap__none">Nothing just like it fits here today. Search below.</p>`}
+          ${renderSwapSearch("wo-swap")}
+          <button type="button" class="btn btn-secondary btn-full" id="wo-swap-keep">Keep ${name}</button>
+        </div>`;
+}
+
+/** What's left, as its own screen: the rest in order, each with Do now, then Add an exercise. */
+function _renderLeft(workout, exercise) {
+  const i = currentExerciseIndex, list = workout.exercises;
+  const rest = list.slice(i + 1).map((e, k) => ({ e, at: i + 1 + k }));
+  return `
+    <div class="view workout-view wo-flow wo-left${_look()}">
+      <div class="workout-header">
+        <button type="button" class="btn btn-ghost" id="wo-left-back">‹ Back to ${_escSwap(exercise.name)}</button>
+      </div>
+      <h1 class="exercise-name" id="wo-left-h" tabindex="-1">What’s left</h1>
+      ${rest.length ? `
+      <ol class="wo-left__list" aria-labelledby="wo-left-h">
+        ${rest.map(({ e, at }) => `
+        <li class="wo-left__row">
+          <span class="wo-left__n" aria-hidden="true">${at + 1}</span>
+          <span class="wo-left__t" id="wo-left-${at}">${_escSwap(e.name)}<span class="wo-left__dose">${_escSwap(_doseWords(e))}</span></span>
+          <button type="button" class="wo-ctl__pill" data-do-now="${at}" aria-describedby="wo-left-${at}">Do now</button>
+        </li>`).join("")}
+      </ol>` : `<p class="coach-message-text">${_escSwap(exercise.name)} is the last one.</p>`}
+      ${addOpen ? `
+      <div class="wo-left__add card" role="group" aria-labelledby="wo-add-h">
+        <h2 class="wo-swap__h" id="wo-add-h">Add an exercise</h2>
+        <p class="wo-swap__none">It goes next, and is saved with this session.</p>
+        ${renderSwapSearch("wo-add", { label: "Search for an exercise" })}
+      </div>` : `
+      <button type="button" class="btn btn-secondary btn-full" id="wo-add-btn">+ Add an exercise</button>`}
+    </div>`;
+}
+
+/** "3 sets of 10", "3 × 30 seconds", "About 2 min": as the target says it, shortly. */
+function _doseWords(e) {
+  const sets = Number(e.sets) || 0;
+  if (e.reps != null && e.reps !== "") return sets > 1 ? `${sets} sets of ${e.reps}` : `${e.reps}`;
+  const secs = Number(e.duration) || 0;
+  if (!secs) return "";
+  return secs < 120 ? (sets > 1 ? `${sets} × ${secs} seconds` : `${secs} seconds`) : `About ${Math.round(secs / 60)} min`;
+}
+
+/** The list, changed, kept: the order is the session's own (see the header). */
+function _saveOrder(generated) {
+  store.set("generatedSession", generated);
+  scrollToTop();
+  router.navigate("workout");
+}
+
+/** P-22. Do this one later: to the end of its own part; the next one opens. */
+function _moveLater() {
+  const generated = store.get("generatedSession");
+  const list = generated?.session?.exercises;
+  if (!_plan() || !Array.isArray(list)) return;
+  const i = currentExerciseIndex, j = _laterAt(list, i);
+  if (j <= i) return;
+  const [ex] = list.splice(i, 1);
+  list.splice(j, 0, ex);
+  orderSay = j === list.length - 1 ? `${ex.name} is now last.` : `${ex.name} moves to after ${list[j - 1].name}.`;
+  resetTimer();
+  _saveOrder(generated);
+}
+
+/** P-22. Do now, from What's left: that one here, the current one straight after. */
+function _doNow(at) {
+  const generated = store.get("generatedSession");
+  const list = generated?.session?.exercises;
+  const i = currentExerciseIndex;
+  if (!_plan() || !Array.isArray(list) || !(at > i && at < list.length)) return;
+  const [ex] = list.splice(at, 1);
+  list.splice(i, 0, ex);
+  orderSay = `${ex.name} now. ${list[i + 1].name} is next.`;
+  resetTimer();
+  _saveOrder(generated);
+}
+
+/** P-24. Add an exercise: it goes next, in the current one's part, with its usual dose. */
+function _addNext(entry) {
+  const generated = store.get("generatedSession");
+  const list = generated?.session?.exercises;
+  const i = currentExerciseIndex;
+  if (!_plan() || !Array.isArray(list) || !entry || list.some(e => e.id === entry.id)) return;
+  list.splice(i + 1, 0, withDefaultDose({ ...entry, section: _sectionOf(list[i]), added: true }));
+  orderSay = `${entry.name} goes next.`;
+  leftOpen = false; addOpen = false;
+  focusName = true;
+  _saveOrder(generated);
+}
+
+/** P-23. A swap on the Plan, from Like this one or the search. */
+function _planSwap(entry) {
+  const generated = store.get("generatedSession");
+  const list = generated?.session?.exercises;
+  const i = currentExerciseIndex;
+  const current = list?.[i];
+  if (!_plan() || !current || !entry || entry.id === current.id) return;
+  if (list.some((e, k) => k !== i && e.id === entry.id)) return;
+  noteSwap(store, current.id);   // P-6: less often, never over a like or a Not again
+  list[i] = isCardioMachine(current) && isCardioMachine(entry)
+    ? { ...entry, section: current.section, reps: current.reps ?? entry.reps }
+    : withDefaultDose({ ...entry, section: _sectionOf(current) });
+  orderSay = `Swapped ${current.name} for ${entry.name}.`;
+  resetTimer();
+  _saveOrder(generated);
 }
 
 /**
@@ -1349,12 +1533,15 @@ export function onMount() {
     router.navigate("workout");
     // Focus follows what just changed, or a keyboard or screen-reader
     // user is left on a relabelled button with no idea anything opened.
-    if (swapPanelOpen) document.querySelector(".exercise-swap__option")?.focus();
+    if (swapPanelOpen) document.querySelector(_plan() ? "#wo-swap-panel .wo-swap__pick, #wo-swap-q" : ".exercise-swap__option")?.focus();
     else document.getElementById("wo-swap-btn")?.focus();
   });
   document.querySelectorAll("[data-swap-to]").forEach(btn => {
     btn.addEventListener("click", () => _applySwap(btn.getAttribute("data-swap-to")));
   });
+
+  // P-22 to P-24 (the Plan). The order, the search swap, Add an exercise.
+  if (_plan()) _wirePlanControls(workout);
 
   // P18. The answer to "how often should it come up?".
   document.querySelectorAll("[data-skip-pref]").forEach(btn => {
@@ -1431,6 +1618,51 @@ export function onMount() {
     // D-1. A new step starts at its title.
     focusStep = false;
     document.querySelector(".xstep-title")?.focus({ preventScroll: true });
+  }
+}
+
+
+/** P-22 to P-24. Wired on every mount, as the rest of this view is. */
+function _wirePlanControls(workout) {
+  const root = document.getElementById("app") || document;
+  const exercise = workout.exercises[currentExerciseIndex];
+  document.getElementById("wo-later-btn")?.addEventListener("click", _moveLater);
+  document.getElementById("wo-left-btn")?.addEventListener("click", () => {
+    const left = workout.exercises.length - currentExerciseIndex - 1;
+    leftOpen = true; addOpen = !left; swapPanelOpen = false;
+    scrollToTop();
+    router.navigate("workout");
+    document.querySelector(addOpen && !left ? "#wo-add-q" : "#wo-left-h")?.focus();
+  });
+  document.getElementById("wo-left-back")?.addEventListener("click", () => {
+    leftOpen = false; addOpen = false;
+    router.navigate("workout");
+    document.getElementById("wo-left-btn")?.focus();
+  });
+  document.querySelectorAll("[data-do-now]").forEach(b => b.addEventListener("click", () => _doNow(Number(b.dataset.doNow))));
+  document.getElementById("wo-add-btn")?.addEventListener("click", () => {
+    addOpen = true;
+    router.navigate("workout");
+    document.getElementById("wo-add-q")?.focus();
+  });
+  const ids = workout.exercises.map(e => e.id);
+  wireSwapSearch(root, "wo-add", _addNext, { place: workout.place, exclude: ids });
+  if (exercise && swapPanelOpen) {
+    const like = _likeThis(workout, exercise);
+    document.querySelectorAll("[data-plan-swap]").forEach(b => b.addEventListener("click", () =>
+      _planSwap(like.find(o => o.id === b.getAttribute("data-plan-swap")))));
+    wireSwapSearch(root, "wo-swap", _planSwap, { place: workout.place, exclude: ids });
+    document.getElementById("wo-swap-keep")?.addEventListener("click", () => {
+      swapPanelOpen = false;
+      router.navigate("workout");
+      document.getElementById("wo-swap-btn")?.focus();
+    });
+  }
+  // Said once, into a live region that is already on the page.
+  if (orderSay) {
+    const text = orderSay;
+    orderSay = "";
+    setTimeout(() => { const el = document.getElementById("wo-said"); if (el) el.textContent = text; }, 60);
   }
 }
 
@@ -1610,6 +1842,7 @@ function resetTimer() {
   currentSet    = 1;
   finishedByTimer = false;   // TIMER-1. A new exercise inherits nothing.
   swapPanelOpen   = false;   // P21. Nor an open swap panel.
+  leftOpen = false; addOpen = false;   // P-22. Nor What's left.
   // A new exercise starts unfinished, at its name. Both advance paths
   // (complete and skip) come through here.
   exerciseDone = false;
@@ -1779,6 +2012,7 @@ function _resetPlayer() {
   _awayMs = 0;
   currentExerciseIndex = 0;
   pendingSkipOffer = null; finishAfterOffer = false;   // P18: never carries over
+  swapPanelOpen = false; leftOpen = false; addOpen = false; orderSay = "";   // P-22
   timeRemaining = 0;
   timerStarted  = false;
   exerciseDone = false;   // Index resets here, so this must too.
