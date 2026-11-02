@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 02 Nov 2026 v702
+ * 02 Nov 2026 v703
  *
+ * v703 - P-26 (the Plan; Free unchanged). One Build a session page: where, what it's for, then warm-up, main and cool-down; add moves yourself, or Help me fill this for any one part (your favourites first, then the coach's picks, nothing added until you tick it); a heart on every move (the same as Loved it) and Swap; Lately, what you've worked in the last 7 days, as a suggestion you can leave; one Save with When's it for? (a date, every week on a day in Your week, or just keep it). On that day Home's row names it and one tap opens it; on a sore day, what the sore area rules out is left out with a Swap offered. Opened from Build my own behind Get stronger and Keep moving, from Saved sessions, and from Edit. Long names and headings wrap rather than split a word at the largest text (Home's row, a heading beside its tile). NEW FILES precached: js/views/build-session.js, js/data/build-lately.js.
  * v702 - P-22 to P-24 (the Plan; Free unchanged but for two faults). In a session, under each exercise's name: Swap (moves like it, then Search for something else, by name or muscle, only what your kit there allows, never a Not again or one today's sore areas rule out), Do this one later (to the end of its part of the session) and What's left (the rest, each with Do now, and Add an exercise, which goes next and is saved with the session). A proposal's Swap and Today's plan's swap list have the same search. Make it up as I go is behind Get stronger and Keep moving. Faults fixed on both tiers: Skip this one is 44 px tall, and the player's step strip and Today's plan's names no longer split a word at the largest text. NEW FILE precached: js/data/swap-search.js.
  * v701 - P-21 (the Plan; Free unchanged). Your week can follow a fitness trend: Plan your week > Follow a fitness trend > which trend, the activity (Zone 2) or what you do most (Mix it up), then which days; the week is filled by the trend's own rules (HILIT and Hybrid training two days at most, reformer-style three, never side by side; Zone 2 one harder day mid-week; Mix it up one day; a week of snacks), the other days ordinary sessions you can change. Home's row then names today's trend day with the talk test's word, and one tap opens it. Fixed: on Your week's day screen, at larger text, the A little / Some / Mostly choices and the day's name no longer break mid-word.
  * v700 - P-20, the held entries: nothing you can see changes. The ten new movements the fitness trends were written for (Uphill Walk; Slider Reverse Lunge, Slider Lateral Lunge, Slider Mountain Climber; Sled Pull, Burpee Broad Jump, Walking Lunge with a Load, Wall Ball; Footwork with a Band, Feet in Straps with a Band) are written and drawn but offered nowhere until the clinical read; each recipe keeps playing its approved substitute. NEW FILES precached: js/data/exercises/held_movements.js, js/data/figures/batch-16.js.
@@ -4249,7 +4250,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v702";
+const CACHE_NAME = "alongside-v703";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4314,8 +4315,8 @@ const SHELL_HASHES = {
   "./css/components/capture.css": "343b4ae0dc6fe6ea",
   "./css/components/finish.css": "c33e298d5fcb92ae",
   "./js/app.js": "72054b00e54ad55b",
-  "./js/router.js": "394b564ae6adb351",
-  "./js/store.js": "d2e7fea4f9211013",
+  "./js/router.js": "e8d185b7c1ee607f",
+  "./js/store.js": "1345beb467fdf8c8",
   "./js/session-log.js": "6134de4315842e05",
   "./js/exercise-feedback.js": "adba8549f444da2a",
   "./js/exercise-card.js": "78196b42671c67aa",
@@ -4374,16 +4375,18 @@ const SHELL_HASHES = {
   "./js/views/consent-update.js": "51f918f8e2c9b25a",
   "./js/data/arc-readback.js": "9b06dcba96534da0",
   "./js/data/tier-table.js": "7821c3304bd0815c",
-  "./js/views/know-what.js": "4c4e9aa82b226bd6",
-  "./js/views/plan-home.js": "e6451225dfb42305",
-  "./js/views/path.js": "e8ddc0c8402bfe0a",
+  "./js/views/know-what.js": "e84fee3e6d9d3af0",
+  "./js/views/plan-home.js": "8f3e291c7426fcdc",
+  "./js/views/path.js": "28722e8cbf442289",
   "./js/plan-look.js": "7674d8fbf5101aa9",
   "./js/views/plan-finish.js": "67772c3957aee32e",
   "./js/data/outside.js": "3af4ea46bd898084",
   "./js/data/trend-recipes.js": "14961e4c12aef77e",
-  "./js/data/path-context.js": "fc5643585fe6066e",
-  "./js/data/swap-search.js": "db9cd5a6d1ac965a",
-  "./css/components/path.css": "506ed1a6da136ea6",
+  "./js/data/path-context.js": "bb05075596d17c27",
+  "./js/data/swap-search.js": "5f0f0e4d112f92ea",
+  "./js/views/build-session.js": "763317cec8c62e83",
+  "./js/data/build-lately.js": "e06714cc9d1539a6",
+  "./css/components/path.css": "8a1439f71bb238ae",
   "./js/data/red-flag.js": "3cd9eecbc3985eb3",
   "./js/data/health-consent.js": "a23d005af57f179c",
   "./js/data/age-check.js": "7fa5b0f5a6b34770",
@@ -4392,10 +4395,10 @@ const SHELL_HASHES = {
   "./js/data/health-consent-covers.js": "6698a3e50672cbbe",
   "./js/data/kind-colours.js": "1628adad116963b7",
   "./js/data/line-icons.js": "b746ddec419dc568",
-  "./js/data/week-shape-model.js": "bea5abfccaaeda60",
-  "./js/data/week-shape.js": "11aa21a058a7c640",
+  "./js/data/week-shape-model.js": "125804ade2e3713b",
+  "./js/data/week-shape.js": "7c144c42ca0b91b4",
   "./js/data/warm-views.js": "73c268f74f004e8e",
-  "./js/views/your-week.js": "f74ab9f7826cd193",
+  "./js/views/your-week.js": "134c7ba563b78359",
   "./js/data/plan-reader.js": "a63239d24ffa51f9",
   "./js/views/plan-import.js": "baee11ac3f5ff1da",
   "./css/components/your-week.css": "900ee35d728e96d1",
@@ -4429,7 +4432,7 @@ const SHELL_HASHES = {
   "./js/views/my-programme.js": "b28f193145da0c1a",
   "./js/session-builder.js": "70992dba2147aa1f",
   "./js/data/session-choice.js": "954463b0647f3843",
-  "./js/data/saved-sessions.js": "93acb1c187b291ab",
+  "./js/data/saved-sessions.js": "3e43e131c645626f",
   "./js/data/class-contract.js": "fe8f3f22b0df50f6",
   "./js/data/classes/index.js": "0204f29329b03b15",
   "./js/data/classes/class-ground-001.js": "b4df735986c353bd",
@@ -4448,7 +4451,7 @@ const SHELL_HASHES = {
   "./js/views/class-list.js": "c5f80d89802bf845",
   "./css/components/class-list.css": "e33b073b352399f3",
   "./css/components/class-player.css": "401cc57d7d39dbb1",
-  "./js/views/saved-sessions.js": "bb7b1a61c1e2837f",
+  "./js/views/saved-sessions.js": "62a299eb86e378b0",
   "./js/views/session-builder-ui.js": "30c36be8e7a979d4",
   "./js/views/noticing.js": "afb617785e39e18d",
   "./js/views/in-step.js": "54f53470958ac62f",
@@ -4701,6 +4704,8 @@ const SHELL_URLS = [
   "./js/data/trend-recipes.js",
   "./js/data/path-context.js",
   "./js/data/swap-search.js",
+  "./js/views/build-session.js",
+  "./js/data/build-lately.js",
   "./css/components/path.css",
   "./js/data/red-flag.js",
   "./js/data/health-consent.js",
