@@ -1,6 +1,12 @@
 /**
  * js/data/swap-search.js
- * 02 Nov 2026 v1
+ * 02 Nov 2026 v2
+ *
+ * v2 - P-26 ONE-BUILD-PAGE. Build a session makes a session for another
+ *   day, so its search passes sore: false and today's sore answer does not
+ *   narrow it; the day's own check-in decides, when the session is opened
+ *   (views/path.js leaves out what that day's sore areas rule out and
+ *   offers a swap). Every other caller is unchanged (sore defaults true).
  *
  * P-23 SWAP-SEARCH. One rule for "search for something else", wherever the
  * Plan offers a swap (the session player, a door's proposal, Today's plan),
@@ -43,9 +49,9 @@ function neverIds() {
 }
 
 /** Would this one be allowed here, today, for this person? The filters every list below uses. */
-export function swapAllowed(place = null, exclude = []) {
+export function swapAllowed(place = null, exclude = [], { sore = true } = {}) {
   const kit = resolveEquipment(equipmentForLocation(swapPlace(place)).list);
-  const never = neverIds(), out = new Set(exclude), scores = soreScoresToday();
+  const never = neverIds(), out = new Set(exclude), scores = sore ? soreScoresToday() : {};
   return e => !!e && !out.has(e.id) && !never.has(e.id)
     && exerciseIsAvailable(e, kit) && soreLevelFor(e, scores).level !== "blocked";
 }
@@ -54,10 +60,10 @@ export function swapAllowed(place = null, exclude = []) {
  * Search the library for `q` (two letters or more), by name first and then
  * by the muscle it works. Returns up to `limit` library entries.
  */
-export function searchSwaps(q, { place = null, exclude = [], limit = 8 } = {}) {
+export function searchSwaps(q, { place = null, exclude = [], limit = 8, sore = true } = {}) {
   const t = String(q || "").trim().toLowerCase();
   if (t.length < 2) return [];
-  const ok = swapAllowed(place, exclude);
+  const ok = swapAllowed(place, exclude, { sore });
   const byName = EXERCISES.filter(e => (e.name || "").toLowerCase().includes(t));
   const { exercises: byArea } = searchByTerm(t, EXERCISES);
   const seen = new Set(byName.map(e => e.id));

@@ -1,6 +1,11 @@
 /**
  * js/data/week-shape.js
- * 05 Oct 2026 v2
+ * 02 Nov 2026 v3
+ *
+ * v3 - P-26 ONE-BUILD-PAGE. A day plan that is a saved session (saved,
+ *   week-shape-model.js v5) is played as built, like an own list: the
+ *   balance line does not read its default mix, and Home's plan request
+ *   (askForToday) leaves it to the saved session's own row (plan-home.js).
  *
  * v2 - D-7 PLAN-IMPORT. A day that is the person's own list (own) is played
  *   as written: Home starts My exercises for it (startOwnList), the coach's
@@ -114,7 +119,7 @@ export function balanceGap(d = new Date()) {
   const used = DAY_KEYS.map(k => w.days[k]).filter(v => v && v !== "rest");
   if (used.length < 3) return null;
   const groups = new Set();
-  for (const id of used) if (!w.templates[id]?.own) for (const m of (w.templates[id]?.mix || [])) groups.add(focusById(m.focus)?.group);
+  for (const id of used) if (!w.templates[id]?.own && !w.templates[id]?.saved) for (const m of (w.templates[id]?.mix || [])) groups.add(focusById(m.focus)?.group);
   const start = localDay(weekStartOf(d));
   for (const g of GAP_GROUPS) {
     if (g.from.some(x => groups.has(x))) continue;
@@ -123,7 +128,7 @@ export function balanceGap(d = new Date()) {
     // that is not only cardio; else any with room.
     const order = [...DAY_KEYS.slice(DAY_KEYS.indexOf(dayKeyOf(d))), ...DAY_KEYS.slice(0, DAY_KEYS.indexOf(dayKeyOf(d)))];
     const ids = [...new Set(order.map(k => w.days[k]).filter(v => v && v !== "rest"))];
-    const room = ids.map(id => w.templates[id]).filter(t => t && !t.own && t.mix.length < 4);
+    const room = ids.map(id => w.templates[id]).filter(t => t && !t.own && !t.saved && t.mix.length < 4);
     const target = room.find(t => !t.mix.every(m => m.focus === "cardio")) || room[0];
     if (!target) continue;
     return { key: g.key, label: g.label, focus: g.focus, template: target,
@@ -169,7 +174,7 @@ export function primaryType(t) {
  */
 export function askForToday({ short = false } = {}, d = new Date()) {
   const today = todayInWeek(d);
-  if (!today || !today.template || today.template.own) return false;
+  if (!today || !today.template || today.template.own || today.template.saved) return false;
   store.set("weekDayRequest", { day: today.day, templateId: today.template.id, on: localDay(d), short: !!short });
   store.set("requestedSessionType", primaryType(today.template));
   store.set("requestedLocation", today.template.place);

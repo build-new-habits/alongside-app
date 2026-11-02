@@ -6,6 +6,18 @@ import { validateWeightTarget } from "./data/weight-targets.js";
 
 /**
  * store.js - Data persistence layer
+ * 02 Nov 2026 v121
+ *
+ * v121 - P-26 ONE-BUILD-PAGE, schema first (master schedule v621; mock-up
+ *   v1 approved 02 Nov, Graeme: "I like this. I think it works"; Schema
+ *   v1.121). savedSessions[] may carry plannedFor, a local day
+ *   ('YYYY-MM-DD'): the one date the person saved it for ("When's it
+ *   for? A date"), so Home can name it on that day. Kept only when it is a
+ *   real day; anything else is removed, never nulled, so older records and
+ *   Free gain no keys. A session saved for every week on a day is not
+ *   stored here: Your week's day plan carries it (weekShape templates[]
+ *   saved, week-shape-model.js v5). Nothing reads plannedFor yet.
+ *
  * 01 Nov 2026 v120
  *
  * v120 - P-20 TRENDS-BUILD, session 1 (approved 01 Nov, Graeme: "One day
@@ -1348,7 +1360,7 @@ export const store = {
 
   mergeWithDefaults(saved) {
     const defaults = this.getDefaults();
-    return this._cleanTrendFields(this._cleanPathFields(this._expireOldScores(this._repairSessionTypes(this._dropRetired({
+    return this._cleanPlannedFor(this._cleanTrendFields(this._cleanPathFields(this._expireOldScores(this._repairSessionTypes(this._dropRetired({
       ...defaults,
       ...saved,
 
@@ -1983,7 +1995,7 @@ export const store = {
       // honest direction; a retirement must never take something away
       // from somebody who did nothing wrong.
       tier:       saved.tier === 'athlete' ? 'personal' : (saved.tier || 'free')
-    })))));
+    }))))));
   },
 
   /** P13, v83. The local day, "YYYY-MM-DD". */
@@ -2044,6 +2056,21 @@ export const store = {
     if ('trend' in out && !Object.prototype.hasOwnProperty.call(this.TREND_RULES, out.trend)) delete out.trend;
     if ('effort' in out && !this.EFFORTS.includes(out.effort)) delete out.effort;
     return out;
+  },
+
+  /**
+   * P-26, v121. A saved session's plannedFor is kept only as a real local
+   * day (YYYY-MM-DD); anything else is removed. Absent stays absent.
+   */
+  _cleanPlannedFor(data) {
+    const isDay = v => typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v) && !isNaN(new Date(v + 'T12:00:00'));
+    if (Array.isArray(data.savedSessions)) {
+      data.savedSessions = data.savedSessions.map(r => {
+        if (!r || typeof r !== 'object' || !('plannedFor' in r) || isDay(r.plannedFor)) return r;
+        const out = { ...r }; delete out.plannedFor; return out;
+      });
+    }
+    return data;
   },
 
   /** STAGE PATH P-1, v118. The words each new field may hold (Schema v1.116). */

@@ -1,6 +1,17 @@
 /**
  * views/path.js
- * 02 Nov 2026 v10
+ * 02 Nov 2026 v11
+ *
+ * v11 - P-26 ONE-BUILD-PAGE (mock-up v1 approved 02 Nov). Build my own, in
+ *   Get stronger and Keep moving, opens Build a session with the door, part
+ *   and place chosen (router.buildStart). A session built there and started
+ *   now arrives as router.pathStart.practice and opens as a proposal, as a
+ *   kept session does. Graeme's answer for the day itself: a kept or built
+ *   session leaves out what today's sore areas rule out (path-context
+ *   soreRuledOut), says which and why, and offers that row's Swap; Start
+ *   plays the rest. A kept session's proposal offers Change this session
+ *   (Build a session, editing it), the "Change it" the mock-up put on Home,
+ *   moved here so Home keeps six ways in.
  *
  * v10 - P-23, P-24. How would you like it? gains Make it up as I go (the
  *   capture room, at the place chosen). A proposal's Swap opens a panel under
@@ -127,7 +138,8 @@ import { AREAS, ROUTINES } from "../data/stretch-routines.js";
 import { EXERCISES } from "../data/exercises/index.js";
 import { PATH_MOVEMENTS } from "../data/exercises/path_movements.js";
 import { suggestFeeling, pickProgramme, pickSurprise, routinesFor, STRETCH_AREA_ZONES } from "../data/path-engine.js";
-import { checkinToday, lastPlace, lowMood, shownAdjustments, freshPracticeFor, swapOptionsFor } from "../data/path-context.js";
+import { checkinToday, lastPlace, lowMood, shownAdjustments, freshPracticeFor, swapOptionsFor, soreRuledOut } from "../data/path-context.js";
+import { areaWords } from "../data/conditions.js";
 import { renderSwapSearch, wireSwapSearch, kitWords } from "../data/swap-search.js";
 import { savedSessions, resolveSavedSession } from "../data/saved-sessions.js";
 import { keepVersion } from "../save-block.js";
@@ -188,12 +200,6 @@ export function sessionTypeFor(door, part) {
   if (door === "moving") return part === "whole" ? "cardio" : part;
   return part === "whole" ? "full" : part;
 }
-/** I know what I want's own kinds and parts, for Build my own. */
-function knowWhatFor(door, part, place) {
-  if (part === "core") return { kind: "core", part: "full", place };
-  if (door === "moving" && part === "whole") return { kind: "cardio", part: "full", place };
-  return { kind: "strength", part: part === "whole" ? "full" : part, place };
-}
 /** A routine's steps on a day without the floor: its own swap (stretch-routines.js withoutFloor). */
 export function stepsFor(r, floor) {
   if (floor !== false || !r.withoutFloor) return r.steps.map(s => ({ ...s }));
@@ -209,7 +215,7 @@ export function stepsFor(r, floor) {
 export function startPractice(router, practice, { door, feeling = null } = {}) {
   // A kept session keeps its own doses (sets, reps, time); a programme or routine plays each for its minutes.
   const exercises = practice.saved
-    ? practice.steps.map(s => s.entry).filter(Boolean)
+    ? practice.steps.filter(s => !(s.out || []).length).map(s => s.entry).filter(Boolean)
     : practice.steps.map(s => {
       const e = BY_ID.get(s.id);
       return e ? { ...e, ...(s.label ? { name: s.label } : {}), reps: null, sets: 1, duration: Math.round(s.mins * 60), pathNote: s.note || null } : null;
@@ -239,6 +245,17 @@ export function practiceFromSaved(rec) {
   return { id: rec.id, name: rec.name, minutes: rec.durationMins || null, sessionType: rec.sessionType || null, place: rec.place || null, saved: true,
            steps: exercises.map(e => ({ id: e.id, entry: e, dose: dose(e) })) };
 }
+/**
+ * P-26. A kept or built session on the day: each movement today's sore
+ * areas rule out is marked out (with the areas), so the proposal says so,
+ * offers its Swap, and Start leaves it out. Nothing else changes.
+ */
+export function markSore(practice) {
+  if (!practice?.saved) return practice;
+  return { ...practice, steps: practice.steps.map(s => ({ ...s, out: soreRuledOut(s.entry || BY_ID.get(s.id)) })) };
+}
+const areaList = ids => { const w = ids.map(id => `your ${areaWords(id)}`); return w.length > 1 ? `${w.slice(0, -1).join(", ")} and ${w[w.length - 1]}` : w[0] || ""; };
+
 /** The door a kept session belongs to: its own, or its kind's. */
 export function doorOfSaved(rec) {
   if (DOOR[rec?.purpose]) return rec.purpose;
@@ -273,7 +290,11 @@ export function PathView(router) {
     st = { door };
     if (start?.saved) {
       const rec = savedSessions().find(x => x.id === start.saved);
-      if (rec) { step = "prog"; st = { door, practice: practiceFromSaved(rec), fromSaved: true }; paint(); return; }
+      if (rec) { step = "prog"; st = { door, practice: markSore(practiceFromSaved(rec)), fromSaved: true }; paint(); return; }
+    }
+    // P-26. A session from Build a session, started now: the same proposal.
+    if (start?.practice && Array.isArray(start.practice.steps)) {
+      step = "prog"; st = { door, practice: markSore(start.practice), fromSaved: true }; paint(); return;
     }
     if (start?.trendDay && openTrendDay(door, start.trendDay, start.mins)) return;
     if (door === "feel" && start?.feeling && FEELINGS[start.feeling]) {
@@ -340,7 +361,7 @@ export function PathView(router) {
       return `${bar(3, 3)}${heading("How would you like it?")}
         <ul class="path-list">
           ${row({ v: "coach", t: "Build it for me", d: "Shaped by today’s check-in and what you’ve told me", icon: "fresh", kind: DOOR[st.door].kind, tint: true })}
-          ${row({ v: "own", t: "Build my own", d: "Choose the exercises yourself" })}
+          ${row({ v: "own", t: "Build my own", d: "Choose each move, with help when you want it" })}
           ${row({ v: "asgo", t: "Make it up as I go", d: "Go to an exercise, log your sets, then choose the next" })}
           ${row({ v: "trend", t: "Follow a fitness trend", d: trendsFor(st.door).map(([, x]) => x.short).join(", ") })}
           ${n ? row({ v: "saved", t: "Saved sessions", d: `${n} kept` }) : ""}
@@ -536,6 +557,10 @@ export function PathView(router) {
       const adj = st.fresh || st.fromCoach ? shownAdjustments() : [];
       const meta = [p.minutes ? `About ${p.minutes} minutes` : "", !st.fresh && STYLE[p.style], !st.fresh && POSITION[p.position]].filter(Boolean).join(" · ");
       const ids = p.steps.map(s => s.id);
+      const outs = p.steps.filter(s => (s.out || []).length);
+      const outAreas = [...new Set(outs.flatMap(s => s.out))];
+      const canStart = p.steps.length > outs.length;
+      const editable = p.saved && savedSessions().some(x => x.id === p.id);
       return `${heading(p.name, icon, kind)}
         ${line ? `<p class="${st.note ? "path-note" : "path-coachline"}">${esc(line)}</p>` : ""}
         <p class="path-small">${esc(meta)}</p>
@@ -544,7 +569,9 @@ export function PathView(router) {
         ${p.effort === "hard" ? `<p class="path-note" id="path-hard-safety">${esc(HARD_SAFETY)}</p>` : ""}
         ${p.slowLine || p.style === "taichi" || p.style === "qigong" ? `<p class="path-small">${esc(SLOW_LINE)}</p>` : ""}
         ${adj.length ? `<div class="path-adj"><p class="path-adj__lbl">What I’ve adjusted</p><ul>${adj.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>` : ""}
-        <button type="button" class="btn btn-primary btn-full" id="path-start">Start</button>
+        ${outs.length ? `<p class="path-note" id="path-outs">Left out today, because ${esc(areaList(outAreas))} ${outAreas.length > 1 ? "are" : "is"} sore: ${esc(outs.map(s => nameOf(s.id)).join(", "))}. Each has a Swap, or start without ${outs.length > 1 ? "them" : "it"}.</p>` : ""}
+        <button type="button" class="btn btn-primary btn-full" id="path-start"${canStart ? "" : ' disabled aria-describedby="path-outs"'}>Start</button>
+        ${editable ? `<button type="button" class="path-link" id="path-change">Change this session</button>` : ""}
         ${st.fromCoach ? `<button type="button" class="path-link" id="path-redo">Change my check-in</button>` : ""}
         ${st.door === "feel" && lowMood() ? `<button type="button" class="path-link" id="path-wellbeing">Or something from Wellbeing</button>` : ""}
         ${!p.saved ? `<button type="button" class="path-link" id="path-mine"${st.kept ? " disabled" : ""}>${st.kept ? "Kept in Saved sessions" : "Make it mine"}</button>` : ""}
@@ -555,6 +582,7 @@ export function PathView(router) {
           return `<li class="path-mv">${renderFigure(s.id) || ""}
             <p class="path-mv__nm" id="path-mv-${i}">${i + 1}. ${esc(s.label || nameOf(s.id))}</p>
             <p class="path-small">${s.dose ? esc(s.dose) : stepLength(s.mins)}${s.note ? ` · ${esc(s.note)}` : ""}</p>
+            ${(s.out || []).length ? `<p class="path-small path-mv__out">Left out today, for ${esc(areaList(s.out))}</p>` : ""}
             <span class="path-mv__acts">
               <a class="path-mv__yt" href="https://www.youtube.com/results?search_query=${q}" target="_blank" rel="noopener">Find a video on YouTube<span class="sr-only"> for ${esc(s.label || nameOf(s.id))} (opens YouTube, a search)</span></a>
               ${canSwap(p, s, ids) ? `<button type="button" class="btn btn-secondary path-mv__swap" id="path-swap-${i}" data-swap="${i}" aria-describedby="path-mv-${i}" aria-expanded="${st.swapOpen === i}"${st.swapOpen === i ? ` aria-controls="path-swp-${i}"` : ""}>Swap</button>` : ""}
@@ -692,7 +720,8 @@ export function PathView(router) {
       case "area":  return go("how", { part: v });
       case "how":
         if (v === "coach") return go("buildlen", {});
-        if (v === "own") { router.knowWhatStart = knowWhatFor(st.door, st.part, st.place); router.navigate("know-what"); return; }
+        // P-26. Build a session, with the door, part and place chosen.
+        if (v === "own") { router.buildStart = { door: st.door, part: st.part, place: st.place, returnTo: "today" }; router.navigate("build-session"); return; }
         // P-24. The room that already exists: suggestions, a search, sets logged as they go.
         if (v === "asgo") { if (st.place) store.set("sessionLocation", st.place); router.navigate("capture"); return; }
         if (v === "saved") { router.savedStart = { purpose: st.door, place: st.place }; router.navigate("saved-sessions"); return; }
@@ -857,6 +886,8 @@ export function PathView(router) {
       router.navigate("coach-proposal");
     });
     root.querySelector("#path-start")?.addEventListener("click", () => startPractice(router, st.practice, { door: st.door, feeling: st.door === "feel" ? st.feeling : null }));
+    // P-26. A kept session: change it on Build a session.
+    root.querySelector("#path-change")?.addEventListener("click", () => { router.buildStart = { editId: st.practice.id, returnTo: "saved-sessions" }; router.navigate("build-session"); });
     root.querySelectorAll("[data-swap]").forEach(b => b.addEventListener("click", () => swapAt(Number(b.dataset.swap))));
     if (step === "prog" && Number.isInteger(st.swapOpen)) {
       const i = st.swapOpen, p = st.practice, ids = p.steps.map(s => s.id);

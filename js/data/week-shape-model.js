@@ -1,6 +1,14 @@
 /**
  * js/data/week-shape-model.js
- * 01 Nov 2026 v4
+ * 02 Nov 2026 v5
+ *
+ * v5 - P-26 ONE-BUILD-PAGE, schema first (Schema v1.121). A day plan may be
+ *   one of the person's saved sessions: saved, the saved session's id
+ *   ("When's it for? Every week, on..."), played as they built it, as own
+ *   is for My exercises. Kept only when it looks like a saved session's id
+ *   (own_...); absent otherwise. Whether that session still exists is the
+ *   reader's to check (this file has no store). mixLine() and detailLine()
+ *   say what such a day is.
  *
  * v4 - P-21 TRENDS-WEEK (mock-up approved 01 Nov, Graeme: "Yes, build it";
  *   other days "Ordinary sessions"). A day plan may follow a fitness trend:
@@ -124,6 +132,8 @@ const NAME_MAX = 40;
 
 const _str = (s, n) => (typeof s === "string" ? s.replace(/[<>]/g, "").trim().slice(0, n) : "");
 const _id = s => (typeof s === "string" && /^[a-z0-9-]{1,40}$/.test(s) ? s : null);
+/** P-26. A saved session's id, as saved-sessions.js makes them (own_<ISO time>_<4 letters>). */
+const _savedId = s => (typeof s === "string" && /^own_[0-9A-Za-z:.\-]{1,40}_[a-z0-9]{1,8}$/.test(s) ? s : null);
 
 /** A template made safe: unknown values dropped, missing ones defaulted. */
 export function sanitizeTemplate(t, id) {
@@ -146,6 +156,7 @@ export function sanitizeTemplate(t, id) {
     favourites: (Array.isArray(t.favourites) ? t.favourites : []).filter((f, i, a) => _id(f) && a.indexOf(f) === i).slice(0, MAX_FAVOURITES),
     own: _str(t.own, NAME_MAX) || null,
     ...(cleanTrend(t.trend) ? { trend: cleanTrend(t.trend) } : {}),
+    ...(_savedId(t.saved) ? { saved: t.saved } : {}),
   };
 }
 
@@ -350,6 +361,7 @@ export function newTemplate(existingIds = [], name = "My day") {
 export function mixLine(t) {
   if (!t) return "";
   if (t.trend) return `From your trend: ${WEEK_TRENDS[t.trend.id].name}`;
+  if (t.saved) return "A session you built";
   if (t.own) return t.own === "all" ? "Your own list: all of My exercises" : `Your own list: ${t.own}`;
   const parts = [...t.mix].sort((a, b) => b.level - a.level)
     .map(m => `${LEVELS[m.level].toLowerCase()} ${focusById(m.focus).label.toLowerCase()}`);
@@ -361,5 +373,6 @@ export function mixLine(t) {
 export function detailLine(t) {
   if (!t) return "";
   if (t.own) return "As you wrote it";
+  if (t.saved) return "As you built it";
   return `${intensityById(t.intensity).label} · ${t.mins} min · ${PLACES.find(p => p.id === t.place)?.label.toLowerCase() || ""}`;
 }

@@ -1,6 +1,13 @@
 /**
  * js/views/your-week.js
- * 01 Nov 2026 v4
+ * 02 Nov 2026 v5
+ *
+ * v5 - P-26 ONE-BUILD-PAGE. A day can be a session the person built and
+ *   saved for every week on that day (Build a session, "Every week, on…";
+ *   templates[].saved). Its row says so (the keep icon, "A session you
+ *   built", "As you built it"); its own screen names the session and offers
+ *   Change this session (Build a session, editing it), and A session, My
+ *   exercises or Rest turn the day into something else, as for any day.
  *
  * v4 - P-21 TRENDS-WEEK (mock-up v1 approved 01 Nov, Graeme: "Yes, build
  *   it"; other days "Ordinary sessions"). Plan your week gains Follow a
@@ -215,7 +222,7 @@ export function YourWeekView(router) {
         ${DAY_KEYS.map(d => {
           const v = w.days[d];
           const t = v && v !== "rest" ? w.templates[v] : null;
-          const f = t ? (t.own ? { kind: "teal", icon: "list" } : primaryFocus(t)) : null;
+          const f = t ? (t.own ? { kind: "teal", icon: "list" } : t.saved ? { kind: "teal", icon: "keep" } : primaryFocus(t)) : null;
           const kind = t ? f.kind : v === "rest" ? "green" : "slate";
           const icon = t ? f.icon : v === "rest" ? "rest" : "plus";
           const name = t ? t.name : v === "rest" ? "Rest" : "Nothing planned";
@@ -262,8 +269,10 @@ export function YourWeekView(router) {
       <h1 class="yw-title" tabindex="-1">${DAY_NAMES[dayKey]}</h1>
       ${t && t.trend ? `<p class="yw-note" id="yw-trend-note">This day follows ${esc(WEEK_TRENDS[t.trend.id].name)}: ${esc(t.name)}. On the day, Home opens it.</p>
         <button class="btn btn-secondary" id="yw-untrend">Make it an ordinary session</button>` : ""}
+      ${t && t.saved ? `<p class="yw-note" id="yw-saved-note">This day is a session you built: ${esc(t.name)}. On the day, Home opens it as you built it.</p>
+        <button class="btn btn-secondary" id="yw-edit-saved">Change this session</button>` : ""}
       <div class="yw-chips" role="group" aria-label="This day is">
-        ${btn('data-kind="session"', !!t && !t.own, "A session")}
+        ${btn('data-kind="session"', !!t && !t.own && !t.saved, "A session")}
         ${btn('data-kind="own"', !!(t && t.own), "My exercises")}
         ${btn('data-kind="rest"', v === "rest", "Rest")}
       </div>
@@ -272,7 +281,7 @@ export function YourWeekView(router) {
         <div class="yw-chips" role="group" aria-labelledby="yw-use-h">
           ${others.map(o => `<button class="yw-chip" data-use="${o.id}">${esc(o.name)}</button>`).join("")}
         </div>` : ""}
-      ${t ? (t.own ? renderOwn(t, usedOn) : renderEditor(t, usedOn)) : ""}
+      ${t ? (t.own ? renderOwn(t, usedOn) : t.saved ? "" : renderEditor(t, usedOn)) : ""}
       <button class="btn btn-primary btn-large btn-full" id="yw-save">Save ${DAY_NAMES[dayKey]}</button>
       <p class="yw-foot">Back saves nothing.</p>`;
   }
@@ -373,6 +382,8 @@ export function YourWeekView(router) {
   function wire() {
     const $ = s => root.querySelector(s), $$ = s => [...root.querySelectorAll(s)];
     $$("[data-go-route]").forEach(b => b.addEventListener("click", () => router.navigate(b.dataset.goRoute)));
+    // P-26. A day that is a session they built: change it where it was built.
+    $("#yw-edit-saved")?.addEventListener("click", () => { const t = cur(); if (!t?.saved) return; router.buildStart = { editId: t.saved, returnTo: "your-week" }; router.navigate("build-session"); });
     $$("[data-back]").forEach(b => b.addEventListener("click", () => { draft = null; go(b.dataset.back); }));
 
     // start
@@ -467,7 +478,7 @@ export function YourWeekView(router) {
       keepName();
       const k = b.dataset.kind, c = cur();
       if (k === "rest") draft.days[dayKey] = "rest";
-      else if (k === "session" && (!c || c.own)) {
+      else if (k === "session" && (!c || c.own || c.saved)) {
         const t = newTemplate(Object.keys(draft.templates), `${DAY_NAMES[dayKey]} plan`);
         draft.templates[t.id] = t; draft.days[dayKey] = t.id;
       } else if (k === "own" && !(c && c.own)) {

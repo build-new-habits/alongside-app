@@ -1,6 +1,13 @@
 /**
  * js/views/saved-sessions.js
- * 31 Oct 2026 v11
+ * 02 Nov 2026 v12
+ *
+ * v12 - P-26 ONE-BUILD-PAGE (Graeme, 02 Nov: Build a session opens from
+ *   Library › Saved sessions, and from Edit on any saved session). On the
+ *   Plan: a Build a session button under the heading, whether or not any
+ *   are kept; Edit opens Build a session with that session (router.
+ *   buildStart.editId) in place of the old builder's preview. Free
+ *   unchanged (no saved sessions, so no Edit and no button).
  *
  * v11 - STAGE PATH Session 9 (CLOSE; P-12 F3, F4; Graeme, 31 Oct: "24 px,
  *   left"). On the Plan only: the heading at the page size (it was 32 px;
@@ -371,6 +378,7 @@ export function render() {
              is focusable on one screen and not another is a difference with
              no reason behind it. -->
         <h1 tabindex="-1">Saved sessions</h1>
+            <button type="button" class="btn btn-secondary saved-build" id="saved-build">Build a session</button>
           </div>
           <!-- A-7 (v7). Heading, one line, one action. It pointed to "a save
                on the preview screen"; since A-5 the save is the finish's
@@ -410,6 +418,7 @@ export function render() {
           ${hidden ? `${list.length} kept for this, newest first.` : `${list.length} saved, newest first.`}
         </p>
         ${hidden ? `<button type="button" class="btn btn-secondary" data-own-all>Show all ${all.length}</button>` : ''}
+        ${isPremium() ? '<button type="button" class="btn btn-secondary saved-build" id="saved-build">Build a session</button>' : ''}
       </div>
 
       ${searchable ? `
@@ -528,10 +537,17 @@ export function onMount() {
     root.querySelector('h1')?.focus();
   });
 
-  // EDIT. Hands off to the builder's preview, where the swap control
-  // already lets any movement be changed. Nothing is edited here.
+  // P-26. Build a session, the Plan's one page for building and saving.
+  root.querySelector('#saved-build')?.addEventListener('click', () => {
+    router.buildStart = { returnTo: 'saved-sessions' };
+    router.navigate('build-session');
+  });
+
+  // EDIT. On the Plan (P-26), Build a session with this session in it.
+  // Otherwise it hands off to the builder's preview, as before.
   root.querySelectorAll('[data-edit-id]').forEach(btn => {
     btn.addEventListener('click', () => {
+      if (isPremium()) { router.buildStart = { editId: btn.dataset.editId, returnTo: 'saved-sessions' }; router.navigate('build-session'); return; }
       store.set('sessionBuilderPreselect', {
         mode: 'edit',
         savedSessionId: btn.dataset.editId,

@@ -1,6 +1,18 @@
 /**
  * views/plan-home.js
- * 01 Nov 2026 v7
+ * 02 Nov 2026 v8
+ *
+ * v8 - P-26 ONE-BUILD-PAGE (mock-up v1 approved 02 Nov). A session the
+ *   person built and saved for today (plannedFor) leads in the one row:
+ *   "Today: Wednesday gym", about how long, where, "You built this"; one tap
+ *   opens it as a proposal behind its door, through the check-in when today
+ *   has none, as every door does (and the proposal leaves out what today's
+ *   sore areas rule out). A Your week day that is a saved session says
+ *   "Today, from your week: …, as you built it" and opens the same way. A
+ *   week day whose saved session has gone counts as a day with no plan. The
+ *   mock-up's "Change it" lives on the proposal (Change this session), so
+ *   Home keeps one action per row and six ways in. Once the planned
+ *   session is finished today, Done today shows, as for any session.
  *
  * v7 - P-21 TRENDS-WEEK (mock-up v1 approved 01 Nov). When today in Your
  *   week follows a fitness trend, the one row names it ("Today, from your
@@ -82,7 +94,8 @@ import { arcWeekStartsToday } from "./today.js";   // A-5: "Week n starts today"
 import { getTodaysCheckin } from "../data/checkin.js";
 import { checkinToday, soreToday, lastPlace, prefNames } from "../data/path-context.js";
 import { mixLine, detailLine } from "../data/week-shape-model.js";
-import { todayInWeek, primaryFocus } from "../data/week-shape.js";
+import { todayInWeek, primaryFocus, localDay } from "../data/week-shape.js";
+import { savedForDay, savedById, lastDoneOf } from "../data/saved-sessions.js";
 import { kindOf } from "../data/kind-colours.js";
 import { activityPhrase } from "../data/activity-labels.js";
 import { renderFigure } from "../figures.js";
@@ -168,12 +181,32 @@ function ownLeft(t) {
   return (store.get("prescribedExercises") || []).filter(e => !e.completedToday && (!group || e.group === group)).length;
 }
 
-/** One of: carry, week, done, rest, coach. */
+/**
+ * P-26. The session saved for today (plannedFor), not yet finished today,
+ * or null. The newest first, when there is more than one.
+ */
+export function plannedToday(d = new Date()) {
+  const day = localDay(d);
+  return savedForDay(day).find(r => { const t = lastDoneOf(r); return !t || localDay(new Date(t)) !== day; }) || null;
+}
+/** P-26. Today's day plan from Your week, unless it is a saved session that has gone. */
+function weekToday() {
+  const w = todayInWeek();
+  if (w && w.template && w.template.saved && !savedById(w.template.saved)) return { ...w, template: null, value: null };
+  return w;
+}
+/** P-26. The door a saved session opens behind: its own, or its kind's (as path.js doorOfSaved). */
+const savedDoor = r => DOOR[r?.purpose] ? r.purpose : ["stretch", "mobility"].includes(r?.sessionType) ? "stretch" : r?.sessionType === "cardio" ? "moving" : "stronger";
+const savedSub = (r, first) => [first, r.durationMins ? `About ${r.durationMins} min` : "", r.place === "gym" ? "at the gym" : r.place === "home" ? "at home" : ""].filter(Boolean).join(" \u00b7 ");
+
+/** One of: carry, planned, week, done, rest, coach. */
 export function todayState(carry) {
   if (carry) return "carry";
-  const w = todayInWeek();
+  const w = weekToday();
   // Your own list with exercises still to do leads, even after a session today.
   if (w && w.template && w.template.own && ownLeft(w.template) > 0) return "week";
+  // P-26. A session built and saved for today leads until it is done.
+  if (plannedToday()) return "planned";
   if (doneToday()) return "done";
   if (w && w.value === "rest") return "rest";
   if (w && w.template) return "week";
@@ -217,8 +250,16 @@ function todayCard(state, carry) {
     return card("rest", "teal", null, `${head("teal", "rest", "Today, from your week", "Rest")}
       <p class="path-today__coach">Today is a rest day in your week. Rest counts.</p>`);
   }
+  if (state === "planned") {
+    const r = plannedToday(), door = savedDoor(r);
+    return row("planned", DOOR[door].kind, DOOR[door].icon, `Today: ${r.name}`, savedSub(r, "You built this"), `data-action="planned" data-saved="${esc(r.id)}"`, door);
+  }
   if (state === "week") {
-    const t = todayInWeek().template;
+    const t = weekToday().template;
+    if (t.saved) {
+      const r = savedById(t.saved), door = savedDoor(r);
+      return row("week", DOOR[door].kind, DOOR[door].icon, `Today, from your week: ${r.name}`, savedSub(r, "As you built it"), `data-action="week-saved" data-saved="${esc(r.id)}"`, door);
+    }
     const kind = primaryFocus(t)?.kind || "amber";
     const door = KIND_DOOR[kind] || "stronger";
     if (t.own) {
@@ -317,7 +358,7 @@ function lately() {
 export function renderPlanHome(ctx = {}) {
   const arc = arcInfo();
   const state = todayState(ctx.carry);
-  const label = state === "carry" ? "Or instead" : (state === "week" || state === "rest") ? "Or something else today" : "Or choose for yourself";
+  const label = state === "carry" ? "Or instead" : (state === "week" || state === "rest" || state === "planned") ? "Or something else today" : "Or choose for yourself";
   // Your week lives in the Library on the Plan (no card offers to plan it), so the row always names it.
   const libSub = "Classes, practices, the mind, your lists, your week";
   return `
@@ -385,6 +426,13 @@ export function wirePlanHome(container, router) {
     if (needsCheckin()) { store.set("pendingDoorRoute", "path"); router.navigate("checkin"); return; }
     router.navigate("path");
   });
+  // P-26. A session they built: today's planned one, or Your week's day.
+  container.querySelectorAll('[data-action="planned"], [data-action="week-saved"]').forEach(btn => btn.addEventListener("click", () => {
+    const r = savedById(btn.dataset.saved); if (!r) return;
+    router.pathStart = { door: savedDoor(r), saved: r.id };
+    if (needsCheckin()) { store.set("pendingDoorRoute", "path"); router.navigate("checkin"); return; }
+    router.navigate("path");
+  }));
   container.querySelector('[data-action="path-coach"]')?.addEventListener("click", () => {
     if (needsCheckin()) { router.pathStart = { coach: true }; store.set("pendingDoorRoute", "today"); router.navigate("checkin"); return; }
     goToSuggestion(router);

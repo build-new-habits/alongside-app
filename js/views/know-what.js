@@ -1,6 +1,12 @@
 /**
  * js/views/know-what.js
- * 31 Oct 2026 v8
+ * 02 Nov 2026 v9
+ *
+ * v9 - P-26 ONE-BUILD-PAGE. On the Plan, Build your own, move by move
+ *   becomes Build a session (one page to build, get help, and save it for a
+ *   day). Behind a door, Build my own now opens that page directly
+ *   (path.js v11), so this screen is no longer on the Plan's way to
+ *   building. Free unchanged.
  *
  * v8 - P-13 (Graeme, 31 Oct: Mobility & Conditioning split into the Stretch
  *   door). On the Plan the Mobility & Conditioning row goes: its mobility
@@ -301,7 +307,7 @@ export function KnowWhatView(router) {
   function _planRows(prog) {
     const chev = `<span class="path-door__chev" aria-hidden="true">${lineIcon("chevron", 20)}</span>`;
     const rows = [
-      ["session-builder", "pencil", "Build your own, move by move", "Choose each movement yourself, then play it."],
+      ["build-session", "pencil", "Build a session", "Choose each move, with help when you want it, and save it for a day."],
       [prog.programmeId ? "my-programme" : "goal-setup", "week", "A twelve-week shape", prog.programmeId ? "The programme you are following, week by week." : "A programme to follow for twelve weeks, chosen with you."],
     ];
     return `<ul class="path-list kw-rows">${rows.map(([route, icon, t, d]) => `<li><button type="button" class="path-door path-row" data-kw-route="${route}">
@@ -347,6 +353,7 @@ export function KnowWhatView(router) {
     root.querySelectorAll("[data-kw-route]").forEach(b =>
       b.addEventListener("click", () => {
         if (b.dataset.kwRoute === "session-builder") store.set("sessionBuilderPreselect", null);
+        if (b.dataset.kwRoute === "build-session") router.buildStart = { returnTo: "know-what" };
         router.navigate(b.dataset.kwRoute);
       }));
   }

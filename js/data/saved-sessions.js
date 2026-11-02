@@ -1,6 +1,12 @@
 /**
  * saved-sessions.js
- * 29 Oct 2026 v5
+ * 02 Nov 2026 v6
+ *
+ * v6 - P-26 ONE-BUILD-PAGE (Schema v1.121). planSavedSession(id, day) is
+ *   the one writer of plannedFor ("When's it for? A date"; null takes the
+ *   date off); savedForDay(day) is what Home reads; savedById(id). An edit
+ *   from Build a session can also change where it is for (place) and its
+ *   door (purpose), by the same rules saveSession() keeps them.
  *
  * v5 - STAGE PATH Session 6 (P-6; blueprint C3). A session kept on the Plan
  *   keeps the door it came through and where it was done (purpose, place:
@@ -239,6 +245,9 @@ export function updateSavedSession(id, changes = {}) {
   if ("durationMins" in changes) {
     next.durationMins = Number(changes.durationMins) || null;
   }
+  // P-26. Where it is for, and its door, as saveSession() keeps them.
+  if ("place" in changes) { if (_PLACES.includes(changes.place)) next.place = changes.place; else delete next.place; }
+  if ("purpose" in changes) { if (_PURPOSES.includes(changes.purpose)) next.purpose = changes.purpose; else delete next.purpose; }
 
   next.updatedAt = new Date().toISOString();
 
@@ -246,6 +255,37 @@ export function updateSavedSession(id, changes = {}) {
   after[idx] = next;
   store.set("savedSessions", after);
   return { ok: true, saved: next };
+}
+
+/** P-26. One saved session by its id (the Plan's), or null. */
+export function savedById(id) {
+  return savedSessions().find(s => s && s.id === id) || null;
+}
+
+const _isDay = v => typeof v === "string" && /^\d{4}-\d{2}-\d{2}$/.test(v) && !isNaN(new Date(v + "T12:00:00"));
+
+/**
+ * P-26. "When's it for? A date." Puts the one date on the saved session
+ * (a local day, YYYY-MM-DD), or takes it off with null. The same tier
+ * rule as every writer here.
+ */
+export function planSavedSession(id, day) {
+  if (!isPremium()) return { ok: false, reason: "tier" };
+  if (day !== null && !_isDay(day)) return { ok: false, reason: "day" };
+  const before = list();
+  const idx = before.findIndex(s => s && s.id === id);
+  if (idx === -1) return { ok: false, reason: "missing" };
+  const next = { ...before[idx] };
+  if (day === null) delete next.plannedFor; else next.plannedFor = day;
+  const after = [...before];
+  after[idx] = next;
+  store.set("savedSessions", after);
+  return { ok: true, saved: next };
+}
+
+/** P-26. The saved sessions planned for this local day (Home reads it). */
+export function savedForDay(day) {
+  return savedSessions().filter(s => s.plannedFor === day);
 }
 
 export function deleteSavedSession(id) {

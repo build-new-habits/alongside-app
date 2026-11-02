@@ -1,5 +1,12 @@
 /* ============================================================
    components/path.css
+   02 Nov 2026 v13
+
+   v13 - P-26 ONE-BUILD-PAGE: Build a session (.bs-*): Lately, the three
+   parts (each in its kind's colour, with its icon and name), a move's row
+   (figure, name and dose, the heart, Swap), Help me fill this, and When's
+   it for?. A move left out on a sore day says so (.path-mv__out).
+
    02 Nov 2026 v12
 
    v12 - P-23: a proposal's Swap opens a panel under its row (.path-swp):
@@ -429,3 +436,50 @@ body:has(#main-content .plan-back, #main-content .plan-exit) #hidden-nav-home-bt
 .path-swp__pick:focus-visible { outline: 3px solid var(--color-border-focus); outline-offset: 2px; }
 .path-swp__name { font-weight: var(--font-bold); flex: 1 1 10em; min-width: 0; overflow-wrap: break-word; font-size: min(1em, 6.4vw); }
 .path-swp__kit { color: var(--color-text-secondary); font-size: var(--text-sm); }
+
+/* ── P-26 Build a session ─────────────────────────────────────────── */
+.bs-view { gap: var(--space-4); }
+.saved-build { align-self: flex-start; min-height: 44px; margin-top: var(--space-2); }
+.bs-lately { display: flex; flex-direction: column; gap: var(--space-2); padding: var(--space-3); border: 1px solid var(--color-border); border-radius: var(--radius-lg, 16px); background: var(--color-surface); }
+.bs-pills { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.bs-quiet { color: var(--color-text-secondary); }
+.bs-part { display: flex; flex-direction: column; gap: var(--space-2); padding: var(--space-3); border: 1px solid var(--color-border); border-radius: var(--radius-lg, 16px); background: var(--color-surface); min-width: 0; }
+.bs-part__head { display: flex; align-items: center; gap: var(--space-3); }
+.bs-part__head > .kind-tile { flex: none; }
+.bs-part__h { margin: 0; font-size: var(--text-lg); font-weight: var(--font-bold); color: var(--color-text); }
+.bs-part__min { margin-left: auto; font-size: var(--text-sm); color: var(--color-text-secondary); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.bs-mvs, .bs-picks { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-2); }
+.bs-mv { display: flex; flex-direction: column; min-width: 0; }
+.bs-mv__row { display: flex; align-items: center; gap: var(--space-2); min-height: 56px; }
+.bs-mv__fig { flex: none; width: 56px; }
+.bs-mv__fig .xfig { width: 56px; max-width: 56px; }
+.bs-mv__fig .xfig__frame:not(:first-child), .bs-mv__fig .xfig__cap { display: none; }
+.bs-mv__txt, .bs-pick__txt { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.bs-mv__nm { font-weight: 600; color: var(--color-text); overflow-wrap: break-word; hyphens: manual; }
+.bs-fav { flex: none; display: grid; place-items: center; width: 44px; height: 44px; border: 0; border-radius: 50%; background: none; color: var(--color-text-secondary); cursor: pointer; }
+.bs-fav[aria-pressed="true"] { color: var(--color-danger-text, var(--color-text)); }
+.bs-fav[aria-pressed="true"] svg { fill: currentColor; }
+.bs-fav:focus-visible { outline: 3px solid var(--color-border-focus); outline-offset: 2px; }
+.bs-swap { flex: none; min-height: 44px; }
+.bs-acts { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.bs-acts .btn { flex: 1 1 auto; min-height: 44px; }
+.bs-help { border-color: var(--k, var(--color-primary)); }
+.bs-panel { display: flex; flex-direction: column; gap: var(--space-2); padding: var(--space-3); border: 2px solid var(--color-primary); border-radius: var(--radius-lg, 16px); background: var(--color-bg); }
+.bs-panel .path-swp__h:focus { outline: none; }
+.bs-pick { display: flex; align-items: flex-start; gap: var(--space-3); min-height: 56px; padding: var(--space-2) var(--space-3); border: 1px solid var(--color-border); border-radius: var(--radius-md, 12px); background: var(--color-surface); cursor: pointer; }
+.bs-pick input { flex: none; width: 22px; height: 22px; margin-top: 2px; accent-color: var(--color-primary); }
+.bs-pick:has(input:focus-visible) { outline: 3px solid var(--color-border-focus); outline-offset: 2px; }
+.bs-pick__why { font-size: var(--text-sm); color: var(--color-text-secondary); }
+.bs-sum { display: flex; justify-content: space-between; gap: var(--space-2); margin: 0; font-size: var(--text-sm); color: var(--color-text-secondary); font-variant-numeric: tabular-nums; }
+.bs-field { display: flex; flex-direction: column; gap: 6px; }
+.bs-field label { font-weight: 600; color: var(--color-text); }
+.bs-field .form-input { min-height: 48px; max-width: 100%; box-sizing: border-box; }
+.bs-when { border: 0; margin: 0; padding: 0; min-width: 0; display: flex; flex-direction: column; gap: var(--space-2); }
+.bs-when__lg { padding: 0; margin-bottom: var(--space-2); font-weight: 600; color: var(--color-text); }
+.bs-opt { display: flex; flex-direction: column; gap: var(--space-2); padding: var(--space-3); border: 1px solid var(--color-border); border-radius: var(--radius-lg, 16px); background: var(--color-surface); }
+.bs-opt.is-on { border-color: var(--color-primary); }
+.bs-radio { display: flex; align-items: center; gap: var(--space-3); min-height: 44px; font-weight: 600; color: var(--color-text); cursor: pointer; }
+.bs-radio input { flex: none; width: 22px; height: 22px; margin: 0; accent-color: var(--color-primary); }
+.bs-opt__sub { margin-left: calc(22px + var(--space-3)); }
+.path-mv__out { color: var(--color-text); font-weight: 600; }
+

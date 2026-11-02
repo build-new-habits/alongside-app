@@ -1,6 +1,12 @@
 /**
  * js/data/path-context.js
- * 29 Oct 2026 v2
+ * 02 Nov 2026 v3
+ *
+ * v3 - P-26 ONE-BUILD-PAGE (Graeme, 02 Nov: on the day, a session he
+ *   built leaves out what that day's sore areas rule out and offers a swap,
+ *   the rule every session has). soreRuledOut(entry): the sore areas today
+ *   that rule this movement out, by the same two tests the rest of the Plan
+ *   uses (the condition filter, and a Bad day's block); [] when none.
  *
  * v2 - STAGE PATH Session 6. The player now does what the last two lines
  *   say (workout.js v36: no countdown on a low-mood day; the halfway check
@@ -38,6 +44,7 @@ import { areaWords } from "./conditions.js";
 import { EXERCISES, filterByConditions } from "./exercises/index.js";
 import { PATH_MOVEMENTS } from "./exercises/path_movements.js";
 import { movementName, adjustmentsFor, freshSequence, recentIds } from "./path-engine.js";
+import { soreLevelFor } from "../session-builder.js";
 
 const LIBRARY = [...EXERCISES, ...PATH_MOVEMENTS];
 const LIBRARY_BY_ID = new Map(LIBRARY.map(e => [e.id, e]));
@@ -55,6 +62,17 @@ export function checkinToday() {
 export function soreToday() {
   const s = store.get("conditionPainScores") || {};
   return Object.entries(s).filter(([, v]) => Number(v) > 0).map(([id, score]) => ({ id, score: Number(score) }));
+}
+
+/**
+ * P-26. The areas named sore today that rule this movement out: the
+ * condition filter leaves it out for that area, or the area is at Bad and
+ * the movement works it. [] when none (or nothing is sore).
+ */
+export function soreRuledOut(entry) {
+  if (!entry) return [];
+  return soreToday().filter(({ id, score }) =>
+    filterByConditions([entry], [id]).safe.length === 0 || soreLevelFor(entry, { [id]: score }).level === "blocked").map(s => s.id);
 }
 
 /** Where they last moved, Home or Gym (Home when nothing says). */

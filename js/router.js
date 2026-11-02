@@ -1,6 +1,12 @@
 /**
  * router.js
- * 29 Oct 2026 v51
+ * 02 Nov 2026 v52
+ *
+ * v52 - P-26 ONE-BUILD-PAGE. 'build-session' registered (views/
+ *   build-session.js: Build a session, the Plan's; Free is sent to its own
+ *   builder), mapped to Today like the doors it is reached from. Its
+ *   hand-off is router.buildStart ({ door, part, place } or { editId }),
+ *   read once, as pathStart is.
  *
  * v51 - STAGE PATH Session 6 (P-6). 'plan-finish' registered (views/
  *   plan-finish.js: the Plan's finish; Free keeps reflect), without the nav
@@ -431,6 +437,8 @@ const VIEW_NAMES = {
   // SMOOTH-P3b. "I know what I want", Plan Home's second door.
   'know-what':         { path: './views/know-what.js',       fn: 'KnowWhatView'        },
   'path':              { path: './views/path.js',            fn: 'PathView'            },
+  // P-26. Build a session, the Plan's one page for building and saving.
+  'build-session':     { path: './views/build-session.js',   fn: 'BuildSessionView'    },
   'my-programme':      { path: './views/my-programme.js',     fn: 'MyProgrammeView'     },
   // THREAD-1a. The hard conversation is ENTERED from My Programme's
   // invitation, never opened over the top of it.
@@ -557,6 +565,8 @@ const NAV_MAP = {
   'know-what': 'today',
   // STAGE PATH P-5. Behind a Home door.
   'path': 'today',
+  // P-26. Reached from a door's Build my own and from Saved sessions.
+  'build-session': 'today',
   'capture': 'today',
   // PRAC-1. Reached from the Library, which maps to Today. Mapping it
   // to Wellbeing would repeat the NAV-8 fault from the other side --
