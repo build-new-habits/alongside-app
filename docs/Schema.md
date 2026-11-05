@@ -1,5 +1,7 @@
 # Alongside — Data Schema Reference
-## 05 Nov 2026 v1.122
+## 05 Nov 2026 v1.123
+
+> **v1.123, 05 Nov 2026 — P-28 EMPATHY-THREAD, schema first (S1)** (`store.js` v122). Master schedule v624; proposal, wording v5 and prototype v5 approved by Graeme, 05 Nov. Three additions, nothing removed. **`inStepProgress.programme`** `{ part: 1–4, episode: 1–6, done: ['p1e1', …], lastCarry: 'p<part>e<episode>' | null, lastAnswer: 'did' | 'not-yet' | 'didnt' | null, offeredAt: ISO | null, offeredSession: int ≥ 0 }`, default `{ part: 1, episode: 1, done: [], lastCarry: null, lastAnswer: null, offeredAt: null, offeredSession: 0 }`: In Step as a programme (four parts of six episodes). `lastCarry` is whose *Carry it* was given last; `lastAnswer` is the *Did it come up?* tap and nothing else (no words are ever kept). **Written by** In Step's player and the finish offer (S3). **Read by** the same, to choose the next episode and when to offer it. **On load** (`store._cleanP28()`): each field falls back on its own when malformed; an older record gains the default. The old fields (`unlockedAt`, `scenarioIndex`, `completedCount`, `choiceLog`) are unchanged until S3 retires the old room. **`coachVoice`** `'off' | 'on'`, default `'off'`: whether the coach's recorded voice plays (Settings › Display, S4); anything else loads as `'off'`. **`activityLog[].guideMe`** `'just' | 'guide' | 'three'` (absent by default): how an outdoor session was taken (Just go, Guide me, Take three with you; S4). Anything else is removed on load, never nulled, so an older entry gains no key. Both tiers (Graeme, 05 Nov). Gated by `tools/verify-p28-schema.mjs`.
 
 > **v1.122, 05 Nov 2026 — P-27 TIDY** (`store.js` unchanged, v121). **No field added or removed.** Values and writers only, decided by Graeme on 05 Nov: (1) **`activityLog[].type`** may now also be **`pilates`**, **`stretch`** or **`other`** (written by the one log picker, `views/activity-log.js` v7, with `yoga` and `mindful` already known); each has its words (`data/activity-labels.js` v7), a kind (`data/evidence.js` v6: pilates mobility, other none) and a colour (`data/kind-colours.js` v3). (2) **`checkinHistory[day].sleepQuality`** and **`lastCheckin.sleepQuality`** are **no longer written** (the check-in's sleep link is removed, both tiers); an old value is still read by the builder (`_gentleReason`), harmlessly. (3) **`activeProgramme`** no longer shapes anything on the Plan (`getPhaseBias()` neutral on both tiers; Plan Home, Progress and Settings no longer show or start it); the field and Free's use are unchanged. (4) **`strategicGoal.weeklySessionTarget`** is no longer offered on the Plan (Settings › Your plan); Free unchanged. (5) **`availableTimeToday`** is now also written by Home's Let me choose for you, with the length Home names. Gated by `tools/verify-tidy-trace.mjs`.
 
@@ -1087,7 +1089,7 @@
 
 ## 06 Sep 2026 v1.51
 
-**File:** `js/store.js` (confirmed live version: **v121, 02 Nov 2026**)
+**File:** `js/store.js` (confirmed live version: **v122, 05 Nov 2026**)
 
 > **v1.47, 06 Sep 2026 — CR-1.** `conditions[]` gains three ids and loses one. `chronic-fatigue` is **retired**; `persistent-fatigue`, `me-cfs` and `long-covid` replace it. No field shape changed — `conditions` is still `string[]` and `conditionMeta` is still keyed by condition id.
 >

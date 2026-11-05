@@ -6,6 +6,26 @@ import { validateWeightTarget } from "./data/weight-targets.js";
 
 /**
  * store.js - Data persistence layer
+ * 05 Nov 2026 v122
+ *
+ * v122 - P-28 EMPATHY-THREAD, schema first (S1; master schedule v624;
+ *   proposal, wording v5 and prototype v5 approved by Graeme, 05 Nov). Three
+ *   additions, nothing removed:
+ *   - inStepProgress.programme: In Step as a programme (four parts, six
+ *     episodes each). { part 1-4, episode 1-6, done: ['p1e1', ...],
+ *     lastCarry: 'p1e1' | null (whose Carry it was given last),
+ *     lastAnswer: 'did' | 'not-yet' | 'didnt' | null (the tap only, never
+ *     words), offeredAt: ISO | null, offeredSession: int }. Made safe on
+ *     every load (_cleanInStepProgramme); an older record gains the default.
+ *     The old fields (unlockedAt, scenarioIndex, completedCount, choiceLog)
+ *     stay until S3 retires the old room.
+ *   - coachVoice: 'off' | 'on' (default 'off'): whether the coach's recorded
+ *     voice plays. Settings › Display (S4).
+ *   - activityLog[].guideMe: 'just' | 'guide' | 'three', how an outdoor
+ *     session was taken (S4). Absent by default; anything else is removed
+ *     on load, never nulled.
+ *   Writers arrive in S3 and S4. Schema v1.123. Gate verify-p28-schema.
+ *
  * 02 Nov 2026 v121
  *
  * v121 - P-26 ONE-BUILD-PAGE, schema first (master schedule v621; mock-up
@@ -1360,7 +1380,7 @@ export const store = {
 
   mergeWithDefaults(saved) {
     const defaults = this.getDefaults();
-    return this._cleanPlannedFor(this._cleanTrendFields(this._cleanPathFields(this._expireOldScores(this._repairSessionTypes(this._dropRetired({
+    return this._cleanP28(this._cleanPlannedFor(this._cleanTrendFields(this._cleanPathFields(this._expireOldScores(this._repairSessionTypes(this._dropRetired({
       ...defaults,
       ...saved,
 
@@ -1369,6 +1389,7 @@ export const store = {
 
       // LIFT-UNIT, v117. Only 'kg' or 'lb' is a choice.
       liftUnit: (saved.liftUnit === 'kg' || saved.liftUnit === 'lb') ? saved.liftUnit : null,
+      coachVoice: saved.coachVoice === 'on' ? 'on' : 'off',   // v122 (P-28)
 
       // CR-1. Runs before the spread's `conditions` would win. Shape is
       // still not reshaped (CHECKIN-2a) -- only ids are renamed.
@@ -1652,7 +1673,9 @@ export const store = {
                               : {},
             choiceLog: Array.isArray(saved.inStepProgress.choiceLog)
               ? saved.inStepProgress.choiceLog
-              : []
+              : [],
+            // v122: made safe in _cleanInStepProgramme()
+            programme: saved.inStepProgress.programme
           }
         : defaults.inStepProgress,
 
@@ -1995,7 +2018,7 @@ export const store = {
       // honest direction; a retirement must never take something away
       // from somebody who did nothing wrong.
       tier:       saved.tier === 'athlete' ? 'personal' : (saved.tier || 'free')
-    }))))));
+    })))))));
   },
 
   /** P13, v83. The local day, "YYYY-MM-DD". */
@@ -2062,6 +2085,39 @@ export const store = {
    * P-26, v121. A saved session's plannedFor is kept only as a real local
    * day (YYYY-MM-DD); anything else is removed. Absent stays absent.
    */
+  /**
+   * v122 (P-28). In Step's programme record and activityLog[].guideMe,
+   * made safe on every load (Schema v1.123). The programme keeps only the
+   * shape it may hold; anything malformed falls back to the default, field
+   * by field. guideMe is removed (never nulled) when it is not one of its
+   * three words, so an older entry gains no key.
+   */
+  _cleanP28(data) {
+    const EP = /^p[1-4]e[1-6]$/;
+    const def = { part: 1, episode: 1, done: [], lastCarry: null, lastAnswer: null, offeredAt: null, offeredSession: 0 };
+    const isp = data.inStepProgress && typeof data.inStepProgress === 'object' ? data.inStepProgress : null;
+    if (isp) {
+      const p = isp.programme && typeof isp.programme === 'object' ? isp.programme : {};
+      const int = (v, lo, hi, d) => (Number.isInteger(v) && v >= lo && v <= hi ? v : d);
+      isp.programme = {
+        part:           int(p.part, 1, 4, def.part),
+        episode:        int(p.episode, 1, 6, def.episode),
+        done:           Array.isArray(p.done) ? [...new Set(p.done.filter(x => typeof x === 'string' && EP.test(x)))] : [],
+        lastCarry:      typeof p.lastCarry === 'string' && EP.test(p.lastCarry) ? p.lastCarry : null,
+        lastAnswer:     ['did', 'not-yet', 'didnt'].includes(p.lastAnswer) ? p.lastAnswer : null,
+        offeredAt:      typeof p.offeredAt === 'string' && !isNaN(new Date(p.offeredAt)) ? p.offeredAt : null,
+        offeredSession: int(p.offeredSession, 0, 1e6, 0),
+      };
+    }
+    if (Array.isArray(data.activityLog)) {
+      data.activityLog = data.activityLog.map(e => {
+        if (!e || typeof e !== 'object' || !('guideMe' in e) || ['just', 'guide', 'three'].includes(e.guideMe)) return e;
+        const out = { ...e }; delete out.guideMe; return out;
+      });
+    }
+    return data;
+  },
+
   _cleanPlannedFor(data) {
     const isDay = v => typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v) && !isNaN(new Date(v + 'T12:00:00'));
     if (Array.isArray(data.savedSessions)) {
@@ -2971,8 +3027,13 @@ export const store = {
         unlockedAt:     {}, // { [movementId]: ISO } — 3-day cooldown gate
         scenarioIndex:  {}, // { [movementId]: int } — cycles the 4-scenario pool
         completedCount: {}, // { [movementId]: int } — display only
-        choiceLog:      []  // { movementId, scenarioId, optionId, tag, at }[] — aggregate only, see in-step.js
+        choiceLog:      [], // { movementId, scenarioId, optionId, tag, at }[] — aggregate only, see in-step.js
+        // v122 (P-28). In Step as a programme. The tap is kept, never words.
+        programme: { part: 1, episode: 1, done: [], lastCarry: null, lastAnswer: null, offeredAt: null, offeredSession: 0 }
       },
+
+      // v122 (P-28). Whether the coach's recorded voice plays.
+      coachVoice: 'off',
 
       // ── SESSION BUILDER ───────────────────────────────────────
       generatedSession: {
