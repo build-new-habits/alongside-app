@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 05 Nov 2026 v704
+ * 05 Nov 2026 v705
  *
+ * v705 - P-28 S1 (schema only; nothing on screen changes). The app can now remember where you are in In Step as a programme (part, episode, and the one tap after Carry it), whether the coach's recorded voice is on (off unless you turn it on), and how an outdoor session was taken (Just go, Guide me or Take three). store.js v122, Schema v1.123.
  * v704 - P-27 tidy (Graeme, 05 Nov). Nothing is hidden under the bottom bar any more: every screen leaves room for the last card's edge. The check-in no longer has the easy-to-miss sleep link (both tiers). On the Plan: My programme is gone from Get stronger > Gym; the twelve-week programme is retired (no chapter-end card on Home, no programme row on Progress or in Settings); every session, a walk, run, ride, swim, yoga or class too, ends on the Plan's finish with How do you feel now? in the open; Settings > Your plan is Your arc, Your week and one Goals and activity level row; Let me choose for you builds the length and kind Home says and never says You asked for; Back on Today's plan returns to the door's steps with your choices kept; the arc's Start today's session is Home's choice; a lighter plan says why. Both tiers: Log what I did is one picker (now with Yoga, Pilates, Stretching, Meditation, Something else); Library > Rest day opens a rest, not the last session's finish; Library > Breathing opens the same player as Wellbeing; Settings' Activity log is called Log what I did.
  * v703 - P-26 (the Plan; Free unchanged). One Build a session page: where, what it's for, then warm-up, main and cool-down; add moves yourself, or Help me fill this for any one part (your favourites first, then the coach's picks, nothing added until you tick it); a heart on every move (the same as Loved it) and Swap; Lately, what you've worked in the last 7 days, as a suggestion you can leave; one Save with When's it for? (a date, every week on a day in Your week, or just keep it). On that day Home's row names it and one tap opens it; on a sore day, what the sore area rules out is left out with a Swap offered. Opened from Build my own behind Get stronger and Keep moving, from Saved sessions, and from Edit. Long names and headings wrap rather than split a word at the largest text (Home's row, a heading beside its tile). NEW FILES precached: js/views/build-session.js, js/data/build-lately.js.
  * v702 - P-22 to P-24 (the Plan; Free unchanged but for two faults). In a session, under each exercise's name: Swap (moves like it, then Search for something else, by name or muscle, only what your kit there allows, never a Not again or one today's sore areas rule out), Do this one later (to the end of its part of the session) and What's left (the rest, each with Do now, and Add an exercise, which goes next and is saved with the session). A proposal's Swap and Today's plan's swap list have the same search. Make it up as I go is behind Get stronger and Keep moving. Faults fixed on both tiers: Skip this one is 44 px tall, and the player's step strip and Today's plan's names no longer split a word at the largest text. NEW FILE precached: js/data/swap-search.js.
@@ -4251,7 +4252,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v704";
+const CACHE_NAME = "alongside-v705";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4317,7 +4318,7 @@ const SHELL_HASHES = {
   "./css/components/finish.css": "c33e298d5fcb92ae",
   "./js/app.js": "72054b00e54ad55b",
   "./js/router.js": "534ee4ef8831b518",
-  "./js/store.js": "1345beb467fdf8c8",
+  "./js/store.js": "c3996dc10bb10e23",
   "./js/session-log.js": "6134de4315842e05",
   "./js/exercise-feedback.js": "adba8549f444da2a",
   "./js/exercise-card.js": "78196b42671c67aa",
