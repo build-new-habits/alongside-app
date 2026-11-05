@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 02 Nov 2026 v703
+ * 05 Nov 2026 v704
  *
+ * v704 - P-27 tidy (Graeme, 05 Nov). Nothing is hidden under the bottom bar any more: every screen leaves room for the last card's edge. The check-in no longer has the easy-to-miss sleep link (both tiers). On the Plan: My programme is gone from Get stronger > Gym; the twelve-week programme is retired (no chapter-end card on Home, no programme row on Progress or in Settings); every session, a walk, run, ride, swim, yoga or class too, ends on the Plan's finish with How do you feel now? in the open; Settings > Your plan is Your arc, Your week and one Goals and activity level row; Let me choose for you builds the length and kind Home says and never says You asked for; Back on Today's plan returns to the door's steps with your choices kept; the arc's Start today's session is Home's choice; a lighter plan says why. Both tiers: Log what I did is one picker (now with Yoga, Pilates, Stretching, Meditation, Something else); Library > Rest day opens a rest, not the last session's finish; Library > Breathing opens the same player as Wellbeing; Settings' Activity log is called Log what I did.
  * v703 - P-26 (the Plan; Free unchanged). One Build a session page: where, what it's for, then warm-up, main and cool-down; add moves yourself, or Help me fill this for any one part (your favourites first, then the coach's picks, nothing added until you tick it); a heart on every move (the same as Loved it) and Swap; Lately, what you've worked in the last 7 days, as a suggestion you can leave; one Save with When's it for? (a date, every week on a day in Your week, or just keep it). On that day Home's row names it and one tap opens it; on a sore day, what the sore area rules out is left out with a Swap offered. Opened from Build my own behind Get stronger and Keep moving, from Saved sessions, and from Edit. Long names and headings wrap rather than split a word at the largest text (Home's row, a heading beside its tile). NEW FILES precached: js/views/build-session.js, js/data/build-lately.js.
  * v702 - P-22 to P-24 (the Plan; Free unchanged but for two faults). In a session, under each exercise's name: Swap (moves like it, then Search for something else, by name or muscle, only what your kit there allows, never a Not again or one today's sore areas rule out), Do this one later (to the end of its part of the session) and What's left (the rest, each with Do now, and Add an exercise, which goes next and is saved with the session). A proposal's Swap and Today's plan's swap list have the same search. Make it up as I go is behind Get stronger and Keep moving. Faults fixed on both tiers: Skip this one is 44 px tall, and the player's step strip and Today's plan's names no longer split a word at the largest text. NEW FILE precached: js/data/swap-search.js.
  * v701 - P-21 (the Plan; Free unchanged). Your week can follow a fitness trend: Plan your week > Follow a fitness trend > which trend, the activity (Zone 2) or what you do most (Mix it up), then which days; the week is filled by the trend's own rules (HILIT and Hybrid training two days at most, reformer-style three, never side by side; Zone 2 one harder day mid-week; Mix it up one day; a week of snacks), the other days ordinary sessions you can change. Home's row then names today's trend day with the talk test's word, and one tap opens it. Fixed: on Your week's day screen, at larger text, the A little / Some / Mostly choices and the day's name no longer break mid-word.
@@ -4250,7 +4251,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v703";
+const CACHE_NAME = "alongside-v704";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4282,7 +4283,7 @@ const SHELL_HASHES = {
   "./css/components/reflect.css": "5925f1883139ce3f",
   "./css/components/red-flag.css": "3934b0b0d770419b",
   "./css/components/know-what.css": "6f1d7faff6783932",
-  "./css/components/nav-fix.css": "ee5db4b763633630",
+  "./css/components/nav-fix.css": "9385e9e7d7ea4738",
   "./css/components/onboarding-thread.css": "e98173c565e8f212",
   "./css/components/sheet-manager.css": "ea1daa96e07ff080",
   "./css/components/settings-reflection.css": "37c435fb6fe23db7",
@@ -4315,7 +4316,7 @@ const SHELL_HASHES = {
   "./css/components/capture.css": "343b4ae0dc6fe6ea",
   "./css/components/finish.css": "c33e298d5fcb92ae",
   "./js/app.js": "72054b00e54ad55b",
-  "./js/router.js": "e8d185b7c1ee607f",
+  "./js/router.js": "534ee4ef8831b518",
   "./js/store.js": "1345beb467fdf8c8",
   "./js/session-log.js": "6134de4315842e05",
   "./js/exercise-feedback.js": "adba8549f444da2a",
@@ -4332,16 +4333,16 @@ const SHELL_HASHES = {
   "./js/session-guard.js": "00177a846537868c",
   "./js/session-resume.js": "6916b88c0757374f",
   "./js/auth.js": "9b9c7a632dccada6",
-  "./js/views/today.js": "c111c12d501a63e6",
+  "./js/views/today.js": "36e85d3cec39efaf",
   "./js/views/mobility-conditioning.js": "8b30ad4fa0887d62",
   "./js/views/arc-setup.js": "4f7bf6dd047cd079",
-  "./js/views/stretch-arc.js": "9d4f528a4372d5ea",
-  "./js/views/checkin.js": "1d03b5f4d59bee0f",
+  "./js/views/stretch-arc.js": "b4c5fdcd069a4612",
+  "./js/views/checkin.js": "69cd078ee9c3b84a",
   "./js/views/checkin-mini.js": "c647f4da71feddde",
-  "./js/views/coach-proposal.js": "14ff6954e3576885",
+  "./js/views/coach-proposal.js": "483cee5a0d486fd9",
   "./js/views/workout.js": "025277c8fe86396c",
-  "./js/views/progress.js": "5e22359809361986",
-  "./js/views/settings.js": "ec21456c0fda9b36",
+  "./js/views/progress.js": "ec6aaab64e2cee39",
+  "./js/views/settings.js": "3e3fa88471e47c17",
   "./js/views/restore-flow.js": "dc81c2e455fa472d",
   "./js/views/weekly-plan.js": "dcee06e297b402c0",
   "./js/views/reflect.js": "881ab69b445a99ec",
@@ -4358,7 +4359,7 @@ const SHELL_HASHES = {
   "./js/data/session-rationale.js": "f14d0d565eb7f9dc",
   "./js/data/personal-reads.js": "52141f31fa9d4fd0",
   "./js/data/field-contract.js": "d7d662025990b1fd",
-  "./js/views/activity-log.js": "8dbeb7d58332b07e",
+  "./js/views/activity-log.js": "7cb12f7fc36e8818",
   "./js/views/annual-reflection.js": "c1b1221672a0eb4a",
   "./js/views/community-impact.js": "b8537fe58e1f8f69",
   "./js/views/home-threshold.js": "17bc42808aa5bd5c",
@@ -4366,7 +4367,7 @@ const SHELL_HASHES = {
   "./js/views/programme-select.js": "115a22eeb9526be5",
   "./js/views/upgrade.js": "2a3e1f4ce77dbbac",
   "./js/views/privacy.js": "25721026cff47822",
-  "./js/views/library.js": "3e10593fc07a60f2",
+  "./js/views/library.js": "ab502fc0ca8bfa85",
   "./js/views/practices.js": "9890a7fa300e9d1c",
   "./js/views/red-flag.js": "d2f857d0f8ba905f",
   "./js/views/health-consent.js": "66c6f499c7863c7c",
@@ -4376,10 +4377,10 @@ const SHELL_HASHES = {
   "./js/data/arc-readback.js": "9b06dcba96534da0",
   "./js/data/tier-table.js": "7821c3304bd0815c",
   "./js/views/know-what.js": "e84fee3e6d9d3af0",
-  "./js/views/plan-home.js": "8f3e291c7426fcdc",
-  "./js/views/path.js": "28722e8cbf442289",
+  "./js/views/plan-home.js": "c3119c9c9830c2c7",
+  "./js/views/path.js": "13f2c8daeacd9c53",
   "./js/plan-look.js": "7674d8fbf5101aa9",
-  "./js/views/plan-finish.js": "67772c3957aee32e",
+  "./js/views/plan-finish.js": "37a34340b81f8b31",
   "./js/data/outside.js": "3af4ea46bd898084",
   "./js/data/trend-recipes.js": "14961e4c12aef77e",
   "./js/data/path-context.js": "bb05075596d17c27",
@@ -4393,7 +4394,7 @@ const SHELL_HASHES = {
   "./js/data/restore.js": "fd3860a6ccd4e480",
   "./js/data/export-file.js": "bbee762322d0e4e2",
   "./js/data/health-consent-covers.js": "6698a3e50672cbbe",
-  "./js/data/kind-colours.js": "1628adad116963b7",
+  "./js/data/kind-colours.js": "f247edabfec2fd3d",
   "./js/data/line-icons.js": "b746ddec419dc568",
   "./js/data/week-shape-model.js": "125804ade2e3713b",
   "./js/data/week-shape.js": "7c144c42ca0b91b4",
@@ -4426,7 +4427,7 @@ const SHELL_HASHES = {
   "./js/data/session-length.js": "d135da33af36c923",
   "./js/data/file-lock.js": "6428c4d49a58959b",
   "./js/data/messages.js": "252ee15828010efc",
-  "./js/data/evidence.js": "9d0c194e256e2809",
+  "./js/data/evidence.js": "f06ab5ec6eb1804c",
   "./js/data/support-lines.js": "0c1286fa510e427e",
   "./js/data/consent-version.js": "c1a39ed44cc24157",
   "./js/views/my-programme.js": "b28f193145da0c1a",
@@ -4446,12 +4447,12 @@ const SHELL_HASHES = {
   "./js/data/classes/class-getting-going-009.js": "c92381f2c500c0a4",
   "./js/data/classes/class-from-the-feet-010.js": "cdbfa03ffea71774",
   "./js/data/scope-statement.js": "02dac4d3fb7a62fb",
-  "./js/data/activity-labels.js": "5be29507e37604f5",
+  "./js/data/activity-labels.js": "9753c0fbbf27d8cc",
   "./js/views/class-player.js": "42620de997fa1226",
   "./js/views/class-list.js": "c5f80d89802bf845",
   "./css/components/class-list.css": "e33b073b352399f3",
   "./css/components/class-player.css": "401cc57d7d39dbb1",
-  "./js/views/saved-sessions.js": "62a299eb86e378b0",
+  "./js/views/saved-sessions.js": "400202f2e10e8e74",
   "./js/views/session-builder-ui.js": "30c36be8e7a979d4",
   "./js/views/noticing.js": "afb617785e39e18d",
   "./js/views/in-step.js": "54f53470958ac62f",
@@ -4495,7 +4496,7 @@ const SHELL_HASHES = {
   "./js/data/plan-options.js": "86087e77bded2cd0",
   "./js/data/pricing.js": "2458927c2fec1f11",
   "./js/data/time-windows.js": "a25841c83a4ce91e",
-  "./js/data/programmeEngine.js": "74dd56652c4f2c13",
+  "./js/data/programmeEngine.js": "917aa91a3fbd770a",
   "./js/data/programmes.js": "e455b0b69bd02a52",
   "./js/data/grounding-moments.js": "33c5054f7e6540ff",
   "./js/data/coach-voice.js": "92ea4a0209978619",
@@ -4508,7 +4509,7 @@ const SHELL_HASHES = {
   "./js/data/exercises/held_movements.js": "73a0fd1503850f28",
   "./js/data/feel-programmes.js": "ade4752f88834a40",
   "./js/data/stretch-routines.js": "5a5fa2e7598037fb",
-  "./js/data/path-engine.js": "4072deb17d2f4edb",
+  "./js/data/path-engine.js": "1d92317ca9107303",
   "./js/data/exercises/pilates.js": "2428ed5f9e3f41cf",
   "./js/data/exercises/running.js": "c1fc520e1eb7ee8c",
   "./js/data/exercises/rehabilitation.js": "c2b00a8513421566",
