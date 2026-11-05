@@ -1,6 +1,9 @@
 /**
  * tools/verify-write1.mjs
- * 01 Nov 2026 v11
+ * 05 Nov 2026 v12
+ *
+ * v12 - P-28 S1 SCHEMA. coachVoice joins the baseline as a DATED PROMISE
+ *   (schema first): S4 connects it and removes the line.
  *
  * v11 - P-20 TRENDS-BUILD session 1. trends leaves the baseline, as its
  *   dated promise said: views/path.js reads it (Follow a fitness trend).
@@ -222,6 +225,12 @@ const BASELINE = new Set([
   // likedMovements (path-engine.js), Session 4 connects dayOpen
   // (plan-home.js); each removes its line, as the check below insists.
   'dayOpen',
+
+  // P-28 S1, 05 Nov 2026 (store.js v122). DATED PROMISE, not permission:
+  // coachVoice is schema first. S4 (GUIDE ME) connects it: Settings › Display
+  // writes it and the hold and guided players read it. S4 removes this line,
+  // as the check below insists.
+  'coachVoice',
 
   // 'conditionMeta' -- removed 28 Sep 2026. SMOOTH-P4a reads it: Progress
   // says "Since 19 Aug" for each condition from conditionMeta[id].addedAt.
