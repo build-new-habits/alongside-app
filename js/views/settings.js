@@ -1,6 +1,16 @@
 /**
  * settings.js
- * 27 Oct 2026 v73
+ * 05 Nov 2026 v74
+ *
+ * v74 - P-27 TIDY (Graeme, 05 Nov). Both tiers, a fault: "Activity log" opened
+ *   a form to log something, not a log; it is named for what it does, Log
+ *   what I did. The Plan only (Graeme: "Tidy"): Your plan's four rows that
+ *   opened one page (Goals, Sessions per week, Activity level, Programme)
+ *   are one row, Goals and activity level; on that page the twelve-week
+ *   programme (retired on the Plan), Sessions per week (saved, but nothing
+ *   on the Plan read it and its row still said Not set), a second way to
+ *   Your week, and the Your coach note (nothing to choose) are gone. Free
+ *   unchanged.
  *
  * v73 - LIFT-UNIT: Settings › Equipment › Weights you lift, in: kg or lb (store liftUnit), on both tiers. The lifting unit no longer follows the body-weight unit, so it is never stone.
  *
@@ -914,7 +924,7 @@ export function SettingsView(router) {
     background:   { title: 'What you told me at the start', render: () => `<div class="settings-section">${renderBackgroundSection()}</div>` },
     preferences:  { title: 'How sessions are built',  render: () => `<div class="settings-section">${renderPreferencesSection()}</div>` },
     reflection:   { title: 'Your reflection',         render: () => `<div class="settings-section">${renderReflectionSection()}</div>` },
-    programme:    { title: 'Goals and your week',     render: () => renderProgrammePanel() },
+    programme:    { title: isPremium() ? 'Goals and activity level' : 'Goals and your week', render: () => renderProgrammePanel() },   // P-27: the Plan's page holds only these
     notes:        { title: 'Session notes',           render: () => renderLiftLogPanel() },
     weight:       { title: 'Your weight',             render: () => `<div class="settings-section">${_weightSection(store.get('weightTracking') === true, store.get('weightUnit') || 'kg', store.get('weight'))}</div>` },
     display:      { title: 'Display',                 render: () => renderDisplayPanel() },
@@ -1117,7 +1127,7 @@ export function SettingsView(router) {
       ];
       case 'data': return [
         { title: 'Your copy', rows: [
-          _row({ label: 'Activity log', action: 'nav-activity-log' }),
+          _row({ label: 'Log what I did', sub: 'Add something you have already done.', action: 'nav-activity-log' }),
           _row({ label: 'Download your data', sub: 'A file of everything the app keeps about you, your journal included. Saved on this device. Anyone who has the file can read it, unless you add a password.', action: 'download-data' }),
           _row({ label: 'Restore from a file', sub: 'Bring your history across from a file saved with Download your data. It replaces what is on this device.', action: 'restore-data' }),
         ] },
@@ -1133,11 +1143,17 @@ export function SettingsView(router) {
       case 'plan': return [
         { title: 'Goals and your week', rows: [
           c.premium ? _row({ label: 'Your arc', value: c.aim ? c.aim.label : 'Not set', go: c.aim ? 'stretch-arc' : 'arc-setup' }) : '',
+          ...(c.premium ? [
+            // P-27. One row for the one page (four opened it).
+            _row({ label: 'Your week', action: 'open-weekly-plan' }),
+            _row({ label: 'Goals and activity level', value: [c.goals.length ? `${c.goals.length} ${c.goals.length === 1 ? 'goal' : 'goals'}` : '', c.level ? _label(ACTIVITY_LEVELS, c.level, c.level) : ''].filter(Boolean).join(' \u00b7 ') || 'Not set', open: 'programme' }),
+          ] : [
           _row({ label: 'Goals', value: c.goals.length ? `${c.goals.length} chosen` : 'None', open: 'programme', focus: '.settings-goal-chip' }),
           _row({ label: 'Sessions per week', value: c.target ? String(c.target) : 'Not set', open: 'programme', focus: '#settings-weekly-target' }),
           _row({ label: 'Your week', action: 'open-weekly-plan' }),
           _row({ label: 'Activity level', value: c.level ? _label(ACTIVITY_LEVELS, c.level, c.level) : 'Not set', open: 'programme', focus: '#settings-fitness-level' }),
           _row({ label: 'Programme', value: c.progMeta ? c.progMeta.name : 'None', open: 'programme' }),
+          ]),
         ] },
         { title: 'The Plan', rows: [
           _row({ label: 'Your plan', value: c.premium ? 'The Plan' : 'Free', open: 'about-plan' }),
@@ -1918,9 +1934,12 @@ export function SettingsView(router) {
     const fitnessLevel = _activityLevel() || 'moderate';
     const weeklyTarget = store.get('strategicGoal.weeklySessionTarget') || 3;
     const tier         = store.get('tier') || 'free';
+    // P-27. On the Plan: goals and activity level only (see v74).
+    const plan         = isPremium();
 
     return `
       <div class="settings-section">
+      ${plan ? '' : `
 
         <!-- Active programme -->
         <h2 class="settings-section__heading">Your programme</h2>
@@ -1981,12 +2000,13 @@ export function SettingsView(router) {
                 aria-label="Plan your week — set an intent for each day">
           Plan my week
         </button>
+      `}
 
         <!-- Goals -->
         <h2 class="settings-section__heading">Your goals</h2>
         <p class="settings-section__sub">
-          Tap to change what you're working towards.
-          Your programme won't be affected until you next review it.
+          Tap to change what you're working towards.${plan ? '' : `
+          Your programme won't be affected until you next review it.`}
         </p>
         <div class="settings-goals-groups" role="group" aria-label="Select your goals">
           ${offeredGoals({ weightTracking: store.get('weightTracking') === true, selected: goals }).map(cat => `
@@ -2026,12 +2046,12 @@ export function SettingsView(router) {
         </div>
         <!-- SMOOTH-P4c: the Save button that was here is gone; this saves as it changes. -->
 
-        <!-- Coach (S1 — Nurturing only, permanently. No picker.) -->
+        ${plan ? '' : `<!-- Coach (S1 — Nurturing only, permanently. No picker.) -->
         <h2 class="settings-section__heading">Your coach</h2>
         <p class="settings-section__sub">
           Every session is guided in a warm, nurturing style — gentle,
           emotionally attuned, and always on your side.
-        </p>
+        </p>`}
 
       </div>
     `;
@@ -2638,8 +2658,8 @@ export function SettingsView(router) {
           </button>
           <button class="btn btn-ghost"
                   data-action="nav-activity-log"
-                  aria-label="View your full activity log">
-            Activity log
+                  aria-label="Log what I did: add something you have already done">
+            Log what I did
           </button>
           <button class="btn btn-ghost"
                   data-action="nav-privacy"

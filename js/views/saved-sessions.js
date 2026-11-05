@@ -1,5 +1,11 @@
 /**
  * js/views/saved-sessions.js
+ * 05 Nov 2026 v13
+ *
+ * v13 - P-27 TIDY (Graeme, 05 Nov). The empty list's Start today's session
+ *   is Home's Let me choose for you (startCoachChoice), not a session of the
+ *   builder's own choosing (it built Core while Home offered something else).
+ *
  * 02 Nov 2026 v12
  *
  * v12 - P-26 ONE-BUILD-PAGE (Graeme, 02 Nov: Build a session opens from
@@ -171,6 +177,7 @@ import { store } from '../store.js';
 // navigation broken and was right about the mechanism.
 import { router } from '../router.js';
 import { doorOfSaved } from './path.js';
+import { startCoachChoice } from './plan-home.js';   // P-27
 import { isPremium } from '../auth.js';
 import {
   savedSessions,
@@ -453,11 +460,7 @@ export function onMount() {
 
   // A-7 (v7). The empty list's one action: the coach's session, through
   // today's check-in when there has not been one (Home's Tell me what to do).
-  root.querySelector('#saved-empty-start')?.addEventListener('click', () => {
-    store.set('requestedSessionType', null);
-    if (store.checkedInToday()) router.navigate('coach-proposal');
-    else { store.set('pendingDoorRoute', 'coach-proposal'); router.navigate('checkin'); }
-  });
+  root.querySelector('#saved-empty-start')?.addEventListener('click', () => startCoachChoice(router));
 
   // OWN-LIST. Filter in place: hiding rows, not repainting, so the field
   // keeps its focus and caret while somebody types.

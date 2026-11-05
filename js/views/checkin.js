@@ -1,6 +1,16 @@
 /**
  * js/views/checkin.js
- * 31 Oct 2026 v32
+ * 05 Nov 2026 v33
+ *
+ * v33 - P-27 TIDY (Graeme, 05 Nov). (1) The quiet "Add how you slept
+ *   (optional)" link is gone (Graeme: "Remove it"; it was easy to miss, and
+ *   a low energy answer already makes the plan lighter). Both tiers: the
+ *   check-in asks everyone the same questions (P14). Nothing is written to
+ *   sleepQuality now; the builder still reads an old answer harmlessly.
+ *   (2) When one of the Plan's doors is waiting (pendingDoorRoute "path", or
+ *   Home's coach choice), the check-in goes straight on: "See what I'm thinking" with My exercises set was an
+ *   extra stop that opened the door's first step, not anything the coach
+ *   was thinking. Free unchanged.
  *
  * v32 - STAGE PATH Session 9 (CLOSE; P-12 F4, F5; Graeme, 31 Oct: "‹ Back",
  *   "24 px, left"). On the Plan only, the look, never the questions (P14
@@ -461,7 +471,6 @@ export function CheckinView(router) {
   // STALE-CHECKIN. False once the person has left; a panel built by a
   // timer that fires afterwards is never attached to the page.
   let _alive      = false;
-  let _sleepGiven = false;   // SMOOTH-P1
   let _container  = null;
   let _thread     = null;
   let _conditions = [];
@@ -502,7 +511,6 @@ export function CheckinView(router) {
     // morning's answers, which it would otherwise silently resubmit.
     _checkin = { ..._checkin, energy: null, mood: null, sleepHours: null,
                  sleepQuality: null, conditionLevels: {} };
-    _sleepGiven = false;
 
     const plan = planLook();
     container.innerHTML = `
@@ -668,10 +676,8 @@ ${plan ? `        <div class="ci-plan-head">
       ];
       const pick = await _askChips(first ? "Anything sore today" : "Anything else sore",
                                    chips,
-                                   { note: first ? note : null,
-                                     extra: (!_sleepGiven && first) ? "Add how you slept (optional)" : null });
+                                   { note: first ? note : null });
       if (!pick) return;
-      if (pick.extra) { await _askSleep(); continue; }
       let area = pick;
       if (area.id === "__more") {
         await _showCoachBubble("Where?");
@@ -703,16 +709,8 @@ ${plan ? `        <div class="ci-plan-head">
     _checkin.conditionLevels[id] = c.value;
   }
 
-  async function _askSleep() {
-    await _showCoachBubble("How did you sleep?");
-    const s = await _askChips("How you slept", [
-      { label: "Poor", value: "poor" }, { label: "Okay", value: "okay" }, { label: "Good", value: "good" }
-    ]);
-    if (!s) return;
-    _checkin.sleepQuality = s.value;
-    _sleepGiven = true;
-    await _showCoachBubble("Thanks. Anything sore or niggling today?");
-  }
+  // P-27. _askSleep() removed (Graeme, 05 Nov: "Remove it"); archived in
+  // BNH-Files Archive/P-27 TIDY. A low energy answer already makes a plan lighter.
 
   // ─────────────────────────────────────────────────────────────────────────
   // FINISH — was the TIME PANEL until 11 Aug 2026
@@ -751,7 +749,12 @@ ${plan ? `        <div class="ci-plan-head">
    */
   function _continue() {
     const prescribed = store.get("prescribedExercises");
-    if (Array.isArray(prescribed) && prescribed.length > 0) return _showActionButtons();
+    // P-27. A Plan door is waiting (its steps, or Home's coach choice): go on
+    // to it. Read from where the person is going, never the tier (the check-in
+    // never asks the tier); only the Plan's doors set these.
+    const pendingTo = store.get("pendingDoorRoute");
+    const doorWaiting = pendingTo === "path" || (pendingTo === "today" && !!router.pathStart?.coach);
+    if (Array.isArray(prescribed) && prescribed.length > 0 && !doorWaiting) return _showActionButtons();
     _saveAll();
     const pending = store.get("pendingDoorRoute");
     store.set("pendingDoorRoute", null);

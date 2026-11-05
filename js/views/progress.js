@@ -1,5 +1,11 @@
 /**
  * progress.js
+ * 05 Nov 2026 v34
+ *
+ * v34 - P-27 TIDY (Graeme, 05 Nov: retire the twelve-week programme on the
+ *   Plan). The More list's programme row is gone (it opened a nearly empty
+ *   page). Free has no such row.
+ *
  * 01 Nov 2026 v33
  *
  * v33 - P-20 TRENDS-BUILD, session 1 (approved 01 Nov, Graeme). On the
@@ -559,8 +565,7 @@ export function ProgressView(router) {
     const rows = [
       lifts.length ? _prRow('lifts', 'Your lifts', `${lifts.length} logged, first to latest`, 'data-pr-page="lifts"') : '',
       weightOn ? _prRow('weight', 'Your weight', latest ? `${formatWeight(latest.kg, store.get('weightUnit') || 'kg')} \u00b7 ${_weightDate(latest.at)}` : 'Nothing logged yet', 'data-pr-page="weight"') : '',
-      stats.hasActiveProgramme && premium ? _prRow('programme', stats.programmeName || 'Your programme',
-        `${stats.weeksIn === 0 ? 'Just started' : `Week ${stats.weeksIn}`} \u00b7 ${stats.phaseName}`, 'data-pr-page="programme"') : '',
+      // P-27. The twelve-week programme is retired on the Plan: its row is gone.
       _prRow('year', 'Your year', 'Every session since you started', 'id="progress-year-btn" aria-label="Your year: look back across your year"'),
       _prRow('share', 'Share your progress', 'A picture, a certificate, a report or text', 'data-share-open'),
     ].filter(Boolean);

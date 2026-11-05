@@ -1,5 +1,11 @@
 /**
  * js/views/stretch-arc.js
+ * 05 Nov 2026 v9
+ *
+ * v9 - P-27 TIDY (Graeme, 05 Nov). Start today's session is Home's Let me
+ *   choose for you (startCoachChoice): it reused whatever was last asked
+ *   for ("You asked for stretching") instead of the coach's choice.
+ *
  * 31 Oct 2026 v8
  *
  * v8 - STAGE PATH Session 9 (CLOSE; P-12 F5; Graeme, 31 Oct: "‹ Back"). On
@@ -92,6 +98,7 @@ import { aimById, STRANDS } from "../data/aims.js";
 import { strandReadback, arcWeek } from "../data/arc-readback.js";
 import { arcSetupMode } from "./arc-setup.js";
 import { lineIcon } from "../data/line-icons.js";
+import { startCoachChoice } from "./plan-home.js";   // P-27
 
 const aimLabel    = id => (aimById(id) || {}).label || "";
 const strandLabel = id => (STRANDS[id] || {}).label || "";
@@ -337,13 +344,8 @@ export function StretchArcView(router) {
     });
 
     container.querySelector("#sa-today-btn")?.addEventListener("click", () => {
-      // The coach's plan leans on the arc; it asks how today is first.
-      if (store.checkedInToday()) {
-        router.navigate("coach-proposal");
-      } else {
-        store.set("pendingDoorRoute", "coach-proposal");
-        router.navigate("checkin");
-      }
+      // P-27. The coach's choice, as Home's row: it leans on the arc.
+      startCoachChoice(router);
     });
 
     container.querySelector("#sa-stretch-btn")?.addEventListener("click", () => {

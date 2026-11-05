@@ -1,6 +1,13 @@
 /**
  * activity-log.js - Universal Activity Logging View
- * 01 Nov 2026 v6
+ * 05 Nov 2026 v7
+ *
+ * v7 - P-27 TIDY (Graeme, 05 Nov: "One picker"). The Library's own grid is
+ *   gone; this is the one picker, so it gains what only that grid had:
+ *   Mindful and gentle (Yoga, Pilates, Stretching, Meditation) and
+ *   Something else. Types "yoga", "stretch" and "mindful" were already
+ *   known everywhere; "pilates" and "other" are new (labels, kind, colour
+ *   in the same release; Schema v1.122). Both tiers.
  *
  * v6 - P-20 session 4 (Graeme, 01 Nov). "Body Balance" is a branded class's
  *   name (a trademark, as HYROX is): the choice is now "Yoga or Pilates
@@ -55,7 +62,7 @@ import { lineIcon } from "../data/line-icons.js";
 // STAGE PATH P-8 / P-12. The Plan's look: one tier check, a class and line icons.
 const _plan = () => isPremium();
 const _planCls = () => (_plan() ? " is-plan" : "");
-const PLAN_ICON = { run: "run", walk: "walk", cycle: "cycle", swim: "swim", row: "wave", gym: "gym", "body-balance": "yoga", "reformer-class": "yoga", spin: "cycle",
+const PLAN_ICON = { yoga: "yoga", pilates: "yoga", stretch: "mobility", mindful: "mind", other: "plus", run: "run", walk: "walk", cycle: "cycle", swim: "swim", row: "wave", gym: "gym", "body-balance": "yoga", "reformer-class": "yoga", spin: "cycle",
   boxing: "strength", hiit: "strength", class: "classes", tennis: "outside", football: "outside", golf: "outside", sport: "outside",
   hike: "mountain", "outdoor-cycle": "cycle", outdoor: "outside" };
 const _icon = item => (_plan() ? lineIcon(PLAN_ICON[item.id] || "outside", 22) : item.icon);
@@ -108,6 +115,13 @@ const ACTIVITY_GROUPS = [
     { id: "hike", label: "Hike", icon: "\u26F0" },
     { id: "outdoor-cycle", label: "Outdoor cycle", icon: "\uD83D\uDEB4" },
     { id: "outdoor", label: "Other outdoor", icon: "\uD83C\uDF32" },
+  ]},
+  { group: "Mindful and gentle", items: [
+    { id: "yoga", label: "Yoga", icon: "\uD83E\uDDD8" },
+    { id: "pilates", label: "Pilates", icon: "\uD83E\uDDD8" },
+    { id: "stretch", label: "Stretching", icon: "\uD83C\uDF3F" },
+    { id: "mindful", label: "Meditation", icon: "\uD83D\uDE4F" },
+    { id: "other", label: "Something else", icon: "\u2754" },
   ]},
 ];
 

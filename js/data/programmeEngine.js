@@ -1,6 +1,11 @@
 /**
  * programmeEngine.js
- * 12 Oct 2026 v12
+ * 05 Nov 2026 v13
+ *
+ * v13 - P-27 TIDY (Graeme, 05 Nov: retire the twelve-week programme on the
+ *   Plan). getPhaseBias() is neutral on both tiers: a programme started
+ *   before no longer nudges the coach. plannedFocusToday() unchanged (it
+ *   reads the old weekly plan, A-3's).
  *
  * v12 - A-3 RETIRE-WEEKLY-PLAN (Stage AWARD). plannedFocusToday() reads
  *   nothing from the old weekly plan once Your week is set.
@@ -125,7 +130,7 @@ import { daysAgo }        from './activity-labels.js';
 // PLAN-PICKER-TIER, 06 Sep 2026. See plannedFocusToday() and
 // getPhaseBias() below for why the tier check lives at the read.
 import { isPremium }      from '../auth.js';
-import { getProgramme, getPhaseForWeek, getIntensityBiasForWeek, getFocusBiasForWeek } from './programmes.js';
+import { getProgramme, getPhaseForWeek } from './programmes.js';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -283,23 +288,12 @@ export function getCurrentPhaseMessage() {
  * @returns {{ intensityBias: string, focusBias: string[] }}
  */
 export function getPhaseBias() {
-  // PLAN-PICKER-TIER. Same reason as plannedFocusToday(). Returns the
-  // SAME neutral shape the no-programme branch below returns, so free
-  // gets the app's default behaviour rather than a special case -- a
-  // second shape here would be a second thing to keep in sync.
-  if (!isPremium()) {
-    return { intensityBias: 'moderate', focusBias: ['strength', 'mobility'] };
-  }
-  const ap = store.get('activeProgramme');
-  if (!ap?.programmeId) {
-    return { intensityBias: 'moderate', focusBias: ['strength', 'mobility'] };
-  }
-
-  const programme = getProgramme(ap.programmeId);
-  return {
-    intensityBias: getIntensityBiasForWeek(programme, ap.currentWeek || 1),
-    focusBias:     getFocusBiasForWeek(programme, ap.currentWeek || 1),
-  };
+  // P-27 (05 Nov 2026). Neutral on both tiers. Free never had a phase bias
+  // (PLAN-PICKER-TIER); the twelve-week programme is retired on the Plan
+  // (Graeme, 05 Nov: "Retire on the Plan"), so a programme started before
+  // shapes nothing. The arc and Your week lead. The week-by-week rule this
+  // read is archived: BNH-Files Archive/P-27 TIDY.
+  return { intensityBias: 'moderate', focusBias: ['strength', 'mobility'] };
 }
 
 /**

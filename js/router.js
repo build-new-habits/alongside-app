@@ -1,5 +1,10 @@
 /**
  * router.js
+ * 05 Nov 2026 v53
+ *
+ * v53 - P-27 TIDY: on the Plan, the old finish (reflect) is the Plan's finish
+ *   (plan-finish), for every player. Free unchanged.
+ *
  * 02 Nov 2026 v52
  *
  * v52 - P-26 ONE-BUILD-PAGE. 'build-session' registered (views/
@@ -633,6 +638,17 @@ export const router = {
       try {
         if (!this._au) this._au = await import('./auth.js');
         if (!this._au.isPremium()) { viewName = 'upgrade'; this.redirectReason = 'capture'; }
+      } catch (err) { console.error('Router: tier check failed', err); }
+    }
+    // P-27 (Graeme, 05 Nov: "The Plan's finish"). On the Plan every session
+    // ends on the Plan's finish: mood after, Loved it, Less often. Walk, run,
+    // ride, swim, yoga, classes, core, the morning session, My exercises and
+    // Make it up as I go went to the old finish, where the mood question was
+    // folded away and Lately missed them. Free unchanged.
+    if (viewName === 'reflect') {
+      try {
+        if (!this._au) this._au = await import('./auth.js');
+        if (this._au.isPremium()) viewName = 'plan-finish';
       } catch (err) { console.error('Router: tier check failed', err); }
     }
 

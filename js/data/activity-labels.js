@@ -1,6 +1,9 @@
 /**
  * js/data/activity-labels.js
- * 01 Nov 2026 v6
+ * 05 Nov 2026 v7
+ *
+ * v7 - P-27: the one log picker's Pilates, Stretching and Something else
+ *   (yoga and meditation were already here, as yoga and mindful).
  *
  * v6 - P-20: body-balance reads "a yoga or Pilates class" (the name was a
  *   trademark); reformer-class added (the Plan's Log what I did).
@@ -84,6 +87,9 @@ const LABELS = {
   "football":           ["football",                  "football"],
   "golf":               ["golf",                      "golf"],
   "sport":              ["some sport",                "sport"],
+  "pilates":            ["Pilates",                   "Pilates"],
+  "stretch":            ["some stretching",           "stretching"],
+  "other":              ["something else",            "other activity"],
 };
 
 /** Every activity type this file names (W4-12: evidence.js decides a kind for each). */

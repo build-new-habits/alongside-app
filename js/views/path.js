@@ -1,6 +1,13 @@
 /**
  * views/path.js
- * 02 Nov 2026 v11
+ * 05 Nov 2026 v12
+ *
+ * v12 - P-27 TIDY (Graeme, 05 Nov). (1) My programme leaves How would you
+ *   like it? (Graeme: "Remove it"): it replayed only the session already
+ *   built today, and after that session said "complete your check-in" to
+ *   somebody who had. (2) ‹ Back on Today's plan, from Build my session,
+ *   comes back to the length step with every choice kept
+ *   (router.pathReturn); it went Home and lost them, the same as Not today.
  *
  * v11 - P-26 ONE-BUILD-PAGE (mock-up v1 approved 02 Nov). Build my own, in
  *   Get stronger and Keep moving, opens Build a session with the door, part
@@ -282,12 +289,16 @@ export function PathView(router) {
     root = container;
     const start = router.pathStart || null;
     router.pathStart = null;
-    const door = start?.door || lastDoor;
+    // P-27. Back from Today's plan: the steps as they were left.
+    const ret = !start && router.pathReturn ? router.pathReturn : null;
+    router.pathReturn = null;
+    const door = start?.door || ret?.st?.door || lastDoor;
     // The Plan's only (A1.2): Free has no doors, and is sent Home.
     if (!isPremium() || !door || !DOOR[door]) { router.navigate("today", { replace: true }); return; }
     lastDoor = door;
     trail = [];
     st = { door };
+    if (ret && DOOR[ret.st.door]) { trail = ret.trail; st = ret.st; step = ret.step; paint(); return; }
     if (start?.saved) {
       const rec = savedSessions().find(x => x.id === start.saved);
       if (rec) { step = "prog"; st = { door, practice: markSore(practiceFromSaved(rec)), fromSaved: true }; paint(); return; }
@@ -365,7 +376,6 @@ export function PathView(router) {
           ${row({ v: "asgo", t: "Make it up as I go", d: "Go to an exercise, log your sets, then choose the next" })}
           ${row({ v: "trend", t: "Follow a fitness trend", d: trendsFor(st.door).map(([, x]) => x.short).join(", ") })}
           ${n ? row({ v: "saved", t: "Saved sessions", d: `${n} kept` }) : ""}
-          ${st.place === "gym" ? row({ v: "programme", t: "My programme", d: "Your current gym programme" }) : ""}
         </ul>`;
     },
     buildlen() {
@@ -725,7 +735,6 @@ export function PathView(router) {
         // P-24. The room that already exists: suggestions, a search, sets logged as they go.
         if (v === "asgo") { if (st.place) store.set("sessionLocation", st.place); router.navigate("capture"); return; }
         if (v === "saved") { router.savedStart = { purpose: st.door, place: st.place }; router.navigate("saved-sessions"); return; }
-        if (v === "programme") { router.navigate("gym-programme"); return; }
         if (v === "trend") return go("trends", {});
         return;
       case "trends":
@@ -883,6 +892,7 @@ export function PathView(router) {
       store.set("requestedLocation", st.place);
       setTodaysLength(st.blen || "short");
       router.planDoor = st.door;   // P-6: the door goes with the session it starts
+      router.pathBack = { step, st: { ...st }, trail: trail.map(t => ({ ...t })) };   // P-27: ‹ Back returns here
       router.navigate("coach-proposal");
     });
     root.querySelector("#path-start")?.addEventListener("click", () => startPractice(router, st.practice, { door: st.door, feeling: st.door === "feel" ? st.feeling : null }));

@@ -1,6 +1,8 @@
 /**
  * data/kind-colours.js
- * 01 Nov 2026 v2
+ * 05 Nov 2026 v3
+ *
+ * v3 - P-27: logged Pilates and stretching are violet; meditation (mindful) was green already.
  *
  * v2 - P-20: reformer-class is violet, as yoga and Pilates are.
  *
@@ -32,7 +34,7 @@ const BY_SESSION_TYPE = {
 const BY_TYPE = {
   "workout": "amber", "core-session": "amber", "morning-session": "amber", "coach-session": "amber",
   "hiit": "amber", "boxing": "amber",
-  "yoga": "violet", "yoga-session": "violet", "body-balance": "violet", "reformer-class": "violet",
+  "yoga": "violet", "yoga-session": "violet", "body-balance": "violet", "reformer-class": "violet", "pilates": "violet", "stretch": "violet",
   "walk": "blue", "walk-session": "blue", "run": "blue", "running-session": "blue",
   "swim": "blue", "swim-session": "blue", "cycle": "blue", "cycle-session": "blue",
   "outdoor-cycle": "blue", "hike": "blue", "outdoor": "blue", "row": "blue", "spin": "blue",

@@ -1,6 +1,13 @@
 /**
  * views/plan-home.js
- * 02 Nov 2026 v8
+ * 05 Nov 2026 v9
+ *
+ * v9 - P-27 TIDY (Graeme, 05 Nov). Let me choose for you hands Today's plan
+ *   the length it promised ("About 30 minutes" built a plan for the usual
+ *   length), so the plan is the one Home said. startCoachChoice(): the one
+ *   way to the coach's choice, used by Home's row, the arc's Start today's
+ *   session and an empty Saved sessions (each built its own, from a stale
+ *   request).
  *
  * v8 - P-26 ONE-BUILD-PAGE (mock-up v1 approved 02 Nov). A session the
  *   person built and saved for today (plannedFor) leads in the one row:
@@ -100,6 +107,7 @@ import { kindOf } from "../data/kind-colours.js";
 import { activityPhrase } from "../data/activity-labels.js";
 import { renderFigure } from "../figures.js";
 import { suggestToday, arcDoor, pickProgramme, movementName } from "../data/path-engine.js";
+import { setTodaysLength } from "../data/session-length.js";
 import { moodPairs, moodStory, fiveOf } from "../data/progress-report.js";
 import { EFFORT, ZONE2_ACTIVITIES, zone2Week, zone2HardDoneThisWeek } from "../data/trend-recipes.js";
 
@@ -400,6 +408,9 @@ export function goToSuggestion(router, opts = {}) {
   }
   store.set("requestedSessionType", s.sessionType || "full");
   store.set("requestedLocation", s.place || null);
+  // P-27. The length Home said (About n minutes), as today's length.
+  const LEN = [["micro", 10], ["quick", 20], ["short", 30], ["standard", 40], ["long", 50]];
+  if (Number.isFinite(s.minutes)) setTodaysLength(LEN.reduce((a, b) => Math.abs(b[1] - s.minutes) < Math.abs(a[1] - s.minutes) ? b : a)[0]);
   router.planReason = s.reason;   // Today's plan says why, once (coach-proposal.js, Session 5)
   router.planDoor = s.door || null;   // and which door it is, for the finish (Session 6)
   router.navigate("coach-proposal", opts);
@@ -433,8 +444,13 @@ export function wirePlanHome(container, router) {
     if (needsCheckin()) { store.set("pendingDoorRoute", "path"); router.navigate("checkin"); return; }
     router.navigate("path");
   }));
-  container.querySelector('[data-action="path-coach"]')?.addEventListener("click", () => {
-    if (needsCheckin()) { router.pathStart = { coach: true }; store.set("pendingDoorRoute", "today"); router.navigate("checkin"); return; }
-    goToSuggestion(router);
-  });
+  container.querySelector('[data-action="path-coach"]')?.addEventListener("click", () => startCoachChoice(router));
+}
+
+/** P-27. Let me choose for you, from anywhere: today's check-in first when
+ *  there has not been one, then the coach's choice (Home's row, the arc's
+ *  Start today's session, an empty Saved sessions). One way, one plan. */
+export function startCoachChoice(router) {
+  if (needsCheckin()) { router.pathStart = { coach: true }; store.set("pendingDoorRoute", "today"); router.navigate("checkin"); return; }
+  goToSuggestion(router);
 }

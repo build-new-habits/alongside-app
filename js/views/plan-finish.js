@@ -1,6 +1,12 @@
 /**
  * views/plan-finish.js
- * 01 Nov 2026 v2
+ * 05 Nov 2026 v3
+ *
+ * v3 - P-27 TIDY (Graeme, 05 Nov). Every Plan session ends here now (the
+ *   router sends the old finish here on the Plan); an entry a player left
+ *   for the old finish to log is logged on arrival. The undo line names the real place:
+ *   Settings › Sessions › Exercises you asked to change (it said a heading
+ *   inside that page, How you like things, which no row is called).
  *
  * v2 - P-20 TRENDS-BUILD, session 1 (approved 01 Nov, Graeme: "One day
  *   moved, minutes added"). After a snack, one unticked box: Count this as a
@@ -59,6 +65,14 @@ export function PlanFinishView(router) {
     root = container;
     entry = store.get("currentActivityEntry") || null;
     if (!isPremium() || !entry) { router.navigate(isPremium() ? "today" : "reflect", { replace: true }); return; }
+    // P-27. Players that left the logging to the old finish (run, walk, swim,
+    // ride, a class, Make it up as I go) arrive with an entry not yet in the
+    // log: it is logged now, once (logActivity is dedupe-guarded), as the
+    // old finish did.
+    if (entry.id == null || !(store.get("activityLog") || []).some(e => e && e.id === entry.id)) {
+      const created = store.logActivity({ ...entry, completedAt: entry.completedAt || new Date().toISOString() });
+      if (created) { entry = created; store.set("currentActivityEntry", created); }
+    }
     mood = null; pain = null; note = ""; empathy = null; counted = entry.counted === true;
     fb = Object.fromEntries(ids().map(id => [id, { like: false, less: false, never: false }]));
     resetSessionMoments();
@@ -121,7 +135,7 @@ export function PlanFinishView(router) {
               </span>
               ${f.less ? radios(`pf-lo-${j}`, `How much less of ${movementName(id) || "it"}?`, [["Less often", "less"], ["Not again", "never"]], f.never ? "never" : "less") : ""}
             </li>`; }).join("")}</ul>
-          <p class="path-small">Nothing here is required. Less often and Not again can be undone in Settings, How you like things.</p>` : ""}
+          <p class="path-small">Nothing here is required. Less often and Not again can be undone in Settings \u203a Sessions \u203a Exercises you asked to change.</p>` : ""}
         ${entry.snack === true ? `<div class="pf-count"><label class="pf-count__lbl"><input type="checkbox" id="pf-counted" aria-describedby="pf-count-help"${counted ? " checked" : ""}> Count this as a session</label>
           <p class="path-small" id="pf-count-help">Snacks on the same day count as one day moved, with their minutes added up.</p></div>` : ""}
         ${keep ? `<details class="finish-more finish-keep"><summary class="finish-more__summary">Keep to repeat</summary>${keep}</details>` : ""}

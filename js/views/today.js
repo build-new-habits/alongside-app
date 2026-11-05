@@ -1,5 +1,12 @@
 /**
  * today.js
+ * 05 Nov 2026 v62
+ *
+ * v62 - P-27 TIDY (Graeme, 05 Nov: retire the twelve-week programme on the
+ *   Plan). Plan Home no longer shows the chapter-end card (Run it again,
+ *   Something different, and an event date nothing on the Plan read). Free
+ *   unchanged.
+ *
  * 28 Oct 2026 v61
  *
  * v61 - STAGE PATH P-4 (blueprint Session 4; mock-up v9, approved 28 Oct,
@@ -1618,7 +1625,8 @@ export function TodayView(router) {
       greeting,
       coachNote,
       carry: _carryOn(),
-      top: _scopeNotice() + _guidanceLine() + _hingeCard() + _rescuedNote(),
+      // P-27. No chapter-end card: the twelve-week programme is retired on the Plan.
+      top: _scopeNotice() + _guidanceLine() + _rescuedNote(),
     });
     attachEvents(container);
     wirePlanHome(container, router);

@@ -1,6 +1,12 @@
 /*
  * css/components/nav-fix.css
- * 04 Jul 2026 v3
+ * 05 Nov 2026 v4
+ *
+ * v4 - P-27 TIDY (Graeme, 05 Nov: "so close to the nav bar at the bottom
+ *   that you miss the line that ... seals off the pill"). The room left
+ *   above the bar was 64px; the bar is 72px (--nav-height), so the last
+ *   8px of the last card on every screen sat under it. Now the bar's own
+ *   height plus 16px, so the last card's edge always shows.
  *
  * v3 — Root cause found: app-shell.css centres .bottom-nav using
  *   left: 50% + transform: translateX(-50%). v2 overrode left/right/width
@@ -64,7 +70,7 @@
 /* ── Main content: clear the nav bar ──────────────────────────── */
 #main-content,
 .main-content {
-  padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px)) !important;
+  padding-bottom: calc(var(--nav-height, 72px) + var(--space-4, 16px) + env(safe-area-inset-bottom, 0px)) !important;
   min-height: 100% !important;
   box-sizing: border-box !important;
 }

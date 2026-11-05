@@ -1,6 +1,12 @@
 /**
  * js/data/path-engine.js
- * 29 Oct 2026 v3
+ * 05 Nov 2026 v4
+ *
+ * v4 - P-27 TIDY (Graeme, 05 Nov). The coach's choice says what it builds:
+ *   Keep moving's whole body is cardio, as the door's own Whole body is
+ *   (path.js sessionTypeFor); it was strength, full body. Lengths are the
+ *   app's own lengths (30, 40), so Home's "About n minutes" is the length
+ *   Today's plan is built for (it said 25 over a plan built for 30).
  *
  * v3 - STAGE PATH Session 5 (words only; a touch-once exception, recorded).
  *   Two E4 sentences said more than the app does (found before any was on
@@ -71,7 +77,7 @@ export function arcDoor(strandIds = []) {
   return best[1] > 0 ? best[0] : null;
 }
 
-const ARC_TYPE = { stronger: "full", moving: "full", stretch: "stretch" };
+const ARC_TYPE = { stronger: "full", moving: "cardio", stretch: "stretch" };
 
 /**
  * suggestToday({ checkin, week, arcDoor, place, sore, likedNames, lessNames, neverNames, now })
@@ -89,14 +95,14 @@ export function suggestToday({ checkin = null, week = null, arcDoor: door = null
   const adjustments = adjustmentsFor({ checkin, sore, likedNames, lessNames, neverNames });
   const energy = checkin?.energy ?? null, mood = checkin?.mood ?? null;
   if (week) {
-    return { door: week.door || door || "moving", place: week.place || place, minutes: week.mins || 25, fromWeek: true, templateId: week.templateId || null,
+    return { door: week.door || door || "moving", place: week.place || place, minutes: week.mins || 30, fromWeek: true, templateId: week.templateId || null,
              reason: `It's ${week.name || "today's session"} in your week.`, adjustments };
   }
   if (energy === 2) return { door: "feel", feeling: "worn", place: null, minutes: 6, reason: "You said you're running on empty, so this is very gentle and short.", adjustments };
   if (mood === 2 || mood === 3) return { door: "feel", feeling: "calm", place: null, minutes: 15, reason: `You said ${said(mood)}, so this is slow and steady.`, adjustments };
   if (energy === 3) return { door: "moving", place, sessionType: "full", intensity: "light", minutes: 10, reason: "You said your energy is low, so this is short and light.", adjustments };
   const d = door || "moving";
-  const minutes = (energy != null && energy >= 7) ? 35 : 25;
+  const minutes = (energy != null && energy >= 7) ? 40 : 30;
   const reason = checkin
     ? (d === door ? "It's the next step on what you're working towards." : "A steady session to keep you moving.")
     : "I haven't checked in with you today, so this is a steady one; tell me how you are and I'll fit it to you.";

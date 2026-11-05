@@ -1,6 +1,18 @@
 /**
  * library.js - Library Page
  *
+ * 05 Nov 2026 v24
+ *
+ * v24 - P-27 TIDY (Graeme, 05 Nov). Both tiers, each a fault: (1) Log what
+ *   I did opens the logger straight away (Graeme: "One picker"); the
+ *   Library's own grid of 26 led to a second, different grid, and Yoga,
+ *   Pilates, Stretching and Meditation were not on the second one. (2)
+ *   Mindful practice › Rest day opens the quiet room's Rest (it opened the
+ *   finish of the last session, and answering wrote over how that session
+ *   felt). (3) Mindful practice › Breathing opens the breathing player the
+ *   Wellbeing tab opens (it opened an older one). On the Plan only: the
+ *   opening line no longer says sessions start only from Home's doors.
+ *
  * 01 Nov 2026 v23
  *
  * v23 - P-20 (Graeme, 01 Nov): the Classes tile "Body Balance" (a trademark)
@@ -404,10 +416,10 @@ const GUIDED_CATEGORIES = [
     icon:        "\uD83C\uDF3F",
     description: "Breathing, journaling, mindful awareness",
     sessions: [
-      { label: "Breathing",       icon: "\uD83C\uDF2C\uFE0F", target: "quiet-session", quiet: "breathing",  note: "" },
+      { label: "Breathing",       icon: "\uD83C\uDF2C\uFE0F", target: "breathing-session",                  note: "" },
       { label: "Journal",         icon: "\uD83D\uDCDD",        target: "journal-entry",                      note: "" },
       { label: "Mindful awareness",icon: "\uD83C\uDF3F",        target: "quiet-session", quiet: "mindful",   note: "" },
-      { label: "Rest day",        icon: "\uD83D\uDECC",        target: "reflect",                            note: "Log a deliberate rest" },
+      { label: "Rest day",        icon: "\uD83D\uDECC",        target: "quiet-session", quiet: "rest",       note: "" },
     ]
   },
   {
@@ -515,56 +527,8 @@ const GUIDED_CATEGORIES = [
   },
 ];
 
-const LOG_CATEGORIES = [
-  {
-    group: "Cardio",
-    items: [
-      { label: "Run",          icon: "\uD83C\uDFC3", target: "activity-log" },
-      { label: "Walk",         icon: "\uD83D\uDEB6", target: "activity-log" },
-      { label: "Cycle",        icon: "\uD83D\uDEB4", target: "activity-log" },
-      { label: "Swim",         icon: "\uD83C\uDFCA", target: "activity-log" },
-      { label: "Row",          icon: "\uD83D\uDEA3", target: "activity-log" },
-      { label: "Hike",         icon: "\uD83E\uDD7E", target: "activity-log" },
-    ]
-  },
-  {
-    group: "Classes",
-    items: [
-      { label: "Boxing",       icon: "\uD83E\uDD4A", target: "activity-log" },
-      { label: "Spin class",   icon: "\uD83D\uDEB4", target: "activity-log" },
-      { label: "HIIT",         icon: "\u26A1",        target: "activity-log" },
-      { label: "Yoga or Pilates class", icon: "\uD83E\uDDD8",  target: "activity-log" },   // v23: "Body Balance" is a trademark
-      { label: "Other class",  icon: "\uD83C\uDFE5",  target: "activity-log" },
-    ]
-  },
-  {
-    group: "Sport",
-    items: [
-      { label: "Tennis",       icon: "\uD83C\uDFBE", target: "activity-log" },
-      { label: "Football",     icon: "\u26BD",        target: "activity-log" },
-      { label: "Golf",         icon: "\u26F3",        target: "activity-log" },
-      { label: "Other sport",  icon: "\uD83C\uDFC6",  target: "activity-log" },
-    ]
-  },
-  {
-    group: "Outdoor",
-    items: [
-      { label: "Hike",         icon: "\uD83E\uDD7E", target: "activity-log" },
-      { label: "Outdoor cycle",icon: "\uD83D\uDEB4", target: "activity-log" },
-      { label: "Other outdoor",icon: "\uD83C\uDF33", target: "activity-log" },
-    ]
-  },
-  {
-    group: "Mindful and gentle",
-    items: [
-      { label: "Yoga",         icon: "\uD83E\uDDD8",  target: "activity-log" },
-      { label: "Pilates",      icon: "\uD83E\uDDD8",  target: "activity-log" },
-      { label: "Stretching",   icon: "\uD83C\uDF3F",  target: "activity-log" },
-      { label: "Meditation",   icon: "\uD83D\uDE4F",  target: "activity-log" },
-      { label: "Something else",icon: "\u2754",        target: "activity-log" },
-    ]
-  },
-];
+// P-27. LOG_CATEGORIES (the Library's own log grid) removed: Log what I did
+// opens the logger, which has every item (archived: BNH-Files Archive/P-27 TIDY).
 
 // ── Render ────────────────────────────────────────────────────────────────────
 
@@ -572,7 +536,6 @@ export function render() {
   if (screen === "landing")       return renderLanding();
   // LOOK-4: the Start a session page is folded into the Library page.
   if (screen === "guided")        return renderLanding();
-  if (screen === "log")           return renderLogLanding();
   if (screen.startsWith("guided-")) return renderGuidedSubScreen(screen.replace("guided-", ""));
   return renderLanding();
 }
@@ -584,7 +547,7 @@ function renderLanding() {
     <div class="view library-view${isPremium() ? " is-plan" : ""}">
       <div class="view-header">
         <h1>Library</h1>
-${isPremium() ? `        <p class="library-purpose">Your own things, classes and practices. Sessions start from Home\u2019s doors.</p>
+${isPremium() ? `        <p class="library-purpose">What the doors don\u2019t hold: your own sessions and lists, classes and practices.</p>
 ` : ""}      </div>
 
       ${isPremium() ? `<h2 class="look-label" id="lib-start-h">What's here</h2>` : `<h2 class="look-label" id="lib-start-h">Start a session</h2>`}
@@ -716,45 +679,6 @@ function renderGuidedSubScreen(categoryId) {
   `;
 }
 
-// ── Log an activity landing ───────────────────────────────────────────────────
-
-function renderLogLanding() {
-  return `
-    <div class="view library-view${isPremium() ? " is-plan" : ""}">
-      <div class="library-sub-header">
-        ${isPremium() ? `<button class="btn btn-ghost plan-back" id="lib-back-btn" aria-label="Back to Library">‹ Back</button>` : `<button class="btn btn-ghost" id="lib-back-btn" aria-label="Back to Library">
-          \u2190 Back
-        </button>`}
-        <h1>Log what I did</h1>
-      </div>
-
-      <div class="card card-coach" style="margin-bottom: var(--space-4);">
-        <img src="assets/images/logo-icon-192.png" alt=""
-             class="coach-icon-small" aria-hidden="true">
-        <p class="coach-message-text">
-          What did you do? I will note it and factor it into what I suggest next.
-        </p>
-      </div>
-
-      ${LOG_CATEGORIES.map(group => `
-        <h3 class="library-group-heading">${group.group}</h3>
-        <div class="library-grid library-grid--compact" role="group"
-             aria-label="${group.group} activities">
-          ${group.items.map(item => `
-            <button class="library-card library-card--compact"
-                    data-log-target="${item.target}"
-                    data-log-label="${item.label}"
-                    aria-label="Log ${item.label}">
-              <span class="library-card-icon" aria-hidden="true">${item.icon}</span>
-              <span class="library-card-label">${item.label}</span>
-            </button>
-          `).join("")}
-        </div>
-      `).join("")}
-    </div>
-  `;
-}
-
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 // 05 Aug 2026 -- added preselectType param. When set, writes
@@ -834,9 +758,11 @@ function rerender() {
 export function onMount() {
 
   // Landing (LOOK-4: the categories are on it; no Start a session step)
+  // P-27. One picker: the logger itself.
   document.getElementById("lib-log-activity-btn")?.addEventListener("click", () => {
-    screen = "log";
-    rerender();
+    presetLogActivity(null);
+    screen = "landing";
+    router.navigate("activity-log");
   });
 
   // Back button — context-aware
@@ -895,15 +821,4 @@ export function onMount() {
     });
   });
 
-  // Log activity cards
-  document.querySelectorAll("[data-log-target]").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const target = btn.dataset.logTarget;
-      const label  = btn.dataset.logLabel;
-      // Pre-populate activity log with the selected type
-      presetLogActivity(label);   // W6-9: the activity log reads this
-      screen = "landing";
-      router.navigate(target);
-    });
-  });
 }

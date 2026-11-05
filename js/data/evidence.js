@@ -1,6 +1,8 @@
 /**
  * js/data/evidence.js
- * 01 Nov 2026 v5
+ * 05 Nov 2026 v6
+ *
+ * v6 - P-27: logged Pilates is mobility, as yoga is; Something else has no kind.
  *
  * v5 - P-20: reformer-class counts as a class.
  *
@@ -81,6 +83,7 @@ export const KIND_OF = {
   freestyle: null, capture: null, "prescribed-session": null, practice: null, outdoor: null,
   swim: null, "swim-session": null, cycle: null, "cycle-session": null, "outdoor-cycle": null,
   row: null, spin: null, boxing: null, hiit: null, tennis: null, football: null, golf: null, sport: null,
+  pilates: "mobility", other: null,
 };
 const SHAPED = new Set(["workout", "coach-session"]);
 /** The kind one session was, from the fixed list, or null. */

@@ -1,5 +1,14 @@
 /**
  * coach-proposal.js
+ * 05 Nov 2026 v68
+ *
+ * v68 - P-27 TIDY (Graeme, 05 Nov). (1) When the coach chose (Let me choose
+ *   for you), the plan says the coach's reason and never "You asked for":
+ *   nobody had asked. (2) From a door's Build my session, ‹ Back returns to
+ *   the door's length step with every choice kept; Not today is the one way
+ *   to leave (both went Home). (3) A plan made lighter says why above Keep
+ *   my usual plan (the button stood alone). Free unchanged.
+ *
  * 02 Nov 2026 v67
  *
  * v67 - P-23 SWAP-SEARCH. A row's swap list ends with Search for something
@@ -898,7 +907,7 @@ import { AVAILABLE_TIME_WINDOW_MINUTES } from '../data/time-windows.js';
 import { lengthCatForToday, setTodaysLength } from '../data/session-length.js';
 import { buildSession, buildCandidatePools, equipmentForLocation,
          swapAlternatives, swapExerciseInSession, soreLevelFor,
-         soreScoresToday, SESSION_TYPES, exerciseSeconds, gentleReason } from '../session-builder.js';
+         soreScoresToday, SESSION_TYPES, exerciseSeconds, gentleReason, GENTLE_LINES } from '../session-builder.js';
 import { activityPhrase, joinList, daysAgo } from '../data/activity-labels.js';
 // SMOOTH-P2a. The plan carries the safety note when it is due.
 import { isGateDue, isGuidanceDue, recordAcknowledgement,
@@ -976,6 +985,7 @@ export function CoachProposalView(router) {
   let planWhy    = null;
   // P-6. The door this plan came through (router.planDoor, read once).
   let planDoor   = null;
+  let pathBack   = null;   // P-27: the door's steps, for ‹ Back
 
   // ── Mount ──────────────────────────────────────────────────────────────────
 
@@ -988,6 +998,9 @@ export function CoachProposalView(router) {
     if (router) router.planReason = null;
     planDoor = isPremium() && ['stronger', 'moving', 'stretch', 'feel'].includes(router?.planDoor) ? router.planDoor : planDoor;
     if (router) router.planDoor = null;
+    // P-27. Came from a door's steps: ‹ Back goes back to them.
+    pathBack = isPremium() && router?.pathBack ? router.pathBack : null;
+    if (router) router.pathBack = null;
     const keep = isPremium() && router?.planKeep ? router.planKeep : null;
     if (router) router.planKeep = null;
     if (keep) {
@@ -1716,6 +1729,12 @@ export function CoachProposalView(router) {
     if (option.weekDay && option.weekDay.sentence) return option.weekDay.sentence;
     const req = store.get('requestedSessionType');
     const t   = req ? SESSION_TYPES.find(x => x.id === req) : null;
+    // P-27. The coach chose (planWhy): its reason leads, and nobody asked.
+    if (planWhy) {
+      const total = _planTotal(option), want = _getAvailableTimeMinutes();
+      return (total && Math.abs(total - want) > 5 ? `This one comes to about ${total} minutes.` : '') +
+        (option.conditionNote ? ` ${option.conditionNote}` : '');
+    }
     if (t && _deliveredType(option) === req) {
       // W4-20. The length said is the plan's own: "40 minutes" sat over
       // "About 25 min". The asked length is said back, and the plan's
@@ -1787,7 +1806,8 @@ export function CoachProposalView(router) {
     if (!option.lighter) return '';
     return `
       <div class="cp-offer" role="note">
-        <button class="btn btn-secondary" id="cp-lighter-decline">Keep my usual plan</button>
+        ${!isPremium() || String(_planSentence(option)).includes(GENTLE_LINES.busy()) ? '' : `<p class="cp-offer__text">${GENTLE_LINES.busy()}</p>
+        `}<button class="btn btn-secondary" id="cp-lighter-decline">Keep my usual plan</button>
       </div>`;
   }
 
@@ -2049,7 +2069,11 @@ export function CoachProposalView(router) {
     if (!panel) return;
 
     panel.querySelector('.cp-preview-panel__backdrop')?.addEventListener('click', () => closePreviewPanel(container));
-    panel.querySelector('#cp-preview-close')?.addEventListener('click', () => closePreviewPanel(container));
+    panel.querySelector('#cp-preview-close')?.addEventListener('click', () => {
+      // P-27. From a door's steps: back to them, every choice kept.
+      if (pathBack) { const r = pathBack; pathBack = null; closePreviewPanel(container, { navigateHome: false }); router.pathReturn = r; router.navigate('path'); return; }
+      closePreviewPanel(container);
+    });
     panel.querySelector('#cp-preview-not-today')?.addEventListener('click', () => closePreviewPanel(container));
 
     // LOCATION-1. Changing an assumption REBUILDS the plan, because a
