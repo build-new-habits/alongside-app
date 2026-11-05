@@ -1,6 +1,13 @@
 import { createRequire as __cr } from "node:module";
 /**
  * tools/verify-library-shelf.mjs
+ * 05 Nov 2026 v3
+ *
+ * v3 - P-27 TIDY. 1d: the Library's line says what it holds (its tiles start
+ *   sessions too; it said they start only from the doors). 2d reversed with
+ *   Graeme's decision (05 Nov, "Remove it"): Get stronger › Gym has no My
+ *   programme row; the at-home control is kept.
+ *
  * 02 Nov 2026 v2
  *
  * v2 - P-26 ONE-BUILD-PAGE re-point (Graeme, 02 Nov: one Build a session
@@ -88,7 +95,8 @@ const WANT = ["Mindful practice", "Practices", "My exercises", "Classes", "Saved
 ok("1a. exactly Classes, Practices, Mindful practice, My exercises, Saved sessions and Your week", JSON.stringify([...names].sort()) === JSON.stringify([...WANT].sort()), names.join(", "));
 ok("1b. each says what it is for", tiles.every(t => txt(t.querySelector(".library-category-sub")).length > 8));
 ok("1c. and Log what I did", txt(main.querySelector("#lib-log-activity-btn")).startsWith("Log what I did"));
-ok("1d. it says where sessions start", /Sessions start from Home.s doors/.test(txt(main.querySelector(".library-purpose"))));
+// v3 (P-27): sessions start here too (Classes, Saved sessions, My exercises), so it says what it holds.
+ok("1d. it says what it holds, and no longer that sessions start only from the doors", /What the doors don.t hold/.test(txt(main.querySelector(".library-purpose"))) && !/Sessions start from Home.s doors/.test(txt(main)));
 navs = []; click(tiles.find(t => /Saved sessions/.test(txt(t))));
 ok("1e. Saved sessions opens the list", navs.includes("saved-sessions"), JSON.stringify(navs));
 
@@ -107,8 +115,8 @@ ok("2b. Stretch › Yoga & Pilates opens Yoga & Pilates", navs.join() === "yoga-
 fixture(); path("stretch"); navs = []; tapRow("mobility");
 ok("2c. Stretch › A mobility session: the coach's mobility plan, for Stretch", navs.join() === "coach-proposal" && store.get("requestedSessionType") === "mobility" && (fakeRouter.planDoor || realRouter.planDoor) === "stretch", `${navs} ${store.get("requestedSessionType")} ${fakeRouter.planDoor}`);
 fixture(); path("stronger"); tapRow("gym"); tapRow("whole");
-navs = []; tapRow("programme");
-ok("2d. Get stronger › Gym: My programme", navs.join() === "gym-programme", JSON.stringify(navs));
+// v3 (P-27, Graeme 05 Nov: "Remove it"): no My programme behind Get stronger › Gym.
+ok("2d. Get stronger › Gym: no My programme row (the rest of How would you like it? is there)", !main.querySelector('.path-row[data-v="programme"]') && !!main.querySelector('.path-row[data-v="coach"]') && !!main.querySelector('.path-row[data-v="own"]'));
 fixture(); path("stronger"); tapRow("home"); tapRow("whole");
 ok("2d. control: at home there is no gym programme row", !main.querySelector('.path-row[data-v="programme"]'));
 fixture(); path("stronger"); tapRow("home"); tapRow("upper"); navs = []; tapRow("own");

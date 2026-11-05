@@ -1,5 +1,11 @@
 /**
  * tools/verify-path-engine.mjs
+ * 05 Nov 2026 v3
+ *
+ * v3 - P-27 TIDY. 1e and 1f follow the engine's lengths, which are now the
+ *   app's own lengths (30 and 40; they were 25 and 35, which no plan is
+ *   built for). Same rule, same order; nothing loosened.
+ *
  * 29 Oct 2026 v2
  *
  * v2 - Two E4 sentences reworded to what the app does (Graeme, 29 Oct,
@@ -84,9 +90,9 @@ for (const m of [2, 3]) { s = st({ checkin: ci(6, m) });
 s = st({ checkin: ci(3, 6) });
 ok("1d. Low energy -> Keep moving, at the last place, full body, 10 minutes", s.door === "moving" && s.place === "gym" && s.sessionType === "full" && s.minutes === 10, JSON.stringify(s));
 s = st({ checkin: ci(6, 6) });
-ok("1e. Otherwise -> the arc's door at the last place, 25 minutes", s.door === "stronger" && s.place === "gym" && s.minutes === 25, JSON.stringify(s));
+ok("1e. Otherwise -> the arc's door at the last place, 30 minutes", s.door === "stronger" && s.place === "gym" && s.minutes === 30, JSON.stringify(s));
 s = st({ checkin: ci(7, 6) });
-ok("1f. Good energy -> 35 minutes", s.minutes === 35, JSON.stringify(s));
+ok("1f. Good energy -> 40 minutes", s.minutes === 40, JSON.stringify(s));
 s = st({ checkin: ci(9, 9), arcDoor: "stretch" });
 ok("1g. A Stretch arc -> the Stretch door, no place asked", s.door === "stretch" && s.place === null, JSON.stringify(s));
 s = st({ checkin: null });

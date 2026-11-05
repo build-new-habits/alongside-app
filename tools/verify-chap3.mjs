@@ -1,5 +1,13 @@
 /**
  * tools/verify-chap3.mjs
+ * 05 Nov 2026 v5
+ * P-27 TIDY re-point (Graeme, 05 Nov: retire the twelve-week programme on
+ * the Plan). The hinge card is Free's now: the Home checks run on Free
+ * (Free unchanged: a lapsed Plan user finishes what they started), and a new
+ * check holds that Plan Home shows no hinge. Section 10 (the event question,
+ * the Plan's only) retires with the Plan's hinge: one check holds it is asked
+ * on neither tier. Archived as it was: BNH-Files Archive/P-27 TIDY.
+ *
  * 28 Oct 2026 v4
  * STAGE PATH P-4 re-point (none loosened). The Plan's way through is its
  * four purpose doors (.path-door), drawn under the hinge. The
@@ -192,14 +200,20 @@ check('the finished chapter shows on My Programme',
 
 const { TodayView } = await import(B + 'views/today.js');
 
-function home(seedFn) {
+// P-27. Free by default: the hinge is Free's now (the Plan retired it).
+function home(seedFn, tier = 'free') {
   seedFn();
+  store.set('tier', tier);
   const c = document.getElementById('c');
   const navs = [];
   TodayView({ navigate: v => navs.push(v) }).mount(c);
   return { c, navs, text: c.textContent.replace(/\s+/g, ' ') };
 }
 
+// P-27. The Plan shows no chapter-end card (the programme is retired there).
+const planHinge = home(() => { seed(120); PE.advanceWeekIfNeeded(); }, 'personal');
+check('P-27: Plan Home shows no chapter-end card, with a chapter just finished',
+  PE.isHingePending() && !planHinge.c.querySelector('.today-hinge') && planHinge.c.querySelectorAll('.path-door').length > 0);
 const atHingeHome = home(() => { seed(120); PE.advanceWeekIfNeeded(); });
 check('the hinge appears on HOME, not one session view in thirteen',
   !!atHingeHome.c.querySelector('.today-hinge'));
@@ -299,83 +313,16 @@ check('and the shared successor matches what My Programme renders',
   PE.chapterSuccessor('feel-good-foundation')?.id === 'ground' &&
   PE.chapterSuccessor('build') === null);
 
-// ── 10. CHAP-1 step 6. The event goal, at the FIRST hinge. ──────────
-//
-// Blueprint §7: offered at the first hinge, NOT at signup — "most
-// people have no event, and asking implies they ought to". At signup
-// the question tells somebody with no answer that they are missing one.
-// After a finished chapter it is fair, because they have just shown
-// they finish things.
-
-const evHome = home(() => { seed(120); PE.advanceWeekIfNeeded(); });
-check('the first hinge asks about an event',
-  /anything you're working towards/i.test(evHome.text));
-check('and it does not block the chapter choice',
-  evHome.c.querySelectorAll('[data-hinge]').length === 3,
-  'an aside underneath, not a gate in front');
-check('there is no skip button',
-  !/skip/i.test(evHome.c.innerHTML),
-  'a skip makes ignoring it feel like a decision; doing nothing is a complete answer');
-
-// Answering it.
-evHome.c.querySelector('[data-event="open"]')?.click();
-const whatEl = document.getElementById('c').querySelector('#hinge-event-what');
-const whenEl = document.getElementById('c').querySelector('#hinge-event-when');
-check('the form opens', !!whatEl && !!whenEl);
-if (whatEl && whenEl) {
-  whatEl.value = 'The coast path walk';
-  whenEl.value = new Date(Date.now() + 40 * 864e5).toISOString().split('T')[0];
-  document.getElementById('c').querySelector('[data-event="save"]')?.click();
-}
-check('saving records the event where My Programme reads it',
-  store.get('strategicGoal.targetDescription') === 'The coast path walk' &&
-  !!store.get('strategicGoal.targetDate'),
-  'strategicGoal is the structured home TARGET-3 prefers');
-
-// Asked ONCE.
-const askedTwice = home(() => {
-  store.set('activeProgramme.completed', true);
-  store.set('activeProgramme.programmeId', 'beginner-fitness');
-});
-check('and it is never asked twice',
-  !/anything you're working towards/i.test(askedTwice.text),
-  'hingeOfferedAt records that the question was put');
-
-// Declining still counts as being asked.
-const evDeclined = home(() => { seed(120); PE.advanceWeekIfNeeded(); });
-evDeclined.c.querySelector('[data-event="open"]')?.click();
-document.getElementById('c').querySelector('[data-event="cancel"]')?.click();
-check('declining is remembered',
-  !!store.get('programme.hingeOfferedAt') &&
-  !store.get('strategicGoal.targetDescription'),
-  'a question put and declined has still been put');
-
-// And the ONLY thing suppressing it here is hingeOfferedAt: no target
-// was saved. The earlier "asked twice" check passed for the wrong
-// reason — a target had been saved by the test above, so hasTarget
-// alone was doing the work and removing the alreadyAsked guard changed
-// nothing. Reversal testing found that; this is the assertion that
-// actually pins it.
-const reRendered = home(() => {
-  store.set('activeProgramme.programmeId', 'beginner-fitness');
-  store.set('activeProgramme.completed', true);
-  store.set('programme.hingeOfferedAt', new Date().toISOString());
-  store.set('programme.chaptersDone', [{ id: 'beginner-fitness', name: 'Build Your Base' }]);
-});
-check('and having been asked once is enough on its own',
-  !/anything you're working towards/i.test(reRendered.text) &&
-  !store.get('strategicGoal.targetDate'),
-  'no target set — hingeOfferedAt is the only thing suppressing it');
-
-// Somebody who already told onboarding is not asked at all.
-const evHasOne = home(() => {
-  seed(120);
-  store.set('targetDate', new Date(Date.now() + 20 * 864e5).toISOString());
-  PE.advanceWeekIfNeeded();
-});
-check('somebody who already has a target is never asked',
-  !/anything you're working towards/i.test(evHasOne.text),
-  'including one set at onboarding, in the top-level field');
+// ── 10. CHAP-1 step 6, retired (P-27). ───────────────────────────────
+// The event question at the first hinge was the Plan's only (R2-a), and the
+// Plan has no hinge now (Graeme, 05 Nov: retire the twelve-week programme on
+// the Plan; the date it saved was read by nothing on the Plan). Held: it is
+// asked on neither tier, and the chapter choice is still there on Free.
+const evPlan = home(() => { seed(120); PE.advanceWeekIfNeeded(); }, 'personal');
+const evFree = home(() => { seed(120); PE.advanceWeekIfNeeded(); });
+check('P-27: the event question is asked on neither tier',
+  !/anything you're working towards/i.test(evPlan.text) && !/anything you're working towards/i.test(evFree.text) &&
+  evFree.c.querySelectorAll('[data-hinge]').length === 3);
 
 console.log(failures === 0 ? '\nALL PASS\n' : `\n${failures} FAILURE(S)\n`);
 process.exit(failures === 0 ? 0 : 1);

@@ -1,5 +1,12 @@
 /**
  * tools/verify-checkin-three.mjs
+ * 05 Nov 2026 v5
+ *
+ * v5 - P-27 TIDY (Graeme, 05 Nov: "Remove it"). TEST 5 reversed with the
+ *   decision: the sore question offers no sleep link, and finishing without
+ *   one stores no sleep answer. Both tiers (the check-in asks everyone the
+ *   same questions).
+ *
  * 31 Oct 2026 v4
  *
  * v4 - STAGE PATH Session 9. On the Plan the check-in has a heading and its
@@ -185,13 +192,14 @@ ok("4g. REVERSAL: \"Nothing today\" records the listed condition as quiet",
    ((store.get("conditionPainScores") || {})["lower-back"] ?? 0) === 0);
 
 // ── 5. OPTIONAL SLEEP ───────────────────────────────────────────────────
-console.log("\nTEST 5 - sleep can be added, never required");
+console.log("\nTEST 5 - P-27: sleep is no longer asked");
 ({ navs } = setup());
 await tap(/^Okay$/); await tap(/^Okay$/);
-ok("5a. the sore question offers \"Add how you slept\"", !!(await waitFor(() => labelsNow().some(l => /how you slept/i.test(l)))));
-await tap(/how you slept/i); await tap(/^Poor$/); await tap(/^Nothing today$/);
+const soreShown = await waitFor(() => labelsNow().some(l => /^Nothing today$/.test(l)));
+ok("5a. the sore question is there, with no sleep link beside it", !!soreShown && !labelsNow().some(l => /slept|sleep/i.test(l)), labelsNow().join(" | "));
+await tap(/^Nothing today$/);
 await waitFor(() => navs.length > 0, 4000);
-ok("5b. a given answer is stored", (checkinData.getTodaysCheckin() || {}).sleepQuality === "poor");
+ok("5b. finished, and no sleep answer is stored", navs.length > 0 && (checkinData.getTodaysCheckin() || {}).sleepQuality == null);
 
 // ── 6. PRESCRIBED EXERCISES ─────────────────────────────────────────────
 console.log("\nTEST 6 - someone with prescribed exercises still gets that choice");

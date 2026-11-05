@@ -1,5 +1,12 @@
 /**
  * tools/verify-sleep1.mjs
+ * 05 Nov 2026 v7
+ *
+ * v7 - P-27 TIDY (Graeme, 05 Nov: "Remove it"). Check 4 reversed with the
+ *   decision: the check-in no longer offers the sleep question, on either
+ *   tier. Checks 1-3 unchanged (an old stored answer is still read safely,
+ *   and still said truthfully).
+ *
  * 04 Oct 2026 v6
  *
  * v6 - LOOK-1. Settings' rows live on section pages, not the index. Check 5
@@ -112,10 +119,10 @@ check('3  the answer is still stored — the claim went, the data did not',
   /sleepQuality:\s*data\.sleepQuality/.test(checkinData));
 
 const checkinView = fs.readFileSync(path.join(root, 'js/views/checkin.js'), 'utf8');
-// SMOOTH-P1, 28 Sep 2026: sleep is optional, one link away, and asked
-// only if the person offers it. Driven in verify-checkin-three TEST 5.
-check('4  and the check-in still lets you say how you slept (optional since SMOOTH-P1)',
-  /_askSleep\(\)/.test(strip(checkinView)));
+// P-27 (Graeme, 05 Nov: "Remove it"). The quiet sleep link is gone. Driven in
+// verify-checkin-three TEST 5; here, at source, so it cannot quietly return.
+check('4  P-27: the check-in no longer asks how you slept',
+  !/_askSleep|how you slept/i.test(strip(checkinView)) && /Anything sore or niggling today/.test(checkinView));
 
 // ── COACH-TILE ───────────────────────────────────────────────────────
 

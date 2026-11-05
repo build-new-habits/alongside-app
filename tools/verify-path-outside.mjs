@@ -1,6 +1,12 @@
 import { createRequire as __cr } from "node:module";
 /**
  * tools/verify-path-outside.mjs
+ * 05 Nov 2026 v4
+ *
+ * v4 - P-27 TIDY (Graeme, 05 Nov: "One picker", both tiers). TEST 4 makes the
+ *   one approved addition to Free's Log what I did (the Mindful and gentle
+ *   group) and no other; 4g holds that it is that block and nothing else.
+ *
  * 01 Nov 2026 v3
  *
  * v3 - P-20 re-point (Graeme, 01 Nov: rename "Body Balance", a trademark,
@@ -128,6 +134,17 @@ for (const [file, draw] of Object.entries(rooms)) {
 }
 
 // ── 4 ───────────────────────────────────────────────────────────────────
+
+// v4 (P-27, Graeme 05 Nov: "One picker"). The one approved addition to Free's
+// Log what I did: the Mindful and gentle group, and nothing else. Every other
+// byte is still held; the old markup gains exactly that block before comparing.
+function onlyMindfulAdded(a, b) {
+  let s = 0; while (s < a.length && a[s] === b[s]) s++;
+  let e = 0; while (e < a.length - s && e < b.length - s && a[a.length - 1 - e] === b[b.length - 1 - e]) e++;
+  const removed = a.slice(s, a.length - e), added = b.slice(s, b.length - e);
+  const words = added.replace(/<[^>]+>/g, " ").replace(/\p{Extended_Pictographic}|\uFE0F|\u2754/gu, " ").replace(/\s+/g, " ").trim();
+  return removed.trim() === "" && words === "Mindful and gentle Yoga Pilates Stretching Meditation Something else";
+}
 console.log("\nTEST 4 - Free, as it was on v687");
 async function asWas(file) {
   let old = "";
@@ -148,6 +165,11 @@ for (const [file, draw] of Object.entries(rooms)) {
   if (renames) a = a.replace(/Body Balance/g, "Yoga or Pilates class");
   if (file.endsWith("activity-log.js")) ok("4r. v687's Free Log what I did named Body Balance exactly twice (label and words): the rename is that and no more", renames === 2, String(renames));
   store.data = JSON.parse(snap); store.save(); await draw(NOW); const b = main.innerHTML;
+  if (file.endsWith("activity-log.js")) {
+    const g = onlyMindfulAdded(a, b);
+    ok("4g. P-27: the only change to Free's Log what I did is the Mindful and gentle group", g);
+    if (g) a = b;
+  }
   let at = 0; while (at < a.length && a[at] === b[at]) at++;
   ok(`4. Free ${file.split("/").pop()}: the same, byte for byte`, !!OLD && a === b && a.length > 200, `differs at ${at}: ${a.slice(at - 40, at + 40)} | ${b.slice(at - 40, at + 40)}`);
 }

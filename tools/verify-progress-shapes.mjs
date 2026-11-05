@@ -1,6 +1,13 @@
 /**
  * tools/verify-progress-shapes.mjs
- * 04 Oct 2026 v3
+ * 05 Nov 2026 v4
+ *
+ * v4 - P-27 TIDY (Graeme, 05 Nov: "Retire on the Plan"). RE-POINTED with
+ *   the decision: TEST 7 read the programme block one tap away on Progress;
+ *   the twelve-week programme is retired on the Plan and its row is gone, so
+ *   TEST 7 now holds that the block is not reachable on the Plan with a
+ *   programme started (7pc: the overview did render). 7a/7b (no target on
+ *   the block) retire with the block. Archived: BNH-Files Archive/P-27 TIDY.
  *
  * v3 - LOOK-2 (progress.js v26, approved by the product owner from the
  *   mock-up, 04 Oct). Three deliberate changes, each re-pointed:
@@ -288,33 +295,10 @@ function viewWith(extra) {
     currentWeek: 1
   };
   const c = viewWith({ activeProgramme: prog });
-  const txt = (c.textContent || "").replace(/\s+/g, " ");
-
-  ok("7pc. positive control: the programme block rendered",
-     /this week/i.test(txt),
-     "no weekly line at all, so 7a below would pass against a screen that " +
-     "never rendered the block — which is exactly what it did first time");
-
-  ok("7a. with no target set, none is named",
-     !/of \d+ this week/.test(txt),
-     `"${(txt.match(/\d+ of \d+ this week/) || [""])[0]}" — a target nobody ` +
-     `chose, presented as theirs`);
-
-  // LOOK-2 (re-pointed, see header). TARGET-3 said somebody who DID set a
-  // target wants to see it; the product owner reversed that for Progress on
-  // 04 Oct: the count stays, the target is kept in Settings, not shown here.
-  const c2 = viewWith({
-    activeProgramme: prog,
-    strategicGoal: {
-      weeklySessionTarget: 4,
-      setAt: new Date().toISOString(),
-      targetSetAt: new Date().toISOString()
-    }
-  });
-  const txt2 = (c2.textContent || "").replace(/\s+/g, " ");
-  ok("7b. and with one set, it is NOT shown on Progress, but this week's count is",
-     !!c2.querySelector(".progress-programme") && !/of \d+ this week/.test(txt2) && /\b\d+ this week\b/.test(txt2),
-     `"${(txt2.match(/[^.]{0,30}this week/) || [""])[0]}" — LOOK-2: "N of T this week" read as a score against a target`);
+  // P-27. The programme block is retired on the Plan.
+  ok("7pc. control: Progress rendered on the Plan", (c.textContent || "").trim().length > 40 && !!c.querySelector("h1"), (c.textContent || "").slice(0, 80));
+  ok("7. P-27: with a programme started, no programme row and no programme block",
+     !c.querySelector('[data-pr-page="programme"]') && !c.querySelector(".progress-programme"));
 }
 
 console.log(fails === 0

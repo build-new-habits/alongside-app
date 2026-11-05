@@ -1,5 +1,12 @@
 /**
  * tools/verify-look-rest.mjs
+ * 05 Nov 2026 v6
+ *
+ * v6 - P-27 TIDY (Graeme, 05 Nov: "The Plan's finish"). TEST 3: on the Plan,
+ *   reflect now opens the Plan's finish; 3b-3e (the old finish's Plan look)
+ *   are retired with the route, and 3b holds the Plan's finish with the mood
+ *   question in the open. 3pc, 3a and 3f unchanged and still pass on it.
+ *
  * 31 Oct 2026 v5
  *
  * v5 - P-13 re-point: 1f's Library row words are now "Classes, practices,
@@ -156,12 +163,10 @@ store.set("currentActivityEntry", { id: "f1", type: "workout", sessionType: "ful
 await go("reflect");
 ok("3pc. the finish screen rendered", /That.s today done/.test(txt($("h1"))), txt(main).slice(0, 100));
 ok("3a. a tick tile above the heading, decorative", !!$(".finish-head > .kind-tile svg[aria-hidden=true]"));
-const stats = $$(".finish-stat");
-ok("3b. the stats as number tiles: 2 moves, 6 sets, 32 min", JSON.stringify(stats.map(s => `${txt(s.querySelector(".finish-stat__n"))} ${txt(s.querySelector(".finish-stat__l"))}`)) === JSON.stringify(["2 moves", "6 sets", "32 min"]),
-   stats.map(txt).join(" | "));
-ok("3c. and still read as one line, \"2 moves · 6 sets · 32 min\"", txt($(".finish-stats")) === "2 moves · 6 sets · 32 min", `"${txt($(".finish-stats"))}"`);
-ok("3d. moves and sets in the session's kind colour, minutes in blue", stats[0]?.classList.contains("k-amber") && stats[1]?.classList.contains("k-amber") && stats[2]?.classList.contains("k-blue"));
-ok("3e. How did it feel? offers three", $$("[data-feel]").length === 3);
+// v6 (P-27, Graeme 05 Nov: "The Plan's finish"). On the Plan the old finish
+// is the Plan's finish, for every player. Its own look (3b-3e: number tiles,
+// How did it feel?) is Free's only now and is not reached on the Plan.
+ok("3b. P-27: on the Plan it is the Plan's finish, with the mood question in the open", router.currentView === "plan-finish" && !!$('input[name="pf-mood"]') && !$("[data-feel]"), router.currentView);
 ok("3f. the note still one tap away", !!$("details.finish-more") && !$("details.finish-more[open]"));
 
 // ── 4. WELLBEING ────────────────────────────────────────────────────────

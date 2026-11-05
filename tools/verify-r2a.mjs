@@ -1,5 +1,13 @@
 /**
  * tools/verify-r2a.mjs
+ * 05 Nov 2026 v2
+ *
+ * v2 - P-27 TIDY (Graeme, 05 Nov: retire the twelve-week programme on the
+ *   Plan). The event question lived on the Plan's chapter-end card, which is
+ *   retired: section 1 now holds that the Plan is not asked; sections 3-6
+ *   (recording an answer) retire with it. Section 2 (Free never asked)
+ *   unchanged.
+ *
  * 22 Aug 2026 v1
  *
  * R2-a — a dated target can only be recorded on the Plan.
@@ -104,12 +112,16 @@ section("0. Positive control — the fixture reaches the store");
   ok("no target yet", !store.get("strategicGoal.targetDate"));
 }
 
-// ── 1. The Plan sees the hinge ──────────────────────────────────────
-section("1. The Plan is offered the question");
+// ── 1. The Plan is not asked either (P-27) ────────────────────────────
+// Graeme, 05 Nov: retire the twelve-week programme on the Plan. Plan Home has
+// no chapter-end card, so no event question; the date it saved was read by
+// nothing the Plan can reach. Sections 3 to 6 (recording the answer) retire
+// with it; archived as they were: BNH-Files Archive/P-27 TIDY.
+section("1. P-27: the Plan is not asked (the chapter-end card is retired there)");
 {
   const el = await mount(hingeState("personal"));
-  ok("the hinge renders", el.querySelector('[data-event="open"]') !== null,
-     txt(el).slice(0, 120));
+  ok("no event question on the Plan", el.querySelector('[data-event="open"]') === null && !/working towards/i.test(txt(el)), txt(el).slice(0, 120));
+  ok("control: Plan Home rendered its doors", el.querySelectorAll(".path-door").length > 0);
 }
 
 // ── 2. Free sees nothing at all ─────────────────────────────────────
@@ -127,94 +139,6 @@ section("2. Free is not asked, and is not teased");
   // ...and free keeps everything it had.
   ok("free still has its goals", (store.get("goals") || []).includes("improve-cardio"));
   ok("free still gets a session screen", txt(el).length > 40);
-}
-
-// ── 3. Recording a target ───────────────────────────────────────────
-section("3. On the Plan, the answer is recorded properly");
-{
-  const el = await mount(hingeState("personal"));
-  el.querySelector('[data-event="open"]').dispatchEvent(new dom.window.Event("click"));
-  await wait(80);
-
-  const what = el.querySelector("#hinge-event-what");
-  const when = el.querySelector("#hinge-event-when");
-  ok("both fields appear", !!what && !!when);
-  ok("both have real <label for>",
-     el.querySelector('label[for="hinge-event-what"]') !== null &&
-     el.querySelector('label[for="hinge-event-when"]') !== null);
-
-  what.value = "Walk the Quantocks ridge with Jen";
-  when.value = "2026-12-20";
-  el.querySelector('[data-event="save"]').dispatchEvent(new dom.window.Event("click"));
-  await wait(80);
-
-  ok("the description is stored",
-     store.get("strategicGoal.targetDescription") === "Walk the Quantocks ridge with Jen");
-  ok("the date is stored in strategicGoal",
-     String(store.get("strategicGoal.targetDate")).startsWith("2026-12-20"));
-
-  // The whole reason targetSetAt exists. setAt records when the weekly
-  // FREQUENCY was agreed; using it for R1's maturity guard meant the
-  // guard protected the wrong thing.
-  const setAtDay = String(store.get("strategicGoal.targetSetAt")).slice(0, 10);
-  ok("targetSetAt is written when the date is named",
-     typeof store.get("strategicGoal.targetSetAt") === "string" && setAtDay.length === 10,
-     String(store.get("strategicGoal.targetSetAt")));
-  ok("targetSetAt is not the same field as setAt",
-     store.get("strategicGoal.targetSetAt") !== store.get("strategicGoal.setAt"));
-
-  ok("the legacy top-level date is NOT written", !store.get("targetDate"));
-  ok("the question is not asked twice", !!store.get("programme.hingeOfferedAt"));
-}
-
-// ── 4. A description with no date ───────────────────────────────────
-section("4. A description without a date is a real answer");
-{
-  const el = await mount(hingeState("personal"));
-  el.querySelector('[data-event="open"]').dispatchEvent(new dom.window.Event("click"));
-  await wait(80);
-  el.querySelector("#hinge-event-what").value = "The wedding";
-  el.querySelector('[data-event="save"]').dispatchEvent(new dom.window.Event("click"));
-  await wait(80);
-  ok("the description is stored", store.get("strategicGoal.targetDescription") === "The wedding");
-  ok("no date is invented", !store.get("strategicGoal.targetDate"));
-  ok("targetSetAt is NOT written without a date",
-     !store.get("strategicGoal.targetSetAt"), String(store.get("strategicGoal.targetSetAt")));
-}
-
-// ── 5. Declining still counts ───────────────────────────────────────
-section("5. A question put and declined has still been put");
-{
-  const el = await mount(hingeState("personal"));
-  el.querySelector('[data-event="open"]').dispatchEvent(new dom.window.Event("click"));
-  await wait(80);
-  el.querySelector('[data-event="cancel"]').dispatchEvent(new dom.window.Event("click"));
-  await wait(80);
-  ok("nothing was recorded", !store.get("strategicGoal.targetDescription"));
-  ok("but it is not asked again", !!store.get("programme.hingeOfferedAt"));
-}
-
-// ── 6. The copy ─────────────────────────────────────────────────────
-section("6. The copy claims only what R1 actually does");
-{
-  const el = await mount(hingeState("personal"));
-  const body = txt(el);
-
-  // The old line was true when nothing read the date. R1 reads it now.
-  ok("the false claim is gone", !/changes nothing about how I work/i.test(body));
-  ok("it says the coach will speak to it", /harder ask than it needs to be/i.test(body),
-     body.slice(0, 160));
-
-  // Deliberately NOT "I'll build towards it": the programme does not
-  // plan around the date and chapters are twelve weeks regardless.
-  ok("it does not promise the programme plans around the date",
-     !/build towards it|plan around|shape your programme around/i.test(body));
-  ok("no banned vocabulary",
-     !/\b(behind|on track|off track|failing|must)\b/i.test(body), body.slice(0, 160));
-
-  // And nowhere in the file, so a future edit cannot quietly restore it.
-  ok("the false claim is gone from the source too",
-     !/changes nothing about how I work/.test(src));
 }
 
 console.log(`\n${"-".repeat(60)}`);

@@ -1,5 +1,11 @@
 /**
  * tools/verify-know-what.mjs
+ * 05 Nov 2026 v11
+ *
+ * v11 - P-27 TIDY. TEST 8 re-pointed, not loosened: the coach's own kind for
+ *   Keep moving is cardio now (path-engine v4, as the door's Whole body), so
+ *   the request made here is core, and 8a expects the coach's cardio.
+ *
  * 02 Nov 2026 v10
  *
  * v10 - P-26 ONE-BUILD-PAGE re-point (Graeme, 02 Nov: one Build a session
@@ -273,15 +279,15 @@ ok("7d. no Mobility & Conditioning row on the Plan (split into the Stretch door)
 
 // ── 8. TELL ME WHAT TO DO MEANS THE COACH DECIDES ───────────────────────
 console.log("\nTEST 8 - a request made here does not ride into Tell me what to do");
-fixture(); fromHome(); choose(kindInput("cardio")); submit();
-ok("8pc. positive control: the request was made", store.get("requestedSessionType") === "cardio");
+fixture(); fromHome(); choose(kindInput("core")); submit();   // v11: core, as the coach's own kind is cardio now (P-27)
+ok("8pc. positive control: the request was made", store.get("requestedSessionType") === "core");
 const key = new Date().toISOString().split("T")[0];
 store.set("checkinHistory", { [key]: { energy: 6, mood: 6, date: new Date().toDateString() } });
 store.set("lastCheckin", { energy: 6, mood: 6, date: new Date().toDateString(), timestamp: new Date().toISOString() });
 main.innerHTML = ""; TodayView(router).mount(main); navs = [];
 // Stage PATH: the coach's choice is Home's one row now (Let me choose for you); checked in, it goes straight to the plan.
 click(main.querySelector('.path-coach[data-action="path-coach"]'));
-ok("8a. the coach's suggestion asks for its own kind, not the one asked for here", navs[0] === "coach-proposal" && store.get("requestedSessionType") === "full",
+ok("8a. the coach's suggestion asks for its own kind, not the one asked for here", navs[0] === "coach-proposal" && store.get("requestedSessionType") === "cardio",
    `${JSON.stringify(navs)} ${store.get("requestedSessionType")}`);
 
 console.log("");

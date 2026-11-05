@@ -1,5 +1,11 @@
 /**
  * tools/verify-planpicker.mjs
+ * 05 Nov 2026 v5
+ *
+ * v5 - P-27 TIDY (Graeme, 05 Nov: retire the twelve-week programme on the
+ *   Plan). 1c reversed with the decision: the Plan's phase bias is neutral,
+ *   as Free's, with a live programme in the store.
+ *
  * 12 Oct 2026 v4
  *
  * v4 - A-1 PLAN-HOME-PRUNE. 3a-2: on the Plan the classes are reached from
@@ -126,11 +132,12 @@ ok("1b. getPhaseBias is neutral on free",
    JSON.stringify(freeBias.focusBias) === JSON.stringify(["strength", "mobility"]),
    `free got ${JSON.stringify(freeBias)}`);
 
-// The two tiers must actually DIFFER, or 1b passes because the programme
-// happens to produce the neutral shape anyway and nothing is gated.
-ok("1c. and Plan's is genuinely different, so 1b is not a coincidence",
-   JSON.stringify(freeBias) !== JSON.stringify(planBias),
-   `both tiers returned ${JSON.stringify(freeBias)} - the gate may be doing nothing`);
+// P-27 (Graeme, 05 Nov: retire the twelve-week programme on the Plan). The
+// Plan's bias is neutral too now, with the same live programme 0b proved
+// reaches the store: a programme started before shapes nothing on either tier.
+ok("1c. P-27: and the Plan's is neutral too, with a programme live",
+   JSON.stringify(planBias) === JSON.stringify(freeBias) && !!store.get("activeProgramme.programmeId"),
+   `Plan got ${JSON.stringify(planBias)}`);
 
 // ── 2. THE PICKER LEFT ONBOARDING ───────────────────────────────────────
 console.log("\nTEST 2 - nobody is asked to commit before they have moved");

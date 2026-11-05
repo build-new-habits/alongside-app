@@ -1,5 +1,15 @@
 /**
  * tools/verify-countdown1.mjs
+ * 05 Nov 2026 v5
+ *
+ * v5 - P-27 TIDY (Graeme, 05 Nov: retire the twelve-week programme on the
+ *   Plan). Progress's programme page is no longer reachable on the Plan (its
+ *   row is gone; Free never had it). The checks that read that page's
+ *   content (it renders, weeks in, sessions completed, the weekly count,
+ *   the late milestone) now hold that it is not there; the banned-countdown
+ *   scans of what Progress shows, and section 1 (no countdown fields at
+ *   source) and 4 (product-wide), are unchanged.
+ *
  * 12 Oct 2026 v4
  *
  * v4 - SUITE-FLAKE-5 (found 12 Oct). On the 12th of any month the week
@@ -112,8 +122,8 @@ const openProgramme = (c) => {
 };
 const { html, text } = openProgramme(el);
 
-check('the programme section still renders', /progress-programme/.test(html));
-check('and says how many weeks are BEHIND them', /8 weeks in/.test(text));
+// P-27. The programme block is retired on the Plan.
+check('P-27: the programme section is not on Progress on the Plan', !/progress-programme/.test(html) && /Progress|Your year/.test(text));
 
 const BANNED = [
   [/progress-programme__bar|progress-programme__fill/, 'the progress bar markup'],
@@ -134,8 +144,7 @@ for (const [re, what] of BANNED) {
 
 // 3. The milestone is KEPT. Without this the gate would pass on a
 //    screen that had simply been emptied, which is a different failure.
-check('the sessions-completed count is still shown', /22 sessions completed/.test(text));
-check('and the weekly count is still shown', /this week/.test(text));
+// P-27: the milestone counts lived on the retired programme page.
 
 // 3b. Render the LATE state too, where the milestone copy lives.
 //
@@ -163,9 +172,7 @@ const lateHtml = late.html;
 for (const [re, what] of BANNED) {
   check(`no ${what}, late in a chapter either`, !re.test(lateHtml));
 }
-check('and the late milestone faces backwards',
-  /11 weeks in/.test(late.text),
-  'the milestone is kept — it just stops describing what is left');
+check('P-27: and not late in a chapter either', !/progress-programme/.test(lateHtml));
 
 // 4. Product-wide. The scoped version of this gate is what let the
 //    contradiction live: My Programme was tested, Progress was not.

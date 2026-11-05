@@ -1,5 +1,11 @@
 /**
  * tools/verify-one-week.mjs
+ * 05 Nov 2026 v2
+ *
+ * v2 - P-27 TIDY (Graeme, 05 Nov: "Tidy"). 5c re-pointed: the Plan's Goals
+ *   page no longer repeats Your week (it is its own row in Your plan), so 5c
+ *   holds the row and the absence of a second way in. Free's 5a/5b unchanged.
+ *
  * 12 Oct 2026 v1
  *
  * A-3 RETIRE-WEEKLY-PLAN (Stage AWARD), as narrowed on 12 Oct.
@@ -157,7 +163,11 @@ for (const shaped of [false, true]) {
   ok(`5b-${shaped ? "shaped" : "new"}. Free: says the coach builds each day from the check-in`, /from your check-in/i.test(t));
 }
 const tp = weekScreenText("personal", false);
-ok("5c. Plan: the week line is about Your week and Home", /Home will show today/i.test(tp), tp.slice(0, 200));
+// P-27 (Graeme, 05 Nov: "Tidy"). The Plan's Goals page holds goals and activity
+// level only; Your week is its own row in Your plan, one tap, not a second way in.
+main.innerHTML = ""; SettingsView(rtr).mount(main);
+const weekRow = settingsFind(main, '[data-action="open-weekly-plan"]');
+ok("5c. P-27 Plan: Your week is its own row in Your plan, and the Goals page has no second way to it", !!weekRow && !/Plan my week|Home will show today/i.test(tp) && /Your goals/i.test(tp), tp.slice(0, 200));
 
 console.log(`\nVERIFY-ONE-WEEK: ${passes} passed, ${fails} failed`);
 process.exit(fails ? 1 : 0);

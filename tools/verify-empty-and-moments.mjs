@@ -1,5 +1,11 @@
 /**
  * tools/verify-empty-and-moments.mjs
+ * 05 Nov 2026 v3
+ *
+ * v3 - P-27 TIDY. 1e re-pointed, not loosened: the empty list's start is Home's
+ *   Let me choose for you (startCoachChoice), so the check-in comes back for
+ *   the coach's choice (pendingDoorRoute today, pathStart.coach), as Home's row.
+ *
  * 28 Oct 2026 v2
  *
  * v2 - STAGE PATH P-4 re-point (none loosened). The new arc week is said on Plan Home's arc line (plan-home.js), still a day and never a count.
@@ -79,7 +85,8 @@ ok("1c. no longer points to a preview screen", !/preview screen/i.test(txt(main)
 const start = main.querySelector("#saved-empty-start");
 ok("1d. one way to start", !!start);
 click(start);
-ok("1e. which is the coach's session, through today's check-in", navs.at(-1) === "checkin" && store.get("pendingDoorRoute") === "coach-proposal", JSON.stringify(navs));
+// P-27: Home's Let me choose for you, the one way to the coach's choice (it built its own).
+ok("1e. which is the coach's session, through today's check-in (Home's Let me choose for you)", navs.at(-1) === "checkin" && store.get("pendingDoorRoute") === "today" && realRouter.pathStart?.coach === true, JSON.stringify(navs));
 fixture("personal"); store.set("savedSessions", [{ id: "s1", name: "Mine", exerciseIds: ["goblet-squat"], createdAt: new Date().toISOString() }]); mount(saved);
 ok("1f. with a session kept: still Saved sessions", txt(main.querySelector("h1")) === "Saved sessions" && /Mine/.test(txt(main)));
 fixture("free"); mount(saved);

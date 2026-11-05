@@ -1,5 +1,13 @@
 /**
  * tools/verify-clubshell.mjs
+ * 05 Nov 2026 v8
+ *
+ * v8 - P-27 TIDY (Graeme, 05 Nov: "Remove it" for My programme; "Retire on
+ *   the Plan" for the twelve-week programme). 2c no longer needs a
+ *   twelve-week shape reached through the doors; it now also holds that the
+ *   doors no longer open My programme. The other places know-what led stay
+ *   held. Not loosened: one alternative retired by decision, one check added.
+ *
  * 02 Nov 2026 v7
  *
  * v7 - P-26 ONE-BUILD-PAGE re-point (Graeme, 02 Nov: one Build a session
@@ -221,7 +229,7 @@ console.log("\nTEST 2 - everything the rooms and tiles reached is still within t
     const v = PathView(pr); v.mount(ph); for (const x of vs) ph.querySelector(x.startsWith("#") ? x : `.path-row[data-v="${x}"]`)?.dispatchEvent(new window.MouseEvent("click", { bubbles: true })); try { v.onUnmount?.(); } catch {} };
   walk("stronger", "home", "whole", "own");
   walk("stronger", "home", "whole", "coach", "#path-build");   // v7: Build it for me, the door's own way to Today's plan
-  walk("stronger", "gym", "whole", "programme");               // v7: a twelve-week shape, as My programme behind Get stronger › Gym
+  // v8 (P-27): My programme left Get stronger › Gym (Graeme, 05 Nov: "Remove it").
   walk("stretch", "yoga");
   const { CoachProposalView } = await import(B + "views/coach-proposal.js");
   const cph = document.createElement("div"); oneScreen(cph);
@@ -241,7 +249,9 @@ console.log("\nTEST 2 - everything the rooms and tiles reached is still within t
   // v7 (P-26). Everywhere I know what I want led on the Plan is still reached without it.
   const KW_LED = ["build-session", "saved-sessions", "yoga-session", "coach-proposal"];
   const notKw = beforeKw;
-  ok("2c. everywhere I know what I want led is reached without it", KW_LED.every(r => notKw.has(r)) && (notKw.has("goal-setup") || notKw.has("my-programme") || notKw.has("gym-programme")),
+  // v8 (P-27): a twelve-week shape is retired on the Plan (Graeme, 05 Nov), so
+  // it is no longer one of the places that must stay reached through the doors.
+  ok("2c. everywhere I know what I want led is reached without it", KW_LED.every(r => notKw.has(r)) && !notKw.has("gym-programme"),
      `missing: ${KW_LED.filter(r => !notKw.has(r)).join(", ")}`);
 }
 

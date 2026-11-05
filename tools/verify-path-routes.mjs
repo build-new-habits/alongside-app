@@ -1,6 +1,12 @@
 import { createRequire as __cr } from "node:module";
 /**
  * tools/verify-path-routes.mjs
+ * 05 Nov 2026 v8
+ *
+ * v8 - P-27 TIDY. 9a: when the coach chose, the plan says its reason and
+ *   never "You asked for" (nobody asked); the reason still leads, read once.
+ *   Tightened, not loosened.
+ *
  * 02 Nov 2026 v7
  *
  * v7 - P-26 ONE-BUILD-PAGE re-point (Graeme, 02 Nov: one Build a session
@@ -319,7 +325,8 @@ store.set("requestedSessionType", "full");
 fakeRouter.planReason = "It's the next step on what you're working towards.";
 main.innerHTML = ""; CoachProposalView(fakeRouter).mount(main); await wait(50);
 const sent = txt(main.querySelector(".cp-plan__sentence"));
-ok("9a. the coach's reason starts the plan's own sentence, read once", sent.startsWith("It's the next step on what you're working towards. ") && fakeRouter.planReason === null, sent.slice(0, 120));
+// v8 (P-27): the coach chose, so nobody "asked for" anything; the reason leads.
+ok("9a. the coach's reason starts the plan's own sentence, read once, and it never says You asked for", sent.startsWith("It's the next step on what you're working towards.") && !/You asked for/.test(sent) && fakeRouter.planReason === null, sent.slice(0, 120));
 const adjList = [...main.querySelectorAll(".cp-adjusted__list li")].map(txt);
 ok("9b. What I've adjusted: every line, now that the app does each (a low mood: no countdown timers)",
    adjList.includes("Easier options pointed out where something might niggle") && adjList.includes("No countdown timers, go at your own pace"), JSON.stringify(adjList));

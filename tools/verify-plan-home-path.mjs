@@ -1,6 +1,13 @@
 import { createRequire as __cr } from "node:module";
 /**
  * tools/verify-plan-home-path.mjs
+ * 05 Nov 2026 v3
+ *
+ * v3 - P-27 TIDY. 3b (good) says 40 minutes, the engine's length now (it was
+ *   35, a length no plan is built for); 4e expects the coach's own kind for
+ *   Keep moving, cardio (as the door's Whole body; it was strength, full
+ *   body), and now also that today's length is the one Home said.
+ *
  * 29 Oct 2026 v2
  *
  * v2 - MOCK-UP v10 (Graeme, 29 Oct: "I like v10"; v1 held v9). The Plan's
@@ -149,7 +156,7 @@ for (const [label, f] of Object.entries(STATES)) {
 console.log("\nTEST 3 - what leads");
 fixture(); home();
 ok("3a. not checked in: Let me choose for you, three quick questions first", lead().dataset.state === "coach" && /Let me choose for you/.test(txt(lead())) && /Three quick questions, then today.s plan/.test(txt(lead())), txt(lead()));
-for (const [label, ci, want2] of [["mood low", { energy: 6, mood: 3 }, /Today: Calming yoga · About 15 minutes/], ["good", { energy: 7, mood: 6 }, /Today: Whole body, moving · About 35 minutes/],
+for (const [label, ci, want2] of [["mood low", { energy: 6, mood: 3 }, /Today: Calming yoga · About 15 minutes/], ["good", { energy: 7, mood: 6 }, /Today: Whole body, moving · About 40 minutes/],
                                    ["running on empty", { energy: 2, mood: 6 }, /Today: Rest and reset · About 6 minutes/]]) {
   fixture({ checkin: ci }); home();
   ok(`3b. checked in, ${label}: the row names the engine's pick`, want2.test(txt(lead())), txt(lead()));
@@ -184,7 +191,7 @@ ok("4d. Let me choose for you, first of the day: the check-in, which comes back 
 // Back from the check-in, answered: Home goes straight on to the coach's choice.
 store.set("checkinHistory", { [todayKey]: { energy: 7, mood: 6 } }); store.set("lastCheckin", { ...store.get("lastCheckin"), energy: 7, mood: 6, timestamp: new Date().toISOString() });
 store.set("pendingDoorRoute", null); navs = []; home();
-ok("4e. back from it: straight on to Today's plan for the coach's kind (not Home)", navs.join() === "coach-proposal" && store.get("requestedSessionType") === "full" && !fakeRouter.pathStart, JSON.stringify(navs));
+ok("4e. back from it: straight on to Today's plan for the coach's kind (not Home), at the length Home said", navs.join() === "coach-proposal" && store.get("requestedSessionType") === "cardio" && store.get("availableTimeToday")?.cat === "standard" && !fakeRouter.pathStart, JSON.stringify([navs, store.get("requestedSessionType"), store.get("availableTimeToday")]));
 fixture({ checkin: { energy: 6, mood: 3 } }); home(); click(lead());
 ok("4f. checked in, mood low: the coach's choice is a feeling, opened at its steps", navs.join() === "path" && fakeRouter.pathStart?.door === "feel" && fakeRouter.pathStart?.feeling === "calm" && /You said you.re feeling low/.test(fakeRouter.pathStart?.reason || ""), JSON.stringify(fakeRouter.pathStart));
 fixture({ checkin: { energy: 6, mood: 6 }, sore: { "lower-back": 8 } }); home(); click(lead());

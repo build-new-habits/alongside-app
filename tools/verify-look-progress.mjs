@@ -1,6 +1,13 @@
 /**
  * tools/verify-look-progress.mjs
- * 06 Oct 2026 v2
+ * 05 Nov 2026 v3
+ *
+ * v3 - P-27 TIDY (Graeme, 05 Nov: "Retire on the Plan"). RE-POINTED with
+ *   the decision: the twelve-week programme is retired on the Plan, so
+ *   Progress has no programme row there, even with one started (4pc now
+ *   holds that). 4a and 4b read the programme page, which nothing on the
+ *   Plan opens any more (Free never had it); they are retired with it, not
+ *   loosened. Archived as they were: BNH-Files Archive/P-27 TIDY.
  *
  * v2 - D-11 PROGRESS-SHARE. RE-POINTED, not loosened: Share your progress
  *   is its own screen now (views/progress-share.js: a picture, a
@@ -159,11 +166,7 @@ person("personal", {
 });
 mount();
 const prow = el.querySelector("[data-pr-page=programme]");
-ok("4pc. positive control: the programme row is there", !!prow, [...el.querySelectorAll(".pr-row")].map(txt).join(" | "));
-click(prow);
-const ptxt = txt(el);
-ok("4a. this week's count is said", /\b\d+ this week\b/.test(ptxt), ptxt.slice(0, 200));
-ok("4b. and no target beside it, even one that was set", !/\d+ of \d+ this week/.test(ptxt));
+ok("4pc. P-27: no programme row on the Plan, even with one started (the rest of the list is there)", !prow && !!el.querySelector("#progress-year-btn"), [...el.querySelectorAll(".pr-row")].map(txt).join(" | "));
 
 // ── 5. THE WEIGHT NOTE ──────────────────────────────────────────────────
 console.log("\nTEST 5 - the weight note speaks on the overview, once");

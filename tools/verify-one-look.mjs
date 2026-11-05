@@ -8,6 +8,13 @@ import { createRequire as __cr } from "node:module";
  *   new since v688 (build-session, the Plan's only) has no v688 copy to
  *   compare; Free must be sent away from it, to its own screen.
  *
+ * 05 Nov 2026 v8
+ *
+ * v8 - P-27 TIDY (Graeme, 05 Nov: "One picker", both tiers). TEST 4 makes the
+ *   one approved addition to Free's Log what I did (the Mindful and gentle
+ *   group: Yoga, Pilates, Stretching, Meditation, Something else) and no
+ *   other; 4g holds that it is that block and nothing else. Nothing loosened.
+ *
  * 01 Nov 2026 v7
  *
  * v7 - P-20 re-point, as verify-path-outside v3 (Graeme, 01 Nov: rename
@@ -235,6 +242,17 @@ person(); await open("classes"); click(main.querySelector("[data-class]")); awai
 { const f = look(true); ok("3q. the class player, in a class", router.currentView === "class-player" && !f.length, `${router.currentView} ${f.join("; ")}`); }
 
 // ── 4 ───────────────────────────────────────────────────────────────────
+
+// v8 (P-27, Graeme 05 Nov: "One picker"). The one approved addition to Free's
+// Log what I did: the Mindful and gentle group, and nothing else. Every other
+// byte is still held; the old markup gains exactly that block before comparing.
+function onlyMindfulAdded(a, b) {
+  let s = 0; while (s < a.length && a[s] === b[s]) s++;
+  let e = 0; while (e < a.length - s && e < b.length - s && a[a.length - 1 - e] === b[b.length - 1 - e]) e++;
+  const removed = a.slice(s, a.length - e), added = b.slice(s, b.length - e);
+  const words = added.replace(/<[^>]+>/g, " ").replace(/\p{Extended_Pictographic}|\uFE0F|\u2754/gu, " ").replace(/\s+/g, " ").trim();
+  return removed.trim() === "" && words === "Mindful and gentle Yoga Pilates Stretching Meditation Something else";
+}
 console.log("\nTEST 4 - Free, as it was on alongside-v688");
 const V688 = "79799cb";
 const NEW_PLAN_ONLY = ["build-session"];   // v8 (P-26)
@@ -281,6 +299,11 @@ for (const file of touched) {
     const renames = (a.match(/Body Balance/g) || []).length;
     ok("4r. v688's Free Log what I did named Body Balance exactly twice (label and words): the rename is that and no more", renames === 2, String(renames));
     a = a.replace(/Body Balance/g, "Yoga or Pilates class");
+  }
+  if (name === "activity-log") {
+    const g = onlyMindfulAdded(a, b);
+    ok("4g. P-27: the only change to Free's Log what I did is the Mindful and gentle group", g);
+    if (g) a = b;
   }
   let at = 0; while (at < a.length && a[at] === b[at]) at++;
   compared++;

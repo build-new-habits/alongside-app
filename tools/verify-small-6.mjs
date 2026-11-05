@@ -1,5 +1,11 @@
 /**
  * tools/verify-small-6.mjs
+ * 05 Nov 2026 v2
+ *
+ * v2 - P-27 TIDY (Graeme, 05 Nov: "One picker"). 6a re-pointed: the Library's
+ *   own grid is gone, so there is no Library Swim to arrive chosen; Log what
+ *   I did opens the logger, nothing pre-chosen, with every item. 6b unchanged.
+ *
  * 17 Oct 2026 v1
  *
  * W6-9 SMALL-6 (Wave 6: 2.11, 2.12, 2.13, 2.16; Stage W6 session 5). One
@@ -130,11 +136,16 @@ console.log("\nW6-9 SMALL-6");
   const lib = await import(B + "views/library.js");
   const AL = await import(B + "views/activity-log.js");
   main.innerHTML = lib.render(); lib.onMount();
+  navs = [];
+  router.navigate = v => { navs.push(v); };   // v2: an earlier test left its own stub
   click(main.querySelector("#lib-log-activity-btn"));
-  main.innerHTML = lib.render(); lib.onMount();
-  click([...main.querySelectorAll("[data-log-label]")].find(b => b.dataset.logLabel === "Swim"));
+  // v2 (P-27, Graeme 05 Nov: "One picker"): Log what I did opens the logger
+  // itself, with nothing chosen for the person, and every item on it.
   main.innerHTML = AL.render(); AL.onMount();
-  ok("6a. the Library's Swim arrives chosen", txt(main.querySelector(".activity-log-type")) === "Swim", txt(main).slice(0, 120));
+  const items = txt(main);
+  ok("6a. Log what I did opens the one picker, nothing pre-chosen, with Swim and the mindful items", navs.at(-1) === "activity-log" && /Swim/.test(items) && /Yoga/.test(items) && /Pilates/.test(items) && /Stretching/.test(items) && /Meditation/.test(items) && !main.querySelector(".activity-log-type"), JSON.stringify(navs) + " " + items.slice(0, 160));
+  click(main.querySelector('.activity-type-card[data-type="swim"]'));   // v2: choose one, as a person would
+  main.innerHTML = AL.render(); AL.onMount();
   router.history = ["library"]; navs = [];
   click(main.querySelector("#activity-cancel-btn, #activity-done-btn"));
   ok("6b. leaving goes back, not to Settings", navs.at(-1) === "<back>" && !navs.includes("settings"), JSON.stringify(navs));
