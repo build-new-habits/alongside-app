@@ -1,6 +1,10 @@
 /**
  * yoga-session.js
- * 31 Oct 2026 v23
+ * 06 Nov 2026 v24
+ *
+ * v24 - P-28 S4 (both tiers). While you hold: with the coach's voice on, a
+ *   held pose's line (js/hold-voice.js) starts by itself with Start hold,
+ *   under the clock, with one big Pause the voice. Voice off: unchanged.
  *
  * v23 - P-13 rooms (Graeme, 31 Oct: Core and Yoga now). On the Plan only,
  *   the one look (Session 9): the heading 24 px at the left; "‹ Back" before
@@ -308,6 +312,7 @@ import { badDayIds, renderBadDayDoor, wireBadDayDoor } from "./bad-day-door.js";
 import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
 import { renderLogBlock, attachLogEvents, scrollToTop } from "../session-log.js";
 import { selectMoment, recordMomentShown, dismissMoment } from "../data/grounding-moments.js";
+import { startHoldVoice, stopHoldVoice, resetHoldVoice, renderHoldVoice, wireHoldVoice } from "../hold-voice.js";
 
 export const centered = false;
 
@@ -1092,6 +1097,7 @@ function renderPose() {
               </div>
             </div>
           </div>
+          <div id="hv-slot">${renderHoldVoice("y" + currentIndex)}</div>
         ` : ""}
 
         <p class="exercise-description">${pose.description}</p>
@@ -1276,6 +1282,7 @@ function startRestTimer(seconds, onComplete) {
 // ── Session flow ──────────────────────────────────────────────────────────────
 
 function advancePose() {
+  stopHoldVoice();   // P-28
   const pose = sessionQueue[currentIndex];
   currentIndex++;
   scrollToTop();   // SCROLL-1: a new card starts at the top
@@ -1632,6 +1639,7 @@ export function onMount() {
       sessionQueue = _offered[selectedMins] || buildSession(selectedFocus, selectedMins, selectedTarget);
       currentIndex = 0;
       timeRemaining = 0;
+      resetHoldVoice();   // P-28: a new practice
       phase = "overview";
       rerender();
     });
@@ -1639,7 +1647,12 @@ export function onMount() {
 
   document.getElementById("ys-timer-btn")?.addEventListener("click", () => {
     const pose = sessionQueue[currentIndex];
-    if (!timerRunning) startHoldTimer(pose?.holdSeconds || 30);
+    if (!timerRunning) {
+      startHoldTimer(pose?.holdSeconds || 30);
+      // P-28. The hold's line starts with the timer (voice on only).
+      if (pose) { startHoldVoice({ category: "mobility", ...pose }, pose.holdSeconds || 30, "y" + currentIndex);   // a held pose is a stretch, unless it says otherwise
+      const slot = document.getElementById("hv-slot"); if (slot) { slot.innerHTML = renderHoldVoice("y" + currentIndex); wireHoldVoice(slot); } }
+    }
     else pauseHoldTimer();
     const btn = document.getElementById("ys-timer-btn");
     if (btn) {
@@ -1655,6 +1668,7 @@ export function onMount() {
   });
 
   document.getElementById("ys-skip-btn")?.addEventListener("click", () => {
+    stopHoldVoice();   // P-28
     if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
     timerRunning  = false;
     timeRemaining = 0;

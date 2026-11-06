@@ -1,6 +1,11 @@
 /**
  * workout.js - Workout Execution View
- * 02 Nov 2026 v39
+ * 06 Nov 2026 v40
+ *
+ * v40 - P-28 S4 (both tiers). While you hold: with the coach's voice on,
+ *   a timed hold's line (js/hold-voice.js) starts by itself when its timer
+ *   starts, shown under the clock in In Step's look, with one big Pause
+ *   the voice. Voice off (the default): nothing changes.
  *
  * v39 - P-22 SESSION-ORDER, P-23 SWAP-SEARCH, P-24 AS-YOU-GO (the Plan;
  *   Graeme, 02 Nov). Under each exercise's name: Swap (like this one, then a
@@ -522,6 +527,7 @@ import { noteSwap }      from "../data/path-engine.js";
 import { lowMood, soreToday, swapOptionsFor } from "../data/path-context.js";
 import { swapAllowed, swapPlace, renderSwapSearch, wireSwapSearch, kitWords } from "../data/swap-search.js";
 import { withDefaultDose } from "../session-builder.js";
+import { startHoldVoice, stopHoldVoice, resetHoldVoice, renderHoldVoice, wireHoldVoice } from "../hold-voice.js";
 import { soreLevel, areaWords } from "../data/conditions.js";
 
 // STAGE PATH P-6. The Plan's player.
@@ -1328,6 +1334,7 @@ function renderExerciseTarget(exercise) {
           <span class="timer-label">${sets > 1 ? `${sets} sets, this long each` : "About this long"}</span>
         </div>
       </div>
+      ${renderHoldVoice("w" + currentExerciseIndex)}
     `;
   } else if (exercise.reps && timing.shape === "distance") {
     const sets = exercise.sets || 1;
@@ -1385,6 +1392,7 @@ const SECTION_LABELS = { warmup: "Warm up", main: "Main", cooldown: "Cool down",
                          accessory: "Main", finisher: "Main" };
 
 export function onMount() {
+  wireHoldVoice(document.getElementById("main-content") || document);   // P-28
   // W5-1. The Bad-day choice in place of a plan: nothing else to wire.
   const _w = _getWorkout();
   if (_w && !_isGentle(_w) && badDayIds().length) {
@@ -1511,6 +1519,8 @@ export function onMount() {
     if (!timerStarted) {
       timerStarted = true;
       startTimer();
+      // P-28. The hold's line starts with the timer (voice on only).
+      { const w = _getWorkout(), ex = w?.exercises?.[currentExerciseIndex]; if (ex) startHoldVoice(ex, resolveTiming(ex).seconds || 0, "w" + currentExerciseIndex); }
     } else if (timerInterval) {
       pauseTimer();
     } else {
@@ -1787,6 +1797,7 @@ function updateTimerDisplay() {
 }
 
 function completeExercise() {
+  stopHoldVoice();   // P-28
   const workout = _getWorkout();
   pendingSkipOffer = null;   // P18: not answered is "leave it"
   const exercise = workout.exercises[currentExerciseIndex];
@@ -2005,6 +2016,7 @@ function cleanupWorkout() {
 
 /** The player's own place and clocks, back to a session's start (W5-9). */
 function _resetPlayer() {
+  resetHoldVoice();   // P-28
   _resumeChecked = false;
   _stateKey = null;
   pauseTimer();

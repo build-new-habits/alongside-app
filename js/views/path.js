@@ -1,6 +1,15 @@
 /**
  * views/path.js
- * 05 Nov 2026 v12
+ * 06 Nov 2026 v13
+ *
+ * v13 - P-28 S4 GUIDE ME (Graeme, 05 Nov; prototype v5). Outside › Walk,
+ *   Run or Bike ride asks How would you like your walk? before the plan:
+ *   Just go (the plan as before), Guide me (the walk door has two, the
+ *   mindful walk and a walk in any weather; it opens What will happen,
+ *   views/guide-me.js) or Take three with you (three things to notice,
+ *   read now, then the plan). On a bike ride nothing talks to you on the
+ *   road: the line says so, and Guide me is offered indoors only. Log it
+ *   keeps the way chosen on the entry (activityLog[].guideMe).
  *
  * v12 - P-27 TIDY (Graeme, 05 Nov). (1) My programme leaves How would you
  *   like it? (Graeme: "Remove it"): it replayed only the session already
@@ -152,6 +161,8 @@ import { savedSessions, resolveSavedSession } from "../data/saved-sessions.js";
 import { keepVersion } from "../save-block.js";
 import { OUTSIDE_PLANS } from "../data/outside.js";
 import { presetLogActivity } from "./activity-log.js";
+import { GUIDE_SESSIONS, sessionsForDoor } from "../data/guide-me.js";
+import { openGuideMe } from "./guide-me.js";
 import { setTodaysLength, lengthCatForToday, todaysLengthCat } from "../data/session-length.js";
 import { equipmentForLocation } from "../session-builder.js";
 import { resolveEquipment, exerciseIsAvailable } from "../data/equipment-map.js";
@@ -191,6 +202,9 @@ export const ACTIVITIES = Object.freeze([
 // v4 (P-13). The guided room for each outside activity, in the words its Library tile used.
 const GUIDED = { run: ["running-session", "A guided run", "Easy, intervals, or long run"], bike: ["cycle-session", "A guided ride", "Road, indoor, or turbo trainer"],
   walk: ["walk-session", "A guided walk", "Gentle, mindful, brisk, or nature walk"], swim: ["swim-session", "A guided swim", "Steady or interval swim session"] };
+// P-28. The three ways, for the activities Guide me has (its door id for each).
+const GUIDE_DOOR = { walk: "walk", run: "run", bike: "ride" };
+const NOUN = { walk: "walk", run: "run", bike: "ride" };
 const ENJOY = { run: "Enjoy your run", bike: "Enjoy your ride", walk: "Enjoy your walk", swim: "Enjoy your swim", sport: "Enjoy the game", other: "Enjoy it" };
 const STYLE = { gentle: "Gentle movement", yoga: "Yoga", taichi: "Tai chi", qigong: "Qigong", pilates: "Pilates", stretch: "Stretches" };
 const POSITION = { standing: "Standing", seated: "Seated", floor: "On the floor", lying: "Lying down", mixed: "Mixed" };
@@ -390,6 +404,29 @@ export function PathView(router) {
     activity() {
       return `${bar(2, 3)}${heading("What are you doing?")}
         <ul class="path-list">${ACTIVITIES.map(a => row({ v: a.id, t: a.label, d: a.line ? esc(a.line) : "", icon: a.icon, kind: DOOR[st.door].kind })).join("")}</ul>`;
+    },
+    // P-28. How would you like it? Just go, Guide me, Take three with you.
+    gway() {
+      const ss = sessionsForDoor(GUIDE_DOOR[st.activity]);
+      const road = st.activity === "bike";
+      return `${bar(3, 3)}${heading(`How would you like your ${NOUN[st.activity]}?`)}
+        <ul class="path-list">
+          ${row({ v: "just", t: "Just go", d: "Your own thoughts, or your music. No voice.", icon: "play", kind: DOOR[st.door].kind })}
+        </ul>
+        ${road ? `<p class="path-note" id="path-road">${esc(GUIDE_SESSIONS.ride.roadLine)}</p>` : ""}
+        <ul class="path-list">
+          ${ss.map(s => row({ v: "guide:" + s.id, t: road ? "Guide me, indoors" : ss.length > 1 ? `Guide me: ${s.title}` : "Guide me",
+              d: road ? `${esc(s.title)}, ${s.mins} minutes, on a turbo or bike at home.` : `${esc(s.title)}, ${s.mins} minutes. Put your headphones in.`, icon: "instep", kind: "orchid" })).join("")}
+          ${row({ v: "three", t: "Take three with you", d: "Three things to notice, read now. No audio, so keep your music on if you like.", icon: "keep", kind: "orchid" })}
+        </ul>`;
+    },
+    gthree() {
+      const s = sessionsForDoor(GUIDE_DOOR[st.activity])[0];
+      return `${heading("Three to take with you", "instep", "orchid")}
+        <p class="path-small">Read them now. Nothing will speak or buzz while you\u2019re out.</p>
+        ${st.activity === "bike" ? `<p class="path-note">${esc(GUIDE_SESSIONS.ride.roadLine)}</p>` : ""}
+        <div class="card instep-card"><ol class="path-three">${s.three.map(x => `<li>${esc(x)}</li>`).join("")}</ol></div>
+        <button type="button" class="btn btn-primary btn-full" id="path-three-go">Got them. Start</button>`;
     },
     outplan() {
       return `${bar(3, 3)}${heading(ENJOY[st.activity] || "Enjoy it")}
@@ -806,14 +843,24 @@ export function PathView(router) {
         const o = crossOptions({ ...recipeIn(), main: followed("cross")?.activity }).find(x => x.id === v);
         return o ? trendProg(o) : undefined;
       }
-      case "activity": return go("outplan", { activity: v });
+      case "activity": return go(GUIDE_DOOR[v] ? "gway" : "outplan", { activity: v, way: null });
+      case "gway": {
+        if (v === "just") return go("outplan", { way: "just" });
+        if (v === "three") return go("gthree", { way: "three" });
+        if (v.startsWith("guide:")) {
+          router.pathReturn = null;
+          openGuideMe(v.slice(6), { activity: st.activity, ret: { step, st: { ...st }, trail: trail.map(t => ({ ...t })) } });
+          router.navigate("guide-me"); return;
+        }
+        return;
+      }
       case "outplan": {
         if (v === "warm" || v === "cool") {
           const p = outsidePractice(v); if (!p) return;
           return go("prog", { practice: p, fresh: false, reason: null, note: null, surprise: false, fromCoach: false });
         }
         if (v === "guided" && GUIDED[st.activity]) { router.navigate(GUIDED[st.activity][0]); return; }
-        presetLogActivity(OUTSIDE_PLANS[st.activity]?.log || "Other outdoor");   // Log what I did, with the activity chosen
+        presetLogActivity(OUTSIDE_PLANS[st.activity]?.log || "Other outdoor", { guideMe: GUIDE_DOOR[st.activity] ? (st.way || "just") : null });   // Log what I did, with the activity chosen (P-28: and how it was taken)
         router.navigate("activity-log"); return;
       }
       case "sarea":
@@ -906,6 +953,7 @@ export function PathView(router) {
       root.querySelector("#path-swp-keep")?.addEventListener("click", () => swapAt(i));
     }
     root.querySelector("#path-mine")?.addEventListener("click", keepMine);
+    root.querySelector("#path-three-go")?.addEventListener("click", () => go("outplan", { way: "three" }));
     root.querySelector("#path-wellbeing")?.addEventListener("click", () => router.navigate("noticing"));
     root.querySelector("#path-redo")?.addEventListener("click", () => {
       // As Home's row: the check-in, then straight on to the coach's choice (today.js reads pathStart.coach).

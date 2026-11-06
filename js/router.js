@@ -1,6 +1,9 @@
 /**
  * router.js
- * 05 Nov 2026 v53
+ * 06 Nov 2026 v54
+ *
+ * v54 - P-28 S4 GUIDE ME. New route 'guide-me' (views/guide-me.js): a
+ *   session in progress, so no bottom bar, home Today.
  *
  * v53 - P-27 TIDY: on the Plan, the old finish (reflect) is the Plan's finish
  *   (plan-finish), for every player. Free unchanged.
@@ -487,6 +490,7 @@ const VIEW_NAMES = {
   'walk-session':       { path: './views/walk-session.js',      fn: 'WalkSessionView'       },
   'running-session':    { path: './views/running-session.js',   fn: 'RunningSessionView'    },
   'cycle-session':      { path: './views/cycle-session.js',     fn: 'CycleSessionView'      },
+  'guide-me':           { path: './views/guide-me.js',          fn: 'GuideMeView'           },
   'swim-session':       { path: './views/swim-session.js',      fn: 'SwimSessionView'       },
   'quiet-session':      { path: './views/quiet-session.js',     fn: 'QuietSessionView'      },
   'breathing-session':  { path: './views/breathing-session.js', fn: 'BreathingSessionView'  },
@@ -513,7 +517,7 @@ const hideNavViews = new Set([
   'home-threshold', 'community-impact', 'annual-reflection',
   'checkin', 'checkin-mini', 'coach-proposal', 'class-player', 'classes',
   'workout', 'gym-programme', 'morning-session', 'core-session',
-  'yoga-session', 'walk-session', 'running-session', 'cycle-session',
+  'yoga-session', 'walk-session', 'running-session', 'cycle-session', 'guide-me',
   'swim-session', 'quiet-session', 'breathing-session',
   'prescribed', 'prescribed-session', 'session-builder',
   'reflect', 'plan-finish', 'journal-entry', 'privacy', 'upgrade', 'in-step',
@@ -542,7 +546,7 @@ const NAV_MAP = {
   'home-threshold': 'today', 'reflect': 'today', 'plan-finish': 'today',
   'workout': 'today', 'gym-programme': 'today', 'morning-session': 'today',
   'core-session': 'today', 'yoga-session': 'today', 'walk-session': 'today',
-  'running-session': 'today', 'cycle-session': 'today', 'swim-session': 'today',
+  'running-session': 'today', 'cycle-session': 'today', 'guide-me': 'today', 'swim-session': 'today',
   // NAV-8, 13 Aug 2026. Moved from 'today'. Both are launched from the
   // Wellbeing hub (noticing.js's breathe and mindful-movement cards) and
   // exist nowhere else, so highlighting the Today tab while somebody is

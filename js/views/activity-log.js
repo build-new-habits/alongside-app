@@ -1,6 +1,10 @@
 /**
  * activity-log.js - Universal Activity Logging View
- * 05 Nov 2026 v7
+ * 06 Nov 2026 v8
+ *
+ * v8 - P-28 S4. Opened from Outside's Log it after a walk, run or ride, it
+ *   keeps how the session was taken (Just go or Take three with you) on the
+ *   entry as guideMe (Schema v1.123). Nothing on screen changes.
  *
  * v7 - P-27 TIDY (Graeme, 05 Nov: "One picker"). The Library's own grid is
  *   gone; this is the one picker, so it gains what only that grid had:
@@ -79,7 +83,9 @@ let _preset = null;
 const LIBRARY_WORDS = { "spin class": "spin", "hiit": "hiit", "outdoor cycle": "outdoor-cycle", "body balance": "body-balance" };
 /** v6. The groups this person sees: Reformer class is the Plan's. */
 const _groups = () => ACTIVITY_GROUPS.map(g => ({ ...g, items: g.items.filter(i => !i.planOnly || _plan()) }));
-export function presetLogActivity(label) {
+let _presetWay = null;   // P-28: "just" | "three", from Outside's Log it
+export function presetLogActivity(label, { guideMe = null } = {}) {
+  _presetWay = ["just", "guide", "three"].includes(guideMe) ? guideMe : null;
   const l = String(label || "").trim().toLowerCase();
   const all = ACTIVITY_GROUPS.flatMap(g => g.items);
   const hit = all.find(i => i.label.toLowerCase() === l) || all.find(i => i.id === LIBRARY_WORDS[l]);
@@ -308,8 +314,11 @@ export function onMount() {
       durationMins:  durationMins,
       feel:          FEEL_LABELS[feelRating - 1].toLowerCase().replace(" ", "-"),
       completedAt:   nowIso,
-      sessionEnd:    nowIso
+      sessionEnd:    nowIso,
+      // P-28. How an outdoor session was taken, when it came from Outside.
+      ...(_presetWay && ["walk", "run", "cycle"].includes(selectedType) ? { guideMe: _presetWay } : {}),
     });
+    _presetWay = null;
 
     logSaved = true;
     rerender();

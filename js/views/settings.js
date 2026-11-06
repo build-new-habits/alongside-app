@@ -1,6 +1,11 @@
 /**
  * settings.js
- * 05 Nov 2026 v74
+ * 06 Nov 2026 v75
+ *
+ * v75 - P-28 S4 (both tiers). Display › Sound › Coach's voice: on plays the
+ *   coach's recorded lines in In Step and while you hold; off (the default)
+ *   keeps everything as words on the screen. Writes store coachVoice
+ *   ('on' | 'off', Schema v1.123).
  *
  * v74 - P-27 TIDY (Graeme, 05 Nov). Both tiers, a fault: "Activity log" opened
  *   a form to log something, not a log; it is named for what it does, Log
@@ -963,6 +968,23 @@ export function SettingsView(router) {
       </li>`;
   }
 
+  /** P-28. Coach's voice: store coachVoice is 'on' or 'off', not true or false. */
+  function _voiceSwitch() {
+    const on = store.get('coachVoice') === 'on';
+    return `
+      <li class="settings-row settings-row--switch">
+        <label class="settings-row__text" for="disp-coach-voice">
+          <span class="settings-row__label">Coach\u2019s voice</span>
+          <span class="settings-row__sub" id="disp-coach-voice-desc">Plays the coach\u2019s recorded lines in In Step and while you hold. Off, everything is words on the screen.</span>
+        </label>
+        <button class="settings-toggle ${on ? 'settings-toggle--on' : ''}" id="disp-coach-voice" role="switch"
+                aria-checked="${on ? 'true' : 'false'}" aria-describedby="disp-coach-voice-desc"
+                data-voice-toggle aria-label="Coach\u2019s voice">
+          <span class="settings-toggle__track" aria-hidden="true"></span>
+        </button>
+      </li>`;
+  }
+
   /** A switch that works in place. `disp` writes a display preference. */
   function _rowSwitch({ id, label, sub = '', field, disp }) {
     const on = disp ? getDisplayPref(disp) === 'on' : store.get(field) === true;
@@ -1123,6 +1145,10 @@ export function SettingsView(router) {
           // F6. Off follows the device, which the app always has.
           _rowSwitch({ id: 'disp-reduce-motion', label: 'Reduce motion', disp: 'reduceMotion' }),
           _rowSwitch({ id: 'disp-vibration', label: 'Vibration', sub: canVibrate() ? 'Buzzes during sessions to mark a change. Off stops them all.' : 'This phone does not let web apps vibrate, so nothing buzzes here.', disp: 'vibration' }),
+        ] },
+        // P-28. The coach's recorded voice. A Guide me walk, run or ride is chosen each time, whatever this says.
+        { title: 'Sound', rows: [
+          _voiceSwitch(),
         ] },
       ];
       case 'data': return [
@@ -2929,6 +2955,16 @@ export function SettingsView(router) {
         });
         const label = btn.querySelector('.disp-scheme__label')?.textContent.trim() || value;
         _dispAnnounce(`Colour scheme set to ${label}`);
+      });
+    });
+
+    container.querySelectorAll('[data-voice-toggle]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const next = store.get('coachVoice') !== 'on';
+        store.set('coachVoice', next ? 'on' : 'off');
+        btn.setAttribute('aria-checked', next ? 'true' : 'false');
+        btn.classList.toggle('settings-toggle--on', next);
+        _dispAnnounce(`Coach\u2019s voice ${next ? 'on' : 'off'}`);
       });
     });
 
