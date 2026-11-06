@@ -1,6 +1,10 @@
 /**
  * data/line-icons.js
- * 28 Oct 2026 v3
+ * 06 Nov 2026 v4
+ *
+ * v4 - P-28 EMPATHY-THREAD, S3. instep is two figures side by side (the
+ *   approved prototype v5's icon): In Step's own mark, everywhere it shows.
+ *   It was two arrows.
  *
  * v3 - STAGE PATH P-4 (blueprint Session 4, touch-once for this file: every
  *   icon Sessions 4 to 8 draw). The doors: heart (Move to feel better; Get
@@ -40,7 +44,7 @@ const PATHS = {
   classes:  '<circle cx="8" cy="7" r="3"/><circle cx="16" cy="7" r="3"/><path d="M2 20c1-3.5 3.5-5 6-5s5 1.5 6 5M14 15.5c.7-.3 1.3-.5 2-.5 2.5 0 5 1.5 6 5"/>',
   mind:     '<path d="M5 19c8 0 14-6 14-14C11 5 5 11 5 19zM5 19l7-7"/>',
   breath:   '<path d="M3 8h10a3 3 0 1 0-3-3M3 12h15a3 3 0 1 1-3 3M3 16h7"/>',
-  instep:   '<path d="M7 4l-3 4 3 4M17 12l3 4-3 4M4 8h11a4 4 0 0 1 0 8H9"/>',
+  instep:   '<circle cx="8" cy="5" r="2"/><circle cx="16" cy="5" r="2"/><path d="M8 8v6M16 8v6M8 14l-2 6M8 14l2 6M16 14l-2 6M16 14l2 6M5 10.5h6M13 10.5h6"/>',
   list:     '<path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/>',
   library:  '<path d="M5 4h4v16H5zM10 4h4v16h-4zM15.5 4.5l3.5-1 3 15.5-3.5 1z"/>',
   home:     '<path d="M4 11l8-7 8 7v9H4z"/>',

@@ -1,6 +1,19 @@
 /**
  * reflect.js - Reflect Screen
  *
+ * 06 Nov 2026 v22
+ *
+ * v22 - P-28 EMPATHY-THREAD, S3 (and S5's finish lines, here so this file
+ *   is opened once). Both tiers, as the Plan's finish (plan-finish.js v4):
+ *   In Step's offer after a finished session (data/in-step-offer.js), with
+ *   Start and Not today; Start keeps what was said, as Done does, then
+ *   opens the episode, and an offered finish has no reflection prompt as
+ *   well. Otherwise, now and then, B: one line about other people's
+ *   check-ins, only when true. The reflection prompt wears In Step's look
+ *   (orchid, two figures, In Step). The offer, the line and their wiring
+ *   are exported for plan-finish.js (renderInStepOffer, renderInStepLine,
+ *   wireInStepLine), so the two finishes say them the same way.
+ *
  * 31 Oct 2026 v21
  *
  * v21 - STAGE PATH Session 9 (CLOSE; P-12 F3, F4, F5). The Plan's other
@@ -259,6 +272,8 @@ import { router }         from "../router.js";
 // selectEmpathyPrompt(), so this view never touches the pool directly.
 import { selectEmpathyPrompt, canEnterStage } from "../data/empathy-transfer.js";
 import { getTodaysCheckin, getHistory } from "../data/checkin.js";
+import { offerForFinish, finishBLine, openEpisodeNext } from "../data/in-step-offer.js";
+import { playLine, lineAvailable } from "../coach-audio.js";
 // SHARED-1. The end-of-session moments, in the one place every session
 // view already routes to. See data/session-moments.js for why.
 import { renderSessionMoments, attachSessionMoments, resetSessionMoments }
@@ -273,6 +288,9 @@ let openText      = "";
 let moodAfter     = null;   // SMOOTH-P2d: null until the slider is moved
 let _momentsMounted = false;   // SHARED-1
 let empathyPrompt = null; // { stage, text } | null - set by saveAndSummarise() if one should fire
+let _offer = null;        // P-28: In Step's offer on this finish, decided once per entry
+let _offerShown = false;
+let _bLine = null;        // P-28: B, when no episode is offered
 
 const QUESTIONS = {
   "gym":            "So, how was that? I want to know what it actually felt like in there.",
@@ -732,6 +750,14 @@ export function render() {
     _entryKey = _keyOf(entry);
     stage = "reflect"; feelAnswer = null; painAnswer = null; openText = "";
     moodAfter = null; empathyPrompt = null; _momentsMounted = false;
+    // P-28. Decided once per finished session, counting this one even
+    // before Done logs it (a run or a walk is logged at Done).
+    const logged = (store.get("activityLog") || []).some(e => e && entry.id != null && e.id === entry.id);
+    const partialNow = entry.status === "partial";
+    const n = getSessionCount() + (logged || partialNow ? 0 : 1);
+    _offer = offerForFinish({ sessionCount: n, partial: partialNow });
+    _offerShown = !!_offer;
+    _bLine = finishBLine({ sessionCount: n, episodeOffered: !!_offer });
   }
   const type       = entry.type  || "other";
   const name       = entry.name;
@@ -755,8 +781,8 @@ export function render() {
         <div class="view-header">
           <h1 class="sr-only">A thought before you go</h1>
         </div>
-        <div class="card card-coach reflect-coach-card" role="group" aria-labelledby="empathy-prompt-text">
-          <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
+        <div class="card card-coach reflect-coach-card instep-card instep-prompt" role="group" aria-labelledby="empathy-prompt-text">
+          <p class="instep-eyebrow">${lineIcon("instep", 18)}<span>In Step</span></p>
           <p class="coach-message-text" id="empathy-prompt-text">${empathyPrompt.text}</p>
         </div>
         <button class="btn btn-primary btn-large btn-full" id="empathy-continue-btn"
@@ -870,7 +896,7 @@ export function render() {
         </details>` : "";
       })()}
 
-      ${plan ? `<button class="btn btn-primary btn-large btn-full" id="reflect-done-btn"
+      ${_offer && _offerShown ? renderInStepOffer(_offer, "rf") : ""}${!_offer && _bLine ? renderInStepLine(_bLine, "rf") : ""}${plan ? `<button class="btn btn-primary btn-large btn-full" id="reflect-done-btn"
               style="margin-top: var(--space-4);">Done</button>` : `<button class="btn btn-primary btn-large btn-full" id="reflect-done-btn"
               style="margin-top: var(--space-4);">
         Back to Home
@@ -888,6 +914,37 @@ export function render() {
  * Free has no arc.
  */
 export { _arcToday as arcTodayLine };
+
+// ── P-28. In Step on a finish, said the same way on both finishes ──────
+const _esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+/** The offer card: In Step · part · Episode n · about 3 minutes; Start, Not today. */
+export function renderInStepOffer(offer, p) {
+  return `<section class="card instep-card instep-offer" aria-labelledby="${p}-is-h">
+      <h2 class="instep-eyebrow" id="${p}-is-h">${lineIcon("instep", 18)}<span>${_esc(offer.label)}</span></h2>
+      <p class="instep-offer__title">${_esc(offer.episode.title)}</p>
+      ${offer.line ? `<p class="instep-low">${_esc(offer.line)}</p>` : ""}
+      <button type="button" class="btn btn-primary btn-full" id="${p}-is-start">Start</button>
+      <button type="button" class="btn btn-secondary btn-full" id="${p}-is-later" aria-label="Not today, leave In Step for now">Not today</button>
+    </section>`;
+}
+
+/** B: the line about other people's check-ins. Nothing to press but Listen, when there is something to hear. */
+export function renderInStepLine(line, p) {
+  return `<aside class="card instep-card instep-bline" aria-labelledby="${p}-bl-h">
+      <p class="instep-eyebrow" id="${p}-bl-h">${lineIcon("instep", 18)}<span>In Step</span></p>
+      <p>${_esc(line.text)}</p>
+      <button type="button" class="btn btn-secondary btn-full" id="${p}-bl-listen" hidden>Listen</button>
+    </aside>`;
+}
+
+/** Listen appears only when the coach's voice is on and the line's file is there. */
+export function wireInStepLine(root, line, p) {
+  const b = root?.querySelector(`#${p}-bl-listen`);
+  if (!b || !line) return;
+  lineAvailable(line.audio).then(ok => { if (ok && b.isConnected) b.hidden = false; });
+  b.addEventListener("click", () => playLine(line.audio, { title: "In Step" }));
+}
 /** v20. Another finish's answers, for the empathy cadence (plan-finish.js). */
 export function useAnswersForEmpathy(feel, mood) { feelAnswer = feel ?? null; moodAfter = typeof mood === "number" ? mood : null; }
 function _arcToday() {
@@ -964,6 +1021,7 @@ export function onMount() {
 
   const view = document.querySelector(".reflect-view");
   if (!view) return;
+  wireInStepLine(view, _bLine, "rf");
   // W6-9. The moment controls are wired by every mount, the first included
   // (the router's): they were wired only after a repaint, so the baseline
   // chips did nothing until something else redrew the screen.
@@ -1010,6 +1068,15 @@ export function onMount() {
     const doneBtn = e.target.closest("#reflect-done-btn");
     if (doneBtn) { saveAndSummarise(); return; }
 
+    // P-28. In Step's offer.
+    if (e.target.closest("#rf-is-start")) { saveAndSummarise({ toInStep: true }); return; }
+    if (e.target.closest("#rf-is-later")) {
+      _offerShown = false;
+      view.querySelector(".instep-offer")?.remove();
+      document.getElementById("reflect-done-btn")?.focus();
+      return;
+    }
+
 
     const empathyContinueBtn = e.target.closest("#empathy-continue-btn");
     if (empathyContinueBtn) { resolveEmpathyPrompt(false); return; }
@@ -1029,7 +1096,7 @@ function _sayCoachLine(view) {
   line.textContent = buildSummary(store.get("currentActivityEntry") || {}, feelAnswer, painAnswer, moodAfter);
 }
 
-function saveAndSummarise() {
+function saveAndSummarise({ toInStep = false } = {}) {
   const textarea = document.getElementById("reflect-open-text");
   openText = textarea?.value.trim() || "";
 
@@ -1068,6 +1135,11 @@ function saveAndSummarise() {
       }
     }
   }
+
+  // P-28. Start on In Step's offer: saved above, then the episode. An
+  // offered finish has no reflection prompt as well.
+  if (toInStep && _offer) { openEpisodeNext(_offer.id, { low: _offer.low }); router.navigate("in-step"); return; }
+  if (_offer) { router.navigate("today"); return; }
 
   // Empathy Transfer: decide, after this entry is saved, whether a
   // prompt should fire. sessionCount reflects the just-saved entry.

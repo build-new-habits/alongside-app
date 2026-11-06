@@ -1,4 +1,12 @@
 /* variables.css - Midnight Teal Design Tokens
+   06 Nov 2026 v8
+
+   v8 - P-28 EMPATHY-THREAD, S3. One more kind colour, orchid, for In Step
+        and everything about other people (Graeme, 05 Nov; proposal 7):
+        #F0ABFC on dark, #A21CAF on light, #F5D0FE in high contrast. It sits
+        between violet (stretching) and rose (classes) and is neither, and
+        it always comes with the two-figures icon and the words In Step.
+
    31 Oct 2026 v7
 
    v7 - STAGE PATH Session 9 (close checks, axe; both tiers: a fault).
@@ -161,6 +169,7 @@
   --kind-rose:   #FB7185;   /* classes, Your body */
   --kind-green:  #34D399;   /* breathing and mindful practice, Messages */
   --kind-slate:  #94A3B8;   /* anything else, About, not yet */
+  --kind-orchid: #F0ABFC;   /* In Step: other people (P-28) */
   
   /* Energy/Mood Scale (10 levels) */
   --color-scale-1: #FB7185;       /* Low energy - rose */
@@ -380,6 +389,7 @@
   --kind-rose:   #BE123C;
   --kind-green:  #047857;
   --kind-slate:  #475569;
+  --kind-orchid: #A21CAF;
 }
 
 /* ── High contrast ─────────────────────────────────────────────────
@@ -413,6 +423,7 @@
   --kind-rose:   #FDA4AF;
   --kind-green:  #6EE7B7;
   --kind-slate:  #CBD5E1;
+  --kind-orchid: #F5D0FE;
 }
 
 /* OS-level preference, unchanged. Someone who has set it system-wide

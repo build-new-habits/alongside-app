@@ -1,0 +1,137 @@
+/* components/in-step.css - In Step's own look
+   06 Nov 2026 v1
+
+   P-28 EMPATHY-THREAD, S3 (Graeme, 05 Nov: the prompts about other people
+   "need to look different ... still the coach"). Everything about other
+   people is orchid (--kind-orchid, variables.css v8: #F0ABFC on dark,
+   #A21CAF on light, #F5D0FE in high contrast), and always comes with the
+   two-figures icon and the words In Step, so the colour never carries the
+   meaning alone (WCAG 1.4.1). Orchid is text on the page and card ground
+   (4.5:1 and more) and a shape on raised surfaces (3:1 and more), checked
+   by verify-contrast-check with the other kind colours.
+
+   Used by the player (views/in-step.js), the finish's offer and line
+   (views/plan-finish.js, views/reflect.js) and Wellbeing's tile. */
+
+.k-orchid { --k: var(--kind-orchid); }
+
+/* The words In Step with the icon: a label, not a link. */
+.instep-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-3);
+  color: var(--kind-orchid);
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  letter-spacing: 0.04em;
+  overflow-wrap: anywhere;
+}
+.instep-eyebrow .line-icon { flex: none; }
+
+.instep-card {
+  border: 1px solid color-mix(in srgb, var(--kind-orchid) 45%, var(--color-border-light));
+  background: color-mix(in srgb, var(--kind-orchid) 7%, var(--color-bg-card));
+}
+.instep-card p { line-height: 1.6; }
+.instep-said p { margin: 0; }
+.instep-carry p { font-size: var(--text-lg); font-weight: var(--font-semibold); }
+
+.in-step-view .btn-primary,
+.instep-offer .btn-primary {
+  background: var(--kind-orchid);
+  border-color: var(--kind-orchid);
+  color: var(--color-text-inverse);
+  box-shadow: none;
+}
+
+.in-step-view h1 { margin: 0 0 var(--space-3); }
+.instep-bar { display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; }
+.instep-bar .instep-eyebrow { margin: 0; }
+.instep-intro, .instep-why, .instep-later, .instep-small { color: var(--color-text-secondary); font-size: var(--text-sm); line-height: 1.5; }
+.instep-center { text-align: center; }
+.instep-low { color: var(--kind-orchid); font-weight: var(--font-semibold); }
+.instep-closing { font-weight: var(--font-semibold); }
+
+/* The list: the next episode, then each part. */
+.instep-next, .instep-ep {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: 44px;
+  text-align: left;
+  padding: var(--space-3) var(--space-4);
+  border-radius: 16px;
+  border: 1px solid color-mix(in srgb, var(--kind-orchid) 45%, var(--color-border-light));
+  background: var(--color-bg-card);
+  color: var(--color-text);
+  cursor: pointer;
+}
+.instep-next { margin-bottom: var(--space-5); }
+.instep-next__txt, .instep-ep { flex-direction: column; align-items: flex-start; }
+.instep-next__txt { display: flex; gap: 2px; min-width: 0; }
+.instep-next__part, .instep-ep__sub, .instep-next__sub { font-size: var(--text-sm); color: var(--color-text-secondary); }
+.instep-next__title, .instep-ep__title { font-weight: var(--font-semibold); overflow-wrap: anywhere; }
+.instep-part { margin-bottom: var(--space-5); }
+.instep-part h2 { font-size: var(--text-lg); margin: 0 0 var(--space-1); }
+.instep-eps { list-style: none; margin: var(--space-3) 0 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-2); }
+
+/* The step strip: a set of places, not links. */
+.instep-steps ol {
+  list-style: none; margin: 0 0 var(--space-4); padding: 0;
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(5.5em, 1fr)); gap: var(--space-2);
+  font-size: var(--text-xs, 0.8125rem);
+}
+/* The columns are sized in em, so at a larger text size the strip takes two
+   rows rather than splitting a word. */
+.instep-steps li { padding-top: var(--space-2); border-top: 3px solid var(--color-border-light); color: var(--color-text-secondary); overflow-wrap: normal; }
+.instep-steps li.is-done, .instep-steps li.is-now { border-top-color: var(--kind-orchid); }
+.instep-steps li.is-now { color: var(--color-text); font-weight: var(--font-semibold); }
+
+/* Before we start */
+.instep-prev { font-size: var(--text-lg); font-weight: var(--font-semibold); }
+.instep-answers { display: flex; flex-direction: column; gap: var(--space-2); margin: var(--space-4) 0 var(--space-2); }
+
+/* Speaking, while a line plays */
+.instep-speaking { display: inline-flex; align-items: center; gap: var(--space-2); color: var(--kind-orchid); font-size: var(--text-sm); margin: 0 0 var(--space-2); }
+.instep-dots i { display: inline-block; width: 6px; height: 6px; border-radius: 3px; background: var(--kind-orchid); margin-right: 3px; animation: instep-pulse 1s infinite ease-in-out; }
+.instep-dots i:nth-child(2) { animation-delay: .15s; }
+.instep-dots i:nth-child(3) { animation-delay: .3s; }
+@keyframes instep-pulse { 0%, 100% { opacity: .3; } 50% { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .instep-dots i { animation: none; opacity: 1; } }
+.instep-pause[hidden] { display: none; }
+.btn-large.instep-pause { min-height: 64px; }
+
+/* Hold still */
+.instep-pose h2 { font-size: var(--text-lg); margin: 0 0 var(--space-2); }
+.instep-row { display: flex; gap: var(--space-3); flex-wrap: wrap; }
+.instep-row .btn { flex: 1 1 10rem; }
+.instep-ring { position: relative; width: 170px; height: 170px; margin: var(--space-2) auto var(--space-4); }
+.instep-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.instep-ring__track { stroke: var(--color-border); stroke-width: 10; fill: none; }
+.instep-ring__arc { stroke: var(--kind-orchid); stroke-width: 10; fill: none; stroke-linecap: round; }
+.instep-ring__n { position: absolute; inset: 0; display: grid; place-items: center; font-size: var(--text-3xl, 2rem); font-weight: var(--font-bold, 700); font-variant-numeric: tabular-nums; }
+#is-hold-end:empty { display: none; }
+
+/* Choose */
+.instep-choose { border: 0; padding: 0; margin: 0 0 var(--space-3); }
+.instep-choose legend { font-size: var(--text-lg); line-height: 1.45; margin-bottom: var(--space-3); padding: 0; }
+.instep-opt {
+  display: flex; gap: var(--space-3); align-items: flex-start;
+  min-height: 44px; padding: var(--space-3) var(--space-4); margin-bottom: var(--space-2);
+  border-radius: 14px; border: 1px solid var(--color-border-light); background: var(--color-bg-card); cursor: pointer;
+}
+.instep-opt input { width: 22px; height: 22px; margin: 2px 0 0; flex: none; accent-color: var(--kind-orchid); }
+.instep-opt:has(input:checked) { border-color: var(--kind-orchid); }
+.instep-ack { min-height: 1.5em; font-weight: var(--font-semibold); }
+
+/* On a finish: the offer, and the line about other people's check-ins */
+.instep-offer, .instep-bline { margin: var(--space-4) 0; }
+.instep-offer h2 { font-size: var(--text-base); }
+.instep-offer__title { font-weight: var(--font-semibold); margin: 0 0 var(--space-3); }
+.instep-offer .btn + .btn { margin-top: var(--space-2); }
+.instep-bline .btn { margin-top: var(--space-3); }
+
+/* The finish lines about other people, in In Step's look */
+.instep-prompt .coach-message-text { margin-top: 0; }

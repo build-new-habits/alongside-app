@@ -1,4 +1,9 @@
 /* main.css
+ * 06 Nov 2026 v34
+ *
+ * v34 - P-28 EMPATHY-THREAD, S3. components/in-step.css imported (In
+ *   Step's orchid look: the player, the finish's offer and line).
+ *
  * 28 Oct 2026 v33
  *
  * v33 - STAGE PATH P-4. components/path.css imported (the Plan's Home and
@@ -174,6 +179,7 @@
 @import 'components/your-week.css';    /* D-6 WEEK-SHAPE, 05 Oct 2026 */
 @import 'components/progress-share.css'; /* D-11 PROGRESS-SHARE, 06 Oct 2026 */
 @import 'components/path.css';         /* STAGE PATH P-4, 28 Oct 2026 */
+@import 'components/in-step.css';      /* P-28 EMPATHY-THREAD, 06 Nov 2026 */
 /* Content-gated — add when content sessions complete */
 /* D3:  @import 'components/home-threshold.css';       */
 /* D10: @import 'components/community-impact.css';     */

@@ -1,6 +1,21 @@
 /**
  * views/plan-finish.js
- * 05 Nov 2026 v3
+ * 06 Nov 2026 v4
+ *
+ * v4 - P-28 EMPATHY-THREAD, S3 (and S5's finish lines, here so this file is
+ *   opened once). After a finished session, now and then:
+ *   - In Step's offer, an orchid card: "In Step · <part> · Episode n ·
+ *     about 3 minutes", Start and Not today (data/in-step-offer.js: from
+ *     session 3, every second finished session and once a day at most,
+ *     never part-way or on a Bad day; a low day offers Part 1's Adjusting
+ *     with "This one's short and about you today."). Start keeps what was
+ *     said here, as Done does, then opens the episode. When it is offered,
+ *     no reflection prompt follows Done.
+ *   - Otherwise B: one finish line about other people's check-ins, only
+ *     when true (empathy-transfer.js FINISH_B_LINES), with Listen when the
+ *     coach's voice is on and its file is there.
+ *   - The reflection prompt itself (the 33 finish lines) now wears In
+ *     Step's look: orchid, two figures, the words In Step.
  *
  * v3 - P-27 TIDY (Graeme, 05 Nov). Every Plan session ends here now (the
  *   router sends the old finish here on the Plan); an entry a player left
@@ -44,7 +59,9 @@ import { movementName } from "../data/path-engine.js";
 import { renderSaveBlock, attachSaveBlock } from "../save-block.js";
 import { renderSessionMoments, attachSessionMoments, resetSessionMoments } from "../data/session-moments.js";
 import { PAIN_OPTIONS, buildSummary, arcTodayLine, getSessionCount, getEmpathyPromptForSession,
-         fireEmpathyPrompt, skipEmpathyPrompt, useAnswersForEmpathy } from "./reflect.js";
+         fireEmpathyPrompt, skipEmpathyPrompt, useAnswersForEmpathy, renderInStepOffer, renderInStepLine,
+         wireInStepLine } from "./reflect.js";
+import { offerForFinish, finishBLine, openEpisodeNext } from "../data/in-step-offer.js";
 
 /** The check-in's own words and values (checkin.js), so before and after compare directly (C4). */
 export const MOODS = Object.freeze([["Struggling", 2], ["Low", 3], ["Okay", 6], ["Pretty good", 7], ["Great", 9]]);
@@ -60,6 +77,9 @@ export function PlanFinishView(router) {
   let fb = {};          // id -> { like, less, never }
   let empathy = null;   // { text } when the prompt is due
   let counted = false;  // P-20: a snack the person counts as a session
+  let offer = null;     // P-28: In Step's offer on this finish, decided once
+  let offerShown = false;
+  let bLine = null;     // P-28: B, when no episode is offered
 
   function mount(container) {
     root = container;
@@ -74,6 +94,11 @@ export function PlanFinishView(router) {
       if (created) { entry = created; store.set("currentActivityEntry", created); }
     }
     mood = null; pain = null; note = ""; empathy = null; counted = entry.counted === true;
+    // P-28. Decided once per finish, and recorded as offered when decided.
+    const n = getSessionCount();
+    offer = offerForFinish({ sessionCount: n, partial: entry.status === "partial" });
+    offerShown = !!offer;
+    bLine = finishBLine({ sessionCount: n, episodeOffered: !!offer });
     fb = Object.fromEntries(ids().map(id => [id, { like: false, less: false, never: false }]));
     resetSessionMoments();
     paint();
@@ -94,8 +119,8 @@ export function PlanFinishView(router) {
       root.innerHTML = `
         <div class="view plan-finish">
           <h1 class="sr-only" tabindex="-1">A thought before you go</h1>
-          <div class="card card-coach reflect-coach-card" role="group" aria-labelledby="pf-empathy">
-            <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
+          <div class="card card-coach reflect-coach-card instep-card instep-prompt" role="group" aria-labelledby="pf-empathy">
+            <p class="instep-eyebrow">${lineIcon("instep", 18)}<span>In Step</span></p>
             <p class="coach-message-text" id="pf-empathy">${empathy.text}</p>
           </div>
           <button type="button" class="btn btn-primary btn-large btn-full" id="pf-empathy-go">Continue</button>
@@ -142,6 +167,8 @@ export function PlanFinishView(router) {
         ${healthAllowed() ? `<details class="finish-more"${note ? " open" : ""}><summary class="finish-more__summary">Add a note</summary>
           <label class="sr-only" for="pf-note">A note about this session</label>
           <textarea id="pf-note" class="reflect-textarea" rows="3">${esc(note)}</textarea></details>` : ""}
+        ${offer && offerShown ? renderInStepOffer(offer, "pf") : ""}
+        ${!offer && bLine ? renderInStepLine(bLine, "pf") : ""}
         <button type="button" class="btn btn-primary btn-large btn-full" id="pf-done">Done</button>
       </div>`;
     wire();
@@ -173,13 +200,16 @@ export function PlanFinishView(router) {
     });
     root.querySelector("#pf-note")?.addEventListener("input", e => { note = e.target.value; });
     root.querySelector("#pf-counted")?.addEventListener("change", e => { counted = !!e.target.checked; });
-    root.querySelector("#pf-done")?.addEventListener("click", done);
+    root.querySelector("#pf-done")?.addEventListener("click", () => done());
+    root.querySelector("#pf-is-start")?.addEventListener("click", () => done({ toInStep: true }));
+    root.querySelector("#pf-is-later")?.addEventListener("click", () => { offerShown = false; repaint("#pf-done"); });
+    wireInStepLine(root, bLine, "pf");
     root.querySelector("#pf-empathy-go")?.addEventListener("click", () => { fireEmpathyPrompt(getSessionCount()); router.navigate("today"); });
     root.querySelector("#pf-empathy-skip")?.addEventListener("click", () => { skipEmpathyPrompt(getSessionCount()); router.navigate("today"); });
   }
 
   /** Saves only what was said, on the session's own entry and the person's own preferences. */
-  function done() {
+  function done({ toInStep = false } = {}) {
     const log = store.get("activityLog") || [];
     const i = log.findIndex(e => e && e.id === entry.id);
     const fields = {};
@@ -198,6 +228,10 @@ export function PlanFinishView(router) {
       if (f.like) store.likeMovement(id);
       else if (f.less) store.setExercisePreference(id, f.never ? "avoid" : "less", "finish");
     }
+    // P-28. Start on In Step's offer: what was said is kept, then the episode.
+    if (toInStep && offer) { openEpisodeNext(offer.id, { low: offer.low }); router.navigate("in-step"); return; }
+    // An episode was offered on this finish: no reflection prompt as well.
+    if (offer) { router.navigate("today"); return; }
     useAnswersForEmpathy(null, typeof mood === "number" ? mood : null);
     const candidate = getEmpathyPromptForSession(getSessionCount());
     if (candidate) { empathy = candidate; paint(); root.querySelector("h1")?.focus(); return; }

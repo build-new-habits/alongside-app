@@ -1,6 +1,11 @@
 /**
  * js/views/noticing.js - Wellbeing Hub Landing View
  *
+ * 06 Nov 2026 v14 - P-28 EMPATHY-THREAD, S3 (both tiers). In Step's tile is
+ *   orchid with the two-figures icon, and says what In Step now is: short
+ *   moments about the people around you (it said "Short scenarios. Three
+ *   ways to respond. No right step."). Same id, same place, same route.
+ *
  * 31 Oct 2026 v13 - STAGE PATH Session 9 (CLOSE; P-12 F2). On the Plan only,
  *   Write about this is drawn as a button (it was bare words); one look
  *   check (planLook, js/plan-look.js: the look only; Wellbeing still offers
@@ -374,11 +379,11 @@ export function render() {
             <span class="wb-practice__sub">Write anything. Only you can read it.</span>
           </button>
 
-          <button class="wb-practice k-green" id="noticing-in-step-btn"
-                  aria-label="In Step \u2014 short scenarios, three ways to respond, no right step">
+          <button class="wb-practice k-orchid" id="noticing-in-step-btn"
+                  aria-label="In Step \u2014 short moments about the people around you">
             <span class="kind-tile">${lineIcon("instep")}</span>
             <span class="wb-practice__name">In Step</span>
-            <span class="wb-practice__sub">Short scenarios. Three ways to respond. No right step.</span>
+            <span class="wb-practice__sub">Short moments about the people around you.</span>
           </button>
         </div>
       </section>

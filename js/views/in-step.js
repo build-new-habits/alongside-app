@@ -1,503 +1,321 @@
 /**
  * js/views/in-step.js
- * 31 Oct 2026 v5
+ * 06 Nov 2026 v6
  *
- * v5 - P-13 rooms, the mind rooms first (Graeme, 31 Oct). On the Plan only,
- *   the one look (Session 9): the heading 24 px at the left; "‹ Back" (it
- *   said "← Back") with no house beside it; the four movements' line icon
- *   in place of their emoji, and no padlock emoji on one not open yet (its
- *   line already says when it opens); Learn why and Write about it drawn as
- *   buttons. Free unchanged; In Step stays free (verify-door1,
- *   verify-plan-claims).
+ * v6 - P-28 EMPATHY-THREAD, S3 IN STEP PLAYER (Graeme, 05 Nov: In Step
+ *   "probably becomes a program"). The four movements and their scenarios
+ *   are gone (archived first: BNH-Files Archive/P-28 In Step Environment/,
+ *   and docs/archive-code/). In Step is now a programme of four parts, six
+ *   episodes each (data/in-step-programme.js, the approved wording v5 word
+ *   for word), played as the approved prototype v5 plays it:
  *
- * v4 - A-4 WORD BUDGET (Stage AWARD; Graeme, 18 Oct: "You do those
- *   things"). What this is is folded (every word kept), so the four
- *   movements are no longer under 106 words.
+ *     Before we start  last time's Carry it, "Did it come up?", three taps
+ *                      (It did / Not yet / It didn't come up), or skip;
+ *                      only the tap is kept (Schema v1.123).
+ *     Listen           the scene, on screen, and heard when the coach's
+ *                      voice is on and the file is there.
+ *     Hold still       the position, its seated (or standing) way, Skip
+ *                      the hold; then the timer, and the voice starts by
+ *                      itself with it, with one big Pause the voice.
+ *     Choose           three ways, none right; then "There's no wrong
+ *                      answer." whichever was chosen. The choice is not
+ *                      kept anywhere (the old room logged it).
+ *     Carry it         one small thing for today, and at the end of a
+ *                      part, its closing line.
  *
- * 08 Sep 2026 v3
+ *   The order is kept: the next episode in order, and any already done,
+ *   are open; nothing later. Opened from Wellbeing any time, or from a
+ *   finish's offer (data/in-step-offer.js). Both tiers (Graeme, 05 Nov).
+ *   The colour is orchid, always with the two-figures icon and the words
+ *   In Step. No Learn why: each part says why in one plain sentence, and
+ *   no research is cited. Free's door to the Plan stays on Carry it, and
+ *   says four parts (Graeme, 06 Nov; it said four movements).
  *
- * v3 - A11Y-HEADER. The .workout-header-title span is an h1. It was a
- *   span in 11 views and a heading in none, while the rest of the app
- *   uses 48 h1 and 67 h2 -- the screen's title, styled and read as one,
- *   existing in presentation only. WCAG 2.2 AA 1.3.1. Nothing moves:
- *   session-shared.css v8 adds margin:0, which an h1 needs and a span
- *   does not.
- *
- * 18 Aug 2026 v2
- *
- * v2 - IS-2. Three changes, one product decision and two faults.
- *
- *   STAGED ORDER (Graeme's call, 18 Aug). All four movements were open
- *   from the start, with only a per-movement cooldown after use. On
- *   device that read as "I can access all of it and therefore none of
- *   it lands." Now sequential: Solo, then Partner, then Floor, then
- *   Environment, each opening when the one before it has been answered
- *   once. The per-movement 3-day cooldown is UNCHANGED and still
- *   applies on top -- the two gates do different jobs. The order is not
- *   arbitrary: it widens outward from your own patterns to the people
- *   nearest you to strangers to the world, which is the arc the
- *   scenarios were written in.
- *
- *   DERIVED, NOT STORED. The stage is computed from completedCount,
- *   which already exists. A new field would be a second place holding
- *   the same fact, and the scenario data is the only thing that should
- *   ever define the order. Somebody who already answered a later
- *   movement keeps it -- see isMovementAvailable().
- *
- *   The landing had one coach line describing the FORMAT and nothing
- *   saying what In Step is for. An intro now sits above the movements.
- *
- *   A bare completedCount digit sat on each card with no label. It read
- *   as a score in a product that does not score, and a screen reader
- *   got a naked number. Removed -- see the note at the render.
- *
- *   The locked cards used inline opacity: 0.55, the same fault
- *   A11Y-LOCK fixed in tier-gating.css the same day: it dimmed the
- *   TEXT, not just the chrome, taking --color-text-secondary from
- *   5.97:1 to 2.95:1 on card. Locked state is carried by a dashed
- *   border and explicit wording instead.
- *
- * 09 Aug 2026 v1
- *
- * "In Step" — practice space extending the empathy transfer arc.
- * Route: "in-step". FREE since DOOR-1 (12 Aug 2026) -- the empathy arc
- * is a practice, not a journey, and practices are free. The long-horizon
- * version behind the upgrade door is the paid part.
- *
- * E3, 13 Aug 2026: this line previously still said "Personal tier (gated
- * via js/auth.js isPremium())". The code was right and the header was
- * wrong for a day. Documentation drift of exactly the kind logged at the
- * top of master schedule v183.
- * Nav: hidden (activity flow, same pattern as journal-entry/breathing-session).
- *
- * Spec: PM chat session, 09 Aug 2026 ("In Step" concept development).
- * Four movements (solo/partner/floor/environment), each a small
- * progressive series reusing the noticingProgress architecture already
- * live in store.js. One scenario per visit, three lateral unrandomised-
- * order response options, no ranking, no evaluation of the choice made.
- *
- * Multi-screen pattern follows breathing-session.js exactly: module-level
- * `phase` state, a render() dispatcher, and a local rerender() that
- * replaces #main-content directly rather than going back through the
- * router (keeps scroll position sane between scenario steps).
- *
- * Lock rule, TWO gates, updated 18 Aug (v2):
- *
- *   1. Cooldown, unchanged. After a movement's scenario is answered,
- *      that movement's *next* scenario is locked for 3 days
- *      (IN_STEP_LOCK_DAYS below) — a deliberate anti-binge gap,
- *      matching the 3-4 day cadence already used for the empathy
- *      transfer stage prompts elsewhere in the product.
- *
- *   2. Stage, new. Movements open in MOVEMENTS order, each when the one
- *      before it has been answered at least once. The v1 line that used
- *      to sit here — "all four movements are open from the start; there
- *      is no movement-to-movement gate" — described real v1 behaviour
- *      and is now wrong. Replaced rather than left, since a stale
- *      comment describing a mechanism that is not there is the exact
- *      fault class logged against onUnmount and exercises/index.js.
- *
- * Data logged (store.inStepProgress.choiceLog): movementId, scenarioId,
- * optionId, tag, timestamp. Aggregate research signal only — see header
- * note in js/data/in-step-scenarios.js. NEVER read this log to change
- * coach language, session content, or anything shown back to the user.
- * If a future session wires cohort-level reporting, it reads this array
- * in bulk, offline, never per-user in-app.
+ * v5 - P-13 rooms (31 Oct): the one look on the Plan. v4 - A-4 word budget.
+ * v3 - A11Y-HEADER. v2 - IS-2 staged order. v1 - 09 Aug 2026. Their notes
+ * are in the archived copy (docs/archive-code/in-step_v5_retired_06nov2026.js).
  */
-
-import { store }               from "../store.js";
-import { router }              from "../router.js";
-import { MOVEMENTS, getScenario } from "../data/in-step-scenarios.js";
-import { isPremium }           from "../auth.js";
-import { lineIcon }            from "../data/line-icons.js";
+import { store }   from "../store.js";
+import { router }  from "../router.js";
+import { isPremium } from "../auth.js";
+import { lineIcon } from "../data/line-icons.js";
+import { PARTS, EPISODES, ACK, ANSWERS, getEpisode, getPart, episodesInPart, nextEpisodeId } from "../data/in-step-programme.js";
+import { programme, currentEpisodeId, isOpen, lastTimeLine, answerLastTime, completeEpisode,
+         takePendingEpisode, LOW_DAY_LINE } from "../data/in-step-offer.js";
+import { playLine, stopLine, voiceOn } from "../coach-audio.js";
 
 export const centered = false;
 
-const IN_STEP_LOCK_DAYS = 3;
+const STEPS = ["Listen", "Hold still", "Choose", "Carry it"];
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
-let phase           = "landing";  // "landing" | "scenario" | "result"
-let activeMovementId = null;
-let activeScenario   = null;
-let chosenOption     = null;
-let learnWhyOpen     = false;
+let phase  = "landing";   // landing | prev | listen | holdIntro | hold | choose | carry
+let epId   = null;
+let low    = false;       // opened from a low day's offer
+let from   = "wellbeing"; // wellbeing | finish
+let chosen = null;
+let timer  = null;
+let left   = 0;
+let _internal = false;    // true while this file redraws itself (go)
 
-// ── Helpers ──────────────────────────────────────────────────────────────────
-
-function getProgress() {
-  return store.get("inStepProgress") || {
-    unlockedAt: {}, scenarioIndex: {}, completedCount: {}, choiceLog: []
-  };
+function _stop() {
+  if (timer) { clearInterval(timer); timer = null; }
+  stopLine();
 }
 
-function daysSince(iso) {
-  if (!iso) return Infinity;
-  const ms = Date.now() - new Date(iso).getTime();
-  return ms / (1000 * 60 * 60 * 24);
+// ── Pieces ──────────────────────────────────────────────────────────────
+const icon = (size = 20) => lineIcon("instep", size);
+const eyebrow = text => `<p class="instep-eyebrow k-orchid">${icon(18)}<span>${esc(text)}</span></p>`;
+
+function stepNav(n) {
+  return `<nav class="instep-steps" aria-label="This episode's steps"><ol>${STEPS.map((w, i) =>
+    `<li class="${i < n ? "is-done" : ""}${i === n ? " is-now" : ""}"${i === n ? ' aria-current="step"' : ""}>${w}${i < n ? '<span class="sr-only">, done</span>' : ""}</li>`).join("")}</ol></nav>`;
 }
 
-// IS-2. Stage gate. A movement is reached when every movement BEFORE it
-// in MOVEMENTS order has been answered at least once. Derived from
-// completedCount, which already exists -- no new store field, and the
-// scenario data stays the only definition of the order.
-//
-// Somebody who answered a later movement under v1 keeps it: their own
-// completedCount is checked first, so the change never takes away
-// something a person has already reached.
-function isMovementReached(movementId) {
-  const progress = getProgress();
-  if ((progress.completedCount?.[movementId] || 0) > 0) return true;
-
-  const index = MOVEMENTS.findIndex(m => m.id === movementId);
-  if (index <= 0) return true;   // first movement is always reached
-  return MOVEMENTS
-    .slice(0, index)
-    .every(m => (progress.completedCount?.[m.id] || 0) > 0);
+function epHeader(e) {
+  return `<div class="workout-header instep-bar">
+      <button type="button" class="btn btn-ghost${isPremium() ? " plan-exit" : ""}" id="is-exit">Exit</button>
+      ${eyebrow(`In Step · Part ${e.part} · ${e.episode} of 6`)}
+    </div>`;
 }
 
-// The movement immediately before this one, for the "what opens it" line.
-function predecessorName(movementId) {
-  const index = MOVEMENTS.findIndex(m => m.id === movementId);
-  if (index <= 0) return null;
-  return MOVEMENTS[index - 1].name;
+const speaking = `<p class="instep-speaking" id="is-spk" hidden><span class="instep-dots" aria-hidden="true"><i></i><i></i><i></i></span>Speaking</p>`;
+const pauseBtn = (big = false) => `<button type="button" class="btn ${big ? "btn-primary btn-large" : "btn-secondary"} btn-full instep-pause" id="is-pause" hidden>Pause the voice</button>`;
+
+function altLine(alt) {
+  // "Or stand, hands the same." and "Seated: let your weight ..." say what
+  // they are; the rest are the seated way.
+  return /^(Or |Seated:)/.test(alt.text) ? alt.text : `Seated: ${alt.text}`;
 }
 
-// Cooldown gate. Separate from the stage gate above and applied on top:
-// one paces a movement you have reached, the other decides whether you
-// have reached it. Both must pass.
-function isMovementAvailable(movementId) {
-  if (!isMovementReached(movementId)) return false;
-  const progress = getProgress();
-  const last = progress.unlockedAt?.[movementId];
-  if (!last) return true;
-  return daysSince(last) >= IN_STEP_LOCK_DAYS;
+function shell(inner) {
+  return `<div class="view in-step-view${isPremium() ? " is-plan" : ""}">${inner}</div>`;
 }
 
-function daysRemaining(movementId) {
-  const progress = getProgress();
-  const last = progress.unlockedAt?.[movementId];
-  if (!last) return 0;
-  const remaining = Math.ceil(IN_STEP_LOCK_DAYS - daysSince(last));
-  return Math.max(0, remaining);
+// ── Screens ─────────────────────────────────────────────────────────────
+function renderLanding() {
+  const p = programme();
+  const cur = currentEpisodeId(p);
+  const curE = cur ? getEpisode(cur) : null;
+  const back = isPremium()
+    ? `<button type="button" class="btn btn-ghost plan-back" id="is-back" aria-label="Back to Wellbeing">‹ Back</button>`
+    : `<button type="button" class="btn btn-ghost" id="is-back" aria-label="Back to Wellbeing">← Back</button>`;
+  const reachedPart = n => episodesInPart(n).some(e => isOpen(e.id, p));
+  return shell(`
+    <div class="workout-header">${back}<h1 class="workout-header-title" tabindex="-1">In Step</h1></div>
+    ${eyebrow("In Step")}
+    <p class="instep-intro">Short moments after a session about the people around you. They come one at a time, in order, and anything you've done is here whenever you like.</p>
+    ${curE ? `
+      <button type="button" class="instep-next" data-ep="${curE.id}">
+        <span class="kind-tile k-orchid">${icon()}</span>
+        <span class="instep-next__txt"><span class="instep-next__part">Part ${curE.part}: ${esc(getPart(curE.part).name)}</span>
+        <span class="instep-next__title">Episode ${curE.episode}: ${esc(curE.title)}</span>
+        <span class="instep-next__sub">About 3 minutes</span></span>
+      </button>` : `<p class="instep-intro">${esc(PARTS[3].closing.text)}</p>`}
+    ${PARTS.map(part => `
+      <section class="instep-part" aria-labelledby="is-part-${part.n}">
+        <h2 id="is-part-${part.n}">Part ${part.n}: ${esc(part.name)}</h2>
+        <p class="instep-why">${esc(part.why)}</p>
+        ${reachedPart(part.n) ? `<ul class="instep-eps">${episodesInPart(part.n).filter(e => isOpen(e.id, p)).map(e => `
+          <li><button type="button" class="instep-ep" data-ep="${e.id}">
+            <span class="instep-ep__title">Episode ${e.episode}: ${esc(e.title)}</span>
+            <span class="instep-ep__sub">${p.done.includes(e.id) ? "Done. Open it again any time" : "Next · About 3 minutes"}</span>
+          </button></li>`).join("")}</ul>`
+          : `<p class="instep-later">Opens after Part ${part.n - 1}.</p>`}
+      </section>`).join("")}
+  `);
 }
 
-// Fisher-Yates shuffle — option order rotates per view, per spec
-// ("order rotated, first-position-as-correct is a real anchoring bias").
-function shuffled(arr) {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
+function renderPrev(e) {
+  return shell(`${epHeader(e)}
+    <h1 tabindex="-1">Before we start</h1>
+    ${low ? `<p class="instep-low">${esc(LOW_DAY_LINE)}</p>` : ""}
+    <div class="card instep-card"><p class="instep-prev" id="is-prev-line">${esc(lastTimeLine())}</p></div>
+    <div class="instep-answers" role="group" aria-labelledby="is-prev-line">
+      ${ANSWERS.map(a => `<button type="button" class="btn btn-secondary btn-full" data-answer="${a.id}">${esc(a.label)}</button>`).join("")}
+    </div>
+    <p class="instep-small">Only your tap is kept. No score, nothing to write.</p>
+    <button type="button" class="btn btn-secondary btn-full" id="is-skip-prev">Skip this and start</button>`);
 }
 
-function recordChoice(movementId, scenarioId, optionId, tag) {
-  const progress = getProgress();
-  const choiceLog = Array.isArray(progress.choiceLog) ? [...progress.choiceLog] : [];
-  choiceLog.push({ movementId, scenarioId, optionId, tag, at: new Date().toISOString() });
-
-  const scenarioIndex = { ...(progress.scenarioIndex || {}) };
-  scenarioIndex[movementId] = (scenarioIndex[movementId] || 0) + 1;
-
-  const completedCount = { ...(progress.completedCount || {}) };
-  completedCount[movementId] = (completedCount[movementId] || 0) + 1;
-
-  const unlockedAt = { ...(progress.unlockedAt || {}) };
-  unlockedAt[movementId] = new Date().toISOString();
-
-  store.set("inStepProgress", { ...progress, choiceLog, scenarioIndex, completedCount, unlockedAt });
+function renderListen(e) {
+  return shell(`${epHeader(e)}
+    <h1 tabindex="-1">${esc(e.title)}</h1>${stepNav(0)}
+    ${low && !lastTimeLine() ? `<p class="instep-low">${esc(LOW_DAY_LINE)}</p>` : ""}
+    <div class="card instep-card instep-said">${speaking}<p>${esc(e.listen.text)}</p>${pauseBtn()}</div>
+    <button type="button" class="btn btn-primary btn-large btn-full" id="is-next">Next: hold still</button>`);
 }
 
-// ── Render ───────────────────────────────────────────────────────────────────
+function renderHoldIntro(e) {
+  const h = e.hold;
+  return shell(`${epHeader(e)}
+    <h1 tabindex="-1">Hold still</h1>${stepNav(1)}
+    <div class="card instep-pose"><h2>${esc(h.pose)}</h2><p>${esc(h.how)}</p><p class="instep-small">${esc(altLine(h.alt))}</p></div>
+    ${voiceOn() ? `<p class="instep-small">When you press Start, I'll talk you through it. You won't need to touch the phone.</p>` : ""}
+    <div class="instep-row">
+      <button type="button" class="btn btn-secondary" id="is-skip-hold">Skip the hold</button>
+      <button type="button" class="btn btn-primary" id="is-hold-go">Start ${h.secs} seconds</button>
+    </div>`);
+}
+
+function renderHold(e) {
+  const h = e.hold, C = 2 * Math.PI * 76;
+  return shell(`${epHeader(e)}
+    <h1 tabindex="-1">${esc(h.pose)}</h1>${stepNav(1)}
+    <div class="instep-ring" role="timer" aria-label="Time left, in seconds">
+      <svg viewBox="0 0 170 170" aria-hidden="true" focusable="false"><circle class="instep-ring__track" cx="85" cy="85" r="76"/><circle class="instep-ring__arc" id="is-arc" cx="85" cy="85" r="76" stroke-dasharray="${C}" stroke-dashoffset="0"/></svg>
+      <span class="instep-ring__n" id="is-left">${left}</span>
+    </div>
+    <div class="card instep-card instep-said">${speaking}<p>${esc(h.text)}</p></div>
+    ${pauseBtn(true)}
+    <div id="is-hold-end"></div>`);
+}
+
+function renderChoose(e) {
+  return shell(`${epHeader(e)}
+    <h1 tabindex="-1">Choose</h1>${stepNav(2)}
+    <fieldset class="instep-choose"><legend>${esc(e.choose.question)}</legend>
+      ${e.choose.options.map((o, k) => `<label class="instep-opt"><input type="radio" name="is-opt" value="${k}"${chosen === k ? " checked" : ""}><span>${esc(o)}</span></label>`).join("")}
+    </fieldset>
+    <p class="instep-ack" id="is-ack" role="status">${chosen === null ? "" : esc(ACK.text)}</p>
+    <button type="button" class="btn btn-primary btn-large btn-full" id="is-next">Next: carry it</button>`);
+}
+
+function renderCarry(e) {
+  const closing = e.episode === 6 ? getPart(e.part).closing : null;
+  const more = nextEpisodeId(e.id) !== null;
+  return shell(`${epHeader(e)}
+    <h1 tabindex="-1">Carry it</h1>${stepNav(3)}
+    <p class="instep-small instep-center">One small thing for today</p>
+    <div class="card instep-card instep-carry">${speaking}<p>${esc(e.carry.text)}</p>${pauseBtn()}</div>
+    ${more ? `<p class="instep-small">I'll ask how it went next time.</p>` : ""}
+    ${closing ? `<p class="instep-closing">${esc(closing.text)}</p>` : ""}
+    ${!isPremium() ? `
+      <aside class="upgrade-door" aria-label="About the paid plan">
+        <p class="upgrade-door__text">That&rsquo;s In Step — four parts, one thing at a time, each going a bit deeper.</p>
+        <p class="upgrade-door__text">There&rsquo;s a longer version of the same idea. You pick something you&rsquo;d like to get better at — being steadier, being more present, noticing other people more — and I build it out over months, shaped around what you&rsquo;re actually noticing rather than a fixed course.</p>
+        <p class="upgrade-door__text upgrade-door__text--quiet">That&rsquo;s part of the paid plan, if you ever fancy it.</p>
+        <button type="button" class="upgrade-door__link" id="is-door-btn">Have a look</button>
+      </aside>` : ""}
+    <button type="button" class="btn btn-primary btn-large btn-full" id="is-done">Done</button>`);
+}
 
 export function render() {
-  if (phase === "scenario") return renderScenario();
-  if (phase === "result")   return renderResult();
-  return renderLanding();
-}
-
-function renderLanding() {
-  const progress = getProgress();
-
-  return `
-    ${isPremium() ? `<div class="view in-step-view is-plan">` : `<div class="view in-step-view">`}
-
-      <div class="workout-header">
-        ${isPremium() ? `<button class="btn btn-ghost plan-back" id="is-back-btn" aria-label="Back to Noticing">‹ Back</button>` : `<button class="btn btn-ghost" id="is-back-btn" aria-label="Back to Noticing">
-          ← Back
-        </button>`}
-        <h1 class="workout-header-title">In Step</h1>
-      </div>
-
-      <div class="card card-coach" style="margin-bottom: var(--space-4);">
-        <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
-        <p class="coach-message-text">
-          Different styles, different partners, different spaces. A short scenario, three ways to move
-          through it — no right step, just yours.
-        </p>
-      </div>
-
-      <!--
-        IS-2. The coach line above describes the FORMAT. Nothing said what
-        In Step is for, which is why it read as a set of four things
-        rather than one practice. This is the orientation, in the P2
-        helper register rather than coach voice: it explains the screen,
-        it does not speak to the person about themselves.
-      -->
-      <!-- A-4 WORD BUDGET (18 Oct). Folded, every word kept: the four
-           movements are the first thing to choose. -->
-      <details class="card is-intro finish-more"
-               style="margin-bottom: var(--space-5); background: var(--color-bg-card);">
-        <summary class="finish-more__summary" id="is-intro-h">What this is</summary>
-        <p class="text-secondary" style="font-size: var(--text-sm); margin-bottom: var(--space-2);">
-          The same care you practise on yourself here, pointed outward. Each one is a moment you would
-          recognise, and three ways of standing in it.
-        </p>
-        <p class="text-secondary" style="font-size: var(--text-sm); margin-bottom: var(--space-2);">
-          Nothing is scored and nothing is fed back to you. There is no better answer, and the one you
-          pick changes nothing about your sessions.
-        </p>
-        <p class="text-secondary" style="font-size: var(--text-sm);">
-          They open one at a time, widening outward — your own patterns first, then the people nearest
-          you, then strangers, then the world that doesn't consult you. A few days between each.
-        </p>
-      </details>
-
-      <div style="display: flex; flex-direction: column; gap: var(--space-3);">
-        ${MOVEMENTS.map(m => {
-          const reached   = isMovementReached(m.id);
-          const available = isMovementAvailable(m.id);
-          const remaining = daysRemaining(m.id);
-
-          // IS-2. Three states, and each says WHY, which the single
-          // "Available in N days" line could not: not reached yet,
-          // reached but cooling down, open.
-          //
-          // The bare completedCount digit that used to sit here is gone.
-          // An unlabelled number on a card is a score, in a product whose
-          // first principle is that it does not evaluate anybody, and a
-          // screen reader received it as a naked digit with no context.
-          const sub = !reached
-            ? `Opens after ${predecessorName(m.id)}`
-            : (available
-                ? m.tagline
-                : `Ready again in ${remaining} day${remaining === 1 ? "" : "s"}`);
-
-          // No opacity dimming. A11Y-LOCK, same day, same reason: it
-          // lowers TEXT contrast (--color-text-secondary 5.97:1 -> 2.95:1
-          // at 0.55) and encodes state in reduced legibility. The dashed
-          // border, the padlock and the wording carry it instead.
-          return `
-            <button class="card is-movement-card" data-movement="${m.id}"
-                    ${available ? "" : "disabled"}
-                    style="display: flex; align-items: center; gap: var(--space-4);
-                           text-align: left; width: 100%;
-                           cursor: ${available ? "pointer" : "default"};
-                           background: var(--color-surface);
-                           border: 1px ${available ? "solid transparent" : "dashed var(--color-primary)"};"
-                    aria-label="${m.name}: ${available ? m.tagline : sub}">
-              ${isPremium() ? `<span class="kind-tile k-green" aria-hidden="true">${lineIcon("instep")}</span>` : `<span style="font-size: 2rem; flex-shrink: 0; line-height: 1;" aria-hidden="true">${m.icon}</span>`}
-              <div style="flex: 1; min-width: 0;">
-                <p style="font-size: var(--text-lg); font-weight: var(--font-semibold);
-                          margin-bottom: var(--space-1);">${m.name}</p>
-                <p class="text-secondary" style="font-size: var(--text-sm);">${sub}</p>
-              </div>
-              <span style="color: var(--color-primary); font-size: 1.25rem; flex-shrink: 0;"
-                    aria-hidden="true">${available ? "›" : (isPremium() ? "" : "🔒")}</span>
-            </button>
-          `;
-        }).join("")}
-      </div>
-
-    </div>
-  `;
-}
-
-function renderScenario() {
-  const movement = MOVEMENTS.find(m => m.id === activeMovementId);
-  const options = shuffled(activeScenario.options);
-
-  return `
-    ${isPremium() ? `<div class="view in-step-view is-plan">` : `<div class="view in-step-view">`}
-
-      <div class="workout-header">
-        ${isPremium() ? `<button class="btn btn-ghost plan-back" id="is-back-btn" aria-label="Back to In Step">‹ Back</button>` : `<button class="btn btn-ghost" id="is-back-btn" aria-label="Back to In Step">
-          ← Back
-        </button>`}
-        <h1 class="workout-header-title">${movement.name}</h1>
-      </div>
-
-      <div class="card" style="margin-bottom: var(--space-5);">
-        <p style="font-size: var(--text-base); line-height: 1.6;">${activeScenario.text}</p>
-      </div>
-
-      <div style="display: flex; flex-direction: column; gap: var(--space-3);" role="group"
-           aria-label="Three ways to respond — choose the one that fits">
-        ${options.map(opt => `
-          <button class="card is-option-btn" data-option="${opt.id}" data-tag="${opt.tag}"
-                  style="text-align: left; width: 100%; cursor: pointer;
-                         background: var(--color-surface); min-height: 44px;">
-            <p style="font-size: var(--text-base); line-height: 1.5;">${opt.label}</p>
-          </button>
-        `).join("")}
-      </div>
-
-    </div>
-  `;
-}
-
-function renderResult() {
-  const movement = MOVEMENTS.find(m => m.id === activeMovementId);
-
-  return `
-    ${isPremium() ? `<div class="view in-step-view is-plan">` : `<div class="view in-step-view">`}
-
-      <div class="workout-header">
-        <h1 class="workout-header-title">${movement.name}</h1>
-      </div>
-
-      <div class="card card-coach" style="margin-bottom: var(--space-4);">
-        <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
-        <p class="coach-message-text">${movement.acknowledgement}</p>
-      </div>
-
-      <button class="btn ${isPremium() ? "btn-secondary" : "btn-ghost"} btn-small" id="is-learn-why-toggle"
-              aria-expanded="${learnWhyOpen}" aria-controls="is-learn-why-panel"
-              style="margin-bottom: var(--space-3);">
-        ${learnWhyOpen ? "Hide" : "Learn why"}
-      </button>
-
-      ${learnWhyOpen ? `
-        <div class="card" id="is-learn-why-panel" style="margin-bottom: var(--space-4);">
-          <p class="text-secondary" style="font-size: var(--text-sm); line-height: 1.6;">
-            ${movement.learnWhy}
-          </p>
-        </div>
-      ` : `<div id="is-learn-why-panel" hidden></div>`}
-
-      ${!isPremium() ? `
-        <!-- THE DOOR. Destination Architecture section 9, verbatim.
-             "In Step is free, and is the best door in the product --
-             because someone who has just finished a scenario has FELT the
-             shape of the thing."
-
-             P2: this is the helper layer, not the coach. It sits OUTSIDE
-             the card-coach block above and is visibly distinct from it,
-             because P1 says the coach never sells. The coach's
-             acknowledgement finishes; then something else speaks.
-
-             P3 is not breached. This is not an interruption on a timer --
-             it is a permanent surface at the one moment the person has
-             just felt what it is for. Tier Boundary section 6: "visible
-             at all times, never triggered by our judgement of readiness."
-
-             Copy rule 10.2 -- what is it, what would it do for me, how do
-             I get it -- in that order. Deliberately soft: it fires
-             straight after something reflective, and a hard call to
-             action would break the moment. -->
-        <aside class="upgrade-door" aria-label="About the paid plan">
-          <p class="upgrade-door__text">
-            That&rsquo;s In Step \u2014 four movements, one thing at a time, each going
-            a bit deeper.
-          </p>
-          <p class="upgrade-door__text">
-            There&rsquo;s a longer version of the same idea. You pick something
-            you&rsquo;d like to get better at \u2014 being steadier, being more present,
-            noticing other people more \u2014 and I build it out over months, shaped
-            around what you&rsquo;re actually noticing rather than a fixed course.
-          </p>
-          <p class="upgrade-door__text upgrade-door__text--quiet">
-            That&rsquo;s part of the paid plan, if you ever fancy it.
-          </p>
-          <button class="upgrade-door__link" id="is-door-btn">Have a look</button>
-        </aside>
-      ` : ""}
-
-      <div style="display: flex; flex-direction: column; gap: var(--space-3); margin-top: var(--space-5);">
-        <button class="btn ${isPremium() ? "btn-secondary" : "btn-ghost"}" id="is-journal-btn">
-          Want to say more? Write about it.
-        </button>
-        <button class="btn btn-primary" id="is-done-btn">
-          Done
-        </button>
-      </div>
-
-    </div>
-  `;
-}
-
-// ── Mount ─────────────────────────────────────────────────────────────────────
-
-function rerender() {
-  const main = document.getElementById("main-content");
-  if (main) {
-    main.innerHTML = render();
-    onMount();
+  // A finish's Start hands over the episode once (data/in-step-offer.js).
+  const pending = takePendingEpisode();
+  if (pending) { _stop(); epId = pending.id; low = pending.low; chosen = null; from = "finish"; phase = "start"; }
+  // Opened by the router (not a step of this file): the list, quiet.
+  else if (!_internal) { _stop(); phase = "landing"; epId = null; low = false; chosen = null; from = "wellbeing"; }
+  const e = epId ? getEpisode(epId) : null;
+  if (!e) phase = "landing";
+  if (phase === "start") phase = lastTimeLine() && programme().lastAnswer === null ? "prev" : "listen";
+  switch (phase) {
+    case "prev":      return renderPrev(e);
+    case "listen":    return renderListen(e);
+    case "holdIntro": return renderHoldIntro(e);
+    case "hold":      return renderHold(e);
+    case "choose":    return renderChoose(e);
+    case "carry":     return renderCarry(e);
+    default:          return renderLanding();
   }
+}
+
+// ── Behaviour ───────────────────────────────────────────────────────────
+function go(next) {
+  _stop();
+  phase = next;
+  const main = document.getElementById("main-content");
+  if (!main) return;
+  _internal = true;
+  try { main.innerHTML = render(); } finally { _internal = false; }
+  onMount();
+  window.scrollTo?.(0, 0);
+}
+
+function voice(id, { then } = {}) {
+  const spk = document.getElementById("is-spk"), pause = document.getElementById("is-pause");
+  const quiet = () => { if (spk) spk.hidden = true; if (pause) pause.hidden = true; };
+  const h = playLine(id, {
+    onPlaying: () => { if (spk) spk.hidden = false; if (pause) { pause.hidden = false; pause.disabled = false; pause.textContent = "Pause the voice"; } },
+    onEnd: () => { quiet(); then?.(); },
+  });
+  if (pause) pause.addEventListener("click", () => { stopLine(); pause.hidden = false; pause.textContent = "Voice paused"; pause.disabled = true; if (spk) spk.hidden = true; });
+  return h;
+}
+
+function startEpisode(id, opts = {}) {
+  epId = id; low = !!opts.low; chosen = null;
+  go(lastTimeLine() && programme().lastAnswer === null ? "prev" : "listen");
+}
+
+function leave() {
+  _stop();
+  const wasFinish = from === "finish";
+  phase = "landing"; epId = null; low = false; chosen = null; from = "wellbeing";
+  if (wasFinish) router.navigate("today"); else go("landing");
 }
 
 export function onMount() {
-  document.getElementById("is-back-btn")?.addEventListener("click", () => {
-    if (phase === "landing") {
-      router.navigate("noticing");
-    } else {
-      phase = "landing";
-      activeMovementId = null;
-      activeScenario = null;
-      rerender();
-    }
-  });
+  const root = document.querySelector(".in-step-view");
+  if (!root) return;
+  root.querySelector("h1")?.focus?.();
+  const e = epId ? getEpisode(epId) : null;
 
-  document.querySelectorAll(".is-movement-card").forEach(btn => {
-    if (btn.disabled) return;
-    btn.addEventListener("click", () => {
-      const movementId = btn.dataset.movement;
-      const progress = getProgress();
-      const index = progress.scenarioIndex?.[movementId] || 0;
-      activeMovementId = movementId;
-      activeScenario = getScenario(movementId, index);
-      chosenOption = null;
-      learnWhyOpen = false;
-      phase = "scenario";
-      rerender();
-    });
-  });
+  root.querySelector("#is-back")?.addEventListener("click", () => { _stop(); router.navigate("noticing"); });
+  root.querySelectorAll("[data-ep]").forEach(b => b.addEventListener("click", () => { from = "wellbeing"; startEpisode(b.dataset.ep); }));
+  root.querySelector("#is-exit")?.addEventListener("click", leave);
 
-  document.querySelectorAll(".is-option-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      chosenOption = btn.dataset.option;
-      const tag = btn.dataset.tag;
-      recordChoice(activeMovementId, activeScenario.id, chosenOption, tag);
-      phase = "result";
-      rerender();
-    });
-  });
+  if (phase === "prev") {
+    root.querySelectorAll("[data-answer]").forEach(b => b.addEventListener("click", () => { answerLastTime(b.dataset.answer); go("listen"); }));
+    root.querySelector("#is-skip-prev")?.addEventListener("click", () => go("listen"));
+  }
+  if (phase === "listen" && e) {
+    voice(e.listen.audio);
+    root.querySelector("#is-next")?.addEventListener("click", () => go("holdIntro"));
+  }
+  if (phase === "holdIntro" && e) {
+    root.querySelector("#is-skip-hold")?.addEventListener("click", () => go("choose"));
+    root.querySelector("#is-hold-go")?.addEventListener("click", () => { left = e.hold.secs; go("hold"); });
+  }
+  if (phase === "hold" && e) {
+    // The voice starts by itself when the timer starts (Graeme, 05 Nov).
+    voice(e.hold.audio);
+    const C = 2 * Math.PI * 76, total = e.hold.secs;
+    timer = setInterval(() => {
+      left = Math.max(0, left - 0.25);
+      const n = document.getElementById("is-left"); if (n) n.textContent = String(Math.ceil(left));
+      const a = document.getElementById("is-arc"); if (a) a.setAttribute("stroke-dashoffset", String(C * (1 - left / total)));
+      if (left <= 0) {
+        clearInterval(timer); timer = null;
+        const end = document.getElementById("is-hold-end");
+        if (end && !end.firstChild) {
+          end.innerHTML = `<button type="button" class="btn btn-primary btn-large btn-full" id="is-next">Next</button>`;
+          end.querySelector("#is-next").addEventListener("click", () => go("choose"));
+          end.querySelector("#is-next").focus();
+        }
+      }
+    }, 250);
+  }
+  if (phase === "choose" && e) {
+    root.querySelectorAll('input[name="is-opt"]').forEach(r => r.addEventListener("change", () => {
+      const first = chosen === null;
+      chosen = Number(r.value);
+      const ack = document.getElementById("is-ack"); if (ack) ack.textContent = ACK.text;
+      if (first) playLine(ACK.audio);
+    }));
+    root.querySelector("#is-next")?.addEventListener("click", () => go("carry"));
+  }
+  if (phase === "carry" && e) {
+    completeEpisode(e.id);
+    const closing = e.episode === 6 ? getPart(e.part).closing : null;
+    voice(e.carry.audio, { then: closing ? () => playLine(closing.audio) : null });
+    document.getElementById("is-door-btn")?.addEventListener("click", () => { _stop(); router.navigate("upgrade"); });
+    root.querySelector("#is-done")?.addEventListener("click", leave);
+  }
+}
 
-  document.getElementById("is-learn-why-toggle")?.addEventListener("click", () => {
-    learnWhyOpen = !learnWhyOpen;
-    rerender();
-  });
-
-  document.getElementById("is-journal-btn")?.addEventListener("click", () => {
-    // journal-entry.js's journalEntryType pre-select wiring is dormant
-    // (flagged separately on the master schedule, not fixed here — out
-    // of this session's scope). Route there plainly; the person can
-    // write freely, same as tapping the Journal card from Noticing
-    // directly.
-    store.set("journalEntryType", null);
-    router.navigate("journal-entry");
-  });
-
-  document.getElementById("is-door-btn")?.addEventListener("click", () => {
-    router.navigate("upgrade");
-  });
-
-  document.getElementById("is-done-btn")?.addEventListener("click", () => {
-    phase = "landing";
-    activeMovementId = null;
-    activeScenario = null;
-    chosenOption = null;
-    learnWhyOpen = false;
-    router.navigate("noticing");
-  });
+/** Leaving the screen (the router): quiet, and the next visit starts at the list. */
+export function onUnmount() {
+  _stop();
+  phase = "landing"; epId = null; low = false; chosen = null; from = "wellbeing";
 }

@@ -1,0 +1,92 @@
+/**
+ * js/coach-audio.js
+ * 06 Nov 2026 v1
+ *
+ * P-28 EMPATHY-THREAD, S3. The coach's recorded voice, text first.
+ *
+ * Every spoken line has an id (the voice script's clip name, without
+ * .mp3). playLine(id) plays audio/<id>.mp3 when, and only when:
+ *   - the coach's voice is on (store.coachVoice === "on"; off by default,
+ *     Settings › Display › Coach's voice arrives in S4), and
+ *   - the file is there. A missing file is never an error: the line is on
+ *     screen as text whatever happens, and nothing speaks.
+ * No AI in the app (Graeme, 05 Oct): the files are made once in
+ * ElevenLabs. The phone's own synthetic voice, the prototype's stand-in,
+ * is never used here.
+ *
+ * Callers show "Pause the voice" only once the line is actually playing
+ * (onPlaying), so a missing file shows no control that does nothing.
+ *
+ * Where the browser has the Audio Session API, the session is "playback",
+ * so music pauses rather than being talked over; where it does not,
+ * nothing breaks. One line plays at a time: starting one stops the last.
+ */
+import { store } from "./store.js";
+
+let _current = null;   // { audio, id }
+
+/** Whether the coach's voice is on (Settings). */
+export function voiceOn() {
+  return store.get("coachVoice") === "on";
+}
+
+/** Where a line's file lives. */
+export function audioUrl(id) {
+  return `audio/${id}.mp3`;
+}
+
+function _session() {
+  try {
+    if (typeof navigator !== "undefined" && navigator.audioSession) navigator.audioSession.type = "playback";
+  } catch { /* the API is optional */ }
+}
+
+/**
+ * Plays a line if the voice is on. Returns a handle { stop } or null when
+ * nothing will play. onPlaying fires when sound actually starts; onEnd
+ * fires when it ends, is stopped, or could not play (no file).
+ */
+export function playLine(id, { onPlaying, onEnd, title = "In Step" } = {}) {
+  stopLine();
+  if (!id || !voiceOn() || typeof Audio === "undefined") return null;
+  let ended = false;
+  const finish = () => { if (ended) return; ended = true; if (_current && _current.id === id) _current = null; onEnd?.(); };
+  let audio;
+  try { audio = new Audio(audioUrl(id)); } catch { return null; }
+  _current = { audio, id, finish };
+  audio.addEventListener("playing", () => onPlaying?.());
+  audio.addEventListener("ended", finish);
+  audio.addEventListener("error", finish);
+  _session();
+  try {
+    if (typeof navigator !== "undefined" && navigator.mediaSession && typeof MediaMetadata !== "undefined") {
+      navigator.mediaSession.metadata = new MediaMetadata({ title, artist: "Alongside" });
+    }
+  } catch { /* optional */ }
+  try {
+    const p = audio.play();
+    if (p && typeof p.catch === "function") p.catch(finish);
+  } catch { finish(); }
+  return { stop: () => { try { audio.pause(); } catch { /* */ } finish(); } };
+}
+
+/** Stops whatever line is playing (leaving a screen, Pause the voice). */
+export function stopLine() {
+  if (!_current) return;
+  const c = _current; _current = null;
+  try { c.audio.pause(); } catch { /* */ }
+  c.finish?.();
+}
+
+/**
+ * Calls back with true only if the voice is on and the line's file is
+ * there, for a Listen button that should not appear when nothing would
+ * play. Never throws; no network, no file or no fetch is false.
+ */
+export async function lineAvailable(id) {
+  if (!id || !voiceOn() || typeof fetch !== "function") return false;
+  try {
+    const r = await fetch(audioUrl(id), { method: "HEAD" });
+    return !!(r && r.ok);
+  } catch { return false; }
+}
