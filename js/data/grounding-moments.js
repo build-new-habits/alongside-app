@@ -1,5 +1,22 @@
 /**
  * js/data/grounding-moments.js
+ * 06 Nov 2026 v2
+ *
+ * v2 - P-28 EMPATHY-THREAD, S2 CONTENT DATA (Graeme, 05 Nov).
+ *   - BEYOND moments open from session 8, not 20 (proposal 4: "Sooner").
+ *     A week-one moment still reads as instruction, so CONTACT stays from
+ *     the first offer and PLACE from 8 as before; BEYOND now joins it.
+ *   - HOLD_LINES: the eight lines the coach's voice says while you hold
+ *     (wording A4, approved 05 Nov, word for word). Played once, near the
+ *     start of a timed hold, only when Guide me was chosen for the session
+ *     or the voice is on in Settings (wired in S4). If the hold is shorter
+ *     than its line, the line is not offered. Each carries its clip's name
+ *     in the voice script (audio/<audio>.mp3); with no file, the words
+ *     show and nothing speaks. These are a separate thing from the
+ *     moments above: a moment is read on the card, now and then; a hold
+ *     line is heard during the hold, every time it is chosen.
+ *   tools/verify-p28-content.mjs.
+ *
  * 12 Aug 2026 v1
  *
  * GM-1. Grounding moments: a short invitation to notice something,
@@ -51,7 +68,7 @@ import { store } from "../store.js";
 
 /** Depth. Beyond asks more of somebody than Contact does, so it arrives
  *  later: in week one it reads as instruction, later as invitation. */
-export const DEPTH_FLOOR = { contact: 0, place: 8, beyond: 20 };
+export const DEPTH_FLOOR = { contact: 0, place: 8, beyond: 8 };   // v2: beyond was 20 (P-28)
 
 /** Cadence. Often enough to be part of the product, rare enough to stay
  *  slightly unexpected. At every session these become furniture. */
@@ -239,4 +256,65 @@ export function dismissMoment(momentId) {
     ...g,
     dismissed: [...new Set([...(g.dismissed || []), momentId])],
   });
+}
+
+// ── While you hold (P-28, A4) ─────────────────────────────────────────
+// Spoken at about 135 words a minute (the wording's own timing guide), so
+// `secs` is the line's length said slowly, rounded up. The real file's
+// length replaces it once the clip exists.
+const _secs = text => Math.ceil(text.split(/\s+/).filter(Boolean).length * 60 / 135);
+
+export const HOLD_LINES = [
+  { id: "plank", audio: "hold-plank", family: "Plank or any floor hold",
+    text: "Where are you touching the ground? Forearms, toes. Now picture grass under your hands, a meadow growing around you. You're a line, held still above it." },
+  { id: "side-plank", audio: "hold-side-plank", family: "Side plank",
+    text: "One side of you is doing the work. Let the other side be light. Somewhere, someone is holding something heavy on their own today. Hold this for them." },
+  { id: "wall-sit", audio: "hold-wall-sit", family: "Wall sit",
+    text: "Feel the wall behind you. It's taking some of you, without being asked. Most of what holds us up, we never notice." },
+  { id: "bridge", audio: "hold-bridge", family: "Glute bridge hold",
+    text: "Feet heavy on the floor. Let the floor push back as hard as you push down. You're being held up right now." },
+  { id: "balance", audio: "hold-balance", family: "Standing balance",
+    text: "Notice the tiny corrections at your ankle. Nobody taught you those. Your body is doing quiet arithmetic, all the time. Find something still to look at." },
+  { id: "stretch-1", audio: "hold-stretch-1", family: "A stretch (cool-down)",
+    text: "Let something go heavy. Whatever is touching the floor, stop holding it up. The floor has it." },
+  { id: "stretch-2", audio: "hold-stretch-2", family: "A stretch (cool-down, later)",
+    text: "While you hold this, think of one person who held something together for you lately. You don't have to tell them. Just hold this a moment longer." },
+  { id: "seated", audio: "hold-seated", family: "Seated stretch",
+    text: "Notice where the chair is holding you. You're supported right now without doing anything about it. Everyone you'll see today needs that sometimes." },
+].map(l => ({ ...l, secs: _secs(l.text) }));
+
+/**
+ * Which hold line fits this exercise, by the fields every exercise
+ * already carries (name, category, position, balanceDemand), or null.
+ * `later` is true for a stretch after the first in the same cool-down,
+ * which gets the second stretch line. The caller decides whether this is
+ * a timed hold at all; this only says which line would fit one.
+ */
+export function holdLineFamily(exercise, { later = false } = {}) {
+  if (!exercise) return null;
+  const name = (exercise.name || "").toLowerCase();
+  const pos  = exercise.position;
+  const isStretch = /\b(stretch|fold|pose)\b/.test(name)
+    || ["mobility", "recovery"].includes(exercise.category);
+
+  if (/\bside plank\b/.test(name)) return "side-plank";
+  if (/\bwall sit\b/.test(name))   return "wall-sit";
+  if (/\bbridge\b/.test(name))     return "bridge";
+  if (/\bplank\b/.test(name))      return "plank";
+  if (isStretch) {
+    if (pos === "seated") return "seated";
+    if (pos === "standing" && exercise.balanceDemand === true) return "balance";
+    return later ? "stretch-2" : "stretch-1";
+  }
+  if (exercise.balanceDemand === true && pos === "standing") return "balance";
+  if (pos === "floor" && /\b(hold|isometric|hollow)\b/.test(name)) return "plank";
+  return null;
+}
+
+/** The line for this hold, or null when none fits or the hold is too short for it. */
+export function selectHoldLine(exercise, { holdSeconds = 0, later = false } = {}) {
+  const id = holdLineFamily(exercise, { later });
+  if (!id) return null;
+  const line = HOLD_LINES.find(l => l.id === id);
+  return line && holdSeconds >= line.secs ? line : null;
 }

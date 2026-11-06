@@ -1,5 +1,28 @@
 /**
  * data/empathy-transfer.js - Empathy Transfer Prompt Pool
+ * 06 Nov 2026 v7
+ *
+ * v7 - P-28 EMPATHY-THREAD, S2 CONTENT DATA (Graeme, 05 Nov). No prompt
+ *   text changed: all 33 are byte-identical to v6, checked by hash in
+ *   verify-p28-content.
+ *   - D, SOONER. Graeme decided outward stages arrive sooner: people
+ *     close to you about session 8, strangers about session 20 (master
+ *     schedule v624); the rest "about half the time it takes now"
+ *     (proposal 3.4). STAGE_SESSION_FLOOR is { 2: 8, 3: 20, 4: 28,
+ *     5: 43 } (was 12, 30, 55, 85).
+ *   - The session gates inside each stage move with their stage, in the
+ *     same proportion and in the same order (stage 2: 20 -> 13; stage 3:
+ *     35, 40 -> 23, 27; stage 4: 60, 70 -> 31, 36; stage 5: 85, 90, 95,
+ *     100 -> 43, 46, 48, 51). Lowering the floors alone would bring back
+ *     EMP-2's fault: a stage entered with no prompt that qualifies.
+ *     Stage 1's minSessions:6 stays (its floor is 0).
+ *   - Firing cadence and the firings needed per stage live in reflect.js
+ *     and are looked at in S3, which opens that file.
+ *   - FINISH_B_LINES: the three finish lines about other people's
+ *     check-ins (wording A5), with when each may be said.
+ *   - PURPOSE_LINES: the two light sentences naming In Step's purpose
+ *     (wording A6) for the upgrade page and arc setup (shown in S5).
+ *
  * 29 Sep 2026 v6
  *
  * v6 - P10, FINISH LINES (persona finding W2-10). Conditions made true;
@@ -318,7 +341,7 @@ export const EMPATHY_PROMPTS = {
     // Prompt D — when: after 20+ sessions, when a meaningful pattern of variable energy/completion is visible
     {
       text: "Here's something I've noticed over time: the sessions that look like less from the outside often cost the most. The ones where you were tired, or in pain, or not feeling it. The people around you probably have days like that too. Days that look fine from the outside.",
-      requires: ["minSessions:20"],
+      requires: ["minSessions:13"],
       prefers:  ["variablePattern"]
     }
   ],
@@ -342,7 +365,7 @@ export const EMPATHY_PROMPTS = {
     // Prompt C — when: after 35+ sessions, user well established in the practice
     {
       text: "Something to consider: every person you'll speak to today has arrived from somewhere this morning. Traffic. A difficult night. Something on their mind they haven't said. They're all carrying a check-in you haven't seen. What difference would it make to you if you just assumed that was true?",
-      requires: ["minSessions:35"],
+      requires: ["minSessions:23"],
       prefers:  []
     },
     // Prompt D — when: after a session requiring persistence (high difficulty, completed despite low energy)
@@ -354,7 +377,7 @@ export const EMPATHY_PROMPTS = {
     // Prompt E — when: after 40+ sessions, reflective tone appropriate for established users
     {
       text: "You just spent time paying close attention to yourself — what your body needed, how much, at what pace. That quality of attention is rare. Most people rush through the day without it. The people you'll meet today probably haven't had anyone pay that kind of attention to them. You know what it feels like to receive it.",
-      requires: ["minSessions:40"],
+      requires: ["minSessions:27"],
       prefers:  []
     }
   ],
@@ -373,7 +396,7 @@ export const EMPATHY_PROMPTS = {
     // Prompt B — when: after 60+ sessions, long history of variable effort and persistence
     {
       text: "Think about what it took for you to get here today. Not just this session — what it's taken across all of them. The planning. The adjusting. The days when it was harder than it looked. Now think about someone whose daily life requires that same level of adjustment just to be present in the world. What would that cost, over time?",
-      requires: ["minSessions:60"],
+      requires: ["minSessions:31"],
       prefers:  ["variablePattern"]
     },
     // Prompt C — when: after any completed session, philosophical tone suits stage 4
@@ -385,7 +408,7 @@ export const EMPATHY_PROMPTS = {
     // Prompt D — when: after 70+ sessions, mature stage 4 prompt
     {
       text: "Here's a question worth sitting with today: what would you have become if your circumstances had been different? Not better or worse — just different. Different place, different early experiences, different things that were easy or hard for you. The answer isn't you being different. It's someone who is genuinely, interestingly other. That's true of everyone you meet.",
-      requires: ["minSessions:70"],
+      requires: ["minSessions:36"],
       prefers:  []
     }
   ],
@@ -398,25 +421,25 @@ export const EMPATHY_PROMPTS = {
     // Prompt A — when: after 85+ sessions, acknowledges the journey explicitly
     {
       text: "You've been at this long enough to know that what people bring isn't always visible at first. Their effort, their intelligence, their care — it doesn't always show up in the obvious place. You've learned to look past what's on the surface. That's not a small thing. Most people never get there.",
-      requires: ["minSessions:85"],
+      requires: ["minSessions:43"],
       prefers:  []
     },
     // Prompt B — when: after 90+ sessions, strong direct tone appropriate at this stage
     {
       text: "The things that make someone interesting — the particular way they've navigated difficulty, the things they know because of where they've been, the perspective that only exists because of what they've lived through — none of that is visible on first encounter. You know this. The question is what you do with knowing it.",
-      requires: ["minSessions:90"],
+      requires: ["minSessions:46"],
       prefers:  []
     },
     // Prompt C — when: after a long continuous period of training (100+ sessions)
     {
       text: "Every person you've trained around has had days you didn't know about. Reasons for going slower, or going harder, or not being there. You've extended them the same courtesy the coach has extended you: you've just been present, without needing to know everything. That's what's changed in you. I want you to know I've noticed.",
-      requires: ["minSessions:100"],
+      requires: ["minSessions:51"],
       prefers:  []
     },
     // Prompt D — when: after 95+ sessions, the hardest prompt in the library
     {
       text: "What would it mean to take the way you've been treating yourself here — the adjustments, the patience, the willingness to see what's actually happening rather than what should be happening — and offer that to someone whose life looks completely unlike yours? Not as charity. As recognition. That they're navigating something real, the same way you are.",
-      requires: ["minSessions:95"],
+      requires: ["minSessions:48"],
       prefers:  []
     }
   ]
@@ -471,7 +494,10 @@ export const TIE_TOLERANCE = 1;
 // are unaffected in practice -- they already arrive after their floor.
 // One change, and it corrects only the case that is broken. No new
 // prompt content required.
-export const STAGE_SESSION_FLOOR = { 1: 0, 2: 12, 3: 30, 4: 55, 5: 85 };
+// v7 (P-28, 05 Nov): brought forward. Graeme: close people about session 8,
+// strangers about session 20, the rest about half the time it took. The
+// stage headers below keep their original ranges as history.
+export const STAGE_SESSION_FLOOR = { 1: 0, 2: 8, 3: 20, 4: 28, 5: 43 };
 
 /**
  * May this person enter the next stage yet? Firing count is necessary
@@ -620,3 +646,59 @@ export function selectEmpathyPrompt(stageNum, ctx, last, atStage = 0) {
     fellBack,
   };
 }
+
+// ─────────────────────────────────────────────────────────────────────
+// P-28 (v7). B: THE FINISH LINE ABOUT OTHER PEOPLE'S CHECK-INS
+//
+// Wording A5, approved 05 Nov, word for word. Shown now and then on a
+// finish where the person checked in today and no In Step episode is
+// offered; never on a Bad day. Line 2 only after a low energy or low mood
+// check-in; line 3 only when the plan was made lighter or a sore area
+// left something out. Each is said only when it is true. The cadence
+// ("now and then") is the finish's to decide (S3); this file says only
+// which lines are true today.
+// ─────────────────────────────────────────────────────────────────────
+export const FINISH_B_LINES = [
+  { id: "finish-line-1", audio: "finish-line-1", requires: [],
+    text: "This morning you told me how you were, in three answers. Everyone you passed today could have answered the same three questions. You'll never see their answers." },
+  { id: "finish-line-2", audio: "finish-line-2", requires: ["lowDay"],
+    text: "You told me today was a low one, and you came anyway. Someone you meet this week will be having a low one too, and you won't be able to tell." },
+  { id: "finish-line-3", audio: "finish-line-3", requires: ["planChanged"],
+    text: "Your plan changed today because of how you were. Not everyone gets that. Some people are doing their whole day on yesterday's plan." },
+];
+
+/**
+ * The B lines that are true today, most specific first, or [] when none
+ * may be said.
+ *
+ * @param {Object} ctx
+ *   checkedInToday  they answered today's check-in
+ *   badDay          a Bad day (Gentle care), or anything sore at Bad
+ *   episodeOffered  an In Step episode is offered on this finish
+ *   lowEnergy, lowMood   from today's check-in
+ *   planLighter     the plan was made lighter today
+ *   soreLeftOut     a sore area left something out today
+ */
+export function eligibleFinishBLines(ctx = {}) {
+  if (ctx.checkedInToday !== true) return [];
+  if (ctx.badDay === true) return [];
+  if (ctx.episodeOffered === true) return [];
+  const holds = r =>
+    r === "lowDay"      ? (ctx.lowEnergy === true || ctx.lowMood === true) :
+    r === "planChanged" ? (ctx.planLighter === true || ctx.soreLeftOut === true) :
+    false;
+  const ok = FINISH_B_LINES.filter(l => l.requires.every(holds));
+  // A line that says something about today goes before the general one.
+  return ok.sort((a, b) => b.requires.length - a.requires.length);
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// P-28 (v7). E: SAYING IT, LIGHTLY
+//
+// Wording A6, approved 05 Nov, word for word. One sentence each, no
+// progress bar, count or badge for In Step, ever.
+// ─────────────────────────────────────────────────────────────────────
+export const PURPOSE_LINES = {
+  planPage:  "And In Step: short moments after a session about the people around you. The way I meet you is a way of meeting others.",
+  arcSetup:  "Whatever you're working towards, In Step makes room for the people around you too.",
+};
