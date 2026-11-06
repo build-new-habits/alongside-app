@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 06 Nov 2026 v707
+ * 06 Nov 2026 v708
  *
+ * v708 - P-28 S4 (Guide me). On the Plan, Keep moving › Outside › Walk, Run or Bike ride asks how you'd like it: Just go, Guide me (a mindful walk, a walk in any weather, an easy run, or an indoor ride: what will happen is told first, then one recording with its words on screen at their times, pause and stop from the lock screen) or Take three with you (three things to notice, read before you set off). On a road ride nothing talks to you. Both tiers: Settings › Display › Coach's voice (off unless you turn it on); with it on, a timed hold's line starts with its timer, with one big Pause the voice. With no recordings yet, everything is words on the screen. NEW FILES precached: js/views/guide-me.js, js/hold-voice.js.
  * v707 - P-28 S3 (both tiers). In Step is a programme: four parts of six short episodes (Listen, Hold still, Choose, Carry it), the next in order and any you've done open in Wellbeing, and offered now and then after a finished session, with Start and Not today (never part-way or on a Bad day; on a low day, Part 1's Adjusting). On a finish without an episode, now and then, a line about the people around you, only when it is true. In Step has its own look: orchid, with two figures. The coach's voice is ready for its recordings: with none yet, everything is words on the screen. NEW FILES precached: js/coach-audio.js, js/data/in-step-offer.js, css/components/in-step.css. RETIRED: js/data/in-step-scenarios.js.
  * v706 - P-28 S2 (content only; nothing on screen changes). In Step's programme (four parts of six episodes), Guide me's walks, run and indoor ride, and the coach's lines while you hold are in place, word for word as approved, ready for the screens that show them. The reflection after a session can now reach the people around you sooner: people close to you from about session 8, people you pass from about session 20. NEW FILES precached: js/data/in-step-programme.js, js/data/guide-me.js.
  * v705 - P-28 S1 (schema only; nothing on screen changes). The app can now remember where you are in In Step as a programme (part, episode, and the one tap after Carry it), whether the coach's recorded voice is on (off unless you turn it on), and how an outdoor session was taken (Just go, Guide me or Take three). store.js v122, Schema v1.123.
@@ -4254,7 +4255,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v707";
+const CACHE_NAME = "alongside-v708";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4294,7 +4295,7 @@ const SHELL_HASHES = {
   "./css/components/display-preferences.css": "7d1e4e0b34f5223f",
   "./css/components/session-log.css": "92f8082dc0ee69a7",
   "./css/components/grounding-moments.css": "a2641284734e48de",
-  "./css/components/in-step.css": "5caaf394f9b3b261",
+  "./css/components/in-step.css": "2bb3f061d41aa8f1",
   "./css/components/single-activity-session.css": "fef626d39b2d281c",
   "./css/components/session-shared.css": "a71069801a65054c",
   "./css/components/upgrade-door.css": "1a2deeaceb45f4f1",
@@ -4320,7 +4321,7 @@ const SHELL_HASHES = {
   "./css/components/capture.css": "343b4ae0dc6fe6ea",
   "./css/components/finish.css": "c33e298d5fcb92ae",
   "./js/app.js": "72054b00e54ad55b",
-  "./js/router.js": "534ee4ef8831b518",
+  "./js/router.js": "41c12f5523a0d78d",
   "./js/store.js": "c3996dc10bb10e23",
   "./js/session-log.js": "6134de4315842e05",
   "./js/exercise-feedback.js": "adba8549f444da2a",
@@ -4344,9 +4345,9 @@ const SHELL_HASHES = {
   "./js/views/checkin.js": "69cd078ee9c3b84a",
   "./js/views/checkin-mini.js": "c647f4da71feddde",
   "./js/views/coach-proposal.js": "483cee5a0d486fd9",
-  "./js/views/workout.js": "025277c8fe86396c",
+  "./js/views/workout.js": "2892dfe27920a81a",
   "./js/views/progress.js": "ec6aaab64e2cee39",
-  "./js/views/settings.js": "3e3fa88471e47c17",
+  "./js/views/settings.js": "85ce48f8345522b6",
   "./js/views/restore-flow.js": "dc81c2e455fa472d",
   "./js/views/weekly-plan.js": "dcee06e297b402c0",
   "./js/views/reflect.js": "fa33525e04a2feaa",
@@ -4363,7 +4364,7 @@ const SHELL_HASHES = {
   "./js/data/session-rationale.js": "f14d0d565eb7f9dc",
   "./js/data/personal-reads.js": "52141f31fa9d4fd0",
   "./js/data/field-contract.js": "d7d662025990b1fd",
-  "./js/views/activity-log.js": "7cb12f7fc36e8818",
+  "./js/views/activity-log.js": "2137223e462a5b3d",
   "./js/views/annual-reflection.js": "c1b1221672a0eb4a",
   "./js/views/community-impact.js": "b8537fe58e1f8f69",
   "./js/views/home-threshold.js": "17bc42808aa5bd5c",
@@ -4382,7 +4383,7 @@ const SHELL_HASHES = {
   "./js/data/tier-table.js": "7821c3304bd0815c",
   "./js/views/know-what.js": "e84fee3e6d9d3af0",
   "./js/views/plan-home.js": "c3119c9c9830c2c7",
-  "./js/views/path.js": "13f2c8daeacd9c53",
+  "./js/views/path.js": "fd077f2d4d367470",
   "./js/plan-look.js": "7674d8fbf5101aa9",
   "./js/views/plan-finish.js": "84f85fdc2df42597",
   "./js/data/outside.js": "3af4ea46bd898084",
@@ -4463,6 +4464,8 @@ const SHELL_HASHES = {
   "./js/data/in-step-programme.js": "91605a0780fba799",
   "./js/data/in-step-offer.js": "836af3ed624917b9",
   "./js/coach-audio.js": "9c53aeabf8b2021a",
+  "./js/hold-voice.js": "4801164cbddca872",
+  "./js/views/guide-me.js": "02d27509d1897a22",
   "./js/data/guide-me.js": "ed77e97b8a8a35ea",
   "./js/views/journal-entry.js": "dd38e795ee54e7d7",
   "./js/views/gym-programme.js": "98de0c5929699fb1",
@@ -4472,7 +4475,7 @@ const SHELL_HASHES = {
   "./js/views/breathing-session.js": "3d049d83a8e783b9",
   "./js/views/morning-session.js": "549fd3efaac3eb67",
   "./js/views/core-session.js": "dd82e73cd721e233",
-  "./js/views/yoga-session.js": "86d3266d0ac27e7b",
+  "./js/views/yoga-session.js": "d89c7f18da771813",
   "./js/views/walk-session.js": "67b2bcd2f265307f",
   "./js/views/running-session.js": "3fcc750fa8c6214d",
   "./js/views/swim-session.js": "796864e209d35cb8",
@@ -4787,6 +4790,8 @@ const SHELL_URLS = [
   "./js/data/in-step-programme.js",
   "./js/data/in-step-offer.js",
   "./js/coach-audio.js",
+  "./js/hold-voice.js",
+  "./js/views/guide-me.js",
   "./js/data/guide-me.js",
   "./js/views/journal-entry.js",
   "./js/views/gym-programme.js",
