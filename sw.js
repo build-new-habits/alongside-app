@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 06 Nov 2026 v711
+ * 06 Nov 2026 v712
  *
+ * v712 - The coach's recordings: the list of which recordings exist is read when the app opens and kept for offline use; each recording is kept in its newest version only, so a line recorded again reaches your phone. Nothing changes on screen until the recordings are added.
  * v711 - P-28 finished. On a low day In Step's offer says "This one's about you today." The old In Step's stored choices and counters are removed from your phone (nothing used them). With the coach's voice on, opening an episode fetches that part's recordings, so it plays offline. Both tiers, a fault fixed: leaving getting started before its next line arrived could throw an error. NEW FILES: none.
  * v710 - P-28 S6 (close). The coach's recordings, when they arrive, are kept on your phone after the first time each plays, in their own store, so a walk can be guided offline and an app update never downloads them again. They are never downloaded before you play one. A recording that isn't there yet is never an error: the words are on the screen.
  * v709 - P-28 S5. One light sentence about In Step where the Plan is chosen, and one where you set your arc. Nothing else changes. Also a check, not the app: v708's own fresh-clone check found one gate that had not been told Guide me was new; fixed here.
@@ -4258,7 +4259,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v711";
+const CACHE_NAME = "alongside-v712";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4466,9 +4467,9 @@ const SHELL_HASHES = {
   "./js/views/in-step.js": "613388a51c358ad8",
   "./js/data/in-step-programme.js": "91605a0780fba799",
   "./js/data/in-step-offer.js": "c962f66108aeef19",
-  "./js/coach-audio.js": "700d5c0889f83d59",
+  "./js/coach-audio.js": "e7c1504e89aaab1f",
   "./js/hold-voice.js": "4801164cbddca872",
-  "./js/views/guide-me.js": "02d27509d1897a22",
+  "./js/views/guide-me.js": "e4227dbe3e3fcf98",
   "./js/data/guide-me.js": "ed77e97b8a8a35ea",
   "./js/views/journal-entry.js": "dd38e795ee54e7d7",
   "./js/views/gym-programme.js": "98de0c5929699fb1",
@@ -5040,18 +5041,41 @@ self.addEventListener("fetch", event => {
   // Offline, the app keeps the last list it fetched (js/data/messages.js).
   if (url.pathname.endsWith("/messages.json")) return;
 
-  // P-28 S6. A recording: from its own cache, or fetched whole once and
-  // kept there. Not there (404, or offline the first time) is passed on
-  // as it is and kept nowhere: the page shows the words.
-  if (/\/audio\/[^/]+\.mp3$/.test(url.pathname)) {
+  // v712. The recordings' list: from the network when there is one (so a
+  // new recording is known at once), kept in the recordings' cache for
+  // offline use.
+  if (/\/audio\/manifest\.json$/.test(url.pathname)) {
     event.respondWith((async () => {
       const cache = await caches.open(AUDIO_CACHE);
       const key = url.origin + url.pathname;
+      try {
+        const r = await fetch(key, { cache: "no-cache" });
+        if (r && r.status === 200) { await cache.put(key, r.clone()); return r; }
+        return (await cache.match(key)) || r;
+      } catch { return (await cache.match(key)) || new Response("{}", { status: 404 }); }
+    })());
+    return;
+  }
+
+  // P-28 S6. A recording: from its own cache, or fetched whole once and
+  // kept there. Not there (404, or offline the first time) is passed on
+  // as it is and kept nowhere: the page shows the words.
+  // v712. Asked for as audio/<id>.mp3?v=<fingerprint>: kept by the whole
+  // address, and an older fingerprint of the same line is let go when a
+  // newer one is kept, so a re-recorded line replaces the old.
+  if (/\/audio\/[^/]+\.mp3$/.test(url.pathname)) {
+    event.respondWith((async () => {
+      const cache = await caches.open(AUDIO_CACHE);
+      const key = url.origin + url.pathname + url.search;
       let full = await cache.match(key);
       if (!full) {
         let r;
         try { r = await fetch(key); } catch { return new Response(null, { status: 404 }); }
         if (!r || r.status !== 200) return r;
+        for (const old of await cache.keys()) {
+          const u = new URL(old.url || old);
+          if (u.pathname === url.pathname && u.href !== key) await cache.delete(old);
+        }
         await cache.put(key, r.clone());
         full = r;
       }
