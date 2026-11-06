@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 05 Nov 2026 v705
+ * 06 Nov 2026 v706
  *
+ * v706 - P-28 S2 (content only; nothing on screen changes). In Step's programme (four parts of six episodes), Guide me's walks, run and indoor ride, and the coach's lines while you hold are in place, word for word as approved, ready for the screens that show them. The reflection after a session can now reach the people around you sooner: people close to you from about session 8, people you pass from about session 20. NEW FILES precached: js/data/in-step-programme.js, js/data/guide-me.js.
  * v705 - P-28 S1 (schema only; nothing on screen changes). The app can now remember where you are in In Step as a programme (part, episode, and the one tap after Carry it), whether the coach's recorded voice is on (off unless you turn it on), and how an outdoor session was taken (Just go, Guide me or Take three). store.js v122, Schema v1.123.
  * v704 - P-27 tidy (Graeme, 05 Nov). Nothing is hidden under the bottom bar any more: every screen leaves room for the last card's edge. The check-in no longer has the easy-to-miss sleep link (both tiers). On the Plan: My programme is gone from Get stronger > Gym; the twelve-week programme is retired (no chapter-end card on Home, no programme row on Progress or in Settings); every session, a walk, run, ride, swim, yoga or class too, ends on the Plan's finish with How do you feel now? in the open; Settings > Your plan is Your arc, Your week and one Goals and activity level row; Let me choose for you builds the length and kind Home says and never says You asked for; Back on Today's plan returns to the door's steps with your choices kept; the arc's Start today's session is Home's choice; a lighter plan says why. Both tiers: Log what I did is one picker (now with Yoga, Pilates, Stretching, Meditation, Something else); Library > Rest day opens a rest, not the last session's finish; Library > Breathing opens the same player as Wellbeing; Settings' Activity log is called Log what I did.
  * v703 - P-26 (the Plan; Free unchanged). One Build a session page: where, what it's for, then warm-up, main and cool-down; add moves yourself, or Help me fill this for any one part (your favourites first, then the coach's picks, nothing added until you tick it); a heart on every move (the same as Loved it) and Swap; Lately, what you've worked in the last 7 days, as a suggestion you can leave; one Save with When's it for? (a date, every week on a day in Your week, or just keep it). On that day Home's row names it and one tap opens it; on a sore day, what the sore area rules out is left out with a Swap offered. Opened from Build my own behind Get stronger and Keep moving, from Saved sessions, and from Edit. Long names and headings wrap rather than split a word at the largest text (Home's row, a heading beside its tile). NEW FILES precached: js/views/build-session.js, js/data/build-lately.js.
@@ -4252,7 +4253,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v705";
+const CACHE_NAME = "alongside-v706";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4347,7 +4348,7 @@ const SHELL_HASHES = {
   "./js/views/restore-flow.js": "dc81c2e455fa472d",
   "./js/views/weekly-plan.js": "dcee06e297b402c0",
   "./js/views/reflect.js": "881ab69b445a99ec",
-  "./js/data/empathy-transfer.js": "b3513396b3541e3a",
+  "./js/data/empathy-transfer.js": "d4028d2c71515778",
   "./js/data/equipment-map.js": "2db6399d16987707",
   "./js/data/exercises/gym.js": "835e777941d00fe4",
   "./js/data/exercises/seated.js": "96d05952ab9fb6cb",
@@ -4458,6 +4459,8 @@ const SHELL_HASHES = {
   "./js/views/noticing.js": "afb617785e39e18d",
   "./js/views/in-step.js": "54f53470958ac62f",
   "./js/data/in-step-scenarios.js": "b46f085cda4d24fc",
+  "./js/data/in-step-programme.js": "91605a0780fba799",
+  "./js/data/guide-me.js": "ed77e97b8a8a35ea",
   "./js/views/journal-entry.js": "dd38e795ee54e7d7",
   "./js/views/gym-programme.js": "98de0c5929699fb1",
   "./js/views/prescribed.js": "2c074cff1755456e",
@@ -4499,7 +4502,7 @@ const SHELL_HASHES = {
   "./js/data/time-windows.js": "a25841c83a4ce91e",
   "./js/data/programmeEngine.js": "917aa91a3fbd770a",
   "./js/data/programmes.js": "e455b0b69bd02a52",
-  "./js/data/grounding-moments.js": "33c5054f7e6540ff",
+  "./js/data/grounding-moments.js": "ef86ce4f9e84b4f3",
   "./js/data/coach-voice.js": "92ea4a0209978619",
   "./js/data/exercises/index.js": "d9df11d43f5df8ce",
   "./js/data/exercises/strength.js": "56a487cd793dfe1c",
@@ -4778,6 +4781,8 @@ const SHELL_URLS = [
   "./js/views/noticing.js",
   "./js/views/in-step.js",
   "./js/data/in-step-scenarios.js",
+  "./js/data/in-step-programme.js",
+  "./js/data/guide-me.js",
   "./js/views/journal-entry.js",
   "./js/views/gym-programme.js",
 
