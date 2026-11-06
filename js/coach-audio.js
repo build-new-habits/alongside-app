@@ -1,6 +1,12 @@
 /**
  * js/coach-audio.js
- * 06 Nov 2026 v1
+ * 06 Nov 2026 v2
+ *
+ * v2 - P-28 FINISH. prefetchLines(): with the voice on, a part's clips are
+ *   fetched when one of its episodes opens (build blueprint: "fetched when
+ *   a part or session is first opened, then kept in a separate cache";
+ *   sw.js v710 keeps them). Each clip once per page load; a missing one is
+ *   ignored. With the voice off, nothing is fetched.
  *
  * P-28 EMPATHY-THREAD, S3. The coach's recorded voice, text first.
  *
@@ -76,6 +82,19 @@ export function stopLine() {
   const c = _current; _current = null;
   try { c.audio.pause(); } catch { /* */ }
   c.finish?.();
+}
+
+const _fetched = new Set();
+/** With the voice on, asks for each clip once (the service worker keeps them). Never throws. */
+export function prefetchLines(ids = []) {
+  if (!voiceOn() || typeof fetch !== "function") return 0;
+  let n = 0;
+  for (const id of ids) {
+    if (!id || _fetched.has(id)) continue;
+    _fetched.add(id); n++;
+    try { const p = fetch(audioUrl(id)); p?.catch?.(() => {}); } catch { /* a missing clip is never an error */ }
+  }
+  return n;
 }
 
 /**

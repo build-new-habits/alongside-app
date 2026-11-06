@@ -1,6 +1,13 @@
 /**
  * js/views/onboarding/thread.js
- * 17 Oct 2026 v28
+ * 06 Nov 2026 v29
+ *
+ * v29 - P-28 FINISH (a fault found by chromium-p28's harness, both tiers).
+ *   A step's timer could fire after the thread was left (the first open
+ *   sends somebody to getting started; going elsewhere before the coach's
+ *   next line arrived), and drawing the next step into a page that had gone
+ *   threw "Cannot read properties of null (reading 'appendChild')". A step
+ *   now runs only while its thread is on the screen. verify-ob-detached.
  *
  * v28 - W6-9 SMALL-6. Skipping the sore areas says which already-tapped
  *   areas are kept.
@@ -699,6 +706,8 @@ export function ThreadView(router) {
   // ── Step runner ────────────────────────────────────────────────────────────
 
   async function _runStep(stepId) {
+    // v29. Left before this step was due: nothing to draw it into.
+    if (!_container || !_container.isConnected || !_container.querySelector('.ob-thread')) return;
     _currentStep = stepId;
     const step = STEPS[stepId];
     if (!step) {
@@ -935,7 +944,7 @@ export function ThreadView(router) {
         </svg>
       </button>
     `;
-    _container.querySelector('.ob-thread').appendChild(bar);
+    _container?.querySelector('.ob-thread')?.appendChild(bar);
 
     setTimeout(() => bar.classList.add('is-visible'), T.INPUT_APPEAR);
 
@@ -1430,7 +1439,7 @@ export function ThreadView(router) {
         </button>
       ` : ''}
     `;
-    _container.querySelector('.ob-thread').appendChild(bar);
+    _container?.querySelector('.ob-thread')?.appendChild(bar);
     setTimeout(() => bar.classList.add('is-visible'), T.INPUT_APPEAR);
 
     const openBtn = bar.querySelector('[data-action="open"]');

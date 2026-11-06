@@ -1,6 +1,14 @@
 /**
  * js/data/aims.js
- * 31 Oct 2026 v7
+ * 06 Nov 2026 v8
+ *
+ * v8 - P-28 FINISH. Mind strands no longer carry `movements` (the old In
+ *   Step room's four movements). Nothing ever read them, and the movements
+ *   themselves were retired in v707 (archived: BNH-Files Archive/P-28 In
+ *   Step Environment/aims_v7_with-movements_06nov2026.js). A mind strand is
+ *   lit by a breathing, mindful or quiet practice (arc-readback.js, W5-15),
+ *   which is what makes it more than a label. No label, aim or strand
+ *   changed.
  *
  * v7 - P-15 ARC-AIMS-BUILD (P-11 traced, P-14 approved by Graeme, 31 Oct:
  *   Product/alongside_arc_aims_31oct2026_v2.md). Five aims join the list:
@@ -137,9 +145,9 @@ import { bodyAreasOf } from "./conditions.js";
  *   kind: "body" | "mind"
  *   zones:        stretch zones this leans towards (STRETCH_ZONES ids)
  *   sessionTypes: SESSION_TYPES ids this suits
- *   movements:    In Step movements this draws on (in-step-scenarios.js)
  *
- * A mind strand carries `movements` and no zones. A body strand carries
+ * A mind strand carries no zones and no session types: a practice lights it
+ * (arc-readback.js). A body strand carries
  * zones and/or sessionTypes. Nothing carries both sets, because a strand
  * that did would be two strands.
  */
@@ -160,17 +168,17 @@ export const STRANDS = {
 
   // ── Mind ─────────────────────────────────────────────────────────
   // These are strands in their own right. See the header.
-  "confidence-floor": { label: "Confidence about getting down and up", kind: "mind", movements: ["solo", "environment"] },
-  "pacing":           { label: "Pacing yourself",                      kind: "mind", movements: ["solo"] },
-  "being-outside":    { label: "Being outside more",                   kind: "mind", movements: ["environment"] },
-  "winding-down":     { label: "Winding down",                         kind: "mind", movements: ["solo", "environment"] },
-  "meeting-people":   { label: "Meeting people as they are",           kind: "mind", movements: ["partner", "floor"] },
-  "self-kindness":    { label: "Being fair to yourself",               kind: "mind", movements: ["solo"] },
-  "steadiness":       { label: "Staying steady when things shift",     kind: "mind", movements: ["environment", "floor"] },
-  "trusting-body":    { label: "Trusting your body again",             kind: "mind", movements: ["solo", "floor"] },
-  "not-overdoing":    { label: "Knowing when to stop",                 kind: "mind", movements: ["solo"] },
-  "showing-up":       { label: "Showing up when you don't feel like it", kind: "mind", movements: ["solo"] },
-  "at-home-in-body":  { label: "Feeling at home in your body",         kind: "mind", movements: ["solo", "environment"] },
+  "confidence-floor": { label: "Confidence about getting down and up", kind: "mind" },
+  "pacing":           { label: "Pacing yourself",                      kind: "mind" },
+  "being-outside":    { label: "Being outside more",                   kind: "mind" },
+  "winding-down":     { label: "Winding down",                         kind: "mind" },
+  "meeting-people":   { label: "Meeting people as they are",           kind: "mind" },
+  "self-kindness":    { label: "Being fair to yourself",               kind: "mind" },
+  "steadiness":       { label: "Staying steady when things shift",     kind: "mind" },
+  "trusting-body":    { label: "Trusting your body again",             kind: "mind" },
+  "not-overdoing":    { label: "Knowing when to stop",                 kind: "mind" },
+  "showing-up":       { label: "Showing up when you don't feel like it", kind: "mind" },
+  "at-home-in-body":  { label: "Feeling at home in your body",         kind: "mind" },
 
   // ── Body, added in v2 for the personas v1 missed ─────────────────
   "power":            { label: "Power and speed",          kind: "body", zones: [],                              sessionTypes: ["lower", "full", "cardio"] },

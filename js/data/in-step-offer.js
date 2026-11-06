@@ -1,6 +1,10 @@
 /**
  * js/data/in-step-offer.js
- * 06 Nov 2026 v1
+ * 06 Nov 2026 v2
+ *
+ * v2 - P-28 FINISH (Graeme, 06 Nov). The low day's line is "This one's
+ *   about you today." ("short" was not true: Adjusting is about 3
+ *   minutes, as every episode is).
  *
  * P-28 EMPATHY-THREAD, S3. When In Step's programme is offered on a
  * finish, which episode, and where the person is in it. The proposal
@@ -14,8 +18,7 @@
  *     cadence counts from when it was offered, whatever the answer.
  *   - Never on a Bad day (anything sore at Bad).
  *   - A low energy or low mood day: only Part 1's episode 6, Adjusting
- *     (Graeme, 06 Nov), with the proposal's line, "This one's short and
- *     about you today."
+ *     (Graeme, 06 Nov), with "This one's about you today."
  *   - The order is kept (Graeme, 18 Aug: "I can access all of it and
  *     therefore none of it lands"): the offer is the next episode in order.
  *     Wellbeing keeps any episode already done open, any time.
@@ -38,7 +41,7 @@ import { eligibleFinishBLines } from "./empathy-transfer.js";
 export const OFFER_FROM_SESSION = 3;   // "The first episode can come after session 3"
 export const OFFER_GAP          = 2;   // "every second finished session at most"
 export const LOW_DAY_EPISODE    = "p1e6";
-export const LOW_DAY_LINE       = "This one's short and about you today.";
+export const LOW_DAY_LINE       = "This one's about you today.";
 export const B_EVERY            = 3;   // B lines "now and then"
 export const LOW_ENERGY_MAX     = 4;   // as the finish lines (reflect.js)
 export const LOW_MOOD_MAX       = 3;   // the check-in's Struggling and Low

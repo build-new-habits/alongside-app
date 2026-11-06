@@ -1,6 +1,10 @@
 /**
  * js/views/in-step.js
- * 06 Nov 2026 v6
+ * 06 Nov 2026 v7
+ *
+ * v7 - P-28 FINISH. With the voice on, opening an episode asks for its
+ *   part's clips (coach-audio.js prefetchLines), so the part plays offline
+ *   once opened.
  *
  * v6 - P-28 EMPATHY-THREAD, S3 IN STEP PLAYER (Graeme, 05 Nov: In Step
  *   "probably becomes a program"). The four movements and their scenarios
@@ -39,10 +43,10 @@ import { store }   from "../store.js";
 import { router }  from "../router.js";
 import { isPremium } from "../auth.js";
 import { lineIcon } from "../data/line-icons.js";
-import { PARTS, EPISODES, ACK, ANSWERS, getEpisode, getPart, episodesInPart, nextEpisodeId } from "../data/in-step-programme.js";
+import { PARTS, EPISODES, ACK, ANSWERS, getEpisode, getPart, episodesInPart, nextEpisodeId, audioIdsForPart } from "../data/in-step-programme.js";
 import { programme, currentEpisodeId, isOpen, lastTimeLine, answerLastTime, completeEpisode,
          takePendingEpisode, LOW_DAY_LINE } from "../data/in-step-offer.js";
-import { playLine, stopLine, voiceOn } from "../coach-audio.js";
+import { playLine, stopLine, voiceOn, prefetchLines } from "../coach-audio.js";
 
 export const centered = false;
 
@@ -203,7 +207,7 @@ function renderCarry(e) {
 export function render() {
   // A finish's Start hands over the episode once (data/in-step-offer.js).
   const pending = takePendingEpisode();
-  if (pending) { _stop(); epId = pending.id; low = pending.low; chosen = null; from = "finish"; phase = "start"; }
+  if (pending) { _stop(); epId = pending.id; low = pending.low; chosen = null; from = "finish"; phase = "start"; _prefetch(epId); }
   // Opened by the router (not a step of this file): the list, quiet.
   else if (!_internal) { _stop(); phase = "landing"; epId = null; low = false; chosen = null; from = "wellbeing"; }
   const e = epId ? getEpisode(epId) : null;
@@ -245,7 +249,14 @@ function voice(id, { then } = {}) {
 
 function startEpisode(id, opts = {}) {
   epId = id; low = !!opts.low; chosen = null;
+  _prefetch(id);
   go(lastTimeLine() && programme().lastAnswer === null ? "prev" : "listen");
+}
+
+/** The part's clips, and the line after Choose, when the voice is on. */
+function _prefetch(id) {
+  const e = getEpisode(id);
+  if (e) prefetchLines([...audioIdsForPart(e.part), ACK.audio]);
 }
 
 function leave() {

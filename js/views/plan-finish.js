@@ -1,6 +1,9 @@
 /**
  * views/plan-finish.js
- * 06 Nov 2026 v4
+ * 06 Nov 2026 v5
+ *
+ * v5 - P-28 FINISH: a note only (the low day's line, below, is now "This
+ *   one's about you today."; it lives in data/in-step-offer.js).
  *
  * v4 - P-28 EMPATHY-THREAD, S3 (and S5's finish lines, here so this file is
  *   opened once). After a finished session, now and then:
@@ -8,7 +11,7 @@
  *     about 3 minutes", Start and Not today (data/in-step-offer.js: from
  *     session 3, every second finished session and once a day at most,
  *     never part-way or on a Bad day; a low day offers Part 1's Adjusting
- *     with "This one's short and about you today."). Start keeps what was
+ *     with "This one's about you today."). Start keeps what was
  *     said here, as Done does, then opens the episode. When it is offered,
  *     no reflection prompt follows Done.
  *   - Otherwise B: one finish line about other people's check-ins, only
