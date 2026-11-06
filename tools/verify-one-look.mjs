@@ -9,7 +9,10 @@ import { createRequire as __cr } from "node:module";
  *   Graeme's decision (05 Nov: "Both tiers", an exception to Stage AWARD's
  *   leave-Free-alone rule), so Free's In Step is the programme (checked to
  *   be it, not compared with v688's room), and Free's Wellbeing differs
- *   from v688 only in In Step's tile (4w).
+ *   from v688 only in In Step's tile (4w). Guide me (S4) is new since
+ *   v688 and reached only from the Plan's door; opened on Free with no
+ *   session it says where Guide me is, with a way back (4gm). The E lines
+ *   (S5) on the upgrade page and arc setup are their only change (4e).
  *
  * v8 - P-26 ONE-BUILD-PAGE re-point (Graeme, 02 Nov: one Build a session
  *   page on the Plan, replacing the builder's ways in there). TEST 4: a view
@@ -291,6 +294,15 @@ for (const file of touched) {
     ok(`4. Free ${name}: new since v688, the Plan's only: Free is sent to its own screen`, router.currentView !== entry.route, router.currentView);
     continue;
   }
+  // v9 (P-28 S4): Guide me is new since v688, behind the Plan's door.
+  if (!old && name === "guide-me") {
+    person("free"); main.innerHTML = "";
+    const G = await import(new URL(`../${file}`, import.meta.url).href);
+    main.innerHTML = G.render(); G.onMount?.(); await wait(20);
+    compared++;
+    ok("4gm. Free guide-me: new since v688 (P-28); with no session it says where Guide me is, with a way back", /Keep moving › Outside/.test(main.textContent) && !!main.querySelector("#gm-home") && !main.querySelector("#gm-start"));
+    continue;
+  }
   if (!old) { ok(`4. Free ${name}: there on v688`, false); continue; }
   // v9 (P-28, both tiers by Graeme's decision): Free's In Step is the programme.
   if (name === "in-step") {
@@ -325,6 +337,14 @@ for (const file of touched) {
     const cards = b.match(isCard) || [];
     ok("4x. P-28: anything new on Free's finish is In Step's offer or line, one at most", cards.length <= 1 && cards.every(c => /In Step/.test(c)), String(cards.length));
     b = b.replace(isCard, "");
+  }
+  // v9 (P-28 S5): the one E line, where the Plan is chosen and where the
+  // arc is set, is the only change to those two screens.
+  if (name === "upgrade" || name === "arc-setup") {
+    const isE = /\s*<p class="[^"]*instep-purpose"[^>]*>[\s\S]*?<\/p>/g;
+    const es = b.match(isE) || [];
+    ok(`4e. P-28: ${name} gains In Step's one E line and nothing else`, es.length === 1 && /In Step/.test(es[0]), String(es.length));
+    b = b.replace(isE, "");
   }
   // v9 (P-28): Free's Wellbeing differs from v688 only in In Step's tile.
   if (name === "noticing") {

@@ -1,6 +1,8 @@
 /**
  * tools/chromium-p28.mjs
- * 06 Nov 2026 v2
+ * 06 Nov 2026 v3
+ *
+ * v3 - S5: the upgrade page's and arc setup's In Step lines.
  *
  * v2 - S4: Outside's three ways, Take three, Guide me before and while it
  *   plays (the Plan's), and a hold's line with the voice on (both tiers).
@@ -77,6 +79,9 @@ const SCREENS = [
   ["Guide me: what will happen", async p => { await door(p, "run"); await click(p, '.path-row[data-v="guide:run"]'); await p.waitForTimeout(300); }, "#gm-start", true],
   ["Guide me: guiding", async p => { await click(p, "#gm-start"); await p.waitForTimeout(400); }, "#gm-pp", true],
   ["While you hold, the voice on", async p => { await hold(p); }, "#hv-card"],
+  // S5: the E lines.
+  ["The upgrade page's In Step line", async p => { await nav(p, "upgrade"); }, "#upg-instep", "free"],
+  ["Arc setup's In Step line", async p => { await nav(p, "arc-setup"); }, "#as-instep", true],
 ];
 async function door(p, activity) {
   await p.evaluate(() => { window.router.pathStart = { door: "moving" }; });
@@ -194,7 +199,8 @@ for (const { tier, size, scheme } of runs) {
   // schedule, not this check's subject.
   page.on("pageerror", e => /onboarding\/thread\.js/.test(String(e.stack)) || faults.push(`${tier} ${size} ${scheme}: page error ${String(e.message).slice(0, 90)} ${String(e.stack || "").split("\n").slice(1, 3).join(" ").slice(0, 160)}`));
   for (const [name, go, expect, planOnly] of SCREENS) {
-    if (planOnly && tier !== "personal") continue;
+    if (planOnly === true && tier !== "personal") continue;
+    if (planOnly === "free" && tier !== "free") continue;   // the upgrade page is Free's
     const label = `${tier.padEnd(8)} text ${size.padEnd(4)} ${scheme.padEnd(13)} ${name}`;
     try {
       await go(page);
