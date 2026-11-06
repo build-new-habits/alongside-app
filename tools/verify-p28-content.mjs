@@ -1,6 +1,9 @@
 /**
  * tools/verify-p28-content.mjs
- * 06 Nov 2026 v1
+ * 06 Nov 2026 v2
+ *
+ * v2 - The voice script is v2 (06 Nov: the voice set-up and the upload
+ *   folder; the same 109 lines). v1 is archived in BNH-Files Archive/.
  *
  * P-28 EMPATHY-THREAD, S2 CONTENT DATA. Every line In Step's programme,
  * Guide me, the hold lines, the B finish lines and the E lines can show or
@@ -59,7 +62,7 @@ const MOVE = path.resolve(path.dirname(sched), "..");
 const read = rel => { const p = path.join(MOVE, rel); return fs.existsSync(p) ? fs.readFileSync(p, "utf8") : null; };
 const WORDING = read("Product/alongside_content_in-step-guide-me_05nov2026_v5.md");
 const PROTO   = read("Product/alongside_guide_me_prototype_05nov2026_v5.html");
-const SCRIPT  = read("Product/alongside_voice_script_05nov2026_v1.csv");
+const SCRIPT  = read("Product/alongside_voice_script_06nov2026_v2.csv");
 
 // Italics are the only difference allowed: the wording sets a quoted
 // phrase in *italics*, the app between quotation marks.
@@ -111,7 +114,7 @@ function parseGuide(src, tag) {
 console.log("\nTEST 0 - positive controls");
 ok("0a. the approved wording v5 is reachable", !!WORDING);
 ok("0b. the approved prototype v5 is reachable", !!PROTO);
-ok("0c. the voice script v1 is reachable", !!SCRIPT);
+ok("0c. the voice script v2 is reachable", !!SCRIPT);
 if (!WORDING || !PROTO || !SCRIPT) done();
 const W_EPS = parseEpisodes(WORDING);
 ok("0d. the wording parses to 24 episodes, each with every part", W_EPS.length === 24 && W_EPS.every(e => e.listen && e.hold && e.secs && e.question && e.options.length === 3 && e.carry && e.why), String(W_EPS.length));

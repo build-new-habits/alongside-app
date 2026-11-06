@@ -1,6 +1,10 @@
 /**
  * tools/verify-p28-guide.mjs
- * 06 Nov 2026 v1
+ * 06 Nov 2026 v2
+ *
+ * v2 - The recordings' list (coach-audio.js v3, guide-me.js v2): a
+ *   recording plays only when the list names it, at audio/<id>.mp3?v=<fp>.
+ *   The checks set the list, not a file's answer.
  *
  * P-28 EMPATHY-THREAD, S4 GUIDE ME. Drives the real views in jsdom: the
  * Plan's Keep moving › Outside steps (views/path.js), What will happen and
@@ -54,7 +58,7 @@ class FakeAudio {
   pause() { this.paused = true; }
 }
 globalThis.Audio = FakeAudio;
-globalThis.fetch = async () => ({ ok: fileThere });
+globalThis.fetch = async (u) => { u = String(u); if (/audio\/manifest\.json$/.test(u)) return { ok: true, json: async () => ({ files: fileThere ? Object.fromEntries(ALL_IDS.map(id => [id, "abc123def4567890"])) : {} }) }; return { ok: fileThere }; };
 const handlers = {};
 Object.defineProperty(dom.window.navigator, "mediaSession", { value: { metadata: null, playbackState: "none", setActionHandler: (a, f) => { handlers[a] = f; }, setPositionState() {} }, configurable: true });
 Object.defineProperty(dom.window.navigator, "audioSession", { value: { type: "auto" }, configurable: true });
@@ -65,6 +69,14 @@ const realNow = Date.now; Date.now = () => NOW;
 
 const B = new URL("../js/", import.meta.url).href;
 const { store } = await import(B + "store.js");
+// v-list: the recordings' list decides what plays (coach-audio.js v3). Every
+// clip and track the app knows, all "there" or none.
+const CA = await import(B + "coach-audio.js");
+const { clipIds } = await import(new URL("./build-audio.mjs", import.meta.url).href);
+const { GUIDE_SESSIONS: _GS } = await import(B + "data/guide-me.js");
+const ALL_IDS = [...clipIds(), ...Object.values(_GS).map(x => x.track)];
+const V = "?v=abc123def4567890";
+async function setFiles(on) { fileThere = on; await CA.loadAudioManifest(); }
 const { router } = await import(B + "router.js");
 const navs = [];
 const main = document.getElementById("main-content");
@@ -102,12 +114,12 @@ const $ = s => main.querySelector(s);
 const tap = s => { const el = typeof s === "string" ? $(s) : s; el?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true })); return !!el; };
 const rows = () => [...main.querySelectorAll(".path-row[data-v]")].map(b => b.dataset.v);
 
-function seed({ tier = "personal", voice = "off" } = {}) {
+async function seed({ tier = "personal", voice = "off" } = {}) {
   localStorage.clear(); store.init(); agreed(store);
   store.set("onboardingComplete", true); store.set("tier", tier); store.set("name", "Sentinel-S4");
   store.set("safetyAckLog", Array.from({ length: 5 }, () => ({ at: new Date().toISOString(), textVersion: HURT_AND_ACHE_VERSION, surface: "fixture" })));
   store.set("coachVoice", voice);
-  audios.length = 0; navs.length = 0; fileThere = false;
+  audios.length = 0; navs.length = 0; await setFiles(false);
   for (const k of Object.keys(handlers)) delete handlers[k];
 }
 function outside(activity) {
@@ -118,7 +130,7 @@ function outside(activity) {
 
 await block("TEST 0", async () => {
   console.log("\nTEST 0 - positive controls");
-  seed();
+  await seed();
   ok("0a. the fixture reached the store", store.get("name") === "Sentinel-S4");
   router.pathStart = { door: "moving" }; nav("path");
   ok("0b. Keep moving opens on where", rows().includes("outside"), rows().join(","));
@@ -126,28 +138,28 @@ await block("TEST 0", async () => {
 
 await block("TEST 1", async () => {
   console.log("\nTEST 1 - three ways, on a walk, a run and a ride");
-  seed(); outside("walk");
+  await seed(); outside("walk");
   ok("1a. a walk asks How would you like your walk?", T($("h1")) === "How would you like your walk?", T($("h1")));
   ok("1b. Just go, Guide me twice (the two walks), Take three with you", JSON.stringify(rows()) === JSON.stringify(["just", "guide:walk", "guide:weather", "three"]), rows().join(","));
   ok("1c. each Guide me names its walk and its minutes", /Guide me: Mindful walk/.test(T()) && /Guide me: A walk in any weather/.test(T()) && /20 minutes\. Put your headphones in\./.test(T()));
   ok("1d. Take three says no audio", /Three things to notice, read now\. No audio, so keep your music on if you like\./.test(T()));
   ok("1e. Guide me and Take three are In Step's (orchid, two figures)", main.querySelector('.path-row[data-v="guide:walk"] .k-orchid') && main.querySelector('.path-row[data-v="three"] .k-orchid'));
-  seed(); outside("run");
+  await seed(); outside("run");
   ok("1f. a run: How would you like your run?, one Guide me", T($("h1")) === "How would you like your run?" && JSON.stringify(rows()) === JSON.stringify(["just", "guide:run", "three"]));
-  seed(); outside("swim");
+  await seed(); outside("swim");
   ok("1g. a swim goes straight to its plan (no Guide me)", T($("h1")) === "Enjoy your swim" && !rows().some(v => v.startsWith("guide:")));
 });
 
 await block("TEST 2", async () => {
   console.log("\nTEST 2 - a bike ride");
-  seed(); outside("bike");
+  await seed(); outside("bike");
   ok("2a. the road line, word for word", T($("#path-road")) === GUIDE_SESSIONS.ride.roadLine);
   ok("2b. Guide me is offered indoors only", T($('.path-row[data-v="guide:ride"]')).startsWith("Guide me, indoors") && /on a turbo or bike at home/.test(T($('.path-row[data-v="guide:ride"]'))));
 });
 
 await block("TEST 3", async () => {
   console.log("\nTEST 3 - Take three, and Just go");
-  seed(); outside("walk"); tap('.path-row[data-v="three"]');
+  await seed(); outside("walk"); tap('.path-row[data-v="three"]');
   const three = [...main.querySelectorAll(".path-three li")].map(li => T(li));
   ok("3a. the three things, word for word", JSON.stringify(three) === JSON.stringify(GUIDE_SESSIONS.walk.three), three.join(" | "));
   ok("3b. nothing speaks: no recording asked for", audios.length === 0 && /Nothing will speak or buzz while you.re out\./.test(T()));
@@ -161,24 +173,24 @@ await block("TEST 3", async () => {
   const e = (store.get("activityLog") || []).at(-1) || {};
   tap("#activity-done-btn");
   ok("3e. the walk is kept with guideMe three", e.type === "walk" && e.guideMe === "three", JSON.stringify(e).slice(0, 160));
-  seed(); outside("run"); tap('.path-row[data-v="just"]'); tap('.path-row[data-v="log"]');
+  await seed(); outside("run"); tap('.path-row[data-v="just"]'); tap('.path-row[data-v="log"]');
   tap("#activity-save-btn");
   const j = (store.get("activityLog") || []).at(-1) || {};
   tap("#activity-done-btn");
   ok("3f. Just go: the run is kept with guideMe just", j.type === "run" && j.guideMe === "just", JSON.stringify(j).slice(0, 160));
-  seed(); router.pathStart = { door: "moving" }; nav("path"); tap('.path-row[data-v="outside"]'); tap('.path-row[data-v="swim"]'); tap('.path-row[data-v="log"]'); tap("#activity-save-btn");
+  await seed(); router.pathStart = { door: "moving" }; nav("path"); tap('.path-row[data-v="outside"]'); tap('.path-row[data-v="swim"]'); tap('.path-row[data-v="log"]'); tap("#activity-save-btn");
   const sw = (store.get("activityLog") || []).at(-1) || {};
   ok("3g. a swim gains no guideMe", sw.type === "swim" && !("guideMe" in sw), JSON.stringify(sw).slice(0, 120));
   tap("#activity-done-btn");
   // Each layer on its own: the door asks nothing for a swim, and Log what I did keeps a way only for a walk, run or ride.
-  seed(); AL.presetLogActivity("Swim", { guideMe: "just" }); nav("activity-log"); tap("#activity-save-btn");
+  await seed(); AL.presetLogActivity("Swim", { guideMe: "just" }); nav("activity-log"); tap("#activity-save-btn");
   const sw2 = (store.get("activityLog") || []).at(-1) || {}; tap("#activity-done-btn");
   ok("3h. Log what I did keeps a way only for a walk, run or ride", sw2.type === "swim" && !("guideMe" in sw2), JSON.stringify(sw2).slice(0, 120));
 });
 
 await block("TEST 4", async () => {
   console.log("\nTEST 4 - What will happen");
-  seed(); outside("walk"); tap('.path-row[data-v="guide:walk"]'); await wait(10);
+  await seed(); outside("walk"); tap('.path-row[data-v="guide:walk"]'); await wait(10);
   const s = GUIDE_SESSIONS.walk;
   ok("4a. it opens What will happen for that walk", navs.at(-1) === "guide-me" && T($("h1")) === s.title);
   ok("4b. the walk's own words before you start", T().includes(s.before));
@@ -190,7 +202,7 @@ await block("TEST 4", async () => {
 
 await block("TEST 5", async () => {
   console.log("\nTEST 5 - guiding, text first");
-  seed(); outside("walk"); tap('.path-row[data-v="guide:walk"]'); await wait(10);
+  await seed(); outside("walk"); tap('.path-row[data-v="guide:walk"]'); await wait(10);
   tap("#gm-start");
   const s = GUIDE_SESSIONS.walk;
   ok("5a. the first words are on screen at the start", T($("#gm-said")) === s.moments[0].text);
@@ -207,7 +219,7 @@ await block("TEST 5", async () => {
   const e = (store.get("activityLog") || []).at(-1) || {};
   ok("5g. Stop and finish logs the walk, part-way, with guideMe guide", e.type === "walk" && e.guideMe === "guide" && e.status === "partial" && e.durationMins === 6, JSON.stringify(e).slice(0, 200));
   ok("5h. and goes to the finish", navs.at(-1) === "plan-finish" && store.get("currentActivityEntry")?.id === e.id);
-  seed({ tier: "personal" }); outside("walk"); tap('.path-row[data-v="guide:weather"]'); await wait(10); tap("#gm-start");
+  await seed({ tier: "personal" }); outside("walk"); tap('.path-row[data-v="guide:weather"]'); await wait(10); tap("#gm-start");
   NOW += 1201 * 1000; await wait(400);
   const w = (store.get("activityLog") || []).at(-1) || {};
   ok("5i. to the end: logged as done, and on to the finish", w.status === "completed" && w.name === "A walk in any weather" && navs.at(-1) === "plan-finish", JSON.stringify(w).slice(0, 160));
@@ -215,10 +227,10 @@ await block("TEST 5", async () => {
 
 await block("TEST 6", async () => {
   console.log("\nTEST 6 - with the recording");
-  seed(); fileThere = true; outside("run"); tap('.path-row[data-v="guide:run"]'); await wait(10);
+  await seed(); await setFiles(true); outside("run"); tap('.path-row[data-v="guide:run"]'); await wait(10);
   ok("6a. the recording is there: no 'nothing will speak' line", $("#gm-nofile")?.hidden === true);
   tap("#gm-start"); await wait(10);
-  const a = audios.find(x => x.src === "audio/guide-run.mp3");
+  const a = audios.find(x => x.src === "audio/guide-run.mp3" + V);
   ok("6b. the one joined recording plays", !!a && a.paused === false);
   ok("6c. the session is playback, so music pauses rather than being talked over", navigator.audioSession.type === "playback");
   ok("6d. the lock screen: its title, and play, pause and stop", navigator.mediaSession.metadata?.title === "Mindful easy run" && ["play", "pause", "stop"].every(k => typeof handlers[k] === "function"));
@@ -235,7 +247,7 @@ await block("TEST 6", async () => {
 
 await block("TEST 7", async () => {
   console.log("\nTEST 7 - back to the door");
-  seed(); outside("walk"); tap('.path-row[data-v="guide:walk"]'); await wait(10);
+  await seed(); outside("walk"); tap('.path-row[data-v="guide:walk"]'); await wait(10);
   tap("#gm-back");
   ok("7a. ‹ Back returns to How would you like your walk?", navs.at(-1) === "path" && T($("h1")) === "How would you like your walk?", T($("h1")));
 });
@@ -250,15 +262,15 @@ function workoutWith(ex) {
 }
 await block("TEST 8", async () => {
   console.log("\nTEST 8 - while you hold");
-  seed({ voice: "off" }); workoutWith(PLANK);
+  await seed({ voice: "off" }); workoutWith(PLANK);
   ok("8pc. the plank's timer is there", !!$("#timer-toggle-btn"), T().slice(0, 120));
   tap("#timer-toggle-btn"); await wait(10);
   ok("8a. voice off: no line, nothing asked for", !$("#hv-card") && audios.length === 0);
   WO.onUnmount?.();
-  seed({ voice: "on" }); fileThere = true; workoutWith(PLANK);
+  await seed({ voice: "on" }); await setFiles(true); workoutWith(PLANK);
   tap("#timer-toggle-btn"); await wait(10);
   const plank = HOLD_LINES.find(l => l.id === "plank");
-  ok("8b. voice on: the plank's line starts with the timer", audios.at(-1)?.src === "audio/hold-plank.mp3" && !audios.at(-1).paused);
+  ok("8b. voice on: the plank's line starts with the timer", audios.at(-1)?.src === "audio/hold-plank.mp3" + V && !audios.at(-1).paused);
   ok("8c. its words under the clock, in In Step's look", T($("#hv-card")).includes(plank.text) && !!$("#hv-card .line-icon"));
   ok("8d. one big Pause the voice", $("#hv-pause")?.hidden === false && $("#hv-pause").classList.contains("btn-large"));
   tap("#hv-pause");
@@ -266,17 +278,17 @@ await block("TEST 8", async () => {
   const n = audios.length; tap("#timer-toggle-btn"); tap("#timer-toggle-btn"); await wait(10);
   ok("8f. pausing and resuming the timer does not start the line again", audios.length === n, String(audios.length - n));
   WO.onUnmount?.();
-  seed({ voice: "on" }); fileThere = false; workoutWith(PLANK); tap("#timer-toggle-btn"); await wait(10);
+  await seed({ voice: "on" }); await setFiles(false); workoutWith(PLANK); tap("#timer-toggle-btn"); await wait(10);
   ok("8g. no file: the words show, and no Pause that does nothing", T($("#hv-card")).includes(plank.text) && $("#hv-pause")?.hidden === true);
   WO.onUnmount?.();
-  seed({ voice: "on" }); workoutWith(SQUAT);
+  await seed({ voice: "on" }); workoutWith(SQUAT);
   ok("8h. a lift has no timer and no line", !$("#timer-toggle-btn") && !$("#hv-card"));
-  { const HV = await import(B + "hold-voice.js"); HV.resetHoldVoice(); const before = audios.length;
+  { const HV = await import(B + "hold-voice.js"); HV.resetHoldVoice(); await setFiles(true); const before = audios.length;
     HV.startHoldVoice(PLANK, 45, "k1"); HV.startHoldVoice(PLANK, 45, "k1");
     ok("8k. one line per hold, however often its timer starts", audios.length - before === 1, String(audios.length - before)); HV.stopHoldVoice(); }
   WO.onUnmount?.();
   // Yoga: a held pose.
-  seed({ voice: "on" }); fileThere = true;
+  await seed({ voice: "on" }); await setFiles(true);
   main.innerHTML = YS.render(); YS.onMount();
   for (let i = 0; i < 14 && !main.querySelector("#ys-timer-btn"); i++) {
     const next = ['.cs-focus-card:not([disabled])', '[data-mins]', '#ys-start-btn'].map(q => main.querySelector(q)).find(Boolean);
@@ -292,7 +304,7 @@ await block("TEST 8", async () => {
 
 await block("TEST 9", async () => {
   console.log("\nTEST 9 - Settings › Display › Coach's voice");
-  seed();
+  await seed();
   ok("9a. off by default", store.getDefaults().coachVoice === "off" && store.get("coachVoice") === "off");
   main.innerHTML = ""; const v = SettingsView(router); v.mount(main);
   const open = main.querySelector('[data-section="display"], [data-open="display"], #settings-sec-display, [data-sec="display"]');

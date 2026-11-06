@@ -1,0 +1,48 @@
+# .github/workflows/build-audio.yml
+# 06 Nov 2026 v1
+#
+# The coach's recordings (P-28). Graeme uploads ElevenLabs clips into
+# audio/raw/ (GitHub › audio › raw › Add file › Upload files), named as the
+# voice script names them. On every upload this makes the app's files
+# (trimmed, loudness matched, small), joins each guided walk, run and ride
+# into one track, writes audio/manifest.json (which recordings exist, and
+# each one's fingerprint) and commits them. The app plays a line only when
+# the list names it, so a half-finished upload is safe: what is there plays,
+# the rest stays as words on the screen.
+name: Build the coach's recordings
+
+on:
+  push:
+    branches: [main]
+    paths: ["audio/raw/**"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+# Two upload batches close together: the second waits for the first.
+concurrency:
+  group: build-audio
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install ffmpeg
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+      - name: Make the files and the list
+        run: node tools/build-audio.mjs --partial-ok
+      - name: Commit what changed
+        run: |
+          git config user.name "alongside-audio"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add audio/*.mp3 audio/manifest.json
+          if git diff --cached --quiet; then echo "Nothing changed."; exit 0; fi
+          git commit -m "audio: the coach's recordings, made from audio/raw ($(node -e 'console.log(Object.keys(require("./audio/manifest.json").files).length)') files)"
+          git pull --rebase origin main
+          git push origin HEAD:main

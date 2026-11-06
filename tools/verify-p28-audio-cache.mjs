@@ -1,6 +1,11 @@
 /**
  * tools/verify-p28-audio-cache.mjs
- * 06 Nov 2026 v1
+ * 06 Nov 2026 v2
+ *
+ * v2 - sw.js v712. 8: a recording asked for with a newer fingerprint
+ *   (?v=) is fetched and replaces the older one. 9: the recordings' list
+ *   (audio/manifest.json) comes from the network when there is one and is
+ *   kept for offline use.
  *
  * P-28 EMPATHY-THREAD, S6 CLOSE. The coach's recordings in the service
  * worker (build blueprint: "Audio files are not precached. They are fetched
@@ -44,6 +49,7 @@ function makeCaches(stores) {
       put: async (url, res) => { m.set(String(url.url || url), res); },
       match: async url => { const r = m.get(String(url.url || url)); return r ? r.clone() : undefined; },
       keys: async () => [...m.keys()],
+      delete: async url => m.delete(String(url.url || url)),
     });
   };
   return { open, keys: async () => Object.keys(stores), delete: async n => delete stores[n], match: async () => undefined };
@@ -73,7 +79,9 @@ function load({ stores, net }) {
   async function activate() { const pend = []; for (const fn of handlers.activate || []) fn({ waitUntil: x => pend.push(x) }); await Promise.all(pend); }
   return { handlers, fetched, get, activate };
 }
-const online = u => /\/audio\/there\.mp3$/.test(u)
+let MANIFEST = { files: { there: "aaaaaa" } };
+const online = u => /\/audio\/manifest\.json$/.test(u) ? new Response(JSON.stringify(MANIFEST), { status: 200, headers: { "Content-Type": "application/json" } })
+  : /\/audio\/there\.mp3(\?v=[0-9a-f]+)?$/.test(u)
   ? new Response(BYTES, { status: 200, headers: { "Content-Type": "audio/mpeg" } })
   : /\/audio\//.test(u) ? new Response("nope", { status: 404 }) : new Response("shell " + u, { status: 200 });
 const offline = () => { throw new Error("offline"); };
@@ -149,6 +157,33 @@ console.log("\nTEST 7 - everything else as before");
   const r = await w.get("/js/app.js");
   ok("7a. the app's files are answered as before (through the app's own handler)", r.status === 200 && (await r.text()).startsWith("shell "));
   ok("7b. and nothing of theirs goes to the recordings' cache", !s3["alongside-audio"]?.size);
+}
+
+console.log("\nTEST 8 - a line recorded again");
+{
+  const s8 = {};
+  const w = load({ stores: s8, net: online });
+  await w.get("/audio/there.mp3?v=aaaaaa");
+  ok("8pc. the first version is kept by its whole address", s8["alongside-audio"]?.has(ORIGIN + "/audio/there.mp3?v=aaaaaa"));
+  const r = await w.get("/audio/there.mp3?v=bbbbbb");
+  ok("8a. a newer fingerprint is fetched", r.status === 200 && w.fetched.some(u => u.endsWith("?v=bbbbbb")));
+  ok("8b. and replaces the older copy (one per line)", s8["alongside-audio"].has(ORIGIN + "/audio/there.mp3?v=bbbbbb") && !s8["alongside-audio"].has(ORIGIN + "/audio/there.mp3?v=aaaaaa"), [...s8["alongside-audio"].keys()].join(", "));
+}
+
+console.log("\nTEST 9 - the recordings' list");
+{
+  const s9 = {};
+  const w = load({ stores: s9, net: online });
+  const r = await w.get("/audio/manifest.json");
+  ok("9a. from the network, as it is", r.status === 200 && (await r.json()).files.there === "aaaaaa");
+  ok("9b. kept for offline use", s9["alongside-audio"]?.has(ORIGIN + "/audio/manifest.json"));
+  MANIFEST = { files: { there: "cccccc" } };
+  const r2 = await w.get("/audio/manifest.json");
+  ok("9c. a newer list from the network wins over the kept one", (await r2.json()).files.there === "cccccc");
+  const w2 = load({ stores: s9, net: offline });
+  const r3 = await w2.get("/audio/manifest.json");
+  ok("9d. offline: the kept list", r3.status === 200 && (await r3.json()).files.there === "cccccc");
+  ok("9e. and not in the app's own cache (an update would lose it)", !s9[CACHE_NAME]?.has(ORIGIN + "/audio/manifest.json"));
 }
 
 console.log(`\n${passes} passed, ${fails} failed`);
