@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 06 Nov 2026 v706
+ * 06 Nov 2026 v707
  *
+ * v707 - P-28 S3 (both tiers). In Step is a programme: four parts of six short episodes (Listen, Hold still, Choose, Carry it), the next in order and any you've done open in Wellbeing, and offered now and then after a finished session, with Start and Not today (never part-way or on a Bad day; on a low day, Part 1's Adjusting). On a finish without an episode, now and then, a line about the people around you, only when it is true. In Step has its own look: orchid, with two figures. The coach's voice is ready for its recordings: with none yet, everything is words on the screen. NEW FILES precached: js/coach-audio.js, js/data/in-step-offer.js, css/components/in-step.css. RETIRED: js/data/in-step-scenarios.js.
  * v706 - P-28 S2 (content only; nothing on screen changes). In Step's programme (four parts of six episodes), Guide me's walks, run and indoor ride, and the coach's lines while you hold are in place, word for word as approved, ready for the screens that show them. The reflection after a session can now reach the people around you sooner: people close to you from about session 8, people you pass from about session 20. NEW FILES precached: js/data/in-step-programme.js, js/data/guide-me.js.
  * v705 - P-28 S1 (schema only; nothing on screen changes). The app can now remember where you are in In Step as a programme (part, episode, and the one tap after Carry it), whether the coach's recorded voice is on (off unless you turn it on), and how an outdoor session was taken (Just go, Guide me or Take three). store.js v122, Schema v1.123.
  * v704 - P-27 tidy (Graeme, 05 Nov). Nothing is hidden under the bottom bar any more: every screen leaves room for the last card's edge. The check-in no longer has the easy-to-miss sleep link (both tiers). On the Plan: My programme is gone from Get stronger > Gym; the twelve-week programme is retired (no chapter-end card on Home, no programme row on Progress or in Settings); every session, a walk, run, ride, swim, yoga or class too, ends on the Plan's finish with How do you feel now? in the open; Settings > Your plan is Your arc, Your week and one Goals and activity level row; Let me choose for you builds the length and kind Home says and never says You asked for; Back on Today's plan returns to the door's steps with your choices kept; the arc's Start today's session is Home's choice; a lighter plan says why. Both tiers: Log what I did is one picker (now with Yoga, Pilates, Stretching, Meditation, Something else); Library > Rest day opens a rest, not the last session's finish; Library > Breathing opens the same player as Wellbeing; Settings' Activity log is called Log what I did.
@@ -4253,7 +4254,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v706";
+const CACHE_NAME = "alongside-v707";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4261,9 +4262,9 @@ const CACHE_NAME = "alongside-v706";
 // downloads only the rest: it fetched all of them (about 6 MB) every time.
 // SHELL_HASHES:BEGIN
 const SHELL_HASHES = {
-  "./": "0a6b137fb70c49b5",
-  "./index.html": "0a6b137fb70c49b5",
-  "./css/main.css": "3e25300b00cf449e",
+  "./": "dfcf83623b622f91",
+  "./index.html": "dfcf83623b622f91",
+  "./css/main.css": "0b9a312ed5b966ff",
   "./css/base/fonts.css": "04893bbdfa4cf013",
   "./css/layouts/onboarding-additions.css": "43a85bf31e18712f",
   "./css/layouts/today.css": "c1b636255096d8af",
@@ -4293,6 +4294,7 @@ const SHELL_HASHES = {
   "./css/components/display-preferences.css": "7d1e4e0b34f5223f",
   "./css/components/session-log.css": "92f8082dc0ee69a7",
   "./css/components/grounding-moments.css": "a2641284734e48de",
+  "./css/components/in-step.css": "5caaf394f9b3b261",
   "./css/components/single-activity-session.css": "fef626d39b2d281c",
   "./css/components/session-shared.css": "a71069801a65054c",
   "./css/components/upgrade-door.css": "1a2deeaceb45f4f1",
@@ -4300,7 +4302,7 @@ const SHELL_HASHES = {
   "./css/base/global.css": "b8e901782637c19f",
   "./css/base/reset.css": "717c20ab5ebbd16e",
   "./css/base/typography.css": "7ef937ebd7185b4b",
-  "./css/base/variables.css": "03bd991ce4fc7806",
+  "./css/base/variables.css": "988cece14048b4ff",
   "./css/components/buttons.css": "185517a586d2914d",
   "./css/components/cards.css": "c65a1ff9ff422d1d",
   "./css/components/checkin.css": "86932bcac334309a",
@@ -4347,7 +4349,7 @@ const SHELL_HASHES = {
   "./js/views/settings.js": "3e3fa88471e47c17",
   "./js/views/restore-flow.js": "dc81c2e455fa472d",
   "./js/views/weekly-plan.js": "dcee06e297b402c0",
-  "./js/views/reflect.js": "881ab69b445a99ec",
+  "./js/views/reflect.js": "fa33525e04a2feaa",
   "./js/data/empathy-transfer.js": "d4028d2c71515778",
   "./js/data/equipment-map.js": "2db6399d16987707",
   "./js/data/exercises/gym.js": "835e777941d00fe4",
@@ -4382,7 +4384,7 @@ const SHELL_HASHES = {
   "./js/views/plan-home.js": "c3119c9c9830c2c7",
   "./js/views/path.js": "13f2c8daeacd9c53",
   "./js/plan-look.js": "7674d8fbf5101aa9",
-  "./js/views/plan-finish.js": "37a34340b81f8b31",
+  "./js/views/plan-finish.js": "84f85fdc2df42597",
   "./js/data/outside.js": "3af4ea46bd898084",
   "./js/data/trend-recipes.js": "14961e4c12aef77e",
   "./js/data/path-context.js": "bb05075596d17c27",
@@ -4397,7 +4399,7 @@ const SHELL_HASHES = {
   "./js/data/export-file.js": "bbee762322d0e4e2",
   "./js/data/health-consent-covers.js": "6698a3e50672cbbe",
   "./js/data/kind-colours.js": "f247edabfec2fd3d",
-  "./js/data/line-icons.js": "b746ddec419dc568",
+  "./js/data/line-icons.js": "ac72317a529cf62b",
   "./js/data/week-shape-model.js": "125804ade2e3713b",
   "./js/data/week-shape.js": "7c144c42ca0b91b4",
   "./js/data/warm-views.js": "73c268f74f004e8e",
@@ -4456,10 +4458,11 @@ const SHELL_HASHES = {
   "./css/components/class-player.css": "401cc57d7d39dbb1",
   "./js/views/saved-sessions.js": "400202f2e10e8e74",
   "./js/views/session-builder-ui.js": "30c36be8e7a979d4",
-  "./js/views/noticing.js": "afb617785e39e18d",
-  "./js/views/in-step.js": "54f53470958ac62f",
-  "./js/data/in-step-scenarios.js": "b46f085cda4d24fc",
+  "./js/views/noticing.js": "a99e17ca283d7dcf",
+  "./js/views/in-step.js": "9068d760e5eae41a",
   "./js/data/in-step-programme.js": "91605a0780fba799",
+  "./js/data/in-step-offer.js": "836af3ed624917b9",
+  "./js/coach-audio.js": "9c53aeabf8b2021a",
   "./js/data/guide-me.js": "ed77e97b8a8a35ea",
   "./js/views/journal-entry.js": "dd38e795ee54e7d7",
   "./js/views/gym-programme.js": "98de0c5929699fb1",
@@ -4583,6 +4586,7 @@ const SHELL_URLS = [
   "./css/components/display-preferences.css",
   "./css/components/session-log.css",
   "./css/components/grounding-moments.css",
+  "./css/components/in-step.css",
   "./css/components/single-activity-session.css",
   "./css/components/session-shared.css",
   "./css/components/upgrade-door.css",
@@ -4780,8 +4784,9 @@ const SHELL_URLS = [
   "./js/views/session-builder-ui.js",
   "./js/views/noticing.js",
   "./js/views/in-step.js",
-  "./js/data/in-step-scenarios.js",
   "./js/data/in-step-programme.js",
+  "./js/data/in-step-offer.js",
+  "./js/coach-audio.js",
   "./js/data/guide-me.js",
   "./js/views/journal-entry.js",
   "./js/views/gym-programme.js",
