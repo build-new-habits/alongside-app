@@ -1,6 +1,11 @@
 /**
  * tools/verify-sw1.mjs
- * 01 Oct 2026 v2
+ * 06 Nov 2026 v3
+ *
+ * v3 - P-28 S6. The coach's recordings keep their own cache through an
+ *   update (alongside-audio, made once, never changed), so activate deletes
+ *   everything but the current cache AND that one. Nothing else may be kept:
+ *   the filter must name exactly those two (verify-p28-audio-cache runs it).
  *
  * v2 - B3 DOMAIN. The offline fallback is "./index.html" (sw.js v624, every
  *   path relative). Same rule: scoped to this version's cache.
@@ -63,8 +68,8 @@ check("the offline fallback is also scoped", () => {
 });
 
 console.log("\nTEST 2 - old caches are still cleaned up");
-check("activate deletes everything but the current cache", () => {
-  ok(/keys\s*\n?\s*\.filter\(key => key !== CACHE_NAME\)/.test(code),
+check("activate deletes everything but the current cache (and the recordings')", () => {
+  ok(/keys\s*\n?\s*\.filter\(key => key !== CACHE_NAME && key !== AUDIO_CACHE\)/.test(code) && /const AUDIO_CACHE = "alongside-audio";/.test(code),
      "without this, old caches accumulate forever");
   ok(/caches\.delete\(key\)/.test(code), "no deletion");
 });
