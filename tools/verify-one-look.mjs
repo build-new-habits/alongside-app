@@ -1,7 +1,15 @@
 import { createRequire as __cr } from "node:module";
 /**
  * tools/verify-one-look.mjs
- * 02 Nov 2026 v8
+ * 06 Nov 2026 v9
+ *
+ * v9 - P-28 S3. In Step is a programme: 3m opens the next episode (it
+ *   opened a movement's scenario) and checks it as a practice that runs:
+ *   Exit, and nothing else to go back by. TEST 4: P-28 is on both tiers by
+ *   Graeme's decision (05 Nov: "Both tiers", an exception to Stage AWARD's
+ *   leave-Free-alone rule), so Free's In Step is the programme (checked to
+ *   be it, not compared with v688's room), and Free's Wellbeing differs
+ *   from v688 only in In Step's tile (4w).
  *
  * v8 - P-26 ONE-BUILD-PAGE re-point (Graeme, 02 Nov: one Build a session
  *   page on the Plan, replacing the builder's ways in there). TEST 4: a view
@@ -229,7 +237,7 @@ await inside("3j. Breathing: how long, before it starts", "breathing-session", [
 // The room keeps its place between visits (3j left it on How long), so the next tap is the length.
 await inside("3k. Breathing, while it runs", "breathing-session", [() => main.querySelector(".bs-type-card") ? (click(main.querySelector(".bs-type-card")), main.querySelector(".bs-duration-btn")) : main.querySelector(".bs-duration-btn")], true);
 await inside("3l. Something quieter: a breathing pattern, while it runs", "quiet-session", ['[data-mode="breathing"]', ".quiet-breathing-card"], true);
-await inside("3m. In Step: a scenario", "in-step", [".is-movement-card:not([disabled])"]);
+await inside("3m. In Step: an episode, while it plays", "in-step", [".instep-next"], true);
 // v4: Core and Yoga & Pilates, past their first choice.
 await inside("3n. Core: how long, before it starts", "core-session", ["[data-focus]"]);
 await inside("3o. Yoga & Pilates: past the first choice", "yoga-session", ["[data-type], [data-focus]"]);
@@ -284,6 +292,15 @@ for (const file of touched) {
     continue;
   }
   if (!old) { ok(`4. Free ${name}: there on v688`, false); continue; }
+  // v9 (P-28, both tiers by Graeme's decision): Free's In Step is the programme.
+  if (name === "in-step") {
+    person("free"); main.innerHTML = "";
+    const NOWIS = await import(new URL(`../${file}`, import.meta.url).href);
+    main.innerHTML = NOWIS.render(); NOWIS.onMount?.(); await wait(20);
+    compared++;
+    ok("4. Free in-step: the P-28 programme (both tiers by decision), not v688's room", !!main.querySelector(".instep-next, .instep-ep") && !main.querySelector(".is-movement-card"));
+    continue;
+  }
   // Both drawn from fresh copies, so neither carries a state from TEST 2 or 3.
   const fresh = async (code, tag) => { const t = new URL(`../${file.replace(/\.js$/, "")}__${tag}_look.js`, import.meta.url); writeFileSync(t, code); try { return await import(t.href); } finally { unlinkSync(t); } };
   const OLD = await fresh(old, "v688");
@@ -299,6 +316,23 @@ for (const file of touched) {
     const renames = (a.match(/Body Balance/g) || []).length;
     ok("4r. v688's Free Log what I did named Body Balance exactly twice (label and words): the rename is that and no more", renames === 2, String(renames));
     a = a.replace(/Body Balance/g, "Yoga or Pilates class");
+  }
+  // v9 (P-28): Free's finish may carry In Step's offer or its line, and
+  // nothing else changes. Taken out (and checked to be In Step's) before
+  // the byte comparison.
+  if (name === "reflect") {
+    const isCard = /<(section|aside) class="card instep-card instep-(offer|bline)"[\s\S]*?<\/\1>/g;
+    const cards = b.match(isCard) || [];
+    ok("4x. P-28: anything new on Free's finish is In Step's offer or line, one at most", cards.length <= 1 && cards.every(c => /In Step/.test(c)), String(cards.length));
+    b = b.replace(isCard, "");
+  }
+  // v9 (P-28): Free's Wellbeing differs from v688 only in In Step's tile.
+  if (name === "noticing") {
+    const was = ['class="wb-practice k-green" id="noticing-in-step-btn"', "In Step \u2014 short scenarios, three ways to respond, no right step", "Short scenarios. Three ways to respond. No right step."];
+    const now = ['class="wb-practice k-orchid" id="noticing-in-step-btn"', "In Step \u2014 short moments about the people around you", "Short moments about the people around you."];
+    const each = was.every(w => a.split(w).length === 2);
+    ok("4w. P-28: v688's Free Wellbeing had In Step's tile once, and the tile is all that changed", each);
+    if (each) was.forEach((w, i) => { a = a.replace(w, now[i]); });
   }
   if (name === "activity-log") {
     const g = onlyMindfulAdded(a, b);

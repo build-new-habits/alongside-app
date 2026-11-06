@@ -1,6 +1,9 @@
 /**
  * tools/verify-wellbeing-claims.mjs
- * 28 Sep 2026 v1
+ * 06 Nov 2026 v2
+ *
+ * v2 - P-28 S3. In Step's files are its programme and its offer
+ *   (in-step-scenarios.js retired to docs/archive-code/).
  *
  * SMOOTH-P0 C1 and C4. Wellbeing says what to do, plainly.
  *
@@ -33,7 +36,7 @@ const strip = s => s.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:"'`])\/\/.*
 
 const FILES = ["js/views/breathing-session.js", "js/views/quiet-session.js", "js/views/noticing.js",
                "js/views/journal-entry.js", "js/views/in-step.js", "js/views/practices.js",
-               "js/data/practice-library.js", "js/data/in-step-scenarios.js"];
+               "js/data/practice-library.js", "js/data/in-step-programme.js", "js/data/in-step-offer.js"];
 const BANNED = /nervous system|vagus|parasympathetic|\bHRV\b|heart rate variability|\bCO2\b|cortisol|researched|proven|studies show|scientifically|Stanford|Harvard|Huberman|Weil|Plumbly|\bDr\.? [A-Z][a-z]+|military|fastest known|measurabl/i;
 
 console.log("\nTEST 0 - the scan reaches real files and would catch a claim");

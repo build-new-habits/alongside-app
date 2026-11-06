@@ -1,6 +1,11 @@
 /**
  * tools/verify-door1.mjs
- * 01 Oct 2026 v2
+ * 06 Nov 2026 v3
+ *
+ * v3 - P-28 S3. In Step is a programme of four parts (Graeme, 06 Nov: the
+ *   door says "four parts"; it said "four movements"). The door is on Carry
+ *   it, and the player has no coach card at all, so "outside the coach
+ *   card" holds when there is none before it. Wording otherwise unchanged.
  *
  * v2 - DOCS-MOVE. Documents/ left this public repository for the private
  *   BNH-Files repository; the files this check reads are now in docs/ (or,
@@ -83,13 +88,13 @@ check("shown to free users only", () =>
   ok(/!isPremium\(\) \? `/.test(inStep), "a paying person should not be sold to"));
 check("copy matches the specification", () => {
   for (const phrase of [
-    "four movements, one thing at a time",
+    "four parts, one thing at a time",
     "being steadier, being more present",
     "part of the paid plan, if you ever fancy it",
   ]) ok(inStep.includes(phrase), `missing specified line: "${phrase}"`);
 });
 check("copy rule 10.2 - what it is, what it does, how to get it", () => {
-  ok(/four movements/.test(inStep),                 "what is it");
+  ok(/four parts/.test(inStep),                     "what is it");
   ok(/build it out over months/.test(inStep),       "what would it do for me");
   ok(/id="is-door-btn"/.test(inStep),               "how do I get it");
 });
@@ -101,8 +106,8 @@ console.log("\nTEST 4 - P1 and P2: the coach is not the one selling");
 check("the door sits outside the coach card", () => {
   const doorAt  = inStep.indexOf("upgrade-door");
   const coachAt = inStep.lastIndexOf("card-coach", doorAt);
-  const between = inStep.slice(coachAt, doorAt);
-  ok(/<\/div>/.test(between), "the door must not be inside the coach's card");
+  const between = coachAt === -1 ? "</div>" : inStep.slice(coachAt, doorAt);
+  ok(doorAt > -1 && /<\/div>/.test(between), "the door must not be inside the coach's card");
 });
 check("no coach icon inside the door", () => {
   const d = inStep.slice(inStep.indexOf("upgrade-door"), inStep.indexOf("is-door-btn"));

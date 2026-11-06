@@ -1,6 +1,9 @@
 /**
  * tools/verify-verify-contrast-check.mjs
- * 04 Oct 2026 v3
+ * 06 Nov 2026 v4
+ *
+ * v4 - P-28 S3. Eight kind colours: orchid (In Step, other people) joins
+ *   the seven, held to the same text and shape contrast in every scheme.
  *
  * v3 - LOOK-3 COLOUR (Graeme, 04 Oct: "Both lack colour"). Seven kind
  *   colours (--kind-teal, amber, violet, blue, rose, green, slate), one per
@@ -122,7 +125,7 @@ for (const [name, selector] of Object.entries(SCHEMES)) {
   // the raised surfaces. A scheme that forgot one falls back to :root,
   // which is how a pale dark-scheme colour would land on white -- caught.
   console.log("\nLOOK-3 - kind colours (text 4.5:1 on deep/bg, shapes 3:1 on card/elevated)");
-  for (const k of ["teal","amber","violet","blue","rose","green","slate"]) {
+  for (const k of ["teal","amber","violet","blue","rose","green","slate","orchid"]) {
     const t = tok(`kind-${k}`);
     const text  = Math.min(cr(t, tok("color-bg-deep")), cr(t, tok("color-bg")));
     const shape = Math.min(cr(t, tok("color-bg-card")), cr(t, tok("color-bg-elevated")));

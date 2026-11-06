@@ -1,6 +1,13 @@
 /**
  * tools/verify-aims.mjs
- * 31 Oct 2026 v2
+ * 06 Nov 2026 v3
+ *
+ * v3 - P-28 S3. In Step's four movements became the programme (S3 retired
+ *   js/data/in-step-scenarios.js to docs/archive-code/). 4d now checks each
+ *   movement a mind strand names against where it went: solo, partner and
+ *   floor are Parts 1 to 3 of the programme, environment is Guide me's walk
+ *   in any weather. Nothing in the app reads a strand's movements yet; that
+ *   is an orphan carried from before, logged on the schedule.
  *
  * v2 - P-15 ARC-AIMS-BUILD. TEST 7: the aims Graeme approved on 31 Oct
  *   (P-14) are in the list in his words; three goals from getting started
@@ -165,10 +172,16 @@ check("4c. a mind strand is actionable, not a mood", () => {
 });
 
 check("4d. mind strands point at In Step movements that exist", () => {
-  const src = fs.readFileSync(_gatePath("js/data/in-step-scenarios.js"), "utf8");
-  const real = ["solo", "partner", "floor", "environment"].filter(m =>
-    new RegExp(`["']${m}["']`).test(src));
-  ok(real.length === 4, `in-step-scenarios.js no longer defines all four movements (found ${real.join(", ")})`);
+  // v3. Where each movement went in P-28, and the file that holds it now.
+  const WENT = { solo: ["js/data/in-step-programme.js", /part: 1, episode: 1\b/],
+                 partner: ["js/data/in-step-programme.js", /part: 2, episode: 1\b/],
+                 floor: ["js/data/in-step-programme.js", /part: 3, episode: 1\b/],
+                 environment: ["js/data/guide-me.js", /id: "weather"/] };
+  const real = Object.keys(WENT).filter(m => {
+    const [f, re] = WENT[m];
+    return fs.existsSync(_gatePath(f)) && re.test(fs.readFileSync(_gatePath(f), "utf8"));
+  });
+  ok(real.length === 4, `the four movements' new homes are not all there (found ${real.join(", ")})`);
   for (const [k, v] of Object.entries(STRANDS)) {
     for (const m of v.movements || []) {
       ok(real.includes(m), `strand "${k}" names movement "${m}", which In Step does not have`);

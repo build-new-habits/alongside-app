@@ -1,5 +1,5 @@
 # Alongside: Move — Cold Start Blueprint
-## 06 Nov 2026 v312
+## 06 Nov 2026 v313
 
 Build New Habits | Everything a chat with no memory needs to pick this up and build confidently.
 
@@ -74,7 +74,7 @@ git clone --depth 1 https://x-access-token:$TOKEN@github.com/build-new-habits/al
 |---|---|
 | `store.js` | v122 |
 | `Schema.md` | v1.123 |
-| `sw.js` | **v706**, cache `alongside-v706` |
+| `sw.js` | **v707**, cache `alongside-v707` |
 | `router.js` | v48 · `my-programme.js` v8 · `today.js` v49 · `settings.js` v46 · `progress.js` v27 · `onboarding/thread.js` v16 |
 | `exercise-card.js` | **v7** — CARD-4, four pages. `workout.css` v16 |
 | Gates | **354, all green** on jsdom 28.1.0 (`npm ci`) — from the repo root. See the cwd row in §9 |

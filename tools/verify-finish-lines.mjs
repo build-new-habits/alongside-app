@@ -1,6 +1,12 @@
 /**
  * tools/verify-finish-lines.mjs
- * 29 Oct 2026 v3
+ * 06 Nov 2026 v4
+ *
+ * v4 - P-28 S3. A finish that offers an In Step episode has no reflection
+ *   prompt as well (In Step's offer, data/in-step-offer.js). This gate is
+ *   about which reflection is said, so its fixture has In Step already
+ *   offered today (programme.offeredAt), and the reflection is reached as
+ *   before. Nothing else changed; verify-p28-instep checks the offer.
  *
  * v3 - STAGE PATH Session 6 re-point (none loosened; stricter). On the Plan
  *   a session now ends on the Plan's own finish (views/plan-finish.js), which
@@ -89,6 +95,9 @@ function fixture({ sore = null, energies = [7, 7, 7, 7, 7], rotate = 0, checkedI
   if (checkedIn) store.set("lastCheckin", { energy: 7, mood: 6, timestamp: new Date().toISOString() });
   if (sore) { store.set("conditions", [sore]); store.set("conditionPainScores", { [sore]: 4 }); }
   store.set("empathyPromptsAtStage", rotate);
+  // v4. In Step was offered earlier today, so this finish is the reflection's.
+  const isp = store.get("inStepProgress") || {};
+  store.set("inStepProgress", { ...isp, programme: { ...(isp.programme || {}), offeredAt: new Date().toISOString(), offeredSession: 8 } });
   store.set("generatedSession", { session: { id: "s", name: "Upper Body", exercises: TEN }, builtAt: new Date().toISOString(), inputs: {} });
   navs = [];
   paintWorkout();

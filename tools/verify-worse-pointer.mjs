@@ -1,6 +1,11 @@
 /**
  * tools/verify-worse-pointer.mjs
- * 29 Oct 2026 v3
+ * 06 Nov 2026 v4
+ *
+ * v4 - P-28 S3. A finish that offers an In Step episode has no reflection
+ *   prompt as well; on a low day the offer is Part 1's Adjusting. These
+ *   checks are about which reflection is said, so earlier() also has In
+ *   Step offered earlier today. Nothing else changed.
  *
  * v3 - STAGE PATH Session 6 re-point (none loosened; stricter). Tests 1 to 3
  *   are Free's finish (reflect.js), as before. On the Plan a session ends on
@@ -112,6 +117,9 @@ function earlier() {
   });
   store.set("activityLog", [...past, ...l]);
   store.set("lastEmpathyPromptSession", 0);
+  // v4. In Step was offered earlier today, so this finish is the reflection's.
+  const isp = store.get("inStepProgress") || {};
+  store.set("inStepProgress", { ...isp, programme: { ...(isp.programme || {}), offeredAt: new Date().toISOString(), offeredSession: 6 } });
 }
 session({ conditions: ["lower-back"], soreToday: true });
 earlier();

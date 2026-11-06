@@ -1,6 +1,10 @@
 /**
  * tools/verify-css.mjs
- * 04 Oct 2026 v7
+ * 06 Nov 2026 v8
+ *
+ * v8 - P-28 S3. In Step's player is styled now (components/in-step.css):
+ *   in-step-view leaves the hook list, and the old room's is-movement-card,
+ *   is-option-btn and is-intro went with the old room, as the check asks.
  *
  * v7 - LOOK-2. progress-body is styled now (the overview's card stack), so
  *   it leaves the hook list, as the check itself asks.
@@ -94,16 +98,15 @@ for (const f of walk("css", ".css"))
 const SCOPE = "view scope: the wrapper is styled by .view / the page layout";
 const HOOK  = "JS hook: the element is styled by the class beside it (.card, .btn, .ci-slider)";
 const WRAP  = "wrapper or modifier: groups or marks state; its children carry the styling";
-const HOOKS = { "in-step-view": SCOPE,
+const HOOKS = {
   "prescribed-session-view": SCOPE,
   "programme-select-view": SCOPE, "saved-sessions-view": SCOPE, "sb-view": SCOPE,
   "rf-view--stop": SCOPE, "reflect-view": SCOPE,
   "bs-duration-btn": HOOK, "bs-type-card": HOOK,
-  "is-movement-card": HOOK, "is-option-btn": HOOK,
   "ms-timer-btn": HOOK, "quiet-back-btn": HOOK, "sb-buildmode-btn": HOOK,
   "sb-duration-btn": HOOK, "sb-type-tile": HOOK,
   "today-header": WRAP, "activity-log-form": WRAP,
-  "activity-log-picker": WRAP, "is-intro": WRAP,
+  "activity-log-picker": WRAP,
   "reflect-coach-card": WRAP, "checkin-coach-card": WRAP,
   "gp-moment--glance": WRAP, "gp-moment--reflection": WRAP,
   "home-arc--offer": WRAP, "today-arc--active": WRAP, "today-arc--offer": WRAP,
