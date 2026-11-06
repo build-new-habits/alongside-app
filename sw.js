@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 06 Nov 2026 v709
+ * 06 Nov 2026 v710
  *
+ * v710 - P-28 S6 (close). The coach's recordings, when they arrive, are kept on your phone after the first time each plays, in their own store, so a walk can be guided offline and an app update never downloads them again. They are never downloaded before you play one. A recording that isn't there yet is never an error: the words are on the screen.
  * v709 - P-28 S5. One light sentence about In Step where the Plan is chosen, and one where you set your arc. Nothing else changes. Also a check, not the app: v708's own fresh-clone check found one gate that had not been told Guide me was new; fixed here.
  * v708 - P-28 S4 (Guide me). On the Plan, Keep moving › Outside › Walk, Run or Bike ride asks how you'd like it: Just go, Guide me (a mindful walk, a walk in any weather, an easy run, or an indoor ride: what will happen is told first, then one recording with its words on screen at their times, pause and stop from the lock screen) or Take three with you (three things to notice, read before you set off). On a road ride nothing talks to you. Both tiers: Settings › Display › Coach's voice (off unless you turn it on); with it on, a timed hold's line starts with its timer, with one big Pause the voice. With no recordings yet, everything is words on the screen. NEW FILES precached: js/views/guide-me.js, js/hold-voice.js.
  * v707 - P-28 S3 (both tiers). In Step is a programme: four parts of six short episodes (Listen, Hold still, Choose, Carry it), the next in order and any you've done open in Wellbeing, and offered now and then after a finished session, with Start and Not today (never part-way or on a Bad day; on a low day, Part 1's Adjusting). On a finish without an episode, now and then, a line about the people around you, only when it is true. In Step has its own look: orchid, with two figures. The coach's voice is ready for its recordings: with none yet, everything is words on the screen. NEW FILES precached: js/coach-audio.js, js/data/in-step-offer.js, css/components/in-step.css. RETIRED: js/data/in-step-scenarios.js.
@@ -4256,7 +4257,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v709";
+const CACHE_NAME = "alongside-v710";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4987,13 +4988,34 @@ self.addEventListener("install", event => {
   );
 });
 
+// P-28 S6. The coach's recordings (audio/<name>.mp3): never precached; kept
+// after the first play in their own cache, which an update never deletes
+// (they are made once and do not change; a new recording gets a new name).
+const AUDIO_CACHE = "alongside-audio";
+
+/** A cached recording, answered as the browser asked: whole, or the byte range a media element asks for (Safari will not play otherwise). */
+async function _audioAnswer(full, range) {
+  if (!range) return full;
+  const buf = await full.arrayBuffer();
+  const m = /bytes=(\d*)-(\d*)/.exec(range) || [];
+  const size = buf.byteLength;
+  let start = m[1] === "" || m[1] === undefined ? NaN : Number(m[1]);
+  let end = m[2] === "" || m[2] === undefined ? NaN : Number(m[2]);
+  if (Number.isNaN(start)) { start = Math.max(0, size - (Number.isNaN(end) ? size : end)); end = size - 1; }
+  if (Number.isNaN(end) || end >= size) end = size - 1;
+  if (start >= size || start > end) return new Response(null, { status: 416, headers: { "Content-Range": `bytes */${size}` } });
+  return new Response(buf.slice(start, end + 1), { status: 206, headers: {
+    "Content-Type": full.headers.get("Content-Type") || "audio/mpeg",
+    "Content-Range": `bytes ${start}-${end}/${size}`, "Content-Length": String(end - start + 1), "Accept-Ranges": "bytes" } });
+}
+
 // Activate — delete old caches
 self.addEventListener("activate", event => {
   event.waitUntil(
     caches.keys().then(keys =>
       Promise.all(
         keys
-          .filter(key => key !== CACHE_NAME)
+          .filter(key => key !== CACHE_NAME && key !== AUDIO_CACHE)
           .map(key => {
             console.log("SW: deleting old cache", key);
             return caches.delete(key);
@@ -5016,6 +5038,26 @@ self.addEventListener("fetch", event => {
   // never from this cache, so a new message is seen on the next open.
   // Offline, the app keeps the last list it fetched (js/data/messages.js).
   if (url.pathname.endsWith("/messages.json")) return;
+
+  // P-28 S6. A recording: from its own cache, or fetched whole once and
+  // kept there. Not there (404, or offline the first time) is passed on
+  // as it is and kept nowhere: the page shows the words.
+  if (/\/audio\/[^/]+\.mp3$/.test(url.pathname)) {
+    event.respondWith((async () => {
+      const cache = await caches.open(AUDIO_CACHE);
+      const key = url.origin + url.pathname;
+      let full = await cache.match(key);
+      if (!full) {
+        let r;
+        try { r = await fetch(key); } catch { return new Response(null, { status: 404 }); }
+        if (!r || r.status !== 200) return r;
+        await cache.put(key, r.clone());
+        full = r;
+      }
+      return _audioAnswer(full, event.request.headers.get("range"));
+    })());
+    return;
+  }
 
   // SW-1, 12 Aug 2026. THE BUG THAT MADE EVERY OTHER FIX UNRELIABLE.
   //
