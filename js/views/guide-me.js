@@ -1,6 +1,11 @@
 /**
  * js/views/guide-me.js
- * 06 Nov 2026 v1
+ * 06 Nov 2026 v2
+ *
+ * v2 - The recording is there when the recordings' list names it
+ *   (audio/manifest.json, coach-audio.js v3), and is asked for with its
+ *   fingerprint, so a re-made track reaches phones. It no longer tries to
+ *   load the file to find out.
  *
  * P-28 EMPATHY-THREAD, S4 GUIDE ME. Graeme, 05 Nov ("Yes, mock that up";
  * "All of the above"), played as the approved prototype v5 plays it.
@@ -33,7 +38,8 @@ import { store }    from "../store.js";
 import { router }   from "../router.js";
 import { isPremium } from "../auth.js";
 import { lineIcon } from "../data/line-icons.js";
-import { GUIDE_SESSIONS, trackFile, momentAt } from "../data/guide-me.js";
+import { GUIDE_SESSIONS, momentAt } from "../data/guide-me.js";
+import { audioReady, hasLine, audioUrl } from "../coach-audio.js";
 
 export const centered = false;
 
@@ -126,16 +132,15 @@ function go(next) {
 
 // ── The recording ───────────────────────────────────────────────────────
 function _probe(cb) {
-  const s = S(); hasFile = false;
-  if (typeof Audio === "undefined") { cb(false); return; }
-  let a;
-  try { a = new Audio(trackFile(s)); a.preload = "metadata"; } catch { cb(false); return; }
-  let done = false;
-  const fin = ok => { if (done) return; done = true; hasFile = ok; if (ok) audio = a; cb(ok); };
-  a.addEventListener("loadedmetadata", () => fin(true));
-  a.addEventListener("error", () => fin(false));
-  setTimeout(() => fin(false), 4000);
-  try { a.load?.(); } catch { fin(false); }
+  const s = S(); hasFile = false; audio = null;
+  audioReady().then(() => {
+    if (S() !== s) return;
+    hasFile = hasLine(s.track);
+    if (hasFile && typeof Audio !== "undefined") {
+      try { audio = new Audio(audioUrl(s.track)); audio.preload = "auto"; } catch { hasFile = false; audio = null; }
+    }
+    cb(hasFile);
+  });
 }
 
 function _mediaSession() {
