@@ -1,0 +1,4 @@
+{
+ "about": "The coach's recordings: which lines have a file, and each file's fingerprint. Written by tools/build-audio.mjs; read by js/coach-audio.js.",
+ "files": {}
+}
