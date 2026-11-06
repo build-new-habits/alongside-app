@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 06 Nov 2026 v710
+ * 06 Nov 2026 v711
  *
+ * v711 - P-28 finished. On a low day In Step's offer says "This one's about you today." The old In Step's stored choices and counters are removed from your phone (nothing used them). With the coach's voice on, opening an episode fetches that part's recordings, so it plays offline. Both tiers, a fault fixed: leaving getting started before its next line arrived could throw an error. NEW FILES: none.
  * v710 - P-28 S6 (close). The coach's recordings, when they arrive, are kept on your phone after the first time each plays, in their own store, so a walk can be guided offline and an app update never downloads them again. They are never downloaded before you play one. A recording that isn't there yet is never an error: the words are on the screen.
  * v709 - P-28 S5. One light sentence about In Step where the Plan is chosen, and one where you set your arc. Nothing else changes. Also a check, not the app: v708's own fresh-clone check found one gate that had not been told Guide me was new; fixed here.
  * v708 - P-28 S4 (Guide me). On the Plan, Keep moving › Outside › Walk, Run or Bike ride asks how you'd like it: Just go, Guide me (a mindful walk, a walk in any weather, an easy run, or an indoor ride: what will happen is told first, then one recording with its words on screen at their times, pause and stop from the lock screen) or Take three with you (three things to notice, read before you set off). On a road ride nothing talks to you. Both tiers: Settings › Display › Coach's voice (off unless you turn it on); with it on, a timed hold's line starts with its timer, with one big Pause the voice. With no recordings yet, everything is words on the screen. NEW FILES precached: js/views/guide-me.js, js/hold-voice.js.
@@ -4257,7 +4258,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v710";
+const CACHE_NAME = "alongside-v711";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4324,7 +4325,7 @@ const SHELL_HASHES = {
   "./css/components/finish.css": "c33e298d5fcb92ae",
   "./js/app.js": "72054b00e54ad55b",
   "./js/router.js": "41c12f5523a0d78d",
-  "./js/store.js": "c3996dc10bb10e23",
+  "./js/store.js": "7dfd781a05f86e07",
   "./js/session-log.js": "6134de4315842e05",
   "./js/exercise-feedback.js": "adba8549f444da2a",
   "./js/exercise-card.js": "78196b42671c67aa",
@@ -4361,7 +4362,7 @@ const SHELL_HASHES = {
   "./js/data/exercises/swimming_cycling.js": "06c7dd87c9fe64e1",
   "./js/data/morning-programme.js": "684cee9fdc54a03a",
   "./js/data/session-categories.js": "39f35cc7aab24fe6",
-  "./js/data/aims.js": "63294a5f628c7fa8",
+  "./js/data/aims.js": "6bb56556296db3ef",
   "./js/data/stretch-goal-zones.js": "a05bc2d626cade4f",
   "./js/data/session-rationale.js": "f14d0d565eb7f9dc",
   "./js/data/personal-reads.js": "52141f31fa9d4fd0",
@@ -4387,7 +4388,7 @@ const SHELL_HASHES = {
   "./js/views/plan-home.js": "c3119c9c9830c2c7",
   "./js/views/path.js": "fd077f2d4d367470",
   "./js/plan-look.js": "7674d8fbf5101aa9",
-  "./js/views/plan-finish.js": "84f85fdc2df42597",
+  "./js/views/plan-finish.js": "0e0cc208d5d6a59c",
   "./js/data/outside.js": "3af4ea46bd898084",
   "./js/data/trend-recipes.js": "14961e4c12aef77e",
   "./js/data/path-context.js": "bb05075596d17c27",
@@ -4462,10 +4463,10 @@ const SHELL_HASHES = {
   "./js/views/saved-sessions.js": "400202f2e10e8e74",
   "./js/views/session-builder-ui.js": "30c36be8e7a979d4",
   "./js/views/noticing.js": "a99e17ca283d7dcf",
-  "./js/views/in-step.js": "9068d760e5eae41a",
+  "./js/views/in-step.js": "613388a51c358ad8",
   "./js/data/in-step-programme.js": "91605a0780fba799",
-  "./js/data/in-step-offer.js": "836af3ed624917b9",
-  "./js/coach-audio.js": "9c53aeabf8b2021a",
+  "./js/data/in-step-offer.js": "c962f66108aeef19",
+  "./js/coach-audio.js": "700d5c0889f83d59",
   "./js/hold-voice.js": "4801164cbddca872",
   "./js/views/guide-me.js": "02d27509d1897a22",
   "./js/data/guide-me.js": "ed77e97b8a8a35ea",
@@ -4482,7 +4483,7 @@ const SHELL_HASHES = {
   "./js/views/running-session.js": "3fcc750fa8c6214d",
   "./js/views/swim-session.js": "796864e209d35cb8",
   "./js/views/cycle-session.js": "5cf63e9171ece8d8",
-  "./js/views/onboarding/thread.js": "51088ae8b1ee97d9",
+  "./js/views/onboarding/thread.js": "40cace02bcb67ddd",
   "./js/views/onboarding/sheet-manager.js": "20cb675f242157c8",
   "./js/views/onboarding/goals.js": "ec29181741c4bc1e",
   "./js/views/onboarding/conditions.js": "f719e4e253244b9e",
