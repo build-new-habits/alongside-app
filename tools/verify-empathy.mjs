@@ -1,5 +1,13 @@
 /**
  * tools/verify-empathy.mjs
+ * 06 Nov 2026 v2
+ *
+ * v2 - P-28 S2 (Graeme, 05 Nov: outward stages sooner). The floors are
+ *   { 2: 8, 3: 20, 4: 28, 5: 43 } and the gates inside each stage moved
+ *   with them (empathy-transfer.js v7), so the checks below that named 85,
+ *   80 and 77 now name 43, 42 and 40; what each one proves is unchanged.
+ *   verify-p28-content checks the new numbers and the unchanged wording.
+ *
  * 12 Aug 2026 v1
  *
  * Gate for EMP-1. Exercises the real matcher against real contexts --
@@ -89,11 +97,11 @@ check("stage 1 prompt C (minSessions:6) cannot fire at session 4", () => {
     ok(r.index !== 2, "fired a prompt gated at 6+ sessions");
   }
 });
-check("stage 5 at session 80 falls back rather than returning null", () => {
-  const r = selectEmpathyPrompt(5, ctx({ sessionCount: 80 }), NONE);
+check("stage 5 at session 42 falls back rather than returning null", () => {
+  const r = selectEmpathyPrompt(5, ctx({ sessionCount: 42 }), NONE);
   ok(r !== null, "returned null - blank empathy screen");
   ok(r.fellBack === true, "should have flagged the stage 5 catch-all gap");
-  ok(r.index === 0, "should take the nearest threshold (85+)");
+  ok(r.index === 0, "should take the nearest threshold (43+)");
 });
 check("stage 5 at session 100 does NOT fall back", () =>
   ok(selectEmpathyPrompt(5, ctx({ sessionCount: 100 }), NONE).fellBack === false,
@@ -183,16 +191,20 @@ check("coachAdjusted actually changes the stage 2 outcome", () => {
   ok(on.index === 1 || on.score > 0, "an adjusted session should favour prompt B");
 });
 check("stage floors match the stage headers in the same file", () => {
-  ok(STAGE_SESSION_FLOOR[5] === 85, "stage 5 header says Sessions 85+");
-  ok(STAGE_SESSION_FLOOR[4] === 55 && STAGE_SESSION_FLOOR[3] === 30 && STAGE_SESSION_FLOOR[2] === 12,
-     "floors should mirror the documented ranges");
+  // v2: brought forward by Graeme's decision (05 Nov); the stage 5 floor
+  // is still the lowest gate of its own prompts, which is the point.
+  ok(STAGE_SESSION_FLOOR[5] === 43, "stage 5 opens at session 43");
+  ok(STAGE_SESSION_FLOOR[4] === 28 && STAGE_SESSION_FLOOR[3] === 20 && STAGE_SESSION_FLOOR[2] === 8,
+     "floors should be 8, 20, 28 and 43");
+  const lowest5 = Math.min(...EMPATHY_PROMPTS[5].map(p => +(p.requires.find(r => r.startsWith("minSessions:")) || ":0").split(":")[1]));
+  ok(lowest5 === STAGE_SESSION_FLOOR[5], `stage 5's lowest gate (${lowest5}) should equal its floor`);
 });
-check("stage 5 cannot be entered before session 85", () => {
-  ok(canEnterStage(5, 77) === false, "77 was the simulated real-world entry point");
-  ok(canEnterStage(5, 85) === true,  "85 must be allowed");
+check("stage 5 cannot be entered before session 43", () => {
+  ok(canEnterStage(5, 40) === false, "40 is before stage 5's floor");
+  ok(canEnterStage(5, 43) === true,  "43 must be allowed");
 });
 check("with the floor applied, stage 5 never falls back", () => {
-  for (let s = 85; s <= 140; s += 4) {
+  for (let s = 43; s <= 140; s += 4) {
     const r = selectEmpathyPrompt(5, ctx({ sessionCount: s }), NONE, 0);
     ok(r.fellBack === false, `stage 5 still fell back at session ${s}`);
   }
