@@ -6,7 +6,16 @@ import { validateWeightTarget } from "./data/weight-targets.js";
 
 /**
  * store.js - Data persistence layer
- * 05 Nov 2026 v122
+ * 06 Nov 2026 v123
+ *
+ * v123 - P-28 FINISH (Graeme, 06 Nov: "Delete them"). The old In Step
+ *   room's fields are retired: inStepProgress.unlockedAt, scenarioIndex,
+ *   completedCount and choiceLog (the option somebody picked, kept as an
+ *   aggregate research signal nothing ever read) were written by nothing
+ *   since v707. On load, inStepProgress keeps only its programme; the four
+ *   are removed from the phone. The code that wrote them is archived
+ *   (docs/archive-code/in-step_v5_retired_06nov2026.js; BNH-Files Archive/
+ *   P-28 In Step Environment/). Schema v1.124. Gate verify-p28-schema v2.
  *
  * v122 - P-28 EMPATHY-THREAD, schema first (S1; master schedule v624;
  *   proposal, wording v5 and prototype v5 approved by Graeme, 05 Nov). Three
@@ -1655,26 +1664,12 @@ export const store = {
         : defaults.noticingProgress,
 
       // ── IN STEP PROGRESS ───────────────────────────────────────
+      // v123 (P-28 FINISH): the programme only. The old room's four fields
+      // (unlockedAt, scenarioIndex, completedCount, choiceLog) are not
+      // carried over, so they leave the phone on the next load.
       inStepProgress: (saved.inStepProgress && typeof saved.inStepProgress === 'object')
         ? {
-            ...defaults.inStepProgress,
-            ...saved.inStepProgress,
-            unlockedAt:     (saved.inStepProgress.unlockedAt
-                              && typeof saved.inStepProgress.unlockedAt === 'object')
-                              ? saved.inStepProgress.unlockedAt
-                              : {},
-            scenarioIndex:  (saved.inStepProgress.scenarioIndex
-                              && typeof saved.inStepProgress.scenarioIndex === 'object')
-                              ? saved.inStepProgress.scenarioIndex
-                              : {},
-            completedCount: (saved.inStepProgress.completedCount
-                              && typeof saved.inStepProgress.completedCount === 'object')
-                              ? saved.inStepProgress.completedCount
-                              : {},
-            choiceLog: Array.isArray(saved.inStepProgress.choiceLog)
-              ? saved.inStepProgress.choiceLog
-              : [],
-            // v122: made safe in _cleanInStepProgramme()
+            // v122: made safe in _cleanP28()
             programme: saved.inStepProgress.programme
           }
         : defaults.inStepProgress,
@@ -3024,11 +3019,8 @@ export const store = {
 
       // ── IN STEP PROGRESS ───────────────────────────────────────
       inStepProgress: {
-        unlockedAt:     {}, // { [movementId]: ISO } — 3-day cooldown gate
-        scenarioIndex:  {}, // { [movementId]: int } — cycles the 4-scenario pool
-        completedCount: {}, // { [movementId]: int } — display only
-        choiceLog:      [], // { movementId, scenarioId, optionId, tag, at }[] — aggregate only, see in-step.js
         // v122 (P-28). In Step as a programme. The tap is kept, never words.
+        // v123: the old room's four fields are retired.
         programme: { part: 1, episode: 1, done: [], lastCarry: null, lastAnswer: null, offeredAt: null, offeredSession: 0 }
       },
 

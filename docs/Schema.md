@@ -1,5 +1,7 @@
 # Alongside — Data Schema Reference
-## 05 Nov 2026 v1.123
+## 06 Nov 2026 v1.124
+
+> **v1.124, 06 Nov 2026 — P-28 FINISH** (`store.js` v123). **Four fields removed, nothing added** (Graeme, 06 Nov: *"Delete them"*). **`inStepProgress.unlockedAt`**, **`scenarioIndex`**, **`completedCount`** and **`choiceLog`** (the old In Step room's cooldowns, scenario positions, counts and the option somebody picked, `{ movementId, scenarioId, optionId, tag, at }[]`, an aggregate research signal never read) were written by nothing since `alongside-v707` (S3 retired the old room). **On load** `inStepProgress` keeps only **`programme`** (v1.123), so the four leave the phone the next time the app opens; nothing reads them. The code that wrote them is archived (`docs/archive-code/in-step_v5_retired_06nov2026.js`; BNH-Files `Archive/P-28 In Step Environment/`). Both tiers. Gated by `tools/verify-p28-schema.mjs` v2.
 
 > **v1.123, 05 Nov 2026 — P-28 EMPATHY-THREAD, schema first (S1)** (`store.js` v122). Master schedule v624; proposal, wording v5 and prototype v5 approved by Graeme, 05 Nov. Three additions, nothing removed. **`inStepProgress.programme`** `{ part: 1–4, episode: 1–6, done: ['p1e1', …], lastCarry: 'p<part>e<episode>' | null, lastAnswer: 'did' | 'not-yet' | 'didnt' | null, offeredAt: ISO | null, offeredSession: int ≥ 0 }`, default `{ part: 1, episode: 1, done: [], lastCarry: null, lastAnswer: null, offeredAt: null, offeredSession: 0 }`: In Step as a programme (four parts of six episodes). `lastCarry` is whose *Carry it* was given last; `lastAnswer` is the *Did it come up?* tap and nothing else (no words are ever kept). **Written by** In Step's player and the finish offer (S3). **Read by** the same, to choose the next episode and when to offer it. **On load** (`store._cleanP28()`): each field falls back on its own when malformed; an older record gains the default. The old fields (`unlockedAt`, `scenarioIndex`, `completedCount`, `choiceLog`) are unchanged until S3 retires the old room. **`coachVoice`** `'off' | 'on'`, default `'off'`: whether the coach's recorded voice plays (Settings › Display, S4); anything else loads as `'off'`. **`activityLog[].guideMe`** `'just' | 'guide' | 'three'` (absent by default): how an outdoor session was taken (Just go, Guide me, Take three with you; S4). Anything else is removed on load, never nulled, so an older entry gains no key. Both tiers (Graeme, 05 Nov). Gated by `tools/verify-p28-schema.mjs`.
 
@@ -1089,7 +1091,7 @@
 
 ## 06 Sep 2026 v1.51
 
-**File:** `js/store.js` (confirmed live version: **v122, 05 Nov 2026**)
+**File:** `js/store.js` (confirmed live version: **v123, 06 Nov 2026**)
 
 > **v1.47, 06 Sep 2026 — CR-1.** `conditions[]` gains three ids and loses one. `chronic-fatigue` is **retired**; `persistent-fatigue`, `me-cfs` and `long-covid` replace it. No field shape changed — `conditions` is still `string[]` and `conditionMeta` is still keyed by condition id.
 >
@@ -2032,7 +2034,7 @@ There is no `stats` field, live or dormant, anywhere in `store.js`. Every `stats
 
 `exercisePreferences` (`object`, `{}`) — `{ [exerciseId]: { preference: 'avoid'|'less', setAt, source } }`. Binary signal, not a rating (no stars/scores). Added `store.js` v17 (04 Aug), undocumented here until now — catching up the drift. First consumer: `js/data/conditionProgrammes.js` candidate selection.
 
-`inStepProgress` (nested object) — Personal tier "In Step" feature (Noticing Hub), added `store.js` v18 (09 Aug): `unlockedAt` (`object`, `{}` — `{ [movementId]: ISO }`, gates a 3-day anti-binge cooldown between scenarios in the same movement), `scenarioIndex` (`object`, `{}` — `{ [movementId]: int }`, cycles `js/data/in-step-scenarios.js`'s four-scenario pools per movement), `completedCount` (`object`, `{}` — display only), `choiceLog` (`array`, `[]` — `{ movementId, scenarioId, optionId, tag, at }[]`, aggregate research signal only, never read by coach logic or surfaced per-entry to the user). Deliberately not named "territory" — that word is already used, unrelated, by onboarding's `primaryTerritory`/`hardBeforeSelections`.
+`inStepProgress` (nested object) — In Step, both tiers. **v1.124:** holds only `programme` (v1.123: `{ part, episode, done, lastCarry, lastAnswer, offeredAt, offeredSession }`). Its first fields (`store.js` v18, 09 Aug: `unlockedAt`, `scenarioIndex`, `completedCount`, `choiceLog`) were retired in v1.124 and are removed on load.
 
 ---
 
