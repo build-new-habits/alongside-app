@@ -1,5 +1,12 @@
 /**
  * tools/verify-nav-small.mjs
+ * 06 Nov 2026 v9
+ *
+ * v9 - P-28 S4. A walk, run or bike ride now asks How would you like it?
+ *   (Just go, Guide me, Take three with you) before its plan; Just go is
+ *   the plan as before, so this walks through it. verify-p28-guide checks
+ *   the new step.
+ *
  * 31 Oct 2026 v8
  *
  * v8 - P-13 re-point (Graeme, 31 Oct: doors first, then trim). TEST 2: the
@@ -182,7 +189,7 @@ const libRow = main.querySelector('[data-route="library"]');
 ok("2a. Plan Home has the Library row, saying what it holds", !!libRow && /practices/.test(txt(libRow)) && !/runs/.test(txt(libRow)), txt(libRow));
 const { PathView } = await import(B + "views/path.js");
 fixture(); navs = []; rtr.pathStart = { door: "moving" }; main.innerHTML = ""; PathView(rtr).mount(main);
-for (const v of ["outside", "run"]) click(main.querySelector(`.path-row[data-v="${v}"]`));
+for (const v of ["outside", "run", "just"]) click(main.querySelector(`.path-row[data-v="${v}"]`));   // P-28: Just go, then the plan
 const { router: realR } = await import(B + "router.js"); const keepR = realR.navigate; realR.navigate = v => navs.push(v);
 click(main.querySelector('.path-row[data-v="guided"]')); await wait(10); realR.navigate = keepR;
 ok("2b. and Keep moving › Outside › Run › A guided run opens the Run room", navs.includes("running-session"), JSON.stringify(navs));

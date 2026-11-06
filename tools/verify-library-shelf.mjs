@@ -1,6 +1,13 @@
 import { createRequire as __cr } from "node:module";
 /**
  * tools/verify-library-shelf.mjs
+ * 06 Nov 2026 v4
+ *
+ * v4 - P-28 S4. A walk, run or bike ride now asks How would you like it?
+ *   (Just go, Guide me, Take three with you) before its plan; Just go is
+ *   the plan as before, so this walks through it. verify-p28-guide checks
+ *   the new step.
+ *
  * 05 Nov 2026 v3
  *
  * v3 - P-27 TIDY. 1d: the Library's line says what it holds (its tiles start
@@ -83,7 +90,9 @@ function fixture(tier = "personal") {
 }
 let pv = null;
 const path = door => { try { pv?.onUnmount?.(); } catch {} main.innerHTML = ""; fakeRouter.pathStart = { door }; realRouter.pathStart = { door }; pv = PathView(fakeRouter); pv.mount(main); };
-const tapRow = v => click(main.querySelector(`.path-row[data-v="${v}"]`));
+const tapRow = v => { click(main.querySelector(`.path-row[data-v="${v}"]`));
+  // v-P28: a walk, run or ride asks how first; Just go is the plan as before.
+  if (main.querySelector('.path-view[data-step="gway"]')) click(main.querySelector('.path-row[data-v="just"]')); };
 const library = () => { main.innerHTML = LIB.render(); try { LIB.onMount(); } catch {} };
 
 // ── 1 ───────────────────────────────────────────────────────────────────

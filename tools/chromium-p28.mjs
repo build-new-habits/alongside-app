@@ -1,6 +1,9 @@
 /**
  * tools/chromium-p28.mjs
- * 06 Nov 2026 v1
+ * 06 Nov 2026 v2
+ *
+ * v2 - S4: Outside's three ways, Take three, Guide me before and while it
+ *   plays (the Plan's), and a hold's line with the voice on (both tiers).
  *
  * P-28 EMPATHY-THREAD, the real-browser half of its gates. jsdom draws no
  * layout, so verify-p28-instep holds the behaviour and this measures what a
@@ -67,7 +70,27 @@ const SCREENS = [
   ["A finish, with In Step's offer", async p => { await finish(p, { offered: false, logLen: 8 }); }, ".instep-offer"],
   ["A finish, with In Step's line", async p => { await finish(p, { offered: true, logLen: 8 }); }, ".instep-bline"],
   ["A finish's reflection, in In Step's look", async p => { await finish(p, { offered: true, logLen: 9, prompt: true }); await click(p, (await p.evaluate(() => window.store.get("tier"))) === "free" ? "#reflect-done-btn" : "#pf-done"); }, ".instep-prompt"],
+  // S4 (the door's steps are the Plan's; holds are both tiers).
+  ["Outside › Walk: three ways", async p => { await door(p, "walk"); }, '.path-row[data-v="guide:weather"]', true],
+  ["Outside › Bike ride: indoors only", async p => { await door(p, "bike"); }, "#path-road", true],
+  ["Take three with you", async p => { await door(p, "walk"); await click(p, '.path-row[data-v="three"]'); }, ".path-three", true],
+  ["Guide me: what will happen", async p => { await door(p, "run"); await click(p, '.path-row[data-v="guide:run"]'); await p.waitForTimeout(300); }, "#gm-start", true],
+  ["Guide me: guiding", async p => { await click(p, "#gm-start"); await p.waitForTimeout(400); }, "#gm-pp", true],
+  ["While you hold, the voice on", async p => { await hold(p); }, "#hv-card"],
 ];
+async function door(p, activity) {
+  await p.evaluate(() => { window.router.pathStart = { door: "moving" }; });
+  await nav(p, "path"); await click(p, '.path-row[data-v="outside"]'); await click(p, `.path-row[data-v="${activity}"]`);
+}
+async function hold(p) {
+  await p.evaluate(() => {
+    const s = window.store; s.set("coachVoice", "on");
+    s.set("generatedSession", { session: { id: "h", name: "Core", exercises: [{ id: "plank", name: "Plank", category: "strength", position: "floor", duration: 45, sets: 1, section: "main", role: "main", equipment: [], instructions: ["Hold"], watchOut: ["Sagging"] }] }, builtAt: new Date().toISOString(), inputs: {} });
+  });
+  await nav(p, "workout");
+  for (let i = 0; i < 4; i++) { if (await p.evaluate(() => !!document.querySelector("#timer-toggle-btn"))) break; await p.evaluate(() => document.querySelector('[data-step-go="capture"]:not([aria-current]), [data-step-go="do"]:not([aria-current])')?.click()); await p.waitForTimeout(200); }
+  await click(p, "#timer-toggle-btn"); await p.waitForTimeout(400);
+}
 
 async function nav(p, r) { await p.evaluate(r => window.router.navigate(r), r); await p.waitForTimeout(400); }
 async function click(p, sel) {
@@ -158,6 +181,7 @@ for (const { tier, size, scheme } of runs) {
     s.set("consent.given", true); s.set("consent.at", at); s.set("consent.policyVersion", POLICY_VERSION);
     s.set("consent.health", { given: true, at, version: HEALTH_CONSENT_VERSION, withdrawnAt: null });
     s.set("onboardingComplete", true); s.set("name", "Graeme"); s.set("tier", tier);
+    s.set("safetyAckLog", Array.from({ length: 5 }, () => ({ at, textVersion: "2026-09-06.1", surface: "fixture" })));
     const key = new Date().toISOString().split("T")[0];
     s.set("checkinHistory", { [key]: { energy: 7, mood: 6 } }); s.set("lastCheckin", { energy: 7, mood: 6, date: new Date().toDateString(), timestamp: at });
     const DP = await import("./js/display-prefs.js");
@@ -169,7 +193,8 @@ for (const { tier, size, scheme } of runs) {
   // An onboarding step's timer from that first load can still fire after it is left: logged on the
   // schedule, not this check's subject.
   page.on("pageerror", e => /onboarding\/thread\.js/.test(String(e.stack)) || faults.push(`${tier} ${size} ${scheme}: page error ${String(e.message).slice(0, 90)} ${String(e.stack || "").split("\n").slice(1, 3).join(" ").slice(0, 160)}`));
-  for (const [name, go, expect] of SCREENS) {
+  for (const [name, go, expect, planOnly] of SCREENS) {
+    if (planOnly && tier !== "personal") continue;
     const label = `${tier.padEnd(8)} text ${size.padEnd(4)} ${scheme.padEnd(13)} ${name}`;
     try {
       await go(page);

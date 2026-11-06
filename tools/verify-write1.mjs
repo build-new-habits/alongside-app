@@ -1,5 +1,11 @@
 /**
  * tools/verify-write1.mjs
+ * 06 Nov 2026 v13
+ *
+ * v13 - P-28 S4. coachVoice is connected (Settings › Display writes it;
+ *   coach-audio.js and hold-voice.js read it): its dated promise is kept
+ *   and its baseline line removed.
+ *
  * 05 Nov 2026 v12
  *
  * v12 - P-28 S1 SCHEMA. coachVoice joins the baseline as a DATED PROMISE
@@ -226,11 +232,6 @@ const BASELINE = new Set([
   // (plan-home.js); each removes its line, as the check below insists.
   'dayOpen',
 
-  // P-28 S1, 05 Nov 2026 (store.js v122). DATED PROMISE, not permission:
-  // coachVoice is schema first. S4 (GUIDE ME) connects it: Settings › Display
-  // writes it and the hold and guided players read it. S4 removes this line,
-  // as the check below insists.
-  'coachVoice',
 
   // 'conditionMeta' -- removed 28 Sep 2026. SMOOTH-P4a reads it: Progress
   // says "Since 19 Aug" for each condition from conditionMeta[id].addedAt.

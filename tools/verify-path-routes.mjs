@@ -1,6 +1,13 @@
 import { createRequire as __cr } from "node:module";
 /**
  * tools/verify-path-routes.mjs
+ * 06 Nov 2026 v9
+ *
+ * v9 - P-28 S4. A walk, run or bike ride now asks How would you like it?
+ *   (Just go, Guide me, Take three with you) before its plan; Just go is
+ *   the plan as before, so this walks through it. verify-p28-guide checks
+ *   the new step.
+ *
  * 05 Nov 2026 v8
  *
  * v8 - P-27 TIDY. 9a: when the coach chose, the plan says its reason and
@@ -147,7 +154,9 @@ const step = () => main.querySelector(".path-view")?.dataset.step || null;
 const h1 = () => txt(main.querySelector("h1"));
 const rows = () => [...main.querySelectorAll(".path-row[data-v]")];
 const rowText = () => rows().map(r => txt(r.querySelector(".path-door__t")));
-const tapRow = v => click(main.querySelector(`.path-row[data-v="${v}"]`));
+const tapRow = v => { click(main.querySelector(`.path-row[data-v="${v}"]`));
+  // v-P28: a walk, run or ride asks how first; Just go is the plan as before.
+  if (main.querySelector('.path-view[data-step="gway"]')) click(main.querySelector('.path-row[data-v="just"]')); };
 const tapDoor = d => { navs = []; click(main.querySelector(`.path-door[data-door="${d}"]`)); };
 const steps = [];
 const seen = () => steps.push({ step: step(), h1: h1() });
