@@ -1,6 +1,11 @@
 /**
  * tools/verify-aims.mjs
- * 06 Nov 2026 v3
+ * 06 Nov 2026 v4
+ *
+ * v4 - P-28 FINISH. aims.js v8 drops the mind strands' `movements` (read by
+ *   nothing; the movements retired in v707). 4c: a mind strand is actionable
+ *   because a practice lights it (arc-readback.js), and it carries no zones
+ *   or session types. 4d: no strand names the retired movements.
  *
  * v3 - P-28 S3. In Step's four movements became the programme (S3 retired
  *   js/data/in-step-scenarios.js to docs/archive-code/). 4d now checks each
@@ -164,29 +169,17 @@ check("4c. a mind strand is actionable, not a mood", () => {
   // A mind strand with no movements is a label with nothing behind it.
   for (const [k, v] of Object.entries(STRANDS)) {
     if (v.kind !== "mind") continue;
-    ok(Array.isArray(v.movements) && v.movements.length > 0,
-       `mind strand "${k}" names no In Step movements, so nothing can be offered for it`);
+    ok(!v.sessionTypes || v.sessionTypes.length === 0,
+       `mind strand "${k}" carries session types. A strand that is both is two strands.`);
     ok(!v.zones || v.zones.length === 0,
        `mind strand "${k}" also carries zones. A strand that is both is two strands.`);
   }
 });
 
-check("4d. mind strands point at In Step movements that exist", () => {
-  // v3. Where each movement went in P-28, and the file that holds it now.
-  const WENT = { solo: ["js/data/in-step-programme.js", /part: 1, episode: 1\b/],
-                 partner: ["js/data/in-step-programme.js", /part: 2, episode: 1\b/],
-                 floor: ["js/data/in-step-programme.js", /part: 3, episode: 1\b/],
-                 environment: ["js/data/guide-me.js", /id: "weather"/] };
-  const real = Object.keys(WENT).filter(m => {
-    const [f, re] = WENT[m];
-    return fs.existsSync(_gatePath(f)) && re.test(fs.readFileSync(_gatePath(f), "utf8"));
-  });
-  ok(real.length === 4, `the four movements' new homes are not all there (found ${real.join(", ")})`);
-  for (const [k, v] of Object.entries(STRANDS)) {
-    for (const m of v.movements || []) {
-      ok(real.includes(m), `strand "${k}" names movement "${m}", which In Step does not have`);
-    }
-  }
+check("4d. a mind strand is lit by a practice, and names no retired movement", () => {
+  const rb = fs.readFileSync(_gatePath("js/data/arc-readback.js"), "utf8");
+  ok(/s\.kind === "mind" \? \[types\.practice\]/.test(rb), "nothing lights a mind strand: it would be a label with nothing behind it");
+  for (const [k, v] of Object.entries(STRANDS)) ok(!("movements" in v), `strand "${k}" still names the retired In Step movements`);
 });
 
 console.log("\nTEST 5 - the vocabulary may only emphasise");

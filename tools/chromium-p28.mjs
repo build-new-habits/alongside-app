@@ -1,6 +1,9 @@
 /**
  * tools/chromium-p28.mjs
- * 06 Nov 2026 v3
+ * 06 Nov 2026 v4
+ *
+ * v4 - P-28 FINISH: every page error counts again (the getting-started
+ *   timer fault it was setting aside is fixed, onboarding/thread.js v29).
  *
  * v3 - S5: the upgrade page's and arc setup's In Step lines.
  *
@@ -195,9 +198,7 @@ for (const { tier, size, scheme } of runs) {
     DP.applyDisplayPrefs();
   }, { tier, size, scheme });
   // Errors count from here: the harness's first load starts onboarding, which this leaves.
-  // An onboarding step's timer from that first load can still fire after it is left: logged on the
-  // schedule, not this check's subject.
-  page.on("pageerror", e => /onboarding\/thread\.js/.test(String(e.stack)) || faults.push(`${tier} ${size} ${scheme}: page error ${String(e.message).slice(0, 90)} ${String(e.stack || "").split("\n").slice(1, 3).join(" ").slice(0, 160)}`));
+  page.on("pageerror", e => faults.push(`${tier} ${size} ${scheme}: page error ${String(e.message).slice(0, 90)} ${String(e.stack || "").split("\n").slice(1, 3).join(" ").slice(0, 160)}`));
   for (const [name, go, expect, planOnly] of SCREENS) {
     if (planOnly === true && tier !== "personal") continue;
     if (planOnly === "free" && tier !== "free") continue;   // the upgrade page is Free's

@@ -1,6 +1,11 @@
 /**
  * tools/verify-p28-schema.mjs
- * 05 Nov 2026 v1
+ * 06 Nov 2026 v2
+ *
+ * v2 - P-28 FINISH (store.js v123, Schema v1.124; Graeme, 06 Nov: "Delete
+ *   them"). 2b now proves the old room's four fields leave the phone on
+ *   load (it proved they were kept until S3). 2f, 2g: the saved copy loses them
+ *   too, and the programme saved beside them survives.
  *
  * P-28 EMPATHY-THREAD, S1 SCHEMA (store.js v122, Schema v1.123). Graeme,
  * 05 Nov: In Step becomes a programme, the coach's voice can be heard, and
@@ -55,7 +60,11 @@ const oldIsp = { unlockedAt: { solo: "2026-10-01T09:00:00.000Z" }, scenarioIndex
 load({ onboardingComplete: true, inStepProgress: oldIsp });
 const isp = store.get("inStepProgress");
 ok("2a. gains the programme's default", J(isp.programme) === J(DEF), J(isp.programme));
-ok("2b. keeps every old In Step field as it was", J(isp.unlockedAt) === J(oldIsp.unlockedAt) && J(isp.scenarioIndex) === J(oldIsp.scenarioIndex) && J(isp.completedCount) === J(oldIsp.completedCount) && J(isp.choiceLog) === J(oldIsp.choiceLog));
+ok("2b. the old room's four fields are gone (v123: retired)", ["unlockedAt", "scenarioIndex", "completedCount", "choiceLog"].every(k => !(k in isp)) && J(Object.keys(isp)) === J(["programme"]), J(Object.keys(isp)));
+store.set("name", "x");   // any write saves the whole store
+ok("2f. and gone from what is saved, with nothing else of In Step kept", J(Object.keys(saved().inStepProgress)) === J(["programme"]), J(saved().inStepProgress));
+load({ onboardingComplete: true, inStepProgress: { ...oldIsp, programme: { part: 2, episode: 4, done: ["p1e1"], lastCarry: "p1e1", lastAnswer: "did", offeredAt: null, offeredSession: 5 } } });
+ok("2g. a programme saved beside the old fields survives", store.get("inStepProgress").programme.part === 2 && store.get("inStepProgress").programme.episode === 4 && !("choiceLog" in store.get("inStepProgress")));
 ok("2c. coachVoice loads as 'off'", store.get("coachVoice") === "off", J(store.get("coachVoice")));
 load({ onboardingComplete: true });
 ok("2d. a phone that never opened In Step gets the default too", J(store.get("inStepProgress").programme) === J(DEF));

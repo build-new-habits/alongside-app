@@ -1,6 +1,9 @@
 /**
  * tools/verify-p28-instep.mjs
- * 06 Nov 2026 v1
+ * 06 Nov 2026 v2
+ *
+ * v2 - P-28 FINISH: 7m's line is "This one's about you today." (Graeme,
+ *   06 Nov; "short" was not true).
  *
  * P-28 EMPATHY-THREAD, S3 IN STEP PLAYER. Drives the real views in jsdom:
  * Wellbeing's tile, In Step's list and player (views/in-step.js), and both
@@ -59,7 +62,8 @@ class FakeAudio {
   pause() { this.paused = true; }
 }
 globalThis.Audio = FakeAudio;
-globalThis.fetch = async () => ({ ok: fileThere });
+const fetched = [];
+globalThis.fetch = async (u) => { fetched.push(String(u)); return { ok: fileThere }; };
 
 const ROOT = new URL("../", import.meta.url);
 const B = new URL("../js/", import.meta.url).href;
@@ -234,6 +238,16 @@ await block("TEST 6", async () => {
   ok("6i. leaving the screen stops the voice", audios.at(-1).paused === true);
   seed({ voice: "off" }); mountInStep(); tap(".instep-next"); tap("#is-next");
   ok("6j. voice off: the hold intro does not promise a voice", !/talk you through/.test(T()));
+  // v2: a part's clips are asked for when an episode opens, voice on only.
+  // Part 4, which nothing here has opened yet, so the once-only memory cannot hide a fetch.
+  seed({ voice: "off", programme: { part: 4, episode: 1, done: PROG.EPISODES.slice(0, 18).map(e => e.id), lastCarry: "p3e6", lastAnswer: "did" } }); fetched.length = 0; mountInStep(); tap(".instep-next");
+  ok("6k. voice off: no clip is asked for", fetched.length === 0, fetched.join(","));
+  IS.onUnmount?.();
+  seed({ voice: "on", programme: { part: 3, episode: 1, done: ["p1e1","p1e2","p1e3","p1e4","p1e5","p1e6","p2e1","p2e2","p2e3","p2e4","p2e5","p2e6"], lastCarry: "p2e6", lastAnswer: "did" } }); fetched.length = 0; mountInStep(); tap(".instep-next");
+  const want = PROG.audioIdsForPart(3).map(id => `audio/${id}.mp3`);
+  ok("6l. voice on: opening Part 3 asks for its 19 clips (the line after Choose with them, unless already asked)", want.every(u => fetched.includes(u)) && fetched.every(u => want.includes(u) || u === `audio/${PROG.ACK.audio}.mp3`) && new Set(fetched).size === fetched.length, fetched.length + " " + fetched.slice(0, 3).join(","));
+  const n = fetched.length; IS.onUnmount?.(); mountInStep(); tap(".instep-next");
+  ok("6m. and only once: opening it again asks for nothing more", fetched.length === n, String(fetched.length - n));
   fileThere = false;
 });
 
@@ -269,7 +283,7 @@ await block("TEST 7", async () => {
   seed({ sessions: 4, sore: { id: "knee", score: 3 } }); planFinish();
   ok("7l. control: a little sore still offers", !!$(".instep-offer"));
   seed({ sessions: 4, checkin: { energy: 3, mood: 6 }, programme: { part: 2, episode: 2, done: ["p1e1","p1e2","p1e3","p1e4","p1e5","p1e6","p2e1"] } }); planFinish();
-  ok("7m. a low energy day: Part 1's Adjusting, with its line", /Episode 6/.test(T($(".instep-offer h2"))) && T($(".instep-offer")).includes("Adjusting") && T($(".instep-offer")).includes("This one's short and about you today."), T($(".instep-offer")));
+  ok("7m. a low energy day: Part 1's Adjusting, with its line", /Episode 6/.test(T($(".instep-offer h2"))) && T($(".instep-offer")).includes("Adjusting") && T($(".instep-offer")).includes("This one's about you today.") && !/short/.test(T($(".instep-offer"))), T($(".instep-offer")));
   seed({ sessions: 4, checkin: { energy: 7, mood: 2 } }); planFinish();
   ok("7n. a low mood day too", T($(".instep-offer")).includes("Adjusting"));
   seed({ sessions: 4, programme: { part: 2, episode: 3, done: ["p1e1"] } }); planFinish();
