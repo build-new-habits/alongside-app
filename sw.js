@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 06 Nov 2026 v708
+ * 06 Nov 2026 v709
  *
+ * v709 - P-28 S5. One light sentence about In Step where the Plan is chosen, and one where you set your arc. Nothing else changes. Also a check, not the app: v708's own fresh-clone check found one gate that had not been told Guide me was new; fixed here.
  * v708 - P-28 S4 (Guide me). On the Plan, Keep moving › Outside › Walk, Run or Bike ride asks how you'd like it: Just go, Guide me (a mindful walk, a walk in any weather, an easy run, or an indoor ride: what will happen is told first, then one recording with its words on screen at their times, pause and stop from the lock screen) or Take three with you (three things to notice, read before you set off). On a road ride nothing talks to you. Both tiers: Settings › Display › Coach's voice (off unless you turn it on); with it on, a timed hold's line starts with its timer, with one big Pause the voice. With no recordings yet, everything is words on the screen. NEW FILES precached: js/views/guide-me.js, js/hold-voice.js.
  * v707 - P-28 S3 (both tiers). In Step is a programme: four parts of six short episodes (Listen, Hold still, Choose, Carry it), the next in order and any you've done open in Wellbeing, and offered now and then after a finished session, with Start and Not today (never part-way or on a Bad day; on a low day, Part 1's Adjusting). On a finish without an episode, now and then, a line about the people around you, only when it is true. In Step has its own look: orchid, with two figures. The coach's voice is ready for its recordings: with none yet, everything is words on the screen. NEW FILES precached: js/coach-audio.js, js/data/in-step-offer.js, css/components/in-step.css. RETIRED: js/data/in-step-scenarios.js.
  * v706 - P-28 S2 (content only; nothing on screen changes). In Step's programme (four parts of six episodes), Guide me's walks, run and indoor ride, and the coach's lines while you hold are in place, word for word as approved, ready for the screens that show them. The reflection after a session can now reach the people around you sooner: people close to you from about session 8, people you pass from about session 20. NEW FILES precached: js/data/in-step-programme.js, js/data/guide-me.js.
@@ -4255,7 +4256,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v708";
+const CACHE_NAME = "alongside-v709";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4295,7 +4296,7 @@ const SHELL_HASHES = {
   "./css/components/display-preferences.css": "7d1e4e0b34f5223f",
   "./css/components/session-log.css": "92f8082dc0ee69a7",
   "./css/components/grounding-moments.css": "a2641284734e48de",
-  "./css/components/in-step.css": "2bb3f061d41aa8f1",
+  "./css/components/in-step.css": "43549af1a0b40353",
   "./css/components/single-activity-session.css": "fef626d39b2d281c",
   "./css/components/session-shared.css": "a71069801a65054c",
   "./css/components/upgrade-door.css": "1a2deeaceb45f4f1",
@@ -4340,7 +4341,7 @@ const SHELL_HASHES = {
   "./js/auth.js": "9b9c7a632dccada6",
   "./js/views/today.js": "36e85d3cec39efaf",
   "./js/views/mobility-conditioning.js": "8b30ad4fa0887d62",
-  "./js/views/arc-setup.js": "4f7bf6dd047cd079",
+  "./js/views/arc-setup.js": "4259be993a3b9a38",
   "./js/views/stretch-arc.js": "b4c5fdcd069a4612",
   "./js/views/checkin.js": "69cd078ee9c3b84a",
   "./js/views/checkin-mini.js": "c647f4da71feddde",
@@ -4370,7 +4371,7 @@ const SHELL_HASHES = {
   "./js/views/home-threshold.js": "17bc42808aa5bd5c",
   "./js/views/onboarding/frequency.js": "47e40b6e6e2f458f",
   "./js/views/programme-select.js": "115a22eeb9526be5",
-  "./js/views/upgrade.js": "2a3e1f4ce77dbbac",
+  "./js/views/upgrade.js": "1c5fabcb72727877",
   "./js/views/privacy.js": "25721026cff47822",
   "./js/views/library.js": "ab502fc0ca8bfa85",
   "./js/views/practices.js": "9890a7fa300e9d1c",
