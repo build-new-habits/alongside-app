@@ -1,5 +1,8 @@
 /* components/in-step.css - In Step's own look
-   06 Nov 2026 v2
+   06 Nov 2026 v3
+
+   v3 - P-28 S5. The E lines (upgrade page, arc setup): the line with the
+        icon before it.
 
    v2 - P-28 S4. Guide me (views/guide-me.js): the moments with their times,
         the clock; Take three's list (views/path.js); the hold line's card.
@@ -146,6 +149,10 @@
 .path-three { margin: 0; padding-left: 1.4em; display: flex; flex-direction: column; gap: var(--space-2); font-size: var(--text-lg); }
 .hv-card { margin: var(--space-3) 0; text-align: left; }
 #hv-slot:empty { display: none; }
+
+/* E: the purpose, said lightly */
+.instep-purpose { display: flex; gap: var(--space-2); align-items: flex-start; }
+.instep-purpose .instep-eyebrow { margin: 2px 0 0; flex: none; }
 
 /* The finish lines about other people, in In Step's look */
 .instep-prompt .coach-message-text { margin-top: 0; }

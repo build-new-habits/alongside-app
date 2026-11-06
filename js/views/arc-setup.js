@@ -1,6 +1,10 @@
 /**
  * js/views/arc-setup.js
- * 31 Oct 2026 v5
+ * 06 Nov 2026 v6
+ *
+ * v6 - P-28 S5 (E, said lightly; wording A6 approved 05 Nov). Under the
+ *   aims: "Whatever you're working towards, In Step makes room for the
+ *   people around you too." With In Step's icon; nothing to press.
  *
  * v5 - STAGE PATH Session 9 (CLOSE; P-12 F5; Graeme, 31 Oct: "‹ Back"). On
  *   the Plan only: "‹ Back" (it said "← Back"), no house beside it, the
@@ -81,6 +85,8 @@ import { store } from "../store.js";
 import { isPremium } from "../auth.js";
 import { AIMS, STRANDS, aimById, strandsForAim, situationsFor, aimsFor } from "../data/aims.js";
 import { bodyAreasOf } from "../data/conditions.js";
+import { PURPOSE_LINES } from "../data/empathy-transfer.js";
+import { lineIcon } from "../data/line-icons.js";
 
 const esc = s => String(s == null ? "" : s)
   .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
@@ -170,6 +176,7 @@ export function ArcSetupView(router) {
             ${esc(a.label)}
           </button>`).join("")}
       </div>
+      <p class="as-help instep-purpose" id="as-instep"><span class="instep-eyebrow" aria-hidden="true">${lineIcon("instep", 18)}</span>${esc(PURPOSE_LINES.arcSetup)}</p>
 
       ${showAll ? `
         <p class="as-count">Everything I can hold for you.</p>

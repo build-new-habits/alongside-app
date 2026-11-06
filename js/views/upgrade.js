@@ -1,6 +1,13 @@
 /**
  * upgrade.js - Upgrade / Membership view
- * 31 Oct 2026 v22
+ * 06 Nov 2026 v23
+ *
+ * v23 - P-28 S5 (E, said lightly; wording A6 approved 05 Nov). One line
+ *   under what the Plan does: "And In Step: short moments after a session
+ *   about the people around you. The way I meet you is a way of meeting
+ *   others." With In Step's icon. No count, bar or badge for In Step. It
+ *   is not one of the Plan's differences (In Step is on both tiers), so it
+ *   is a plain line, not an upgrade-change (verify-plan-claims 4a).
  *
  * v22 - STAGE PATH Session 9 (CLOSE; P-12 F5; Graeme, 31 Oct: "‹ Back"). The
  *   Plan's page, You have a Plan.: "‹ Back" (it said "← Back"), no house
@@ -232,6 +239,8 @@ import { store }  from "../store.js";
 import { router } from "../router.js";
 import { PRICE_MONTHLY, PRICE_ANNUAL } from "../data/pricing.js";
 import { PLAN_ADDS, FREE_KEEPS } from "../data/tier-table.js";
+import { PURPOSE_LINES } from "../data/empathy-transfer.js";
+import { lineIcon } from "../data/line-icons.js";
 
 export const centered = false;
 
@@ -370,6 +379,7 @@ export function render() {
            understanding. -->
       <section class="upgrade-block upgrade-block--changes" aria-label="What changes">
         ${STATEMENTS.map(s => `<p class="upgrade-change">${s}</p>`).join("")}
+        <p class="upgrade-body instep-purpose" id="upg-instep"><span class="instep-eyebrow" aria-hidden="true">${lineIcon("instep", 18)}</span>${PURPOSE_LINES.planPage}</p>
       </section>
 
       <!-- COMMITMENT, answered before she asks. First, because the doc
