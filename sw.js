@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 06 Nov 2026 v712
+ * 07 Nov 2026 v713
  *
+ * v713 - Safety on both tiers. With an area quite sore this morning, Free now gets the same halfway check as the Plan: "still okay?", carry on or stop and save. On the Plan, a programme now leaves out any movement your sore areas rule out today (as a kept session already did), and What I've adjusted says what was really left out, or that nothing was. NEW FILES: none.
  * v712 - The coach's recordings: the list of which recordings exist is read when the app opens and kept for offline use; each recording is kept in its newest version only, so a line recorded again reaches your phone. Nothing changes on screen until the recordings are added.
  * v711 - P-28 finished. On a low day In Step's offer says "This one's about you today." The old In Step's stored choices and counters are removed from your phone (nothing used them). With the coach's voice on, opening an episode fetches that part's recordings, so it plays offline. Both tiers, a fault fixed: leaving getting started before its next line arrived could throw an error. NEW FILES: none.
  * v710 - P-28 S6 (close). The coach's recordings, when they arrive, are kept on your phone after the first time each plays, in their own store, so a walk can be guided offline and an app update never downloads them again. They are never downloaded before you play one. A recording that isn't there yet is never an error: the words are on the screen.
@@ -4259,7 +4260,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v712";
+const CACHE_NAME = "alongside-v713";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4349,7 +4350,7 @@ const SHELL_HASHES = {
   "./js/views/checkin.js": "69cd078ee9c3b84a",
   "./js/views/checkin-mini.js": "c647f4da71feddde",
   "./js/views/coach-proposal.js": "483cee5a0d486fd9",
-  "./js/views/workout.js": "2892dfe27920a81a",
+  "./js/views/workout.js": "fba068b2e4f6c61f",
   "./js/views/progress.js": "ec6aaab64e2cee39",
   "./js/views/settings.js": "85ce48f8345522b6",
   "./js/views/restore-flow.js": "dc81c2e455fa472d",
@@ -4387,12 +4388,12 @@ const SHELL_HASHES = {
   "./js/data/tier-table.js": "7821c3304bd0815c",
   "./js/views/know-what.js": "e84fee3e6d9d3af0",
   "./js/views/plan-home.js": "c3119c9c9830c2c7",
-  "./js/views/path.js": "fd077f2d4d367470",
+  "./js/views/path.js": "b61c38301f18b744",
   "./js/plan-look.js": "7674d8fbf5101aa9",
   "./js/views/plan-finish.js": "0e0cc208d5d6a59c",
   "./js/data/outside.js": "3af4ea46bd898084",
   "./js/data/trend-recipes.js": "14961e4c12aef77e",
-  "./js/data/path-context.js": "bb05075596d17c27",
+  "./js/data/path-context.js": "a3b00dbb090b937a",
   "./js/data/swap-search.js": "5f0f0e4d112f92ea",
   "./js/views/build-session.js": "763317cec8c62e83",
   "./js/data/build-lately.js": "e06714cc9d1539a6",
@@ -4523,7 +4524,7 @@ const SHELL_HASHES = {
   "./js/data/exercises/held_movements.js": "73a0fd1503850f28",
   "./js/data/feel-programmes.js": "ade4752f88834a40",
   "./js/data/stretch-routines.js": "5a5fa2e7598037fb",
-  "./js/data/path-engine.js": "1d92317ca9107303",
+  "./js/data/path-engine.js": "13cfd17cf3753a14",
   "./js/data/exercises/pilates.js": "2428ed5f9e3f41cf",
   "./js/data/exercises/running.js": "c1fc520e1eb7ee8c",
   "./js/data/exercises/rehabilitation.js": "c2b00a8513421566",
