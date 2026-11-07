@@ -1,7 +1,10 @@
 /**
  * tools/verify-website.mjs
- * 07 Nov 2026 v2
+ * 07 Nov 2026 v3
  *
+ * v3 - Test 11: the site links the app for friends to try (Graeme, 07 Nov).
+ *   Every "Try the app" goes to APP_URL, which is this repo's CNAME; Home
+ *   says it is still being built and gives the Android and iPhone steps.
  * v2 - WEB-TRIM (master schedule row 9b, Graeme 07 Nov: "far far far too
  *   many words"). The site is now Home, How it works and About; Who it's
  *   for, Philosophy, Products, Upgrade, Community and Impact send you on
@@ -40,7 +43,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { JSDOM } from "jsdom";
-import { HOME_ROWS, SCENARIOS, EARLY_BIRD } from "./website-claims.mjs";
+import { HOME_ROWS, SCENARIOS, EARLY_BIRD, APP_URL } from "./website-claims.mjs";
 import { PRICE_MONTHLY, PRICE_ANNUAL } from "../js/data/pricing.js";
 
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -204,6 +207,16 @@ for (const [from, to] of Object.entries(RETIRED)) {
   ok(!!d && meta.endsWith(`url=${target}`) && !!d.querySelector(`a[href="${target}"]`) && /noindex/.test(d.querySelector('meta[name="robots"]')?.getAttribute("content") || ""),
     `10. /${from}/ sends you to /${to}${to ? "/" : ""} and is not listed`, meta || "no refresh");
 }
+
+// 11 ─ trying the app
+console.log("\nTEST 11 - every Try the app goes to the app, and Home says how to install it");
+const cname = fs.readFileSync(path.join(REPO, "CNAME"), "utf8").trim();
+ok(APP_URL === `https://${cname}/`, `11a. APP_URL is this app's address (${cname})`, APP_URL);
+const tries = pages.flatMap(p => [...doc[p].querySelectorAll("a")].filter(a => /Try the app/.test(text(a))).map(a => ({ p, href: a.getAttribute("href") })));
+ok(tries.length >= 3 && tries.every(t => t.href === APP_URL), `11b. ${tries.length} Try the app buttons, all to ${APP_URL}`, tries.filter(t => t.href !== APP_URL).map(t => `${t.p}: ${t.href}`).join(", "));
+const home = visible(doc["index.html"]);
+ok(/Still being built/.test(home), "11c. Home says the app is still being built");
+ok(/Install app/.test(home) && /Add to Home Screen/.test(home), "11d. Home gives the Android and iPhone install steps");
 
 console.log(`\n${passed} passed, ${failed} failed`);
 process.exit(failed ? 1 : 0);

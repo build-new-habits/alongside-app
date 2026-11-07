@@ -1,6 +1,8 @@
 /**
  * tools/website-claims.mjs
- * 07 Nov 2026 v1
+ * 07 Nov 2026 v2
+ *
+ * v2 - APP_URL: the site links the app for friends to try (Graeme, 07 Nov).
  *
  * WEB-TRIM (master schedule row 9b). Every Free / Plan claim the public
  * website makes, in one reviewed list beside the app, so the site and the
@@ -21,6 +23,9 @@
  */
 
 const P = (file, words) => ({ file, words });
+
+/** Where the site sends people to try the app. Must match this repo's CNAME. */
+export const APP_URL = "https://app.buildnewhabits.co.uk/";
 
 /** Prices shown on the site. Monthly and yearly must equal js/data/pricing.js. */
 export const EARLY_BIRD = {
