@@ -1,6 +1,10 @@
 /**
  * js/data/path-context.js
- * 02 Nov 2026 v3
+ * 07 Nov 2026 v4
+ *
+ * v4 - S2 SAFE-LEFTOUT (Graeme, 07 Nov). shownAdjustments() passes
+ *   leftOutAreas through, so a screen that checked its movements can say
+ *   what was really left out (path-engine.js v5).
  *
  * v3 - P-26 ONE-BUILD-PAGE (Graeme, 02 Nov: on the day, a session he
  *   built leaves out what that day's sore areas rule out and offers a swap,
@@ -112,9 +116,9 @@ const NOT_YET = [];   // v2: Session 6 made the last two true (workout.js v36)
  * that already says it in its own sentence (Today's plan: the area is said
  * once, verify-sore-words 4c).
  */
-export function shownAdjustments({ nameArea = true } = {}) {
+export function shownAdjustments({ nameArea = true, leftOutAreas } = {}) {
   const named = soreToday().map(s => ` your ${areaWords(s.id)}`);
-  return adjustmentsFor({ checkin: checkinToday(), sore: soreToday(), ...prefNames() })
+  return adjustmentsFor({ checkin: checkinToday(), sore: soreToday(), ...prefNames(), leftOutAreas })
     .filter(line => !NOT_YET.some(re => re.test(line)))
     .filter(line => nameArea || !named.some(w => line.endsWith(w)));
 }

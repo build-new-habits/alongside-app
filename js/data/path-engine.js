@@ -1,6 +1,12 @@
 /**
  * js/data/path-engine.js
- * 05 Nov 2026 v4
+ * 07 Nov 2026 v5
+ *
+ * v5 - S2 SAFE-LEFTOUT (Graeme, 07 Nov). adjustmentsFor() says "Left out
+ *   moves that load your <area>" only for an area in leftOutAreas (the
+ *   caller checked the movements and something went); "Nothing left out for
+ *   your <area> today, so skip anything that hurts it" when the caller
+ *   checked and nothing went; neither when the caller does not say.
  *
  * v4 - P-27 TIDY (Graeme, 05 Nov). The coach's choice says what it builds:
  *   Keep moving's whole body is cardio, as the door's own Whole body is
@@ -112,7 +118,7 @@ export function suggestToday({ checkin = null, week = null, arcDoor: door = null
 // ── E4. What I've adjusted ───────────────────────────────────────────────
 
 /** The exact sentences of blueprint E4. Never empty. */
-export function adjustmentsFor({ checkin = null, sore = [], likedNames = [], lessNames = [], neverNames = [] } = {}) {
+export function adjustmentsFor({ checkin = null, sore = [], likedNames = [], lessNames = [], neverNames = [], leftOutAreas } = {}) {
   const out = [];
   const energy = checkin?.energy ?? null, mood = checkin?.mood ?? null;
   if (energy != null && energy <= 3) out.push("Shorter than usual, with more time to settle at the end");
@@ -121,7 +127,9 @@ export function adjustmentsFor({ checkin = null, sore = [], likedNames = [], les
     const lvl = soreLevel(s.score);
     const area = areaWords(s.id);
     if (lvl === "quite-sore") {
-      out.push(`Left out moves that load your ${area}`, `Easier options pointed out on cards that use your ${area}`, "A quick check halfway: still okay?");
+      // S2: a claim about what was left out only from a caller that checked.
+      if (Array.isArray(leftOutAreas)) out.push(leftOutAreas.includes(s.id) ? `Left out moves that load your ${area}` : `Nothing left out for your ${area} today, so skip anything that hurts it`);
+      out.push(`Easier options pointed out on cards that use your ${area}`, "A quick check halfway: still okay?");
     } else if (lvl === "a-little") {
       out.push("Easier options pointed out where something might niggle");
     }

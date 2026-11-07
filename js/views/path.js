@@ -1,6 +1,13 @@
 /**
  * views/path.js
- * 06 Nov 2026 v13
+ * 07 Nov 2026 v14
+ *
+ * v14 - S2 SAFE-LEFTOUT (Graeme, 07 Nov). A programme (the coach's choice,
+ *   a door's, a fresh one, a trend day) goes through the same sore check as
+ *   a kept session: each movement today's sore areas rule out is marked,
+ *   named on the page, and left out at Start. What I've adjusted says
+ *   "Left out moves that load your <area>" only when one was; otherwise
+ *   "Nothing left out for your <area> today, so skip anything that hurts it".
  *
  * v13 - P-28 S4 GUIDE ME (Graeme, 05 Nov; prototype v5). Outside › Walk,
  *   Run or Bike ride asks How would you like your walk? before the plan:
@@ -235,9 +242,10 @@ export function stepsFor(r, floor) {
 /** The one player, as Saved sessions starts it: the movements, in order, each for its minutes. */
 export function startPractice(router, practice, { door, feeling = null } = {}) {
   // A kept session keeps its own doses (sets, reps, time); a programme or routine plays each for its minutes.
+  // Either way a movement marked out for a sore area today is left out (S2).
   const exercises = practice.saved
     ? practice.steps.filter(s => !(s.out || []).length).map(s => s.entry).filter(Boolean)
-    : practice.steps.map(s => {
+    : practice.steps.filter(s => !(s.out || []).length).map(s => {
       const e = BY_ID.get(s.id);
       return e ? { ...e, ...(s.label ? { name: s.label } : {}), reps: null, sets: 1, duration: Math.round(s.mins * 60), pathNote: s.note || null } : null;
     }).filter(Boolean);
@@ -272,7 +280,7 @@ export function practiceFromSaved(rec) {
  * offers its Swap, and Start leaves it out. Nothing else changes.
  */
 export function markSore(practice) {
-  if (!practice?.saved) return practice;
+  if (!practice || !Array.isArray(practice.steps)) return practice;
   return { ...practice, steps: practice.steps.map(s => ({ ...s, out: soreRuledOut(s.entry || BY_ID.get(s.id)) })) };
 }
 const areaList = ids => { const w = ids.map(id => `your ${areaWords(id)}`); return w.length > 1 ? `${w.slice(0, -1).join(", ")} and ${w[w.length - 1]}` : w[0] || ""; };
@@ -598,10 +606,11 @@ export function PathView(router) {
 
     // A programme or a routine, before Start
     prog() {
-      const p = st.practice, kind = DOOR[st.door].kind;
+      const p = markSore(st.practice), kind = DOOR[st.door].kind;
       const icon = st.door === "feel" ? (FEELINGS[st.feeling]?.icon || "heart") : DOOR[st.door].icon;
       const line = st.note || st.reason || (st.surprise ? "A surprise that fits today." : "");
-      const adj = st.fresh || st.fromCoach ? shownAdjustments() : [];
+      const outIds = new Set(p.steps.flatMap(s => s.out || []));
+      const adj = st.fresh || st.fromCoach ? shownAdjustments({ leftOutAreas: [...outIds] }) : [];
       const meta = [p.minutes ? `About ${p.minutes} minutes` : "", !st.fresh && STYLE[p.style], !st.fresh && POSITION[p.position]].filter(Boolean).join(" · ");
       const ids = p.steps.map(s => s.id);
       const outs = p.steps.filter(s => (s.out || []).length);
@@ -942,7 +951,7 @@ export function PathView(router) {
       router.pathBack = { step, st: { ...st }, trail: trail.map(t => ({ ...t })) };   // P-27: ‹ Back returns here
       router.navigate("coach-proposal");
     });
-    root.querySelector("#path-start")?.addEventListener("click", () => startPractice(router, st.practice, { door: st.door, feeling: st.door === "feel" ? st.feeling : null }));
+    root.querySelector("#path-start")?.addEventListener("click", () => startPractice(router, markSore(st.practice), { door: st.door, feeling: st.door === "feel" ? st.feeling : null }));
     // P-26. A kept session: change it on Build a session.
     root.querySelector("#path-change")?.addEventListener("click", () => { router.buildStart = { editId: st.practice.id, returnTo: "saved-sessions" }; router.navigate("build-session"); });
     root.querySelectorAll("[data-swap]").forEach(b => b.addEventListener("click", () => swapAt(Number(b.dataset.swap))));

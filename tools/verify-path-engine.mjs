@@ -1,6 +1,11 @@
 /**
  * tools/verify-path-engine.mjs
- * 05 Nov 2026 v3
+ * 07 Nov 2026 v4
+ *
+ * v4 - S2 SAFE-LEFTOUT (Graeme, 07 Nov). "Left out moves that load your
+ *   <area>" is said only when the caller says something was left out for
+ *   it; when nothing was, "Nothing left out for your <area> today, so skip
+ *   anything that hurts it"; when the caller does not know, neither.
  *
  * v3 - P-27 TIDY. 1e and 1f follow the engine's lengths, which are now the
  *   app's own lengths (30 and 40; they were 25 and 35, which no plan is
@@ -108,7 +113,7 @@ for (const c of [ci(2, 6), ci(6, 2), ci(3, 6), ci(6, 6), null]) { const r = st({
 ok("1l. every suggestion has one plain reason", reasonsOk);
 
 console.log("\nTEST 2 - adjustments (E4): never empty, exact words");
-const EXACT = [/^Shorter than usual, with more time to settle at the end$/, /^No countdown timers, go at your own pace$/, /^Left out moves that load your [a-z ]+$/, /^Easier options pointed out on cards that use your [a-z ]+$/,
+const EXACT = [/^Shorter than usual, with more time to settle at the end$/, /^No countdown timers, go at your own pace$/, /^Left out moves that load your [a-z ]+$/, /^Nothing left out for your [a-z ]+ today, so skip anything that hurts it$/, /^Easier options pointed out on cards that use your [a-z ]+$/,
   /^A quick check halfway: still okay\?$/, /^Easier options pointed out where something might niggle$/, /^More of [^,]+ and [^,]+, which you loved$/, /^More of [^,]+, which you loved$/,
   /^Left out [^,]+, as you asked$/, /^Less of [^,]+$/, /^Mixed up from your last few sessions$/];
 const adj = o => safe(fn("adjustmentsFor"), o) || [];
@@ -117,7 +122,9 @@ const cases = [
   [{ checkin: ci(6, 6) }, a => a.length === 1 && /^Mixed up from your last few sessions$/.test(a[0]), "nothing to say -> the recency line"],
   [{ checkin: ci(3, 6) }, a => a.includes("Shorter than usual, with more time to settle at the end"), "low energy"],
   [{ checkin: ci(6, 3) }, a => a.includes("No countdown timers, go at your own pace"), "low mood"],
-  [{ checkin: ci(6, 6), sore: [{ id: "knee", score: 6 }] }, a => a.includes("Left out moves that load your knee") && a.includes("Easier options pointed out on cards that use your knee") && a.includes("A quick check halfway: still okay?"), "quite sore"],
+  [{ checkin: ci(6, 6), sore: [{ id: "knee", score: 6 }], leftOutAreas: ["knee"] }, a => a.includes("Left out moves that load your knee") && !a.some(x => /^Nothing left out/.test(x)) && a.includes("Easier options pointed out on cards that use your knee") && a.includes("A quick check halfway: still okay?"), "quite sore, something left out for it"],
+  [{ checkin: ci(6, 6), sore: [{ id: "knee", score: 6 }], leftOutAreas: [] }, a => a.includes("Nothing left out for your knee today, so skip anything that hurts it") && !a.includes("Left out moves that load your knee") && a.includes("A quick check halfway: still okay?"), "quite sore, nothing left out for it"],
+  [{ checkin: ci(6, 6), sore: [{ id: "knee", score: 6 }] }, a => !a.includes("Left out moves that load your knee") && !a.some(x => /^Nothing left out/.test(x)) && a.includes("Easier options pointed out on cards that use your knee"), "quite sore, caller does not know: no claim either way"],
   [{ checkin: ci(6, 6), sore: [{ id: "lower-back", score: 4 }] }, a => a.includes("Easier options pointed out where something might niggle"), "a little sore"],
   [{ checkin: ci(6, 6), likedNames: ["Glute Bridge", "Bird Dog", "Plank"] }, a => a.includes("More of Glute Bridge and Bird Dog, which you loved"), "likes, two named"],
   [{ checkin: ci(6, 6), neverNames: ["Burpee"] }, a => a.includes("Left out Burpee, as you asked"), "never"],

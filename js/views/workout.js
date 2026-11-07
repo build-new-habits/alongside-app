@@ -1,6 +1,10 @@
 /**
  * workout.js - Workout Execution View
- * 06 Nov 2026 v40
+ * 07 Nov 2026 v41
+ *
+ * v41 - S1 SAFE-HALFWAY (Graeme, 07 Nov). The halfway "still okay?" check
+ *   for an area quite sore this morning runs on both tiers: safety is never
+ *   paywalled. Not so good still stops, saves and goes to that tier's finish.
  *
  * v40 - P-28 S4 (both tiers). While you hold: with the coach's voice on,
  *   a timed hold's line (js/hold-voice.js) starts by itself when its timer
@@ -554,9 +558,8 @@ function _pathFields(w) {
   if (w.snack === true) out.snack = true;
   return out;
 }
-/** Quite sore this morning, on the Plan: the area. */
+/** Quite sore this morning, on either tier: the area (S1, safety is never paywalled). */
 function _quiteSore() {
-  if (!_plan()) return null;
   const s = soreToday().find(x => soreLevel(x.score) === "quite-sore");
   return s ? s.id : null;
 }

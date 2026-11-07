@@ -1,7 +1,13 @@
 import { createRequire as __cr } from "node:module";
 /**
  * tools/verify-path-finish.mjs
- * 02 Nov 2026 v2
+ * 07 Nov 2026 v3
+ *
+ * v3 - S1 SAFE-HALFWAY and S2 SAFE-LEFTOUT (Graeme, 07 Nov). 4e re-pointed:
+ *   Free gets the halfway check too (safety is never paywalled), and 4f:
+ *   Free's Not so good stops, saves and goes to Free's finish. TEST 9: a
+ *   programme the coach opens says only what was really left out; a
+ *   programme's movements go through the same sore check as a kept session.
  *
  * v2 - P-23 SWAP-SEARCH re-point (none loosened). On the Plan, Swap opens a
  *   list (Like this one, then a search) instead of taking the first one on
@@ -159,7 +165,11 @@ ok("4c. Not so good: stop here, what was done is saved, the Plan's finish", navs
 fixture({ sore: { "lower-back": 3 } }); startSession({ exercises: four }); finishAll(2);
 ok("4d. CONTROL, a little sore: no check", txt(main.querySelector("h1")) === "Curl");
 fixture({ tier: "free", sore: { "lower-back": 6 } }); startSession({ exercises: four }); finishAll(2);
-ok("4e. CONTROL, Free: no check", txt(main.querySelector("h1")) === "Curl");
+ok("4e. Free, quite sore: the same halfway check (safety is never paywalled)", txt(main.querySelector("h1")) === "A quick check: still okay?" && /lower back was quite sore this morning/.test(txt(main)), txt(main).slice(0, 160));
+fixture({ tier: "free", sore: { "lower-back": 6 } }); startSession({ exercises: four }); finishAll(2); navs = [];
+tap("#wo-half-stop");
+const e4f = (store.get("activityLog") || []).at(-1);
+ok("4f. Free, Not so good: stop here, what was done is saved, Free's finish", navs.at(-1) === "reflect" && e4f?.status === "partial" && e4f.exerciseIds.join() === "a,b", JSON.stringify({ navs, ids: e4f?.exerciseIds }));
 
 // ── 5 ───────────────────────────────────────────────────────────────────
 console.log("\nTEST 5 - the Plan's finish");
@@ -253,6 +263,30 @@ ok("7a. purpose and place kept from the session", res.ok && r7.purpose === "movi
 saveSession("Mine two", { title: "Mine two", exercises: [EX("plank", "Plank")] });
 const r7b = (store.get("savedSessions") || []).at(-1);
 ok("7b. absent when the session does not say", !("purpose" in r7b) && !("place" in r7b));
+
+// ── 9 ───────────────────────────────────────────────────────────────────
+console.log("\nTEST 9 - a programme says only what was really left out");
+{
+  const { markSore, startPractice } = await import(B + "views/path.js");
+  const c2 = PROGRAMMES.find(p => p.id === "c2");
+  const openCalm = () => { fakeRouter.pathStart = { door: "feel", feeling: "calm", programmeId: "c2" }; main.innerHTML = ""; PathView(fakeRouter).mount(main); };
+  const adjText = () => [...main.querySelectorAll(".path-adj li")].map(li => txt(li));
+  fixture({ sore: { knee: 6 } }); openCalm();
+  ok("9pc. the coach's Calming yoga is open, with its adjustments", /Calming yoga/.test(txt(main.querySelector("h1"))) && adjText().length > 0, txt(main).slice(0, 200));
+  ok("9a. quite sore knee, nothing removed: no \"Left out moves that load your knee\"", !adjText().includes("Left out moves that load your knee"), JSON.stringify(adjText()));
+  ok("9b. ...it says so: Nothing left out for your knee today, so skip anything that hurts it", adjText().includes("Nothing left out for your knee today, so skip anything that hurts it"), JSON.stringify(adjText()));
+  ok("9c. ...and Child's Pose is still in it (only Bad rules it out)", /Child/.test(txt(main.querySelector("#path-mvs-h")?.parentElement || main)));
+  fixture({ sore: { knee: 8 } });
+  const marked = markSore(c2);
+  const cp = marked.steps.find(s => s.id === "childs-pose");
+  ok("9d. a programme goes through the sore check: Bad knee marks Child's Pose out", (cp?.out || []).includes("knee"), JSON.stringify(cp));
+  ok("9e. CONTROL: a movement that does not load the knee is not marked", !(marked.steps.find(s => s.id === "coherent-breathing")?.out || []).length);
+  startPractice(fakeRouter, marked, { door: "feel", feeling: "calm" });
+  const ids = (store.get("generatedSession")?.session?.exercises || []).map(e => e.id);
+  ok("9f. ...and Start leaves it out of the session", ids.length === c2.steps.length - 1 && !ids.includes("childs-pose"), JSON.stringify(ids));
+  fixture({ sore: { knee: 8 } }); startPractice(fakeRouter, c2, { door: "feel", feeling: "calm" });
+  ok("9g. CONTROL: an unmarked programme still plays every movement", (store.get("generatedSession")?.session?.exercises || []).length === c2.steps.length);
+}
 
 // ── 8 ───────────────────────────────────────────────────────────────────
 console.log("\nTEST 8 - Free's finish is as it was");
