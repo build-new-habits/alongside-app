@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 07 Nov 2026 v713
+ * 08 Nov 2026 v714
  *
+ * v714 - The coach's recordings: added while the app is open, they are now found when you open Guide me or come back to the app, without closing it first.
  * v713 - Safety on both tiers. With an area quite sore this morning, Free now gets the same halfway check as the Plan: "still okay?", carry on or stop and save. On the Plan, a programme now leaves out any movement your sore areas rule out today (as a kept session already did), and What I've adjusted says what was really left out, or that nothing was. NEW FILES: none.
  * v712 - The coach's recordings: the list of which recordings exist is read when the app opens and kept for offline use; each recording is kept in its newest version only, so a line recorded again reaches your phone. Nothing changes on screen until the recordings are added.
  * v711 - P-28 finished. On a low day In Step's offer says "This one's about you today." The old In Step's stored choices and counters are removed from your phone (nothing used them). With the coach's voice on, opening an episode fetches that part's recordings, so it plays offline. Both tiers, a fault fixed: leaving getting started before its next line arrived could throw an error. NEW FILES: none.
@@ -4260,7 +4261,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v713";
+const CACHE_NAME = "alongside-v714";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4468,9 +4469,9 @@ const SHELL_HASHES = {
   "./js/views/in-step.js": "613388a51c358ad8",
   "./js/data/in-step-programme.js": "91605a0780fba799",
   "./js/data/in-step-offer.js": "c962f66108aeef19",
-  "./js/coach-audio.js": "e7c1504e89aaab1f",
+  "./js/coach-audio.js": "d201650f60b33617",
   "./js/hold-voice.js": "4801164cbddca872",
-  "./js/views/guide-me.js": "e4227dbe3e3fcf98",
+  "./js/views/guide-me.js": "eed24714732918fc",
   "./js/data/guide-me.js": "ed77e97b8a8a35ea",
   "./js/views/journal-entry.js": "dd38e795ee54e7d7",
   "./js/views/gym-programme.js": "98de0c5929699fb1",
