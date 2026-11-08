@@ -1,6 +1,10 @@
 /**
  * js/coach-audio.js
- * 06 Nov 2026 v3
+ * 08 Nov 2026 v4
+ *
+ * v4 - The list is read again whenever the app comes back to the screen
+ *   (Graeme, 08 Nov: recordings uploaded while the app was open were not
+ *   heard).
  *
  * v3 - THE RECORDINGS' LIST (audio/manifest.json, written by
  *   tools/build-audio.mjs when the recordings are built). It says which
@@ -71,6 +75,12 @@ export function audioReady() { return _loading || loadAudioManifest(); }
 /** Whether this line has a recording. */
 export function hasLine(id) { return !!(id && _files[id]); }
 loadAudioManifest();
+// v4. Read it again whenever the app comes back to the screen: a phone
+// keeps a home-screen app open for days, and recordings uploaded meanwhile
+// would otherwise stay unheard until it was fully closed.
+if (typeof document !== "undefined" && document.addEventListener) {
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState !== "hidden") loadAudioManifest(); });
+}
 
 /** Whether the coach's voice is on (Settings). */
 export function voiceOn() {

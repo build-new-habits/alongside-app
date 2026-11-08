@@ -1,6 +1,9 @@
 /**
  * js/views/guide-me.js
- * 06 Nov 2026 v2
+ * 08 Nov 2026 v3
+ *
+ * v3 - Opening a session reads the recordings' list again, so a recording
+ *   uploaded while the app was open is found (Graeme, 08 Nov).
  *
  * v2 - The recording is there when the recordings' list names it
  *   (audio/manifest.json, coach-audio.js v3), and is asked for with its
@@ -39,7 +42,7 @@ import { router }   from "../router.js";
 import { isPremium } from "../auth.js";
 import { lineIcon } from "../data/line-icons.js";
 import { GUIDE_SESSIONS, momentAt } from "../data/guide-me.js";
-import { audioReady, hasLine, audioUrl } from "../coach-audio.js";
+import { loadAudioManifest, hasLine, audioUrl } from "../coach-audio.js";
 
 export const centered = false;
 
@@ -133,7 +136,7 @@ function go(next) {
 // ── The recording ───────────────────────────────────────────────────────
 function _probe(cb) {
   const s = S(); hasFile = false; audio = null;
-  audioReady().then(() => {
+  loadAudioManifest().then(() => {
     if (S() !== s) return;
     hasFile = hasLine(s.track);
     if (hasFile && typeof Audio !== "undefined") {
