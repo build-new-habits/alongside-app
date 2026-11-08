@@ -1,4 +1,12 @@
 {
  "about": "The coach's recordings: which lines have a file, and each file's fingerprint. Written by tools/build-audio.mjs; read by js/coach-audio.js.",
- "files": {}
+ "files": {
+  "guide-walk-00": "cb1b0efd39cd67bd",
+  "guide-walk-01": "99c3676e133763db",
+  "guide-walk-06": "601631e4cbaefd40",
+  "guide-walk-12": "9f382095d525f86a",
+  "guide-walk-18": "f766e861fb1cad30",
+  "guide-walk-20": "fba80595b10e1a4e",
+  "guide-walk": "c07da5597ff173fc"
+ }
 }
