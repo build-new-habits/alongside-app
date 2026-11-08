@@ -1,6 +1,10 @@
 /**
  * tools/verify-p28-guide.mjs
- * 06 Nov 2026 v2
+ * 06 Nov 2026 v3
+ *
+ * v3 - TEST 10 (Graeme, 08 Nov: "I didn't hear anything"): recordings
+ *   added while the app is open. Opening Guide me and coming back to the
+ *   app read the list again; before, the list read at start was kept.
  *
  * v2 - The recordings' list (coach-audio.js v3, guide-me.js v2): a
  *   recording plays only when the list names it, at audio/<id>.mp3?v=<fp>.
@@ -223,6 +227,18 @@ await block("TEST 5", async () => {
   NOW += 1201 * 1000; await wait(400);
   const w = (store.get("activityLog") || []).at(-1) || {};
   ok("5i. to the end: logged as done, and on to the finish", w.status === "completed" && w.name === "A walk in any weather" && navs.at(-1) === "plan-finish", JSON.stringify(w).slice(0, 160));
+});
+
+await block("TEST 10", async () => {
+  console.log("\nTEST 10 - recordings added while the app is open");
+  await seed(); await setFiles(false);
+  fileThere = true;   // the site now has them; the app read its list before they arrived
+  outside("walk"); tap('.path-row[data-v="guide:walk"]'); await wait(10);
+  ok("10a. opening Guide me reads the list again, so the new recording plays", $("#gm-nofile")?.hidden === true);
+  await setFiles(false); fileThere = true;
+  document.dispatchEvent(new window.Event("visibilitychange")); await wait(10);
+  ok("10b. coming back to the app reads the list again", CA.hasLine("guide-walk"));
+  await setFiles(false);
 });
 
 await block("TEST 6", async () => {
