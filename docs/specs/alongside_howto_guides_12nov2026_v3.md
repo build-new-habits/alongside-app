@@ -1,10 +1,18 @@
 # Alongside: Move — How-To Guides
 
-## 11 Nov 2026 v2
+## 12 Nov 2026 v3
 
 Build New Habits | Alongside: Move | Spec, agreed in outline, not built (master schedule row P-25)
 
-**v2 (11 Nov 2026).** This version takes in the review of v1 (project doc `alongside_howto_guides_review_11nov2026_v1.md`) and Graeme's four decisions of 11 Nov:
+**v3 (12 Nov 2026).** Graeme tried mock-up v1 (BNH-Files `Product/alongside_howto_mockup_11nov2026_v1.html`): *"I don't mind this. Obviously some styling things to get right to be consistent."* His concern: in self-help you **do** each step alongside the help, and the step-by-step pictures don't let you. He asked for instructions that sit over the app while you use it, *"like a genie floating over it"*, rather than a sheet open in two places. Agreed 12 Nov (*"Seems good to me"*):
+- **Guide me through it** is the main way to use a guide (new §2.3).
+- Pictures one step at a time, the printable sheet and the video are the backups, and what the website uses.
+- `verify-guides` walks each guide through the real screens.
+- **E3, Set up or change my arc**, added as a P1 guide. *"How to start"* is A1.
+
+The rest of v2 stands. v2 is archived in BNH-Files, `Archive/P-25 HOW-TO GUIDES/`.
+
+**v2 (11 Nov 2026).** That version took in the review of v1 (project doc `alongside_howto_guides_review_11nov2026_v1.md`) and Graeme's four decisions of 11 Nov:
 
 1. **Help on both tiers.** This is an exception to Stage AWARD's and Stage PATH's rule of leaving Free alone, as In Step was.
 2. **Help is hidden while a session is running.**
@@ -19,8 +27,6 @@ Changes from v1:
 - The guide sheet has tier variants and placeholders.
 - A1 and D1 written.
 - Section 9 answered.
-
-v1 is archived in BNH-Files, `Archive/P-25 HOW-TO GUIDES/`.
 
 ---
 
@@ -72,7 +78,40 @@ Small pop-out menus are hard to use with a screen reader, a switch or large text
 
 The screen stores nothing, so it needs no change to the Privacy Policy.
 
-### 2.3 Every guide ends with "Did that work?"
+### 2.3 Guide me through it: the help sits over the app while you do it
+
+You learn a task by doing it, not by reading about it somewhere else. Each guide opens on a short overview: what you'll end up with, how many steps, and the steps listed. Then one main button:
+
+**Guide me through it** (the main way)
+1. The help screen closes. The app is underneath, live, on the guide's first screen.
+2. **On the real button,** a ring and an arrow. The ring is never colour alone: it is a thick outline, and the box says the button's name.
+3. **A box with the step:** *Step 2 of 5 · Tap **Your week**.* It is docked at the top or bottom edge, whichever is further from the button. It never sits on top of the button or the button's own text (SC 2.4.11; at text 2 a box beside the button would cover other controls).
+4. **You tap the real button.** The app does what it always does, and the box moves on to the next step. Nothing is pretend. The person learns the real route, so next time they need no guide.
+5. **Off the route:** if they tap something else, the box says *You've left the guide.* with **Carry on from here** (back to the step's screen) and **Stop the guide**. Nothing breaks and nothing is undone.
+6. **A step that depends on what is already there** says so: *If you see **Change the week**, tap that first.* Steps can branch, like "Did that work?".
+7. **At the end:** *That's it.* then "Did that work?".
+
+**The box, to WCAG 2.2 AA:**
+- Always **Back a step** and **Stop the guide**, at least 44 px (SC 2.5.8; 1.4.13 dismissible and persistent).
+- It never moves by itself or times out (SC 2.2.1).
+- A live region says each new step once, and focus stays in the app, so a screen reader or switch user reaches the real button in the usual order (SC 4.1.3, 2.4.3).
+- The ring's gentle pulse stops under Reduce motion (SC 2.3.3).
+- The app's page gets room for the box, so nothing is hidden behind it.
+
+**Pausing:**
+- A running session pauses the guide (Help is hidden there) and it picks up after.
+- Closing the app ends the guide; it is not stored. Nothing about guide use is recorded (Privacy Policy v12).
+
+**The backups, from the same steps:**
+- **Show me the steps:** pictures one step at a time (the mock-up's first style), for reading before or after.
+- **Watch it:** the video on the website (§5).
+- **Print or save it:** the guide sheet on the website.
+
+On the website, where there is no live app, pictures are the main way.
+
+**How it is built:** one engine in the app shell, drawn the way the Help button is. A step is `{ screen, target, say, advance }`. `target` is a fixed marker on the real button (`data-guide-target="your-week"`), added screen by screen, and planned so that each view file is touched once. `advance` is the route the button opens, or the marker tapped. Rule-based; no AI. Steps are on screen only; the narrated version is the video.
+
+### 2.3b Every guide ends with "Did that work?"
 
 - It is optional, never a gate.
 - **Back to where I was** returns to the screen they came from.
@@ -96,6 +135,13 @@ The check works from the screens, not the source. A label in code that is never 
 - **Branches.** Every "Not quite" target exists, and none loops back.
 - **Version.** It writes `checked_against` itself; never by hand.
 - **Reversal-proven.** A label renamed in a copy turns it red and names the guide.
+- **Walks the guide (v3).** For each guide and each tier it covers, the check starts from the fixture and goes through **Guide me through it** step by step, in jsdom. On each step it checks four things:
+  - the step's screen is the one showing;
+  - its `target` marker is on a visible control;
+  - that control's name matches the step's bold label;
+  - pressing it leads to the next step's screen.
+
+  A guide that can't be walked from start to finish turns the check red. This proves the route, not only the words.
 - **Before it is trusted:** Plan Home's unreached code in `today.js` (`_planDoors`, `_weekCard`, `_coachCard`) is archived under the archive rule, and the stale notes are corrected (`store.js` line 154; `week-shape.js` `askForToday({ short })`; the `today.js` header's "a shorter way in (QUICK-2)").
 
 *(v1's section 2.6, anonymous counts of guide use, is withdrawn. Privacy Policy v12 says the app uses no analytics and sends nothing, and `verify-outbound` holds it to that. Feedback comes from tester sessions now. Later, one optional question can go in the B5 survey: "Which guides did you need?")*
@@ -146,6 +192,7 @@ Six categories, each title in plain words. **P1** guides are needed before beta;
 | --- | --- | --- | --- | --- |
 | E1 | I'm working towards a date | arc-setup, your-week | Plan | P2 |
 | E2 | Am I getting anywhere? | progress | both | P2 |
+| E3 | Set up or change my arc | arc-setup, today, progress | Plan | P1 |
 
 ### F. Account, privacy and the Plan
 
@@ -173,6 +220,11 @@ keywords: [days, week, schedule, plan]
 fixture: own-plan-imported        # the state verify-guides opens the screens in
 video: https://<website>/help/c1
 checked_against: (written by verify-guides)
+steps:
+  - screen: today
+    target: library            # data-guide-target on the real button
+    say: "On Home, tap **Library**."
+    advance: library           # the screen it opens
 ```
 
 - One line first: what you'll end up with.
@@ -414,15 +466,24 @@ No. Alongside never counts days in a row, so there is nothing to lose and nothin
 
 P-25's place in the order holds: **after the phone test's fixes, with BUNDLE-RESYNC.**
 
-1. ✅ Agree this spec (11 Nov 2026, v2).
-2. Archive Plan Home's unreached code in `today.js` and correct the stale notes (section 2.5).
-3. Write the P1 guides into `js/data/guides.js` with their fixtures. Graeme approves the wording.
-4. Build `tools/verify-guides.mjs`: red first, reversal-proven.
-5. Build the Help button (app shell) and the **How do I…?** screen: on this screen, categories, search, still stuck. Both tiers, measured with text-fit and under-bar.
-6. Add "Did that work?" branching.
-7. The website: the `/help/` page from the export script. Record the P1 videos.
-8. Test with 3–5 people from the core audience (ADHD, dyslexia, older users), watching where they still get stuck.
-9. P2 guides.
+1. ✅ Agree this spec (11 Nov 2026, v2; v3 12 Nov 2026).
+2. **Mock-up v2** for Graeme:
+   - the app's own components, made consistent (his styling note on v1);
+   - the guide's overview screen;
+   - **Guide me through it**, with the ring, the arrow and the box docked away from the button, at text 1 and 2;
+   - off the route;
+   - E3.
+3. Archive Plan Home's unreached code in `today.js` and correct the stale notes (§2.5).
+4. Write the P1 guides (A1, A2, B1, C1, C2, D1, E3) into `js/data/guides.js` with their steps, targets and fixtures. Graeme approves the wording.
+5. Build `tools/verify-guides.mjs`: words and walks, red first, reversal-proven.
+6. Build the Help button and the **How do I…?** screen (app shell): on this screen, categories, search, still stuck. Both tiers, measured with text-fit and under-bar.
+7. Build the **Guide me through it** engine and the `data-guide-target` markers (one pass per view file). Then "Did that work?".
+8. The backups:
+   - the step pictures, made by script from the fixtures;
+   - the website `/help/` pages and sheets from the export script;
+   - the P1 videos.
+9. Test with 3–5 people from the core audience (ADHD, dyslexia, older users), watching where they still get stuck.
+10. P2 guides.
 
 "Every day, as well" (section 7) has its own row and mock-up. C2 is rewritten when it ships.
 
@@ -453,4 +514,4 @@ P-25's place in the order holds: **after the phone test's fixes, with BUNDLE-RES
 
 ---
 
-*Build New Habits · Alongside: Move · How-To Guides · 11 Nov 2026 v2*
+*Build New Habits · Alongside: Move · How-To Guides · 12 Nov 2026 v3*
