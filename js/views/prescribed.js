@@ -1,6 +1,16 @@
 /**
  * prescribed.js - My exercises
  *
+ * 14 Nov 2026 v1.13
+ *
+ * v1.13 - P-29 LITTLE-AND-OFTEN (mock-up v5 approved by Graeme, 14 Nov). On
+ *   the Plan, each named list has On Home, one labelled choice (a select,
+ *   one row, so My exercises grows by one line a list): Not on Home, Any
+ *   time, Mornings, Evenings (data/little-and-often.js). A list on Home
+ *   shows under Little and often, one tap to play; at most three show at
+ *   once. Saved as it changes, focus stays on it, and a status line says it.
+ *   Free unchanged.
+ *
  * 31 Oct 2026 v1.12
  *
  * v1.12 - STAGE PATH Session 9 (CLOSE; P-12 F2, F5; Graeme, 31 Oct: "‹
@@ -120,6 +130,7 @@
 
 import { store } from "../store.js";
 import { planLook } from "../plan-look.js";
+import { ON_HOME_CHOICES, onHomeFor, setOnHome } from "../data/little-and-often.js";
 import { healthAllowed } from "../data/health-consent.js";
 
 export const centered = false;
@@ -313,7 +324,19 @@ function renderGroups(active) {
         ${g.items.map((ex, i) => renderExerciseCard(ex, i, false)).join("")}
       </ul>
       ${g.name ? `<button class="btn btn-primary btn-full prescribed-group__start" data-px-group="${_esc(g.name)}">Start ${_esc(g.name)}</button>` : ""}
-    </section>`).join("");
+      ${g.name && planLook() ? renderOnHome(g.name, gi) : ""}
+    </section>`).join("") + (planLook() ? `<p class="sr-only" role="status" id="px-onhome-status"></p>` : "");
+}
+
+/** P-29. On Home: whether this list shows on Home under Little and often, and when. */
+function renderOnHome(name, gi) {
+  const now = onHomeFor(name);
+  return `<div class="px-onhome">
+      <label class="px-onhome__label" for="px-onhome-${gi}">On Home</label>
+      <select class="px-onhome__select" id="px-onhome-${gi}" data-px-onhome="${_esc(name)}">
+        ${ON_HOME_CHOICES.map(c => `<option value="${c.id}"${now === c.id ? " selected" : ""}>${c.label}</option>`).join("")}
+      </select>
+    </div>`;
 }
 
 /**
@@ -554,6 +577,14 @@ export function onMount() {
     router.navigate("prescribed-session");
   }));
   document.getElementById("px-import-btn")?.addEventListener("click", () => router.navigate("plan-import"));
+  // P-29. On Home: one choice per list, saved as it changes; focus stays on it.
+  document.querySelectorAll("[data-px-onhome]").forEach(sel => sel.addEventListener("change", () => {
+    const name = sel.dataset.pxOnhome;
+    setOnHome(name, sel.value);
+    const label = sel.options[sel.selectedIndex]?.text || "";
+    const status = document.getElementById("px-onhome-status");
+    if (status) status.textContent = sel.value === "off" ? `${name} is not on Home.` : `${name} is on Home, ${label.toLowerCase()}.`;
+  }));
 
   // ── Toggle add form ───────────────────────────────────────────────────────
   document.getElementById("px-toggle-form-btn")?.addEventListener("click", () => {

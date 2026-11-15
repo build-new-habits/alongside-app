@@ -1,12 +1,22 @@
 import { zonesForAreas } from "./data/aims.js";
 import { consentCovers } from "./data/health-consent-covers.js";
 import { RETIRED_CONDITIONS } from "./data/scope-statement.js";
-import { sanitizeWeekShape, sanitizeWeekDayRequest } from "./data/week-shape-model.js";
+import { sanitizeWeekShape, sanitizeWeekDayRequest, sanitizeOnHome, sanitizeWeekChanges } from "./data/week-shape-model.js";
 import { validateWeightTarget } from "./data/weight-targets.js";
 
 /**
  * store.js - Data persistence layer
- * 06 Nov 2026 v123
+ * 14 Nov 2026 v124
+ *
+ * v124 - P-29 LITTLE-AND-OFTEN and CHANGE-TODAY (Schema v1.125; mock-up v5
+ *   approved by Graeme, 14 Nov). Two additions, nothing removed, Plan only.
+ *   myExercisesOnHome ({ "<list name>": "any"|"morning"|"evening" }, default
+ *   {}): which lists from My exercises show on Home under Little and often,
+ *   and when. weekChanges ({ week: "<Monday>", days: { <day>: change } } or
+ *   null): this week's changes from Change today. Both made safe on every
+ *   load by week-shape-model.js v6 (sanitizeOnHome, sanitizeWeekChanges); a
+ *   change from an earlier week loads as null, so nothing carries into
+ *   next week. Your week (weekShape) is never changed by either.
  *
  * v123 - P-28 FINISH (Graeme, 06 Nov: "Delete them"). The old In Step
  *   room's fields are retired: inStepProgress.unlockedAt, scenarioIndex,
@@ -1743,6 +1753,9 @@ export const store = {
       // cleared by the plan.
       weekShape: null,
       weekDayRequest: null,
+      // P-29. Little and often's choices, and this week's changes (Change today).
+      myExercisesOnHome: {},
+      weekChanges: null,
 
       // D-7 PLAN-IMPORT. Which group of My exercises the player plays
       // (a group name), or null for all of them. Set by every Start.
@@ -1770,6 +1783,9 @@ export const store = {
       // D-6. Made safe on every load: a malformed week is dropped, never coerced.
       weekShape: sanitizeWeekShape(saved.weekShape),
       weekDayRequest: sanitizeWeekDayRequest(saved.weekDayRequest),
+      // P-29. Made safe on every load; an earlier week's changes load as null.
+      myExercisesOnHome: sanitizeOnHome(saved.myExercisesOnHome),
+      weekChanges: sanitizeWeekChanges(saved.weekChanges, sanitizeWeekShape(saved.weekShape)),
       myExercisesGroup: typeof saved.myExercisesGroup === "string" && saved.myExercisesGroup.trim()
         ? saved.myExercisesGroup.replace(/[<>]/g, "").slice(0, 40) : null,
 

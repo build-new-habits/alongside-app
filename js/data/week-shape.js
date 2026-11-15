@@ -1,6 +1,15 @@
 /**
  * js/data/week-shape.js
- * 02 Nov 2026 v3
+ * 14 Nov 2026 v4
+ *
+ * v4 - P-29 CHANGE-TODAY. What a day is for now includes this week's
+ *   change from Change today (weekChanges, week-shape-model.js v6):
+ *   dayInWeek() reads any day of this week with its change applied, and
+ *   todayInWeek() is today's. So Home, the coach's plan (askForToday,
+ *   applyWeekDay) and every other reader see the same day: a swapped day
+ *   plays the other day's plan, a moved one is free, Little and often and
+ *   Rest today read as rest, and Something else as no plan from the week.
+ *   Your week itself (weekShape) is never changed by it.
  *
  * v3 - P-26 ONE-BUILD-PAGE. A day plan that is a saved session (saved,
  *   week-shape-model.js v5) is played as built, like an own list: the
@@ -54,7 +63,7 @@
 import { store } from "../store.js";
 import { EXERCISES } from "./exercises/index.js";
 import { soreLevelFor, soreScoresToday } from "../session-builder.js";
-import { DAY_KEYS, focusById, LEVEL_WEIGHT, intensityById, mixLine, BALANCE_IDS, EXTRAS } from "./week-shape-model.js";
+import { DAY_KEYS, focusById, LEVEL_WEIGHT, intensityById, mixLine, BALANCE_IDS, EXTRAS, sanitizeWeekChanges } from "./week-shape-model.js";
 
 const JS_DAY = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
 const pad = n => String(n).padStart(2, "0");
@@ -77,13 +86,30 @@ export function weekDates(d = new Date()) {
 
 export function getWeek() { return store.get("weekShape") || null; }
 
-/** What today is for: { day, value: id|"rest"|null, template } or null with no week. */
-export function todayInWeek(d = new Date()) {
+/** P-29. This week's changes from Change today ({ week, days }), or null. An earlier week's read as none. */
+export function weekChangesNow(d = new Date()) {
+  return sanitizeWeekChanges(store.get("weekChanges"), getWeek(), d);
+}
+
+/**
+ * P-29. What a day of this week is for, with this week's change applied:
+ * { day, value: id|"rest"|null, template, change } or null with no week.
+ * change is the day's change ({ kind, value?, from?, to?, caught? }) or null.
+ */
+export function dayInWeek(day, d = new Date()) {
   const w = getWeek();
   if (!w) return null;
-  const day = dayKeyOf(d);
+  const change = weekChangesNow(d)?.days?.[day] || null;
+  if (change && change.kind === "plan") return { day, value: change.value, template: w.templates[change.value] || null, change };
+  if (change && change.kind === "else") return { day, value: null, template: null, change };
+  if (change) return { day, value: "rest", template: null, change };   // moved, little, rest
   const value = w.days[day] || null;
-  return { day, value, template: value && value !== "rest" ? w.templates[value] || null : null };
+  return { day, value, template: value && value !== "rest" ? w.templates[value] || null : null, change: null };
+}
+
+/** What today is for: { day, value: id|"rest"|null, template, change } or null with no week. */
+export function todayInWeek(d = new Date()) {
+  return dayInWeek(dayKeyOf(d), d);
 }
 
 /** { mon: true, ... } for days this week with a finished session. */

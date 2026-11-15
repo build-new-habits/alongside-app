@@ -1,6 +1,12 @@
 /* ============================================================
    components/path.css
-   02 Nov 2026 v13
+   14 Nov 2026 v14
+
+   v14 - P-29 LITTLE-AND-OFTEN and CHANGE-TODAY: under the Today card, the
+   change line with Undo (.path-change*), and Change today as a link; the
+   Little and often list (.path-lao*), built from .path-door; Change today's
+   own screen's choices (.ct-*). Text colour, borders and tokens only, so all
+   three looks hold; Undo is a bordered 44 px button, never colour alone.
 
    v13 - P-26 ONE-BUILD-PAGE: Build a session (.bs-*): Lately, the three
    parts (each in its kind's colour, with its icon and name), a move's row
@@ -491,3 +497,31 @@ body:has(#main-content .plan-back, #main-content .plan-exit) #hidden-nav-home-bt
 .bs-opt__sub { margin-left: calc(22px + var(--space-3)); }
 .path-mv__out { color: var(--color-text); font-weight: 600; }
 
+
+/* P-29. Change today and its Undo, under the Today card. */
+.path-change { display: flex; flex-direction: column; align-items: stretch; gap: var(--space-2); margin-top: calc(-1 * var(--space-1)); }
+.path-change__line {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2);
+  margin: 0; padding: var(--space-1) var(--space-1) var(--space-1) var(--space-3);
+  border: 1.5px solid var(--color-border); border-radius: 12px; background: var(--color-surface);
+}
+.path-change__what { flex: 1 1 10em; font-weight: 700; color: var(--color-text); min-width: 0; overflow-wrap: break-word; }
+.path-change__undo {
+  flex: none; min-height: 44px; min-width: 72px; padding: 0 var(--space-3);
+  border: 2px solid var(--color-text); border-radius: 10px; background: transparent;
+  color: var(--color-text); font: inherit; font-weight: 700; cursor: pointer;
+}
+.path-change__link { align-self: center; padding: 0 var(--space-3); }
+.path-change__undo:focus-visible { outline: 3px solid var(--color-border-focus); outline-offset: 2px; }
+
+/* P-29. Little and often: the person's own short lists, one tap each. */
+.path-lao { display: flex; flex-direction: column; gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
+.path-lao .path-door { width: 100%; }
+.path-lao__done { cursor: default; border-style: dashed; }
+.path-lao__sore { font-size: var(--text-xs); font-weight: 700; color: var(--color-text); line-height: 1.4; }
+.path-lao__all { align-self: flex-start; }
+.path-door__text { min-width: 0; }
+
+/* P-29. Change today's screen: its choices, one per row. */
+.ct-list { margin-top: var(--space-2); }
+.ct-choice { text-align: left; }

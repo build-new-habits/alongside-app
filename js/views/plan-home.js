@@ -1,6 +1,20 @@
 /**
  * views/plan-home.js
- * 05 Nov 2026 v9
+ * 14 Nov 2026 v10
+ *
+ * v10 - P-29 LITTLE-AND-OFTEN and CHANGE-TODAY (mock-up v5 approved by
+ *   Graeme, 14 Nov). Home keeps everything it had, in the same order, and
+ *   gains two things. Under the Today card, Change today (a link to its
+ *   own screen, change-today.js) and, after a change, one line saying what
+ *   happened with Undo beside it ("Swapped with Friday. Undo"); undo also
+ *   puts the other day back. Then Little and often: at most three short
+ *   lists from My exercises the person put on Home, one tap each to play
+ *   (the list's own player warns on a sore day; the row says which area a
+ *   list works), "Done today" once every exercise in one is ticked, and
+ *   All of My exercises. Nothing shows when nothing is chosen. A rest day
+ *   from Change today says what it is (Little and often, a moved session,
+ *   Rest today). Lately shows once today's session is done, or on a day
+ *   without one, so the Today card stays near the top.
  *
  * v9 - P-27 TIDY (Graeme, 05 Nov). Let me choose for you hands Today's plan
  *   the length it promised ("About 30 minutes" built a plan for the usual
@@ -101,7 +115,10 @@ import { arcWeekStartsToday } from "./today.js";   // A-5: "Week n starts today"
 import { getTodaysCheckin } from "../data/checkin.js";
 import { checkinToday, soreToday, lastPlace, prefNames } from "../data/path-context.js";
 import { mixLine, detailLine } from "../data/week-shape-model.js";
-import { todayInWeek, primaryFocus, localDay } from "../data/week-shape.js";
+import { todayInWeek, primaryFocus, localDay, getWeek } from "../data/week-shape.js";
+import { changeLine, undoToday } from "../data/week-changes.js";
+import { homeItems } from "../data/little-and-often.js";
+import { DAY_NAMES } from "../data/week-shape-model.js";
 import { savedForDay, savedById, lastDoneOf } from "../data/saved-sessions.js";
 import { kindOf } from "../data/kind-colours.js";
 import { activityPhrase } from "../data/activity-labels.js";
@@ -255,8 +272,16 @@ function todayCard(state, carry) {
       <p class="path-today__coach">${line}</p>${remember}`);
   }
   if (state === "rest") {
+    const ch = weekToday()?.change;
+    if (ch && ch.kind === "little") return card("rest", "violet", null, `${head("violet", "mobility", "Today", "Little and often")}
+      <p class="path-today__coach">Just the short ones today. That counts.</p>`);
+    if (ch && ch.kind === "moved") {
+      const name = getWeek()?.templates?.[ch.value]?.name || "Your session";
+      return card("rest", "teal", null, `${head("teal", "rest", "Today", "Nothing planned now")}
+      <p class="path-today__coach">${esc(ch.caught ? `You did ${name} on ${DAY_NAMES[ch.to]} instead.` : `${name} is on ${DAY_NAMES[ch.to]} now.`)} Rest counts, or choose something below.</p>`);
+    }
     return card("rest", "teal", null, `${head("teal", "rest", "Today, from your week", "Rest")}
-      <p class="path-today__coach">Today is a rest day in your week. Rest counts.</p>`);
+      <p class="path-today__coach">${ch && ch.kind === "rest" ? "You've made today a rest day." : "Today is a rest day in your week."} Rest counts.</p>`);
   }
   if (state === "planned") {
     const r = plannedToday(), door = savedDoor(r);
@@ -357,6 +382,42 @@ function lately() {
     </div>`;
 }
 
+/**
+ * P-29. Under the Today card: what today's change was, with Undo beside it,
+ * and Change today. Only with a week, and not while a session is carried
+ * on, already done today, or built and saved for today.
+ */
+function changeBar(state) {
+  if (!getWeek() || !["week", "rest", "coach"].includes(state)) return "";
+  const line = changeLine();
+  return `<div class="path-change">
+      ${line ? `<p class="path-change__line"><span class="path-change__what">${esc(line)}</span>
+        <button type="button" class="path-change__undo" data-action="undo-change" aria-label="Undo: ${esc(line)}">Undo</button></p>` : ""}
+      <button type="button" class="path-link path-change__link" data-action="change-today">Change today</button>
+    </div>`;
+}
+
+/** P-29. Little and often: the lists the person put on Home, at most three. */
+function littleAndOften() {
+  const items = homeItems();
+  if (!items.length) return "";
+  const when = { morning: "This morning", evening: "This evening", any: "" };
+  return `<h2 class="look-label" id="path-lao-h">Little and often</h2>
+    <ul class="path-lao" aria-labelledby="path-lao-h">
+      ${items.map(i => {
+        const sub = [`${i.count} exercise${i.count === 1 ? "" : "s"}`, when[i.when]].filter(Boolean).join(" \u00b7 ");
+        const body = `<span class="kind-tile k-violet">${lineIcon(i.done ? "tick" : "mobility")}</span>
+          <span class="path-door__text"><span class="path-door__t">${esc(i.group)}</span>
+            <span class="path-door__d">${esc(i.done ? "Done today" : sub)}</span>
+            ${i.sore && !i.done ? `<span class="path-lao__sore">Works your ${esc(String(i.sore).toLowerCase())}</span>` : ""}</span>`;
+        return i.done ? `<li><div class="path-door path-lao__done">${body}</div></li>`
+          : `<li><button type="button" class="path-door" data-action="lao-start" data-group="${esc(i.group)}">${body}
+          <span class="path-door__chev" aria-hidden="true">${lineIcon("chevron", 20)}</span></button></li>`;
+      }).join("")}
+    </ul>
+    <button type="button" class="path-link path-lao__all" data-action="lao-all">All of My exercises</button>`;
+}
+
 // ── Home ───────────────────────────────────────────────────────────────────
 
 /**
@@ -375,9 +436,11 @@ export function renderPlanHome(ctx = {}) {
       <h1 class="path-greeting" tabindex="-1">${esc(ctx.greeting || "")}</h1>
       ${ctx.coachNote ? `<p class="path-note" role="status">${esc(ctx.coachNote)}</p>` : ""}
       ${arcLine(arc)}
-      ${lately()}
+      ${["week", "planned", "carry"].includes(state) ? "" : lately()}
       ${todayCard(state, ctx.carry)}
-      <h2 class="look-label" id="path-doors-h">${label}</h2>
+      ${changeBar(state)}
+      ${littleAndOften()}
+      <h2 class="look-label" id="path-doors-h" tabindex="-1">${label}</h2>
       <ul class="path-doors" aria-labelledby="path-doors-h">
         ${DOORS.map(d => `<li><button type="button" class="path-door" data-door="${d.id}">
           <span class="kind-tile k-${d.kind}">${lineIcon(d.icon)}</span>
@@ -445,6 +508,26 @@ export function wirePlanHome(container, router) {
     router.navigate("path");
   }));
   container.querySelector('[data-action="path-coach"]')?.addEventListener("click", () => startCoachChoice(router));
+  // P-29. Change today, its Undo, and Little and often.
+  container.querySelector('[data-action="change-today"]')?.addEventListener("click", () => router.navigate("change-today"));
+  container.querySelector('[data-action="undo-change"]')?.addEventListener("click", () => {
+    undoToday();
+    router.homeFocus = "change";
+    router.navigate("today");
+  });
+  container.querySelectorAll('[data-action="lao-start"]').forEach(btn => btn.addEventListener("click", () => {
+    store.set("myExercisesGroup", btn.dataset.group);
+    router.navigate("prescribed-session");
+  }));
+  container.querySelector('[data-action="lao-all"]')?.addEventListener("click", () => router.navigate("prescribed"));
+  // After Change today or Undo, the next thing to read is the change itself.
+  const focus = router.homeFocus;
+  if (focus) {
+    router.homeFocus = null;
+    const el = focus === "doors" ? container.querySelector("#path-doors-h")
+      : container.querySelector('[data-action="undo-change"]') || container.querySelector('[data-action="change-today"]');
+    el?.focus();   // the router keeps focus a view has placed (router.js W4-18)
+  }
 }
 
 /** P-27. Let me choose for you, from anywhere: today's check-in first when
