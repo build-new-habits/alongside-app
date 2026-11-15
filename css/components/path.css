@@ -2,7 +2,7 @@
    components/path.css
    14 Nov 2026 v14
 
-   v14 - P-29 LITTLE-AND-OFTEN and CHANGE-TODAY: under the Today card, the
+   v14 - P-31 LITTLE-AND-OFTEN and CHANGE-TODAY: under the Today card, the
    change line with Undo (.path-change*), and Change today as a link; the
    Little and often list (.path-lao*), built from .path-door; Change today's
    own screen's choices (.ct-*). Text colour, borders and tokens only, so all
@@ -498,7 +498,7 @@ body:has(#main-content .plan-back, #main-content .plan-exit) #hidden-nav-home-bt
 .path-mv__out { color: var(--color-text); font-weight: 600; }
 
 
-/* P-29. Change today and its Undo, under the Today card. */
+/* P-31. Change today and its Undo, under the Today card. */
 .path-change { display: flex; flex-direction: column; align-items: stretch; gap: var(--space-2); margin-top: calc(-1 * var(--space-1)); }
 .path-change__line {
   display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2);
@@ -514,7 +514,7 @@ body:has(#main-content .plan-back, #main-content .plan-exit) #hidden-nav-home-bt
 .path-change__link { align-self: center; padding: 0 var(--space-3); }
 .path-change__undo:focus-visible { outline: 3px solid var(--color-border-focus); outline-offset: 2px; }
 
-/* P-29. Little and often: the person's own short lists, one tap each. */
+/* P-31. Little and often: the person's own short lists, one tap each. */
 .path-lao { display: flex; flex-direction: column; gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
 .path-lao .path-door { width: 100%; }
 .path-lao__done { cursor: default; border-style: dashed; }
@@ -522,6 +522,6 @@ body:has(#main-content .plan-back, #main-content .plan-exit) #hidden-nav-home-bt
 .path-lao__all { align-self: flex-start; }
 .path-door__text { min-width: 0; }
 
-/* P-29. Change today's screen: its choices, one per row. */
+/* P-31. Change today's screen: its choices, one per row. */
 .ct-list { margin-top: var(--space-2); }
 .ct-choice { text-align: left; }

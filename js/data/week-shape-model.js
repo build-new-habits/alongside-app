@@ -2,7 +2,7 @@
  * js/data/week-shape-model.js
  * 14 Nov 2026 v6
  *
- * v6 - P-29 LITTLE-AND-OFTEN and CHANGE-TODAY, schema (Schema v1.125;
+ * v6 - P-31 LITTLE-AND-OFTEN and CHANGE-TODAY, schema (Schema v1.125;
  *   mock-up v5 approved by Graeme, 14 Nov: "Spec and build the code").
  *   Two new shapes, made safe here because this file has no store:
  *   sanitizeOnHome() for myExercisesOnHome (which lists from My exercises
@@ -388,7 +388,7 @@ export function detailLine(t) {
 }
 
 
-// ── P-29. Little and often, and Change today ──────────────────────────
+// ── P-31. Little and often, and Change today ──────────────────────────
 
 /** When a list from My exercises shows on Home (absent: not on Home). */
 export const ON_HOME = ["any", "morning", "evening"];

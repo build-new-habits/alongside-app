@@ -1,9 +1,16 @@
 /**
  * views/change-today.js
- * 14 Nov 2026 v1
+ * 15 Nov 2026 v2
  *
- * P-29 CHANGE-TODAY (mock-up v5 approved by Graeme, 14 Nov: "Spec and build
- * the code"; spec docs/specs/alongside_little-and-often_change-today_14nov2026_v1.md).
+ * v2 - P-31 review (15 Nov). Free is sent to Home rather than shown a
+ *   page about the Plan, as Build a session sends Free to its own screen
+ *   (verify-one-look TEST 4: Free stays as it was). Free never sees the
+ *   link, so this only matters for a stale address.
+ *
+ * v1 - 14 Nov 2026.
+ *
+ * P-31 CHANGE-TODAY (mock-up v5 approved by Graeme, 14 Nov: "Spec and build
+ * the code"; spec docs/specs/alongside_little-and-often_change-today_15nov2026_v2.md).
  * Reached from Change today under the Plan's Today card.
  *
  * Screens, one at a time, each with its own h1 that takes focus:
@@ -90,17 +97,9 @@ export function ChangeTodayView(router) {
 
   function render() {
     if (!root) return;
-    if (!isPremium()) {
-      root.innerHTML = `<div class="view yw-view">
-        ${header("home")}
-        <h1 class="yw-title" tabindex="-1">Change today</h1>
-        <p class="yw-sub">Changing a day of your week is part of the Plan.</p>
-        <button class="btn btn-primary btn-large btn-full" data-route-to="upgrade">See the Plan</button>
-      </div>`;
-    } else {
-      const body = screen === "another" ? another() : screen === "catch" ? catchUp() : menu();
-      root.innerHTML = `<div class="view yw-view">${body}</div>`;
-    }
+    if (!isPremium()) { router.navigate("today", { replace: true }); return; }
+    const body = screen === "another" ? another() : screen === "catch" ? catchUp() : menu();
+    root.innerHTML = `<div class="view yw-view">${body}</div>`;
     wire();
     root.querySelector(".yw-title")?.focus?.({ preventScroll: true });
   }
@@ -116,7 +115,6 @@ export function ChangeTodayView(router) {
       if (b.dataset.back === "home") router.navigate("today");
       else { screen = b.dataset.back; render(); }
     }));
-    $$("[data-route-to]").forEach(b => b.addEventListener("click", () => router.navigate(b.dataset.routeTo)));
     $$("[data-go]").forEach(b => b.addEventListener("click", () => { screen = b.dataset.go; render(); }));
     $$("[data-day]").forEach(b => b.addEventListener("click", () => { if (doAnotherDay(b.dataset.day)) home(); }));
     $$("[data-catch]").forEach(b => b.addEventListener("click", () => { if (doCatchUp(b.dataset.catch)) home(); }));

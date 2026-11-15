@@ -1,6 +1,12 @@
 /**
  * prescribed-session.js - My exercises, played
  *
+ * 15 Nov 2026 v18
+ *
+ * v18 - P-31 (review, 15 Nov). _checkContraindication() reads the shared
+ *   rule in data/sore-rule.js, so Home's Little and often names the same
+ *   sore area this player warns about. Behaviour unchanged.
+ *
  * 31 Oct 2026 v17
  *
  * v17 - STAGE PATH Session 9 (CLOSE; P-12 F4, F5; Graeme, 31 Oct: "Exit in a
@@ -191,8 +197,8 @@ import { isGateDue, renderSafetyGate, attachSafetyGate } from "../safety-gate.js
 import { resolveTiming, formatTime } from "../exercise-timing.js";
 import { renderLogBlock, attachLogEvents, scrollToTop, lastLine } from "../session-log.js";
 import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
-import { getActiveConditionIds, getConditionName } from "../data/conditions.js";
 import { EXERCISES } from "../data/exercises/index.js";
+import { soreConditionFor } from "../data/sore-rule.js";
 
 /** BUNDLE-TRUE. Text the person typed (or a file brought) is text, never markup. */
 function _esc(s) {
@@ -240,19 +246,8 @@ let currentCardPage = "decide";
 // added ones via "Build my own" have no database record to check
 // against and are correctly left alone, not false-flagged.
 function _checkContraindication(ex) {
-  if (!ex.exerciseId) return null;
-  const fullEx = EXERCISES.find(e => e.id === ex.exerciseId);
-  if (!fullEx || !fullEx.contraindications?.length) return null;
-
-  const conditions   = store.get("conditions") || [];
-  const painScores    = store.get("conditionPainScores") || {};
-  const activeIds     = getActiveConditionIds(conditions, painScores);
-
-  const hit = fullEx.contraindications.find(c => activeIds.includes(c));
-  if (!hit) return null;
-
-  const baseConditionId = hit.replace(/-acute$|-subacute$/, "");
-  return { conditionName: getConditionName(baseConditionId) };
+  // P-31 (15 Nov): the rule now lives in data/sore-rule.js, shared with Home's Little and often.
+  return soreConditionFor(ex);
 }
 
 /** D-7. Today's list: not yet done, in the chosen group if there is one. */

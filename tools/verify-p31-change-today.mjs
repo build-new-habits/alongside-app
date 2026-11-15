@@ -1,9 +1,20 @@
 /**
- * tools/verify-p29-change-today.mjs
- * 14 Nov 2026 v1
+ * tools/verify-p31-change-today.mjs
+ * 15 Nov 2026 v2
  *
- * P-29 LITTLE-AND-OFTEN and CHANGE-TODAY (spec
- * docs/specs/alongside_little-and-often_change-today_14nov2026_v1.md).
+ * v2 - P-31 review (15 Nov). 8g: Free is sent Home (as Build a session
+ *   does), not shown a page. 9a: On Home's label names its list for a
+ *   screen reader. New TEST 10, the review's rules: Undo never puts a
+ *   session on a day that has passed; a session moved to a later day stays
+ *   there when today becomes something else, and Undo brings back "Moved
+ *   to"; "Swapped with" only for a real swap; Home shows no Undo when it
+ *   cannot be done; the sore rule is the player's own (one shared file);
+ *   the status line with more than three lists on Home.
+ *
+ * v1 - 14 Nov 2026.
+ *
+ * P-31 LITTLE-AND-OFTEN and CHANGE-TODAY (spec
+ * docs/specs/alongside_little-and-often_change-today_15nov2026_v2.md).
  *
  *   1  Schema: myExercisesOnHome and weekChanges made safe on load; an
  *      earlier week's changes load as null; Your week is never changed.
@@ -20,8 +31,9 @@
  *      row; Lately waits; Free unchanged.
  *   8  Change today's screen: its choices, and each one writes the change.
  *   9  My exercises: On Home (one labelled choice) on the Plan; not on Free.
+ *  10  The review's rules (v2).
  *
- *   node tools/verify-p29-change-today.mjs
+ *   node tools/verify-p31-change-today.mjs
  */
 import { createRequire as __cr } from "node:module";
 const __require = __cr(import.meta.url);
@@ -233,8 +245,8 @@ ok("8e. Which day instead? with each day's outcome", txt(main.querySelector("h1"
   [...main.querySelectorAll(".ct-choice .path-door__d")].every(d => /^(Swaps with Session|Rest day · moves here)/.test(txt(d))), txt(main));
 const back = main.querySelector("[data-back='menu']"); click(back);
 ok("8f. ‹ Back returns to the menu", txt(main.querySelector("h1")) === "Change today");
-fixture({ tier: "free" }); todayIsSession(); ct.mount(main);
-ok("8g. Free: part of the Plan", /part of the Plan/.test(txt(main)) && !main.querySelector(".ct-choice"));
+fixture({ tier: "free" }); todayIsSession(); navs = []; main.innerHTML = ""; ct.mount(main);
+ok("8g. Free: sent Home, nothing drawn", navs.includes("today") && !main.querySelector(".ct-choice, h1"), JSON.stringify(navs));
 
 console.log("\nTEST 9 - My exercises: On Home");
 fixture();
@@ -243,7 +255,8 @@ main.innerHTML = prescribed.render(); prescribed.onMount?.();
 const sel = () => main.querySelector("select[data-px-onhome]");
 ok("9a. one labelled choice: Not on Home, Any time, Mornings, Evenings; Not on Home chosen",
   !!sel() && [...sel().options].map(o => o.text).join("|") === "Not on Home|Any time|Mornings|Evenings" && sel().value === "off" &&
-  txt(main.querySelector(`label[for="${sel()?.id}"]`)) === "On Home");
+  txt(main.querySelector(`label[for="${sel()?.id}"]`)) === "On Home: Kettle" &&
+  txt(main.querySelector(`label[for="${sel()?.id}"] .sr-only`)) === ": Kettle");
 sel().focus(); sel().value = "morning"; sel().dispatchEvent(new dom.window.Event("change", { bubbles: true }));
 ok("9b. Mornings: saved, focus kept, said", store.get("myExercisesOnHome").Kettle === "morning" &&
   document.activeElement === sel() && /on Home, mornings/.test(txt(main.querySelector("#px-onhome-status"))));
@@ -251,6 +264,67 @@ fixture({ tier: "free" });
 store.set("prescribedExercises", [{ id: "1", name: "Hip circles", sets: 1, reps: "8", group: "Kettle" }]);
 main.innerHTML = prescribed.render(); prescribed.onMount?.();
 ok("9c. Free: no On Home", !sel());
+
+console.log("\nTEST 10 - the review's rules (15 Nov)");
+fixture();
+{
+  // Undo never puts a session back on a day that has passed.
+  WC.doAnotherDay("fri", D.wed);   // Wednesday's Session B moves to Friday (a session day: a swap)
+  ok("10a. the swap's later day says what happened", WC.changeLine(D.fri) === "Swapped with Wednesday.", WC.changeLine(D.fri));
+  ok("10b. on that later day, no Undo (Wednesday has passed)", !WC.canUndoToday(D.fri) && !WC.undoToday(D.fri) && WS.dayInWeek("wed", D.fri).change?.kind === "plan");
+  ok("10c. on the day itself, Undo is there", WC.canUndoToday(D.wed) && WC.undoToday(D.wed) && store.get("weekChanges") === null);
+  WC.doAnotherDay("thu", D.wed);   // a move to a rest day
+  ok("10d. a move's later day: no Undo, the session stays", !WC.canUndoToday(D.thu) && WS.dayInWeek("thu", D.thu).template?.id === "s-b");
+  ok("10e. Rest today on that later day leaves Wednesday as it was", WC.setToday("rest", D.thu) && WS.dayInWeek("wed", D.thu).change?.kind === "moved");
+}
+fixture();
+{
+  // A session moved to a later day stays there when today becomes something else.
+  WC.doAnotherDay("thu", D.wed);
+  ok("10f. Little and often instead on the moved day keeps the session on Thursday",
+    WC.setToday("little", D.wed) && WS.dayInWeek("thu", D.wed).template?.id === "s-b" && WC.changeLine(D.thu) === "Moved from Wednesday.", WC.changeLine(D.thu));
+  ok("10g. Undo then brings back Moved to Thursday., never the session twice",
+    WC.undoToday(D.wed) && WC.changeLine(D.wed) === "Moved to Thursday." && WS.todayInWeek(D.wed).template === null && WS.dayInWeek("thu", D.wed).template?.id === "s-b", WC.changeLine(D.wed));
+  ok("10h. Catch up on the moved day keeps the move too",
+    WC.doCatchUp("mon", D.wed) && WS.todayInWeek(D.wed).template?.id === "s-a" && WS.dayInWeek("thu", D.wed).template?.id === "s-b");
+  ok("10i. and Thursday still says Moved from, not Swapped with", WC.changeLine(D.thu) === "Moved from Wednesday.", WC.changeLine(D.thu));
+  ok("10j. a catch-up can be undone (its other day was already missed)", WC.canUndoToday(D.wed) && WC.undoToday(D.wed) && !WS.dayInWeek("mon", D.wed).change && WC.changeLine(D.wed) === "Moved to Thursday.", WC.changeLine(D.wed));
+}
+{
+  // Home: the line without Undo when it cannot be done.
+  fixture();
+  const di = WM.DAY_KEYS.indexOf(dayToday);
+  if (di > 0) {
+    const earlier = WM.DAY_KEYS[di - 1];
+    const days = Object.fromEntries(WM.DAY_KEYS.map(k => [k, "rest"])); days[earlier] = "s-a";
+    store.set("weekShape", WM.sanitizeWeekShape({ templates: { "s-a": T("s-a") }, days, setAt: "2026-11-01" }));
+    store.set("weekChanges", { week: WM.mondayOf(new Date()), days: { [earlier]: { kind: "moved", value: "s-a", to: dayToday }, [dayToday]: { kind: "plan", value: "s-a", from: earlier } } });
+    home();
+    ok("10k. Home: the line stays, no Undo, when the other day has passed",
+      /Moved from/.test(txt(main.querySelector(".path-change__line"))) && !main.querySelector("[data-action='undo-change']"), txt(main.querySelector(".path-change")));
+  } else ok("10k. (Monday: no earlier day; skipped)", true);
+}
+{
+  // One sore rule: the player's and Home's are the same file.
+  const fs = await import("node:fs");
+  const lo = fs.readFileSync(new URL("../js/data/little-and-often.js", import.meta.url), "utf8");
+  const ps = fs.readFileSync(new URL("../js/views/prescribed-session.js", import.meta.url), "utf8");
+  ok("10l. Home and the player read one sore rule (data/sore-rule.js)",
+    /from "\.\/sore-rule\.js"/.test(lo) && /from "\.\.\/data\/sore-rule\.js"/.test(ps) && !/getActiveConditionIds/.test(lo));
+  ok("10m. canChangeToday is gone (it was unused and did not do what it said)", !("canChangeToday" in WC));
+}
+fixture();
+{
+  // More than three lists on Home: the status line says Home shows up to three.
+  const names = ["A", "B", "C", "D"];
+  store.set("prescribedExercises", names.map(n => ({ id: n, name: "Move " + n, sets: 1, reps: "8", group: n })));
+  ["A", "B", "C"].forEach(n => LO.setOnHome(n, "any"));
+  main.innerHTML = prescribed.render(); prescribed.onMount?.();
+  const d = main.querySelector('select[data-px-onhome="D"]');
+  d.value = "any"; d.dispatchEvent(new dom.window.Event("change", { bubbles: true }));
+  ok("10n. a fourth list: the status says Home shows up to three at a time",
+    /D is on Home, any time\. Home shows up to three at a time\./.test(txt(main.querySelector("#px-onhome-status"))), txt(main.querySelector("#px-onhome-status")));
+}
 
 console.log(`\n${passes} passed, ${fails} failed`);
 process.exit(fails ? 1 : 0);

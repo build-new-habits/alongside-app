@@ -8,7 +8,7 @@ import { validateWeightTarget } from "./data/weight-targets.js";
  * store.js - Data persistence layer
  * 14 Nov 2026 v124
  *
- * v124 - P-29 LITTLE-AND-OFTEN and CHANGE-TODAY (Schema v1.125; mock-up v5
+ * v124 - P-31 LITTLE-AND-OFTEN and CHANGE-TODAY (Schema v1.125; mock-up v5
  *   approved by Graeme, 14 Nov). Two additions, nothing removed, Plan only.
  *   myExercisesOnHome ({ "<list name>": "any"|"morning"|"evening" }, default
  *   {}): which lists from My exercises show on Home under Little and often,
@@ -1753,7 +1753,7 @@ export const store = {
       // cleared by the plan.
       weekShape: null,
       weekDayRequest: null,
-      // P-29. Little and often's choices, and this week's changes (Change today).
+      // P-31. Little and often's choices, and this week's changes (Change today).
       myExercisesOnHome: {},
       weekChanges: null,
 
@@ -1783,7 +1783,7 @@ export const store = {
       // D-6. Made safe on every load: a malformed week is dropped, never coerced.
       weekShape: sanitizeWeekShape(saved.weekShape),
       weekDayRequest: sanitizeWeekDayRequest(saved.weekDayRequest),
-      // P-29. Made safe on every load; an earlier week's changes load as null.
+      // P-31. Made safe on every load; an earlier week's changes load as null.
       myExercisesOnHome: sanitizeOnHome(saved.myExercisesOnHome),
       weekChanges: sanitizeWeekChanges(saved.weekChanges, sanitizeWeekShape(saved.weekShape)),
       myExercisesGroup: typeof saved.myExercisesGroup === "string" && saved.myExercisesGroup.trim()

@@ -1,9 +1,16 @@
 /**
  * prescribed.js - My exercises
  *
- * 14 Nov 2026 v1.13
+ * 15 Nov 2026 v1.14
  *
- * v1.13 - P-29 LITTLE-AND-OFTEN (mock-up v5 approved by Graeme, 14 Nov). On
+ * v1.14 - P-31 review (15 Nov). On Home's label carries the list's name as
+ *   hidden text ("On Home: Kettle stretch"), so a screen reader moving
+ *   between the choices hears which list each one is for (WCAG 2.4.6;
+ *   the visible "On Home" still starts the name, 2.5.3). With more than
+ *   three lists on Home, the status line says Home shows up to three at a
+ *   time, so a fourth is not promised.
+ *
+ * v1.13 - P-31 LITTLE-AND-OFTEN (mock-up v5 approved by Graeme, 14 Nov). On
  *   the Plan, each named list has On Home, one labelled choice (a select,
  *   one row, so My exercises grows by one line a list): Not on Home, Any
  *   time, Mornings, Evenings (data/little-and-often.js). A list on Home
@@ -130,7 +137,7 @@
 
 import { store } from "../store.js";
 import { planLook } from "../plan-look.js";
-import { ON_HOME_CHOICES, onHomeFor, setOnHome } from "../data/little-and-often.js";
+import { ON_HOME_CHOICES, onHomeFor, setOnHome, onHomeCount, MAX_ON_HOME_SHOWN } from "../data/little-and-often.js";
 import { healthAllowed } from "../data/health-consent.js";
 
 export const centered = false;
@@ -328,11 +335,11 @@ function renderGroups(active) {
     </section>`).join("") + (planLook() ? `<p class="sr-only" role="status" id="px-onhome-status"></p>` : "");
 }
 
-/** P-29. On Home: whether this list shows on Home under Little and often, and when. */
+/** P-31. On Home: whether this list shows on Home under Little and often, and when. */
 function renderOnHome(name, gi) {
   const now = onHomeFor(name);
   return `<div class="px-onhome">
-      <label class="px-onhome__label" for="px-onhome-${gi}">On Home</label>
+      <label class="px-onhome__label" for="px-onhome-${gi}">On Home<span class="sr-only">: ${_esc(name)}</span></label>
       <select class="px-onhome__select" id="px-onhome-${gi}" data-px-onhome="${_esc(name)}">
         ${ON_HOME_CHOICES.map(c => `<option value="${c.id}"${now === c.id ? " selected" : ""}>${c.label}</option>`).join("")}
       </select>
@@ -577,13 +584,14 @@ export function onMount() {
     router.navigate("prescribed-session");
   }));
   document.getElementById("px-import-btn")?.addEventListener("click", () => router.navigate("plan-import"));
-  // P-29. On Home: one choice per list, saved as it changes; focus stays on it.
+  // P-31. On Home: one choice per list, saved as it changes; focus stays on it.
   document.querySelectorAll("[data-px-onhome]").forEach(sel => sel.addEventListener("change", () => {
     const name = sel.dataset.pxOnhome;
     setOnHome(name, sel.value);
     const label = sel.options[sel.selectedIndex]?.text || "";
     const status = document.getElementById("px-onhome-status");
-    if (status) status.textContent = sel.value === "off" ? `${name} is not on Home.` : `${name} is on Home, ${label.toLowerCase()}.`;
+    const more = sel.value !== "off" && onHomeCount() > MAX_ON_HOME_SHOWN ? " Home shows up to three at a time." : "";
+    if (status) status.textContent = sel.value === "off" ? `${name} is not on Home.` : `${name} is on Home, ${label.toLowerCase()}.${more}`;
   }));
 
   // ── Toggle add form ───────────────────────────────────────────────────────

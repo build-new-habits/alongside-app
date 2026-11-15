@@ -1,7 +1,7 @@
 # Alongside: Move — Glossary
 ## 14 Nov 2026 v5
 
-v5 - P-29 (Graeme, 14 Nov: "new words go in the glossary"). Little and often, On Home and its four choices, Change today and its five choices.
+v5 - P-31 (Graeme, 14 Nov: "new words go in the glossary"). Little and often, On Home and its four choices, Change today and its five choices.
 
 A-9 ONE-NAME (Stage AWARD). One name for each thing, across the app, the website and the policies. A screen, a page or a policy that names one of these uses the name in the **Use** column. Names in **Not** are retired or wrong for it; `tools/verify-one-name.mjs` fails if a retired one reaches a string in `js/`.
 
@@ -31,10 +31,10 @@ Taken from the words on every screen (`node tools/chromium-words.mjs`, 95 screen
 | A movement somebody loved | **Loved it** | Like, thumbs up, favourite | Stored as `likedMovements` |
 | A movement somebody would rather have less of | **Less often** | Not a fan, skip (as a name) | One store record with Skip's: `exercisePreferences` `'less'` |
 | A movement somebody never wants again | **Not again** | Never show me this | Decision 2, settled. Settings › How you like things says it and undoes it. One store record: `exercisePreferences` `'avoid'` |
-| The Plan Home row of short lists from My exercises | **Little and often** | snack, routine (as its name) | P-29. "Snack" stays the word for the trend's 10-minute snack (P-20); a person's own list may be called anything |
-| The choice on a list in My exercises | **On Home**: **Not on Home**, **Any time**, **Mornings**, **Evenings** | Pin, Show on Home | P-29. Store: `myExercisesOnHome` |
-| The link under the Today card, and its screen | **Change today** | Edit today, Swap day | P-29. This week only; Your week stays as planned. Store: `weekChanges` |
-| Change today's choices | **Do it another day**, **Catch up**, **Little and often instead**, **Rest today**, **Something else** | Swap or Move as choices | P-29. *Which day instead?* says per day "Swaps with …" or "Rest day · moves here". Home's line after a change has **Undo** |
+| The Plan Home row of short lists from My exercises | **Little and often** | snack, routine (as its name) | P-31. "Snack" stays the word for the trend's 10-minute snack (P-20); a person's own list may be called anything |
+| The choice on a list in My exercises | **On Home**: **Not on Home**, **Any time**, **Mornings**, **Evenings** | Pin, Show on Home | P-31. Store: `myExercisesOnHome` |
+| The link under the Today card, and its screen | **Change today** | Edit today, Swap day | P-31. This week only; Your week stays as planned. Store: `weekChanges` |
+| Change today's choices | **Do it another day**, **Catch up**, **Little and often instead**, **Rest today**, **Something else** | Swap or Move as choices | P-31. *Which day instead?* says per day "Swaps with …" or "Rest day · moves here". Home's line after a change has **Undo** |
 
 ## Decided
 

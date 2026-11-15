@@ -3,7 +3,7 @@ import { createRequire as __cr } from "node:module";
  * tools/verify-plan-home-path.mjs
  * 14 Nov 2026 v4
  *
- * v4 - P-29 (Graeme, 14 Nov: "Count Change today with the Today card").
+ * v4 - P-31 (Graeme, 14 Nov: "Count Change today with the Today card").
  *   Test 2's six ways in leaves out Change today and its Undo (.path-change,
  *   part of the Today card) and Little and often (.path-lao, the person's
  *   own choice). Nothing else loosened.
@@ -113,7 +113,7 @@ function fixture({ tier = "personal", arc = true, choice = undefined, checkin = 
   navs = []; delete fakeRouter.pathStart;
 }
 function home() { main.innerHTML = ""; TodayView(fakeRouter).mount(main); }
-// P-29 (Graeme, 14 Nov): Change today and its Undo count with the Today card; Little and often is the person's own choice.
+// P-31 (Graeme, 14 Nov): Change today and its Undo count with the Today card; Little and often is the person's own choice.
 const waysIn = () => [...main.querySelectorAll("button, a[href], [role=button]")].filter(b => !b.closest(".scope-notice, .today-hinge, .path-change, .path-lao") && !b.matches(".path-lao__all"));
 const card = () => main.querySelector(".path-today");
 const lead = () => main.querySelector(".path-coach, .path-today");

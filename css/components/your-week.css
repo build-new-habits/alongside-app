@@ -1,7 +1,7 @@
 /* css/components/your-week.css
  * 14 Nov 2026 v5
  *
- * v5 - P-29 LITTLE-AND-OFTEN: On Home under each list in My exercises
+ * v5 - P-31 LITTLE-AND-OFTEN: On Home under each list in My exercises
  *   (.px-onhome): a label and one select, in one row.
  *
  * v4 - P-21 (found by chromium-trends v5, and on v700 before P-21: a fault,
@@ -221,7 +221,7 @@ button.yw-way:hover { background: var(--color-bg-hover); }
 .prescribed-group__name { margin: 0; font-size: var(--text-lg, 1.125rem); font-weight: 700; color: var(--color-text); }
 .prescribed-group__start { min-height: 48px; height: auto; white-space: normal; }
 
-/* P-29. On Home, under a list in My exercises: one row, a label and a choice. */
+/* P-31. On Home, under a list in My exercises: one row, a label and a choice. */
 .px-onhome { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-3); margin-top: var(--space-3); }
 .px-onhome__label { margin: 0; font-size: var(--text-sm, 0.9375rem); font-weight: 700; color: var(--color-text); }
 .px-onhome__select {

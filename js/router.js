@@ -2,7 +2,7 @@
  * router.js
  * 14 Nov 2026 v55
  *
- * v55 - P-29 CHANGE-TODAY. 'change-today' (Change today, the Plan),
+ * v55 - P-31 CHANGE-TODAY. 'change-today' (Change today, the Plan),
  *   reached from under Home's Today card; its tab is Home's.
  *
  * v54 - P-28 S4 GUIDE ME. New route 'guide-me' (views/guide-me.js): a

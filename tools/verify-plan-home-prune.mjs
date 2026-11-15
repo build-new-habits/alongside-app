@@ -2,7 +2,7 @@
  * tools/verify-plan-home-prune.mjs
  * 14 Nov 2026 v4
  *
- * v4 - P-29 (Graeme, 14 Nov: "Count Change today with the Today card").
+ * v4 - P-31 (Graeme, 14 Nov: "Count Change today with the Today card").
  *   Six ways in still holds. Change today and its Undo (.path-change) are
  *   part of the Today card, and Little and often (.path-lao, All of My
  *   exercises) is what the person chose to put on Home, so neither is
@@ -108,7 +108,7 @@ function fixture({ tier = "personal", week = null, arc = true } = {}) {
 function home() { main.innerHTML = ""; TodayView(fakeRouter).mount(main); }
 // Ways in: anything on Home's own content that can be pressed (the bottom
 // navigation is in index.html, not here).
-// P-29 (Graeme, 14 Nov): Change today and its Undo count with the Today card; Little and often is the person's own choice.
+// P-31 (Graeme, 14 Nov): Change today and its Undo count with the Today card; Little and often is the person's own choice.
 const waysIn = () => [...main.querySelectorAll("button, a[href], [role=button]")].filter(b => !b.closest(".today-scope, .scope-notice, .path-change, .path-lao") && !b.matches(".path-lao__all"));
 const card = () => main.querySelector(".home-week, .home-today");
 const doorActions = () => [...main.querySelectorAll(".home-doors .home-door")].map(d => d.dataset.action);

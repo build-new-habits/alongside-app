@@ -1,8 +1,12 @@
 /**
  * views/plan-home.js
- * 14 Nov 2026 v10
+ * 15 Nov 2026 v10
  *
- * v10 - P-29 LITTLE-AND-OFTEN and CHANGE-TODAY (mock-up v5 approved by
+ * v10 review (15 Nov): Undo shows only when it can be done safely
+ *   (week-changes.js canUndoToday: never onto a day that has passed); the
+ *   line saying what happened stays either way.
+ *
+ * v10 - P-31 LITTLE-AND-OFTEN and CHANGE-TODAY (mock-up v5 approved by
  *   Graeme, 14 Nov). Home keeps everything it had, in the same order, and
  *   gains two things. Under the Today card, Change today (a link to its
  *   own screen, change-today.js) and, after a change, one line saying what
@@ -116,7 +120,7 @@ import { getTodaysCheckin } from "../data/checkin.js";
 import { checkinToday, soreToday, lastPlace, prefNames } from "../data/path-context.js";
 import { mixLine, detailLine } from "../data/week-shape-model.js";
 import { todayInWeek, primaryFocus, localDay, getWeek } from "../data/week-shape.js";
-import { changeLine, undoToday } from "../data/week-changes.js";
+import { changeLine, undoToday, canUndoToday } from "../data/week-changes.js";
 import { homeItems } from "../data/little-and-often.js";
 import { DAY_NAMES } from "../data/week-shape-model.js";
 import { savedForDay, savedById, lastDoneOf } from "../data/saved-sessions.js";
@@ -383,21 +387,22 @@ function lately() {
 }
 
 /**
- * P-29. Under the Today card: what today's change was, with Undo beside it,
+ * P-31. Under the Today card: what today's change was, with Undo beside it,
  * and Change today. Only with a week, and not while a session is carried
  * on, already done today, or built and saved for today.
  */
 function changeBar(state) {
   if (!getWeek() || !["week", "rest", "coach"].includes(state)) return "";
   const line = changeLine();
+  const undo = line && canUndoToday()
+    ? `<button type="button" class="path-change__undo" data-action="undo-change" aria-label="Undo: ${esc(line)}">Undo</button>` : "";
   return `<div class="path-change">
-      ${line ? `<p class="path-change__line"><span class="path-change__what">${esc(line)}</span>
-        <button type="button" class="path-change__undo" data-action="undo-change" aria-label="Undo: ${esc(line)}">Undo</button></p>` : ""}
+      ${line ? `<p class="path-change__line"><span class="path-change__what">${esc(line)}</span>${undo}</p>` : ""}
       <button type="button" class="path-link path-change__link" data-action="change-today">Change today</button>
     </div>`;
 }
 
-/** P-29. Little and often: the lists the person put on Home, at most three. */
+/** P-31. Little and often: the lists the person put on Home, at most three. */
 function littleAndOften() {
   const items = homeItems();
   if (!items.length) return "";
@@ -508,7 +513,7 @@ export function wirePlanHome(container, router) {
     router.navigate("path");
   }));
   container.querySelector('[data-action="path-coach"]')?.addEventListener("click", () => startCoachChoice(router));
-  // P-29. Change today, its Undo, and Little and often.
+  // P-31. Change today, its Undo, and Little and often.
   container.querySelector('[data-action="change-today"]')?.addEventListener("click", () => router.navigate("change-today"));
   container.querySelector('[data-action="undo-change"]')?.addEventListener("click", () => {
     undoToday();

@@ -1,7 +1,11 @@
 import { createRequire as __cr } from "node:module";
 /**
  * tools/verify-one-look.mjs
- * 06 Nov 2026 v9
+ * 15 Nov 2026 v10
+ *
+ * v10 - P-31 (review, 15 Nov). TEST 4: Change today is new since v688 and
+ *   the Plan's only, so it joins Build a session in NEW_PLAN_ONLY: Free is
+ *   sent to its own screen. Nothing else loosened.
  *
  * v9 - P-28 S3. In Step is a programme: 3m opens the next episode (it
  *   opened a movement's scenario) and checks it as a practice that runs:
@@ -266,7 +270,7 @@ function onlyMindfulAdded(a, b) {
 }
 console.log("\nTEST 4 - Free, as it was on alongside-v688");
 const V688 = "79799cb";
-const NEW_PLAN_ONLY = ["build-session"];   // v8 (P-26)
+const NEW_PLAN_ONLY = ["build-session", "change-today"];   // v8 (P-26); P-31 (15 Nov): Change today
 const touched = execSync(`git -C "${ROOT}" diff --name-only ${V688} -- js/views`, { encoding: "utf8" }).split("\n").filter(f => /^js\/views\/[a-z-]+\.js$/.test(f));
 ok("4pc. the files this session touched are found from git", touched.length >= 20, touched.join(", "));
 const fnOf = Object.fromEntries([...table.matchAll(/'([a-z0-9/-]+)'\s*:\s*\{\s*path:\s*'\.\/views\/([a-z-]+)\.js',\s*fn:\s*'(\w+)'/g)].map(m => [m[2], { route: m[1], fn: m[3] }]));

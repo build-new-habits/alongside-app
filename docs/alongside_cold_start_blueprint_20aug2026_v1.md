@@ -77,7 +77,7 @@ git clone --depth 1 https://x-access-token:$TOKEN@github.com/build-new-habits/al
 | `sw.js` | **v715**, cache `alongside-v715` |
 | `router.js` | v48 · `my-programme.js` v8 · `today.js` v49 · `settings.js` v46 · `progress.js` v27 · `onboarding/thread.js` v16 |
 | `exercise-card.js` | **v7** — CARD-4, four pages. `workout.css` v16 |
-| Gates | **360** on jsdom 28.1.0 (`npm ci`) — from the repo root. See the cwd row in §9. P-29 (14 Nov) added `verify-p29-change-today`. Run from a shallow clone without `../bnh-files` or the website, 12 fail before and after P-29 for that reason alone (they read the private repository, the website, or older versions from git history) |
+| Gates | **360** on jsdom 28.1.0 (`npm ci`) — from the repo root. See the cwd row in §9. P-31 (14 Nov) added `verify-p31-change-today`. Run from a shallow clone without `../bnh-files` or the website, 12 fail before and after P-31 for that reason alone (they read the private repository, the website, or older versions from git history) |
 
 🟢 **This table is now GATED.** `tools/verify-blueprint.mjs` compares every version above against the file that carries it and goes red on any drift, naming the row to change.
 

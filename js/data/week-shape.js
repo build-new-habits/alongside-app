@@ -2,7 +2,7 @@
  * js/data/week-shape.js
  * 14 Nov 2026 v4
  *
- * v4 - P-29 CHANGE-TODAY. What a day is for now includes this week's
+ * v4 - P-31 CHANGE-TODAY. What a day is for now includes this week's
  *   change from Change today (weekChanges, week-shape-model.js v6):
  *   dayInWeek() reads any day of this week with its change applied, and
  *   todayInWeek() is today's. So Home, the coach's plan (askForToday,
@@ -86,13 +86,13 @@ export function weekDates(d = new Date()) {
 
 export function getWeek() { return store.get("weekShape") || null; }
 
-/** P-29. This week's changes from Change today ({ week, days }), or null. An earlier week's read as none. */
+/** P-31. This week's changes from Change today ({ week, days }), or null. An earlier week's read as none. */
 export function weekChangesNow(d = new Date()) {
   return sanitizeWeekChanges(store.get("weekChanges"), getWeek(), d);
 }
 
 /**
- * P-29. What a day of this week is for, with this week's change applied:
+ * P-31. What a day of this week is for, with this week's change applied:
  * { day, value: id|"rest"|null, template, change } or null with no week.
  * change is the day's change ({ kind, value?, from?, to?, caught? }) or null.
  */

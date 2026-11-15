@@ -1,9 +1,25 @@
 /**
  * js/data/week-changes.js
- * 14 Nov 2026 v1
+ * 15 Nov 2026 v2
  *
- * P-29 CHANGE-TODAY (mock-up v5 approved by Graeme, 14 Nov: "Spec and build
- * the code"; spec docs/specs/alongside_little-and-often_change-today_14nov2026_v1.md).
+ * v2 - P-31 review (15 Nov), three rules made safe:
+ *   1. Undo never puts a session back on a day that has passed. On the
+ *      later day of a swap or a move, Home still says what happened, with
+ *      no Undo (canUndoToday). A catch-up can always be undone: its other
+ *      day is the earlier one it was missed on, so nothing is lost.
+ *   2. On a day whose session moved to a later day, choosing Little and
+ *      often, Rest today, Something else or Catch up leaves the session on
+ *      that later day (it was being undone without a word). Undo then puts
+ *      today back to "Moved to Friday.", not to the session itself, so the
+ *      week never holds it twice.
+ *   3. "Swapped with" is said only when the other day plays today's plan.
+ *   canChangeToday() removed: nothing used it, and it did not check what
+ *   its comment said.
+ *
+ * v1 - 14 Nov 2026.
+ *
+ * P-31 CHANGE-TODAY (mock-up v5 approved by Graeme, 14 Nov: "Spec and build
+ * the code"; spec docs/specs/alongside_little-and-often_change-today_15nov2026_v2.md).
  *
  * Change today, on the Plan's Today card: what today can become, and the
  * rules that keep it simple and kind. Every change is this week's only
@@ -22,6 +38,7 @@
  *   doAnotherDay(day)    swap or move today's session to that day
  *   doCatchUp(day)       play that earlier day's session today
  *   setToday(kind)       little | rest | else (Something else)
+ *   canUndoToday()       whether Undo shows (never onto a day that has passed)
  *   undoToday()          today back as planned, and the other day too
  *   changeLine()         what Home says about today's change, or ""
  *
@@ -43,19 +60,33 @@ function write(days, d) {
   store.set("weekChanges", Object.keys(days).length ? { week: mondayOf(d), days } : null);
 }
 
-/** Today's change removed, with the other day it was tied to. */
-function dropDay(days, day) {
+/**
+ * The day a change is tied to, if it should be undone with it: only when it
+ * plays or gave up this day's plan, and never a day that has passed, except
+ * a catch-up's earlier day (missed already, so putting it back loses
+ * nothing). keepMoved: a day whose session moved keeps the move.
+ */
+function tiedDay(days, day, keepMoved = false) {
   const ch = days[day];
-  if (!ch) return days;
+  if (!ch) return null;
   const other = ch.from || ch.to;
-  if (other && days[other] && (days[other].from === day || days[other].to === day)) delete days[other];
+  if (!other || !days[other] || (days[other].from !== day && days[other].to !== day)) return null;
+  if (keepMoved && ch.kind === "moved") return null;
+  return ch.caught || at(other) > at(day) ? other : null;
+}
+
+/** This day's change removed, with the day it is tied to (tiedDay). */
+function dropDay(days, day, keepMoved = false) {
+  const other = tiedDay(days, day, keepMoved);
+  if (other) delete days[other];
   delete days[day];
   return days;
 }
 
-/** Change today is offered when there is a week and today is not done. */
-export function canChangeToday(d = new Date()) {
-  return !!getWeek();
+/** The later day now playing this day's session (a move), or null. */
+function movedOnTo(days, day) {
+  const hit = Object.entries(days).find(([k, c]) => c.kind === "plan" && c.from === day && !c.caught && at(k) > at(day));
+  return hit ? { day: hit[0], value: hit[1].value } : null;
 }
 
 /** Do it another day: [{ day, kind: "swap"|"move", template? }]. */
@@ -111,7 +142,7 @@ export function doCatchUp(earlier, d = new Date()) {
   if (!choice) return false;
   const today = dayKeyOf(d);
   const value = dayInWeek(earlier, d).value;
-  const days = dropDay(current(d), today);
+  const days = dropDay(current(d), today, true);
   days[today] = { kind: "plan", value, from: earlier, caught: true };
   days[earlier] = { kind: "moved", value, to: today, caught: true };
   write(days, d);
@@ -122,18 +153,33 @@ export function doCatchUp(earlier, d = new Date()) {
 export function setToday(kind, d = new Date()) {
   if (!["little", "rest", "else"].includes(kind) || !getWeek()) return false;
   const today = dayKeyOf(d);
-  const days = dropDay(current(d), today);
+  const days = dropDay(current(d), today, true);
   days[today] = { kind };
   write(days, d);
   return true;
 }
 
-/** Today back as planned, and the day it was tied to. */
-export function undoToday(d = new Date()) {
+/**
+ * Whether today's change can be undone: never when its other day has
+ * passed (the session would land in the past), except a catch-up.
+ */
+export function canUndoToday(d = new Date()) {
   const days = current(d);
   const today = dayKeyOf(d);
-  if (!days[today]) return false;
-  write(dropDay(days, today), d);
+  const ch = days[today];
+  if (!ch) return false;
+  const other = ch.from || ch.to;
+  return !other || !!ch.caught || at(other) > at(today);
+}
+
+/** Today back as planned, and the day it was tied to; a moved session stays moved. */
+export function undoToday(d = new Date()) {
+  if (!canUndoToday(d)) return false;
+  const today = dayKeyOf(d);
+  const days = dropDay(current(d), today);
+  const moved = movedOnTo(days, today);
+  if (moved) days[today] = { kind: "moved", value: moved.value, to: moved.day };
+  write(days, d);
   return true;
 }
 
@@ -145,7 +191,7 @@ export function changeLine(d = new Date()) {
   if (ch.kind === "plan") {
     if (ch.caught) return `Caught up from ${DAY_NAMES[ch.from]}.`;
     const other = weekChangesNow(d)?.days?.[ch.from];
-    return other && other.kind === "plan" ? `Swapped with ${DAY_NAMES[ch.from]}.` : `Moved from ${DAY_NAMES[ch.from]}.`;
+    return other && other.kind === "plan" && other.from === dayKeyOf(d) ? `Swapped with ${DAY_NAMES[ch.from]}.` : `Moved from ${DAY_NAMES[ch.from]}.`;
   }
   if (ch.kind === "moved") return ch.caught ? `Done on ${DAY_NAMES[ch.to]} instead.` : `Moved to ${DAY_NAMES[ch.to]}.`;
   if (ch.kind === "little") return "Little and often instead.";
