@@ -1,5 +1,12 @@
 /**
  * js/views/your-week.js
+ * 15 Nov 2026 v6
+ *
+ * v6 - P-25 HOW-TO GUIDES. Guide markers only: Build it with me
+ *   (build-with-me), the days to move (days) and Continue (continue), the
+ *   week's days (day-row), My exercises (day-own), Which of My exercises
+ *   (day-which) and Save {day} (save-day). Nothing else changes.
+ *
  * 02 Nov 2026 v5
  *
  * v5 - P-26 ONE-BUILD-PAGE. A day can be a session the person built and
@@ -129,7 +136,7 @@ export function YourWeekView(router) {
       <h1 class="yw-title" tabindex="-1">Plan your week</h1>
       <p class="yw-sub">You say what each day is for. I build each session inside it, and fit it to how you are on the day.</p>
       ${has ? `<p class="yw-note">Choosing one of these replaces your week as it is now.</p>` : ""}
-      <button class="yw-way" data-start="build">
+      <button class="yw-way" data-start="build" data-guide-target="build-with-me">
         <span class="kind-tile k-teal">${lineIcon("pencil")}</span>
         <span class="yw-way__text"><span class="yw-way__name">Build it with me</span>
           <span class="yw-way__line">Which days you want to move, then what each one is for.</span></span>
@@ -186,11 +193,11 @@ export function YourWeekView(router) {
       ${header("Back", null, trendPick ? (["zone2", "cross"].includes(trendPick.id) ? "tact" : "trend") : "start")}
       <h1 class="yw-title" tabindex="-1">Which days do you want to move?</h1>
       <p class="yw-sub">The others are rest. Rest counts.${trendPick ? ` ${esc(trendNote(trendPick.id))}` : ""}</p>
-      <div class="yw-chips" role="group" aria-label="Days to move">
+      <div class="yw-chips" role="group" aria-label="Days to move" data-guide-target="days">
         ${DAY_KEYS.map(d => `<button class="yw-chip${picked.includes(d) ? " is-on" : ""}" data-pick="${d}" aria-pressed="${picked.includes(d)}">${DAY_NAMES[d]}</button>`).join("")}
       </div>
       <p class="yw-error" id="yw-pick-error" role="alert"></p>
-      <button class="btn btn-primary btn-large btn-full" id="yw-pick-go">Continue</button>`;
+      <button class="btn btn-primary btn-large btn-full" id="yw-pick-go" data-guide-target="continue">Continue</button>`;
   }
 
   function trendNote(id) {
@@ -218,7 +225,7 @@ export function YourWeekView(router) {
       </div>
       <h1 class="yw-title" tabindex="-1">Your week</h1>
       <p class="yw-sub">${esc(span)}. I build each day inside it.</p>
-      <ol class="yw-days look-card" aria-label="Each day">
+      <ol class="yw-days look-card" aria-label="Each day" data-guide-target="day-row">
         ${DAY_KEYS.map(d => {
           const v = w.days[d];
           const t = v && v !== "rest" ? w.templates[v] : null;
@@ -273,7 +280,7 @@ export function YourWeekView(router) {
         <button class="btn btn-secondary" id="yw-edit-saved">Change this session</button>` : ""}
       <div class="yw-chips" role="group" aria-label="This day is">
         ${btn('data-kind="session"', !!t && !t.own && !t.saved, "A session")}
-        ${btn('data-kind="own"', !!(t && t.own), "My exercises")}
+        ${btn('data-kind="own" data-guide-target="day-own"', !!(t && t.own), "My exercises")}
         ${btn('data-kind="rest"', v === "rest", "Rest")}
       </div>
       ${others.length && t ? `
@@ -282,7 +289,7 @@ export function YourWeekView(router) {
           ${others.map(o => `<button class="yw-chip" data-use="${o.id}">${esc(o.name)}</button>`).join("")}
         </div>` : ""}
       ${t ? (t.own ? renderOwn(t, usedOn) : t.saved ? "" : renderEditor(t, usedOn)) : ""}
-      <button class="btn btn-primary btn-large btn-full" id="yw-save">Save ${DAY_NAMES[dayKey]}</button>
+      <button class="btn btn-primary btn-large btn-full" id="yw-save" data-guide-target="save-day">Save ${DAY_NAMES[dayKey]}</button>
       <p class="yw-foot">Back saves nothing.</p>`;
   }
 
@@ -296,7 +303,7 @@ export function YourWeekView(router) {
       <section class="look-card yw-card" aria-labelledby="yw-own-h">
         <h2 class="yw-card__h" id="yw-own-h">Which of My exercises</h2>
         ${any ? `
-          <div class="yw-chips" role="group" aria-labelledby="yw-own-h">
+          <div class="yw-chips" role="group" aria-labelledby="yw-own-h" data-guide-target="day-which">
             ${groups.map(g => btn(`data-own="${esc(g)}"`, t.own === g, esc(g))).join("")}
             ${btn('data-own="all"', t.own === "all", "All of them")}
           </div>

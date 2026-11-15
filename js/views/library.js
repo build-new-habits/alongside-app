@@ -1,6 +1,11 @@
 /**
  * library.js - Library Page
  *
+ * 15 Nov 2026 v25
+ *
+ * v25 - P-25 HOW-TO GUIDES. Guide markers only: My exercises
+ *   (my-exercises) and Your week (your-week). Nothing else changes.
+ *
  * 05 Nov 2026 v24
  *
  * v24 - P-27 TIDY (Graeme, 05 Nov). Both tiers, each a fault: (1) Log what
@@ -603,7 +608,7 @@ function categoryGrid(labelledBy) {
 
           return `
           <button class="library-category-card"
-                  data-guided="${cat.id}"
+                  data-guided="${cat.id}"${cat.id === "prescribed" ? ' data-guide-target="my-exercises"' : cat.id === "week" ? ' data-guide-target="your-week"' : ""}
                   aria-label="${cat.label}: ${cat.description}">
             ${inner}
           </button>

@@ -1,5 +1,10 @@
 /**
  * coach-proposal.js
+ * 15 Nov 2026 v69
+ *
+ * v69 - P-25 HOW-TO GUIDES. Guide markers only: I have read this. (ack)
+ *   and Start (start). Nothing else changes.
+ *
  * 05 Nov 2026 v68
  *
  * v68 - P-27 TIDY (Graeme, 05 Nov). (1) When the coach chose (Let me choose
@@ -1929,7 +1934,7 @@ export function CoachProposalView(router) {
           <p class="cp-dock__label">Before you start</p>
           <ul class="cp-dock__lines">${HURT_AND_ACHE.map(l => `<li>${l}</li>`).join('')}</ul>
           ${guidance}
-          <label class="gate-ack" for="cp-ack-box">
+          <label class="gate-ack" for="cp-ack-box" data-guide-target="ack">
             <input type="checkbox" id="cp-ack-box" ${ackTicked ? 'checked' : ''}>
             <span>I have read this.</span>
           </label>
@@ -1941,7 +1946,7 @@ export function CoachProposalView(router) {
           <button class="btn ${premium ? 'btn-secondary' : 'btn-ghost'}" id="cp-preview-not-today">
             ${premium ? 'Not today' : 'Pick something else'}
           </button>
-          <button class="btn btn-primary" id="cp-preview-start">Start</button>
+          <button class="btn btn-primary" id="cp-preview-start" data-guide-target="start">Start</button>
         </div>
       </div>`;
   }

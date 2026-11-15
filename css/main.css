@@ -1,4 +1,9 @@
 /* main.css
+ * 15 Nov 2026 v35
+ *
+ * v35 - P-25 HOW-TO GUIDES. components/help.css imported (Help, How do
+ *   I…? and Guide me through it).
+ *
  * 06 Nov 2026 v34
  *
  * v34 - P-28 EMPATHY-THREAD, S3. components/in-step.css imported (In
@@ -180,6 +185,7 @@
 @import 'components/progress-share.css'; /* D-11 PROGRESS-SHARE, 06 Oct 2026 */
 @import 'components/path.css';         /* STAGE PATH P-4, 28 Oct 2026 */
 @import 'components/in-step.css';      /* P-28 EMPATHY-THREAD, 06 Nov 2026 */
+@import 'components/help.css';         /* P-25 HOW-TO GUIDES, 15 Nov 2026 */
 /* Content-gated — add when content sessions complete */
 /* D3:  @import 'components/home-threshold.css';       */
 /* D10: @import 'components/community-impact.css';     */

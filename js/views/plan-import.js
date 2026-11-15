@@ -1,6 +1,10 @@
 /**
  * js/views/plan-import.js
- * 15 Nov 2026 v3
+ * 15 Nov 2026 v4
+ *
+ * v4 - P-25 HOW-TO GUIDES. Guide markers only: Your plan (plan-text), Read
+ *   my plan (read-plan), Add the ticked ones (add-ticked) and Put them into
+ *   your week (into-week). Nothing else changes.
  *
  * v3 - P-33 PLAN-SHARE. A day read with "On Home: mornings" (as Share your
  *   plan writes it) says so under its name, and adding it puts that list
@@ -114,11 +118,11 @@ export function PlanImportView(router) {
       <p class="yw-sub">From a trainer, a class, another app or an AI. Paste it below and I'll find the exercises in it.</p>
       ${rulesCard()}
       <label class="yw-label" for="pi-text">Your plan</label>
-      <textarea class="yw-input pi-text" id="pi-text" rows="10" maxlength="${LIMITS.text}" aria-describedby="pi-text-hint pi-error"
+      <textarea class="yw-input pi-text" id="pi-text" data-guide-target="plan-text" rows="10" maxlength="${LIMITS.text}" aria-describedby="pi-text-hint pi-error"
         autocomplete="off" spellcheck="false">${esc(text)}</textarea>
       <p class="yw-hint" id="pi-text-hint">One exercise to a line works best, with its amount: "Goblet squat 3 x 10". Days or sessions on their own line: "Session A".</p>
       <p class="yw-error" id="pi-error" role="alert">${esc(error)}</p>
-      <button class="btn btn-primary btn-large btn-full" id="pi-read">Read my plan</button>
+      <button class="btn btn-primary btn-large btn-full" id="pi-read" data-guide-target="read-plan">Read my plan</button>
       <button class="yw-way" data-go="template">
         <span class="kind-tile k-blue">${lineIcon("list")}</span>
         <span class="yw-way__text"><span class="yw-way__name">Get the template</span>
@@ -159,7 +163,7 @@ export function PlanImportView(router) {
         </details>` : ""}
       ${!healthAllowed() && plan.days.some(d => d.items.some(i => i.note)) ? `<p class="yw-hint">Notes from the plan are kept only if you have said I can keep health answers, as with notes you type into My exercises.</p>` : ""}
       <p class="yw-error" id="pi-error" role="alert">${esc(error)}</p>
-      <button class="btn btn-primary btn-large btn-full" id="pi-add">Add the ticked ones to My exercises</button>`;
+      <button class="btn btn-primary btn-large btn-full" id="pi-add" data-guide-target="add-ticked">Add the ticked ones to My exercises</button>`;
   }
 
   function renderItem(it, di, ii) {
@@ -196,7 +200,7 @@ export function PlanImportView(router) {
       <h1 class="yw-title" tabindex="-1">Added to My exercises</h1>
       <p class="yw-sub">${added.count} exercise${added.count === 1 ? "" : "s"}, in ${added.days.map(esc).join(", ")}.</p>
       <p class="yw-sub">${esc(HEALTH_LINES.yours)}</p>
-      <button class="btn btn-primary btn-large btn-full" data-route-to="your-week">Put them into your week</button>
+      <button class="btn btn-primary btn-large btn-full" data-route-to="your-week" data-guide-target="into-week">Put them into your week</button>
       <button class="btn btn-secondary btn-full" data-route-to="prescribed">Open My exercises</button>
       <button class="btn btn-ghost btn-full" data-go="paste">Add another plan</button>`;
   }

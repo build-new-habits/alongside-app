@@ -1,5 +1,10 @@
 /**
  * js/views/stretch-arc.js
+ * 15 Nov 2026 v10
+ *
+ * v10 - P-25 HOW-TO GUIDES. Guide marker only: the ways to change the arc
+ *   (arc-rows). Nothing else changes.
+ *
  * 05 Nov 2026 v9
  *
  * v9 - P-27 TIDY (Graeme, 05 Nov). Start today's session is Home's Let me
@@ -244,7 +249,7 @@ export function StretchArcView(router) {
 
         <section class="sa-changes" aria-labelledby="sa-change-h">
           <h2 class="look-label" id="sa-change-h">Change your arc</h2>
-          <ul class="look-card sa-change-list">
+          <ul class="look-card sa-change-list" data-guide-target="arc-rows">
             ${row("strands", "list", "amber", "Change what feeds it", "Keep this aim; choose different parts. Same arc, same week.")}
             ${row("marker", "pencil", "violet", "Change how you\u2019d know", arc.marker ? "Put it in different words. Same arc, same week." : "Say it in your own words. Same arc, same week.")}
             ${row("fresh", "arc", "teal", "Start a fresh arc", "Keep this aim or choose another, from week 1.")}

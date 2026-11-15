@@ -1,0 +1,133 @@
+/* css/components/help.css
+ * 15 Nov 2026 v1
+ *
+ * v1 - P-25 HOW-TO GUIDES (mock-up v2, Graeme 12 Nov: "Perfect"). Help in its
+ *   own slim row, top right, scrolling with the page (SC 2.4.11, 3.2.6);
+ *   How do I…? in the app's own look classes; Guide me through it: the ring
+ *   (a thick outline, never colour alone), the arrow in the left margin and
+ *   the box docked at the top or bottom edge. Every size from the tokens,
+ *   so the text size setting reaches all of it. The pulse stops under Reduce
+ *   motion (SC 2.3.3).
+ */
+
+/* ── Help ─────────────────────────────────────────────────────────────── */
+.help-row {
+  display: flex;
+  justify-content: flex-end;
+  padding: var(--space-2, 8px) var(--content-padding, 16px) 0;
+}
+.help-row[hidden] { display: none; }
+/* The house button sits fixed in the top-right corner on screens without
+   the bottom bar: Help keeps clear of it, in the same order. */
+.help-row--hatch { padding-right: calc(var(--content-padding, 16px) + var(--escape-hatch-gutter, 68px)); }
+.help-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2, 8px);
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0 var(--space-4, 16px);
+  border-radius: 999px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-card);
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--text-base);
+  font-weight: 600;
+  cursor: pointer;
+}
+.help-btn svg { color: var(--color-primary); flex: none; }
+.help-btn:focus-visible { outline: 3px solid var(--color-border-focus); outline-offset: 2px; }
+
+/* ── How do I…? ───────────────────────────────────────────────────────── */
+.help-view { min-width: 0; width: 100%; box-sizing: border-box; }
+.help-head { display: flex; }
+.help-title { margin: var(--space-2, 8px) 0 var(--space-3, 12px); }
+.help-lead { margin: 0 0 var(--space-4, 16px); font-size: var(--text-lg); line-height: 1.5; }
+.help-sub { color: var(--color-text-secondary); margin: 0 0 var(--space-3, 12px); }
+.help-after { margin-top: var(--space-3, 12px); }
+.help-search { display: flex; flex-direction: column; gap: var(--space-2, 8px); margin: var(--space-4, 16px) 0; }
+.help-search label { font-weight: 600; }
+.help-count { margin: 0; color: var(--color-text-secondary); font-size: var(--text-sm); }
+.help-steps { margin: 0; padding-left: 1.4em; display: flex; flex-direction: column; gap: var(--space-2, 8px); line-height: 1.5; }
+.help-steps__part { margin: var(--space-3, 12px) 0 var(--space-2, 8px); font-weight: 700; }
+.help-stuck { padding: var(--space-4, 16px); margin: var(--space-4, 16px) 0; }
+.help-stuck p { margin: 0 0 var(--space-2, 8px); }
+.help-email { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2, 8px) var(--space-3, 12px); }
+.help-email strong { overflow-wrap: anywhere; }
+.help-view .sa-card { padding: var(--space-4, 16px); margin-bottom: var(--space-4, 16px); }
+.help-nq { list-style: none; margin: 0 0 var(--space-3, 12px); padding: 0; overflow: hidden; }
+.help-nq > li + li { border-top: 1px solid var(--color-border-light); }
+.help-nq__item summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  padding: var(--space-3, 12px) var(--space-4, 16px);
+  cursor: pointer;
+  font-weight: 600;
+}
+.help-nq__item summary:focus-visible { outline: 3px solid var(--color-border-focus); outline-offset: -3px; }
+.help-nq__item p { margin: 0; padding: 0 var(--space-4, 16px) var(--space-4, 16px); line-height: 1.5; }
+
+/* ── Guide me through it ──────────────────────────────────────────────── */
+:root { --gd-ring: var(--kind-amber); }
+.gd-ring {
+  outline: 3px solid var(--gd-ring) !important;
+  outline-offset: 3px !important;
+  box-shadow: 0 0 0 8px color-mix(in srgb, var(--gd-ring) 22%, transparent) !important;
+  position: relative;
+  z-index: 2;
+}
+@media (prefers-reduced-motion: no-preference) {
+  :root:not(.reduce-motion) .gd-ring { animation: gdPulse 1.6s ease-in-out infinite; }
+}
+@keyframes gdPulse { 50% { box-shadow: 0 0 0 13px color-mix(in srgb, var(--gd-ring) 8%, transparent) !important; } }
+.gd-arrow { position: fixed; z-index: 10002; color: var(--gd-ring); pointer-events: none; }
+.gd-dock {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: var(--max-width, 480px);
+  box-sizing: border-box;
+  z-index: 10001;
+  background: var(--color-bg-card);
+  color: var(--color-text);
+  padding: var(--space-3, 12px) var(--space-4, 16px) calc(var(--space-3, 12px) + env(safe-area-inset-bottom, 0px));
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2, 8px);
+  box-shadow: 0 0 0 1px var(--color-border), 0 8px 30px rgba(0, 0, 0, 0.35);
+  max-height: 60vh;
+  overflow-y: auto;
+}
+.gd-dock--bottom { bottom: var(--nav-height, 72px); border-top: 4px solid var(--gd-ring); border-radius: 16px 16px 0 0; }
+.gd-dock--nonav.gd-dock--bottom { bottom: 0; }
+.gd-dock--top {
+  top: 0;
+  border-bottom: 4px solid var(--gd-ring);
+  border-radius: 0 0 16px 16px;
+  padding-top: calc(var(--space-3, 12px) + env(safe-area-inset-top, 0px));
+}
+.gd-dock__eyebrow {
+  margin: 0;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2, 8px);
+}
+.gd-dock__bar { flex: 1; height: 6px; border-radius: 3px; background: var(--color-border); overflow: hidden; }
+.gd-dock__bar i { display: block; height: 100%; background: var(--gd-ring); }
+.gd-dock__say { margin: 0; font-size: var(--text-lg); line-height: 1.45; }
+.gd-dock__say:focus { outline: none; }
+.gd-dock__mini { margin: 0; color: var(--color-text-secondary); }
+.gd-dock__row { display: flex; gap: var(--space-2, 8px); flex-wrap: wrap; }
+.gd-dock__row .btn {
+  flex: 1 1 calc(8rem * var(--user-text-scale, 1));
+  min-height: 44px;
+  height: auto;
+  white-space: normal;
+  padding-block: var(--space-2, 8px);
+}

@@ -1,9 +1,12 @@
-<!-- index.html | 06 Nov 2026 v15 -->
+<!-- index.html | 15 Nov 2026 v16 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
 <!--
+  v16 — P-25 HOW-TO GUIDES, 15 Nov 2026. Help's row above the page (drawn
+  by js/guide.js, hidden while a session runs), the guide's box layer and
+  its live region; css/components/help.css preloaded, in main.css's order.
   v15 — P-28 EMPATHY-THREAD S3, 06 Nov 2026. css/components/in-step.css
   preloaded, in main.css's order (verify-css-parallel).
   v14 — STAGE PATH P-4, 28 Oct 2026. css/components/path.css preloaded, in
@@ -164,6 +167,7 @@
   <link rel="preload" as="style" href="css/components/progress-share.css">
   <link rel="preload" as="style" href="css/components/path.css">
   <link rel="preload" as="style" href="css/components/in-step.css">
+  <link rel="preload" as="style" href="css/components/help.css">
   <link rel="stylesheet" href="css/main.css">
 
   <!--
@@ -382,6 +386,10 @@
       tabindex="-1" allows router.js to programmatically move focus here
       after each navigation, without making it part of the keyboard tab order.
     -->
+    <!-- P-25. Help: one button, in the same place on every screen that
+         shows it (WCAG 2.2 SC 3.2.6). In the page, so it scrolls with it. -->
+    <div id="help-row" class="help-row" hidden></div>
+
     <main id="main-content" class="main-content" tabindex="-1"></main>
 
     <!-- Bottom navigation -->
@@ -451,6 +459,12 @@
   >
     <span aria-hidden="true">🏠</span>
   </button>
+
+  <!-- P-25. Guide me through it: the box with the step, and where each new
+       step is said once. Outside #app, as the house button is, so position:
+       fixed is never moved by an ancestor. -->
+  <div id="guide-overlay" class="guide-overlay"></div>
+  <p id="guide-live" class="sr-only" role="status" aria-live="polite"></p>
 
   <!-- HATCH-OVERLAP. The surfaces that put content in the top-right
        corner. Listed explicitly rather than applied to every view: a

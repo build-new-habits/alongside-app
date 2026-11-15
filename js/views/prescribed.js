@@ -1,7 +1,11 @@
 /**
  * prescribed.js - My exercises
  *
- * 15 Nov 2026 v1.14
+ * 15 Nov 2026 v1.15
+ *
+ * v1.15 - P-25 HOW-TO GUIDES. Guide markers only: Add a plan you already
+ *   have (add-plan) and each list's Start (start-group). Nothing else
+ *   changes.
  *
  * v1.14 - P-31 review (15 Nov). On Home's label carries the list's name as
  *   hidden text ("On Home: Kettle stretch"), so a screen reader moving
@@ -231,7 +235,7 @@ export function render() {
         <div id="px-add-form-wrap" class="${showAddForm ? "" : "hidden"}" aria-live="polite">
           ${renderAddForm()}
         </div>
-        <button class="btn ${quiet} btn-full" id="px-import-btn">Add a plan you already have</button>
+        <button class="btn ${quiet} btn-full" id="px-import-btn" data-guide-target="add-plan">Add a plan you already have</button>
       </div>
 
 ${plan ? "" : `      <!-- ── Bottom back button ───────────────────────────────────────────── -->
@@ -330,7 +334,7 @@ function renderGroups(active) {
       <ul class="prescribed-exercise-list" aria-labelledby="px-group-${gi}">
         ${g.items.map((ex, i) => renderExerciseCard(ex, i, false)).join("")}
       </ul>
-      ${g.name ? `<button class="btn btn-primary btn-full prescribed-group__start" data-px-group="${_esc(g.name)}">Start ${_esc(g.name)}</button>` : ""}
+      ${g.name ? `<button class="btn btn-primary btn-full prescribed-group__start" data-px-group="${_esc(g.name)}" data-guide-target="start-group">Start ${_esc(g.name)}</button>` : ""}
       ${g.name && planLook() ? renderOnHome(g.name, gi) : ""}
     </section>`).join("") + (planLook() ? `<p class="sr-only" role="status" id="px-onhome-status"></p>` : "");
 }

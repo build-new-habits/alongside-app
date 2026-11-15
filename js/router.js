@@ -1,6 +1,12 @@
 /**
  * router.js
- * 15 Nov 2026 v56
+ * 15 Nov 2026 v57
+ *
+ * v57 - P-25 HOW-TO GUIDES. 'help' (How do I…?, views/help.js), both tiers,
+ *   opened by Help (js/guide.js); its tab is the tab of the screen it was
+ *   opened from (router.helpFrom). After every screen the router says so
+ *   ('alongside:mounted'), so Help and Guide me through it are drawn once,
+ *   by the shell, as the house button is.
  *
  * v56 - P-33 PLAN-SHARE. 'plan-share' (Share your plan, the Plan's), from
  *   Progress; its tab is Progress's.
@@ -499,6 +505,8 @@ const VIEW_NAMES = {
   'running-session':    { path: './views/running-session.js',   fn: 'RunningSessionView'    },
   'cycle-session':      { path: './views/cycle-session.js',     fn: 'CycleSessionView'      },
   'guide-me':           { path: './views/guide-me.js',          fn: 'GuideMeView'           },
+  // P-25. How do I…? (Help), from any screen that shows Help.
+  'help':               { path: './views/help.js',              fn: 'HelpView'              },
   'swim-session':       { path: './views/swim-session.js',      fn: 'SwimSessionView'       },
   'quiet-session':      { path: './views/quiet-session.js',     fn: 'QuietSessionView'      },
   'breathing-session':  { path: './views/breathing-session.js', fn: 'BreathingSessionView'  },
@@ -841,6 +849,10 @@ export const router = {
         throw new Error(`View factory for "${viewName}" is not a function`);
       }
 
+      // P-25. Help and Guide me through it are drawn after the screen (js/guide.js).
+      try { document.dispatchEvent(new CustomEvent('alongside:mounted', { detail: { view: viewName } })); }
+      catch { /* never block a navigation */ }
+
       // ABYSS 2. An empty render is a failure, and used to be silence.
       //
       // 🔴 CHECKED LATE, NOT IMMEDIATELY -- and the first version of this
@@ -963,7 +975,8 @@ export const router = {
   },
 
   _setActiveNav(viewName) {
-    const activeTab = NAV_MAP[viewName] || null;
+    // P-25. How do I…? keeps the tab of the screen it was opened from.
+    const activeTab = (viewName === 'help' ? NAV_MAP[this.helpFrom] : NAV_MAP[viewName]) || null;
     document.querySelectorAll('[data-nav]').forEach(btn => {
       const isActive = btn.dataset.nav === activeTab;
       btn.setAttribute('aria-current', isActive ? 'page' : 'false');
