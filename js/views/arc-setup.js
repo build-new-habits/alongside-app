@@ -1,5 +1,11 @@
 /**
  * js/views/arc-setup.js
+ * 15 Nov 2026 v7
+ *
+ * v7 - P-25 HOW-TO GUIDES. Guide markers only: the aims (aims), what feeds
+ *   it (strands), Continue (continue), Skip for now (skip) and Yes, that's
+ *   mine (yes-mine). Nothing else changes.
+ *
  * 06 Nov 2026 v6
  *
  * v6 - P-28 S5 (E, said lightly; wording A6 approved 05 Nov). Under the
@@ -169,7 +175,7 @@ export function ArcSetupView(router) {
       <p class="as-help">
         Something you'd notice yourself doing. Not a number \u2014 a thing.
       </p>
-      <div class="as-options" role="group" aria-label="Choose one">
+      <div class="as-options" role="group" aria-label="Choose one" data-guide-target="aims">
         ${shown.map(a => `
           <button class="as-option ${aimId === a.id ? "as-option--on" : ""}"
                   data-aim="${a.id}" aria-pressed="${aimId === a.id}">
@@ -186,7 +192,7 @@ export function ArcSetupView(router) {
         </button>
       `}
 
-      <button class="btn btn-primary btn-large btn-full" id="as-next-btn" ${aimId ? "" : "disabled"}>
+      <button class="btn btn-primary btn-large btn-full" id="as-next-btn" data-guide-target="continue" ${aimId ? "" : "disabled"}>
         Continue
       </button>`;
   }
@@ -205,7 +211,7 @@ export function ArcSetupView(router) {
       <p class="as-help">
         Pick up to ${AIMS.maxStrands}. The body ones are what I'll lean your sessions towards; the others light up on Progress when you do a breathing or mindful practice.
       </p>
-      <div class="as-options" role="group" aria-label="Choose up to ${AIMS.maxStrands}">
+      <div class="as-options" role="group" aria-label="Choose up to ${AIMS.maxStrands}" data-guide-target="strands">
         ${cands.map(s => {
           const on = chosen.includes(s.id);
           return `
@@ -223,7 +229,7 @@ export function ArcSetupView(router) {
       <button class="btn btn-primary btn-large btn-full" id="as-save-btn" ${chosen.length ? "" : "disabled"}>
         Save
       </button>` : `
-      <button class="btn btn-primary btn-large btn-full" id="as-next-btn" ${chosen.length ? "" : "disabled"}>
+      <button class="btn btn-primary btn-large btn-full" id="as-next-btn" data-guide-target="continue" ${chosen.length ? "" : "disabled"}>
         Continue
       </button>`}`;
   }
@@ -241,8 +247,8 @@ export function ArcSetupView(router) {
                 placeholder="Getting up off the floor without thinking about it first">${esc(marker)}</textarea>
       ${editing() ? `
       <button class="btn btn-primary btn-large btn-full" id="as-save-btn">Save</button>` : `
-      <button class="btn btn-primary btn-large btn-full" id="as-next-btn">Continue</button>
-      <button class="btn ${isPremium() ? "btn-secondary" : "btn-ghost"} btn-full" id="as-skip-btn">Skip for now</button>`}`;
+      <button class="btn btn-primary btn-large btn-full" id="as-next-btn" data-guide-target="continue">Continue</button>
+      <button class="btn ${isPremium() ? "btn-secondary" : "btn-ghost"} btn-full" id="as-skip-btn" data-guide-target="skip">Skip for now</button>`}`;
   }
 
   // ── 4. Is this yours ─────────────────────────────────────────────
@@ -267,7 +273,7 @@ export function ArcSetupView(router) {
         No dates, nothing to keep up with. Change it or stop it whenever you like.
       </p>
 
-      <button class="btn btn-primary btn-large btn-full" id="as-start-btn">Yes, that's mine</button>
+      <button class="btn btn-primary btn-large btn-full" id="as-start-btn" data-guide-target="yes-mine">Yes, that's mine</button>
       <button class="btn ${isPremium() ? "btn-secondary" : "btn-ghost"} btn-full" id="as-restart-btn">Start again</button>`;
   }
 

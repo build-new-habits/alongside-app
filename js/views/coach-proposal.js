@@ -1,5 +1,12 @@
 /**
  * coach-proposal.js
+ * 15 Nov 2026 v69
+ *
+ * v69 - P-25 HOW-TO GUIDES. Guide markers: I have read this. (ack) and
+ *   Start (start). And Help, top right of the plan's panel, both tiers: the
+ *   panel covers the page, and the shell's Help row with it, so Help is
+ *   drawn here too, the same button with the same words (js/guide.js).
+ *
  * 05 Nov 2026 v68
  *
  * v68 - P-27 TIDY (Graeme, 05 Nov). (1) When the coach chose (Let me choose
@@ -877,6 +884,7 @@
  *   prefers-reduced-motion: panel slide transition removed.
  */
 
+import { helpButtonHTML } from "../guide.js";
 import { store }             from '../store.js';
 import { healthConsentNeeded, setPendingRoute } from '../data/health-consent.js';
 // ARC-VISIBLE, 16 Sep 2026. Same source today.js reads for "What it's
@@ -1373,6 +1381,7 @@ export function CoachProposalView(router) {
           ${premium ? `<button class="cp-preview-panel__close plan-back" id="cp-preview-close" aria-label="Back to Home">‹ Back</button>` : `<button class="cp-preview-panel__close" id="cp-preview-close" aria-label="Back to Home">
             <span aria-hidden="true">‹</span> Home
           </button>`}
+          ${helpButtonHTML("panel")}
 
           ${proposal && (proposal.constraint || proposal.reentryLine) ? `
             <div class="cp-coach-block cp-coach-block--in-panel" aria-live="polite">
@@ -1929,7 +1938,7 @@ export function CoachProposalView(router) {
           <p class="cp-dock__label">Before you start</p>
           <ul class="cp-dock__lines">${HURT_AND_ACHE.map(l => `<li>${l}</li>`).join('')}</ul>
           ${guidance}
-          <label class="gate-ack" for="cp-ack-box">
+          <label class="gate-ack" for="cp-ack-box" data-guide-target="ack">
             <input type="checkbox" id="cp-ack-box" ${ackTicked ? 'checked' : ''}>
             <span>I have read this.</span>
           </label>
@@ -1941,7 +1950,7 @@ export function CoachProposalView(router) {
           <button class="btn ${premium ? 'btn-secondary' : 'btn-ghost'}" id="cp-preview-not-today">
             ${premium ? 'Not today' : 'Pick something else'}
           </button>
-          <button class="btn btn-primary" id="cp-preview-start">Start</button>
+          <button class="btn btn-primary" id="cp-preview-start" data-guide-target="start">Start</button>
         </div>
       </div>`;
   }

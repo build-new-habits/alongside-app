@@ -1,7 +1,15 @@
 import { createRequire as __cr } from "node:module";
 /**
  * tools/verify-one-look.mjs
- * 15 Nov 2026 v11
+ * 15 Nov 2026 v12
+ *
+ * v12 - P-25 HOW-TO GUIDES. How do I…? is new since v688 and on both tiers
+ *   by Graeme's decision (11 Nov: Help on both tiers, an exception to
+ *   leaving Free alone, as In Step was): its heading (help-title) is
+ *   agreed, and TEST 4 checks Free sees How do I…?, not a redirect. The
+ *   guide markers (data-guide-target, read by Guide me through it only)
+ *   are taken out of today's Free drawings before the byte comparison, and
+ *   Help in Today's plan's panel (checked to be there once); nothing else.
  *
  * v11 - P-33 (15 Nov). Share your plan is new since v688 and the Plan's
  *   only (Free is sent to Progress), so it joins NEW_PLAN_ONLY. Found by
@@ -166,7 +174,7 @@ async function open(route, extra = null) {
 // Session 9 (Home, the doors, Your week, Progress, Settings, Wellbeing, I
 // know what I want). TEST 1f reads each rule; any other heading must sit in
 // the Plan's look (.is-plan).
-const AGREED_H1 = ["path-h1", "path-greeting", "yw-title", "progress-title", "settings-title", "wb-title", "kw-title"];
+const AGREED_H1 = ["path-h1", "path-greeting", "yw-title", "progress-title", "settings-title", "wb-title", "kw-title", "help-title"];
 // A ghost button its own CSS gives an edge is a button (TEST 1e holds the edge).
 const EDGED = [".prescribed-remove-btn"];
 
@@ -313,6 +321,16 @@ for (const file of touched) {
     ok("4gm. Free guide-me: new since v688 (P-28); with no session it says where Guide me is, with a way back", /Keep moving › Outside/.test(main.textContent) && !!main.querySelector("#gm-home") && !main.querySelector("#gm-start"));
     continue;
   }
+  // v12 (P-25, both tiers by Graeme's decision): Free's Help is How do I…?.
+  if (!old && name === "help") {
+    person("free"); main.innerHTML = "";
+    const H = await import(new URL(`../${file}`, import.meta.url).href);
+    router.helpFrom = "today";
+    H.HelpView(router).mount(main); await wait(20);
+    compared++;
+    ok("4h. Free help: How do I…? (both tiers by decision), with nothing of the Plan but Part of the Plan", /How do I/.test(main.textContent) && !/upgrade|subscribe|\u00a3/i.test(main.textContent));
+    continue;
+  }
   if (!old) { ok(`4. Free ${name}: there on v688`, false); continue; }
   // v9 (P-28, both tiers by Graeme's decision): Free's In Step is the programme.
   if (name === "in-step") {
@@ -333,6 +351,14 @@ for (const file of touched) {
   try { a = await draw(OLD, entry.fn); } catch (e) { a = "THREW " + e.message; }
   store.data = JSON.parse(snap); store.save();
   try { b = await draw(NOW, entry.fn); } catch (e) { b = "THREW " + e.message; }
+  // v12: P-25's markers only (an old file can draw a shared piece, such as Free Home, from today's code).
+  a = a.replace(/ data-guide-target="[a-z:-]+"/g, ""); b = b.replace(/ data-guide-target="[a-z:-]+"/g, "");
+  // v12: and Help, drawn in Today's plan's panel (the panel covers the shell's Help row), both tiers.
+  if (name === "coach-proposal") {
+    const hp = /\s*<button type="button" class="help-btn help-btn--panel" data-help-open="panel">[\s\S]*?<\/button>/g;
+    ok("4hp. P-25: Today's plan gains Help in its panel, once, and nothing else", (b.match(hp) || []).length === 1);
+    b = b.replace(hp, "");
+  }
   // v7: the one approved rename, made to the old words only, on Log what I did only.
   if (name === "activity-log") {
     const renames = (a.match(/Body Balance/g) || []).length;

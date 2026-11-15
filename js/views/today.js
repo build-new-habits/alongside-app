@@ -1,5 +1,10 @@
 /**
  * today.js
+ * 15 Nov 2026 v63
+ *
+ * v63 - P-25 HOW-TO GUIDES. Guide markers only: Free Home's
+ *   Not sure? I'll pick something (not-sure). Nothing else changes.
+ *
  * 05 Nov 2026 v62
  *
  * v62 - P-27 TIDY (Graeme, 05 Nov: retire the twelve-week programme on the
@@ -2447,7 +2452,7 @@ function _markGuidanceShown(root) {
       ${tileGrid()}
 
       <button class="btn btn-ghost btn-full today-unsure"
-              data-action="start-today"
+              data-action="start-today" data-guide-target="not-sure"
               aria-label="Not sure \u2014 I'll pick something, going on how you're doing today">
         Not sure? I'll pick something
       </button>

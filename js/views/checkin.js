@@ -1,5 +1,10 @@
 /**
  * js/views/checkin.js
+ * 15 Nov 2026 v34
+ *
+ * v34 - P-25 HOW-TO GUIDES. Guide markers only: each question's words
+ *   (energy, mood, sore) and Not today (not-today). Nothing else changes.
+ *
  * 05 Nov 2026 v33
  *
  * v33 - P-27 TIDY (Graeme, 05 Nov). (1) The quiet "Add how you slept
@@ -618,17 +623,20 @@ ${plan ? `        <div class="ci-plan-head">
    * `extra` adds a quiet link that resolves with { extra: true } instead
    * (used for the optional sleep question).
    */
+  // P-25. Guide markers: which question this is, for Guide me through it.
+  const GUIDE_Q = { "Your energy today": "energy", "Your mood today": "mood", "Anything sore today": "sore" };
+
   function _askChips(ariaLabel, chips, { note = null, extra = null } = {}) {
     return new Promise(resolve => {
       if (!_alive) return resolve(null);
       const wrap = document.createElement("div");
       wrap.className = "ci-chips";
       wrap.innerHTML = `
-        <div class="ci-chips__row" role="group" aria-label="${_esc(ariaLabel)}">
+        <div class="ci-chips__row" role="group" aria-label="${_esc(ariaLabel)}"${GUIDE_Q[ariaLabel] ? ` data-guide-target="${GUIDE_Q[ariaLabel]}"` : ""}>
           ${chips.map((c, i) => `<button type="button" class="ci-chip" data-i="${i}">${_esc(c.label)}</button>`).join("")}
         </div>
         ${note ? `<p class="ci-chips__note">${_esc(note)}</p>` : ""}
-        ${extra ? `<button type="button" class="ci-chips__extra" data-extra="1">${_esc(extra)}</button>` : ""}
+        ${extra ? `<button type="button" class="ci-chips__extra" data-extra="1" data-guide-target="not-today">${_esc(extra)}</button>` : ""}
       `;
       _thread.appendChild(wrap);
       _scrollToNewElement(wrap);

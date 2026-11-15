@@ -1,6 +1,14 @@
 import { createRequire as __cr } from "node:module";
 /**
  * tools/verify-path-free-unchanged.mjs
+ * 15 Nov 2026 v2
+ *
+ * v2 - P-25 HOW-TO GUIDES (Help on both tiers, Graeme 11 Nov: an exception
+ *   to leaving Free alone). The guide markers (data-guide-target="…", an
+ *   attribute nothing reads but Guide me through it) are taken out of
+ *   today's drawing before the byte comparison, and nothing else is: any
+ *   other change to Free Home is still red.
+ *
  * 28 Oct 2026 v1
  *
  * STAGE PATH, rule A1 (Graeme, 12 and 27 Oct): Free is left exactly as it
@@ -84,7 +92,7 @@ const draw = mod => { const snap = JSON.stringify(store.data); main.innerHTML = 
 console.log("\nTEST 1 - Free Home, byte for byte, as on v683");
 for (const [label, fn] of Object.entries(SITUATIONS)) {
   fixture(fn);
-  const before = draw(OLD); const after = draw(NOW);
+  const before = draw(OLD); const after = draw(NOW).replace(/ data-guide-target="[a-z:-]+"/g, "");
   let at = 0; while (at < before.length && before[at] === after[at]) at++;
   ok(`1. ${label}: the same`, before === after && before.length > 500, `differs at ${at}: "${before.slice(at - 40, at + 60)}" vs "${after.slice(at - 40, at + 60)}"`);
   ok(`1. ${label}: no Plan Home in it`, !/path-home|path-today|path-coach/.test(after), JSON.stringify(navs));

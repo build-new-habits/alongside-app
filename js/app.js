@@ -1,5 +1,10 @@
 /**
  * app.js - Application entry point
+ * 15 Nov 2026 v16
+ *
+ * v16 - P-25 HOW-TO GUIDES. Help and Guide me through it (js/guide.js) are
+ *   set up once, with the router, before the first screen.
+ *
  * 17 Oct 2026 v15
  *
  * v15 - W6-18 A11Y-W6. The update banner goes after the page in reading
@@ -87,6 +92,7 @@ import { refreshMessages, updateNavDot } from './data/messages.js';
 import { declaredUnder18, heldOnPhone, deleteForUnder18 } from './data/age-check.js';
 import './data/evidence.js';   // B5: registers the two research messages (only while sending is on)
 import { warmViews } from './data/warm-views.js';
+import { initGuides } from './guide.js';
 
 // ── Globals — set immediately, before anything else runs ──────────────────────
 window.router = router;
@@ -225,6 +231,7 @@ const App = {
     console.log("Alongside starting...");
     store.init();
     router.init();
+    initGuides(router);
     registerServiceWorker();
 
     // Nav escape-hatch icon — single click handler, wired once.

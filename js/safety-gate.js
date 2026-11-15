@@ -1,5 +1,10 @@
 /**
  * js/safety-gate.js
+ * 15 Nov 2026 v6
+ *
+ * v6 - P-25 HOW-TO GUIDES. Guide markers only: I have read this.
+ *   (gate-ack) and Start the session (gate-start). Nothing else changes.
+ *
  * 29 Sep 2026 v5
  *
  * v5 - P23, PRACTICE WORDING (persona finding W2-19). Gating breathing
@@ -282,14 +287,14 @@ export function renderSafetyGate({ practice = false } = {}) {
 
       ${guidance}
 
-      <label class="gate-ack" for="gate-ack-box">
+      <label class="gate-ack" for="gate-ack-box" data-guide-target="gate-ack">
         <input type="checkbox" id="gate-ack-box" data-gate-ack>
         <span>I have read this.</span>
       </label>
 
       <p class="gate-error" data-gate-error role="status" aria-live="assertive"></p>
 
-      <button type="button" class="btn btn-primary gate-start" data-gate-start>
+      <button type="button" class="btn btn-primary gate-start" data-gate-start data-guide-target="gate-start">
         Start the session
       </button>
       <button type="button" class="btn-quiet gate-leave" data-gate-leave>

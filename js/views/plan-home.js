@@ -1,6 +1,10 @@
 /**
  * views/plan-home.js
- * 15 Nov 2026 v11
+ * 15 Nov 2026 v12
+ *
+ * v12 - P-25 HOW-TO GUIDES. Guide markers only (data-guide-target): the
+ *   coach's row (coach-row), your week's day (week-row), Start your list
+ *   (start-list) and the Library (library). Nothing else changes.
  *
  * v11 - P-34 HOME-CALM (Graeme, 15 Nov: "exercise routes from home and
  *   progress in progress, so lately in progress"). Lately is gone from Home:
@@ -196,7 +200,7 @@ function head(kind, icon, eyebrow, title, figId) {
       <div class="path-today__titles"><p class="path-today__eyebrow">${esc(eyebrow)}</p><h2 class="path-today__title" id="path-today-h">${esc(title)}</h2></div>${fig(figId)}</div>`;
 }
 const card = (state, kind, door, body) =>
-  `<section class="path-today k-${kind}" data-state="${state}"${door ? ` data-door="${door}"` : ""} aria-labelledby="path-today-h">${body}</section>`;
+  `<section class="path-today k-${kind}" data-state="${state}"${door ? ` data-door="${door}"` : ""}${state === "week" ? ' data-guide-target="week-row"' : ""} aria-labelledby="path-today-h">${body}</section>`;
 const go = (label, attrs) => `<button type="button" class="btn btn-primary btn-full path-today__go" ${attrs}>${label}</button>`;
 
 function moodPath(before, after) {
@@ -311,7 +315,7 @@ function todayCard(state, carry) {
       const left = ownLeft(t);
       return card("week", kind, door, `${head(kind, DOOR[door].icon, "Today, from your week", t.name)}
         <p class="path-today__meta">${esc(mixLine(t))}</p>
-        ${left ? `<p class="path-today__coach">${left} exercise${left === 1 ? "" : "s"}, as you wrote ${left === 1 ? "it" : "them"}.</p>${go("Start your list", 'data-action="week-own"')}`
+        ${left ? `<p class="path-today__coach">${left} exercise${left === 1 ? "" : "s"}, as you wrote ${left === 1 ? "it" : "them"}.</p>${go("Start your list", 'data-action="week-own" data-guide-target="start-list"')}`
           : `<p class="path-today__coach">All done today.</p>`}`);
     }
     if (t.trend) {
@@ -358,7 +362,8 @@ function coachTitle(s) {
 
 /** One row with one action: the coach, or your week's day. */
 function row(state, kind, icon, title, sub, attrs, door = null) {
-  return `<button type="button" class="path-coach k-${kind}" data-state="${state}"${door ? ` data-door="${door}"` : ""} ${attrs}>
+  const gt = state === "coach" ? "coach-row" : state === "week" ? "week-row" : "";
+  return `<button type="button" class="path-coach k-${kind}" data-state="${state}"${door ? ` data-door="${door}"` : ""}${gt ? ` data-guide-target="${gt}"` : ""} ${attrs}>
     <span class="kind-tile k-${kind}">${lineIcon(icon)}</span>
     <span class="path-coach__text"><span class="path-coach__t">${esc(title)}</span><span class="path-coach__d">${esc(sub)}</span></span>
     <span class="path-door__chev" aria-hidden="true">${lineIcon("chevron", 20)}</span>
@@ -429,7 +434,7 @@ export function renderPlanHome(ctx = {}) {
           <span class="kind-tile k-${d.kind}">${lineIcon(d.icon)}</span>
           <span class="path-door__text"><span class="path-door__t">${d.label}</span>${arc.door === d.id ? `<span class="path-door__d">Your arc</span>` : ""}</span>
         </button></li>`).join("")}
-        <li class="path-doors__wide"><button type="button" class="path-door path-door--wide" data-route="library" data-requires-checkin="false">
+        <li class="path-doors__wide"><button type="button" class="path-door path-door--wide" data-route="library" data-requires-checkin="false" data-guide-target="library">
           <span class="kind-tile k-slate">${lineIcon("library")}</span>
           <span class="path-door__text"><span class="path-door__t">Library</span><span class="path-door__d">${libSub}</span></span>
           <span class="path-door__chev" aria-hidden="true">${lineIcon("chevron", 20)}</span>

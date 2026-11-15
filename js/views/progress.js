@@ -1,6 +1,9 @@
 /**
  * progress.js
- * 15 Nov 2026 v36
+ * 15 Nov 2026 v37
+ *
+ * v37 - P-25 HOW-TO GUIDES. Guide markers only: Set up your arc
+ *   (arc-setup) and Change my arc (change-arc). Nothing else changes.
  *
  * v36 - P-34 HOME-CALM (Graeme, 15 Nov: "progress in progress, so lately in
  *   progress"). On the Plan, Before and after (how you felt before and after
@@ -1140,7 +1143,7 @@ export function ProgressView(router) {
         <section class="pr-card pr-block" aria-labelledby="pr-arc-h">
           <h2 class="pr-card__title pr-title" id="pr-arc-h">Your arc</h2>
           <p class="pr-coach">Tell me what you want to be able to do, and this is where it lives — what you’re working towards and what has come up.</p>
-          <button class="btn btn-secondary btn-full" data-route="arc-setup">Set up your arc</button>
+          <button class="btn btn-secondary btn-full" data-route="arc-setup" data-guide-target="arc-setup">Set up your arc</button>
         </section>`;
     }
 
@@ -1168,7 +1171,7 @@ export function ProgressView(router) {
               </li>`).join('')}
           </ul>
           <p class="pr-note">Nothing is behind. “Not yet” means it hasn’t come up since your arc began.</p>` : ''}
-        <button class="btn btn-ghost pr-change plan-link" data-route="stretch-arc">Change my arc</button>
+        <button class="btn btn-ghost pr-change plan-link" data-route="stretch-arc" data-guide-target="change-arc">Change my arc</button>
       </section>`;
   }
 

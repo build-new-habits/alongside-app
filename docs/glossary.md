@@ -1,5 +1,7 @@
 # Alongside: Move — Glossary
-## 15 Nov 2026 v8
+## 15 Nov 2026 v9
+
+v9 - P-25 (Graeme, 11 and 12 Nov: spec v3 §10.6). Help, How do I…?, Guide me through it, Did that work?, Not quite, Still stuck?.
 
 v8 - P-34 (Graeme, 15 Nov). Decision 6: Home is what to do; how it is going is on Progress.
 
@@ -44,6 +46,11 @@ Taken from the words on every screen (`node tools/chromium-words.mjs`, 95 screen
 | Stretch's question after the area | **How does it feel today?**: **Fine, just a stretch**, **A little stiff**, **Quite stiff**, **Very stiff** | Pain level, sore (as a choice) | P-32. A sore area never sets it (W5-14). Nothing stored |
 | Stretch's finer spots | **Anywhere in particular?** | Target, focus area | P-32. A routine that works one says **Works your …** |
 | The way out when it is pain, not stiffness | **It hurts** | Injured, treat | P-32. Goes to the check-in, never to a stretch |
+| The button on every screen that opens the guides | **Help** | — | P-25. The word with a line icon, never the icon alone. Both tiers; hidden while a session runs |
+| The page of guides | **How do I…?** | — | P-25. *On this screen*, search, the groups, **Still stuck?** |
+| A guide's main way: help over the live app | **Guide me through it** | Tutorial, walkthrough (on screen) | P-25. A ring on the real button and a box with the step; **Back a step**, **Stop the guide**, **Make this smaller**, **Carry on from here** |
+| The question at the end of a guide | **Did that work?** | Was this helpful | P-25. **Yes, back to where I was**, or **Not quite** (a few likely answers, one level deep). Nothing is recorded |
+| Help's last part | **Still stuck?** | Contact support | P-25. The email address with **Copy** (the app sends nothing), and the support lines |
 | The finish's offer after an easier stretch | **Put this on Home** | Pin, Save to Home | P-32. Adds the routine to My exercises, On Home any time (P-31) |
 | The Plan's page of the person's plan, for a physio or trainer | **Share your plan** (beside **Share your progress**) | Export, Download my plan, My plan PDF | P-33. Made on the phone; **Save as a file**, **Copy as text**; the choices are behind **Change what's in it** |
 | The section linking the person's exercises to the arc | **What works towards it** | Recommended for you, Best for your arc | P-33. The arc's own rule; the person's own exercises only; never a suggestion |
@@ -61,3 +68,5 @@ Taken from the words on every screen (`node tools/chromium-words.mjs`, 95 screen
 5. **Share your plan** (Graeme, 15 Nov: mock-up v2, and a PDF made on the phone): what goes in it is the person's choice; the journal, check-in answers and weight are never in it.
 
 6. **Home is what to do; Progress is how it is going** (Graeme, 15 Nov: *"exercise routes from home and progress in progress, so lately in progress"*). Home's *Lately* is retired; the same reading is **Before and after**, near the top of Progress.
+
+7. **Help, on both tiers** (Graeme, 11 Nov; mock-up v2 approved 12 Nov: *"Perfect"*). One **Help** button in the same place on every screen that shows it; hidden while a session runs. Guides say how to use the app, never what exercise to do; their safety lines are the app's own, word for word.
