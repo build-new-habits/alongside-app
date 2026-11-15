@@ -1,6 +1,12 @@
 /**
  * progress.js
- * 15 Nov 2026 v35
+ * 15 Nov 2026 v36
+ *
+ * v36 - P-34 HOME-CALM (Graeme, 15 Nov: "progress in progress, so lately in
+ *   progress"). On the Plan, Before and after (how you felt before and after
+ *   your sessions, and what seems to help) comes straight after the
+ *   window's numbers, near the top: it is where Home's Lately now lives.
+ *   Free unchanged.
  *
  * v35 - P-33 PLAN-SHARE (Graeme, 15 Nov). On the Plan, Share your plan
  *   under Share your progress: "Your arc, your week and your lists, for a
@@ -514,9 +520,9 @@ export function ProgressView(router) {
         </header>
 
         <div class="progress-body" id="panel-${activeWindow}" role="tabpanel" aria-labelledby="tab-${activeWindow}">
-          ${renderActivitySummary(range)}
+          ${renderActivitySummary(range)}${premium ? renderMoodStory(range) : ''}
           ${renderCoachNarrative(stats, tier, name, range)}
-          ${range.days === 1 ? renderToday() : renderSessionsChart(range)}${premium ? renderMoodStory(range) + renderZone2Week() : ''}
+          ${range.days === 1 ? renderToday() : renderSessionsChart(range)}${premium ? renderZone2Week() : ''}
           ${renderSessionShapes(tier, range)}
           ${premium ? renderArcReadback() : ''}
           ${_rateNote(premium)}

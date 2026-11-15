@@ -116,6 +116,8 @@ Home says what happened, in one line with **Undo** beside it, and focus goes to 
 
 ## 4. Lately
 
+**Superseded 15 Nov by P-34 HOME-CALM** (Graeme: *"exercise routes from home and progress in progress, so lately in progress"*): Lately is not on Home at all; Before and after sits near the top of Progress. The rule below was v2's.
+
 Lately moves out of the way while today's session is still to do: it shows once today's session is done, on a rest day, or on a day without a plan. On a small phone this keeps the Today card, Change today and the four ways in above the fold.
 
 ---

@@ -1,5 +1,7 @@
 # Alongside: Move — Glossary
-## 15 Nov 2026 v7
+## 15 Nov 2026 v8
+
+v8 - P-34 (Graeme, 15 Nov). Decision 6: Home is what to do; how it is going is on Progress.
 
 v7 - P-33 (Graeme, 15 Nov). Share your plan, Change what's in it, What works towards it.
 
@@ -57,3 +59,5 @@ Taken from the words on every screen (`node tools/chromium-words.mjs`, 95 screen
 4. **Stretch for stiffness** words (Graeme, 15 Nov: mock-up v2, "The full range"): the person chooses it inside Stretch; It hurts goes to the check-in.
 
 5. **Share your plan** (Graeme, 15 Nov: mock-up v2, and a PDF made on the phone): what goes in it is the person's choice; the journal, check-in answers and weight are never in it.
+
+6. **Home is what to do; Progress is how it is going** (Graeme, 15 Nov: *"exercise routes from home and progress in progress, so lately in progress"*). Home's *Lately* is retired; the same reading is **Before and after**, near the top of Progress.

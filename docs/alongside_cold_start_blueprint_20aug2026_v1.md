@@ -1,5 +1,5 @@
 # Alongside: Move — Cold Start Blueprint
-## 15 Nov 2026 v323
+## 15 Nov 2026 v324
 
 Build New Habits | Everything a chat with no memory needs to pick this up and build confidently.
 
@@ -74,7 +74,7 @@ git clone --depth 1 https://x-access-token:$TOKEN@github.com/build-new-habits/al
 |---|---|
 | `store.js` | v124 |
 | `Schema.md` | v1.125 |
-| `sw.js` | **v717**, cache `alongside-v717` |
+| `sw.js` | **v718**, cache `alongside-v718` |
 | `router.js` | v48 · `my-programme.js` v8 · `today.js` v49 · `settings.js` v46 · `progress.js` v27 · `onboarding/thread.js` v16 |
 | `exercise-card.js` | **v7** — CARD-4, four pages. `workout.css` v16 |
 | Gates | **362** on jsdom 28.1.0 (`npm ci`) — from the repo root. See the cwd row in §9. P-31 (14 Nov) added `verify-p31-change-today`; P-32 (15 Nov) added `verify-p32-stretch-stiffness`; P-33 (15 Nov) added `verify-p33-plan-share`. Run from a shallow clone without `../bnh-files` or the website, 12 fail before and after P-31 for that reason alone (they read the private repository, the website, or older versions from git history) |

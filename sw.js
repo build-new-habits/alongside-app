@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 15 Nov 2026 v717
+ * 15 Nov 2026 v718
  *
+ * v718 - P-34 (the Plan; Free unchanged). Home is for what to do: Lately (how you felt before and after your sessions, and what seems to help) has moved off Home. The same reading is Before and after, now near the top of Progress, straight after the numbers for the days you are looking at. NEW FILES: none.
  * v717 - P-33 (the Plan; Free unchanged). Share your plan, on Progress: your arc and what works towards it, your week, your lists with amounts and what is on Home, and saved sessions, on one page for a physio or trainer, made on your phone as a PDF (Share… or Save as a file) or as text to copy. The text comes back in through Add a plan you already have, with its On Home choices; a name with a dash in it now matches. The journal, check-in answers and weight are never in it; the last 30 days, anything sore, notes and your name only if you switch them on. NEW FILES precached: js/data/plan-share.js, js/data/pdf-lite.js, js/views/plan-share.js.
  * v716 - P-32 (the Plan; Free unchanged). Stretch for stiffness: in Stretch, after the area, How does it feel today? (Fine, just a stretch, A little, Quite or Very stiff) and Anywhere in particular? (routines that work the spot say so and come first). Very stiff starts each routine with two minutes of gentle movement and shorter holds. It hurts sends you to the check-in, never to a stretch. Every Stretch routine says to ease into a gentle pull. After a stiff stretch, How do your … feel now?, and Put this on Home when it helped. Nothing new is stored. NEW FILE precached: js/data/stretch-stiffness.js.
  * v715 - P-31 (the Plan; Free unchanged). Little and often: in My exercises, each list has On Home (Not on Home, Any time, Mornings, Evenings); up to three show on Home under the Today card, one tap each, with "Done today" once a list is ticked and, on a sore day, which area a list works (its player still asks). Change today, a link under the Today card: Do it another day (each later day says whether it swaps or the session moves there), Catch up (on a day with no session, an earlier one this week not done; never a reminder), Little and often instead, Rest today and Something else. Every change is this week's only; Your week stays as planned, a session moves once, and Home says what changed with Undo beside it. Lately shows once today's session is done, or on a day without one. Undo never puts a session back on a day that has passed, and a session moved to a later day stays there if today becomes something else. store.js v124, Schema v1.125. NEW FILES precached: js/views/change-today.js, js/data/week-changes.js, js/data/little-and-often.js, js/data/sore-rule.js (one sore rule for the player and Home).
@@ -4264,7 +4265,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v717";
+const CACHE_NAME = "alongside-v718";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4355,7 +4356,7 @@ const SHELL_HASHES = {
   "./js/views/checkin-mini.js": "c647f4da71feddde",
   "./js/views/coach-proposal.js": "483cee5a0d486fd9",
   "./js/views/workout.js": "fba068b2e4f6c61f",
-  "./js/views/progress.js": "528d89a073b71db1",
+  "./js/views/progress.js": "319bf945f338ac96",
   "./js/views/settings.js": "85ce48f8345522b6",
   "./js/views/restore-flow.js": "dc81c2e455fa472d",
   "./js/views/weekly-plan.js": "dcee06e297b402c0",
@@ -4391,7 +4392,7 @@ const SHELL_HASHES = {
   "./js/data/arc-readback.js": "9b06dcba96534da0",
   "./js/data/tier-table.js": "7821c3304bd0815c",
   "./js/views/know-what.js": "e84fee3e6d9d3af0",
-  "./js/views/plan-home.js": "04294fa6cad1336f",
+  "./js/views/plan-home.js": "5725d595376f7b8b",
   "./js/views/path.js": "dbfa695d9edd6ec8",
   "./js/plan-look.js": "7674d8fbf5101aa9",
   "./js/views/plan-finish.js": "d3901b6355f55542",
