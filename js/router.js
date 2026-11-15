@@ -1,6 +1,9 @@
 /**
  * router.js
- * 06 Nov 2026 v54
+ * 14 Nov 2026 v55
+ *
+ * v55 - P-31 CHANGE-TODAY. 'change-today' (Change today, the Plan),
+ *   reached from under Home's Today card; its tab is Home's.
  *
  * v54 - P-28 S4 GUIDE ME. New route 'guide-me' (views/guide-me.js): a
  *   session in progress, so no bottom bar, home Today.
@@ -431,6 +434,7 @@ const VIEW_NAMES = {
   'library':           { path: './views/library.js',          fn: 'LibraryView'         },
   'your-week':         { path: './views/your-week.js',        fn: 'YourWeekView'        },
   'plan-import':       { path: './views/plan-import.js',      fn: 'PlanImportView'      },
+  'change-today':      { path: './views/change-today.js',     fn: 'ChangeTodayView'     },
   // SAVED-1, 08 Sep 2026. The Your own room counted saved sessions and
   // hid all but the newest behind a button that opened the BUILDER --
   // a screen for making a new one, reached by tapping a control that
@@ -586,6 +590,7 @@ const NAV_MAP = {
   // D-6. Reached from Home.
   'your-week': 'today',
   'plan-import': 'today',
+  'change-today': 'today',
   'goal-review': 'my-programme',
   'settings': 'settings', 'privacy': 'settings',
   'upgrade': 'settings', 'goal-setup': 'settings',

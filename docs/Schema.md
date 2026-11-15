@@ -1,5 +1,8 @@
 # Alongside — Data Schema Reference
-## 06 Nov 2026 v1.124
+## 14 Nov 2026 v1.125
+
+> **v1.125, 14 Nov 2026 — P-31 LITTLE-AND-OFTEN and CHANGE-TODAY** (`store.js` v124; `data/week-shape-model.js` v6). Mock-up v5 approved by Graeme, 14 Nov (*"Spec and build the code"*); spec `docs/specs/alongside_little-and-often_change-today_15nov2026_v2.md`. **Two additions, nothing removed. The Plan only** (Free never writes either). **`myExercisesOnHome`** `{ "<list name>": "any" | "morning" | "evening" }`, default `{}`: which lists (groups) from My exercises show on Plan Home under *Little and often*, and when. Absent means *Not on Home*. **Written by** My exercises' *On Home* (`data/little-and-often.js` `setOnHome`). **Read by** `homeItems()` (at most three on Home: this part of the day first, then *Any time*). **On load** (`sanitizeOnHome`): keys are list names up to 40 characters with `<` and `>` removed, at most 40 entries; any other value is dropped. **`weekChanges`** `{ week: "<this week's Monday, YYYY-MM-DD>", days: { <day>: change } }` or `null`, default `null`: this week's changes from *Change today*. A change is `{ kind: "plan", value: <day plan id>, from: <day>, caught?: true }` (this day plays another day's plan), `{ kind: "moved", value, to: <day>, caught?: true }` (this day's plan went to another day), or `{ kind: "little" | "rest" | "else" }` (*Little and often instead*, *Rest today*, *Something else*). `caught` marks *Catch up*. **Written only by** `data/week-changes.js`. **Read by** `data/week-shape.js` `dayInWeek()` and `todayInWeek()`, so Home, `askForToday()` and the coach's plan read the changed day. **On load** (`sanitizeWeekChanges`, against the loaded `weekShape`): an earlier week's changes load as `null` (nothing carries into next week); a change whose day plan is no longer in the week, whose other day is itself or not a day, or whose kind is unknown is dropped. **`weekShape` is never written by either.** Gated by `tools/verify-p31-change-today.mjs`.
+
 
 > **v1.124, 06 Nov 2026 — P-28 FINISH** (`store.js` v123). **Four fields removed, nothing added** (Graeme, 06 Nov: *"Delete them"*). **`inStepProgress.unlockedAt`**, **`scenarioIndex`**, **`completedCount`** and **`choiceLog`** (the old In Step room's cooldowns, scenario positions, counts and the option somebody picked, `{ movementId, scenarioId, optionId, tag, at }[]`, an aggregate research signal never read) were written by nothing since `alongside-v707` (S3 retired the old room). **On load** `inStepProgress` keeps only **`programme`** (v1.123), so the four leave the phone the next time the app opens; nothing reads them. The code that wrote them is archived (`docs/archive-code/in-step_v5_retired_06nov2026.js`; BNH-Files `Archive/P-28 In Step Environment/`). Both tiers. Gated by `tools/verify-p28-schema.mjs` v2.
 
@@ -1091,7 +1094,7 @@
 
 ## 06 Sep 2026 v1.51
 
-**File:** `js/store.js` (confirmed live version: **v123, 06 Nov 2026**)
+**File:** `js/store.js` (confirmed live version: **v124, 14 Nov 2026**)
 
 > **v1.47, 06 Sep 2026 — CR-1.** `conditions[]` gains three ids and loses one. `chronic-fatigue` is **retired**; `persistent-fatigue`, `me-cfs` and `long-covid` replace it. No field shape changed — `conditions` is still `string[]` and `conditionMeta` is still keyed by condition id.
 >

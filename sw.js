@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 08 Nov 2026 v714
+ * 15 Nov 2026 v715
  *
+ * v715 - P-31 (the Plan; Free unchanged). Little and often: in My exercises, each list has On Home (Not on Home, Any time, Mornings, Evenings); up to three show on Home under the Today card, one tap each, with "Done today" once a list is ticked and, on a sore day, which area a list works (its player still asks). Change today, a link under the Today card: Do it another day (each later day says whether it swaps or the session moves there), Catch up (on a day with no session, an earlier one this week not done; never a reminder), Little and often instead, Rest today and Something else. Every change is this week's only; Your week stays as planned, a session moves once, and Home says what changed with Undo beside it. Lately shows once today's session is done, or on a day without one. Undo never puts a session back on a day that has passed, and a session moved to a later day stays there if today becomes something else. store.js v124, Schema v1.125. NEW FILES precached: js/views/change-today.js, js/data/week-changes.js, js/data/little-and-often.js, js/data/sore-rule.js (one sore rule for the player and Home).
  * v714 - The coach's recordings: added while the app is open, they are now found when you open Guide me or come back to the app, without closing it first.
  * v713 - Safety on both tiers. With an area quite sore this morning, Free now gets the same halfway check as the Plan: "still okay?", carry on or stop and save. On the Plan, a programme now leaves out any movement your sore areas rule out today (as a kept session already did), and What I've adjusted says what was really left out, or that nothing was. NEW FILES: none.
  * v712 - The coach's recordings: the list of which recordings exist is read when the app opens and kept for offline use; each recording is kept in its newest version only, so a line recorded again reaches your phone. Nothing changes on screen until the recordings are added.
@@ -4261,7 +4262,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v714";
+const CACHE_NAME = "alongside-v715";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4327,8 +4328,8 @@ const SHELL_HASHES = {
   "./css/components/capture.css": "343b4ae0dc6fe6ea",
   "./css/components/finish.css": "c33e298d5fcb92ae",
   "./js/app.js": "72054b00e54ad55b",
-  "./js/router.js": "41c12f5523a0d78d",
-  "./js/store.js": "7dfd781a05f86e07",
+  "./js/router.js": "ffd731ae2e878720",
+  "./js/store.js": "096e89665e70d949",
   "./js/session-log.js": "6134de4315842e05",
   "./js/exercise-feedback.js": "adba8549f444da2a",
   "./js/exercise-card.js": "78196b42671c67aa",
@@ -4388,7 +4389,7 @@ const SHELL_HASHES = {
   "./js/data/arc-readback.js": "9b06dcba96534da0",
   "./js/data/tier-table.js": "7821c3304bd0815c",
   "./js/views/know-what.js": "e84fee3e6d9d3af0",
-  "./js/views/plan-home.js": "c3119c9c9830c2c7",
+  "./js/views/plan-home.js": "04294fa6cad1336f",
   "./js/views/path.js": "b61c38301f18b744",
   "./js/plan-look.js": "7674d8fbf5101aa9",
   "./js/views/plan-finish.js": "0e0cc208d5d6a59c",
@@ -4398,7 +4399,7 @@ const SHELL_HASHES = {
   "./js/data/swap-search.js": "5f0f0e4d112f92ea",
   "./js/views/build-session.js": "763317cec8c62e83",
   "./js/data/build-lately.js": "e06714cc9d1539a6",
-  "./css/components/path.css": "8a1439f71bb238ae",
+  "./css/components/path.css": "0f1c966ff5988696",
   "./js/data/red-flag.js": "3cd9eecbc3985eb3",
   "./js/data/health-consent.js": "a23d005af57f179c",
   "./js/data/age-check.js": "7fa5b0f5a6b34770",
@@ -4407,13 +4408,17 @@ const SHELL_HASHES = {
   "./js/data/health-consent-covers.js": "6698a3e50672cbbe",
   "./js/data/kind-colours.js": "f247edabfec2fd3d",
   "./js/data/line-icons.js": "ac72317a529cf62b",
-  "./js/data/week-shape-model.js": "125804ade2e3713b",
-  "./js/data/week-shape.js": "7c144c42ca0b91b4",
+  "./js/data/week-shape-model.js": "7889ce6889cad039",
+  "./js/data/week-shape.js": "e77e784bdbf00e28",
   "./js/data/warm-views.js": "73c268f74f004e8e",
   "./js/views/your-week.js": "134c7ba563b78359",
   "./js/data/plan-reader.js": "a63239d24ffa51f9",
   "./js/views/plan-import.js": "baee11ac3f5ff1da",
-  "./css/components/your-week.css": "900ee35d728e96d1",
+  "./js/views/change-today.js": "dfaf52c019014371",
+  "./js/data/week-changes.js": "1bd0a7a6db2c338f",
+  "./js/data/little-and-often.js": "5ea20b534c403550",
+  "./js/data/sore-rule.js": "f6ea51d828be37f0",
+  "./css/components/your-week.css": "c95efbc697af8495",
   "./js/figures.js": "621b376c8778dbb4",
   "./js/data/figures/index.js": "9dd411b0802b6ff2",
   "./js/data/figures/batch-01.js": "27f86e28fb0c9833",
@@ -4475,8 +4480,8 @@ const SHELL_HASHES = {
   "./js/data/guide-me.js": "ed77e97b8a8a35ea",
   "./js/views/journal-entry.js": "dd38e795ee54e7d7",
   "./js/views/gym-programme.js": "98de0c5929699fb1",
-  "./js/views/prescribed.js": "2c074cff1755456e",
-  "./js/views/prescribed-session.js": "105d69a0d22b6318",
+  "./js/views/prescribed.js": "968c57c40c5ea479",
+  "./js/views/prescribed-session.js": "109860d8ccecb09a",
   "./js/views/quiet-session.js": "eb439e800dc71d74",
   "./js/views/breathing-session.js": "3d049d83a8e783b9",
   "./js/views/morning-session.js": "549fd3efaac3eb67",
@@ -4739,6 +4744,10 @@ const SHELL_URLS = [
   "./js/views/your-week.js",
   "./js/data/plan-reader.js",
   "./js/views/plan-import.js",
+  "./js/views/change-today.js",
+  "./js/data/week-changes.js",
+  "./js/data/little-and-often.js",
+  "./js/data/sore-rule.js",
   "./css/components/your-week.css",
   "./js/figures.js",
   "./js/data/figures/index.js",

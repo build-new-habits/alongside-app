@@ -1,6 +1,16 @@
 /**
  * js/data/week-shape-model.js
- * 02 Nov 2026 v5
+ * 14 Nov 2026 v6
+ *
+ * v6 - P-31 LITTLE-AND-OFTEN and CHANGE-TODAY, schema (Schema v1.125;
+ *   mock-up v5 approved by Graeme, 14 Nov: "Spec and build the code").
+ *   Two new shapes, made safe here because this file has no store:
+ *   sanitizeOnHome() for myExercisesOnHome (which lists from My exercises
+ *   show on Home under Little and often, and when: Any time, Mornings,
+ *   Evenings) and sanitizeWeekChanges() for weekChanges (this week's
+ *   changes from Change today: a day playing another day's plan, a day
+ *   whose plan moved, Little and often instead, Rest today, Something
+ *   else). A change from an earlier week reads as none.
  *
  * v5 - P-26 ONE-BUILD-PAGE, schema first (Schema v1.121). A day plan may be
  *   one of the person's saved sessions: saved, the saved session's id
@@ -375,4 +385,62 @@ export function detailLine(t) {
   if (t.own) return "As you wrote it";
   if (t.saved) return "As you built it";
   return `${intensityById(t.intensity).label} · ${t.mins} min · ${PLACES.find(p => p.id === t.place)?.label.toLowerCase() || ""}`;
+}
+
+
+// ── P-31. Little and often, and Change today ──────────────────────────
+
+/** When a list from My exercises shows on Home (absent: not on Home). */
+export const ON_HOME = ["any", "morning", "evening"];
+const MAX_ON_HOME = 40;
+
+/** myExercisesOnHome made safe: { "<group name>": "any"|"morning"|"evening" }. */
+export function sanitizeOnHome(o) {
+  if (!o || typeof o !== "object" || Array.isArray(o)) return {};
+  const out = {};
+  for (const [k, v] of Object.entries(o).slice(0, MAX_ON_HOME)) {
+    const name = String(k).replace(/[<>]/g, "").trim().slice(0, 40);
+    if (name && ON_HOME.includes(v)) out[name] = v;
+  }
+  return out;
+}
+
+/**
+ * What a day of this week can be changed to. plan: it plays another day's
+ * plan (value, from); moved: its plan went to another day (value, to);
+ * little: Little and often instead; rest: Rest today; else: Something else
+ * (no plan from the week today). caught marks a plan done to catch up.
+ */
+export const CHANGE_KINDS = ["plan", "moved", "little", "rest", "else"];
+
+/** The local Monday of this date's week, YYYY-MM-DD. */
+export function mondayOf(d = new Date()) {
+  const m = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  m.setDate(m.getDate() - ((m.getDay() + 6) % 7));
+  return `${m.getFullYear()}-${String(m.getMonth() + 1).padStart(2, "0")}-${String(m.getDate()).padStart(2, "0")}`;
+}
+
+/**
+ * weekChanges made safe against the week it changes: { week, days } or
+ * null. Only this week's are kept (week is its Monday); a day whose plan
+ * is no longer in the week, or whose other day is itself, is dropped.
+ */
+export function sanitizeWeekChanges(c, week, today = new Date()) {
+  if (!c || typeof c !== "object" || !week || !week.templates) return null;
+  const monday = mondayOf(today);
+  if (c.week !== monday) return null;
+  const days = {};
+  for (const d of DAY_KEYS) {
+    const x = c.days && c.days[d];
+    if (!x || typeof x !== "object" || !CHANGE_KINDS.includes(x.kind)) continue;
+    if (x.kind === "plan" || x.kind === "moved") {
+      const other = x.kind === "plan" ? x.from : x.to;
+      if (!_id(x.value) || !week.templates[x.value] || !DAY_KEYS.includes(other) || other === d) continue;
+      days[d] = { kind: x.kind, value: x.value, [x.kind === "plan" ? "from" : "to"]: other };
+      if (x.caught === true) days[d].caught = true;
+    } else {
+      days[d] = { kind: x.kind };
+    }
+  }
+  return Object.keys(days).length ? { week: monday, days } : null;
 }
