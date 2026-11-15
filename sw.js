@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 15 Nov 2026 v718
+ * 15 Nov 2026 v719
  *
+ * v719 - P-25 (both tiers). Help: one button, top right, on every screen but a running session. It opens How do I…?: the guides for the screen you were on, search, the guides by what you want to do, and Still stuck? (an email address to copy and the support lines). Each guide says what you'll end up with and its steps, then Guide me through it: a ring on the real button and a box with the step, moving on as you tap; Back a step, Stop the guide, Make this smaller; tap something else and it says you've left the guide, with Carry on from here. It ends with Did that work?. Seven guides: starting, today's session, adding a plan from a physio or a sheet, setting days, a daily routine, missed days, and your arc. Nothing about using them is stored or sent. NEW FILES precached: js/guide.js, js/data/guides.js, js/views/help.js, css/components/help.css.
  * v718 - P-34 (the Plan; Free unchanged). Home is for what to do: Lately (how you felt before and after your sessions, and what seems to help) has moved off Home. The same reading is Before and after, now near the top of Progress, straight after the numbers for the days you are looking at. NEW FILES: none.
  * v717 - P-33 (the Plan; Free unchanged). Share your plan, on Progress: your arc and what works towards it, your week, your lists with amounts and what is on Home, and saved sessions, on one page for a physio or trainer, made on your phone as a PDF (Share… or Save as a file) or as text to copy. The text comes back in through Add a plan you already have, with its On Home choices; a name with a dash in it now matches. The journal, check-in answers and weight are never in it; the last 30 days, anything sore, notes and your name only if you switch them on. NEW FILES precached: js/data/plan-share.js, js/data/pdf-lite.js, js/views/plan-share.js.
  * v716 - P-32 (the Plan; Free unchanged). Stretch for stiffness: in Stretch, after the area, How does it feel today? (Fine, just a stretch, A little, Quite or Very stiff) and Anywhere in particular? (routines that work the spot say so and come first). Very stiff starts each routine with two minutes of gentle movement and shorter holds. It hurts sends you to the check-in, never to a stretch. Every Stretch routine says to ease into a gentle pull. After a stiff stretch, How do your … feel now?, and Put this on Home when it helped. Nothing new is stored. NEW FILE precached: js/data/stretch-stiffness.js.
@@ -4265,7 +4266,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v718";
+const CACHE_NAME = "alongside-v719";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4273,9 +4274,9 @@ const CACHE_NAME = "alongside-v718";
 // downloads only the rest: it fetched all of them (about 6 MB) every time.
 // SHELL_HASHES:BEGIN
 const SHELL_HASHES = {
-  "./": "dfcf83623b622f91",
-  "./index.html": "dfcf83623b622f91",
-  "./css/main.css": "0b9a312ed5b966ff",
+  "./": "9e667c02edab5b4d",
+  "./index.html": "9e667c02edab5b4d",
+  "./css/main.css": "736c69954dcc167f",
   "./css/base/fonts.css": "04893bbdfa4cf013",
   "./css/layouts/onboarding-additions.css": "43a85bf31e18712f",
   "./css/layouts/today.css": "c1b636255096d8af",
@@ -4330,13 +4331,13 @@ const SHELL_HASHES = {
   "./css/components/club-rooms.css": "f1c069c5b8eaf09e",
   "./css/components/capture.css": "343b4ae0dc6fe6ea",
   "./css/components/finish.css": "c33e298d5fcb92ae",
-  "./js/app.js": "72054b00e54ad55b",
-  "./js/router.js": "d6d5616fab2d55d8",
+  "./js/app.js": "f1496daa7cfb04a4",
+  "./js/router.js": "35549644c785935c",
   "./js/store.js": "096e89665e70d949",
   "./js/session-log.js": "6134de4315842e05",
   "./js/exercise-feedback.js": "adba8549f444da2a",
   "./js/exercise-card.js": "78196b42671c67aa",
-  "./js/safety-gate.js": "7a095f4bf8018087",
+  "./js/safety-gate.js": "1b7e41d99e2cf520",
   "./js/save-block.js": "efe2b2583f4c14f7",
   "./js/stretch-target.js": "e8c305bfb957d655",
   "./js/data/purpose.js": "fe0f0dcf76cd4591",
@@ -4348,15 +4349,15 @@ const SHELL_HASHES = {
   "./js/session-guard.js": "00177a846537868c",
   "./js/session-resume.js": "6916b88c0757374f",
   "./js/auth.js": "9b9c7a632dccada6",
-  "./js/views/today.js": "36e85d3cec39efaf",
+  "./js/views/today.js": "1ebac1eefa630699",
   "./js/views/mobility-conditioning.js": "8b30ad4fa0887d62",
-  "./js/views/arc-setup.js": "4259be993a3b9a38",
-  "./js/views/stretch-arc.js": "b4c5fdcd069a4612",
-  "./js/views/checkin.js": "69cd078ee9c3b84a",
+  "./js/views/arc-setup.js": "f96f80a770f56b47",
+  "./js/views/stretch-arc.js": "cdc78c24b91d2e1c",
+  "./js/views/checkin.js": "5ea0fea142be8ceb",
   "./js/views/checkin-mini.js": "c647f4da71feddde",
-  "./js/views/coach-proposal.js": "483cee5a0d486fd9",
+  "./js/views/coach-proposal.js": "816ba25a48fe721e",
   "./js/views/workout.js": "fba068b2e4f6c61f",
-  "./js/views/progress.js": "319bf945f338ac96",
+  "./js/views/progress.js": "aae7d6a3c1ffaee5",
   "./js/views/settings.js": "85ce48f8345522b6",
   "./js/views/restore-flow.js": "dc81c2e455fa472d",
   "./js/views/weekly-plan.js": "dcee06e297b402c0",
@@ -4382,7 +4383,7 @@ const SHELL_HASHES = {
   "./js/views/programme-select.js": "115a22eeb9526be5",
   "./js/views/upgrade.js": "1c5fabcb72727877",
   "./js/views/privacy.js": "25721026cff47822",
-  "./js/views/library.js": "ab502fc0ca8bfa85",
+  "./js/views/library.js": "36195497d25a503d",
   "./js/views/practices.js": "9890a7fa300e9d1c",
   "./js/views/red-flag.js": "d2f857d0f8ba905f",
   "./js/views/health-consent.js": "66c6f499c7863c7c",
@@ -4392,7 +4393,7 @@ const SHELL_HASHES = {
   "./js/data/arc-readback.js": "9b06dcba96534da0",
   "./js/data/tier-table.js": "7821c3304bd0815c",
   "./js/views/know-what.js": "e84fee3e6d9d3af0",
-  "./js/views/plan-home.js": "5725d595376f7b8b",
+  "./js/views/plan-home.js": "46ba931aac825b6a",
   "./js/views/path.js": "dbfa695d9edd6ec8",
   "./js/plan-look.js": "7674d8fbf5101aa9",
   "./js/views/plan-finish.js": "d3901b6355f55542",
@@ -4414,9 +4415,9 @@ const SHELL_HASHES = {
   "./js/data/week-shape-model.js": "7889ce6889cad039",
   "./js/data/week-shape.js": "e77e784bdbf00e28",
   "./js/data/warm-views.js": "73c268f74f004e8e",
-  "./js/views/your-week.js": "134c7ba563b78359",
+  "./js/views/your-week.js": "037bff571dd21bee",
   "./js/data/plan-reader.js": "8b909dcd350014b1",
-  "./js/views/plan-import.js": "15bb71fb19b37333",
+  "./js/views/plan-import.js": "b4b6bc817ef1b455",
   "./js/views/change-today.js": "dfaf52c019014371",
   "./js/data/week-changes.js": "1bd0a7a6db2c338f",
   "./js/data/little-and-often.js": "5ea20b534c403550",
@@ -4425,6 +4426,10 @@ const SHELL_HASHES = {
   "./js/data/plan-share.js": "0461891c97ca592b",
   "./js/data/pdf-lite.js": "b924b197ae7f46fe",
   "./js/views/plan-share.js": "44d68277e1a8d77e",
+  "./js/guide.js": "29bd60e63aff9d8d",
+  "./js/data/guides.js": "caa98e35eb996e53",
+  "./js/views/help.js": "4d4218955ce16e02",
+  "./css/components/help.css": "bd47e75e7a505a29",
   "./css/components/your-week.css": "c95efbc697af8495",
   "./js/figures.js": "621b376c8778dbb4",
   "./js/data/figures/index.js": "9dd411b0802b6ff2",
@@ -4487,7 +4492,7 @@ const SHELL_HASHES = {
   "./js/data/guide-me.js": "ed77e97b8a8a35ea",
   "./js/views/journal-entry.js": "dd38e795ee54e7d7",
   "./js/views/gym-programme.js": "98de0c5929699fb1",
-  "./js/views/prescribed.js": "968c57c40c5ea479",
+  "./js/views/prescribed.js": "f8ee61de31f26330",
   "./js/views/prescribed-session.js": "109860d8ccecb09a",
   "./js/views/quiet-session.js": "eb439e800dc71d74",
   "./js/views/breathing-session.js": "3d049d83a8e783b9",
@@ -4759,6 +4764,10 @@ const SHELL_URLS = [
   "./js/data/plan-share.js",
   "./js/data/pdf-lite.js",
   "./js/views/plan-share.js",
+  "./js/guide.js",
+  "./js/data/guides.js",
+  "./js/views/help.js",
+  "./css/components/help.css",
   "./css/components/your-week.css",
   "./js/figures.js",
   "./js/data/figures/index.js",
