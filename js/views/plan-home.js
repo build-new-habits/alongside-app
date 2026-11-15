@@ -1,6 +1,14 @@
 /**
  * views/plan-home.js
- * 15 Nov 2026 v10
+ * 15 Nov 2026 v11
+ *
+ * v11 - P-34 HOME-CALM (Graeme, 15 Nov: "exercise routes from home and
+ *   progress in progress, so lately in progress"). Lately is gone from Home:
+ *   Home is what to do (greeting, arc line, Today, Change today, Little and
+ *   often, the four ways in, the Library). How moving is going lives on
+ *   Progress, as Before and after, near its top; it read the same pairs the
+ *   same way (data/progress-report.js), so nothing is lost. The finish still
+ *   sets now beside this morning.
  *
  * v10 review (15 Nov): Undo shows only when it can be done safely
  *   (week-changes.js canUndoToday: never onto a day that has passed); the
@@ -129,7 +137,7 @@ import { activityPhrase } from "../data/activity-labels.js";
 import { renderFigure } from "../figures.js";
 import { suggestToday, arcDoor, pickProgramme, movementName } from "../data/path-engine.js";
 import { setTodaysLength } from "../data/session-length.js";
-import { moodPairs, moodStory, fiveOf } from "../data/progress-report.js";
+import { fiveOf } from "../data/progress-report.js";
 import { EFFORT, ZONE2_ACTIVITIES, zone2Week, zone2HardDoneThisWeek } from "../data/trend-recipes.js";
 
 // ── The doors ──────────────────────────────────────────────────────────────
@@ -357,35 +365,6 @@ function row(state, kind, icon, title, sub, attrs, door = null) {
   </button>`;
 }
 
-// ── Lately (a first cut; Session 7 draws it from progress-report.js) ───────
-
-/**
- * Before and after, on the person's own five words, for the last six
- * finished sessions that have both (the check-in's mood that day, and the
- * mood after). Shown from three. Never a count of days, never a target.
- */
-export function latelyPairs(n = 6) {
-  return moodPairs(store.completedSessions(store.get("activityLog") || []), store.get("checkinHistory") || {}, { last: n })
-    .map(p => ({ e: p.entry, before: p.before, after: p.after, better: p.better }));
-}
-
-/** v5: the same reading as Progress (data/progress-report.js moodStory), so the two never disagree. */
-function lately() {
-  const pairs = latelyPairs();
-  const story = moodStory(pairs.map(p => ({ entry: p.e, before: p.before, after: p.after, better: p.better })), e => e.name || e.title || activityPhrase(e));
-  if (!story) return "";
-  const H = 40, bw = 12, gw = bw * 2 + 10, h = v => ((fiveOf(v) + 1) / 5) * H;
-  const bars = pairs.map((p, i) => `<rect x="${i * gw}" y="${H - h(p.before)}" width="${bw}" height="${h(p.before)}" rx="3" class="path-lately__before"></rect>` +
-    `<rect x="${i * gw + bw + 2}" y="${H - h(p.after)}" width="${bw}" height="${h(p.after)}" rx="3" class="path-lately__after"></rect>`).join("");
-  return `<h2 class="look-label" id="path-lately-h">Lately</h2>
-    <div class="path-lately" role="group" aria-labelledby="path-lately-h">
-      <div class="path-lately__tile"><p class="path-lately__lbl">After moving</p>
-        <svg class="path-lately__spark" viewBox="0 0 ${gw * pairs.length - 10} ${H}" role="img" aria-label="${story.label}">${bars}</svg>
-        <p class="path-lately__line">Better after ${story.better} of your last ${story.total}.</p></div>
-      ${story.helps ? `<div class="path-lately__tile"><p class="path-lately__lbl">What seems to help</p><p class="path-lately__line">${esc(story.helps)} seems to help you most.</p></div>` : ""}
-    </div>`;
-}
-
 /**
  * P-31. Under the Today card: what today's change was, with Undo beside it,
  * and Change today. Only with a week, and not while a session is carried
@@ -441,7 +420,6 @@ export function renderPlanHome(ctx = {}) {
       <h1 class="path-greeting" tabindex="-1">${esc(ctx.greeting || "")}</h1>
       ${ctx.coachNote ? `<p class="path-note" role="status">${esc(ctx.coachNote)}</p>` : ""}
       ${arcLine(arc)}
-      ${["week", "planned", "carry"].includes(state) ? "" : lately()}
       ${todayCard(state, ctx.carry)}
       ${changeBar(state)}
       ${littleAndOften()}

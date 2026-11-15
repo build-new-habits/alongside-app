@@ -1,7 +1,12 @@
 import { createRequire as __cr } from "node:module";
 /**
  * tools/verify-plan-home-path.mjs
- * 14 Nov 2026 v4
+ * 15 Nov 2026 v5
+ *
+ * v5 - P-34 HOME-CALM (Graeme, 15 Nov: "lately in progress"). Lately is not
+ *   on Home: 1a's order has no Lately; TEST 5 now checks it is gone from
+ *   Home in every state, with six sessions rated before and after
+ *   (verify-path-progress checks it on Progress). 5d unchanged.
  *
  * v4 - P-31 (Graeme, 14 Nov: "Count Change today with the Today card").
  *   Test 2's six ways in leaves out Change today and its Undo (.path-change,
@@ -131,8 +136,8 @@ ok("0b. a cold open on the Plan draws Home (no first-open screen)", !!main.query
 console.log("\nTEST 1 - top to bottom, as mock-up v10");
 fixture({ pairs: 4 }); home();
 const order = [...main.querySelectorAll(".path-home > *")].map(el => el.matches("h1") ? "h1" : el.classList[0]);
-const want = ["h1", "path-arcline", "look-label", "path-lately", "path-coach", "look-label", "path-doors"];
-ok("1a. greeting, arc line, Lately, the coach's row, label, doors", JSON.stringify(order.filter(o => want.includes(o))) === JSON.stringify(want), order.join(" > "));
+const want = ["h1", "path-arcline", "path-coach", "look-label", "path-doors"];
+ok("1a. greeting, arc line, the coach's row, label, doors (no Lately: P-34)", JSON.stringify(order.filter(o => want.includes(o))) === JSON.stringify(want), order.join(" > "));
 ok("1b. one h1", main.querySelectorAll("h1").length === 1);
 const arcLine = main.querySelector(".path-arcline");
 ok("1c. the arc is said, with its week and its aim, and is not a button", /Your arc · Week \d+( starts today)?\./.test(txt(arcLine)) && !arcLine.closest("button") && !arcLine.querySelector("button, a"), txt(arcLine));
@@ -207,14 +212,13 @@ ok("4h. the Library: no check-in on the way", navs.join() === "library", JSON.st
 ok("4i. a mood is said as a person says it", /^You said you.re struggling, so this is slow and steady\.$/.test(ENG.suggestToday({ checkin: { energy: 6, mood: 2 } }).reason));
 
 // ── 5 ─────────────────────────────────────────────────────────────────────
-console.log("\nTEST 5 - Lately");
-fixture({ pairs: 2 }); home();
-ok("5a. under three sessions with both moods: not shown", !main.querySelector(".path-lately"));
-fixture({ pairs: 4 }); home();
-const late = main.querySelector(".path-lately");
-ok("5b. from three: before and after, said in words and named for screen readers", /Better after 3 of your last 4\./.test(txt(late)) && /better after 3/.test(late.querySelector("svg[role='img']")?.getAttribute("aria-label") || ""), txt(late));
-ok("5c. and what seems to help, when one session has been followed by a better mood twice or more", /Calming yoga seems to help you most\./.test(txt(late)));
-ok("5d. never a weekly count or a target on Home (LOBBY-1b)", !/\b\d+ (times|sessions)\b|this week|\b\d+ of \d+ this/i.test(txt(main)), txt(late));
+console.log("\nTEST 5 - Lately lives on Progress (P-34)");
+for (const [label, f] of Object.entries(STATES)) {
+  fixture({ ...f, pairs: 6 }); home();
+  ok(`5a. ${label}, six sessions rated before and after: no Lately on Home`, !main.querySelector(".path-lately, #path-lately-h") && !/\bLately\b/.test(txt(main)));
+}
+fixture({ pairs: 6 }); home();
+ok("5d. never a weekly count or a target on Home (LOBBY-1b)", !/\b\d+ (times|sessions)\b|this week|\b\d+ of \d+ this/i.test(txt(main)), txt(main).slice(0, 200));
 
 // ── 6 ─────────────────────────────────────────────────────────────────────
 console.log("\nTEST 6 - the coach's line, only when it adds something");

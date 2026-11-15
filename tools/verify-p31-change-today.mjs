@@ -1,6 +1,8 @@
 /**
  * tools/verify-p31-change-today.mjs
- * 15 Nov 2026 v2
+ * 15 Nov 2026 v3
+ *
+ * v3 - P-34: 7c's name only (Lately is not on Home at all now).
  *
  * v2 - P-31 review (15 Nov). 8g: Free is sent Home (as Build a session
  *   does), not shown a page. 9a: On Home's label names its list for a
@@ -210,7 +212,7 @@ fixture(); todayIsSession(); home();
 ok("7a. Change today under the Today card", !!main.querySelector("[data-action='change-today']") &&
   main.querySelector(".path-today, .path-coach").compareDocumentPosition(main.querySelector("[data-action='change-today']")) & 4);
 ok("7b. no change line before a change", !main.querySelector("[data-action='undo-change']"));
-ok("7c. Lately waits while today's session is still to do", !main.querySelector("#path-lately-h"));
+ok("7c. no Lately on Home (P-34, 15 Nov: it lives on Progress)", !main.querySelector("#path-lately-h"));
 navs = []; click(main.querySelector("[data-action='change-today']"));
 ok("7d. Change today opens its screen", navs.includes("change-today"), JSON.stringify(navs));
 WC.setToday("rest"); home();

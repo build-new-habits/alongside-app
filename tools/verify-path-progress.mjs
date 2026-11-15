@@ -1,7 +1,12 @@
 import { createRequire as __cr } from "node:module";
 /**
  * tools/verify-path-progress.mjs
- * 31 Oct 2026 v1
+ * 15 Nov 2026 v2
+ *
+ * v2 - P-34 HOME-CALM (Graeme, 15 Nov: "lately in progress"). Home has no
+ *   Lately now, so TEST 4 checks that, and that Progress shows Before and
+ *   after near the top: straight after the window's numbers, before the
+ *   coach's line and the chart. What-helps is read here (4c).
  *
  * STAGE PATH Session 7 (P-7 PROGRESS-STORY; blueprint D6; P-12's Plan look,
  * Graeme 29 Oct: "I basically want a paying user to look at the app and see
@@ -14,8 +19,8 @@ import { createRequire as __cr } from "node:module";
  *   2. Two pairs: nothing (two is not a pattern). Outside the window: not
  *      counted.
  *   3. Never a streak, days in a row, "down", a score or "best".
- *   4. Home's Lately and Progress read the same pairs the same way
- *      (data/progress-report.js moodStory): the same numbers.
+ *   4. v2 (P-34): Home has no Lately; on Progress, Before and after comes
+ *      straight after the window's numbers, with what seems to help.
  *   5. Free's Progress, Your year and Your impact: byte for byte as they were
  *      on alongside-v686.
  *   6. On the Plan, Your year and Your impact take the new look: "‹ Back",
@@ -101,12 +106,16 @@ const words = txt(section()) + " " + (svg?.getAttribute("aria-label") || "");
 ok("3a. no streak, days in a row, down, score, best, worst or record", !/streak|in a row|\bdown\b|score|\bbest\b|worst|record|\d+%/i.test(words), words);
 
 // ── 4 ───────────────────────────────────────────────────────────────────
-console.log("\nTEST 4 - Home's Lately reads the same");
+console.log("\nTEST 4 - Lately lives on Progress (P-34)");
 fixture({ pairs: FOUR }); main.innerHTML = ""; TodayView(fakeRouter).mount(main);
-const homeLine = txt(main.querySelector(".path-lately__line"));
-const story = PR.moodStory(PR.moodPairs(store.completedSessions(store.get("activityLog")), store.get("checkinHistory"), { last: 6 }), e => e.name);
-ok("4a. Lately: the same count from the same reading", homeLine === `Better after ${story.better} of your last ${story.total}.` && story.better === 3, homeLine);
-ok("4b. and the same what-helps", /Calming yoga seems to help you most/.test(txt(main.querySelector(".path-lately"))));
+ok("4a. Home: no Lately, with four sessions rated before and after", !main.querySelector(".path-lately, #path-lately-h"));
+fixture({ pairs: FOUR }); progress();
+const body = main.querySelector(".progress-body");
+const kids = body ? [...body.children] : [];
+const at = sel => kids.findIndex(k => k.matches(sel) || k.querySelector?.(sel));
+ok("4b. Progress: Before and after comes straight after the window's numbers, before the coach's line and the chart",
+  !!section() && at(".pr-mood") > -1 && at(".pr-mood") < kids.length && kids.slice(0, at(".pr-mood")).length <= 1, kids.map(k => k.className || k.tagName).join(" > "));
+ok("4c. and says what seems to help", /Calming yoga seems to help you most/.test(txt(section())));
 
 // ── 5 ───────────────────────────────────────────────────────────────────
 console.log("\nTEST 5 - Free, as it was on v686");
