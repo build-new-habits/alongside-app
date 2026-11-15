@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 15 Nov 2026 v719
+ * 15 Nov 2026 v720
  *
+ * v720 - P-25 fix (both tiers). "I've just opened the app" now starts from whatever Home leads with today: Let me choose for you, Today, from your week, or Start your list (on a day set in your week there was nothing to ring). The check-in on the way says "Answer the questions. The guide picks up after." and never counts as leaving the guide; already checked in, the guide carries on from the next screen. Make this smaller keeps its words at ordinary text sizes. NEW FILES: none.
  * v719 - P-25 (both tiers). Help: one button, top right, on every screen but a running session. It opens How do I…?: the guides for the screen you were on, search, the guides by what you want to do, and Still stuck? (an email address to copy and the support lines). Each guide says what you'll end up with and its steps, then Guide me through it: a ring on the real button and a box with the step, moving on as you tap; Back a step, Stop the guide, Make this smaller; tap something else and it says you've left the guide, with Carry on from here. It ends with Did that work?. Seven guides: starting, today's session, adding a plan from a physio or a sheet, setting days, a daily routine, missed days, and your arc. Nothing about using them is stored or sent. NEW FILES precached: js/guide.js, js/data/guides.js, js/views/help.js, css/components/help.css.
  * v718 - P-34 (the Plan; Free unchanged). Home is for what to do: Lately (how you felt before and after your sessions, and what seems to help) has moved off Home. The same reading is Before and after, now near the top of Progress, straight after the numbers for the days you are looking at. NEW FILES: none.
  * v717 - P-33 (the Plan; Free unchanged). Share your plan, on Progress: your arc and what works towards it, your week, your lists with amounts and what is on Home, and saved sessions, on one page for a physio or trainer, made on your phone as a PDF (Share… or Save as a file) or as text to copy. The text comes back in through Add a plan you already have, with its On Home choices; a name with a dash in it now matches. The journal, check-in answers and weight are never in it; the last 30 days, anything sore, notes and your name only if you switch them on. NEW FILES precached: js/data/plan-share.js, js/data/pdf-lite.js, js/views/plan-share.js.
@@ -4266,7 +4267,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v719";
+const CACHE_NAME = "alongside-v720";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4394,7 +4395,7 @@ const SHELL_HASHES = {
   "./js/data/tier-table.js": "7821c3304bd0815c",
   "./js/views/know-what.js": "e84fee3e6d9d3af0",
   "./js/views/plan-home.js": "46ba931aac825b6a",
-  "./js/views/path.js": "dbfa695d9edd6ec8",
+  "./js/views/path.js": "58b8b222835ce885",
   "./js/plan-look.js": "7674d8fbf5101aa9",
   "./js/views/plan-finish.js": "d3901b6355f55542",
   "./js/data/outside.js": "3af4ea46bd898084",
@@ -4426,8 +4427,8 @@ const SHELL_HASHES = {
   "./js/data/plan-share.js": "0461891c97ca592b",
   "./js/data/pdf-lite.js": "b924b197ae7f46fe",
   "./js/views/plan-share.js": "44d68277e1a8d77e",
-  "./js/guide.js": "3eb9b87dfe3e809d",
-  "./js/data/guides.js": "cf2c523eda5172bc",
+  "./js/guide.js": "45e26ccb97e3616b",
+  "./js/data/guides.js": "d7d09636263e1e8c",
   "./js/views/help.js": "4d4218955ce16e02",
   "./css/components/help.css": "1ea3aee117dc9aee",
   "./css/components/your-week.css": "c95efbc697af8495",
