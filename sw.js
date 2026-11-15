@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 15 Nov 2026 v716
+ * 15 Nov 2026 v717
  *
+ * v717 - P-33 (the Plan; Free unchanged). Share your plan, on Progress: your arc and what works towards it, your week, your lists with amounts and what is on Home, and saved sessions, on one page for a physio or trainer, made on your phone as a PDF (Share… or Save as a file) or as text to copy. The text comes back in through Add a plan you already have, with its On Home choices; a name with a dash in it now matches. The journal, check-in answers and weight are never in it; the last 30 days, anything sore, notes and your name only if you switch them on. NEW FILES precached: js/data/plan-share.js, js/data/pdf-lite.js, js/views/plan-share.js.
  * v716 - P-32 (the Plan; Free unchanged). Stretch for stiffness: in Stretch, after the area, How does it feel today? (Fine, just a stretch, A little, Quite or Very stiff) and Anywhere in particular? (routines that work the spot say so and come first). Very stiff starts each routine with two minutes of gentle movement and shorter holds. It hurts sends you to the check-in, never to a stretch. Every Stretch routine says to ease into a gentle pull. After a stiff stretch, How do your … feel now?, and Put this on Home when it helped. Nothing new is stored. NEW FILE precached: js/data/stretch-stiffness.js.
  * v715 - P-31 (the Plan; Free unchanged). Little and often: in My exercises, each list has On Home (Not on Home, Any time, Mornings, Evenings); up to three show on Home under the Today card, one tap each, with "Done today" once a list is ticked and, on a sore day, which area a list works (its player still asks). Change today, a link under the Today card: Do it another day (each later day says whether it swaps or the session moves there), Catch up (on a day with no session, an earlier one this week not done; never a reminder), Little and often instead, Rest today and Something else. Every change is this week's only; Your week stays as planned, a session moves once, and Home says what changed with Undo beside it. Lately shows once today's session is done, or on a day without one. Undo never puts a session back on a day that has passed, and a session moved to a later day stays there if today becomes something else. store.js v124, Schema v1.125. NEW FILES precached: js/views/change-today.js, js/data/week-changes.js, js/data/little-and-often.js, js/data/sore-rule.js (one sore rule for the player and Home).
  * v714 - The coach's recordings: added while the app is open, they are now found when you open Guide me or come back to the app, without closing it first.
@@ -4263,7 +4264,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v716";
+const CACHE_NAME = "alongside-v717";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4329,7 +4330,7 @@ const SHELL_HASHES = {
   "./css/components/capture.css": "343b4ae0dc6fe6ea",
   "./css/components/finish.css": "c33e298d5fcb92ae",
   "./js/app.js": "72054b00e54ad55b",
-  "./js/router.js": "ffd731ae2e878720",
+  "./js/router.js": "d6d5616fab2d55d8",
   "./js/store.js": "096e89665e70d949",
   "./js/session-log.js": "6134de4315842e05",
   "./js/exercise-feedback.js": "adba8549f444da2a",
@@ -4354,7 +4355,7 @@ const SHELL_HASHES = {
   "./js/views/checkin-mini.js": "c647f4da71feddde",
   "./js/views/coach-proposal.js": "483cee5a0d486fd9",
   "./js/views/workout.js": "fba068b2e4f6c61f",
-  "./js/views/progress.js": "ec6aaab64e2cee39",
+  "./js/views/progress.js": "528d89a073b71db1",
   "./js/views/settings.js": "85ce48f8345522b6",
   "./js/views/restore-flow.js": "dc81c2e455fa472d",
   "./js/views/weekly-plan.js": "dcee06e297b402c0",
@@ -4413,13 +4414,16 @@ const SHELL_HASHES = {
   "./js/data/week-shape.js": "e77e784bdbf00e28",
   "./js/data/warm-views.js": "73c268f74f004e8e",
   "./js/views/your-week.js": "134c7ba563b78359",
-  "./js/data/plan-reader.js": "a63239d24ffa51f9",
-  "./js/views/plan-import.js": "baee11ac3f5ff1da",
+  "./js/data/plan-reader.js": "8b909dcd350014b1",
+  "./js/views/plan-import.js": "15bb71fb19b37333",
   "./js/views/change-today.js": "dfaf52c019014371",
   "./js/data/week-changes.js": "1bd0a7a6db2c338f",
   "./js/data/little-and-often.js": "5ea20b534c403550",
   "./js/data/sore-rule.js": "f6ea51d828be37f0",
   "./js/data/stretch-stiffness.js": "80d3e230b5f0ecef",
+  "./js/data/plan-share.js": "0461891c97ca592b",
+  "./js/data/pdf-lite.js": "b924b197ae7f46fe",
+  "./js/views/plan-share.js": "44d68277e1a8d77e",
   "./css/components/your-week.css": "c95efbc697af8495",
   "./js/figures.js": "621b376c8778dbb4",
   "./js/data/figures/index.js": "9dd411b0802b6ff2",
@@ -4552,7 +4556,7 @@ const SHELL_HASHES = {
   "./js/data/progress-report.js": "5bbd5461406855bb",
   "./js/data/share-images.js": "0812f14d822387ad",
   "./js/views/progress-share.js": "b1238e1af7f8cecb",
-  "./css/components/progress-share.css": "530655f5cd5c62b4",
+  "./css/components/progress-share.css": "255a457d4a3168d9",
   "./assets/fonts/newsreader-latin-500-normal.woff2": "5613e2fc8377392c",
   "./assets/fonts/newsreader-latin-400-italic.woff2": "fa9b900403949d9a",
   "./assets/images/brand/alongside-icon-teal.png": "7b5bde05f9e32efe",
@@ -4751,6 +4755,9 @@ const SHELL_URLS = [
   "./js/data/little-and-often.js",
   "./js/data/sore-rule.js",
   "./js/data/stretch-stiffness.js",
+  "./js/data/plan-share.js",
+  "./js/data/pdf-lite.js",
+  "./js/views/plan-share.js",
   "./css/components/your-week.css",
   "./js/figures.js",
   "./js/data/figures/index.js",
