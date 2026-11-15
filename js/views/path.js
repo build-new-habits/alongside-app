@@ -1,6 +1,9 @@
 /**
  * views/path.js
- * 15 Nov 2026 v15
+ * 15 Nov 2026 v16
+ *
+ * v16 - P-25. Guide marker only: a programme's Start (path-start), where the
+ *   coach's choice can open. Nothing else changes.
  *
  * v15 - P-32 STRETCH-FOR-STIFFNESS (Graeme, 15 Nov: mock-up v2, "The full
  *   range"; spec docs/specs/alongside_stretch-for-stiffness_15nov2026_v1.md).
@@ -657,7 +660,7 @@ export function PathView(router) {
         ${p.slowLine || p.style === "taichi" || p.style === "qigong" ? `<p class="path-small">${esc(SLOW_LINE)}</p>` : ""}
         ${adj.length ? `<div class="path-adj"><p class="path-adj__lbl">What I’ve adjusted</p><ul>${adj.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>` : ""}
         ${outs.length ? `<p class="path-note" id="path-outs">Left out today, because ${esc(areaList(outAreas))} ${outAreas.length > 1 ? "are" : "is"} sore: ${esc(outs.map(s => nameOf(s.id)).join(", "))}. Each has a Swap, or start without ${outs.length > 1 ? "them" : "it"}.</p>` : ""}
-        <button type="button" class="btn btn-primary btn-full" id="path-start"${canStart ? "" : ' disabled aria-describedby="path-outs"'}>Start</button>
+        <button type="button" class="btn btn-primary btn-full" id="path-start" data-guide-target="path-start"${canStart ? "" : ' disabled aria-describedby="path-outs"'}>Start</button>
         ${editable ? `<button type="button" class="path-link" id="path-change">Change this session</button>` : ""}
         ${st.fromCoach ? `<button type="button" class="path-link" id="path-redo">Change my check-in</button>` : ""}
         ${st.door === "feel" && lowMood() ? `<button type="button" class="path-link" id="path-wellbeing">Or something from Wellbeing</button>` : ""}

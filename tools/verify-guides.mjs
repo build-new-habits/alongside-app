@@ -1,6 +1,13 @@
 /**
  * tools/verify-guides.mjs
- * 15 Nov 2026 v2
+ * 15 Nov 2026 v3
+ *
+ * v3 - On the live app (Graeme, 15 Nov: "Where's this?"): A1 on a Home led
+ *   by today's day from your week had nothing to ring. TEST 4 now walks A1
+ *   from every Home that starts something (the coach; a session from your
+ *   week; your own list from your week; already checked in today), and
+ *   TEST 8 checks every guide On this screen has its first button on that
+ *   screen, in every Home state, and Make this smaller keeps its words.
  *
  * v2 - Graeme's review (15 Nov): Help shows on a player's start screen and
  *   goes when the session runs (2g, 2h, 2i); between screens the box says
@@ -120,17 +127,23 @@ export function labelOK(el, label) {
 const ex = (group, name) => ({ id: group + "-" + name, name, sets: 3, reps: "10", group, completedToday: false });
 const LISTS = [ex("Morning routine", "Cat-cow"), ex("Morning routine", "Glute bridge"), ex("Gym A", "Goblet squat"), ex("Gym A", "Lat pulldown")];
 const todayKey = WM.DAY_KEYS[(new Date().getDay() + 6) % 7];
-function person({ tier = "personal", own = false, week = null, arc = false, ackDone = false } = {}) {
+function person({ tier = "personal", own = false, week = null, arc = false, ackDone = false, checkedIn = false, rest = false } = {}) {
   GE.stopGuide({ quiet: true });
   localStorage.clear(); store.init(); agreed(store);
   store.set("onboardingComplete", true); store.set("name", "Sam"); store.set("tier", tier);
   store.set("safetyAckLog", ackDone ? Array.from({ length: 5 }, () => ({ at: new Date().toISOString(), textVersion: HURT_AND_ACHE_VERSION, surface: "fixture" })) : []);
   store.set("guidanceLastShownAt", new Date().toISOString());
   if (own) store.set("prescribedExercises", JSON.parse(JSON.stringify(LISTS)));
-  if (week === "own") {
+  if (week === "own" || week === "session") {
     const days = Object.fromEntries(WM.DAY_KEYS.map(k => [k, "rest"]));
-    days[todayKey] = "t-gym";
-    store.set("weekShape", WM.sanitizeWeekShape({ templates: { "t-gym": { id: "t-gym", name: "Gym A", own: "Gym A", mix: [{ focus: "upper", level: 2 }], intensity: "steady", mins: 30, place: "gym" } }, days, setAt: "2026-11-01" }));
+    days[todayKey] = rest ? "rest" : "t-gym";
+    const t = { id: "t-gym", name: week === "own" ? "Gym A" : "Sunday plan", mix: [{ focus: "upper", level: 2 }], intensity: "steady", mins: 30, place: "gym" };
+    if (week === "own") t.own = "Gym A";
+    store.set("weekShape", WM.sanitizeWeekShape({ templates: { "t-gym": t }, days, setAt: "2026-11-01" }));
+  }
+  if (checkedIn) {
+    const at = new Date().toISOString();
+    store.set("lastCheckin", { timestamp: at, date: new Date().toDateString(), energy: 3, mood: 3, sore: [] });
   }
   if (arc) store.set("arc", { active: true, aimId: "sport-without-flaring", strands: ["hip-range"], startedAt: new Date(Date.now() - 14 * 864e5).toISOString() });
   router.history = []; router.currentView = null; router.helpFrom = null;
@@ -246,9 +259,9 @@ await go("today");
 
 console.log("\nTEST 4 - walks every guide, from the screens");
 const FIX = {
-  "A1:plan": { tier: "personal" },
+  "A1:homeStarts": { tier: "personal" },
   "A1:free": { tier: "free" },
-  "A2:hasWeek": { tier: "personal", own: true, week: "own" },
+  "A2:weekLeads": { tier: "personal", own: true, week: "own" },
   "B1:always": { tier: "personal" },
   "C1:noWeek": { tier: "personal", own: true },
   "C1:hasWeek": { tier: "personal", own: true, week: "own" },
@@ -265,6 +278,66 @@ const pick = (el, label) => {
   const want = Array.isArray(label) ? label[0] : label;
   return btns.find(b => norm(nameOf(b)).startsWith(norm(want))) || btns[0];
 };
+async function walk(g, way, label) {
+  const w = GD.wayFor(g);
+  if (w !== way) { ok(`4. ${g.id}:${way.when}${label ? " (" + label + ")" : ""}: the fixture gives this way`, false, w?.when); return; }
+  router.helpFrom = "today";
+  GE.startGuide(g.id);
+  const steps = GD.stepsOf(way);
+  const problems = [];
+  let reached = 0;
+  for (let n = 0; n < 40; n++) {
+    const st = GE.guideState();
+    if (!st.id || st.ended) break;
+    const s = st.step;
+    const want = s.screen === "any" ? null : (Array.isArray(s.screen) ? s.screen : [s.screen]);
+    // A screen the guide waits through (the check-in): the person answers it.
+    for (let q = 0; q < 6 && router.currentView === "checkin" && want && !want.includes("checkin"); q++) {
+      await until(() => GE.guideState().waiting === "pass" || router.currentView !== "checkin", 1500);
+      if (router.currentView !== "checkin") break;
+      if (q === 0 && !/Answer the questions/.test(txt(document.querySelector("#guide-overlay")))) problems.push("the check-in on the way: the box did not say to answer the questions");
+      await until(() => GE.findTarget(["energy", "mood", "sore"]) || router.currentView !== "checkin", 3000);
+      const grp = GE.findTarget(["energy", "mood", "sore"]);
+      if (grp) click(grp.querySelector("button")); else break;
+      await sleep(150);
+    }
+    const shown = await until(() => {
+      const t = GE.guideState(); if (t.ended || t.i !== st.i || t.sub !== st.sub) return true;
+      return (!want || want.includes(router.currentView)) && GE.findTarget(t.step.target);
+    });
+    const now = GE.guideState();
+    if (now.ended || now.i !== st.i || now.sub !== st.sub) continue;   // an optional step skipped itself
+    if (!shown) { problems.push(`step ${st.i + 1}${st.sub ? "b" : ""} (${s.target}): on ${router.currentView}, marker ${GE.findTarget(s.target) ? "found" : "missing"}`); break; }
+    if (process.env.DEBUG) console.log("   [walk]", g.id, st.i, router.currentView, JSON.stringify(GE.guideState().off), txt(document.querySelector("#guide-overlay")).slice(0, 80));
+    const el = GE.findTarget(s.target);
+    if (!el.classList.contains("gd-ring")) await until(() => el.classList.contains("gd-ring"), 800);
+    if (!el.classList.contains("gd-ring")) problems.push(`step ${st.i + 1}: not ringed (${JSON.stringify({ ...GE.guideState(), steps: undefined, way: undefined, step: undefined })}, view ${router.currentView} via ${(router._trail || []).join(">")}, ${document.querySelectorAll("[data-guide-target='" + s.target + "']").length} markers)`);
+    await until(() => norm(txt(document.querySelector("#guide-overlay .gd-dock__say"))) === norm(GD.plainSay(GE.guideState().step?.say)), 800);
+    const sayNow = txt(document.querySelector("#guide-overlay .gd-dock__say"));
+    if (norm(sayNow) !== norm(GD.plainSay(s.say))) problems.push(`step ${st.i + 1}: the box says "${sayNow}"`);
+    if (s.label && !labelOK(el, s.label)) problems.push(`step ${st.i + 1}: "${nameOf(el).slice(0, 60)}" is not ${JSON.stringify(s.label)}`);
+    reached++;
+    if (s.tap === false) {
+      if (s.target === "plan-text") { el.value = PLAN; el.dispatchEvent(new dom.window.Event("input", { bubbles: true })); }
+      click(document.querySelector('#guide-overlay [data-gd="next"]'));
+    } else {
+      const c = pick(el, s.label);
+      if (c.tagName === "TEXTAREA") click(c); else click(c);
+    }
+    await until(() => { const t = GE.guideState(); return !t.id || t.ended || t.i !== st.i || t.sub !== st.sub; }, 3000);
+    const after = GE.guideState();
+    if (after.pause) { await until(() => document.querySelector('#guide-overlay [data-gd="carry"]'), 1000); click(document.querySelector('#guide-overlay [data-gd="carry"]')); await until(() => !GE.guideState().pause, 1000); }
+    if (after.off) { problems.push(`step ${st.i + 1}: pressing it left the guide (on ${router.currentView})`); break; }
+    if (after.id && !after.ended && after.i === st.i && after.sub === st.sub) { problems.push(`step ${st.i + 1}: pressing it did not lead on`); break; }
+  }
+  const end = GE.guideState();
+  const optional = steps.filter(s => s.optional).length;
+  ok(`4. ${g.id} (${way.when}${way.name ? ", " + way.name : ""}${label ? ": " + label : ""}): walked start to finish, ${reached} of ${steps.length} steps${optional ? ` (${optional} asked the first time only)` : ""}`, !problems.length && end.ended, problems.join(" | ") || `ended: ${end.ended}, on ${router.currentView}`);
+  GE.stopGuide({ quiet: true });
+  // A walk can end in a session that is starting; let it, then go Home, so the next walk starts clean.
+  if (/session has started|routine has started/.test(GD.guideById(g.id).end || "")) await until(() => GE.HELP_HIDDEN.has(router.currentView) && router.currentView !== "prescribed-session", 5000);
+  await sleep(300); await go("today"); await sleep(100);
+}
 for (const g of GD.GUIDES.filter(x => !x.readOnly)) {
   for (const way of g.ways) {
     const key = `${g.id}:${way.when}`;
@@ -272,55 +345,19 @@ for (const g of GD.GUIDES.filter(x => !x.readOnly)) {
     if (!fx) { ok(`4. ${key} has a fixture`, false); continue; }
     person(fx);
     await go("today");
-    const w = GD.wayFor(g);
-    if (w !== way) { ok(`4. ${key}: the fixture gives this way`, false, w?.when); continue; }
-    router.helpFrom = "today";
-    GE.startGuide(g.id);
-    const steps = GD.stepsOf(way);
-    const problems = [];
-    let reached = 0;
-    for (let n = 0; n < 40; n++) {
-      const st = GE.guideState();
-      if (!st.id || st.ended) break;
-      const s = st.step;
-      const want = s.screen === "any" ? null : (Array.isArray(s.screen) ? s.screen : [s.screen]);
-      const shown = await until(() => {
-        const t = GE.guideState(); if (t.ended || t.i !== st.i || t.sub !== st.sub) return true;
-        return (!want || want.includes(router.currentView)) && GE.findTarget(t.step.target);
-      });
-      const now = GE.guideState();
-      if (now.ended || now.i !== st.i || now.sub !== st.sub) continue;   // an optional step skipped itself
-      if (!shown) { problems.push(`step ${st.i + 1}${st.sub ? "b" : ""} (${s.target}): on ${router.currentView}, marker ${GE.findTarget(s.target) ? "found" : "missing"}`); break; }
-      if (process.env.DEBUG) console.log("   [walk]", g.id, st.i, router.currentView, JSON.stringify(GE.guideState().off), txt(document.querySelector("#guide-overlay")).slice(0, 80));
-      const el = GE.findTarget(s.target);
-      if (!el.classList.contains("gd-ring")) await until(() => el.classList.contains("gd-ring"), 800);
-      if (!el.classList.contains("gd-ring")) problems.push(`step ${st.i + 1}: not ringed (${JSON.stringify({ ...GE.guideState(), steps: undefined, way: undefined, step: undefined })}, view ${router.currentView} via ${(router._trail || []).join(">")}, ${document.querySelectorAll("[data-guide-target='" + s.target + "']").length} markers)`);
-      const sayNow = txt(document.querySelector("#guide-overlay .gd-dock__say"));
-      if (norm(sayNow) !== norm(GD.plainSay(s.say))) problems.push(`step ${st.i + 1}: the box says "${sayNow}"`);
-      if (s.label && !labelOK(el, s.label)) problems.push(`step ${st.i + 1}: "${nameOf(el).slice(0, 60)}" is not ${JSON.stringify(s.label)}`);
-      reached++;
-      if (s.tap === false) {
-        if (s.target === "plan-text") { el.value = PLAN; el.dispatchEvent(new dom.window.Event("input", { bubbles: true })); }
-        click(document.querySelector('#guide-overlay [data-gd="next"]'));
-      } else {
-        const c = pick(el, s.label);
-        if (c.tagName === "TEXTAREA") click(c); else click(c);
-      }
-      await until(() => { const t = GE.guideState(); return !t.id || t.ended || t.i !== st.i || t.sub !== st.sub; }, 3000);
-      const after = GE.guideState();
-      if (after.pause) { await until(() => document.querySelector('#guide-overlay [data-gd="carry"]'), 1000); click(document.querySelector('#guide-overlay [data-gd="carry"]')); await until(() => !GE.guideState().pause, 1000); }
-      if (after.off) { problems.push(`step ${st.i + 1}: pressing it left the guide (on ${router.currentView})`); break; }
-      if (after.id && !after.ended && after.i === st.i && after.sub === st.sub) { problems.push(`step ${st.i + 1}: pressing it did not lead on`); break; }
-    }
-    const end = GE.guideState();
-    const optional = steps.filter(s => s.optional).length;
-    ok(`4. ${g.id} (${way.when}${way.name ? ", " + way.name : ""}): walked start to finish, ${reached} of ${steps.length} steps${optional ? ` (${optional} asked the first time only)` : ""}`, !problems.length && end.ended, problems.join(" | ") || `ended: ${end.ended}, on ${router.currentView}`);
-    GE.stopGuide({ quiet: true });
-    // A walk can end in a session that is starting; let it, then go Home, so the next walk starts clean.
-    if (/session has started|routine has started/.test(GD.guideById(g.id).end || "")) await until(() => GE.HELP_HIDDEN.has(router.currentView) && router.currentView !== "prescribed-session", 5000);
-    await sleep(300); await go("today"); await sleep(100);
+    await walk(g, way, "");
   }
 }
+// v3: A1 from every Home that starts something.
+for (const [label, fx] of [["a session from your week", { tier: "personal", week: "session" }], ["your own list from your week", { tier: "personal", own: true, week: "own" }], ["already checked in today", { tier: "personal", checkedIn: true }]]) {
+  person(fx);
+  await go("today");
+  const g = GD.guideById("A1");
+  await walk(g, g.ways[0], label);
+}
+// A2 from a session day, through the check-in (a screen the guide waits through).
+person({ tier: "personal", week: "session" }); await go("today");
+await walk(GD.guideById("A2"), GD.guideById("A2").ways[0], "a session from your week, through the check-in");
 
 console.log("\nTEST 5 - the box");
 person({ tier: "personal" });
@@ -395,6 +432,30 @@ await go("today");
   ok("5o. text 2: Back, Stop, Smaller on one row, each name beginning with its word (SC 2.5.3)", bs.length === 3 && bs.every(b => (b.getAttribute("aria-label") || "").startsWith(txt(b))) && !!document.querySelector(".gd-dock__say--big"),
     bs.map(b => txt(b) + "|" + b.getAttribute("aria-label")).join(", "));
   document.documentElement.style.removeProperty("--user-text-scale");
+  GE.stopGuide({ quiet: true });
+}
+
+console.log("\nTEST 8 - On this screen offers only what can be done there");
+{
+  const bad = [];
+  for (const [label, fx] of [["coach", { tier: "personal" }], ["week session", { tier: "personal", week: "session" }], ["own list", { tier: "personal", own: true, week: "own" }], ["rest day", { tier: "personal", week: "session", rest: true }], ["free", { tier: "free" }]]) {
+    person(fx); await go("today"); await sleep(60);
+    for (const g of GD.guidesFor("today")) {
+      const w = GD.wayFor(g);
+      if (!w) continue;
+      const first = GD.stepsOf(w)[0];
+      if (first.screen !== "today") continue;
+      const t = first.alts ? first.alts.map(a => a.target) : first.target;
+      if (!GE.findTarget(t)) bad.push(`${label}: ${g.id} offered, nothing to ring`);
+    }
+  }
+  ok("8a. every guide On this screen (Home) has its first button there, in every Home state", !bad.length, bad.join(" | "));
+  person({ tier: "personal", week: "session", rest: true }); await go("today");
+  ok("8b. a rest day: the first guide is not offered as a walk, and its overview says what to do instead", !GD.wayFor(GD.guideById("A1")) && /Home already shows/.test(GD.guideById("A1").noWay || ""));
+  person({ tier: "personal" }); await go("today"); router.helpFrom = "today";
+  GE.startGuide("B1");
+  await until(() => document.querySelector('#guide-overlay [data-gd="mini"]'));
+  ok("8c. ordinary text: Make this smaller says so", txt(document.querySelector('#guide-overlay [data-gd="mini"]')) === "Make this smaller");
   GE.stopGuide({ quiet: true });
 }
 

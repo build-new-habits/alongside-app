@@ -1,6 +1,6 @@
 /**
  * js/guide.js
- * 15 Nov 2026 v1
+ * 15 Nov 2026 v2
  *
  * v1 - P-25 HOW-TO GUIDES (spec v3 §2.1, §2.3; mock-up v2, Graeme 12 Nov:
  *   "Perfect"). Two things the app shell draws, once, the way the router
@@ -25,6 +25,11 @@
  *      (SC 1.4.13); each new step is said once in a live region and focus
  *      stays in the app (SC 4.1.3); the page gets room for the box (SC
  *      2.4.11); the pulse stops under Reduce motion (SC 2.3.3).
+ *
+ * v2 (15 Nov, on the live app): a later step's screen open (the check-in
+ *   already answered today) carries the guide on from there; the check-in is
+ *   a screen to wait through ("Answer the questions"), never off the route;
+ *   Make this smaller keeps its words at ordinary text sizes.
  *
  * Steps come from data/guides.js and find their button by its
  * data-guide-target marker. Nothing about guide use is stored or sent:
@@ -160,6 +165,18 @@ export function stopGuide({ quiet = false } = {}) {
   if (!quiet) say("Guide stopped.");
 }
 
+/** Screens the app may put in the way (asked once a day): wait there, never "left the guide". */
+const PASS = new Set(["checkin"]);
+/** The first later step, in this part, whose screen is open now. */
+function aheadOnScreen(v) {
+  const part = G.steps[G.i]?.part;
+  for (let k = G.i + 1; k < G.steps.length; k++) {
+    const ks = G.steps[k];
+    if (ks.part !== part) break;
+    if (ks.screen !== "any" && onScreen(ks, v)) return k;
+  }
+  return -1;
+}
 const onPrevScreen = v => { const p = G.steps[G.i - (G.sub ? 0 : 1)]; return !!p && p.screen !== "any" && onScreen(p, v); };
 const firstScreen = s => (Array.isArray(s) ? s[0] : s);
 const onScreen = (st, v) => st.screen === "any" ? !HELP_HIDDEN.has(v) : (Array.isArray(st.screen) ? st.screen.includes(v) : st.screen === v);
@@ -203,12 +220,16 @@ function sync() {
   if (hidden) { G.waitSince = 0; clearRing(); draw(null, true); return; }
   if (G.off || G.pause || G.ended) { G.waitSince = 0; clearRing(); draw(null); return; }
   if (!onScreen(st, v)) {
+    // A later step's screen is open: the app skipped a screen the guide
+    // allowed for (the check-in, already answered today). Carry on from there.
+    const later = aheadOnScreen(v);
+    if (later > G.i) { G.i = later; G.sub = false; G.waitSince = 0; G.waiting = false; return sync(); }
     // Between screens: "One moment…", never the next screen's words early.
     // Still not there after a few seconds (a back gesture, say): off the route.
     clearRing();
     // Still on the last step's screen (the check-in finishing, or a button
     // there to tap first): the person carries on there, for as long as it takes.
-    if (onPrevScreen(v)) { G.waitSince = 0; G.waiting = "here"; draw(null); return; }
+    if (onPrevScreen(v) || PASS.has(v)) { G.waitSince = 0; G.waiting = PASS.has(v) && !onPrevScreen(v) ? "pass" : "here"; draw(null); return; }
     if (!G.waitSince) { G.waitSince = Date.now(); setTimeout(() => { if (G.id) sync(); }, WAIT_MS + 100); }
     else if (Date.now() - G.waitSince > WAIT_MS) { G.waitSince = 0; G.waiting = false; G.off = true; say("You’ve left the guide."); draw(null); return; }
     G.waiting = "moment"; draw(null); return;
@@ -302,7 +323,7 @@ function onClick(e) {
   const st = cur();
   if (!st || !onScreen(st, R.currentView)) {
     if (b.matches("input, textarea, select") || b.closest("label")) return;
-    if (onPrevScreen(R.currentView)) return;   // finishing the last screen is part of the route
+    if (onPrevScreen(R.currentView) || PASS.has(R.currentView)) return;   // finishing the last screen is part of the route
     return offRoute();
   }
   const el = findTarget(st.target);
@@ -386,7 +407,7 @@ function dockBody(st) {
   const partTxt = parts > 1 ? `Part ${s.part + 1} of ${parts} · ` : "";
   const eyebrow = `<p class="gd-dock__eyebrow" id="gd-dock-h">${partTxt}Step ${s.index + 1} of ${s.inPart} ${bar}</p>`;
   if (G.waiting) {
-    return { key: "wait" + G.i + G.waiting, text: "", html: `${eyebrow}<p class="gd-dock__mini">${G.waiting === "here" ? "Carry on here. The guide picks up on the next screen." : "One moment…"}</p>
+    return { key: "wait" + G.i + G.waiting, text: "", html: `${eyebrow}<p class="gd-dock__mini">${G.waiting === "here" ? "Carry on here. The guide picks up on the next screen." : G.waiting === "pass" ? "Answer the questions. The guide picks up after." : "One moment…"}</p>
       <div class="gd-dock__row">${btn("stop", "Stop the guide")}</div>` };
   }
   if (G.mini) {
@@ -398,10 +419,12 @@ function dockBody(st) {
   // (each name still begins with its visible word, SC 2.5.3), and the step at
   // body size, so the box takes less of the screen.
   const big = textScale() >= 1.4;
-  const b2 = (gd, short, long, cls) => big ? `<button type="button" class="btn ${cls}" data-gd="${gd}" aria-label="${long}">${short}</button>` : btn(gd, long, cls);
+  // short: the word shown at large text; spoken: its name there (begins with
+  // the word); long: the words at ordinary sizes.
+  const b2 = (gd, short, spoken, long, cls) => big ? `<button type="button" class="btn ${cls}" data-gd="${gd}" aria-label="${spoken}">${short}</button>` : btn(gd, long, cls);
   return { key: "step" + G.i + G.sub + (st.target || "") + big, text: plainSay(st.say), html: `${eyebrow}
     <p class="gd-dock__say${big ? " gd-dock__say--big" : ""}" tabindex="-1">${sayHTML(st.say, esc)}</p>
-    <div class="gd-dock__row${big ? " gd-dock__row--big" : ""}">${st.tap === false ? btn("next", "Next", "btn-primary") : ""}${canBack ? b2("back", "Back", "Back a step", "btn-secondary") : ""}${b2("stop", "Stop", "Stop the guide", "btn-ghost")}${b2("mini", "Smaller", "Smaller: show one line", "btn-ghost")}</div>` };
+    <div class="gd-dock__row${big ? " gd-dock__row--big" : ""}">${st.tap === false ? btn("next", "Next", "btn-primary") : ""}${canBack ? b2("back", "Back", "Back a step", "Back a step", "btn-secondary") : ""}${b2("stop", "Stop", "Stop the guide", "Stop the guide", "btn-ghost")}${b2("mini", "Smaller", "Smaller: make this box one line", "Make this smaller", "btn-ghost")}</div>` };
 }
 
 function draw(el, hidden = false) {
