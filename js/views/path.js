@@ -1,6 +1,18 @@
 /**
  * views/path.js
- * 07 Nov 2026 v14
+ * 15 Nov 2026 v15
+ *
+ * v15 - P-32 STRETCH-FOR-STIFFNESS (Graeme, 15 Nov: mock-up v2, "The full
+ *   range"; spec docs/specs/alongside_stretch-for-stiffness_15nov2026_v1.md).
+ *   Stretch, after the area: How does it feel today? (Fine, just a stretch,
+ *   chosen to start; A little, Quite, Very stiff) and Anywhere in particular?
+ *   (finer spots; routines that work one say so and come first; A fresh one
+ *   for me is built for them). Very stiff: a two-minute gentle start and
+ *   shorter holds. It hurts, a row of its own, opens a page that sends the
+ *   person to the check-in, never to a stretch. Every Stretch routine has
+ *   the ease-in line before Start. A sore area never sets either question
+ *   (W5-14 stands). Rules in data/stretch-stiffness.js; nothing stored: the
+ *   finish's question is handed over in memory (router.stretchCheck).
  *
  * v14 - S2 SAFE-LEFTOUT (Graeme, 07 Nov). A programme (the coach's choice,
  *   a door's, a fresh one, a trend day) goes through the same sore check as
@@ -172,6 +184,7 @@ import { GUIDE_SESSIONS, sessionsForDoor } from "../data/guide-me.js";
 import { openGuideMe } from "./guide-me.js";
 import { setTodaysLength, lengthCatForToday, todaysLengthCat } from "../data/session-length.js";
 import { equipmentForLocation } from "../session-builder.js";
+import { STIFFNESS, isStiffness, spotsFor, cleanSpots, worksPhrase, routinesForSpots, zonesForSpots, stiffPractice, minutesAt, stiffLine, EASE_IN, HURTS } from "../data/stretch-stiffness.js";
 import { resolveEquipment, exerciseIsAvailable } from "../data/equipment-map.js";
 import { TRENDS, EFFORT, HARD_SAFETY, ZONE2_ACTIVITIES, zone2Week, zone2Session, zone2HardDoneThisWeek,
          SNACK_QUALITIES, snackSession, MAIN_ACTIVITIES, mainActivityFrom, crossOptions, recentTrendIds, plainName,
@@ -559,16 +572,33 @@ export function PathView(router) {
     },
     routines() {
       const floor = st.floor !== "no";
-      const mine = routinesFor({ area: st.area, floor: floor ? null : false });
+      const stiff = isStiffness(st.stiff) ? st.stiff : "fine";
+      const spots = spotsFor(st.area), chosen = cleanSpots(st.area, st.spots);
+      const mine = routinesForSpots(routinesFor({ area: st.area, floor: floor ? null : false }), st.area, st.spots);
       const n = savedFor("stretch", null).length;
+      const line = stiffLine(stiff);
       return `${bar(2, 2)}${heading(AREAS[st.area].label, "mobility", "violet")}
+        ${radios("stiff", "How does it feel today?", STIFFNESS.map(x => [x.id, x.label]), stiff)}
+        ${line ? `<p class="path-coachline" id="path-stiff-line">${esc(line)}</p>` : ""}
+        ${spots.length ? `<fieldset class="path-seg"><legend>Anywhere in particular? <span class="path-seg__opt">(pick any)</span></legend><div class="path-seg__opts">${spots.map(x =>
+          `<label><input type="checkbox" name="spot" value="${esc(x.id)}"${chosen.some(c => c.id === x.id) ? " checked" : ""}><span>${esc(x.label)}</span></label>`).join("")}</div></fieldset>` : ""}
         ${radios("floor", "Can you get down to the floor today?", [["yes", "Yes"], ["no", "Not today"]], floor ? "yes" : "no")}
         <ul class="path-list">
-          ${mine.map(r => row({ v: r.id, t: r.name, icon: "mobility", kind: "violet",
-              d: `${r.minutes} min · ${STYLE[r.style] || ""}${!floor || r.floor === false ? " · Standing or seated" : " · On the floor"}` })).join("")}
-          ${floor ? row({ v: "fresh", t: "A fresh one for me", d: "Built by the coach for this area", icon: "fresh", kind: "violet", dashed: true }) : ""}
+          ${mine.map(({ routine: r, tag }) => row({ v: r.id, t: r.name, icon: "mobility", kind: "violet",
+              d: `${minutesAt(r, stiff)} min · ${STYLE[r.style] || ""}${!floor || r.floor === false ? " · Standing or seated" : " · On the floor"}${tag ? `<span class="path-row__works">${esc(tag)}</span>` : ""}` })).join("")}
+          ${floor ? row({ v: "fresh", t: "A fresh one for me", d: esc(chosen.length ? `Built by the coach for ${worksPhrase(chosen)}` : "Built by the coach for this area"), icon: "fresh", kind: "violet", dashed: true }) : ""}
           ${n ? row({ v: "saved", t: "Saved sessions", d: `${n} kept`, icon: "keep", kind: "violet" }) : ""}
-        </ul>`;
+        </ul>
+        <ul class="path-list">${row({ v: "hurts", t: HURTS.row, d: esc(HURTS.rowSub), icon: "unsure", kind: "violet" })}</ul>`;
+    },
+    // P-32. It hurts: never a stretch; the check-in works around a sore area.
+    hurts() {
+      return `${heading(HURTS.head, "unsure", "violet")}
+        <p class="path-coachline">${esc(HURTS.line)}</p>
+        <p class="path-small">${esc(HURTS.what)}</p>
+        <button type="button" class="btn btn-primary btn-full" id="path-hurts-checkin">${esc(HURTS.button)}</button>
+        <ul class="path-list path-hurts__other">${row({ v: "other", t: HURTS.other, d: esc(HURTS.otherSub), icon: "mobility", kind: "violet" })}</ul>
+        <p class="path-note" id="path-hurts-note">${esc(HURTS.note)}</p>`;
     },
 
     // Move to feel better
@@ -611,7 +641,7 @@ export function PathView(router) {
       const line = st.note || st.reason || (st.surprise ? "A surprise that fits today." : "");
       const outIds = new Set(p.steps.flatMap(s => s.out || []));
       const adj = st.fresh || st.fromCoach ? shownAdjustments({ leftOutAreas: [...outIds] }) : [];
-      const meta = [p.minutes ? `About ${p.minutes} minutes` : "", !st.fresh && STYLE[p.style], !st.fresh && POSITION[p.position]].filter(Boolean).join(" · ");
+      const meta = [p.minutes ? `About ${p.minutes} minutes` : "", !st.fresh && STYLE[p.style], !st.fresh && POSITION[p.position], p.stiff === "very" && "Very stiff: starts gently"].filter(Boolean).join(" · ");
       const ids = p.steps.map(s => s.id);
       const outs = p.steps.filter(s => (s.out || []).length);
       const outAreas = [...new Set(outs.flatMap(s => s.out))];
@@ -620,6 +650,7 @@ export function PathView(router) {
       return `${heading(p.name, icon, kind)}
         ${line ? `<p class="${st.note ? "path-note" : "path-coachline"}">${esc(line)}</p>` : ""}
         <p class="path-small">${esc(meta)}</p>
+        ${st.door === "stretch" ? `<p class="path-coachline" id="path-ease-in">${esc(EASE_IN)}</p>` : ""}
         ${p.support ? `<p class="path-small">${esc(p.support)}</p>` : ""}
         ${p.effort ? `<p class="path-small path-effort" id="path-effort">${esc(EFFORT[p.effort])}${p.line ? ` ${esc(p.line)}` : ""}</p>` : ""}
         ${p.effort === "hard" ? `<p class="path-note" id="path-hard-safety">${esc(HARD_SAFETY)}</p>` : ""}
@@ -879,18 +910,26 @@ export function PathView(router) {
           router.planDoor = "stretch";
           router.navigate("coach-proposal"); return;
         }
-        return go("routines", { area: v, floor: "yes" });
+        return go("routines", { area: v, floor: "yes", spots: [] });
       case "routines": {
+        if (v === "hurts") return go("hurts", {});
         if (v === "fresh") {
           store.set("requestedSessionType", "stretch");
-          store.set("sessionZoneFocus", [...(STRETCH_AREA_ZONES[st.area] || [])]);
+          store.set("sessionZoneFocus", zonesForSpots(st.area, st.spots) || [...(STRETCH_AREA_ZONES[st.area] || [])]);
           setTodaysLength("quick");
           router.planDoor = "stretch";
           router.navigate("coach-proposal"); return;
         }
         if (v === "saved") { router.savedStart = { purpose: "stretch", place: null }; router.navigate("saved-sessions"); return; }
         const r = ROUTINES.find(x => x.id === v); if (!r) return;
-        return go("prog", { practice: { ...r, steps: stepsFor(r, st.floor !== "no" ? null : false) }, fresh: false, reason: null, note: null, surprise: false, fromCoach: false });
+        return go("prog", { practice: stiffPractice({ ...r, steps: stepsFor(r, st.floor !== "no" ? null : false) }, st.area, st.stiff), fresh: false, reason: null, note: null, surprise: false, fromCoach: false });
+      }
+      case "hurts": {
+        // Stretch somewhere else: back to where you want to stretch.
+        const at = trail.map(t => t.step).lastIndexOf("sarea");
+        if (at === -1) return;
+        const p = trail[at]; trail = trail.slice(0, at);
+        step = p.step; st = p.st; paint(); return;
       }
       case "feel":
         if (v === "help") return go("helpme", {});
@@ -931,6 +970,23 @@ export function PathView(router) {
       root.querySelector(`input[name="floor"][value="${r.value}"]`)?.focus();
       say(r.value === "no" ? "Showing ones without the floor." : "Showing all of them.");
     }));
+    // P-32. How does it feel today? and Anywhere in particular?: kept on the screen only.
+    root.querySelectorAll('input[name="stiff"]').forEach(r => r.addEventListener("change", () => {
+      st.stiff = r.value; paint(false);
+      root.querySelector(`input[name="stiff"][value="${r.value}"]`)?.focus();
+      say(r.value === "very" ? "Very stiff: each one starts with gentle movement, with shorter holds." : `${STIFFNESS.find(x => x.id === r.value)?.label || ""}.`);
+    }));
+    root.querySelectorAll('input[name="spot"]').forEach(c => c.addEventListener("change", () => {
+      st.spots = [...root.querySelectorAll('input[name="spot"]:checked')].map(x => x.value);
+      paint(false);
+      root.querySelector(`input[name="spot"][value="${c.value}"]`)?.focus();
+      const chosen = cleanSpots(st.area, st.spots);
+      say(chosen.length ? `Showing the ones for ${worksPhrase(chosen)} first.` : "Showing all of them.");
+    }));
+    root.querySelector("#path-hurts-checkin")?.addEventListener("click", () => {
+      store.set("pendingDoorRoute", "today");
+      router.navigate("checkin");
+    });
     root.querySelectorAll('input[name="blen"]').forEach(r => r.addEventListener("change", () => { st.blen = r.value; }));
     root.querySelectorAll('input[name="slen"]').forEach(r => r.addEventListener("change", () => { st.slen = r.value; }));
     root.querySelectorAll('input[name="sseat"]').forEach(r => r.addEventListener("change", () => { st.sseat = r.value; }));
@@ -951,7 +1007,12 @@ export function PathView(router) {
       router.pathBack = { step, st: { ...st }, trail: trail.map(t => ({ ...t })) };   // P-27: ‹ Back returns here
       router.navigate("coach-proposal");
     });
-    root.querySelector("#path-start")?.addEventListener("click", () => startPractice(router, markSore(st.practice), { door: st.door, feeling: st.door === "feel" ? st.feeling : null }));
+    root.querySelector("#path-start")?.addEventListener("click", () => {
+      // P-32. The finish asks how it feels now, when a stiffness was said; in memory only.
+      router.stretchCheck = st.door === "stretch" && isStiffness(st.stiff) && st.stiff !== "fine" && AREAS[st.area]
+        ? { name: st.practice.name, area: AREAS[st.area].label, practice: st.practice } : null;
+      startPractice(router, markSore(st.practice), { door: st.door, feeling: st.door === "feel" ? st.feeling : null });
+    });
     // P-26. A kept session: change it on Build a session.
     root.querySelector("#path-change")?.addEventListener("click", () => { router.buildStart = { editId: st.practice.id, returnTo: "saved-sessions" }; router.navigate("build-session"); });
     root.querySelectorAll("[data-swap]").forEach(b => b.addEventListener("click", () => swapAt(Number(b.dataset.swap))));

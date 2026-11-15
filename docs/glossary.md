@@ -1,5 +1,7 @@
 # Alongside: Move — Glossary
-## 14 Nov 2026 v5
+## 15 Nov 2026 v6
+
+v6 - P-32 (Graeme, 15 Nov). Stretch for stiffness: How does it feel today? and its four choices, Anywhere in particular?, It hurts, Put this on Home.
 
 v5 - P-31 (Graeme, 14 Nov: "new words go in the glossary"). Little and often, On Home and its four choices, Change today and its five choices.
 
@@ -35,6 +37,10 @@ Taken from the words on every screen (`node tools/chromium-words.mjs`, 95 screen
 | The choice on a list in My exercises | **On Home**: **Not on Home**, **Any time**, **Mornings**, **Evenings** | Pin, Show on Home | P-31. Store: `myExercisesOnHome` |
 | The link under the Today card, and its screen | **Change today** | Edit today, Swap day | P-31. This week only; Your week stays as planned. Store: `weekChanges` |
 | Change today's choices | **Do it another day**, **Catch up**, **Little and often instead**, **Rest today**, **Something else** | Swap or Move as choices | P-31. *Which day instead?* says per day "Swaps with …" or "Rest day · moves here". Home's line after a change has **Undo** |
+| Stretch's question after the area | **How does it feel today?**: **Fine, just a stretch**, **A little stiff**, **Quite stiff**, **Very stiff** | Pain level, sore (as a choice) | P-32. A sore area never sets it (W5-14). Nothing stored |
+| Stretch's finer spots | **Anywhere in particular?** | Target, focus area | P-32. A routine that works one says **Works your …** |
+| The way out when it is pain, not stiffness | **It hurts** | Injured, treat | P-32. Goes to the check-in, never to a stretch |
+| The finish's offer after an easier stretch | **Put this on Home** | Pin, Save to Home | P-32. Adds the routine to My exercises, On Home any time (P-31) |
 
 ## Decided
 
@@ -43,3 +49,5 @@ Taken from the words on every screen (`node tools/chromium-words.mjs`, 95 screen
 2. **Keep to repeat** and **Not again** on the Plan's new finish (Graeme, 28 Oct: agreed): the button and the list that undoes it say the same thing. The Stage PATH spec's *Save this session* and *Never show me this* are not used.
 
 3. **Little and often**, **On Home** and **Change today** (Graeme, 14 Nov: "new words go in the glossary"), with catching up a missed session allowed as a choice, never a reminder.
+
+4. **Stretch for stiffness** words (Graeme, 15 Nov: mock-up v2, "The full range"): the person chooses it inside Stretch; It hurts goes to the check-in.
