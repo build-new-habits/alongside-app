@@ -94,7 +94,7 @@ export const GUIDES = Object.freeze([
   },
   {
     id: "A2", cat: "start", tiers: ["plan"],
-    title: "Start today’s session",
+    title: "Start what I planned for today",
     outcome: "If today is in your week, it’s waiting at the top of Home. One tap to start.",
     on: ["today"],
     keywords: ["start", "today", "session", "go", "my list", "week"],
@@ -117,10 +117,10 @@ export const GUIDES = Object.freeze([
   },
   {
     id: "B1", cat: "plans", tiers: ["plan"],
-    title: "I’ve got exercises from a physio, a class or a sheet",
-    outcome: "Paste your plan in and it becomes your own exercises in the app, grouped the way your plan groups them. Five taps.",
+    title: "I want the coach to know my physio plan",
+    outcome: "Paste your plan in and it becomes your own exercises in the app, grouped the way your plan groups them. Five taps. They’re played as written: the coach doesn’t change them. On a sore day it says which ones load the sore area, and you choose.",
     on: ["prescribed", "plan-import", "your-week"],
-    keywords: ["physio", "pt", "trainer", "sheet", "paste", "import", "programme", "routine", "my exercises", "add"],
+    keywords: ["physio", "pt", "trainer", "sheet", "paste", "import", "programme", "routine", "my exercises", "add", "coach", "know", "rehab"],
     ways: [{ when: "always", parts: [{ steps: [
       { screen: "today", target: "library", label: "Library", say: "Tap **Library**." },
       { screen: "library", target: "my-exercises", label: "My exercises", say: "Tap **My exercises**." },
@@ -128,7 +128,7 @@ export const GUIDES = Object.freeze([
       { screen: "plan-import", target: "plan-text", label: "Your plan", tap: false, say: "Paste your plan into the box called **Your plan**. One exercise to a line works best. Put each day or session’s name on its own line." },
       { screen: "plan-import", target: "read-plan", label: "Read my plan", say: "Tap **Read my plan**." },
       { screen: "plan-import", target: "add-ticked", label: "Add the ticked ones to My exercises", say: "Check the list. Untick anything you don’t want. Then tap **Add the ticked ones to My exercises**." },
-      { screen: "plan-import", target: "into-week", label: "Put them into your week", say: "To give each one a day, tap **Put them into your week** (the guide “Put my sessions on set days”)." },
+      { screen: "plan-import", target: "into-week", label: "Put them into your week", say: "To give each one a day, tap **Put them into your week** (the guide “I want my sessions on set days”)." },
     ] }] }],
     end: "Your exercises are in My exercises.",
     notQuite: [
@@ -139,7 +139,7 @@ export const GUIDES = Object.freeze([
   },
   {
     id: "C1", cat: "week", tiers: ["plan"],
-    title: "Put my sessions on set days",
+    title: "I want my sessions on set days",
     outcome: "Two parts. Part 1: choose the days you want to move. Part 2: say what each day is. On the day, it’s waiting on Home.",
     on: ["your-week", "plan-import"],
     keywords: ["days", "week", "monday", "schedule", "set", "routine", "gym", "plan"],
@@ -175,7 +175,7 @@ export const GUIDES = Object.freeze([
   },
   {
     id: "C2", cat: "week", tiers: ["plan"],
-    title: "Do a daily routine as well as my sessions",
+    title: "I want to do my routine every day as well as my sessions",
     outcome: "Keep your sessions in Your week, and start a daily routine from My exercises. You can also put a routine on Home: under its heading in My exercises, set **On Home**.",
     on: ["your-week", "prescribed"],
     keywords: ["daily", "routine", "morning", "evening", "every day", "as well", "little and often", "home"],
@@ -214,10 +214,10 @@ export const GUIDES = Object.freeze([
   },
   {
     id: "E3", cat: "progress", tiers: ["plan"],
-    title: "Set up or change my arc",
+    title: "I want to work towards something",
     outcome: "Your arc is what you’re working towards, in your own words. Four questions, and the coach leans your sessions towards it. Change it or stop it whenever you like.",
     on: ["progress", "arc-setup", "stretch-arc", "today"],
-    keywords: ["arc", "aim", "goal", "working towards", "change", "start again", "fresh"],
+    keywords: ["arc", "aim", "goal", "working towards", "change", "start again", "fresh", "set up", "purpose"],
     ways: [
       { when: "noArc", name: "Set it up", parts: [{ steps: [
         { screen: "any", target: "nav:progress", label: "Progress", say: "Tap **Progress** at the bottom." },

@@ -33,23 +33,37 @@
 import { guideById, wayFor, stepsOf, sayHTML, plainSay } from "./data/guides.js";
 import { lineIcon } from "./data/line-icons.js";
 
-/** No Help while a session is running, or on a screen that is only answered. */
+/** No Help on a screen that is only answered, or that runs from start to end. */
 export const HELP_HIDDEN = new Set([
   "help",
   "onboarding/thread", "onboarding/goals", "onboarding/conditions", "onboarding/equipment", "onboarding/plan-select",
   "home-threshold", "community-impact", "annual-reflection",
-  "workout", "gym-programme", "morning-session", "core-session", "yoga-session", "walk-session",
-  "running-session", "cycle-session", "guide-me", "swim-session", "quiet-session", "breathing-session",
-  "prescribed-session", "class-player", "capture", "practices", "in-step",
+  "guide-me", "class-player", "practices", "in-step",
   "reflect", "plan-finish", "journal-entry",
   "red-flag", "health-consent", "age-check", "under-18", "consent-update",
 ]);
+
+/**
+ * The players. Help shows on a player's start screen (choosing, the safety
+ * note, Start) and goes the moment the session is running: the player's own
+ * session guard says when (isGuardActive(), the house button's own test).
+ */
+export const PLAYERS = new Set([
+  "workout", "gym-programme", "morning-session", "core-session", "yoga-session", "walk-session",
+  "running-session", "cycle-session", "swim-session", "quiet-session", "breathing-session",
+  "prescribed-session", "capture",
+]);
+let guardMod = null;
+const running = () => { try { return !!guardMod?.isGuardActive(); } catch { return false; } };
+/** No Help here, now? */
+export const helpHiddenNow = view => HELP_HIDDEN.has(view) || (PLAYERS.has(view) && running());
 
 const esc = s => String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 const $ = (s, r = document) => r.querySelector(s);
 
 let R = null;
-const fresh = () => ({ id: null, way: null, side: null, steps: [], i: 0, sub: false, off: false, pause: false, ended: false, mini: false, ret: null, said: "", lastI: -1 });
+const WAIT_MS = 3000;
+const fresh = () => ({ id: null, way: null, side: null, waitSince: 0, waiting: false, steps: [], i: 0, sub: false, off: false, pause: false, ended: false, mini: false, ret: null, said: "", lastI: -1 });
 let G = fresh();
 let ringEl = null, timer = 0, observer = null;
 
@@ -63,6 +77,7 @@ export function helpButtonHTML(where = "row") {
 
 export function initGuides(router) {
   R = router;
+  import("./session-guard.js").then(m => { guardMod = m; }).catch(() => {});
   const row = document.getElementById("help-row");
   if (row && !row.querySelector("#help-btn")) row.innerHTML = helpButtonHTML();
   // Help is the row's button, or, where a screen covers the page with its own
@@ -78,7 +93,11 @@ export function initGuides(router) {
     // The ring's own class going on and off is not a change to the screen.
     const ringOnly = r => r.type === "attributes" && r.attributeName === "class" &&
       String(r.oldValue || "").replace(/\s*gd-ring/g, "").trim() === String(r.target.className || "").replace(/\s*gd-ring/g, "").trim();
-    observer = new MutationObserver(recs => { if (G.id && !recs.every(ringOnly)) schedule(); });
+    observer = new MutationObserver(recs => {
+      if (recs.every(ringOnly)) return;
+      if (PLAYERS.has(R?.currentView)) helpRow();     // a session starting, or ending
+      if (G.id) schedule();
+    });
     observer.observe(main, { childList: true, subtree: true, attributes: true, attributeOldValue: true, attributeFilter: ["hidden", "class", "disabled"] });
   }
   window.addEventListener("scroll", () => { if (G.id && ringEl) placeArrow(); }, { passive: true });
@@ -97,19 +116,22 @@ export function openHelp(where = "row") {
 
 /** After every screen: Help shown or hidden, and the guide drawn again. */
 export function afterMount(view) {
-  const row = document.getElementById("help-row");
-  if (row) {
-    const hide = HELP_HIDDEN.has(view);
-    row.hidden = hide;
-    const hatch = document.getElementById("hidden-nav-home-btn");
-    row.classList.toggle("help-row--hatch", !!hatch && !hatch.classList.contains("hidden"));
-  }
+  helpRow(view);
   if (view !== "help" && R?.helpReturnFocus) {
     R.helpReturnFocus = false;
     const sel = R.helpFocus === "panel" ? "[data-help-open='panel']" : "#help-btn";
     setTimeout(() => document.querySelector(sel)?.focus({ preventScroll: true }), 120);
   }
   if (G.id) schedule();
+}
+
+function helpRow(view = R?.currentView) {
+  const row = document.getElementById("help-row");
+  if (!row) return;
+  const hide = helpHiddenNow(view);
+  if (row.hidden !== hide) row.hidden = hide;
+  const hatch = document.getElementById("hidden-nav-home-btn");
+  row.classList.toggle("help-row--hatch", !!hatch && !hatch.classList.contains("hidden"));
 }
 
 // ── Guide me through it ──────────────────────────────────────────────────
@@ -138,6 +160,7 @@ export function stopGuide({ quiet = false } = {}) {
   if (!quiet) say("Guide stopped.");
 }
 
+const onPrevScreen = v => { const p = G.steps[G.i - (G.sub ? 0 : 1)]; return !!p && p.screen !== "any" && onScreen(p, v); };
 const firstScreen = s => (Array.isArray(s) ? s[0] : s);
 const onScreen = (st, v) => st.screen === "any" ? !HELP_HIDDEN.has(v) : (Array.isArray(st.screen) ? st.screen.includes(v) : st.screen === v);
 
@@ -176,10 +199,21 @@ function sync() {
   const st = cur();
   const keep = ringEl;
   if (!st) { clearRing(); return; }
-  const hidden = HELP_HIDDEN.has(v) && !(st && onScreen(st, v) && !G.off && !G.pause && !G.ended);
-  if (hidden) { clearRing(); draw(null, true); return; }
-  if (G.off || G.pause || G.ended) { clearRing(); draw(null); return; }
-  if (!onScreen(st, v)) { clearRing(); draw(null); return; }
+  const hidden = helpHiddenNow(v) && !(st && onScreen(st, v) && !G.off && !G.pause && !G.ended);
+  if (hidden) { G.waitSince = 0; clearRing(); draw(null, true); return; }
+  if (G.off || G.pause || G.ended) { G.waitSince = 0; clearRing(); draw(null); return; }
+  if (!onScreen(st, v)) {
+    // Between screens: "One moment…", never the next screen's words early.
+    // Still not there after a few seconds (a back gesture, say): off the route.
+    clearRing();
+    // Still on the last step's screen (the check-in finishing, or a button
+    // there to tap first): the person carries on there, for as long as it takes.
+    if (onPrevScreen(v)) { G.waitSince = 0; G.waiting = "here"; draw(null); return; }
+    if (!G.waitSince) { G.waitSince = Date.now(); setTimeout(() => { if (G.id) sync(); }, WAIT_MS + 100); }
+    else if (Date.now() - G.waitSince > WAIT_MS) { G.waitSince = 0; G.waiting = false; G.off = true; say("You’ve left the guide."); draw(null); return; }
+    G.waiting = "moment"; draw(null); return;
+  }
+  G.waitSince = 0; G.waiting = false;
   const el = findTarget(st.target);
   if (!el && st.optional) { G.i++; G.sub = false; return sync(); }
   let moved = false;
@@ -268,6 +302,7 @@ function onClick(e) {
   const st = cur();
   if (!st || !onScreen(st, R.currentView)) {
     if (b.matches("input, textarea, select") || b.closest("label")) return;
+    if (onPrevScreen(R.currentView)) return;   // finishing the last screen is part of the route
     return offRoute();
   }
   const el = findTarget(st.target);
@@ -350,14 +385,23 @@ function dockBody(st) {
   const s = G.steps[G.i];
   const partTxt = parts > 1 ? `Part ${s.part + 1} of ${parts} · ` : "";
   const eyebrow = `<p class="gd-dock__eyebrow" id="gd-dock-h">${partTxt}Step ${s.index + 1} of ${s.inPart} ${bar}</p>`;
+  if (G.waiting) {
+    return { key: "wait" + G.i + G.waiting, text: "", html: `${eyebrow}<p class="gd-dock__mini">${G.waiting === "here" ? "Carry on here. The guide picks up on the next screen." : "One moment…"}</p>
+      <div class="gd-dock__row">${btn("stop", "Stop the guide")}</div>` };
+  }
   if (G.mini) {
     return { key: "mini" + G.i + G.sub, text: "", html: `${eyebrow}<p class="gd-dock__mini">${st.tap === false ? "Then tap Next." : "Tap the ringed button."}</p>
       <div class="gd-dock__row">${btn("big", "Show the step", "btn-secondary")}${btn("stop", "Stop the guide")}</div>` };
   }
   const canBack = G.i > 0 || G.sub;
-  return { key: "step" + G.i + G.sub + (st.target || ""), text: plainSay(st.say), html: `${eyebrow}
-    <p class="gd-dock__say" tabindex="-1">${sayHTML(st.say, esc)}</p>
-    <div class="gd-dock__row">${st.tap === false ? btn("next", "Next", "btn-primary") : ""}${canBack ? btn("back", "Back a step", "btn-secondary") : ""}${btn("stop", "Stop the guide")}${btn("mini", "Make this smaller")}</div>` };
+  // Large text: the same three buttons, said shorter so they share one line
+  // (each name still begins with its visible word, SC 2.5.3), and the step at
+  // body size, so the box takes less of the screen.
+  const big = textScale() >= 1.4;
+  const b2 = (gd, short, long, cls) => big ? `<button type="button" class="btn ${cls}" data-gd="${gd}" aria-label="${long}">${short}</button>` : btn(gd, long, cls);
+  return { key: "step" + G.i + G.sub + (st.target || "") + big, text: plainSay(st.say), html: `${eyebrow}
+    <p class="gd-dock__say${big ? " gd-dock__say--big" : ""}" tabindex="-1">${sayHTML(st.say, esc)}</p>
+    <div class="gd-dock__row${big ? " gd-dock__row--big" : ""}">${st.tap === false ? btn("next", "Next", "btn-primary") : ""}${canBack ? b2("back", "Back", "Back a step", "btn-secondary") : ""}${b2("stop", "Stop", "Stop the guide", "btn-ghost")}${b2("mini", "Smaller", "Smaller: show one line", "btn-ghost")}</div>` };
 }
 
 function draw(el, hidden = false) {
@@ -380,6 +424,10 @@ function draw(el, hidden = false) {
   placeArrow();
   if (body.text && body.key !== G.said) { G.said = body.key; say(body.text); }
 }
+
+const textScale = () => {
+  try { return parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--user-text-scale")) || 1; } catch { return 1; }
+};
 
 const midY = el => { const r = el.getBoundingClientRect(); return r.top + r.height / 2; };
 

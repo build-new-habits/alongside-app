@@ -1,7 +1,8 @@
 /* css/components/help.css
  * 15 Nov 2026 v1
  *
- * v1 - P-25 HOW-TO GUIDES (mock-up v2, Graeme 12 Nov: "Perfect"). Help in its
+ * v1 - P-25 HOW-TO GUIDES. (15 Nov, after Graeme's review: at large text the
+ *   box's step is body size and its buttons share a line.) (mock-up v2, Graeme 12 Nov: "Perfect"). Help in its
  *   own slim row, top right, scrolling with the page (SC 2.4.11, 3.2.6);
  *   How do I…? in the app's own look classes; Guide me through it: the ring
  *   (a thick outline, never colour alone), the arrow in the left margin and
@@ -127,6 +128,8 @@
 .gd-dock__bar i { display: block; height: 100%; background: var(--gd-ring); }
 .gd-dock__say { margin: 0; font-size: var(--text-lg); line-height: 1.45; }
 .gd-dock__say:focus { outline: none; }
+/* Large text: the step at body size and the three buttons on one line. */
+.gd-dock__say--big { font-size: var(--text-base); }
 .gd-dock__mini { margin: 0; color: var(--color-text-secondary); }
 .gd-dock__row { display: flex; gap: var(--space-2, 8px); flex-wrap: wrap; }
 .gd-dock__row .btn {
@@ -136,3 +139,5 @@
   white-space: normal;
   padding-block: var(--space-2, 8px);
 }
+/* After the rule above, so it wins at large text. */
+.gd-dock__row--big .btn { flex: 1 1 auto; padding-inline: var(--space-3, 12px); }

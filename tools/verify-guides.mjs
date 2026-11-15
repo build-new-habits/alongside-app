@@ -1,6 +1,12 @@
 /**
  * tools/verify-guides.mjs
- * 15 Nov 2026 v1
+ * 15 Nov 2026 v2
+ *
+ * v2 - Graeme's review (15 Nov): Help shows on a player's start screen and
+ *   goes when the session runs (2g, 2h, 2i); between screens the box says
+ *   "One moment…", then off the route (5m, 5n); at large text the box's
+ *   buttons are said shorter, each name beginning with its word (5o); the
+ *   guides' goal-level titles (3c, 3d, 3h, 3l).
  *
  * v1 - P-25 HOW-TO GUIDES (spec v3 §2.5). The guides can't go out of date
  * silently. The check works from the screens, not the source: a label in
@@ -186,10 +192,17 @@ await go("today");
   ok("2e. Help on Free's Home too", !document.getElementById("help-row").hidden);
   await go("checkin");
   ok("2f. shown in the check-in, where first-timers are, and kept clear of the house button", !document.getElementById("help-row").hidden && document.getElementById("help-row").classList.contains("help-row--hatch"));
-  const hidden = ["workout", "yoga-session", "prescribed-session", "breathing-session", "plan-finish", "reflect", "red-flag", "age-check"].filter(v => !GE.HELP_HIDDEN.has(v));
-  ok("2g. hidden while a session runs, and on the gates and the finish", !hidden.length, hidden.join(","));
-  person({ tier: "personal", own: true }); await go("prescribed-session"); await sleep(50);
-  ok("2h. a player mounted: no Help", document.getElementById("help-row").hidden);
+  const hidden = ["plan-finish", "reflect", "red-flag", "age-check", "guide-me", "class-player"].filter(v => !GE.HELP_HIDDEN.has(v));
+  const players = ["workout", "yoga-session", "prescribed-session", "breathing-session", "walk-session", "core-session"].filter(v => !GE.PLAYERS.has(v));
+  ok("2g. hidden on the gates, the finish and the guided players; the players decide by whether a session runs", !hidden.length && !players.length, hidden.concat(players).join(","));
+  person({ tier: "personal", own: true }); await go("prescribed-session"); await sleep(80);
+  ok("2h. a player's start screen (the safety note, Start): Help is there", !document.getElementById("help-row").hidden);
+  const SG = await import(B + "session-guard.js");
+  SG.mountSessionGuard({ isActive: () => true, onExit() {} });
+  main.appendChild(document.createElement("span"));
+  await until(() => document.getElementById("help-row").hidden, 1500);
+  ok("2i. the session running: Help goes, with nothing to tap", document.getElementById("help-row").hidden);
+  SG.dismountSessionGuard();
 }
 
 console.log("\nTEST 3 - How do I…?");
@@ -206,14 +219,14 @@ await go("today");
   ok("3c. On this screen: Home's guides, only what this person can do", !!here && /On this screen: Home/i.test(txt(here)) && /just opened the app/.test(txt(here)) && !/Start today’s session/.test(txt(here)), txt(here));
   const q = main.querySelector("#help-q");
   q.value = "physio"; q.dispatchEvent(new dom.window.Event("input", { bubbles: true }));
-  ok("3d. search by the words people use: physio finds the physio guide", /1 guide match/.test(txt(main.querySelector("#help-count"))) && /from a physio/.test(txt(main.querySelector("#help-results"))));
+  ok("3d. search by the words people use: physio finds the physio guide", /1 guide match/.test(txt(main.querySelector("#help-count"))) && /know my physio plan/.test(txt(main.querySelector("#help-results"))));
   q.value = "zebra crossing"; q.dispatchEvent(new dom.window.Event("input", { bubbles: true }));
   ok("3e. nothing matched: said plainly, and the groups stay", /Nothing matched/.test(txt(main.querySelector("#help-count"))) && main.querySelectorAll("[data-cat]").length >= 5);
   ok("3f. only groups with guides (no empty group)", [...main.querySelectorAll("[data-cat]")].every(b => !/\b0 guides/.test(txt(b))));
   const stuck = main.querySelector(".help-stuck");
   ok("3g. Still stuck?: the address with Copy, nothing sent; the support lines as written", /hello@buildnewhabits\.co\.uk/.test(txt(stuck)) && !!stuck.querySelector('[data-help="copy"]') && !!main.querySelector("[data-support-lines]") && /116 123/.test(txt(main)));
   click(main.querySelector('[data-cat="week"]')); await sleep(20);
-  ok("3h. a group lists its guides", txt(main.querySelector("h1")) === "Your week" && /Put my sessions on set days/.test(txt(main)));
+  ok("3h. a group lists its guides, by what people want", txt(main.querySelector("h1")) === "Your week" && /I want my sessions on set days/.test(txt(main)));
   click(main.querySelector('[data-guide="C1"]')); await sleep(20);
   ok("3i. a guide opens on its overview: what you end up with, its steps, Guide me through it", /Two parts/.test(txt(main)) && main.querySelectorAll("ol.help-steps li").length >= 7 && /Guide me through it/.test(txt(main.querySelector('[data-help="go"]'))));
   click(main.querySelector('[data-help="back"]')); await sleep(10);
@@ -226,7 +239,7 @@ await go("today");
   person({ tier: "free" }); await go("today");
   click(document.getElementById("help-btn")); await until(() => main.querySelector(".help-view"));
   click(main.querySelector('[data-cat="week"]')); await sleep(20);
-  ok("3l. Free: the Plan's guides last, under Part of the Plan (the only mention of it)", /Part of the Plan/.test(txt(main)) && /Put my sessions on set days/.test(txt(main)));
+  ok("3l. Free: the Plan's guides last, under Part of the Plan (the only mention of it)", /Part of the Plan/.test(txt(main)) && /I want my sessions on set days/.test(txt(main)));
   click(main.querySelector('[data-guide="C1"]')); await sleep(20);
   ok("3m. Free opening a Plan guide: “This is part of the Plan.”, no Guide me, no selling", /This is part of the Plan\./.test(txt(main)) && !main.querySelector('[data-help="go"]') && !/upgrade|subscribe|£/i.test(txt(main)));
 }
@@ -358,6 +371,31 @@ await go("today");
   click(main.querySelector('[data-help="yes"]'));
   await until(() => router.currentView === "today");
   ok("5l. Yes: back to where they were when they asked", router.currentView === "today");
+
+  // Between screens, and a back gesture away from the route.
+  person({ tier: "personal" }); await go("today");
+  router.helpFrom = "today";
+  GE.startGuide("B1");
+  await until(() => GE.findTarget("library")?.classList.contains("gd-ring"));
+  await router.navigate("settings");       // not a tap: as a back gesture or a link would
+  await until(() => /One moment/.test(txt(document.querySelector(".gd-dock"))), 1500);
+  ok("5m. between screens: \u201cOne moment\u2026\u201d and Stop the guide, never the next step's words early", /One moment/.test(txt(document.querySelector(".gd-dock"))) && !/Tap Library/.test(txt(document.querySelector(".gd-dock"))) && !!document.querySelector('#guide-overlay [data-gd="stop"]'));
+  await until(() => GE.guideState().off, 4500);
+  ok("5n. still somewhere else after a few seconds: off the route, with Carry on from here", GE.guideState().off && !!document.querySelector('#guide-overlay [data-gd="resume"]'));
+  GE.stopGuide({ quiet: true });
+
+  // Large text: shorter words, each name beginning with its visible word.
+  document.documentElement.style.setProperty("--user-text-scale", "2");
+  await go("today"); router.helpFrom = "today";
+  GE.startGuide("B1");
+  await until(() => GE.findTarget("my-exercises") || GE.findTarget("library")?.classList.contains("gd-ring"));
+  click(GE.findTarget("library"));
+  await until(() => document.querySelector('#guide-overlay [data-gd="back"]'));
+  const bs = [...document.querySelectorAll("#guide-overlay .gd-dock__row button")];
+  ok("5o. text 2: Back, Stop, Smaller on one row, each name beginning with its word (SC 2.5.3)", bs.length === 3 && bs.every(b => (b.getAttribute("aria-label") || "").startsWith(txt(b))) && !!document.querySelector(".gd-dock__say--big"),
+    bs.map(b => txt(b) + "|" + b.getAttribute("aria-label")).join(", "));
+  document.documentElement.style.removeProperty("--user-text-scale");
+  GE.stopGuide({ quiet: true });
 }
 
 console.log("\nTEST 6 - reversal: a renamed label is red, and names the guide");
