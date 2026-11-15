@@ -1,6 +1,14 @@
 /**
  * views/plan-finish.js
- * 06 Nov 2026 v5
+ * 15 Nov 2026 v6
+ *
+ * v6 - P-32 STRETCH-FOR-STIFFNESS (Graeme, 15 Nov). After a Stretch routine
+ *   started with a stiffness other than Fine: "How do your <area> feel
+ *   now?" with Easier, About the same, Worse (optional, nothing kept).
+ *   Easier offers Put this on Home (the routine as a list in My exercises,
+ *   On Home any time, P-31); Worse says leave it today and points to the
+ *   check-in. Handed over in memory by path.js (router.stretchCheck), read
+ *   once, and only for the session it was started for.
  *
  * v5 - P-28 FINISH: a note only (the low day's line, below, is now "This
  *   one's about you today."; it lives in data/in-step-offer.js).
@@ -65,6 +73,7 @@ import { PAIN_OPTIONS, buildSummary, arcTodayLine, getSessionCount, getEmpathyPr
          fireEmpathyPrompt, skipEmpathyPrompt, useAnswersForEmpathy, renderInStepOffer, renderInStepLine,
          wireInStepLine } from "./reflect.js";
 import { offerForFinish, finishBLine, openEpisodeNext } from "../data/in-step-offer.js";
+import { AFTER, afterQuestion, addToHome } from "../data/stretch-stiffness.js";
 
 /** The check-in's own words and values (checkin.js), so before and after compare directly (C4). */
 export const MOODS = Object.freeze([["Struggling", 2], ["Low", 3], ["Okay", 6], ["Pretty good", 7], ["Great", 9]]);
@@ -83,6 +92,9 @@ export function PlanFinishView(router) {
   let offer = null;     // P-28: In Step's offer on this finish, decided once
   let offerShown = false;
   let bLine = null;     // P-28: B, when no episode is offered
+  let stiff = null;     // P-32: { name, area, practice } when the finish asks how it feels now
+  let stiffAns = null;  // "easier" | "same" | "worse"
+  let onHome = null;    // the list's name once Put this on Home is done
 
   function mount(container) {
     root = container;
@@ -97,6 +109,11 @@ export function PlanFinishView(router) {
       if (created) { entry = created; store.set("currentActivityEntry", created); }
     }
     mood = null; pain = null; note = ""; empathy = null; counted = entry.counted === true;
+    // P-32. Read once; only for the Stretch routine it was started for.
+    const sc = router.stretchCheck || null;
+    router.stretchCheck = null;
+    stiff = sc && entry.door === "stretch" && sc.name === entry.name ? sc : null;
+    stiffAns = null; onHome = null;
     // P-28. Decided once per finish, and recorded as offered when decided.
     const n = getSessionCount();
     offer = offerForFinish({ sessionCount: n, partial: entry.status === "partial" });
@@ -151,6 +168,12 @@ export function PlanFinishView(router) {
             beforeWord ? `<p class="path-small" id="pf-before">This morning you said ${esc(beforeWord)}.</p>` : "") : ""}
         ${sore.length ? radios("pf-pain", painQ, PAIN_OPTIONS.map(o => [o.l, o.v]), pain) : ""}
         <p class="path-coachline" id="pf-line" role="status" aria-live="polite">${esc(line)}</p>
+        ${stiff ? `<div class="pf-stiff">${radios("pf-stiff", afterQuestion(stiff.area), AFTER.options, stiffAns, `<p class="path-small">${esc(AFTER.legend)}.</p>`)}
+          <p class="path-coachline" id="pf-stiff-line" role="status" aria-live="polite">${stiffAns ? esc(AFTER[stiffAns]) : ""}</p>
+          ${stiffAns === "easier" ? (onHome
+            ? `<p class="path-small" id="pf-onhome-done" tabindex="-1">${esc(onHome)} is on Home, under Little and often.</p>`
+            : `<button type="button" class="path-door" id="pf-onhome"><span class="path-door__text"><span class="path-door__t">${esc(AFTER.home)}</span><span class="path-door__d">${esc(AFTER.homeSub)}</span></span></button>`) : ""}
+        </div>` : ""}
         ${list.length ? `
           <h2 class="look-label" id="pf-fb-h">Any you loved, or want less of?</h2>
           <ul class="pf-fb" aria-labelledby="pf-fb-h">${list.map((id, j) => {
@@ -202,6 +225,14 @@ export function PlanFinishView(router) {
       li.querySelectorAll(`input[name="pf-lo-${j}"]`).forEach(r => r.addEventListener("change", () => { f.never = r.value === "never"; }));
     });
     root.querySelector("#pf-note")?.addEventListener("input", e => { note = e.target.value; });
+    // P-32. How it feels now: shown, never kept.
+    root.querySelectorAll('input[name="pf-stiff"]').forEach(r => r.addEventListener("change", () => {
+      stiffAns = r.value; repaint(`input[name="pf-stiff"][value="${r.value}"]`);
+    }));
+    root.querySelector("#pf-onhome")?.addEventListener("click", () => {
+      onHome = addToHome(stiff?.practice);
+      repaint(onHome ? "#pf-onhome-done" : null);
+    });
     root.querySelector("#pf-counted")?.addEventListener("change", e => { counted = !!e.target.checked; });
     root.querySelector("#pf-done")?.addEventListener("click", () => done());
     root.querySelector("#pf-is-start")?.addEventListener("click", () => done({ toInStep: true }));

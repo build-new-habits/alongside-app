@@ -1,7 +1,14 @@
 import { createRequire as __cr } from "node:module";
 /**
  * tools/verify-path-routes.mjs
- * 06 Nov 2026 v9
+ * 15 Nov 2026 v10
+ *
+ * v10 - P-32 STRETCH-FOR-STIFFNESS. Stretch's routines step now asks How
+ *   does it feel today? (and Anywhere in particular?) before the floor
+ *   question, and ends with It hurts, a row of its own that is not a
+ *   routine. 4b finds the floor question among the legends; 4b and 4c
+ *   count routines without It hurts. Nothing else loosened;
+ *   verify-p32-stretch-stiffness checks the new parts.
  *
  * v9 - P-28 S4. A walk, run or bike ride now asks How would you like it?
  *   (Just go, Guide me, Take three with you) before its plan; Just go is
@@ -222,11 +229,13 @@ const areaRows = () => [...main.querySelectorAll(".path-list:first-of-type .path
 ok("4a. it opens at Where do you want to stretch? Four areas, step 1 of 2, and a whole session under them", step() === "sarea" && h1() === "Where do you want to stretch?" && areaRows().join("|") === "Whole body|Neck and shoulders|Back and hips|Legs" && rowText().join("|") === "Whole body|Neck and shoulders|Back and hips|Legs|Yoga & Pilates|A mobility session" && !!main.querySelector('.path-stepbar[aria-label="Step 1 of 2"]'), rowText().join("|"));
 tapRow("legs"); seen();
 const legs = ROUTINES.filter(r => r.area === "legs");
+const HURTS_ROW = "It hurts, rather than feels stiff";   // v10 (P-32): not a routine
+const routineRows = () => rowText().filter(t => t !== HURTS_ROW);
 ok("4b. Legs: its routines, A fresh one for me, and Can you get down to the floor today?", step() === "routines" && legs.every(r => rowText().includes(r.name)) && rowText().includes("A fresh one for me") &&
-   txt(main.querySelector(".path-seg legend")) === "Can you get down to the floor today?", rowText().join("|"));
+   [...main.querySelectorAll(".path-seg legend")].some(l => txt(l) === "Can you get down to the floor today?") && rowText().slice(-1)[0] === HURTS_ROW, rowText().join("|"));
 pick(main.querySelector('input[name="floor"][value="no"]')); await wait(60);
 const noFloor = ROUTINES.filter(r => r.area === "legs" && (r.floor === false || r.withoutFloor));
-ok("4c. Not today: only routines without the floor (or with their own swap), no fresh one, and it is said", rowText().join("|") === noFloor.map(r => r.name).join("|") && !rowText().includes("A fresh one for me") &&
+ok("4c. Not today: only routines without the floor (or with their own swap), no fresh one, and it is said", routineRows().join("|") === noFloor.map(r => r.name).join("|") && !rowText().includes("A fresh one for me") &&
    /without the floor/.test(txt(main.querySelector("#path-live"))) && document.activeElement?.value === "no", rowText().join("|"));
 fixture(); fakeRouter.pathStart = { door: "stretch" }; path(); tapRow("whole"); pick(main.querySelector('input[name="floor"][value="no"]')); tapRow("wb1"); seen();
 const shown = [...main.querySelectorAll(".path-mv__nm")].map(txt).join("|");

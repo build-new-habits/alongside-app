@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 15 Nov 2026 v715
+ * 15 Nov 2026 v716
  *
+ * v716 - P-32 (the Plan; Free unchanged). Stretch for stiffness: in Stretch, after the area, How does it feel today? (Fine, just a stretch, A little, Quite or Very stiff) and Anywhere in particular? (routines that work the spot say so and come first). Very stiff starts each routine with two minutes of gentle movement and shorter holds. It hurts sends you to the check-in, never to a stretch. Every Stretch routine says to ease into a gentle pull. After a stiff stretch, How do your … feel now?, and Put this on Home when it helped. Nothing new is stored. NEW FILE precached: js/data/stretch-stiffness.js.
  * v715 - P-31 (the Plan; Free unchanged). Little and often: in My exercises, each list has On Home (Not on Home, Any time, Mornings, Evenings); up to three show on Home under the Today card, one tap each, with "Done today" once a list is ticked and, on a sore day, which area a list works (its player still asks). Change today, a link under the Today card: Do it another day (each later day says whether it swaps or the session moves there), Catch up (on a day with no session, an earlier one this week not done; never a reminder), Little and often instead, Rest today and Something else. Every change is this week's only; Your week stays as planned, a session moves once, and Home says what changed with Undo beside it. Lately shows once today's session is done, or on a day without one. Undo never puts a session back on a day that has passed, and a session moved to a later day stays there if today becomes something else. store.js v124, Schema v1.125. NEW FILES precached: js/views/change-today.js, js/data/week-changes.js, js/data/little-and-often.js, js/data/sore-rule.js (one sore rule for the player and Home).
  * v714 - The coach's recordings: added while the app is open, they are now found when you open Guide me or come back to the app, without closing it first.
  * v713 - Safety on both tiers. With an area quite sore this morning, Free now gets the same halfway check as the Plan: "still okay?", carry on or stop and save. On the Plan, a programme now leaves out any movement your sore areas rule out today (as a kept session already did), and What I've adjusted says what was really left out, or that nothing was. NEW FILES: none.
@@ -4262,7 +4263,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v715";
+const CACHE_NAME = "alongside-v716";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4390,16 +4391,16 @@ const SHELL_HASHES = {
   "./js/data/tier-table.js": "7821c3304bd0815c",
   "./js/views/know-what.js": "e84fee3e6d9d3af0",
   "./js/views/plan-home.js": "04294fa6cad1336f",
-  "./js/views/path.js": "b61c38301f18b744",
+  "./js/views/path.js": "dbfa695d9edd6ec8",
   "./js/plan-look.js": "7674d8fbf5101aa9",
-  "./js/views/plan-finish.js": "0e0cc208d5d6a59c",
+  "./js/views/plan-finish.js": "d3901b6355f55542",
   "./js/data/outside.js": "3af4ea46bd898084",
   "./js/data/trend-recipes.js": "14961e4c12aef77e",
   "./js/data/path-context.js": "a3b00dbb090b937a",
   "./js/data/swap-search.js": "5f0f0e4d112f92ea",
   "./js/views/build-session.js": "763317cec8c62e83",
   "./js/data/build-lately.js": "e06714cc9d1539a6",
-  "./css/components/path.css": "0f1c966ff5988696",
+  "./css/components/path.css": "edb96497e820891b",
   "./js/data/red-flag.js": "3cd9eecbc3985eb3",
   "./js/data/health-consent.js": "a23d005af57f179c",
   "./js/data/age-check.js": "7fa5b0f5a6b34770",
@@ -4418,6 +4419,7 @@ const SHELL_HASHES = {
   "./js/data/week-changes.js": "1bd0a7a6db2c338f",
   "./js/data/little-and-often.js": "5ea20b534c403550",
   "./js/data/sore-rule.js": "f6ea51d828be37f0",
+  "./js/data/stretch-stiffness.js": "80d3e230b5f0ecef",
   "./css/components/your-week.css": "c95efbc697af8495",
   "./js/figures.js": "621b376c8778dbb4",
   "./js/data/figures/index.js": "9dd411b0802b6ff2",
@@ -4748,6 +4750,7 @@ const SHELL_URLS = [
   "./js/data/week-changes.js",
   "./js/data/little-and-often.js",
   "./js/data/sore-rule.js",
+  "./js/data/stretch-stiffness.js",
   "./css/components/your-week.css",
   "./js/figures.js",
   "./js/data/figures/index.js",
