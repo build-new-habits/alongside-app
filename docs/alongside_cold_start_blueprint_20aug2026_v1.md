@@ -74,7 +74,7 @@ git clone --depth 1 https://x-access-token:$TOKEN@github.com/build-new-habits/al
 |---|---|
 | `store.js` | v124 |
 | `Schema.md` | v1.125 |
-| `sw.js` | **v718**, cache `alongside-v718` |
+| `sw.js` | **v719**, cache `alongside-v719` |
 | `router.js` | v48 · `my-programme.js` v8 · `today.js` v49 · `settings.js` v46 · `progress.js` v27 · `onboarding/thread.js` v16 |
 | `exercise-card.js` | **v7** — CARD-4, four pages. `workout.css` v16 |
 | Gates | **363** on jsdom 28.1.0 (`npm ci`) — from the repo root. See the cwd row in §9. P-31 (14 Nov) added `verify-p31-change-today`; P-32 (15 Nov) added `verify-p32-stretch-stiffness`; P-33 (15 Nov) added `verify-p33-plan-share`; P-25 (15 Nov) added `verify-guides` (it walks every guide through the real screens). Run from a shallow clone without `../bnh-files` or the website, 12 fail before and after P-31 for that reason alone (they read the private repository, the website, or older versions from git history) |
