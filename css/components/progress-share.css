@@ -1,6 +1,10 @@
 /*
  * css/components/progress-share.css
- * 06 Oct 2026 v1
+ * 15 Nov 2026 v2
+ *
+ * v2 - P-33 PLAN-SHARE: Share your plan (views/plan-share.js) uses this
+ * screen's look; its page adds headings, the arc's parts, plain tables
+ * and ruled lines for notes (.sp-*), on the same white page.
  *
  * D-11 PROGRESS-SHARE. Share your progress (views/progress-share.js): the
  * choices as large tappable cards and chips (44px and over), the switches
@@ -126,3 +130,28 @@
   .shr-tile dd { font-size: 14pt; }
   .shr-sess, .shr-moves tr { break-inside: avoid; }
 }
+
+/* P-33. Share your plan: the page's own parts, on the report's white page. */
+.sp-doc .sp-h { margin-top: var(--space-4, 16px); }
+.sp-doc .sp-big { font-size: var(--text-lg); font-weight: 700; margin: 4px 0 6px; line-height: 1.3; color: inherit; }
+.sp-doc .sp-line { margin: 2px 0; font-size: var(--text-sm); line-height: 1.45; color: inherit; }
+.sp-doc .sp-small { font-size: var(--text-xs); margin: 8px 0 0; line-height: 1.4; color: inherit; opacity: 0.85; }
+.sp-doc .sp-list { font-size: var(--text-base); margin: 14px 0 2px; color: inherit; }
+.sp-doc .sp-when { font-weight: 400; font-size: var(--text-xs); }
+.sp-doc .sp-table { width: 100%; border-collapse: collapse; font-size: var(--text-sm); margin: 4px 0 8px; color: inherit; }
+.sp-doc .sp-table th, .sp-doc .sp-table td { text-align: left; padding: 6px 8px 6px 0; border-bottom: 1px solid rgba(127, 127, 127, 0.4); vertical-align: top; }
+.sp-doc .sp-table thead th { font-size: var(--text-xs); text-transform: uppercase; letter-spacing: 0.04em; }
+.sp-doc .sp-parts { margin: 4px 0 0; }
+.sp-doc .sp-parts div { padding: 6px 0; border-bottom: 1px solid rgba(127, 127, 127, 0.4); }
+.sp-doc .sp-parts dt { font-weight: 700; font-size: var(--text-sm); }
+.sp-doc .sp-parts dd { margin: 2px 0 0; font-size: var(--text-sm); line-height: 1.45; }
+.sp-doc .sp-lines { height: 140px; background: repeating-linear-gradient(to bottom, transparent 0, transparent 27px, rgba(127, 127, 127, 0.55) 27px, rgba(127, 127, 127, 0.55) 28px); }
+.sp-doc .sp-foot { margin-top: 16px; padding-top: 10px; border-top: 1px solid rgba(127, 127, 127, 0.4); font-size: var(--text-xs); line-height: 1.45; }
+.sp-acts { display: flex; flex-direction: column; gap: var(--space-2, 10px); margin: var(--space-4, 16px) 0; }
+.sp-more { margin: var(--space-2, 8px) 0 0; border: 1px solid var(--color-border); border-radius: 14px; padding: 4px 14px; background: var(--color-surface); }
+.sp-more > summary { min-height: 48px; display: flex; align-items: center; font-weight: 700; cursor: pointer; color: var(--color-text); }
+.sp-more > summary:focus-visible { outline: 3px solid var(--color-border-focus); outline-offset: 2px; border-radius: 8px; }
+.sp-more .sh-parts { border: 0; padding: 0; margin: 0 0 8px; background: none; }
+.sp-left, .sp-empty { font-size: var(--text-sm); color: var(--color-text-secondary); margin: var(--space-2, 8px) 0 0; line-height: 1.5; }
+.sp-empty { color: var(--color-text); font-size: var(--text-base); }
+.sp-textarea { width: 100%; min-height: 12em; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: var(--text-sm); line-height: 1.5; padding: 12px; border-radius: 12px; border: 1px solid var(--color-border); background: var(--color-surface); color: var(--color-text); }

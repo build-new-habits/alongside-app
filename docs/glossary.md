@@ -1,5 +1,7 @@
 # Alongside: Move — Glossary
-## 15 Nov 2026 v6
+## 15 Nov 2026 v7
+
+v7 - P-33 (Graeme, 15 Nov). Share your plan, Change what's in it, What works towards it.
 
 v6 - P-32 (Graeme, 15 Nov). Stretch for stiffness: How does it feel today? and its four choices, Anywhere in particular?, It hurts, Put this on Home.
 
@@ -41,6 +43,8 @@ Taken from the words on every screen (`node tools/chromium-words.mjs`, 95 screen
 | Stretch's finer spots | **Anywhere in particular?** | Target, focus area | P-32. A routine that works one says **Works your …** |
 | The way out when it is pain, not stiffness | **It hurts** | Injured, treat | P-32. Goes to the check-in, never to a stretch |
 | The finish's offer after an easier stretch | **Put this on Home** | Pin, Save to Home | P-32. Adds the routine to My exercises, On Home any time (P-31) |
+| The Plan's page of the person's plan, for a physio or trainer | **Share your plan** (beside **Share your progress**) | Export, Download my plan, My plan PDF | P-33. Made on the phone; **Save as a file**, **Copy as text**; the choices are behind **Change what's in it** |
+| The section linking the person's exercises to the arc | **What works towards it** | Recommended for you, Best for your arc | P-33. The arc's own rule; the person's own exercises only; never a suggestion |
 
 ## Decided
 
@@ -51,3 +55,5 @@ Taken from the words on every screen (`node tools/chromium-words.mjs`, 95 screen
 3. **Little and often**, **On Home** and **Change today** (Graeme, 14 Nov: "new words go in the glossary"), with catching up a missed session allowed as a choice, never a reminder.
 
 4. **Stretch for stiffness** words (Graeme, 15 Nov: mock-up v2, "The full range"): the person chooses it inside Stretch; It hurts goes to the check-in.
+
+5. **Share your plan** (Graeme, 15 Nov: mock-up v2, and a PDF made on the phone): what goes in it is the person's choice; the journal, check-in answers and weight are never in it.

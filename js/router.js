@@ -1,6 +1,9 @@
 /**
  * router.js
- * 14 Nov 2026 v55
+ * 15 Nov 2026 v56
+ *
+ * v56 - P-33 PLAN-SHARE. 'plan-share' (Share your plan, the Plan's), from
+ *   Progress; its tab is Progress's.
  *
  * v55 - P-31 CHANGE-TODAY. 'change-today' (Change today, the Plan),
  *   reached from under Home's Today card; its tab is Home's.
@@ -425,6 +428,7 @@ const VIEW_NAMES = {
   'progress':          { path: './views/progress.js',         fn: 'ProgressView'        },
   // D-11. Share your progress.
   'progress-share':    { path: './views/progress-share.js',   fn: 'ProgressShareView'   },
+  'plan-share':        { path: './views/plan-share.js',       fn: 'PlanShareView'       },
   'settings':          { path: './views/settings.js',         fn: 'SettingsView'        },
   'weekly-plan':       { path: './views/weekly-plan.js',      fn: 'WeeklyPlanView'      },
   'noticing':          { path: './views/noticing.js',         fn: 'NoticingView'        },
@@ -560,7 +564,7 @@ const NAV_MAP = {
   // absent.
   'quiet-session': 'noticing', 'breathing-session': 'noticing',
   'prescribed': 'today', 'prescribed-session': 'today', 'session-builder': 'today',
-  'progress': 'progress', 'weekly-plan': 'progress', 'progress-share': 'progress',
+  'progress': 'progress', 'weekly-plan': 'progress', 'progress-share': 'progress', 'plan-share': 'progress',
   'noticing': 'noticing', 'journal-entry': 'noticing',
   'in-step': 'noticing',
   // NAV-8. 'library' moved from 'noticing' to 'today'. The Library is an
