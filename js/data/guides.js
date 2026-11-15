@@ -1,6 +1,6 @@
 /**
  * js/data/guides.js
- * 15 Nov 2026 v1
+ * 15 Nov 2026 v2
  *
  * v1 - P-25 HOW-TO GUIDES (spec BNH-Files Product/alongside_howto_guides_
  *   12nov2026_v3.md; the seven P1 guides' words approved by Graeme 12 Nov,
@@ -27,11 +27,20 @@
  *            (Pick up to 3, then Continue), as mock-up v2.
  *   alts     one of these, whichever control is on screen.
  *
+ * v2 (15 Nov, Graeme on the live app: "Where's this?", A1 on a Home whose day
+ *   was set in Your week, where there is no Let me choose for you). A1's
+ *   first step is whatever Home leads with today: Let me choose for you,
+ *   Today, from your week, or Start your list; its last two steps are Today's
+ *   plan's or the safety note's, whichever opens. A1 is offered only when Home
+ *   leads with one of those (WHEN.homeStarts); otherwise its overview says
+ *   what to do instead.
+ *
  * Nothing here is health advice: the guides say how to use the app.
  * Rule-based; no AI. Nothing about using a guide is stored or sent.
  */
 import { store } from "../store.js";
 import { isPremium } from "../auth.js";
+import { todayState } from "../views/plan-home.js";
 
 export const HELP_EMAIL = "hello@buildnewhabits.co.uk";
 
@@ -54,9 +63,15 @@ export const WHEN = Object.freeze({
   noWeek:  () => !hasWeek(),
   hasWeek: () => hasWeek(),
   noArc:   () => !hasArc(),
+  // Today's day from your week leads Home.
+  weekLeads: () => isPremium() && (() => { try { return todayState(null) === "week"; } catch { return false; } })(),
+  // The Plan's Home leads with something to start: the coach, or today's day from your week.
+  homeStarts: () => isPremium() && (() => { try { return ["coach", "week"].includes(todayState(null)); } catch { return false; } })(),
   hasArc:  () => hasArc(),
 });
 
+// Asked once a day: already answered today, they are skipped (the guide moves
+// on when the next step's screen opens).
 const A1_CHECKIN = [
   { screen: "checkin", target: "energy", label: "Okay", say: "How’s your energy? Tap the word closest to it. **Okay** is fine." },
   { screen: "checkin", target: "mood", label: "Okay", say: "And your mood? Tap the closest word." },
@@ -71,11 +86,22 @@ export const GUIDES = Object.freeze([
     on: ["today", "checkin"],
     keywords: ["start", "begin", "new", "first", "what now", "lost", "how"],
     ways: [
-      { when: "plan", parts: [{ steps: [
-        { screen: "today", target: "coach-row", label: "Let me choose for you", say: "Tap **Let me choose for you**." },
+      { when: "homeStarts", parts: [{ steps: [
+        { screen: "today", alts: [
+          { target: "coach-row", label: "Let me choose for you", say: "Tap **Let me choose for you**." },
+          { target: "start-list", label: "Start your list", say: "Today is your own list, from your week. Tap **Start your list**." },
+          { target: "week-row", label: "Today, from your week", say: "Today is set in your week. Tap **Today, from your week**." },
+        ] },
         ...A1_CHECKIN,
-        { screen: "coach-proposal", target: "ack", label: "I have read this.", optional: true, say: "This is today’s plan. The first time, tick **I have read this.**" },
-        { screen: "coach-proposal", target: "start", label: "Start", say: "Tap **Start**." },
+        { screen: ["coach-proposal", "prescribed-session"], optional: true, alts: [
+          { target: "ack", label: "I have read this.", say: "This is today’s plan. The first time, tick **I have read this.**" },
+          { target: "gate-ack", label: "I have read this.", say: "The first time, read **Before you start**, then tick **I have read this.**" },
+        ] },
+        { screen: ["coach-proposal", "prescribed-session", "path"], alts: [
+          { target: "start", label: "Start", say: "Tap **Start**." },
+          { target: "gate-start", label: "Start the session", say: "Tap **Start the session**." },
+          { target: "path-start", label: "Start", say: "This is the coach’s choice for today. Tap **Start**." },
+        ] },
       ] }] },
       { when: "free", parts: [{ steps: [
         { screen: "today", target: "not-sure", label: "Not sure? I’ll pick something", say: "Tap **Not sure? I’ll pick something**." },
@@ -84,6 +110,7 @@ export const GUIDES = Object.freeze([
         { screen: "coach-proposal", target: "start", label: "Start", say: "Tap **Start**." },
       ] }] },
     ],
+    noWay: "Home already shows what’s set for today. Tap it, or choose one of the four ways in under **Or something else today**.",
     end: "Your session has started.",
     notQuite: [
       { q: "I don’t want to answer questions today", tiers: ["plan"], answer: "On the first question, tap **Not today**. Today’s plan opens straight away, with **Check in now** if you change your mind." },
@@ -98,7 +125,7 @@ export const GUIDES = Object.freeze([
     outcome: "If today is in your week, it’s waiting at the top of Home. One tap to start.",
     on: ["today"],
     keywords: ["start", "today", "session", "go", "my list", "week"],
-    ways: [{ when: "hasWeek", parts: [{ steps: [
+    ways: [{ when: "weekLeads", parts: [{ steps: [
       { screen: "today", target: "week-row", tap: false, say: "Today’s plan from your week is at the top, under **Today, from your week**." },
       { screen: "today", alts: [
         { target: "start-list", label: "Start your list", say: "It’s your own exercises: tap **Start your list**." },
