@@ -1,6 +1,11 @@
 /**
  * js/views/plan-import.js
- * 31 Oct 2026 v2
+ * 15 Nov 2026 v3
+ *
+ * v3 - P-33 PLAN-SHARE. A day read with "On Home: mornings" (as Share your
+ *   plan writes it) says so under its name, and adding it puts that list
+ *   On Home for that part of the day (P-31), so a plan shared with a
+ *   physio or trainer comes back as it went.
  *
  * v2 - STAGE PATH Session 9 (CLOSE; P-12 F5; Graeme, 31 Oct: "‹ Back"). On
  *   the Plan, every way back says "‹ Back" (it said "← Back", "← My
@@ -37,6 +42,10 @@ import { store } from "../store.js";
 import { isPremium } from "../auth.js";
 import { healthAllowed } from "../data/health-consent.js";
 import { lineIcon } from "../data/line-icons.js";
+import { setOnHome } from "../data/little-and-often.js";
+
+/** v3 (P-33). How a day's On Home choice reads. */
+const ON_HOME_WORDS = { morning: "mornings", evening: "evenings", any: "any time" };
 import {
   readPlan, findAmount, amountOk, amountText, repsString, exerciseById, HEALTH_LINES, TEMPLATE, LIMITS,
 } from "../data/plan-reader.js";
@@ -140,6 +149,7 @@ export function PlanImportView(router) {
           <label class="yw-label" for="pi-day-${di}">Name for this day</label>
           <input class="yw-input" id="pi-day-${di}" data-dayname="${di}" maxlength="40" value="${esc(d.name)}" autocomplete="off">
           ${ownGroups.has(d.name) ? `<p class="yw-note">${esc(d.name)} is already in My exercises: adding replaces it.</p>` : ""}
+          ${d.onHome ? `<p class="yw-note">On Home, ${esc(ON_HOME_WORDS[d.onHome] || "any time")}, as the plan says.</p>` : ""}
           <ul class="pi-items">${d.items.map((it, ii) => renderItem(it, di, ii)).join("")}</ul>
         </section>`).join("")}
       ${plan.notRead.length ? `
@@ -298,6 +308,11 @@ export function PlanImportView(router) {
     // A day already there is replaced by the one just read.
     const kept = (store.get("prescribedExercises") || []).filter(e => !days.includes(e.group));
     store.set("prescribedExercises", [...kept, ...entries]);
+    // v3 (P-33). On Home, as the plan says, for each day added under its (maybe renamed) name.
+    for (const d of plan.days) {
+      const name = (d.name || "").trim();
+      if (d.onHome && days.includes(name)) setOnHome(name, d.onHome);
+    }
     added = { count: entries.length, days };
     text = ""; plan = null;   // H2: the pasted words go
     go("done", `Added ${entries.length} exercises to My exercises.`);

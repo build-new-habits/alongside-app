@@ -1,6 +1,16 @@
 /**
  * js/data/plan-reader.js
- * 05 Oct 2026 v1
+ * 15 Nov 2026 v2
+ *
+ * v2 - P-33 PLAN-SHARE (Graeme, 15 Nov). So a plan shared with Share your
+ *   plan comes back in whole: (1) a library name that has a dash in it
+ *   ("Romanian Deadlift — Light Load") is matched as the whole name before
+ *   the dash is read as the start of a note; a name that is not a library
+ *   name exactly is read as before. (2) "On Home: mornings" (or evenings,
+ *   any time) under a day is read as that day's On Home choice (P-31);
+ *   nothing else about it changes.
+ *
+ * v1 - 05 Oct 2026.
  *
  * D-7 PLAN-IMPORT. Reads a plan the person pastes (from a trainer, a class,
  * another app or an AI) and finds the exercises in it, with rules: no AI in
@@ -253,6 +263,9 @@ function readLine(raw) {
   }
 
   if (/^day\s*:/i.test(line)) return [{ type: "day", name: headerLabel(line) }];
+  // v2 (P-33). A day's On Home choice, as Share your plan writes it.
+  const onHome = line.match(ON_HOME_LINE);
+  if (onHome) return [{ type: "onhome", value: /^m/i.test(onHome[1]) ? "morning" : /^e/i.test(onHome[1]) ? "evening" : "any" }];
   if (/^week\s*\d+\b/i.test(line) && !findAmount(line)) return [{ type: "not", line: raw.trim() }];
 
   // A part heading, alone or with a list after it.
@@ -278,6 +291,18 @@ function readLine(raw) {
   return [item(raw, before, a, [...notes, after].map(s => clean(s, 80)).filter(Boolean).join(" — "))];
 }
 
+/** v2 (P-33). "On Home: mornings" / "evenings" / "any time", as Share your plan writes it. */
+const ON_HOME_LINE = /^\(?on home\s*[:,]\s*(mornings?|evenings?|any\s*time)\)?\s*\.?$/i;
+
+/**
+ * v2 (P-33). The whole text, when it is a library name exactly (a name
+ * with a dash in it), else null: then the dash starts a note, as before.
+ */
+function wholeName(s) {
+  const t = clean(String(s || "").replace(SIDE, " ").replace(/\b(sets?|reps?|x)\b\s*$/i, " "));
+  return t && matchName(t).kind === "matched" ? t : null;
+}
+
 /** The name and its note: a dash or colon starts the note. */
 function splitName(s) {
   const t = String(s || "").replace(SIDE, " ").replace(/\b(sets?|reps?|x)\b\s*$/i, " ");
@@ -286,7 +311,8 @@ function splitName(s) {
 }
 
 function item(raw, nameText, a, note) {
-  const [name, extra] = splitName(nameText);
+  const whole = wholeName(nameText);
+  const [name, extra] = whole ? [whole, ""] : splitName(nameText);
   if (name.replace(/[^a-z]/gi, "").length < 3) return { type: "not", line: raw.trim() };
   const match = matchName(name);
   const noteText = [extra, note].map(x => clean(String(x || "").replace(new RegExp(SIDE.source, "g"), " "), 120)).filter(Boolean).join(" — ");
@@ -296,7 +322,8 @@ function item(raw, nameText, a, note) {
 
 /** A line with no amount: an exercise only if it is a library name exactly. */
 function bare(raw, text, note) {
-  const [name, extra] = splitName(text);
+  const whole = wholeName(text);
+  const [name, extra] = whole ? [whole, ""] : splitName(text);
   const match = name ? matchName(name) : { kind: "own" };
   if (match.kind !== "matched") return { type: "not", line: raw.trim() };
   const ex = EXERCISES.find(e => e.id === match.id);
@@ -308,7 +335,7 @@ function bare(raw, text, note) {
 
 /**
  * Read a whole plan.
- * { days: [{ name, items: [...] }], notRead: [line], counts, readable }.
+ * { days: [{ name, items: [...], onHome? }], notRead: [line], counts, readable }.
  * Items carry section (warmup / main / cooldown), match, amount, ok (the
  * amount is inside the limits) and take (ticked to start with: H3).
  */
@@ -328,6 +355,7 @@ export function readPlan(text) {
       lines++;
       if (r.type === "day") { day = dayNamed(r.name || `Day ${days.length + 1}`); section = "main"; continue; }
       if (r.type === "section") { section = r.section; continue; }
+      if (r.type === "onhome") { if (day) day.onHome = r.value; else notRead.push(clean(raw, 120)); continue; }
       if (r.type === "not") { notRead.push(clean(r.line, 120)); continue; }
       const total = days.reduce((n, d) => n + d.items.length, 0);
       if (total >= LIMITS.items) { notRead.push(clean(r.line, 120)); continue; }

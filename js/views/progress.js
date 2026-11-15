@@ -1,6 +1,10 @@
 /**
  * progress.js
- * 05 Nov 2026 v34
+ * 15 Nov 2026 v35
+ *
+ * v35 - P-33 PLAN-SHARE (Graeme, 15 Nov). On the Plan, Share your plan
+ *   under Share your progress: "Your arc, your week and your lists, for a
+ *   physio or trainer" (views/plan-share.js). Free unchanged.
  *
  * v34 - P-27 TIDY (Graeme, 05 Nov: retire the twelve-week programme on the
  *   Plan). The More list's programme row is gone (it opened a nearly empty
@@ -540,8 +544,9 @@ export function ProgressView(router) {
     programme: '<path d="M4 20V10l8-6 8 6v10"/><path d="M10 20v-6h4v6"/>',
     year:      '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
     share:     '<path d="M12 15V3M7 8l5-5 5 5"/><path d="M5 13v6h14v-6"/>',
+    plan:      '<path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 13h6M10 17h6"/>',
   };
-  const PAGE_KIND = { lifts: 'amber', weight: 'blue', programme: 'teal', year: 'violet', share: 'green' };
+  const PAGE_KIND = { lifts: 'amber', weight: 'blue', programme: 'teal', year: 'violet', share: 'green', plan: 'teal' };
 
   function _prRow(key, title, sub, attrs) {
     return `
@@ -568,6 +573,8 @@ export function ProgressView(router) {
       // P-27. The twelve-week programme is retired on the Plan: its row is gone.
       _prRow('year', 'Your year', 'Every session since you started', 'id="progress-year-btn" aria-label="Your year: look back across your year"'),
       _prRow('share', 'Share your progress', 'A picture, a certificate, a report or text', 'data-share-open'),
+      // P-33. Share your plan: the Plan's, for a physio or trainer.
+      premium ? _prRow('plan', 'Share your plan', 'Your arc, your week and your lists, for a physio or trainer', 'data-plan-share') : '',
     ].filter(Boolean);
     return `
       <nav class="pr-card pr-more" aria-label="More on your progress">
@@ -1350,6 +1357,9 @@ export function ProgressView(router) {
         setSharePreset({ window: format ? 'today' : activeWindow, format });
         router.navigate('progress-share');
       }));
+
+    // P-33. Share your plan.
+    container.querySelector('[data-plan-share]')?.addEventListener('click', () => router.navigate('plan-share'));
 
     container.querySelector('#progress-year-btn')
       ?.addEventListener('click', () => router.navigate('annual-reflection'));
