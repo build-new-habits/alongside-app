@@ -241,7 +241,10 @@
          10000 is deliberately one above the highest z-index in the app
          rather than a large round number, so the next thing that outranks
          this fails loudly at review instead of quietly on a handset. */
-      z-index: 10000;
+      /* P-25, 15 Nov 2026: 10003, one above Guide me through it's box (10001)
+         and arrow (10002), which sit above the preview panel (9999) so a
+         guide can ring Start on it. The house is still above everything. */
+      z-index: 10003;
       /* HATCH-OVERLAP. Driven from the same variable the gutter is
          derived from, so the reserved space and the actual button
          cannot disagree. min-* kept as literals: they are the WCAG

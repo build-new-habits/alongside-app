@@ -49,37 +49,48 @@ const esc = s => String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").re
 const $ = (s, r = document) => r.querySelector(s);
 
 let R = null;
-const fresh = () => ({ id: null, way: null, steps: [], i: 0, sub: false, off: false, pause: false, ended: false, mini: false, ret: null, said: "", lastI: -1 });
+const fresh = () => ({ id: null, way: null, side: null, steps: [], i: 0, sub: false, off: false, pause: false, ended: false, mini: false, ret: null, said: "", lastI: -1 });
 let G = fresh();
 let ringEl = null, timer = 0, observer = null;
 
 // ── Help ──────────────────────────────────────────────────────────────────
 
-export function helpButtonHTML() {
-  return `<button type="button" class="help-btn" id="help-btn" data-help-open>${lineIcon("unsure", 20)}<span>Help</span></button>`;
+export function helpButtonHTML(where = "row") {
+  return where === "panel"
+    ? `<button type="button" class="help-btn help-btn--panel" data-help-open="panel">${lineIcon("unsure", 20)}<span>Help</span></button>`
+    : `<button type="button" class="help-btn" id="help-btn" data-help-open="row">${lineIcon("unsure", 20)}<span>Help</span></button>`;
 }
 
 export function initGuides(router) {
   R = router;
   const row = document.getElementById("help-row");
   if (row && !row.querySelector("#help-btn")) row.innerHTML = helpButtonHTML();
-  row?.querySelector("#help-btn")?.addEventListener("click", openHelp);
+  // Help is the row's button, or, where a screen covers the page with its own
+  // panel (Today's plan), the same button drawn top right in that panel.
+  document.addEventListener("click", e => {
+    const b = e.target.closest?.("[data-help-open]");
+    if (b) openHelp(b.dataset.helpOpen);
+  });
   document.addEventListener("click", onClick, true);
   document.addEventListener("alongside:mounted", e => afterMount(e.detail?.view));
   const main = document.getElementById("main-content");
   if (main && typeof MutationObserver === "function") {
-    observer = new MutationObserver(() => { if (G.id) schedule(); });
-    observer.observe(main, { childList: true, subtree: true, attributes: true, attributeFilter: ["hidden", "class", "disabled"] });
+    // The ring's own class going on and off is not a change to the screen.
+    const ringOnly = r => r.type === "attributes" && r.attributeName === "class" &&
+      String(r.oldValue || "").replace(/\s*gd-ring/g, "").trim() === String(r.target.className || "").replace(/\s*gd-ring/g, "").trim();
+    observer = new MutationObserver(recs => { if (G.id && !recs.every(ringOnly)) schedule(); });
+    observer.observe(main, { childList: true, subtree: true, attributes: true, attributeOldValue: true, attributeFilter: ["hidden", "class", "disabled"] });
   }
   window.addEventListener("scroll", () => { if (G.id && ringEl) placeArrow(); }, { passive: true });
   window.addEventListener("resize", () => { if (G.id) schedule(); });
 }
 
 /** Help: open How do I…? for the screen the person is on. A running guide stops. */
-export function openHelp() {
+export function openHelp(where = "row") {
   if (G.id) stopGuide({ quiet: true });
   if (!R) return;
   R.helpFrom = R.currentView;
+  R.helpFocus = where === "panel" ? "panel" : "row";
   R.helpOpen = { screen: "home" };
   R.navigate("help");
 }
@@ -95,7 +106,8 @@ export function afterMount(view) {
   }
   if (view !== "help" && R?.helpReturnFocus) {
     R.helpReturnFocus = false;
-    setTimeout(() => document.getElementById("help-btn")?.focus({ preventScroll: true }), 0);
+    const sel = R.helpFocus === "panel" ? "[data-help-open='panel']" : "#help-btn";
+    setTimeout(() => document.querySelector(sel)?.focus({ preventScroll: true }), 120);
   }
   if (G.id) schedule();
 }
@@ -121,7 +133,7 @@ export function stopGuide({ quiet = false } = {}) {
   G = fresh();
   clearRing();
   const o = document.getElementById("guide-overlay");
-  if (o) o.innerHTML = "";
+  if (o) { o.innerHTML = ""; o.dataset.html = ""; }
   roomFor(null);
   if (!quiet) say("Guide stopped.");
 }
@@ -162,23 +174,44 @@ function sync() {
   if (!G.id) return;
   const v = R?.currentView;
   const st = cur();
-  clearRing();
-  if (!st) return;
+  const keep = ringEl;
+  if (!st) { clearRing(); return; }
   const hidden = HELP_HIDDEN.has(v) && !(st && onScreen(st, v) && !G.off && !G.pause && !G.ended);
-  if (hidden) { draw(null, true); return; }
-  if (G.off || G.pause || G.ended) { draw(null); return; }
-  if (!onScreen(st, v)) { draw(null); return; }
+  if (hidden) { clearRing(); draw(null, true); return; }
+  if (G.off || G.pause || G.ended) { clearRing(); draw(null); return; }
+  if (!onScreen(st, v)) { clearRing(); draw(null); return; }
   const el = findTarget(st.target);
   if (!el && st.optional) { G.i++; G.sub = false; return sync(); }
+  let moved = false;
+  if (keep !== el) clearRing();
   if (el) {
-    el.classList.add("gd-ring");
+    if (!el.classList.contains("gd-ring")) el.classList.add("gd-ring");
     ringEl = el;
     if (G.lastI !== G.i * 2 + (G.sub ? 1 : 0)) {
       G.lastI = G.i * 2 + (G.sub ? 1 : 0);
+      G.side = null;
+      moved = true;
       try { el.scrollIntoView({ block: "center" }); } catch { /* old browsers */ }
     }
   }
   draw(el);
+  if (moved) intoFreeSpace(el);
+}
+
+/** Then move the page so the ring sits in the space the box leaves free. */
+function intoFreeSpace(el) {
+  const dock = document.querySelector("#guide-overlay .gd-dock");
+  if (!el || !dock || el.closest("#bottom-nav")) return;
+  const r = el.getBoundingClientRect(), d = dock.getBoundingClientRect();
+  if (!r.height) return;
+  const nav = document.getElementById("bottom-nav");
+  const navH = nav && !nav.classList.contains("hidden") ? nav.getBoundingClientRect().height : 0;
+  const top = G.side === "top" ? d.bottom : 0;
+  const bottom = G.side === "top" ? (window.innerHeight - navH) : d.top;
+  if (r.top >= top + 8 && r.bottom <= bottom - 8) return;
+  const want = r.height < (bottom - top - 24) ? (top + bottom) / 2 - (r.top + r.height / 2) : top + 16 - r.top;
+  try { window.scrollBy(0, -want); } catch { /* jsdom */ }
+  placeArrow();
 }
 
 function clearRing() {
@@ -330,13 +363,19 @@ function dockBody(st) {
 function draw(el, hidden = false) {
   const o = document.getElementById("guide-overlay");
   if (!o) return;
-  if (!G.id || hidden) { o.innerHTML = ""; roomFor(null); return; }
+  if (!G.id || hidden) { o.innerHTML = ""; o.dataset.html = ""; roomFor(null); return; }
   const st = cur();
   const body = dockBody(st || {});
-  const side = el && !el.closest("#bottom-nav") && midY(el) > (window.innerHeight || 800) / 2 ? "top" : "bottom";
+  // The side is chosen once a step: whichever edge is further from the button.
+  if (!G.side || !el) G.side = el && !el.closest("#bottom-nav") && midY(el) > (window.innerHeight || 800) / 2 ? "top" : "bottom";
+  const side = el ? G.side : "bottom";
   const nav = document.getElementById("bottom-nav");
   const navShown = !!nav && !nav.classList.contains("hidden");
-  o.innerHTML = `<section class="gd-dock gd-dock--${side}${navShown ? "" : " gd-dock--nonav"}" aria-labelledby="gd-dock-h">${body.html}</section>`;
+  const hatch = document.getElementById("hidden-nav-home-btn");
+  const hatchShown = !!hatch && !hatch.classList.contains("hidden");
+  const html = `<section class="gd-dock gd-dock--${side}${navShown ? "" : " gd-dock--nonav"}${hatchShown ? " gd-dock--hatch" : ""}" aria-labelledby="gd-dock-h">${body.html}</section>`;
+  // Drawn again only when it changes, so a keyboard or switch user's place in the box is kept.
+  if (o.dataset.html !== html || !o.firstElementChild) { o.innerHTML = html; o.dataset.html = html; }
   roomFor(side, o.firstElementChild);
   placeArrow();
   if (body.text && body.key !== G.said) { G.said = body.key; say(body.text); }
@@ -348,11 +387,14 @@ const midY = el => { const r = el.getBoundingClientRect(); return r.top + r.heig
 function roomFor(side, dock) {
   const main = document.getElementById("main-content");
   if (!main) return;
-  main.style.removeProperty("padding-top");
-  main.style.removeProperty("padding-bottom");
-  if (!side || !dock) return;
+  if (!side || !dock) { main.style.removeProperty("padding-top"); main.style.removeProperty("padding-bottom"); return; }
   const h = dock.offsetHeight || 160;
-  if (side === "top") main.style.setProperty("padding-top", `calc(${h}px + var(--content-padding, 16px))`, "important");
+  if (side === "bottom") main.style.removeProperty("padding-top");
+  if (side === "top") {
+    main.style.setProperty("padding-top", `calc(${h}px + var(--content-padding, 16px))`, "important");
+    // And room below, so a button near the end of the page can be scrolled up into view.
+    main.style.setProperty("padding-bottom", `calc(var(--nav-height, 72px) + 45vh)`, "important");
+  }
   else main.style.setProperty("padding-bottom", `calc(${h}px + var(--nav-height, 72px) + 24px)`, "important");
 }
 
@@ -370,6 +412,7 @@ function placeArrow() {
   a.setAttribute("aria-hidden", "true");
   a.innerHTML = `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M4 12h15M13 6l6 6-6 6"/></svg>`;
   const top = Math.max(r.top, 0), bot = Math.min(r.bottom, window.innerHeight || r.bottom);
+  if (bot - top < 12) return;                 // off the screen: no arrow pointing at nothing
   a.style.cssText = `width:${size}px;height:${size}px;left:${Math.max(1, r.left - size - 5)}px;top:${(top + bot) / 2 - size / 2}px`;
   o.append(a);
 }

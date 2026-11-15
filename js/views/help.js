@@ -56,7 +56,7 @@ export function HelpView(router) {
     const c = CATEGORIES.find(x => x.id === g.cat);
     return row(`data-guide="${g.id}"`, c?.kind || "slate", "unsure", esc(g.title));
   };
-  const backBtn = label => `<div class="help-head"><button type="button" class="btn btn-ghost plan-back help-back" data-help="back" aria-label="Back to ${esc(label)}">‹ Back</button></div>`;
+  const backBtn = label => `<div class="help-head"><button type="button" class="btn btn-ghost plan-back" data-help="back" aria-label="Back to ${esc(label)}">‹ Back</button></div>`;
 
   function home() {
     const here = guidesFor(from);
@@ -169,7 +169,7 @@ export function HelpView(router) {
 
   function render(focus = true) {
     const body = state.screen === "cat" ? category() : state.screen === "guide" ? overview() : state.screen === "done" ? done() : home();
-    el.innerHTML = `<div class="help-view look-view">${body}</div>`;
+    el.innerHTML = `<div class="help-view">${body}</div>`;
     if (state.screen === "home" && query) search(query);
     if (focus) {
       try { window.scrollTo({ top: 0, left: 0, behavior: "instant" }); } catch { /* jsdom */ }

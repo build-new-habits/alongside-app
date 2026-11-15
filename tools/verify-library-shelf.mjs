@@ -1,6 +1,12 @@
 import { createRequire as __cr } from "node:module";
 /**
  * tools/verify-library-shelf.mjs
+ * 15 Nov 2026 v5
+ *
+ * v5 - P-25 HOW-TO GUIDES. TEST 4: the guide markers (data-guide-target,
+ *   read by Guide me through it only) are taken out of today's Free Library
+ *   before the byte comparison; nothing else is.
+ *
  * 06 Nov 2026 v4
  *
  * v4 - P-28 S4. A walk, run or bike ride now asks How would you like it?
@@ -153,7 +159,7 @@ const tmp = new URL("../js/views/library__v690_check.js", import.meta.url);
 writeFileSync(tmp, old);
 let OLD; try { OLD = await import(tmp.href); } finally { unlinkSync(tmp); }
 fixture("free"); main.innerHTML = OLD.render(); const a = main.innerHTML;
-fixture("free"); main.innerHTML = LIB.render(); const b = main.innerHTML;
+fixture("free"); main.innerHTML = LIB.render(); const b = main.innerHTML.replace(/ data-guide-target="[a-z:-]+"/g, "");
 let at = 0; while (at < a.length && a[at] === b[at]) at++;
 ok("4. Free's Library: the same, byte for byte", !!old && a === b && a.length > 200, `differs at ${at}: ${a.slice(at - 40, at + 40)} | ${b.slice(at - 40, at + 40)}`);
 

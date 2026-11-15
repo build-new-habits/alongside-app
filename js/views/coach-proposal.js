@@ -2,8 +2,10 @@
  * coach-proposal.js
  * 15 Nov 2026 v69
  *
- * v69 - P-25 HOW-TO GUIDES. Guide markers only: I have read this. (ack)
- *   and Start (start). Nothing else changes.
+ * v69 - P-25 HOW-TO GUIDES. Guide markers: I have read this. (ack) and
+ *   Start (start). And Help, top right of the plan's panel, both tiers: the
+ *   panel covers the page, and the shell's Help row with it, so Help is
+ *   drawn here too, the same button with the same words (js/guide.js).
  *
  * 05 Nov 2026 v68
  *
@@ -882,6 +884,7 @@
  *   prefers-reduced-motion: panel slide transition removed.
  */
 
+import { helpButtonHTML } from "../guide.js";
 import { store }             from '../store.js';
 import { healthConsentNeeded, setPendingRoute } from '../data/health-consent.js';
 // ARC-VISIBLE, 16 Sep 2026. Same source today.js reads for "What it's
@@ -1378,6 +1381,7 @@ export function CoachProposalView(router) {
           ${premium ? `<button class="cp-preview-panel__close plan-back" id="cp-preview-close" aria-label="Back to Home">‹ Back</button>` : `<button class="cp-preview-panel__close" id="cp-preview-close" aria-label="Back to Home">
             <span aria-hidden="true">‹</span> Home
           </button>`}
+          ${helpButtonHTML("panel")}
 
           ${proposal && (proposal.constraint || proposal.reentryLine) ? `
             <div class="cp-coach-block cp-coach-block--in-panel" aria-live="polite">

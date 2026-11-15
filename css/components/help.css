@@ -19,7 +19,7 @@
 .help-row[hidden] { display: none; }
 /* The house button sits fixed in the top-right corner on screens without
    the bottom bar: Help keeps clear of it, in the same order. */
-.help-row--hatch { padding-right: calc(var(--content-padding, 16px) + var(--escape-hatch-gutter, 68px)); }
+.help-row--hatch { padding-right: calc(var(--content-padding, 16px) + var(--escape-hatch-gutter)); }
 .help-btn {
   display: inline-flex;
   align-items: center;
@@ -37,12 +37,15 @@
   cursor: pointer;
 }
 .help-btn svg { color: var(--color-primary); flex: none; }
+/* Today's plan covers the page with its panel: Help sits top right in it,
+   across from ‹ Back, and scrolls with the panel's words. */
+.help-btn--panel { position: absolute; top: var(--space-4, 16px); right: var(--space-4, 16px); z-index: 1; }
 .help-btn:focus-visible { outline: 3px solid var(--color-border-focus); outline-offset: 2px; }
 
 /* ── How do I…? ───────────────────────────────────────────────────────── */
 .help-view { min-width: 0; width: 100%; box-sizing: border-box; }
 .help-head { display: flex; }
-.help-title { margin: var(--space-2, 8px) 0 var(--space-3, 12px); }
+.help-title { margin: var(--space-2, 8px) 0 var(--space-3, 12px); font-size: var(--text-2xl); line-height: 1.25; }
 .help-lead { margin: 0 0 var(--space-4, 16px); font-size: var(--text-lg); line-height: 1.5; }
 .help-sub { color: var(--color-text-secondary); margin: 0 0 var(--space-3, 12px); }
 .help-after { margin-top: var(--space-3, 12px); }
@@ -103,6 +106,8 @@
 }
 .gd-dock--bottom { bottom: var(--nav-height, 72px); border-top: 4px solid var(--gd-ring); border-radius: 16px 16px 0 0; }
 .gd-dock--nonav.gd-dock--bottom { bottom: 0; }
+/* The house button stays above the box (index.html); the box keeps clear of it. */
+.gd-dock--hatch.gd-dock--top { padding-right: calc(var(--space-4, 16px) + var(--escape-hatch-gutter)); }
 .gd-dock--top {
   top: 0;
   border-bottom: 4px solid var(--gd-ring);
