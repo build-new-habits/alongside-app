@@ -1,5 +1,11 @@
 /**
  * js/exercise-card.js
+ * 16 Nov 2026 v16
+ *
+ * v16 - P-36 MY-LIST-PLAYER. layout: "compact": one screen per exercise for
+ *   My exercises (today's caution, figure, How, pace, Watch out folded on the
+ *   same screen, ways to ease off, the video). The paged card is unchanged.
+ *
  * 04 Oct 2026 v15
  *
  * v15 - D-4 FIGURES. The exercise's stick figure (js/figures.js) is the
@@ -685,6 +691,30 @@ export function renderExerciseCard(exercise, opts = {}) {
   // without the page turns. "How to do it" is open; the options and the
   // universal hurt-and-ache text are one tap away.
   // D-1. One step at a time: why, watch or how. Capture is the player's.
+  // P-36 MY-LIST-PLAYER (Graeme, 16 Nov: "I can't see what exercises are
+  // being done"; Watch out and Note "Ok"). One screen per exercise: today's
+  // caution, the figure, How, the pace, then Watch out folded open-able on
+  // the same screen (never a page of its own), the ways to ease off, and the
+  // caller's slot (the video). The safety line sits in the player itself.
+  if (opts.layout === "compact") {
+    const watchList = (exercise.watchOut && exercise.watchOut.length) ? list("exercise-watchout-list", exercise.watchOut) : "";
+    const formList  = restCues.length ? list("exercise-section-list", restCues) : "";
+    return `
+  <div class="exercise-card exercise-card--compact" data-xcard="${p}"
+       role="region" aria-label="How to do ${esc(exercise.name)}">
+    ${caution ? `<p class="exercise-caution" role="note">${caution}</p>` : ""}
+    ${figure ? `<div class="xcard-block xcard-figure">${figure}</div>` : ""}
+    ${(exercise.instructions && exercise.instructions.length) ? section("How", list("exercise-section-list", exercise.instructions)) : ""}
+    ${hold}
+    ${(watchList || formList || leadCue) ? `<details class="xcard-block xcard-block--hazard xcard-watch">
+      <summary class="exercise-section-label xcard-watch-summary">Watch out</summary>
+      ${leadCue ? `<p class="exercise-cue">${esc(leadCue)}</p>` : ""}${watchList}${formList}
+    </details>` : ""}
+    ${adaptBlock}
+    ${opts.doSlot || ""}
+  </div>`;
+  }
+
   if (opts.layout === "steps") {
     const step = ["why", "watch", "how"].includes(opts.step) ? opts.step : "why";
     const title = STEPS.find(s => s.key === step).title;

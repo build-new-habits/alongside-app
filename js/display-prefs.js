@@ -1,5 +1,16 @@
 /**
  * js/display-prefs.js
+ * 16 Nov 2026 v9
+ *
+ * v9 - P-36 MY-LIST-PLAYER (Graeme, 16 Nov: "I also want a noise or
+ *   vibration when the timer finishes"; "The chime. On by default").
+ *   timerSound ("on" default): playTimerChime() plays a soft two-note chime,
+ *   made here with Web Audio (no sound file, nothing fetched), at a gentle
+ *   volume; the phone's own volume and silent switch still decide.
+ *   primeTimerSound() is called from the tap that starts a timer, because a
+ *   phone only lets a page make sound after a tap. Kept by Reset display,
+ *   as Vibration is (it is set beside it, not on the reset's screen).
+ *
  * 17 Oct 2026 v8
  *
  * v8 - W6-9 SMALL-6. canVibrate(): whether this phone lets a web app
@@ -92,6 +103,7 @@ export const DISPLAY_KEYS = {
   fullInstructions: "alongside-full-instructions",
   reduceMotion:  "alongside-reduce-motion",
   vibration:     "alongside-vibration",
+  timerSound:    "alongside-timer-sound",
 };
 
 export const DISPLAY_DEFAULTS = {
@@ -115,6 +127,8 @@ export const DISPLAY_DEFAULTS = {
   // W4-22. "on" vibrates as sessions always have; "off" stops every
   // vibration in the app (navigator.vibrate is wrapped, so every caller).
   vibration:     "on",
+  // P-36. A soft chime when a timer ends (My exercises). On unless turned off.
+  timerSound:    "on",
 };
 
 // Ranges are deliberately conservative at the bottom end: nothing here
@@ -180,7 +194,7 @@ export function resetDisplayPrefs() {
   // W5-21. Vibration is kept: it is set in Settings › Display beside the
   // others, not on the screen with this reset, and turning buzzing back on
   // unasked is the one change here that can be felt.
-  Object.entries(DISPLAY_KEYS).forEach(([name, key]) => { if (name !== "vibration") _remove(key); });
+  Object.entries(DISPLAY_KEYS).forEach(([name, key]) => { if (name !== "vibration" && name !== "timerSound") _remove(key); });
   applyDisplayPrefs();
 }
 
@@ -224,6 +238,38 @@ function _applyVibration(on) {
     catch { /* the browser will not let it be wrapped: vibration stays as the device has it */ }
   }
   void on;
+}
+
+// P-36. The timer's chime. One AudioContext, made on the tap that starts a
+// timer (a phone allows sound only after a tap), reused after.
+let _audio = null;
+export function primeTimerSound() {
+  if (getDisplayPref("timerSound") === "off") return;
+  try {
+    const AC = globalThis.AudioContext || globalThis.webkitAudioContext;
+    if (!AC) return;
+    if (!_audio) _audio = new AC();
+    if (_audio.state === "suspended") _audio.resume();
+  } catch { /* no sound here: the buzz and the words still say it */ }
+}
+/** Two soft notes, rising, about a second in all. Never loud. */
+export function playTimerChime() {
+  if (getDisplayPref("timerSound") === "off") return false;
+  try {
+    if (!_audio) primeTimerSound();
+    if (!_audio) return false;
+    const t0 = _audio.currentTime + 0.02;
+    [[659.25, 0], [880, 0.28]].forEach(([hz, at]) => {
+      const o = _audio.createOscillator(), g = _audio.createGain();
+      o.type = "sine"; o.frequency.value = hz;
+      g.gain.setValueAtTime(0.0001, t0 + at);
+      g.gain.exponentialRampToValueAtTime(0.18, t0 + at + 0.03);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0 + at + 0.7);
+      o.connect(g).connect(_audio.destination);
+      o.start(t0 + at); o.stop(t0 + at + 0.75);
+    });
+    return true;
+  } catch { return false; }
 }
 
 /**
