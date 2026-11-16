@@ -1,5 +1,12 @@
 /**
  * tools/verify-card4.mjs
+ * 16 Nov 2026 v5
+ *
+ * v5 - P-36 MY-LIST-PLAYER. REVERSAL (Graeme, mock-up approved 16 Nov):
+ *   prescribed-session.js is one screen an exercise (layout "compact"), so
+ *   7.2 and test 8 assert the page model on gym-programme and core-session
+ *   only, and 8.10 asserts My exercises keeps no card-page state.
+ *
  * 04 Oct 2026 v4
  *
  * v4 - D-1 EXERCISE-FOUR. REVERSAL (Option B, approved in the mock-up):
@@ -326,7 +333,7 @@ console.log("\nTEST 7 — the per-set control stays on DO (TIMER-2)");
   })());
 
   ok("7.2 the set-done control appears in no WATCH branch (paged views)",
-     Object.entries(src).filter(([k]) => k !== "workout.js").every(([, s]) => {
+     Object.entries(src).filter(([k]) => k !== "workout.js" && k !== "prescribed-session.js").every(([, s]) => {
        const a = s.indexOf('currentCardPage === "watch"');
        if (a < 0) return false;
        const b = s.indexOf('currentCardPage === "do"', a);
@@ -353,7 +360,9 @@ console.log("\nTEST 8 — moving forward passes the warnings; Back goes one page
      /data-xcard-back="do"/.test(H.note));
 
   // SMOOTH-P2c. workout.js is one screen now; see 8.9.
-  const VIEWS = ["gym-programme", "core-session", "prescribed-session"];
+  // P-36. prescribed-session is one screen now; see 8.10.
+  const VIEWS = ["gym-programme", "core-session"];
+  const ps = strip(fs.readFileSync("js/views/prescribed-session.js", "utf8"));
   const src = Object.fromEntries(
     VIEWS.map(v => [v, strip(fs.readFileSync(`js/views/${v}.js`, "utf8"))]));
   const wo = strip(fs.readFileSync("js/views/workout.js", "utf8"));
@@ -363,7 +372,10 @@ console.log("\nTEST 8 — moving forward passes the warnings; Back goes one page
   ok("8.9 workout.js uses the four-step layout and keeps no card-page state",
      /layout:\s*"steps"/.test(wo) && !/layout:\s*"flow"/.test(wo) && !/currentCardPage/.test(wo));
 
-  ok("8.5 CONTROL: three paged view sources read and each holds page state",
+  ok("8.10 prescribed-session.js uses the compact layout and keeps no card-page state",
+     /layout:\s*"compact"/.test(ps) && !/currentCardPage/.test(ps));
+
+  ok("8.5 CONTROL: two paged view sources read and each holds page state",
      VIEWS.every(v => src[v].length > 2000 && /currentCardPage/.test(src[v])));
 
   ok("8.6 no view sends DECIDE straight to DO", (() => {

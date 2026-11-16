@@ -1,5 +1,11 @@
 /**
  * tools/verify-my-exercises-play.mjs
+ * 16 Nov 2026 v2
+ *
+ * v2 - P-36 MY-LIST-PLAYER. The player opens on the list (Start) and ends
+ *   on the notes (Finish); the walk taps those too. 1pc reads the exercise's
+ *   own heading, not the list's. No assertion changed.
+ *
  * 29 Sep 2026 v1
  *
  * P5, PRESCRIBED-CRASH (persona finding W2-5). A person's own list of
@@ -64,9 +70,9 @@ paint();
 console.log("\nTEST 1 - all eight, in order, to the end");
 const seen = [];
 for (let i = 0; i < 200 && !navs.includes("reflect") && !crash; i++) {
-  const name = main.querySelector(".exercise-name, h1, h2")?.textContent?.trim();
+  const name = main.querySelector(".exercise-name")?.textContent?.trim();
   if (name && OWN.some(e => e.name === name) && seen.at(-1) !== name) seen.push(name);
-  if (!tap("ps-complete-btn") && !tap("ps-done-btn") && !tap("ps-watch-btn") && !tap("ps-begin-btn")) break;
+  if (!tap("ps-start-btn") && !tap("ps-complete-btn") && !tap("ps-finish-btn") && !tap("ps-done-btn") && !tap("ps-watch-btn") && !tap("ps-begin-btn")) break;
 }
 ok("1pc. the player opened on the first exercise", seen[0] === OWN[0].name, JSON.stringify(seen));
 ok("1a. no crash", !crash, crash);

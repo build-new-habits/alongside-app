@@ -1,5 +1,12 @@
 /**
  * tools/verify-device-662.mjs
+ * 16 Nov 2026 v5
+ *
+ * v5 - P-36 MY-LIST-PLAYER. The player opens on its list; 10 taps Start to
+ *   reach the first move. One set is no longer spelt out (the list and the
+ *   screen say "8"; three sets say "8 · 3 sets"), so 10c asserts what it
+ *   guarded: never "1 sets", and more than one counted right.
+ *
  * 31 Oct 2026 v4
  *
  * v4 - P-13 re-point (Graeme, 31 Oct: Mobility & Conditioning "Split into
@@ -220,10 +227,17 @@ const listText = txt(main);
 ok("10pc. My exercises is showing its list", /Cat-Cow Flow/.test(listText));
 ok("10a. My exercises: no \"Up to +…\" and no star", !/Up to \+\d/.test(listText) && !/\u2B50/.test(main.innerHTML) && !main.querySelector(".prescribed-credits-badge"));
 main.innerHTML = ""; try { main.innerHTML = player.render(); player.onMount(); } catch {}
+const plListText = txt(main);
+// The app's router is a global; here it only redraws the player.
+const _hadRouter = globalThis.router;
+globalThis.router = { navigate: () => { main.innerHTML = player.render(); player.onMount(); }, back() {}, history: [] };
+document.getElementById("ps-start-btn")?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }));
+await new Promise(r => setTimeout(r, 120));
 const playText = txt(main);
-ok("10pc2. the player is showing the first move", /Cat-Cow Flow/.test(playText), playText.slice(0, 160));
+globalThis.router = _hadRouter;
+ok("10pc2. the player is showing the first move", (main.querySelector("h1")?.textContent || "").trim() === "Cat-Cow Flow", playText.slice(0, 160));
 ok("10b. the player: no \"+35 ⭐\"", !/\+\d+\s*\u2B50/.test(playText) && !/\u2B50/.test(main.innerHTML));
-ok("10c. the player says 1 set", /\b1 set\b/.test(playText) && !/\b1 sets\b/.test(playText), playText.slice(0, 200));
+ok("10c. never \"1 sets\"; three sets counted right", !/\b1 sets\b/.test(playText + plListText) && /Dead Bug\W*8 · 3 sets/.test(plListText), plListText.slice(0, 200));
 
 console.log(`\nVERIFY-DEVICE-662: ${passes} passed, ${fails} failed`);
 process.exit(fails ? 1 : 0);

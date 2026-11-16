@@ -352,7 +352,7 @@ function renderList(whole, active) {
       <p class="ps-sub">${left.length} exercise${left.length === 1 ? "" : "s"}${done ? ` left, ${done} done today` : ""} \u00b7 about ${_aboutMins(left)} minute${_aboutMins(left) === 1 ? "" : "s"}</p>
       ${_rows(whole, null)}
       <p class="ps-note">Your own exercises, as you wrote them.</p>
-      <div class="workout-actions ps-actions">
+      <div class="workout-actions">
         <button class="btn btn-primary btn-large btn-full" id="ps-start-btn" data-guide-target="list-start">${done ? "Carry on" : "Start"}</button>
       </div>
     </div>`;
@@ -363,7 +363,7 @@ function _rows(whole, current, jump = false) {
   return `<ul class="ps-rows look-card">${whole.map(ex => {
     const isNow = current && ex.id === current.id;
     const tick = `<span class="ps-tick${ex.completedToday ? " ps-tick--on" : ""}" aria-hidden="true">${ex.completedToday ? "\u2713" : ""}</span>`;
-    const text = `<span class="ps-row__t"><span class="ps-row__name">${_esc(ex.name)}</span><span class="ps-row__amt">${_esc(_amount(ex))}${ex.completedToday ? " \u00b7 done" : isNow ? " \u00b7 now" : ""}</span></span>`;
+    const text = `<span class="ps-row__t"><span class="ps-row__name">${_esc(ex.name)}</span><span class="sr-only">, </span><span class="ps-row__amt">${_esc(_amount(ex))}${ex.completedToday ? " \u00b7 done" : isNow ? " \u00b7 now" : ""}</span></span>`;
     const inner = `${tick}${_thumb(ex)}${text}`;
     return jump && !ex.completedToday
       ? `<li><button type="button" class="ps-row${isNow ? " ps-row--now" : ""}" data-ps-jump="${_esc(ex.id)}"${isNow ? ' aria-current="step"' : ""}>${inner}</button></li>`
@@ -447,7 +447,7 @@ function renderExercise(whole, active) {
 
       <p class="ps-hurt" role="note">${HURT_LINE}</p>
 
-      <div class="workout-actions ps-actions ps-actions--two">
+      <div class="workout-actions ps-actions--two">
         <button class="btn btn-secondary btn-large" id="ps-skip-btn">Skip</button>
         <button class="btn btn-primary btn-large" id="ps-complete-btn">${nextLabel}</button>
       </div>
@@ -478,11 +478,11 @@ function renderEnd(whole) {
       ${did.length ? `<p class="ps-sub">Anything to note? Optional.</p>
       <ul class="ps-notes">${did.map((ex, i) => `
         <li><details class="ps-note-item">
-          <summary><span class="ps-row__name">${_esc(ex.name)}</span><span class="ps-row__amt">Add a note</span></summary>
-          ${renderLogBlock(ex, `ps-log-end-${i}`)}
+          <summary><span class="ps-row__name">${_esc(ex.name)}</span><span class="sr-only">, </span><span class="ps-row__amt">Add a note</span></summary>
+          ${renderLogBlock(ex, `ps-log-${ex.id}`)}
           ${_fullOf(ex) ? renderFeedbackControl(_fullOf(ex)) : ""}
         </details></li>`).join("")}</ul>` : `<p class="ps-sub">That\u2019s fine. Your list is here when you want it.</p>`}
-      <div class="workout-actions ps-actions">
+      <div class="workout-actions">
         <button class="btn btn-primary btn-large btn-full" id="ps-finish-btn">Finish</button>
       </div>
     </div>`;
@@ -554,7 +554,7 @@ export function onMount() {
   }
   if (phase === "end") {
     const did = (store.get("prescribedSessionProgress") || []).map(p => whole.find(e => e.id === p.exerciseId)).filter(Boolean);
-    did.forEach((ex, i) => { attachLogEvents(ex, `ps-log-end-${i}`); attachFeedbackEvents(ex); });
+    did.forEach((ex, i) => { attachLogEvents(ex, `ps-log-${ex.id}`); attachFeedbackEvents(ex); });
     document.getElementById("ps-finish-btn")?.addEventListener("click", () => completeSession());
     return;
   }

@@ -1,5 +1,10 @@
 /**
  * tools/verify-cont3.mjs
+ * 16 Nov 2026 v3
+ * P-36. My exercises' notes are written at the end, one per exercise done,
+ * so its ids are made from the exercise's own id (ps-log-${ex.id}): still
+ * per-exercise, which is what this asks. The other two views unchanged.
+ *
  * 21 Aug 2026 v2
  * GATE-PATH. Path resolution only -- no assertion changed.
  *
@@ -86,7 +91,7 @@ check("yoga alone uses gentle mode", () => {
 });
 check("id prefixes are per-exercise everywhere", () => {
   for (const [v, p] of [["core-session","cs-log-"],["prescribed-session","ps-log-"],["yoga-session","ys-log-"]])
-    ok(new RegExp(`${p}\\$\\{current`).test(read(v)),
+    ok(new RegExp(`${p}\\$\\{${v === "prescribed-session" ? "ex\\.id" : "current"}`).test(read(v)),
        `${v}: a fixed id lets one exercise's numbers be written onto another`);
 });
 
