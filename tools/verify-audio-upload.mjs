@@ -1,6 +1,10 @@
 /**
  * tools/verify-audio-upload.mjs
- * 06 Nov 2026 v1
+ * 18 Nov 2026 v2
+ *
+ * v2 - 3d, 3e: a file saved as guide-ride-00.mp3.mp3 (the ending twice,
+ *   which is what Graeme's uploads have) counts as guide-ride-00, and
+ *   capitals in a name are ignored.
  *
  * The coach's recordings, from upload to the app (Graeme, 06 Nov: "set up
  * the folder I'm uploading into so that once it is in the right place it
@@ -62,6 +66,12 @@ ok("3b. no two clips share a name, and every name is a file name", new Set(ids).
 const { GUIDE_SESSIONS } = await import(new URL("../js/data/guide-me.js", import.meta.url).href);
 const tracks = Object.values(GUIDE_SESSIONS).map(s => s.track);
 ok("3c. no guided track shares a name with a clip", tracks.every(t => !ids.includes(t)), tracks.join(","));
+
+console.log("\nTEST 3b - a name saved with its ending twice");
+const BA = await import(new URL("./build-audio.mjs", import.meta.url).href);
+ok("3d. guide-ride-00.mp3.mp3 is read as guide-ride-00 (Graeme's computer adds .mp3 to a name that has it)",
+  typeof BA.clipName === "function" && BA.clipName("guide-ride-00.mp3.mp3") === "guide-ride-00" && BA.clipName("hold-plank.wav") === "hold-plank" && BA.clipName("Guide-Ride-02.MP3") === "guide-ride-02");
+ok("3e. anything else is still not a clip name", typeof BA.clipName === "function" && BA.clipName("notes.txt") === null && BA.clipName("guide-ride-00 (1).mp3") === "guide-ride-00 (1)");
 
 console.log("\nTEST 4 - the list");
 const M = read("audio/manifest.json");

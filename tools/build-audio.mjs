@@ -1,6 +1,10 @@
 /**
  * tools/build-audio.mjs
- * 06 Nov 2026 v2
+ * 18 Nov 2026 v3
+ *
+ * v3 - A recording saved with its ending twice (guide-ride-00.mp3.mp3, as
+ *   Graeme's computer saves a name typed with .mp3) is used, as is one with
+ *   capitals; before, both were listed as not a clip and left out.
  *
  * v2 - THE UPLOAD FOLDER. Graeme uploads his ElevenLabs recordings into
  *   this repository's audio/raw/ (GitHub › audio › raw › Add file › Upload
@@ -50,6 +54,11 @@ export function clipIds(repo = REPO) {
   for (const f of files) for (const m of readFileSync(path.join(repo, f), "utf8").matchAll(/audio:\s*"([a-z0-9-]+)"/g)) ids.add(m[1]);
   return [...ids];
 }
+/** A file's clip name: its ending taken off, once or more (guide-ride-00.mp3.mp3), lower case. Not audio: null. */
+export function clipName(file) {
+  if (!/\.(mp3|wav|m4a|ogg)$/i.test(file)) return null;
+  return file.replace(/(\.(mp3|wav|m4a|ogg))+$/i, "").toLowerCase();
+}
 export const fingerprint = file => createHash("sha256").update(readFileSync(file)).digest("hex").slice(0, 16);
 
 if (import.meta.url !== `file://${process.argv[1]}`) { /* imported by a check: nothing to run */ }
@@ -59,7 +68,7 @@ else {
   const TRACKS = Object.values(GUIDE_SESSIONS).map(s => s.track);
 
   const rawFiles = existsSync(RAW) ? readdirSync(RAW).filter(f => /\.(mp3|wav|m4a|ogg)$/i.test(f)) : [];
-  const stem = f => f.replace(/\.(mp3|wav|m4a|ogg)$/i, "");
+  const stem = clipName;
   const rawOf = id => { const hit = rawFiles.find(f => stem(f) === id); return hit ? path.join(RAW, hit) : null; };
   const missing = CLIPS.filter(id => !rawOf(id));
   const stray = rawFiles.filter(f => !CLIPS.includes(stem(f)));
