@@ -1,6 +1,11 @@
 /**
  * tools/verify-session-control.mjs
- * 02 Nov 2026 v1
+ * 19 Nov 2026 v2
+ *
+ * v2 - P-9d (c) READY-MADE SESSIONS (19 Nov). How would you like it? has
+ *   Ready-made sessions second; 7a reads the same four rows in the same
+ *   order with it named between Build it for me and Build my own. Nothing
+ *   loosened; verify-ready-sessions checks the new row.
  *
  * P-22 SESSION-ORDER, P-23 SWAP-SEARCH, P-24 AS-YOU-GO. Graeme, 02 Nov:
  * "When I'm mid session and I can't get to an exercise I can't change the
@@ -267,7 +272,7 @@ console.log("\nTEST 7 - Make it up as I go behind a door; a proposal's Swap sear
   const v = PathView(fakeRouter); v.mount(main);
   click(main.querySelector('.path-row[data-v="gym"]')); click(main.querySelector('.path-row[data-v="whole"]'));
   const rows = [...main.querySelectorAll(".path-row[data-v]")].map(r => txt(r.querySelector(".path-door__t")));
-  ok("7a. How would you like it? Build it for me, Build my own, Make it up as I go, Follow a fitness trend", J(rows.slice(0, 4)) === J(["Build it for me", "Build my own", "Make it up as I go", "Follow a fitness trend"]), J(rows));
+  ok("7a. How would you like it? Build it for me, Ready-made sessions, Build my own, Make it up as I go, Follow a fitness trend", J(rows.slice(0, 5)) === J(["Build it for me", "Ready-made sessions", "Build my own", "Make it up as I go", "Follow a fitness trend"]), J(rows));
   ok("7b. its line says what it does", txt(main.querySelector('.path-row[data-v="asgo"] .path-door__d')) === "Go to an exercise, log your sets, then choose the next");
   store.set("sessionLocation", "home");
   navs = []; click(main.querySelector('.path-row[data-v="asgo"]'));

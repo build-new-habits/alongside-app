@@ -1,6 +1,18 @@
 /**
  * views/path.js
- * 15 Nov 2026 v16
+ * 19 Nov 2026 v17
+ *
+ * v17 - P-9d (c) READY-MADE SESSIONS (Graeme, 19 Nov: "publish and push
+ *   those exercise programs to the app"). Get stronger and Keep moving, at
+ *   Home or the Gym, How would you like it? gains Ready-made sessions: six a
+ *   door a place (data/ready-sessions.js), the part chosen first, each with
+ *   its line and its minutes. Then How long have you got? (Shorter, As
+ *   written, Longer, each with its minutes worked out), then the plan screen
+ *   as any programme (figures, Swap, the sore check, Make it mine), and the
+ *   one player. A strength move keeps its sets, reps or seconds and its rest
+ *   (it played as a single timed go before, which suited stretch routines
+ *   only); Make it mine keeps them too. Free unchanged (the doors are the
+ *   Plan's).
  *
  * v16 - P-25. Guide marker only: a programme's Start (path-start), where the
  *   coach's choice can open. Nothing else changes.
@@ -173,6 +185,7 @@ import { lineIcon } from "../data/line-icons.js";
 import { renderFigure } from "../figures.js";
 import { FEELINGS, PROGRAMMES, SLOW_LINE } from "../data/feel-programmes.js";
 import { AREAS, ROUTINES } from "../data/stretch-routines.js";
+import { readyFor, readySession, readyById, SIZES as READY_SIZES } from "../data/ready-sessions.js";
 import { EXERCISES } from "../data/exercises/index.js";
 import { PATH_MOVEMENTS } from "../data/exercises/path_movements.js";
 import { suggestFeeling, pickProgramme, pickSurprise, routinesFor, STRETCH_AREA_ZONES } from "../data/path-engine.js";
@@ -263,7 +276,11 @@ export function startPractice(router, practice, { door, feeling = null } = {}) {
     ? practice.steps.filter(s => !(s.out || []).length).map(s => s.entry).filter(Boolean)
     : practice.steps.filter(s => !(s.out || []).length).map(s => {
       const e = BY_ID.get(s.id);
-      return e ? { ...e, ...(s.label ? { name: s.label } : {}), reps: null, sets: 1, duration: Math.round(s.mins * 60), pathNote: s.note || null } : null;
+      if (!e) return null;
+      const named = s.label ? { name: s.label } : {};
+      // P-9d. A ready-made strength move keeps its sets, reps or seconds, and its rest.
+      if (s.sets) return { ...e, ...named, sets: s.sets, reps: s.reps ?? null, duration: s.secs ?? null, ...(s.rest ? { rest: s.rest } : {}), pathNote: s.note || null };
+      return { ...e, ...named, reps: null, sets: 1, duration: Math.round(s.mins * 60), pathNote: s.note || null };
     }).filter(Boolean);
   if (!exercises.length) return;
   const session = { id: practice.id, title: practice.name, duration: practice.minutes ? `${practice.minutes} mins` : null, exercises,
@@ -410,11 +427,33 @@ export function PathView(router) {
       return `${bar(3, 3)}${heading("How would you like it?")}
         <ul class="path-list">
           ${row({ v: "coach", t: "Build it for me", d: "Shaped by today’s check-in and what you’ve told me", icon: "fresh", kind: DOOR[st.door].kind, tint: true })}
+          ${readyFor(st.door, st.place).length ? row({ v: "ready", t: "Ready-made sessions", d: `${readyFor(st.door, st.place).length} to choose from, warm-up and stretch included` }) : ""}
           ${row({ v: "own", t: "Build my own", d: "Choose each move, with help when you want it" })}
           ${row({ v: "asgo", t: "Make it up as I go", d: "Go to an exercise, log your sets, then choose the next" })}
           ${row({ v: "trend", t: "Follow a fitness trend", d: trendsFor(st.door).map(([, x]) => x.short).join(", ") })}
           ${n ? row({ v: "saved", t: "Saved sessions", d: `${n} kept` }) : ""}
         </ul>`;
+    },
+    // P-9d. Ready-made sessions: the list, the part chosen first.
+    ready() {
+      const kind = DOOR[st.door].kind;
+      const part = PARTS.find(p => p.id === st.part);
+      return `${heading("Ready-made sessions", DOOR[st.door].icon, kind)}
+        <p class="path-small">Each one starts by warming you up and ends with a stretch.</p>
+        <ul class="path-list">${readyFor(st.door, st.place, st.part).map(s => {
+          const at = readySession(s, "usual");
+          const fits = part && s.part === st.part && st.part !== "whole" ? ` \u00b7 For your ${part.label.toLowerCase()}` : "";
+          return row({ v: s.id, t: s.name, d: `${esc(s.line)} About ${at.minutes} min${s.effort ? ` \u00b7 ${s.effort === "hard" ? "Hard" : "Steady"}` : ""}${fits}`, icon: DOOR[st.door].icon, kind });
+        }).join("")}</ul>`;
+    },
+    msize() {
+      const s = readyById(st.rs);
+      const sizes = s.fixed ? [["usual", "As written"]] : READY_SIZES;
+      const cur = st.msz || "usual";
+      return `${heading("How long have you got?")}
+        <p class="path-small">${esc(s.name)}</p>
+        ${radios("msz", "Length", sizes.map(([id, w]) => [id, `${w}, about ${readySession(s, id).minutes} min`]), cur)}
+        <button type="button" class="btn btn-primary btn-full" id="path-ready-go">Show me the session</button>`;
     },
     buildlen() {
       const cat = lengthCatForToday();
@@ -785,10 +824,12 @@ export function PathView(router) {
   /** Make it mine: this version, swaps and all, kept in Saved sessions for this door. */
   function keepMine() {
     const p = st.practice;
-    const exercises = p.steps.map(s => BY_ID.get(s.id)).filter(Boolean)
-      .map((e, j) => ({ ...e, sets: 1, reps: null, duration: Math.round((p.steps[j].mins || 1) * 60) }));
+    const exercises = p.steps.map(s => [s, BY_ID.get(s.id)]).filter(([, e]) => e)
+      .map(([s, e]) => s.sets
+        ? { ...e, sets: s.sets, reps: s.reps ?? null, duration: s.secs ?? null, ...(s.rest ? { rest: s.rest } : {}) }
+        : { ...e, sets: 1, reps: null, duration: Math.round((s.mins || 1) * 60) });
     const res = keepVersion(`${p.name}, my version`, { title: p.name, exercises, door: st.door, durationMins: p.minutes,
-      sessionType: st.door === "stretch" ? "stretch" : null });
+      sessionType: st.door === "stretch" ? "stretch" : (p.sessionType || null) });
     if (res?.ok) { st = { ...st, kept: true }; paint(false); root.querySelector("#path-mine")?.focus(); say(`Kept in Saved sessions as ${p.name}, my version.`); }
     else say(res?.reason === "dupe" ? "You already have one kept under that name." : "That could not be kept.");
   }
@@ -816,7 +857,9 @@ export function PathView(router) {
         if (v === "asgo") { if (st.place) store.set("sessionLocation", st.place); router.navigate("capture"); return; }
         if (v === "saved") { router.savedStart = { purpose: st.door, place: st.place }; router.navigate("saved-sessions"); return; }
         if (v === "trend") return go("trends", {});
+        if (v === "ready") return go("ready", {});
         return;
+      case "ready": return readyById(v) ? go("msize", { rs: v, msz: "usual" }) : undefined;
       case "trends":
         if (v === "zone2") return go(followed("zone2")?.activity ? "z2day" : "z2act", {});
         if (v === "cross") {
@@ -998,6 +1041,11 @@ export function PathView(router) {
     root.querySelectorAll('input[name="ylen"]').forEach(r => r.addEventListener("change", () => { st.ylen = r.value; }));
     root.querySelectorAll('input[name="ybetween"]').forEach(r => r.addEventListener("change", () => { st.ybetween = r.value; }));
     root.querySelectorAll('input[name="rlen"]').forEach(r => r.addEventListener("change", () => { st.rlen = r.value; }));
+    root.querySelectorAll('input[name="msz"]').forEach(r => r.addEventListener("change", () => { st.msz = r.value; }));
+    root.querySelector("#path-ready-go")?.addEventListener("click", () => {
+      const practice = readySession(readyById(st.rs), st.msz || "usual");
+      if (practice) go("prog", { practice, fresh: false, reason: practice.line, note: null, surprise: false, fromCoach: false, kept: false });
+    });
     root.querySelectorAll('input[name="rfloor"]').forEach(r => r.addEventListener("change", () => {
       st.rfloor = r.value; paint(false); root.querySelector(`input[name="rfloor"][value="${r.value}"]`)?.focus();
       say(r.value === "no" ? "Showing the session without the floor." : "Showing all of them.");
