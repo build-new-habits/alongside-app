@@ -1,7 +1,13 @@
 import { createRequire as __cr } from "node:module";
 /**
  * tools/verify-path-routes.mjs
- * 15 Nov 2026 v10
+ * 19 Nov 2026 v11
+ *
+ * v11 - P-9d (c) READY-MADE SESSIONS. 1d said "no ready-made routine yet
+ *   (no content)", which was true until the content came (19 Nov). It now
+ *   expects Ready-made sessions second, straight after Build it for me,
+ *   everything else as before in the same order; nothing loosened.
+ *   verify-ready-sessions checks the new step and the sessions.
  *
  * v10 - P-32 STRETCH-FOR-STIFFNESS. Stretch's routines step now asks How
  *   does it feel today? (and Anywhere in particular?) before the floor
@@ -183,8 +189,8 @@ ok("1b. Home, Gym, Outside, each with what it means", rowText().join("|") === "H
 tapRow("home");
 ok("1c. Which part of you? Whole body, Upper, Lower, Core", step() === "area" && h1() === "Which part of you?" && rowText().join("|") === "Whole body|Upper body|Lower body|Core");
 tapRow("upper");
-ok("1d. How would you like it? Build it for me (set apart) and Build my own; no Saved sessions with none kept; no ready-made routine yet (no content)",
-   step() === "how" && rowText().join("|") === "Build it for me|Build my own|Make it up as I go|Follow a fitness trend" && main.querySelector('.path-row[data-v="coach"]').classList.contains("is-tint"), rowText().join("|"));
+ok("1d. How would you like it? Build it for me (set apart), Ready-made sessions, and Build my own; no Saved sessions with none kept",
+   step() === "how" && rowText().join("|") === "Build it for me|Ready-made sessions|Build my own|Make it up as I go|Follow a fitness trend" && main.querySelector('.path-row[data-v="coach"]').classList.contains("is-tint"), rowText().join("|"));
 const upperBtn = () => main.querySelector('.path-row[data-v="upper"]');
 click(main.querySelector("#path-back"));
 ok("1e. Back: one step, and focus on what opened it", step() === "area" && document.activeElement === upperBtn(), document.activeElement?.outerHTML?.slice(0, 80));
