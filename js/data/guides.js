@@ -1,6 +1,6 @@
 /**
  * js/data/guides.js
- * 15 Nov 2026 v2
+ * 16 Nov 2026 v3
  *
  * v1 - P-25 HOW-TO GUIDES (spec BNH-Files Product/alongside_howto_guides_
  *   12nov2026_v3.md; the seven P1 guides' words approved by Graeme 12 Nov,
@@ -34,6 +34,10 @@
  *   plan's or the safety note's, whichever opens. A1 is offered only when Home
  *   leads with one of those (WHEN.homeStarts); otherwise its overview says
  *   what to do instead.
+ *
+ * v3 (16 Nov, P-36): My exercises opens on its list, with Start, before the
+ *   safety note: A1, A2 and C2 say "This is your list. Tap Start." (asked
+ *   only if the list is there).
  *
  * Nothing here is health advice: the guides say how to use the app.
  * Rule-based; no AI. Nothing about using a guide is stored or sent.
@@ -93,6 +97,7 @@ export const GUIDES = Object.freeze([
           { target: "week-row", label: "Today, from your week", say: "Today is set in your week. Tap **Today, from your week**." },
         ] },
         ...A1_CHECKIN,
+        { screen: "prescribed-session", target: "list-start", label: ["Start", "Carry on"], optional: true, say: "This is your list. Tap **Start**." },
         { screen: ["coach-proposal", "prescribed-session"], optional: true, alts: [
           { target: "ack", label: "I have read this.", say: "This is today’s plan. The first time, tick **I have read this.**" },
           { target: "gate-ack", label: "I have read this.", say: "The first time, read **Before you start**, then tick **I have read this.**" },
@@ -131,6 +136,7 @@ export const GUIDES = Object.freeze([
         { target: "start-list", label: "Start your list", say: "It’s your own exercises: tap **Start your list**." },
         { target: "week-row", label: "Today, from your week", say: "It’s a session: tap its row." },
       ] },
+      { screen: "prescribed-session", target: "list-start", label: ["Start", "Carry on"], optional: true, say: "This is your list. Tap **Start**." },
       { screen: ["prescribed-session", "coach-proposal"], target: ["gate-ack", "ack"], label: "I have read this.", optional: true, say: "The first time, read **Before you start**, then tick **I have read this.**" },
       { screen: ["prescribed-session", "coach-proposal"], target: ["gate-start", "start"], label: ["Start the session", "Start"], say: "Tap **Start the session**, or **Start**." },
     ] }] }],
@@ -210,6 +216,7 @@ export const GUIDES = Object.freeze([
       { screen: "today", target: "library", label: "Library", say: "Tap **Library**." },
       { screen: "library", target: "my-exercises", label: "My exercises", say: "Tap **My exercises**." },
       { screen: "prescribed", target: "start-group", label: "Start {list}", say: "Each part of your plan has its own button. Tap **Start {its name}**, for example **Start Morning routine**." },
+      { screen: "prescribed-session", target: "list-start", label: ["Start", "Carry on"], say: "This is your list. Tap **Start**." },
     ] }] }],
     end: "Your routine has started.",
     notQuite: [

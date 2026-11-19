@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 15 Nov 2026 v720
+ * 16 Nov 2026 v721
  *
+ * v721 - P-36 (both tiers). My exercises, rebuilt: each list opens on the list itself, every exercise with its picture and how much, about how long, and Start (Carry on if you have begun). Then one screen an exercise: the timer or the count at the top, Start the timer under it, then the picture, How, and Watch out folded beneath. When a timer ends: a soft chime, a longer buzz, a tick and "Time's up."; it never moves on by itself, and the button names what's next. "n of N · The list" shows what's done and what's left, and any one can be done next. Notes come at the end, then Finish. Settings › Display › Sound › Timer sound (on unless you turn it off; your phone's volume and silent switch still apply). NEW FILES: none.
  * v720 - P-25 fix (both tiers). "I've just opened the app" now starts from whatever Home leads with today: Let me choose for you, Today, from your week, or Start your list (on a day set in your week there was nothing to ring). The check-in on the way says "Answer the questions. The guide picks up after." and never counts as leaving the guide; already checked in, the guide carries on from the next screen. Make this smaller keeps its words at ordinary text sizes. NEW FILES: none.
  * v719 - P-25 (both tiers). Help: one button, top right, on every screen but a running session. It opens How do I…?: the guides for the screen you were on, search, the guides by what you want to do, and Still stuck? (an email address to copy and the support lines). Each guide says what you'll end up with and its steps, then Guide me through it: a ring on the real button and a box with the step, moving on as you tap; Back a step, Stop the guide, Make this smaller; tap something else and it says you've left the guide, with Carry on from here. It ends with Did that work?. Seven guides: starting, today's session, adding a plan from a physio or a sheet, setting days, a daily routine, missed days, and your arc. Nothing about using them is stored or sent. NEW FILES precached: js/guide.js, js/data/guides.js, js/views/help.js, css/components/help.css.
  * v718 - P-34 (the Plan; Free unchanged). Home is for what to do: Lately (how you felt before and after your sessions, and what seems to help) has moved off Home. The same reading is Before and after, now near the top of Progress, straight after the numbers for the days you are looking at. NEW FILES: none.
@@ -4267,7 +4268,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v720";
+const CACHE_NAME = "alongside-v721";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4275,8 +4276,8 @@ const CACHE_NAME = "alongside-v720";
 // downloads only the rest: it fetched all of them (about 6 MB) every time.
 // SHELL_HASHES:BEGIN
 const SHELL_HASHES = {
-  "./": "9e667c02edab5b4d",
-  "./index.html": "9e667c02edab5b4d",
+  "./": "950e243d77032111",
+  "./index.html": "950e243d77032111",
   "./css/main.css": "736c69954dcc167f",
   "./css/base/fonts.css": "04893bbdfa4cf013",
   "./css/layouts/onboarding-additions.css": "43a85bf31e18712f",
@@ -4323,7 +4324,7 @@ const SHELL_HASHES = {
   "./css/components/equipment-modal.css": "923c72d2dadb57c3",
   "./css/components/morning-session.css": "88a53b15036d446d",
   "./css/components/settings-library.css": "6e8065c1fb782ba8",
-  "./css/components/workout.css": "a579c812b38fb65f",
+  "./css/components/workout.css": "7e8e0bcd8b851fca",
   "./css/layouts/app-shell.css": "a7b24b10fea16cc7",
   "./css/layouts/goal-setup.css": "32ded4f3cacc0b13",
   "./css/layouts/onboarding.css": "9dd282cf6249ceae",
@@ -4337,7 +4338,7 @@ const SHELL_HASHES = {
   "./js/store.js": "096e89665e70d949",
   "./js/session-log.js": "6134de4315842e05",
   "./js/exercise-feedback.js": "adba8549f444da2a",
-  "./js/exercise-card.js": "78196b42671c67aa",
+  "./js/exercise-card.js": "4ed40e63efe33a26",
   "./js/safety-gate.js": "1b7e41d99e2cf520",
   "./js/save-block.js": "efe2b2583f4c14f7",
   "./js/stretch-target.js": "e8c305bfb957d655",
@@ -4345,7 +4346,7 @@ const SHELL_HASHES = {
   "./js/data/morning-library-map.js": "d4eb79cc3e5df86d",
   "./js/views/capture.js": "25354da2769f6604",
   "./js/exercise-timing.js": "38608437fd7b08fb",
-  "./js/display-prefs.js": "4fe3fe77bd5f796c",
+  "./js/display-prefs.js": "f5ee472bd9f24106",
   "./js/tts.js": "acb754b56a41d53e",
   "./js/session-guard.js": "00177a846537868c",
   "./js/session-resume.js": "6916b88c0757374f",
@@ -4359,7 +4360,7 @@ const SHELL_HASHES = {
   "./js/views/coach-proposal.js": "816ba25a48fe721e",
   "./js/views/workout.js": "fba068b2e4f6c61f",
   "./js/views/progress.js": "aae7d6a3c1ffaee5",
-  "./js/views/settings.js": "85ce48f8345522b6",
+  "./js/views/settings.js": "56ab1c3c0cc7a8a8",
   "./js/views/restore-flow.js": "dc81c2e455fa472d",
   "./js/views/weekly-plan.js": "dcee06e297b402c0",
   "./js/views/reflect.js": "fa33525e04a2feaa",
@@ -4428,7 +4429,7 @@ const SHELL_HASHES = {
   "./js/data/pdf-lite.js": "b924b197ae7f46fe",
   "./js/views/plan-share.js": "44d68277e1a8d77e",
   "./js/guide.js": "45e26ccb97e3616b",
-  "./js/data/guides.js": "d7d09636263e1e8c",
+  "./js/data/guides.js": "201ff0ce50b33414",
   "./js/views/help.js": "4d4218955ce16e02",
   "./css/components/help.css": "1ea3aee117dc9aee",
   "./css/components/your-week.css": "c95efbc697af8495",
@@ -4494,7 +4495,7 @@ const SHELL_HASHES = {
   "./js/views/journal-entry.js": "dd38e795ee54e7d7",
   "./js/views/gym-programme.js": "98de0c5929699fb1",
   "./js/views/prescribed.js": "f8ee61de31f26330",
-  "./js/views/prescribed-session.js": "109860d8ccecb09a",
+  "./js/views/prescribed-session.js": "7bc3e8f2ffd6b227",
   "./js/views/quiet-session.js": "eb439e800dc71d74",
   "./js/views/breathing-session.js": "3d049d83a8e783b9",
   "./js/views/morning-session.js": "549fd3efaac3eb67",

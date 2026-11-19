@@ -1,6 +1,14 @@
 import { createRequire as __cr } from "node:module";
 /**
  * tools/verify-one-look.mjs
+ * 16 Nov 2026 v13
+ *
+ * v13 - P-36 MY-LIST-PLAYER. My exercises' player is rebuilt on both tiers
+ *   by Graeme's decision (16 Nov, on the mock-up: "Where it applies. Yes"):
+ *   the list first, one screen an exercise with the timer at the top. So
+ *   TEST 4 checks Free's prescribed-session is the new player (the list,
+ *   with Start, and no page model), not v688's; every other room unchanged.
+ *
  * 15 Nov 2026 v12
  *
  * v12 - P-25 HOW-TO GUIDES. How do I…? is new since v688 and on both tiers
@@ -339,6 +347,16 @@ for (const file of touched) {
     main.innerHTML = NOWIS.render(); NOWIS.onMount?.(); await wait(20);
     compared++;
     ok("4. Free in-step: the P-28 programme (both tiers by decision), not v688's room", !!main.querySelector(".instep-next, .instep-ep") && !main.querySelector(".is-movement-card"));
+    continue;
+  }
+  // v13 (P-36, both tiers by decision): Free's My exercises is the new player.
+  if (name === "prescribed-session") {
+    person("free"); main.innerHTML = "";
+    store.set("prescribedExercises", [{ id: "ol-1", exerciseId: "glute-bridge", name: "Glute bridge", sets: 2, reps: "10", completedToday: false }]);
+    const NOWPS = await import(new URL(`../${file}`, import.meta.url).href);
+    main.innerHTML = NOWPS.render(); NOWPS.onMount?.(); await wait(20);
+    compared++;
+    ok("4. Free prescribed-session: the P-36 player (both tiers by decision), the list first, not v688's pages", !!main.querySelector(".ps-rows .ps-row") && !!main.querySelector("#ps-start-btn") && !main.querySelector("[data-xcard-page]"));
     continue;
   }
   // Both drawn from fresh copies, so neither carries a state from TEST 2 or 3.

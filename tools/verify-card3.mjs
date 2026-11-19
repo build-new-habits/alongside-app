@@ -1,5 +1,15 @@
 /**
  * tools/verify-card3.mjs
+ * 16 Nov 2026 v4
+ *
+ * v4 - P-36 MY-LIST-PLAYER. REVERSAL (Graeme, mock-up approved 16 Nov):
+ *   prescribed-session.js left the page model for one screen an exercise
+ *   (exercise-card.js v16 layout "compact": the timer at the top, Watch out
+ *   folded below). Tests 3, 4b and 11 keep asserting the page model on the
+ *   two views still on it; 3p asserts My exercises holds no page state at
+ *   all (a half-migrated view is still the fault to catch). Its ids gain
+ *   ps-exit-btn and ps-list-btn.
+ *
  * 04 Oct 2026 v3
  *
  * v3 - D-1 EXERCISE-FOUR. REVERSAL, Graeme's request on the device test
@@ -71,14 +81,15 @@ const VIEWS = ["js/views/workout.js", "js/views/prescribed-session.js",
 const src = {};
 for (const v of VIEWS) src[v] = strip(fs.readFileSync(_gatePath(v), "utf8"));
 // SMOOTH-P2c. Still on the four-page model.
-const PAGED = VIEWS.filter(v => v !== "js/views/workout.js");
+const PAGED = VIEWS.filter(v => v !== "js/views/workout.js" && v !== "js/views/prescribed-session.js");
+const PS = src["js/views/prescribed-session.js"];
 const WO = src["js/views/workout.js"];
 
 // The action-bar ids each view binds by. Renaming one silently unbinds a
 // control, which is the failure this whole slot design exists to avoid.
 const IDS = {
   "js/views/workout.js":            ["timer-toggle-btn", "complete-exercise-btn", "skip-exercise-btn"],
-  "js/views/prescribed-session.js": ["ps-timer-btn", "ps-complete-btn", "ps-skip-btn", "ps-back-btn"],
+  "js/views/prescribed-session.js": ["ps-timer-btn", "ps-complete-btn", "ps-skip-btn", "ps-back-btn", "ps-exit-btn", "ps-list-btn"],
   "js/views/gym-programme.js":      ["gp-timer-btn", "gp-next-btn", "gp-skip-btn", "gp-swap-btn"],
   "js/views/core-session.js":       ["cs-timer-btn", "cs-next-btn", "cs-skip-btn", "cs-back-btn"],
 };
@@ -363,6 +374,12 @@ console.log("\nTEST 8 - the running flag is gone, not merely unused");
 check("8. the card does not read opts.running", () => {
   ok(!card.includes("opts.running"),
      "the card still reads opts.running; the page is set by the view, so a view cannot be wrong about it");
+});
+
+check("3p. prescribed-session.js is one screen: the compact card, no page state, no page handler", () => {
+  ok(/layout:\s*"compact"/.test(PS), "My exercises does not ask the card for its compact layout");
+  ok(!/currentCardPage/.test(PS), "My exercises still holds card-page state alongside the one screen");
+  ok(!PS.includes('addEventListener("xcard:page"'), "My exercises still listens for xcard:page");
 });
 
 console.log("\nTEST 9 - action-bar ids survive");

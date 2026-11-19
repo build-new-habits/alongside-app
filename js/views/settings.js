@@ -1,5 +1,10 @@
 /**
  * settings.js
+ * 16 Nov 2026 v76
+ *
+ * v76 - P-36 MY-LIST-PLAYER. Display › Sound › Timer sound (on unless
+ *   turned off): a soft chime when a timer ends in My exercises.
+ *
  * 06 Nov 2026 v75
  *
  * v75 - P-28 S4 (both tiers). Display › Sound › Coach's voice: on plays the
@@ -1149,6 +1154,8 @@ export function SettingsView(router) {
         // P-28. The coach's recorded voice. A Guide me walk, run or ride is chosen each time, whatever this says.
         { title: 'Sound', rows: [
           _voiceSwitch(),
+          // P-36. On unless turned off (Graeme, 16 Nov).
+          _rowSwitch({ id: 'disp-timer-sound', label: 'Timer sound', sub: 'A soft chime when a timer ends in My exercises. Your phone\'s volume and silent switch still apply.', disp: 'timerSound' }),
         ] },
       ];
       case 'data': return [

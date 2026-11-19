@@ -1,5 +1,10 @@
 /**
  * tools/verify-class-finish.mjs
+ * 16 Nov 2026 v3
+ *
+ * v3 - P-36 MY-LIST-PLAYER. My exercises opens on its list (Start) and ends
+ *   on its notes (Finish); the walk taps those too. No assertion changed.
+ *
  * 02 Oct 2026 v2
  *
  * v2 - W4-1 GATE-OPEN. The fixture person has agreed (tools/agreed.mjs): the
@@ -111,7 +116,7 @@ store.set("prescribedExercises", [{ id: "own-1", exerciseId: "glute-bridge", nam
 await go("prescribed-session");
 const tapId = id => { const el = document.getElementById(id); if (el) click(el); return !!el; };
 for (let i = 0; i < 60 && router.currentView === "prescribed-session"; i++) {
-  if (!tapId("ps-complete-btn") && !tapId("ps-done-btn") && !tapId("ps-watch-btn") && !tapId("ps-begin-btn")) break;
+  if (!tapId("ps-start-btn") && !tapId("ps-complete-btn") && !tapId("ps-finish-btn") && !tapId("ps-done-btn") && !tapId("ps-watch-btn") && !tapId("ps-begin-btn")) break;
   await wait(40);
 }
 ok("2pc. My exercises reached the finish screen", router.currentView === "reflect", router.currentView);

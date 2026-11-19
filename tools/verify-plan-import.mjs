@@ -1,5 +1,11 @@
 /**
  * tools/verify-plan-import.mjs
+ * 16 Nov 2026 v3
+ *
+ * v3 - P-36 MY-LIST-PLAYER (none loosened). The player opens on the list:
+ *   5d and 6h read its heading (the plan day) and every row being that
+ *   day's, then Start shows "1 of N"; the walk taps Finish at the end.
+ *
  * 28 Oct 2026 v2
  *
  * v2 - STAGE PATH P-4 re-point (none loosened). 6f reads the Plan's Today card (plan-home.js, mock-up v9): today from your week, Session A, how many, Start your list; same words, same button.
@@ -274,10 +280,12 @@ ok("5b. each with its own Start, and Start all of them", $$("[data-px-group]").m
 ok("5c. and the way to add another plan", !!$("#px-import-btn"));
 const nB = store.get("prescribedExercises").filter(e => e.group === "Session B").length;
 await click($('[data-px-group="Session B"]'), 200);
-ok("5d. Start Session B plays Session B only", view() === "prescribed-session" && store.get("myExercisesGroup") === "Session B" && new RegExp(`1 of ${nB}\\b`).test(txt(main)), `${view()} ${txt(main).slice(0, 120)}`);
+const listB = view() === "prescribed-session" && txt($("h1")) === "Session B" && $$(".ps-rows .ps-row").length === nB;
+await click($("#ps-start-btn"), 200);
+ok("5d. Start Session B plays Session B only", listB && store.get("myExercisesGroup") === "Session B" && new RegExp(`1 of ${nB}\\b`).test(txt(main)), `${view()} ${txt(main).slice(0, 120)}`);
 // Finish it: Done on each exercise.
 for (let i = 0; i < 80 && view() === "prescribed-session"; i++) {
-  const next = $("#ps-complete-btn") || $("#ps-done-btn") || $("#ps-watch-btn") || $("#ps-begin-btn");
+  const next = $("#ps-complete-btn") || $("#ps-finish-btn") || $("#ps-done-btn") || $("#ps-watch-btn") || $("#ps-begin-btn");
   if (!next) break;
   await click(next, 60);
 }
@@ -310,7 +318,9 @@ const nA = store.get("prescribedExercises").filter(e => e.group === "Session A")
 ok("6f. Home: Today, from your week, Session A, how many, Start your list", !!card && txt($("#path-today-h")) === "Session A" && new RegExp(`${nA} exercises, as you wrote them`).test(txt(card)) && !!$('[data-action="week-own"]'), txt(card));
 ok("6g. the coach's plan is not offered for it", !$('[data-action="week-today"]') && WS.askForToday() === false);
 await click($('[data-action="week-own"]'), 200);
-ok("6h. Start your list plays Session A only", view() === "prescribed-session" && store.get("myExercisesGroup") === "Session A" && new RegExp(`1 of ${nA}\\b`).test(txt(main)), txt(main).slice(0, 100));
+const listA = view() === "prescribed-session" && txt($("h1")) === "Session A" && $$(".ps-rows .ps-row").length === nA;
+await click($("#ps-start-btn"), 200);
+ok("6h. Start your list plays Session A only", listA && store.get("myExercisesGroup") === "Session A" && new RegExp(`1 of ${nA}\\b`).test(txt(main)), txt(main).slice(0, 100));
 ok("6i. a saved week keeps it", WM.sanitizeWeekShape(store.get("weekShape")).templates[wk.days[TODAY]].own === "Session A");
 
 // ── 7. Text is text ────────────────────────────────────────────────────

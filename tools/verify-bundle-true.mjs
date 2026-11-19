@@ -1,5 +1,11 @@
 /**
  * tools/verify-bundle-true.mjs
+ * 16 Nov 2026 v6
+ *
+ * v6 - P-36 MY-LIST-PLAYER. My exercises' player opens on its list, so 2g
+ *   asserts the typed text twice: in the list's row, and (after Start) in
+ *   the exercise's heading and dose. Nothing loosened; 2h is the list.
+ *
  * 04 Oct 2026 v5
  *
  * v5 - LOOK-1: the Your profile and Your plan rows are no longer on the
@@ -156,12 +162,19 @@ const SG = await import(B + "safety-gate.js");
 SG.recordAcknowledgement("test");
 const PS = await import(B + "views/prescribed-session.js");
 store.set("prescribedExercises", [{ id: "p2", name: 'Band "pull" <b>apart</b>', sets: 2, reps: '10 <i>each</i> side', notes: 'Slow "down"' }]);
-main.innerHTML = PS.render(); await wait(5);
+main.innerHTML = PS.render(); PS.onMount?.(); await wait(5);
+const row = main.querySelector(".ps-row");
+ok("2h. the list shows typed text as text (no markup made from it)",
+   /Band "pull" <b>apart<\/b>/.test(txt(row)) && /10 <i>each<\/i> side/.test(txt(row)) && !row?.querySelector("b, i"), txt(row));
+{ const _r = globalThis.router;
+  globalThis.router = { navigate: () => { main.innerHTML = PS.render(); PS.onMount?.(); }, back() {}, history: [] };
+  main.querySelector("#ps-start-btn")?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }));
+  await wait(20); globalThis.router = _r; }
 const h1 = main.querySelector(".exercise-name");
 ok("2gpc. positive control: the player shows the exercise", !!h1, main.innerHTML.slice(0, 120));
 ok("2g. the player shows typed text as text, in heading and dose (no markup made from it)",
    /Band "pull" <b>apart<\/b>/.test(txt(h1)) && /10 <i>each<\/i> side/.test(txt(main)) &&
-   !main.querySelector(".exercise-name b") && !main.querySelector(".meta-tag i"), txt(h1));
+   !main.querySelector(".exercise-name b") && !main.querySelector(".ps-sub i, .meta-tag i"), txt(h1));
 // W4-6: made harmless, not refused (a person's own words never refuse their file).
 const js2 = R.readRestoreFile(JSON.stringify({ ...crafted, store: { ...crafted.store, name: "javascript:alert(1)" } }));
 ok("2f. a javascript: address in a file can never be an address",
