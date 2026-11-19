@@ -1,8 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 16 Nov 2026 v721
+ * 19 Nov 2026 v722
  *
+ * v722 - P-9d (c) (the Plan; Free unchanged). Ready-made sessions: in Get stronger and Keep moving, at Home or the Gym, How would you like it? gains Ready-made sessions, six for each door and place (Home: body weight only), the part you chose first. Each starts by warming you up and ends with an approved stretch routine; choose Shorter, As written or Longer, each with its minutes, then the plan screen as any programme (pictures, Swap, YouTube, the sore check, Make it mine) and the one player. Strength moves now keep their sets, reps and rest in the player and in Make it mine. NEW FILE precached: js/data/ready-sessions.js.
  * v721 - P-36 (both tiers). My exercises, rebuilt: each list opens on the list itself, every exercise with its picture and how much, about how long, and Start (Carry on if you have begun). Then one screen an exercise: the timer or the count at the top, Start the timer under it, then the picture, How, and Watch out folded beneath. When a timer ends: a soft chime, a longer buzz, a tick and "Time's up."; it never moves on by itself, and the button names what's next. "n of N · The list" shows what's done and what's left, and any one can be done next. Notes come at the end, then Finish. Settings › Display › Sound › Timer sound (on unless you turn it off; your phone's volume and silent switch still apply). NEW FILES: none.
  * v720 - P-25 fix (both tiers). "I've just opened the app" now starts from whatever Home leads with today: Let me choose for you, Today, from your week, or Start your list (on a day set in your week there was nothing to ring). The check-in on the way says "Answer the questions. The guide picks up after." and never counts as leaving the guide; already checked in, the guide carries on from the next screen. Make this smaller keeps its words at ordinary text sizes. NEW FILES: none.
  * v719 - P-25 (both tiers). Help: one button, top right, on every screen but a running session. It opens How do I…?: the guides for the screen you were on, search, the guides by what you want to do, and Still stuck? (an email address to copy and the support lines). Each guide says what you'll end up with and its steps, then Guide me through it: a ring on the real button and a box with the step, moving on as you tap; Back a step, Stop the guide, Make this smaller; tap something else and it says you've left the guide, with Carry on from here. It ends with Did that work?. Seven guides: starting, today's session, adding a plan from a physio or a sheet, setting days, a daily routine, missed days, and your arc. Nothing about using them is stored or sent. NEW FILES precached: js/guide.js, js/data/guides.js, js/views/help.js, css/components/help.css.
@@ -4268,7 +4269,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v721";
+const CACHE_NAME = "alongside-v722";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4396,11 +4397,12 @@ const SHELL_HASHES = {
   "./js/data/tier-table.js": "7821c3304bd0815c",
   "./js/views/know-what.js": "e84fee3e6d9d3af0",
   "./js/views/plan-home.js": "46ba931aac825b6a",
-  "./js/views/path.js": "58b8b222835ce885",
+  "./js/views/path.js": "440a45cfcd4f385f",
   "./js/plan-look.js": "7674d8fbf5101aa9",
   "./js/views/plan-finish.js": "d3901b6355f55542",
   "./js/data/outside.js": "3af4ea46bd898084",
   "./js/data/trend-recipes.js": "14961e4c12aef77e",
+  "./js/data/ready-sessions.js": "0187232763966245",
   "./js/data/path-context.js": "a3b00dbb090b937a",
   "./js/data/swap-search.js": "5f0f0e4d112f92ea",
   "./js/views/build-session.js": "763317cec8c62e83",
@@ -4739,6 +4741,7 @@ const SHELL_URLS = [
   "./js/views/plan-finish.js",
   "./js/data/outside.js",
   "./js/data/trend-recipes.js",
+  "./js/data/ready-sessions.js",
   "./js/data/path-context.js",
   "./js/data/swap-search.js",
   "./js/views/build-session.js",
