@@ -1,5 +1,7 @@
 # Alongside: Move — Making my Move (P-39) spec
-## 23 Nov 2026 v5
+## 23 Nov 2026 v6
+
+v6 - **S6 QUIET HOME** (Graeme, 23 Nov, on his own Home: *"I'd like them to disappear off the main home page"*; then *"Is that the best move, or to be exceptional?"*, agreed *"Sure"*). *It's a hard day* and *Change what Alongside is for* no longer stand on Home. Home asks instead, once, when it matters: on an in-between day (the check-in's mood **Low**, not a hard day by the S3 rule; never with a sore area at Bad), *You said your mood is low today. Keep today to what you chose for hard days?* (**Yes** / **No, as planned**; the answer is today's word, so it is not asked again that day); at each twelve-week turn of an arc (weeks 12, 24, …), *n weeks into your arc. Still what you want Alongside for?* (**Have a look** / **Yes, still right**), once per turn, not while Start your Plan shows, not on a hard day, never beside the first question. *It's a hard day* moves into **Change today** (once made, not already hard). *Show my usual Home* stays on a hard day, focus then on the doors. Making my Move stays in *Settings › Your plan* and Help A3 (two ways: from Start your Plan, or from Settings once it is closed). A third touch-once exception: `myMove.review` `{ arc, block }` (store v128, Schema v1.130). Without a week, Change today is not on Home, so a hard day comes from the check-in or the question. Gated by `verify-my-move-quiet` (39).
 
 v5 - S5 built; Making my Move is complete. **Start your Plan** (P-35 folded in) sits under Today on the Plan's Home until *Close this list*: *Making my Move* first, then *Set what you're working towards* (done when the arc has an aim), *Plan your week* (done when a week is set) and *Add exercises from your physio or trainer* (done when there is a list). Done ones are ticked, quieter and said as done, and can be done again. While it shows, it is the way into Making my Move and the arc (no second line); after it closes, the S3/S4 line returns. Never on a hard day (that Home stays the one line and the hard-day choices). A second touch-once exception: `myMove.startClosed` (ISO or `null`), store v127, Schema v1.129. *Settings › Your plan › Making my Move* (the Plan only; *Not done yet* until made). Help guide **A3** *Make Home show only what I want* (the Plan), walked from Start your Plan. Gated by `verify-my-move-close` (32) and `verify-guides` v4. The voice lines for *Try it first* are scripted (BNH-Files); the playback hook waits for the recordings.
 
@@ -106,4 +108,4 @@ Written only through `store.setMyMove(patch)` (cleans the same way). Not a healt
 - The teenage In Step set (P-42).
 - The *Try it first* recordings: about eight new clips for Graeme (voice script addendum).
 
-*Build New Habits · Alongside: Move · Making my Move spec · 23 Nov 2026 v5*
+*Build New Habits · Alongside: Move · Making my Move spec · 23 Nov 2026 v6*

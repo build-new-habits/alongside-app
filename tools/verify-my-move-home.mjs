@@ -1,7 +1,13 @@
 import { createRequire as __cr } from "node:module";
 /**
  * tools/verify-my-move-home.mjs
- * 23 Nov 2026 v2
+ * 23 Nov 2026 v3
+ *
+ * v3 - S6 QUIET HOME (Graeme, 23 Nov: "I'd like them to disappear off the
+ *   main home page"). 2d/2e: a good day has no standing line under Today
+ *   (no It's a hard day, no Change what Alongside is for). 7: today's word
+ *   now comes from Change today or Home's one question (verify-my-move-
+ *   quiet); Show my usual Home stays, and puts focus on the doors.
  *
  * v2 - S5 (plan-home v15): the fixture closes Start your Plan, so this
  *   gate keeps testing the Home after it; verify-my-move-close tests the
@@ -139,9 +145,8 @@ ok("2a. only the chosen doors", doorIds() === "stronger,stretch", doorIds());
 const calm = main.querySelector('.path-doors [data-route="noticing"]');
 ok("2b. Calm my mind, a row into Wellbeing", !!calm && /Calm my mind/.test(txt(calm)) && calm.dataset.requiresCheckin === "false", txt(calm));
 ok("2c. six ways in at most", waysIn().length <= 6, waysIn().map(b => txt(b).slice(0, 20)).join(" | "));
-ok("2d. It's a hard day and Change what Alongside is for", [...mmBar().querySelectorAll("button")].map(txt).join("|") === "It's a hard day|Change what Alongside is for", txt(mmBar()));
-click(main.querySelector('[data-action="mm-change"]'));
-ok("2e. Change opens Making my Move", navs.at(-1) === "my-move");
+ok("2d. S6: nothing standing under Today on a good day", !mmBar(), txt(mmBar()));
+ok("2e. S6: no It's a hard day, no Change what Alongside is for on Home", !/It's a hard day|Change what Alongside is for/.test(txt(main)) && !main.querySelector('[data-action="mm-hard"], [data-action="mm-change"]'));
 ok("2f. no hard-day line on a good day", !main.querySelector(".path-mm__note"));
 
 console.log("\nTEST 3 - Just tell me what to do");
@@ -172,16 +177,15 @@ ok("6a. mood Struggling makes a hard day", !!main.querySelector('.path-coach[dat
 fixture({ checkin: { energy: 5, mood: 5 } }); set(MY); home();
 ok("6b. an okay day is not a hard day", !main.querySelector('.path-coach[data-state="hard"]') && doorIds() === "stronger,stretch");
 
-console.log("\nTEST 7 - It's a hard day, Show my usual Home");
-fixture({ checkin: { energy: 7, mood: 7 } }); set(MY); home();
-fakeRouter.homeFocus = null;
-click(main.querySelector('[data-action="mm-hard"]'));
-ok("7a. saved for today", JSON.stringify(store.get("myMove").day) === JSON.stringify({ date: store._localDay(), mode: "hard" }), JSON.stringify(store.get("myMove").day));
-ok("7b. Home is redrawn", navs.at(-1) === "today" && fakeRouter.homeFocus === "mm");
+console.log("\nTEST 7 - today's word, Show my usual Home");
+fixture({ checkin: { energy: 7, mood: 7 } }); set({ ...MY, day: { date: store._localDay(), mode: "hard" } });
+fakeRouter.homeFocus = "mm"; home();
+ok("7a. today's word (Change today, or Home's question) makes a hard day on a good check-in", !!main.querySelector('.path-coach[data-state="hard"]'));
+ok("7b. focus on Show my usual Home", document.activeElement === main.querySelector('[data-action="mm-usual"]'));
+click(main.querySelector('[data-action="mm-usual"]'));
+ok("7c. Show my usual Home: saved for today, Home redrawn with focus on the doors", store.get("myMove").day.mode === "usual" && navs.at(-1) === "today" && fakeRouter.homeFocus === "doors", JSON.stringify({ d: store.get("myMove").day, f: fakeRouter.homeFocus }));
 home();
-ok("7c. now the hard day, focus on Show my usual Home", !!main.querySelector('.path-coach[data-state="hard"]') && document.activeElement === main.querySelector('[data-action="mm-usual"]'));
-click(main.querySelector('[data-action="mm-usual"]')); home();
-ok("7d. Show my usual Home: the good day again", store.get("myMove").day.mode === "usual" && doorIds() === "stronger,stretch");
+ok("7d. the good day again, the doors heading focused", doorIds() === "stronger,stretch" && document.activeElement === main.querySelector("#path-doors-h"));
 fixture({ checkin: { energy: 3, mood: 6 } }); set({ ...MY, day: { date: store._localDay(), mode: "usual" } }); home();
 ok("7f. their word wins over a low check-in", !main.querySelector('.path-coach[data-state="hard"]') && doorIds() === "stronger,stretch");
 fixture({ checkin: { energy: 7, mood: 7 } }); set({ ...MY, day: { date: "2020-01-01", mode: "hard" } }); home();

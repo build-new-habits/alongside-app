@@ -1,6 +1,8 @@
 # Alongside — Data Schema Reference
-## 23 Nov 2026 v1.129
+## 23 Nov 2026 v1.130
 
+> **v1.130, 23 Nov 2026 — P-39 S6 QUIET HOME** (`store.js` v128). One key added to **`myMove`**: **`review`** `{ arc, block }` or `null` (default `null`): Home asks *Still what you want Alongside for?* once at each twelve-week turn of an arc (weeks 12, 24, …); `arc` is that arc's `startedAt`, `block` the turn answered (1 for week 12, 2 for week 24). **Written by** `setReviewed()` (`data/my-move.js`) through `store.setMyMove()`; **read by** `reviewDue()` (Home). A new arc (another `startedAt`) asks again at its own week 12. **On load:** anything but a string `arc` (40 characters at most) and a whole `block` from 1 to 100 → `null`. A third recorded touch-once exception (spec v6). Not a health answer.
+>
 > **v1.129, 23 Nov 2026 — P-39 S5 CLOSE** (`store.js` v127). One key added to **`myMove`**: **`startClosed`** (ISO) or `null` (default `null`): when the person pressed *Close this list* under **Start your Plan** on Home. While `null`, the list shows on the Plan's Home (never on a hard day). **Written by** `views/plan-home.js` through `store.setMyMove()`; **read by** `startOpen()` (`data/my-move.js`). **On load:** anything but a readable date-time → `null`. A second touch-once exception, recorded in the spec (v5): S1 did not foresee it. Not a health answer.
 >
 > **v1.128, 23 Nov 2026 — P-39 S3 HOME** (`store.js` v126). One key added to **`myMove`**: **`day`** `{ date, mode }` or `null` (default `null`): what the person said about today on Home, *It's a hard day* (`"hard"`) or *Show my usual Home* (`"usual"`), for that local day (`date` `YYYY-MM-DD`); read as nothing on any other day. **Written by** `setToday()` (`data/my-move.js`) through `store.setMyMove()`; **read by** `homeDay()` (Home). **On load:** anything but a local date and one of the two words → `null`. A touch-once exception, recorded in the spec (v3): S1 did not foresee it. `myMove` is now read by `views/my-move.js` and `views/plan-home.js`.
@@ -1102,7 +1104,7 @@
 
 ## 06 Sep 2026 v1.51
 
-**File:** `js/store.js` (confirmed live version: **v127, 23 Nov 2026**)
+**File:** `js/store.js` (confirmed live version: **v128, 23 Nov 2026**)
 
 > **v1.47, 06 Sep 2026 — CR-1.** `conditions[]` gains three ids and loses one. `chronic-fatigue` is **retired**; `persistent-fatigue`, `me-cfs` and `long-covid` replace it. No field shape changed — `conditions` is still `string[]` and `conditionMeta` is still keyed by condition id.
 >

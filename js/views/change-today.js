@@ -1,6 +1,11 @@
 /**
  * views/change-today.js
- * 15 Nov 2026 v2
+ * 23 Nov 2026 v3
+ *
+ * v3 - P-39 S6 (Graeme, 23 Nov). It's a hard day moves here from Home:
+ *   "Home shows what you chose for days like this", once Making my Move is
+ *   made and today is not already a hard day. Home opens on that hard-day
+ *   Home with focus on Show my usual Home.
  *
  * v2 - P-31 review (15 Nov). Free is sent to Home rather than shown a
  *   page about the Plan, as Build a session sends Free to its own screen
@@ -36,6 +41,8 @@ import { lineIcon } from "../data/line-icons.js";
 import { DAY_NAMES } from "../data/week-shape-model.js";
 import { todayInWeek } from "../data/week-shape.js";
 import { anotherDayChoices, catchUpChoices, doAnotherDay, doCatchUp, setToday } from "../data/week-changes.js";
+import { homeDay, setToday as setMyDay } from "../data/my-move.js";
+import { store } from "../store.js";
 
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
@@ -66,6 +73,7 @@ export function ChangeTodayView(router) {
       <ul class="path-lao ct-list">
         ${t?.template && !movedOnce ? choice('data-go="another"', "Do it another day", another.length ? "Pick a day later this week" : "No days left this week") : ""}
         ${catchUp.length ? choice('data-go="catch"', "Catch up", "Do a session you missed earlier this week") : ""}
+        ${(store.get("myMove") || {}).made && homeDay() !== "hard" ? choice('data-hard', "It's a hard day", "Home shows what you chose for days like this") : ""}
         ${choice('data-set="little"', "Little and often instead", "The short ones on Home")}
         ${t?.value === "rest" && !t.change ? "" : choice('data-set="rest"', "Rest today", "Rest counts")}
         ${choice('data-set="else"', "Something else", "The four ways in, or let the coach choose")}
@@ -118,6 +126,11 @@ export function ChangeTodayView(router) {
     $$("[data-go]").forEach(b => b.addEventListener("click", () => { screen = b.dataset.go; render(); }));
     $$("[data-day]").forEach(b => b.addEventListener("click", () => { if (doAnotherDay(b.dataset.day)) home(); }));
     $$("[data-catch]").forEach(b => b.addEventListener("click", () => { if (doCatchUp(b.dataset.catch)) home(); }));
+    $$("[data-hard]").forEach(b => b.addEventListener("click", () => {
+      setMyDay("hard");
+      router.homeFocus = "mm";
+      router.navigate("today");
+    }));
     $$("[data-set]").forEach(b => b.addEventListener("click", () => { if (setToday(b.dataset.set)) home(); }));
   }
 

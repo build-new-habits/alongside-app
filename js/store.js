@@ -6,7 +6,12 @@ import { validateWeightTarget } from "./data/weight-targets.js";
 
 /**
  * store.js - Data persistence layer
- * 23 Nov 2026 v127
+ * 23 Nov 2026 v128
+ *
+ * v128 - P-39 S6 QUIET HOME (Graeme, 23 Nov: the hard-day and change links
+ *   off Home). myMove.review { arc, block } or null: the twelve-week turn
+ *   of an arc at which Still what you want Alongside for? was answered.
+ *   Cleaned on load. Schema v1.130.
  *
  * v127 - P-39 S5 CLOSE (a second recorded touch-once exception, spec v5).
  *   myMove.startClosed: when the person closed Start your Plan on Home
@@ -2196,6 +2201,7 @@ export const store = {
       dismissed: only(src.dismissed, V.doors),
       day,
       startClosed: typeof src.startClosed === 'string' && /^\d{4}-\d{2}-\d{2}T/.test(src.startClosed) && !isNaN(new Date(src.startClosed)) ? src.startClosed : null,
+      review: src.review && typeof src.review === 'object' && typeof src.review.arc === 'string' && src.review.arc.length <= 40 && Number.isInteger(src.review.block) && src.review.block >= 1 && src.review.block <= 100 ? { arc: src.review.arc, block: src.review.block } : null,
     };
   },
 
@@ -2822,7 +2828,7 @@ export const store = {
       // is liked or not wanted, never both (likeMovement / setExercisePreference).
       likedMovements: {},
       // P-39 MAKING MY MOVE (v125). Spec section 7.
-      myMove: { step: null, made: null, purposes: [], most: null, goodDay: 'few', hardDay: ['coach'], dismissed: [], day: null, startClosed: null },
+      myMove: { step: null, made: null, purposes: [], most: null, goodDay: 'few', hardDay: ['coach'], dismissed: [], day: null, startClosed: null, review: null },
 
       // P-19, v119. The fitness trends the person follows, each once:
       // [{ id, startedAt: 'YYYY-MM-DD', activity }]. See TREND_RULES.

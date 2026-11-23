@@ -1,6 +1,10 @@
 /**
  * settings.js
- * 23 Nov 2026 v77
+ * 23 Nov 2026 v78
+ *
+ * v78 - P-39 S6. Guide markers on the Plan only (Free byte for byte):
+ *   Your plan (settings-plan) and Making my Move (mm-settings), for Help
+ *   guide A3 once Home no longer has Change what Alongside is for.
  *
  * v77 - P-39 S5. Your plan › Goals and your week gains Making my Move
  *   (what Alongside is for; the Plan only), above Your arc. No value on
@@ -961,13 +965,13 @@ export function SettingsView(router) {
 
   const _label = (list, id, fallback) => (list.find(x => x.id === id) || {}).label || fallback;
 
-  function _row({ label, value = '', open, go, action, focus, sub = '' }) {
+  function _row({ label, value = '', open, go, action, focus, sub = '', guide = '' }) {
     const attrs = open ? `data-open="${open}"${focus ? ` data-focus="${_esc(focus)}"` : ''}`
                 : go   ? `data-go="${go}"`
                 :        `data-action="${action}"`;
     return `
       <li>
-        <button class="settings-row" ${attrs}>
+        <button class="settings-row" ${attrs}${guide ? ` data-guide-target="${guide}"` : ''}>
           <span class="settings-row__text">
             <span class="settings-row__label">${_esc(label)}</span>
             ${sub ? `<span class="settings-row__sub">${_esc(sub)}</span>` : ''}
@@ -1180,7 +1184,7 @@ export function SettingsView(router) {
       ];
       case 'plan': return [
         { title: 'Goals and your week', rows: [
-          c.premium ? _row({ label: 'Making my Move', sub: `${(store.get('myMove') || {}).made ? '' : 'Not done yet. '}What Alongside is for, on good days and hard ones.`, go: 'my-move' }) : '',
+          c.premium ? _row({ label: 'Making my Move', sub: `${(store.get('myMove') || {}).made ? '' : 'Not done yet. '}What Alongside is for, on good days and hard ones.`, go: 'my-move', guide: 'mm-settings' }) : '',
           c.premium ? _row({ label: 'Your arc', value: c.aim ? c.aim.label : 'Not set', go: c.aim ? 'stretch-arc' : 'arc-setup' }) : '',
           ...(c.premium ? [
             // P-27. One row for the one page (four opened it).
@@ -1216,7 +1220,7 @@ export function SettingsView(router) {
           <li class="settings-index__item">
             <h2 class="settings-index__h">
               <button class="settings-idx settings-idx--${SECTION_KIND[id]}" data-section="${id}"
-                      ${id === 'messages' ? 'data-open="messages"' : `data-section-open="${id}"`}>
+                      ${id === 'messages' ? 'data-open="messages"' : `data-section-open="${id}"`}${id === 'plan' && c.premium ? ' data-guide-target="settings-plan"' : ''}>
                 ${_tile(id)}
                 <span class="settings-idx__text">
                   <span class="settings-sec__title">${_esc(SECTION_TITLES[id])}</span>

@@ -1,6 +1,8 @@
 /**
  * tools/verify-my-move-schema.mjs
- * 23 Nov 2026 v3
+ * 23 Nov 2026 v4
+ *
+ * v4 - S6 (store.js v128): myMove.review { arc, block } or null. 3q to 3s.
  *
  * v3 - S5 (store.js v127): myMove.startClosed (ISO or null). 3o, 3p.
  *
@@ -43,7 +45,7 @@ const ok = (name, cond, detail = "") => {
 const J = v => JSON.stringify(v);
 const saved = () => JSON.parse(localStorage.getItem(store.STORAGE_KEY));
 function load(s) { localStorage.clear(); localStorage.setItem(store.STORAGE_KEY, JSON.stringify(s)); store.init(); }
-const DEF = { step: null, made: null, purposes: [], most: null, goodDay: "few", hardDay: ["coach"], dismissed: [], day: null, startClosed: null };
+const DEF = { step: null, made: null, purposes: [], most: null, goodDay: "few", hardDay: ["coach"], dismissed: [], day: null, startClosed: null, review: null };
 
 console.log("\nTEST 0 - positive control");
 load({ onboardingComplete: true, name: "Sentinel-39" });
@@ -59,7 +61,7 @@ load({ onboardingComplete: true, myMove: "nonsense" });
 ok("2b. a myMove that is not an object loads the default", J(store.get("myMove")) === J(DEF), J(store.get("myMove")));
 
 console.log("\nTEST 3 - each key cleaned on its own");
-const GOOD = { step: "good", made: "2026-11-23T09:41:00.000Z", purposes: ["stronger", "stretch", "instep"], most: "stretch", goodDay: "one", hardDay: ["stretch", "walk"], dismissed: ["feel"], day: { date: "2026-11-23", mode: "hard" }, startClosed: "2026-11-23T19:10:00.000Z" };
+const GOOD = { step: "good", made: "2026-11-23T09:41:00.000Z", purposes: ["stronger", "stretch", "instep"], most: "stretch", goodDay: "one", hardDay: ["stretch", "walk"], dismissed: ["feel"], day: { date: "2026-11-23", mode: "hard" }, startClosed: "2026-11-23T19:10:00.000Z", review: { arc: "2026-09-01T09:00:00.000Z", block: 1 } };
 load({ onboardingComplete: true, myMove: GOOD });
 ok("3a. a well-formed myMove is kept exactly", J(store.get("myMove")) === J(GOOD), J(store.get("myMove")));
 load({ onboardingComplete: true, myMove: { ...GOOD, step: "summary" } });
@@ -93,6 +95,13 @@ load({ onboardingComplete: true, myMove: { ...GOOD, startClosed: "Monday" } });
 ok("3o. a startClosed that is not a date-time loads as null", store.get("myMove").startClosed === null, J(store.get("myMove").startClosed));
 load({ onboardingComplete: true, myMove: GOOD });
 ok("3p. a well-formed startClosed is kept", store.get("myMove").startClosed === GOOD.startClosed);
+
+load({ onboardingComplete: true, myMove: { ...GOOD, review: { arc: "x", block: 0 } } });
+ok("3q. a review at block 0 loads as null", store.get("myMove").review === null, J(store.get("myMove").review));
+load({ onboardingComplete: true, myMove: { ...GOOD, review: "yes" } });
+ok("3r. a review that is not { arc, block } loads as null", store.get("myMove").review === null);
+load({ onboardingComplete: true, myMove: { ...GOOD, review: { arc: GOOD.review.arc, block: 2, extra: 1 } } });
+ok("3s. a well-formed review is kept, nothing else with it", J(store.get("myMove").review) === J({ arc: GOOD.review.arc, block: 2 }));
 
 console.log("\nTEST 4 - setMyMove");
 load({ onboardingComplete: true, name: "Writer", myMove: GOOD });

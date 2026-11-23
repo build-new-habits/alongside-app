@@ -1,6 +1,15 @@
 /**
  * views/plan-home.js
- * 23 Nov 2026 v15
+ * 23 Nov 2026 v16
+ *
+ * v16 - P-39 S6 QUIET HOME (Graeme, 23 Nov: "I'd like them to disappear
+ *   off the main home page"; "be exceptional"). It's a hard day and Change
+ *   what Alongside is for leave Home. Instead, Home asks at the moment it
+ *   matters, once: on an in-between day (mood Low), Keep today to what you
+ *   chose for hard days? (Yes / No, as planned); at each twelve-week turn of
+ *   an arc, Still what you want Alongside for? (Have a look / Yes, still
+ *   right). It's a hard day moves into Change today; Making my Move stays
+ *   in Settings › Your plan and Help. Show my usual Home stays on a hard day.
  *
  * v15 - P-39 S5 CLOSE. Start your Plan, under Today until closed (P-35
  *   folded in): Making my Move first, then Set what you're working towards,
@@ -173,7 +182,7 @@ import { suggestToday, arcDoor, pickProgramme, movementName } from "../data/path
 import { setTodaysLength } from "../data/session-length.js";
 import { fiveOf } from "../data/progress-report.js";
 import { EFFORT, ZONE2_ACTIVITIES, zone2Week, zone2HardDoneThisWeek } from "../data/trend-recipes.js";
-import { goodDayDoors, HARD_OFFERED, homeDay, setToday, arcNext, startItems, startOpen } from "../data/my-move.js";
+import { goodDayDoors, HARD_OFFERED, homeDay, setToday, arcNext, startItems, startOpen, askHardToday, reviewDue, reviewBlock, setReviewed } from "../data/my-move.js";
 
 // ── The doors ──────────────────────────────────────────────────────────────
 
@@ -443,11 +452,13 @@ function littleAndOften() {
 /** Which Home today, and the doors it shows. */
 export function myMoveHome() {
   const s = needsCheckin() ? null : todaysSuggestion();
-  const day = homeDay({ badSore: s?.route === "bad-day" });
+  const badSore = s?.route === "bad-day";
+  const day = homeDay({ badSore });
   const m = store.get("myMove");
   const doors = day === "unmade" ? DOORS.map(d => d.id) : day === "hard" ? [] : goodDayDoors(m);
   const calm = day === "good" && m.purposes.includes("calm") && doors.length <= 3;
-  return { day, doors, calm, hard: day === "hard" ? m.hardDay : [] };
+  const ask = day === "good" && askHardToday({ badSore });
+  return { day, doors, calm, hard: day === "hard" ? m.hardDay : [], ask, review: day === "good" && !ask && reviewDue() };
 }
 
 const HARD_ROUTE = { coach: "hard-coach", stretch: "hard-stretch", walk: "hard-walk", calm: "hard-calm" };
@@ -477,22 +488,30 @@ function startList() {
     </section>`;
 }
 
+/** S6. One question, asked when it matters, gone once answered. */
+function ask(id, q, yes, no) {
+  return `<section class="path-ask" aria-labelledby="path-ask-${id}">
+      <p class="path-ask__q" id="path-ask-${id}">${esc(q)}</p>
+      <div class="path-ask__btns">
+        <button type="button" class="btn btn-secondary path-ask__btn" data-action="${id}-yes">${esc(yes)}</button>
+        <button type="button" class="btn btn-ghost path-ask__btn" data-action="${id}-no">${esc(no)}</button>
+      </div>
+    </section>`;
+}
+
 function myMoveBar(mm) {
-  if (startOpen() && mm.day !== "hard") {
-    const after = mm.day === "unmade" ? "" : mm.day === "hard"
-      ? `<button type="button" class="path-link" data-action="mm-usual">Show my usual Home</button>`
-      : `<button type="button" class="path-link" data-action="mm-hard">It's a hard day</button>`;
-    return `<div class="path-mm">${startList()}${after}</div>`;
-  }
+  const asks = mm.ask ? ask("ask-hard", "You said your mood is low today. Keep today to what you chose for hard days?", "Yes", "No, as planned")
+    : mm.review ? ask("ask-review", `${reviewBlock() * 12} weeks into your arc. Still what you want Alongside for?`, "Have a look", "Yes, still right") : "";
+  if (startOpen() && mm.day !== "hard") return `<div class="path-mm">${asks}${startList()}</div>`;
   if (mm.day === "unmade") {
     return `<div class="path-mm"><p class="path-mm__line">Make Home yours, in about a minute.</p>
       <button type="button" class="path-link" data-action="mm-open">Making my Move</button></div>`;
   }
-  const toggle = mm.day === "hard"
-    ? `<button type="button" class="path-link" data-action="mm-usual">Show my usual Home</button>`
-    : `<button type="button" class="path-link" data-action="mm-hard">It's a hard day</button>`;
+  // S6: on a hard day, the one way back; on a good day, nothing standing.
+  const usual = mm.day === "hard" ? `<button type="button" class="path-link" data-action="mm-usual">Show my usual Home</button>` : "";
   const arcLink = arcNext() ? `<button type="button" class="path-link" data-action="mm-arc">Set what you're working towards</button>` : "";
-  return `<div class="path-mm">${toggle}${arcLink}<button type="button" class="path-link" data-action="mm-change" data-guide-target="mm-change">Change what Alongside is for</button></div>`;
+  const inside = asks + usual + arcLink;
+  return inside ? `<div class="path-mm">${inside}</div>` : "";
 }
 
 // ── Home ───────────────────────────────────────────────────────────────────
@@ -594,12 +613,33 @@ export function wirePlanHome(container, router) {
   }));
   container.querySelector('[data-action="path-coach"]')?.addEventListener("click", () => startCoachChoice(router));
   // P-39. Making my Move: its way in, today's word, and the hard-day choices.
-  container.querySelectorAll('[data-action="mm-open"], [data-action="mm-change"]').forEach(b => b.addEventListener("click", () => router.navigate("my-move")));
-  container.querySelectorAll('[data-action="mm-hard"], [data-action="mm-usual"]').forEach(b => b.addEventListener("click", () => {
-    setToday(b.dataset.action === "mm-hard" ? "hard" : "usual");
+  container.querySelector('[data-action="mm-open"]')?.addEventListener("click", () => router.navigate("my-move"));
+  container.querySelector('[data-action="mm-usual"]')?.addEventListener("click", () => {
+    setToday("usual");
+    router.homeFocus = "doors";
+    router.navigate("today");
+  });
+  // S6. The in-between day's question: Yes is today's hard day; No keeps the plan. Either way it is answered for today.
+  container.querySelector('[data-action="ask-hard-yes"]')?.addEventListener("click", () => {
+    setToday("hard");
     router.homeFocus = "mm";
     router.navigate("today");
-  }));
+  });
+  container.querySelector('[data-action="ask-hard-no"]')?.addEventListener("click", () => {
+    setToday("usual");
+    router.homeFocus = "doors";
+    router.navigate("today");
+  });
+  // S6. The twelve-week turn: answered either way, not asked again until the next turn.
+  container.querySelector('[data-action="ask-review-yes"]')?.addEventListener("click", () => {
+    setReviewed();
+    router.navigate("my-move");
+  });
+  container.querySelector('[data-action="ask-review-no"]')?.addEventListener("click", () => {
+    setReviewed();
+    router.homeFocus = "doors";
+    router.navigate("today");
+  });
   container.querySelector('[data-action="mm-arc"]')?.addEventListener("click", () => router.navigate("arc-setup"));
   container.querySelector('[data-action="mm-week"]')?.addEventListener("click", () => router.navigate("your-week"));
   container.querySelector('[data-action="mm-own"]')?.addEventListener("click", () => router.navigate("prescribed"));
@@ -633,7 +673,7 @@ export function wirePlanHome(container, router) {
   if (focus) {
     router.homeFocus = null;
     const el = focus === "doors" ? container.querySelector("#path-doors-h")
-      : focus === "mm" ? container.querySelector('[data-action="mm-usual"], [data-action="mm-hard"]')
+      : focus === "mm" ? container.querySelector('[data-action="mm-usual"]')
       : container.querySelector('[data-action="undo-change"]') || container.querySelector('[data-action="change-today"]');
     el?.focus();   // the router keeps focus a view has placed (router.js W4-18)
   }
