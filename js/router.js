@@ -1,6 +1,10 @@
 /**
  * router.js
- * 23 Nov 2026 v58
+ * 23 Nov 2026 v59
+ *
+ * v59 - P-44 PHYSIO LINK S2. 'plan-link-send' (Send a link to change, the
+ *   Plan's; Free is sent to Progress), from Share your plan; its tab is
+ *   Progress's.
  *
  * v58 - P-39 MAKING MY MOVE S2. 'my-move' (views/my-move.js: Making my
  *   Move, the Plan's; Free is sent Home), without the nav like the other
@@ -439,6 +443,7 @@ const VIEW_NAMES = {
   // D-11. Share your progress.
   'progress-share':    { path: './views/progress-share.js',   fn: 'ProgressShareView'   },
   'plan-share':        { path: './views/plan-share.js',       fn: 'PlanShareView'       },
+  'plan-link-send':    { path: './views/plan-link-send.js',   fn: 'PlanLinkSendView'    },
   'settings':          { path: './views/settings.js',         fn: 'SettingsView'        },
   'weekly-plan':       { path: './views/weekly-plan.js',      fn: 'WeeklyPlanView'      },
   'noticing':          { path: './views/noticing.js',         fn: 'NoticingView'        },
@@ -580,7 +585,7 @@ const NAV_MAP = {
   // absent.
   'quiet-session': 'noticing', 'breathing-session': 'noticing',
   'prescribed': 'today', 'prescribed-session': 'today', 'session-builder': 'today',
-  'progress': 'progress', 'weekly-plan': 'progress', 'progress-share': 'progress', 'plan-share': 'progress',
+  'progress': 'progress', 'weekly-plan': 'progress', 'progress-share': 'progress', 'plan-share': 'progress', 'plan-link-send': 'progress',
   'noticing': 'noticing', 'journal-entry': 'noticing',
   'in-step': 'noticing',
   // NAV-8. 'library' moved from 'noticing' to 'today'. The Library is an

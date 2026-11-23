@@ -1,6 +1,8 @@
 /*
  * css/components/progress-share.css
- * 15 Nov 2026 v2
+ * 23 Nov 2026 v3
+ *
+ * v3 - P-44 S2: Send a link to change (.sp-link-line, the QR code .pl-qr).
  *
  * v2 - P-33 PLAN-SHARE: Share your plan (views/plan-share.js) uses this
  * screen's look; its page adds headings, the arc's parts, plain tables
@@ -155,3 +157,8 @@
 .sp-left, .sp-empty { font-size: var(--text-sm); color: var(--color-text-secondary); margin: var(--space-2, 8px) 0 0; line-height: 1.5; }
 .sp-empty { color: var(--color-text); font-size: var(--text-base); }
 .sp-textarea { width: 100%; min-height: 12em; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: var(--text-sm); line-height: 1.5; padding: 12px; border-radius: 12px; border: 1px solid var(--color-border); background: var(--color-surface); color: var(--color-text); }
+
+/* ---------- P-44 S2: Send a link to change (v3) ---------- */
+.sp-link-line, .pl-qr-line { margin: var(--space-4) 0 var(--space-2); color: var(--color-text-secondary); }
+.pl-qr-wrap { background: #fff; padding: var(--space-3); border-radius: var(--radius-lg, 16px); max-width: 360px; margin: 0 auto var(--space-4); }
+.pl-qr { display: block; width: 100%; height: auto; }

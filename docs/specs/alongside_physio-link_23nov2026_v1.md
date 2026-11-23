@@ -2,6 +2,7 @@
 ## 23 Nov 2026 v1
 
 S1 built 23 Nov: `store.js` v130 (`ownPrevious`), Schema v1.132, `data/plan-link.js` v1; gate `verify-plan-link` (56; red on v729, reversals red).
+S2 and S3 built 23 Nov: `views/plan-link-send.js` v1 (route `plan-link-send`, `router.js` v59; from Share your plan v2), `data/qr.js` (qrcode-generator 1.4.4, MIT, vendored); website `edit-plan/` v1 (with `css/main.css` v4: the footer's email address wrapped, a site-wide overflow at 200% text). The QR code shows for links up to 1,200 characters (`QR_MAX`). Gate `verify-physio-link` (44, end to end; red on v730, reversals red); real browser: `chromium-my-move.mjs` v6 (Send) and `chromium-edit-plan.mjs` v1 (the page, 12 views, axe), 0 faults.
 
 Build New Habits | Agreed by Graeme, 23 Nov: the physio and PT route *"sticks"*; Stage 1 first, *"Go ahead"*; the editing page on the website. Master schedule row P-40 (PAID-PULL, the physio and PT route) and P-44 (this build).
 
@@ -53,8 +54,8 @@ The Plan: sending the link and *What your physio changed* (P-40: *Share my plan 
 | Session | What | Files | Gate |
 |---|---|---|---|
 | **S1 SCHEMA AND LINK** (built) | `ownPrevious` (store, Schema); `data/plan-link.js`: encode, decode, check, and the changes between two lists in words | `store.js`, `Schema.md`, `data/plan-link.js` (new) | `verify-plan-link` |
-| **S2 SEND** | *Send a link to edit*: choose, make, share, copy; the QR code (`data/qr.js`, vendored, MIT) | `plan-share` views, `data/qr.js` (new) | `verify-plan-link-send` |
-| **S3 THE PAGE** | `buildnewhabits.co.uk/edit-plan/`: read, edit, add, remove, say a line, Send back; the iPhone note; WCAG 2.2 AA; no third-party anything | website `edit-plan/` | `verify-edit-plan` (app repo, reads `../website`) |
+| **S2 SEND** (built) | *Send a link to edit*: choose, make, share, copy; the QR code (`data/qr.js`, vendored, MIT) | `plan-share` views, `data/qr.js` (new) | `verify-plan-link-send` |
+| **S3 THE PAGE** (built) | `buildnewhabits.co.uk/edit-plan/`: read, edit, add, remove, say a line, Send back; the iPhone note; WCAG 2.2 AA; no third-party anything | website `edit-plan/` | `verify-edit-plan` (app repo, reads `../website`) |
 | **S4 BACK** | the back link at start-up and pasted; *What your physio changed*; Use all, choose, Keep my list; `ownPrevious`; *Put back my old list* | `app.js`, `plan-import.js`, a new view, `prescribed.js`, `router.js` | `verify-plan-link-back` |
 | **S5 CLOSE** | Help guide, glossary, a Privacy Policy line drafted for Graeme and Foot Anstey, the device checklist sitting, real-browser checks on both sites | `guides.js`, BNH-Files | full suite from a fresh clone |
 
