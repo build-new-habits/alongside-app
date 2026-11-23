@@ -1,5 +1,7 @@
 # Alongside: Move — Making my Move (P-39) spec
-## 23 Nov 2026 v1
+## 23 Nov 2026 v2
+
+v2 - S2 built: its styles went into `css/components/path.css` (v16, beside Home's), not a new file, so no new stylesheet to load; `data/my-move.js` also holds the hard-day and good-day words and the preview sentence. When a movement purpose is ticked while *In Step* is what matters most, the movement purpose takes over (In Step is ticked for everyone).
 
 Build New Habits | Master schedule v684, row P-39. Agreed by Graeme, 22–23 Nov 2026 (*"Those things I think stick now"*; *"Let's start building the 'Creating My Move', or 'Making My Move' experience into the app"*). Tap-through prototype v2: BNH-Files `Apps/Alongside Move/Product/alongside_make-it-yours_prototype_23nov2026_v2.html`. Persona judgement: `Research/alongside_make-it-yours_persona-judgement_22nov2026_v1.md`.
 
@@ -86,7 +88,7 @@ Written only through `store.setMyMove(patch)` (cleans the same way). Not a healt
 | Session | What | Files (confirm at start) | Gate |
 |---|---|---|---|
 | **S1 SCHEMA** | `myMove`, its cleaning and `setMyMove` | `store.js`, `Schema.md`, `verify-write1` (dated promise), `glossary.md`; `sw.js` last | `verify-my-move-schema` |
-| **S2 SCREENS** | the four screens, live preview, Try it first, resume; `router.js` | new `views/my-move.js`, `css/components/my-move.css`, `router.js`, `data/my-move.js` (purposes, seeding from getting started) | `verify-my-move-screens` (drives the real view; a11y names; Plan only) |
+| **S2 SCREENS** ✅ `alongside-v724` | the four screens, live preview, Try it first, resume; `router.js` | new `views/my-move.js`, new `data/my-move.js` (purposes, hard and good words, seeding from getting started, the preview), `css/components/path.css` v16, `router.js` v58 | `verify-my-move-screens` (55; drives the real view; a11y names; Plan only) |
 | **S3 HOME** | good-day and hard-day Home, *It's a hard day*, *Calm my mind* row, *Start your Plan* with Making my Move first | `plan-home.js`, `path.css` | `verify-my-move-home` (six ways in; Bad still first; Free byte for byte) |
 | **S4 AIM AND SUGGESTIONS** | *Which matters most* → arc; learned suggestions | `data/my-move.js`, `aims.js` (read only), `views/my-move.js` | `verify-my-move-learn` |
 | **S5 CLOSE** | Help guide, glossary, device checklist sitting, real-browser text-fit and axe | `guides.js`, checklist | full suite ×3 from a fresh clone |
@@ -98,4 +100,4 @@ Written only through `store.setMyMove(patch)` (cleans the same way). Not a healt
 - The teenage In Step set (P-42).
 - The *Try it first* recordings: about eight new clips for Graeme (voice script addendum).
 
-*Build New Habits · Alongside: Move · Making my Move spec · 23 Nov 2026 v1*
+*Build New Habits · Alongside: Move · Making my Move spec · 23 Nov 2026 v2*

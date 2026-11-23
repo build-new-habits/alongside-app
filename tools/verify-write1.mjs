@@ -1,6 +1,9 @@
 /**
  * tools/verify-write1.mjs
- * 23 Nov 2026 v14
+ * 23 Nov 2026 v15
+ *
+ * v15 - P-39 S2. myMove's dated promise kept: Making my Move's screens
+ *   (views/my-move.js, data/my-move.js) now read it. Its line is gone.
  *
  * v14 - P-39 S1 SCHEMA. myMove joins the baseline as a DATED PROMISE
  *   (schema first): written by store.setMyMove(), read by nothing until
@@ -238,10 +241,6 @@ const BASELINE = new Set([
   // likedMovements (path-engine.js), Session 4 connects dayOpen
   // (plan-home.js); each removes its line, as the check below insists.
   'dayOpen',
-  // P-39 S1, 23 Nov 2026 (store.js v125). DATED PROMISE, not permission:
-  // written by store.setMyMove() with no reader yet (schema before code).
-  // S2 (views/my-move.js) reads it and removes this line.
-  'myMove',
 
 
   // 'conditionMeta' -- removed 28 Sep 2026. SMOOTH-P4a reads it: Progress

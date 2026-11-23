@@ -1,6 +1,12 @@
 import { createRequire as __cr } from "node:module";
 /**
  * tools/verify-one-look.mjs
+ * 23 Nov 2026 v14
+ *
+ * v14 - P-39 S2. Making my Move is new since v688 and the Plan's only
+ *   (Free is sent Home), so it joins NEW_PLAN_ONLY, as Change today did.
+ *   Nothing else loosened.
+ *
  * 16 Nov 2026 v13
  *
  * v13 - P-36 MY-LIST-PLAYER. My exercises' player is rebuilt on both tiers
@@ -292,7 +298,7 @@ function onlyMindfulAdded(a, b) {
 }
 console.log("\nTEST 4 - Free, as it was on alongside-v688");
 const V688 = "79799cb";
-const NEW_PLAN_ONLY = ["build-session", "change-today", "plan-share"];   // v8 (P-26); P-31 (15 Nov): Change today; P-33 (15 Nov): Share your plan
+const NEW_PLAN_ONLY = ["build-session", "change-today", "plan-share", "my-move"];   // v8 (P-26); P-31 (15 Nov): Change today; P-33 (15 Nov): Share your plan
 const touched = execSync(`git -C "${ROOT}" diff --name-only ${V688} -- js/views`, { encoding: "utf8" }).split("\n").filter(f => /^js\/views\/[a-z-]+\.js$/.test(f));
 ok("4pc. the files this session touched are found from git", touched.length >= 20, touched.join(", "));
 const fnOf = Object.fromEntries([...table.matchAll(/'([a-z0-9/-]+)'\s*:\s*\{\s*path:\s*'\.\/views\/([a-z-]+)\.js',\s*fn:\s*'(\w+)'/g)].map(m => [m[2], { route: m[1], fn: m[3] }]));

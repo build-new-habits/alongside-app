@@ -1,6 +1,10 @@
 /**
  * router.js
- * 15 Nov 2026 v57
+ * 23 Nov 2026 v58
+ *
+ * v58 - P-39 MAKING MY MOVE S2. 'my-move' (views/my-move.js: Making my
+ *   Move, the Plan's; Free is sent Home), without the nav like the other
+ *   screens that are read and answered; its tab is Home's.
  *
  * v57 - P-25 HOW-TO GUIDES. 'help' (How do I…?, views/help.js), both tiers,
  *   opened by Help (js/guide.js); its tab is the tab of the screen it was
@@ -445,6 +449,8 @@ const VIEW_NAMES = {
   'your-week':         { path: './views/your-week.js',        fn: 'YourWeekView'        },
   'plan-import':       { path: './views/plan-import.js',      fn: 'PlanImportView'      },
   'change-today':      { path: './views/change-today.js',     fn: 'ChangeTodayView'     },
+  // P-39. Making my Move: what Alongside is for, good and hard days.
+  'my-move':           { path: './views/my-move.js',          fn: 'MyMoveView'          },
   // SAVED-1, 08 Sep 2026. The Your own room counted saved sessions and
   // hid all but the newest behind a button that opened the BUILDER --
   // a screen for making a new one, reached by tapping a control that
@@ -548,6 +554,8 @@ const hideNavViews = new Set([
   'age-check', 'under-18', 'consent-update',
   // SMOOTH-P3c. A session in progress, with its own Exit and Finish.
   'capture',
+  // P-39. Making my Move is answered, like the check-in: nothing else to tap.
+  'my-move',
 ]);
 
 // W4-1 GATE-OPEN. Screens left only by answering them: no house button.
@@ -603,6 +611,7 @@ const NAV_MAP = {
   'your-week': 'today',
   'plan-import': 'today',
   'change-today': 'today',
+  'my-move': 'today',
   'goal-review': 'my-programme',
   'settings': 'settings', 'privacy': 'settings',
   'upgrade': 'settings', 'goal-setup': 'settings',
