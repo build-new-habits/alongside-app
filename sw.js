@@ -1,6 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 23 Nov 2026 v730
+ *
+ * v730 - P-44 PHYSIO LINK S1 (nothing on screen yet). ownPrevious in the store; the link codec. NEW FILE precached: js/data/plan-link.js.
+ *
  * 23 Nov 2026 v729
  *
  * v729 - OWN-DONE-TODAY and OWN-NAMES (both tiers). My exercises' ticks count for the day they were made; Progress names your own exercises. No new files.
@@ -4297,7 +4301,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v729";
+const CACHE_NAME = "alongside-v730";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4364,7 +4368,7 @@ const SHELL_HASHES = {
   "./css/components/finish.css": "c33e298d5fcb92ae",
   "./js/app.js": "f1496daa7cfb04a4",
   "./js/router.js": "89d2aec6f28f6662",
-  "./js/store.js": "72e43f520b878739",
+  "./js/store.js": "af46173f09925c56",
   "./js/session-log.js": "6134de4315842e05",
   "./js/exercise-feedback.js": "adba8549f444da2a",
   "./js/exercise-card.js": "4ed40e63efe33a26",
@@ -4453,6 +4457,7 @@ const SHELL_HASHES = {
   "./js/views/change-today.js": "31101d97d53492c8",
   "./js/views/my-move.js": "bc53b61cdf65da20",
   "./js/data/my-move.js": "c6ec80cda14e499b",
+  "./js/data/plan-link.js": "6afcc95819d6987c",
   "./js/data/week-changes.js": "1bd0a7a6db2c338f",
   "./js/data/little-and-often.js": "9828926d20ce94dc",
   "./js/data/sore-rule.js": "f6ea51d828be37f0",
@@ -4794,6 +4799,7 @@ const SHELL_URLS = [
   "./js/views/change-today.js",
   "./js/views/my-move.js",
   "./js/data/my-move.js",
+  "./js/data/plan-link.js",
   "./js/data/week-changes.js",
   "./js/data/little-and-often.js",
   "./js/data/sore-rule.js",
