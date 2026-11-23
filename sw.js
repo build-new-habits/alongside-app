@@ -1,6 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 23 Nov 2026 v726
+ *
+ * v726 - P-39 S4 (the Plan; Free unchanged). What matters most leads the arc's aims (Set what you're working towards under Today); Making my Move, opened again, offers one door used often to put on Home. No new files.
+ *
  * 23 Nov 2026 v725
  *
  * v725 - P-39 S3 HOME (the Plan; Free unchanged). Home follows Making my Move: only the chosen doors on a good day, the hard-day choices on a hard day, It's a hard day and Change what Alongside is for under Today. store.js v126 (myMove.day). No new files.
@@ -4281,7 +4285,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v725";
+const CACHE_NAME = "alongside-v726";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4366,7 +4370,7 @@ const SHELL_HASHES = {
   "./js/auth.js": "9b9c7a632dccada6",
   "./js/views/today.js": "1ebac1eefa630699",
   "./js/views/mobility-conditioning.js": "8b30ad4fa0887d62",
-  "./js/views/arc-setup.js": "f96f80a770f56b47",
+  "./js/views/arc-setup.js": "c1d43e86b901ace3",
   "./js/views/stretch-arc.js": "cdc78c24b91d2e1c",
   "./js/views/checkin.js": "5ea0fea142be8ceb",
   "./js/views/checkin-mini.js": "c647f4da71feddde",
@@ -4408,7 +4412,7 @@ const SHELL_HASHES = {
   "./js/data/arc-readback.js": "9b06dcba96534da0",
   "./js/data/tier-table.js": "7821c3304bd0815c",
   "./js/views/know-what.js": "e84fee3e6d9d3af0",
-  "./js/views/plan-home.js": "99d9b0393a696f6b",
+  "./js/views/plan-home.js": "eea27eac3a8e2879",
   "./js/views/path.js": "440a45cfcd4f385f",
   "./js/plan-look.js": "7674d8fbf5101aa9",
   "./js/views/plan-finish.js": "d3901b6355f55542",
@@ -4419,7 +4423,7 @@ const SHELL_HASHES = {
   "./js/data/swap-search.js": "5f0f0e4d112f92ea",
   "./js/views/build-session.js": "763317cec8c62e83",
   "./js/data/build-lately.js": "e06714cc9d1539a6",
-  "./css/components/path.css": "69715a0c133501bf",
+  "./css/components/path.css": "073194af3ebdb43a",
   "./js/data/red-flag.js": "3cd9eecbc3985eb3",
   "./js/data/health-consent.js": "a23d005af57f179c",
   "./js/data/age-check.js": "7fa5b0f5a6b34770",
@@ -4435,8 +4439,8 @@ const SHELL_HASHES = {
   "./js/data/plan-reader.js": "8b909dcd350014b1",
   "./js/views/plan-import.js": "b4b6bc817ef1b455",
   "./js/views/change-today.js": "dfaf52c019014371",
-  "./js/views/my-move.js": "9212e52a89cfee79",
-  "./js/data/my-move.js": "ccab37ffb072fbf4",
+  "./js/views/my-move.js": "f636b827733f20bb",
+  "./js/data/my-move.js": "6750b6b8374389e4",
   "./js/data/week-changes.js": "1bd0a7a6db2c338f",
   "./js/data/little-and-often.js": "5ea20b534c403550",
   "./js/data/sore-rule.js": "f6ea51d828be37f0",
