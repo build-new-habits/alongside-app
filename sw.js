@@ -1,6 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 23 Nov 2026 v724
+ *
+ * v724 - P-39 S2 SCREENS (the Plan; Free unchanged). Making my Move: What's it for? (eight purposes, Try it first, which matters most), On a good day, how much choice?, and On a hard day, what would help? (up to two; Rest alone), with a live preview of Home; every choice kept as made, so it resumes. Not yet reached from Home (S3). NEW FILES precached: js/views/my-move.js, js/data/my-move.js.
+ *
  * 23 Nov 2026 v723
  *
  * v723 - P-39 S1 SCHEMA (the Plan; Free unchanged; nothing changes on screen). store.js v125 keeps Making my Move's record (myMove), made safe on every load. Schema v1.127.
@@ -4273,7 +4277,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v723";
+const CACHE_NAME = "alongside-v724";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4339,7 +4343,7 @@ const SHELL_HASHES = {
   "./css/components/capture.css": "343b4ae0dc6fe6ea",
   "./css/components/finish.css": "c33e298d5fcb92ae",
   "./js/app.js": "f1496daa7cfb04a4",
-  "./js/router.js": "35549644c785935c",
+  "./js/router.js": "89d2aec6f28f6662",
   "./js/store.js": "2eb781e77ba1bbcf",
   "./js/session-log.js": "6134de4315842e05",
   "./js/exercise-feedback.js": "adba8549f444da2a",
@@ -4411,7 +4415,7 @@ const SHELL_HASHES = {
   "./js/data/swap-search.js": "5f0f0e4d112f92ea",
   "./js/views/build-session.js": "763317cec8c62e83",
   "./js/data/build-lately.js": "e06714cc9d1539a6",
-  "./css/components/path.css": "edb96497e820891b",
+  "./css/components/path.css": "bee23e551254f925",
   "./js/data/red-flag.js": "3cd9eecbc3985eb3",
   "./js/data/health-consent.js": "a23d005af57f179c",
   "./js/data/age-check.js": "7fa5b0f5a6b34770",
@@ -4427,6 +4431,8 @@ const SHELL_HASHES = {
   "./js/data/plan-reader.js": "8b909dcd350014b1",
   "./js/views/plan-import.js": "b4b6bc817ef1b455",
   "./js/views/change-today.js": "dfaf52c019014371",
+  "./js/views/my-move.js": "9212e52a89cfee79",
+  "./js/data/my-move.js": "7984e152bd44deda",
   "./js/data/week-changes.js": "1bd0a7a6db2c338f",
   "./js/data/little-and-often.js": "5ea20b534c403550",
   "./js/data/sore-rule.js": "f6ea51d828be37f0",
@@ -4766,6 +4772,8 @@ const SHELL_URLS = [
   "./js/data/plan-reader.js",
   "./js/views/plan-import.js",
   "./js/views/change-today.js",
+  "./js/views/my-move.js",
+  "./js/data/my-move.js",
   "./js/data/week-changes.js",
   "./js/data/little-and-often.js",
   "./js/data/sore-rule.js",
