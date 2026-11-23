@@ -1,6 +1,14 @@
 /**
  * data/my-move.js
- * 23 Nov 2026 v2
+ * 23 Nov 2026 v3
+ *
+ * v3 - S4 AIM AND SUGGESTIONS. AIMS_FOR: for each purpose, the arc aims
+ *   (data/aims.js, none held) that fit it, in order; aimsForMost() puts
+ *   them first where the arc asks "What do you want to be able to do?".
+ *   The arc's own questions stay (being asked is the Plan's experience,
+ *   ARC-3-SETUP); Making my Move leads the choice and does not make it.
+ *   suggestion(): a door not on Home, started five or more times in the
+ *   last 30 days (activityLog door), not said no to; only with "my doors".
  *
  * v2 - S3 HOME. homeDay(): Making my Move not yet made, a good day or a
  *   hard day (the check-in: energy at Low or below, or mood at Struggling;
@@ -136,4 +144,48 @@ export function homeDay({ badSore = false } = {}) {
 /** S3. It's a hard day / Show my usual Home, for today only. */
 export function setToday(mode) {
   store.setMyMove({ day: { date: store._localDay(), mode } });
+}
+
+/** S4. The arc aims that fit each purpose, in the order they are offered. */
+export const AIMS_FOR = {
+  stronger: ["lift-heavier", "stronger-core", "stay-independent", "carry-shopping"],
+  moving:   ["walk-further", "run-5k-nonstop", "ride-swim-further", "outdoors-more"],
+  stretch:  ["flexible-again", "desk-comfort", "neck-shoulders-ease", "reach-overhead"],
+  feel:     ["steadier-in-myself", "energy-through-day", "sleep-better", "kinder-to-myself"],
+  yoga:     ["flexible-again", "steadier-in-myself"],
+  calm:     ["steadier-in-myself", "sleep-better", "kinder-to-myself"],
+  trend:    ["lift-heavier", "faster", "run-further"],
+  instep:   ["meet-people-better", "with-others"],
+};
+
+/** S4. The aim ids to offer first, from what matters most (none if not made). */
+export function aimsForMost() {
+  const m = store.get("myMove");
+  return m && m.made && m.most ? (AIMS_FOR[m.most] || []).slice() : [];
+}
+
+/** S4. Whether Home should offer the arc next: made, something matters most, no arc yet. */
+export function arcNext() {
+  const arc = store.get("arc") || {};
+  return aimsForMost().length > 0 && !(arc.active && arc.aimId);
+}
+
+/**
+ * S4. One door to suggest putting on Home, or null (spec section 4): not on
+ * Home, started five or more times in the last 30 days, never said no to.
+ * Only when Home shows "my doors" (the other two choices show none or all).
+ */
+export function suggestion(now = new Date()) {
+  const m = store.get("myMove");
+  if (!m || !m.made || m.goodDay !== "few") return null;
+  const onHome = goodDayDoors(m);
+  const since = now.getTime() - 30 * 864e5;
+  const counts = {};
+  for (const e of store.get("activityLog") || []) {
+    const t = new Date(e.completedAt || e.loggedAt || e.date || 0).getTime();
+    if (!DOOR_IDS.includes(e.door) || !(t >= since && t <= now.getTime())) continue;
+    counts[e.door] = (counts[e.door] || 0) + 1;
+  }
+  const id = DOOR_IDS.find(d => !onHome.includes(d) && !m.dismissed.includes(d) && (counts[d] || 0) >= 5);
+  return id ? { id, count: counts[id] } : null;
 }

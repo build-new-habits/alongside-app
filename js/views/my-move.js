@@ -1,6 +1,12 @@
 /**
  * views/my-move.js
- * 23 Nov 2026 v1
+ * 23 Nov 2026 v2
+ *
+ * v2 - S4. Opened again after it is made, What's it for? leads with one
+ *   suggestion when there is one ("You've used Stretch often lately. Put it
+ *   on Home?" Add it / No thanks; no thanks is kept and never asked again).
+ *   Which matters most says what it does now: it leads the aims offered when
+ *   they set what they're working towards.
  *
  * P-39 MAKING MY MOVE, S2 SCREENS (spec docs/specs/alongside_making-my-move_23nov2026_v1.md
  * section 2; tap-through prototype v2, agreed by Graeme 23 Nov: "Those
@@ -31,7 +37,7 @@ import { store } from "../store.js";
 import { isPremium } from "../auth.js";
 import { lineIcon } from "../data/line-icons.js";
 import { renderFigure, hasFigure } from "../figures.js";
-import { PURPOSES, HARD_OFFERED, GOOD, purposeById, myMoveForScreens, goodDayDoors, previewSentence } from "../data/my-move.js";
+import { PURPOSES, HARD_OFFERED, GOOD, purposeById, myMoveForScreens, goodDayDoors, previewSentence, suggestion } from "../data/my-move.js";
 
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const STEPS = ["intro", "for", "good", "hard"];
@@ -117,14 +123,22 @@ export function MyMoveView(router) {
   function forScreen() {
     const r = m();
     const chosen = PURPOSES.filter(p => r.purposes.includes(p.id));
+    const sug = suggestion();
+    const sp = sug ? purposeById(sug.id) : null;
     return `${header("intro")}
       <p class="mm-kicker">Step 1 of 3</p>
       <h1 class="yw-title" tabindex="-1">What's it for?</h1>
+      ${sp ? `<section class="mm-suggest" aria-labelledby="mm-suggest-h">
+        <p class="mm-suggest__t" id="mm-suggest-h">You've used ${esc(sp.short)} often lately. Put it on Home?</p>
+        <div class="mm-suggest__actions">
+          <button type="button" class="btn btn-primary" data-sug-yes="${sp.id}" data-key="sug-yes">Add it</button>
+          <button type="button" class="btn btn-secondary" data-sug-no="${sp.id}" data-key="sug-no">No thanks</button>
+        </div></section>` : ""}
       <p class="yw-sub">Choose as many as you like. Ticked from what you told me at the start. Try any of them first.</p>
       <ul class="mm-list" aria-label="What Alongside: Move is for">${PURPOSES.map(purposeRow).join("")}</ul>
       ${chosen.length >= 2 ? `<fieldset class="mm-field">
         <legend class="mm-legend">Which matters most right now?</legend>
-        <p class="yw-sub">This becomes what you're working towards. Change it any time.</p>
+        <p class="yw-sub">The aims that fit it come first when you set what you're working towards.</p>
         ${chosen.map(p => `<label class="mm-radio"><input type="radio" name="mm-most" value="${p.id}" data-key="m-${p.id}"${r.most === p.id ? " checked" : ""}><span>${esc(p.short)}</span></label>`).join("")}
       </fieldset>` : ""}
       ${footer(false, 'data-go="good" data-key="next"', "Next")}`;
@@ -229,6 +243,13 @@ export function MyMoveView(router) {
     $$("[data-taste]").forEach(b => b.addEventListener("click", () => {
       const id = b.dataset.taste; open.has(id) ? open.delete(id) : open.add(id); focusKey = b.dataset.key; render();
     }));
+    root.querySelector("[data-sug-yes]")?.addEventListener("click", e => {
+      const id = e.currentTarget.dataset.sugYes;
+      store.setMyMove({ purposes: [...m().purposes, id] }); focusKey = null; render(true); say(false);
+    });
+    root.querySelector("[data-sug-no]")?.addEventListener("click", e => {
+      store.setMyMove({ dismissed: [...m().dismissed, e.currentTarget.dataset.sugNo] }); focusKey = null; render(true);
+    });
     $$('input[name="mm-most"]').forEach(i => i.addEventListener("change", () => {
       store.setMyMove({ most: i.value }); focusKey = i.dataset.key; render(); say(false);
     }));

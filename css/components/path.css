@@ -1,6 +1,8 @@
 /* ============================================================
    components/path.css
-   23 Nov 2026 v17
+   23 Nov 2026 v18
+
+   v18 - P-39 S4: Making my Move's one suggestion (.mm-suggest).
 
    v17 - P-39 S3 HOME: the line under Today for Making my Move, It's a
    hard day / Show my usual Home and Change what Alongside is for
@@ -597,3 +599,9 @@ html:has(.mm-view:not(.mm-view--big)) { scroll-padding-bottom: 240px; }
 .path-mm { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-4); margin-top: calc(-1 * var(--space-1)); }
 .path-mm__line { margin: 0; flex: 1 1 100%; color: var(--color-text-secondary); font-size: var(--text-sm); }
 .path-mm__note { margin: 0; }
+
+/* ---------- P-39 S4: one suggestion (v18) ---------- */
+.mm-suggest { padding: var(--space-3); border: 2px solid var(--color-primary); border-radius: var(--radius-lg, 16px); background: var(--color-surface); display: flex; flex-direction: column; gap: var(--space-2); }
+.mm-suggest__t { margin: 0; font-weight: 700; color: var(--color-text); }
+.mm-suggest__actions { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.mm-suggest__actions .btn { flex: 1 1 140px; min-height: 48px; }
