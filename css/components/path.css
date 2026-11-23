@@ -1,6 +1,10 @@
 /* ============================================================
    components/path.css
-   23 Nov 2026 v16
+   23 Nov 2026 v17
+
+   v17 - P-39 S3 HOME: the line under Today for Making my Move, It's a
+   hard day / Show my usual Home and Change what Alongside is for
+   (.path-mm), and the hard day's one line (.path-mm__note).
 
    v16 - P-39 MAKING MY MOVE S2: the screens' purposes (.mm-opt, built
    from .path-door, aria-pressed shown by a border and a tick, never colour
@@ -588,3 +592,8 @@ body:has(#main-content .plan-back, #main-content .plan-exit) #hidden-nav-home-bt
 /* P-39: a focused choice is never hidden under the pinned preview (WCAG 2.4.11). */
 html:has(.mm-view:not(.mm-view--big)) { scroll-padding-bottom: 240px; }
 .mm-view--big .mm-foot { position: static; }
+
+/* ---------- P-39 S3: Making my Move on Home (v17) ---------- */
+.path-mm { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-4); margin-top: calc(-1 * var(--space-1)); }
+.path-mm__line { margin: 0; flex: 1 1 100%; color: var(--color-text-secondary); font-size: var(--text-sm); }
+.path-mm__note { margin: 0; }

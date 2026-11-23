@@ -1,6 +1,10 @@
 /**
  * tools/chromium-my-move.mjs
- * 23 Nov 2026 v1
+ * 23 Nov 2026 v2
+ *
+ * v2 - S3: the Plan's Home after Making my Move, on a good day (two doors,
+ *   Calm my mind, It's a hard day) and a hard day (the one line, two
+ *   choices, Show my usual Home).
  *
  * P-39 MAKING MY MOVE S2, the real-browser half of verify-my-move-screens
  * (the Plan): Making my Move, What's it for? with a taste open, On a good
@@ -42,6 +46,8 @@ const SCREENS = [
   ["mm", ['[data-go="for"]', '[data-taste="stronger"]'], "What's it for?, a taste open"],
   ["mm", ['[data-go="for"]', '[data-go="good"]'], "On a good day"],
   ["mm", ['[data-go="for"]', '[data-go="good"]', '[data-go="hard"]', '[data-hard="walk"]'], "On a hard day, two chosen"],
+  ["home-good", [], "Home, a good day"],
+  ["home-hard", [], "Home, a hard day"],
 ];
 
 const browser = await chromium.launch({ executablePath: process.env.CHROMIUM || "/opt/pw-browsers/chromium" });
@@ -53,7 +59,7 @@ for (const scheme of ["light", "dark"]) for (const width of [390, 320]) for (con
   await page.goto(BASE); await page.waitForTimeout(1000);
   for (let [where, presses, name] of SCREENS) {
     const label = `${scheme} ${width}px text ${size}: ${name}`;
-    await page.evaluate(async ({ size }) => {
+    await page.evaluate(async ({ size, where }) => {
       const s = window.store;
       const { POLICY_VERSION } = await import("./js/data/consent-version.js");
       const { AGE_CHECK_VERSION } = await import("./js/data/age-check.js");
@@ -66,9 +72,16 @@ for (const scheme of ["light", "dark"]) for (const width of [390, 320]) for (con
       s.set("onboardingComplete", true); s.set("name", "Graeme"); s.set("tier", "personal");
       s.set("goals", ["get-stronger", "flexibility", "reduce-stress"]);
       const DP = await import("./js/display-prefs.js"); DP.setDisplayPref("textScale", size); DP.applyDisplayPrefs();
-    }, { size });
+      if (where !== "mm") {
+        const k = new Date().toISOString().split("T")[0], e = where === "home-hard" ? 3 : 7;
+        s.set("checkinHistory", { [k]: { energy: e, mood: 6, date: new Date().toDateString() } });
+        s.set("lastCheckin", { energy: e, mood: 6, date: new Date().toDateString(), timestamp: new Date().toISOString() });
+        s.setMyMove({ made: new Date().toISOString(), purposes: ["stronger", "stretch", "calm", "instep"], most: "stronger", goodDay: "few", hardDay: ["coach", "walk"] });
+      }
+    }, { size, where });
     await page.evaluate(() => window.router.navigate("today")); await page.waitForTimeout(150);
-    await page.evaluate(() => window.router.navigate("my-move"));
+    if (where === "mm") await page.evaluate(() => window.router.navigate("my-move"));
+    else { await page.evaluate(() => window.router.navigate("progress")); await page.waitForTimeout(100); await page.evaluate(() => window.router.navigate("today")); }
     await page.waitForTimeout(500);
     for (const p of presses) {
       const hit = await page.evaluate(v => {

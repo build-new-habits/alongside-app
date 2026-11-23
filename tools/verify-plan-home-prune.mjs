@@ -1,6 +1,12 @@
 /**
  * tools/verify-plan-home-prune.mjs
- * 14 Nov 2026 v4
+ * 23 Nov 2026 v5
+ *
+ * v5 - P-39 S3 (Making my Move, prototype v2 agreed by Graeme 23 Nov). The
+ *   line under Today (.path-mm: Making my Move before it is made; then It's
+ *   a hard day / Show my usual Home and Change what Alongside is for) sits
+ *   with the Today card, as Change today does, so it is not counted. Six
+ *   ways in still holds for everything else. Nothing else loosened.
  *
  * v4 - P-31 (Graeme, 14 Nov: "Count Change today with the Today card").
  *   Six ways in still holds. Change today and its Undo (.path-change) are
@@ -109,7 +115,7 @@ function home() { main.innerHTML = ""; TodayView(fakeRouter).mount(main); }
 // Ways in: anything on Home's own content that can be pressed (the bottom
 // navigation is in index.html, not here).
 // P-31 (Graeme, 14 Nov): Change today and its Undo count with the Today card; Little and often is the person's own choice.
-const waysIn = () => [...main.querySelectorAll("button, a[href], [role=button]")].filter(b => !b.closest(".today-scope, .scope-notice, .path-change, .path-lao") && !b.matches(".path-lao__all"));
+const waysIn = () => [...main.querySelectorAll("button, a[href], [role=button]")].filter(b => !b.closest(".today-scope, .scope-notice, .path-change, .path-lao, .path-mm") && !b.matches(".path-lao__all"));
 const card = () => main.querySelector(".home-week, .home-today");
 const doorActions = () => [...main.querySelectorAll(".home-doors .home-door")].map(d => d.dataset.action);
 const homeRoutes = () => [...main.querySelectorAll("[data-route]")].map(b => b.dataset.route);

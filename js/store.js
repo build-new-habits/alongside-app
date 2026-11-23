@@ -6,7 +6,13 @@ import { validateWeightTarget } from "./data/weight-targets.js";
 
 /**
  * store.js - Data persistence layer
- * 23 Nov 2026 v125
+ * 23 Nov 2026 v126
+ *
+ * v126 - P-39 S3 HOME (a touch-once exception, recorded in the spec: S3
+ *   needs one key S1 did not foresee). myMove.day { date, mode } or null:
+ *   what the person said about today on Home. mode "hard" (It's a hard
+ *   day) or "usual" (Show my usual Home), for that local day only; any
+ *   other day it is read as nothing. Cleaned on load. Schema v1.128.
  *
  * v125 - P-39 MAKING MY MOVE, schema first (S1; spec docs/specs/
  *   alongside_making-my-move_23nov2026_v1.md; Graeme, 23 Nov: "Those
@@ -2173,6 +2179,8 @@ export const store = {
     let hardDay = Array.isArray(src.hardDay) ? only(src.hardDay, V.hardDay) : ['coach'];
     if (hardDay.includes('rest')) hardDay = ['rest'];
     hardDay = hardDay.slice(0, 2);
+    const day = src.day && typeof src.day === 'object' && /^\d{4}-\d{2}-\d{2}$/.test(src.day.date) && ['hard', 'usual'].includes(src.day.mode)
+      ? { date: src.day.date, mode: src.day.mode } : null;
     const made = typeof src.made === 'string' && /^\d{4}-\d{2}-\d{2}T/.test(src.made) && !isNaN(new Date(src.made)) ? src.made : null;
     return {
       step:      V.step.includes(src.step) ? src.step : null,
@@ -2182,6 +2190,7 @@ export const store = {
       goodDay:   V.goodDay.includes(src.goodDay) ? src.goodDay : 'few',
       hardDay,
       dismissed: only(src.dismissed, V.doors),
+      day,
     };
   },
 
@@ -2808,7 +2817,7 @@ export const store = {
       // is liked or not wanted, never both (likeMovement / setExercisePreference).
       likedMovements: {},
       // P-39 MAKING MY MOVE (v125). Spec section 7.
-      myMove: { step: null, made: null, purposes: [], most: null, goodDay: 'few', hardDay: ['coach'], dismissed: [] },
+      myMove: { step: null, made: null, purposes: [], most: null, goodDay: 'few', hardDay: ['coach'], dismissed: [], day: null },
 
       // P-19, v119. The fitness trends the person follows, each once:
       // [{ id, startedAt: 'YYYY-MM-DD', activity }]. See TREND_RULES.
