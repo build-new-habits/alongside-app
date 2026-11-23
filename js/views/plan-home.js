@@ -1,6 +1,10 @@
 /**
  * views/plan-home.js
- * 23 Nov 2026 v16
+ * 23 Nov 2026 v17
+ *
+ * v17 - OWN-DONE-TODAY (Graeme, 23 Nov: "It says I did these today but I
+ *   didn't"). Done today is read through store.ownDoneToday(): ticked today
+ *   only (the flag was never cleared).
  *
  * v16 - P-39 S6 QUIET HOME (Graeme, 23 Nov: "I'd like them to disappear
  *   off the main home page"; "be exceptional"). It's a hard day and Change
@@ -259,7 +263,7 @@ function moodPath(before, after) {
 
 function ownLeft(t) {
   const group = t.own === "all" ? null : t.own;
-  return (store.get("prescribedExercises") || []).filter(e => !e.completedToday && (!group || e.group === group)).length;
+  return (store.get("prescribedExercises") || []).filter(e => !store.ownDoneToday(e) && (!group || e.group === group)).length;
 }
 
 /**

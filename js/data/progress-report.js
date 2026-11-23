@@ -1,6 +1,10 @@
 /**
  * data/progress-report.js
- * 31 Oct 2026 v2
+ * 23 Nov 2026 v3
+ *
+ * v3 - OWN-NAMES (Graeme, 23 Nov: own exercises showed as "Px 1794424682372 14"). readableId() never
+ *   shows one of My exercises' ids (px-...): it says "One of your own
+ *   exercises" when the list no longer has it. ownName(id, own) names them.
  *
  * v2 - STAGE PATH Session 7 (P-7 PROGRESS-STORY; blueprint D6). The Plan's
  *   before and after: moodPairs() reads, for each finished session, the
@@ -180,8 +184,15 @@ export function movesFor(entry, liftLog = {}, exerciseName = id => id) {
  * developer vocabulary).
  */
 export function readableId(id) {
+  if (/^px-\d/.test(String(id || ""))) return "One of your own exercises";
   const s = String(id || "").replace(/[-_]+/g, " ").replace(/\s+/g, " ").trim();
   return s ? s.charAt(0).toUpperCase() + s.slice(1) : "A move";
+}
+
+/** v3. The name of one of My exercises (px-...), from the list, or null. */
+export function ownName(id, own = []) {
+  const e = (Array.isArray(own) ? own : []).find(x => x && x.id === id);
+  return e && e.name ? String(e.name) : null;
 }
 
 /** One set in words: "10 × 40 kg", "2 min", "Level 6, 12 min". */

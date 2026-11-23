@@ -1,6 +1,8 @@
 # Alongside — Data Schema Reference
-## 23 Nov 2026 v1.130
+## 23 Nov 2026 v1.131
 
+> **v1.131, 23 Nov 2026 — OWN-DONE-TODAY** (`store.js` v129). No field added or changed. **`prescribedExercises[].completedToday`** is now read only through `store.ownDoneToday(e)`: done today only when `completedAt` is today's local day (an entry with no `completedAt` keeps its flag). Before this, the flag was set and never cleared, so every exercise ever ticked showed under *Completed today* (Graeme, 23 Nov). Readers: `prescribed.js`, `prescribed-session.js`, `today.js`, `plan-home.js`, `data/week-shape.js`, `data/little-and-often.js`.
+>
 > **v1.130, 23 Nov 2026 — P-39 S6 QUIET HOME** (`store.js` v128). One key added to **`myMove`**: **`review`** `{ arc, block }` or `null` (default `null`): Home asks *Still what you want Alongside for?* once at each twelve-week turn of an arc (weeks 12, 24, …); `arc` is that arc's `startedAt`, `block` the turn answered (1 for week 12, 2 for week 24). **Written by** `setReviewed()` (`data/my-move.js`) through `store.setMyMove()`; **read by** `reviewDue()` (Home). A new arc (another `startedAt`) asks again at its own week 12. **On load:** anything but a string `arc` (40 characters at most) and a whole `block` from 1 to 100 → `null`. A third recorded touch-once exception (spec v6). Not a health answer.
 >
 > **v1.129, 23 Nov 2026 — P-39 S5 CLOSE** (`store.js` v127). One key added to **`myMove`**: **`startClosed`** (ISO) or `null` (default `null`): when the person pressed *Close this list* under **Start your Plan** on Home. While `null`, the list shows on the Plan's Home (never on a hard day). **Written by** `views/plan-home.js` through `store.setMyMove()`; **read by** `startOpen()` (`data/my-move.js`). **On load:** anything but a readable date-time → `null`. A second touch-once exception, recorded in the spec (v5): S1 did not foresee it. Not a health answer.
@@ -1104,7 +1106,7 @@
 
 ## 06 Sep 2026 v1.51
 
-**File:** `js/store.js` (confirmed live version: **v128, 23 Nov 2026**)
+**File:** `js/store.js` (confirmed live version: **v129, 23 Nov 2026**)
 
 > **v1.47, 06 Sep 2026 — CR-1.** `conditions[]` gains three ids and loses one. `chronic-fatigue` is **retired**; `persistent-fatigue`, `me-cfs` and `long-covid` replace it. No field shape changed — `conditions` is still `string[]` and `conditionMeta` is still keyed by condition id.
 >

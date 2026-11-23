@@ -1,7 +1,11 @@
 /**
  * prescribed.js - My exercises
  *
- * 15 Nov 2026 v1.15
+ * 23 Nov 2026 v1.16
+ *
+ * v1.16 - OWN-DONE-TODAY (Graeme, 23 Nov: "It says I did these today but I
+ *   didn't"). Done today is read through store.ownDoneToday(): ticked today
+ *   only (the flag was never cleared).
  *
  * v1.15 - P-25 HOW-TO GUIDES. Guide markers only: Add a plan you already
  *   have (add-plan) and each list's Start (start-group). Nothing else
@@ -168,8 +172,8 @@ let showAddForm = false;
  * @param {string|null} origin - store.get('prescribedExercisesOrigin')
  */
 function buildCoachLine(exercises, energy) {
-  const active = exercises.filter(e => !e.completedToday);
-  const done   = exercises.filter(e => e.completedToday);
+  const active = exercises.filter(e => !store.ownDoneToday(e));
+  const done   = exercises.filter(e => store.ownDoneToday(e));
 
   if (exercises.length === 0) {
     return "Keep your own exercises here \u2014 anything you want to come back to. I'll keep them separate from your other sessions, and if something's sore on the day I'll tell you which ones load it.";
@@ -190,8 +194,8 @@ function buildCoachLine(exercises, energy) {
 
 export function render() {
   const exercises  = store.get("prescribedExercises") || [];
-  const active     = exercises.filter(e => !e.completedToday);
-  const done       = exercises.filter(e => e.completedToday);
+  const active     = exercises.filter(e => !store.ownDoneToday(e));
+  const done       = exercises.filter(e => store.ownDoneToday(e));
   const checkin    = store.get("lastCheckin") || {};
   const energy     = checkin.energy || null;
   const coachLine  = buildCoachLine(exercises, energy);

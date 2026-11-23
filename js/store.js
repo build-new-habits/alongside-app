@@ -6,7 +6,10 @@ import { validateWeightTarget } from "./data/weight-targets.js";
 
 /**
  * store.js - Data persistence layer
- * 23 Nov 2026 v128
+ * 23 Nov 2026 v129
+ *
+ * v129 - OWN-DONE-TODAY (Graeme, 23 Nov). ownDoneToday(e): one of My
+ *   exercises is done today only if completedAt is today. No field changes.
  *
  * v128 - P-39 S6 QUIET HOME (Graeme, 23 Nov: the hard-day and change links
  *   off Home). myMove.review { arc, block } or null: the twelve-week turn
@@ -2060,6 +2063,20 @@ export const store = {
   },
 
   /** P13, v83. The local day, "YYYY-MM-DD". */
+  /**
+   * v129 - OWN-DONE-TODAY (Graeme, 23 Nov: "It says I did these today but I
+   * didn't"). One of My exercises is done today only if it was ticked
+   * today: completedToday was set and never cleared, so every exercise ever
+   * ticked stayed under Completed today. completedAt (set with it) must be
+   * today's local day; an entry with no completedAt keeps its flag.
+   */
+  ownDoneToday(e) {
+    if (!e || !e.completedToday) return false;
+    if (!e.completedAt) return true;
+    const t = Date.parse(e.completedAt);
+    return Number.isFinite(t) && this._localDay(new Date(t)) === this._localDay();
+  },
+
   _localDay(d = new Date()) {
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
   },
