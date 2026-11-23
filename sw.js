@@ -1,6 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 23 Nov 2026 v729
+ *
+ * v729 - OWN-DONE-TODAY and OWN-NAMES (both tiers). My exercises' ticks count for the day they were made; Progress names your own exercises. No new files.
+ *
  * 23 Nov 2026 v728
  *
  * v728 - P-39 S6 QUIET HOME (the Plan; Free unchanged). It's a hard day and Change what Alongside is for leave Home; Home asks once when it matters (an in-between day; twelve weeks into an arc); It's a hard day in Change today. No new files.
@@ -4293,7 +4297,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v728";
+const CACHE_NAME = "alongside-v729";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4360,7 +4364,7 @@ const SHELL_HASHES = {
   "./css/components/finish.css": "c33e298d5fcb92ae",
   "./js/app.js": "f1496daa7cfb04a4",
   "./js/router.js": "89d2aec6f28f6662",
-  "./js/store.js": "54b23916f6981a07",
+  "./js/store.js": "72e43f520b878739",
   "./js/session-log.js": "6134de4315842e05",
   "./js/exercise-feedback.js": "adba8549f444da2a",
   "./js/exercise-card.js": "4ed40e63efe33a26",
@@ -4376,7 +4380,7 @@ const SHELL_HASHES = {
   "./js/session-guard.js": "00177a846537868c",
   "./js/session-resume.js": "6916b88c0757374f",
   "./js/auth.js": "9b9c7a632dccada6",
-  "./js/views/today.js": "1ebac1eefa630699",
+  "./js/views/today.js": "31d084f39148d844",
   "./js/views/mobility-conditioning.js": "8b30ad4fa0887d62",
   "./js/views/arc-setup.js": "c1d43e86b901ace3",
   "./js/views/stretch-arc.js": "cdc78c24b91d2e1c",
@@ -4384,7 +4388,7 @@ const SHELL_HASHES = {
   "./js/views/checkin-mini.js": "c647f4da71feddde",
   "./js/views/coach-proposal.js": "816ba25a48fe721e",
   "./js/views/workout.js": "fba068b2e4f6c61f",
-  "./js/views/progress.js": "aae7d6a3c1ffaee5",
+  "./js/views/progress.js": "8338387f9ccd4ba3",
   "./js/views/settings.js": "409f0a13bbb63e89",
   "./js/views/restore-flow.js": "dc81c2e455fa472d",
   "./js/views/weekly-plan.js": "dcee06e297b402c0",
@@ -4420,7 +4424,7 @@ const SHELL_HASHES = {
   "./js/data/arc-readback.js": "9b06dcba96534da0",
   "./js/data/tier-table.js": "7821c3304bd0815c",
   "./js/views/know-what.js": "e84fee3e6d9d3af0",
-  "./js/views/plan-home.js": "24bd556704f74c9a",
+  "./js/views/plan-home.js": "79cdb2685714c941",
   "./js/views/path.js": "440a45cfcd4f385f",
   "./js/plan-look.js": "7674d8fbf5101aa9",
   "./js/views/plan-finish.js": "d3901b6355f55542",
@@ -4441,7 +4445,7 @@ const SHELL_HASHES = {
   "./js/data/kind-colours.js": "f247edabfec2fd3d",
   "./js/data/line-icons.js": "ac72317a529cf62b",
   "./js/data/week-shape-model.js": "7889ce6889cad039",
-  "./js/data/week-shape.js": "e77e784bdbf00e28",
+  "./js/data/week-shape.js": "57cc6aa85210d710",
   "./js/data/warm-views.js": "73c268f74f004e8e",
   "./js/views/your-week.js": "037bff571dd21bee",
   "./js/data/plan-reader.js": "8b909dcd350014b1",
@@ -4450,7 +4454,7 @@ const SHELL_HASHES = {
   "./js/views/my-move.js": "bc53b61cdf65da20",
   "./js/data/my-move.js": "c6ec80cda14e499b",
   "./js/data/week-changes.js": "1bd0a7a6db2c338f",
-  "./js/data/little-and-often.js": "5ea20b534c403550",
+  "./js/data/little-and-often.js": "9828926d20ce94dc",
   "./js/data/sore-rule.js": "f6ea51d828be37f0",
   "./js/data/stretch-stiffness.js": "80d3e230b5f0ecef",
   "./js/data/plan-share.js": "0461891c97ca592b",
@@ -4522,8 +4526,8 @@ const SHELL_HASHES = {
   "./js/data/guide-me.js": "ed77e97b8a8a35ea",
   "./js/views/journal-entry.js": "dd38e795ee54e7d7",
   "./js/views/gym-programme.js": "98de0c5929699fb1",
-  "./js/views/prescribed.js": "f8ee61de31f26330",
-  "./js/views/prescribed-session.js": "7bc3e8f2ffd6b227",
+  "./js/views/prescribed.js": "b568790260f0f6d1",
+  "./js/views/prescribed-session.js": "ce2eb0c803f66cfe",
   "./js/views/quiet-session.js": "eb439e800dc71d74",
   "./js/views/breathing-session.js": "3d049d83a8e783b9",
   "./js/views/morning-session.js": "549fd3efaac3eb67",
@@ -4589,9 +4593,9 @@ const SHELL_HASHES = {
   "./assets/fonts/inter-latin-600-normal.woff2": "f9a06e79cd3a2a20",
   "./assets/fonts/inter-latin-700-normal.woff2": "6f56409fd3d64bb8",
   "./assets/images/logo-icon-512.png": "83e03cc4171a36cc",
-  "./js/data/progress-report.js": "5bbd5461406855bb",
+  "./js/data/progress-report.js": "9f12b0421f0c4adb",
   "./js/data/share-images.js": "0812f14d822387ad",
-  "./js/views/progress-share.js": "b1238e1af7f8cecb",
+  "./js/views/progress-share.js": "6cf56fe459d112dd",
   "./css/components/progress-share.css": "255a457d4a3168d9",
   "./assets/fonts/newsreader-latin-500-normal.woff2": "5613e2fc8377392c",
   "./assets/fonts/newsreader-latin-400-italic.woff2": "fa9b900403949d9a",
