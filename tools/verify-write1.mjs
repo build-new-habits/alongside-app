@@ -1,5 +1,12 @@
 /**
  * tools/verify-write1.mjs
+ * 23 Nov 2026 v14
+ *
+ * v14 - P-39 S1 SCHEMA. myMove joins the baseline as a DATED PROMISE
+ *   (schema first): written by store.setMyMove(), read by nothing until
+ *   S2 (the Making my Move screens) and S3 (Home) connect it; S2 removes
+ *   the line, as the check below insists.
+ *
  * 06 Nov 2026 v13
  *
  * v13 - P-28 S4. coachVoice is connected (Settings › Display writes it;
@@ -231,6 +238,10 @@ const BASELINE = new Set([
   // likedMovements (path-engine.js), Session 4 connects dayOpen
   // (plan-home.js); each removes its line, as the check below insists.
   'dayOpen',
+  // P-39 S1, 23 Nov 2026 (store.js v125). DATED PROMISE, not permission:
+  // written by store.setMyMove() with no reader yet (schema before code).
+  // S2 (views/my-move.js) reads it and removes this line.
+  'myMove',
 
 
   // 'conditionMeta' -- removed 28 Sep 2026. SMOOTH-P4a reads it: Progress
