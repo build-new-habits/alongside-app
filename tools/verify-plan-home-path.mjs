@@ -1,7 +1,13 @@
 import { createRequire as __cr } from "node:module";
 /**
  * tools/verify-plan-home-path.mjs
- * 15 Nov 2026 v5
+ * 23 Nov 2026 v6
+ *
+ * v6 - P-39 S3 (Making my Move, prototype v2 agreed by Graeme 23 Nov). Test
+ *   2's six ways in leaves out the line under Today (.path-mm: Making my
+ *   Move's way in, It's a hard day / Show my usual Home, Change what
+ *   Alongside is for), as it leaves out Change today. Nothing else loosened;
+ *   verify-my-move-home counts the hard day's ways in itself.
  *
  * v5 - P-34 HOME-CALM (Graeme, 15 Nov: "lately in progress"). Lately is not
  *   on Home: 1a's order has no Lately; TEST 5 now checks it is gone from
@@ -119,7 +125,7 @@ function fixture({ tier = "personal", arc = true, choice = undefined, checkin = 
 }
 function home() { main.innerHTML = ""; TodayView(fakeRouter).mount(main); }
 // P-31 (Graeme, 14 Nov): Change today and its Undo count with the Today card; Little and often is the person's own choice.
-const waysIn = () => [...main.querySelectorAll("button, a[href], [role=button]")].filter(b => !b.closest(".scope-notice, .today-hinge, .path-change, .path-lao") && !b.matches(".path-lao__all"));
+const waysIn = () => [...main.querySelectorAll("button, a[href], [role=button]")].filter(b => !b.closest(".scope-notice, .today-hinge, .path-change, .path-lao, .path-mm") && !b.matches(".path-lao__all"));
 const card = () => main.querySelector(".path-today");
 const lead = () => main.querySelector(".path-coach, .path-today");
 const doors = () => [...main.querySelectorAll(".path-doors .path-door[data-door]")];

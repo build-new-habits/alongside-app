@@ -1,6 +1,13 @@
 import { createRequire as __cr } from "node:module";
 /**
  * tools/verify-build-session.mjs
+ * 23 Nov 2026 v2
+ *
+ * v2 - P-39 S3. 4b leaves out the line under Today (.path-mm: Making my
+ *   Move's way in, It's a hard day, Change what Alongside is for), as the
+ *   six-ways-in checks on Home now do (verify-plan-home-path v6,
+ *   verify-plan-home-prune v5). Nothing else loosened.
+ *
  * 02 Nov 2026 v1
  *
  * P-26 ONE-BUILD-PAGE (master schedule v621). Graeme, 02 Nov: one page to
@@ -220,7 +227,7 @@ person(); store.set("savedSessions", [planned("own_f_x6")]); SS.planSavedSession
 home();
 const prow = main.querySelector('[data-action="planned"]');
 ok("4a. saved for today: Home's one row names it", !!prow && /Today: Wednesday gym/.test(txt(prow)) && /You built this/.test(txt(prow)), txt(main.querySelector(".path-coach")));
-ok("4b. still six ways in at most", main.querySelectorAll(".path-home button").length <= 6, main.querySelectorAll(".path-home button").length + "");
+ok("4b. still six ways in at most", [...main.querySelectorAll(".path-home button")].filter(b => !b.closest(".path-mm")).length <= 6, main.querySelectorAll(".path-home button").length + "");
 click(prow); await wait(80);
 ok("4c. one tap: its proposal, behind its door", router.currentView === "path" && /Wednesday gym/.test(txt(main.querySelector("h1"))), router.currentView + " " + txt(main.querySelector("h1")));
 ok("4d. and it can be changed from there", !!main.querySelector("#path-change"));

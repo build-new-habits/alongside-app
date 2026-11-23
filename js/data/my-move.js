@@ -1,6 +1,13 @@
 /**
  * data/my-move.js
- * 23 Nov 2026 v1
+ * 23 Nov 2026 v2
+ *
+ * v2 - S3 HOME. homeDay(): Making my Move not yet made, a good day or a
+ *   hard day (the check-in: energy at Low or below, or mood at Struggling;
+ *   or the person's own word today on Home, which wins); a sore area at Bad
+ *   keeps the usual Home, where its own choice comes first. setToday().
+ *   True words: the gentle stretch and the short walk said ten and fifteen
+ *   minutes, sitting; Home opens the Stretch door and the walk, which ask.
  *
  * P-39 MAKING MY MOVE, S2 (spec docs/specs/alongside_making-my-move_23nov2026_v1.md
  * sections 2, 3 and 7). The words, the seeding from getting started, and
@@ -12,6 +19,7 @@
  */
 
 import { store } from "../store.js";
+import { checkinToday } from "./path-context.js";
 
 /** What it can be for, in the order the screen lists them (spec section 2). */
 export const PURPOSES = [
@@ -38,8 +46,8 @@ export const DOOR_IDS = ["stronger", "moving", "stretch", "feel"];
 /** On a hard day (spec section 2). Holds wait for P-38's content. */
 export const HARD = [
   { id: "coach",   title: "Let the coach pick something gentle", line: "One easy plan, built from your check-in", kind: "teal",   icon: "choose" },
-  { id: "stretch", title: "A gentle stretch",                    line: "Ten minutes, sitting",                    kind: "violet", icon: "mobility" },
-  { id: "walk",    title: "A short walk",                        line: "Fifteen minutes, any pace",               kind: "blue",   icon: "walk" },
+  { id: "stretch", title: "A gentle stretch",                    line: "Sitting or standing, as you like",                    kind: "violet", icon: "mobility" },
+  { id: "walk",    title: "A short walk",                        line: "Any length, any pace",               kind: "blue",   icon: "walk" },
   { id: "holds",   title: "A few seated holds",                  line: "Strength without moving much",            kind: "amber",  icon: "strength", offered: false },
   { id: "calm",    title: "Calm my mind",                        line: "Breathing, sitting still",                kind: "green",  icon: "breath" },
   { id: "rest",    title: "Rest, and that's fine",               line: "Home says so, and nothing else",          kind: "slate",  icon: "rest" },
@@ -104,4 +112,28 @@ export function previewSentence(m, hard = false) {
   const parts = ["Let me choose for you", ...goodDayDoors(m).map(id => purposeById(id).short)];
   if (m.purposes.includes("calm")) parts.push("Calm my mind");
   return "Home will show: " + parts.join(", ") + ".";
+}
+
+/**
+ * S3. Which Home today: "unmade" (Making my Move not done), "good" or
+ * "hard" (spec section 3). The person's own word today wins; otherwise the
+ * check-in: energy 3 or lower (Low, Running on empty) or mood 2 or lower
+ * (Struggling). A sore area at Bad keeps the usual Home (its own Rest or
+ * Something gentler choice comes first).
+ */
+export function hardFromCheckin(c = checkinToday()) {
+  return !!c && ((c.energy != null && c.energy <= 3) || (c.mood != null && c.mood <= 2));
+}
+export function homeDay({ badSore = false } = {}) {
+  const m = store.get("myMove");
+  if (!m || !m.made) return "unmade";
+  if (badSore) return "good";
+  const said = m.day && m.day.date === store._localDay() ? m.day.mode : null;
+  if (said === "usual") return "good";
+  if (said === "hard") return "hard";
+  return hardFromCheckin() ? "hard" : "good";
+}
+/** S3. It's a hard day / Show my usual Home, for today only. */
+export function setToday(mode) {
+  store.setMyMove({ day: { date: store._localDay(), mode } });
 }

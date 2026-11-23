@@ -1,6 +1,9 @@
 /**
  * tools/verify-my-move-schema.mjs
- * 23 Nov 2026 v1
+ * 23 Nov 2026 v2
+ *
+ * v2 - S3 (store.js v126): myMove.day { date, mode } or null, today's word
+ *   from Home (It's a hard day / Show my usual Home). Defaults and 3l-3n.
  *
  * P-39 MAKING MY MOVE, S1 SCHEMA (store.js v125, Schema v1.127; spec
  * docs/specs/alongside_making-my-move_23nov2026_v1.md section 7).
@@ -38,7 +41,7 @@ const ok = (name, cond, detail = "") => {
 const J = v => JSON.stringify(v);
 const saved = () => JSON.parse(localStorage.getItem(store.STORAGE_KEY));
 function load(s) { localStorage.clear(); localStorage.setItem(store.STORAGE_KEY, JSON.stringify(s)); store.init(); }
-const DEF = { step: null, made: null, purposes: [], most: null, goodDay: "few", hardDay: ["coach"], dismissed: [] };
+const DEF = { step: null, made: null, purposes: [], most: null, goodDay: "few", hardDay: ["coach"], dismissed: [], day: null };
 
 console.log("\nTEST 0 - positive control");
 load({ onboardingComplete: true, name: "Sentinel-39" });
@@ -54,7 +57,7 @@ load({ onboardingComplete: true, myMove: "nonsense" });
 ok("2b. a myMove that is not an object loads the default", J(store.get("myMove")) === J(DEF), J(store.get("myMove")));
 
 console.log("\nTEST 3 - each key cleaned on its own");
-const GOOD = { step: "good", made: "2026-11-23T09:41:00.000Z", purposes: ["stronger", "stretch", "instep"], most: "stretch", goodDay: "one", hardDay: ["stretch", "walk"], dismissed: ["feel"] };
+const GOOD = { step: "good", made: "2026-11-23T09:41:00.000Z", purposes: ["stronger", "stretch", "instep"], most: "stretch", goodDay: "one", hardDay: ["stretch", "walk"], dismissed: ["feel"], day: { date: "2026-11-23", mode: "hard" } };
 load({ onboardingComplete: true, myMove: GOOD });
 ok("3a. a well-formed myMove is kept exactly", J(store.get("myMove")) === J(GOOD), J(store.get("myMove")));
 load({ onboardingComplete: true, myMove: { ...GOOD, step: "summary" } });
@@ -76,6 +79,13 @@ load({ onboardingComplete: true, myMove: { ...GOOD, hardDay: [] } });
 ok("3j. an empty hard day is kept empty (the coach's pick is the screen's fallback)", J(store.get("myMove").hardDay) === J([]), J(store.get("myMove").hardDay));
 load({ onboardingComplete: true, myMove: { ...GOOD, dismissed: ["calm", "feel", "feel", "yoga"] } });
 ok("3k. dismissed keeps door ids only, once", J(store.get("myMove").dismissed) === J(["feel"]), J(store.get("myMove").dismissed));
+
+load({ onboardingComplete: true, myMove: { ...GOOD, day: { date: "23 Nov", mode: "hard" } } });
+ok("3l. a day whose date is not a local date loads as null", store.get("myMove").day === null, J(store.get("myMove").day));
+load({ onboardingComplete: true, myMove: { ...GOOD, day: { date: "2026-11-23", mode: "tired" } } });
+ok("3m. a day with an unknown mode loads as null", store.get("myMove").day === null, J(store.get("myMove").day));
+load({ onboardingComplete: true, myMove: { ...GOOD, day: { date: "2026-11-23", mode: "usual", extra: 1 } } });
+ok("3n. a good day keeps only date and mode", J(store.get("myMove").day) === J({ date: "2026-11-23", mode: "usual" }), J(store.get("myMove").day));
 
 console.log("\nTEST 4 - setMyMove");
 load({ onboardingComplete: true, name: "Writer", myMove: GOOD });

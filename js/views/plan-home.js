@@ -1,6 +1,24 @@
 /**
  * views/plan-home.js
- * 15 Nov 2026 v12
+ * 23 Nov 2026 v13
+ *
+ * v13 - P-39 S3 HOME (Making my Move; spec section 3; prototype v2 agreed
+ *   by Graeme, 23 Nov). The Plan's Home follows what the person chose:
+ *   - Not made yet: Home as before, and one line under Today, "Make Home
+ *     yours, in about a minute" with Making my Move.
+ *   - A good day: Let me choose for you, then only the doors they chose
+ *     (none for Just tell me what to do, all four for Show me everything),
+ *     a Calm my mind row when chosen (when three doors or fewer, so six ways
+ *     in still hold), the Library. Under Today: It's a hard day, and Change
+ *     what Alongside is for.
+ *   - A hard day (the check-in: energy Low or below, or mood Struggling; or
+ *     It's a hard day): one line, "A hard day. Here's what you chose for
+ *     days like this.", then only their hard-day choices (or the coach's
+ *     gentle pick), and no doors; Show my usual Home under it. Rest alone is
+ *     said, with nothing to press. A session carried on, planned or done
+ *     today keeps its card. A sore area at Bad keeps the usual Home, where
+ *     its own Rest or Something gentler choice comes first.
+ *   Nothing re-adds a door by itself. Free's Home is unchanged.
  *
  * v12 - P-25 HOW-TO GUIDES. Guide markers only (data-guide-target): the
  *   coach's row (coach-row), your week's day (week-row), Start your list
@@ -143,6 +161,7 @@ import { suggestToday, arcDoor, pickProgramme, movementName } from "../data/path
 import { setTodaysLength } from "../data/session-length.js";
 import { fiveOf } from "../data/progress-report.js";
 import { EFFORT, ZONE2_ACTIVITIES, zone2Week, zone2HardDoneThisWeek } from "../data/trend-recipes.js";
+import { goodDayDoors, HARD_OFFERED, homeDay, setToday } from "../data/my-move.js";
 
 // ── The doors ──────────────────────────────────────────────────────────────
 
@@ -407,6 +426,44 @@ function littleAndOften() {
     <button type="button" class="path-link path-lao__all" data-action="lao-all">All of My exercises</button>`;
 }
 
+// ── P-39 Making my Move on Home ────────────────────────────────────────────
+
+/** Which Home today, and the doors it shows. */
+export function myMoveHome() {
+  const s = needsCheckin() ? null : todaysSuggestion();
+  const day = homeDay({ badSore: s?.route === "bad-day" });
+  const m = store.get("myMove");
+  const doors = day === "unmade" ? DOORS.map(d => d.id) : day === "hard" ? [] : goodDayDoors(m);
+  const calm = day === "good" && m.purposes.includes("calm") && doors.length <= 3;
+  return { day, doors, calm, hard: day === "hard" ? m.hardDay : [] };
+}
+
+const HARD_ROUTE = { coach: "hard-coach", stretch: "hard-stretch", walk: "hard-walk", calm: "hard-calm" };
+const HARD_ICON = { coach: "chat", stretch: "mobility", walk: "walk", calm: "breath" };
+
+/** A hard day: the person's own choices, set on a good day. */
+function hardToday(mm) {
+  const note = `<p class="path-note path-mm__note">A hard day. Here's what you chose for days like this.</p>`;
+  if (mm.hard.includes("rest")) {
+    return note + card("hard", "slate", null, `${head("slate", "rest", "A hard day", "Rest, and that's fine")}
+      <p class="path-today__coach">You chose this for days like this. Rest counts.</p>`);
+  }
+  const picks = (mm.hard.length ? mm.hard : ["coach"]).map(id => HARD_OFFERED.find(h => h.id === id)).filter(h => h && HARD_ROUTE[h.id]);
+  return note + picks.map(h => row("hard", h.kind, HARD_ICON[h.id], h.title, h.line, `data-action="${HARD_ROUTE[h.id]}"`)).join("");
+}
+
+/** Under Today: Making my Move's way in, or It's a hard day / Show my usual Home, and Change. */
+function myMoveBar(mm) {
+  if (mm.day === "unmade") {
+    return `<div class="path-mm"><p class="path-mm__line">Make Home yours, in about a minute.</p>
+      <button type="button" class="path-link" data-action="mm-open">Making my Move</button></div>`;
+  }
+  const toggle = mm.day === "hard"
+    ? `<button type="button" class="path-link" data-action="mm-usual">Show my usual Home</button>`
+    : `<button type="button" class="path-link" data-action="mm-hard">It's a hard day</button>`;
+  return `<div class="path-mm">${toggle}<button type="button" class="path-link" data-action="mm-change">Change what Alongside is for</button></div>`;
+}
+
 // ── Home ───────────────────────────────────────────────────────────────────
 
 /**
@@ -416,7 +473,10 @@ function littleAndOften() {
 export function renderPlanHome(ctx = {}) {
   const arc = arcInfo();
   const state = todayState(ctx.carry);
-  const label = state === "carry" ? "Or instead" : (state === "week" || state === "rest" || state === "planned") ? "Or something else today" : "Or choose for yourself";
+  const mm = myMoveHome();
+  const hardLead = mm.day === "hard" && ["coach", "week", "rest"].includes(state);
+  const label = !mm.doors.length ? "More" : state === "carry" ? "Or instead" : (state === "week" || state === "rest" || state === "planned") ? "Or something else today" : "Or choose for yourself";
+  const shown = DOORS.filter(d => mm.doors.includes(d.id));
   // Your week lives in the Library on the Plan (no card offers to plan it), so the row always names it.
   const libSub = "Classes, practices, the mind, your lists, your week";
   return `
@@ -425,15 +485,21 @@ export function renderPlanHome(ctx = {}) {
       <h1 class="path-greeting" tabindex="-1">${esc(ctx.greeting || "")}</h1>
       ${ctx.coachNote ? `<p class="path-note" role="status">${esc(ctx.coachNote)}</p>` : ""}
       ${arcLine(arc)}
-      ${todayCard(state, ctx.carry)}
-      ${changeBar(state)}
+      ${hardLead ? hardToday(mm) : (mm.day === "hard" ? `<p class="path-note path-mm__note">A hard day. Here's what you chose for days like this.</p>` : "") + todayCard(state, ctx.carry)}
+      ${hardLead ? "" : changeBar(state)}
+      ${myMoveBar(mm)}
       ${littleAndOften()}
       <h2 class="look-label" id="path-doors-h" tabindex="-1">${label}</h2>
       <ul class="path-doors" aria-labelledby="path-doors-h">
-        ${DOORS.map(d => `<li><button type="button" class="path-door" data-door="${d.id}">
+        ${shown.map(d => `<li><button type="button" class="path-door" data-door="${d.id}">
           <span class="kind-tile k-${d.kind}">${lineIcon(d.icon)}</span>
           <span class="path-door__text"><span class="path-door__t">${d.label}</span>${arc.door === d.id ? `<span class="path-door__d">Your arc</span>` : ""}</span>
         </button></li>`).join("")}
+        ${mm.calm ? `<li class="path-doors__wide"><button type="button" class="path-door path-door--wide" data-route="noticing" data-requires-checkin="false">
+          <span class="kind-tile k-green">${lineIcon("breath")}</span>
+          <span class="path-door__text"><span class="path-door__t">Calm my mind</span><span class="path-door__d">Breathing and mindful practice</span></span>
+          <span class="path-door__chev" aria-hidden="true">${lineIcon("chevron", 20)}</span>
+        </button></li>` : ""}
         <li class="path-doors__wide"><button type="button" class="path-door path-door--wide" data-route="library" data-requires-checkin="false" data-guide-target="library">
           <span class="kind-tile k-slate">${lineIcon("library")}</span>
           <span class="path-door__text"><span class="path-door__t">Library</span><span class="path-door__d">${libSub}</span></span>
@@ -496,6 +562,21 @@ export function wirePlanHome(container, router) {
     router.navigate("path");
   }));
   container.querySelector('[data-action="path-coach"]')?.addEventListener("click", () => startCoachChoice(router));
+  // P-39. Making my Move: its way in, today's word, and the hard-day choices.
+  container.querySelectorAll('[data-action="mm-open"], [data-action="mm-change"]').forEach(b => b.addEventListener("click", () => router.navigate("my-move")));
+  container.querySelectorAll('[data-action="mm-hard"], [data-action="mm-usual"]').forEach(b => b.addEventListener("click", () => {
+    setToday(b.dataset.action === "mm-hard" ? "hard" : "usual");
+    router.homeFocus = "mm";
+    router.navigate("today");
+  }));
+  container.querySelector('[data-action="hard-coach"]')?.addEventListener("click", () => startCoachChoice(router));
+  container.querySelector('[data-action="hard-stretch"]')?.addEventListener("click", () => {
+    router.pathStart = { door: "stretch" };
+    if (needsCheckin()) { store.set("pendingDoorRoute", "path"); router.navigate("checkin"); return; }
+    router.navigate("path");
+  });
+  container.querySelector('[data-action="hard-walk"]')?.addEventListener("click", () => router.navigate("walk-session"));
+  container.querySelector('[data-action="hard-calm"]')?.addEventListener("click", () => router.navigate("noticing"));
   // P-31. Change today, its Undo, and Little and often.
   container.querySelector('[data-action="change-today"]')?.addEventListener("click", () => router.navigate("change-today"));
   container.querySelector('[data-action="undo-change"]')?.addEventListener("click", () => {
@@ -513,6 +594,7 @@ export function wirePlanHome(container, router) {
   if (focus) {
     router.homeFocus = null;
     const el = focus === "doors" ? container.querySelector("#path-doors-h")
+      : focus === "mm" ? container.querySelector('[data-action="mm-usual"], [data-action="mm-hard"]')
       : container.querySelector('[data-action="undo-change"]') || container.querySelector('[data-action="change-today"]');
     el?.focus();   // the router keeps focus a view has placed (router.js W4-18)
   }
