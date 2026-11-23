@@ -1,6 +1,9 @@
 /**
  * views/plan-share.js
- * 15 Nov 2026 v1
+ * 23 Nov 2026 v2
+ *
+ * v2 - P-44 PHYSIO LINK S2. Under the three ways to share, Or let them
+ *   change it: Send a link to change (views/plan-link-send.js).
  *
  * P-33 PLAN-SHARE (Graeme, 15 Nov: mock-up v2, "That looks better"; a PDF
  * made on the phone, "Yes"; spec docs/specs/alongside_share-your-plan_15nov2026_v1.md).
@@ -75,6 +78,8 @@ export function PlanShareView(router) {
         <button class="btn btn-secondary btn-large btn-full" id="sp-save">Save as a file</button>
         <button class="btn btn-secondary btn-large btn-full" id="sp-copy">Copy as text</button>
       </div>
+      ${m.has.lists ? `<p class="sp-link-line">Or let them change it, and send it back for you to choose what to keep.</p>
+      <div class="sp-acts"><button class="btn btn-secondary btn-large btn-full" data-go="plan-link-send">Send a link to change</button></div>` : ""}
       ${copyBox ? `<label class="sh-legend" for="sp-text">The text, to copy</label><textarea class="sp-textarea" id="sp-text" rows="10" readonly>${esc(planText(m))}</textarea>` : ""}
       <p class="sh-status" id="sp-status" role="status" aria-live="polite"></p>
       <details class="sp-more" id="sp-more"${open ? " open" : ""}><summary>Change what\u2019s in it</summary>

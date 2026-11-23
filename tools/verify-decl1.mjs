@@ -1,6 +1,12 @@
 /**
  * tools/verify-decl1.mjs
- * 15 Aug 2026 v1
+ * 23 Nov 2026 v2
+ *
+ * v2 - P-44 S2. A name declared later in a list (`var c, mc, qrSvg = '', rect;`,
+ *   as in the vendored data/qr.js) counts as declared; before, only the first
+ *   name in a list did, and qr.js read as five undeclared names. Each earlier
+ *   name in the list may have a simple value (no brackets or commas), so a
+ *   call such as `const x = f(name, 1)` still does not declare name.
  *
  * DECL-1. Every view module must have all its variables declared.
  *
@@ -96,6 +102,7 @@ for (const f of files) {
     if (name.startsWith('aria') || name.startsWith('data')) continue;
     const declared = new RegExp(
       `(?:let|const|var|function|class)\\s+${name}\\b|` +
+      `(?:let|const|var)\\s+(?:[\\w$]+(?:\\s*=\\s*[^,;()\\[\\]{}]*)?\\s*,\\s*)+${name}\\b|` +   // v2: later in a list
       `\\b${name}\\s*(?:,[^)]*)?\\)?\\s*=>|` +          // arrow params
       `function\\s*\\w*\\s*\\([^)]*\\b${name}\\b|` +     // function params
       `\\b(?:catch|for)\\s*\\([^)]*\\b${name}\\b|` +

@@ -1,6 +1,8 @@
 /**
  * tools/chromium-my-move.mjs
- * 23 Nov 2026 v5
+ * 23 Nov 2026 v6
+ *
+ * v6 - P-44 S2: Send a link to change, with the QR code showing.
  *
  * v5 - S6: Home's one question on an in-between day, the twelve-week
  *   question, and Change today with It's a hard day.
@@ -65,6 +67,7 @@ const SCREENS_ALL = [
   ["mm-again", [], "Making my Move again, a suggestion"],
   ["arc", [], "The arc's aims, led"],
   ["settings", ['[data-section-open="plan"]'], "Settings, Your plan"],
+  ["send", ['#pl-qr'], "Send a link to change, the QR code showing"],
 ];
 const SCREENS = process.env.ONLY ? SCREENS_ALL.filter(x => x[0] === process.env.ONLY) : SCREENS_ALL;
 
@@ -93,6 +96,8 @@ for (const scheme of ["light", "dark"]) for (const width of [390, 320]) for (con
       if (where === "mm-again" || where === "arc") {
         s.setMyMove({ made: new Date().toISOString(), purposes: ["stronger", "stretch", "instep"], most: "stretch", goodDay: "few", hardDay: ["coach"] });
         s.set("activityLog", Array.from({ length: 5 }, (_, i) => ({ id: "f" + i, type: "workout", door: "feel", completed: true, durationMins: 20, completedAt: new Date(Date.now() - (i + 1) * 864e5).toISOString() })));
+      } else if (where === "send") {
+        s.set("prescribedExercises", [["Supine Spinal Twist", "Evening Release"], ["Seated Figure-4 Stretch", "Evening Release"], ["Lat Pulldown", "Session A"], ["Seated Cable Row", "Session A"]].map(([name, group], i) => ({ id: "px-1794424682372-" + i, name, group, sets: 3, reps: "45 seconds each side", active: true })));
       } else if (where === "home-new" || where === "settings") {
         // a new Plan: nothing made, nothing set
       } else if (where !== "mm") {
@@ -113,6 +118,7 @@ for (const scheme of ["light", "dark"]) for (const width of [390, 320]) for (con
     if (where === "mm" || where === "mm-again") await page.evaluate(() => window.router.navigate("my-move"));
     else if (where === "arc") await page.evaluate(() => window.router.navigate("arc-setup"));
     else if (where === "settings") await page.evaluate(() => window.router.navigate("settings"));
+    else if (where === "send") await page.evaluate(() => window.router.navigate("plan-link-send"));
     else if (where === "change") await page.evaluate(() => window.router.navigate("change-today"));
     else { await page.evaluate(() => window.router.navigate("progress")); await page.waitForTimeout(100); await page.evaluate(() => window.router.navigate("today")); }
     await page.waitForTimeout(500);
