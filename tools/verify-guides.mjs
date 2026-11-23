@@ -1,6 +1,10 @@
 /**
  * tools/verify-guides.mjs
- * 15 Nov 2026 v3
+ * 23 Nov 2026 v4
+ *
+ * v4 - P-39 S5: A3 Make Home show only what I want (the Plan), walked
+ *   from Start your Plan on Home. Proven: with That's mine unmarked, A3
+ *   stops at 4 of 5.
  *
  * v3 - On the live app (Graeme, 15 Nov: "Where's this?"): A1 on a Home led
  *   by today's day from your week had nothing to ring. TEST 4 now walks A1
@@ -261,6 +265,7 @@ console.log("\nTEST 4 - walks every guide, from the screens");
 const FIX = {
   "A1:homeStarts": { tier: "personal" },
   "A1:free": { tier: "free" },
+  "A3:plan": { tier: "personal" },   // v-S5: Making my Move, from Start your Plan
   "A2:weekLeads": { tier: "personal", own: true, week: "own" },
   "B1:always": { tier: "personal" },
   "C1:noWeek": { tier: "personal", own: true },

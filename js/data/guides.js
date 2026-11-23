@@ -125,6 +125,31 @@ export const GUIDES = Object.freeze([
     ],
   },
   {
+    // P-39 S5. Making my Move, from Start your Plan or Change what Alongside is for.
+    id: "A3", cat: "start", tiers: ["plan"],
+    title: "Make Home show only what I want",
+    outcome: "Home shows what you want Alongside for, and what you chose for hard days. About a minute.",
+    on: ["today", "my-move"],
+    keywords: ["make it mine", "my move", "home", "simple", "hard day", "less", "choose", "personalise", "personalize", "too much"],
+    ways: [{ when: "plan", parts: [{ steps: [
+      { screen: "today", alts: [
+        { target: "mm-open", label: "Making my Move", say: "Under **Start your Plan**, tap **Making my Move**." },
+        { target: "mm-change", label: "Change what Alongside is for", say: "Tap **Change what Alongside is for**." },
+      ] },
+      { screen: "my-move", target: "mm-start", label: "Start", optional: true, say: "Tap **Start**." },
+      { screen: "my-move", target: "mm-next", label: "Next", say: "Tick what you want Alongside for. Then tap **Next**." },
+      { screen: "my-move", target: "mm-next", label: "Next", say: "Choose how much choice you want on a good day. Then tap **Next**." },
+      { screen: "my-move", target: "mm-done", label: "That's mine", say: "Choose up to two things for a hard day. Then tap **That's mine**." },
+    ] }] }],
+    noWay: "This is part of the Plan.",
+    end: "Home now shows what you chose.",
+    notQuite: [
+      { q: "I'm not sure what I want", answer: "On the first screen, tap **Not sure? Keep it simple**. Home will just say what to do each day." },
+      { q: "It's a hard day today", answer: "On Home, tap **It's a hard day**. Home shows what you chose for days like this. **Show my usual Home** puts it back." },
+      { q: "I want to change it later", answer: "Tap **Change what Alongside is for** on Home, or **Settings › Your plan › Making my Move**." },
+    ],
+  },
+  {
     id: "A2", cat: "start", tiers: ["plan"],
     title: "Start what I planned for today",
     outcome: "If today is in your week, it’s waiting at the top of Home. One tap to start.",

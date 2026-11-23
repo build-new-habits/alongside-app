@@ -1,7 +1,11 @@
 import { createRequire as __cr } from "node:module";
 /**
  * tools/verify-my-move-home.mjs
- * 23 Nov 2026 v1
+ * 23 Nov 2026 v2
+ *
+ * v2 - S5 (plan-home v15): the fixture closes Start your Plan, so this
+ *   gate keeps testing the Home after it; verify-my-move-close tests the
+ *   list itself.
  *
  * P-39 MAKING MY MOVE, S3 HOME (views/plan-home.js v13, data/my-move.js v2;
  * spec docs/specs/alongside_making-my-move_23nov2026_v1.md section 3).
@@ -72,6 +76,7 @@ function fixture({ tier = "personal", arc = true, choice = undefined, checkin = 
   store.set("activityLog", Array.from({ length: 6 }, (_, i) => ({ id: "a" + i, type: "workout", sessionType: "upper", place: "gym",
     completedAt: new Date(Date.now() - (i + 1) * 864e5).toISOString(), durationMins: 30, completed: true })));
   store.set("guidanceShownAt", new Date().toISOString());
+  store.setMyMove({ startClosed: "2026-11-23T09:00:00.000Z" });   // S5: Start your Plan closed; verify-my-move-close tests it open
   if (arc) store.set("arc", { active: true, aimId: "sport-without-flaring", startedAt: new Date(Date.now() - 15 * 864e5).toISOString(), strands: [] });
   if (choice !== undefined) store.setDayOpen(choice);
   if (checkin) {

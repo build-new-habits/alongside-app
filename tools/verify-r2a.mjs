@@ -1,6 +1,11 @@
 /**
  * tools/verify-r2a.mjs
- * 05 Nov 2026 v2
+ * 23 Nov 2026 v3
+ *
+ * v3 - P-39 S5: on the Plan, the check matches the event question's own
+ *   words ("Is there anything you're working towards?", its Tell me
+ *   button's name), because Start your Plan now says "Set what you're
+ *   working towards" (the arc). Free's check (section 2) unchanged.
  *
  * v2 - P-27 TIDY (Graeme, 05 Nov: retire the twelve-week programme on the
  *   Plan). The event question lived on the Plan's chapter-end card, which is
@@ -120,7 +125,8 @@ section("0. Positive control — the fixture reaches the store");
 section("1. P-27: the Plan is not asked (the chapter-end card is retired there)");
 {
   const el = await mount(hingeState("personal"));
-  ok("no event question on the Plan", el.querySelector('[data-event="open"]') === null && !/working towards/i.test(txt(el)), txt(el).slice(0, 120));
+  // v3: the event question's own words; Start your Plan's "Set what you're working towards" (P-39 S5) is the arc, not it.
+  ok("no event question on the Plan", el.querySelector('[data-event="open"]') === null && !/anything you're working towards|Tell me what you are working towards/i.test(el.innerHTML), txt(el).slice(0, 120));
   ok("control: Plan Home rendered its doors", el.querySelectorAll(".path-door").length > 0);
 }
 

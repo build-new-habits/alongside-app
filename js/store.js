@@ -6,7 +6,11 @@ import { validateWeightTarget } from "./data/weight-targets.js";
 
 /**
  * store.js - Data persistence layer
- * 23 Nov 2026 v126
+ * 23 Nov 2026 v127
+ *
+ * v127 - P-39 S5 CLOSE (a second recorded touch-once exception, spec v5).
+ *   myMove.startClosed: when the person closed Start your Plan on Home
+ *   (ISO), or null while it shows. Cleaned on load. Schema v1.129.
  *
  * v126 - P-39 S3 HOME (a touch-once exception, recorded in the spec: S3
  *   needs one key S1 did not foresee). myMove.day { date, mode } or null:
@@ -2191,6 +2195,7 @@ export const store = {
       hardDay,
       dismissed: only(src.dismissed, V.doors),
       day,
+      startClosed: typeof src.startClosed === 'string' && /^\d{4}-\d{2}-\d{2}T/.test(src.startClosed) && !isNaN(new Date(src.startClosed)) ? src.startClosed : null,
     };
   },
 
@@ -2817,7 +2822,7 @@ export const store = {
       // is liked or not wanted, never both (likeMovement / setExercisePreference).
       likedMovements: {},
       // P-39 MAKING MY MOVE (v125). Spec section 7.
-      myMove: { step: null, made: null, purposes: [], most: null, goodDay: 'few', hardDay: ['coach'], dismissed: [], day: null },
+      myMove: { step: null, made: null, purposes: [], most: null, goodDay: 'few', hardDay: ['coach'], dismissed: [], day: null, startClosed: null },
 
       // P-19, v119. The fitness trends the person follows, each once:
       // [{ id, startedAt: 'YYYY-MM-DD', activity }]. See TREND_RULES.

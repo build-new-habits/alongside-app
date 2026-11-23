@@ -1,6 +1,11 @@
 /**
  * settings.js
- * 16 Nov 2026 v76
+ * 23 Nov 2026 v77
+ *
+ * v77 - P-39 S5. Your plan › Goals and your week gains Making my Move
+ *   (what Alongside is for; the Plan only), above Your arc. No value on
+ *   the right (it squeezed the words at the largest text): Not done yet
+ *   leads the line under it.
  *
  * v76 - P-36 MY-LIST-PLAYER. Display › Sound › Timer sound (on unless
  *   turned off): a soft chime when a timer ends in My exercises.
@@ -1175,6 +1180,7 @@ export function SettingsView(router) {
       ];
       case 'plan': return [
         { title: 'Goals and your week', rows: [
+          c.premium ? _row({ label: 'Making my Move', sub: `${(store.get('myMove') || {}).made ? '' : 'Not done yet. '}What Alongside is for, on good days and hard ones.`, go: 'my-move' }) : '',
           c.premium ? _row({ label: 'Your arc', value: c.aim ? c.aim.label : 'Not set', go: c.aim ? 'stretch-arc' : 'arc-setup' }) : '',
           ...(c.premium ? [
             // P-27. One row for the one page (four opened it).

@@ -1,5 +1,7 @@
 # Alongside: Move — Glossary
-## 23 Nov 2026 v10
+## 23 Nov 2026 v11
+
+v11 - P-39 S5. Start your Plan, Close this list.
 
 v10 - P-39 (Graeme, 23 Nov: *"Making My Move"*). Making my Move, Change what Alongside is for, a hard day, It's a hard day, Show my usual Home, Try it first.
 
@@ -50,6 +52,8 @@ Taken from the words on every screen (`node tools/chromium-words.mjs`, 95 screen
 | The way out when it is pain, not stiffness | **It hurts** | Injured, treat | P-32. Goes to the check-in, never to a stretch |
 | What the person says Alongside: Move is for, on good and hard days | **Making my Move** | Make it yours, Creating my Move, onboarding (on screen) | P-39. Step 1 of *Start your Plan*. Store: `myMove` |
 | Home's way back into it | **Change what Alongside is for** | Edit preferences, Customise | P-39. In Settings: *Your plan › Making my Move* |
+| What to do first on a new Plan, under Today on Home | **Start your Plan** | Getting started, Setup, Checklist, Onboarding | P-39 S5 (P-35 folded in). *Making my Move*, *Set what you're working towards*, *Plan your week*, *Add exercises from your physio or trainer*. Done ones ticked; never on a hard day |
+| Putting the list away | **Close this list** | Dismiss, Hide, Done | P-39 S5. The list does not come back. Making my Move, the arc and the week stay in Settings › Your plan; own exercises in My exercises |
 | A day the check-in or the person says is hard | **a hard day** | bad day (for this), low day | P-39. *Bad* stays the sore-area word. Home's button: **It's a hard day**; its way out: **Show my usual Home** |
 | A short taste of a purpose before choosing it | **Try it first** | Preview, demo | P-39. A figure and one coach line |
 | The button on every screen that opens the guides | **Help** | — | P-25. The word with a line icon, never the icon alone. Both tiers; hidden while a session runs |
