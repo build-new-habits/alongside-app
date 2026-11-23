@@ -1,6 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 23 Nov 2026 v723
+ *
+ * v723 - P-39 S1 SCHEMA (the Plan; Free unchanged; nothing changes on screen). store.js v125 keeps Making my Move's record (myMove), made safe on every load. Schema v1.127.
+ *
  * 19 Nov 2026 v722
  *
  * v722 - P-9d (c) (the Plan; Free unchanged). Ready-made sessions: in Get stronger and Keep moving, at Home or the Gym, How would you like it? gains Ready-made sessions, six for each door and place (Home: body weight only), the part you chose first. Each starts by warming you up and ends with an approved stretch routine; choose Shorter, As written or Longer, each with its minutes, then the plan screen as any programme (pictures, Swap, YouTube, the sore check, Make it mine) and the one player. Strength moves now keep their sets, reps and rest in the player and in Make it mine. NEW FILE precached: js/data/ready-sessions.js.
@@ -4269,7 +4273,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v722";
+const CACHE_NAME = "alongside-v723";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4336,7 +4340,7 @@ const SHELL_HASHES = {
   "./css/components/finish.css": "c33e298d5fcb92ae",
   "./js/app.js": "f1496daa7cfb04a4",
   "./js/router.js": "35549644c785935c",
-  "./js/store.js": "096e89665e70d949",
+  "./js/store.js": "2eb781e77ba1bbcf",
   "./js/session-log.js": "6134de4315842e05",
   "./js/exercise-feedback.js": "adba8549f444da2a",
   "./js/exercise-card.js": "4ed40e63efe33a26",
