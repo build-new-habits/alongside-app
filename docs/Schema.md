@@ -1,5 +1,7 @@
 # Alongside — Data Schema Reference
-## 16 Nov 2026 v1.126
+## 23 Nov 2026 v1.127
+
+> **v1.127, 23 Nov 2026 — P-39 MAKING MY MOVE, schema first (S1)** (`store.js` v125). Spec `docs/specs/alongside_making-my-move_23nov2026_v1.md`; agreed by Graeme, 23 Nov (*"Those things I think stick now"*). **One addition, nothing removed. The Plan only** (Free never writes it). **`myMove`** `{ step, made, purposes, most, goodDay, hardDay, dismissed }`, default `{ step: null, made: null, purposes: [], most: null, goodDay: "few", hardDay: ["coach"], dismissed: [] }`: what the person said Alongside: Move is for, how much choice they want on a good day, what helps on a hard day, and the suggestions they said no to. `step` `"intro"`, `"for"`, `"good"`, `"hard"` or `null` (where they stopped part way); `made` when *That's mine* was last pressed (ISO) or `null`; `purposes` any of `stronger`, `moving`, `stretch`, `feel`, `yoga`, `calm`, `trend`, `instep`, each once; `most` one of `purposes` or `null` (sets the arc's aim, S4); `goodDay` `"one"`, `"few"` or `"all"`; `hardDay` up to two of `coach`, `stretch`, `walk`, `holds`, `calm`, `rest` (`rest` only alone; an empty list means the coach's gentle pick); `dismissed` door words (`stronger`, `moving`, `stretch`, `feel`) whose suggestion was declined. **Written only by** `store.setMyMove(patch)` (merges, cleans, saves). **Read by** nothing yet: S2 (the screens) and S3 (Home) connect it (a dated promise in `verify-write1`). **On load** (`store.cleanMyMove()`): each key falls back on its own (unknown or repeated ids dropped, `most` not among `purposes` → `null`, more than two hard-day choices → the first two, `rest` with another → `["rest"]`, anything unreadable → its default). Not a health answer: *Delete my health answers* does not touch it. Restore carries it. Leaving the Plan keeps it. Gated by `tools/verify-my-move-schema.mjs`.
 
 > **v1.126, 16 Nov 2026 — P-36 MY-LIST-PLAYER** (`store.js` v124, unchanged). No store field changes. One display key **outside the store**, beside `alongside-vibration`: **`alongside-timer-sound`** (`"on"` default, `"off"`), in `display-prefs.js` (this phone's; kept by Reset display, as Vibration is). On: a soft chime (made on the phone, no sound file) when a timer in My exercises ends. Graeme, 16 Nov: *"The chime. On by default"*. Settings › Display › Sound › Timer sound.
 
@@ -1096,7 +1098,7 @@
 
 ## 06 Sep 2026 v1.51
 
-**File:** `js/store.js` (confirmed live version: **v124, 14 Nov 2026**)
+**File:** `js/store.js` (confirmed live version: **v125, 23 Nov 2026**)
 
 > **v1.47, 06 Sep 2026 — CR-1.** `conditions[]` gains three ids and loses one. `chronic-fatigue` is **retired**; `persistent-fatigue`, `me-cfs` and `long-covid` replace it. No field shape changed — `conditions` is still `string[]` and `conditionMeta` is still keyed by condition id.
 >

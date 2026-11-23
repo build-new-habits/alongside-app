@@ -6,7 +6,17 @@ import { validateWeightTarget } from "./data/weight-targets.js";
 
 /**
  * store.js - Data persistence layer
- * 14 Nov 2026 v124
+ * 23 Nov 2026 v125
+ *
+ * v125 - P-39 MAKING MY MOVE, schema first (S1; spec docs/specs/
+ *   alongside_making-my-move_23nov2026_v1.md; Graeme, 23 Nov: "Those
+ *   things I think stick now"). One addition, nothing removed, the Plan
+ *   only (Free never writes it). myMove { step, made, purposes, most,
+ *   goodDay, hardDay, dismissed }: what the person said Alongside is for,
+ *   how much choice on a good day, what helps on a hard day, and the
+ *   suggestions they said no to. Made safe on every load by cleanMyMove();
+ *   written only through setMyMove(). Not a health answer. Schema v1.127.
+ *   Gate verify-my-move-schema.
  *
  * v124 - P-31 LITTLE-AND-OFTEN and CHANGE-TODAY (Schema v1.125; mock-up v5
  *   approved by Graeme, 14 Nov). Two additions, nothing removed, Plan only.
@@ -1786,6 +1796,8 @@ export const store = {
       // P-31. Made safe on every load; an earlier week's changes load as null.
       myExercisesOnHome: sanitizeOnHome(saved.myExercisesOnHome),
       weekChanges: sanitizeWeekChanges(saved.weekChanges, sanitizeWeekShape(saved.weekShape)),
+      // P-39 (v125). Made safe on every load.
+      myMove: this.cleanMyMove(saved.myMove),
       myExercisesGroup: typeof saved.myExercisesGroup === "string" && saved.myExercisesGroup.trim()
         ? saved.myExercisesGroup.replace(/[<>]/g, "").slice(0, 40) : null,
 
@@ -2138,6 +2150,46 @@ export const store = {
       });
     }
     return data;
+  },
+
+  /** P-39 MAKING MY MOVE, v125. The words myMove may hold (Schema v1.127). */
+  MY_MOVE_VALUES: {
+    step:     ['intro', 'for', 'good', 'hard'],
+    purposes: ['stronger', 'moving', 'stretch', 'feel', 'yoga', 'calm', 'trend', 'instep'],
+    goodDay:  ['one', 'few', 'all'],
+    hardDay:  ['coach', 'stretch', 'walk', 'holds', 'calm', 'rest'],
+    doors:    ['stronger', 'moving', 'stretch', 'feel'],
+  },
+
+  /**
+   * P-39, v125. myMove made safe, key by key (spec section 7). Anything
+   * malformed falls back to its default on its own; nothing is guessed.
+   */
+  cleanMyMove(m) {
+    const V = this.MY_MOVE_VALUES;
+    const src = m && typeof m === 'object' && !Array.isArray(m) ? m : {};
+    const only = (arr, allowed) => Array.isArray(arr) ? [...new Set(arr.filter(x => allowed.includes(x)))] : [];
+    const purposes = only(src.purposes, V.purposes);
+    let hardDay = Array.isArray(src.hardDay) ? only(src.hardDay, V.hardDay) : ['coach'];
+    if (hardDay.includes('rest')) hardDay = ['rest'];
+    hardDay = hardDay.slice(0, 2);
+    const made = typeof src.made === 'string' && /^\d{4}-\d{2}-\d{2}T/.test(src.made) && !isNaN(new Date(src.made)) ? src.made : null;
+    return {
+      step:      V.step.includes(src.step) ? src.step : null,
+      made,
+      purposes,
+      most:      purposes.includes(src.most) ? src.most : null,
+      goodDay:   V.goodDay.includes(src.goodDay) ? src.goodDay : 'few',
+      hardDay,
+      dismissed: only(src.dismissed, V.doors),
+    };
+  },
+
+  /** P-39, v125. The one writer of myMove: merges a patch, cleans, saves. */
+  setMyMove(patch) {
+    if (!patch || typeof patch !== 'object') return;
+    this.data.myMove = this.cleanMyMove({ ...this.cleanMyMove(this.data.myMove), ...patch });
+    this.save();
   },
 
   /** STAGE PATH P-1, v118. The words each new field may hold (Schema v1.116). */
@@ -2755,6 +2807,8 @@ export const store = {
       // person loved. The other side of exercisePreferences: one movement
       // is liked or not wanted, never both (likeMovement / setExercisePreference).
       likedMovements: {},
+      // P-39 MAKING MY MOVE (v125). Spec section 7.
+      myMove: { step: null, made: null, purposes: [], most: null, goodDay: 'few', hardDay: ['coach'], dismissed: [] },
 
       // P-19, v119. The fitness trends the person follows, each once:
       // [{ id, startedAt: 'YYYY-MM-DD', activity }]. See TREND_RULES.

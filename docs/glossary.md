@@ -1,5 +1,7 @@
 # Alongside: Move — Glossary
-## 15 Nov 2026 v9
+## 23 Nov 2026 v10
+
+v10 - P-39 (Graeme, 23 Nov: *"Making My Move"*). Making my Move, Change what Alongside is for, a hard day, It's a hard day, Show my usual Home, Try it first.
 
 v9 - P-25 (Graeme, 11 and 12 Nov: spec v3 §10.6). Help, How do I…?, Guide me through it, Did that work?, Not quite, Still stuck?.
 
@@ -46,6 +48,10 @@ Taken from the words on every screen (`node tools/chromium-words.mjs`, 95 screen
 | Stretch's question after the area | **How does it feel today?**: **Fine, just a stretch**, **A little stiff**, **Quite stiff**, **Very stiff** | Pain level, sore (as a choice) | P-32. A sore area never sets it (W5-14). Nothing stored |
 | Stretch's finer spots | **Anywhere in particular?** | Target, focus area | P-32. A routine that works one says **Works your …** |
 | The way out when it is pain, not stiffness | **It hurts** | Injured, treat | P-32. Goes to the check-in, never to a stretch |
+| What the person says Alongside: Move is for, on good and hard days | **Making my Move** | Make it yours, Creating my Move, onboarding (on screen) | P-39. Step 1 of *Start your Plan*. Store: `myMove` |
+| Home's way back into it | **Change what Alongside is for** | Edit preferences, Customise | P-39. In Settings: *Your plan › Making my Move* |
+| A day the check-in or the person says is hard | **a hard day** | bad day (for this), low day | P-39. *Bad* stays the sore-area word. Home's button: **It's a hard day**; its way out: **Show my usual Home** |
+| A short taste of a purpose before choosing it | **Try it first** | Preview, demo | P-39. A figure and one coach line |
 | The button on every screen that opens the guides | **Help** | — | P-25. The word with a line icon, never the icon alone. Both tiers; hidden while a session runs |
 | The page of guides | **How do I…?** | — | P-25. *On this screen*, search, the groups, **Still stuck?** |
 | A guide's main way: help over the live app | **Guide me through it** | Tutorial, walkthrough (on screen) | P-25. A ring on the real button and a box with the step; **Back a step**, **Stop the guide**, **Make this smaller**, **Carry on from here** |
