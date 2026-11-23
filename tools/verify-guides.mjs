@@ -1,6 +1,10 @@
 /**
  * tools/verify-guides.mjs
- * 23 Nov 2026 v4
+ * 23 Nov 2026 v5
+ *
+ * v5 - P-39 S6: A3 has two ways, from Start your Plan while it shows and
+ *   from Settings › Your plan once it is closed (Home keeps no standing
+ *   link). Both walked.
  *
  * v4 - P-39 S5: A3 Make Home show only what I want (the Plan), walked
  *   from Start your Plan on Home. Proven: with That's mine unmarked, A3
@@ -131,7 +135,7 @@ export function labelOK(el, label) {
 const ex = (group, name) => ({ id: group + "-" + name, name, sets: 3, reps: "10", group, completedToday: false });
 const LISTS = [ex("Morning routine", "Cat-cow"), ex("Morning routine", "Glute bridge"), ex("Gym A", "Goblet squat"), ex("Gym A", "Lat pulldown")];
 const todayKey = WM.DAY_KEYS[(new Date().getDay() + 6) % 7];
-function person({ tier = "personal", own = false, week = null, arc = false, ackDone = false, checkedIn = false, rest = false } = {}) {
+function person({ tier = "personal", own = false, week = null, arc = false, ackDone = false, checkedIn = false, rest = false, closed = false } = {}) {
   GE.stopGuide({ quiet: true });
   localStorage.clear(); store.init(); agreed(store);
   store.set("onboardingComplete", true); store.set("name", "Sam"); store.set("tier", tier);
@@ -150,6 +154,7 @@ function person({ tier = "personal", own = false, week = null, arc = false, ackD
     store.set("lastCheckin", { timestamp: at, date: new Date().toDateString(), energy: 3, mood: 3, sore: [] });
   }
   if (arc) store.set("arc", { active: true, aimId: "sport-without-flaring", strands: ["hip-range"], startedAt: new Date(Date.now() - 14 * 864e5).toISOString() });
+  if (closed) store.setMyMove({ startClosed: new Date().toISOString() });
   router.history = []; router.currentView = null; router.helpFrom = null;
 }
 async function go(view) { await router.navigate(view); await sleep(80); }
@@ -265,7 +270,8 @@ console.log("\nTEST 4 - walks every guide, from the screens");
 const FIX = {
   "A1:homeStarts": { tier: "personal" },
   "A1:free": { tier: "free" },
-  "A3:plan": { tier: "personal" },   // v-S5: Making my Move, from Start your Plan
+  "A3:startOpen": { tier: "personal" },   // S5: Making my Move, from Start your Plan
+  "A3:startClosed": { tier: "personal", closed: true },   // S6: from Settings › Your plan
   "A2:weekLeads": { tier: "personal", own: true, week: "own" },
   "B1:always": { tier: "personal" },
   "C1:noWeek": { tier: "personal", own: true },

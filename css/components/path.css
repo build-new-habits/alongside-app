@@ -1,6 +1,9 @@
 /* ============================================================
    components/path.css
-   23 Nov 2026 v19
+   23 Nov 2026 v20
+
+   v20 - P-39 S6: .path-ask, Home's one question when it matters (an
+   in-between day; the twelve-week turn of an arc).
 
    v19 - P-39 S5: Start your Plan under Today (.path-start), done ones
    ticked and quieter, still pressable.
@@ -618,3 +621,9 @@ html:has(.mm-view:not(.mm-view--big)) { scroll-padding-bottom: 240px; }
 .path-start__list li.is-done .path-start__mark { background: var(--color-primary); border-color: var(--color-primary); }
 .path-start__list li.is-done .path-link { color: var(--color-text-secondary); }
 .path-start__close { align-self: flex-start; }
+
+/* ---------- P-39 S6: one question, when it matters (v20) ---------- */
+.path-ask { flex: 1 1 100%; padding: var(--space-3); border: 1.5px solid var(--color-border); border-radius: var(--radius-lg, 16px); display: flex; flex-direction: column; gap: var(--space-2); }
+.path-ask__q { margin: 0; color: var(--color-text); font-size: var(--text-base); line-height: 1.4; }
+.path-ask__btns { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.path-ask__btn { flex: 1 1 auto; min-height: 44px; }

@@ -1,6 +1,9 @@
 /**
  * tools/chromium-my-move.mjs
- * 23 Nov 2026 v4
+ * 23 Nov 2026 v5
+ *
+ * v5 - S6: Home's one question on an in-between day, the twelve-week
+ *   question, and Change today with It's a hard day.
  *
  * v4 - S5: Home on a new Plan (Start your Plan, nothing done; Home, a
  *   good day now shows it with Making my Move ticked), and Settings ›
@@ -55,6 +58,9 @@ const SCREENS_ALL = [
   ["mm", ['[data-go="for"]', '[data-go="good"]', '[data-go="hard"]', '[data-hard="walk"]'], "On a hard day, two chosen"],
   ["home-new", [], "Home, a new Plan: Start your Plan"],
   ["home-good", [], "Home, a good day"],
+  ["home-ask", [], "Home, an in-between day: the question"],
+  ["home-review", [], "Home, twelve weeks into the arc: the question"],
+  ["change", [], "Change today, with It's a hard day"],
   ["home-hard", [], "Home, a hard day"],
   ["mm-again", [], "Making my Move again, a suggestion"],
   ["arc", [], "The arc's aims, led"],
@@ -90,9 +96,16 @@ for (const scheme of ["light", "dark"]) for (const width of [390, 320]) for (con
       } else if (where === "home-new" || where === "settings") {
         // a new Plan: nothing made, nothing set
       } else if (where !== "mm") {
-        const k = new Date().toISOString().split("T")[0], e = where === "home-hard" ? 3 : 7;
-        s.set("checkinHistory", { [k]: { energy: e, mood: 6, date: new Date().toDateString() } });
-        s.set("lastCheckin", { energy: e, mood: 6, date: new Date().toDateString(), timestamp: new Date().toISOString() });
+        const k = new Date().toISOString().split("T")[0], e = where === "home-hard" ? 3 : 7, md = where === "home-ask" ? 3 : 6;
+        s.set("checkinHistory", { [k]: { energy: e, mood: md, date: new Date().toDateString() } });
+        s.set("lastCheckin", { energy: e, mood: md, date: new Date().toDateString(), timestamp: new Date().toISOString() });
+        if (where === "home-ask" || where === "home-review" || where === "change") s.setMyMove({ startClosed: new Date().toISOString() });
+        if (where === "home-review") s.set("arc", { active: true, aimId: "stronger-core", strands: [], startedAt: new Date(Date.now() - 11 * 7 * 864e5).toISOString() });
+        if (where === "change") {
+          const WM = await import("./js/data/week-shape-model.js");
+          const days = Object.fromEntries(WM.DAY_KEYS.map(d => [d, null])); days[WM.DAY_KEYS[(new Date().getDay() + 6) % 7]] = "t";
+          s.set("weekShape", WM.sanitizeWeekShape({ templates: { t: { id: "t", name: "Session A", mix: [{ focus: "upper", level: 2 }], intensity: "steady", mins: 30, place: "gym" } }, days, setAt: "2026-11-01" }));
+        }
         s.setMyMove({ made: new Date().toISOString(), purposes: ["stronger", "stretch", "calm", "instep"], most: "stronger", goodDay: "few", hardDay: ["coach", "walk"] });
       }
     }, { size, where });
@@ -100,6 +113,7 @@ for (const scheme of ["light", "dark"]) for (const width of [390, 320]) for (con
     if (where === "mm" || where === "mm-again") await page.evaluate(() => window.router.navigate("my-move"));
     else if (where === "arc") await page.evaluate(() => window.router.navigate("arc-setup"));
     else if (where === "settings") await page.evaluate(() => window.router.navigate("settings"));
+    else if (where === "change") await page.evaluate(() => window.router.navigate("change-today"));
     else { await page.evaluate(() => window.router.navigate("progress")); await page.waitForTimeout(100); await page.evaluate(() => window.router.navigate("today")); }
     await page.waitForTimeout(500);
     for (const p of presses) {

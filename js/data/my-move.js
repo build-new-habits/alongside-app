@@ -1,6 +1,13 @@
 /**
  * data/my-move.js
- * 23 Nov 2026 v4
+ * 23 Nov 2026 v5
+ *
+ * v5 - S6 QUIET HOME (Graeme, 23 Nov: It's a hard day and Change what
+ *   Alongside is for off Home; "be exceptional"). askHardToday(): one
+ *   question on Home when the check-in's mood is Low (an in-between day:
+ *   not hard by the S3 rule), until answered for today. reviewDue() and
+ *   setReviewed(): Still what you want Alongside for? once at each
+ *   twelve-week turn of an arc (weeks 12, 24, ...).
  *
  * v4 - S5 CLOSE. startItems(): Start your Plan on Home, Making my Move
  *   first (P-35 folded in): Making my Move, Set what you're working
@@ -34,6 +41,7 @@
 
 import { store } from "../store.js";
 import { checkinToday } from "./path-context.js";
+import { arcWeek } from "./arc-readback.js";
 
 /** What it can be for, in the order the screen lists them (spec section 2). */
 export const PURPOSES = [
@@ -209,3 +217,38 @@ export function startItems() {
 }
 /** S5. Start your Plan shows until closed. */
 export const startOpen = () => !(store.get("myMove") || {}).startClosed;
+
+/**
+ * S6. An in-between day: the check-in's mood is Low (3), and it is not a
+ * hard day by the S3 rule. Asked once, until answered for today (the
+ * answer is today's word, as It's a hard day / Show my usual Home).
+ * Never with a sore area at Bad (that asks its own question first).
+ */
+export function askHardToday({ badSore = false } = {}) {
+  const m = store.get("myMove") || {};
+  if (!m.made || badSore) return false;
+  if (m.day && m.day.date === store._localDay()) return false;
+  const c = checkinToday();
+  return !!c && !hardFromCheckin(c) && c.mood === 3;
+}
+
+/** S6. The twelve-week turn an arc is at: 1 from week 12, 2 from week 24; 0 before. */
+export function reviewBlock(arc = store.get("arc") || {}, now = new Date()) {
+  if (!arc.active || !arc.aimId || !arc.startedAt) return 0;
+  return Math.floor((arcWeek(arc, now) || 0) / 12);
+}
+/** S6. Still what you want Alongside for? Once at each turn, until answered. */
+export function reviewDue(now = new Date()) {
+  const m = store.get("myMove") || {};
+  if (!m.made || startOpen()) return false;   // while Start your Plan shows, Making my Move is already on it
+  const arc = store.get("arc") || {};
+  const block = reviewBlock(arc, now);
+  if (!block) return false;
+  const r = m.review;
+  return !(r && r.arc === arc.startedAt && r.block >= block);
+}
+export function setReviewed(now = new Date()) {
+  const arc = store.get("arc") || {};
+  const block = reviewBlock(arc, now);
+  if (block) store.setMyMove({ review: { arc: arc.startedAt, block } });
+}

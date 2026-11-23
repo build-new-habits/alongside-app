@@ -1,7 +1,10 @@
 import { createRequire as __cr } from "node:module";
 /**
  * tools/verify-my-move-close.mjs
- * 23 Nov 2026 v1
+ * 23 Nov 2026 v2
+ *
+ * v2 - S6 QUIET HOME: once the list is closed, Home keeps no standing
+ *   line (4d); Making my Move is in Settings and Help.
  *
  * P-39 MAKING MY MOVE, S5 CLOSE (views/plan-home.js v15, data/my-move.js
  * v4, views/settings.js v77, data/guides.js A3; spec section 3, P-35
@@ -152,14 +155,14 @@ ok("3e. an arc with no aim is not done", !items()[1].classList.contains("is-done
 
 console.log("\nTEST 4 - Close this list");
 fixture({ arc: false }); set(MY); home();
-ok("4a. while it shows, Change what Alongside is for is not there too", !main.querySelector('[data-action="mm-change"]'));
+ok("4a. while it shows, no second way into Making my Move", main.querySelectorAll('[data-action="mm-open"], [data-action="mm-change"]').length === 1);
 const before = Date.now();
 click(main.querySelector('[data-action="start-close"]'));
 const sc = store.get("myMove").startClosed;
 ok("4b. saved, when", typeof sc === "string" && Math.abs(new Date(sc) - before) < 5000, sc);
 ok("4c. Home redrawn, focus on the doors", navs.at(-1) === "today" && fakeRouter.homeFocus === "doors", JSON.stringify({ navs, f: fakeRouter.homeFocus }));
 home();
-ok("4d. the list is gone, Change what Alongside is for is back", !startList() && !!main.querySelector('[data-action="mm-change"]'));
+ok("4d. the list is gone; with no arc yet, only Set what you're working towards stays (S6: no Change what Alongside is for)", !startList() && txt(mmBar()) === "Set what you're working towards", txt(mmBar()));
 fixture({ arc: false }); store.setMyMove({ startClosed: new Date().toISOString() }); home();
 ok("4e. closed before Making my Move: the one-line way in still shows", !startList() && /Make Home yours, in about a minute/.test(txt(mmBar())));
 
@@ -186,7 +189,7 @@ for (const [made, label] of [[false, "not made"], [true, "made"]]) {
 console.log("\nTEST 7 - Help");
 const A3 = GD.guideById("A3");
 ok("7a. A3 is the Plan's", !!A3 && JSON.stringify(A3.tiers) === JSON.stringify(["plan"]));
-ok("7b. it starts from Start your Plan's Making my Move", A3?.ways[0].parts[0].steps[0].alts.some(a => a.target === "mm-open"));
+ok("7b. it starts from Start your Plan's Making my Move", A3?.ways[0].when === "startOpen" && A3.ways[0].parts[0].steps[0].target === "mm-open");
 fixture({ arc: false }); home();
 ok("7c. that marker is on Start your Plan's Making my Move", main.querySelector('[data-guide-target="mm-open"]')?.closest(".path-start__list") != null);
 

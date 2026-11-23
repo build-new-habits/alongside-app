@@ -72,7 +72,18 @@ export const WHEN = Object.freeze({
   // The Plan's Home leads with something to start: the coach, or today's day from your week.
   homeStarts: () => isPremium() && (() => { try { return ["coach", "week"].includes(todayState(null)); } catch { return false; } })(),
   hasArc:  () => hasArc(),
+  // P-39 S6. Start your Plan still on the Plan's Home, or closed.
+  startOpen:   () => isPremium() && !(store.get("myMove") || {}).startClosed,
+  startClosed: () => isPremium() && !!(store.get("myMove") || {}).startClosed,
 });
+
+// P-39. Making my Move's own screens, for A3 however it is reached.
+const A3_STEPS = [
+  { screen: "my-move", target: "mm-start", label: "Start", optional: true, say: "Tap **Start**." },
+  { screen: "my-move", target: "mm-next", label: "Next", say: "Tick what you want Alongside for. Then tap **Next**." },
+  { screen: "my-move", target: "mm-next", label: "Next", say: "Choose how much choice you want on a good day. Then tap **Next**." },
+  { screen: "my-move", target: "mm-done", label: "That's mine", say: "Choose up to two things for a hard day. Then tap **That's mine**." },
+];
 
 // Asked once a day: already answered today, they are skipped (the guide moves
 // on when the next step's screen opens).
@@ -129,24 +140,24 @@ export const GUIDES = Object.freeze([
     id: "A3", cat: "start", tiers: ["plan"],
     title: "Make Home show only what I want",
     outcome: "Home shows what you want Alongside for, and what you chose for hard days. About a minute.",
-    on: ["today", "my-move"],
-    keywords: ["make it mine", "my move", "home", "simple", "hard day", "less", "choose", "personalise", "personalize", "too much"],
-    ways: [{ when: "plan", parts: [{ steps: [
-      { screen: "today", alts: [
-        { target: "mm-open", label: "Making my Move", say: "Under **Start your Plan**, tap **Making my Move**." },
-        { target: "mm-change", label: "Change what Alongside is for", say: "Tap **Change what Alongside is for**." },
-      ] },
-      { screen: "my-move", target: "mm-start", label: "Start", optional: true, say: "Tap **Start**." },
-      { screen: "my-move", target: "mm-next", label: "Next", say: "Tick what you want Alongside for. Then tap **Next**." },
-      { screen: "my-move", target: "mm-next", label: "Next", say: "Choose how much choice you want on a good day. Then tap **Next**." },
-      { screen: "my-move", target: "mm-done", label: "That's mine", say: "Choose up to two things for a hard day. Then tap **That's mine**." },
+    on: ["today", "settings", "my-move"],
+    keywords: ["make it mine", "my move", "home", "simple", "hard day", "less", "choose", "personalise", "personalize", "too much", "change what alongside is for"],
+    // S6: from Start your Plan while it shows; after it is closed, from Settings › Your plan (Home keeps no standing link).
+    ways: [{ when: "startOpen", parts: [{ steps: [
+      { screen: "today", target: "mm-open", label: "Making my Move", say: "Under **Start your Plan**, tap **Making my Move**." },
+      ...A3_STEPS,
+    ] }] }, { when: "startClosed", parts: [{ steps: [
+      { screen: "any", target: "nav:settings", label: "Settings", say: "Tap **Settings** at the bottom." },
+      { screen: "settings", target: "settings-plan", label: "Your plan", say: "Tap **Your plan**." },
+      { screen: "settings", target: "mm-settings", label: "Making my Move", say: "Tap **Making my Move**." },
+      ...A3_STEPS,
     ] }] }],
     noWay: "This is part of the Plan.",
     end: "Home now shows what you chose.",
     notQuite: [
       { q: "I'm not sure what I want", answer: "On the first screen, tap **Not sure? Keep it simple**. Home will just say what to do each day." },
-      { q: "It's a hard day today", answer: "On Home, tap **It's a hard day**. Home shows what you chose for days like this. **Show my usual Home** puts it back." },
-      { q: "I want to change it later", answer: "Tap **Change what Alongside is for** on Home, or **Settings › Your plan › Making my Move**." },
+      { q: "It's a hard day today", answer: "Your check-in sees it: answer **Low** for energy or **Struggling** for mood, and Home shows what you chose for days like this. Or, with a week set, tap **Change today**, then **It's a hard day**. **Show my usual Home** puts it back." },
+      { q: "I want to change it later", answer: "**Settings › Your plan › Making my Move**. Home also asks every twelve weeks of your arc." },
     ],
   },
   {
