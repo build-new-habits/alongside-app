@@ -1,6 +1,10 @@
 /**
  * js/views/arc-setup.js
- * 15 Nov 2026 v7
+ * 23 Nov 2026 v8
+ *
+ * v8 - P-39 S4. What matters most in Making my Move leads: its aims come
+ *   first on "What do you want to be able to do?", with one line saying
+ *   why. Nothing is removed (None of these still shows everything).
  *
  * v7 - P-25 HOW-TO GUIDES. Guide markers only: the aims (aims), what feeds
  *   it (strands), Continue (continue), Skip for now (skip) and Yes, that's
@@ -90,6 +94,7 @@
 import { store } from "../store.js";
 import { isPremium } from "../auth.js";
 import { AIMS, STRANDS, aimById, strandsForAim, situationsFor, aimsFor } from "../data/aims.js";
+import { aimsForMost, purposeById } from "../data/my-move.js";
 import { bodyAreasOf } from "../data/conditions.js";
 import { PURPOSE_LINES } from "../data/empathy-transfer.js";
 import { lineIcon } from "../data/line-icons.js";
@@ -167,6 +172,10 @@ export function ArcSetupView(router) {
     // Deciding what somebody is allowed to want is the judgement this
     // audience already gets everywhere else.
     let shown = showAll ? AIMS.list : aimsFor(situationsFor(store), 8, bodyAreasOf(store.get("conditions") || []));
+    // P-39 S4. What matters most to them (Making my Move) leads, in its order.
+    const first = showAll ? [] : aimsForMost().map(aimById).filter(Boolean);
+    if (first.length) shown = [...first, ...shown.filter(a => !first.some(f => f.id === a.id))].slice(0, 8);
+    const mostWord = first.length ? purposeById(store.get("myMove").most)?.short : null;
     // D-3. The aim already chosen is always there to keep.
     if (aimId && !shown.some(a => a.id === aimId) && aimById(aimId)) shown = [aimById(aimId), ...shown];
 
@@ -174,7 +183,8 @@ export function ArcSetupView(router) {
       <h1 class="as-question" tabindex="-1">What do you want to be able to do?</h1>
       <p class="as-help">
         Something you'd notice yourself doing. Not a number \u2014 a thing.
-      </p>
+      </p>${mostWord ? `
+      <p class="as-help" id="as-most">The first ones fit what you said matters most: ${esc(mostWord)}.</p>` : ""}
       <div class="as-options" role="group" aria-label="Choose one" data-guide-target="aims">
         ${shown.map(a => `
           <button class="as-option ${aimId === a.id ? "as-option--on" : ""}"

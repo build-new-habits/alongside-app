@@ -1,6 +1,11 @@
 /**
  * views/plan-home.js
- * 23 Nov 2026 v13
+ * 23 Nov 2026 v14
+ *
+ * v14 - P-39 S4. Once Making my Move is made and something matters most,
+ *   with no arc set yet, the line under Today also offers Set what you're
+ *   working towards (the arc's own questions, its aims led by what matters
+ *   most).
  *
  * v13 - P-39 S3 HOME (Making my Move; spec section 3; prototype v2 agreed
  *   by Graeme, 23 Nov). The Plan's Home follows what the person chose:
@@ -161,7 +166,7 @@ import { suggestToday, arcDoor, pickProgramme, movementName } from "../data/path
 import { setTodaysLength } from "../data/session-length.js";
 import { fiveOf } from "../data/progress-report.js";
 import { EFFORT, ZONE2_ACTIVITIES, zone2Week, zone2HardDoneThisWeek } from "../data/trend-recipes.js";
-import { goodDayDoors, HARD_OFFERED, homeDay, setToday } from "../data/my-move.js";
+import { goodDayDoors, HARD_OFFERED, homeDay, setToday, arcNext } from "../data/my-move.js";
 
 // ── The doors ──────────────────────────────────────────────────────────────
 
@@ -461,7 +466,8 @@ function myMoveBar(mm) {
   const toggle = mm.day === "hard"
     ? `<button type="button" class="path-link" data-action="mm-usual">Show my usual Home</button>`
     : `<button type="button" class="path-link" data-action="mm-hard">It's a hard day</button>`;
-  return `<div class="path-mm">${toggle}<button type="button" class="path-link" data-action="mm-change">Change what Alongside is for</button></div>`;
+  const arcLink = arcNext() ? `<button type="button" class="path-link" data-action="mm-arc">Set what you're working towards</button>` : "";
+  return `<div class="path-mm">${toggle}${arcLink}<button type="button" class="path-link" data-action="mm-change">Change what Alongside is for</button></div>`;
 }
 
 // ── Home ───────────────────────────────────────────────────────────────────
@@ -569,6 +575,7 @@ export function wirePlanHome(container, router) {
     router.homeFocus = "mm";
     router.navigate("today");
   }));
+  container.querySelector('[data-action="mm-arc"]')?.addEventListener("click", () => router.navigate("arc-setup"));
   container.querySelector('[data-action="hard-coach"]')?.addEventListener("click", () => startCoachChoice(router));
   container.querySelector('[data-action="hard-stretch"]')?.addEventListener("click", () => {
     router.pathStart = { door: "stretch" };

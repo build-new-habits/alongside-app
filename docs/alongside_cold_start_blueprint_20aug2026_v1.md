@@ -1,5 +1,5 @@
 # Alongside: Move — Cold Start Blueprint
-## 23 Nov 2026 v330
+## 23 Nov 2026 v331
 
 Build New Habits | Everything a chat with no memory needs to pick this up and build confidently.
 
@@ -53,7 +53,7 @@ git clone --depth 1 https://x-access-token:$TOKEN@github.com/build-new-habits/al
 | BNH-Files: `Apps/Alongside Move/` `Legal/`, `Clinical/`, `Business/`, `Product/`, `Research/`, `Testing/`, `Admin/`, `Archive/` | Every other paper, including the governing documents below |
 | `docs/Schema.md` | Store fields. **Must match `store.js`** |
 | `docs/` | Only what the code and checks need: `Changelog.md`, `exercise_entry_standard.md`, `glossary.md` (one name per thing, A-9), this blueprint, `specs/` (three specs the checks read), `classes/` (guided class scripts), `archive-code/` (retired code) |
-| `tools/verify-*.mjs` | 368 gates |
+| `tools/verify-*.mjs` | 369 gates |
 | `js/` | Vanilla ES modules, no framework, no bundler |
 
 **Governing documents, in read order** (BNH-Files, `Apps/Alongside Move/Business/`):
@@ -74,10 +74,10 @@ git clone --depth 1 https://x-access-token:$TOKEN@github.com/build-new-habits/al
 |---|---|
 | `store.js` | v126 |
 | `Schema.md` | v1.128 |
-| `sw.js` | **v725**, cache `alongside-v725` |
+| `sw.js` | **v726**, cache `alongside-v726` |
 | `router.js` | v48 · `my-programme.js` v8 · `today.js` v49 · `settings.js` v46 · `progress.js` v27 · `onboarding/thread.js` v16 |
 | `exercise-card.js` | **v7** — CARD-4, four pages. `workout.css` v16 |
-| Gates | **368** on jsdom 28.1.0 (`npm ci`) — from the repo root. See the cwd row in §9. P-31 (14 Nov) added `verify-p31-change-today`; P-32 (15 Nov) added `verify-p32-stretch-stiffness`; P-33 (15 Nov) added `verify-p33-plan-share`; P-25 (15 Nov) added `verify-guides` (it walks every guide through the real screens); P-36 (16 Nov) added `verify-p36-my-list` (My exercises' list-first player, the timer at the top, the chime); P-9d (c) (19 Nov) added `verify-ready-sessions` (the 24 ready-made sessions and their route); P-39 S1 (23 Nov) added `verify-my-move-schema` (Making my Move's stored record); P-39 S2 (23 Nov) added `verify-my-move-screens` (its four screens, driven through the real view); P-39 S3 (23 Nov) added `verify-my-move-home` (the Plan's Home on good and hard days). Run from a shallow clone without `../bnh-files` or the website, 12 fail before and after P-31 for that reason alone (they read the private repository, the website, or older versions from git history) |
+| Gates | **369** on jsdom 28.1.0 (`npm ci`) — from the repo root. See the cwd row in §9. P-31 (14 Nov) added `verify-p31-change-today`; P-32 (15 Nov) added `verify-p32-stretch-stiffness`; P-33 (15 Nov) added `verify-p33-plan-share`; P-25 (15 Nov) added `verify-guides` (it walks every guide through the real screens); P-36 (16 Nov) added `verify-p36-my-list` (My exercises' list-first player, the timer at the top, the chime); P-9d (c) (19 Nov) added `verify-ready-sessions` (the 24 ready-made sessions and their route); P-39 S1 (23 Nov) added `verify-my-move-schema` (Making my Move's stored record); P-39 S2 (23 Nov) added `verify-my-move-screens` (its four screens, driven through the real view); P-39 S3 (23 Nov) added `verify-my-move-home` (the Plan's Home on good and hard days); P-39 S4 (23 Nov) added `verify-my-move-learn` (what matters most leads the arc's aims; suggestions from use). Run from a shallow clone without `../bnh-files` or the website, 12 fail before and after P-31 for that reason alone (they read the private repository, the website, or older versions from git history) |
 
 🟢 **This table is now GATED.** `tools/verify-blueprint.mjs` compares every version above against the file that carries it and goes red on any drift, naming the row to change.
 
