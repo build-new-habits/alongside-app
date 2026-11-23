@@ -1,6 +1,12 @@
 /**
  * data/my-move.js
- * 23 Nov 2026 v3
+ * 23 Nov 2026 v4
+ *
+ * v4 - S5 CLOSE. startItems(): Start your Plan on Home, Making my Move
+ *   first (P-35 folded in): Making my Move, Set what you're working
+ *   towards, Plan your week, Add exercises from your physio or trainer;
+ *   each says when it is done and can be done again. Shown until closed,
+ *   never on a hard day.
  *
  * v3 - S4 AIM AND SUGGESTIONS. AIMS_FOR: for each purpose, the arc aims
  *   (data/aims.js, none held) that fit it, in order; aimsForMost() puts
@@ -189,3 +195,17 @@ export function suggestion(now = new Date()) {
   const id = DOOR_IDS.find(d => !onHome.includes(d) && !m.dismissed.includes(d) && (counts[d] || 0) >= 5);
   return id ? { id, count: counts[id] } : null;
 }
+
+/** S5. Start your Plan (spec section 3; P-35 folded in): what to do first, in order. */
+export function startItems() {
+  const m = store.get("myMove") || {};
+  const arc = store.get("arc") || {};
+  return [
+    { id: "my-move", label: "Making my Move", done: !!m.made, action: "mm-open", guide: "mm-open" },
+    { id: "arc", label: "Set what you're working towards", done: !!(arc.active && arc.aimId), action: "mm-arc" },
+    { id: "week", label: "Plan your week", done: !!store.get("weekShape"), action: "mm-week" },
+    { id: "own", label: "Add exercises from your physio or trainer", done: (store.get("prescribedExercises") || []).length > 0, action: "mm-own" },
+  ];
+}
+/** S5. Start your Plan shows until closed. */
+export const startOpen = () => !(store.get("myMove") || {}).startClosed;

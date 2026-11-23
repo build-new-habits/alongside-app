@@ -1,5 +1,7 @@
 # Alongside: Move — Making my Move (P-39) spec
-## 23 Nov 2026 v4
+## 23 Nov 2026 v5
+
+v5 - S5 built; Making my Move is complete. **Start your Plan** (P-35 folded in) sits under Today on the Plan's Home until *Close this list*: *Making my Move* first, then *Set what you're working towards* (done when the arc has an aim), *Plan your week* (done when a week is set) and *Add exercises from your physio or trainer* (done when there is a list). Done ones are ticked, quieter and said as done, and can be done again. While it shows, it is the way into Making my Move and the arc (no second line); after it closes, the S3/S4 line returns. Never on a hard day (that Home stays the one line and the hard-day choices). A second touch-once exception: `myMove.startClosed` (ISO or `null`), store v127, Schema v1.129. *Settings › Your plan › Making my Move* (the Plan only; *Not done yet* until made). Help guide **A3** *Make Home show only what I want* (the Plan), walked from Start your Plan. Gated by `verify-my-move-close` (32) and `verify-guides` v4. The voice lines for *Try it first* are scripted (BNH-Files); the playback hook waits for the recordings.
 
 v4 - S4 built. **Section 5 as built:** *Which matters most right now?* leads the arc; it does not set it. The arc's own questions stay (strands and what they'd notice: *being asked is the Plan's experience*, ARC-3-SETUP), so the aims that fit what matters most come first on *What do you want to be able to do?*, with one line saying why, and Home offers *Set what you're working towards* under Today once Making my Move is made and no arc is set. An arc already set is never changed by it. The aims for each purpose are in `data/my-move.js` (`AIMS_FOR`; none held). **Section 4 as built:** suggestions only when Home shows *my doors* (the other two choices show no doors, or all four); counted from `activityLog[].door`, wherever the session was started.
 
@@ -95,7 +97,7 @@ Written only through `store.setMyMove(patch)` (cleans the same way). Not a healt
 | **S2 SCREENS** ✅ `alongside-v724` | the four screens, live preview, Try it first, resume; `router.js` | new `views/my-move.js`, new `data/my-move.js` (purposes, hard and good words, seeding from getting started, the preview), `css/components/path.css` v16, `router.js` v58 | `verify-my-move-screens` (55; drives the real view; a11y names; Plan only) |
 | **S3 HOME** ✅ `alongside-v725` | good-day and hard-day Home, *It's a hard day*, *Calm my mind* row, Making my Move's way in under Today | `plan-home.js` v13, `data/my-move.js` v2, `store.js` v126 (`myMove.day`), `path.css` v17 | `verify-my-move-home` (41; six ways in; Bad still first; Free has none of it) |
 | **S4 AIM AND SUGGESTIONS** ✅ `alongside-v726` | *Which matters most* leads the arc's aims; learned suggestions | `data/my-move.js` v3, `views/my-move.js` v2, `views/arc-setup.js` v8, `views/plan-home.js` v14, `path.css` v18 | `verify-my-move-learn` (27) |
-| **S5 CLOSE** | *Settings › Your plan › Making my Move*; Help guide, glossary, device checklist sitting, real-browser text-fit and axe; the full *Start your Plan* list | `settings.js`, `guides.js`, checklist | full suite ×3 from a fresh clone |
+| **S5 CLOSE** (built, v5) | *Settings › Your plan › Making my Move*; Help guide, glossary, device checklist sitting, real-browser text-fit and axe; the full *Start your Plan* list | `settings.js`, `guides.js`, checklist | full suite ×3 from a fresh clone |
 
 ## 9. Not in this spec
 
@@ -104,4 +106,4 @@ Written only through `store.setMyMove(patch)` (cleans the same way). Not a healt
 - The teenage In Step set (P-42).
 - The *Try it first* recordings: about eight new clips for Graeme (voice script addendum).
 
-*Build New Habits · Alongside: Move · Making my Move spec · 23 Nov 2026 v4*
+*Build New Habits · Alongside: Move · Making my Move spec · 23 Nov 2026 v5*

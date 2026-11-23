@@ -1,6 +1,10 @@
 /**
  * tools/chromium-my-move.mjs
- * 23 Nov 2026 v3
+ * 23 Nov 2026 v4
+ *
+ * v4 - S5: Home on a new Plan (Start your Plan, nothing done; Home, a
+ *   good day now shows it with Making my Move ticked), and Settings ›
+ *   Your plan with Making my Move.
  *
  * v3 - S4: Making my Move opened again with a suggestion, and the arc's
  *   aims led by what matters most.
@@ -18,7 +22,7 @@
  *
  * Needs Chromium and Playwright, so it is not in the verify-* loop. From
  * the repository root: AXE=/path/to/axe.min.js node tools/chromium-my-move.mjs
- * Optional: SHOTS=dir. Exits 1 on any fault.
+ * Optional: SHOTS=dir; ONLY=a screen's where (e.g. settings). Exits 1 on any fault.
  */
 import { createServer } from "node:http";
 import { readFileSync, existsSync, statSync } from "node:fs";
@@ -44,16 +48,19 @@ const BASE = `http://127.0.0.1:${server.address().port}/index.html`;
 const AXE = process.env.AXE && existsSync(process.env.AXE) ? readFileSync(process.env.AXE, "utf8") : null;
 
 // Each screen: [where, presses, a name].
-const SCREENS = [
+const SCREENS_ALL = [
   ["mm", [], "Making my Move"],
   ["mm", ['[data-go="for"]', '[data-taste="stronger"]'], "What's it for?, a taste open"],
   ["mm", ['[data-go="for"]', '[data-go="good"]'], "On a good day"],
   ["mm", ['[data-go="for"]', '[data-go="good"]', '[data-go="hard"]', '[data-hard="walk"]'], "On a hard day, two chosen"],
+  ["home-new", [], "Home, a new Plan: Start your Plan"],
   ["home-good", [], "Home, a good day"],
   ["home-hard", [], "Home, a hard day"],
   ["mm-again", [], "Making my Move again, a suggestion"],
   ["arc", [], "The arc's aims, led"],
+  ["settings", ['[data-section-open="plan"]'], "Settings, Your plan"],
 ];
+const SCREENS = process.env.ONLY ? SCREENS_ALL.filter(x => x[0] === process.env.ONLY) : SCREENS_ALL;
 
 const browser = await chromium.launch({ executablePath: process.env.CHROMIUM || "/opt/pw-browsers/chromium" });
 const faults = [];
@@ -80,6 +87,8 @@ for (const scheme of ["light", "dark"]) for (const width of [390, 320]) for (con
       if (where === "mm-again" || where === "arc") {
         s.setMyMove({ made: new Date().toISOString(), purposes: ["stronger", "stretch", "instep"], most: "stretch", goodDay: "few", hardDay: ["coach"] });
         s.set("activityLog", Array.from({ length: 5 }, (_, i) => ({ id: "f" + i, type: "workout", door: "feel", completed: true, durationMins: 20, completedAt: new Date(Date.now() - (i + 1) * 864e5).toISOString() })));
+      } else if (where === "home-new" || where === "settings") {
+        // a new Plan: nothing made, nothing set
       } else if (where !== "mm") {
         const k = new Date().toISOString().split("T")[0], e = where === "home-hard" ? 3 : 7;
         s.set("checkinHistory", { [k]: { energy: e, mood: 6, date: new Date().toDateString() } });
@@ -90,6 +99,7 @@ for (const scheme of ["light", "dark"]) for (const width of [390, 320]) for (con
     await page.evaluate(() => window.router.navigate("today")); await page.waitForTimeout(150);
     if (where === "mm" || where === "mm-again") await page.evaluate(() => window.router.navigate("my-move"));
     else if (where === "arc") await page.evaluate(() => window.router.navigate("arc-setup"));
+    else if (where === "settings") await page.evaluate(() => window.router.navigate("settings"));
     else { await page.evaluate(() => window.router.navigate("progress")); await page.waitForTimeout(100); await page.evaluate(() => window.router.navigate("today")); }
     await page.waitForTimeout(500);
     for (const p of presses) {

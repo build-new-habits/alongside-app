@@ -1,6 +1,13 @@
 /**
  * views/plan-home.js
- * 23 Nov 2026 v14
+ * 23 Nov 2026 v15
+ *
+ * v15 - P-39 S5 CLOSE. Start your Plan, under Today until closed (P-35
+ *   folded in): Making my Move first, then Set what you're working towards,
+ *   Plan your week, Add exercises from your physio or trainer; done ones
+ *   ticked and quieter, still there to do again; Close this list. While it
+ *   shows, it is the way into Making my Move and the arc. Not on a hard
+ *   day: that Home stays the one line and the hard-day choices.
  *
  * v14 - P-39 S4. Once Making my Move is made and something matters most,
  *   with no arc set yet, the line under Today also offers Set what you're
@@ -166,7 +173,7 @@ import { suggestToday, arcDoor, pickProgramme, movementName } from "../data/path
 import { setTodaysLength } from "../data/session-length.js";
 import { fiveOf } from "../data/progress-report.js";
 import { EFFORT, ZONE2_ACTIVITIES, zone2Week, zone2HardDoneThisWeek } from "../data/trend-recipes.js";
-import { goodDayDoors, HARD_OFFERED, homeDay, setToday, arcNext } from "../data/my-move.js";
+import { goodDayDoors, HARD_OFFERED, homeDay, setToday, arcNext, startItems, startOpen } from "../data/my-move.js";
 
 // ── The doors ──────────────────────────────────────────────────────────────
 
@@ -458,7 +465,25 @@ function hardToday(mm) {
 }
 
 /** Under Today: Making my Move's way in, or It's a hard day / Show my usual Home, and Change. */
+function startList() {
+  const items = startItems();
+  return `<section class="path-start" aria-labelledby="path-start-h">
+      <h2 class="path-start__h" id="path-start-h">Start your Plan</h2>
+      <ul class="path-start__list">${items.map(i => `<li class="${i.done ? "is-done" : ""}">
+        <span class="path-start__mark" aria-hidden="true">${i.done ? lineIcon("tick", 18) : ""}</span>
+        <button type="button" class="path-link" data-action="${i.action}"${i.guide ? ` data-guide-target="${i.guide}"` : ""}>${esc(i.label)}${i.done ? '<span class="sr-only">, done</span>' : ""}</button>
+      </li>`).join("")}</ul>
+      <button type="button" class="path-link path-start__close" data-action="start-close">Close this list</button>
+    </section>`;
+}
+
 function myMoveBar(mm) {
+  if (startOpen() && mm.day !== "hard") {
+    const after = mm.day === "unmade" ? "" : mm.day === "hard"
+      ? `<button type="button" class="path-link" data-action="mm-usual">Show my usual Home</button>`
+      : `<button type="button" class="path-link" data-action="mm-hard">It's a hard day</button>`;
+    return `<div class="path-mm">${startList()}${after}</div>`;
+  }
   if (mm.day === "unmade") {
     return `<div class="path-mm"><p class="path-mm__line">Make Home yours, in about a minute.</p>
       <button type="button" class="path-link" data-action="mm-open">Making my Move</button></div>`;
@@ -467,7 +492,7 @@ function myMoveBar(mm) {
     ? `<button type="button" class="path-link" data-action="mm-usual">Show my usual Home</button>`
     : `<button type="button" class="path-link" data-action="mm-hard">It's a hard day</button>`;
   const arcLink = arcNext() ? `<button type="button" class="path-link" data-action="mm-arc">Set what you're working towards</button>` : "";
-  return `<div class="path-mm">${toggle}${arcLink}<button type="button" class="path-link" data-action="mm-change">Change what Alongside is for</button></div>`;
+  return `<div class="path-mm">${toggle}${arcLink}<button type="button" class="path-link" data-action="mm-change" data-guide-target="mm-change">Change what Alongside is for</button></div>`;
 }
 
 // ── Home ───────────────────────────────────────────────────────────────────
@@ -576,6 +601,13 @@ export function wirePlanHome(container, router) {
     router.navigate("today");
   }));
   container.querySelector('[data-action="mm-arc"]')?.addEventListener("click", () => router.navigate("arc-setup"));
+  container.querySelector('[data-action="mm-week"]')?.addEventListener("click", () => router.navigate("your-week"));
+  container.querySelector('[data-action="mm-own"]')?.addEventListener("click", () => router.navigate("prescribed"));
+  container.querySelector('[data-action="start-close"]')?.addEventListener("click", () => {
+    store.setMyMove({ startClosed: new Date().toISOString() });
+    router.homeFocus = "doors";
+    router.navigate("today");
+  });
   container.querySelector('[data-action="hard-coach"]')?.addEventListener("click", () => startCoachChoice(router));
   container.querySelector('[data-action="hard-stretch"]')?.addEventListener("click", () => {
     router.pathStart = { door: "stretch" };

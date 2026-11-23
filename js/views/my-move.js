@@ -1,6 +1,9 @@
 /**
  * views/my-move.js
- * 23 Nov 2026 v2
+ * 23 Nov 2026 v3
+ *
+ * v3 - S5. Guide markers only (data-guide-target): Start (mm-start), Next
+ *   (mm-next), That's mine (mm-done), for the Help guide A3.
  *
  * v2 - S4. Opened again after it is made, What's it for? leads with one
  *   suggestion when there is one ("You've used Stretch often lately. Put it
@@ -87,7 +90,7 @@ export function MyMoveView(router) {
   function footer(hard, nextAttrs, nextLabel) {
     return `<div class="mm-foot">${preview(hard)}
       <p class="sr-only" id="mm-said" aria-live="polite"></p>
-      <button type="button" class="btn btn-primary mm-next" ${nextAttrs}>${esc(nextLabel)}</button></div>`;
+      <button type="button" class="btn btn-primary mm-next" ${nextAttrs} data-guide-target="${nextLabel === "Next" ? "mm-next" : "mm-done"}">${esc(nextLabel)}</button></div>`;
   }
 
   function intro() {
@@ -97,7 +100,7 @@ export function MyMoveView(router) {
       <p class="yw-note">Tell me what you want Alongside: Move for, on good days and on hard ones.</p>
       <p class="yw-sub">Set up your hard days while you're having a good one. About a minute. What you choose is kept if you stop, and you can change it any time.</p>
       <div class="mm-intro-actions">
-        <button type="button" class="btn btn-primary" data-go="for" data-key="start">Start</button>
+        <button type="button" class="btn btn-primary" data-go="for" data-key="start" data-guide-target="mm-start">Start</button>
         <button type="button" class="btn btn-secondary" data-simple data-key="simple">Not sure? Keep it simple</button>
       </div>`;
   }
