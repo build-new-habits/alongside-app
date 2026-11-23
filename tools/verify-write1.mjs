@@ -1,6 +1,11 @@
 /**
  * tools/verify-write1.mjs
- * 23 Nov 2026 v15
+ * 23 Nov 2026 v16
+ *
+ * v16 - P-44 S1 SCHEMA (the physio link). ownPrevious joins the baseline
+ *   as a DATED PROMISE: written by store.setOwnPrevious(), read by nothing
+ *   until S4 (What your physio changed, Put back my old list) connects it;
+ *   S4 removes the line, as the check below insists.
  *
  * v15 - P-39 S2. myMove's dated promise kept: Making my Move's screens
  *   (views/my-move.js, data/my-move.js) now read it. Its line is gone.
@@ -241,6 +246,11 @@ const BASELINE = new Set([
   // likedMovements (path-engine.js), Session 4 connects dayOpen
   // (plan-home.js); each removes its line, as the check below insists.
   'dayOpen',
+
+  // P-44 S1, 23 Nov 2026 (store.js v130). A DATED PROMISE: written by
+  // store.setOwnPrevious(), read by nothing until S4 (What your physio
+  // changed; Put back my old list). S4 removes this line.
+  'ownPrevious',
 
 
   // 'conditionMeta' -- removed 28 Sep 2026. SMOOTH-P4a reads it: Progress

@@ -1,6 +1,8 @@
 # Alongside — Data Schema Reference
-## 23 Nov 2026 v1.131
+## 23 Nov 2026 v1.132
 
+> **v1.132, 23 Nov 2026 — P-44 PHYSIO LINK, schema first (S1)** (`store.js` v130). Spec `docs/specs/alongside_physio-link_23nov2026_v1.md`; agreed by Graeme, 23 Nov (*"Go ahead"*). **One addition. The Plan only** (Free never writes it). **`ownPrevious`** `{ at, list }` or `null` (default `null`): My exercises (`prescribedExercises` entries, as they were) just before the person used a professional's changes from a back link, so *Put back my old list* can restore it. **Written by** `store.setOwnPrevious(list)` (S4, *What your physio changed*); **read by** My exercises (S4). Read by nothing yet: S4 connects it. **On load** (`store.cleanOwnPrevious()`): `at` must be a date-time within the last 30 days (not in the future); `list` 1 to 200 objects each with a string `id` and `name`; otherwise `null`. *Delete my health answers* takes the notes from its entries, as from `prescribedExercises`. The links themselves are never kept. Gated by `tools/verify-plan-link.mjs`.
+>
 > **v1.131, 23 Nov 2026 — OWN-DONE-TODAY** (`store.js` v129). No field added or changed. **`prescribedExercises[].completedToday`** is now read only through `store.ownDoneToday(e)`: done today only when `completedAt` is today's local day (an entry with no `completedAt` keeps its flag). Before this, the flag was set and never cleared, so every exercise ever ticked showed under *Completed today* (Graeme, 23 Nov). Readers: `prescribed.js`, `prescribed-session.js`, `today.js`, `plan-home.js`, `data/week-shape.js`, `data/little-and-often.js`.
 >
 > **v1.130, 23 Nov 2026 — P-39 S6 QUIET HOME** (`store.js` v128). One key added to **`myMove`**: **`review`** `{ arc, block }` or `null` (default `null`): Home asks *Still what you want Alongside for?* once at each twelve-week turn of an arc (weeks 12, 24, …); `arc` is that arc's `startedAt`, `block` the turn answered (1 for week 12, 2 for week 24). **Written by** `setReviewed()` (`data/my-move.js`) through `store.setMyMove()`; **read by** `reviewDue()` (Home). A new arc (another `startedAt`) asks again at its own week 12. **On load:** anything but a string `arc` (40 characters at most) and a whole `block` from 1 to 100 → `null`. A third recorded touch-once exception (spec v6). Not a health answer.
@@ -1106,7 +1108,7 @@
 
 ## 06 Sep 2026 v1.51
 
-**File:** `js/store.js` (confirmed live version: **v129, 23 Nov 2026**)
+**File:** `js/store.js` (confirmed live version: **v130, 23 Nov 2026**)
 
 > **v1.47, 06 Sep 2026 — CR-1.** `conditions[]` gains three ids and loses one. `chronic-fatigue` is **retired**; `persistent-fatigue`, `me-cfs` and `long-covid` replace it. No field shape changed — `conditions` is still `string[]` and `conditionMeta` is still keyed by condition id.
 >

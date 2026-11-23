@@ -6,7 +6,13 @@ import { validateWeightTarget } from "./data/weight-targets.js";
 
 /**
  * store.js - Data persistence layer
- * 23 Nov 2026 v129
+ * 23 Nov 2026 v130
+ *
+ * v130 - P-44 PHYSIO LINK S1 (spec docs/specs/alongside_physio-link_23nov2026_v1.md).
+ *   ownPrevious { at, list } or null: My exercises just before the person
+ *   used a professional's changes, kept 30 days. cleanOwnPrevious() on load;
+ *   setOwnPrevious(list); Delete my health answers takes its notes.
+ *   Schema v1.132.
  *
  * v129 - OWN-DONE-TODAY (Graeme, 23 Nov). ownDoneToday(e): one of My
  *   exercises is done today only if completedAt is today. No field changes.
@@ -1816,6 +1822,7 @@ export const store = {
       weekChanges: sanitizeWeekChanges(saved.weekChanges, sanitizeWeekShape(saved.weekShape)),
       // P-39 (v125). Made safe on every load.
       myMove: this.cleanMyMove(saved.myMove),
+      ownPrevious: this.cleanOwnPrevious(saved.ownPrevious),
       myExercisesGroup: typeof saved.myExercisesGroup === "string" && saved.myExercisesGroup.trim()
         ? saved.myExercisesGroup.replace(/[<>]/g, "").slice(0, 40) : null,
 
@@ -2223,6 +2230,26 @@ export const store = {
   },
 
   /** P-39, v125. The one writer of myMove: merges a patch, cleans, saves. */
+  /**
+   * P-44 S1. My exercises as they were before a professional's changes were
+   * used: { at (ISO), list (prescribedExercises entries) } or null. Kept 30
+   * days from at; anything unreadable, older, empty or over 200 entries is
+   * null. Each entry must be an object with an id and a name.
+   */
+  OWN_PREVIOUS_DAYS: 30,
+  cleanOwnPrevious(src, now = new Date()) {
+    if (!src || typeof src !== 'object' || Array.isArray(src)) return null;
+    const t = typeof src.at === 'string' && /^\d{4}-\d{2}-\d{2}T/.test(src.at) ? Date.parse(src.at) : NaN;
+    if (!Number.isFinite(t) || t > now.getTime() + 60000 || now.getTime() - t > this.OWN_PREVIOUS_DAYS * 864e5) return null;
+    if (!Array.isArray(src.list) || !src.list.length || src.list.length > 200) return null;
+    if (!src.list.every(e => e && typeof e === 'object' && !Array.isArray(e) && typeof e.id === 'string' && typeof e.name === 'string')) return null;
+    return { at: src.at, list: JSON.parse(JSON.stringify(src.list)) };
+  },
+  setOwnPrevious(list) {
+    this.data.ownPrevious = list ? this.cleanOwnPrevious({ at: new Date().toISOString(), list }) : null;
+    this.save();
+  },
+
   setMyMove(patch) {
     if (!patch || typeof patch !== 'object') return;
     this.data.myMove = this.cleanMyMove({ ...this.cleanMyMove(this.data.myMove), ...patch });
@@ -2844,6 +2871,7 @@ export const store = {
       // person loved. The other side of exercisePreferences: one movement
       // is liked or not wanted, never both (likeMovement / setExercisePreference).
       likedMovements: {},
+      ownPrevious: null,
       // P-39 MAKING MY MOVE (v125). Spec section 7.
       myMove: { step: null, made: null, purposes: [], most: null, goodDay: 'few', hardDay: ['coach'], dismissed: [], day: null, startClosed: null, review: null },
 
@@ -3439,6 +3467,8 @@ export const store = {
       const { notes, ...rest } = e || {};
       return rest;
     });
+    // P-44 S1. The list kept from before a professional's changes: its notes go too.
+    if (this.data.ownPrevious) this.data.ownPrevious = { ...this.data.ownPrevious, list: this.data.ownPrevious.list.map(e => { const { notes, ...rest } = e || {}; return rest; }) };
     const sg = this.data.strategicGoal;
     if (sg && typeof sg === 'object' && (sg.targetUnit === 'kg' || sg.weightTargetBand != null)) {
       this.data.strategicGoal = { ...sg, targetValue: null, targetUnit: null, weightTargetBand: null };
