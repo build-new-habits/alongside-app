@@ -1,7 +1,11 @@
 /**
  * prescribed-session.js - My exercises, played
  *
- * 16 Nov 2026 v19
+ * 23 Nov 2026 v20
+ *
+ * v20 - OWN-DONE-TODAY (Graeme, 23 Nov: "It says I did these today but I
+ *   didn't"). Done today is read through store.ownDoneToday(): ticked today
+ *   only (the flag was never cleared).
  *
  * v19 - P-36 MY-LIST-PLAYER (Graeme, 15-16 Nov, on Little and often: "The
  *   timer is at the bottom. I can't see what exercises are being done in
@@ -316,7 +320,7 @@ function _thumb(ex) {
 /** D-7. Today's list: not yet done, in the chosen group if there is one. */
 function _todaysList() {
   const group = store.get("myExercisesGroup") || null;
-  return (store.get("prescribedExercises") || []).filter(e => !e.completedToday && (!group || e.group === group));
+  return (store.get("prescribedExercises") || []).filter(e => !store.ownDoneToday(e) && (!group || e.group === group));
 }
 
 export function render() {
@@ -343,7 +347,7 @@ export function render() {
 
 /** P-36. The list first: what's in it, about how long, then Start. */
 function renderList(whole, active) {
-  const left = whole.filter(e => !e.completedToday);
+  const left = whole.filter(e => !store.ownDoneToday(e));
   const done = whole.length - left.length;
   return `
     <div class="view workout-view is-plan ps-view">
@@ -362,10 +366,10 @@ function renderList(whole, active) {
 function _rows(whole, current, jump = false) {
   return `<ul class="ps-rows look-card">${whole.map(ex => {
     const isNow = current && ex.id === current.id;
-    const tick = `<span class="ps-tick${ex.completedToday ? " ps-tick--on" : ""}" aria-hidden="true">${ex.completedToday ? "\u2713" : ""}</span>`;
-    const text = `<span class="ps-row__t"><span class="ps-row__name">${_esc(ex.name)}</span><span class="sr-only">, </span><span class="ps-row__amt">${_esc(_amount(ex))}${ex.completedToday ? " \u00b7 done" : isNow ? " \u00b7 now" : ""}</span></span>`;
+    const tick = `<span class="ps-tick${store.ownDoneToday(ex) ? " ps-tick--on" : ""}" aria-hidden="true">${store.ownDoneToday(ex) ? "\u2713" : ""}</span>`;
+    const text = `<span class="ps-row__t"><span class="ps-row__name">${_esc(ex.name)}</span><span class="sr-only">, </span><span class="ps-row__amt">${_esc(_amount(ex))}${store.ownDoneToday(ex) ? " \u00b7 done" : isNow ? " \u00b7 now" : ""}</span></span>`;
     const inner = `${tick}${_thumb(ex)}${text}`;
-    return jump && !ex.completedToday
+    return jump && !store.ownDoneToday(ex)
       ? `<li><button type="button" class="ps-row${isNow ? " ps-row--now" : ""}" data-ps-jump="${_esc(ex.id)}"${isNow ? ' aria-current="step"' : ""}>${inner}</button></li>`
       : `<li class="ps-row${isNow ? " ps-row--now" : ""}">${inner}</li>`;
   }).join("")}</ul>`;
@@ -377,7 +381,7 @@ function renderExercise(whole, active) {
   const next       = active[currentIndex + 1] || null;
   const isLast     = active.length === 1 || currentIndex >= active.length - 1;
   const pos        = Math.max(1, whole.findIndex(e => e.id === ex.id) + 1);
-  const doneCount  = whole.filter(e => e.completedToday).length;
+  const doneCount  = whole.filter(e => store.ownDoneToday(e)).length;
   const progress   = whole.length ? (doneCount / whole.length) * 100 : 0;
   // TIME-1. The one resolver.
   const holdSecs   = resolveTiming(ex, ex.reps).seconds;

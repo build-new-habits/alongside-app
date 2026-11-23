@@ -1,6 +1,10 @@
 /**
  * today.js
- * 15 Nov 2026 v63
+ * 23 Nov 2026 v64
+ *
+ * v64 - OWN-DONE-TODAY (Graeme, 23 Nov: "It says I did these today but I
+ *   didn't"). Done today is read through store.ownDoneToday(): ticked today
+ *   only (the flag was never cleared).
  *
  * v63 - P-25 HOW-TO GUIDES. Guide markers only: Free Home's
  *   Not sure? I'll pick something (not-sure). Nothing else changes.
@@ -2342,7 +2346,7 @@ function _markGuidanceShown(root) {
     const t = week.template;
     if (t.own) {
       const group = t.own === 'all' ? null : t.own;
-      const left = (store.get('prescribedExercises') || []).filter(e => !e.completedToday && (!group || e.group === group)).length;
+      const left = (store.get('prescribedExercises') || []).filter(e => !store.ownDoneToday(e) && (!group || e.group === group)).length;
       return `<section class="home-week look-card" aria-labelledby="home-week-h">
         <p class="look-label home-week__lbl">Today, from your week</p>
         <h2 class="home-week__name" id="home-week-h">${_esc(t.name)}</h2>

@@ -1,6 +1,9 @@
 /**
  * views/progress-share.js
- * 31 Oct 2026 v2
+ * 23 Nov 2026 v3
+ *
+ * v3 - OWN-NAMES (Graeme, 23 Nov: own exercises showed as "Px 1794424682372 14"). My exercises are named
+ *   from the list (ownName), not from their ids.
  *
  * v2 - STAGE PATH Session 9 (CLOSE; P-12 F5; Graeme, 31 Oct: "‹ Back"). On
  *   the Plan only: the way back says "‹ Back" (it said "← Progress"; its
@@ -39,7 +42,7 @@ import { EXERCISES } from "../data/exercises/index.js";
 import { aimById } from "../data/aims.js";
 import { arcWeek } from "../data/arc-readback.js";
 import { windowsFor, windowRange, buildReport, defaultsFor, PARTS, FORMATS, reportText, reportCsv,
-         describeShare, setsText, minutesText, ABOUT_LINES } from "../data/progress-report.js";
+         describeShare, setsText, minutesText, ABOUT_LINES, ownName } from "../data/progress-report.js";
 import { drawPicture, drawCertificate, canvasBlob } from "../data/share-images.js";
 
 let _preset = null;
@@ -66,7 +69,7 @@ export function ProgressShareView(router) {
   let container = null;
 
   const premium = () => store.get("tier") === "personal";
-  const exerciseName = id => (EXERCISES.find(e => e.id === id) || {}).name || null;
+  const exerciseName = id => (EXERCISES.find(e => e.id === id) || {}).name || ownName(id, store.get("prescribedExercises"));
 
   function arcInfo() {
     if (!premium()) return null;

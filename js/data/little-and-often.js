@@ -1,6 +1,10 @@
 /**
  * js/data/little-and-often.js
- * 15 Nov 2026 v2
+ * 23 Nov 2026 v3
+ *
+ * v3 - OWN-DONE-TODAY (Graeme, 23 Nov: "It says I did these today but I
+ *   didn't"). Done today is read through store.ownDoneToday(): ticked today
+ *   only (the flag was never cleared).
  *
  * v2 - P-31 review (15 Nov). The sore rule is the shared one in
  *   data/sore-rule.js (it was a copy of the player's), so Home and the
@@ -94,7 +98,7 @@ export function homeItems(d = new Date()) {
       group,
       when: choices[group],
       count: items.length,
-      done: items.length > 0 && items.every(e => e.completedToday),
+      done: items.length > 0 && items.every(e => store.ownDoneToday(e)),
       sore: soreAreaIn(items),
     };
   });

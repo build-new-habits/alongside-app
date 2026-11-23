@@ -1,6 +1,9 @@
 /**
  * progress.js
- * 15 Nov 2026 v37
+ * 23 Nov 2026 v38
+ *
+ * v38 - OWN-NAMES (Graeme, 23 Nov: own exercises showed as "Px 1794424682372 14"). Today's report names
+ *   My exercises from the list (ownName), not from their ids.
  *
  * v37 - P-25 HOW-TO GUIDES. Guide markers only: Set up your arc
  *   (arc-setup) and Change my arc (change-arc). Nothing else changes.
@@ -414,7 +417,7 @@ import { liftReadback, strandReadback, arcWeek, sessionsByWeek,
 import { kindOf } from '../data/kind-colours.js';
 import { zone2WeekWords } from '../data/trend-recipes.js';
 import { windowRange, windowsFor, sessionsIn, dailyCounts, buildReport,
-         setsText, moodPairs, moodStory, fiveOf } from '../data/progress-report.js';
+         setsText, moodPairs, moodStory, fiveOf, ownName } from '../data/progress-report.js';
 import { setSharePreset } from './progress-share.js';
 
 // Set by _rateNote when it renders the sustained-rate note, committed by
@@ -1280,7 +1283,7 @@ export function ProgressView(router) {
 
   function _exerciseName(id) {
     const e = EXERCISES.find(x => x.id === id);
-    return e ? e.name : null;
+    return e ? e.name : ownName(id, store.get('prescribedExercises'));
   }
 
   /** Free: last, quiet. Nothing greyed out, nothing locked. */

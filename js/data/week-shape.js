@@ -1,6 +1,10 @@
 /**
  * js/data/week-shape.js
- * 14 Nov 2026 v4
+ * 23 Nov 2026 v5
+ *
+ * v5 - OWN-DONE-TODAY (Graeme, 23 Nov: "It says I did these today but I
+ *   didn't"). Done today is read through store.ownDoneToday(): ticked today
+ *   only (the flag was never cleared).
  *
  * v4 - P-31 CHANGE-TODAY. What a day is for now includes this week's
  *   change from Change today (weekChanges, week-shape-model.js v6):
@@ -216,7 +220,7 @@ export function startOwnList(d = new Date()) {
   const own = today?.template?.own;
   if (!own) return false;
   const group = own === "all" ? null : own;
-  const left = (store.get("prescribedExercises") || []).filter(e => !e.completedToday && (!group || e.group === group));
+  const left = (store.get("prescribedExercises") || []).filter(e => !store.ownDoneToday(e) && (!group || e.group === group));
   if (!left.length) return false;
   store.set("myExercisesGroup", group);
   return true;
