@@ -1,7 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 24 Nov 2026 v740
+ * 24 Nov 2026 v741
+ *
+ * v741 - P-46 S4 FREE HOME (Free; the Plan's Home unchanged). Free Home is the coach, today: How are you today? and Check in, then today's session; Something gentler; six ready-made sessions; Log what I did; Your exercises with a list; See what the Plan adds. Choosing any kind of session, Classes, the Library, the arc and the programme are the Plan's: a Free route to one opens a page that says so. NEW FILES precached: js/views/free-home.js, js/views/on-the-plan.js.
  *
  * v740 - P-46 S3 ASK LATER (both tiers). After the one-minute start, Home asks three things once, later: how active you've been (after a first session), what you want from it (Free, after three), how often a week (after a week). Never on a hard day; Not now is final. NEW FILE precached: js/data/ask-later.js.
  *
@@ -4333,7 +4335,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v740";
+const CACHE_NAME = "alongside-v741";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4399,7 +4401,7 @@ const SHELL_HASHES = {
   "./css/components/capture.css": "343b4ae0dc6fe6ea",
   "./css/components/finish.css": "c33e298d5fcb92ae",
   "./js/app.js": "81ed92c5ada71eb8",
-  "./js/router.js": "72429ae70e4499a5",
+  "./js/router.js": "2e4ae29b50cdcfb3",
   "./js/store.js": "da198c2848d498f0",
   "./js/session-log.js": "6134de4315842e05",
   "./js/exercise-feedback.js": "adba8549f444da2a",
@@ -4416,7 +4418,7 @@ const SHELL_HASHES = {
   "./js/session-guard.js": "00177a846537868c",
   "./js/session-resume.js": "6916b88c0757374f",
   "./js/auth.js": "9b9c7a632dccada6",
-  "./js/views/today.js": "094d2779230d6c0c",
+  "./js/views/today.js": "36762a19c4e7bee0",
   "./js/views/mobility-conditioning.js": "8b30ad4fa0887d62",
   "./js/views/arc-setup.js": "c1d43e86b901ace3",
   "./js/views/stretch-arc.js": "cdc78c24b91d2e1c",
@@ -4449,7 +4451,7 @@ const SHELL_HASHES = {
   "./js/views/home-threshold.js": "17bc42808aa5bd5c",
   "./js/views/onboarding/frequency.js": "47e40b6e6e2f458f",
   "./js/views/programme-select.js": "115a22eeb9526be5",
-  "./js/views/upgrade.js": "1c5fabcb72727877",
+  "./js/views/upgrade.js": "c20de0f464afbb80",
   "./js/views/privacy.js": "25721026cff47822",
   "./js/views/library.js": "36195497d25a503d",
   "./js/views/practices.js": "9890a7fa300e9d1c",
@@ -4459,20 +4461,20 @@ const SHELL_HASHES = {
   "./js/views/under-18.js": "22c82205c5f7626a",
   "./js/views/consent-update.js": "51f918f8e2c9b25a",
   "./js/data/arc-readback.js": "9b06dcba96534da0",
-  "./js/data/tier-table.js": "7821c3304bd0815c",
+  "./js/data/tier-table.js": "ca492fb2752322a4",
   "./js/views/know-what.js": "e84fee3e6d9d3af0",
   "./js/views/plan-home.js": "9e7f620b5821dfa0",
-  "./js/views/path.js": "440a45cfcd4f385f",
+  "./js/views/path.js": "e6ccf9456ebfd488",
   "./js/plan-look.js": "7674d8fbf5101aa9",
   "./js/views/plan-finish.js": "d3901b6355f55542",
   "./js/data/outside.js": "3af4ea46bd898084",
   "./js/data/trend-recipes.js": "14961e4c12aef77e",
-  "./js/data/ready-sessions.js": "0187232763966245",
+  "./js/data/ready-sessions.js": "9e92e2c63af939a8",
   "./js/data/path-context.js": "5d8018dcdcdb3f17",
   "./js/data/swap-search.js": "5f0f0e4d112f92ea",
   "./js/views/build-session.js": "763317cec8c62e83",
   "./js/data/build-lately.js": "e06714cc9d1539a6",
-  "./css/components/path.css": "a099858d00434d21",
+  "./css/components/path.css": "e47b23e28e32a2ba",
   "./css/components/start.css": "308a22950f0a3940",
   "./js/data/red-flag.js": "3cd9eecbc3985eb3",
   "./js/data/health-consent.js": "a23d005af57f179c",
@@ -4490,6 +4492,8 @@ const SHELL_HASHES = {
   "./js/views/plan-import.js": "027c3f9fc203c613",
   "./js/views/change-today.js": "31101d97d53492c8",
   "./js/views/my-move.js": "bc53b61cdf65da20",
+  "./js/views/free-home.js": "f94508fd3bb83d2f",
+  "./js/views/on-the-plan.js": "a0738085784cb045",
   "./js/views/onboarding/start.js": "5f52e26da854742b",
   "./js/data/my-move.js": "c6ec80cda14e499b",
   "./js/data/plan-link.js": "ebeb09703328fab6",
@@ -4507,7 +4511,7 @@ const SHELL_HASHES = {
   "./js/data/pdf-lite.js": "b924b197ae7f46fe",
   "./js/views/plan-share.js": "0b6f255658b7037b",
   "./js/guide.js": "5a0fdd80790faafe",
-  "./js/data/guides.js": "4aa792d5523ba53d",
+  "./js/data/guides.js": "93be74a63cd62aab",
   "./js/views/help.js": "4d4218955ce16e02",
   "./css/components/help.css": "1ea3aee117dc9aee",
   "./css/components/your-week.css": "c95efbc697af8495",
@@ -4841,6 +4845,8 @@ const SHELL_URLS = [
   "./js/views/plan-import.js",
   "./js/views/change-today.js",
   "./js/views/my-move.js",
+  "./js/views/free-home.js",
+  "./js/views/on-the-plan.js",
   "./js/views/onboarding/start.js",
   "./js/data/my-move.js",
   "./js/data/plan-link.js",
