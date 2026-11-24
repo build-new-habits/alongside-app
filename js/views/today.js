@@ -1,5 +1,11 @@
 /**
  * today.js
+ * 24 Nov 2026 v65
+ *
+ * v65 - P-46 S3. Home asks one question once, later (data/ask-later.js): on
+ *   Free under the main card; on the Plan, plan-home.js places it. Bound here
+ *   for both tiers (attachEvents).
+ *
  * 23 Nov 2026 v64
  *
  * v64 - OWN-DONE-TODAY (Graeme, 23 Nov: "It says I did these today but I
@@ -876,6 +882,7 @@ import { arcWeek, weekStart }  from '../data/arc-readback.js';
 import { noticePlanJump, offerBriefPath } from '../data/pacing.js';
 import { isPremium, lockedFeature } from '../auth.js';
 import { renderPlanHome, wirePlanHome, goToSuggestion } from './plan-home.js';   // STAGE PATH P-4
+import { dueAskLater, askLaterCard, bindAskLater } from '../data/ask-later.js';   // P-46 S3
 import { scopeStatementHTML } from '../data/scope-statement.js';
 // GUIDED-COPY, 06 Sep 2026. plannedFocusToday dropped from this import.
 // CLUB-SHELL added it so Guided class could say what the class was for
@@ -1304,7 +1311,7 @@ export function TodayView(router) {
              history remains in Progress, where looking it up is a
              choice. -->
 
-        ${_hingeCard()}
+        ${_hingeCard()}${askLaterCard(dueAskLater())}
 
         <!-- LOBBY-1b. THE ARC IS THE FIRST THING, and it is reachable
              without a check-in. It was three levels deep on device --
@@ -1411,6 +1418,8 @@ export function TodayView(router) {
   }
 
   function attachEvents(container) {
+    // P-46 S3. The question asked once, later (both tiers; Plan Home places it).
+    bindAskLater(container, () => router.navigate('today'));
 
     // LOBBY-1c. The one way through to the session space. Routes via
     // the check-in when one is owed and straight through when it is

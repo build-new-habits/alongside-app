@@ -43,6 +43,9 @@ const SCREENS_ALL = [
   ["start", ["=#st-name|Sam", "[data-st-next]", '[data-area="lower-back"]', '[data-area="knee"]', "[data-st-next]", '[data-place="home"]', "[data-st-next]"], "4 Your first session"],
   ["nohealth", ["[data-st-next]"], "No health answers: 2 Where"],
   ["nohealth", ["[data-st-next]", '[data-place="outside"]', "[data-st-next]"], "No health answers: 3 Your first session"],
+  ["ask-free", [], "S3 Free Home: How active have you been lately?"],
+  ["ask-plan", [], "S3 Plan Home: How active have you been lately?"],
+  ["ask-goals", ['[data-al-pick="get-stronger"]'], "S3 Free Home: What do you most want from this?"],
 ];
 const SCREENS = process.env.ONLY ? SCREENS_ALL.filter(x => x[0] === process.env.ONLY) : SCREENS_ALL;
 
@@ -67,8 +70,19 @@ for (const scheme of ["light", "dark"]) for (const width of [390, 320]) for (con
       if (where === "nohealth") HC.declineHealthConsent();
       else s.set("consent.health", { given: true, at, version: HC.HEALTH_CONSENT_VERSION, withdrawnAt: null });
       const DP = await import("./js/display-prefs.js"); DP.setDisplayPref("textScale", size); DP.applyDisplayPrefs();
+      if (where.startsWith("ask-")) {   // S3: onboarded through the short start, one session (three for goals)
+        const { HURT_AND_ACHE_VERSION } = await import("./js/exercise-card.js");
+        s.set("onboardingComplete", true); s.set("name", "Sam"); s.set("onboarding.flow", "short");
+        s.set("onboarding.threadCompletedAt", new Date(Date.now() - 864e5).toISOString());
+        s.set("tier", where === "ask-plan" ? "personal" : "free");
+        s.set("safetyAckLog", [{ at, textVersion: HURT_AND_ACHE_VERSION, surface: "fixture" }]); s.set("guidanceShownAt", at);
+        const n = where === "ask-goals" ? 3 : 1;
+        s.set("activityLog", Array.from({ length: n }, (_, i) => ({ id: "a" + i, type: "workout", completedAt: new Date(Date.now() - (i + 1) * 3600e3).toISOString(), durationMins: 15, completed: true })));
+        if (where === "ask-goals") s.set("lifestyle.activityLevel", "light");
+        if (where === "ask-plan") s.setMyMove({ made: at, purposes: ["stronger", "moving", "instep"], most: "stronger", goodDay: "few", hardDay: ["coach"], startClosed: at });
+      }
     }, { size, where });
-    await page.evaluate(() => window.router.navigate("onboarding/start"));
+    await page.evaluate(w => window.router.navigate(w.startsWith("ask-") ? "today" : "onboarding/start"), where);
     await page.waitForTimeout(500);
     for (const p of presses) {
       const hit = await page.evaluate(v => {
@@ -88,7 +102,7 @@ for (const scheme of ["light", "dark"]) for (const width of [390, 320]) for (con
       const main = document.getElementById("main-content");
       const h1s = [...main.querySelectorAll("h1")].filter(h => !h.closest(".sr-only") && getComputedStyle(h).display !== "none" && h.getClientRects().length).length;
       const small = [];
-      for (const el of main.querySelectorAll("button, .st-seg__opt span, .st-input")) {
+      for (const el of main.querySelectorAll(".st button, .st-seg__opt span, .st-input, .al button")) {
         const b = el.getBoundingClientRect(); if (!b.width) continue;
         if (b.height < 43.5) small.push(`${(el.id || el.className || el.tagName).toString().slice(0, 30)} ${Math.round(b.height)}px`);
       }
