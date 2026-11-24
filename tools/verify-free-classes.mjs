@@ -1,5 +1,11 @@
 /**
  * tools/verify-free-classes.mjs
+ * 24 Nov 2026 v7
+ *
+ * v7 - P-46 S4 FREE HOME. Classes moved to the Plan. Free gets the on-the-
+ *   plan page (TEST 1); the knee rule (TEST 4) is checked on the Plan's list;
+ *   Free's list checks are retired (git history v6).
+ *
  * 12 Oct 2026 v6
  *
  * v6 - A-1 PLAN-HOME-PRUNE (Graeme approved the mock-up, 12 Oct). 3a: on
@@ -101,39 +107,18 @@ function fixture(tier) {
 async function go(view) { await router.navigate(view); await wait(60); }
 const { CLASSES, seatedThroughout } = await import(B + "data/classes/index.js");
 
-// ── 1. THE DOOR ─────────────────────────────────────────────────────────
-console.log("\nTEST 1 - Free Home has a door to classes");
+// ── 1. FREE: CLASSES ARE THE PLAN'S (P-46 S4) ──────────────────────────
+// Classes moved to the Plan (spec §5). The Free door and Free's list checks
+// are retired (git history v6); the seated words on the Plan's list are
+// verify-s1-seated TEST 2.
+console.log("\nTEST 1 - Free: Classes are part of the Plan");
 fixture("free");
 await go("today");
-const moveGroup = main.querySelector('[aria-labelledby="today-group-body"]');
-const door = moveGroup && [...moveGroup.querySelectorAll("button")].find(b => /Classes/.test(txt(b)));
-ok("1pc. Free Home, \"Move your body\"", !!moveGroup, txt(main).slice(0, 160));
-ok("1a. a Classes door is among them", !!door, moveGroup ? [...moveGroup.querySelectorAll("button")].map(txt).join(" | ") : "");
-click(door); await wait(120);
-ok("1b. it opens the class list, not the upgrade page", router.currentView === "classes" && /Classes/.test(txt(main)) && !/the plan costs|£/i.test(txt(main)), `${router.currentView} | ${txt(main).slice(0, 120)}`);
-const start = $("[data-start]");
-click(start); await wait(200);
-ok("1c. and a class starts", router.currentView === "class-player", router.currentView);
-
-// ── 2. SEATED ───────────────────────────────────────────────────────────
-console.log("\nTEST 2 - the list says which classes can be done seated");
-fixture("free");
+ok("1a. no Classes door on Free Home", !/Classes/.test(txt(main)), txt(main).slice(0, 160));
 await go("classes");
-const rows = $$(".class-list__row").map(li => ({ name: txt(li.querySelector(".class-list__name")), facts: txt(li.querySelector(".class-list__facts")), label: li.querySelector("[data-start]")?.getAttribute("aria-label") || "" }));
-const byTitle = new Map(CLASSES.map(c => [c.title, c]));
-const wrong = [];
-let seatedShown = 0;
-for (const r of rows) {
-  const c = byTitle.get(r.name); if (!c) continue;
-  const should = seatedThroughout(c);
-  const says = /can be done seated|\bseated\b/i.test(r.facts);
-  if (should !== says) wrong.push(`${r.name}: declares ${c.seatedRoute}/${c.position}, list says "${r.facts}"`);
-  if (should) { seatedShown++; if (!/seated/i.test(r.label)) wrong.push(`${r.name}: Start's name does not say seated`); }
-}
-ok("2pc. the list shows the classes", rows.length >= 8, `${rows.length}`);
-ok("2a. \"can be done seated\" exactly where every step has a seated version", wrong.length === 0 && seatedShown >= 3, `${seatedShown} seated; ${wrong.join("; ")}`);
-const going = rows.find(r => r.name === "Putting the Day Down");
-ok("2b. Putting the Day Down (mixed, every step with a seated version) says both", !!going && /mixed/.test(going.facts) && /can be done seated/.test(going.facts), going?.facts);
+ok("1b. Free asking for Classes: the on-the-plan page, which says what they are", router.currentView === "on-the-plan" && /Follow-along classes/.test(txt(main)), router.currentView);
+await go("class-player");
+ok("1c. and the class player too", router.currentView === "on-the-plan", router.currentView);
 
 // ── 3. CONTROL ──────────────────────────────────────────────────────────
 console.log("\nTEST 3 - control: the Plan's \"Join a class\" is unchanged");
@@ -149,11 +134,11 @@ ok("3c. which opens the classes", router.currentView === "classes", router.curre
 // ── 4. A SEVERE SCORE HOLDS A CLASS BACK ────────────────────────────────
 console.log("\nTEST 4 - a knee scored 8 today holds back the classes that load it");
 {
-  fixture("free");
+  fixture("personal");   // P-46 S4: Classes are the Plan's; the safety rule is checked there
   store.set("conditions", ["knee"]);
   store.set("conditionPainScores", { knee: 0 });
   await go("classes");
-  const offered = () => $$(".class-list__row:not(.class-list__row--held)").filter(li => li.querySelector("[data-start]")).map(li => txt(li.querySelector(".class-list__name")));
+  const offered = () => $$("[data-class]").map(b => txt(b.querySelector(".path-door__t")).replace(/ Your arc$/, ""));
   const held = () => $$(".class-list__row--held .class-list__name").map(txt);
   const quiet = offered();
   store.set("conditionPainScores", { knee: 7 });
@@ -164,7 +149,7 @@ console.log("\nTEST 4 - a knee scored 8 today holds back the classes that load i
      held().includes("Standing Up") && held().includes("Unsticking"), `offered: ${sore.join(", ")} | held: ${held().join(", ")}`);
   store.set("conditionPainScores", { knee: 8 });
   await go("today"); await go("classes");
-  ok("4b. with the knee Bad (8), the Bad-day choice and no class to start", !!$('[data-bad-day="adapt"]') && !$("[data-start]"), txt(main).slice(0, 160));
+  ok("4b. with the knee Bad (8), the Bad-day choice and no class to start", !!$('[data-bad-day="adapt"]') && !$("[data-start]") && !$("[data-class]"), txt(main).slice(0, 160));
 }
 
 console.log("");

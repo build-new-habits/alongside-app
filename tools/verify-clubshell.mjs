@@ -1,5 +1,11 @@
 /**
  * tools/verify-clubshell.mjs
+ * 24 Nov 2026 v9
+ *
+ * v9 - P-46 S4 FREE HOME. Free Home has no orientation line and no arc panel
+ *   now. 9a-2 checks Free points only at its Today card; 9a-3, 9c, 10f and 10g
+ *   hold that the retired lines and strand rows have not come back.
+ *
  * 05 Nov 2026 v8
  *
  * v8 - P-27 TIDY (Graeme, 05 Nov: "Remove it" for My programme; "Retire on
@@ -281,12 +287,14 @@ ok("9a. the Plan's Home points only at a control that is on the screen",
    "it points at a door that is not on the screen - and it shows ONLY to " +
    "somebody with no goal set, the exact person who needs the pointer to work");
 
-ok("9a-2. and free's own control on free",
-   /Not sure\?[^"]*lets me decide today/.test(code9),
-   "free is told to use One to one, which is a Plan room and is not on its screen");
+// P-46 S4: Free Home has no orientation line now; it points at nothing but its
+// own Today card, which is on the screen.
+ok("9a-2. and free's own control on free: the Today card, on the screen",
+   !/lets me decide today/.test(code9) && !!free.c.querySelector('.path-today [data-action="start-today"]'),
+   "free is pointed at a control that is not on its screen");
 
-ok("9a-3. and the line is chosen by tier, not written once for both",
-   /isPremium\(\)\s*\n?\s*\?\s*"If you'd rather not choose/.test(code9),
+ok("9a-3. and no orientation line is left to be written once for both tiers",
+   !/If you'd rather not choose/.test(code9),
    "one line for two different screens is how the fault moved rather than closed");
 
 ok("9b. and no longer says Unsure",
@@ -295,10 +303,10 @@ ok("9b. and no longer says Unsure",
 
 // "Every strand has come up at least once" was reached with ZERO
 // strands, because zero of zero is zero.
-ok("9c. full-coverage is only claimed when there are strands to cover",
-   /strands\.length\s*\n?\s*\?\s*"Every strand has come up at least once\."/.test(code9),
-   "an arc with no strands announces complete coverage of nothing - vacuously " +
-   "true, and read as an achievement");
+// P-46 S4: the arc panel (and its coverage note) went with Free's arc row.
+ok("9c. no coverage claim is left on Home at all",
+   !/Every strand has come up at least once/.test(code9),
+   "an arc with no strands announces complete coverage of nothing");
 
 // ── 10. ARC-LED ─────────────────────────────────────────────────────────
 // Home led with the coach's pick and four full cards, so the screen
@@ -334,10 +342,9 @@ ok("10e. the arc block has no progress bar or percentage",
 // So this asserts the note rather than the rows, because the note is
 // what is doing the work. If the note ever stops naming them, state
 // becomes colour-only and this goes red.
-ok("10f. the note names which strands have not come up",
-   /_esc\(notYet\.join/.test(arcLed) && /All of it still ahead of you/.test(arcLed),
-   "state is carried by colour alone (WCAG 1.4.1), and colour is the first " +
-   "thing to fail on a phone in daylight");
+ok("10f. retired with the arc panel (P-46 S4): no strand rows on Home, so no colour-only state",
+   !/today-arc__strand/.test(arcLed),
+   "strand rows are back without their note");
 
 // One colour, one meaning. Teal is interactive across the whole app.
 const clubCss = fs.readFileSync(_gatePath("css/components/club-rooms.css"), "utf8");
@@ -348,10 +355,9 @@ ok("10f-2. and a lit strand is not painted the interactive colour",
    "teal means 'you can tap this' everywhere else in this app. Spending it on " +
    "'this strand has come up' makes one colour mean two things");
 
-ok("10g. and 'not yet' is said not to mean behind",
-   /Nothing is behind/.test(arcLed),
-   "without that sentence, two of three strands reading 'not yet' is read as " +
-   "being behind, whatever the design intends");
+ok("10g. retired with the arc panel (P-46 S4): no 'not yet' on Home",
+   !/haven't come up yet/.test(arcLed),
+   "a 'not yet' is back without 'Nothing is behind'");
 
 console.log("\nTEST 11 - A11Y-HOME: Home can be read by heading");
 

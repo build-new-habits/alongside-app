@@ -1,5 +1,11 @@
 /**
  * tools/verify-activity-labels.mjs
+ * 24 Nov 2026 v6
+ *
+ * v6 - P-46 S4 FREE HOME. Free Home no longer recaps yesterday (the words
+ *   pass). 2a and 2d now hold that nothing says it wrongly; the recap's own
+ *   words are retired with it.
+ *
  * 28 Oct 2026 v5
  *
  * v5 - STAGE PATH P-4 re-point (none loosened). TEST 2 reads the recap on Free's Home: the Plan's purpose-first Home (mock-up v9) no longer says yesterday's session, its Today card gives today's reason instead (recorded for Graeme). The words are held exactly as before: the actual day, breathing as breathing, never gym for a kind; the plan still does not repeat it.
@@ -133,13 +139,15 @@ async function recap(log) {
 }
 {
   const t1 = await recap([{ type: "walk", completedAt: at(1, 12) }]);
-  ok("2a. a walk yesterday: \"You did a walk yesterday\"", /You did a walk yesterday\./.test(t1) && !/Since yesterday/.test(t1), t1.slice(0, 200));
+  // P-46 S4 (words: "no one needs a lecture"). Free Home no longer recaps yesterday either; 2a and 2d
+  // held the recap's words and are retired with it. Nothing on Home may say it wrongly instead.
+  ok("2a. Free Home: no recap, and never \"Since yesterday\"", !/You did a walk/.test(t1) && !/Since yesterday/.test(t1), t1.slice(0, 200));
   const t2 = await recap([{ type: "mindfulness", completedAt: at(2, 23) }]);
   ok("2b. two days ago is not yesterday", !/yesterday/i.test(t2), t2.slice(0, 200));
   const t3 = await recap([{ type: "gym", sessionType: "lower", completedAt: todayEarlier }]);
   ok("2c. a session earlier today: today, and never \"you did gym\"", /today/i.test(t3) && !/you did gym/i.test(t3), t3.slice(0, 200));
   const t4 = await recap([{ type: "mindfulness", completedAt: at(1, 9) }, { type: "walk", completedAt: at(1, 18) }]);
-  ok("2d. breathing is breathing, not \"movement\"", /breathing practice/.test(t4) && !/movement yesterday/.test(t4), t4.slice(0, 200));
+  ok("2d. breathing is never called \"movement\"", !/movement yesterday/.test(t4), t4.slice(0, 200));
   fixture("personal", [{ type: "walk", completedAt: at(1, 12) }]);
   main.innerHTML = ""; CoachProposalView(rtr).mount(main); await wait(40);
   ok("2e. the plan does not repeat it (A-4)", !/yesterday/i.test(txt(main.querySelector("#cp-preview-panel"))), txt(main.querySelector("#cp-preview-panel")).slice(0, 160));

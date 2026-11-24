@@ -1,5 +1,11 @@
 /**
  * tools/verify-plan-claims.mjs
+ * 24 Nov 2026 v11
+ *
+ * v11 - P-46 S4 FREE HOME. Free asking for Your week or the Library gets the
+ *   on-the-plan page; Free Home is coach-led (check in, Something gentler, six
+ *   ready-made, Log what I did), as the tier table now says.
+ *
  * 29 Oct 2026 v10
  *
  * v10 - STAGE PATH P-4 re-point (none loosened). 3.home: the Plan's Home is four doors by what you came for and one suggestion for today (tier-table.js v8, mock-up v10); read from the doors themselves and Home's one row (Let me choose for you, or the day's card once there is one). 3.as-you-go: Make it up as I go is no longer a Home door, so the claim is proved where it is opened: the router gives it to the Plan and sends Free to the upgrade page. Same property: the table says what the screen does.
@@ -168,12 +174,13 @@ ok("3pc. the table has the spec's rows, and Wellbeing and Safety are the same on
    rows.wellbeing.same && rows.safety.same && rows.checkin.same);
 
 tierFixture("free"); mountView(TodayView);
-const freeHome = { doors: box.querySelectorAll(".home-door").length, tiles: box.querySelectorAll("[data-door-id]").length, pick: !!box.querySelector('[data-action="start-today"]') };
+// P-46 S4: Free Home is coach-led: check in, Something gentler, six ready-made, Log what I did.
+const freeHome = { doors: box.querySelectorAll(".home-door, .path-door[data-door]").length, gentler: !!box.querySelector('[data-action="free-gentler"]'), ready: !!box.querySelector('[data-action="free-ready"]'), log: !!box.querySelector('[data-route="activity-log"]'), pick: !!box.querySelector('[data-action="start-today"]') };
 tierFixture("personal"); mountView(TodayView);
 const planDoors = [...box.querySelectorAll(".path-door[data-door] .path-door__t")].map(txt);   // v10: purpose first
 const planCard = box.querySelector(".path-coach, .path-today");
-ok("3.home  free: any kind of session, or the coach suggests one; the Plan: four doors by what you came for, and one suggestion for today",
-   freeHome.doors === 0 && freeHome.tiles >= 3 && freeHome.pick &&
+ok("3.home  free: check in for today's session, something gentler, six ready-made, Log what I did; the Plan: four doors by what you came for, and one suggestion for today",
+   freeHome.doors === 0 && freeHome.gentler && freeHome.ready && freeHome.log && freeHome.pick && /six ready-made sessions/.test(rows.home.free) &&
    JSON.stringify(planDoors) === JSON.stringify(["Get stronger", "Keep moving", "Stretch", "Move to feel better"]) && !!planCard, JSON.stringify({ freeHome, planDoors }));
 // v10. Make it up as I go is no longer a Home door: it is the Plan's wherever it is opened.
 const { router: claimsRouter } = await import(B + "router.js");

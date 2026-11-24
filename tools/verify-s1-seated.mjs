@@ -1,5 +1,11 @@
 /**
  * tools/verify-s1-seated.mjs
+ * 24 Nov 2026 v4
+ *
+ * v4 - P-46 S4 FREE HOME. Test 2 reads the Plan's class list: Classes moved
+ *   to the Plan. The seated words are on each row's line; the Start button is
+ *   on the class's own page.
+ *
  * 02 Oct 2026 v3
  *
  * v3 - W4-1 GATE-OPEN. The fixture person has agreed (tools/agreed.mjs): the
@@ -102,19 +108,21 @@ for (const [t, steps] of Object.entries(NO)) {
 }
 
 console.log("\nTEST 2 - the real class list says it exactly there");
-fixture("free");
+fixture("personal");   // P-46 S4: Classes are the Plan's
 await go("classes");
-const rows = $$(".class-list__row").map(li => ({ name: txt(li.querySelector(".class-list__name")), facts: txt(li.querySelector(".class-list__facts")), label: li.querySelector("[data-start]")?.getAttribute("aria-label") || "" }));
-ok("2pc. the list shows every class", rows.length === CLASSES.length, `${rows.length} of ${CLASSES.length}`);
+// P-46 S4. The Plan's list (Classes moved to the Plan): the name, then the line. The
+// Start button is on the class's own page, which says "It can all be done seated."
+const rows = $$("[data-class]").map(b => ({ name: txt(b.querySelector(".path-door__t")).replace(/ Your arc$/, ""), facts: txt(b.querySelector(".path-door__d")), label: "" }));
+ok("2pc. the list shows every class (none held: no conditions)", rows.length === CLASSES.length, `${rows.length} of ${CLASSES.length}`);
 const wrong = [];
 for (const r of rows) {
   const c = byTitle.get(r.name);
   const should = YES.includes(r.name);
   const says = /can be done seated/i.test(r.facts) || (c?.position === "seated");
   const label = /seated/i.test(r.label);
-  if (should !== says || should !== label) wrong.push(`${r.name}: facts "${r.facts}", Start "${r.label}"`);
+  if (should !== says) wrong.push(`${r.name}: facts "${r.facts}", Start "${r.label}"`);
 }
-ok("2a. \"can be done seated\" on the line and the Start button, exactly where every step has a seated version", wrong.length === 0, wrong.join("; "));
+ok("2a. \"can be done seated\" on the line, exactly where every step has a seated version", wrong.length === 0, wrong.join("; "));
 const ground = rows.find(r => r.name === "Ground");
 ok("2b. Ground still says floor, and no longer says seated", !!ground && /floor/.test(ground.facts) && !/seated/i.test(ground.facts + ground.label), ground && (ground.facts + " | " + ground.label));
 

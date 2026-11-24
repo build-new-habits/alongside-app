@@ -1,5 +1,13 @@
 /**
  * tools/verify-lobby1.mjs
+ * 24 Nov 2026 v6
+ *
+ * v6 - P-46 S4 FREE HOME. Free Home is free-home.js (coach-led, Plan look).
+ *   The door-list, arc-panel and chooser checks are re-pointed to the same
+ *   properties of the new Home (one invitation with its price, the Today card
+ *   first, no tiles, no arc, Wellbeing once); 2 and 7c retire with HOME_DOORS
+ *   and the arc panel.
+ *
  * 12 Oct 2026 v5
  *
  * v5 - A-1 PLAN-HOME-PRUNE (Graeme approved the mock-up, 12 Oct). REACH
@@ -83,47 +91,26 @@ const rawDoors = [...today.matchAll(/\{\s*(?:kind:[^,]+,\s*)?id:\s*'([a-z-]+)',\
 
 console.log("\nTEST 1 - every door declares what it is");
 
-check("1a. all doors are tagged", () => {
-  ok(rawDoors.length > 0, "no doors found at all");
-  ok(doors.length === rawDoors.length,
-     `${rawDoors.length} doors, ${doors.length} tagged. An untagged door falls through to ` +
-     `whatever the renderer does by default, and Home drifts back to seven equal tiles ` +
-     `the same afternoon somebody adds one.`);
+check("1a. P-46 S4: Free Home's ways in are built in one place (free-home.js door())", () => {
+  const fh = strip(fs.readFileSync(_gatePath("js/views/free-home.js"), "utf8"));
+  ok((fh.match(/door\('data-(route|action)=/g) || []).length >= 4, "Free Home's ways in are not built by door()");
 });
-
-check("1b. both kinds are actually in use", () => {
-  ok(doors.some(d => d.kind === "session"), "no session tiles");
-  ok(doors.some(d => d.kind === "reference"), "no reference rows -- the split is inert");
+check("1b. both kinds: sessions you DO (actions) and things you check (Log what I did)", () => {
+  const fh = strip(fs.readFileSync(_gatePath("js/views/free-home.js"), "utf8"));
+  ok(/data-action="free-ready"/.test(fh) && /data-route="activity-log"/.test(fh), "a kind is missing");
 });
-
 console.log("\nTEST 2 - the split is honoured when rendering");
 
-check("2. rows render from the tag, not a hardcoded list", () => {
-  // SUPERSEDED IN PART BY LOBBY-1c. This asserted that the TILE grid
-  // filtered by kind. There is no tile grid on Home any more -- session
-  // tiles moved behind the check-in, which is a stronger version of the
-  // same rule and is asserted by 10a. What remains is the reference
-  // half, which still has to read the tag rather than name doors.
-  // The filter gained a tier clause for the Wellbeing de-duplication,
-  // so match the kind test rather than the whole expression.
-  ok(/HOME_DOORS\.filter\(d => d\.kind === 'reference'/.test(today),
-     "the reference rows do not filter by kind");
-  ok(!/today-ref-row[\s\S]{0,400}?'library'/.test(today),
-     "the rows name specific doors instead of reading the tag");
+check("2. retired with HOME_DOORS (P-46 S4): nothing left to tag; the old list is in BNH-Files Archive/P-46", () => {
+  ok(!/const HOME_DOORS/.test(today), "HOME_DOORS is back in today.js with nothing reading it");
 });
-
 console.log("\nTEST 3 - demotion does not break routing or the check-in gate");
 
-check("3. rows carry route and check-in data exactly as tiles do", () => {
-  const at = today.indexOf("today-ref-row");
-  ok(at > -1, "no reference rows");
-  const row = today.slice(at, at + 600);
-  ok(row.includes("data-route="), "rows lost their route, so they navigate nowhere");
-  ok(row.includes("data-requires-checkin="),
-     "rows lost the check-in flag. attachEvents binds on [data-route] and reads that " +
-     "attribute -- a row without it silently bypasses the gate.");
+check("3. Free Home's route rows carry their check-in data (data-requires-checkin)", () => {
+  const fh = strip(fs.readFileSync(_gatePath("js/views/free-home.js"), "utf8"));
+  const rows = fh.match(/data-route="[a-z-]+"[^']*/g) || [];
+  ok(rows.length >= 3 && rows.every(r => /data-requires-checkin="(true|false)"/.test(r)), rows.join(" | "));
 });
-
 console.log("\nTEST 4 - quiet, not disabled, and not smaller for thumbs");
 
 check("4a. rows keep a full-size tap target", () => {
@@ -147,16 +134,10 @@ check("4b. rows do not read as disabled", () => {
 
 console.log("\nTEST 5 - the drop-in is still a session, not a footnote");
 
-check("5. the coach's suggestion is a tile", () => {
-  const unsure = doors.find(d => d.id === "unsure");
-  ok(unsure, "the coach-decides door is gone");
-  ok(unsure.kind === "session",
-     "the drop-in was demoted to a reference row. It is the thing somebody does when they " +
-     "turn up without a plan, and it is due promotion, not demotion.");
-  ok(unsure.checkin === true,
-     "the drop-in no longer requires a check-in, so the coach would suggest from no data");
+check("5. the coach's session is the first thing: the Today card's full-width button", () => {
+  const fh = strip(fs.readFileSync(_gatePath("js/views/free-home.js"), "utf8"));
+  ok(/path-today__go" data-action="start-today"/.test(fh), "the Today card has no start-today button");
 });
-
 console.log("\nTEST 6 - LOBBY-1b: no scoreboard on the first screen");
 
 check("6a. Home shows no session count and no weekly target", () => {
@@ -174,68 +155,25 @@ check("6a. Home shows no session count and no weekly target", () => {
 
 console.log("\nTEST 7 - the arc is the first thing, and needs no check-in");
 
-check("7a. the arc panel is on Home", () => {
-  // "arcPanel()" matches the function's own DEFINITION, so the naive
-  // check passed with the call removed. Look for the call inside the
-  // template instead.
-  // HOME-DOORS, 06 Sep 2026. The free branch used to end with a bare
-  // ${arcPanel()} inside the chooser. The chooser is shared now, so the
-  // arc moved out of it and each tier places it explicitly -- above on
-  // Plan, below on free. Both branches asserted separately: one regex
-  // over the whole file passed with a tier's arc deleted.
-  // v5. Inside the Plan branch's _planDoors(): the Today card's arc.
-  const pd = today.slice(today.indexOf("function _planDoors"), today.indexOf("function _arcLine"));
-  ok(/isPremium\(\) \? _planDoors\(\)/.test(today) && /_coachCard\(week\)/.test(pd) && /function _coachCard[\s\S]*data-route="stretch-arc"/.test(today) && /\$\{_arcLine\(\)\}/.test(today),
-     "Plan's Home does not render the arc");
-  // CLUB-SHELL, 06 Sep 2026. Free's arc moved into the same ternary that
-  // chooses the chooser, because Plan now renders clubRooms() instead.
-  ok(/chooser\(\) \+ arcPanel\(\)/.test(today),
-     "free's Home does not render the arc offer, so the product is never mentioned to " +
-     "the people who might buy it");
-  ok(/function arcPanel/.test(today), "no arc panel");
+check("7a. P-46 S4: the arc is the Plan's; Free Home draws none (verify-arc-door)", () => {
+  ok(!/today-arc|arcPanel\(/.test(today) && !/today-arc|path-arcline/.test(strip(fs.readFileSync(_gatePath("js/views/free-home.js"), "utf8"))), "an arc on Free Home");
 });
-
-check("7b. it is reachable without checking in", () => {
-  const at = today.indexOf("function arcPanel");
-  const body = today.slice(at, today.indexOf("_programmeHint", at));
-  // The panel has TWO branches (offer and active). Asserting that
-  // "false" appears anywhere passed while one of them said "true", so
-  // assert the absence of "true" instead.
-  ok(!/data-requires-checkin="true"/.test(body),
-     "a branch of the arc panel requires a check-in. It is the thing somebody opens the " +
-     "app to see, and browsing must not pay the check-in cost.");
-  ok(/data-requires-checkin="false"/.test(body), "the arc panel sets no check-in flag");
-  ok(!/data-route="mobility-conditioning"/.test(body),
-     "the arc still routes through the Mobility door, which is where it was buried");
+check("7b. what needs no check-in opens without one: Log what I did, the Plan line", () => {
+  const fh = strip(fs.readFileSync(_gatePath("js/views/free-home.js"), "utf8"));
+  ok(/data-route="activity-log" data-requires-checkin="false"/.test(fh) && /data-route="upgrade" data-requires-checkin="false"/.test(fh), "a reference row asks for a check-in");
 });
-
-check("7c. it surfaces what has NOT come up, never what has", () => {
-  const at = today.indexOf("function arcPanel");
-  const body = today.slice(at, today.indexOf("_programmeHint", at));
-  for (const bad of ["you have done", "you've done", "sessions", "times", "streak", "% "]) {
-    ok(!body.toLowerCase().includes(bad),
-       `the arc panel says "${bad}" — that is a score, not a fact about the plan`);
-  }
-  ok(/come up yet/.test(body), "the panel never names what the plan has not reached");
+check("7c. retired with Free's arc panel (P-46 S4); the Plan's arc line is verify-arc-door", () => {
+  ok(!/today-arc__note/.test(today), "the old arc note is back");
 });
-
-check("7d. day one reads as a starting line, not an empty state", () => {
-  const at = today.indexOf("function arcPanel");
-  const body = today.slice(at, today.indexOf("_programmeHint", at));
-  ok(/still ahead of you/.test(body),
-     "an arc with nothing covered yet has no wording of its own, so it will read as empty. " +
-     "Day one is premium's richest moment: everything is still ahead.");
+check("7d. day one reads as a starting line: How are you today? Three taps, then your session.", () => {
+  const fh = strip(fs.readFileSync(_gatePath("js/views/free-home.js"), "utf8"));
+  ok(/How are you today\?/.test(fh) && /Three taps, then your session\./.test(fh), "the day-one words are missing");
 });
-
-check("7e. the offer sits above the reference rows", () => {
-  const arcAt = today.indexOf("arcPanel()");
-  const refAt = today.indexOf("today-reference");
-  ok(arcAt > -1 && refAt > -1, "a marker is missing");
-  ok(arcAt < refAt,
-     "the arc offer renders below the reference rows. Below Settings is where terms and " +
-     "privacy links live, so the eye files it as boilerplate and skips it.");
+check("7e. the Today card sits above the other ways in", () => {
+  const fh = strip(fs.readFileSync(_gatePath("js/views/free-home.js"), "utf8"));
+  const at = fh.indexOf("todayCard(!!ctx.checkedIn)"), rows = fh.indexOf('class="path-doors"');
+  ok(at > -1 && rows > at, "the Today card is not first");
 });
-
 console.log("\nTEST 8 - unlit is not failed");
 
 check("8. an untouched strand does not read as disabled", () => {
@@ -274,59 +212,13 @@ check("9. the aim replaces the goal list", () => {
 
 console.log("\nTEST 10 - LOBBY-1c: the lobby holds no sessions");
 
-check("10a. session tiles have left PLAN's Home", () => {
-  // NARROWED, 05 Sep 2026. LOBBY-1c asserted no session tiles on Home
-  // at all. TIER-HOME reverses that for FREE, deliberately: a free user
-  // has no coach holding the thread, so the territory must be legible
-  // to them and the picks ARE the product. On Plan the coach holds it,
-  // and the tiles stay behind the check-in where LOBBY-1c put them.
-  //
-  // The original property is unchanged where it applies -- Plan's Home
-  // is still an arc and an invitation, nothing else.
-  const at = today.indexOf("${isPremium() ? _planDoors()");   // v5
-  ok(at > -1, "Home no longer branches on tier");
-  // HOME-DOORS, 06 Sep 2026. THIS ASSERTION IS INVERTED, deliberately.
-  // It used to require that Plan's Home had NO tiles. On device the
-  // tiles' only other home was a row underneath coach-proposal's
-  // auto-opening panel (fixed, inset 0, z-index 9999), which cannot be
-  // dismissed to reveal it -- so "relocated" meant "removed", and the
-  // stretch session became unreachable because coach-proposal builds
-  // through workoutGenerator.js, whose type list is three hardcoded
-  // names with no stretch in it.
-  // CLUB-SHELL, 06 Sep 2026. Plan renders clubRooms(), free renders
-  // chooser(), and BOTH render tileGrid(). The tiles are what LOBBY-1c
-  // removed and what verify-homedoors exists to protect; the rooms are
-  // an addition above them, not a replacement.
-  // SMOOTH-P3a. Plan renders _planDoors(). The direct routes the tiles
-  // carried now sit one door in, on "I know what I want" -- driven, not
-  // read, by verify-clubshell 2a and verify-know-what 7. Here: the doors
-  // are what Plan renders, and the second door is the way to them.
-  ok(/_planDoors\(\)/.test(today), "Plan's Home does not render the doors");
-  ok(/function tileGrid/.test(today), "there is no tile grid (free still renders it)");
-  const doorsAt = today.indexOf("function _planDoors");
-  const doorsBody = today.slice(doorsAt, today.indexOf("function _arcChip", doorsAt));
-  ok(doorsAt > -1 && /door\('know-what'/.test(doorsBody),
-     "Plan's doors have no way to the direct routes, which is LOBBY-1c with better comments");
+check("10a. session tiles have left Home on both tiers (P-46 S4: Free too)", () => {
+  ok(!/today-door/.test(today) && !/today-door/.test(strip(fs.readFileSync(_gatePath("js/views/free-home.js"), "utf8"))), "a session tile on Home");
 });
-
-check("10b. one invitation, and it names the price of entry", () => {
-  ok(/data-action="start-today"/.test(today), "there is no way into the session space");
-  // The aria-label carries the same words, so a bare text match passed
-  // with the visible note deleted. Anchor on the element.
-  ok(/class="today-invite__note"/.test(today),
-     "the check-in is not named beneath the invitation, so it is sprung rather than " +
-     "consented to");
-  // A SECOND ROUTE IN is what had to go. Updating a check-in already
-  // made is a different act and is kept -- CHAP-2 caught its removal as
-  // a real regression: checked in this morning, felt worse by evening.
-  ok(!/data-action="checkin"/.test(today),
-     'a second unexplained "Check in" route remains alongside the invitation, which is ' +
-     'two doors to one place with one of them unlabelled');
-  ok(/data-action="checkin-mini"/.test(today),
-     "there is no way to update a check-in without starting a session \u2014 the case of " +
-     "somebody who checked in this morning and feels worse by evening");
+check("10b. one invitation, and it names the price of entry (Three taps)", () => {
+  const fh = strip(fs.readFileSync(_gatePath("js/views/free-home.js"), "utf8"));
+  ok((fh.match(/data-action="start-today"/g) || []).length === 2 && /Three taps, then your session\./.test(fh), "not one invitation with its price");
 });
-
 check("10c. the invitation routes through the check-in only when one is owed", () => {
   const at = today.indexOf('[data-action="start-today"]');
   ok(at > -1, "no invitation handler");
@@ -364,86 +256,23 @@ check("11. sessions are reachable, below the suggestion", () => {
 
 console.log("\nTEST 11 - TIER-HOME: free and Plan are different screens");
 
-check("11a. Home branches on tier at all", () => {
-  // Decided 3 Sep and unbuilt until 5 Sep: both tiers rendered an
-  // identical Home, which is the one thing the design said it must
-  // never be. Free is not Plan with a panel swapped.
-  ok(/isPremium\(\) \? _planDoors\(\) : _freeCarryCard\(\) \+ chooser\(\) \+ arcPanel\(\)/.test(today),   // v5
-     "the arc panel renders on both tiers, so free is Plan with a panel swapped");
-  // HOME-DOORS. The tiers no longer differ in their CALL TO ACTION --
-  // both get the doors, which is what Plan lost on 04 Sep. They differ
-  // in the arc: Plan leads with it, free is offered it beneath the
-  // doors. Asserted as two positions, not one branch.
-  const arcPlan = today.indexOf("isPremium() ? _planDoors()");   // v5: the Plan's arc is inside its doors
-  const arcFree = today.indexOf("chooser() + arcPanel()");
-  ok(arcPlan > -1 && arcFree > -1 && arcPlan < arcFree,
-     "the arc sits in the same place on both tiers, so free is Plan with a panel swapped");
+check("11a. Home branches on tier: the Plan's Home, or Free's (free-home.js)", () => {
+  ok(/if \(isPremium\(\)\) \{ _renderPlanHome\(container, greeting\); return; \}\s*_renderFreeHome\(container, greeting\);/.test(today), "no tier branch");
 });
-
-check("11b. free is given a question and the controls", () => {
-  ok(/function chooser/.test(today), "there is no chooser");
-  const at = today.indexOf("function chooser");
-  const body = today.slice(at, today.indexOf("function arcPanel", at));
-  ok(/What do you want to do today\?/.test(body),
-     "free is never asked what it wants — which is the whole free product");
-  // CLUB-SHELL, 06 Sep 2026. The group headings moved into tileGrid(),
-  // which BOTH tiers render -- the rooms are an addition on Plan, not a
-  // replacement. Asserted where they live AND asserted reachable from
-  // the chooser, so "the headings exist somewhere" cannot pass while
-  // free stops rendering them.
-  ok(/tileGrid\(\)/.test(body), "free's chooser no longer renders the tile grid");
-  const gridAt = today.indexOf("function tileGrid");
-  const grid = today.slice(gridAt, today.indexOf("function chooser", gridAt));
-  const groups = (grid.match(/today-group-label/g) || []).length;
-  ok(groups >= 2,
-     `${groups} group heading(s). The picks need both \u2014 structure IS the free product: ` +
-     `nobody holds the thread for a free user, so the territory has to be legible to them.`);
+check("11b. free is given a question (How are you today?) and its controls", () => {
+  const fh = strip(fs.readFileSync(_gatePath("js/views/free-home.js"), "utf8"));
+  ok(/How are you today\?/.test(fh) && /free-gentler/.test(fh) && /free-ready/.test(fh), "question or controls missing");
 });
-
-check("11c. free gets the coach-picks fallback, named as an offer", () => {
-  const at = today.indexOf("function chooser");
-  const body = today.slice(at, today.indexOf("function arcPanel", at));
-  ok(/today-unsure/.test(body), "free has no coach-picks fallback");
-  ok(!/Unsure\?\s*Coach decides/.test(body),
-     "the fallback is still named as a confession of indecision rather than an offer");
-  // Anchor on the NOTE the person reads, not anywhere in the block: the
-  // button's aria-label carries the same words, so a rewritten note
-  // still passed.
-  const note = (body.match(/today-invite__note">([^<]*)</) || [])[1] || "";
-  ok(/go on how you're doing today/.test(note),
-     "the fallback overstates what the coach knows. With no arc it genuinely is going on " +
-     "today only, and saying otherwise is the lie the onboarding goals were.");
+check("11c. free gets the gentle fallback, named as an offer (Something gentler)", () => {
+  ok(/"Something gentler", "A short, easy session"/.test(strip(fs.readFileSync(_gatePath("js/views/free-home.js"), "utf8"))), "no Something gentler");
 });
-
-check("11d. the offer is above the reference rows on free", () => {
-  const at   = today.indexOf("function chooser");
-  const body = today.slice(at, today.indexOf("function arcPanel", at));
-  // HOME-DOORS. arcPanel() left the chooser when the chooser became
-  // shared -- rendering it inside would have emitted the panel twice on
-  // Plan, which already calls it above. Free's offer is asserted at 7a.
-  ok(!/arcPanel\(\)/.test(body),
-     "the chooser still renders the arc itself, so Plan gets the panel twice");
-  // CLUB-SHELL. The call site is now a tier ternary, so the literal
-  // "${chooser()}" no longer appears. Located by the ternary instead,
-  // and BOTH tiers checked -- finding one above the reference rows says
-  // nothing about the other.
-  const callAt = today.indexOf("isPremium() ? _planDoors() :");
-  const refAt  = today.indexOf("today-reference");
-  ok(callAt > -1 && refAt > -1 && callAt < refAt,
-     "the chooser renders below the reference rows");
+check("11d. the Plan line is last, under the ways in", () => {
+  const fh = strip(fs.readFileSync(_gatePath("js/views/free-home.js"), "utf8"));
+  ok(fh.indexOf("Want more choice?") > fh.indexOf('class="path-doors"'), "the Plan line is above the ways in");
 });
-
-check("11e. Wellbeing is not duplicated on either tier", () => {
-  // HOME-DOORS. The exclusion used to be free-only, because only free
-  // promoted Wellbeing into "Settle your mind". Both tiers promote it
-  // now, so the exclusion applies to both or Plan gets the row twice.
-  ok(/d\.id !== 'wellbeing'/.test(today),
-     "Wellbeing appears both as a pick and as a reference row \u2014 the duplication " +
-     "this screen exists to remove");
-  ok(!/!isPremium\(\) && d\.id === 'wellbeing'/.test(today),
-     "the exclusion is still gated on tier, so Plan renders Wellbeing twice");
+check("11e. Wellbeing is not duplicated: on Free it is in the bottom bar only", () => {
+  ok(!/noticing/.test(strip(fs.readFileSync(_gatePath("js/views/free-home.js"), "utf8"))), "Free Home has a Wellbeing row as well as the bar");
 });
-
 console.log(fails === 0
   ? "\nLOBBY-1a: all assertions pass\n"
   : "\nLOBBY-1a: " + fails + " FAILED\n");

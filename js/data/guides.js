@@ -1,5 +1,12 @@
 /**
  * js/data/guides.js
+ * 24 Nov 2026 v4
+ *
+ * v4 - P-46 S4 FREE HOME. Free's way in to today's session is the Today
+ *   card's **Check in** (same marker, not-sure). I'd rather choose myself
+ *   says what Free Home offers now (Something gentler, Ready-made sessions);
+ *   D1's Free line about My programme went with Free's programme.
+ *
  * 16 Nov 2026 v3
  *
  * v1 - P-25 HOW-TO GUIDES (spec BNH-Files Product/alongside_howto_guides_
@@ -120,7 +127,7 @@ export const GUIDES = Object.freeze([
         ] },
       ] }] },
       { when: "free", parts: [{ steps: [
-        { screen: "today", target: "not-sure", label: "Not sure? I’ll pick something", say: "Tap **Not sure? I’ll pick something**." },
+        { screen: "today", target: "not-sure", label: "Check in", say: "Under **How are you today?**, tap **Check in**." },
         ...A1_CHECKIN,
         { screen: "coach-proposal", target: "ack", label: "I have read this.", optional: true, say: "The first time, tick **I have read this.**" },
         { screen: "coach-proposal", target: "start", label: "Start", say: "Tap **Start**." },
@@ -130,7 +137,7 @@ export const GUIDES = Object.freeze([
     end: "Your session has started.",
     notQuite: [
       { q: "I don’t want to answer questions today", tiers: ["plan"], answer: "On the first question, tap **Not today**. Today’s plan opens straight away, with **Check in now** if you change your mind." },
-      { q: "I’d rather choose myself", answer: "If Home says **Let me choose for you**: tap **‹ Back**, then **Get stronger**, **Keep moving**, **Stretch** or **Move to feel better**. If Home says **What do you want to do today?**: tap **Pick something else**, then a session such as **Yoga & Pilates**." },
+      { q: "I’d rather choose myself", answer: "If Home says **Let me choose for you**: tap **‹ Back**, then **Get stronger**, **Keep moving**, **Stretch** or **Move to feel better**. If Home says **How are you today?**: tap **Something gentler** or **Ready-made sessions**." },
       { q: "Something’s sore", answer: "Tap where in the questions. If something hurts — sharp, or building as you go — stop that one. Aching afterwards is normal." },
       { q: "I’ve only got a few minutes", answer: "On today’s plan, tap the length, for example **30 min**, and choose a shorter one." },
     ],
@@ -295,7 +302,6 @@ export const GUIDES = Object.freeze([
       { say: "After **Life got full** or **Finding it harder**, it offers **Yes, ease me back in** or **No, I feel fine — carry on as before**." },
       { say: "After **Was unwell** or **Was injured**, your first session back starts gentler without asking." },
       { tiers: ["plan"], say: "**Your week** carries on as it was. Missing a day is fine: the week does not keep score. Your arc doesn’t need making up either." },
-      { tiers: ["free"], say: "If you follow My programme and have missed a couple of sessions, Today’s plan asks how to fit the rest: **Stay in 12 weeks** or **Keep the same rhythm**." },
     ],
     end: "",
     notQuite: [

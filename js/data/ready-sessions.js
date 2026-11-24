@@ -1,5 +1,11 @@
 /**
  * data/ready-sessions.js
+ * 24 Nov 2026 v2
+ *
+ * v2 - P-46 S4 FREE HOME. FREE_READY and freeReady(place): the six Free
+ *   Home offers (spec §5). Home: rm-gs-h1, h5, h6, rm-km-h1, h2, h6; with a
+ *   gym, rm-gs-g3, g6, rm-km-g2, g3 take the place of the first four.
+ *
  * 19 Nov 2026 v1
  *
  * v1 - P-9d (c) READY-MADE SESSIONS (Graeme, 19 Nov, by voice: "could you
@@ -194,6 +200,13 @@ export const READY_SESSIONS = Object.freeze([
 
 const BY = new Map(READY_SESSIONS.map(s => [s.id, s]));
 export const readyById = id => BY.get(id) || null;
+
+/** P-46 S4. Free's six, by place (spec §5). */
+export const FREE_READY = Object.freeze({
+  home: Object.freeze(["rm-gs-h1", "rm-gs-h5", "rm-gs-h6", "rm-km-h1", "rm-km-h2", "rm-km-h6"]),
+  gym:  Object.freeze(["rm-gs-g3", "rm-gs-g6", "rm-km-g2", "rm-km-g3", "rm-km-h2", "rm-km-h6"]),
+});
+export const freeReady = place => (FREE_READY[place === "gym" ? "gym" : "home"]).map(readyById).filter(Boolean);
 
 /** The sessions behind a door, for a place; the part chosen first, the rest after. */
 export function readyFor(door, place, part = null) {

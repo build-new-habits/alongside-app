@@ -1,5 +1,12 @@
 /**
  * js/data/tier-table.js
+ * 24 Nov 2026 v9
+ *
+ * v9 - P-46 S4 FREE HOME. Home on Free is the coach, today: check in for
+ *   today's session, Something gentler, six ready-made sessions and Log what
+ *   I did. Choosing any kind of session went to the Plan. Log what I did is
+ *   on Home, not in the Library (the Library's shelves are the Plan's).
+ *
  * 28 Oct 2026 v8
  *
  * v8 - STAGE PATH P-4. Home on the Plan is purpose first (mock-up v9,
@@ -59,7 +66,7 @@ export const TIER_TABLE = [
   {
     id: "home",
     area: "Home",
-    free: "Choose any kind of session, or let the coach suggest one from your check-in",
+    free: "Check in for today\u2019s session, or something gentler, six ready-made sessions, and Log what I did",
     plan: "Four doors, by what you came for: get stronger, keep moving, stretch or move to feel better, and one suggestion for today from your check-in",
     says: "Home asks what you came for: get stronger, keep moving, stretch or move to feel better, with one suggestion for today from your check-in.",
     proof: "verify-plan-claims 3.home, verify-plan-home-path",
@@ -84,7 +91,7 @@ export const TIER_TABLE = [
     id: "know-what",
     area: "I know what I want",
     // W5-20: the door is the Plan's (Home on Free has no such door).
-    free: "Not included. Home on Free lets you choose any kind of session",
+    free: "Not included. Home on Free has six ready-made sessions",
     plan: "Pick the kind of session and how long yourself, and save sessions to start again",
     says: "Sessions you put together can be saved and started again.",
     proof: "verify-plan-claims 3.saved, verify-saved1",
@@ -92,7 +99,7 @@ export const TIER_TABLE = [
   {
     id: "as-you-go",
     area: "Make it up as I go",
-    free: "Not included. Log what I did, in the Library, records anything you did",
+    free: "Not included. Log what I did, on Home, records anything you did",
     plan: "Log each move and set as you go, and it counts as a full session",
     says: "Make it up as you go: log each move and set as you do it, and it counts as a full session.",
     proof: "verify-plan-claims 3.freestyle, verify-freestyle",

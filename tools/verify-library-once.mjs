@@ -1,5 +1,11 @@
 /**
  * tools/verify-library-once.mjs
+ * 24 Nov 2026 v3
+ *
+ * v3 - P-46 S4 FREE HOME. Free's Library moved to the Plan. The Free checks
+ *   are retired (git history v2; screens archived in BNH-Files Archive/P-46):
+ *   Free gets the on-the-plan page, the Plan its Library.
+ *
  * 31 Oct 2026 v2
  *
  * v2 - P-13 re-point (Graeme, 29 Oct: the Library keeps "Only what doors
@@ -93,69 +99,17 @@ const CARDS = {
 };
 const WORDS = { full: "strength, full body", upper: "strength, upper body", lower: "strength, lower body", glute: "strength, glutes", core: "core", mobility: "mobility" };
 
-for (const tier of ["free"]) {   // v2: the Plan's equivalent is the Get stronger door (see header)
-  for (const place of ["home", "gym"]) {
-    for (const [label, type] of CARDS[place]) {
-      fixture(tier);
-      await router.navigate("library"); await wait(60);
-      await click($(`[data-guided="${place}"]`));
-      const card = $$("[data-target]").find(b => txt(b.querySelector(".library-session-label")) === label);
-      const tag = `${tier} · ${place} · ${label}`;
-      if (!card) { ok(`${tag}: the card is there`, false, txt(main).slice(0, 200)); continue; }
-      let asked = asksWhere();
-      await click(card);
-      await wait(200);
-      asked = asked || asksWhere();
-      ok(`${tag}: one tap opens Today's plan, not the builder`, view() === "coach-proposal" && !!$("#cp-preview-panel.is-open"), `${view()}`);
-      ok(`${tag}: nothing asks home or gym again`, !asked);
-      const where = $("#cp-loc");
-      ok(`${tag}: the plan is for ${place === "gym" ? "the gym" : "home"}`, new RegExp(place === "gym" ? "gym" : "home", "i").test(txt(where)), txt(where));
-      ok(`${tag}: and for what was tapped`, txt($(".cp-plan__sentence")).includes(`You asked for ${WORDS[type]}`), txt($(".cp-plan__sentence")));
-      ok(`${tag}: the same plan screen: rows that open their exercise, ${tier === "personal" ? "Swap, " : ""}Start`,
-         $$(".cp-plan__row").length > 0 && $$(".cp-plan__row [data-preview]").length === $$(".cp-plan__row").length &&
-         (tier === "personal" ? $$("[data-swap]").length > 0 : true) && !!$("#cp-preview-start"));
-    }
-  }
-}
-
-// 5. Read once.
-console.log("\nTEST 5 - the place is read once");
+// P-46 S4 FREE HOME. Every check here ran on Free's Library, which moved to the
+// Plan (spec §5). Free asking for the Library opens the on-the-plan page; the
+// Plan's Library is verify-library-shelf. The old checks are in git history
+// (v2) and the Free screens in BNH-Files Archive/P-46.
+console.log("\nTEST 1 - Free's Library is the Plan's now");
 fixture("free");
 await router.navigate("library"); await wait(60);
-await click($('[data-guided="gym"]'));
-await click($$("[data-target]").find(b => txt(b.querySelector(".library-session-label")).startsWith("Upper body")));
-await wait(200);
-ok("5pc. the Library's plan is at the gym", /gym/i.test(txt($("#cp-loc"))));
-store.set("requestedSessionType", null);
-await router.navigate("coach-proposal"); await wait(200);
-ok("5. the next plan, opened from elsewhere, is back where they usually train (home)", /home/i.test(txt($("#cp-loc"))), txt($("#cp-loc")));
-
-// 7. The look.
-console.log("\nTEST 7 - the category page in the LOOK cards");
-fixture("free");
+ok("1. Free asking for the Library: the on-the-plan page, which says what it is", view() === "on-the-plan" && /The Library/.test(txt(main)) && /Part of the Plan/.test(txt(main)), view());
+fixture("personal");
 await router.navigate("library"); await wait(60);
-await click($('[data-guided="gym"]'));
-const rows = $$(".library-session-card");
-ok("7a. every session row has its kind tile with a line icon, and a chevron", rows.length > 4 &&
-   rows.every(r => r.querySelector(".kind-tile svg[aria-hidden=true]") && r.querySelector(".library-session-chev svg")));
-// v2: on Free the Plan's own card carries the paywall's lock badge (auth.js lockedFeature); every session tile is still a line icon.
-const _noLock = (() => { const c = main.cloneNode(true); c.querySelectorAll(".locked-badge-icon").forEach(n => n.remove()); return txt(c); })();
-ok("7b. no emoji on the page (the Plan's lock badge aside)", !/\p{Extended_Pictographic}/u.test(_noLock), _noLock.slice(0, 200));
-ok("7c. the title carries its tile", !!$("h1.library-sub-title .kind-tile svg"));
-
-// 6. The other cards.
-console.log("\nTEST 6 - the other cards go where they went");
-fixture("free");
-await router.navigate("library"); await wait(60);
-if ($("#lib-back-btn")) await click($("#lib-back-btn"));   // the Library page, not the last category
-await click($('[data-guided="home"]'));
-const core = $$("[data-target]").find(b => txt(b.querySelector(".library-session-label")).startsWith("Core"));
-ok("6a. Core at home still opens the core session", core?.dataset.target === "core-session");
-const cardio = $$("[data-target]").find(b => txt(b.querySelector(".library-session-label")).startsWith("Cardio"));
-ok("6b. Cardio at home still opens the walk", cardio?.dataset.target === "walk-session");
-await click($("#lib-back-btn"));
-await click($('[data-guided="gym"]'));
-ok("6c. My programme is still on the gym page (the Plan's: locked on Free, as before)", /My programme/.test(txt(main)));
+ok("2. the Plan: the Library, as before", view() === "library");
 
 console.log(`\n${passes} passed, ${fails} failed`);
 process.exit(fails ? 1 : 0);

@@ -1,5 +1,11 @@
 /**
  * tools/verify-decisions.mjs
+ * 24 Nov 2026 v7
+ *
+ * v7 - P-46 S4 FREE HOME. The tier-is-named check reads what replaced Free's
+ *   arc invitation: the Plan line on Free Home and the on-the-plan page, each
+ *   naming the Plan in visible text.
+ *
  * 01 Oct 2026 v6
  *
  * v6 - DOCS-MOVE. Documents/ left this public repository for the private
@@ -164,17 +170,18 @@ check("No upgrade language inside a coach card", "Locked Principles P1/P2", () =
 // an upgrade page with no warning.
 //
 // The tier is now NAMED there, and nowhere near the coach.
+// P-46 S4: the arc invitation went with Free's arc row. The rule holds on
+// what replaced it: the Plan line on Free Home names the tier in its visible
+// words, and the on-the-plan page says "Part of the Plan" in text.
 check("The tier is named where a free user can see it", "WCAG 1.3.1 / DIC-SIGNAL", () => {
-  const t = read("js/views/today.js");
-  const i = t.indexOf('aria-label="About the arc, part of the Plan"');
-  ok(i !== -1, "the free arc invitation is gone or renamed; this check needs rereading");
-  const block = t.slice(i, i + 1600);
-  ok(/today-arc__tier/.test(block),
-     "the aria-label says which tier this is and the visible text does not \u2014 " +
-     "the same information must arrive by every route");
-  ok(!/upgrade now|subscri|free trial|only \u00a3/i.test(block),
-     "it names the tier; it does not argue for it. The invitation above is the " +
-     "argument, in the coach's own words");
+  const fh = read("js/views/free-home.js");
+  ok(/>Want more choice\? See what the Plan adds</.test(fh),
+     "Free Home's way to the Plan does not name the Plan in its visible words");
+  const otp = read("js/views/on-the-plan.js");
+  ok(/<p class="path-small">Part of the Plan<\/p>/.test(otp),
+     "the on-the-plan page does not say Part of the Plan in text \u2014 the same information must arrive by every route");
+  ok(!/upgrade now|subscri|free trial|only \u00a3/i.test(fh + otp),
+     "it names the tier; it does not argue for it");
 });
 
 console.log("\nP4 \u2014 the app may display load; the coach never interprets it");

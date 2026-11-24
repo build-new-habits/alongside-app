@@ -1,5 +1,11 @@
 /**
  * tools/verify-free-builder.mjs
+ * 24 Nov 2026 v4
+ *
+ * v4 - P-46 S4 FREE HOME. Free's builder moved to the Plan. Test 1 now
+ *   checks Free gets the on-the-plan page; a Free session played is verify-
+ *   one-player.
+ *
  * 02 Oct 2026 v3
  *
  * v3 - W4-1 GATE-OPEN. The fixture person has agreed (tools/agreed.mjs): the
@@ -99,16 +105,14 @@ async function buildAndGo() {
   return { reached, first };
 }
 
-// ── 1. FREE, NO PROGRAMME: WHAT THEY BUILT PLAYS ─────────────────────────
-console.log("\nTEST 1 - Free, no programme: Let's go plays the session they built");
+// ── 1. FREE: THE BUILDER IS THE PLAN'S (P-46 S4) ──────────────────────────
+// Free's builder moved to the Plan (spec §5). Free asking for it opens the
+// one page that says so; what it built played on Free is verify-one-player.
+console.log("\nTEST 1 - Free: the builder is part of the Plan");
 fixture("free");
 ok("1pc. Free, and no programme (the Decide later state)", store.get("tier") === "free" && !store.hasActiveProgramme());
-{
-  const r = await buildAndGo();
-  ok("1pc2. the builder reached Let's go with a session", r.reached && !!r.first, JSON.stringify(r));
-  ok("1a. it lands on the session, not the upgrade page", router.currentView === "workout", router.currentView);
-  ok("1b. showing the first exercise of what they built", !!r.first && txt(main).includes(r.first) && !/upgrade|the plan costs|£/i.test(txt(main)), txt(main).slice(0, 160));
-}
+await go("today"); await go("session-builder");
+ok("1a. Free asking for the builder: the on-the-plan page, never the builder", router.currentView === "on-the-plan" && /Part of the Plan/.test(txt(main)) && !$("#sb-go-btn"), router.currentView);
 
 // ── 3. NOTHING OF THEIR OWN: UPGRADE, AND BACK LEAVES ────────────────────
 console.log("\nTEST 3 - Free, nothing of their own to play: the upgrade page, and Back leaves it");

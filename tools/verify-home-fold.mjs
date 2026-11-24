@@ -1,5 +1,11 @@
 /**
  * tools/verify-home-fold.mjs
+ * 24 Nov 2026 v4
+ *
+ * v4 - P-46 S4 FREE HOME. Free Home has no orientation line now (the Today
+ *   card orients). F3.2's reversal is the guidance line going; F3c holds Free
+ *   names nothing that is not on it.
+ *
  * 28 Oct 2026 v3
  *
  * v3 - STAGE PATH P-4 re-point (none loosened). F3.2's reversal is read on Free: the Plan's Home (plan-home.js) no longer says the first-days orientation line, its Today card gives the coach's reason. F3.0 and F3.1 still hold the guidance day on the Plan. F3b reads the Plan's controls as they are now.
@@ -73,7 +79,8 @@ ok("F3.1 and no orientation line beside it", !ORIENT.test(txt(c)), txt(c.querySe
 const month = new Date(Date.now() - 2 * 864e5).toISOString();
 // v3: the Plan's Home no longer says the first-days line (its Today card gives the coach's reason), so the reversal is read on Free, which still says both.
 c = home({ tier: "free", goals: ["get-stronger"], guidanceShownAt: month });
-ok("F3.2 REVERSAL: any other day, the orientation line is back (Free)", ORIENT.test(txt(c)) && !c.querySelector(".today-guidance"), txt(c.querySelector(".today-header")));
+// P-46 S4: Free Home has no orientation line either (the Today card does the orienting), so the reversal is the guidance line itself.
+ok("F3.2 REVERSAL: any other day, the guidance line is gone, and no orientation line on Free", !c.querySelector(".today-guidance") && !ORIENT.test(txt(c)) && !!c.querySelector(".free-home"), txt(c).slice(0, 120));
 
 console.log("\nF3b - a coach line on Plan Home names only doors that are on it");
 for (const goals of [["get-stronger"], ["flexibility"], []]) {
@@ -84,7 +91,8 @@ for (const goals of [["get-stronger"], ["flexibility"], []]) {
   ok(`F3b ${JSON.stringify(goals)}: "${head.slice(0, 70)}"`, named.every(n => doors.includes(n)), `names ${named.join(", ")}; doors ${doors.join(", ")}`);
 }
 c = home({ tier: "free", goals: ["get-stronger"], guidanceShownAt: month });
-ok("F3c free Home still names its own tile", /Cardio, Core & Strength/.test(txt(c)));
+const fNamed = [...txt(c).matchAll(/‘([^’]+)’/g)].map(m => m[1]);
+ok("F3c free Home names nothing that is not on it", fNamed.every(n => txt(c).split(`‘${n}’`).join("").includes(n)), fNamed.join(", "));
 
 // ── F4 ──────────────────────────────────────────────────────────────────
 console.log("\nF4 - every use of the hatch gutter resolves to the one declaration");

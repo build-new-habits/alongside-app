@@ -1,6 +1,11 @@
 import { createRequire as __cr } from "node:module";
 /**
  * tools/verify-build-session.mjs
+ * 24 Nov 2026 v3
+ *
+ * v3 - P-46 S4 FREE HOME. 3y: Free asking to build is sent to the on-the-
+ *   plan page (its builder moved to the Plan).
+ *
  * 23 Nov 2026 v2
  *
  * v2 - P-39 S3. 4b leaves out the line under Today (.path-mm: Making my
@@ -215,7 +220,7 @@ ok("3w. every Wednesday: Your week's Wednesday is this session", !!tid && w.temp
 ok("3x. and the one date comes off", !("plannedFor" in store.get("savedSessions")[0]) && (store.get("savedSessions") || []).length === 1);
 person("free");
 await open("build-session");
-ok("3y. Free is sent to its own builder", router.currentView === "session-builder", router.currentView);
+ok("3y. Free is sent on: its builder is the Plan's now, so the on-the-plan page (P-46 S4)", router.currentView === "on-the-plan" && router.planOnly === "session-builder", router.currentView);
 
 // ── 4 ───────────────────────────────────────────────────────────────────
 console.log("\nTEST 4 - Home");

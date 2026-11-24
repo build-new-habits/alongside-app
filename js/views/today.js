@@ -1,5 +1,14 @@
 /**
  * today.js
+ * 24 Nov 2026 v66
+ *
+ * v66 - P-46 S4 FREE HOME. Free Home is views/free-home.js: the Today card,
+ *   Something gentler, six ready-made sessions, Log what I did, Your
+ *   exercises with a list, and what the Plan adds. The door tiles, the arc
+ *   offer, the reference rows and their helpers (chooser, tileGrid,
+ *   arcPanel, HOME_DOORS, DOOR_LOOK) went; archived in BNH-Files
+ *   Archive/P-46. The ask-later card is placed by free-home.js now.
+ *
  * 24 Nov 2026 v65
  *
  * v65 - P-46 S3. Home asks one question once, later (data/ask-later.js): on
@@ -882,7 +891,8 @@ import { arcWeek, weekStart }  from '../data/arc-readback.js';
 import { noticePlanJump, offerBriefPath } from '../data/pacing.js';
 import { isPremium, lockedFeature } from '../auth.js';
 import { renderPlanHome, wirePlanHome, goToSuggestion } from './plan-home.js';   // STAGE PATH P-4
-import { dueAskLater, askLaterCard, bindAskLater } from '../data/ask-later.js';   // P-46 S3
+import { bindAskLater } from '../data/ask-later.js';   // P-46 S3
+import { renderFreeHome, wireFreeHome, askGentler } from './free-home.js';   // P-46 S4
 import { scopeStatementHTML } from '../data/scope-statement.js';
 // GUIDED-COPY, 06 Sep 2026. plannedFocusToday dropped from this import.
 // CLUB-SHELL added it so Guided class could say what the class was for
@@ -915,136 +925,6 @@ export function arcWeekStartsToday(arc = {}, now = new Date()) {
 
 export function TodayView(router) {
 
-  // ── Home doors (04 Aug 2026, Phase C, now 7 items) ───────────────────────
-  // requiresCheckin: true for doors whose whole value depends on knowing
-  // today's state (energy, pain, equipment) — these route through
-  // check-in (full the first time today, check-in-mini after) before
-  // their real destination. Graeme's call, 04 Aug: reaching a session-
-  // generating screen without ever having checked in defeats the point
-  // of it adapting to "where you are today." Applied to the two doors
-  // that actually generate an adaptive session (Cardio/Core/Strength,
-  // Unsure? Coach decides) — confirmed by Graeme as the right split.
-  //
-  // Mobility & Conditioning routes to its own landing screen
-  // (mobility-conditioning.js, same day follow-up), which handles the
-  // programme-or-not branching internally now — Start a Mobility
-  // Session / My Conditions Programme / Log an event. Supersedes the
-  // earlier smart-routing hack that lived in attachEvents() below
-  // (programme-or-Library), which is now removed.
-  //
-  // Library added as its own door, same day: once Mobility &
-  // Conditioning started smart-routing to the programme instead of
-  // Library whenever one exists, Library stopped being reachable from
-  // Home at all in that case — a real discoverability regression
-  // Graeme caught. Library is broader than mobility/conditioning
-  // content anyway (every session type, prescribed exercises, coach
-  // recommends), so it earns its own door rather than only being
-  // reachable as Mobility & Conditioning's fallback. "Unsure? Coach
-  // decides" keeps its existing distinct treatment — spans both grid
-  // columns, dashed border, sits visually underneath the rest — not
-  // counted as one of the "real" doors, exactly as before.
-  // ── THE LOBBY RULE (LOBBY-1a, 03 Sep 2026) ────────────────────────
-  //
-  // kind: 'session'   opens something you DO. Rendered as a tile.
-  // kind: 'reference' something you read, check or change. Rendered as
-  //                   a quiet row beneath.
-  //
-  // Home had seven tiles of equal visual weight, and Graeme could not
-  // navigate his own app: "I find the whole app overwhelming for choice
-  // and navigation." It got there one reasonable addition at a time,
-  // because nothing said what Home was FOR.
-  //
-  // This is the rule, and it is the answer to every future proposal for
-  // a new tile: anything that starts a session is a tile; everything
-  // else is a row. A door that cannot say which it is does not belong
-  // on Home at all.
-  //
-  // Wellbeing is a reference row despite opening practices, on the
-  // evidence already in this file: the NAV-6 note records that it
-  // duplicates the Noticing tab, and a thing reachable from every screen
-  // does not need a tile on the one screen where slots are scarce.
-  //
-  // This is the FIRST HALF of the lobby. The second half -- promoting
-  // the coach's suggestion to the top and moving the session tiles
-  // behind the check-in -- is not done here, because the suggestion is
-  // built by coach-proposal, which requires a check-in. Promoting it
-  // onto an ungated Home would mean either gating Home or showing a
-  // suggestion built on no data. The split is what makes the promotion
-  // possible, and it is a bigger change than this one.
-  const HOME_DOORS = [
-    { kind: 'session', id: 'cardio-core-strength', label: 'Cardio, Core & Strength', icon: '\uD83D\uDCAA', route: 'session-builder', requiresCheckin: true },
-    // R4, 20 Aug 2026. tier: 'personal' REMOVED. Choosing which session
-    // you do today is self-direction, and self-direction is an
-    // accessibility feature -- charging for it penalised the person who
-    // most needs to override the default because the default hurts.
-    // Revenue architecture section 3: free is today, the Plan is the arc.
-    { kind: 'session', id: 'mobility-conditioning', label: 'Mobility & Conditioning', icon: '\uD83E\uDDD8', route: 'mobility-conditioning', requiresCheckin: false },
-    // NAV-3, 12 Aug 2026. Graeme, device pass part 4: "Yoga was not easy
-    // to find... Can the yoga/pilates door be offered in multiple places
-    // as well?"
-    //
-    // He looked in Cardio/Core/Strength, then Mobility & Conditioning,
-    // then Wellbeing, then Library. Yoga lives inside Mobility &
-    // Conditioning, which is a reasonable place for it and not a
-    // findable one -- somebody looking for yoga is not looking for
-    // "conditioning".
-    //
-    // A second door is the right answer rather than moving it. The same
-    // thing being reachable from more than one place is how people
-    // actually navigate; insisting on one true location is a filing
-    // system, not a product. Mobility & Conditioning keeps its route in.
-    // R4, 20 Aug 2026. tier: 'personal' REMOVED -- same reasoning as the
-    // door above. NAV-3's finding stands: yoga was hard to find, and a
-    // paywall on top of that was a second wall on the same door.
-    { kind: 'session', id: 'yoga', label: 'Yoga & Pilates', icon: '\uD83E\uDDD8\u200D\u2640\uFE0F', route: 'yoga-session', requiresCheckin: false },
-    // P22, 29 Sep 2026 (persona finding W2-18). Classes run the same for
-    // everybody and suit 2.11 and 2.14 best; the Plan had "Join a class",
-    // Free had no way in. Graeme: classes are the same for everybody, so
-    // Free gets the door. No check-in: a class is chosen, not proposed.
-    // P26, 29 Sep 2026. Run: persona 2.1's main goal had no door on Free.
-    // No check-in: a run is chosen, not proposed. The red-flag screen
-    // still comes first where it applies (router).
-    { kind: 'session', id: 'run', label: 'Run', icon: '\uD83C\uDFC3', route: 'running-session', requiresCheckin: false },
-    { kind: 'session', id: 'classes', label: 'Classes', icon: '\uD83D\uDDD3\uFE0F', route: 'classes', requiresCheckin: false },
-    // TIER-F, 13 Aug 2026 -- RESOLVED. The flag below stood since
-    // NAV-6. The door and the bottom-nav tab route to the same view;
-    // the nav label is now "Wellbeing" too (index.html), so the two
-    // entry points finally name one destination. Kept as two entries
-    // deliberately: a door on Home and a persistent tab serve different
-    // moments.
-    //
-    // Original NAV-6 note follows.
-    // NAV-6, FLAGGED NOT CHANGED. This routes to 'noticing', which is
-    // also a bottom-nav destination -- the same duplication as the
-    // Progress tile removed below, hidden by a different label.
-    //
-    // Deliberately left alone, because it is not the same decision.
-    // Progress was called Progress in both places, so the tile was plainly
-    // redundant. Here the tile says "Wellbeing" and the nav says
-    // "Noticing", and somebody looking for the first may not recognise
-    // the second -- which is exactly the failure that made Yoga
-    // unfindable. Removing it could cost a door rather than tidy one.
-    //
-    // The real question is whether these should share a name, and that is
-    // Graeme's call, not a cleanup.
-    { kind: 'reference', id: 'wellbeing', label: 'Wellbeing', icon: '\uD83C\uDF3F', route: 'noticing', requiresCheckin: false },
-    { kind: 'reference', id: 'my-exercises', label: 'My exercises', icon: '\uD83D\uDCCB', route: 'prescribed', requiresCheckin: false },
-    // NAV-6, 12 Aug 2026. Progress tile REMOVED. Graeme: "why do we have
-    // a progress tile when we have a tab? You're right about it looking
-    // cluttered."
-    //
-    // It was the only tile duplicating a bottom-nav destination, and the
-    // bottom nav is reachable from every screen while Home is not -- so
-    // the tile was the weaker of the two routes and cost a slot on the
-    // one screen where slots are scarce.
-    //
-    // Removed rather than moved: NAV-3 added Yoga & Pilates this morning
-    // and Home is where things go to become hard to find. A door that
-    // already exists somewhere better is not a second door, it is
-    // clutter.
-    { kind: 'reference', id: 'library', label: 'Library', icon: '\uD83D\uDCDA', route: 'library', requiresCheckin: false },
-    { kind: 'session', id: 'unsure', label: 'Unsure? Coach decides', icon: '\uD83C\uDFAF', route: 'coach-proposal', requiresCheckin: true },
-  ];
 
   function mount(container) {
     rescueStaleSession();   // W3-13: a session nobody came back to is saved, not dropped
@@ -1071,6 +951,18 @@ export function TodayView(router) {
       router.pathStart = null;
       goToSuggestion(router, { replace: true });
       return;
+    }
+
+    // P-46 S4. Back from the check-in Something gentler asked: on to the
+    // gentle session. Only if today was answered (‹ Back from the check-in
+    // answers nothing, and Home is shown).
+    if (!isPremium() && router?.freeGentler) {
+      router.freeGentler = null;
+      if (_checkedInToday() || store.dayOpenToday()?.choice === 'pick') {
+        askGentler();
+        router.navigate('coach-proposal', { replace: true });
+        return;
+      }
     }
 
     renderHome(container);
@@ -1217,204 +1109,37 @@ export function TodayView(router) {
     const name          = store.get('name') || '';
     const greeting      = _buildGreeting(name);
     if (isPremium()) { _renderPlanHome(container, greeting); return; }
-    const sessionDone   = _sessionCompletedToday();
-    // HOME-1, 13 Aug 2026. The denominator only appears if the person
-    // actually set one.
-    //
-    // strategicGoal.weeklySessionTarget defaults to 3 with setAt: null --
-    // the field literally records that nobody agreed to it. So Home read
-    // "1 of 3 this week" to persona 2.12, whose defining trait is
-    // decision paralysis: visibly two short of something he never chose.
-    // The count was right (COUNT-1 fixed that); the shortfall was
-    // invented.
-    //
-    // Deliberately NOT removing the target outright. Somebody who sets
-    // one wants to see it, and taking that away would be the opposite
-    // error. setAt is the honest test of whether it was ever a choice.
-    const targetSetAt   = store.get('strategicGoal.setAt');
-    const weeklyTarget  = targetSetAt ? (store.get('strategicGoal.weeklySessionTarget') || null) : null;
-    const sessionCount  = _sessionsThisWeek();
+    _renderFreeHome(container, greeting);
+  }
 
-    // ── TARGET-2 (15 Aug 2026, moment-of-delight audit) ────────────────
-    //
-    // Hitting the weekly target the person chose at step 12 got exactly
-    // the same treatment as missing it: the counter read "2 of 2" and
-    // nothing was said. Somebody set a number, reached it, and the app
-    // did not notice.
-    //
-    // The line CLOSES the week rather than opening a demand, which is the
-    // whole difference between this and a target mechanic. "That's the
-    // two you said you'd aim for" states what happened; "anything else is
-    // extra, not expected" removes the obligation that a hit target
-    // otherwise creates. Persona 2.5 named 'escalation-trap' — for her,
-    // reaching a goal is historically the moment the pressure starts.
-    //
-    // It also must not stop her doing more. Somebody who hits two on
-    // Tuesday should not read this as the week being over, so the
-    // invitation stays.
-    //
-    // No new state and no "fired once" flag: the line describes the true
-    // current state of the week, so it is idempotent and P4-safe — the
-    // coach displays, it does not interpret. It appears on the days she
-    // has moved, and the week resets it.
-    // PACE-2. Matrix decision 4: a plan set sharply above recent actual
-    // history gets named warmly, once a week at most. Checked before the
-    // other lines because it is about the shape of the whole week rather
-    // than about today, and because it is the one persona 2.8 needs.
+  // W6-19 EMPATHY-GAPS, kept on Free Home (P-46 S4). A low mood this morning
+  // is answered, in their own word, with the quieter door.
+  function _lowMoodLine() {
+    const low = lowMoodToday();
+    return low ? `You said you're ${low} today. Wellbeing has the quieter things, if that's more like it.` : '';
+  }
+
+  /**
+   * P-46 S4 FREE HOME. Coach-led, in the Plan's look (views/free-home.js).
+   * The old Free Home (the door tiles, the arc offer, the reference rows,
+   * the weekly count line) is archived in BNH-Files Archive/P-46. Kept word
+   * for word: the scope notice, the monthly advice line, the rescued note,
+   * the part-way card, the pacing and brief-path lines, the flat-fortnight
+   * line and the low-mood line.
+   */
+  function _renderFreeHome(container, greeting) {
     const planJump = noticePlanJump();
-
-    // QUICK-2. Offered here rather than in the check-in itself: the
-    // check-in is the thing she is finding long, and interrupting it to
-    // ask about its length would be self-defeating. Home is where she
-    // arrives with a moment to read something.
-    const briefOffer = planJump ? null : offerBriefPath();
-
-    // CHAP-1 step 2. The row's second line, and it says only what is
-    // actually there: the chapter name when one exists, and a plain
-    // description of the screen when one does not. It never invents a
-    // programme for somebody who has none, and it carries no number --
-    // a count on Home's one "where am I going" control would turn a
-    // destination into a scoreboard.
-    const programmeHint = _programmeHint();
-
-    const targetMet = sessionDone && weeklyTarget && sessionCount >= weeklyTarget;
-    const coachLine     = planJump
-      ? planJump.body
-      : briefOffer
-      ? briefOffer.body
-      : targetMet
-      ? `That's the ${weeklyTarget} you said you'd aim for this week. Anything else is extra, not expected.`
-      : sessionDone
-      ? "You moved today \u2014 that's done. Tap in below any time if you'd like to do more."
-      : _buildCoachLine();
-
-    container.innerHTML = `
-      <div class="today-view">
-
-        <header class="today-header">
-          <h1 class="today-greeting">${_esc(greeting)}</h1>
-          ${coachLine ? `<p class="today-coach-line" role="status">${_esc(coachLine)}</p>` : ''}
-          ${_rescuedNote()}
-        </header>
-
-        <!-- WEEK COUNTER REMOVED, LOBBY-1b, 03 Sep 2026.
-             It rendered "3 of 5 this week" on the first screen of the
-             app. A count against a target is a scoreboard, and a
-             scoreboard is a thing you can be behind on by Wednesday --
-             the mechanic the prohibited-patterns list bans and the one
-             this product has spent two days removing everywhere else.
-             It was live on device.
-
-             Removing it entirely rather than dropping the "of 5": a
-             bare count is still a score, and the lobby is where
-             somebody arrives, not where they are marked. Session
-             history remains in Progress, where looking it up is a
-             choice. -->
-
-        ${_hingeCard()}${askLaterCard(dueAskLater())}
-
-        <!-- LOBBY-1b. THE ARC IS THE FIRST THING, and it is reachable
-             without a check-in. It was three levels deep on device --
-             Home, then Mobility & Conditioning, then a card between "My
-             Conditions Programme" and "Stretch" -- which is no place for
-             the thing the business rests on.
-
-             The panel says what the arc is FOR and what has not come up
-             yet. It never says what has been done, and never how much:
-             see verify-arc2's assertions on this. -->
-        <!-- TIER-HOME, 05 Sep 2026. FREE AND PLAN ARE DIFFERENT VERBS.
-             Decided 3 Sep and not built until now: Home looked identical
-             on both tiers, which is the one thing this design said it
-             must never be.
-
-             Free is "you decide, I'll handle it" -- the question, the
-             groups, and a coach-picks fallback. Plan is "I've been
-             thinking, here's what I'd do" -- the arc, then the
-             invitation.
-
-             This is not one screen with a panel swapped. Free is not
-             given a diminished suggestion; it is given something
-             complete on its own terms, and that is also the honest
-             arrangement -- the coach genuinely knows little about a free
-             user between sessions, so a confident suggestion built on
-             that would be the same lie the onboarding goals were.
-
-             STRUCTURE IS THE FREE PRODUCT. Nobody holds the thread for a
-             free user, so the territory has to be legible to them. That
-             is why the taxonomy is visible here and hidden on Plan: the
-             "coach weaves body and mind" argument only holds where there
-             IS a coach doing the weaving. -->
-        <!-- A-1 (v57). The arc is inside Plan Home's Today card now
-             (_arcLine / _coachCard); its own card here went. -->
-
-
-        <!-- MY PROGRAMME ROW REMOVED, LOBBY-1c, 03 Sep 2026.
-             It read "Your goals and where you are up to" and sat
-             directly beneath the arc panel, which now says both of
-             those things with the actual aim in it. Two rows doing one
-             job, on the screen we are trying to simplify.
-             My Programme itself is unchanged and still reachable: the
-             arc panel routes there. What went is the second door. -->
-
-        <!-- LOBBY-1c. THE SPLIT.
-             Session tiles have moved behind the check-in. Home is a
-             lobby: the arc, an invitation, and the reference sections.
-             Somebody reading progress, browsing the library or changing
-             a setting is never asked how their back is on the way.
-
-             WHY THIS IS NOT A LAYOUT CHANGE. coach-proposal builds the
-             suggestion and requires a check-in, so the suggestion could
-             never be promoted onto an ungated Home -- that would have
-             meant gating Home, or suggesting from no data. The split is
-             what MAKES the suggestion promotable; the tiles follow it.
-
-             The invitation states the price of entry, so the check-in
-             is consented to rather than sprung. -->
-        ${isPremium() ? _planDoors() : _freeCarryCard() + chooser() + arcPanel()}
-
-        ${isPremium() ? '' : `<div class="today-reference look-card" role="group" aria-label="Reference and settings">
-          <!-- On free, Wellbeing is promoted into "Settle your mind"
-               above, so repeating it here would be the duplication this
-               screen exists to remove. On Plan it stays a reference row,
-               because Plan's Home has no picker to promote it into. -->
-          ${HOME_DOORS.filter(d => d.kind === 'reference' && d.id !== 'wellbeing').map(d => `
-            <button class="today-ref-row"
-                    data-route="${d.route}"
-                    data-door-id="${d.id}"
-                    data-requires-checkin="${d.requiresCheckin}"
-                    aria-label="${_esc(d.label)}">
-              <span class="kind-tile kind-tile--sm k-${(DOOR_LOOK[d.id] || ['', 'slate'])[1]} today-ref-row__icon">${lineIcon((DOOR_LOOK[d.id] || ['star'])[0], 20)}</span>
-              <span class="today-ref-row__label">${_esc(d.label)}</span>
-              <span class="today-ref-row__chevron" aria-hidden="true">\u203A</span>
-            </button>
-          `).join('')}
-        </div>`}
-
-        <!-- STRAY CHECK-IN LINKS REMOVED, LOBBY-1c, 03 Sep 2026.
-             They floated between the reference rows and the nav with
-             nothing around them, offering a second unexplained route
-             into the same gate the invitation now names properly. Two
-             doors to one place, one of them unlabelled.
-
-             "Update check-in" IS RESTORED BELOW, and its removal was a
-             real regression rather than a tidy-up. CHAP-2 caught it:
-             somebody who checked in this morning and feels worse by
-             evening had no way to say so without starting a session.
-
-             It also belongs here by our own rule -- it changes stored
-             information rather than starting a session, which makes it
-             reference, not a door. -->
-        ${_checkedInToday() ? `
-          <button class="btn btn-ghost today-checkin-link" data-action="checkin-mini"
-                  aria-label="Update your check-in — optional, only if how you're feeling has changed">
-            Update check-in
-          </button>
-        ` : ''}
-
-      </div>
-    `;
-
+    const brief = planJump ? null : offerBriefPath();
+    const checkedIn = _checkedInToday();
+    container.innerHTML = renderFreeHome({
+      greeting,
+      coachNote: planJump ? planJump.body : brief ? brief.body : (_burnoutLine() || _lowMoodLine()),
+      top: _scopeNotice() + _guidanceLine() + _rescuedNote(),
+      carryCard: _freeCarryCard(),
+      checkedIn,
+    });
     attachEvents(container);
+    wireFreeHome(container, router, { checkedIn });
   }
 
   function attachEvents(container) {
@@ -1650,167 +1375,6 @@ export function TodayView(router) {
     wirePlanHome(container, router);
   }
 
-  function _buildCoachLine() {
-    // COUNT-1. Same rule -- the coach must not refer back to a session
-    // yesterday that was opened and abandoned.
-    const activityLog    = store.completedSessions(store.get('activityLog'));
-    const checkinHistory = store.get('checkinHistory') || {};
-    const yesterday      = _yesterdayString();
-
-    // ── BURN-3, 16 Aug 2026. The graded burnout message, restored. ──
-    //
-    // It lived in coach-reflection.js, whose route was retired on 04 Aug.
-    // Unreachable code says nothing, so this had been said to nobody for
-    // twelve days -- and four gates stayed green throughout by reading
-    // that file's source text.
-    //
-    // HOME, not the end of a session. Burnout is a statement about the
-    // last week, and it belongs BEFORE somebody chooses what to do, not
-    // after they have already done it. Home is also the one surface
-    // everybody reaches, which is the whole reason the previous version
-    // went unseen.
-    //
-    // FIRST, above the yesterday line. If somebody has been flat for a
-    // week, "you did strength work yesterday" is not the most useful
-    // thing the coach can say to them.
-    //
-    // GRADED, because the session is graded. 'high' narrows the pool and
-    // sets recoveryMode; 'moderate' does not. Saying the same sentence
-    // for both would tell somebody having a flat week the same thing as
-    // somebody a fortnight into exhaustion.
-    //
-    // P4: it says what it noticed and what it is doing. No diagnosis, no
-    // instruction, no "you are burnt out" -- that is a clinical claim
-    // this product is not qualified to make, and the word is deliberately
-    // absent from what a person sees.
-    const flat = _burnoutLine(checkinHistory);
-    if (flat) return flat;
-
-    // W6-19 EMPATHY-GAPS. A low mood this morning is answered, in their own
-    // word, with the quieter door; the line was the same on a good day and
-    // the worst. No claim about why, and nothing more than the offer.
-    const low = lowMoodToday();
-    if (low) return `You said you're ${low} today. Wellbeing has the quieter things, if that's more like it.`;
-
-    // P7. The local calendar day, and the one label map.
-    const yesterdaySessions = activityLog.filter(e => {
-      const ts = e.completedAt || e.loggedAt || e.date;
-      return ts && e.status !== 'partial' && daysAgo(ts) === 1;
-    });
-
-    if (yesterdaySessions.length > 0) {
-      return `You did ${activityPhrase(yesterdaySessions[0])} yesterday.`;
-    }
-
-    const recentCheckins = Object.keys(checkinHistory)
-      .filter(d => d >= _daysAgoString(7))
-      .length;
-
-    if (recentCheckins >= 5) return "You've been showing up.";
-
-    // ── ORIENT-1, 13 Aug 2026 ────────────────────────────────────────
-    //
-    // Everything above needs history. For somebody in their first days
-    // this function returned null, so Home was a bare greeting and seven
-    // doors -- and the first three of those are workouts.
-    //
-    // THE PERSON THIS IS FOR. Persona 2.11: 76, lifelong overweight,
-    // ex-dancer, "doesn't know how to exercise or move confidently",
-    // more likely to engage with mindfulness than structured exercise.
-    // She tells the app during onboarding that she wants to reduce
-    // stress and feel better. Nothing on Home has ever read `goals` --
-    // grep returned nothing before this. So the person least likely to
-    // want a workout landed on a screen led by workouts, with the thing
-    // she came for fourth.
-    //
-    // The matrix has carried her gap since 05 Jul: "unconfirmed whether
-    // the Noticing Hub is reachable as a genuine front door at
-    // onboarding". Confirmed 13 Aug: it is not. Every route out of
-    // onboarding ends here.
-    //
-    // WHY NOT REORDER THE DOORS, which was the obvious fix. Persona 2.14
-    // is autistic and predictability-seeking; a Home screen that
-    // rearranges itself based on what the app thinks you want is
-    // precisely aversive to her. Fixing 2.11 by breaking 2.14 is not a
-    // fix. The grid stays fixed for everybody and the coach speaks
-    // instead -- which is also what P1 asks for: the coach offers.
-    //
-    // Fires only in the first few sessions. Orientation, not a nudge:
-    // somebody who has been here a fortnight has found the doors.
-    const sessionsSoFar = activityLog.length;
-    // F3, GUIDANCE-FOLD. On the one day a month the general-guidance line
-    // shows, it is the note on this screen: an orientation line as well
-    // pushed the last of Plan Home under the nav (912px at 390 x 844).
-    // Orientation runs for four sessions, so it is back tomorrow.
-    if (sessionsSoFar < ORIENTATION_SESSIONS && !(isPremium() && _guidanceDue())) {
-      const goals = store.get('goals') || [];
-      if (goals.some(g => WELLBEING_GOALS.has(g))) {
-        return "Wellbeing is where the breathing and the quieter practices live \u2014 that might be the door for you.";
-      }
-      if (goals.length === 0) {
-        // Persona 2.12's case: no goal, genuine decision paralysis.
-        // Naming the door that decides for you is the whole point of it.
-        // DEVICE-1, 06 Sep 2026. Named "Unsure" -- a door that has not
-        // existed since CLUB-SHELL. It was "Unsure? Coach decides", then
-        // the club renamed it "One to one", and this line never followed.
-        //
-        // WORST POSSIBLE AUDIENCE FOR A STALE REFERENCE. It shows only to
-        // somebody with NO GOAL SET in their first sessions -- the case
-        // this line calls genuine decision paralysis. The one person who
-        // most needs pointing at a door was being pointed at a door that
-        // is not on their screen.
-        // DEVICE-2, 06 Sep 2026. DEVICE-1 replaced "Unsure" with "One to
-        // one" -- and One to one is a PLAN room. Free's coach route is
-        // the "Not sure? I'll pick something" button beneath its tiles.
-        // So the fix moved the fault one tier over instead of removing
-        // it, within the hour, because it was verified on one fixture.
-        //
-        // Named per tier now, from the control actually on that screen.
-        return isPremium()
-          // SMOOTH-P3a. The door on this screen now is "Tell me what to do".
-          ? "If you'd rather not choose, \u2018Tell me what to do\u2019 lets me decide today."
-          : "If you'd rather not choose, \u2018Not sure?\u2019 lets me decide today.";
-      }
-
-      // ── ORIENT-2 (15 Aug 2026, first-ninety-seconds audit) ──────────
-      //
-      // ORIENT-1 gave a line to wellbeing-goal users and to users with no
-      // goal at all. Everybody else still got null. Checked across the
-      // persona set: FIVE of nine were silent here -- 2.6, 2.10, 2.15,
-      // 2.16 and 2.4. That includes the 76-year-old and the returning
-      // lifter, neither of whom is an edge case.
-      //
-      // They come out of a twenty-question conversation that ends "I'm
-      // glad you're here, [name]. Let's see what we can do." and land on
-      // a grid of four unlabelled doors in silence. The product handles
-      // its edge cases warmly and says nothing to the middle.
-      //
-      // Same constraints as ORIENT-1: the grid does NOT reorder, because
-      // a Home screen that rearranges itself is aversive to persona 2.14.
-      // The coach speaks instead. Orientation, not a nudge -- it names
-      // where the thing they asked for lives, once, in the first few
-      // sessions, and then stops.
-      // F3, 28 Sep. These named the FREE tiles on both tiers; since
-      // SMOOTH-P3a Plan Home has three doors and neither tile is on it.
-      // Named per tier, from the control actually on the screen.
-      if (goals.some(g => STRENGTH_GOALS.has(g))) {
-        return isPremium()
-          ? "\u2018I know what I want\u2019 is where you pick strength, and how long."
-          : "Cardio, Core & Strength is the door for what you said you're after.";
-      }
-      if (goals.some(g => MOVEMENT_GOALS.has(g))) {
-        return isPremium()
-          ? "\u2018I know what I want\u2019 has the gentler kinds \u2014 mobility, stretching and yoga."
-          : "Mobility & Conditioning is where the gentler movement lives \u2014 that might be the door for you.";
-      }
-      // Everything else, including 'build-habit' alone. Says the true
-      // thing rather than guessing a door: the smallest session is the
-      // one most likely to actually happen.
-      return "Any door is a fine place to start. The shortest session counts as much as the longest one.";
-    }
-
-    return null;
-  }
 
   /**
    * CHAP-1 step 3 part two. The hinge, on Home.
@@ -1838,105 +1402,7 @@ export function TodayView(router) {
   // Whether the event form is open is not a fact about the person.
   let _eventOpen = false;
 
-  function _hingeCard() {
-    if (!isHingePending()) return '';
 
-    const ap   = store.get('activeProgramme') || {};
-    const done = getProgramme(ap.programmeId);
-    const next = chapterSuccessor(ap.programmeId);
-
-    // No countdown, no score, no "you completed 100%". It states the
-    // fact and asks the question -- COUNTDOWN-1's rule applies here
-    // most of all, because this is the moment a chapter could most
-    // easily be made to read as an exam result.
-    return `
-      <section class="today-hinge" aria-label="Your chapter is complete">
-        <h2 class="today-hinge__heading">That's ${_esc(done?.name || "your chapter")} done.</h2>
-        <p class="today-hinge__body">
-          ${_esc(next
-            ? `Nothing has to change today. When you're ready, ${next.name} would be my suggestion — or run this one again, or go somewhere different entirely.`
-            : "Nothing has to change today. When you're ready, you can run this one again or pick something different.")}
-        </p>
-        <div class="today-hinge__actions">
-          ${next ? `
-            <button class="btn btn-primary btn-small" data-hinge="next"
-                    aria-label="Start ${_esc(next.name)}">Start ${_esc(next.name)}</button>` : ''}
-          <button class="btn btn-ghost btn-small" data-hinge="repeat"
-                  aria-label="Run ${_esc(done?.name || "this chapter")} again">Run it again</button>
-          <button class="btn btn-ghost btn-small" data-hinge="different"
-                  aria-label="Choose something different">Something different</button>
-        </div>
-        ${_eventPrompt()}
-      </section>
-    `;
-  }
-
-  /**
-   * CHAP-1 step 6. The event goal, offered at the FIRST hinge.
-   *
-   * Blueprint §7: "Offered at the first hinge, not at signup: most
-   * people have no event, and asking implies they ought to."
-   *
-   * That sentence is the whole design. At signup, asking "what are you
-   * training for?" tells somebody with no answer that they are missing
-   * one. After a finished chapter it is a fair question, because they
-   * have just demonstrated they are the kind of person who finishes
-   * things.
-   *
-   * FIRST hinge only, and asked ONCE. programme.hingeOfferedAt records
-   * that the question has been put -- it is the field CHAP-1 step 1
-   * declared for exactly this ("one offer per hinge") and it is used
-   * rather than adding a new one, so no schema change is needed.
-   *
-   * Not asked at all if they already have a target: somebody who told
-   * onboarding about their hike does not need asking again.
-   *
-   * It does not block the chapter choice. It sits underneath, and doing
-   * nothing at all is a complete answer -- there is no "skip" to press,
-   * because a skip button makes ignoring it feel like a decision.
-   */
-  function _eventPrompt() {
-    // R2-a. Plan only, and silently -- free is not shown a locked
-    // version. Free is complete in itself and limited in horizon; it is
-    // never degraded to create pressure, and a teaser on the morning
-    // screen would be exactly that.
-    if (!isPremium()) return '';
-
-    const alreadyAsked = !!store.get('programme.hingeOfferedAt');
-    const hasTarget    = !!(store.get('strategicGoal.targetDate') || store.get('targetDate'));
-    const firstHinge   = (store.get('programme.chaptersDone') || []).length <= 1;
-    if (alreadyAsked || hasTarget || !firstHinge) return '';
-
-    if (_eventOpen) {
-      return `
-        <div class="today-hinge__event">
-          <label class="today-hinge__label" for="hinge-event-what">
-            What is it?
-          </label>
-          <input class="today-hinge__input" id="hinge-event-what" type="text"
-                 placeholder="A hike, a wedding, a park run" maxlength="60">
-          <label class="today-hinge__label" for="hinge-event-when">
-            When, if you know
-          </label>
-          <input class="today-hinge__input" id="hinge-event-when" type="date">
-          <div class="today-hinge__actions">
-            <button class="btn btn-primary btn-small" data-event="save">Save it</button>
-            <button class="btn btn-ghost btn-small" data-event="cancel">Never mind</button>
-          </div>
-        </div>
-      `;
-    }
-
-    return `
-      <p class="today-hinge__aside">
-        Is there anything you're working towards? A date in the diary, if you
-        have one. I'll keep it in view — and if it starts looking like a harder
-        ask than it needs to be, I'll say so.
-        <button class="btn btn-ghost btn-small" data-event="open"
-                aria-label="Tell me what you are working towards">Tell me</button>
-      </p>
-    `;
-  }
 
   /**
    * LOBBY-1b. The arc, on the lobby.
@@ -2232,62 +1698,6 @@ function _markGuidanceShown(root) {
    * session to carry on, in which case that card leads and all three sit
    * quietly under "Or instead".
    */
-  /**
-   * A-1 PLAN-HOME-PRUNE (v57; Graeme approved the mock-up, 12 Oct: "I love
-   * plan home"). One Today card, then the doors, then one Library row: six
-   * ways in at most (it was up to twelve).
-   *   - A day of the week: that day leads, the arc a line inside the card,
-   *     all three doors below.
-   *   - A rest day: said, with the arc; all three doors below.
-   *   - No week, or nothing set for today: the coach's card leads with the
-   *     arc and Tell me what to do, which is then not repeated below; the
-   *     week is offered on the card.
-   *   - A session to carry on: that card leads, the arc a line under it.
-   * Join a class, Go for a run, Something for the mind and Your week moved
-   * to the Library (one tap; the mind is also the Wellbeing tab). The old
-   * markup is archived in BNH-Files, Archive/Stage AWARD/A-1.
-   */
-  function _planDoors() {
-    const carry = _carryOn();
-    // D-6. The week's day leads when there is one for today.
-    const week = todayInWeek();
-    const weekCard = !carry && !!(week && (week.template || week.value === 'rest'));
-    const coachCard = !carry && !weekCard;
-    // LOOK-4. A tile, the words, a chevron. The words decide, not the colour.
-    // A-4: the doors' second lines went; their names say it.
-    const door = (action, title, icon) => `
-      <button class="home-door" data-action="${action}">
-        <span class="kind-tile k-teal">${lineIcon(icon)}</span>
-        <span class="home-door__text"><span class="home-door__title">${title}</span></span>
-        <span class="home-door__chev" aria-hidden="true">${lineIcon('chevron', 20)}</span>
-      </button>`;
-    const label = carry ? 'Or instead' : coachCard ? 'Or choose for yourself' : 'Or something else today';
-    // The Library row names what moved there; your week only when no card
-    // on Home already offers it.
-    const libSub = `Classes, runs, the mind, your lists${coachCard ? '' : ', your week'}`;
-    // GUIDANCE-1 goes with the doors: it was in the rooms, and the rooms
-    // were the only Plan place it was said. Found by verify-clubshell 12a.
-    return `
-      ${_scopeNotice()}
-      ${_guidanceLine()}
-      ${carry ? _carryOnCard(carry) + _arcChip() : ''}
-      ${weekCard ? _weekCard(week) : ''}
-      ${coachCard ? _coachCard(week) : ''}
-      <h2 class="look-label" id="home-doors-label" tabindex="-1">${label}</h2>
-      <div class="home-doors" role="group" aria-labelledby="home-doors-label">
-        ${coachCard ? '' : door('start-today', 'Tell me what to do', 'star')}
-        ${door('know-what', 'I know what I want', 'choose')}
-        ${door('as-i-go', 'Make it up as I go', 'pencil')}
-      </div>
-      <button class="home-door home-libraryrow" data-route="library" data-requires-checkin="false">
-        <span class="kind-tile k-slate">${lineIcon('library')}</span>
-        <span class="home-door__text">
-          <span class="home-door__title">Library</span>
-          <span class="home-door__sub">${libSub}</span>
-        </span>
-        <span class="home-door__chev" aria-hidden="true">${lineIcon('chevron', 20)}</span>
-      </button>`;
-  }
 
   /**
    * A-1. The arc as a line inside a card: opens the arc, or offers to set
@@ -2410,230 +1820,10 @@ function _markGuidanceShown(root) {
          </button>`;
   }
 
-  // LOOK-4. Each door's line icon and kind colour (data/kind-colours.js's
-  // meaning: strength amber, mobility and yoga violet, run blue, classes
-  // rose, the mind green, your own teal, reference slate).
-  const DOOR_LOOK = {
-    'cardio-core-strength':  ['strength', 'amber'],
-    'mobility-conditioning': ['mobility', 'violet'],
-    'yoga':                  ['yoga', 'violet'],
-    'run':                   ['run', 'blue'],
-    'classes':               ['classes', 'rose'],
-    'wellbeing':             ['mind', 'green'],
-    'my-exercises':          ['list', 'teal'],
-    'library':               ['library', 'slate'],
-    'unsure':                ['star', 'teal'],
-  };
 
-  function tileGrid() {
-    const move = HOME_DOORS.filter(d => d.kind === 'session' && d.id !== 'unsure');
-    const mind = HOME_DOORS.filter(d => d.id === 'wellbeing');
 
-    // LOOK-4. Each tile in its kind colour, a line icon for the emoji.
-    const tile = d => {
-      const [icon, kind] = DOOR_LOOK[d.id] || ['star', 'teal'];
-      return `
-      <button class="today-door today-door--pick${d.id === 'wellbeing' ? ' today-door--wide' : ''}"
-              data-route="${d.route}"
-              data-door-id="${d.id}"
-              data-requires-checkin="${d.requiresCheckin}"
-              aria-label="${_esc(d.label)}">
-        <span class="kind-tile k-${kind} today-door__icon">${lineIcon(icon)}</span>
-        <span class="today-door__label">${_esc(d.label)}</span>
-      </button>`;
-    };
 
-    return `
-      <p class="today-group-label look-label" id="today-group-body">Move your body</p>
-      <div class="today-doors" role="group" aria-labelledby="today-group-body">
-        ${move.map(tile).join('')}
-      </div>
 
-      ${mind.length ? `
-        <p class="today-group-label look-label" id="today-group-mind">Settle your mind</p>
-        <div class="today-doors" role="group" aria-labelledby="today-group-mind">
-          ${mind.map(tile).join('')}
-        </div>
-      ` : ''}`;
-  }
-
-  function chooser() {
-    return `
-      ${_scopeNotice()}
-      ${_guidanceLine()}
-      <p class="today-chooser-q">What do you want to do today?</p>
-      ${tileGrid()}
-
-      <button class="btn btn-ghost btn-full today-unsure"
-              data-action="start-today" data-guide-target="not-sure"
-              aria-label="Not sure \u2014 I'll pick something, going on how you're doing today">
-        Not sure? I'll pick something
-      </button>
-      <p class="today-invite__note">I'll go on how you're doing today</p>`;
-  }
-
-  function arcPanel() {
-    const arc = store.get('arc') || {};
-
-    // ARC-DOOR, 06 Sep 2026. THE TIER RULE LIVES HERE, NOT AT THE CALL
-    // SITES. There were two; only one was gated, and free rendered the
-    // full panel through the other. Anything that calls arcPanel() now
-    // inherits this, including call sites nobody has written yet.
-    //
-    // Free gets the invitation and nothing else. "Free is today, the
-    // Plan is the arc" -- so the door is honest and the arc is not
-    // behind it until there is a Plan. Routed to "upgrade", not
-    // "arc-setup": a free user must not be able to build one.
-    if (!isPremium()) {
-      return `
-        <button class="today-arc today-arc--offer"
-                data-route="upgrade"
-                data-requires-checkin="false"
-                aria-label="About the arc, part of the Plan">
-          <span class="today-arc__label">Your arc</span>
-          <span class="today-arc__offer">
-            Tell me what you want to be able to do, and I'll hold it and work
-            towards it with you.
-          </span>
-          <!--
-            DIC-SIGNAL, 16 Sep 2026. Say which tier this is, in the place
-            where saying it is fair.
-
-            Graeme wanted a line telling free users the coach could do
-            more in the Plan. Locked Principles P1/P2 -- the coach never
-            sells -- blocks that inside a coach card, and the free
-            drop-in question IS one. Selling in the coach's voice, to
-            somebody mid-habit, is the moment most likely to read as a
-            bait-and-switch rather than an offer.
-
-            🔴 BUT THERE WAS A REAL FAULT HERE, AND IT IS A PARITY ONE.
-            The aria-label on this button has always said "About the
-            arc, part of the Plan". The visible text never did. So a
-            screen-reader user learned which tier this belonged to and a
-            sighted user did not -- they tapped an invitation and landed
-            on an upgrade page with no warning. WCAG 2.2 AA 1.3.1: the
-            same information, by every route.
-
-            So the line names the tier and stops. It does not argue for
-            it. The invitation above is already the argument, in the
-            coach's own words, and it is better than anything a sales
-            line would add.
-          -->
-          <span class="today-arc__tier">Part of the Plan</span>
-        </button>`;
-    }
-
-    if (!arc.active || !arc.aimId) {
-      return `
-        <button class="today-arc today-arc--offer"
-                data-route="arc-setup"
-                data-requires-checkin="false"
-                aria-label="Set up your arc">
-          <span class="today-arc__label">Your arc</span>
-          <span class="today-arc__offer">
-            Tell me what you want to be able to do, and I'll hold it and work
-            towards it with you.
-          </span>
-        </button>`;
-    }
-
-    const aim     = aimById(arc.aimId);
-    const worked  = arc.zonesWorked || {};
-    const typesDone = arc.typesWorked || {};
-    const strands = (arc.strands || []).map(id => ({
-      label: (STRANDS[id] || {}).label,
-      // A strand counts as touched when any zone it leans on has been
-      // worked. A date, never a count -- the strand is either lit or it
-      // is not, which is a fact about the plan rather than a score.
-      // ARC-COVERAGE, 05 Sep 2026. This counted ANY dated zone, including
-      // sessions done before the arc existed. On device a brand-new arc
-      // showed "A back that copes" already lit, because a stretch two
-      // days earlier had touched lower-back.
-      //
-      // An arc cannot have covered something before it started. Borrowing
-      // history it did not earn is the same dishonesty as the sore-zone
-      // marking, and it also robs day one of the thing that makes it
-      // worth seeing: everything still ahead.
-      // ARC-EVERYTHING, 16 Sep 2026. TWO CHANNELS, because the strands
-      // are two kinds.
-      //
-      // 🔴 This asked only about ZONES. 18 of the 30 strands carry no
-      // zones at all -- they carry sessionTypes -- so [].some() was
-      // false forever and Trunk strength, Staying-power and Pacing
-      // yourself COULD NOT LIGHT, whatever anybody did. Graeme's first
-      // screenshot said "Trunk strength and Trusting your body again
-      // haven't come up yet" in a week he had done strength work. The
-      // arc was not behind; it could not see.
-      //
-      // Body strands still light from zones worked. Capability strands
-      // light from the type of session done. Either counts, and the
-      // startedAt guard is applied to both -- ARC-COVERAGE found a
-      // brand-new arc showing a strand already lit because of a session
-      // two days before it existed, and that must not come back through
-      // the new channel.
-      lit: ((STRANDS[id] || {}).zones || [])
-             .some(z => worked[z] && (!arc.startedAt || worked[z] >= arc.startedAt))
-        || ((STRANDS[id] || {}).sessionTypes || [])
-             .some(t => typesDone[t] && (!arc.startedAt || typesDone[t] >= arc.startedAt))
-    })).filter(x => x.label);
-
-    const notYet = strands.filter(x => !x.lit).map(x => x.label);
-
-    return `
-      <button class="today-arc today-arc--active"
-              data-route="stretch-arc"
-              data-requires-checkin="false"
-              aria-label="Your arc — ${_esc(aim ? aim.label : '')}">
-        <span class="today-arc__label">Your arc</span>
-        <span class="today-arc__aim">${_esc(aim ? aim.label : '')}</span>
-        ${strands.length ? `
-          <span class="today-arc__heading">What it's made of</span>
-          <span class="today-arc__strands">
-            ${strands.map(x => `
-              <!-- ARC-PLAIN, 06 Sep 2026. No mark, no "not yet" label.
-                   Lit strands are full-strength text, unlit are muted.
-                   Graeme's call, and the screen is much quieter for it.
-
-                   WCAG 1.4.1 STILL HOLDS, and not by accident: the note
-                   directly below NAMES the strands that have not come up,
-                   in every state -- all of them, some of them, none of
-                   them. So the information is in text on the same block
-                   and colour is not the only means of conveying it.
-                   verify-clubshell 10f now asserts that note rather than
-                   per-row words, because the note is what is carrying it. -->
-              <span class="today-arc__strand ${x.lit ? 'today-arc__strand--lit' : ''}">
-                ${_esc(x.label)}
-              </span>
-            `).join('')}
-          </span>` : ''}
-        <span class="today-arc__note">${
-          notYet.length === strands.length && strands.length
-            ? "All of it still ahead of you. That's the whole point of today."
-            : notYet.length
-            // ARC-LED, 06 Sep 2026. The second sentence is load-bearing.
-            // Without it, two of three strands reading "not yet" is read
-            // as being BEHIND, whatever the design intends -- and this
-            // panel shows coverage, not completion. P4: displays, never
-            // interprets. No bar, no percentage, no count, ever.
-            ? `${_esc(notYet.join(' and '))} ${notYet.length === 1 ? "hasn't" : "haven't"} come up yet. Nothing is behind \u2014 that's just where the arc is.`
-            // DEVICE-1, 06 Sep 2026. This branch is reached when notYet
-            // is empty -- INCLUDING when there are no strands at all,
-            // because zero of zero is zero. An arc with an aim but no
-            // strands therefore announced complete coverage of nothing.
-            // Silent instead.
-            : strands.length
-            ? "Every strand has come up at least once."
-            : ""
-        }</span>
-      </button>`;
-  }
-
-  function _programmeHint() {
-    const id = store.get('activeProgramme.programmeId');
-    if (!id) return "Your goals and where you are up to";
-    const p = getProgramme(id);
-    return p ? p.name : "Your goals and where you are up to";
-  }
 
   function _timeGreeting() {
     const hour = new Date().getHours();
@@ -2642,20 +1832,6 @@ function _markGuidanceShown(root) {
     return 'Evening';
   }
 
-  function _sessionsThisWeek() {
-    // COUNT-1, 12 Aug 2026. Counted EVERY entry, partials included, so
-    // opening a session to look at it and backing out incremented the
-    // number on Home. Graeme's read "7 of 3" from two real sessions.
-    // Build Your Base said 2, because programmeEngine only counts genuine
-    // completions -- and he correctly identified that as the trustworthy
-    // one. store.completedSessions() is now the single definition.
-    const activityLog = store.completedSessions(store.get('activityLog'));
-    const monday      = _mondayString();
-    return activityLog.filter(e => {
-      const ts = e.completedAt || e.loggedAt || e.date;
-      return ts && new Date(ts).toISOString().split('T')[0] >= monday;
-    }).length;
-  }
 
   function _todayString() {
     return new Date().toISOString().split('T')[0];

@@ -1,5 +1,11 @@
 /**
  * tools/verify-delight.mjs
+ * 24 Nov 2026 v4
+ *
+ * v4 - P-46 S4 FREE HOME. Free Home has no door grid or goal-led line; those
+ *   checks retire (git history v3). It holds Free Home is never silent and is
+ *   not reordered by goals.
+ *
  * 17 Oct 2026 v3
  *
  * v3 - W6-17 (Graeme, 04 Oct: "I guess option 1"). The lighter-day rule is read as
@@ -100,40 +106,18 @@ for (const setName of ['WELLBEING_GOALS', 'STRENGTH_GOALS', 'MOVEMENT_GOALS']) {
     bogus.length ? `invented: ${bogus.join(', ')}` : `${used.length} ids, all present in goals.js`);
 }
 
-check('there is a fallback line, so no goal combination is silent',
-  /Any door is a fine place to start/.test(today),
-  'five of nine personas got null before this');
-// SWEEP-1, 18 Aug 2026. This was a NEGATIVE {0,200} window, which is the
-// dangerous direction. A positive window fails loudly when the gap grows;
-// a negative one goes SILENTLY GREEN the moment the thing it forbids
-// drifts 201 characters away. Adding one comment above a .sort() call
-// would have disarmed this assertion without anybody noticing.
-//
-// The property is "the door grid is never reordered", so it is asserted
-// against the whole HOME_DOORS region rather than a fixed distance from
-// its name -- extracted from the declaration to its closing bracket.
-//
-// SEED NOTE, and it cost a false FAIL first. The replacement originally
-// sliced to the next '\n];' and the array actually closes on an INDENTED
-// '  ];', so the region swallowed hundreds of unrelated lines and found a
-// .sort() in one of them. Bracket-matched now: the region is exactly the
-// literal, and the assertion says so if it cannot find one.
+// P-46 S4. Free Home has no door grid and no goal-led coach line now (the
+// Today card speaks instead), so the fallback line and the grid-order checks
+// retire with them (git history v3). The property they served holds: Home is
+// the same for everybody, whatever their goals, and never silent.
 {
-  const decl = today.indexOf('HOME_DOORS');
-  let region = '';
-  if (decl !== -1) {
-    const open = today.indexOf('[', decl);
-    let depth = 0, i = open;
-    for (; i < today.length; i++) {
-      if (today[i] === '[') depth++;
-      else if (today[i] === ']' && --depth === 0) break;
-    }
-    region = today.slice(open, i + 1);
-  }
-  check('the door grid is still never reordered',
-    decl !== -1 && region.length > 50 && !/\.sort\(|\.reverse\(/.test(region),
-    region.length <= 50 ? 'could not read the HOME_DOORS literal — assertion had nothing to test'
-                        : 'reordering would fix 2.11 by breaking 2.14');
+  const fh = fs.readFileSync(new URL('../js/views/free-home.js', import.meta.url), 'utf8');
+  check('Free Home is never silent: the Today card speaks in every state',
+    /How are you today\?/.test(fh) && /Your session is ready/.test(fh) && /That\u2019s today done\./.test(fh),
+    'a Today-card state with nothing to say');
+  check('and it does not read goals at all, so nothing is reordered by them',
+    !/goals/.test(fh) && !/\.sort\(|\.reverse\(/.test(fh),
+    'reordering would fix 2.11 by breaking 2.14');
 }
 
 // ── STREAK-1: the product must not keep streaks ──────────────

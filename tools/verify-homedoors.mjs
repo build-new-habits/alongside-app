@@ -1,5 +1,11 @@
 /**
  * tools/verify-homedoors.mjs
+ * 24 Nov 2026 v7
+ *
+ * v7 - P-46 S4 FREE HOME. Free Home is its own now (free-home.js: coach-led,
+ *   in the Plan's look, path-* classes), so the Free control reads .free-home
+ *   and the absence of the Plan's doors, not the absence of path-home.
+ *
  * 02 Nov 2026 v6
  *
  * v6 - P-26 ONE-BUILD-PAGE re-point (Graeme, 02 Nov: one Build a session
@@ -250,11 +256,13 @@ console.log("\nTEST 4 - free keeps what it already had");
 
 const free = home("free");
 const freeDoors = [...free.c.querySelectorAll("[data-door-id]")];
-ok("4a. free still has its doors", freeDoors.length >= 4,
-   `${freeDoors.length} door(s) on free's Home`);
-ok("4b. free still gets the arc offer beneath them",
-   /what you are working towards|arc|aim/i.test(free.text),
-   "free never sees the arc, so the product is never mentioned to the people " +
+// P-46 S4. Free Home is coach-led (free-home.js): its ways in, then one line
+// to the Plan. The arc offer is replaced by that line (the arc is the Plan's).
+ok("4a. free still has its ways in (Something gentler, the six, Log what I did)", free.c.querySelectorAll(".free-home .path-door").length >= 3,
+   `${free.c.querySelectorAll(".free-home .path-door").length} way(s) in on free's Home`);
+ok("4b. free is told what the Plan adds, beneath them",
+   /See what the Plan adds/.test(free.text),
+   "free never hears of the Plan, so the product is never mentioned to the people " +
    "who might buy it");
 ok("4c. free still gets its fallback",
    !!free.c.querySelector('[data-action="start-today"]'));

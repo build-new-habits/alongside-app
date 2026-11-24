@@ -1,6 +1,11 @@
 import { createRequire as __cr } from "node:module";
 /**
  * tools/verify-library-shelf.mjs
+ * 24 Nov 2026 v6
+ *
+ * v6 - P-46 S4 FREE HOME. 3d: Free has no way into Mobility & Conditioning
+ *   either now; the on-the-plan page says what it is.
+ *
  * 15 Nov 2026 v5
  *
  * v5 - P-25 HOW-TO GUIDES. TEST 4: the guide markers (data-guide-target,
@@ -149,7 +154,8 @@ fixture(); main.innerHTML = ""; KnowWhatView(fakeRouter).mount(main);
 ok("3b. not from I know what I want", !main.querySelector('[data-kw-route="mobility-conditioning"]') && !!main.querySelector('[data-kw-route="build-session"]'));
 const planFiles = ["js/views/path.js", "js/views/plan-home.js", "js/views/plan-finish.js", "js/data/path-context.js"];
 ok("3c. not from Home or a door", planFiles.every(f => !readFileSync(`${ROOT}${f}`, "utf8").includes("mobility-conditioning")));
-ok("3d. control: Free keeps its own way in (Free Home's Mobility & Conditioning)", /route: 'mobility-conditioning'/.test(readFileSync(`${ROOT}js/views/today.js`, "utf8")));
+// P-46 S4: Mobility & Conditioning moved to the Plan's for Free too; Free asking for it gets the on-the-plan page.
+ok("3d. Free: no way in either (on-the-plan says what it is)", !/mobility-conditioning/.test(readFileSync(`${ROOT}js/views/today.js`, "utf8").replace(/\/\/.*|\/\*[\s\S]*?\*\//g, "")) && /"mobility-conditioning":\s*\[/.test(readFileSync(`${ROOT}js/views/on-the-plan.js`, "utf8")));
 
 // ── 4 ───────────────────────────────────────────────────────────────────
 console.log("\nTEST 4 - Free's Library, as it was on alongside-v690");

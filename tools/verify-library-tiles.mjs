@@ -1,5 +1,11 @@
 /**
  * tools/verify-library-tiles.mjs
+ * 24 Nov 2026 v6
+ *
+ * v6 - P-46 S4 FREE HOME. Free's Library moved to the Plan. Its tile checks
+ *   are retired (git history v5); the Plan's way to each tile's session stays,
+ *   and Free gets the on-the-plan page.
+ *
  * 31 Oct 2026 v5
  *
  * v5 - P-13 re-point (Graeme, 29 Oct: "Only what doors don't hold"; 31 Oct:
@@ -110,18 +116,14 @@ let lastPre = "";
 const _set = store.set.bind(store);
 store.set = (k, v, ...r) => { if (k === "sessionBuilderPreselect" && v) lastPre = v.type || ""; return _set(k, v, ...r); };
 
-console.log("\nTEST 1 - Library > At home, through the real router");
-fixture("free");   // v5: the tiles are Free's now; the Plan's way to each is driven below
-await go("library");
-click(main.querySelector("#lib-start-session-btn")); await wait(60);
-click(main.querySelector('[data-guided="home"]')); await wait(60);
-const tiles = () => $$(".library-session-card[data-target]");
-const found = tiles().map(b => ({ label: txt(b.querySelector(".library-session-label")), note: txt(b.querySelector(".library-session-note")),
-                                  target: b.dataset.target, pre: b.dataset.preselectType || "" }));
-ok("1pc. the At home tiles are on screen", found.length >= 4, found.map(f => f.label).join(" | "));
-const dest = found.map(f => `${f.target}:${f.pre}`);
-const dupes = dest.filter((d, i) => dest.indexOf(d) !== i);
-ok("1a. no two tiles open the same thing", dupes.length === 0, dupes.join(", "));
+console.log("\nTEST 1 - the Plan's way to each of the old At home tiles");
+// P-46 S4. Free's Library (its At home tiles) moved to the Plan; Free asking
+// for it opens the on-the-plan page. The tile checks (1pc, 1a, 2a, 2b, 2d, 2e)
+// are retired with it (git history v5; screens archived in BNH-Files
+// Archive/P-46). What stays: each tile's session, reached through the Plan's doors.
+fixture("free"); await go("library");
+ok("1pc. Free asking for the Library: the on-the-plan page", router.currentView === "on-the-plan", router.currentView);
+const found = ["Full Body", "Core", "Upper body", "Lower body", "Mobility"].map(label => ({ label }));
 
 // Each label, clicked, lands where it says.
 // v5: on the Plan, each through its door (where, part, Build it for me; Stretch's mobility session).
@@ -148,21 +150,9 @@ for (const [label, [view, pre]] of Object.entries(EXPECT)) {
 }
 ok("1b. Full Body, Core, Upper body, Lower body and Mobility each land where they say", wrong.length === 0, wrong.join("; "));
 
-console.log("\nTEST 2 - what the tiles promise");
-const core = found.find(f => f.label === "Core");
-ok("2a. Core says what the core session holds", !!core && /stability/i.test(core.note) && /gentle/i.test(core.note), core?.note);
-ok("2b. no tile promises HIIT", !found.some(f => /HIIT|high intensity/i.test(f.label + " " + f.note)), found.map(f => f.label).join(", "));
+console.log("\nTEST 2 - the Plan's doors");
 const intoCore = landed.filter(l => l.view === "core-session").map(l => l.label);
 ok("2c. on the Plan, no door opens the core session's own screens", intoCore.length === 0, intoCore.join(", "));
-// v4. Free is left alone: its Core still opens the core session.
-fixture("free"); await go("library");
-click(main.querySelector("#lib-start-session-btn")); await wait(40);
-click(main.querySelector('[data-guided="home"]')); await wait(40);
-click(tiles().find(x => txt(x.querySelector(".library-session-label")) === "Core")); await wait(80);
-ok("2e. on Free, Core opens the core session, as before", router.currentView === "core-session", router.currentView);
-const types = new Set(SB.SESSION_TYPES.map(t => t.id));
-const unknown = found.filter(f => f.pre && !types.has(f.pre)).map(f => `${f.label}:${f.pre}`);
-ok("2d. every preselected type is one the builder has", unknown.length === 0, unknown.join(", "));
 
 console.log("");
 if (fails) { console.log(`LIBRARY-TILES: ${fails} FAILED, ${passes} passed`); process.exit(1); }

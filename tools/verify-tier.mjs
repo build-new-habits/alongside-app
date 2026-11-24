@@ -1,5 +1,13 @@
 /**
  * tools/verify-tier.mjs
+ * 24 Nov 2026 v8
+ *
+ * v8 - P-46 S4 FREE HOME. HOME_DOORS went with Free's door tiles. The Home-
+ *   door checks read free-home.js (nothing gated or locked, one fixed order,
+ *   gentler and ready-made free); SAFETY reads the router: your own exercises,
+ *   the coach's session, the check-in, the player and Wellbeing are never
+ *   Free-moved routes.
+ *
  * 06 Oct 2026 v7
  *
  * v7 - D-11 PROGRESS-SHARE. RE-POINTED, nothing loosened. The three text
@@ -182,44 +190,45 @@ check("no silent downgrade survives anywhere", () => {
 console.log("\nTIER-A — Home doors follow the same boundary");
 
 check("the two self-directed doors are FREE", () => {
-  // R4, 20 Aug 2026. INVERTED. v1 required tier: 'personal' on both.
-  for (const id of ["mobility-conditioning", "yoga"]) {
-    const line = today.split("\n").find(l => l.includes(`id: '${id}'`));
-    ok(line, `the ${id} door has gone missing from HOME_DOORS`);
-    ok(!/tier:/.test(line),
-       `the ${id} door has been re-gated. Free is today and the Plan is the ` +
-       "arc -- choosing which session you do today is still a session");
-  }
+  // P-46 S4 (Graeme, 24 Nov: coach-led Free). Free Home has no doors by kind
+  // now; what stays free and self-directed is Something gentler and the six
+  // ready-made sessions, each a session the person chooses for today.
+  const fh = read("js/views/free-home.js");
+  ok(/data-action="free-gentler"/.test(fh) && /data-action="free-ready"/.test(fh),
+     "Free Home has lost a way to choose today's session for yourself");
 });
 
 check("NO Home door is gated at all", () => {
-  // The inverse, and the load-bearing half. Naming the two doors above
-  // would stay green if a THIRD door were gated tomorrow. Every door on
-  // Home is now free; the paid act is not reachable from this grid.
-  const doors = today.slice(today.indexOf("const HOME_DOORS"));
-  const block = doors.slice(0, doors.indexOf("\n  ];"));
-  const gated = block.split("\n").filter(l => /^\s*\{ id:/.test(l) && /tier:/.test(l));
-  ok(gated.length === 0,
-     `${gated.length} Home door(s) still carry a tier tag: ` +
-     gated.map(l => (l.match(/id: '([^']+)'/) || [])[1]).join(", "));
+  // P-46 S4: Free Home's ways in are in free-home.js. None is tier-gated or
+  // locked: what is the Plan's is not drawn there, and says so in one line.
+  const fh = read("js/views/free-home.js");
+  ok(fh.length > 1000, "free-home.js is missing; this check needs rereading");
+  ok(!/isPremium|lockedFeature|locked-badge/.test(fh),
+     "a way in on Free Home is gated or shown locked");
 });
 
 check("SAFETY: nothing safety-critical is ever gated", () => {
-  // The direction that matters more. My exercises is how somebody keeps
-  // their own list (P0 retired Conditions Update); the coach proposal is the free
-  // tier's whole point; Wellbeing carries the crisis-adjacent content.
-  for (const [id, why] of [
-    ["my-exercises",      "somebody's own exercises are never paywalled"],
-    ["unsure",            "the coach deciding IS the free tier"],
-    ["wellbeing",         "safety-critical features are never paywalled"],
-    ["cardio-core-strength", "it is the free session"]
+  // P-46 S4. Read from the router and Free Home now that HOME_DOORS is gone.
+  // Somebody's own exercises, the coach's session, and Wellbeing must never be
+  // a Free-moved route, and Free Home keeps its ways to them.
+  const routerSrc = read("js/router.js");
+  const moved = (routerSrc.match(/const FREE_MOVED = new Set\(\[([\s\S]*?)\]\)/) || [, ""])[1];
+  ok(moved.length > 0, "FREE_MOVED is gone or renamed; this check needs rereading");
+  for (const [route, why] of [
+    ["prescribed",         "somebody's own exercises are never paywalled"],
+    ["prescribed-session", "somebody's own exercises are never paywalled"],
+    ["coach-proposal",     "the coach deciding IS the free tier"],
+    ["checkin",            "the check-in is the free session's door"],
+    ["noticing",           "safety-critical features are never paywalled"],
+    ["workout",            "it is the free session"],
   ]) {
-    const line = today.split("\n").find(l => l.includes(`id: '${id}'`));
-    ok(line, `the ${id} door has gone missing from HOME_DOORS`);
-    ok(!/tier:/.test(line),
-       `the ${id} door has been made paid — ${why}. Safety-critical features ` +
+    ok(!new RegExp(`'${route}'`).test(moved),
+       `${route} has been moved to the Plan — ${why}. Safety-critical features ` +
        "are permanently free; this is a founding constraint, not a preference");
   }
+  const fh = read("js/views/free-home.js");
+  ok(/data-route="prescribed"/.test(fh) && /data-action="start-today"/.test(fh),
+     "Free Home has lost its way to your own exercises or to the coach's session");
 });
 
 console.log("\nTIER-I — the session builder does not gate its own steps");
@@ -400,23 +409,19 @@ check("the orientation line uses real goal ids", () => {
 });
 
 check("orientation stops once somebody has found their way", () => {
-  const src = fs.readFileSync(_gatePath("js/views/today.js"), "utf8");
-  ok(/sessionsSoFar < ORIENTATION_SESSIONS/.test(src),
-     "the orientation line has no session limit. It is orientation, not a nudge — " +
-     "somebody who has been here a fortnight has found the doors, and a coach " +
-     "that keeps pointing at one is a coach that is selling");
+  // P-46 S4: Free Home has no orientation line at all now (the Today card does
+  // the orienting), so it cannot keep pointing at one door.
+  const src = read("js/views/today.js");
+  ok(!/the door for|I know what I want. (is where|has the gentler)/.test(src.replace(/\/\*[\s\S]*?\*\/|\/\/.*$/gm, "")),
+     "an orientation line is back on Home, with no session limit");
 });
 
 check("the door order is NOT reordered by goals", () => {
-  // The obvious fix for persona 2.11 was to promote Wellbeing up the
-  // grid. That would have fixed her by breaking persona 2.14, who is
-  // autistic and predictability-seeking: a Home screen that rearranges
-  // itself is precisely aversive. The grid is fixed for everybody and
-  // the coach speaks instead.
-  const src = read("js/views/today.js");
-  const doors = src.slice(src.indexOf("HOME_DOORS"), src.indexOf("HOME_DOORS") + 2000);
-  ok(!/sort\(|goals\.includes|reorder/i.test(doors),
-     "HOME_DOORS is being sorted or filtered by preference. The order must be " +
+  // persona 2.14 needs a layout that does not move. P-46 S4: Free Home's
+  // ways in are in free-home.js, in one fixed order.
+  const fh = read("js/views/free-home.js");
+  ok(fh.length > 1000 && !/sort\(|goals|reorder/i.test(fh),
+     "Free Home is being sorted or filtered by preference. The order must be " +
      "identical for every user — persona 2.14 needs a layout that does not move");
 });
 

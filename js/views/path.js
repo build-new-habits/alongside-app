@@ -1,5 +1,13 @@
 /**
  * views/path.js
+ * 24 Nov 2026 v18
+ *
+ * v18 - P-46 S4 FREE HOME. Free opens one thing here: its six ready-made
+ *   sessions (router.pathStart { free: true, place }, from Free Home), then
+ *   the length and the plan screen as the Plan has them. Nothing else on
+ *   Free: any other way in goes Home, as before. Make it mine (Saved
+ *   sessions) and Swap stay the Plan's (Free gains Swap in the player, S5).
+ *
  * 19 Nov 2026 v17
  *
  * v17 - P-9d (c) READY-MADE SESSIONS (Graeme, 19 Nov: "publish and push
@@ -185,7 +193,7 @@ import { lineIcon } from "../data/line-icons.js";
 import { renderFigure } from "../figures.js";
 import { FEELINGS, PROGRAMMES, SLOW_LINE } from "../data/feel-programmes.js";
 import { AREAS, ROUTINES } from "../data/stretch-routines.js";
-import { readyFor, readySession, readyById, SIZES as READY_SIZES } from "../data/ready-sessions.js";
+import { readyFor, readySession, readyById, freeReady, SIZES as READY_SIZES } from "../data/ready-sessions.js";
 import { EXERCISES } from "../data/exercises/index.js";
 import { PATH_MOVEMENTS } from "../data/exercises/path_movements.js";
 import { suggestFeeling, pickProgramme, pickSurprise, routinesFor, STRETCH_AREA_ZONES } from "../data/path-engine.js";
@@ -325,6 +333,7 @@ export function doorOfSaved(rec) {
 }
 
 let lastDoor = null;   // Back to this view without a hand-off starts at this door's first step
+let lastFree = null;   // P-46 S4: the same for Free's six (home or gym)
 
 export function PathView(router) {
   let root = null;
@@ -347,9 +356,19 @@ export function PathView(router) {
     // P-27. Back from Today's plan: the steps as they were left.
     const ret = !start && router.pathReturn ? router.pathReturn : null;
     router.pathReturn = null;
+    // P-46 S4. Free: its six ready-made sessions, and only those.
+    if (!isPremium()) {
+      if (ret?.st?.free) { trail = ret.trail; st = ret.st; step = ret.step; paint(); return; }
+      // As lastDoor for the Plan: mounted again with the hand-off spent, the list again.
+      const place = start?.free ? (start.place === "gym" ? "gym" : "home") : lastFree;
+      if (!place) { router.navigate("today", { replace: true }); return; }
+      lastFree = place;
+      trail = []; st = { door: "stronger", free: true, place }; step = "fready";
+      paint(); return;
+    }
     const door = start?.door || ret?.st?.door || lastDoor;
     // The Plan's only (A1.2): Free has no doors, and is sent Home.
-    if (!isPremium() || !door || !DOOR[door]) { router.navigate("today", { replace: true }); return; }
+    if (!door || !DOOR[door]) { router.navigate("today", { replace: true }); return; }
     lastDoor = door;
     trail = [];
     st = { door };
@@ -444,6 +463,15 @@ export function PathView(router) {
           const at = readySession(s, "usual");
           const fits = part && s.part === st.part && st.part !== "whole" ? ` \u00b7 For your ${part.label.toLowerCase()}` : "";
           return row({ v: s.id, t: s.name, d: `${esc(s.line)} About ${at.minutes} min${s.effort ? ` \u00b7 ${s.effort === "hard" ? "Hard" : "Steady"}` : ""}${fits}`, icon: DOOR[st.door].icon, kind });
+        }).join("")}</ul>`;
+    },
+    // P-46 S4. Free's six, at its place.
+    fready() {
+      return `${heading("Ready-made sessions", "list", "teal")}
+        <p class="path-small">Each one starts with a warm-up and ends with a stretch.</p>
+        <ul class="path-list">${freeReady(st.place).map(s => {
+          const at = readySession(s, "usual");
+          return row({ v: s.id, t: s.name, d: `${esc(s.line)} About ${at.minutes} min`, icon: DOOR[s.door].icon, kind: DOOR[s.door].kind });
         }).join("")}</ul>`;
     },
     msize() {
@@ -703,7 +731,7 @@ export function PathView(router) {
         ${editable ? `<button type="button" class="path-link" id="path-change">Change this session</button>` : ""}
         ${st.fromCoach ? `<button type="button" class="path-link" id="path-redo">Change my check-in</button>` : ""}
         ${st.door === "feel" && lowMood() ? `<button type="button" class="path-link" id="path-wellbeing">Or something from Wellbeing</button>` : ""}
-        ${!p.saved ? `<button type="button" class="path-link" id="path-mine"${st.kept ? " disabled" : ""}>${st.kept ? "Kept in Saved sessions" : "Make it mine"}</button>` : ""}
+        ${!p.saved && !st.free ? `<button type="button" class="path-link" id="path-mine"${st.kept ? " disabled" : ""}>${st.kept ? "Kept in Saved sessions" : "Make it mine"}</button>` : ""}
         <h2 class="path-adj__lbl" id="path-mvs-h">What\u2019s in it</h2>
         <ol class="path-mvs" aria-labelledby="path-mvs-h">${p.steps.map((s, i) => {
           const e = BY_ID.get(s.id) || {};
@@ -714,7 +742,7 @@ export function PathView(router) {
             ${(s.out || []).length ? `<p class="path-small path-mv__out">Left out today, for ${esc(areaList(s.out))}</p>` : ""}
             <span class="path-mv__acts">
               <a class="path-mv__yt" href="https://www.youtube.com/results?search_query=${q}" target="_blank" rel="noopener">Find a video on YouTube<span class="sr-only"> for ${esc(s.label || nameOf(s.id))} (opens YouTube, a search)</span></a>
-              ${canSwap(p, s, ids) ? `<button type="button" class="btn btn-secondary path-mv__swap" id="path-swap-${i}" data-swap="${i}" aria-describedby="path-mv-${i}" aria-expanded="${st.swapOpen === i}"${st.swapOpen === i ? ` aria-controls="path-swp-${i}"` : ""}>Swap</button>` : ""}
+              ${!st.free && canSwap(p, s, ids) ? `<button type="button" class="btn btn-secondary path-mv__swap" id="path-swap-${i}" data-swap="${i}" aria-describedby="path-mv-${i}" aria-expanded="${st.swapOpen === i}"${st.swapOpen === i ? ` aria-controls="path-swp-${i}"` : ""}>Swap</button>` : ""}
             </span>
             ${st.swapOpen === i ? swapPanel(p, s, i, ids) : ""}
           </li>`; }).join("")}</ol>
@@ -860,6 +888,7 @@ export function PathView(router) {
         if (v === "ready") return go("ready", {});
         return;
       case "ready": return readyById(v) ? go("msize", { rs: v, msz: "usual" }) : undefined;
+      case "fready": return readyById(v) ? go("msize", { rs: v, msz: "usual", door: readyById(v).door }) : undefined;
       case "trends":
         if (v === "zone2") return go(followed("zone2")?.activity ? "z2day" : "z2act", {});
         if (v === "cross") {

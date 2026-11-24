@@ -1,5 +1,11 @@
 /**
  * tools/verify-trends-week.mjs
+ * 24 Nov 2026 v2
+ *
+ * v2 - P-46 S4 FREE HOME. Free asking for Your week or the Library gets the
+ *   on-the-plan page; Free Home is coach-led (check in, Something gentler, six
+ *   ready-made, Log what I did), as the tier table now says.
+ *
  * 01 Nov 2026 v1
  *
  * P-21 TRENDS-WEEK (master schedule v616; mock-up v1 approved 01 Nov,
@@ -237,7 +243,7 @@ ok("4j. not checked in today: the check-in first, then on to the trend", view() 
 console.log("\nTEST 5 - Free");
 fixture("free");
 await router.navigate("your-week"); await wait(60);
-ok("5a. Free's Your week offers no trend", !$("[data-trendway]") && /part of the Plan/.test(txt(main)));
+ok("5a. Free's Your week offers no trend", !$("[data-trendway]") && /Part of the Plan/.test(txt(main)));   // P-46 S4: the on-the-plan page
 
 console.log(`\n${passes} passed, ${fails} failed`);
 process.exit(fails ? 1 : 0);

@@ -1,5 +1,10 @@
 /**
  * tools/verify-exercise-four.mjs
+ * 24 Nov 2026 v2
+ *
+ * v2 - P-46 S4 FREE HOME. The builder is the Plan's; the Free session is
+ *   built on the Plan and played on Free (the player is what this checks).
+ *
  * 04 Oct 2026 v1
  *
  * D-1 EXERCISE-FOUR. Graeme, on the phone, 04 Oct: "the 4 pages for
@@ -77,6 +82,9 @@ function fixture(tier) {
 async function go(view) { await router.navigate(view); await wait(40); }
 
 async function buildAndGo() {
+  // P-46 S4. The builder is the Plan's now (Free opens on-the-plan); a Free
+  // session is built there and played on Free, which is what this checks.
+  const tierWas = store.get("tier"); store.set("tier", "personal");
   await go("today");
   await go("session-builder");
   if (!$$(".sb-type-tile").length) await click($("#sb-rebuild-btn"));
@@ -87,7 +95,7 @@ async function buildAndGo() {
   await click($$(".sb-buildmode-btn").find(b => b.dataset.mode === "coach"));
   await wait(1400);
   const s = store.get("generatedSession")?.session;
-  await click($("#sb-go-btn")); await wait(300);
+  store.set("tier", tierWas); await click($("#sb-go-btn")); await wait(300);
   return s;
 }
 

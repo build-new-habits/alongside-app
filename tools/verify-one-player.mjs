@@ -1,5 +1,10 @@
 /**
  * tools/verify-one-player.mjs
+ * 24 Nov 2026 v6
+ *
+ * v6 - P-46 S4 FREE HOME. The builder is the Plan's; the Free session is
+ *   built on the Plan and played on Free (the player is what this checks).
+ *
  * 02 Nov 2026 v5
  *
  * v5 - P-23 SWAP-SEARCH re-point (none loosened). On the Plan the machine's
@@ -101,6 +106,9 @@ async function go(view) { await router.navigate(view); await wait(40); }
 const onView = () => router.currentView;
 
 async function buildAndGo() {
+  // P-46 S4. The builder is the Plan's now (Free opens on-the-plan); a Free
+  // session is built there and played on Free, which is what this checks.
+  const tierWas = store.get("tier"); store.set("tier", "personal");
   await go("today");
   await go("session-builder");
   if (!$$(".sb-type-tile").length) { click($("#sb-rebuild-btn")); await wait(200); }
@@ -111,7 +119,7 @@ async function buildAndGo() {
   click($$(".sb-buildmode-btn").find(b => b.dataset.mode === "coach"));
   await wait(1400);
   const s = store.get("generatedSession")?.session;
-  click($("#sb-go-btn")); await wait(300);
+  store.set("tier", tierWas); click($("#sb-go-btn")); await wait(300);
   return s;
 }
 // Play to the finish by the fewest taps the player offers; count them.

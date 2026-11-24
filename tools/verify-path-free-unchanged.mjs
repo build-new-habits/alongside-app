@@ -1,6 +1,15 @@
 import { createRequire as __cr } from "node:module";
 /**
  * tools/verify-path-free-unchanged.mjs
+ * 24 Nov 2026 v3
+ *
+ * v3 - P-46 S4 FREE HOME. Free Home changed by Graeme's decision (P-40,
+ *   confirmed 24 Nov: coach-led Free), which ends what this gate held. It
+ *   now holds the other side of that change: the Plan's Home is byte for
+ *   byte as it was on alongside-v740 (2724693), the build before S4, and its
+ *   controls go where they went. Free Home is verify-p46-free-home. The name
+ *   is kept so the gate count and its history stay readable.
+ *
  * 15 Nov 2026 v2
  *
  * v2 - P-25 HOW-TO GUIDES (Help on both tiers, Graeme 11 Nov: an exception
@@ -45,13 +54,13 @@ const ok = (name, cond, detail = "") => {
   if (cond) passes++; else { fails++; if (detail) console.log(`        ${detail}`); }
 };
 
-const BASE = "ded4632";
+const BASE = "2724693";   // v3: alongside-v740, the build before P-46 S4
 const ROOT = new URL("..", import.meta.url).pathname;
 let oldSrc = "";
 try { oldSrc = execSync(`git -C "${ROOT}" show ${BASE}:js/views/today.js`, { encoding: "utf8", maxBuffer: 1 << 26 }); } catch (e) { /* below */ }
-ok("0a. today.js as it was on v683 is in the history", oldSrc.length > 50000, `${oldSrc.length} bytes`);
+ok("0a. today.js as it was on v740 is in the history", oldSrc.length > 50000, `${oldSrc.length} bytes`);
 if (!oldSrc) { console.log(`\nVERIFY-PATH-FREE-UNCHANGED: ${passes} passed, ${fails} failed`); process.exit(1); }
-const oldPath = new URL("../js/views/__today_v683_check.js", import.meta.url);
+const oldPath = new URL("../js/views/__today_v740_check.js", import.meta.url);
 writeFileSync(oldPath, oldSrc);
 
 const B = new URL("../js/", import.meta.url).href;
@@ -82,23 +91,23 @@ const SITUATIONS = {
 };
 function fixture(fn) {
   localStorage.clear(); store.init(); agreed(store);
-  store.set("onboardingComplete", true); store.set("name", "Test"); store.set("tier", "free");
+  store.set("onboardingComplete", true); store.set("name", "Test"); store.set("tier", "personal");   // v3: the Plan
   store.set("safetyAckLog", Array.from({ length: 5 }, () => ({ at: new Date().toISOString(), textVersion: HURT_AND_ACHE_VERSION, surface: "fixture" })));
   fn(store);
   navs = [];
 }
 const draw = mod => { const snap = JSON.stringify(store.data); main.innerHTML = ""; mod.TodayView(fakeRouter).mount(main); const html = main.innerHTML; store.data = JSON.parse(snap); store.save(); return html; };
 
-console.log("\nTEST 1 - Free Home, byte for byte, as on v683");
+console.log("\nTEST 1 - the Plan's Home, byte for byte, as on v740 (before P-46 S4)");
 for (const [label, fn] of Object.entries(SITUATIONS)) {
   fixture(fn);
-  const before = draw(OLD); const after = draw(NOW).replace(/ data-guide-target="[a-z:-]+"/g, "");
+  const before = draw(OLD); const after = draw(NOW);
   let at = 0; while (at < before.length && before[at] === after[at]) at++;
   ok(`1. ${label}: the same`, before === after && before.length > 500, `differs at ${at}: "${before.slice(at - 40, at + 60)}" vs "${after.slice(at - 40, at + 60)}"`);
-  ok(`1. ${label}: no Plan Home in it`, !/path-home|path-today|path-coach/.test(after), JSON.stringify(navs));
+  ok(`1. ${label}: and it is the Plan's Home`, /path-home/.test(after) && !/free-home/.test(after), JSON.stringify(navs));
 }
 
-console.log("\nTEST 2 - every control on Free Home goes where it went");
+console.log("\nTEST 2 - every control on the Plan's Home goes where it went");
 for (const [label, fn] of Object.entries(SITUATIONS)) {
   fixture(fn); draw(NOW);
   const n = main.querySelectorAll("button").length;

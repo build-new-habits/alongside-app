@@ -1,5 +1,12 @@
 /**
  * tools/verify-target1.mjs
+ * 24 Nov 2026 v3
+ *
+ * v3 - P-46 S4 FREE HOME. Home shows no weekly target on either tier now
+ *   (stronger than HOME-1's setAt gate). TARGET-2's weekly line went with
+ *   Free's coach line (the words pass); a session done today still closes the
+ *   day.
+ *
  * 21 Aug 2026 v2
  * GATE-PATH. Path resolution only -- no assertion changed.
  *
@@ -54,8 +61,11 @@ check('step 12 is asked of everyone', typeof D.STEPS[12].showIf !== 'function');
 
 // Downstream: today.js must still gate on setAt, not on the raw number.
 const today = fs.readFileSync(new URL('../js/views/today.js', import.meta.url), 'utf8');
-check('Home still gates the denominator on setAt',
-  /targetSetAt\s*\?\s*\(store\.get\('strategicGoal\.weeklySessionTarget'\)/.test(today),
+// P-46 S4: Free Home shows no count and no target at all now (the Plan's never
+// did), which is stronger than HOME-1's gate on setAt.
+const freeHome = fs.readFileSync(new URL('../js/views/free-home.js', import.meta.url), 'utf8');
+check('Home shows no weekly target, chosen or not (P-46 S4)',
+  !/weeklySessionTarget|weeklyTarget/.test(today.replace(/\/\*[\s\S]*?\*\/|\/\/.*$/gm, '')) && !/weeklySessionTarget|this week/i.test(freeHome),
   'HOME-1: persona 2.12 must not be shown a shortfall against a number he never chose');
 
 // Behavioural: with setAt written, the denominator is available; without, it is not.
@@ -76,34 +86,12 @@ check('a fresh store has no setAt', store.get('strategicGoal.setAt') === null);
 check('and its target sits at the unagreed default',
   store.get('strategicGoal.weeklySessionTarget') === 3);
 
-// ── TARGET-2: hitting a chosen target is acknowledged ────────
-check('reaching the chosen target is said out loud',
-  /targetMet/.test(today) && /you said you'd aim for/.test(today),
-  'reaching it previously read identically to missing it');
-
-// Extract the template literal itself. The first pattern used a `[^`]*`
-// class that stopped at the wrong place and captured an empty string,
-// so the "closes the week" assertion tested nothing.
-const line = (today.match(/`That's[\s\S]*?`/) || [''])[0];
-check('the line CLOSES the week rather than opening a demand',
-  /extra, not expected/.test(line), line.slice(0, 80));
-check('it does not declare the week over',
-  !/that's it for|see you next week|done for the week|no more/i.test(line),
-  'somebody who hits two on Tuesday must not read this as a stop sign');
-check('no streak or comparison language',
-  !/streak|in a row|again next week|keep it up|beat/i.test(line));
-check('it only fires against a target the person CHOSE',
-  /targetMet = sessionDone && weeklyTarget/.test(today),
-  'weeklyTarget is null unless setAt is written, so the default 3 cannot trigger it');
-check('it needs the person to have moved today',
-  /targetMet = sessionDone/.test(today),
-  'otherwise it would greet them with it on an untouched day');
-
-// Declaration order — the first version referenced weeklyTarget 20 lines
-// before it was declared, which is a temporal dead zone and would have
-// thrown on every Home render.
-check('weeklyTarget is declared before targetMet uses it',
-  today.indexOf('const weeklyTarget') < today.indexOf('const targetMet'));
+// ── TARGET-2, retired (P-46 S4) ─────────────────────────────
+// The weekly line went with Free's coach line (the words pass, Graeme 24 Nov:
+// "no one needs a lecture"). What stays true: when somebody has moved today,
+// Home closes the day rather than opening a demand.
+check('a session done today closes the day: That\u2019s today done.',
+  /That\u2019s today done\./.test(freeHome) && !/streak|in a row|keep it up|beat/i.test(freeHome));
 
 console.log(failures === 0 ? '\nTARGET-1 GATE GREEN' : `\nTARGET-1 GATE RED — ${failures} failure(s)`);
 process.exit(failures === 0 ? 0 : 1);

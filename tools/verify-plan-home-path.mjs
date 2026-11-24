@@ -1,6 +1,12 @@
 import { createRequire as __cr } from "node:module";
 /**
  * tools/verify-plan-home-path.mjs
+ * 24 Nov 2026 v7
+ *
+ * v7 - P-46 S4 FREE HOME. Free Home is its own now (free-home.js: coach-led,
+ *   in the Plan's look, path-* classes), so the Free control reads .free-home
+ *   and the absence of the Plan's doors, not the absence of path-home.
+ *
  * 23 Nov 2026 v6
  *
  * v6 - P-39 S3 (Making my Move, prototype v2 agreed by Graeme 23 Nov). Test
@@ -134,7 +140,7 @@ const engineFor = (checkin, sore = []) => ENG.suggestToday({ checkin, place: "gy
 // ── 0 ─────────────────────────────────────────────────────────────────────
 console.log("\nTEST 0 - positive control");
 fixture({ tier: "free" }); home();
-ok("0a. Free Home has no Plan Home in it", !main.querySelector(".path-home") && !!main.querySelector(".today-view"));
+ok("0a. Free Home has no Plan Home in it (P-46 S4: its own, in the same look)", !main.querySelector(".path-door[data-door], .path-arcline, .path-mm") && !!main.querySelector(".free-home"));
 fixture(); fakeRouter.history = []; home(); fakeRouter.history = ["somewhere"];
 ok("0b. a cold open on the Plan draws Home (no first-open screen)", !!main.querySelector(".path-home") && !navs.length, JSON.stringify(navs));
 

@@ -1,5 +1,10 @@
 /**
  * tools/verify-nav5.mjs
+ * 24 Nov 2026 v6
+ *
+ * v6 - P-46 S4 FREE HOME. NAV-6 reads Free Home's ways in from free-home.js
+ *   (no tile list in today.js now): none goes to a bottom-nav destination.
+ *
  * 04 Oct 2026 v5
  *
  * v5 - LOOK-1. Settings is now an index of eight sections; each section's
@@ -158,25 +163,16 @@ check("reopening Settings shows the page, not the last screen", () => {
 });
 
 console.log("\nTEST 6 - NAV-6: Home does not duplicate the bottom nav");
-check("no tile routes to a nav destination except the flagged one", () => {
-  const home = fs.readFileSync(_gatePath("js/views/today.js"), "utf8");
-  // LOBBY-1a added a leading `kind:` to every door, and this pattern
-  // assumed `id:` came first -- so it matched nothing and reported "no
-  // tiles found" rather than passing silently. That is the gate working:
-  // it noticed the shape changed instead of quietly measuring an empty
-  // set. The kind is now optional in the pattern and captured, because
-  // the duplication rule this test enforces applies to TILES, and
-  // reference rows are allowed to point at nav destinations -- being
-  // reachable two ways is only clutter when both look equally important.
-  const tiles = [...home.matchAll(/\{ (?:kind: '(\w+)', )?id: '[\w-]+', label: '([^']+)'[^}]*?route: '([\w-]+)'/g)]
-    .map(m => ({ kind: m[1] || 'session', label: m[2], route: m[3] }))
-    .filter(t => t.kind !== 'reference');
-  ok(tiles.length > 0, "no tiles found - the regex has drifted from the markup");
+// P-46 S4: Free Home's ways in are built in free-home.js; no tile list in today.js.
+check("no way in on Free Home routes to a bottom-nav destination", () => {
+  const fh = fs.readFileSync(_gatePath("js/views/free-home.js"), "utf8");
+  const routes = [...fh.matchAll(/data-route="([\w-]+)"/g)].map(m => m[1]);
+  ok(routes.length >= 2, "no routes found - the pattern has drifted from the markup");
   const nav = ["today", "progress", "noticing", "settings"];
-  const dup = tiles.filter(t => nav.includes(t.route) && t.label !== "Wellbeing");
+  const dup = routes.filter(r => nav.includes(r));
   ok(dup.length === 0,
      `duplicates a bottom-nav destination, which is reachable from every ` +
-     `screen while Home is not: ${dup.map(d => `${d.label} -> ${d.route}`).join(", ")}`);
+     `screen while Home is not: ${dup.join(", ")}`);
 });
 check("the Progress tile stays removed", () => {
   const home = fs.readFileSync(_gatePath("js/views/today.js"), "utf8");
