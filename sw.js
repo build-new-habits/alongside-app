@@ -1,7 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 24 Nov 2026 v739
+ * 24 Nov 2026 v740
+ *
+ * v740 - P-46 S3 ASK LATER (both tiers). After the one-minute start, Home asks three things once, later: how active you've been (after a first session), what you want from it (Free, after three), how often a week (after a week). Never on a hard day; Not now is final. NEW FILE precached: js/data/ask-later.js.
  *
  * v739 - P-46 S2 GETTING STARTED (both tiers). After the age question and the agreements, someone new answers four short screens: your name; anything sore; where you move and what's easy; your first session (Today's plan, gentle). Anyone part-way through the old conversation carries on there. NEW FILES precached: js/views/onboarding/start.js, css/components/start.css.
  *
@@ -4331,7 +4333,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v739";
+const CACHE_NAME = "alongside-v740";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4414,7 +4416,7 @@ const SHELL_HASHES = {
   "./js/session-guard.js": "00177a846537868c",
   "./js/session-resume.js": "6916b88c0757374f",
   "./js/auth.js": "9b9c7a632dccada6",
-  "./js/views/today.js": "31d084f39148d844",
+  "./js/views/today.js": "094d2779230d6c0c",
   "./js/views/mobility-conditioning.js": "8b30ad4fa0887d62",
   "./js/views/arc-setup.js": "c1d43e86b901ace3",
   "./js/views/stretch-arc.js": "cdc78c24b91d2e1c",
@@ -4435,6 +4437,7 @@ const SHELL_HASHES = {
   "./js/data/exercises/swimming_cycling.js": "06c7dd87c9fe64e1",
   "./js/data/morning-programme.js": "684cee9fdc54a03a",
   "./js/data/session-categories.js": "39f35cc7aab24fe6",
+  "./js/data/ask-later.js": "13d61e5930dc4d3c",
   "./js/data/aims.js": "6bb56556296db3ef",
   "./js/data/stretch-goal-zones.js": "a05bc2d626cade4f",
   "./js/data/session-rationale.js": "f14d0d565eb7f9dc",
@@ -4458,7 +4461,7 @@ const SHELL_HASHES = {
   "./js/data/arc-readback.js": "9b06dcba96534da0",
   "./js/data/tier-table.js": "7821c3304bd0815c",
   "./js/views/know-what.js": "e84fee3e6d9d3af0",
-  "./js/views/plan-home.js": "52023ad20d1a2d1a",
+  "./js/views/plan-home.js": "9e7f620b5821dfa0",
   "./js/views/path.js": "440a45cfcd4f385f",
   "./js/plan-look.js": "7674d8fbf5101aa9",
   "./js/views/plan-finish.js": "d3901b6355f55542",
@@ -4470,7 +4473,7 @@ const SHELL_HASHES = {
   "./js/views/build-session.js": "763317cec8c62e83",
   "./js/data/build-lately.js": "e06714cc9d1539a6",
   "./css/components/path.css": "a099858d00434d21",
-  "./css/components/start.css": "cefb7c778870cb30",
+  "./css/components/start.css": "308a22950f0a3940",
   "./js/data/red-flag.js": "3cd9eecbc3985eb3",
   "./js/data/health-consent.js": "a23d005af57f179c",
   "./js/data/age-check.js": "7fa5b0f5a6b34770",
@@ -4784,6 +4787,7 @@ const SHELL_URLS = [
   "./js/data/exercises/swimming_cycling.js",
   "./js/data/morning-programme.js",
   "./js/data/session-categories.js",
+  "./js/data/ask-later.js",
   "./js/data/aims.js",
   "./js/data/stretch-goal-zones.js",
   "./js/data/session-rationale.js",
