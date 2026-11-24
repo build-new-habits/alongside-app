@@ -1,6 +1,13 @@
 /**
  * views/plan-link-send.js
- * 24 Nov 2026 v2
+ * 24 Nov 2026 v3
+ *
+ * v3 - P-45 THE LIVE LINK. When the relay is set up (relay-config.js):
+ *   Send their changes straight to this phone (off to start). The first
+ *   link made opens a live link on the relay; its key goes after the # with
+ *   the plan, never to a server. Your live links: each one sent, with Stop.
+ *   If it can't be opened, said, and the link works the usual way. With the
+ *   relay not set up, this screen is as v2.
  *
  * v2 - P-44 S5. Guide markers send-share and send-copy.
  *
@@ -25,6 +32,9 @@ import { isPremium } from "../auth.js";
 import { healthAllowed } from "../data/health-consent.js";
 import { outFromOwn, encodePlan, linkFor, NO_GROUP } from "../data/plan-link.js";
 import qrcode from "../data/qr.js";
+import { RELAY } from "../data/relay-config.js";
+import { relayClient, newLiveLink, ownerHash, liveFragment } from "../data/live-link.js";
+import { stopLive } from "../data/live-check.js";
 
 export const EDIT_PAGE = "https://buildnewhabits.co.uk/edit-plan/";
 /** Longer than this, a QR code is too dense for a phone camera: share the link. */
@@ -56,18 +66,22 @@ export function qrSvg(text, label) {
   return `<svg class="pl-qr" role="img" aria-label="${esc(label)}" viewBox="0 0 ${size} ${size}" shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg"><rect width="${size}" height="${size}" fill="#fff"/><path d="${d}" fill="#000"/></svg>`;
 }
 
-export function PlanLinkSendView(router) {
+export function PlanLinkSendView(router, { client = relayClient(RELAY) } = {}) {
   let root = null;
   let chosen = null;          // list names ticked
   let notes = false, name = false;
   let link = "";
   let showQr = false;
+  let live = false;           // P-45: send their changes straight to this phone
+  let liveLink = null;        // the one opened on this visit, reused
+  let liveNote = "";
+  let redraw = false;         // a live link was just opened, or couldn't be
 
   function mount(el) {
     root = el;
     if (!isPremium()) { router.navigate("progress", { replace: true }); return; }
     chosen = ownLists().map(l => l.g);
-    notes = false; name = false; link = ""; showQr = false;
+    notes = false; name = false; link = ""; showQr = false; live = false; liveLink = null; liveNote = "";
     render();
     root.querySelector(".share-title")?.focus();
   }
@@ -75,7 +89,24 @@ export function PlanLinkSendView(router) {
   async function makeLink() {
     const by = name ? String(store.get("name") || "").trim() : "";
     const plan = outFromOwn(store.get("prescribedExercises") || [], { groups: chosen, notes: notes && healthAllowed(), by });
-    link = plan ? linkFor(EDIT_PAGE, await encodePlan(plan)) : "";
+    if (!plan) { link = ""; return link; }
+    let code = await encodePlan(plan);
+    if (live && client.on) {
+      if (!liveLink) {
+        redraw = true;
+        const made = newLiveLink();
+        let opened = false;
+        try { opened = await client.open(made.id, await ownerHash(made.owner)); } catch { opened = false; }
+        if (opened) liveLink = { ...made, openedAt: new Date().toISOString(), after: 0, lists: [] };
+        else { live = false; liveNote = "The live link couldn\u2019t be set up just now, so this link works the usual way: they send a link back."; }
+      }
+      if (liveLink) {
+        liveLink = { ...liveLink, lists: [...chosen] };
+        store.saveLiveLink(liveLink);
+        code += "&" + liveFragment(liveLink);
+      }
+    }
+    link = linkFor(EDIT_PAGE, code);
     return link;
   }
 
@@ -105,7 +136,10 @@ export function PlanLinkSendView(router) {
           <span>Your notes<span class="sh-part__hint">${esc(health ? "They can be about an injury. Off unless you choose." : "Only if you’ve said the app can keep health answers (Settings › Your data).")}</span></span></label>
         <label class="sh-part"><input type="checkbox" id="pl-name" data-also="name"${name ? " checked" : ""}>
           <span>Your first name<span class="sh-part__hint">So they know whose it is.</span></span></label>
+        ${client.on ? `<label class="sh-part"><input type="checkbox" id="pl-live" data-also="live"${live ? " checked" : ""}>
+          <span>Send their changes straight to this phone<span class="sh-part__hint">Locked so only this phone can read them. You still choose what to keep. Ends after 90 days, or when you stop it.</span></span></label>` : ""}
       </fieldset>
+      ${liveNote ? `<p class="sp-left" id="pl-live-note">${esc(liveNote)}</p>` : ""}
       ${none ? `<p class="sp-left" id="pl-none">Tick at least one list to send.</p>` : ""}
       <div class="sp-acts">
         <button class="btn btn-primary btn-large btn-full" id="pl-share" data-guide-target="send-share"${none ? " disabled" : ""}>Share the link…</button>
@@ -116,10 +150,21 @@ export function PlanLinkSendView(router) {
       <div id="pl-qr-box"${showQr ? "" : " hidden"}>${showQr ? (qr
         ? `<p class="pl-qr-line">For them to scan in the clinic.</p><div class="pl-qr-wrap">${qr}</div>`
         : `<p class="sp-left">Too long for a QR code. Share the link instead.</p>`) : ""}</div>
-      <p class="sh-private"><svg aria-hidden="true" focusable="false" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg><span>Nothing is sent to us. Everything is in the link, so anyone you give it to can read it.</span></p>
+      <p class="sh-private"><svg aria-hidden="true" focusable="false" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg><span>${live && client.on ? "Your exercises are in the link, so anyone you give it to can read them. Their changes come back through our relay, locked so only this phone can read them: we can\u2019t." : "Nothing is sent to us. Everything is in the link, so anyone you give it to can read it."}</span></p>
+      ${liveList()}
     </div>`;
     wire();
     if (focusSel) root.querySelector(focusSel)?.focus();
+  }
+
+  /** P-45. The live links this phone has open, each with Stop. */
+  function liveList() {
+    const open = client.on ? store.get("liveLinks") || [] : [];
+    if (!open.length) return "";
+    const day = iso => new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "long" });
+    return `<section class="sh-group pl-live" aria-labelledby="pl-live-h"><h2 class="sh-legend" id="pl-live-h">Your live links</h2>
+      <ul class="pl-live__list">${open.map(l => `<li><span>Sent ${esc(day(l.openedAt))}${l.lists.length ? `: ${esc(l.lists.join(", "))}` : ""}. Ends ${esc(day(new Date(Date.parse(l.openedAt) + 90 * 864e5).toISOString()))}.</span>
+        <button class="btn btn-secondary" data-stop="${esc(l.id)}">Stop this live link</button></li>`).join("")}</ul></section>`;
   }
 
   function say(msg) {
@@ -129,8 +174,12 @@ export function PlanLinkSendView(router) {
     setTimeout(() => { if (s) s.textContent = msg; }, 30);
   }
 
+  /** After a live link was opened (or refused), draw again: Your live links, or the note. */
+  function redrawIf(sel) { if (redraw) { redraw = false; render(sel); } }
+
   async function share() {
     const url = await makeLink();
+    redrawIf("#pl-share");
     if (!url) { say("This list could not be made into a link. Check each exercise has a name."); return; }
     if (navigator.share) {
       try { await navigator.share({ title: "My exercises", text: "My exercises from Alongside: Move. Open the link to change them, then press Send back.", url }); say("Shared."); return; }
@@ -141,6 +190,7 @@ export function PlanLinkSendView(router) {
 
   async function copy(pre) {
     const url = pre || await makeLink();
+    if (!pre) redrawIf("#pl-copy");
     if (!url) { say("This list could not be made into a link. Check each exercise has a name."); return; }
     try { await navigator.clipboard.writeText(url); say("Link copied. Paste it in a message or an email."); }
     catch { say("Copying is not allowed here. Show a QR code, or Share the link instead."); }
@@ -148,6 +198,12 @@ export function PlanLinkSendView(router) {
 
   function wire() {
     const q = s => root.querySelector(s);
+    root.querySelectorAll("[data-stop]").forEach(b => b.addEventListener("click", async () => {
+      await stopLive(b.dataset.stop, { client });
+      if (liveLink && liveLink.id === b.dataset.stop) { liveLink = null; live = false; link = ""; }
+      render("h1");
+      say("Live link stopped. They can still open the link, but changes no longer come straight to this phone.");
+    }));
     q("#pl-back")?.addEventListener("click", () => router.navigate("plan-share"));
     root.querySelectorAll("[data-go]").forEach(b => b.addEventListener("click", () => router.navigate(b.dataset.go)));
     q("#pl-share")?.addEventListener("click", share);
@@ -162,15 +218,16 @@ export function PlanLinkSendView(router) {
       const g = cb.dataset.list;
       chosen = cb.checked ? [...chosen, g] : chosen.filter(x => x !== g);
       chosen = ownLists().map(l => l.g).filter(x => chosen.includes(x));
+      if (liveLink) { liveLink = { ...liveLink, lists: [...chosen] }; store.saveLiveLink(liveLink); }
       if (showQr) await makeLink();
       render(`#pl-g-${i}`);
       say(`${g}: ${cb.checked ? "in" : "out"}.`);
     }));
     root.querySelectorAll("[data-also]").forEach(cb => cb.addEventListener("change", async () => {
-      if (cb.dataset.also === "notes") notes = cb.checked; else name = cb.checked;
+      if (cb.dataset.also === "notes") notes = cb.checked; else if (cb.dataset.also === "live") { live = cb.checked; liveNote = ""; } else name = cb.checked;
       if (showQr) await makeLink();
       render(`#pl-${cb.dataset.also}`);
-      say(`${cb.dataset.also === "notes" ? "Your notes" : "Your first name"}: ${cb.checked ? "in" : "out"}.`);
+      say(`${({ notes: "Your notes", name: "Your first name", live: "Straight to this phone" })[cb.dataset.also]}: ${cb.checked ? "on" : "off"}.`);
     }));
   }
 

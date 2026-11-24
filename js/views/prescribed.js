@@ -1,7 +1,11 @@
 /**
  * prescribed.js - My exercises
  *
- * 24 Nov 2026 v1.17
+ * 24 Nov 2026 v1.18
+ *
+ * v1.18 - P-45 THE LIVE LINK. Changes from a physio or trainer waiting
+ *   (liveInbox): one row each, with when, and Look at them. Not tier-gated
+ *   (verify-tiergh 14); only a Plan fills it.
  *
  * v1.17 - P-44 S4. Put back my old list: after a physio's or trainer's
  *   changes were used (the Plan), the list as it was, for 30 days
@@ -229,7 +233,7 @@ export function render() {
         <p class="coach-message-text">${coachLine}</p>
       </div>
 
-      ${renderPrevious()}<!-- ── Exercise list ────────────────────────────────────────────────── -->
+      ${renderLiveInbox()}${renderPrevious()}<!-- ── Exercise list ────────────────────────────────────────────────── -->
       ${exercises.length === 0
         ? renderEmptyState()
         : renderExerciseList(active, done)
@@ -588,6 +592,14 @@ export function onMount() {
     router.navigate("today");
   });
 
+  // ── P-45. Changes waiting from a live link ──────────────────────────────────
+  document.querySelectorAll("[data-px-live]").forEach(b => b.addEventListener("click", () => {
+    const m = (store.get("liveInbox") || []).find(x => `${x.link}:${x.msg}` === b.dataset.pxLive);
+    if (!m) return;
+    router.planBack = m.code; router.planBackInbox = b.dataset.pxLive;
+    router.navigate("plan-link-back");
+  }));
+
   // ── P-44 S4. Put back my old list ────────────────────────────────────────
   document.getElementById("px-prev-btn")?.addEventListener("click", () => {
     prevAsk = true; prevSaid = ""; rerender(); document.getElementById("px-prev-yes")?.focus();
@@ -701,6 +713,18 @@ function removeExercise(id) {
 
   store.set("prescribedExercises", exercises.filter(e => e.id !== id));
   rerender();
+}
+
+/** P-45. Changes sent through a live link, waiting to be looked at. */
+function renderLiveInbox() {
+  const waiting = store.get("liveInbox") || [];
+  if (!waiting.length) return "";
+  const day = iso => new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "long" });
+  return `<section class="card px-prev" aria-labelledby="px-live-h">
+    <h2 class="section-heading" id="px-live-h">Changes from your physio or trainer</h2>
+    <ul class="px-live__list">${waiting.slice().reverse().map(m => `<li><span>Sent ${day(m.at)}</span>
+      <button class="btn btn-primary" data-px-live="${_esc(`${m.link}:${m.msg}`)}">Look at them<span class="sr-only">, sent ${day(m.at)}</span></button></li>`).join("")}</ul>
+  </section>`;
 }
 
 /** P-44 S4. The list before a professional's changes were used, for 30 days. */

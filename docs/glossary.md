@@ -1,5 +1,7 @@
 # Alongside: Move — Glossary
-## 24 Nov 2026 v13
+## 24 Nov 2026 v14
+
+v14 - P-45 the live link.
 
 v13 - P-44 the physio link: Send a link to change, What your physio or trainer changed, Put back my old list, the edit page's words.
 
@@ -60,6 +62,8 @@ Taken from the words on every screen (`node tools/chromium-words.mjs`, 95 screen
 | Home's question at each twelve weeks of an arc | **Still what you want Alongside for?** **Have a look** / **Yes, still right** | Review, Check-in, Reflect | P-39 S6. Once per twelve weeks |
 | Sending your lists for a professional to change | **Send a link to change** (Share your plan) | Share with physio, Invite, Collaborate, Sync | P-44. Makes a link; the app sends nothing |
 | The screen when their link comes back | **What your physio or trainer changed** | Review changes, Import, Merge | P-44. **Use all of it** / **Use the n ticked** / **Keep my list** |
+| Changes coming straight back | **Send their changes straight to this phone**; a **live link** | Sync, Connect, Real-time, Collaborate | P-45. Switched off until the relay is set up. **Stop this live link** ends it |
+| Home's question when they arrive | **Your physio or trainer sent changes to your exercises.** **Look at them** / **Later** | New message, Notification | P-45 |
 | Undoing their changes | **Put back my old list** | Undo, Revert, Restore | P-44. 30 days, asked once |
 | On the edit page, the professional's button | **Send back** | Submit, Save, Done | P-44. Makes the link to return |
 | On the edit page, removing one | **Take it out** / **Put it back** | Delete, Remove | P-44 |
