@@ -170,7 +170,7 @@ ok("10d. Cancel: nothing changed, focus back", names().includes("Side plank") &&
 await click(q("#px-prev-btn")); await click(q("#px-prev-yes"));
 ok("10e. Yes: the old list back, nothing kept, said, focus on the heading", names() === "Glute bridge 3x12 | Clamshell 2x15 each side | Cat-cow 1x10" && store.get("ownPrevious") === null && /Your list is as it was before the changes\./.test(txt(q(".px-prev"))) && document.activeElement === q("#px-prev-h"), names());
 fixture(); store.setOwnPrevious(OWN); store.set("tier", "free"); px();
-ok("10f. Free: never offered", !q(".px-prev"));
+ok("10f. not tier-gated: their own list kept from the Plan is still theirs to put back on Free (verify-tiergh 14)", !!q("#px-prev-btn"));
 
 console.log("\nTEST 11 - nobody set up here");
 let setUp = false;

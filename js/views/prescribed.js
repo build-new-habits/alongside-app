@@ -5,7 +5,8 @@
  *
  * v1.17 - P-44 S4. Put back my old list: after a physio's or trainer's
  *   changes were used (the Plan), the list as it was, for 30 days
- *   (ownPrevious). Asks once before it replaces the list.
+ *   (ownPrevious). Asks once before it replaces the list. Not tier-gated:
+ *   their own list is free (verify-tiergh 14).
  *
  * v1.16 - OWN-DONE-TODAY (Graeme, 23 Nov: "It says I did these today but I
  *   didn't"). Done today is read through store.ownDoneToday(): ticked today
@@ -151,7 +152,6 @@ import { store } from "../store.js";
 import { planLook } from "../plan-look.js";
 import { ON_HOME_CHOICES, onHomeFor, setOnHome, onHomeCount, MAX_ON_HOME_SHOWN } from "../data/little-and-often.js";
 import { healthAllowed } from "../data/health-consent.js";
-import { isPremium } from "../auth.js";
 
 export const centered = false;
 
@@ -705,7 +705,10 @@ function removeExercise(id) {
 
 /** P-44 S4. The list before a professional's changes were used, for 30 days. */
 function renderPrevious() {
-  const prev = isPremium() ? store.get("ownPrevious") : null;
+  // Not tier-gated (verify-tiergh 14: a person's own list is free). Only the
+  // Plan can use a professional's changes, so only a Plan writes ownPrevious;
+  // a list kept from before someone left the Plan is still theirs to put back.
+  const prev = store.get("ownPrevious");
   if (!prev && !prevSaid) return "";
   const until = prev ? new Date(Date.parse(prev.at) + store.OWN_PREVIOUS_DAYS * 864e5).toLocaleDateString("en-GB", { day: "numeric", month: "long" }) : "";
   return `<section class="card px-prev" aria-labelledby="px-prev-h">
