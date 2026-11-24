@@ -1,5 +1,11 @@
 /**
  * tools/verify-player-flow.mjs
+ * 24 Nov 2026 v8
+ *
+ * v8 - P-46 S5 PLAYER. One screen per move: 1a checks no stepper and the set
+ *   controls on screen; 1f holds Watch out before How under More about this
+ *   move (Graeme's approved mock-up); 1e the dose above the card.
+ *
  * 29 Oct 2026 v7
  *
  * v7 - STAGE PATH Session 6 re-point (none loosened). On the Plan a session
@@ -118,8 +124,9 @@ ok("0a. the first exercise is on screen", main.querySelector(".exercise-name")?.
 
 // ── 1. ONE SCREEN ───────────────────────────────────────────────────────
 console.log("\nTEST 1 - one screen per exercise: what to do, then how");
-ok("1a. no Start-this-one and no old page stepper: it arrives at Why, the set controls one tap away",
-   main.querySelector('.wo-steps [aria-current="step"]')?.dataset.stepGo === "why" && !!main.querySelector("#wo-step-capture") &&
+// P-46 S5: one screen per move; the set controls are on it.
+ok("1a. no Start-this-one and no stepper of any kind: it arrives at the move, the set controls on screen",
+   !main.querySelector(".wo-steps") && !!main.querySelector("#wo-set-done-btn, #wo-done-btn, #timer-toggle-btn") &&
    !main.querySelector("#wo-begin-btn") && !main.querySelector(".xcard-stepper"));
 ok("1b. no raw category id and no points badge", !main.querySelector(".meta-tag") && !/⭐/.test(main.innerHTML));
 ok("1c. the section is a plain label", /^(Warm up|Main|Cool down)$/.test(main.querySelector(".wo-flow__section")?.textContent.trim() || ""));
@@ -128,18 +135,16 @@ ok("1d. \"If it hurts\" is on the screen, one tap away (closed)",
    !!main.querySelector("details.xcard-hurt") && !main.querySelector("details.xcard-hurt[open]"));
 
 fresh([ROW, { ...ROW, id: "fixture-2", name: "Goblet Squat" }]);
-const order = [...main.querySelectorAll(".wo-steps [data-step-go]")].map(b => b.dataset.stepGo);
-tap("#wo-step-next");
-const onWatch = main.querySelector('.wo-steps [aria-current="step"]')?.dataset.stepGo === "watch" &&
-  !!main.querySelector(".xstep--watch .xcard-block--hazard") && !main.querySelector("details .xcard-block--hazard:not(.xcard-hurt)") &&
-  /Next: How/.test(main.querySelector("#wo-step-next")?.textContent || "");
-ok("1f. what to watch out for comes before how to do it, outside any disclosure",
-   order.indexOf("watch") > -1 && order.indexOf("watch") < order.indexOf("how") && onWatch, JSON.stringify(order));
+// P-46 S5 (Graeme's mock-up, approved 24 Nov): Watch out is folded under More about
+// this move with Why and How, still before How. Today's caution stays on screen (TEST 1 and verify-p46-player 4a).
+const moreHtml = main.querySelector("details.xcard-more")?.innerHTML || "";
+ok("1f. what to watch out for comes before how to do it, under More about this move",
+   moreHtml.indexOf(">Watch out<") > -1 && moreHtml.indexOf(">Watch out<") < moreHtml.indexOf(">How<") && !!main.querySelector("details.xcard-more .xcard-block--hazard"), moreHtml.slice(0, 120));
 toCapture();
 const html = main.innerHTML;
 ok("1e. the dose leads: 3 × 10 and Set 1 of 3, above the guidance",
    /3 × 10/.test(main.querySelector(".reps-value")?.textContent || "") && /Set 1 of 3/.test(T()) &&
-   html.indexOf("reps-value") > -1 && html.indexOf("reps-value") < html.indexOf("wo-steps"));
+   html.indexOf("reps-value") > -1 && html.indexOf("reps-value") < html.indexOf("exercise-card--one"));
 
 // ── 2. SETS, THEN NEXT ──────────────────────────────────────────────────
 console.log("\nTEST 2 - a tap a set, then Next on the same screen");

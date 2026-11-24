@@ -1,6 +1,12 @@
 /* ============================================
    WORKOUT STYLES
    css/components/workout.css
+   24 Nov 2026 v26
+
+   v26 - P-46 S5 PLAYER: the one-screen card (.exercise-card--one) and
+   More about this move (.xcard-more), folded; the four-step strip is gone
+   from the player.
+
    16 Nov 2026 v25
 
    v25 - P-36 MY-LIST-PLAYER (Graeme, mock-up approved 16 Nov). My
@@ -2078,3 +2084,15 @@ button.ps-row:focus-visible { outline: 3px solid var(--color-border-focus); outl
 .exercise-card--compact .xcard-figure svg { max-height: 120px; }
 .xcard-watch summary { min-height: 44px; display: flex; align-items: center; cursor: pointer; }
 .xcard-watch-summary:focus-visible { outline: 3px solid var(--color-border-focus); outline-offset: 2px; }
+
+/* P-46 S5. One screen per move: the card's own part, then More about this move. */
+.exercise-card--one { display: flex; flex-direction: column; gap: var(--space-3); margin-top: var(--space-3); }
+.xcard-more {
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md, 8px);
+}
+/* 44px target; display left alone so the disclosure triangle shows state (as .xcard-adapt-summary). */
+.xcard-more-summary { min-height: 44px; padding: var(--space-2) 0; cursor: pointer; font-weight: 600; color: var(--color-text); }
+.xcard-more-summary:focus-visible { outline: 3px solid var(--color-border-focus); outline-offset: 2px; }
+.xcard-more-sub { margin: var(--space-2) 0 var(--space-1); font-weight: 600; }

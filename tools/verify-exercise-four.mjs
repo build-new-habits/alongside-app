@@ -1,5 +1,12 @@
 /**
  * tools/verify-exercise-four.mjs
+ * 24 Nov 2026 v3
+ *
+ * v3 - P-46 S5 PLAYER. One screen per move (Graeme's decision; spec §6): the
+ *   four steps went. The checks hold what they carried: Why, then Watch out
+ *   before How, under More about this move; the sets on the screen; today's
+ *   caution never folded; If it hurts one tap away; resume lands on the sets.
+ *
  * 24 Nov 2026 v2
  *
  * v2 - P-46 S4 FREE HOME. The builder is the Plan's; the Free session is
@@ -99,8 +106,10 @@ async function buildAndGo() {
   return s;
 }
 
-const current = () => $('.wo-steps [aria-current="step"]')?.dataset.stepGo;
-const title   = () => txt($(".xstep-title"));
+// P-46 S5. One screen per move, both tiers: the four steps went. What they
+// held is on the one screen, in the same safety order: today's caution and
+// the cue on screen; Why, Watch out and How under More about this move.
+const more = () => $("details.xcard-more");
 
 for (const tier of ["free", "personal"]) {
   console.log(`\nTIER ${tier}`);
@@ -110,85 +119,48 @@ for (const tier of ["free", "personal"]) {
      !!s && router.currentView === "workout", `${router.currentView}`);
   const ex0 = s.exercises[0];
 
-  // 1. The four steps.
-  const btns = $$(".wo-steps button[data-step-go]");
-  ok(`${tier} 1a. four steps, in order: Why, Watch out, How, Capture`,
-     JSON.stringify(btns.map(b => txt(b))) === JSON.stringify(["Why", "Watch out", "How", "Capture"]),
-     JSON.stringify(btns.map(b => txt(b))));
-  ok(`${tier} 1b. each step's name contains its visible words (label in name)`,
-     btns.length === 4 && btns.every(b => (b.getAttribute("aria-label") || "").toLowerCase().includes(txt(b).toLowerCase())));
-  ok(`${tier} 1c. the steps are a named navigation list`,
-     !!$('nav.wo-steps[aria-label] ol'));
+  // 1. One screen: no steps strip.
+  ok(`${tier} 1a. one screen per move: no steps strip, no Next: Why`, !$(".wo-steps") && !$("#wo-step-next") && !$("[data-step-go]"));
+  ok(`${tier} 1b. the name is the screen's heading`, txt($("h1#wo-exercise-name")) === ex0.name);
+  ok(`${tier} 1c. More about this move is a closed disclosure`, !!more() && !more().open && txt(more().querySelector("summary")) === "More about this move");
 
-  // 2. Starts at Why, with the why.
-  ok(`${tier} 2a. a new exercise starts at Why`, current() === "why" && title() === "Why", `${current()} | ${title()}`);
+  // 2. Why, Watch out, How: inside More, in the safety order.
+  const m = more()?.innerHTML || "";
   ok(`${tier} 2b. Why shows the exercise's own written why`,
-     !!ex0.why && txt($(".xstep-why")) === ex0.why.replace(/\s+/g, " ").trim(), `${txt($(".xstep-why")).slice(0, 80)} | ${String(ex0.why).slice(0, 80)}`);
-  ok(`${tier} 2c. no weight, reps or set buttons on Why`,
-     !$("#wo-set-done-btn") && !$("#wo-done-btn") && !$("#complete-exercise-btn") && !$(".slog, [id^='wo-log-']"));
+     !!ex0.why && txt($(".xcard-more .xstep-why")) === ex0.why.replace(/\s+/g, " ").trim(), `${txt($(".xcard-more .xstep-why")).slice(0, 80)} | ${String(ex0.why).slice(0, 80)}`);
+  ok(`${tier} 2c. Watch out comes before How, and How has the steps and the video link`,
+     m.indexOf(">Watch out<") > -1 && m.indexOf(">Watch out<") < m.indexOf(">How<") &&
+     $$(".xcard-more .xcard-how .exercise-section-list li").length > 0 && /Watch how to do this/.test(txt(more())));
   ok(`${tier} 2d. Skip this one is there`, !!$("#skip-exercise-btn"));
 
-  // 3. Next walks the steps in the safety order.
-  const walk = [];
-  for (let i = 0; i < 3; i++) {
-    const n = $("#wo-step-next");
-    walk.push(txt(n));
-    await click(n);
-    walk.push(`${current()}:${title()}:${document.activeElement?.classList.contains("xstep-title")}`);
-    if (current() === "watch") {
-      ok(`${tier} 3w. Watch out shows the hazards in the rose box`,
-         !!$(".xstep--watch .xcard-block--hazard") && $$(".xstep--watch .xcard-block--hazard li").length > 0);
-      ok(`${tier} 3s. Skip this one on Watch out`, !!$("#skip-exercise-btn"));
-    }
-    if (current() === "how") {
-      ok(`${tier} 3h. How shows the steps and the video link`,
-         $$(".xstep--how .exercise-section-list li").length > 0 && /Watch how to do this/.test(txt($(".xstep--how"))));
-      ok(`${tier} 3k. no shortcut on How (Next is Capture)`, !$("#wo-step-capture"));
-    }
-  }
-  ok(`${tier} 3a. Next goes Why → What to watch out for → How → Reflect and capture, focus on each title`,
-     JSON.stringify(walk) === JSON.stringify([
-       "Next: What to watch out for", "watch:What to watch out for:true",
-       "Next: How", "how:How:true",
-       "Next: Reflect and capture", "capture:Reflect and capture:true"]),
-     JSON.stringify(walk));
-  ok(`${tier} 3b. Capture has the sets and Skip`,
+  // 3. The sets are on the screen.
+  ok(`${tier} 3b. the sets and Skip, on the one screen`,
      (!!$("#wo-set-done-btn") || !!$("#wo-done-btn") || !!$("#timer-toggle-btn")) && !!$("#skip-exercise-btn") &&
      !!$(".xstep--capture [id^='wo-log-'], .xstep--capture .slog"));
+  ok(`${tier} 4b. no "I know this one: go to capture" (there is nothing to skip past)`, !/I know this one/.test(txt(main)));
 
-  // 4. Any step from the strip; back to Why.
-  await click($('.wo-steps [data-step-go="why"]'));
-  ok(`${tier} 4a. the strip goes back to Why`, current() === "why");
-  await click($("#wo-step-capture"));
-  ok(`${tier} 4b. "I know this one: go to capture" goes straight to Capture`,
-     current() === "capture" && document.activeElement?.id === "wo-cap-h", `${current()} ${document.activeElement?.id}`);
-
-  // 5. Finishing an exercise: the next one starts at Why.
+  // 5. Finishing an exercise: the next one starts at its name.
   for (let i = 0; i < 20 && !$("#complete-exercise-btn"); i++) {
     const b = $("#wo-set-done-btn") || $("#wo-done-btn");
     if (!b) break;
     await click(b);
   }
-  ok(`${tier} 5a. once the sets are done, too hard / too easy is on Capture`, !!$("#complete-exercise-btn") && current() === "capture");
+  ok(`${tier} 5a. once the sets are done, too hard / too easy is on the screen`, !!$("#complete-exercise-btn") && !!$(".wo-flow__done"));
   await click($("#complete-exercise-btn"));
-  ok(`${tier} 5b. the next exercise starts at Why`,
-     txt(main).includes(s.exercises[1].name) && current() === "why", `${current()} | ${txt(main).slice(0, 80)}`);
+  ok(`${tier} 5b. the next exercise starts at its name, More folded`,
+     txt($("h1#wo-exercise-name")) === s.exercises[1].name && !!more() && !more().open, `${txt(main).slice(0, 80)}`);
 
-  // 6. Skip from Why moves on, and starts at Why.
+  // 6. Skip moves on.
   await click($("#skip-exercise-btn"));
-  ok(`${tier} 6. Skip from Why moves to the next exercise, at Why`,
-     txt(main).includes(s.exercises[2].name) && current() === "why");
+  ok(`${tier} 6. Skip moves to the next exercise`, txt($("h1#wo-exercise-name")) === s.exercises[2].name);
 }
 
-// 7. Reopened part-way through an exercise's sets: Capture.
+// 7. Reopened part-way through an exercise's sets: the sets are there.
 console.log("\nRESUME");
 fixture("personal");
 const s = await buildAndGo();
-// The first exercise the player counts by sets (a per-set button), so one
-// tap logs one set and leaves it part-way.
 let k = -1;
 for (let i = 0; i < s.exercises.length; i++) {
-  await click($("#wo-step-capture"));
   if ($("#wo-set-done-btn")) { k = i; break; }
   await click($("#skip-exercise-btn"));
 }
@@ -196,32 +168,23 @@ await click($("#wo-set-done-btn")); await wait(100);
 const cp = store.get("activeSessionCheckpoint");
 ok("7a. one set logged on a multi-set exercise is checkpointed part-way",
    k >= 0 && Number(cp?.index) === k && Number(cp?.set) === 2, JSON.stringify({ k, index: cp?.index, set: cp?.set }));
-// The app reopened: a fresh copy of the player, the same store.
 const W2 = await import(B + "views/workout.js?reopen=" + Date.now());
 main.innerHTML = W2.render();
-ok("7b. reopened part-way, the player lands on Capture, where the sets are",
-   current() === "capture" && txt(main).includes(s.exercises[k].name) && !!$("#wo-set-done-btn"),
-   `${current()} | ${txt(main).slice(0, 100)}`);
+ok("7b. reopened part-way, the player lands on that exercise with its sets",
+   txt(main).includes(s.exercises[k].name) && !!$("#wo-set-done-btn") && /Set 2 done/.test(txt($("#wo-set-done-btn"))),
+   `${txt(main).slice(0, 100)}`);
 
-// 8. Safety travels with the shortcut: today's caution on every step,
-//    and If it hurts on Capture, so "I know this one" skips neither.
+// 8. Safety on the one screen: today's caution never folded, If it hurts one tap away.
 console.log("\nCAUTION");
 fixture("personal");
 store.set("conditions", ["lower-back"]); store.set("conditionPainScores", { "lower-back": 5 });
-// Screened today (the red-flag questions answered, nothing found).
 const RF = await import(B + "data/red-flag.js");
 store.set("redFlag", { screenedAt: new Date().toISOString(), areas: ["lower-back"], textVersion: RF.RED_FLAG_VERSION, level: null, flaggedAt: null, clearedAt: null });
 await buildAndGo();
-const seen = {};
-for (const st of ["why", "watch", "how", "capture"]) {
-  await click($(`.wo-steps [data-step-go="${st}"]`));
-  seen[st] = !!$(".exercise-caution") && current() === st;
-}
-ok("8a. with something sore today, the caution is on all four steps",
-   Object.values(seen).length === 4 && Object.values(seen).every(Boolean), JSON.stringify(seen));
-await click($(".wo-steps [data-step-go=\"why\"]"));
-await click($("#wo-step-capture"));
-ok("8b. Capture has If it hurts, one tap away (closed)",
+const cau = $(".exercise-caution");
+ok("8a. with something sore today, the caution is on the screen, not folded away",
+   !!cau && !cau.closest("details"), txt(main).slice(0, 120));
+ok("8b. If it hurts, one tap away (closed), on the screen",
    !!$(".xstep--capture details.xcard-hurt") && !$(".xstep--capture details.xcard-hurt[open]"));
 
 console.log(`\n${passes} passed, ${fails} failed`);

@@ -57,6 +57,10 @@ const SCREENS_ALL = [
   ["fh-ready", [], "S4 Free: Ready-made sessions (gym)"],
   ["fh-ready", [".path-list button", "#path-ready-go"], "S4 Free: a ready-made session, Start"],
   ["fh-otp", [], "S4 Free: on-the-plan (the Library)"],
+  ["pl-free", [], "S5 Free player: one screen per move"],
+  ["pl-free", ["details.xcard-more summary"], "S5 Free player: More about this move open"],
+  ["pl-free", ["#wo-swap-btn"], "S5 Free player: Swap open"],
+  ["pl-plan", [], "S5 Plan player: one screen per move"],
 ];
 const SCREENS = process.env.ONLY ? SCREENS_ALL.filter(x => x[0] === process.env.ONLY) : SCREENS_ALL;
 
@@ -81,15 +85,23 @@ for (const scheme of ["light", "dark"]) for (const width of [390, 320]) for (con
       if (where === "nohealth") HC.declineHealthConsent();
       else s.set("consent.health", { given: true, at, version: HC.HEALTH_CONSENT_VERSION, withdrawnAt: null });
       const DP = await import("./js/display-prefs.js"); DP.setDisplayPref("textScale", size); DP.applyDisplayPrefs();
-      if (where.startsWith("ask-") || where.startsWith("fh-")) {   // S3: onboarded through the short start, one session (three for goals)
+      if (where.startsWith("ask-") || where.startsWith("fh-") || where.startsWith("pl-")) {   // S3: onboarded through the short start, one session (three for goals)
         const { HURT_AND_ACHE_VERSION } = await import("./js/exercise-card.js");
         s.set("onboardingComplete", true); s.set("name", "Sam"); s.set("onboarding.flow", "short");
         s.set("onboarding.threadCompletedAt", new Date(Date.now() - 864e5).toISOString());
-        s.set("tier", where === "ask-plan" ? "personal" : "free");
+        s.set("tier", where === "ask-plan" || where === "pl-plan" ? "personal" : "free");
         s.set("safetyAckLog", [{ at, textVersion: HURT_AND_ACHE_VERSION, surface: "fixture" }]); s.set("guidanceShownAt", at);
         const n = where === "ask-goals" ? 3 : 1;
         s.set("activityLog", Array.from({ length: n }, (_, i) => ({ id: "a" + i, type: "workout", completedAt: new Date(Date.now() - (i + 1) * 3600e3).toISOString(), durationMins: 15, completed: true })));
         if (where === "ask-goals") s.set("lifestyle.activityLevel", "light");
+        if (where.startsWith("pl-")) {   // S5: a session of three real moves, the safety note already read
+          const nn = { notNowAt: at }; s.set("askLater", { activity: nn, goals: nn, weekly: nn });
+          const { EXERCISES } = await import("./js/data/exercises/index.js");
+          const three = EXERCISES.filter(e => e.instructions?.length && e.why && e.watchOut?.length).slice(0, 3).map(e => ({ ...e, section: "main", sets: 3, reps: "10", rest: 45, duration: null }));
+          s.set("safetyAckLog", Array.from({ length: 5 }, () => ({ at, textVersion: HURT_AND_ACHE_VERSION, surface: "fixture" })));
+          s.set("generatedSession", { session: { id: "pl", title: "Three", exercises: three }, builtAt: at, inputs: {} });
+          s.set("usingGeneratedSession", true);
+        }
         if (where.startsWith("fh-")) {   // S4: nothing to ask today
           const nn = { notNowAt: at };
           s.set("askLater", { activity: nn, goals: nn, weekly: nn });
@@ -99,10 +111,12 @@ for (const scheme of ["light", "dark"]) for (const width of [390, 320]) for (con
         if (where === "ask-plan") s.setMyMove({ made: at, purposes: ["stronger", "moving", "instep"], most: "stronger", goodDay: "few", hardDay: ["coach"], startClosed: at });
       }
     }, { size, where });
-    if (where === "fh-ready") { await page.evaluate(() => window.router.navigate("today")); await page.waitForTimeout(400); }   // as a person: Home, then the six
+    if (where.startsWith("pl-")) { await page.reload(); await page.waitForTimeout(1200); }   // S5: the app opened afresh on this person (the first-open conversation mounted at load is gone)
+    if (where === "fh-ready" || where.startsWith("pl-")) { await page.evaluate(() => window.router.navigate("today")); await page.waitForTimeout(400); }   // as a person: Home first
     await page.evaluate(w => {
       if (w === "fh-ready") { window.router.pathStart = { free: true, place: "gym" }; return window.router.navigate("path"); }
       if (w === "fh-otp") return window.router.navigate("library");
+      if (w.startsWith("pl-")) return window.router.navigate("workout");
       return window.router.navigate(w.startsWith("ask-") || w.startsWith("fh-") ? "today" : "onboarding/start");
     }, where);
     await page.waitForTimeout(500);
@@ -124,7 +138,7 @@ for (const scheme of ["light", "dark"]) for (const width of [390, 320]) for (con
       const main = document.getElementById("main-content");
       const h1s = [...main.querySelectorAll("h1")].filter(h => !h.closest(".sr-only") && getComputedStyle(h).display !== "none" && h.getClientRects().length).length;
       const small = [];
-      for (const el of main.querySelectorAll(".st button, .st-seg__opt span, .st-input, .al button, .free-home button, .on-the-plan button, .path-view[data-step] > button, .path-list button")) {
+      for (const el of main.querySelectorAll(".st button, .st-seg__opt span, .st-input, .al button, .free-home button, .on-the-plan button, .path-view[data-step] > button, .path-list button, .workout-actions button, .wo-ctl button, .xcard-more-summary")) {
         const b = el.getBoundingClientRect(); if (!b.width) continue;
         if (b.height < 43.5) small.push(`${(el.id || el.className || el.tagName).toString().slice(0, 30)} ${Math.round(b.height)}px`);
       }

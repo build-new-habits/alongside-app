@@ -1,6 +1,11 @@
 import { createRequire as __cr } from "node:module";
 /**
  * tools/verify-one-look.mjs
+ * 24 Nov 2026 v18
+ *
+ * v18 - P-46 S5 PLAYER. Free's player is one screen per move by Graeme's
+ *   decision (both tiers): TEST 4 checks that (4w), not v688's four steps.
+ *
  * 24 Nov 2026 v17
  *
  * v17 - P-46 S4, after merge. 5b: Free's Home is drawn by free-home.js and
@@ -384,6 +389,16 @@ for (const file of touched) {
     continue;
   }
   if (!old) { ok(`4. Free ${name}: there on v688`, false); continue; }
+  // v18 (P-46 S5, by decision: one screen per move, both tiers): Free's player is the one screen, with Swap and What's left.
+  if (name === "workout") {
+    person("free"); main.innerHTML = "";
+    const WO = await import(new URL(`../${file}`, import.meta.url).href);
+    main.innerHTML = WO.render(); await wait(20);
+    compared++;
+    const isPlayer = !!main.querySelector("#wo-exercise-name");
+    ok("4w. Free workout: one screen per move (P-46 S5, by decision), not v688's four steps", !main.querySelector(".wo-steps") && (!isPlayer || (!!main.querySelector(".exercise-card--one") && !!main.querySelector("#wo-swap-btn"))), main.textContent.replace(/\s+/g, " ").slice(0, 120));
+    continue;
+  }
   // v16 (P-46 S4, by decision): Free's Home is the coach-led Home, not v688's.
   if (name === "today") {
     person("free"); main.innerHTML = "";

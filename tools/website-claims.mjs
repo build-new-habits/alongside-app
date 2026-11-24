@@ -1,5 +1,11 @@
 /**
  * tools/website-claims.mjs
+ * 24 Nov 2026 v4
+ *
+ * v4 - P-46 S5 PLAYER. When I want the coach to choose for me: Swap any
+ *   exercise, and Do an exercise later or see what's left, are Free's too
+ *   (in the session, both tiers).
+ *
  * 24 Nov 2026 v3
  *
  * v3 - P-46 S4 FREE HOME. When I want to choose for myself: choosing the
@@ -87,9 +93,9 @@ export const SCENARIOS = [
       proof: [P("js/exercise-card.js", "\"why\"")] },
     { text: "A list of what the coach adjusted, and Change my check-in", free: false, plan: true,
       proof: [P("js/views/coach-proposal.js", "What I've adjusted"), P("js/views/coach-proposal.js", "Change my check-in")] },
-    { text: "Swap any exercise", free: false, plan: true,
-      proof: [P("js/views/path.js", "Swap")] },
-    { text: "Do an exercise later, or see what’s left", free: false, plan: true,
+    { text: "Swap any exercise", free: true, plan: true,   // v4: P-46 S5, in the session on both tiers
+      proof: [P("js/views/path.js", "Swap"), P("js/views/workout.js", "wo-swap-btn")] },
+    { text: "Do an exercise later, or see what’s left", free: true, plan: true,   // v4: P-46 S5
       proof: [P("js/views/workout.js", "Do this one later"), P("js/views/workout.js", "What's left")] },
   ]},
   { id: "know", title: "When I want to choose for myself", rows: [

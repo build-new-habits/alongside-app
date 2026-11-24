@@ -1,5 +1,11 @@
 /**
  * tools/verify-card3.mjs
+ * 24 Nov 2026 v5
+ *
+ * v5 - P-46 S5 PLAYER. 10b: the player's one screen puts why under More
+ *   about this move as Why; the steps layout keeps it on its Why step; nowhere
+ *   else.
+ *
  * 16 Nov 2026 v4
  *
  * v4 - P-36 MY-LIST-PLAYER. REVERSAL (Graeme, mock-up approved 16 Nov):
@@ -431,10 +437,12 @@ check("10a. DECIDE carries no instructions, no hazards, no why", () => {
 
 // D-1 REVERSAL (Graeme, 04 Oct, Option B): the exercise's own why is the
 // first of the four steps. It renders there and nowhere else on the card.
-check("10b. `why` renders only on the Why step of the four-step layout", () => {
-  const i = card.indexOf('if (opts.layout === "steps")');
+// P-46 S5: the player's one screen ("one") puts it under More about this move,
+// as Why; the steps layout keeps it on its Why step. Nowhere else.
+check("10b. `why` renders only as Why: under More about this move, or on the Why step", () => {
+  const i = card.indexOf('if (opts.layout === "one")');
   const j = card.indexOf('if (opts.layout === "flow")');
-  ok(i > -1 && j > i, "no steps branch before the flow branch");
+  ok(i > -1 && j > i && card.indexOf('if (opts.layout === "steps")') > i, "no one-screen and steps branches before the flow branch");
   const uses = [...card.matchAll(/exercise\.why/g)].map(m => m.index);
   ok(uses.length > 0 && uses.every(k => k > i && k < j), "`why` is read outside the steps layout");
 });
