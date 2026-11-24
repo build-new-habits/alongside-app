@@ -1,7 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 24 Nov 2026 v736
+ * 24 Nov 2026 v737
+ *
+ * v737 - W7-1 and W7-2 (Wave 7). A first plan says "A balanced first session"; a warm-up for someone with no ability limit stands. No new files.
  *
  * v736 - OUT-LINK-ROBUST (the Plan). Send a link to change: one odd exercise never stops the link being made. No new files.
  *
@@ -4325,7 +4327,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v736";
+const CACHE_NAME = "alongside-v737";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4459,7 +4461,7 @@ const SHELL_HASHES = {
   "./js/data/outside.js": "3af4ea46bd898084",
   "./js/data/trend-recipes.js": "14961e4c12aef77e",
   "./js/data/ready-sessions.js": "0187232763966245",
-  "./js/data/path-context.js": "a3b00dbb090b937a",
+  "./js/data/path-context.js": "5d8018dcdcdb3f17",
   "./js/data/swap-search.js": "5f0f0e4d112f92ea",
   "./js/views/build-session.js": "763317cec8c62e83",
   "./js/data/build-lately.js": "e06714cc9d1539a6",
@@ -4528,7 +4530,7 @@ const SHELL_HASHES = {
   "./js/data/support-lines.js": "0c1286fa510e427e",
   "./js/data/consent-version.js": "c1a39ed44cc24157",
   "./js/views/my-programme.js": "b28f193145da0c1a",
-  "./js/session-builder.js": "70992dba2147aa1f",
+  "./js/session-builder.js": "7d1b1540f9dcc767",
   "./js/data/session-choice.js": "954463b0647f3843",
   "./js/data/saved-sessions.js": "3e43e131c645626f",
   "./js/data/class-contract.js": "fe8f3f22b0df50f6",
@@ -4611,7 +4613,7 @@ const SHELL_HASHES = {
   "./js/data/exercises/held_movements.js": "73a0fd1503850f28",
   "./js/data/feel-programmes.js": "ade4752f88834a40",
   "./js/data/stretch-routines.js": "5a5fa2e7598037fb",
-  "./js/data/path-engine.js": "13cfd17cf3753a14",
+  "./js/data/path-engine.js": "f3d03de7075fb8c3",
   "./js/data/exercises/pilates.js": "2428ed5f9e3f41cf",
   "./js/data/exercises/running.js": "c1fc520e1eb7ee8c",
   "./js/data/exercises/rehabilitation.js": "c2b00a8513421566",

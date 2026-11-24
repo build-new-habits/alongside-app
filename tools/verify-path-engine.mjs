@@ -19,6 +19,12 @@
  *   "Mixed up from your last few sessions". Same rules, same strictness:
  *   exact words only.
  *
+ * v3 - W7-1 (Wave 7, 24 Nov 2026): TEST 8. With no finished session the
+ *   filler line is "A balanced first session", never "Mixed up from your
+ *   last few sessions" (it said so on a brand-new person's first plan).
+ *   8e/8f drive shownAdjustments(), the caller Today's plan and the door
+ *   programmes use. Red on alongside-v736 (8a, 8e).
+ *
  * 28 Oct 2026 v1
  *
  * STAGE PATH Session 3 (P-3 ENGINE; blueprint v3 Part E; P-9c part 2).
@@ -318,6 +324,24 @@ ok("7a. a built session goes to Today's plan with the session type, place and le
 const rq2 = safe(fn("buildRequest"), safe(fn("suggestToday"), { checkin: ci(2, 6), place: "home", arcDoor: "stronger", now: NOON }), 6);
 ok("7b. Move to feel better goes to its door with the feeling", rq2?.route === "path" && rq2.params?.door === "feel" && rq2.params?.feeling === "worn", JSON.stringify(rq2));
 ok("7c. arcDoor maps the arc's strands to a door", safe(fn("arcDoor"), ["leg-strength", "trunk-strength"]) === "stronger" && safe(fn("arcDoor"), ["hip-range", "hamstring-range"]) === "stretch" && safe(fn("arcDoor"), ["aerobic-base", "keep-walking"]) === "moving" && safe(fn("arcDoor"), ["pacing"]) === null);
+
+console.log("\nTEST 8 - W7-1: a first plan never claims past sessions");
+const a8 = adj({ checkin: ci(6, 6), firstSession: true });
+ok("8a. first session, nothing else to say -> the first-session line only", a8.length === 1 && a8[0] === "A balanced first session", JSON.stringify(a8));
+const a8b = adj({ checkin: ci(3, 6), firstSession: true });
+ok("8b. first session with low energy -> the real adjustment, no filler", a8b.includes("Shorter than usual, with more time to settle at the end") && !a8b.some(x => /first session|last few/.test(x)), JSON.stringify(a8b));
+ok("8c. not a first session -> the recency line, as before", JSON.stringify(adj({ checkin: ci(6, 6), firstSession: false })) === JSON.stringify(["Mixed up from your last few sessions"]));
+// Through the real caller (Today's plan and the door programmes use shownAdjustments).
+let PC = {}; try { PC = await import(B + "data/path-context.js"); } catch (e) { console.log("  (path-context.js did not load: " + e.message + ")"); }
+person("personal");
+store.set("lastCheckin", { energy: 6, mood: 6, date: new Date().toDateString(), timestamp: new Date().toISOString() });
+store.set("checkinHistory", { [new Date().toISOString().split("T")[0]]: { energy: 6, mood: 6, date: new Date().toDateString() } });
+ok("8d. self-check: the fixture counts as checked in today", PC.checkinToday?.()?.energy === 6, JSON.stringify(PC.checkinToday?.()));
+const first = PC.shownAdjustments?.() || [];
+ok("8e. shownAdjustments, nobody's first session: no 'last few sessions'", first.length >= 1 && !first.some(x => /last few sessions/.test(x)), JSON.stringify(first));
+store.set("activityLog", [{ id: "w1", type: "workout", completed: true, durationMins: 20, completedAt: new Date(Date.now() - 2 * 864e5).toISOString() }]);
+const later = PC.shownAdjustments?.() || [];
+ok("8f. after one finished session: the recency line returns", later.includes("Mixed up from your last few sessions"), JSON.stringify(later));
 
 console.log(`\n${passes} passed, ${fails} failed`);
 process.exit(fails ? 1 : 0);

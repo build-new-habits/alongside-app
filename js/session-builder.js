@@ -1,7 +1,14 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
- * 28 Oct 2026 v91
+ * 24 Nov 2026 v92
+ *
+ * v92 - W7-2 LIFTER-WARMUP (Wave 7, 24 Nov). For someone with no ability
+ *   limit (_capabilityUnrestricted), the warm-up prefers standing moves,
+ *   in the pulse-raiser slot and in pickFrom(), after the adapted-content
+ *   preference. A preference, not a filter; warm-up only. Seated warm-up
+ *   moves for that person: 4-15% of picks before, 0 after
+ *   (verify-w7-warmup).
  *
  * v91 - STAGE PATH P-3 ENGINE (blueprint E3). pickFrom() puts the person's
  *   liked movements first when they fit the slot, at most two a session,
@@ -4215,6 +4222,9 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
         if (_capabilityUnrestricted()) {
           const notAdapted = pulsePool.filter(e => e.adaptive !== true);
           if (notAdapted.length > 0) pulsePool = notAdapted;
+          // W7-2: and standing, for someone who does not need a chair.
+          const standing = pulsePool.filter(e => e.position !== "seated");
+          if (standing.length > 0) pulsePool = standing;
         }
 
         // SEL-1, 13 Aug 2026. Logged when CAP-6 shipped, fixed here.
@@ -4629,6 +4639,16 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
       if (_capabilityUnrestricted()) {
         const notAdapted = candidates.filter(e => e.adaptive !== true);
         if (notAdapted.length > 0) candidates = notAdapted;
+        // W7-2 (Wave 7, 24 Nov 2026). A warm-up for someone with no limits
+        // prefers standing moves: seated versions exist for people who
+        // need a chair, and an active lifter was opening on Seated
+        // Punches. A preference, not a rule (a slot with only seated
+        // options still fills). Warm-up only: a seated cable row or leg
+        // curl in the main part is the right move.
+        if (section === "warmup") {
+          const standing = candidates.filter(e => e.position !== "seated");
+          if (standing.length > 0) candidates = standing;
+        }
       }
 
       // FIX-1. Yoga and Pilates movements sort behind everything else in
