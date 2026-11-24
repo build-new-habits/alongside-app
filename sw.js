@@ -1,6 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 24 Nov 2026 v734
+ *
+ * v734 - P-45 THE LIVE LINK (the Plan; switched off until the relay is set up, so nothing changes on screen yet). NEW FILES precached: js/data/live-link.js, js/data/live-check.js, js/data/relay-config.js.
+ *
  * 24 Nov 2026 v733
  *
  * v733 - P-44 PHYSIO LINK S5 CLOSE (the Plan). Help guide B2, I want my physio or trainer to change my exercises. No new files.
@@ -4313,7 +4317,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v733";
+const CACHE_NAME = "alongside-v734";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4378,9 +4382,9 @@ const SHELL_HASHES = {
   "./css/components/club-rooms.css": "f1c069c5b8eaf09e",
   "./css/components/capture.css": "343b4ae0dc6fe6ea",
   "./css/components/finish.css": "c33e298d5fcb92ae",
-  "./js/app.js": "4139586dc667659a",
+  "./js/app.js": "511e961b15840a9e",
   "./js/router.js": "a3aca7c4df9422bf",
-  "./js/store.js": "af46173f09925c56",
+  "./js/store.js": "2cb441d9cc1afea5",
   "./js/session-log.js": "6134de4315842e05",
   "./js/exercise-feedback.js": "adba8549f444da2a",
   "./js/exercise-card.js": "4ed40e63efe33a26",
@@ -4440,7 +4444,7 @@ const SHELL_HASHES = {
   "./js/data/arc-readback.js": "9b06dcba96534da0",
   "./js/data/tier-table.js": "7821c3304bd0815c",
   "./js/views/know-what.js": "e84fee3e6d9d3af0",
-  "./js/views/plan-home.js": "79cdb2685714c941",
+  "./js/views/plan-home.js": "52023ad20d1a2d1a",
   "./js/views/path.js": "440a45cfcd4f385f",
   "./js/plan-look.js": "7674d8fbf5101aa9",
   "./js/views/plan-finish.js": "d3901b6355f55542",
@@ -4470,9 +4474,12 @@ const SHELL_HASHES = {
   "./js/views/my-move.js": "bc53b61cdf65da20",
   "./js/data/my-move.js": "c6ec80cda14e499b",
   "./js/data/plan-link.js": "96a3e9d1839a5928",
+  "./js/data/live-link.js": "e8d57b2c0a7cec36",
+  "./js/data/live-check.js": "8a492b3619d9c114",
+  "./js/data/relay-config.js": "3b41decd73b14858",
   "./js/data/qr.js": "751dbedf04c0b444",
-  "./js/views/plan-link-send.js": "09858ca11a9d4b59",
-  "./js/views/plan-link-back.js": "d2ff57ace2d3e65c",
+  "./js/views/plan-link-send.js": "d697e6092f9e85be",
+  "./js/views/plan-link-back.js": "599cfb3a883b46f8",
   "./js/data/week-changes.js": "1bd0a7a6db2c338f",
   "./js/data/little-and-often.js": "9828926d20ce94dc",
   "./js/data/sore-rule.js": "f6ea51d828be37f0",
@@ -4481,7 +4488,7 @@ const SHELL_HASHES = {
   "./js/data/pdf-lite.js": "b924b197ae7f46fe",
   "./js/views/plan-share.js": "0b6f255658b7037b",
   "./js/guide.js": "45e26ccb97e3616b",
-  "./js/data/guides.js": "8e5455e4bf863355",
+  "./js/data/guides.js": "4aa792d5523ba53d",
   "./js/views/help.js": "4d4218955ce16e02",
   "./css/components/help.css": "1ea3aee117dc9aee",
   "./css/components/your-week.css": "c95efbc697af8495",
@@ -4546,7 +4553,7 @@ const SHELL_HASHES = {
   "./js/data/guide-me.js": "ed77e97b8a8a35ea",
   "./js/views/journal-entry.js": "dd38e795ee54e7d7",
   "./js/views/gym-programme.js": "98de0c5929699fb1",
-  "./js/views/prescribed.js": "cabc8749f0e71afc",
+  "./js/views/prescribed.js": "1e354daaab5151b4",
   "./js/views/prescribed-session.js": "ce2eb0c803f66cfe",
   "./js/views/quiet-session.js": "eb439e800dc71d74",
   "./js/views/breathing-session.js": "3d049d83a8e783b9",
@@ -4616,7 +4623,7 @@ const SHELL_HASHES = {
   "./js/data/progress-report.js": "9f12b0421f0c4adb",
   "./js/data/share-images.js": "0812f14d822387ad",
   "./js/views/progress-share.js": "6cf56fe459d112dd",
-  "./css/components/progress-share.css": "761783c7f7c68838",
+  "./css/components/progress-share.css": "ec6b517162be9045",
   "./assets/fonts/newsreader-latin-500-normal.woff2": "5613e2fc8377392c",
   "./assets/fonts/newsreader-latin-400-italic.woff2": "fa9b900403949d9a",
   "./assets/images/brand/alongside-icon-teal.png": "7b5bde05f9e32efe",
@@ -4815,6 +4822,9 @@ const SHELL_URLS = [
   "./js/views/my-move.js",
   "./js/data/my-move.js",
   "./js/data/plan-link.js",
+  "./js/data/live-link.js",
+  "./js/data/live-check.js",
+  "./js/data/relay-config.js",
   "./js/data/qr.js",
   "./js/views/plan-link-send.js",
   "./js/views/plan-link-back.js",
