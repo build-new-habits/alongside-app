@@ -1,6 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 24 Nov 2026 v733
+ *
+ * v733 - P-44 PHYSIO LINK S5 CLOSE (the Plan). Help guide B2, I want my physio or trainer to change my exercises. No new files.
+ *
  * 24 Nov 2026 v732
  *
  * v732 - P-44 PHYSIO LINK S4 (the Plan; Free told it is the Plan's). The link sent back opens What your physio or trainer changed; Put back my old list in My exercises. NEW FILE precached: js/views/plan-link-back.js.
@@ -4309,7 +4313,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v732";
+const CACHE_NAME = "alongside-v733";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4400,7 +4404,7 @@ const SHELL_HASHES = {
   "./js/views/checkin-mini.js": "c647f4da71feddde",
   "./js/views/coach-proposal.js": "816ba25a48fe721e",
   "./js/views/workout.js": "fba068b2e4f6c61f",
-  "./js/views/progress.js": "8338387f9ccd4ba3",
+  "./js/views/progress.js": "7708195f75512d62",
   "./js/views/settings.js": "409f0a13bbb63e89",
   "./js/views/restore-flow.js": "dc81c2e455fa472d",
   "./js/views/weekly-plan.js": "dcee06e297b402c0",
@@ -4467,7 +4471,7 @@ const SHELL_HASHES = {
   "./js/data/my-move.js": "c6ec80cda14e499b",
   "./js/data/plan-link.js": "96a3e9d1839a5928",
   "./js/data/qr.js": "751dbedf04c0b444",
-  "./js/views/plan-link-send.js": "33a9e401ed15f32e",
+  "./js/views/plan-link-send.js": "09858ca11a9d4b59",
   "./js/views/plan-link-back.js": "d2ff57ace2d3e65c",
   "./js/data/week-changes.js": "1bd0a7a6db2c338f",
   "./js/data/little-and-often.js": "9828926d20ce94dc",
@@ -4475,9 +4479,9 @@ const SHELL_HASHES = {
   "./js/data/stretch-stiffness.js": "80d3e230b5f0ecef",
   "./js/data/plan-share.js": "0461891c97ca592b",
   "./js/data/pdf-lite.js": "b924b197ae7f46fe",
-  "./js/views/plan-share.js": "e312030224d6ca4c",
+  "./js/views/plan-share.js": "0b6f255658b7037b",
   "./js/guide.js": "45e26ccb97e3616b",
-  "./js/data/guides.js": "33157dd92b741e9a",
+  "./js/data/guides.js": "8e5455e4bf863355",
   "./js/views/help.js": "4d4218955ce16e02",
   "./css/components/help.css": "1ea3aee117dc9aee",
   "./css/components/your-week.css": "c95efbc697af8495",

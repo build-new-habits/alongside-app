@@ -1,6 +1,8 @@
 /**
  * views/plan-link-send.js
- * 23 Nov 2026 v1
+ * 24 Nov 2026 v2
+ *
+ * v2 - P-44 S5. Guide markers send-share and send-copy.
  *
  * P-44 THE PHYSIO LINK, S2 SEND (spec docs/specs/alongside_physio-link_23nov2026_v1.md
  * section 3; Graeme, 23 Nov: "Yes"). Reached from Share your plan. The Plan
@@ -106,8 +108,8 @@ export function PlanLinkSendView(router) {
       </fieldset>
       ${none ? `<p class="sp-left" id="pl-none">Tick at least one list to send.</p>` : ""}
       <div class="sp-acts">
-        <button class="btn btn-primary btn-large btn-full" id="pl-share"${none ? " disabled" : ""}>Share the link…</button>
-        <button class="btn btn-secondary btn-large btn-full" id="pl-copy"${none ? " disabled" : ""}>Copy link</button>
+        <button class="btn btn-primary btn-large btn-full" id="pl-share" data-guide-target="send-share"${none ? " disabled" : ""}>Share the link…</button>
+        <button class="btn btn-secondary btn-large btn-full" id="pl-copy" data-guide-target="send-copy"${none ? " disabled" : ""}>Copy link</button>
         <button class="btn btn-secondary btn-large btn-full" id="pl-qr"${none ? " disabled" : ""} aria-expanded="${showQr ? "true" : "false"}" aria-controls="pl-qr-box">${showQr ? "Hide the QR code" : "Show a QR code"}</button>
       </div>
       <p class="sh-status" id="pl-status" role="status" aria-live="polite"></p>

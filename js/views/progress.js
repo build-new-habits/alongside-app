@@ -1,6 +1,9 @@
 /**
  * progress.js
- * 23 Nov 2026 v38
+ * 24 Nov 2026 v39
+ *
+ * v39 - P-44 S5. Share your plan's row carries the guide marker share-plan
+ *   (the Plan's row only; Free unchanged).
  *
  * v38 - OWN-NAMES (Graeme, 23 Nov: own exercises showed as "Px 1794424682372 14"). Today's report names
  *   My exercises from the list (ownName), not from their ids.
@@ -586,7 +589,7 @@ export function ProgressView(router) {
       _prRow('year', 'Your year', 'Every session since you started', 'id="progress-year-btn" aria-label="Your year: look back across your year"'),
       _prRow('share', 'Share your progress', 'A picture, a certificate, a report or text', 'data-share-open'),
       // P-33. Share your plan: the Plan's, for a physio or trainer.
-      premium ? _prRow('plan', 'Share your plan', 'Your arc, your week and your lists, for a physio or trainer', 'data-plan-share') : '',
+      premium ? _prRow('plan', 'Share your plan', 'Your arc, your week and your lists, for a physio or trainer', 'data-plan-share data-guide-target="share-plan"') : '',
     ].filter(Boolean);
     return `
       <nav class="pr-card pr-more" aria-label="More on your progress">
