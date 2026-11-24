@@ -1,6 +1,9 @@
 /**
  * assessment.js - Calibration, baseline and ongoing
- * 16 Aug 2026 v2
+ * 24 Nov 2026 v3
+ *
+ * v3 - P-46 S1. The starting level is store.declaredLevel(): a short start
+ *   with no activity level starts from "light", as the builder does.
  *
  * v2 - ASSESS-1 step 3. The read stops being a one-off.
  *
@@ -241,8 +244,7 @@ export function recordAssessmentAnswers(answers) {
   const given = Object.values(answers || {}).filter(v => v in SCORE);
   if (given.length === 0) return null;
 
-  const declared = store.get('fitnessLevel')
-                || store.get('lifestyle.activityLevel')
+  const declared = store.declaredLevel()   // P-46 (store v132)
                 || 'moderate';
   const startIdx = LEVELS.indexOf(declared) >= 0 ? LEVELS.indexOf(declared) : 2;
 

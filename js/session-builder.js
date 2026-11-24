@@ -1,7 +1,11 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
- * 24 Nov 2026 v92
+ * 24 Nov 2026 v93
+ *
+ * v93 - P-46 S1. The difficulty ceiling and the impact gate read
+ *   store.declaredLevel(): a short start with no activity level is built as
+ *   "light" until the person answers. Everyone else is unchanged.
  *
  * v92 - W7-2 LIFTER-WARMUP (Wave 7, 24 Nov). For someone with no ability
  *   limit (_capabilityUnrestricted), the warm-up prefers standing moves,
@@ -2431,8 +2435,7 @@ function _difficultyCeiling() {
   // protects, it does not promote -- somebody answering well does not
   // get handed harder work than their declared activity supports.
   const capProfile = store.capabilityProfile();
-  const declared = store.get("fitnessLevel")
-                || store.get("lifestyle.activityLevel")
+  const declared = store.declaredLevel()   // P-46: a short start with no answer is "light"
                 || "moderate";
   const base = DIFFICULTY_CEILINGS[declared] ?? DIFFICULTY_CEILINGS["moderate"];
   return capProfile.ceilingCap !== null
@@ -3327,9 +3330,7 @@ export function personFilter({ equipment = null } = {}) {
   // not told us they can absorb landing forces. Persona 2.12 (blank
   // slate, sedentary desk job, nothing to personalise against) was
   // served a Jump Squat in her very first session on the old default.
-  const declaredLevel = store.get("fitnessLevel")
-                     || store.get("lifestyle.activityLevel")
-                     || null;
+  const declaredLevel = store.declaredLevel();   // P-46 (store v132)
 
   // CAP-1. The capability screen measures what a person CAN do; the
   // activity level measures how often they move. They answer different
