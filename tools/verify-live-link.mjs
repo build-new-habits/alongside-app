@@ -1,6 +1,10 @@
 /**
  * tools/verify-live-link.mjs
- * 24 Nov 2026 v1
+ * 24 Nov 2026 v2
+ *
+ * v2 - 8c was flaky (about 1 run in 6): it looked for "15" and "Gym" in
+ *   random sealed bytes, where they turn up by chance. It now looks for the
+ *   exercise names and for the unsealed code itself.
  *
  * P-45 THE PHYSIO LINK, Stage 2: the live link (spec
  * docs/specs/alongside_physio-live-link_24nov2026_v1.md). store.js v131,
@@ -277,7 +281,7 @@ await ptype(D.querySelector("#ex-0-0-r"), "15");
 D.querySelector("#ep-make").dispatchEvent(new pg.window.MouseEvent("click", { bubbles: true })); await wait(250);
 const post = relay.calls.find(c => c[0] === "post");
 ok("8b. Send back: sent straight to their phone, said", !!post && txt(D.querySelector("#ep-back-h")) === "Sent straight to their phone" && /next time they open Alongside: Move/.test(pt()));
-ok("8c. only sealed bytes, to that link: no words, no key", post && post[1] === theLink.id && !/Glute|bridge|Gym|15/.test(J(post[2]).replace(/"iv":"[^"]*"/, "")) && !J(post[2]).includes(theLink.key));
+ok("8c. only sealed bytes, to that link: no words, no key", post && post[1] === theLink.id && !/Glute bridge|Gym A|Clamshell/.test(J(post[2])) && !J(post[2]).includes(new URL(D.querySelector("#ep-link").value).hash.slice(9, 40)) && !J(post[2]).includes(theLink.key));
 ok("8d. the back link is there too", D.querySelector("#ep-link").value.startsWith("https://app.buildnewhabits.co.uk/#back=v1."));
 EP._useClient({ ...relay, on: true, post: async () => null });
 await EP.start(new URL(liveOut).hash); await wait(100);
