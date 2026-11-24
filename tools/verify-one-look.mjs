@@ -1,6 +1,13 @@
 import { createRequire as __cr } from "node:module";
 /**
  * tools/verify-one-look.mjs
+ * 24 Nov 2026 v17
+ *
+ * v17 - P-46 S4, after merge. 5b: Free's Home is drawn by free-home.js and
+ *   wired by today.js; Update check-in is opened from those two only. Found
+ *   by the fresh-clone run: 5b finds callers with git grep, and the branch
+ *   run could not see free-home.js before it was committed (as v11).
+ *
  * 24 Nov 2026 v16
  *
  * v16 - P-46 S4 FREE HOME. Free Home is the coach-led Home by Graeme's
@@ -470,7 +477,8 @@ console.log("\nTEST 5 - the scope");
 // v2 (P-13): Mobility & Conditioning left the Plan (split into the Stretch door); verify-library-shelf proves nothing on the Plan opens it.
 ok("5a. P-13 keeps its rooms but My exercises and the twelve-week shape (taken in by Session 9) and Mobility & Conditioning (no longer on the Plan)", P13_ROOMS.length === 0 && !["in-step", "quiet-session", "breathing-session", "core-session", "yoga-session", "classes", "class-player", "session-builder", "morning-session"].some(r => P13_ROOMS.includes(r)) && !P13_ROOMS.includes("prescribed") && !P13_ROOMS.includes("goal-setup") && !P13_ROOMS.includes("mobility-conditioning") && NOT_ON_THE_PLAN.includes("mobility-conditioning") && NOT_ON_THE_PLAN.includes("checkin-mini"), P13_ROOMS.join(", ") || "(none left)");
 const callers = execSync(`git -C "${ROOT}" grep -n "navigate('checkin-mini')\\|data-action=\\"checkin-mini\\"" -- js`, { encoding: "utf8" }).trim().split("\n");
-ok("5b. Update check-in is opened only from Free's Home (today.js)", callers.every(l => l.startsWith("js/views/today.js")), callers.join(" | "));
+// v17 (P-46 S4): Free's Home is drawn by free-home.js and wired by today.js.
+ok("5b. Update check-in is opened only from Free's Home (free-home.js draws it, today.js wires it)", callers.some(l => l.startsWith("js/views/free-home.js")) && callers.every(l => l.startsWith("js/views/free-home.js") || l.startsWith("js/views/today.js")), callers.join(" | "));
 person(); await open("today");
 ok("5c. the Plan's Home does not offer it", !main.querySelector('[data-action="checkin-mini"]') && !!main.querySelector(".path-home, [class*='plan-home']"), txt(main).slice(0, 80));
 
