@@ -1,6 +1,9 @@
 /**
  * js/views/plan-import.js
- * 15 Nov 2026 v4
+ * 24 Nov 2026 v5
+ *
+ * v5 - P-44 S4. A link sent back by a physio or trainer, pasted here, opens
+ *   What your physio or trainer changed (not read as a plan).
  *
  * v4 - P-25 HOW-TO GUIDES. Guide markers only: Your plan (plan-text), Read
  *   my plan (read-plan), Add the ticked ones (add-ticked) and Put them into
@@ -233,6 +236,11 @@ export function PlanImportView(router) {
     $("#pi-read")?.addEventListener("click", () => {
       keepText();
       if (!text.trim()) return fail("Paste your plan into the box first.", "#pi-text");
+      // P-44 S4. A link from a physio or trainer (back), or the one sent (out): not a plan to read.
+      if (/(^|[#=\s])v1\.[A-Za-z0-9_-]{8,}/.test(text.trim())) {
+        router.planBack = text.trim(); text = "";
+        return router.navigate("plan-link-back");
+      }
       plan = readPlan(text);
       for (const d of plan.days) for (const it of d.items) {
         it.chosen = it.match.kind === "matched" ? it.match.id : null;

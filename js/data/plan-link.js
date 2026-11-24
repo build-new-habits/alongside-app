@@ -1,6 +1,12 @@
 /**
  * data/plan-link.js
- * 23 Nov 2026 v1
+ * 24 Nov 2026 v2
+ *
+ * v2 - P-44 S4. changesFrom: an exercise the professional added (no id)
+ *   that the person already has in that list by the same name is that
+ *   exercise, not a new one. So a back link opened again after its changes
+ *   were used reads "nothing changed", not the added ones twice and the
+ *   ones added last time taken out.
  *
  * P-44 THE PHYSIO LINK, Stage 1 (spec docs/specs/alongside_physio-link_23nov2026_v1.md;
  * Graeme, 23 Nov: "Go ahead"). The one codec for the link the person sends
@@ -163,7 +169,8 @@ export function changesFrom(own = [], back) {
     const mine = own.filter(e => e && groupOf(e) === l.g);
     const seen = new Set();
     l.x.forEach((b, k) => {
-      const ex = b.i ? mine.find(e => e.id === b.i) : null;
+      const ex = b.i ? mine.find(e => e.id === b.i)
+        : mine.find(e => !seen.has(e.id) && !l.x.some(o => o.i === e.id) && String(e.name).toLowerCase() === b.n.toLowerCase());
       if (!ex) {
         const amt = amountText(b.s, b.r);
         out.push({ id: `add:${l.g}:${k}`, kind: "added", g: l.g, name: b.n, back: b,

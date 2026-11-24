@@ -1,7 +1,10 @@
 import { createRequire as __cr } from "node:module";
 /**
  * tools/verify-own-today.mjs
- * 23 Nov 2026 v1
+ * 24 Nov 2026 v2
+ *
+ * v2 - The session ticked "today" is earlier today, never in the future:
+ *   run before 07:27 the fixture's 07:27 session was not yet today.
  *
  * OWN-DONE-TODAY and OWN-NAMES (Graeme, 23 Nov, on his phone: My exercises
  * said "Completed today" for exercises he had not done; Progress named his
@@ -55,7 +58,8 @@ const rtr = { history: [], navigate() {}, back() {} };
 globalThis.window.router = rtr;
 
 const now = new Date();
-const today = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 7, 27).toISOString();
+// v2: earlier today, never later than now (at 05:00 a 07:27 session was in the future and not "today").
+const today = new Date(Math.max(new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 1).getTime(), now.getTime() - 60000)).toISOString();
 const yesterday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1, 19, 0).toISOString();
 const lastMinute = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1, 23, 59).toISOString();
 const ex = (id, name, completedAt, extra = {}) => ({ id, name, sets: 1, reps: 8, group: "Evening Release", active: true, completedToday: !!completedAt, completedAt, ...extra });

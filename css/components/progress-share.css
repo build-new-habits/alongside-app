@@ -1,6 +1,9 @@
 /*
  * css/components/progress-share.css
- * 23 Nov 2026 v3
+ * 24 Nov 2026 v4
+ *
+ * v4 - P-44 S4: What your physio or trainer changed (.plb-say, .plb-kind);
+ *   My exercises' Put back my old list (.px-prev).
  *
  * v3 - P-44 S2: Send a link to change (.sp-link-line, the QR code .pl-qr).
  *
@@ -162,3 +165,13 @@
 .sp-link-line, .pl-qr-line { margin: var(--space-4) 0 var(--space-2); color: var(--color-text-secondary); }
 .pl-qr-wrap { background: #fff; padding: var(--space-3); border-radius: var(--radius-lg, 16px); max-width: 360px; margin: 0 auto var(--space-4); }
 .pl-qr { display: block; width: 100%; height: auto; }
+
+/* ---------- P-44 S4 (v4) ---------- */
+.plb-say { margin: var(--space-4) 0; padding: var(--space-3) var(--space-4); border-left: 4px solid var(--color-primary); background: var(--color-surface); border-radius: 0 var(--radius-md, 12px) var(--radius-md, 12px) 0; }
+.plb-say figcaption { font-weight: 700; margin-bottom: var(--space-1); }
+.plb-say blockquote { margin: 0; }
+.plb-kind { font-weight: 700; }
+.px-prev { margin-top: var(--space-4); display: flex; flex-direction: column; gap: var(--space-2); align-items: flex-start; }
+.px-prev p { margin: 0; }
+.px-prev__acts { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.px-prev .btn { min-height: 44px; }

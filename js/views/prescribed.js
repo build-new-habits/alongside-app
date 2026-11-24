@@ -1,7 +1,12 @@
 /**
  * prescribed.js - My exercises
  *
- * 23 Nov 2026 v1.16
+ * 24 Nov 2026 v1.17
+ *
+ * v1.17 - P-44 S4. Put back my old list: after a physio's or trainer's
+ *   changes were used (the Plan), the list as it was, for 30 days
+ *   (ownPrevious). Asks once before it replaces the list. Not tier-gated:
+ *   their own list is free (verify-tiergh 14).
  *
  * v1.16 - OWN-DONE-TODAY (Graeme, 23 Nov: "It says I did these today but I
  *   didn't"). Done today is read through store.ownDoneToday(): ticked today
@@ -152,6 +157,8 @@ export const centered = false;
 
 // ── View state ────────────────────────────────────────────────────────────────
 let showAddForm = false;
+let prevAsk = false;    // P-44 S4: Put back my old list, asked once
+let prevSaid = "";
 
 // ── Coach lines ───────────────────────────────────────────────────────────────
 
@@ -222,7 +229,7 @@ export function render() {
         <p class="coach-message-text">${coachLine}</p>
       </div>
 
-      <!-- ── Exercise list ────────────────────────────────────────────────── -->
+      ${renderPrevious()}<!-- ── Exercise list ────────────────────────────────────────────────── -->
       ${exercises.length === 0
         ? renderEmptyState()
         : renderExerciseList(active, done)
@@ -581,6 +588,21 @@ export function onMount() {
     router.navigate("today");
   });
 
+  // ── P-44 S4. Put back my old list ────────────────────────────────────────
+  document.getElementById("px-prev-btn")?.addEventListener("click", () => {
+    prevAsk = true; prevSaid = ""; rerender(); document.getElementById("px-prev-yes")?.focus();
+  });
+  document.getElementById("px-prev-no")?.addEventListener("click", () => {
+    prevAsk = false; rerender(); document.getElementById("px-prev-btn")?.focus();
+  });
+  document.getElementById("px-prev-yes")?.addEventListener("click", () => {
+    const prev = store.get("ownPrevious");
+    if (prev) { store.set("prescribedExercises", prev.list); store.setOwnPrevious(null); }
+    prevAsk = false; prevSaid = "Your list is as it was before the changes.";
+    rerender(); document.getElementById("px-prev-h")?.focus();
+    prevSaid = "";
+  });
+
   // ── Start session ─────────────────────────────────────────────────────────
   document.getElementById("px-start-session-btn")?.addEventListener("click", () => {
     store.set("myExercisesGroup", null);   // D-7: all of them
@@ -679,6 +701,26 @@ function removeExercise(id) {
 
   store.set("prescribedExercises", exercises.filter(e => e.id !== id));
   rerender();
+}
+
+/** P-44 S4. The list before a professional's changes were used, for 30 days. */
+function renderPrevious() {
+  // Not tier-gated (verify-tiergh 14: a person's own list is free). Only the
+  // Plan can use a professional's changes, so only a Plan writes ownPrevious;
+  // a list kept from before someone left the Plan is still theirs to put back.
+  const prev = store.get("ownPrevious");
+  if (!prev && !prevSaid) return "";
+  const until = prev ? new Date(Date.parse(prev.at) + store.OWN_PREVIOUS_DAYS * 864e5).toLocaleDateString("en-GB", { day: "numeric", month: "long" }) : "";
+  return `<section class="card px-prev" aria-labelledby="px-prev-h">
+    ${prev ? `<h2 class="section-heading" id="px-prev-h" tabindex="-1">Your list before the last changes</h2>
+    <p>Kept until ${until}, in case you want it back.</p>
+    ${prevAsk ? `<p><strong>Put back your old list?</strong> Your list now will be replaced by it.</p>
+      <div class="px-prev__acts"><button class="btn btn-primary" id="px-prev-yes">Yes, put it back</button>
+      <button class="btn btn-secondary" id="px-prev-no">Cancel</button></div>`
+      : `<button class="btn btn-secondary" id="px-prev-btn">Put back my old list</button>`}`
+    : `<h2 class="section-heading" id="px-prev-h" tabindex="-1">Your old list is back</h2>`}
+    <p class="sh-status" id="px-prev-status" role="status" aria-live="polite">${prevSaid}</p>
+  </section>`;
 }
 
 function rerender() {

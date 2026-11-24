@@ -1,5 +1,7 @@
 # Alongside: Move — The physio link, Stage 1 (P-40) spec
-## 23 Nov 2026 v1
+## 24 Nov 2026 v2
+
+v2 - **S4 BACK built 24 Nov** (Graeme: *"Yes please"*). `views/plan-link-back.js` v1 (route `plan-link-back`, `router.js` v60): *What your physio or trainer changed*: their line (*They wrote*), each change in words with *Changed.* before a change, all ticked; **Use all of it** / **Use the n ticked** / **Keep my list**; using them keeps the list as it was (`ownPrevious`) and says *My exercises › Put back my old list*. Their notes kept only with the health consent (said when not). The same link opened again reads *Nothing to change* (`data/plan-link.js` v2: an added exercise the person already has by name in that list is that exercise; the website's copy updated byte for byte). `app.js` v17 takes `#back=…` out of the address before any screen; with nobody set up (an iPhone's Safari) it says so and offers **Copy this link** or *Set up here instead*; a link tapped with the app open works too. `plan-import.js` v5: a pasted link opens it. `prescribed.js` v1.17: *Your list before the last changes · Kept until …* and **Put back my old list**, asked once (not tier-gated: their own list is free, verify-tiergh 14; only the Plan writes it). `verify-write1` v17: the dated promise kept. Gate `verify-physio-back` 39 (red on v731; reversals red); real browser 0 faults.
 
 S1 built 23 Nov: `store.js` v130 (`ownPrevious`), Schema v1.132, `data/plan-link.js` v1; gate `verify-plan-link` (56; red on v729, reversals red).
 S2 and S3 built 23 Nov: `views/plan-link-send.js` v1 (route `plan-link-send`, `router.js` v59; from Share your plan v2), `data/qr.js` (qrcode-generator 1.4.4, MIT, vendored); website `edit-plan/` v1 (with `css/main.css` v4: the footer's email address wrapped, a site-wide overflow at 200% text). The QR code shows for links up to 1,200 characters (`QR_MAX`). Gate `verify-physio-link` (44, end to end; red on v730, reversals red); real browser: `chromium-my-move.mjs` v6 (Send) and `chromium-edit-plan.mjs` v1 (the page, 12 views, axe), 0 faults.
@@ -56,9 +58,9 @@ The Plan: sending the link and *What your physio changed* (P-40: *Share my plan 
 | **S1 SCHEMA AND LINK** (built) | `ownPrevious` (store, Schema); `data/plan-link.js`: encode, decode, check, and the changes between two lists in words | `store.js`, `Schema.md`, `data/plan-link.js` (new) | `verify-plan-link` |
 | **S2 SEND** (built) | *Send a link to edit*: choose, make, share, copy; the QR code (`data/qr.js`, vendored, MIT) | `plan-share` views, `data/qr.js` (new) | `verify-plan-link-send` |
 | **S3 THE PAGE** (built) | `buildnewhabits.co.uk/edit-plan/`: read, edit, add, remove, say a line, Send back; the iPhone note; WCAG 2.2 AA; no third-party anything | website `edit-plan/` | `verify-edit-plan` (app repo, reads `../website`) |
-| **S4 BACK** | the back link at start-up and pasted; *What your physio changed*; Use all, choose, Keep my list; `ownPrevious`; *Put back my old list* | `app.js`, `plan-import.js`, a new view, `prescribed.js`, `router.js` | `verify-plan-link-back` |
+| **S4 BACK** (built) | the back link at start-up and pasted; *What your physio changed*; Use all, choose, Keep my list; `ownPrevious`; *Put back my old list* | `app.js`, `plan-import.js`, a new view, `prescribed.js`, `router.js` | `verify-plan-link-back` |
 | **S5 CLOSE** | Help guide, glossary, a Privacy Policy line drafted for Graeme and Foot Anstey, the device checklist sitting, real-browser checks on both sites | `guides.js`, BNH-Files | full suite from a fresh clone |
 
 ---
 
-*Build New Habits · Alongside: Move · The physio link, Stage 1 · 23 Nov 2026 v1*
+*Build New Habits · Alongside: Move · The physio link, Stage 1 · 24 Nov 2026 v2*
