@@ -1,6 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 24 Nov 2026 v736
+ *
+ * v736 - OUT-LINK-ROBUST (the Plan). Send a link to change: one odd exercise never stops the link being made. No new files.
+ *
  * 24 Nov 2026 v735
  *
  * v735 - SHARE-NOW (the Plan). Send a link to change: Share opens the phone's share sheet (the link is ready before the tap); if it can't, the link is copied and it says so. No new files.
@@ -4321,7 +4325,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v735";
+const CACHE_NAME = "alongside-v736";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4477,7 +4481,7 @@ const SHELL_HASHES = {
   "./js/views/change-today.js": "31101d97d53492c8",
   "./js/views/my-move.js": "bc53b61cdf65da20",
   "./js/data/my-move.js": "c6ec80cda14e499b",
-  "./js/data/plan-link.js": "96a3e9d1839a5928",
+  "./js/data/plan-link.js": "ebeb09703328fab6",
   "./js/data/live-link.js": "e8d57b2c0a7cec36",
   "./js/data/live-check.js": "8a492b3619d9c114",
   "./js/data/relay-config.js": "3b41decd73b14858",
