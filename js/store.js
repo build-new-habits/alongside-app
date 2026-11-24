@@ -6,7 +6,16 @@ import { validateWeightTarget } from "./data/weight-targets.js";
 
 /**
  * store.js - Data persistence layer
- * 24 Nov 2026 v131
+ * 24 Nov 2026 v132
+ *
+ * v132 - P-46 FREE-AND-FIRST S1, schema first (spec
+ *   docs/specs/alongside_free-and-first_24nov2026_v1.md). onboarding.flow:
+ *   "short" for anyone who comes through the one-minute start, else null.
+ *   askLater { activity | goals | weekly: { shownAt, answeredAt, notNowAt } }:
+ *   the questions asked once, later (setAskLater). declaredLevel(): the
+ *   activity level the builder and the assessment read; a short start with
+ *   no answer reads as "light" until the person answers (the old start is
+ *   unchanged: null, which they read as moderate). Schema v1.134.
  *
  * v131 - P-45 THE LIVE LINK, schema first (spec
  *   docs/specs/alongside_physio-live-link_24nov2026_v1.md). liveLinks: the
@@ -1481,7 +1490,8 @@ export const store = {
             ...saved.onboarding,
             hardBeforeSelections: Array.isArray(saved.onboarding.hardBeforeSelections)
               ? saved.onboarding.hardBeforeSelections
-              : []
+              : [],
+            flow: saved.onboarding.flow === 'short' ? 'short' : null   // P-46 (v132)
           }
         : defaults.onboarding,
 
@@ -1834,6 +1844,7 @@ export const store = {
       ownPrevious: this.cleanOwnPrevious(saved.ownPrevious),
       liveLinks: this.cleanLiveLinks(saved.liveLinks),
       liveInbox: this.cleanLiveInbox(saved.liveInbox),
+      askLater: this.cleanAskLater(saved.askLater),   // P-46 (v132)
       myExercisesGroup: typeof saved.myExercisesGroup === "string" && saved.myExercisesGroup.trim()
         ? saved.myExercisesGroup.replace(/[<>]/g, "").slice(0, 40) : null,
 
@@ -2282,6 +2293,43 @@ export const store = {
    * id), msg (the relay's number), code (the plan link's code, "v1.…"), at
    * (ISO, when it came), noticed (Home has asked once) }. 20 at most, 30 days.
    */
+  /** P-46 (v132). The questions asked once, later (spec section 4). */
+  ASK_LATER_IDS: ['activity', 'goals', 'weekly'],
+
+  /** P-46 (v132). askLater made safe: known ids only, three dates each, anything unreadable null. */
+  cleanAskLater(src) {
+    const out = {};
+    if (!src || typeof src !== 'object' || Array.isArray(src)) return out;
+    const date = v => (typeof v === 'string' && v.length <= 40 && !isNaN(Date.parse(v))) ? v : null;
+    for (const id of this.ASK_LATER_IDS) {
+      const r = src[id];
+      if (!r || typeof r !== 'object' || Array.isArray(r)) continue;
+      out[id] = { shownAt: date(r.shownAt), answeredAt: date(r.answeredAt), notNowAt: date(r.notNowAt) };
+    }
+    return out;
+  },
+
+  /** P-46 (v132). The one writer of askLater: merges a patch for one known question. */
+  setAskLater(id, patch = {}) {
+    if (!this.ASK_LATER_IDS.includes(id)) return false;
+    const cur = this.cleanAskLater(this.data.askLater);
+    cur[id] = { ...(cur[id] || { shownAt: null, answeredAt: null, notNowAt: null }), ...patch };
+    this.data.askLater = this.cleanAskLater(cur);
+    this.save();
+    return true;
+  },
+
+  /**
+   * P-46 (v132). The activity level the builder and the assessment read.
+   * A short start with no answer reads as "light" (spec section 3); the old
+   * start with no answer stays null, which they read as moderate, as before.
+   */
+  declaredLevel() {
+    const lvl = this.get('fitnessLevel') || this.get('lifestyle.activityLevel') || null;
+    if (lvl) return lvl;
+    return this.get('onboarding.flow') === 'short' ? 'light' : null;
+  },
+
   cleanLiveInbox(src, now = new Date()) {
     if (!Array.isArray(src)) return [];
     const U = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
@@ -2550,7 +2598,10 @@ export const store = {
         reflectionShownAt:   null,  // ISO string|null — Step 4 timing
 
         // ── Beat 1: The Castle (v6 — field kept for analytics) ─
-        castleShownAt:       null   // ISO string|null — arrival.js retired but field preserved
+        castleShownAt:       null,  // ISO string|null — arrival.js retired but field preserved
+
+        // ── P-46 (v132) ──────────────────────────────────────
+        flow:                null   // "short" | null — the one-minute start (null: the old conversation, or not yet)
       },
 
       // ── PROFILE ───────────────────────────────────────────────
@@ -2948,6 +2999,7 @@ export const store = {
       ownPrevious: null,
       liveLinks: [],
       liveInbox: [],
+      askLater: {},   // P-46 (v132): { activity|goals|weekly: { shownAt, answeredAt, notNowAt } }
       // P-39 MAKING MY MOVE (v125). Spec section 7.
       myMove: { step: null, made: null, purposes: [], most: null, goodDay: 'few', hardDay: ['coach'], dismissed: [], day: null, startClosed: null, review: null },
 

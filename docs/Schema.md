@@ -1,5 +1,8 @@
 # Alongside — Data Schema Reference
-## 24 Nov 2026 v1.133
+## 24 Nov 2026 v1.134
+
+> **v1.134, 24 Nov 2026 — P-46 FREE-AND-FIRST S1, schema first** (`store.js` v132). Spec `docs/specs/alongside_free-and-first_24nov2026_v1.md`; Graeme, 24 Nov (mock-up approved: *"I love all of it"*). **Two additions, both tiers.** **`onboarding.flow`** `"short"` or `null` (default `null`): `"short"` for anyone who comes through the one-minute start (S2 writes it); `null` for anyone who finished the old conversation, or has not started. **On load** anything but `"short"` → `null`. **Read by** `store.declaredLevel()`. **`askLater`** `{ activity, goals, weekly }`, each `{ shownAt, answeredAt, notNowAt }` (ISO or `null`; default `{}`): the questions asked once, later (spec §4). **Written by** `store.setAskLater(id, patch)` (S3's Home card); **read by** S3. **On load** unknown ids, non-objects and other keys are dropped; an unreadable date is `null`. Not a health answer. **New method, no field:** `store.declaredLevel()` = `fitnessLevel`, else `lifestyle.activityLevel`, else `"light"` when `onboarding.flow` is `"short"`, else `null`; read by `session-builder.js` v93 (difficulty ceiling, impact gate) and `data/assessment.js` v3 (the starting level). The old start is unchanged (`null`, read as moderate). Restore carries both (they are store defaults). Gated by `tools/verify-p46-schema.mjs`.
+>
 
 > **v1.133, 24 Nov 2026 — P-45 THE LIVE LINK, schema first** (`store.js` v131). Spec `docs/specs/alongside_physio-live-link_24nov2026_v1.md`; Graeme, 24 Nov (*"Stage 2 please"*). **Two additions, the Plan only; empty while the relay is not set up (`js/data/relay-config.js`).** **`liveLinks`** `[{ id, key, owner, openedAt, after, lists }]` (default `[]`): the live links this phone opened. `id` a v4 UUID (the relay's channel); `key` the AES-GCM key and `owner` the phone's secret, 43 base64url characters each, both kept only here (the relay holds a SHA-256 of `owner`, never `key`); `openedAt` ISO; `after` the last message collected; `lists` the list names sent. 5 at most; one opened over 90 days ago has ended and is dropped on load. **Written by** `views/plan-link-send.js` (open, Stop) and `data/live-check.js` (`after`); **read by** both. **`liveInbox`** `[{ link, msg, code, at, noticed }]` (default `[]`): changes sent through a live link, collected and unsealed, not yet looked at; `code` is the plan link's code (`v1.…`), which may hold the professional's notes. 20 at most, 30 days. **Written by** `data/live-check.js`, Home's question (`noticed`) and *What your physio or trainer changed* (removed when used or kept); **read by** Home and My exercises. *Delete my health answers* empties it. Gated by `tools/verify-live-link.mjs`.
 >
@@ -1110,7 +1113,7 @@
 
 ## 06 Sep 2026 v1.51
 
-**File:** `js/store.js` (confirmed live version: **v131, 24 Nov 2026**)
+**File:** `js/store.js` (confirmed live version: **v132, 24 Nov 2026**)
 
 > **v1.47, 06 Sep 2026 — CR-1.** `conditions[]` gains three ids and loses one. `chronic-fatigue` is **retired**; `persistent-fatigue`, `me-cfs` and `long-covid` replace it. No field shape changed — `conditions` is still `string[]` and `conditionMeta` is still keyed by condition id.
 >

@@ -1,7 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 24 Nov 2026 v737
+ * 24 Nov 2026 v738
+ *
+ * v738 - P-46 S1 SCHEMA (both tiers). onboarding.flow and askLater; a short start with no activity level is built gentle. Nothing changes on screen yet. New file: none.
  *
  * v737 - W7-1 and W7-2 (Wave 7). A first plan says "A balanced first session"; a warm-up for someone with no ability limit stands. No new files.
  *
@@ -4327,7 +4329,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v737";
+const CACHE_NAME = "alongside-v738";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4394,7 +4396,7 @@ const SHELL_HASHES = {
   "./css/components/finish.css": "c33e298d5fcb92ae",
   "./js/app.js": "511e961b15840a9e",
   "./js/router.js": "a3aca7c4df9422bf",
-  "./js/store.js": "2cb441d9cc1afea5",
+  "./js/store.js": "da198c2848d498f0",
   "./js/session-log.js": "6134de4315842e05",
   "./js/exercise-feedback.js": "adba8549f444da2a",
   "./js/exercise-card.js": "4ed40e63efe33a26",
@@ -4530,7 +4532,7 @@ const SHELL_HASHES = {
   "./js/data/support-lines.js": "0c1286fa510e427e",
   "./js/data/consent-version.js": "c1a39ed44cc24157",
   "./js/views/my-programme.js": "b28f193145da0c1a",
-  "./js/session-builder.js": "7d1b1540f9dcc767",
+  "./js/session-builder.js": "df8b660e695bb146",
   "./js/data/session-choice.js": "954463b0647f3843",
   "./js/data/saved-sessions.js": "3e43e131c645626f",
   "./js/data/class-contract.js": "fe8f3f22b0df50f6",
@@ -4587,7 +4589,7 @@ const SHELL_HASHES = {
   "./js/data/first-session.js": "4803879459a70821",
   "./js/data/pacing.js": "6d73dd69633dbaf0",
   "./js/data/week-focus.js": "7ef62ccb4eab0729",
-  "./js/data/assessment.js": "abbb5c432a0d6f3c",
+  "./js/data/assessment.js": "0832674e28e375ef",
   "./js/data/session-moments.js": "85608dcfb8a34055",
   "./js/data/conditions.js": "7869a336d4fdfcc8",
   "./js/data/equipment.js": "b1d233c36eaf6270",
