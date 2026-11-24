@@ -1,6 +1,11 @@
 /**
  * data/plan-link.js
- * 24 Nov 2026 v2
+ * 24 Nov 2026 v3
+ *
+ * v3 - outFromOwn never fails on one odd entry (Graeme, 24 Nov: the link
+ *   didn't copy or share). A sets number outside 1 to 20, or an id or
+ *   library id the rules don't allow, is left out of that exercise rather
+ *   than refusing the whole list; past 60 exercises, the rest are left out.
  *
  * v2 - P-44 S4. changesFrom: an exercise the professional added (no id)
  *   that the person already has in that list by the same name is that
@@ -132,11 +137,14 @@ export function outFromOwn(own = [], { groups = null, notes = false, by = "", at
     if (!e || typeof e.name !== "string") continue;
     const g = clean(e.group, LIMITS.group) || NO_GROUP;
     if (groups && !groups.includes(g)) continue;
+    if (!clean(e.name, LIMITS.name)) continue;
+    if (lists.reduce((k, o) => k + o.x.length, 0) >= LIMITS.exercises) break;
     let l = lists.find(o => o.g === g);
-    if (!l) lists.push(l = { g, x: [] });
-    const one = { i: e.id, n: e.name };
-    if (e.exerciseId) one.l = e.exerciseId;
-    if (Number.isInteger(e.sets)) one.s = e.sets;
+    if (!l) { if (lists.length >= LIMITS.lists) continue; lists.push(l = { g, x: [] }); }
+    const one = { n: e.name };
+    if (typeof e.id === "string" && /^[\w-]{1,60}$/.test(e.id)) one.i = e.id;
+    if (typeof e.exerciseId === "string" && /^[\w-]{1,80}$/.test(e.exerciseId)) one.l = e.exerciseId;
+    if (Number.isInteger(e.sets) && e.sets >= 1 && e.sets <= LIMITS.sets) one.s = e.sets;
     if (e.reps) one.r = String(e.reps);
     if (notes && e.notes) one.nt = String(e.notes);
     l.x.push(one);
