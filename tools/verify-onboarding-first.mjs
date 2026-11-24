@@ -1,5 +1,11 @@
 /**
  * tools/verify-onboarding-first.mjs
+ * 24 Nov 2026 v2
+ *
+ * v2 - P-46 S2. 1a re-pointed: with only the first tick the person goes on
+ *   to the one-minute start (which skips its sore-area and body questions
+ *   without the health consent: verify-p46-start TEST 4). No assertion loosened.
+ *
  * 02 Oct 2026 v1
  *
  * W4-19 ONBOARDING-FIRST (Wave 4 persona trace: 2.11, 2.12, 2.16).
@@ -65,7 +71,8 @@ const tick = el => { el.checked = true; el.dispatchEvent(new dom.window.Event("c
 
 async function mount() {
   const el = oneScreen(document.createElement("div"));
-  ThreadView({ navigate() {}, back() {} }).mount(el);
+  globalThis.__nav = [];
+  ThreadView({ navigate(r) { globalThis.__nav.push(r); }, back() {} }).mount(el);
   await wait(2300);
   return el;
 }
@@ -84,7 +91,8 @@ ok("1pc. the consent screen", !!el.querySelector("#ob-consent-check"), txt(el).s
 tick(el.querySelector("#ob-consent-check"));
 ok("1a0. one tick: Continue shows as ready", el.querySelector("#ob-consent-continue").getAttribute("aria-disabled") === "false" && !el.querySelector("#ob-consent-continue").classList.contains("is-inactive"));
 click(el.querySelector("#ob-consent-continue")); await wait(60);
-ok("1a. with only the Privacy and Terms tick, the person goes on", store.get("consent.given") === true && typeof store.get("onboarding.threadStartedAt") === "string",
+// P-46 S2 (re-pointed, not loosened): going on is now the one-minute start.
+ok("1a. with only the Privacy and Terms tick, the person goes on", store.get("consent.given") === true && globalThis.__nav.includes("onboarding/start"),
    txt(el).slice(0, 200));
 ok("1b. health consent recorded as declined, not given", store.get("consent.health.given") === false && !!store.get("consent.health.declinedAt"), JSON.stringify(store.get("consent.health")));
 const HEALTH_STEPS = ["3a", "3b", 4, 8, "9a", "9b", "9c", "9d", "9e", 10];

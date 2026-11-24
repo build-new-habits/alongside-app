@@ -1,7 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 24 Nov 2026 v738
+ * 24 Nov 2026 v739
+ *
+ * v739 - P-46 S2 GETTING STARTED (both tiers). After the age question and the agreements, someone new answers four short screens: your name; anything sore; where you move and what's easy; your first session (Today's plan, gentle). Anyone part-way through the old conversation carries on there. NEW FILES precached: js/views/onboarding/start.js, css/components/start.css.
  *
  * v738 - P-46 S1 SCHEMA (both tiers). onboarding.flow and askLater; a short start with no activity level is built gentle. Nothing changes on screen yet. New file: none.
  *
@@ -4329,7 +4331,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v738";
+const CACHE_NAME = "alongside-v739";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4337,9 +4339,9 @@ const CACHE_NAME = "alongside-v738";
 // downloads only the rest: it fetched all of them (about 6 MB) every time.
 // SHELL_HASHES:BEGIN
 const SHELL_HASHES = {
-  "./": "950e243d77032111",
-  "./index.html": "950e243d77032111",
-  "./css/main.css": "736c69954dcc167f",
+  "./": "bfe9e923879dd010",
+  "./index.html": "bfe9e923879dd010",
+  "./css/main.css": "c0d7e4b65c2e0303",
   "./css/base/fonts.css": "04893bbdfa4cf013",
   "./css/layouts/onboarding-additions.css": "43a85bf31e18712f",
   "./css/layouts/today.css": "c1b636255096d8af",
@@ -4394,8 +4396,8 @@ const SHELL_HASHES = {
   "./css/components/club-rooms.css": "f1c069c5b8eaf09e",
   "./css/components/capture.css": "343b4ae0dc6fe6ea",
   "./css/components/finish.css": "c33e298d5fcb92ae",
-  "./js/app.js": "511e961b15840a9e",
-  "./js/router.js": "a3aca7c4df9422bf",
+  "./js/app.js": "81ed92c5ada71eb8",
+  "./js/router.js": "72429ae70e4499a5",
   "./js/store.js": "da198c2848d498f0",
   "./js/session-log.js": "6134de4315842e05",
   "./js/exercise-feedback.js": "adba8549f444da2a",
@@ -4468,6 +4470,7 @@ const SHELL_HASHES = {
   "./js/views/build-session.js": "763317cec8c62e83",
   "./js/data/build-lately.js": "e06714cc9d1539a6",
   "./css/components/path.css": "a099858d00434d21",
+  "./css/components/start.css": "cefb7c778870cb30",
   "./js/data/red-flag.js": "3cd9eecbc3985eb3",
   "./js/data/health-consent.js": "a23d005af57f179c",
   "./js/data/age-check.js": "7fa5b0f5a6b34770",
@@ -4484,6 +4487,7 @@ const SHELL_HASHES = {
   "./js/views/plan-import.js": "027c3f9fc203c613",
   "./js/views/change-today.js": "31101d97d53492c8",
   "./js/views/my-move.js": "bc53b61cdf65da20",
+  "./js/views/onboarding/start.js": "5f52e26da854742b",
   "./js/data/my-move.js": "c6ec80cda14e499b",
   "./js/data/plan-link.js": "ebeb09703328fab6",
   "./js/data/live-link.js": "e8d57b2c0a7cec36",
@@ -4499,7 +4503,7 @@ const SHELL_HASHES = {
   "./js/data/plan-share.js": "0461891c97ca592b",
   "./js/data/pdf-lite.js": "b924b197ae7f46fe",
   "./js/views/plan-share.js": "0b6f255658b7037b",
-  "./js/guide.js": "45e26ccb97e3616b",
+  "./js/guide.js": "5a0fdd80790faafe",
   "./js/data/guides.js": "4aa792d5523ba53d",
   "./js/views/help.js": "4d4218955ce16e02",
   "./css/components/help.css": "1ea3aee117dc9aee",
@@ -4576,7 +4580,7 @@ const SHELL_HASHES = {
   "./js/views/running-session.js": "3fcc750fa8c6214d",
   "./js/views/swim-session.js": "796864e209d35cb8",
   "./js/views/cycle-session.js": "5cf63e9171ece8d8",
-  "./js/views/onboarding/thread.js": "40cace02bcb67ddd",
+  "./js/views/onboarding/thread.js": "5f909fd403fdbbd2",
   "./js/views/onboarding/sheet-manager.js": "20cb675f242157c8",
   "./js/views/onboarding/goals.js": "ec29181741c4bc1e",
   "./js/views/onboarding/conditions.js": "f719e4e253244b9e",
@@ -4816,6 +4820,7 @@ const SHELL_URLS = [
   "./js/views/build-session.js",
   "./js/data/build-lately.js",
   "./css/components/path.css",
+  "./css/components/start.css",
   "./js/data/red-flag.js",
   "./js/data/health-consent.js",
   "./js/data/age-check.js",
@@ -4832,6 +4837,7 @@ const SHELL_URLS = [
   "./js/views/plan-import.js",
   "./js/views/change-today.js",
   "./js/views/my-move.js",
+  "./js/views/onboarding/start.js",
   "./js/data/my-move.js",
   "./js/data/plan-link.js",
   "./js/data/live-link.js",

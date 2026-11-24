@@ -1,5 +1,12 @@
 /**
  * tools/verify-ob-detached.mjs
+ * 24 Nov 2026 v2
+ *
+ * v2 - P-46 S2. The old conversation is now reached part-way, so the
+ *   fixture starts there (tools/part-way.mjs) and 0a waits for that step's
+ *   answers, not the name box. The timing fault and its assertions are
+ *   unchanged. (The one-minute start draws nothing on a timer.)
+ *
  * 06 Nov 2026 v1
  *
  * P-28 FINISH. A fault found by chromium-p28's harness (both tiers): the
@@ -38,6 +45,7 @@ const { router } = await import(B + "router.js");
 router.navigate = () => {};
 const { ThreadView } = await import(B + "views/onboarding/thread.js");
 const { agreed } = await import(new URL("./agreed.mjs", import.meta.url).href);
+const { partWay } = await import(new URL("./part-way.mjs", import.meta.url).href);
 
 let fails = 0, passes = 0;
 const ok = (name, cond, detail = "") => {
@@ -47,14 +55,16 @@ const ok = (name, cond, detail = "") => {
 const wait = ms => new Promise(r => setTimeout(r, ms));
 async function until(fn, ms = 8000) { for (let t = 0; t < ms; t += 50) { if (fn()) return true; await wait(50); } return false; }
 // Agreed already (the age and consent screens done), so the conversation starts at once.
-function fresh() { localStorage.clear(); store.init(); agreed(store); const m = document.getElementById("main-content"); m.innerHTML = ""; return m; }
+// P-46 S2: the old conversation is reached part-way (tools/part-way.mjs); it
+// resumes with "Welcome back", then draws the step reached on a timer.
+function fresh() { partWay(store); const m = document.getElementById("main-content"); m.innerHTML = ""; return m; }
 
 console.log("\nTEST 0 - positive control");
 {
   const main = fresh();
   ThreadView(router).mount(main);
-  const reached = await until(() => !!main.querySelector(".ob-input-bar__field"));
-  ok("0a. left alone, the thread reaches the name box", reached, (main.textContent || "").slice(0, 80));
+  const reached = await until(() => !!main.querySelector(".ob-chips, .ob-input-bar__field"));
+  ok("0a. left alone, the thread reaches the step's answers", reached, (main.textContent || "").slice(0, 80));
   ok("0b. without an error", errors.length === 0, errors.join(" | "));
 }
 
@@ -70,7 +80,7 @@ console.log("\nTEST 1 - left before the next step is due");
   const next = main;
   await wait(6000);
   ok("1a. nothing throws when the step comes due", errors.length === 0, errors.join(" | "));
-  ok("1b. nothing is drawn into the page that replaced it", !next.querySelector(".ob-input-bar, .ob-thread"), next.innerHTML.slice(0, 120));
+  ok("1b. nothing is drawn into the page that replaced it", !next.querySelector(".ob-input-bar, .ob-chips, .ob-thread"), next.innerHTML.slice(0, 120));
 }
 
 console.log(`\n${passes} passed, ${fails} failed`);

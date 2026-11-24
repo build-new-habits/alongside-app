@@ -1,5 +1,10 @@
 /**
  * tools/verify-consent2.mjs
+ * 24 Nov 2026 v5
+ *
+ * v5 - P-46 S2. "The thread began" re-pointed: after consent, getting
+ *   started begins at the one-minute start (navigates onboarding/start).
+ *
  * 02 Oct 2026 v4
  *
  * v4 - W4-0 SUITE-TRUE. Mounts through tools/one-screen.mjs, so one screen
@@ -100,7 +105,8 @@ async function openGate({ attached = true } = {}) {
   store.init();
   const el = document.createElement("div");
   if (attached) oneScreen(el);
-  ThreadView({ navigate() {} }).mount(el);
+  globalThis.__nav = [];
+  ThreadView({ navigate(r) { globalThis.__nav.push(r); } }).mount(el);
   await wait(2500);
   { const mo = el.querySelector("#ob-age-month"), yr = el.querySelector("#ob-age-year"); if (mo && yr) { mo.value = "1"; yr.value = "1990"; el.querySelector("#ob-age-continue").dispatchEvent(new dom.window.Event("click")); await wait(20); } }
   return el;
@@ -186,7 +192,9 @@ section("3. Ticking and continuing records consent");
   ok("it matches the POLICY_VERSION constant actually shipping",
      m && v === m[1], `store ${v} vs source ${m && m[1]}`);
 
-  ok("the thread began", typeof store.get("onboarding.threadStartedAt") === "string");
+  // P-46 S2 (re-pointed, not loosened): getting started begins after
+  // consent; for someone new it is the one-minute start.
+  ok("getting started began (the one-minute start)", globalThis.__nav.includes("onboarding/start"), JSON.stringify(globalThis.__nav));
 }
 
 // ── 4. Consent is remembered ────────────────────────────────────────

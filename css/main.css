@@ -1,4 +1,8 @@
 /* main.css
+ * 24 Nov 2026 v36
+ *
+ * v36 - P-46 S2. components/start.css imported (the one-minute start).
+ *
  * 15 Nov 2026 v35
  *
  * v35 - P-25 HOW-TO GUIDES. components/help.css imported (Help, How do
@@ -184,6 +188,7 @@
 @import 'components/your-week.css';    /* D-6 WEEK-SHAPE, 05 Oct 2026 */
 @import 'components/progress-share.css'; /* D-11 PROGRESS-SHARE, 06 Oct 2026 */
 @import 'components/path.css';         /* STAGE PATH P-4, 28 Oct 2026 */
+@import 'components/start.css';        /* P-46 S2, 24 Nov 2026 */
 @import 'components/in-step.css';      /* P-28 EMPATHY-THREAD, 06 Nov 2026 */
 @import 'components/help.css';         /* P-25 HOW-TO GUIDES, 15 Nov 2026 */
 /* Content-gated — add when content sessions complete */

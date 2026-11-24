@@ -1,5 +1,12 @@
 /**
  * tools/verify-onboarding-echoes.mjs
+ * 24 Nov 2026 v5
+ *
+ * v5 - P-46 S2. The old conversation is now reached only part-way (the
+ *   one-minute start replaced it for anyone new), so the walk starts there
+ *   (tools/part-way.mjs) instead of at the age and consent screens, which
+ *   are checked on their own and unchanged. No assertion changed.
+ *
  * 04 Oct 2026 v4
  *
  * v4 - LOOK-1: TEST 3 looks for the Activity level row on each Settings
@@ -24,6 +31,7 @@
  *
  * Walks the real onboarding thread, sheets included, then opens Settings.
  */
+import { partWay } from "./part-way.mjs";
 import { createRequire } from "node:module";
 import { settingsSection } from "./settings-open.mjs";
 const require = createRequire(import.meta.url);
@@ -59,15 +67,11 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
 const txt = el => (el?.textContent || "").replace(/\s+/g, " ").trim();
 const click = el => el?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }));
 
-localStorage.clear(); store.init();
+partWay(store);   // P-46 S2: the old conversation is reached part-way (tools/part-way.mjs)
 const el = document.createElement("div"); document.body.appendChild(el);
 ThreadView(rtr).mount(el);
 await wait(2500);
   { const mo = el.querySelector("#ob-age-month"), yr = el.querySelector("#ob-age-year"); if (mo && yr) { mo.value = "1"; yr.value = "1990"; el.querySelector("#ob-age-continue").dispatchEvent(new dom.window.Event("click")); await wait(20); } }
-const check = el.querySelector("#ob-consent-check");
-check.checked = true; check.dispatchEvent(new dom.window.Event("change"));
-{ const h = el.querySelector("#ob-consent-health"); if (h) { h.checked = true; h.dispatchEvent(new dom.window.Event("change")); } }
-el.querySelector("#ob-consent-continue").dispatchEvent(new dom.window.Event("click"));
 await wait(300);
 
 // Walk it as a person would, choosing real things in the sheets.

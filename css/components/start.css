@@ -1,0 +1,55 @@
+/**
+ * css/components/start.css
+ * 24 Nov 2026 v1
+ *
+ * P-46 S2. The one-minute start (views/onboarding/start.js), both tiers.
+ * The app's own tokens, so light, dark and high contrast follow them.
+ * Text sizes from the app's --text-* tokens (and the heading scaled by
+ * --user-text-scale), so the text size setting reaches them; 44 px targets.
+ */
+
+.st { display: flex; flex-direction: column; min-height: 100%; box-sizing: border-box; padding: var(--space-4) var(--space-4) var(--space-6); gap: var(--space-4); max-width: 34rem; margin: 0 auto; }
+.st-top { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); min-height: 44px; }
+.st-back { min-height: 44px; padding: 0 var(--space-2); color: var(--color-primary); }
+.st-back-space { min-width: 44px; }
+.st-count { font-size: var(--text-sm); color: var(--color-text-secondary); }
+.st-dots { display: flex; gap: 6px; }
+.st-dot { width: 24px; height: 4px; border-radius: 2px; background: var(--color-border); }
+.st-dot.is-on { background: var(--color-primary); }
+
+.st-body { flex: 1; display: flex; flex-direction: column; gap: var(--space-3); min-width: 0; }
+.st-body h1 { margin: 0; font-size: calc(1.75rem * var(--user-text-scale)); line-height: 1.2; font-weight: 700; }
+.st-body h1:focus, .st-body h1:focus-visible { outline: none; }   /* focused on arrival for screen readers; a heading is not a control */
+.st-line { margin: 0; font-size: var(--text-base); line-height: 1.5; color: var(--color-text-secondary); }
+.st-h2 { margin: var(--space-3) 0 0; font-size: var(--text-xl); font-weight: 700; }
+.st-label { font-size: var(--text-sm); color: var(--color-text-secondary); margin-top: var(--space-3); }
+.st-input { width: 100%; min-width: 0; box-sizing: border-box; min-height: 52px; border-radius: var(--radius-md, 12px); border: 2px solid var(--color-border); background: var(--color-bg-elevated); color: var(--color-text); font-size: var(--text-lg); padding: 0 var(--space-3); font-family: inherit; }
+.st-input:focus { border-color: var(--color-primary); outline: none; box-shadow: 0 0 0 3px var(--color-focus-ring, rgba(45, 212, 191, 0.35)); }
+
+.st-chips { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.st-chip { min-height: 48px; padding: 0 var(--space-3); border-radius: 24px; border: 2px solid var(--color-border); background: var(--color-bg-elevated); color: var(--color-text); font-size: var(--text-base); font-family: inherit; cursor: pointer; }
+.st-chip.is-on { border-color: var(--color-primary); background: var(--color-primary-subtle, rgba(45, 212, 191, 0.15)); font-weight: 600; }
+
+.st-places { display: grid; grid-template-columns: repeat(auto-fit, minmax(calc(8.5rem * var(--user-text-scale)), 1fr)); gap: var(--space-2); }   /* two across, one at large text */
+.st-place { min-height: 56px; border-radius: var(--radius-md, 12px); border: 2px solid var(--color-border); background: var(--color-bg-elevated); color: var(--color-text); font-family: inherit; text-align: left; padding: var(--space-2) var(--space-3); cursor: pointer; }
+.st-place.is-on { border-color: var(--color-primary); background: var(--color-primary-subtle, rgba(45, 212, 191, 0.15)); }
+.st-place__t { display: block; font-size: var(--text-base); font-weight: 600; }
+.st-place__s { display: block; font-size: var(--text-xs); color: var(--color-text-secondary); }
+
+.st-seg { border: 0; margin: 0; padding: 0; }
+.st-seg legend { font-size: var(--text-base); font-weight: 500; margin-bottom: var(--space-2); padding: 0; }
+.st-seg__row { display: flex; gap: var(--space-2); flex-wrap: wrap; }
+.st-seg__opt { flex: 1 1 6rem; position: relative; }
+.st-seg__opt input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.st-seg__opt span { display: flex; align-items: center; justify-content: center; min-height: 44px; border-radius: 10px; border: 2px solid var(--color-border); background: var(--color-bg-elevated); font-size: var(--text-sm); text-align: center; padding: 0 var(--space-2); cursor: pointer; }
+.st-seg__opt input:checked + span { border-color: var(--color-primary); background: var(--color-primary-subtle, rgba(45, 212, 191, 0.15)); font-weight: 600; }
+.st-seg__opt input:focus-visible + span { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+
+.st-card { background: var(--color-bg-elevated); border: 1px solid var(--color-border); border-radius: 16px; padding: var(--space-4); display: flex; flex-direction: column; align-items: center; gap: var(--space-2); }
+.st-fig { color: var(--color-primary); }
+.st-card__t { margin: 0; font-size: var(--text-xl); font-weight: 600; }
+.st-card__s { margin: 0; font-size: var(--text-sm); color: var(--color-text-secondary); }
+
+.st-actions { display: flex; flex-direction: column; gap: var(--space-2); }
+.st-need { margin: 0; font-size: var(--text-sm); color: var(--color-text-secondary); text-align: center; }
+.st-later { min-height: 48px; }

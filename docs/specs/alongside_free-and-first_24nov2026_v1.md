@@ -1,5 +1,7 @@
 # Alongside: Move — Free and first (P-46) spec
-## 24 Nov 2026 v1
+## 24 Nov 2026 v2
+
+**v2 (S2, built):** three corrections found building it. (1) The red-flag questions are **not** asked in getting started, now or before: the route guard asks them before the first session with a sore area (`data/red-flag.js`), so screen 2 only records the areas and the guard does the rest. (2) Screen 4's button is **Show me my session**, which opens Today's plan with the request set (whole body, gentle, at the chosen place, about 15 minutes): one way into a session (A-2), with its own safety note; the card names no move count. (3) The old conversation stays for anyone part-way through it (resumes past the name); everyone else gets the one-minute start, so its checks now start part-way (`tools/part-way.mjs`).
 
 Build New Habits | Graeme, 24 Nov, after the Wave 7 trace: *"we do need to look at the Free level … I wanted to improve Onboarding anyway because I thought it was too much … I also have way too many words - so we need to simplify. no one needs a lecture or a sermon."* Four decisions the same day (all recommended options) and mock-up v1 approved: *"I think the designs are exceptional … I love all of it."*
 
@@ -20,9 +22,9 @@ Then four screens, each with *‹ Back* and *n of 4*:
 | # | Screen | Writes | Notes |
 |---|---|---|---|
 | 1 | *Hi. What should I call you?* · *About a minute, then your first session.* · First name · Next | `name` | Blank allowed (the coach then uses no name, as today) |
-| 2 | *Anything sore at the moment?* · *Pick any. I'll work around them.* · body areas · *Nothing sore* | `conditions` | **Picking an area runs the existing red-flag questions and soreness answer exactly as the conditions sheet does today** (same component, same words, same records: `redFlag`, `conditionPainScores`). Without the health consent, the screen is skipped (as the conditions sheet is today) |
+| 2 | *Anything sore at the moment?* · *Pick any. I'll work around them.* · the pain areas the conditions sheet lists (lower body, back, upper body) · the scope statement word for word · *Nothing sore* / *Next* | `conditions` | The red-flag questions follow before the first session, through the route guard, as they always have; how sore on the day is the check-in's. Without the health consent, the screen is skipped (as the conditions sheet was) |
 | 3 | *Where will you move?* Home · Gym · Outside · A mix. *So I keep it safe:* up from a chair without your hands? · down to the floor and back up? · worried about your balance? | `equipment`, `homeEquipment`, `gymEquipment`, `sessionLocation`, `capability.chairRise`, `capability.floorAccess`, `capability.balanceWorry`, `capability.askedAt` | **Where:** Home → bodyweight (`[]`); Gym → the *Full gym* set (`FACILITY_DEFS` `gym-full`), changeable in Settings › Equipment; Outside → bodyweight, `sessionLocation` home; A mix → both. **Ability:** *Not easily* or *No* on the chair asks the existing leg question (`capability.legPower`) on the same screen, as today's 9c. Impact (`capability.bothFeet`) is **not asked**: unanswered already means no jumping (`impactGated`), the safe side |
-| 4 | *Your first session, {name}* · one line in their words (*Gentle, at home, working around your lower back and knee.*) · the session card (figure, name, minutes, moves) · *Before you start* · Start · *Not now, take me Home* | `onboardingComplete`, `onboarding.flow = "short"`, `onboarding.threadCompletedAt` | The session is the coach's own, built gentle (§3) for the place chosen. *Before you start* opens the existing safety note, **word for word**; Start needs it read once, as Today's plan does today |
+| 4 | *Your first session, {name}* · one line in their words (*Gentle, at home, working around your lower back and knee.*) · the card (figure, *Whole body, gentle*, *About 15 minutes*) · **Show me my session** · *Not now, take me Home* | `onboardingComplete`, `onboarding.flow = "short"`, `onboarding.threadCompletedAt`; with Show me: `requestedSessionType` full, `requestedLocation`, today's length *short* | Show me opens Today's plan, built gentle (§3) at the place chosen, with its safety note word for word, read once as now |
 
 **No longer asked before the first session** (each stays changeable where it already is, and §4 asks some later):
 
@@ -101,4 +103,4 @@ Every screen: **at most about 15 words above the first button**. Longer text mov
 
 The voices and *Hear from your coach* (next month); payments and the 14-day trial (P-40, row 14); the 14+ age change (P-41); Free's Progress window (P-40 says 30 days, unchanged here).
 
-*Build New Habits · Alongside: Move · P-46 spec · 24 Nov 2026 v1*
+*Build New Habits · Alongside: Move · P-46 spec · 24 Nov 2026 v2*

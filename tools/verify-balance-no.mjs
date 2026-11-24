@@ -1,5 +1,12 @@
 /**
  * tools/verify-balance-no.mjs
+ * 24 Nov 2026 v5
+ *
+ * v5 - P-46 S2. The old conversation is now reached only part-way (the
+ *   one-minute start replaced it for anyone new), so the walk starts there
+ *   (tools/part-way.mjs) instead of at the age and consent screens, which
+ *   are checked on their own and unchanged. No assertion changed.
+ *
  * 01 Oct 2026 v4
  *
  * v4 - AGE-CHECK. Onboarding asks when you were born before consent; the
@@ -28,6 +35,7 @@
  *   3. C1-SAFETY holds: "Not easily" from a chair with the leg question
  *      skipped is still limited; "No" is still seated.
  */
+import { partWay } from "./part-way.mjs";
 import { createRequire } from "node:module";
 const require = createRequire(import.meta.url);
 const { JSDOM } = require("jsdom");
@@ -73,15 +81,11 @@ const ANSWERS = [
 ];
 
 async function walkOnboarding() {
-  localStorage.clear(); store.init();
+  partWay(store);   // P-46 S2: the old conversation is reached part-way (tools/part-way.mjs)
   const el = document.createElement("div"); document.body.appendChild(el);
   ThreadView(rtr).mount(el);
   await wait(2500);
   { const mo = el.querySelector("#ob-age-month"), yr = el.querySelector("#ob-age-year"); if (mo && yr) { mo.value = "1"; yr.value = "1990"; el.querySelector("#ob-age-continue").dispatchEvent(new dom.window.Event("click")); await wait(20); } }
-  const c = el.querySelector("#ob-consent-check");
-  c.checked = true; c.dispatchEvent(new dom.window.Event("change"));
-  { const h = el.querySelector("#ob-consent-health"); if (h) { h.checked = true; h.dispatchEvent(new dom.window.Event("change")); } }
-  el.querySelector("#ob-consent-continue").dispatchEvent(new dom.window.Event("click"));
   await wait(300);
   const used = new WeakSet(); const asked = []; let idle = 0;
   for (let i = 0; i < 400; i++) {
