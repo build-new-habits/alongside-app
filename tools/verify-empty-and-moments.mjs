@@ -1,5 +1,10 @@
 /**
  * tools/verify-empty-and-moments.mjs
+ * 24 Nov 2026 v4
+ *
+ * v4 - P-46 S6 WORDS. Reads the shorter words (spec §7); the property held
+ *   is the same.
+ *
  * 05 Nov 2026 v3
  *
  * v3 - P-27 TIDY. 1e re-pointed, not loosened: the empty list's start is Home's
@@ -96,7 +101,8 @@ console.log("\nTEST 2 - My exercises, empty");
 fixture("personal"); store.set("prescribedExercises", []); mount(prescribed);
 const empty = main.querySelector(".prescribed-empty-card");
 ok("2a. a heading", txt(empty?.querySelector("h2")) === "No exercises yet", txt(empty));
-ok("2b. one line saying what goes here, as you wrote it", /as you wrote/i.test(txt(empty)) && !/button below/i.test(txt(empty)), txt(empty));
+// P-46 S6: "as you wrote them" is the coach line above; the card says what goes here.
+ok("2b. one line saying what goes here (and above it, kept as you wrote them)", /given, or like to do/i.test(txt(empty)) && /as you wrote/i.test(txt(main)) && !/button below/i.test(txt(empty)), txt(empty));
 ok("2c. and the way to add one is there", !![...main.querySelectorAll("button")].find(b => /Add/.test(txt(b))));
 
 console.log("\nTEST 3 - a new arc week, on Plan Home");

@@ -1,5 +1,7 @@
 # Alongside: Move — Free and first (P-46) spec
-## 24 Nov 2026 v4
+## 24 Nov 2026 v5
+
+**v5 (S6, built):** (1) `tools/chromium-word-budget.mjs` v2: budget 15 on every screen the router opens, both tiers; safety and scope words are not counted (the advice line, the scope notice, the support lines); the safety note before a first exercise, the Plan's own page, the first-session finish and the pages to read are listed with a reason each. (2) Sixteen screens cut, the meaning kept, nothing about safety touched: Wellbeing, Log what I did, In Step, Breathing, Quiet, the morning session, Practices, My exercises (empty), Privacy (the summary's lead-in only), Making my Move, Plan your week, Share your plan, a link from a physio, Classes, the programme page, the session builder. (3) Saved sessions joins the Plan's routes (its Free page took 22 words to say so). (4) The byte-for-byte Free checks apply the approved changes to the old drawing only (`tools/p46-words.mjs`), as they did for v7's one rename.
 
 **v4 (S5, built):** (1) The player is one screen per move on both tiers (`workout.js` v42; `exercise-card.js` layout `one`). (2) The main button keeps today's set counting: **Set n done** per set, or **Finish this one** for all of them; a 12-move session takes 24 taps that way (one-tap Finish, one-tap Next), within the 25 target. Reps and weight are typed in the sets block on the same screen (the sheet on the button is not built: the block was already there and one tap less). (3) *Watch out* is folded under *More about this move* with Why, How and Easier or harder, as in the mock-up; today's caution for a sore area stays on screen, above the cue, never folded; *If it hurts* stays on screen, one tap away. (4) Free's old cardio-machine-only Swap is replaced by the one Swap. (5) *Watch how to do this* is a bordered link without the emoji (one look).
 
@@ -107,4 +109,4 @@ Every screen: **at most about 15 words above the first button**. Longer text mov
 
 The voices and *Hear from your coach* (next month); payments and the 14-day trial (P-40, row 14); the 14+ age change (P-41); Free's Progress window (P-40 says 30 days, unchanged here).
 
-*Build New Habits · Alongside: Move · P-46 spec · 24 Nov 2026 v4*
+*Build New Habits · Alongside: Move · P-46 spec · 24 Nov 2026 v5*

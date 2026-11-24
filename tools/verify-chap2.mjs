@@ -1,5 +1,10 @@
 /**
  * tools/verify-chap2.mjs
+ * 24 Nov 2026 v3
+ *
+ * v3 - P-46 S6 WORDS. Reads the shorter words (spec §7); the property held
+ *   is the same.
+ *
  * 21 Aug 2026 v2
  * GATE-PATH. Path resolution only -- no assertion changed.
  *
@@ -192,7 +197,7 @@ const nothing = mountWith(MyProgrammeView, seedNothing);
 check('it mounts for somebody with nothing at all', !nothing.threw && nothing.text.length > 0,
   nothing.threw ? String(nothing.threw) : '');
 check('and does not claim they are on a programme',
-  /not following a chapter/i.test(nothing.text));
+  /no chapter at the moment/i.test(nothing.text));   // P-46 S6: fewer words, same meaning
 
 const free = mountWith(MyProgrammeView, seedFree);
 check('a free user with no programme still sees what they are after',

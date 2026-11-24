@@ -1,5 +1,10 @@
 /**
  * views/my-move.js
+ * 24 Nov 2026 v4
+ *
+ * v4 - P-46 S6 WORDS. Fewer words before the first button (spec §7: about
+ *   15). The meaning kept; anything about safety unchanged.
+ *
  * 23 Nov 2026 v3
  *
  * v3 - S5. Guide markers only (data-guide-target): Start (mm-start), Next
@@ -97,12 +102,12 @@ export function MyMoveView(router) {
     return `${header("home")}
       <p class="mm-kicker">Start your Plan</p>
       <h1 class="yw-title" tabindex="-1">Making my Move</h1>
-      <p class="yw-note">Tell me what you want Alongside: Move for, on good days and on hard ones.</p>
-      <p class="yw-sub">Set up your hard days while you're having a good one. About a minute. What you choose is kept if you stop, and you can change it any time.</p>
+      <p class="yw-note">What do you want Alongside for, on good days and hard ones?</p>
       <div class="mm-intro-actions">
         <button type="button" class="btn btn-primary" data-go="for" data-key="start" data-guide-target="mm-start">Start</button>
         <button type="button" class="btn btn-secondary" data-simple data-key="simple">Not sure? Keep it simple</button>
-      </div>`;
+      </div>
+      <p class="yw-sub">About a minute. What you choose is kept if you stop, and you can change it any time.</p>`;
   }
 
   function purposeRow(p) {

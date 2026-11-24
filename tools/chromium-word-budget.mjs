@@ -1,5 +1,13 @@
 /**
  * tools/chromium-word-budget.mjs
+ * 24 Nov 2026 v2
+ *
+ * v2 - P-46 S6 WORDS (Graeme, 24 Nov: "no one needs a lecture or a
+ *   sermon"; spec §7). Budget 60 → 15. Not counted, wherever it appears:
+ *   safety and scope wording the clinical reviewer reads first (the monthly
+ *   advice line, the scope notice, the support lines), listed in SAFETY.
+ *   SHOW=1 prints the words counted; BUDGET=n tries another budget.
+ *
  * 18 Oct 2026 v1
  *
  * A-4 WORD BUDGET (Stage AWARD; Graeme, 12 Oct: "Measured, not felt";
@@ -59,7 +67,9 @@ const faults = [], unreached = [], excused = [];
 // A-4 WORD BUDGET (Stage AWARD, 18 Oct 2026). Words a person reads before
 // the first thing they can do. Headings, labels and the controls' own words
 // are not counted; a closed fold's contents are not on the screen.
-const BUDGET = 60;
+const BUDGET = Number(process.env.BUDGET) || 15;
+// P-46 S6. Safety and scope words, not counted until the clinical reviewer has read them (spec §7).
+const SAFETY = ".today-guidance, [data-scope-notice], .support-lines, .wb-support";
 // Screens that are for reading, each with its reason. Anything else over
 // the budget is a fault.
 const EXEMPT = {
@@ -71,6 +81,8 @@ const EXEMPT = {
   "plan-import": "what is taken in and what is not, said before anything is pasted",
   "progress": "numbers and their labels, not prose",
   "annual-reflection": "a page to read; it has no action",
+  "reflect": "the first-session finish (Graeme kept it, spec §7)",
+  "plan-finish": "the first-session finish (Graeme kept it, spec §7)",
 };
 let measured = 0;
 
@@ -110,7 +122,7 @@ for (const tier of TIERS) for (const size of SIZES) {
         if (!has) continue;   // that row is not offered to this person (no programme, weight off)
         await page.waitForTimeout(400);
       }
-      const r = await page.evaluate(() => {
+      const r = await page.evaluate((SAFETY) => {
         const main = document.getElementById("main-content");
         const failed = /Something went wrong loading this page/.test(main?.innerText || "");
         const vis = el => { const b = el.getBoundingClientRect(); const cs = getComputedStyle(el); return b.width > 0 && b.height > 0 && cs.visibility !== "hidden" && cs.display !== "none" && !el.closest("details:not([open]) > :not(summary)"); };
@@ -120,21 +132,22 @@ for (const tier of TIERS) for (const size of SIZES) {
           .filter(el => !/^(‹\s*)?(back|home|close|exit|go back|back to .*)$/i.test((el.getAttribute("aria-label") || el.innerText || "").trim()));
         const first = acts[0];
         const top = first ? first.getBoundingClientRect().top : Infinity;
-        let words = 0;
+        let words = 0; const said = [];
         const tw = document.createTreeWalker(main, NodeFilter.SHOW_TEXT);
         let n;
         while ((n = tw.nextNode())) {
           const el = n.parentElement;
-          if (!el || !vis(el) || el.closest(".sr-only,.visually-hidden,button,a,label,select,summary,h1,h2,h3")) continue;
+          if (!el || !vis(el) || el.closest(".sr-only,.visually-hidden,button,a,label,select,summary,h1,h2,h3") || el.closest(SAFETY)) continue;
           if (el.getBoundingClientRect().top >= top) continue;
           words += n.data.trim().split(/\s+/).filter(w => /[A-Za-z]{2,}/.test(w)).length;
+          if (n.data.trim()) said.push(n.data.trim());
         }
-        return { failed, words, first: first ? (first.getAttribute("aria-label") || first.innerText || first.tagName).trim().slice(0, 40) : null };
-      });
+        return { failed, words, said: said.join(" | "), first: first ? (first.getAttribute("aria-label") || first.innerText || first.tagName).trim().slice(0, 40) : null };
+      }, SAFETY);
       if (r.failed) { unreached.push(label); continue; }
       measured++;
       const exempt = EXEMPT[v.r];
-      if (r.words > BUDGET && !exempt) faults.push(`${label}: ${r.words} words before "${r.first}" (budget ${BUDGET})`);
+      if (r.words > BUDGET && !exempt) faults.push(`${label}: ${r.words} words before "${r.first}" (budget ${BUDGET})${process.env.SHOW ? "\n        " + r.said : ""}`);
       if (exempt && r.words > BUDGET) excused.push(`${label}: ${r.words} words, ${exempt}`);
     } catch (e) { unreached.push(`${label} (${String(e.message).slice(0, 60)})`); }
   }

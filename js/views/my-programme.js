@@ -1,6 +1,11 @@
 /**
  * my-programme.js - My Programme
  *
+ * 24 Nov 2026 v13
+ *
+ * v13 - P-46 S6 WORDS. Fewer words before the first button (spec §7: about
+ *   15). The meaning kept; anything about safety unchanged.
+ *
  * 31 Oct 2026 v12
  *
  * v12 - STAGE PATH Session 9 (CLOSE; P-12 F5; Graeme, 31 Oct: "‹ Back"). On
@@ -295,8 +300,7 @@ ${plan ? '' : `        <button class="btn btn-ghost btn-full my-programme-back"
     } else {
       const done = store.completedSessions(store.get('activityLog') || []).length;
       lines.push(`<p class="my-programme-line">
-        You are not following a chapter at the moment. Each session gets
-        chosen for where you are on the day.
+        No chapter at the moment: each session fits the day.
       </p>`);
       if (done > 0) {
         lines.push(`<p class="my-programme-line">${done} ${done === 1 ? "session" : "sessions"} so far.</p>`);

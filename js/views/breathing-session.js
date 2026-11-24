@@ -1,6 +1,11 @@
 /**
  * js/views/breathing-session.js - Guided Breathing Session
  *
+ * 24 Nov 2026 v15
+ *
+ * v15 - P-46 S6 WORDS. Fewer words before the first button (spec §7: about
+ *   15). The meaning kept; anything about safety unchanged.
+ *
  * 31 Oct 2026 v14
  *
  * v14 - P-13 rooms, the mind rooms first (Graeme, 31 Oct). On the Plan only,
@@ -440,7 +445,7 @@ function renderPicker() {
       <div class="card card-coach" style="margin-bottom: var(--space-5);">
         <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
         <p class="coach-message-text">
-          Choose a breathing practice. All of them work — the best one is the one you'll actually do.
+          Choose one. The best one is the one you'll do.
         </p>
       </div>
 

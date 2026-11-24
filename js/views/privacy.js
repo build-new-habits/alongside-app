@@ -1,5 +1,10 @@
 /**
  * privacy.js - Privacy and Terms (in-app summary)
+ * 24 Nov 2026 v11
+ *
+ * v11 - P-46 S6 WORDS. Fewer words before the first button (spec §7: about
+ *   15). The meaning kept; anything about safety unchanged.
+ *
  * 31 Oct 2026 v10
  *
  * v10 - STAGE PATH Session 9 (CLOSE; P-12 F5; Graeme, 31 Oct: "‹ Back"). On
@@ -127,9 +132,7 @@ export function render() {
       <div class="privacy-section card">
         <h2 class="privacy-heading">This is a summary</h2>
         <p class="text-secondary">
-          The plain-English version is below so you can see what you agreed to
-          without reading a legal document. The full and canonical Privacy Policy
-          and Terms of Service live on our website:
+          Below, in plain English. The full versions are on our website:
         </p>
         ${plan ? `<p class="privacy-docs">
           <a class="plan-link" href="https://buildnewhabits.co.uk/privacy/"

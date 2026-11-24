@@ -1,5 +1,10 @@
 /**
  * views/plan-link-back.js
+ * 24 Nov 2026 v3
+ *
+ * v3 - P-46 S6 WORDS. Fewer words before the first button (spec §7: about
+ *   15). The meaning kept; anything about safety unchanged.
+ *
  * 24 Nov 2026 v2
  *
  * v2 - P-45 THE LIVE LINK. Opened from changes that came through a live
@@ -75,11 +80,12 @@ export function PlanLinkBackView(router) {
     const acts = (...b) => `<div class="sp-acts">${b.join("")}</div>`;
     const btn = (id, label, primary = false, extra = "") => `<button class="btn ${primary ? "btn-primary" : "btn-secondary"} btn-large btn-full" id="${id}"${extra}>${esc(label)}</button>`;
     let html;
-    if (state === "free") html = shell("Changes to your exercises", `<p class="pr-range">Using a physio’s or trainer’s changes from a link is part of the Plan. Nothing from the link has been kept.</p>
+    if (state === "free") html = shell("Changes to your exercises", `<p class="pr-range">These links are part of the Plan. Nothing from the link has been kept.</p>
       ${acts(btn("plb-upgrade", "See the Plan", true), btn("plb-own", "My exercises"))}`);
     else if (state === "reading") html = shell("Changes to your exercises", `<p class="pr-range" role="status">Reading the link…</p>`);
     else if (state === "bad") html = shell("Changes to your exercises", `<p class="pr-range">This link is not complete. Ask for it to be sent again.</p>
-      <p class="pr-range">Links from Alongside: Move are long. If it was cut short in a message, ask them to use Copy the link or Email it.</p>${acts(btn("plb-own", "My exercises", true))}`);
+      ${acts(btn("plb-own", "My exercises", true))}
+      <p class="pr-range">Links from Alongside: Move are long. If it was cut short in a message, ask them to use Copy the link or Email it.</p>`);
     else if (state === "out") html = shell("Changes to your exercises", `<p class="pr-range">This is the link you sent, so it has no changes in it yet. When they press Send back, they get a new link to send you.</p>${acts(btn("plb-own", "My exercises", true))}`);
     else if (state === "none") html = shell("Nothing to change", `<p class="pr-range">${plan.say ? `They wrote: “${esc(plan.say)}” ` : ""}Your exercises already match what they sent back${plan.of ? ` for your list from ${esc(dayOf(plan.of))}` : ""}.</p>${acts(btn("plb-own", "My exercises", true))}`);
     else if (state === "done") html = shell("Your exercises are changed", `<p class="pr-range">${used === 1 ? "One change used." : `${used} changes used.`} Your list as it was is kept for 30 days: <strong>My exercises › Put back my old list</strong>.</p>${acts(btn("plb-own", "My exercises", true))}`);

@@ -1,6 +1,11 @@
 /**
  * morning-session.js - Morning Session View
  *
+ * 24 Nov 2026 v8
+ *
+ * v8 - P-46 S6 WORDS. Fewer words before the first button (spec §7: about
+ *   15). The meaning kept; anything about safety unchanged.
+ *
  * 01 Nov 2026 v7
  *
  * v7 - P-13, the last rooms (Graeme, 01 Nov: "Build both now"). On the Plan
@@ -345,7 +350,7 @@ function renderSelect() {
         <div class="card card-coach" style="margin-bottom: var(--space-5);">
           <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
           <div>
-            <p>${name ? "Good morning, " + name + "." : "Good morning."} Let me know which session you are doing today and I will walk you through it.</p>
+            <p>${name ? "Good morning, " + name + "." : "Good morning."} Which session today?</p>
           </div>
         </div>
 

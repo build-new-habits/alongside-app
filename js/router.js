@@ -1,5 +1,11 @@
 /**
  * router.js
+ * 24 Nov 2026 v63
+ *
+ * v63 - P-46 S6 WORDS. saved-sessions joins FREE_MOVED: Saved sessions are
+ *   the Plan's, and its Free page said so in 22 words; on-the-plan says it in
+ *   one line.
+ *
  * 24 Nov 2026 v62
  *
  * v62 - P-46 S4 FREE HOME. 'on-the-plan' (views/on-the-plan.js). Free asking
@@ -589,7 +595,8 @@ const hideNavViews = new Set([
 // W4-1 GATE-OPEN. Screens left only by answering them: no house button.
 // P-46 S4. Free's routes that moved to the Plan (views/on-the-plan.js PLAN_ONLY).
 const FREE_MOVED = new Set(['session-builder', 'mobility-conditioning', 'classes', 'class-player', 'library',
-  'know-what', 'my-programme', 'weekly-plan', 'your-week', 'arc-setup', 'stretch-arc', 'goal-setup']);
+  'know-what', 'my-programme', 'weekly-plan', 'your-week', 'arc-setup', 'stretch-arc', 'goal-setup',
+  'saved-sessions']);   // P-46 S6: Saved sessions are the Plan's (its Free page said so in 22 words)
 
 const NO_EXIT_VIEWS = new Set(['onboarding/thread', 'onboarding/start', 'age-check', 'under-18', 'consent-update']);
 // D662-6 TWO-HOMES. Screens with their own way home: no house beside it.
