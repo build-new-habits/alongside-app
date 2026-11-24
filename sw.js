@@ -1,6 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 24 Nov 2026 v732
+ *
+ * v732 - P-44 PHYSIO LINK S4 (the Plan; Free told it is the Plan's). The link sent back opens What your physio or trainer changed; Put back my old list in My exercises. NEW FILE precached: js/views/plan-link-back.js.
+ *
  * 23 Nov 2026 v731
  *
  * v731 - P-44 PHYSIO LINK S2 (the Plan; Free unchanged). Share your plan › Send a link to change, with a QR code. NEW FILES precached: js/views/plan-link-send.js, js/data/qr.js.
@@ -4305,7 +4309,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v731";
+const CACHE_NAME = "alongside-v732";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4370,8 +4374,8 @@ const SHELL_HASHES = {
   "./css/components/club-rooms.css": "f1c069c5b8eaf09e",
   "./css/components/capture.css": "343b4ae0dc6fe6ea",
   "./css/components/finish.css": "c33e298d5fcb92ae",
-  "./js/app.js": "f1496daa7cfb04a4",
-  "./js/router.js": "1713a28791830f81",
+  "./js/app.js": "4139586dc667659a",
+  "./js/router.js": "a3aca7c4df9422bf",
   "./js/store.js": "af46173f09925c56",
   "./js/session-log.js": "6134de4315842e05",
   "./js/exercise-feedback.js": "adba8549f444da2a",
@@ -4457,13 +4461,14 @@ const SHELL_HASHES = {
   "./js/data/warm-views.js": "73c268f74f004e8e",
   "./js/views/your-week.js": "037bff571dd21bee",
   "./js/data/plan-reader.js": "8b909dcd350014b1",
-  "./js/views/plan-import.js": "b4b6bc817ef1b455",
+  "./js/views/plan-import.js": "027c3f9fc203c613",
   "./js/views/change-today.js": "31101d97d53492c8",
   "./js/views/my-move.js": "bc53b61cdf65da20",
   "./js/data/my-move.js": "c6ec80cda14e499b",
-  "./js/data/plan-link.js": "6afcc95819d6987c",
+  "./js/data/plan-link.js": "96a3e9d1839a5928",
   "./js/data/qr.js": "751dbedf04c0b444",
   "./js/views/plan-link-send.js": "33a9e401ed15f32e",
+  "./js/views/plan-link-back.js": "d2ff57ace2d3e65c",
   "./js/data/week-changes.js": "1bd0a7a6db2c338f",
   "./js/data/little-and-often.js": "9828926d20ce94dc",
   "./js/data/sore-rule.js": "f6ea51d828be37f0",
@@ -4537,7 +4542,7 @@ const SHELL_HASHES = {
   "./js/data/guide-me.js": "ed77e97b8a8a35ea",
   "./js/views/journal-entry.js": "dd38e795ee54e7d7",
   "./js/views/gym-programme.js": "98de0c5929699fb1",
-  "./js/views/prescribed.js": "b568790260f0f6d1",
+  "./js/views/prescribed.js": "cabc8749f0e71afc",
   "./js/views/prescribed-session.js": "ce2eb0c803f66cfe",
   "./js/views/quiet-session.js": "eb439e800dc71d74",
   "./js/views/breathing-session.js": "3d049d83a8e783b9",
@@ -4607,7 +4612,7 @@ const SHELL_HASHES = {
   "./js/data/progress-report.js": "9f12b0421f0c4adb",
   "./js/data/share-images.js": "0812f14d822387ad",
   "./js/views/progress-share.js": "6cf56fe459d112dd",
-  "./css/components/progress-share.css": "882ce0dff428a3ff",
+  "./css/components/progress-share.css": "761783c7f7c68838",
   "./assets/fonts/newsreader-latin-500-normal.woff2": "5613e2fc8377392c",
   "./assets/fonts/newsreader-latin-400-italic.woff2": "fa9b900403949d9a",
   "./assets/images/brand/alongside-icon-teal.png": "7b5bde05f9e32efe",
@@ -4808,6 +4813,7 @@ const SHELL_URLS = [
   "./js/data/plan-link.js",
   "./js/data/qr.js",
   "./js/views/plan-link-send.js",
+  "./js/views/plan-link-back.js",
   "./js/data/week-changes.js",
   "./js/data/little-and-often.js",
   "./js/data/sore-rule.js",
