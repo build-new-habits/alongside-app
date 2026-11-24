@@ -1,6 +1,12 @@
 import { createRequire as __cr } from "node:module";
 /**
  * tools/verify-one-look.mjs
+ * 24 Nov 2026 v19
+ *
+ * v19 - P-46 S6 WORDS. TEST 4 makes the approved word changes
+ *   (tools/p46-words.mjs) to v688's drawing before comparing, as v7 does
+ *   for the one rename; any other change on Free is still red.
+ *
  * 24 Nov 2026 v18
  *
  * v18 - P-46 S5 PLAYER. Free's player is one screen per move by Graeme's
@@ -144,6 +150,7 @@ import { createRequire as __cr } from "node:module";
  */
 const __require = __cr(import.meta.url);
 const { JSDOM } = __require("jsdom");
+import { withP46Words } from "./p46-words.mjs";
 import { execSync } from "node:child_process";
 import { readFileSync, writeFileSync, unlinkSync } from "node:fs";
 
@@ -439,6 +446,7 @@ for (const file of touched) {
   try { b = await draw(NOW, entry.fn); } catch (e) { b = "THREW " + e.message; }
   // v12: P-25's markers only (an old file can draw a shared piece, such as Free Home, from today's code).
   a = a.replace(/ data-guide-target="[a-z:-]+"/g, ""); b = b.replace(/ data-guide-target="[a-z:-]+"/g, "");
+  a = withP46Words(a);   // v19: P-46 S6's approved words (tools/p46-words.mjs), to the old drawing only
   // v12: and Help, drawn in Today's plan's panel (the panel covers the shell's Help row), both tiers.
   if (name === "coach-proposal") {
     const hp = /\s*<button type="button" class="help-btn help-btn--panel" data-help-open="panel">[\s\S]*?<\/button>/g;

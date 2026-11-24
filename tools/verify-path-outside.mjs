@@ -1,6 +1,12 @@
 import { createRequire as __cr } from "node:module";
 /**
  * tools/verify-path-outside.mjs
+ * 24 Nov 2026 v6
+ *
+ * v6 - P-46 S6 WORDS. TEST 4 makes the approved word changes
+ *   (tools/p46-words.mjs) to v687's drawing before comparing; any other change
+ *   is still red.
+ *
  * 06 Nov 2026 v5
  *
  * v5 - P-28 S4. A walk, run or bike ride now asks How would you like it?
@@ -42,6 +48,7 @@ import { createRequire as __cr } from "node:module";
  */
 const __require = __cr(import.meta.url);
 const { JSDOM } = __require("jsdom");
+import { withP46Words } from "./p46-words.mjs";
 import { execSync } from "node:child_process";
 import { writeFileSync, unlinkSync } from "node:fs";
 const dom = new JSDOM('<!doctype html><div id="app"><div id="main-content"></div></div>', { url: "https://x/" });
@@ -172,6 +179,7 @@ for (const [file, draw] of Object.entries(rooms)) {
   // v3: the one approved rename, made to the old words only (its count is held below).
   const renames = file.endsWith("activity-log.js") ? (a.match(/Body Balance/g) || []).length : 0;
   if (renames) a = a.replace(/Body Balance/g, "Yoga or Pilates class");
+  a = withP46Words(a);   // P-46 S6's approved words (tools/p46-words.mjs), to the old drawing only
   if (file.endsWith("activity-log.js")) ok("4r. v687's Free Log what I did named Body Balance exactly twice (label and words): the rename is that and no more", renames === 2, String(renames));
   store.data = JSON.parse(snap); store.save(); await draw(NOW); const b = main.innerHTML;
   if (file.endsWith("activity-log.js")) {

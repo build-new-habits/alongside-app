@@ -1,5 +1,10 @@
 /**
  * js/views/in-step.js
+ * 24 Nov 2026 v8
+ *
+ * v8 - P-46 S6 WORDS. Fewer words before the first button (spec §7: about
+ *   15). The meaning kept; anything about safety unchanged.
+ *
  * 06 Nov 2026 v7
  *
  * v7 - P-28 FINISH. With the voice on, opening an episode asks for its
@@ -108,7 +113,7 @@ function renderLanding() {
   return shell(`
     <div class="workout-header">${back}<h1 class="workout-header-title" tabindex="-1">In Step</h1></div>
     ${eyebrow("In Step")}
-    <p class="instep-intro">Short moments after a session about the people around you. They come one at a time, in order, and anything you've done is here whenever you like.</p>
+    <p class="instep-intro">Short moments after a session, about the people around you.</p>
     ${curE ? `
       <button type="button" class="instep-next" data-ep="${curE.id}">
         <span class="kind-tile k-orchid">${icon()}</span>

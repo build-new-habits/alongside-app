@@ -1,5 +1,11 @@
 /**
  * tools/verify-wellbeing-suggest.mjs
+ * 24 Nov 2026 v3
+ *
+ * v3 - P-46 S6 WORDS. The coach's lines are shorter (the words pass, 15
+ *   before the first button); each still says the person's own word and claims
+ *   nothing about the body.
+ *
  * 02 Oct 2026 v2
  *
  * v2 - W4-1 GATE-OPEN. The fixture person has agreed (tools/agreed.mjs): the
@@ -86,18 +92,18 @@ ok("0b. one coach line and a Suggested now card with Start", !!main.querySelecto
 console.log("\nTEST 1 - the line and the practice come from today's check-in");
 fixture(); paint();
 ok("1a. no check-in: a neutral line, and the default -- Box breathing, 3 min",
-   txt(main.querySelector(".wb-coach")) === "Whenever you want a few minutes to settle, this is here." &&
+   txt(main.querySelector(".wb-coach")) === "Any time you like." &&   // P-46 S6: fewer words
    /^Box breathing · 3 min$/.test(txt(main.querySelector(".wb-suggest__name"))));
 fixture({ checkin: { energy: 6, mood: 3 } }); paint();
 ok("1b. a heavy day: the spec's line, and a slow practice",
-   txt(main.querySelector(".wb-coach")) === "You said today's been heavy going. Three minutes of slow breathing might help settle it." &&
+   txt(main.querySelector(".wb-coach")) === "You said today's been heavy going. Slow breathing might help." &&
    /^Extended exhale · 3 min$/.test(txt(main.querySelector(".wb-suggest__name"))));
 fixture({ checkin: { energy: 3, mood: 6 } }); paint();
 ok("1c. low energy: something that asks nothing", /energy is low/.test(txt(main.querySelector(".wb-coach"))) &&
    /^Resonance breathing/.test(txt(main.querySelector(".wb-suggest__name"))));
 const yesterday = new Date(Date.now() - 86400000).toISOString().split("T")[0];
 fixture(); store.set("checkinHistory", { [yesterday]: { energy: 2, mood: 2 } }); paint();
-ok("1d. REVERSAL: yesterday's check-in is not today's", /^Whenever you want/.test(txt(main.querySelector(".wb-coach"))));
+ok("1d. REVERSAL: yesterday's check-in is not today's", /^Any time you like/.test(txt(main.querySelector(".wb-coach"))));
 const lines = [null, { energy: 2, mood: 2 }, { energy: 3, mood: 6 }, { energy: 8, mood: 8 }, { energy: 6, mood: 6 }].map(c => W.suggestNow(c).line);
 ok("1e. no line claims what a practice does to the body (C1)", lines.every(l => !/nervous system|parasympathetic|vagus|HRV|cortisol|reduce(s)? stress|calm(s)? (you|your)|proven|research/i.test(l)), lines.join(" | "));
 

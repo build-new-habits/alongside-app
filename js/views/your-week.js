@@ -1,5 +1,10 @@
 /**
  * js/views/your-week.js
+ * 24 Nov 2026 v7
+ *
+ * v7 - P-46 S6 WORDS. Fewer words before the first button (spec §7: about
+ *   15). The meaning kept; anything about safety unchanged.
+ *
  * 15 Nov 2026 v6
  *
  * v6 - P-25 HOW-TO GUIDES. Guide markers only: Build it with me
@@ -134,7 +139,7 @@ export function YourWeekView(router) {
     return `
       ${has ? header("Your week", null, "week") : header("Home", "today")}
       <h1 class="yw-title" tabindex="-1">Plan your week</h1>
-      <p class="yw-sub">You say what each day is for. I build each session inside it, and fit it to how you are on the day.</p>
+      <p class="yw-sub">You say what each day is for. I fit each session to the day.</p>
       ${has ? `<p class="yw-note">Choosing one of these replaces your week as it is now.</p>` : ""}
       <button class="yw-way" data-start="build" data-guide-target="build-with-me">
         <span class="kind-tile k-teal">${lineIcon("pencil")}</span>

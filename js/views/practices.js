@@ -1,6 +1,11 @@
 /**
  * views/practices.js - Guided Practices
  *
+ * 24 Nov 2026 v5
+ *
+ * v5 - P-46 S6 WORDS. Fewer words before the first button (spec §7: about
+ *   15). The meaning kept; anything about safety unchanged.
+ *
  * 31 Oct 2026 v4
  *
  * v4 - STAGE PATH Session 9 (CLOSE; P-12 F3, F4, F5; Graeme, 31 Oct: "‹
@@ -224,8 +229,7 @@ export function PracticesView(router) {
 
     return shell("Practices", "Back to the Library", `
       <p class="practices-intro">
-        Whole practices, start to finish. Nothing here is part of a session —
-        each one is the thing itself.
+        Whole practices, start to finish.
       </p>
 
       <ul class="practices-group-grid" role="list">

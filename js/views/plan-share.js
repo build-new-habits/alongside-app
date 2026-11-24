@@ -1,5 +1,10 @@
 /**
  * views/plan-share.js
+ * 24 Nov 2026 v4
+ *
+ * v4 - P-46 S6 WORDS. Fewer words before the first button (spec §7: about
+ *   15). The meaning kept; anything about safety unchanged.
+ *
  * 24 Nov 2026 v3
  *
  * v3 - P-44 S5. Guide marker send-link on Send a link to change.
@@ -63,7 +68,7 @@ export function PlanShareView(router) {
     if (empty) {
       root.innerHTML = `<div class="view share-view is-plan">${back}
         <h1 class="share-title" tabindex="-1">Share your plan</h1>
-        <p class="sp-empty">There’s nothing to share yet. Your arc, your week and your lists in My exercises go in it once you have them.</p>
+        <p class="sp-empty">Nothing to share yet. Your arc, week and lists go in it.</p>
         <div class="sp-acts">
           <button class="btn btn-secondary btn-large btn-full" data-go="your-week">Set up your week</button>
           <button class="btn btn-secondary btn-large btn-full" data-go="prescribed">My exercises</button>

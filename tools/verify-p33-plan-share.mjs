@@ -1,6 +1,11 @@
 import { createRequire as __cr } from "node:module";
 /**
  * tools/verify-p33-plan-share.mjs
+ * 24 Nov 2026 v2
+ *
+ * v2 - P-46 S6 WORDS. Reads the shorter words (spec §7); the property held
+ *   is the same.
+ *
  * 15 Nov 2026 v1
  *
  * P-33 PLAN-SHARE (spec docs/specs/alongside_share-your-plan_15nov2026_v1.md).
@@ -219,7 +224,7 @@ fixture();
   ok("6k. no arc and no week: one line says so; the page has the lists", /no arc and no week yet/.test(txt(main.querySelector("#sp-gap"))) && !/My arc/.test(txt(main.querySelector(".sp-doc"))) && /Kettle stretch/.test(txt(main.querySelector(".sp-doc"))), txt(main.querySelector("#sp-gap")));
   fixture({ arc: false, week: false, lists: false });
   main.innerHTML = ""; PlanShareView(fakeRouter).mount(main); await wait(20);
-  ok("6l. nothing at all: says so, with a way to start, and no Share", /nothing to share yet/.test(txt(main)) && !main.querySelector("#sp-share") && !!main.querySelector('[data-go="your-week"]'));
+  ok("6l. nothing at all: says so, with a way to start, and no Share", /Nothing to share yet/i.test(txt(main)) && !main.querySelector("#sp-share") && !!main.querySelector('[data-go="your-week"]'));
   fixture({ tier: "free" }); navs = [];
   main.innerHTML = ""; PlanShareView(fakeRouter).mount(main); await wait(20);
   ok("6m. Free: sent to Progress, nothing drawn", navs.includes("progress") && !main.querySelector("h1"));

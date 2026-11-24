@@ -1,6 +1,10 @@
 /**
  * js/views/noticing.js - Wellbeing Hub Landing View
  *
+ * 24 Nov 2026 v15 - P-46 S6 WORDS (both tiers). The coach's line above the
+ *   suggested practice is shorter (spec §7: about 15 words before the first
+ *   button); each still says the person's own word, and claims nothing.
+ *
  * 06 Nov 2026 v14 - P-28 EMPATHY-THREAD, S3 (both tiers). In Step's tile is
  *   orchid with the two-figures icon, and says what In Step now is: short
  *   moments about the people around you (it said "Short scenarios. Three
@@ -266,22 +270,22 @@ export function suggestNow(checkin) {
   const has = Number.isFinite(e) || Number.isFinite(m);
   if (!has) {
     return { type: "box", mins: 3,
-      line: "Whenever you want a few minutes to settle, this is here." };
+      line: "Any time you like." };
   }
   if (Number.isFinite(m) && m <= 3) {
     return { type: "exhale", mins: 3,
-      line: "You said today's been heavy going. Three minutes of slow breathing might help settle it." };
+      line: "You said today's been heavy going. Slow breathing might help." };
   }
   if (Number.isFinite(e) && e <= 3) {
     return { type: "resonance", mins: 3,
-      line: "You said your energy is low today. Slow, even breathing asks nothing of you." };
+      line: "You said your energy is low. This asks nothing of you." };
   }
   if (Number.isFinite(e) && e >= 7 && Number.isFinite(m) && m >= 7) {
     return { type: "box", mins: 3,
-      line: "You said you're feeling good today. A few even breaths is a way to notice it." };
+      line: "You said you're feeling good. A few breaths to notice it." };
   }
   return { type: "box", mins: 3,
-    line: "You checked in today. Three minutes of box breathing is here if it helps." };
+    line: "Three minutes of box breathing, if it helps." };
 }
 
 // ── Render ────────────────────────────────────────────────────────────────────

@@ -1,5 +1,10 @@
 /**
  * views/on-the-plan.js
+ * 24 Nov 2026 v2
+ *
+ * v2 - P-46 S6 WORDS. Fewer words before the first button (spec §7: about
+ *   15). The meaning kept; anything about safety unchanged.
+ *
  * 24 Nov 2026 v1
  *
  * v1 - P-46 S4 FREE HOME (spec §5, "Moves to the Plan"). A Free route to
@@ -26,6 +31,7 @@ export const PLAN_ONLY = Object.freeze({
   "arc-setup":             ["Your arc", "Something you want to be able to do, worked towards."],
   "stretch-arc":           ["Your arc", "Something you want to be able to do, worked towards."],
   "goal-setup":            ["Your programme", "A plan for the weeks ahead, held for you."],
+  "saved-sessions":        ["Saved sessions", "Sessions you put together, kept to start again."],
 });
 
 export function OnThePlanView(router) {

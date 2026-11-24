@@ -1,6 +1,11 @@
 /**
  * js/views/session-builder-ui.js - Session Builder UI
  *
+ * 24 Nov 2026 v36
+ *
+ * v36 - P-46 S6 WORDS. Fewer words before the first button (spec §7: about
+ *   15). The meaning kept; anything about safety unchanged.
+ *
  * 01 Nov 2026 v35
  *
  * v35 - P-13, the last rooms (Graeme, 01 Nov: "Build both now"). On the Plan
@@ -894,7 +899,7 @@ function renderTypePicker() {
       <div class="card card-coach" style="margin-bottom: var(--space-5);">
         <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
         <p class="coach-message-text">
-          Tell me what you want to work on today. I'll build something around your equipment and how you're feeling.
+          What do you want to work on today?
         </p>
       </div>
 

@@ -1,5 +1,10 @@
 /**
  * activity-log.js - Universal Activity Logging View
+ * 24 Nov 2026 v9
+ *
+ * v9 - P-46 S6 WORDS. Fewer words before the first button (spec §7: about
+ *   15). The meaning kept; anything about safety unchanged.
+ *
  * 06 Nov 2026 v8
  *
  * v8 - P-28 S4. Opened from Outside's Log it after a walk, run or ride, it
@@ -148,12 +153,11 @@ export function render() {
     <div class="view activity-log-view${_planCls()}">
       <div class="view-header">
         <h1>Log an Activity</h1>
-        <p class="text-secondary">You did the work. Let's capture it.</p>
       </div>
 
       <div class="card card-coach" style="margin-bottom:var(--space-5);">
         <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
-        <p>What did you do? I will note it and factor it into what I suggest next.</p>
+        <p>What did you do? I’ll use it in what I suggest next.</p>
       </div>
 
       ${!selectedType ? renderTypePicker() : renderLogForm()}

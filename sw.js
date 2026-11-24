@@ -1,7 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 24 Nov 2026 v742
+ * 24 Nov 2026 v743
+ *
+ * v743 - P-46 S6 WORDS (both tiers). About 15 words before the first button on every screen: Wellbeing, Log what I did, In Step, Breathing, Quiet, the morning session, Practices, My exercises, Privacy's lead-in, Making my Move, Plan your week, Share your plan, a physio's link, Classes, the programme page, the session builder say less, and mean the same. Nothing about safety changed. Saved sessions on Free opens the Plan page. No new files.
  *
  * v742 - P-46 S5 PLAYER (both tiers). One screen per move: the name, the dose, Swap, Do this one later and What's left (now on Free too), the figure and one cue line, then the sets and the main button. Why, Watch out, How and Easier or harder are folded under More about this move; a sore area's line stays on screen. The four steps are gone: a 12-move session in about 24 taps. No new files.
  *
@@ -4337,7 +4339,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v742";
+const CACHE_NAME = "alongside-v743";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4403,7 +4405,7 @@ const SHELL_HASHES = {
   "./css/components/capture.css": "343b4ae0dc6fe6ea",
   "./css/components/finish.css": "c33e298d5fcb92ae",
   "./js/app.js": "81ed92c5ada71eb8",
-  "./js/router.js": "2e4ae29b50cdcfb3",
+  "./js/router.js": "f4e0c7f0eac0a035",
   "./js/store.js": "da198c2848d498f0",
   "./js/session-log.js": "6134de4315842e05",
   "./js/exercise-feedback.js": "adba8549f444da2a",
@@ -4447,16 +4449,16 @@ const SHELL_HASHES = {
   "./js/data/session-rationale.js": "f14d0d565eb7f9dc",
   "./js/data/personal-reads.js": "52141f31fa9d4fd0",
   "./js/data/field-contract.js": "d7d662025990b1fd",
-  "./js/views/activity-log.js": "2137223e462a5b3d",
+  "./js/views/activity-log.js": "07d0ba188ebba51b",
   "./js/views/annual-reflection.js": "c1b1221672a0eb4a",
   "./js/views/community-impact.js": "b8537fe58e1f8f69",
   "./js/views/home-threshold.js": "17bc42808aa5bd5c",
   "./js/views/onboarding/frequency.js": "47e40b6e6e2f458f",
   "./js/views/programme-select.js": "115a22eeb9526be5",
   "./js/views/upgrade.js": "c20de0f464afbb80",
-  "./js/views/privacy.js": "25721026cff47822",
+  "./js/views/privacy.js": "a3141eea5d56825f",
   "./js/views/library.js": "36195497d25a503d",
-  "./js/views/practices.js": "9890a7fa300e9d1c",
+  "./js/views/practices.js": "f76d5aae3596a565",
   "./js/views/red-flag.js": "d2f857d0f8ba905f",
   "./js/views/health-consent.js": "66c6f499c7863c7c",
   "./js/views/age-check.js": "b29fd222f8378e0b",
@@ -4489,13 +4491,13 @@ const SHELL_HASHES = {
   "./js/data/week-shape-model.js": "7889ce6889cad039",
   "./js/data/week-shape.js": "57cc6aa85210d710",
   "./js/data/warm-views.js": "73c268f74f004e8e",
-  "./js/views/your-week.js": "037bff571dd21bee",
+  "./js/views/your-week.js": "0490ccd23827529c",
   "./js/data/plan-reader.js": "8b909dcd350014b1",
   "./js/views/plan-import.js": "027c3f9fc203c613",
   "./js/views/change-today.js": "31101d97d53492c8",
-  "./js/views/my-move.js": "bc53b61cdf65da20",
+  "./js/views/my-move.js": "a431f1a0696487ed",
   "./js/views/free-home.js": "f94508fd3bb83d2f",
-  "./js/views/on-the-plan.js": "a0738085784cb045",
+  "./js/views/on-the-plan.js": "2d25cce8dfb0fc9e",
   "./js/views/onboarding/start.js": "5f52e26da854742b",
   "./js/data/my-move.js": "c6ec80cda14e499b",
   "./js/data/plan-link.js": "ebeb09703328fab6",
@@ -4504,14 +4506,14 @@ const SHELL_HASHES = {
   "./js/data/relay-config.js": "3b41decd73b14858",
   "./js/data/qr.js": "751dbedf04c0b444",
   "./js/views/plan-link-send.js": "6fb5c0b3b8817526",
-  "./js/views/plan-link-back.js": "599cfb3a883b46f8",
+  "./js/views/plan-link-back.js": "d544b32f9fcd26f7",
   "./js/data/week-changes.js": "1bd0a7a6db2c338f",
   "./js/data/little-and-often.js": "9828926d20ce94dc",
   "./js/data/sore-rule.js": "f6ea51d828be37f0",
   "./js/data/stretch-stiffness.js": "80d3e230b5f0ecef",
   "./js/data/plan-share.js": "0461891c97ca592b",
   "./js/data/pdf-lite.js": "b924b197ae7f46fe",
-  "./js/views/plan-share.js": "0b6f255658b7037b",
+  "./js/views/plan-share.js": "c60361d6d4ed08e5",
   "./js/guide.js": "5a0fdd80790faafe",
   "./js/data/guides.js": "93be74a63cd62aab",
   "./js/views/help.js": "4d4218955ce16e02",
@@ -4544,7 +4546,7 @@ const SHELL_HASHES = {
   "./js/data/evidence.js": "f06ab5ec6eb1804c",
   "./js/data/support-lines.js": "0c1286fa510e427e",
   "./js/data/consent-version.js": "c1a39ed44cc24157",
-  "./js/views/my-programme.js": "b28f193145da0c1a",
+  "./js/views/my-programme.js": "6d4ee7ee5f3927b8",
   "./js/session-builder.js": "df8b660e695bb146",
   "./js/data/session-choice.js": "954463b0647f3843",
   "./js/data/saved-sessions.js": "3e43e131c645626f",
@@ -4562,14 +4564,14 @@ const SHELL_HASHES = {
   "./js/data/classes/class-from-the-feet-010.js": "cdbfa03ffea71774",
   "./js/data/scope-statement.js": "02dac4d3fb7a62fb",
   "./js/data/activity-labels.js": "9753c0fbbf27d8cc",
-  "./js/views/class-player.js": "42620de997fa1226",
+  "./js/views/class-player.js": "958fd2cf4c442f85",
   "./js/views/class-list.js": "c5f80d89802bf845",
   "./css/components/class-list.css": "e33b073b352399f3",
   "./css/components/class-player.css": "401cc57d7d39dbb1",
   "./js/views/saved-sessions.js": "400202f2e10e8e74",
-  "./js/views/session-builder-ui.js": "30c36be8e7a979d4",
-  "./js/views/noticing.js": "a99e17ca283d7dcf",
-  "./js/views/in-step.js": "613388a51c358ad8",
+  "./js/views/session-builder-ui.js": "9155cae5f311cd10",
+  "./js/views/noticing.js": "b0fd1db225416f4f",
+  "./js/views/in-step.js": "b19c81ba82c39b1d",
   "./js/data/in-step-programme.js": "91605a0780fba799",
   "./js/data/in-step-offer.js": "c962f66108aeef19",
   "./js/coach-audio.js": "d201650f60b33617",
@@ -4578,11 +4580,11 @@ const SHELL_HASHES = {
   "./js/data/guide-me.js": "ed77e97b8a8a35ea",
   "./js/views/journal-entry.js": "dd38e795ee54e7d7",
   "./js/views/gym-programme.js": "98de0c5929699fb1",
-  "./js/views/prescribed.js": "1e354daaab5151b4",
+  "./js/views/prescribed.js": "f501edb3001cfa71",
   "./js/views/prescribed-session.js": "ce2eb0c803f66cfe",
-  "./js/views/quiet-session.js": "eb439e800dc71d74",
-  "./js/views/breathing-session.js": "3d049d83a8e783b9",
-  "./js/views/morning-session.js": "549fd3efaac3eb67",
+  "./js/views/quiet-session.js": "aedf9e5e3a2d25c3",
+  "./js/views/breathing-session.js": "2a1ab65c919190a6",
+  "./js/views/morning-session.js": "ffc63242dcf349f5",
   "./js/views/core-session.js": "dd82e73cd721e233",
   "./js/views/yoga-session.js": "d89c7f18da771813",
   "./js/views/walk-session.js": "67b2bcd2f265307f",

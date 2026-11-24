@@ -1,7 +1,11 @@
 /**
  * prescribed.js - My exercises
  *
- * 24 Nov 2026 v1.18
+ * 24 Nov 2026 v1.19
+ *
+ * v1.19 - P-46 S6 WORDS. The empty list says less (spec §7): Yours, kept
+ *   as you wrote them; ones you've been given, or like to do. With
+ *   exercises, the sore-area line is unchanged.
  *
  * v1.18 - P-45 THE LIVE LINK. Changes from a physio or trainer waiting
  *   (liveInbox): one row each, with when, and Look at them. Not tier-gated
@@ -187,7 +191,7 @@ function buildCoachLine(exercises, energy) {
   const done   = exercises.filter(e => store.ownDoneToday(e));
 
   if (exercises.length === 0) {
-    return "Keep your own exercises here \u2014 anything you want to come back to. I'll keep them separate from your other sessions, and if something's sore on the day I'll tell you which ones load it.";
+    return "Yours, kept as you wrote them.";
   }
   if (done.length > 0 && active.length === 0) {
     return "That's all of them done today.";
@@ -271,9 +275,7 @@ function renderEmptyState() {
   return `
     <section class="card prescribed-empty-card" aria-labelledby="prescribed-empty-h">
       <h2 id="prescribed-empty-h" class="prescribed-empty__h">No exercises yet</h2>
-      <p class="text-secondary">
-        Add exercises you’ve been given, or ones you like to do. They’ll be here, as you wrote them.
-      </p>
+      <p class="text-secondary">Ones you’ve been given, or like to do.</p>
     </section>
   `;
 }

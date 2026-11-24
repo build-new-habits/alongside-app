@@ -1,6 +1,11 @@
 /**
  * js/views/class-player.js
  *
+ * 24 Nov 2026 v7
+ *
+ * v7 - P-46 S6 WORDS. Fewer words before the first button (spec §7: about
+ *   15). The meaning kept; anything about safety unchanged.
+ *
  * 01 Nov 2026 v6
  *
  * v6 - P-13 Classes (mock-up v1 approved by Graeme, 01 Nov). On the Plan
@@ -207,7 +212,7 @@ export function render() {
       <div class="view class-player is-plan">
         <button class="btn btn-ghost plan-back" id="cp-home" aria-label="Back to today">‹ Back</button>
         <h1 tabindex="-1">No class open</h1>
-        <p class="text-secondary">That class is no longer available. Nothing has been lost — pick another whenever you want to.</p>
+        <p class="text-secondary">That class is no longer here. Pick another whenever you like.</p>
       </div>`;
     return `
       <div class="view class-player">

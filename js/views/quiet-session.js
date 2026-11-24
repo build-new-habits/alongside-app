@@ -1,6 +1,11 @@
 /**
  * quiet-session.js - Something Quieter View
  *
+ * 24 Nov 2026 v13
+ *
+ * v13 - P-46 S6 WORDS. Fewer words before the first button (spec §7: about
+ *   15). The meaning kept; anything about safety unchanged.
+ *
  * 31 Oct 2026 v12
  *
  * v12 - P-13 rooms, the mind rooms first (Graeme, 31 Oct). On the Plan only,
@@ -368,8 +373,7 @@ function renderModeSelector() {
     <div class="card card-coach quiet-coach-card">
       <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
       <div>
-        <p>What feels right today? Each of these works differently.
-           Take a moment to notice what you actually need.</p>
+        <p>What feels right today?</p>
       </div>
     </div>
 
