@@ -1,5 +1,13 @@
 /**
  * js/exercise-card.js
+ * 24 Nov 2026 v17
+ *
+ * v17 - P-46 S5 PLAYER (both tiers; spec §6). layout: "one": the player's
+ *   one screen per move. On screen: today's caution (safety, never folded),
+ *   the figure, one cue line (the entry's first coaching cue), what last
+ *   time said and how heavy. Folded under More about this move: Why, Watch
+ *   out (with the hurt-and-ache text), How, and Easier or harder.
+ *
  * 16 Nov 2026 v16
  *
  * v16 - P-36 MY-LIST-PLAYER. layout: "compact": one screen per exercise for
@@ -712,6 +720,36 @@ export function renderExerciseCard(exercise, opts = {}) {
     </details>` : ""}
     ${adaptBlock}
     ${opts.doSlot || ""}
+  </div>`;
+  }
+
+  // P-46 S5. One screen per move (the player, both tiers).
+  if (opts.layout === "one") {
+    const howList = [
+      (exercise.instructions && exercise.instructions.length) ? list("exercise-section-list", exercise.instructions) : "",
+      restCues.length ? list("exercise-section-list xcard-more-form", restCues) : "",
+      hold,
+    ].join("");
+    const watchList = (exercise.watchOut && exercise.watchOut.length) ? list("exercise-watchout-list", exercise.watchOut) : "";
+    const easier = (easeOff.length || further.length) ? `
+      <p class="exercise-section-label">Easier or harder</p>
+      ${easeOff.length ? `<p class="xcard-more-sub">Easier</p>${list("exercise-section-list", easeOff)}` : ""}
+      ${further.length ? `<p class="xcard-more-sub">Harder</p>${list("exercise-section-list", further)}` : ""}` : "";
+    return `
+  <div class="exercise-card exercise-card--one" data-xcard="${p}" role="region" aria-label="${esc(exercise.name)}">
+    ${caution ? `<p class="exercise-caution" role="note">${caution}</p>` : ""}
+    ${figure ? `<div class="xcard-block xcard-figure">${figure}</div>` : ""}
+    ${cueBlock}
+    ${lastBlock}${loadBlock}
+    <details class="xcard-more"${openedByFeedback ? " open" : ""}>
+      <summary class="xcard-more-summary">More about this move</summary>
+      ${exercise.why ? `<p class="exercise-section-label">Why</p><p class="xstep-why">${esc(exercise.why)}</p>` : ""}
+      <p class="exercise-section-label">Watch out</p>
+      ${watchList ? `<div class="xcard-block xcard-block--hazard">${watchList}</div>` : ""}
+      ${howList ? `<p class="exercise-section-label">How</p><div class="xcard-block xcard-how">${howList}</div>` : ""}
+      ${easier}
+      ${opts.doSlot || ""}
+    </details>
   </div>`;
   }
 

@@ -1,5 +1,11 @@
 /**
  * tools/verify-timer2.mjs
+ * 24 Nov 2026 v5
+ *
+ * v5 - P-46 S5 PLAYER. One screen per move: each exercise arrives with no
+ *   steps strip, its timer and set controls on screen, and Watch out before
+ *   How under More about this move. Nothing to tap through.
+ *
  * 04 Oct 2026 v4
  *
  * v4 - D-1 EXERCISE-FOUR. Reaches Capture (the fourth step) before the timer
@@ -269,14 +275,16 @@ console.log("\nTEST 6 — the player, driven: sets one at a time, no false label
   // Oct). Each exercise arrives as four steps in the safety order, Why,
   // Watch out, How, Capture, at Why, with no Start-this-one step before
   // it: what to watch out for still comes before how to do it.
-  const strip = [...main.querySelectorAll(".wo-steps [data-step-go]")].map(b => b.dataset.stepGo);
+  // P-46 S5: one screen per move. On arrival: no steps strip, the timer and
+  // set controls on screen, and Watch out before How under More about this move.
+  const more = main.querySelector("details.xcard-more")?.innerHTML || "";
   const oneScreen = !main.querySelector("#wo-begin-btn") && !main.querySelector("#wo-watch-btn") &&
-    JSON.stringify(strip) === JSON.stringify(["why", "watch", "how", "capture"]) &&
-    main.querySelector('.wo-steps [aria-current="step"]')?.dataset.stepGo === "why";
+    !main.querySelector(".wo-steps") && more.indexOf(">Watch out<") > -1 && more.indexOf(">Watch out<") < more.indexOf(">How<") &&
+    !!main.querySelector("#timer-toggle-btn, #wo-set-done-btn, #wo-done-btn");
   if (oneScreen) _watchPassed++;
   // D-1. The tally above is read on ARRIVAL, unchanged. Then reach
     // Capture, where the timer and set controls now live.
-    tap('[data-step-go="capture"]');
+    // (P-46 S5: nothing to tap through; the controls are already here.)
     return oneScreen;
   };
 
@@ -382,7 +390,7 @@ console.log("\nTEST 6 — the player, driven: sets one at a time, no false label
      !/Set 1 of/.test(T()), T().slice(0, 140));
 
   // CARD-4. Asserted once, covering every toDo() in this block.
-  ok("D-1. every exercise arrived as its four steps, Watch out before How, at Why (" +
+  ok("D-1 / P-46 S5. every exercise arrived as one screen, the controls on it, Watch out before How under More (" +
      _watchPassed + " of " + _toDoCalls + ")",
      _toDoCalls > 0 && _watchPassed === _toDoCalls,
      "a Start-this-one step came back, or the steps are out of their safety order");

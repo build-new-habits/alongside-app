@@ -1,5 +1,10 @@
 /**
  * tools/verify-card4.mjs
+ * 24 Nov 2026 v6
+ *
+ * v6 - P-46 S5 PLAYER. 8.9: workout.js uses the one-screen layout ("one"),
+ *   no steps, flow or page state.
+ *
  * 16 Nov 2026 v5
  *
  * v5 - P-36 MY-LIST-PLAYER. REVERSAL (Graeme, mock-up approved 16 Nov):
@@ -369,8 +374,9 @@ console.log("\nTEST 8 — moving forward passes the warnings; Back goes one page
 
   // D-1. The four steps replaced the one screen (Option B, 04 Oct); the
   // fault to catch is still a half-migrated view holding both models.
-  ok("8.9 workout.js uses the four-step layout and keeps no card-page state",
-     /layout:\s*"steps"/.test(wo) && !/layout:\s*"flow"/.test(wo) && !/currentCardPage/.test(wo));
+  // P-46 S5: one screen per move ("one"), both tiers; no steps, flow or page state.
+  ok("8.9 workout.js uses the one-screen layout and keeps no card-page state",
+     /layout:\s*"one"/.test(wo) && !/layout:\s*"(steps|flow)"/.test(wo) && !/currentCardPage/.test(wo));
 
   ok("8.10 prescribed-session.js uses the compact layout and keeps no card-page state",
      /layout:\s*"compact"/.test(ps) && !/currentCardPage/.test(ps));

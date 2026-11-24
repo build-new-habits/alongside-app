@@ -1,5 +1,17 @@
 /**
  * workout.js - Workout Execution View
+ * 24 Nov 2026 v42
+ *
+ * v42 - P-46 S5 PLAYER (both tiers; spec §6, mock-up v1 approved 24 Nov).
+ *   One screen per move: Exit, n of N, the bar; the name; the dose; Swap, Do
+ *   this one later and What's left (Free gains them: the Plan has had them
+ *   since P-22 to P-24); the card's one-screen layout (today's caution, the
+ *   figure, one cue line; More about this move folded); the sets; the main
+ *   button; Skip. Gone: the four steps (Why, Watch out, How, Capture) and
+ *   I know this one: go to capture. Free's cardio-only swap went with them
+ *   (the one Swap covers it). Kept: the first-move safety note, the
+ *   halfway check, the hold voice, the timer, each tier's own finish.
+ *
  * 07 Nov 2026 v41
  *
  * v41 - S1 SAFE-HALFWAY (Graeme, 07 Nov). The halfway "still okay?" check
@@ -515,7 +527,7 @@
 import { store }         from "../store.js";
 import { isCardioMachine, getSwapCandidates } from "../data/exercises/index.js";
 import { renderFeedbackControl, attachFeedbackEvents } from "../exercise-feedback.js";
-import { STEPS, hurtBlock, renderExerciseCard, attachCardEvents } from "../exercise-card.js";
+import { hurtBlock, renderExerciseCard, attachCardEvents } from "../exercise-card.js";
 import { bodyCaution } from "../data/session-rationale.js";
 import { isGateDue, renderSafetyGate, attachSafetyGate } from "../safety-gate.js";
 import { resolveTiming, formatTime } from "../exercise-timing.js";
@@ -590,8 +602,8 @@ let timerStarted = false; // Timer doesn't start until user taps Start
 // every exercise change, never stored -- same reasons as before.
 let exerciseDone = false;
 // D-1. Which of the four steps is showing, and whether to focus its title.
-let step = "why";
-let focusStep = false;
+let step = "capture";   // P-46 S5: one screen per move (the four steps went)
+
 
 // SMOOTH-P2e, REST-1. When the suggested rest ends (ms since epoch), or
 // null when no rest is running. Never stored.
@@ -825,7 +837,7 @@ export function render() {
   const exercise = workout.exercises[currentExerciseIndex];
 
   // P-22. What's left: the rest of the session, any one of them now.
-  if (_plan() && leftOpen) return _renderLeft(workout, exercise);
+  if (leftOpen) return _renderLeft(workout, exercise);   // P-46 S5: both tiers
 
   // GM-1. Chosen once per render, so the card does not shuffle moments
   // on a timer tick. Returns null far more often than not: wrong family,
@@ -869,33 +881,24 @@ export function render() {
           ${renderExerciseTarget(exercise)}
         </div>
 
-        ${_plan() ? _renderPlanControls(workout, exercise) : _renderSwapControl(exercise)}
+        ${_renderPlanControls(workout, exercise)}
 
         ${finishedByTimer ? `
           <p class="xcard-timer-done" role="status">That is the time up on ${exercise.name}.</p>
         ` : ""}
 
-        ${_renderStepNav()}
-
-        ${step !== "capture" ? renderExerciseCard(exercise, {
+        ${renderExerciseCard(exercise, {
           idPrefix: `wo-${currentExerciseIndex}`,
-          layout:   "steps",
-          step,
+          layout:   "one",
           lastTime: "",
           doSlot: `
             <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(exercise.youtube || (exercise.name + " exercise form"))}"
                target="_blank"
                rel="noopener noreferrer"
-               class="youtube-link"
-               aria-label="Watch how to do ${exercise.name} on YouTube (opens in new tab)">
-              <span class="youtube-icon" aria-hidden="true">\u25B6\uFE0F</span>
-              Watch how to do this
-            </a>`
-        }) : `
-        <section class="xstep xstep--capture" aria-labelledby="wo-cap-h">
-          <h2 class="xstep-title" id="wo-cap-h" tabindex="-1">Reflect and capture</h2>
-          ${(() => { const c = bodyCaution(exercise); return c ? `<p class="exercise-caution" role="note">${c}</p>` : ""; })()}
+               class="plan-link youtube-link">Watch how to do this<span class="sr-only"> (${exercise.name}, a YouTube search, opens in a new tab)</span></a>`
+        })}
 
+        <section class="xstep xstep--capture" aria-label="Your sets">
           ${restUntil && !exerciseDone && _noClock() ? `
             <div class="wo-rest" role="group" aria-labelledby="wo-rest-label">
               <p class="wo-rest__label" id="wo-rest-label">Rest as long as you need.</p>
@@ -921,21 +924,14 @@ export function render() {
                 </aside>
               ` : ""}
             </div>
-          ` : `<p class="xstep-hint">When the last set is done, you can say whether this was the right level.</p>`}
+          ` : ""}
 
           ${hurtBlock(false)}
-        </section>`}
+        </section>
       </div>
 
-      <!-- SMOOTH-P2c / D-1. What the thumb needs, and nothing else. -->
+      <!-- P-46 S5. One screen per move, both tiers: the main button, then Skip. -->
       <div class="workout-actions">
-        ${step !== "capture" ? `
-          <button class="btn btn-primary btn-large btn-full" id="wo-step-next" data-step-go="${_nextStep().key}">
-            Next: ${_nextStep().title}
-          </button>
-          ${step !== "how" ? `<button class="btn ${_plan() ? "btn-secondary" : "btn-ghost"} btn-full" id="wo-step-capture" data-step-go="capture">I know this one: go to capture</button>` : ""}
-          <button class="btn ${_plan() ? "btn-secondary" : "btn-ghost"} btn-small" id="skip-exercise-btn">Skip this one</button>
-        ` : `
         ${exerciseDone ? `
           <button class="btn btn-primary btn-large btn-full" id="complete-exercise-btn">
             ${isLastExercise ? "Finish the session" : `Next: ${next.name} \u2192`}
@@ -959,95 +955,16 @@ export function render() {
           </button>
           <button class="btn ${_plan() ? "btn-secondary" : "btn-ghost"} btn-small" id="skip-exercise-btn">Skip this one</button>
         `}
-        `}
       </div>
     </div>
   `;
 }
 
-/** D-1. The four steps as a strip: each a button, the current one marked. */
-function _renderStepNav() {
-  const at = STEPS.findIndex(s => s.key === step);
-  return `
-        <nav class="wo-steps" aria-label="Steps for this exercise">
-          <ol class="wo-steps__list">
-            ${STEPS.map((s, i) => `
-              <li class="wo-steps__item">
-                <button type="button" class="wo-steps__btn${s.key === step ? " wo-steps__btn--on" : ""}${i < at ? " wo-steps__btn--done" : ""}"
-                        data-step-go="${s.key}"${s.key === step ? ' aria-current="step"' : ""}
-                        aria-label="${s.title}">
-                  <span class="wo-steps__label">${s.label}</span>
-                  <span class="wo-steps__bar" aria-hidden="true"></span>
-                </button>
-              </li>`).join("")}
-          </ol>
-        </nav>`;
-}
-
-/** D-1. The step after this one (Why, Watch out, How, then Capture). */
-function _nextStep() {
-  const i = STEPS.findIndex(s => s.key === step);
-  return STEPS[Math.min(i + 1, STEPS.length - 1)];
-}
-
-/**
- * P21 / SWAP-0, from the session screen. Nothing at all unless this is a
- * cardio machine WITH another machine the person has: an affordance that
- * opens onto an empty list teaches people not to trust the affordances.
- */
+/** Escapes text for the controls' markup. */
 function _escSwap(t) {
   return String(t ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
-function _renderSwapControl(exercise) {
-  if (!exercise || !isCardioMachine(exercise)) return "";
-  const options = getSwapCandidates(exercise, store.get("equipment") || []);
-  if (options.length === 0) return "";
-  if (!swapPanelOpen) {
-    return `
-      <div class="exercise-swap">
-        <button type="button" class="btn btn-ghost btn-small exercise-swap__btn" id="wo-swap-btn"
-                aria-expanded="false" aria-controls="wo-swap-panel">Can't get on this? Swap it</button>
-      </div>`;
-  }
-  return `
-    <div class="exercise-swap">
-      <button type="button" class="btn btn-ghost btn-small exercise-swap__btn" id="wo-swap-btn"
-              aria-expanded="true" aria-controls="wo-swap-panel">Never mind, keep ${_escSwap(exercise.name)}</button>
-      <div class="exercise-swap__panel card" id="wo-swap-panel" role="group"
-           aria-label="Choose something else instead of ${_escSwap(exercise.name)}">
-        <p class="coach-voice exercise-swap__intro">No problem \u2014 pick whatever's free.</p>
-        <ul class="exercise-swap__list">
-          ${options.map(opt => `
-            <li>
-              <button type="button" class="exercise-swap__option" data-swap-to="${_escSwap(opt.id)}">
-                <span class="exercise-swap__option-name">${_escSwap(opt.name)}</span>
-                <span class="exercise-swap__option-meta text-xs text-muted">${opt.duration ? Math.round(opt.duration / 60) + " min" : ""}</span>
-              </button>
-            </li>`).join("")}
-        </ul>
-      </div>
-    </div>`;
-}
 
-/**
- * The swapped-in machine is the whole library entry (its own coaching,
- * watch-outs and timer); section and reps are carried across, so the
- * session keeps its shape -- the person swapped a machine, not a plan.
- */
-function _applySwap(toId) {
-  const generated = store.get("generatedSession");
-  const list = generated?.session?.exercises;
-  if (!Array.isArray(list)) return;
-  const current = list[currentExerciseIndex];
-  const chosen = getSwapCandidates(current, store.get("equipment") || []).find(o => o.id === toId);
-  if (!chosen) return;
-  if (_plan() && current?.id) noteSwap(store, current.id);   // P-6: less often, never over a like or a Not again
-  list[currentExerciseIndex] = { ...chosen, section: current.section, reps: current.reps ?? chosen.reps };
-  store.set("generatedSession", generated);
-  swapPanelOpen = false;
-  resetTimer();
-  router.navigate("workout");
-}
 
 // ── P-22 SESSION-ORDER, P-23 SWAP-SEARCH, P-24 AS-YOU-GO (the Plan) ──────
 //
@@ -1159,7 +1076,7 @@ function _saveOrder(generated) {
 function _moveLater() {
   const generated = store.get("generatedSession");
   const list = generated?.session?.exercises;
-  if (!_plan() || !Array.isArray(list)) return;
+  if (!Array.isArray(list)) return;
   const i = currentExerciseIndex, j = _laterAt(list, i);
   if (j <= i) return;
   const [ex] = list.splice(i, 1);
@@ -1174,7 +1091,7 @@ function _doNow(at) {
   const generated = store.get("generatedSession");
   const list = generated?.session?.exercises;
   const i = currentExerciseIndex;
-  if (!_plan() || !Array.isArray(list) || !(at > i && at < list.length)) return;
+  if (!Array.isArray(list) || !(at > i && at < list.length)) return;
   const [ex] = list.splice(at, 1);
   list.splice(i, 0, ex);
   orderSay = `${ex.name} now. ${list[i + 1].name} is next.`;
@@ -1187,7 +1104,7 @@ function _addNext(entry) {
   const generated = store.get("generatedSession");
   const list = generated?.session?.exercises;
   const i = currentExerciseIndex;
-  if (!_plan() || !Array.isArray(list) || !entry || list.some(e => e.id === entry.id)) return;
+  if (!Array.isArray(list) || !entry || list.some(e => e.id === entry.id)) return;
   list.splice(i + 1, 0, withDefaultDose({ ...entry, section: _sectionOf(list[i]) }));
   orderSay = `${entry.name} goes next.`;
   leftOpen = false; addOpen = false;
@@ -1201,7 +1118,7 @@ function _planSwap(entry) {
   const list = generated?.session?.exercises;
   const i = currentExerciseIndex;
   const current = list?.[i];
-  if (!_plan() || !current || !entry || entry.id === current.id) return;
+  if (!current || !entry || entry.id === current.id) return;
   if (list.some((e, k) => k !== i && e.id === entry.id)) return;
   noteSwap(store, current.id);   // P-6: less often, never over a like or a Not again
   list[i] = isCardioMachine(current) && isCardioMachine(entry)
@@ -1546,15 +1463,12 @@ export function onMount() {
     router.navigate("workout");
     // Focus follows what just changed, or a keyboard or screen-reader
     // user is left on a relabelled button with no idea anything opened.
-    if (swapPanelOpen) document.querySelector(_plan() ? "#wo-swap-panel .wo-swap__pick, #wo-swap-q" : ".exercise-swap__option")?.focus();
+    if (swapPanelOpen) document.querySelector("#wo-swap-panel .wo-swap__pick, #wo-swap-q")?.focus();
     else document.getElementById("wo-swap-btn")?.focus();
-  });
-  document.querySelectorAll("[data-swap-to]").forEach(btn => {
-    btn.addEventListener("click", () => _applySwap(btn.getAttribute("data-swap-to")));
   });
 
   // P-22 to P-24 (the Plan). The order, the search swap, Add an exercise.
-  if (_plan()) _wirePlanControls(workout);
+  _wirePlanControls(workout);   // P-46 S5: Swap, Do later, What\u2019s left on both tiers
 
   // P18. The answer to "how often should it come up?".
   document.querySelectorAll("[data-skip-pref]").forEach(btn => {
@@ -1568,18 +1482,6 @@ export function onMount() {
       }
       if (finish) completeWorkout();
       else router.navigate("workout");
-    });
-  });
-
-  // D-1. Any step, from the strip, Next, or "I know this one".
-  document.querySelectorAll("[data-step-go]").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const to = btn.dataset.stepGo;
-      if (!STEPS.some(s => s.key === to)) return;
-      step = to;
-      focusStep = true;
-      scrollToTop();
-      router.navigate("workout");
     });
   });
 
@@ -1627,10 +1529,6 @@ export function onMount() {
   if (focusName) {
     focusName = false;
     document.getElementById("wo-exercise-name")?.focus({ preventScroll: true });
-  } else if (focusStep) {
-    // D-1. A new step starts at its title.
-    focusStep = false;
-    document.querySelector(".xstep-title")?.focus({ preventScroll: true });
   }
 }
 
@@ -1862,7 +1760,7 @@ function resetTimer() {
   exerciseDone = false;
   focusName    = true;
   step         = "why";   // D-1. A new exercise starts at Why.
-  focusStep    = false;
+
   _clearRest();   // REST-1. A new exercise starts without a rest.
 }
 
@@ -2040,5 +1938,5 @@ function _resetPlayer() {
   // adding one and not adding it to this list is how the next one breaks.
   finishedByTimer = false;
   currentSet = 1;
-  step = "why"; focusStep = false;   // D-1
+  step = "capture";   // P-46 S5: one screen per move
 }

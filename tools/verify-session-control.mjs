@@ -1,5 +1,10 @@
 /**
  * tools/verify-session-control.mjs
+ * 24 Nov 2026 v3
+ *
+ * v3 - P-46 S5 PLAYER. TEST 8: Free gains Swap, Do this one later and What's
+ *   left (Graeme's decision, spec §6).
+ *
  * 19 Nov 2026 v2
  *
  * v2 - P-9d (c) READY-MADE SESSIONS (19 Nov). How would you like it? has
@@ -314,11 +319,12 @@ console.log("\nTEST 7 - Make it up as I go behind a door; a proposal's Swap sear
 }
 
 // ── 8. Free: none of it ─────────────────────────────────────────────────
-console.log("\nTEST 8 - Free is unchanged");
+// P-46 S5 (Graeme's decision, spec §6): Free gains Swap, Do this one later and What's left.
+console.log("\nTEST 8 - Free has them too");
 fixture("free");
 for (let k = 0; k < firstMain; k++) finishOne();
-ok("8a. Free: no Swap, Do this one later or What's left on an ordinary exercise; Skip this one as before",
-   !main.querySelector(".wo-ctl, #wo-later-btn, #wo-left-btn, #wo-swap-btn") && !!main.querySelector("#skip-exercise-btn") && !!main.querySelector("#wo-exercise-name"), txt(main).slice(0, 200));
+ok("8a. Free: Swap, Do this one later and What's left on an ordinary exercise; Skip this one as before",
+   !!main.querySelector("#wo-swap-btn") && !!main.querySelector("#wo-left-btn") && !!main.querySelector("#skip-exercise-btn") && !!main.querySelector("#wo-exercise-name"), txt(main).slice(0, 200));
 
 console.log(`\n${passes} passed, ${fails} failed`);
 process.exit(fails ? 1 : 0);
