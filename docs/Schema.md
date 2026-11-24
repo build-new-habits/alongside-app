@@ -1,6 +1,8 @@
 # Alongside — Data Schema Reference
-## 23 Nov 2026 v1.132
+## 24 Nov 2026 v1.133
 
+> **v1.133, 24 Nov 2026 — P-45 THE LIVE LINK, schema first** (`store.js` v131). Spec `docs/specs/alongside_physio-live-link_24nov2026_v1.md`; Graeme, 24 Nov (*"Stage 2 please"*). **Two additions, the Plan only; empty while the relay is not set up (`js/data/relay-config.js`).** **`liveLinks`** `[{ id, key, owner, openedAt, after, lists }]` (default `[]`): the live links this phone opened. `id` a v4 UUID (the relay's channel); `key` the AES-GCM key and `owner` the phone's secret, 43 base64url characters each, both kept only here (the relay holds a SHA-256 of `owner`, never `key`); `openedAt` ISO; `after` the last message collected; `lists` the list names sent. 5 at most; one opened over 90 days ago has ended and is dropped on load. **Written by** `views/plan-link-send.js` (open, Stop) and `data/live-check.js` (`after`); **read by** both. **`liveInbox`** `[{ link, msg, code, at, noticed }]` (default `[]`): changes sent through a live link, collected and unsealed, not yet looked at; `code` is the plan link's code (`v1.…`), which may hold the professional's notes. 20 at most, 30 days. **Written by** `data/live-check.js`, Home's question (`noticed`) and *What your physio or trainer changed* (removed when used or kept); **read by** Home and My exercises. *Delete my health answers* empties it. Gated by `tools/verify-live-link.mjs`.
+>
 > **v1.132, 23 Nov 2026 — P-44 PHYSIO LINK, schema first (S1)** (`store.js` v130). Spec `docs/specs/alongside_physio-link_23nov2026_v1.md`; agreed by Graeme, 23 Nov (*"Go ahead"*). **One addition. The Plan only** (Free never writes it). **`ownPrevious`** `{ at, list }` or `null` (default `null`): My exercises (`prescribedExercises` entries, as they were) just before the person used a professional's changes from a back link, so *Put back my old list* can restore it. **Written by** `store.setOwnPrevious(list)` (S4, *What your physio changed*); **read by** My exercises (S4). Read by nothing yet: S4 connects it. **On load** (`store.cleanOwnPrevious()`): `at` must be a date-time within the last 30 days (not in the future); `list` 1 to 200 objects each with a string `id` and `name`; otherwise `null`. *Delete my health answers* takes the notes from its entries, as from `prescribedExercises`. The links themselves are never kept. Gated by `tools/verify-plan-link.mjs`.
 >
 > **v1.131, 23 Nov 2026 — OWN-DONE-TODAY** (`store.js` v129). No field added or changed. **`prescribedExercises[].completedToday`** is now read only through `store.ownDoneToday(e)`: done today only when `completedAt` is today's local day (an entry with no `completedAt` keeps its flag). Before this, the flag was set and never cleared, so every exercise ever ticked showed under *Completed today* (Graeme, 23 Nov). Readers: `prescribed.js`, `prescribed-session.js`, `today.js`, `plan-home.js`, `data/week-shape.js`, `data/little-and-often.js`.
@@ -1108,7 +1110,7 @@
 
 ## 06 Sep 2026 v1.51
 
-**File:** `js/store.js` (confirmed live version: **v130, 23 Nov 2026**)
+**File:** `js/store.js` (confirmed live version: **v131, 24 Nov 2026**)
 
 > **v1.47, 06 Sep 2026 — CR-1.** `conditions[]` gains three ids and loses one. `chronic-fatigue` is **retired**; `persistent-fatigue`, `me-cfs` and `long-covid` replace it. No field shape changed — `conditions` is still `string[]` and `conditionMeta` is still keyed by condition id.
 >

@@ -1,6 +1,10 @@
 /**
  * views/plan-link-back.js
- * 24 Nov 2026 v1
+ * 24 Nov 2026 v2
+ *
+ * v2 - P-45 THE LIVE LINK. Opened from changes that came through a live
+ *   link (router.planBackInbox, "<link>:<msg>"): used or kept, they leave
+ *   the waiting list; so do changes that can't be read or change nothing.
  *
  * P-44 THE PHYSIO LINK, S4 BACK (spec docs/specs/alongside_physio-link_23nov2026_v1.md
  * section 3; Graeme, 24 Nov: "Yes please"). The link a physio or trainer
@@ -36,11 +40,15 @@ export function PlanLinkBackView(router) {
   let plan = null, changes = [], ticked = new Set();
   let state = "reading";      // reading | bad | out | none | choose | done | free
   let used = 0;
+  let inboxKey = null;        // P-45: from the live link's waiting list
+  const done = () => { if (inboxKey) { store.removeLiveInbox(inboxKey); inboxKey = null; } };
 
   async function mount(el) {
     root = el;
     code = router.planBack || null;
     router.planBack = null;
+    inboxKey = router.planBackInbox || null;
+    router.planBackInbox = null;
     if (!isPremium()) { state = "free"; render(); return; }
     render();
     const r = await decodePlan(code);
@@ -52,6 +60,7 @@ export function PlanLinkBackView(router) {
       ticked = new Set(changes.map(c => c.id));
       state = changes.length ? "choose" : "none";
     }
+    if (state !== "choose") done();
     render();
   }
 
@@ -100,14 +109,14 @@ export function PlanLinkBackView(router) {
     if (!ids.length) return;
     store.setOwnPrevious(own.length ? own : null);
     store.set("prescribedExercises", applyChanges(own, plan, ids, { notes: healthAllowed(), known: id => !!exerciseById(id) }));
-    used = ids.length; state = "done"; render(); focusTitle();
+    used = ids.length; state = "done"; done(); render(); focusTitle();
   }
 
   function wire() {
     const q = s => root.querySelector(s);
     q("#plb-home")?.addEventListener("click", () => router.navigate("today"));
     q("#plb-own")?.addEventListener("click", () => router.navigate("prescribed"));
-    q("#plb-keep")?.addEventListener("click", () => router.navigate("prescribed"));
+    q("#plb-keep")?.addEventListener("click", () => { done(); router.navigate("prescribed"); });
     q("#plb-upgrade")?.addEventListener("click", () => router.navigate("upgrade"));
     q("#plb-use")?.addEventListener("click", use);
     root.querySelectorAll("[data-change]").forEach((cb, i) => cb.addEventListener("change", () => {

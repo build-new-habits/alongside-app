@@ -6,6 +6,15 @@ import { validateWeightTarget } from "./data/weight-targets.js";
 
 /**
  * store.js - Data persistence layer
+ * 24 Nov 2026 v131
+ *
+ * v131 - P-45 THE LIVE LINK, schema first (spec
+ *   docs/specs/alongside_physio-live-link_24nov2026_v1.md). liveLinks: the
+ *   live links this phone opened (5 at most, 90 days each); liveInbox: changes
+ *   a professional sent through one, waiting to be looked at (20 at most, 30
+ *   days). Cleaned on load. Delete my health answers empties liveInbox (their
+ *   notes may be in it). Schema v1.133.
+ *
  * 23 Nov 2026 v130
  *
  * v130 - P-44 PHYSIO LINK S1 (spec docs/specs/alongside_physio-link_23nov2026_v1.md).
@@ -1823,6 +1832,8 @@ export const store = {
       // P-39 (v125). Made safe on every load.
       myMove: this.cleanMyMove(saved.myMove),
       ownPrevious: this.cleanOwnPrevious(saved.ownPrevious),
+      liveLinks: this.cleanLiveLinks(saved.liveLinks),
+      liveInbox: this.cleanLiveInbox(saved.liveInbox),
       myExercisesGroup: typeof saved.myExercisesGroup === "string" && saved.myExercisesGroup.trim()
         ? saved.myExercisesGroup.replace(/[<>]/g, "").slice(0, 40) : null,
 
@@ -2245,6 +2256,69 @@ export const store = {
     if (!src.list.every(e => e && typeof e === 'object' && !Array.isArray(e) && typeof e.id === 'string' && typeof e.name === 'string')) return null;
     return { at: src.at, list: JSON.parse(JSON.stringify(src.list)) };
   },
+  /**
+   * P-45. The live links this phone opened: { id (uuid), key, owner (43
+   * characters each, base64url), openedAt (ISO), after (the last message
+   * collected, 0 to start), lists (the list names sent) }. 5 at most; one
+   * opened more than 90 days ago has ended and is dropped.
+   */
+  LIVE_DAYS: 90, LIVE_MAX: 5, INBOX_MAX: 20, INBOX_DAYS: 30,
+  cleanLiveLinks(src, now = new Date()) {
+    if (!Array.isArray(src)) return [];
+    const K = /^[A-Za-z0-9_-]{43}$/, U = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
+    const out = [];
+    for (const l of src) {
+      if (!l || typeof l !== 'object' || !U.test(l.id) || !K.test(l.key) || !K.test(l.owner)) continue;
+      const t = typeof l.openedAt === 'string' ? Date.parse(l.openedAt) : NaN;
+      if (!Number.isFinite(t) || t > now.getTime() + 60000 || now.getTime() - t > this.LIVE_DAYS * 864e5) continue;
+      if (out.some(o => o.id === l.id)) continue;
+      const lists = Array.isArray(l.lists) ? l.lists.filter(g => typeof g === 'string' && g.length <= 40).slice(0, 12) : [];
+      out.push({ id: l.id, key: l.key, owner: l.owner, openedAt: l.openedAt, after: Number.isInteger(l.after) && l.after >= 0 ? l.after : 0, lists });
+    }
+    return out.slice(-this.LIVE_MAX);
+  },
+  /**
+   * P-45. Changes sent through a live link, not yet looked at: { link (its
+   * id), msg (the relay's number), code (the plan link's code, "v1.…"), at
+   * (ISO, when it came), noticed (Home has asked once) }. 20 at most, 30 days.
+   */
+  cleanLiveInbox(src, now = new Date()) {
+    if (!Array.isArray(src)) return [];
+    const U = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
+    const out = [];
+    for (const m of src) {
+      if (!m || typeof m !== 'object' || !U.test(m.link) || !Number.isInteger(m.msg) || m.msg < 1) continue;
+      if (typeof m.code !== 'string' || !/^v1\.[A-Za-z0-9_-]{8,20000}$/.test(m.code)) continue;
+      const t = typeof m.at === 'string' ? Date.parse(m.at) : NaN;
+      if (!Number.isFinite(t) || t > now.getTime() + 60000 || now.getTime() - t > this.INBOX_DAYS * 864e5) continue;
+      if (out.some(o => o.link === m.link && o.msg === m.msg)) continue;
+      out.push({ link: m.link, msg: m.msg, code: m.code, at: m.at, noticed: m.noticed === true });
+    }
+    return out.slice(-this.INBOX_MAX);
+  },
+  saveLiveLink(link) {
+    const rest = (this.data.liveLinks || []).filter(l => l.id !== link.id);
+    this.data.liveLinks = this.cleanLiveLinks([...rest, link]);
+    this.save();
+  },
+  removeLiveLink(id) {
+    this.data.liveLinks = (this.data.liveLinks || []).filter(l => l.id !== id);
+    this.save();
+  },
+  addLiveInbox(items) {
+    this.data.liveInbox = this.cleanLiveInbox([...(this.data.liveInbox || []), ...items]);
+    this.save();
+  },
+  /** key: "<link>:<msg>". */
+  noticeLiveInbox(key) {
+    this.data.liveInbox = (this.data.liveInbox || []).map(m => `${m.link}:${m.msg}` === key ? { ...m, noticed: true } : m);
+    this.save();
+  },
+  removeLiveInbox(key) {
+    this.data.liveInbox = (this.data.liveInbox || []).filter(m => `${m.link}:${m.msg}` !== key);
+    this.save();
+  },
+
   setOwnPrevious(list) {
     this.data.ownPrevious = list ? this.cleanOwnPrevious({ at: new Date().toISOString(), list }) : null;
     this.save();
@@ -2872,6 +2946,8 @@ export const store = {
       // is liked or not wanted, never both (likeMovement / setExercisePreference).
       likedMovements: {},
       ownPrevious: null,
+      liveLinks: [],
+      liveInbox: [],
       // P-39 MAKING MY MOVE (v125). Spec section 7.
       myMove: { step: null, made: null, purposes: [], most: null, goodDay: 'few', hardDay: ['coach'], dismissed: [], day: null, startClosed: null, review: null },
 
@@ -3468,6 +3544,8 @@ export const store = {
       return rest;
     });
     // P-44 S1. The list kept from before a professional's changes: its notes go too.
+    // P-45. Changes waiting from a professional may carry their notes: they go.
+    this.data.liveInbox = [];
     if (this.data.ownPrevious) this.data.ownPrevious = { ...this.data.ownPrevious, list: this.data.ownPrevious.list.map(e => { const { notes, ...rest } = e || {}; return rest; }) };
     const sg = this.data.strategicGoal;
     if (sg && typeof sg === 'object' && (sg.targetUnit === 'kg' || sg.weightTargetBand != null)) {

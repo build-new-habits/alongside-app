@@ -1,6 +1,11 @@
 /**
  * views/plan-home.js
- * 23 Nov 2026 v17
+ * 24 Nov 2026 v18
+ *
+ * v18 - P-45 THE LIVE LINK. When a physio or trainer has sent changes
+ *   through a live link, Home asks once: Your physio or trainer sent changes
+ *   to your exercises (Look at them / Later); it comes first, and the other
+ *   questions wait. Not on a hard day. Later leaves them in My exercises.
  *
  * v17 - OWN-DONE-TODAY (Graeme, 23 Nov: "It says I did these today but I
  *   didn't"). Done today is read through store.ownDoneToday(): ticked today
@@ -503,6 +508,13 @@ function ask(id, q, yes, no) {
     </section>`;
 }
 
+/** P-45. Changes sent through a live link, not yet asked about. */
+function liveWaiting() { return (store.get("liveInbox") || []).find(m => !m.noticed) || null; }
+function liveAsk(mm) {
+  if (mm.day === "hard" || !liveWaiting()) return "";
+  return ask("ask-live", "Your physio or trainer sent changes to your exercises.", "Look at them", "Later");
+}
+
 function myMoveBar(mm) {
   const asks = mm.ask ? ask("ask-hard", "You said your mood is low today. Keep today to what you chose for hard days?", "Yes", "No, as planned")
     : mm.review ? ask("ask-review", `${reviewBlock() * 12} weeks into your arc. Still what you want Alongside for?`, "Have a look", "Yes, still right") : "";
@@ -541,7 +553,7 @@ export function renderPlanHome(ctx = {}) {
       ${arcLine(arc)}
       ${hardLead ? hardToday(mm) : (mm.day === "hard" ? `<p class="path-note path-mm__note">A hard day. Here's what you chose for days like this.</p>` : "") + todayCard(state, ctx.carry)}
       ${hardLead ? "" : changeBar(state)}
-      ${myMoveBar(mm)}
+      ${liveAsk(mm) ? `<div class="path-mm">${liveAsk(mm)}</div>` : ""}${myMoveBar(liveAsk(mm) ? { ...mm, ask: false, review: false } : mm)}
       ${littleAndOften()}
       <h2 class="look-label" id="path-doors-h" tabindex="-1">${label}</h2>
       <ul class="path-doors" aria-labelledby="path-doors-h">
@@ -631,6 +643,18 @@ export function wirePlanHome(container, router) {
   });
   container.querySelector('[data-action="ask-hard-no"]')?.addEventListener("click", () => {
     setToday("usual");
+    router.homeFocus = "doors";
+    router.navigate("today");
+  });
+  // P-45. Look at them: What your physio or trainer changed. Later: My exercises keeps them.
+  container.querySelector('[data-action="ask-live-yes"]')?.addEventListener("click", () => {
+    const m = liveWaiting(); if (!m) return;
+    store.noticeLiveInbox(`${m.link}:${m.msg}`);
+    router.planBack = m.code; router.planBackInbox = `${m.link}:${m.msg}`;
+    router.navigate("plan-link-back");
+  });
+  container.querySelector('[data-action="ask-live-no"]')?.addEventListener("click", () => {
+    const m = liveWaiting(); if (m) store.noticeLiveInbox(`${m.link}:${m.msg}`);
     router.homeFocus = "doors";
     router.navigate("today");
   });

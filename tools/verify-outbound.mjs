@@ -1,6 +1,12 @@
 /**
  * tools/verify-outbound.mjs
- * 06 Oct 2026 v5
+ * 24 Nov 2026 v6
+ *
+ * v6 - P-45 THE LIVE LINK. A second, and only other, file may send:
+ *   js/data/live-link.js, only inside rpc(), only while the relay is set
+ *   (a Supabase https address and key), only to its /rest/v1/rpc/ address,
+ *   with no cookies or referrer; and the relay starts empty (4e-4g). Its
+ *   privacy lines are drafted for Foot Anstey before it is switched on.
  *
  * v5 - D-11 PROGRESS-SHARE. 2c reads the font faces per family: Inter keeps
  *   its four weights; Newsreader, the certificate's serif (OFL, served from
@@ -157,11 +163,16 @@ for (const p of js) {
 }
 ok("4a. no fetch, XMLHttpRequest, sendBeacon or WebSocket to a web address", calls.length === 0, calls.join(", "));
 const posts = js.filter(p => /method:\s*["']POST["']/.test(read(p).replace(/\/\*[\s\S]*?\*\//g, "")));
-ok("4b. one file in the app can send anything it made: evidence.js", posts.length === 1 && /data\/evidence\.js$/.test(posts[0]), posts.join(", "));
-const ev = read(posts[0] || "js/data/evidence.js");
+ok("4b. two files in the app can send anything: evidence.js and (v6, P-45) live-link.js", posts.length === 2 && posts.some(f => /data\/evidence\.js$/.test(f)) && posts.some(f => /data\/live-link\.js$/.test(f)), posts.join(", "));
+const ev = read("js/data/evidence.js");
 const fnBody = ev.slice(ev.indexOf("export async function sendEvidence"), ev.indexOf("export function researchMessages"));
 ok("4c. only inside sendEvidence, and only while the receiver is set", /if \(!enabled\(\)/.test(fnBody) && /method: "POST"/.test(fnBody));
 ok("4d. the receiver starts empty: nothing is sent until it is set", /export const RECEIVER = \{ url: "", key: ""/.test(ev));
+const ll = read("js/data/live-link.js").replace(/\/\*[\s\S]*?\*\//g, "");
+const rpcBody = ll.slice(ll.indexOf("async function rpc("), ll.indexOf("return {", ll.indexOf("async function rpc(")));
+ok("4e. live-link.js: only inside rpc(), and only while the relay is set", (ll.match(/method:\s*"POST"/g) || []).length === 1 && /method: "POST"/.test(rpcBody) && /if \(!on\) throw/.test(rpcBody));
+ok("4f. ... only to a Supabase https address's RPC, with no cookies or referrer", /const on = \/\^https:\\\/\\\/\[a-z0-9-\]\+\\\.supabase\\\.co\$\//.test(ll) && /\$\{url\}\/rest\/v1\/rpc\/\$\{name\}/.test(rpcBody) && /credentials: "omit"/.test(rpcBody) && /referrerPolicy: "no-referrer"/.test(rpcBody));
+ok("4g. the relay starts empty: nothing is sent until it is set", /export const RELAY = Object\.freeze\(\{ url: "", anonKey: "" \}\);/.test(read("js/data/relay-config.js")));
 
 console.log(`\n${passes} passed, ${fails} failed`);
 process.exit(fails ? 1 : 0);

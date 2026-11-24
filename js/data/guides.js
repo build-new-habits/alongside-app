@@ -226,6 +226,7 @@ export const GUIDES = Object.freeze([
       { q: "It says the link is not complete", answer: "Messages sometimes cut long links short. Ask them to use **Copy the link** or **Email it** on their page." },
       { q: "I used their changes and want my old list back", answer: "In **My exercises**, tap **Put back my old list**. It is kept for 30 days." },
       { q: "Can they see my notes?", answer: "Only if you tick **Your notes** before you send. Anyone with the link can read what is in it." },
+      { q: "Can their changes come straight to my phone?", answer: "When it is switched on, tick **Send their changes straight to this phone** before you send. Home tells you when changes arrive, and you still choose what to keep. To end it, go back to **Send a link to change** and tap **Stop this live link**." },
     ],
   },
   {

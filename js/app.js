@@ -1,6 +1,11 @@
 /**
  * app.js - Application entry point
- * 24 Nov 2026 v17
+ * 24 Nov 2026 v18
+ *
+ * v18 - P-45 THE LIVE LINK. After the first screen, and whenever the app
+ *   comes back into view, collect changes sent through live links
+ *   (data/live-check.js, every 2 minutes at most; nothing when the relay is
+ *   not set up). New ones on Home: Home is drawn again to ask.
  *
  * v17 - P-44 S4 (the physio link). Opened by a link a physio or trainer
  *   sent back (#back=v1.…): the code is taken out of the address at once
@@ -277,6 +282,13 @@ const App = {
     } else {
       await router.navigate(firstView);
     }
+    // P-45. Changes sent through a live link.
+    const liveCheck = () => import('./data/live-check.js')
+      .then(m => m.checkLive())
+      .then(n => { if (n && router.currentView === 'today') router.navigate('today', { replace: true }); })
+      .catch(() => {});
+    liveCheck();
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') liveCheck(); });
     // ... and one tapped while the app is already open.
     window.addEventListener('hashchange', () => {
       if (!/^#back=v1\./.test(location.hash) || store.get('onboardingComplete') !== true) return;

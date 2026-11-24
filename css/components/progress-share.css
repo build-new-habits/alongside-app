@@ -1,6 +1,8 @@
 /*
  * css/components/progress-share.css
- * 24 Nov 2026 v4
+ * 24 Nov 2026 v5
+ *
+ * v5 - P-45: Your live links (.pl-live); changes waiting (.px-live__list).
  *
  * v4 - P-44 S4: What your physio or trainer changed (.plb-say, .plb-kind);
  *   My exercises' Put back my old list (.px-prev).
@@ -175,3 +177,9 @@
 .px-prev p { margin: 0; }
 .px-prev__acts { display: flex; flex-wrap: wrap; gap: var(--space-2); }
 .px-prev .btn { min-height: 44px; }
+
+/* ---------- P-45 the live link (v5) ---------- */
+.pl-live { margin-top: var(--space-5); }
+.pl-live__list, .px-live__list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-3); width: 100%; }
+.pl-live__list li, .px-live__list li { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2); }
+.pl-live__list .btn, .px-live__list .btn { min-height: 44px; }
