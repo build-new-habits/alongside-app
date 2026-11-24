@@ -1,7 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 24 Nov 2026 v741
+ * 24 Nov 2026 v742
+ *
+ * v742 - P-46 S5 PLAYER (both tiers). One screen per move: the name, the dose, Swap, Do this one later and What's left (now on Free too), the figure and one cue line, then the sets and the main button. Why, Watch out, How and Easier or harder are folded under More about this move; a sore area's line stays on screen. The four steps are gone: a 12-move session in about 24 taps. No new files.
  *
  * v741 - P-46 S4 FREE HOME (Free; the Plan's Home unchanged). Free Home is the coach, today: How are you today? and Check in, then today's session; Something gentler; six ready-made sessions; Log what I did; Your exercises with a list; See what the Plan adds. Choosing any kind of session, Classes, the Library, the arc and the programme are the Plan's: a Free route to one opens a page that says so. NEW FILES precached: js/views/free-home.js, js/views/on-the-plan.js.
  *
@@ -4335,7 +4337,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v741";
+const CACHE_NAME = "alongside-v742";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4391,7 +4393,7 @@ const SHELL_HASHES = {
   "./css/components/equipment-modal.css": "923c72d2dadb57c3",
   "./css/components/morning-session.css": "88a53b15036d446d",
   "./css/components/settings-library.css": "6e8065c1fb782ba8",
-  "./css/components/workout.css": "7e8e0bcd8b851fca",
+  "./css/components/workout.css": "07c2fe0fc62befd3",
   "./css/layouts/app-shell.css": "a7b24b10fea16cc7",
   "./css/layouts/goal-setup.css": "32ded4f3cacc0b13",
   "./css/layouts/onboarding.css": "9dd282cf6249ceae",
@@ -4405,7 +4407,7 @@ const SHELL_HASHES = {
   "./js/store.js": "da198c2848d498f0",
   "./js/session-log.js": "6134de4315842e05",
   "./js/exercise-feedback.js": "adba8549f444da2a",
-  "./js/exercise-card.js": "4ed40e63efe33a26",
+  "./js/exercise-card.js": "87af7a5668137593",
   "./js/safety-gate.js": "1b7e41d99e2cf520",
   "./js/save-block.js": "efe2b2583f4c14f7",
   "./js/stretch-target.js": "e8c305bfb957d655",
@@ -4425,7 +4427,7 @@ const SHELL_HASHES = {
   "./js/views/checkin.js": "5ea0fea142be8ceb",
   "./js/views/checkin-mini.js": "c647f4da71feddde",
   "./js/views/coach-proposal.js": "816ba25a48fe721e",
-  "./js/views/workout.js": "fba068b2e4f6c61f",
+  "./js/views/workout.js": "eb9b6b11c13086e9",
   "./js/views/progress.js": "7708195f75512d62",
   "./js/views/settings.js": "409f0a13bbb63e89",
   "./js/views/restore-flow.js": "dc81c2e455fa472d",
