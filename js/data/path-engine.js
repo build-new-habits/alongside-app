@@ -1,6 +1,11 @@
 /**
  * js/data/path-engine.js
- * 07 Nov 2026 v5
+ * 24 Nov 2026 v6
+ *
+ * v6 - W7-1 (Wave 7, 24 Nov). adjustmentsFor() takes firstSession: with
+ *   no finished session yet, the line said when nothing else applies is
+ *   "A balanced first session", not "Mixed up from your last few
+ *   sessions", which was untrue on a first plan.
  *
  * v5 - S2 SAFE-LEFTOUT (Graeme, 07 Nov). adjustmentsFor() says "Left out
  *   moves that load your <area>" only for an area in leftOutAreas (the
@@ -118,7 +123,7 @@ export function suggestToday({ checkin = null, week = null, arcDoor: door = null
 // ── E4. What I've adjusted ───────────────────────────────────────────────
 
 /** The exact sentences of blueprint E4. Never empty. */
-export function adjustmentsFor({ checkin = null, sore = [], likedNames = [], lessNames = [], neverNames = [], leftOutAreas } = {}) {
+export function adjustmentsFor({ checkin = null, sore = [], likedNames = [], lessNames = [], neverNames = [], leftOutAreas, firstSession = false } = {}) {
   const out = [];
   const energy = checkin?.energy ?? null, mood = checkin?.mood ?? null;
   if (energy != null && energy <= 3) out.push("Shorter than usual, with more time to settle at the end");
@@ -141,7 +146,7 @@ export function adjustmentsFor({ checkin = null, sore = [], likedNames = [], les
   if ((lessNames || [])[0]) out.push(`Less of ${lessNames[0]}`);
   const seen = new Set();
   const list = out.filter(x => !seen.has(x) && seen.add(x));
-  return list.length ? list : ["Mixed up from your last few sessions"];
+  return list.length ? list : [firstSession ? "A balanced first session" : "Mixed up from your last few sessions"];
 }
 
 // ── E3. Likes, recency ───────────────────────────────────────────────────

@@ -1,6 +1,10 @@
 /**
  * js/data/path-context.js
- * 07 Nov 2026 v4
+ * 24 Nov 2026 v5
+ *
+ * v5 - W7-1 (Wave 7, 24 Nov). shownAdjustments() tells the engine when no
+ *   session has been finished yet, so a first plan never says "Mixed up
+ *   from your last few sessions".
  *
  * v4 - S2 SAFE-LEFTOUT (Graeme, 07 Nov). shownAdjustments() passes
  *   leftOutAreas through, so a screen that checked its movements can say
@@ -118,7 +122,8 @@ const NOT_YET = [];   // v2: Session 6 made the last two true (workout.js v36)
  */
 export function shownAdjustments({ nameArea = true, leftOutAreas } = {}) {
   const named = soreToday().map(s => ` your ${areaWords(s.id)}`);
-  return adjustmentsFor({ checkin: checkinToday(), sore: soreToday(), ...prefNames(), leftOutAreas })
+  const firstSession = store.completedSessions(store.get("activityLog") || []).length === 0;   // W7-1
+  return adjustmentsFor({ checkin: checkinToday(), sore: soreToday(), ...prefNames(), leftOutAreas, firstSession })
     .filter(line => !NOT_YET.some(re => re.test(line)))
     .filter(line => nameArea || !named.some(w => line.endsWith(w)));
 }
