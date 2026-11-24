@@ -1,6 +1,11 @@
 /**
  * tools/verify-physio-link.mjs
- * 23 Nov 2026 v1
+ * 24 Nov 2026 v2
+ *
+ * v2 - SHARE-NOW (Graeme, 24 Nov: "The link does copy and I can't share").
+ *   TEST 2S: the link is ready before the tap, so Share and Copy are asked
+ *   for at once, inside it; Share refused: copied, and said; no Share:
+ *   copied, said; Copy refused too: the link shown, selected.
  *
  * P-44 THE PHYSIO LINK, S2 SEND and S3 THE PAGE (spec
  * docs/specs/alongside_physio-link_23nov2026_v1.md). The app's Send a
@@ -143,6 +148,34 @@ ok("2i. without the health consent, notes can't be chosen, and it says why", q("
 await click(q("#pl-copy")); r = await PL.decodePlan(copied);
 ok("2j. ... and none go", r.ok && !JSON.stringify(r.plan).includes("squeeze"));
 ok("2k. it says plainly that anyone with the link can read it", /Nothing is sent to us\. Everything is in the link, so anyone you give it to can read it\./.test(txt(main)));
+
+console.log("\nTEST 2S - Share and Copy, at once");
+let shares = [];
+const setShare = fn => Object.defineProperty(dom.window.navigator, "share", { value: fn, configurable: true, writable: true });
+fixture(); await mountSend(); await wait(100);
+setShare(d => { shares.push(d); return Promise.resolve(); });
+q("#pl-share").dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }));
+ok("2Sa. the link is ready before the tap: Share is asked for at once, inside it", shares.length === 1 && (await PL.decodePlan(shares[0].url)).ok, String(shares.length));
+await wait(40); ok("2Sb. said", /^Shared\.$/.test(txt(q("#pl-status"))));
+copied = null; q("#pl-copy").dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }));
+ok("2Sc. Copy, at once too", typeof copied === "string" && copied.startsWith("https://buildnewhabits.co.uk/edit-plan/#v1."));
+await tick(q('[data-list="Evening"]'), false); shares = [];
+q("#pl-share").dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }));
+ok("2Sd. after a change, the new link is ready at once", shares.length === 1 && (await PL.decodePlan(shares[0].url)).plan.lists.map(l => l.g).join() === "Gym A");
+setShare(() => Promise.reject(Object.assign(new Error("x"), { name: "NotAllowedError" }))); copied = null;
+q("#pl-share").dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true })); await wait(80);
+ok("2Se. Share refused: copied instead, and said", typeof copied === "string" && /Sharing didn’t open here, so the link is copied instead/.test(txt(q("#pl-status"))), txt(q("#pl-status")));
+setShare(() => Promise.reject(Object.assign(new Error("x"), { name: "AbortError" }))); copied = null;
+q("#pl-share").dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true })); await wait(80);
+ok("2Sf. they closed the share sheet: nothing more", copied === null);
+setShare(undefined); delete dom.window.navigator.share; copied = null;
+q("#pl-share").dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true })); await wait(80);
+ok("2Sg. no Share on this phone: copied, and said", typeof copied === "string" && /can’t share from here, so the link is copied instead/.test(txt(q("#pl-status"))));
+const realClip = dom.window.navigator.clipboard;
+Object.defineProperty(dom.window.navigator, "clipboard", { value: { writeText: () => Promise.reject(new Error("no")) }, configurable: true });
+q("#pl-copy").dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true })); await wait(80);
+ok("2Sh. Copy refused too: the link shown, labelled, focused, and said", !!q("#pl-link") && q("#pl-link").value.startsWith("https://buildnewhabits.co.uk/edit-plan/#v1.") && document.activeElement === q("#pl-link") && !!document.querySelector('label[for="pl-link"]') && /won’t copy from here\. The link is below, selected/.test(txt(q("#pl-status"))));
+Object.defineProperty(dom.window.navigator, "clipboard", { value: realClip, configurable: true });
 
 console.log("\nTEST 3 - the QR code");
 fixture(); await mountSend();
