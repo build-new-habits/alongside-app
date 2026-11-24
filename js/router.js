@@ -1,5 +1,14 @@
 /**
  * router.js
+ * 24 Nov 2026 v62
+ *
+ * v62 - P-46 S4 FREE HOME. 'on-the-plan' (views/on-the-plan.js). Free asking
+ *   for something that moved to the Plan (FREE_MOVED: choosing a session,
+ *   Mobility & Conditioning, Classes, the Library, I know what I want, the
+ *   programme, the weekly plan, Your week, the arc) opens that page, told
+ *   which (this.planOnly). Make it up as I go still goes to the upgrade page
+ *   (W4-22). The session players, In Step and Wellbeing stay on both tiers.
+ *
  * 24 Nov 2026 v61
  *
  * v61 - P-46 S2. 'onboarding/start' (views/onboarding/start.js), the one-minute
@@ -463,6 +472,8 @@ const VIEW_NAMES = {
   'journal-entry':     { path: './views/journal-entry.js',    fn: 'JournalEntryView'    },
   'activity-log':      { path: './views/activity-log.js',     fn: 'ActivityLogView'     },
   'library':           { path: './views/library.js',          fn: 'LibraryView'         },
+  // P-46 S4. A Free route to something on the Plan: one page saying so.
+  'on-the-plan':       { path: './views/on-the-plan.js',      fn: 'OnThePlanView'       },
   'your-week':         { path: './views/your-week.js',        fn: 'YourWeekView'        },
   'plan-import':       { path: './views/plan-import.js',      fn: 'PlanImportView'      },
   'change-today':      { path: './views/change-today.js',     fn: 'ChangeTodayView'     },
@@ -576,6 +587,10 @@ const hideNavViews = new Set([
 ]);
 
 // W4-1 GATE-OPEN. Screens left only by answering them: no house button.
+// P-46 S4. Free's routes that moved to the Plan (views/on-the-plan.js PLAN_ONLY).
+const FREE_MOVED = new Set(['session-builder', 'mobility-conditioning', 'classes', 'class-player', 'library',
+  'know-what', 'my-programme', 'weekly-plan', 'your-week', 'arc-setup', 'stretch-arc', 'goal-setup']);
+
 const NO_EXIT_VIEWS = new Set(['onboarding/thread', 'onboarding/start', 'age-check', 'under-18', 'consent-update']);
 // D662-6 TWO-HOMES. Screens with their own way home: no house beside it.
 // Today's plan hides it itself while its plan (with "‹ Home") is showing.
@@ -639,7 +654,7 @@ const NAV_MAP = {
 // W5-16. Screens where the phone's Back, with nothing behind, leaves the app.
 const BACK_LEAVES = new Set(['under-18', 'age-check', 'onboarding/thread', 'onboarding/start', 'consent-update']);
 
-const GATE_SESSION_ENDS = new Set(['today', 'progress', 'noticing', 'settings', 'library']);
+const GATE_SESSION_ENDS = new Set(['today', 'progress', 'noticing', 'settings', 'library', 'on-the-plan']);   // P-46 S4: Free's Library is on-the-plan
 
 export const router = {
 
@@ -685,6 +700,14 @@ export const router = {
       try {
         if (!this._au) this._au = await import('./auth.js');
         if (!this._au.isPremium()) { viewName = 'upgrade'; this.redirectReason = 'capture'; }
+      } catch (err) { console.error('Router: tier check failed', err); }
+    }
+    // P-46 S4. Moved to the Plan: on Free, one page that says so.
+    this.planOnly = null;
+    if (FREE_MOVED.has(viewName)) {
+      try {
+        if (!this._au) this._au = await import('./auth.js');
+        if (!this._au.isPremium()) { this.planOnly = viewName; viewName = 'on-the-plan'; }
       } catch (err) { console.error('Router: tier check failed', err); }
     }
     // P-27 (Graeme, 05 Nov: "The Plan's finish"). On the Plan every session

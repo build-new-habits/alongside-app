@@ -1,5 +1,10 @@
 /**
  * tools/verify-small-ones.mjs
+ * 24 Nov 2026 v4
+ *
+ * v4 - P-46 S4 FREE HOME. Free Home has no doors by kind (Graeme's
+ *   decision): TEST 1 keeps only that a run still plays on Free.
+ *
  * 17 Oct 2026 v3
  *
  * v3 - W6-17 (Graeme, 04 Oct: "I guess option 1"). 6a counts sessions in the last three
@@ -79,16 +84,13 @@ function fixture(tier) {
 async function go(view) { await router.navigate(view); await wait(60); }
 
 // ── 1. RUN ON FREE ──────────────────────────────────────────────────────
-console.log("\nTEST 1 - Free Home has a door to running");
+// P-46 S4. Free Home has no doors by kind now (spec §5, Graeme's decision):
+// a run is the Plan's Keep moving door. The run itself still plays on Free
+// when Today's plan chooses one.
+console.log("\nTEST 1 - a run still plays on Free; its door is the Plan's");
 fixture("free");
-await go("today");
-{
-  const group = main.querySelector('[aria-labelledby="today-group-body"]');
-  const door = group && [...group.querySelectorAll("button")].find(b => /\bRun\b/.test(txt(b)));
-  ok("1a. a Run door among \"Move your body\"", !!door, group ? [...group.querySelectorAll("button")].map(txt).join(" | ") : "");
-  click(door); await wait(150);
-  ok("1b. it opens a run, not the upgrade page", router.currentView === "running-session" || (router.currentView === "red-flag"), `${router.currentView} | ${txt(main).slice(0, 100)}`);
-}
+await go("running-session");
+ok("1b. the run opens on Free, not the upgrade page", router.currentView === "running-session" || router.currentView === "red-flag", `${router.currentView} | ${txt(main).slice(0, 100)}`);
 
 // ── 2. THE ARC SCREEN SAYS WHAT THE ARC IS ──────────────────────────────
 console.log("\nTEST 2 - a strength arc lands on a screen about that arc");

@@ -1,6 +1,12 @@
 import { createRequire as __cr } from "node:module";
 /**
  * tools/verify-my-move-home.mjs
+ * 24 Nov 2026 v4
+ *
+ * v4 - P-46 S4 FREE HOME. Free Home is its own now (free-home.js: coach-led,
+ *   in the Plan's look, path-* classes), so the Free control reads .free-home
+ *   and the absence of the Plan's doors, not the absence of path-home.
+ *
  * 23 Nov 2026 v3
  *
  * v3 - S6 QUIET HOME (Graeme, 23 Nov: "I'd like them to disappear off the
@@ -128,7 +134,7 @@ const MY = { purposes: ["stronger", "stretch", "calm", "instep"], most: "stronge
 
 console.log("\nTEST 0 - controls");
 fixture({ tier: "free" }); home();
-ok("0a. Free Home has no Making my Move line", !mmBar() && !main.querySelector(".path-home"));
+ok("0a. Free Home has no Making my Move line", !mmBar() && !!main.querySelector(".free-home"));
 fixture(); home();
 ok("0b. the fixture reaches the Plan's Home", !!main.querySelector(".path-home"));
 

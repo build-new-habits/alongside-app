@@ -1,5 +1,12 @@
 /**
  * tools/verify-look-rest.mjs
+ * 24 Nov 2026 v7
+ *
+ * v7 - P-46 S4 FREE HOME. TEST 2 reads the coach-led Free Home (each way in
+ *   in its kind colour, a line icon beside its words, Check in); TEST 5:
+ *   Free's Library moved to the Plan, so Free gets the on-the-plan page in the
+ *   same look.
+ *
  * 05 Nov 2026 v6
  *
  * v6 - P-27 TIDY (Graeme, 05 Nov: "The Plan's finish"). TEST 3: on the Plan,
@@ -145,15 +152,16 @@ ok("1k. a link still opens its screen (Library)", router.currentView === "librar
 console.log("\nTEST 2 - Free Home");
 fixture("free");
 await go("today");
-const tiles = $$(".today-door--pick");
-const tileLook = tiles.map(t => `${t.dataset.doorId}:${(t.querySelector(".kind-tile")?.className.match(KIND) || [])[1]}`);
-ok("2pc. Free Home rendered (the session tiles)", tiles.length >= 5, txt(main).slice(0, 120));
-ok("2a. each tile in its kind colour (strength amber, mobility and yoga violet, run blue, classes rose, Wellbeing green)",
-   ["cardio-core-strength:amber", "mobility-conditioning:violet", "yoga:violet", "run:blue", "classes:rose", "wellbeing:green"].every(x => tileLook.includes(x)), JSON.stringify(tileLook));
-ok("2b. a line icon on each, beside its words", tiles.every(t => t.querySelector(".kind-tile svg.line-icon") && txt(t.querySelector(".today-door__label"))));
-ok("2c. Wellbeing has its own row", $('[data-door-id="wellbeing"]')?.classList.contains("today-door--wide"));
-ok("2d. My exercises and Library in one card, each with its tile", $(".today-reference")?.classList.contains("look-card") && $$(".today-ref-row .kind-tile svg").length === 2);
-ok("2e. Not sure? I'll pick something is still there", /Not sure\? I.ll pick something/.test(txt($(".today-unsure"))));
+// P-46 S4: Free Home is coach-led, in the Plan's look (free-home.js).
+const ways = $$(".free-home .path-door");
+const wayLook = ways.map(t => `${t.dataset.action || t.dataset.route}:${(t.querySelector(".kind-tile")?.className.match(KIND) || [])[1]}`);
+ok("2pc. Free Home rendered (the Today card and its ways in)", !!$(".free-home .path-today") && ways.length >= 3, txt(main).slice(0, 120));
+ok("2a. each way in in its kind colour (Something gentler violet, ready-made amber, Log what I did slate)",
+   ["free-gentler:violet", "free-ready:amber", "activity-log:slate"].every(x => wayLook.includes(x)), JSON.stringify(wayLook));
+ok("2b. a line icon on each, beside its words", ways.every(t => t.querySelector(".kind-tile svg.line-icon") && txt(t.querySelector(".path-door__t"))));
+ok("2c. Wellbeing is not a row (it is in the bottom bar)", !$('[data-route="noticing"]'));
+ok("2d. the Today card carries its tile", !!$(".path-today .kind-tile svg"));
+ok("2e. Check in is there", txt($('.path-today [data-action="start-today"]')) === "Check in");
 ok("2f. icons decorative; no emoji on Free Home", iconsDecorative() && !EMOJI.test(txt(main)), (txt(main).match(EMOJI) || [""])[0]);
 
 // ── 3. THE FINISH SCREEN ────────────────────────────────────────────────
@@ -188,26 +196,11 @@ ok("4h. a practice still opens (Breathing)", router.currentView !== "noticing", 
 
 // ── 5. LIBRARY ──────────────────────────────────────────────────────────
 console.log("\nTEST 5 - Library");
+// P-46 S4: Free's Library moved to the Plan; its first-page checks retire with
+// it (git history). The Plan's Library is verify-library-shelf.
 fixture("free");
 await go("library");
-const cats = $$(".library-category-card");
-ok("5pc. the Library rendered", txt($("h1")) === "Library");
-ok("5a. every kind of session is on the first page (no Start a session step)", cats.length >= 9 && !$("#lib-start-session-btn"), `${cats.length} categories`);
-const catLook = Object.fromEntries(cats.map(c => [txt(c.querySelector(".library-category-label")), (c.querySelector(".kind-tile")?.className.match(KIND) || [])[1]]));
-ok("5b. each in its kind colour (home and gym amber; run, walk, swim, cycle blue; yoga violet; mindful green)",
-   catLook["At home"] === "amber" && catLook["At the gym"] === "amber" && ["Run", "Walk", "Swim", "Cycle"].every(k => catLook[k] === "blue") && catLook["Yoga / Pilates"] === "violet" && catLook["Mindful practice"] === "green",
-   JSON.stringify(catLook));
-ok("5c. Log what I did is still there", /Log what I did/.test(txt($("#lib-log-activity-btn"))));
-ok("5d. the categories are named by their heading", $(".library-category-grid")?.getAttribute("aria-labelledby") === "lib-start-h" && txt($("#lib-start-h")) === "Start a session");
-ok("5e. icons decorative; no emoji on the Library page", iconsDecorative() && !EMOJI.test(txt(main)), (txt(main).match(EMOJI) || [""])[0]);
-click($('[data-guided="home"]')); await wait(30);
-ok("5f. one tap: At home opens its sessions", /At home/.test(txt($("h1"))), txt($("h1")));
-const back = $("#lib-back-btn");
-ok("5g. its Back says Library", back?.getAttribute("aria-label") === "Back to Library");
-click(back); await wait(30);
-ok("5h. and returns to the Library page", txt($("h1")) === "Library" && $$(".library-category-card").length === cats.length);
-click($('[data-guided="run"]')); await wait(60);
-ok("5i. a direct category still starts its session (Run)", router.currentView === "running-session", router.currentView);
+ok("5. Free asking for the Library: the on-the-plan page, in the same look", router.currentView === "on-the-plan" && !!$(".on-the-plan .kind-tile svg") && iconsDecorative() && !EMOJI.test(txt(main)), router.currentView);
 
 console.log(`\nLOOK-REST: ${passes} passed, ${fails} failed`);
 process.exit(fails ? 1 : 0);

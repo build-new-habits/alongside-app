@@ -1,5 +1,11 @@
 /**
  * tools/chromium-start.mjs
+ * 24 Nov 2026 v2
+ *
+ * v2 - P-46 S4 FREE HOME. Free Home's screens (new, checked in), Free's
+ *   ready-made list and session, and the on-the-plan page; their buttons
+ *   measured too.
+ *
  * 24 Nov 2026 v1
  *
  * P-46 S2. The one-minute start in a real browser (Chromium), from
@@ -46,6 +52,11 @@ const SCREENS_ALL = [
   ["ask-free", [], "S3 Free Home: How active have you been lately?"],
   ["ask-plan", [], "S3 Plan Home: How active have you been lately?"],
   ["ask-goals", ['[data-al-pick="get-stronger"]'], "S3 Free Home: What do you most want from this?"],
+  ["fh-new", [], "S4 Free Home: How are you today?"],
+  ["fh-checked", [], "S4 Free Home: checked in, Your session is ready"],
+  ["fh-ready", [], "S4 Free: Ready-made sessions (gym)"],
+  ["fh-ready", [".path-list button", "#path-ready-go"], "S4 Free: a ready-made session, Start"],
+  ["fh-otp", [], "S4 Free: on-the-plan (the Library)"],
 ];
 const SCREENS = process.env.ONLY ? SCREENS_ALL.filter(x => x[0] === process.env.ONLY) : SCREENS_ALL;
 
@@ -70,7 +81,7 @@ for (const scheme of ["light", "dark"]) for (const width of [390, 320]) for (con
       if (where === "nohealth") HC.declineHealthConsent();
       else s.set("consent.health", { given: true, at, version: HC.HEALTH_CONSENT_VERSION, withdrawnAt: null });
       const DP = await import("./js/display-prefs.js"); DP.setDisplayPref("textScale", size); DP.applyDisplayPrefs();
-      if (where.startsWith("ask-")) {   // S3: onboarded through the short start, one session (three for goals)
+      if (where.startsWith("ask-") || where.startsWith("fh-")) {   // S3: onboarded through the short start, one session (three for goals)
         const { HURT_AND_ACHE_VERSION } = await import("./js/exercise-card.js");
         s.set("onboardingComplete", true); s.set("name", "Sam"); s.set("onboarding.flow", "short");
         s.set("onboarding.threadCompletedAt", new Date(Date.now() - 864e5).toISOString());
@@ -79,10 +90,21 @@ for (const scheme of ["light", "dark"]) for (const width of [390, 320]) for (con
         const n = where === "ask-goals" ? 3 : 1;
         s.set("activityLog", Array.from({ length: n }, (_, i) => ({ id: "a" + i, type: "workout", completedAt: new Date(Date.now() - (i + 1) * 3600e3).toISOString(), durationMins: 15, completed: true })));
         if (where === "ask-goals") s.set("lifestyle.activityLevel", "light");
+        if (where.startsWith("fh-")) {   // S4: nothing to ask today
+          const nn = { notNowAt: at };
+          s.set("askLater", { activity: nn, goals: nn, weekly: nn });
+          if (where === "fh-ready") s.set("sessionLocation", "gym");
+          if (where === "fh-checked") { const k = at.split("T")[0]; s.set("checkinHistory", { [k]: { energy: 6, mood: 6 } }); s.set("lastCheckin", { energy: 6, mood: 6, date: new Date().toDateString(), timestamp: at }); }
+        }
         if (where === "ask-plan") s.setMyMove({ made: at, purposes: ["stronger", "moving", "instep"], most: "stronger", goodDay: "few", hardDay: ["coach"], startClosed: at });
       }
     }, { size, where });
-    await page.evaluate(w => window.router.navigate(w.startsWith("ask-") ? "today" : "onboarding/start"), where);
+    if (where === "fh-ready") { await page.evaluate(() => window.router.navigate("today")); await page.waitForTimeout(400); }   // as a person: Home, then the six
+    await page.evaluate(w => {
+      if (w === "fh-ready") { window.router.pathStart = { free: true, place: "gym" }; return window.router.navigate("path"); }
+      if (w === "fh-otp") return window.router.navigate("library");
+      return window.router.navigate(w.startsWith("ask-") || w.startsWith("fh-") ? "today" : "onboarding/start");
+    }, where);
     await page.waitForTimeout(500);
     for (const p of presses) {
       const hit = await page.evaluate(v => {
@@ -92,7 +114,7 @@ for (const scheme of ["light", "dark"]) for (const width of [390, 320]) for (con
         if (el.matches("input[type=radio],input[type=checkbox]")) { el.checked = true; el.dispatchEvent(new Event("change", { bubbles: true })); } else el.click();
         return true;
       }, p);
-      if (!hit) { faults.push(`${label}: could not press ${p}`); break; }
+      if (!hit) { faults.push(`${label}: could not press ${p} (on ${await page.evaluate(() => window.router.currentView)})`); break; }
       await page.waitForTimeout(250);
     }
     await page.waitForTimeout(350);
@@ -102,7 +124,7 @@ for (const scheme of ["light", "dark"]) for (const width of [390, 320]) for (con
       const main = document.getElementById("main-content");
       const h1s = [...main.querySelectorAll("h1")].filter(h => !h.closest(".sr-only") && getComputedStyle(h).display !== "none" && h.getClientRects().length).length;
       const small = [];
-      for (const el of main.querySelectorAll(".st button, .st-seg__opt span, .st-input, .al button")) {
+      for (const el of main.querySelectorAll(".st button, .st-seg__opt span, .st-input, .al button, .free-home button, .on-the-plan button, .path-view[data-step] > button, .path-list button")) {
         const b = el.getBoundingClientRect(); if (!b.width) continue;
         if (b.height < 43.5) small.push(`${(el.id || el.className || el.tagName).toString().slice(0, 30)} ${Math.round(b.height)}px`);
       }

@@ -1,5 +1,7 @@
 # Alongside: Move — Free and first (P-46) spec
-## 24 Nov 2026 v2
+## 24 Nov 2026 v3
+
+**v3 (S4, built):** (1) Free Home is `views/free-home.js` in the Plan's look; *Something gentler* is Today's plan for mobility at the shortest length (about 10 minutes) at the last place, through the check-in when today has none. (2) The six open in the Plan's own steps (`path.js`): the list, *How long have you got?*, the session, Start; *Make it mine* and *Swap* stay the Plan's until S5. (3) Kept on Free Home as well as §5's list: the pacing, brief-path, flat-fortnight and low-mood lines (the website quotes the low-mood one). (4) The on-the-plan page's way back is *‹ Back* (to Home), the one look's back, not *‹ Home*. (5) The tier table and the website's *When I want to choose for myself* table say Free has six ready-made sessions and choosing the kind is the Plan's; the website's Free video there still shows the old Home and is to be recorded again. (6) Free-only code no longer reachable (the session builder, Free's Library tiles and class list, Mobility & Conditioning) is left in place for a later tidy; its gates now check it on the Plan or check Free gets *Part of the Plan*.
 
 **v2 (S2, built):** three corrections found building it. (1) The red-flag questions are **not** asked in getting started, now or before: the route guard asks them before the first session with a sore area (`data/red-flag.js`), so screen 2 only records the areas and the guard does the rest. (2) Screen 4's button is **Show me my session**, which opens Today's plan with the request set (whole body, gentle, at the chosen place, about 15 minutes): one way into a session (A-2), with its own safety note; the card names no move count. (3) The old conversation stays for anyone part-way through it (resumes past the name); everyone else gets the one-minute start, so its checks now start part-way (`tools/part-way.mjs`).
 
@@ -103,4 +105,4 @@ Every screen: **at most about 15 words above the first button**. Longer text mov
 
 The voices and *Hear from your coach* (next month); payments and the 14-day trial (P-40, row 14); the 14+ age change (P-41); Free's Progress window (P-40 says 30 days, unchanged here).
 
-*Build New Habits · Alongside: Move · P-46 spec · 24 Nov 2026 v2*
+*Build New Habits · Alongside: Move · P-46 spec · 24 Nov 2026 v3*

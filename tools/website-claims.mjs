@@ -1,5 +1,11 @@
 /**
  * tools/website-claims.mjs
+ * 24 Nov 2026 v3
+ *
+ * v3 - P-46 S4 FREE HOME. When I want to choose for myself: choosing the
+ *   kind of session is the Plan's now; Free has six ready-made sessions on
+ *   Home. Log what you did is proved on Free Home.
+ *
  * 07 Nov 2026 v2
  *
  * v2 - APP_URL: the site links the app for friends to try (Graeme, 07 Nov).
@@ -58,7 +64,7 @@ export const HOME_ROWS = [
 export const SCENARIOS = [
   { id: "arc", title: "When I’m working towards something", rows: [
     { text: "Tell the coach what you want to be able to do, in your own words", free: false, plan: true,
-      proof: [P("js/views/arc-setup.js", "What do you want to be able to do?"), P("js/views/today.js", "Part of the Plan")] },
+      proof: [P("js/views/arc-setup.js", "What do you want to be able to do?"), P("js/views/on-the-plan.js", "Part of the Plan")] },
     { text: "Pick up to three things that feed it", free: false, plan: true,
       proof: [P("js/views/arc-setup.js", "Pick up to ${AIMS.maxStrands}")] },
     { text: "Sessions are built towards it", free: false, plan: true,
@@ -87,8 +93,10 @@ export const SCENARIOS = [
       proof: [P("js/views/workout.js", "Do this one later"), P("js/views/workout.js", "What's left")] },
   ]},
   { id: "know", title: "When I want to choose for myself", rows: [
-    { text: "Choose the kind of session, home or gym, and how long", free: true, plan: true,
-      proof: [P("js/data/tier-table.js", "Choose any kind of session")] },
+    { text: "Six ready-made sessions, each with a warm-up and a stretch", free: true, plan: true,
+      proof: [P("js/data/ready-sessions.js", "FREE_READY"), P("js/views/free-home.js", "Six to choose from")] },
+    { text: "Choose the kind of session, home or gym, and how long", free: false, plan: true,
+      proof: [P("js/views/plan-home.js", "Get stronger"), P("js/views/on-the-plan.js", "Choose your session")] },
     { text: "Start from your purpose: get stronger, keep moving, stretch, or move to feel better", free: false, plan: true,
       proof: [P("js/views/plan-home.js", "Get stronger")] },
     { text: "Build your own session, part by part, with the coach’s help", free: false, plan: true,
@@ -98,7 +106,7 @@ export const SCENARIOS = [
     { text: "Save sessions to start again", free: false, plan: true,
       proof: [P("js/data/saved-sessions.js", "export")] },
     { text: "Log what you did", free: true, plan: true,
-      proof: [P("js/views/path.js", "Log what I did")] },
+      proof: [P("js/views/path.js", "Log what I did"), P("js/views/free-home.js", "Log what I did")] },
     { text: "Make it up as you go, logging each set", free: false, plan: true,
       proof: [P("js/views/path.js", "Make it up as I go")] },
   ]},

@@ -1,5 +1,10 @@
 /**
  * tools/verify-onunmount1.mjs
+ * 24 Nov 2026 v4
+ *
+ * v4 - P-46 S4 FREE HOME. Leaves for Progress: on Free, the Library opens
+ *   the on-the-plan page.
+ *
  * 02 Oct 2026 v3
  *
  * v3 - W4-1 GATE-OPEN. The fixture person has agreed (tools/agreed.mjs): the
@@ -107,10 +112,10 @@ router.viewCache['today'] = {
 };
 router.currentView = 'today';
 let stranded = false;
-try { await router.navigate('library'); }
+try { await router.navigate('progress'); }   // P-46 S4: Free's 'library' opens on-the-plan
 catch { stranded = true; }
 check('a view that throws on the way out does not block the navigation',
-  !stranded && router.currentView === 'library');
+  !stranded && router.currentView === 'progress');
 
 // ── Nobody exports one the router will never reach ───────────────────
 //

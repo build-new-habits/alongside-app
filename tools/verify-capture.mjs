@@ -1,5 +1,11 @@
 /**
  * tools/verify-capture.mjs
+ * 24 Nov 2026 v5
+ *
+ * v5 - P-46 S4 FREE HOME. _planDoors() was drawn by nothing (the Plan's Home
+ *   is plan-home.js) and went with Free's Home. 5.2 finds Make it up as I go
+ *   behind a Plan door's How; 5.3 holds it is a door on neither Home.
+ *
  * 12 Oct 2026 v4
  *
  * v4 - A-1 PLAN-HOME-PRUNE. 5.3 counts door('...') calls wherever they sit:
@@ -207,14 +213,16 @@ console.log("\nTEST 5 — reachable, and not a fifth room");
   const today  = fs.readFileSync(new URL("../js/views/today.js", import.meta.url), "utf8");
   const router = fs.readFileSync(new URL("../js/router.js", import.meta.url), "utf8");
   ok("5.1 the route is registered", /'capture':\s*\{\s*path: '\.\/views\/capture\.js'/.test(router));
-  ok("5.2 reached from Home's third door, Make it up as I go",
-     /door\('as-i-go', 'Make it up as I go'/.test(today) &&
-     /data-action="as-i-go"\]'\)\s*\?\.addEventListener\('click', \(\) => router\.navigate\('capture'\)\)/.test(today));
-  const doorsFn = today.slice(today.indexOf("function _planDoors"), today.indexOf("function _arcChip"));
-  ok("5.3 REVERSAL: it is not a fourth door on Home",
-     (doorsFn.match(/\bdoor\('/g) || []).length === 3,
-     "three doors is spec 4.1. If a door is legitimately added, change this " +
-     "line on purpose rather than loosening the count");
+  // v5 (P-46 S4): _planDoors() was no longer drawn by anything (the Plan's Home is
+  // plan-home.js since P-4) and went with Free's Home. Make it up as I go is reached
+  // from a Plan door's How (path.js, P-24), and is a door on neither Home.
+  const pathSrc = fs.readFileSync(new URL("../js/views/path.js", import.meta.url), "utf8");
+  ok("5.2 reached from a Plan door's How, Make it up as I go",
+     /if \(v === "asgo"\)[^\n]*router\.navigate\("capture"\)/.test(pathSrc));
+  const homes = ["../js/views/free-home.js", "../js/views/plan-home.js"].map(f => fs.readFileSync(new URL(f, import.meta.url), "utf8")).join("\n");
+  ok("5.3 REVERSAL: it is not a door on either Home",
+     !/as-i-go|Make it up as I go/.test(homes) && !/function _planDoors/.test(today),
+     "Make it up as I go is the Plan's, from a door's How. A door on Home is a decision, not a drift");
   ok("5.4 and its stylesheet is imported",
      /components\/capture\.css/.test(fs.readFileSync(new URL("../css/main.css", import.meta.url), "utf8")));
 }

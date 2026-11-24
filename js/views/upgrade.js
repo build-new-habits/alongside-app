@@ -1,5 +1,9 @@
 /**
  * upgrade.js - Upgrade / Membership view
+ * 24 Nov 2026 v24
+ *
+ * v24 - P-46 S4. Log what I did is on Home on Free (the Library is the Plan's).
+ *
  * 06 Nov 2026 v23
  *
  * v23 - P-28 S5 (E, said lightly; wording A6 approved 05 Nov). One line
@@ -360,7 +364,7 @@ export function render() {
       ${(typeof window !== "undefined" && window.router?.redirectReason === "capture") ? `
       <p class="upgrade-body" role="status">
         Make it up as I go is part of the Plan, so it brought you here. On Free,
-        Log what I did, in the Library, records anything you did.
+        Log what I did, on Home, records anything you did.
       </p>` : ""}
       <header class="upgrade-block">
         <h1 class="upgrade-heading">A coach who knows where you&rsquo;re going.</h1>

@@ -1,5 +1,10 @@
 /**
  * tools/verify-backstack.mjs
+ * 24 Nov 2026 v2
+ *
+ * v2 - P-46 S4 FREE HOME. navigate() is longer (the Free-moved check), so 3b
+ *   reads 3400 characters of it.
+ *
  * 31 Aug 2026 v1
  *
  * RETIRE-INTENTION + BACK-STACK.
@@ -112,7 +117,7 @@ check("3b. a back navigation pushes nothing, on either stack", () => {
   ok(at > -1, "no navigate()");
   ok(/navigate\(viewName,\s*opts\s*=\s*\{\}\)/.test(router),
      "navigate() does not accept opts");
-  const body = router.slice(at, at + 2600);
+  const body = router.slice(at, at + 3400);   // P-46 S4: the Free-moved check sits above the push
 
   const browserPush = body.indexOf("history.pushState");
   ok(browserPush > -1, "navigate() never pushes browser state");

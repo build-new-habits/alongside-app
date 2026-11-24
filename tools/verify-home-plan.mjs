@@ -1,5 +1,11 @@
 /**
  * tools/verify-home-plan.mjs
+ * 24 Nov 2026 v6
+ *
+ * v6 - P-46 S4 FREE HOME. Free Home is its own now (free-home.js: coach-led,
+ *   in the Plan's look, path-* classes), so the Free control reads .free-home
+ *   and the absence of the Plan's doors, not the absence of path-home.
+ *
  * 29 Oct 2026 v5
  *
  * v5 - STAGE PATH Session 6 re-point (none loosened). On the Plan a session
@@ -196,7 +202,7 @@ ok("5b. and nothing is left to carry on", !main.querySelector('.path-today[data-
 // ── 6. FREE ─────────────────────────────────────────────────────────────
 console.log("\nTEST 6 - free Home is unchanged (P5 cross-checks it)");
 fixture({ tier: "free" }); home();
-ok("6a. free keeps its chooser, not the Plan's doors", !main.querySelector(".home-door, .path-door") && !!main.querySelector(".today-doors"));
+ok("6a. free has its own Home (P-46 S4: coach-led), not the Plan's doors", !main.querySelector(".home-door, .path-door[data-door]") && !!main.querySelector(".free-home"));
 
 console.log("");
 if (fails) { console.log(`HOME-PLAN: ${fails} FAILED, ${passes} passed`); process.exit(1); }

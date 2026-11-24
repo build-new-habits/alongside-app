@@ -1,5 +1,10 @@
 /**
  * tools/verify-planpicker.mjs
+ * 24 Nov 2026 v6
+ *
+ * v6 - P-46 S4 FREE HOME. 3a-2 reads the Plan's Home (plan-home.js) for its
+ *   Library row; today.js no longer draws one.
+ *
  * 05 Nov 2026 v5
  *
  * v5 - P-27 TIDY (Graeme, 05 Nov: retire the twelve-week programme on the
@@ -171,7 +176,7 @@ ok("3a. the twelve-week shape routes to the chooser",
    "the picker has no home");
 
 ok("3a-2. and the classes are reachable from Home",
-   /class="home-door home-libraryrow" data-route="library"/.test(todaySrc) &&   // v4: Home > Library > Classes
+   /data-route="library"/.test(fs.readFileSync(new URL("../js/views/plan-home.js", import.meta.url), "utf8")) &&   // v6: the Plan's Home > Library > Classes
    /id:\s*"classes"[\s\S]{0,200}directTarget:\s*"classes"[\s\S]{0,40}planOnly:\s*true/.test(fs.readFileSync(new URL("../js/views/library.js", import.meta.url), "utf8")),
    "the room named for classes does not reach them — the fault " +
    "TIMETABLE-1 exists to fix");

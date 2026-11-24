@@ -1,5 +1,11 @@
 /**
  * tools/verify-css.mjs
+ * 24 Nov 2026 v9
+ *
+ * v9 - P-46 S4 FREE HOME. today-header, today-arc--active and today-arc--
+ *   offer leave HOOKS: Free Home's old header and arc panel are no longer
+ *   drawn.
+ *
  * 06 Nov 2026 v8
  *
  * v8 - P-28 S3. In Step's player is styled now (components/in-step.css):
@@ -105,11 +111,11 @@ const HOOKS = {
   "bs-duration-btn": HOOK, "bs-type-card": HOOK,
   "ms-timer-btn": HOOK, "quiet-back-btn": HOOK, "sb-buildmode-btn": HOOK,
   "sb-duration-btn": HOOK, "sb-type-tile": HOOK,
-  "today-header": WRAP, "activity-log-form": WRAP,
+  "activity-log-form": WRAP,
   "activity-log-picker": WRAP,
   "reflect-coach-card": WRAP, "checkin-coach-card": WRAP,
   "gp-moment--glance": WRAP, "gp-moment--reflection": WRAP,
-  "home-arc--offer": WRAP, "today-arc--active": WRAP, "today-arc--offer": WRAP,
+  "home-arc--offer": WRAP,
   "noticing-section": WRAP, "onboarding-continue": WRAP, "reflect-mood-slider-block": WRAP,
   "prescribed-add-section": WRAP,
   "btn-quiet": "styled by .gate-leave beside it (session-shared.css)",

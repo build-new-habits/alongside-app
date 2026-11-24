@@ -1,5 +1,10 @@
 /**
  * tools/verify-bad-day-doors.mjs
+ * 24 Nov 2026 v2
+ *
+ * v2 - P-46 S4 FREE HOME. The builder's door is checked on the Plan (Free's
+ *   builder moved there); the other doors stay on Free.
+ *
  * 04 Oct 2026 v1
  *
  * W6-1 BAD-DAY-BUILDER-2 and W6-2 LIBRARY-BAD-DAY (Wave 6 persona trace:
@@ -60,9 +65,9 @@ const $ = s => main.querySelector(s);
 const txt = el => (el?.textContent || "").replace(/\s+/g, " ").trim();
 const click = el => el?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true, cancelable: true }));
 
-function fixture(score) {
+function fixture(score, tier = "free") {
   localStorage.clear(); store.init(); agreed(store); gate.endGateSession();
-  store.set("onboardingComplete", true); store.set("name", "Robin"); store.set("tier", "free");
+  store.set("onboardingComplete", true); store.set("name", "Robin"); store.set("tier", tier);
   store.set("equipment", ["dumbbells"]); store.set("homeEquipment", ["dumbbells"]);
   store.set("conditions", ["knee"]); store.set("conditionPainScores", { knee: score });
   store.set("redFlag", { screenedAt: new Date().toISOString(), areas: ["knee"], textVersion: RF.RED_FLAG_VERSION, level: null, flaggedAt: null, clearedAt: null });
@@ -75,13 +80,13 @@ const DOORS = ["session-builder", "walk-session", "core-session", "cycle-session
 
 console.log("\nTEST 1 - knee Bad: every door asks first");
 for (const d of DOORS) {
-  fixture(8);
+  fixture(8, d === "session-builder" ? "personal" : "free");   // P-46 S4: the builder is the Plan's
   await go("today"); await go(d);
   ok(`1. ${d}: Rest today / Something gentler, in their word`, !!$('[data-bad-day="adapt"]') && !!$('[data-bad-day="rest"]') && /knee is bad today/i.test(txt(main)) && !/some discomfort/i.test(txt(main)) && !$(".sb-severe-banner"), `${router.currentView} | ${txt(main).slice(0, 160)}`);
 }
 
 console.log("\nTEST 2 - Something gentler from the builder");
-fixture(8);
+fixture(8, "personal");
 store.set("sessionBuilderPreselect", { type: "mobility", returnTo: "mobility-conditioning" });
 const storedBefore = JSON.stringify(store.get("generatedSession"));
 await go("today"); await go("session-builder");
@@ -99,7 +104,7 @@ ok("3a. Something gentler, named by its words; no Severe pain / Adapt and contin
 
 console.log("\nTEST 4 - controls: Quite sore");
 for (const d of DOORS) {
-  fixture(6);
+  fixture(6, d === "session-builder" ? "personal" : "free");
   await go("today"); await go(d);
   ok(`4. ${d}: opens as before`, !$('[data-bad-day]') && router.currentView === d, txt(main).slice(0, 120));
 }

@@ -1,5 +1,11 @@
 /**
  * tools/verify-your-week.mjs
+ * 24 Nov 2026 v6
+ *
+ * v6 - P-46 S4 FREE HOME. Free asking for Your week or the Library gets the
+ *   on-the-plan page; Free Home is coach-led (check in, Something gentler, six
+ *   ready-made, Log what I did), as the tier table now says.
+ *
  * 29 Oct 2026 v5
  *
  * v5 - STAGE PATH P-4 re-point (none loosened). TEST 4 reads the Plan's Home (plan-home.js, mock-up v10, Graeme approved 29 Oct): the week's day is Home's one row, one action, with the same words (Today, from your week: the day's name; its mix and details), then the four doors; no door filled, Or something else today, a rest day asks nothing. 2a: the Plan's Home has no Plan your week button (six ways in with four doors); its Library row names your week and the Library's Your week opens it, two taps, as A-1 required of everything that left Home. 2b onwards unchanged.
@@ -148,7 +154,8 @@ async function start() {
 console.log("TEST 1 - Free sees it is part of the Plan");
 fixture("free");
 await router.navigate("your-week"); await wait(60);
-ok("1a. Your week on Free says it is part of the Plan, with the way to see it", /part of the Plan/.test(txt(main)) && !!$('[data-go-route="upgrade"]'), txt(main).slice(0, 200));
+// P-46 S4: the router sends Free to the one on-the-plan page.
+ok("1a. Your week on Free says it is part of the Plan, with the way to see it", router.currentView === "on-the-plan" && /Part of the Plan/.test(txt(main)) && !!$("#otp-plan"), txt(main).slice(0, 200));
 ok("1b. and offers nothing to set", !$("[data-start]") && !$("[data-ready]") && !$("[data-day]"));
 await router.navigate("today"); await wait(60);
 ok("1c. Free Home has no week card", !$(".home-week"));

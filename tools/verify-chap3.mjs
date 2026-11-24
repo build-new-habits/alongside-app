@@ -1,5 +1,12 @@
 /**
  * tools/verify-chap3.mjs
+ * 24 Nov 2026 v6
+ *
+ * v6 - P-46 S4 FREE HOME. Free's twelve-week programme moved to the Plan,
+ *   which retired it: no tier shows a chapter-end card. The Free hinge checks
+ *   are retired (git history v5); the chapter's own state checks are
+ *   unchanged.
+ *
  * 05 Nov 2026 v5
  * P-27 TIDY re-point (Graeme, 05 Nov: retire the twelve-week programme on
  * the Plan). The hinge card is Free's now: the Home checks run on Free
@@ -214,94 +221,16 @@ function home(seedFn, tier = 'free') {
 const planHinge = home(() => { seed(120); PE.advanceWeekIfNeeded(); }, 'personal');
 check('P-27: Plan Home shows no chapter-end card, with a chapter just finished',
   PE.isHingePending() && !planHinge.c.querySelector('.today-hinge') && planHinge.c.querySelectorAll('.path-door').length > 0);
-const atHingeHome = home(() => { seed(120); PE.advanceWeekIfNeeded(); });
-check('the hinge appears on HOME, not one session view in thirteen',
-  !!atHingeHome.c.querySelector('.today-hinge'));
-check('and it names the chapter that finished',
-  /That's Build Your Base done/.test(atHingeHome.text));
-check('and suggests the successor from the SHARED chain',
-  /Back to Strength would be my suggestion/.test(atHingeHome.text),
-  'programmes.js, not the deleted private map that said Feel Good Foundation');
-check('with all three ways out offered',
-  atHingeHome.c.querySelectorAll('[data-hinge]').length === 3);
-
-// It must not block. Somebody opened the app to move.
-// Presence alone is not enough: hiding the grid with an inline style
-// left this passing, because jsdom does not compute CSS and the nodes
-// are still there. Reversal testing caught it. Check they are present
-// AND visible AND actually clickable.
-// LOBBY-1c, 03 Sep 2026. Home no longer has a door grid -- session
-// tiles moved behind the check-in. The PROPERTY this guards is
-// unchanged and still matters: a hinge card must not block the way
-// through to moving. What it checks is now the invitation, which is
-// that way through.
-// CLUB-SHELL, 06 Sep 2026. On Plan the way through is a room card, not
-// the invitation button. The PROPERTY is unchanged and still the point:
-// a hinge card must not block the way through to moving. Any of the
-// three routes to moving satisfies it, so this passes on either tier
-// without asserting which one the fixture happens to be on.
-const doorsGrid = atHingeHome.c.querySelector(
-  '.path-door, .home-door, [data-action="start-today"], .club-room__go, [data-door-id]');
-const doorsHidden = !doorsGrid
-  || doorsGrid.hasAttribute('hidden')
-  || doorsGrid.disabled
-  || /display:\s*none|visibility:\s*hidden/.test(doorsGrid.getAttribute('style') || '');
-check('the way through still works underneath it',
-  atHingeHome.c.querySelectorAll('.path-door, .home-door, [data-door-id]').length > 0 && !doorsHidden,
-  'gym-programme blocked the session until an option was chosen');
-
-// No countdown and no verdict, at the moment most likely to produce one.
-for (const [re, what] of [
-  [/\d+%/,                'a percentage'],
-  [/\bcomplete[d]?\b.*\d/, 'a completion figure'],
-  [/well done|congratulations|smashed|crushed/i, 'a verdict'],
-  [/weeks remaining|weeks left/i, 'a countdown'],
-]) {
-  check(`the hinge shows no ${what}`, !re.test(atHingeHome.c.innerHTML));
-}
-
-// Answering it. Executed: click, then read the store and the re-render.
-// Guarded, so a missing card FAILS rather than throwing. A gate that
-// crashes is not a gate that failed — removing the card from Home
-// produced a TypeError here rather than a red assertion, which is the
-// difference between a gate reporting a fault and a gate falling over
-// next to one.
-const nextBtn = atHingeHome.c.querySelector('[data-hinge="next"]');
-check('there is a button to start the next chapter', !!nextBtn);
-const before = store.get('activeProgramme.programmeId');
-nextBtn?.click();
-check('choosing the next chapter starts it',
-  store.get('activeProgramme.programmeId') === 'back-to-strength' &&
-  store.get('activeProgramme.programmeId') !== before);
-check('and answers the hinge', PE.isHingePending() === false);
-check('and the new chapter starts at week one',
-  store.get('activeProgramme.currentWeek') === 1 &&
-  store.get('activeProgramme.totalSessions') === 0);
-check('while the arc keeps the finished chapter',
-  (store.get('programme.chaptersDone') || []).length === 1,
-  'a new chapter adds to the arc; it does not replace it');
-check('and the card is gone once answered',
-  !document.getElementById('c').querySelector('.today-hinge'));
-
-const repeatHome = home(() => { seed(120); PE.advanceWeekIfNeeded(); });
-repeatHome.c.querySelector('[data-hinge="repeat"]')?.click();
-check('running it again restarts the same chapter',
-  store.get('activeProgramme.programmeId') === 'beginner-fitness' &&
-  store.get('activeProgramme.currentWeek') === 1 &&
-  PE.isHingePending() === false);
-
-const differentHome = home(() => { seed(120); PE.advanceWeekIfNeeded(); });
-differentHome.c.querySelector('[data-hinge="different"]')?.click();
-check('something different routes somewhere to choose',
-  differentHome.navs.includes('goal-setup'));
-check('and leaves the hinge standing until they actually choose',
-  PE.isHingePending() === true,
-  'a hinge that can be dismissed leaves somebody between chapters with nothing to say so');
-
-// And nobody mid-chapter ever sees it.
-const midHome = home(() => { seed(70, 11); PE.advanceWeekIfNeeded(); });
-check('nobody mid-chapter sees a hinge',
-  !midHome.c.querySelector('.today-hinge'));
+// P-46 S4 FREE HOME. Free's twelve-week programme moved to the Plan (spec §5),
+// which retired it (P-27): no tier shows a chapter-end card now. The Free
+// hinge checks (the card, its three ways out, starting the next chapter) are
+// retired with it (git history v5; the card archived in BNH-Files Archive/P-46).
+// The chapter's own state above (it ends, once, not early) is unchanged.
+const freeHinge = home(() => { seed(120); PE.advanceWeekIfNeeded(); });
+check('P-46 S4: Free Home shows no chapter-end card either, with a chapter just finished',
+  PE.isHingePending() && !freeHinge.c.querySelector('.today-hinge') && !!freeHinge.c.querySelector('.free-home'));
+check('and the way through is there: the Today card',
+  !!freeHinge.c.querySelector('.path-today [data-action="start-today"]'));
 
 // ── 9. One chain, not two ────────────────────────────────────────────
 check('gym-programme no longer carries its own chain map',
@@ -322,7 +251,7 @@ const evPlan = home(() => { seed(120); PE.advanceWeekIfNeeded(); }, 'personal');
 const evFree = home(() => { seed(120); PE.advanceWeekIfNeeded(); });
 check('P-27: the event question is asked on neither tier',
   !/anything you're working towards/i.test(evPlan.text) && !/anything you're working towards/i.test(evFree.text) &&
-  evFree.c.querySelectorAll('[data-hinge]').length === 3);
+  evFree.c.querySelectorAll('[data-hinge]').length === 0);   // P-46 S4: and no chapter choice on Free either
 
 console.log(failures === 0 ? '\nALL PASS\n' : `\n${failures} FAILURE(S)\n`);
 process.exit(failures === 0 ? 0 : 1);

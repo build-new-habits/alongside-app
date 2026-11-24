@@ -1,5 +1,12 @@
 /**
  * tools/verify-arc-door.mjs
+ * 24 Nov 2026 v7
+ *
+ * v7 - P-46 S4 FREE HOME. Free Home has no arc row now (the arc is the
+ *   Plan's). Free with an arc stored: no arc on Home, the aim never shown, and
+ *   arc-setup is a Free-moved route. The arcPanel() source checks went with
+ *   arcPanel().
+ *
  * 28 Oct 2026 v6
  *
  * v6 - STAGE PATH P-4 re-point (none loosened; mock-up v9, Graeme approved
@@ -97,19 +104,20 @@ ok("FIXTURE REACHES THE ACTIVE BRANCH: Plan's arc line says the arc, with the ai
 reverses("the fixture is not quietly on the offer branch (the fault that hid this)",
   ()=>!!document.querySelector('#main-content [data-route="arc-setup"]'));
 
+// P-46 S4 FREE HOME. Free Home has no arc row at all now (spec §5: the arc row
+// moved to the Plan); Free asking for arc-setup gets the on-the-plan page
+// (router FREE_MOVED, verify-p46-free-home 7).
 store.set("tier","free"); paint();
-const freeEl=document.querySelector(".today-arc");
-ok("free, WITH an active arc stored, still gets only the offer",
-  freeEl && /today-arc--offer/.test(freeEl.className));
-reverses("free does not render the active arc panel",
-  ()=>/today-arc--active/.test(freeEl.className));
+const fm=document.getElementById("main-content");
+ok("free, WITH an active arc stored, gets no arc on Home at all",
+  !fm.querySelector(".today-arc, .path-arcline") && !!fm.querySelector(".free-home"));
 ok("and the aim itself never appears on free",
-  !/Build a core that actually holds me up/.test(document.getElementById("main-content").innerHTML));
-
-ok("the free door leads to upgrade, not arc-setup",
-  freeEl.dataset.route==="upgrade");
+  !/Build a core that actually holds me up/.test(fm.innerHTML));
 reverses("free cannot walk into arc setup from Home",
-  ()=>freeEl.dataset.route==="arc-setup");
+  ()=>!!fm.querySelector('[data-route="arc-setup"]'));
+const routerSrc=fs.readFileSync(new URL("../js/router.js", import.meta.url),"utf8");
+ok("arc-setup and the arc itself are Free-moved routes (the router sends Free to on-the-plan)",
+  /FREE_MOVED = new Set\([\s\S]{0,300}'arc-setup'[\s\S]{0,40}'stretch-arc'/.test(routerSrc));
 
 // Plan with no arc keeps the real setup entrance.
 store.set("tier","personal");store.set("arc",{}); paint();
@@ -119,14 +127,6 @@ const pm=document.getElementById("main-content"); pm.innerHTML=""; ProgressView(
 const setupEl=pm.querySelector('[data-route="arc-setup"]');
 ok("Plan without an arc still gets the SETUP entrance (Progress, Set up your arc)",
   setupEl && setupEl.dataset.route==="arc-setup");
-
-// The rule must live in arcPanel(), not at a call site.
-const fn=todaySrc.slice(todaySrc.indexOf("function arcPanel() {"));
-ok("the tier rule is inside arcPanel(), so every call site inherits it",
-  /isPremium\(\)/.test(fn.slice(0,1400)));
-reverses("the slice is the function, not an empty string",()=>fn.length<200);
-ok("BOTH call sites exist and neither can leak",
-  (todaySrc.match(/arcPanel\(\)/g)||[]).length>=3);
 
 console.log("\n────────────────────────────────\n"+pass+" passed, "+fail+" failed");
 if(fails.length){fails.forEach(f=>console.log("  - "+f));process.exit(1);}

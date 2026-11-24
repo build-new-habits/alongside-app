@@ -1,5 +1,10 @@
 /**
  * tools/verify-bad-day-builder.mjs
+ * 24 Nov 2026 v3
+ *
+ * v3 - P-46 S4 FREE HOME. The fixture is on the Plan: the builder is the
+ *   Plan's now (Free opens on-the-plan, verify-p46-free-home 7).
+ *
  * 04 Oct 2026 v2
  *
  * v2 - W6-1. Re-pointed: the builder asks the Bad-day choice first, and
@@ -70,7 +75,7 @@ const click = el => el?.dispatchEvent(new dom.window.MouseEvent("click", { bubbl
 function fixture(score) {
   localStorage.clear(); store.init(); agreed(store);
   gate.endGateSession();
-  store.set("onboardingComplete", true); store.set("name", "Robin"); store.set("tier", "free");
+  store.set("onboardingComplete", true); store.set("name", "Robin"); store.set("tier", "personal");   // P-46 S4: the builder is the Plan's
   store.set("equipment", ["dumbbells"]); store.set("homeEquipment", ["dumbbells"]);
   store.set("conditions", ["knee"]);
   store.set("conditionPainScores", score == null ? {} : { knee: score });

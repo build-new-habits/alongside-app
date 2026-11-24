@@ -1,6 +1,12 @@
 import { createRequire as __cr } from "node:module";
 /**
  * tools/verify-one-look.mjs
+ * 24 Nov 2026 v16
+ *
+ * v16 - P-46 S4 FREE HOME. Free Home is the coach-led Home by Graeme's
+ *   decision (24 Nov), so TEST 4 checks Free today is it (4t), not v688's; the
+ *   on-the-plan page is new and Free's only (4otp). Nothing else loosened.
+ *
  * 24 Nov 2026 v15
  *
  * v15 - P-44: plan-link-send joins NEW_PLAN_ONLY (Free sent to Progress);
@@ -361,7 +367,25 @@ for (const file of touched) {
     ok("4h. Free help: How do I…? (both tiers by decision), with nothing of the Plan but Part of the Plan", /How do I/.test(main.textContent) && !/upgrade|subscribe|\u00a3/i.test(main.textContent));
     continue;
   }
+  // v16 (P-46 S4, Graeme's decision 24 Nov: Free coach-led): the on-the-plan page is new, Free's only.
+  if (!old && name === "on-the-plan") {
+    person("free"); router.planOnly = "library"; main.innerHTML = "";
+    const OTP = await import(new URL(`../${file}`, import.meta.url).href);
+    OTP.OnThePlanView(router).mount(main); await wait(20);
+    compared++;
+    ok("4otp. Free on-the-plan: new (P-46 S4); what it is, Part of the Plan, See what the Plan adds", /The Library/.test(main.textContent) && /Part of the Plan/.test(main.textContent) && !!main.querySelector("#otp-plan"));
+    continue;
+  }
   if (!old) { ok(`4. Free ${name}: there on v688`, false); continue; }
+  // v16 (P-46 S4, by decision): Free's Home is the coach-led Home, not v688's.
+  if (name === "today") {
+    person("free"); main.innerHTML = "";
+    const T = await import(new URL(`../${file}`, import.meta.url).href);
+    T.TodayView(router).mount(main); await wait(40);
+    compared++;
+    ok("4t. Free today: the coach-led Home (P-46 S4, by decision), not v688's", !!main.querySelector(".free-home .path-today") && !main.querySelector(".today-door"));
+    continue;
+  }
   // v9 (P-28, both tiers by Graeme's decision): Free's In Step is the programme.
   if (name === "in-step") {
     person("free"); main.innerHTML = "";

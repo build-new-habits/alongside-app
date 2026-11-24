@@ -1,5 +1,10 @@
 /* ============================================================
    components/path.css
+   24 Nov 2026 v21
+
+   v21 - P-46 S4: Free Home (.free-home, free-home.js) and the on-the-plan
+   page (.on-the-plan) in the same look; a little room above the Plan line.
+
    23 Nov 2026 v20
 
    v20 - P-39 S6: .path-ask, Home's one question when it matters (an
@@ -627,3 +632,9 @@ html:has(.mm-view:not(.mm-view--big)) { scroll-padding-bottom: 240px; }
 .path-ask__q { margin: 0; color: var(--color-text); font-size: var(--text-base); line-height: 1.4; }
 .path-ask__btns { display: flex; flex-wrap: wrap; gap: var(--space-2); }
 .path-ask__btn { flex: 1 1 auto; min-height: 44px; }
+
+/* P-46 S4. Free Home: the Plan's look, coach-led (free-home.js). */
+.free-home .path-doors { margin-bottom: var(--space-3); }
+.free-home__plan { margin-top: var(--space-2); }
+/* The one page for a Free route that moved to the Plan (on-the-plan.js). */
+.on-the-plan .path-coachline { margin-bottom: var(--space-2); }

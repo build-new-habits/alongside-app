@@ -1,5 +1,10 @@
 /**
  * tools/verify-sectionrules.mjs
+ * 24 Nov 2026 v5
+ *
+ * v5 - P-46 S4 FREE HOME. 14b reads the one place strands are lit now (arc-
+ *   readback.js strandReadback): Home's arc panel went with Free's arc row.
+ *
  * 12 Oct 2026 v4
  * A-2 ONE-PLAN-SCREEN. The door helper chooses its destination by tier: the
  * builder on Free (with the preselect), Today's plan on the Plan (with
@@ -580,11 +585,13 @@ check("14a. sore zones come from today's check-in, not the standing list", () =>
 });
 
 check("14b. an arc cannot have covered anything before it started", () => {
-  const today = read("js/views/today.js");
-  const at = today.indexOf("lit:");
-  ok(at > -1, "strands are never lit");
-  const body = today.slice(at, at + 400);
-  ok(/arc\.startedAt/.test(body),
+  // P-46 S4: Home's arc panel went (Free's arc row moved to the Plan); the
+  // strands are read back in one place now, arc-readback.js strandReadback().
+  const rb = read("js/data/arc-readback.js");
+  const at = rb.indexOf("export function strandReadback");
+  ok(at > -1, "strands are never read back");
+  const body = rb.slice(at, at + 900);
+  ok(/arc\.startedAt/.test(body) && /String\(d\)\.slice\(0, 10\) >= from/.test(body),
      "strand coverage counts sessions from before the arc existed. On device a brand-new " +
      "arc showed a strand already lit, which robs day one of the only thing that makes it " +
      "worth seeing: everything still ahead.");

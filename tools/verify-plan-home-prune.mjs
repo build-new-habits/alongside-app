@@ -1,5 +1,11 @@
 /**
  * tools/verify-plan-home-prune.mjs
+ * 24 Nov 2026 v6
+ *
+ * v6 - P-46 S4 FREE HOME. Free Home is its own now (free-home.js: coach-led,
+ *   in the Plan's look, path-* classes), so the Free control reads .free-home
+ *   and the absence of the Plan's doors, not the absence of path-home.
+ *
  * 23 Nov 2026 v5
  *
  * v5 - P-39 S3 (Making my Move, prototype v2 agreed by Graeme 23 Nov). The
@@ -152,8 +158,9 @@ ok("6c. Your week opens your week", navs.includes("your-week"), JSON.stringify(n
 
 console.log("\nTEST 7 - FREE IS LEFT ALONE");
 fixture({ tier: "free" }); home();
-ok("7a. Free Home has no Plan doors or Today card", !main.querySelector(".home-door, .home-today, .home-week, .path-home, .path-door"));
-ok("7b. Free Home keeps its own tiles and Not sure? I'll pick something", /Cardio, Core/.test(txt(main)) && /Not sure\? I.ll pick something/.test(txt(main)));
+// P-46 S4. Free Home is its own (free-home.js), in the Plan's look: no Plan doors, its own Today card.
+ok("7a. Free Home has no Plan doors, week or arc", !main.querySelector(".home-door, .home-today, .home-week, .path-door[data-door], .path-arcline") && !!main.querySelector(".free-home"));
+ok("7b. Free Home has its own Today card (How are you today?) and Something gentler", /How are you today\?/.test(txt(main)) && /Something gentler/.test(txt(main)));
 main.innerHTML = library.render(); library.onMount();
 const freeGuided = [...main.querySelectorAll("[data-guided]")].map(b => b.dataset.guided);
 ok("7c. Free's Library has no new tiles", !freeGuided.includes("classes") && !freeGuided.includes("week"), freeGuided.join());

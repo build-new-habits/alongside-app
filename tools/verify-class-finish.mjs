@@ -1,5 +1,10 @@
 /**
  * tools/verify-class-finish.mjs
+ * 24 Nov 2026 v4
+ *
+ * v4 - P-46 S4 FREE HOME. Test 1 runs on the Plan (Classes moved there): its
+ *   list, the class's page, Start, and the Plan's finish.
+ *
  * 16 Nov 2026 v3
  *
  * v3 - P-36 MY-LIST-PLAYER. My exercises opens on its list (Start) and ends
@@ -90,17 +95,19 @@ function withMonday() {
 const monday = id => log().find(e => e.id === id);
 
 console.log("\nTEST 1 - a class after a workout with answers");
-fixture("free");
+fixture("personal");   // P-46 S4: Classes are the Plan's (its finish is plan-finish)
 const id1 = withMonday();
 await go("classes");
-const row = [...main.querySelectorAll(".class-list__row")].find(r => /Getting Going/.test(txt(r)));
-click(row?.querySelector("[data-start]")); await wait(300);
+// P-46 S4. The Plan's list: the class's own page, then its Start.
+const row = [...main.querySelectorAll("[data-class]")].find(r => /Getting Going/.test(txt(r)));
+click(row); await wait(100);
+click(main.querySelector("[data-start]")); await wait(300);
 ok("1pc. the class started", router.currentView === "class-player", router.currentView);
 for (let i = 0; i < 40 && router.currentView === "class-player"; i++) {
   if (main.querySelector("#cp-reflect")) { click(main.querySelector("#cp-reflect")); await wait(300); break; }
   click(main.querySelector("#cp-skip")); await wait(60);
 }
-ok("1pc2. the finish screen is showing", router.currentView === "reflect", router.currentView);
+ok("1pc2. the finish screen is showing", router.currentView === "plan-finish", router.currentView);
 ok("1a. the finish does not show the workout's 12 moves", !/12 moves/.test(txt(main)), txt(main).slice(0, 200));
 const cls = log().filter(e => e.type === "class").at(-1);
 ok("1b. the finish's entry is the class", store.get("currentActivityEntry")?.id === cls?.id, `${store.get("currentActivityEntry")?.type} vs class ${cls?.id}`);
