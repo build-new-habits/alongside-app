@@ -1,7 +1,11 @@
 import { createRequire as __cr } from "node:module";
 /**
  * tools/verify-one-look.mjs
- * 23 Nov 2026 v14
+ * 24 Nov 2026 v15
+ *
+ * v15 - P-44: plan-link-send joins NEW_PLAN_ONLY (Free sent to Progress);
+ *   plan-link-back, opened from a link, tells Free it is the Plan's and
+ *   keeps nothing (4pb). It is found from git only once committed.
  *
  * v14 - P-39 S2. Making my Move is new since v688 and the Plan's only
  *   (Free is sent Home), so it joins NEW_PLAN_ONLY, as Change today did.
@@ -298,7 +302,8 @@ function onlyMindfulAdded(a, b) {
 }
 console.log("\nTEST 4 - Free, as it was on alongside-v688");
 const V688 = "79799cb";
-const NEW_PLAN_ONLY = ["build-session", "change-today", "plan-share", "my-move"];   // v8 (P-26); P-31 (15 Nov): Change today; P-33 (15 Nov): Share your plan
+const NEW_PLAN_ONLY = ["build-session", "change-today", "plan-share", "my-move", "plan-link-send"];   // P-44 S2 (23 Nov): Send a link to change
+//   // v8 (P-26); P-31 (15 Nov): Change today; P-33 (15 Nov): Share your plan
 const touched = execSync(`git -C "${ROOT}" diff --name-only ${V688} -- js/views`, { encoding: "utf8" }).split("\n").filter(f => /^js\/views\/[a-z-]+\.js$/.test(f));
 ok("4pc. the files this session touched are found from git", touched.length >= 20, touched.join(", "));
 const fnOf = Object.fromEntries([...table.matchAll(/'([a-z0-9/-]+)'\s*:\s*\{\s*path:\s*'\.\/views\/([a-z-]+)\.js',\s*fn:\s*'(\w+)'/g)].map(m => [m[2], { route: m[1], fn: m[3] }]));
@@ -324,6 +329,17 @@ for (const file of touched) {
   if (!old && NEW_PLAN_ONLY.includes(name)) {
     person("free"); await router.navigate(entry.route); await wait(80);
     ok(`4. Free ${name}: new since v688, the Plan's only: Free is sent to its own screen`, router.currentView !== entry.route, router.currentView);
+    continue;
+  }
+  // v15 (P-44 S4): What your physio or trainer changed opens from a link, so Free
+  // is not sent away: it is told it is the Plan's, and nothing is kept.
+  if (!old && name === "plan-link-back") {
+    person("free"); main.innerHTML = "";
+    const V = await import(new URL(`../${file}`, import.meta.url).href);
+    const before = JSON.stringify(store.get("prescribedExercises"));
+    router.planBack = "back=v1.abcdefghij"; await V.PlanLinkBackView(router).mount(main); await wait(20);
+    compared++;
+    ok("4pb. Free plan-link-back: new since v688 (P-44); says it is the Plan's, keeps nothing", /part of the Plan\. Nothing from the link has been kept\./.test(main.textContent) && JSON.stringify(store.get("prescribedExercises")) === before && store.get("ownPrevious") === null);
     continue;
   }
   // v9 (P-28 S4): Guide me is new since v688, behind the Plan's door.

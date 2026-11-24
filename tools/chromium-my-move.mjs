@@ -1,6 +1,9 @@
 /**
  * tools/chromium-my-move.mjs
- * 23 Nov 2026 v6
+ * 24 Nov 2026 v7
+ *
+ * v7 - P-44 S4: What your physio or trainer changed; My exercises with
+ *   Put back my old list, asked.
  *
  * v6 - P-44 S2: Send a link to change, with the QR code showing.
  *
@@ -68,6 +71,8 @@ const SCREENS_ALL = [
   ["arc", [], "The arc's aims, led"],
   ["settings", ['[data-section-open="plan"]'], "Settings, Your plan"],
   ["send", ['#pl-qr'], "Send a link to change, the QR code showing"],
+  ["back", [], "What your physio or trainer changed"],
+  ["prev", ['#px-prev-btn'], "My exercises, Put back my old list asked"],
 ];
 const SCREENS = process.env.ONLY ? SCREENS_ALL.filter(x => x[0] === process.env.ONLY) : SCREENS_ALL;
 
@@ -96,6 +101,9 @@ for (const scheme of ["light", "dark"]) for (const width of [390, 320]) for (con
       if (where === "mm-again" || where === "arc") {
         s.setMyMove({ made: new Date().toISOString(), purposes: ["stronger", "stretch", "instep"], most: "stretch", goodDay: "few", hardDay: ["coach"] });
         s.set("activityLog", Array.from({ length: 5 }, (_, i) => ({ id: "f" + i, type: "workout", door: "feel", completed: true, durationMins: 20, completedAt: new Date(Date.now() - (i + 1) * 864e5).toISOString() })));
+      } else if (where === "back" || where === "prev") {
+        s.set("prescribedExercises", [["Supine Spinal Twist", "Evening Release"], ["Lat Pulldown", "Session A"], ["Seated Cable Row", "Session A"]].map(([name, group], i) => ({ id: "px-9-" + i, name, group, sets: 3, reps: "10", active: true })));
+        if (where === "prev") s.setOwnPrevious(s.get("prescribedExercises"));
       } else if (where === "send") {
         s.set("prescribedExercises", [["Supine Spinal Twist", "Evening Release"], ["Seated Figure-4 Stretch", "Evening Release"], ["Lat Pulldown", "Session A"], ["Seated Cable Row", "Session A"]].map(([name, group], i) => ({ id: "px-1794424682372-" + i, name, group, sets: 3, reps: "45 seconds each side", active: true })));
       } else if (where === "home-new" || where === "settings") {
@@ -119,6 +127,14 @@ for (const scheme of ["light", "dark"]) for (const width of [390, 320]) for (con
     else if (where === "arc") await page.evaluate(() => window.router.navigate("arc-setup"));
     else if (where === "settings") await page.evaluate(() => window.router.navigate("settings"));
     else if (where === "send") await page.evaluate(() => window.router.navigate("plan-link-send"));
+    else if (where === "prev") await page.evaluate(() => window.router.navigate("prescribed"));
+    else if (where === "back") await page.evaluate(async () => {
+      const PL = await import("./js/data/plan-link.js");
+      window.router.planBack = "back=" + await PL.encodePlan({ t: "back", at: new Date().toISOString(), of: "2026-11-23T20:00:00.000Z", say: "Add a heavier row and a side plank; drop the twist for now.",
+        lists: [{ g: "Session A", x: [{ i: "px-9-1", n: "Lat Pulldown", s: 3, r: "12" }, { i: "px-9-2", n: "Seated Cable Row", s: 4, r: "8", nt: "heavier, slow on the way back" }, { n: "Side plank", s: 3, r: "30 seconds each side" }] },
+          { g: "Evening Release", x: [] }] });
+      await window.router.navigate("plan-link-back");
+    });
     else if (where === "change") await page.evaluate(() => window.router.navigate("change-today"));
     else { await page.evaluate(() => window.router.navigate("progress")); await page.waitForTimeout(100); await page.evaluate(() => window.router.navigate("today")); }
     await page.waitForTimeout(500);

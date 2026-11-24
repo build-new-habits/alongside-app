@@ -1,6 +1,10 @@
 /**
  * router.js
- * 23 Nov 2026 v59
+ * 24 Nov 2026 v60
+ *
+ * v60 - P-44 S4. 'plan-link-back' (What your physio or trainer changed),
+ *   from a link sent back or pasted into Add a plan you already have; the
+ *   code travels on router.planBack, never stored.
  *
  * v59 - P-44 PHYSIO LINK S2. 'plan-link-send' (Send a link to change, the
  *   Plan's; Free is sent to Progress), from Share your plan; its tab is
@@ -444,6 +448,7 @@ const VIEW_NAMES = {
   'progress-share':    { path: './views/progress-share.js',   fn: 'ProgressShareView'   },
   'plan-share':        { path: './views/plan-share.js',       fn: 'PlanShareView'       },
   'plan-link-send':    { path: './views/plan-link-send.js',   fn: 'PlanLinkSendView'    },
+  'plan-link-back':    { path: './views/plan-link-back.js',   fn: 'PlanLinkBackView'    },
   'settings':          { path: './views/settings.js',         fn: 'SettingsView'        },
   'weekly-plan':       { path: './views/weekly-plan.js',      fn: 'WeeklyPlanView'      },
   'noticing':          { path: './views/noticing.js',         fn: 'NoticingView'        },
@@ -585,7 +590,7 @@ const NAV_MAP = {
   // absent.
   'quiet-session': 'noticing', 'breathing-session': 'noticing',
   'prescribed': 'today', 'prescribed-session': 'today', 'session-builder': 'today',
-  'progress': 'progress', 'weekly-plan': 'progress', 'progress-share': 'progress', 'plan-share': 'progress', 'plan-link-send': 'progress',
+  'progress': 'progress', 'weekly-plan': 'progress', 'progress-share': 'progress', 'plan-share': 'progress', 'plan-link-send': 'progress', 'plan-link-back': 'today',
   'noticing': 'noticing', 'journal-entry': 'noticing',
   'in-step': 'noticing',
   // NAV-8. 'library' moved from 'noticing' to 'today'. The Library is an

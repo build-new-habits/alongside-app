@@ -1,6 +1,12 @@
 /**
  * app.js - Application entry point
- * 15 Nov 2026 v16
+ * 24 Nov 2026 v17
+ *
+ * v17 - P-44 S4 (the physio link). Opened by a link a physio or trainer
+ *   sent back (#back=v1.…): the code is taken out of the address at once
+ *   (so it is not kept in history) and handed to What your physio or
+ *   trainer changed. With nobody set up here (an iPhone opens Safari), it
+ *   says so and offers Copy this link (views/plan-link-back.js showNotHere).
  *
  * v16 - P-25 HOW-TO GUIDES. Help and Guide me through it (js/guide.js) are
  *   set up once, with the router, before the first screen.
@@ -258,7 +264,26 @@ const App = {
     const isOnboarded    = store.get('onboardingComplete') === true;
     const firstView      = isOnboarded ? 'today' : 'onboarding/thread';
 
-    await router.navigate(firstView);
+    // P-44 S4. A link sent back by a physio or trainer.
+    const backCode = /^#back=v1\./.test(location.hash) ? location.hash.slice(1) : null;
+    if (backCode) {
+      const whole = location.origin + location.pathname + '#' + backCode;
+      try { history.replaceState(history.state, '', location.pathname + location.search); } catch { /* keep going */ }
+      if (isOnboarded) { router.planBack = backCode; await router.navigate('plan-link-back'); }
+      else {
+        const m = await import('./views/plan-link-back.js');
+        m.showNotHere(document.getElementById('main-content'), whole, () => router.navigate(firstView));
+      }
+    } else {
+      await router.navigate(firstView);
+    }
+    // ... and one tapped while the app is already open.
+    window.addEventListener('hashchange', () => {
+      if (!/^#back=v1\./.test(location.hash) || store.get('onboardingComplete') !== true) return;
+      router.planBack = location.hash.slice(1);
+      try { history.replaceState(history.state, '', location.pathname + location.search); } catch { /* keep going */ }
+      router.navigate('plan-link-back');
+    });
 
     // Dismiss loading screen
     const loading = document.getElementById('loading');
