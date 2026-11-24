@@ -1,6 +1,9 @@
 /**
  * tools/verify-write1.mjs
- * 24 Nov 2026 v18
+ * 24 Nov 2026 v19
+ *
+ * v19 - P-46 S3. askLater's dated promise kept: data/ask-later.js reads it
+ *   (Home's question asked once, later); the line is gone.
  *
  * v18 - P-46 S1 SCHEMA. askLater joins the baseline as a DATED PROMISE:
  *   written by store.setAskLater(), read by nothing until S3 (Home asks once,
@@ -254,10 +257,6 @@ const BASELINE = new Set([
   // (plan-home.js); each removes its line, as the check below insists.
   'dayOpen',
 
-  // P-46 S1, 24 Nov 2026 (store.js v132). DATED PROMISE, not permission:
-  // askLater is written by store.setAskLater() with no reader until S3
-  // (the Home card that asks once, later) connects it; S3 removes this line.
-  'askLater',
 
 
   // 'conditionMeta' -- removed 28 Sep 2026. SMOOTH-P4a reads it: Progress

@@ -1,6 +1,8 @@
 /**
  * css/components/start.css
- * 24 Nov 2026 v1
+ * 24 Nov 2026 v2
+ *
+ * v2 - P-46 S3. .al: the question asked once, later, on both Homes.
  *
  * P-46 S2. The one-minute start (views/onboarding/start.js), both tiers.
  * The app's own tokens, so light, dark and high contrast follow them.
@@ -53,3 +55,14 @@
 .st-actions { display: flex; flex-direction: column; gap: var(--space-2); }
 .st-need { margin: 0; font-size: var(--text-sm); color: var(--color-text-secondary); text-align: center; }
 .st-later { min-height: 48px; }
+
+/* P-46 S3. The question asked once, later (data/ask-later.js), on both
+ * tiers' Home: one question, its answers, Not now. */
+.al { border: 1px solid var(--color-border); background: var(--color-bg-elevated); border-radius: 14px; padding: var(--space-3); display: flex; flex-direction: column; gap: var(--space-2); margin: var(--space-3) 0; }
+.al-q { margin: 0; font-size: var(--text-base); font-weight: 600; }
+.al-line { margin: 0; font-size: var(--text-sm); color: var(--color-text-secondary); }
+.al-chips { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.al-chip { min-height: 44px; padding: 0 var(--space-3); border-radius: 22px; border: 2px solid var(--color-border); background: var(--color-bg); color: var(--color-text); font-size: var(--text-sm); font-family: inherit; cursor: pointer; }
+.al-chip.is-on { border-color: var(--color-primary); background: var(--color-primary-subtle, rgba(45, 212, 191, 0.15)); font-weight: 600; }
+.al-btns { display: flex; gap: var(--space-2); flex-wrap: wrap; }
+.al-btns .btn { min-height: 44px; }

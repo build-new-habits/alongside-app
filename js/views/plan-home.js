@@ -1,5 +1,11 @@
 /**
  * views/plan-home.js
+ * 24 Nov 2026 v19
+ *
+ * v19 - P-46 S3. The question asked once, later (data/ask-later.js), under
+ *   Making my Move's bar, only when no other question is asking and never on
+ *   a hard day. Not a way in (a question, not a destination).
+ *
  * 24 Nov 2026 v18
  *
  * v18 - P-45 THE LIVE LINK. When a physio or trainer has sent changes
@@ -191,6 +197,7 @@ import { suggestToday, arcDoor, pickProgramme, movementName } from "../data/path
 import { setTodaysLength } from "../data/session-length.js";
 import { fiveOf } from "../data/progress-report.js";
 import { EFFORT, ZONE2_ACTIVITIES, zone2Week, zone2HardDoneThisWeek } from "../data/trend-recipes.js";
+import { dueAskLater, askLaterCard } from "../data/ask-later.js";   // P-46 S3 (bound by today.js attachEvents)
 import { goodDayDoors, HARD_OFFERED, homeDay, setToday, arcNext, startItems, startOpen, askHardToday, reviewDue, reviewBlock, setReviewed } from "../data/my-move.js";
 
 // ── The doors ──────────────────────────────────────────────────────────────
@@ -554,6 +561,7 @@ export function renderPlanHome(ctx = {}) {
       ${hardLead ? hardToday(mm) : (mm.day === "hard" ? `<p class="path-note path-mm__note">A hard day. Here's what you chose for days like this.</p>` : "") + todayCard(state, ctx.carry)}
       ${hardLead ? "" : changeBar(state)}
       ${liveAsk(mm) ? `<div class="path-mm">${liveAsk(mm)}</div>` : ""}${myMoveBar(liveAsk(mm) ? { ...mm, ask: false, review: false } : mm)}
+      ${!hardLead && mm.day !== "hard" && !liveAsk(mm) && !mm.ask && !mm.review ? askLaterCard(dueAskLater()) : ""}
       ${littleAndOften()}
       <h2 class="look-label" id="path-doors-h" tabindex="-1">${label}</h2>
       <ul class="path-doors" aria-labelledby="path-doors-h">
