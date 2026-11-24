@@ -1,6 +1,8 @@
 /**
  * tools/verify-plan-link.mjs
- * 23 Nov 2026 v1
+ * 24 Nov 2026 v2
+ *
+ * v2 - 4g: outFromOwn never fails on one odd entry (plan-link.js v3).
  *
  * P-44 THE PHYSIO LINK, S1 SCHEMA AND LINK (spec
  * docs/specs/alongside_physio-link_23nov2026_v1.md; store.js v130,
@@ -121,6 +123,8 @@ ok("4b. notes off unless asked", !J(out).includes("squeeze") && J(PL.outFromOwn(
 ok("4c. no name unless asked", !("by" in out) && PL.outFromOwn(OWN, { by: "Graeme" }).by === "Graeme");
 ok("4d. only the lists chosen", J(PL.outFromOwn(OWN, { groups: ["Evening"] }).lists.map(l => l.g)) === J(["Evening"]));
 ok("4e. each exercise: its id, name, library id, sets, reps", J(out.lists[0].x[0]) === J({ n: "Glute bridge", i: "px-1-0", l: "glute-bridge", s: 3, r: "12" }));
+const odd = PL.outFromOwn([{ id: "px 1", name: "A", sets: 0, exerciseId: "child's-pose", group: "G" }, { id: "px-2", name: "B", sets: 25, reps: "10", group: "G" }, { id: "px-3", name: "<>", group: "G" }, ...Array.from({ length: 70 }, (_, i) => ({ id: "px-9-" + i, name: "E" + i, group: "H" }))]);
+ok("4g. v3: one odd entry never stops the link: odd sets, ids and library ids left out, a nameless one skipped, 60 at most", !!odd && JSON.stringify(odd.lists[0].x) === JSON.stringify([{ n: "A" }, { n: "B", i: "px-2", r: "10" }]) && odd.lists.reduce((k, l) => k + l.x.length, 0) === 60, JSON.stringify(odd && odd.lists[0].x));
 ok("4f. never a tick, a date done, or anything else", !/completed|addedAt|active/.test(J(out)));
 
 console.log("\nTEST 5 - what changed");
