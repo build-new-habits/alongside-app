@@ -1,6 +1,15 @@
 /**
  * views/plan-link-send.js
- * 24 Nov 2026 v3
+ * 24 Nov 2026 v4
+ *
+ * v4 - SHARE-NOW (Graeme, 24 Nov, on his phone: "The link does copy and I
+ *   can't share"). The link was made after the tap (compressing it takes a
+ *   moment), so by the time Share was asked for, the phone no longer counted
+ *   it as the tap and refused; the code then copied the link without saying
+ *   why. Now the link is made as soon as the screen opens and again on each
+ *   choice, so Share and Copy use it at once, inside the tap. If Share still
+ *   won't open, it copies and says so; if copying won't either, the link is
+ *   shown, selected, to copy by hand.
  *
  * v3 - P-45 THE LIVE LINK. When the relay is set up (relay-config.js):
  *   Send their changes straight to this phone (off to start). The first
@@ -75,22 +84,25 @@ export function PlanLinkSendView(router, { client = relayClient(RELAY) } = {}) {
   let live = false;           // P-45: send their changes straight to this phone
   let liveLink = null;        // the one opened on this visit, reused
   let liveNote = "";
+  let showLink = false;       // v4: neither Share nor Copy worked: the link, to copy by hand
   let redraw = false;         // a live link was just opened, or couldn't be
 
   function mount(el) {
     root = el;
     if (!isPremium()) { router.navigate("progress", { replace: true }); return; }
     chosen = ownLists().map(l => l.g);
-    notes = false; name = false; link = ""; showQr = false; live = false; liveLink = null; liveNote = "";
+    notes = false; name = false; link = ""; showQr = false; live = false; liveLink = null; liveNote = ""; showLink = false;
     render();
     root.querySelector(".share-title")?.focus();
+    makeLink();   // v4: ready before any tap
   }
 
   async function makeLink() {
     const by = name ? String(store.get("name") || "").trim() : "";
     const plan = outFromOwn(store.get("prescribedExercises") || [], { groups: chosen, notes: notes && healthAllowed(), by });
     if (!plan) { link = ""; return link; }
-    let code = await encodePlan(plan);
+    let code;
+    try { code = await encodePlan(plan); } catch { link = ""; return link; }   // v4: a phone that can't compress: say so on the tap, never throw
     if (live && client.on) {
       if (!liveLink) {
         redraw = true;
@@ -147,6 +159,8 @@ export function PlanLinkSendView(router, { client = relayClient(RELAY) } = {}) {
         <button class="btn btn-secondary btn-large btn-full" id="pl-qr"${none ? " disabled" : ""} aria-expanded="${showQr ? "true" : "false"}" aria-controls="pl-qr-box">${showQr ? "Hide the QR code" : "Show a QR code"}</button>
       </div>
       <p class="sh-status" id="pl-status" role="status" aria-live="polite"></p>
+      ${showLink && link ? `<div class="sh-group"><label class="sh-legend" for="pl-link">The link, to copy</label>
+        <textarea class="yw-input" id="pl-link" rows="4" readonly>${esc(link)}</textarea></div>` : ""}
       <div id="pl-qr-box"${showQr ? "" : " hidden"}>${showQr ? (qr
         ? `<p class="pl-qr-line">For them to scan in the clinic.</p><div class="pl-qr-wrap">${qr}</div>`
         : `<p class="sp-left">Too long for a QR code. Share the link instead.</p>`) : ""}</div>
@@ -177,23 +191,30 @@ export function PlanLinkSendView(router, { client = relayClient(RELAY) } = {}) {
   /** After a live link was opened (or refused), draw again: Your live links, or the note. */
   function redrawIf(sel) { if (redraw) { redraw = false; render(sel); } }
 
-  async function share() {
-    const url = await makeLink();
-    redrawIf("#pl-share");
-    if (!url) { say("This list could not be made into a link. Check each exercise has a name."); return; }
-    if (navigator.share) {
-      try { await navigator.share({ title: "My exercises", text: "My exercises from Alongside: Move. Open the link to change them, then press Send back.", url }); say("Shared."); return; }
-      catch (e) { if (e && e.name === "AbortError") return; }
-    }
-    await copy(url);
+  const SHARE_TEXT = "My exercises from Alongside: Move. Open the link to change them, then press Send back.";
+  const NO_LINK = "This list could not be made into a link. Check each exercise has a name.";
+
+  /** v4: Share at once, inside the tap, with the link already made. */
+  function share() {
+    if (!link) { makeLink().then(u => { redrawIf("#pl-share"); u ? shareNow(u) : say(NO_LINK); }); return; }
+    shareNow(link);
+  }
+  function shareNow(url) {
+    if (!navigator.share) { copyNow(url, "This phone can\u2019t share from here, so the link is copied instead. Paste it in a message or an email."); return; }
+    navigator.share({ title: "My exercises", text: SHARE_TEXT, url }).then(
+      () => say("Shared."),
+      e => { if (e && e.name === "AbortError") return; copyNow(url, "Sharing didn\u2019t open here, so the link is copied instead. Paste it in a message or an email."); });
   }
 
-  async function copy(pre) {
-    const url = pre || await makeLink();
-    if (!pre) redrawIf("#pl-copy");
-    if (!url) { say("This list could not be made into a link. Check each exercise has a name."); return; }
-    try { await navigator.clipboard.writeText(url); say("Link copied. Paste it in a message or an email."); }
-    catch { say("Copying is not allowed here. Show a QR code, or Share the link instead."); }
+  /** v4: Copy at once, inside the tap. */
+  function copy() {
+    if (!link) { makeLink().then(u => { redrawIf("#pl-copy"); u ? copyNow(u) : say(NO_LINK); }); return; }
+    copyNow(link);
+  }
+  function copyNow(url, done = "Link copied. Paste it in a message or an email.") {
+    const fail = () => { showLink = true; render("#pl-link"); root?.querySelector("#pl-link")?.select(); say("This phone won\u2019t copy from here. The link is below, selected: copy it from your phone\u2019s menu, or show a QR code."); };
+    try { navigator.clipboard.writeText(url).then(() => say(done), fail); }
+    catch { fail(); }
   }
 
   function wire() {
@@ -207,7 +228,7 @@ export function PlanLinkSendView(router, { client = relayClient(RELAY) } = {}) {
     q("#pl-back")?.addEventListener("click", () => router.navigate("plan-share"));
     root.querySelectorAll("[data-go]").forEach(b => b.addEventListener("click", () => router.navigate(b.dataset.go)));
     q("#pl-share")?.addEventListener("click", share);
-    q("#pl-copy")?.addEventListener("click", () => copy());
+    q("#pl-copy")?.addEventListener("click", copy);
     q("#pl-qr")?.addEventListener("click", async () => {
       showQr = !showQr;
       if (showQr) await makeLink();
@@ -219,13 +240,16 @@ export function PlanLinkSendView(router, { client = relayClient(RELAY) } = {}) {
       chosen = cb.checked ? [...chosen, g] : chosen.filter(x => x !== g);
       chosen = ownLists().map(l => l.g).filter(x => chosen.includes(x));
       if (liveLink) { liveLink = { ...liveLink, lists: [...chosen] }; store.saveLiveLink(liveLink); }
-      if (showQr) await makeLink();
+      showLink = false;
+      await makeLink();   // v4: ready for the next tap
       render(`#pl-g-${i}`);
       say(`${g}: ${cb.checked ? "in" : "out"}.`);
     }));
     root.querySelectorAll("[data-also]").forEach(cb => cb.addEventListener("change", async () => {
       if (cb.dataset.also === "notes") notes = cb.checked; else if (cb.dataset.also === "live") { live = cb.checked; liveNote = ""; } else name = cb.checked;
-      if (showQr) await makeLink();
+      showLink = false;
+      await makeLink();   // v4: ready for the next tap (ticking Straight to this phone opens the live link now)
+      redraw = false;
       render(`#pl-${cb.dataset.also}`);
       say(`${({ notes: "Your notes", name: "Your first name", live: "Straight to this phone" })[cb.dataset.also]}: ${cb.checked ? "on" : "off"}.`);
     }));
