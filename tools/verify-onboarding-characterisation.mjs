@@ -1,5 +1,13 @@
 /**
  * tools/verify-onboarding-characterisation.mjs
+ * 24 Nov 2026 v6
+ *
+ * v6 - P-46 S2 (re-pointed, none loosened). Consent still goes on at once:
+ *   for someone new, to the one-minute start (section 2 checks the hand-over).
+ *   The old conversation is now reached only part-way (tools/part-way.mjs), so
+ *   sections 3, 5 and 6 walk it from there; their assertions are unchanged.
+ *   The one-minute start itself: verify-p46-start.
+ *
  * 03 Oct 2026 v5
  *
  * v5 - W5-17 A11Y-W5. Re-pointed to the decision: the consent screen is not
@@ -47,6 +55,7 @@
  * Run: node tools/verify-onboarding-characterisation.mjs
  */
 
+import { partWay } from "./part-way.mjs";
 import { oneScreen } from "./one-screen.mjs";
 import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
@@ -88,6 +97,17 @@ async function fresh() {
   ThreadView({ navigate: r => seen.push(r) }).mount(el);
   await wait(2500);
   { const mo = el.querySelector("#ob-age-month"), yr = el.querySelector("#ob-age-year"); if (mo && yr) { mo.value = "1"; yr.value = "1990"; el.querySelector("#ob-age-continue").dispatchEvent(new dom.window.Event("click")); await wait(20); } }
+  return { el, navigated: seen };
+}
+
+/** P-46 S2. The old conversation, as it is now reached: part-way through. */
+async function freshPartWay() {
+  partWay(store);
+  const el = document.createElement("div");
+  oneScreen(el);
+  const seen = [];
+  ThreadView({ navigate: r => seen.push(r) }).mount(el);
+  await wait(400);
   return { el, navigated: seen };
 }
 
@@ -170,7 +190,7 @@ section("1. The flow opens as it does today");
 // ── 2. Consent — the part that must not change ──────────────────────
 section("2. Consent capture");
 {
-  const { el } = await fresh();
+  const { el, navigated } = await fresh();
   await passConsent(el);
 
   ok("consent.given is true", store.get("consent.given") === true);
@@ -189,15 +209,17 @@ section("2. Consent capture");
      el.querySelectorAll(".ob-bubble--coach").length > 0,
      "consent block may persist as history; the thread must have moved on");
   ok("the thread has moved past it", el.querySelector(".ob-thread") !== null);
-  ok("the thread starts immediately after",
-     typeof store.get("onboarding.threadStartedAt") === "string");
+  // P-46 S2 (re-pointed, not loosened): getting started still goes on at
+  // once after consent; for someone new it now goes to the one-minute start.
+  ok("getting started goes on immediately after (the one-minute start)",
+     navigated.includes("onboarding/start"), JSON.stringify(navigated));
 }
 
 // ── 3. Driving it to the end ────────────────────────────────────────
 section("3. A full pass, answering everything offered");
 {
-  const { el } = await fresh();
-  await passConsent(el);
+  // P-46 S2: the old conversation is reached part-way (tools/part-way.mjs).
+  const { el } = await freshPartWay();
   const path = await walk(el);
 
   ok("the thread accepted a sequence of answers", path.length > 3, path.join(" > "));
@@ -255,8 +277,7 @@ section("5. Reduced motion is honoured");
   // matchMedia reports reduced here, so nothing should be waiting on a
   // typing delay. If the flow still needed real time to progress, the
   // walk above would have stalled — which is itself the assertion.
-  const { el } = await fresh();
-  await passConsent(el);
+  const { el } = await freshPartWay();   // P-46 S2
   const path = await walk(el, 12);
   ok("the flow progresses without real-time delays under reduced motion",
      path.length > 2, path.join(" > "));
@@ -281,8 +302,7 @@ section("6. The gap — stated, not glossed");
   // Recorded as an assertion rather than a comment so it cannot be
   // skimmed past: a gate whose green implies more coverage than it has
   // is worse than no gate.
-  const { el } = await fresh();
-  await passConsent(el);
+  const { el } = await freshPartWay();   // P-46 S2
   await walk(el);
 
   const characterised = ["consent.given", "consent.at", "consent.policyVersion",

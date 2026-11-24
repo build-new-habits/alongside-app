@@ -1,5 +1,9 @@
 /**
  * app.js - Application entry point
+ * 24 Nov 2026 v19
+ *
+ * v19 - P-46 S2. onboarding/start is a busy view (a reload would lose the answers in hand).
+ *
  * 24 Nov 2026 v18
  *
  * v18 - P-45 THE LIVE LINK. After the first screen, and whenever the app
@@ -129,7 +133,7 @@ const BUSY_VIEWS = new Set([
   'walk-session', 'running-session', 'cycle-session', 'swim-session',
   'quiet-session', 'breathing-session', 'prescribed-session', 'class-player',
   'capture', 'in-step', 'practices', 'checkin', 'checkin-mini', 'journal-entry',
-  'reflect', 'onboarding/thread', 'age-check', 'consent-update', 'health-consent',
+  'reflect', 'onboarding/thread', 'onboarding/start', 'age-check', 'consent-update', 'health-consent',
 ]);
 const BANNER_RETRY_MS = 30000;
 

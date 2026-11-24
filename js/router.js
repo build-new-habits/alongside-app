@@ -1,5 +1,10 @@
 /**
  * router.js
+ * 24 Nov 2026 v61
+ *
+ * v61 - P-46 S2. 'onboarding/start' (views/onboarding/start.js), the one-minute
+ *   start; no nav, no exit, Back leaves, as onboarding/thread.
+ *
  * 24 Nov 2026 v60
  *
  * v60 - P-44 S4. 'plan-link-back' (What your physio or trainer changed),
@@ -420,6 +425,8 @@ const VIEW_NAMES = {
   // ── Onboarding ─────────────────────────────────────────────────────────────
   // OB-THREAD: single entry point. Replaces all previous onboarding screens.
   'onboarding/thread':  { path: './views/onboarding/thread.js',      fn: 'ThreadView'               },
+  // P-46 S2, 24 Nov 2026. The one-minute start, after the age question and the agreements.
+  'onboarding/start':   { path: './views/onboarding/start.js',       fn: 'StartView'                },
 
   // Kept for sheet-manager.js dynamic imports — not router-navigated directly.
   // Do not remove: sheet-manager.js imports these via import() not router.navigate().
@@ -542,7 +549,7 @@ const VIEW_NAMES = {
 
 const hideNavViews = new Set([
   // OB-THREAD and its sheet views
-  'onboarding/thread',
+  'onboarding/thread', 'onboarding/start',
   'onboarding/goals', 'onboarding/conditions',
   'onboarding/equipment', 'onboarding/plan-select',
   // Core flow (no nav)
@@ -569,7 +576,7 @@ const hideNavViews = new Set([
 ]);
 
 // W4-1 GATE-OPEN. Screens left only by answering them: no house button.
-const NO_EXIT_VIEWS = new Set(['onboarding/thread', 'age-check', 'under-18', 'consent-update']);
+const NO_EXIT_VIEWS = new Set(['onboarding/thread', 'onboarding/start', 'age-check', 'under-18', 'consent-update']);
 // D662-6 TWO-HOMES. Screens with their own way home: no house beside it.
 // Today's plan hides it itself while its plan (with "‹ Home") is showing.
 const OWN_HOME_VIEWS = new Set(['reflect', 'plan-finish', 'prescribed']);
@@ -630,7 +637,7 @@ const NAV_MAP = {
 
 // GATE-ONCE. The screens that mean a session is over.
 // W5-16. Screens where the phone's Back, with nothing behind, leaves the app.
-const BACK_LEAVES = new Set(['under-18', 'age-check', 'onboarding/thread', 'consent-update']);
+const BACK_LEAVES = new Set(['under-18', 'age-check', 'onboarding/thread', 'onboarding/start', 'consent-update']);
 
 const GATE_SESSION_ENDS = new Set(['today', 'progress', 'noticing', 'settings', 'library']);
 

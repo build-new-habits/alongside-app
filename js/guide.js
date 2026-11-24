@@ -1,5 +1,9 @@
 /**
  * js/guide.js
+ * 24 Nov 2026 v3
+ *
+ * v3 - P-46 S2. No Help on onboarding/start (answered, start to end).
+ *
  * 15 Nov 2026 v2
  *
  * v1 - P-25 HOW-TO GUIDES (spec v3 §2.1, §2.3; mock-up v2, Graeme 12 Nov:
@@ -41,7 +45,7 @@ import { lineIcon } from "./data/line-icons.js";
 /** No Help on a screen that is only answered, or that runs from start to end. */
 export const HELP_HIDDEN = new Set([
   "help",
-  "onboarding/thread", "onboarding/goals", "onboarding/conditions", "onboarding/equipment", "onboarding/plan-select",
+  "onboarding/thread", "onboarding/start", "onboarding/goals", "onboarding/conditions", "onboarding/equipment", "onboarding/plan-select",
   "home-threshold", "community-impact", "annual-reflection",
   "guide-me", "class-player", "practices", "in-step",
   "reflect", "plan-finish", "journal-entry",

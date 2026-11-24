@@ -1,5 +1,11 @@
 /**
  * js/views/onboarding/thread.js
+ * 24 Nov 2026 v30
+ *
+ * v30 - P-46 S2. _beginThread(): anyone who has not started this conversation
+ *   goes to the one-minute start (onboarding/start); someone part-way through
+ *   it carries on here, as before. The age question and the agreements stay here.
+ *
  * 06 Nov 2026 v29
  *
  * v29 - P-28 FINISH (a fault found by chromium-p28's harness, both tiers).
@@ -699,8 +705,10 @@ export function ThreadView(router) {
       _showCoachBubble("Welcome back. Let's pick up where we left off.").then(() => _runStep(reached));
       return;
     }
-    store.set('onboarding.threadStartedAt', new Date().toISOString());
-    _runStep(1);
+    // P-46 S2. Anyone who has not started this conversation goes to the
+    // one-minute start (views/onboarding/start.js). Someone part-way
+    // through it carries on above, as before.
+    router.navigate('onboarding/start', { replace: true });
   }
 
   // ── Step runner ────────────────────────────────────────────────────────────
