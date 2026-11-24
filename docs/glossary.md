@@ -1,5 +1,7 @@
 # Alongside: Move — Glossary
-## 23 Nov 2026 v12
+## 24 Nov 2026 v13
+
+v13 - P-44 the physio link: Send a link to change, What your physio or trainer changed, Put back my old list, the edit page's words.
 
 v12 - P-39 S6. Home's question on an in-between day; the twelve-week question. It's a hard day moves into Change today.
 
@@ -56,6 +58,11 @@ Taken from the words on every screen (`node tools/chromium-words.mjs`, 95 screen
 | Going back into it | **Making my Move** (Settings › Your plan) | Change what Alongside is for (retired from Home, S6), Edit preferences, Customise | P-39. Also Help A3, and Home's twelve-week question |
 | Home's question on an in-between day (mood Low) | **Keep today to what you chose for hard days?** **Yes** / **No, as planned** | Are you sure, Feeling down? | P-39 S6. Once a day at most; never decides for them |
 | Home's question at each twelve weeks of an arc | **Still what you want Alongside for?** **Have a look** / **Yes, still right** | Review, Check-in, Reflect | P-39 S6. Once per twelve weeks |
+| Sending your lists for a professional to change | **Send a link to change** (Share your plan) | Share with physio, Invite, Collaborate, Sync | P-44. Makes a link; the app sends nothing |
+| The screen when their link comes back | **What your physio or trainer changed** | Review changes, Import, Merge | P-44. **Use all of it** / **Use the n ticked** / **Keep my list** |
+| Undoing their changes | **Put back my old list** | Undo, Revert, Restore | P-44. 30 days, asked once |
+| On the edit page, the professional's button | **Send back** | Submit, Save, Done | P-44. Makes the link to return |
+| On the edit page, removing one | **Take it out** / **Put it back** | Delete, Remove | P-44 |
 | What to do first on a new Plan, under Today on Home | **Start your Plan** | Getting started, Setup, Checklist, Onboarding | P-39 S5 (P-35 folded in). *Making my Move*, *Set what you're working towards*, *Plan your week*, *Add exercises from your physio or trainer*. Done ones ticked; never on a hard day |
 | Putting the list away | **Close this list** | Dismiss, Hide, Done | P-39 S5. The list does not come back. Making my Move, the arc and the week stay in Settings › Your plan; own exercises in My exercises |
 | A day the check-in or the person says is hard | **a hard day** | bad day (for this), low day | P-39. *Bad* stays the sore-area word. In Change today: **It's a hard day** (S6; no longer a standing button on Home); its way out, on Home: **Show my usual Home** |

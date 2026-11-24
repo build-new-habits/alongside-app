@@ -1,6 +1,8 @@
 /**
  * views/plan-share.js
- * 23 Nov 2026 v2
+ * 24 Nov 2026 v3
+ *
+ * v3 - P-44 S5. Guide marker send-link on Send a link to change.
  *
  * v2 - P-44 PHYSIO LINK S2. Under the three ways to share, Or let them
  *   change it: Send a link to change (views/plan-link-send.js).
@@ -79,7 +81,7 @@ export function PlanShareView(router) {
         <button class="btn btn-secondary btn-large btn-full" id="sp-copy">Copy as text</button>
       </div>
       ${m.has.lists ? `<p class="sp-link-line">Or let them change it, and send it back for you to choose what to keep.</p>
-      <div class="sp-acts"><button class="btn btn-secondary btn-large btn-full" data-go="plan-link-send">Send a link to change</button></div>` : ""}
+      <div class="sp-acts"><button class="btn btn-secondary btn-large btn-full" data-go="plan-link-send" data-guide-target="send-link">Send a link to change</button></div>` : ""}
       ${copyBox ? `<label class="sh-legend" for="sp-text">The text, to copy</label><textarea class="sp-textarea" id="sp-text" rows="10" readonly>${esc(planText(m))}</textarea>` : ""}
       <p class="sh-status" id="sp-status" role="status" aria-live="polite"></p>
       <details class="sp-more" id="sp-more"${open ? " open" : ""}><summary>Change what\u2019s in it</summary>

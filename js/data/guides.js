@@ -207,6 +207,28 @@ export const GUIDES = Object.freeze([
     ],
   },
   {
+    // P-44 S5. The physio link, Stage 1.
+    id: "B2", cat: "plans", tiers: ["plan"],
+    title: "I want my physio or trainer to change my exercises",
+    outcome: "Send them a link. They change your exercises in their browser, with no account, and send a link back. You see each change and choose what to keep. Your old list is kept for 30 days.",
+    on: ["progress", "plan-share", "plan-link-send", "plan-link-back", "prescribed"],
+    keywords: ["physio", "pt", "trainer", "send", "link", "change", "edit", "update", "review", "qr", "clinic", "share", "back", "rehab"],
+    ways: [{ when: "always", parts: [{ steps: [
+      { screen: "any", target: "nav:progress", label: "Progress", say: "Tap **Progress** at the bottom." },
+      { screen: "progress", target: "share-plan", label: "Share your plan", say: "Tap **Share your plan**." },
+      { screen: "plan-share", target: "send-link", label: "Send a link to change", say: "Tap **Send a link to change**." },
+      { screen: "plan-link-send", target: ["send-share", "send-copy"], label: ["Share the link…", "Copy link"], say: "Choose which lists go. Then tap **Share the link…**, or **Copy link** and paste it in a message. In the clinic, tap **Show a QR code** for them to scan." },
+    ] }] }],
+    noWay: "This is part of the Plan.",
+    end: "When they send a link back, tap it, or paste it into **My exercises › Add a plan you already have**.",
+    notQuite: [
+      { q: "Their link opened in Safari, not the app", answer: "On an iPhone, the app on your Home Screen keeps its own data. Tap **Copy this link**, open Alongside: Move from your Home Screen, and paste it into **My exercises › Add a plan you already have**." },
+      { q: "It says the link is not complete", answer: "Messages sometimes cut long links short. Ask them to use **Copy the link** or **Email it** on their page." },
+      { q: "I used their changes and want my old list back", answer: "In **My exercises**, tap **Put back my old list**. It is kept for 30 days." },
+      { q: "Can they see my notes?", answer: "Only if you tick **Your notes** before you send. Anyone with the link can read what is in it." },
+    ],
+  },
+  {
     id: "C1", cat: "week", tiers: ["plan"],
     title: "I want my sessions on set days",
     outcome: "Two parts. Part 1: choose the days you want to move. Part 2: say what each day is. On the day, it’s waiting on Home.",

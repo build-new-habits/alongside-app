@@ -1,6 +1,9 @@
 /**
  * tools/verify-guides.mjs
- * 23 Nov 2026 v5
+ * 24 Nov 2026 v6
+ *
+ * v6 - P-44 S5: B2 I want my physio or trainer to change my exercises
+ *   (the Plan), walked from Progress to Share the link.
  *
  * v5 - P-39 S6: A3 has two ways, from Start your Plan while it shows and
  *   from Settings › Your plan once it is closed (Home keeps no standing
@@ -241,7 +244,7 @@ await go("today");
   ok("3c. On this screen: Home's guides, only what this person can do", !!here && /On this screen: Home/i.test(txt(here)) && /just opened the app/.test(txt(here)) && !/Start today’s session/.test(txt(here)), txt(here));
   const q = main.querySelector("#help-q");
   q.value = "physio"; q.dispatchEvent(new dom.window.Event("input", { bubbles: true }));
-  ok("3d. search by the words people use: physio finds the physio guide", /1 guide match/.test(txt(main.querySelector("#help-count"))) && /know my physio plan/.test(txt(main.querySelector("#help-results"))));
+  ok("3d. search by the words people use: physio finds both physio guides (B1, and B2 since P-44 S5)", /2 guides match/.test(txt(main.querySelector("#help-count"))) && /know my physio plan/.test(txt(main.querySelector("#help-results"))) && /physio or trainer to change my exercises/.test(txt(main.querySelector("#help-results"))), txt(main.querySelector("#help-count")));
   q.value = "zebra crossing"; q.dispatchEvent(new dom.window.Event("input", { bubbles: true }));
   ok("3e. nothing matched: said plainly, and the groups stay", /Nothing matched/.test(txt(main.querySelector("#help-count"))) && main.querySelectorAll("[data-cat]").length >= 5);
   ok("3f. only groups with guides (no empty group)", [...main.querySelectorAll("[data-cat]")].every(b => !/\b0 guides/.test(txt(b))));
@@ -274,6 +277,7 @@ const FIX = {
   "A3:startClosed": { tier: "personal", closed: true },   // S6: from Settings › Your plan
   "A2:weekLeads": { tier: "personal", own: true, week: "own" },
   "B1:always": { tier: "personal" },
+  "B2:always": { tier: "personal", own: true },   // P-44 S5: the physio link
   "C1:noWeek": { tier: "personal", own: true },
   "C1:hasWeek": { tier: "personal", own: true, week: "own" },
   "C2:always": { tier: "personal", own: true },
