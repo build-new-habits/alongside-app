@@ -1,7 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 25 Nov 2026 v746
+ * 25 Nov 2026 v747
+ *
+ * v747 - P-46 Wave 8 fixes (Graeme, 25 Nov). The ask again's last line says why: without the answers I won't know if something is sore or you're having a hard day, so please listen to your body. Free's player has one way out, Exit (the house sat on 1 of 7); no house on the consent screens; 3 of 4 on one line at the largest text; Free's ready-made sessions end with A walk or a run. No new files.
  *
  * v746 - P-46 Wave 8, persona 2.12 (Graeme's decision, 25 Nov). Someone who said no to health answers is asked again before a session on one short screen: a gentle routine without them, but it can't fit how they are on the day; that's fine, change it in Settings; if you go without, listen to your body. Yes, keep my answers, or Carry on without them. No new files.
  *
@@ -4345,7 +4347,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v746";
+const CACHE_NAME = "alongside-v747";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4435,7 +4437,7 @@ const SHELL_HASHES = {
   "./js/views/checkin.js": "5ea0fea142be8ceb",
   "./js/views/checkin-mini.js": "c647f4da71feddde",
   "./js/views/coach-proposal.js": "c8f548d3c2e5db8c",
-  "./js/views/workout.js": "eb9b6b11c13086e9",
+  "./js/views/workout.js": "a64a827af4e52fb2",
   "./js/views/progress.js": "7708195f75512d62",
   "./js/views/settings.js": "409f0a13bbb63e89",
   "./js/views/restore-flow.js": "dc81c2e455fa472d",
@@ -4466,7 +4468,7 @@ const SHELL_HASHES = {
   "./js/views/library.js": "36195497d25a503d",
   "./js/views/practices.js": "f76d5aae3596a565",
   "./js/views/red-flag.js": "d2f857d0f8ba905f",
-  "./js/views/health-consent.js": "daf6465718ac66fe",
+  "./js/views/health-consent.js": "cace2ae17b89b230",
   "./js/views/age-check.js": "b29fd222f8378e0b",
   "./js/views/under-18.js": "22c82205c5f7626a",
   "./js/views/consent-update.js": "51f918f8e2c9b25a",
@@ -4474,7 +4476,7 @@ const SHELL_HASHES = {
   "./js/data/tier-table.js": "ca492fb2752322a4",
   "./js/views/know-what.js": "e84fee3e6d9d3af0",
   "./js/views/plan-home.js": "9e7f620b5821dfa0",
-  "./js/views/path.js": "e6ccf9456ebfd488",
+  "./js/views/path.js": "12cb43dfccb79b19",
   "./js/plan-look.js": "7674d8fbf5101aa9",
   "./js/views/plan-finish.js": "d3901b6355f55542",
   "./js/data/outside.js": "3af4ea46bd898084",
@@ -4484,8 +4486,8 @@ const SHELL_HASHES = {
   "./js/data/swap-search.js": "5f0f0e4d112f92ea",
   "./js/views/build-session.js": "763317cec8c62e83",
   "./js/data/build-lately.js": "e06714cc9d1539a6",
-  "./css/components/path.css": "e47b23e28e32a2ba",
-  "./css/components/start.css": "308a22950f0a3940",
+  "./css/components/path.css": "37805c062225d90d",
+  "./css/components/start.css": "e2621b6cdc4017e1",
   "./js/data/red-flag.js": "3cd9eecbc3985eb3",
   "./js/data/health-consent.js": "a23d005af57f179c",
   "./js/data/age-check.js": "7fa5b0f5a6b34770",
@@ -4502,7 +4504,7 @@ const SHELL_HASHES = {
   "./js/views/plan-import.js": "027c3f9fc203c613",
   "./js/views/change-today.js": "31101d97d53492c8",
   "./js/views/my-move.js": "a431f1a0696487ed",
-  "./js/views/free-home.js": "3bd8d62df607f955",
+  "./js/views/free-home.js": "f1505d02950513f2",
   "./js/views/on-the-plan.js": "2d25cce8dfb0fc9e",
   "./js/views/onboarding/start.js": "b6fe85c63c26b37d",
   "./js/data/my-move.js": "c6ec80cda14e499b",
