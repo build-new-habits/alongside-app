@@ -1,5 +1,11 @@
 /**
  * tools/verify-p46-start.mjs
+ * 24 Nov 2026 v2
+ *
+ * v2 - P-46 WAVE 8 FIX. Wave 8: the length asked is quick (about 20 minutes,
+ *   as the card says), Today's plan says Your first session (never You asked
+ *   for), and Outside asks for outside.
+ *
  * 24 Nov 2026 v1
  *
  * P-46 FREE-AND-FIRST, S2 GETTING STARTED (spec docs/specs/alongside_free-and-first_24nov2026_v1.md, v2, section 2). Drives the
@@ -10,6 +16,7 @@
  * red-flag guard before the first session, and the first session asked
  * for gentle at the chosen place. Red on alongside-v738.
  */
+import { readFileSync } from "node:fs";
 import { agreed } from "./agreed.mjs";
 import { createRequire as __cr } from "node:module";
 const __require = __cr(import.meta.url);
@@ -128,7 +135,11 @@ click(S.q("[data-st-back]")); await wait(5);
 ok("2q. Back returns a screen, answers kept", S.h1() === "Where will you move?" && S.q('[data-place="gym"]').getAttribute("aria-pressed") === "true" && S.q('input[name="st-chairRise"][value="yes"]').checked);
 click(S.q("[data-st-next]")); await wait(5);
 click(S.q("[data-st-go]")); await wait(10);
-ok("2r. Show me my session: onboarded, flow short, Today's plan asked for a gentle whole body at the gym", store.get("onboardingComplete") === true && store.get("onboarding.flow") === "short" && !!store.get("onboarding.threadCompletedAt") && store.get("requestedSessionType") === "full" && store.get("requestedLocation") === "gym" && store.get("availableTimeToday")?.cat === "short" && S.nav.includes("coach-proposal"), JSON.stringify({ nav: S.nav, f: store.get("onboarding.flow") }));
+ok("2r. Show me my session: onboarded, flow short, Today's plan asked for a gentle whole body at the gym", store.get("onboardingComplete") === true && store.get("onboarding.flow") === "short" && !!store.get("onboarding.threadCompletedAt") && store.get("requestedSessionType") === "full" && store.get("requestedLocation") === "gym" && store.get("availableTimeToday")?.cat === "quick" && S.nav.includes("coach-proposal"), JSON.stringify({ nav: S.nav, f: store.get("onboarding.flow"), len: store.get("availableTimeToday") }));
+// v2 (Wave 8): the card and Today's plan agree on the length; Today's plan says it is the first session, not "You asked for".
+ok("2r2. the card says About 20 minutes, the length asked (quick, 20 minutes)", /About 20 minutes/.test(readFileSync(new URL("../js/views/onboarding/start.js", import.meta.url), "utf8")));
+const cpSrc = readFileSync(new URL("../js/views/coach-proposal.js", import.meta.url), "utf8");
+ok("2r3. Today's plan's first sentence for it: Your first session: whole body, gentle, about N minutes (never You asked for)", /req === 'full' && store\.get\('onboarding\.flow'\) === 'short'[\s\S]{0,260}`Your first session: whole body, gentle, about \$\{total\} minutes\.`/.test(cpSrc));
 ok("2s. the first session is built gentle (light) because nothing said otherwise", store.declaredLevel() === "light");
 ok("2t. the red-flag questions are due before that first session (the guard asks them)", RFv.redFlagDue() === true && RFv.guardRoute("workout") !== "workout", String(RFv.guardRoute("workout")));
 ok("2u. nothing the old conversation asked later was written here", store.get("lifestyle.activityLevel") == null && (store.get("goals") || []).length === 0 && store.get("ageBand") == null && store.get("capability.bothFeet") == null);
@@ -138,6 +149,11 @@ fresh(); S = await openStart();
 click(S.q("[data-st-next]")); await wait(5); click(S.q("[data-st-next]")); await wait(5);
 click(S.q('[data-place="outside"]')); await wait(5); click(S.q("[data-st-next]")); await wait(5);
 ok("3a. no name: screen 4 says no name; Outside is said as no kit needed", S.h1() === "Your first session" && /Gentle, no kit needed\./.test(txt(S.el)) && store.get("sessionLocation") === "home", txt(S.el).slice(0, 160));
+click(S.q("[data-st-go]")); await wait(5);
+ok("3a2. Outside, then Show me my session: Today's plan is asked for outside (v2, Wave 8)", store.get("requestedLocation") === "outside");
+fresh(); S = await openStart();
+click(S.q("[data-st-next]")); await wait(5); click(S.q("[data-st-next]")); await wait(5);
+click(S.q('[data-place="outside"]')); await wait(5); click(S.q("[data-st-next]")); await wait(5);
 click(S.q("[data-st-home]")); await wait(5);
 ok("3b. Not now: onboarded, flow short, Home", store.get("onboardingComplete") === true && store.get("onboarding.flow") === "short" && S.nav.includes("today") && store.get("requestedSessionType") == null);
 let over = [];

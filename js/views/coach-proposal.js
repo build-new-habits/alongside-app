@@ -1,5 +1,11 @@
 /**
  * coach-proposal.js
+ * 24 Nov 2026 v70
+ *
+ * v70 - P-46 WAVE 8 FIX. The first session from Getting started says "Your
+ *   first session: whole body, gentle, about N minutes.", not "You asked
+ *   for…": nobody asked (Wave 8 trace).
+ *
  * 15 Nov 2026 v69
  *
  * v69 - P-25 HOW-TO GUIDES. Guide markers: I have read this. (ack) and
@@ -1742,6 +1748,14 @@ export function CoachProposalView(router) {
     if (planWhy) {
       const total = _planTotal(option), want = _getAvailableTimeMinutes();
       return (total && Math.abs(total - want) > 5 ? `This one comes to about ${total} minutes.` : '') +
+        (option.conditionNote ? ` ${option.conditionNote}` : '');
+    }
+    // P-46 (Wave 8). The first session from Getting started: nobody asked for
+    // anything, so it says what the card said, and its own length.
+    if (req === 'full' && store.get('onboarding.flow') === 'short' && _deliveredType(option) === req &&
+        !store.completedSessions(store.get('activityLog') || []).length) {
+      const total = _planTotal(option) || _getAvailableTimeMinutes();
+      return `Your first session: whole body, gentle, about ${total} minutes.` +
         (option.conditionNote ? ` ${option.conditionNote}` : '');
     }
     if (t && _deliveredType(option) === req) {

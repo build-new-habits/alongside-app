@@ -1,5 +1,12 @@
 /**
  * js/views/onboarding/start.js
+ * 24 Nov 2026 v2
+ *
+ * v2 - P-46 WAVE 8 FIX. Found in the Wave 8 trace: the card said about 15
+ *   minutes, gentle, and Today's plan said "You asked for strength, full body,
+ *   30 minutes". Now about 20 minutes on both (quick), and Outside asks for
+ *   outside.
+ *
  * 24 Nov 2026 v1
  *
  * P-46 FREE-AND-FIRST, S2 GETTING STARTED (spec
@@ -163,7 +170,7 @@ export function StartView(router) {
       <div class="st-card">
         <svg class="st-fig" aria-hidden="true" width="120" height="96" viewBox="0 0 120 96" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="60" cy="16" r="9"/><path d="M60 25v30M60 34l-20 14M60 34l20 14M60 55l-14 30M60 55l14 30"/></svg>
         <p class="st-card__t">Whole body, gentle</p>
-        <p class="st-card__s">About 15 minutes</p>
+        <p class="st-card__s">About 20 minutes</p>
       </div>`,
       `<button type="button" class="btn btn-primary btn-large btn-full" data-st-go>Show me my session</button>
        <button type="button" class="btn btn-secondary btn-full st-later" data-st-home>Not now, take me Home</button>`);
@@ -212,8 +219,9 @@ export function StartView(router) {
     root.querySelector("[data-st-go]")?.addEventListener("click", () => {
       finish();
       store.set("requestedSessionType", "full");
-      store.set("requestedLocation", store.get("sessionLocation") || "home");
-      setTodaysLength("short");
+      // v2 (Wave 8): the place they chose, outside included, and the length the card says.
+      store.set("requestedLocation", place === "outside" ? "outside" : (store.get("sessionLocation") || "home"));
+      setTodaysLength("quick");   // about 20 minutes (time-windows.js); "short" was 30
       router.navigate("coach-proposal");
     });
     root.querySelector("[data-st-home]")?.addEventListener("click", () => { finish(); router.navigate("today"); });
