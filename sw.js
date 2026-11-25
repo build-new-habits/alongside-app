@@ -1,7 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 25 Nov 2026 v744
+ * 25 Nov 2026 v745
+ *
+ * v745 - P-46 Wave 8 fixes (both tiers). The first session from Getting started keeps the card's promise: about 20 minutes, and Today's plan says Your first session: whole body, gentle (not You asked for strength, 30 minutes); Outside asks for outside. Free's Done today names the session. No new files.
  *
  * v744 - P-46 S7 CLOSE (both tiers). Help gains I want to change a move while I'm doing it (Swap, Do this one later, What's left, Skip, More about this move, If it hurts), and, on Free, Something gentler for a day not up to a full session. P-46 Free and first is complete. No new files.
  *
@@ -4341,7 +4343,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v744";
+const CACHE_NAME = "alongside-v745";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4430,7 +4432,7 @@ const SHELL_HASHES = {
   "./js/views/stretch-arc.js": "cdc78c24b91d2e1c",
   "./js/views/checkin.js": "5ea0fea142be8ceb",
   "./js/views/checkin-mini.js": "c647f4da71feddde",
-  "./js/views/coach-proposal.js": "816ba25a48fe721e",
+  "./js/views/coach-proposal.js": "c8f548d3c2e5db8c",
   "./js/views/workout.js": "eb9b6b11c13086e9",
   "./js/views/progress.js": "7708195f75512d62",
   "./js/views/settings.js": "409f0a13bbb63e89",
@@ -4498,9 +4500,9 @@ const SHELL_HASHES = {
   "./js/views/plan-import.js": "027c3f9fc203c613",
   "./js/views/change-today.js": "31101d97d53492c8",
   "./js/views/my-move.js": "a431f1a0696487ed",
-  "./js/views/free-home.js": "f94508fd3bb83d2f",
+  "./js/views/free-home.js": "3bd8d62df607f955",
   "./js/views/on-the-plan.js": "2d25cce8dfb0fc9e",
-  "./js/views/onboarding/start.js": "5f52e26da854742b",
+  "./js/views/onboarding/start.js": "b6fe85c63c26b37d",
   "./js/data/my-move.js": "c6ec80cda14e499b",
   "./js/data/plan-link.js": "ebeb09703328fab6",
   "./js/data/live-link.js": "e8d57b2c0a7cec36",
