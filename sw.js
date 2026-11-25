@@ -1,7 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 25 Nov 2026 v747
+ * 25 Nov 2026 v748
+ *
+ * v748 - P-46 S4b TIDY. The Free-only code no one reaches is removed from the session builder, the Library, Classes and Mobility & Conditioning (Free is sent to Part of the Plan). Nobody sees a change. No new files.
  *
  * v747 - P-46 Wave 8 fixes (Graeme, 25 Nov). The ask again's last line says why: without the answers I won't know if something is sore or you're having a hard day, so please listen to your body. Free's player has one way out, Exit (the house sat on 1 of 7); no house on the consent screens; 3 of 4 on one line at the largest text; Free's ready-made sessions end with A walk or a run. No new files.
  *
@@ -4347,7 +4349,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v747";
+const CACHE_NAME = "alongside-v748";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4431,7 +4433,7 @@ const SHELL_HASHES = {
   "./js/session-resume.js": "6916b88c0757374f",
   "./js/auth.js": "9b9c7a632dccada6",
   "./js/views/today.js": "36762a19c4e7bee0",
-  "./js/views/mobility-conditioning.js": "8b30ad4fa0887d62",
+  "./js/views/mobility-conditioning.js": "7b60688e779d5b58",
   "./js/views/arc-setup.js": "c1d43e86b901ace3",
   "./js/views/stretch-arc.js": "cdc78c24b91d2e1c",
   "./js/views/checkin.js": "5ea0fea142be8ceb",
@@ -4465,7 +4467,7 @@ const SHELL_HASHES = {
   "./js/views/programme-select.js": "115a22eeb9526be5",
   "./js/views/upgrade.js": "c20de0f464afbb80",
   "./js/views/privacy.js": "a3141eea5d56825f",
-  "./js/views/library.js": "36195497d25a503d",
+  "./js/views/library.js": "ae647a15a875452c",
   "./js/views/practices.js": "f76d5aae3596a565",
   "./js/views/red-flag.js": "d2f857d0f8ba905f",
   "./js/views/health-consent.js": "cace2ae17b89b230",
@@ -4572,12 +4574,12 @@ const SHELL_HASHES = {
   "./js/data/classes/class-from-the-feet-010.js": "cdbfa03ffea71774",
   "./js/data/scope-statement.js": "02dac4d3fb7a62fb",
   "./js/data/activity-labels.js": "9753c0fbbf27d8cc",
-  "./js/views/class-player.js": "958fd2cf4c442f85",
-  "./js/views/class-list.js": "c5f80d89802bf845",
+  "./js/views/class-player.js": "46cdb86c21de1d66",
+  "./js/views/class-list.js": "ec34d99274aaee67",
   "./css/components/class-list.css": "e33b073b352399f3",
   "./css/components/class-player.css": "401cc57d7d39dbb1",
   "./js/views/saved-sessions.js": "400202f2e10e8e74",
-  "./js/views/session-builder-ui.js": "9155cae5f311cd10",
+  "./js/views/session-builder-ui.js": "fa76c5ea1b7462aa",
   "./js/views/noticing.js": "b0fd1db225416f4f",
   "./js/views/in-step.js": "b19c81ba82c39b1d",
   "./js/data/in-step-programme.js": "91605a0780fba799",
