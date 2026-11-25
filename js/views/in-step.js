@@ -1,5 +1,15 @@
 /**
  * js/views/in-step.js
+ * 25 Nov 2026 v9
+ *
+ * v9 - P-29 INSTEP-RECAP (approved 19 Nov). "Before we start" becomes
+ *   "Last time": when (Earlier today, Yesterday, On Monday, Last week, A
+ *   while ago), in which episode, what it was about, its Carry it word for
+ *   word, and "Did you get to try it?" with I tried it, I forgot and that
+ *   episode's own third answer. Voiced as the screen opens when the coach's
+ *   voice is on and the clip is there, with Pause; the when words are on
+ *   screen only. Part 4's recaps keep their line until Part 4's read.
+ *
  * 24 Nov 2026 v8
  *
  * v8 - P-46 S6 WORDS. Fewer words before the first button (spec §7: about
@@ -48,8 +58,8 @@ import { store }   from "../store.js";
 import { router }  from "../router.js";
 import { isPremium } from "../auth.js";
 import { lineIcon } from "../data/line-icons.js";
-import { PARTS, EPISODES, ACK, ANSWERS, getEpisode, getPart, episodesInPart, nextEpisodeId, audioIdsForPart } from "../data/in-step-programme.js";
-import { programme, currentEpisodeId, isOpen, lastTimeLine, answerLastTime, completeEpisode,
+import { PARTS, EPISODES, ACK, ANSWERS, HELD_THIRD, getEpisode, getPart, episodesInPart, nextEpisodeId, audioIdsForPart } from "../data/in-step-programme.js";
+import { programme, currentEpisodeId, isOpen, lastTime, lastTimeLine, answerLastTime, completeEpisode,
          takePendingEpisode, LOW_DAY_LINE } from "../data/in-step-offer.js";
 import { playLine, stopLine, voiceOn, prefetchLines } from "../coach-audio.js";
 
@@ -135,13 +145,25 @@ function renderLanding() {
   `);
 }
 
+// P-29 (approved 19 Nov): Last time. When, which episode and what it was
+// about, its Carry it word for word, then "Did you get to try it?" with I
+// tried it, I forgot and that episode's own third answer. Part 4's recaps
+// wait for their read and keep the line they had (held).
 function renderPrev(e) {
+  const t = lastTime();
+  const third = t && !t.held ? t.episode.notCame : HELD_THIRD;
+  const said = t && !t.held
+    ? `<p class="instep-recap"><strong>${esc(t.when)}, in “${esc(t.episode.title)}”</strong>, we talked about ${esc(t.episode.about)}.</p>
+      <p class="instep-recap">I left you with one thing to try:</p>
+      <p class="instep-recap instep-recap__carry"><strong>“${esc(t.episode.carry.text)}”</strong></p>`
+    : `<p class="instep-recap">${esc(t?.line || "")}</p>`;
   return shell(`${epHeader(e)}
-    <h1 tabindex="-1">Before we start</h1>
+    <h1 tabindex="-1">Last time</h1>
     ${low ? `<p class="instep-low">${esc(LOW_DAY_LINE)}</p>` : ""}
-    <div class="card instep-card"><p class="instep-prev" id="is-prev-line">${esc(lastTimeLine())}</p></div>
-    <div class="instep-answers" role="group" aria-labelledby="is-prev-line">
-      ${ANSWERS.map(a => `<button type="button" class="btn btn-secondary btn-full" data-answer="${a.id}">${esc(a.label)}</button>`).join("")}
+    <div class="card instep-card instep-said">${speaking}${said}${t && !t.held ? pauseBtn() : ""}</div>
+    <p class="instep-ask" id="is-prev-q">Did you get to try it?</p>
+    <div class="instep-answers" role="group" aria-labelledby="is-prev-q">
+      ${ANSWERS.map(a => `<button type="button" class="btn btn-secondary btn-full" data-answer="${a.id}">${esc(a.label || third)}</button>`).join("")}
     </div>
     <p class="instep-small">Only your tap is kept. No score, nothing to write.</p>
     <button type="button" class="btn btn-secondary btn-full" id="is-skip-prev">Skip this and start</button>`);
@@ -261,7 +283,9 @@ function startEpisode(id, opts = {}) {
 /** The part's clips, and the line after Choose, when the voice is on. */
 function _prefetch(id) {
   const e = getEpisode(id);
-  if (e) prefetchLines([...audioIdsForPart(e.part), ACK.audio]);
+  const t = lastTime();
+  const recapDue = t && !t.held && programme().lastAnswer === null;
+  if (e) prefetchLines([...audioIdsForPart(e.part), ACK.audio, ...(recapDue ? [t.episode.recap.audio] : [])]);
 }
 
 function leave() {
@@ -282,6 +306,9 @@ export function onMount() {
   root.querySelector("#is-exit")?.addEventListener("click", leave);
 
   if (phase === "prev") {
+    // P-29: the recap is voiced (the when words are on screen only).
+    const t = lastTime();
+    if (t && !t.held) voice(t.episode.recap.audio);
     root.querySelectorAll("[data-answer]").forEach(b => b.addEventListener("click", () => { answerLastTime(b.dataset.answer); go("listen"); }));
     root.querySelector("#is-skip-prev")?.addEventListener("click", () => go("listen"));
   }

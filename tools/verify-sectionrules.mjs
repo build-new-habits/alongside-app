@@ -1,5 +1,11 @@
 /**
  * tools/verify-sectionrules.mjs
+ * 25 Nov 2026 v7
+ *
+ * v7 - 11b ARC-BACK-2. 14c re-pointed, not loosened: Back goes where you
+ *   came from (router.back), never a fixed old parent; verify-back-fixes 11b
+ *   drives it in the real view.
+ *
  * 24 Nov 2026 v6
  *
  * v6 - S4b TIDY. P-46 S4b TIDY. TEST 6: the Mobility & Conditioning door is
@@ -610,9 +616,12 @@ check("14c. the arc goes back where it came from", () => {
   const at = arc.indexOf('"#sa-back-btn"');
   ok(at > -1, "no back control");
   const body = arc.slice(at, at + 400);
-  ok(/navigate\("today"/.test(body),
-     "the arc's Back still points at Mobility & Conditioning, where it lived before " +
-     "LOBBY-1b moved it to Home — so there is no way home except starting a session");
+  // ARC-BACK-2 (11b, 25 Nov): the way in is Progress now, so Back goes where
+  // you came from (router.back), never to the arc's old parents. The steps
+  // are proved in a real view by verify-back-fixes 11b.
+  ok(/router\.back\(\)/.test(body) && !/mobility-conditioning/.test(body),
+     "the arc's Back points at a fixed place again (Mobility & Conditioning or Home, " +
+     "where it once lived), not where the person came from");
 });
 
 console.log(fails === 0

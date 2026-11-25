@@ -6,6 +6,15 @@ import { validateWeightTarget } from "./data/weight-targets.js";
 
 /**
  * store.js - Data persistence layer
+ * 25 Nov 2026 v133
+ *
+ * v133 - P-29 INSTEP-RECAP, schema first (Schema v1.136). One key added
+ *   to inStepProgress.programme: lastCarryAt, the local day (YYYY-MM-DD)
+ *   an episode reached its Carry it, or null; written with lastCarry, read
+ *   only to say when last time was (Earlier today, Yesterday, On Monday,
+ *   Last week, A while ago). Malformed or absent loads as null, so an older
+ *   record says "Last time". Both tiers, as In Step is.
+ *
  * 24 Nov 2026 v132
  *
  * v132 - P-46 FREE-AND-FIRST S1, schema first (spec
@@ -2178,7 +2187,7 @@ export const store = {
    */
   _cleanP28(data) {
     const EP = /^p[1-4]e[1-6]$/;
-    const def = { part: 1, episode: 1, done: [], lastCarry: null, lastAnswer: null, offeredAt: null, offeredSession: 0 };
+    const def = { part: 1, episode: 1, done: [], lastCarry: null, lastCarryAt: null, lastAnswer: null, offeredAt: null, offeredSession: 0 };
     const isp = data.inStepProgress && typeof data.inStepProgress === 'object' ? data.inStepProgress : null;
     if (isp) {
       const p = isp.programme && typeof isp.programme === 'object' ? isp.programme : {};
@@ -2188,6 +2197,8 @@ export const store = {
         episode:        int(p.episode, 1, 6, def.episode),
         done:           Array.isArray(p.done) ? [...new Set(p.done.filter(x => typeof x === 'string' && EP.test(x)))] : [],
         lastCarry:      typeof p.lastCarry === 'string' && EP.test(p.lastCarry) ? p.lastCarry : null,
+        // v133 (P-29): the local day that Carry it was given, YYYY-MM-DD, or null.
+        lastCarryAt:    typeof p.lastCarryAt === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(p.lastCarryAt) && !isNaN(new Date(p.lastCarryAt)) ? p.lastCarryAt : null,
         lastAnswer:     ['did', 'not-yet', 'didnt'].includes(p.lastAnswer) ? p.lastAnswer : null,
         offeredAt:      typeof p.offeredAt === 'string' && !isNaN(new Date(p.offeredAt)) ? p.offeredAt : null,
         offeredSession: int(p.offeredSession, 0, 1e6, 0),
@@ -3284,7 +3295,8 @@ export const store = {
       inStepProgress: {
         // v122 (P-28). In Step as a programme. The tap is kept, never words.
         // v123: the old room's four fields are retired.
-        programme: { part: 1, episode: 1, done: [], lastCarry: null, lastAnswer: null, offeredAt: null, offeredSession: 0 }
+        // v133 (P-29): lastCarryAt, the local day of the last Carry it.
+        programme: { part: 1, episode: 1, done: [], lastCarry: null, lastCarryAt: null, lastAnswer: null, offeredAt: null, offeredSession: 0 }
       },
 
       // v122 (P-28). Whether the coach's recorded voice plays.

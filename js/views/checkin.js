@@ -1,6 +1,12 @@
 /**
  * js/views/checkin.js
- * 15 Nov 2026 v34
+ * 25 Nov 2026 v35
+ *
+ * v35 - 11a FREE-CHECKIN-HEAD (held since 12 Nov for the phone test's
+ *   fixes). Free's check-in had no heading and no way back (WCAG 1.3.1,
+ *   2.4.6): someone who opened it by mistake was stuck. Both tiers now draw
+ *   "Check in" and "‹ Back" (the same control on both, so verify-one-look
+ *   TEST 6 still holds); the Plan's look class stays the Plan's.
  *
  * v34 - P-25 HOW-TO GUIDES. Guide markers only: each question's words
  *   (energy, mood, sore) and Not today (not-today). Nothing else changes.
@@ -520,11 +526,11 @@ export function CheckinView(router) {
     const plan = planLook();
     container.innerHTML = `
       <div class="ci-view${plan ? " is-plan" : ""}">
-${plan ? `        <div class="ci-plan-head">
+        <div class="ci-plan-head">
           <button type="button" class="btn btn-ghost plan-back" id="ci-back">‹ Back</button>
           <h1 tabindex="-1">Check in</h1>
         </div>
-` : ""}        <div class="ci-thread"
+        <div class="ci-thread"
              id="ci-thread"
              aria-live="polite"
              aria-atomic="false"

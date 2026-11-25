@@ -1,7 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 25 Nov 2026 v748
+ * 25 Nov 2026 v750
+ *
+ * v750 - P-29 In Step's Last time (approved 19 Nov). Before an episode: when, which episode, what it was about and its Carry it, then Did you get to try it? with I tried it, I forgot and the episode's own third answer; voiced when the voice is on. Part 4's recaps wait for their read. No new files.
+ *
+ * v749 - 11a and 11b (held for the phone test's fixes; Graeme, 25 Nov). Free's check-in has a heading and a way back, as the Plan's does; Your arc's Back goes where you came from (Progress), not always Home. No new files.
  *
  * v748 - P-46 S4b TIDY. The Free-only code no one reaches is removed from the session builder, the Library, Classes and Mobility & Conditioning (Free is sent to Part of the Plan). Nobody sees a change. No new files.
  *
@@ -4349,7 +4353,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v748";
+const CACHE_NAME = "alongside-v750";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4389,7 +4393,7 @@ const SHELL_HASHES = {
   "./css/components/display-preferences.css": "7d1e4e0b34f5223f",
   "./css/components/session-log.css": "92f8082dc0ee69a7",
   "./css/components/grounding-moments.css": "a2641284734e48de",
-  "./css/components/in-step.css": "43549af1a0b40353",
+  "./css/components/in-step.css": "67309363ee77ecf4",
   "./css/components/single-activity-session.css": "fef626d39b2d281c",
   "./css/components/session-shared.css": "a71069801a65054c",
   "./css/components/upgrade-door.css": "1a2deeaceb45f4f1",
@@ -4416,7 +4420,7 @@ const SHELL_HASHES = {
   "./css/components/finish.css": "c33e298d5fcb92ae",
   "./js/app.js": "81ed92c5ada71eb8",
   "./js/router.js": "f4e0c7f0eac0a035",
-  "./js/store.js": "da198c2848d498f0",
+  "./js/store.js": "5306eafc2df487ee",
   "./js/session-log.js": "6134de4315842e05",
   "./js/exercise-feedback.js": "adba8549f444da2a",
   "./js/exercise-card.js": "87af7a5668137593",
@@ -4435,8 +4439,8 @@ const SHELL_HASHES = {
   "./js/views/today.js": "36762a19c4e7bee0",
   "./js/views/mobility-conditioning.js": "7b60688e779d5b58",
   "./js/views/arc-setup.js": "c1d43e86b901ace3",
-  "./js/views/stretch-arc.js": "cdc78c24b91d2e1c",
-  "./js/views/checkin.js": "5ea0fea142be8ceb",
+  "./js/views/stretch-arc.js": "aab4c04531021935",
+  "./js/views/checkin.js": "f59e6d3b27f36b50",
   "./js/views/checkin-mini.js": "c647f4da71feddde",
   "./js/views/coach-proposal.js": "c8f548d3c2e5db8c",
   "./js/views/workout.js": "a64a827af4e52fb2",
@@ -4581,9 +4585,9 @@ const SHELL_HASHES = {
   "./js/views/saved-sessions.js": "400202f2e10e8e74",
   "./js/views/session-builder-ui.js": "fa76c5ea1b7462aa",
   "./js/views/noticing.js": "b0fd1db225416f4f",
-  "./js/views/in-step.js": "b19c81ba82c39b1d",
-  "./js/data/in-step-programme.js": "91605a0780fba799",
-  "./js/data/in-step-offer.js": "c962f66108aeef19",
+  "./js/views/in-step.js": "b94455f6ff474328",
+  "./js/data/in-step-programme.js": "a325e135e7dd09a0",
+  "./js/data/in-step-offer.js": "acd6208e2974565e",
   "./js/coach-audio.js": "d201650f60b33617",
   "./js/hold-voice.js": "4801164cbddca872",
   "./js/views/guide-me.js": "eed24714732918fc",

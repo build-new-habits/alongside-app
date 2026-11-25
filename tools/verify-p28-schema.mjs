@@ -1,5 +1,10 @@
 /**
  * tools/verify-p28-schema.mjs
+ * 25 Nov 2026 v3
+ *
+ * v3 - P-29 INSTEP-RECAP (Schema v1.136): the default programme holds
+ *   lastCarryAt: null. Re-pointed, not loosened: every field still compared.
+ *
  * 06 Nov 2026 v2
  *
  * v2 - P-28 FINISH (store.js v123, Schema v1.124; Graeme, 06 Nov: "Delete
@@ -44,7 +49,8 @@ const ok = (name, cond, detail = "") => {
 const J = v => JSON.stringify(v);
 const saved = () => JSON.parse(localStorage.getItem(store.STORAGE_KEY));
 function load(s) { localStorage.clear(); localStorage.setItem(store.STORAGE_KEY, JSON.stringify(s)); store.init(); }
-const DEF = { part: 1, episode: 1, done: [], lastCarry: null, lastAnswer: null, offeredAt: null, offeredSession: 0 };
+// v3 (P-29, Schema v1.136): lastCarryAt, the local day of the last Carry it (verify-p29-recap TEST 2).
+const DEF = { part: 1, episode: 1, done: [], lastCarry: null, lastCarryAt: null, lastAnswer: null, offeredAt: null, offeredSession: 0 };
 
 console.log("\nTEST 0 - positive control");
 load({ onboardingComplete: true, name: "Sentinel-28" });
@@ -70,7 +76,7 @@ load({ onboardingComplete: true });
 ok("2d. a phone that never opened In Step gets the default too", J(store.get("inStepProgress").programme) === J(DEF));
 
 console.log("\nTEST 3 - the programme loads only the shape it may hold");
-const good = { part: 3, episode: 4, done: ["p1e1", "p1e2", "p2e6"], lastCarry: "p3e3", lastAnswer: "not-yet", offeredAt: "2026-11-05T18:00:00.000Z", offeredSession: 41 };
+const good = { part: 3, episode: 4, done: ["p1e1", "p1e2", "p2e6"], lastCarry: "p3e3", lastCarryAt: "2026-11-05", lastAnswer: "not-yet", offeredAt: "2026-11-05T18:00:00.000Z", offeredSession: 41 };
 load({ inStepProgress: { programme: good } });
 ok("3a. a good record loads exactly", J(store.get("inStepProgress").programme) === J(good), J(store.get("inStepProgress").programme));
 load({ inStepProgress: { programme: { part: 7, episode: 0, done: ["p1e1", "p1e1", "p5e1", "x", 3, "p2e7"], lastCarry: "p9e9", lastAnswer: "maybe", offeredAt: "not a date", offeredSession: -2 } } });

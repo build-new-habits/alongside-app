@@ -1,6 +1,13 @@
 import { createRequire as __cr } from "node:module";
 /**
  * tools/verify-one-look.mjs
+ * 25 Nov 2026 v22
+ *
+ * v22 - 11a FREE-CHECKIN-HEAD. TEST 4 takes out Free's new check-in heading
+ *   and way back (4h: exactly one, and not there before) before comparing;
+ *   any other change on Free is still red. TEST 6 unchanged (the way back is
+ *   the same control on both tiers).
+ *
  * 24 Nov 2026 v21
  *
  * v21 - S4b TIDY. P-46 S4b TIDY. The five pages whose Free drawings were
@@ -505,6 +512,14 @@ for (const file of touched) {
     const each = was.every(w => a.split(w).length === 2);
     ok("4w. P-28: v688's Free Wellbeing had In Step's tile once, and the tile is all that changed", each);
     if (each) was.forEach((w, i) => { a = a.replace(w, now[i]); });
+  }
+  // v22 (11a FREE-CHECKIN-HEAD, 25 Nov): Free's check-in gains the heading
+  // and the way back the Plan's has ("Check in", "‹ Back"), and nothing else.
+  if (name === "checkin") {
+    const isHead = /\s*<div class="ci-plan-head">\s*<button type="button" class="btn btn-ghost plan-back" id="ci-back">‹ Back<\/button>\s*<h1 tabindex="-1">Check in<\/h1>\s*<\/div>/g;
+    const heads = b.match(isHead) || [];
+    ok("4h. 11a: Free's check-in gains one heading and one way back, and that is all", heads.length === 1 && !(a.match(isHead) || []).length, String(heads.length));
+    b = b.replace(isHead, "");
   }
   if (name === "activity-log") {
     const g = onlyMindfulAdded(a, b);
