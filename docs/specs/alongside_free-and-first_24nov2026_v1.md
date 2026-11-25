@@ -1,5 +1,7 @@
 # Alongside: Move — Free and first (P-46) spec
-## 25 Nov 2026 v7
+## 25 Nov 2026 v8
+
+**v8 (Graeme's decision on 2.12, 25 Nov):** *"Some might be protective of their personal data, so we should ask again without telling them what question specifically and what the answers would be used for"*, with a warning in better words. At a session door, someone who has said no is asked again on one short screen (`health-consent.js` v6): **Before your session** · *Without your answers I can still give you a gentle routine, the same for anyone. I just can't fit it to how you are on the day.* · *That's fine. You can change your mind any time in Settings.* · **If you go without, listen to your body**, *and ease off on days you're not at your best.* · **Yes, keep my answers** (the full screen and its tick; the consent is unchanged) · **Carry on without them** (the gentle routine; not asked again). Not now on the full screen leads to the same screen. The journal, Settings and a change of wording are unchanged. Gate `verify-p46-health-reask`.
 
 **v7 (Wave 8 fixes):** the Wave 8 trace found the first session broke screen 4's promise: the card said *About 15 minutes*, gentle, and Today's plan said *You asked for strength, full body, 30 minutes* (the length asked was `short`, 30). Now the card says *About 20 minutes*, the length asked is `quick` (20), and Today's plan says *Your first session: whole body, gentle, about N minutes.*; Outside asks for outside. Free's *Done today* names the session (from `workoutHistory`; Free's log entry has no name).
 
@@ -113,4 +115,4 @@ Every screen: **at most about 15 words above the first button**. Longer text mov
 
 The voices and *Hear from your coach* (next month); payments and the 14-day trial (P-40, row 14); the 14+ age change (P-41); Free's Progress window (P-40 says 30 days, unchanged here).
 
-*Build New Habits · Alongside: Move · P-46 spec · 25 Nov 2026 v7*
+*Build New Habits · Alongside: Move · P-46 spec · 25 Nov 2026 v8*
