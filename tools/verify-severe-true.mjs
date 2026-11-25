@@ -1,5 +1,10 @@
 /**
  * tools/verify-severe-true.mjs
+ * 24 Nov 2026 v4
+ *
+ * v4 - S4b TIDY. P-46 S4b TIDY. 6h reads the one Classes list (a row per
+ *   class, data-class); Free's board, with Start on each row, is gone.
+ *
  * 03 Oct 2026 v3
  *
  * v3 - W5-21. TEST 3 chooses the minutes as the app does, for today
@@ -169,7 +174,7 @@ fixture(["lower-back"], { "lower-back": 6 });
 main.innerHTML = YS.render();
 ok("6g. Quite sore: Yoga opens as before", !main.querySelector("[data-bad-day]") && !!main.querySelector("[data-target]"), txt(main).slice(0, 160));
 main.innerHTML = CL.render();
-ok("6h. Quite sore: Classes as before", !main.querySelector("[data-bad-day]") && !!main.querySelector("[data-start]"), txt(main).slice(0, 160));
+ok("6h. Quite sore: Classes as before, the list to choose from", !main.querySelector("[data-bad-day]") && !!main.querySelector("[data-class]"), txt(main).slice(0, 160));   // S4b: the one list (Free's board is gone)
 
 console.log(`\nSEVERE-TRUE: ${passes} passed, ${fails} failed`);
 process.exit(fails ? 1 : 0);

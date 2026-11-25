@@ -1,5 +1,12 @@
 /**
  * tools/verify-timetable.mjs
+ * 24 Nov 2026 v9
+ *
+ * v9 - S4b TIDY. P-46 S4b TIDY. Free never reaches Classes, so Free's board
+ *   is gone; TESTS 2-7 hold the same properties on the Plan's list and each
+ *   class's page (none loosened; 7 now also checks every class's page
+ *   outline).
+ *
  * 01 Nov 2026 v8
  *
  * v8 - P-13 Classes re-point (mock-up v1, Graeme 01 Nov: "Yes, build it").
@@ -201,63 +208,60 @@ ok("1c. and it does so WITHOUT a twelve-week shape chosen",
    "depends on having signed up for a course");
 
 // ── 2. THE TIMETABLE SHOWS THE CLASSES
-// v8 (P-13 Classes, 01 Nov): TESTS 2 to 7 hold the board as Free has it, unchanged. On the Plan the
-// board is one row per class and a page for each (mock-up v1, Graeme 01 Nov); verify-path-classes holds
-// the same properties there: every class listed in the order written, the arc named, Not today with why,
-// the length before you commit, the shorter one a choice, Start opens the player. ──────────────────────────────────
+// v9 (P-46 S4b TIDY): Free never reaches Classes (router.js FREE_MOVED), so
+// Free's board is gone and TESTS 2 to 7 hold the same properties on the Plan's
+// list and each class's page. None loosened: every class listed in the order
+// written, each can be started, its length before you commit, nothing badged
+// as suggested, the arc named, Not today named with why (each movement once),
+// a Bad day asks first, the shorter one a choice, headings without gaps. ──
+const click = (el) => el?.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }));
+const board = () => { main.innerHTML = L.render(); L.onMount(); };
+const page = (id) => { board(); click(main.querySelector(`[data-class="${id}"]`)); };
 console.log("\nTEST 2 - every class is on the board");
 
-seed({ tier: "free" });
-main.innerHTML = L.render();
-L.onMount();
+seed();
+board();
 
 ok("2pc. positive control: the timetable rendered rows",
-   main.querySelectorAll(".class-list__row").length > 0,
+   main.querySelectorAll("[data-class]").length > 0,
    "nothing on the board");
 
 ok("2a. every class is listed",
-   main.querySelectorAll(".class-list__row").length === CLASSES.length,
-   `${main.querySelectorAll(".class-list__row").length} rows for ${CLASSES.length} classes`);
+   main.querySelectorAll("[data-class]").length === CLASSES.length,
+   `${main.querySelectorAll("[data-class]").length} rows for ${CLASSES.length} classes`);
 
 ok("2b. each can be started",
-   main.querySelectorAll("[data-start]").length >= CLASSES.length,
+   CLASSES.every(c => { page(c.id); return main.querySelector(`[data-start="${c.id}"]`); }),
    "a class on the board with no way into it");
 
+board();
 ok("2c. and its length is on the card before you commit",
-   [...main.querySelectorAll(".class-list__facts")]
-     .every(p => /about \d+ minute/.test(p.textContent)),
+   [...main.querySelectorAll("[data-class]")].every(r => /\d+ min/.test(r.textContent)),
    "somebody choosing a class cannot see how long it is");
 
 // ── 3. IT IS A TIMETABLE, NOT A RECOMMENDATION ──────────────────────────
 console.log("\nTEST 3 - nothing here picks for the person");
 
-// The line between this room and One to one. A coach picking is the
-// other room; this is a wall with the classes on it.
 const listText = (main.textContent || "").toLowerCase();
 ok("3a. no class is badged as suggested",
    !/suggested|recommended|best for you|we think/.test(listText),
    "a badge here makes this One to one wearing a timetable's clothes");
 
 ok("3b. the order is the order they were written",
-   [...main.querySelectorAll(".class-list__name")].map(h => h.textContent.trim())
-     .join("|") === CLASSES.map(c => c.title).join("|"),
-   "the board has been sorted by something, which is a recommendation " +
-   "without the word");
+   [...main.querySelectorAll("[data-class]")].map(r => r.dataset.class).join("|") === CLASSES.map(c => c.id).join("|"),
+   "the board has been sorted by something, which is a recommendation without the word");
 
-// The arc is NAMED, and that is all it does.
 ok("3c. but a class in the person's arc says so",
-   /part of your arc/i.test(main.textContent),
-   "the arc is what makes this better than a class at a gym that knows " +
-   "nothing about you — if it is never mentioned, nothing distinguishes them");
+   /your arc/i.test(main.textContent),
+   "the arc is what makes this better than a class at a gym that knows nothing about you");
 
 // ── 4. SAFETY WITHHOLDS, AND SAYS WHY ───────────────────────────────────
 console.log("\nTEST 4 - a declared severe zone withholds classes rather than editing them");
 
-seed({ injured: true, tier: "free" });
-main.innerHTML = L.render();
-L.onMount();
+seed({ injured: true });
+board();
 
-const startable = main.querySelectorAll("[data-start]").length;
+const startable = main.querySelectorAll("[data-class]").length;
 const withheld  = main.querySelectorAll(".class-list__row--held").length;
 
 ok("4pc. positive control: some classes are still offered",
@@ -271,13 +275,11 @@ ok("4b. the withheld ones are NAMED, not hidden",
    "a class that vanishes leaves somebody wondering whether it exists");
 
 ok("4c. and each says what is in it",
+   [...main.querySelectorAll(".class-list__why")].length === withheld &&
    [...main.querySelectorAll(".class-list__why")]
      .every(p => /in it, which I.m\s+leaving out/i.test(p.textContent)),
    "withheld without a reason is the app deciding silently");
 
-// 🔴 No duplicate movement names. Steady Round uses a glute bridge in
-// both rounds, and naming it twice reads as a bug in the app rather than
-// a fact about the class.
 ok("4d. and names each movement once",
    [...main.querySelectorAll(".class-list__why")].every(p => {
      const names = (p.textContent.match(/Has (.+?) in it/s) || [, ""])[1]
@@ -286,26 +288,25 @@ ok("4d. and names each movement once",
    }),
    "a movement named twice in one reason");
 
-seed({ injured: 9, tier: "free" });
+seed({ injured: 9 });
 main.innerHTML = L.render();
 ok("4e. a Bad lower back (9): the Bad-day choice, no class to start",
-   !!main.querySelector('[data-bad-day="adapt"]') && !main.querySelector("[data-start]"),
+   !!main.querySelector('[data-bad-day="adapt"]') && !main.querySelector("[data-class], [data-start]"),
    main.textContent.replace(/\s+/g, " ").slice(0, 160));
 
 // ── 5. THE WHOLE ROUTE, END TO END ──────────────────────────────────────
 console.log("\nTEST 5 - tapping a class actually starts it");
 
-seed({ tier: "free" });
-main.innerHTML = L.render();
-L.onMount();
+seed();
+const wanted = CLASSES[0].id;
+page(wanted);
 navs.length = 0;
 
 const first = main.querySelector("[data-start]");
 ok("5pc. positive control: there is a class to start", !!first);
 
 if (first) {
-  const wanted = first.dataset.start;
-  first.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }));
+  click(first);
 
   ok("5a. it goes to the player",
      navs.includes("class-player"), `navigated: ${navs.join(", ") || "nowhere"}`);
@@ -314,7 +315,6 @@ if (first) {
   ok("5b. and the class it started is the one that was tapped",
      st.id === wanted, `tapped ${wanted}, started ${st.id}`);
 
-  // The player, rendered, on the real state the timetable left behind.
   main.innerHTML = P.render();
   ok("5c. the player opens on that class",
      (main.querySelector("h1") || {}).textContent === CLASSES.find(c => c.id === wanted).title,
@@ -324,9 +324,7 @@ if (first) {
      "started part-way through");
   ok("5e. and says it can be paused",
      /pause/i.test(main.textContent),
-     "the slack that used to be padded onto the stated length now lives in " +
-     "a pause control — if it is not there, the honest number has nothing " +
-     "behind it");
+     "the slack that used to be padded onto the stated length now lives in a pause control");
 }
 
 // ── 5b. A CLASS THAT WAS DONE IS RECORDED ───────────────────────────────
@@ -476,41 +474,43 @@ console.log("\nTEST 5d - leaving immediately records nothing");
 // ── 6. THE SHORTER VERSION IS OFFERED ───────────────────────────────────
 console.log("\nTEST 6 - the lighter variant is a choice on the board");
 
-seed({ tier: "free" });
-main.innerHTML = L.render();
-L.onMount();
-
+seed();
+const lighterOffered = CLASSES.filter(c => { page(c.id); return !!main.querySelector('input[name="cl-len"][value="short"]'); });
 ok("6a. every class with a lighter variant offers it",
-   main.querySelectorAll('[data-lighter="1"]').length ===
-     CLASSES.filter(c => c.lighter).length,
+   lighterOffered.length === CLASSES.filter(c => c.lighter).length && lighterOffered.every(c => c.lighter),
    "a lighter variant nobody can pick is a lighter variant nobody has");
 
-const lighterBtn = main.querySelector('[data-lighter="1"]');
-if (lighterBtn) {
+const withLighter = CLASSES.find(c => c.lighter);
+if (withLighter) {
+  page(withLighter.id);
+  const shortIn = main.querySelector('input[name="cl-len"][value="short"]');
+  shortIn.checked = true; shortIn.dispatchEvent(new dom.window.Event("change", { bubbles: true }));
   navs.length = 0;
-  lighterBtn.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }));
+  click(main.querySelector("[data-start]"));
   ok("6b. and choosing it starts the lighter one",
      (store.get("activeClass") || {}).lighter === true,
      "the shorter button started the full class");
 }
 
 // ── 7. IT CAN BE READ ───────────────────────────────────────────────────
-console.log("\nTEST 7 - the board can be navigated by heading");
+console.log("\nTEST 7 - the board and each class's page can be navigated by heading");
 
-seed({ tier: "free" });
-main.innerHTML = L.render();
-const heads = [...main.querySelectorAll("h1,h2,h3,h4")].map(h => Number(h.tagName[1]));
+seed({ injured: true });
+board();
+const outline = () => [...main.querySelectorAll("h1,h2,h3,h4")].map(h => Number(h.tagName[1]));
+const noSkip = (h) => h.every((l, i) => i === 0 || l <= h[i - 1] + 1);
+let heads = outline();
 ok("7a. exactly one h1", heads.filter(l => l === 1).length === 1, `${heads.filter(l => l === 1).length}`);
-ok("7b. every class is a heading",
-   main.querySelectorAll(".class-list__name").length === CLASSES.length,
-   "classes are not headings, so the board cannot be skimmed");
+ok("7b. every class is named: a row button or a held heading",
+   main.querySelectorAll("[data-class]").length + main.querySelectorAll(".class-list__row--held .class-list__name").length === CLASSES.length,
+   "a class with no name on the board");
+const pageHeads = CLASSES.map(c => { seed(); page(c.id); return outline(); });
 ok("7c. no level is skipped",
-   heads.every((l, i) => i === 0 || l <= heads[i - 1] + 1),
+   noSkip(heads) && pageHeads.every(h => h.filter(l => l === 1).length === 1 && noSkip(h)),
    `outline: ${heads.map(l => "h" + l).join(" > ")}`);
 ok("7d. and each start button names its class",
-   [...main.querySelectorAll("[data-start]")]
-     .every(b => /^Start /.test(b.getAttribute("aria-label") || "")),
-   'seven rows of "Start" are seven identical announcements');
+   CLASSES.every(c => { seed(); page(c.id); return new RegExp("^Start " + c.title.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).test(main.querySelector("[data-start]")?.textContent.trim() || ""); }),
+   'a row of "Start" buttons is a row of identical announcements');
 
 console.log(fails === 0
   ? "\nTIMETABLE-1: all assertions pass\n"

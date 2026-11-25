@@ -1,6 +1,12 @@
 import { createRequire as __cr } from "node:module";
 /**
  * tools/verify-path-classes.mjs
+ * 24 Nov 2026 v2
+ *
+ * v2 - S4b TIDY. P-46 S4b TIDY. TEST 6: Free's board and player are gone; it
+ *   checks the router sends Free to Part of the Plan and neither file holds a
+ *   tier check.
+ *
  * 01 Nov 2026 v1
  *
  * P-13 Classes. Graeme approved mock-up v1 on 01 Nov ("Yes, build it";
@@ -122,15 +128,17 @@ ok("5c. Pause and Move on are there", !!main.querySelector("#cp-pause") && !!mai
 try { CP.onUnmount?.(); } catch {}
 
 // ── 6 ───────────────────────────────────────────────────────────────────
-console.log("\nTEST 6 - Free, as it was on alongside-v693");
-const fresh = async (code, name) => { const t = new URL(`../js/views/${name}__chk.js`, import.meta.url); writeFileSync(t, code); try { return await import(t.href); } finally { unlinkSync(t); } };
-for (const [file, draw] of [["class-list", m => { main.innerHTML = m.render(); return main.innerHTML; }],
-                             ["class-player", m => { m.startClass(ground.id, { lighter: false }); main.innerHTML = m.render(); return main.innerHTML; }]]) {
-  let old = ""; try { old = execSync(`git -C "${ROOT}" show d173e53:js/views/${file}.js`, { encoding: "utf8" }); } catch {}
-  const OLD = await fresh(old, file + "_old"), NOW = await fresh(readFileSync(`${ROOT}js/views/${file}.js`, "utf8"), file + "_now");
-  fixture("free"); const a = draw(OLD); fixture("free"); const b = draw(NOW);
-  let at = 0; while (at < a.length && a[at] === b[at]) at++;
-  ok(`6. Free ${file}: the same, byte for byte`, !!old && a === b && a.length > 200, `differs at ${at}: ${a.slice(at - 40, at + 40)} | ${b.slice(at - 40, at + 40)}`);
+// v-S4b (P-46 S4b TIDY): Free's board and player drawings are gone; Free never
+// reaches Classes. Checked: the router sends Free to Part of the Plan, and
+// neither file holds a tier check.
+console.log("\nTEST 6 - Free never reaches Classes");
+const routerSrc = readFileSync(`${ROOT}js/router.js`, "utf8");
+const moved = (routerSrc.match(/const FREE_MOVED = new Set\(\[([\s\S]*?)\]\)/) || [, ""])[1];
+for (const file of ["class-list", "class-player"]) {
+  const route = file === "class-list" ? "classes" : "class-player";
+  ok(`6. Free ${file}: the router sends Free to Part of the Plan (FREE_MOVED has '${route}')`, new RegExp(`'${route}'`).test(moved));
+  const code = readFileSync(`${ROOT}js/views/${file}.js`, "utf8").replace(/\/\*[\s\S]*?\*\/|\/\/.*$/gm, "");
+  ok(`6b. ${file}: no tier check left in it`, !/\bisPremium\b/.test(code));
 }
 
 console.log(`\n${"=".repeat(60)}\nVERIFY-PATH-CLASSES: ${passes} passed, ${fails} failed\n${"=".repeat(60)}`);

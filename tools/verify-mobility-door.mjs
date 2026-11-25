@@ -1,5 +1,11 @@
 /**
  * tools/verify-mobility-door.mjs
+ * 24 Nov 2026 v6
+ *
+ * v6 - S4b TIDY. P-46 S4b TIDY. Free's drawing of this page is gone (Free
+ *   never reaches it): the check is now that the router sends Free to Part of
+ *   the Plan and the page holds no tier check.
+ *
  * 12 Oct 2026 v5
  *
  * v5 - A-2 ONE-PLAN-SCREEN (Stage AWARD). REVERSAL on the Plan only: Start a
@@ -51,6 +57,7 @@
  *   4. Control: with every answer clear and a full kit, both still build.
  */
 import { createRequire as __cr } from "node:module";
+import { readFileSync } from "node:fs";
 const __require = __cr(import.meta.url);
 const { JSDOM } = __require("jsdom");
 
@@ -196,12 +203,9 @@ console.log("\nTEST 1 - \"Start a Mobility Session\" opens a mobility session");
   navs = []; main.innerHTML = ""; MobilityConditioningView(rtr).mount(main); await wait(10);
   click(main.querySelector("#mc-start-session")); await wait(10);
   ok("1c. checked in: straight to Today's plan, as Mobility", navs.at(-1) === "coach-proposal" && store.get("requestedSessionType") === "mobility", JSON.stringify(navs));
-  // v5. Free is left alone: its door still opens the builder.
-  store.set("tier", "free");
-  navs = []; main.innerHTML = ""; MobilityConditioningView(rtr).mount(main); await wait(10);
-  click(main.querySelector("#mc-start-session")); await wait(10);
-  ok("1e. on Free, the builder, as Mobility, as before", navs.at(-1) === "session-builder" && (store.get("sessionBuilderPreselect") || {}).type === "mobility", JSON.stringify(navs));
-  store.set("tier", "personal");
+  // P-46 S4b TIDY: Free never reaches this page (router.js FREE_MOVED), so
+  // Free's way to the builder is gone; the door is Today's plan only.
+  ok("1e. Free never reaches it (FREE_MOVED), and the door holds no tier check", /'mobility-conditioning'/.test((readFileSync(new URL("../js/router.js", import.meta.url), "utf8").match(/const FREE_MOVED = new Set\(\[([\s\S]*?)\]\)/) || [, ""])[1]) && !/\bisPremium\b/.test(readFileSync(new URL("../js/views/mobility-conditioning.js", import.meta.url), "utf8").replace(/\/\*[\s\S]*?\*\/|\/\/.*$/gm, "")));
   const allows = SB.personFilter({ equipment: [] });
   const s = SB.buildSession({ sessionType: "mobility", durationMins: 20, equipmentOverride: [] });
   const off = s.exercises.filter(e => !allows(EXERCISES.find(x => x.id === e.id) || e)).map(e => e.name);

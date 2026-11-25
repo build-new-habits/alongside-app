@@ -1,6 +1,13 @@
 import { createRequire as __cr } from "node:module";
 /**
  * tools/verify-one-look.mjs
+ * 24 Nov 2026 v21
+ *
+ * v21 - S4b TIDY. P-46 S4b TIDY. The five pages whose Free drawings were
+ *   removed (Free never reaches them) are checked another way: the router
+ *   opens Part of the Plan for Free (4m) and the page holds no tier check
+ *   (4m2). Every other page still byte for byte.
+ *
  * 25 Nov 2026 v20
  *
  * v20 - P-46 Wave 8. 1c reads the rule with the consent screens added
@@ -332,6 +339,7 @@ function onlyMindfulAdded(a, b) {
 }
 console.log("\nTEST 4 - Free, as it was on alongside-v688");
 const V688 = "79799cb";
+const S4B_TIDIED = ["session-builder-ui", "library", "class-list", "class-player", "mobility-conditioning"];   // v21
 const NEW_PLAN_ONLY = ["build-session", "change-today", "plan-share", "my-move", "plan-link-send"];   // P-44 S2 (23 Nov): Send a link to change
 //   // v8 (P-26); P-31 (15 Nov): Change today; P-33 (15 Nov): Share your plan
 const touched = execSync(`git -C "${ROOT}" diff --name-only ${V688} -- js/views`, { encoding: "utf8" }).split("\n").filter(f => /^js\/views\/[a-z-]+\.js$/.test(f));
@@ -359,6 +367,15 @@ for (const file of touched) {
   if (!old && NEW_PLAN_ONLY.includes(name)) {
     person("free"); await router.navigate(entry.route); await wait(80);
     ok(`4. Free ${name}: new since v688, the Plan's only: Free is sent to its own screen`, router.currentView !== entry.route, router.currentView);
+    continue;
+  }
+  // v21 (P-46 S4b TIDY): these pages' Free drawings are gone; Free never
+  // reaches them (router.js FREE_MOVED). Checked: the router sends Free to
+  // the on-the-plan page, and the page holds no tier check.
+  if (S4B_TIDIED.includes(name)) {
+    person("free"); await router.navigate(entry.route); await wait(80);
+    ok(`4m. Free ${name}: the router opens Part of the Plan instead`, router.currentView === "on-the-plan" && router.planOnly === entry.route, router.currentView);
+    ok(`4m2. ${name}: no tier check left in it`, !/\bisPremium\b|\blockedFeature\b/.test(readFileSync(`${ROOT}${file}`, "utf8").replace(/\/\*[\s\S]*?\*\/|\/\/.*$/gm, "")));
     continue;
   }
   // v15 (P-44 S4): What your physio or trainer changed opens from a link, so Free

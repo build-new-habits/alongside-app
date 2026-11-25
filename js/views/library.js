@@ -1,6 +1,12 @@
 /**
  * library.js - Library Page
  *
+ * 24 Nov 2026 v26
+ *
+ * v26 - S4b TIDY. P-46 S4b TIDY. Free never reaches this page (router.js
+ *   FREE_MOVED sends Free to on-the-plan), so its Free-only code is removed:
+ *   the Plan's look only, no tier check.
+ *
  * 15 Nov 2026 v25
  *
  * v25 - P-25 HOW-TO GUIDES. Guide markers only: My exercises
@@ -264,159 +270,22 @@ import { store } from "../store.js";
 // broken on its first run and the harness was right about the
 // mechanism even though the app was fine. Nine other views import it.
 import { router } from "../router.js";
-import { isPremium, lockedFeature } from "../auth.js";
 import { lineIcon } from "../data/line-icons.js";
 
 export const centered = false;
 
 // ── State ─────────────────────────────────────────────────────────────────────
-let screen = "landing";  // "landing" | "guided" | "guided-home" | "guided-gym"
-                          // "guided-mindful" | "log"
+let screen = "landing";  // "landing" | "guided-mindful"
 
 // ── Session definitions ───────────────────────────────────────────────────────
 
 const GUIDED_CATEGORIES = [
-  {
-    id:          "home",
-    label:       "At home",
-    icon:        "\uD83C\uDFE0",
-    description: "Bodyweight or home equipment",
-    // TIER-H, 18 Aug 2026. This category was locked WHOLE, while "At the
-    // gym" one row below was open with its cards locked individually --
-    // so a free user could build the free Full Body session at the gym
-    // and not at home. For an audience of neurodivergent adults, people
-    // navigating hormonal change and time-poor parents, home is the more
-    // likely room, and it was the one that was shut.
-    //
-    // The old comment justifying the category lock said opening it would
-    // bypass the isPremium()-gated location step. That is true, and it
-    // was equally true of "At the gym", which was open. The reasoning did
-    // not match its own implementation.
-    //
-    // Now symmetric with the gym: category open, cards gated, one free
-    // door, and that door is the same free act -- a full-body session the
-    // coach builds. Tier stays data on the definitions, so _isPaidTarget()
-    // below picks this up with no change.
-    //
-    // "Mixed workout" is RETIRED. Its target, "home-workout", is not a
-    // route: it appears nowhere in router.js and nowhere else in js/ --
-    // grepped, not assumed. It has been a dead link since it was written,
-    // and the category lock is the only reason nobody ever hit it. Full
-    // Body replaces it and is the thing it described.
-    sessions: [
-      { label: "Full Body",     icon: "\u26A1",        target: "session-builder", note: "A blend of everything, built for you", preselectType: "full" },
-      // R4, 20 Aug 2026. tier REMOVED from all five. Choosing which
-      // session you do today is self-direction, and self-direction is an
-      // accessibility feature -- charging for it penalised the person
-      // who most needs to override the default because the default
-      // hurts. Revenue architecture section 3.
-      //
-      // Full Body stays first and unchanged: the coach-built session is
-      // still the centre of the product. Self-direction being free does
-      // not make it compulsory.
-      // LIBRARY-TILES, 30 Sep 2026. HIIT, Strength and Mobility all opened
-      // the core session, which has no HIIT: labels promising a session
-      // they did not open (P17's fault, on a second door). Core is the core
-      // session's one door (CORE-DOOR) and now says what it holds. HIIT is
-      // gone: nothing here builds one. Strength becomes Upper body and
-      // Lower body, as At the gym has; Mobility opens the builder's
-      // mobility session, as the Home door does since P17.
-      { label: "Core",          icon: "\uD83E\uDDD8",  target: "core-session",   note: "Stability, strength, mobility or gentle" },
-      { label: "Upper body",    icon: "\uD83D\uDCAA",  target: "session-builder", note: "Bodyweight or home weights", preselectType: "upper" },
-      { label: "Lower body",    icon: "\uD83E\uDDB5",  target: "session-builder", note: "Bodyweight or home weights", preselectType: "lower" },
-      { label: "Cardio",        icon: "\uD83C\uDFC3",  target: "walk-session",   note: "Raise the heart rate" },
-      { label: "Mobility",      icon: "\uD83C\uDF3F",  target: "session-builder", note: "Hips, spine, ankles and shoulders", preselectType: "mobility" },
-    ]
-  },
-  {
-    id:          "gym",
-    label:       "At the gym",
-    icon:        "\uD83C\uDFCB",
-    description: "Your gym programme and session types",
-    // 05 Aug 2026 -- Core/Upper body/Lower body/Strength were confirmed
-    // non-functional duplicates: all navigated to gym-programme with no
-    // parameter, and gym-programme.js had no way to receive one, so all
-    // four produced the identical result regardless of which was tapped.
-    // Fixed: Core/Upper/Lower now route into session-builder-ui.js with
-    // the matching SESSION_TYPES id pre-selected (via preselectType,
-    // read once by session-builder-ui.js's onMount, same pattern as
-    // running-session.js's resume-checkpoint reading). "Strength" is
-    // retired -- it never mapped to any real SESSION_TYPES id (glute/
-    // upper/lower/full/core/cardio/mobility has no "strength" entry) --
-    // replaced with "Glute Focus", which already exists in the engine
-    // and was never surfaced anywhere in Library before now. New "Full
-    // Body" card added as the blend option Graeme asked for, mapping to
-    // SESSION_TYPES' "full" (free-tier available). "My programme" and
-    // "Cardio" (a log-what-you-did shortcut to activity-log, a
-    // different, working, deliberately-unchanged feature) are untouched.
-    sessions: [
-      // R4, 20 Aug 2026. "My programme" KEEPS its tier -- it is the
-      // twelve-week generative programme, which is the ARC and the one
-      // genuinely paid thing in this file. The four session types below
-      // lose theirs: they are session shapes, and choosing a session
-      // shape is still choosing a session.
-      //
-      // This is the line the boundary now runs along, inside a single
-      // array. A blanket untag would have freed the programme by
-      // accident, which is why verify-tier.mjs asserts this card BY NAME
-      // rather than counting tags.
-      { label: "My programme",   icon: "\uD83C\uDFCB",  target: "gym-programme",   note: "Your current programme", tier: "personal" },
-      { label: "Core",           icon: "\uD83E\uDDD8",  target: "session-builder", note: "", preselectType: "core"  },
-      { label: "Upper body",     icon: "\uD83D\uDCAA",  target: "session-builder", note: "", preselectType: "upper" },
-      { label: "Lower body",     icon: "\uD83E\uDDB5",  target: "session-builder", note: "", preselectType: "lower" },
-      { label: "Glute Focus",    icon: "\uD83C\uDF51",  target: "session-builder", note: "", preselectType: "glute" },
-      { label: "Full Body",      icon: "\u26A1",        target: "session-builder", note: "A blend of everything", preselectType: "full" },
-      { label: "Cardio",         icon: "\uD83C\uDFC3",  target: "activity-log",    note: "Treadmill, bike, rower" },
-    ]
-  },
-  // R4, 20 Aug 2026. Run, Walk, Swim, Cycle and Yoga each carried
-  // tier: "personal" with the comment "self-directed activity choice".
-  // All five removed. Going for a run is not a plan, and the person who
-  // wants to log a walk is frequently the person for whom a gym session
-  // is not available at all.
-  {
-    id:          "run",
-    label:       "Run",
-    icon:        "\uD83C\uDFC3",
-    description: "Easy, intervals, or long run",
-    sessions: [],
-    directTarget: "running-session"
-  },
-  {
-    id:          "walk",
-    label:       "Walk",
-    icon:        "\uD83D\uDEB6",
-    description: "Gentle, mindful, brisk, or nature walk",
-    sessions: [],
-    directTarget: "walk-session"
-  },
-  {
-    id:          "swim",
-    label:       "Swim",
-    icon:        "\uD83C\uDFCA",
-    description: "Steady or interval swim session",
-    sessions: [],
-    directTarget: "swim-session"
-  },
-  {
-    id:          "cycle",
-    label:       "Cycle",
-    icon:        "\uD83D\uDEB4",
-    description: "Road, indoor, or turbo trainer",
-    sessions: [],
-    directTarget: "cycle-session"
-  },
-  {
-    id:          "yoga",
-    label:       "Yoga / Pilates",
-    icon:        "\uD83E\uDDD8",
-    description: "Flexibility, strength, balance, recovery",
-    sessions: [],
-    directTarget: "yoga-session"
-  },
+  // P-46 S4b TIDY. Only the Plan reaches the Library (router.js FREE_MOVED
+  // sends Free to on-the-plan), so these are the Plan's: the doors hold the
+  // rest. Free's tiles, its locks and the At home and At the gym lists are
+  // gone with the tier checks that chose them.
   {
     id:          "mindful",
-    onPlan:      true,
     label:       "Mindful practice",
     icon:        "\uD83C\uDF3F",
     description: "Breathing, journaling, mindful awareness",
@@ -435,12 +304,7 @@ const GUIDED_CATEGORIES = [
     // circuits, and folding them into the mindful card would have
     // mislabelled two of the four groups.
     //
-    // FREE, and no `tier` field, deliberately. Tier is data on the
-    // definition and absent means free; the tier model reads "Free =
-    // coach-chosen full-body session + all wellbeing practices", and
-    // nothing behind this card is a plan or a journey.
     id:          "practices",
-    onPlan:      true,
     label:       "Practices",
     icon:        "\uD83E\uDDF4",
     description: "Recovery, grounding, warm-ups and whole circuits",
@@ -449,7 +313,6 @@ const GUIDED_CATEGORIES = [
   },
   {
     id:          "prescribed",
-    onPlan:      true,
     label:       "My exercises",
     icon:        "\uD83D\uDCCB",
     description: "Your own list of exercises",
@@ -457,79 +320,30 @@ const GUIDED_CATEGORIES = [
     directTarget: "prescribed"
   },
   {
-    id:          "coach",
-    label:       "Coach recommends",
-    icon:        "\uD83C\uDFAF",
-    description: "Let the coach suggest something for today",
-    sessions: [],
-    directTarget: "coach-proposal"
-  },
-  // A-1 PLAN-HOME-PRUNE (v16). Join a class and Your week left Plan Home;
-  // they are here, one tap from it. The Plan's only: Free Home keeps its
-  // own Classes tile and Free's Library is as it was (Graeme, 12 Oct:
-  // Free is left alone).
-  // D662-2 (v18). Mobility & Conditioning (a mobility session, Stretch,
-  // Stretch arc, My exercises): Plan Home has no door for it. Plan only;
-  // Free Home has its own.
-  {
-    id:          "mobility",
-    label:       "Mobility & Conditioning",
-    icon:        "",
-    description: "Mobility, stretching and your own exercises",
-    sessions: [],
-    directTarget: "mobility-conditioning",
-    planOnly:    true
-  },
-  {
     id:          "classes",
-    onPlan:      true,
     label:       "Classes",
     icon:        "",
     description: "Guided classes to follow along",
     sessions: [],
-    directTarget: "classes",
-    planOnly:    true
+    directTarget: "classes"
   },
-  // STAGE PATH P-4 (v20). The two mode doors that left the Plan's Home.
-  {
-    id:          "know-what",
-    label:       "I know what I want",
-    icon:        "",
-    description: "Choose the kind of session and how long",
-    sessions: [],
-    directTarget: "know-what",
-    planOnly:    true
-  },
-  {
-    id:          "as-i-go",
-    label:       "Make it up as I go",
-    icon:        "",
-    description: "Log each move and set as you do it",
-    sessions: [],
-    directTarget: "capture",
-    planOnly:    true
-  },
-  // P-13 (v22). The Plan's: sessions you kept, which no door lists whole.
   {
     id:          "saved",
     label:       "Saved sessions",
     icon:        "",
     description: "Sessions you kept to repeat",
     sessions: [],
-    directTarget: "saved-sessions",
-    planOnly:    true,
-    onPlan:      true
+    directTarget: "saved-sessions"
   },
   {
     id:          "week",
-    onPlan:      true,
     label:       "Your week",
     icon:        "",
     description: "What each day is for",
     sessions: [],
-    directTarget: "your-week",
-    planOnly:    true
+    directTarget: "your-week"
   },
+
 ];
 
 // P-27. LOG_CATEGORIES (the Library's own log grid) removed: Log what I did
@@ -549,13 +363,13 @@ export function render() {
 
 function renderLanding() {
   return `
-    <div class="view library-view${isPremium() ? " is-plan" : ""}">
+    <div class="view library-view is-plan">
       <div class="view-header">
         <h1>Library</h1>
-${isPremium() ? `        <p class="library-purpose">What the doors don\u2019t hold: your own sessions and lists, classes and practices.</p>
-` : ""}      </div>
+        <p class="library-purpose">What the doors don\u2019t hold: your own sessions and lists, classes and practices.</p>
+      </div>
 
-      ${isPremium() ? `<h2 class="look-label" id="lib-start-h">What's here</h2>` : `<h2 class="look-label" id="lib-start-h">Start a session</h2>`}
+      <h2 class="look-label" id="lib-start-h">What's here</h2>
       ${categoryGrid("lib-start-h")}
 
       <h2 class="look-label" id="lib-log-h">Already done something?</h2>
@@ -574,37 +388,21 @@ ${isPremium() ? `        <p class="library-purpose">What the doors don\u2019t ho
 
 // LOOK-4. Each category's line icon and kind colour.
 const CATEGORY_LOOK = {
-  home: ["home", "amber"], gym: ["strength", "amber"],
-  run: ["run", "blue"], walk: ["walk", "blue"], swim: ["swim", "blue"], cycle: ["cycle", "blue"],
-  yoga: ["yoga", "violet"], mindful: ["mind", "green"], practices: ["breath", "green"],
-  prescribed: ["list", "teal"], coach: ["star", "teal"], saved: ["keep", "teal"],
-  mobility: ["mobility", "violet"], classes: ["classes", "rose"], week: ["week", "teal"],
-  "know-what": ["choose", "teal"], "as-i-go": ["pencil", "teal"],   // v20: sessions you make yourself
+  mindful: ["mind", "green"], practices: ["breath", "green"], prescribed: ["list", "teal"],
+  classes: ["classes", "rose"], saved: ["keep", "teal"], week: ["week", "teal"],
 };
 
 /** The category tiles, shared by the Library page and the old landing. */
 function categoryGrid(labelledBy) {
   return `
       <div class="library-category-grid" role="group" aria-labelledby="${labelledBy}">
-        ${GUIDED_CATEGORIES.filter(cat => (isPremium() ? cat.onPlan : !cat.planOnly)).map(cat => {
+        ${GUIDED_CATEGORIES.map(cat => {
           const [icon, kind] = CATEGORY_LOOK[cat.id] || ["star", "slate"];
           const inner = `
             <span class="kind-tile k-${kind} library-category-icon">${lineIcon(icon)}</span>
             <span class="library-category-label">${cat.label}</span>
             <span class="library-category-sub">${cat.description}</span>
           `;
-
-          // A <div> inside, never a <button>: lockedFeature() returns
-          // role="button" and nesting one interactive control inside
-          // another is invalid. Same reasoning, same treatment, as the
-          // type picker in session-builder-ui.js.
-          if (cat.tier && !isPremium()) {
-            return lockedFeature(
-              `<div class="library-category-card">${inner}</div>`,
-              cat.tier,
-              cat.label
-            );
-          }
 
           return `
           <button class="library-category-card"
@@ -619,16 +417,14 @@ function categoryGrid(labelledBy) {
 
 // LOOK-4. renderGuidedLanding() is gone: its categories are on the Library page.
 
-// ── Guided sub-screen (home / gym / mindful) ──────────────────────────────────
+// ── Guided sub-screen (mindful) ──────────────────────────────────
 
 // D-5. Each session in a category gets the LOOK tile its kind has
 // everywhere else (strength amber, mobility violet, cardio blue, the mind
 // green, your own teal), with a line icon in place of the emoji.
 const SESSION_LOOK = {
-  "Full Body": ["strength", "amber"], "Core": ["instep", "amber"], "Upper body": ["strength", "amber"],
-  "Lower body": ["walk", "amber"], "Glute Focus": ["run", "amber"], "Mobility": ["mobility", "violet"],
-  "Cardio": ["run", "blue"], "My programme": ["list", "teal"], "Breathing": ["breath", "green"],
-  "Journal": ["pencil", "green"], "Mindful awareness": ["mind", "green"], "Rest day": ["rest", "slate"],
+  "Breathing": ["breath", "green"], "Journal": ["pencil", "green"],
+  "Mindful awareness": ["mind", "green"], "Rest day": ["rest", "slate"],
 };
 
 function renderGuidedSubScreen(categoryId) {
@@ -637,11 +433,9 @@ function renderGuidedSubScreen(categoryId) {
   const [catIcon, catKind] = CATEGORY_LOOK[cat.id] || ["star", "slate"];
 
   return `
-    <div class="view library-view${isPremium() ? " is-plan" : ""}">
+    <div class="view library-view is-plan">
       <div class="library-sub-header">
-        ${isPremium() ? `<button class="btn btn-ghost plan-back" id="lib-back-btn" aria-label="Back to Library">‹ Back</button>` : `<button class="btn btn-ghost" id="lib-back-btn" aria-label="Back to Library">
-          \u2190 Library
-        </button>`}
+        <button class="btn btn-ghost plan-back" id="lib-back-btn" aria-label="Back to Library">‹ Back</button>
         <h1 class="library-sub-title"><span class="kind-tile k-${catKind}">${lineIcon(catIcon)}</span> ${cat.label}</h1>
       </div>
 
@@ -660,14 +454,6 @@ function renderGuidedSubScreen(categoryId) {
             </span>
             <span class="library-session-chev" aria-hidden="true">${lineIcon("chevron", 20)}</span>
           `;
-
-          if (s.tier && !isPremium()) {
-            return lockedFeature(
-              `<div class="library-session-card">${inner}</div>`,
-              s.tier,
-              s.label + " session"
-            );
-          }
 
           return `
           <button class="library-session-card"
@@ -692,65 +478,12 @@ function renderGuidedSubScreen(categoryId) {
 // the right type already chosen -- read-once-and-clear pattern, same as
 // running-session.js's resume checkpoint.
 function navigateToSession(target, quiet, preselectType) {
-  // TIER-B, defence in depth. The locked cards are not buttons and carry
-  // no data-target, so nothing here should ever be reachable for a paid
-  // route on the free tier. This guard exists because the render and the
-  // handler are two places that must agree, and the previous bug in this
-  // file was exactly a disagreement of that kind -- the render offered
-  // something the handler then quietly swapped for something else.
-  //
-  // Routing to upgrade rather than silently substituting: a substitution
-  // is what TIER-B was raised to remove.
-  if (!isPremium() && _isPaidTarget(target, preselectType)) {
-    screen = "landing";
-    router.navigate("upgrade");
-    return;
-  }
-
   if (quiet) store.set("quietMode", quiet);
   // BUNDLE-TRUE. The journal's own prompt, not one left from elsewhere.
   if (target === "journal-entry") store.set("journalEntryType", null);
   if (preselectType) store.set("sessionBuilderPreselect", { type: preselectType });
   screen = "landing";  // reset for next time
   router.navigate(target);
-}
-
-/**
- * D-5 LIBRARY-ONCE. Today's plan for this kind of session, at this place.
- * The same hand-over "I know what I want" makes: the kind as
- * requestedSessionType (cleared at the next check-in), the place as
- * requestedLocation (read once by the plan). The plan screen carries the
- * Bad-day choice, Where and Length to change, Swap and the exercise sheet.
- */
-function planFor(type, place) {
-  if (!isPremium() && _isPaidTarget("session-builder", type)) {
-    screen = "landing";
-    router.navigate("upgrade");
-    return;
-  }
-  store.set("requestedSessionType", type);
-  store.set("requestedLocation", place);
-  store.set("sessionBuilderPreselect", null);
-  screen = "landing";
-  router.navigate("coach-proposal");
-}
-
-// Derived from the definitions above rather than hardcoded, so a card and
-// its guard cannot drift apart. That drift is the whole bug class this
-// change closes.
-function _isPaidTarget(target, preselectType) {
-  for (const cat of GUIDED_CATEGORIES) {
-    if (cat.tier && cat.directTarget === target) return true;
-    for (const s of (cat.sessions || [])) {
-      if (!s.tier) continue;
-      if (s.target !== target) continue;
-      // "session-builder" is shared by free Full Body and four paid
-      // types, so the preselect is what distinguishes them.
-      if (s.preselectType && s.preselectType !== preselectType) continue;
-      return true;
-    }
-  }
-  return false;
 }
 
 function rerender() {
@@ -789,13 +522,13 @@ export function onMount() {
       const cat = GUIDED_CATEGORIES.find(c => c.id === id);
       if (!cat) return;
 
-      // Direct targets (run, walk, swim, cycle, yoga, prescribed, coach)
+      // Direct targets (practices, My exercises, classes, saved, your week)
       if (cat.directTarget) {
         navigateToSession(cat.directTarget, null);
         return;
       }
 
-      // Sub-screen for home, gym, mindful
+      // Sub-screen for Mindful practice
       screen = `guided-${id}`;
       rerender();
     });
@@ -808,20 +541,6 @@ export function onMount() {
       const quiet          = btn.dataset.quiet || null;
       const preselectType  = btn.dataset.preselectType || null;
       if (!target) return;
-      // D-5. The place is already answered by the category: the plan,
-      // not the builder, and nothing asked again.
-      const place = screen === "guided-gym" ? "gym" : screen === "guided-home" ? "home" : null;
-      if (target === "session-builder" && preselectType && place) {
-        planFor(preselectType, place);
-        return;
-      }
-      // A-2 ONE-PLAN-SCREEN (v17). On the Plan, Core is Today's plan for a
-      // core session too, on the one plan screen and player. Free keeps the
-      // core session's own screens.
-      if (target === "core-session" && place && isPremium()) {
-        planFor("core", place);
-        return;
-      }
       navigateToSession(target, quiet, preselectType);
     });
   });

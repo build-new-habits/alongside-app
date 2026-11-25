@@ -1,5 +1,11 @@
 /**
  * tools/verify-planpicker.mjs
+ * 24 Nov 2026 v7
+ *
+ * v7 - S4b TIDY. P-46 S4b TIDY. The Library's planOnly flags went with
+ *   Free's tiles: the Plan's only is now the router's (FREE_MOVED), and that
+ *   is what is checked.
+ *
  * 24 Nov 2026 v6
  *
  * v6 - P-46 S4 FREE HOME. 3a-2 reads the Plan's Home (plan-home.js) for its
@@ -177,7 +183,8 @@ ok("3a. the twelve-week shape routes to the chooser",
 
 ok("3a-2. and the classes are reachable from Home",
    /data-route="library"/.test(fs.readFileSync(new URL("../js/views/plan-home.js", import.meta.url), "utf8")) &&   // v6: the Plan's Home > Library > Classes
-   /id:\s*"classes"[\s\S]{0,200}directTarget:\s*"classes"[\s\S]{0,40}planOnly:\s*true/.test(fs.readFileSync(new URL("../js/views/library.js", import.meta.url), "utf8")),
+   /id:\s*"classes"[\s\S]{0,200}directTarget:\s*"classes"/.test(fs.readFileSync(new URL("../js/views/library.js", import.meta.url), "utf8")) &&   // S4b: the Plan's only by the router (FREE_MOVED), not a planOnly flag
+   /'classes'/.test((fs.readFileSync(new URL("../js/router.js", import.meta.url), "utf8").match(/const FREE_MOVED = new Set\(\[([\s\S]*?)\]\)/) || [, ""])[1]),
    "the room named for classes does not reach them — the fault " +
    "TIMETABLE-1 exists to fix");
 
