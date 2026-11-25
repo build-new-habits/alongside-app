@@ -2,7 +2,8 @@
  * css/components/start.css
  * 25 Nov 2026 v3
  *
- * v3 - P-46 Wave 8: "3 of 4" stays on one line at the largest text.
+ * v3 - P-46 Wave 8: "3 of 4" stays on one line at the largest text; the
+ *   top row wraps, so the dots go underneath on a narrow phone.
  *
  * v2 - P-46 S3. .al: the question asked once, later, on both Homes.
  *
@@ -13,11 +14,11 @@
  */
 
 .st { display: flex; flex-direction: column; min-height: 100%; box-sizing: border-box; padding: var(--space-4) var(--space-4) var(--space-6); gap: var(--space-4); max-width: 34rem; margin: 0 auto; }
-.st-top { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); min-height: 44px; }
+.st-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2); min-height: 44px; }   /* v3: the dots move under when the words grow */
 .st-back { min-height: 44px; padding: 0 var(--space-2); color: var(--color-primary); }
 .st-back-space { min-width: 44px; }
 .st-count { font-size: var(--text-sm); color: var(--color-text-secondary); white-space: nowrap; }   /* v3: "3 of 4" on one line at text 2 (Wave 8) */
-.st-dots { display: flex; gap: 6px; }
+.st-dots { display: flex; gap: 6px; flex-shrink: 1; min-width: 0; }
 .st-dot { width: 24px; height: 4px; border-radius: 2px; background: var(--color-border); }
 .st-dot.is-on { background: var(--color-primary); }
 
