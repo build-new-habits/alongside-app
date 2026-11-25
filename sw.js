@@ -1,7 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 25 Nov 2026 v748
+ * 25 Nov 2026 v749
+ *
+ * v749 - 11a and 11b (held for the phone test's fixes; Graeme, 25 Nov). Free's check-in has a heading and a way back, as the Plan's does; Your arc's Back goes where you came from (Progress), not always Home. No new files.
  *
  * v748 - P-46 S4b TIDY. The Free-only code no one reaches is removed from the session builder, the Library, Classes and Mobility & Conditioning (Free is sent to Part of the Plan). Nobody sees a change. No new files.
  *
@@ -4349,7 +4351,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v748";
+const CACHE_NAME = "alongside-v749";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4435,8 +4437,8 @@ const SHELL_HASHES = {
   "./js/views/today.js": "36762a19c4e7bee0",
   "./js/views/mobility-conditioning.js": "7b60688e779d5b58",
   "./js/views/arc-setup.js": "c1d43e86b901ace3",
-  "./js/views/stretch-arc.js": "cdc78c24b91d2e1c",
-  "./js/views/checkin.js": "5ea0fea142be8ceb",
+  "./js/views/stretch-arc.js": "aab4c04531021935",
+  "./js/views/checkin.js": "f59e6d3b27f36b50",
   "./js/views/checkin-mini.js": "c647f4da71feddde",
   "./js/views/coach-proposal.js": "c8f548d3c2e5db8c",
   "./js/views/workout.js": "a64a827af4e52fb2",
