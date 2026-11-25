@@ -1,5 +1,10 @@
 /**
  * tools/verify-save1.mjs
+ * 24 Nov 2026 v4
+ *
+ * v4 - S4b TIDY. P-46 S4b TIDY. TEST 3: Free never reaches the builder
+ *   (FREE_MOVED), so the check is the route, not Free's removed drawing.
+ *
  * 28 Sep 2026 v3
  *
  * v3 - F2. Reaches the preview by the builder's own route (type, where,
@@ -215,17 +220,17 @@ ok("2d. the form stays open so the name can be fixed",
    "the person is told what is wrong and given no way to correct it");
 
 // ── 3. FREE IS NOT OFFERED A SAVE IT CANNOT MAKE ────────────────────────
+// P-46 S4b TIDY. Since P-46 S4 Free never reaches the builder (router.js
+// FREE_MOVED sends Free to Part of the Plan), so its Free drawing is gone.
+// The property holds by the route: no builder, so no save block that refuses.
 console.log("\nTEST 3 - free is not shown a save that would refuse it");
-
-await reachPreview({ tier: "free" });
-ok("3pc. positive control: free still reaches the preview",
-   !!$("#sb-go-btn"),
-   "free cannot build at all, which would contradict R4");
-ok("3a. and is offered no save block",
-   !$("#sb-save-block"),
-   "free composes freely and the Plan is what KEEPS it (R4, 20 Aug). " +
-   "Offering a control whose only outcome is a refusal is a sales pitch " +
-   "wearing a feature's clothes");
+{
+  const { readFileSync } = await import("node:fs");
+  const moved = (readFileSync(new URL("../js/router.js", import.meta.url), "utf8").match(/const FREE_MOVED = new Set\(\[([\s\S]*?)\]\)/) || [, ""])[1];
+  ok("3a. Free never reaches the builder, so is offered no save block (FREE_MOVED has 'session-builder' and 'saved-sessions')",
+     /'session-builder'/.test(moved) && /'saved-sessions'/.test(moved),
+     "a Free person on the builder would be offered a save the Plan keeps");
+}
 
 console.log(fails === 0
   ? "\nSAVE-1: all assertions pass\n"

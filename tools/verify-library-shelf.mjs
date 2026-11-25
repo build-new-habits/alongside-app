@@ -1,6 +1,12 @@
 import { createRequire as __cr } from "node:module";
 /**
  * tools/verify-library-shelf.mjs
+ * 24 Nov 2026 v7
+ *
+ * v7 - S4b TIDY. P-46 S4b TIDY. Free's drawing of this page is gone (Free
+ *   never reaches it): the check is now that the router sends Free to Part of
+ *   the Plan and the page holds no tier check.
+ *
  * 24 Nov 2026 v6
  *
  * v6 - P-46 S4 FREE HOME. 3d: Free has no way into Mobility & Conditioning
@@ -158,16 +164,13 @@ ok("3c. not from Home or a door", planFiles.every(f => !readFileSync(`${ROOT}${f
 ok("3d. Free: no way in either (on-the-plan says what it is)", !/mobility-conditioning/.test(readFileSync(`${ROOT}js/views/today.js`, "utf8").replace(/\/\/.*|\/\*[\s\S]*?\*\//g, "")) && /"mobility-conditioning":\s*\[/.test(readFileSync(`${ROOT}js/views/on-the-plan.js`, "utf8")));
 
 // ── 4 ───────────────────────────────────────────────────────────────────
-console.log("\nTEST 4 - Free's Library, as it was on alongside-v690");
-let old = "";
-try { old = execSync(`git -C "${ROOT}" show 1a27106:js/views/library.js`, { encoding: "utf8", maxBuffer: 1 << 26 }); } catch {}
-const tmp = new URL("../js/views/library__v690_check.js", import.meta.url);
-writeFileSync(tmp, old);
-let OLD; try { OLD = await import(tmp.href); } finally { unlinkSync(tmp); }
-fixture("free"); main.innerHTML = OLD.render(); const a = main.innerHTML;
-fixture("free"); main.innerHTML = LIB.render(); const b = main.innerHTML.replace(/ data-guide-target="[a-z:-]+"/g, "");
-let at = 0; while (at < a.length && a[at] === b[at]) at++;
-ok("4. Free's Library: the same, byte for byte", !!old && a === b && a.length > 200, `differs at ${at}: ${a.slice(at - 40, at + 40)} | ${b.slice(at - 40, at + 40)}`);
+// P-46 S4b TIDY: Free's Library drawing is gone; Free never reaches the Library.
+console.log("\nTEST 4 - Free never reaches the Library");
+{
+  const moved = (readFileSync(`${ROOT}js/router.js`, "utf8").match(/const FREE_MOVED = new Set\(\[([\s\S]*?)\]\)/) || [, ""])[1];
+  const code = readFileSync(`${ROOT}js/views/library.js`, "utf8").replace(/\/\*[\s\S]*?\*\/|\/\/.*$/gm, "");
+  ok("4. Free's Library: the router sends Free to Part of the Plan, and the page holds no tier check", /'library'/.test(moved) && !/\bisPremium\b|\blockedFeature\b/.test(code));
+}
 
 try { pv?.onUnmount?.(); } catch {}
 console.log(`\n${"=".repeat(60)}\nVERIFY-LIBRARY-SHELF: ${passes} passed, ${fails} failed\n${"=".repeat(60)}`);

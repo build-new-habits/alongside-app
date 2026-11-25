@@ -1,5 +1,11 @@
 /**
  * tools/verify-sectionrules.mjs
+ * 24 Nov 2026 v6
+ *
+ * v6 - S4b TIDY. P-46 S4b TIDY. TEST 6: the Mobility & Conditioning door is
+ *   the Plan's only, so its helper goes to Today's plan for the type; Free's
+ *   builder way is gone.
+ *
  * 24 Nov 2026 v5
  *
  * v5 - P-46 S4 FREE HOME. 14b reads the one place strands are lit now (arc-
@@ -245,10 +251,12 @@ check("6. the Mobility & Conditioning door offers Stretch", () => {
   const handler = mc.slice(at, at + 400);
   // P17: the card calls the shared door helper with its type.
   const helper = mc.slice(mc.indexOf("function _toBuilder("), mc.indexOf("function _toBuilder(") + 1400);
-  ok(handler.includes('_toBuilder("stretch")') && helper.includes("sessionBuilderPreselect", ) && helper.includes("{ type, returnTo") &&
+  // P-46 S4b TIDY: only the Plan reaches this door, so the helper is Today's
+  // plan for the type (the builder's preselect cleared); Free's builder way is gone.
+  ok(handler.includes('_toBuilder("stretch")') && helper.includes('store.set("sessionBuilderPreselect", null)') &&
      helper.includes('store.set("requestedSessionType", type)'),
      "the card preselects the wrong type");
-  ok(/const dest = plan \? "coach-proposal" : "session-builder"/.test(helper) && helper.includes("router.navigate(dest)"), "the card goes nowhere");
+  ok(/const dest = "coach-proposal"/.test(helper) && helper.includes("router.navigate(dest)"), "the card goes nowhere");
 });
 
 console.log("\nTEST 7 - the Stretch door gates on check-in and gives back a way out");

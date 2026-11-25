@@ -1,5 +1,11 @@
 /**
  * tools/verify-one-plan-screen.mjs
+ * 24 Nov 2026 v4
+ *
+ * v4 - S4b TIDY. P-46 S4b TIDY. TEST 5: Free never reaches Mobility &
+ *   Conditioning or the Library, so it checks the router sends Free to Part of
+ *   the Plan and their Free doors are gone; Stretch is Today's plan.
+ *
  * 02 Nov 2026 v3
  *
  * v3 - P-26 ONE-BUILD-PAGE re-point (Graeme, 02 Nov: one Build a session
@@ -125,23 +131,18 @@ fixture(); main.innerHTML = "";
 KnowWhatView(rtr).mount(main);
 ok("4a. choosing each move is kept: Build a session (P-26)", !!main.querySelector('[data-kw-route="build-session"]'));
 
-console.log("\nTEST 5 - FREE IS LEFT ALONE");
-mc("#mc-start-session", "free");
-ok("5a. Free's Mobility & Conditioning opens the builder, as before", navs.at(-1) === "session-builder" && store.get("sessionBuilderPreselect")?.type === "mobility", JSON.stringify(navs));
-mc("#mc-stretch", "free");
-ok("5b. and its Stretch too", navs.at(-1) === "session-builder" && store.get("sessionBuilderPreselect")?.type === "stretch", JSON.stringify(navs));
-// v2: Free's Library is unchanged, so its At home › Core is driven as before.
-function libCore(tier) {
-  fixture(tier);
-  main.innerHTML = library.render(); library.onMount();
-  click(main.querySelector('[data-guided="home"]'));
-  main.innerHTML = library.render(); library.onMount();
-  const core = [...main.querySelectorAll("[data-target]")].find(b => b.dataset.target === "core-session");
-  navs = []; click(core);
-  return !!core;
+// P-46 S4b TIDY: Free never reaches Mobility & Conditioning or the Library
+// (router.js FREE_MOVED), so Free's builder doors and its At home list are gone.
+console.log("\nTEST 5 - Free never reaches these pages");
+{
+  const { readFileSync } = await import("node:fs");
+  const moved = (readFileSync(new URL("../js/router.js", import.meta.url), "utf8").match(/const FREE_MOVED = new Set\(\[([\s\S]*?)\]\)/) || [, ""])[1];
+  const strip = f => readFileSync(new URL(`../js/views/${f}.js`, import.meta.url), "utf8").replace(/\/\*[\s\S]*?\*\/|\/\/.*$/gm, "");
+  ok("5a. Mobility & Conditioning: the router sends Free to Part of the Plan; no tier check, so no builder door", /'mobility-conditioning'/.test(moved) && !/\bisPremium\b/.test(strip("mobility-conditioning")));
+  mc("#mc-stretch", "personal");
+  ok("5b. and its Stretch is Today's plan, as the Plan's", navs.at(-1) === "coach-proposal" && store.get("requestedSessionType") === "stretch", JSON.stringify(navs));
+  ok("5c. the Library: the router sends Free to Part of the Plan; no At home list left", /'library'/.test(moved) && !/data-guided="home"|id:\s*"home"/.test(strip("library")));
 }
-ok("5pc. Free's Core row is there", libCore("free"));
-ok("5c. Free's Library Core opens the core session, as before", navs.at(-1) === "core-session", JSON.stringify(navs));
 
 console.log(`\nVERIFY-ONE-PLAN-SCREEN: ${passes} passed, ${fails} failed`);
 process.exit(fails ? 1 : 0);

@@ -1,5 +1,11 @@
 /**
  * tools/verify-tiergh.mjs
+ * 24 Nov 2026 v8
+ *
+ * v8 - S4b TIDY. P-46 S4b TIDY. TIER-H: Free never reaches the Library
+ *   (FREE_MOVED), so Free's At home and At the gym lists and their locks are
+ *   gone; it checks the route and that nothing in the Library is locked.
+ *
  * 06 Oct 2026 v7
  *
  * v7 - D-11 PROGRESS-SHARE. 15/15b RE-POINTED, nothing loosened: the export
@@ -105,111 +111,26 @@ function setTier(tier) {
   store.set('tier', tier);
 }
 
-// ── TIER-H: the Library's "Start a session" screen ───────────────────
-
-function mountGuidedLanding() {
-  el.innerHTML = LibraryMod.render();
-  LibraryMod.onMount();
-  // LOOK-4: the categories are on the Library's first page; no step.
-  return el.querySelector('button[data-guided]');
-}
-
+// ── TIER-H: the Library ──────────────────────────────────────────────
+// P-46 S4b TIDY. Since P-46 S4 Free never reaches the Library (router.js
+// FREE_MOVED sends Free to Part of the Plan), so Free's At home and At the
+// gym lists, and their locks, were removed. What TIER-H and R4 guarded (a
+// Free person shut out of a room, or charged for self-direction inside one)
+// cannot happen in a room Free does not enter; verify-tier holds the free
+// surfaces by route.
 setTier('free');
-const startBtn = mountGuidedLanding();
-check('1  Library landing offers the categories as real buttons (LOOK-4: no Start a session step)',
-  !!startBtn && !document.getElementById('lib-start-session-btn'));
-
-const homeCard = [...el.querySelectorAll('[data-guided], .locked-feature-wrap')]
-  .find(n => /at home/i.test(n.textContent));
-check('2  TIER-H: "At home" is present on the free tier',
-  !!homeCard);
-check('3  TIER-H: "At home" is NOT locked as a whole category',
-  !!homeCard && !homeCard.classList.contains('locked-feature-wrap'),
-  homeCard && homeCard.classList.contains('locked-feature-wrap')
-    ? 'still wrapped in lockedFeature()' : '');
-
-// R4: the five activity categories are self-direction and are now free.
-// Asserted at the landing, where they live.
-const activityLocked = [...el.querySelectorAll('.locked-feature-wrap')]
-  .filter(n => /^(run|walk|swim|cycle|yoga)/i.test(n.textContent.trim()));
-check('3b R4: Run, Walk, Swim, Cycle and Yoga are NOT locked',
-  activityLocked.length === 0,
-  `${activityLocked.length} still locked. Going for a run is not a plan`);
-
-// Symmetry, asserted at the landing BEFORE walking into a sub-screen.
-//
-// SEED NOTE. The first run of this gate asserted this after clicking
-// into "At home" and re-mounting, and it went red. The app was right and
-// the seed was wrong: library.js holds `screen` at module level, so a
-// re-mount without a navigate lands back on the sub-screen it was left
-// on. In the app the router resets it; in a bare harness nothing does.
-const gymCard = [...el.querySelectorAll('[data-guided]')]
-  .find(n => /at the gym/i.test(n.textContent));
-check('8  TIER-H: "At the gym" is open on free, same as "At home"',
-  !!gymCard);
-
-// Click into At home and count what a free user can actually press.
-if (homeCard && homeCard.dataset.guided) homeCard.click();
-const homeFree   = [...el.querySelectorAll('button[data-target]')];
-const homeLocked = [...el.querySelectorAll('.locked-feature-wrap')];
-
-check('4  R4: every door inside "At home" is free — all six',
-  homeFree.length === 6,
-  `found ${homeFree.length}: ${homeFree.map(b => b.getAttribute('aria-label') || '?').join(' | ')}`);
-check('5  R4: the coach-built Full Body session is still among them',
-  homeFree.some(b => b.dataset.target === 'session-builder' &&
-                     b.dataset.preselectType === 'full'),
-  'the free tier must still contain the session the COACH builds — ' +
-  'self-direction being free does not mean self-direction is compulsory');
-check('6  R4 (inverse): NOTHING inside "At home" is locked',
-  homeLocked.length === 0,
-  `${homeLocked.length} still locked: ` +
-  homeLocked.map(n => n.getAttribute('aria-label') || '?').join(' | '));
-
-// The retired dead route must not come back anywhere in the app.
 const libSrc = fs.readFileSync(new URL('../js/views/library.js', import.meta.url), 'utf8');
+const routerSrc = fs.readFileSync(new URL('../js/router.js', import.meta.url), 'utf8');
+const moved = (routerSrc.match(/const FREE_MOVED = new Set\(\[([\s\S]*?)\]\)/) || [, ''])[1];
+check('1  the Library is the Plan\'s: the router sends Free to Part of the Plan',
+  /'library'/.test(moved));
+check('2  and it holds no lock: nothing in it is half-open',
+  !/lockedFeature|locked-feature-wrap|tier:\s*["']personal["']/.test(libSrc.replace(/\/\*[\s\S]*?\*\/|\/\/.*$/gm, '')));
+el.innerHTML = LibraryMod.render(); LibraryMod.onMount();
+check('3  its categories are real buttons (LOOK-4)',
+  el.querySelectorAll('button[data-guided]').length > 0 && !el.querySelector('.locked-feature-wrap'));
 check('7  "home-workout" is gone — it was never a route in router.js',
   !/target:\s*"home-workout"/.test(libSrc));
-
-// ── R4: the gym category, where the ONE paid surface lives ───────────
-//
-// THE LOAD-BEARING INVERSE. v1's was "exactly one free door"; with the
-// boundary moved, the check that carries the weight is the opposite --
-// exactly one LOCKED door, and it must be My programme. Without this,
-// removing the paywall entirely would pass every other assertion here.
-// SEED NOTE, R4. The first draft of this block re-mounted the landing
-// and clicked "At the gym" -- and every gym assertion reported the HOME
-// cards instead. library.js holds `screen` at module level, so the
-// re-mount landed back inside "At home" where the previous block left
-// it, and "Start a session" was not on screen to be clicked. The app is
-// right and the harness was wrong: in the app the router resets it.
-//
-// Walk back the way a person does, via the Back control, rather than
-// reaching into module state -- then verify we actually arrived before
-// asserting anything about what is locked. A gate that asserts against
-// the wrong screen is worse than no gate: it was green on the count and
-// wrong about the subject.
-document.getElementById('lib-back-btn')?.click();
-const gymCard2 = [...el.querySelectorAll('[data-guided]')]
-  .find(n => /at the gym/i.test(n.textContent));
-check('7z  harness: reached the gym category, not still inside "At home"',
-  !!gymCard2, 'back-navigation failed — the assertions below would be ' +
-  'reporting the wrong screen');
-if (gymCard2 && gymCard2.dataset.guided) gymCard2.click();
-const gymFree   = [...el.querySelectorAll('button[data-target]')];
-const gymLocked = [...el.querySelectorAll('.locked-feature-wrap')];
-
-check('7a R4 (inverse): exactly ONE locked door in "At the gym"',
-  gymLocked.length === 1,
-  `found ${gymLocked.length}: ` +
-  gymLocked.map(n => n.getAttribute('aria-label') || '?').join(' | '));
-check('7b R4: and it is My programme — the arc, not a session',
-  gymLocked.length === 1 &&
-  /my programme/i.test(gymLocked[0].getAttribute('aria-label') || ''),
-  gymLocked.map(n => n.getAttribute('aria-label')).join(' | '));
-check('7c R4: the five self-directed gym cards are pressable on free',
-  gymFree.length === 6,
-  `found ${gymFree.length}: ${gymFree.map(b => b.dataset.preselectType || b.dataset.target).join(', ')}`);
 
 // ── TIER-G: the build-mode step ──────────────────────────────────────
 

@@ -1,5 +1,12 @@
 /**
  * tools/verify-tier.mjs
+ * 24 Nov 2026 v9
+ *
+ * v9 - S4b TIDY. P-46 S4b TIDY. TIER-B: the Library is the Plan's whole
+ *   (FREE_MOVED) with no locks left; R4's free surfaces (My exercises, the
+ *   practices, the coach, a run or walk) are checked not to be moved to the
+ *   Plan, by route.
+ *
  * 24 Nov 2026 v8
  *
  * v8 - P-46 S4 FREE HOME. HOME_DOORS went with Free's door tiles. The Home-
@@ -111,73 +118,34 @@ const today   = read("js/views/today.js");
 const gymProg = read("js/views/gym-programme.js");
 const sbUI    = read("js/views/session-builder-ui.js");
 
-console.log("\nTIER-B — the Library knows about tiers");
+console.log("\nTIER-B — the Library is the Plan's; what is free stays free elsewhere");
+// P-46 S4b TIDY. Since P-46 S4 the whole Library is the Plan's: the router
+// sends Free to Part of the Plan (router.js FREE_MOVED), so the Library's
+// per-card tiers and locks went in the tidy. R4's ethical line is held where
+// Free now meets these things: by route, not by Library card.
+const routerSrc = read("js/router.js");
+const freeMoved = (routerSrc.match(/const FREE_MOVED = new Set\(\[([\s\S]*?)\]\)/) || [, ""])[1];
 
-check("library.js imports the shared paywall components", () => {
-  ok(/isPremium/.test(library) && /lockedFeature/.test(library),
-     "library.js has no tier awareness at all — this was the state that let a " +
-     "free user tap 'Lower body' and silently receive Full Body 30");
+check("the Library is the Plan's whole, by route, with no locks left in it", () => {
+  ok(/'library'/.test(freeMoved), "the router no longer sends Free away from the Library");
+  ok(!/isPremium|lockedFeature|tier:\s*["']personal["']/.test(library),
+     "library.js still has a tier check or a locked card, which Free never sees");
 });
 
-check("exactly ONE Library surface is paid, and it is My programme", () => {
-  // R4, 20 Aug 2026. v1 asserted `tags >= 11`. That was a FLOOR, and a
-  // floor can be satisfied by the wrong eleven -- it would have stayed
-  // green if the ten self-directed tags had been swapped for ten
-  // others. Replaced with an exact count plus a named survivor, so both
-  // directions of drift go red: re-gating anything, or ungating the one
-  // thing that is genuinely the arc.
-  const tags = (library.match(/tier:\s*["']personal["']/g) || []).length;
-  ok(tags === 1,
-     `${tags} paid Library surfaces tagged; expected exactly 1. ` +
-     "Self-directed session types and activity categories are FREE " +
-     "(revenue architecture section 3). Only 'My programme' is paid, " +
-     "because a twelve-week programme is the arc, not a session");
-  const line = library.split("\n").find(l => /My programme/.test(l));
-  ok(line, "the 'My programme' card has gone missing from the gym category");
-  ok(/tier:\s*["']personal["']/.test(line),
-     "'My programme' is no longer paid. It is the twelve-week generative " +
-     "programme -- the arc itself, and the one thing in the Library that " +
-     "is a plan rather than a session");
-});
-
-check("the ten self-directed Library surfaces are FREE", () => {
-  // Named individually, because this is the change R4 made and a count
-  // alone cannot say WHICH survived. Two shapes: cards inside a
-  // category, and whole categories with a directTarget.
-  for (const label of ["Core", "Cardio", "Mobility",
-                       "Upper body", "Lower body", "Glute Focus"]) {
-    const lines = library.split("\n").filter(l =>
-      new RegExp(`label:\\s*"${label}"`).test(l));
-    ok(lines.length > 0, `the "${label}" card has gone missing from the Library`);
-    for (const l of lines) {
-      ok(!/tier:\s*["']personal["']/.test(l),
-         `the "${label}" card has been re-gated. Choosing which session you ` +
-         "do today is self-direction, and self-direction is an accessibility " +
-         "feature -- charging for it penalises the person who most needs to " +
-         "override the default");
-    }
-  }
-  for (const id of ["run", "walk", "swim", "cycle", "yoga"]) {
-    const block = library.slice(library.indexOf(`id:          "${id}"`));
-    const upToNext = block.slice(0, block.indexOf("},"));
-    ok(!/tier:\s*["']personal["']/.test(upToNext),
-       `the "${id}" category has been re-gated. Going for a run is not a plan`);
-  }
-});
-
-check("the free Library surfaces are NOT tagged", () => {
+check("the free surfaces are NOT moved to the Plan", () => {
   // These are free on ethical grounds, not commercial convenience.
   // Prescribed especially: 8 Mar 2026, "physio compliance is a health
   // issue, not a premium feature".
-  for (const [id, why] of [
-    ["prescribed", "physio compliance is a health issue, not a premium feature"],
-    ["mindful",    "practices are free; journeys are paid"],
-    ["coach",      "it IS the coach deciding, which is the free tier"]
+  for (const [route, why] of [
+    ["prescribed",        "physio compliance is a health issue, not a premium feature"],
+    ["breathing-session", "practices are free; journeys are paid"],
+    ["journal-entry",     "practices are free; journeys are paid"],
+    ["quiet-session",     "practices are free; journeys are paid"],
+    ["coach-proposal",    "it IS the coach deciding, which is the free tier"],
+    ["running-session",   "going for a run is not a plan"],
+    ["walk-session",      "going for a walk is not a plan"]
   ]) {
-    const block = library.slice(library.indexOf(`id:          "${id}"`));
-    const upToNext = block.slice(0, block.indexOf("},"));
-    ok(!/tier:\s*["']personal["']/.test(upToNext),
-       `the "${id}" category has been made paid — ${why}`);
+    ok(!new RegExp(`'${route}'`).test(freeMoved), `"${route}" has been moved to the Plan — ${why}`);
   }
 });
 

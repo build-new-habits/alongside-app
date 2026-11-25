@@ -1,6 +1,12 @@
 /**
  * mobility-conditioning.js - Mobility & Conditioning
  *
+ * 24 Nov 2026 v11
+ *
+ * v11 - S4b TIDY. P-46 S4b TIDY. Free never reaches this page (router.js
+ *   FREE_MOVED sends Free to on-the-plan), so its Free-only code is removed:
+ *   the Plan's look only, no tier check.
+ *
  * 29 Oct 2026 v10
  *
  * v10 - P-12 FIX-NOW (consistency trace, Graeme 29 Oct: "As proposed"). Both tiers: a fault, not a look.
@@ -88,7 +94,6 @@
  */
 
 import { store } from "../store.js";
-import { isPremium } from "../auth.js";
 
 export function MobilityConditioningView(router) {
 
@@ -173,18 +178,12 @@ export function MobilityConditioningView(router) {
   // records the door, so Back does not walk into the type picker the card
   // exists to skip; only the day's FIRST check-in is a gate.
   function _toBuilder(type) {
-    // A-2 ONE-PLAN-SCREEN (v9). On the Plan, Today's plan for this kind of
-    // session, the hand-over I know what I want and the Library make; the
-    // one plan screen and the one player. Free keeps the builder (Graeme,
-    // 12 Oct: Free is left alone).
-    const plan = isPremium();
-    if (plan) {
-      store.set("requestedSessionType", type);
-      store.set("sessionBuilderPreselect", null);
-    } else {
-      store.set("sessionBuilderPreselect", { type, returnTo: "mobility-conditioning" });
-    }
-    const dest = plan ? "coach-proposal" : "session-builder";
+    // A-2 ONE-PLAN-SCREEN (v9). Today's plan for this kind of session: the
+    // one plan screen and the one player. P-46 S4b: Free's way to the
+    // builder is gone; Free never reaches this page (router.js FREE_MOVED).
+    store.set("requestedSessionType", type);
+    store.set("sessionBuilderPreselect", null);
+    const dest = "coach-proposal";
     if (store.checkedInToday()) {
       router.navigate(dest);
     } else {

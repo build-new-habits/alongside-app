@@ -1,6 +1,12 @@
 /**
  * js/views/session-builder-ui.js - Session Builder UI
  *
+ * 24 Nov 2026 v37
+ *
+ * v37 - S4b TIDY. P-46 S4b TIDY. Free never reaches this page (router.js
+ *   FREE_MOVED sends Free to on-the-plan), so its Free-only code is removed:
+ *   the Plan's look only, no tier check.
+ *
  * 24 Nov 2026 v36
  *
  * v36 - P-46 S6 WORDS. Fewer words before the first button (spec §7: about
@@ -527,13 +533,9 @@ import { store }                          from "../store.js";
 // view that writes the array directly will get one right and miss
 // another.
 import { saveSession, updateSavedSession, savedSessions, resolveSavedSession, savedSessionCount, NAME_MAX } from '../data/saved-sessions.js';
-// R4 removed this file's isPremium import when TIER-G was reversed --
-// composing is free. YOUR-OWN needs it back for a different question:
-// not whether you may build, but whether it is KEPT.
-import { isPremium } from '../auth.js';
+// P-46 S4b TIDY. No tier check: Free never reaches this page (router.js
+// FREE_MOVED sends Free to on-the-plan), so it has only the Plan's look.
 import { lineIcon } from '../data/line-icons.js';
-// P-13 (v35). The Plan's look: one tier check.
-const _plan = () => isPremium();
 // QUICK-BUILD. The SAME chain One to one uses, not a second simpler one.
 import { router }                         from "../router.js";
 import { badDayIds, renderBadDayDoor, wireBadDayDoor } from "./bad-day-door.js";
@@ -692,7 +694,7 @@ const EQUIPMENT_OPTIONS = [
 // Plan's render drops them here, in one place, with the space after each.
 export function render() {
   const html = _render();
-  return _plan() ? html.replace(/\p{Extended_Pictographic}\uFE0F?\s?/gu, "").replace(/&#(1[2-3]\d{4});\s?/g, "") : html;
+  return html.replace(/\p{Extended_Pictographic}\uFE0F?\s?/gu, "").replace(/&#(1[2-3]\d{4});\s?/g, "");
 }
 
 function _render() {
@@ -826,12 +828,10 @@ function _exerciseMeta(ex, opts = {}) {
 function renderLocationStep() {
   const type = SESSION_TYPES.find(t => t.id === selectedType);
   return `
-    ${_plan() ? `<div class="view session-builder-view is-plan">` : `<div class="view session-builder-view">`}
+    <div class="view session-builder-view is-plan">
 
       <div class="workout-header">
-        ${_plan() ? `<button class="btn btn-ghost plan-back" id="sb-back-btn" aria-label="Back to session type">‹ Back</button>` : `<button class="btn btn-ghost" id="sb-back-btn" aria-label="Back to session type">
-          &larr; Back
-        </button>`}
+        <button class="btn btn-ghost plan-back" id="sb-back-btn" aria-label="Back to session type">‹ Back</button>
         <h1 class="workout-header-title">${type?.label || "Build a session"}</h1>
       </div>
 
@@ -846,7 +846,7 @@ function renderLocationStep() {
                 style="display:flex;align-items:center;gap:var(--space-4);text-align:left;width:100%;cursor:pointer;background:var(--color-surface);
                        border:2px solid ${selectedLocation === 'home' ? 'var(--color-primary)' : 'transparent'};"
                 aria-pressed="${selectedLocation === 'home'}">
-          ${_plan() ? `<span class="kind-tile k-teal" aria-hidden="true">${lineIcon("home")}</span>` : `<span style="font-size:1.75rem;flex-shrink:0;" aria-hidden="true">&#127968;</span>`}
+          <span class="kind-tile k-teal" aria-hidden="true">${lineIcon("home")}</span>
           <span style="font-weight:var(--font-semibold);">Home</span>
         </button>
         <button class="card sb-location-btn ${selectedLocation === 'gym' ? 'sb-location-btn--selected' : ''}"
@@ -854,7 +854,7 @@ function renderLocationStep() {
                 style="display:flex;align-items:center;gap:var(--space-4);text-align:left;width:100%;cursor:pointer;background:var(--color-surface);
                        border:2px solid ${selectedLocation === 'gym' ? 'var(--color-primary)' : 'transparent'};"
                 aria-pressed="${selectedLocation === 'gym'}">
-          ${_plan() ? `<span class="kind-tile k-teal" aria-hidden="true">${lineIcon("run")}</span>` : `<span style="font-size:1.75rem;flex-shrink:0;" aria-hidden="true">&#127939;</span>`}
+          <span class="kind-tile k-teal" aria-hidden="true">${lineIcon("run")}</span>
           <span style="font-weight:var(--font-semibold);">Gym</span>
         </button>
       </div>
@@ -887,12 +887,10 @@ function _groupedTypes() {
 
 function renderTypePicker() {
   return `
-    ${_plan() ? `<div class="view session-builder-view is-plan">` : `<div class="view session-builder-view">`}
+    <div class="view session-builder-view is-plan">
 
       <div class="workout-header">
-        ${_plan() ? `<button class="btn btn-ghost plan-back" id="sb-back-btn" aria-label="Go back">‹ Back</button>` : `<button class="btn btn-ghost" id="sb-back-btn" aria-label="Go back">
-          &larr; Back
-        </button>`}
+        <button class="btn btn-ghost plan-back" id="sb-back-btn" aria-label="Go back">‹ Back</button>
         <h1 class="workout-header-title">Build a session</h1>
       </div>
 
@@ -915,7 +913,7 @@ function renderTypePicker() {
              role="group" aria-label="${g.label} sessions">
         ${g.types.map(t => {
           const inner = `
-              ${_plan() ? `<span class="kind-tile k-teal" aria-hidden="true">${lineIcon("pencil")}</span>` : `<span style="font-size:2rem;flex-shrink:0;line-height:1;" aria-hidden="true">${t.icon}</span>`}
+              <span class="kind-tile k-teal" aria-hidden="true">${lineIcon("pencil")}</span>
               <div style="flex:1;min-width:0;">
                 <p style="font-size:var(--text-base);font-weight:var(--font-semibold);margin-bottom:var(--space-1);">${t.label}</p>
                 <p class="text-secondary" style="font-size:var(--text-sm);">${t.description}</p>
@@ -1047,10 +1045,10 @@ function renderZonePicker() {
     .map(id => (zones.find(z => z.id === id) || {}).label)
     .filter(Boolean);
   return `
-    ${_plan() ? `<div class="sb-view is-plan">` : `<div class="sb-view">`}
+    <div class="sb-view is-plan">
       <div class="sb-header">
-        ${_plan() ? `<button class="btn btn-ghost plan-back" id="sb-back-btn" aria-label="Go back">‹ Back</button>` : `<button class="btn btn-ghost" id="sb-back-btn" aria-label="Go back">&larr; Back</button>`}
-        ${_plan() ? `<h1 class="sb-header-title">Stretch</h1>` : `<span class="sb-header-title">Stretch</span>`}
+        <button class="btn btn-ghost plan-back" id="sb-back-btn" aria-label="Go back">‹ Back</button>
+        <h1 class="sb-header-title">Stretch</h1>
       </div>
 
       <!-- Graeme, 2 Sep: the coach prompt should be teal writing, a
@@ -1098,12 +1096,10 @@ function renderDurationPicker() {
   const type    = SESSION_TYPES.find(t => t.id === selectedType);
 
   return `
-    ${_plan() ? `<div class="view session-builder-view is-plan">` : `<div class="view session-builder-view">`}
+    <div class="view session-builder-view is-plan">
 
       <div class="workout-header">
-        ${_plan() ? `<button class="btn btn-ghost plan-back" id="sb-back-btn" aria-label="Back to session type">‹ Back</button>` : `<button class="btn btn-ghost" id="sb-back-btn" aria-label="Back to session type">
-          &larr; Back
-        </button>`}
+        <button class="btn btn-ghost plan-back" id="sb-back-btn" aria-label="Back to session type">‹ Back</button>
         <h1 class="workout-header-title">${type?.label || "Build a session"}</h1>
       </div>
 
@@ -1246,12 +1242,10 @@ function renderEquipmentCheck() {
   const otherWord     = selectedLocation === "gym" ? "home" : "gym";
 
   return `
-    ${_plan() ? `<div class="view session-builder-view is-plan">` : `<div class="view session-builder-view">`}
+    <div class="view session-builder-view is-plan">
 
       <div class="workout-header">
-        ${_plan() ? `<button class="btn btn-ghost plan-back" id="sb-back-btn" aria-label="Back to duration">‹ Back</button>` : `<button class="btn btn-ghost" id="sb-back-btn" aria-label="Back to duration">
-          &larr; Back
-        </button>`}
+        <button class="btn btn-ghost plan-back" id="sb-back-btn" aria-label="Back to duration">‹ Back</button>
         <h1 class="workout-header-title">Equipment today</h1>
       </div>
 
@@ -1378,12 +1372,10 @@ function _buildModeOption(mode, title, blurb) {
 function renderBuildModeStep() {
   const type = SESSION_TYPES.find(t => t.id === selectedType);
   return `
-    ${_plan() ? `<div class="view session-builder-view is-plan">` : `<div class="view session-builder-view">`}
+    <div class="view session-builder-view is-plan">
 
       <div class="workout-header">
-        ${_plan() ? `<button class="btn btn-ghost plan-back" id="sb-back-btn" aria-label="Back to equipment">‹ Back</button>` : `<button class="btn btn-ghost" id="sb-back-btn" aria-label="Back to equipment">
-          &larr; Back
-        </button>`}
+        <button class="btn btn-ghost plan-back" id="sb-back-btn" aria-label="Back to equipment">‹ Back</button>
         <h1 class="workout-header-title">${type?.label || "Build a session"}</h1>
       </div>
 
@@ -1433,7 +1425,7 @@ function renderBuildModeStep() {
 function renderLoading() {
   const type = SESSION_TYPES.find(t => t.id === selectedType);
   return `
-    ${_plan() ? `<div class="view session-builder-view is-plan">` : `<div class="view session-builder-view" style="text-align: center;">`}
+    <div class="view session-builder-view is-plan">
       <div style="margin-top: var(--space-10);">
         <div class="card card-coach">
           <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
@@ -1514,12 +1506,10 @@ function renderPreview() {
   const anySwappable = rows.some(r => _canSwap(r.ex));
 
   return `
-    ${_plan() ? `<div class="view session-builder-view is-plan">` : `<div class="view session-builder-view">`}
+    <div class="view session-builder-view is-plan">
 
       <div class="workout-header">
-        ${_plan() ? `<button class="btn btn-ghost plan-back" id="sb-back-btn" aria-label="Back">‹ Back</button>` : `<button class="btn btn-ghost" id="sb-back-btn" aria-label="Back">
-          &larr; Back
-        </button>`}
+        <button class="btn btn-ghost plan-back" id="sb-back-btn" aria-label="Back">‹ Back</button>
         <h1 class="workout-header-title">${builtSession.title}</h1>
       </div>
 
@@ -1592,12 +1582,12 @@ function renderPreview() {
            Gentle Care is a response to today, not a session somebody
            would want again, and offering to save it would misread what
            it is. -->
-      ${!builtSession.gentleCare && isPremium() ? `
+      ${!builtSession.gentleCare ? `
         <div class="sb-save" id="sb-save-block">
           <!-- SAVED-2. The same block does both jobs, because they are the
                same job: name it and keep it. Only the words and the
                writer differ. -->
-          <button class="btn ${_plan() ? "btn-secondary" : "btn-ghost"} btn-full" id="sb-save-open">${
+          <button class="btn ${"btn-secondary"} btn-full" id="sb-save-open">${
             editingSavedId ? "Save your changes" : "Save this one"
           }</button>
           <div class="sb-save__form hidden" id="sb-save-form">
@@ -1641,8 +1631,8 @@ function renderPreview() {
         <button class="btn btn-primary btn-large btn-full" id="sb-go-btn">
           Let's go
         </button>
-        <button class="btn ${_plan() ? "btn-secondary" : "btn-ghost"} btn-full" id="sb-rebuild-btn">
-          ${builtSession.gentleCare ? (_plan() ? "Leave it for today" : "Back to Today") : "Build a different one"}
+        <button class="btn ${"btn-secondary"} btn-full" id="sb-rebuild-btn">
+          ${builtSession.gentleCare ? ("Leave it for today") : "Build a different one"}
         </button>
       </div>
 
@@ -1672,15 +1662,13 @@ function renderSwapSheet() {
 
   const header = `
       <div class="workout-header">
-        ${_plan() ? `<button class="btn btn-ghost plan-back" id="sb-swap-close-btn" aria-label="Back to your session">‹ Back</button>` : `<button class="btn btn-ghost" id="sb-swap-close-btn" aria-label="Back to your session">
-          &larr; Back
-        </button>`}
+        <button class="btn btn-ghost plan-back" id="sb-swap-close-btn" aria-label="Back to your session">‹ Back</button>
         <h1 class="workout-header-title">Instead of ${current.name}</h1>
       </div>`;
 
   if (total === 0) {
     return `
-      ${_plan() ? `<div class="view session-builder-view is-plan">` : `<div class="view session-builder-view">`}
+      <div class="view session-builder-view is-plan">
         ${header}
         <p class="sb-coach-line">There's nothing else in today's ${word} I can offer you.</p>
         <p class="sb-zone-note">
@@ -1754,7 +1742,7 @@ function renderSwapSheet() {
   };
 
   return `
-    ${_plan() ? `<div class="view session-builder-view is-plan">` : `<div class="view session-builder-view">`}
+    <div class="view session-builder-view is-plan">
       ${header}
 
       <p class="sb-coach-line">Something else for the ${word}?</p>
@@ -1796,7 +1784,7 @@ function renderSwapSheet() {
       </div>
 
       ${capped.length < shown.length ? `
-        <button class="btn ${_plan() ? "btn-secondary" : "btn-ghost"} btn-full" id="sb-swap-expand-btn">
+        <button class="btn ${"btn-secondary"} btn-full" id="sb-swap-expand-btn">
           Show all ${shown.length} in ${active ? active.label.toLowerCase() : "this group"}
         </button>
       ` : ""}

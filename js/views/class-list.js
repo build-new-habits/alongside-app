@@ -1,6 +1,12 @@
 /**
  * js/views/class-list.js
  *
+ * 24 Nov 2026 v8
+ *
+ * v8 - S4b TIDY. P-46 S4b TIDY. Free never reaches this page (router.js
+ *   FREE_MOVED sends Free to on-the-plan), so its Free-only code is removed:
+ *   the Plan's look only, no tier check.
+ *
  * 01 Nov 2026 v7
  *
  * v7 - P-13 Classes (mock-up v1 approved by Graeme, 01 Nov: "Yes, build
@@ -93,7 +99,6 @@ import { store } from '../store.js';
 import { router } from '../router.js';
 import { CLASSES, classSafety, seatedThroughout } from '../data/classes/index.js';
 import { durationLabel, sectionsFor, lighterMinutes } from '../data/class-contract.js';
-import { isPremium } from '../auth.js';
 import { lineIcon } from '../data/line-icons.js';
 import { hasFigure, renderFigure } from '../figures.js';
 import { STRANDS } from '../data/aims.js';
@@ -247,82 +252,10 @@ export function render(stay = false) {
   const open = rows.filter(r => r.safety.offer);
   const held = rows.filter(r => !r.safety.offer);
 
-  // v7. The Plan: the list, or the chosen class's own page.
-  if (isPremium()) {
-    const pick = _chosen && open.find(r => r.cls.id === _chosen);
-    return pick ? _planClass(pick) : _planList(rows, open, held);
-  }
-
-  return `
-    <div class="view class-list">
-      <h1 class="class-list__title" tabindex="-1">Classes</h1>
-      <p class="class-list__intro">
-        Pick the one you want. They run the same for everybody${mine.length ? ` — the
-        difference here is that they know what you're working towards` : ""}.
-      </p>
-
-      ${open.length ? `
-        <ul class="class-list__board">
-          ${open.map(r => `
-            <li class="class-list__row">
-              <h2 class="class-list__name">${_esc(r.cls.title)}</h2>
-              <p class="class-list__facts">
-                ${_esc(r.length)} · ${r.sections} parts · ${_esc(r.cls.position)}${r.seatable && r.cls.position !== 'seated' ? ' · can be done seated' : ''}
-              </p>
-              <p class="class-list__serves">
-                ${r.inArc
-                  ? `Part of your arc — ${_esc(r.strandLabel)}`
-                  : _esc(r.strandLabel)}
-              </p>
-              ${(r.cls.flags || []).length ? `
-                <p class="class-list__flags">${
-                  (r.cls.flags || []).map(f => _esc(String(f).replace(/-/g, ' '))).join(' · ')
-                }</p>` : ''}
-
-              <div class="class-list__actions">
-                <button class="btn btn-primary btn-full"
-                        data-start="${_esc(r.cls.id)}"
-                        aria-label="Start ${_esc(r.cls.title)}, ${_esc(r.length)}${r.seatable ? ', can be done seated' : ''}">
-                  Start ${_esc(r.cls.title)}
-                </button>
-                ${r.cls.lighter ? `
-                  <button class="btn btn-secondary btn-full"
-                          data-start="${_esc(r.cls.id)}" data-lighter="1"
-                          aria-label="Start the shorter version of ${_esc(r.cls.title)}">
-                    Shorter version
-                  </button>` : ''}
-              </div>
-            </li>`).join('')}
-        </ul>` : `
-        <p class="class-list__empty">
-          Nothing here today, because of what you've told me to avoid.
-          That isn't permanent.
-        </p>`}
-
-      ${held.length ? `
-        <!--
-          TIMETABLE-1. Withheld classes are NAMED, not hidden.
-          A class that vanishes leaves somebody wondering whether it
-          exists; a class that says why it is not on offer today is a
-          fact they can do something with. It is also honest about the
-          app declining rather than deciding.
-        -->
-        <section class="class-list__held">
-          <h2 class="class-list__held-title">Not today</h2>
-          <ul class="class-list__board">
-            ${held.map(r => `
-              <li class="class-list__row class-list__row--held">
-                <h3 class="class-list__name">${_esc(r.cls.title)}</h3>
-                <p class="class-list__why">
-                  Has ${_esc(r.safety.blockedBy.join(', '))} in it, which I'm
-                  leaving out for you at the moment.
-                </p>
-              </li>`).join('')}
-          </ul>
-        </section>` : ''}
-
-      <button class="btn btn-ghost btn-full" id="cl-back">Back to today</button>
-    </div>`;
+  // v7. The Plan: the list, or the chosen class's own page. P-46 S4b: the
+  // Free list is gone; Free never reaches this page (router.js FREE_MOVED).
+  const pick = _chosen && open.find(r => r.cls.id === _chosen);
+  return pick ? _planClass(pick) : _planList(rows, open, held);
 }
 
 export function onMount() {

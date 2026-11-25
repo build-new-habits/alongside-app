@@ -1,5 +1,11 @@
 /**
  * tools/verify-plan-home-prune.mjs
+ * 24 Nov 2026 v7
+ *
+ * v7 - S4b TIDY. P-46 S4b TIDY. The Library's planOnly flags went with
+ *   Free's tiles: the Plan's only is now the router's (FREE_MOVED), and that
+ *   is what is checked.
+ *
  * 24 Nov 2026 v6
  *
  * v6 - P-46 S4 FREE HOME. Free Home is its own now (free-home.js: coach-led,
@@ -63,6 +69,7 @@
 import { createRequire as __cr } from "node:module";
 const __require = __cr(import.meta.url);
 const { JSDOM } = __require("jsdom");
+import * as fs from "node:fs";
 
 const dom = new JSDOM('<!doctype html><div id="app"><div id="main-content"></div></div>', { url: "https://x/" });
 globalThis.window = dom.window;
@@ -161,9 +168,8 @@ fixture({ tier: "free" }); home();
 // P-46 S4. Free Home is its own (free-home.js), in the Plan's look: no Plan doors, its own Today card.
 ok("7a. Free Home has no Plan doors, week or arc", !main.querySelector(".home-door, .home-today, .home-week, .path-door[data-door], .path-arcline") && !!main.querySelector(".free-home"));
 ok("7b. Free Home has its own Today card (How are you today?) and Something gentler", /How are you today\?/.test(txt(main)) && /Something gentler/.test(txt(main)));
-main.innerHTML = library.render(); library.onMount();
-const freeGuided = [...main.querySelectorAll("[data-guided]")].map(b => b.dataset.guided);
-ok("7c. Free's Library has no new tiles", !freeGuided.includes("classes") && !freeGuided.includes("week"), freeGuided.join());
+// P-46 S4b TIDY: Free never reaches the Library (router.js FREE_MOVED), so it has no Free tiles at all.
+ok("7c. Free never reaches the Library, so none of its tiles (FREE_MOVED has 'library')", /'library'/.test((fs.readFileSync(new URL("../js/router.js", import.meta.url), "utf8").match(/const FREE_MOVED = new Set\(\[([\s\S]*?)\]\)/) || [, ""])[1]));
 
 console.log(`\nVERIFY-PLAN-HOME-PRUNE: ${passes} passed, ${fails} failed`);
 process.exit(fails ? 1 : 0);

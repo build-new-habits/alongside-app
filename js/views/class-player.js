@@ -1,6 +1,12 @@
 /**
  * js/views/class-player.js
  *
+ * 24 Nov 2026 v8
+ *
+ * v8 - S4b TIDY. P-46 S4b TIDY. Free never reaches this page (router.js
+ *   FREE_MOVED sends Free to on-the-plan), so its Free-only code is removed:
+ *   the Plan's look only, no tier check.
+ *
  * 24 Nov 2026 v7
  *
  * v7 - P-46 S6 WORDS. Fewer words before the first button (spec §7: about
@@ -105,7 +111,6 @@
 import { prefersReducedMotion } from '../display-prefs.js';
 
 import { store } from '../store.js';
-import { isPremium } from '../auth.js';
 import { hasFigure, renderFigure } from '../figures.js';
 // v6. The part's stick figure (the Plan's): the first exercise in it that has one, first frame.
 function _partFig(sec) {
@@ -208,20 +213,11 @@ export function render() {
   _load();
 
   if (!_cls) {
-    if (isPremium()) return `
+    return `
       <div class="view class-player is-plan">
         <button class="btn btn-ghost plan-back" id="cp-home" aria-label="Back to today">‹ Back</button>
         <h1 tabindex="-1">No class open</h1>
         <p class="text-secondary">That class is no longer here. Pick another whenever you like.</p>
-      </div>`;
-    return `
-      <div class="view class-player">
-        <h1 tabindex="-1">No class open</h1>
-        <p class="text-secondary">
-          That class is no longer available. Nothing has been lost — pick
-          another whenever you want to.
-        </p>
-        <button class="btn btn-primary btn-full" id="cp-home">Back to today</button>
       </div>`;
   }
 
@@ -249,13 +245,11 @@ export function render() {
   const spoken = beat ? voiceFor(beat, { lighter: _lighter }) : '';
   const held = typeof beat?.holdSeconds === 'number';
 
-  const plan = isPremium();
   return `
-    ${plan ? `<div class="view class-player is-plan">` : `<div class="view class-player">`}
+    <div class="view class-player is-plan">
       <div class="class-player__head">
-        ${plan ? `<button class="btn btn-ghost plan-exit" id="cp-exit"
-                aria-label="Exit ${_esc(_cls.title)}">Exit</button>` : `<button class="btn btn-ghost" id="cp-exit"
-                aria-label="Leave ${_esc(_cls.title)}">✕ Leave</button>`}
+        <button class="btn btn-ghost plan-exit" id="cp-exit"
+                aria-label="Exit ${_esc(_cls.title)}">Exit</button>
         <span class="class-player__where">
           ${st.sectionIndex + 1} of ${_sections.length}
         </span>
@@ -263,8 +257,8 @@ export function render() {
 
       <h1 class="class-player__title" tabindex="-1">${_esc(_cls.title)}</h1>
       <h2 class="class-player__section">${_esc(sec.title)}</h2>
-${plan ? `      ${_partFig(sec)}
-` : ''}
+      ${_partFig(sec)}
+
       <!--
         PLAYER-1. role="status" because the beat changes ON A TIMER, under
         somebody who may be lying on the floor with their eyes shut. Same
