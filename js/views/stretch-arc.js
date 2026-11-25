@@ -1,5 +1,10 @@
 /**
  * js/views/stretch-arc.js
+ * 25 Nov 2026 v11
+ *
+ * v11 - 11b ARC-BACK-2. Back goes where you came from (Progress' Change my
+ *   arc, now the way in), not always Home. verify-back-fixes 11b.
+ *
  * 15 Nov 2026 v10
  *
  * v10 - P-25 HOW-TO GUIDES. Guide marker only: the ways to change the arc
@@ -311,12 +316,13 @@ export function StretchArcView(router) {
     });
 
     container.querySelector("#sa-back-btn")?.addEventListener("click", () => {
-      // ARC-BACK, 05 Sep 2026. This went to Mobility & Conditioning,
-      // which is where the arc USED to live. LOBBY-1b moved it to Home
-      // and this was left pointing at the old parent, so Back sent
-      // people somewhere they had not come from and there was no way
-      // home except starting a session.
-      router.navigate("today", { fromBack: true });
+      // ARC-BACK-2, 25 Nov 2026 (11b). ARC-BACK (05 Sep) sent this Home,
+      // where the arc lived then; the way in is now Progress' Change my
+      // arc. Back goes where you came from, stepping over the arc's own
+      // screens (changing a part comes back here without a new step).
+      const h = router.history || [];
+      while (h.length && ["stretch-arc", "arc-setup"].includes(h[h.length - 1])) h.pop();
+      router.back();
     });
 
     container.querySelector("#sa-start-btn")?.addEventListener("click", () => {
