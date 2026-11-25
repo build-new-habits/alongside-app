@@ -1,5 +1,10 @@
 /**
  * tools/verify-health-consent.mjs
+ * 24 Nov 2026 v11
+ *
+ * v11 - P-46 WAVE 8 2.12. 2d: Not now's second screen is the short ask again
+ *   (Before your session; listen to your body), Graeme's decision on 2.12.
+ *
  * 04 Oct 2026 v10
  *
  * v10 - LOOK-1/LOOK-2. Settings rows are on section pages, not the index:
@@ -176,7 +181,8 @@ ok("2c. a class is not a health question", (await go("classes")) === "classes");
 fixture({ consent: true });
 await go("checkin");
 click(main.querySelector("#hc-not-now")); await wait(20);
-ok("2d. Not now opens the second screen and records nothing", /stay on this phone/i.test(main.textContent) && !landed.includes("today") &&
+// P-46 Wave 8 (Graeme, 25 Nov): the second screen is the short ask again, Before your session.
+ok("2d. Not now opens the second screen and records nothing", /Before your session/.test(main.textContent) && /listen to your body/i.test(main.textContent) && !landed.includes("today") &&
    store.get("consent")?.health?.given !== true && !store.get("consent")?.health?.confirmedNoAt, JSON.stringify(landed));
 fixture({ consent: true });
 await go("checkin");
