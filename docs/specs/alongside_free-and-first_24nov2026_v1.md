@@ -1,5 +1,7 @@
 # Alongside: Move — Free and first (P-46) spec
-## 25 Nov 2026 v6
+## 25 Nov 2026 v7
+
+**v7 (Wave 8 fixes):** the Wave 8 trace found the first session broke screen 4's promise: the card said *About 15 minutes*, gentle, and Today's plan said *You asked for strength, full body, 30 minutes* (the length asked was `short`, 30). Now the card says *About 20 minutes*, the length asked is `quick` (20), and Today's plan says *Your first session: whole body, gentle, about N minutes.*; Outside asks for outside. Free's *Done today* names the session (from `workoutHistory`; Free's log entry has no name).
 
 **v6 (S7, built; P-46 complete):** Help guide **A4** *I want to change a move while I'm doing it* (both tiers, read only, walks A1), and D1's Free answer *Something gentler*. Glossary v15 (the new words, and decision 8: about 15 words before the first button). BNH-Files: device checklist v34 **Sitting Z**; `Legal/alongside_privacy_line_free-and-first_25nov2026_v1.md` (three proposed Privacy Policy edits and two questions for Foot Anstey; nothing new leaves the device). Then the Wave 8 persona trace.
 
@@ -111,4 +113,4 @@ Every screen: **at most about 15 words above the first button**. Longer text mov
 
 The voices and *Hear from your coach* (next month); payments and the 14-day trial (P-40, row 14); the 14+ age change (P-41); Free's Progress window (P-40 says 30 days, unchanged here).
 
-*Build New Habits · Alongside: Move · P-46 spec · 25 Nov 2026 v6*
+*Build New Habits · Alongside: Move · P-46 spec · 25 Nov 2026 v7*

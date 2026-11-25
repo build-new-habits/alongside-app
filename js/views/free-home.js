@@ -1,5 +1,11 @@
 /**
  * views/free-home.js
+ * 24 Nov 2026 v2
+ *
+ * v2 - P-46 WAVE 8 FIX. Done today names the session from workoutHistory
+ *   when the log entry has no name (Free's never does): it said "Your session"
+ *   in the Wave 8 trace.
+ *
  * 24 Nov 2026 v1
  *
  * v1 - P-46 S4 FREE HOME (spec alongside_free-and-first_24nov2026_v1 §5;
@@ -53,7 +59,9 @@ function head(kind, icon, eyebrow, title) {
 function todayCard(checkedIn) {
   const done = doneToday();
   if (done) {
-    const title = done.name || done.title || "Your session";
+    // Free's log entry carries no name (workout.js _pathFields is the Plan's); the session's own history does.
+    const wh = (store.get("workoutHistory") || []).slice(-1)[0];
+    const title = done.name || done.title || (wh?.name && dayOf(wh.completedAt) === dayOf(done.completedAt || done.date) ? wh.name : "") || "Your session";
     return `<section class="path-today k-teal" data-state="done" aria-labelledby="path-today-h">${head("teal", "tick", "Done today", title)}
       <p class="path-today__coach">That’s today done.</p></section>`;
   }
