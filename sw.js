@@ -1,7 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 25 Nov 2026 v750
+ * 25 Nov 2026 v751
+ *
+ * v751 - P-41 S1 (approved 25 Nov). The age question now works out which version of the app suits the age and keeps that (never the date); the 16-17 and 14-15 versions are closed until built, so nothing on screen changes. No new files.
  *
  * v750 - P-29 In Step's Last time (approved 19 Nov). Before an episode: when, which episode, what it was about and its Carry it, then Did you get to try it? with I tried it, I forgot and the episode's own third answer; voiced when the voice is on. Part 4's recaps wait for their read. No new files.
  *
@@ -4353,7 +4355,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v750";
+const CACHE_NAME = "alongside-v751";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4420,7 +4422,7 @@ const SHELL_HASHES = {
   "./css/components/finish.css": "c33e298d5fcb92ae",
   "./js/app.js": "81ed92c5ada71eb8",
   "./js/router.js": "f4e0c7f0eac0a035",
-  "./js/store.js": "5306eafc2df487ee",
+  "./js/store.js": "9a115918e664687e",
   "./js/session-log.js": "6134de4315842e05",
   "./js/exercise-feedback.js": "adba8549f444da2a",
   "./js/exercise-card.js": "87af7a5668137593",
@@ -4475,7 +4477,7 @@ const SHELL_HASHES = {
   "./js/views/practices.js": "f76d5aae3596a565",
   "./js/views/red-flag.js": "d2f857d0f8ba905f",
   "./js/views/health-consent.js": "cace2ae17b89b230",
-  "./js/views/age-check.js": "b29fd222f8378e0b",
+  "./js/views/age-check.js": "2485fc6e163c47ae",
   "./js/views/under-18.js": "22c82205c5f7626a",
   "./js/views/consent-update.js": "51f918f8e2c9b25a",
   "./js/data/arc-readback.js": "9b06dcba96534da0",
@@ -4496,7 +4498,7 @@ const SHELL_HASHES = {
   "./css/components/start.css": "0f7b613d180c41ee",
   "./js/data/red-flag.js": "3cd9eecbc3985eb3",
   "./js/data/health-consent.js": "a23d005af57f179c",
-  "./js/data/age-check.js": "7fa5b0f5a6b34770",
+  "./js/data/age-check.js": "ebe52a0249529e29",
   "./js/data/restore.js": "fd3860a6ccd4e480",
   "./js/data/export-file.js": "bbee762322d0e4e2",
   "./js/data/health-consent-covers.js": "6698a3e50672cbbe",
@@ -4605,7 +4607,7 @@ const SHELL_HASHES = {
   "./js/views/running-session.js": "3fcc750fa8c6214d",
   "./js/views/swim-session.js": "796864e209d35cb8",
   "./js/views/cycle-session.js": "5cf63e9171ece8d8",
-  "./js/views/onboarding/thread.js": "5f909fd403fdbbd2",
+  "./js/views/onboarding/thread.js": "1ba7d6c1f3250a23",
   "./js/views/onboarding/sheet-manager.js": "20cb675f242157c8",
   "./js/views/onboarding/goals.js": "ec29181741c4bc1e",
   "./js/views/onboarding/conditions.js": "f719e4e253244b9e",
