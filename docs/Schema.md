@@ -1,5 +1,7 @@
 # Alongside — Data Schema Reference
-## 25 Nov 2026 v1.136
+## 25 Nov 2026 v1.137
+
+> **v1.137, 25 Nov 2026 — P-41 THREE AGE VERSIONS, S1, schema first** (`store.js` v134). Spec BNH-Files `Product/alongside_p41_three-age-versions_spec_25nov2026_v2.md`, approved by Graeme 25 Nov. **Three keys added to `consent`:** **`ageGroup`** `'adult' | 'young-16' | null` (default `null`): which version of the app suits their age, set by the age question (`age-check.js` `recordAge`, `recordAnswer`); **`ageGroupNext`** `'YYYY-MM' | null`: for `young-16` only, the month they move up to the adult version (the month after the month they turn 18). Graeme, 25 Nov: kept on the phone only, never sent, deleted at 18; it is close to a birth month and year, so Foot Anstey is asked to confirm. The date of birth itself is never kept. **`ageGroupAt`** ISO or `null`: when the group was last set. **On load** (`store._cleanAgeGroup()`): a group not one of the two is `null`; a phone let in before this version (`ageConfirmed` true, no group) is `'adult'`, as the check then let in only adults; a phone not let in holds no group; `ageGroupNext` only for `young-16` and only as `YYYY-MM`; a `young-16` with no month is asked the age again (`ageConfirmed` `null`). **Both young versions are closed in S1** (`YOUNG_OPEN`): anyone under 18 is still kept out and nothing is kept, as before. Gated by `tools/verify-p41-schema.mjs`.
 
 > **v1.136, 25 Nov 2026 — P-29 INSTEP-RECAP, schema first** (`store.js` v133). Wording approved by Graeme, 19 Nov (BNH-Files `Product/alongside_content_in-step-recap_19nov2026_v3.md`). **One key added to `inStepProgress.programme`: `lastCarryAt`** (`'YYYY-MM-DD'`, the person's local day, or `null`; default `null`): the day the episode named by `lastCarry` reached its *Carry it*. **Written by** `in-step-offer.js` `completeEpisode()`, with `lastCarry`. **Read by** In Step's *Last time* screen, only to say when that was (*Earlier today*, *Yesterday*, *On Monday*, *Last week*, *A while ago*; no date: *Last time*). **On load** (`store._cleanP28()`): anything not a valid date loads as `null`, so a record from before this version gains `null`. Restore carries it with the rest of `inStepProgress`. **`lastAnswer`'s ids are unchanged** (`did`, `not-yet`, `didnt`); what they are labelled changes: `did` *I tried it*, `not-yet` *I forgot*, `didnt` the episode's own third answer (for example *Nobody asked*), or *It didn't come up* while a Part 4 recap waits for its read. Both tiers. Gated by `tools/verify-p29-recap.mjs`.
 
@@ -1117,7 +1119,7 @@
 
 ## 06 Sep 2026 v1.51
 
-**File:** `js/store.js` (confirmed live version: **v133, 25 Nov 2026**)
+**File:** `js/store.js` (confirmed live version: **v134, 25 Nov 2026**)
 
 > **v1.47, 06 Sep 2026 — CR-1.** `conditions[]` gains three ids and loses one. `chronic-fatigue` is **retired**; `persistent-fatigue`, `me-cfs` and `long-covid` replace it. No field shape changed — `conditions` is still `string[]` and `conditionMeta` is still keyed by condition id.
 >
@@ -1784,6 +1786,9 @@ Legal consent record. Restored after the PT-W1 store audit found it absent: `wel
 | `consent.at` | `string \| null` | `null` | ISO timestamp of the tick |
 | `consent.policyVersion` | `string \| null` | `null` | Which documents were agreed to (`POLICY_VERSION` in `thread.js`). Without this, any policy revision silently invalidates every existing record |
 | `consent.ageConfirmed` | `boolean \| null` | `null` | **Reserved and inert.** Age gate is built but switched off via `AGE_GATE_ENABLED` pending the ToS 13+/16+ contradiction (Stream A, A1.11) and Natalie's written advice |
+| `consent.ageGroup` | `'adult' \| 'young-16' \| null` | `null` | **v1.137 (P-41).** Which version suits their age; set by the age question. A phone let in before v1.137 loads as `'adult'`. |
+| `consent.ageGroupNext` | `'YYYY-MM' \| null` | `null` | **v1.137 (P-41).** `young-16` only: the month they move up to the adult version. On the phone only, deleted at 18. |
+| `consent.ageGroupAt` | `ISO \| null` | `null` | **v1.137 (P-41).** When the group was last set. |
 
 **Deprecated, do not write:** flat `consentGiven` / `consentAt`. Superseded by the nested object above. Nesting was chosen deliberately for the coming Supabase migration, where PT-10 flagged undeclared flat fields as a real loss risk.
 
