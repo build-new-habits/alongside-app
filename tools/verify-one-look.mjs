@@ -1,6 +1,11 @@
 import { createRequire as __cr } from "node:module";
 /**
  * tools/verify-one-look.mjs
+ * 25 Nov 2026 v20
+ *
+ * v20 - P-46 Wave 8. 1c reads the rule with the consent screens added
+ *   (.hc-view: no house there either; each has its own way on).
+ *
  * 24 Nov 2026 v19
  *
  * v19 - P-46 S6 WORDS. TEST 4 makes the approved word changes
@@ -255,7 +260,7 @@ const vars = readFileSync(`${ROOT}css/base/variables.css`, "utf8");
 const rule = sel => { const i = css.indexOf(sel + " {"); return i < 0 ? "" : css.slice(i, css.indexOf("}", i)); };
 ok("1a. on the Plan, the page heading is --text-2xl at the left", /font-size:\s*var\(--text-2xl\)/.test(rule(".is-plan h1:not(.sr-only)")) && /text-align:\s*left/.test(rule(".is-plan h1:not(.sr-only)")), rule(".is-plan h1:not(.sr-only)"));
 ok("1b. --text-2xl is 24 px (times the person's text size)", /--text-2xl:\s*calc\(1\.5rem \* var\(--user-text-scale\)\)/.test(vars), (vars.match(/--text-2xl:[^;]*/) || [""])[0]);
-ok("1c. a room's own way back hides the house (one way back)", /body:has\(#main-content \.plan-back, #main-content \.plan-exit\) #hidden-nav-home-btn\s*\{\s*display:\s*none/.test(css));
+ok("1c. a room's own way back hides the house (one way back; v20: the consent screens too)", /body:has\(#main-content \.plan-back, #main-content \.plan-exit(, #main-content \.hc-view)?\) #hidden-nav-home-btn\s*\{\s*display:\s*none/.test(css));
 const finishCss = readFileSync(`${ROOT}css/components/finish.css`, "utf8");
 ok("1e. Remove on My exercises has an edge (a button, not bare words)", /\.prescribed-view \.prescribed-remove-btn \{[^}]*border: 1px solid/.test(finishCss));
 const allCss = execSync(`cat ${ROOT}css/*.css ${ROOT}css/*/*.css`, { encoding: "utf8", maxBuffer: 1 << 26 });

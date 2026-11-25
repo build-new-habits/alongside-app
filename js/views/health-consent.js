@@ -13,6 +13,10 @@
  *   its tick (the consent itself is unchanged); Carry on without them gives
  *   the gentle routine, as before. From the journal, Settings or a restore:
  *   unchanged.
+ *   Same day (Graeme: "If you go without sounds weird. Clear language with
+ *   context"): the last line says why: "Without them, I won't know if
+ *   something is sore or you're having a hard day. So please listen to your
+ *   body: go gently, and stop if something doesn't feel right."
  *
  * 17 Oct 2026 v5
  *
@@ -94,8 +98,9 @@ export function HealthConsentView(router) {
         <p class="hc-text">Without your answers I can still give you a gentle routine, the same for anyone.
           I just can't fit it to how you are on the day.</p>
         <p class="hc-text">That's fine. You can change your mind any time in Settings.</p>
-        <p class="hc-text hc-listen"><strong>If you go without, listen to your body</strong>, and ease off
-          on days you're not at your best.</p>
+        <p class="hc-text hc-listen">Without them, I won't know if something is sore or you're having
+          a hard day. <strong>So please listen to your body</strong>: go gently, and stop if
+          something doesn't feel right.</p>
         <button class="btn btn-primary btn-large btn-full" id="hc-back-to-tick">Yes, keep my answers</button>
         <button class="btn btn-secondary btn-full" id="hc-routine">Carry on without them</button>
       </div>`;

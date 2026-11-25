@@ -1,6 +1,11 @@
 import { createRequire as __cr } from "node:module";
 /**
  * tools/verify-p46-free-home.mjs
+ * 24 Nov 2026 v2
+ *
+ * v2 - P-46 WAVE 8 FIX. The list ends with A walk or a run, which opens the
+ *   guided run (Wave 8, persona 2.1).
+ *
  * 24 Nov 2026 v1
  *
  * P-46 FREE-AND-FIRST, S4 FREE HOME (spec
@@ -129,7 +134,7 @@ ok("2f. ‹ Back from the check-in (nothing answered): Home, and nothing waiting
 console.log("\nTEST 3 - six ready-made sessions");
 fixture(); home();
 const rdy = q('[data-action="free-ready"]');
-ok("3a. Ready-made sessions: Six to choose from", /Ready-made sessions/.test(txt(rdy)) && /Six to choose from/.test(txt(rdy)));
+ok("3a. Ready-made sessions: Six sessions, or a run", /Ready-made sessions/.test(txt(rdy)) && /Six sessions, or a run/.test(txt(rdy)));
 click(rdy);
 ok("3b. it opens the six at home (no gym given)", navs.includes("path") && fakeRouter.pathStart?.free === true && fakeRouter.pathStart.place === "home");
 ok("3c. the six at home, as the spec names them", JSON.stringify(RS.FREE_READY.home) === JSON.stringify(["rm-gs-h1", "rm-gs-h5", "rm-gs-h6", "rm-km-h1", "rm-km-h2", "rm-km-h6"]));
@@ -146,7 +151,7 @@ fixture(); navs = [];
 fakeRouter.pathStart = { free: true, place: "home" };
 main.innerHTML = ""; const pv = PathView(fakeRouter); pv.mount(main);
 const rows = [...main.querySelectorAll(".path-list button")];
-ok("3g. the list: six, by name, each with its warm-up and stretch said", rows.length === 6 && /Whole body at home/.test(txt(rows[0])) && /warm-up and ends with a stretch/.test(txt(main)), txt(main).slice(0, 200));
+ok("3g. the list: six, by name, each with its warm-up and stretch said, then A walk or a run (v2, Wave 8)", rows.length === 7 && /A walk or a run/.test(txt(rows[6])) && /Whole body at home/.test(txt(rows[0])) && /warm-up and ends with a stretch/.test(txt(main)), txt(main).slice(0, 200));
 click(rows[0]);
 ok("3h. then How long have you got?", /How long have you got\?/.test(txt(main)));
 click(main.querySelector("#path-ready-go"));
@@ -156,7 +161,9 @@ click(main.querySelector("#path-start"));
 ok("3k. Start plays it in the one player", navs.includes("workout") && store.get("generatedSession")?.session?.id === "rm-gs-h1");
 fixture(); navs = []; delete fakeRouter.pathStart;
 main.innerHTML = ""; PathView(fakeRouter).mount(main);
-ok("3m. mounted again with the hand-off spent (Back from the player): the six again, as the Plan's doors do", !navs.includes("today") && main.querySelectorAll(".path-list button").length === 6);
+ok("3m. mounted again with the hand-off spent (Back from the player): the six again, as the Plan's doors do", !navs.includes("today") && main.querySelectorAll(".path-list button").length === 7);
+click([...main.querySelectorAll(".path-list button")].find(b => /A walk or a run/.test(txt(b))));
+ok("3n. A walk or a run opens the guided run (it plays on both tiers): Wave 8, persona 2.1", navs.includes("running-session"));
 
 console.log("\nTEST 4 - Log what I did, Your exercises, what the Plan adds");
 fixture(); home();
