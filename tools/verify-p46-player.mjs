@@ -1,5 +1,10 @@
 /**
  * tools/verify-p46-player.mjs
+ * 24 Nov 2026 v2
+ *
+ * v2 - P-46 WAVE 8 FIX. 1f: one way out on both tiers, Exit with the house
+ *   hidden (Free's house sat on 1 of 7 at text 2, Wave 8).
+ *
  * 24 Nov 2026 v1
  *
  * P-46 FREE-AND-FIRST, S5 PLAYER (spec
@@ -97,6 +102,7 @@ for (const tier of ["free", "personal"]) {
   ok(`1c-${tier}. More about this move, folded: Why, Watch out, How`, !!more && !more.open && txt(more.querySelector("summary")) === "More about this move"
      && /Why/.test(txt(more)) && /Watch out/.test(txt(more)) && /How/.test(txt(more)) && more.textContent.includes(e.why.slice(0, 20)));
   ok(`1d-${tier}. no steps strip, no Next: Why, no "I know this one"`, !$(".wo-steps") && !$("[data-step-go]") && !/I know this one/.test(txt(main)));
+  ok(`1f-${tier}. one way out: Exit, the house hidden beside it (v2, Wave 8: Free's sat on "1 of 7")`, txt($("#exit-workout-btn")) === "Exit" && $("#exit-workout-btn").classList.contains("plan-exit"));
   ok(`1e-${tier}. the main button is Set 1 done, with Finish this one and Skip`, txt($("#wo-set-done-btn")) === "Set 1 done" && !!$("#wo-done-btn") && !!$("#skip-exercise-btn"));
 }
 

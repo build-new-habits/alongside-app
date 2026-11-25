@@ -1,6 +1,8 @@
 /**
  * css/components/start.css
- * 24 Nov 2026 v2
+ * 25 Nov 2026 v3
+ *
+ * v3 - P-46 Wave 8: "3 of 4" stays on one line at the largest text.
  *
  * v2 - P-46 S3. .al: the question asked once, later, on both Homes.
  *
@@ -14,7 +16,7 @@
 .st-top { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); min-height: 44px; }
 .st-back { min-height: 44px; padding: 0 var(--space-2); color: var(--color-primary); }
 .st-back-space { min-width: 44px; }
-.st-count { font-size: var(--text-sm); color: var(--color-text-secondary); }
+.st-count { font-size: var(--text-sm); color: var(--color-text-secondary); white-space: nowrap; }   /* v3: "3 of 4" on one line at text 2 (Wave 8) */
 .st-dots { display: flex; gap: 6px; }
 .st-dot { width: 24px; height: 4px; border-radius: 2px; background: var(--color-border); }
 .st-dot.is-on { background: var(--color-primary); }

@@ -1,5 +1,10 @@
 /* ============================================================
    components/path.css
+   25 Nov 2026 v22
+
+   v22 - P-46 Wave 8: no house on the health-consent screens either; each
+   has its own way on.
+
    24 Nov 2026 v21
 
    v21 - P-46 S4: Free Home (.free-home, free-home.js) and the on-the-plan
@@ -430,7 +435,7 @@
 .is-plan h1:not(.sr-only) { font-size: var(--text-2xl); font-weight: var(--font-bold); line-height: 1.2; text-align: left; }
 .plan-back, .plan-exit { min-height: 44px; padding-left: 0; padding-right: var(--space-3); background: none; border: 0; color: var(--color-text); font-weight: 400; justify-content: flex-start; }
 /* One way back: a room with its own does not draw the house beside it. */
-body:has(#main-content .plan-back, #main-content .plan-exit) #hidden-nav-home-btn { display: none; }
+body:has(#main-content .plan-back, #main-content .plan-exit, #main-content .hc-view) #hidden-nav-home-btn { display: none; }   /* P-46 Wave 8: the consent screens have their own way on (Not now, Carry on without them) */
 .plan-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: var(--space-2) var(--space-4); border: 1px solid var(--color-border-strong, var(--color-border)); border-radius: 999px; background: var(--color-surface); color: var(--color-text); text-decoration: none; font-weight: var(--font-medium, 500); }
 /* Rooms whose heading sat beside the way back, or centred, on the Plan. */
 .is-plan .je-header, .is-plan .practices-header, .is-plan .library-sub-header, .is-plan .mc-header, .is-plan .prescribed-view-header, .is-plan .privacy-header { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-2); border-bottom: 0; }

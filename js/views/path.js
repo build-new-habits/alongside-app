@@ -1,5 +1,10 @@
 /**
  * views/path.js
+ * 24 Nov 2026 v19
+ *
+ * v19 - P-46 WAVE 8 FIX. Free's ready-made list ends with A walk or a run
+ *   (the guided run, which plays on both tiers): Wave 8, persona 2.1.
+ *
  * 24 Nov 2026 v18
  *
  * v18 - P-46 S4 FREE HOME. Free opens one thing here: its six ready-made
@@ -472,7 +477,7 @@ export function PathView(router) {
         <ul class="path-list">${freeReady(st.place).map(s => {
           const at = readySession(s, "usual");
           return row({ v: s.id, t: s.name, d: `${esc(s.line)} About ${at.minutes} min`, icon: DOOR[s.door].icon, kind: DOOR[s.door].kind });
-        }).join("")}</ul>`;
+        }).join("")}${row({ v: "free-run", t: "A walk or a run", d: "Outside, at your own pace", icon: DOOR.moving.icon, kind: DOOR.moving.kind })}</ul>`;
     },
     msize() {
       const s = readyById(st.rs);
@@ -888,7 +893,9 @@ export function PathView(router) {
         if (v === "ready") return go("ready", {});
         return;
       case "ready": return readyById(v) ? go("msize", { rs: v, msz: "usual" }) : undefined;
-      case "fready": return readyById(v) ? go("msize", { rs: v, msz: "usual", door: readyById(v).door }) : undefined;
+      case "fready":
+        if (v === "free-run") { router.navigate("running-session"); return; }   // P-46 Wave 8: a runner on Free (2.1)
+        return readyById(v) ? go("msize", { rs: v, msz: "usual", door: readyById(v).door }) : undefined;
       case "trends":
         if (v === "zone2") return go(followed("zone2")?.activity ? "z2day" : "z2act", {});
         if (v === "cross") {

@@ -1,5 +1,11 @@
 /**
  * tools/verify-p46-health-reask.mjs
+ * 24 Nov 2026 v2
+ *
+ * v2 - P-46 WAVE 8 LINE. 1e reads the clearer last line: why (I won't know
+ *   if something is sore or you're having a hard day), then So please listen
+ *   to your body: go gently, and stop if something doesn't feel right.
+ *
  * 25 Nov 2026 v1
  *
  * P-46 WAVE 8, persona 2.12 (Graeme, 25 Nov: "some might be protective of
@@ -77,7 +83,8 @@ ok("1a. the short ask again: Before your session", txt(main.querySelector("h1"))
 ok("1b. it does not say what is kept, or list the answers", !LIST.test(t1) && !main.querySelector("#hc-check"), t1);
 ok("1c. the coach can still give a routine, but can't fit it to how you are on the day", /still give you a gentle routine/.test(t1) && /can't fit it to how you are on the day/.test(t1));
 ok("1d. no is fine, and can be changed in Settings", /That's fine\. You can change your mind any time in Settings\./.test(t1));
-ok("1e. listen to your body, said first and strongly", /If you go without, listen to your body/.test(txt(main.querySelector(".hc-listen strong"))) && /ease off on days you're not at your best/.test(t1));
+// v2 (Graeme, same day: "If you go without sounds weird. Clear language with context"): the line says why.
+ok("1e. why, then listen to your body, said strongly", /Without them, I won't know if something is sore or you're having a hard day\./.test(t1) && txt(main.querySelector(".hc-listen strong")) === "So please listen to your body" && /go gently, and stop if something doesn't feel right\./.test(t1) && !/If you go without/.test(t1));
 ok("1f. two buttons: Yes, keep my answers · Carry on without them", txt(main.querySelector("#hc-back-to-tick")) === "Yes, keep my answers" && txt(main.querySelector("#hc-routine")) === "Carry on without them");
 
 console.log("\nTEST 2 - Yes, keep my answers");

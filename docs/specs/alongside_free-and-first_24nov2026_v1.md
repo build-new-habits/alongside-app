@@ -1,5 +1,7 @@
 # Alongside: Move — Free and first (P-46) spec
-## 25 Nov 2026 v8
+## 25 Nov 2026 v9
+
+**v9 (Graeme, 25 Nov: "If you go without sounds weird. Clear language with context"; "push all … fixes"):** the ask again's last line now says why: *Without them, I won't know if something is sore or you're having a hard day.* **So please listen to your body**: *go gently, and stop if something doesn't feel right.* Wave 8's smaller fixes: Free's player has the one way out (**Exit**, no house; it sat on *1 of 7*), the consent screens draw no house, *3 of 4* stays on one line, and Free's ready-made list ends with **A walk or a run** (the guided run; Home says *Six sessions, or a run*). Website PR #5 merged.
 
 **v8 (Graeme's decision on 2.12, 25 Nov):** *"Some might be protective of their personal data, so we should ask again without telling them what question specifically and what the answers would be used for"*, with a warning in better words. At a session door, someone who has said no is asked again on one short screen (`health-consent.js` v6): **Before your session** · *Without your answers I can still give you a gentle routine, the same for anyone. I just can't fit it to how you are on the day.* · *That's fine. You can change your mind any time in Settings.* · **If you go without, listen to your body**, *and ease off on days you're not at your best.* · **Yes, keep my answers** (the full screen and its tick; the consent is unchanged) · **Carry on without them** (the gentle routine; not asked again). Not now on the full screen leads to the same screen. The journal, Settings and a change of wording are unchanged. Gate `verify-p46-health-reask`.
 
@@ -115,4 +117,4 @@ Every screen: **at most about 15 words above the first button**. Longer text mov
 
 The voices and *Hear from your coach* (next month); payments and the 14-day trial (P-40, row 14); the 14+ age change (P-41); Free's Progress window (P-40 says 30 days, unchanged here).
 
-*Build New Habits · Alongside: Move · P-46 spec · 25 Nov 2026 v8*
+*Build New Habits · Alongside: Move · P-46 spec · 25 Nov 2026 v9*

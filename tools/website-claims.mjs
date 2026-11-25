@@ -100,7 +100,7 @@ export const SCENARIOS = [
   ]},
   { id: "know", title: "When I want to choose for myself", rows: [
     { text: "Six ready-made sessions, each with a warm-up and a stretch", free: true, plan: true,
-      proof: [P("js/data/ready-sessions.js", "FREE_READY"), P("js/views/free-home.js", "Six to choose from")] },
+      proof: [P("js/data/ready-sessions.js", "FREE_READY"), P("js/views/free-home.js", "Six sessions, or a run")] },
     { text: "Choose the kind of session, home or gym, and how long", free: false, plan: true,
       proof: [P("js/views/plan-home.js", "Get stronger"), P("js/views/on-the-plan.js", "Choose your session")] },
     { text: "Start from your purpose: get stronger, keep moving, stretch, or move to feel better", free: false, plan: true,

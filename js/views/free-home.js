@@ -4,7 +4,8 @@
  *
  * v2 - P-46 WAVE 8 FIX. Done today names the session from workoutHistory
  *   when the log entry has no name (Free's never does): it said "Your session"
- *   in the Wave 8 trace.
+ *   in the Wave 8 trace. Ready-made sessions says Six sessions, or a run:
+ *   the list ends with A walk or a run (path.js v19, persona 2.1).
  *
  * 24 Nov 2026 v1
  *
@@ -98,7 +99,7 @@ export function renderFreeHome(ctx = {}) {
       <h2 class="look-label" id="free-more-h">Or something else</h2>
       <ul class="path-doors" aria-labelledby="free-more-h">
         ${door('data-action="free-gentler"', "violet", "mobility", "Something gentler", "A short, easy session")}
-        ${door('data-action="free-ready"', "amber", "strength", "Ready-made sessions", "Six to choose from")}
+        ${door('data-action="free-ready"', "amber", "strength", "Ready-made sessions", "Six sessions, or a run")}
         ${door('data-route="activity-log" data-requires-checkin="false"', "slate", "pencil", "Log what I did", "A walk, a swim, a class")}
         ${hasList() ? door('data-route="prescribed" data-requires-checkin="false"', "teal", "list", "Your exercises", "Your own list") : ""}
       </ul>

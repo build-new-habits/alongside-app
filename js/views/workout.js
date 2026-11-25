@@ -1,6 +1,9 @@
 /**
  * workout.js - Workout Execution View
- * 24 Nov 2026 v42
+ * 25 Nov 2026 v43
+ *
+ * v43 - P-46 Wave 8 fixes. Free's way out is the Plan's: Exit, and no
+ *   house beside it (the house sat on "1 of 7" at the largest text).
  *
  * v42 - P-46 S5 PLAYER (both tiers; spec §6, mock-up v1 approved 24 Nov).
  *   One screen per move: Exit, n of N, the bar; the name; the dose; Swap, Do
@@ -550,10 +553,9 @@ import { soreLevel, areaWords } from "../data/conditions.js";
 const _plan = () => isPremium();
 /** Where a finished session goes: the Plan's finish, or Free's. */
 const _finishRoute = () => (_plan() ? "plan-finish" : "reflect");
-// Session 9. The Plan's one way out of a session: Exit, and no house beside it.
-const _exitBtn = () => (_plan()
-  ? `<button class="btn btn-ghost plan-exit" id="exit-workout-btn" aria-label="Exit workout">Exit</button>`
-  : `<button class="btn btn-ghost" id="exit-workout-btn" aria-label="Exit workout">\u2715 Exit</button>`);
+// Session 9. The one way out of a session: Exit, and no house beside it.
+// P-46 (Wave 8): both tiers; Free's house sat on top of "1 of 7" at text 2.
+const _exitBtn = () => `<button class="btn btn-ghost plan-exit" id="exit-workout-btn" aria-label="Exit workout">Exit</button>`;
 const _look = () => (_plan() ? " is-plan" : "");
 /** A low mood this morning, on the Plan: no countdown anywhere. */
 const _noClock = () => _plan() && lowMood();
