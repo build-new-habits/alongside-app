@@ -4487,7 +4487,7 @@ const SHELL_HASHES = {
   "./js/views/build-session.js": "763317cec8c62e83",
   "./js/data/build-lately.js": "e06714cc9d1539a6",
   "./css/components/path.css": "37805c062225d90d",
-  "./css/components/start.css": "e2621b6cdc4017e1",
+  "./css/components/start.css": "0f7b613d180c41ee",
   "./js/data/red-flag.js": "3cd9eecbc3985eb3",
   "./js/data/health-consent.js": "a23d005af57f179c",
   "./js/data/age-check.js": "7fa5b0f5a6b34770",
