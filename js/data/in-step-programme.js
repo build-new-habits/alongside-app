@@ -1,5 +1,18 @@
 /**
  * js/data/in-step-programme.js
+ * 25 Nov 2026 v2
+ *
+ * v2 - P-29 INSTEP-RECAP (approved by Graeme 19 Nov, BNH-Files
+ *   Product/alongside_content_in-step-recap_19nov2026_v3.md, word for word;
+ *   tools/verify-p29-recap.mjs reads it). Each episode carries its own
+ *   recap: about (what we talked about, standing on its own without the
+ *   title), notCame (its third answer), and recap.audio (the clip that says
+ *   the whole recap). The recap is shown when the NEXT episode opens, so it
+ *   lives on the episode it is about; the old prev line (on the episode
+ *   after) is gone, except Part 4's: p4e1 to p4e5's recaps are approved but
+ *   held for the clinical and safeguarding read of Part 4 (recapHeld), so
+ *   p4e2 to p4e6 keep the line they had until then.
+ *
  * 06 Nov 2026 v1
  *
  * P-28 EMPATHY-THREAD, S2 CONTENT DATA. In Step as a programme: four
@@ -45,12 +58,19 @@
 /** The plain line after every Choose, whichever way was chosen. */
 export const ACK = { text: "There's no wrong answer.", audio: "instep-no-wrong-answer" };
 
-/** "Did it come up?" The tap is all that is kept. Ids are Schema v1.123's. */
+/**
+ * "Did you get to try it?" The tap is all that is kept. Ids are Schema
+ * v1.123's. P-29 (approved 19 Nov): the first two are "I tried it" and
+ * "I forgot"; the third is the episode's own (notCame), because a moment
+ * that never came is not a miss. HELD_THIRD is said while a recap waits for
+ * its read (recapHeld), with the line it had before.
+ */
 export const ANSWERS = [
-  { id: "did",     label: "It did" },
-  { id: "not-yet", label: "Not yet" },
-  { id: "didnt",   label: "It didn't come up" },
+  { id: "did",     label: "I tried it" },
+  { id: "not-yet", label: "I forgot" },
+  { id: "didnt",   label: null },
 ];
+export const HELD_THIRD = "It didn't come up";
 
 export const PARTS = [
   { n: 1, name: "You",
@@ -69,7 +89,7 @@ export const PARTS = [
 
 export const EPISODES = [
   { id: "p1e1", part: 1, episode: 1, title: "Three answers",
-    prev: null,
+    about: "how honestly you say how you are, starting with your three check-in answers", notCame: "Nobody asked", recap: { audio: "instep-recap-1-1" },
     listen: { text: "This morning, or whenever you last checked in, you told me three things. How much energy you had. How you were feeling. Whether anything was sore. Those answers changed what I gave you. A lower number made the session gentler. A sore knee left some moves out. You told me the truth about your day, and the day was planned around it. So we start there: you, and how honestly you meet yourself.", audio: "instep-p1-e1-listen" },
     hold: { pose: "Standing tall", how: "Feet hip-width, arms easy by your sides.",
       alt: { label: "Seated", text: "Sit tall, feet flat, hands on your thighs." },
@@ -78,7 +98,7 @@ export const EPISODES = [
       options: ["Say “fine”, and mean “let's not get into it”.", "Give the honest answer, if it's someone I trust.", "Notice I'm not sure, and leave it there."] },
     carry: { text: "Once today, when someone asks how you are, notice the answer you give, and the one you didn't.", audio: "instep-p1-e1-carry" } },
   { id: "p1e2", part: 1, episode: 2, title: "The session you didn't do",
-    prev: "Last time: notice the answer you give, and the one you didn't. Did it come up?",
+    about: "days when a plan doesn't fit, and seeing that as information, not a failing", notCame: "My plans held", recap: { audio: "instep-recap-1-2" },
     listen: { text: "Think of a day you'd planned to move and didn't. Not because anything went wrong. You just didn't feel like it. It's easy to call that lazy, or a slip. Here's what I saw on days like that: someone who was tired, or full, or somewhere else in their head. The plan didn't fit the day. That isn't a failing. It's information, and you'd see it that way in anyone else.", audio: "instep-p1-e2-listen" },
     hold: { pose: "Wall lean", how: "Back against a wall, feet a little forward, let the wall take your weight.",
       alt: { label: "Seated", text: "Sit back in the chair and let it hold you." },
@@ -87,7 +107,7 @@ export const EPISODES = [
       options: ["Notice it, and leave it there.", "Get curious about what actually got in the way.", "Do something small instead, just to keep the thread going."] },
     carry: { text: "If you change a plan today, say the reason to yourself plainly, the way you'd say it about a friend.", audio: "instep-p1-e2-carry" } },
   { id: "p1e3", part: 1, episode: 3, title: "Two standards",
-    prev: "Last time: say the reason plainly, the way you'd say it about a friend. Did it come up?",
+    about: "the kind voice you use for friends, and the sharper one you use on yourself", notCame: "It didn't get sharp", recap: { audio: "instep-recap-1-3" },
     listen: { text: "A friend tells you they didn't manage their run this week. What do you say? Probably something kind. That's okay. Life's busy. Go when you can. Now think about what you said to yourself the last time you didn't manage something. Often the two voices sound nothing alike. One is patient. The other is keeping score. You already know how to be patient. The question is who gets left out of it.", audio: "instep-p1-e3-listen" },
     hold: { pose: "Seated, hands resting", how: "Sit tall, one hand on your chest, one on your belly.",
       alt: { label: "Standing", text: "Or stand, hands the same." },
@@ -96,7 +116,7 @@ export const EPISODES = [
       options: ["Notice the double standard, nothing more.", "Ask what you'd actually say to a friend in this spot.", "Let the moment pass without dwelling on it."] },
     carry: { text: "Once today, when your inner voice gets sharp, ask: would I say this to someone I like?", audio: "instep-p1-e3-carry" } },
   { id: "p1e4", part: 1, episode: 4, title: "The pride you talked down",
-    prev: "Last time: would I say this to someone I like? Did it come up?",
+    about: "how quickly a moment of pride gets talked down", notCame: "Nothing stood out", recap: { audio: "instep-recap-1-4" },
     listen: { text: "Something went well for you recently. Maybe a session, maybe something at work, maybe just a day you got through. For a second, you felt proud. And then, quite quickly, something talked you out of it. It wasn't much. Anyone could have done it. Lots of people do more. That second voice is very fast. Today, let the moment be as big as it was.", audio: "instep-p1-e4-listen" },
     hold: { pose: "Standing level", how: "Standing tall, arms easy, chin level.",
       alt: { label: "Seated", text: "Sit tall and let your shoulders settle." },
@@ -105,7 +125,7 @@ export const EPISODES = [
       options: ["Let the pride sit a moment longer, even if it's uncomfortable.", "Name specifically what you did that earned it.", "Move on. The moment's already passed."] },
     carry: { text: "If something goes well today, let it be the size it was. Don't shrink it.", audio: "instep-p1-e4-carry" } },
   { id: "p1e5", part: 1, episode: 5, title: "The decision nobody saw",
-    prev: "Last time: let it be the size it was. Did it come up?",
+    about: "the quiet decision to show up at all, which nobody else sees", notCame: "Nobody seemed slow", recap: { audio: "instep-recap-1-5" },
     listen: { text: "Some days, the hardest part isn't the session. It's the moment before it, deciding to go at all. That moment doesn't get logged anywhere. Nobody claps. Most people around you will never know it happened. But it did. You made a choice when another one was easier. Everyone you meet has moments like that: quiet decisions nobody saw. You've just had one, so you know what they cost.", audio: "instep-p1-e5-listen" },
     hold: { pose: "Wall lean", how: "Back against a wall, feet a little forward.",
       alt: { label: "Seated", text: "Sit back and let the chair hold you." },
@@ -114,7 +134,7 @@ export const EPISODES = [
       options: ["Notice the decision, quietly.", "Think about what made the difference today.", "Let it be ordinary. Not everything needs marking."] },
     carry: { text: "Today, when someone seems slow or reluctant, remember there may be a decision you can't see.", audio: "instep-p1-e5-carry" } },
   { id: "p1e6", part: 1, episode: 6, title: "Adjusting",
-    prev: "Last time: a decision you can't see. Did it come up?",
+    about: "how I fit the plan to your day, and turning that towards people close to you", notCame: "I didn't spot anyone", recap: { audio: "instep-recap-1-6" },
     listen: { text: "Every time you've checked in, I've changed something. A shorter session on a low day. A move left out for a sore back. A quieter finish when your mood was low. I didn't ask whether you deserved it. I just met you where you were. You've been doing some of that for yourself too. Next time, we'll turn it outward, towards the people closest to you. You already know how this works. You've been on the receiving end of it.", audio: "instep-p1-e6-listen" },
     hold: { pose: "Standing, then soften", how: "Stand tall, then let your knees soften and your arms hang.",
       alt: { label: "Seated", text: "Sit tall, then let your shoulders drop." },
@@ -123,7 +143,7 @@ export const EPISODES = [
       options: ["Notice that changing the plan was a choice, not a failure.", "Think of someone who might need their plan changed this week.", "Keep it simple. It's just what today needed."] },
     carry: { text: "Once today, notice someone whose plan didn't fit their day, and give them a little room.", audio: "instep-p1-e6-carry" } },
   { id: "p2e1", part: 2, episode: 1, title: "The short reply",
-    prev: "Last time: once today, notice someone whose plan didn't fit their day, and give them a little room. Did it come up?",
+    about: "why someone close might be short with you, and how often it's their morning", notCame: "Nobody was short with me", recap: { audio: "instep-recap-2-1" },
     listen: { text: "Someone close to you is short with you, for no obvious reason. One word where there'd usually be a sentence. It's easy to take it personally, and sometimes it is personal. But think about your own short replies. Most of them weren't about the person in front of you. They were about the morning, or the inbox, or the night before. The person you love is carrying a check-in you haven't seen.", audio: "instep-p2-e1-listen" },
     hold: { pose: "Standing tall", how: "Feet hip-width, arms easy by your sides.",
       alt: { label: "Seated", text: "Sit tall, feet flat, hands on your thighs." },
@@ -132,7 +152,7 @@ export const EPISODES = [
       options: ["Take it at face value and move on.", "Wonder what might be sitting underneath it for them.", "Ask them directly what's going on."] },
     carry: { text: "When someone close is short with you today, wonder about their morning before you answer.", audio: "instep-p2-e1-carry" } },
   { id: "p2e2", part: 2, episode: 2, title: "The cancelled plan",
-    prev: "Last time: when someone close is short with you today, wonder about their morning before you answer. Did it come up?",
+    about: "a friend cancelling, and how it can mean they didn't have enough left", notCame: "No plans fell through", recap: { audio: "instep-recap-2-2" },
     listen: { text: "A friend cancels on you at the last minute, again. You can feel the day quietly reorganising itself. You might be disappointed. That's fair. You might also remember a time you cancelled, and how much it took just to send the message. From the outside, a cancellation looks like not caring. From the inside, it's often the opposite: someone who didn't have enough left to come.", audio: "instep-p2-e2-listen" },
     hold: { pose: "Wall lean", how: "Back against a wall, feet a little forward. Let the wall take your weight.",
       alt: { label: "Seated", text: "Sit back in the chair and let it hold you." },
@@ -141,7 +161,7 @@ export const EPISODES = [
       options: ["Let it go, no comment.", "Notice what might actually be going on for them.", "Notice what you're feeling before you decide how to respond."] },
     carry: { text: "If a plan falls through today, notice what you feel before you decide what it means.", audio: "instep-p2-e2-carry" } },
   { id: "p2e3", part: 2, episode: 3, title: "The same worry again",
-    prev: "Last time: if a plan falls through today, notice what you feel before you decide what it means. Did it come up?",
+    about: "a worry that keeps coming back, and how being heard can make it lighter", notCame: "Nobody repeated a worry", recap: { audio: "instep-recap-2-3" },
     listen: { text: "Someone in your family brings up the same worry again. You've heard this one a few times now. It's tempting to give the same answer, a little shorter each time. But a worry that keeps coming back usually hasn't been put down yet. Repeating it is how some people carry it. You don't have to fix it. Sometimes being heard is the only thing that makes it lighter.", audio: "instep-p2-e3-listen" },
     hold: { pose: "Seated, palms up", how: "Sit tall, hands resting on your thighs, palms up.",
       alt: { label: "Standing", text: "Or stand, hands open by your sides." },
@@ -150,7 +170,7 @@ export const EPISODES = [
       options: ["Answer it the way you have before.", "Notice that repetition is often what worry sounds like.", "Say plainly that you've noticed they're carrying this."] },
     carry: { text: "If someone repeats a worry today, listen as if it's the first time.", audio: "instep-p2-e3-carry" } },
   { id: "p2e4", part: 2, episode: 4, title: "Their good news",
-    prev: "Last time: if someone repeats a worry today, listen as if it's the first time. Did it come up?",
+    about: "feeling glad, and something harder to say, when someone gets what you wanted", notCame: "Nobody shared news", recap: { audio: "instep-recap-2-4" },
     listen: { text: "Someone you care about gets something you've wanted for yourself. A job, a home, a body that seems to just work. You're glad for them. And there's another feeling under it, harder to say out loud. Both can be true at once. Noticing the second one honestly doesn't make you a worse friend. It makes you an honest one, and honest people are easier to be close to.", audio: "instep-p2-e4-listen" },
     hold: { pose: "Standing level", how: "Standing tall, arms easy, chin level.",
       alt: { label: "Seated", text: "Sit tall and let your shoulders settle." },
@@ -159,7 +179,7 @@ export const EPISODES = [
       options: ["Notice the mixed feeling honestly, without judging it.", "Focus on what this means for them, not you.", "Let both feelings exist at once."] },
     carry: { text: "If someone shares good news today, let yourself feel all of it, then tell them you're glad.", audio: "instep-p2-e4-carry" } },
   { id: "p2e5", part: 2, episode: 5, title: "The quiet one",
-    prev: "Last time: if someone shares good news today, let yourself feel all of it, then tell them you're glad. Did it come up?",
+    about: "someone close going quiet, and how staying near helps more than questions", notCame: "Nobody went quiet", recap: { audio: "instep-recap-2-5" },
     listen: { text: "Someone close to you has gone quiet. Not angry, just further away than usual, for a few days now. You might want to fix it, or ask a lot of questions, or take it as something you did. Think about your own quiet days. What helped? Usually not questions. Usually someone staying near, and not needing anything from you.", audio: "instep-p2-e5-listen" },
     hold: { pose: "Holding yourself", how: "Cross your arms and rest your hands on your shoulders.",
       alt: { label: "Seated", text: "The same, sitting down." },
@@ -168,7 +188,7 @@ export const EPISODES = [
       options: ["Leave space, and stay near.", "Ask once, gently, and accept the answer.", "Notice your own worry before you act on it."] },
     carry: { text: "Today, if someone close is quiet, stay near without needing them to talk.", audio: "instep-p2-e5-carry" } },
   { id: "p2e6", part: 2, episode: 6, title: "Meeting them where they are",
-    prev: "Last time: today, if someone close is quiet, stay near without needing them to talk. Did it come up?",
+    about: "changing one small thing for someone whose day isn't going to plan", notCame: "The week's still going", recap: { audio: "instep-recap-2-6" },
     listen: { text: "Every time you check in, I change the plan to fit your day. Shorter on a low day. Gentler on a sore one. Nobody asks whether you've earned it. Now think of someone close to you whose day isn't going the way it was planned. What would it look like to change one small thing for them? Not a big gesture. Just meeting them where they actually are.", audio: "instep-p2-e6-listen" },
     hold: { pose: "Standing, then soften", how: "Stand tall, then let your knees soften and your arms hang.",
       alt: { label: "Seated", text: "Sit tall, then let your shoulders drop." },
@@ -177,7 +197,7 @@ export const EPISODES = [
       options: ["Change one thing to fit their day, not yours.", "Ask what would help, and take the answer as it comes.", "Notice where they actually are, and leave it there."] },
     carry: { text: "This week, change one small plan to fit someone else's day.", audio: "instep-p2-e6-carry" } },
   { id: "p3e1", part: 3, episode: 1, title: "The queue",
-    prev: "Last time: this week, change one small plan to fit someone else's day. Did it come up?",
+    about: "seeing a stranger at a bad moment, when you saw one second of their day", notCame: "I didn't see that", recap: { audio: "instep-recap-3-1" },
     listen: { text: "Someone in the queue ahead of you snaps at the person serving them. It's uncomfortable to watch. You might feel annoyed at them, or sorry for the person behind the counter, or both. You only saw one second of their day. You don't know what came before it. That doesn't make the snap okay. It just means the second you saw isn't the whole person.", audio: "instep-p3-e1-listen" },
     hold: { pose: "Standing tall", how: "Feet hip-width, arms easy by your sides.",
       alt: { label: "Seated", text: "Sit tall, feet flat, hands on your thighs." },
@@ -186,7 +206,7 @@ export const EPISODES = [
       options: ["Notice your own reaction to watching it.", "Wonder what kind of day led to that.", "Let it pass. No read needed."] },
     carry: { text: "If you see someone at their worst today, remember it's one second of their day.", audio: "instep-p3-e1-carry" } },
   { id: "p3e2", part: 3, episode: 2, title: "The car that cut in",
-    prev: "Last time: if you see someone at their worst today, remember it's one second of their day. Did it come up?",
+    about: "the quick, hot flash when a car cuts in front of you, and how long you carry it", notCame: "Nobody got in my way", recap: { audio: "instep-recap-3-2" },
     listen: { text: "Someone cuts in ahead of you in traffic, badly. There's a flash, quick and hot. That flash is your body doing its job. What happens next is a choice. You'll never know who was in that car. They might not have seen you. They might be late for something that really matters. Or they might just be careless. You get to decide how long you carry it.", audio: "instep-p3-e2-listen" },
     hold: { pose: "Gentle sway", how: "Stand with feet hip-width and let your weight move slowly from one foot to the other.",
       alt: { label: "Seated", text: "Seated: let your weight move slowly from one side of the chair to the other." },
@@ -195,7 +215,7 @@ export const EPISODES = [
       options: ["Feel the flash of annoyance, and let it be brief.", "Consider they might not have seen you, or might be having a rough day.", "Let it go entirely. No story attached."] },
     carry: { text: "When someone gets in your way today, see how short you can make the flash.", audio: "instep-p3-e2-carry" } },
   { id: "p3e3", part: 3, episode: 3, title: "The sharp comment",
-    prev: "Last time: when someone gets in your way today, see how short you can make the flash. Did it come up?",
+    about: "a sharp opinion from a stranger, and the experience that may sit behind it", notCame: "Nothing sharp came up", recap: { audio: "instep-recap-3-3" },
     listen: { text: "A stranger online says something you disagree with, sharply. You can feel the reply forming before you've finished reading. Behind every certain opinion there's usually an experience you haven't had. That doesn't make them right. It makes them a person, with reasons. You don't have to agree, and you don't have to answer. Noticing the reasons is enough for today.", audio: "instep-p3-e3-listen" },
     hold: { pose: "Seated, palms up", how: "Sit tall, hands resting on your thighs, palms up.",
       alt: { label: "Standing", text: "Or stand, hands open by your sides." },
@@ -204,7 +224,7 @@ export const EPISODES = [
       options: ["Notice your own charge before responding.", "Consider what experience might sit behind their certainty.", "Scroll on. Not every charge needs closing."] },
     carry: { text: "Before you reply to anything sharp today, wait one breath.", audio: "instep-p3-e3-carry" } },
   { id: "p3e4", part: 3, episode: 4, title: "The heavy bag",
-    prev: "Last time: before you reply to anything sharp today, wait one breath. Did it come up?",
+    about: "offering help in a way that lets the other person decide", notCame: "Nobody needed a hand", recap: { audio: "instep-recap-3-4" },
     listen: { text: "You see someone struggling to carry something heavy, and you're not sure if they want help. Offering can feel awkward. Not offering can feel worse. Think about the times you were struggling with something. Some offers helped. Some made you feel watched. The difference was usually whether the other person let you decide.", audio: "instep-p3-e4-listen" },
     hold: { pose: "Wall lean", how: "Back against a wall, feet a little forward. Let the wall take your weight.",
       alt: { label: "Seated", text: "Sit back in the chair and let it hold you." },
@@ -213,7 +233,7 @@ export const EPISODES = [
       options: ["Offer, and let them decide.", "Notice the hesitation in yourself before deciding.", "Walk on. Not every moment is yours to enter."] },
     carry: { text: "If you offer help today, make it easy for them to say no.", audio: "instep-p3-e4-carry" } },
   { id: "p3e5", part: 3, episode: 5, title: "The slow walker",
-    prev: "Last time: if you offer help today, make it easy for them to say no. Did it come up?",
+    about: "someone slow in front of you, and the slow days you've had yourself", notCame: "Nobody slowed me down", recap: { audio: "instep-recap-3-5" },
     listen: { text: "You're in a hurry on a narrow pavement, and the person in front of you is walking slowly. There's no way past. It's easy to sigh, or edge closer. But you've had slow days. Days when your legs, or your head, or your energy just wouldn't go any faster. From behind, you'd have looked like someone in the way. You were someone doing their best.", audio: "instep-p3-e5-listen" },
     hold: { pose: "Gentle sway", how: "Stand with feet hip-width and let your weight move slowly from one foot to the other.",
       alt: { label: "Seated", text: "Seated: let your weight move slowly from one side of the chair to the other." },
@@ -222,7 +242,7 @@ export const EPISODES = [
       options: ["Slow down with them for a few steps.", "Wonder what's making today slow for them.", "Pass when there's room, without a sigh."] },
     carry: { text: "If someone is slow in front of you today, give them three steps before you pass.", audio: "instep-p3-e5-carry" } },
   { id: "p3e6", part: 3, episode: 6, title: "The person serving you",
-    prev: "Last time: if someone is slow in front of you today, give them three steps before you pass. Did it come up?",
+    about: "the whole day the person serving you has had before you arrived", notCame: "Nobody served me", recap: { audio: "instep-recap-3-6" },
     listen: { text: "The person who serves you today has had a whole day before you arrived. You might be their first customer, or their two hundredth. They might be tired, or on their feet for hours, or thinking about someone at home. You can't see any of that. You can see that they're there. That's often enough to change how you say thank you.", audio: "instep-p3-e6-listen" },
     hold: { pose: "Standing level", how: "Standing tall, arms easy, chin level.",
       alt: { label: "Seated", text: "Sit tall and let your shoulders settle." },
@@ -231,7 +251,7 @@ export const EPISODES = [
       options: ["Say thank you, and mean it.", "Notice they've had a whole day before you.", "Keep it brief. That can be kind too."] },
     carry: { text: "Today, look up when you say thank you to someone serving you.", audio: "instep-p3-e6-carry" } },
   { id: "p4e1", part: 4, episode: 1, title: "The night shift",
-    prev: "Last time: today, look up when you say thank you to someone serving you. Did it come up?",
+    about: "people whose working day happens while you sleep", notCame: "I couldn't think of one", recap: { audio: "instep-recap-4-1" }, recapHeld: true,
     listen: { text: "Right now, someone is starting their working day as yours is ending. They'll sleep while you're out. They'll eat breakfast at a time you'd call dinner. Their tired doesn't look like your tired, and their good day doesn't either. You'll pass people like this without knowing. On their way home in the morning, they'll pass you on your way out.", audio: "instep-p4-e1-listen" },
     hold: { pose: "Standing tall", how: "Feet hip-width, arms easy by your sides.",
       alt: { label: "Seated", text: "Sit tall, feet flat, hands on your thighs." },
@@ -240,6 +260,7 @@ export const EPISODES = [
       options: ["Notice how much of the world runs while you sleep.", "Wonder what their good day looks like.", "Leave it there. Some lives just run on different hours."] },
     carry: { text: "Today, notice one thing that was done for you while you were asleep.", audio: "instep-p4-e1-carry" } },
   { id: "p4e2", part: 4, episode: 2, title: "Caring for someone",
+    about: "people whose day bends, every day, around someone they care for", notCame: "No chance to ask", recap: { audio: "instep-recap-4-2" }, recapHeld: true,
     prev: "Last time: today, notice one thing that was done for you while you were asleep. Did it come up?",
     listen: { text: "Someone near you plans their whole day around another person. A parent, a partner, a child who needs more than most. Their energy goes somewhere before it reaches them. When they're late, or short, or can't come, there's usually someone else's need behind it. You have days when your plan has to bend. Theirs bends every day.", audio: "instep-p4-e2-listen" },
     hold: { pose: "Holding yourself", how: "Cross your arms and rest your hands on your shoulders.",
@@ -249,6 +270,7 @@ export const EPISODES = [
       options: ["Notice how much of their day you never see.", "Offer one small thing, without making it a favour.", "Let them be more than their caring. Ask about them."] },
     carry: { text: "If someone you know cares for another person, ask about them, not just the person they care for.", audio: "instep-p4-e2-carry" } },
   { id: "p4e3", part: 4, episode: 3, title: "A body that tires differently",
+    about: "people for whom a low-energy day is most days", notCame: "I didn't see anyone", recap: { audio: "instep-recap-4-3" }, recapHeld: true,
     prev: "Last time: if someone you know cares for another person, ask about them, not just the person they care for. Did it come up?",
     listen: { text: "You've had low-energy days. Days when the stairs looked longer and everything cost more. For some people, that's most days. Their body tires faster, or hurts more, or needs more rest than it shows. From the outside they might look fine. You know, a little, what's under that. Your low days have taught you something you can use.", audio: "instep-p4-e3-listen" },
     hold: { pose: "Seated, palms up", how: "Sit tall, hands resting on your thighs, palms up.",
@@ -258,6 +280,7 @@ export const EPISODES = [
       options: ["Remember your own low days, and how little showed.", "Slow your pace to theirs without saying why.", "Let it be theirs to mention, not yours to ask."] },
     carry: { text: "Today, if someone takes the lift or sits down, assume there's a reason you can't see.", audio: "instep-p4-e3-carry" } },
   { id: "p4e4", part: 4, episode: 4, title: "A different start",
+    about: "how everyone was shaped by a start they didn't choose", notCame: "Nobody surprised me", recap: { audio: "instep-recap-4-4" }, recapHeld: true,
     prev: "Last time: today, if someone takes the lift or sits down, assume there's a reason you can't see. Did it come up?",
     listen: { text: "Think about where you grew up. The people around you. What there was, and what there wasn't. Now picture starting somewhere else entirely. A different place, different people, different chances. You'd still be you, but you'd have been shaped by different things. Everyone you meet was shaped like that, by a start they didn't choose.", audio: "instep-p4-e4-listen" },
     hold: { pose: "Standing, then soften", how: "Stand tall, then let your knees soften and your arms hang.",
@@ -267,6 +290,7 @@ export const EPISODES = [
       options: ["Wonder who you'd be if you'd started where they did.", "Notice what your own start gave you without asking.", "Let them be more than where they started."] },
     carry: { text: "Today, when someone surprises you, wonder what shaped them.", audio: "instep-p4-e4-carry" } },
   { id: "p4e5", part: 4, episode: 5, title: "Finding their way",
+    about: "being new somewhere, and how much a small kindness means then", notCame: "Nobody looked lost", recap: { audio: "instep-recap-4-5" }, recapHeld: true,
     prev: "Last time: today, when someone surprises you, wonder what shaped them. Did it come up?",
     listen: { text: "Someone near you is new. To the area, the job, the language, the way things are done here. Everything takes them longer, because nothing is automatic yet. You've been new somewhere. You'll remember how tiring it was, working everything out while trying to look as if you already knew. A small kindness meant a lot then.", audio: "instep-p4-e5-listen" },
     hold: { pose: "Gentle sway", how: "Stand with feet hip-width and let your weight move slowly from one foot to the other.",

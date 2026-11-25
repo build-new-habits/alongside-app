@@ -1,5 +1,14 @@
 /**
  * js/data/in-step-offer.js
+ * 25 Nov 2026 v3
+ *
+ * v3 - P-29 INSTEP-RECAP. lastCarryAt (Schema v1.136): the local day an
+ *   episode reached its Carry it, written with lastCarry. lastTime() gives
+ *   the recap for that episode (its title, about, Carry it and third
+ *   answer, from in-step-programme.js) with when it was in words
+ *   (whenWords); Part 4's recaps are held for their read and keep the line
+ *   they had. The answer ids are unchanged.
+ *
  * 06 Nov 2026 v2
  *
  * v2 - P-28 FINISH (Graeme, 06 Nov). The low day's line is "This one's
@@ -47,7 +56,7 @@ export const LOW_ENERGY_MAX     = 4;   // as the finish lines (reflect.js)
 export const LOW_MOOD_MAX       = 3;   // the check-in's Struggling and Low
 export const ANSWER_IDS         = ["did", "not-yet", "didnt"];
 
-const DEFAULT = Object.freeze({ part: 1, episode: 1, done: [], lastCarry: null, lastAnswer: null, offeredAt: null, offeredSession: 0 });
+const DEFAULT = Object.freeze({ part: 1, episode: 1, done: [], lastCarry: null, lastCarryAt: null, lastAnswer: null, offeredAt: null, offeredSession: 0 });
 
 /** The programme record, always whole. */
 export function programme() {
@@ -72,11 +81,55 @@ export function isOpen(id, p = programme()) {
   return !!getEpisode(id) && (p.done.includes(id) || id === currentEpisodeId(p));
 }
 
-/** The line that opens an episode: last time's Carry it, if there was one. */
-export function lastTimeLine(p = programme()) {
+/** The local day, YYYY-MM-DD (P-29: lastCarryAt is the person's own day). */
+export function localDay(d = new Date()) {
+  const z = n => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${z(d.getMonth() + 1)}-${z(d.getDate())}`;
+}
+
+const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+/**
+ * P-29. When last time was, in words: Earlier today, Yesterday, On Monday
+ * (2 to 6 days), Last week (7 to 13), A while ago (14 or more). No date
+ * kept (an episode finished before P-29 shipped): "Last time".
+ */
+export function whenWords(day, now = new Date()) {
+  const m = typeof day === "string" && /^(\d{4})-(\d{2})-(\d{2})$/.exec(day);
+  if (!m) return "Last time";
+  const then = new Date(+m[1], +m[2] - 1, +m[3]);
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const n = Math.round((today - then) / 86400000);
+  if (n <= 0) return "Earlier today";
+  if (n === 1) return "Yesterday";
+  if (n <= 6) return `On ${DAYS[then.getDay()]}`;
+  if (n <= 13) return "Last week";
+  return "A while ago";
+}
+
+/**
+ * P-29. Last time's recap, about the episode whose Carry it was given last,
+ * or null (none yet, or the last one of all). { episode, when, held, line }:
+ * held is true while that recap waits for Part 4's read, and line is then
+ * the line it had before.
+ */
+export function lastTime(p = programme(), now = new Date()) {
   if (!p.lastCarry) return null;
+  const e = getEpisode(p.lastCarry);
   const next = nextEpisodeId(p.lastCarry);
-  return next ? getEpisode(next).prev : null;
+  if (!e || !next) return null;
+  // Held: the line it had, without its old question (the screen now asks
+  // "Did you get to try it?" once, for every recap).
+  if (e.recapHeld) return { episode: e, when: whenWords(p.lastCarryAt, now), held: true, line: (getEpisode(next).prev || "").replace(/\s*Did it come up\?$/, "") || null };
+  if (!e.about) return null;
+  return { episode: e, when: whenWords(p.lastCarryAt, now), held: false, line: null };
+}
+
+/** True when an episode opens with last time's recap (kept for its callers). */
+export function lastTimeLine(p = programme()) {
+  const t = lastTime(p);
+  if (!t) return null;
+  return t.held ? t.line : `${t.when}, in “${t.episode.title}”, we talked about ${t.episode.about}.`;
 }
 
 /** The tap after "Did it come up?". Only one of the three, nothing else. */
@@ -96,7 +149,7 @@ export function completeEpisode(id) {
     const next = nextEpisodeId(id);
     if (next) { const e = getEpisode(next); part = e.part; episode = e.episode; }
   }
-  _save({ ...p, done, part, episode, lastCarry: id, lastAnswer: null });
+  _save({ ...p, done, part, episode, lastCarry: id, lastCarryAt: localDay(), lastAnswer: null });
 }
 
 /** What today says about offering: from the check-in and the sore areas. */

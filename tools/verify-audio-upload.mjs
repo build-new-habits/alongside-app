@@ -1,5 +1,9 @@
 /**
  * tools/verify-audio-upload.mjs
+ * 25 Nov 2026 v3
+ *
+ * v3 - P-29 INSTEP-RECAP: 3a counts 132, the 109 and In Step's 23 recap clips.
+ *
  * 18 Nov 2026 v2
  *
  * v2 - 3d, 3e: a file saved as guide-ride-00.mp3.mp3 (the ending twice,
@@ -61,7 +65,9 @@ ok("2e. two batches wait for each other (no lost commit)", !!WF && /concurrency:
 console.log("\nTEST 3 - the names");
 const { clipIds, fingerprint } = await import(new URL("./build-audio.mjs", import.meta.url).href);
 const ids = clipIds();
-ok("3a. 109 clips, every one from the app's own data", ids.length === 109, String(ids.length));
+// v3 (P-29): 109 from the voice script v2, and In Step's 23 recap clips (instep-recap-1-1 to -4-5),
+// whose own script is BNH-Files Product/alongside_voice_script_instep-recap_25nov2026_v1.md.
+ok("3a. 132 clips, every one from the app's own data (109, and the 23 recaps)", ids.length === 132 && ids.filter(id => /^instep-recap-[1-4]-[1-6]$/.test(id)).length === 23, String(ids.length));
 ok("3b. no two clips share a name, and every name is a file name", new Set(ids).size === ids.length && ids.every(id => /^[a-z0-9-]+$/.test(id)));
 const { GUIDE_SESSIONS } = await import(new URL("../js/data/guide-me.js", import.meta.url).href);
 const tracks = Object.values(GUIDE_SESSIONS).map(s => s.track);

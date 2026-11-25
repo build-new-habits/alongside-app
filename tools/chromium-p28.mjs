@@ -66,7 +66,7 @@ let measured = 0;
 const SCREENS = [
   ["Wellbeing", async p => { await nav(p, "noticing"); }, "#noticing-in-step-btn.k-orchid"],
   ["In Step: the list", async p => { await setProg(p, { part: 2, episode: 3, done: ["p1e1", "p1e2", "p1e3", "p1e4", "p1e5", "p1e6", "p2e1", "p2e2"], lastCarry: "p2e2", lastAnswer: null }); await nav(p, "in-step"); }, ".instep-next"],
-  ["In Step: Before we start", async p => { await click(p, ".instep-next"); }, "[data-answer]"],
+  ["In Step: Last time", async p => { await click(p, ".instep-next"); }, "[data-answer]"],
   ["In Step: Listen", async p => { await click(p, '[data-answer="did"]'); }, ".instep-said"],
   ["In Step: Hold still", async p => { await click(p, "#is-next"); }, "#is-hold-go"],
   ["In Step: holding", async p => { await click(p, "#is-hold-go"); }, ".instep-ring"],

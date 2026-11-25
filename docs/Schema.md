@@ -1,5 +1,7 @@
 # Alongside — Data Schema Reference
-## 24 Nov 2026 v1.135
+## 25 Nov 2026 v1.136
+
+> **v1.136, 25 Nov 2026 — P-29 INSTEP-RECAP, schema first** (`store.js` v133). Wording approved by Graeme, 19 Nov (BNH-Files `Product/alongside_content_in-step-recap_19nov2026_v3.md`). **One key added to `inStepProgress.programme`: `lastCarryAt`** (`'YYYY-MM-DD'`, the person's local day, or `null`; default `null`): the day the episode named by `lastCarry` reached its *Carry it*. **Written by** `in-step-offer.js` `completeEpisode()`, with `lastCarry`. **Read by** In Step's *Last time* screen, only to say when that was (*Earlier today*, *Yesterday*, *On Monday*, *Last week*, *A while ago*; no date: *Last time*). **On load** (`store._cleanP28()`): anything not a valid date loads as `null`, so a record from before this version gains `null`. Restore carries it with the rest of `inStepProgress`. **`lastAnswer`'s ids are unchanged** (`did`, `not-yet`, `didnt`); what they are labelled changes: `did` *I tried it*, `not-yet` *I forgot*, `didnt` the episode's own third answer (for example *Nobody asked*), or *It didn't come up* while a Part 4 recap waits for its read. Both tiers. Gated by `tools/verify-p29-recap.mjs`.
 
 > **v1.135, 24 Nov 2026 — P-46 S3 ASK LATER.** No field changed. **`askLater`** now has its reader and writer in use: `js/data/ask-later.js` (Home's one question, both tiers) reads it to choose the question (never on a hard day, one a day, Not now final, only for `onboarding.flow` `"short"`) and writes `shownAt`, `answeredAt`, `notNowAt` through `store.setAskLater()`. The answers go to the fields the old conversation used, with its values: `lifestyle.activityLevel` (step 9), `lifestyle.returningAfter` (step 9e, health consent only), `goals` (Free only, up to three), `strategicGoal.weeklySessionTarget` and `strategicGoal.setAt` (step 12). Gated by `tools/verify-p46-ask-later.mjs`.
 
@@ -1115,7 +1117,7 @@
 
 ## 06 Sep 2026 v1.51
 
-**File:** `js/store.js` (confirmed live version: **v132, 24 Nov 2026**)
+**File:** `js/store.js` (confirmed live version: **v133, 25 Nov 2026**)
 
 > **v1.47, 06 Sep 2026 — CR-1.** `conditions[]` gains three ids and loses one. `chronic-fatigue` is **retired**; `persistent-fatigue`, `me-cfs` and `long-covid` replace it. No field shape changed — `conditions` is still `string[]` and `conditionMeta` is still keyed by condition id.
 >
@@ -2058,7 +2060,7 @@ There is no `stats` field, live or dormant, anywhere in `store.js`. Every `stats
 
 `exercisePreferences` (`object`, `{}`) — `{ [exerciseId]: { preference: 'avoid'|'less', setAt, source } }`. Binary signal, not a rating (no stars/scores). Added `store.js` v17 (04 Aug), undocumented here until now — catching up the drift. First consumer: `js/data/conditionProgrammes.js` candidate selection.
 
-`inStepProgress` (nested object) — In Step, both tiers. **v1.124:** holds only `programme` (v1.123: `{ part, episode, done, lastCarry, lastAnswer, offeredAt, offeredSession }`). Its first fields (`store.js` v18, 09 Aug: `unlockedAt`, `scenarioIndex`, `completedCount`, `choiceLog`) were retired in v1.124 and are removed on load.
+`inStepProgress` (nested object) — In Step, both tiers. **v1.124:** holds only `programme` (v1.123: `{ part, episode, done, lastCarry, lastAnswer, offeredAt, offeredSession }`; **v1.136** adds `lastCarryAt`, the local day of the last *Carry it*). Its first fields (`store.js` v18, 09 Aug: `unlockedAt`, `scenarioIndex`, `completedCount`, `choiceLog`) were retired in v1.124 and are removed on load.
 
 ---
 

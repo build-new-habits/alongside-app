@@ -1,5 +1,12 @@
 /**
  * tools/verify-p28-content.mjs
+ * 25 Nov 2026 v3
+ *
+ * v3 - P-29 INSTEP-RECAP. 1c: last time's old line is gone where the
+ *   approved recap replaces it, and kept word for word after Part 4's
+ *   episodes (their recaps wait for the read). 1e: the ids unchanged, the
+ *   labels as P-29 approved. verify-p29-recap holds the new words.
+ *
  * 06 Nov 2026 v2
  *
  * v2 - The voice script is v2 (06 Nov: the voice set-up and the upload
@@ -168,7 +175,12 @@ ok("1b. 24 episodes, p1e1 to p4e6 in order", IS.EPISODES?.length === 24 &&
 const diff = [];
 for (const [i, w] of W_EPS.entries()) {
   const e = IS.EPISODES?.[i] || {}, p = P_EPS[i] || {};
-  const pairs = [["title", e.title, w.title], ["prev", e.prev, w.prev], ["listen", e.listen?.text, w.listen],
+  // v3 (P-29): last time's line is the recap now (verify-p29-recap reads its
+  // approved words), except after Part 4's episodes, whose recaps wait for
+  // their read: those keep the wording's line here, word for word.
+  const before = IS.EPISODES?.[i - 1];
+  const prevPair = before?.recapHeld ? ["prev", e.prev, w.prev] : ["prev retired by P-29", e.prev === undefined ? "gone" : e.prev, "gone"];
+  const pairs = [["title", e.title, w.title], prevPair, ["listen", e.listen?.text, w.listen],
     ["hold line", e.hold?.text, w.hold], ["seconds", String(e.hold?.secs), String(w.secs)],
     ["question", e.choose?.question, w.question], ["carry", e.carry?.text, w.carry],
     ["why", IS.PARTS?.[w.part - 1]?.why, w.why],
@@ -179,9 +191,11 @@ for (const [i, w] of W_EPS.entries()) {
 }
 ok("1c. every line word for word (only italics become quotation marks)", diff.length === 0, diff.slice(0, 4).join(" | "));
 ok("1d. the line after every Choose is the wording's", same(IS.ACK?.text, "There's no wrong answer.") && /There's no wrong answer\./.test(WORDING));
-ok("1e. the three answers are the wording's, with Schema v1.123's ids",
+// v3 (P-29, approved 19 Nov): I tried it, I forgot, and the episode's own
+// third answer (verify-p29-recap); the ids are still Schema v1.123's.
+ok("1e. the three answers keep Schema v1.123's ids; labelled as P-29 approved",
   JSON.stringify(IS.ANSWERS?.map(a => a.id)) === JSON.stringify(["did", "not-yet", "didnt"]) &&
-  /It did \/ Not yet \/ It didn't come up/.test(WORDING) && same(IS.ANSWERS.map(a => a.label).join(" / "), "It did / Not yet / It didn't come up"));
+  /It did \/ Not yet \/ It didn't come up/.test(WORDING) && same(IS.ANSWERS.slice(0, 2).map(a => a.label).join(" / "), "I tried it / I forgot") && IS.ANSWERS[2].label === null);
 ok("1f. the seated or standing way is labelled by what it is",
   IS.EPISODES.every(e => (e.hold.alt.label === "Standing") === /^Or stand/.test(e.hold.alt.text)));
 ok("1g. order is kept: next after p1e6 is p2e1, nothing after p4e6",

@@ -1,5 +1,11 @@
 /**
  * tools/verify-p28-instep.mjs
+ * 25 Nov 2026 v4
+ *
+ * v4 - P-29 INSTEP-RECAP. TEST 4 reads Last time (the recap of the last
+ *   Carry it, with I tried it, I forgot and its own third answer); 5b asks
+ *   lastTime() which episode it is about. verify-p29-recap holds the words.
+ *
  * 06 Nov 2026 v3
  *
  * v3 - The recordings' list (coach-audio.js v3): a line is asked for only
@@ -205,10 +211,11 @@ await block("TEST 4", async () => {
   console.log("\nTEST 4 - Before we start");
   await seed({ programme: { part: 1, episode: 2, done: ["p1e1"], lastCarry: "p1e1", lastAnswer: null } });
   mountInStep(); tap(".instep-next");
-  const prev = PROG.getEpisode("p1e2").prev;
-  ok("4a. last time's line, word for word", $("h1")?.textContent === "Before we start" && T($("#is-prev-line")) === prev, T($("#is-prev-line")));
+  // v4 (P-29): Before we start is Last time; its words are verify-p29-recap's.
+  const e1 = PROG.getEpisode("p1e1");
+  ok("4a. last time's recap: its title and Carry it, word for word", $("h1")?.textContent === "Last time" && T($(".instep-said")).includes(`“${e1.title}”`) && T($(".instep-said")).includes(`“${e1.carry.text}”`), T($(".instep-said")));
   const btns = [...main.querySelectorAll("[data-answer]")];
-  ok("4b. three taps: It did / Not yet / It didn't come up", btns.map(b => b.textContent.trim()).join(" / ") === "It did / Not yet / It didn't come up");
+  ok("4b. three taps: I tried it / I forgot / its own third answer", btns.map(b => b.textContent.trim()).join(" / ") === `I tried it / I forgot / ${e1.notCame}`);
   ok("4c. it says only the tap is kept", /Only your tap is kept\. No score, nothing to write\./.test(T()));
   tap('[data-answer="not-yet"]');
   ok("4d. the tap is kept, and only the tap", prog().lastAnswer === "not-yet" && $("h1")?.textContent === "The session you didn't do");
@@ -229,7 +236,7 @@ await block("TEST 5", async () => {
   tap("#is-next"); tap("#is-skip-hold"); tap("#is-next");
   const p = prog();
   ok("5a. the place in the programme is kept", p.part === 2 && p.episode === 3, JSON.stringify(p));
-  ok("5b. the last Carry it is the one just given", p.lastCarry === "p1e4" && OFF.lastTimeLine() === PROG.getEpisode("p1e5").prev);
+  ok("5b. the last Carry it is the one just given", p.lastCarry === "p1e4" && OFF.lastTime()?.episode.id === "p1e4");
 });
 
 // ── 6 ──────────────────────────────────────────────────────────────────
@@ -328,7 +335,7 @@ await block("TEST 7", async () => {
   await seed({ sessions: 4, programme: { part: 1, episode: 2, done: ["p1e1"], lastCarry: "p1e1", lastAnswer: "did" } }); planFinish(); tap("#pf-is-start"); mountInStep();
   ok("7u. last time already answered: it opens on Listen", $("h1")?.textContent === "The session you didn't do");
   await seed({ sessions: 4, programme: { part: 1, episode: 2, done: ["p1e1"], lastCarry: "p1e1", lastAnswer: null } }); planFinish(); tap("#pf-is-start"); mountInStep();
-  ok("7v. not yet answered: it asks first", $("h1")?.textContent === "Before we start");
+  ok("7v. not yet answered: it asks first (Last time, P-29)", $("h1")?.textContent === "Last time");
   // No reflection prompt as well.
   await seed({ sessions: 4, programme: {} }); store.set("lastEmpathyPromptSession", 0);
   planFinish(); tap("#pf-done");
