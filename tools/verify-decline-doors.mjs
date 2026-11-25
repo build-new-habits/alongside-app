@@ -1,5 +1,12 @@
 /**
  * tools/verify-decline-doors.mjs
+ * 24 Nov 2026 v2
+ *
+ * v2 - P-46 WAVE 8 2.12. After a decline, a coach door asks again on one
+ *   short screen (Graeme, 25 Nov): what going without means and to listen to
+ *   your body, not what is kept. Yes, keep my answers opens the tick; Carry on
+ *   without them, the routine.
+ *
  * 02 Oct 2026 v1
  *
  * W5-8 DECLINE-DOORS (Wave 5 persona trace: 2.14, 2.4). Decided by Graeme,
@@ -89,26 +96,28 @@ const onView = () => router.currentView;
 const btn = re => [...main.querySelectorAll("button")].find(b => re.test(txt(b)) && !b.disabled);
 const SQUAT_LUNGE = /squat|lunge|split[- ]squat|step[- ]?up|step[- ]?down|wall sit/i;
 
-// ── 1. THE SECOND SCREEN ────────────────────────────────────────────────
-console.log("\nTEST 1 - Not now opens a second screen");
+// ── 1. THE ASK AGAIN ────────────────────────────────────────────────────
+// v2 (P-46 Wave 8, Graeme 25 Nov): after a decline, a coach door asks again
+// on one short screen, "without telling them what question specifically and
+// what the answers would be used for". verify-p46-health-reask holds its words.
+console.log("\nTEST 1 - a coach door after a decline: the short ask again");
 fixture();
 await go("today"); await go("checkin");
-ok("1pc. a coach door after a decline: the consent screen", onView() === "health-consent", onView());
-click(btn(/^Not now$/)); await wait(60);
 const second = txt(main);
-ok("1a. still on the consent screen, not Home", onView() === "health-consent", onView());
-ok("1b. it says, plainly, that the answers stay on this phone", /stay on this phone/i.test(second) && /never sent|not sent|isn.t sent/i.test(second), second.slice(0, 300));
-ok("1c. the way back to the tick, and the gentle routine", !!btn(/tick/i) && !!btn(/gentle routine/i), second.slice(0, 400));
+ok("1pc. a coach door after a decline: the consent view", onView() === "health-consent", onView());
+ok("1a. the short ask again, not Home and not the full list", txt(main.querySelector("h1")) === "Before your session" && !main.querySelector("#hc-check"), second.slice(0, 200));
+ok("1b. it says, plainly, what going without means, and to listen to your body", /gentle routine/i.test(second) && /can't fit it to how you are on the day/i.test(second) && /listen to your body/i.test(second), second.slice(0, 300));
+ok("1c. the way to the tick, and the gentle routine", !!btn(/keep my answers/i) && !!btn(/carry on without them/i), second.slice(0, 400));
 
-// ── 2. BACK TO THE TICK ─────────────────────────────────────────────────
-console.log("\nTEST 2 - back to the tick");
-click(btn(/tick/i)); await wait(40);
+// ── 2. TO THE TICK ──────────────────────────────────────────────────────
+console.log("\nTEST 2 - Yes, keep my answers: the tick");
+click(btn(/keep my answers/i)); await wait(40);
 ok("2a. the tick again", !!main.querySelector("#hc-check") && !!btn(/^Not now$/), txt(main).slice(0, 200));
 
 // ── 3. THE GENTLE ROUTINE ───────────────────────────────────────────────
 console.log("\nTEST 3 - the gentle routine");
 click(btn(/^Not now$/)); await wait(40);
-click(btn(/gentle routine/i)); await wait(120);
+click(btn(/carry on without them/i)); await wait(120);
 const s = store.get("generatedSession")?.session;
 const full = (s?.exercises || []).map(e => EXERCISES.find(x => x.id === e.id) || e);
 ok("3a. the player opens on the routine's first movement", onView() === "workout" && !!s?.general && txt(main).includes(full[0]?.name || "--"), `${onView()} | ${txt(main).slice(0, 160)}`);

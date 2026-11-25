@@ -1,5 +1,19 @@
 /**
  * js/views/health-consent.js
+ * 25 Nov 2026 v6
+ *
+ * v6 - P-46 WAVE 8, 2.12 (Graeme, 25 Nov: "some might be protective of
+ *   their personal data, so we should ask again without telling them what
+ *   question specifically and what the answers would be used for", with a
+ *   warning that the coach can give exercises but can't adapt them, that no
+ *   is fine and can be changed in Settings, and to listen to your body).
+ *   At a session door: someone who has already said no is asked again
+ *   with that one short screen, not the full list. The second screen after
+ *   Not now says the same. Yes, keep my answers opens the full screen with
+ *   its tick (the consent itself is unchanged); Carry on without them gives
+ *   the gentle routine, as before. From the journal, Settings or a restore:
+ *   unchanged.
+ *
  * 17 Oct 2026 v5
  *
  * v5 - W6-9 SMALL-6. From the journal, Settings or a restore, No thanks goes
@@ -34,7 +48,7 @@
  */
 import {
   HEALTH_TICK, HEALTH_NOTE, giveHealthConsent, takePendingRoute, healthWordingChanged, confirmNoHealth,
-  peekPendingRoute, ROUTINE_ROUTES
+  peekPendingRoute, ROUTINE_ROUTES, healthDeclined
 } from "../data/health-consent.js";
 import { startGeneralRoutine } from "../data/general-routine.js";
 
@@ -69,18 +83,23 @@ export function HealthConsentView(router) {
       root.querySelector("#hc-title")?.focus();
       return;
     }
+    reAsk();
+  }
+
+  // v6 (Graeme, 25 Nov). The ask again: what it means to go without, not what is kept.
+  function reAsk() {
     root.innerHTML = `
-      <div class="view hc-view">
-        <h1 class="hc-title" id="hc-title" tabindex="-1">Your answers stay on this phone</h1>
-        <p class="hc-text">Before you decide: what you tell me about your body and how you are is kept
-          on this phone and nowhere else. It is never sent to Build New Habits or to anyone, and you can
-          delete it whenever you like in Settings.</p>
-        <p class="hc-text">Without it I can't shape a session to you. What I can do is give you one gentle
-          routine, the same for anyone, all of it sitting in a chair. It changes from day to day.</p>
-        <button class="btn btn-primary btn-large btn-full" id="hc-back-to-tick">Back to the tick</button>
-        <button class="btn btn-secondary btn-full" id="hc-routine">No thanks: the gentle routine</button>
+      <div class="view hc-view hc-reask">
+        <h1 class="hc-title" id="hc-title" tabindex="-1">Before your session</h1>
+        <p class="hc-text">Without your answers I can still give you a gentle routine, the same for anyone.
+          I just can't fit it to how you are on the day.</p>
+        <p class="hc-text">That's fine. You can change your mind any time in Settings.</p>
+        <p class="hc-text hc-listen"><strong>If you go without, listen to your body</strong>, and ease off
+          on days you're not at your best.</p>
+        <button class="btn btn-primary btn-large btn-full" id="hc-back-to-tick">Yes, keep my answers</button>
+        <button class="btn btn-secondary btn-full" id="hc-routine">Carry on without them</button>
       </div>`;
-    root.querySelector("#hc-back-to-tick").addEventListener("click", () => mount(root));
+    root.querySelector("#hc-back-to-tick").addEventListener("click", () => full());
     root.querySelector("#hc-routine").addEventListener("click", () => {
       confirmNoHealth();
       takePendingRoute();
@@ -92,6 +111,12 @@ export function HealthConsentView(router) {
 
   function mount(container) {
     root = container;
+    // v6. Already said no, at a session door, wording unchanged: the short ask again.
+    if (healthDeclined() && !healthWordingChanged() && ROUTINE_ROUTES.has(peekPendingRoute())) { reAsk(); return; }
+    full();
+  }
+
+  function full() {
     root.innerHTML = `
       <div class="view hc-view">
         <h1 class="hc-title" id="hc-title" tabindex="-1">Before I keep how you are</h1>

@@ -1,5 +1,9 @@
 /**
  * tools/chromium-start.mjs
+ * 24 Nov 2026 v3
+ *
+ * v3 - P-46 WAVE 8 2.12. The short ask again (2.12) is a screen too.
+ *
  * 24 Nov 2026 v2
  *
  * v2 - P-46 S4 FREE HOME. Free Home's screens (new, checked in), Free's
@@ -57,6 +61,7 @@ const SCREENS_ALL = [
   ["fh-ready", [], "S4 Free: Ready-made sessions (gym)"],
   ["fh-ready", [".path-list button", "#path-ready-go"], "S4 Free: a ready-made session, Start"],
   ["fh-otp", [], "S4 Free: on-the-plan (the Library)"],
+  ["hc-reask", [], "2.12: the short ask again, Before your session"],
   ["pl-free", [], "S5 Free player: one screen per move"],
   ["pl-free", ["details.xcard-more summary"], "S5 Free player: More about this move open"],
   ["pl-free", ["#wo-swap-btn"], "S5 Free player: Swap open"],
@@ -85,7 +90,7 @@ for (const scheme of ["light", "dark"]) for (const width of [390, 320]) for (con
       if (where === "nohealth") HC.declineHealthConsent();
       else s.set("consent.health", { given: true, at, version: HC.HEALTH_CONSENT_VERSION, withdrawnAt: null });
       const DP = await import("./js/display-prefs.js"); DP.setDisplayPref("textScale", size); DP.applyDisplayPrefs();
-      if (where.startsWith("ask-") || where.startsWith("fh-") || where.startsWith("pl-")) {   // S3: onboarded through the short start, one session (three for goals)
+      if (where.startsWith("ask-") || where.startsWith("fh-") || where.startsWith("pl-") || where === "hc-reask") {   // S3: onboarded through the short start, one session (three for goals)
         const { HURT_AND_ACHE_VERSION } = await import("./js/exercise-card.js");
         s.set("onboardingComplete", true); s.set("name", "Sam"); s.set("onboarding.flow", "short");
         s.set("onboarding.threadCompletedAt", new Date(Date.now() - 864e5).toISOString());
@@ -102,6 +107,7 @@ for (const scheme of ["light", "dark"]) for (const width of [390, 320]) for (con
           s.set("generatedSession", { session: { id: "pl", title: "Three", exercises: three }, builtAt: at, inputs: {} });
           s.set("usingGeneratedSession", true);
         }
+        if (where === "hc-reask") { const HCm = await import("./js/data/health-consent.js"); HCm.declineHealthConsent(); }
         if (where.startsWith("fh-")) {   // S4: nothing to ask today
           const nn = { notNowAt: at };
           s.set("askLater", { activity: nn, goals: nn, weekly: nn });
@@ -111,12 +117,13 @@ for (const scheme of ["light", "dark"]) for (const width of [390, 320]) for (con
         if (where === "ask-plan") s.setMyMove({ made: at, purposes: ["stronger", "moving", "instep"], most: "stronger", goodDay: "few", hardDay: ["coach"], startClosed: at });
       }
     }, { size, where });
-    if (where.startsWith("pl-")) { await page.reload(); await page.waitForTimeout(1200); }   // S5: the app opened afresh on this person (the first-open conversation mounted at load is gone)
+    if (where.startsWith("pl-") || where === "hc-reask") { await page.reload(); await page.waitForTimeout(1200); }   // S5: the app opened afresh on this person (the first-open conversation mounted at load is gone)
     if (where === "fh-ready" || where.startsWith("pl-")) { await page.evaluate(() => window.router.navigate("today")); await page.waitForTimeout(400); }   // as a person: Home first
     await page.evaluate(w => {
       if (w === "fh-ready") { window.router.pathStart = { free: true, place: "gym" }; return window.router.navigate("path"); }
       if (w === "fh-otp") return window.router.navigate("library");
       if (w.startsWith("pl-")) return window.router.navigate("workout");
+      if (w === "hc-reask") return window.router.navigate("coach-proposal");
       return window.router.navigate(w.startsWith("ask-") || w.startsWith("fh-") ? "today" : "onboarding/start");
     }, where);
     await page.waitForTimeout(500);
@@ -138,7 +145,7 @@ for (const scheme of ["light", "dark"]) for (const width of [390, 320]) for (con
       const main = document.getElementById("main-content");
       const h1s = [...main.querySelectorAll("h1")].filter(h => !h.closest(".sr-only") && getComputedStyle(h).display !== "none" && h.getClientRects().length).length;
       const small = [];
-      for (const el of main.querySelectorAll(".st button, .st-seg__opt span, .st-input, .al button, .free-home button, .on-the-plan button, .path-view[data-step] > button, .path-list button, .workout-actions button, .wo-ctl button, .xcard-more-summary")) {
+      for (const el of main.querySelectorAll(".st button, .st-seg__opt span, .st-input, .al button, .free-home button, .on-the-plan button, .path-view[data-step] > button, .path-list button, .workout-actions button, .wo-ctl button, .xcard-more-summary, .hc-reask button")) {
         const b = el.getBoundingClientRect(); if (!b.width) continue;
         if (b.height < 43.5) small.push(`${(el.id || el.className || el.tagName).toString().slice(0, 30)} ${Math.round(b.height)}px`);
       }

@@ -1,7 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 25 Nov 2026 v745
+ * 25 Nov 2026 v746
+ *
+ * v746 - P-46 Wave 8, persona 2.12 (Graeme's decision, 25 Nov). Someone who said no to health answers is asked again before a session on one short screen: a gentle routine without them, but it can't fit how they are on the day; that's fine, change it in Settings; if you go without, listen to your body. Yes, keep my answers, or Carry on without them. No new files.
  *
  * v745 - P-46 Wave 8 fixes (both tiers). The first session from Getting started keeps the card's promise: about 20 minutes, and Today's plan says Your first session: whole body, gentle (not You asked for strength, 30 minutes); Outside asks for outside. Free's Done today names the session. No new files.
  *
@@ -4343,7 +4345,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v745";
+const CACHE_NAME = "alongside-v746";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4376,7 +4378,7 @@ const SHELL_HASHES = {
   "./css/components/red-flag.css": "3934b0b0d770419b",
   "./css/components/know-what.css": "6f1d7faff6783932",
   "./css/components/nav-fix.css": "9385e9e7d7ea4738",
-  "./css/components/onboarding-thread.css": "e98173c565e8f212",
+  "./css/components/onboarding-thread.css": "7a2a62939c3d5be8",
   "./css/components/sheet-manager.css": "ea1daa96e07ff080",
   "./css/components/settings-reflection.css": "37c435fb6fe23db7",
   "./css/components/checkin-conversation.css": "ce65a87176d427d5",
@@ -4464,7 +4466,7 @@ const SHELL_HASHES = {
   "./js/views/library.js": "36195497d25a503d",
   "./js/views/practices.js": "f76d5aae3596a565",
   "./js/views/red-flag.js": "d2f857d0f8ba905f",
-  "./js/views/health-consent.js": "66c6f499c7863c7c",
+  "./js/views/health-consent.js": "daf6465718ac66fe",
   "./js/views/age-check.js": "b29fd222f8378e0b",
   "./js/views/under-18.js": "22c82205c5f7626a",
   "./js/views/consent-update.js": "51f918f8e2c9b25a",

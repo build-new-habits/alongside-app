@@ -1,6 +1,10 @@
 /**
  * css/components/onboarding-thread.css
- * 02 Oct 2026 v10
+ * 25 Nov 2026 v11
+ *
+ * v11 - P-46 Wave 8 (2.12). The short ask again (.hc-reask): its
+ *      listen-to-your-body line sits apart, with a teal rule beside it
+ *      (the words carry it in bold too, never colour alone).
  *
  * v10 - W4-19. Consent text at body size and colour: the list, the ticks'
  *      labels, the notes and the links were 15px, and the list and notes
@@ -979,6 +983,8 @@
 
 .hc-title { font-size: var(--text-2xl); margin: 0; }
 .hc-text  { color: var(--color-text); line-height: 1.6; margin: 0; }
+/* P-46 Wave 8 (2.12). The short ask again. */
+.hc-reask .hc-listen { padding-left: var(--space-3); border-left: 3px solid var(--color-primary); }
 .hc-error { color: var(--color-danger); font-size: var(--text-sm); font-weight: var(--font-medium); min-height: 1.2em; margin: 0; }
 
 /* AGE-CHECK, 01 Oct 2026. The age question, in onboarding (.ob-age) and
