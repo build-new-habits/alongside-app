@@ -1,5 +1,7 @@
 # Alongside: Move — Free and first (P-46) spec
-## 24 Nov 2026 v5
+## 25 Nov 2026 v6
+
+**v6 (S7, built; P-46 complete):** Help guide **A4** *I want to change a move while I'm doing it* (both tiers, read only, walks A1), and D1's Free answer *Something gentler*. Glossary v15 (the new words, and decision 8: about 15 words before the first button). BNH-Files: device checklist v34 **Sitting Z**; `Legal/alongside_privacy_line_free-and-first_25nov2026_v1.md` (three proposed Privacy Policy edits and two questions for Foot Anstey; nothing new leaves the device). Then the Wave 8 persona trace.
 
 **v5 (S6, built):** (1) `tools/chromium-word-budget.mjs` v2: budget 15 on every screen the router opens, both tiers; safety and scope words are not counted (the advice line, the scope notice, the support lines); the safety note before a first exercise, the Plan's own page, the first-session finish and the pages to read are listed with a reason each. (2) Sixteen screens cut, the meaning kept, nothing about safety touched: Wellbeing, Log what I did, In Step, Breathing, Quiet, the morning session, Practices, My exercises (empty), Privacy (the summary's lead-in only), Making my Move, Plan your week, Share your plan, a link from a physio, Classes, the programme page, the session builder. (3) Saved sessions joins the Plan's routes (its Free page took 22 words to say so). (4) The byte-for-byte Free checks apply the approved changes to the old drawing only (`tools/p46-words.mjs`), as they did for v7's one rename.
 
@@ -109,4 +111,4 @@ Every screen: **at most about 15 words above the first button**. Longer text mov
 
 The voices and *Hear from your coach* (next month); payments and the 14-day trial (P-40, row 14); the 14+ age change (P-41); Free's Progress window (P-40 says 30 days, unchanged here).
 
-*Build New Habits · Alongside: Move · P-46 spec · 24 Nov 2026 v5*
+*Build New Habits · Alongside: Move · P-46 spec · 25 Nov 2026 v6*

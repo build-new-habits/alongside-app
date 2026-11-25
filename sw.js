@@ -1,7 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 24 Nov 2026 v743
+ * 25 Nov 2026 v744
+ *
+ * v744 - P-46 S7 CLOSE (both tiers). Help gains I want to change a move while I'm doing it (Swap, Do this one later, What's left, Skip, More about this move, If it hurts), and, on Free, Something gentler for a day not up to a full session. P-46 Free and first is complete. No new files.
  *
  * v743 - P-46 S6 WORDS (both tiers). About 15 words before the first button on every screen: Wellbeing, Log what I did, In Step, Breathing, Quiet, the morning session, Practices, My exercises, Privacy's lead-in, Making my Move, Plan your week, Share your plan, a physio's link, Classes, the programme page, the session builder say less, and mean the same. Nothing about safety changed. Saved sessions on Free opens the Plan page. No new files.
  *
@@ -4339,7 +4341,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v743";
+const CACHE_NAME = "alongside-v744";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4515,7 +4517,7 @@ const SHELL_HASHES = {
   "./js/data/pdf-lite.js": "b924b197ae7f46fe",
   "./js/views/plan-share.js": "c60361d6d4ed08e5",
   "./js/guide.js": "5a0fdd80790faafe",
-  "./js/data/guides.js": "93be74a63cd62aab",
+  "./js/data/guides.js": "12b492912d368d80",
   "./js/views/help.js": "4d4218955ce16e02",
   "./css/components/help.css": "1ea3aee117dc9aee",
   "./css/components/your-week.css": "c95efbc697af8495",

@@ -1,5 +1,12 @@
 /**
  * js/data/guides.js
+ * 25 Nov 2026 v5
+ *
+ * v5 - P-46 S7 CLOSE. A4 (both tiers, read only): I want to change a move
+ *   while I'm doing it. Swap, Do this one later, What's left, Skip this one,
+ *   More about this move, If it hurts: the one-screen player (S5). D1 on
+ *   Free: Something gentler for a day that isn't up to a full session.
+ *
  * 24 Nov 2026 v4
  *
  * v4 - P-46 S4 FREE HOME. Free's way in to today's session is the Today
@@ -291,6 +298,26 @@ export const GUIDES = Object.freeze([
     ],
   },
   {
+    id: "A4", cat: "start", tiers: ["free", "plan"], readOnly: true, walk: "A1",
+    title: "I want to change a move while I’m doing it",
+    outcome: "Each move is one screen. The ways to change it are under its name, and they don’t stop the session.",
+    on: ["workout"],
+    keywords: ["swap", "change", "replace", "later", "skip", "left", "move", "exercise", "session", "hurts", "how"],
+    read: [
+      { say: "**Swap**: choose another move instead of this one, or search for one. **Keep this one** leaves it as it was." },
+      { say: "**Do this one later**: it moves to the end of this part of the session." },
+      { say: "**What’s left**: the moves still to come. **Do now** plays one straight away." },
+      { say: "**Skip this one**, at the bottom, goes to the next move." },
+      { say: "**More about this move** opens why it’s there, what to watch out for, how to do it, and an easier or harder way." },
+      { say: "If something hurts, stop that one. **If it hurts** on the same screen says what to do." },
+    ],
+    end: "",
+    notQuite: [
+      { q: "I can’t see Swap", answer: "It’s under the move’s name, beside **Do this one later** and **What’s left**." },
+      { q: "Something’s sore today", answer: "Say so when you check in. Moves that work it are marked, and the worst ones are left out." },
+    ],
+  },
+  {
     id: "D1", cat: "life", tiers: ["free", "plan"], readOnly: true, walk: "A1",
     title: "I’ve missed days. Have I ruined it?",
     outcome: "No. Alongside never counts days in a row, so there’s nothing to lose and nothing to catch up on. Start as you usually do.",
@@ -306,6 +333,7 @@ export const GUIDES = Object.freeze([
     end: "",
     notQuite: [
       { q: "I don’t feel up to a full session", answer: "On today’s plan, tap the length, for example **30 min**, and choose a shorter one." },
+      { q: "I want something easy", tiers: ["free"], answer: "On Home, tap **Something gentler**: about ten minutes of easy moving." },
       { q: "Something’s sore after the break", answer: "Tap where in the questions. If something hurts — sharp, or building as you go — stop that one. Aching afterwards is normal." },
       { q: "I want to change my week", tiers: ["plan"], answer: "Home › **Library** › **Your week**, then tap a day." },
       { q: "It’s more than missed days", answer: "The **Wellbeing** tab has quieter things. **Still stuck?** on the Help page says who to talk to." },

@@ -1,5 +1,7 @@
 # Alongside: Move — Glossary
-## 24 Nov 2026 v14
+## 25 Nov 2026 v15
+
+v15 - P-46 Free and first (Graeme, 24 Nov: *"no one needs a lecture or a sermon"*). Getting started's words, Free Home's ways in, Part of the Plan, the one-screen player, and decision 8: about 15 words before the first button.
 
 v14 - P-45 the live link.
 
@@ -79,6 +81,16 @@ Taken from the words on every screen (`node tools/chromium-words.mjs`, 95 screen
 | The finish's offer after an easier stretch | **Put this on Home** | Pin, Save to Home | P-32. Adds the routine to My exercises, On Home any time (P-31) |
 | The Plan's page of the person's plan, for a physio or trainer | **Share your plan** (beside **Share your progress**) | Export, Download my plan, My plan PDF | P-33. Made on the phone; **Save as a file**, **Copy as text**; the choices are behind **Change what's in it** |
 | The section linking the person's exercises to the arc | **What works towards it** | Recommended for you, Best for your arc | P-33. The arc's own rule; the person's own exercises only; never a suggestion |
+| The first open, after the age and consent screens | **Getting started** (in docs; the screens just ask) | Onboarding (on screen), Setup | P-46 S2. Name, anything sore, where, then **Show me my session** or **Not now, take me Home**. About a minute |
+| A question kept for later, asked once on Home | **asked later** (in docs) | Survey, Profile questions | P-46 S3. One a day at most; **Not now** is an answer. Activity, what you most want, how often |
+| Free Home's card | **How are you today?** · **Check in** | — | P-46 S4. Then **Show me my session**; then *Done today* |
+| Free's gentle way in | **Something gentler** | Easy mode, Recovery | P-46 S4. Today's plan, easy moving, about ten minutes |
+| Free's six | **Ready-made sessions** | Templates, Workouts | P-46 S4. Each starts with a warm-up and ends with a stretch |
+| What Free taps for the Plan | **Want more choice? See what the Plan adds** | Upgrade now, Go Premium | P-46 S4. One line at the bottom of Free Home |
+| The page for a Free route that moved to the Plan | **Part of the Plan** | Locked, Premium only | P-46 S4. What it is in one line, then **See what the Plan adds** |
+| The player's folded part | **More about this move** | Details, Info, Learn more | P-46 S5. Why, Watch out, How, Easier or harder |
+| The player's three controls (both tiers) | **Swap** · **Do this one later** · **What's left** | Replace, Postpone, Queue | P-46 S5 (the Plan's since P-22 to P-24) |
+| The player's all-sets button | **Finish this one** | Complete, Mark done | P-46 S5. Beside **Set n done** |
 
 ## Decided
 
@@ -95,3 +107,5 @@ Taken from the words on every screen (`node tools/chromium-words.mjs`, 95 screen
 6. **Home is what to do; Progress is how it is going** (Graeme, 15 Nov: *"exercise routes from home and progress in progress, so lately in progress"*). Home's *Lately* is retired; the same reading is **Before and after**, near the top of Progress.
 
 7. **Help, on both tiers** (Graeme, 11 Nov; mock-up v2 approved 12 Nov: *"Perfect"*). One **Help** button in the same place on every screen that shows it; hidden while a session runs. Guides say how to use the app, never what exercise to do; their safety lines are the app's own, word for word.
+
+8. **About 15 words before the first button** (Graeme, 24 Nov: *"no one needs a lecture or a sermon"*). Every screen, both tiers (`tools/chromium-word-budget.mjs`). Safety and scope words are not counted and are never cut to fit.
