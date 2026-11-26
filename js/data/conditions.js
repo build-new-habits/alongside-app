@@ -1,6 +1,13 @@
 /**
  * conditions.js — Condition definitions for onboarding and check-in
  *
+ * 26 Nov 2026 v1.13
+ *
+ * v1.13 - P-41 S2 rule 3. In the 16-17 version, soreLine() for the knee,
+ *   heel or back of the heel adds that pain which keeps coming back is
+ *   worth showing a GP or physio (data/age-version.js growthNote). Adults
+ *   unchanged.
+ *
  * 17 Oct 2026 v1.12
  *
  * v1.12 - W6-15 SCOPE-WORDS (Graeme, 17 Oct: "these are fine"). The sore-area list names
@@ -150,6 +157,7 @@
  * to convert user conditions + today's pain into the expanded ID set
  * that exercise contraindications reference.
  */
+import { growthNote } from "./age-version.js";
 
 // ─────────────────────────────────────────────────────────────
 // CONDITIONS SHOWN TO USERS IN ONBOARDING / SETTINGS
@@ -363,7 +371,10 @@ export function soreLine(id, score, leftOutNames = [], { planNames = [] } = {}) 
   const _words = n => String(n).toLowerCase().split(/[^a-z]+/).filter(w => w.length >= 4);
   const alike = n <= 3 ? planNames.filter(p => leftOutNames.some(l => _words(l).some(w => _words(p).includes(w)))) : [];
   const apart = alike.length ? ` ${_joinList(alike)} ${alike.length === 1 ? 'is a different move' : 'are different moves'}, in your plan.` : '';
-  return `You said your ${area} is ${sore} today. ${left}${apart}`;
+  // P-41 S2 rule 3: in the 16-17 version, knee and heel pain that keeps
+  // coming back is worth showing a GP or physio (growthNote; '' otherwise).
+  const growth = growthNote(id);
+  return `You said your ${area} is ${sore} today. ${left}${apart}${growth ? ` ${growth}` : ''}`;
 }
 function _joinList(a) { return a.length < 2 ? (a[0] || '') : `${a.slice(0, -1).join(', ')} and ${a[a.length - 1]}`; }
 

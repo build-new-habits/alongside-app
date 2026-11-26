@@ -1,5 +1,10 @@
 /**
  * js/views/in-step.js
+ * 26 Nov 2026 v10
+ *
+ * v10 - P-41 S2 rule 5. In the 16-17 version In Step says it is coming
+ *   soon and opens no episode (P-42 writes theirs). Adults unchanged.
+ *
  * 25 Nov 2026 v9
  *
  * v9 - P-29 INSTEP-RECAP (approved 19 Nov). "Before we start" becomes
@@ -54,6 +59,7 @@
  * v3 - A11Y-HEADER. v2 - IS-2 staged order. v1 - 09 Aug 2026. Their notes
  * are in the archived copy (docs/archive-code/in-step_v5_retired_06nov2026.js).
  */
+import { inStepOpen, IN_STEP_SOON } from "../data/age-version.js";
 import { store }   from "../store.js";
 import { router }  from "../router.js";
 import { isPremium } from "../auth.js";
@@ -120,6 +126,10 @@ function renderLanding() {
     ? `<button type="button" class="btn btn-ghost plan-back" id="is-back" aria-label="Back to Wellbeing">‹ Back</button>`
     : `<button type="button" class="btn btn-ghost" id="is-back" aria-label="Back to Wellbeing">← Back</button>`;
   const reachedPart = n => episodesInPart(n).some(e => isOpen(e.id, p));
+  // P-41 S2 rule 5: the 16-17 version's In Step is coming soon (P-42).
+  if (!inStepOpen()) return shell(`
+    <div class="workout-header">${back}<h1 class="workout-header-title" tabindex="-1">In Step</h1></div>
+    <p class="instep-intro" id="is-soon">${esc(IN_STEP_SOON)}</p>`);
   return shell(`
     <div class="workout-header">${back}<h1 class="workout-header-title" tabindex="-1">In Step</h1></div>
     ${eyebrow("In Step")}
@@ -238,7 +248,7 @@ export function render() {
   // Opened by the router (not a step of this file): the list, quiet.
   else if (!_internal) { _stop(); phase = "landing"; epId = null; low = false; chosen = null; from = "wellbeing"; }
   const e = epId ? getEpisode(epId) : null;
-  if (!e) phase = "landing";
+  if (!e || !inStepOpen()) phase = "landing";
   if (phase === "start") phase = lastTimeLine() && programme().lastAnswer === null ? "prev" : "listen";
   switch (phase) {
     case "prev":      return renderPrev(e);

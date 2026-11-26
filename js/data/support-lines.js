@@ -1,5 +1,11 @@
 /**
  * js/data/support-lines.js
+ * 26 Nov 2026 v2
+ *
+ * v2 - P-41 S2 rule 2. The 16-17 version sees Childline and Shout first,
+ *   a trusted adult named, then Samaritans, 111 and 999
+ *   (data/age-version.js). Adults unchanged.
+ *
  * 01 Oct 2026 v1
  *
  * SIGNPOST-STATIC. Free support, the same for everybody, triggered by
@@ -16,6 +22,8 @@
  * and adults); NHS 111 (urgent help, including mental health); 999.
  * Under-18s see their own list (views/under-18.js).
  */
+import { isYoung, YOUNG_SUPPORT_LINES, YOUNG_SUPPORT_LEDE } from "./age-version.js";
+
 export const SUPPORT_LINES = Object.freeze([
   { name: "Samaritans", what: "free, any time, about anything", label: "call 116 123", href: "tel:116123" },
   { name: "Shout", what: "free, any time, by text", label: "text SHOUT to 85258", href: "sms:85258?&body=SHOUT" },
@@ -24,12 +32,16 @@ export const SUPPORT_LINES = Object.freeze([
 ]);
 
 export function supportLinesHTML(id = "support-lines") {
+  // P-41 S2 rule 2: the 16-17 version leads with Childline and Shout, and
+  // names a trusted adult.
+  const young = isYoung();
+  const lines = young ? YOUNG_SUPPORT_LINES : SUPPORT_LINES;
   return `
     <section class="support-lines" data-support-lines aria-labelledby="${id}-h">
       <h2 class="support-lines__title" id="${id}-h">If you need to talk to someone</h2>
-      <p class="support-lines__lede">These are free and confidential. You don’t need a reason.</p>
+      <p class="support-lines__lede">${young ? YOUNG_SUPPORT_LEDE : "These are free and confidential. You don’t need a reason."}</p>
       <ul class="support-lines__list">
-        ${SUPPORT_LINES.map(s => `
+        ${lines.map(s => `
           <li><strong>${s.name}</strong>${s.what ? `, ${s.what}` : ""}:
             <a class="support-lines__link" href="${s.href}">${s.label}</a></li>`).join("")}
       </ul>

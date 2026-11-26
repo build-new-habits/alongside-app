@@ -6,6 +6,12 @@ import { validateWeightTarget } from "./data/weight-targets.js";
 
 /**
  * store.js - Data persistence layer
+ * 26 Nov 2026 v135
+ *
+ * v135 - P-41 S2, rule 1 (no field change): a 16-17 phone never tracks
+ *   weight. _youngNoWeight() keeps weightTracking false and no weight on
+ *   load and on any write; data/age-version.js gives screens the rule.
+ *
  * 25 Nov 2026 v134
  *
  * v134 - P-41 THREE AGE VERSIONS, S1, schema first (Schema v1.137; spec
@@ -1281,6 +1287,7 @@ export const store = {
       console.error('Store: Error loading data', e);
       this.data = this.getDefaults();
     }
+    this._youngNoWeight();
     console.log('📦 Store initialised');
   },
 
@@ -2212,6 +2219,20 @@ export const store = {
     if (out.ageGroup === 'young-16' && !out.ageGroupNext) { out.ageGroup = null; out.ageConfirmed = null; }
     out.ageGroupAt = typeof out.ageGroupAt === 'string' && !isNaN(new Date(out.ageGroupAt)) ? out.ageGroupAt : null;
     return out;
+  },
+
+  /**
+   * v135 (P-41 S2, rule 1). The 16-17 version never tracks weight: on load
+   * and on any write, weightTracking is false for a young-16 phone, and no
+   * weight, target or weight goal is kept. data/age-version.js says the
+   * rule for screens; this keeps it true in what is stored.
+   */
+  _youngNoWeight() {
+    const d = this.data;
+    if (!d || d.consent?.ageConfirmed !== true || d.consent?.ageGroup !== 'young-16') return;
+    d.weightTracking = false;
+    if (d.weight != null) d.weight = null;
+    if (Array.isArray(d.weightLog) && d.weightLog.length) d.weightLog = [];
   },
 
   _cleanP28(data) {
@@ -3526,6 +3547,8 @@ export const store = {
       obj = obj[key];
     }
     obj[keys[keys.length - 1]] = value;
+    // v135 (P-41 S2): no weight tracking in the 16-17 version, however written.
+    if (['weightTracking', 'weight', 'weightLog', 'consent'].includes(keys[0])) this._youngNoWeight();
     // W5-18. Sore answers carry the day they were given, however written.
     if (keys[0] === 'conditionPainScores') this.data.conditionPainScoresOn = this._localDay();
     // WEIGHT-RECHECK (v116). The weight, the date or the target changed:

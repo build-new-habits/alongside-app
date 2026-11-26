@@ -1,5 +1,9 @@
 /**
  * js/data/in-step-offer.js
+ * 26 Nov 2026 v4
+ *
+ * v4 - P-41 S2 rule 5. Never offered at the finish in the 16-17 version.
+ *
  * 25 Nov 2026 v3
  *
  * v3 - P-29 INSTEP-RECAP. lastCarryAt (Schema v1.136): the local day an
@@ -41,6 +45,7 @@
  * "Did it come up?", and when it was last offered. Never words, never a
  * choice, never a score.
  */
+import { inStepOpen } from "./age-version.js";
 import { store } from "../store.js";
 import { getTodaysCheckin } from "./checkin.js";
 import { bodyAreasOf, isBad } from "./conditions.js";
@@ -193,6 +198,7 @@ export function decideOffer(ctx) {
  * Returns { id, low, line, label, episode, part }.
  */
 export function offerForFinish({ sessionCount, partial = false, now = new Date() } = {}) {
+  if (!inStepOpen()) return null;   // P-41 S2 rule 5: never offered in the 16-17 version
   const day = dayContext();
   const o = decideOffer({ sessionCount, partial, badDay: day.badDay, lowEnergy: day.lowEnergy, lowMood: day.lowMood, now });
   if (!o) return null;
