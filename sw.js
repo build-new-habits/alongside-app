@@ -1,7 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 25 Nov 2026 v751
+ * 26 Nov 2026 v752
+ *
+ * v752 - P-41 S2. How the 16-17 version differs, in one new file (js/data/age-version.js, precached): no weight, Childline first, the GP or physio line for knee and heel pain, two hard days a week, In Step coming soon, no messages, no buying. The version stays closed, so nothing changes for anyone yet.
  *
  * v751 - P-41 S1 (approved 25 Nov). The age question now works out which version of the app suits the age and keeps that (never the date); the 16-17 and 14-15 versions are closed until built, so nothing on screen changes. No new files.
  *
@@ -4355,7 +4357,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v751";
+const CACHE_NAME = "alongside-v752";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4422,7 +4424,7 @@ const SHELL_HASHES = {
   "./css/components/finish.css": "c33e298d5fcb92ae",
   "./js/app.js": "81ed92c5ada71eb8",
   "./js/router.js": "f4e0c7f0eac0a035",
-  "./js/store.js": "9a115918e664687e",
+  "./js/store.js": "4ada9d18ff5701b6",
   "./js/session-log.js": "6134de4315842e05",
   "./js/exercise-feedback.js": "adba8549f444da2a",
   "./js/exercise-card.js": "87af7a5668137593",
@@ -4447,7 +4449,7 @@ const SHELL_HASHES = {
   "./js/views/coach-proposal.js": "c8f548d3c2e5db8c",
   "./js/views/workout.js": "a64a827af4e52fb2",
   "./js/views/progress.js": "7708195f75512d62",
-  "./js/views/settings.js": "409f0a13bbb63e89",
+  "./js/views/settings.js": "65349bad785a150d",
   "./js/views/restore-flow.js": "dc81c2e455fa472d",
   "./js/views/weekly-plan.js": "dcee06e297b402c0",
   "./js/views/reflect.js": "fa33525e04a2feaa",
@@ -4471,7 +4473,7 @@ const SHELL_HASHES = {
   "./js/views/home-threshold.js": "17bc42808aa5bd5c",
   "./js/views/onboarding/frequency.js": "47e40b6e6e2f458f",
   "./js/views/programme-select.js": "115a22eeb9526be5",
-  "./js/views/upgrade.js": "c20de0f464afbb80",
+  "./js/views/upgrade.js": "60548142d092aa9a",
   "./js/views/privacy.js": "a3141eea5d56825f",
   "./js/views/library.js": "ae647a15a875452c",
   "./js/views/practices.js": "f76d5aae3596a565",
@@ -4488,7 +4490,7 @@ const SHELL_HASHES = {
   "./js/plan-look.js": "7674d8fbf5101aa9",
   "./js/views/plan-finish.js": "d3901b6355f55542",
   "./js/data/outside.js": "3af4ea46bd898084",
-  "./js/data/trend-recipes.js": "14961e4c12aef77e",
+  "./js/data/trend-recipes.js": "93f13a1611ffd6e6",
   "./js/data/ready-sessions.js": "9e92e2c63af939a8",
   "./js/data/path-context.js": "5d8018dcdcdb3f17",
   "./js/data/swap-search.js": "5f0f0e4d112f92ea",
@@ -4499,6 +4501,7 @@ const SHELL_HASHES = {
   "./js/data/red-flag.js": "3cd9eecbc3985eb3",
   "./js/data/health-consent.js": "a23d005af57f179c",
   "./js/data/age-check.js": "ebe52a0249529e29",
+  "./js/data/age-version.js": "bc477e7f1463c1e2",
   "./js/data/restore.js": "fd3860a6ccd4e480",
   "./js/data/export-file.js": "bbee762322d0e4e2",
   "./js/data/health-consent-covers.js": "6698a3e50672cbbe",
@@ -4507,11 +4510,11 @@ const SHELL_HASHES = {
   "./js/data/week-shape-model.js": "7889ce6889cad039",
   "./js/data/week-shape.js": "57cc6aa85210d710",
   "./js/data/warm-views.js": "73c268f74f004e8e",
-  "./js/views/your-week.js": "0490ccd23827529c",
+  "./js/views/your-week.js": "c1c29b6e775003f4",
   "./js/data/plan-reader.js": "8b909dcd350014b1",
   "./js/views/plan-import.js": "027c3f9fc203c613",
   "./js/views/change-today.js": "31101d97d53492c8",
-  "./js/views/my-move.js": "a431f1a0696487ed",
+  "./js/views/my-move.js": "ce330836035477e3",
   "./js/views/free-home.js": "f1505d02950513f2",
   "./js/views/on-the-plan.js": "2d25cce8dfb0fc9e",
   "./js/views/onboarding/start.js": "b6fe85c63c26b37d",
@@ -4558,9 +4561,9 @@ const SHELL_HASHES = {
   "./js/data/general-routine.js": "30dd1899fa187d6a",
   "./js/data/session-length.js": "d135da33af36c923",
   "./js/data/file-lock.js": "6428c4d49a58959b",
-  "./js/data/messages.js": "252ee15828010efc",
+  "./js/data/messages.js": "410c3a5651363d4d",
   "./js/data/evidence.js": "f06ab5ec6eb1804c",
-  "./js/data/support-lines.js": "0c1286fa510e427e",
+  "./js/data/support-lines.js": "21494b8f97ecf787",
   "./js/data/consent-version.js": "c1a39ed44cc24157",
   "./js/views/my-programme.js": "6d4ee7ee5f3927b8",
   "./js/session-builder.js": "df8b660e695bb146",
@@ -4587,9 +4590,9 @@ const SHELL_HASHES = {
   "./js/views/saved-sessions.js": "400202f2e10e8e74",
   "./js/views/session-builder-ui.js": "fa76c5ea1b7462aa",
   "./js/views/noticing.js": "b0fd1db225416f4f",
-  "./js/views/in-step.js": "b94455f6ff474328",
+  "./js/views/in-step.js": "a6ee08b20baff9ef",
   "./js/data/in-step-programme.js": "a325e135e7dd09a0",
-  "./js/data/in-step-offer.js": "acd6208e2974565e",
+  "./js/data/in-step-offer.js": "ec9cfbd456a76669",
   "./js/coach-audio.js": "d201650f60b33617",
   "./js/hold-voice.js": "4801164cbddca872",
   "./js/views/guide-me.js": "eed24714732918fc",
@@ -4622,7 +4625,7 @@ const SHELL_HASHES = {
   "./js/data/week-focus.js": "7ef62ccb4eab0729",
   "./js/data/assessment.js": "0832674e28e375ef",
   "./js/data/session-moments.js": "85608dcfb8a34055",
-  "./js/data/conditions.js": "7869a336d4fdfcc8",
+  "./js/data/conditions.js": "fe2b2f35e034c458",
   "./js/data/equipment.js": "b1d233c36eaf6270",
   "./js/data/goals.js": "6cac79f51ca5b5a4",
   "./js/data/goal-review.js": "a0208fe146fed15d",
@@ -4852,6 +4855,7 @@ const SHELL_URLS = [
   "./js/data/red-flag.js",
   "./js/data/health-consent.js",
   "./js/data/age-check.js",
+  "./js/data/age-version.js",
   "./js/data/restore.js",
   "./js/data/export-file.js",
   "./js/data/health-consent-covers.js",
