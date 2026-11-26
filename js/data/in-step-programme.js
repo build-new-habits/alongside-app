@@ -1,6 +1,14 @@
 /**
  * js/data/in-step-programme.js
- * 25 Nov 2026 v2
+ * 26 Nov 2026 v3
+ *
+ * v3 - P-42 S1. The adults' Part 5, The world on your phone (approved by
+ *   Graeme 26 Nov, BNH-Files Product/alongside_in-step-adult_part5_words_
+ *   26nov2026_v2.md, word for word; tools/verify-p42-adult.mjs reads it).
+ *   Part 5 is now the last part: "That's In Step ..." moves to its end,
+ *   Part 4 closes as Parts 1 to 3 do, and Part 4's last episode,
+ *   Recognition, gains its recap (about, notCame) for Part 5's first Last
+ *   time. Five parts; 30 episodes.
  *
  * v2 - P-29 INSTEP-RECAP (approved by Graeme 19 Nov, BNH-Files
  *   Product/alongside_content_in-step-recap_19nov2026_v3.md, word for word;
@@ -84,6 +92,9 @@ export const PARTS = [
     closing: { text: "That's Part 3. Next time, if you'd like, we'll look at people whose lives look nothing like yours.", audio: "instep-p3-e6-closing" } },
   { n: 4, name: "People whose lives look nothing like yours",
     why: "People whose days are shaped by things you've never had to think about.",
+    closing: { text: "That's Part 4. Next time, if you'd like, we'll look at the world on your phone.", audio: "instep-p4-e6-closing-next" } },
+  { n: 5, name: "The world on your phone",
+    why: "Last, the world on your phone: what's built to hold your attention, and how you show up there, because the young people around you are watching how adults do it.",
     closing: { text: "That's In Step. You can go back to any episode in Wellbeing whenever you like.", audio: "instep-p4-e6-closing" } },
 ];
 
@@ -300,6 +311,7 @@ export const EPISODES = [
       options: ["Explain one thing before they have to ask.", "Remember your own first week somewhere new.", "Be patient, and let it be their pace."] },
     carry: { text: "Today, if someone looks lost, offer one sentence of help.", audio: "instep-p4-e5-carry" } },
   { id: "p4e6", part: 4, episode: 6, title: "Recognition",
+    about: "recognising people whose lives look nothing like yours", notCame: "I didn't get the chance", recap: { audio: "instep-recap-4-6" },
     prev: "Last time: today, if someone looks lost, offer one sentence of help. Did it come up?",
     listen: { text: "Over these sessions, I've met you where you were. On low days and good ones, sore days and easy ones. You've done some of that for yourself, and some of it for the people around you. Now think of someone whose life looks completely unlike yours. What would it mean to offer them the same? Not as charity. As recognition. They're working through something real, just as you are.", audio: "instep-p4-e6-listen" },
     hold: { pose: "Standing level", how: "Standing tall, arms easy, chin level.",
@@ -308,6 +320,60 @@ export const EPISODES = [
     choose: { question: "Someone whose life looks nothing like yours is working through something real. What would you like to do?",
       options: ["Notice that you can't see most of what they carry.", "Treat them the way you've been treated here.", "Keep it simple. Recognise them, and carry on."] },
     carry: { text: "This week, offer someone you don't understand the patience you've been given here.", audio: "instep-p4-e6-carry" } },
+  // ── Part 5, The world on your phone (P-42 S1) ──
+  { id: "p5e1", part: 5, episode: 1, title: "The feed is built to keep you",
+    about: "the feed, and who decides when you leave", notCame: "I didn't think of it", recap: { audio: "instep-recap-5-1" },
+    listen: { text: "Think about the last time you picked up your phone for one thing, and put it down twenty minutes later. That isn't a lack of willpower. The apps are built by clever people, paid to keep you there. Feeds learn what holds you, and often that's what makes you anxious, envious or angry. It can take the edge off your sleep, and off how you feel about your own life, set against everyone else's best moments. Deciding when you leave isn't missing out. It's taking your attention back.", audio: "instep-p5-e1-listen" },
+    hold: { pose: "Phone down", how: "Seated, phone face down and out of reach, hands resting.",
+      alt: { label: "Standing", text: "Standing: phone in another room, arms easy." },
+      secs: 45, text: "Notice the pull to pick it up. Let it wait. Notice one thing you can hear, and one thing you can see.", audio: "instep-p5-e1-hold" },
+    choose: { question: "You pick up your phone without deciding to. What would you like to do?",
+      options: ["Notice it, and carry on.","Ask what I came for, and leave when it's done.","Put it in another room for an hour."] },
+    carry: { text: "Once today, before you open an app, decide what you're there for.", audio: "instep-p5-e1-carry" } },
+  { id: "p5e2", part: 5, episode: 2, title: "Outrage is a business model",
+    about: "anger online, and who gains from it", notCame: "Nothing like that came up", recap: { audio: "instep-recap-5-2" },
+    listen: { text: "Some of what reaches you is made to make you angry. Not by accident. Anger keeps people watching, sharing and coming back, and that's worth money. Often the anger points at a whole group of people. They're the problem. They're ruining it. They're not like us. One question cuts through it. Who gains if I believe this? Usually someone selling clicks, a course or a cause. You can care about something deeply without hating a whole group. Most of them are just getting through their day, like you.", audio: "instep-p5-e2-listen" },
+    hold: { pose: "Standing steady", how: "Feet planted, arms easy.",
+      alt: { label: "Seated", text: "Feet flat, hands on your thighs." },
+      secs: 45, text: "Steady feet. Think of something online that made you angry at a whole group. Just notice it. You don't have to decide anything.", audio: "instep-p5-e2-hold" },
+    choose: { question: "A post makes you angry at a whole group of people. What would you like to do?",
+      options: ["Notice the anger, and scroll on.","Ask who made it, and what they gain.","Think of one person from that group I actually know."] },
+    carry: { text: "When a post makes you angry at a whole group, ask who gains if you believe it.", audio: "instep-p5-e2-carry" } },
+  { id: "p5e3", part: 5, episode: 3, title: "True, false or made to look true",
+    about: "what's real online, and slowing down before you share", notCame: "I didn't see anything shocking", recap: { audio: "instep-recap-5-3" },
+    listen: { text: "It's never been easier to make something look real. Photos are changed. Voices are copied. Videos show people saying things they never said. And the shocking things spread fastest, often shared by people we trust, who didn't check either. You don't have to work out the truth of everything. Slowing down is enough. Who posted it first? Is anyone else reporting it? Does it look made to make me angry, or afraid? It's fine not to have an opinion yet. Waiting is often the wisest thing in the room.", audio: "instep-p5-e3-listen" },
+    hold: { pose: "Eyes on one spot", how: "Seated, hands resting, eyes resting on one spot.",
+      alt: { label: "Standing", text: "Standing: the same." },
+      secs: 30, text: "Keep your eyes on that one spot. Notice how much slower everything feels when you're not reacting.", audio: "instep-p5-e3-hold" },
+    choose: { question: "Something shocking arrives, shared by someone you trust. What would you like to do?",
+      options: ["Wait, and see if it's still true tomorrow.","Look for one other source.","Gently ask them where it came from."] },
+    carry: { text: "Before you share something shocking, find one other source.", audio: "instep-p5-e3-carry" } },
+  { id: "p5e4", part: 5, episode: 4, title: "Being the adult in the comments",
+    about: "how adults speak online, and who's watching", notCame: "I didn't post anything", recap: { audio: "instep-recap-5-4" },
+    listen: { text: "Young people learn how to behave online by watching the adults around them. Not what we tell them. What we do. The comment we leave on a stranger's post. The joke in the family group. The way we argue with someone we've never met. It's easy to forget that anyone's watching. Someone usually is. You don't have to be perfect. But you can be the adult who disagrees without sneering, who doesn't pile on, and who says something kind where people can see it.", audio: "instep-p5-e4-listen" },
+    hold: { pose: "Standing level", how: "Standing tall, arms easy, chin level.",
+      alt: { label: "Seated", text: "Sit tall and let your shoulders settle." },
+      secs: 30, text: "Stand like someone a young person might be watching. Not stiff. Just steady.", audio: "instep-p5-e4-hold" },
+    choose: { question: "You're about to reply to something that annoyed you. What would you like to do?",
+      options: ["Write it, and wait before sending.","Ask if I'd say it to their face.","Leave it, and say nothing."] },
+    carry: { text: "Before you post a reply today, ask: would I want a young person to copy this?", audio: "instep-p5-e4-carry" } },
+  { id: "p5e5", part: 5, episode: 5, title: "Achievement without an audience",
+    about: "achievement, and doing things without an audience", notCame: "I had nothing to post", recap: { audio: "instep-recap-5-5" },
+    listen: { text: "Somewhere along the way, doing something started to mean posting it. The run, the meal, the view, the new job. There's nothing wrong with sharing good news. But it can change why we do things. We start working for the likes, and feel flat when they don't come. The best kind of achievement doesn't need an audience. It's the thing you work towards because it matters to you. Getting there slowly, and knowing you gave it everything, is enough. Nobody else has to see it.", audio: "instep-p5-e5-listen" },
+    hold: { pose: "Standing planted", how: "Hands on hips, feet planted.",
+      alt: { label: "Seated", text: "Sit tall, hands on your thighs." },
+      secs: 45, text: "Think of something you're working towards. Picture finishing it, with nobody watching. Notice how that feels.", audio: "instep-p5-e5-hold" },
+    choose: { question: "You've done something you're proud of. What would you like to do?",
+      options: ["Share it, and enjoy the replies.","Tell one person who'd really care.","Keep it to myself, for now."] },
+    carry: { text: "This week, do one thing you're proud of, and don't post it.", audio: "instep-p5-e5-carry" } },
+  { id: "p5e6", part: 5, episode: 6, title: "A part to play",
+    listen: { text: "Over these sessions, we've looked at how you meet yourself. The people close to you. People you pass. People whose lives look nothing like yours. And now, the world on your phone. Here's what joins them up. When we only ask what's in it for me, we tend to end up on our own, and quietly worse off. When we look after each other, everyone does better. Including us. You've got a part to play, in your family, your street, your work. Small and steady counts.", audio: "instep-p5-e6-listen" },
+    hold: { pose: "Open hands", how: "Standing, hands held a little in front of you, palms up.",
+      alt: { label: "Seated", text: "The same." },
+      secs: 60, text: "Open hands, as if you're offering something. Think of one person who could use a hand this week.", audio: "instep-p5-e6-hold" },
+    choose: { question: "Someone near you could use a hand. What would you like to do?",
+      options: ["Offer it, and say nothing about it.","Ask what would actually help.","Notice, and keep them in mind."] },
+    carry: { text: "This week, do one thing for someone else, and tell no one.", audio: "instep-p5-e6-carry" } },
 ];
 
 /** "p2e3" -> the episode, or null. */
@@ -336,7 +402,7 @@ export function nextEpisodeId(id) {
 /** Whether this episode ends its part (it is followed by the part's closing line). */
 export function endsPart(id) {
   const e = getEpisode(id);
-  return !!e && e.episode === 6;
+  return !!e && episodesInPart(e.part).at(-1)?.id === e.id;
 }
 
 /** Every clip this file can play, in order: for the voice script check

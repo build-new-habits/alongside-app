@@ -1,5 +1,10 @@
 /**
  * tools/verify-p28-instep.mjs
+ * 26 Nov 2026 v5
+ *
+ * v5 - P-42 S1. Five parts (the adults' Part 5): 2e counts every episode
+ *   and reads the last part's closing; 10c's door says five parts.
+ *
  * 25 Nov 2026 v4
  *
  * v4 - P-29 INSTEP-RECAP. TEST 4 reads Last time (the recap of the last
@@ -160,9 +165,9 @@ await block("TEST 2", async () => {
   ok("2b. the episodes done are open again; nothing later is", JSON.stringify([...new Set(eps)].sort()) === JSON.stringify(["p1e1", "p1e2", "p1e3"]), eps.join(","));
   ok("2c. each part says why, in its own plain sentence", PROG.PARTS.every(p => T().includes(p.why)));
   ok("2d. a part not reached says when it opens", /Opens after Part 1\./.test(T()) && /Opens after Part 3\./.test(T()));
-  await seed({ programme: { part: 4, episode: 6, done: PROG.EPISODES.map(e => e.id) } });
+  await seed({ programme: { part: 5, episode: 6, done: PROG.EPISODES.map(e => e.id) } });   // v5: the last is Part 5's
   mountInStep();
-  ok("2e. all 24 done: every episode open, and the last part's closing line", main.querySelectorAll(".instep-ep").length === 24 && !main.querySelector(".instep-next") && T().includes(PROG.PARTS[3].closing.text));
+  ok("2e. all done: every episode open, and the last part's closing line", main.querySelectorAll(".instep-ep").length === PROG.EPISODES.length && PROG.EPISODES.length === 30 && !main.querySelector(".instep-next") && T().includes(PROG.PARTS.at(-1).closing.text));
 });
 
 // ── 3 ──────────────────────────────────────────────────────────────────
@@ -411,7 +416,7 @@ await block("TEST 10", async () => {
     !fs.existsSync(new URL("js/data/in-step-scenarios.js", ROOT)) && fs.existsSync(new URL("docs/archive-code/in-step-scenarios_retired_06nov2026.js", ROOT)) &&
     !fs.readdirSync(new URL("js/views/", ROOT)).some(f => f.endsWith(".js") && /in-step-scenarios/.test(fs.readFileSync(new URL("js/views/" + f, ROOT), "utf8"))));
   await seed({ tier: "free", programme: { part: 1, episode: 1 } }); mountInStep(); tap(".instep-next"); tap("#is-next"); tap("#is-skip-hold"); tap("#is-next");
-  ok("10c. Free's door, on Carry it, says four parts", /That.s In Step \u2014 four parts, one thing at a time/.test(T($(".upgrade-door"))), T($(".upgrade-door")));
+  ok("10c. Free's door, on Carry it, says five parts", /That.s In Step \u2014 five parts, one thing at a time/.test(T($(".upgrade-door"))), T($(".upgrade-door")));
   await seed({ tier: "personal" }); mountInStep(); let shown = T(); tap(".instep-next"); shown += T(); tap("#is-next"); shown += T(); tap("#is-skip-hold"); shown += T(); tap("#is-next");
   ok("10d. the Plan has no door", !$(".upgrade-door"));
   shown += T();

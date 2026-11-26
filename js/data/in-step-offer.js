@@ -1,6 +1,8 @@
 /**
  * js/data/in-step-offer.js
- * 26 Nov 2026 v4
+ * 26 Nov 2026 v5
+ *
+ * v5 - P-42 S1. A comment no longer says 24 episodes (Part 5 makes 30).
  *
  * v4 - P-41 S2 rule 5. Never offered at the finish in the 16-17 version.
  *
@@ -74,7 +76,7 @@ function _save(p) {
   store.set("inStepProgress", { ...isp, programme: p });
 }
 
-/** The next episode in order, or null when all 24 are done. */
+/** The next episode in order, or null when all are done. */
 export function currentEpisodeId(p = programme()) {
   const id = `p${p.part}e${p.episode}`;
   if (!getEpisode(id)) return EPISODES[0].id;

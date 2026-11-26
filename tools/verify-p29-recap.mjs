@@ -1,5 +1,11 @@
 /**
  * tools/verify-p29-recap.mjs
+ * 26 Nov 2026 v2
+ *
+ * v2 - P-42 S1. Part 5 follows Part 4, so Recognition (p4e6) now has a
+ *   recap (approved with Part 5, verify-p42-adult holds its words); 1c reads
+ *   the last episode, p5e6.
+ *
  * 25 Nov 2026 v1
  *
  * P-29 INSTEP-RECAP. In Step's "Before we start" becomes "Last time"
@@ -128,7 +134,7 @@ await block("TEST 1", async () => {
   }
   ok("1a. each of the 23 has its approved about line, third answer and clip", diff.length === 0, diff.slice(0, 4).join(" | "));
   ok("1b. Part 4's five wait for their read; Parts 1 to 3 ship", ROWS.filter(r => PROG.getEpisode(r.id).recapHeld).map(r => r.id).join() === "p4e1,p4e2,p4e3,p4e4,p4e5");
-  ok("1c. the last episode has no recap (nothing follows it)", !PROG.getEpisode("p4e6").about);
+  ok("1c. the last episode has no recap (nothing follows it)", PROG.EPISODES.at(-1).id === "p5e6" && !PROG.getEpisode("p5e6").about);
   const ids = PROG.EPISODES.map(e => e.id);
   const prevLeft = ids.filter(id => PROG.getEpisode(id).prev).join();
   ok("1d. the old line is gone where the new recap replaces it, kept where it waits (p4e2 to p4e6)", prevLeft === "p4e2,p4e3,p4e4,p4e5,p4e6", prevLeft);
