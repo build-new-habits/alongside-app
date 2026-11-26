@@ -1,6 +1,13 @@
 import { createRequire as __cr } from "node:module";
 /**
  * tools/verify-build-session.mjs
+ * 26 Nov 2026 v4
+ *
+ * v4 - 4b leaves out Little and often, as the six ways in always have
+ *   (Graeme, 14 Nov; P-37 mock-up v1: the fresh set is part of its row).
+ *   It failed before midday and from 6pm, when A fresh morning or evening
+ *   set shows (P-37 S2).
+ *
  * 24 Nov 2026 v3
  *
  * v3 - P-46 S4 FREE HOME. 3y: Free asking to build is sent to the on-the-
@@ -232,7 +239,7 @@ person(); store.set("savedSessions", [planned("own_f_x6")]); SS.planSavedSession
 home();
 const prow = main.querySelector('[data-action="planned"]');
 ok("4a. saved for today: Home's one row names it", !!prow && /Today: Wednesday gym/.test(txt(prow)) && /You built this/.test(txt(prow)), txt(main.querySelector(".path-coach")));
-ok("4b. still six ways in at most", [...main.querySelectorAll(".path-home button")].filter(b => !b.closest(".path-mm")).length <= 6, main.querySelectorAll(".path-home button").length + "");
+ok("4b. still six ways in at most (Little and often isn't counted)", [...main.querySelectorAll(".path-home button")].filter(b => !b.closest(".path-mm") && !b.closest(".path-lao")).length <= 6, main.querySelectorAll(".path-home button").length + "");
 click(prow); await wait(80);
 ok("4c. one tap: its proposal, behind its door", router.currentView === "path" && /Wednesday gym/.test(txt(main.querySelector("h1"))), router.currentView + " " + txt(main.querySelector("h1")));
 ok("4d. and it can be changed from there", !!main.querySelector("#path-change"));

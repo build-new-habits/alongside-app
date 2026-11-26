@@ -1,5 +1,16 @@
 /**
  * tools/verify-p28-content.mjs
+ * 26 Nov 2026 v4
+ *
+ * v4 - P-42 S1. In Step has a fifth part (the adults' The world on your
+ *   phone, approved 26 Nov; verify-p42-adult holds its words). This gate
+ *   still holds Parts 1 to 4 to the 05 Nov wording, word for word: 1a and
+ *   1b read the first four parts and 24 episodes, 1g says Part 5 follows
+ *   Part 4, and Part 4's closing is now P-42's (the wording's "That's In
+ *   Step" line closes Part 5). 1f also takes a Standing: way (Part 5).
+ *   6b and 6d read Parts 1 to 4 (Part 5's clips are the Part 5 voice
+ *   script's, verify-p42-adult); 7c allows Part 5's "the anger points at".
+ *
  * 25 Nov 2026 v3
  *
  * v3 - P-29 INSTEP-RECAP. 1c: last time's old line is gone where the
@@ -167,11 +178,11 @@ async function block(name, fn) {
 
 await block("TEST 1 - In Step programme", async () => {
 console.log("\nTEST 1 - In Step's programme");
-ok("1a. four parts, named as the wording names them", IS.PARTS?.length === 4 &&
+ok("1a. the first four parts, named as the wording names them (a fifth follows: P-42)", IS.PARTS?.length === 5 &&
   same(IS.PARTS[0].name, "You") && same(IS.PARTS[1].name, "People close to you") &&
   same(IS.PARTS[2].name, "People you pass") && same(IS.PARTS[3].name, "People whose lives look nothing like yours"));
-ok("1b. 24 episodes, p1e1 to p4e6 in order", IS.EPISODES?.length === 24 &&
-  IS.EPISODES.every((e, i) => e.id === `p${Math.floor(i / 6) + 1}e${i % 6 + 1}` && e.part === Math.floor(i / 6) + 1 && e.episode === i % 6 + 1));
+ok("1b. 24 episodes, p1e1 to p4e6 in order, then Part 5", IS.EPISODES?.length === 30 &&
+  IS.EPISODES.slice(0, 24).every((e, i) => e.id === `p${Math.floor(i / 6) + 1}e${i % 6 + 1}` && e.part === Math.floor(i / 6) + 1 && e.episode === i % 6 + 1));
 const diff = [];
 for (const [i, w] of W_EPS.entries()) {
   const e = IS.EPISODES?.[i] || {}, p = P_EPS[i] || {};
@@ -187,7 +198,8 @@ for (const [i, w] of W_EPS.entries()) {
     ["pose", e.hold?.pose, p.pose], ["how", e.hold?.how, p.posedesc], ["alt", e.hold?.alt?.text, p.seated]];
   for (const [k, a, b] of pairs) if (!same(a, b)) diff.push(`p${w.part}e${w.episode} ${k}: "${a}" vs "${b}"`);
   if ((e.choose?.options || []).length !== 3 || !w.options.every((o, j) => same(e.choose.options[j], o))) diff.push(`p${w.part}e${w.episode} options`);
-  if (w.closing && !same(IS.PARTS?.[w.part - 1]?.closing?.text, w.closing)) diff.push(`part ${w.part} closing`);
+  // v4 (P-42): the wording's last closing line now closes Part 5; Part 4 closes as Parts 1 to 3.
+  if (w.closing && !same(IS.PARTS?.[w.part === 4 ? 4 : w.part - 1]?.closing?.text, w.closing)) diff.push(`part ${w.part} closing`);
 }
 ok("1c. every line word for word (only italics become quotation marks)", diff.length === 0, diff.slice(0, 4).join(" | "));
 ok("1d. the line after every Choose is the wording's", same(IS.ACK?.text, "There's no wrong answer.") && /There's no wrong answer\./.test(WORDING));
@@ -197,9 +209,9 @@ ok("1e. the three answers keep Schema v1.123's ids; labelled as P-29 approved",
   JSON.stringify(IS.ANSWERS?.map(a => a.id)) === JSON.stringify(["did", "not-yet", "didnt"]) &&
   /It did \/ Not yet \/ It didn't come up/.test(WORDING) && same(IS.ANSWERS.slice(0, 2).map(a => a.label).join(" / "), "I tried it / I forgot") && IS.ANSWERS[2].label === null);
 ok("1f. the seated or standing way is labelled by what it is",
-  IS.EPISODES.every(e => (e.hold.alt.label === "Standing") === /^Or stand/.test(e.hold.alt.text)));
-ok("1g. order is kept: next after p1e6 is p2e1, nothing after p4e6",
-  IS.nextEpisodeId("p1e6") === "p2e1" && IS.nextEpisodeId("p4e6") === null && IS.endsPart("p3e6") && !IS.endsPart("p3e5"));
+  IS.EPISODES.every(e => (e.hold.alt.label === "Standing") === /^(Or stand|Standing:)/.test(e.hold.alt.text)));
+ok("1g. order is kept: next after p1e6 is p2e1, Part 5 after p4e6, nothing after p5e6",
+  IS.nextEpisodeId("p1e6") === "p2e1" && IS.nextEpisodeId("p4e6") === "p5e1" && IS.nextEpisodeId("p5e6") === null && IS.PARTS[3].closing.text === "That's Part 4. Next time, if you'd like, we'll look at the world on your phone." && IS.endsPart("p3e6") && !IS.endsPart("p3e5"));
 });
 
 await block("TEST 2 - Guide me", async () => {
@@ -294,15 +306,18 @@ function csvRows(src) {
 }
 const CSV = csvRows(SCRIPT).slice(1);
 const clips = new Set(CSV.map(r => r[0].replace(/\.mp3$/, "")));
+// v4 (P-42): Parts 1 to 4 are this voice script's; Part 5 and Part 4's new closing
+// line are the Part 5 addendum's (verify-p42-adult).
+const P14 = IS.EPISODES.filter(e => e.part <= 4), P42_CLOSING = "instep-p4-e6-closing-next";
 const named = new Set([
-  ...IS.EPISODES.flatMap(e => [e.listen.audio, e.hold.audio, e.carry.audio]), ...IS.PARTS.map(p => p.closing.audio), IS.ACK.audio,
+  ...P14.flatMap(e => [e.listen.audio, e.hold.audio, e.carry.audio]), ...IS.PARTS.map(p => p.closing.audio).filter(a => a !== P42_CLOSING), IS.ACK.audio,
   ...Object.values(S).flatMap(s => s.moments.map(m => m.audio)), ...H.map(h => h.audio), ...BL.map(l => l.audio)]);
 const missing = [...named].filter(a => !clips.has(a)), unused = [...clips].filter(c => !named.has(c));
 ok("6a. the voice script has 109 clips", clips.size === 109, String(clips.size));
 ok("6b. every clip the data names is in the voice script", missing.length === 0, missing.join(", "));
 ok("6c. every clip in the voice script is named by the data", unused.length === 0, unused.join(", "));
 const csvText = Object.fromEntries(CSV.map(r => [r[0].replace(/\.mp3$/, ""), r[4]]));
-spoken = [...IS.EPISODES.flatMap(e => [e.listen, { text: e.hold.text, audio: e.hold.audio }, e.carry]), ...IS.PARTS.map(p => p.closing), IS.ACK,
+spoken = [...P14.flatMap(e => [e.listen, { text: e.hold.text, audio: e.hold.audio }, e.carry]), ...IS.PARTS.map(p => p.closing).filter(c => c.audio !== P42_CLOSING), IS.ACK,
   ...Object.values(S).flatMap(s => s.moments), ...H, ...BL];
 const off = spoken.filter(x => !same(csvText[x.audio], x.text)).map(x => x.audio);
 ok("6d. each clip's words are the words on screen", off.length === 0, off.slice(0, 5).join(", "));
@@ -319,7 +334,7 @@ ok("7b. no research cited in anything shown or heard", cited.length === 0, cited
 // One approved line uses "score" about the inner voice, never about the
 // person (Part 1, episode 3: "The other is keeping score."). It is named
 // here so that nothing else can borrow the exception.
-const ALLOWED = ["The other is keeping score."];
+const ALLOWED = ["The other is keeping score.", "Often the anger points at a whole group of people."];   // v4: P-42 Part 5, points the verb
 const bad = shown.filter(t => /\b(should|shouldn't|score|scores|streak|streaks|badges?|well done|great job|points)\b/i.test(ALLOWED.reduce((x, a) => x.replace(a, ""), t)));
 ok("7c. no should, score, streak, badge or praise words", bad.length === 0, bad[0]);
 ok("7d. the new files carry no research citation in their data", NEW.every(src => !/learnWhy|\(\d{4}\)/.test(src)));

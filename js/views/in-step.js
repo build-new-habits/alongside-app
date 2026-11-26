@@ -1,6 +1,11 @@
 /**
  * js/views/in-step.js
- * 26 Nov 2026 v10
+ * 26 Nov 2026 v11
+ *
+ * v11 - P-42 S1. Five parts: the closing after In Step's last episode is
+ *   the last part's (Part 5's, the world on your phone); a part closes on
+ *   its last episode (endsPart), not on its sixth; the Free door says five
+ *   parts.
  *
  * v10 - P-41 S2 rule 5. In the 16-17 version In Step says it is coming
  *   soon and opens no episode (P-42 writes theirs). Adults unchanged.
@@ -64,7 +69,7 @@ import { store }   from "../store.js";
 import { router }  from "../router.js";
 import { isPremium } from "../auth.js";
 import { lineIcon } from "../data/line-icons.js";
-import { PARTS, EPISODES, ACK, ANSWERS, HELD_THIRD, getEpisode, getPart, episodesInPart, nextEpisodeId, audioIdsForPart } from "../data/in-step-programme.js";
+import { PARTS, EPISODES, ACK, ANSWERS, HELD_THIRD, getEpisode, getPart, episodesInPart, nextEpisodeId, endsPart, audioIdsForPart } from "../data/in-step-programme.js";
 import { programme, currentEpisodeId, isOpen, lastTime, lastTimeLine, answerLastTime, completeEpisode,
          takePendingEpisode, LOW_DAY_LINE } from "../data/in-step-offer.js";
 import { playLine, stopLine, voiceOn, prefetchLines } from "../coach-audio.js";
@@ -110,7 +115,7 @@ const pauseBtn = (big = false) => `<button type="button" class="btn ${big ? "btn
 function altLine(alt) {
   // "Or stand, hands the same." and "Seated: let your weight ..." say what
   // they are; the rest are the seated way.
-  return /^(Or |Seated:)/.test(alt.text) ? alt.text : `Seated: ${alt.text}`;
+  return /^(Or |Seated:|Standing:)/.test(alt.text) ? alt.text : `Seated: ${alt.text}`;
 }
 
 function shell(inner) {
@@ -140,7 +145,7 @@ function renderLanding() {
         <span class="instep-next__txt"><span class="instep-next__part">Part ${curE.part}: ${esc(getPart(curE.part).name)}</span>
         <span class="instep-next__title">Episode ${curE.episode}: ${esc(curE.title)}</span>
         <span class="instep-next__sub">About 3 minutes</span></span>
-      </button>` : `<p class="instep-intro">${esc(PARTS[3].closing.text)}</p>`}
+      </button>` : `<p class="instep-intro">${esc(PARTS.at(-1).closing.text)}</p>`}
     ${PARTS.map(part => `
       <section class="instep-part" aria-labelledby="is-part-${part.n}">
         <h2 id="is-part-${part.n}">Part ${part.n}: ${esc(part.name)}</h2>
@@ -223,7 +228,7 @@ function renderChoose(e) {
 }
 
 function renderCarry(e) {
-  const closing = e.episode === 6 ? getPart(e.part).closing : null;
+  const closing = endsPart(e.id) ? getPart(e.part).closing : null;
   const more = nextEpisodeId(e.id) !== null;
   return shell(`${epHeader(e)}
     <h1 tabindex="-1">Carry it</h1>${stepNav(3)}
@@ -233,7 +238,7 @@ function renderCarry(e) {
     ${closing ? `<p class="instep-closing">${esc(closing.text)}</p>` : ""}
     ${!isPremium() ? `
       <aside class="upgrade-door" aria-label="About the paid plan">
-        <p class="upgrade-door__text">That&rsquo;s In Step — four parts, one thing at a time, each going a bit deeper.</p>
+        <p class="upgrade-door__text">That&rsquo;s In Step — five parts, one thing at a time, each going a bit deeper.</p>
         <p class="upgrade-door__text">There&rsquo;s a longer version of the same idea. You pick something you&rsquo;d like to get better at — being steadier, being more present, noticing other people more — and I build it out over months, shaped around what you&rsquo;re actually noticing rather than a fixed course.</p>
         <p class="upgrade-door__text upgrade-door__text--quiet">That&rsquo;s part of the paid plan, if you ever fancy it.</p>
         <button type="button" class="upgrade-door__link" id="is-door-btn">Have a look</button>
@@ -360,7 +365,7 @@ export function onMount() {
   }
   if (phase === "carry" && e) {
     completeEpisode(e.id);
-    const closing = e.episode === 6 ? getPart(e.part).closing : null;
+    const closing = endsPart(e.id) ? getPart(e.part).closing : null;
     voice(e.carry.audio, { then: closing ? () => playLine(closing.audio) : null });
     document.getElementById("is-door-btn")?.addEventListener("click", () => { _stop(); router.navigate("upgrade"); });
     root.querySelector("#is-done")?.addEventListener("click", leave);

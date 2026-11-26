@@ -1,5 +1,10 @@
 /**
  * tools/verify-door1.mjs
+ * 26 Nov 2026 v4
+ *
+ * v4 - P-42 S1. In Step has five parts for adults (Part 5, The world on
+ *   your phone, approved 26 Nov), so the door says five parts.
+ *
  * 06 Nov 2026 v3
  *
  * v3 - P-28 S3. In Step is a programme of four parts (Graeme, 06 Nov: the
@@ -88,13 +93,13 @@ check("shown to free users only", () =>
   ok(/!isPremium\(\) \? `/.test(inStep), "a paying person should not be sold to"));
 check("copy matches the specification", () => {
   for (const phrase of [
-    "four parts, one thing at a time",
+    "five parts, one thing at a time",   // v4: P-42 Part 5
     "being steadier, being more present",
     "part of the paid plan, if you ever fancy it",
   ]) ok(inStep.includes(phrase), `missing specified line: "${phrase}"`);
 });
 check("copy rule 10.2 - what it is, what it does, how to get it", () => {
-  ok(/four parts/.test(inStep),                     "what is it");
+  ok(/five parts/.test(inStep),                     "what is it");
   ok(/build it out over months/.test(inStep),       "what would it do for me");
   ok(/id="is-door-btn"/.test(inStep),               "how do I get it");
 });

@@ -1,6 +1,11 @@
 import { createRequire as __cr } from "node:module";
 /**
  * tools/verify-plan-home-path.mjs
+ * 26 Nov 2026 v8
+ *
+ * v8 - 1a leaves out Little and often and its label (P-36, P-37): it shows
+ *   before midday and from 6pm with A fresh set, so 1a failed then.
+ *
  * 24 Nov 2026 v7
  *
  * v7 - P-46 S4 FREE HOME. Free Home is its own now (free-home.js: coach-led,
@@ -147,7 +152,7 @@ ok("0b. a cold open on the Plan draws Home (no first-open screen)", !!main.query
 // ── 1 ─────────────────────────────────────────────────────────────────────
 console.log("\nTEST 1 - top to bottom, as mock-up v10");
 fixture({ pairs: 4 }); home();
-const order = [...main.querySelectorAll(".path-home > *")].map(el => el.matches("h1") ? "h1" : el.classList[0]);
+const order = [...main.querySelectorAll(".path-home > *")].filter(el => !el.matches(".path-lao, #path-lao-h")).map(el => el.matches("h1") ? "h1" : el.classList[0]);
 const want = ["h1", "path-arcline", "path-coach", "look-label", "path-doors"];
 ok("1a. greeting, arc line, the coach's row, label, doors (no Lately: P-34)", JSON.stringify(order.filter(o => want.includes(o))) === JSON.stringify(want), order.join(" > "));
 ok("1b. one h1", main.querySelectorAll("h1").length === 1);
