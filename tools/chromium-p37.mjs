@@ -1,6 +1,8 @@
 /**
  * tools/chromium-p37.mjs
- * 26 Nov 2026 v3
+ * 26 Nov 2026 v4
+ *
+ * v4 - S3: Your week with the lists' lines and Every day, as well.
  *
  * v3 - S2: the coach's morning and evening sets, Keep this, Home's fresh row.
  *
@@ -51,6 +53,7 @@ const SCREENS = [
   ["S2 Home: A fresh morning set", async p => { await p.evaluate(() => { Date.prototype.getHours = () => 8; }); await nav(p, "today"); }, '[data-action="day-set"]', true],
   ["S2 A morning set", async p => { await p.evaluate(() => { window.router.pathStart = { door: "feel", dayset: "morning" }; }); await nav(p, "path"); }, '#path-ds-keep', true],
   ["S2 A morning set, kept", async p => { await click(p, "#path-ds-keep"); }, '#path-ds-kept', true],
+  ["S3 Your week, lines and Every day, as well", async p => { await p.evaluate(() => { const s = window.store; const T = (id, name) => ({ id, name, own: name, mix: [{ focus: "full", level: 2 }], intensity: "steady", mins: 45, place: "gym" }); s.set("weekShape", { templates: { "t-a": T("t-a", "Upper day") }, days: { mon: "t-a", tue: "rest", wed: "rest", thu: "rest", fri: "t-a", sat: "rest", sun: "rest" }, setAt: "2026-11-11" }); s.set("prescribedExercises", [{ id: "1", name: "Hip circles", sets: 1, reps: "8", group: "Wake-up hips" }, { id: "2", name: "Shoulder rolls", sets: 1, reps: "8", group: "Shoulders" }, { id: "3", name: "Cat-cow", sets: 1, reps: "8", group: "Morning: hips and lower back" }, { id: "4", name: "Child's pose", sets: 1, reps: "8", group: "Wind down" }]); s.set("myExercisesOnHome", { "Wake-up hips": "morning", Shoulders: "morning", "Morning: hips and lower back": "morning", "Wind down": "evening" }); s.set("onHomeDays", { "Wake-up hips": ["mon", "wed", "fri"] }); }); await nav(p, "your-week"); }, '#yw-every-h', true],
   ["S2 An evening set", async p => { await p.evaluate(() => { window.router.pathStart = { door: "feel", dayset: "evening" }; }); await nav(p, "path"); }, '.path-mv__part', true],
 ];
 async function door(p, activity) {

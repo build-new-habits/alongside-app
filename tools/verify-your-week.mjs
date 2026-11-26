@@ -1,6 +1,11 @@
 /**
  * tools/verify-your-week.mjs
- * 24 Nov 2026 v6
+ * 26 Nov 2026 v7
+ *
+ * v7 - P-37 S3. A day's button is now named by its own words (no
+ *   aria-label: axe label-content-name-mismatch), so 2e and 7e read the
+ *   name as a screen reader does (text not hidden), not the attribute.
+ *   Same promise: today and done said in words.
  *
  * v6 - P-46 S4 FREE HOME. Free asking for Your week or the Library gets the
  *   on-the-plan page; Free Home is coach-led (check in, Something gentler, six
@@ -179,7 +184,8 @@ await click($('[data-ready="rotation"]'));
 let w = store.get("weekShape");
 ok("2c. a ready-made week becomes the week (Three-way rotation: six days and a rest)", !!w && w.days.sun === "rest" && Object.values(w.days).filter(v => v !== "rest").length === 6);
 ok("2d. the week shows seven days, each with what it is for", $$(".yw-day").length === 7 && txt($('[data-day="mon"]')).includes("Strength") && /Moderate · 30 min · gym/.test(txt($('[data-day="mon"]'))));
-ok("2e. today is marked as today, in words", txt($(`[data-day="${TODAY}"]`)).includes("Today") && /today/.test($(`[data-day="${TODAY}"]`).getAttribute("aria-label")));
+const spoken = el => { const c = el?.cloneNode(true); c?.querySelectorAll('[aria-hidden="true"]').forEach(n => n.remove()); return (c?.textContent || "").replace(/\s+/g, " ").trim(); };
+ok("2e. today is marked as today, in words", txt($(`[data-day="${TODAY}"]`)).includes("Today") && /, today:/.test(spoken($(`[data-day="${TODAY}"]`))) && !$(`[data-day="${TODAY}"]`).hasAttribute("aria-label"));
 ok("2f. the status line says what happened", /is your week/.test(txt($("#yw-status"))));
 await click($('[data-back="start"]'));
 ok("2g. Change the week goes back to the ways to start, saying it replaces the week", /replaces your week/.test(txt(main)));
@@ -334,7 +340,7 @@ ok("7b. and its other kinds (core and trunk)", arc.typesWorked?.core === today, 
 ok("7c. Progress counts the session", store.completedSessions(store.get("activityLog") || []).length === before + 1);
 ok("7d. the week shows today done", WS.doneThisWeek()[TODAY] === true);
 await router.navigate("your-week"); await wait(60);
-ok("7e. on screen: Done, in words, on today's row", /Done/.test(txt($(`[data-day="${TODAY}"]`))) && /done/.test($(`[data-day="${TODAY}"]`).getAttribute("aria-label")));
+ok("7e. on screen: Done, in words, on today's row", /Done/.test(txt($(`[data-day="${TODAY}"]`))) && /Done/.test(spoken($(`[data-day="${TODAY}"]`))));
 
 // ── 8. Across the week ─────────────────────────────────────────────────
 console.log("\nTEST 8 - across the week");
