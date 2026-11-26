@@ -1,5 +1,10 @@
 /**
  * js/data/age-check.js
+ * 26 Nov 2026 v9
+ *
+ * v9 - P-41 S4. Once 16-17 is open the question's line says Alongside is
+ *   for 16 and over (approved 26 Nov); while closed it is as before.
+ *
  * 25 Nov 2026 v8
  *
  * v8 - P-41 THREE AGE VERSIONS, S1 (spec v2, approved by Graeme 25 Nov).
@@ -76,6 +81,7 @@
  * on any day of October 2026, so they are let in from November 2026. An
  * 18-year-old can wait up to a month; a 17-year-old is never let in.
  */
+import { AGE_LINE_OPEN } from "./age-version.js";
 import { store } from "../store.js";
 
 export const AGE_CHECK_VERSION = "2026-10-01";
@@ -265,7 +271,7 @@ export function ageQuestionHTML(idPrefix = "age") {
   return `
     <fieldset class="age-q" id="${idPrefix}-fieldset">
       <legend class="age-q__legend">When were you born?</legend>
-      <p class="age-q__hint" id="${idPrefix}-hint">Alongside is for adults. I only keep whether you are 18 or over, not the date.</p>
+      <p class="age-q__hint" id="${idPrefix}-hint">${YOUNG_OPEN["young-16"] ? AGE_LINE_OPEN : "Alongside is for adults. I only keep whether you are 18 or over, not the date."}</p>
       <div class="age-q__row">
         <div class="age-q__field">
           <label class="age-q__label" for="${idPrefix}-month">Month</label>

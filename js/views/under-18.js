@@ -1,5 +1,11 @@
 /**
  * js/views/under-18.js
+ * 26 Nov 2026 v7
+ *
+ * v7 - P-41 S4. Once the 16-17 version is open this screen is for under 16:
+ *   its heading, why, and the month to start again say 16 (approved 26
+ *   Nov). While closed it is exactly as before.
+ *
  * 17 Oct 2026 v6
  *
  * v6 - W6-16. Starting again is from the month after turning 18
@@ -50,6 +56,9 @@
  * privacy summary stays reachable, so they can read what was and was not
  * kept.
  */
+import { YOUNG_OPEN } from "../data/age-check.js";
+import { UNDER16_TITLE, UNDER16_WHY } from "../data/age-version.js";
+
 // W5-16. The site this copy of the app runs on, not a fixed name.
 const _host = () => (typeof location !== "undefined" && location.host) || "this app\u2019s site";
 
@@ -57,14 +66,17 @@ export function Under18View(router) {
   let root = null;
 
   function render() {
+    // P-41 S4: once 16-17 is open, this is the under-16 screen.
+    const open16 = YOUNG_OPEN["young-16"] === true;
     root.innerHTML = `
       <div class="view u18-view">
-        <h1 class="u18-title" id="u18-title" tabindex="-1">Alongside is for adults</h1>
+        ${open16 ? `<h1 class="u18-title" id="u18-title" tabindex="-1">${UNDER16_TITLE}</h1>
+        <p class="u18-text">${UNDER16_WHY}</p>` : `<h1 class="u18-title" id="u18-title" tabindex="-1">Alongside is for adults</h1>
         <p class="u18-text">So I can\u2019t be your coach. That isn\u2019t about you. What Alongside
           suggests is written for adult bodies, and young people\u2019s information
-          deserves more care than this app was built to give.</p>
-        <p class="u18-text">Nothing you told the app is kept on this phone. It remembers only that you said you are under 18, so it shows you this page.</p>
-        <p class="u18-text">From the month after you turn 18, you can start again: clear this app\u2019s data in your phone\u2019s browser settings (the site is ${_host()}), and if you added Alongside to your home screen, remove it from there too. Then it will ask you from the beginning.</p>
+          deserves more care than this app was built to give.</p>`}
+        <p class="u18-text">Nothing you told the app is kept on this phone. It remembers only that you said you are under ${open16 ? "16" : "18"}, so it shows you this page.</p>
+        <p class="u18-text">From the month after you turn ${open16 ? "16" : "18"}, you can start again: clear this app\u2019s data in your phone\u2019s browser settings (the site is ${_host()}), and if you added Alongside to your home screen, remove it from there too. Then it will ask you from the beginning.</p>
         <p class="u18-text">If you\u2019d like to move more, a PE teacher, your GP or a local club
           can help you find something that suits you.</p>
 

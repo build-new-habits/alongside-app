@@ -1,5 +1,12 @@
 /**
  * js/data/age-version.js
+ * 26 Nov 2026 v3
+ *
+ * v3 - P-41 S4 WORDS (approved by Graeme 26 Nov, BNH-Files Product/
+ *   alongside_p41_words-16-17_26nov2026_v1.md): the age line and the
+ *   under-16 screen for when 16-17 is open, the once-only welcome, the
+ *   health-answers line and the privacy summary for 16-17.
+ *
  * 26 Nov 2026 v2
  *
  * v2 - P-41 S3. takeMovedUpLine(): moves a 16-17 phone up when its month
@@ -110,3 +117,15 @@ export function takeMovedUpLine(now = new Date()) {
   store.set("consent.ageMovedUpAt", null);
   return MOVED_UP_LINE;
 }
+
+// S4. Words (approved 26 Nov). The age line and the under-16 screen are
+// used only once the 16-17 version is open (YOUNG_OPEN in age-check.js).
+export const AGE_LINE_OPEN = "Alongside is for 16 and over. I keep what your age means for the app, never your date of birth.";
+export const UNDER16_TITLE = "Alongside is for 16 and over";
+export const UNDER16_WHY = "So I can’t be your coach yet. That isn’t about you: young people’s information deserves extra care, and the version for your age isn’t ready.";
+export const WELCOME_TITLE = "Alongside for 16 and 17";
+export const WELCOME_LINE = "A few things are different at your age: no weight tracking, at most two hard days a week, and help lines for young people.";
+export const HEALTH_YOUNG = "At 16 you can agree to this yourself. If you’re unsure, talk to someone you trust first.";
+export const PRIVACY_YOUNG = "Everything stays on this phone. Nobody else sees it, not us and not your parents or carers. Your journal is never read, by anyone or by the app. The app keeps the month you turn 18, so it can change to the adult version then; it never keeps your date of birth. You can delete everything in Settings at any time.";
+/** The once-only welcome is due: a 16-17 phone that has not seen it. */
+export const welcomeDue = () => isYoung() && !(store.get("consent") || {}).ageWelcomedAt;

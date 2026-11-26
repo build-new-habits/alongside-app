@@ -1,6 +1,11 @@
 /**
  * js/views/onboarding/thread.js
- * 25 Nov 2026 v31
+ * 26 Nov 2026 v32
+ *
+ * v32 - P-41 S4 (approved 26 Nov). A 16-17 year old sees "Alongside for
+ *   16 and 17" once, before getting started (consent.ageWelcomedAt), and
+ *   the health-answers line for their age on the agreements. Adults
+ *   unchanged.
  *
  * v31 - P-41 S1. The age answer is recorded from the fields (recordAnswer),
  *   with the version that suits the age. Young versions are closed, so
@@ -317,6 +322,7 @@
  *     collapsed to 0ms.
  *   - Sheet focus trap handled by sheet-manager.js.
  */
+import { isYoung, welcomeDue, WELCOME_TITLE, WELCOME_LINE, HEALTH_YOUNG } from '../../data/age-version.js';
 import { prefersReducedMotion } from '../../display-prefs.js';
 
 import { store }              from '../../store.js';
@@ -556,7 +562,8 @@ export function ThreadView(router) {
         </div>
         <p class="ob-consent__note" id="ob-consent-health-what">${HEALTH_WHAT}</p>
         <p class="ob-consent__note" id="ob-consent-health-note">${HEALTH_NOTE}
-          This one is up to you: without it I won\u2019t ask about your body or keep check-ins, and I\u2019ll plan sessions carefully. You can say yes later.</p>
+          This one is up to you: without it I won\u2019t ask about your body or keep check-ins, and I\u2019ll plan sessions carefully. You can say yes later.</p>${isYoung() ? `
+        <p class="ob-consent__note" id="ob-consent-health-young">${HEALTH_YOUNG}</p>` : ''}
 
         <p class="ob-consent__error" id="ob-consent-error" role="status" hidden>
           Tick the first box to agree to the Privacy Policy and Terms of Service before continuing.
@@ -714,7 +721,24 @@ export function ThreadView(router) {
     // P-46 S2. Anyone who has not started this conversation goes to the
     // one-minute start (views/onboarding/start.js). Someone part-way
     // through it carries on above, as before.
+    // P-41 S4 (approved 26 Nov): a 16-17 year old sees what is different
+    // at their age once, before getting started.
+    if (welcomeDue()) { _renderYoungWelcome(); return; }
     router.navigate('onboarding/start', { replace: true });
+  }
+
+  function _renderYoungWelcome() {
+    _thread.innerHTML = `
+      <section class="ob-consent" aria-labelledby="ob-young-h">
+        <h1 class="ob-consent__heading" id="ob-young-h" tabindex="-1">${WELCOME_TITLE}</h1>
+        <p class="ob-consent__note" id="ob-young-line">${WELCOME_LINE}</p>
+        <button class="btn btn-primary btn-large btn-full" id="ob-young-go">Carry on</button>
+      </section>`;
+    _thread.querySelector('#ob-young-go')?.addEventListener('click', () => {
+      store.set('consent.ageWelcomedAt', new Date().toISOString());
+      router.navigate('onboarding/start', { replace: true });
+    });
+    _thread.querySelector('#ob-young-h')?.focus();
   }
 
   // ── Step runner ────────────────────────────────────────────────────────────

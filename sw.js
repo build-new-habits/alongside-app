@@ -1,7 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 26 Nov 2026 v753
+ * 26 Nov 2026 v754
+ *
+ * v754 - P-41 S4. The 16-17 version's words (approved 26 Nov): a welcome once, the health answers line, what the app keeps at 16 and 17, and the age line and under-16 screen for when it opens. Still closed. No new files.
  *
  * v753 - P-41 S3. A 16-17 phone moves up to the adult version by itself the month they turn 18, and Home says so once. Still closed to new 16-17 year olds, so nothing changes for anyone yet. No new files.
  *
@@ -4359,7 +4361,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v753";
+const CACHE_NAME = "alongside-v754";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4426,7 +4428,7 @@ const SHELL_HASHES = {
   "./css/components/finish.css": "c33e298d5fcb92ae",
   "./js/app.js": "81ed92c5ada71eb8",
   "./js/router.js": "f4e0c7f0eac0a035",
-  "./js/store.js": "0c2d4360c949a6e4",
+  "./js/store.js": "815986c676a1a6de",
   "./js/session-log.js": "6134de4315842e05",
   "./js/exercise-feedback.js": "adba8549f444da2a",
   "./js/exercise-card.js": "87af7a5668137593",
@@ -4476,13 +4478,13 @@ const SHELL_HASHES = {
   "./js/views/onboarding/frequency.js": "47e40b6e6e2f458f",
   "./js/views/programme-select.js": "115a22eeb9526be5",
   "./js/views/upgrade.js": "60548142d092aa9a",
-  "./js/views/privacy.js": "a3141eea5d56825f",
+  "./js/views/privacy.js": "a32845d9bb4b826a",
   "./js/views/library.js": "ae647a15a875452c",
   "./js/views/practices.js": "f76d5aae3596a565",
   "./js/views/red-flag.js": "d2f857d0f8ba905f",
-  "./js/views/health-consent.js": "cace2ae17b89b230",
+  "./js/views/health-consent.js": "e879f280bacfa201",
   "./js/views/age-check.js": "2485fc6e163c47ae",
-  "./js/views/under-18.js": "22c82205c5f7626a",
+  "./js/views/under-18.js": "dd9882ca9847db82",
   "./js/views/consent-update.js": "51f918f8e2c9b25a",
   "./js/data/arc-readback.js": "9b06dcba96534da0",
   "./js/data/tier-table.js": "ca492fb2752322a4",
@@ -4502,8 +4504,8 @@ const SHELL_HASHES = {
   "./css/components/start.css": "0f7b613d180c41ee",
   "./js/data/red-flag.js": "3cd9eecbc3985eb3",
   "./js/data/health-consent.js": "a23d005af57f179c",
-  "./js/data/age-check.js": "ebe52a0249529e29",
-  "./js/data/age-version.js": "18e106bdbbf4b5fe",
+  "./js/data/age-check.js": "369495a6cf2da524",
+  "./js/data/age-version.js": "f2333fa27163f289",
   "./js/data/restore.js": "fd3860a6ccd4e480",
   "./js/data/export-file.js": "bbee762322d0e4e2",
   "./js/data/health-consent-covers.js": "6698a3e50672cbbe",
@@ -4612,7 +4614,7 @@ const SHELL_HASHES = {
   "./js/views/running-session.js": "3fcc750fa8c6214d",
   "./js/views/swim-session.js": "796864e209d35cb8",
   "./js/views/cycle-session.js": "5cf63e9171ece8d8",
-  "./js/views/onboarding/thread.js": "1ba7d6c1f3250a23",
+  "./js/views/onboarding/thread.js": "db7d63b7fab27574",
   "./js/views/onboarding/sheet-manager.js": "20cb675f242157c8",
   "./js/views/onboarding/goals.js": "ec29181741c4bc1e",
   "./js/views/onboarding/conditions.js": "f719e4e253244b9e",
