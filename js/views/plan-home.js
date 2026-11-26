@@ -1,5 +1,11 @@
 /**
  * views/plan-home.js
+ * 26 Nov 2026 v21
+ *
+ * v21 - P-37 S2. Little and often adds A fresh morning set (before
+ *   midday) or A fresh evening set (from 6pm), not on a hard day: the
+ *   coach's set (views/path.js).
+ *
  * 26 Nov 2026 v20
  *
  * v20 - P-37 S1. Little and often: a list taking turns says which comes
@@ -190,7 +196,8 @@ import { checkinToday, soreToday, lastPlace, prefNames } from "../data/path-cont
 import { mixLine, detailLine } from "../data/week-shape-model.js";
 import { todayInWeek, primaryFocus, localDay, getWeek } from "../data/week-shape.js";
 import { changeLine, undoToday, canUndoToday } from "../data/week-changes.js";
-import { homeItems, homeItemLine } from "../data/little-and-often.js";
+import { homeItems, homeItemLine, partOfDay } from "../data/little-and-often.js";
+import { WORDS as DS_WORDS } from "../data/day-sets.js";
 import { DAY_NAMES } from "../data/week-shape-model.js";
 import { savedForDay, savedById, lastDoneOf } from "../data/saved-sessions.js";
 import { kindOf } from "../data/kind-colours.js";
@@ -446,9 +453,16 @@ function changeBar(state) {
 }
 
 /** P-31. Little and often: the lists the person put on Home, at most three. */
-function littleAndOften() {
+function littleAndOften(hard = false) {
   const items = homeItems();
-  if (!items.length) return "";
+  // P-37 S2. A fresh morning set before midday, a fresh evening set from 6pm; not on a hard day.
+  const part = hard ? null : partOfDay();
+  if (!items.length && !part) return "";
+  const fresh = part ? `<li><button type="button" class="path-door path-lao__fresh" data-action="day-set" data-part="${part}">
+          <span class="kind-tile k-green">${lineIcon("fresh")}</span>
+          <span class="path-door__text"><span class="path-door__t">${esc(DS_WORDS[part].home)}</span>
+            <span class="path-door__d">${esc(DS_WORDS[part].homeSub)}</span></span>
+          <span class="path-door__chev" aria-hidden="true">${lineIcon("chevron", 20)}</span></button></li>` : "";
   return `<h2 class="look-label" id="path-lao-h">Little and often</h2>
     <ul class="path-lao" aria-labelledby="path-lao-h">
       ${items.map(i => {
@@ -461,8 +475,9 @@ function littleAndOften() {
           : `<li><button type="button" class="path-door" data-action="lao-start" data-group="${esc(i.group)}">${body}
           <span class="path-door__chev" aria-hidden="true">${lineIcon("chevron", 20)}</span></button></li>`;
       }).join("")}
+      ${fresh}
     </ul>
-    <button type="button" class="path-link path-lao__all" data-action="lao-all">All of My exercises</button>`;
+    ${items.length ? `<button type="button" class="path-link path-lao__all" data-action="lao-all">All of My exercises</button>` : ""}`;
 }
 
 // ── P-39 Making my Move on Home ────────────────────────────────────────────
@@ -564,7 +579,7 @@ export function renderPlanHome(ctx = {}) {
       ${hardLead ? "" : changeBar(state)}
       ${liveAsk(mm) ? `<div class="path-mm">${liveAsk(mm)}</div>` : ""}${myMoveBar(liveAsk(mm) ? { ...mm, ask: false, review: false } : mm)}
       ${!hardLead && mm.day !== "hard" && !liveAsk(mm) && !mm.ask && !mm.review ? askLaterCard(dueAskLater()) : ""}
-      ${littleAndOften()}
+      ${littleAndOften(mm.day === "hard")}
       <h2 class="look-label" id="path-doors-h" tabindex="-1">${label}</h2>
       <ul class="path-doors" aria-labelledby="path-doors-h">
         ${shown.map(d => `<li><button type="button" class="path-door" data-door="${d.id}">
@@ -706,6 +721,10 @@ export function wirePlanHome(container, router) {
     router.navigate("prescribed-session");
   }));
   container.querySelector('[data-action="lao-all"]')?.addEventListener("click", () => router.navigate("prescribed"));
+  container.querySelector('[data-action="day-set"]')?.addEventListener("click", e => {
+    router.pathStart = { door: "feel", dayset: e.currentTarget.dataset.part };
+    router.navigate("path");
+  });
   // After Change today or Undo, the next thing to read is the change itself.
   const focus = router.homeFocus;
   if (focus) {

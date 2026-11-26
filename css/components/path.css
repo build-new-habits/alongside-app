@@ -1,5 +1,10 @@
 /* ============================================================
    components/path.css
+   26 Nov 2026 v23
+
+   v23 - P-37 S2: .path-mv__part (the evening set's parts) and
+   .path-lao__fresh (Home's fresh set row).
+
    25 Nov 2026 v22
 
    v22 - P-46 Wave 8: no house on the health-consent screens either; each
@@ -364,6 +369,7 @@
 .path-mv { display: flex; flex-direction: column; gap: 4px; padding: var(--space-3); border: 1px solid var(--color-border); border-radius: var(--radius-lg, 16px); background: var(--color-surface); }
 .path-mv .xfig { max-width: 160px; }
 .path-mv .xfig__cap { display: none; }
+.path-mv__part { margin: 0 0 var(--space-xs, 0.25rem); }   /* P-37 S2: the evening set's parts */
 .path-mv__nm { margin: 0; font-size: var(--text-base); font-weight: 700; color: var(--color-text); }
 .path-mv__yt { align-self: flex-start; display: inline-flex; align-items: center; min-height: 44px; color: var(--color-text); font-size: var(--text-sm); text-decoration: underline; }
 .path-view .path-adj { display: flex; flex-direction: column; gap: 2px; }
@@ -553,6 +559,7 @@ body:has(#main-content .plan-back, #main-content .plan-exit, #main-content .hc-v
 .path-lao__done { cursor: default; border-style: dashed; }
 .path-lao__sore { font-size: var(--text-xs); font-weight: 700; color: var(--color-text); line-height: 1.4; }
 .path-lao__all { align-self: flex-start; }
+.path-lao__fresh .path-door__d { white-space: normal; }   /* P-37 S2: A fresh morning (or evening) set */
 .path-door__text { min-width: 0; }
 
 /* P-31. Change today's screen: its choices, one per row. */
