@@ -1,5 +1,11 @@
 /**
  * js/views/your-week.js
+ * 26 Nov 2026 v8
+ *
+ * v8 - P-41 S2 rule 4. In the 16-17 version How hard says two hard days a
+ *   week at most, and a day is not saved as Hard if that would make three.
+ *   Adults unchanged.
+ *
  * 24 Nov 2026 v7
  *
  * v7 - P-46 S6 WORDS. Fewer words before the first button (spec §7: about
@@ -66,6 +72,7 @@
  */
 
 import { store } from "../store.js";
+import { isYoung, hardDaysInWeek, HARD_DAYS_MOST, HARD_DAYS_LINE } from "../data/age-version.js";
 import { isPremium } from "../auth.js";
 import { lineIcon } from "../data/line-icons.js";
 import { EXERCISES } from "../data/exercises/index.js";
@@ -351,6 +358,8 @@ export function YourWeekView(router) {
 
       <section class="look-card yw-card" aria-labelledby="yw-int-h">
         <h2 class="yw-card__h" id="yw-int-h">How hard</h2>
+        ${isYoung() ? `<p class="yw-sub" id="yw-int-young">${esc(HARD_DAYS_LINE)}</p>` : ""}
+        <p class="yw-error" id="yw-int-error" role="alert"></p>
         <div class="yw-stack" role="group" aria-labelledby="yw-int-h">
           ${INTENSITIES.map(i => `<button class="yw-int${t.intensity === i.id ? " is-on" : ""}" data-int="${i.id}" aria-pressed="${t.intensity === i.id}">
             <span class="yw-int__name">${i.label}</span><span class="yw-int__line">${esc(i.line)}</span></button>`).join("")}
@@ -553,6 +562,13 @@ export function YourWeekView(router) {
       const used = new Set(Object.values(draft.days).filter(v => v && v !== "rest"));
       for (const id of Object.keys(draft.templates)) if (!used.has(id)) delete draft.templates[id];
       const saved = sanitizeWeekShape(draft);
+      // P-41 S2 rule 4: two hard days a week at most in the 16-17 version.
+      if (saved && isYoung() && hardDaysInWeek(saved) > HARD_DAYS_MOST) {
+        const e = $("#yw-int-error");
+        if (e) e.textContent = "That would be more than two hard days this week. Choose an easier level for this day.";
+        $("#yw-int-h")?.scrollIntoView?.({ block: "center" });
+        return;
+      }
       if (saved) store.set("weekShape", saved);
       const name = DAY_NAMES[dayKey];
       draft = null;

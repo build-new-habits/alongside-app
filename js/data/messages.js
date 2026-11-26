@@ -1,5 +1,10 @@
 /**
  * js/data/messages.js
+ * 26 Nov 2026 v5
+ *
+ * v5 - P-41 S2 rule 6. Nothing fetched or shown in the 16-17 version
+ *   (messagesAllowed), so no survey, Share my figures or news either.
+ *
  * 17 Oct 2026 v4
  *
  * v4 - W6-16. The under-18 check is made again when the download
@@ -51,6 +56,7 @@
  * Tested by tools/verify-messages.mjs.
  */
 import { store } from "../store.js";
+import { messagesAllowed } from "./age-version.js";
 
 export const MESSAGES_URL = "messages.json";
 export const KINDS = ["app", "research", "news"];
@@ -108,6 +114,7 @@ export async function refreshMessages(fetchImpl = globalThis.fetch) {
   if (typeof fetchImpl !== "function") return false;
   // W4-17: nothing is fetched for somebody who said they are under 18.
   if ((store.get("consent") || {}).ageConfirmed === false) return false;
+  if (!messagesAllowed()) return false;   // P-41 S2 rule 6: none in the 16-17 version
   try {
     const res = await fetchImpl(MESSAGES_URL, { cache: "no-store", credentials: "omit" });
     if (!res || !res.ok) return false;
@@ -134,6 +141,7 @@ export function addBuiltIn(provider) { if (typeof provider === "function") _extr
 
 /** The messages this person sees now, newest first. */
 export function visibleMessages() {
+  if (!messagesAllowed()) return [];   // P-41 S2 rule 6
   const m = store.get("messages") || {};
   const plan = (store.get("tier") || "free") !== "free";
   const sessions = _sessionCount();

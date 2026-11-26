@@ -1,5 +1,11 @@
 /**
  * upgrade.js - Upgrade / Membership view
+ * 26 Nov 2026 v25
+ *
+ * v25 - P-41 S2 rule 7. In the 16-17 version the Plan is not bought here:
+ *   no I'm ready, and a line that a parent or carer can buy a place.
+ *   Adults unchanged.
+ *
  * 24 Nov 2026 v24
  *
  * v24 - P-46 S4. Log what I did is on Home on Free (the Library is the Plan's).
@@ -239,6 +245,7 @@
  */
 
 import { updateNavDot } from "../data/messages.js";
+import { canBuy, BUY_YOUNG_LINE } from "../data/age-version.js";
 import { store }  from "../store.js";
 import { router } from "../router.js";
 import { PRICE_MONTHLY, PRICE_ANNUAL } from "../data/pricing.js";
@@ -444,11 +451,11 @@ export function render() {
       <!-- THE BUTTON. "I'm ready" echoes the home page CTA -- the doc:
            "she has said this before. It feels familiar." -->
       <div class="upgrade-actions">
-        <button class="btn btn-primary btn-full btn-large"
+        ${canBuy() ? `<button class="btn btn-primary btn-full btn-large"
                 id="upgrade-cta"
                 aria-label="I’m ready: start the Plan">
           I&rsquo;m ready
-        </button>
+        </button>` : `<p class="upgrade-body" id="upgrade-young">${BUY_YOUNG_LINE}</p>`}
 
         <p class="upgrade-safety">
           Nothing is lost. Everything you have done stays on this phone,

@@ -1,5 +1,7 @@
 # Alongside — Data Schema Reference
-## 25 Nov 2026 v1.137
+## 26 Nov 2026 v1.138
+
+> **v1.138, 26 Nov 2026 — P-41 S2 RULES, no field change** (`store.js` v135). In the 16-17 version (`consent.ageGroup` `'young-16'`), `weightTracking` is always `false` and no `weight` or `weightLog` is kept: `store._youngNoWeight()` holds it on load and on any write to those keys or to `consent`. Every other difference is a rule in `js/data/age-version.js`, read by the screens. Gated by `tools/verify-p41-rules.mjs`.
 
 > **v1.137, 25 Nov 2026 — P-41 THREE AGE VERSIONS, S1, schema first** (`store.js` v134). Spec BNH-Files `Product/alongside_p41_three-age-versions_spec_25nov2026_v2.md`, approved by Graeme 25 Nov. **Three keys added to `consent`:** **`ageGroup`** `'adult' | 'young-16' | null` (default `null`): which version of the app suits their age, set by the age question (`age-check.js` `recordAge`, `recordAnswer`); **`ageGroupNext`** `'YYYY-MM' | null`: for `young-16` only, the month they move up to the adult version (the month after the month they turn 18). Graeme, 25 Nov: kept on the phone only, never sent, deleted at 18; it is close to a birth month and year, so Foot Anstey is asked to confirm. The date of birth itself is never kept. **`ageGroupAt`** ISO or `null`: when the group was last set. **On load** (`store._cleanAgeGroup()`): a group not one of the two is `null`; a phone let in before this version (`ageConfirmed` true, no group) is `'adult'`, as the check then let in only adults; a phone not let in holds no group; `ageGroupNext` only for `young-16` and only as `YYYY-MM`; a `young-16` with no month is asked the age again (`ageConfirmed` `null`). **Both young versions are closed in S1** (`YOUNG_OPEN`): anyone under 18 is still kept out and nothing is kept, as before. Gated by `tools/verify-p41-schema.mjs`.
 
@@ -1119,7 +1121,7 @@
 
 ## 06 Sep 2026 v1.51
 
-**File:** `js/store.js` (confirmed live version: **v134, 25 Nov 2026**)
+**File:** `js/store.js` (confirmed live version: **v135, 26 Nov 2026**)
 
 > **v1.47, 06 Sep 2026 — CR-1.** `conditions[]` gains three ids and loses one. `chronic-fatigue` is **retired**; `persistent-fatigue`, `me-cfs` and `long-covid` replace it. No field shape changed — `conditions` is still `string[]` and `conditionMeta` is still keyed by condition id.
 >

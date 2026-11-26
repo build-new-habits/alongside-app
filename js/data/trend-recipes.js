@@ -1,5 +1,11 @@
 /**
  * js/data/trend-recipes.js
+ * 26 Nov 2026 v5
+ *
+ * v5 - P-41 S2 rule 4. In the 16-17 version every hard day counts together:
+ *   two a week at most across HILIT, Hybrid and Zone 2's harder day
+ *   (data/age-version.js hardDayAllowed). Adults unchanged.
+ *
  * 01 Nov 2026 v4
  *
  * v4 - P-20 session 4: reformer-style Pilates with a band, and Dynamic
@@ -51,6 +57,7 @@
  *    the app offers.
  *  - No times kept as a result, no scores, no counts of days in a row.
  */
+import { hardDayAllowed } from "./age-version.js";
 
 export const EFFORT = Object.freeze({
   easy:   "Easy: you could talk in full sentences the whole time.",
@@ -179,7 +186,9 @@ export function zone2HardDoneThisWeek(log = [], now = new Date()) {
   const day = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const monday = new Date(day); monday.setDate(day.getDate() - ((day.getDay() + 6) % 7));
   return log.some(e => e && e.trend === "zone2" && e.effort === "hard"
-    && Date.parse(e.completedAt || e.date) >= monday.getTime());
+    && Date.parse(e.completedAt || e.date) >= monday.getTime())
+    // P-41 S2 rule 4: in the 16-17 version, two hard days this week of any kind is the most.
+    || !hardDayAllowed(log, now).ok;
 }
 
 // ── Snacks (draft §4) ────────────────────────────────────────────────────
@@ -292,6 +301,8 @@ export function hardTrendDayAllowed(trend, label, log = [], now = new Date(), mo
   const done = log.filter(e => e && e.trend === trend && e.status !== "partial").map(e => Date.parse(e.completedAt || e.date)).filter(Number.isFinite);
   if (done.some(t => t >= yesterday.getTime())) return { ok: false, why: `You did ${label} yesterday or today. It works best with a day off between.` };
   if (done.filter(t => t >= monday.getTime()).length >= most) return { ok: false, why: `That\u2019s ${most === 3 ? "three" : "two"} ${label} days this week, which is plenty. The rest of the week is for something else.` };
+  // P-41 S2 rule 4: the 16-17 version counts every hard day together, two a week at most.
+  if (trend !== "reformer") { const young = hardDayAllowed(log, now); if (!young.ok) return young; }
   return { ok: true, why: "" };
 }
 

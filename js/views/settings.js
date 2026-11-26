@@ -1,5 +1,10 @@
 /**
  * settings.js
+ * 26 Nov 2026 v79
+ *
+ * v79 - P-41 S2 (16-17 version): no Weight section (rule 1) and no
+ *   Messages row (rule 6), from data/age-version.js. Adults unchanged.
+ *
  * 23 Nov 2026 v78
  *
  * v78 - P-39 S6. Guide markers on the Plan only (Free byte for byte):
@@ -792,6 +797,7 @@ import { CONDITIONS, bodyAreasOf, everydayOf, isEveryday } from '../data/conditi
 import { scopeStatementHTML } from '../data/scope-statement.js';
 import { aimById } from '../data/aims.js';
 import { healthAllowed, healthConsentNeeded, setPendingRoute, takeOpenCapability, takePendingRoute } from '../data/health-consent.js';
+import { weightAllowed, messagesAllowed } from '../data/age-version.js';
 import { describeDate, restoredMessage } from '../data/restore.js';
 import { lockText, passwordProblem, lockAvailable } from '../data/file-lock.js';
 import { restoreFromFile } from './restore-flow.js';
@@ -1122,7 +1128,8 @@ export function SettingsView(router) {
             ? _row({ label: 'What you told me at the start', value: _backgroundAnswered() ? 'Answered' : 'Not answered', open: 'background' })
             : _row({ label: 'What you told me at the start', value: 'Not answered', action: 'health-background' }),
         ] },
-        c.premium ? { title: 'Weight', rows: [
+        // P-41 S2 rule 1: no weight in the 16-17 version.
+        c.premium && weightAllowed() ? { title: 'Weight', rows: [
           _rowSwitch({ id: 'settings-weight-tracking', label: 'Weight tracking', sub: 'Off unless you turn it on. Only you see it, and I will never ask you to weigh yourself.', field: 'weightTracking' }),
           store.get('weightTracking') === true && healthAllowed() ? _row({ label: 'Your weight and units', open: 'weight' }) : '',
         ] } : null,
@@ -1216,7 +1223,7 @@ export function SettingsView(router) {
     const c = _ctx();
     return `
       <ul class="settings-index">
-        ${SECTION_ORDER.map(id => `
+        ${SECTION_ORDER.filter(id => id !== 'messages' || messagesAllowed()).map(id => `
           <li class="settings-index__item">
             <h2 class="settings-index__h">
               <button class="settings-idx settings-idx--${SECTION_KIND[id]}" data-section="${id}"
@@ -1549,6 +1556,7 @@ export function SettingsView(router) {
    * their name, is pressure dressed as information.
    */
   function _weightSection(on, unit, kg) {
+    if (!weightAllowed()) return '';   // P-41 S2 rule 1
     // BUNDLE-TRUE: weight is a health answer; no entry without the consent.
     if (!isPremium() || !healthAllowed()) return '';
 
