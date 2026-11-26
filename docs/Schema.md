@@ -1,5 +1,7 @@
 # Alongside — Data Schema Reference
-## 26 Nov 2026 v1.140
+## 26 Nov 2026 v1.141
+
+> **v1.141, 26 Nov 2026 — P-37 MORNING-EVENING, S1, schema first** (`store.js` v138; `data/week-shape-model.js` v7). Mock-up approved by Graeme 26 Nov (*"That mock up was good"*). **Two additions, nothing removed, the Plan only.** **`onHomeDays`** `{ "<list name>": ["mon", …] }`, default `{}`: *Choose the days* for a list that is On Home for Mornings or Evenings; a list not here **takes turns** (the default). **Written by** My exercises' *Which mornings?* (`little-and-often.js` `setOnHomeDays`); cleared when the list stops being Mornings or Evenings. **On load** (`sanitizeOnHomeDays`, against `myExercisesOnHome`): only Mornings or Evenings lists keep days; days are known day keys, once each, in week order; none means take turns. **`onHomeTurns`** `{ morning?: { group, doneOn }, evening?: { group, doneOn } }`, default `{}`: whose turn it is among the lists taking turns, and the local day (`YYYY-MM-DD`) it was finished, or `null`. **Written only by** `little-and-often.js` `turnFor()`: the turn moves to the next list (My exercises' order) only after the one before was finished on an earlier day, so a missed morning skips nothing. **On load** (`sanitizeOnHomeTurns`): anything else is dropped; a list no longer taking turns is let go when read. Gated by `tools/verify-p37-turns.mjs`.
 
 > **v1.140, 26 Nov 2026 — P-41 S4 WORDS** (`store.js` v137). **One key added to `consent`: `ageWelcomedAt`** (ISO or `null`, default `null`): when a 16-17 phone saw the once-only *Alongside for 16 and 17* screen (`onboarding/thread.js`), so it is never shown again. Anything not a valid time loads as `null`. Gated by `tools/verify-p41-words.mjs`.
 
@@ -1125,7 +1127,7 @@
 
 ## 06 Sep 2026 v1.51
 
-**File:** `js/store.js` (confirmed live version: **v137, 26 Nov 2026**)
+**File:** `js/store.js` (confirmed live version: **v138, 26 Nov 2026**)
 
 > **v1.47, 06 Sep 2026 — CR-1.** `conditions[]` gains three ids and loses one. `chronic-fatigue` is **retired**; `persistent-fatigue`, `me-cfs` and `long-covid` replace it. No field shape changed — `conditions` is still `string[]` and `conditionMeta` is still keyed by condition id.
 >

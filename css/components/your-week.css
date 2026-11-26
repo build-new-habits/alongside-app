@@ -1,5 +1,8 @@
 /* css/components/your-week.css
- * 14 Nov 2026 v5
+ * 26 Nov 2026 v6
+ *
+ * v6 - P-37 S1: Which mornings? (Take turns or Choose the days) under a
+ *   Mornings or Evenings list (.px-days).
  *
  * v5 - P-31 LITTLE-AND-OFTEN: On Home under each list in My exercises
  *   (.px-onhome): a label and one select, in one row.
@@ -230,3 +233,16 @@ button.yw-way:hover { background: var(--color-bg-hover); }
   border-radius: 10px; font: inherit; font-size: var(--text-sm, 0.9375rem);
 }
 .px-onhome__select:focus-visible { outline: 3px solid var(--color-border-focus, var(--color-primary)); outline-offset: 2px; }
+
+/* P-37 S1. Which mornings or evenings: two choices, then the days (44 px targets). */
+.px-days { flex-basis: 100%; border: 0; padding: 0; margin: var(--space-2) 0 0; }
+.px-days legend { margin-bottom: var(--space-2); }
+.px-days__opt { display: flex; gap: var(--space-2); align-items: flex-start; min-height: 44px; padding: var(--space-2) 0; }
+.px-days__opt input { width: 22px; height: 22px; margin-top: 2px; accent-color: var(--color-primary); flex: 0 0 auto; }
+.px-days__opt strong { display: block; }
+.px-days__d { display: block; font-size: var(--text-sm, 0.9375rem); color: var(--color-text-secondary); }
+.px-days__chips { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-2); }
+.px-days__chip { min-height: 44px; min-width: 52px; padding: 0 var(--space-3); border-radius: 999px; border: 2px solid var(--color-border); background: var(--color-bg-card); color: var(--color-text); font: inherit; cursor: pointer; }
+.px-days__chip[aria-pressed="true"] { border-color: var(--color-primary); font-weight: 700; }
+.px-days__chip[aria-pressed="true"]::before { content: "\2713\00a0"; }
+.px-days__chip:focus-visible { outline: 3px solid var(--color-border-focus, var(--color-primary)); outline-offset: 2px; }

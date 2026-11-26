@@ -1,11 +1,20 @@
 import { zonesForAreas } from "./data/aims.js";
 import { consentCovers } from "./data/health-consent-covers.js";
 import { RETIRED_CONDITIONS } from "./data/scope-statement.js";
-import { sanitizeWeekShape, sanitizeWeekDayRequest, sanitizeOnHome, sanitizeWeekChanges } from "./data/week-shape-model.js";
+import { sanitizeWeekShape, sanitizeWeekDayRequest, sanitizeOnHome, sanitizeWeekChanges, sanitizeOnHomeDays, sanitizeOnHomeTurns } from "./data/week-shape-model.js";
 import { validateWeightTarget } from "./data/weight-targets.js";
 
 /**
  * store.js - Data persistence layer
+ * 26 Nov 2026 v138
+ *
+ * v138 - P-37 MORNING-EVENING, S1, schema first (Schema v1.141; mock-up
+ *   approved by Graeme 26 Nov: "That mock up was good"). Two additions,
+ *   nothing removed, the Plan only: onHomeDays ({ list: [days] }, Choose the
+ *   days for a Mornings or Evenings list; absent = Take turns) and
+ *   onHomeTurns ({ morning, evening }: whose turn it is, and the day it was
+ *   finished). Sanitised in week-shape-model.js.
+ *
  * 26 Nov 2026 v137
  *
  * v137 - P-41 S4 (Schema v1.140): consent.ageWelcomedAt, when a 16-17
@@ -1847,6 +1856,9 @@ export const store = {
       weekDayRequest: null,
       // P-31. Little and often's choices, and this week's changes (Change today).
       myExercisesOnHome: {},
+      // v138 (P-37): Choose the days for a Mornings or Evenings list, and whose turn it is.
+      onHomeDays: {},
+      onHomeTurns: {},
       weekChanges: null,
 
       // D-7 PLAN-IMPORT. Which group of My exercises the player plays
@@ -1877,6 +1889,8 @@ export const store = {
       weekDayRequest: sanitizeWeekDayRequest(saved.weekDayRequest),
       // P-31. Made safe on every load; an earlier week's changes load as null.
       myExercisesOnHome: sanitizeOnHome(saved.myExercisesOnHome),
+      onHomeDays: sanitizeOnHomeDays(saved.onHomeDays, sanitizeOnHome(saved.myExercisesOnHome)),
+      onHomeTurns: sanitizeOnHomeTurns(saved.onHomeTurns),
       weekChanges: sanitizeWeekChanges(saved.weekChanges, sanitizeWeekShape(saved.weekShape)),
       // P-39 (v125). Made safe on every load.
       myMove: this.cleanMyMove(saved.myMove),

@@ -1,7 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 26 Nov 2026 v757
+ * 26 Nov 2026 v758
+ *
+ * v758 - P-37 S1. Mornings and Evenings lists take turns (one each morning, the next when it's done) or have their own days; My exercises asks which. No new files.
  *
  * v757 - P-25: today.js's unreached Plan Home cards removed (archived). Nothing on screen changes. No new files.
  *
@@ -4367,7 +4369,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v757";
+const CACHE_NAME = "alongside-v758";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4434,7 +4436,7 @@ const SHELL_HASHES = {
   "./css/components/finish.css": "c33e298d5fcb92ae",
   "./js/app.js": "81ed92c5ada71eb8",
   "./js/router.js": "f4e0c7f0eac0a035",
-  "./js/store.js": "815986c676a1a6de",
+  "./js/store.js": "d6b02be612493e14",
   "./js/session-log.js": "6134de4315842e05",
   "./js/exercise-feedback.js": "adba8549f444da2a",
   "./js/exercise-card.js": "87af7a5668137593",
@@ -4495,7 +4497,7 @@ const SHELL_HASHES = {
   "./js/data/arc-readback.js": "9b06dcba96534da0",
   "./js/data/tier-table.js": "ca492fb2752322a4",
   "./js/views/know-what.js": "e84fee3e6d9d3af0",
-  "./js/views/plan-home.js": "9e7f620b5821dfa0",
+  "./js/views/plan-home.js": "a587e47669815859",
   "./js/views/path.js": "12cb43dfccb79b19",
   "./js/plan-look.js": "7674d8fbf5101aa9",
   "./js/views/plan-finish.js": "d3901b6355f55542",
@@ -4517,7 +4519,7 @@ const SHELL_HASHES = {
   "./js/data/health-consent-covers.js": "6698a3e50672cbbe",
   "./js/data/kind-colours.js": "f247edabfec2fd3d",
   "./js/data/line-icons.js": "ac72317a529cf62b",
-  "./js/data/week-shape-model.js": "7889ce6889cad039",
+  "./js/data/week-shape-model.js": "e6307617fbc3543c",
   "./js/data/week-shape.js": "57cc6aa85210d710",
   "./js/data/warm-views.js": "73c268f74f004e8e",
   "./js/views/your-week.js": "c1c29b6e775003f4",
@@ -4537,7 +4539,7 @@ const SHELL_HASHES = {
   "./js/views/plan-link-send.js": "6fb5c0b3b8817526",
   "./js/views/plan-link-back.js": "d544b32f9fcd26f7",
   "./js/data/week-changes.js": "1bd0a7a6db2c338f",
-  "./js/data/little-and-often.js": "9828926d20ce94dc",
+  "./js/data/little-and-often.js": "2466e453706db6ad",
   "./js/data/sore-rule.js": "f6ea51d828be37f0",
   "./js/data/stretch-stiffness.js": "80d3e230b5f0ecef",
   "./js/data/plan-share.js": "0461891c97ca592b",
@@ -4547,7 +4549,7 @@ const SHELL_HASHES = {
   "./js/data/guides.js": "12b492912d368d80",
   "./js/views/help.js": "4d4218955ce16e02",
   "./css/components/help.css": "1ea3aee117dc9aee",
-  "./css/components/your-week.css": "c95efbc697af8495",
+  "./css/components/your-week.css": "6ebdf6ef83e1a4a5",
   "./js/figures.js": "621b376c8778dbb4",
   "./js/data/figures/index.js": "9dd411b0802b6ff2",
   "./js/data/figures/batch-01.js": "27f86e28fb0c9833",
@@ -4609,7 +4611,7 @@ const SHELL_HASHES = {
   "./js/data/guide-me.js": "ed77e97b8a8a35ea",
   "./js/views/journal-entry.js": "dd38e795ee54e7d7",
   "./js/views/gym-programme.js": "98de0c5929699fb1",
-  "./js/views/prescribed.js": "f501edb3001cfa71",
+  "./js/views/prescribed.js": "b0c859babc7e408c",
   "./js/views/prescribed-session.js": "ce2eb0c803f66cfe",
   "./js/views/quiet-session.js": "aedf9e5e3a2d25c3",
   "./js/views/breathing-session.js": "2a1ab65c919190a6",

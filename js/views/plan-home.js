@@ -1,6 +1,9 @@
 /**
  * views/plan-home.js
- * 24 Nov 2026 v19
+ * 26 Nov 2026 v20
+ *
+ * v20 - P-37 S1. Little and often: a list taking turns says which comes
+ *   next ("Shoulders next").
  *
  * v19 - P-46 S3. The question asked once, later (data/ask-later.js), under
  *   Making my Move's bar, only when no other question is asking and never on
@@ -187,7 +190,7 @@ import { checkinToday, soreToday, lastPlace, prefNames } from "../data/path-cont
 import { mixLine, detailLine } from "../data/week-shape-model.js";
 import { todayInWeek, primaryFocus, localDay, getWeek } from "../data/week-shape.js";
 import { changeLine, undoToday, canUndoToday } from "../data/week-changes.js";
-import { homeItems } from "../data/little-and-often.js";
+import { homeItems, homeItemLine } from "../data/little-and-often.js";
 import { DAY_NAMES } from "../data/week-shape-model.js";
 import { savedForDay, savedById, lastDoneOf } from "../data/saved-sessions.js";
 import { kindOf } from "../data/kind-colours.js";
@@ -446,11 +449,10 @@ function changeBar(state) {
 function littleAndOften() {
   const items = homeItems();
   if (!items.length) return "";
-  const when = { morning: "This morning", evening: "This evening", any: "" };
   return `<h2 class="look-label" id="path-lao-h">Little and often</h2>
     <ul class="path-lao" aria-labelledby="path-lao-h">
       ${items.map(i => {
-        const sub = [`${i.count} exercise${i.count === 1 ? "" : "s"}`, when[i.when]].filter(Boolean).join(" \u00b7 ");
+        const sub = homeItemLine(i);   // P-37: with which comes next, when lists take turns
         const body = `<span class="kind-tile k-violet">${lineIcon(i.done ? "tick" : "mobility")}</span>
           <span class="path-door__text"><span class="path-door__t">${esc(i.group)}</span>
             <span class="path-door__d">${esc(i.done ? "Done today" : sub)}</span>
