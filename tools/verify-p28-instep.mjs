@@ -1,6 +1,10 @@
 /**
  * tools/verify-p28-instep.mjs
- * 26 Nov 2026 v5
+ * 26 Nov 2026 v6
+ *
+ * v6 - P-42 S2. The next episode is the first not yet done (it works for
+ *   the young programmes too), so 7o's fixture lists Part 1 and 2.1 to 2.2
+ *   as done, as a real record would; it listed only 1.1.
  *
  * v5 - P-42 S1. Five parts (the adults' Part 5): 2e counts every episode
  *   and reads the last part's closing; 10c's door says five parts.
@@ -320,7 +324,8 @@ await block("TEST 7", async () => {
   ok("7m. a low energy day: Part 1's Adjusting, with its line", /Episode 6/.test(T($(".instep-offer h2"))) && T($(".instep-offer")).includes("Adjusting") && T($(".instep-offer")).includes("This one's about you today.") && !/short/.test(T($(".instep-offer"))), T($(".instep-offer")));
   await seed({ sessions: 4, checkin: { energy: 7, mood: 2 } }); planFinish();
   ok("7n. a low mood day too", T($(".instep-offer")).includes("Adjusting"));
-  await seed({ sessions: 4, programme: { part: 2, episode: 3, done: ["p1e1"] } }); planFinish();
+  // v6 (P-42 S2): the next is the first not done, so the fixture's done list is the start of the order, as a real one always is.
+  await seed({ sessions: 4, programme: { part: 2, episode: 3, done: ["p1e1", "p1e2", "p1e3", "p1e4", "p1e5", "p1e6", "p2e1", "p2e2"] } }); planFinish();
   ok("7o. otherwise the next in order", T($(".instep-offer h2")) === "In Step · People close to you · Episode 3 · about 3 minutes");
   // Start keeps what was said, then opens the episode.
   await seed({ sessions: 4 }); giveHealthConsent();

@@ -1,6 +1,11 @@
 /**
  * js/data/in-step-offer.js
- * 26 Nov 2026 v5
+ * 26 Nov 2026 v6
+ *
+ * v6 - P-42 S2. The programme follows the age version (in-step-version.js:
+ *   the young parts for 14-17); still never offered at the finish in a
+ *   young version (inStepAtFinish). The next episode is the first not yet
+ *   done in the programme in use (currentEpisodeId).
  *
  * v5 - P-42 S1. A comment no longer says 24 episodes (Part 5 makes 30).
  *
@@ -47,11 +52,12 @@
  * "Did it come up?", and when it was last offered. Never words, never a
  * choice, never a score.
  */
-import { inStepOpen } from "./age-version.js";
+import { inStepAtFinish } from "./age-version.js";
+import "./in-step-version.js";   // P-42 S2: In Step's programme follows the age version
 import { store } from "../store.js";
 import { getTodaysCheckin } from "./checkin.js";
 import { bodyAreasOf, isBad } from "./conditions.js";
-import { EPISODES, getEpisode, getPart, nextEpisodeId } from "./in-step-programme.js";
+import { episodes, getEpisode, getPart, nextEpisodeId } from "./in-step-programme.js";
 import { eligibleFinishBLines } from "./empathy-transfer.js";
 
 export const OFFER_FROM_SESSION = 3;   // "The first episode can come after session 3"
@@ -76,11 +82,14 @@ function _save(p) {
   store.set("inStepProgress", { ...isp, programme: p });
 }
 
-/** The next episode in order, or null when all are done. */
+/** The next episode in order, or null when all are done. P-42 S2: the first
+ *  in the programme in use not yet done (the order is kept, so the done
+ *  ones are always the start of it). This reads the same as part/episode
+ *  did for the adults' programme, and also works for the young ones, whose
+ *  ids and numbers differ, and after a phone moves up at 18 (the adults'
+ *  In Step starts at its beginning). part and episode are still written. */
 export function currentEpisodeId(p = programme()) {
-  const id = `p${p.part}e${p.episode}`;
-  if (!getEpisode(id)) return EPISODES[0].id;
-  return p.done.includes(id) && nextEpisodeId(id) === null ? null : id;
+  return episodes().find(e => !p.done.includes(e.id))?.id || null;
 }
 
 /** Open from Wellbeing: done already, or the next in order. */
@@ -200,7 +209,7 @@ export function decideOffer(ctx) {
  * Returns { id, low, line, label, episode, part }.
  */
 export function offerForFinish({ sessionCount, partial = false, now = new Date() } = {}) {
-  if (!inStepOpen()) return null;   // P-41 S2 rule 5: never offered in the 16-17 version
+  if (!inStepAtFinish()) return null;   // P-41 S2 rule 5: never offered at the finish in a young version
   const day = dayContext();
   const o = decideOffer({ sessionCount, partial, badDay: day.badDay, lowEnergy: day.lowEnergy, lowMood: day.lowMood, now });
   if (!o) return null;

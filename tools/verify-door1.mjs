@@ -1,6 +1,9 @@
 /**
  * tools/verify-door1.mjs
- * 26 Nov 2026 v4
+ * 26 Nov 2026 v5
+ *
+ * v5 - P-42 S2. The door is also kept from anyone who can't buy the Plan
+ *   here (canBuy: the young versions).
  *
  * v4 - P-42 S1. In Step has five parts for adults (Part 5, The world on
  *   your phone, approved 26 Nov), so the door says five parts.
@@ -90,7 +93,7 @@ console.log("\nTEST 3 - the door exists, and says what the spec says");
 check("the door renders on the In Step result screen", () =>
   ok(/upgrade-door/.test(inStep), "section 9's offer is specified but not built"));
 check("shown to free users only", () =>
-  ok(/!isPremium\(\) \? `/.test(inStep), "a paying person should not be sold to"));
+  ok(/!isPremium\(\)( && canBuy\(\))? \? `/.test(inStep), "a paying person should not be sold to"));   // v5: nor anyone who can't buy here (P-42: the young versions)
 check("copy matches the specification", () => {
   for (const phrase of [
     "five parts, one thing at a time",   // v4: P-42 Part 5

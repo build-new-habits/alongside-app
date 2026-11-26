@@ -1,5 +1,7 @@
 # Alongside — Data Schema Reference
-## 26 Nov 2026 v1.142
+## 26 Nov 2026 v1.143
+
+> **v1.143, 26 Nov 2026 — P-42 S2, the 14-15 version for the developer panel** (`store.js` v140). **`consent.ageGroup`** may now also be **`young-14`** (the 14-15 version), kept on load with **no move-up month** (`ageGroupNext` null; moving to 16-17 at 16 is not built). Only the developer panel's *14–15* switch sets it: the age check never gives it while `age-check.js` `YOUNG_OPEN` is closed. It gets every young rule (`age-version.js` `isYoung`) and In Step's young parts at 14-15; the 16-17 welcome and health line stay 16-17's (`isSixteen`). Gated by `tools/verify-p42-young.mjs`.
 
 > **v1.142, 26 Nov 2026 — P-37 S2, the coach's sets** (`store.js` v139; `data/week-shape-model.js` v8). **One addition, the Plan only.** **`daySetChoices`** `{ morning?: { area, mins }, evening?: { area, mins } }`, default `{}`: what the person last chose for *A fresh morning set* or *A fresh evening set* (area `hips` · `lower-back` · `shoulders` · `all`; minutes 5, 10 or 15), so the next set starts there. **Written only by** the set's screen (`views/path.js`). **On load** (`sanitizeDaySetChoices`): an unknown area is `all`, unknown minutes `10`; anything else dropped. Nothing about the set itself is kept unless the person taps *Keep this*, which adds a list to `prescribedExercises` and sets it On Home for Mornings or Evenings (taking turns), as any list. Gated by `tools/verify-p37-sets.mjs`.
 
@@ -1129,7 +1131,7 @@
 
 ## 06 Sep 2026 v1.51
 
-**File:** `js/store.js` (confirmed live version: **v139, 26 Nov 2026**)
+**File:** `js/store.js` (confirmed live version: **v140, 26 Nov 2026**)
 
 > **v1.47, 06 Sep 2026 — CR-1.** `conditions[]` gains three ids and loses one. `chronic-fatigue` is **retired**; `persistent-fatigue`, `me-cfs` and `long-covid` replace it. No field shape changed — `conditions` is still `string[]` and `conditionMeta` is still keyed by condition id.
 >

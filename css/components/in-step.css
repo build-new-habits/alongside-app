@@ -1,4 +1,8 @@
 /* components/in-step.css - In Step's own look
+   26 Nov 2026 v5
+
+   v5 - P-42 S2. .instep-help: a young episode's help line, under Carry it.
+
    25 Nov 2026 v4
 
    v4 - P-29 INSTEP-RECAP. Last time's recap and its question
@@ -61,6 +65,7 @@
 .instep-center { text-align: center; }
 .instep-low { color: var(--kind-orchid); font-weight: var(--font-semibold); }
 .instep-closing { font-weight: var(--font-semibold); }
+.instep-help { margin: var(--space-md, 1rem) 0; padding: var(--space-md, 1rem); border-left: 4px solid var(--color-primary); background: var(--color-surface, transparent); border-radius: var(--radius-sm, 6px); }   /* P-42 S2: a young episode's help line */
 
 /* The list: the next episode, then each part. */
 .instep-next, .instep-ep {

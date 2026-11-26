@@ -1,6 +1,10 @@
 /**
  * settings.js
- * 26 Nov 2026 v80
+ * 26 Nov 2026 v81
+ *
+ * v81 - P-42 S2. The developer panel's age switch adds 14–15 (Graeme, 26
+ *   Nov: "I'll need to be able to switch between them like we do with plan
+ *   and free"), to try In Step's young parts at either age.
  *
  * v80 - P-41 S5. The developer panel can switch the age version (Adult,
  *   16-17, or 16-17 turning 18 now), so the 16-17 version can be tried on a
@@ -2758,6 +2762,7 @@ export function SettingsView(router) {
           <div class="settings-dev-panel__buttons" role="group" aria-label="Switch age version for testing">
             <button class="btn btn-secondary btn-sm" data-dev-age="adult">Adult</button>
             <button class="btn btn-secondary btn-sm" data-dev-age="young-16">16–17</button>
+            <button class="btn btn-secondary btn-sm" data-dev-age="young-14">14–15</button>
             <button class="btn btn-secondary btn-sm" data-dev-age="turning-18">16–17, turning 18 now</button>
           </div>
         </div>
@@ -3195,13 +3200,14 @@ export function SettingsView(router) {
         const v = btn.dataset.devAge, d = new Date();
         const month = n => { const x = new Date(d.getFullYear(), d.getMonth() + n, 1); return `${x.getFullYear()}-${String(x.getMonth() + 1).padStart(2, '0')}`; };
         store.set('consent.ageConfirmed', true);
-        store.set('consent.ageGroup', v === 'adult' ? 'adult' : 'young-16');
-        store.set('consent.ageGroupNext', v === 'adult' ? null : month(v === 'turning-18' ? 0 : 12));
+        store.set('consent.ageGroup', v === 'adult' ? 'adult' : v === 'young-14' ? 'young-14' : 'young-16');
+        // 14-15 has no move-up month yet (it moves to 16-17 at 16, not built): none is set.
+        store.set('consent.ageGroupNext', v === 'adult' || v === 'young-14' ? null : month(v === 'turning-18' ? 0 : 12));
         store.set('consent.ageGroupAt', d.toISOString());
         store.set('consent.ageWelcomedAt', null);
         const label = container.querySelector('#dev-current-age');
-        if (label) label.textContent = v === 'adult' ? 'adult' : 'young-16';
-        _showToast(v === 'adult' ? 'Age version: adult' : v === 'turning-18' ? 'Age version: 16–17, moving up when the app opens again' : 'Age version: 16–17', container);
+        if (label) label.textContent = v === 'adult' ? 'adult' : v === 'young-14' ? 'young-14' : 'young-16';
+        _showToast(v === 'adult' ? 'Age version: adult' : v === 'turning-18' ? 'Age version: 16–17, moving up when the app opens again' : v === 'young-14' ? 'Age version: 14–15' : 'Age version: 16–17', container);
       });
     });
 

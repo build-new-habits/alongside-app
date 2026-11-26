@@ -1,6 +1,15 @@
 /**
  * js/views/in-step.js
- * 26 Nov 2026 v11
+ * 26 Nov 2026 v12
+ *
+ * v12 - P-42 S2. The programme in use (parts(), episodes(): the adults',
+ *   or the young four parts at 14-15 or 16-17). A young episode's help
+ *   line is shown under Carry it and spoken after it (a web address may
+ *   break after its slash, so it never splits a word at large text). A part with no
+ *   closing line ends on its Carry it. The Free door (selling the Plan) is
+ *   never shown where the Plan can't be bought here (canBuy: the young
+ *   versions). Coming soon is gone: every version has its programme. The
+ *   header counts the part's own episodes ("4 of 7"; it said "of 6").
  *
  * v11 - P-42 S1. Five parts: the closing after In Step's last episode is
  *   the last part's (Part 5's, the world on your phone); a part closes on
@@ -64,12 +73,12 @@
  * v3 - A11Y-HEADER. v2 - IS-2 staged order. v1 - 09 Aug 2026. Their notes
  * are in the archived copy (docs/archive-code/in-step_v5_retired_06nov2026.js).
  */
-import { inStepOpen, IN_STEP_SOON } from "../data/age-version.js";
+import { canBuy } from "../data/age-version.js";
 import { store }   from "../store.js";
 import { router }  from "../router.js";
 import { isPremium } from "../auth.js";
 import { lineIcon } from "../data/line-icons.js";
-import { PARTS, EPISODES, ACK, ANSWERS, HELD_THIRD, getEpisode, getPart, episodesInPart, nextEpisodeId, endsPart, audioIdsForPart } from "../data/in-step-programme.js";
+import { parts, ACK, ANSWERS, HELD_THIRD, getEpisode, getPart, episodesInPart, nextEpisodeId, endsPart, audioIdsForPart } from "../data/in-step-programme.js";
 import { programme, currentEpisodeId, isOpen, lastTime, lastTimeLine, answerLastTime, completeEpisode,
          takePendingEpisode, LOW_DAY_LINE } from "../data/in-step-offer.js";
 import { playLine, stopLine, voiceOn, prefetchLines } from "../coach-audio.js";
@@ -105,7 +114,7 @@ function stepNav(n) {
 function epHeader(e) {
   return `<div class="workout-header instep-bar">
       <button type="button" class="btn btn-ghost${isPremium() ? " plan-exit" : ""}" id="is-exit">Exit</button>
-      ${eyebrow(`In Step · Part ${e.part} · ${e.episode} of 6`)}
+      ${eyebrow(`In Step · Part ${e.part} · ${e.episode} of ${episodesInPart(e.part).length}`)}
     </div>`;
 }
 
@@ -131,10 +140,6 @@ function renderLanding() {
     ? `<button type="button" class="btn btn-ghost plan-back" id="is-back" aria-label="Back to Wellbeing">‹ Back</button>`
     : `<button type="button" class="btn btn-ghost" id="is-back" aria-label="Back to Wellbeing">← Back</button>`;
   const reachedPart = n => episodesInPart(n).some(e => isOpen(e.id, p));
-  // P-41 S2 rule 5: the 16-17 version's In Step is coming soon (P-42).
-  if (!inStepOpen()) return shell(`
-    <div class="workout-header">${back}<h1 class="workout-header-title" tabindex="-1">In Step</h1></div>
-    <p class="instep-intro" id="is-soon">${esc(IN_STEP_SOON)}</p>`);
   return shell(`
     <div class="workout-header">${back}<h1 class="workout-header-title" tabindex="-1">In Step</h1></div>
     ${eyebrow("In Step")}
@@ -145,8 +150,8 @@ function renderLanding() {
         <span class="instep-next__txt"><span class="instep-next__part">Part ${curE.part}: ${esc(getPart(curE.part).name)}</span>
         <span class="instep-next__title">Episode ${curE.episode}: ${esc(curE.title)}</span>
         <span class="instep-next__sub">About 3 minutes</span></span>
-      </button>` : `<p class="instep-intro">${esc(PARTS.at(-1).closing.text)}</p>`}
-    ${PARTS.map(part => `
+      </button>` : `<p class="instep-intro">${esc(parts().at(-1).closing?.text || "")}</p>`}
+    ${parts().map(part => `
       <section class="instep-part" aria-labelledby="is-part-${part.n}">
         <h2 id="is-part-${part.n}">Part ${part.n}: ${esc(part.name)}</h2>
         <p class="instep-why">${esc(part.why)}</p>
@@ -234,9 +239,10 @@ function renderCarry(e) {
     <h1 tabindex="-1">Carry it</h1>${stepNav(3)}
     <p class="instep-small instep-center">One small thing for today</p>
     <div class="card instep-card instep-carry">${speaking}<p>${esc(e.carry.text)}</p>${pauseBtn()}</div>
+    ${e.help ? `<p class="instep-help" id="is-help">${esc(e.help.text).replace(/\//g, "/<wbr>")}</p>` : ""}
     ${more ? `<p class="instep-small">I'll ask how it went next time.</p>` : ""}
     ${closing ? `<p class="instep-closing">${esc(closing.text)}</p>` : ""}
-    ${!isPremium() ? `
+    ${!isPremium() && canBuy() ? `
       <aside class="upgrade-door" aria-label="About the paid plan">
         <p class="upgrade-door__text">That&rsquo;s In Step — five parts, one thing at a time, each going a bit deeper.</p>
         <p class="upgrade-door__text">There&rsquo;s a longer version of the same idea. You pick something you&rsquo;d like to get better at — being steadier, being more present, noticing other people more — and I build it out over months, shaped around what you&rsquo;re actually noticing rather than a fixed course.</p>
@@ -253,7 +259,7 @@ export function render() {
   // Opened by the router (not a step of this file): the list, quiet.
   else if (!_internal) { _stop(); phase = "landing"; epId = null; low = false; chosen = null; from = "wellbeing"; }
   const e = epId ? getEpisode(epId) : null;
-  if (!e || !inStepOpen()) phase = "landing";
+  if (!e) phase = "landing";
   if (phase === "start") phase = lastTimeLine() && programme().lastAnswer === null ? "prev" : "listen";
   switch (phase) {
     case "prev":      return renderPrev(e);
@@ -366,7 +372,10 @@ export function onMount() {
   if (phase === "carry" && e) {
     completeEpisode(e.id);
     const closing = endsPart(e.id) ? getPart(e.part).closing : null;
-    voice(e.carry.audio, { then: closing ? () => playLine(closing.audio) : null });
+    // P-42 S2: a young episode's help line is spoken after Carry it (then the part's closing, if it has one).
+    const after = [e.help?.audio, closing?.audio].filter(Boolean);
+    const chain = ids => { if (!ids.length) return; if (!playLine(ids[0], { onEnd: () => chain(ids.slice(1)) })) chain(ids.slice(1)); };
+    voice(e.carry.audio, { then: after.length ? () => chain(after) : null });
     document.getElementById("is-door-btn")?.addEventListener("click", () => { _stop(); router.navigate("upgrade"); });
     root.querySelector("#is-done")?.addEventListener("click", leave);
   }

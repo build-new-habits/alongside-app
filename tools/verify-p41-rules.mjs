@@ -1,6 +1,12 @@
 /**
  * tools/verify-p41-rules.mjs
- * 26 Nov 2026 v1
+ * 26 Nov 2026 v2
+ *
+ * v2 - P-42 S2. Rule 5 changed (In Step's young parts are written and
+ *   approved): at 16-17 In Step opens its own programme, Part 1 Me, on a
+ *   good day and a hard one (5a, 5b), still never offered at a finish
+ *   (5c), and Making my Move no longer says Coming soon (5d).
+ *   verify-p42-young holds the young programme itself.
  *
  * P-41 THREE AGE VERSIONS, S2 RULES (spec BNH-Files Product/alongside_p41_
  * three-age-versions_spec_25nov2026_v2.md, approved by Graeme 25 Nov). Each
@@ -170,11 +176,11 @@ await block("TEST 5", async () => {
   console.log("\nTEST 5 - In Step");
   person("young");
   await go("in-step");
-  ok("5a. 16-17: In Step is coming soon, with a heading and a way back", /coming soon/.test(txt($("#is-soon"))) && txt($("h1")) === "In Step" && !!$("#is-back"), txt(main).slice(0, 200));
-  ok("5b. 16-17: no episode to open", !main.querySelector("[data-ep]"));
+  ok("5a. 16-17: In Step opens its own programme, with a heading and a way back", !$("#is-soon") && /Part 1: Me, on a good day and a hard one/.test(txt(main)) && txt($("h1")) === "In Step" && !!$("#is-back"), txt(main).slice(0, 200));
+  ok("5b. 16-17: its first episode is the young one", main.querySelector(".instep-next")?.dataset.ep === "y1e1");
   ok("5c. 16-17: never offered at a finish", OFF.offerForFinish({ sessionCount: 20 }) === null);
   await go("my-move"); await click(main.querySelector('[data-go="for"]'));
-  ok("5d. 16-17: Making my Move says Coming soon for your age", /Coming soon for your age/.test(txt(main)), txt(main).slice(0, 300));
+  ok("5d. 16-17: Making my Move no longer says Coming soon", !/Coming soon for your age/.test(txt(main)), txt(main).slice(0, 300));
   person("adult");
   await go("in-step");
   ok("5e. control: an adult sees the episodes", !!main.querySelector("[data-ep]") && !$("#is-soon"));

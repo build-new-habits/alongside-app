@@ -1,6 +1,9 @@
 /**
  * js/views/health-consent.js
- * 26 Nov 2026 v7
+ * 26 Nov 2026 v8
+ *
+ * v8 - P-42 S2. "At 16 you can agree to this yourself" shows in the 16-17
+ *   version only (isSixteen), not in the developer panel's 14-15.
  *
  * v7 - P-41 S4. A 16-17 phone sees one more line: at 16 you can agree to
  *   this yourself, and to talk to someone you trust if unsure (approved 26
@@ -56,7 +59,7 @@
  * without the tick it says what is needed and moves focus to the box
  * (3.3.1). The heading takes focus on arrival.
  */
-import { isYoung, HEALTH_YOUNG } from "../data/age-version.js";
+import { isSixteen, HEALTH_YOUNG } from "../data/age-version.js";
 import {
   HEALTH_TICK, HEALTH_NOTE, giveHealthConsent, takePendingRoute, healthWordingChanged, confirmNoHealth,
   peekPendingRoute, ROUTINE_ROUTES, healthDeclined
@@ -137,7 +140,7 @@ export function HealthConsentView(router) {
           what’s sore and how much, what you tell me about your body and how you’ve been,
           your check-ins, your weight if you add it, and your journal.
           They stay on this phone; nothing in them is sent anywhere.</p>
-        <p class="hc-text">${HEALTH_NOTE}</p>${isYoung() ? `
+        <p class="hc-text">${HEALTH_NOTE}</p>${isSixteen() ? `
         <p class="hc-text" id="hc-young">${HEALTH_YOUNG}</p>` : ""}
         <div class="ob-consent__tick">
           <input type="checkbox" id="hc-check" class="ob-consent__checkbox">
