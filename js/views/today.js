@@ -1,6 +1,9 @@
 /**
  * today.js
- * 24 Nov 2026 v66
+ * 26 Nov 2026 v67
+ *
+ * v67 - P-41 S3. On the day a 16-17 phone moves up to the adult version,
+ *   Home's coach line says so, once, on both tiers.
  *
  * v66 - P-46 S4 FREE HOME. Free Home is views/free-home.js: the Today card,
  *   Something gentler, six ready-made sessions, Log what I did, Your
@@ -871,6 +874,7 @@
  *   All states have text — nothing conveyed by colour alone.
  */
 
+import { takeMovedUpLine } from "../data/age-version.js";
 import { store }               from '../store.js';
 import { getResumableSession, rescueStaleSession, clearCheckpoint } from '../session-resume.js';
 import { carryOnSummary } from './capture.js';   // F1: a freestyle session to carry on
@@ -1133,7 +1137,8 @@ export function TodayView(router) {
     const checkedIn = _checkedInToday();
     container.innerHTML = renderFreeHome({
       greeting,
-      coachNote: planJump ? planJump.body : brief ? brief.body : (_burnoutLine() || _lowMoodLine()),
+      // P-41 S3: moved up to the adult version today: said once, first.
+      coachNote: takeMovedUpLine() || (planJump ? planJump.body : brief ? brief.body : (_burnoutLine() || _lowMoodLine())),
       top: _scopeNotice() + _guidanceLine() + _rescuedNote(),
       carryCard: _freeCarryCard(),
       checkedIn,
@@ -1363,7 +1368,7 @@ export function TodayView(router) {
   function _renderPlanHome(container, greeting) {
     const planJump = noticePlanJump();
     const brief = planJump ? null : offerBriefPath();
-    const coachNote = planJump ? planJump.body : brief ? brief.body : (_burnoutLine() || '');
+    const coachNote = takeMovedUpLine() || (planJump ? planJump.body : brief ? brief.body : (_burnoutLine() || ''));   // P-41 S3
     container.innerHTML = renderPlanHome({
       greeting,
       coachNote,
