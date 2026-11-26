@@ -1,7 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 26 Nov 2026 v756
+ * 26 Nov 2026 v757
+ *
+ * v757 - P-25: today.js's unreached Plan Home cards removed (archived). Nothing on screen changes. No new files.
  *
  * v756 - WB-NAMES. Wellbeing's four practice tiles are named by their own words for screen readers (WCAG 2.5.3). No new files.
  *
@@ -4365,7 +4367,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v756";
+const CACHE_NAME = "alongside-v757";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4448,7 +4450,7 @@ const SHELL_HASHES = {
   "./js/session-guard.js": "00177a846537868c",
   "./js/session-resume.js": "6916b88c0757374f",
   "./js/auth.js": "9b9c7a632dccada6",
-  "./js/views/today.js": "a7304d49a664fbc7",
+  "./js/views/today.js": "049cbbc4fd03a67c",
   "./js/views/mobility-conditioning.js": "7b60688e779d5b58",
   "./js/views/arc-setup.js": "c1d43e86b901ace3",
   "./js/views/stretch-arc.js": "aab4c04531021935",

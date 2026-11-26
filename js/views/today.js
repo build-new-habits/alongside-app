@@ -1,6 +1,10 @@
 /**
  * today.js
- * 26 Nov 2026 v67
+ * 26 Nov 2026 v68
+ *
+ * v68 - P-25 (spec §8, first build step). _coachCard() and _weekCard(), no
+ *   longer called since plan-home.js draws the Plan's Home, are removed
+ *   (archived in BNH-Files). Nothing on screen changes.
  *
  * v67 - P-41 S3. On the day a 16-17 phone moves up to the adult version,
  *   Home's coach line says so, once, on both tiers.
@@ -1724,72 +1728,10 @@ function _markGuidanceShown(root) {
          </button>`;
   }
 
-  /**
-   * A-1. No week, or nothing set for today: the coach chooses. Leads with
-   * the arc when there is one (its aim is the heading, and opens the arc),
-   * then Tell me what to do, then the week.
-   */
-  function _coachCard(week) {
-    const arc = store.get('arc') || {};
-    const aim = arc.active ? ((arc.aimId && aimById(arc.aimId)?.label) || arc.label || null) : null;
-    const wk = aim ? arcWeek(arc, new Date()) : null;
-    // A-5 (v58). On the first day of a new arc week the card says so first.
-    const fresh = aim && arcWeekStartsToday(arc) ? `Week ${wk} starts today. ` : '';
-    const line = fresh + (_checkedInToday() ? 'You\u2019ve checked in. Straight to today\u2019s plan.' : 'Three quick questions, then today\u2019s plan.');
-    const top = aim
-      ? `<button class="home-today__arc" data-route="stretch-arc" data-requires-checkin="false"
-                 aria-label="Your arc${wk ? `, week ${wk}` : ''}: working towards ${_esc(aim)}">
-           <span class="look-label home-week__lbl">Your arc${wk ? ` \u00b7 Week ${wk}` : ''}</span>
-           <span class="home-week__name" id="home-today-h">${_esc(aim)}</span>
-         </button>`
-      : `<p class="look-label home-week__lbl">Today</p>
-         <h2 class="home-week__name" id="home-today-h">What shall we do today?</h2>`;
-    return `<section class="home-week home-today look-card" aria-labelledby="home-today-h">
-      ${top}
-      <p class="home-week__line">${line}</p>
-      <button class="btn btn-primary btn-large btn-full" data-action="start-today">Tell me what to do</button>
-      ${aim ? '' : _arcLine()}
-      <button class="home-today__link" data-route="your-week" data-requires-checkin="false">${week ? 'Your week' : 'Plan your week'}</button>
-    </section>`;
-  }
-
-  /**
-   * D-6. Today, from the person's week. A day plan: what it is, and three
-   * ways in. A rest day: said, and nothing asked. Nothing set for today:
-   * no card (the doors are the way in, as before).
-   */
-  function _weekCard(week) {
-    if (week.value === 'rest') {
-      return `<section class="home-week look-card" aria-labelledby="home-week-h">
-        <p class="look-label home-week__lbl">Today, from your week</p>
-        <h2 class="home-week__name" id="home-week-h">Rest</h2>
-        <p class="home-week__line">Today is a rest day in your week. Rest counts.</p>
-        ${_arcLine()}
-      </section>`;
-    }
-    const t = week.template;
-    if (t.own) {
-      const group = t.own === 'all' ? null : t.own;
-      const left = (store.get('prescribedExercises') || []).filter(e => !store.ownDoneToday(e) && (!group || e.group === group)).length;
-      return `<section class="home-week look-card" aria-labelledby="home-week-h">
-        <p class="look-label home-week__lbl">Today, from your week</p>
-        <h2 class="home-week__name" id="home-week-h">${_esc(t.name)}</h2>
-        <p class="home-week__line">${_esc(mixLine(t))}.</p>
-        ${left ? `<p class="home-week__line">${left} exercise${left === 1 ? '' : 's'}, as you wrote ${left === 1 ? 'it' : 'them'}.</p>
-        <button class="btn btn-primary btn-large btn-full" data-action="week-own">Start your list</button>`
-        : `<p class="home-week__line">All done today.</p>`}
-        ${_arcLine()}
-      </section>`;
-    }
-    return `<section class="home-week look-card" aria-labelledby="home-week-h">
-      <p class="look-label home-week__lbl">Today, from your week</p>
-      <h2 class="home-week__name" id="home-week-h">${_esc(t.name)}</h2>
-      <p class="home-week__line">${_esc(mixLine(t))}.</p>
-      <p class="home-week__line">${_esc(detailLine(t))}</p>
-      <button class="btn btn-primary btn-large btn-full" data-action="week-today">Show me today\u2019s plan</button>
-      ${_arcLine()}
-    </section>`;
-  }
+  // P-25 (26 Nov): _coachCard() and _weekCard(), the Plan Home cards from
+  // Stage AWARD's A-1 and D-6, were unreached once plan-home.js drew the
+  // Plan's Home (Stage PATH, 29 Oct). Archived in BNH-Files, Archive/
+  // P-25 today-unreached/, and removed here.
 
   /**
    * The arc, in one line. Opens the arc; sets one up if there is none.
