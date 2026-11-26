@@ -1,7 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 26 Nov 2026 v752
+ * 26 Nov 2026 v753
+ *
+ * v753 - P-41 S3. A 16-17 phone moves up to the adult version by itself the month they turn 18, and Home says so once. Still closed to new 16-17 year olds, so nothing changes for anyone yet. No new files.
  *
  * v752 - P-41 S2. How the 16-17 version differs, in one new file (js/data/age-version.js, precached): no weight, Childline first, the GP or physio line for knee and heel pain, two hard days a week, In Step coming soon, no messages, no buying. The version stays closed, so nothing changes for anyone yet.
  *
@@ -4357,7 +4359,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v752";
+const CACHE_NAME = "alongside-v753";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4424,7 +4426,7 @@ const SHELL_HASHES = {
   "./css/components/finish.css": "c33e298d5fcb92ae",
   "./js/app.js": "81ed92c5ada71eb8",
   "./js/router.js": "f4e0c7f0eac0a035",
-  "./js/store.js": "4ada9d18ff5701b6",
+  "./js/store.js": "0c2d4360c949a6e4",
   "./js/session-log.js": "6134de4315842e05",
   "./js/exercise-feedback.js": "adba8549f444da2a",
   "./js/exercise-card.js": "87af7a5668137593",
@@ -4440,7 +4442,7 @@ const SHELL_HASHES = {
   "./js/session-guard.js": "00177a846537868c",
   "./js/session-resume.js": "6916b88c0757374f",
   "./js/auth.js": "9b9c7a632dccada6",
-  "./js/views/today.js": "36762a19c4e7bee0",
+  "./js/views/today.js": "a7304d49a664fbc7",
   "./js/views/mobility-conditioning.js": "7b60688e779d5b58",
   "./js/views/arc-setup.js": "c1d43e86b901ace3",
   "./js/views/stretch-arc.js": "aab4c04531021935",
@@ -4501,7 +4503,7 @@ const SHELL_HASHES = {
   "./js/data/red-flag.js": "3cd9eecbc3985eb3",
   "./js/data/health-consent.js": "a23d005af57f179c",
   "./js/data/age-check.js": "ebe52a0249529e29",
-  "./js/data/age-version.js": "bc477e7f1463c1e2",
+  "./js/data/age-version.js": "18e106bdbbf4b5fe",
   "./js/data/restore.js": "fd3860a6ccd4e480",
   "./js/data/export-file.js": "bbee762322d0e4e2",
   "./js/data/health-consent-covers.js": "6698a3e50672cbbe",
