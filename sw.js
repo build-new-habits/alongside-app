@@ -1,7 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 26 Nov 2026 v760
+ * 26 Nov 2026 v761
+ *
+ * v761 - P-42 S1. In Step's Part 5 for adults, The world on your phone. No new files.
  *
  * v760 - P-37 S3. Your week shows the morning and evening lists; a day's button named by its own words. No new files.
  *
@@ -4373,7 +4375,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v760";
+const CACHE_NAME = "alongside-v761";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4607,9 +4609,9 @@ const SHELL_HASHES = {
   "./js/views/saved-sessions.js": "400202f2e10e8e74",
   "./js/views/session-builder-ui.js": "fa76c5ea1b7462aa",
   "./js/views/noticing.js": "9b9be8501630015e",
-  "./js/views/in-step.js": "a6ee08b20baff9ef",
-  "./js/data/in-step-programme.js": "a325e135e7dd09a0",
-  "./js/data/in-step-offer.js": "ec9cfbd456a76669",
+  "./js/views/in-step.js": "dfc32194c03c41b9",
+  "./js/data/in-step-programme.js": "e303b9f24ecf8b23",
+  "./js/data/in-step-offer.js": "c7fe4596220dacdf",
   "./js/coach-audio.js": "d201650f60b33617",
   "./js/hold-voice.js": "4801164cbddca872",
   "./js/views/guide-me.js": "eed24714732918fc",
