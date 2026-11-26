@@ -1,7 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 26 Nov 2026 v761
+ * 26 Nov 2026 v762
+ *
+ * v762 - P-42 S2. In Step for 14-17 (closed to real people) and the 14-15 developer switch. New files: js/data/in-step-young.js, js/data/in-step-version.js.
  *
  * v761 - P-42 S1. In Step's Part 5 for adults, The world on your phone. No new files.
  *
@@ -4375,7 +4377,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v761";
+const CACHE_NAME = "alongside-v762";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4415,7 +4417,7 @@ const SHELL_HASHES = {
   "./css/components/display-preferences.css": "7d1e4e0b34f5223f",
   "./css/components/session-log.css": "92f8082dc0ee69a7",
   "./css/components/grounding-moments.css": "a2641284734e48de",
-  "./css/components/in-step.css": "67309363ee77ecf4",
+  "./css/components/in-step.css": "b3d9a966d4565c34",
   "./css/components/single-activity-session.css": "fef626d39b2d281c",
   "./css/components/session-shared.css": "a71069801a65054c",
   "./css/components/upgrade-door.css": "1a2deeaceb45f4f1",
@@ -4442,7 +4444,7 @@ const SHELL_HASHES = {
   "./css/components/finish.css": "c33e298d5fcb92ae",
   "./js/app.js": "81ed92c5ada71eb8",
   "./js/router.js": "f4e0c7f0eac0a035",
-  "./js/store.js": "cf7c1634359da331",
+  "./js/store.js": "ba39ec0a7795447d",
   "./js/session-log.js": "6134de4315842e05",
   "./js/exercise-feedback.js": "adba8549f444da2a",
   "./js/exercise-card.js": "87af7a5668137593",
@@ -4467,7 +4469,7 @@ const SHELL_HASHES = {
   "./js/views/coach-proposal.js": "c8f548d3c2e5db8c",
   "./js/views/workout.js": "e0c6b605642e7790",
   "./js/views/progress.js": "7708195f75512d62",
-  "./js/views/settings.js": "d2fd581264f5ed40",
+  "./js/views/settings.js": "50b59b35af7fbfc0",
   "./js/views/restore-flow.js": "dc81c2e455fa472d",
   "./js/views/weekly-plan.js": "dcee06e297b402c0",
   "./js/views/reflect.js": "fa33525e04a2feaa",
@@ -4496,7 +4498,7 @@ const SHELL_HASHES = {
   "./js/views/library.js": "ae647a15a875452c",
   "./js/views/practices.js": "f76d5aae3596a565",
   "./js/views/red-flag.js": "d2f857d0f8ba905f",
-  "./js/views/health-consent.js": "e879f280bacfa201",
+  "./js/views/health-consent.js": "2634f15590bb0ac1",
   "./js/views/age-check.js": "2485fc6e163c47ae",
   "./js/views/under-18.js": "dd9882ca9847db82",
   "./js/views/consent-update.js": "51f918f8e2c9b25a",
@@ -4519,7 +4521,7 @@ const SHELL_HASHES = {
   "./js/data/red-flag.js": "3cd9eecbc3985eb3",
   "./js/data/health-consent.js": "a23d005af57f179c",
   "./js/data/age-check.js": "369495a6cf2da524",
-  "./js/data/age-version.js": "f2333fa27163f289",
+  "./js/data/age-version.js": "6190cade8be5937c",
   "./js/data/restore.js": "fd3860a6ccd4e480",
   "./js/data/export-file.js": "bbee762322d0e4e2",
   "./js/data/health-consent-covers.js": "6698a3e50672cbbe",
@@ -4532,7 +4534,7 @@ const SHELL_HASHES = {
   "./js/data/plan-reader.js": "8b909dcd350014b1",
   "./js/views/plan-import.js": "027c3f9fc203c613",
   "./js/views/change-today.js": "31101d97d53492c8",
-  "./js/views/my-move.js": "ce330836035477e3",
+  "./js/views/my-move.js": "f5cc6ef9349a3647",
   "./js/views/free-home.js": "f1505d02950513f2",
   "./js/views/on-the-plan.js": "2d25cce8dfb0fc9e",
   "./js/views/onboarding/start.js": "b6fe85c63c26b37d",
@@ -4609,9 +4611,11 @@ const SHELL_HASHES = {
   "./js/views/saved-sessions.js": "400202f2e10e8e74",
   "./js/views/session-builder-ui.js": "fa76c5ea1b7462aa",
   "./js/views/noticing.js": "9b9be8501630015e",
-  "./js/views/in-step.js": "dfc32194c03c41b9",
-  "./js/data/in-step-programme.js": "e303b9f24ecf8b23",
-  "./js/data/in-step-offer.js": "c7fe4596220dacdf",
+  "./js/views/in-step.js": "79266c5eb9a6a0e5",
+  "./js/data/in-step-programme.js": "02eb3e713cbf4495",
+  "./js/data/in-step-offer.js": "caf27805f2f0198e",
+  "./js/data/in-step-young.js": "82f347ee08b4a41c",
+  "./js/data/in-step-version.js": "1e53f9c77cb5c291",
   "./js/coach-audio.js": "d201650f60b33617",
   "./js/hold-voice.js": "4801164cbddca872",
   "./js/views/guide-me.js": "eed24714732918fc",
@@ -4629,7 +4633,7 @@ const SHELL_HASHES = {
   "./js/views/running-session.js": "3fcc750fa8c6214d",
   "./js/views/swim-session.js": "796864e209d35cb8",
   "./js/views/cycle-session.js": "5cf63e9171ece8d8",
-  "./js/views/onboarding/thread.js": "db7d63b7fab27574",
+  "./js/views/onboarding/thread.js": "5cdc5109e53cdd8b",
   "./js/views/onboarding/sheet-manager.js": "20cb675f242157c8",
   "./js/views/onboarding/goals.js": "ec29181741c4bc1e",
   "./js/views/onboarding/conditions.js": "f719e4e253244b9e",
@@ -4967,6 +4971,8 @@ const SHELL_URLS = [
   "./js/views/in-step.js",
   "./js/data/in-step-programme.js",
   "./js/data/in-step-offer.js",
+  "./js/data/in-step-young.js",
+  "./js/data/in-step-version.js",
   "./js/coach-audio.js",
   "./js/hold-voice.js",
   "./js/views/guide-me.js",
