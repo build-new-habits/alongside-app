@@ -1,6 +1,10 @@
 /**
  * js/data/little-and-often.js
- * 26 Nov 2026 v4
+ * 26 Nov 2026 v5
+ *
+ * v5 - P-37 S3. weekRoutines(): what Your week says of the lists on Home,
+ *   each day (Mornings: Wake-up hips · Evenings: takes turns) and across
+ *   the week (Every day, as well). Nothing counted.
  *
  * v4 - P-37 S1 (mock-up approved by Graeme 26 Nov). A Mornings or Evenings
  *   list either takes turns (the default) or has its own days. Take turns:
@@ -162,4 +166,44 @@ export function homeItems(d = new Date()) {
       sore: soreAreaIn(items),
     };
   });
+}
+
+const _and = list => list.length <= 1 ? (list[0] || "") : `${list.slice(0, -1).join(", ")} and ${list[list.length - 1]}`;
+const _SHORT = { mon: "Mon", tue: "Tue", wed: "Wed", thu: "Thu", fri: "Fri", sat: "Sat", sun: "Sun" };
+
+/**
+ * P-37 S3. Your week's lines for the lists on Home.
+ *   days: { mon: "Mornings: Wake-up hips · Evenings: takes turns", ... } ("" when none)
+ *   summary: [{ part: "Mornings"|"Evenings"|"Any time", line }] for Every day, as well
+ * A list on its chosen day is named; lists taking turns say "takes turns"
+ * (which one depends on when the last was finished, so no day is promised).
+ */
+export function weekRoutines() {
+  const choices = store.get("myExercisesOnHome") || {};
+  const daysOf = store.get("onHomeDays") || {};
+  const groups = ownGroups().filter(g => ON_HOME.includes(choices[g]));
+  const out = { days: {}, summary: [] };
+  const by = part => groups.filter(g => choices[g] === part);
+  for (const d of DAY_KEYS) {
+    const bits = [];
+    for (const [part, word] of [["morning", "Mornings"], ["evening", "Evenings"]]) {
+      const lists = by(part);
+      const on = lists.filter(g => Array.isArray(daysOf[g]) && daysOf[g].includes(d));
+      const turns = lists.filter(g => !Array.isArray(daysOf[g]));
+      if (!on.length && !turns.length) continue;
+      bits.push(`${word}: ${[..._and(on) ? [_and(on)] : [], ...(turns.length ? [on.length ? "one taking turns" : turns.length > 1 ? "takes turns" : turns[0]] : [])].join(", and ")}`);
+    }
+    out.days[d] = bits.join(" \u00b7 ");
+  }
+  for (const [part, word] of [["morning", "Mornings"], ["evening", "Evenings"]]) {
+    const lists = by(part);
+    if (!lists.length) continue;
+    const chosen = lists.filter(g => Array.isArray(daysOf[g])).map(g => `${g} (${daysOf[g].map(k => _SHORT[k]).join(", ")})`);
+    const turns = lists.filter(g => !Array.isArray(daysOf[g]));
+    const t = turns.length > 1 ? `${_and(turns)} take turns` : turns.length ? `${turns[0]}, every ${part}` : "";
+    out.summary.push({ part: word, line: [...chosen, ...(t ? [t] : [])].join(" \u00b7 ") });
+  }
+  const any = by("any");
+  if (any.length) out.summary.push({ part: "Any time", line: _and(any) });
+  return out;
 }

@@ -1,5 +1,15 @@
 /**
  * js/views/your-week.js
+ * 26 Nov 2026 v9
+ *
+ * v9 - P-37 S3. Each day's row adds a quiet line for the lists on Home
+ *   (Mornings: Wake-up hips · Evenings: takes turns), and Every day, as
+ *   well sums them up, with Change these in My exercises. Nothing counted.
+ *   A day's button is named by its own words (the aria-label said
+ *   "Monday: …" while the row showed "Mon …": axe
+ *   label-content-name-mismatch), and today's day key no longer leans on a
+ *   light colour that failed contrast in the light scheme.
+ *
  * 26 Nov 2026 v8
  *
  * v8 - P-41 S2 rule 4. In the 16-17 version How hard says two hard days a
@@ -72,6 +82,7 @@
  */
 
 import { store } from "../store.js";
+import { weekRoutines } from "../data/little-and-often.js";
 import { isYoung, hardDaysInWeek, HARD_DAYS_MOST, HARD_DAYS_LINE } from "../data/age-version.js";
 import { isPremium } from "../auth.js";
 import { lineIcon } from "../data/line-icons.js";
@@ -230,6 +241,7 @@ export function YourWeekView(router) {
     const span = `${dates[0].date.getDate()} to ${dates[6].date.toLocaleDateString("en-GB", { day: "numeric", month: "long" })}`;
     const favs = [...new Set(Object.values(w.templates).flatMap(t => t.favourites || []))];
     const gap = balanceGap();
+    const routines = weekRoutines();   // P-37 S3
     return `
       <div class="yw-header">
         <button class="btn btn-ghost yw-back plan-back" data-go-route="today" aria-label="Back to Home">‹ Back</button>
@@ -246,20 +258,31 @@ export function YourWeekView(router) {
           const icon = t ? f.icon : v === "rest" ? "rest" : "plus";
           const name = t ? t.name : v === "rest" ? "Rest" : "Nothing planned";
           const isToday = d === today;
-          const aria = `${DAY_NAMES[d]}${isToday ? ", today" : ""}: ${name}${done[d] ? ", done" : ""}. Change`;
-          return `<li><button class="yw-day" data-day="${d}" aria-label="${esc(aria)}">
+          const rl = routines.days[d] || "";
+          // P-37 S3: the button's name is its own words (no aria-label), so what is
+          // read out starts with what is seen (axe label-content-name-mismatch).
+          return `<li><button class="yw-day" data-day="${d}">
+            <span class="sr-only">${DAY_NAMES[d]}${isToday ? ", today" : ""}: </span>
             <span class="yw-day__key${isToday ? " is-today" : ""}" aria-hidden="true">${DAY_SHORT[d]}</span>
             <span class="kind-tile kind-tile--sm k-${kind}">${lineIcon(icon, 20)}</span>
-            <span class="yw-day__text" aria-hidden="true">
+            <span class="yw-day__text">
               <span class="yw-day__name">${esc(name)}</span>
               ${t ? `<span class="yw-day__line">${esc(mixLine(t))}</span><span class="yw-day__line">${esc(detailLine(t))}</span>`
                   : v === "rest" ? `<span class="yw-day__line">Rest counts.</span>` : `<span class="yw-day__line">Tap to say what this day is for.</span>`}
-              ${isToday ? `<span class="yw-tag yw-tag--today">Today</span>` : ""}
+              ${rl ? `<span class="yw-day__line yw-day__routines">${esc(rl)}</span>` : ""}
+              ${isToday ? `<span class="yw-tag yw-tag--today" aria-hidden="true">Today</span>` : ""}
             </span>
-            ${done[d] ? `<span class="yw-done" aria-hidden="true">${lineIcon("tick", 18)} Done</span>` : ""}
+            ${done[d] ? `<span class="yw-done">${lineIcon("tick", 18)} Done</span>` : ""}
+            <span class="sr-only">. Change</span>
           </button></li>`;
         }).join("")}
       </ol>
+      ${routines.summary.length ? `
+      <section class="look-card yw-card" aria-labelledby="yw-every-h">
+        <h2 class="yw-card__h" id="yw-every-h">Every day, as well</h2>
+        <dl class="yw-every">${routines.summary.map(x => `<dt>${esc(x.part)}</dt><dd>${esc(x.line)}</dd>`).join("")}</dl>
+        <button class="path-link yw-every__change" data-go-route="prescribed">Change these in My exercises</button>
+      </section>` : ""}
       ${favs.length ? `
       <section class="look-card yw-card" aria-labelledby="yw-fav-h">
         <h2 class="yw-card__h" id="yw-fav-h">Always in, when it fits</h2>

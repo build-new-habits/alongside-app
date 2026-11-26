@@ -1,5 +1,9 @@
 /* css/components/your-week.css
- * 26 Nov 2026 v6
+ * 26 Nov 2026 v7
+ *
+ * v7 - P-37 S3: a day's routines line (.yw-day__routines) and Every day,
+ *   as well (.yw-every). Today's day key in the text colour (bold and
+ *   underlined, as before): the light colour failed contrast in light.
  *
  * v6 - P-37 S1: Which mornings? (Take turns or Choose the days) under a
  *   Mornings or Evenings list (.px-days).
@@ -131,10 +135,15 @@ button.yw-way:hover { background: var(--color-bg-hover); }
 }
 .yw-day:hover { background: var(--color-bg-hover); }
 .yw-day__key { flex: none; width: 2.5em; font-size: var(--text-sm, 0.9375rem); font-weight: 600; color: var(--color-text-secondary); }
-.yw-day__key.is-today { color: var(--color-primary-light); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+.yw-day__key.is-today { color: var(--color-text); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
 .yw-day__text { flex: 1 1 9em; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .yw-day__name { font-weight: 700; }
 .yw-day__line { font-size: var(--text-sm, 0.9375rem); line-height: 1.35; color: var(--color-text-secondary); }
+.yw-day__routines { margin-top: 2px; overflow-wrap: anywhere; }
+.yw-every { margin: 0 0 var(--space-sm, 0.5rem); display: grid; gap: 2px var(--space-sm, 0.5rem); }
+.yw-every dt { font-weight: 700; color: var(--color-text); }
+.yw-every dd { margin: 0 0 var(--space-xs, 0.25rem); color: var(--color-text-secondary); overflow-wrap: anywhere; }
+.yw-every__change { align-self: flex-start; }
 .yw-tag {
   align-self: flex-start;
   margin-top: 4px;
@@ -144,7 +153,7 @@ button.yw-way:hover { background: var(--color-bg-hover); }
   font-size: var(--text-xs, 0.8125rem);
   font-weight: 600;
 }
-.yw-tag--today { color: var(--color-primary-light); }
+.yw-tag--today { color: var(--color-primary); }   /* P-37 S3: primary-light failed contrast in light */
 .yw-done { flex: none; display: inline-flex; align-items: center; gap: 4px; font-size: var(--text-sm, 0.9375rem); font-weight: 600; color: var(--color-success); }
 
 /* Cards on the day screen */
