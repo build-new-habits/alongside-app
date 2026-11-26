@@ -1,6 +1,12 @@
 /**
  * prescribed.js - My exercises
  *
+ * 26 Nov 2026 v1.20
+ *
+ * v1.20 - P-37 S1 (mock-up approved 26 Nov). A Mornings or Evenings list
+ *   asks Which mornings? (or evenings): Take turns, the default, or Choose
+ *   the days, with a chip for each day (at least one).
+ *
  * 24 Nov 2026 v1.19
  *
  * v1.19 - P-46 S6 WORDS. The empty list says less (spec §7): Yours, kept
@@ -158,7 +164,8 @@
 
 import { store } from "../store.js";
 import { planLook } from "../plan-look.js";
-import { ON_HOME_CHOICES, onHomeFor, setOnHome, onHomeCount, MAX_ON_HOME_SHOWN } from "../data/little-and-often.js";
+import { ON_HOME_CHOICES, onHomeFor, setOnHome, onHomeCount, MAX_ON_HOME_SHOWN, onHomeDaysFor, setOnHomeDays } from "../data/little-and-often.js";
+import { DAY_KEYS, DAY_NAMES } from "../data/week-shape-model.js";
 import { healthAllowed } from "../data/health-consent.js";
 
 export const centered = false;
@@ -364,7 +371,27 @@ function renderOnHome(name, gi) {
       <select class="px-onhome__select" id="px-onhome-${gi}" data-px-onhome="${_esc(name)}">
         ${ON_HOME_CHOICES.map(c => `<option value="${c.id}"${now === c.id ? " selected" : ""}>${c.label}</option>`).join("")}
       </select>
+      ${now === "morning" || now === "evening" ? renderWhichDays(name, gi, now) : ""}
     </div>`;
+}
+
+/**
+ * P-37 (mock-up approved 26 Nov). For a Mornings or Evenings list: take
+ * turns with the other lists (the default), or choose the days.
+ */
+function renderWhichDays(name, gi, part) {
+  const days = onHomeDaysFor(name);
+  const which = part === "morning" ? "mornings" : "evenings";
+  return `<fieldset class="px-days" data-px-days="${_esc(name)}">
+      <legend class="px-onhome__label">Which ${which}?<span class="sr-only">: ${_esc(name)}</span></legend>
+      <label class="px-days__opt"><input type="radio" name="px-days-${gi}" value="turns"${days ? "" : " checked"}>
+        <span><strong>Take turns</strong><span class="px-days__d">With your other ${which.slice(0, -1)} lists, one each ${which.slice(0, -1)}.</span></span></label>
+      <label class="px-days__opt"><input type="radio" name="px-days-${gi}" value="days"${days ? " checked" : ""}>
+        <span><strong>Choose the days</strong><span class="px-days__d">This list on the ${which} you pick.</span></span></label>
+      ${days ? `<div class="px-days__chips" role="group" aria-label="Days for ${_esc(name)}">
+        ${DAY_KEYS.map(d => `<button type="button" class="px-days__chip" data-px-day="${d}" aria-pressed="${days.includes(d)}">${DAY_NAMES[d].slice(0, 3)}</button>`).join("")}
+      </div>` : ""}
+    </fieldset>`;
 }
 
 /**
@@ -633,10 +660,39 @@ export function onMount() {
     const name = sel.dataset.pxOnhome;
     setOnHome(name, sel.value);
     const label = sel.options[sel.selectedIndex]?.text || "";
-    const status = document.getElementById("px-onhome-status");
     const more = sel.value !== "off" && onHomeCount() > MAX_ON_HOME_SHOWN ? " Home shows up to three at a time." : "";
-    if (status) status.textContent = sel.value === "off" ? `${name} is not on Home.` : `${name} is on Home, ${label.toLowerCase()}.${more}`;
+    const said = sel.value === "off" ? `${name} is not on Home.` : `${name} is on Home, ${label.toLowerCase()}.${more}`;
+    // P-37: Mornings and Evenings ask which ones, so the list is drawn again
+    // when the question comes or goes; focus and the status stay.
+    const asks = v => v === "morning" || v === "evening";
+    if (asks(sel.value) || sel.closest(".px-onhome")?.querySelector("[data-px-days]")) {
+      const id = sel.id; rerender();
+      document.getElementById(id)?.focus();
+    }
+    const status = document.getElementById("px-onhome-status");
+    if (status) status.textContent = said;
   }));
+  // P-37. Take turns, or choose the days (Monday, Wednesday and Friday to start).
+  document.querySelectorAll("[data-px-days]").forEach(fs => {
+    const name = fs.dataset.pxDays;
+    fs.querySelectorAll('input[type="radio"]').forEach(r => r.addEventListener("change", () => {
+      setOnHomeDays(name, r.value === "days" ? ["mon", "wed", "fri"] : null);
+      rerender();
+      document.querySelector(`[data-px-days="${CSS.escape(name)}"] input[value="${r.value}"]`)?.focus();
+      const status = document.getElementById("px-onhome-status");
+      if (status) status.textContent = r.value === "days" ? `${name}: Monday, Wednesday and Friday. Change the days below.` : `${name} takes turns.`;
+    }));
+    fs.querySelectorAll("[data-px-day]").forEach(b => b.addEventListener("click", () => {
+      const now = onHomeDaysFor(name) || [];
+      const d = b.dataset.pxDay;
+      const next = now.includes(d) ? now.filter(x => x !== d) : [...now, d];
+      if (!next.length) return;   // at least one day; Take turns is the way to have none
+      setOnHomeDays(name, next);
+      b.setAttribute("aria-pressed", String(next.includes(d)));
+      const status = document.getElementById("px-onhome-status");
+      if (status) status.textContent = `${DAY_NAMES[d]} ${next.includes(d) ? "added" : "taken off"}.`;
+    }));
+  });
 
   // ── Toggle add form ───────────────────────────────────────────────────────
   document.getElementById("px-toggle-form-btn")?.addEventListener("click", () => {

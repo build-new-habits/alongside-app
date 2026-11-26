@@ -1,6 +1,10 @@
 /**
  * js/data/week-shape-model.js
- * 14 Nov 2026 v6
+ * 26 Nov 2026 v7
+ *
+ * v7 - P-37 S1. sanitizeOnHomeDays() and sanitizeOnHomeTurns() (Schema
+ *   v1.141): Choose the days for a Mornings or Evenings list, and whose
+ *   turn it is when lists take turns.
  *
  * v6 - P-31 LITTLE-AND-OFTEN and CHANGE-TODAY, schema (Schema v1.125;
  *   mock-up v5 approved by Graeme, 14 Nov: "Spec and build the code").
@@ -395,6 +399,43 @@ export const ON_HOME = ["any", "morning", "evening"];
 const MAX_ON_HOME = 40;
 
 /** myExercisesOnHome made safe: { "<group name>": "any"|"morning"|"evening" }. */
+/**
+ * P-37 (Schema v1.141). Which days a Mornings or Evenings list shows on
+ * (Choose the days): { "<list name>": ["mon", ...] }. A list not here takes
+ * turns. Only lists that are on Home for mornings or evenings keep days;
+ * days are known day keys, each once, in week order; none means take turns.
+ */
+export function sanitizeOnHomeDays(o, onHome = {}) {
+  if (!o || typeof o !== "object" || Array.isArray(o)) return {};
+  const out = {};
+  for (const [k, v] of Object.entries(o).slice(0, MAX_ON_HOME)) {
+    const name = String(k).replace(/[<>]/g, "").trim().slice(0, 40);
+    if (!name || !["morning", "evening"].includes(onHome[name]) || !Array.isArray(v)) continue;
+    const days = DAY_KEYS.filter(d => v.includes(d));
+    if (days.length) out[name] = days;
+  }
+  return out;
+}
+
+/**
+ * P-37 (Schema v1.141). Whose turn it is, for mornings and for evenings:
+ * { morning?: { group, doneOn }, evening?: { group, doneOn } }. doneOn is
+ * the local day the list was finished (YYYY-MM-DD) or null. Anything else
+ * is dropped; a list no longer taking turns is let go by its reader.
+ */
+export function sanitizeOnHomeTurns(o) {
+  if (!o || typeof o !== "object" || Array.isArray(o)) return {};
+  const out = {};
+  for (const part of ["morning", "evening"]) {
+    const t = o[part];
+    if (!t || typeof t !== "object") continue;
+    const group = String(t.group || "").replace(/[<>]/g, "").trim().slice(0, 40);
+    if (!group) continue;
+    out[part] = { group, doneOn: typeof t.doneOn === "string" && /^\d{4}-\d{2}-\d{2}$/.test(t.doneOn) ? t.doneOn : null };
+  }
+  return out;
+}
+
 export function sanitizeOnHome(o) {
   if (!o || typeof o !== "object" || Array.isArray(o)) return {};
   const out = {};
