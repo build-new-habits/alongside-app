@@ -1,7 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 26 Nov 2026 v754
+ * 26 Nov 2026 v755
+ *
+ * v755 - P-41 S5. The developer panel can switch the age version, to try the 16-17 version on a phone before it opens. Still closed. No new files.
  *
  * v754 - P-41 S4. The 16-17 version's words (approved 26 Nov): a welcome once, the health answers line, what the app keeps at 16 and 17, and the age line and under-16 screen for when it opens. Still closed. No new files.
  *
@@ -4361,7 +4363,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v754";
+const CACHE_NAME = "alongside-v755";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4453,7 +4455,7 @@ const SHELL_HASHES = {
   "./js/views/coach-proposal.js": "c8f548d3c2e5db8c",
   "./js/views/workout.js": "a64a827af4e52fb2",
   "./js/views/progress.js": "7708195f75512d62",
-  "./js/views/settings.js": "65349bad785a150d",
+  "./js/views/settings.js": "d2fd581264f5ed40",
   "./js/views/restore-flow.js": "dc81c2e455fa472d",
   "./js/views/weekly-plan.js": "dcee06e297b402c0",
   "./js/views/reflect.js": "fa33525e04a2feaa",

@@ -1,5 +1,11 @@
 /**
  * settings.js
+ * 26 Nov 2026 v80
+ *
+ * v80 - P-41 S5. The developer panel can switch the age version (Adult,
+ *   16-17, or 16-17 turning 18 now), so the 16-17 version can be tried on a
+ *   phone before it opens. The panel is off at release (row 15).
+ *
  * 26 Nov 2026 v79
  *
  * v79 - P-41 S2 (16-17 version): no Weight section (rule 1) and no
@@ -2746,6 +2752,14 @@ export function SettingsView(router) {
                  nothing, so this button's entire function was to put a
                  device into a state indistinguishable from Personal. -->
           </div>
+          <!-- P-41 S5: try the 16-17 version on a phone before it opens
+               (this panel is off at release, row 15). -->
+          <p class="settings-dev-panel__tier">Age version: <strong id="dev-current-age">${store.get('consent.ageGroup') || 'adult'}</strong></p>
+          <div class="settings-dev-panel__buttons" role="group" aria-label="Switch age version for testing">
+            <button class="btn btn-secondary btn-sm" data-dev-age="adult">Adult</button>
+            <button class="btn btn-secondary btn-sm" data-dev-age="young-16">16–17</button>
+            <button class="btn btn-secondary btn-sm" data-dev-age="turning-18">16–17, turning 18 now</button>
+          </div>
         </div>
         `}
 
@@ -3173,6 +3187,24 @@ export function SettingsView(router) {
     }
 
     // Developer tier buttons
+    // P-41 S5. The age version, for a device test before 16-17 opens.
+    // "Turning 18 now" sets this month as the month to move up, so the next
+    // time the app opens it moves up and Home says so once.
+    container.querySelectorAll('[data-dev-age]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const v = btn.dataset.devAge, d = new Date();
+        const month = n => { const x = new Date(d.getFullYear(), d.getMonth() + n, 1); return `${x.getFullYear()}-${String(x.getMonth() + 1).padStart(2, '0')}`; };
+        store.set('consent.ageConfirmed', true);
+        store.set('consent.ageGroup', v === 'adult' ? 'adult' : 'young-16');
+        store.set('consent.ageGroupNext', v === 'adult' ? null : month(v === 'turning-18' ? 0 : 12));
+        store.set('consent.ageGroupAt', d.toISOString());
+        store.set('consent.ageWelcomedAt', null);
+        const label = container.querySelector('#dev-current-age');
+        if (label) label.textContent = v === 'adult' ? 'adult' : 'young-16';
+        _showToast(v === 'adult' ? 'Age version: adult' : v === 'turning-18' ? 'Age version: 16–17, moving up when the app opens again' : 'Age version: 16–17', container);
+      });
+    });
+
     container.querySelectorAll('[data-dev-tier]').forEach(btn => {
       btn.addEventListener('click', () => {
         const tier = btn.dataset.devTier;
