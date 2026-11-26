@@ -1,7 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 26 Nov 2026 v755
+ * 26 Nov 2026 v756
+ *
+ * v756 - WB-NAMES. Wellbeing's four practice tiles are named by their own words for screen readers (WCAG 2.5.3). No new files.
  *
  * v755 - P-41 S5. The developer panel can switch the age version, to try the 16-17 version on a phone before it opens. Still closed. No new files.
  *
@@ -4363,7 +4365,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v755";
+const CACHE_NAME = "alongside-v756";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4595,7 +4597,7 @@ const SHELL_HASHES = {
   "./css/components/class-player.css": "401cc57d7d39dbb1",
   "./js/views/saved-sessions.js": "400202f2e10e8e74",
   "./js/views/session-builder-ui.js": "fa76c5ea1b7462aa",
-  "./js/views/noticing.js": "b0fd1db225416f4f",
+  "./js/views/noticing.js": "9b9be8501630015e",
   "./js/views/in-step.js": "a6ee08b20baff9ef",
   "./js/data/in-step-programme.js": "a325e135e7dd09a0",
   "./js/data/in-step-offer.js": "ec9cfbd456a76669",

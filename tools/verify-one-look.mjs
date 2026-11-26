@@ -1,6 +1,11 @@
 import { createRequire as __cr } from "node:module";
 /**
  * tools/verify-one-look.mjs
+ * 26 Nov 2026 v23
+ *
+ * v23 - WB-NAMES. TEST 4 (noticing): the four practice tiles lose their
+ *   aria-labels (WCAG 2.5.3) and nothing else changes on Free (4n).
+ *
  * 25 Nov 2026 v22
  *
  * v22 - 11a FREE-CHECKIN-HEAD. TEST 4 takes out Free's new check-in heading
@@ -512,6 +517,11 @@ for (const file of touched) {
     const each = was.every(w => a.split(w).length === 2);
     ok("4w. P-28: v688's Free Wellbeing had In Step's tile once, and the tile is all that changed", each);
     if (each) was.forEach((w, i) => { a = a.replace(w, now[i]); });
+    // v23 (WB-NAMES, 26 Nov, WCAG 2.5.3): the four tiles lose their
+    // aria-labels, so each is named by its own words; nothing else changes.
+    const labelled = /(<button class="wb-practice k-(?:green|orchid)" id="noticing-[a-z-]+-btn")\s+aria-label="[^"]*">/g;
+    ok("4n. WB-NAMES: no practice tile carries a name of its own any more", !/class="wb-practice k-[^>]*aria-label/.test(b) && (a.match(labelled) || []).length === 4);
+    a = a.replace(labelled, "$1>");
   }
   // v22 (11a FREE-CHECKIN-HEAD, 25 Nov): Free's check-in gains the heading
   // and the way back the Plan's has ("Check in", "‹ Back"), and nothing else.

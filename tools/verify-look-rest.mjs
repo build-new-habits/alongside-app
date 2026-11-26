@@ -1,5 +1,10 @@
 /**
  * tools/verify-look-rest.mjs
+ * 26 Nov 2026 v8
+ *
+ * v8 - WB-NAMES. 4d asks that each Wellbeing tile's spoken name holds all
+ *   its visible words (axe, WCAG 2.5.3), not only that it starts with the title.
+ *
  * 24 Nov 2026 v7
  *
  * v7 - P-46 S4 FREE HOME. TEST 2 reads the coach-led Free Home (each way in
@@ -187,7 +192,9 @@ const prac = $$(".wb-practice");
 ok("4b. four practices as tiles, each with its words", JSON.stringify(prac.map(p => txt(p.querySelector(".wb-practice__name")))) === JSON.stringify(["Breathing", "Mindful awareness", "Journal", "In Step"]),
    prac.map(txt).join(" | "));
 ok("4c. their ids are as before", ["noticing-breathe-btn", "noticing-mindful-btn", "noticing-journal-btn", "noticing-in-step-btn"].every(id => !!main.querySelector("#" + id)));
-ok("4d. each one's name starts with its visible words (2.5.3)", prac.every(p => (p.getAttribute("aria-label") || "").startsWith(txt(p.querySelector(".wb-practice__name")))));
+// WB-NAMES (26 Nov): axe found the names began with the tile's title but
+// not its other words; the spoken name must hold ALL its visible words.
+ok("4d. each one's spoken name holds all its visible words (2.5.3)", prac.every(p => { const name = p.getAttribute("aria-label") || txt(p); return name.includes(txt(p.querySelector(".wb-practice__name"))) && name.includes(txt(p.querySelector(".wb-practice__sub"))); }));
 ok("4e. the journal still says only you can read it", /Only you can read it/.test(txt($("#noticing-journal-btn"))));
 ok("4f. the support lines are still there", !!$("[data-support-lines]") && /116 123/.test(txt($("[data-support-lines]"))));
 ok("4g. icons decorative; no emoji on Wellbeing", iconsDecorative() && !EMOJI.test(txt(main)), (txt(main).match(EMOJI) || [""])[0]);

@@ -1,6 +1,11 @@
 /**
  * js/views/noticing.js - Wellbeing Hub Landing View
  *
+ * 26 Nov 2026 v16 - WB-NAMES (found by axe in P-41 S2, WCAG 2.5.3 Label in
+ *   Name). The four practice tiles' spoken names did not start with their
+ *   visible words ("Breathing exercises — five types…" for "Breathing"). The
+ *   names are now the tiles' own words; the icons are hidden. Both tiers.
+ *
  * 24 Nov 2026 v15 - P-46 S6 WORDS (both tiers). The coach's line above the
  *   suggested practice is shorter (spec §7: about 15 words before the first
  *   button); each still says the person's own word, and claims nothing.
@@ -362,29 +367,25 @@ export function render() {
              Architecture, 12 Aug 2026, sections 9 and 18): everything in
              Wellbeing is free; the paid thing is the long version, never this. -->
         <div class="wb-practices">
-          <button class="wb-practice k-green" id="noticing-breathe-btn"
-                  aria-label="Breathing exercises — five types, any duration">
+          <button class="wb-practice k-green" id="noticing-breathe-btn">
             <span class="kind-tile">${lineIcon("breath")}</span>
             <span class="wb-practice__name">Breathing</span>
             <span class="wb-practice__sub">Five types. Any duration.</span>
           </button>
 
-          <button class="wb-practice k-green" id="noticing-mindful-btn"
-                  aria-label="Mindful awareness — five, ten, fifteen, or twenty minute guided sessions">
+          <button class="wb-practice k-green" id="noticing-mindful-btn">
             <span class="kind-tile">${lineIcon("mind")}</span>
             <span class="wb-practice__name">Mindful awareness</span>
             <span class="wb-practice__sub">5, 10, 15, or 20 minutes. Guided, with a timer.</span>
           </button>
 
-          <button class="wb-practice k-green" id="noticing-journal-btn"
-                  aria-label="Journal — write anything. Only you can read it.">
+          <button class="wb-practice k-green" id="noticing-journal-btn">
             <span class="kind-tile">${lineIcon("pencil")}</span>
             <span class="wb-practice__name">Journal</span>
             <span class="wb-practice__sub">Write anything. Only you can read it.</span>
           </button>
 
-          <button class="wb-practice k-orchid" id="noticing-in-step-btn"
-                  aria-label="In Step \u2014 short moments about the people around you">
+          <button class="wb-practice k-orchid" id="noticing-in-step-btn">
             <span class="kind-tile">${lineIcon("instep")}</span>
             <span class="wb-practice__name">In Step</span>
             <span class="wb-practice__sub">Short moments about the people around you.</span>
