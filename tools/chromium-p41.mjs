@@ -1,6 +1,8 @@
 /**
  * tools/chromium-p41.mjs
- * 26 Nov 2026 v1
+ * 26 Nov 2026 v2
+ *
+ * v2 - S4: what the app keeps and the health answers, for 16-17.
  *
  * P-41 S2, in a real browser (not in the loop): the screens the 16-17
  * version changes, at text 1, 1.45 and 2, dark, light and high contrast,
@@ -45,6 +47,8 @@ const SCREENS = [
   ["16-17: Wellbeing (help lines)", async p => { await nav(p, "noticing"); }, "[data-support-lines]"],
   ["16-17: the upgrade page", async p => { await nav(p, "upgrade"); }, "#upgrade-young", "free"],
   ["16-17: Settings", async p => { await nav(p, "settings"); }, ".settings-index"],
+  ["16-17: what the app keeps", async p => { await nav(p, "privacy"); }, "#privacy-young"],
+  ["16-17: the health answers", async p => { await p.evaluate(() => window.store.set("consent.health", { given: false, at: null, version: null, withdrawnAt: null })); await nav(p, "health-consent"); }, "#hc-young"],
   ["16-17: In Step, coming soon", async p => { await nav(p, "in-step"); await p.waitForTimeout(400); }, "#is-soon"],
   ["16-17: Your week, a day", async p => { await p.evaluate(async () => { const WM = await import("./js/data/week-shape-model.js"); const t = WM.newTemplate([], "Monday plan"); window.store.set("weekShape", WM.sanitizeWeekShape({ templates: { [t.id]: t }, days: { mon: t.id, tue: "rest", wed: "rest", thu: "rest", fri: "rest", sat: "rest", sun: "rest" }, setAt: "2026-11-23" })); }); await nav(p, "your-week"); await p.evaluate(() => document.querySelector('[data-day="mon"]')?.click()); await p.waitForTimeout(300); }, "#yw-int-young", true],
   ["16-17: Making my Move", async p => { await nav(p, "my-move"); await click(p, '[data-go="for"]'); }, ".path-door", true],

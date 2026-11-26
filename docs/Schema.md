@@ -1,5 +1,7 @@
 # Alongside — Data Schema Reference
-## 26 Nov 2026 v1.139
+## 26 Nov 2026 v1.140
+
+> **v1.140, 26 Nov 2026 — P-41 S4 WORDS** (`store.js` v137). **One key added to `consent`: `ageWelcomedAt`** (ISO or `null`, default `null`): when a 16-17 phone saw the once-only *Alongside for 16 and 17* screen (`onboarding/thread.js`), so it is never shown again. Anything not a valid time loads as `null`. Gated by `tools/verify-p41-words.mjs`.
 
 > **v1.139, 26 Nov 2026 — P-41 S3 MOVING UP** (`store.js` v136). **One key added to `consent`: `ageMovedUpAt`** (ISO or `null`, default `null`): set when a `young-16` phone moves up to the adult version by itself, which happens from the month in `ageGroupNext` (on load, `store._ageMoveUp()`, and through `store.ageMoveUpIfDue()`); `ageGroup` becomes `'adult'`, `ageGroupNext` `null` (the month is let go), `ageGroupAt` the time. Home says so once (`age-version.js` `takeMovedUpLine()`), then sets it back to `null`. Kept only on an adult phone; anything else loads as `null`. Gated by `tools/verify-p41-moveup.mjs`.
 
@@ -1123,7 +1125,7 @@
 
 ## 06 Sep 2026 v1.51
 
-**File:** `js/store.js` (confirmed live version: **v136, 26 Nov 2026**)
+**File:** `js/store.js` (confirmed live version: **v137, 26 Nov 2026**)
 
 > **v1.47, 06 Sep 2026 — CR-1.** `conditions[]` gains three ids and loses one. `chronic-fatigue` is **retired**; `persistent-fatigue`, `me-cfs` and `long-covid` replace it. No field shape changed — `conditions` is still `string[]` and `conditionMeta` is still keyed by condition id.
 >
@@ -1794,6 +1796,7 @@ Legal consent record. Restored after the PT-W1 store audit found it absent: `wel
 | `consent.ageGroupNext` | `'YYYY-MM' \| null` | `null` | **v1.137 (P-41).** `young-16` only: the month they move up to the adult version. On the phone only, deleted at 18. |
 | `consent.ageGroupAt` | `ISO \| null` | `null` | **v1.137 (P-41).** When the group was last set. |
 | `consent.ageMovedUpAt` | `ISO \| null` | `null` | **v1.139 (P-41 S3).** When a 16-17 phone moved up to the adult version by itself; Home says so once, then `null`. |
+| `consent.ageWelcomedAt` | `ISO \| null` | `null` | **v1.140 (P-41 S4).** When a 16-17 phone saw *Alongside for 16 and 17*, once. |
 
 **Deprecated, do not write:** flat `consentGiven` / `consentAt`. Superseded by the nested object above. Nesting was chosen deliberately for the coming Supabase migration, where PT-10 flagged undeclared flat fields as a real loss risk.
 

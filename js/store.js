@@ -6,6 +6,11 @@ import { validateWeightTarget } from "./data/weight-targets.js";
 
 /**
  * store.js - Data persistence layer
+ * 26 Nov 2026 v137
+ *
+ * v137 - P-41 S4 (Schema v1.140): consent.ageWelcomedAt, when a 16-17
+ *   phone saw the once-only "Alongside for 16 and 17" screen.
+ *
  * 26 Nov 2026 v136
  *
  * v136 - P-41 S3 MOVING UP (Schema v1.139). From the month in
@@ -2226,6 +2231,7 @@ export const store = {
     if (out.ageGroup === 'young-16' && !out.ageGroupNext) { out.ageGroup = null; out.ageConfirmed = null; }
     out.ageGroupAt = typeof out.ageGroupAt === 'string' && !isNaN(new Date(out.ageGroupAt)) ? out.ageGroupAt : null;
     out.ageMovedUpAt = out.ageGroup === 'adult' && typeof out.ageMovedUpAt === 'string' && !isNaN(new Date(out.ageMovedUpAt)) ? out.ageMovedUpAt : null;
+    out.ageWelcomedAt = typeof out.ageWelcomedAt === 'string' && !isNaN(new Date(out.ageWelcomedAt)) ? out.ageWelcomedAt : null;
     return this._ageMoveUp(out);
   },
 
@@ -2673,6 +2679,8 @@ export const store = {
         // v136 (P-41 S3): when a 16-17 phone moved up to the adult version
         // by itself; Home says so once, then it is null again.
         ageMovedUpAt:  null,   // ISO string|null
+        // v137 (P-41 S4): when a 16-17 phone saw "Alongside for 16 and 17", once.
+        ageWelcomedAt: null,   // ISO string|null
         // PT-2, 01 Oct 2026. Explicit consent for health answers, apart
         // from the Privacy-and-Terms tick. given: true | false (withdrawn)
         // | null (never asked: an install from before this existed).

@@ -1,5 +1,10 @@
 /**
  * privacy.js - Privacy and Terms (in-app summary)
+ * 26 Nov 2026 v12
+ *
+ * v12 - P-41 S4. A 16-17 phone sees what the app keeps at their age first
+ *   (approved 26 Nov). Adults unchanged.
+ *
  * 24 Nov 2026 v11
  *
  * v11 - P-46 S6 WORDS. Fewer words before the first button (spec §7: about
@@ -77,6 +82,7 @@
  * Settings. Returns to previous view on back tap.
  */
 
+import { isYoung, PRIVACY_YOUNG } from "../data/age-version.js";
 import { scopeStatementHTML } from "../data/scope-statement.js";
 import { researchPrivacyLine, noServerCopy } from "../data/evidence.js";
 import { declaredUnder18 } from "../data/age-check.js";
@@ -129,6 +135,10 @@ export function render() {
         <h1>Privacy &amp; Terms</h1>
       </div>
 
+      ${isYoung() ? `<div class="privacy-section card" id="privacy-young">
+        <h2 class="privacy-heading">What this app keeps, at 16 and 17</h2>
+        <p class="text-secondary">${PRIVACY_YOUNG}</p>
+      </div>` : ""}
       <div class="privacy-section card">
         <h2 class="privacy-heading">This is a summary</h2>
         <p class="text-secondary">
