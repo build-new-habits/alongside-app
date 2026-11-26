@@ -6,6 +6,16 @@ import { validateWeightTarget } from "./data/weight-targets.js";
 
 /**
  * store.js - Data persistence layer
+ * 25 Nov 2026 v134
+ *
+ * v134 - P-41 THREE AGE VERSIONS, S1, schema first (Schema v1.137; spec
+ *   BNH-Files Product/alongside_p41_three-age-versions_spec_25nov2026_v2.md,
+ *   approved by Graeme 25 Nov). Three keys in consent: ageGroup ('adult' or
+ *   'young-16'), ageGroupNext (the month a 16-17 year old moves up,
+ *   YYYY-MM), ageGroupAt. A phone let in before this is an adult. A young-16
+ *   group without its month is asked the age again (ageConfirmed null), so
+ *   nobody can be young-16 without a month to move up. Nothing on screen.
+ *
  * 25 Nov 2026 v133
  *
  * v133 - P-29 INSTEP-RECAP, schema first (Schema v1.136). One key added
@@ -1530,11 +1540,12 @@ export const store = {
       // ── CONSENT (v19) ─────────────────────────────────────────
       // Never overwrite a real consent record with defaults — an existing
       // user's timestamp and policyVersion are a legal audit trail.
-      consent: (saved.consent && typeof saved.consent === 'object')
+      // v134 (P-41): the age group, cleaned field by field (_cleanAgeGroup).
+      consent: this._cleanAgeGroup((saved.consent && typeof saved.consent === 'object')
         ? { ...defaults.consent, ...saved.consent,
             health: { ...defaults.consent.health,
                       ...((saved.consent.health && typeof saved.consent.health === 'object') ? saved.consent.health : {}) } }
-        : defaults.consent,
+        : defaults.consent),
 
       // ── PROFILE ───────────────────────────────────────────────
       fitnessLevel: saved.fitnessLevel || null,
@@ -2185,6 +2196,24 @@ export const store = {
    * by field. guideMe is removed (never nulled) when it is not one of its
    * three words, so an older entry gains no key.
    */
+  /**
+   * v134 (P-41). The age group, each part on its own: a group not one of
+   * the two is null; the move-up month only for young-16 and only as
+   * YYYY-MM; a phone let in before P-41 (ageConfirmed true, no group) is
+   * an adult, as the check then let in only adults; a phone kept out holds
+   * no group at all.
+   */
+  _cleanAgeGroup(c) {
+    const out = { ...c };
+    if (!['adult', 'young-16'].includes(out.ageGroup)) out.ageGroup = null;
+    if (out.ageConfirmed === true && out.ageGroup === null) out.ageGroup = 'adult';
+    if (out.ageConfirmed !== true) out.ageGroup = null;
+    out.ageGroupNext = out.ageGroup === 'young-16' && typeof out.ageGroupNext === 'string' && /^\d{4}-(0[1-9]|1[0-2])$/.test(out.ageGroupNext) ? out.ageGroupNext : null;
+    if (out.ageGroup === 'young-16' && !out.ageGroupNext) { out.ageGroup = null; out.ageConfirmed = null; }
+    out.ageGroupAt = typeof out.ageGroupAt === 'string' && !isNaN(new Date(out.ageGroupAt)) ? out.ageGroupAt : null;
+    return out;
+  },
+
   _cleanP28(data) {
     const EP = /^p[1-4]e[1-6]$/;
     const def = { part: 1, episode: 1, done: [], lastCarry: null, lastCarryAt: null, lastAnswer: null, offeredAt: null, offeredSession: 0 };
@@ -2581,6 +2610,15 @@ export const store = {
         ageConfirmed:  null,   // bool|null
         ageCheckedAt:  null,   // ISO string|null
         ageVersion:    null,   // string|null
+        // P-41 (v134, Schema v1.137). Which version of the app suits their
+        // age: 'adult' (18+) or 'young-16' (16-17); null before the
+        // question, or when kept out. ageGroupNext is the month a 16-17 year
+        // old moves up to the adult version ('YYYY-MM'; Graeme, 25 Nov:
+        // kept on the phone only, never sent, gone at 18); ageGroupAt is
+        // when the group was last set. The date of birth is never kept.
+        ageGroup:      null,   // 'adult'|'young-16'|null
+        ageGroupNext:  null,   // 'YYYY-MM'|null, young-16 only
+        ageGroupAt:    null,   // ISO string|null
         // PT-2, 01 Oct 2026. Explicit consent for health answers, apart
         // from the Privacy-and-Terms tick. given: true | false (withdrawn)
         // | null (never asked: an install from before this existed).

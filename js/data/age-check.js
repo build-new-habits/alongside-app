@@ -1,5 +1,16 @@
 /**
  * js/data/age-check.js
+ * 25 Nov 2026 v8
+ *
+ * v8 - P-41 THREE AGE VERSIONS, S1 (spec v2, approved by Graeme 25 Nov).
+ *   ageGroupFor() says which version suits an age (adult, young-16,
+ *   young-14, under), by the same month rule, with the month a 16-17 year
+ *   old moves up. recordAge() keeps the group (consent.ageGroup, Schema
+ *   v1.137) and recordAnswer() records from the question's fields. Both
+ *   young versions are closed (YOUNG_OPEN): until their rules are built,
+ *   anyone under 18 is kept out exactly as before. Nothing on screen
+ *   changes in S1.
+ *
  * 17 Oct 2026 v7
  *
  * v7 - W6-16 U18-POLICY-2 (Graeme, 17 Oct: "a"; "make everything
@@ -69,6 +80,41 @@ import { store } from "../store.js";
 
 export const AGE_CHECK_VERSION = "2026-10-01";
 export const ADULT_MONTHS = 18 * 12;
+/** P-41: 16 and over can have the young version, by the same month rule. */
+export const YOUNG_MONTHS = 16 * 12;
+
+/**
+ * P-41 (Graeme, 23 and 25 Nov): three versions, 14-15, 16-17 and 18+.
+ * Which young versions are open. Both closed until their rules are built
+ * and read (spec §1, §3): 16-17 opens when S2 to S5 are done; 14-15 after
+ * its own reads. A closed version is kept out exactly as under 18 was:
+ * everything deleted, nothing kept but that they were kept out.
+ */
+export const YOUNG_OPEN = { "young-16": false, "young-14": false };   // not frozen: verify-p41-schema opens it to prove the open path
+
+/** Whole months old by the month rule (the birth month not yet reached). */
+function _months(m, y, now) { return (now.getFullYear() - y) * 12 + (now.getMonth() + 1 - m); }
+
+/**
+ * P-41. Which version suits this age: { group: "adult" | "young-16" |
+ * "young-14" | "under", next }. next is the month a 16-17 year old moves up
+ * to the adult version (YYYY-MM: the month after the month they turn 18,
+ * as the adult rule lets them in); null for everyone else. null when the
+ * answer can't be read.
+ */
+export function ageGroupFor(month, year, now = new Date()) {
+  const m = Number(month), y = Number(year);
+  if (!Number.isInteger(m) || !Number.isInteger(y) || m < 1 || m > 12) return null;
+  const months = _months(m, y, now);
+  if (months < 0) return null;
+  if (months > ADULT_MONTHS) return { group: "adult", next: null };
+  if (months > YOUNG_MONTHS) {
+    const at = new Date(y + 18, m, 1);   // the month after the 18th birthday month
+    return { group: "young-16", next: `${at.getFullYear()}-${String(at.getMonth() + 1).padStart(2, "0")}` };
+  }
+  if (months > 14 * 12) return { group: "young-14", next: null };
+  return { group: "under", next: null };
+}
 
 export const MONTHS = ["January", "February", "March", "April", "May", "June",
   "July", "August", "September", "October", "November", "December"];
@@ -102,7 +148,10 @@ export function ageAnswer(month, year, now = new Date()) {
   if (Number(y) < now.getFullYear() - OLDEST_YEARS) return "old";
   const adult = isAdult(m, y, now);
   if (adult === null) return "future";
-  return adult ? "adult" : "under";
+  if (adult) return "adult";
+  // P-41: a young version that is open is "young"; closed, it is kept out.
+  const g = ageGroupFor(m, y, now);
+  return g && YOUNG_OPEN[g.group] ? "young" : "under";
 }
 
 /** The plain words for an answer that can't be read. */
@@ -148,12 +197,17 @@ export const ageNeeded = () => _c().given === true && _c().ageConfirmed !== true
  * now, with no warning and no copy, as the policies say ("deleted at
  * once"). Nothing about their health is ever kept.
  */
-export function recordAge(adult) {
+export function recordAge(adult, { group = "adult", next = null } = {}) {
   const at = new Date().toISOString();
   if (adult) {
+    // P-41 (Schema v1.137): the group, and for 16-17 the month they move up.
+    const young = group === "young-16" && YOUNG_OPEN["young-16"] && /^\d{4}-\d{2}$/.test(next || "");
     store.set("consent.ageConfirmed", true);
     store.set("consent.ageCheckedAt", at);
     store.set("consent.ageVersion", AGE_CHECK_VERSION);
+    store.set("consent.ageGroup", young ? "young-16" : "adult");
+    store.set("consent.ageGroupNext", young ? next : null);
+    store.set("consent.ageGroupAt", at);
     return;
   }
   store.resetEverything();
@@ -230,6 +284,24 @@ export function ageQuestionHTML(idPrefix = "age") {
       <p class="age-q__error" id="${idPrefix}-error" role="alert"></p>
     </fieldset>`;
 }
+
+/**
+ * P-41. Record what the question's fields say: let in ("adult", or "young"
+ * when that version is open, with its month to move up) or kept out.
+ * Returns the answer as ageAnswer() gives it; a reason it can't be read
+ * records nothing.
+ */
+export function recordAnswer(root, idPrefix = "age", now = new Date()) {
+  const month = root.querySelector(`#${idPrefix}-month`)?.value, year = root.querySelector(`#${idPrefix}-year`)?.value;
+  const a = ageAnswer(month, year, now);
+  if (a === "adult") recordAge(true);
+  else if (a === "young") { const g = ageGroupFor(month, year, now); recordAge(true, { group: g.group, next: g.next }); }
+  else if (a === "under") recordAge(false);
+  return a;
+}
+
+/** The version this phone is in: "adult", "young-16", or null (not let in). */
+export const ageGroup = () => (_c().ageConfirmed === true ? (_c().ageGroup || "adult") : null);
 
 /** Read the answer: true adult, false under 18, null not answered. */
 export function readAge(root, idPrefix = "age") {

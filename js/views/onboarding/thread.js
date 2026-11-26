@@ -1,5 +1,11 @@
 /**
  * js/views/onboarding/thread.js
+ * 25 Nov 2026 v31
+ *
+ * v31 - P-41 S1. The age answer is recorded from the fields (recordAnswer),
+ *   with the version that suits the age. Young versions are closed, so
+ *   nothing on screen changes yet.
+ *
  * 24 Nov 2026 v30
  *
  * v30 - P-46 S2. _beginThread(): anyone who has not started this conversation
@@ -338,7 +344,7 @@ import {
 }                             from '../../data/onboarding-thread-data.js';
 import { openSheet }          from './sheet-manager.js';
 import { HEALTH_TICK, HEALTH_NOTE, HEALTH_WHAT, giveHealthConsent, declineHealthConsent } from '../../data/health-consent.js';
-import { ageQuestionHTML, readAnswer, showAgeError, recordAge } from '../../data/age-check.js';
+import { ageQuestionHTML, readAnswer, showAgeError, recordAnswer } from '../../data/age-check.js';
 import { POLICY_VERSION as CURRENT_POLICY_VERSION } from '../../data/consent-version.js';
 import { restoreFromFile } from '../restore-flow.js';
 import { restoredMessage } from '../../data/restore.js';
@@ -495,10 +501,10 @@ export function ThreadView(router) {
       </section>`;
     _thread.querySelector('#ob-age-continue')?.addEventListener('click', () => {
       const answer = readAnswer(_thread, 'ob-age');
-      if (answer !== 'adult' && answer !== 'under') { showAgeError(_thread, 'ob-age', answer); return; }
-      const adult = answer === 'adult';
-      recordAge(adult);
-      if (!adult) { router.navigate('under-18'); return; }
+      if (!['adult', 'young', 'under'].includes(answer)) { showAgeError(_thread, 'ob-age', answer); return; }
+      // P-41: recorded from the fields, with the version that suits the age.
+      recordAnswer(_thread, 'ob-age');
+      if (answer === 'under') { router.navigate('under-18'); return; }
       if (_needsConsent()) _renderConsentGate();
       else { _thread.innerHTML = ''; _beginThread(); }
     });

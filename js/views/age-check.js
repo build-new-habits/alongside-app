@@ -1,5 +1,11 @@
 /**
  * js/views/age-check.js
+ * 25 Nov 2026 v5
+ *
+ * v5 - P-41 S1. The answer is recorded from the fields (recordAnswer), with
+ *   the version that suits the age. Young versions are closed, so nothing
+ *   on screen changes yet.
+ *
  * 17 Oct 2026 v4
  *
  * v4 - W6-16. After the answer the question is replaced in the
@@ -31,7 +37,7 @@
  * is never disabled -- unanswered, it says what is needed and moves focus
  * to the first empty field (3.3.1). The heading takes focus on arrival.
  */
-import { ageQuestionHTML, readAnswer, showAgeError, recordAge, takePendingRoute } from "../data/age-check.js";
+import { ageQuestionHTML, readAnswer, showAgeError, recordAnswer, takePendingRoute } from "../data/age-check.js";
 
 export function AgeCheckView(router) {
   let root = null;
@@ -45,14 +51,15 @@ export function AgeCheckView(router) {
       </div>`;
     root.querySelector("#age-continue").addEventListener("click", () => {
       const a = readAnswer(root, "age");
-      if (a !== "adult" && a !== "under") { showAgeError(root, "age", a); return; }
+      if (!["adult", "young", "under"].includes(a)) { showAgeError(root, "age", a); return; }
       // W6-16. Replaced, not stacked: one Back leaves the screen after the
       // answer (it took two, the first landing on the answered question).
-      if (a === "adult") { recordAge(true); router.navigate(takePendingRoute() || "today", { replace: true }); return; }
+      // P-41: recorded from the fields, with the version that suits the age.
+      if (a !== "under") { recordAnswer(root, "age"); router.navigate(takePendingRoute() || "today", { replace: true }); return; }
       // W5-5. Recorded now, and it stands: the under-18 screen warns about
       // anything this phone holds, offers a copy, then deletes it. There is
       // no way back to change the answer (the warning here offered one).
-      recordAge(false);
+      recordAnswer(root, "age");
       takePendingRoute();
       router.navigate("under-18", { replace: true });
     });
