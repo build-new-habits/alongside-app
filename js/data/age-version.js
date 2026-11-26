@@ -1,6 +1,9 @@
 /**
  * js/data/age-version.js
- * 26 Nov 2026 v1
+ * 26 Nov 2026 v2
+ *
+ * v2 - P-41 S3. takeMovedUpLine(): moves a 16-17 phone up when its month
+ *   has come, and gives Home the line that says so, once.
  *
  * P-41 THREE AGE VERSIONS, S2 RULES (spec BNH-Files Product/alongside_p41_
  * three-age-versions_spec_25nov2026_v2.md, approved by Graeme 25 Nov). One
@@ -97,3 +100,13 @@ export const messagesAllowed = () => !isYoung();
 // 7. Buying the Plan.
 export const canBuy = () => !isYoung();
 export const BUY_YOUNG_LINE = "At your age the Plan isn’t bought here. A parent or carer can buy a place for you, and they won’t see anything you do.";
+
+// S3. Moving up, said once.
+export const MOVED_UP_LINE = "You’re 18 now, so Alongside shows you everything for adults. Nothing you made has changed.";
+/** Moves up if this month has come; the line to say once, or "". */
+export function takeMovedUpLine(now = new Date()) {
+  store.ageMoveUpIfDue?.(now);
+  if (!(store.get("consent") || {}).ageMovedUpAt) return "";
+  store.set("consent.ageMovedUpAt", null);
+  return MOVED_UP_LINE;
+}

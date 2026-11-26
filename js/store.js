@@ -6,6 +6,13 @@ import { validateWeightTarget } from "./data/weight-targets.js";
 
 /**
  * store.js - Data persistence layer
+ * 26 Nov 2026 v136
+ *
+ * v136 - P-41 S3 MOVING UP (Schema v1.139). From the month in
+ *   consent.ageGroupNext a 16-17 phone is the adult version, on load and
+ *   through ageMoveUpIfDue(); the month is let go and consent.ageMovedUpAt
+ *   (new) is set so Home says so once. Nothing else changes.
+ *
  * 26 Nov 2026 v135
  *
  * v135 - P-41 S2, rule 1 (no field change): a 16-17 phone never tracks
@@ -2218,7 +2225,30 @@ export const store = {
     out.ageGroupNext = out.ageGroup === 'young-16' && typeof out.ageGroupNext === 'string' && /^\d{4}-(0[1-9]|1[0-2])$/.test(out.ageGroupNext) ? out.ageGroupNext : null;
     if (out.ageGroup === 'young-16' && !out.ageGroupNext) { out.ageGroup = null; out.ageConfirmed = null; }
     out.ageGroupAt = typeof out.ageGroupAt === 'string' && !isNaN(new Date(out.ageGroupAt)) ? out.ageGroupAt : null;
-    return out;
+    out.ageMovedUpAt = out.ageGroup === 'adult' && typeof out.ageMovedUpAt === 'string' && !isNaN(new Date(out.ageMovedUpAt)) ? out.ageMovedUpAt : null;
+    return this._ageMoveUp(out);
+  },
+
+  /**
+   * v136 (P-41 S3). Moving up by itself: from the month in ageGroupNext a
+   * 16-17 phone is the adult version. The month is let go (gone at 18, as
+   * Graeme decided), and ageMovedUpAt is set so Home can say so once.
+   * Nothing they made is touched.
+   */
+  _ageMoveUp(c, now = new Date()) {
+    if (!c || c.ageGroup !== 'young-16' || typeof c.ageGroupNext !== 'string') return c;
+    const month = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    if (c.ageGroupNext > month) return c;
+    const at = now.toISOString();
+    return { ...c, ageGroup: 'adult', ageGroupNext: null, ageGroupAt: at, ageMovedUpAt: at };
+  },
+
+  /** v136 (P-41 S3). Move up now if this month has come (the app open across a month). */
+  ageMoveUpIfDue(now = new Date()) {
+    const c = this.get('consent');
+    const next = this._ageMoveUp(c, now);
+    if (next !== c) { this.data.consent = next; this.save?.(); }
+    return next !== c;
   },
 
   /**
@@ -2640,6 +2670,9 @@ export const store = {
         ageGroup:      null,   // 'adult'|'young-16'|null
         ageGroupNext:  null,   // 'YYYY-MM'|null, young-16 only
         ageGroupAt:    null,   // ISO string|null
+        // v136 (P-41 S3): when a 16-17 phone moved up to the adult version
+        // by itself; Home says so once, then it is null again.
+        ageMovedUpAt:  null,   // ISO string|null
         // PT-2, 01 Oct 2026. Explicit consent for health answers, apart
         // from the Privacy-and-Terms tick. given: true | false (withdrawn)
         // | null (never asked: an install from before this existed).
