@@ -1,5 +1,7 @@
 # Alongside — Data Schema Reference
-## 26 Nov 2026 v1.141
+## 26 Nov 2026 v1.142
+
+> **v1.142, 26 Nov 2026 — P-37 S2, the coach's sets** (`store.js` v139; `data/week-shape-model.js` v8). **One addition, the Plan only.** **`daySetChoices`** `{ morning?: { area, mins }, evening?: { area, mins } }`, default `{}`: what the person last chose for *A fresh morning set* or *A fresh evening set* (area `hips` · `lower-back` · `shoulders` · `all`; minutes 5, 10 or 15), so the next set starts there. **Written only by** the set's screen (`views/path.js`). **On load** (`sanitizeDaySetChoices`): an unknown area is `all`, unknown minutes `10`; anything else dropped. Nothing about the set itself is kept unless the person taps *Keep this*, which adds a list to `prescribedExercises` and sets it On Home for Mornings or Evenings (taking turns), as any list. Gated by `tools/verify-p37-sets.mjs`.
 
 > **v1.141, 26 Nov 2026 — P-37 MORNING-EVENING, S1, schema first** (`store.js` v138; `data/week-shape-model.js` v7). Mock-up approved by Graeme 26 Nov (*"That mock up was good"*). **Two additions, nothing removed, the Plan only.** **`onHomeDays`** `{ "<list name>": ["mon", …] }`, default `{}`: *Choose the days* for a list that is On Home for Mornings or Evenings; a list not here **takes turns** (the default). **Written by** My exercises' *Which mornings?* (`little-and-often.js` `setOnHomeDays`); cleared when the list stops being Mornings or Evenings. **On load** (`sanitizeOnHomeDays`, against `myExercisesOnHome`): only Mornings or Evenings lists keep days; days are known day keys, once each, in week order; none means take turns. **`onHomeTurns`** `{ morning?: { group, doneOn }, evening?: { group, doneOn } }`, default `{}`: whose turn it is among the lists taking turns, and the local day (`YYYY-MM-DD`) it was finished, or `null`. **Written only by** `little-and-often.js` `turnFor()`: the turn moves to the next list (My exercises' order) only after the one before was finished on an earlier day, so a missed morning skips nothing. **On load** (`sanitizeOnHomeTurns`): anything else is dropped; a list no longer taking turns is let go when read. Gated by `tools/verify-p37-turns.mjs`.
 
@@ -1127,7 +1129,7 @@
 
 ## 06 Sep 2026 v1.51
 
-**File:** `js/store.js` (confirmed live version: **v138, 26 Nov 2026**)
+**File:** `js/store.js` (confirmed live version: **v139, 26 Nov 2026**)
 
 > **v1.47, 06 Sep 2026 — CR-1.** `conditions[]` gains three ids and loses one. `chronic-fatigue` is **retired**; `persistent-fatigue`, `me-cfs` and `long-covid` replace it. No field shape changed — `conditions` is still `string[]` and `conditionMeta` is still keyed by condition id.
 >

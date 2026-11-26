@@ -1,6 +1,8 @@
 /**
  * tools/chromium-p37.mjs
- * 26 Nov 2026 v2
+ * 26 Nov 2026 v3
+ *
+ * v3 - S2: the coach's morning and evening sets, Keep this, Home's fresh row.
  *
  * v2 - S4: what the app keeps and the health answers, for 16-17.
  *
@@ -46,6 +48,10 @@ let measured = 0;
 const SCREENS = [
   ["My exercises: Which mornings?, take turns", async p => { await p.evaluate(() => { const s = window.store; s.set("prescribedExercises", [{ id: "1", name: "Hip circles", sets: 1, reps: "8", group: "Wake-up hips" }, { id: "2", name: "Shoulder rolls", sets: 1, reps: "8", group: "Shoulders" }]); s.set("myExercisesOnHome", { "Wake-up hips": "morning", "Shoulders": "evening" }); s.set("onHomeDays", {}); }); await nav(p, "prescribed"); }, '[data-px-days="Wake-up hips"]', true],
   ["My exercises: Choose the days", async p => { await p.evaluate(() => { window.store.set("onHomeDays", { "Wake-up hips": ["mon", "wed", "fri"] }); }); await nav(p, "today"); await nav(p, "prescribed"); }, '[data-px-day="mon"]', true],
+  ["S2 Home: A fresh morning set", async p => { await p.evaluate(() => { Date.prototype.getHours = () => 8; }); await nav(p, "today"); }, '[data-action="day-set"]', true],
+  ["S2 A morning set", async p => { await p.evaluate(() => { window.router.pathStart = { door: "feel", dayset: "morning" }; }); await nav(p, "path"); }, '#path-ds-keep', true],
+  ["S2 A morning set, kept", async p => { await click(p, "#path-ds-keep"); }, '#path-ds-kept', true],
+  ["S2 An evening set", async p => { await p.evaluate(() => { window.router.pathStart = { door: "feel", dayset: "evening" }; }); await nav(p, "path"); }, '.path-mv__part', true],
 ];
 async function door(p, activity) {
   await p.evaluate(() => { window.router.pathStart = { door: "moving" }; });

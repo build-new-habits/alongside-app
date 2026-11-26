@@ -1,5 +1,16 @@
 /**
  * views/path.js
+ * 26 Nov 2026 v20
+ *
+ * v20 - P-37 S2 (mock-up approved by Graeme 26 Nov). The coach's fresh
+ *   morning and evening sets (router.pathStart { door: "feel", dayset:
+ *   "morning" | "evening" }, from Home's Little and often): where you're
+ *   stiff (or hold it) and how long, both remembered (daySetChoices); the
+ *   set from data/day-sets.js as any proposal (figures, Swap, the sore
+ *   check), the evening's three parts named; Keep this (a list in My
+ *   exercises, On Home for Mornings or Evenings, taking turns) and A
+ *   different one. An evening set plays with no countdown.
+ *
  * 24 Nov 2026 v19
  *
  * v19 - P-46 WAVE 8 FIX. Free's ready-made list ends with A walk or a run
@@ -202,7 +213,8 @@ import { readyFor, readySession, readyById, freeReady, SIZES as READY_SIZES } fr
 import { EXERCISES } from "../data/exercises/index.js";
 import { PATH_MOVEMENTS } from "../data/exercises/path_movements.js";
 import { suggestFeeling, pickProgramme, pickSurprise, routinesFor, STRETCH_AREA_ZONES } from "../data/path-engine.js";
-import { checkinToday, lastPlace, lowMood, shownAdjustments, freshPracticeFor, swapOptionsFor, soreRuledOut } from "../data/path-context.js";
+import { checkinToday, lastPlace, lowMood, shownAdjustments, freshPracticeFor, swapOptionsFor, soreRuledOut, prefIds, soreToday } from "../data/path-context.js";
+import { daySet, lastChoice, rememberChoice, keepDaySet, WORDS as DS_WORDS, AREA_LABEL as DS_AREAS, DAY_SET_MINS } from "../data/day-sets.js";
 import { areaWords } from "../data/conditions.js";
 import { renderSwapSearch, wireSwapSearch, kitWords } from "../data/swap-search.js";
 import { savedSessions, resolveSavedSession } from "../data/saved-sessions.js";
@@ -304,6 +316,8 @@ export function startPractice(router, practice, { door, feeling = null } = {}) {
   if (practice.trend && practice.trend !== "snack") session.trend = practice.trend;
   if (practice.effort) session.effort = practice.effort;
   if (practice.snack) session.snack = true;
+  // P-37 S2. The coach's evening set: no countdown (each move ends on Done).
+  if (practice.dayset) { session.dayset = practice.dayset; if (practice.dayset === "evening") session.noClock = true; }
   store.set("generatedSession", {
     session,
     builtAt: new Date().toISOString(),
@@ -387,6 +401,7 @@ export function PathView(router) {
       step = "prog"; st = { door, practice: markSore(start.practice), fromSaved: true }; paint(); return;
     }
     if (start?.trendDay && openTrendDay(door, start.trendDay, start.mins)) return;
+    if (door === "feel" && (start?.dayset === "morning" || start?.dayset === "evening")) { openDaySet(start.dayset); return; }
     if (door === "feel" && start?.feeling && FEELINGS[start.feeling]) {
       // The coach's choice: its feeling's programmes behind, its programme open.
       st.feeling = start.feeling; st.markId = start.programmeId || null;
@@ -400,6 +415,29 @@ export function PathView(router) {
     }
     [step] = first(door);
     paint();
+  }
+
+  /** P-37 S2. The coach's set, with the choices remembered; the feeling's programmes when the library cannot fill one. */
+  function makeDaySet(part, area, mins) {
+    const set = daySet({ part, area, mins, never: prefIds().never, avoidFor: soreToday().map(x => x.id) });
+    return set ? markSore(set) : null;
+  }
+  function openDaySet(part) {
+    const c = lastChoice(part);
+    const feeling = part === "evening" ? "sleep" : "wake";
+    const practice = makeDaySet(part, c.area, c.mins);
+    trail = [];
+    if (!practice) { st = { door: "feel", feeling }; step = "progs"; paint(); say("There isn\u2019t enough for a fresh set today, so here are the ready-made ones."); return; }
+    st = { door: "feel", feeling, dayset: part, dsArea: c.area, dsMins: c.mins, practice, fresh: false, reason: DS_WORDS[part].line, kept: false, keptName: null };
+    step = "prog"; paint();
+  }
+  function remakeDaySet(msg, focusSel) {
+    const practice = makeDaySet(st.dayset, st.dsArea, st.dsMins);
+    if (!practice) { say("There isn\u2019t enough for a set like that today. Try another."); return; }
+    st = { ...st, practice, kept: false, keptName: null, swapOpen: null };
+    paint(false);
+    root.querySelector(focusSel)?.focus();
+    say(msg);
   }
 
   // ── Navigation inside the view ────────────────────────────────────────
@@ -724,6 +762,8 @@ export function PathView(router) {
       const editable = p.saved && savedSessions().some(x => x.id === p.id);
       return `${heading(p.name, icon, kind)}
         ${line ? `<p class="${st.note ? "path-note" : "path-coachline"}">${esc(line)}</p>` : ""}
+        ${st.dayset ? `${radios("dsarea", DS_WORDS[st.dayset].where, Object.entries(DS_AREAS), st.dsArea)}
+          ${radios("dsmins", DS_WORDS.long, DAY_SET_MINS.map(n => [n, `${n} min`]), st.dsMins)}` : ""}
         <p class="path-small">${esc(meta)}</p>
         ${st.door === "stretch" ? `<p class="path-coachline" id="path-ease-in">${esc(EASE_IN)}</p>` : ""}
         ${p.support ? `<p class="path-small">${esc(p.support)}</p>` : ""}
@@ -736,12 +776,14 @@ export function PathView(router) {
         ${editable ? `<button type="button" class="path-link" id="path-change">Change this session</button>` : ""}
         ${st.fromCoach ? `<button type="button" class="path-link" id="path-redo">Change my check-in</button>` : ""}
         ${st.door === "feel" && lowMood() ? `<button type="button" class="path-link" id="path-wellbeing">Or something from Wellbeing</button>` : ""}
-        ${!p.saved && !st.free ? `<button type="button" class="path-link" id="path-mine"${st.kept ? " disabled" : ""}>${st.kept ? "Kept in Saved sessions" : "Make it mine"}</button>` : ""}
+        ${st.dayset ? `${st.kept ? `<p class="path-small" id="path-ds-kept" tabindex="-1">${esc(`Kept in My exercises as ${st.keptName}.`)}</p>` : `<button type="button" class="path-link" id="path-ds-keep">${DS_WORDS.keep}</button>`}
+          <button type="button" class="path-link" id="path-ds-again">${DS_WORDS.again}</button>` : ""}
+        ${!p.saved && !st.free && !st.dayset ? `<button type="button" class="path-link" id="path-mine"${st.kept ? " disabled" : ""}>${st.kept ? "Kept in Saved sessions" : "Make it mine"}</button>` : ""}
         <h2 class="path-adj__lbl" id="path-mvs-h">What\u2019s in it</h2>
         <ol class="path-mvs" aria-labelledby="path-mvs-h">${p.steps.map((s, i) => {
           const e = BY_ID.get(s.id) || {};
           const q = encodeURIComponent(e.youtube || `${e.name || s.id} how to`);
-          return `<li class="path-mv">${renderFigure(s.id) || ""}
+          return `<li class="path-mv">${s.part ? `<p class="path-adj__lbl path-mv__part">${esc(DS_WORDS.parts[s.part])}</p>` : ""}${renderFigure(s.id) || ""}
             <p class="path-mv__nm" id="path-mv-${i}">${i + 1}. ${esc(s.label || nameOf(s.id))}</p>
             <p class="path-small">${s.dose ? esc(s.dose) : stepLength(s.mins)}${s.note ? ` · ${esc(s.note)}` : ""}</p>
             ${(s.out || []).length ? `<p class="path-small path-mv__out">Left out today, for ${esc(areaList(s.out))}</p>` : ""}
@@ -1110,6 +1152,22 @@ export function PathView(router) {
       root.querySelector("#path-swp-keep")?.addEventListener("click", () => swapAt(i));
     }
     root.querySelector("#path-mine")?.addEventListener("click", keepMine);
+    // P-37 S2. The coach's set: the two choices (remembered), Keep this, A different one.
+    root.querySelectorAll('input[name="dsarea"], input[name="dsmins"]').forEach(r => r.addEventListener("change", () => {
+      if (r.name === "dsarea") st.dsArea = r.value; else st.dsMins = Number(r.value);
+      rememberChoice(st.dayset, st.dsArea, st.dsMins);
+      const where = st.dsArea === "all" ? "all over" : `your ${DS_AREAS[st.dsArea].toLowerCase()}`;
+      remakeDaySet(`A new set for ${where}, ${st.dsMins} minutes.`, `input[name="${r.name}"][value="${r.value}"]`);
+    }));
+    root.querySelector("#path-ds-again")?.addEventListener("click", () => remakeDaySet("Here\u2019s a different one.", "#path-ds-again"));
+    root.querySelector("#path-ds-keep")?.addEventListener("click", () => {
+      const name = keepDaySet(st.practice);
+      if (!name) { say("That could not be kept."); return; }
+      st = { ...st, kept: true, keptName: name };
+      paint(false);
+      root.querySelector("#path-ds-kept")?.focus();
+      say(`Kept in My exercises as ${name}, on Home in the ${st.dayset === "evening" ? "evenings" : "mornings"}, taking turns.`);
+    });
     root.querySelector("#path-three-go")?.addEventListener("click", () => go("outplan", { way: "three" }));
     root.querySelector("#path-wellbeing")?.addEventListener("click", () => router.navigate("noticing"));
     root.querySelector("#path-redo")?.addEventListener("click", () => {
@@ -1125,7 +1183,7 @@ export function PathView(router) {
     const door = DOOR[st.door];
     root.innerHTML = `
       <div class="path-view" data-step="${step}" data-door="${st.door}" style="--k: var(--kind-${door.kind})">
-        ${trail.length ? `<button type="button" class="path-back" id="path-back"><span aria-hidden="true">‹</span> Back</button>` : ""}
+        ${trail.length || st.dayset ? `<button type="button" class="path-back" id="path-back"><span aria-hidden="true">‹</span> Back</button>` : ""}
         ${STEPS[step]()}
         <p class="sr-only" role="status" aria-live="polite" id="path-live"></p>
       </div>`;

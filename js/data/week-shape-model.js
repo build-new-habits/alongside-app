@@ -1,6 +1,9 @@
 /**
  * js/data/week-shape-model.js
- * 26 Nov 2026 v7
+ * 26 Nov 2026 v8
+ *
+ * v8 - P-37 S2. sanitizeDaySetChoices() (Schema v1.142): the coach's
+ *   morning and evening sets remember where and how long.
  *
  * v7 - P-37 S1. sanitizeOnHomeDays() and sanitizeOnHomeTurns() (Schema
  *   v1.141): Choose the days for a Mornings or Evenings list, and whose
@@ -432,6 +435,22 @@ export function sanitizeOnHomeTurns(o) {
     const group = String(t.group || "").replace(/[<>]/g, "").trim().slice(0, 40);
     if (!group) continue;
     out[part] = { group, doneOn: typeof t.doneOn === "string" && /^\d{4}-\d{2}-\d{2}$/.test(t.doneOn) ? t.doneOn : null };
+  }
+  return out;
+}
+
+/** P-37 S2. The coach's sets: { morning?: { area, mins }, evening?: { area, mins } }. */
+export const DAY_SET_AREAS = Object.freeze(["hips", "lower-back", "shoulders", "all"]);
+export const DAY_SET_MINS = Object.freeze([5, 10, 15]);
+export function sanitizeDaySetChoices(o) {
+  if (!o || typeof o !== "object" || Array.isArray(o)) return {};
+  const out = {};
+  for (const part of ["morning", "evening"]) {
+    const t = o[part];
+    if (!t || typeof t !== "object") continue;
+    const area = DAY_SET_AREAS.includes(t.area) ? t.area : null;
+    const mins = DAY_SET_MINS.includes(Number(t.mins)) ? Number(t.mins) : null;
+    if (area || mins) out[part] = { area: area || "all", mins: mins || 10 };
   }
   return out;
 }

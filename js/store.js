@@ -1,12 +1,16 @@
 import { zonesForAreas } from "./data/aims.js";
 import { consentCovers } from "./data/health-consent-covers.js";
 import { RETIRED_CONDITIONS } from "./data/scope-statement.js";
-import { sanitizeWeekShape, sanitizeWeekDayRequest, sanitizeOnHome, sanitizeWeekChanges, sanitizeOnHomeDays, sanitizeOnHomeTurns } from "./data/week-shape-model.js";
+import { sanitizeWeekShape, sanitizeWeekDayRequest, sanitizeOnHome, sanitizeWeekChanges, sanitizeOnHomeDays, sanitizeOnHomeTurns, sanitizeDaySetChoices } from "./data/week-shape-model.js";
 import { validateWeightTarget } from "./data/weight-targets.js";
 
 /**
  * store.js - Data persistence layer
- * 26 Nov 2026 v138
+ * 26 Nov 2026 v139
+ *
+ * v139 - P-37 S2 (Schema v1.142). daySetChoices ({ morning, evening }:
+ *   where and how long, for the coach's fresh sets), remembered for next
+ *   time. Sanitised in week-shape-model.js.
  *
  * v138 - P-37 MORNING-EVENING, S1, schema first (Schema v1.141; mock-up
  *   approved by Graeme 26 Nov: "That mock up was good"). Two additions,
@@ -1859,6 +1863,7 @@ export const store = {
       // v138 (P-37): Choose the days for a Mornings or Evenings list, and whose turn it is.
       onHomeDays: {},
       onHomeTurns: {},
+      daySetChoices: {},
       weekChanges: null,
 
       // D-7 PLAN-IMPORT. Which group of My exercises the player plays
@@ -1891,6 +1896,7 @@ export const store = {
       myExercisesOnHome: sanitizeOnHome(saved.myExercisesOnHome),
       onHomeDays: sanitizeOnHomeDays(saved.onHomeDays, sanitizeOnHome(saved.myExercisesOnHome)),
       onHomeTurns: sanitizeOnHomeTurns(saved.onHomeTurns),
+      daySetChoices: sanitizeDaySetChoices(saved.daySetChoices),
       weekChanges: sanitizeWeekChanges(saved.weekChanges, sanitizeWeekShape(saved.weekShape)),
       // P-39 (v125). Made safe on every load.
       myMove: this.cleanMyMove(saved.myMove),

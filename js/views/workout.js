@@ -1,5 +1,10 @@
 /**
  * workout.js - Workout Execution View
+ * 26 Nov 2026 v44
+ *
+ * v44 - P-37 S2. The coach's evening set (session.noClock) plays with no
+ *   countdown, as on a low-mood morning: each move ends on Done.
+ *
  * 25 Nov 2026 v43
  *
  * v43 - P-46 Wave 8 fixes. Free's way out is the Plan's: Exit, and no
@@ -557,8 +562,8 @@ const _finishRoute = () => (_plan() ? "plan-finish" : "reflect");
 // P-46 (Wave 8): both tiers; Free's house sat on top of "1 of 7" at text 2.
 const _exitBtn = () => `<button class="btn btn-ghost plan-exit" id="exit-workout-btn" aria-label="Exit workout">Exit</button>`;
 const _look = () => (_plan() ? " is-plan" : "");
-/** A low mood this morning, on the Plan: no countdown anywhere. */
-const _noClock = () => _plan() && lowMood();
+/** A low mood this morning, on the Plan: no countdown anywhere. P-37 S2: nor in the coach's evening set. */
+const _noClock = () => _plan() && (lowMood() || (store.get("usingGeneratedSession") === true && store.get("generatedSession")?.session?.noClock === true));
 /** The session's door and feeling, and its name, for its log entry (the Plan's sessions only). */
 function _pathFields(w) {
   if (!_plan() || !w) return {};
