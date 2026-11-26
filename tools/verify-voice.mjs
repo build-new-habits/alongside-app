@@ -1,5 +1,10 @@
 /**
  * tools/verify-voice.mjs
+ * 26 Nov 2026 v2
+ *
+ * v2 - P-42 S2. One exemption, anchored to its line: In Step for 14-17's
+ *   "They don't do the work" is schoolwork, about someone else.
+ *
  * 12 Aug 2026 v1
  *
  * COPY REGISTER GATE.
@@ -96,6 +101,10 @@ const EXEMPT = [
   // re-run until only genuine register violations remained.
   /(legs|arms|glutes|hamstrings|quads|back|core|shoulders|momentum|gravity|the right muscles|the muscle|the band|the weight[^.]{0,20}) (to )?do the work/i,
   /lean into (it|the turn|the turns|the stretch|the movement|the wall|the bar)/i,
+  // P-42 S2, 26 Nov 2026. In Step for 14-17, A different start (approved by
+  // Graeme): "They snap. They don't do the work." is schoolwork, said about
+  // someone else, not the self-help register. Anchored to that one line.
+  /They snap\. They don't do the work\./,
 ];
 
 const FILES = [

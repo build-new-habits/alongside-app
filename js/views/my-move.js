@@ -1,5 +1,10 @@
 /**
  * views/my-move.js
+ * 26 Nov 2026 v6
+ *
+ * v6 - P-42 S2. In Step no longer says Coming soon for your age: the young
+ *   versions have their own programme.
+ *
  * 26 Nov 2026 v5
  *
  * v5 - P-41 S2 rule 5. In the 16-17 version In Step's line says it is
@@ -46,7 +51,6 @@
  * be taken says why in words; nothing relies on colour; 44 px targets.
  */
 
-import { inStepOpen } from "../data/age-version.js";
 import { store } from "../store.js";
 import { isPremium } from "../auth.js";
 import { lineIcon } from "../data/line-icons.js";
@@ -123,7 +127,7 @@ export function MyMoveView(router) {
     return `<li class="mm-opt${on ? " is-on" : ""} k-${p.kind}">
       <button type="button" class="path-door mm-opt__btn" aria-pressed="${on}" data-purpose="${p.id}" data-key="p-${p.id}">
         <span class="kind-tile k-${p.kind}" aria-hidden="true">${lineIcon(p.icon)}</span>
-        <span class="path-door__text"><span class="path-door__t">${esc(p.title)}</span><span class="path-door__d">${esc(p.id === "instep" && !inStepOpen() ? "Coming soon for your age" : p.line)}</span></span>
+        <span class="path-door__text"><span class="path-door__t">${esc(p.title)}</span><span class="path-door__d">${esc(p.line)}</span></span>
         <span class="mm-tick" aria-hidden="true">${on ? lineIcon("tick", 18) : ""}</span>
       </button>
       <button type="button" class="mm-taste-btn" aria-expanded="${isOpen}" aria-controls="mm-taste-${p.id}" data-taste="${p.id}" data-key="t-${p.id}">${isOpen ? "Close the taste" : "Try it first"}<span class="sr-only">: ${esc(p.short)}</span></button>

@@ -1,6 +1,16 @@
 /**
  * js/data/age-version.js
- * 26 Nov 2026 v3
+ * 26 Nov 2026 v4
+ *
+ * v4 - P-42 S2. In Step is written for 14-17 (four parts, approved by
+ *   Graeme 26 Nov), so rule 5 changes: In Step is open in the young
+ *   versions, with their own programme (data/in-step-young.js), and is
+ *   still never offered at the finish (inStepAtFinish). The 14-15 version
+ *   now exists for the developer panel: ageGroupNow() returns young-14,
+ *   and every young rule (1 to 7) is the same for it. Its own words for
+ *   the welcome, the health answers and the under-age screen are not
+ *   written yet, so those three stay 16-17's only (isSixteen). Still
+ *   closed to real people (age-check.js YOUNG_OPEN).
  *
  * v3 - P-41 S4 WORDS (approved by Graeme 26 Nov, BNH-Files Product/
  *   alongside_p41_words-16-17_26nov2026_v1.md): the age line and the
@@ -27,8 +37,8 @@
  *      back in a growing body is worth showing a GP or physio.
  *   4  Hard training: with the talk test (as for everyone), and no more
  *      than two hard days a week, across every trend and Your week.
- *   5  In Step: Coming soon, until P-42's programme for 14-17 is written
- *      and read. Never offered at the finish.
+ *   5  In Step: its own programme for 14-17 (P-42 S2). Never offered at
+ *      the finish.
  *   6  Messages, the survey, Share my figures and news: off.
  *   7  Buying the Plan: not in the app; a parent or carer buys a place.
  *
@@ -37,15 +47,19 @@
  */
 import { store } from "../store.js";
 
-/** The version this phone is in: "adult", "young-16", or null (not let in). */
+/** The version this phone is in: "adult", "young-16", "young-14", or null (not let in). */
 export function ageGroupNow() {
   const c = store.get("consent") || {};
   if (c.ageConfirmed !== true) return null;
-  return c.ageGroup === "young-16" ? "young-16" : "adult";
+  return c.ageGroup === "young-16" || c.ageGroup === "young-14" ? c.ageGroup : "adult";
 }
 
-/** True for the 16-17 version. */
-export const isYoung = () => ageGroupNow() === "young-16";
+/** True for the young versions (16-17 and 14-15): every rule below applies to both. */
+export const isYoung = () => /^young-/.test(ageGroupNow() || "");
+/** P-42 S2. Only the 16-17 version: its welcome, health and under-age words are written for 16 and 17. */
+export const isSixteen = () => ageGroupNow() === "young-16";
+/** P-42 S2. Which In Step programme: "adult", "young-16" or "young-14". */
+export const inStepVersion = () => (isYoung() ? ageGroupNow() : "adult");
 
 // 1. Weight.
 export const weightAllowed = () => !isYoung();
@@ -98,7 +112,9 @@ export function hardDaysInWeek(shape) {
 }
 
 // 5. In Step.
-export const inStepOpen = () => !isYoung();
+export const inStepOpen = () => true;   // P-42 S2: every version has its programme now
+/** P-41 rule 5, kept: never offered at the finish in a young version (it is in Wellbeing). */
+export const inStepAtFinish = () => !isYoung();
 export const IN_STEP_SOON = "In Step for your age is coming soon. It’s being written with young people.";
 
 // 6. Messages, the survey, Share my figures, news.
@@ -128,4 +144,4 @@ export const WELCOME_LINE = "A few things are different at your age: no weight t
 export const HEALTH_YOUNG = "At 16 you can agree to this yourself. If you’re unsure, talk to someone you trust first.";
 export const PRIVACY_YOUNG = "Everything stays on this phone. Nobody else sees it, not us and not your parents or carers. Your journal is never read, by anyone or by the app. The app keeps the month you turn 18, so it can change to the adult version then; it never keeps your date of birth. You can delete everything in Settings at any time.";
 /** The once-only welcome is due: a 16-17 phone that has not seen it. */
-export const welcomeDue = () => isYoung() && !(store.get("consent") || {}).ageWelcomedAt;
+export const welcomeDue = () => isSixteen() && !(store.get("consent") || {}).ageWelcomedAt;

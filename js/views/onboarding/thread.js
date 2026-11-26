@@ -1,6 +1,10 @@
 /**
  * js/views/onboarding/thread.js
- * 26 Nov 2026 v32
+ * 26 Nov 2026 v33
+ *
+ * v33 - P-42 S2. The health line for 16 and 17 ("At 16 you can agree to
+ *   this yourself") shows in the 16-17 version only (isSixteen), now that
+ *   the developer panel has a 14-15 version too.
  *
  * v32 - P-41 S4 (approved 26 Nov). A 16-17 year old sees "Alongside for
  *   16 and 17" once, before getting started (consent.ageWelcomedAt), and
@@ -322,7 +326,7 @@
  *     collapsed to 0ms.
  *   - Sheet focus trap handled by sheet-manager.js.
  */
-import { isYoung, welcomeDue, WELCOME_TITLE, WELCOME_LINE, HEALTH_YOUNG } from '../../data/age-version.js';
+import { isSixteen, welcomeDue, WELCOME_TITLE, WELCOME_LINE, HEALTH_YOUNG } from '../../data/age-version.js';
 import { prefersReducedMotion } from '../../display-prefs.js';
 
 import { store }              from '../../store.js';
@@ -562,7 +566,7 @@ export function ThreadView(router) {
         </div>
         <p class="ob-consent__note" id="ob-consent-health-what">${HEALTH_WHAT}</p>
         <p class="ob-consent__note" id="ob-consent-health-note">${HEALTH_NOTE}
-          This one is up to you: without it I won\u2019t ask about your body or keep check-ins, and I\u2019ll plan sessions carefully. You can say yes later.</p>${isYoung() ? `
+          This one is up to you: without it I won\u2019t ask about your body or keep check-ins, and I\u2019ll plan sessions carefully. You can say yes later.</p>${isSixteen() ? `
         <p class="ob-consent__note" id="ob-consent-health-young">${HEALTH_YOUNG}</p>` : ''}
 
         <p class="ob-consent__error" id="ob-consent-error" role="status" hidden>

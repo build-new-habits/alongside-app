@@ -1,6 +1,13 @@
 /**
  * js/data/in-step-programme.js
- * 26 Nov 2026 v3
+ * 26 Nov 2026 v4
+ *
+ * v4 - P-42 S2. One In Step player, more than one programme: PARTS and
+ *   EPISODES are still the adults', and the helpers below (getEpisode,
+ *   episodesInPart, getPart, nextEpisodeId, endsPart, audioIdsForPart, and
+ *   new parts() and episodes()) read whichever programme is in use, set by
+ *   setProgrammeSource() (in-step-version.js: the young parts for 14-17).
+ *   This file still reads nothing from the store.
  *
  * v3 - P-42 S1. The adults' Part 5, The world on your phone (approved by
  *   Graeme 26 Nov, BNH-Files Product/alongside_in-step-adult_part5_words_
@@ -376,27 +383,34 @@ export const EPISODES = [
     carry: { text: "This week, do one thing for someone else, and tell no one.", audio: "instep-p5-e6-carry" } },
 ];
 
+/** P-42 S2. The programme in use: the adults' unless something else is set. */
+let _source = () => ({ parts: PARTS, episodes: EPISODES });
+export function setProgrammeSource(fn) { _source = typeof fn === "function" ? fn : () => ({ parts: PARTS, episodes: EPISODES }); }
+export const parts = () => _source().parts;
+export const episodes = () => _source().episodes;
+
 /** "p2e3" -> the episode, or null. */
 export function getEpisode(id) {
-  return EPISODES.find(e => e.id === id) || null;
+  return episodes().find(e => e.id === id) || null;
 }
 
-/** The six episodes of a part, in order. */
+/** A part's episodes, in order. */
 export function episodesInPart(part) {
-  return EPISODES.filter(e => e.part === part);
+  return episodes().filter(e => e.part === part);
 }
 
 /** The part's record, or null. */
 export function getPart(part) {
-  return PARTS.find(p => p.n === part) || null;
+  return parts().find(p => p.n === part) || null;
 }
 
 /** The episode after this one, or null after the last. The order is kept
  *  (Graeme, 18 Aug: "I can access all of it and therefore none of it
  *  lands"): Part 2 opens only after Part 1's six. */
 export function nextEpisodeId(id) {
-  const i = EPISODES.findIndex(e => e.id === id);
-  return i >= 0 && i < EPISODES.length - 1 ? EPISODES[i + 1].id : null;
+  const list = episodes();
+  const i = list.findIndex(e => e.id === id);
+  return i >= 0 && i < list.length - 1 ? list[i + 1].id : null;
 }
 
 /** Whether this episode ends its part (it is followed by the part's closing line). */
@@ -409,8 +423,8 @@ export function endsPart(id) {
  *  and for fetching a part's audio when it is first opened. */
 export function audioIdsForPart(part) {
   const ids = [];
-  for (const e of episodesInPart(part)) ids.push(e.listen.audio, e.hold.audio, e.carry.audio);
+  for (const e of episodesInPart(part)) ids.push(e.listen.audio, e.hold.audio, e.carry.audio, ...(e.help ? [e.help.audio] : []));
   const p = getPart(part);
-  if (p) ids.push(p.closing.audio);
+  if (p?.closing) ids.push(p.closing.audio);
   return ids;
 }

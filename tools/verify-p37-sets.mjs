@@ -1,6 +1,9 @@
 /**
  * tools/verify-p37-sets.mjs
- * 26 Nov 2026 v1
+ * 26 Nov 2026 v2
+ *
+ * v2 - 1c takes any store version from v139 on (it named v139 only, so
+ *   failed on the next store change, P-42 S2's v140).
  *
  * P-37 MORNING-EVENING, S2 (mock-up approved by Graeme 26 Nov: "That mock
  * up was good"; decided 19 Nov: a new set each time, with Keep this).
@@ -84,7 +87,7 @@ await block("TEST 1", async () => {
   store.set("daySetChoices", { morning: { area: "hips", mins: 15 }, evening: { area: "knees", mins: 15 }, late: { area: "x", mins: 7 }, noon: { area: "hips" } });
   store.init();
   ok("1b. known kept, an unknown area all, anything else dropped", JSON.stringify(store.get("daySetChoices")) === '{"morning":{"area":"hips","mins":15},"evening":{"area":"all","mins":15}}', JSON.stringify(store.get("daySetChoices")));
-  ok("1c. Schema.md documents it, and its live store version", /v1\.142[\s\S]*daySetChoices/.test(read("docs/Schema.md")) && /confirmed live version: \*\*v139/.test(read("docs/Schema.md")));
+  ok("1c. Schema.md documents it, and its live store version", /v1\.142[\s\S]*daySetChoices/.test(read("docs/Schema.md")) && /confirmed live version: \*\*v(139|1[4-9]\d)/.test(read("docs/Schema.md")));
 });
 
 await block("TEST 2", async () => {

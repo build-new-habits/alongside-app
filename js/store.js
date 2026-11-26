@@ -6,7 +6,12 @@ import { validateWeightTarget } from "./data/weight-targets.js";
 
 /**
  * store.js - Data persistence layer
- * 26 Nov 2026 v139
+ * 26 Nov 2026 v140
+ *
+ * v140 - P-42 S2 (Schema v1.143). consent.ageGroup may be young-14, the
+ *   14-15 version, for the developer panel (closed to real people: the
+ *   age check never gives it while age-check.js YOUNG_OPEN is closed). It
+ *   has no move-up month (moving to 16-17 at 16 is not built).
  *
  * v139 - P-37 S2 (Schema v1.142). daySetChoices ({ morning, evening }:
  *   where and how long, for the coach's fresh sets), remembered for next
@@ -2244,7 +2249,7 @@ export const store = {
    */
   _cleanAgeGroup(c) {
     const out = { ...c };
-    if (!['adult', 'young-16'].includes(out.ageGroup)) out.ageGroup = null;
+    if (!['adult', 'young-16', 'young-14'].includes(out.ageGroup)) out.ageGroup = null;   // v140: young-14 (P-42 S2)
     if (out.ageConfirmed === true && out.ageGroup === null) out.ageGroup = 'adult';
     if (out.ageConfirmed !== true) out.ageGroup = null;
     out.ageGroupNext = out.ageGroup === 'young-16' && typeof out.ageGroupNext === 'string' && /^\d{4}-(0[1-9]|1[0-2])$/.test(out.ageGroupNext) ? out.ageGroupNext : null;
