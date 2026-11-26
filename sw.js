@@ -1,7 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 26 Nov 2026 v759
+ * 26 Nov 2026 v760
+ *
+ * v760 - P-37 S3. Your week shows the morning and evening lists; a day's button named by its own words. No new files.
  *
  * v759 - P-37 S2. The coach's fresh morning and evening sets (Home's Little and often), Keep this. New file: js/data/day-sets.js.
  *
@@ -4371,7 +4373,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v759";
+const CACHE_NAME = "alongside-v760";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4524,7 +4526,7 @@ const SHELL_HASHES = {
   "./js/data/week-shape-model.js": "04363433c6f6975b",
   "./js/data/week-shape.js": "57cc6aa85210d710",
   "./js/data/warm-views.js": "73c268f74f004e8e",
-  "./js/views/your-week.js": "c1c29b6e775003f4",
+  "./js/views/your-week.js": "66f5350c70a75db2",
   "./js/data/plan-reader.js": "8b909dcd350014b1",
   "./js/views/plan-import.js": "027c3f9fc203c613",
   "./js/views/change-today.js": "31101d97d53492c8",
@@ -4541,7 +4543,7 @@ const SHELL_HASHES = {
   "./js/views/plan-link-send.js": "6fb5c0b3b8817526",
   "./js/views/plan-link-back.js": "d544b32f9fcd26f7",
   "./js/data/week-changes.js": "1bd0a7a6db2c338f",
-  "./js/data/little-and-often.js": "2466e453706db6ad",
+  "./js/data/little-and-often.js": "9f838adc0a033bd4",
   "./js/data/day-sets.js": "de4e63ad7a6a23b5",
   "./js/data/sore-rule.js": "f6ea51d828be37f0",
   "./js/data/stretch-stiffness.js": "80d3e230b5f0ecef",
@@ -4552,7 +4554,7 @@ const SHELL_HASHES = {
   "./js/data/guides.js": "12b492912d368d80",
   "./js/views/help.js": "4d4218955ce16e02",
   "./css/components/help.css": "1ea3aee117dc9aee",
-  "./css/components/your-week.css": "6ebdf6ef83e1a4a5",
+  "./css/components/your-week.css": "976588b9f88022e4",
   "./js/figures.js": "621b376c8778dbb4",
   "./js/data/figures/index.js": "9dd411b0802b6ff2",
   "./js/data/figures/batch-01.js": "27f86e28fb0c9833",
