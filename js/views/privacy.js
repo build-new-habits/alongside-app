@@ -135,11 +135,11 @@ export function render() {
         <h1>Privacy &amp; Terms</h1>
       </div>
 
-      ${isYoung() ? `<div class="privacy-section card" id="privacy-young">
+${isYoung() ? `      <div class="privacy-section card" id="privacy-young">
         <h2 class="privacy-heading">What this app keeps, at 16 and 17</h2>
         <p class="text-secondary">${PRIVACY_YOUNG}</p>
-      </div>` : ""}
-      <div class="privacy-section card">
+      </div>
+` : ""}      <div class="privacy-section card">
         <h2 class="privacy-heading">This is a summary</h2>
         <p class="text-secondary">
           Below, in plain English. The full versions are on our website:

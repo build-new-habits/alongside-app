@@ -562,8 +562,8 @@ export function ThreadView(router) {
         </div>
         <p class="ob-consent__note" id="ob-consent-health-what">${HEALTH_WHAT}</p>
         <p class="ob-consent__note" id="ob-consent-health-note">${HEALTH_NOTE}
-          This one is up to you: without it I won\u2019t ask about your body or keep check-ins, and I\u2019ll plan sessions carefully. You can say yes later.</p>
-        ${isYoung() ? `<p class="ob-consent__note" id="ob-consent-health-young">${HEALTH_YOUNG}</p>` : ''}
+          This one is up to you: without it I won\u2019t ask about your body or keep check-ins, and I\u2019ll plan sessions carefully. You can say yes later.</p>${isYoung() ? `
+        <p class="ob-consent__note" id="ob-consent-health-young">${HEALTH_YOUNG}</p>` : ''}
 
         <p class="ob-consent__error" id="ob-consent-error" role="status" hidden>
           Tick the first box to agree to the Privacy Policy and Terms of Service before continuing.

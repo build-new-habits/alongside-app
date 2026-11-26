@@ -137,8 +137,8 @@ export function HealthConsentView(router) {
           what’s sore and how much, what you tell me about your body and how you’ve been,
           your check-ins, your weight if you add it, and your journal.
           They stay on this phone; nothing in them is sent anywhere.</p>
-        <p class="hc-text">${HEALTH_NOTE}</p>
-        ${isYoung() ? `<p class="hc-text" id="hc-young">${HEALTH_YOUNG}</p>` : ""}
+        <p class="hc-text">${HEALTH_NOTE}</p>${isYoung() ? `
+        <p class="hc-text" id="hc-young">${HEALTH_YOUNG}</p>` : ""}
         <div class="ob-consent__tick">
           <input type="checkbox" id="hc-check" class="ob-consent__checkbox">
           <label for="hc-check" class="ob-consent__label">${HEALTH_TICK}</label>
