@@ -1,7 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 27 Nov 2026 v763
+ * 27 Nov 2026 v764
+ *
+ * v764 - Row 17 Try the Plan S2: the trial's screens (the finish's offer, Upgrade, Your plan, Home's notice, Free Home's line). No new files.
  *
  * v763 - Row 17 Try the Plan S1: the trial's record and rules. New files: js/data/plan-trial.js, js/data/plan-trial-model.js.
  *
@@ -4379,7 +4381,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v763";
+const CACHE_NAME = "alongside-v764";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4408,7 +4410,7 @@ const SHELL_HASHES = {
   "./css/components/weekly-plan-v2.css": "4f70501241fc4fa0",
   "./css/components/gym-programme.css": "79be04064c6bd328",
   "./css/components/journal-entry.css": "dd51da5425ee545b",
-  "./css/components/reflect.css": "5925f1883139ce3f",
+  "./css/components/reflect.css": "6d6ccfb8b3fa501b",
   "./css/components/red-flag.css": "3934b0b0d770419b",
   "./css/components/know-what.css": "6f1d7faff6783932",
   "./css/components/nav-fix.css": "9385e9e7d7ea4738",
@@ -4423,7 +4425,7 @@ const SHELL_HASHES = {
   "./css/components/single-activity-session.css": "fef626d39b2d281c",
   "./css/components/session-shared.css": "a71069801a65054c",
   "./css/components/upgrade-door.css": "1a2deeaceb45f4f1",
-  "./css/components/upgrade-page.css": "ef2284fa060b21ea",
+  "./css/components/upgrade-page.css": "6089ebb4cb99dd10",
   "./css/base/global.css": "b8e901782637c19f",
   "./css/base/reset.css": "717c20ab5ebbd16e",
   "./css/base/typography.css": "7ef937ebd7185b4b",
@@ -4471,10 +4473,10 @@ const SHELL_HASHES = {
   "./js/views/coach-proposal.js": "c8f548d3c2e5db8c",
   "./js/views/workout.js": "e0c6b605642e7790",
   "./js/views/progress.js": "7708195f75512d62",
-  "./js/views/settings.js": "50b59b35af7fbfc0",
+  "./js/views/settings.js": "ddbc85818289b247",
   "./js/views/restore-flow.js": "dc81c2e455fa472d",
   "./js/views/weekly-plan.js": "dcee06e297b402c0",
-  "./js/views/reflect.js": "fa33525e04a2feaa",
+  "./js/views/reflect.js": "9f565b8eca948fd4",
   "./js/data/empathy-transfer.js": "d4028d2c71515778",
   "./js/data/equipment-map.js": "2db6399d16987707",
   "./js/data/exercises/gym.js": "835e777941d00fe4",
@@ -4495,7 +4497,7 @@ const SHELL_HASHES = {
   "./js/views/home-threshold.js": "17bc42808aa5bd5c",
   "./js/views/onboarding/frequency.js": "47e40b6e6e2f458f",
   "./js/views/programme-select.js": "115a22eeb9526be5",
-  "./js/views/upgrade.js": "60548142d092aa9a",
+  "./js/views/upgrade.js": "c0473cfd1c9a220f",
   "./js/views/privacy.js": "a32845d9bb4b826a",
   "./js/views/library.js": "ae647a15a875452c",
   "./js/views/practices.js": "f76d5aae3596a565",
@@ -4507,7 +4509,7 @@ const SHELL_HASHES = {
   "./js/data/arc-readback.js": "9b06dcba96534da0",
   "./js/data/tier-table.js": "ca492fb2752322a4",
   "./js/views/know-what.js": "e84fee3e6d9d3af0",
-  "./js/views/plan-home.js": "7bbb724edb130b50",
+  "./js/views/plan-home.js": "e7e0159f15429a4a",
   "./js/views/path.js": "faccd7e07764d9d8",
   "./js/plan-look.js": "7674d8fbf5101aa9",
   "./js/views/plan-finish.js": "d3901b6355f55542",
@@ -4537,7 +4539,7 @@ const SHELL_HASHES = {
   "./js/views/plan-import.js": "027c3f9fc203c613",
   "./js/views/change-today.js": "31101d97d53492c8",
   "./js/views/my-move.js": "f5cc6ef9349a3647",
-  "./js/views/free-home.js": "f1505d02950513f2",
+  "./js/views/free-home.js": "a8f7c93427d9b110",
   "./js/views/on-the-plan.js": "2d25cce8dfb0fc9e",
   "./js/views/onboarding/start.js": "b6fe85c63c26b37d",
   "./js/data/my-move.js": "c6ec80cda14e499b",
@@ -4618,7 +4620,7 @@ const SHELL_HASHES = {
   "./js/data/in-step-offer.js": "caf27805f2f0198e",
   "./js/data/in-step-young.js": "82f347ee08b4a41c",
   "./js/data/in-step-version.js": "1e53f9c77cb5c291",
-  "./js/data/plan-trial.js": "5a616bd56a924106",
+  "./js/data/plan-trial.js": "f935e8f56e03208e",
   "./js/data/plan-trial-model.js": "1018114a973dad8a",
   "./js/coach-audio.js": "d201650f60b33617",
   "./js/hold-voice.js": "4801164cbddca872",
@@ -4661,7 +4663,7 @@ const SHELL_HASHES = {
   "./js/views/goal-review-thread.js": "73b03c3ebaecc0a9",
   "./js/data/weight-targets.js": "290a14916aa4ed3e",
   "./js/data/plan-options.js": "86087e77bded2cd0",
-  "./js/data/pricing.js": "2458927c2fec1f11",
+  "./js/data/pricing.js": "4cf3df40e49dd247",
   "./js/data/time-windows.js": "a25841c83a4ce91e",
   "./js/data/programmeEngine.js": "917aa91a3fbd770a",
   "./js/data/programmes.js": "e455b0b69bd02a52",
