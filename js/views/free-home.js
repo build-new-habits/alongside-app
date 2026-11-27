@@ -1,5 +1,10 @@
 /**
  * views/free-home.js
+ * 27 Nov 2026 v3
+ *
+ * v3 - Row 17 Try the Plan, S2. After a trial, the Plan link says Your own
+ *   Home is saved. Pick up the Plan any time.
+ *
  * 24 Nov 2026 v2
  *
  * v2 - P-46 WAVE 8 FIX. Done today names the session from workoutHistory
@@ -29,6 +34,7 @@ import { store } from "../store.js";
 import { lineIcon } from "../data/line-icons.js";
 import { setTodaysLength } from "../data/session-length.js";
 import { askLaterCard, dueAskLater } from "../data/ask-later.js";
+import { trialEnded } from "../data/plan-trial.js";
 
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const NOT_MOVEMENT = ["breathing", "mindful", "mindfulness", "practice"];
@@ -103,7 +109,7 @@ export function renderFreeHome(ctx = {}) {
         ${door('data-route="activity-log" data-requires-checkin="false"', "slate", "pencil", "Log what I did", "A walk, a swim, a class")}
         ${hasList() ? door('data-route="prescribed" data-requires-checkin="false"', "teal", "list", "Your exercises", "Your own list") : ""}
       </ul>
-      <button type="button" class="path-link free-home__plan" data-route="upgrade" data-requires-checkin="false">Want more choice? See what the Plan adds</button>
+      ${trialEnded() ? `<p class="path-note free-home__saved">Your own Home is saved. <button type="button" class="path-link free-home__plan" data-route="upgrade" data-requires-checkin="false">Pick up the Plan any time.</button></p>` : `<button type="button" class="path-link free-home__plan" data-route="upgrade" data-requires-checkin="false">Want more choice? See what the Plan adds</button>`}
       ${ctx.checkedIn ? `<button type="button" class="path-link today-checkin-link" data-action="checkin-mini">Update check-in</button>` : ""}
     </div>`;
 }

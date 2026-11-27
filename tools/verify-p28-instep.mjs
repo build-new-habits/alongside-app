@@ -1,5 +1,11 @@
 /**
  * tools/verify-p28-instep.mjs
+ * 27 Nov 2026 v7
+ *
+ * v7 - Row 17 Try the Plan. Free's finish offers the trial first, one offer at a
+ *   time; the seed records it as offered this week, so section 8 is still
+ *   about In Step's offer.
+ *
  * 26 Nov 2026 v6
  *
  * v6 - P-42 S2. The next episode is the first not yet done (it works for
@@ -133,6 +139,8 @@ async function seed({ tier = "personal", sessions = 4, checkin = { energy: 7, mo
   if (sore) { store.set("conditions", [sore.id]); store.set("conditionPainScores", { [sore.id]: sore.score }); }
   if (programme) store.set("inStepProgress", { ...(store.get("inStepProgress") || {}), programme: { ...prog(), ...programme } });
   store.set("coachVoice", voice);
+  // v7 (Row 17): Free's finish offers the Plan trial first, with no In Step offer as well; In Step's offer here is the subject, so the trial was offered this week.
+  if (tier === "free") store.set("planTrial", { offeredAt: new Date().toISOString() });
   audios.length = 0; navs.length = 0;
   await setFiles(false);
 }

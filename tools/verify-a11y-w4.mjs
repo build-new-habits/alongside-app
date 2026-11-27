@@ -1,5 +1,9 @@
 /**
  * tools/verify-a11y-w4.mjs
+ * 27 Nov 2026 v4
+ *
+ * v4 - Row 17 Try the Plan: 3a reads the trial's button, named by its words.
+ *
  * 04 Oct 2026 v3
  *
  * v3 - D-5. The Library category heading's emoji became a kind tile with a
@@ -117,7 +121,7 @@ const up = document.createElement("div"); up.innerHTML = U.render();
 const cta = up.querySelector("#upgrade-cta");
 const ctaName = cta?.getAttribute("aria-label") || txt(cta);
 ok("3pc. the button is on the page", !!cta);
-ok("3a. its name contains I'm ready", /I.m ready/.test(ctaName) && /I.m ready/.test(txt(cta)), ctaName);
+ok("3a. its name is its words, Try the Plan for 14 days (Row 17: I'm ready went)", /^Try the Plan for 14 days$/.test(ctaName.trim()) && !cta.hasAttribute("aria-label"), ctaName);
 
 // ── 4. HEADING FOCUS ────────────────────────────────────────────────────
 console.log("\nTEST 4 - the router leaves a view's heading focus alone");

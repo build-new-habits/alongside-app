@@ -1,6 +1,16 @@
 /**
  * upgrade.js - Upgrade / Membership view
- * 26 Nov 2026 v25
+ * 27 Nov 2026 v26
+ *
+ * v26 - Row 17 Try the Plan, S2 (mock-up v2 approved by Graeme 27 Nov).
+ *   The beta's I'm ready (the Plan free with no end) is gone. On Free, the
+ *   button is Try the Plan for 14 days (no card; it opens Start your Plan,
+ *   Making my Move); after a trial it is Keep the Plan. During a trial the
+ *   page says so, until when, and that nothing is charged. Keep the Plan
+ *   shows the early price, yearly first, and, until Payments (row 14), Not
+ *   open yet: nobody can pay while Alongside is being tested. Manage your
+ *   plan is named by its words (its aria-label said something else: axe
+ *   label-content-name-mismatch, in a real browser).
  *
  * v25 - P-41 S2 rule 7. In the 16-17 version the Plan is not bought here:
  *   no I'm ready, and a line that a parent or carer can buy a place.
@@ -248,7 +258,8 @@ import { updateNavDot } from "../data/messages.js";
 import { canBuy, BUY_YOUNG_LINE } from "../data/age-version.js";
 import { store }  from "../store.js";
 import { router } from "../router.js";
-import { PRICE_MONTHLY, PRICE_ANNUAL } from "../data/pricing.js";
+import { PRICE_MONTHLY, PRICE_ANNUAL, PRICE_EARLY_ANNUAL, PRICE_EARLY_MONTHLY_EQUIV } from "../data/pricing.js";
+import { canStartTrial, startTrial, trialActive, trialEnded, endsOnWords } from "../data/plan-trial.js";
 import { PLAN_ADDS, FREE_KEEPS } from "../data/tier-table.js";
 import { PURPOSE_LINES } from "../data/empathy-transfer.js";
 import { lineIcon } from "../data/line-icons.js";
@@ -321,9 +332,65 @@ const STATEMENTS = PLAN_ADDS;
   // personal-reads.js, which is waiting on the same thing.
 
 
+/** Row 17. Keep the Plan: the early price, and, until Payments, Not open yet. */
+function renderKeep() {
+  const during = trialActive();
+  return `
+    <div class="view upgrade-view upgrade-keep">
+      <div class="view-header">
+        <button class="btn btn-ghost" data-action="keep-back" aria-label="Go back">&larr; Back</button>
+      </div>
+      <header class="upgrade-block">
+        <p class="upgrade-eyebrow">Early price</p>
+        <h1 class="upgrade-heading" tabindex="-1">Keep the Plan</h1>
+      </header>
+      <section class="upgrade-block upgrade-keep__prices" aria-label="Price">
+        <div class="card upgrade-keep__card">
+          <p class="upgrade-keep__price">${PRICE_EARLY_ANNUAL} a year</p>
+          <p class="upgrade-body">About ${PRICE_EARLY_MONTHLY_EQUIV} a month. The early price, for anyone who joins in the first three months. It stays yours while you keep the Plan.</p>
+        </div>
+        <div class="card upgrade-keep__card">
+          <p class="upgrade-keep__price">Or ${PRICE_MONTHLY} a month</p>
+          <p class="upgrade-body">Stop any time.</p>
+        </div>
+      </section>
+      <section class="card upgrade-keep__card upgrade-keep__notyet" id="keep-not-yet" aria-labelledby="keep-not-yet-h">
+        <h2 class="upgrade-keep__price" id="keep-not-yet-h">Not open yet</h2>
+        <p class="upgrade-body">${during
+          ? `Alongside is still being tested, so nobody can pay yet. You\u2019re on the Plan until ${endsOnWords()}, then Free, with everything saved.`
+          : "Alongside is still being tested, so nobody can pay yet. You\u2019re on Free, with everything saved."}</p>
+      </section>
+      <div class="upgrade-actions">
+        <button class="btn btn-secondary btn-full" data-action="keep-home">Back to Home</button>
+      </div>
+    </div>`;
+}
+
 export function render() {
+  // Asked for by Home's notice or Settings (router.upgradeStage), once.
+  if (typeof window !== "undefined" && window.router?.upgradeStage === "keep") { window.router.upgradeStage = null; return renderKeep(); }
   const tier   = store.get("tier") || "free";
   const isPaid = tier !== "free";
+
+  // Row 17. During a Plan trial: what it is, until when, nothing charged.
+  if (isPaid && trialActive()) {
+    return `
+      <div class="view upgrade-view is-plan">
+        <div class="view-header">
+          <button class="btn btn-ghost plan-back" data-action="upgrade-back" aria-label="Go back">‹ Back</button>
+        </div>
+        <div class="upgrade-block">
+          <h1 class="upgrade-heading">You&rsquo;re trying the Plan.</h1>
+          <p class="upgrade-lede" id="upg-trial-until">Free until ${endsOnWords()}. Nothing is charged.</p>
+          <p class="upgrade-body">When it ends, you go back to Free, and everything you&rsquo;ve made is kept.</p>
+        </div>
+        <div class="upgrade-actions">
+          <button class="btn btn-primary btn-full" id="upgrade-keep">Keep the Plan</button>
+          <button class="btn btn-secondary btn-full" data-action="upgrade-settings">Manage your plan</button>
+        </div>
+      </div>
+    `;
+  }
 
   // Somebody already on Personal who lands here -- a stale deep link, or
   // the Settings route -- should not be sold to. Acknowledgement and a
@@ -346,8 +413,7 @@ export function render() {
 
         <div class="upgrade-actions">
           <button class="btn btn-secondary btn-full"
-                  data-action="upgrade-settings"
-                  aria-label="Go to your plan in Settings">
+                  data-action="upgrade-settings">
             Manage your plan
           </button>
         </div>
@@ -407,8 +473,10 @@ export function render() {
            cancellation period -- see the progression boundary section 9
            and the note for Natalie. -->
       <section class="upgrade-block" aria-label="Commitment">
-        <p class="upgrade-body upgrade-body--emphasis">
-          The Plan is free while Alongside is in beta. You won&rsquo;t be charged.
+        <p class="upgrade-body upgrade-body--emphasis" id="upg-trial-line">
+          ${trialEnded()
+            ? "Your trial has ended. Your own Home is saved, if you come back."
+            : "Try the Plan for 14 days. No card, and nothing is charged, then or after."}
         </p>
         <p class="upgrade-body">
           When payment starts, there will be thirty days before you pay anything,
@@ -452,9 +520,8 @@ export function render() {
            "she has said this before. It feels familiar." -->
       <div class="upgrade-actions">
         ${canBuy() ? `<button class="btn btn-primary btn-full btn-large"
-                id="upgrade-cta"
-                aria-label="I’m ready: start the Plan">
-          I&rsquo;m ready
+                id="upgrade-cta">
+          ${canStartTrial() ? "Try the Plan for 14 days" : "Keep the Plan"}
         </button>` : `<p class="upgrade-body" id="upgrade-young">${BUY_YOUNG_LINE}</p>`}
 
         <p class="upgrade-safety">
@@ -476,41 +543,25 @@ export function onMount() {
   document.querySelector("[data-action='upgrade-settings']")
     ?.addEventListener("click", () => router.navigate("settings"));
 
+  // Row 17. Keep the Plan (the early price) and its way back.
+  const showKeep = () => {
+    const main = document.getElementById("main-content");
+    if (main) { main.innerHTML = renderKeep(); onMount(); main.querySelector("h1")?.focus(); }
+  };
+  document.getElementById("upgrade-keep")?.addEventListener("click", showKeep);
+  document.querySelector("[data-action='keep-back']")?.addEventListener("click", () => router.back());
+  document.querySelector("[data-action='keep-home']")?.addEventListener("click", () => router.navigate("today"));
+
   const cta = document.getElementById("upgrade-cta");
   if (!cta) return;
 
   cta.addEventListener("click", () => {
-    // Beta behaviour. Stripe lands in Phase F; until then the button does
-    // the thing the button says it does, rather than doing nothing and
-    // apologising. She asked for Personal, so she gets Personal.
-    //
-    // The message is written for somebody already inside a beta, not
-    // somebody queuing outside a shop. It states plainly that she has NOT
-    // been charged -- leaving that ambiguous after a button labelled
-    // "I'm ready" would be the worst thing this page could do.
-    store.set("tier", "personal");
+    // Row 17 (27 Nov). The beta's I'm ready gave the Plan with no end; now
+    // the button is the trial: 14 days, no card, then Free with everything
+    // kept. After a trial it is Keep the Plan (the early price).
+    if (!canStartTrial()) { showKeep(); return; }
+    startTrial();
     updateNavDot();   // W4-22: a message for the Plan shows its dot now, not on reopen
-
-    const confirm = document.getElementById("upgrade-confirm");
-    if (confirm) {
-      // Kept as one unbroken string deliberately. Split across a
-      // concatenation, "haven't been charged" never appears contiguously
-      // in source, and verify-upg2.mjs -- correctly -- could not confirm
-      // the page says it. A gate that cannot read the promise cannot
-      // guard it.
-      confirm.textContent =
-        "You have a Plan. Payment opens when beta ends \u2014 " +
-        "you haven\u2019t been charged, and everything is yours to use in the meantime.";
-      confirm.classList.add("upgrade-confirm--visible");
-    }
-
-    cta.disabled = true;
-    cta.textContent = "You\u2019re in";
-    cta.removeAttribute("aria-label");   // W5-17: named by its words, not "I'm ready
-
-    // Deliberately not navigating away. The doc's success state is a
-    // confirmation announced via aria-live, and a screen reader that is
-    // mid-announcement when the route changes loses the message entirely.
-    // She leaves when she chooses to.
+    router.navigate("my-move");   // Start your Plan (Making my Move, P-39)
   });
 }

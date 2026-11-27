@@ -1,5 +1,10 @@
 /**
  * tools/verify-bundle-true.mjs
+ * 27 Nov 2026 v7
+ *
+ * v7 - Row 17 Try the Plan (Graeme, 27 Nov). 10b: Your plan on Free offers the
+ *   14-day trial, nothing charged, where it said the Plan is free in beta.
+ *
  * 16 Nov 2026 v6
  *
  * v6 - P-36 MY-LIST-PLAYER. My exercises' player opens on its list, so 2g
@@ -300,7 +305,8 @@ fixture({ tier: "free" });
   const plan = txt(main);
   ok("10pc. positive control: the Your plan screen shows the price", /£7\.99 a month/.test(plan), plan.slice(0, 200));
   ok("10a. no \"no contract either way\"", !/contract either way/i.test(plan));
-  ok("10b. no minimum term, and free while in beta", /no minimum term/i.test(plan) && /free while Alongside is in beta/i.test(plan));
+  // v7 (Row 17, Graeme 27 Nov): the beta's free Plan became a 14-day trial with no card.
+  ok("10b. no minimum term, and the trial, with nothing charged", /no minimum term/i.test(plan) && /Try the Plan free for 14 days\. No card, and nothing is charged\./.test(plan));
   ok("10c. what stays is said exactly", /Everything you have done stays on this phone, whatever you decide/.test(plan));
 }
 

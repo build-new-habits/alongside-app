@@ -1,5 +1,12 @@
 /**
  * views/plan-home.js
+ * 27 Nov 2026 v22
+ *
+ * v22 - Row 17 Try the Plan, S2. The one notice, two days before a trial
+ *   ends (data/plan-trial.js noticeDue, never on a hard or low day): Your
+ *   Plan trial ends on Friday; what stays on Free and what is kept; Keep
+ *   the Plan (the early price) or Stay on Free. Shown once.
+ *
  * 26 Nov 2026 v21
  *
  * v21 - P-37 S2. Little and often adds A fresh morning set (before
@@ -198,6 +205,7 @@ import { todayInWeek, primaryFocus, localDay, getWeek } from "../data/week-shape
 import { changeLine, undoToday, canUndoToday } from "../data/week-changes.js";
 import { homeItems, homeItemLine, partOfDay } from "../data/little-and-often.js";
 import { WORDS as DS_WORDS } from "../data/day-sets.js";
+import { noticeDue, markNoticed, endsOnDay } from "../data/plan-trial.js";
 import { DAY_NAMES } from "../data/week-shape-model.js";
 import { savedForDay, savedById, lastDoneOf } from "../data/saved-sessions.js";
 import { kindOf } from "../data/kind-colours.js";
@@ -560,6 +568,19 @@ function myMoveBar(mm) {
  * ctx: { greeting, top (scope notice, guidance, hinge, saved-for-you: HTML),
  *        coachNote (a flat week or the week's pace, or ''), carry }
  */
+/** Row 17. The trial's one notice, two days before it ends. */
+function trialNotice() {
+  if (!noticeDue()) return "";
+  return `<section class="card trial-notice" id="trial-notice" aria-labelledby="trial-notice-h">
+        <h2 class="trial-notice__h" id="trial-notice-h">Your Plan trial ends on ${esc(endsOnDay())}</h2>
+        <p class="trial-notice__p"><strong>On Free.</strong> The coach still builds a session every day. Wellbeing and safety stay.</p>
+        <p class="trial-notice__p"><strong>Kept for you.</strong> Your Home, your hard days, My exercises and what helps you. Saved, if you come back.</p>
+        <button type="button" class="btn btn-secondary btn-full" data-action="trial-keep">Keep the Plan</button>
+        <button type="button" class="btn btn-ghost btn-full" data-action="trial-stay">Stay on Free</button>
+      </section>
+      <p class="path-note" id="trial-notice-status" role="status" aria-live="polite"></p>`;
+}
+
 export function renderPlanHome(ctx = {}) {
   const arc = arcInfo();
   const state = todayState(ctx.carry);
@@ -574,6 +595,7 @@ export function renderPlanHome(ctx = {}) {
       ${ctx.top || ""}
       <h1 class="path-greeting" tabindex="-1">${esc(ctx.greeting || "")}</h1>
       ${ctx.coachNote ? `<p class="path-note" role="status">${esc(ctx.coachNote)}</p>` : ""}
+      ${trialNotice()}
       ${arcLine(arc)}
       ${hardLead ? hardToday(mm) : (mm.day === "hard" ? `<p class="path-note path-mm__note">A hard day. Here's what you chose for days like this.</p>` : "") + todayCard(state, ctx.carry)}
       ${hardLead ? "" : changeBar(state)}
@@ -632,6 +654,16 @@ export function goToSuggestion(router, opts = {}) {
  * (router.pathStart.coach, read by today.js).
  */
 export function wirePlanHome(container, router) {
+  // Row 17. The notice is shown once: seen is noticed.
+  if (container.querySelector("#trial-notice")) markNoticed();
+  container.querySelector('[data-action="trial-keep"]')?.addEventListener("click", () => { router.upgradeStage = "keep"; router.navigate("upgrade"); });
+  container.querySelector('[data-action="trial-stay"]')?.addEventListener("click", () => {
+    const day = container.querySelector("#trial-notice-h")?.textContent.replace(/^Your Plan trial ends on /, "") || "";
+    container.querySelector("#trial-notice")?.remove();
+    const st = container.querySelector("#trial-notice-status");
+    if (st) st.textContent = `You\u2019ll be back on Free on ${day}, with everything kept.`;
+    container.querySelector(".path-greeting")?.focus();
+  });
   container.querySelectorAll(".path-door[data-door]").forEach(btn => btn.addEventListener("click", () => {
     router.pathStart = { door: btn.dataset.door };
     if (needsCheckin()) { store.set("pendingDoorRoute", "path"); router.navigate("checkin"); return; }

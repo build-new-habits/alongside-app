@@ -1,6 +1,11 @@
 /*
  * css/components/upgrade-page.css
- * 28 Sep 2026 v3
+ * 27 Nov 2026 v4
+ *
+ * v4 - Row 17 Try the Plan, S2: Keep the Plan (.upgrade-keep*), the
+ *   finish's offer (.trial-offer*), Home's notice (.trial-notice*), Free
+ *   Home's saved line, Settings' trial status. Kept here, with the Plan's
+ *   other selling, so it is in one place.
  *
  * v3 - SMOOTH-P5. .upgrade-keeps: what free keeps, from the one table.
  *
@@ -179,3 +184,18 @@
 .upgrade-keeps { margin: 0 0 var(--space-3); padding-left: 1.25rem; color: var(--color-text-secondary); line-height: 1.6; }
 .upgrade-keeps li { margin-bottom: var(--space-2); }
 .upgrade-keeps strong { color: var(--color-text-primary); }
+
+/* ── v4, Row 17: Try the Plan ─────────────────────────────────────── */
+.upgrade-eyebrow { margin: 0 0 var(--space-1, 0.25rem); color: var(--color-primary); font-weight: var(--font-semibold, 600); font-size: var(--text-sm, 0.9375rem); }
+.upgrade-keep__prices { display: grid; gap: var(--space-3, 0.75rem); }
+.upgrade-keep__card { padding: var(--space-4, 1rem); }
+.upgrade-keep__price { margin: 0 0 var(--space-1, 0.25rem); font-size: var(--text-lg, 1.125rem); font-weight: var(--font-semibold, 600); color: var(--color-text); }
+.upgrade-keep__notyet { margin-top: var(--space-3, 0.75rem); border-left: 4px solid var(--color-primary); }
+.upgrade-keep .upgrade-actions { margin-top: var(--space-4, 1rem); }
+.trial-offer, .trial-notice { padding: var(--space-4, 1rem); margin: var(--space-4, 1rem) 0; display: grid; gap: var(--space-2, 0.5rem); }
+.trial-offer__h, .trial-notice__h { margin: 0; font-size: var(--text-lg, 1.125rem); color: var(--color-text); }
+.trial-offer__line, .trial-offer__what, .trial-notice__p { margin: 0; color: var(--color-text-secondary); }
+.trial-offer__what strong, .trial-notice__p strong { color: var(--color-text); }
+.free-home__saved { margin-top: var(--space-3, 0.75rem); }
+.free-home__saved .path-link { display: inline; padding: 0; }
+.settings-plan-confirm:empty { display: none; }

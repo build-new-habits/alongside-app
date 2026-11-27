@@ -1,5 +1,14 @@
 /**
  * js/data/pricing.js
+ * 27 Nov 2026 v2
+ *
+ * v2 - Row 17 / row 14 (prices decided by Graeme 27 Nov: "Yes. Happy
+ *   there"). The early price, named as an offer, not a second annual:
+ *   PRICE_EARLY_ANNUAL, £49.99 a year (about £4.17 a month), for anyone who
+ *   joins in the first three months after launch, kept while they stay.
+ *   Shown on Keep the Plan (upgrade.js), yearly first. The closed-test
+ *   testers' £44.99 comes with Payments (row 14).
+ *
  * 18 Aug 2026 v1
  *
  * PRICE-3. The price, once.
@@ -35,3 +44,7 @@
 
 export const PRICE_MONTHLY = "\u00A37.99";
 export const PRICE_ANNUAL  = "\u00A359.99";
+
+/** v2 (row 14, 27 Nov). The early price: an offer, beside the standard prices, never instead of them. */
+export const PRICE_EARLY_ANNUAL = "\u00A349.99";
+export const PRICE_EARLY_MONTHLY_EQUIV = "\u00A34.17";

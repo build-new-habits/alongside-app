@@ -1,5 +1,12 @@
 /**
  * tools/verify-legal-true.mjs
+ * 27 Nov 2026 v5
+ *
+ * v5 - Row 17 Try the Plan (Graeme, 27 Nov). The upgrade page now offers a
+ *   14-day trial with no card instead of the Plan free in beta; 2a asks it
+ *   says so, and that nothing is charged. The 12g documents' beta wording
+ *   needs the same change before Foot Anstey's review (schedule row 17).
+ *
  * 04 Oct 2026 v4
  *
  * v4 - LOOK-1: Reset all data is no longer on the Settings index; 2pc now
@@ -120,8 +127,9 @@ const up = await import(B + "views/upgrade.js");
 main.innerHTML = up.render();
 const page = txt(main);
 ok("2pc. positive control: the upgrade page is up", /Plan/.test(page) && page.length > 200);
-ok("2a. the Plan is free while Alongside is in beta, and nobody is charged",
-   /free while Alongside is in beta/i.test(page) && /won.t be charged/i.test(page), page.slice(0, 300));
+// v5 (Row 17, Graeme 27 Nov): the beta's free Plan became a 14-day trial with no card. Still: nobody is charged.
+ok("2a. the Plan is tried for 14 days, with no card, and nobody is charged",
+   /Try the Plan for 14 days\. No card, and nothing is charged, then or after\./.test(page), page.slice(0, 300));
 ok("2b. no \"No contract\" (the Terms are a contract)", !/No contract/i.test(page));
 ok("2c. any price is for when payment starts", !/£/.test(page) || /When payment starts/i.test(page));
 

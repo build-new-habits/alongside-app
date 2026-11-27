@@ -1,5 +1,10 @@
 /**
  * tools/verify-a11y-w5.mjs
+ * 27 Nov 2026 v3
+ *
+ * v3 - Row 17 Try the Plan: 7a, after the tap the trial has started (the page
+ *   goes on to Start your Plan instead of saying You're in).
+ *
  * 17 Oct 2026 v2
  *
  * v2 - W6-18 A11Y-W6 (Wave 6 findings §4). Each item checked against
@@ -156,7 +161,7 @@ main.innerHTML = U.render(); U.onMount?.(); await wait(20);
 const cta = main.querySelector("#upgrade-cta");
 click(cta); await wait(20);
 const ctaName = cta?.getAttribute("aria-label") || txt(cta);
-ok("7a. named You're in, as it reads", /You.re in/.test(txt(cta)) && /You.re in/.test(ctaName), `${ctaName} | ${txt(cta)}`);
+ok("7a. the tap starts the trial (Row 17: it went on to Start your Plan; You're in went)", store.get("tier") === "personal" && !!(store.get("planTrial") || {}).startedAt, `${ctaName} | ${JSON.stringify(store.get("planTrial"))}`);
 
 // ── 8. THE UPDATE BANNER ────────────────────────────────────────────────
 console.log("\nTEST 8 - the update banner");

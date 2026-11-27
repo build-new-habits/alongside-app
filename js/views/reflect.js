@@ -1,6 +1,16 @@
 /**
  * reflect.js - Reflect Screen
  *
+ * 27 Nov 2026 v23
+ *
+ * v23 - Row 17 Try the Plan, S2 (mock-up v2 approved by Graeme 27 Nov). On
+ *   Free's finish, from the first finished session, at most once a week and
+ *   never on a hard, low or sore day (data/plan-trial.js offerDue): Want me
+ *   to fit around your week? Try the Plan for 14 days, no card. Try the
+ *   Plan keeps what was said, as Done does, then starts the trial and opens
+ *   Start your Plan; Not now closes it. One offer at a time: no In Step
+ *   offer on a finish that offers the trial.
+ *
  * 06 Nov 2026 v22
  *
  * v22 - P-28 EMPATHY-THREAD, S3 (and S5's finish lines, here so this file
@@ -273,6 +283,7 @@ import { router }         from "../router.js";
 import { selectEmpathyPrompt, canEnterStage } from "../data/empathy-transfer.js";
 import { getTodaysCheckin, getHistory } from "../data/checkin.js";
 import { offerForFinish, finishBLine, openEpisodeNext } from "../data/in-step-offer.js";
+import { offerDue as trialOfferDue, markOffered as trialMarkOffered, startTrial } from "../data/plan-trial.js";
 import { playLine, lineAvailable } from "../coach-audio.js";
 // SHARED-1. The end-of-session moments, in the one place every session
 // view already routes to. See data/session-moments.js for why.
@@ -291,6 +302,8 @@ let empathyPrompt = null; // { stage, text } | null - set by saveAndSummarise() 
 let _offer = null;        // P-28: In Step's offer on this finish, decided once per entry
 let _offerShown = false;
 let _bLine = null;        // P-28: B, when no episode is offered
+let _trial = false;       // Row 17: the Plan trial's offer on this finish (Free only), decided once per entry
+let _trialShown = false;
 
 const QUESTIONS = {
   "gym":            "So, how was that? I want to know what it actually felt like in there.",
@@ -755,7 +768,11 @@ export function render() {
     const logged = (store.get("activityLog") || []).some(e => e && entry.id != null && e.id === entry.id);
     const partialNow = entry.status === "partial";
     const n = getSessionCount() + (logged || partialNow ? 0 : 1);
-    _offer = offerForFinish({ sessionCount: n, partial: partialNow });
+    // Row 17. The trial's offer first, on Free: then no In Step offer as well.
+    _trial = !isPremium() && trialOfferDue({ sessionCount: n, partial: partialNow });
+    if (_trial) trialMarkOffered();
+    _trialShown = _trial;
+    _offer = _trial ? null : offerForFinish({ sessionCount: n, partial: partialNow });
     _offerShown = !!_offer;
     _bLine = finishBLine({ sessionCount: n, episodeOffered: !!_offer });
   }
@@ -896,7 +913,13 @@ export function render() {
         </details>` : "";
       })()}
 
-      ${_offer && _offerShown ? renderInStepOffer(_offer, "rf") : ""}${!_offer && _bLine ? renderInStepLine(_bLine, "rf") : ""}${plan ? `<button class="btn btn-primary btn-large btn-full" id="reflect-done-btn"
+      ${_trial && _trialShown ? `<section class="card reflect-section trial-offer" id="rf-trial" aria-labelledby="rf-trial-h">
+        <h2 class="trial-offer__h" id="rf-trial-h">Want me to fit around your week?</h2>
+        <p class="trial-offer__line">With the Plan, you choose what good days and hard days look like, and Home follows you.</p>
+        <p class="trial-offer__what"><strong>Try the Plan for 14 days.</strong> No card. Nothing is charged, then or after.</p>
+        <button class="btn btn-secondary btn-full" id="rf-trial-start">Try the Plan</button>
+        <button class="btn btn-ghost btn-full" id="rf-trial-later">Not now</button>
+      </section>` : ""}${_offer && _offerShown ? renderInStepOffer(_offer, "rf") : ""}${!_offer && _bLine ? renderInStepLine(_bLine, "rf") : ""}${plan ? `<button class="btn btn-primary btn-large btn-full" id="reflect-done-btn"
               style="margin-top: var(--space-4);">Done</button>` : `<button class="btn btn-primary btn-large btn-full" id="reflect-done-btn"
               style="margin-top: var(--space-4);">
         Back to Home
@@ -1068,6 +1091,15 @@ export function onMount() {
     const doneBtn = e.target.closest("#reflect-done-btn");
     if (doneBtn) { saveAndSummarise(); return; }
 
+    // Row 17. The Plan trial's offer.
+    if (e.target.closest("#rf-trial-start")) { saveAndSummarise({ toTrial: true }); return; }
+    if (e.target.closest("#rf-trial-later")) {
+      _trialShown = false;
+      view.querySelector("#rf-trial")?.remove();
+      document.getElementById("reflect-done-btn")?.focus();
+      return;
+    }
+
     // P-28. In Step's offer.
     if (e.target.closest("#rf-is-start")) { saveAndSummarise({ toInStep: true }); return; }
     if (e.target.closest("#rf-is-later")) {
@@ -1096,7 +1128,7 @@ function _sayCoachLine(view) {
   line.textContent = buildSummary(store.get("currentActivityEntry") || {}, feelAnswer, painAnswer, moodAfter);
 }
 
-function saveAndSummarise({ toInStep = false } = {}) {
+function saveAndSummarise({ toInStep = false, toTrial = false } = {}) {
   const textarea = document.getElementById("reflect-open-text");
   openText = textarea?.value.trim() || "";
 
@@ -1138,6 +1170,9 @@ function saveAndSummarise({ toInStep = false } = {}) {
 
   // P-28. Start on In Step's offer: saved above, then the episode. An
   // offered finish has no reflection prompt as well.
+  // Row 17. Try the Plan: saved above, then the trial, then Start your Plan.
+  if (toTrial && _trial) { startTrial(); router.navigate("my-move"); return; }
+  if (_trial) { router.navigate("today"); return; }
   if (toInStep && _offer) { openEpisodeNext(_offer.id, { low: _offer.low }); router.navigate("in-step"); return; }
   if (_offer) { router.navigate("today"); return; }
 
