@@ -1,7 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 26 Nov 2026 v762
+ * 27 Nov 2026 v763
+ *
+ * v763 - Row 17 Try the Plan S1: the trial's record and rules. New files: js/data/plan-trial.js, js/data/plan-trial-model.js.
  *
  * v762 - P-42 S2. In Step for 14-17 (closed to real people) and the 14-15 developer switch. New files: js/data/in-step-young.js, js/data/in-step-version.js.
  *
@@ -4377,7 +4379,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v762";
+const CACHE_NAME = "alongside-v763";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4442,9 +4444,9 @@ const SHELL_HASHES = {
   "./css/components/club-rooms.css": "f1c069c5b8eaf09e",
   "./css/components/capture.css": "343b4ae0dc6fe6ea",
   "./css/components/finish.css": "c33e298d5fcb92ae",
-  "./js/app.js": "81ed92c5ada71eb8",
+  "./js/app.js": "f0383a94bde41c6e",
   "./js/router.js": "f4e0c7f0eac0a035",
-  "./js/store.js": "ba39ec0a7795447d",
+  "./js/store.js": "8951c0139a5b4d49",
   "./js/session-log.js": "6134de4315842e05",
   "./js/exercise-feedback.js": "adba8549f444da2a",
   "./js/exercise-card.js": "87af7a5668137593",
@@ -4616,6 +4618,8 @@ const SHELL_HASHES = {
   "./js/data/in-step-offer.js": "caf27805f2f0198e",
   "./js/data/in-step-young.js": "82f347ee08b4a41c",
   "./js/data/in-step-version.js": "1e53f9c77cb5c291",
+  "./js/data/plan-trial.js": "5a616bd56a924106",
+  "./js/data/plan-trial-model.js": "1018114a973dad8a",
   "./js/coach-audio.js": "d201650f60b33617",
   "./js/hold-voice.js": "4801164cbddca872",
   "./js/views/guide-me.js": "eed24714732918fc",
@@ -4973,6 +4977,8 @@ const SHELL_URLS = [
   "./js/data/in-step-offer.js",
   "./js/data/in-step-young.js",
   "./js/data/in-step-version.js",
+  "./js/data/plan-trial.js",
+  "./js/data/plan-trial-model.js",
   "./js/coach-audio.js",
   "./js/hold-voice.js",
   "./js/views/guide-me.js",
