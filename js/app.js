@@ -1,5 +1,10 @@
 /**
  * app.js - Application entry point
+ * 27 Nov 2026 v20
+ *
+ * v20 - Row 17 Try the Plan, S1. On every open, before the first screen, a
+ *   Plan trial whose end day has come goes back to Free (checkTrial).
+ *
  * 24 Nov 2026 v19
  *
  * v19 - P-46 S2. onboarding/start is a busy view (a reload would lose the answers in hand).
@@ -108,6 +113,7 @@ import { declaredUnder18, heldOnPhone, deleteForUnder18 } from './data/age-check
 import './data/evidence.js';   // B5: registers the two research messages (only while sending is on)
 import { warmViews } from './data/warm-views.js';
 import { initGuides } from './guide.js';
+import { checkTrial } from './data/plan-trial.js';
 
 // ── Globals — set immediately, before anything else runs ──────────────────────
 window.router = router;
@@ -245,6 +251,7 @@ const App = {
   async init() {
     console.log("Alongside starting...");
     store.init();
+    checkTrial();   // Row 17: a Plan trial whose end day has come goes back to Free, before anything draws
     router.init();
     initGuides(router);
     registerServiceWorker();

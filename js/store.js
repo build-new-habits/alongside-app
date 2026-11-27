@@ -1,4 +1,5 @@
 import { zonesForAreas } from "./data/aims.js";
+import { sanitizePlanTrial } from "./data/plan-trial-model.js";
 import { consentCovers } from "./data/health-consent-covers.js";
 import { RETIRED_CONDITIONS } from "./data/scope-statement.js";
 import { sanitizeWeekShape, sanitizeWeekDayRequest, sanitizeOnHome, sanitizeWeekChanges, sanitizeOnHomeDays, sanitizeOnHomeTurns, sanitizeDaySetChoices } from "./data/week-shape-model.js";
@@ -6,6 +7,12 @@ import { validateWeightTarget } from "./data/weight-targets.js";
 
 /**
  * store.js - Data persistence layer
+ * 27 Nov 2026 v141
+ *
+ * v141 - Row 17 Try the Plan, S1 (Schema v1.144). planTrial: the 14-day
+ *   trial of the Plan, no card (startedAt, endsOn, noticedAt, endedAt,
+ *   endedHow, offeredAt), cleaned on load (data/plan-trial-model.js).
+ *
  * 26 Nov 2026 v140
  *
  * v140 - P-42 S2 (Schema v1.143). consent.ageGroup may be young-14, the
@@ -1869,6 +1876,7 @@ export const store = {
       onHomeDays: {},
       onHomeTurns: {},
       daySetChoices: {},
+      planTrial: {},
       weekChanges: null,
 
       // D-7 PLAN-IMPORT. Which group of My exercises the player plays
@@ -1902,6 +1910,7 @@ export const store = {
       onHomeDays: sanitizeOnHomeDays(saved.onHomeDays, sanitizeOnHome(saved.myExercisesOnHome)),
       onHomeTurns: sanitizeOnHomeTurns(saved.onHomeTurns),
       daySetChoices: sanitizeDaySetChoices(saved.daySetChoices),
+      planTrial: sanitizePlanTrial(saved.planTrial),
       weekChanges: sanitizeWeekChanges(saved.weekChanges, sanitizeWeekShape(saved.weekShape)),
       // P-39 (v125). Made safe on every load.
       myMove: this.cleanMyMove(saved.myMove),

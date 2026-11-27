@@ -1,5 +1,7 @@
 # Alongside — Data Schema Reference
-## 26 Nov 2026 v1.143
+## 27 Nov 2026 v1.144
+
+> **v1.144, 27 Nov 2026 — Row 17, Try the Plan, S1** (`store.js` v141; `data/plan-trial-model.js` v1; spec `docs/specs/alongside_plan-trial_27nov2026_v1.md`). **One addition.** **`planTrial`** `{ startedAt, endsOn, noticedAt, endedAt, endedHow, offeredAt }`, default `{}`: the 14-day trial of the Plan, with no card, one per phone. `startedAt` ISO, set once by *Try the Plan*; `endsOn` the local day (`YYYY-MM-DD`) 14 days on; `noticedAt` when the one notice was shown; `endedAt` and `endedHow` (`ended`: it ran out; `stopped`: *Go back to Free now*); `offeredAt` when the offer last showed on a finish. **Written only by** `data/plan-trial.js`. **On load** (`sanitizePlanTrial`): anything not of its type dropped; a start needs its end day; `endedHow` is `ended` unless `stopped`. While a trial runs, `tier` is `personal`; when it ends, `free`, and nothing else is changed or deleted. Gated by `tools/verify-trial-rules.mjs`.
 
 > **v1.143, 26 Nov 2026 — P-42 S2, the 14-15 version for the developer panel** (`store.js` v140). **`consent.ageGroup`** may now also be **`young-14`** (the 14-15 version), kept on load with **no move-up month** (`ageGroupNext` null; moving to 16-17 at 16 is not built). Only the developer panel's *14–15* switch sets it: the age check never gives it while `age-check.js` `YOUNG_OPEN` is closed. It gets every young rule (`age-version.js` `isYoung`) and In Step's young parts at 14-15; the 16-17 welcome and health line stay 16-17's (`isSixteen`). Gated by `tools/verify-p42-young.mjs`.
 
@@ -1131,7 +1133,7 @@
 
 ## 06 Sep 2026 v1.51
 
-**File:** `js/store.js` (confirmed live version: **v140, 26 Nov 2026**)
+**File:** `js/store.js` (confirmed live version: **v141, 27 Nov 2026**)
 
 > **v1.47, 06 Sep 2026 — CR-1.** `conditions[]` gains three ids and loses one. `chronic-fatigue` is **retired**; `persistent-fatigue`, `me-cfs` and `long-covid` replace it. No field shape changed — `conditions` is still `string[]` and `conditionMeta` is still keyed by condition id.
 >
