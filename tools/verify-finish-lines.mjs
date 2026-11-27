@@ -1,5 +1,12 @@
 /**
  * tools/verify-finish-lines.mjs
+ * 27 Nov 2026 v5
+ *
+ * v5 - Row 17 Try the Plan. Free's finish offers the Plan trial first, and an
+ *   offered finish has no reflection prompt as well; the person here was
+ *   offered it this week (planTrial.offeredAt), so this gate is still
+ *   about the finish's reflections.
+ *
  * 06 Nov 2026 v4
  *
  * v4 - P-28 S3. A finish that offers an In Step episode has no reflection
@@ -88,6 +95,7 @@ function fixture({ sore = null, energies = [7, 7, 7, 7, 7], rotate = 0, checkedI
   localStorage.clear(); store.init();
   store.set("safetyAckLog", Array.from({ length: 5 }, () => ({ at: new Date().toISOString(), textVersion: HURT_AND_ACHE_VERSION, surface: "fixture" })));
   store.set("tier", TIER); store.set("onboardingComplete", true);
+  store.set("planTrial", { offeredAt: new Date().toISOString() });   // Row 17: offered this week
   store.set("activityLog", Array.from({ length: 8 }, (_, i) => ({ id: "p" + i, type: "workout", status: "completed", completedAt: dayAgo(i + 2).toISOString(), date: dayAgo(i + 2).toISOString() })));
   const hist = {}; energies.forEach((e, i) => { hist[key(dayAgo(i + 1))] = { energy: e, mood: 6 }; });
   if (checkedIn) hist[key(new Date())] = { energy: 7, mood: 6 };

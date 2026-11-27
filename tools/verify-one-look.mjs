@@ -1,7 +1,12 @@
 import { createRequire as __cr } from "node:module";
 /**
  * tools/verify-one-look.mjs
- * 26 Nov 2026 v23
+ * 27 Nov 2026 v24
+ *
+ * v24 - Row 17 Try the Plan (Graeme, 27 Nov). TEST 4: Free's finish may
+ *   carry the Plan trial's offer, once at most (4t), and the upgrade page's
+ *   beta line and I'm ready become the trial's line and button and nothing
+ *   else (4u); each is taken out before the byte comparison.
  *
  * v23 - WB-NAMES. TEST 4 (noticing): the four practice tiles lose their
  *   aria-labels (WCAG 2.5.3) and nothing else changes on Free (4n).
@@ -497,6 +502,11 @@ for (const file of touched) {
   // nothing else changes. Taken out (and checked to be In Step's) before
   // the byte comparison.
   if (name === "reflect") {
+    // Row 17 (27 Nov): or the Plan trial's offer, in place of In Step's.
+    const trialCard = /<section class="card reflect-section trial-offer" id="rf-trial"[\s\S]*?<\/section>/g;
+    const tc = b.match(trialCard) || [];
+    ok("4t. Row 17: Free's finish may carry the Plan trial's offer, once at most", tc.length <= 1 && tc.every(c => /Try the Plan for 14 days/.test(c)), String(tc.length));
+    b = b.replace(trialCard, "");
     const isCard = /<(section|aside) class="card instep-card instep-(offer|bline)"[\s\S]*?<\/\1>/g;
     const cards = b.match(isCard) || [];
     ok("4x. P-28: anything new on Free's finish is In Step's offer or line, one at most", cards.length <= 1 && cards.every(c => /In Step/.test(c)), String(cards.length));
@@ -504,6 +514,22 @@ for (const file of touched) {
   }
   // v9 (P-28 S5): the one E line, where the Plan is chosen and where the
   // arc is set, is the only change to those two screens.
+  // Row 17 (Graeme, 27 Nov): the beta's free Plan became a 14-day trial. On the
+  // upgrade page, the commitment line and the button change, and nothing else.
+  if (name === "upgrade") {
+    const pairs = [
+      [/<p class="upgrade-body upgrade-body--emphasis">\s*The Plan is free while Alongside is in beta\. You won(&rsquo;|\u2019)t be charged\.\s*<\/p>/, ""],
+      [/<button class="btn btn-primary btn-full btn-large"\s*id="upgrade-cta"\s*aria-label="I[^"]*">\s*I(&rsquo;|\u2019)m ready\s*<\/button>/, ""],
+    ];
+    const newPairs = [
+      /<p class="upgrade-body upgrade-body--emphasis" id="upg-trial-line">\s*Try the Plan for 14 days\. No card, and nothing is charged, then or after\.\s*<\/p>/,
+      /<button class="btn btn-primary btn-full btn-large"\s*id="upgrade-cta">\s*Try the Plan for 14 days\s*<\/button>/,
+    ];
+    const had = pairs.every(([re]) => re.test(a)), has = newPairs.every(re => re.test(b));
+    ok("4u. Row 17: the upgrade page's beta line and I'm ready become the trial's line and button, and nothing else", had && has, `${had} ${has}`);
+    pairs.forEach(([re], i) => { a = a.replace(re, "\u0000T" + i); });
+    newPairs.forEach((re, i) => { b = b.replace(re, "\u0000T" + i); });
+  }
   if (name === "upgrade" || name === "arc-setup") {
     const isE = /\s*<p class="[^"]*instep-purpose"[^>]*>[\s\S]*?<\/p>/g;
     const es = b.match(isE) || [];

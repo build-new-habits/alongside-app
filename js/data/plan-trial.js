@@ -1,5 +1,10 @@
 /**
  * js/data/plan-trial.js
+ * 27 Nov 2026 v2
+ *
+ * v2 - S2. The developer panel's controls live here, so this stays the only
+ *   writer of planTrial: devForgetTrial(), devTwoDaysLeft().
+ *
  * 27 Nov 2026 v1
  *
  * Row 17 / P-40, Try the Plan, S1 (spec docs/specs/alongside_plan-trial_
@@ -107,4 +112,19 @@ export function offerDue({ sessionCount = 0, partial = false, now = new Date() }
 }
 export function markOffered(now = new Date()) {
   store.set("planTrial", { ...trial(), offeredAt: now.toISOString() });
+}
+
+// ── S2. The developer panel's controls (the panel is off at release) ──
+/** Forget the trial: none on this phone, and Free. */
+export function devForgetTrial() {
+  store.set("planTrial", {});
+  if (store.get("tier") === "personal") store.set("tier", "free");
+}
+/** A running trial with two days left, the notice not yet shown. */
+export function devTwoDaysLeft(now = new Date()) {
+  const t = trial();
+  if (!trialActive(t)) return false;
+  const { noticedAt, ...rest } = t;
+  store.set("planTrial", { ...rest, endsOn: localDay(addDays(now, NOTICE_DAYS_LEFT)) });
+  return true;
 }

@@ -1,6 +1,13 @@
 /**
  * settings.js
- * 26 Nov 2026 v81
+ * 27 Nov 2026 v82
+ *
+ * v82 - Row 17 Try the Plan, S2. Your plan during a trial: the Plan, on a
+ *   free trial, until when, nothing charged, what happens at the end, and
+ *   Go back to Free now (asked once more: a phone has one trial). On Free
+ *   it offers the trial (or, after one, says your Home is saved) where it
+ *   said the Plan is free in beta. The developer panel gains trial
+ *   controls: start, two days left, end now, forget.
  *
  * v81 - P-42 S2. The developer panel's age switch adds 14–15 (Graeme, 26
  *   Nov: "I'll need to be able to switch between them like we do with plan
@@ -812,6 +819,7 @@ import { describeDate, restoredMessage } from '../data/restore.js';
 import { lockText, passwordProblem, lockAvailable } from '../data/file-lock.js';
 import { restoreFromFile } from './restore-flow.js';
 import { visibleMessages, hasUnread, markAllRead, dismissMessage, updateNavDot } from '../data/messages.js';
+import { trialActive, trialEnded, canStartTrial, endsOnWords, startTrial, endTrial, trial as planTrialNow, TRIAL_DAYS, devForgetTrial, devTwoDaysLeft } from '../data/plan-trial.js';
 import { SURVEY, CANT_FIND, NOT_SENT, figuresPayload, surveyPayload, sendEvidence, researchPrivacyLine, wasAnswered, noServerCopy } from '../data/evidence.js';
 import { conditionReadback, shortDate } from '../data/arc-readback.js';
 
@@ -2568,7 +2576,8 @@ export function SettingsView(router) {
   function renderPlanPanel() {
     const tier      = store.get('tier') || 'free';
     const isPaid    = tier !== 'free';
-    const tierLabel = isPaid ? 'Plan' : 'Free';
+    const onTrial   = isPaid && trialActive();
+    const tierLabel = onTrial ? 'The Plan, on a free trial' : isPaid ? 'Plan' : 'Free';
 
     return `
       <div class="settings-section">
@@ -2584,7 +2593,17 @@ export function SettingsView(router) {
              and left standing on this one; now there is only the table. -->
         ${tierTableHtml(_esc)}
 
-        ${isPaid ? `
+        ${onTrial ? `
+          <div class="settings-plan-block" id="settings-trial">
+            <p><strong>Until ${_esc(endsOnWords())}.</strong> Nothing is charged.</p>
+            <p><strong>When it ends.</strong> You go back to Free. Your Home, your hard days and My exercises are kept, if you come back.</p>
+          </div>
+          <div class="settings-actions" id="settings-trial-actions">
+            <button class="btn btn-secondary" data-action="trial-keep">Keep the Plan</button>
+            <button class="btn btn-ghost" data-action="trial-stop">Go back to Free now</button>
+          </div>
+          <p class="settings-plan-confirm" id="settings-trial-status" role="status" aria-live="polite"></p>
+        ` : isPaid ? `
           <div class="settings-plan-block">
             <p>When payment starts, five percent of what you pay will go to
                causes this community chooses. In the beta you pay nothing.</p>
@@ -2599,8 +2618,8 @@ export function SettingsView(router) {
         ` : `
           <div class="settings-plan-block">
             <p class="settings-plan-price">${PRICE_MONTHLY} a month, or ${PRICE_ANNUAL} for the year, when payment starts.</p>
-            <p class="text-sm text-muted">
-              The Plan is free while Alongside is in beta.
+            <p class="text-sm text-muted" id="settings-free-trial-line">
+              ${trialEnded() ? 'Your trial has ended. Your own Home is saved, if you come back.' : canStartTrial() ? 'Try the Plan free for 14 days. No card, and nothing is charged.' : ''}
               Thirty days before you pay anything, and no minimum term.
               Everything you have done stays on this phone, whatever you decide.
             </p>
@@ -2755,6 +2774,14 @@ export function SettingsView(router) {
                  It was the only way into that tier and the tier granted
                  nothing, so this button's entire function was to put a
                  device into a state indistinguishable from Personal. -->
+          </div>
+          <!-- Row 17: try the Plan trial's days without waiting for them. -->
+          <p class="settings-dev-panel__tier">Plan trial: <strong id="dev-current-trial">${trialActive() ? 'on, ends ' + planTrialNow().endsOn : trialEnded() ? 'ended' : 'none'}</strong></p>
+          <div class="settings-dev-panel__buttons" role="group" aria-label="Plan trial for testing">
+            <button class="btn btn-secondary btn-sm" data-dev-trial="start">Start trial</button>
+            <button class="btn btn-secondary btn-sm" data-dev-trial="two-left">2 days left</button>
+            <button class="btn btn-secondary btn-sm" data-dev-trial="end">End now</button>
+            <button class="btn btn-secondary btn-sm" data-dev-trial="forget">Forget trial</button>
           </div>
           <!-- P-41 S5: try the 16-17 version on a phone before it opens
                (this panel is off at release, row 15). -->
@@ -3211,6 +3238,23 @@ export function SettingsView(router) {
       });
     });
 
+    // Row 17. The trial's days, for testing (this panel is off at release).
+    container.querySelectorAll('[data-dev-trial]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const v = btn.dataset.devTrial;
+        if (v === 'start') { devForgetTrial(); startTrial(); }
+        if (v === 'two-left') devTwoDaysLeft();
+        if (v === 'end') endTrial(new Date(), 'ended');
+        if (v === 'forget') devForgetTrial();
+        const t = planTrialNow();
+        const lab = container.querySelector('#dev-current-trial');
+        if (lab) lab.textContent = trialActive() ? 'on, ends ' + t.endsOn : trialEnded() ? 'ended' : 'none';
+        const tl = container.querySelector('#dev-current-tier');
+        if (tl) tl.textContent = store.get('tier');
+        _showToast(`Plan trial: ${lab?.textContent || ''} (${TRIAL_DAYS} days)`, container);
+      });
+    });
+
     container.querySelectorAll('[data-dev-tier]').forEach(btn => {
       btn.addEventListener('click', () => {
         const tier = btn.dataset.devTier;
@@ -3424,6 +3468,25 @@ export function SettingsView(router) {
       case 'nav-upgrade':
         router.navigate('upgrade');
         break;
+
+      // Row 17. Keep the Plan: the early price.
+      case 'trial-keep':
+        router.upgradeStage = 'keep';
+        router.navigate('upgrade');
+        break;
+
+      // Row 17. Go back to Free now, asked once more (a phone has one trial).
+      case 'trial-stop': {
+        const acts = container.querySelector('#settings-trial-actions');
+        if (acts) acts.innerHTML = `<p>Go back to Free now? The trial ends today, and a phone has one trial. Everything is kept.</p>
+          <button class="btn btn-secondary" data-action="trial-stop-yes">Yes, go back to Free</button>
+          <button class="btn btn-ghost" data-action="trial-stop-no">Keep trying the Plan</button>`;
+        // Bound here: these two are made after the panel's listeners were wired.
+        acts?.querySelector('[data-action="trial-stop-yes"]')?.addEventListener('click', () => { endTrial(new Date(), 'stopped'); router.navigate('settings'); });
+        acts?.querySelector('[data-action="trial-stop-no"]')?.addEventListener('click', () => router.navigate('settings'));
+        acts?.querySelector('[data-action="trial-stop-yes"]')?.focus();
+        break;
+      }
 
       case 'nav-activity-log':
         router.navigate('activity-log');

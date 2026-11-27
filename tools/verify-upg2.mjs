@@ -1,5 +1,10 @@
 /**
  * tools/verify-upg2.mjs
+ * 27 Nov 2026 v2
+ *
+ * v2 - Row 17 Try the Plan: the button starts a 14-day trial, not the beta's
+ *   I'm ready; "honest about payment" reads the page's Nothing is charged.
+ *
  * 13 Aug 2026 v1
  *
  * A2 GATE — the upgrade page is a real page.
@@ -81,8 +86,9 @@ check("there is a call to action", () => {
 check("the CTA is honest about payment", () => {
   // A button labelled "I'm ready" that changes tier without saying
   // whether money moved is the single worst thing this page could do.
-  ok(/haven\\u2019t been charged|have not been charged|haven't been charged/.test(view),
-     "the confirmation does not state that no payment was taken");
+  // v2 (Row 17): the button is the trial now; the page says plainly nothing is charged.
+  ok(/nothing is charged/i.test(view),
+     "the page does not state that nothing is charged");
 });
 
 check("no statement describes an unbuilt feature", () => {

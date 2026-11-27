@@ -1,5 +1,12 @@
 /**
  * tools/verify-worse-pointer.mjs
+ * 27 Nov 2026 v5
+ *
+ * v5 - Row 17 Try the Plan. Free's finish offers the Plan trial first, and an
+ *   offered finish has no reflection prompt as well; the person here was
+ *   offered it this week (planTrial.offeredAt), so this gate is still
+ *   about the finish's reflections.
+ *
  * 06 Nov 2026 v4
  *
  * v4 - P-28 S3. A finish that offers an In Step episode has no reflection
@@ -83,6 +90,7 @@ function session({ conditions = [], finish = true, soreToday = false } = {}) {
   localStorage.clear(); store.init();
   store.set("safetyAckLog", Array.from({ length: 5 }, () => ({ at: new Date().toISOString(), textVersion: HURT_AND_ACHE_VERSION, surface: "fixture" })));
   store.set("tier", TIER); store.set("onboardingComplete", true); store.set("conditions", conditions);
+  store.set("planTrial", { offeredAt: new Date().toISOString() });   // Row 17: offered this week
   store.set("lastCheckin", { mood: 6, energy: 6, timestamp: new Date().toISOString() });
   if (soreToday) { store.set("conditionPainScores", Object.fromEntries(conditions.map(c => [c, 4]))); store.set("conditionPainScoresOn", store._localDay()); }
   store.set("generatedSession", { session: { id: "s", name: "Upper Body", exercises: [EX("a", "Row"), EX("b", "Press")] }, builtAt: new Date().toISOString(), inputs: {} });
