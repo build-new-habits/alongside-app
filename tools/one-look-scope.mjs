@@ -1,5 +1,10 @@
 /**
  * tools/one-look-scope.mjs
+ * 28 Nov 2026 v2
+ *
+ * v2 - Row 13a ACCOUNTS, S2. The email step ('account', 'account-link') is a
+ *   gate screen: left only by answering it, like the age question.
+ *
  * 31 Oct 2026 v1
  *
  * STAGE PATH Session 9. Which Plan screens verify-one-look and
@@ -33,5 +38,5 @@
  */
 export const P13_ROOMS = [];   // 01 Nov: P-13's rooms are all in the Plan's look (Build a session and the Morning programme last)
 export const SESSION_SCREENS = ["workout", "capture", "prescribed-session", "gym-programme", "breathing-session", "quiet-session", "core-session", "yoga-session", "class-player", "morning-session"];
-export const NOT_A_ROOM = ["age-check", "under-18", "consent-update", "health-consent", "red-flag"];
+export const NOT_A_ROOM = ["age-check", "under-18", "consent-update", "health-consent", "red-flag", "account", "account-link"];
 export const NOT_ON_THE_PLAN = ["checkin-mini", "mobility-conditioning"];

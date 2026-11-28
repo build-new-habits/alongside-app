@@ -1,5 +1,14 @@
 /**
  * router.js
+ * 28 Nov 2026 v64
+ *
+ * v64 - Row 13a ACCOUNTS, S2. 'account' (the email step) and 'account-link'
+ *   (the email's link opened where Alongside wasn't waiting), reached only
+ *   through the guard in navigate(), after the age and agreement guards
+ *   (data/account.js guardRoute; off until the account service is set up).
+ *   The email's link (#access_token=...) is taken first, and cleared from
+ *   the address. Both are full screen, left only by answering them.
+ *
  * 24 Nov 2026 v63
  *
  * v63 - P-46 S6 WORDS. saved-sessions joins FREE_MOVED: Saved sessions are
@@ -562,6 +571,9 @@ const VIEW_NAMES = {
   'under-18':           { path: './views/under-18.js',         fn: 'Under18View'           },
   // CONSENT-VERSION, 01 Oct 2026. Reached only through the guard.
   'consent-update':     { path: './views/consent-update.js',   fn: 'ConsentUpdateView'     },
+  // Row 13a ACCOUNTS, 28 Nov 2026. Reached only through the guard.
+  'account':            { path: './views/account-step.js',     fn: 'AccountStepView'       },
+  'account-link':       { path: './views/account-step.js',     fn: 'AccountLinkView'       },
 };
 
 const hideNavViews = new Set([
@@ -586,6 +598,8 @@ const hideNavViews = new Set([
   'health-consent',
   // AGE-CHECK. Nothing else to go to from either.
   'age-check', 'under-18', 'consent-update',
+  // Row 13a. The email step: nothing else to go to.
+  'account', 'account-link',
   // SMOOTH-P3c. A session in progress, with its own Exit and Finish.
   'capture',
   // P-39. Making my Move is answered, like the check-in: nothing else to tap.
@@ -598,14 +612,14 @@ const FREE_MOVED = new Set(['session-builder', 'mobility-conditioning', 'classes
   'know-what', 'my-programme', 'weekly-plan', 'your-week', 'arc-setup', 'stretch-arc', 'goal-setup',
   'saved-sessions']);   // P-46 S6: Saved sessions are the Plan's (its Free page said so in 22 words)
 
-const NO_EXIT_VIEWS = new Set(['onboarding/thread', 'onboarding/start', 'age-check', 'under-18', 'consent-update']);
+const NO_EXIT_VIEWS = new Set(['onboarding/thread', 'onboarding/start', 'age-check', 'under-18', 'consent-update', 'account', 'account-link']);
 // D662-6 TWO-HOMES. Screens with their own way home: no house beside it.
 // Today's plan hides it itself while its plan (with "‹ Home") is showing.
 const OWN_HOME_VIEWS = new Set(['reflect', 'plan-finish', 'prescribed']);
 
 const NAV_MAP = {
   'today': 'today', 'checkin': 'today', 'checkin-mini': 'today',
-  'coach-proposal': 'today', 'red-flag': 'today', 'health-consent': 'today', 'age-check': 'today', 'under-18': 'today', 'consent-update': 'today',
+  'coach-proposal': 'today', 'red-flag': 'today', 'health-consent': 'today', 'age-check': 'today', 'under-18': 'today', 'consent-update': 'today', 'account': 'today', 'account-link': 'today',
   'home-threshold': 'today', 'reflect': 'today', 'plan-finish': 'today',
   'workout': 'today', 'gym-programme': 'today', 'morning-session': 'today',
   'core-session': 'today', 'yoga-session': 'today', 'walk-session': 'today',
@@ -659,7 +673,7 @@ const NAV_MAP = {
 
 // GATE-ONCE. The screens that mean a session is over.
 // W5-16. Screens where the phone's Back, with nothing behind, leaves the app.
-const BACK_LEAVES = new Set(['under-18', 'age-check', 'onboarding/thread', 'onboarding/start', 'consent-update']);
+const BACK_LEAVES = new Set(['under-18', 'age-check', 'onboarding/thread', 'onboarding/start', 'consent-update', 'account', 'account-link']);
 
 const GATE_SESSION_ENDS = new Set(['today', 'progress', 'noticing', 'settings', 'library', 'on-the-plan']);   // P-46 S4: Free's Library is on-the-plan
 
@@ -680,6 +694,20 @@ export const router = {
       viewName = 'today';
     }
 
+    // Row 13a ACCOUNTS. The email's link, before anything else: taken (this
+    // browser was waiting for it) or Screen 5; cleared from the address.
+    if (typeof location !== 'undefined' && /^#access_token=/.test(location.hash)) {
+      try {
+        if (!this._acc) this._acc = await import('./data/account.js');
+        const hash = location.hash;
+        try { history.replaceState(history.state, '', location.pathname + location.search); } catch { /* keep going */ }
+        const got = await this._acc.takeLink(hash);
+        if (got === 'notWaiting') viewName = 'account-link';
+      } catch (err) {
+        console.error('Router: account link failed', err);
+      }
+    }
+
     // AGE-CHECK, 01 Oct 2026. First of all: under 18 sees only the
     // under-18 screen; an install from before the check is asked once.
     try {
@@ -697,6 +725,16 @@ export const router = {
       if (to) viewName = to;
     } catch (err) {
       console.error('Router: consent-version guard failed', err);
+    }
+
+    // Row 13a ACCOUNTS, 28 Nov 2026. Then the email step, if there is no
+    // account yet (off until the account service is set up).
+    try {
+      if (!this._acc) this._acc = await import('./data/account.js');
+      const to = this._acc.guardRoute(viewName);
+      if (to) viewName = to;
+    } catch (err) {
+      console.error('Router: account guard failed', err);
     }
 
     // W4-22. Make it up as I go is the Plan's (tier table: Free "Not

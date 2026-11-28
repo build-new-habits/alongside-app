@@ -1,6 +1,12 @@
 import { createRequire as __cr } from "node:module";
 /**
  * tools/verify-one-look.mjs
+ * 28 Nov 2026 v25
+ *
+ * v25 - Row 13a ACCOUNTS, S2. The email step (account-step) is new since
+ *   v688 and is not a room: TEST 4 checks that, with accounts off, nobody
+ *   is kept on it (the router sends them on).
+ *
  * 27 Nov 2026 v24
  *
  * v24 - Row 17 Try the Plan (Graeme, 27 Nov). TEST 4: Free's finish may
@@ -381,6 +387,11 @@ for (const file of touched) {
   if (!entry) continue;                     // a view the router does not open by itself
   let old = "";
   try { old = execSync(`git -C "${ROOT}" show ${V688}:${file}`, { encoding: "utf8", maxBuffer: 1 << 26 }); } catch {}
+  if (!old && name === "account-step") {   // v25
+    person("free"); await router.navigate(entry.route); await wait(80);
+    ok(`4ac. Free account-step: new since v688 (row 13a), the email step: off, nobody is kept on it`, router.currentView !== "account", router.currentView);
+    continue;
+  }
   if (!old && NEW_PLAN_ONLY.includes(name)) {
     person("free"); await router.navigate(entry.route); await wait(80);
     ok(`4. Free ${name}: new since v688, the Plan's only: Free is sent to its own screen`, router.currentView !== entry.route, router.currentView);

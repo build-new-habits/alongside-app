@@ -1,5 +1,15 @@
 /**
  * settings.js
+ * 28 Nov 2026 v83
+ *
+ * v83 - Row 13a ACCOUNTS, S2. Settings › Your account (signed in only): the
+ *   email address, Change my email (a code to the new address first), Sign
+ *   out, Delete my account (one confirm). Download your data leaves out the
+ *   sign-in tokens. Go back to Free now goes through the account when there
+ *   is one. Your plan on Free no longer says thirty days before paying (the
+ *   trial replaced them, 28 Nov). The developer panel gains the account
+ *   demo, Pretend signed in and Sign out.
+ *
  * 27 Nov 2026 v82
  *
  * v82 - Row 17 Try the Plan, S2. Your plan during a trial: the Plan, on a
@@ -820,6 +830,8 @@ import { lockText, passwordProblem, lockAvailable } from '../data/file-lock.js';
 import { restoreFromFile } from './restore-flow.js';
 import { visibleMessages, hasUnread, markAllRead, dismissMessage, updateNavDot } from '../data/messages.js';
 import { trialActive, trialEnded, canStartTrial, endsOnWords, startTrial, endTrial, trial as planTrialNow, TRIAL_DAYS, devForgetTrial, devTwoDaysLeft } from '../data/plan-trial.js';
+import { accountsOn, signedIn, account as accountNow, changeEmail, confirmEmailChange, signOut as accountSignOut, deleteAccount, backToFree, demoOn, setDemo, devPretendSignedIn, devSignOut } from '../data/account.js';
+import { SESSION_KEY } from '../data/account-model.js';
 import { SURVEY, CANT_FIND, NOT_SENT, figuresPayload, surveyPayload, sendEvidence, researchPrivacyLine, wasAnswered, noServerCopy } from '../data/evidence.js';
 import { conditionReadback, shortDate } from '../data/arc-readback.js';
 
@@ -972,6 +984,7 @@ export function SettingsView(router) {
     weight:       { title: 'Your weight',             render: () => `<div class="settings-section">${_weightSection(store.get('weightTracking') === true, store.get('weightUnit') || 'kg', store.get('weight'))}</div>` },
     display:      { title: 'Display',                 render: () => renderDisplayPanel() },
     'about-plan': { title: 'Your plan',               render: () => renderPanel('about-plan') },
+    account:      { title: 'Your account',            render: () => renderAccountScreen() },   // Row 13a
     'about-story':{ title: 'Why Alongside exists',    render: () => renderPanel('about-story') },
     'about-app':  { title: 'The app',                 render: () => renderPanel('about-app') },
     'about-data': { title: 'How your data is kept',   render: () => renderPanel('about-data') },
@@ -1224,6 +1237,7 @@ export function SettingsView(router) {
           ]),
         ] },
         { title: 'The Plan', rows: [
+          ...(accountsOn() && signedIn() ? [_row({ label: 'Your account', value: accountNow().email || '', open: 'account' })] : []),   // Row 13a
           _row({ label: 'Your plan', value: c.premium ? 'The Plan' : 'Free', open: 'about-plan' }),
           _row({ label: 'Your impact', sub: 'Where the 5% goes.', action: 'nav-impact' }),
         ] },
@@ -1307,7 +1321,7 @@ export function SettingsView(router) {
       exportedAt: new Date().toISOString(),
       about: 'Everything Alongside: Move keeps about you on this device, including your journal. Nothing here was sent anywhere to make this file.',
       store: JSON.parse(localStorage.getItem('alongside_user') || '{}'),
-      display: (() => { const o = {}; for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k && k !== 'alongside_user' && /^alongside/i.test(k)) o[k] = localStorage.getItem(k); } return o; })(),
+      display: (() => { const o = {}; for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k && k !== 'alongside_user' && k !== SESSION_KEY && /^alongside/i.test(k)) o[k] = localStorage.getItem(k); } return o; })(),
     };
     const text = JSON.stringify(data, null, 2);
     if (password) return _saveLocked(container, text, password);
@@ -2573,6 +2587,101 @@ export function SettingsView(router) {
    * any more -- Year 2 pricing is deferred to Year 2, so there is no
    * expiry to state.
    */
+  // Row 13a ACCOUNTS, S2. Settings › Your account (mock-up v2, Screens 7 and 8).
+  function renderAccountScreen() {
+    return `
+      <div class="settings-section" id="settings-account">
+        <div class="settings-plan-block">
+          <p><strong id="settings-account-email">${_esc(accountNow().email || '').replace(/([.@])/g, '$1<wbr>')}</strong></p>
+          <p class="text-sm text-muted">Used only to sign you in.</p>
+        </div>
+        <div class="settings-actions" id="settings-account-actions">
+          <button class="btn btn-secondary" data-action="acct-change">Change my email</button>
+          <button class="btn btn-secondary" data-action="acct-signout">Sign out</button>
+          <button class="btn btn-ghost" data-action="acct-delete">Delete my account</button>
+        </div>
+        <p class="settings-plan-confirm" id="settings-account-status" role="status" aria-live="polite"></p>
+      </div>`;
+  }
+
+  const ACCOUNT_SAY = {
+    invalid: 'That doesn\u2019t look like a new email address. Check it and try again.',
+    offline: 'You need to be online for this.',
+    tooMany: 'That\u2019s a lot of codes for now. Try again a little later.',
+    failed: 'Something went wrong at our end. Try again in a minute.',
+    format: 'The code is 6 numbers. Check it and try again.',
+    wrong: 'That code didn\u2019t work. Check the 6 digits.',
+    newCode: 'That code can\u2019t be used now. Start again with Change my email.',
+  };
+
+  // The three choices again, after changing the email (made after the page's listeners were wired).
+  function _accountButtons(acts, container) {
+    acts.innerHTML = `
+          <button class="btn btn-secondary" data-action="acct-change">Change my email</button>
+          <button class="btn btn-secondary" data-action="acct-signout">Sign out</button>
+          <button class="btn btn-ghost" data-action="acct-delete">Delete my account</button>`;
+    acts.querySelectorAll('[data-action]').forEach(b => b.addEventListener('click', () => handleAction(b.dataset.action, container)));
+  }
+
+  function _accountChange(container) {
+    const acts = container.querySelector('#settings-account-actions');
+    if (!acts) return;
+    acts.innerHTML = `
+      <label class="form-label" for="settings-account-new">New email address</label>
+      <input class="form-input" id="settings-account-new" type="email" inputmode="email" autocomplete="email" autocapitalize="none" spellcheck="false" maxlength="254" aria-describedby="settings-account-err">
+      <p class="hc-error" id="settings-account-err" role="alert"></p>
+      <button class="btn btn-primary" id="settings-account-send">Send a code</button>
+      <button class="btn btn-ghost" id="settings-account-cancel">Keep this email</button>`;
+    const err = acts.querySelector('#settings-account-err');
+    acts.querySelector('#settings-account-cancel').addEventListener('click', () => router.navigate('settings'));
+    acts.querySelector('#settings-account-send').addEventListener('click', async () => {
+      const field = acts.querySelector('#settings-account-new');
+      const r = await changeEmail(field.value);
+      if (!r.ok) { err.textContent = ACCOUNT_SAY[r.reason] || ACCOUNT_SAY.failed; field.setAttribute('aria-invalid', String(r.reason === 'invalid')); field.focus(); return; }
+      acts.innerHTML = `
+        <p id="settings-account-sent">We've sent a 6-digit code to <strong>${_esc(r.email).replace(/([.@])/g, '$1<wbr>')}</strong>. Your email changes once you type it here.</p>
+        <label class="form-label" for="settings-account-code">Code</label>
+        <input class="form-input" id="settings-account-code" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]*" maxlength="6" aria-describedby="settings-account-sent settings-account-err">
+        <p class="hc-error" id="settings-account-err" role="alert"></p>
+        <button class="btn btn-primary" id="settings-account-confirm">Change my email</button>
+        <button class="btn btn-ghost" id="settings-account-cancel">Keep this email</button>`;
+      const err2 = acts.querySelector('#settings-account-err');
+      acts.querySelector('#settings-account-cancel').addEventListener('click', () => router.navigate('settings'));
+      acts.querySelector('#settings-account-confirm').addEventListener('click', async () => {
+        const code = acts.querySelector('#settings-account-code');
+        const c = await confirmEmailChange(code.value);
+        if (!c.ok) { err2.textContent = ACCOUNT_SAY[c.reason] || ACCOUNT_SAY.failed; code.setAttribute('aria-invalid', 'true'); code.focus(); return; }
+        const em = container.querySelector('#settings-account-email');
+        if (em) em.textContent = accountNow().email || '';
+        _accountButtons(acts, container);
+        container.querySelector('#settings-account-status').textContent = `Your email is now ${accountNow().email || ''}.`;
+        acts.querySelector('[data-action="acct-change"]')?.focus();
+      });
+      acts.querySelector('#settings-account-code').focus();
+    });
+    acts.querySelector('#settings-account-new').focus();
+  }
+
+  function _accountDelete(container) {
+    const acts = container.querySelector('#settings-account-actions');
+    if (!acts) return;
+    acts.innerHTML = `
+      <h3 class="settings-section__heading" id="settings-account-del-h" tabindex="-1">Delete your account?</h3>
+      <p>Your email address and account are deleted from our server straight away. A free trial that\u2019s running ends.</p>
+      <div class="settings-plan-block"><p><strong>This phone keeps what\u2019s on it</strong></p>
+      <p class="text-sm text-muted">Unless you also use Reset all data in Settings.</p></div>
+      <p class="hc-error" id="settings-account-err" role="alert"></p>
+      <button class="btn btn-danger" id="settings-account-del-yes">Delete my account</button>
+      <button class="btn btn-ghost" id="settings-account-del-no">Keep my account</button>`;
+    acts.querySelector('#settings-account-del-no').addEventListener('click', () => router.navigate('settings'));
+    acts.querySelector('#settings-account-del-yes').addEventListener('click', async () => {
+      const r = await deleteAccount(new Date());
+      if (!r.ok) { acts.querySelector('#settings-account-err').textContent = r.reason === 'offline' ? 'You need to be online to delete your account.' : 'Something went wrong at our end. Nothing was deleted. Try again in a minute.'; return; }
+      router.navigate('account', { replace: true });
+    });
+    acts.querySelector('#settings-account-del-h').focus();
+  }
+
   function renderPlanPanel() {
     const tier      = store.get('tier') || 'free';
     const isPaid    = tier !== 'free';
@@ -2620,7 +2729,7 @@ export function SettingsView(router) {
             <p class="settings-plan-price">${PRICE_MONTHLY} a month, or ${PRICE_ANNUAL} for the year, when payment starts.</p>
             <p class="text-sm text-muted" id="settings-free-trial-line">
               ${trialEnded() ? 'Your trial has ended. Your own Home is saved, if you come back.' : canStartTrial() ? 'Try the Plan free for 14 days. No card, and nothing is charged.' : ''}
-              Thirty days before you pay anything, and no minimum term.
+              No minimum term.
               Everything you have done stays on this phone, whatever you decide.
             </p>
           </div>
@@ -2774,6 +2883,13 @@ export function SettingsView(router) {
                  It was the only way into that tier and the tier granted
                  nothing, so this button's entire function was to put a
                  device into a state indistinguishable from Personal. -->
+          </div>
+          <!-- Row 13a: the email step and Your account, before Supabase exists (a stand-in on this phone; code 123456). -->
+          <p class="settings-dev-panel__tier">Email account: <strong id="dev-current-account">${demoOn() ? 'demo on' : accountsOn() ? 'live' : 'off'}${signedIn() ? ', signed in as ' + _esc(accountNow().email || '') : ''}</strong></p>
+          <div class="settings-dev-panel__buttons" role="group" aria-label="Email account for testing">
+            <button class="btn btn-secondary btn-sm" data-dev-account="demo">${demoOn() ? 'Demo off' : 'Demo on'}</button>
+            <button class="btn btn-secondary btn-sm" data-dev-account="pretend">Pretend signed in</button>
+            <button class="btn btn-secondary btn-sm" data-dev-account="signout">Sign out</button>
           </div>
           <!-- Row 17: try the Plan trial's days without waiting for them. -->
           <p class="settings-dev-panel__tier">Plan trial: <strong id="dev-current-trial">${trialActive() ? 'on, ends ' + planTrialNow().endsOn : trialEnded() ? 'ended' : 'none'}</strong></p>
@@ -3238,6 +3354,17 @@ export function SettingsView(router) {
       });
     });
 
+    // Row 13a. The email account, for testing (this panel is off at release).
+    container.querySelectorAll('[data-dev-account]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const v = btn.dataset.devAccount;
+        if (v === 'demo') setDemo(!demoOn());
+        if (v === 'pretend') devPretendSignedIn();
+        if (v === 'signout') devSignOut();
+        router.navigate('settings');
+      });
+    });
+
     // Row 17. The trial's days, for testing (this panel is off at release).
     container.querySelectorAll('[data-dev-trial]').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -3469,6 +3596,11 @@ export function SettingsView(router) {
         router.navigate('upgrade');
         break;
 
+      // Row 13a. Settings › Your account.
+      case 'acct-change': _accountChange(container); break;
+      case 'acct-signout': accountSignOut().then(() => router.navigate('account', { replace: true })); break;
+      case 'acct-delete': _accountDelete(container); break;
+
       // Row 17. Keep the Plan: the early price.
       case 'trial-keep':
         router.upgradeStage = 'keep';
@@ -3478,11 +3610,11 @@ export function SettingsView(router) {
       // Row 17. Go back to Free now, asked once more (a phone has one trial).
       case 'trial-stop': {
         const acts = container.querySelector('#settings-trial-actions');
-        if (acts) acts.innerHTML = `<p>Go back to Free now? The trial ends today, and a phone has one trial. Everything is kept.</p>
+        if (acts) acts.innerHTML = `<p>Go back to Free now? The trial ends today, and ${accountsOn() && signedIn() ? 'you have one trial' : 'a phone has one trial'}. Everything is kept.</p>
           <button class="btn btn-secondary" data-action="trial-stop-yes">Yes, go back to Free</button>
           <button class="btn btn-ghost" data-action="trial-stop-no">Keep trying the Plan</button>`;
         // Bound here: these two are made after the panel's listeners were wired.
-        acts?.querySelector('[data-action="trial-stop-yes"]')?.addEventListener('click', () => { endTrial(new Date(), 'stopped'); router.navigate('settings'); });
+        acts?.querySelector('[data-action="trial-stop-yes"]')?.addEventListener('click', async () => { await backToFree(new Date()); router.navigate('settings'); });   // Row 13a: through the account when there is one
         acts?.querySelector('[data-action="trial-stop-no"]')?.addEventListener('click', () => router.navigate('settings'));
         acts?.querySelector('[data-action="trial-stop-yes"]')?.focus();
         break;

@@ -1,5 +1,10 @@
 /**
  * tools/verify-nav5.mjs
+ * 28 Nov 2026 v7
+ *
+ * v7 - Row 13a ACCOUNTS, S2. Your account is opened from the page when
+ *   accounts are on and the person is signed in (the developer demo here).
+ *
  * 24 Nov 2026 v6
  *
  * v6 - P-46 S4 FREE HOME. NAV-6 reads Free Home's ways in from free-home.js
@@ -121,6 +126,10 @@ const opened = new Set(allPages("[data-open]").map(b => b.dataset.open));
 store.set("onboarding.primaryTerritory", "body"); page();
 allPages("[data-open]").forEach(b => opened.add(b.dataset.open));
 store.set("weightTracking", true); store.set("checkInNotification.enabled", true); page();
+allPages("[data-open]").forEach(b => opened.add(b.dataset.open));
+// v7: signed in to an email account (the developer demo: nothing sent).
+const AC = await import(new URL("../js/data/account.js", import.meta.url).href);
+AC.setDemo(true); AC.devPretendSignedIn(); page();
 allPages("[data-open]").forEach(b => opened.add(b.dataset.open));
 check("the page opens only screens that exist", () => {
   const bad = [...opened].filter(k => !screens.includes(k));

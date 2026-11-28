@@ -1,7 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 28 Nov 2026 v765
+ * 28 Nov 2026 v766
+ *
+ * v766 - Row 13a email accounts S2: the email step and Settings › Your account (switched off until set up). New files: js/views/account-step.js, js/data/account-demo.js.
  *
  * v765 - Row 13a email accounts S1: the account's record and rules, switched off. New files: js/data/account.js, js/data/account-client.js, js/data/account-config.js, js/data/account-model.js.
  *
@@ -4383,7 +4385,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v765";
+const CACHE_NAME = "alongside-v766";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4449,7 +4451,7 @@ const SHELL_HASHES = {
   "./css/components/capture.css": "343b4ae0dc6fe6ea",
   "./css/components/finish.css": "c33e298d5fcb92ae",
   "./js/app.js": "94bac7a343ab802f",
-  "./js/router.js": "f4e0c7f0eac0a035",
+  "./js/router.js": "c31cedf779fc08cd",
   "./js/store.js": "5cf81868d8a376b0",
   "./js/session-log.js": "6134de4315842e05",
   "./js/exercise-feedback.js": "adba8549f444da2a",
@@ -4475,10 +4477,10 @@ const SHELL_HASHES = {
   "./js/views/coach-proposal.js": "c8f548d3c2e5db8c",
   "./js/views/workout.js": "e0c6b605642e7790",
   "./js/views/progress.js": "7708195f75512d62",
-  "./js/views/settings.js": "ddbc85818289b247",
+  "./js/views/settings.js": "34e63e0887adc34d",
   "./js/views/restore-flow.js": "dc81c2e455fa472d",
   "./js/views/weekly-plan.js": "dcee06e297b402c0",
-  "./js/views/reflect.js": "9f565b8eca948fd4",
+  "./js/views/reflect.js": "88231c3ae9ad6d63",
   "./js/data/empathy-transfer.js": "d4028d2c71515778",
   "./js/data/equipment-map.js": "2db6399d16987707",
   "./js/data/exercises/gym.js": "835e777941d00fe4",
@@ -4499,7 +4501,7 @@ const SHELL_HASHES = {
   "./js/views/home-threshold.js": "17bc42808aa5bd5c",
   "./js/views/onboarding/frequency.js": "47e40b6e6e2f458f",
   "./js/views/programme-select.js": "115a22eeb9526be5",
-  "./js/views/upgrade.js": "c0473cfd1c9a220f",
+  "./js/views/upgrade.js": "636ce0a69360d5e5",
   "./js/views/privacy.js": "a32845d9bb4b826a",
   "./js/views/library.js": "ae647a15a875452c",
   "./js/views/practices.js": "f76d5aae3596a565",
@@ -4624,10 +4626,12 @@ const SHELL_HASHES = {
   "./js/data/in-step-version.js": "1e53f9c77cb5c291",
   "./js/data/plan-trial.js": "f935e8f56e03208e",
   "./js/data/plan-trial-model.js": "1018114a973dad8a",
-  "./js/data/account.js": "73185406fbf427b2",
+  "./js/data/account.js": "3d60824f71f3d9f5",
   "./js/data/account-client.js": "9b988efce7374aec",
   "./js/data/account-config.js": "c5822e7ce034ba9b",
   "./js/data/account-model.js": "2183f9c383b9a034",
+  "./js/data/account-demo.js": "9de1fb5c6ff2b9b0",
+  "./js/views/account-step.js": "d7f102ada374dc50",
   "./js/coach-audio.js": "d201650f60b33617",
   "./js/hold-voice.js": "4801164cbddca872",
   "./js/views/guide-me.js": "eed24714732918fc",
@@ -4991,6 +4995,8 @@ const SHELL_URLS = [
   "./js/data/account-client.js",
   "./js/data/account-config.js",
   "./js/data/account-model.js",
+  "./js/data/account-demo.js",
+  "./js/views/account-step.js",
   "./js/coach-audio.js",
   "./js/hold-voice.js",
   "./js/views/guide-me.js",

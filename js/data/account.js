@@ -1,5 +1,11 @@
 /**
  * js/data/account.js
+ * 28 Nov 2026 v2
+ *
+ * v2 - Row 13a ACCOUNTS, S2. The guard (after the age and agreement guards):
+ *   guardRoute, takePendingRoute; the email's link (takeLink); the developer
+ *   demo (a stand-in on the phone, code 123456, nothing sent anywhere).
+ *
  * 28 Nov 2026 v1
  *
  * Row 13a ACCOUNTS, S1 (spec docs/specs/alongside_accounts_spec_28nov2026_v2.md;
@@ -38,6 +44,7 @@ import { sanitizePlanTrial } from "./plan-trial-model.js";
 import { trial, trialActive, canStartTrial, startTrial, endTrial } from "./plan-trial.js";
 import { canBuy } from "./age-version.js";
 import { localDay } from "./in-step-offer.js";
+import { demoFetch, DEMO_CONFIG, DEMO_CODE } from "./account-demo.js";
 
 export const CODE_MINUTES = 15;
 export const RESEND_SECONDS = 60;
@@ -49,7 +56,14 @@ let _emailChange = null;
 /** Gates only: point the module at a stand-in service. */
 export function _configureForTest(config, fetchImpl) { _config = config || ACCOUNTS; _fetch = fetchImpl || undefined; }
 
-const client = () => accountClient(_config, _fetch);
+// The developer demo (Settings › developer panel, off at release): a stand-in
+// account service on this phone, so the screens can be tried before Supabase.
+export const DEMO_KEY = "alongside-dev-account-demo";
+export const demoOn = () => { try { return localStorage.getItem(DEMO_KEY) === "1"; } catch { return false; } };
+export function setDemo(on) { try { if (on) localStorage.setItem(DEMO_KEY, "1"); else localStorage.removeItem(DEMO_KEY); } catch { /* storage unavailable */ } }
+export { DEMO_CODE };
+
+const client = () => (demoOn() && _config === ACCOUNTS ? accountClient(DEMO_CONFIG, demoFetch) : accountClient(_config, _fetch));
 export const accountsOn = () => client().on && canBuy();
 export const account = () => store.get("account") || {};
 
@@ -78,6 +92,47 @@ async function accessToken(now = new Date()) {
   if (r.ok && r.data?.access_token && r.data?.refresh_token) { const n = fromAuth(r.data, now); saveSession(n); return n.accessToken; }
   if (r.status === 400 || r.status === 401) clearSession();   // the server has signed this phone out
   return null;
+}
+
+// ── The guard (router.navigate, after the age and agreement guards) ──────
+
+/** Reached without an account: the age question, the under-18 screen, the policies, Help, Settings (to download or delete everything), the agreement itself. */
+const OPEN = new Set(["account", "account-link", "age-check", "under-18", "privacy", "help", "settings", "consent-update", "onboarding/thread"]);
+let _pending = null;
+export function guardRoute(route) {
+  if (!needsAccount()) return route === "account" ? "today" : null;   // nobody is kept on the email step who doesn't need it
+  const c = store.get("consent") || {};
+  if (c.given !== true || c.ageConfirmed !== true) return null;   // the age and agreement guards come first
+  if (OPEN.has(route)) return null;
+  _pending = route;
+  return "account";
+}
+export function takePendingRoute() { const r = _pending; _pending = null; return r; }
+
+// ── The email's link (rule 7) ─────────────────────────────────────────────
+
+export const LINK_RE = /^#access_token=/;
+function tokenClaims(jwt) {
+  try {
+    const part = String(jwt).split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
+    return JSON.parse(atob(part + "===".slice((part.length + 3) % 4)));
+  } catch { return null; }
+}
+/** "signedIn" (this browser was waiting for it), "notWaiting" (Screen 5), or "off". */
+export async function takeLink(hash, now = new Date()) {
+  if (!accountsOn()) return "off";
+  const q = new URLSearchParams(String(hash || "").replace(/^#/, ""));
+  const p = account().pending;
+  const claims = tokenClaims(q.get("access_token"));
+  if (!p || !claims || cleanEmail(claims.email) !== p.email || typeof claims.sub !== "string") return "notWaiting";
+  const s = fromAuth({ access_token: q.get("access_token"), refresh_token: q.get("refresh_token"), expires_in: Number(q.get("expires_in")) || 3600 }, now);
+  if (!sanitizeSession(s).refreshToken) return "notWaiting";
+  saveSession(s);
+  setAccount({ email: p.email, userId: claims.sub, signedInAt: now.toISOString() });
+  if (!account().userId) { clearSession(); return "notWaiting"; }
+  await carryPhoneTrial(now);
+  await checkAccount(now);
+  return "signedIn";
 }
 
 // ── Signing in ────────────────────────────────────────────────────────────

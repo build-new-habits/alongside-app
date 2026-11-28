@@ -1,5 +1,14 @@
 /**
  * tools/verify-privacy-words.mjs
+ * 28 Nov 2026 v4
+ *
+ * v4 - Row 13a ACCOUNTS, S2 (Graeme, 28 Nov: an email account for everyone).
+ *   4a: "your account" may now be said by the email account's own screen,
+ *   Settings › Your account, whose row shows only when accounts are on and
+ *   the person is signed in; nowhere else. The consent screen's "no account"
+ *   (TEST 1) stays true while accounts are off; switching them on waits for
+ *   the Privacy Policy and these words (schedule row 13a, S3).
+ *
  * 04 Oct 2026 v3
  *
  * v3 - LOOK-1: Settings is an index of section pages. 3a reaches How your
@@ -127,9 +136,10 @@ function walk(dir, out = []) {
 const hits = [];
 for (const p of walk("js/")) {
   const src = fs.readFileSync(new URL(p, ROOT), "utf8").replace(/\/\*[\s\S]*?\*\//g, "").replace(/<!--[\s\S]*?-->/g, "");
-  src.split("\n").forEach((l, i) => { if (!/^\s*\/\//.test(l) && /your account|with your account/i.test(l)) hits.push(`${p}:${i + 1}`); });
+  src.split("\n").forEach((l, i) => { if (!/^\s*\/\//.test(l) && /your account|with your account/i.test(l) && !(p === "js/views/settings.js" && /account:\s+\{ title: 'Your account'|accountsOn\(\) && signedIn\(\)|settings-account-/.test(l))) hits.push(`${p}:${i + 1}`); });
 }
-ok("4a. no screen says \"your account\"", hits.length === 0, hits.join(", "));
+ok("4a. no screen says \"your account\" but Settings › Your account itself (v4)", hits.length === 0, hits.join(", "));
+ok("4b. ... whose row shows only when accounts are on and the person is signed in", /\.\.\.\(accountsOn\(\) && signedIn\(\) \? \[_row\(\{ label: 'Your account'/.test(fs.readFileSync(new URL("js/views/settings.js", ROOT), "utf8")));
 
 // ── 5. NO REMINDER SWITCHES ─────────────────────────────────────────────
 console.log("\nTEST 5 - no reminder switches");
