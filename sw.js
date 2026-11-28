@@ -1,7 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 27 Nov 2026 v764
+ * 28 Nov 2026 v765
+ *
+ * v765 - Row 13a email accounts S1: the account's record and rules, switched off. New files: js/data/account.js, js/data/account-client.js, js/data/account-config.js, js/data/account-model.js.
  *
  * v764 - Row 17 Try the Plan S2: the trial's screens (the finish's offer, Upgrade, Your plan, Home's notice, Free Home's line). No new files.
  *
@@ -4381,7 +4383,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v764";
+const CACHE_NAME = "alongside-v765";
 
 // SW-INCREMENTAL, 05 Oct 2026. Each shell file's content hash, written by
 // tools/sw-hashes.mjs and checked by verify-sw-hashes. An update copies
@@ -4446,9 +4448,9 @@ const SHELL_HASHES = {
   "./css/components/club-rooms.css": "f1c069c5b8eaf09e",
   "./css/components/capture.css": "343b4ae0dc6fe6ea",
   "./css/components/finish.css": "c33e298d5fcb92ae",
-  "./js/app.js": "f0383a94bde41c6e",
+  "./js/app.js": "94bac7a343ab802f",
   "./js/router.js": "f4e0c7f0eac0a035",
-  "./js/store.js": "8951c0139a5b4d49",
+  "./js/store.js": "5cf81868d8a376b0",
   "./js/session-log.js": "6134de4315842e05",
   "./js/exercise-feedback.js": "adba8549f444da2a",
   "./js/exercise-card.js": "87af7a5668137593",
@@ -4526,7 +4528,7 @@ const SHELL_HASHES = {
   "./js/data/health-consent.js": "a23d005af57f179c",
   "./js/data/age-check.js": "369495a6cf2da524",
   "./js/data/age-version.js": "6190cade8be5937c",
-  "./js/data/restore.js": "fd3860a6ccd4e480",
+  "./js/data/restore.js": "9a49641f4a456031",
   "./js/data/export-file.js": "bbee762322d0e4e2",
   "./js/data/health-consent-covers.js": "6698a3e50672cbbe",
   "./js/data/kind-colours.js": "f247edabfec2fd3d",
@@ -4622,6 +4624,10 @@ const SHELL_HASHES = {
   "./js/data/in-step-version.js": "1e53f9c77cb5c291",
   "./js/data/plan-trial.js": "f935e8f56e03208e",
   "./js/data/plan-trial-model.js": "1018114a973dad8a",
+  "./js/data/account.js": "73185406fbf427b2",
+  "./js/data/account-client.js": "9b988efce7374aec",
+  "./js/data/account-config.js": "c5822e7ce034ba9b",
+  "./js/data/account-model.js": "2183f9c383b9a034",
   "./js/coach-audio.js": "d201650f60b33617",
   "./js/hold-voice.js": "4801164cbddca872",
   "./js/views/guide-me.js": "eed24714732918fc",
@@ -4981,6 +4987,10 @@ const SHELL_URLS = [
   "./js/data/in-step-version.js",
   "./js/data/plan-trial.js",
   "./js/data/plan-trial-model.js",
+  "./js/data/account.js",
+  "./js/data/account-client.js",
+  "./js/data/account-config.js",
+  "./js/data/account-model.js",
   "./js/coach-audio.js",
   "./js/hold-voice.js",
   "./js/views/guide-me.js",

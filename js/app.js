@@ -1,5 +1,11 @@
 /**
  * app.js - Application entry point
+ * 28 Nov 2026 v21
+ *
+ * v21 - Row 13a ACCOUNTS, S1. Then, without waiting (the first screen never
+ *   waits for the network), the account's word on the Plan and the trial
+ *   (checkAccount); off, it does nothing. Switched off until set up.
+ *
  * 27 Nov 2026 v20
  *
  * v20 - Row 17 Try the Plan, S1. On every open, before the first screen, a
@@ -114,6 +120,7 @@ import './data/evidence.js';   // B5: registers the two research messages (only 
 import { warmViews } from './data/warm-views.js';
 import { initGuides } from './guide.js';
 import { checkTrial } from './data/plan-trial.js';
+import { checkAccount } from './data/account.js';
 
 // ── Globals — set immediately, before anything else runs ──────────────────────
 window.router = router;
@@ -252,6 +259,7 @@ const App = {
     console.log("Alongside starting...");
     store.init();
     checkTrial();   // Row 17: a Plan trial whose end day has come goes back to Free, before anything draws
+    checkAccount().then(r => { if (r === 'checked') checkTrial(); }).catch(() => {});   // Row 13a: off until set up
     router.init();
     initGuides(router);
     registerServiceWorker();
