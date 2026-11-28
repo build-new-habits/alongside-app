@@ -4626,7 +4626,7 @@ const SHELL_HASHES = {
   "./js/data/in-step-version.js": "1e53f9c77cb5c291",
   "./js/data/plan-trial.js": "f935e8f56e03208e",
   "./js/data/plan-trial-model.js": "1018114a973dad8a",
-  "./js/data/account.js": "ec54c026614fabc2",
+  "./js/data/account.js": "3d60824f71f3d9f5",
   "./js/data/account-client.js": "9b988efce7374aec",
   "./js/data/account-config.js": "c5822e7ce034ba9b",
   "./js/data/account-model.js": "2183f9c383b9a034",
