@@ -1,5 +1,10 @@
 /**
  * tools/verify-backstack.mjs
+ * 28 Nov 2026 v3
+ *
+ * v3 - Row 13a ACCOUNTS, S2. navigate() is longer again (the email's link and
+ *   the account guard), so 3b reads 5000 characters of it. Same checks.
+ *
  * 24 Nov 2026 v2
  *
  * v2 - P-46 S4 FREE HOME. navigate() is longer (the Free-moved check), so 3b
@@ -117,7 +122,7 @@ check("3b. a back navigation pushes nothing, on either stack", () => {
   ok(at > -1, "no navigate()");
   ok(/navigate\(viewName,\s*opts\s*=\s*\{\}\)/.test(router),
      "navigate() does not accept opts");
-  const body = router.slice(at, at + 3400);   // P-46 S4: the Free-moved check sits above the push
+  const body = router.slice(at, at + 5000);   // P-46 S4: the Free-moved check; v3: the account's link and guard
 
   const browserPush = body.indexOf("history.pushState");
   ok(browserPush > -1, "navigate() never pushes browser state");

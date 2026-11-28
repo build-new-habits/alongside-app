@@ -1,5 +1,11 @@
 /**
  * upgrade.js - Upgrade / Membership view
+ * 28 Nov 2026 v27
+ *
+ * v27 - Row 13a ACCOUNTS, S2. Try the Plan starts the trial through the
+ *   account when there is one (data/account.js tryThePlan): one per account.
+ *   Off, as before.
+ *
  * 27 Nov 2026 v26
  *
  * v26 - Row 17 Try the Plan, S2 (mock-up v2 approved by Graeme 27 Nov).
@@ -259,7 +265,8 @@ import { canBuy, BUY_YOUNG_LINE } from "../data/age-version.js";
 import { store }  from "../store.js";
 import { router } from "../router.js";
 import { PRICE_MONTHLY, PRICE_ANNUAL, PRICE_EARLY_ANNUAL, PRICE_EARLY_MONTHLY_EQUIV } from "../data/pricing.js";
-import { canStartTrial, startTrial, trialActive, trialEnded, endsOnWords } from "../data/plan-trial.js";
+import { canStartTrial, trialActive, trialEnded, endsOnWords } from "../data/plan-trial.js";
+import { tryThePlan } from "../data/account.js";
 import { PLAN_ADDS, FREE_KEEPS } from "../data/tier-table.js";
 import { PURPOSE_LINES } from "../data/empathy-transfer.js";
 import { lineIcon } from "../data/line-icons.js";
@@ -555,12 +562,21 @@ export function onMount() {
   const cta = document.getElementById("upgrade-cta");
   if (!cta) return;
 
-  cta.addEventListener("click", () => {
+  cta.addEventListener("click", async () => {
     // Row 17 (27 Nov). The beta's I'm ready gave the Plan with no end; now
     // the button is the trial: 14 days, no card, then Free with everything
     // kept. After a trial it is Keep the Plan (the early price).
     if (!canStartTrial()) { showKeep(); return; }
-    startTrial();
+    cta.disabled = true;
+    const started = await tryThePlan();
+    cta.disabled = false;
+    if (!started) {
+      // Through the account and offline (or the server said no): say so, by the button.
+      let note = document.getElementById("upgrade-cta-note");
+      if (!note) { note = document.createElement("p"); note.id = "upgrade-cta-note"; note.className = "hc-error"; note.setAttribute("role", "alert"); cta.insertAdjacentElement("afterend", note); }
+      note.textContent = "Your trial couldn\u2019t start just now. Check you\u2019re online, then try again.";
+      return;
+    }
     updateNavDot();   // W4-22: a message for the Plan shows its dot now, not on reopen
     router.navigate("my-move");   // Start your Plan (Making my Move, P-39)
   });

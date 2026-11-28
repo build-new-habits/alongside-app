@@ -125,8 +125,10 @@ for (const [name, src] of [["upgrade.js", upgradeCopy], ["settings.js", settings
 check("upgrade.js states the 30-day trial",
   /thirty days|30 days/i.test(upgradeCopy),
   "not a penny until day 30 is the strongest line available");
-check("settings.js states the 30-day trial where it states the price",
-  /thirty days|30 days/i.test(settingsCopy));
+// 28 Nov 2026 (row 13a/17, Graeme): the 14-day trial with no card replaced
+// the thirty days before paying; Your plan says the trial where it says the price.
+check("settings.js states the 14-day trial where it states the price (it replaced the thirty days)",
+  /Try the Plan free for 14 days/.test(settingsCopy) && !/Thirty days before you pay anything/.test(settingsCopy));
 
 // ── 5. And never against the statutory period ────────────────────────
 //

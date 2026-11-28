@@ -1,5 +1,11 @@
 /**
  * tools/verify-small-5.mjs
+ * 28 Nov 2026 v3
+ *
+ * v3 - Row 13a ACCOUNTS, S2. TEST 8 first lets TEST 2's finish (a navigation
+ *   it does not wait for) land: navigate() loads one more guard the first
+ *   time, so it landed in the middle of TEST 8. Same checks.
+ *
  * 17 Oct 2026 v2
  *
  * v2 - W6-9. 5a is on a phone that can vibrate (the practice now says it
@@ -155,6 +161,7 @@ ok("7a. the same plan from both doors", shape(fromBuilder) === shape(fromCoach),
 
 // ── 8. THE UPDATE CHECK-IN ──────────────────────────────────────────────
 console.log("\nTEST 8 - the update check-in starts from today's answers");
+await wait(600);   // v3: TEST 2's finish lands first
 person();
 const CK = await import(B + "data/checkin.js");
 CK.saveCheckin({ energy: 6, mood: 7 });

@@ -1,6 +1,11 @@
 /**
  * reflect.js - Reflect Screen
  *
+ * 28 Nov 2026 v24
+ *
+ * v24 - Row 13a ACCOUNTS, S2. Try the Plan on the finish starts the trial
+ *   through the account when there is one (tryThePlan). Off, as before.
+ *
  * 27 Nov 2026 v23
  *
  * v23 - Row 17 Try the Plan, S2 (mock-up v2 approved by Graeme 27 Nov). On
@@ -283,7 +288,8 @@ import { router }         from "../router.js";
 import { selectEmpathyPrompt, canEnterStage } from "../data/empathy-transfer.js";
 import { getTodaysCheckin, getHistory } from "../data/checkin.js";
 import { offerForFinish, finishBLine, openEpisodeNext } from "../data/in-step-offer.js";
-import { offerDue as trialOfferDue, markOffered as trialMarkOffered, startTrial } from "../data/plan-trial.js";
+import { offerDue as trialOfferDue, markOffered as trialMarkOffered } from "../data/plan-trial.js";
+import { tryThePlan } from "../data/account.js";
 import { playLine, lineAvailable } from "../coach-audio.js";
 // SHARED-1. The end-of-session moments, in the one place every session
 // view already routes to. See data/session-moments.js for why.
@@ -1171,7 +1177,7 @@ function saveAndSummarise({ toInStep = false, toTrial = false } = {}) {
   // P-28. Start on In Step's offer: saved above, then the episode. An
   // offered finish has no reflection prompt as well.
   // Row 17. Try the Plan: saved above, then the trial, then Start your Plan.
-  if (toTrial && _trial) { startTrial(); router.navigate("my-move"); return; }
+  if (toTrial && _trial) { tryThePlan().then(started => router.navigate(started ? "my-move" : "today")); return; }
   if (_trial) { router.navigate("today"); return; }
   if (toInStep && _offer) { openEpisodeNext(_offer.id, { low: _offer.low }); router.navigate("in-step"); return; }
   if (_offer) { router.navigate("today"); return; }
