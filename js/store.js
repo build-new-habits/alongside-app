@@ -1,5 +1,6 @@
 import { zonesForAreas } from "./data/aims.js";
 import { sanitizePlanTrial } from "./data/plan-trial-model.js";
+import { sanitizeAccount } from "./data/account-model.js";
 import { consentCovers } from "./data/health-consent-covers.js";
 import { RETIRED_CONDITIONS } from "./data/scope-statement.js";
 import { sanitizeWeekShape, sanitizeWeekDayRequest, sanitizeOnHome, sanitizeWeekChanges, sanitizeOnHomeDays, sanitizeOnHomeTurns, sanitizeDaySetChoices } from "./data/week-shape-model.js";
@@ -7,6 +8,13 @@ import { validateWeightTarget } from "./data/weight-targets.js";
 
 /**
  * store.js - Data persistence layer
+ * 28 Nov 2026 v142
+ *
+ * v142 - Row 13a ACCOUNTS, S1 (Schema v1.145). account: the email account
+ *   (email, userId, signedInAt, checkedAt, tier as paid, the server's trial,
+ *   and a code on its way), cleaned on load (data/account-model.js). The
+ *   sign-in tokens are not in the store: their own key, never downloaded.
+ *
  * 27 Nov 2026 v141
  *
  * v141 - Row 17 Try the Plan, S1 (Schema v1.144). planTrial: the 14-day
@@ -1877,6 +1885,7 @@ export const store = {
       onHomeTurns: {},
       daySetChoices: {},
       planTrial: {},
+      account: {},
       weekChanges: null,
 
       // D-7 PLAN-IMPORT. Which group of My exercises the player plays
@@ -1911,6 +1920,7 @@ export const store = {
       onHomeTurns: sanitizeOnHomeTurns(saved.onHomeTurns),
       daySetChoices: sanitizeDaySetChoices(saved.daySetChoices),
       planTrial: sanitizePlanTrial(saved.planTrial),
+      account: sanitizeAccount(saved.account),
       weekChanges: sanitizeWeekChanges(saved.weekChanges, sanitizeWeekShape(saved.weekShape)),
       // P-39 (v125). Made safe on every load.
       myMove: this.cleanMyMove(saved.myMove),
@@ -2667,6 +2677,9 @@ export const store = {
 
   getDefaults() {
     return {
+
+      // v142, row 13a: the email account (data/account-model.js), empty until signed in.
+      account: {},
 
       // ── ONBOARDING (top-level flags) ─────────────────────────
       onboardingComplete: false,

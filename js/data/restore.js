@@ -1,5 +1,12 @@
 /**
  * js/data/restore.js
+ * 28 Nov 2026 v8
+ *
+ * v8 - Row 13a ACCOUNTS, S1. The account is this phone's, like its agreements:
+ *   the file's `account` is ignored, this phone's kept; the sign-in tokens'
+ *   key (alongside-account-session) is never removed, written or read from a
+ *   file. Restore never signs anyone in.
+ *
  * 27 Oct 2026 v7
  *
  * v7 - STAGE PATH P-1 SCHEMA (store.js v118, Schema v1.116). The Plan's
@@ -92,9 +99,10 @@
 import { consentCovers } from "./health-consent-covers.js";
 import { store } from "../store.js";
 import { DISPLAY_KEYS } from "../display-prefs.js";
+import { SESSION_KEY } from "./account-model.js";
 
 // W4-3. Display settings are this phone's, like its agreements.
-const THIS_PHONE = new Set(Object.values(DISPLAY_KEYS));
+const THIS_PHONE = new Set([...Object.values(DISPLAY_KEYS), SESSION_KEY]);   // v8: and the sign-in tokens
 
 export const MAX_BYTES = 10 * 1024 * 1024;
 const ABOUT_PREFIX = "Everything Alongside: Move keeps about you";
@@ -200,6 +208,8 @@ export function applyRestore(data) {
   // W5-20. The file had the Plan and this phone does not: said, not implied.
   const planLeft = !!incoming.tier && incoming.tier !== "free" && picked.tier === "free";
   picked.messages = JSON.parse(JSON.stringify(here.messages || store.getDefaults().messages || {}));
+  // v8, row 13a: this phone's account, never the file's.
+  picked.account = JSON.parse(JSON.stringify(here.account || {}));
   const healthHere = consentCovers(picked.consent?.health);   // W4-26: the same test as everywhere
 
   // Rule 5: replace. Every other 'alongside' key goes first.

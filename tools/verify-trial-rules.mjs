@@ -1,5 +1,11 @@
 /**
  * tools/verify-trial-rules.mjs
+ * 28 Nov 2026 v2
+ *
+ * v2 - Row 13a ACCOUNTS, S1. 6a: app.js's account check may follow the trial's
+ *   on the same open (it does not hold up the first screen). 6b: account.js
+ *   may write planTrial too, mirroring the server's trial (verify-accounts-rules).
+ *
  * 27 Nov 2026 v1
  *
  * Row 17 / P-40, Try the Plan, S1 (spec docs/specs/alongside_plan-trial_
@@ -138,8 +144,8 @@ await block("TEST 5", async () => {
 await block("TEST 6", async () => {
   console.log("\nTEST 6 - The open");
   const app = read("js/app.js");
-  ok("6a. app.js checks the trial after the store loads and before the first screen", /store\.init\(\);\s*checkTrial\(\);[^\n]*\n\s*router\.init\(\);/.test(app));
-  ok("6b. plan-trial.js is the only writer of planTrial", fs.readdirSync(new URL("../js/", import.meta.url), { recursive: true }).filter(f => /\.js$/.test(f) && !/data\/plan-trial\.js$/.test(f)).every(f => !/store\.set\(\s*["']planTrial/.test(read("js/" + f))));
+  ok("6a. app.js checks the trial after the store loads and before the first screen", /store\.init\(\);\s*checkTrial\(\);[^\n]*\n(\s*checkAccount\(\)[^\n]*\n)?\s*router\.init\(\);/.test(app));
+  ok("6b. plan-trial.js is the only writer of planTrial (and, v2, account.js mirroring the server's)", fs.readdirSync(new URL("../js/", import.meta.url), { recursive: true }).filter(f => /\.js$/.test(f) && !/data\/(plan-trial|account)\.js$/.test(f)).every(f => !/store\.set\(\s*["']planTrial/.test(read("js/" + f))));
 });
 
 console.log(`\n${passes} passed, ${fails} failed`);

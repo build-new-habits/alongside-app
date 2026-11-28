@@ -1,5 +1,7 @@
 # Alongside — Data Schema Reference
-## 27 Nov 2026 v1.144
+## 28 Nov 2026 v1.145
+
+> **v1.145, 28 Nov 2026 — Row 13a, email accounts, S1** (`store.js` v142; `data/account-model.js` v1; spec `docs/specs/alongside_accounts_spec_28nov2026_v2.md`, mock-up v2 approved by Graeme 28 Nov). **One addition.** **`account`** `{ email, userId, signedInAt, checkedAt, tier, trial, pending }`, default `{}`: the person's email account. `email` the address they sign in with (lower case); `userId` the sign-in service's id (a uuid), only with an email; `signedInAt` and `checkedAt` ISO (this phone's sign-in; when it last heard from the server); `tier` `personal` only when the Plan is paid (row 14), else `free`; `trial` the server's trial `{ startedAt, endsOn, endedAt, endedHow }`; `pending` `{ email, sentAt, tries }` while a code is on its way (only before sign-in; tries 0–5). **Written only by** `data/account.js`. **On load** (`sanitizeAccount`): anything not of its type dropped; no `userId` without an email; nothing but `email` and `pending` without a `userId`. **Not in the store:** the sign-in tokens, in their own key `alongside-account-session` (`{ accessToken, refreshToken, expiresAt }`), never in Download your data, never taken from a file by Restore, cleared by Reset all data. While accounts are switched on and the person is signed in, `planTrial` and `tier` mirror the server's on each open (`checkAccount`); switched off (`data/account-config.js` empty), nothing changes. Restore keeps this phone's `account`. Gated by `tools/verify-accounts-rules.mjs`.
 
 > **v1.144, 27 Nov 2026 — Row 17, Try the Plan, S1** (`store.js` v141; `data/plan-trial-model.js` v1; spec `docs/specs/alongside_plan-trial_27nov2026_v1.md`). **One addition.** **`planTrial`** `{ startedAt, endsOn, noticedAt, endedAt, endedHow, offeredAt }`, default `{}`: the 14-day trial of the Plan, with no card, one per phone. `startedAt` ISO, set once by *Try the Plan*; `endsOn` the local day (`YYYY-MM-DD`) 14 days on; `noticedAt` when the one notice was shown; `endedAt` and `endedHow` (`ended`: it ran out; `stopped`: *Go back to Free now*); `offeredAt` when the offer last showed on a finish. **Written only by** `data/plan-trial.js`. **On load** (`sanitizePlanTrial`): anything not of its type dropped; a start needs its end day; `endedHow` is `ended` unless `stopped`. While a trial runs, `tier` is `personal`; when it ends, `free`, and nothing else is changed or deleted. Gated by `tools/verify-trial-rules.mjs`.
 
@@ -1133,7 +1135,7 @@
 
 ## 06 Sep 2026 v1.51
 
-**File:** `js/store.js` (confirmed live version: **v141, 27 Nov 2026**)
+**File:** `js/store.js` (confirmed live version: **v142, 28 Nov 2026**)
 
 > **v1.47, 06 Sep 2026 — CR-1.** `conditions[]` gains three ids and loses one. `chronic-fatigue` is **retired**; `persistent-fatigue`, `me-cfs` and `long-covid` replace it. No field shape changed — `conditions` is still `string[]` and `conditionMeta` is still keyed by condition id.
 >

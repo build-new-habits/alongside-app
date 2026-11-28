@@ -1,5 +1,14 @@
 /**
  * tools/verify-outbound.mjs
+ * 28 Nov 2026 v7
+ *
+ * v7 - Row 13a ACCOUNTS, S1. A third file may send: js/data/account-client.js,
+ *   only inside call(), only while the account service is set (a Supabase
+ *   https address and key), only to its listed /auth/v1/ and /rest/v1/
+ *   addresses, with no cookies or referrer, refusing any body field it may
+ *   not send; and the account service starts empty (4h-4k). What it sends is
+ *   driven in verify-accounts-rules.
+ *
  * 24 Nov 2026 v6
  *
  * v6 - P-45 THE LIVE LINK. A second, and only other, file may send:
@@ -173,6 +182,14 @@ const rpcBody = ll.slice(ll.indexOf("async function rpc("), ll.indexOf("return {
 ok("4e. live-link.js: only inside rpc(), and only while the relay is set", (ll.match(/method:\s*"POST"/g) || []).length === 1 && /method: "POST"/.test(rpcBody) && /if \(!on\) throw/.test(rpcBody));
 ok("4f. ... only to a Supabase https address's RPC, with no cookies or referrer", /const on = \/\^https:\\\/\\\/\[a-z0-9-\]\+\\\.supabase\\\.co\$\//.test(ll) && /\$\{url\}\/rest\/v1\/rpc\/\$\{name\}/.test(rpcBody) && /credentials: "omit"/.test(rpcBody) && /referrerPolicy: "no-referrer"/.test(rpcBody));
 ok("4g. the relay starts empty: nothing is sent until it is set", /export const RELAY = Object\.freeze\(\{ url: "", anonKey: "" \}\);/.test(read("js/data/relay-config.js")));
+const acRaw = read("js/data/account-client.js").replace(/\/\*[\s\S]*?\*\//g, "");
+const callBody = acRaw.slice(acRaw.indexOf("async function call("), acRaw.indexOf("return {", acRaw.indexOf("async function call(")));
+ok("4h. account-client.js: one fetch, only inside call(), only while set up", (acRaw.match(/fetchImpl\(/g) || []).length === 1 && /fetchImpl\(/.test(callBody) && /if \(!on\) throw/.test(callBody));
+ok("4i. ... only to a Supabase https address, to the listed addresses only", /const on = \/\^https:\\\/\\\/\[a-z0-9-\]\+\\\.supabase\\\.co\$\//.test(acRaw) && /if \(!PATHS\.has\(path\.split\("\?"\)\[0\]\)\) throw/.test(callBody) && /const PATHS = new Set\(\[\s*"\/auth\/v1\/otp"/.test(acRaw));
+ok("4j. ... with no cookies or referrer, and never a body field it may not send", /credentials: "omit"/.test(callBody) && /referrerPolicy: "no-referrer"/.test(callBody) && /!BODY_KEYS\.has\(k\)\)\) throw/.test(callBody));
+ok("4k. the account service starts empty: nothing is sent until it is set", /export const ACCOUNTS = Object\.freeze\(\{ url: "", anonKey: "" \}\);/.test(read("js/data/account-config.js")));
+const fetchFiles = js.filter(p => /fetch(Impl)?\(/.test(read(p).replace(/\/\*[\s\S]*?\*\//g, "").split("\n").filter(l => !/^\s*\/\//.test(l)).join("\n")) && /data\/account/.test(p));
+ok("4l. of the account files, only account-client.js calls the web", fetchFiles.length === 1 && /account-client\.js$/.test(fetchFiles[0]), fetchFiles.join(", "));
 
 console.log(`\n${passes} passed, ${fails} failed`);
 process.exit(fails ? 1 : 0);
