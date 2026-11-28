@@ -111,6 +111,9 @@ await block("1", async () => {
   ok("1g. the email step is full screen: no bar, no house", document.getElementById("bottom-nav").classList.contains("hidden"));
   const src = read("js/router.js");
   const iCV = src.indexOf("this._cv.guardRoute(viewName)"), iAC = src.indexOf("this._acc.guardRoute(viewName)"), iAge = src.indexOf("this._ac.guardRoute(viewName)");
+  person(); A._configureForTest(null, null);
+  ok("1i. off: the email step itself sends you on", (await go("account")) === "today");
+  A._configureForTest(CONFIG, server().fetch);
   ok("1h. in the router: age, then agreement, then the account", iAge > 0 && iCV > iAge && iAC > iCV);
 });
 

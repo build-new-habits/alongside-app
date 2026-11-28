@@ -100,7 +100,7 @@ async function accessToken(now = new Date()) {
 const OPEN = new Set(["account", "account-link", "age-check", "under-18", "privacy", "help", "settings", "consent-update", "onboarding/thread"]);
 let _pending = null;
 export function guardRoute(route) {
-  if (!needsAccount()) return null;
+  if (!needsAccount()) return route === "account" ? "today" : null;   // nobody is kept on the email step who doesn't need it
   const c = store.get("consent") || {};
   if (c.given !== true || c.ageConfirmed !== true) return null;   // the age and agreement guards come first
   if (OPEN.has(route)) return null;
